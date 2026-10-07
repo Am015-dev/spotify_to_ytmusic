@@ -207,6 +207,58 @@ Add it to a game (about an hour):
    function, why <= 15 words, rules 2-4 cards <= 20 words with a picture; tips-off game shows nothing) and the bubble geometry check in `checks()`.
 Pilot: Thornbound (`thornbound/game/src/ui11.js`).
 
+## 10. Tutorial kit (`gx-tutor.js` + `gx-tutor.css`): a staged game that teaches every rule by doing it once
+One staged game per game, ~12-20 steps, 3-6 minutes: each step spotlights ONE thing (everything else is dimmed and eats taps), a bubble with an arrow says
+one short thing, and the step moves on only when the player does exactly that. Reuses the help kit's bubble look (`gx-help.css`), so load both css files.
+Needs `gx-viewport.js` (bubbles are re-placed after a rotation through `GXV.watch`). Everything the kit draws has `data-help`.
+
+```js
+GXT.start({ game: 'slug',
+  setup: () => { /* build the FIXED staged game: seed, deck, dice, hands; start it behind the kit */ },
+  steps: [ { id: 'bid1', title: 'Bid in secret',                   // title <= 4 words (optional)
+             say: 'Tap your 5 to pick it.',                        // <= 20 words, or () => string for numbers read from the engine
+             target: () => el | {left,top,width,height} | {x,y},   // the spotlight (a function: it is re-read on every relayout and every 100 ms)
+             also: () => el | [el],                                // more spotlights that stay live (e.g. the card to drag)
+             wait: { type: 'tap'|'drag'|'event', match: a => bool, times: 2 } | null,   // null = a "Next" button; times = taps needed (default 1)
+             from: () => el,                                       // drag steps: where the ghost finger starts
+             ready: () => bool,                                    // the game has reached this state (default: the target exists); polled, the step waits (never guess with timers)
+             onEnter: () => {}, onNext: () => {}, ai: () => void | Promise,   // scripted computer move; onNext = what Next does (e.g. close the event card)
+             side: 'top'|'bottom', wrong: 'Tap the glowing one.', pending: 'Watch the board' } ],
+  onDone: ({choice}) => {},     // choice 'play' | 'story' from the end card ("You know the rules": Play a real game / Story mode)
+  onExit: () => {},             // Skip tutorial
+  story: true, endTitle, endText });
+GXT.act({type:'tap'|'drag'|'event', ...game fields})   // returns true = go on, false = not what this step asks (ignore the action)
+GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.lint(steps)
+GXT.menuHTML({game, first: isFirstVisit, cls: 'btn', launch: startTutorial})   // the menu entry, see below
+GXT.status(game) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
+```
+How a step runs: the game reaches the state (`ready()`), the rects settle for ~200 ms, then the spotlight appears (cells around the hole eat taps; a tap there shakes the
+bubble and shows "Tap the glowing one."), the ghost finger shows the tap (or the drag from `from`), the bubble sits where it covers no spotlight. The game's input
+handlers call `GXT.act(action)` BEFORE applying the action and stop when it returns false; `match(action)` says whether it is the asked action. Between steps a
+transparent shield blocks input while the game moves on (a "Watch the board" pill after ~1 s). Top strip: progress dots with "n/N" and "Skip tutorial".
+Rotation: re-placed through `GXV.watch`; spotlight geometry is re-read, so a target that moves (hand re-fan, map relayout) is followed.
+- Pause long events for a Next step in the game, not in the kit: a card that auto-advances (clash result, round summary, bid reveal) must not advance while the
+  current step holds it. Give such steps a `hold: c => bool` of your own and check `GXT.current().hold` when the auto-advance timer FIRES (not when it starts).
+  `onNext` then closes the card.
+- Programmatic moves of the game (skipping a season with nothing to use) must not go through `GXT.act`: set a flag around them.
+- A tap is often two actions (select a card, then a region). Teach the first pair as two steps, then pre-select the card in `ready()` so later steps need one tap.
+- A hand of overlapping cards: aim the spotlight at the card's visible strip, or the tap lands on the neighbour.
+- Progress is `localStorage['gxt-<game>']` = `{done, open, step}`. Done -> the menu shows "Tutorial ✓". A reload mid-way -> the menu entry opens "Restart or Exit".
+- Do not save the staged game as a normal game, and keep the game's own help bubbles/bulb quiet while `GXT.active()` (the help kit checks `tutOn()` in Thornbound).
+Menu helper (put it in the title menu, the setup screen and the in-game menu; it is a `<button data-gxt-open>` with `<b>` + `<span>`, click handled by the kit):
+first visit -> "New here? Learn in 5 minutes" as the FIRST option; afterwards "Tutorial"; when done "Tutorial ✓"; half done "Tutorial (continue?)".
+Pass `first` yourself (`firstTime()`), `launch` = the function that calls `GXT.start`.
+
+Add a tutorial to a game (about two hours):
+1. `build.py`: `SRC['gx-tutor.js']` from `shell/`, inline `gx-tutor.css` after `gx-help.css`, `<script src="gx-tutor.js"></script>` after `gx-help.js`. Needs gx-viewport and gx-help.
+2. Add a staged mode to the game (fixed seed, scripted computer, usually ONE round or one short scenario: add a 1-round length to the engine if it has none) that is never saved.
+3. Write `tutor.js`: `tutSteps()` in the order the rules come up (goal and board, then each phase once: choose, reveal, place, special piece, conflict, scoring, end), a scripted computer (override the AI
+   pick for the seat in this mode), `tutStart()` = `GXT.start({...})`, wrappers around the game's input functions that call `GXT.act`, hold hooks for auto-advancing cards, `tutOn()`.
+4. Menu: `GXT.menuHTML` in the title (first option on a first visit), setup and in-game menu. Replace any old guided-first-game button and coach pop-ups.
+5. `tutor-test.js` (copy `thornbound/game/tutor-test.js`): does exactly what each step asks at 390x763 and 375x553 (+ a rotation and a leave-and-return run), checks short text, spotlight visible and not covered,
+   bubble inside the screen and off the spotlight, wrong taps do not advance and shake the bubble, the end card, "Tutorial ✓", no page errors, nothing stuck > 8 s. LOOK at the screenshots.
+Pilot: Thornbound (`thornbound/game/src/ui12.js`, 19 steps, ~5 minutes).
+
 ## Checklist per game
 1. build.py + head + body (section 0).
 2. `GX.settings({...})` replaces the old menu; delete Speed tool buttons; `AIDELAY = GX.aiDelay(base)`.

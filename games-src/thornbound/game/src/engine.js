@@ -11,7 +11,7 @@
 const TB=g.TB=g.TB||{};const D=TB.DATA;
 let G=null;
 const COUNCILS=D.COUNCILS,NLOC=6,NREG=3;
-const LEN={short:4,standard:5,extended:6};
+const LEN={short:4,standard:5,extended:6,tutorial:1};   // 'tutorial' = one round, used only by the staged tutorial game
 // ---------------------------------------------------------------- rng
 function rnd(n){let t=(G.rng=(G.rng+0x6D2B79F5)|0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);const x=a[i];a[i]=a[j];a[j]=x}return a}

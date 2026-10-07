@@ -70,7 +70,7 @@ const PAGE_LIB = `(() => {
         if (e.tagName === 'CANVAS') continue;
         if (cx < 0 || cy < 0 || cx > W || cy > H) continue;
         const t = document.elementFromPoint(cx, cy);
-        if (t && t !== e && !e.contains(t) && !t.contains(e) && !modalCover(t) && !ghost(t)) covered.push(n + ' <- ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + (t.className && t.className.baseVal === undefined ? '.' + String(t.className).split(' ')[0] : '')));
+        if (t && t !== e && !e.contains(t) && !t.contains(e) && !modalCover(t) && !ghost(t) && !(t.closest && t.closest('[data-help]'))) covered.push(n + ' <- ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + (t.className && t.className.baseVal === undefined ? '.' + String(t.className).split(' ')[0] : '')));
       }
       // wordy: any visible text block over 8 words during play (advice cards, tips, coach panels)
       const wordy = [];

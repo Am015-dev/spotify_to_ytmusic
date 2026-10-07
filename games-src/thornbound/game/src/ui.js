@@ -125,6 +125,7 @@ function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   return seats}
 function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDone=false;
   const cfg={mode:mode==='ai'?'watch':mode,np:o.np||(mode==='guided'?2:3),length:o.length||(mode==='guided'?'short':'standard'),faction:o.faction||'nobility',levels:o.levels||[],seed:o.seed,humanSeats:o.humanSeats,guide:o.guide};
+  if(mode==='tutorial'){cfg.mode='me';cfg.guided=true;cfg.tutorial=true;cfg.guide='off';cfg.levels=['easy','easy'];cfg.np=2;cfg.length='tutorial';cfg.faction=GUIDED.faction;cfg.seed=GUIDED.seed;o.seatFactions=[GUIDED.faction,GUIDED.rival];UI.aiSeed=GUIDED.ai}
   if(mode==='guided'){cfg.mode='me';cfg.guided=true;cfg.guide='full';cfg.levels=['easy','easy'];cfg.np=2;cfg.length='short';cfg.faction=GUIDED.faction;cfg.seed=GUIDED.seed;o.seatFactions=[GUIDED.faction,GUIDED.rival];UI.aiSeed=GUIDED.ai}
   const seats=mkSeats(cfg);
   const hn=cfg.mode==='hot'?(cfg.humanSeats||seats.map((_,i)=>i)):cfg.mode==='watch'?[]:[0];
@@ -138,8 +139,8 @@ function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDon
   G=g;if(UI.camp&&typeof campApply==='function')campApply(UI.camp);resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
   UI.rs0=snapInf();UI.rsLog=0;
   try{localStorage.setItem('tb_played','1')}catch(e){}saveGame();hideStart();afterStart();return G}
-function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.coachInfo=null;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
-function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
+function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
+function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp||UI.cfg.tutorial)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
 function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;return G}
@@ -658,7 +659,7 @@ function popKingdom(){const V=UI.V;let h='';
 // ---------------------------------------------------------------- the one card (events, pass the device, coach tips, game over)
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;if(ev.t==='news')return wantNews();return false}
 function showEvent(ev){if(ev.t==='news'){showNews(ev);return}UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
-function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
+function showOver(){if(UI.cfg&&UI.cfg.tutorial)return;if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
@@ -759,12 +760,11 @@ document.addEventListener('click',e=>{
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
-   case 'coachok':coachOk();break;
    case 'gloss':showGloss(t.dataset.t);break;
    case 'gclose':hideGloss();break;
    case 'nowlog':GX.show('logd');break;
    case 'title':UI.sv='title';renderStart();break;
-   case 'story':if(typeof GXC!=='undefined')GXC.open();break;
+   case 'story':storyOpen();break;
    case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
    case 'online':UI.sv='online';UI.onl=true;renderStart();break;
    case 'cfgopen':UI.cfgOpen=true;renderStart();break;
@@ -798,7 +798,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){c
 function toast(t){UI.toast=t;const l=$('#live');if(l)l.textContent=t}
 // start screens (title, setup, online): see part 7
 function startFromCfg(c){hideStart();const o={np:c.np,length:c.length,faction:c.faction,levels:c.levels,guide:c.guide,seatFactions:c.seats.map(s=>s.faction),humanSeats:c.humanSeats};
-  if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
+  if(c.tutorial&&typeof tutStart==='function')tutStart();else if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
 function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pump()}
 // ---------------------------------------------------------------- drawers
 function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small">Newest first. Tap an underlined word for its meaning. <button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
@@ -807,7 +807,7 @@ function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slic
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
-   '<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
+   (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
@@ -926,7 +926,7 @@ function aiFallback(s,q,mv){const N=G.pl[s].name;const k=q.kind;
   if(q.t==='menu'&&mv.t==='done')return null;   // trivia: not narrated
   if(k==='edict')return mv.yes?N+' plays a Tactic.':null;if(k==='statue'||k==='harvest')return N+' decides about a card.';
   return null}
-function renderNow(){const el=$('#now');if(!el||!G)return;if(UI.coachInfo){el.innerHTML='';return}
+function renderNow(){const el=$('#now');if(!el||!G)return;
   let t=null,s=-1;const f=UI.nowT;const last=G.log[G.log.length-1];
   if(f&&f.at===G.logN){t=f.t;s=f.s}else if(last){t=last.t;s=last.s}
   if(!t){el.innerHTML='';return}
@@ -1018,25 +1018,16 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.datas
 // Cairn Field and win there with your Heir and two Supporters: the +2, the Herald's +1 and the steal all happen in round 1.
 const GUIDED={seed:23,lastNormal:0,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
-const COACH_INFO=[
- {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Win by having the most Influence when round '+G.rounds+' ends. Influence is the score: the bar at the bottom shows you and the Gilded Court, both at 0.',hl:'#rivals'},
- {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The Map button at the top makes the map bigger.',locs:[0,1,2,3,4,5]},
- {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, six steps',text:()=>'1 Bid a card for a Kingdom Card. 2 Take your Kingdom Card. 3 Place your Herald. 4 Hide one card at each region. 5 Send Supporters. 6 The three Clashes. Round 1 is only this; new powers come in rounds 2 and 3. Tap the glowing button each time.',btn:'Let\'s start'},
- {id:'own',when:()=>G.round===2&&G.q,title:'Round 2: two new things',text:()=>'Card abilities: some of your cards can Flank, Ambush, Retreat or Rally (the card says when). Autumn: after the Clashes you may send a card on a Journey for Lore, and Lore buys stronger cards. The ★ suggestion still shows a good move and why.',btn:'Play on'},
- {id:'r3',when:()=>G.round===3&&G.q,title:'Round 3: the full game',text:()=>'Now everything is in play: your faction\'s Tactics, the Kingdom\'s Favour, and Govern (a card with votes goes into a Council for a lasting power). Each one is explained the first time you can use it.',btn:'Play on'}];
-function coachGate(){if(!G||!G.q||UI.coachInfo)return !!UI.coachInfo;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
-  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(st){UI.coachDone[st.id]=1}
+// the old coach pop-ups (goal / map / round) are replaced by the staged tutorial (part 12, shell/gx-tutor.js)
+function coachGate(){if(!G||!G.q)return false;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
   // the guided game skips a season for you when nothing you have learnt yet can be used in it
-  const s=viewSeatForQ();if(s!=null&&G.q.t==='menu'&&G.round<3&&menuPhase(G.q)!=='Day'){const mv=legal(s);if(!visibleActs(mv).some(m=>m.t==='act')){const d=mv.find(m=>m.t==='done');if(d){if(!UI._skipT)UI._skipT=setTimeout(()=>{UI._skipT=0;humanMove(d.k)},0);return true}}}
+  const s=viewSeatForQ();if(s!=null&&G.q.t==='menu'&&G.round<3&&menuPhase(G.q)!=='Day'){const mv=legal(s);if(!visibleActs(mv).some(m=>m.t==='act')){const d=mv.find(m=>m.t==='done');if(d){if(!UI._skipT)UI._skipT=setTimeout(()=>{UI._skipT=0;humanMoveAuto(d.k)},0);return true}}}
   return false}
-function coachOk(){const c=UI.coachInfo;if(!c)return;UI.coachDone=UI.coachDone||{};UI.coachDone[c.id]=1;UI.coachInfo=null;$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));saveGame();pump()}
-function coachInfoHTML(c){setTimeout(()=>{$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));if(c.hl){const e=$(c.hl);if(e)e.classList.add('coachhl')}},0);
-  const n=COACH_INFO.findIndex(x=>x.id===c.id);return '<div class="step"><h3 class="st">'+esc(c.title)+'</h3><p class="coach info">'+gloss(c.text)+'</p>'+(n>=0&&n<3?'<p class="hint">'+(n+1)+' of 3 before you play</p>':'')+'</div>'}
 const menuPhase=q=>((q.title||'').match(/(Spring|Day|Autumn)/)||[])[1]||'';
 const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
 const BONUSK=['castle','wilderness','harvest','shrine','ossuary'];
 // teaching moves for round 1 (falls back to the normal suggestion when the scripted card is not there)
-function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
+function coachRec(s,mv){if(!isGuided()||!G.q)return null;if(UI.cfg.tutorial){const tr=tutRec(s,mv);if(tr!==undefined)return tr}const q=G.q,k=q.kind;
   if(G.round===1){
     if(k==='bid')return byLabel(mv,'Sailing Hall');
     if(k==='bidRes'){const takes=mv.filter(m=>m.t==='take');const pref=[11,13,17,5,46,51,14,39];for(const n of pref){const m=takes.find(x=>x.kc===n);if(m)return m}
@@ -1057,7 +1048,7 @@ const NEWK={cmd:['Card abilities','Some of your cards have a power printed on th
   council:['Councils','Your cards in a Council give you a power. Why you\'d want it: it works every round while the cards stay there.'],
   kc:['Kingdom Card powers','Some Kingdom Cards and HQ cards have a power you choose when to use. Why you\'d want it: each row says what it costs and what it gives.']};
 // the coach line that replaces the prompt in round 1 (and the first time something new appears later)
-function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
+function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q||UI.cfg.tutorial)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
   const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
   if(R===1){
     if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first, and your bid card is tucked under it.'+(rm?' '+nm(rm.id)+' is a fair bid that keeps your big cards for the Clashes.':'')};
@@ -1123,7 +1114,7 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
   if(view==='title'){const sav=hasSave();
     el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><p class="tag goal">Win by holding the most Influence when the last round ends.</p><div class="tmid"></div><div class="tbtns">'+
-      (window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn go story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'?'':' go')+'" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
+      (firstTime()?tutBtn('tbtn go'):'')+(window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn'+(firstTime()?'':' go')+' story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'||firstTime()?'':' go')+'" data-a="play"><b>Play</b><span>against the computer</span></button>'+(firstTime()?'':tutBtn('tbtn'))+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
       '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
@@ -1142,8 +1133,8 @@ function optionsHTML(ONL,plan){return '<div class="opts2">'+(ONL?'':'<div class=
   '<div class="row"><span>Tips</span><div class="seg">'+[['full','Full'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+seatRows(ONL,plan)+'</div>'}
 function sumLine(){const n=sv.np-1,R=({short:4,standard:5,extended:6}[sv.length]);return 'You lead <b>'+esc(DD.FSHORT[sv.faction])+'</b> against '+n+' computer'+(n>1?'s':'')+' · most Influence after round '+R+' wins'}
 function setupHTML(){const ph=UI.phone;const k=TBKit.FACTIONS[FK[sv.faction]];
-  const guide='<div class="guidebox"><p><b>First time?</b> The <b>Guided first game</b> teaches one step at a time: Heathbound Clans against one computer (Easy, for learning), 4 rounds, about 15 minutes. <b>Start the game</b> is a normal game with the settings below.</p></div>';
-  const ft=firstTime();const gbtn='<button class="sbtn'+(ft?' big':'')+'" data-a="guided" data-start="guided"><b>'+(ft?'Guided first game':'Guided game')+'</b><span>'+(ft?'recommended: learn one step at a time':'learn step by step')+'</span></button>';
+  const guide='';
+  const ft=firstTime();const gbtn=tutBtn('sbtn'+(ft?' big':''));
   const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+esc(DD.FSHORT[sv.faction])+' vs '+(sv.np-1)+' computer'+(sv.np>2?'s':'')+' ('+sv.levels.slice(1,sv.np).map(l=>l==='easy'?'Easy':l==='hard'?'Hard':'Normal').filter((x,i,a)=>a.indexOf(x)===i).join('/')+') · '+({short:4,standard:5,extended:6}[sv.length])+' rounds</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
     '<button class="sbtn" data-a="mode" data-v="hot" data-go="1" data-start="hot"><b>Hot-seat</b><span>'+sv.np+' people, one device</span></button>'+
     '<button class="sbtn" data-a="mode" data-v="watch" data-go="1" data-start="watch"><b>Watch</b><span>the computers play</span></button></div></div>';
@@ -1205,7 +1196,7 @@ function showNews(first){const items=[first];if(first.big&&infK(first)){while(UI
   if(!first.big){while(UI.evq.length&&items.length<4){const n=UI.evq[0];if(n.t!=='news'||n.big)break;items.push(UI.evq.shift())}}
   const c={kind:'news',items,big:first.big,id:(UI._nid=(UI._nid||0)+1)};UI.card=c;
   const dur=newsDur(c);
-  clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c){UI.card=null;pump()}},dur)}
+  clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c))){UI.card=null;pump()}},dur)}
 // how long a news card stays: short for plain computer moves, longer when it changes Influence or your Clash (a tap always skips)
 function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4));if(c.big)return 1800/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1300:600,500+300*c.items.length)/sp}
 function newsOk(){const c=UI.card;if(!c||c.kind!=='news')return;clearTimeout(UI._nt);UI.card=null;
@@ -1325,7 +1316,7 @@ function campOver(){if(!UI.camp||UI.campDone||typeof GXC==='undefined'||!GXC.act
   setTimeout(()=>{if(G===g&&GXC.active()){try{clearSave()}catch(e){}GXC.finish(g)}},window.CAMP_WAIT!=null?window.CAMP_WAIT:2200)}
 function campLine(){try{const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'chapters, bosses, three acts'}catch(e){return 'chapters, bosses, three acts'}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'thornbound',data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'thornbound',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
     onExit(){showStart()},scores:g=>g.pl.map(p=>p.inf),seats:g=>g.pl.map((p,i)=>({name:p.name,me:i===0,ai:i?p.ai:undefined}))})}
 campInit();
 // ===================== part 10: board-first play =====================
@@ -1425,7 +1416,7 @@ function bfSlot(r,s,old,nw){if(!ANIM||UI.noAnim||!nw||!nw.faceDown||(old&&old.co
 function evDone(){const c=UI.card;if(!c||c.kind!=='event')return;clearTimeout(UI._evT);UI.card=null;UI._cardKey=null;UI.noAnim=false;UI._cp=null;UI._clashLine='';UI.mapReset=false;MAP.slotDirty=true;pump()}
 function bfSkip(){const c=UI.card;if(!c)return false;if(c.kind==='event'){evDone();return true}if(c.kind==='news'){newsOk();return true}return false}
 const spd=()=>Math.max(1,Math.min(UI.speed||1,4));
-function bfAuto(c,ms){clearTimeout(UI._evT);UI._evT=setTimeout(()=>{if(UI.card===c)evDone()},ANIM?ms/spd():0)}
+function bfAuto(c,ms){clearTimeout(UI._evT);UI._evT=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c)))evDone()},ANIM?ms/spd():0)}
 function bfEvent(c){const ev=c.ev;if(ev.t==='bids')bfBids(c);else if(ev.t==='clash')bfClash(c);else if(ev.t==='summary')bfSummary(c);else bfAuto(c,300)}
 function bfBids(c){const ev=c.ev;c.rank=ev.bids.slice().sort((a,b)=>a.str-b.str||ev.order.indexOf(b.seat)-ev.order.indexOf(a.seat)).map(b=>b.seat);c.revN=0;
   const step=()=>{if(UI.card!==c)return;if(c.revN<c.rank.length){c.revN++;if(typeof sfx==='function')sfx('flip');renderRivals();setTimeout(step,ANIM?420/spd():0)}else bfAuto(c,1100)};
@@ -1514,7 +1505,7 @@ function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
     default:{to=T(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
   }}catch(e){return null}
   return to?{from,to,fromR,toR,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
-function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey()))return null;return planFor(M,rm)}
+function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey())||(typeof tutOn==='function'&&tutOn()))return null;return planFor(M,rm)}
 function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?fingerPlan():null;
   if(!p){if(!f.hidden){f.hidden=true;try{f._a&&f._a.cancel()}catch(e){}f._k=''}return}
   if(f._k===p.key&&!f.hidden)return;f._k=p.key;f.hidden=false;try{f._a&&f._a.cancel()}catch(e){}
@@ -1525,7 +1516,9 @@ function bfAfter(){bfFinger();if(typeof hlpAfter==='function')hlpAfter()}
 // the computer acts at a watchable pace (about 0.6 s per move; tap to skip narration)
 function autoSkip(h){if(NET.on||hotSeat()||!G||!G.q||G.q.t!=='menu')return false;
   const mv=legal(h);const acts=visibleActs(mv).filter(m=>m.t==='act');const d=mv.find(m=>m.t==='done');if(!d||acts.length)return false;
-  return humanMove(d.k)}
+  return humanMoveAuto(d.k)}
+// a move the game makes for you (a season with nothing to use): not a tap, so the tutorial does not gate it
+function humanMoveAuto(k){UI._tutIn=1;try{return humanMove(k)}finally{UI._tutIn=0}}
 // ===================== part 11: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
 // Bubbles: once per phase, short, pointing at the board. The bulb: the advisor's own move (UI.bf.sug, the same one the glowing suggestion uses) + a short why + rules cards.
 // ---------------------------------------------------------------- pictures for the rules cards (inline SVG in the game's colours)
@@ -1556,7 +1549,7 @@ const HLP_STEPS={
  occupier:{target:hfirst('#handw'),title:'Tuck a card under',text:'Pick the hand card that sits under your new Kingdom Card. It cannot fight.',pic:()=>HP.back()},
  herald:{target:hfirst('.tb-loc.glow.rec .tb-ring','.tb-loc.glow .tb-ring'),title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that region.',pic:()=>HP.herald()},
  place:{target:hq('#handw'),title:'Hide a card',text:'Tap a card, then tap a region. It stays hidden until the Clash.',pic:()=>HP.region()},
- tie:{target:hfirst('#handw','#act .btn'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
+ tie:{target:hfirst('#act .btn','#handw'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
  spring:{target:hfirst('.tbx-pan g.rglow rect','#act .btn'),title:'Send Supporters',text:'Tap a region to send a Supporter: +1 Strength in its first Clash. Then tap Done.',pic:()=>HP.supp()},
  day:{target:hfirst('#act .btn.pri','#act .btn'),title:'The Clash',text:'The cards are face up. Highest total Strength wins. Tap Done to fight.',pic:()=>HP.swords()},
  autumn:{target:hfirst('#act [data-a=powers]','#act .btn.pri','#act .btn'),title:'Autumn options',text:'Optional: Govern or Journey with a card. Tap Powers to look, or Done to skip.',pic:()=>HP.scroll()},
@@ -1643,5 +1636,125 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.coachInfo||UI.dragging||(st&&!st.hidden)||isPassing();
+  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
   GXH.phase(busy?null:hlpPhase())}
+// ===================== part 12: the tutorial (shell/gx-tutor.js): a staged one-round game that teaches every rule by doing it once =====================
+// The staged game is the guided deal (seed 23, you lead the Heathbound Clans against the Gilded Court on Easy) cut to ONE round (engine length 'tutorial').
+// The computer is scripted by the fixed seed plus the teaching moves below (tutRec): the same cards every time, so each rule appears on cue.
+// Each step spotlights one thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act).
+const TUT_GAME='thornbound';
+const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(UI.cfg&&UI.cfg.tutorial);
+const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart});
+// ---------------------------------------------------------------- the script: which card, which region (hand ids are fixed by the seed; names are checked)
+const tutHand=()=>G.pl[0].hand.slice();
+const tutHeir=()=>tutHand().find(id=>cinfo(id).archetype==='heir');
+const tutBidId=()=>{const h=tutHand();return h.find(id=>/Sailing Hall/.test(cinfo(id).name))||h.slice().sort((a,b)=>cinfo(a).strength-cinfo(b).strength).find(id=>cinfo(id).strength>=3&&cinfo(id).archetype!=='heir')};
+const tutPlaced=()=>{try{return UI.V.reg.reduce((a,R)=>a+R.down.filter(id=>id>=0&&ownerOf(id)===0).length,0)}catch(e){return 0}};
+// the next hidden card (the engine takes the regions in order: Uplands, Tablelands, Sinks): the strongest ordinary card, then the Heir where both Heralds wait, then the next strongest
+function tutPlace(){const n=tutPlaced(),left=tutHand(),heir=tutHeir();
+  if(n===1)return heir!=null&&left.includes(heir)?[heir,1]:null;
+  const h=left.filter(id=>id!==heir).sort((a,b)=>cinfo(b).strength-cinfo(a).strength);return h.length?[h[0],n]:null}
+function tutRec(s,mv){const q=G.q,k=q.kind;
+  if(k==='bid'){const id=tutBidId();return mv.find(m=>m.id===id)||undefined}
+  if(k==='place'){const p=tutPlace();if(!p)return undefined;return mv.find(m=>m.id===p[0]&&m.r===p[1])||mv.find(m=>m.id===p[0])||undefined}
+  if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'){if(G.pl[s].supp.r[1]<2){const m=mv.find(x=>x.a==='supp'&&x.p&&x.p.r===1&&x.p.n===1);if(m)return m}return mv.find(m=>m.t==='done')||undefined}return undefined}
+  if(k==='clashOrder'){const m=mv.find(x=>x.order&&x.order.join()==='0,1,2');return m||undefined}
+  return undefined}
+// ---------------------------------------------------------------- the Court is scripted too (the cards are fixed by the seed): it takes Cairn Field, wins the Uplands and the Sinks, and
+// leaves the Tablelands (where your Herald and Supporters are) to you. Everything else it plays by the normal Easy AI.
+function tutAI(seat){if(!(UI.cfg&&UI.cfg.tutorial)||!G||!G.q||seat!==1||G.round!==1)return null;const k=G.q.kind,mv=legal(seat);
+  if(k==='herald')return mv.find(m=>m.loc===3)||null;
+  if(k==='place'){const n=G.reg.reduce((a,R)=>a+R.down.filter(id=>id>=0&&Math.floor(id/100)===1).length,0);const want=[112,110,113][n];
+    return mv.find(m=>m.id===want&&m.r===n)||null}
+  if(G.q.t==='menu'&&menuPhase(G.q)==='Spring'){if(G.pl[1].supp.r[1]<2){const m=mv.find(x=>x.a==='supp'&&x.p&&x.p.r===1&&x.p.n===1);if(m)return m}return mv.find(m=>m.t==='done')||null}
+  return null}
+(function(){const o=aiChoose;aiChoose=function(seat,level){const m=tutAI(seat);return m||o(seat,level)}})();
+// ---------------------------------------------------------------- where each step points
+const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
+const tkind=k=>!!(UI.bf&&UI.bf.kind===k&&!UI.card&&!UI.pop);
+const tfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
+// a hand card's visible strip (the next card overlaps its right side), so the tap lands on that card
+function tutHandRect(id){const e=document.querySelector('#handw .hc[data-id="'+id+'"]');if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;let right=r.right;
+  if(!e.classList.contains('on')){const nx=e.nextElementSibling;if(nx&&nx.classList.contains('hc')){const q=nx.getBoundingClientRect();if(q.left>r.left+8)right=Math.min(right,q.left)}}
+  return {left:r.left,top:r.top,width:Math.max(24,right-r.left),height:r.height}}
+const tutReg=r=>()=>{try{return MAP.m?regionRect(r):null}catch(e){return null}};
+function tutLoc(){const e=document.querySelector('.tb-loc.glow.rec .tb-ring')||document.querySelector('.tb-loc.glow .tb-ring');return e&&e.getBoundingClientRect().width?e:null}
+// keep a hand card lifted for the "just tap the region" steps
+function tutSelect(id){if(UI.hand===id)return true;if(!UI.bf||UI.bf.kind!=='place'||!UI.bf.use.has(id))return false;UI.hand=id;renderAll();return UI.hand===id}
+const mvOf=a=>a.what==='move'?a:null;
+const isMove=(a,kind)=>a.what==='move'&&a.kind===kind;
+const myInf=()=>G.pl[0].inf, rivInf=()=>G.pl[1].inf;
+const locOf=m=>m&&m.loc!=null?LOCN[m.loc]:'';
+function tutSteps(){
+  let p2=null,p3=null,clashSeen=null;
+  return [
+ {id:'map',title:'The kingdom',say:'Three regions, two locations each. Every location you claim pays Influence.',target:tq('#mapbox svg'),wait:null,ready:()=>tkind('bid')},
+ {id:'goal',title:'Your goal',say:'Influence is your score. After the last round, the most Influence wins.',target:tq('#rivals'),wait:null,ready:()=>tkind('bid')},
+ {id:'bid1',title:'Bid in secret',say:()=>'Every round starts with a secret bid. Tap your '+cinfo(tutBidId()).strength+' to pick it.',target:()=>tutHandRect(tutBidId()),
+   wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutBidId()},ready:()=>tkind('bid')&&UI.hand==null},
+ {id:'bid2',title:'Face down',say:'Tap the spot to bid it face down. Nobody sees it yet.',target:tq('#bidspot'),from:()=>tutHandRect(tutBidId()),
+   wait:{type:'tap',match:a=>isMove(a,'bid')},ready:()=>tkind('bid')&&UI.hand===tutBidId()&&!!document.querySelector('#bidspot.glow')},
+ {id:'reveal',title:'Highest bid first',say:()=>{const b=G.bstr||[];const m=b[0],t=b[1];return m>t?'Bids flip: your '+m+' beats their '+t+', so you choose first.':m<t?'Bids flip: their '+t+' beats your '+m+', so they choose first.':'Bids flip. A tie goes to the higher on the Order Track.'},
+   target:tq('#rivals'),wait:null,hold:c=>c.kind==='event'&&c.ev.t==='bids',onNext:()=>evDone(),
+   ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='bids'&&UI.card.rank&&UI.card.revN>=UI.card.rank.length)},
+ {id:'kc',title:'A Kingdom Card',say:'Take a Kingdom Card: a power you keep. Your bid card goes under it. Tap the glowing one.',target:tfirst('#handw .kcb.glow.rg','#handw .kcb.glow'),
+   wait:{type:'tap',match:a=>isMove(a,'bidRes')&&a.mv&&a.mv.t==='take'},ready:()=>tkind('bidRes')},
+ {id:'herald',title:'Place your Herald',say:()=>'Your Herald marks a location. Tap '+(UI.bf&&UI.bf.rec?locOf(UI.bf.rec):'the glowing one')+', where the Court stands too.',target:tutLoc,
+   wait:{type:'tap',match:a=>isMove(a,'herald')},ready:()=>tkind('herald')&&!!tutLoc()},
+ {id:'place1',title:'Hide a card',say:()=>'Hide one card at every region, face down. Start with your '+cinfo(tutPlace()[0]).strength+'.',target:()=>tutHandRect(tutPlace()&&tutPlace()[0]),
+   wait:{type:'tap',match:a=>a.what==='select'&&tutPlace()&&a.id===tutPlace()[0]},ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
+ {id:'place1b',title:'Where it fights',say:'Tap the Uplands. Your card stays hidden until the Clash.',target:tutReg(0),
+   wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===0},ready:()=>tkind('place')&&tutPlaced()===0&&tutPlace()&&UI.hand===tutPlace()[0]},
+ {id:'place2',title:'Your Heir',say:'Your Heir, your strongest card, goes where both Heralds stand: the Tablelands.',target:tutReg(1),also:()=>tutHandRect(p2||0),
+   wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===1},ready:()=>tkind('place')&&tutPlaced()===1&&!!tutPlace()&&(p2=tutPlace()[0],tutSelect(p2))},
+ {id:'place3',title:'Last card',say:()=>'Your '+cinfo(p3=tutPlace()[0]).strength+' goes to the Sinks. Tap the region.',target:tutReg(2),also:()=>tutHandRect(p3||0),
+   wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===2},ready:()=>tkind('place')&&tutPlaced()===2&&!!tutPlace()&&(p3=tutPlace()[0],tutSelect(p3))},
+ {id:'supp',title:'Supporters',say:'Each Supporter adds +1 Strength here this round. Tap the Tablelands twice.',target:tutReg(1),
+   wait:{type:'tap',times:2,match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='supp'&&a.mv.p&&a.mv.p.r===1},ready:()=>tkind('menu')&&G.pl[0].supp.r[1]<2&&/Spring/.test(G.q.title||'')},
+ {id:'spring',title:'Spring is over',say:'Supporters are placed. Tap Done to end Spring.',target:tfirst('#act [data-a=mv].pri','#act [data-a=mv]'),
+   wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.t==='done'},ready:()=>tkind('menu')&&G.pl[0].supp.r[1]>=2&&/Spring/.test(G.q.title||'')},
+ {id:'order',title:'Clash order',say:'You choose which region fights first. Tap the Uplands, then the Tablelands.',target:()=>tutReg((UI.ord||[]).length?1:0)(),
+   wait:{type:'tap',times:2,match:a=>a.what==='order'},ready:()=>tkind('clashOrder')},
+ {id:'clash',title:'The Clash',say:()=>{const ev=UI.card&&UI.card.ev;if(!ev)return '';const t=ev.tot,me=t[0],o=Math.max(...Object.keys(t).filter(s=>+s!==0).map(s=>t[s]));return ev.winner===0?'Cards flip. Highest total wins: your '+me+' beats '+o+'.':ev.winner<0?'Cards flip. Totals are equal: nobody wins here.':'Cards flip. Highest total wins: the Court\'s '+o+' beats your '+me+'.'},
+   target:()=>{const ev=UI.card&&UI.card.ev;return ev?tutReg(ev.r)():null},wait:null,hold:c=>c.kind==='event'&&c.ev.t==='clash'&&!clashSeen,onNext:()=>{clashSeen=1;evDone()},
+   ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='clash'&&UI.clashRes[UI.card.ev.r])},
+ {id:'claim',title:'Claim a location',say:()=>'You won the Tablelands! Tap '+(UI.bf&&UI.bf.rec?locOf(UI.bf.rec):'the glowing location')+': your Herald there earns more.',target:tutLoc,
+   wait:{type:'tap',match:a=>isMove(a,'location')},ready:()=>tkind('location')&&!!tutLoc()},
+ {id:'score',title:'Scoring',say:()=>'Location +2, your Herald +1, and 1 stolen from the Court. You now have '+myInf()+'.',target:tq('#rivals'),wait:null,
+   hold:c=>c.kind==='news'&&c.big&&c.items.some(infK),onNext:()=>newsOk(),pending:'Watch the board',
+   ready:()=>!!(UI.card&&UI.card.kind==='news'&&UI.card.big&&UI.card.items.some(infK))},
+ {id:'round',title:'Round over',say:()=>'The round ends: Supporters go home and played cards are discarded. You have '+myInf()+', the Court '+rivInf()+'.',target:tq('#rivals'),wait:null,
+   hold:c=>c.kind==='event'&&c.ev.t==='summary',onNext:()=>evDone(),pending:'Watch the board',
+   ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='summary')},
+ {id:'end',title:'The game ends',say:()=>'Real games last 4 to 6 rounds. The most Influence wins: '+(myInf()>rivInf()?'you win, '+myInf()+' to '+rivInf()+'!':myInf()===rivInf()?'a tie goes to the Favour holder.':'the Court wins, '+rivInf()+' to '+myInf()+'.'),
+   target:tq('#rivals'),wait:null,ready:()=>!!(G&&G.over&&!UI.card)}
+  ]}
+// ---------------------------------------------------------------- the kit hooks
+function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen(){if(typeof GXC==='undefined')return;
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
+    endTitle:'You know the rules',endText:o?'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Now the Story begins.':'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Round 2 adds Journeys, Tactics and more: the lightbulb explains them.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    setup:()=>{try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial')},
+    onDone:r=>{tutLeave();const c=r&&r.choice;
+      if(c==='chapter'&&first){showStart();GXC.play(first.id)}
+      else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
+      else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
+    onExit:()=>{tutLeave();showStart()}})}
+// leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
+function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
+// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+(function(){const o=humanMove;humanMove=function(k){
+  if(tutOn()&&!UI._tutIn){const s=viewSeatForQ();const mv=s!=null?legal(s).find(m=>m.k===k):null;if(!GXT.act({type:'tap',what:'move',k,kind:G.q&&G.q.kind,mv}))return false}
+  return o(k)}})();
+(function(){const o=handTap;handTap=function(id){
+  if(tutOn()){const M=UI.bf;const commit=!!(M&&cardDriven(M)&&UI.hand===id&&cardMoves(id).length===1);
+    if(!commit&&!GXT.act({type:'tap',what:'select',id}))return}
+  return o(id)}})();
+(function(){const o=orderTap;orderTap=function(r){
+  if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;if(!GXT.act({type:'tap',what:'order',r}))return;
+    UI._tutIn=1;try{return o(r)}finally{UI._tutIn=0}}
+  return o(r)}})();

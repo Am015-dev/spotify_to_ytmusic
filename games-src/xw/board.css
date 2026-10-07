@@ -114,3 +114,8 @@ html.bf #tags .tag .tgl{display:none}
 /* long-press popup with the full text of a shortened line (brief.js) */
 #fulltip{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80;max-width:min(86vw,420px);background:rgba(8,6,24,.96);border:2px solid #ffc86b;border-radius:14px;padding:14px 16px;color:#fff;font:600 15px/1.4 "Exo 2",sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.7);pointer-events:none}
 .tl{cursor:help}.brief .bico{font-weight:800;font-size:17px;margin:4px 0}.brief .bico2{margin:2px 0;font-size:15px}.brief .bico2 .hold{opacity:.65;font-size:12px;margin-left:8px}
+/* help kit: the bulb in the top bar, the Tips rows in the menu */
+.gx-bar .gxh-bulb{min-width:40px;min-height:40px;border:1.5px solid var(--line);border-radius:10px;background:transparent;padding:0 6px}
+.gxh-mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--ink)}.gxh-mrow .btn{min-height:40px}.gxh-mrow .btn[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
+@media (min-width:1600px){.gx-more .gxh-mrow{flex:0 0 auto;gap:6px}.gx-more .gxh-mrow:last-child>span:first-child{display:none}.gx-more .gxh-mrow .btn{padding:.2rem .5rem;min-height:36px;font-size:.78rem}}
+.gx-more .gxh-mrow .btn,html.ph .gx-more .gxh-mrow .btn{width:auto;flex:0 0 auto;display:inline-flex;justify-content:center;min-width:56px}
