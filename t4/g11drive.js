@@ -19,12 +19,16 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  const kmh=()=>p.evaluate(()=>{try{return Math.round(Math.abs(__mho.RO.v||0)*3.6)}catch(e){return 0}});
  const pgap=()=>p.evaluate(()=>{try{const R=__mho.RO;if(R.vy!==0)return null;return __gnb.gap()}catch(e){return String(e)}});
  const tgap=()=>p.evaluate(()=>{try{return __g9ev(`(()=>{const out=[],M=new THREE.Matrix4(),v=new THREE.Vector3();for(const c of HUB.cars||[]){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>80*80)continue;const im=HUB.cim&&HUB.cim[c.k],wm=im&&im.userData.w;if(!wm)continue;
-   const W=ART6_wl[c.k]||(ART6_wl[c.k]=ART6_wheels(wm.geometry));wm.getMatrixAt(c.j,M);const g=[];for(const q of W){v.set(q[0],q[1],q[2]).applyMatrix4(M);g.push(+(v.y-groundAt(v.x,v.z,v.y+1)).toFixed(3))}out.push(g)}return out.slice(0,6)})()`)}catch(e){return String(e)}});
+   const W=ART6_wl[c.k]||(ART6_wl[c.k]=ART6_wheels(wm.geometry));wm.getMatrixAt(c.j,M);const g=[];for(const q of W){v.set(q[0],q[1],q[2]).applyMatrix4(M);g.push(+(v.y-groundAt(v.x,v.z,v.y+1)).toFixed(3))}if(W.length===4)out.push(g)}return out.slice(0,6)})()`)}catch(e){return String(e)}});
  const veh=()=>p.evaluate(()=>{try{const R=__mho.RO;return (R.vk||R.veh||R.mode||'')+''}catch(e){return ''}});
  const G=[],T=[];const drive=async(sec,tag)=>{const g=await (await p.$('#tG')).boundingBox();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:g.x+g.width/2,y:g.y+g.height/2,id:2}]});
   const t0=Date.now();let k=0,top=0;while(Date.now()-t0<sec*1000){await p.waitForTimeout(2500);k++;const v=await kmh();top=Math.max(top,v);
-   if(k%3===1){const key=['ArrowLeft','ArrowRight'][k%2];await p.keyboard.down(key);await p.waitForTimeout(250);await p.keyboard.up(key)}
-   const a=await pgap();if(Array.isArray(a)&&a.length)G.push({tag,max:Math.max(...a.map(Math.abs)),a});if(k%4===0){const t=await tgap();if(Array.isArray(t))for(const w of t)if(w.length)T.push({tag,max:Math.max(...w.map(Math.abs))})}}
+   // human-like: look where the road is (nearest street lane) and give a short steer tap toward it when drifting off or pointing away
+   const st=await p.evaluate(()=>{const M=__mho,R=M.RO,N=M.HUB.nodes;let bi=-1,bd=1e9;for(let i=0;i<N.length;i++){const n=N[i];if(!n.nb||!n.nb.length)continue;const d=(n.x-R.x)**2+(n.z-R.z)**2;if(d<bd){bd=d;bi=i}}if(bi<0)return 0;
+     const n=N[bi],m=N[n.nb[0]],L=Math.hypot(m.x-n.x,m.z-n.z)||1,tx=(m.x-n.x)/L,tz=(m.z-n.z)/L,fx=Math.sin(R.h),fz=Math.cos(R.h),dir=Math.sign(tx*fx+tz*fz)||1,ax=n.x+tx*dir*14-R.x,az=n.z+tz*dir*14-R.z;
+     const cr=fx*az-fz*ax;return Math.abs(cr)<1.5?0:(cr>0?1:-1)});
+   if(st){const key=st>0?'ArrowLeft':'ArrowRight';await p.keyboard.down(key);await p.waitForTimeout(220);await p.keyboard.up(key)}
+   const a=await pgap();if(Array.isArray(a)&&a.length)G.push({tag,max:Math.max(...a.map(Math.abs)),a});if(k%2===0){const t=await tgap();if(Array.isArray(t))for(const w of t)if(w.length)T.push({tag,max:Math.max(...w.map(Math.abs))})}}
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});console.log(tag,'top kmh',top,'pos',await p.evaluate(()=>[Math.round(__mho.RO.x),Math.round(__mho.RO.z)]))};
  await drive(+(process.env.SEC||75),'fra');await shot('02_frankfurt_drive');
  // low side view: brake to a stop (real touch), camera ~1 m above the road, side-on, framing the player and the nearest traffic car; then a close tyre view
@@ -33,7 +37,14 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  const side=async(n,close)=>{const r=await p.evaluate(close=>{const M=__mho,R=M.RO,g=M.gnd(R.x,R.z,R.y+.3);let c=null,bd=40;for(const o of(M.HUB.cars||[])){if(o.dead>0)continue;const d=Math.hypot(o.x-R.x,o.z-R.z);if(d<bd&&d>2){bd=d;c=o}}
    const tx=close||!c?R.x:(R.x+c.x)/2,tz=close||!c?R.z:(R.z+c.z)/2,h=close||!c?R.h:Math.atan2(c.x-R.x,c.z-R.z),sx=Math.cos(h),sz=-Math.sin(h),k=close?3.6:Math.max(8,bd*.75);
    __gnb.cam([tx+sx*k,g+(close?.35:1),tz+sz*k,tx,g+(close?.25:.6),tz]);return{traffic:c?+bd.toFixed(1):null}},close);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n,JSON.stringify(r))};
- await side('03_side_traffic',0);await side('04_side_tyres',1);await p.evaluate(()=>__gnb.cam(null));
+ if(process.env.SIDE){// screenshot aid (like nbside.js): freeze the nearest traffic car on a straight lane and stand the stopped player 7.5 m behind it
+  const sel=await p.evaluate(()=>{const M=__mho,R=M.RO,H=M.HUB,N=H.nodes;let j=-1,bd=1e9;const nw=k=>{try{return __g9ev(`(()=>{const im=HUB.cim&&HUB.cim[${JSON.stringify(k)}],wm=im&&im.userData.w;return wm?(ART6_wl[${JSON.stringify(k)}]||(ART6_wl[${JSON.stringify(k)}]=ART6_wheels(wm.geometry))).length:0})()`)}catch(e){return 0}};(H.cars||[]).forEach((c,i)=>{if(c.dead>0||c.tr||nw(c.k)!==4)return;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||A.g||B.g)return;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L*(1-c.t)<20||L*c.t<14)return;const d=Math.hypot(c.x-R.x,c.z-R.z);if(d<bd){bd=d;j=i}});if(j<0)return null;
+   const c=H.cars[j];c.v=0;c.cv=0;c.hv=.01;c.route=[];c.hitT=99;window.__tc=j;const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z);return{x:c.x,z:c.z,h:Math.atan2((B.x-A.x)/L,(B.z-A.z)/L)}});console.log('traffic car',JSON.stringify(sel));
+  if(sel){const place=()=>p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.x=x;R.z=z;R.y=M.gnd(x,z,R.y+30);R.v=0;R.yr=0;R.vh=h;R.h=h;R.stkT=0;R.crTurn=null},[sel.x-Math.sin(sel.h)*7.5,sel.z-Math.cos(sel.h)*7.5,sel.h]);
+   await place();await p.waitForTimeout(6000);await place();await p.waitForTimeout(3000);
+   const cam=async(n,close)=>{await p.evaluate(([x,z,h,close])=>{const M=__mho,R=M.RO,ax=close?R.x:R.x+(x-R.x)*.35,az=close?R.z:R.z+(z-R.z)*.35,g=M.gnd(ax,az,R.y+.3),sx=Math.cos(h),sz=-Math.sin(h),k=close?3.6:9;__gnb.cam([ax+sx*k,g+(close?.35:1),az+sz*k,ax,g+(close?.25:.6),az])},[sel.x,sel.z,sel.h,close]);await p.waitForTimeout(3000);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n)};
+   await cam('03_side_traffic',0);await cam('04_side_tyres',1);await p.evaluate(()=>__gnb.cam(null))}}
+ else{await side('03_side_traffic',0);await side('04_side_tyres',1);await p.evaluate(()=>__gnb.cam(null))}
  const rest=await pgap(),trest=await tgap();console.log('tyre_rest',JSON.stringify(rest),'traffic_rest',JSON.stringify(trest));if(Array.isArray(trest))for(const w of trest)if(w.length)T.push({tag:'rest',max:Math.max(...w.map(Math.abs))});
  if(process.env.OFF){// off-road form (Blue Beast) mixed in: press T (vehicle cycle, real key) until 4x4, drive, low side shot
   for(let i=0;i<4&&await p.evaluate(()=>__mho.RO.vsel)!=='offroad';i++){await p.keyboard.press('KeyT');await p.waitForTimeout(1500)}console.log('vsel',await p.evaluate(()=>__mho.RO.vsel));await p.waitForTimeout(3000);
@@ -42,7 +53,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
   for(let i=0;i<4&&await p.evaluate(()=>__mho.RO.vsel)!=='auto';i++){await p.keyboard.press('KeyT');await p.waitForTimeout(1200)}}
  if(process.env.ATH){// Athens: test placement on an Athens street lane node (Historic Centre), heading along the lane, then real driving
   const at=await p.evaluate(()=>{const M=__mho,N=M.HUB.nodes;let best=-1,bd=1e9;for(let i=0;i<N.length;i++){const n=N[i];if(n.ab||!n.nb||!n.nb.length)continue;if(n.x<-1350||n.x>-1150||n.z<760||n.z>1000)continue;const d=Math.hypot(n.x+1250,n.z-880);if(d<bd){bd=d;best=i}}
-    if(best<0)return null;const n=N[best],m=N[n.nb[0]],h=Math.atan2(m.x-n.x,m.z-n.z),now=performance.now();M.warp(n.x,n.z,h,now);return{x:Math.round(n.x),z:Math.round(n.z),h:+h.toFixed(2)}});
+    if(best<0)return null;const n=N[best],m=N[n.nb[0]],h=Math.atan2(m.x-n.x,m.z-n.z),now=performance.now(),R=M.RO,w=M.warp(n.x,n.z,h,now);R.x=n.x;R.z=n.z;R.y=M.gnd(n.x,n.z,R.y+60);R.v=0;R.yr=0;R.vh=h;R.h=h;R.stkT=0;R.crTurn=null;return{w,x:Math.round(n.x),z:Math.round(n.z),h:+h.toFixed(2)}});
   console.log('athens at',JSON.stringify(at));await p.waitForTimeout(8000);await shot('05_athens_start');await drive(+(process.env.SEC||75)*.8,'ath');await shot('06_athens_drive')}
  const sum=a=>a.length?{n:a.length,max:+Math.max(...a.map(x=>x.max)).toFixed(3),over05:a.filter(x=>x.max>.05).length}:null;
  console.log('GAP player',JSON.stringify(sum(G)),'traffic',JSON.stringify(sum(T)),'veh',await veh());
