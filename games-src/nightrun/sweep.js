@@ -5,11 +5,15 @@
 // It fails on: page errors, audio errors, a run that stands still >8 s, ship not following input, buttons off screen or covered,
 // horizontal scroll, average FPS < 45, a boss that cannot be hurt or reached, HUD text not equal to the game state, NaN state,
 // broken pause / restart / resume / settings, tab-hide not pausing, rotation breaking layout or input, and beat judging that is off by more than 80 ms.
+// Shop / garage (SKIP=shop,garage,econ to leave out): a pit stop opens after every district; touch buy / reroll / skip / 10 s timeout work; every upgrade really changes the game;
+//   garage purchases persist across reloads; the ships fire their own rhythms; no horizontal scroll; pit-stop and garage buttons >= 44 px (375x553 included); screenshots shop-*.png.
+//   ECON=6 (+ECONSECS=150) plays that many long bot runs and prints the Neon economy (Neon per run, picks per run, garage bank).
 // Beat checks use a generated 120 BPM test WAV served by a route override (nothing is written to the repo).
 const PW = require(process.env.PW || 'playwright'), fs = require('fs'), path = require('path'), net = require('net'), cp = require('child_process');
-const GAME_DIR = path.resolve(__dirname, '../../games/mainhattan-nightrun');
+const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const OUT = path.join(__dirname, 'playtest'); fs.mkdirSync(OUT, { recursive: true });
 for (const f of fs.readdirSync(OUT)) if (/^fail.*\.png$/.test(f)) fs.unlinkSync(path.join(OUT, f));
+const ECON = +process.env.ECON || 0, ECONSECS = +process.env.ECONSECS || 150;
 const RUNS = +process.env.RUNS || 34, SECS = +process.env.SECS || 22, PAR = +process.env.PAR || 2;
 const SKIP = new Set((process.env.SKIP || '').split(',').filter(Boolean)), ONLY = process.env.ONLY || '';
 const want = n => ONLY ? ONLY.split(',').includes(n) : !SKIP.has(n);
@@ -20,7 +24,7 @@ const CFGS = [
   { name: '390x763', w: 390, h: 763, touch: true }, { name: '375x553', w: 375, h: 553, touch: true },
   { name: '844x390', w: 844, h: 390, touch: true }, { name: '1280x800', w: 1280, h: 800, touch: false }];
 const PT_CAP = 150;                                     // calm visuals: most particles allowed on screen at once
-const fails = [], seen = new Set(), stats = { runs: 0, ticks: 0, perfect: 0, kills: 0, bosses: 0, fps: [], maxDistrict: 0 }; let shotN = 0;
+const fails = [], seen = new Set(), stats = { runs: 0, ticks: 0, perfect: 0, kills: 0, bosses: 0, fps: [], maxDistrict: 0, pits: 0, econ: [], shopChecks: 0 }; let shotN = 0;
 let URL_BASE = '';
 
 async function fail(p, tag, kind, detail) {
@@ -67,7 +71,7 @@ const INIT = () => {
       const m = window.__mnr, out = { ok: !!m }; if (!m) return out;
       const G = m.G, P = m.P, vis = e => { const r = e.getBoundingClientRect(); return r.width > 2 && r.height > 2 && !e.closest('[hidden]'); };
       const ids = ['title', 'over', 'pausem', 'setm']; out.ov = {}; for (const i of ids) out.ov[i] = !document.getElementById(i).hidden;
-      out.run = m.running; out.paused = m.paused; out.rot = m.rotMode; out.vw = innerWidth; out.vh = innerHeight; out.touchUI = m.touchUI;
+      out.run = m.running; out.paused = m.paused; out.shop = !!(m.SH && m.SH.active); out.neon = m.SH ? m.SH.neon : 0; out.pits = m.SH ? m.SH.pits : 0; out.rot = m.rotMode; out.vw = innerWidth; out.vh = innerHeight; out.touchUI = m.touchUI;
       out.sw = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth); out.sl = document.documentElement.scrollLeft + document.body.scrollLeft;
       out.actx = m.AU.a ? m.AU.a.state : 'none';
       const fr = document.getElementById('frame').getBoundingClientRect(); out.fr = [fr.left, fr.top, fr.right, fr.bottom];
@@ -81,8 +85,10 @@ const INIT = () => {
         if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) { out.bad.push('control off screen ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); continue; }
         const h = document.elementFromPoint(x, y); if (!(h && (e === h || e.contains(h) || (h.closest && h.closest('label') && h.closest('label') === e.closest('label'))))) out.bad.push('control covered ' + (e.id || e.textContent.trim().slice(0, 12)) + ' by ' + (h && (h.id || h.className || h.tagName)));
       }
+      for (const e of document.querySelectorAll('.pg:not([hidden]) button, #gaBtn, #gaBtn2')) { if (!vis(e)) continue; const r = e.getBoundingClientRect(); if (Math.min(r.width, r.height) < 43.5) out.bad.push('button under 44 px ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height)); }
+      for (const e of document.querySelectorAll('.pg:not([hidden]) .card')) { if (e.scrollHeight > e.clientHeight + 2 || e.scrollWidth > e.clientWidth + 2) out.bad.push('card text overflows ' + e.dataset.id); const r = e.getBoundingClientRect(); if (r.width < 40 || r.height < 40) out.bad.push('card too small ' + e.dataset.id); }
       for (const o of document.querySelectorAll('.ov:not([hidden])')) if (o.scrollWidth > o.clientWidth + 1) out.bad.push('overlay wider than screen ' + o.id);
-      if (m.running && !m.paused && !G.dead && !document.getElementById('touch').hidden === false && out.touchUI) out.bad.push('touch buttons hidden while playing');
+      if (m.running && !m.paused && !G.dead && !out.shop && !document.getElementById('touch').hidden === false && out.touchUI) out.bad.push('touch buttons hidden while playing');
       if (G && P) {
         const fin = v => Number.isFinite(v); out.nan = !(fin(P.x) && fin(P.y) && fin(P.hp) && fin(P.heat) && fin(G.score) && fin(G.mult) && G.eb.every(b => fin(b.x) && fin(b.y)) && G.en.every(e => fin(e.x) && fin(e.y) && fin(e.hp)));
         out.G = { t: G.t, score: G.score, kills: G.kills, di: G.di, loop: G.loop, dt: G.dt, en: G.en.length, eb: G.eb.length, dead: G.dead, bc: G.bc, bossDone: G.bossDone, transT: G.transT, banner: G.banner.t, daily: G.daily, perf: G.perf, pt: G.pt.length, calm: m.SET.calm };
@@ -131,14 +137,14 @@ async function startGame(p, cfg, T, how) {
 // ---------------- bot run ----------------
 async function playRun(browser, cfg, i, kind) {
   const tag = `${cfg.name}#${i}${kind ? '/' + kind : ''}`, { p, cdp, T } = await newPage(browser, cfg, { reduce: kind === 'reduce', pw: true });
-  stats.runs++; const t0 = Date.now(), maxMs = SECS * 1000 * (kind === 'boss' ? 4 : 1);
+  stats.runs++; const t0 = Date.now(), maxMs = kind === 'econ' ? ECONSECS * 1000 : SECS * 1000 * (kind === 'boss' ? 4 : 1);
   try {
     if (!await startGame(p, cfg, T, kind === 'daily' ? 'daily' : 'start')) { await fail(p, tag, 'start', 'game did not start'); return; }
     if (kind === 'late') await ev(p, i => window.__mnr.skipTo(i), 1 + (i % 3));
     if (kind === 'boss') { await ev(p, () => { window.__mnr.god = true; window.__mnr.skipTo(0); window.__mnr.bossNow(); }); }
     if (kind === 'bossN') { await ev(p, i => { window.__mnr.god = true; window.__mnr.skipTo(i); window.__mnr.bossNow(); }, 1 + (i % 3)); }
     let fx = cfg.w / 2, fy = cfg.h / 2, touching = false, keys = {}, lastProg = Date.now(), lastSig = '', lastHudFrame = -1, lastEn = Date.now(), stillSince = 0, lastPos = null, lastMoveCheck = Date.now();
-    let bossT0 = 0, bossHp0 = 0, bossSeen = false, over = false, nTick = 0, dashN = 0;
+    let pitN = 0, bossT0 = 0, bossHp0 = 0, bossSeen = false, over = false, nTick = 0, dashN = 0;
     if (!cfg.touch) { await p.keyboard.down('Space'); keys.Space = 1; }
     while (Date.now() - t0 < maxMs) {
       const s = await ev(p, () => window.__bot.step()); nTick++; stats.ticks++;
@@ -146,6 +152,13 @@ async function playRun(browser, cfg, i, kind) {
       for (const b of s.bad) await fail(p, tag, 'layout', b);
       if (s.nan) await fail(p, tag, 'NaN-state', 'non-finite value in game state');
       if (!s.run) { over = true; break; }
+      if (s.shop) {                                       // pit stop: the world waits, play the shop like a player (buy / skip) by touch or mouse
+        lastProg = Date.now(); lastEn = Date.now();
+        if (touching) { await T.up(1); touching = false; }   // a player lifts the finger to tap a card
+        if (keys.Space) { await p.keyboard.up('Space'); keys.Space = 0; }
+        if (s.pits !== pitN) { pitN = s.pits; stats.pits++; await shopTurn(p, cfg, T, tag, kind === 'econ' ? 0 : (i + pitN) % 3); }
+        await sleep(60); continue;
+      }
       if (s.paused) { await fail(p, tag, 'unexpected-pause', 'game paused by itself'); break; }
       if (s.actx !== 'running' && Date.now() - t0 > 3000) { await fail(p, tag, 'audio', 'AudioContext is ' + s.actx + ' while playing'); }
       stats.maxDistrict = Math.max(stats.maxDistrict, s.G.di + 4 * s.G.loop);
@@ -153,8 +166,8 @@ async function playRun(browser, cfg, i, kind) {
       // HUD text equals the engine state
       if (s.hud.frame > 0 && s.hud.frame !== lastHudFrame && !s.G.dead) {
         lastHudFrame = s.hud.frame; const h = s.hud;
-        if (h.score !== String(s.G.score).padStart(8, '0') || h.hp !== s.P.hp || h.heat !== Math.round(s.P.heat) || h.emp !== s.P.emp || h.combo !== s.C || h.wl !== s.P.wl)
-          await fail(p, tag, 'HUD-mismatch', JSON.stringify({ hud: [h.score, h.hp, h.heat, h.emp, h.combo, h.wl], eng: [s.G.score, s.P.hp, Math.round(s.P.heat), s.P.emp, s.C, s.P.wl] }));
+        if (h.score !== String(s.G.score).padStart(8, '0') || h.hp !== s.P.hp || h.heat !== Math.round(s.P.heat) || h.emp !== s.P.emp || h.combo !== s.C || h.wl !== s.P.wl || h.neon !== s.neon)
+          await fail(p, tag, 'HUD-mismatch', JSON.stringify({ hud: [h.score, h.hp, h.heat, h.emp, h.combo, h.wl, h.neon], eng: [s.G.score, s.P.hp, Math.round(s.P.heat), s.P.emp, s.C, s.P.wl, s.neon] }));
         if (!(s.P.hp >= 0 && s.P.hp <= 5 && s.P.heat >= 0 && s.P.heat <= 100.01 && s.P.emp >= 0 && s.P.emp <= 3)) await fail(p, tag, 'HUD-range', JSON.stringify(s.P));
       }
       // progress / stuck
@@ -163,6 +176,7 @@ async function playRun(browser, cfg, i, kind) {
       if (s.G.en > 0 || s.boss || s.G.transT >= 0 || s.G.dead || s.G.banner > 0) lastEn = Date.now();
       if (Date.now() - lastEn > 9000) await fail(p, tag, 'stuck', 'no enemies for 9 s and no boss');
       // boss reachability
+      if (!s.boss) bossSeen = false;
       if (s.boss && s.boss.x < 960) {
         if (!bossSeen) { bossSeen = true; bossT0 = Date.now(); bossHp0 = s.boss.hp; stats.bosses++; if (s.boss.y - s.boss.r > 486 || s.boss.y + s.boss.r < 36) await fail(p, tag, 'boss-unreachable', 'boss y ' + s.boss.y); }
         if (s.boss.x > 800 && Date.now() - bossT0 > 9000) await fail(p, tag, 'boss-unreachable', 'boss stays at x ' + s.boss.x);
@@ -187,12 +201,14 @@ async function playRun(browser, cfg, i, kind) {
     }
     // wrap up
     const e = await ev(p, () => ({ fps: window.__mnr.FPS.t ? window.__mnr.FPS.n / window.__mnr.FPS.t * 1000 : 0, slow: window.__mnr.FPS.slow, n: window.__mnr.FPS.n, msgs: window.__mnr.MSGS.slice(), ok: window.__mnr.J.ok, c: window.__mnr.C.best, kills: window.__mnr.G.kills }));
+    if (kind === 'econ' || kind === '') { const q = await ev(p, () => { const m = __mnr, h = m.SH; return { pit: h.pitLog.slice(), earned: h.earned, spent: h.spent, picks: h.picks, left: h.neon, bank: h.lastBank || 0, di: m.G.di + 4 * m.G.loop, score: m.G.score, t: m.G.t, kills: m.G.kills, dead: m.G.dead || !m.running }; }); stats.econ.push(Object.assign({ kind }, q)); }
     if (e.n > 120) stats.fps.push(e.fps); stats.perfect += e.ok; stats.kills += e.kills;
     for (const m of e.msgs) if (m.trim().split(/\s+/).length > 8) await fail(p, tag, 'message-too-long', m);
     if (over) {                                           // game-over screen: right numbers, button reachable, restart works
       await sleep(900); const o = await ev(p, () => { const m = window.__mnr, r = window.__bot.probe(); return { bad: r.bad, shown: document.getElementById('oScore').textContent, score: m.G.score, over: !document.getElementById('over').hidden }; });
       if (!o.over) await fail(p, tag, 'game-over', 'overlay not shown'); for (const b of o.bad) await fail(p, tag, 'layout', 'game-over ' + b);
       if (o.shown.replace(/\D/g, '') !== String(o.score)) await fail(p, tag, 'HUD-mismatch', 'game-over score ' + o.shown + ' vs ' + o.score);
+      if (touching) { await T.up(1); touching = false; }
       if (i % 3 === 0) { await press(p, cfg, T, '#againBtn'); if (!await waitFor(p, () => window.__mnr.running && window.__mnr.G.t < 1.5 && window.__mnr.G.score === 0, null, 3000)) await fail(p, tag, 'restart', 'FLY AGAIN did not restart'); }
     }
     if (cfg.name === '390x763' && process.env.SHOTS && !seen.has('shot' + kind)) { seen.add('shot' + kind); }
@@ -678,6 +694,163 @@ async function shots(browser) {                          // portrait screenshots
   await p.context().close();
 }
 
+
+// ---------------- shop / garage ----------------
+async function shopTurn(p, cfg, T, tag, mode) {             // what a player does in a pit stop: 0 buy what it can then GO, 1 SKIP, 2 buy one and GO
+  if (!await waitFor(p, () => __mnr.SH.lock <= 0 || !__mnr.SH.active, null, 2500)) return;
+  const nCards = await ev(p, () => __mnr.SH.active ? __mnr.SH.cards.length : -1); if (nCards < 0) return;
+  if (mode !== 1) for (let k = 0; k < nCards; k++) {
+    const can = await ev(p, k => { const h = __mnr.SH, c = h.cards[k]; return h.active && c && !c.sold && h.neon >= h.price(c.u); }, k);
+    if (can) { await press(p, cfg, T, `#shCards .card:nth-child(${k + 1})`); await sleep(120); if (mode === 2) break; }
+  }
+  if (await ev(p, () => __mnr.SH.active)) { await sleep(150); await press(p, cfg, T, '#shGo'); }
+}
+async function toPit(p, di) {                               // play district di up to its boss, kill the boss, wait for the pit stop
+  await ev(p, d => { const m = window.__mnr; m.god = true; m.skipTo(d); m.bossNow(); }, di);
+  if (!await waitFor(p, () => __mnr.G.boss, null, 15000)) return false;
+  await ev(p, () => { __mnr.G.boss.hp = 0; });
+  return waitFor(p, () => __mnr.SH.active, null, 9000);
+}
+const unlock = p => waitFor(p, () => !__mnr.SH.active || __mnr.SH.lock <= 0, null, 8000);
+const shotPath = n => path.join(OUT, 'shop-' + n + '.png');
+async function shopTests(browser, cfg, full) {
+  const tag = cfg.name + '/shop', { p, T } = await newPage(browser, cfg), chk = (c, kind, d) => { stats.shopChecks++; return c ? Promise.resolve() : fail(p, tag, kind, d); };
+  try {
+    if (!await startGame(p, cfg, T)) return fail(p, tag, 'start', 'no start');
+    // 1. a pit stop opens after the district, with cards, a counter and a timer; layout is clean
+    if (!await toPit(p, 0)) { await fail(p, tag, 'pit-missing', 'no pit stop after district 1'); return; }
+    await unlock(p); await sleep(300);
+    let s = await ev(p, () => window.__bot.probe()); for (const b of s.bad) await fail(p, tag, 'layout', 'pit stop ' + b);
+    const ui = await ev(p, () => ({ cards: document.querySelectorAll('#shCards .card').length, texts: [...document.querySelectorAll('#shCards .card .t')].map(e => e.textContent), vis: !document.getElementById('shop').hidden, words: [...document.querySelectorAll('#shCards .card .t')].every(e => e.textContent.trim().split(/\s+/).length <= 8) }));
+    await chk(ui.vis && ui.cards >= 1 && ui.cards <= 3, 'pit-ui', 'cards ' + ui.cards); await chk(ui.words, 'message-too-long', 'card text over 8 words ' + ui.texts.join('|'));
+    await chk(!(await ev(p, () => __mnr.paused)) && (await ev(p, () => __mnr.running)), 'pit-ui', 'run state wrong in pit stop');
+    const w0 = await ev(p, () => __mnr.G.t); await sleep(500); await chk(Math.abs((await ev(p, () => __mnr.G.t)) - w0) < .01, 'pit-frozen', 'world kept running during pit stop');
+    await p.screenshot({ path: shotPath('pit-' + cfg.name) });
+    // 2. cannot afford -> nothing bought, hint shown
+    await ev(p, () => { __mnr.SH.neon = 0; __mnr.SH.draw(); });
+    await press(p, cfg, T, '#shCards .card:nth-child(1)'); await sleep(150);
+    await chk(await ev(p, () => __mnr.SH.picks === 0 && __mnr.SH.neon === 0 && /Need/.test(document.getElementById('shMsg').textContent)), 'shop-buy', 'unaffordable card was bought or no hint');
+    // 3. buy with enough Neon: price paid, upgrade applied, icon shown
+    await ev(p, () => { __mnr.SH.neon = 100; __mnr.SH.draw(); });
+    const b0 = await ev(p, () => { const h = __mnr.SH, c = h.cards[0]; return { id: c.u.id, pr: h.price(c.u) }; });
+    await press(p, cfg, T, '#shCards .card:nth-child(1)'); await sleep(200);
+    const b1 = await ev(p, () => ({ neon: __mnr.SH.neon, n: __mnr.SH.n(__mnr.SH.cards[0].u.id), sold: __mnr.SH.cards[0].sold, own: document.querySelectorAll('#shOwn svg').length }));
+    await chk(b1.neon === 100 - b0.pr && b1.n === 1 && b1.sold && b1.own === 1, 'shop-buy', 'buy by tap failed ' + JSON.stringify([b0, b1]));
+    // 4. reroll costs Neon and deals new cards
+    const r0 = await ev(p, () => ({ neon: __mnr.SH.neon, pr: __mnr.SH.rerollPrice() }));
+    await press(p, cfg, T, '#shRe'); await sleep(150);
+    const r1 = await ev(p, () => ({ neon: __mnr.SH.neon, rr: __mnr.SH.rerolls, sold: __mnr.SH.cards.some(c => c.sold) }));
+    await chk(r1.neon === r0.neon - r0.pr && r1.rr === 1 && !r1.sold, 'shop-reroll', 'reroll failed ' + JSON.stringify([r0, r1]));
+    // 5. SKIP / GO continues to the next district
+    await press(p, cfg, T, '#shGo'); await sleep(300);
+    s = await ev(p, () => ({ act: __mnr.SH.active, di: __mnr.G.di, hidden: document.getElementById('shop').hidden }));
+    await chk(!s.act && s.hidden && s.di === 1, 'shop-skip', 'GO did not continue to district 2 ' + JSON.stringify(s));
+    // 6. second district: the pit stop comes again; the 10 s timer continues on its own
+    if (!await toPit(p, 1)) { await fail(p, tag, 'pit-missing', 'no pit stop after district 2'); }
+    else {
+      const t0 = Date.now(); const ended = await waitFor(p, () => !__mnr.SH.active, null, 15000), el = Date.now() - t0;
+      s = await ev(p, () => ({ di: __mnr.G.di, banner: __mnr.G.banner.t }));
+      await chk(ended && el > 7500 && el < 14500 && s.di === 2, 'shop-timeout', 'auto-continue after ' + el + ' ms, district ' + s.di);
+    }
+    if (full) {                                         // 7. every upgrade does what its card says
+      await ev(p, () => { const h = __mnr.SH; h.got = {}; h.order = []; h.sh = 0; h.spare = 0; h.recalc(); h.neon = 9999; });
+      const U = await ev(p, () => __mnr.SH.UPG.map(u => u.id)); let di = 2;
+      for (let k = 0; k < U.length; k += 3) {
+        if (!await toPit(p, di++ % 4)) { await fail(p, tag, 'pit-missing', 'no pit stop for upgrade batch'); break; }
+        await unlock(p); const batch = U.slice(k, k + 3);
+        await ev(p, ids => { const h = __mnr.SH; h.neon = 9999; h.cards = ids.map(id => ({ u: h.UPG.find(u => u.id === id), sold: false })); h.draw(); }, batch);
+        for (let j = 0; j < batch.length; j++) { await press(p, cfg, T, `#shCards .card:nth-child(${j + 1})`); await sleep(120); }
+        await chk(await ev(p, ids => ids.every(id => __mnr.SH.n(id) === 1), batch), 'shop-buy', 'batch not bought ' + batch);
+        await press(p, cfg, T, '#shGo'); await sleep(300);
+      }
+      const E = await ev(p, () => { const h = __mnr.SH; return { fr: h.shot().cd, hm: h.hm, ck: h.ck, sharp: h.sharp, nx: h.nx, sh: h.sh, spare: h.spare, mag: __mnr.NR.mod.mag, win: __mnr.NR.mod.win, pw: __mnr.NR.mod.pw, spb: __mnr.BT.spb }; });
+      await chk(E.fr < Math.max(.09, E.spb / 6) - 1e-6 && E.hm === 1 && E.ck === 4 && E.sharp === 1.5 && E.nx === 1.5 && E.mag > 140 && E.win === 20 && E.pw === 1.5, 'upgrade-effect', 'state ' + JSON.stringify(E));
+      await chk(E.sh === 1 && E.spare >= 1, 'upgrade-effect', 'shield/dash charge not given ' + JSON.stringify(E));
+      // shield soaks one hit
+      await ev(p, () => { const m = __mnr; m.god = false; m.G.en = []; m.G.eb = []; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
+      await sleep(120); const sh = await ev(p, () => ({ hp: __mnr.P.hp, sh: __mnr.SH.sh })); await chk(sh.hp === 5 && sh.sh === 0, 'upgrade-effect', 'shield did not absorb a hit ' + JSON.stringify(sh));
+      // spare dash charge: dash again while the first dash cools down
+      await ev(p, () => { const m = __mnr; m.god = true; m.G.en = []; m.G.eb = []; m.P.dashCd = .9; m.P.dashT = 0; m.SH.spare = 1; });
+      await p.keyboard.press('ShiftLeft'); await sleep(60); const dd = await ev(p, () => ({ t: __mnr.P.dashT, sp: __mnr.SH.spare })); await chk(dd.t > 0 && dd.sp === 0, 'upgrade-effect', 'spare dash charge unused ' + JSON.stringify(dd));
+      // dash blast + sharp beat damage
+      await sleep(400); const dh = await ev(p, () => { const m = __mnr, e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: m.P.x + 10, y: m.P.y, r: 14, hp: 100, max: 100, score: 100, by: m.P.y, amp: 0 }; m.G.en = [e]; m.P.dashCd = 0; window.__t = e; return e.hp; });
+      await p.keyboard.press('ShiftLeft'); await sleep(120); await chk((await ev(p, () => __t.hp)) <= dh - 9.9, 'upgrade-effect', 'dash blast did no damage (x2)');
+      await sleep(300); await ev(p, () => { const m = __mnr; m.G.en = []; const e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: 700, y: 300, r: 14, hp: 100, max: 100, score: 100, by: 300, amp: 0 }; m.G.en = [e]; m.G.pb = [{ x: 700, y: 300, vx: 0, vy: 0, dm: 2, pf: 1 }]; window.__t = e; });
+      await sleep(100); const hp = await ev(p, () => __t.hp); await chk(Math.abs(100 - hp - 3) < .01, 'upgrade-effect', 'sharp beat damage ' + (100 - hp) + ' != 3');
+      // homing bends a bullet toward an enemy
+      const hv = await ev(p, () => { const m = __mnr, e = { type: 'drone', x: 400, y: 330, hp: 9, r: 14 }; m.G.en = [e]; const b = { x: 100, y: 200, vx: 900, vy: 0 }; m.SH.steer(b, .05); return b.vy; }); await chk(hv > 20, 'upgrade-effect', 'homing did not bend the shot ' + hv);
+      // combo keeper holds the combo past 8 beats
+      await ev(p, () => { const m = __mnr; m.G.en = []; m.C.n = 5; m.C.lb = m.G.bc - 9; window.__bc = m.G.bc; }); await waitFor(p, () => __mnr.G.bc > window.__bc, null, 2500);
+      await chk(await ev(p, () => __mnr.C.n === 5), 'upgrade-effect', 'combo keeper did not hold the combo');
+      // neon boost: a drone kill pays 2 instead of 1
+      const nb = await ev(p, () => { const h = __mnr.SH; __mnr.C.n = 0; h.acc = 0; const n0 = h.neon; h.award({ type: 'gunship', x: 0, y: 0, pf: 0 }); return h.neon - n0; }); await chk(nb === 4, 'upgrade-effect', 'neon boost paid ' + nb + ' (3 x 1.5 = 4)');
+    }
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+async function garageTests(browser, cfg, full) {
+  const tag = cfg.name + '/garage', chk = (p, c, kind, d) => { stats.shopChecks++; return c ? Promise.resolve() : fail(p, tag, kind, d); };
+  const { p, T } = await newPage(browser, cfg);
+  try {
+    await ev(p, () => { localStorage.setItem('mnr_bank', '500'); }); await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
+    await press(p, cfg, T, '#gaBtn'); await sleep(250);
+    let s = await ev(p, () => window.__bot.probe()); for (const b of s.bad) await fail(p, tag, 'layout', 'garage ' + b);
+    await chk(p, await ev(p, () => !document.getElementById('garage').hidden && document.querySelectorAll('#gaCards .card').length === 4), 'garage-ui', 'garage did not open with 4 cards');
+    await p.screenshot({ path: shotPath('garage-' + cfg.name) });
+    const buy = async (tab, id) => { await press(p, cfg, T, `.tabs button[data-t="${tab}"]`); await sleep(100); await press(p, cfg, T, `#gaCards .card[data-id="${id}"]`); await sleep(150); };
+    await ev(p, () => { __mnr.GA.bank = 10; }); await buy('ships', 'hv'); await chk(p, await ev(p, () => !__mnr.GA.own.ship_hv && __mnr.GA.bank === 10), 'garage-buy', 'bought a ship without the Neon');
+    await ev(p, () => { __mnr.GA.bank = 500; });
+    await buy('ships', 'tri'); await buy('crew', 'up_db'); await buy('looks', 'dusk');
+    await p.screenshot({ path: shotPath('garage-looks-' + cfg.name) });
+    s = await ev(p, () => ({ own: __mnr.GA.own, bank: __mnr.GA.bank, ship: __mnr.GA.ship, theme: __mnr.GA.theme, f: document.getElementById('game').style.filter }));
+    await chk(p, s.own.ship_tri && s.own.up_db && s.own.th_dusk && s.bank === 500 - 80 - 70 - 60 && s.ship === 'tri' && s.theme === 'dusk' && /hue-rotate/.test(s.f), 'garage-buy', 'purchases wrong ' + JSON.stringify(s));
+    // persistence across a reload
+    await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
+    s = await ev(p, () => ({ own: __mnr.GA.own, bank: __mnr.GA.bank, ship: __mnr.GA.ship, theme: __mnr.GA.theme, f: document.getElementById('game').style.filter, btn: document.getElementById('gaBtn').textContent }));
+    await chk(p, s.own.ship_tri && s.own.up_db && s.own.th_dusk && s.bank === 290 && s.ship === 'tri' && s.theme === 'dusk' && /hue-rotate/.test(s.f) && /290/.test(s.btn), 'garage-persist', 'not kept after reload ' + JSON.stringify(s));
+    // the unlocked extra upgrade is now in the pit-stop pool; the bought ship is the one flown
+    if (!await startGame(p, cfg, T)) { await fail(p, tag, 'start', 'no start'); await p.context().close(); return; }
+    s = await ev(p, () => ({ ship: __mnr.SH.ship, db: __mnr.SH.pool().some(u => u.id === 'db'), nx: __mnr.SH.pool().some(u => u.id === 'nx') }));
+    await chk(p, s.ship === 'tri' && s.db && !s.nx, 'garage-effect', 'ship/pool wrong ' + JSON.stringify(s));
+    // Neon banks after a run: unspent + 30% of earned
+    await ev(p, () => { const m = __mnr; m.god = false; m.SH.neon = 20; m.SH.earned = 50; m.P.hp = 1; });
+    await ev(p, () => { __mnr.G.eb.push({ x: __mnr.P.x, y: __mnr.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); __mnr.P.inv = 0; __mnr.SH.sh = 0; });
+    await waitFor(p, () => !__mnr.running, null, 6000); await sleep(300);
+    s = await ev(p, () => ({ bank: __mnr.GA.bank, line: document.getElementById('oNeon').textContent, runs: __mnr.GA.runs, stored: localStorage.getItem('mnr_bank') }));
+    await chk(p, s.bank === 290 + 20 + 15 && s.stored === String(s.bank) && /Banked/.test(s.line), 'garage-bank', 'run did not bank Neon ' + JSON.stringify(s));
+    s = await ev(p, () => window.__bot.probe()); for (const b of s.bad) await fail(p, tag, 'layout', 'game over ' + b);
+    if (full) await shipTests(p, cfg, T, tag);
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+async function shipTests(p, cfg, T, tag) {               // each ship fires its own rhythm
+  const chk = (c, kind, d) => { stats.shopChecks++; return c ? Promise.resolve() : fail(p, tag, kind, d); };
+  await ev(p, () => { localStorage.setItem('mnr_own', JSON.stringify({ ship_tri: true, ship_hv: true, ship_ec: true })); });
+  for (const ship of ['std', 'tri', 'hv', 'ec']) {
+    await ev(p, sh => { localStorage.setItem('mnr_ship', JSON.stringify(sh)); }, ship); await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
+    if (!await startGame(p, cfg, T)) { await fail(p, tag, 'start', 'no start ' + ship); continue; }
+    await ev(p, () => { const m = __mnr; m.god = true; m.P.wl = 1; window.__log = []; setInterval(() => { for (const b of m.G.pb) if (!b.s) { b.s = 1; window.__log.push([performance.now(), b.ec ? 1 : 0, b.hv ? 1 : 0, m.bpos(), m.BT.spb]); } }, 8); });
+    await sleep(3200);                                    // let the first banner pass; then hold fire
+    if (cfg.touch) await T.down(1, cfg.w / 2, cfg.h / 2); else await p.keyboard.down('Space');
+    await sleep(5200); if (cfg.touch) await T.up(1); else await p.keyboard.up('Space'); await sleep(800);
+    const L = await ev(p, () => window.__log), spb = L.length ? L[0][4] : .5;
+    const vol = [], cl = a => { const out = []; for (const r of a) { if (!out.length || r[0] - out[out.length - 1].t > 30) out.push({ t: r[0], n: 1, bp: r[3], ec: r[1], hv: r[2] }); else out[out.length - 1].n++; } return out; };
+    const norm = cl(L.filter(r => !r[1])), ech = cl(L.filter(r => r[1])), V = norm, dur = V.length > 1 ? (V[V.length - 1].t - V[0].t) / 1000 : 0, perBeat = dur ? (V.length - 1) / (dur / spb) : 0;
+    const gridOk = (g) => norm.filter(v => { const f = (v.bp / g) % 1; return Math.min(f, 1 - f) * g < .3; }).length / Math.max(1, norm.length);
+    if (ship === 'std') await chk(norm.length > 8 && !ech.length && !norm.some(v => v.hv) && perBeat > 3, 'ship-rhythm', 'Courier volleys/beat ' + perBeat.toFixed(2));
+    if (ship === 'tri') { const pb = norm.length > 1 ? (norm.length - 1) / ((norm[norm.length - 1].t - norm[0].t) / 1000 / spb) : 0; await chk(norm.length > 8 && Math.abs(pb - 3) < .5 && gridOk(1 / 3) > .8 && norm.every(v => v.n >= 4), 'ship-rhythm', `Triplet ${pb.toFixed(2)}/beat grid ${gridOk(1 / 3).toFixed(2)} n=${norm.map(v => v.n).slice(0, 5)}`); }
+    if (ship === 'hv') { const pb = norm.length > 1 ? (norm.length - 1) / ((norm[norm.length - 1].t - norm[0].t) / 1000 / spb) : 0; await chk(norm.length > 3 && Math.abs(pb - .5) < .1 && gridOk(2) > .8 && norm.every(v => v.hv), 'ship-rhythm', `Heavy ${pb.toFixed(2)}/beat grid ${gridOk(2).toFixed(2)}`); }
+    if (ship === 'ec') { const ok = ech.filter(e => norm.some(n => Math.abs(e.t - n.t - spb * 1000) < 90)).length; await chk(norm.length > 4 && ech.length >= norm.length - 2 && ok >= ech.length * .8, 'ship-rhythm', `Echo ${ech.length} echoes of ${norm.length}, ${ok} one beat late`); }
+  }
+}
+function econReport() {
+  const E = stats.econ; if (!E.length) return; const avg = k => E.reduce((a, b) => a + b[k], 0) / E.length;
+  const pits1 = E.filter(e => e.pit.length).map(e => e.pit[0]); console.log(`\nNEON ECONOMY over ${E.length} bot runs (${pits1.length} reached a pit stop; Neon in hand at the first one: ${pits1.join(', ') || '-'}): earned ${avg('earned').toFixed(1)} per run (min ${Math.min(...E.map(e => e.earned))}, max ${Math.max(...E.map(e => e.earned))}), spent ${avg('spent').toFixed(1)}, pit-stop picks ${avg('picks').toFixed(2)}, banked ${avg('bank').toFixed(1)}, reached district index ${avg('di').toFixed(1)}, run length ${avg('t').toFixed(0)} s`);
+  for (const e of E) console.log('   ', JSON.stringify(e));
+}
+
 (async () => {
   const srv = await startServer(); const browser = await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream'] });
   const t0 = Date.now(); console.log('serving', URL_BASE, 'runs', RUNS, 'secs', SECS, 'par', PAR);
@@ -695,6 +868,9 @@ async function shots(browser) {                          // portrait screenshots
     if (want('songs')) ['stage1', 'stage2', 'stage3'].forEach((st, i) => solo.push(() => songTests(browser, st, i)));
     if (want('ios')) solo.push(() => iosTests(browser));
     for (const j of solo) await j();
+    if (want('shop')) CFGS.forEach((c, k) => pre.push(() => shopTests(browser, c, k === 0 || k === 3)));
+    if (want('garage')) CFGS.forEach((c, k) => pre.push(() => garageTests(browser, c, k === 0 || k === 3)));
+    for (let k = 0; k < ECON; k++) pre.push(() => playRun(browser, CFGS[k % 2], 100 + k, 'econ'));
     const all = pre.concat(jobs); let next = 0;
     await Promise.all(Array.from({ length: PAR }, async () => { while (next < all.length) { const j = all[next++]; await j(); } }));
     if (want('webkit')) await webkitTests();
@@ -709,6 +885,7 @@ async function shots(browser) {                          // portrait screenshots
   const avg = stats.fps.length ? stats.fps.reduce((a, b) => a + b, 0) / stats.fps.length : 0;
   console.log(`\nruns ${stats.runs}, ticks ${stats.ticks}, avg FPS ${avg.toFixed(1)} (${stats.fps.length} runs), perfects ${stats.perfect}, kills ${stats.kills}, bosses reached ${stats.bosses}, furthest district index ${stats.maxDistrict}, max particles (calm) ${stats.maxPt || 0}, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   if (stats.fps.length && avg < 45) fails.push({ tag: 'all', kind: 'FPS', detail: 'average FPS ' + avg.toFixed(1) });
+  econReport(); console.log(`shop: ${stats.pits} pit stops played in runs, ${stats.shopChecks} shop/garage checks`);
   fs.writeFileSync(path.join(OUT, 'sweep-result.json'), JSON.stringify({ fails, stats, avg }, null, 1));
   if (fails.length) { console.log('\nFAILED:', fails.length); for (const f of fails) console.log(' -', f.tag, f.kind, f.detail, f.shot); process.exit(1); }
   console.log('\nSWEEP PASSED');

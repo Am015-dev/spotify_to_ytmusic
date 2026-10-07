@@ -63,9 +63,10 @@ function newGame(daily){
   G={spawnB:[],t:0,scroll:0,di:0,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
      daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
-  enterDistrict(0);}
+  SH.reset();enterDistrict(0);}
 function diff(){const ease=G.loop?1:clamp(.62+.38*G.t/180,.62,1);return(1+.13*G.di+.45*G.loop)*ease;}   // gentle first three minutes
-const stageFor=(i,boss)=>boss?'boss':G.loop?'endless':['stage1','stage2','stage3'][i%3];
+const bossStage=k=>k===3?'boss2':'boss';   // final boss gets its own song
+const stageFor=(i,boss)=>boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):G.loop?['endless','endless2'][i%2]:['stage1','stage2','stage3'][i%3];
 function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:''),false,3.2);AU.root=D.root;AU.boss=false;
   if(G.live)AU.startStage(stageFor(i,false));}
@@ -92,7 +93,7 @@ function spawnBoss(){const D=DISTRICTS[G.di],k=D.boss;
   const hp=Math.round((340+110*k)*(1+.35*G.loop)*(G.loop||G.t>180?1:.85));
   G.boss={type:'boss',k,x:W+120,y:H/2,r:k===3?54:46,hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:5000*(k+1),col:[D.a,D.b,D.a,D.a][k]};
   G.en.push(G.boss);banner('WARNUNG',D.bossName+' · '+D.bossSub,true,3);AU.boss=true;AU.sfx('warn');
-  if(G.live)AU.startStage('boss');}
+  if(G.live)AU.startStage(bossStage(k));}
 
 /* ---------- effects + scoring ---------- */
 function burst(x,y,col,n=18,sp=260,life=.6){if(SET.calm){if(FXV.near(x,y))return;n=Math.ceil(n*.3);life*=.55;}for(let i=0;i<n;i++){const a=rnd(0,7),s=rnd(40,sp);G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(life*.5,life),m:life,c:col,sz:rnd(1.5,3.5)});}}
@@ -115,7 +116,7 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   else if(e.type==='gunship'){drop(P.wl<3&&GX()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
   if(GX()<.035&&P.hp<P.max)drop('hp');}
-function hurt(){if(P.inv>0||P.dashT>0||G.dead||godMode)return;P.hp--;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);C.n=0;G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
+function hurt(){if(P.inv>0||P.dashT>0||G.dead||godMode)return;if(SH.absorb())return;P.hp--;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);C.n=0;G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;shake(16);burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
 
@@ -128,7 +129,7 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
 function onTick(i){const e=G.boss;if(e&&e.x<=790&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
   const sp=e.ph===3?1.1:1;e.sa+=.36;for(let j=0;j<3;j++)eb(e.x,e.y,e.sa+j*2.094,(150+10*diff())*sp,'#ff3dbb',5);}}
 function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
-  if(C.n>0&&G.bc-C.lb>8)C.n=0;                           // combo drops after 8 beats without a PERFECT
+  if(C.n>0&&G.bc-C.lb>8+SH.ck)C.n=0;                           // combo drops after 8 beats without a PERFECT
   if(G.waveWait&&i%4===0&&!G.dead&&!G.boss&&!G.bossDone){const D=DISTRICTS[G.di];G.waveWait=false;
     G.waveT=barQ(WAVES[gpick(D.waves)]()/(0.8+0.2*d)*(G.loop?1:clamp(1.3-.3*G.t/180,1,1.3)));}
   if(G.dead)return;
@@ -153,6 +154,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=32?3:bar>=16?
 
 /* ---------- update ---------- */
 function update(dt){
+  if(SH.active){SH.tick(dt);return;}                      // pit stop: the world waits
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
   const sdt=dt*G.slow;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
@@ -170,7 +172,7 @@ function update(dt){
     let mx=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0),my=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0);
     if(mx||my){const l=Math.hypot(mx,my);P.dx=mx/l;P.dy=my/l;}
     const dashTs=pressed.ShiftLeft||pressed.ShiftRight||pressed.KeyK||pressed.Dash;
-    if(dashTs&&P.dashCd<=0){P.dashT=.2;P.dashCd=1;if(!(mx||my)&&!touch){P.dx=1;P.dy=0;}AU.sfx('dash');
+    if(dashTs&&(P.dashCd<=0||SH.spare>0)){if(P.dashCd>0)SH.spare--;P.dashT=.2;P.dashCd=1;if(!(mx||my)&&!touch){P.dx=1;P.dy=0;}AU.sfx('dash');
       P.dashPf=tryPerfect('dash',dashTs,P.x,P.y);if(P.dashPf){P.dashCd=.5;G.score+=Math.round(200*G.mult);}}
     P.dashT=Math.max(0,P.dashT-sdt);P.dashCd=Math.max(0,P.dashCd-sdt);P.inv=Math.max(0,P.inv-sdt);if(P.dashT<=0)P.dashPf=false;
     const py0=P.y;
@@ -187,11 +189,9 @@ function update(dt){
     const firing=K.Space||K.KeyJ||touchFire;P.fcd-=sdt;
     if(pressed.Fire&&!P.over&&tryPerfect('fire',pressed.Fire,P.x+30,P.y))P.pfT=G.t;
     if(P.over){P.heat-=48*sdt;if(P.heat<=25)P.over=false;}
-    else if(firing&&P.fcd<=0){P.fcd=Math.max(.09,BT.spb/6);P.heat+=1.65;const x=P.x+22,y=P.y+2,pf=G.t-P.pfT<.4?1:0;
-      G.pb.push({x,y:y-5,vx:900,vy:0,dm:1,pf},{x,y:y+5,vx:900,vy:0,dm:1,pf});
-      if(P.wl>=2)G.pb.push({x,y,vx:860,vy:-150,dm:1,pf},{x,y,vx:860,vy:150,dm:1,pf});
-      if(P.wl>=3)G.pb.push({x,y,vx:980,vy:0,dm:2,big:1,pf});
-      NR.emit('fire',{x,y,pf});AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
+    else if(firing&&P.fcd<=0&&SH.canFire()){const fr=SH.shot();P.fcd=fr.cd;P.heat+=fr.heat;const x=P.x+22,y=P.y+2,pf=G.t-P.pfT<.4*NR.mod.pw?1:0;
+      SH.volley(x,y,pf);NR.emit('fire',{x,y,pf});
+      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
     else if(!firing)P.heat=Math.max(0,P.heat-34*sdt);
     if(!SET.calm&&Math.random()<.7)G.pt.push({x:P.x-18,y:P.y+rnd(-2,2)+2,vx:rnd(-220,-120),vy:rnd(-15,15),l:.3,m:.3,c:D.a,sz:rnd(2,4)});
   }
@@ -201,8 +201,8 @@ function update(dt){
   if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;G.waveT-=dt;
     if(G.dt>=distLen()){if(G.en.length===0||G.dt>distLen()+6)spawnBoss();}
     else if(G.waveT<=0)G.waveWait=true;                   // the wave itself enters on the next bar
-    if(!G.preload&&G.dt>10){G.preload=true;const n=(G.di+1)%DISTRICTS.length;loadTrack('boss');loadTrack(stageFor(n,false));}}
-  if(G.transT>=0){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}enterDistrict(n);}}
+    if(!G.preload&&G.dt>10){G.preload=true;const n=(G.di+1)%DISTRICTS.length;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
+  if(G.transT>=0){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}SH.pit(()=>enterDistrict(n));}}
 
   /* enemies */
   for(const e of G.en){e.t+=sdt;e.flash=Math.max(0,e.flash-dt);
@@ -219,11 +219,12 @@ function update(dt){
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
   /* player bullets */
-  for(const b of G.pb){b.x+=b.vx*sdt;b.y+=b.vy*sdt;
+  for(const b of G.pb){if(SH.hm)SH.steer(b,sdt);b.x+=b.vx*sdt;b.y+=b.vy*sdt;
     for(const e of G.en){if(e.hp<=0||e.dying)continue;let hit=false;
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
-      else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4)**2;
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm;e.flash=.06;e.pf=b.pf;b.dead=1;G.score+=2;if(Math.random()<.3)burst(b.x,b.y,'#ffffff',3,120,.2);AU.sfx('hit');break;}}
+      else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
+      if(hit&&b.px&&b.px.has(e))continue;
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1);e.flash=.06;e.pf=b.pf;if(b.px)b.px.add(e);else b.dead=1;G.score+=2;if(Math.random()<.3)burst(b.x,b.y,'#ffffff',3,120,.2);AU.sfx('hit');break;}}
     if(b.x>W+30||b.y<-20||b.y>H+20)b.dead=1;}
   G.pb=G.pb.filter(b=>!b.dead);
   for(const e of G.en){if(e.hp<=0&&!e.dead){e.dead=1;if(e.type==='boss')bossDown(e);else kill(e);}
@@ -241,7 +242,7 @@ function update(dt){
 
   /* pickups */
   for(const p of G.pk){p.bob+=dt*4;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);
-    if(l<140&&!G.dead){p.vx+=dx/l*1400*sdt;p.vy+=dy/l*1400*sdt;}else{p.vx+=(-70-p.vx)*sdt*2;p.vy*=1-sdt*2;}
+    if(l<NR.mod.mag&&!G.dead){p.vx+=dx/l*1400*sdt;p.vy+=dy/l*1400*sdt;}else{p.vx+=(-70-p.vx)*sdt*2;p.vy*=1-sdt*2;}
     p.x+=p.vx*sdt;p.y+=p.vy*sdt;
     if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');
       if(p.t==='shard'){G.mult=Math.min(9.9,+(G.mult+.1).toFixed(1));G.score+=Math.round(50*G.mult);}
@@ -257,6 +258,7 @@ function update(dt){
   for(const r of G.rings)r.l-=dt;G.rings=G.rings.filter(r=>r.l>0);
   if(!G.dead&&G.slow<1)G.slow=Math.min(1,G.slow+dt);
   NR.emit('tick',dt);
+  SH.upd(sdt);
 }
 
 function bossUpdate(e,dt,d){
