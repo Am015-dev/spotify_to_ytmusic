@@ -65,7 +65,8 @@ function newGame(daily){
      daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
   SH.reset();enterDistrict(0);}
 function diff(){const ease=G.loop?1:clamp(.62+.38*G.t/180,.62,1);return(1+.13*G.di+.45*G.loop)*ease;}   // gentle first three minutes
-const stageFor=(i,boss)=>boss?'boss':G.loop?'endless':['stage1','stage2','stage3'][i%3];
+const bossStage=k=>k===3?'boss2':'boss';   // final boss gets its own song
+const stageFor=(i,boss)=>boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):G.loop?['endless','endless2'][i%2]:['stage1','stage2','stage3'][i%3];
 function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:''),false,3.2);AU.root=D.root;AU.boss=false;
   if(G.live)AU.startStage(stageFor(i,false));}
@@ -92,7 +93,7 @@ function spawnBoss(){const D=DISTRICTS[G.di],k=D.boss;
   const hp=Math.round((340+110*k)*(1+.35*G.loop)*(G.loop||G.t>180?1:.85));
   G.boss={type:'boss',k,x:W+120,y:H/2,r:k===3?54:46,hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:5000*(k+1),col:[D.a,D.b,D.a,D.a][k]};
   G.en.push(G.boss);banner('WARNUNG',D.bossName+' · '+D.bossSub,true,3);AU.boss=true;AU.sfx('warn');
-  if(G.live)AU.startStage('boss');}
+  if(G.live)AU.startStage(bossStage(k));}
 
 /* ---------- effects + scoring ---------- */
 function burst(x,y,col,n=18,sp=260,life=.6){for(let i=0;i<n;i++){const a=rnd(0,7),s=rnd(40,sp);G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(life*.5,life),m:life,c:col,sz:rnd(1.5,3.5)});}}
@@ -200,7 +201,7 @@ function update(dt){
   if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;G.waveT-=dt;
     if(G.dt>=distLen()){if(G.en.length===0||G.dt>distLen()+6)spawnBoss();}
     else if(G.waveT<=0)G.waveWait=true;                   // the wave itself enters on the next bar
-    if(!G.preload&&G.dt>10){G.preload=true;const n=(G.di+1)%DISTRICTS.length;loadTrack('boss');loadTrack(stageFor(n,false));}}
+    if(!G.preload&&G.dt>10){G.preload=true;const n=(G.di+1)%DISTRICTS.length;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
   if(G.transT>=0){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}SH.pit(()=>enterDistrict(n));}}
 
   /* enemies */
