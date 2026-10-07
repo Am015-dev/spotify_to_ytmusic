@@ -51,6 +51,61 @@ async function game(b, gi, [W, H]) {
     const np = 3 + Math.floor(R() * 2); await p.evaluate(n => { UI.opt = UI.opt || {}; UI.opt.np = n; setNp(n); renderStart(); }, np);
     c = await ev(`__sw.btn('[data-start=vs]')`); if (!c) { fail('no vs button'); throw 0; } await tap(c.x, c.y); await p.waitForTimeout(900);
     await p.evaluate(LIB);
+
+    // ---- help kit checks: tips ON from a fresh profile in 4 of 5 games (each first-time bubble once, short, pointing at its target, never covering the target or
+    // a glowing thing, dismissed by a tap, game still completes); the 5th game has tips OFF (no bubble may appear). The bulb finger must equal hlpSuggest().
+    const tipsOn = gi % 5 !== 4, seenPh = new Set(); let bulbN = 0;
+    await p.evaluate(on => { GXH.reset(); GXH.setEnabled(on); }, tipsOn);
+    const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
+    const NEUTRAL = [60, 16];
+    const bubbleInfo = ph => p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(); const r = e.getBoundingClientRect();
+      const av = [...document.querySelectorAll('#belt .hc.rec,#tbl .grp.usable,#rs .btn')].filter(x => x.getBoundingClientRect().width).map(x => { const q = x.getBoundingClientRect(); return { l: q.left + q.width / 2 - 14, r: q.left + q.width / 2 + 14, t: q.top + q.height / 2 - 14, b: q.top + q.height / 2 + 14 }; });
+      return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, B: { l: r.left, t: r.top, r: r.right, b: r.bottom }, av, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; }, ph);
+    const rulesCheck = async ph => {
+      const R0 = await p.evaluate(() => { const e = document.querySelector('.gxh-rules'); if (!e) return null; const out = [], n = +e.dataset.count;
+        for (let i = 0; i < n; i++) { out.push({ t: e.querySelector('.gxh-rt').textContent, x: e.querySelector('.gxh-rx').textContent, pic: !!e.querySelector('.gxh-pic svg') }); if (i < n - 1) e.querySelector('.gxh-next').click(); }
+        const r = e.querySelector('.gxh-card').getBoundingClientRect(); return { n, cards: out, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; });
+      if (!R0) { fail('rules cards did not open (' + ph + ')'); return; }
+      if (R0.n < 2 || R0.n > 4) fail('rules for ' + ph + ' have ' + R0.n + ' cards (want 2-4)');
+      R0.cards.forEach(c => { if (wc(c.x) > 20) fail('rules card over 20 words (' + ph + '): ' + c.x); if (!c.pic) fail('rules card without a picture (' + ph + '): ' + c.t); });
+      if (!R0.inside) fail('rules card outside the screen (' + ph + ')');
+      await p.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await p.waitForTimeout(100);
+      if (await p.evaluate(() => !!document.querySelector('.gxh-rules'))) fail('rules cards did not close');
+    };
+    // one first-time bubble of the current phase (returns true when it was handled)
+    const bubbleFlow = async ph => {
+      if (!tipsOn || !ph || seenPh.has(ph)) return false; seenPh.add(ph);
+      let b = null; const t1 = Date.now(); while (Date.now() - t1 < 2500) { b = await bubbleInfo(ph); if (b) break; await p.waitForTimeout(100); }
+      if (!b) { fail('no coach bubble for phase ' + ph); return false; }
+      if (b.id !== ph) fail('bubble for ' + b.id + ' shown in phase ' + ph);
+      if (wc(b.title) > 4) fail('bubble title over 4 words: ' + b.title); if (wc(b.text) > 20) fail('bubble text over 20 words: ' + b.text);
+      if (!b.arrow || !b.ok) fail('bubble without arrow or Got it (' + ph + ')'); if (!b.inside) fail('bubble outside the screen (' + ph + ')');
+      const X = (a, c) => a.l < c.r && a.r > c.l && a.t < c.b && a.b > c.t;
+      if (b.T && X(b.B, { l: b.T.l, r: b.T.r, t: b.T.t, b: b.T.b })) fail('bubble covers its target (' + ph + ')');
+      b.av.forEach(a => { if (X(b.B, a)) fail('bubble covers a glowing thing (' + ph + ')'); });
+      await tap(...NEUTRAL); await p.waitForTimeout(140);
+      if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) fail('bubble did not dismiss on a tap (' + ph + ')');
+      return true;
+    };
+    const bulbFlow = async ph => {
+      if (!ph || bulbN >= 12 || !(!seenPh.has('bulb:' + ph) || R() < .25)) return false; seenPh.add('bulb:' + ph); bulbN++; stats.bulbs = (stats.bulbs || 0) + 1;
+      const pre = await p.evaluate(() => { const s = hlpSuggest(); const r = s && s.target() && s.target().getBoundingClientRect(); return { has: !!s, why: s && s.why, to: r && { x: r.left + r.width / 2, y: r.top + r.height / 2 }, sig: JSON.stringify([G.round, G.turn, G.players[0].hand.length, G.players[0].picked, UI.sel, UI.twin]) }; });
+      const bb = await ev(`__sw.btn('#bulbbtn')`); if (!bb) { fail('no bulb button'); return false; }
+      await tap(bb.x, bb.y); await p.waitForTimeout(350);
+      const r = await p.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'); return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!document.querySelector('.gxh-rules') }; });
+      if (pre.has) {
+        if (!r.f) fail('bulb tapped, no finger (' + ph + ')');
+        else if (Math.abs(+r.f.tx - pre.to.x) > 2 || Math.abs(+r.f.ty - pre.to.y) > 2) fail('bulb finger ' + r.f.tx + ',' + r.f.ty + ' != suggestion ' + Math.round(pre.to.x) + ',' + Math.round(pre.to.y) + ' (' + ph + ')');
+        if (!r.ring) fail('bulb: nothing glows at the suggestion'); if (!r.why || wc(r.why) > 15) fail('bulb why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) fail('bulb bubble has no "How does this work?"');
+        const a1 = await __chk('bulb ' + ph);
+        if (R() < .5 && r.link) { const lk = await ev(`__sw.btn('.gxh-bub .gxh-link')`); if (lk) { await tap(lk.x, lk.y); await p.waitForTimeout(250); await rulesCheck(ph); } } else { await tap(...NEUTRAL); await p.waitForTimeout(150); }
+      } else { stats.bulbNull = (stats.bulbNull || 0) + 1; if (r.f) fail('bulb with no suggestion still pointed a finger'); if (!r.rules) fail('bulb with no suggestion did not open the rules'); else await rulesCheck(ph); }
+      await p.evaluate(() => GXH.hide());
+      const a = await p.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: JSON.stringify([G.round, G.turn, G.players[0].hand.length, G.players[0].picked, UI.sel, UI.twin]) }));
+      if (a.g) fail('help still on screen after a tap (' + ph + ')'); if (a.sig !== pre.sig) fail('tapping the bulb changed the game (' + pre.sig + ' -> ' + a.sig + ')');
+      return true;
+    };
+    const __chk = async tg => { const a = await ev(`__sw.audit()`); a.covered.forEach(x => fail('covered ' + x + ' @' + tg)); if (a.hscroll) fail('hscroll @' + tg); return a; };
     let lastSig = '', lastT = Date.now(), over = false, handled = new Set(), rotated = 0, nodead = 0;
     const t0 = Date.now();
     while (Date.now() - t0 < 420000) {
@@ -68,12 +123,14 @@ async function game(b, gi, [W, H]) {
           if (W < H) { const bd = await ev(`__sw.board()`); stats.board = Math.min(stats.board, bd); if (bd < 55) fail('board ' + bd + '%'); }
           if (ag) { over = true; break; }
         }
+        if (nx) await bubbleFlow('tally');
         await p.waitForTimeout(200); if (R() < .5) await p.waitForTimeout(500);
         const n2 = await ev(`__sw.btn('#rs [data-a=rsnext]')`); if (n2) { await tap(n2.x, n2.y); await p.waitForTimeout(250); }
         continue;
       }
       if (st.over && st.rsOpen === false && !st.busy) { fail('game over without result buttons'); break; }
       if (st.pick) {
+        { const ph = await ev(`hlpPhase()`); if (await bubbleFlow(ph)) continue; if (await bulbFlow(ph)) continue; }
         const cards = await ev(`__sw.cards()`); if (!cards.length) { if (await ev(`!!document.querySelector('.gx-drawer.on') || !!document.querySelector('#ppop:not([hidden])')`)) await p.keyboard.press('Escape'); await p.waitForTimeout(150); continue; }
         // rotations mid-game
         if (rotated < 2 && R() < .07 && st.turn > 2) { rotated++; stats.rot++; await p.setViewportSize(rotated === 1 ? { width: Math.max(W, H), height: Math.min(W, H) } : { width: W, height: H }); await ev(`window.dispatchEvent(new Event('resize'));window.dispatchEvent(new Event('orientationchange'))`); await p.waitForTimeout(900); await p.evaluate(LIB); continue; }
@@ -85,12 +142,6 @@ async function game(b, gi, [W, H]) {
         // Twin Sticks: tap the glowing sticks on my tray, then two dishes
         const tw = await ev(`__sw.btn('#tbl .seat.me .grp.usable') || __sw.btn('#tbl .grp.usable')`);
         if (tw && cards.length >= 2 && R() < .8) { stats.twin++; await tap(tw.x, tw.y); await p.waitForTimeout(250); const tw2 = await ev(`UI.twin`); if (!tw2) fail('Twin Sticks glow did not respond'); else { const cs = await ev(`__sw.cards()`); const a = cs[0], b2 = cs[cs.length - 1]; await tap(a.x, a.y); await p.waitForTimeout(200); await tap(b2.x, b2.y); did = true; } }
-        if (!did && R() < .2) { // hint: tap the bulb, then the glowing dish
-          const bulb = await ev(`__sw.btn('#labacts .bulb') || __sw.btn('#acts [data-a=hint]')`);
-          if (bulb) { stats.hints++; await tap(bulb.x, bulb.y); await p.waitForTimeout(350); const rec = (await ev(`__sw.cards()`)).filter(x => x.rec); const two = await ev(`UI.rec && UI.rec.pick.length === 2`);
-            if (two) { const t2 = await ev(`__sw.btn('#tbl .grp.usable')`); if (t2) { await tap(t2.x, t2.y); await p.waitForTimeout(250); const cs = await ev(`__sw.cards().filter(x => UI.rec.pick.includes(x.i))`); for (const q of cs) { await tap(q.x, q.y); await p.waitForTimeout(200); } did = true; } else fail('hint wants Twin Sticks but nothing glows'); }
-            else if (!rec.length) fail('hint shows no glowing dish'); else { await tap(rec[0].x, rec[0].y); did = true; } }
-        }
         if (!did) { const cs = await ev(`__sw.cards()`); const q = cs[Math.floor(R() * cs.length)]; await tap(q.x, q.y); did = true; }
         await p.waitForTimeout(500);
         const after = await ev(`({ h: G.players[0].hand.length, p: G.players[0].picked, t: G.turn, r: G.round })`);
@@ -103,6 +154,7 @@ async function game(b, gi, [W, H]) {
       await p.waitForTimeout(160);
     }
     if (!over && !fails.length) fail('game did not finish in time');
+    { const hs = await p.evaluate(() => GXH.state()); const dup = hs.shown.filter((x, i) => hs.shown.indexOf(x) !== i); if (dup.length) fail('bubble shown twice: ' + dup.join()); if (!tipsOn && hs.shown.length) fail('tips off but bubbles shown: ' + hs.shown.join()); stats.tipsOff = (stats.tipsOff || 0) + (tipsOn ? 0 : 1); stats.bubs = hs.shown.length; }
     if (over) { // Play again must start a fresh game
       const ag = await ev(`__sw.btn('#rs [data-a=again]')`); if (ag) { await tap(ag.x, ag.y); await p.waitForTimeout(900); const ok = await ev(`G.phase === 'pick' && G.round === 1 && !UI.busy`); if (!ok) fail('Play again did not start a new game'); }
     }
@@ -117,7 +169,7 @@ async function game(b, gi, [W, H]) {
   let bad = 0; const t0 = Date.now();
   for (let gi = 0; gi < N; gi++) for (const sz of SIZES) {
     const r = await game(b, gi, sz); const s = r.stats;
-    console.log((r.fails.length ? 'FAIL ' : 'ok   ') + r.tag + ` overflowTurns ${s.over || 0} turns ${s.turns} rounds ${s.rounds} twin ${s.twin} hint ${s.hints} hurry ${s.hurry} rot ${s.rot} board ${s.board}% ${Math.round((Date.now() - t0) / 1000)}s` + (r.fails.length ? '\n   ' + r.fails.slice(0, 6).join('\n   ') : ''));
+    console.log((r.fails.length ? 'FAIL ' : 'ok   ') + r.tag + ` overflowTurns ${s.over || 0} turns ${s.turns} rounds ${s.rounds} twin ${s.twin} hint ${s.hints} hurry ${s.hurry} rot ${s.rot} bulbs ${s.bulbs || 0}/${s.bulbNull || 0}null bubbles ${s.bubs} board ${s.board}% ${Math.round((Date.now() - t0) / 1000)}s` + (r.fails.length ? '\n   ' + r.fails.slice(0, 6).join('\n   ') : ''));
     if (r.fails.length) bad++;
   }
   console.log(bad ? 'SWEEP FAILED: ' + bad : 'SWEEP CLEAN'); await b.close(); process.exit(bad ? 1 : 0);
