@@ -1,0 +1,14 @@
+phone ath {"min":2.14,"hits":11,"kinds":{"wall":4,"traffic":7},"wallHits":4,"wallPerMin":1.87,"hitsPerMin":5.13,"bigDrop":6,"stuckPct":6.9,"avgKmh":34.9,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":1.9,"traffic120m":2.4,"missions":[],"worst":[{"ctx":"DRIFT KING","f":2495,"v0":32,"v1":3,"drop":0.92,"kind":"traffic","x":2031,"z":-1648,"dy":0},{"ctx":"SPEED DEMON","f":7346,"v0":50,"v1":5,"drop":0.9,"kind":"traffic","x":2034,"z":-1649,"dy":0},{"ctx":"SPEED DEMON","f":6814,"v0":48,"v1":15,"drop":0.68,"kind":"traffic","x":2032,"z":-1650,"dy":0},{"ctx":"DRIFT KING","f":5763,"v0":51,"v1":17,"drop":0.66,"kind":"wall","x":2045,"z":-1663,"dy":0},{"ctx":"DRIFT KING","f":1741,"v0":44,"v1":16,"drop":0.64,"kind":"wall","x":2024,"z":-1631,"dy":0}],"monErr":null,"rot":{"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]},"scale":{"pedH":1.77,"carL":4.45,"carH":1.33,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.99,"pedVsPlayer":0.94,"nPed":8,"nCar":8},"road":{"roadPts":450,"blocked":0,"pct":0,"colliders":0,"sample":[]},"roadEnd":{"roadPts":435,"blocked":0,"pct":0,"colliders":0,"sample":[]},"overlap":[],"hudOverlap":[],"tiny":[],"extra":{"map":{"opened":false,"drag":null,"pinch":null},"pause":{"tP_settings":false,"opts":[],"opened":true,"frozen":true,"resumed":true},"garage":{"pause":false,"btn":false,"back":true},"otg":null},"events":[],"perf":{"calls":249,"tris":1766625,"jsMs":0,"geoms":1419,"tex":123},"wallSec":246}
+FAIL phone ath: wall/building hits ≤ 1/min · {"wallPerMin":1.87,"bigDrop":6,"hits":11}
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":6.9}
+PASS phone ath: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone ath: no loading screens while driving · {"loads":0}
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.77,"carL":4.45,"carH":1.33,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.99,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":885,"start":0,"end":0,"ex":[]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone: zero console / page errors · []
+TPLAY FAIL 3 · 246 s · qa_w14/tplay_live/phone-ath/tPlay.json
