@@ -37,7 +37,7 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
  const busy=()=>p.evaluate(()=>{const R=__mho.RO;return!!(R.card||R.mapOpen||R.story||R.frozen)});
  async function clear(){for(let i=0;i<10;i++){if(!(await busy()))return;let t=null;for(const s of CONT)if(await tap(s)){t=s;break}await tick(20)}}
  // setup: straight stretch (pick the longest straight run of an Autobahn sample)
- const ST=await p.evaluate(()=>{const M=__mho;let best=null;M.abS().forEach((S,k)=>{for(let i=0;i+40<S.n;i+=4){const a=M.abPt(k,i),c=M.abPt(k,i+40);const d=Math.abs(Math.atan2(a.tx,a.tz)-Math.atan2(c.tx,c.tz));if(d<.02&&(!best||d<best.d))best={k,i,d,x:a.x,z:a.z,h:Math.atan2(a.tx,a.tz)}}});return best});
+ const ST=await p.evaluate(()=>{const M=__mho;let best=null;M.abS().forEach((S,k)=>{if(!S.ab)return;for(let i=0;i+40<S.n;i+=4){const a=M.abPt(k,i),c=M.abPt(k,i+40);const d=Math.abs(Math.atan2(a.tx,a.tz)-Math.atan2(c.tx,c.tz));if(d<.02&&(!best||d<best.d))best={k,i,d,x:a.x,z:a.z,h:Math.atan2(a.tx,a.tz)}}});return best});
  const place=async(x,z,h)=>{await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.v=0;R.yr=0;R.vh=h;R.h=h;R.stkT=0;R.crTurn=null},[x,z,h]);await tick(30);await clear()};
  const res={mode:MODE,straight:ST,brake:[],traffic:[],errs};
  const D=180/Math.PI;const ad=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d};
@@ -56,8 +56,8 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
  if(TEST!=='brake')for(const kmh of[20,60,120,160]){
   // setup only: a stopped city traffic car on a straight segment (as at a red light); the player is placed behind it in its lane.
   // then real input: GAS (+BOOST for 160) until the target speed, then off the gas and coast into it.
-  const sel=await p.evaluate(()=>{const M=__mho,R=M.RO,H=M.HUB,N=H.nodes;let j=-1,bd=-1;(H.cars||[]).forEach((c,i)=>{if(c.dead>0||c.route||c.__used)return;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||A.g||B.g)return;const L=Math.hypot(B.x-A.x,B.z-A.z);const rest=L*(1-c.t);if(c.t*L>160&&rest>20&&L>bd){bd=L;j=i}});if(j<0)return null;
-   const c=H.cars[j],A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z);c.v=0;c.cv=0;c.__used=1;window.__tc=j;return{j,h:Math.atan2(B.x-A.x,B.z-A.z),x:c.x,z:c.z,back:c.t*L}});
+  const sel=await p.evaluate(([wantAB])=>{const M=__mho,R=M.RO,H=M.HUB,N=H.nodes;let j=-1,bd=-1;(H.cars||[]).forEach((c,i)=>{if(c.dead>0||c.route||c.tr||c.__used)return;const A=N[c.a],B=N[c.b];if(!A||!B||A.g||B.g||!!(A.ab&&B.ab)!==wantAB||(!wantAB&&(A.ab||B.ab)))return;const L=Math.hypot(B.x-A.x,B.z-A.z);const rest=L*(1-c.t);if(c.t*L>160&&rest>20&&L>bd){bd=L;j=i}});if(j<0)return null;
+   const c=H.cars[j],A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z);c.v=0;c.cv=0;c.hv=.01;c.route=[];c.__used=1;window.__tc=j;return{j,h:Math.atan2(B.x-A.x,B.z-A.z),x:c.x,z:c.z,back:c.t*L}},[kmh>=120]);
   if(!sel){res.traffic.push({kmh,err:'no traffic car'});continue}
   const runway=Math.min(sel.back-5,Math.max(40,(kmh/3.6)**2/(2*(kmh>100?9:6))+25));
   await place(sel.x-Math.sin(sel.h)*runway,sel.z-Math.cos(sel.h)*runway,sel.h);
