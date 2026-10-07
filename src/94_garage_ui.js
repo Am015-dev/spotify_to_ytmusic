@@ -44,10 +44,10 @@ function GB_msg(t){const e=$('#gbBkN');if(!e)return;e.textContent=t;clearTimeout
  v.addEventListener('pointerdown',e=>{if(!GB_.bk||e.target!==cvs)return;e.stopPropagation();cvs.setPointerCapture(e.pointerId);const p=pt(e);GB_.ptr.set(e.pointerId,{...p,x0:p.x,y0:p.y,t:performance.now(),b:e.button});if(GB_.ptr.size>1)GB_.multi=1;else GB_.multi=0;GB_.drag=0},true);
  v.addEventListener('pointermove',e=>{if(!GB_.bk||e.target!==cvs)return;e.stopPropagation();const q=GB_.ptr.get(e.pointerId),p=pt(e);
   if(!q){if(e.pointerType==='mouse'){GB_.mx=p;GB_hover()}return}
-  if(GB_.ptr.size===1){if(Math.hypot(p.x-q.x0,p.y-q.y0)>8)GB_.drag=1;if(GB_.drag){GB_.yaw-=(p.x-q.x)*.01;GB_.pit=clamp(GB_.pit+(p.y-q.y)*.008,.12,1.4)}q.x=p.x;q.y=p.y;if(e.pointerType==='mouse'){GB_.mx=p;if(!GB_.drag)GB_hover()}return}
+  if(GB_.ptr.size===1){if(Math.hypot(p.x-q.x0,p.y-q.y0)>(e.pointerType==='mouse'?8:14))GB_.drag=1;if(GB_.drag){GB_.yaw-=(p.x-q.x)*.01;GB_.pit=clamp(GB_.pit+(p.y-q.y)*.008,.12,1.4)}q.x=p.x;q.y=p.y;if(e.pointerType==='mouse'){GB_.mx=p;if(!GB_.drag)GB_hover()}return}
   const A=[...GB_.ptr.values()],d0=Math.hypot(A[0].x-A[1].x,A[0].y-A[1].y),mx0=(A[0].x+A[1].x)/2,my0=(A[0].y+A[1].y)/2;q.x=p.x;q.y=p.y;const d1=Math.hypot(A[0].x-A[1].x,A[0].y-A[1].y),mx1=(A[0].x+A[1].x)/2,my1=(A[0].y+A[1].y)/2;
   GB_.yaw-=(mx1-mx0)*.012;GB_.pit=clamp(GB_.pit+(my1-my0)*.01,.12,1.4);if(d0>10&&d1>10)GB_.dist=clamp(GB_.dist*d0/d1,7,26)},true);
- const up=e=>{if(!GB_.bk)return;const q=GB_.ptr.get(e.pointerId);if(!q)return;e.stopPropagation();GB_.ptr.delete(e.pointerId);if(e.type==='pointerup'&&!GB_.multi&&!GB_.drag&&performance.now()-q.t<900)GB_act(q.x0,q.y0,q.b===2);if(!GB_.ptr.size)GB_.multi=0};
+ const up=e=>{if(!GB_.bk)return;const q=GB_.ptr.get(e.pointerId);if(!q)return;e.stopPropagation();GB_.ptr.delete(e.pointerId);if(e.type==='pointerup'&&!GB_.multi&&!GB_.drag&&performance.now()-q.t<(e.pointerType==='mouse'?900:1500))GB_act(q.x0,q.y0,q.b===2);if(!GB_.ptr.size)GB_.multi=0};
  v.addEventListener('pointerup',up,true);v.addEventListener('pointercancel',up,true);v.addEventListener('wheel',e=>{if(!GB_.bk)return;e.preventDefault();GB_.dist=clamp(GB_.dist*(1+e.deltaY*.001),7,26)},{passive:false});
  v.addEventListener('contextmenu',e=>{if(GB_.bk)e.preventDefault()});
  addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden)return;const k=e.code;if(k==='Escape'){e.preventDefault();e.stopImmediatePropagation();GB_exit();return}
