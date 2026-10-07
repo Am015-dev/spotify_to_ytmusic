@@ -40,7 +40,7 @@ const FX=()=>SET.reduce?.25:1;                          // strength of flashes a
 /* ---------- beat clock ---------- */
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
 // currentTime when audio runs, and a plain game-time counter (fbT) when it does not, so the game also works silent.
-const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,endless:132};
+const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,boss2:140,endless:132,endless2:132};
 const distLen=()=>24*4*BT.spb;                            // a district is 24 bars of the current song
 const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds -> whole bars
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};

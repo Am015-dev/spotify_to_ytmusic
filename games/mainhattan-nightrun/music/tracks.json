@@ -1,5 +1,5 @@
 {
-  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, stage3, boss, endless. Files are loudness-normalised to about -18 LUFS (true peak -1.5 dB); offsets measured by onset alignment.",
+  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, stage3, boss, boss2 (final boss), endless, endless2. Files are loudness-normalised to about -18 LUFS (true peak -1.5 dB); offsets measured by onset alignment.",
   "tracks": [
     {
       "file": "menu.mp3",
@@ -32,16 +32,30 @@
     {
       "file": "boss.mp3",
       "stage": "boss",
-      "bpm": 140,
-      "offsetMs": 0,
-      "title": "Kronos Protocol"
+      "bpm": 100,
+      "offsetMs": 280,
+      "title": "Last Boss Standing"
+    },
+    {
+      "file": "boss2.mp3",
+      "stage": "boss2",
+      "bpm": 110,
+      "offsetMs": 270,
+      "title": "Final Protocol"
     },
     {
       "file": "endless.mp3",
       "stage": "endless",
-      "bpm": 132,
-      "offsetMs": 0,
-      "title": "Endless Shift"
+      "bpm": 136,
+      "offsetMs": 220,
+      "title": "Neon Pixel Sprint"
+    },
+    {
+      "file": "endless2.mp3",
+      "stage": "endless2",
+      "bpm": 84,
+      "offsetMs": 20,
+      "title": "Stage Eight Clear"
     }
   ]
 }
