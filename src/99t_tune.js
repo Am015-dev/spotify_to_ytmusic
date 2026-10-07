@@ -51,13 +51,13 @@ async function TU_setCur(v){if(!TU.db)return;try{await TU.db.doc('tune/current')
 function TU_load(v){const d=TU.list.find(q=>q.v===v);if(!d)return;TU_apply(d.values);TU.src='v'+v;TU.msg='loaded v'+v+' (not default until ★)';TU_render()}
 function TU_export(){const j=JSON.stringify({v:TU.cur,note:'export '+new Date().toISOString().slice(0,16),values:TU_vals()},null,1);TU.exp=j;
  const done=ok=>{TU.msg=ok?'JSON copied':'copy blocked: select the text below';TU_render()};try{navigator.clipboard.writeText(j).then(()=>done(true),()=>done(false))}catch(e){done(false)}}
-// ---- drawer UI (852×393 phone landscape first; opens instantly, no slide, so a tap never lands mid-animation). ⚙ sits top-centre, clear of the minimap, speed, pause and all drive controls;
-// the drawer is a left column that stops above the lowest touch control, so GAS/BRAKE/◀▶ stay usable while it is open.
+// ---- drawer UI (852×393 phone landscape first; opens instantly, no slide, so a tap never lands mid-animation). ⚙ sits top-right (coins/objective are top-centre, pause+minimap top-left);
+// on the phone the drawer fills the free middle column between ◀▶ and BRAKE/GAS/BOOST, so every drive control stays usable while it is open.
 const TU_fmt=(v,st)=>{const d=st>=1?0:st>=.1?1:st>=.01?2:st>=.001?3:4;return(+v).toFixed(d)};
 const TU_esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.textContent=`
-#tuG{position:fixed;top:calc(4px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:9000;width:34px;height:34px;border-radius:17px;border:1px solid #4ceaff88;background:#0b1424cc;color:#bff6ff;font:18px/32px system-ui;text-align:center;padding:0;touch-action:manipulation}
-#tuD{position:fixed;left:calc(6px + env(safe-area-inset-left));top:calc(6px + env(safe-area-inset-top));z-index:9001;width:min(360px,44vw);display:flex;flex-direction:column;background:#081120ee;border:1px solid #4ceaff66;border-radius:12px;color:#e6f7ff;font:13px/1.25 system-ui,sans-serif;box-shadow:0 6px 24px #0008;touch-action:pan-y}
+#tuG{position:fixed;top:calc(6px + env(safe-area-inset-top));right:calc(8px + env(safe-area-inset-right));z-index:9000;width:34px;height:34px;border-radius:17px;border:1px solid #4ceaff88;background:#0b1424cc;color:#bff6ff;font:18px/32px system-ui;text-align:center;padding:0;touch-action:manipulation}
+#tuD{position:fixed;left:6px;top:6px;z-index:9001;width:380px;display:flex;flex-direction:column;background:#081120ee;border:1px solid #4ceaff66;border-radius:12px;color:#e6f7ff;font:13px/1.25 system-ui,sans-serif;box-shadow:0 6px 24px #0008;touch-action:pan-y}
 #tuD:not(.on){display:none}#tuD *{box-sizing:border-box}
 #tuD .th{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid #4ceaff33}#tuD .th b{font-size:13px;color:#4ceaff}#tuD .th small{flex:1;font-size:12px;color:#9fb6c8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #tuD button{font:600 12px system-ui;color:#e6f7ff;background:#16304c;border:1px solid #4ceaff55;border-radius:7px;padding:5px 8px;min-height:28px}
@@ -88,9 +88,13 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
  addEventListener('resize',()=>TU_fit());TU_render()}
 function TU_toggle(on){TU.open=on==null?!TU.open:on;TU.el.classList.toggle('on',TU.open);if(TU.open){TU_render();TU_fit()}}
 // keep the drawer above every visible touch control it would cover (GAS/BRAKE/◀▶/DRIFT/BOOST): its bottom stops 6 px above them
-function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const L=d.offsetLeft,R0=L+d.offsetWidth,top=d.offsetTop;let bot=innerHeight-6;
- for(const e of document.querySelectorAll('#touch .tbtn,#steerZone')){const q=e.getBoundingClientRect();if(q.width<4||q.height<4||getComputedStyle(e).display==='none')continue;if(q.right>L&&q.left<R0)bot=Math.min(bot,q.top-6)}
- d.style.height=Math.max(150,bot-top)+'px'}
+function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const W=innerWidth,H=innerHeight,C=[];
+ for(const e of document.querySelectorAll('#touch .tbtn,#steerZone')){const q=e.getBoundingClientRect();if(q.width>4&&q.height>4&&getComputedStyle(e).display!=='none')C.push(q)}
+ // phone: the free column between the left cluster (◀▶ / steer pad) and the right cluster (BRAKE/GAS/BOOST); top buttons (pause) don't count
+ let L=6,R=W-6;for(const q of C){if(q.bottom<H*.45)continue;if(q.left+q.width/2<W/2)L=Math.max(L,q.right+6);else R=Math.min(R,q.left-6)}
+ const w=Math.max(260,Math.min(420,R-L)),x=Math.min(L,W-w-6);let top=6,bot=H-6;
+ for(const q of C)if(q.right>x&&q.left<x+w){if(q.bottom<H*.45)top=Math.max(top,q.bottom+6);else bot=Math.min(bot,q.top-6)}
+ d.style.left=x+'px';d.style.width=w+'px';d.style.top=top+'px';d.style.height=Math.max(150,bot-top)+'px'}
 function TU_render(){const d=TU.el;if(!d)return;const G=[...new Set(TUNE_K.map(k=>k[0]))],sv=TU.grp==='Saves';let h=`<div class="th"><b>TUNE</b><small>active: ${TU_esc(TU.src)}${TU.db?'':' · no db'}</small><button data-a="x" aria-label="close">✕</button></div><div class="tabs">`;
  for(const g of[...G,'Saves'])h+=`<button data-a="tab" data-g="${g}" class="${g===TU.grp?'on':''}">${g}</button>`;h+='</div><div class="bd">';
  if(!sv){for(const k of TUNE_K){if(k[0]!==TU.grp)continue;const v=TU_get(k[1]),ch=Math.abs(v-TU_DEF[k[1]])>k[5]/2;
@@ -102,7 +106,7 @@ function TU_render(){const d=TU.el;if(!d)return;const G=[...new Set(TUNE_K.map(k
   if(TU.exp)h+=`<textarea readonly>${TU_esc(TU.exp)}</textarea>`}
  h+=`</div>${TU.msg?`<div class="msg">${TU_esc(TU.msg)}</div>`:''}<div class="ft">${sv?'<button data-a="exp">EXPORT JSON</button><button data-a="ref">REFRESH</button><button data-a="resetAll">ALL DEFAULTS</button>':`<button data-a="reset">RESET ${TU.grp.toUpperCase()}</button><button data-a="tab" data-g="Saves">SAVE…</button>`}</div>`;
  const bd=d.querySelector('.bd'),sc=bd?bd.scrollTop:0,same=d.dataset.g===TU.grp;d.innerHTML=h;d.dataset.g=TU.grp;if(same){const b2=d.querySelector('.bd');if(b2)b2.scrollTop=sc}
- const ta=d.querySelector('textarea');if(ta){ta.focus();ta.select()}}
+ const ta=d.querySelector('textarea');if(ta){ta.focus();ta.select()}TU_fit()}
 // body width / length / ride height: cosmetic, on the player car only, applied after every other pose step (wrapped last, after boot)
 setTimeout(()=>{const f0=roamPose;roamPose=function(s,dt){const r=f0.apply(this,arguments);try{if(s===pl&&state==='roam')TU_body(s)}catch(e){}return r}},0);
 function TU_body(s){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;const sc=ud.m.scale,W=TUNE.carW,L=TUNE.carL,on=W!==1||L!==1;
