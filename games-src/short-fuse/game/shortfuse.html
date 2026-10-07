@@ -58,6 +58,69 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @media (min-width:1000px){.gx-grab{display:none}}
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
 
+/* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
+   Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
+:root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub.on{visibility:visible}
+.gxh-bub *{box-sizing:border-box}
+.gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
+.gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
+.gxh-bub .gxh-sp svg{width:100%;height:100%}
+.gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
+.gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
+.gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
+.gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
+.gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring.round{border-radius:50%}
+.gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
+.gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+.gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gxh-bulb svg{width:24px;height:24px;display:block;fill:#ffd95a;stroke:#6b4a00;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,217,90,.7))}
+.gxh-bulb.gxh-float{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:calc(var(--gxh-z) - 2);width:44px;height:44px;border-radius:50%;border:2px solid var(--gxh-accent);background:#2a1820}
+.gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
+.gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
+.gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
+.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
+.gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
+.gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
+.gxh-rules .gxh-rx{font-weight:600;font-size:16px}
+.gxh-rules .gxh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.gxh-rules .gxh-nav button{min-height:44px;min-width:76px;padding:0 14px;border-radius:22px;border:2px solid var(--gxh-btn);background:transparent;color:var(--gxh-btn);font:800 15px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-nav button.gxh-next{background:var(--gxh-btn);color:var(--gxh-btn-ink)}
+.gxh-rules .gxh-nav button[disabled]{opacity:.3}
+.gxh-rules .gxh-dots{display:flex;gap:6px}
+.gxh-rules .gxh-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.25)}
+.gxh-rules .gxh-dots i.on{background:var(--gxh-btn)}
+.gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
+.gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.gxh-pics svg{width:64px;height:64px}
+.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
+.gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.gxh-set>span{flex:1 0 90px;font-weight:700}
+.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
+@keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
+/* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+
 [hidden]{display:none!important}
 :root{--ink:#1c1838;--cream:#fff2d4;--paper:#fff6e2;--paper2:#f5dfb4;--orange:#ff8a1f;--orange2:#e8681c;--teal:#16b3a6;--purple:#8f5bff;--green:#52c23a;--green2:#2e9e2a;--red:#ef3b2d;--red2:#b3140c;--yellow:#ffc928;--blue:#2f86ff;--blue2:#1c62d9;--navy:#2b2f63;--navy2:#1f2250;
   --fd:'Lilita One','Arial Black',Impact,system-ui,sans-serif;--fb:'Nunito','Trebuchet MS','Segoe UI',system-ui,sans-serif;
@@ -583,6 +646,10 @@ html.short .nc{height:24px;min-width:18px}
 #gear.mini .nc{height:22px;min-width:16px}
 #gear.mini .mkr{padding:0 3px;font-size:.7rem}
 
+/* help kit colours */
+:root{--gxh-bg:#fff6e2;--gxh-ink:#1c1838;--gxh-accent:#ff8a1f;--gxh-glow:#ffc928;--gxh-btn:#e8681c;--gxh-btn-ink:#fff;--gxh-font:var(--fb)}
+.gx-bar .gxh-bulb{background:linear-gradient(#3a3f86,#2b2f63);border:2px solid #14163a;box-shadow:0 3px 0 #14163a;min-height:40px;min-width:40px;border-radius:12px}
+
 </style>
 </head>
 <body>
@@ -594,6 +661,7 @@ html.short .nc{height:24px;min-width:18px}
   <button class="gx-ibtn" data-gx="missiond" aria-expanded="false" data-ico="target" title="The job card" aria-label="Job card"><span>Job</span></button>
   <button class="gx-ibtn" data-gx="geard" aria-expanded="false" data-ico="gear" title="Equipment cards" aria-label="Equipment"><span>Gear</span></button>
   <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" title="How to play" aria-label="How to play"><span>Rules</span></button>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" title="Hint: what should I do?" aria-label="Hint: what should I do?"></button>
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" data-ico="menu" title="Menu" aria-label="Menu"><span>Menu</span></button>
 </header>
 <div class="gx-main">
@@ -671,6 +739,277 @@ const GX={key:'gx',open:null,
   drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
+
+</script>
+<script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// gx-help.js: on-demand and first-time help for any game. Coach bubbles (once per phase), a lightbulb (suggested move + rules cards), a tips switch.
+// Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
+//   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
+//   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
+// Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
+(function () {
+  'use strict';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
+  function load() {
+    var raw = null; try { raw = localStorage.getItem(key()); } catch (e) { raw = mem || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    st = { on: o && typeof o.on === 'boolean' ? o.on : cfg.defaultOn !== false, seen: (o && o.seen && typeof o.seen === 'object') ? o.seen : {} };
+  }
+  function save() { var s = JSON.stringify(st); mem = s; try { localStorage.setItem(key(), s); } catch (e) {} }
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function inter(a, b) { return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)); }
+  function infl(r, p) { return { left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p }; }
+  // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
+  var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
+  function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
+  function avoidRects(k) {
+    var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
+    var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+    }
+    return out;
+  }
+  function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
+  function place(b, tr) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
+    var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
+    var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
+    var ks = [CORE, 32];
+    for (var ki = 0; ki < ks.length && !best; ki++) {
+      var av = avoidRects(ks[ki]);
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
+        var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (hit(c, T)) continue;
+        var ov = 0; for (var k = 0; k < av.length; k++) if (hit(c, av[k])) ov += inter(c, av[k]) || 1;
+        var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
+        if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
+      }
+    }
+    var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
+    b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
+    var side = c2.bottom <= tr.top + 2 ? 'bottom' : c2.top >= tr.bottom - 2 ? 'top' : c2.right <= tr.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + side;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (side === 'top' || side === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, tr.cx - c2.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return c2;
+  }
+  function ringAt(r, cls) {
+    var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
+    if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
+    D.body.appendChild(e); return e;
+  }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function fingerAt(fr, tr) {
+    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+    f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
+    if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
+  // ------------------------------------------------------------------ the one current help element
+  function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
+  function hide() {
+    if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
+    cur = null; D.removeEventListener('pointerdown', onDown, true);
+  }
+  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
+  function onDown(e) {
+    if (rulesEl || !cur) return;
+    var t = e.target;
+    if (t && t.closest) {
+      if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
+      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+    }
+    hide();   // the tap is not swallowed: it still reaches whatever was tapped
+  }
+  function draw() {   // (re)build the visible pieces for cur at the current layout
+    if (!cur) return;
+    clearEls();
+    var tr = toRect(cur.target); if (!tr) { hide(); return; }
+    var fr = cur.from ? toRect(cur.from) : null, els = [];
+    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    else els.push(ringAt(tr, 'soft'));
+    var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
+    place(b, tr);
+  }
+  // ------------------------------------------------------------------ coach bubbles
+  function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function tryShow(id, n) {
+    pend = null;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var tr = toRect(step.target);
+    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    st.seen[id] = 1; save(); shown.push(id);
+    cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd">' + (step.pic ? '<div class="gxh-sp">' + picHTML(step.pic) + '</div>' : '') + '<div><div class="gxh-tt">' + esc(step.title) + '</div><div class="gxh-tx">' + esc(step.text) + '</div></div></div><div class="gxh-row2"><button type="button" class="gxh-ok">Got it</button></div>';
+      b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
+      return b;
+    } };
+    draw(); arm();
+  }
+  function phase(id) {
+    if (!cfg) return;
+    if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (pend) { if (pend.id === id) return; cancelPend(); }
+    if (!st.on || st.seen[id] || !cfg.steps[id]) return;
+    pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
+  }
+  // ------------------------------------------------------------------ the lightbulb
+  var BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>';
+  function bulbOpen() {
+    if (!bulbOpts || Date.now() < skipUntil) return;
+    hide(); cancelPend();
+    var s = null, ph = null;
+    try { s = bulbOpts.suggest ? bulbOpts.suggest() : null; } catch (e) { console.warn('gxh suggest', e); }
+    try { ph = bulbOpts.rulesFor ? bulbOpts.rulesFor() : null; } catch (e) {}
+    if (!s || !s.target || !toRect(s.target)) { rules(ph); return; }
+    cur = { kind: 'bulb', phase: ph, target: s.target, from: s.from, sug: s, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub gxh-bulbb'); b.setAttribute('role', 'status');
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">' + esc(s.why || '') + '</div><div class="gxh-row2"><button type="button" class="gxh-link">How does this work?</button></div>';
+      b.querySelector('.gxh-link').addEventListener('click', function () { rules(ph); });
+      return b;
+    } };
+    if (bulbEl) bulbEl.classList.add('lit');
+    draw(); arm();
+  }
+  function bulb(o) {
+    if (!cfg) return; bulbOpts = o || {};
+    var e = o && o.el; if (typeof e === 'string') e = D.querySelector(e);
+    if (!e) { e = mk('button', 'gxh-bulb gxh-float'); e.type = 'button'; D.body.appendChild(e); }
+    if (bulbEl && bulbEl !== e) bulbEl.removeEventListener('click', bulbOpen);
+    bulbEl = e; e.classList.add('gxh-bulb'); e.setAttribute('data-help', ''); if (!e.getAttribute('aria-label')) e.setAttribute('aria-label', 'Help: suggest a move');
+    if (!e.querySelector('svg')) e.insertAdjacentHTML('afterbegin', BULB);
+    e.removeEventListener('click', bulbOpen); e.addEventListener('click', bulbOpen);
+    return e;
+  }
+  // ------------------------------------------------------------------ rules cards
+  function rulesList(ph) {
+    var all = cfg.rules || [], m = function (r) { return r.phase === ph || (Array.isArray(r.phase) && r.phase.indexOf(ph) >= 0); };
+    var l = ph != null ? all.filter(m) : []; if (!l.length) l = all.filter(function (r) { return r.phase == null; }); if (!l.length) l = all.slice();
+    return l;
+  }
+  function closeRules() { if (rulesEl) { if (rulesEl.parentNode) rulesEl.parentNode.removeChild(rulesEl); rulesEl = null; D.removeEventListener('keydown', onKey, true); } }
+  function onKey(e) { if (!rulesEl) return; if (e.key === 'Escape') closeRules(); else if (e.key === 'ArrowRight') rulesEl._go(1); else if (e.key === 'ArrowLeft') rulesEl._go(-1); }
+  function rules(ph) {
+    if (!cfg) return; var list = rulesList(ph); hide(); cancelPend(); closeRules(); if (!list.length) return;
+    var R = rulesEl = mk('div', 'gxh-rules'); R.setAttribute('role', 'dialog'); R.setAttribute('aria-modal', 'true'); R.setAttribute('aria-label', 'How this works');
+    R.innerHTML = '<div class="gxh-card" data-help><button type="button" class="gxh-x" aria-label="Close">×</button><div class="gxh-pic"></div><div class="gxh-rt"></div><div class="gxh-rx"></div><div class="gxh-nav"><button type="button" class="gxh-prev">Back</button><span class="gxh-dots"></span><button type="button" class="gxh-next">Next</button></div></div>';
+    var i = 0, q = function (s) { return R.querySelector(s); };
+    function show() {
+      var c = list[i]; q('.gxh-pic').innerHTML = picHTML(c.pic); q('.gxh-rt').textContent = c.title || ''; q('.gxh-rx').textContent = c.text || '';
+      q('.gxh-dots').innerHTML = list.length > 1 ? list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') : '';
+      q('.gxh-prev').disabled = i === 0; q('.gxh-prev').style.visibility = list.length > 1 ? 'visible' : 'hidden'; q('.gxh-next').textContent = i === list.length - 1 ? 'Done' : 'Next';
+      R.dataset.card = i; R.dataset.count = list.length;
+    }
+    R._go = function (d) { var n = i + d; if (n >= list.length) { closeRules(); return; } if (n < 0) return; i = n; show(); };
+    q('.gxh-x').addEventListener('click', closeRules); q('.gxh-prev').addEventListener('click', function () { R._go(-1); }); q('.gxh-next').addEventListener('click', function () { R._go(1); });
+    R.addEventListener('click', function (e) { if (e.target === R) closeRules(); });
+    var x0 = null; R.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    R.addEventListener('touchend', function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 45) R._go(dx < 0 ? 1 : -1); }, { passive: true });
+    D.addEventListener('keydown', onKey, true);
+    show(); D.body.appendChild(R);
+  }
+  // ------------------------------------------------------------------ settings: Tips on/off + Reset tips
+  function settingsHTML(o) {
+    o = o || {}; var rc = o.rowClass || 'gxh-set', sc = o.segClass || '', bc = o.btnClass || '';
+    var b = function (a, v, label, pr) { return '<button type="button" class="' + bc + '" data-gxh="' + a + '"' + (v != null ? ' data-v="' + v + '"' : '') + (pr != null ? ' aria-pressed="' + pr + '"' : '') + '>' + label + '</button>'; };
+    return '<div class="' + rc + ' gxh-set" data-help><span>Tips</span><span class="' + sc + '" style="display:inline-flex;gap:6px;flex:0 0 auto">' + b('tips', 1, 'On', st.on) + b('tips', 0, 'Off', !st.on) + '</span></div>' +
+      '<div class="' + rc + ' gxh-set" data-help><span>Show tips again</span>' + b('reset', null, 'Reset tips') + '</div>';
+  }
+  function settingsRow(o) { var d = D.createElement('div'); d.setAttribute('data-help', ''); d.innerHTML = settingsHTML(o); return d; }
+  function syncSettings() {
+    var l = D.querySelectorAll('[data-gxh=tips]');
+    for (var i = 0; i < l.length; i++) l[i].setAttribute('aria-pressed', String((l[i].dataset.v === '1') === st.on));
+  }
+  function onClick(e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-gxh]'); if (!t || !cfg) return;
+    if (t.dataset.gxh === 'tips') setEnabled(t.dataset.v === '1');
+    else if (t.dataset.gxh === 'reset') { reset(); var o = t.textContent; t.textContent = 'Done'; setTimeout(function () { t.textContent = o; }, 1400); }
+  }
+  function setEnabled(v) { if (!cfg) return; st.on = !!v; save(); if (!st.on) { cancelPend(); if (cur && cur.kind === 'coach') hide(); } syncSettings(); }
+  function reset() { if (!cfg) return; st.seen = {}; shown.length = 0; save(); }
+  // ------------------------------------------------------------------ relayout
+  function relayout() { if (!cfg || !cur || rulesEl) return; draw(); }
+  function init(o) {
+    cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
+    if (wired) return GXH; wired = true;
+    D.addEventListener('click', onClick, true);
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    return GXH;
+  }
+  var GXH = window.GXH = {
+    version: 1, init: init, phase: phase, bulb: bulb, rules: rules, hide: hide, relayout: relayout, setEnabled: setEnabled, reset: reset,
+    enabled: function () { return !!st.on; }, seen: function (id) { return !!st.seen[id]; }, settingsHTML: settingsHTML, settingsRow: settingsRow,
+    state: function () { return { on: st.on, seen: Object.keys(st.seen), shown: shown.slice(), cur: cur ? { kind: cur.kind, id: cur.id || null, phase: cur.phase } : null, rules: !!rulesEl, pending: pend ? pend.id : null }; }
+  };
+})();
 
 </script>
 <script>
@@ -3282,6 +3621,123 @@ function refEntries(){const E=[];const add=(s,n,tags,t,c,sub)=>E.push({s,n,tags:
 
 </script>
 <script>
+// ===================== hlp.js: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase, short, pointing at the board. The bulb: the advisor's own move (wwk(V).suggestion, the same one the "What we know" box uses;
+// an opening token or an answer comes from aiAnswer) with its "why", plus the rules cards. Never advice on its own during play.
+// ---------------------------------------------------------------- pictures for the rules cards (inline SVG in the game's colours)
+const HP={
+ tile:(n,c)=>{const g=c==='y'?['#ffe455','#ffb300','#14163a']:c==='r'?['#ff6048','#c11d1d','#fff']:c==='b'?['#56a6ff','#1c62d9','#fff']:['#4a52a8','#2b2f63','#fff'];
+  return '<svg viewBox="0 0 64 64"><defs><linearGradient id="hg'+c+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+g[0]+'"/><stop offset="1" stop-color="'+g[1]+'"/></linearGradient></defs><path d="M32 2v8M32 54v8" stroke="#c57a2a" stroke-width="4" stroke-linecap="round"/><rect x="13" y="9" width="38" height="46" rx="7" fill="url(#hg'+c+')" stroke="#14163a" stroke-width="3"/><text x="32" y="42" text-anchor="middle" font-size="28" font-weight="900" fill="'+g[2]+'" stroke="#14163a" stroke-width="'+(c==='y'?0:1.2)+'" paint-order="stroke" font-family="Arial Black,Arial,sans-serif">'+(n==null?'?':n)+'</text></svg>'},
+ cut:()=>'<svg viewBox="0 0 64 64"><path d="M32 2v22M32 40v22" stroke="#c57a2a" stroke-width="5" stroke-linecap="round"/><circle cx="20" cy="46" r="7" fill="none" stroke="#14163a" stroke-width="4"/><circle cx="44" cy="46" r="7" fill="none" stroke="#14163a" stroke-width="4"/><path d="M24 40L46 14M40 40L18 14" stroke="#14163a" stroke-width="4.5" stroke-linecap="round"/></svg>',
+ fuse:(n)=>{let s='';const tot=5,left=n==null?3:n;for(let i=0;i<tot;i++)s+='<rect x="'+(6+i*10.4)+'" y="26" width="8.6" height="12" rx="3" fill="'+(i<tot-left?'#555':'#e8a040')+'" stroke="#14163a" stroke-width="2"/>';return '<svg viewBox="0 0 64 64">'+s+'<circle cx="6" cy="20" r="4" fill="#ffc928" stroke="#14163a" stroke-width="2"/><path d="M6 14v-5M1 18H0M11 15l3-3" stroke="#ff8a1f" stroke-width="2.5" stroke-linecap="round"/></svg>'},
+ bomb:()=>'<svg viewBox="0 0 24 24" style="overflow:visible"><circle cx="11" cy="14" r="7" fill="#1c1838"/><path d="M15 8l2-2m0 0l1.5 1.5M17 6c1-2 3-2 4-1" stroke="#ffc928" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="8.5" cy="11.5" r="1.6" fill="#fff" opacity=".8"/></svg>',
+ boom:()=>'<svg viewBox="0 0 64 64"><path d="M32 4l6 14 14-8-6 15 14 3-13 8 9 12-15-4-3 15-7-13-11 11 1-16-16 2 12-11-12-9 16-1-4-15 12 8z" fill="#ff8a1f" stroke="#b3140c" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="32" r="8" fill="#ffe455"/></svg>',
+ token:(t)=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#d9ecff" stroke="#14163a" stroke-width="4"/><text x="32" y="42" text-anchor="middle" font-size="26" font-weight="900" fill="#14163a" font-family="Arial Black,Arial,sans-serif">'+(t==null?'5':t)+'</text></svg>',
+ gear:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="40" rx="8" fill="#fff6e2" stroke="#14163a" stroke-width="3"/><circle cx="32" cy="32" r="9" fill="none" stroke="#e8681c" stroke-width="5"/><path d="M32 17v6M32 41v6M17 32h6M41 32h6" stroke="#e8681c" stroke-width="5" stroke-linecap="round"/></svg>',
+ lock:()=>'<svg viewBox="0 0 64 64"><rect x="12" y="28" width="40" height="30" rx="6" fill="#8a8fb8" stroke="#14163a" stroke-width="3"/><path d="M20 28v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#14163a" stroke-width="4"/></svg>',
+ check:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#52c23a" stroke="#14163a" stroke-width="3"/><path d="M20 33l8 8 17-18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ tap:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="30" r="18" fill="rgba(255,138,31,.2)" stroke="#e8681c" stroke-width="4"/><path d="M30 12v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="#14163a" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+ stand:()=>'<svg viewBox="0 0 64 64"><rect x="4" y="46" width="56" height="10" rx="4" fill="#2b2f63" stroke="#14163a" stroke-width="3"/><rect x="8" y="14" width="12" height="32" rx="4" fill="#56a6ff" stroke="#14163a" stroke-width="2.5"/><rect x="26" y="14" width="12" height="32" rx="4" fill="#ffe455" stroke="#14163a" stroke-width="2.5"/><rect x="44" y="14" width="12" height="32" rx="4" fill="#56a6ff" stroke="#14163a" stroke-width="2.5"/></svg>',
+ star:()=>'<svg viewBox="0 0 64 64"><path d="M32 6l7.5 17 18.5 1.6-14 12 4.4 18.4L32 45l-16.4 10 4.4-18.4-14-12L24.5 23z" fill="#ffc928" stroke="#14163a" stroke-width="3" stroke-linejoin="round"/></svg>',
+ order:()=>'<svg viewBox="0 0 64 64"><rect x="6" y="22" width="14" height="22" rx="4" fill="#56a6ff" stroke="#14163a" stroke-width="2.5"/><rect x="25" y="22" width="14" height="22" rx="4" fill="#56a6ff" stroke="#14163a" stroke-width="2.5"/><rect x="44" y="22" width="14" height="22" rx="4" fill="#56a6ff" stroke="#14163a" stroke-width="2.5"/><text x="13" y="38" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Arial,sans-serif">1</text><text x="32" y="38" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Arial,sans-serif">5</text><text x="51" y="38" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Arial,sans-serif">9</text><path d="M10 54h44l-6-5M54 54l-6 5" fill="none" stroke="#14163a" stroke-width="3" stroke-linecap="round"/></svg>',
+ turn:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="20" fill="#fff6e2" stroke="#14163a" stroke-width="3"/><path d="M32 18v14l9 6" fill="none" stroke="#e8681c" stroke-width="5" stroke-linecap="round"/><path d="M52 12v12H40" fill="none" stroke="#14163a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<span class="gxh-ar">&rarr;</span>':'<figure>'+(HP[it[0]]?HP[it[0]](it[2],it[3]):'')+(it[1]?'<figcaption>'+it[1]+'</figcaption>':'')+'</figure>').join('')+'</div>'}
+// ---------------------------------------------------------------- where each bubble points
+const hfirst=(...sels)=>()=>{for(const s of sels){for(const e of document.querySelectorAll(s)){const r=e.getBoundingClientRect();if(r.width&&r.height&&!e.closest('[hidden]'))return e}}return null};
+const HLP_STEPS={
+ open:{target:hfirst('#mine .tile.glow'),title:'Show one wire',text:'Tap one of your wires. A token with its number goes in front of it for the whole crew.',pic:()=>HP.token(5)},
+ turn:{target:hfirst('#crew .tile.glow'),title:'Your turn: point',text:'Tap a crewmate\'s glowing wire, then tap one of your own numbers: the one you think it is.',pic:()=>HP.tap()},
+ number:{target:hfirst('#mine .tile.glow'),title:'Say a number',text:'Tap a glowing wire of yours: the number you say. It must be one you hold.',pic:()=>HP.tile(7,'b')},
+ wire:{target:hfirst('#crew .tile.glow'),title:'Point at a wire',text:'Tap the crewmate\'s wire you think has your number. A match cuts both wires.',pic:()=>HP.cut()},
+ solo:{target:hfirst('#mine .tile.glow.g-solo','#mine .tile.glow'),title:'A free cut',text:'You hold every wire left of this number. Tap one: all of them are cut, and it cannot fail.',pic:()=>HP.check()},
+ reveal:{target:hfirst('#mine .tile.glow.g-rev','#mine .tile.glow'),title:'Only red wires left',text:'Tap one red wire to show your reds. You are then finished, and nothing blows up.',pic:()=>HP.tile('R','r')},
+ tag:{target:hfirst('#tb .tile.glow','#tb .plate.glow','#tray .chip.glow','#mine .chip.glow'),title:'Tag a wire',text:'Tap a glowing wire to put an info token in front of it. Everyone then sees the number.',pic:()=>HP.token(3)},
+ answer:{target:hfirst('#tb .tile.glow','#tb .plate.glow','#tray .chip.glow','#mine .chip.glow'),title:'Your choice',text:'Something is asked of you. Tap one of the glowing wires, players or buttons.',pic:()=>HP.tap()},
+ gear:{target:hfirst('#tb .tile.glow','#tb .plate.glow','#tray .chip.glow','#mine .chip.glow'),title:'Finish the move',text:'Keep tapping the glowing wires, players or buttons. The cross button cancels.',pic:()=>HP.gear()},
+ claim:{target:hfirst('#tray .chip.glow','#tray .chip'),title:'Claim the turn',text:'In this job anyone may take the next turn. Tap the button if you are ready.',pic:()=>HP.turn()}
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES=[
+ {title:'The goal',text:'Cut every wire on every stand before the fuse runs out. You win or lose together.',pic:()=>hpics([['cut','Cut all'],'>',['check','Defused']])},
+ {title:'The fuse',text:'Each wrong cut burns one fuse step. With no step left the bomb goes off. A red wire ends the job at once.',pic:()=>hpics([['fuse','Fuse'],'>',['boom','Boom']])},
+ {title:'Hidden numbers',text:'You see your own wires, not the crew\'s. Every stand is sorted from the lowest number to the highest.',pic:()=>hpics([['order','Sorted'],['tile',null,'?']])},
+ {phase:'open',title:'The opening token',text:'Everyone starts by showing one of their wires. A token with its number goes in front of it.',pic:()=>hpics([['tile','Yours',5,'b'],'>',['token','Shown',5]])},
+ {phase:'open',title:'Why a token?',text:'The crew can use it as a clue: they now know that wire, and where it sits in the order.',pic:()=>hpics([['token','Clue',5],'>',['order','Order'] ])},
+ {phase:'turn',title:'A dual cut',text:'Point at a crewmate\'s wire and say a number you hold. If they have that number, both wires are cut.',pic:()=>hpics([['tile','Yours',7,'b'],'>',['tile','Theirs',null,'back'],'>',['cut','Both cut']])},
+ {phase:'turn',title:'A wrong guess',text:'If the wire is not that number, the fuse burns one step. A token then shows the true number.',pic:()=>hpics([['tile',null,4,'b'],['fuse','-1',2]])},
+ {phase:'turn',title:'Use the clues',text:'Wires are sorted low to high, and tokens show numbers. A wire beside a low token must be low too.',pic:()=>hpics([['order','Sorted'],['token','Token',3]])},
+ {phase:'turn',title:'Never point at red',text:'Red wires must never be cut. Pointing at one blows up the bomb, so only point at wires you trust.',pic:()=>hpics([['tile','Red','R','r'],'>',['boom','Boom']])},
+ {phase:'number',title:'Say a number you hold',text:'You can only say a number that you hold yourself. Tap one of your glowing wires.',pic:()=>hpics([['tile','Yours',7,'b'],'>',['tap','Say it']])},
+ {phase:'number',title:'A hit cuts two',text:'If the wire matches, both wires are cut: theirs and yours. When all four of a number are cut, it is finished.',pic:()=>hpics([['cut','Hit'],'>',['check','Finished']])},
+ {phase:'wire',title:'Point at a wire',text:'You chose a number. Now tap the crewmate\'s wire you think is that number.',pic:()=>hpics([['tile','Say',7,'b'],'>',['tile','Point',null,'back']])},
+ {phase:'wire',title:'Not sure?',text:'The light bulb shows the likeliest wire. A miss is not the end: it burns one step and shows a token.',pic:()=>hpics([['fuse','One step',3],['token','Token',7]])},
+ {phase:'solo',title:'A solo cut',text:'If you hold every uncut wire of a number, cut them yourself. A solo cut never fails and costs nothing.',pic:()=>hpics([['tile','All yours',6,'b'],'>',['check','Cut']])},
+ {phase:'solo',title:'Take free cuts',text:'Solo cuts make progress without risking the fuse, so they are usually a good move.',pic:()=>hpics([['fuse','Safe',3],['check','Free']])},
+ {phase:'reveal',title:'Only red wires',text:'You hold nothing but red wires. Show them to the crew. You are done, and nothing blows up.',pic:()=>hpics([['tile','Red','R','r'],'>',['check','Done']])},
+ {phase:'reveal',title:'Your crew goes on',text:'The rest of the crew keeps cutting. You still win or lose together.',pic:()=>hpics([['stand','Crew'],'>',['cut','Keep cutting']])},
+ {phase:'tag',title:'A token on a wire',text:'Put an info token in front of a wire. Everyone sees the number it shows, and the sort order adds clues.',pic:()=>hpics([['tile','Wire',null,'back'],'>',['token','Token',4]])},
+ {phase:'tag',title:'After a miss',text:'A wrong cut tags the wire that was pointed at, so the crew learns its true number.',pic:()=>hpics([['fuse','Miss',2],'>',['token','Tagged',4]])},
+ {phase:'answer',title:'Your choice',text:'The job asks you something. Tap one of the glowing wires, players or buttons to answer.',pic:()=>hpics([['tap','Tap a glow']])},
+ {phase:'answer',title:'Not sure?',text:'The light bulb shows the crew advisor\'s pick, with a reason. You can follow it or choose your own.',pic:()=>hpics([['star','Advisor'],'>',['tap','Your pick']])},
+ {phase:'gear',title:'Equipment',text:'Gear cards unlock when the crew cuts certain numbers. Tap a glowing card to use it once.',pic:()=>hpics([['lock','Locked'],'>',['gear','Ready']])},
+ {phase:'gear',title:'Finish the move',text:'Keep tapping glowing wires, players or buttons until the move is done. The cross cancels it.',pic:()=>hpics([['tap','Tap'],'>',['check','Done']])},
+ {phase:'claim',title:'Claim the turn',text:'In this job there is no fixed order. Tap Claim when you can make progress.',pic:()=>hpics([['turn','Turn'],'>',['tap','Claim']])},
+ {phase:'claim',title:'One at a time',text:'If two players claim, the better placed one goes first. Your wires stay your own secret.',pic:()=>hpics([['stand','Crew'],'>',['turn','One turn']])}
+];
+// ---------------------------------------------------------------- phases
+const HLP_TAGQ=['tagPick','lackTag','infoNeg','infoFalse'];
+// the moment the player is deciding in (null when it is not their turn or nothing is asked of them)
+function hlpPhase(){try{if(!G||!UI.started||G.over||UI.brief||passTo()>=0)return null;const V=UI.V;if(!V||V.seat<0)return null;const me=V.seat,sel=UI.sel;
+  if(V.q&&V.q.who===me&&V.q.opts){const k=V.q.kind;return k==='infoStd'?'open':HLP_TAGQ.includes(k)?'tag':'answer'}
+  if(sel&&(sel.mode==='choose'||sel.mode==='multi'||sel.mode==='flipown'))return 'gear';
+  const L=V.legal;
+  if(!L||decider()!==me){const off=(V.off||[]).some(m=>m.a==='claim'||m.a==='snip');return off&&(G.step==='claim'||G.step==='snip')?'claim':null}
+  if(sel&&sel.mode==='dual'){if(sel.tool||sel.two)return 'gear';if(sel.tg.length&&sel.v==null)return 'number';if(sel.v!=null&&!sel.tg.length)return 'wire';if(sel.fu!=null)return 'wire'}
+  if(L.plain.length)return 'turn';
+  if(L.solo.length)return 'solo';
+  if(L.other.some(m=>m.a==='reveal'))return 'reveal';
+  return null}catch(e){return null}}
+// ---------------------------------------------------------------- the advice: where the finger goes and why
+function hlpWhy(t,n){const s=String(t||'').replace(/\s+/g,' ').trim();if(!s)return '';const one=s.split(/(?<=[.!?])\s+/)[0].replace(/\.$/,'.');const w=one.split(' ');return w.length<=n?one:w.slice(0,n).join(' ').replace(/[,:;]$/,'')+'.'}
+function hlpMine(V,v){for(const st of V.stands)if(st.mine)for(const x of st.slots)if(!x.cut&&!x.flip&&x.v===v)return x;return null}
+// one function gives the finger, the glow and the sweep's check: {to:uid|selector-element, from:uid|null, why, kind}
+function hlpPlan(){const V=UI.V;if(!V||V.seat<0||!G||G.over||UI.brief||passTo()>=0||UI.paused)return null;const me=V.seat,sel=UI.sel;
+  if(V.q&&V.q.who===me&&V.q.opts){if(sel)return null;const q=V.q;let i=-1;try{const K=knowledge(me);i=aiAnswer(K,null,AILV.hard)}catch(e){return null}
+    const o=q.opts[i];if(!o||!o.d)return null;
+    if(q.kind==='infoStd'&&o.d.u!=null)return {kind:'q',to:{u:o.d.u},why:'Crewmates hold this number too, so a token here helps most.'};
+    if(o.d.u!=null)return {kind:'q',to:{u:o.d.u},why:'The crew advisor\'s best pick here.'};
+    if(o.d.st!=null&&o.d.k!=null){const sl=G.st[o.d.st]&&G.st[o.d.st].w[o.d.k];return sl?{kind:'q',to:{u:sl.u},why:'The crew advisor\'s best pick here.'}:null}
+    if(o.d.seat!=null)return {kind:'q',to:{seat:o.d.seat},why:'The crew advisor\'s best pick here.'};
+    const n=TBL.items&&TBL.items.findIndex(it=>it.t==='q'&&it.i===i);if(n>=0)return {kind:'q',to:{chip:n},why:'The crew advisor\'s best pick here.'};return null}
+  if(!V.legal||decider()!==me||V.q)return null;
+  const W=wwk(V);const sg=W&&W.suggestion,m=sg&&sg.m;if(!m||legal(m,me))return null;const why=hlpWhy(sg.why,15);if(!why)return null;
+  const tgt=m.a==='dual'?(G.st[m.st]&&G.st[m.st].w[m.ks[0]]):null;
+  if(m.a==='dual'&&!m.tool&&!m.two&&m.ks.length===1&&!m.own&&tgt){const mine=hlpMine(V,m.v);if(!mine)return null;
+    if(!sel)return {kind:'dual',from:{u:mine.u},to:{u:tgt.u},why};
+    if(sel.mode==='dual'&&!sel.tool&&!sel.two&&sel.fu==null){
+      if(sel.tg.length===1&&sel.v==null&&sel.tg[0].st===m.st&&sel.tg[0].k===m.ks[0])return {kind:'dual',to:{u:mine.u},why};
+      if(!sel.tg.length&&sel.v===m.v)return {kind:'dual',to:{u:tgt.u},why}}
+    return null}
+  if(sel)return null;
+  if(m.a==='solo'&&!m.flip&&!m.ep){const mine=hlpMine(V,m.v);return mine?{kind:'solo',to:{u:mine.u},why}:null}
+  if(m.a==='reveal'){const x=V.stands.filter(s=>s.mine).map(s=>s.slots).flat().find(y=>!y.cut&&y.c==='r');return x?{kind:'reveal',to:{u:x.u},why:'Only red wires are left in your hand: show them.'}:null}
+  if(m.a==='eq'&&EQUIP[m.id]&&eqMovesFor(V,m.id).length)return {kind:'eq',to:{eq:m.id},why:hlpWhy(EQUIP[m.id].n+' is worth using now.',15)};
+  return null}
+function hlpEl(r){if(!r)return null;if(r.u!=null)return document.querySelector('#tb .tile[data-u="'+r.u+'"]');if(r.seat!=null)return document.querySelector('#tb .plate[data-seat="'+r.seat+'"]');if(r.eq!=null)return document.querySelector('#tb .eqk[data-eq="'+r.eq+'"]');if(r.chip!=null)return document.querySelector('#tb .chip[data-chip="'+r.chip+'"]');return null}
+function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p||!hlpEl(p.to))return null;
+  return {why:p.why,target:()=>hlpEl(p.to),from:p.from?()=>hlpEl(p.from):null}}
+// ---------------------------------------------------------------- wiring
+let _hlpInit=false;
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+  GXH.init({game:'short-fuse',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.sel,#tray .chip,#mine .chip,#over .big,#cover .big'});
+  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
+  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause;
+  GXH.phase(busy?null:hlpPhase())}
+
+</script>
+<script>
 /* gameaudio.js - shared sample playback for the single-file board games.
  * Plain script (no modules). Defines window.GA. Every public call is wrapped so it never throws;
  * without Web Audio (jsdom, very old browsers) it stays silent and GA.has() returns false,
@@ -4010,7 +4466,7 @@ function refresh(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake(
   renderTable(V);renderOpenDrawer();audioMood(V);
   const need=humanNeeded();
   if(need&&need!==UI.lastNeed){UI.lastNeed=need;if(ANIM)sfx('turn')}if(!need)UI.lastNeed=null;
-  schedule();netAfter()}
+  schedule();netAfter();try{hlpAfter()}catch(e){console.error(e)}}
 function humanNeeded(){if(!G||G.over)return null;const p=passTo();if(p>=0)return 'pass'+p;const v=viewer();if(v<0)return null;const s=decider();if(s===v)return 'me'+G.turn+':'+(G.q?G.q.kind:G.step);return null}
 function saveNow(){if(NET.on)return;try{if(G&&!G.over&&humans().length)localStorage.setItem(SAVE,JSON.stringify({G,ui:{holder:UI.holder,rt:UI.rt,camp:UI.camp?UI.camp.id:null}}));else if(G&&G.over)localStorage.removeItem(SAVE)}catch(e){}}
 // ---------- the computer crew ----------
@@ -4178,7 +4634,7 @@ function renderSettings(){const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd" id="sndbtn">${ico('snd')}Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus" id="musbtn">${ico('music')}Music ${SND.music?'on':'off'}</button></div></div>
   <div><div class="lbl">Computer crew speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?`<button class="btn small" data-a="netleave">${ico('back')}Leave the online game</button>`:`${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart</button>`:''}<button class="btn small" data-a="newgame">${ico('map')}Jobs</button>`}</div></div>
-  <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>`}
+  <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>${typeof GXH!=='undefined'?`<div><div class="lbl">Tips</div>${GXH.settingsHTML({rowClass:"row",btnClass:"btn small"})}</div>`:''}`}
 // ---------- campaign progress ----------
 function jobProg(){if(!UI.prog)UI.prog=lsGet('sf_camp',{v:1,jobs:{}});return UI.prog}
 function unlocked(n){const c=jobProg();return n===1||!!(c.jobs[n-1]&&c.jobs[n-1].w)||!!(c.jobs[n]&&c.jobs[n].p)}
@@ -4498,7 +4954,8 @@ function chipTap(n){const V=UI.V;const it=TBL.items&&TBL.items[n];if(!it||!V)ret
     if(ownerOf(si)===V.seat)return;UI.sel={mode:'dual',tool:null,tg:[{st:si,k}],v:mv.v,v2:null,two:null,fu:null};if(UI.ghost&&UI.ghost.turn)ghostDone('turn');autoFire()};
   document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true)})();
 // ---------- keeping the layout right on every size change (iOS reports the old size right after a rotation) ----------
-(function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
+if(window.GXV)GXV.watch(()=>{try{layoutTable()}catch(e){}});
+else (function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
   window.addEventListener('resize',deb);window.addEventListener('orientationchange',deb);if(window.visualViewport)window.visualViewport.addEventListener('resize',deb);
   const init=()=>{const b=document.getElementById('tb');if(b&&window.ResizeObserver)new ResizeObserver(deb).observe(b)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
 
@@ -4539,6 +4996,7 @@ function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names
   UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;
   UI.camp=s.camp||null;UI.brief=(NET.on||isHost()||s.camp)?null:{n:s.job};UI.aiNotBefore=0;UI.lastPrompt=null;
   UI.ghost=lsGet('sf_ghost',{info:1,turn:1});if(s.camp&&s.camp.hints&&!lsGet('sf_ghost_'+s.camp.id,0)){lsSet('sf_ghost_'+s.camp.id,1);UI.ghost={info:1,turn:1}}if(s.camp&&!s.camp.hints)UI.ghost={info:0,turn:0};
+  if(typeof GXH!=='undefined'){UI.ghost={info:0,turn:0};if(s.camp&&s.camp.hints)GXH.setEnabled(true)}
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}
   if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;if(s.twist)o.twist=s.twist;if(s.lvs)o.lv=s.lvs;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
