@@ -70,24 +70,11 @@ function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.ma
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button></div>
    <ul class="small"><li>The <b>glowing plate</b> on the board shows whose turn it is.</li><li><b>👑</b> marks the monster in Downtown: it scores stars but everyone hits it.</li><li>Stuck? <b>🧭 What now?</b> at the top of this panel says what to do and why.</li></ul></div>`}
 
-// ---------- four tips, each at the real moment ----------
-const TIPS={dice:{el:'#dicewrap',t:'Your dice',b:'Tap a die to keep it (it turns yellow), then Roll the others again. Blue dashed outline = our suggestion (💡 keeps exactly those). The line under the dice says what you would get.'},
- city:{el:'#map',t:'Downtown and 👑',b:'👑 = the monster in Downtown: +2 ★ at the start of each of its turns, but it cannot heal and every claw from outside hits it. When hit it may yield. If Downtown is empty after your roll, you move in (+1 ★).'},
- buy:{el:'#buymini',t:'Power cards',b:'Spend energy ⚡ on cards. ONE-SHOT cards happen at once, PERMANENT cards stay with you, SAVE FOR LATER cards wait for their moment. A yellow outline marks our suggestion. Saving ⚡ is fine: it carries over.'},
- bar:{el:'header.gx-bar',t:'While the others play',b:'This panel narrates each computer turn, and your next turn starts with “While you waited” (tap it for every event). Up top: 🃏 cards for sale, 🎴 yours, 👾 monsters, 📰 log, ⚙ rules and speed. 🧭 What now? explains your best move.'}};
-const TIPORDER=['dice','city','buy','bar'];
-function startTour(){UI.tour=true;UI.tipSeen={};UI.coach=-1;checkTips();renderTour()}
-function checkTips(){if(!G||!UI.tour||NET.on||UI.info||UI.intro||G.winner||UI.coach>=0)return;const s=UI.tipSeen||(UI.tipSeen={});const ht=humanTurn(),p=cur();
-  let k=null;if(!s.dice&&ht&&G.phase==='roll'&&!G.bug&&G.dice.length&&!UI.choice)k='dice';
-  else if(s.dice&&!s.city&&!ht&&!UI.choice)k='city';
-  else if(s.city&&!s.buy&&ht&&!UI.choice&&G.phase==='buy'&&G.market.length)k='buy';
-  else if(s.buy&&s.city&&!s.bar&&!ht&&!UI.choice)k='bar';
-  if(k){UI.coach=TIPORDER.indexOf(k);UI.freeze=k==='bar'||k==='city'}}
-function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));const el=document.getElementById('coach');if(!el)return;
-  if(UI.coach<0){el.classList.add('hidden');el.innerHTML='';return}const k=TIPORDER[UI.coach],st=TIPS[k];el.classList.remove('hidden');
-  el.innerHTML=`<h3>Tip ${UI.coach+1} of 4: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn primary" data-tour="next">Got it</button><button class="btn" data-tour="skip">No more tips</button></div>`;
-  const tg=document.querySelector(st.el);if(tg&&tg.id!=='map')tg.classList.add('hl');if(UI.tipShown!==k){UI.tipShown=k;try{el.scrollIntoView({block:'nearest'})}catch(e){}}}
-function tourClick(a){const k=TIPORDER[UI.coach];if(k)(UI.tipSeen=UI.tipSeen||{})[k]=1;UI.coach=-1;UI.freeze=false;if(a==='skip')UI.tour=false;render();if(typeof schedule==='function')schedule()}
+// ---------- tips: the help kit (hlp.js) shows each first-time bubble; the old four-tip tour is retired ----------
+function startTour(){if(window.GXH)GXH.reset();render()}
+function checkTips(){}
+function renderTour(){const el=document.getElementById('coach');if(el){el.classList.add('hidden');el.innerHTML=''}}
+function tourClick(){}
 
 // ---------- the advisor: what to do now, and why ----------
 const FNAME={'1':'1','2':'2','3':'3',E:'⚡',C:'claw',H:'heart'};
@@ -99,9 +86,9 @@ function advise(){if(!G)return {a:'Press ▶ Play now.',w:'The recommended setup
   const me=meSeat();const p=cur();const c=UI.choice&&!(NET.on&&c0Remote())?UI.choice:null;const riv=rivalLine();
   if(c){if(c.why)return {a:c.why.split(':')[0]+'.',w:c.why.split(':').slice(1).join(':').trim()||c.text};
     if(/Stay or yield/.test(c.title)){const q=P(c.who);const th=alive().filter(r=>r.i!==q.i&&!inCity(r.i)).length;const y=c.options.find(o=>o.k==='yield'&&/Recommended\./.test(o.d||''));
-      return y?{a:'Yield.',w:`${plu(q.hp,'heart')} and ${th} monster${th===1?'':'s'} can hit you: staying is too risky. Staying pays 2 ★ only if you survive a round.`}:{a:'Stay.',w:`With ${plu(q.hp,'heart')} you can likely survive a round, and starting your turn in the city pays 2 ★. Yield once you are at 3 ♥ or less.`}}
-    const r=c.options.find(o=>o.rec||/Recommended\./.test(o.d||''));if(r)return {a:`Choose “${r.l}”.`,w:(r.d||'').replace(/ ?Recommended\.?/,'')||'It is the safer option here.'};
-    if(typeof c.ai==='function'&&!c.net){if(c._aiK===undefined){try{c._aiK=String(c.ai())}catch(e){c._aiK=null}}const o=c.options.find(x=>String(x.k)===c._aiK);if(o)return {a:`Choose “${o.l}”.`,w:(o.d?o.d+' ':'')+'That is what an experienced monster would pick right now.'}}
+      return y?{k:'yield',a:'Yield.',w:`${plu(q.hp,'heart')} and ${th} monster${th===1?'':'s'} can hit you: staying is too risky. Staying pays 2 ★ only if you survive a round.`}:{k:'stay',a:'Stay.',w:`With ${plu(q.hp,'heart')} you can likely survive a round, and starting your turn in the city pays 2 ★. Yield once you are at 3 ♥ or less.`}}
+    const r=c.options.find(o=>o.rec||/Recommended\./.test(o.d||''));if(r)return {k:r.k,a:`Choose “${r.l}”.`,w:(r.d||'').replace(/ ?Recommended\.?/,'')||'It is the safer option here.'};
+    if(typeof c.ai==='function'&&!c.net){if(c._aiK===undefined){try{c._aiK=String(c.ai())}catch(e){c._aiK=null}}const o=c.options.find(x=>String(x.k)===c._aiK);if(o)return {k:o.k,a:`Choose “${o.l}”.`,w:(o.d?o.d+' ':'')+'That is what an experienced monster would pick right now.'}}
     return {a:'Pick one of the options.',w:'The small text under each option says what it does. The computer waits for you.'}}
   if(!humanTurn()){const w=me>=0?`You are ${mname(G.pl[me])}. You will get a pop-up if you can yield the city${mbOn()&&G.pl[me].mb?' or steal this roll with your 🧠':''}.`:'';return {a:`Watch: ${mname(p)} is playing.`,w:(riv?riv+' ':'')+w}}
   if(G.phase==='roll'){const inT=inCity(p.i);const occ=G.city>=0?P(G.city):null;
