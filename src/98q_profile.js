@@ -14,6 +14,9 @@ profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;
   if(h.startsWith('CAR ·'))c.innerHTML=`<h5>VEHICLES · ${GAR_SETS.filter(GAR_owned).length}/${GAR_SETS.length} OWNED</h5><div class="gpfVs">${GPF_veh()}</div><small class="pnote">Buy, drive and upgrade them in the garage (RIDES).</small>`;
   else if(h.startsWith('PERKS'))c.innerHTML=GPF_perks();
   else if(h.startsWith('COLLECTION'))c.innerHTML=`<h5>COLLECTION</h5><div class="gpfCs">${GPF_col()}</div>`}
+ // phone fold: the PERKS card (slots + Next unlock) goes to the top of its column, above VEHICLES
+ const pc=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'').startsWith('PERKS')),vc=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'').startsWith('VEHICLES'));
+ if(pc&&vc&&vc.parentNode&&pc.compareDocumentPosition(vc)&Node.DOCUMENT_POSITION_PRECEDING)vc.parentNode.insertBefore(pc,vc)
  const P=$('#profile');if(state!=='roam'){P.classList.add('gpfMenu')}else P.classList.remove('gpfMenu')})(profileOpen);
 {const P=$('#profile');document.body.appendChild(P);
  const st=document.createElement('style');st.textContent=`#profile{position:fixed!important;z-index:40!important}.gpfFig{width:64px;height:64px;border-radius:12px;border:3px solid #141413;background:#cfe8ff;flex:none}
