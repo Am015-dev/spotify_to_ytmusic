@@ -10,9 +10,20 @@ function ART4_base(s,ud,boat){const host=ud.m;const key=host.uuid+'|'+(ud.gbM?ud
   o=boat?-(B.min.y-y0)-Math.min(.7,h*.3):-(B.min.y-y0);ART4.off.set(key,o);if(ART4.off.size>40)ART4.off.delete(ART4.off.keys().next().value);return o}
 function ART4_tyres(){if(ART4.ty)return ART4.ty;const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:ART_blobTex(),color:0,transparent:true,opacity:.7,depthWrite:false,fog:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),8);im.count=0;im.frustumCulled=false;im.renderOrder=1;im.userData.keep=1;scene.add(im);return ART4.ty=im}
 function ART4_foam(){if(ART4.fm)return ART4.fm;const im=new THREE.InstancedMesh(new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false,fog:false}),90);im.count=90;im.frustumCulled=false;im.userData.keep=1;ART4.fp=[];for(let i=0;i<90;i++){ART4.fp.push({x:0,y:-999,z:0,a:0,s:0});im.setMatrixAt(i,new THREE.Matrix4().makeScale(0,0,0))}ART4.fi=0;ART4.ft=0;scene.add(im);return ART4.fm=im}
+// W8 (v87f): boats sit IN the water. Boat mode kept the street car's ride-height offset (0 to 0.58 m depending on the garage set), so set
+// boats rode high. Now the hull bottom sits W8B.sink below the local wave surface every frame (world metres, through the live transform chain).
+const W8B={bb:new Map(),sink:.22,v:new THREE.Vector3(),q:new THREE.Quaternion(),sc:new THREE.Vector3(),M:new THREE.Matrix4(),T:new THREE.Matrix4()};
+function W8_boatY(s,ud){const g=ud.gbV&&ud.gbV.boat,host=ud.m,P=host.parent;if(!g||!P)return host.position.y;let n=0;g.traverse(m=>{if(m.isMesh&&m.geometry.attributes.position)n+=m.geometry.attributes.position.count});
+  const key=g.uuid+'|'+n;let B=W8B.bb.get(key);P.updateWorldMatrix(true,false);const y0=host.position.y;host.position.y=0;host.updateMatrixWorld(true);
+  if(!B){B=new THREE.Box3();W8B.M.copy(g.matrixWorld).invert();g.traverse(m=>{if(!m.isMesh||m.userData.a8s||m.material&&m.material.transparent&&m.material.opacity<.6)return;const pa=m.geometry.attributes.position;if(!pa)return;
+    W8B.T.multiplyMatrices(W8B.M,m.matrixWorld);for(let i=0;i<pa.count;i++)B.expandByPoint(W8B.v.fromBufferAttribute(pa,i).applyMatrix4(W8B.T))});
+   if(B.isEmpty()){host.position.y=y0;return y0}W8B.bb.set(key,B);if(W8B.bb.size>20)W8B.bb.delete(W8B.bb.keys().next().value)}
+  let lo=1e9;for(let i=0;i<8;i++){W8B.v.set(i&1?B.max.x:B.min.x,i&2?B.max.y:B.min.y,i&4?B.max.z:B.min.z).applyMatrix4(g.matrixWorld);if(W8B.v.y<lo)lo=W8B.v.y}
+  P.matrixWorld.decompose(W8B.v,W8B.q,W8B.sc);const sy=W8B.sc.y||1,water=RO.y+waveH(RO.x,RO.z,T)*Math.min(1,s.boatK||0)+Math.sin((s.bob||0)*.55)*.05;
+  host.position.y=y0;return(water-W8B.sink-lo)/sy}
 roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||s!==pl)return;const boat=(s.boatK||0)>.5;
   if(s.air){if(ART4.ty)ART4.ty.count=0;return}
-  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}
+  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}else ud.m.position.y=W8_boatY(s,ud);
   // front wheels steer (front = -z), spin order keeps the steer axis vertical
   const st=-(CTL.steer||0)*.42;let n=0;const T=ART4_tyres();
   for(const w of ud.gbM||[]){if(!w.userData.r||!ART4_vis(w))continue;if(w.position.z<-.2){w.rotation.order='YXZ';w.rotation.y=st}
