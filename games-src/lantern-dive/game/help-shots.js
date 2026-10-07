@@ -15,7 +15,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await sleep(160);
     const st = await p.evaluate(() => ({ ph: hlpPhase(), cur: GXH.state().cur, over: G.phase === 'over', busy: UI.busy }));
     if (st.over) break;
-    if (st.ph === 'lead' && !done.coach && st.cur && st.cur.kind === 'coach') { done.coach = 1; await sleep(300); await p.screenshot({ path: OUT + 'help-coach-bubble-390x763.png' }); console.log('coach'); }
+    if (['lead', 'follow', 'jobs'].includes(st.ph) && !done.coach && st.cur && st.cur.kind === 'coach') { done.coach = 1; await sleep(300); await p.screenshot({ path: OUT + 'help-coach-bubble-390x763.png' }); console.log('coach'); }
     if (st.ph === 'follow' && !done.bulb && !st.busy) {
       await p.evaluate(() => GXH.hide());
       const bb = await p.evaluate(() => { const r = document.querySelector('#bulbbtn').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
@@ -25,6 +25,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       done.rules = 1; await p.screenshot({ path: OUT + 'help-rules-card-390x763.png' }); console.log('rules');
       await p.evaluate(() => { GXH.hide(); const x = document.querySelector('.gxh-rules .gxh-x'); x && x.click(); });
     }
+    if (['lead', 'follow', 'jobs'].includes(st.ph) && !done.coach && i < 60) { await sleep(150); continue; }
     // play on: tap the first glowing thing
     await p.evaluate(() => { GXH.hide(); const e = document.querySelector('#pool .jcard.glow, #hand .hc.glow, #acts .btn.go, #acts .btn'); if (e && iMustAct() && !UI.busy) e.click(); });
   }
