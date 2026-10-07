@@ -174,8 +174,9 @@ async function helpFlow(p, tag, st) {
       if (!r.why || wc(r.why) > 15) await fail(p, tag, 'help bulb', 'why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) await fail(p, tag, 'help bulb', 'no "How does this work?" (' + hs.ph + ')');
       if (rnd() < .5 && r.link) { await helpTap(p, '.gxh-bub .gxh-link'); await p.waitForTimeout(250); await rulesCheck(p, tag, hs.ph) } else { await neutralTap(p); await p.waitForTimeout(150) }
     } else {
-      helpTot.bulbNull++; if (r.f) await fail(p, tag, 'help bulb', 'no suggestion but a finger pointed (' + hs.ph + ')'); if (!r.rules) await fail(p, tag, 'help bulb', 'no suggestion and no rules cards (' + hs.ph + ')'); else await rulesCheck(p, tag, hs.ph);
-      if (pre.adv && !pre.adv.none && !pre.has) await fail(p, tag, 'help bulb', 'advisor has a pick ' + JSON.stringify(pre.adv) + ' but the bulb gave none (' + hs.ph + ')');
+      helpTot.bulbNull++;
+      if (!r.f) { if (!r.rules) await fail(p, tag, 'help bulb', 'no suggestion and no rules cards (' + hs.ph + ')'); else await rulesCheck(p, tag, hs.ph); if (pre.adv && !pre.adv.none) await fail(p, tag, 'help bulb', 'advisor has a pick ' + JSON.stringify(pre.adv) + ' but the bulb gave none (' + hs.ph + ')'); }
+      // (a finger that appeared after a no-suggestion probe: the dice stopped spinning between the probe and the tap)
     }
     await p.evaluate(() => GXH.hide());
     const after = await p.evaluate(AFTER);
@@ -200,11 +201,11 @@ async function play(p, tag, o) {
       await p.waitForTimeout(1500); const cvOk = await p.evaluate(() => { const st = document.getElementById('stage').getBoundingClientRect(); return !V3.on || (Math.abs(V3.r.domElement.clientWidth - st.width) < 3 && Math.abs(V3.r.domElement.clientHeight - st.height) < 3) }); if (!cvOk) await fail(p, tag, 'board not resized after rotation', 'canvas size differs from the board');
       await p.setViewportSize(vp); await p.waitForTimeout(900); rotated = 1; continue;
     }
-    const sig = await p.evaluate(SIG); if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000 && !st.busy) { await fail(p, tag, 'stuck >8s', st.phase + ' ' + (st.humanTurn ? 'human' : 'computer') + ' ' + st.line); lastAt = Date.now(); }
+    const sig = await p.evaluate(SIG); if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000 && !st.busy) { await fail(p, tag, 'stuck >8s', JSON.stringify(await p.evaluate(() => { const e = document.querySelector('#pacts [data-act=end]'); if (!e) return 'no end btn'; const q = e.getBoundingClientRect(), h = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return [Math.round(q.top), Math.round(q.height), h && (h.tagName + '.' + String(h.className).slice(0, 25) + '#' + h.id), getComputedStyle(e).visibility, e.disabled, document.querySelector('.gx-dock').dataset.bf] })) + ' ' + st.phase + ' ' + (st.humanTurn ? 'human' : 'computer') + ' ' + st.line + ' | lastpick ' + JSON.stringify(p._pk) + ' | ' + await p.evaluate(() => JSON.stringify(GXH.state().cur) + ' sel=' + BF.sel + ' pop=' + PHN.pop + ' gx=' + (GX && GX.open))); lastAt = Date.now(); }
     if (st.gxc) { const g = await p.evaluate(() => { const b = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetParent && !e.disabled); const pr = b.find(e => /go|primary/.test(e.className)) || b.find(e => /next|start|continue|fight|play|meet/i.test(e.textContent)) || b[0]; if (!pr) return null; const R = pr.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (g) await p.touchscreen.tap(g.x, g.y); await p.waitForTimeout(500); continue; }
     if (st.intro) { const ib = await p.evaluate(() => { const e = [...document.querySelectorAll('#choice button, #moment button, #advice button')].find(x => x.offsetParent && !x.disabled && /smash|go|play|ok|got it|start/i.test(x.textContent)); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (ib) { await p.touchscreen.tap(ib.x, ib.y); await p.waitForTimeout(600); continue; } }
     if (!st.humanTurn && !st.choice) { await p.waitForTimeout(350); continue; } // the computer plays
-    const pick = await choose(p, st, rnd());
+    const pick = await choose(p, st, rnd()); p._pk = pick;
     if (pick) { taps++; if (pick.kind === 'shop') buys++; if (pick.kind === 'die') keeps++; await p.touchscreen.tap(pick.x, pick.y); if (Date.now() - lastAt > 3500 && pick.kind !== 'die' && pick.kind !== 'shop') { await p.waitForTimeout(1500); if ((await p.evaluate(SIG)) === sig) await fail(p, tag, 'tap did nothing', pick.c + ' @' + st.phase); } }
     await p.waitForTimeout(pick ? 400 : 350);
   }
