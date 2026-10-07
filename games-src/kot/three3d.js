@@ -518,7 +518,7 @@ function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[
     const pm=new THREE.MeshStandardMaterial({map:tex,emissiveMap:tex,emissive:0xffffff,emissiveIntensity:.3,roughness:.55,metalness:0});
     const pl=new THREE.Mesh(new THREE.BufferGeometry(),pm);pl.visible=false;pl.castShadow=true;pl.userData.standee=1;g.add(pl)}
   const R=new THREE.Group();const base=new THREE.Group();R.add(base);g.position.y=.14;R.add(g);
-  mesh(lathe([[0,0],[1.18,0],[1.24,.03],[1.26,.08],[1.22,.13],[1.14,.155],[0,.155]],64),new THREE.MeshPhysicalMaterial({color:0x17111e,roughness:.25,clearcoat:1,clearcoatRoughness:.1}),0,0,0,base);
+  mesh(lathe([[0,0],[1.18,0],[1.24,.03],[1.26,.08],[1.22,.13],[1.14,.155],[0,.155]],64),new THREE.MeshPhysicalMaterial({color:new THREE.Color(0x17111e).lerp(C,.5),roughness:.25,clearcoat:1,clearcoatRoughness:.1,emissive:C,emissiveIntensity:.12}),0,0,0,base);
   mesh(new THREE.TorusGeometry(1.255,.022,8,80),new THREE.MeshStandardMaterial({color:C,emissive:C,emissiveIntensity:.9,roughness:.3}),0,.08,0,base,true).rotation.x=Math.PI/2;
   mesh(lathe([[1.16,.15],[1.13,.163],[1.1,.15]],64),new THREE.MeshStandardMaterial({color:0xd9a441,metalness:1,roughness:.3}),0,0,0,base,true);
   const shadow=mesh(new THREE.PlaneGeometry(3.4,3.4),new THREE.MeshBasicMaterial({map:V3.tex.blob,transparent:true,depthWrite:false,opacity:.75}),0,.012,0,R,true);shadow.rotation.x=-Math.PI/2;shadow.renderOrder=1;

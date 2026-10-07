@@ -46,10 +46,9 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
     for(const e of G.en){if(e.type==='boss'){if(e.x<W-20){e.hp-=ob?55:40;e.flash=.2;e.lasers=[];}}else{e.hp-=ob?40:30;e.flash=.2;}}
     G.flash=Math.max(G.flash,.45*FX());s.wv=.7;floater(P.x,P.y-24,'DROP!','#b36bff');},
   drums(){const a=AU.a;if(!a||a.state!=='running'||!running||paused||!G||G.dead||!this.on('drum')){this.dstep=-1;return;}
-    if(BT.rp)mnow();
-    const s16=BT.spb/4,now=a.currentTime,lim=BT.rp?BT.rp.at:1e9;
-    if(this.dstep<0||BT.rev!==this.drev||BT.rate!==this.drate){this.drev=BT.rev;this.drate=BT.rate;this.dstep=Math.ceil((now-BT.t0)/s16);}
-    while(BT.t0+this.dstep*s16<now+.12&&BT.t0+this.dstep*s16<lim){const t=BT.t0+this.dstep*s16;if(t>=now-.01)this.hit(this.dstep,t);this.dstep++;}},
+    const s16=BT.spb/4,now=a.currentTime;
+    if(this.dstep<0||BT.rev!==this.drev||NR.music.rate!==this.drate){this.drev=BT.rev;this.drate=NR.music.rate;this.dstep=Math.ceil((now-BT.t0)/s16);}   // song or speed changed: restart the pattern on the new grid
+    while(BT.t0+this.dstep*s16<now+.12){const t=BT.t0+this.dstep*s16;if(t>=now-.01)this.hit(this.dstep,t);this.dstep++;}},
   hit(n,t){const s=((n%16)+16)%16,bar=Math.floor(n/16),D=AU.musv;
     if(s%4===0)AU.osc(t,'sine',165,.3,1.1,D,42);
     if(s===10)AU.osc(t,'sine',150,.2,.5,D,45);
@@ -85,7 +84,7 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
       ctx.restore();y+=46;}}
 };
 NR.on('spawn',e=>{if(!G.live||e.type==='gate'||G.dead)return;const s=PW.st();if(--s.cnt>0)return;s.cnt=Math.round(gx(22,34));e.pw=PW.pick();});
-NR.on('kill',e=>{if(!G.live)return;if(e.pw||e.type==='boss')G.pk.push({t:'pw',k:e.pw||PW.pick(),x:e.x,y:e.y,vx:-30,vy:0,bob:0});});
+NR.on('kill',({e})=>{if(!G.live)return;if(e.pw||e.type==='boss')G.pk.push({t:'pw',k:e.pw||PW.pick(),x:e.x,y:e.y,vx:-30,vy:0,bob:0});});
 NR.on('pickup',p=>{PW.give(p.k,judge(performance.now()).ok);});
 NR.on('tick',dt=>{PW.tick(dt);});
 NR.on('beat',()=>{if(!G.live||G.dead||!PW.on('drum'))return;const x=P.x+22,y=P.y;PW.stat.auto++;
