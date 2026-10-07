@@ -172,7 +172,7 @@ async function playGame(browser, size, gi, rep) {
         if (a.sig !== pre.sig && !(r.f && r.f.tx == null)) issues.add('tapping the bulb changed the game (' + pre.sig + ' -> ' + a.sig + ')');
         return true; }
       return false; };
-    const shotOnce = async (kind, ph) => { TOT.shots[kind === 'bubble' ? ph : kind] = 1; if (!process.env.HELPSHOTS || W !== 390 || H !== 763 || TOT.saved[kind]) return; TOT.saved[kind] = 1;
+    const shotOnce = async (kind, ph) => { if (!process.env.HELPSHOTS || W !== 390 || H !== 763) { if (kind === 'bubble') TOT.shots[ph] = 1; return; } TOT.shots[kind === 'bubble' ? ph : kind] = 1; if (TOT.saved[kind]) return; TOT.saved[kind] = 1;
       const name = { bubble: 'help-coach-bubble', bulb: 'help-bulb-suggestion', rules: 'help-rules-card' }[kind]; await page.screenshot({ path: path.join(__dirname, 'playtest', name + '-390x763.png') }).catch(() => { }); };
     for (; ;) {
       steps++;
