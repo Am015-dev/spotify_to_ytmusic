@@ -24,11 +24,11 @@ for(const ev of['touchstart','touchmove','touchend','touchcancel'])addEventListe
     if(s.done){if(y>s.y-10)s.done=false}else if(s.y-y>26&&n-s.t<500){s.done=true;B2K_hop()}s.ly=y;s.lt=n}},{passive:true,capture:true});
   const end=e=>{for(const t of e.changedTouches)sw.delete(t.identifier)};addEventListener('touchend',end,{passive:true,capture:true});addEventListener('touchcancel',end,{passive:true,capture:true})}
 function B2K_hop(){if(state==='roam')pressed.fire=true;else B2K.hopReq=true;B2K.log.hop++;const G=document.getElementById('tG');if(G){G.classList.remove('b2kHop');void G.offsetWidth;G.classList.add('b2kHop')}}
-// ctlPlayer: GAS+BRAKE+steer = drift (hb), never a brake; keyboard Up+Down+steer too
+// ctlPlayer: an explicit GAS+BRAKE+steer hold = drift (hb), never plain braking; keyboard Up+Down+steer too
 {const f0=ctlPlayer;ctlPlayer=function(){const c=f0.apply(this,arguments);try{if(state==='roam'||state==='race'){
-  const gas=TOUCH.gas||B2K.tG||K.ArrowUp||K.KeyW,brk=TOUCH.brake||B2K.tB||K.ArrowDown||K.KeyS,auto=TOUCH.on&&TOUCH.used&&thrEff()!=='pedal';
+  const gas=TOUCH.gas||B2K.tG||K.ArrowUp||K.KeyW,brk=TOUCH.brake||B2K.tB||K.ArrowDown||K.KeyS;
   const sp=state==='roam'?Math.abs(RO.v):(pl?pl.v:0),dr=state==='roam'?!!RO.dDir:!!(pl&&pl.hbDir);
-  B2K.req=brk&&(gas||auto)&&sp>window.B2K_DMIN&&(dr||Math.abs(c.steer)>.25)&&!TOUCH.park;if(B2K.req){c.hb=1;c.brk=0;c.thr=1}}}catch(e){}return c}}
+  B2K.req=brk&&gas&&sp>window.B2K_DMIN&&(dr||Math.abs(c.steer)>.25)&&!TOUCH.park;if(B2K.req){c.hb=1;c.brk=0;c.thr=1}}}catch(e){}return c}}
 // ---- HUD: pink drift bar over a cyan boost bar, just above the speed readout
 (()=>{const st=document.createElement('style');st.id='b2kCss';st.textContent=`
 #b2kM{position:fixed;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:clamp(150px,22vw,200px);z-index:6;pointer-events:none;display:none}
@@ -98,7 +98,7 @@ function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.b
   B2K.log.drift.push({s:+B2K.dT.toFixed(2),bar:+B2K.dm.toFixed(1),boost:+g.toFixed(1),slipAvg:+(B2K.slS/Math.max(1,B2K.slN)*57.3).toFixed(1),slipMax:+(B2K.slMax*57.3).toFixed(1)});if(B2K.log.drift.length>40)B2K.log.drift.shift();
   if(g>=1){B2K_pop('+'+Math.round(g)+' BOOST','#ff8ad0');B2K.pulse=1}B2K.dm=0;B2K.dT=0;B2K.slS=0;B2K.slN=0;B2K.slMax=0}
 function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,15);shake=Math.max(shake,.25);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
-    if(roam)RO.turbo=Math.max(RO.turbo||0,.4);else s.boost=Math.max(s.boost||0,.4)}
+    if(roam)RO.bRamp=1;else s.boost=Math.max(s.boost||0,.25)}
   B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=B2K_BASHT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,12);shake=Math.max(shake,.3)}B2K.bash=bash;
   if(bash){s.bm=Math.min(100,s.bm+8*dt);if(roam){RO.turbo=Math.max(RO.turbo||0,.12);RO.inv=Math.max(RO.inv||0,.15)}else s.boost=Math.max(s.boost||0,.12)}B2K.wasB=boosting}
 // Brickbash in roam: traffic within reach is knocked aside (tumble + debris) instead of stopping the car
@@ -108,7 +108,7 @@ function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(R
     try{AU.sfx('crash')}catch(e){}shake=Math.max(shake,.35);comboAdd(2);B2K_pop('BASH!','#ffd12c')}}}
 // roam: wrap roamStep (pre: Brickbash push; post: drift bar instead of the old trickle, conversion, slow regen, FX, HUD)
 {const f0=roamStep;roamStep=function(dt){const s=pl;if(state!=='roam'||!s||RO.wk){const r=f0.apply(this,arguments);B2K_hud(s?s.bm:0);return r}
-  B2K_bashPush();const bm0=s.bm,d0=RO.dDir,t0=RO.dT||0;const r=f0.apply(this,arguments);try{
+  B2K_bashPush();const bm0=s.bm,d0=RO.dDir,t0=RO.dT||0;{const L=B2K.log;L.stk=L.stk||[];if(Math.abs(RO.v)<1.4&&!RO.card&&!RO.story){B2K.stT=(B2K.stT||0)+dt;if(B2K.stT>2&&!B2K.stOn){B2K.stOn=1;if(L.stk.length<20)L.stk.push({x:Math.round(RO.x),z:Math.round(RO.z),lastDrift:+(B2K.tD||0).toFixed(1),bash:B2K.bash,boostT:+(B2K.tB0||0).toFixed(1),hp:Math.round(RO.hp??100),wk:!!RO.wk})}}else{B2K.stT=0;B2K.stOn=0}B2K.tD=RO.dDir?0:(B2K.tD||0)+dt;B2K.tB0=CTL&&CTL.boost?0:(B2K.tB0||0)+dt}const r=f0.apply(this,arguments);try{
   const boosting=!!(CTL&&CTL.boost)&&bm0>1&&!RO.card&&!RO.mapOpen&&!RO.story;
   // take back the old drift trickle (8/s) and end bonus (6 per tier): the drift bar pays out instead
   let take=(RO.dDir?8*dt:0)+(d0&&!RO.dDir?6*(t0>2?3:t0>1.1?2:t0>.5?1:0):0);if(take>0){const base=boosting?Math.max(0,bm0-22*dt):Math.min(100,bm0+((RO.bIdle||0)>.5?FL_RECH*dt:0));s.bm-=Math.min(take,Math.max(0,s.bm-base))}
