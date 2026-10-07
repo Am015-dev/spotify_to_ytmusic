@@ -5050,10 +5050,10 @@ const HLP_STEPS={
  start:{target:()=>hlpPipExample(),title:'Pick a start mark',text:'Tap a gold mark on the board\'s edge. The middle of an edge is safest; corners are cramped.',pic:()=>HP.mark()},
  lay:{target:hq('#ppop .ph-tiles','#ps .ps-tiles','#pin .hand'),title:'Lay a current',text:'Pick a tile, turn it, then tap Place. Your junk sails along the new line.',pic:()=>HP.tile()},
  nolay:{target:hq('#ps .ps-x .pb','#ps .ps-ctl .pb','#pin .row .btn','#main .row .btn'),title:'Nothing to lay',text:'No tile fits. Tap Pass, or use a Rift Gate or Deck Cannon if you have one.',pic:()=>HP.pass()},
- doom:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'Junk in danger',text:'A leviathan is about to sink you. Pick a rescue below, or Accept.',pic:()=>HP.lev()},
- cannon:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'A Deck Cannon',text:'Keep it to shoot a leviathan later, or discard it and draw a different tile.',pic:()=>HP.cannon()},
- bonus:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'Sunken crews\' tiles',text:'Swap one of your tiles for a sunken crew\'s tile, or keep your hand.',pic:()=>HP.swap()},
- gate:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'Rift Gate landing',text:'Tap an option below to choose where the Rift Gate puts you.',pic:()=>HP.gate()}
+ doom:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Junk in danger',text:'A leviathan is about to sink you. Pick a rescue below, or Accept.',pic:()=>HP.lev()},
+ cannon:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'A Deck Cannon',text:'Keep it to shoot a leviathan later, or discard it and draw a different tile.',pic:()=>HP.cannon()},
+ bonus:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Sunken crews\' tiles',text:'Swap one of your tiles for a sunken crew\'s tile, or keep your hand.',pic:()=>HP.swap()},
+ gate:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Rift Gate landing',text:'Tap an option below to choose where the Rift Gate puts you.',pic:()=>HP.gate()}
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
@@ -5121,7 +5121,7 @@ function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb,#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
+  GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const b=$('#bulbbtn');if(b)b.addEventListener('click',()=>{try{const c=GXH.state().cur;if(c&&c.kind==='bulb'&&G&&UI.started)UI.campHints=(UI.campHints||0)+1}catch(e){}})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet)return;GXH.phase(hlpPhase())}

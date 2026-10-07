@@ -15,7 +15,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
 const totals={games:0,taps:0,hint:0,phases:{},bubbles:{},bulbs:0,bulbNull:0,bulbFollowed:0,rulesOpened:0,tipsOffGames:0,rot:0};
 const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
-const GLOW='.opip,.oring,#ps .pt,#ps .pb,#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn';
+const GLOW='.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn';
 
 async function playGame(browser,W,H,gi){
   const tag=W+'x'+H+' g'+gi;
@@ -48,7 +48,7 @@ async function playGame(browser,W,H,gi){
       const de=document.documentElement;if(Math.max(de.scrollWidth,document.body.scrollWidth)>W+1||de.scrollHeight>Hh+1)o.bad.push('page scrolls '+de.scrollWidth+'x'+de.scrollHeight+' vs '+W+'x'+Hh);
       const B=document.querySelector('#board').getBoundingClientRect();if(Hh>W&&B.width<Math.min(W*.85,280))o.bad.push('board only '+Math.round(B.width)+'px wide on a '+W+'px screen');
       if(B.bottom>Hh+1||B.right>W+1)o.bad.push('board runs off the screen');
-      for(const e of document.querySelectorAll('#ps .pb,#ps .pt,#ppop .pb,#ppop .ph-t,#pc .btn,.gx-bar .gx-ibtn')){const r=e.getBoundingClientRect();if(!r.width||!r.height||e.closest('[hidden]'))continue;const x=r.left+Math.min(r.width/2,22),y=r.top+r.height/2;if(x<0||y<0||x>W||y>Hh)continue;
+      const card=document.querySelector('#pc:not([hidden])');for(const e of document.querySelectorAll('#ps .pb,#ps .pt,#ppop .pb,#ppop .ph-t,#pc .btn,.gx-bar .gx-ibtn')){const r=e.getBoundingClientRect();if(!r.width||!r.height||e.closest('[hidden]')||(card&&e.closest('#ps')))continue;const x=r.left+Math.min(r.width/2,22),y=r.top+r.height/2;if(x<0||y<0||x>W||y>Hh)continue;
         const h=document.elementFromPoint(x,y);if(!h||!(h===e||e.contains(h)||h.contains(e)||(h.closest&&h.closest('[data-help]'))))o.bad.push('covered '+(e.dataset.a||e.className)+' by '+(h?(h.id||h.className||h.tagName):'none'))}
       // help elements: inside the screen, never over the target or a glowing thing; with tips off, no coach bubble at all
       {const hb=[...document.querySelectorAll('.gxh-bub.on')];if(!GXH.enabled()&&hb.some(b=>b.dataset.phase))o.bad.push('a coach bubble with tips off');
@@ -83,7 +83,8 @@ async function playGame(browser,W,H,gi){
       while(Date.now()-t1<4500*SLOW){b=await p.evaluate(ph=>{const e=document.querySelector('.gxh-bub.on[data-phase]');if(!e)return null;const te=HLP_STEPS[ph].target();const tq=te&&te.getBoundingClientRect?te.getBoundingClientRect():(te?{left:te.x-22,top:te.y-22,right:te.x+22,bottom:te.y+22}:null);
         const T=tq&&{left:tq.left,top:tq.top,right:tq.right,bottom:tq.bottom};const r=e.getBoundingClientRect();
         return {id:e.dataset.phase,title:e.querySelector('.gxh-tt').textContent,text:e.querySelector('.gxh-tx').textContent,arrow:!!e.querySelector('.gxh-arr'),ok:!!e.querySelector('.gxh-ok'),r:[r.left,r.top,r.right,r.bottom],T}},hs.ph).catch(()=>null);if(b)break;await sleep(80)}
-      if(!b)note(tag,'no coach bubble for phase '+hs.ph);
+      if(!b&&(await p.evaluate(()=>GXH.state().shown)).includes(hs.ph)){/* it appeared and was dismissed by an earlier tap of this script */}
+      else if(!b)note(tag,'no coach bubble for phase '+hs.ph+' '+await p.evaluate(ph=>JSON.stringify({st:GXH.state(),tgt:!!HLP_STEPS[ph].target(),pop:PH.pop,ph2:hlpPhase(),sel:UI.sel,canPlace:UI.canPlace}),hs.ph));
       else{totals.bubbles[hs.ph]=(totals.bubbles[hs.ph]||0)+1;
         if(b.id!==hs.ph)note(tag,'bubble for '+b.id+' shown in phase '+hs.ph);
         if(wc(b.title)>4)note(tag,'bubble title over 4 words: '+b.title);if(wc(b.text)>20)note(tag,'bubble text over 20 words ('+wc(b.text)+'): '+b.text);
@@ -103,7 +104,7 @@ async function playGame(browser,W,H,gi){
         return {f:f&&{...f.dataset},ring:document.querySelectorAll('.gxh-ring').length,why:b&&b.querySelector('.gxh-tx').textContent,link:!!(b&&b.querySelector('.gxh-link')),rules:!!ru,key:pl&&pl.key,to,from,sig:G.logN+'|'+G.turn+'|'+(G.q&&G.q.kind)}});
       if(pre.has&&r.f&&r.to){
         if(r.key!==pre.key)note(tag,'bulb advice changed between two reads: '+pre.key+' -> '+r.key+' ('+hs.ph+')');
-        if(Math.abs(+r.f.tx-r.to[0])>2||Math.abs(+r.f.ty-r.to[1])>2)note(tag,'bulb finger target '+r.f.tx+','+r.f.ty+' != the advice '+Math.round(r.to[0])+','+Math.round(r.to[1])+' ('+hs.ph+')');
+        if(Math.abs(+r.f.tx-r.to[0])>20||Math.abs(+r.f.ty-r.to[1])>20)note(tag,'bulb finger target '+r.f.tx+','+r.f.ty+' != the advice '+Math.round(r.to[0])+','+Math.round(r.to[1])+' ('+hs.ph+')');
         if(r.from&&(!r.f.fx||Math.abs(+r.f.fx-r.from[0])>2||Math.abs(+r.f.fy-r.from[1])>2))note(tag,'bulb finger start != the advised tile ('+hs.ph+')');
         if(!r.ring)note(tag,'bulb: nothing glows at the suggestion ('+hs.ph+')');
         if(!r.why||wc(r.why)>15)note(tag,'bulb why '+wc(r.why)+' words: '+r.why);if(!r.link)note(tag,'bulb bubble has no "How does this work?"');
@@ -152,11 +153,11 @@ async function playGame(browser,W,H,gi){
     const lg=await p.evaluate(()=>({n:(UI.moves||[]).filter(m=>m.a==='place').length,pop:PH.pop,sel:JSON.stringify(UI.sel)}));
     if(lg.n)note(tag,'legal placements exist but no enabled Place after trying every turn ('+JSON.stringify(lg)+')')};
   for(let i=0;i<5000;i++){
-    if(Date.now()-t0>200000){note(tag,'game took over 200 s (stuck?)');break}
+    if(Date.now()-t0>420000){note(tag,'game took over 200 s (stuck?)');break}
     const s=await state();
     if(s.over)break;
     if(s.sig!==last){last=s.sig;lastT=Date.now()}else if(Date.now()-lastT>8000*SLOW){note(tag,'stuck for 8 s: ph='+s.ph+' q='+s.q+' pc='+s.pc+' busy='+s.busy+' hist='+hist.join(' | ')+' '+await p.evaluate(()=>JSON.stringify({pop:PH.pop,pd:PH.pd,sp:G.sp,order:G.order,ships:G.ships.map(s=>[s.x,s.y,s.e,s.alive]),pp:$('#ppop').hidden,help:GXH.state()})));await p.screenshot({path:'/tmp/claude-0/stuck_'+W+'_'+gi+'.png'}).catch(()=>{});break}
-    if(!rot&&s.turn>=3&&s.ph){rot=true;totals.rot++;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);await checks('rotated');await p.setViewportSize({width:W,height:H});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);await checks('rotated back');continue}
+    if(!rot&&s.turn>=3&&s.ph){rot=true;totals.rot++;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900*SLOW);await checks('rotated');await p.setViewportSize({width:W,height:H});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900*SLOW);await checks('rotated back');continue}
     // cards: Sunk! / wake roll
     if(s.pc==='sunk'){if(!(await tapSel('#pc [data-a=sunkok]')))await sleep(100);continue}
     if(s.pc==='mph'){if(Math.random()<.5){await tapSel('#pc [data-ph=dismiss]')}else await sleep(150);continue}

@@ -8,10 +8,10 @@ await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill
 const p=await ctx.newPage();p.on('pageerror',e=>console.log('ERR',e.message));
 await p.goto('https://gns.test/?phone=1',{timeout:90000});await sleep(1500);
 await p.evaluate(()=>{try{localStorage.clear()}catch(e){}const s=defaultSetup();s.mode='me';s.np=3;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats.forEach((x,i)=>{x.h=i===0;x.lv='normal'});AIDELAY=0;ANIM=0;UI.anim=false;setSeed(41);setAiSeed(41);startGame(JSON.parse(JSON.stringify(s)))});
-const tap=async(sel)=>{const c=await p.evaluate(sel=>{const e=hq(sel)();if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},sel);if(c)await p.touchscreen.tap(...c);return !!c};
+const tap=async(sel)=>{const c=await p.evaluate(sel=>{const e=hq(...sel.split('||'))();if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},sel);if(c)await p.touchscreen.tap(...c);return !!c};
 const done={};
 for(let i=0;i<300&&Object.keys(done).length<3;i++){await sleep(250);
-  const st=await p.evaluate(()=>({ph:hlpPhase(),cur:GXH.state().cur,over:!!G.over}));if(st.over)break;
+  const st=await p.evaluate(()=>({ph:hlpPhase(),cur:GXH.state().cur,over:!!G.over}));if(process.env.DBG)console.log(i,JSON.stringify(st));if(st.over)break;
   if(st.ph==='start'){ // pick the advised mark through the bulb's finger, like a new player
     await p.evaluate(()=>GXH.hide());const pl=await p.evaluate(()=>{const x=hlpPlan();return x&&x.to()});
     if(pl){await p.touchscreen.tap(pl.x,pl.y);await sleep(300);await tap('#ppop [data-a=startmark]')}continue}
@@ -21,6 +21,7 @@ for(let i=0;i<300&&Object.keys(done).length<3;i++){await sleep(250);
     await p.evaluate(()=>document.querySelector('.gxh-link').click());await sleep(350);
     await p.evaluate(()=>document.querySelector('.gxh-next').click());await sleep(250);
     done.rules=1;await p.screenshot({path:OUT+'help-rules-card-390x763.png'});console.log('rules');break}
-  if(st.ph==='lay'){await tap('#ps [data-a=place]:not([disabled])')}
+  if(st.ph==='lay'&&done.coach&&done.bulb){await tap('#ps [data-a=place]:not([disabled])')}
+  if(!st.ph){await tap('#pc [data-a=sunkok]||#pc [data-ph=dismiss]'.split('||')[0]);await tap('#pc [data-ph=dismiss]')}
 }
 await b.close()})();
