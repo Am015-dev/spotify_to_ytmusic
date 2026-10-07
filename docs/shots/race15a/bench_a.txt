@@ -1,0 +1,3 @@
+grand W 38.0 raceSec 119.4 avgKmh 208.8 top 285.4 wall/min 0.0 transf 2.0 items 6.0 ms 486.36 calls 211.5 place ['4/8', '1/8'] routes [[], []] err 0
+hafen W 38.0 raceSec 75.4 avgKmh 183.2 top 268.35 wall/min 0.8 transf 2.0 items 2.0 ms 458.44 calls 209.0 place ['6/8', '5/8'] routes [[], []] err 0
+akro W 38.0 raceSec 110.6 avgKmh 190.4 top 291.95 wall/min 0.28 transf 0.0 items 1.5 ms 428.19 calls 171.0 place ['5/8', '3/8'] routes [[], []] err 0
