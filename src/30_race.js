@@ -247,9 +247,11 @@ function dailyCfg(){const key=dayKey();let h=2166136261;for(const c of key)h=Mat
     laps:type==='race'?trk.laps:type==='tt'?2:999,traffic:type==='tt'?0:pick([12,20,30])};return c}
 const dailyLabel=c=>{const t=TRACK_DEFS.find(x=>x.id===c.track),m=MOODS.find(x=>x.id===c.mood);return{t,m,mode:{race:'Race · '+c.laps+' laps',tt:'Time attack · 2 laps',zone:'Zone survival'}[c.type]}};
 const medalPts=()=>Object.values(career()).reduce((a,m)=>a+m,0);
-function makeShip(team,isPlayer,name,skill){const mesh=shipMesh(team);scene.add(mesh);const top=BASE_TOP*cls.mul*team.top;
+// R15: races are faster for everyone (top +20 %, acceleration +35 %); free roam keeps its own physics
+const R15_SPD=1.2,R15_ACC=1.35;const R15_on=()=>RC&&RC.type!=='roam';
+function makeShip(team,isPlayer,name,skill){const mesh=shipMesh(team);scene.add(mesh);const rk=R15_on()?R15_SPD:1,top=BASE_TOP*cls.mul*team.top*rk;
   return{team,isPlayer,name,skill,mesh,dist:0,x:0,yaw:0,beta:0,yawRate:0,v:0,hull:100,item:null,
-    stats:{top,top0:BASE_TOP*cls.mul,acc:8.4*cls.mul*team.acc,brake:8+cls.mul,han:team.han,hull:team.hull},
+    stats:{top,top0:BASE_TOP*cls.mul*rk,acc:8.4*cls.mul*team.acc*(R15_on()?R15_ACC:1),brake:8+cls.mul,han:team.han,hull:team.hull},
     lap:-1,lapStart:0,best:Infinity,laps:[],finished:false,finishTime:0,dead:0,shield:0,turbo:0,boost:0,inv:0,roll:0,rollV:0,laneBias:rr(-4,4)*CR_LS,rubber:1,wall:0,wrong:0,place:1,bob:R()*6,aiFire:0,lastHit:-9,
     bm:20,nitro:false,air:null,lastJump:'',rollT:0,rollDir:0,rollCd:0,driftT:0,style:0,takedowns:0,nearMiss:0,airTime:0,maxSpeed:0,eliminated:false,attackT:0,aggrCd:rr(2,6),stall:0,latV:0}}
 function clearRace(){for(const s of ships){scene.remove(s.mesh);disposeTree(s.mesh,true)}ships.length=0;for(const o of projs)wfxDrop(o);for(const o of mines)wfxDrop(o);projs.length=0;mines.length=0;
@@ -328,10 +330,10 @@ function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
   s.aab=0;if(SET.assist!=='off'&&TOUCH.used&&!s.air&&state==='race'){let kA=0;for(let d=15;d<=135;d+=20)kA=Math.max(kA,Math.abs(kAt(TD,s.dist+d)));const vr0=Math.min(1,s.v/st.top0),Rm=(1.32-.52*vr0)*st.han*{low:.85,normal:1,high:1.15}[SET.steer],need=kA*s.v,kL=kAt(TD,s.dist+12),cap=Math.min(Rm+(s.v>st.top0*.3?.5*st.han:0),C26.on?C26_muRace(s)*.95/Math.max(1,s.v):9);
     if(Math.abs(kL)*s.v>Rm*.72&&s.v>st.top0*.3&&!c.hb)s.aab=Math.sign(kL);if(need>cap*.8){c.thr=0;c.boost=0}if(need>cap*.98)c.brk=Math.max(c.brk,.7)}
   if(c.boost&&!s.bPrev){if(raceT-(s.bT??-9)<.32&&PK.has('_lock')&&state==='race'){s.spLock=!s.spLock;feed(s.spLock?'BOOST LOCK ON':'BOOST LOCK OFF',0,'#ffd12c');AU.sfx('pick')}s.bT=raceT}s.bPrev=!!c.boost;if(s.spLock){if(c.brk>0||s.dead>0)s.spLock=false;else c.thr=1}
-  s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,8)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
+  s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,R15_on()?14:8);if(R15_on())R15_boostFx(s)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
   const top=st.top*(s.turbo>0?1.2:1)*(s.boost>0?1.12:1)*(s.nitro?1.3:1)*(s.spLock?1.06:1);
   const vr=Math.min(1,s.v/st.top0),Rmax=(1.32-.52*vr)*st.han*(s.air?.85:1)*{low:.85,normal:1,high:1.15}[SET.steer];
-  if(SET.assist!=='off'&&TOUCH.used&&state==='race'){const u=c.steer,au=Math.abs(u);if(au>=.06||s.holdX==null)s.holdX=clamp(s.x+s.v*Math.sin(s.beta)*.17,-(MARGIN-3.5*CR_LS),MARGIN-3.5*CR_LS);if(s.aab>0)c.abR=Math.max(c.abR,1);else if(s.aab<0)c.abL=Math.max(c.abL,1);
+  if(SET.assist!=='off'&&TOUCH.used&&state==='race'){const u=c.steer,au=Math.abs(u);if(au>=.06||s.holdX==null)s.holdX=clamp(s.x+s.v*Math.sin(s.beta)*.17,-(MARGIN-3.5*CR_LS),MARGIN-3.5*CR_LS);else if(R15_on())s.holdX+=(R15_line(s)-s.holdX)*Math.min(1,H*.6);if(s.aab>0)c.abR=Math.max(c.abR,1);else if(s.aab<0)c.abL=Math.max(c.abL,1);
     const yMax=Math.min(.3,SENS().lat/Math.max(40,s.v));let desYaw=au<.06?clamp((s.holdX-s.x)*1.9/Math.max(40,s.v),-.12,.12):u*yMax;
     const edge=Math.abs(s.x)-(MARGIN-5*CR_LS);if(edge>0&&Math.sign(desYaw)===Math.sign(s.x))desYaw*=Math.max(0,1-edge/4);
     c.steer=clamp((k*s.v+(desYaw-s.beta)*6-(c.abR-c.abL)*.62*st.han)/Math.max(.2,Rmax),-1,1);s.asst=1}else s.asst=0
@@ -707,3 +709,9 @@ function updWorld(dt,t){skyMat.uniforms.uT.value=t;
   if(duelGhost&&ghostShip&&pl&&state!=='menu'){const f=duelGhost.f,i=Math.min(f.length-2,Math.floor(raceT*20)*2);if(state!=='countdown'&&i>=0){frameAt(TD,f[i],F2);ghostShip.position.copy(F2.p).addScaledVector(F2.r,f[i+1]).addScaledVector(F2.u,1.6);ghostShip.userData.m.quaternion.setFromRotationMatrix(_m.makeBasis(F2.r,F2.u,F2.t.clone().negate()));ghostShip.visible=true}else ghostShip.visible=false}
   else if(ghost&&ghostShip&&pl&&state!=='menu'){const lt=raceT-pl.lapStart,i=Math.floor(lt*20)*2;if(pl.lap>=0&&ghost.f[i]!=null&&lt>0){const gd=pl.lap*TD.L+ghost.f[i],gx=ghost.f[i+1];frameAt(TD,gd,F2);ghostShip.position.copy(F2.p).addScaledVector(F2.r,gx).addScaledVector(F2.u,1.6);ghostShip.userData.m.quaternion.setFromRotationMatrix(_m.makeBasis(F2.r,F2.u,F2.t.clone().negate()));ghostShip.visible=true}else ghostShip.visible=false}}
 
+
+// R15: boost burst: turbine flash + blue/white sparks out of the back and a short shake when BOOST kicks in
+function R15_boostFx(s){try{if(!s.mesh)return;frameAt(TD,s.dist,F2);const at=s.mesh.position.clone().add(s.mesh.userData.m.position).addScaledVector(F2.t,-2.6).addScaledVector(F2.u,.8);
+ burst(SPARK,at,34,18,.45,new THREE.Color(.7,1.6,2.6),F2.t.clone().negate());burst(SPARK,at,14,10,.3,new THREE.Color(2.4,2.4,2.2));shake=Math.max(shake,.42);FX.uniforms.uBoost.value=Math.max(FX.uniforms.uBoost.value,.9*fxK())}catch(e){}}
+// R15: the racing line the AI uses (inside of the bends ahead); the touch assist drifts toward it when the player is not steering
+function R15_line(s){let ka=0;for(let d=30;d<=150;d+=20)ka+=kAt(TD,s.dist+d);ka/=7;const m=MARGIN-3.5*CR_LS;return clamp(ka*3200,-m,m)}
