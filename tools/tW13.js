@@ -45,6 +45,25 @@ const OUT=process.argv[3]||'qa_w13';fs.mkdirSync(OUT,{recursive:true});const TES
    for(const d of [9,25]){await render();await p.evaluate(([k,d])=>{const M=__mho,D=__dbg,H=M.HUB,R=M.RO;let cc=null,b=1e9;for(const q of H.cars){const e=Math.hypot(q.x-R.x,q.z-R.z);if(!q.dead&&q.k===k&&e<b){b=e;cc=q}}const N=H.nodes,A=N[cc.a],B=N[cc.b],l=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/l,dz=(B.z-A.z)/l,g=M.gnd(cc.x,cc.z,50);
      D.camera.position.set(cc.x-dx*d*.6+dz*d*.8,g+1.4+d*.06,cc.z-dz*d*.6-dx*d*.8);D.camera.lookAt(cc.x,g+1,cc.z);D.camera.updateMatrixWorld();D.composer.render()},[k,d]);
     await p.screenshot({path:path.join(OUT,`${TAG}_k${k}_${d}.jpg`),type:'jpeg',quality:85});await unrender()}}await HQ(0)}
+ if(has('info'))console.log('INFO',await EV(`JSON.stringify({rc:RCAM.chase,k:SC_cam(),SET:{fov:SET.fov,rcam:SET.rcam},top:RO.top*3.6,stats:pl.stats,lvl:carStat(),CAMK:CR_CAMK,minB:CR_minBack()})`));
+ if(has('top')){const r=await p.evaluate(()=>{const N=__mho.HUB.nodes;return null});
+  const runs=JSON.parse(fs.readFileSync(path.join(OUT,'w13_speed_live.json'))).runs;for(const k of ['city','ab']){const q=runs[k];await place(q.x,q.z,q.h);await render();
+   const m=await p.evaluate(([x,z,h])=>{const M=__mho,D=__dbg,g=M.gnd(x,z,50),c=D.camera;c.fov=40;c.updateProjectionMatrix();c.position.set(x+Math.sin(h)*12,g+40,z+Math.cos(h)*12);c.up.set(Math.sin(h),0,Math.cos(h));c.lookAt(x+Math.sin(h)*12,g,z+Math.cos(h)*12);c.updateMatrixWorld();D.composer.render();c.up.set(0,1,0);return{mPerPx:2*40*Math.tan(20*Math.PI/180)/innerHeight}},[q.x,q.z,q.h]);
+   console.log('TOP',k,JSON.stringify(m));await p.screenshot({path:path.join(OUT,TAG+'_top_'+k+'.jpg'),type:'jpeg',quality:85});await unrender()}}
+ if(has('speed')){
+  // longest straight traffic-graph runs: city (no ab flag) and Autobahn (ab); chain collinear edges
+  const runs=await p.evaluate(()=>{const N=__mho.HUB.nodes,out={city:null,ab:null};const seen=new Set();
+   for(let a=0;a<N.length;a++)for(const b of N[a].nb||[]){const A=N[a],B=N[b];let L=Math.hypot(B.x-A.x,B.z-A.z);if(L<5)continue;const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L;let cur=b,prev=a,tot=L;
+     for(let i=0;i<40;i++){const C=N[cur];let best=null;for(const n of C.nb||[]){if(n===prev)continue;const D=N[n],l=Math.hypot(D.x-C.x,D.z-C.z);if(l<1)continue;if(((D.x-C.x)*dx+(D.z-C.z)*dz)/l>.995){best=n;break}}if(best==null)break;tot+=Math.hypot(N[best].x-C.x,N[best].z-C.z);prev=cur;cur=best}
+     const k=A.ab?'ab':'city';if(k==='city'){const ok=t=>{const c=__oc.ev('cityAt')(A.x+dx*t,A.z+dz*t);return c&&c.d<c.road.w/2};if(!(ok(5)&&ok(Math.min(tot,300)*.5)&&ok(Math.min(tot,300)-5)))continue}if(!out[k]||Math.min(tot,700)>Math.min(out[k].L,700))out[k]={L:tot,x:A.x-dz*3.2,z:A.z+dx*3.2,h:Math.atan2(dx,dz)}}return out});
+  console.log('RUNS',JSON.stringify(runs));
+  const hudK=()=>p.evaluate(()=>{const e=[...document.querySelectorAll('#roam *, #hud *')].find(e=>e.children.length<=1&&/KM\/H/i.test(e.textContent)&&e.getClientRects().length);return e?e.textContent.replace(/\s+/g,' ').trim():''});
+  const res={};
+  for(const k of ['city','ab']){const r=runs[k];if(!r)continue;await place(r.x,r.z,r.h);await tick(10);await log(true);await apply({gas:true});const T=[];let t100=null,t60=null;
+   for(let i=0;i<40;i++){await tick(30);const st=await p.evaluate(()=>{const R=__mho.RO;return{v:R.v,x:R.x,z:R.z,top:R.top*3.6,stt:__oc.ev('pl.stats.top'),sacc:__oc.ev('RO.v85o'),inC:!!R.inCity,ab:!!R.onAB,fov:__dbg.camera.fov}});const hk=await hudK();T.push([(i+1)/2,+(st.v*3.6).toFixed(1),hk,st.inC?'C':st.ab?'A':'-',+st.fov.toFixed(1),+st.top.toFixed(0),st.stt,st.sacc]);if(t60==null&&st.v*3.6>=60)t60=(i+1)/2;if(t100==null&&st.v*3.6>=100)t100=(i+1)/2;if(i===5)await shot(TAG+'_spd_'+k+'_3s');if(i===19)await shot(TAG+'_spd_'+k+'_10s')}
+   await apply({gas:false});const L=await log(false);let hits=0;for(let i=1;i<L.length;i++)if(L[i].v<L[i-1].v-1.5)hits++;
+   res[k]={t60,t100,vmax:Math.max(...T.map(q=>q[1])),hits,T};console.log('SPEED',k,JSON.stringify({t60,t100,vmax:res[k].vmax,hits}));console.log('TRACE',k,JSON.stringify(T))}
+  fs.writeFileSync(path.join(OUT,'w13_speed_'+TAG+'.json'),JSON.stringify({runs,res},null,0))}
  if(has('traffic')){
   await shot(TAG+'_chase0');
   const cars=await p.evaluate(()=>{const R=__mho.RO,H=__mho.HUB,N=H.nodes;return (H.cars||[]).filter(c=>!c.dead&&c.x!=null).map(c=>{const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;return{k:c.k,x:c.x,z:c.z,dx:(B.x-A.x)/L,dz:(B.z-A.z)/L,d:Math.hypot(c.x-R.x,c.z-R.z)}}).sort((a,b)=>a.d-b.d).slice(0,4)});
