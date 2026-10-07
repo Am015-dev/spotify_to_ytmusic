@@ -1,23 +1,36 @@
-// t4/nb.js: RIDES → BUILD YOUR OWN → chassis → place parts by taps → DONE → SAVE & DRIVE → story drive shot. usage: node t4/nb.js <url> <out> [desk]
+// t4/nb.js: RIDES → BUILD YOUR OWN → chassis → place real parts by taps on chassis cells → paint one part → DONE → SAVE & DRIVE → drive shot.
+// usage: node t4/nb.js <url> <out> [desk]   env CH=sc8|rod  DRIVE=1 (drive in Frankfurt + tyre gap)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='desk',CH=process.env.CH||'sc8';fs.mkdirSync(OUT,{recursive:true});
 (async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const ctx=await b.newContext(DESK?{viewport:{width:1280,height:720}}:{viewport:{width:852,height:393},isMobile:true,hasTouch:true});
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});
- const tapXY=async(x,y)=>{if(DESK)await p.mouse.click(x,y);else await p.touchscreen.tap(x,y);await p.waitForTimeout(700)};
+ const cdp=DESK?null:await ctx.newCDPSession(p);
+ // touchStart + touchEnd sent back to back (the slow software renderer otherwise splits a tap across >900 ms of frames = a long press)
+ const tapXY=async(x,y)=>{if(DESK)await p.mouse.click(x,y);else{const tp=[{x,y,id:1,radiusX:4,radiusY:4,force:1}];await Promise.all([cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:tp}),cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})])}await p.waitForTimeout(600)};
  const tapEl=async e=>{await e.scrollIntoViewIfNeeded();const bb=await e.boundingBox();if(!bb)return console.log('HIDDEN');await tapXY(bb.x+bb.width/2,bb.y+bb.height/2)};
  const tap=async s=>{const e=await p.$(s);if(!e)return console.log('NO',s);await tapEl(e)};
- const shot=async n=>{await p.waitForTimeout(1200);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n)};
+ const shot=async n=>{await p.waitForTimeout(1000);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n)};
+ const cnt=()=>p.evaluate(()=>__gb.list().length);
+ const part=async pc=>{const ct=await p.$eval(`#gbBkPc [data-p="${pc}"]`,x=>x.dataset.ct).catch(()=>null);if(!ct)return console.log('nopc',pc);await tap(`#gbBkCt [data-ct="${ct}"]`);await tap(`#gbBkPc [data-p="${pc}"]`)};
+ const put=async(pc,i,j,rot=0)=>{await part(pc);for(let r=0;r<rot;r++)await tap('#gbBkT [data-a="rot"]');const n0=await cnt();const s=await p.evaluate(([i,j])=>__gb.scr(i,j),[i,j]);if(!s)return console.log('noscr',i,j);
+  await tapXY(s.x,s.y);console.log('put',pc,i,j,'+'+((await cnt())-n0));for(let r=0;r<rot;r++)await tap('#gbBkT [data-a="rot"]')};
  await tap('#gbMenuBtn');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('01_rides');await tap('.gnbGo');await shot('02_picker');
  await tap(`[data-ch="${CH}"]`);await shot('03_chassis');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
- // place parts: pick a few part buttons in the drawer and tap on the car body
- const V=await (await p.$('#gbC')).boundingBox(),cx=V.x+V.width/2,cy=V.y+V.height*0.5;
- for(const [pc,dx,dy] of[['b24',0,0],['b24',0,-20],['slope',0,30],['spoiler',0,-45]]){const e=await p.$(`#gbBkPc [data-p="${pc}"]`);if(e){await p.$eval(`#gbBkPc [data-p="${pc}"]`,x=>{const c=x.dataset.ct;const t=document.querySelector(`#gbBkCt [data-ct="${c}"]`);t&&t.click()});await tapEl(e);await tapXY(cx+dx,cy+dy)}else console.log('nopc',pc)}
- await shot('04_built');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
- await tap('#gbBkT [data-a="done"]');await shot('05_done');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('06_rides_mine');await tap('#gbSave');
- console.log('sel',await p.evaluate(()=>JSON.parse(localStorage.getItem('mho_gar@1')||'{}').sel),'bricks',await p.evaluate(()=>(JSON.parse(localStorage.getItem('mho_build@1')||'{}').bricks||[]).length));
- if(process.env.DRIVE){await tap('#hcStory');for(let i=0;i<60;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}}
+ // zoom in a little with the wheel/pinch-free path: keep the default camera (phone users orbit by drag)
+ for(const[pc,i,j,r]of(process.env.PARTS?JSON.parse(process.env.PARTS):[['arch',-4,-6],['arch',-4,4],['b16',-4,-1],['cs14',-2,-6],['cs14',-1,-6],['hl',-4,-8],['ws4',-1,-3],['cs14',-2,4,2],['cs14',-1,4,2],['tl',-4,7,2],['spoiler',-1,6]]))await put(pc,i,j,r||0);
+ await shot('04_parts');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
+ // paint: red, brush tool, tap a front mudguard (mirror paints its twin)
+ await tap('#gbBkCl [data-c="6"]');await tap('#gbBkT [data-a="paint"]');{const s=await p.evaluate(()=>__gb.scr(-4,-5));if(s)await tapXY(s.x,s.y+6)}
+ await tap('#gbBkCl [data-c="2"]');{const s=await p.evaluate(()=>__gb.scr(-2,-5));if(s)await tapXY(s.x,s.y+4)}
+ await shot('05_painted');console.log('cols',await p.evaluate(()=>JSON.stringify(__gb.list().filter(b=>!/^(wL|wM|T)/.test(b.t)).map(b=>b.t+':'+b.c))));
+ await tap('#gbBkT [data-a="done"]');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('06_rides_mine');await tap('#gbSave');
+ console.log('sel',await p.evaluate(()=>JSON.parse(localStorage.getItem('mho_gar@1')||'{}').sel),'bricks',await p.evaluate(()=>(JSON.parse(localStorage.getItem('mho_gar@1')||'{}').br||{}).mine?.length));
+ if(process.env.DRIVE){await tap('#hcStory');for(let i=0;i<80;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}}
   for(let i=0;i<14;i++){let hit=0;for(const l of[p.getByText('SKIP',{exact:false}),p.getByText('TAP TO CONTINUE'),p.locator('#m1Next')]){const e=l.first();if(await e.count()&&await e.isVisible()){await tapEl(await e.elementHandle());hit=1;break}}if(!hit&&i>3)break;await p.waitForTimeout(1500)}
-  await p.waitForTimeout(3000);await shot('07_drive');console.log('tyre',await p.evaluate(()=>{try{const R=__mho.RO;return (R.y-__mho.gnd(R.x,R.z,R.y+.3)).toFixed(3)}catch(e){return String(e)}}))}
+  await shot('07_roam');
+  // drive: hold GAS (touch default) a few seconds, small steering by keyboard taps like a human
+  await p.keyboard.down('ArrowUp');await p.waitForTimeout(4000);await p.keyboard.down('ArrowLeft');await p.waitForTimeout(300);await p.keyboard.up('ArrowLeft');await p.waitForTimeout(2500);await shot('08_drive');await p.keyboard.up('ArrowUp');
+  console.log('tyre',await p.evaluate(()=>{try{return JSON.stringify(__gnb.gap())}catch(e){return String(e)}}),'kmh',await p.evaluate(()=>{try{return Math.round(Math.abs(__mho.RO.v||__mho.RO.spd||0)*3.6)}catch(e){return 'n/a'}}))}
  console.log('ERR',errs.slice(0,8));await b.close()})();
