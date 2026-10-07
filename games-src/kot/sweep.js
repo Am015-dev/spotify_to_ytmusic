@@ -152,6 +152,7 @@ async function helpFlow(p, tag, st) {
   if (hs.ph && (!seen.has('bulb:' + hs.ph) || rnd() < .12) && (p._bulbN || 0) < 16) {
     seen.add('bulb:' + hs.ph); p._bulbN = (p._bulbN || 0) + 1; helpTot.bulbs++;
     if (hs.ph === 'watch') { await p.evaluate(() => GXH.rules('watch')); await p.waitForTimeout(150); await rulesCheck(p, tag, 'watch'); return true } // the computer's turn has no advice: rules cards only
+    for (let w = 0; w < 25 && (await p.evaluate(() => !!document.querySelector('#dice .die.spin,.gx-dock[data-bf="resolving"]'))); w++) await p.waitForTimeout(100); // let the dice settle
     const pre = await p.evaluate(PRE);
     if (!(await helpTap(p, '#bulbbtn'))) { await fail(p, tag, 'help bulb', 'no bulb button on screen'); return false }
     await p.waitForTimeout(380);
