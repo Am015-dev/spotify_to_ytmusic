@@ -22,3 +22,5 @@ b=rep(b,"if(!$('over').hidden)start();else if(!$('title').hidden)start();","if(!
 out=rd('head.html')+rd('a.js')+"\n"+bg+"\n"+b+"\n"+dr+"\n"+rd('c.js')
 open('/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html','w',encoding='utf8').write(out)
 print(len(out))
+import subprocess
+subprocess.run(['python3','/home/user/spotify_to_ytmusic/games-src/scripts/stamp-copyright.py','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html'],check=True)

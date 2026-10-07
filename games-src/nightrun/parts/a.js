@@ -10,8 +10,8 @@ try{touchUI=matchMedia('(pointer:coarse)').matches;}catch(e){}
 const rnd=(a,b)=>a+Math.random()*(b-a);                 // looks only (particles, rain)
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 function mul(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-let GR=Math.random;                                     // gameplay dice: seeded for the daily run
-const gr=(a,b)=>a+GR()*(b-a);
+let GR=Math.random,GX=Math.random;                      // gameplay dice, seeded for the daily run: GR picks waves (same every time), GX drops and refires
+const gr=(a,b)=>a+GR()*(b-a),gx=(a,b)=>a+GX()*(b-a);
 const gpick=a=>a[Math.floor(GR()*a.length)];
 function mk(w,h){const c=document.createElement('canvas');c.width=Math.ceil(w*PR);c.height=Math.ceil(h*PR);const g=c.getContext('2d');g.scale(PR,PR);return[c,g];}
 function blit(c,x,y){ctx.drawImage(c,x,y,c.width/PR,c.height/PR);}
@@ -40,13 +40,19 @@ const FX=()=>SET.reduce?.25:1;                          // strength of flashes a
 const DEF_BPM={menu:100,stage1:120,stage2:128,boss:140,endless:132};
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
+const CK={h:[],d:0,at:0};                                // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
+function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;}         // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping
+function ckPush(a){const p=performance.now();if(p-CK.at<4&&CK.h.length)return;CK.at=p;CK.h.push([p,a.currentTime*1000-p]);
+  while(CK.h.length&&CK.h[0][0]<p-1500)CK.h.shift();let m=-1e12;for(const e of CK.h)if(e[1]>m)m=e[1];CK.d=m;}
 function mnow(){const a=AU.a,src=a&&a.state==='running'?1:0,raw=src?a.currentTime:fbT;
-  if(src!==BT.src){BT.t0+=raw-BT.lastRaw;if(BT.pend)BT.pend.at+=raw-BT.lastRaw;BT.src=src;}
-  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'♪ '+BT.title};}
+  if(src!==BT.src){BT.t0+=raw-BT.lastRaw;if(BT.pend)BT.pend.at+=raw-BT.lastRaw;BT.src=src;ckReset();}
+  if(src)ckPush(a);
+  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
-function audible(ts){                                    // music-clock seconds that the player hears right now (or at event time ts)
-  const a=AU.a;let t=mnow();if(BT.src&&a)t-=(a.outputLatency||0);
-  const ago=ts?clamp(performance.now()-ts,0,250)/1000:0;return t-ago+SET.sync/1000;}
+function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
+  const a=AU.a;mnow();const p=ts>0?ts:performance.now();
+  if(BT.src&&a)return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;
+  return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
@@ -91,7 +97,8 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     if(BT.stage===stage&&BT.mode!=='file'){const spb4=BT.spb*4,now=mnow();let at=now+.1;
       if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
   // switch to the music of a stage: the track file if it is loaded, otherwise the built-in synth at that stage's tempo
-  startStage(stage,at){const a=this.a;if(!a)return;const info=TR.by[stage],buf=info&&TR.bufs[info.file];
+  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];
+    if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
     if(info)loadTrack(stage);
     const now=mnow(),t=at||now+.08,ctxT=a.currentTime+(t-now);
     if(this.cur&&this.cur.src){const c=this.cur;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);c.src.stop(ctxT+1);}catch(e){}}
@@ -102,7 +109,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
       Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm,off:info.offsetMs/1000,t0:t,title:info.title});}
     else if(stage==='menu'){Object.assign(v,{mode:'none',bpm:100,spb:.6,off:0,t0:t,title:''});}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm,off:0,t0:t,title:''});}
-    if(at||BT.mode==='none'&&false){BT.pend={at:t,v};}
+    if(at){BT.pend={at:t,v};}
     else{Object.assign(BT,v);BT.rev++;BT.pend=null;this.step=0;if(v.mode==='file'&&v.title&&G&&G.live)G.note={t:4,txt:'♪ '+v.title};}},
   osc(t,type,freq,dur,vol,dest,slide,cut){const a=this.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
     if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+dur);

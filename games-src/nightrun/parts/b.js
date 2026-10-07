@@ -56,12 +56,12 @@ const FPS={n:0,t:0,worst:0,slow:0};
 const say=s=>{s=String(s);if(MSGS.length<500)MSGS.push(s);return s;};
 function banner(a,b,warn,t){t=t||3.2;G.banner={t,m:t,a:say(a),b:say(b),warn:!!warn};}
 function newGame(daily){
-  GR=daily?mul(todayN()):Math.random;
+  GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
   P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,heat:0,over:false,wl:1,emp:2,fcd:0,tilt:0,pfT:-9,dashPf:false};
   C={n:0,best:0,last:-999,lb:0};
   G={t:0,scroll:0,di:0,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
-     daily:!!daily,live:false,perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
+     daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
   enterDistrict(0);}
 function diff(){const ease=G.loop?1:clamp(.62+.38*G.t/180,.62,1);return(1+.13*G.di+.45*G.loop)*ease;}   // gentle first three minutes
 const stageFor=(i,boss)=>boss?'boss':G.loop?'endless':(i%2?'stage2':'stage1');
@@ -72,7 +72,7 @@ function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gr(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);return e;}
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -109,11 +109,11 @@ function tryPerfect(kind,ts,x,y){const j=judge(ts);J.n++;J.last={kind,ok:j.ok,dt
 function kill(e){const D=DISTRICTS[G.di];G.kills++;const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);
   burst(e.x,e.y,D.a,e.type==='gunship'?50:22,e.type==='gunship'?380:260);burst(e.x,e.y,'#ffffff',8,160,.3);shake(e.type==='gunship'?12:5);AU.sfx('boom');
   const drop=(t,dx=0,dy=0)=>G.pk.push({t,x:e.x+dx,y:e.y+dy,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});
-  if(e.type==='drone'||e.type==='charger'){if(GR()<.6)drop('shard');}
-  else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GR()<.15)drop(P.wl<3?'up':'emp');}
-  else if(e.type==='gunship'){drop(P.wl<3&&GR()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
+  if(e.type==='drone'||e.type==='charger'){if(GX()<.6)drop('shard');}
+  else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GX()<.15)drop(P.wl<3?'up':'emp');}
+  else if(e.type==='gunship'){drop(P.wl<3&&GX()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
-  if(GR()<.035&&P.hp<P.max)drop('hp');}
+  if(GX()<.035&&P.hp<P.max)drop('hp');}
 function hurt(){if(P.inv>0||P.dashT>0||G.dead||godMode)return;P.hp--;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);C.n=0;shake(14);G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
@@ -133,7 +133,7 @@ function onBeat(i){G.bc++;const d=diff();
   if(G.dead)return;
   for(const e of G.en){
     if(e.type==='boss'){bossBeat(e,d);continue;}
-    if(e.type==='drone'){if(--e.bf<=0){if(e.x<W-30&&e.x>P.x+60)eb(e.x,e.y,aim(e),150+22*d);e.bf=fireIn(gr(1.8,3)/d);}}
+    if(e.type==='drone'){if(--e.bf<=0){if(e.x<W-30&&e.x>P.x+60)eb(e.x,e.y,aim(e),150+22*d);e.bf=fireIn(gx(1.8,3)/d);}}
     else if(e.type==='turret'){if(e.t<6.5&&e.x<=e.stop&&--e.bf<=0){fan(e,3+(d>1.4?2:0),.5,170+15*d,'#ffa02d');e.bf=fireIn(1.5/d);}}
     else if(e.type==='gunship'){if(e.x<W-100&&--e.bf<=0){e.bn++;if(e.bn%2)ring(e,12+2*G.di,120+12*d,e.t,'#ff3dbb');else fan(e,3,.3,210,'#ffa02d');e.bf=fireIn(1.4/d);}}
   }}
@@ -147,7 +147,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=32?3:bar>=16?
     case'fan7':if(c%cad===0)fan(e,7,1.2,(180+15*d)*sp,c2);break;
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
     case'ring':if(c%cad===0){ring(e,14+2*e.k,(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
-    case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gr(60,H-100),amp:40,ph:gr(0,6)});en('charger',{x:W+60,y:gr(60,H-100)});}break;
+    case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gx(60,H-100),amp:40,ph:gx(0,6)});en('charger',{x:W+60,y:gx(60,H-100)});}break;
     case'laser':if(c%3===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}}
 
 /* ---------- update ---------- */

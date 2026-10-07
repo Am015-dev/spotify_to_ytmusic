@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mainhattan Nightrun</title>
+<!doctype html><html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mainhattan Nightrun</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Share+Tech+Mono&display=swap">
@@ -116,8 +116,8 @@ try{touchUI=matchMedia('(pointer:coarse)').matches;}catch(e){}
 const rnd=(a,b)=>a+Math.random()*(b-a);                 // looks only (particles, rain)
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 function mul(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-let GR=Math.random;                                     // gameplay dice: seeded for the daily run
-const gr=(a,b)=>a+GR()*(b-a);
+let GR=Math.random,GX=Math.random;                      // gameplay dice, seeded for the daily run: GR picks waves (same every time), GX drops and refires
+const gr=(a,b)=>a+GR()*(b-a),gx=(a,b)=>a+GX()*(b-a);
 const gpick=a=>a[Math.floor(GR()*a.length)];
 function mk(w,h){const c=document.createElement('canvas');c.width=Math.ceil(w*PR);c.height=Math.ceil(h*PR);const g=c.getContext('2d');g.scale(PR,PR);return[c,g];}
 function blit(c,x,y){ctx.drawImage(c,x,y,c.width/PR,c.height/PR);}
@@ -146,13 +146,19 @@ const FX=()=>SET.reduce?.25:1;                          // strength of flashes a
 const DEF_BPM={menu:100,stage1:120,stage2:128,boss:140,endless:132};
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
+const CK={h:[],d:0,at:0};                                // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
+function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;}         // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping
+function ckPush(a){const p=performance.now();if(p-CK.at<4&&CK.h.length)return;CK.at=p;CK.h.push([p,a.currentTime*1000-p]);
+  while(CK.h.length&&CK.h[0][0]<p-1500)CK.h.shift();let m=-1e12;for(const e of CK.h)if(e[1]>m)m=e[1];CK.d=m;}
 function mnow(){const a=AU.a,src=a&&a.state==='running'?1:0,raw=src?a.currentTime:fbT;
-  if(src!==BT.src){BT.t0+=raw-BT.lastRaw;if(BT.pend)BT.pend.at+=raw-BT.lastRaw;BT.src=src;}
-  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'♪ '+BT.title};}
+  if(src!==BT.src){BT.t0+=raw-BT.lastRaw;if(BT.pend)BT.pend.at+=raw-BT.lastRaw;BT.src=src;ckReset();}
+  if(src)ckPush(a);
+  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
-function audible(ts){                                    // music-clock seconds that the player hears right now (or at event time ts)
-  const a=AU.a;let t=mnow();if(BT.src&&a)t-=(a.outputLatency||0);
-  const ago=ts?clamp(performance.now()-ts,0,250)/1000:0;return t-ago+SET.sync/1000;}
+function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
+  const a=AU.a;mnow();const p=ts>0?ts:performance.now();
+  if(BT.src&&a)return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;
+  return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
@@ -197,7 +203,8 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     if(BT.stage===stage&&BT.mode!=='file'){const spb4=BT.spb*4,now=mnow();let at=now+.1;
       if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
   // switch to the music of a stage: the track file if it is loaded, otherwise the built-in synth at that stage's tempo
-  startStage(stage,at){const a=this.a;if(!a)return;const info=TR.by[stage],buf=info&&TR.bufs[info.file];
+  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];
+    if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
     if(info)loadTrack(stage);
     const now=mnow(),t=at||now+.08,ctxT=a.currentTime+(t-now);
     if(this.cur&&this.cur.src){const c=this.cur;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);c.src.stop(ctxT+1);}catch(e){}}
@@ -208,7 +215,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
       Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm,off:info.offsetMs/1000,t0:t,title:info.title});}
     else if(stage==='menu'){Object.assign(v,{mode:'none',bpm:100,spb:.6,off:0,t0:t,title:''});}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm,off:0,t0:t,title:''});}
-    if(at||BT.mode==='none'&&false){BT.pend={at:t,v};}
+    if(at){BT.pend={at:t,v};}
     else{Object.assign(BT,v);BT.rev++;BT.pend=null;this.step=0;if(v.mode==='file'&&v.title&&G&&G.live)G.note={t:4,txt:'♪ '+v.title};}},
   osc(t,type,freq,dur,vol,dest,slide,cut){const a=this.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
     if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+dur);
@@ -447,12 +454,12 @@ const FPS={n:0,t:0,worst:0,slow:0};
 const say=s=>{s=String(s);if(MSGS.length<500)MSGS.push(s);return s;};
 function banner(a,b,warn,t){t=t||3.2;G.banner={t,m:t,a:say(a),b:say(b),warn:!!warn};}
 function newGame(daily){
-  GR=daily?mul(todayN()):Math.random;
+  GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
   P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,heat:0,over:false,wl:1,emp:2,fcd:0,tilt:0,pfT:-9,dashPf:false};
   C={n:0,best:0,last:-999,lb:0};
   G={t:0,scroll:0,di:0,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
-     daily:!!daily,live:false,perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
+     daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
   enterDistrict(0);}
 function diff(){const ease=G.loop?1:clamp(.62+.38*G.t/180,.62,1);return(1+.13*G.di+.45*G.loop)*ease;}   // gentle first three minutes
 const stageFor=(i,boss)=>boss?'boss':G.loop?'endless':(i%2?'stage2':'stage1');
@@ -463,7 +470,7 @@ function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gr(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);return e;}
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -500,11 +507,11 @@ function tryPerfect(kind,ts,x,y){const j=judge(ts);J.n++;J.last={kind,ok:j.ok,dt
 function kill(e){const D=DISTRICTS[G.di];G.kills++;const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);
   burst(e.x,e.y,D.a,e.type==='gunship'?50:22,e.type==='gunship'?380:260);burst(e.x,e.y,'#ffffff',8,160,.3);shake(e.type==='gunship'?12:5);AU.sfx('boom');
   const drop=(t,dx=0,dy=0)=>G.pk.push({t,x:e.x+dx,y:e.y+dy,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});
-  if(e.type==='drone'||e.type==='charger'){if(GR()<.6)drop('shard');}
-  else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GR()<.15)drop(P.wl<3?'up':'emp');}
-  else if(e.type==='gunship'){drop(P.wl<3&&GR()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
+  if(e.type==='drone'||e.type==='charger'){if(GX()<.6)drop('shard');}
+  else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GX()<.15)drop(P.wl<3?'up':'emp');}
+  else if(e.type==='gunship'){drop(P.wl<3&&GX()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
-  if(GR()<.035&&P.hp<P.max)drop('hp');}
+  if(GX()<.035&&P.hp<P.max)drop('hp');}
 function hurt(){if(P.inv>0||P.dashT>0||G.dead||godMode)return;P.hp--;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);C.n=0;shake(14);G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
@@ -524,7 +531,7 @@ function onBeat(i){G.bc++;const d=diff();
   if(G.dead)return;
   for(const e of G.en){
     if(e.type==='boss'){bossBeat(e,d);continue;}
-    if(e.type==='drone'){if(--e.bf<=0){if(e.x<W-30&&e.x>P.x+60)eb(e.x,e.y,aim(e),150+22*d);e.bf=fireIn(gr(1.8,3)/d);}}
+    if(e.type==='drone'){if(--e.bf<=0){if(e.x<W-30&&e.x>P.x+60)eb(e.x,e.y,aim(e),150+22*d);e.bf=fireIn(gx(1.8,3)/d);}}
     else if(e.type==='turret'){if(e.t<6.5&&e.x<=e.stop&&--e.bf<=0){fan(e,3+(d>1.4?2:0),.5,170+15*d,'#ffa02d');e.bf=fireIn(1.5/d);}}
     else if(e.type==='gunship'){if(e.x<W-100&&--e.bf<=0){e.bn++;if(e.bn%2)ring(e,12+2*G.di,120+12*d,e.t,'#ff3dbb');else fan(e,3,.3,210,'#ffa02d');e.bf=fireIn(1.4/d);}}
   }}
@@ -538,7 +545,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=32?3:bar>=16?
     case'fan7':if(c%cad===0)fan(e,7,1.2,(180+15*d)*sp,c2);break;
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
     case'ring':if(c%cad===0){ring(e,14+2*e.k,(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
-    case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gr(60,H-100),amp:40,ph:gr(0,6)});en('charger',{x:W+60,y:gr(60,H-100)});}break;
+    case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gx(60,H-100),amp:40,ph:gx(0,6)});en('charger',{x:W+60,y:gx(60,H-100)});}break;
     case'laser':if(c%3===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}}
 
 /* ---------- update ---------- */
