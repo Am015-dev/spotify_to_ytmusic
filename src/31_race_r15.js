@@ -94,9 +94,9 @@ function R15_mesh(){if(!R15C.length)return;try{const td=TF,f=mkF(),ath=TRK.city=
     for(const d of[-220,-120,-30]){frameAt(td,c.s0+d,f);const g=new THREE.Group();placeOnTrack(g,f,c.sd*(HALF+1.2),0);
       // R17: overhead cantilever gantry from outside the barrier: a 30×10.3 m board over the shortcut half of the road, 9 m clear
       const b=new THREE.Mesh(new THREE.PlaneGeometry(30,10.3),sm);b.position.set(-c.sd*16.2,14.2,0);g.add(b);
-      const bk=new THREE.Mesh(new THREE.BoxGeometry(30.6,10.9,.4),post);bk.position.set(-c.sd*16.2,14.2,.25);g.add(bk);
-      const p=new THREE.Mesh(new THREE.BoxGeometry(1,19.4,1),post);p.position.set(0,9.7,.3);g.add(p);
-      const arm=new THREE.Mesh(new THREE.BoxGeometry(32,.8,.8),post);arm.position.set(-c.sd*15.6,19,.3);g.add(arm);ROOT.add(g)}
+      const bk=new THREE.Mesh(new THREE.BoxGeometry(30.6,10.9,.4),post);bk.position.set(-c.sd*16.2,14.2,-.25);g.add(bk);
+      const p=new THREE.Mesh(new THREE.BoxGeometry(1,19.4,1),post);p.position.set(0,9.7,-.3);g.add(p);
+      const arm=new THREE.Mesh(new THREE.BoxGeometry(32,.8,.8),post);arm.position.set(-c.sd*15.6,19,-.3);g.add(arm);ROOT.add(g)}
     const am=new THREE.MeshBasicMaterial({map:R15_arrowTex(),transparent:true,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-3});
     for(let k=0;k<4;k++){const u=-50+k*30;frameAt(td,c.s0+u,f);const a=new THREE.Mesh(new THREE.PlaneGeometry(6,6),am);a.rotation.x=-Math.PI/2;a.rotation.z=-c.sd*.55;const g=new THREE.Group();placeOnTrack(g,f,c.sd*(MARGIN-4-k*0)+c.sd*k*3,.06);g.add(a);ROOT.add(g)}}
  }catch(e){console.warn('R15 mesh',e)}}
