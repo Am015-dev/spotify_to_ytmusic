@@ -35,7 +35,7 @@ function G8_free(b,y,list){const[fw,fd]=GB_dims(b),h=GB_PC[b.t].h;let bmax=-1e9,
   if(ox&&oz){if(vy)return 0;if(o.y+oh===y||o.y===y+h)touch=1}else if(vy&&o.x<=b.x+fw&&o.x+ow>=b.x&&o.z<=b.z+fd&&o.z+od>=b.z&&((o.x+ow===b.x||o.x===b.x+fw)!==(o.z+od===b.z||o.z===b.z+fd)))touch=1}
  return touch}
 function G8_step(dir){const b=GS.held;if(!b){GS_tip('Tap the car first to hold a part');return 0}const L=GB_list();
- for(let y=b.y+dir;y>=-12&&y<=60;y+=dir)if(G8_free(b,y,L)){const nb={...b,y};GS.held=nb;GB_ghostSet(nb);try{AU.sfx('pick')}catch(e){}GS_ui();GS_tip((dir>0?'▲ Up':'▼ Down')+' · '+(y-G8_top(b))+' plates from the top');return 1}
+ for(let y=b.y+dir;y>=-12&&y<=120;y+=dir)if(G8_free(b,y,L)){const nb={...b,y};GS.held=nb;GB_ghostSet(nb);try{AU.sfx('pick')}catch(e){}GS_ui();GS_tip((dir>0?'▲ Up':'▼ Down')+' · '+(y-G8_top(b))+' plates from the top');return 1}
  try{AU.sfx('bump')}catch(e){}GS_tip(dir>0?'Can\'t go higher here':'Can\'t go lower here');return 0}
 function G8_top(b){const y=GB_fit(b,GB_list());return y==null?b.y:y}
 // a stepped part keeps its height when you rotate it (if it still fits there)
