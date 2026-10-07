@@ -81,7 +81,7 @@ function hlpTurnTo(r){UI.deg+=((r-UI.rot+4)%4||4)*90;UI.rot=r;renderGlows();upda
 function hlpSuggest(){const h=hlpPlan();if(!h)return null;const m=h.move;
   if(h.kind==='place'){if(UI.tw){if(!UI.user)refit(false);else{cancelAnimationFrame(UI.tween);UI.tw=false}}
     if(UI.rot!==m.r)hlpTurnTo(m.r);
-    if(!hGlow(m.x,m.y)){cancelAnimationFrame(UI.tween);UI.tw=false;setView(viewFor({c:Math.max(MINC,UI.view.s*100),cx:m.x+.5,cy:m.y+.5},measure()));UI.user=true}
+    if(!hGlow(m.x,m.y)){cancelAnimationFrame(UI.tween);UI.tw=false;setView(viewFor({c:Math.max(MINC,UI.view.s*100),cx:m.x+.5,cy:m.y+.5},measure()))}
     if(!hGlow(m.x,m.y))return null;return {target:()=>hGlow(m.x,m.y),why:h.why}}
   if(UI.tw)zoomTile(G.cur.k,false);
   if(m.act==='skip')return {target:()=>$('#hskip'),why:h.why};
