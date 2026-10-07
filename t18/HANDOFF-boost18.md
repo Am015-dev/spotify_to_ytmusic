@@ -24,3 +24,11 @@ Branch `alex/od-boost18` = `alex/od-race15` (live v87s src; worktree build is LI
 ## Next
 Numbers + LOOK at the shots → REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v → on PASS: rebuild on CURRENT live, OD_CHANGELOG entry
 (top of src/10_core.js), out/<next ver> (v87t if free) → DEPLOY to the coordinator.
+
+## Update 17:25
+- Serial A/B (MIN 4, seeds 1-3, live v87s vs b2k18): ath walls 0.57 vs 0.65, stuck 5.9 vs 3.9 (seed 1 9.8%: stuck twice at (1516,-101), last drift 30 s earlier; 9 full bursts sent it on another route).
+  fra walls 0.16 vs 0.32, stuck 4.2 vs 5.5.
+- tPlay brake tail: it holds BRAKE 18 frames and GAS comes back → GAS+BRAKE+steer drift. Fix (b2k18b): roam drift needs BRAKE pressed while GAS is
+  ALREADY held (B2K.bG latch). Athens A/B on b2k18b: qa18/ab2 (running). tPlayDbg now logs stuck positions (stPos).
+- perf: tyre gap 0.03 m (x4). s_water stuck en route → scen_water now reverses when stuck; rerun queued (qa18/s_water2).
+- Review shots: t18/shots/. Live moved to v87t (64e3bec): rebase at DEPLOY time.
