@@ -29,3 +29,15 @@ Before DEPLOY: if live has moved, re-split src (`tools/split_src.py`), re-apply 
 ## Next: slice 4, build from a chassis (plan §4)
 Add NEW BUILD in the BRICKS tab: type → chassis (8-wide SC: T6x16 + wL×4 + drvL; 6-wide classic; off-road wXL), a bare frame, a build-limit bar of 350 parts, the weight class, and a "MY BUILD" 5th set in RIDES.
 Code to read: `92_garage_builder.js` (GB_PC, GB_scanBase, bp) and `94_garage_ui.js` (toolbar `#gbBkT`, the `bp` action = blank baseplate).
+
+## State 2026-10-07 07:10 (stop point; context limit)
+- **v87h (paint) is LIVE** a1ce30e (DEPLOY sent from alex/od-garage4 c7428d9).
+- **Slices 2+3 = v87i candidate:** alex/od-garage4-s2 841eae6, merged onto v87h, OD_CHANGELOG entry v87i. REVIEW sent to the reviewer.
+  - On PASS: check live HEAD. If it is still a1ce30e, run `tools/build.sh v87i`, `git add -f out/v87i`, commit, and send DEPLOY to the coordinator.
+  - If live moved (the driving worker may take v87i): re-split src from live (`tools/split_src.py`, `verify_live` must print LIVE_MATCH). Re-add ORDER lines for 98g/98p/98q after 98_garage_driver.js. Renumber the changelog entry to the next free version.
+- **Slice 4 (NEW BUILD from a chassis) is parked and untested:** `t4/wip/98r_garage_newbuild.js` + `t4/nb.js`.
+  - It adds a 5th set 'mine' ("My Build", Neat) whose street car = a bare frame filtered 1:1 from a real set (wheels, drv/drvL/stw/diff, black T-plates).
+  - Chassis choices: Speed Champion (posei), Hypercar (gold), Hot Rod (rod). The picker opens from the builder toolbar (🆕 NEW BUILD) and from RIDES (BUILD YOUR OWN).
+  - The #gbBkN counter becomes a build-limit bar plus the 2K weight class.
+  - To activate: move the file to src/, add it to ORDER after 98q_profile.js, run `node t4/nb.js <url> <out>` (DRIVE=1 for the drive shot plus the tyre gap), and look at the shots. Placement taps in nb.js are guesses; fix them first.
+- Servers: :8766 serves the repo dir (alex/od-garage4); :8767 serves the worktree /home/user/odg4s2.
