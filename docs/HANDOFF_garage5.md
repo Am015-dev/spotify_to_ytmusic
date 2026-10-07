@@ -24,6 +24,14 @@ Module `src/98r_garage_newbuild.js` (ORDER after 98q_profile.js). What it does:
 - Test: `node t4/nb.js <url> <out>` (`DRIVE=1` for the drive + gap). It taps chassis cells via `__gb.scr(i,j)` and sends touchStart+touchEnd back to back over CDP. The software renderer runs at about 2 fps, so a normal tap spans more than 900 ms and the builder treats it as a long press.
 - The paint step uses colours 6 (blue) and 2 (yellow); 0 = red is the default colour.
 
+## Last run (07:55, nb.js without DRIVE): works end to end with 0 console errors. Shots: `docs/shots/garage5_newbuild_wip/`
+- Picker → bare Speed Champion chassis (15 parts) → 30 parts → painted (mudguards blue, hood curves yellow) → RIDES shows a "My Build · Built by you · driving" card with a 3-form preview. SAVE & DRIVE was tapped.
+- NOT good enough to review yet:
+  - The rear mudguard tap (-4,4) gave +0. The second hood curve (-1,-6) and the spoiler (-1,6) gave +0; the spoiler is probably over the cap or blocked.
+  - The ws4 windscreen placed only 1 and sits hidden under the driver.
+  - The car looks like loose parts, not a car. Pick better cells and parts (side bricks b16 at y≥1, cs24 bonnet, ws6 at x-3 z-3 like the posei preset) and look at it.
+  - nb.js prints `bricks undefined` (the save key check is wrong: it reads `mho_gar@1`.br.mine; check the key that GAR_select/GB save actually use).
+
 ## Left to do
 1. Run nb.js and look at the shots `03_chassis 04_parts 05_painted 06_rides_mine`. Then run it with DRIVE=1 for `08_drive` and `tyre` (≤ 0.05 m). The DRIVE section (story start, skip cutscenes) is untested.
 2. Check that RIDES shows the "My Build" card and that SAVE & DRIVE uses the bricks (`mho_gar@1`.br.mine).
