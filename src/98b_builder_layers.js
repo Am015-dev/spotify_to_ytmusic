@@ -90,6 +90,8 @@ GS_ui=(f=>function(){const r=f.apply(this,arguments);B25_ui();return r})(GS_ui);
 GB_scanBase=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk&&GB.d){B25.L=B25_def();B25_grid()}return r})(GB_scanBase);
 GNB_new=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk){B25.L=B25_def();B25_grid();B25_look();B25_ui()}return r})(GNB_new);
 GB_preset=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk){B25.L=B25_def();B25_grid();B25_look();B25_ui()}return r})(GB_preset);
+// the CATEGORY ▾ popup stayed open after picking a category and covered the car, the parts and ▼: close it once a category is picked
+addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#gbBkCt .gbCt');if(b&&!b.dataset.r2s)setTimeout(()=>{if(R2.pop==='cat')R2_pop(null)},0)},true);
 // STEP ▲/▼ on the held part moves the active layer too (one control for height)
 G8_step=(f=>function(d){if(!B25_act())return f.apply(this,arguments);return B25_step(d)})(G8_step);
 {const st=document.createElement('style');st.textContent=`#b25{position:absolute;right:6px;top:calc(var(--r2hh,52px) + 6px);display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:4}#b25[hidden]{display:none}
