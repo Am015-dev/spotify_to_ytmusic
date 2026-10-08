@@ -70,3 +70,11 @@ Coordinator = session_017iH3DB4VyxwKSdMwsco4Ut, reviewer = session_01Y6FYerWwxv4
 5. REVIEW → after PASS: rebuild on CURRENT live HEAD (v88d once deployed), OD_CHANGELOG entry, out/<ver> + tune.json + music.
    - The changelog must say slots moved from 8/16 to 10/20 (a player at level 8–9 loses slot 2 until level 10).
 6. Polish ideas: perk list items could show their class letter; the showroom has no stat chips per car (only weight + rarity).
+
+## v88d status (11:30)
+- Reviewer QUICK PASS on 93091b8. DEPLOY sent to the coordinator: `alex/od-r3 9a2514e out/v88d`.
+- Reviewer notes:
+  - The ⚙ is a 6th HUD button; it is OK only behind TEST_MODE (it is).
+  - The giant tan box on the Frankfurt road in t5_quest_gear is pre-existing world art; the reviewer routed it to the coordinator.
+- Still open in TEST_MODE: DRIVER mode shows 1 disabled control (not identified).
+- R3 next: build on live v88d once it is deployed.
