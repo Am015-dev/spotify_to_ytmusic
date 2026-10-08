@@ -41,6 +41,18 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await tapSel('#modal [data-start="F"]');await sleep(400);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
     const o4=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut,i:GXT.state().i}));if(!o4.run||!o4.tut||o4.i!==0)note(tag,'"Learn in 5 minutes" did not start the tutorial '+JSON.stringify(o4));
     totals.runs++;console.log(tag,'done');await ctx.close();return}
+  if(mode==='storyskip'){
+    const tapSel=async sel=>{const r=await p.evaluate(sel=>{const b=document.querySelector(sel);if(!b)return null;const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},sel);if(!r)return false;await p.touchscreen.tap(r[0],r[1]);return true};
+    await p.evaluate(()=>{G=null;render()});await sleep(300);
+    await tapSel('#modal [data-a="story"]');await sleep(900);
+    const a0=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut}));if(!a0.run||!a0.tut)note(tag,'the first Story tap did not start the tutorial '+JSON.stringify(a0));
+    await p.evaluate(()=>{UI.speed=4});await sleep(600);
+    if(!await tapSel('.gxt-skip'))note(tag,'no Skip tutorial button');await sleep(700);
+    const a1=await p.evaluate(()=>({run:GXT.running(),map:!!document.querySelector('.gxc-map-on'),done:GXT.isDone('doorkick-dungeon')}));
+    if(a1.run)note(tag,'skip left the tutorial running');if(!a1.map)note(tag,'skipping the Story prologue did not open the chapter map');if(a1.done)note(tag,'a skipped tutorial counted as done');
+    await p.evaluate(()=>{GXC.close();G=null;render()});await sleep(300);await tapSel('#modal [data-a="story"]');await sleep(700);
+    const a2=await p.evaluate(()=>({run:GXT.running(),map:!!document.querySelector('.gxc-map-on')}));if(a2.run||!a2.map)note(tag,'Story asked for the tutorial again after Skip '+JSON.stringify(a2));
+    totals.runs++;console.log(tag,'done');await ctx.close();return}
   if(mode==='drag'){
     // the same step can be answered with a mouse drag: card -> hero (pointer events), and a drag dropped on the wrong place does nothing
     await p.evaluate(()=>{G=null;render();tutStart()});await sleep(800);await p.evaluate(()=>{UI.speed=4});
@@ -219,7 +231,7 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
 
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
-  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'offer']);jobs.push([W0,H0,'drag']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
+  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'offer']);jobs.push([W0,H0,'drag']);jobs.push([W0,H0,'storyskip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
   const MODES=(process.argv[3]||'').split(',').filter(Boolean);
   for(const j of jobs){if(MODES.length&&!MODES.includes(j[2]))continue;guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();

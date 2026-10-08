@@ -24,6 +24,7 @@ const TUT_GAME='doorkick-dungeon';
 let TUTG=false;
 const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(G&&G.tut);
 const tutFirst=()=>{try{return !localStorage.getItem('dkd_offer')&&!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')&&!localStorage.getItem(SAVE)}catch(e){return true}};
+const tutSkipped=()=>{try{return !!localStorage.getItem('dkd_tutskip')}catch(e){return false}};
 const tutBtn=cls=>typeof GXT==='undefined'||(G&&G.mode==='net'&&!G.winner)?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:()=>tutStart()});
 // ---------------------------------------------------------------- the fixed deal
 const TUT_SEED=20261008;
@@ -157,7 +158,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
     onDone:r=>{const c=r&&r.choice;tutLeave();
       if(c==='chapter'&&first)GXC.play(first.id);
       else if(c==='story'&&typeof campOpen==='function')campOpen()},
-    onExit:()=>tutLeave()})}
+    onExit:()=>{tutLeave();if(o&&typeof campOpen==='function'){try{localStorage.setItem('dkd_tutskip','1')}catch(e){}campOpen()}}})}   // skipping the Chapter 0 prologue goes on to the Story map, and Story does not ask again
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 (function(){const o=uiAct;uiAct=function(m){
   if(tutOn()&&!UI._tutIn){if(m.act==='kick'){if(!UI._tutKick){render();return}UI._tutKick=0}else{if(!GXT.act({type:'tap',what:'move',m})){render();return}if(m.act==='run')tutRoll(1)}}
@@ -169,7 +170,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
 function tutBlock(e){e.stopPropagation();e.stopImmediatePropagation();e.preventDefault()}
 window.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest)return;
   // Story: the first tap runs the tutorial as Chapter 0
-  if(t.closest('[data-a="story"]')&&!tutOn()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME)&&!GXT.running()){tutBlock(e);tutStart({prologue:true});return}
+  if(t.closest('[data-a="story"]')&&!tutOn()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME)&&!GXT.running()&&!tutSkipped()){tutBlock(e);tutStart({prologue:true});return}
   // Play for the first time: offer the tutorial once
   const sb=t.closest('[data-start]');
   if(sb&&sb.dataset.start!=='ai'&&sb.dataset.start!=='net'&&!UI._offerOk&&!tutOn()&&typeof GXT!=='undefined'&&tutFirst()&&!GXT.status(TUT_GAME).seen){tutBlock(e);tutOffer(sb);return}
