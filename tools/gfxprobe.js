@@ -41,13 +41,13 @@ const lap = (k, t0) => { T[k] = +((now() - t0) / 1000).toFixed(1); console.log(k
   if (gbOk) {
     await p.screenshot({ path: path.join(OUT, 'builder.jpg'), type: 'jpeg', quality: 60 });
     R.fps_builder = await fps(4000); console.log('fps_builder'.padEnd(28), R.fps_builder);
-    await p.evaluate(() => { const c = document.querySelector('#gbC'); window.__tp = []; let d = 0; c.addEventListener('pointerdown', () => { d = performance.now() }, true); c.addEventListener('pointerup', () => { __tp.push(+(performance.now() - d).toFixed(0)) }, true) });
+    await p.evaluate(() => { const c = document.querySelector('#gbC'); window.__tp = []; let d = 0; c.addEventListener('pointerdown', () => { d = performance.now() }, true); c.addEventListener('pointerup', () => { __tp.push(+(performance.now() - d).toFixed(0)) }, true); window.__tw = []; for (const t of ['pointerdown', 'pointerup']) { window.addEventListener(t, e => { __tw.push(t + ':' + e.target.id + ':' + e.isTrusted + ':' + e.pointerType) }, true); c.addEventListener(t, e => { __tw.push('c-' + t) }) } });
     const r = await p.evaluate(() => { const r = document.querySelector('#gbC').getBoundingClientRect(); return [r.left, r.top, r.width, r.height] });
     const pts = Array.from({ length: 10 }, (_, i) => [r[0] + r[2] * (.3 + .04 * i), r[1] + r[3] * (.45 + .02 * (i % 5))]);
     t = now(); for (const q of pts) { await rawTap(q[0], q[1]); await p.waitForTimeout(100) } lap('10_taps_plain_cdp', t);
     R.tap_ms_b2b = await p.evaluate(() => __tp.splice(0)); console.log('page-seen down->up ms', JSON.stringify(R.tap_ms_b2b), 'under 900 ms:', R.tap_ms_b2b.filter(x => x < 900).length + '/10');
     R.tap_ms_plain = R.tap_ms_b2b;
-    t = now(); const hit = []; for (const q of pts) { hit.push(await heldTap(q[0], q[1])); await p.waitForTimeout(100) } console.log('sync tap target:', hit.slice(0, 3).join(','), 'canvas rect', JSON.stringify(r), 'first pt', pts[0].map(Math.round)); lap('10_taps_sync', t);
+    t = now(); const hit = []; for (const q of pts) { hit.push(await heldTap(q[0], q[1])); await p.waitForTimeout(100) } console.log('events seen:', JSON.stringify(await p.evaluate(() => __tw.slice(-8)))); console.log('sync tap target:', hit.slice(0, 3).join(','), 'canvas rect', JSON.stringify(r), 'first pt', pts[0].map(Math.round)); lap('10_taps_sync', t);
     R.tap_ms_sync = await p.evaluate(() => __tp.splice(0)); console.log('SYNC page-seen down->up ms', JSON.stringify(R.tap_ms_sync), 'under 900 ms:', R.tap_ms_sync.filter(x => x < 900).length + '/10');
     if (process.env.SKIP4F) { R.T = T; fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(R, null, 1)); console.log('DONE', JSON.stringify(R)); await b.close(); return }
     // old tPlay tap: down, wait 4 rendered frames, up
