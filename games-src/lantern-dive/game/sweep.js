@@ -144,7 +144,7 @@ async function playGame(browser, size, gi, rep) {
   try {
     await page.goto('file://' + FILE); await sleep(900);
     await page.evaluate(PAGE);
-    const mission = MISSIONS[gi % MISSIONS.length], np = NPS[gi % NPS.length], mode = gi % 11 === 5 ? 'guided' : 'vs';
+    const mission = MISSIONS[gi % MISSIONS.length], np = NPS[gi % NPS.length], mode = 'vs';
     await page.evaluate(`AIDELAY=${160};UI.seed=${gi * 977 + 11};UI.fingerOn=${gi % 3 === 0};newGame('${mode}',{np:${np},mission:${mission},kind:'log',level:'${['easy', 'normal', 'hard'][gi % 3]}'})`);
     if (!tipsOn) await page.evaluate(() => { window.__tipsOff = true; GXH.setEnabled(false); });
     let last = '', lastAt = Date.now(), noCand = 0, audits = 0, overAt = 0;

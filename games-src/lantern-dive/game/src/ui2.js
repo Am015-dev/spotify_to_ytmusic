@@ -292,7 +292,7 @@ function actModel(v) {
   const act = actorSeat(), who = act >= 0 ? pname(act) : '';
   const btn = (label, a, o) => M.acts.push(Object.assign({ label, a }, o || {}));
   if (!G) return M;
-  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; btn('Result', 'result'); return M; }
+  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; if (UI.mode !== 'tutorial') btn('Result', 'result'); return M; }
   if (hotSeat() && UI.holder < 0 && ph !== 'distress') { M.p = 'Pass the device on.'; return M; }
   switch (ph) {
     case 'assign': {

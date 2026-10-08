@@ -393,22 +393,28 @@ function tutHandRect(id) {
 }
 const tutSpot = id => () => { const e = document.querySelector('#hand .hc[data-id="' + id + '"] .pspot'); return e && e.getBoundingClientRect().width ? e : null; };
 const tutSeat = s => () => { const e = document.querySelector('[data-key="seat' + s + '"]'); const b = e && (e.closest('.seat') || e.closest('.me') || e); return b && b.getBoundingClientRect().width ? b : null; };
+// a job's chip: my own sit under my hand (#mine), the others' inside their seat
 const tutJobChip = i => () => {
   const o = G.tasks[i] && G.tasks[i].owner; if (o == null || o < 0) return null;
-  const root = (document.querySelector('[data-key="seat' + o + '"]') || {}).closest ? document.querySelector('[data-key="seat' + o + '"]').closest('.seat,.me') : null;
-  const chips = root ? Array.from(root.querySelectorAll('.jc')) : [];
-  const el = chips.find(c => c.getBoundingClientRect().width) || root; return el && el.getBoundingClientRect().width ? el : null;
+  const chips = o === viewSeat() ? Array.from(document.querySelectorAll('#mine .jc.me')) : (() => { const k = document.querySelector('[data-key="seat' + o + '"]'), root = k && k.closest('.seat'); return root ? Array.from(root.querySelectorAll('.jc')) : []; })();
+  const el = chips.find(c => c.getBoundingClientRect().width); return el || null;
 };
-const tutFelt = () => { const e = document.querySelector('#felt'); return e && e.getBoundingClientRect().width ? e : null; };
+// the box around all the elements that match (the job cards on the table, the cards of the trick)
+const tutBox = sel => () => {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 4 && r.height > 4); if (!rs.length) return null;
+  const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+  return { left: l - 4, top: t - 4, width: r2 - l + 8, height: b - t + 8 };
+};
+const tutFelt = tutBox('#slots .tslot');
 const myTurnLead = () => G && G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !UI.busy && !UI.fz;
 const trickShown = () => !!(UI.fz && UI.fz.win);
 const cn2 = c => D.cardName(c);
 function lastTrickLine() { const k = G.tricks[G.tricks.length - 1]; return k; }
 function tutSteps() {
   return [
-    { id: 'goal', title: 'One crew', say: 'You, Dag and Sumi win or lose together. Each job card is a task for one diver.', target: tq('#pool'), wait: null,
+    { id: 'goal', title: 'One crew', say: 'You, Dag and Sumi win or lose together. Each job card is a task for one diver.', target: tutBox('#pool .jcard'), wait: null,
       ready: () => G && G.phase === 'assign' && G.att === 1 && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard') },
-    { id: 'cmd', title: 'You are Commander', say: 'You hold Lantern 4, the top trump. So you pick a job first.', target: () => tutHandRect(tcard('L4')), wait: null,
+    { id: 'cmd', title: 'You are Commander', say: 'You hold Lantern 4, so you are the Commander. The Commander picks a job first.', target: () => tutHandRect(tcard('L4')), wait: null,
       ready: () => G && G.phase === 'assign' && !UI.busy && !!tutHandRect(tcard('L4')) },
     { id: 'take', title: 'Take a job', say: 'Tap "Win the Lantern 3". You hold Lantern 3 and 4, so it is safe.', target: tq('#pool [data-key="job0"]'),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' && a.mv.i === 0 }, ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy },
@@ -442,7 +448,7 @@ function tutSteps() {
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('L3') }, ready: () => G.att === 2 && G.tricks.length === 2 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 1 && !UI.busy && !UI.fz },
     { id: 'win4', title: 'Lantern wins', say: 'Your Lantern 3 beats Sumi\'s Tide 8. A higher Lantern would have won instead.', target: tutFelt, wait: null,
       hold: () => true, ready: () => G.att === 2 && G.tricks.length === 3 && trickShown() },
-    { id: 'won', title: 'Dive won!', say: 'Both jobs are done, so the dive ends at once and the whole crew wins. Cards left in hand do not matter.', target: tq('#table'), wait: null,
+    { id: 'won', title: 'Dive won!', say: 'Both jobs are done, so the dive ends now and the crew wins. Cards left over do not matter.', target: tutJobChip(0), also: tutJobChip(1), wait: null,
       ready: () => G && G.phase === 'over' && G.result && G.result.ok && !UI.busy && !UI.fz }
   ];
 }
@@ -766,7 +772,7 @@ function actModel(v) {
   const act = actorSeat(), who = act >= 0 ? pname(act) : '';
   const btn = (label, a, o) => M.acts.push(Object.assign({ label, a }, o || {}));
   if (!G) return M;
-  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; btn('Result', 'result'); return M; }
+  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; if (UI.mode !== 'tutorial') btn('Result', 'result'); return M; }
   if (hotSeat() && UI.holder < 0 && ph !== 'distress') { M.p = 'Pass the device on.'; return M; }
   switch (ph) {
     case 'assign': {
@@ -1340,7 +1346,7 @@ function renderMenu() {
   if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New dive'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  { const tr = h('div.mrow', { html: tutBtn('btn') }); b.appendChild(tr); }
+  if (!NET.on) { const tr = h('div.mrow', { html: tutBtn('btn') }); b.appendChild(tr); }
   try { hlpInit(); if (typeof GXH !== 'undefined') b.appendChild(GXH.settingsRow({ rowClass: 'mrow', btnClass: 'btn' })); } catch (e) { }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gg = gfxPref(); row('Graphics' + (PX.on ? (gg === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gg === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gg === v ? 'true' : 'false' }, n))); }
