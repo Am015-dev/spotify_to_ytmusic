@@ -108,7 +108,7 @@ studBurst=(f=>function(at,fw,sp){AU_M.sb++;AU_M.sbF++;AU_M.sbAt=at;return f.appl
 // stud fountain: the studs of a smash shoot up instead of out
 smashCheck=(f=>function(dt){const n0=HUB.smashed;AU_M.sbF=0;AU_M.sbAt=null;const r=f.apply(this,arguments);if(HUB.smashed>n0)AU_fountain(AU_M.sbAt,AU_M.sbF);return r})(smashCheck);
 comboAdd=(f=>function(k){const m0=comboMult();const r=f.apply(this,arguments);const m1=comboMult();if(m1>m0&&!RO.ch)AU_pop('+COMBO ×'+m1,'#ffd12c');return r})(comboAdd);
-roamCam=(f=>function(dt){if(RO.ch)shake=0;else shake=Math.min(shake,.45);if(RO.boosting&&!RO.ch)fovKick=Math.max(fovKick,6);const b=!!RO.boosting;if(b!==AU_M.boostC){AU_M.boostC=b;document.body.classList.toggle('auBoost',b)}return f.apply(this,arguments)})(roamCam);
+roamCam=(f=>function(dt){if(RO.ch)shake=0;else shake=Math.min(shake,.45);if(RO.boosting&&!RO.ch)fovKick=Math.max(fovKick,6*TUNE.fxFov);const b=!!RO.boosting;if(b!==AU_M.boostC){AU_M.boostC=b;document.body.classList.toggle('auBoost',b)}return f.apply(this,arguments)})(roamCam);
 showResults=(f=>function(){const r=f.apply(this,arguments);try{if(pl&&pl.finished&&!pl.eliminated&&ships.length>1&&ships.every(o=>o===pl||!o.finished||o.finishTime>=pl.finishTime)){AU_M.win++;AU_confetti();AU_fanfare()}}catch(e){}return r})(showResults);
 chEnd=(f=>function(v){let won=false;try{const ch=RO.ch,e=ch.m.ev,g=ch.g||OTG_GOAL[e.kind],HI=ch.hi??OTG_HI[e.kind];won=v!=null&&(ch.cap!==0)&&(HI?v>=g[2]:v<=g[2])}catch(e){}const r=f.apply(this,arguments);if(won){AU_M.win++;AU_confetti();AU_fanfare()}return r})(chEnd);
 // UI clicks on any button
