@@ -64,12 +64,31 @@ function musicWant(){if(typeof G==='undefined'||!G)return ['tavern',0];
   if(G.winner){const me=typeof viewSeat==='function'?viewSeat():-1;const won=me>=0&&G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';return [won?'victory':'defeat',1]}
   const cb=G.cb;if(cb&&cb.mons&&cb.mons.some(m=>{try{const d=mdef(m);return (d.lvl||0)>=12||(typeof BOSS_CLIPS!=='undefined'&&BOSS_CLIPS[d.k])}catch(e){return false}}))return ['fight',0];
   return ['main',0]}
-function musicSync(){if(!window.GA||!SND.music)return;const w=musicWant();if(SND.want===w[0])return;SND.want=w[0];GA.music(w[0],{fade:w[1]?.6:1,once:!!w[1]});
-  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{GA.preload(w[0]==='tavern'?'main':'fight')}catch(e){}},4000)}}
+// ---- music picker: each slot (tavern=Menu, main=Dungeon, fight, victory, defeat) has a saved choice: a, b, shuffle, off or classic
+const MSLOTS=[['tavern','Menu'],['main','Dungeon'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
+const MTITLE={'tavern-a':'Six Copper Cups','tavern-b':'Tavern of the Lazy Lantern','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
+const MDEF={tavern:'a',main:'b',fight:'a',victory:'b',defeat:'a'};
+SND.pick=Object.assign({},MDEF);try{Object.assign(SND.pick,JSON.parse(localStorage.getItem('dkd_mpick')||'{}'))}catch(e){}
+SND.res={};SND.wslot=null;SND.prev=null;
+function musicName(slot){let c=SND.pick[slot]||MDEF[slot];if(c==='off')return '-';if(c==='classic'&&slot!=='victory'&&slot!=='defeat')return 'classic';
+  if(c==='shuffle'){if(!SND.res[slot]){SND.sh=SND.sh||{};SND.sh[slot]=SND.sh[slot]===undefined?(Math.random()<.5?0:1):1-SND.sh[slot];SND.res[slot]=slot+'-'+'ab'[SND.sh[slot]]}return SND.res[slot]}
+  return slot+'-'+(c==='b'?'b':'a')}
+function musicPick(slot,c){SND.pick[slot]=c;SND.res[slot]=null;try{localStorage.setItem('dkd_mpick',JSON.stringify(SND.pick))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musicName(slot))}catch(e){}
+  if(SND.wslot===slot&&!SND.prev){SND.want=null;musicSync()}}
+function musicSync(){if(!window.GA||!SND.music||SND.prev)return;const w=musicWant();if(SND.wslot!==w[0]){SND.wslot=w[0];SND.res[w[0]]=null}
+  const n=musicName(w[0]);if(SND.want===n)return;SND.want=n;
+  if(n==='-'){GA.music(null,{fade:1});return}
+  GA.music(n,{fade:w[1]?.6:1,once:!!w[1]});
+  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=SND.pick[nx];if(c!=='off'&&c!=='shuffle')GA.preload(musicName(nx))}catch(e){}},4000)}}
+function musicPreview(slot){if(!window.GA||!SND.music||!SND.ctx||SND.wslot===slot)return;const n=musicName(slot);if(n==='-')return;
+  clearTimeout(SND.prevT);SND.prev=slot;SND.want=null;GA.music(n,{fade:.5,once:true});
+  SND.prevT=setTimeout(()=>{SND.prev=null;SND.want=null;musicSync();if(typeof renderMusic==='function')renderMusic()},8000)}
+function musicPreviewStop(){if(!SND.prev)return;clearTimeout(SND.prevT);SND.prev=null;SND.want=null;musicSync()}
 function musicStart(){SND.want=null;if(window.GA)musicSync();if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
 function musicStop(){SND.want=null;if(window.GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
 // the recorded track owns the music unless it failed to decode: then the synth groove below plays instead
-function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf(SND.want||'main')<0)}
+function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&(SND.want==='-'||s.failed.indexOf(SND.want||'main')<0))}
 const BASS=[73.4,0,110,0,98,0,87.3,82.4,73.4,0,110,0,130.8,123.5,110,98];
 function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const step=60/124/2;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}
   while(SND.nextT<c.currentTime+.3){const k=SND.beat%16,at=SND.nextT-c.currentTime;

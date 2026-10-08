@@ -76,7 +76,7 @@ function expireFx(){if(!G)return;const now=Date.now();if(UI.toast&&UI.toast.unti
 // only touch the DOM when the markup really changed (a click in flight keeps its button)
 function setHTML(el,h){if(!el)return;h=emo(h);if(el._h===h)return;el._h=h;el.innerHTML=h}
 function syncMenu(){const b=$('#dkMenuBody');if(!b)return;const so=typeof SND!=='undefined'?SND.on:true,mu=typeof SND!=='undefined'?SND.music:true;const sp=UI.speed<1?'slow':UI.speed>1?'fast':'normal';
-  b.innerHTML=`<div class="menu">${typeof tutBtn==='function'?tutBtn('btn'):''}<button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):''}<button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
+  b.innerHTML=`<div class="menu">${typeof tutBtn==='function'?tutBtn('btn'):''}<button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="music">${ic('music')} Pick the songs…</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):''}<button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
 function syncGfxBtn(){const g=$('#gfxbtn');if(g&&typeof GFX!=='undefined')g.innerHTML=`${ic('gem')} ${GFX.name()}`;syncMenu()}
 function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
 function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
@@ -227,7 +227,7 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online||UI.mode==='ai'?'':`<button class="btn learn ${UI.learn===true?'on':''}" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Teach me as I play</button>`}
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
-   <div class="acts" style="margin-top:12px">${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>${saved?'<button class="btn" data-a="load">Continue saved game</button>':''}`}<button class="btn" data-a="rules">How to play</button></div>${!net&&typeof onlineBlock==='function'?onlineBlock():''}</div>`}
+   <div class="acts" style="margin-top:12px">${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>${saved?'<button class="btn" data-a="load">Continue saved game</button>':''}`}<button class="btn" data-a="rules">How to play</button><button class="btn" data-a="music">${ic('music')} Music</button></div>${!net&&typeof onlineBlock==='function'?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
    <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
    ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
@@ -255,6 +255,11 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='pause'){UI.pause=!UI.pause;$('#pausebtn').innerHTML=ic(UI.pause?'play':'pause');syncMenu();if(!UI.pause)schedule();return}
   if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
+  if(a==='music'){renderMusic();GX.show('dkMusic');return}
+  if(a==='mpick'){musicPick(t.dataset.s,t.dataset.c);renderMusic();return}
+  if(a==='mprev'){musicPreview(t.dataset.s);renderMusic();return}
+  if(a==='mprevx'){musicPreviewStop();renderMusic();return}
+  if(a==='mmus'&&typeof toggleMusic==='function'){toggleMusic();renderMusic();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
   if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
   if(t.dataset.opp!=null&&t.dataset.card===undefined){if(document.documentElement.classList.contains('ph'))return;UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
@@ -281,6 +286,16 @@ GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));
 GX.drawer('dkRules','How to play',$('#dkRulesBody'),true);$('#dkRulesBody').innerHTML=rulesHTML();
 GX.drawer('dkMenu','Menu',$('#dkMenuBody'));
+GX.drawer('dkMusic','Music',$('#dkMusicBody'));
+function renderMusic(){const b=$('#dkMusicBody');if(!b||typeof MSLOTS==='undefined')return;const on=SND.music;let vol=.5;try{vol=GA.state().musVol}catch(e){}
+  const rows=MSLOTS.map(([k,nm])=>{const cur=SND.pick[k],act=SND.wslot===k&&on&&cur!=='off';
+    const ch=[['a'],['b']].map(([v])=>`<button class="mchip${cur===v?' on':''}" data-a="mpick" data-s="${k}" data-c="${v}">${MTITLE[k+'-'+v]}</button>`);
+    if(k!=='victory'&&k!=='defeat')ch.push(`<button class="mchip${cur==='classic'?' on':''}" data-a="mpick" data-s="${k}" data-c="classic">Classic</button>`);
+    ch.push(`<button class="mchip${cur==='shuffle'?' on':''}" data-a="mpick" data-s="${k}" data-c="shuffle">⇄ Shuffle</button>`,`<button class="mchip${cur==='off'?' on':''}" data-a="mpick" data-s="${k}" data-c="off">Off</button>`);
+    const pv=SND.prev===k?`<button class="mchip prev" data-a="mprevx" data-s="${k}">■ Stop preview</button>`:(!act&&cur!=='off'&&on?`<button class="mchip prev" data-a="mprev" data-s="${k}">▶ Preview</button>`:'');
+    return `<div class="mrow2"><h3>${nm}${act?' <small>playing now</small>':''}</h3><div class="mchips">${ch.join('')}${pv}</div></div>`}).join('');
+  setHTML(b,`<div class="music"><div class="mtop"><button class="mchip${on?' on':''}" data-a="mmus">${ic('music')} Music: ${on?'on':'off'}</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div>${rows}</div>`)}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
 GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
 $('#speedbtn').innerHTML=SPEEDN(UI.speed);if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
 GX.onClose=id=>{if(id==='dkCard'&&((UI.menu&&UI.menu.card!=null)||UI.zoom!=null)){UI.menu=null;UI.zoom=null;if(G)render()}};
