@@ -16,7 +16,10 @@ const M1_gated=()=>CID==='fra'&&!!M1.s&&!!M1.s.fresh&&M1.s.step<4;
 const M1_wpn=()=>!!(M1.s&&M1.s.wpn)||(RO.ch&&RO.ch.m.m1&&RO.ch.m.ev.items);
 // ---------- geometry helpers
 function M1_P(x,z,R=320){const G=qvGraph();if(!G)return{x,z};const i=qvNear(x,z,R);return i<0?{x,z}:{x:G.X[i],z:G.Z[i],i}}
-function M1_path(pts){let P=[];for(let k=1;k<pts.length;k++){const q=qvPath(pts[k-1].x,pts[k-1].z,pts[k].x,pts[k].z);P=P.concat(k>1?q.slice(1):q)}const C=qvCum(P);return{P,C,L:C[C.length-1]}}
+// D24: via points snap to the nearest real street, each leg starts with the heading the previous leg ended on (no U-turn at a via point),
+// and spurs/loops are cut from the joined path before it is simplified
+function M1_path(pts){let P=[],h0;const G=qvGraph();pts=pts.map((p,k)=>{if(k===0||k===pts.length-1||!G)return p;const i=D24_nearMain(p.x,p.z);return i<0?p:{x:G.X[i],z:G.Z[i]}});
+  for(let k=1;k<pts.length;k++){const q=qvPath(pts[k-1].x,pts[k-1].z,pts[k].x,pts[k].z,h0,1);P=P.concat(k>1?q.slice(1):q);const n=P.length;if(n>1)h0=Math.atan2(P[n-1][0]-P[n-2][0],P[n-1][1]-P[n-2][1])}D24_clean(P,null,0,60);P=D24_round(P);const C=qvCum(P);return{P,C,L:C[C.length-1]}}
 function M1_car(geo,col,sc,trim){if(!/boat/.test(geo))try{const g=CR_npcVeh(geo,col);RO.grp.add(g);return g}catch(e){console.warn('CR npc',e)}const mat=kmMat('car').clone();mat.color=new THREE.Color(col);const g=new THREE.Group(),b=new THREE.Mesh(kmGeo(geo,sc),mat);g.add(b);if(trim){const s=new THREE.Mesh(new THREE.BoxGeometry(sc*.95,.25,sc*1.9),neonMat(trim,2.4));s.position.y=sc*.62;g.add(s)}RO.grp.add(g);return g}
 function M1_put(m,x,z,h){m.position.set(x,groundAt(x,z,(m.position.y||0)+4),z);if(h!=null)m.rotation.y=h}
 function M1_obj(o){M1.act.push(o);return o}
@@ -205,7 +208,7 @@ function M1_setup(ch,S,i){const V=ch.v2;
   else if(S.t==='jumpR'){const b=M1_bridge(S.bridge);let rx,rz,rh;if(b){const[x,z]=deckPt(b,-b.half-24);rx=x;rz=z;rh=Math.atan2(b.ux,b.uz)}else{rx=S.ax;rz=S.az+60;rh=0}S.r=M1_ramp(rx,rz,rh,20,5.5,12,null);S.rh=rh;S.x=rx-Math.sin(rh)*90;S.z=rz-Math.cos(rh)*90;S.ax=S.x;S.az=S.z;
     if(b){for(const sd of[-1,1]){const[x,z]=deckPt(b,-8*sd);const pn=new THREE.Mesh(new THREE.BoxGeometry(b.w-4,1.2,22),new THREE.MeshStandardMaterial({color:0x6b6f78,roughness:.6}));pn.position.set(x,deckY(b,0)+7,z);pn.rotation.set(sd*.5,Math.atan2(b.ux,b.uz),0,'YXZ');RO.grp.add(pn);M1_obj({m:pn})}}}}
 function M1_stage(ch,S,dt){const V=ch.v2,kmh=Math.abs(RO.v)*3.6;
-  if(S.t==='follow'||S.t==='tail'){const R=S.R,L=R.L,dP=Math.hypot(S.vx-RO.x,S.vz-RO.z);let v;if(S.t==='follow')v=dP<35?26:dP<80?22:dP<150?14:6;else v=dP<50?30:dP<120?27:dP<170?23:18;S.cv=(S.cv||0)+clamp(v-(S.cv||0),-8*dt,5*dt);S.s+=S.cv*dt;const a=qvAt(R.P,R.C,S.s);S.vx=a.x;S.vz=a.z;M1_put(S.m,a.x,a.z,a.h);if(S.t==='follow')FX19_side(S,a);
+  if(S.t==='follow'||S.t==='tail'){const R=S.R,L=R.L,dP=Math.hypot(S.vx-RO.x,S.vz-RO.z);let v;if(S.t==='follow')v=dP<35?26:dP<80?22:dP<150?14:6;else v=dP<50?30:dP<120?27:dP<170?23:18;v=Math.min(v,D24_vcap(R,S.s));/* D24: slows for corners */S.cv=(S.cv||0)+clamp(v-(S.cv||0),-8*dt,5*dt);S.s+=S.cv*dt;const a=qvAt(R.P,R.C,S.s);S.vx=a.x;S.vz=a.z;M1_put(S.m,a.x,a.z,a.h);D24_blink(S.m,D24_side(R,S.s,S.cv));if(S.t==='follow')FX19_side(S,a);
     if(S.t==='tail'){if(dP>S.max){S.away+=dt;if(S.away>8)return qvFail(ch,'KAISER GOT AWAY')}else S.away=0}
     if(S.t==='follow'){S.lt=(S.lt||0)+dt;const tips=[[8,'Hold <b>BOOST</b> (SHIFT) on the straight. Smashing bins refills it!'],[20,'Corner coming! Hold <b>DRIFT</b> (X) and steer, release for a mini-turbo.'],[34,'Traffic? <b>HOP</b> over it (SPACE). Show-off.']];for(const[t,txt]of tips)if(S.lt>=t&&(S.tip||0)<t){S.tip=t;M1_radio('HILDE',txt)}if(S.s>=L-3||S.lt>Math.max(75,L/18+15))return qvNext(ch)}else if(S.s>=L-3)return qvNext(ch);return}
   if(S.t==='thieves'){for(const g of S.th)if(!g.dead&&g.esc)return qvFail(ch,'A GETAWAY CAR ESCAPED');if(S.hunter&&!S.hOn&&S.th.some(g=>g.dead)){S.hOn=1;M1_spawn(S,'rammer',1,null,120,200);M1_radio('HILDE','Another goon behind you! He rams, you lose ❤. Ram him back!')}if(S.th.every(g=>g.dead))return qvNext(ch);return}

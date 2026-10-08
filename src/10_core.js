@@ -8,7 +8,12 @@ const TUNE={stAng:.55,stFall:14,stIn:11,stOut:16,stMax:1.35,stSpd:.75,tRet:14,as
   // fix21 boost FX (TUNE drawer "FX" tab): thruster flame size / length / brightness, boost sparks on/off + count + size, speed lines, screen blur/glow, FOV kick, shake (all ×, 1 = default look)
   fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
   // fix21 audio (TUNE drawer AUDIO tab, 98m_music.js): music on/off + volume (0.5 = the old synth level), SFX ×, duck music under dialogue (on/off + how much)
-  musOn:1,musVol:.5,sfxVol:1,duckOn:1,duckAmt:.7};
+  musOn:1,musVol:.5,sfxVol:1,duckOn:1,duckAmt:.7,
+  // drive24 ROUTE (TUNE drawer Route tab, 41_career_quests.js qvAstar/D24_clean): metres added per 90° turn, per U-turn, filler-grid cost ×,
+  // narrow-street extra, simplify tolerance (m); turn cue lead (s) + min distance (m); followed cars (98d_drive24.js): corner radius (m), corner grip (m/s²), brake (m/s²), blinker on/off
+  rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
+  // drive24 STEER (98d_drive24.js D24_shape, roam only): on/off, ramp time to full lock at 0 and at 100 km/h (s), start fraction, let-go rate (/s), full lock = × grip limit
+  stOn:1,stRampLo:.12,stRampHi:.4,stK0:.1,stRet:12,stLim:1.1};
 const OD_CHANGELOG=[
   {v:'v88c',date:'8 Oct 2026',items:[{t:'CHANGED',s:'The garage is one tidy Body Shop: a header with SAVE & DRIVE, five modes on the left (RIDES, BUILD, PAINT, PERKS, DRIVER) and one row of big buttons at the bottom, with your car always in clear view.'},{t:'NEW',s:'PAINT finishes: GLOSS, MATTE, METAL, CHROME and PEARL, saved per car and shown while you drive.'},{t:'FIXED',s:'Building: a placed brick shows on the car right away, the PLACE/TURN/DROP buttons are a slim column that never covers the car, and the build tip only shows in BUILD.'},{t:'NEW',s:'Kits, driver parts, liveries and horns show a picture, with a lock on the ones you still have to earn.'}]},
   {v:'v88b',date:'8 Oct 2026',items:[{t:'FIXED',s:'Your car no longer turns into the off-road buggy when you drive onto grass; it stays your street car (it still becomes a boat on water).'},{t:'FIXED',s:'Oma Hilde\'s tips and the tutorial card now sit in one spot at the top of the screen, never over your car, the boost bar or the buttons.'},{t:'CHANGED',s:'Races start in sunny Brick Day by default, and Athens street lamps are a real 5.5 m in dark iron.'},{t:'NEW',s:'Garage stats show +/− chips and a weight class (Light, Heavy…) instead of numbers.'}]},
