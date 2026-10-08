@@ -21,7 +21,7 @@ function tileName(t){return `${TILEDEF[t.k].n} ${tileCoord(t.i)}`}
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);const np=o.np||(o.seats?o.seats.length:2);
   const ex=Object.assign({artisans:false,sultan:false,thieves:false,promos:false},o.ex||{});if(np===5)ex.sultan=true;
-  G={v:1,rng:seed,seed,np,ex,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
+  G={v:1,rng:seed,seed,np,ex,tut:o.tut?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
     pl:[],board:[],market:[],rdeck:[],rdisc:[],djRow:[],djDeck:[],djDisc:[],bag:[],items:[],itemDisc:[],thRow:[],thDeck:[],
     bids:[],bidQueue:[],order:[],nextBid:[],turnIdx:0,cur:null,step:null,move:null,act:null,turnFx:{},endTrig:false,stats:{kills:0,djinns:0,moves:0}};
   const names=o.names||PNAMES;
@@ -72,6 +72,7 @@ function startTurn(){const mk=G.order[G.turnIdx];G.cur=mk.p;G.nextBid.push(mk);G
   lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){lg(`${p.nm} has no legal move and passes.`);G.step='sell'}}
 function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
+  if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
   if(G.endTrig){lg('The last camel has been placed: the game ends.','big');return finish()}
   if(!legalStarts().length){lg('No legal move remains anywhere on the board.','big');return finish()}
   G.round++;G.bidQueue=G.nextBid.slice();G.bids=[];G.phase='bid';lg(`— Round ${G.round}: bid for turn order —`,'round');fx('round')}

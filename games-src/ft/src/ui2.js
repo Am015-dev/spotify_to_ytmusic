@@ -63,7 +63,7 @@ function fingerEl(m){const q=s=>document.querySelector(s);
   case 'q':{const o=G.q&&G.q.opts[m.i];const t=o?qBoardTile(o):null;if(t!=null)return tileEl(t);return [...document.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===JSON.stringify(m))||null}
   case 'tile':if(m.place!=null)return tileEl(m.place)||q('#acts .ab.go');if(m.take)return q(`[data-mk="${m.take[0]}"]`);if(m.dj)return q(`[data-dj="${m.dj}"]`);if(m.thief)return q(`[data-th="${m.thief}"]`);if(m.skip||m.work)return [...document.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===JSON.stringify(m))||null}
   return null}
-function fingerTarget(){if(!G||G.over||UI.modal||GX.open||UI.chz||UI.autoOn||FING.n>=FING.max)return null;if(typeof GXH!=='undefined'){const hs=GXH.state();if(!hs.on||hs.cur||hs.rules)return null}const hp=me();if(!hp||online()&&isClient())return null;
+function fingerTarget(){if(!G||G.over||G.tut||UI.modal||GX.open||UI.chz||UI.autoOn||FING.n>=FING.max)return null;if(typeof GXH!=='undefined'){const hs=GXH.state();if(!hs.on||hs.cur||hs.rules)return null}const hp=me();if(!hp||online()&&isClient())return null;
   const k=G.seed+'|'+G.logN+'|'+G.phase+'|'+G.step+'|'+(G.q?1:0)+'|'+(G.move?G.move.path.length:0);if(FING.key!==k){FING.key=k;FING.m=null;
     try{FING.m=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){FING.m=null}}
   const m=FING.m;if(!m)return null;if(!validMoves(hp.i).some(x=>same(x,m))&&m.act!=='start')return null;return fingerEl(m)}

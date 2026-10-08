@@ -102,7 +102,7 @@ function hlpPlan(){const V=UI.V;if(!V||V.seat<0||!G||G.over||UI.brief||passTo()>
   if(m.a==='eq'&&EQUIP[m.id]&&eqMovesFor(V,m.id).length)return {kind:'eq',to:{eq:m.id},why:hlpWhy(EQUIP[m.id].n+' is worth using now.',15)};
   return null}
 function hlpEl(r){if(!r)return null;if(r.u!=null)return document.querySelector('#tb .tile[data-u="'+r.u+'"]');if(r.seat!=null)return document.querySelector('#tb .plate[data-seat="'+r.seat+'"]');if(r.eq!=null)return document.querySelector('#tb .eqk[data-eq="'+r.eq+'"]');if(r.chip!=null)return document.querySelector('#tb .chip[data-chip="'+r.chip+'"]');return null}
-function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p||!hlpEl(p.to))return null;
+function hlpSuggest(){if(UI.tut)return null;let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p||!hlpEl(p.to))return null;
   return {why:p.why,target:()=>hlpEl(p.to),from:p.from?()=>hlpEl(p.from):null}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
@@ -110,5 +110,5 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'short-fuse',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.sel,#tray .chip,#mine .chip,#over .big,#cover .big'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause;
+  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause||UI.tut;
   GXH.phase(busy?null:hlpPhase())}

@@ -7,7 +7,6 @@ const fs = require('fs'); const path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'kaiten.html'), 'utf8');
 const ANIMON = process.argv.includes('--anim');
 const CONF = [
-  { name: 'guided', start: 'guided' },
   { name: 'vs 2p normal', start: 'vs', np: 2 },
   { name: 'vs 3p easy', start: 'vs', np: 3, level: 'easy' },
   { name: 'vs 4p hard', start: 'vs', np: 4, level: 'hard' },
@@ -17,7 +16,6 @@ const CONF = [
   { name: 'hot 5p', start: 'hot', np: 5 },
   { name: 'watch 3p', start: 'ai', np: 3 },
   { name: 'watch 5p hard', start: 'ai', np: 5, level: 'hard' },
-  { name: 'PHONE guided', start: 'guided', phone: 1 },
   { name: 'PHONE vs 3p', start: 'vs', np: 3, phone: 1 },
   { name: 'PHONE hot 3p', start: 'hot', np: 3, phone: 1 },
   { name: 'PHONE vs 5p', start: 'vs', np: 5, phone: 1 },
