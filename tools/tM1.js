@@ -69,6 +69,7 @@ const MON=()=>{const M=__mho,R=M.RO;const L=window.__L={f:0,otp:[],ydrop:[],camj
   if(s.tp>tpSeen){tpSeen=s.tp;if(tpShots<6){tpShots++;await shot(`tp${tpShots}_a`);await tick(20);f+=20;await shot(`tp${tpShots}_b`)}}
   if(s.ch)started=true;if(started&&!s.ch&&!ended){ended={f,res:s.res};await shot('zz_result');console.log('MISSION END',f,s.res);break}
   if(s.stage&&!stShot[s.stage]&&s.ch&&!s.busy){stShot[s.stage]=f;await tick(90);f+=90;await shot('st_'+s.stage.replace(/\W/g,'_'))}
+  for(const fm of [1800,3600,9000,15000])if(f>=fm&&!stShot['m'+fm]&&s.ch&&!s.busy){stShot['m'+fm]=1;await shot('mid_'+fm+'_'+(s.stage||'').replace(/\W/g,'_'))}
   if(s.state!=='roam'||s.busy){await releaseAll();const t=await tapThrough();await tick(t?6:30);f+=t?6:30;continue}
   if(!s.ch&&s.nextVis&&f-lastNext>300){lastNext=f;await tap('#m1Next');await tick(10);f+=10;continue}
   const goal=s.arr||s.wp;if(goal&&(!dest||Math.hypot(goal.x-dest[0],goal.z-dest[1])>25)){dest=[goal.x,goal.z];route=null}
