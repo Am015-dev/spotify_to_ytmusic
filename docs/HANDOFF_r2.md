@@ -36,3 +36,8 @@
 - **Test env facts:** the garage redraws only every ~5 s on this box, and NEVER with ?fast=1 (virtual rAF) → shots need ≥ 8 s waits, no fast mode (SW env in t4/r2shell.js). Kit thumbnails take seconds each here.
 - Finishes verified visually (t4/r2fin.js, 30 s waits): gloss/matte/metal/chrome/pearl differ.
 - Next: s4 full tour (non-fast) → t4/r2drive.js (PAINT chrome → SAVE & DRIVE → Frankfurt, tyre gap) → PC 1280×720 → REVIEW.
+
+## REVIEW sent (08:25, coordinator asked to send with what exists, context 331k)
+- Shots: docs/shots/r2/ (852×393 touch run s3 = ?fast=1 run: UI layout correct, 3D frame may lag; finishes sheet from a non-fast run with 30 s waits; before_v88a.png = old garage).
+- NOT done (for the next worker): Frankfurt drive after the garage + tyre gap (`node t4/r2drive.js http://127.0.0.1:8766/local_dbg.html <out>`), start-screen shot, PC 1280×720 run (`node t4/r2shell.js <url> <out> 1280 720`), iframe run (IFRAME=1), re-shoot RIDES (stat chips now on top of the panel; s3 rides shot shows the older top-left card), kit pictures in a non-fast run (they render slowly here).
+- A non-fast full tour (s4) was still running when REVIEW went out.
