@@ -19,3 +19,7 @@ setInterval(pumpTracks,300);
 loadTrack=function(stage,urgent){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
   if(urgent){TRQ.urgent++;if(!calmNow())TRQ.mid++;TRQ.log.push(stage+'@'+(G?G.t|0:0));if(TRQ.log.length>20)TRQ.log.shift();}
   TRQ.loads++;return _loadTrack(stage);};
+/* Skylines (landscape and portrait) of every district are built one at a time in calm moments (title, pit stop, pause, banner), never in the middle of a fight:
+   building one is 20-80 ms of canvas work, which showed as a hitch at the first visit of a district. */
+setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
+  for(let k=0;k<2*n;k++){const i=k%n,port=k>=n;if(port?BGPC[i]:BGC[i])continue;if(running&&!calmNow())return;(port?bgpFor:bgFor)(i);return;}},350);

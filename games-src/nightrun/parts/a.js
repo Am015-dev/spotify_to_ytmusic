@@ -256,7 +256,10 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
       if(s.el.paused){if(pn-s.kickT>600)this.kick(s);continue;}
       this.strSync(s,a,pn);}},
   strSync(s,a,pn){const el=s.el;if(el.seeking||el.readyState<2)return;
-    const e=el.currentTime,D=s.D||el.duration;if(e<s.last-D*.5){s.loops++;const pl=s.gapPlan||0;s.gapAt={pre:s.hist.length>=6?s.hist.slice(-8):null,post:[],pl};if(pl){s.ctx0+=pl;s.gapPlan=0;}}s.last=e;   // a planned pre-roll wrap: the gap was expected, the grid does not move
+    const e=el.currentTime,D=s.D||el.duration;if(e<s.last-D*.5){s.loops++;const pl=s.gapPlan||0,ge=(s.info?s.info.gapMs:24)/1000;s.gapAt={pre:s.hist.length>=6?s.hist.slice(-8):null,post:[],pl};s.hist.length=0;
+      if(pl){s.ctx0+=pl;s.gapPlan=0;}                                   // a planned pre-roll wrap: the gap was expected, the grid does not move
+      else{const tg=BT.pend&&s===this.cur?BT.pend.v:BT.stage===s.stage?BT:null;if(tg){tg.t0+=ge;s.applied+=ge;}}}   // a loop of the playing song: the music restarts one gap later, and so does the grid
+    s.last=e;
     const u=e+s.loops*D,rate=el.playbackRate||1;
     if(s.phase==='wait'){if(u-s.uPlay>.03){s.phase='acq';s.acqT=pn+700;s.hist.length=0;}else return;}   // not playing yet
     const dd=(a.currentTime-s.ctx0)-(u-s.pos0)/rate;s.hist.push(dd);if(s.hist.length>40)s.hist.shift();

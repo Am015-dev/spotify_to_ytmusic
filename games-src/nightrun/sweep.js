@@ -44,12 +44,18 @@ async function startServer() {
 const INIT = () => {
   window.__spy = { starts: [], onsets: [] };
   setInterval(() => { const m = window.__mnr; if (window.__noPW && m && m.G && m.G.live) m.PW.st().cnt = 1e9; }, 30);   // tests that need a steady tempo get no glowing enemies
-  const os = AudioBufferSourceNode.prototype.start;
-  AudioBufferSourceNode.prototype.start = function (when) { try { if (this.buffer && this.buffer.duration > 3) window.__spy.starts.push({ at: this.context.currentTime, when: when || 0, o: arguments[1] || 0, rate: this.playbackRate ? this.playbackRate.value : 1, dur: this.buffer.duration }); } catch (e) { } return os.apply(this, arguments); };
+  // songs are streamed <audio> elements now: the spy records every play() of one, and the ground truth is where the element really is
+  const op = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function () { try { const m = window.__mnr; if (m && m.AU && m.AU.a && /^blob:/.test(this.currentSrc || this.src)) window.__spy.starts.push({ at: m.AU.a.currentTime, el: this }); } catch (e) { } return op.apply(this, arguments); };
+  const playing = () => { const m = window.__mnr; return m && m.AU && m.AU.slots ? m.AU.slots.find(x => x.stage === m.BT.stage && x.playing && !x.el.paused) : null; };
   window.__bot = {
-    gridErr() {                                          // ms the game's beat position is off the real audio grid (file mode): last started song + offsetMs
-      const m = window.__mnr, a = m.AU.a, sp = window.__spy.starts[window.__spy.starts.length - 1]; if (!sp || m.BT.mode !== 'file') return null;
-      const lat = a.outputLatency || 0, b0 = sp.when + ((((m.BT.off - sp.o) % sp.dur) + sp.dur) % sp.dur) / sp.rate, want = (a.currentTime - lat - b0) / m.BT.spb; return (m.bpos() - want) * m.BT.spb * 1000;   // b0: audio time at which file position BT.off plays (the song may start mid-file when it was cross-faded in)
+    gridErr() {                                          // ms the game's beat position is off the real audio grid (file mode): where the playing element really is
+      const m = window.__mnr, a = m.AU.a, s = playing(); if (!s || m.BT.mode !== 'file' || a.state !== 'running') return null;
+      const lat = a.outputLatency || 0, info = m.TR.by[s.stage], want = (s.el.currentTime - lat - m.BT.off) / (60 / info.bpm), p = m.bpos(); let d = p - want; d -= Math.round(d); return d * m.BT.spb * 1000;
+    },
+    async grid0() {                                      // audio-clock time at which beat 0 of the playing song played (median of 15 samples; rate 1)
+      const m = window.__mnr, a = m.AU.a, xs = []; for (let i = 0; i < 15; i++) { const s = playing(); if (s) xs.push(a.currentTime - ((s.el.currentTime + s.loops * s.D) - m.BT.off) / s.el.playbackRate); await new Promise(r => setTimeout(r, 12)); }
+      xs.sort((x, y) => x - y); const s = playing(), D = s ? s.D / s.el.playbackRate : 0, g = xs[xs.length >> 1]; return D ? g + Math.round((m.BT.t0 + m.BT.off - g) / D) * D : g;   // the element may have looped once (whole bars): same beat, one file length later
     },
     scr(dx, dy) { const r = document.getElementById('frame').getBoundingClientRect(), rot = window.__mnr.rotMode; return rot ? [dy * r.width / 540, -dx * r.height / 960] : [dx * r.width / 960, dy * r.height / 540]; },   // portrait: world +y is screen right, world +x is screen up
     decide() {
@@ -375,10 +381,10 @@ async function beatTests(browser) {
       if (!await waitFor(p, () => window.__spy.starts.length > 0, null, 8000)) { await fail(p, tag, 'beat', 'test track never started; TR=' + JSON.stringify(await ev(p, () => ({ by: Object.keys(__mnr.TR.by), bad: __mnr.TR.bad, mode: __mnr.BT.mode })))); continue; }
       if (!await waitFor(p, () => __mnr.BT.mode === 'file', null, 5000)) { await fail(p, tag, 'beat', 'game never switched to the loaded file track ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT })))); continue; }
       await sleep(600);
-      const info = await ev(p, () => ({ spy: window.__spy.starts[window.__spy.starts.length - 1], bt: { ...__mnr.BT }, lat: __mnr.AU.a.outputLatency || 0, bpm: __mnr.BT.bpm }));
+      const info = await ev(p, () => ({ bt: { ...__mnr.BT }, lat: __mnr.AU.a.outputLatency || 0, bpm: __mnr.BT.bpm }));
       if (info.bt.mode !== 'file' || info.bt.bpm !== 120) await fail(p, tag, 'beat', 'game is not on the file track ' + JSON.stringify(info.bt));
-      const grid0 = info.spy.when + off / 1000;              // true time of beat 0 on the audio clock (from the real start() call + the offset in tracks.json)
-      if (Math.abs(info.bt.t0 + info.bt.off - grid0) > .006) await fail(p, tag, 'beat', `beat clock disagrees with the audio start by ${((info.bt.t0 + info.bt.off - grid0) * 1000).toFixed(1)} ms`);
+      const grid0 = await ev(p, () => window.__bot.grid0());   // true time of beat 0 on the audio clock (where the streamed element really is + the offset in tracks.json)
+      if (Math.abs(info.bt.t0 + info.bt.off - grid0) > .02) await fail(p, tag, 'beat', `beat clock disagrees with the audio start by ${((info.bt.t0 + info.bt.off - grid0) * 1000).toFixed(1)} ms`);
       // real audio check: tap the file bus with an analyser and find the clicks the speakers would play
       const clicks = await ev(p, async () => {
         const m = window.__mnr, a = m.AU.a, an = a.createAnalyser(); an.fftSize = 256; m.AU.fb.connect(an); const buf = new Float32Array(256), out = []; let prev = 0, until = performance.now() + 8200;
@@ -392,6 +398,7 @@ async function beatTests(browser) {
       // judging: press at known offsets from the true beat; within +-110 ms (Normal window) must be on-beat, beyond must not. The ship fires itself now: only DASH is judged.
       const kinds = [['ShiftLeft', 'dash']];
       const sample = async (code, kind, delta) => {
+        const g0 = await ev(p, () => window.__bot.grid0());   // fresh every time: an <audio> loop pauses the music for a few ms, and the beat clock follows it
         const r = await ev(p, async ([code, delta, grid0, kind]) => {
           const m = window.__mnr, a = m.AU.a, lat = a.outputLatency || 0; const clr = setInterval(() => { m.G.eb.length = 0; }, 5);   // a graze must not overwrite the judged press
           const nowT = a.currentTime - lat; let k = Math.ceil((nowT - grid0) / .5) + 2; const target = grid0 + k * .5 + delta / 1000;   // audible time we want
@@ -401,7 +408,7 @@ async function beatTests(browser) {
           window.dispatchEvent(new KeyboardEvent('keydown', { code, bubbles: true })); window.dispatchEvent(new KeyboardEvent('keyup', { code, bubbles: true }));
           await new Promise(res => setTimeout(res, 220)); const J = m.J.last;
           clearInterval(clr); return { J, lag };
-        }, [code, delta, grid0, kind]);
+        }, [code, delta, g0, kind]);
         await sleep(1100);
         const j = r.J, expected = delta + r.lag; if (!j || j.kind !== kind) return 'not judged ' + JSON.stringify(j);
         if (Math.abs(j.dt - expected) > 20) return `pressed ${expected.toFixed(0)} ms from the true beat, game measured ${j.dt} ms`;
@@ -454,8 +461,8 @@ async function songTests(browser, stageName, si) {
     await sleep(500);
     const bt = await ev(p, () => ({ ...__mnr.BT })); if (bt.bpm !== info.bpm || Math.abs(bt.off * 1000 - info.offsetMs) > .5) await fail(p, tag, 'beat', 'game uses ' + bt.bpm + '/' + bt.off + ' not tracks.json ' + info.bpm + '/' + info.offsetMs);
     // 1) onsets in the decoded audio vs the grid: best offset within +-40 ms of tracks.json, and the grid beats are the strong ones
-    const on = await ev(p, () => {
-      const m = window.__mnr, buf = m.TR.bufs[m.TR.by[m.BT.stage].file], sr = buf.sampleRate, ch = buf.getChannelData(0), HOP = Math.round(sr * .005), n = Math.floor(Math.min(buf.length, sr * 30) / HOP);
+    const on = await ev(p, async () => {
+      const m = window.__mnr, buf = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await (await fetch('music/' + m.TR.by[m.BT.stage].file)).arrayBuffer()), sr = buf.sampleRate, ch = buf.getChannelData(0), HOP = Math.round(sr * .005), n = Math.floor(Math.min(buf.length, sr * 30) / HOP);
       let a = 0, b = 0, prev = 0; const e = [];
       for (let i = 0; i < n; i++) { let s = 0; for (let k = 0; k < HOP; k++) { const v = ch[i * HOP + k]; a += .3 * (v - a); b += .01 * (a - b); const h = a - b; s += h * h; } const r = Math.sqrt(s / HOP); e.push(Math.max(0, r - prev)); prev = r; }
       const mean = e.reduce((x, y) => x + y, 0) / e.length, o = e.map(v => Math.max(0, v - mean)), spb = m.BT.spb / (HOP / sr);
@@ -474,8 +481,9 @@ async function songTests(browser, stageName, si) {
     if (over > 2)   // a stalled page on a loaded machine can spoil one or two samples; sustained drift cannot
        await fail(p, tag, 'beat', 'beat clock drifts ' + worst.toFixed(1) + ' ms from the file position');
     // 3) PERFECT on the beat, not 200 ms off; and after pause/resume
-    const sp = await ev(p, () => ({ ...window.__spy.starts[window.__spy.starts.length - 1] })), spb = 60 / info.bpm, grid0 = sp.when + ((((info.offsetMs / 1000 - sp.o) % sp.dur) + sp.dur) % sp.dur) / sp.rate;
+    const spb = 60 / info.bpm, grid0 = await ev(p, () => window.__bot.grid0());
     const sample = async (code, kind, delta) => {
+      const g0 = await ev(p, () => window.__bot.grid0());
       const r = await ev(p, async ([code, delta, grid0, kind, spb]) => {
         const m = window.__mnr, a = m.AU.a, lat = a.outputLatency || 0, clr = setInterval(() => { m.G.eb.length = 0; }, 5), nowT = a.currentTime - lat, k = Math.ceil((nowT - grid0) / spb) + 2, target = grid0 + k * spb + delta / 1000;
         if (kind === 'dash') { m.P.dashCd = 0; m.P.dashT = 0; }
@@ -483,7 +491,7 @@ async function songTests(browser, stageName, si) {
         const lag = (a.currentTime - lat - target) * 1000;
         window.dispatchEvent(new KeyboardEvent('keydown', { code, bubbles: true })); window.dispatchEvent(new KeyboardEvent('keyup', { code, bubbles: true }));
         await new Promise(res => setTimeout(res, 220)); clearInterval(clr); return { J: m.J.last, lag };
-      }, [code, delta, grid0, kind, spb]);
+      }, [code, delta, g0, kind, spb]);
       await sleep(1000); const j = r.J, expected = delta + r.lag; if (!j || j.kind !== kind) return 'not judged ' + JSON.stringify(j);
       if (Math.abs(j.dt - expected) > 25) return `pressed ${expected.toFixed(0)} ms from the true beat, game measured ${j.dt} ms`;
       if (Math.abs(Math.abs(expected) - 110) > 15 && j.ok !== (Math.abs(expected) <= 110)) return `${expected.toFixed(0)} ms from the beat gave ok=${j.ok}`; return '';

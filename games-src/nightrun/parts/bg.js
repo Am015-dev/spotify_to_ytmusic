@@ -116,7 +116,7 @@ function drawBG(bg,t,dt,scroll){const D=bg.D;
   // traffic
   ctx.globalCompositeOperation='source-over';
   // haze
-  const hz=ctx.createLinearGradient(0,H-220,0,H);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'38');ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
+  const hz=bg.hzG||(bg.hzG=(()=>{const q=ctx.createLinearGradient(0,H-220,0,H);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'38');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
   drawNear(bg,t,scroll);}
 
 function drawHammer(x,base,t){ctx.fillStyle='#0a0508';const hgt=190;const bx=x+40,by=base-hgt;
@@ -178,6 +178,6 @@ function drawBGP(bg,t,dt,scroll){const D=bg.D,L=bgpFor(DISTRICTS.indexOf(D));
   if(D.near==='river'){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';
   ctx.globalCompositeOperation='source-over';
-  const hz=ctx.createLinearGradient(0,PH_-260,0,PH_);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'30');ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);
+  const hz=bg.hzP||(bg.hzP=(()=>{const q=ctx.createLinearGradient(0,PH_-260,0,PH_);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'30');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);
   if(D.near==='sea')athensP(bg,t,scroll);
 }

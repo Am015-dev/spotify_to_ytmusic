@@ -10,7 +10,9 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 149
+  "shopChecks": 0,
+  "switches": 8,
+  "judged": 12
  },
  "avg": 0
 }

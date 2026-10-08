@@ -390,7 +390,10 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
       if(s.el.paused){if(pn-s.kickT>600)this.kick(s);continue;}
       this.strSync(s,a,pn);}},
   strSync(s,a,pn){const el=s.el;if(el.seeking||el.readyState<2)return;
-    const e=el.currentTime,D=s.D||el.duration;if(e<s.last-D*.5){s.loops++;const pl=s.gapPlan||0;s.gapAt={pre:s.hist.length>=6?s.hist.slice(-8):null,post:[],pl};if(pl){s.ctx0+=pl;s.gapPlan=0;}}s.last=e;   // a planned pre-roll wrap: the gap was expected, the grid does not move
+    const e=el.currentTime,D=s.D||el.duration;if(e<s.last-D*.5){s.loops++;const pl=s.gapPlan||0,ge=(s.info?s.info.gapMs:24)/1000;s.gapAt={pre:s.hist.length>=6?s.hist.slice(-8):null,post:[],pl};s.hist.length=0;
+      if(pl){s.ctx0+=pl;s.gapPlan=0;}                                   // a planned pre-roll wrap: the gap was expected, the grid does not move
+      else{const tg=BT.pend&&s===this.cur?BT.pend.v:BT.stage===s.stage?BT:null;if(tg){tg.t0+=ge;s.applied+=ge;}}}   // a loop of the playing song: the music restarts one gap later, and so does the grid
+    s.last=e;
     const u=e+s.loops*D,rate=el.playbackRate||1;
     if(s.phase==='wait'){if(u-s.uPlay>.03){s.phase='acq';s.acqT=pn+700;s.hist.length=0;}else return;}   // not playing yet
     const dd=(a.currentTime-s.ctx0)-(u-s.pos0)/rate;s.hist.push(dd);if(s.hist.length>40)s.hist.shift();
@@ -590,7 +593,7 @@ function drawBG(bg,t,dt,scroll){const D=bg.D;
   // traffic
   ctx.globalCompositeOperation='source-over';
   // haze
-  const hz=ctx.createLinearGradient(0,H-220,0,H);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'38');ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
+  const hz=bg.hzG||(bg.hzG=(()=>{const q=ctx.createLinearGradient(0,H-220,0,H);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'38');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
   drawNear(bg,t,scroll);}
 
 function drawHammer(x,base,t){ctx.fillStyle='#0a0508';const hgt=190;const bx=x+40,by=base-hgt;
@@ -652,7 +655,7 @@ function drawBGP(bg,t,dt,scroll){const D=bg.D,L=bgpFor(DISTRICTS.indexOf(D));
   if(D.near==='river'){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';
   ctx.globalCompositeOperation='source-over';
-  const hz=ctx.createLinearGradient(0,PH_-260,0,PH_);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'30');ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);
+  const hz=bg.hzP||(bg.hzP=(()=>{const q=ctx.createLinearGradient(0,PH_-260,0,PH_);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'30');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);
   if(D.near==='sea')athensP(bg,t,scroll);
 }
 
@@ -1252,8 +1255,8 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     this.msg('');this.draw();shopEl.hidden=false;syncUI();NR.emit('pitStart',this.pits);},
   close(){if(!this.active)return;this.active=false;shopEl.hidden=true;syncUI();const cb=this.cb;this.cb=null;if(cb)cb();},
   tick(dt){pressed={};this.left-=dt;this.lock=Math.max(0,this.lock-dt);this.flash=Math.max(0,this.flash-dt);
-    shopEl.style.setProperty('--pul',(typeof PUL==='number'?PUL:0).toFixed(2));
-    $('shBar').style.width=Math.max(0,this.left/PIT_SECS*100)+'%';$('shSec').textContent=Math.max(0,Math.ceil(this.left));
+    const pq=((typeof PUL==='number'?PUL:0)*5|0)/5;if(pq!==this.pq){this.pq=pq;shopEl.style.setProperty('--pul',pq.toFixed(1));}   // 6 glow steps, not a new blurred shadow every frame
+    const bw=Math.round(Math.max(0,this.left/PIT_SECS*200))/2,sc=Math.max(0,Math.ceil(this.left));if(bw!==this.bw){this.bw=bw;$('shBar').style.width=bw+'%';}if(sc!==this.sc){this.sc=sc;$('shSec').textContent=sc;}
     if(this.left<=0)this.close();},
   buy(i){if(!this.active||this.lock>0)return false;const c=this.cards[i];if(!c||c.sold)return false;const pr=this.price(c.u);
     if(this.neon<pr){this.msg('Need '+(pr-this.neon)+' more Neon');const el=$('shCards').children[i];if(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}return false;}
@@ -1338,6 +1341,7 @@ addEventListener('keydown',e=>{if(!SH.active)return;if(e.code==='Digit1'||e.code
 
 /* ---------- calm visuals + the beat cue: where sparks may appear, the pulse ring round the ship, the pulse on the screen edges, enemy bullets ---------- */
 const CUE={off:0,S:.7,M:1,L:1.5};                         // settings > Rhythm > Beat cue size
+const EDG={};
 const FXV={
   rdy:false,rf:0,
   near(x,y){                                             // calm mode: no sparks next to the ship or in the middle of the screen
@@ -1345,7 +1349,7 @@ const FXV={
     return Math.abs(x-W/2)<150&&Math.abs(y-H/2)<110;},
   edges(t){                                              // the beat pulse also lives at the four screen edges (never over the action)
     if(G.dead||SET.cue==='off')return;const K=CUE[SET.cue],T=tierOf(C.n),a=PUL*(.3+.1*T)*K*[.25,.5,1][SET.flash];if(a<.01)return;
-    const c=T>1?TIERC[T-1]:DISTRICTS[G.di].a,ew=24+18*K,bar=(w,h,x0,y0,x1,y1,rx,ry)=>{const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,c);g.addColorStop(1,c+'00');ctx.fillStyle=g;ctx.fillRect(rx,ry,w,h);};
+    const c=T>1?TIERC[T-1]:DISTRICTS[G.di].a,ew=24+18*K,bar=(w,h,x0,y0,x1,y1,rx,ry)=>{const k=c+'|'+x0+'|'+y0+'|'+x1+'|'+y1;let g=EDG[k];if(!g){g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,c);g.addColorStop(1,c+'00');EDG[k]=g;}ctx.fillStyle=g;ctx.fillRect(rx,ry,w,h);};   // gradients are cached: no new object per edge per frame
     ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,a);
     bar(ew,H,0,0,ew,0,0,0);bar(ew,H,W,0,W-ew,0,W-ew,0);bar(W,ew*.6,0,0,0,ew*.6,0,0);bar(W,ew*.6,0,H,0,H-ew*.6,0,H-ew*.6);
     ctx.restore();},
@@ -2327,6 +2331,10 @@ setInterval(pumpTracks,300);
 loadTrack=function(stage,urgent){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
   if(urgent){TRQ.urgent++;if(!calmNow())TRQ.mid++;TRQ.log.push(stage+'@'+(G?G.t|0:0));if(TRQ.log.length>20)TRQ.log.shift();}
   TRQ.loads++;return _loadTrack(stage);};
+/* Skylines (landscape and portrait) of every district are built one at a time in calm moments (title, pit stop, pause, banner), never in the middle of a fight:
+   building one is 20-80 ms of canvas work, which showed as a hitch at the first visit of a district. */
+setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
+  for(let k=0;k<2*n;k++){const i=k%n,port=k>=n;if(port?BGPC[i]:BGC[i])continue;if(running&&!calmNow())return;(port?bgpFor:bgFor)(i);return;}},350);
 
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre

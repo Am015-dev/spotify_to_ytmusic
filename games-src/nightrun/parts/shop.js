@@ -43,8 +43,8 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     this.msg('');this.draw();shopEl.hidden=false;syncUI();NR.emit('pitStart',this.pits);},
   close(){if(!this.active)return;this.active=false;shopEl.hidden=true;syncUI();const cb=this.cb;this.cb=null;if(cb)cb();},
   tick(dt){pressed={};this.left-=dt;this.lock=Math.max(0,this.lock-dt);this.flash=Math.max(0,this.flash-dt);
-    shopEl.style.setProperty('--pul',(typeof PUL==='number'?PUL:0).toFixed(2));
-    $('shBar').style.width=Math.max(0,this.left/PIT_SECS*100)+'%';$('shSec').textContent=Math.max(0,Math.ceil(this.left));
+    const pq=((typeof PUL==='number'?PUL:0)*5|0)/5;if(pq!==this.pq){this.pq=pq;shopEl.style.setProperty('--pul',pq.toFixed(1));}   // 6 glow steps, not a new blurred shadow every frame
+    const bw=Math.round(Math.max(0,this.left/PIT_SECS*200))/2,sc=Math.max(0,Math.ceil(this.left));if(bw!==this.bw){this.bw=bw;$('shBar').style.width=bw+'%';}if(sc!==this.sc){this.sc=sc;$('shSec').textContent=sc;}
     if(this.left<=0)this.close();},
   buy(i){if(!this.active||this.lock>0)return false;const c=this.cards[i];if(!c||c.sold)return false;const pr=this.price(c.u);
     if(this.neon<pr){this.msg('Need '+(pr-this.neon)+' more Neon');const el=$('shCards').children[i];if(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}return false;}
