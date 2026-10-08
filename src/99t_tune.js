@@ -16,7 +16,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Grip','C26.muCity.road','Road grip',5,40,.5],['Grip','C26.muCity.dirt','Dirt grip',3,25,.5],['Grip','C26.muCity.water','Water grip',1,15,.5],
  ['Grip','TUNE.gripRoad','Lateral grip (lower = slides)',5,80,1],['Grip','C26.align','Self-straighten',0,6,.1],['Grip','C26.scrub','Slide scrub (speed loss)',0,5,.1],
  ['Grip','W.B2K_DMIN','Drift min speed (m/s)',4,30,.5],['Grip','W14_ST.hbCity','Touch BRAKE+steer drift speed (m/s)',10,60,.5],
- ['Grip','TUNE.drSlip','Drift angle',.5,3,.05],['Grip','TUNE.drGrip','Drift grip',.01,.3,.005],
+ ['Grip','TUNE.gbHold','GAS+BRAKE drift: hold BRAKE (s, 0 = at once)',0,1,.05],['Grip','TUNE.gbSteer','GAS+BRAKE drift: min steer',0,1,.05],['Grip','TUNE.slipMax','Max slide outside drift (rad)',.02,.6,.01],['Grip','C26.kR','Rear grip lost when braking',0,.6,.01],['Grip','TUNE.drSlip','Drift angle',.5,3,.05],['Grip','TUNE.drGrip','Drift grip',.01,.3,.005],
  ['Grip','TUNE.drFill','Drift bar fill rate',5,60,1],['Grip','TUNE.drConv','Drift → boost gain',.1,1.5,.05],
  ['Engine','W13S.city','City top speed ×',.5,1.6,.01],['Engine','W13S.open','Open-road top speed ×',.5,1.6,.01],['Engine','TUNE.abTop','Autobahn top speed ×',.8,2,.01],
  ['Engine','TUNE.acc','Acceleration',.4,3,.05],['Engine','W13S.cp','Accel curve (higher = pulls to top)',.5,4,.1],['Engine','C26.thUp','Throttle response',.5,10,.1],
