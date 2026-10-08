@@ -27,14 +27,14 @@ GB_pick=(f=>function(cx,cy){if(!B25_act()||GB_.tool!=='add'||(typeof SL!=='undef
  const y0=B25.L*GB_PH;if(Math.abs(d.y)<.12){const h=f(cx,cy);if(h){h.b25=1;h.brick=null}return h}const t=(y0-o.y)/d.y;if(t<0)return null;
  const px=o.x+d.x*t,pz=o.z+d.z*t;return{brick:null,i:Math.floor(px/GB_U),j:Math.floor(pz/GB_U),px:px/GB_U,pz:pz/GB_U,b25:1}})(GB_pick);
 // is b free at its own y? 'ok' | 'full' (overlaps a part or the chassis) | 'air' (touches nothing) | 'out' (outside the build area / height cap)
-function B25_why(b){const[fw,fd]=GB_dims(b),h=B25_h(b);if(b.x<GB_N0||b.x+fw-1>GB_N1||b.z<GB_N0||b.z+fd-1>GB_N1||b.y+h>B25_cap())return'out';
+function B25_why(b){const[fw,fd]=GB_dims(b),h=B25_h(b);if(b.x<GB_N0||b.x+fw-1>GB_N1||b.z<GB_Z0||b.z+fd-1>GB_Z1||b.y+h>B25_cap())return'out';
  for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){const s=GB_.base[i+','+j];if(s!=null&&s>b.y)return'full'}
  for(const o of GB_list()){const[ow,od]=GB_dims(o);if(o.x<b.x+fw&&o.x+ow>b.x&&o.z<b.z+fd&&o.z+od>b.z&&o.y<b.y+h&&o.y+B25_h(o)>b.y)return'full'}
  return G8_free(b,b.y,GB_list())?'ok':'air'}
 const B25_TXT={full:'Something is already there',air:'Nothing to hold it here',out:'Outside the build area'};
 GB_cand=(f=>function(hit){if(!B25_act()||!hit||!hit.b25||!GB_PC[GB_.pc])return f(hit);const P=GB_PC[GB_.pc],r=GB_.rot,[fw,fd]=r%2?[P.d,P.w]:[P.w,P.d];
  let x=hit.px!=null?Math.round(hit.px-fw/2):hit.i-Math.floor((fw-1)/2),z=hit.pz!=null?Math.round(hit.pz-fd/2):hit.j-Math.floor((fd-1)/2);
- x=clamp(x,GB_N0,GB_N1-fw+1);z=clamp(z,GB_N0,GB_N1-fd+1);const b={t:GB_.pc,x,z,y:B25.L,r,m:0,c:GB_.col},w=B25_why(b);
+ x=clamp(x,GB_N0,GB_N1-fw+1);z=clamp(z,GB_Z0,GB_Z1-fd+1);const b={t:GB_.pc,x,z,y:B25.L,r,m:0,c:GB_.col},w=B25_why(b);
  b.bad=w!=='ok'||GB_list().length>=GB_MAX;B25.why=w==='ok'?(GB_list().length>=GB_MAX?'Build limit full':''):B25_TXT[w];return b})(GB_cand);
 // place on the active layer (touch: ✔ PLACE / second tap; mouse: click). The mirror twin goes on the same layer when it fits.
 function B25_place(b){const L=GB_list();if(!b||b.bad||B25_why(b)!=='ok'){try{AU.sfx('bump')}catch(e){}B25_ui();return 0}
@@ -58,8 +58,8 @@ function B25_look(){const U=GB.mesh&&GB.mesh.userData;if(!U)return;const host=U.
  if(B.p.length){const gh=new THREE.Mesh(mk(B),new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.16,depthWrite:false}));gh.raycast=()=>{};gh.userData.gbG=1;gh.renderOrder=2;host.add(gh);B25.gh=gh}}
 // stud grid of the active layer over the whole build area
 function B25_grid(){const U=GB.mesh&&GB.mesh.userData;if(!U)return;const host=U.carG||U.m;if(B25.grid){host.remove(B25.grid);B25.grid.traverse(o=>{if(o.geometry)o.geometry.dispose()});B25.grid=null}
- if(!B25_act()||B25.L==null)return;const y=B25.L*GB_PH+.012,u=GB_U,x0=GB_N0*u,x1=(GB_N1+1)*u,z0=GB_N0*u,z1=(GB_N1+1)*u,V=[];
- for(let i=GB_N0;i<=GB_N1+1;i++)V.push(i*u,y,z0,i*u,y,z1);for(let j=GB_N0;j<=GB_N1+1;j++)V.push(x0,y,j*u,x1,y,j*u);
+ if(!B25_act()||B25.L==null)return;const y=B25.L*GB_PH+.012,u=GB_U,x0=GB_N0*u,x1=(GB_N1+1)*u,z0=GB_Z0*u,z1=(GB_Z1+1)*u,V=[];
+ for(let i=GB_N0;i<=GB_N1+1;i++)V.push(i*u,y,z0,i*u,y,z1);for(let j=GB_Z0;j<=GB_Z1+1;j++)V.push(x0,y,j*u,x1,y,j*u);
  const G=new THREE.Group();G.userData.gbG=1;const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(V,3));
  const ln=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x4ceaff,transparent:true,opacity:.42,depthWrite:false}));ln.raycast=()=>{};ln.renderOrder=1;G.add(ln);
  const pl=new THREE.Mesh(new THREE.PlaneGeometry(x1-x0,z1-z0).rotateX(-Math.PI/2).translate((x0+x1)/2,y-.004,(z0+z1)/2),new THREE.MeshBasicMaterial({color:0x22c5e4,transparent:true,opacity:.07,depthWrite:false,side:THREE.DoubleSide}));pl.raycast=()=>{};G.add(pl);
