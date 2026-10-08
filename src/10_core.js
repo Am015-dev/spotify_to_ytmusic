@@ -93,6 +93,8 @@ function CR_minBack(){const v=pl&&pl.vmode||'car';return v==='4x4'?5.5:v==='boat
 const CR_SMASHV=150/3.6;
 
 const ALL_OPEN=true,TEST_MODE=true; // TEST_MODE: Alex's test build (src/99x_test_mode.js): ∞ studs, everything unlocked, all events open, ⚙ everywhere. false = normal game
+// R3b: English UI. Numbers were formatted 'de-DE' (3.000 studs reads as 3); one wrapper maps it to en-US (3,000) without touching every module
+{const _tls=Number.prototype.toLocaleString;Number.prototype.toLocaleString=function(l,o){return _tls.call(this,l==='de-DE'?'en-US':l,o)}}
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';

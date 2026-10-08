@@ -106,6 +106,7 @@ gbClose=(f=>function(){R3_show(false);return f.apply(this,arguments)})(gbClose);
 #gbx .gbFig+.r3Drv,#gbx .r3Drv~.gbInfo{display:none}
 #profile .r3Hero .r3Lv b{color:#141413;text-shadow:none}#profile .r3Hero .r3Lv small,#profile .r3Xp em{color:#6a3df0}#profile .r3Xp small{color:#4a5468}#profile .r3Hero{margin:4px 0 0}
 #profile .r3PfL{background:#1d2a6e}#profile .r3PfL h5{color:#ffd12c}#profile .r3PfL .r3Nx{color:#c9d6ff}#profile .r3Fold:not(.open)>:not(h5){display:none}
+#profX{min-width:44px!important;min-height:44px!important;display:inline-grid;place-items:center}
 .r3More{all:unset;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border-radius:999px;background:#fff;border:3px solid #141413;font:italic 900 13px var(--hud);color:#141413}
 #r3Up{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(5,3,15,.62);font-family:system-ui}#r3Up[hidden]{display:none}body:has(#r3Up:not([hidden])) #odNew{display:none!important}
 #r3Up .r3UC{position:relative;width:min(560px,94vw);max-height:calc(100vh - 28px);margin-top:14px;overflow:visible;box-sizing:border-box;padding:16px 16px 12px;border-radius:18px;background:linear-gradient(135deg,#1d2a6e,#2a1450);border:4px solid #141413;box-shadow:0 8px 0 #141413,0 0 40px rgba(214,92,255,.5);color:#fff}
