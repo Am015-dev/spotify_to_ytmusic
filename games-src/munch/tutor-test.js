@@ -41,6 +41,18 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await tapSel('#modal [data-start="F"]');await sleep(400);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
     const o4=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut,i:GXT.state().i}));if(!o4.run||!o4.tut||o4.i!==0)note(tag,'"Learn in 5 minutes" did not start the tutorial '+JSON.stringify(o4));
     totals.runs++;console.log(tag,'done');await ctx.close();return}
+  if(mode==='drag'){
+    // the same step can be answered with a mouse drag: card -> hero (pointer events), and a drag dropped on the wrong place does nothing
+    await p.evaluate(()=>{G=null;render();tutStart()});await sleep(800);await p.evaluate(()=>{UI.speed=4});
+    for(let k=0;k<60;k++){const st=await p.evaluate(()=>GXT.state());if(st.id==='goal'&&st.shown){const nx=await p.evaluate(()=>{const b=document.querySelector('.gxt-next').getBoundingClientRect();return [b.left+b.width/2,b.top+b.height/2]});await p.touchscreen.tap(nx[0],nx[1])}
+      if(st.id==='elf'&&st.shown)break;await sleep(150)}
+    const st=await p.evaluate(()=>GXT.state());if(st.id!=='elf'||!st.shown){note(tag,'drag: elf step not reached '+JSON.stringify({id:st.id,ph:st.phase}));await ctx.close();return}
+    const card=st.holes[1],hero=st.holes[0];
+    const drag=async(x1,y1,x2,y2)=>{await p.mouse.move(x1,y1);await p.mouse.down();for(let i=1;i<=12;i++){await p.mouse.move(x1+(x2-x1)*i/12,y1+(y2-y1)*i/12);await sleep(16)}await p.mouse.up();await sleep(500)};
+    await drag(card.cx,card.cy,hero.cx,hero.cy-hero.height*0.35);                       // wait: this ends ON the hero (inside its spotlight)
+    const a1=await p.evaluate(()=>({i:GXT.state().i,id:GXT.state().id,race:P(0).race.length}));
+    if(a1.id==='elf'||!a1.race)note(tag,'dragging the Elf onto the hero did not play it '+JSON.stringify(a1));
+    totals.runs++;console.log(tag,'done');await ctx.close();return}
   // first visit: the title shows "New here? Learn in 5 minutes" as the first option
   const first=await p.evaluate(()=>{G=null;render();const b=document.querySelector('#modal .dlg.start button');return b?{t:b.textContent,gxt:b.hasAttribute('data-gxt-open')}:null});
   if(!first||!first.gxt||!/New here/.test(first.t))note(tag,'first menu option is not "New here? Learn in 5 minutes": '+JSON.stringify(first));
@@ -74,9 +86,10 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(wc(info.say)>20)note(tag,id+': say over 20 words ('+wc(info.say)+')');
+    if(process.env.ALLSHOTS&&W===390&&mode==='clean'){await sleep(700);await p.screenshot({path:process.env.ALLSHOTS+'/s'+String(s.i).padStart(2,'0')+'_'+id+'.png'})}
+    if(wc(s.say)>20)note(tag,id+': say over 20 words ('+wc(s.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
-    if(!info.say)note(tag,id+': empty text');
+    if(!s.say)note(tag,id+': empty text');
     if(info.hs)note(tag,id+': page scrolls sideways');
     if(!info.hasData)note(tag,id+': a tutorial element without data-help');
     if(info.dots!==s.n)note(tag,id+': progress dots '+info.dots+' vs steps '+s.n);
@@ -206,7 +219,7 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
 
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
-  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'offer']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
+  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'offer']);jobs.push([W0,H0,'drag']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
   const MODES=(process.argv[3]||'').split(',').filter(Boolean);
   for(const j of jobs){if(MODES.length&&!MODES.includes(j[2]))continue;guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();

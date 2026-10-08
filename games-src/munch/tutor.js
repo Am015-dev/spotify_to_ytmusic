@@ -24,7 +24,7 @@ const TUT_GAME='doorkick-dungeon';
 let TUTG=false;
 const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(G&&G.tut);
 const tutFirst=()=>{try{return !localStorage.getItem('dkd_offer')&&!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')&&!localStorage.getItem(SAVE)}catch(e){return true}};
-const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:()=>tutStart()});
+const tutBtn=cls=>typeof GXT==='undefined'||(G&&G.mode==='net'&&!G.winner)?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:()=>tutStart()});
 // ---------------------------------------------------------------- the fixed deal
 const TUT_SEED=20261008;
 const kdef=id=>G.C[id];                         // a card's key ('elf', 'imp', ...)
@@ -83,8 +83,8 @@ const tpick=key=>()=>myId(key);
 // ---------------------------------------------------------------- the steps
 function tutSteps(){
   return [
- {id:'goal',title:'Race to level 10',say:'Be first to reach level 10. The final level can only come from killing a monster.',target:tq('.mine .lv','.mine .top'),wait:null,
-   ready:()=>G.phase==='setup'&&tmine()},
+ {id:'goal',title:'Race to level 10',say:'Be first to reach level 10. The final level can only come from killing a monster.',target:tq('.bfbig','.mine .top'),wait:null,
+   ready:()=>G.phase==='setup'&&tmine()&&!!document.querySelector('.bfbig')},
  {id:'elf',title:'Play your race',say:'Tap your Elf, then tap your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},
  {id:'powers',title:'Races and classes',say:'Your Elf runs better. Classes add powers too: Warriors win ties, Wizards flee, Thieves stab, Clerics fight undead.',target:tq('.mine .gear'),wait:null,
@@ -110,12 +110,14 @@ function tutSteps(){
    ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},
  {id:'end1',title:'End your turn',say:'You may wear or sell more now. Then tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
    ready:()=>G.phase==='post'&&tmine()},
- {id:'curse',title:'Curse a rival',say:'Computer heroes play by the same rules. Before Morwen kicks, curse her: tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
+ {id:'curse',title:'Curse a rival',say:'Before Morwen kicks, you may curse her. Anyone can curse anyone. Tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='hexlvl'&&a.z==='p1'},from:()=>tcard('hexlvl'),
    ready:()=>G.phase==='window'&&G.active===1&&tmine()&&BF.pick==null&&!!tcard('hexlvl')&&!!tchip(1)()},
  {id:'meddle',title:'Meddle in her fight',say:'Morwen fights alone. Anyone may interfere! Tap Gargantuan, then her monster: +10 for it.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='gargantuan'},from:()=>tcard('gargantuan'),
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
+ {id:'rivals',title:'The computer plays too',say:'Morwen and Grub follow the same rules: they kick doors, fight, run, curse and ask for help.',target:tq('#phopps','#app .opps'),wait:null,
+   ready:()=>G.active===2&&!G.winner},
  {id:'kick2',title:'Your turn again',say:'Kick the door. Not every door hides a monster.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
  {id:'trouble',title:'Look for trouble',say:'No monster. You may loot a free card, or fight one from your hand: tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
@@ -132,15 +134,15 @@ function tutSteps(){
  {id:'charity',title:'Too many cards',say:'You may keep 5 cards. Give the extras to the lowest-level hero: tap the Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='halfling'&&a.z==='p1'},from:()=>tcard('halfling'),
    ready:()=>G.phase==='charity'&&tmine()&&BF.pick==null&&!!tcard('halfling')&&!!tchip(1)()},
- {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins, and the last level needs a monster kill. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .lv','.mine .top'),wait:null,
+ {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins, and the last level needs a monster kill. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
    ready:()=>G.active!==0&&!G.winner}
   ]}
 // ---------------------------------------------------------------- the kit hooks
 function tutSetup(){try{GX.close()}catch(e){}
   TUTG=true;clearTimeout(aiTimer);aiTimer=null;UI.pass=null;UI.lastSeat=-1;UI.menu=null;UI.zoom=null;UI.sell=null;UI.cmp=null;UI.pause=false;
   BF.pick=null;BF.ask=null;BF.kicking=false;UI.spd0=UI.speed;UI.speed=Math.max(1.5,UI.speed||1);
-  const lvl0=UI.lvl,n0=UI.n;UI.lvl='normal';DEFSEED=TUT_SEED;
-  try{newGame('F',3)}finally{UI.lvl=lvl0;UI.n=n0;DEFSEED=null}
+  const lvl0=UI.lvl,n0=UI.n,nm0=UI.names;UI.lvl='normal';UI.names=null;DEFSEED=TUT_SEED;
+  try{newGame('F',3)}finally{UI.lvl=lvl0;UI.n=n0;UI.names=nm0;DEFSEED=null}
   G.tut=1;G.learn=false;G.rng=TUT_SEED;
   G.active=G.first=0;G.setupOrd=[0,1,2];G.setupI=0;G.log=[];G.ln=0;lg(-1,'The tutorial dungeon opens: you, Morwen and Grub.');
   tutDeal();tutStackTreasure();tutTop('hatmuncher');
@@ -158,12 +160,12 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
     onExit:()=>tutLeave()})}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 (function(){const o=uiAct;uiAct=function(m){
-  if(tutOn()&&!UI._tutIn&&m.act!=='kick'){if(!GXT.act({type:'tap',what:'move',m})){render();return}if(m.act==='run')tutRoll(1)}
+  if(tutOn()&&!UI._tutIn){if(m.act==='kick'){if(!UI._tutKick){render();return}UI._tutKick=0}else{if(!GXT.act({type:'tap',what:'move',m})){render();return}if(m.act==='run')tutRoll(1)}}
   return o.apply(this,arguments)}})();
 (function(){const o=bfDrop;bfDrop=function(id,z,at){
   if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'drop',id,z}))return false;UI._tutIn=1;try{return o(id,z,at)}finally{UI._tutIn=0}}
   return o(id,z,at)}})();
-(function(){const o=bfKick;bfKick=function(){if(tutOn()&&!BF.kicking&&!GXT.act({type:'tap',what:'kick'}))return;return o.apply(this,arguments)}})();
+(function(){const o=bfKick;bfKick=function(){if(tutOn()&&!BF.kicking){if(!GXT.act({type:'tap',what:'kick'}))return;UI._tutKick=1}return o.apply(this,arguments)}})();
 function tutBlock(e){e.stopPropagation();e.stopImmediatePropagation();e.preventDefault()}
 window.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest)return;
   // Story: the first tap runs the tutorial as Chapter 0
