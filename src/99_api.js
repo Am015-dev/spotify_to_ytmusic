@@ -183,7 +183,7 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
   if(cx-w<b.right&&cx+w>b.left&&cy-h<b.bottom&&cy+h>b.top)CRSM_tutHide(1150)}}catch(e){}return r})(hitPop);
 // first-time hint above the arrows until 2 SMASHes
 // R3b: HUD hints (smash hint, prompts, tutorial, pops) hide while any panel or overlay is open
-const R3B_PANELS=['journal','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
+const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
 function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='TAP TAP = SMASH';document.body.appendChild(h)}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
