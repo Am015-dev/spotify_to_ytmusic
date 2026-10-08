@@ -4,7 +4,7 @@ let HARD=SET.diff==='hard';DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty liv
 const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all};})();
 const sPersist=()=>save('mnr_story',sSave);
 // difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
-const TUNE={d0:.8,dd:.11,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.07,eh:.2,el0:2,eld:.07,hd:.09,hull:[5,5,5,5,5,5,5,5,4,4,4,4],lv:[2.2,3.3,3.7,3.8,5.2,6.6,5.3,6.2,8,7.8,8.55,9.4],bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
+const TUNE={d0:.8,dd:.11,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.07,eh:.2,el0:2,eld:.07,hd:.09,hull:[6,6,6,6,6,6,6,6,5,5,5,5],lv:[2.2,3.3,3.7,3.8,4.6,5.2,5.4,6.4,8.2,8.2,9,9.8],bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
 const STAGES=[
   {n:1, di:0,name:'FIRST RUN',     intro:'Deliver the data. Stay alive.',     goal:{k:'survive',v:46},perf:46,waves:['droneLine','droneV','droneSine']},
@@ -36,12 +36,12 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
-    this.dk=1;},
+    this.dk=TUNE2.stDk;},
   kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
   snapFor(n){const sn=sSave.snap[n];return sn?Object.assign({},sn):this.kit(n);},
   // the new run has just been created: put this stage's district, hull and upgrades in place
   begin(){const D=DISTRICTS[this.def.di];G.di=this.def.di;G.pos=posOf(G.di);G.dt=0;G.d0=G.bc;DIR.plan(this.def.song);G.boss=null;G.bossDone=false;G.waveT=2.4;G.waveWait=false;G.preload=true;bgFor(G.di);AU.root=D.root;AU.boss=false;
-    P.hp=this.hp0;P.max=5;banner(this.n+' · '+this.def.name,this.def.intro,false,3.4);},
+    P.max=Math.max(5,this.hp0);P.hp=this.hp0;banner(this.n+' · '+this.def.name,this.def.intro,false,3.4);},
   carry(){const got=this.snapFor(this.n);for(const id in got)for(let i=0;i<got[id];i++)SH.add(id);},
   frac(){const g=this.def.goal,tf=G.dbar/this.len;let f=0;
     if(g.k==='survive')f=tf;else if(g.k==='kill')f=Math.min(G.kills/this.kv,tf);else if(g.k==='score')f=Math.min(G.score/this.sv,tf);else f=G.boss||this.spawned?1:G.dbar/this.lead;

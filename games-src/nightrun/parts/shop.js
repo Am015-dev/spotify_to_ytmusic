@@ -18,7 +18,7 @@ const NEON_K=.04;                                         // Neon per kill: dist
 const NEON_V={drone:.5,charger:.5,turret:1,gate:1,gunship:3,boss:8};     // fractions add up: about 40 Neon from a first district
 const p2d={};const path2=d=>p2d[d]||(p2d[d]=new Path2D(d));
 
-const SH={UPG,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:0,lock:0,cards:[],rerolls:0,live:false,flash:0,
+const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:0,lock:0,cards:[],rerolls:0,live:false,flash:0,
   ck:0,hm:0,sharp:1,nx:1,spare:0,dmax:0,sh:0,db:0,dashId:0,wasDash:false,tk:false,prevCur:-1,rch:0,picks:0,pits:0,
   reset(){if(this.live)this.bankRun(true);
     this.pitLog=[];this.neon=0;this.earned=0;this.acc=0;this.spent=0;this.got={};this.order=[];this.active=false;this.cb=null;this.rerolls=0;this.picks=0;this.pits=0;this.live=false;this.flash=0;

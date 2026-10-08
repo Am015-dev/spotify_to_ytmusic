@@ -7,13 +7,13 @@
    * Loops add mutators (hailstorm, minefield, turbo, tide, flank rush, elite guard), not only more hit points.
    * Fair: every shot is armed one beat before (b.js), nothing spawns within SPAWN_R of the ship, flankers and rain are announced by a marker for one beat. */
 const SPAWN_R=210;
-const TUNE2={loopD:.45,hpD:.35,hpK:1.1,densK:.35,dK:.1,bsK:.08,loopFan:1,loopSpd:.06,slope:.17,quad:0,lenK:.5};   // difficulty numbers of the director (tune with f-sim.js; __mnr.TUNE2 is live)
+const TUNE2={loopD:.9,hpD:.35,hpK:1.8,densK:.5,dK:.1,bsK:.08,loopFan:1.5,loopSpd:.1,slope:.2,quad:.014,lenK:.5,stDk:.4,stHeal:3,stFree:99,stHpK:1.1,stDensK:.35};   // difficulty numbers of the director (tune with f-sim.js; __mnr.TUNE2 is live)
 const UPS={d:1,hp:1,dens:1,bs:1,u:0,soft:0};             // soft scaling of the enemies with the player's upgrade level
 const UP_W={fr:.05,dc:.03,mg:.01,sh:.06,lp:.02,wd:.02,hm:.05,ck:.02,db:.04,sb:.05,nx:0,dm:.09,cr:.03,hl:0,mh:.05,dr:.08,rv:.06,
   sc:.07,rg:.04,pc:.06,cl:.06,bt:.05,rc:.04,og:.07,as:.05,bd:.08,sm:0,ni:0,sw:.07,ec:.02,lk:0};
 const TP_W={dmg:.07,rof:.05,shd:.06,rgn:.04,hul:.06,dsh:.04,mag:.005,ckp:.01,pwd:.01,crt:.04,drn:.09,rev:.06,nmn:0,ovc:.03,tdl:.04,prc:.05,nint:0};
 function upsCalc(){let u=0;try{for(const id in SH.got)u+=(UP_W[id]||.03)*SH.got[id];for(const d of TP_DEF)u+=(TP_W[d.id]||.03)*TP.l(d.id);}catch(e){}
-  const soft=1-Math.exp(-u/1.4);UPS.u=u;UPS.soft=soft;UPS.hp=1+TUNE2.hpK*soft;UPS.dens=1+TUNE2.densK*soft;UPS.d=1+TUNE2.dK*soft;UPS.bs=1+TUNE2.bsK*soft;}
+  const soft=1-Math.exp(-u/1.4);UPS.u=u;UPS.soft=soft;UPS.hp=1+(ST.on?TUNE2.stHpK:TUNE2.hpK)*soft;UPS.dens=1+(ST.on?TUNE2.stDensK:TUNE2.densK)*soft;UPS.d=1+TUNE2.dK*soft;UPS.bs=1+TUNE2.bsK*soft;}
 const MUTS=[{id:'hail',n:'HAILSTORM',t:'Slow rain from above'},{id:'mine',n:'MINEFIELD',t:'Mines drift in'},{id:'turbo',n:'TURBO',t:'Faster shots'},
   {id:'tide',n:'TIDE',t:'Swarms every phrase'},{id:'rush',n:'FLANK RUSH',t:'Flankers every bar'},{id:'guard',n:'ELITE GUARD',t:'More elites'}];
 const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B',sub:'Bridge sentinel, twin cannon'},
@@ -87,7 +87,7 @@ const DIR={
     this.theme=pick;this.thName=pick;this.lastTheme=pick;this.thBar=bar;if(this.log.themes.length<80)this.log.themes.push([bar,pick,+E.toFixed(2)]);},
   // ---- spawning ----
   pool(){const th=this.thName,t=this.tierv(),ok=ST.on?new Set(ST.def.waves):null,out=[];
-    for(const k in PATS){const p=PATS[k];if(p.th.indexOf(th)<0)continue;if(p.t>t+.01)continue;if(ok&&!p.free&&!ok.has(k))continue;out.push(p);}
+    for(const k in PATS){const p=PATS[k];if(p.th.indexOf(th)<0)continue;if(p.t>t+.01)continue;if(ok&&!ok.has(k)&&!(p.free&&ST.lvl>=TUNE2.stFree))continue;out.push(p);}
     return out.length?out:[PATS.droneLine];},
   spawnOne(fill){const P_=this.pool();let tot=0;for(const p of P_)tot+=p.w;let r=GR()*tot,pk=P_[0];for(const p of P_){r-=p.w;if(r<=0){pk=p;break;}}
     if(fill){const small=P_.filter(p=>p.n<=6);if(small.length)pk=small[Math.floor(GR()*small.length)];}

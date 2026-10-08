@@ -227,7 +227,7 @@ window.__mnr={get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DE
   simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},
   abort(){if(running){NR.emit('runEnd',{quit:true});running=false;}ST.on=false;ST.over=false;paused=false;touch=null;touchFire=false;pressed={};},
   skipTo(i){if(!running)return;G.loop=G.loop;G.en=[];G.eb=[];enterDistrict(i);},
-  bossNow(){if(running&&!G.boss&&!G.bossDone){G.force=true;G.en=[];}},get spawnBoss(){return spawnBoss},bossShot,BCAP,fanAngle,get PWbs(){return PW.bs},get bsMnow(){return bsM()},get diffNow(){return diff()},DIR,UPS,TUNE2,PATS,MUTS,WARN,NEW2,SHIPX,SHIPS,AX,upsCalc,lvSide,lvRear,lvPierce,lvBT,get SONGM(){return SONGM},songBars,songEnergy,ORDER,nextDi,posOf};
+  killBoss(){const b=G.boss;if(b){b.floor=0;b.minBar=0;b.hp=0;}},bossNow(){if(running&&!G.boss&&!G.bossDone){G.force=true;G.en=[];}},get spawnBoss(){return spawnBoss},bossShot,BCAP,fanAngle,get PWbs(){return PW.bs},get bsMnow(){return bsM()},get diffNow(){return diff()},DIR,UPS,TUNE2,PATS,MUTS,WARN,NEW2,SHIPX,SHIPS,AX,upsCalc,lvSide,lvRear,lvPierce,lvBT,get SONGM(){return SONGM},songBars,songEnergy,ORDER,nextDi,posOf};
 })();
 </script>
 

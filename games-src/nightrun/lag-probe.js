@@ -46,7 +46,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
     await mark('boss-call' + di);
     for (let w = 0; w < 80 && !(await st()).boss; w++) await steer(250);
     await mark('boss' + di); await steer(6000);
-    await p.evaluate(() => { const b = __mnr.G.boss; if (b) { b.hp = 0; } }); await mark('boss-dead' + di);
+    await p.evaluate(() => { __mnr.killBoss(); }); await mark('boss-dead' + di);
     for (let w = 0; w < 80 && !(await st()).pit; w++) await steer(250);
     await mark('pit' + di); await touch('touchEnd'); await sleep(4000);        // the shopper looks at the cards for 4 s
     const g = await p.evaluate(() => { const b = document.getElementById('shGo').getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; });
