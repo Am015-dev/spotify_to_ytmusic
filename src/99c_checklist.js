@@ -11,6 +11,8 @@ const OD_CHECKLIST=[
  {ver:'v88i',id:'big-pc-cam',text:'On PC: drive the Bus and the Box Truck; the camera sits above the roof and you can see the road ahead over the vehicle.'},
  {ver:'v88i',id:'big-limo',text:'Drive the Stretch Limo through a few junctions: it turns wider than a car, tyres on the road, nothing stuck.'},
  {ver:'v88i',id:'small-same',text:'Switch back to a normal car: it drives exactly like before.'},
+ {ver:'v88h',id:'city-reenter',text:'Leave free roam (menu, a race or garage SAVE & DRIVE), come back, then logbook ALL (TEST) → GO to Hot Drop: the city is fully built around you (road, kerbs, grass, buildings), no floating roofs.'},
+ {ver:'v88h',id:'city-far',text:'After coming back to free roam, drive or GO to the far side of town (2+ km): the streets and buildings there are drawn, not a pale empty plane.'},
  {ver:'v88g',id:'turn60',text:'Normal turn at a junction at 50–80 km/h with GAS only: the car turns cleanly where it points, no sliding sideways.'},
  {ver:'v88g',id:'brake-turn',text:'Brake briefly before or in a turn (tap BRAKE, or ↓ while holding ↑ on PC): the car slows down and does NOT start a drift.'},
  {ver:'v88g',id:'drift-btn',text:'DRIFT button (X on PC) while steering at speed: the car still slides on purpose, with the pink trail and a mini-turbo after.'},
