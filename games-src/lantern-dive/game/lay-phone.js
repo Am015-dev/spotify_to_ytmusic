@@ -91,10 +91,6 @@ const SIZES = arg.split(',').filter(Boolean).map(s => s.split('x').map(Number));
     for (let k = 0; k < 900; k++) { const st = await p.evaluate(() => G.phase === 'over' && UI.overShown); if (st) break; await step(); await p.waitForTimeout(50); }
     await p.waitForTimeout(500); await shot('7final'); await scroll('final'); await targets('final'); { const rr = await rect('.rsbox'); if (!rr) prob('no final result'); else if (!insideVP(rr)) prob('final result does not fit', JSON.stringify(rr)); }
     await tap('#rs [data-a=rsclose]'); await p.waitForTimeout(300); await scroll('after final');
-    // guided dive: the tip card is readable and has a visible button
-    await p.evaluate(() => { ANIM = 1; AIDELAY = 60; showStart(); }); await p.waitForTimeout(300); await p.tap('[data-a=play]'); await p.waitForTimeout(200); await p.tap('[data-start=guided]'); await p.waitForTimeout(1200);
-    { const dl = await p.evaluate(() => { const b = document.querySelector('#dlg [data-a=dlgok]'); if (!b) return null; const r = b.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return { vis: !!h && (h === b || b.contains(h)) && r.bottom <= innerHeight + 1 && r.top >= 0, mara: /Mara/.test(document.querySelector('#dlg').textContent) }; });
-      if (!dl) prob('training dive shows no Mara dialog'); else { if (!dl.vis) prob('dialog button not visible or covered', JSON.stringify(dl)); if (!dl.mara) prob('training dialog is not Mara'); await shot('8tip'); await targets('dialog'); await tap('#dlg [data-a=dlgok]'); await p.waitForTimeout(300); } }
     // the Descent: map, boss intro dialog, boss bar never covers the trick slots
     await p.evaluate(() => { ANIM = 0; AIDELAY = 0; showStart(); Desc.save({ v: 1, z: 1, s: 1, o2: 2, stars: { '0:0': 1 }, best: 1, met: {} }); UI.sv = 'descent'; renderStart(); }); await p.waitForTimeout(300);
     await scroll('descent map'); await shot('9descent'); await targets('descent map'); { const r = await inVP('#start [data-a=descgo]'); if (r !== 'ok') prob('descent dive button', r); }

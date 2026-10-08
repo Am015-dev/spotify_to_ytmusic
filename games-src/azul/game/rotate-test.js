@@ -30,8 +30,10 @@ async function tapAll(p,label,R,opts={}){await install(p);const ts=await targets
   const avg=res.lat.length?res.lat.reduce((a,b)=>a+b,0)/res.lat.length:0;
   console.log(`${label.padEnd(30)} ctl=${res.n} off=${res.off} blocked=${res.blocked} noresp=${res.noresp} slow>150=${res.slow} avg=${avg.toFixed(0)}ms max=${res.max.toFixed(0)}ms hscroll=${res.hscroll} longtasks=${res.lt}(max ${res.ltMax}ms)`);
   for(const b of res.bad.slice(0,8))console.log('    '+b);return res}
-async function closeDialogs(p){await p.evaluate(()=>{for(const b of document.querySelectorAll('.close,[data-bf=close],.gx-scrim.on'))if(b.offsetParent!==null||b.classList.contains('on'))try{b.click()}catch(e){}})}
-async function fresh(b,w,h){const c=await b.newContext({viewport:{width:w,height:h},isMobile:true,hasTouch:true,deviceScaleFactor:3,userAgent:UA});const p=await c.newPage();
+async function closeDialogs(p){await p.evaluate(()=>{try{GXH.hide();const r=document.querySelector('.gxh-rules');if(r)r.remove()}catch(e){}   // the lightbulb's bubble sits over the board until dismissed
+    for(const b of document.querySelectorAll('.close,[data-bf=close],.gx-scrim.on'))if(b.offsetParent!==null||b.classList.contains('on'))try{b.click()}catch(e){}})}
+async function fresh(b,w,h){const c=await b.newContext({viewport:{width:w,height:h},isMobile:true,hasTouch:true,deviceScaleFactor:3,userAgent:UA});await c.addInitScript(()=>{try{localStorage.setItem('sgz_offer','1');localStorage.setItem('gxh-sunglaze','{"on":false,"seen":{}}')}catch(e){}});   // no first-time tutorial offer, no coach bubbles over the board
+  const p=await c.newPage();
   p.on('pageerror',e=>console.log('PAGEERROR',e.message));await p.goto(URL);await sleep(1500);return p}
 async function start(p){await p.evaluate(()=>{document.querySelector('[data-ui=start]').click()});await sleep(600);
   await p.evaluate(()=>{const o=document.querySelector('[data-ui=story-ok]');if(o)o.click()});await sleep(1500)}

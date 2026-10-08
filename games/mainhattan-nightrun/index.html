@@ -138,7 +138,7 @@ html.hc #stage{filter:contrast(1.08)}
 const W=960,H=540,PR=1.5;
 const $=id=>document.getElementById(id);
 const cv=$('game'),frame=$('frame'),stage=$('stage');
-let ctx=cv.getContext('2d');                              // the context everything draws on right now
+let ctx=cv.getContext('2d',{alpha:false});                              // the context everything draws on right now
 const vctx=ctx;                                         // the visible canvas
 let wctx=ctx,wcv=cv,VS=1;                               // world layer: portrait draws the world on its own canvas, then turns it upright; VS = visible px per HUD unit
 let S=1,rotMode=false,touchUI=false;
@@ -478,31 +478,47 @@ function lmSprite(kind,D){const body='#0b0816',rim=D.b;let c,g,w,h;
 function buildBG(i){const D=DISTRICTS[i];
   const far=skyline(1920,300,{seed:11+i*7,minW:30,maxW:80,minH:60,maxH:220,body:'#0d0a1e',edge:'#1f1a3a',win:D.win,winP:.12,cell:5});
   const mid=skyline(1920,380,{seed:99+i*13,minW:44,maxW:120,minH:D.low?70:110,maxH:D.low?170:330,body:'#07050f',edge:D.a,win:D.win,winP:.22,cell:7,signs:true,sl:D.signs,na:D.a,nb:D.b,gap:26});
+  {const g=mid.c.getContext('2d');g.save();g.globalCompositeOperation='lighter';g.globalAlpha=.5;mid.lights.forEach(([lx,ly],k)=>{if(k%2)return;g.drawImage(glow('#ff3030'),lx-6,ly-6,12,12);});g.restore();}   // red tower lights are part of the layer (they were ~12 glow draws a frame)
   const lms=D.lm.filter(k=>k!=='hammer').map(k=>lmSprite(k,D));
   return{D,far,mid,lms,hammer:D.lm.includes('hammer')};}
 const BGC={};function bgFor(i){return BGC[i]||(BGC[i]=buildBG(i));}
 
-const scan=(()=>{const[c,g]=mk(W,H);g.fillStyle='rgba(0,0,0,.18)';for(let y=0;y<H;y+=3)g.fillRect(0,y,W,1);
-  const v=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,H*.95);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,W,H);return c;})();
+// Scanlines + vignette: rebuilt at the canvas's own pixel size (1 canvas pixel per output pixel, no scaling pass) and drawn as one image a frame.
+const SCN={l:null,p:null};
+function scanFor(port){const w=cv.width,h=cv.height,o=SCN[port?'p':'l'];if(o&&o.width===w&&o.height===h)return o;
+  const c=o||document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d'),u=port?VS:S,SW=port?PW_:W,SH_=port?PH_:H;g.setTransform(u,0,0,u,0,0);
+  g.fillStyle=port?'rgba(0,0,0,.16)':'rgba(0,0,0,.18)';for(let y=0;y<SH_;y+=3)g.fillRect(0,y,SW,1);
+  const v=port?g.createRadialGradient(SW/2,SH_/2,SH_*.3,SW/2,SH_/2,SH_*.75):g.createRadialGradient(SW/2,SH_/2,SH_*.35,SW/2,SH_/2,SH_*.95);
+  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,port?'rgba(0,0,0,.55)':'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,SW,SH_);SCN[port?'p':'l']=c;return c;}
+// A big scrolling layer is built once at 1.5 px per unit; on a screen that needs less (1 px per unit at 1080p) a copy at exactly the needed size is drawn instead,
+// so the GPU does not shrink a 2880 px wide texture every frame.
+function dispOf(L,r){r=Math.min(PR,r);if(r>=PR*.98)return L.c;if(L.d&&Math.abs(L.dr-r)<.004)return L.d;
+  const c=L.d||document.createElement('canvas');c.width=Math.max(1,Math.round(L.c.width/PR*r));c.height=Math.max(1,Math.round(L.c.height/PR*r));const g=c.getContext('2d');g.imageSmoothingQuality='high';g.clearRect(0,0,c.width,c.height);g.drawImage(L.c,0,0,c.width,c.height);L.d=c;L.dr=r;return c;}
+function blitL(L,x,y){if(x>=W||x+L.c.width/PR<=0)return;ctx.drawImage(dispOf(L,S),x,y,L.c.width/PR,L.c.height/PR);}
 
 
 const cars=[];
+// Sky gradient + glow pre-rendered at the canvas's own pixel size: one drawImage a frame instead of a full-screen gradient fill, a gradient object and a glow sprite.
+// One slot per orientation (the current district only), rebuilt when the district or the canvas size changes.
+const SKYS={l:null,p:null};
+function skyFor(bg,port){const w=cv.width,h=cv.height,s=SKYS[port?'p':'l'];if(s&&s.bg===bg&&s.c.width===w&&s.c.height===h)return s.c;
+  const D=bg.D,c=s?s.c:document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d'),u=port?VS:S,SW=port?PW_:W,SH_=port?PH_:H;g.setTransform(u,0,0,u,0,0);
+  const k=g.createLinearGradient(0,0,0,SH_);if(port){k.addColorStop(0,D.sky[2]);k.addColorStop(.5,D.sky[1]);k.addColorStop(1,D.sky[0]);}else{k.addColorStop(0,D.sky[0]);k.addColorStop(.55,D.sky[1]);k.addColorStop(1,D.sky[2]);}
+  g.fillStyle=k;g.fillRect(0,0,SW,SH_);
+  const gx=port?SW*.3:SW*.72,gy=port?SH_*.25:SH_*.28,r=260;g.globalCompositeOperation='lighter';g.globalAlpha=port?.12:.18;g.drawImage(glow(D.a),gx-r,gy-r,r*2,r*2);
+  SKYS[port?'p':'l']={bg,c};return c;}
 
 function drawBG(bg,t,dt,scroll){const D=bg.D;
-  const sk=ctx.createLinearGradient(0,0,0,H);sk.addColorStop(0,D.sky[0]);sk.addColorStop(.55,D.sky[1]);sk.addColorStop(1,D.sky[2]);ctx.fillStyle=sk;ctx.fillRect(0,0,W,H);
-  // moon-ish haze and ad
-  ctx.globalCompositeOperation='lighter';G_(W*.72,H*.28,260,D.a,.18);ctx.globalCompositeOperation='source-over';
+  ctx.drawImage(skyFor(bg,false),0,0,W,H);                // sky gradient + moon haze, drawn once per district and size (see skyFor)
   ctx.save();ctx.globalAlpha=.1;ctx.font='700 46px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;
-  const adw=ctx.measureText(D.ad).width+400;const ax=W-((scroll*.06)%(adw+W));ctx.fillText(D.ad,ax,84);ctx.restore();
-  const tile=(L,par,y)=>{const o=(scroll*par)%L.w;blit(L.c,-o,y);blit(L.c,-o+L.w,y);return o;};
+  const adw=(bg.adw||(bg.adw=ctx.measureText(D.ad).width))+400;const ax=W-((scroll*.06)%(adw+W));ctx.fillText(D.ad,ax,84);ctx.restore();
+  const tile=(L,par,y)=>{const o=(scroll*par)%L.w;blitL(L,-o,y);blitL(L,-o+L.w,y);return o;};
   const fo=tile(bg.far,.1,H-300-40);
   // landmarks
-  const span=1500;bg.lms.forEach((lm,k)=>{let x=((k*span/bg.lms.length+300)-scroll*.22)%span;if(x<-lm.w)x+=span;const y=H-lm.h-50;blit(lm.c,x,y);
+  const span=1500;bg.lms.forEach((lm,k)=>{let x=((k*span/bg.lms.length+300)-scroll*.22)%span;if(x<-lm.w)x+=span;const y=H-lm.h-50;blitL(lm,x,y);
     ctx.globalCompositeOperation='lighter';G_(x+lm.w/2,y+2,8,'#ff3030',.45);ctx.globalCompositeOperation='source-over';});
   if(bg.hammer){let x=(900-scroll*.22)%span;if(x<-120)x+=span;drawHammer(x,H-50,t);}
   const mo=tile(bg.mid,.45,H-380);
-  ctx.globalCompositeOperation='lighter';const blink=0;                // calm city: no blinking lights, no traffic, no rain
-  bg.mid.lights.forEach(([lx,ly],k)=>{if((k+blink)%2)return;for(const off of[0,bg.mid.w]){const x=lx-mo+off;if(x>-10&&x<W+10)G_(x,ly+H-380,6,'#ff3030',.5);}});
   // traffic
   ctx.globalCompositeOperation='source-over';
   // haze
@@ -561,12 +577,9 @@ function buildBGP(i){const D=DISTRICTS[i];
          near:roofLayer(1500,{seed:77+i*13,minW:70,maxW:170,minH:120,maxH:260,body:'#07050f',edge:D.a,ea:.55,detail:'#140e24',win:D.win,winP:.16,cell:4,fill:.7,gap:30,beacon:1})};}
 const BGPC={};function bgpFor(i){return BGPC[i]||(BGPC[i]=buildBGP(i));}
 
-const scanP=(()=>{const[c,g]=mk(PW_,PH_);g.fillStyle='rgba(0,0,0,.16)';for(let y=0;y<PH_;y+=3)g.fillRect(0,y,PW_,1);
-  const v=g.createRadialGradient(PW_/2,PH_/2,PH_*.3,PW_/2,PH_/2,PH_*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.55)');g.fillStyle=v;g.fillRect(0,0,PW_,PH_);return c;})();
 function drawBGP(bg,t,dt,scroll){const D=bg.D,L=bgpFor(DISTRICTS.indexOf(D));
-  const sk=ctx.createLinearGradient(0,0,0,PH_);sk.addColorStop(0,D.sky[2]);sk.addColorStop(.5,D.sky[1]);sk.addColorStop(1,D.sky[0]);ctx.fillStyle=sk;ctx.fillRect(0,0,PW_,PH_);
-  ctx.globalCompositeOperation='lighter';G_(PW_*.3,PH_*.25,260,D.a,.12);ctx.globalCompositeOperation='source-over';
-  for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;ctx.drawImage(lay.c,0,o-lay.h,PW_,lay.h);ctx.drawImage(lay.c,0,o,PW_,lay.h);}
+  ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);
+  for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
   ctx.globalAlpha=1;
   if(D.near==='river'){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';
@@ -580,7 +593,8 @@ function drawBGP(bg,t,dt,scroll){const D=bg.D,L=bgpFor(DISTRICTS.indexOf(D));
 const K={};let pressed={};
 let touch=null,touchFire=false;
 const stampOf=e=>(e&&e.timeStamp>0?e.timeStamp:performance.now());
-const QD={L:1,M:1.5,H:2};                              // quality setting -> highest pixel ratio
+const QD={L:1,M:1.5,H:2};
+const PXB={L:.93e6,M:2.1e6,H:3.7e6};                   // backing-store budget in pixels (1280x720 / 1920x1080 / 2560x1440): a 4K or DPR-2 screen is not drawn at its full size, the browser scales the canvas up                              // quality setting -> highest pixel ratio
 function fit(){
   const st=stage.getBoundingClientRect();if(st.width<2||st.height<2)return;
   const was=rotMode;rotMode=touchUI&&st.height>st.width*1.05;   // portrait: a vertical play area, ship at the bottom
@@ -593,7 +607,7 @@ function fit(){
   stage.classList.toggle('p',rotMode);stage.classList.toggle('sd',side>0);stage.classList.toggle('tl',left);
   stage.style.setProperty('--strip',strip+'px');stage.style.setProperty('--shift',side?(left?40:-40)+'px':'0px');
   frame.style.width=w+'px';frame.style.height=h+'px';
-  const dpr=Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
+  const dpr=Math.max(.5,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
   if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch;}
   if(rotMode){                                           // the world keeps its landscape coordinates on its own canvas; render() turns it upright
     if(wcv===cv){wcv=document.createElement('canvas');wctx=wcv.getContext('2d');}
@@ -2360,9 +2374,9 @@ function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierO
   if(running&&T_>1)tierGlow(ctx);
   if(PT){if(running)FXV.edges(t);
     ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);                // world, turned so that its right is the screen's up
-    ctx.setTransform(VS,0,0,VS,0,0);ctx.drawImage(scanP,0,0,PW_,PH_);
+    ctx.setTransform(VS,0,0,VS,0,0);ctx.drawImage(scanFor(true),0,0,PW_,PH_);
     if(running)drawHUDP(t);}
-  else{ctx.drawImage(scan,0,0,W,H);
+  else{ctx.drawImage(scanFor(false),0,0,W,H);
     if(running){FXV.edges(t);drawHUD(t);PW.hud(t);}}}
 
 /* ---------- menus, settings, flow ---------- */
@@ -2457,7 +2471,7 @@ newGame();G.banner.t=0;P.x=-200;
 let last=performance.now();
 let simOn=false;
 let fpsN=0,fpsT=0;
-function loop(now){const raw=now-last;if(SET.fps===30&&raw<30&&!simOn){requestAnimationFrame(loop);return;}   // 30 FPS cap: skip every other frame
+function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){requestAnimationFrame(loop);return;}   // FPS cap: 30 skips every other frame; 60 holds a 120/144/240 Hz screen to 60-80 draws a second (the game was drawing every refresh)
   let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
   if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
   if(CAL.on)calFrame();

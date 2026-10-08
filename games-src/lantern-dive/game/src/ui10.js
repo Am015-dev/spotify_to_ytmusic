@@ -1,4 +1,4 @@
-// ===================== part 10: the ghost finger (first move, and every move of the training dive) and dragging a card onto the table =====================
+// ===================== part 10: the ghost finger (the first move) and dragging a card onto the table =====================
 let _fing = '';
 function fingerDone() {
   if (UI.fingerOn) { UI.fingerOn = false; try { lsSet('ld_finger', String((+lsGet('ld_finger') || 0) + 1)); } catch (e) { } }
@@ -6,7 +6,7 @@ function fingerDone() {
 }
 function fingerTarget() {
   if (!G || !UI.started || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || G.phase === 'over' || viewSeat() < 0 || !iMustAct()) return null;
-  const train = UI.mode === 'guided'; if (!train && !UI.fingerOn) return null;
+  if (!UI.fingerOn) return null;
   const v = viewSeat(), ph = G.phase;
   if (ph === 'assign') {
     if (!myMoves().some(m => m.t === 'take')) return null;
@@ -14,14 +14,11 @@ function fingerTarget() {
     const sel = m && m.t === 'take' ? '#pool [data-key="job' + m.i + '"]' : '#pool .jcard.glow';
     return { sel, kind: 'tap' };
   }
-  if (!train) { if (ph !== 'play') return null; }
-  if (ph === 'distress') return { sel: '#acts [data-a=dist][data-on=false]', kind: 'tap' };
-  if (ph === 'signal') return { sel: '#acts [data-a=nosig]', kind: 'tap' };
+  if (ph !== 'play') return null;
   if (ph === 'play') {
     const T = G.trick, turn = T.turn; if (ctlSeat(turn) !== v) return null;
     if (G.players[turn].helper) return { sel: '#opp .dc.can', kind: 'tap' };
-    let c = tutOnly();
-    if (c < 0) { let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { } if (m && m.t === 'play') c = m.c; }
+    let c = -1; { let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { } if (m && m.t === 'play') c = m.c; }
     if (c >= 0) return { sel: '#hand .hc[data-id="' + c + '"]', kind: 'drag' };
   }
   return null;

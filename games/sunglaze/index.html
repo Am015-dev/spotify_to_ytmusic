@@ -457,6 +457,113 @@ html body .gxc-htitle{white-space:normal;font-size:16px;line-height:1.1;display:
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
+   Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
+:root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub.on{visibility:visible}
+.gxh-bub *{box-sizing:border-box}
+.gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
+.gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
+.gxh-bub .gxh-sp svg{width:100%;height:100%}
+.gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
+.gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
+.gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
+.gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
+.gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring.round{border-radius:50%}
+.gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
+.gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+.gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gxh-bulb svg{width:24px;height:24px;display:block;fill:#ffd95a;stroke:#6b4a00;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,217,90,.7))}
+.gxh-bulb.gxh-float{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:calc(var(--gxh-z) - 2);width:44px;height:44px;border-radius:50%;border:2px solid var(--gxh-accent);background:#2a1820}
+.gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
+.gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
+.gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
+.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
+.gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
+.gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
+.gxh-rules .gxh-rx{font-weight:600;font-size:16px}
+.gxh-rules .gxh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.gxh-rules .gxh-nav button{min-height:44px;min-width:76px;padding:0 14px;border-radius:22px;border:2px solid var(--gxh-btn);background:transparent;color:var(--gxh-btn);font:800 15px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-nav button.gxh-next{background:var(--gxh-btn);color:var(--gxh-btn-ink)}
+.gxh-rules .gxh-nav button[disabled]{opacity:.3}
+.gxh-rules .gxh-dots{display:flex;gap:6px}
+.gxh-rules .gxh-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.25)}
+.gxh-rules .gxh-dots i.on{background:var(--gxh-btn)}
+.gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
+.gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.gxh-pics svg{width:64px;height:64px}
+.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
+.gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.gxh-set>span{flex:1 0 90px;font-weight:700}
+.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
+@keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
+/* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
+   Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
+:root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
+.gxt-cell{position:fixed;z-index:var(--gxt-z);background:var(--gxt-dim);touch-action:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.gxt-cell.gxt-clear{background:transparent}
+.gxt-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow,#ffe08a);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow,#ffe08a);animation:gxt-pulse 1.1s ease-in-out infinite}
+.gxt-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow,#ffe08a);opacity:.9;animation:none}
+.gxt-fin{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 3);pointer-events:none;width:0;height:0}
+.gxt-fin i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxt-fin b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
+.gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
+.gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
+.gxt-dots i.done{background:#c99a35}
+.gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
+.gxt-n{opacity:.85;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
+.gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
+.gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
+.gxt-et{font-weight:800;font-size:22px;line-height:1.15}
+.gxt-ex{font-weight:600;font-size:15px}
+.gxt-eb{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.gxt-b{min-height:48px;padding:0 16px;border-radius:24px;border:2px solid var(--gxh-btn,#7a1f31);background:transparent;color:var(--gxh-btn,#7a1f31);font:800 16px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-b.pri{background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc)}
+@keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
+@keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+/* help kit + tutorial pieces inside the board-first table */
+.bf-menu .bf-set{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;font:800 15px var(--ff);color:#3a2410;padding:2px 4px}
+.bf-menu .bf-set button{min-height:40px;padding:0 14px;justify-content:center}
+.bf-menu .bf-set button[aria-pressed=true]{background:#e0a948;box-shadow:none}
+.bf-menu .gxt-menu b{font:800 15px var(--ff)}
+.bf-bulb.gxh-bulb svg{width:26px;height:26px}
+.acts .gxt-menu{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.acts .gxt-menu span{font-weight:400;font-size:.78em;opacity:.85}
+.acts .gxt-menu{flex:1 1 100%;order:-1}
+.bf-bw{flex:none;display:inline-flex;width:44px;height:44px}
+@media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 7px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}}
 
 </style>
 </head>
@@ -549,9 +656,616 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// gx-help.js: on-demand and first-time help for any game. Coach bubbles (once per phase), a lightbulb (suggested move + rules cards), a tips switch.
+// Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
+//   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
+//   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
+// Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
+(function () {
+  'use strict';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
+  function load() {
+    var raw = null; try { raw = localStorage.getItem(key()); } catch (e) { raw = mem || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    st = { on: o && typeof o.on === 'boolean' ? o.on : cfg.defaultOn !== false, seen: (o && o.seen && typeof o.seen === 'object') ? o.seen : {} };
+  }
+  function save() { var s = JSON.stringify(st); mem = s; try { localStorage.setItem(key(), s); } catch (e) {} }
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function inter(a, b) { return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)); }
+  function infl(r, p) { return { left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p }; }
+  // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
+  var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
+  function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
+  function avoidRects(k) {
+    var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
+    var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+    }
+    return out;
+  }
+  function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
+  function place(b, tr) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
+    var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
+    var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
+    var ks = [CORE, 32];
+    for (var ki = 0; ki < ks.length && !best; ki++) {
+      var av = avoidRects(ks[ki]);
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
+        var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (hit(c, T)) continue;
+        var ov = 0; for (var k = 0; k < av.length; k++) if (hit(c, av[k])) ov += inter(c, av[k]) || 1;
+        var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
+        if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
+      }
+    }
+    var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
+    b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
+    var side = c2.bottom <= tr.top + 2 ? 'bottom' : c2.top >= tr.bottom - 2 ? 'top' : c2.right <= tr.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + side;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (side === 'top' || side === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, tr.cx - c2.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return c2;
+  }
+  function ringAt(r, cls) {
+    var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
+    if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
+    D.body.appendChild(e); return e;
+  }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function fingerAt(fr, tr) {
+    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+    f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
+    if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
+  // ------------------------------------------------------------------ the one current help element
+  function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
+  function hide() {
+    if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
+    cur = null; D.removeEventListener('pointerdown', onDown, true);
+  }
+  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
+  function onDown(e) {
+    if (rulesEl || !cur) return;
+    var t = e.target;
+    if (t && t.closest) {
+      if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
+      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+    }
+    hide();   // the tap is not swallowed: it still reaches whatever was tapped
+  }
+  function draw() {   // (re)build the visible pieces for cur at the current layout
+    if (!cur) return;
+    clearEls();
+    var tr = toRect(cur.target); if (!tr) { hide(); return; }
+    var fr = cur.from ? toRect(cur.from) : null, els = [];
+    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    else els.push(ringAt(tr, 'soft'));
+    var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
+    place(b, tr);
+  }
+  // ------------------------------------------------------------------ coach bubbles
+  function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function tryShow(id, n) {
+    pend = null;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var tr = toRect(step.target);
+    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    st.seen[id] = 1; save(); shown.push(id);
+    cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd">' + (step.pic ? '<div class="gxh-sp">' + picHTML(step.pic) + '</div>' : '') + '<div><div class="gxh-tt">' + esc(step.title) + '</div><div class="gxh-tx">' + esc(step.text) + '</div></div></div><div class="gxh-row2"><button type="button" class="gxh-ok">Got it</button></div>';
+      b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
+      return b;
+    } };
+    draw(); arm();
+  }
+  function phase(id) {
+    if (!cfg) return;
+    if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (pend) { if (pend.id === id) return; cancelPend(); }
+    if (!st.on || st.seen[id] || !cfg.steps[id]) return;
+    pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
+  }
+  // ------------------------------------------------------------------ the lightbulb
+  var BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>';
+  function bulbOpen() {
+    if (!bulbOpts || Date.now() < skipUntil) return;
+    hide(); cancelPend();
+    var s = null, ph = null;
+    try { s = bulbOpts.suggest ? bulbOpts.suggest() : null; } catch (e) { console.warn('gxh suggest', e); }
+    try { ph = bulbOpts.rulesFor ? bulbOpts.rulesFor() : null; } catch (e) {}
+    if (!s || !s.target || !toRect(s.target)) { rules(ph); return; }
+    cur = { kind: 'bulb', phase: ph, target: s.target, from: s.from, sug: s, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub gxh-bulbb'); b.setAttribute('role', 'status');
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">' + esc(s.why || '') + '</div><div class="gxh-row2"><button type="button" class="gxh-link">How does this work?</button></div>';
+      b.querySelector('.gxh-link').addEventListener('click', function () { rules(ph); });
+      return b;
+    } };
+    if (bulbEl) bulbEl.classList.add('lit');
+    draw(); arm();
+  }
+  function bulb(o) {
+    if (!cfg) return; bulbOpts = o || {};
+    var e = o && o.el; if (typeof e === 'string') e = D.querySelector(e);
+    if (!e) { e = mk('button', 'gxh-bulb gxh-float'); e.type = 'button'; D.body.appendChild(e); }
+    if (bulbEl && bulbEl !== e) bulbEl.removeEventListener('click', bulbOpen);
+    bulbEl = e; e.classList.add('gxh-bulb'); e.setAttribute('data-help', ''); if (!e.getAttribute('aria-label')) e.setAttribute('aria-label', 'Help: suggest a move');
+    if (!e.querySelector('svg')) e.insertAdjacentHTML('afterbegin', BULB);
+    e.removeEventListener('click', bulbOpen); e.addEventListener('click', bulbOpen);
+    return e;
+  }
+  // ------------------------------------------------------------------ rules cards
+  function rulesList(ph) {
+    var all = cfg.rules || [], m = function (r) { return r.phase === ph || (Array.isArray(r.phase) && r.phase.indexOf(ph) >= 0); };
+    var l = ph != null ? all.filter(m) : []; if (!l.length) l = all.filter(function (r) { return r.phase == null; }); if (!l.length) l = all.slice();
+    return l;
+  }
+  function closeRules() { if (rulesEl) { if (rulesEl.parentNode) rulesEl.parentNode.removeChild(rulesEl); rulesEl = null; D.removeEventListener('keydown', onKey, true); } }
+  function onKey(e) { if (!rulesEl) return; if (e.key === 'Escape') closeRules(); else if (e.key === 'ArrowRight') rulesEl._go(1); else if (e.key === 'ArrowLeft') rulesEl._go(-1); }
+  function rules(ph) {
+    if (!cfg) return; var list = rulesList(ph); hide(); cancelPend(); closeRules(); if (!list.length) return;
+    var R = rulesEl = mk('div', 'gxh-rules'); R.setAttribute('role', 'dialog'); R.setAttribute('aria-modal', 'true'); R.setAttribute('aria-label', 'How this works');
+    R.innerHTML = '<div class="gxh-card" data-help><button type="button" class="gxh-x" aria-label="Close">×</button><div class="gxh-pic"></div><div class="gxh-rt"></div><div class="gxh-rx"></div><div class="gxh-nav"><button type="button" class="gxh-prev">Back</button><span class="gxh-dots"></span><button type="button" class="gxh-next">Next</button></div></div>';
+    var i = 0, q = function (s) { return R.querySelector(s); };
+    function show() {
+      var c = list[i]; q('.gxh-pic').innerHTML = picHTML(c.pic); q('.gxh-rt').textContent = c.title || ''; q('.gxh-rx').textContent = c.text || '';
+      q('.gxh-dots').innerHTML = list.length > 1 ? list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') : '';
+      q('.gxh-prev').disabled = i === 0; q('.gxh-prev').style.visibility = list.length > 1 ? 'visible' : 'hidden'; q('.gxh-next').textContent = i === list.length - 1 ? 'Done' : 'Next';
+      R.dataset.card = i; R.dataset.count = list.length;
+    }
+    R._go = function (d) { var n = i + d; if (n >= list.length) { closeRules(); return; } if (n < 0) return; i = n; show(); };
+    q('.gxh-x').addEventListener('click', closeRules); q('.gxh-prev').addEventListener('click', function () { R._go(-1); }); q('.gxh-next').addEventListener('click', function () { R._go(1); });
+    R.addEventListener('click', function (e) { if (e.target === R) closeRules(); });
+    var x0 = null; R.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    R.addEventListener('touchend', function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 45) R._go(dx < 0 ? 1 : -1); }, { passive: true });
+    D.addEventListener('keydown', onKey, true);
+    show(); D.body.appendChild(R);
+  }
+  // ------------------------------------------------------------------ settings: Tips on/off + Reset tips
+  function settingsHTML(o) {
+    o = o || {}; var rc = o.rowClass || 'gxh-set', sc = o.segClass || '', bc = o.btnClass || '';
+    var b = function (a, v, label, pr) { return '<button type="button" class="' + bc + '" data-gxh="' + a + '"' + (v != null ? ' data-v="' + v + '"' : '') + (pr != null ? ' aria-pressed="' + pr + '"' : '') + '>' + label + '</button>'; };
+    return '<div class="' + rc + ' gxh-set" data-help><span>Tips</span><span class="' + sc + '" style="display:inline-flex;gap:6px;flex:0 0 auto">' + b('tips', 1, 'On', st.on) + b('tips', 0, 'Off', !st.on) + '</span></div>' +
+      '<div class="' + rc + ' gxh-set" data-help><span>Show tips again</span>' + b('reset', null, 'Reset tips') + '</div>';
+  }
+  function settingsRow(o) { var d = D.createElement('div'); d.setAttribute('data-help', ''); d.innerHTML = settingsHTML(o); return d; }
+  function syncSettings() {
+    var l = D.querySelectorAll('[data-gxh=tips]');
+    for (var i = 0; i < l.length; i++) l[i].setAttribute('aria-pressed', String((l[i].dataset.v === '1') === st.on));
+  }
+  function onClick(e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-gxh]'); if (!t || !cfg) return;
+    if (t.dataset.gxh === 'tips') setEnabled(t.dataset.v === '1');
+    else if (t.dataset.gxh === 'reset') { reset(); var o = t.textContent; t.textContent = 'Done'; setTimeout(function () { t.textContent = o; }, 1400); }
+  }
+  function setEnabled(v) { if (!cfg) return; st.on = !!v; save(); if (!st.on) { cancelPend(); if (cur && cur.kind === 'coach') hide(); } syncSettings(); }
+  function reset() { if (!cfg) return; st.seen = {}; shown.length = 0; save(); }
+  // ------------------------------------------------------------------ relayout
+  function relayout() { if (!cfg || !cur || rulesEl) return; draw(); }
+  function init(o) {
+    cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
+    if (wired) return GXH; wired = true;
+    D.addEventListener('click', onClick, true);
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    return GXH;
+  }
+  var GXH = window.GXH = {
+    version: 1, init: init, phase: phase, bulb: bulb, rules: rules, hide: hide, relayout: relayout, setEnabled: setEnabled, reset: reset,
+    enabled: function () { return !!st.on; }, seen: function (id) { return !!st.seen[id]; }, settingsHTML: settingsHTML, settingsRow: settingsRow,
+    state: function () { return { on: st.on, seen: Object.keys(st.seen), shown: shown.slice(), cur: cur ? { kind: cur.kind, id: cur.id || null, phase: cur.phase } : null, rules: !!rulesEl, pending: pend ? pend.id : null }; }
+  };
+})();
+
+</script>
+<script>
+// gx-tutor.js: a staged tutorial game for any game (spotlight, one bubble per step, only the target accepts input, steps advance only on the
+// right action). Needs gx-tutor.css and gx-help.css (bubble styles). Uses GXV.watch (gx-viewport.js) for relayout when it is loaded. See GX-KIT.md section 10.
+//   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
+//              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
+//              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
+//   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
+//   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
+//   GXT.status(game) GXT.menuHTML({game, first, cls, launch}) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
+// Everything the kit draws carries data-help. Progress is remembered per game in localStorage 'gxt-<game>' {done, open, step}.
+(function () {
+  'use strict';
+  var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
+  var DIM = 'rgba(8,4,10,.62)';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
+  // ------------------------------------------------------------------ remembered progress
+  function key(g) { return 'gxt-' + g; }
+  function load(g) {
+    var raw = null; try { raw = localStorage.getItem(key(g)); } catch (e) { raw = mem[g] || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    return o && typeof o === 'object' ? o : null;
+  }
+  function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
+  // ------------------------------------------------------------------ geometry
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function holesOf(st) {
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var out = [p], al = null;
+    try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
+    if (al && !Array.isArray(al)) al = [al];
+    (al || []).forEach(function (a) { var r = toRect(a); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out;
+  }
+  function inflate(r, p, v) {
+    var l = Math.max(0, r.left - p), t = Math.max(0, r.top - p), rr = Math.min(v.w, r.right + p), b = Math.min(v.h, r.bottom + p);
+    return norm({ left: l, top: t, width: Math.max(1, rr - l), height: Math.max(1, b - t) });
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function moved(hs, key) {
+    if (!key) return true; var a = key.split('|'); if (a.length !== hs.length) return true;
+    for (var i = 0; i < hs.length; i++) { var q = a[i].split(',').map(Number), r = hs[i]; if (Math.abs(q[0] - r.left) > 3 || Math.abs(q[1] - r.top) > 3 || Math.abs(q[2] - r.width) > 4 || Math.abs(q[3] - r.height) > 4) return true; }
+    return false;
+  }
+  function rkey(hs) { return hs.map(function (r) { return Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.width) + ',' + Math.round(r.height); }).join('|'); }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  // ------------------------------------------------------------------ drawing
+  function clearVisuals() {
+    if (!S) return;
+    (S.vis || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); S.vis = []; S.bub = null; S.holes = null; S.cells = []; S.pill = null;
+  }
+  function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
+  function cell(l, t, w, h, clear) {
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    return c;
+  }
+  function swallow(e) { e.preventDefault(); e.stopPropagation(); }
+  function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
+  // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
+  function drawCells(hs, shield) {
+    var v = vp(), xs = [0, v.w], ys = [0, v.h];
+    hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
+    xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    ys = ys.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
+      var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
+      for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+    }
+    if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
+  }
+  function ring(r, cls) {
+    var e = mk('div', 'gxt-ring' + (cls ? ' ' + cls : ''));
+    e.style.cssText = 'left:' + Math.round(r.left) + 'px;top:' + Math.round(r.top) + 'px;width:' + Math.round(r.width) + 'px;height:' + Math.round(r.height) + 'px';
+    return add(e);
+  }
+  function finger(fr, tr) {
+    var f = mk('div', 'gxt-fin', '<i></i><b></b>'); add(f); f.setAttribute('aria-hidden', 'true');
+    f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy); if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function stepText(st, k) { var v = st[k]; try { if (typeof v === 'function') v = v(); } catch (e) { v = ''; } return v == null ? '' : String(v); }
+  function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
+  function topLimit() { return stripH() + 4; }
+  // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
+  function place(b, hs, side) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
+    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
+    function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
+    var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
+    var below = { left: x, top: hull.bottom + 12, right: x + w, bottom: hull.bottom + 12 + h }, above = { left: x, top: hull.top - 12 - h, right: x + w, bottom: hull.top - 12 };
+    var room = { below: bot - hull.bottom, above: hull.top - top }, order = side === 'top' ? ['above', 'below'] : side === 'bottom' ? ['below', 'above'] : (room.below >= room.above ? ['below', 'above'] : ['above', 'below']);
+    var best = null; order.forEach(function (n) { var c = n === 'below' ? below : above; if (!best && ok(c)) best = c; });
+    if (!best) {   // scan the whole screen for the free spot nearest the primary hole (any x, so a bubble can sit beside a big target)
+      var bs = 1e9, xs = [x, pad, Math.max(pad, v.w - w - pad)];
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 4) {
+        var c2 = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (!ok(c2)) continue; var d = Math.abs(c2.left + w / 2 - P.cx) * 0.5 + Math.abs(y + h / 2 - P.cy); if (d < bs) { bs = d; best = c2; }
+      }
+    }
+    if (!best) { var useBelow = room.below >= room.above; var yy = useBelow ? Math.min(bot - h, hull.bottom + 12) : Math.max(top, hull.top - 12 - h); best = { left: x, top: yy, right: x + w, bottom: yy + h }; }
+    b.style.left = Math.round(best.left) + 'px'; b.style.top = Math.round(best.top) + 'px';
+    var sd = best.bottom <= P.top + 2 ? 'bottom' : best.top >= P.bottom - 2 ? 'top' : best.right <= P.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + sd;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (sd === 'top' || sd === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, P.cx - best.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, P.cy - best.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return best;
+  }
+  function dots() {
+    var n = cfg.steps.length, h = '';
+    for (var i = 0; i < n; i++) h += '<i' + (i < S.i ? ' class="done"' : i === S.i ? ' class="on"' : '') + '></i>';
+    return '<span class="gxt-dots" role="img" aria-label="Step ' + (S.i + 1) + ' of ' + n + '">' + h + '</span><span class="gxt-n">' + (S.i + 1) + '/' + n + '</span>';
+  }
+  function topStrip() {
+    var t = mk('div', 'gxt-top', '<span class="gxt-prog">' + dots() + '</span><button type="button" class="gxt-skip" data-gxt-skip>Skip tutorial</button>');
+    t.style.height = stripH() + 'px'; t.querySelector('.gxt-skip').addEventListener('click', function (e) { e.stopPropagation(); skip(); });
+    return t;
+  }
+  // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
+  function draw() {   // (re)build the visible pieces for the current step at the current layout
+    var st = S.step, hs = holesOf(st); clearVisuals();
+    var v = vp();
+    if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
+    var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
+    S.holes = H; S.key = rkey(hs);
+    var nextStep = !st.wait;
+    drawCells(H, nextStep);
+    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    add(topStrip());
+    if (st.wait && st.wait.type !== 'event') {
+      var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
+    }
+    var say = stepText(st, 'say'), title = stepText(st, 'title');
+    var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
+    b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
+      (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
+    add(b); S.bub = b; S.say = say;
+    var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+    place(b, H, st.side);
+    return true;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
+    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  }
+  function enter(i) {
+    var st = cfg.steps[i]; if (!st) { finish(); return; }
+    S.i = i; S.step = st; S.count = 0; S.phase = 'pend'; S.key = ''; S.stable = 0; S.stable_k = ''; S.since = Date.now(); S.shown = false; S.misses = 0;
+    mark(cfg.game, { open: 1, step: i });
+    clearVisuals(); drawWaiting();
+    try { if (st.onEnter) st.onEnter(); } catch (e) { console.warn('gxt onEnter', e); }
+    if (st.ai) { try { var r = st.ai(); if (r && r.then) { S.aiBusy = true; r.then(function () { S.aiBusy = false; }, function () { S.aiBusy = false; }); } } catch (e) { console.warn('gxt ai', e); } }
+  }
+  function tick() {
+    if (!S || S.phase === 'gap' || S.phase === 'end') return;
+    var st = S.step; if (!st) return;
+    if (S.phase === 'pend') {
+      var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
+      var hs = rdy ? holesOf(st) : null;
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
+      if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
+      return;
+    }
+    if (S.phase === 'show') {
+      var hs2 = holesOf(st);
+      if (!hs2) { if (++S.misses >= 3) { S.misses = 0; S.phase = 'pend'; S.stable = 0; S.stable_k = ''; clearVisuals(); drawWaiting(); } return; }
+      S.misses = 0;
+      if (moved(hs2, S.key)) draw();
+    }
+  }
+  function advance() {
+    var st = S.step; S.phase = 'gap'; clearVisuals(); drawWaiting();
+    setTimeout(function () { if (!S || S.step !== st) return; try { if (st.onDone) st.onDone(); } catch (e) {} if (S.i + 1 >= cfg.steps.length) finish(); else enter(S.i + 1); }, 0);
+  }
+  function next() {
+    if (!S || S.phase !== 'show' || S.step.wait) return;
+    try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
+    advance();
+  }
+  var wrongT = 0;
+  function wrong() {
+    if (!S || S.phase !== 'show' || !S.bub) return;
+    var b = S.bub, st = S.step, tx = b.querySelector('.gxh-tx'); if (!tx) return;
+    b.classList.remove('gxt-shake'); void b.offsetWidth; b.classList.add('gxt-shake');
+    tx.textContent = st.wrong || (st.wait ? 'Tap the glowing one.' : 'Tap Next.');
+    clearTimeout(wrongT); wrongT = setTimeout(function () { if (S && S.bub === b && tx) { tx.textContent = S.say; b.classList.remove('gxt-shake'); } }, 1700);
+    S.wrongs = (S.wrongs || 0) + 1;
+  }
+  // the games call this from their input handlers; the return value says whether to go on with the action
+  function act(a) {
+    if (!S || S.phase === 'end') return true;
+    a = a || {};
+    if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    var st = S.step, w = st.wait;
+    if (a.type === 'event') {
+      if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
+      return true;
+    }
+    if (!w || w.type === 'event') { wrong(); return false; }
+    var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
+    if (!okm) { wrong(); return false; }
+    S.count++;
+    if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
+    return true;
+  }
+  // ------------------------------------------------------------------ end card, skip, stop
+  function teardown() {
+    if (S) { clearVisuals(); clearInterval(S.timer); }
+    S = null; closeDlg();
+  }
+  function finish() {
+    mark(cfg.game, { done: 1, open: 0, step: 0 });
+    clearVisuals(); S.phase = 'end';
+    var v = vp(); add(cell(0, 0, v.w, v.h, false));
+    var story = cfg.story !== false;
+    var c = mk('div', 'gxt-end'); c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', 'Tutorial finished');
+    c.innerHTML = '<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">' + esc(cfg.endTitle || 'You know the rules') + '</div><div class="gxt-ex">' + esc(cfg.endText || 'You can start a real game now.') + '</div>' +
+      '<div class="gxt-eb">' + (cfg.endButtons ? cfg.endButtons.map(function (b, i) { return '<button type="button" class="gxt-b' + (i ? '' : ' pri') + '" data-gxt-end="' + esc(b.id) + '">' + esc(b.label) + '</button>'; }).join('') : '<button type="button" class="gxt-b pri" data-gxt-end="play">Play a real game</button>' + (story ? '<button type="button" class="gxt-b" data-gxt-end="story">Story mode</button>' : '')) + '</div></div>';
+    add(c);
+    c.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-end]'); if (!b) return;
+      var choice = b.dataset.gxtEnd, done = cfg.onDone; teardown();
+      try { if (done) done({ choice: choice }); } catch (err) { console.warn('gxt onDone', err); }
+    });
+  }
+  function skip() {
+    if (!S) return; var g = cfg.game, ex = cfg.onExit;
+    mark(g, { open: 0, step: 0 }); teardown();
+    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+  }
+  function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
+  // ------------------------------------------------------------------ start
+  function lint(steps) {
+    var bad = [];
+    (steps || []).forEach(function (s, i) {
+      var tag = 'step ' + i + ' (' + (s.id || '?') + ')';
+      if (!s.id) bad.push(tag + ': no id');
+      if (typeof s.say === 'string' && words(s.say) > 20) bad.push(tag + ': say over 20 words (' + words(s.say) + ')');
+      if (typeof s.title === 'string' && words(s.title) > 4) bad.push(tag + ': title over 4 words');
+      if (typeof s.target !== 'function' && !(s.target && typeof s.target === 'object')) bad.push(tag + ': no target');
+      if (s.wait && s.wait.type !== 'event' && s.wait.type !== 'tap' && s.wait.type !== 'drag') bad.push(tag + ': wait.type must be tap, drag or event');
+    });
+    return bad;
+  }
+  function start(c) {
+    if (S) teardown();
+    cfg = c; cfg.steps = cfg.steps || []; wire();
+    var bad = lint(cfg.steps); if (bad.length) console.warn('gxt lint: ' + bad.join('; '));
+    mark(cfg.game, { open: 1, step: 0 });
+    S = { i: 0, step: null, phase: 'pend', vis: [], cells: [], timer: 0 };
+    try { if (cfg.setup) cfg.setup(); } catch (e) { console.error('gxt setup', e); }
+    S.timer = setInterval(tick, 100);
+    enter(0);
+    return GXT;
+  }
+  function relayout() { if (S && S.phase === 'show') draw(); else if (S && S.phase === 'end') { var e = S.vis[S.vis.length - 1]; if (e) { var v = vp(), c0 = S.vis[0]; if (c0) c0.style.cssText = 'left:0;top:0;width:' + v.w + 'px;height:' + v.h + 'px'; } } else if (S && (S.phase === 'pend' || S.phase === 'gap')) { clearVisuals(); drawWaiting(); } }
+  function wire() {
+    if (wired) return; wired = true;
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    D.addEventListener('click', onMenuClick, true);
+  }
+  // ------------------------------------------------------------------ menu helper: "New here? Learn in 5 minutes" / "Tutorial" / "Tutorial ✓"
+  function label(g, first) {
+    var s = status(g);
+    if (s.done) return 'Tutorial ✓';
+    if (first && !s.open) return 'New here? Learn in 5 minutes';
+    return s.open ? 'Tutorial (continue?)' : 'Tutorial';
+  }
+  function menuHTML(o) {
+    o = o || {}; var g = o.game; if (o.launch) launchers[g] = o.launch; wire();
+    var s = status(g), first = !!o.first && !s.done && !s.open, cls = (o.cls || '') + ' gxt-menu' + (first ? ' gxt-first' : '') + (s.done ? ' gxt-ok' : '');
+    var sub = o.sub === false ? '' : '<span>' + esc(s.done ? 'Done. Tap to play it again.' : first ? 'Short, one tap at a time, no reading' : s.open ? 'Restart or exit' : 'Learn by doing, step by step') + '</span>';
+    return '<button type="button" class="' + cls.trim() + '" data-gxt-open="' + esc(g) + '" data-help><b>' + esc(label(g, first)) + '</b>' + sub + '</button>';
+  }
+  function onMenuClick(e) {
+    var b = e.target && e.target.closest && e.target.closest('[data-gxt-open]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var g = b.dataset.gxtOpen, fn = launchers[g]; if (!fn) return;
+    if (status(g).open && !S) openDlg(g, fn); else fn();
+  }
+  function closeDlg() { if (dlg) { if (dlg.parentNode) dlg.parentNode.removeChild(dlg); dlg = null; } }
+  function openDlg(g, fn) {
+    closeDlg();
+    dlg = mk('div', 'gxt-end'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-label', 'Tutorial in progress');
+    dlg.innerHTML = '<div class="gxt-endc"><div class="gxt-et">You left the tutorial half way</div><div class="gxt-ex">Start it again from the first step, or leave it.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-gxt-dlg="restart">Restart tutorial</button><button type="button" class="gxt-b" data-gxt-dlg="exit">Exit</button></div></div>';
+    D.body.appendChild(dlg);
+    dlg.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-dlg]'); if (!b) return;
+      closeDlg(); if (b.dataset.gxtDlg === 'restart') fn(); else { mark(g, { open: 0, step: 0 }); var l = D.querySelectorAll('[data-gxt-open="' + g + '"]'); for (var i = 0; i < l.length; i++) { var bb = l[i].querySelector('b'); if (bb) bb.textContent = label(g, false); } }
+    });
+  }
+  function state() {
+    if (!S) return { active: false };
+    var st = S.step || {}, hs = S.holes && S.holes[0], b = S.bub && S.bub.getBoundingClientRect();
+    return { active: true, phase: S.phase, i: S.i, n: cfg.steps.length, id: st.id, shown: S.phase === 'show' && !!S.bub, wait: st.wait ? st.wait.type : null, times: st.wait && st.wait.times || 1, count: S.count,
+      say: S.say || '', title: stepText(st, 'title'), hole: hs ? { left: hs.left, top: hs.top, width: hs.width, height: hs.height, cx: hs.cx, cy: hs.cy } : null,
+      holes: (S.holes || []).map(function (r) { return { left: r.left, top: r.top, width: r.width, height: r.height, cx: r.cx, cy: r.cy }; }),
+      bubble: b ? { left: b.left, top: b.top, right: b.right, bottom: b.bottom } : null, wrongs: S.wrongs || 0, shownAt: S.shownAt || 0 };
+  }
+  var GXT = window.GXT = {
+    version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
+    index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
+    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
 //   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
@@ -714,6 +1428,7 @@ const GX={key:'gx',open:null,
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
     var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
     var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
     map.appendChild(path); s.appendChild(map);
@@ -2960,7 +3675,7 @@ UI.sel=null;UI.tgt=null;UI.adv=null;UI.recap=[];UI.fxSeen=0;UI.hover=null;UI.las
 try{UI.coach=localStorage.getItem('sgz_coach')!=='0'}catch(e){UI.coach=true}
 const CHAPTERS=['The king’s first commission: the north wall','Morning light on the fountain court','The king inspects the east wall','Dust and glaze in the south arcade','The west wall catches the sunset','The whole court gathers to watch','Lanterns over the throne-room gallery','One last wall before the feast'];
 const chapter=r=>`Round ${r}: ${CHAPTERS[Math.min(r,CHAPTERS.length)-1]}`;
-function refresh(){if(G&&!NET.on){try{if(!G.over&&G.pl.some(p=>p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(G&&!NET.on&&!UI.tut){try{if(!G.over&&G.pl.some(p=>p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}const h=me();if(h&&UI.lastHuman!==h.i){UI.lastHuman=h.i;if(V3.on)relayout()}
   playFx();computeHL();render();try{sync3D();camFocus()}catch(e){console.error(e)}schedule();netAfter()}
 const me=()=>{if(!G||G.over)return null;const s=sideToAct();if(NET.on&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
@@ -3082,7 +3797,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <h3>Variants</h3><div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
-   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'+(typeof campOpen==='function'&&window.CAMPAIGN?'<button class="btn go bigb story-btn" data-ui="story-map">★ Story</button>':'')}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':(typeof tutBtn==='function'?tutBtn('btn bigb'):'')+'<button class="btn go bigb" data-ui="start">Begin ▶</button>'+(typeof campOpen==='function'&&window.CAMPAIGN?'<button class="btn go bigb story-btn" data-ui="story-map">★ Story</button>':'')}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
 function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,40+i*38,152,32));const arch=(x)=>`<path d="M${x} 300V210a55 55 0 0 1 110 0V300Z" fill="#5a3a2a" opacity=".85"/><path d="M${x+8} 300V212a47 47 0 0 1 94 0V300Z" fill="url(#shade)"/>`;
   return `<svg viewBox="0 0 600 330" role="img" aria-label="A palace courtyard at sunrise with tiled arches"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c77c"/><stop offset="1" stop-color="#fde9c4"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f6e"/><stop offset="1" stop-color="#6e4b3a"/></linearGradient></defs>
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
@@ -3148,7 +3863,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'coach':setCoach(!UI.coach);if(G)render();return;case 'gfx':gfxCycle();return}});
 function gfxBtn(){const b=$('#gfxbtn');if(!b)return;const h=IC('gfx')+'<span>'+(typeof gfxLabel==='function'?gfxLabel():'Graphics')+'</span>';if(b.dataset.h!==h){b.innerHTML=h;b.dataset.h=h}b.title='Graphics quality: '+(typeof gfxLabel==='function'?gfxLabel():'')+' (Auto picks by device and steps down if frames stutter)'}
 function setCoach(v){UI.coach=!!v;try{localStorage.setItem('sgz_coach',v?'1':'0')}catch(e){}const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach)}
-function uiAct(a){switch(a){case 'start':beginGame();return;case 'story-map':campOpen();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
+function uiAct(a){switch(a){case 'start':if(typeof tutOffer==='function'&&tutOffer())return;beginGame();return;case 'story-map':if(typeof storyOpen==='function')storyOpen();else campOpen();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
   case 'unsel':UI.sel=null;UI.tgt=null;UI.adv=null;upd();return;case 'prism':if(UI.sel){UI.sel={src:UI.sel.src,c:UI.sel.c,j:UI.sel.j?0:1};const ms=movesFor(UI.sel);if(!ms.some(m=>m.line===UI.tgt))UI.tgt=null;upd()}return;
   case 'advise':advise();return;case 'noadv':UI.adv=null;upd();return}}
 document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.key==='Escape'&&UI.sel){UI.sel=null;UI.tgt=null;upd()}else if(e.key==='Enter'&&UI.sel&&UI.tgt!=null){const m=movesFor(UI.sel).find(m=>m.line===UI.tgt);if(m){e.preventDefault();go(m)}}});
@@ -3158,8 +3873,8 @@ function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?2.6:1.4;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!NET.on)||phHold()||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||UI.tut||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?2.6:1.4;
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||UI.tut||(UI.modal&&!NET.on)||phHold()||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
 function boot(){$('#defs').innerHTML=glazeDefs();GX.init({key:'sgz'});GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};
   try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);netInit();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
@@ -3174,7 +3889,7 @@ const PH_DOTS='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx
 // size of the layout viewport, measured from a fixed full-screen probe: iOS Safari fires resize/orientationchange while innerWidth/innerHeight still hold the OLD size
 function vpDims(){try{let p=document.getElementById('vpprobe');if(!p){p=document.createElement('div');p.id='vpprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;visibility:hidden;pointer-events:none';document.body.appendChild(p)}
   const w=p.offsetWidth,h=p.offsetHeight;if(w>0&&h>0)return {w,h}}catch(e){}return {w:innerWidth,h:innerHeight}}
-function phDetect(){try{const q=new URLSearchParams(location.search);if(q.has('phone'))return q.get('phone')!=='0'}catch(e){}
+function phDetect(){if(window.__tutPh)return true;try{const q=new URLSearchParams(location.search);if(q.has('phone'))return q.get('phone')!=='0'}catch(e){}
   const V=vpDims(),s=Math.min(V.w,V.h);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const q=new URLSearchParams(location.search);if(q.has('safe')){const a=q.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
@@ -3587,9 +4302,11 @@ function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;const d=document.createEl
 const BF_TIPS={nofit:'Red ✗ colours fit no row.',slide:'Leftovers slid to the middle.',tiling:'Full rows slide onto the wall!',chain:'Touching tiles score more!',
   floor:'Extra tiles break: minus points.',sun:'☀ costs 1, but you start next.',bonus:'Full column +7 at the end!',
   end:'A full wall row ends the game.',keep:'Unfinished rows wait for next round.'};
-function bfTip(k,force){if((!UI.coach&&!force)||BF.seen['tip_'+k])return;BF.seen['tip_'+k]=1;BF.tip=BF_TIPS[k];bfHintSet();
+function bfTipSeen(k){try{return (localStorage.getItem('sgz_tips')||'').split(',').includes(k)}catch(e){return false}}
+function bfTipMark(k){try{const a=(localStorage.getItem('sgz_tips')||'').split(',').filter(Boolean);if(!a.includes(k)){a.push(k);localStorage.setItem('sgz_tips',a.join(','))}}catch(e){}}
+function bfTip(k,force){if(UI.tut)return;if(!force&&(!UI.coach||(typeof GXH!=='undefined'&&!GXH.enabled())||bfTipSeen(k)))return;if(BF.seen['tip_'+k])return;BF.seen['tip_'+k]=1;if(!force)bfTipMark(k);BF.tip=BF_TIPS[k];bfHintSet();
   clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},4200)}
-function bfHintSet(){if(!BF.hint||!BF.disp||!G)return;BF.hint.innerHTML=bfHintHTML(BF.disp,BF.busy?null:me())}
+function bfHintSet(){if(!BF.hint||!BF.disp||!G)return;BF.hint.innerHTML=bfHintHTML(BF.disp,BF.busy?null:me());if(typeof hlpAfter==='function')hlpAfter()}
 // ---------- the engine's events go into a queue; each is played on the board in turn ----------
 function bfSync(){if(!G)return false;const gk=G.seed+':'+(G.gid||'');if(gk!==BF.gk){BF.gk=gk;BF.q.length=0;BF.disp=bfClone(G);BF.seen={};BF.resHide=false;BF.menu=false;BF.peek=null;BF.lastWarn=0;BF.adv=null;BF.advK='';BF.fingerOn=false;BF.deal=true;return true}return false}
 function bfFx(f){if(!G)return;bfSync();const x=f.x;let e=null;
@@ -3602,13 +4319,13 @@ async function bfRun(){if(BF.busy)return;BF.busy=true;const gk=BF.gk;clearTimeou
   finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
 async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
-  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);return}
+  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
   if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length))await bfFloors();
     S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
     bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
-  if(e.t==='win'){await bfFloors();await bfBonus();sfx('win');return}}
+  if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
 async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!a)throw Error('take: no source');
   const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
@@ -3663,6 +4380,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
     const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
   bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
   await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
+  if(UI.tut)await tutPause('wall'+x.r);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
   const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
@@ -3699,7 +4417,7 @@ function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.
   const ax=Math.max(10,W/2-ks/2-6),ay=Math.max(10,H/2-ks/2-6);const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
   return {ks,K,cx,cy,pw:Math.max(70,2*(ax-ks*.6)),ph:Math.max(54,2*(ay-ks*.6))}}
 function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R.ks*.33;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
-  const am=can&&UI.coach&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
+  const am=can&&UI.coach&&UI.cmp&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
   const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
@@ -3714,7 +4432,7 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   return h}
 function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
   if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
-  let rec=-1;if(sel&&UI.coach){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&(!!a.j)===(!!sel.j)&&ms.some(m=>m.line===a.line))rec=a.line}}catch(e){}}
+  let rec=-1;if(sel&&UI.coach&&UI.cmp){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&(!!a.j)===(!!sel.j)&&ms.some(m=>m.line===a.line))rec=a.line}}catch(e){}}
   const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
@@ -3745,18 +4463,18 @@ function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
   else if(G.over)say=bfWinLine();
   else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
   else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing row';
-    const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
+    const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-gxh-avoid data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
   else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
   else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
   if(BF.tip){say=BF.tip;chip='';tg=''}
-  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over?`<button class="bf-ib bf-bulb" data-bf="hint" aria-label="Show me a good move">${IC('bulb')}</button>`:''}${live&&G.over&&BF.resHide?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
+  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-gxh-avoid data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over&&!UI.tut?`<span class="bf-bw" data-gxh-avoid><button class="bf-ib bf-bulb gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?"></button></span>`:''}${live&&G.over&&BF.resHide&&!UI.tut?`<button class="bf-b" data-gxh-avoid data-bf="res">Result</button>`:''}`}
 function bfOvHTML(){if(!G)return '';
   if(BF.boss&&UI.cmp&&UI.cmp.twist)return `<div class="bf-card bf-bosscard" role="dialog" aria-label="Rule"><b>${esc(UI.cmp.twist.text||'')}</b><button class="bf-go" data-bf="close">Got it</button></div>`;
   if(BF.busy)return '';
   if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
-    return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${b('guide','Guide: '+(UI.coach?'on':'off'),'data-a="coach"')}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}</div>`}
+    return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${typeof tutBtn==='function'?tutBtn('bf-mi',false):''}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'bf-set',btnClass:'bf-mi'}):''}</div>`}
   if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?'<em>☀</em>':''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
-  if(G.over&&!BF.resHide){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
+  if(G.over&&!BF.resHide&&!UI.tut){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
     return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
       <div class="bf-rk"><span>tiles</span><span>broken</span><span>bonus</span></div>
       ${L.map(r=>{const p=P(r.p),s=r.s;const bon=s.rows+s.cols+s.colours;return `<div class="bf-rr" style="--pc:${PCOL[r.p]}"><i></i><b>${isYou(r.p)?'You':esc(p.nm)}</b><span class="g">+${s.place}</span><span class="r">${s.floor?String(s.floor).replace('-','−'):'0'}</span><span class="g">${bon?'+'+bon:''}</span><b class="t">★${s.total}</b></div>`}).join('')}
@@ -3767,7 +4485,7 @@ function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.
   BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);
   BF.me.style.setProperty('--pc',PCOL[fp.i]);BF.me.classList.toggle('turn',!!hp);
   const ov=bfOvHTML();BF.ov.innerHTML=ov;BF.ov.hidden=!ov;
-  if(live)bfGuide(hp)}
+  if(live)bfGuide(hp);if(typeof hlpAfter==='function')hlpAfter()}
 // ---------- the ghost finger: first move of the guided game, the bulb, or after a long pause ----------
 function bfAdvice(hp){const k=G.logN+':'+G.phase+':'+hp.i;if(BF.advK===k)return BF.adv;BF.advK=k;BF.adv=null;if(isClient())return null;try{const a=adviceFor(hp.i);BF.adv=a?a.m:null}catch(e){}return BF.adv}
 function bfFingerTarget(hp){const m=bfAdvice(hp);
@@ -3778,14 +4496,14 @@ function bfFingerTarget(hp){const m=bfAdvice(hp);
 function bfFinger(el){const f=bfQ('.bf-fing');if(!f)return;const r=bfR(el);if(!r){f.hidden=true;return}f.hidden=false;const s=Math.max(.8,Math.min(1.2,BF.cs/34));
   f.style.width=48*s+'px';f.style.height=56*s+'px';f.style.left=(r.left+r.width/2-18*s)+'px';f.style.top=(r.top+r.height/2-4*s)+'px'}
 function bfGuide(hp){clearTimeout(BF.idleT);
-  const guided=UI.coach&&!BF.seen.took&&hp&&G.phase==='offer'&&!G.over;
+  const guided=UI.coach&&!BF.seen.took&&hp&&G.phase==='offer'&&!G.over&&!UI.tut&&(typeof GXH==='undefined'||!GXH.enabled());
   if(hp&&!G.over&&(guided||BF.fingerOn))bfFinger(bfFingerTarget(hp));else bfFinger(null);
   if(hp&&!G.over&&!BF.fingerOn&&!guided)BF.idleT=setTimeout(()=>{if(!BF.busy&&me()){BF.fingerOn=true;bfDraw()}},UI.coach?9000:16000);
-  if(hp&&G.phase==='offer'&&!G.over){try{if(phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
+  if(hp&&G.phase==='offer'&&!G.over){try{if(!UI.tut&&phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
     if(G.markerIn==='ctr'&&G.ctr.length&&BF.seen.took)bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
 // ---------- input: everything is a tap on the thing itself ----------
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
-function bfClick(e){const t=e.target;const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
+function bfClick(e){const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();return}
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
@@ -3880,7 +4598,7 @@ function campWatch(){if(!UI.cmp||!G)return;if(!G.over){CMP_OVER=0;return}
   clearInterval(CMP_FIN);const g=G;UI.cmp=null;campLvlReset();try{if(typeof BF!=='undefined')BF.resHide=true;if(BF.on)bfDraw()}catch(e){}
   if(GXC.active())GXC.finish(g)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'sunglaze',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'sunglaze',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit(){openStart()},scores:g=>g.pl.map(p=>p.score),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
 function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
 // a normal game (Begin) leaves story mode and restores the player's own guide setting
@@ -3888,6 +4606,213 @@ function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('
 function campLine(){try{const p=GXC.progress();const ch=window.CAMPAIGN.chapters;const n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;
   if(!n)return '';const nx=ch.find(c=>!(p.ch[c.id]&&p.ch[c.id].beaten));return `<p class="cmp-line"><b>Story: ${n} of ${ch.length} chapters done${nx?`, next: “${esc(nx.title)}”`:''}.</b></p>`}catch(e){return ''}}
 campInit();
+
+</script>
+<script>
+// ===================== part 10: help (shell/gx-help.js): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase (pick a colour / choose a row / choose a wall space), short, pointing at the board. The bulb: the game's own advice function
+// (adviceFor -> bestNetTake / bestWallCell, through bfAdvice) as a ghost finger plus a short why, and rules cards. No safe advice -> rules cards only.
+// Help lives on the board-first table (phone layout, also used by the tutorial on any screen); the old 3D desktop dock keeps its guide panel.
+const hT=(c,x,y,s)=>`<use href="#gz${c}" x="${x}" y="${y}" width="${s}" height="${s}"/>`;   // no nested <svg>: the kit's css sizes every svg inside a picture
+const hSVG=b=>`<svg viewBox="0 0 64 64" role="img" aria-hidden="true">${b}</svg>`;
+const hRing=(x,y,w,h,r)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r||4}" fill="none" stroke="#ffd24a" stroke-width="2.4"/>`;
+const HPIC={
+  kiln:()=>hSVG(`<circle cx="32" cy="32" r="29" fill="#b44a2c" stroke="#e7b660" stroke-width="3"/>${hT(2,12,12,19)}${hT(2,33,12,19)}${hT(1,12,33,19)}${hT(0,33,33,19)}${hRing(10,10,23,23,5)}${hRing(31,10,23,23,5)}`),
+  middle:()=>hSVG(`<ellipse cx="32" cy="38" rx="29" ry="22" fill="#e0c08e" stroke="#a0703e" stroke-width="3"/>${hT(1,8,31,15)}${hT(0,24,38,15)}${hT(4,40,31,15)}${hT('sun',22,2,20)}`),
+  racks:()=>hSVG([0,1,2,3,4].map(r=>Array.from({length:r+1},(_,k)=>`<rect x="${52-(k+1)*10}" y="${4+r*12}" width="9" height="9" rx="2" fill="#d6c29a" stroke="#9a7a4e" stroke-width="1"/>`).join('')).join('')+hT(4,42,4,9)+hT(2,32,16,9)+hT(2,42,16,9)+hT(0,22,28,9)),
+  oneColour:()=>hSVG(`<rect x="6" y="8" width="52" height="14" rx="3" fill="#d6c29a" stroke="#9a7a4e" stroke-width="1.5"/>${hT(1,20,9,12)}${hT(1,33,9,12)}${hT(1,46,9,12)}<rect x="6" y="28" width="52" height="14" rx="3" fill="#d6c29a" stroke="#9a7a4e" stroke-width="1.5"/>${hT(0,33,29,12)}${hT(3,46,29,12)}<path d="M22 31l8 8m0-8l-8 8" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/>`),
+  blocked:()=>hSVG(`<rect x="4" y="10" width="26" height="14" rx="3" fill="#d6c29a" stroke="#9a7a4e" stroke-width="1.5"/><path d="M34 17h6" stroke="#a07040" stroke-width="3" stroke-linecap="round"/>${[0,1,2,3,4].map(i=>`<rect x="${4+i*12}" y="34" width="11" height="11" rx="2" fill="#fffaf0" stroke="#cdb995"/>`).join('')}${hT(2,4+24,35,9)}${hT(2,6,11,12)}<path d="M8 12l16 10m0-10L8 22" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/>`),
+  floor:()=>hSVG(`${[0,1,2,3,4,5,6].map(i=>`<rect x="${3+i*8.6}" y="12" width="7.6" height="14" rx="2" fill="#ecd3c7" stroke="#a8493a" stroke-width="1"/><text x="${6.8+i*8.6}" y="22.5" font-size="6.5" font-weight="800" text-anchor="middle" fill="#a8302a" font-family="sans-serif">${['−1','−1','−2','−2','−2','−3','−3'][i]}</text>`).join('')}${hT(0,6,34,13)}${hT(0,22,40,13)}<path d="M13 49v7M29 55v7" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>`),
+  wall:()=>hSVG(`${[0,1,2,3,4].map(r=>[0,1,2,3,4].map(c=>`<rect x="${4+c*11.4}" y="${4+r*11.4}" width="10.4" height="10.4" rx="2" fill="#fffaf0" stroke="#cdb995"/>`).join('')).join('')}${hT(1,4+11.4*1,4+11.4*2,10.4)}${hT(2,4+11.4*2,4+11.4*2,10.4)}${hT(0,4+11.4*2,4+11.4*1,10.4)}${hT(4,4+11.4*2,4+11.4*3,10.4)}${hRing(4+11.4*2-1,4+11.4*2-1,12.4,12.4,3)}`),
+  bonus:()=>hSVG(`${[0,1,2,3,4].map(c=>hT(c,3+c*11.6,3,10.4)).join('')}<text x="32" y="26" text-anchor="middle" font-size="9" font-weight="800" fill="#2f8a4a" font-family="sans-serif">row +2</text>${[0,1,2].map(r=>hT(r+1,6,31+r*11.4,10.4)).join('')}<text x="22" y="44" font-size="9" font-weight="800" fill="#2f8a4a" font-family="sans-serif">column +7</text><text x="22" y="58" font-size="9" font-weight="800" fill="#2f8a4a" font-family="sans-serif">colour +10</text>`),
+  goal:()=>hSVG(`${[0,1,2,3,4].map(r=>[0,1,2,3,4].map(c=>`<rect x="${4+c*11.4}" y="${4+r*11.4}" width="10.4" height="10.4" rx="2" fill="#fffaf0" stroke="#cdb995"/>`).join('')).join('')}${[0,1,2,3,4].map(r=>[0,1,2,3,4].filter(c=>c<=r).map(c=>hT(((c-r)%5+5)%5,4+c*11.4,4+r*11.4,10.4)).join('')).join('')}`)
+};
+const HLP_STEPS={
+  pick:{target:()=>bfQ('.bf-k.can')||bfQ('.bf-pool.can'),title:'Take one colour',text:'Tap any tile. You take every tile of that colour from its kiln.',pic:HPIC.kiln},
+  rack:{target:()=>bfQ('.bf-row.ok .bf-rack')||bfQ('.bf-floor.ok .bf-fl'),title:'Choose a row',text:'Tap a glowing row. Tiles that do not fit fall to the floor.',pic:HPIC.racks},
+  wall:{target:()=>bfQ('.bf-c.pick'),title:'Set a tile',text:'Tap a glowing wall space. It scores for the tiles it touches.',pic:HPIC.wall}
+};
+const HLP_RULES=[
+  {phase:'pick',title:'Take one colour',text:'Pick a kiln and a colour. You take every tile of that colour. The rest slide to the middle.',pic:HPIC.kiln},
+  {phase:'pick',title:'The middle',text:'Taking from the middle first also takes the Sun token. It costs floor points, but you start next round.',pic:HPIC.middle},
+  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, each full row sends one tile to your wall.',pic:HPIC.racks},
+  {phase:'pick',title:'Game end',text:'A full wall row ends the game. Bonuses: row +2, column +7, all five of a colour +10.',pic:HPIC.bonus},
+  {phase:'rack',title:'One colour per row',text:'Row 3 holds three tiles of a single colour. You cannot mix colours in a row.',pic:HPIC.oneColour},
+  {phase:'rack',title:'Blocked rows',text:'A row is blocked if its wall row already has that colour. Blocked and full rows do not glow.',pic:HPIC.blocked},
+  {phase:'rack',title:'The floor',text:'Extra tiles fall to the floor: −1, −1, −2, −2, −2, −3, −3 points. You can also drop tiles there.',pic:HPIC.floor},
+  {phase:'rack',title:'Touching scores',text:'A set tile scores 1 alone, or its row line plus its column line when it touches others.',pic:HPIC.wall},
+  {phase:'wall',title:'Pick the space',text:'On the grey wall choose any empty space in the row. No colour may repeat in a row or column.',pic:HPIC.wall},
+  {phase:'wall',title:'Touching scores',text:'A tile scores 1 alone, or the length of its row line plus its column line if it touches others.',pic:HPIC.wall},
+  {title:'The goal',text:'Fill your wall with tiles. Touching tiles score more. Most points wins.',pic:HPIC.goal}
+];
+// ---------------------------------------------------------------- which phase is the player in?
+function hlpPhase(){try{if(!BF.on||BF.busy||UI.tut||UI.modal||BF.menu||BF.peek!=null||BF.boss||!G||G.over||isClient())return null;
+  const hp=me();if(!hp)return null;
+  if(G.phase==='wall')return G.wt&&G.wt.q&&G.wt.q.p===hp.i?'wall':null;
+  if(G.phase==='offer')return UI.sel?'rack':'pick';return null}catch(e){return null}}
+const capW=(t,n)=>{const w=String(t||'').replace(/\s+/g,' ').trim().split(' ');return w.length<=n?w.join(' '):''};
+// the "why" (<= 15 words), from the same move the advice function picked
+function hlpWhy(m,hp){try{
+  if(m.act==='wall')return capW(`Column ${m.c+1} touches the most tiles: +${adjPts2(hp.wall,m.r,m.c)} now.`,15);
+  const pv=preview(m,hp.i);let t;
+  if(m.line===5)t='No better choice: every other move scores less this round.';
+  else if(pv.full&&pv.pts!=null)t=`Fills row ${m.line+1}: about +${pv.pts} when the round ends${pv.pen?`, minus ${-pv.pen} breakage`:''}.`;
+  else t=`Row ${m.line+1} grows to ${pv.cnt} of ${cap(m.line)}${pv.pen?`, costing ${-pv.pen} breakage`:' with nothing broken'}.`;
+  return capW(t,15)}catch(e){return ''}}
+const hlpTile=m=>{const a=m.src<0?G.ctr:G.fac[m.src];if(!a)return null;const k=a.findIndex(t=>t===m.c);return k<0?null:bfEl((m.src<0?'c':'f'+m.src)+'_'+k)};
+// the plan for the bulb (and for the sweep): where the ghost finger goes
+function hlpPlan(){if(!BF.on||BF.busy||UI.tut||UI.modal||!G||G.over||isClient())return null;const hp=me();if(!hp)return null;const m=bfAdvice(hp);if(!m)return null;
+  if(m.act==='wall'){const q=G.wt&&G.wt.q;if(!q||m.r!==q.r)return null;return {m,hp,target:()=>bfSlot(`w${hp.i}_${q.r}_${m.c}`),from:null}}
+  if(m.act!=='take'||G.phase!=='offer')return null;
+  const sel=UI.sel;
+  if(sel&&sel.src===m.src&&sel.c===m.c){if(!!sel.j!==!!m.j||!movesFor(sel).some(x=>x.line===m.line))return null;
+    return {m,hp,target:()=>m.line<5?bfQ(`[data-bfrow="${m.line}"] .bf-rack`):bfQ('.bf-fl'),from:()=>hlpTile(m)}}
+  return {m,hp,target:()=>hlpTile(m),from:null}}
+function hlpSuggest(){const pl=hlpPlan();if(!pl)return null;const why=hlpWhy(pl.m,pl.hp);if(!why)return null;
+  const e=pl.target();if(!e||!e.getBoundingClientRect().width)return null;return {why,key:JSON.stringify(pl.m),target:pl.target,from:pl.from}}
+// ---------------------------------------------------------------- wiring
+let _hlpInit=false;
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+  GXH.init({game:'sunglaze',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bf-row.ok .bf-rack,.bf-floor.ok .bf-fl,.bf-c.pick,.bf-k.can,.bf-pool.can,.bf-t.adv'})}
+function hlpAfter(){if(typeof GXH==='undefined')return;hlpInit();
+  const b=document.getElementById('bulbbtn');if(b&&b!==hlpAfter._b){hlpAfter._b=b}
+  if(b)GXH.bulb({el:b,suggest:hlpSuggest,rulesFor:hlpPhase});
+  GXH.phase(hlpPhase())}
+// a tap on a kit element (Got it, a bubble) must not also reach the board underneath: the kit removes the bubble on pointerdown, so the click would land on what was below it
+document.addEventListener('pointerdown',e=>{window.__hlpDown=e.target&&e.target.closest&&e.target.closest('[data-help]')?Date.now():0},true);
+hlpInit();
+
+</script>
+<script>
+// ===================== part 11: the tutorial (shell/gx-tutor.js): a staged one-round game that teaches every rule by doing it once =====================
+// RULES CHECKLIST (from the rules drawer, RULES_HTML, and the reference list) and the step that teaches each one:
+//   goal: tile the palace wall, most points wins ............................ goal
+//   5 kilns of 4 tiles; take from one kiln or the middle ..................... kilns
+//   take EVERY tile of one colour from a kiln ................................ take1
+//   the rest of the kiln slides to the middle ................................ slide, olive1
+//   pattern rows: row n holds n tiles of ONE colour; put all tiles on one row  take1b, take2b
+//   a colour already on that wall row blocks the row; full rows do not glow ... take2b, last2
+//   take from the middle; the first to do so takes the Sun token ............. middle, sun
+//   overflow falls to the floor; floor spaces cost -1 -1 -2 -2 -2 -3 -3 ....... middle2, floor, floorpen
+//   rows that are not full keep their tiles for later ........................ olive2, tiling, last2
+//   the round ends when every kiln and the middle are empty .................. tiling
+//   each full row sends ONE tile to the wall, the rest is discarded .......... tiling
+//   scoring: alone = 1; otherwise row line + column line ...................... chain0, chain1, chain2
+//   the Sun token holder starts next round (it also costs a floor space) ..... sun
+//   the game ends after the round in which a wall row is complete ............ bonus
+//   end bonuses: row +2, column +7, all five of a colour +10; most points wins; ties: more rows  bonus, final
+//   (variants - unmarked mosaic, prism tiles - are in the lightbulb's rules cards)
+// The staged game: you (Coral, seat 0) and Olive (seat 1, scripted) in the last round of a game. Your mosaic already holds 12 tiles, so ONE round teaches
+// the whole scoring cycle, including all three end bonuses. Tiles are placed by hand below (never saved, never counted as a real game).
+const TUT_GAME='sunglaze';
+const TUT={at:null,res:null,coach:true};
+const tutOn=()=>!!UI.tut&&typeof GXT!=='undefined'&&GXT.active();
+const firstTime=()=>{try{return !localStorage.getItem('sgz_guided')&&!localStorage.getItem('sgz_offer')&&!GXT.status(TUT_GAME).seen}catch(e){return true}};
+const tutBtn=(cls,sub)=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart,sub:sub});
+const tutWait=(cond,ms)=>new Promise(res=>{const t0=Date.now();(function f(){let ok=false;try{ok=cond()}catch(e){}if(ok||Date.now()-t0>(ms||20000))res();else setTimeout(f,60)})()});
+// the board waits here (inside the animation queue) until the step that explains this moment is dismissed
+function tutPause(name){return new Promise(res=>{if(!UI.tut||!tutOn()){res();return}TUT.at=name;TUT.res=res})}
+function tutRelease(){const r=TUT.res;TUT.at=null;TUT.res=null;if(r)r()}
+// ---------------------------------------------------------------- the staged game
+const TUT_K=[[2,2,1,0],[4,4,3,3],[0,0,0,1],[2,2,2,2],[4,4,4,4]];      // the five kilns: Garnet Garnet Saffron Cobalt | Frost Frost Obsidian Obsidian | Cobalt x3 Saffron | Garnet x4 | Frost x4
+const TUT_O=[[1,3,1],[2,0,3],[4,4,4],[-1,1,2]];                       // Olive's four takes: [source, glaze, rack index]
+function tutBuild(){UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.modal=null;UI.lastHuman=null;UI.guideNote='';
+  const _r=refresh;refresh=function(){};
+  try{newGame({np:2,seats:['human','ai'],lv:['normal','easy'],names:['Coral','Olive'],mode:'x'})}finally{refresh=_r}
+  const take=c=>{const k=G.bag.indexOf(c);if(k<0)throw Error('tutor: the sack has no tile '+c);G.bag.splice(k,1)};
+  for(const a of G.fac)G.bag.push(...a);
+  G.fac=TUT_K.map(a=>{a.forEach(take);return a.slice()});
+  const put=(p,r,c,v)=>{take(v);P(p).wall[r][c]=v};
+  for(let c=0;c<4;c++)put(0,0,c,WALLC(0,c));                           // your top row: four of five
+  for(let r=1;r<5;r++)put(0,r,4,WALLC(r,4));                           // the last column: four of five
+  for(const [r,c] of [[1,0],[2,1],[3,2],[4,3]])put(0,r,c,4);           // four of the five Frost tiles
+  for(let r=0;r<3;r++)put(1,r,WALLCOL(0,r),0);                         // Olive: three Cobalt, two Saffron
+  for(let r=0;r<2;r++)put(1,r,WALLCOL(1,r),1);
+  P(0).score=21;P(1).score=12;G.round=4;G.first=0;G.cur=0;G.markerIn='ctr';G.log=[];G.logN=0;G.turn=0;
+  UI.fx.length=0;UI.fxSeen=0;BF.gk='';BF.q.length=0;BF.seen={};
+  try{resetScene()}catch(e){}
+  TUT.t0=Date.now();refresh()}
+function tutOlive(n){const t=TUT_O[n];const m=t&&sideToAct()===1?validMoves(1).find(x=>x.src===t[0]&&x.c===t[1]&&x.line===t[2]&&!x.j):null;if(m)go(m);else console.error('tutor: Olive has no move '+n)}
+// ---------------------------------------------------------------- where each step points
+const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
+const tIdle=()=>!!G&&!G.over&&!bfHold()&&!BF.menu&&BF.peek==null&&!UI.modal;
+const tYou=()=>tIdle()&&sideToAct()===0;
+const tTile=(src,c)=>()=>{const a=src<0?G.ctr:G.fac[src];const k=a?a.indexOf(c):-1;return k<0?null:bfEl((src<0?'c':'f'+src)+'_'+k)};
+const tRack=r=>()=>bfQ(r<5?`[data-bfrow="${r}"] .bf-rack`:'.bf-fl');
+const tSel=(src,c)=>!!UI.sel&&UI.sel.src===src&&UI.sel.c===c&&!!bfQ('.bf-row.ok');
+const tWall=(r,c)=>()=>bfSlot(`w0_${r}_${c}`);
+function tutSteps(){return [
+ {id:'goal',title:'Tile the palace wall',say:'Set tiles onto your wall to score points. When the game ends, the most points wins.',target:tq('.bf-me'),wait:null,ready:()=>tYou()&&G.turn===0&&Date.now()-TUT.t0>2000},
+ {id:'kilns',title:'Five kilns',say:'Each kiln holds four tiles. On your turn you take tiles from one kiln, or from the middle.',target:tq('.bf-table'),wait:null,ready:()=>tYou()&&G.turn===0},
+ {id:'take1',title:'Take a colour',say:'Tap a Garnet tile. You take every Garnet on that kiln.',target:tTile(0,2),
+   wait:{type:'tap',match:a=>a.what==='pick'&&a.src===0&&a.c===2},ready:()=>tYou()&&G.turn===0&&!UI.sel},
+ {id:'take1b',title:'Fill a pattern row',say:'The second row holds two tiles of one colour. Tap it to place your two Garnets.',target:tRack(1),
+   wait:{type:'tap',match:a=>a.what==='go'&&a.line===1},ready:()=>tYou()&&tSel(0,2)},
+ {id:'slide',title:'Leftovers slide',say:'The other tiles slid into the middle. Anyone can take them from there.',target:tq('.bf-pool'),wait:null,ready:()=>tIdle()&&G.turn===1},
+ {id:'olive1',title:'Olive takes a kiln',say:'Olive took both Obsidians. The two Frost tiles from that kiln slid to the middle.',target:tq('.bf-pool'),wait:null,
+   ai:()=>tutWait(()=>tIdle()&&sideToAct()===1).then(()=>tutOlive(0)),ready:()=>tYou()&&G.turn===2},
+ {id:'middle',title:'Take from the middle',say:'Tap a Frost in the middle. The first to take there also gets the Sun token.',target:tTile(-1,4),
+   wait:{type:'tap',match:a=>a.what==='pick'&&a.src===-1&&a.c===4},ready:()=>tYou()&&G.turn===2&&!UI.sel},
+ {id:'middle2',title:'Too many tiles',say:'Tap the top row. It holds one tile, so the second Frost falls to the floor.',target:tRack(0),
+   wait:{type:'tap',match:a=>a.what==='go'&&a.line===0},ready:()=>tYou()&&tSel(-1,4)},
+ {id:'floor',title:'The floor',say:'Extra tiles land on the floor. Each space costs points at round end: −1, −1, −2, −2…',target:tq('.bf-floor'),wait:null,ready:()=>tIdle()&&G.turn===3},
+ {id:'sun',title:'The Sun token',say:'The Sun token sits on your floor: one penalty, but you start the next round.',target:()=>bfSlot('x0_0'),wait:null,ready:()=>tIdle()&&G.turn===3},
+ {id:'olive2',title:'Olive takes again',say:'Olive took the three Cobalt. The leftover Saffron slid to the middle.',target:tq('.bf-pool'),wait:null,
+   ai:()=>tutWait(()=>tIdle()&&sideToAct()===1).then(()=>tutOlive(1)),ready:()=>tYou()&&G.turn===4},
+ {id:'take2',title:'Take four',say:'Tap a Garnet in the fourth kiln. All four are yours in one take.',target:tTile(3,2),
+   wait:{type:'tap',match:a=>a.what==='pick'&&a.src===3&&a.c===2},ready:()=>tYou()&&G.turn===4&&!UI.sel},
+ {id:'take2b',title:'A perfect fit',say:'The fourth row holds exactly four tiles. Tap it. Rows 1 and 3 already have Garnet on the wall.',target:tRack(3),
+   wait:{type:'tap',match:a=>a.what==='go'&&a.line===3},ready:()=>tYou()&&tSel(3,2)},
+ {id:'olive3',title:'Olive takes again',say:'Olive took four Frost. All kilns are empty now. Only the middle still has tiles.',target:tq('.bf-pool'),wait:null,
+   ai:()=>tutWait(()=>tIdle()&&sideToAct()===1).then(()=>tutOlive(2)),ready:()=>tYou()&&G.turn===6},
+ {id:'last',title:'Last pick',say:'Tap the single Cobalt in the middle.',target:tTile(-1,0),
+   wait:{type:'tap',match:a=>a.what==='pick'&&a.src===-1&&a.c===0},ready:()=>tYou()&&G.turn===6&&!UI.sel},
+ {id:'last2',title:'Only some rows glow',say:'Rows 1 and 5 already have Cobalt on the wall; rows 2 and 4 are full. Tap the third row.',target:tRack(2),
+   wait:{type:'tap',match:a=>a.what==='go'&&a.line===2},ready:()=>tYou()&&tSel(-1,0)},
+ {id:'tiling',title:'Round over',say:'Kilns and middle are empty. Each full row sends one tile to your wall; the third row waits.',target:tq('.bf-me'),wait:null,
+   ai:()=>tutWait(()=>tIdle()&&sideToAct()===1).then(()=>tutOlive(3)),onNext:tutRelease,ready:()=>TUT.at==='tiling'},
+ {id:'chain0',title:'Frost scores ten',say:'Frost completes a row of five and a column of five: 5 + 5 = 10 points.',target:tWall(0,4),wait:null,onNext:tutRelease,ready:()=>TUT.at==='wall0'},
+ {id:'chain1',title:'Touching tiles',say:'This Garnet touches a line of two across and two down: 2 + 2 = 4 points.',target:tWall(1,3),wait:null,onNext:tutRelease,ready:()=>TUT.at==='wall1'},
+ {id:'chain2',title:'Alone scores one',say:'This Garnet touches nothing, so it scores 1 point. The other three Garnets are discarded.',target:tWall(3,0),wait:null,onNext:tutRelease,ready:()=>TUT.at==='wall3'},
+ {id:'floorpen',title:'Pay for the floor',say:'Now the floor: the Frost and the Sun token cost −1 and −1. Your score drops by 2.',target:tq('.bf-floor'),wait:null,onNext:tutRelease,ready:()=>TUT.at==='floor'},
+ {id:'bonus',title:'The game ends',say:'A full wall row ends the game. Bonuses: row +2, column +7, whole colour +10. You earn all three!',target:tq('.bf-me'),wait:null,onNext:tutRelease,ready:()=>TUT.at==='bonus'},
+ {id:'final',title:'Most points wins',say:()=>`You finish with ${P(0).score} points to Olive's ${P(1).score}. A tie goes to the most full rows.`,target:tq('.bf-me'),wait:null,onNext:tutRelease,ready:()=>TUT.at==='final'}
+]}
+// ---------------------------------------------------------------- start, leave, story
+function tutSetup(){try{GX.close()}catch(e){}try{GXH.hide()}catch(e){}
+  clearTimeout(aiTimer);aiTimer=null;TUT.at=null;TUT.res=null;TUT.coach=UI.coach;UI.coach=false;UI.tut=1;UI.pause=false;
+  const m=document.getElementById('modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}
+  window.__tutPh=1;phApply();bfApply();                                  // the board-first table, on any screen
+  tutBuild()}
+function tutLeave(){tutRelease();UI.tut=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=null;UI.adv=null;clearTimeout(aiTimer);aiTimer=null;
+  try{bfSpeedUp()}catch(e){}BF.q.length=0;BF.gk='';BF.disp=null;BF.resHide=false;BF.menu=false;BF.peek=null;G=null;
+  try{GXH.hide()}catch(e){}window.__tutPh=0;phApply();bfApply();try{resetScene()}catch(e){}}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
+    endTitle:'You know the rules',endText:o?'Take, place, tile, score, bonuses. Now the Story begins.':'Take, place, tile, score, bonuses. The lightbulb helps in real games.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    setup:tutSetup,
+    onDone:r=>{tutLeave();const c=r&&r.choice;
+      if(c==='chapter'&&first){openStart();GXC.play(first.id)}
+      else if(c==='story'&&typeof GXC!=='undefined')campOpen();
+      else openStart()},
+    onExit:()=>{tutLeave();openStart()}})}
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
+// first-time players tapping Begin are offered the tutorial once
+function tutOffer(){if(typeof GXT==='undefined'||UI.tut||NET.on||!firstTime())return false;
+  try{localStorage.setItem('sgz_offer','1')}catch(e){}
+  const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in about five minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-offer="play">Just play</button></div></div>';
+  d.addEventListener('click',e=>{const b=e.target.closest('[data-offer]');if(!b)return;d.remove();if(b.dataset.offer==='learn')tutStart();else beginGame()});
+  document.body.appendChild(d);return true}
+// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+(function(){const o=pickSel;pickSel=function(s){
+  if(tutOn()&&!GXT.act({type:'tap',what:'pick',src:s.src,c:s.c}))return;
+  return o.apply(this,arguments)}})();
+(function(){const o=go;go=function(m){
+  if(tutOn()){const s=sideToAct();if(s>=0&&P(s)&&P(s).human&&!GXT.act({type:'tap',what:'go',src:m.src,c:m.c,line:m.line}))return}
+  return o.apply(this,arguments)}})();
 
 </script>
 </body>

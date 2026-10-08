@@ -1,4 +1,4 @@
-// Guided dive + a lost dive result card: node look2.js WxH [phone] [tag] -> shots/look2_<tag>_<size>_*.png
+// A dive + a lost dive result card: node look2.js WxH [phone] [tag] -> shots/look2_<tag>_<size>_*.png
 const PW = require(process.env.PW || (require('child_process').execSync('npm root -g').toString().trim() + '/playwright'));
 const fs = require('fs'), path = require('path'); const OUT = path.join(__dirname, 'shots');
 const html = fs.readFileSync(path.join(__dirname, 'lantern-dive.html'));
@@ -10,7 +10,7 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number); const PH =
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   const sh = n => p.screenshot({ path: path.join(OUT, `look2_${TAG}_${W}x${H}_${n}.png`) });
   await p.goto('https://gns.test/'); await p.waitForTimeout(1500);
-  await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 4; AIDELAY = 60; ANIM = 1; showStart(); UI.sv = 'setup'; renderStart(); document.querySelector('[data-start=guided]').click(); });
+  await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 4; AIDELAY = 60; ANIM = 1; showStart(); UI.sv = 'setup'; renderStart(); document.querySelector('[data-start=vs]').click(); });
   await p.waitForTimeout(2500); await sh('g1welcome');
   let n = 0;
   for (let k = 0; k < 600; k++) {

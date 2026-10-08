@@ -293,7 +293,7 @@ function afterMove(evs){saveAll();UI.stepNow=0;
   const finish=()=>{if(UI.mphNext){UI.mph=UI.mphNext;UI.mphNext=null}UI.busy=false;UI.dice=null;UI.res=null;if(UI.mph){UI.mph.roll=false;UI.mph.shown=UI.mph.lines.length}if(!G.q)KS.hold={};for(const e of evs)if(e.t==='sink')sunkAdd(e);kitSync();render();overCheck();schedule();if(NET.on)netDrain()};
   if(ANIM&&evs.some(e=>e.t!=='log')&&UI.started){const gen=UI.gen;UI.busy=true;render();playEvents(evs,gen).then(()=>{if(UI.gen!==gen)return;finish()})}
   else finish()}
-function overCheck(){if(G&&G.over&&!UI.overSeen){UI.overSeen=1;const w=G.over.win||[];musicStop(.4);sndLoop('sea_loop',false);const mine=w.some(i=>G.seats[i].human)||!humans().length&&w.length;sfx(mine?'win':'lose');UI.trig.end=1;clearSave();if(campOn()){const gg=G;setTimeout(()=>{if(G===gg)campFinish()},1400)}}}
+function overCheck(){if(G&&G.over&&!UI.overSeen){UI.overSeen=1;const w=G.over.win||[];musicStop(.4);sndLoop('sea_loop',false);const mine=w.some(i=>G.seats[i].human)||!humans().length&&w.length;sfx(mine?'win':'lose');UI.trig.end=1;if(!UI.tut)clearSave();if(campOn()){const gg=G;setTimeout(()=>{if(G===gg)campFinish()},1400)}}}
 function schedule(){clearTimeout(UI.tm);if(isClient()||!G||!UI.started||G.over||UI.busy||UI.pause)return;const d=sideToAct();if(d<0||G.seats[d].human)return;UI.tm=setTimeout(aiAct,Math.max(0,(AIDELAY||0)/(UI.speed||1)))}
 function aiAct(){if(isClient()||!G||!UI.started||UI.busy||UI.pause||G.over)return;const d=sideToAct();if(d<0||G.seats[d].human)return;const st=aiStep();if(!st)return;act(st.m,st.seat)}
 function doPlace(){const d=sideToAct();const s=UI.sel;if(!s)return;const m={a:'place',t:s.t,r:s.r,s:s.s};act(m,d)&&sfx('confirm')}
@@ -360,10 +360,10 @@ function renderSettings(){const g=(()=>{try{return TWKit.getQuality()}catch(e){r
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd">Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus">Music ${SND.music?'on':'off'}</button></div></div>
   <div><div class="lbl">Computer captains' speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}<button class="btn small${UI.anim?' on':''}" data-a="animtog">Animations ${UI.anim?'on':'off'}</button></div></div>
   <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D chart: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div><p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot" class="row">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
-  <div><div class="lbl">Help</div>${typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'row',btnClass:'btn small'}):''}</div>
+  <div><div class="lbl">Help</div>${typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'row',btnClass:'btn small'}):''}${typeof tutBtn==='function'&&!NET.on?'<div class="row">'+tutBtn('btn small')+'</div>':''}</div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?'<button class="btn small" data-a="netleave">Leave the online game</button>':''}${isClient()?'':G&&UI.started?'<button class="btn small" data-a="restart">Restart this setup</button>':''}${isClient()?'':'<button class="btn small" data-a="tonew">New game...</button>'}<button class="btn small" data-gx="credd">Credits</button></div></div></div>`}
 function saveSettings(){lsSet('tw_set',{speed:UI.speed,guide:UI.guide,anim:UI.anim})}
-function saveAll(){try{if(!NET.on&&G&&!G.over){saveGame();lsSet('tw_ui1',{cols:UI.cols,guide:UI.guide,seen:UI.seen,trig:UI.trig,guided:UI.guided,setup:UI.lastSetup})}}catch(e){}}
+function saveAll(){try{if(!NET.on&&G&&!G.over&&!UI.tut){saveGame();lsSet('tw_ui1',{cols:UI.cols,guide:UI.guide,seen:UI.seen,trig:UI.trig,guided:UI.guided,setup:UI.lastSetup})}}catch(e){}}
 function clearSave(){if(NET.on)return;try{localStorage.removeItem(SAVE)}catch(e){}}
 function savedGame(){try{const s=localStorage.getItem(SAVE);if(!s)return null;const g=JSON.parse(s);if(!g||g.phase==='over'||!g.seats)return null;return g}catch(e){return null}}
 function piecesHTML(){const cnt=t=>1+(EXTRA_TYPES.indexOf(t)>=0?1:0);
@@ -387,7 +387,7 @@ function renderStart(){const el=$('#start');const s=UI.setup=UI.setup||defaultSe
   const ex=[['rift','Rift Gate','A portal tile that rescues a junk or flings pieces across the sea.'],['wave','Rogue Wave','A wave that sweeps a row or column and can capsize junks.'],['maelstrom','Maelstrom','A whirlpool that moves on calm turns and destroys what it enters.'],['cannon','Deck Cannon','Five cannons in the tile pile: shoot a leviathan about to sink you.']];
   const cont=savedGame();
   el.innerHTML=`<div class="stin"><h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">Lay currents, steer your junk, outlast the leviathans. 1 to 8 captains, computers and hot-seat.</p>
-  <div class="stcard"><h2>Quick start</h2>${NET.on||typeof GXC==='undefined'||!window.CAMPAIGN?'':'<div class="row" style="margin-bottom:8px"><button class="btn pri" data-a="story" id="storybtn" style="flex:1;min-height:56px;font-size:1.15em">&#9875; Story: The Lantern Reach <small style="display:block;font-weight:400">'+campLine()+'</small></button></div>'}<div class="row">${NET.on?'':'<button class="btn" data-a="guided">Guided first game (you vs an easy computer)</button>'}${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">${(()=>{const n=s.variant==='solo'||s.variant==='easysolo'?1:teamN(s);const c=s.seats.slice(0,n).filter(x=>!x.h).length;return n===1?'Play now (solo)':c===n-1?`Play now: you vs ${c} computer${c>1?'s':''}`:'Play now (settings below)'})()}</button></div><p class="tiny">${NET.on?'':'New here? Try the guided game.'}</p></div>
+  <div class="stcard"><h2>Quick start</h2>${NET.on||typeof tutBtn!=='function'||!firstTime()?'':'<div class="row" style="margin-bottom:8px">'+tutBtn('btn pri')+'</div>'}${NET.on||typeof GXC==='undefined'||!window.CAMPAIGN?'':'<div class="row" style="margin-bottom:8px"><button class="btn pri" data-a="story" id="storybtn" style="flex:1;min-height:56px;font-size:1.15em">&#9875; Story: The Lantern Reach <small style="display:block;font-weight:400">'+campLine()+'</small></button></div>'}<div class="row">${NET.on||typeof tutBtn!=='function'||firstTime()?'':tutBtn('btn')}${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">${(()=>{const n=s.variant==='solo'||s.variant==='easysolo'?1:teamN(s);const c=s.seats.slice(0,n).filter(x=>!x.h).length;return n===1?'Play now (solo)':c===n-1?`Play now: you vs ${c} computer${c>1?'s':''}`:'Play now (settings below)'})()}</button></div><p class="tiny">${NET.on?'':'New here? The tutorial teaches every rule by doing it, in a few minutes.'}</p></div>
   <div class="stcard"><h2>Play with friends</h2>${onlineBlock()}</div>
   <div class="stcols"><div class="stcard"><h2>How to play</h2><div class="row">${onl?'<span class="tiny">Online game: captains take seats in join order.</span>':seg('mode',mode,[['me','Me vs computers'],['hot','Hot-seat'],['watch','Watch']])}</div><p class="tiny">${onl?'Seats without an online captain are computers.':mode==='me'?'You are the first captain; the others are computers.':mode==='hot'?'Everyone shares this screen. Hands are hidden between players behind a pass screen.':'The computers play each other. Sit back.'}</p>
    <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded.':s.variant==='teams'?'Two equal teams (every other seat); you may lay a tile for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
@@ -403,10 +403,10 @@ function startAction(a,t){const s=UI.setup=UI.setup||defaultSetup();const D=t.da
   case 'np':s.np=+D.v;break;
   case 'var':s.variant=D.v==='std'?null:D.v;if(s.variant==='teams')s.np=teamN(s);break;
   case 'seath':s.seats[+D.i].h=D.v==='1';break;
-  case 'start':if(!$('#start').hidden){lsSet('tw_setup',s);startGame(JSON.parse(JSON.stringify(s)));return}return;
+  case 'start':if(!$('#start').hidden){if(typeof tutOffer==='function'&&tutOffer(()=>{lsSet('tw_setup',s);startGame(JSON.parse(JSON.stringify(s)))}))return;lsSet('tw_setup',s);startGame(JSON.parse(JSON.stringify(s)));return}return;
   case 'guided':if(NET.on)return;startGuided();return;
   case 'cont':if(NET.on)return;resumeSaved();return;
-  case 'story':campOpen();return;
+  case 'story':if(typeof storyOpen==='function')storyOpen();else campOpen();return;
   default:return}
   renderStart()}
 document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.dataset.a)return;const s=UI.setup=UI.setup||defaultSetup();
@@ -419,7 +419,8 @@ function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){
   UI.gen++;clearTimeout(UI.tm);kitReset();
   const solo=s.variant==='solo'||s.variant==='easysolo';let np=solo?1:teamN(s);const seats=s.seats.slice(0,np);
   seats.forEach((x,i)=>{SHIP_NAMES[i]=COL[x.col].name});UI.cols=seats.map(x=>x.col);
-  newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon,first:o.first,goalTurns:o.goalTurns,names:o.names,bossCannon:o.bossCannon,bossSeat:o.bossSeat});if(plan)netBound(plan);
+  newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon,first:o.first,goalTurns:o.goalTurns,names:o.names,bossCannon:o.bossCannon,bossSeat:o.bossSeat,seed:o.seed});if(plan)netBound(plan);
+  if(o.tutorial&&typeof tutRig==='function')tutRig();else if(!UI.tut){try{localStorage.setItem('tw_played','1')}catch(e){}}
   UI.lastSetup=s;UI.guided=!!o.guided;UI.guide=o.guided?'full':(lsGet('tw_set',{}).guide||'light');UI.seen=o.guided?{}:UI.seen;if(o.guided)UI.trig={};else UI.trig={};
   UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.myLogI=null;UI.curTurnN=null;UI.mphNext=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.snap=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;
   const h=humans();UI.holder=h.length===1?h[0]:-1;UI.started=true;hideStart();GX.close();
@@ -789,7 +790,7 @@ function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():nul
   pc.hidden=false;PH.cur.block=true;
   if(PH.pop&&(PH.pop!=='info'||kind==='pass'||kind==='over'||kind==='q')){PH.pop=null;PH.pd=null;phPopup()}
   // the wake roll card goes away by itself a few seconds after the animation ends
-  if(kind==='mph'&&!UI.busy&&!PH.tmr){const mp=UI.mph;PH.tmr=setTimeout(()=>{PH.tmr=0;if(UI.mph===mp&&!UI.busy){PH.mphHide=mp;phAfter()}},3500/(UI.tickRate||1))}
+  if(kind==='mph'&&!UI.busy&&!PH.tmr){const mp=UI.mph;PH.tmr=setTimeout(()=>{PH.tmr=0;if(typeof tutHold==='function'&&tutHold('mph'))return;if(UI.mph===mp&&!UI.busy){PH.mphHide=mp;phAfter()}},3500/(UI.tickRate||1))}
   if(kind!=='mph'){clearTimeout(PH.tmr);PH.tmr=0}}
 // ---------- one pass after every render ----------
 function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}catch(e){console.error(e)}}
@@ -870,7 +871,7 @@ function campOpen(){if(typeof GXC==='undefined')return;try{GX.close()}catch(e){}
 function campOn(){return !!(UI.camp&&typeof GXC!=='undefined'&&GXC.active())}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'Ten chapters, three bosses'}catch(e){return ''}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'tidewake',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'tidewake',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit:()=>{UI.camp=null;showStart()},
     scores:g=>g.ships.map(s=>s.alive?1:0),seats:g=>g.seats.map((x,i)=>({name:i===0?'You':x.nm,me:i===0,ai:x.human?undefined:x.lv}))})}
 campInit();
@@ -988,7 +989,139 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const b=$('#bulbbtn');if(b)b.addEventListener('click',()=>{try{const c=GXH.state().cur;if(c&&c.kind==='bulb'&&G&&UI.started)UI.campHints=(UI.campHints||0)+1}catch(e){}})}
-function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet)return;GXH.phase(hlpPhase())}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet||(typeof tutOn==='function'&&tutOn()))return;GXH.phase(hlpPhase())}
 {const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r};
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
 hlpInit();
+// ===================== part 10: the tutorial (shell/gx-tutor.js): a staged game that teaches every rule by doing it once =====================
+// The staged game is src/tutscript.js: you (Vermilion) against Cobalt, fixed seed, fixed leviathans, hands, pile, dice and a scripted computer; never saved.
+// Each step spotlights one thing; only that thing answers; the step moves on only when the page reports that exact action (GXT.act). The rule checklist
+// (what each step teaches) is at the top of src/tutscript.js. Story opens through it as "Chapter 0" the first time; the menu replays it any time.
+const TUT_GAME='tidewake';
+const TUTP={pause:false};                                         // true = the computer waits (a step wants you to read what just happened)
+function tutOn(){return typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut}
+function firstTime(){try{return !localStorage.getItem('tw_played')&&!localStorage.getItem('tw_offered')}catch(e){return true}}
+function tutBtn(cls){return typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart})}
+// ---------------------------------------------------------------- where each step points
+const tq=sel=>()=>{const e=document.querySelector(sel);return e&&!e.closest('[hidden]')&&e.getBoundingClientRect().width?e:null};
+const tfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&!e.closest('[hidden]')&&e.getBoundingClientRect().width)return e}return null};
+// pieces on the board (a junk, the wave): the phone layout hides their name tags, so spotlight the square where they are, projected onto the screen
+function tutProj(w,sz){try{const p=hproj(w[0],w[1],.3);return p?{left:p.x-sz/2,top:p.y-sz/2,width:sz,height:sz}:null}catch(e){return null}}
+const tutShipRect=i=>()=>{try{const sp=shipPos(G.ships[i]);if(!sp)return null;return tutProj(sp.port!=null?pw(sp.c,sp.r,sp.port):sqW(sp.c,sp.r),56)}catch(e){return null}};
+const tutWaveRect=()=>{try{return G.wave?tutProj(sqW(G.wave.x,G.wave.y),64):null}catch(e){return null}};
+// the gold mark you start from: where the game itself draws it (the same projection as the board's pips)
+function tutPipRect(){try{const d=sideToAct();const t=TS.myStart;const o=startInfo(d).find(q=>q.m.x===t.x&&q.m.y===t.y&&q.m.e===t.e);if(!o)return null;const p=hproj(o.w[0],o.w[1]);
+  return p?{left:p.x-24,top:p.y-24,width:48,height:48}:null}catch(e){return null}}
+const TQ={tile:t=>tfirst('#ppop .ph-t[data-t="'+t+'"]','#ps .pt[data-t="'+t+'"]','#pin .hc[data-t="'+t+'"]'),
+  turn:tfirst('#ppop [data-a=rot][data-d="1"]','#ps [data-a=rot][data-d="1"]','#pin [data-a=rot][data-d="1"]'),
+  place:tfirst('#ppop [data-a=place]:not([disabled])','#ps [data-a=place]:not([disabled])','#pin [data-a=place]:not([disabled])'),
+  q:i=>tfirst('#pc [data-a=q][data-i="'+i+'"]','#main [data-a=q][data-i="'+i+'"]'),
+  mph:tfirst('#pc .mph','#res .mph')};
+// the wake-roll / end cards live in the pop-up card on the phone layout and in the side panel on a desktop
+const mphUp=()=>PH.on?!!PH.cur&&PH.cur.kind==='mph':!!UI.mph;
+const overUp=()=>PH.on?!!PH.cur&&PH.cur.kind==='over':!!document.querySelector('#main [data-over]');
+const layReady=()=>{try{return hlpPhase()==='lay'&&!UI.busy}catch(e){return false}};
+// keep a given tile turned a given way selected (the lay screen otherwise starts on the safest tile)
+function tutSel(t,r){if(!UI.sel||UI.sel.t!==t||UI.sel.r!==r||UI.sel.s!==0){UI.sel={t,r,s:0};UI.rots=[];UI.rots[t]=r;render()}return !!UI.sel&&UI.sel.t===t&&UI.sel.r===r}
+const placeOn=()=>!!TQ.place();
+const doomOpt=h=>{try{return G.q.opts.findIndex(o=>o.h===h)}catch(e){return -1}};
+const waveLine=()=>{try{const l=G.log.map(x=>x.t).find(t=>/Rogue Wave \(rolled \d, needed \d\)/.test(t));const m=l&&l.match(/rolled (\d), needed (\d)/);return m?{r:m[1],n:m[2]}:null}catch(e){return null}};
+const dismissMph=()=>{PH.mphHide=UI.mph;try{phAfter();phStrip()}catch(e){}};
+function tutSteps(){const L=[
+ {id:'goal',title:'Last junk afloat',say:'Steer your junk with current tiles. Stay afloat longer than every rival. Leviathans and the chart\'s edge sink you.',target:tq('#board'),wait:null,
+   ready:()=>!!G&&UI.started&&G.phase==='setup'&&sideToAct()===0&&!UI.busy},
+ {id:'mark',title:'Pick a start mark',say:'Tap the glowing gold mark at the bottom. Your junk starts there.',target:tutPipRect,
+   wait:{type:'tap',match:a=>(a.what==='sq'||a.what==='startmark'&&a.e===TS.myStart.e)&&a.x===TS.myStart.x&&a.y===TS.myStart.y},ready:()=>G.phase==='setup'&&!PH.pop&&sideToAct()===0&&!UI.busy&&!!tutPipRect()},
+ {id:'mark2',title:'Set sail here',say:'Tap the glowing button to confirm this mark.',target:tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]'),
+   wait:{type:'tap',match:a=>a.what==='startmark'&&a.x===TS.myStart.x&&a.y===TS.myStart.y&&a.e===TS.myStart.e},ready:()=>PH.pop==='start'&&!!tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]')()},
+ {id:'stir',title:'Roll the dice',say:'Two dice are added. A 6, 7 or 8 wakes the leviathans: each moves a square or turns.',target:TQ.mph,wait:null,hold:c=>c==='mph',onNext:dismissMph,
+   ready:()=>G.turn===2&&!UI.busy&&!!UI.mph&&UI.mph.wake&&!UI.mph.roll&&mphUp()&&!!TQ.mph()},
+ {id:'pick',side:'bottom',title:'Pick a tile',say:'Tap the glowing tile in your hand to pick it.',target:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='card'&&a.t===0},
+   ready:()=>G.turn===2&&layReady()&&(UI.sel&&UI.sel.t===2&&UI.sel.r===0||tutSel(2,0))},
+ {id:'turn',side:'bottom',title:'Turn the tile',say:'A red cross: this tile sails off the chart and sinks you. Tap Turn.',target:TQ.turn,also:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='rot'&&a.d===1},
+   ready:()=>G.turn===2&&layReady()&&!!UI.sel&&UI.sel.t===0&&UI.sel.r===0},
+ {id:'place',side:'bottom',title:'Lay it',say:'Green check: safe. Tap Place. Your junk sails along the new line.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},pauseAfter:true,
+   ready:()=>G.turn===2&&layReady()&&!!UI.sel&&UI.sel.t===0&&UI.sel.r===1&&placeOn()},
+ {id:'sail',title:'Your junk sails',say:'It followed the line to the end. Then you draw back up to three tiles.',target:tutShipRect(0),wait:null,onNext:()=>{TUTP.pause=false;schedule()},
+   ready:()=>G.turn===3&&TUTP.pause&&!UI.busy&&!!tutShipRect(0)()},
+ {id:'rivals',title:'Mind other junks',say:'Cobalt sails too. Never end on another junk\'s wake: two junks on one wake both sink.',target:tutShipRect(1),wait:null,
+   ready:()=>G.turn===4&&layReady()&&!!tutShipRect(1)()},
+ {id:'chain',side:'bottom',title:'Join another tile',say:'This tile links to Cobalt\'s current. Tap Place: your junk sails across both.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
+   ready:()=>G.turn===4&&layReady()&&tutSel(0,0)&&placeOn()},
+ {id:'keep',side:'bottom',title:'A Deck Cannon',say:'You drew a Deck Cannon. Keep it: later it destroys a leviathan about to sink you.',target:TQ.q(0),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='cKeep'},
+   ready:()=>!!G.q&&G.q.kind==='cannonDraw'&&!UI.busy&&!!TQ.q(0)()},
+ {id:'wave',title:'Rogue Wave',say:()=>{const w=waveLine();return w?'A Rogue Wave sweeps your row. You rolled '+w.r+'; it needs '+w.n+'+ or you capsize. You ride it.':'A Rogue Wave sweeps this row. Roll its strength or capsize.'},
+   target:tutWaveRect,wait:null,ready:()=>G.turn===6&&!!G.wave&&!UI.busy&&sideToAct()===0&&!!tutWaveRect()},
+ {id:'place3',side:'bottom',title:'Lay a tile',say:'Lay this tile. Your path crosses the wave\'s row again, so you roll once more.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
+   ready:()=>G.turn===6&&layReady()&&tutSel(0,0)&&placeOn()},
+ {id:'cannon',side:'bottom',title:'Fire the cannon!',say:()=>levName(4)+' blocks your junk and would sink it. Fire your Deck Cannon.',target:()=>TQ.q(doomOpt('dCannon'))(),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='dCannon'},
+   ready:()=>!!G.q&&G.q.kind==='doom'&&doomOpt('dCannon')>=0&&!UI.busy&&!!TQ.q(doomOpt('dCannon'))()},
+ {id:'place4',side:'bottom',title:'Keep sailing',say:'The leviathan is gone. Lay a tile to carry on.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
+   ready:()=>G.turn===8&&layReady()&&tutSel(0,2)&&placeOn()},
+ {id:'sunk',side:'bottom',title:'Leviathans sink junks',say:()=>levName(7)+' swam onto Cobalt\'s current: tile destroyed, junk sunk. Tap Continue.',target:tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]'),wait:{type:'tap',match:a=>a.what==='sunkok'},
+   ready:()=>!!G.over&&!UI.busy&&!!tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]')()},
+ {id:'win',title:'Last junk afloat',say:'Only your junk is left, so you win. Real games add more captains, tiles and leviathans.',target:tq('#board'),wait:null,
+   ready:()=>!!G.over&&!UI.busy&&!UI.sunk.length&&overUp()}
+];return PH.on?L:L.filter(x=>x.id!=='mark2')}
+// ---------------------------------------------------------------- the staged game
+function tutNewGame(){
+  try{GX.close()}catch(e){}
+  UI.tut=1;TS.on=true;TUT=tutDice;TUTP.pause=false;
+  if(!UI.tutSpeed0){UI.tutSpeed0=UI.speed||1}UI.speed=Math.max(UI.tutSpeed0,2);try{TWKit.setSpeed(UI.speed)}catch(e){}
+  const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};
+  s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
+  startGame(s,{tutorial:true,seed:TS.seed,first:1});
+  UI.guide='light';UI.confirm=null;UI.seen={};UI.trig={};UI.camp=null;try{GXH.hide()}catch(e){}
+  render()}
+// leave the staged game: nothing of it was saved, the dice are real again and the board goes quiet behind the menu
+function tutLeave(){TS.on=false;TUT=null;UI.tut=0;TUTP.pause=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.pause=false;UI.sel=null;UI.sunk=[];UI.marks=[];UI.mph=null;
+  if(UI.tutSpeed0){UI.speed=UI.tutSpeed0;UI.tutSpeed0=0;try{TWKit.setSpeed(UI.speed)}catch(e){}}
+  try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen(){if(typeof GXC==='undefined')return;
+  if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
+function tutStart(o){if(typeof GXT==='undefined'||NET.on)return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  const story=!!(window.CAMPAIGN&&typeof GXC!=='undefined');
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story,
+    endTitle:'You know the rules',endText:o?'Start, tiles, sailing, leviathans, the wave, the cannon. Now the Story begins.':'Start, tiles, sailing, leviathans, the wave, the cannon. The lightbulb explains the Rift Gate and the Maelstrom.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    setup:tutNewGame,
+    onDone:r=>{tutLeave();const c=r&&r.choice;showStart();
+      if(c==='chapter'&&first)GXC.play(first.id);
+      else if(c==='story'&&story)campOpen()},
+    onExit:()=>{tutLeave();showStart()}})}
+// a first-time player tapping Play is offered the tutorial once; true = the offer is showing (the real game starts from "Just play")
+function tutOffer(go){if(typeof GXT==='undefined'||NET.on||!firstTime()||GXT.status(TUT_GAME).seen)return false;
+  try{localStorage.setItem('tw_offered','1')}catch(e){}
+  const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules by doing them, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">New here? Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();d.remove();if(b.dataset.tutoffer==='learn')tutStart();else go()});
+  return true}
+function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
+// ---------------------------------------------------------------- the page tells the kit what the player does (before it is applied)
+// the computer waits while a step reads out what just happened
+{const _sc=schedule;schedule=function(){if(UI.tut&&TUTP.pause)return;return _sc.apply(this,arguments)}}
+// taps on the board (a start mark, a square)
+{const o=phPick;phPick=function(p){
+  if(tutOn()){let sq=null;if(p&&(p.kind==='square'||p.kind==='start'))sq=[p.c,p.r];else if(p&&p.kind==='ship'){const S=G.ships[+String(p.id).slice(1)];if(S&&S.x!=null)sq=[S.x,S.y]}
+    if(!GXT.act({type:'tap',what:'sq',x:sq?sq[0]:-1,y:sq?sq[1]:-1}))return}
+  return o.apply(this,arguments)}}
+{const o=onPick;onPick=function(p){
+  if(tutOn()&&!PH.on&&p&&p.kind==='start'){if(!GXT.act({type:'tap',what:'startmark',x:p.c,y:p.r,e:p.port}))return}
+  else if(tutOn()&&!PH.on&&p&&(p.kind==='square'||p.kind==='ship'||p.kind==='start')){if(!GXT.act({type:'tap',what:'sq',x:p.c,y:p.r}))return}
+  return o.apply(this,arguments)}}
+// taps on the game's own buttons (tiles, Turn, Place, pop-up and question buttons, Continue)
+document.addEventListener('click',e=>{if(!tutOn())return;const t=e.target&&e.target.closest&&e.target.closest('[data-a],[data-ph]');if(!t||t.disabled||t.closest('[data-help]'))return;
+  const D=t.dataset;let a;
+  if(D.a==='startmark')a={what:'startmark',x:+D.x,y:+D.y,e:+D.e};
+  else if(D.a==='card')a={what:'card',t:+D.t};
+  else if(D.a==='rot')a={what:'rot',d:+D.d};
+  else if(D.a==='place')a={what:'place'};
+  else if(D.a==='q'){const o=G&&G.q&&G.q.opts[+D.i];a={what:'q',i:+D.i,h:o&&o.h}}
+  else if(D.a==='sunkok')a={what:'sunkok'};
+  else if(D.ph==='dismiss')a={what:'dismiss'};
+  else a={what:'other',a:D.a||D.ph};
+  const st=GXT.current();const pause=!!(st&&st.pauseAfter);
+  if(!GXT.act(Object.assign({type:'tap'},a))){e.stopPropagation();e.preventDefault();return}
+  if(pause)TUTP.pause=true},true);

@@ -139,3 +139,14 @@ html.ph .pchip.hot em.v{color:#e63946}
 /* long-press popup with the full text of a shortened line (brief.js) */
 #fulltip{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80;max-width:min(86vw,420px);background:rgba(20,10,40,.97);border:2px solid #ffd35a;border-radius:14px;padding:14px 16px;color:#fff;font:600 15px/1.4 system-ui,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.7);pointer-events:none}
 .tl{cursor:help}
+/* tutorial (gx-tutor.js): its top strip covers the bar, so in portrait the score chips ride just under it, on the board, and stay readable and spotlight-able */
+html.gxt-on.ph-p header.gx-bar #pchips{position:fixed;left:6px;right:6px;top:calc(var(--sat,0px) + var(--ph-bar,52px) + 4px);height:44px;flex:none;z-index:30;padding:3px;border-radius:11px;background:rgba(22,11,17,.6)}
+/* tutorial in landscape: the game has no sweep button in its tray there, so the tutorial lays one out beside Done */
+html.gxt-on.ph-l .gx-dock[data-bf] #pacts [data-act="sweep"]{display:flex;min-height:56px;padding:0 2px}
+html.gxt-on.ph-l .gx-dock[data-bf="buy"] #pacts{grid-template-columns:minmax(0,3fr) minmax(0,1fr)}
+/* the tutorial's menu entry: title over its one-line note */
+.gxt-menu{text-align:left}
+.gxt-menu b{display:block}
+.gxt-menu span{display:block;margin-top:2px;font-size:.74em;font-weight:600;opacity:.85;line-height:1.2}
+html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:36px;padding:3px 8px;border-radius:10px;font-size:12px;line-height:1.1;text-align:center;flex:none}
+html.ph .bfintro .you .gxt-menu.tutmini b{font:800 12px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}

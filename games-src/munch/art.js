@@ -365,7 +365,14 @@ function pump(){if(pumping)return;const n=QUEUE.shift();if(!n)return;pumping=tru
   const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');if(!x){done();return}x.drawImage(im,0,0,w,h);
     c.toBlob(b=>{if(b){const bu=URL.createObjectURL(b);BMP.set(k,bu);document.querySelectorAll('img[src="'+u+'"]').forEach(e=>{e.src=bu})}done()},'image/webp',.9)}catch(e){done()}};im.onerror=done;im.src=u}
 function pic(k,u,w,h){const b=BMP.get(k);if(b)return b;want(k,u,w,h);return u}
-function svgArt(def,key,cls){if(CAN_BLOB){const k='a:'+key+':'+def.t;const u=ART_URL.get(k)||artURL(k,cardArt(def,key),'-60 -60 120 120');return `<img class="${cls||'art'}" src="${pic(k,u,320,320)}" alt="" draggable="false">`}
+// painted card art (DK_ART data URIs from build.py): one blob URL per key, made once; falls back to a data: URI where blobs are missing
+const PT_URL=new Map();
+function paintedKey(def){if(typeof DK_ART==='undefined'||!def)return null;const k=def.k||(def.t==='race'&&def.art==='half'?'halfling':def.t==='race'?def.art:null);return k&&DK_ART[k]?k:null}
+function paintedURL(k){let u=PT_URL.get(k);if(u)return u;u=DK_ART[k];
+  if(CAN_BLOB&&window.atob){try{const p=u.split(','),bin=atob(p[1]),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);u=URL.createObjectURL(new Blob([a],{type:'image/webp'}))}catch(e){u=DK_ART[k]}}
+  PT_URL.set(k,u);return u}
+function svgArt(def,key,cls){const pk=!IS_JSDOM&&paintedKey(def);if(pk)return `<img class="${cls||'art'} pt" src="${paintedURL(pk)}" alt="" draggable="false">`;
+  if(CAN_BLOB){const k='a:'+key+':'+def.t;const u=ART_URL.get(k)||artURL(k,cardArt(def,key),'-60 -60 120 120');return `<img class="${cls||'art'}" src="${pic(k,u,320,320)}" alt="" draggable="false">`}
   // headless DOM tests (jsdom) never paint: skip the picture, keep the element
   if(IS_JSDOM)return `<svg class="${cls||'art'}" viewBox="-60 -60 120 120" aria-hidden="true" focusable="false"></svg>`;
   // no blob URLs: a self-contained data: image (one attribute to parse instead of hundreds of SVG nodes)

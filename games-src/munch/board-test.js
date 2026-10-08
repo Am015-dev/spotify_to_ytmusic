@@ -14,7 +14,7 @@ for(const [name,W,H] of SIZES)for(const cs of ['light','dark']){if(cs==='dark'&&
       return o},board);
     if(r.sh>r.ih||r.sw>r.iw)bad.push(`${where}: page scrolls ${r.sw}x${r.sh} > ${r.iw}x${r.ih}`);if(!r.inside)bad.push(`${where}: board outside viewport ${r.board}`);
     if(r.cover.length)bad.push(`${where}: board covered at ${JSON.stringify(r.cover.slice(0,3))}`);if(r.overlap)bad.push(`${where}: dock overlaps board ${r.dock} / ${r.board}`);return r};
-  await p.goto('file://'+process.cwd()+'/doorkick.html');await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await p.waitForTimeout(300);
+  await p.goto('file://'+process.cwd()+'/doorkick.html');await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('dkd_offer','1')}catch(e){}});await p.reload();await p.waitForTimeout(300);
   const r0=await check('start',false);await shot('start');
   // the start dialog must fit
   const dl=await p.evaluate(()=>{const r=document.querySelector('#modal .dlg').getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight+.5});if(!dl)bad.push('start dialog does not fit');
