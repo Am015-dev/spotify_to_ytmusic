@@ -977,7 +977,7 @@ function navPath(x0,z0,x1,z1){const N=HUB.nodes;if(!N||!N.length)return[[x1,z1]]
 
 // ---- keep the streets busy: cars and pedestrians far from the player are moved to roads around them
 function hubNear(min,max,behind){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),kx=Math.floor(RO.x/250),kz=Math.floor(RO.z/250),key=kx*10000+kz;if(!HUB.ngrid){HUB.ngrid=new Map();N.forEach((n,i)=>{const k=Math.floor(n.x/250)*10000+Math.floor(n.z/250);if(!HUB.ngrid.has(k))HUB.ngrid.set(k,[]);HUB.ngrid.get(k).push(i)})}if(!HUB.nc||HUB.nc.k!==key){const L=[];for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const c=HUB.ngrid.get((kx+a)*10000+kz+b);if(c)for(const i of c)L.push(i)}HUB.nc={k:key,L}}const CL=HUB.nc.L;if(!CL.length)return -1;for(let k=0;k<18;k++){const i=CL[Math.floor(R()*CL.length)],n=N[i],dx=n.x-RO.x,dz=n.z-RO.z,d=Math.hypot(dx,dz);if(d<min||d>max)continue;if(behind&&k<12&&dx*fx+dz*fz>d*.2)continue;return i}return -1}
-function hubRecycle(){const C=HUB.cars;if(!C||!C.length)return;for(let k=0;k<6;k++){HUB.rr=((HUB.rr||0)+1)%C.length;const c=C[HUB.rr];if(c.route||c.tr||c.dead>0||Math.hypot(c.x-RO.x,c.z-RO.z)<LV_trFar())continue;const i=LV_trNear();if(i<0)continue;const n=HUB.nodes[i];c.a=i;c.b=n.nb[Math.floor(R()*n.nb.length)];c.t=R()}}
+function hubRecycle(){const C=HUB.cars;if(!C||!C.length)return;for(let k=0;k<6;k++){HUB.rr=((HUB.rr||0)+1)%C.length;const c=C[HUB.rr];if(c.route||c.tr||c.pk||c.dead>0||Math.hypot(c.x-RO.x,c.z-RO.z)<LV_trFar())continue;const i=LV_trNear();if(i<0)continue;const n=HUB.nodes[i];c.a=i;c.b=n.nb[Math.floor(R()*n.nb.length)];c.t=R()}}
 // LEGO minifig pedestrians on the pavements; they leap out of the way (nobody gets hurt)
 const PED_N=110,PED_COL=['#e8412c','#2f7de1','#ffd12c','#3dbb5c','#ff8a1c','#9b5de5','#ffffff','#1fb5b0','#ff5fa2','#5a6b7d','#c0392b','#2c3e50'],PED_PANTS=['#2b3a67','#3b2f2f','#1e1e24','#4a5a3a','#6b4a2a','#7a7f8a'],PED_HAIR=['#3b2414','#111111','#d9a23a','#a8401c','#9aa0a6','#5a3a1c','#e01e2b','#2f7de1'];
 // LEGO minifig pedestrians (about 2.6 m tall, the ship's scale): legs/arms swing while walking, arms up when they leap aside
@@ -996,16 +996,16 @@ const _pB=new THREE.Matrix4(),_pL=new THREE.Matrix4(),_pR=new THREE.Matrix4(),_p
 function pedPart(im,i,ox,oy,oz,rx,rz){_pe.set(rx||0,0,rz||0);_pq.setFromEuler(_pe);_pL.compose(_pv.set(ox,oy,oz),_pq,_ps.set(1,1,1));_pR.multiplyMatrices(_pB,_pL);im.setMatrixAt(i,_pR)}
 function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=Math.abs(RO.v),Q=HUB.pP;
   const PN=LV_pn(P.length);for(const k in Q)if(Q[k].count!==PN)Q[k].count=PN;for(let i=0;i<PN;i++){const p=P[i],A=N[p.a],B=N[p.b];if(!A||!B){pedPlace(p,40,380);continue}const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gN=A.g&&B.g,W=Math.min(A.w||20,B.w||20);
-    if(p.jy<=0){p.t+=p.v*dt/L;p.ph+=p.v*dt*3.2;if(p.t>=1){const nx=B.nb.filter(n=>n!==p.a);p.a=p.b;p.b=nx.length?nx[Math.floor(R()*nx.length)]:p.a;p.t=0}}
-    const off=gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)),bx=A.x+(B.x-A.x)*p.t-dz*off,bz=A.z+(B.z-A.z)*p.t+dx*off;
+    if(p.jy<=0&&!p.cw){p.t+=p.v*dt/L;p.ph+=p.v*dt*3.2;if(p.t>=1){const nx=B.nb.filter(n=>n!==p.a);p.a=p.b;p.b=nx.length?nx[Math.floor(R()*nx.length)]:p.a;p.t=0}}
+    const off=gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)),bx=p.cw?p.cx:A.x+(B.x-A.x)*p.t-dz*off,bz=p.cw?p.cz:A.z+(B.z-A.z)*p.t+dx*off;/* v88p: crowd peds (LV clusters) stand at p.cx/p.cz */
     let d=Math.hypot(bx+p.jx-RO.x,bz+p.jz-RO.z);
-    if(d>LV_pedFar()){LV_pedPut(p);continue}
+    if(!p.cw&&d>LV_pedFar()){LV_pedPut(p);continue}
     if(p.jy<=0&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}
     const x=bx+p.jx,z=bz+p.jz;p._x=x;p._z=z;if(!p.yc||(i+HUB.fr)%8===0){p.y=groundAt(x,z,(p.y||0)+3);if(p.y<-1){pedPlace(p,120,380);continue}p.y=Math.max(0,p.y)}p.yc=1;
-    const air=p.jy>0,sw=air?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=Math.atan2(dx,dz)+(p.spin?performance.now()/1000*p.spin:0),S2=SC_S&&SC_S.on?SC_K.ped:.66;
+    const air=p.jy>0,sw=air||p.cw?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1);
     _pq.setFromAxisAngle(up,h);_pB.compose(_pv.set(x,p.y+p.jy+bob,z),_pq,_ps.set(S2,S2,S2));
     pedPart(Q.legL,i,-.3,1.25,0,air?-.5:sw);pedPart(Q.legR,i,.3,1.25,0,air?.4:-sw);pedPart(Q.hip,i,0,1.36,0);pedPart(Q.tor,i,0,2.22,0);
-    const wv=!air&&LV_wave(i,d,sp),wa=wv?Math.sin(performance.now()/95+i)*.4:0,aL=air?-2.7:wv&&i%2?-2.8+wa:-sw*.9,aR=air?-2.7:wv?-2.8-wa:sw*.9;pedPart(Q.armL,i,-.86,2.78,0,aL,-.12);pedPart(Q.armR,i,.86,2.78,0,aR,.12);pedPart(Q.handL,i,-.86,2.78,0,aL,-.12);pedPart(Q.handR,i,.86,2.78,0,aR,.12);
+    const wv=!air&&(p.cw?LV_cwave(i,d):LV_wave(i,d,sp)),wa=wv?Math.sin(performance.now()/95+i)*.4:0,ct=p.cw&&!wv&&!air?Math.max(0,Math.sin(performance.now()/420+i*1.7)):0,aL=air?-2.7:wv&&i%2?-2.8+wa:p.cw?-.15-ct*1.1:-sw*.9,aR=air?-2.7:wv?-2.8-wa:sw*.9;pedPart(Q.armL,i,-.86,2.78,0,aL,-.12);pedPart(Q.armR,i,.86,2.78,0,aR,.12);pedPart(Q.handL,i,-.86,2.78,0,aL,-.12);pedPart(Q.handR,i,.86,2.78,0,aR,.12);
     pedPart(Q.head,i,0,3.32,0);pedPart(Q.hair,i,0,3.62,0)}
   HUB.fr=(HUB.fr||0)+1;for(const k in Q)Q[k].instanceMatrix.needsUpdate=true}
