@@ -17,7 +17,7 @@ const HP={
 };
 function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<span class="gxh-ar">&rarr;</span>':'<figure>'+(HP[it[0]]?HP[it[0]](it[2]):'')+(it[1]?'<figcaption>'+it[1]+'</figcaption>':'')+'</figure>').join('')+'</div>'}
 // ---------------------------------------------------------------- the phase (null when the player has nothing to decide)
-function hlpPhase(){try{if(!G||G.over||UI.sim||!G.cur||!myTurn())return null;if(document.querySelector('#modal .scrim,.gxc,#menu'))return null;
+function hlpPhase(){try{if(!G||G.over||UI.sim||UI.tut||!G.cur||!myTurn())return null;if(document.querySelector('#modal .scrim,.gxc,#menu'))return null;
   if(G.step==='place')return G.cur.bonus?'bonus':isRiver(G.cur.t)?'river':'place';
   if(G.step==='fig'){const ms=figMoves(G.cur.p).filter(m=>m.act==='fig');if(!ms.length)return 'nofig';return ms.some(m=>m.k==='bld'||m.k==='pig')?'figx':'fig'}}catch(e){}return null}
 // ---------------------------------------------------------------- where each bubble points

@@ -51,7 +51,7 @@ function bfDecide(p, r, fm) {
   if (pct <= 15) return { act: 'draw', text: pct ? 'Low risk. Pull another chip' : 'Safe! Pull another chip' };
   return { act: null, text: '' };
 }
-function bfLine(p, r, fm) { return bfDecide(p, r, fm).text; }
+function bfLine(p, r, fm) { return tutOn() ? '' : bfDecide(p, r, fm).text; }
 function bfMeter(p, v, fm, legal) {
   const lim = CF.limitOf(G, p), ws = CF.whiteSum(p), r = CF.risk(G, v), pct = Math.round(r.pBoom * 100);
   const prev = BF.lastWs[p.seat + ':' + G.round] || 0; BF.lastWs[p.seat + ':' + G.round] = ws;
@@ -132,7 +132,7 @@ function bfGhost() {
   g.hidden = false; g.style.left = Math.round(Math.min(innerWidth - 52, r.left + r.width * .62)) + 'px'; g.style.top = Math.round(Math.min(innerHeight - 64, r.top + r.height * .5)) + 'px';
 }
 function bfGhostTarget() {
-  if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off') return null;
+  if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off' || tutOn()) return null;
   const p = mineP(); if (!p) return null; const fresh = UI.mode === 'guided' || !UI.prefs.drew;
   if (UI.rsOpen && UI.rsMode === 'report') {
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled])') || document.querySelector('#rs .tok:not([disabled])');
@@ -146,11 +146,11 @@ function bfGhostTarget() {
   return null;
 }
 // ---------- rubies, on the same panel as the shop ----------
-const nextLabel = () => G.round >= D.rounds ? 'See final scores' : 'Start day ' + (G.round + 1);
+const nextLabel = () => G.round >= LASTD() ? 'See final scores' : 'Start day ' + (G.round + 1);
 function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; for (let n = 0; n <= mx; n++) { out.push({ drop: n, flask: false }); if (!p.flask && n < mx) out.push({ drop: n, flask: true }); } return out; }
 function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
 const rubyKey = o => o.drop + (o.flask ? 'f' : '');
-function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = rubyBest(p); UI.rubyBest = rubyKey(UI.rubySel); } return UI.rubySel; }
+function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = tutOn() ? { drop: 0, flask: false } : rubyBest(p); UI.rubyBest = tutOn() ? '' : rubyKey(UI.rubySel); } return UI.rubySel; }
 function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
 // the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
 function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }

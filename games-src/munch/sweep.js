@@ -101,7 +101,7 @@ async function playGame(browser, size, gi, rep) {
   page.on('console', m => { if (m.type() === 'error' && !/ERR_|Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
   const anim = gi % 3 === 0 ? 1 : 0, learn = gi % 5 === 4, np = NPS[gi % NPS.length];
   try {
-    await page.goto('file://' + FILE); await page.evaluate(() => { try { localStorage.clear() } catch (e) { } }); await page.reload(); await sleep(500);
+    await page.goto('file://' + FILE); await page.evaluate(() => { try { localStorage.clear(); localStorage.setItem('dkd_offer', '1') } catch (e) { } }); await page.reload(); await sleep(500);   // dkd_offer: a player who already saw the "New here?" tutorial offer (tutor-test.js covers the offer)
     await page.evaluate(PAGE);
     await page.evaluate(([seed, anim, np, learn]) => { setSeed(seed); ANIM = anim; AIDELAY = anim ? 90 : 0; UI.n = np; UI.lvl = ['easy', 'normal', 'hard'][seed % 3]; UI.learn = learn; UI.speed = 1; }, [1000 + gi * 7 + W, anim, np, learn]);
     if (learn) await page.evaluate(() => { try { localStorage.removeItem('dkd_learned'); localStorage.removeItem('dkd_bf') } catch (e) { } });
