@@ -4,6 +4,7 @@ var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, focus: 0, pop: null, seq: 0, evN: 0, over: null, overShown: false, rep: false, repLog: 0, repV: [], repDay: 0, tm: {}, tipq: [], tipShown: {}, tip: null,
   coach: { level: 'full', seen: {} }, prefs: { sound: true, music: true, gfx: 'auto', hint: true }, busy: false, shopSel: [], legal: {}, sim: false, rsOpen: false, aiHold: {} };
 const D = CF.DATA;
+const LASTD = () => G ? CF.lastOf(G) : D.rounds;      // the number of days of the game on the table (9; the staged tutorial has 2)
 const KIT = window.KIT;
 // painted art: CF_ART (data URIs made by build.py) -> blob URLs so the many chip <svg>s only carry a short link. Without blob URLs
 // (old browsers, jsdom) the kit keeps its own vector drawings.
@@ -98,7 +99,7 @@ function savePrefs() { try { localStorage.setItem('cf_prefs', JSON.stringify({ p
 function loadPrefs() { try { const o = JSON.parse(localStorage.getItem('cf_prefs') || 'null'); if (o) { Object.assign(UI.prefs, o.p || {}); if (o.aid != null) AIDELAY = o.aid; if (o.coach) UI.coach.level = o.coach; } } catch (e) { } }
 const SAVEV = 1;
 function hasSave() { try { const s = localStorage.getItem('cf_save'); if (!s) return false; const o = JSON.parse(s); return !!(o && o.v === SAVEV && o.G && o.G.phase !== 'over'); } catch (e) { return false; } }
-function save() { try { if (!G || UI.camp || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
+function save() { try { if (!G || UI.camp || UI.mode === 'tutorial' || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('cf_save'); } catch (e) { } }
 // log lines name every maker; the viewer reads "You" instead of their maker's name ("Wynne takes" -> "You take")
 function youText(t) {
@@ -167,7 +168,7 @@ function promptInfo() {
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
     if (p.st === 'draw' && p.lock) return { text: wn.length ? 'Decided. Waiting for others...' : 'Revealing...' };
-    if (p.st === 'draw') return { text: (G.round === 9 ? 'Last day: Draw or Stop, secretly.' : p.pot.length ? 'Draw another, or stop.' : 'Tap Draw for your first chip.'), mine: true };
+    if (p.st === 'draw') return { text: (G.round === LASTD() ? 'Last day: Draw or Stop, secretly.' : p.pot.length ? 'Draw another, or stop.' : 'Tap Draw for your first chip.'), mine: true };
     return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for others...' : 'Everyone is done.') };
   }
   if (G.phase === 'prep') return { text: wn.length ? 'Waiting for others...' : 'The day begins.' };
@@ -298,7 +299,7 @@ function renderQ(p, legal, qb) {
 }
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
-  if (!G) return; const dtxt = isPh() ? 'Day ' + G.round + '/' + D.rounds : 'Day ' + G.round + ' of ' + D.rounds;
+  if (!G) return; const dtxt = isPh() ? 'Day ' + G.round + '/' + LASTD() : 'Day ' + G.round + ' of ' + LASTD();
   bs.append(UI.camp ? h('button.dayn.gchip', { 'data-a': 'campgoal', type: 'button', 'aria-label': 'Day ' + G.round + '. Tap for the chapter goal' }, '\ud83c\udfaf ' + dtxt) : h('span.dayn', dtxt));
   const v0 = viewSeat(), f0 = focusSeat(), q0 = G.players[f0 >= 0 ? f0 : 0];
   if (isPh() && q0) bs.append(h('span.bst', { title: (f0 === v0 ? 'Your' : q0.name + '\'s') + ' points, rubies and flask' }, UI.camp ? null : h('span.bav', { html: avHTML(f0, 24) }), h('span', { html: ico('vp', 17) }), h('b', q0.vp), h('span', { html: ico('ruby', 16) }), h('b', q0.rubies), h('span.bfl', { html: ico('flask', 17, q0.flask) })));
@@ -306,7 +307,7 @@ function renderBar() {
 }
 let rndT = 0;
 function autoWatch() {   // once I have stopped, watch the computer that is still drawing; go back to my own pot when the day ends
-  const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim()) return; const me = G.players[v];
+  const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim() || tutOn()) return; const me = G.players[v];
   if (UI.autoF && (G.phase !== 'brew' || UI.autoF !== G.round)) { if (UI.focus !== v && UI.autoF) UI.focus = v; UI.autoF = 0; UI.fastAI = false; return; }
   if (!UI.autoF && G.phase === 'brew' && (me.lock || me.st === 'done') && UI.focus === v) { const c = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (c) { UI.focus = c.seat; UI.autoF = G.round; } }
   if (UI.autoF && UI.focus !== v) { const c = G.players[UI.focus]; if (c && c.st !== 'draw') { const n = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (n) UI.focus = n.seat; } }
@@ -319,6 +320,7 @@ function render() {
     const pi = promptInfo(), pr = $('#prompt'); if (pr) { pr.textContent = pi.text; pr.className = pi.mine ? 'mine' : ''; }
     renderHint(); renderLegend(); renderBlg(); renderDrawers(); renderNetBadge && renderNetBadge();
     bfHeat(); const db = $('#dockbody'); if (db) db.classList.toggle('deckon', !!document.querySelector('#acts .bdeck')); requestAnimationFrame(bfGhost);
+    if (typeof hlpAfter === 'function') hlpAfter();
   } catch (e) { console.error(e); if (window.__cfErr) window.__cfErr.push(String(e.stack || e)); }
 }
 function renderHint() { const e = $('#hint'); if (e) { e.hidden = true; e.innerHTML = ''; } }  // tips live in #pc (the tip card)
@@ -330,26 +332,28 @@ function cfgOf(o) {
 }
 // players: seat 0 = you (or the first person), the others follow
 function newGame(mode, o) {
-  if (mode !== 'guided' && !UI.prefs.played) { UI.prefs.played = true; try { savePrefs(); } catch (e) { } }
+  if (mode !== 'guided' && mode !== 'tutorial' && !UI.prefs.played) { UI.prefs.played = true; try { savePrefs(); } catch (e) { } }
   o = o || {}; const c = cfgOf(o); clearTimeout(UI.tm0); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; UI.seq++;
   let np = Math.max(2, Math.min(4, c.np || 3)); const me = c.me != null ? c.me : 0;
   let chars = [me]; for (const s of c.seats) { if (chars.length >= np) break; if (chars.indexOf(s) < 0) chars.push(s); } for (let k = 0; chars.length < np; k++) if (chars.indexOf(k) < 0) chars.push(k);
   np = chars.length; let ai = [], sets = c.sets; const lvOf = ch => (c.lvBy && c.lvBy[ch]) || TEMPER[ch];
   if (mode === 'guided') { np = 2; sets = 1; chars = [me, me === 1 ? 2 : 1]; ai = [null, 'easy']; }
+  else if (mode === 'tutorial') { np = 2; sets = 1; chars = [2, 0]; ai = [null, 'easy']; }   // the staged tutorial: you (Tamsin) against Wynne, beginner books, two days
   else if (mode === 'hot') ai = new Array(np).fill(null);
   else if (mode === 'ai') ai = chars.map(ch => lvOf(ch));
   else ai = chars.map((ch, i) => i === 0 ? null : lvOf(ch));
   const names = chars.map(ch => PN[ch]); if (o.camp && o.camp.opponent && o.camp.opponent.name) names[1] = o.camp.opponent.name.split(' ').pop();   // short name for the table (the boss card shows the full one)
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0; UI.seed = null;
-  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
+  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', length: mode === 'tutorial' ? 2 : undefined, firstCard: mode === 'tutorial' ? 'pick' : mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
   if (o.camp) campTwist(G, o.camp.twist);
+  if (mode === 'tutorial') G.force = 'thick';      // day 2 (the last day) turns up Thick Skin: a blue card, the limit is 9 all day
   UI.camp = o.camp || null; UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
+  UI.coach = { level: mode === 'tutorial' ? 'off' : mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
   if (mode === 'guided' && UI.coach.level === 'off') UI.coach.level = 'full';
   campCoach(o.camp || null);
   window.G = G; try { const st = $('#start'); if (st) st.hidden = true; } catch (e) { }
   closeRS && closeRS(true); try { GX.close(); } catch (e) { }
-  if (mode !== 'ai') save();
+  if (mode !== 'ai' && mode !== 'tutorial') save();
   afterApply(true);
   sndMusic();
   if (mode === 'guided') tipStart();
@@ -369,8 +373,9 @@ function commit(seat, m) {
   afterApply(false); return true;
 }
 function afterApply(first) {
+  if (typeof tutFix === 'function') tutFix();       // the staged tutorial: fixed bag orders, set before anyone draws
   playEvents(first);
-  if (UI.mode !== 'ai' && !(typeof NET !== 'undefined' && NET.on)) { if (G.phase === 'over') clearSave(); else save(); }
+  if (UI.mode !== 'ai' && UI.mode !== 'tutorial' && !(typeof NET !== 'undefined' && NET.on)) { if (G.phase === 'over') clearSave(); else save(); }
   updateHolder();
   if (typeof netPush === 'function' && typeof NET !== 'undefined' && NET.on && isHost()) netPush(false);
   tipCheck();
@@ -497,7 +502,7 @@ function renderReport() {
   rs.innerHTML = ''; rs.appendChild(sc.box);
   if (keepTop) { const nb = rs.querySelector('.rsbody'); if (nb) nb.scrollTop = keepTop; }
   if (play) { sc.box.addEventListener('pointerdown', () => stgFinish()); stgPlay(sc.box, sc.ds, R); }
-  tipCheck();
+  tipCheck(); if (typeof hlpAfter === 'function') hlpAfter();
   const done = G.phase !== 'eval' && !myq && !hotShared;
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
@@ -548,13 +553,13 @@ function showFinal() {
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final scores' });
   const body = h('div.rsbody'); const wn = G.winners.map(s => pname(s));
   body.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', youText(G.winText))));
-  const t = h('table.fin-tab'); const head = h('tr', h('th', 'Cauldron')); for (let r = 1; r <= D.rounds; r++) head.appendChild(h('th', 'D' + r)); head.append(h('th', 'Extra'), h('th', 'Total')); t.appendChild(head);
+  const t = h('table.fin-tab'); const head = h('tr', h('th', 'Cauldron')); for (let r = 1; r <= LASTD(); r++) head.appendChild(h('th', 'D' + r)); head.append(h('th', 'Extra'), h('th', 'Total')); t.appendChild(head);
   for (const p of order) {
-    const gains = []; let sum = 0; for (let r = 1; r <= D.rounds; r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.after - dayStart(p.seat, r) : 0; gains.push(gn); sum += gn; }
+    const gains = []; let sum = 0; for (let r = 1; r <= LASTD(); r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.after - dayStart(p.seat, r) : 0; gains.push(gn); sum += gn; }
     const row = h('tr' + (G.winners.indexOf(p.seat) >= 0 ? '.w' : ''), h('td', p.seat === viewSeat() ? 'You' : p.name)); gains.forEach(x => row.appendChild(h('td', x))); row.append(h('td', p.vp - sum), h('td', h('b', p.vp))); t.appendChild(row);
   }
   body.appendChild(h('div', { style: 'overflow-x:auto' }, t));
-  body.appendChild(h('p.sm', 'D1 to D9 are the points each day brought (fortune cards included). Extra: leftover rubies, 2 rubies for 1 point at the end. Tie: the cauldron that went furthest on the last day wins.'));
+  body.appendChild(h('p.sm', 'D1 to D' + LASTD() + ' are the points each day brought (fortune cards included). Extra: leftover rubies, 2 rubies for 1 point at the end. Tie: the cauldron that went furthest on the last day wins.'));
   const cfg = UI.cfg || {};
   const online = typeof NET !== 'undefined' && NET.on;
   box.appendChild(body);
@@ -562,55 +567,12 @@ function showFinal() {
   const conf = h('div.conf'); const cols = ['#f2b81e', '#d6392f', '#3fa04a', '#3b82d6', '#8a55c4']; for (let i = 0; i < 26; i++) { const c = h('i'); c.style.cssText = 'left:' + Math.random() * 100 + '%;background:' + cols[i % 5] + ';animation-delay:' + Math.random() * 2 + 's;animation-duration:' + (2 + Math.random() * 2) + 's'; conf.appendChild(c); }
   rs.innerHTML = ''; rs.appendChild(box); if (!UI.sim) rs.appendChild(conf);
 }
-// ---------- guided tips (one at a time, in the dock) ----------
-const TIPS = [
-  { id: 'welcome', t: 'Welcome to the fair', x: () => 'Pull chips from the bag. Stop before the whites boil over.', when: () => G.round === 1 && mineP() && mineP().pot.length === 0 },
-  { id: 'place', t: 'Where chips land', x: () => 'Further along the spiral = more coins and points.', when: () => mineP() && mineP().pot.length >= 1 },
-  { id: 'white', t: 'White Fizzpods', x: () => 'White chips heat the pot. Over the limit: boom!', when: () => mineP() && CF.whiteSum(mineP()) > 0 },
-  { id: 'risk', t: 'Reading the odds', x: () => 'The meter shows the danger. Red? Think about Stop.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .15; } },
-  { id: 'flask', t: 'The flask', x: () => 'The flask puts that white chip back. Once a day.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.flask && p.f.canFlask && CF.whiteSum(p) >= 4; } },
-  { id: 'stop', t: 'When to stop', x: () => 'Stop keeps the points and coins under the ring.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
-  { id: 'boom', modal: true, light: true, off: true, t: 'Boom!', x: () => 'Boom! Now choose: the points OR the shopping.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
-  { id: 'report', modal: true, off: true, t: 'The day report', x: () => 'Everyone stopped. Here is how the day went.', when: () => UI.rsOpen && UI.rsMode === 'report' },
-  { id: 'shop', modal: true, light: true, off: true, t: 'The shop', x: () => 'Tap chips to drop them in your bag.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
-  { id: 'rubies', modal: true, off: true, t: 'Rubies', x: () => 'Rubies: start further on, or refill the flask.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
-  { id: 'day2', t: 'Rats and new stalls', x: () => 'Behind? A rat gives you a head start.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
-  { id: 'last', t: 'The last day', x: () => 'Last day: no shop. Leftovers become points.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
-];
+// ---------- the old guided tips are retired: first-time help is the help kit (ui10.js), the staged tutorial is ui11.js ----------
 const mineP = () => { const v = viewSeat(); return G && v >= 0 ? G.players[v] : null; };
-const tipInRs = () => !!(UI.rsOpen && UI.rsMode === 'report');
-function tipSafe(t) { try { return !!t.when(); } catch (e) { return false; } }
-function tipStart() { tipCheck(); render(); }
-// one tip at a time, in the dock (or at the top of the day report for the report/shop/rubies/boom tips), never over the board or Draw:
-// dock tips are spaced out (3 on day 1, 1 on later days, not within 10 log lines of the last one); a tip whose moment has passed is dropped
-function tipCheck() {
-  if (!G) return;
-  if (UI.coach.level === 'off') { UI.tip = null; renderTip(); return; }
-  if (UI.tip && (!!UI.tip.modal !== tipInRs() || !tipSafe(UI.tip))) UI.tip = null;
-  if (!UI.tip) {
-    const lvl = UI.coach.level, guided = UI.mode === 'guided'; UI.tipRound = UI.tipRound || {};
-    if (guided || lvl === 'light' || lvl === 'full') for (const t of TIPS) {
-      if (t.off || UI.tipShown[t.id] || UI.coach.seen[t.id]) continue;
-      if (!guided && lvl === 'light' && !t.light) continue;
-      if (!guided && lvl === 'full' && t.id === 'welcome') continue;
-      if (!!t.modal !== tipInRs()) continue;
-      if (!t.modal) { const m = UI.tipMark; if (m && m.round === G.round && G.logN - m.log < 10) continue; if ((UI.tipRound[G.round] || 0) >= (G.round === 1 ? 3 : 1)) continue; }
-      if (t.modal && G.rep && UI.tipRep === G.rep.round) continue;
-      if (tipSafe(t)) { if (t.modal && G.rep) UI.tipRep = G.rep.round; UI.tipShown[t.id] = 1; UI.tip = t; UI.coach.seen[t.id] = 1; if (!t.modal) UI.tipRound[G.round] = (UI.tipRound[G.round] || 0) + 1; break; }
-    }
-  }
-  renderTip();
-}
-function renderTip() {
-  const pc = $('#pc'), rt = $('#rstip'), t = UI.tip, on = !!t && UI.coach.level !== 'off';
-  const target = on ? (t.modal ? rt : pc) : null;
-  for (const e of [pc, rt]) if (e && e !== target) { e.hidden = true; e.innerHTML = ''; }
-  document.documentElement.classList.toggle('tipon', !!(on && !t.modal));
-  if (!target) return;
-  target.hidden = false; target.innerHTML = ''; target.className = 'tipb';
-  target.appendChild(h('div.tl', h('span.tt', t.x()), h('button.btn.go.tb', { 'data-a': 'tipok', type: 'button', 'aria-label': 'Got it' }, 'OK')));
-}
-function tipOk() { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; tipCheck(); render(); schedule(); }
+function tipCheck() { if (UI.tip) { UI.tip = null; renderTip(); } }
+function tipStart() { }
+function renderTip() { for (const e of [$('#pc'), $('#rstip')]) if (e) { e.hidden = true; e.innerHTML = ''; } document.documentElement.classList.remove('tipon'); }
+function tipOk() { UI.tip = null; renderTip(); }
 // ===================== part 5: drawers (scores, log, cards, rules, menu), start screens, events, phone mode, boot =====================
 function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + youText(G.log[i].t))); return e; }
 function buildRules() {
@@ -646,7 +608,7 @@ function buildRules() {
   sec('Playing it', h('ul', ...li([
     'The ring on the spiral marks where you would score now. The box under the buttons shows the chance that the next chip explodes you.',
     'The small cauldrons at the top are the other players: tap one to watch it. Hot-seat plays one cauldron after the other with a pass screen, online everybody brews in parallel and the host collects every stop.',
-    'The Guide in the menu can be Full, Light or Off.'])));
+    'The lightbulb at the top gives a hint for this very moment. The Menu switches the tips on or off and replays the Tutorial.'])));
   root.appendChild(h('div', { html: typeof CF_CREDITS !== 'undefined' ? CF_CREDITS : '' }));
   root.appendChild(h('p.sm', 'Cauldron Fair is an original game. Names, text and art are original; the rules follow the box.'));
   return root;
@@ -683,7 +645,7 @@ function renderScores() {
   b.appendChild(t);
   b.appendChild(h('h3', 'Score track'));
   for (const p of order) { const w = Math.min(100, 100 * p.vp / mx); b.appendChild(h('div', { style: 'display:flex;align-items:center;gap:8px;margin:5px 0' }, h('span', { style: 'width:62px;font-weight:800;font-size:13px' }, p.name), h('div', { style: 'flex:1;height:16px;border-radius:8px;background:#e9dcc0;overflow:hidden' }, h('i', { style: 'display:block;height:100%;border-radius:8px;width:' + w + '%;background:' + pcol(p.seat) })), h('b', p.vp))); }
-  const ro = G.rep ? G.rep.round : 0; const days = []; for (let r = 1; r <= D.rounds; r++) if (G.hist.some(x => x.round === r)) days.push(r);
+  const ro = G.rep ? G.rep.round : 0; const days = []; for (let r = 1; r <= LASTD(); r++) if (G.hist.some(x => x.round === r)) days.push(r);
   if (days.length) { b.appendChild(h('h3', 'Each day')); const dt = h('table.reft'); const hr = h('tr', h('th', 'Cauldron')); days.forEach(r => hr.appendChild(h('th', 'D' + r))); dt.appendChild(hr); for (const p of G.players) { const rw = h('tr', h('td', p.name)); days.forEach(r => { const x = G.hist.find(y => y.round === r && y.seat === p.seat); rw.appendChild(h('td', x ? (x.boom ? '✖ ' : '') + '+' + x.gain : '')); }); dt.appendChild(rw); } b.appendChild(h('div', { style: 'overflow-x:auto' }, dt)); b.appendChild(h('p.sm', '✖ = the cauldron exploded that day.')); }
 }
 function renderDrawers() {
@@ -701,7 +663,8 @@ function renderMenu() {
   if (online) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  if (!online) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
+  if (!online) b.appendChild(tutNode('btn', true));
+  if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gp = typeof gfxPref === 'function' ? gfxPref() : 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (gp === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gp === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gp === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
@@ -733,8 +696,9 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
+      firstTime() ? tutNode('tbtn go') : null,
       h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), h('span', campLine() || 'Ten chapters, three bosses')),
-      h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
+      h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved fair')) : null,
       h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'))));
@@ -762,7 +726,7 @@ function setupEl() {
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const first = !UI.prefs.played;
   const bStart = h('button.sbtn' + (first ? '' : '.big'), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the fair'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
-  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? You and one computer maker, beginner books and short tips' : 'You and one computer maker, beginner books, tips'));
+  const bGuide = tutNode('sbtn' + (first ? ' big' : ''));
   const go = h('div.sgo', first ? [bGuide, bStart] : [bStart],
     h('div.sgrid3', first ? null : bGuide,
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
@@ -790,6 +754,7 @@ document.addEventListener('click', ev => {
       if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
+        if (!tutAct({ what: 'mv', m })) break;      // the staged tutorial: only the asked move goes through
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }
         if (m.t === 'ratset' || m.t === 'draw') UI.ratOpen = false;
         if (m.t === 'draw') UI.drawT = Date.now();
@@ -808,20 +773,20 @@ document.addEventListener('click', ev => {
     case 'tipmore': UI.tipOpen = !UI.tipOpen; renderTip(); break;
     case 'fort': t.classList.toggle('open'); break;
     case 'fortchip': lpShow(t); break;
-    case 'ratopen': UI.ratOpen = !UI.ratOpen; render(); break;
+    case 'ratopen': if (!tutAct({ what: 'ratopen' })) break; UI.ratOpen = !UI.ratOpen; render(); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
-    case 'rscont': repContinue(); break;
-    case 'shopsel': shopToggle(d.k); break;
-    case 'shopbuy': shopBuy(); break;
-    case 'rubysel': rubySelect(d.k); break;
-    case 'rubygo': rubyGo(); break;
+    case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
+    case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; shopToggle(d.k); break;
+    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; shopBuy(); break;
+    case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; rubySelect(d.k); break;
+    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
     case 'tipoff': UI.coach.level = 'off'; tipOk(); savePrefs(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; closeRS(true); UI.overShown = false; newGame(m === 'net' ? 'vs' : m, c); break; }
     case 'look': closeRS(true); UI.overShown = true; render(); break;
-    case 'story': campOpen(); break;
+    case 'story': storyOpen(); break;
     case 'campfin': closeRS(true); campFinish(); break;
     case 'campgoal': campGoalToast(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
@@ -834,7 +799,6 @@ document.addEventListener('click', ev => {
     case 'gfx': setGfx && setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m, optObj()); break;
-    case 'guided': newGame('guided', optObj()); break;
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
@@ -842,7 +806,6 @@ document.addEventListener('click', ev => {
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; savePrefs(); renderMenu(); tipCheck(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }
@@ -955,7 +918,7 @@ function bfDecide(p, r, fm) {
   if (pct <= 15) return { act: 'draw', text: pct ? 'Low risk. Pull another chip' : 'Safe! Pull another chip' };
   return { act: null, text: '' };
 }
-function bfLine(p, r, fm) { return bfDecide(p, r, fm).text; }
+function bfLine(p, r, fm) { return tutOn() ? '' : bfDecide(p, r, fm).text; }
 function bfMeter(p, v, fm, legal) {
   const lim = CF.limitOf(G, p), ws = CF.whiteSum(p), r = CF.risk(G, v), pct = Math.round(r.pBoom * 100);
   const prev = BF.lastWs[p.seat + ':' + G.round] || 0; BF.lastWs[p.seat + ':' + G.round] = ws;
@@ -1036,7 +999,7 @@ function bfGhost() {
   g.hidden = false; g.style.left = Math.round(Math.min(innerWidth - 52, r.left + r.width * .62)) + 'px'; g.style.top = Math.round(Math.min(innerHeight - 64, r.top + r.height * .5)) + 'px';
 }
 function bfGhostTarget() {
-  if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off') return null;
+  if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off' || tutOn()) return null;
   const p = mineP(); if (!p) return null; const fresh = UI.mode === 'guided' || !UI.prefs.drew;
   if (UI.rsOpen && UI.rsMode === 'report') {
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled])') || document.querySelector('#rs .tok:not([disabled])');
@@ -1050,11 +1013,11 @@ function bfGhostTarget() {
   return null;
 }
 // ---------- rubies, on the same panel as the shop ----------
-const nextLabel = () => G.round >= D.rounds ? 'See final scores' : 'Start day ' + (G.round + 1);
+const nextLabel = () => G.round >= LASTD() ? 'See final scores' : 'Start day ' + (G.round + 1);
 function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; for (let n = 0; n <= mx; n++) { out.push({ drop: n, flask: false }); if (!p.flask && n < mx) out.push({ drop: n, flask: true }); } return out; }
 function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
 const rubyKey = o => o.drop + (o.flask ? 'f' : '');
-function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = rubyBest(p); UI.rubyBest = rubyKey(UI.rubySel); } return UI.rubySel; }
+function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = tutOn() ? { drop: 0, flask: false } : rubyBest(p); UI.rubyBest = tutOn() ? '' : rubyKey(UI.rubySel); } return UI.rubySel; }
 function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
 // the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
 function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }
@@ -1443,6 +1406,7 @@ function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
     game: 'cauldron', data: window.CAMPAIGN,
+    headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; },
     startChapter: campStart,
     isWon: campIsWon, metrics: campMetrics,
     onExit: () => { UI.camp = null; campCoach(null); showStart(); },
@@ -1640,7 +1604,7 @@ function marketEl(p, q) {
     });
     st.appendChild(row); stalls.appendChild(st);
   }
-  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
+  if (p.rubies >= D.rubySpend && G.round < LASTD()) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
   wrap.appendChild(stalls);
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
@@ -1688,4 +1652,280 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
   wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend)),
     h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop))));
   return wrap;
+}
+// ===================== part 10: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// One bubble per phase of play (title <= 4 words, text <= 20 words), shown the first time that phase is reached, pointing at the thing to tap.
+// The bulb: the game's own advice (the same CF.AI.choose move that makes the "sug" glow, the same bfDecide as the brew line) + a short why + rules cards.
+// Nothing here appears on its own twice; Menu > Tips switches it off. While the staged tutorial runs (ui11.js) all of this stays quiet.
+// ---------------------------------------------------------------- pictures for the rules cards (the game's own chips and icons)
+function hpics(items) {
+  return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' :
+    '<figure>' + (it[0] === 'chip' ? chipHTML(it[1], 56) : ico(it[1], 56)) + (it[2] ? '<figcaption>' + it[2] + '</figcaption>' : '') + '</figure>').join('') + '</div>';
+}
+const hq = s => () => { const e = document.querySelector(s); return e && e.getBoundingClientRect().width ? e : null; };
+const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+const HLP_STEPS = {
+  first: { target: hfirst('#acts .bagb:not(.off)', '#acts .bagb'), title: 'Pull a chip', text: 'Tap the bag. The chip lands on the spiral, as many spaces on as its number.', pic: () => hpics([['ico', 'bag']]) },
+  brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Draw for more coins and points, or Stop to keep your space. Whites must stay at 7 or less.', pic: () => hpics([['chip', 'W2']]) },
+  hot: { target: hfirst('#acts .stopb', '#acts .brow'), title: 'Close to boiling', text: 'Another white chip may explode the pot. Stop now, or use the flask on the last white.', pic: () => hpics([['ico', 'boom']]) },
+  last: { target: hfirst('#acts .brow', '#acts .bagb'), title: 'The last day', text: 'Everyone secretly picks Draw or Stop, then all show together. No shopping today.', pic: () => hpics([['ico', 'bag']]) },
+  card: { target: hfirst('#qbox .opts', '#qbox'), title: 'Fortune card', text: 'Today\'s card lets you choose something. Tap the option you want.', pic: () => hpics([['ico', 'ruby']]) },
+  chip: { target: hfirst('#qbox .opts', '#qbox'), title: 'Chip power', text: 'A chip lets you choose. Place the chip it shows, or put it all back.', pic: () => hpics([['chip', 'B1']]) },
+  boom: { target: hfirst('#rs .ds.me .dtile', '#rs .dtile', '#rs .dec'), title: 'Boom! Choose', text: 'Your pot exploded. Take the victory points, or the coins to go shopping.', pic: () => hpics([['ico', 'boom']]) },
+  shop: { target: hfirst('#rs .stalls', '#rs .mkt'), title: 'The fair stalls', text: 'Tap chips to buy them for your bag: up to two, different colours.', pic: () => hpics([['ico', 'coin']]) },
+  ruby: { target: hfirst('#rs .rpot', '#rs .rbar', '#rs .rboard'), title: 'Spend rubies', text: '2 rubies move your droplet one space on, or refill your flask. Then go on.', pic: () => hpics([['ico', 'ruby']]) },
+  power: { target: hfirst('#rs .dsheet', '#rs .dec', '#rs .rsbody'), title: 'Chip power', text: 'A chip in your pot earned a bonus. Tap the reward you want.', pic: () => hpics([['chip', 'G1']]) }
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each); a card without a phase is general
+const HLP_RULES = [
+  { title: 'The goal', text: 'You brew for nine days. Chips earn coins and victory points. The most points after day 9 wins.', pic: () => hpics([['ico', 'bag'], '>', ['ico', 'vp', 'Points'], '>', ['ico', 'check', 'Winner']]) },
+  { title: 'One day', text: 'Draw chips one by one and stop when you like. Then count the day, shop, and begin again.', pic: () => hpics([['ico', 'bag', 'Draw'], '>', ['ico', 'coin', 'Count'], '>', ['chip', 'B1', 'Shop']]) },
+  { title: 'Explosions', text: 'White chips add up. More than 7 and the cauldron explodes: you must stop and give something up.', pic: () => hpics([['chip', 'W2', '2'], ['chip', 'W3', '3'], ['chip', 'W3', '3'], '>', ['ico', 'boom', '8']]) },
+  { phase: 'first', title: 'Pull a chip', text: 'Tap the bag. The chip moves forward along the spiral by its number.', pic: () => hpics([['ico', 'bag'], '>', ['chip', 'G2', 'Moves 2']]) },
+  { phase: 'first', title: 'Your scoring space', text: 'The ring sits one space past your last chip. Its coins buy chips, its points win the game.', pic: () => hpics([['ico', 'coin', 'Coins'], ['ico', 'vp', 'Points'], ['ico', 'ruby', 'Ruby']]) },
+  { phase: 'first', title: 'White chips', text: 'The meter adds up your white chips. Seven is the limit; one more and the pot explodes.', pic: () => hpics([['chip', 'W1'], ['chip', 'W2'], ['chip', 'W3'], '>', ['ico', 'boom', 'Over 7']]) },
+  { phase: 'brew', title: 'Draw or stop', text: 'Drawing travels further for more coins and points, but risks an explosion. Stop keeps your space.', pic: () => hpics([['ico', 'bag', 'Draw'], ['ico', 'check', 'Stop']]) },
+  { phase: 'brew', title: 'The danger meter', text: 'It shows the chance that the next chip explodes you. When it turns red, think about Stop.', pic: () => hpics([['chip', 'W3', 'Risky']]) },
+  { phase: 'brew', title: 'The flask', text: 'Once a day the flask puts the white chip you just drew back in the bag. Rubies refill it.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
+  { phase: 'brew', title: 'The bonus die', text: 'When everyone has stopped, the safe cauldron with the most coins rolls the bonus die for a prize.', pic: () => hpics([['ico', 'die', 'Die']]) },
+  { phase: 'hot', title: 'Close to boiling', text: 'Your whites are near 7. A white chip may explode you; other colours are safe.', pic: () => hpics([['chip', 'W3'], '>', ['ico', 'boom']]) },
+  { phase: 'hot', title: 'The flask', text: 'Just drew a white? Tap the flask to put it back. You cannot save the chip that exploded you.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
+  { phase: 'hot', title: 'If it explodes', text: 'Your last chip stays and you must stop. Then you choose: the points, or the coins to shop.', pic: () => hpics([['ico', 'boom'], '>', ['ico', 'vp', 'Points'], ['ico', 'coin', 'Coins']]) },
+  { phase: 'last', title: 'Stir!', text: 'On the last day everybody secretly chooses Draw or Stop. All choices are shown together.', pic: () => hpics([['ico', 'bag', 'Draw'], ['ico', 'check', 'Stop']]) },
+  { phase: 'last', title: 'Final count', text: 'No shop today. Every 5 coins and every 2 rubies you hold become 1 victory point.', pic: () => hpics([['ico', 'coin', '5'], ['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
+  { phase: 'last', title: 'Who wins', text: 'The most points wins. A tie goes to the cauldron that reached furthest today.', pic: () => hpics([['ico', 'vp'], '>', ['ico', 'check', 'Winner']]) },
+  { phase: 'card', title: 'Fortune cards', text: 'Each day opens with a card. Purple cards happen now, blue cards last the whole day.', pic: () => hpics([['ico', 'ruby', 'Purple: now'], ['ico', 'drop', 'Blue: all day']]) },
+  { phase: 'card', title: 'Choose a reward', text: 'Read the options and tap one. The card text above tells you what each one does.', pic: () => hpics([['chip', 'B2'], ['ico', 'ruby', '3']]) },
+  { phase: 'card', title: 'The rat stone', text: 'From day 2, if you trail the leader your first chip starts further on. Tap the rat to use less.', pic: () => hpics([['ico', 'rat', 'Head start']]) },
+  { phase: 'chip', title: 'Chip powers', text: 'Some coloured chips have a power when they land. Blue and yellow ones may ask you to choose.', pic: () => hpics([['chip', 'B1'], ['chip', 'Y1']]) },
+  { phase: 'chip', title: 'Place or put back', text: 'A peeked chip can be your next chip, with its power. Or put them all back in the bag.', pic: () => hpics([['chip', 'B2'], '>', ['ico', 'bag', 'Back']]) },
+  { phase: 'boom', title: 'You exploded', text: 'The last chip stays and the day ends for you. You still score a ruby if your space has one.', pic: () => hpics([['ico', 'boom'], ['ico', 'ruby']]) },
+  { phase: 'boom', title: 'Points or coins', text: 'Take the victory points on your space, or the coins to buy chips. Not both.', pic: () => hpics([['ico', 'vp', 'Points'], ['ico', 'coin', 'Coins']]) },
+  { phase: 'boom', title: 'Coins buy chips', text: 'Better chips make a stronger bag for the next days. Points win the game today.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], '>', ['ico', 'bag']]) },
+  { phase: 'shop', title: 'Buy for your bag', text: 'Spend up to your coins on one or two chips of different colours. New chips go in your bag.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], ['chip', 'G1']]) },
+  { phase: 'shop', title: 'Each colour has a power', text: 'Orange is plain. Green gives rubies, blue peeks, red slides, black counts moths. Tap and hold to read.', pic: () => hpics([['chip', 'O1'], ['chip', 'G1'], ['chip', 'B1'], ['chip', 'R1'], ['chip', 'K1']]) },
+  { phase: 'shop', title: 'Locked stalls', text: 'The yellow stall opens on day 2 and the purple one on day 3. Sold-out chips are gone.', pic: () => hpics([['chip', 'Y1', 'Day 2'], ['chip', 'P1', 'Day 3']]) },
+  { phase: 'ruby', title: 'Spend rubies', text: 'Every 2 rubies do one thing: move your droplet one space, or refill the flask.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'drop', 'Droplet']]) },
+  { phase: 'ruby', title: 'The droplet', text: 'Your first chip starts at the droplet. Moving it on gives you a head start every day.', pic: () => hpics([['ico', 'drop'], '>', ['chip', 'G1']]) },
+  { phase: 'ruby', title: 'Keep them?', text: 'Unspent rubies are not lost. At the end of the game 2 rubies count as 1 victory point.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
+  { phase: 'power', title: 'Chip powers', text: 'Green, purple and black chips act after the brew, if they sit near the end of your pot.', pic: () => hpics([['chip', 'G1'], ['chip', 'P1'], ['chip', 'K1']]) },
+  { phase: 'power', title: 'Pick a reward', text: 'The glowing option is a good choice. Read the others if you like, then tap one.', pic: () => hpics([['ico', 'check']]) }
+];
+// ---------------------------------------------------------------- the phase the player is deciding in (null when there is nothing to decide)
+const HP_CARDQ = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, restart: 1 }, HP_CHIPQ = { crow: 1, peek: 1, y1: 1, side: 1 };
+function hlpPhase() {
+  try {
+    if (!G || !UI.started || G.phase === 'over' || tutOn()) return null;
+    const v = viewSeat(); if (v < 0 || (hotSeat() && UI.holder < 0)) return null;
+    const p = G.players[v];
+    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? 'shop' : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
+    if (p.q) return HP_CARDQ[p.q.h] ? 'card' : HP_CHIPQ[p.q.h] ? 'chip' : null;
+    if (G.phase !== 'brew' || p.st !== 'draw' || p.lock || BF.pulling || focusSeat() !== v) return null;
+    if (G.round === LASTD()) return 'last';
+    if (!p.pot.length) return 'first';
+    return CF.risk(G, v).pBoom >= .3 ? 'hot' : 'brew';
+  } catch (e) { return null; }
+}
+// ---------------------------------------------------------------- the bulb: the game's own advice, as a target and a short why (<= 15 words)
+function capW(t, n) { const w = String(t || '').replace(/\s+/g, ' ').trim().split(' '); return w.length <= n ? w.join(' ') : ''; }
+function hlpWhy(p, q, m) {
+  const pct = () => Math.round(CF.risk(G, p.seat).pBoom * 100), sp = CF.spaceOf(p);
+  if (!q) {
+    if (m.t === 'draw') return 'Only ' + pct() + '% to explode, so another chip is worth the risk.';
+    if (m.t === 'flask') return 'Too hot: the flask puts the last white chip back in the bag.';
+    return pct() + '% to explode. Stop and keep ' + D.COINS[sp] + ' coins and ' + D.VP[sp] + ' points.';
+  }
+  switch (q.h) {
+    case 'de': return m.o === 'vp' ? 'Few coins here, so the victory points are worth more.' : q.d.coins + ' coins buy more for your bag than ' + q.d.vp + ' points.';
+    case 'shop': return 'These chips make your bag stronger for the coins you have.';
+    case 'ruby': return m.drop || m.flask ? (m.flask && !m.drop ? 'Refill the flask so you can use it tomorrow.' : 'A further start gives every day a head start.') : 'Keep the rubies: 2 of them are worth a point at the end.';
+    case 'pick': return m.o === 'rubies' ? 'Rubies buy droplet steps and flask refills.' : 'A new chip makes your bag stronger.';
+    case 'crow': case 'peek': return m.idx < 0 ? 'None of these chips helps now: put them all back.' : 'This chip fits your pot best. Place it.';
+    default: return 'This is the best option for your bag right now.';
+  }
+}
+function hlpSuggest() {
+  try {
+    if (!G || !UI.started || G.phase === 'over' || tutOn() || BF.pulling || (hotSeat() && UI.holder < 0)) return null;
+    const v = viewSeat(); if (v < 0 || focusSeat() !== v) return null; const p = G.players[v], q = p.q;
+    if (UI.rsOpen) {
+      if (UI.rsMode !== 'report' || STG.run || !q) return null;
+      const m = (q.h === 'shop' || q.h === 'ruby') ? null : CF.AI.choose(G, v, 'normal'); const sel = document.querySelector('#rs .tok.on, #rs .rtg.here');
+      let tgt;
+      if (q.h === 'shop') tgt = document.querySelector('#rs .tok.sug:not(.on):not([disabled])') || document.querySelector('#rs [data-a=shopbuy]');
+      else if (q.h === 'ruby') tgt = document.querySelector('#rs .rtg.sug:not(.here), #rs .rbt.sug') || document.querySelector('#rs [data-a=rubygo]');
+      else tgt = document.querySelector('#rs [data-a=mv].sug, #rs .dpick.sug');
+      if (!tgt || !tgt.getBoundingClientRect().width) return null;
+      const why = capW(hlpWhy(p, q, q.h === 'ruby' ? (UI.rubySel || {}) : q.h === 'shop' ? {} : m || {}), 15); if (!why) return null;
+      return { why, target: () => tgt.isConnected ? tgt : null };
+    }
+    if (q) {
+      const btn = document.querySelector('#qbox [data-a=mv].sug'); if (!btn) return null;
+      const m = (UI.legal[v] || [])[+btn.dataset.i]; if (!m) return null; const why = capW(hlpWhy(p, q, m), 15); if (!why) return null;
+      return { why, target: () => btn.isConnected ? btn : document.querySelector('#qbox [data-a=mv].sug') };
+    }
+    if (G.phase !== 'brew' || p.st !== 'draw' || p.lock) return null;
+    const legal = UI.legal[v] || mvList(v);
+    let m = CF.AI.choose(G, v, 'normal'); if (!m || (m.t !== 'draw' && m.t !== 'stop' && m.t !== 'flask')) return null;
+    if (G.round === LASTD() && m.t === 'flask') return null;
+    const sel = m.t === 'draw' ? '#acts .bagb:not(.off)' : m.t === 'stop' ? '#acts .stopb:not(.off)' : '#acts .flb'; const why = capW(hlpWhy(p, null, m), 15);
+    if (!why || !document.querySelector(sel) || !legal.some(x => x.t === m.t)) return null;
+    return { why, target: () => document.querySelector(sel) };
+  } catch (e) { return null; }
+}
+// ---------------------------------------------------------------- wiring
+let _hlpInit = false;
+function hlpInit() {
+  if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
+  GXH.init({ game: 'cauldron-fair', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
+}
+function hlpAfter() {
+  hlpInit(); if (typeof GXH === 'undefined') return;
+  const st = $('#start'), busy = !G || !UI.started || G.phase === 'over' || tutOn() || (st && !st.hidden) || UI.mode === 'ai' || !!GX.open || Date.now() < BF.fxUntil || (UI.rsOpen && UI.rsMode !== 'report');
+  GXH.phase(busy ? null : hlpPhase());
+}
+// ===================== part 11: the tutorial (shell/gx-tutor.js): a staged two-day game that teaches every rule by doing it once =====================
+// The staged game is a real game cut to TWO days (engine length 2): day 1 is the full brew, day 2 is "the last day" (its own rules). You (Tamsin) play Wynne; the seed, the
+// fortune cards, both bags and Wynne's draws are fixed, so each rule comes up on cue. Nothing of it is ever saved. Each step spotlights ONE thing, everything else is dimmed
+// and inert, and the step moves on only when the game reports that exact action (GXT.act from the input handlers in ui5.js).
+//
+// THE RULES THIS TUTORIAL TEACHES (read from the rules drawer and rules-test.js): each line is  rule -> the steps that do it.  tutor-test.js checks every rule has a step.
+const TUT_RULES = [
+  ['the goal: most victory points after 9 days', 'goal', 'end'],
+  ['drawing chips from your bag', 'draw1'],
+  ['moving along the cauldron spiral, the scoring space (coins, points, ruby)', 'spiral'],
+  ['white chips and the explosion limit of 7 (the meter)', 'whites', 'keep'],
+  ['the flask puts a white chip back (once a day)', 'flask'],
+  ['stopping versus pushing your luck', 'seven', 'push', 'd2stop'],
+  ['what happens when you explode: choose coins or points', 'choose'],
+  ['the bonus die', 'report'],
+  ['the fortune card (purple now, blue all day)', 'fortune', 'day2'],
+  ['rubies: move the droplet / refill the flask', 'droplet', 'refill'],
+  ['the droplet and the rat stone head start', 'droplet', 'day2'],
+  ['buying chips in the shop; each colour has a power', 'shops1', 'shops2', 'buy'],
+  ['a chip power at work (blue: peek and pick)', 'peek'],
+  ['scoring at the end of a day', 'report', 'd2report'],
+  ['the last day: secret Draw or Stop, no shop, 5 coins and 2 rubies = 1 point', 'd2draw', 'd2report'],
+  ['how the game ends after 9 days', 'end']
+];
+const TUT_GAME = 'cauldron-fair', TUT_SEED = 23;
+const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial';
+const firstTime = () => !UI.prefs.played;
+const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls, launch: tutStart });
+function tutNode(cls, row) { const w = document.createElement('div'); w.innerHTML = tutBtn(cls); const b = w.firstChild; if (!b) return null; return row ? h('div.mrow', b) : b; }
+// the game's input handlers ask the kit BEFORE they act; false = not what this step asks (the click is ignored)
+function tutAct(x) { if (!tutOn()) return true; return GXT.act(Object.assign({ type: 'tap' }, x)); }
+// ---------------------------------------------------------------- the script: fixed draws (the next chips come in this order, the rest follow)
+function tutOrder(p, keys) {
+  const rest = p.bag.slice(), pick = [];
+  for (const k of keys) { const i = rest.findIndex(c => c && c.c + c.v === k); if (i >= 0) pick.push(rest.splice(i, 1)[0]); }
+  p.bag = rest.concat(pick.reverse());       // a draw takes the END of the bag
+}
+UI.tut = {};
+function tutFix() {
+  if (UI.mode !== 'tutorial' || !G || G.phase === 'over') return;
+  const T = UI.tut = UI.tut || {}, me = G.players[0], wy = G.players[1];
+  UI.focus = 0;
+  if (G.phase === 'brew' && G.round === 1 && !T.d1) { T.d1 = 1; tutOrder(me, ['W2', 'W3', 'W1']); tutOrder(wy, ['W2', 'O1', 'W1', 'G1', 'W1']); }
+  if (G.round === 1 && T.d1 && !T.fl && me.flask === false) { T.fl = 1; tutOrder(me, ['W2', 'W1']); }        // the flask put the white 1 back at a random place
+  if (G.phase === 'brew' && G.round === 2 && !T.d2) { T.d2 = 1; tutOrder(me, ['B1', 'W2', 'W3']); tutOrder(wy, ['W2', 'O1']); }
+}
+// Wynne is scripted too: she takes a Wren Feather 2 from the card, draws 4 chips on day 1 and 2 on day 2, then stops; shopping and rubies are the normal computer's.
+function tutAI(Gx, seat) {
+  if (UI.mode !== 'tutorial' || Gx !== G || seat !== 1) return null;
+  const p = Gx.players[1], mv = CF.moves(Gx, 1);
+  if (p.q) return p.q.h === 'pick' ? (mv.find(m => m.o === 'B2') || null) : null;
+  if (Gx.phase === 'brew' && p.st === 'draw') { const want = Gx.round === 1 ? 4 : 2; return mv.find(m => m.t === (p.pot.length >= want ? 'stop' : 'draw')) || null; }
+  return null;
+}
+(function () { const o = CF.AI.choose; CF.AI.choose = function (Gx, seat, level) { const m = tutAI(Gx, seat); return m || o.call(CF.AI, Gx, seat, level); }; })();
+// ---------------------------------------------------------------- where each step points
+const tp = () => G && G.players[0];
+const tq = sel => () => { const e = document.querySelector(sel); return e && e.getBoundingClientRect().width && !e.disabled ? e : null; };
+const tfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width && !e.disabled) return e; } return null; };
+const tbrew = () => { const p = tp(); return !!(G && p && G.phase === 'brew' && p.st === 'draw' && !p.q && !p.lock && !BF.pulling && !document.querySelector('.boomfx')); };
+const tbag = tq('#acts .bagb:not(.off)');
+const tmove = pred => () => { const L = UI.legal[0] || []; const b = [...document.querySelectorAll('#qbox [data-a=mv]')].find(e => { const m = L[+e.dataset.i]; return m && pred(m); }); return b && b.getBoundingClientRect().width ? b : null; };
+const tws = () => CF.whiteSum(tp());
+const tn = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+function tutSteps() {
+  return [
+    { id: 'goal', title: 'Welcome to the fair', say: 'Brew potions for 9 days. The most victory points wins. Your rival\'s points are here. This practice lasts two days.', target: tfirst('#others .th', '#cwrap'), wait: null,
+      ready: () => !!(G && UI.started && G.round === 1 && document.querySelector('#acts,#qbox')) },
+    { id: 'fortune', title: 'Fortune card', say: 'Each day starts with a fortune card. This purple one happens now. Take 3 rubies.', target: tmove(m => m.t === 'pick' && m.o === 'rubies'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pick' && a.m.o === 'rubies' }, ready: () => !!(tp() && tp().q && tp().q.h === 'pick') },
+    { id: 'draw1', title: 'Draw a chip', say: 'Your chips live in the bag. Tap it to pull one out.', target: tbag,
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 0 && G.round === 1 },
+    { id: 'spiral', title: 'The spiral', say: () => 'It moved ' + tn(tp().pot[0].v, 'space') + ': its number. The ring marks the space you score if you stop.', target: tq('#cwrap'), wait: null,
+      ready: () => tbrew() && tp().pot.length === 1 },
+    { id: 'whites', title: 'White chips', say: 'White chips fill this meter. More than 7 and the pot explodes. Draw again.', target: tbag, also: tq('#acts .meter'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 1 && !!document.querySelector('#acts .meter') },
+    { id: 'keep', title: 'Keep drawing', say: () => 'Whites are at ' + tws() + ' of 7. Draw once more.', target: tbag, also: tq('#acts .meter'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 2 },
+    { id: 'flask', title: 'The flask', say: () => tws() + ' of 7 is risky. The flask puts the last white chip back. Tap it!', target: tq('#acts .flb'), also: tq('#acts .meter'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'flask' }, ready: () => tbrew() && tp().pot.length === 3 && !!document.querySelector('#acts .flb') },
+    { id: 'seven', title: 'Seven is safe', say: 'The chip is back in the bag. Exactly 7 is still safe. Draw again.', target: tbag, also: tq('#acts .meter'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 2 && tp().flask === false && tws() === 5 },
+    { id: 'push', title: 'Push your luck', say: 'At 7, any white chip explodes the pot. Stopping is safe, but be bold: draw!', target: tbag, also: tq('#acts .meter'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, wrong: 'Be bold: tap the bag.', ready: () => tbrew() && tp().pot.length === 3 && tws() === 7 },
+    { id: 'report', title: 'Counting the day', say: () => { const d = G.players[1].res && G.players[1].res.die; return 'Spaces pay coins and points. Only safe pots can roll the bonus die' + (d && d.length ? ': ' + G.players[1].name + '\'s did.' : '.'); }, target: tq('#rs .dtable'), wait: null,
+      ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .dtable')) },
+    { id: 'choose', title: 'Boom: pick one', say: () => { const d = tp().q.d; return 'Exploded pots choose: ' + tn(d.vp, 'point') + ' or ' + d.coins + ' coins to shop. Take the coins.'; }, target: tq('#rs .dpick.dpc'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'de' && a.m.o === 'buy' }, ready: () => !!(UI.rsOpen && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .dpick.dpc')) },
+    { id: 'shops1', title: 'The fair stalls', say: 'Each stall sells one colour, and each colour has a power. Orange: none. Green: rubies. Blue: peek. Black: moth count.', target: tfirst('#rs .stalls'), wait: null,
+      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stalls')) },
+    { id: 'shops2', title: 'More stalls', say: 'Red slides further. Yellow opens on day 2, purple on day 3. Tap and hold a chip to read its power.', target: tfirst('#rs .stalls'), wait: null,
+      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stalls')) },
+    { id: 'buy', title: 'Buy a chip', say: 'You may buy up to two chips of different colours. Tap the Wren Feather: it peeks at extra chips.', target: tq('#rs .tok[data-k="B1"]'),
+      wait: { type: 'tap', match: a => a.what === 'shopsel' && a.k === 'B1' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .tok[data-k="B1"]')) },
+    { id: 'droplet', title: 'The droplet', say: '2 rubies move your droplet one space on. Your first chip starts further every day. Tap it.', target: tq('#rs .rbt.rdrop'),
+      wait: { type: 'tap', match: a => a.what === 'rubysel' && a.k === '1' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .rbt.rdrop:not([disabled])')) },
+    { id: 'refill', title: 'Refill the flask', say: 'A used flask comes back for 2 rubies. Tap the flask to refill it.', target: tq('#rs .rbt.rflask'),
+      wait: { type: 'tap', match: a => a.what === 'rubysel' && a.k === '1f' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .rbt.rflask:not([disabled])') && UI.rubySel && UI.rubySel.drop === 1) },
+    { id: 'confirm', title: 'Start day 2', say: 'Chips go in your bag and rubies are spent. Tap to begin day 2.', target: tq('#rs [data-a=shopbuy]'),
+      wait: { type: 'tap', match: a => a.what === 'shopbuy' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && UI.rubySel && UI.rubySel.flask) },
+    { id: 'day2', title: 'The last day', say: 'Blue cards last all day: the limit is 9 now. Trailing on points? The rat stone gives a head start.', target: tfirst('#fortchip', '#fort'), also: tq('#ratchip'), wait: null,
+      ready: () => tbrew() && G.round === 2 && !!document.querySelector('#ratchip') },
+    { id: 'd2draw', title: 'Draw together', say: 'On the last day both players secretly choose, then reveal together. Tap the bag.', target: tbag,
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && G.round === 2 && tp().pot.length === 0 },
+    { id: 'peek', title: 'Peek and pick', say: 'The Wren Feather peeked at a chip. Place it as your next chip, or put it back.', target: tmove(m => m.t === 'crow' && m.idx === 0),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'crow' && a.m.idx === 0 }, ready: () => !!(tp() && tp().q && tp().q.h === 'crow') },
+    { id: 'd2stop', title: 'Stop here', say: 'Stop keeps your space: its coins and points are yours. Tap Stop.', target: tq('#acts .stopb:not(.off)'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'stop' }, wrong: 'Tap Stop.', ready: () => tbrew() && G.round === 2 && tp().pot.length === 2 },
+    { id: 'd2report', title: 'The final count', say: () => 'Last day: every 5 coins and every 2 rubies give 1 point. Tap to see who won.', target: tq('#rs [data-a=rscont]:not(.off)'), also: tq('#rs .dtable'),
+      wait: { type: 'tap', match: a => a.what === 'rscont' }, ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && G.phase === 'over' && document.querySelector('#rs [data-a=rscont]:not(.off)')) },
+    { id: 'end', title: 'You know the game', say: () => { const a = G.players[0].vp, b = G.players[1].vp; return (a > b ? 'You win, ' + a + ' to ' + b + '!' : a === b ? 'A tie, ' + a + ' each!' : G.players[1].name + ' wins, ' + b + ' to ' + a + '.') + ' A real game lasts 9 days.'; },
+      target: tfirst('#rs .win', '#rs .rsbody'), wait: null, ready: () => !!(G && G.phase === 'over' && UI.rsMode === 'final' && document.querySelector('#rs .win')) }
+  ];
+}
+// ---------------------------------------------------------------- the kit hooks
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen() {
+  if (typeof GXC === 'undefined') return;
+  if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen();
+}
+function tutStart(o) {
+  if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null;
+  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  GXT.start({
+    game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+    endTitle: 'You know the rules',
+    endText: o ? 'Draw, stop, explode, shop, rubies, the last day. Now the Story begins.' : 'Draw, stop, explode, shop, rubies, the last day. Rounds 3 to 8 bring more books: the lightbulb explains them.',
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    setup: () => { try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false; newGame('tutorial'); },
+    onDone: r => {
+      tutLeave(); const c = r && r.choice;
+      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
+      else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); }
+      else { UI.sv = 'setup'; UI.cfgOpen = false; showStart(); UI.sv = 'setup'; renderStart(); }
+    },
+    onExit: () => { tutLeave(); showStart(); }
+  });
+}
+// leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
+function tutLeave() {
+  UI.seq++; Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; clearTimeout(UI.advT); UI.advT = 0; UI.started = false; UI.rsOpen = false; UI.rsMode = ''; UI.mode = 'vs'; UI.tut = {}; BF.pulling = false;
+  try { stgAbort(); } catch (e) { } try { GXH.hide(); } catch (e) { }
+  document.documentElement.classList.remove('pulling'); $$('.boomfx,.bfchip,.dfly,#ghost').forEach(e => e.remove());
 }

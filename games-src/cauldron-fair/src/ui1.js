@@ -4,6 +4,7 @@ var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, focus: 0, pop: null, seq: 0, evN: 0, over: null, overShown: false, rep: false, repLog: 0, repV: [], repDay: 0, tm: {}, tipq: [], tipShown: {}, tip: null,
   coach: { level: 'full', seen: {} }, prefs: { sound: true, music: true, gfx: 'auto', hint: true }, busy: false, shopSel: [], legal: {}, sim: false, rsOpen: false, aiHold: {} };
 const D = CF.DATA;
+const LASTD = () => G ? CF.lastOf(G) : D.rounds;      // the number of days of the game on the table (9; the staged tutorial has 2)
 const KIT = window.KIT;
 // painted art: CF_ART (data URIs made by build.py) -> blob URLs so the many chip <svg>s only carry a short link. Without blob URLs
 // (old browsers, jsdom) the kit keeps its own vector drawings.
@@ -98,7 +99,7 @@ function savePrefs() { try { localStorage.setItem('cf_prefs', JSON.stringify({ p
 function loadPrefs() { try { const o = JSON.parse(localStorage.getItem('cf_prefs') || 'null'); if (o) { Object.assign(UI.prefs, o.p || {}); if (o.aid != null) AIDELAY = o.aid; if (o.coach) UI.coach.level = o.coach; } } catch (e) { } }
 const SAVEV = 1;
 function hasSave() { try { const s = localStorage.getItem('cf_save'); if (!s) return false; const o = JSON.parse(s); return !!(o && o.v === SAVEV && o.G && o.G.phase !== 'over'); } catch (e) { return false; } }
-function save() { try { if (!G || UI.camp || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
+function save() { try { if (!G || UI.camp || UI.mode === 'tutorial' || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('cf_save'); } catch (e) { } }
 // log lines name every maker; the viewer reads "You" instead of their maker's name ("Wynne takes" -> "You take")
 function youText(t) {
