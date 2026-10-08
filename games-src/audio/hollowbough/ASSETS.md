@@ -23,15 +23,23 @@ All sounds are real CC0 recordings (Kenney, OpenGameArt), processed with `tools/
 | `lose` | `jingles_PIZZI01.ogg` | Kenney Music Jingles | CC0 1.0 | 0.99 s | 6338 B | low-score / lose sting |
 | `error` | `error_004.ogg` | Kenney Interface Sounds | CC0 1.0 | 0.10 s | 1009 B | illegal move |
 
-## Music (mono MP3, loudness-normalised, seamless loop)
+## Music (separate files in `games/hollowbough/music/`, 96 kbps stereo MP3, -18 LUFS)
 
-| name | track | author | source page | download | licence | loop cut | similarity | length | size |
-|---|---|---|---|---|---|---|---|---|---|
-| `spring` | "Celtic Loop" | stereoscopic | https://opengameart.org/content/celtic-loop | https://opengameart.org/sites/default/files/celtic_0.mp3 | CC0 1.0 | 17.65 s-32.03 s, 1.5 s equal-power cross-fade | 0.853 | 14.4 s | 57968 B (32 kbps) |
-| `summer` | "Medieval 5" | Tozan | https://opengameart.org/content/medieval-5 | https://opengameart.org/sites/default/files/medievalvillagesquare_0.ogg | CC0 1.0 | 22.90 s-35.11 s, 1.5 s equal-power cross-fade | 0.963 | 12.2 s | 49328 B (32 kbps) |
-| `autumn` | "Northumberland" | Spring Spring | https://opengameart.org/content/northumberland | https://opengameart.org/sites/default/files/northumberland_0.mp3 | CC0 1.0 | 27.00 s-39.01 s, 1.5 s equal-power cross-fade | 0.774 | 12.0 s | 48464 B (32 kbps) |
-| `winter` | "Long Winter" | Indieteur | https://opengameart.org/content/long-winter | https://opengameart.org/sites/default/files/Long%20Winter_0.mp3 | CC0 1.0 | 3.90 s-17.61 s, 1.5 s equal-power cross-fade | 0.806 | 13.7 s | 55232 B (32 kbps) |
+Ten instrumental tracks generated with Treblo (treblo.com) from our own prompts on the owner's account, 2026-10-08. Processed by `audio/tools/music_treblo.py` from `treblo/` (loops: at most 150 s with the last 2 s cross-faded into the first 2 s; victory 18 s and defeat 11 s with fades). Treblo Terms of Service section 8 (Output): the user owns the Outputs; no third-party samples; Treblo gives no warranty that a track can be copyrighted. Details: `treblo/README.md`.
 
-Totals: SFX 62 KB + music 206 KB MP3; `audio-data.js` 359 KB (base64). Licence: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
+| slot | a | b | default |
+|---|---|---|---|
+| Menu (`tavern`) | Morning in Willowbrook: The Village Wakes | Morning in Willowbrook: Sunlight Through the Canopy | a |
+| Game (`main`) | Hearthwood Grove: Quiet Cartographer | Hearthwood Grove: Meadowlight Turn | a |
+| Fight / big moment (`fight`) | Race the Frost: Last Harvest Before Winter | Race the Frost: Fiddle at the Wood's Edge | a |
+| Victory | Harvest Faire Dance: Grove of Golden Light | Harvest Faire Dance: Tambourine at the Woodland Gate | a |
+| Defeat | Leaves Let Go: E Minor, Late October | Leaves Let Go: Last Chord, Golden Light | a |
 
+The four CC0 season beds used before (stereoscopic, Tozan, Spring Spring, Indieteur) were retired and removed from `audio-data.js`.
+
+## Painted art (2026-10)
+
+Card paintings (`art/`, 47 of 48 cards), campaign portraits, card backs, tables, title and end-screen art (`games/hollowbough/media/`): generated with Google Flow (Nano Banana) from our own prompts, with no reference to any other game, its art or its publisher.
+
+Sound effects: 62 KB in `audio-data.js` (base64). Licence for the Kenney sound effects: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
 Rebuild: `python3 tools/build_real.py <raw> <work> && python3 tools/bundle_real.py <raw> <work>` (raw = Kenney zips unpacked + `mus/` with the OGA tracks).

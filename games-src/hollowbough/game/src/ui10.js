@@ -45,6 +45,7 @@ function hrng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>
 function sceneSVG(R) {
   const S = R.scene, w = Math.round(S.w), hh = Math.round(S.h), rnd = hrng(w * 31 + hh), o = [];
   o.push('<defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9d07f"/><stop offset=".55" stop-color="#88b866"/><stop offset="1" stop-color="#6d9e54"/></linearGradient><radialGradient id="vg" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#1c3a14" stop-opacity="0"/><stop offset="1" stop-color="#1c3a14" stop-opacity=".38"/></radialGradient></defs>');
+  o.push('<g class="gdec">');
   o.push('<rect width="' + w + '" height="' + hh + '" fill="url(#gr)"/>');
   // grass tufts and flowers
   for (let k = 0; k < 46; k++) { const x = rnd() * w, y = rnd() * hh; o.push('<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l-2.500-6M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l0-7M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l2.500-6" stroke="#4f8a3a" stroke-width="1.600" stroke-linecap="round" fill="none" opacity=".55"/>'); }
@@ -71,6 +72,7 @@ function sceneSVG(R) {
     const l = P[P.length - 1]; d += 'T' + l.x.toFixed(1) + ' ' + l.y.toFixed(1);
     o.push('<path d="' + d + '" fill="none" stroke="#8a6a3a" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/><path d="' + d + '" fill="none" stroke="#d9b87a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="' + d + '" fill="none" stroke="#f0d9a2" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 9" opacity=".8"/>');
   }
+  o.push('</g>');
   // the meadow bench
   if (R.bench) { const b = R.bench; o.push('<rect x="' + (b.x + 2) + '" y="' + (b.y + 4) + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="rgba(0,0,0,.28)"/><rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="#b98650" stroke="#5a3b1d" stroke-width="3"/>'); for (let y = b.y + 14; y < b.y + b.h - 4; y += 15) o.push('<path d="M' + (b.x + 6) + ' ' + y + 'H' + (b.x + b.w - 6) + '" stroke="#8a5f30" stroke-width="1.500" opacity=".55"/>'); }
   // the rope the event pennants hang from, between two posts

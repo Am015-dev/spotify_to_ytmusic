@@ -103,7 +103,7 @@ svg{display:block}
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#2a1f19;color:#fff;padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:80;max-width:90vw}
 #toast.on{opacity:1}
 /* ---- start screen ---- */
-#start{position:fixed;inset:0;z-index:60;overflow:auto;background:radial-gradient(ellipse at 50% 20%,#a9c98a,#5f8f4a 60%,#34512b);display:flex;align-items:flex-start;justify-content:center;padding:12px}
+#start{position:fixed;inset:0;z-index:40;overflow:auto;background:radial-gradient(ellipse at 50% 20%,#a9c98a,#5f8f4a 60%,#34512b);display:flex;align-items:flex-start;justify-content:center;padding:12px}
 #start[hidden]{display:none}
 .scard{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:16px;width:min(560px,100%);display:flex;flex-direction:column;gap:12px;margin:auto;box-shadow:0 12px 40px rgba(0,0,0,.45)}
 .scard h1{margin:0;font-size:2rem;display:flex;align-items:center;gap:10px}.scard h1>span{width:40px;height:40px;display:inline-block}.scard h1 svg{width:100%;height:100%}
@@ -295,4 +295,30 @@ html.cb .pawnw .gx-cbm{display:block}
 .gxh-bub .gxh-row2{position:absolute;top:5px;right:6px;margin:0}
 .gxh-bub .gxh-ok{min-height:26px;padding:0 10px;font-size:12px}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+/* ---- painted extras: card backs, table, title and end art, rival portrait, music panel (images load from media/; the plain colours stay as fallback) ---- */
+.cd.back{background:var(--back-img,none) center/cover no-repeat,linear-gradient(135deg,#5f8f4a,#3f6a33)}.cd.back>span{display:none}
+.tile.t-deck .face{background:var(--back-img,none) center/cover no-repeat,radial-gradient(circle at 35% 30%,#fff8e6,#e2d0a4)!important}
+.tile.t-deck .face .its,.tile.t-deck .face .nm{background:rgba(251,244,226,.9);border-radius:8px;padding:1px 6px}
+html[data-timg] .gdec{display:none}
+html[data-timg] .gx-board{background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 52%,rgba(12,20,8,.34) 100%),var(--tbl-img) center/cover no-repeat,#4f7040}
+#start.art{background:linear-gradient(180deg,rgba(18,26,12,.05),rgba(18,26,12,.38)),url(media/title.webp) center/cover no-repeat,#34512b}
+#start.art .scard{background:rgba(251,244,226,.95)}
+.skylogo{display:none}
+@media (max-aspect-ratio:4/5){
+ html #start.art{background:linear-gradient(180deg,rgba(18,26,12,0) 0%,rgba(18,26,12,.3) 100%),url(media/title-phone.webp) center top/cover no-repeat,#34512b;padding-top:max(8px,min(24dvh,210px))}
+ #start.art .skylogo{display:block;position:absolute;left:0;right:0;top:max(10px,calc(min(24dvh,210px)/2 - 30px));text-align:center;color:#fffaf0;font-weight:800;font-size:2.1rem;letter-spacing:.5px;text-shadow:0 2px 0 #3b2a14,0 0 14px rgba(40,24,6,.9),0 0 3px #3b2a14;pointer-events:none}
+ #start.art .skylogo small{display:block;font-size:.8rem;font-weight:700;letter-spacing:0;margin-top:2px}
+ #start.art .scard>h1,#start.art .scard>.tag{display:none}
+}
+.pcard .endart{flex:none;height:min(30dvh,230px);background:center/cover no-repeat #6f8f5c;border-bottom:3px solid var(--wood2)}
+.pcard .endart.win{background-image:linear-gradient(180deg,rgba(0,0,0,0) 60%,rgba(0,0,0,.18)),url(media/end-win.webp)}.pcard .endart.lose{background-image:linear-gradient(180deg,rgba(0,0,0,0) 60%,rgba(0,0,0,.22)),url(media/end-lose.webp)}
+html.ph-l .pcard .endart{height:22dvh}
+.rhead{display:flex;align-items:center;gap:10px;margin:2px 0 6px}.rhead b{font-size:1.05rem}
+.rport{width:64px;height:64px;border-radius:50%;border:3px solid #8a6a43;object-fit:cover;background:#e8dcc0;flex:none}
+#musicbody{display:flex;flex-direction:column;gap:14px;padding:4px 2px 12px}
+#musicbody h3{margin:0 0 6px;font-size:1.05rem}#musicbody h3 small{font-weight:400;opacity:.75;font-size:.8rem;margin-left:6px}
+.mtop{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.mvol{display:flex;align-items:center;gap:8px;flex:1 1 160px}.mvol input{flex:1;min-height:44px}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #8a6a43;background:#fbf4e2;color:#2a1a0a;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
+.mchip.on{background:#d9a53a;border-color:#7a5413;font-weight:700}.mchip.prev{border-style:dashed}
 </style></head>

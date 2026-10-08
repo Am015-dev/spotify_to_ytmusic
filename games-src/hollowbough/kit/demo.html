@@ -330,10 +330,20 @@ function costPills(cost, x, y, big, horizontal) {
   });
   return s;
 }
-function cardString(spec, layout) {
+// ---------- painted art (HB_ART data URIs from build.py): one blob URL per key, made once; the drawn SVG art stays as the fallback ----------
+const PT_URL = {};
+function paintedHref(key, inline) {
+  const A = typeof HB_ART !== 'undefined' ? HB_ART : null; if (!key || !A || !A[key]) return null;
+  if (inline) return A[key];
+  if (PT_URL[key]) return PT_URL[key];
+  let u = A[key];
+  try { if (typeof atob === 'function' && typeof URL !== 'undefined' && URL.createObjectURL && typeof Blob === 'function') { const bin = atob(u.split(',')[1]), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); u = URL.createObjectURL(new Blob([a], { type: 'image/webp' })); } } catch (e) { u = A[key]; }
+  return PT_URL[key] = u;
+}
+function cardString(spec, layout, inline) {
   const T = TYPES[spec.type] || TYPES.traveler, isCrit = (spec.kind || (CRIT[spec.art] ? 'critter' : 'construction')) === 'critter';
   const uniq = !!spec.unique, name = String(spec.name || spec.art || ''), pts = spec.points == null ? 0 : spec.points;
-  const art = artInner(spec.art);
+  const art = paintedHref(spec.key, inline) ? '' : artInner(spec.art);
   const L = layout === 's';
   const W = L ? 128 : 260, H = L ? 180 : 364;
   let s = `<svg xmlns="${NS}" viewBox="0 0 ${W} ${H}" font-family="${FONT}" data-art="${esc(spec.art)}" data-type="${esc(spec.type)}">`;
@@ -348,7 +358,9 @@ function cardString(spec, layout) {
   s += `<text x="${W / 2}" y="${by + bh * (L ? .62 : .64)}" text-anchor="middle" font-size="${f1(fsT)}" font-weight="700" fill="${INK}">${esc(name)}</text>`;
   // art window
   const ax = L ? 8 : 12, ay = L ? 34 : 50, aw = W - 2 * ax, ah = L ? 90 : 142;
-  s += `<svg x="${ax}" y="${ay}" width="${aw}" height="${ah}" viewBox="0 0 100 62" preserveAspectRatio="xMidYMid slice" overflow="hidden"><g filter="url(#${L ? 'hb-wcl' : 'hb-wc'})">${art}</g></svg>`;
+  const ph = paintedHref(spec.key, inline);
+  s += ph ? `<svg x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="none" overflow="hidden"><image href="${ph}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"/></svg>`
+    : `<svg x="${ax}" y="${ay}" width="${aw}" height="${ah}" viewBox="0 0 100 62" preserveAspectRatio="xMidYMid slice" overflow="hidden"><g filter="url(#${L ? 'hb-wcl' : 'hb-wc'})">${art}</g></svg>`;
   s += `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" rx="3" fill="none" stroke="${INK}" stroke-width="1.6"/><rect x="${ax + 2}" y="${ay + 2}" width="${aw - 4}" height="${ah - 4}" rx="2" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1"/>`;
   if (L) {
     s += costPills(spec.cost, 20, 140, 9.5, true) + badge(104, 141, .8, pts, isCrit, 17);
@@ -495,7 +507,7 @@ function dims(size) {
   return [size.w, size.h || Math.round(size.w * 1.4)];
 }
 const tmpl = new Map(); let stats = { built: 0, cloned: 0 };
-const specKey = (sp, lay) => lay + '|' + [sp.art, sp.type, sp.kind || '', sp.name, sp.unique ? 1 : 0, sp.points, JSON.stringify(sp.cost || {}), lay === 'l' ? sp.text || '' : ''].join('|');
+const specKey = (sp, lay) => lay + '|' + [sp.art, paintedHref(sp.key) ? sp.key : '', sp.type, sp.kind || '', sp.name, sp.unique ? 1 : 0, sp.points, JSON.stringify(sp.cost || {}), lay === 'l' ? sp.text || '' : ''].join('|');
 function card(spec, size, opts) {
   mount();
   const [w, h] = dims(size), lay = w <= 120 ? 's' : 'l', k = specKey(spec, lay);
@@ -511,7 +523,7 @@ const urlCache = new Map();
 function toURL(svgStr) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr); }
 function cardURL(spec, size) { // standalone data-URL (defs embedded) for <img>/canvas use; browser caches the decode
   const [w, h] = dims(size), lay = w <= 120 ? 's' : 'l', k = specKey(spec, lay) + '#url';
-  let u = urlCache.get(k); if (!u) { u = toURL(cardString(spec, lay).replace(/^(<svg[^>]*>)/, '$1' + DEFS2)); urlCache.set(k, u); }
+  let u = urlCache.get(k); if (!u) { u = toURL(cardString(spec, lay, true).replace(/^(<svg[^>]*>)/, '$1' + DEFS2)); urlCache.set(k, u); }
   return u;
 }
 function cardImg(spec, size) { const [w, h] = dims(size), i = new Image(); i.width = w; i.height = h; i.src = cardURL(spec, size); i.alt = spec.name || spec.art; i.draggable = false; return i; }

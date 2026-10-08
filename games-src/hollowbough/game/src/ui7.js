@@ -14,5 +14,5 @@ function sndPost(pre, m, seat) {
     if (ev > pre[pre.length - 1].ev && m.k !== 'event') snd('event');
   } catch (e) { }
 }
-function sndMusic() { try { if (UI.sound === false || !window.GA || !G) return; const s = G.players[Math.max(0, focusSeat())].season; GA.music(G.phase === 'over' ? null : SEAS[s], { vol: .35 }); } catch (e) { } }
+function sndMusic() { try { musicSync(); } catch (e) { } }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !/data-a="(do|q)"/.test(t.outerHTML.slice(0, 80))) snd('click', { vol: .5 }); }, true);

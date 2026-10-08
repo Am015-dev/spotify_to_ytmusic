@@ -64,7 +64,8 @@ function renderStart() {
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
     netBlock(),
     firstTime() ? null : tutNode('sbtn'),
-    h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play')));
+    h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, '\u266A Music')));
+  s.appendChild(h('div.skylogo', { 'aria-hidden': 'true' }, 'Hollowbough', h('small', 'Build a woodland city. Outlast the winter.')));
   s.appendChild(card);
 }
 function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; clearTimeout(UI.tm); renderStart(); }
@@ -131,6 +132,7 @@ function boot() {
   GX.drawer('rulesd', 'How to play', h('div.rules', { html: RULES }), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('rivald', 'Cities and players', h('div#rivalbody'));
+  extrasBoot();
   GX.onShow = id => { renderDrawers(); };
   kitBoot();
   applyPhone();
