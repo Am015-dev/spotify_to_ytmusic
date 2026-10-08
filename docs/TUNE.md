@@ -80,6 +80,11 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvBlimp` Blimp in the sky | ON | a 46 m LEGO blimp circling each city at 150 m |
 | `TUNE.lvBoat` Boats on the Main × | 1 | 5 LEGO cruisers on the Main (Frankfurt), pushed-off hull like a glancing hit; next city load |
 | `TUNE.lvFac` Bold LEGO facade colours | 1 | mixes the district facade tints toward saturated LEGO colours (Athens at 0.6 ×, the white city stays white); next page load |
+| `TUNE.lvCrowd` Crowds, stalls, cafés ahead × | 1 | (v88p) 6 life clusters at street corners 20-115 m ahead: crowds of 3-6 minifigs (chat, face you, wave, cheer-hop, leap aside), market stalls, café tables. 27 people from the same pool (PED_N 110). Stalls/cafés smash on contact (collider = drawn size) |
+| `TUNE.lvPark` Parked cars ahead × | 1 | (v88p) 5 traffic cars parked half on the kerb 30-130 m ahead (same mesh and box collider; smash one and it rejoins traffic) |
+| `TUNE.lvPop` Roadside pop-up challenges | ON | (v88p) a ring 45-75 m ahead in your lane: RAMP JUMP, DRIFT ZONE, SMASH STREAK, CONE SLALOM. Drive through to start; timer on the objective line; at most 1; replaces the old random pop-ups |
+| `TUNE.lvPopGap` Pop-up gap (s) | 28 | seconds after one ends before the next ring (×0.6 after a miss) |
+| `TUNE.lvPopRw` Pop-up studs × | 1 | reward 150 studs × this, plus a brick burst |
 
 ## Where the values live
 - Beta artifact (db capability): collection `tune_versions` holds one doc `v<N>` per version: `{v, note, values, createdAt}`. Doc `tune/current` holds `{v}`.
