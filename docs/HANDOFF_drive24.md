@@ -1,3 +1,42 @@
+# >>> drive24b HANDOFF (2026-10-08 14:20) — read this block + docs/HANDOFF_drive24b.md first
+Branch alex/od-drive24 (HEAD = this commit). v88e merged (od-r3 63f4fca = live cc9b68d, LIVE_MATCH proven in a worktree).
+Release candidate = current src (build: `tools/build.sh <ver> --local`). Steering defaults = sweep Z1. NO REVIEW sent yet, NO out/<ver> yet.
+
+## What changed (all knobs in ⚙ Steer/Route + docs/TUNE.md + src/assets/tune.json)
+1. BUG: ◀ straight to ▶ skipped the ramp (stRet path → full opposite lock in 0.17 s) — fixed in D24_shape (98d).
+2. BUG: touch ◀▶ had two stacked ramps (steering kept building ~0.2 s after lift) — TUNE.stTouchDig=1 feeds TOUCH.dir like keys.
+3. BUG: lane assist had no road direction on filler-grid streets (RO.rdT only cityAt/Autobahn) — fillAt fallback (71).
+4. Less input→yaw lag: stIn 60, stOut 45 (were 11/16), yrIn 60 (new; was 11→7), yrOut 45 (was 22), stLim 1.4, stRampLo .2.
+5. Routes: S-jog straightening D24_clean step 4 (TUNE.rtJog 14 m), D24_clr height check per 4 m step on groundAt (decks).
+6. tools: tSteer24 settleX/flipsX/t90/hit positions+nearest car; tZig24 (zig-zag plots); tPlay FPS=30; qa24b/sw.sh, t90.sh sweeps.
+
+## Metrics vs live v88e (tSteer24, 8 Frankfurt routes × 60+100 km/h; flips / counter-yaw °/s / settle s / settleX s / t90 s)
+| | live v88e | new |
+|---|---|---|
+| keys 60 fps | 1.11 / 29.7 / 3.10 / 2.81 / 1.77 | 1.11 / 23.7 / 1.71 / 0.99 / 1.77 |
+| touch 60 fps | 1.33 / 32.0 / 3.13 / 2.92 / 1.82 | 1.09 / 23.5 / 1.66 / 1.00 / 1.77 |
+| keys 30 fps | 1.12 / 30.1 / 2.69 / 2.25 / 1.73 | 0.98 / 20.6 / 1.85 / 1.16 / 1.77 |
+| touch 30 fps | 1.29 / 32.0 / 3.24 / 3.01 / 1.77 | 0.92 / 20.0 / 1.99 / 1.34 / 1.77 |
+Second run (qa24b/h2_*): keys60 1.09 flips / settle 1.94, touch60 1.04 / 1.83. Flips vary ±0.1 run to run.
+Targets: flips ≤ 1 ≈ met (0.92-1.11); settle ≤ 0.8 s NOT met (1.7-2.0 s). Why: the old settle clock starts 15 m past the route's
+sharp corner where a 50 km/h car is still ~40° short of the new street (a 90° turn takes 1.77 s at full lock = live). settleX (clock from
+turn exit) = 1.0-1.3 s, bimodal: half the turns ~0.1 s, the rest 2-4 s = big turns where the test driver re-centres onto the route line.
+Every faster-ramp variant (sweeps P-X, Y7) brought counter-yaw back to 25-31 °/s. Straight-line yaw sign flips/km rose (155-180 vs 110-155;
+a count, the car follows small taps more exactly — magnitude not measured).
+Hits: first run 20 hits/48 min vs live 6; re-run with nearest-car logging: new 0.08-0.36/min vs live 0.54/min (touch). Hits are traffic-car
+bumps (nearest car 4-5 m), plus one static spot on test route 5 at 30 fps that live also hits → noise, no wall regression found.
+Routes: Frankfurt zig-zags 49 → 36 (live ~170), Athens 408 (live) → 100, turns/km 3.93 → 2.56, Athens U-turns 26 → 28 (not checked).
+
+## Gate status (qa24b/rc/, build rc_dbg.html = out/d24z split + test modules)
+- shots: qa24b/rc/drive/01_start…06_athens_drive (tyre gap max 0.03 m), qa24b/rc/mission/s0,s1 (turn cue "right in 30 m"… then
+  "U-turn in 60 m" on Hot Drop follow — LOOK at it, may be a real U-turn cue). NOT looked at yet. No garage shot yet (tPlay SHOTS).
+- tPlay 60 (FAST=1) phone: FAIL fra stuck 3.6 %, FAIL rotation check (DRIFT "hidden", steps []), FAIL road collider at (527,-200)
+  (static world box, not drive24), FAIL ath hits 1.74/min (player was the SHIP: h 13.8 l 21.8). tPlay 30 (FPS=30 THROTTLE=1): stuck 5.8 %,
+  same rotation + collider FAILs, ath: 1 page RELOAD, 2 loading screens, small text "TAP TO CONTINUE"/"YOU". Desk runs were still going.
+- NEXT: run the same tPlay on live (base_dbg_e.html = live v88e debug page, build it from od-r3 63f4fca in a worktree) to see which FAILs
+  are pre-existing; look at shots; then REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v; after PASS: OD_CHANGELOG v88f, out/v88f
+  (overdrive.html, km.js, tune.json from src/assets, music/*.mp3 from live), DEPLOY msg to the coordinator.
+
 # HANDOFF drive24 (branch alex/od-drive24, from live v88c src = od-r2 75248d2; v88d 3222a87 NOT merged yet)
 
 Brief: mission routes ("random lefts/rights, sudden") + steering stability on left/right road turns + every knob in TUNE.
