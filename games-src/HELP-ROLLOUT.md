@@ -33,3 +33,4 @@ Owner evaluates Thornbound first. Then one Sonnet cloud session per game (max 4)
 staged never-saved mode (fixed seed, scripted computer), steps in rule order teaching EVERY rule once, GXT.act in input handlers,
 Story routes through it on first tap, menu "Tutorial" replay, tutor-test.js (390x763, 375x553, rotation, leave/return, skip, fresh Story run).
 Final Approach: its learn-by-chapters ladder is in progress; its Chapter 0 should teach the full cockpit staged.
+- Shelf filter: when a game gets its staged tutorial or lightbulb help, add its shelf id to TUTOR / HELP in games/index.html (orchestrator does this after reviewing).

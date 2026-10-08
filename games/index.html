@@ -663,7 +663,10 @@ const stOf=g=>{const x=STATUS[g.id];return x?{k:x[0],st:!!x[1]}:null};
 const ST_LABEL={done:'Completed',testing:'Under testing',progress:'Being rebuilt',todo:'Story mode coming'};
 const isPrev=g=>{const x=stOf(g);return !!x&&x.k!=='done'};
 const hasChip=(g,re)=>(g.chips||[]).some(c=>re.test(c));
-const FDEF={story:['Story mode',g=>{const x=stOf(g);return !!x&&x.st}],coop:['Co-op',g=>hasChip(g,/^co-?op/i)],cpu:['Vs computer',g=>hasChip(g,/^vs computer/i)],online:['Online with friends',g=>hasChip(g,/^online with/i)],
+/* learning aids per game, for testing: TUTOR = staged tutorial game (Story chapter 0), HELP = lightbulb + first-time tips. Update when a game gets one. */
+const TUTOR=new Set(['thornbound']);
+const HELP=new Set(['thornbound','doorkick','hollowbough','approach','shipwreck','sands','rampart','kaiten','crown','shortfuse','lantern','tidewake']);
+const FDEF={story:['Story mode',g=>{const x=stOf(g);return !!x&&x.st}],tutor:['Has tutorial',g=>TUTOR.has(g.id)],notutor:['No tutorial yet',g=>!TUTOR.has(g.id)],help:['Lightbulb help',g=>HELP.has(g.id)],nohelp:['No help yet',g=>!HELP.has(g.id)],coop:['Co-op',g=>hasChip(g,/^co-?op/i)],cpu:['Vs computer',g=>hasChip(g,/^vs computer/i)],online:['Online with friends',g=>hasChip(g,/^online with/i)],
  testing:['Under testing',g=>{const x=stOf(g);return !!x&&x.k==='testing'}],soon:['Coming soon',g=>{const x=stOf(g);return !!x&&(x.k==='progress'||x.k==='todo')}]};
 /* only offer a filter when at least one board game matches it (status filters vanish once everything is finished) */
 const filterOpts=()=>[['all','All games']].concat(Object.keys(FDEF).filter(k=>BOARD().some(FDEF[k][1])).map(k=>[k,FDEF[k][0]]));
