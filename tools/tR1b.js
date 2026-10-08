@@ -9,9 +9,9 @@ const URL=process.argv[2],OUT=process.argv[3]||'qa_r1';fs.mkdirSync(OUT,{recursi
  await p.evaluate(s=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(s)localStorage.setItem('mho_mood','night')},!!process.env.STALE);await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000,polling:500});
  const shot=async n=>{await p.evaluate(()=>{window.__sh=1;if(window.__fr){__dbg.composer.render=window.__fr;window.__fr=null}__tick(1)});await p.screenshot({path:path.join(OUT,n+'.png')});await p.evaluate(()=>{window.__sh=0})};
  console.log('MENU',JSON.stringify(await p.evaluate(()=>({menuMood:__oc.ev('menuMood'),MOOD:__oc.ev('MOOD.id'),tab:__oc.ev('menuTab')}))));
- await p.click('#startBtn');await p.waitForFunction(()=>__mho.state!=='menu',null,{timeout:300000,polling:500});await p.evaluate(()=>{window.__auto=false;__tick(90)});
+ console.log('step click');await p.evaluate(()=>document.querySelector('#startBtn').click());await p.waitForFunction(()=>__mho.state!=='menu',null,{timeout:120000,polling:500});console.log('step started');await p.evaluate(()=>{window.__auto=false;__tick(90)});
  await shot('race_start');console.log('RACE',JSON.stringify(await p.evaluate(()=>({state:__mho.state,MOOD:__oc.ev('MOOD.id'),name:__oc.ev('MOOD.name'),track:__oc.ev('RC&&RC.track')}))));
- await p.evaluate(()=>{window.__auto=true});await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000,polling:500});
+ await p.evaluate(()=>{window.__auto=true});await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000,polling:500});console.log('step garage');
  await p.evaluate(()=>__oc.ev('gbOpen()'));await p.waitForTimeout(1500);await p.evaluate(()=>{window.__auto=false;__tick(20)});
  await shot('garage_stats');console.log('STATS',JSON.stringify(await p.evaluate(()=>{const e=document.querySelector('#gbStats');const r=e.getBoundingClientRect();return{txt:e.innerText.replace(/\n/g,' | '),n:__oc.ev('GB.d.bricks.length'),box:[r.x,r.y,r.width,r.height].map(Math.round),vis:getComputedStyle(e).display}})));
  console.log('ERRS',JSON.stringify(errs));await b.close()})().catch(e=>{console.error('ERR',e);process.exit(1)});
