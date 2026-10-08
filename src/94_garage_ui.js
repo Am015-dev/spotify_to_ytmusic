@@ -44,10 +44,10 @@ function GB_msg(t){const e=$('#gbBkN');if(!e)return;e.textContent=t;clearTimeout
  v.addEventListener('pointerdown',e=>{if(!GB_.bk||e.target!==cvs)return;e.stopPropagation();cvs.setPointerCapture(e.pointerId);const p=pt(e);GB_.ptr.set(e.pointerId,{...p,x0:p.x,y0:p.y,t:performance.now(),b:e.button});if(GB_.ptr.size>1)GB_.multi=1;else GB_.multi=0;GB_.drag=0},true);
  v.addEventListener('pointermove',e=>{if(!GB_.bk||e.target!==cvs)return;e.stopPropagation();const q=GB_.ptr.get(e.pointerId),p=pt(e);
   if(!q){if(e.pointerType==='mouse'){GB_.mx=p;GB_hover()}return}
-  if(GB_.ptr.size===1){if(Math.hypot(p.x-q.x0,p.y-q.y0)>8)GB_.drag=1;if(GB_.drag){GB_.yaw-=(p.x-q.x)*.01;GB_.pit=clamp(GB_.pit+(p.y-q.y)*.008,.12,1.4)}q.x=p.x;q.y=p.y;if(e.pointerType==='mouse'){GB_.mx=p;if(!GB_.drag)GB_hover()}return}
+  if(GB_.ptr.size===1){if(Math.hypot(p.x-q.x0,p.y-q.y0)>(e.pointerType==='mouse'?8:14))GB_.drag=1;if(GB_.drag){GB_.yaw-=(p.x-q.x)*.01;GB_.pit=clamp(GB_.pit+(p.y-q.y)*.008,.12,1.4)}q.x=p.x;q.y=p.y;if(e.pointerType==='mouse'){GB_.mx=p;if(!GB_.drag)GB_hover()}return}
   const A=[...GB_.ptr.values()],d0=Math.hypot(A[0].x-A[1].x,A[0].y-A[1].y),mx0=(A[0].x+A[1].x)/2,my0=(A[0].y+A[1].y)/2;q.x=p.x;q.y=p.y;const d1=Math.hypot(A[0].x-A[1].x,A[0].y-A[1].y),mx1=(A[0].x+A[1].x)/2,my1=(A[0].y+A[1].y)/2;
   GB_.yaw-=(mx1-mx0)*.012;GB_.pit=clamp(GB_.pit+(my1-my0)*.01,.12,1.4);if(d0>10&&d1>10)GB_.dist=clamp(GB_.dist*d0/d1,7,26)},true);
- const up=e=>{if(!GB_.bk)return;const q=GB_.ptr.get(e.pointerId);if(!q)return;e.stopPropagation();GB_.ptr.delete(e.pointerId);if(e.type==='pointerup'&&!GB_.multi&&!GB_.drag&&performance.now()-q.t<900)GB_act(q.x0,q.y0,q.b===2);if(!GB_.ptr.size)GB_.multi=0};
+ const up=e=>{if(!GB_.bk)return;const q=GB_.ptr.get(e.pointerId);if(!q)return;e.stopPropagation();GB_.ptr.delete(e.pointerId);if(e.type==='pointerup'&&!GB_.multi&&!GB_.drag&&performance.now()-q.t<(e.pointerType==='mouse'?900:1500))GB_act(q.x0,q.y0,q.b===2);if(!GB_.ptr.size)GB_.multi=0};
  v.addEventListener('pointerup',up,true);v.addEventListener('pointercancel',up,true);v.addEventListener('wheel',e=>{if(!GB_.bk)return;e.preventDefault();GB_.dist=clamp(GB_.dist*(1+e.deltaY*.001),7,26)},{passive:false});
  v.addEventListener('contextmenu',e=>{if(GB_.bk)e.preventDefault()});
  addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden)return;const k=e.code;if(k==='Escape'){e.preventDefault();e.stopImmediatePropagation();GB_exit();return}
@@ -80,3 +80,10 @@ window.__cr={RIVS:CR_RIVS,rivB:CR_rivB};window.__gb={mesh:()=>GB.mesh,refresh:()
  scr:(i,j)=>{const t=GB_top(i,j,GB_list());if(t<-1e8)return null;const m=GB.mesh.userData.m;GB.mesh.updateMatrixWorld(true);GB_cam();const p=m.localToWorld(V3((i+.5)*GB_U,t*GB_PH+.02,(j+.5)*GB_U)).project(GB.cam),r=$('#gbC').getBoundingClientRect();return{x:r.left+(p.x+1)/2*r.width,y:r.top+(1-p.y)/2*r.height}},
  calls:()=>{const o=pl&&pl.mesh;if(!o)return null;let n=0,list=[];o.traverse(x=>{if(x.userData&&x.userData.gb){list.push(x);if(x.visible)n++}});return{n,tris:list.map(x=>x.geometry.attributes.position.count/3)}}};
 
+// FX19: the "drag to rotate" hint sat on the GARAGE sign of the 3D hall. It now sits mid-right on the hall floor (the stats card covers the bottom), shows
+// until the player's first real drag of the view (>20 px), then fades out and never comes back.
+(()=>{const st=document.createElement('style');st.textContent='#gbx .gbHint{top:46%!important;right:10px!important;opacity:.85;transition:opacity .6s;background:rgba(3,14,26,.55);border-radius:8px;padding:2px 8px;pointer-events:none}#gbx .gbHint.fxOff{opacity:0!important}';document.head.appendChild(st);
+ const box=document.getElementById('gbx'),h=box&&box.querySelector('.gbHint'),c=document.getElementById('gbC');if(!box||!h)return;let tm=0;
+ const off=()=>{h.classList.add('fxOff');clearTimeout(tm)},show=()=>{if(store.get('fx19_drag',0)){off();return}h.classList.remove('fxOff')};
+ let d0=null;if(c){c.addEventListener('pointerdown',e=>{d0=[e.clientX,e.clientY]},{passive:true});c.addEventListener('pointermove',e=>{if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>20){d0=null;store.set('fx19_drag',1);off()}},{passive:true});addEventListener('pointerup',()=>{d0=null},{passive:true})}
+ new MutationObserver(()=>{if(!box.hidden)show()}).observe(box,{attributes:true,attributeFilter:['hidden']});if(!box.hidden)show()})();

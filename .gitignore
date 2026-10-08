@@ -7,3 +7,7 @@ __pycache__/
 smoke/*.jpg
 out/
 km.js
+qa_race/
+/tune.json
+qa20/base/
+/music/

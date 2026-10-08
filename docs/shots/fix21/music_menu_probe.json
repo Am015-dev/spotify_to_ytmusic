@@ -1,0 +1,447 @@
+{
+ "LOG": [
+  {
+   "label": "menu_before_tap",
+   "mus": {
+    "mode": "",
+    "track": null,
+    "unlocked": false,
+    "ctx": null,
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": null,
+    "playing": [],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": null,
+   "fx": null,
+   "synth": null
+  },
+  {
+   "label": "menu_after_tap",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 3.5,
+      "g": 0.3,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "music_off",
+   "mus": {
+    "mode": "menu",
+    "track": null,
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 16.3,
+      "g": 0.013,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "music_on",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 2.4,
+      "g": 0.297,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "music_vol_0.2",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.12,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 3.9,
+      "g": 0.12,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "sfx_0.5",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.12,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 4.8,
+      "g": 0.12,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.248,
+   "synth": 0
+  },
+  {
+   "label": "sound_off",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": true,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 12.5,
+      "g": 0.3,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "sound_on",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 19.4,
+      "g": 0.3,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "garage",
+   "mus": {
+    "mode": "garage",
+    "track": "garage",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 30,
+      "g": 0,
+      "rs": 4
+     },
+     {
+      "name": "garage",
+      "paused": false,
+      "t": 0,
+      "g": 0.3,
+      "rs": 0
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "garage_closed",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 2.5,
+      "g": 0.298,
+      "rs": 4
+     },
+     {
+      "name": "garage",
+      "paused": false,
+      "t": 6.6,
+      "g": 0.001,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "race",
+   "mus": {
+    "mode": "race",
+    "track": "race",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": true,
+      "t": 5.9,
+      "g": 0,
+      "rs": 4
+     },
+     {
+      "name": "race",
+      "paused": false,
+      "t": 4.1,
+      "g": 0.3,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "race",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "race_boost_duck",
+   "mus": {
+    "mode": "race",
+    "track": "race",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.195,
+    "duck": 0.65,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": true,
+      "t": 5.9,
+      "g": 0,
+      "rs": 4
+     },
+     {
+      "name": "race",
+      "paused": false,
+      "t": 13.1,
+      "g": 0.212,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "race",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  }
+ ],
+ "mlog": [
+  {
+   "t": 6.2,
+   "mode": "menu",
+   "track": "menu"
+  },
+  {
+   "t": 21.1,
+   "mode": "menu",
+   "track": "(synth)"
+  },
+  {
+   "t": 22.6,
+   "mode": "menu",
+   "track": "menu"
+  },
+  {
+   "t": 46.1,
+   "mode": "garage",
+   "track": "garage"
+  },
+  {
+   "t": 61.3,
+   "mode": "menu",
+   "track": "menu"
+  },
+  {
+   "t": 64.6,
+   "mode": "race",
+   "track": "race"
+  }
+ ],
+ "net": [
+  "menu.mp3",
+  "garage.mp3",
+  "race.mp3"
+ ],
+ "errs": []
+}

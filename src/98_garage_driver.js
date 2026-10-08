@@ -130,7 +130,7 @@ window.__gar.grp=(id,i)=>id==='off'?CR_grp(CR_OFF,'off'):id==='boat'?CR_grp(CR_B
  let seen=null;try{seen=localStorage.getItem('mho_seenVer')}catch(e){}
  if(seen!==OD_VER){const t=document.createElement('div');t.id='odNew';t.hidden=true;t.innerHTML=`<span>New in ${esc(OD_VER)}</span><button id="odNewGo">SEE</button><button id="odNewX">✕</button>`;document.body.appendChild(t);
   t.querySelector('#odNewGo').onclick=()=>odUpdOpen();t.querySelector('#odNewX').onclick=()=>{t.hidden=true;try{localStorage.setItem('mho_seenVer',OD_VER)}catch(e){}};
-  const chk=()=>{const m=document.getElementById('menu'),on=m&&!m.hidden&&window.__mho&&__mho.state==='menu';if(!document.getElementById('odNew'))return;t.hidden=!on||(localStorage.getItem('mho_seenVer')===OD_VER);setTimeout(chk,700)};setTimeout(chk,700)}
+  const chk=()=>{const m=document.getElementById('menu'),on=m&&!m.hidden&&m.classList.contains('home')&&window.__mho&&__mho.state==='menu';if(!document.getElementById('odNew'))return;t.hidden=!on||(localStorage.getItem('mho_seenVer')===OD_VER);setTimeout(chk,700)};setTimeout(chk,700)}
  window.__upd={open:()=>odUpdOpen(),ver:OD_VER,log:OD_CHANGELOG}}
 
 roamPose=(f=>function(s,dt){f(s,dt);try{if(!C26.on||s!==pl||state!=='roam')return;const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||!ud.gbM)return;
@@ -196,13 +196,15 @@ function GAR_apply(B,u,form){if(!u||!(u.sp||u.ex||u.wh||u.bo))return B;const sx=
 const GAR_arr=A=>A.map(e=>Array.isArray(e)?{t:e[0],x:e[1],z:e[2],r:e[3]%4,c:e[4],y:e[5],m:0}:e);
 const GAR_figK=()=>JSON.stringify(GB_figGet());
 // player's 4×4 + boat come from the selected set (with its upgrades); rivals unchanged
-CR_attachV=(f=>function(g,team){if(team)return f(g,team);const S=GAR_set(),u=GAR_ups(S.id),U=g.userData,host=U.carG||U.m;for(const k in U.gbV||{})host.remove(U.gbV[k]);
- const sig=S.id+JSON.stringify(u)+GAR_figK(),mk=(fm,src)=>{const key='gar|'+fm+'|'+sig;return CR_VC[key]?CR_grp(null,key):CR_grp(GAR_apply(GAR_arr(src()),u,fm).map(b=>[b.t,b.x,b.z,b.r,b.c,b.y]),key)};
- U.gbV={'4x4':mk('off',S.off),boat:mk('boat',S.boat)};for(const k in U.gbV){U.gbV[k].visible=false;host.add(U.gbV[k])}})(CR_attachV);
+CR_attachV=(f=>function(g,team){if(team)return f(g,team);const S=GAR_set(),u=GAR_ups(S.id),U=g.userData,host=U.carG||U.m,SO=GAR_frm('off'),SB=GAR_frm('boat');for(const k in U.gbV||{})host.remove(U.gbV[k]);
+ const sig=S.id+SO.id+SB.id+JSON.stringify(u)+GAR_figK(),mk=(fm,src)=>{const key='gar|'+fm+'|'+sig;return CR_VC[key]?CR_grp(null,key):CR_grp(GAR_apply(GAR_arr(src()),u,fm).map(b=>[b.t,b.x,b.z,b.r,b.c,b.y]),key)};
+ U.gbV={'4x4':mk('off',SO.off),boat:mk('boat',SB.boat)};for(const k in U.gbV){U.gbV[k].visible=false;host.add(U.gbV[k])}})(CR_attachV);
 // street form: upgrades on the player's bricks (not while the brick builder is open: picking uses brick indices) + stat perks
 gbTeam=(f=>function(base,b){const t=f(base,b);if(!t||!(b&&b.on))return t;const u=GAR_ups();if(t.gbB&&!(typeof GB_!=='undefined'&&GB_.bk))t.gbB=GAR_apply(t.gbB,u,'car');for(const s of['top','acc','han','hull'])t[s]=(t[s]||1)*GAR_upMul(u,s);t.id=(t.id||'')+'g'+GAR_UP.map(([k])=>u[k]).join('');return t})(gbTeam);
 // loadout names/stats/perks follow the selected set
-const GAR_L0=JSON.parse(JSON.stringify(CR_LOAD));function GAR_load(){const S=GAR_set();for(const k of['car','4x4','boat'])Object.assign(CR_LOAD[k],JSON.parse(JSON.stringify(S.load[k]||GAR_L0[k])))}GAR_load();
+const GAR_L0=JSON.parse(JSON.stringify(CR_LOAD));function GAR_load(){const S=GAR_set();for(const k of['car','4x4','boat']){const T=k==='car'?S:GAR_frm(k==='4x4'?'off':'boat');Object.assign(CR_LOAD[k],JSON.parse(JSON.stringify(T.load[k]||GAR_L0[k])))}}
+// off-road / water form: the one equipped in the COLLECTION (mho_gar.off / .boat), else the street car's own set
+function GAR_frm(f){const G=GAR_get(),id=G[f],T=id&&GAR_SETS.find(s=>s.id===id);return T&&GAR_owned(T)?T:GAR_set()}GAR_load();
 // ---- garage VEHICLES tab: set cards (rarity, lock/buy, select), form preview, upgrades with visible levels
 const GAR_={pv:'car'};
 function GAR_select(id){const G=GAR_get(),S=GAR_set(id);if(!GAR_owned(S))return;if(GB.d){G.br[G.sel]=JSON.parse(JSON.stringify(GB.d.bricks||[]));GB.d.bricks=(G.br[id]||GAR_arr(S.car())).map(b=>({...b}));GB.d.bp=1;store.set('mho_build',GB.d)}

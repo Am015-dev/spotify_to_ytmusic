@@ -1,0 +1,13 @@
+{
+ "mode": "yaw",
+ "url": "http://127.0.0.1:8766/local_dbg.html",
+ "yaw": {
+  "stAng0.55@20kmh": 41.9,
+  "stAng0.55@50kmh": 40.7,
+  "stAng0.8@20kmh": 50.9,
+  "stAng0.8@50kmh": 42.3,
+  "stAng1.01@20kmh": 52.5,
+  "stAng1.01@50kmh": 42.9
+ },
+ "errors": []
+}

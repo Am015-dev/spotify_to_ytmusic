@@ -3,6 +3,7 @@
 10_core.js
 20_race_world.js
 30_race.js
+31_race_r15.js
 40_hud_input_menu.js
 41_career_quests.js
 50_kenney_data.js
@@ -24,4 +25,18 @@
 96_scale_qa.js
 97_art.js
 98_garage_driver.js
+98g_garage_paint.js
+98p_garage_perks.js
+98q_profile.js
+98r_garage_newbuild.js
+98w_w13_traffic.js
+98s_garage_studio.js
+98x_w14_speed.js
+98t_garage_tools.js
+98y_garage_collection.js
+98z_race_items.js
+98k_boost2k.js
+98m_music.js
+99t_tune.js
+91_r1_polish.js
 99_api.js
