@@ -181,6 +181,17 @@ async function full(b, tag, w, h, { touch = true, qs = '?phone=1', shots = null,
     if (!again) fail(tag, 'the chapter map Tutorial button did not replay it'); else ok(tag, 'replay from the chapter map works');
     if (p.errs.length) fail(tag, 'page errors ' + p.errs.slice(0, 3).join(' | '));
     await ctx.close();
+    { // Skip from the Story prologue goes on to the chapter map; the next Story tap does not start it again
+      const c2 = await open(b, 390, 763);
+      await c2.p.evaluate(() => document.querySelector('[data-camp="open"]').click()); await shown(c2.p, 'goal', 8000);
+      await c2.p.evaluate(() => document.querySelector('.gxt-skip').click()); await c2.p.waitForTimeout(900);
+      const m1 = await c2.p.evaluate(() => ({ run: GXT.running(), gxc: !!document.querySelector('.gxc:not([hidden])') }));
+      await c2.p.evaluate(() => { GXC.close(); document.querySelector('[data-camp="open"]').click() }); await c2.p.waitForTimeout(900);
+      const m2 = await c2.p.evaluate(() => ({ run: GXT.running(), gxc: !!document.querySelector('.gxc:not([hidden])') }));
+      if (m1.run || !m1.gxc || m2.run || !m2.gxc) fail(tag, 'Skip from Story should open the map and not ask again ' + JSON.stringify([m1, m2])); else ok(tag, 'Skip from the Story prologue opens the chapter map; Story does not ask again');
+      if (c2.p.errs.length) fail(tag, 'page errors ' + c2.p.errs.slice(0, 3).join(' | '));
+      await c2.ctx.close();
+    }
   }
   if (ONLY.includes('h')) await full(b, 'h:844x390', 844, 390);
   if (ONLY.includes('g')) await full(b, 'g:1280x800', 1280, 800, { touch: false, qs: '?phone=0', expectPhone: false });

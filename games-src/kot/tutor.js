@@ -27,6 +27,9 @@ const TUT_GAME='crown-city-smash';
 const TUT={script:[],hold:false,feed:false,frame:null,ends:0};
 const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(G&&G.tut);
 const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:tutStart});
+// the intro card of a first game offers it once more (a Play tap sets the 'played' flag first, so this reads the first-game flag instead)
+const tutOffer=()=>{try{return !!(typeof GXT!=='undefined'&&G&&!G.tut&&UI.firstGame&&!GXT.status(TUT_GAME).seen)}catch(e){return false}};
+const tutMini=()=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:true,cls:'btn tutmini',launch:tutStart,sub:false});
 function tutFirst(){try{return !localStorage.getItem(TOUR)&&!GXT.status(TUT_GAME).seen}catch(e){return false}}
 // ---------------------------------------------------------------- the staged game
 // Dice throws in order. A frame is the list of faces for the dice thrown (the whole six at the start of a turn, the unkept ones on a reroll).
@@ -144,7 +147,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prolog
       if(c==='chapter'&&first)GXC.play(first.id);
       else if(c==='story'&&typeof GXC!=='undefined')GXC.open();
       else{const b=document.querySelector('[data-start="solo"]');if(b)b.click()}},
-    onExit:()=>tutLeave()})}
+    onExit:()=>{tutLeave();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Chapter 0 prologue goes on to the chapter map, and Story does not ask again
 function tutSetup(){document.documentElement.classList.add('gxt-on');try{GXH.hide()}catch(e){}
   try{if(GX.open)GX.close()}catch(e){}
   try{if(typeof GXC!=='undefined'&&GXC.close)GXC.close()}catch(e){}

@@ -144,3 +144,9 @@ html.gxt-on.ph-p header.gx-bar #pchips{position:fixed;left:6px;right:6px;top:cal
 /* tutorial in landscape: the game has no sweep button in its tray there, so the tutorial lays one out beside Done */
 html.gxt-on.ph-l .gx-dock[data-bf] #pacts [data-act="sweep"]{display:flex;min-height:56px;padding:0 2px}
 html.gxt-on.ph-l .gx-dock[data-bf="buy"] #pacts{grid-template-columns:minmax(0,3fr) minmax(0,1fr)}
+/* the tutorial's menu entry: title over its one-line note */
+.gxt-menu{text-align:left}
+.gxt-menu b{display:block}
+.gxt-menu span{display:block;margin-top:2px;font-size:.74em;font-weight:600;opacity:.85;line-height:1.2}
+html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:36px;padding:3px 8px;border-radius:10px;font-size:12px;line-height:1.1;text-align:center;flex:none}
+html.ph .bfintro .you .gxt-menu.tutmini b{font:800 12px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}
