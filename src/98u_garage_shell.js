@@ -74,8 +74,7 @@ const R2_CIC={nose:'🔺',wing:'🪽',rear:'🔧',roof:'🚨',side:'🛡'},R2_KI
 function R2_post(){const B=$('#gbBody');if(!B)return;
  if(GB.tab==='veh'){let g='rides';for(const e of B.children){if(e.classList.contains('gbInfo')){e.dataset.r2='x';continue}if(e.classList.contains('gpkTop')){e.dataset.r2='perks';continue}
    if(e.tagName==='H5'){const t=e.textContent;g=/^UPGRADES/.test(t)?'perks':/^PREVIEW/.test(t)?'x':'rides'}else if(g==='x'&&e.classList.contains('gbRow')){e.dataset.r2='x';g='rides';continue}e.dataset.r2=g}
-  const h=B.querySelector('[data-r2="rides"]');if(h&&h.tagName==='H5')h.textContent='COLLECTION · tap a card to equip'
-  B.querySelectorAll('.gpkTop h5').forEach(h=>{if(/SLOTS/.test(h.textContent))h.textContent=h.textContent.replace(/ · (\d)\/3 SLOTS/,' · $1/3').replace('DRIVER LEVEL','LV')})}
+  const h=B.querySelector('[data-r2="rides"]');if(h&&h.tagName==='H5')h.textContent='COLLECTION · tap a card to equip'}
  const pic=(b,inner)=>{if(b.querySelector('.r2Pic'))return;const lk=b.disabled||/^🔒/.test((b.querySelector('b')||{}).textContent||'');b.classList.add('r2Pk');const s=document.createElement('span');s.className='r2Pic';s.innerHTML=inner+(lk?'<em class="r2Lk">🔒</em>':'');b.prepend(s);
   const t=b.querySelector('b');if(t&&t.firstChild&&t.firstChild.nodeType===3)t.firstChild.textContent=t.firstChild.textContent.replace(/^🔒 /,'')};
  B.querySelectorAll('.gbP[data-cat][data-id]').forEach(b=>{const id=b.dataset.id,u=R2_KT.get(id);pic(b,R2_KIC[id]?`<i>${R2_KIC[id]}</i>`:`<i class="r2Fb">${R2_CIC[b.dataset.cat]||'🔩'}</i>`+(u?`<img alt="" src="${u}">`:u===null?'':`<img alt="" data-r2kit="${id}">`))});
@@ -99,14 +98,21 @@ function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]
 // ---------- paint finishes (one cached material per finish; the shared LEGO material stays for everything else)
 // gloss = clear-coated LEGO plastic; matte = no coat, rough; metal = metallic flake under a clear coat; chrome = mirror (base hue mixed toward silver,
 // metalness 1, roughness .04, strong env); pearl = the base colour kept, a soft iridescent sheen on top (thin-film), no lightening
+// gloss = clear-coated LEGO plastic; matte = no coat, rough; metal = metallic flake under a clear coat; chrome = mirror (base hue mixed toward silver,
+// metalness 1, roughness .04, its own bright studio reflection map); pearl = the base colour kept, a soft pearly sheen (warm face, cool rim) on top
 const R2_FP={gloss:{roughness:.15,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.6,k:1},matte:{roughness:1,clearcoat:0,metalness:0,envMapIntensity:.15,k:.92,em:.12},
- metal:{metalness:.75,roughness:.28,clearcoat:.8,clearcoatRoughness:.15,envMapIntensity:2.4,k:1.15,em:.1},
- chrome:{metalness:1,roughness:.04,clearcoat:1,clearcoatRoughness:.02,envMapIntensity:3.2,k:1,mix:.62,em:.02},
- pearl:{iridescence:.9,iridescenceIOR:1.35,clearcoat:1,clearcoatRoughness:.06,roughness:.22,envMapIntensity:1.5,k:1,mix:.12,em:.16}};
+ metal:{metalness:.7,roughness:.26,clearcoat:.8,clearcoatRoughness:.12,envMapIntensity:1.4,k:1.1,em:.12,env:1},
+ chrome:{metalness:1,roughness:.05,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.25,k:1,mix:.7,em:.03,env:1},
+ pearl:{roughness:.2,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.5,k:1,em:.16,pearl:1}};
 const R2_MC={};
-function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,mix,em,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(f==='pearl')m.iridescenceThicknessRange=[260,420];
+// studio reflection map for chrome/metal: a plain canvas (works in the garage renderer and the game renderer alike): bright sky, soft-box strips, horizon, grey floor
+let R2_ENV=null;
+function R2_env(){if(R2_ENV)return R2_ENV;const[c,g]=cv(512,256),s=g.createLinearGradient(0,0,0,256);s.addColorStop(0,'#eef4ff');s.addColorStop(.42,'#9fb4d6');s.addColorStop(.5,'#ffffff');s.addColorStop(.53,'#5d6470');s.addColorStop(1,'#2a2e36');g.fillStyle=s;g.fillRect(0,0,512,256);
+ g.fillStyle='#fff';for(let i=0;i<4;i++)g.fillRect(40+i*128,24,52,70);const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;return R2_ENV=t}
+function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,mix,em,env,pearl,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(env)m.envMap=R2_env();
  const e=em==null?.16:em;m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>'+(mix?`\ndiffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.95,.98),${mix.toFixed(2)});`:''))
-  .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';')};m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
+  .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';'+(pearl?'\n{float r2v=1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.);totalEmissiveRadiance+=mix(vec3(1.,.86,.62),vec3(.55,.78,1.),r2v)*(.10+.42*r2v*r2v);}':''))};
+ m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
 const R2_fin=()=>{try{const f=GP_pa().fin;return R2_FP[f]?f:'gloss'}catch(e){return'gloss'}};
 function R2_finSet(o,f){if(!o)return 0;const M=R2_mat(f);let n=0;o.traverse(x=>{if(!x.isMesh||x.userData.r!=null||!x.material)return;if(x.material===GB_MAT||(x.material.userData&&x.material.userData.r2)){if(x.material!==M)x.material=M;n++}});return n}
 function R2_finPick(f){GP_save('fin',f==='gloss'?'gloss':f);if(GB.mesh)R2_finSet(GB.mesh,f);try{AU.sfx('pick')}catch(e){}R2_ctx()}
@@ -118,7 +124,7 @@ function R2_calc(){const c=$('#gbC');if(!c)return null;const r=c.getBoundingClie
  if(vis(R))l=R.getBoundingClientRect().right-r.left;if(GB_.bk)l+=(parseFloat(getComputedStyle($('#gbx')).getPropertyValue('--r2pad'))||62)+10;if(vis(H))t=H.getBoundingClientRect().bottom-r.top;if(!GB_.bk&&vis(p))R0=p.getBoundingClientRect().left-r.left;
  if(vis(C)){const q=C.querySelector('#gbBkPc')||C;const y=q.getBoundingClientRect().top-r.top;if(y>t+60)b=y}return{l,t,r:R0,b,w:r.width,h:r.height}}
 function R2_frame(C,bk){if(!C||$('#gbx').hidden)return;if(!R2.area||++R2.af>20){R2.area=R2_calc();R2.af=1}const A=R2.area;if(!A||A.r-A.l<80||A.b-A.t<60)return;
- const ox=Math.round(A.w/2-(A.l+A.r)/2),oy=Math.round(A.h/2-(A.t+A.b)/2),z=Math.max(.8,Math.min(1.8,(bk?R2.bz:2.1)*Math.min((A.r-A.l)/A.w,(A.b-A.t)/A.h)));const v=C.view;
+ const ox=Math.round(A.w/2-(A.l+A.r)/2),oy=Math.round(A.h/2-(A.t+A.b)/2),z=Math.max(.8,Math.min(1.8,(bk?R2.bz:2.6)*Math.min((A.r-A.l)/A.w,(A.b-A.t)/A.h)));const v=C.view;
  if(!v||!v.enabled||v.offsetX!==ox||v.offsetY!==oy||v.fullWidth!==A.w||v.fullHeight!==A.h||C.zoom!==z){C.zoom=z;C.setViewOffset(A.w,A.h,ox,oy,A.w,A.h)}C.updateMatrixWorld()}
 G8_band=function(){const A=R2.area||R2_calc();const c=$('#gbC').getBoundingClientRect();return A?[A.t+G8.T.top,A.b-G8.T.bot,c.height,c.width]:[0,c.height,c.height,c.width]};
 GB_cam=(f=>function(){f();R2_frame(GB.cam,GB_.bk)})(GB_cam);
@@ -135,6 +141,7 @@ function R2_pads(){const B=$('#gsBar');if(B)B.querySelectorAll('button').forEach
  const S=$('#slBar');if(S)S.querySelectorAll('button[data-s]').forEach(b=>{const t=R2_SL[b.dataset.s],sp=b.querySelector('span');if(t&&sp&&sp.textContent!==t)sp.textContent=t});
  const h=!!(GS.held||(typeof SL!=='undefined'&&SL.carry));if(R2.held&&!h)R2_tipOff();R2.held=h}
 GS_ui=(f=>function(){const r=f.apply(this,arguments);try{R2_pads()}catch(e){}return r})(GS_ui);
+GPK_html=(f=>function(){return String(f.apply(this,arguments)).replace(/ · (\d)\/3 SLOTS/,' · $1/3').replace('DRIVER LEVEL','LV')})(GPK_html);
 GB_msg=(f=>function(t){f(t);try{if(GB_.bk&&t)GS_tip(t)}catch(e){}})(GB_msg);
 CR_cat=(f=>function(ct){const r=f(ct);try{R2_bkSync()}catch(e){}return r})(CR_cat);
 gbOpen=(f=>function(){if(!GB.tab||GB.tab==='parts'||GB.tab==='bricks')GB.tab='veh';R2.pk=0;R2.af=99;R2_dom();const r=f.apply(this,arguments);R2_sync();return r})(gbOpen);
