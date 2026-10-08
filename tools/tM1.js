@@ -61,7 +61,7 @@ const MON=()=>{const M=__mho,R=M.RO;const L=window.__L={f:0,otp:[],ydrop:[],camj
  await tap('#hcStory');await tick(10);await tap('#slotList .go');
  for(let i=0;i<150;i++){try{if(await E(()=>window.__mho&&__mho.state==='roam'))break}catch(e){}await p.waitForTimeout(2000)}await E(()=>{window.__auto=false});
  await E(MON);await shot('00_roam');
- const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(17);let f=0,route=null,routeT=-1e9,dest=null,wob=0,brakeUntil=-1,lastBrake=-1e9,boostT=-1e9,driftT=-1e9,stuckT=0,revT=-1e9,lagged=[],tpSeen=0,tpShots=0,started=false,ended=null,stShot={},lastNext=-1e9;const frames=MIN*3600;const T0=Date.now();
+ const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(17);const P2=[];let f=0,route=null,routeT=-1e9,dest=null,wob=0,brakeUntil=-1,lastBrake=-1e9,boostT=-1e9,driftT=-1e9,stuckT=0,revT=-1e9,lagged=[],tpSeen=0,tpShots=0,started=false,ended=null,stShot={},lastNext=-1e9;const frames=MIN*3600;const T0=Date.now();
  while(f<frames){
   const s=await E(()=>{const M=__mho,R=M.RO;const a=document.querySelector('#roamArrow');let arr=null;if(a&&!a.hidden){const m=/rotate\((-?[\d.]+)rad/.exec(a.querySelector('i').style.transform||''),d=/([\d.]+)\s*m\s*$/.exec(a.querySelector('span').textContent||'');if(m&&d){const ang=-(+m[1])+R.h,D=+d[1];arr={x:R.x+Math.sin(ang)*D,z:R.z+Math.cos(ang)*D,d:D}}}
    const n=document.querySelector('#m1Next');const h=window.__m1&&__m1.hint();const r=document.querySelector('#chRes');
@@ -86,7 +86,7 @@ const MON=()=>{const M=__mho,R=M.RO;const L=window.__L={f:0,otp:[],ydrop:[],camj
   if(wantB&&(ctl.brake||f-lastBrake>60))brakeUntil=Math.max(brakeUntil,f+18);if(f<brakeUntil){c.brake=true;lastBrake=f}
   if(Math.abs(ae)<.08&&a2<.2&&o.v>12&&o.v<45&&f-boostT>600)boostT=f;if(f-boostT<90)c.boost=true;
   if(s.hint&&s.hint.mode==='drift'&&o.v>15){c.drift=true;c.steer=-1}
-  if(Math.abs(s.v)<1.4)stuckT+=6;else stuckT=0;if(stuckT>90&&f>revT+150){revT=f;stuckT=0}if(f-revT<72){c.gas=false;c.brake=true;c.boost=false;c.drift=false;c.steer=ae>0?1:-1}
+  P2.push([f,s.x,s.z]);while(P2.length&&P2[0][0]<f-120)P2.shift();if(Math.abs(s.v)<1.4||(P2.length>15&&f-P2[0][0]>=110&&Math.hypot(s.x-P2[0][1],s.z-P2[0][2])<4))stuckT+=6;else stuckT=0;if(stuckT>90&&f>revT+150){revT=f;stuckT=0}if(f-revT<72){c.gas=false;c.brake=true;c.boost=false;c.drift=false;c.steer=ae>0?1:-1}
   await apply(c);await tick(6);f+=6;
   if(f%1800<6)console.log('t',Math.round(f/60),'s',JSON.stringify(await E(()=>({st:__L.act,tp:__L.tp.length,vmax:Math.round(__L.vmax),tv:Math.round(__L.tvmax),x:Math.round(__mho.RO.x),z:Math.round(__mho.RO.z)}))),Math.round((Date.now()-T0)/1000)+'s wall');
  }
