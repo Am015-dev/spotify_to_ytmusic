@@ -1,4 +1,4 @@
-<title>Mainhattan Overdrive</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body><title>Mainhattan Overdrive</title>
 <style>
 /* Layout: full-bleed WebGL race; HUD in the four corners in heavy italic numerals; menu is one glowing panel on the left over a live attract race. Single dark look by choice. */
 :root{
@@ -753,7 +753,7 @@ const TUNE={life:1,lvPed:1,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
-  {v:'v88r',date:'9 Oct 2026',items:[{t:'CHANGED',s:'The pinned checklist folds to its small chip in the garage (it covered the car) and during the race countdown; tap the chip to open it.'}]},
+  {v:'v88q',date:'9 Oct 2026',items:[{t:'CHANGED',s:'The pinned checklist folds to its small chip in the garage (it covered the car) and during the race countdown; tap the chip to open it.'}]},
  {v:'v88p',date:'8 Oct 2026',items:[{t:'NEW',s:'Street corners ahead come alive: groups of people chatting who turn, wave and cheer as you drive up (and leap aside), market stalls, café tables and parked cars on the kerb. Smash a stall for studs.'},{t:'NEW',s:'Roadside pop-up challenges like 2K Drive: a coloured ring appears on the road ahead; drive through it for a RAMP JUMP, DRIFT ZONE, SMASH STREAK or CONE SLALOM. Timer on the objective line, +150 studs and a brick burst if you make it.'},{t:'CHANGED',s:'Traffic and pigeons now show up closer, along the street you are driving.'}]},
   {v:'v88o',date:'8 Oct 2026',items:[{t:'NEW',s:'The test checklist stays on screen while you play: answer each item with ✅ / ❌, ‹ › to move, tap the counter to fold it to a small chip.'},{t:'FIXED',s:'Garage BUILD → CLEAR now leaves one clean chassis with its wheels and a fresh grid (no leftover base, no floating grid). UNDO brings the build back.'},{t:'NEW',s:'Bigger parts palette in BUILD: 2 rows of named tiles, category chips, ★ FAVS (long-press a part) and 🕘 RECENT.'},{t:'NEW',s:'Groups in BUILD: select parts → MAKE GROUP, then 👁 hide/show, move, copy, mirror or delete the whole group. HIDE UP hides the layers above the one you build on.'}]},
  {v:'v88n',date:'8 Oct 2026',items:[{t:'NEW',s:'The cities feel alive: more people on the pavements near you (they wave as you pass), and traffic now drives where you can see it, including the new orange and pink street racers.'},{t:'NEW',s:'Pigeons that scatter when you drive up, gulls circling overhead, flags flapping on the rooftops, a LEGO blimp over each city and boats sailing on the Main.'},{t:'CHANGED',s:'Bolder LEGO colours on the buildings: Frankfurt districts are bright brick colours instead of pale pastels; the Athens old town is warmer.'},{t:'NEW',s:'⚙ TUNE → Life: a "World life" slider (0 = the old quiet city) plus one knob per part.'}]},
@@ -12121,7 +12121,7 @@ function GB_clear(){if(!GB.d)return;const L=GB_list(),brick=L.some(CR_isW);GB_sn
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
- {ver:'v88r',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
+ {ver:'v88q',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
  {ver:'v88p',id:'life-crowds',text:'Drive 1 minute in Frankfurt and in Athens: at most street corners ahead you see a group of 3-6 people standing together; they turn to look, wave and hop as you come by.'},
  {ver:'v88p',id:'life-dodge',text:'Drive fast past a corner group: the people leap out of the way; nobody stands on the road.'},
  {ver:'v88p',id:'life-stalls',text:'You pass market stalls (striped awnings, fruit boxes) and café tables with umbrellas on the pavements. Drive into one: it bursts into bricks and studs; it does not stop you dead.'},
@@ -12463,3 +12463,4 @@ updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((sta
  const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);const CB=typeof R15_camB==='function'?R15_camB(s.dist+al):null,lo=CB?CB[0]:-lim,hi=CB?CB[1]:lim;if(l>=lo&&l<=hi)return;CR_CAMX.n++;const dl=(l>hi?hi:lo)-l;c.addScaledVector(F.r,dl);
  if(CC&&CC.s){const w=CC.s;camera.lookAt(w.mesh.position.clone().add(w.mesh.userData.m.position))}else camera.lookAt(camLook)}catch(e){}})(updateCam);
 </script>
+</body></html>
