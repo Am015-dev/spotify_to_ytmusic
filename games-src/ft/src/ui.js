@@ -6,7 +6,7 @@ const PCOL=['#2b2b33','#119e98','#ff4fa3','#8b5a2b','#6d7b8d'];const MCSS={vizie
 const TSHORT={village:'Hamlet',sacred:'Shrine',oasis:'Oasis',small:'Stall',large:'Bazaar',workshop:'Workshop',exchange:'Exchange',ravine:'Ravine',lake:'Lake',city:'City'};
 const TICON={village:'🏘️',sacred:'🕌',oasis:'💧',small:'🧺',large:'🏪',workshop:'🔨',exchange:'🌶️',ravine:'⛰️',lake:'🌊',city:'🏛️'};
 Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:0,hurry:false,pick:[],pickSeat:[],pickMk:[],pickDj:[],pickSpot:[],snap:null,autoMove:null,autoMs:650,modal:null,moveSnap:null,moveSteps:null});
-function refresh(){if(G&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(G&&!G.tut&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
@@ -124,8 +124,8 @@ function snapState(){return {seed:G.seed,tiles:G.board.map(t=>({m:t.m.slice(),ha
   tot:G.pl.map(p=>shownTotal(p)),coins:G.pl.map(p=>p.coins),cur:G.cur,act:G.act?{color:G.act.color,tile:G.act.tile}:null,step:G.step,logN:G.logN}}
 // steps that need no decision run by themselves after a short beat, so the player sees what happened
 function autoStep(){clearTimeout(UI.autoT);UI.autoT=0;const m=UI.autoMove;UI.autoMove=null;UI.autoOn=!!m;if(!m||UI.pause)return;const key=G.logN+'|'+G.step+'|'+JSON.stringify(m);
-  UI.autoT=setTimeout(()=>{UI.autoT=0;const hp=G&&!G.over&&!UI.modal?me():null;if(!hp||G.logN+'|'+G.step+'|'+JSON.stringify(m)!==key)return;if(!validMoves(hp.i).some(x=>same(x,m)))return;go(m)},ANIM?UI.autoMs/(UI.speed>1?UI.speed:1):0)}
-function overCheck(){if(!G||!G.over||UI.overFor===G.seed)return;UI.overFor=G.seed;
+  UI.autoT=setTimeout(()=>{UI.autoT=0;const hp=G&&!G.over&&!UI.modal?me():null;if(!hp||G.logN+'|'+G.step+'|'+JSON.stringify(m)!==key)return;if(!validMoves(hp.i).some(x=>same(x,m)))return;UI._tutIn=1;try{go(m)}finally{UI._tutIn=0}},ANIM?UI.autoMs/(UI.speed>1?UI.speed:1):0)}
+function overCheck(){if(!G||!G.over||G.tut||UI.overFor===G.seed)return;UI.overFor=G.seed;
   if(UI.camp&&typeof GXC!=='undefined'&&GXC.active&&GXC.active()){setTimeout(()=>{try{GXC.finish(G)}catch(e){console.error(e)}},ANIM?1600:0);return}
   setTimeout(()=>{if(G&&G.over&&!UI.modal){UI.modal='over';render()}},ANIM?1800:0)}
 // ---------- input ----------
@@ -160,7 +160,7 @@ function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.ancho
   const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
 function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
-  if(hu&&mine&&typeof fingerUsed==='function')fingerUsed(m);
+  if(hu&&mine&&!G.tut&&typeof fingerUsed==='function')fingerUsed(m);
   const r=performMove(m,s);if(G&&!G.move)UI.moveSnap=G.step==='move'?UI.moveSnap:null;
   if(!r.success&&mine){toast('Not allowed now');console.error(r.error)}}
 function toast(t){const el=$('#line');if(!el)return;el.textContent=t;clearTimeout(UI.tt);UI.tt=setTimeout(()=>{if(G)renderLine()},1800)}
@@ -182,10 +182,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
 // a tap anywhere that is not a button, while the computer plays, hurries it along
 document.addEventListener('pointerdown',e=>{if(G&&!G.over&&!me()&&!UI.modal&&e.target.closest&&e.target.closest('#bd'))UI.hurry=true},true);
 document.addEventListener('pointerdown',e=>{const tp=document.getElementById('tip');if(tp&&!tp.hidden&&!(e.target.closest&&e.target.closest('#tip')))tp.hidden=true},true);
-document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th]'))){UI.chz=null;if(G)render()}},true);
+document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th],[data-help]'))){UI.chz=null;if(G)render()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pendItem||UI.chz)){UI.pendDj=UI.pendItem=UI.chz=null;render()}});
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
-  switch(a){case 'start':beginGame();return;case 'quick':UI.setup.np=2;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();GXC.open()}return;
+  switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.np=2;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
@@ -195,6 +195,6 @@ function beginGame(o){o=o||{};const s=UI.setup;UI.modal=null;UI.fx.length=0;UI.f
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh()}catch(e){openStart()}}
 // ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
-let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops())return;const s=sideToAct();if(s<0||P(s).human)return;
+let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
   const drop=G.step==='move'&&G.move;const base=drop?600:420;const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}

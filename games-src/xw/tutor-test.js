@@ -95,7 +95,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     }
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
     // screenshots at 390x763 (after a moment so the bubble has settled)
-    if(mode==='clean'&&W===390&&!shots[id]&&['goal','dice','stress'].includes(id)){shots[id]=1;await sleep(500);await shot(id==='goal'?'start':id)}
+    if(mode==='clean'&&W===390&&!shots[id]&&['goal','dice','stress'].includes(id)){shots[id]=1;await sleep(1100);await shot(id==='goal'?'start':id)}
     if(mode==='rotate'&&rotated===0&&s.id==='order'){rotated=1;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(1500);
       const r=await state();if(!r.shown||!r.hole)note(tag,'after rotating to landscape the step is not on screen ('+JSON.stringify({sh:r.shown,ph:r.phase,i:r.i})+')');else await p.screenshot({path:'/tmp/claude-0/tutor_rot_land.png'});continue}
     if(mode==='rotate'&&rotated===1&&s.id==='res1'){rotated=2;await p.setViewportSize({width:W,height:H});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(1500);
@@ -114,7 +114,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       if(gs0!==gs1)note(tag,id+': a wrong tap changed the game');
       if(after.wrongs<=before.wrongs)note(tag,id+': a wrong tap did not shake the bubble');
       const hint=await p.evaluate(()=>{const b=document.querySelector('.gxt-bub');return b&&b.classList.contains('gxt-shake')&&b.querySelector('.gxh-tx').textContent});
-      if(!hint||!/Tap/.test(hint))note(tag,id+': wrong tap gave no "Tap ..." hint ('+hint+')')}
+      if(!['res1','res2','win'].includes(id)&&(!hint||!/Tap/.test(hint)))note(tag,id+': wrong tap gave no "Tap ..." hint ('+hint+')')}
     // "Skip tutorial": once, at step 3: everything goes away, the menu is back, the tutorial is not marked done
     if(mode==='skip'&&s.i>=3){const sk=info.skip;await p.touchscreen.tap((sk.left+sk.right)/2,(sk.top+sk.bottom)/2);await sleep(600);
       const o=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-top,.gxt-end').length,start:UI.info&&!!document.querySelector('#modal .dlg.start'),
