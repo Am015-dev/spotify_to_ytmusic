@@ -15,7 +15,7 @@ function missionFrom(opt) {
 }
 function resetUI(mode, cfg) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
+  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && mode !== 'tutorial' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
@@ -23,8 +23,7 @@ function newGame(mode, o) {
   o = o || {};
   const opt = Object.assign({}, DEF, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 4)), names = [], ai = [];
-  if (mode === 'guided') { np = 3; opt.kind = 'log'; opt.mission = 1; }
-  if (mode === 'guided') { try { hlpInit(); GXH.setEnabled(true); GXH.reset(); } catch (e) { } }   // the training dive shows every coach bubble
+  if (mode === 'tutorial') { np = 3; opt.kind = 'log'; opt.mission = 1; opt.seats = [3, 2]; }   // the staged tutorial (ui12.js): you, Dag and Sumi
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
   const chefs = mode === 'net' ? null : chefsFor(np, opt);
   if (mode !== 'net') for (let i = 0; i < np; i++) {
@@ -32,26 +31,25 @@ function newGame(mode, o) {
     if (mode === 'hot') { names.push(i === 0 ? 'Diver 1' : 'Diver ' + (i + 1)); ai.push(null); }
     else if (mode === 'ai') { names.push(D.names[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(D.names[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
+    else { names.push(D.names[c]); ai.push(mode === 'tutorial' ? 'normal' : lv); }
   }
   UI.chefs = chefs;
   let mission = mode === 'net' ? (opt.mission && typeof opt.mission === 'object' ? opt.mission : missionFrom(opt)) : missionFrom(opt);
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   let tries = 0;
-  // the guided first dive is a fixed, stacked deal that cannot be lost: you hold the Commander's Lantern 4 AND the Lantern 3, the job is to win the Lantern 3
-  const gs = mode === 'guided' ? guidedStack() : null;
+  // the staged tutorial is a fixed, stacked deal (data.js tutorial); the computer divers are scripted (ui12.js tutMove)
+  const gs = mode === 'tutorial' ? tutorialStack() : null;
   G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs, boss: mode === 'descent' ? opt.boss || null : null });
-  G.noProg = mission.kind !== 'log' && mission.kind !== 'deep';
+  G.noProg = mode === 'tutorial' || (mission.kind !== 'log' && mission.kind !== 'deep');
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
   UI.news = [];
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
-  if (mode === 'guided') UI.coach.level = 'off'; // Mara's dialogs teach the training dive (ui8.js)
+  UI.coach = { level: mode === 'tutorial' ? 'off' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
-function guidedStack() {
+function tutorialStack() {
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
-  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h), nopass: true };
+  return { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;
@@ -67,7 +65,7 @@ function nextAttempt(same) {
 function aiWants() {
   if (!G || G.phase === 'over') return false;
   for (const s of LD.pending(G)) if (G.players[s].ai) return true;
-  if (G.phase === 'play' && G.trick.plays.length === 0) for (const p of G.players) if (p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)) return true;
+  if (G.phase === 'play' && G.trick.plays.length === 0 && UI.mode !== 'tutorial') for (const p of G.players) if (p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)) return true;
   return false;
 }
 function schedule() {
@@ -77,7 +75,8 @@ function schedule() {
   if (UI.busy) return;
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length) return;
-  if (UI.tip && UI.mode === 'guided') return;
+  if (UI.mode === 'tutorial' && tutAuto()) return;
+  if (UI.mode === 'tutorial' && tutPaused()) { UI.tm = setTimeout(schedule, 200); return; }
   try { if (storyCheck()) return; } catch (e) { console.error(e); }
   if (G.clock && G.clockRun && UI.timerAt === 0) { UI.timerAt = Date.now(); UI.clockLeft = G.clock; startClock(); }
   if (aiWants()) {
@@ -89,7 +88,7 @@ function schedule() {
 }
 function aiTurn() {
   if (!G || UI.busy || G.phase === 'over') return;
-  let ok = false; try { ok = LD.AI.step(G); } catch (e) { console.error(e); }
+  let ok = false; try { ok = UI.mode === 'tutorial' ? tutAiStep() : LD.AI.step(G); } catch (e) { console.error(e); }
   if (!ok) { schedule(); return; }
   afterApply(G.events.slice());
 }
@@ -113,6 +112,7 @@ function afterApply(evs) {
 // ---------- human actions ----------
 function doMove(mv) {
   const v = viewSeat(); if (v < 0) return false;
+  if (tutOn() && !tutGate(mv)) return false;      // the staged tutorial: only the action the step asks for goes through
   fingerDone();
   if (isClient()) { netAct(mv); UI.sel = -1; UI.pingSel = false; UI.giveSel = -1; UI.job = -1; render(); return true; }
   return commit(v, mv);
@@ -127,7 +127,6 @@ function tapHand(id) {
     const T = G.trick, turn = T.turn;
     if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards.' : 'Wait for ' + pname(turn) + '.'); return; }
     const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
-    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Play the glowing card.'); return; }
     UI.sel = id; UI.hint = null; playSel(); return;
   }
   toast('Not your turn yet.');
@@ -239,6 +238,7 @@ async function playEvs(evs) {
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
       render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
       UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      await tutHoldWait(); if (tok !== UI.seq) return;
       UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1', 'plus'); await wait(520); if (tok !== UI.seq) return;
       UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(700); if (tok !== UI.seq) return; }
     } else {
@@ -277,7 +277,7 @@ function startClock() {
 function hasSave() { return !!lsGet('ld_save'); }
 function autosave() { if (NET.on || !G || !UI.started) return false; return save(true); }
 function save(quiet) {
-  if (NET.on || !G || !UI.started) return false;
+  if (NET.on || !G || !UI.started || UI.mode === 'tutorial') return false;
   try { const g = LD.clone(G); delete g.events; lsSet('ld_save', JSON.stringify({ G: g, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, coach: UI.coach })); return true; } catch (e) { return false; }
 }
 function loadSave() {
@@ -287,7 +287,7 @@ function loadSave() {
   G = o.G; G.events = [];
   try { if (G.phase !== 'over' && LD.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.hn ? o.chefs : null;
-  resetUI(o.mode || 'vs', o.cfg || null); if (o.coach) UI.coach = o.coach;
+  resetUI(o.mode === 'guided' || o.mode === 'tutorial' ? 'vs' : (o.mode || 'vs'), o.cfg || null); if (o.coach) UI.coach = o.coach;
   UI.timerAt = 0; placePrompt(); render(); sndMusic();
   if (G.phase === 'over') showResult(); else schedule();
   return true;

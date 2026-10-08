@@ -23,13 +23,14 @@ function campStart(def) {
   let np = s.np || 4; if (t && t.id === 'big-team') np = t.param || 5;
   const o = { camp: def, np, kind: 'log', mission: s.mission || 1, seats: [0, 1, 2, 3], lv: [mates, mates, mates, mates], level: 'normal', timer: !!((t && t.id === 'clock-on') || s.timer) };
   UI.seed = s.seed != null ? s.seed : null;
-  newGame(s.mode === 'guided' ? 'guided' : 'vs', o);
+  newGame('vs', o);
   UI.camp = def;
-  if (s.mode !== 'guided') { UI.coach.level = def.hints ? 'full' : 'off'; render(); }
+  UI.coach.level = def.hints ? 'full' : 'off'; render();
   try { toast('Goal: ' + def.goal.text); } catch (e) { }
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
-function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
+// Story starts with the staged tutorial (Chapter 0) until it has been finished once; then it goes straight to the chapter map
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); if (typeof GXT !== 'undefined' && typeof tutStart === 'function' && !GXT.isDone('lantern-dive')) tutStart({ prologue: true }); else GXC.open(); }
 function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
 // result footer inside a story chapter (called from showResult)
 function campResult(box, ok) {
@@ -52,7 +53,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'lantern-dive', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    game: 'lantern-dive', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
     onExit: () => { UI.camp = null; showStart(); },
     scores: g => g.players.map(() => 0), seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
   });

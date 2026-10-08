@@ -22,7 +22,7 @@ function run(cfg,seed){return new Promise(res=>{const dom=new JSDOM(html,{runScr
     const hp=E('me()');
     if(hp){const r=Math.random();
       if(r<.02){const t=rnd(['[data-bf=menu]','[data-bfchip]']);const e=d.querySelector('#bf '+t);if(e){click(e);if(!d.querySelector('#bf .bf-ov:not([hidden]) .bf-card'))errs.push('no pop-up after '+t);seen.add('open:'+t);click(d.querySelector('#bf .bf-ov'));if(!d.querySelector('#bf .bf-ov[hidden]'))errs.push('pop-up did not close');return}}
-      if(r<.04){const a=d.querySelector('#bf [data-bf=hint]');if(a){click(a);seen.add('hint');return}}
+      if(r<.04){const a=d.querySelector('#bf #bulbbtn');if(a){click(a);seen.add('hint');return}}
       if(G.phase==='wall'){const cells=[...d.querySelectorAll('#bf [data-bfcell]')];if(cells.length){click(rnd(cells));seen.add('wall-cell');return}errs.push('wall question without glowing spaces');return}
       const sel=E('UI.sel');
       if(!sel){if(r<.1){const k=[...d.querySelectorAll('#bf [data-bfsrc]')];if(k.length){click(rnd(k));seen.add('kiln-tap');return}}

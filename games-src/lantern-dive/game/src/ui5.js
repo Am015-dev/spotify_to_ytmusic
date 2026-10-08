@@ -65,6 +65,7 @@ function renderMenu() {
   if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New dive'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
+  if (!NET.on) { const tr = h('div.mrow', { html: tutBtn('btn') }); b.appendChild(tr); }
   try { hlpInit(); if (typeof GXH !== 'undefined') b.appendChild(GXH.settingsRow({ rowClass: 'mrow', btnClass: 'btn' })); } catch (e) { }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gg = gfxPref(); row('Graphics' + (PX.on ? (gg === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gg === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gg === v ? 'true' : 'false' }, n))); }
@@ -78,6 +79,7 @@ const SEAT_ORDER = [0, 1, 2, 3];
 function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice(), seats: DEF.seats.slice() }); if (!Array.isArray(o.seats)) o.seats = chefsFor(o.np || 4, o).slice(1); if (!o.lv) o.lv = DEF.lv.slice(); o.np = o.seats.length + 1; return o; }
 function setNp(n) { const o = optObj(), want = Math.max(1, Math.min(4, n - 1)); const st = o.seats.slice(); while (st.length > want) st.pop(); for (const c of SEAT_ORDER) { if (st.length >= want) break; if (st.indexOf(c) < 0) st.push(c); } o.seats = st; o.np = st.length + 1; }
 function toggleChef(c) { const o = optObj(), st = o.seats.slice(), i = st.indexOf(c); if (i >= 0) { if (st.length > 1) st.splice(i, 1); else { toast('At least one diver joins you.'); return; } } else if (st.length < 4) st.push(c); o.seats = st; o.np = st.length + 1; }
+function firstTime() { try { return !Object.keys(Prog.load().done || {}).length && !lsGet('ld_save') && !(typeof GXT !== 'undefined' && GXT.status('lantern-dive').seen); } catch (e) { return false; } }
 function logoSVG() { return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#0e2146" stroke="#ffd873" stroke-width="1.4"/><circle cx="13" cy="9" r="4.4" fill="#ffe9a6" stroke="#0b1f3a" stroke-width="1"/><path d="M13 13.4C13 16 10 16 8 19" fill="none" stroke="#ffd873" stroke-width="1.6" stroke-linecap="round"/></svg>'; }
 function missionLine(o) {
   const kind = o.kind || 'log';
@@ -106,10 +108,11 @@ function titleEl() {
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Lantern Dive')),
     h('p.tag', 'Dive together. Say nothing. Trust the lantern.'),
     h('div.tbtns',
+      firstTime() ? h('div.tutw', { html: tutBtn('tbtn go') }) : null,
       window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), ' ', h('span', campLine())) : null,
       h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
-      h('button.tbtn', { 'data-a': 'guided', type: 'button' }, h('b', 'Training'), ' ', h('span', 'a dive with Mara, step by step')),
       h('button.tbtn', { 'data-a': 'play', type: 'button' }, h('b', 'Free play'), ' ', h('span', 'any dive, any crew')),
+      firstTime() ? null : h('div.tutw', { html: tutBtn('tbtn') }),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), ' ', h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), ' ', h('span', 'your saved dive')) : null),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
@@ -158,7 +161,7 @@ function setupEl() {
   // first visit (nothing in the logbook yet): the guided dive is the big button, so a player who taps the big button learns first
   const fresh = (() => { try { return !Object.keys(Prog.load().done || {}).length; } catch (e) { return false; } })();
   const bStart = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the dive'), ' ', h('span', missionLine(o)));
-  const bGuided = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', big ? 'Guided first dive (start here)' : 'Guided first dive'), ' ', h('span', 'You + 2 computer divers, with tips'));
+  const bGuided = (big) => h('div.tutw', { html: tutBtn('sbtn' + (big ? ' big' : '')) });
   const go = h('div.sgo',
     fresh ? bGuided(true) : bStart(true),
     h('div.sgrid3',
@@ -224,7 +227,6 @@ document.addEventListener('click', ev => {
     case 'gfx': setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m); break;
-    case 'guided': newGame('guided'); break;
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'kind') { o.kind = d.v; if (d.v === 'log' && !o.mission) o.mission = Prog.load().cur > 32 ? 32 : Prog.load().cur; if (d.v === 'deep') o.deep = Math.max(D.deep.start, Prog.load().deep.level); } else if (d.k === 'timer') o.timer = d.v === '1'; else { o[d.k] = isNaN(+d.v) ? d.v : +d.v; } renderStart(); break; }
     case 'pickdive': { const o = optObj(); o.mission = +d.v; renderStart(); break; }
     case 'jobstep': { const o = optObj(); o.job = Math.max(1, Math.min(96, ((o.job | 0) || 1) + (+d.v))); renderStart(); break; }
