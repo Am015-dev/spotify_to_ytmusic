@@ -77,6 +77,7 @@ function renderMenu() {
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
+  if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn')); b.appendChild(tr); }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
   b.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are in How to play.'));
 }
@@ -113,11 +114,13 @@ function titleEl() {
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Kaiten Kitchen')),
     h('p.tag', 'Grab a plate, pass the belt.'),
     h('div.tbtns',
+      firstTime() ? tutNode('tbtn go') : null,
       sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
-      h('button.tbtn' + (sv ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn' + (sv || firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
       h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
-    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
+    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'),
+    firstTime() ? null : tutNode('tlink', { sub: false })));
 }
 function dinerCard(c, o) {
   const d = DINERS[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c - 1] || 'normal', pc = KIT.PLAYERS[c];
@@ -141,7 +144,7 @@ function setupEl() {
   // until a first meal is finished, the guided game is the big button
   const first = !lsGet('kk_done');
   const bMeal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', first ? 'Normal game' : 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
-  const bGuide = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Start: guided first game' : 'Guided first game'), h('span', '1 on 1 with ' + PN[o.seats[0]] + ', with tips' + (first ? ' (recommended)' : '')));
+  const bGuide = cls => tutNode('sbtn' + cls.replace(/\./g, ' '));
   const go = h('div.sgo',
     first ? bGuide('.big') : bMeal('.big'),
     h('div.sgrid3',
@@ -180,7 +183,7 @@ document.addEventListener('click', ev => {
     case 'rsskip': skipCount(); break;
     case 'rsclose': closeRS(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; closeRS(); newGame(m === 'net' ? 'vs' : m, { np: c.np, level: c.level, lv: c.lv, seats: c.seats || undefined }); break; }
-    case 'story': campOpen(); break;
+    case 'story': storyOpen(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;

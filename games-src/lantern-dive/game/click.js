@@ -7,7 +7,6 @@ const fs = require('fs'); const path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'lantern-dive.html'), 'utf8');
 const ANIMON = process.argv.includes('--anim');
 const CONF = [
-  { name: 'guided', start: 'guided' },
   { name: 'vs 2p dive 3 (drone)', start: 'vs', np: 2, mission: 3 },
   { name: 'vs 3p dive 7 easy', start: 'vs', np: 3, mission: 7, level: 'easy' },
   { name: 'vs 4p dive 10 (commander call) hard', start: 'vs', np: 4, mission: 10, level: 'hard' },
@@ -19,7 +18,6 @@ const CONF = [
   { name: 'watch 5p dive 26 hard', start: 'ai', np: 5, mission: 26, level: 'hard' },
   { name: 'vs 4p dive 11 (narcosis)', start: 'vs', np: 4, mission: 11 },
   { name: 'vs 3p dive 19 + 25 style', start: 'vs', np: 3, mission: 25 },
-  { name: 'PHONE guided', start: 'guided', phone: 1 },
   { name: 'PHONE vs 3p dive 7', start: 'vs', np: 3, mission: 7, phone: 1 },
   { name: 'PHONE hot 3p dive 8', start: 'hot', np: 3, mission: 8, phone: 1 },
   { name: 'PHONE vs 5p dive 20', start: 'vs', np: 5, mission: 20, phone: 1 },
@@ -74,7 +72,7 @@ function run(cf, seed) {
               attempts = attempts || 0;
               const ok = G.result.ok; seen.add('result:' + (ok ? 'won' : 'lost'));
               if (!ok) { const bad = [...d.querySelectorAll('#rs .rjob.bad')]; if (!bad.length && G.result.tasks.some(x => x < 0)) errs.push('lost dive: no red job row'); for (const r of bad) if (!r.querySelector('.why') || !/Trick \d+|could not be met/.test(r.textContent)) errs.push('failed job without an explanation: ' + r.textContent.slice(0, 80)); const open = [...d.querySelectorAll('#rs .rjob.open')].every(r => /Not finished/.test(r.textContent)); if (!open) errs.push('open job row without "Not finished"'); if (G.result.tasks.some((x, i) => x === 0) && !d.querySelector('#rs .rjob.open')) errs.push('open job shown as failed'); seen.add('explained-loss'); }
-              if (ok && cf.start === 'guided' && !d.querySelector('#rs .debrief')) errs.push('guided win without a debrief'); if (ok && cf.start === 'guided') seen.add('guided-debrief');
+             
               if (!ok && attempts < 2 && cf.start !== 'ai') { attempts++; const b = d.querySelector('#rs [data-a=' + (R() < .5 ? 'retrysame' : 'retrynew') + ']'); if (!b) { errs.push('no retry button'); return fin({}); } click(b); seen.add('retry'); if (w.eval('G.phase') === 'over') errs.push('retry did not start a new attempt'); return; }
               if (ok && !attempts && R() < .3 && cf.start !== 'ai' && !cf.phone) { attempts = 9; const b = d.querySelector('#rs [data-a=nextdive]'); if (b) { click(b); seen.add('nextdive'); if (w.eval('G.phase') === 'over') errs.push('next dive did not start'); return; } }
               return fin({ over: { ok, att: G.att, why: G.result.why.slice(0, 40), jobs: process.env.DBGJ ? G.tasks.map(t => t.id + ':' + t.owner).join(',') + ' hands0 ' + JSON.stringify(G.players[0].hand) + ' log ' + JSON.stringify(G.log.slice(-8).map(l => l.t)) : undefined } });

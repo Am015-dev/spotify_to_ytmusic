@@ -237,3 +237,6 @@ html.short .nc{height:24px;min-width:18px}
 /* help kit colours */
 :root{--gxh-bg:#fff6e2;--gxh-ink:#1c1838;--gxh-accent:#ff8a1f;--gxh-glow:#ffc928;--gxh-btn:#e8681c;--gxh-btn-ink:#fff;--gxh-font:var(--fb)}
 .gx-bar .gxh-bulb{background:linear-gradient(#3a3f86,#2b2f63);border:2px solid #14163a;box-shadow:0 3px 0 #14163a;min-height:40px;min-width:40px;border-radius:12px}
+/* tutorial entry in the menus (shell/gx-tutor.js) */
+.big.gxt-menu{flex-direction:column;gap:0;line-height:1.15}.big.gxt-menu span{font:800 .75rem var(--fb);opacity:.9;text-shadow:none}
+.btn.gxt-menu{display:inline-flex;flex-direction:column;align-items:center;gap:0}.btn.gxt-menu span{font:700 .7rem var(--fb);opacity:.8}

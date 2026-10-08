@@ -32,7 +32,7 @@
       "intro": [
         { "who": "brack", "text": "Welcome to Saltmere Base. Before you dive for real, one small job in the bay." },
         { "who": "dag", "text": "I'm new too! Win the trick your job asks for and we all go home dry." },
-        { "who": "brack", "text": "Follow the coach. Nothing down there can hurt you today." }
+        { "who": "brack", "text": "Stuck? Tap the lightbulb. Nothing down there can hurt you today." }
       ],
       "outro": [
         { "who": "brack", "text": "Job done, logbook signed. You're a diver now." },
@@ -41,7 +41,7 @@
       "opponent": { "name": "Calm Shallows", "portrait": "camp-shallows.webp", "emoji": "🏝️", "cast": null,
         "personality": "Clear, warm water. The only danger is forgetting to follow suit.",
         "aiLevel": "easy", "aiStyle": "calm" },
-      "setup": { "mode": "guided", "kind": "log", "mission": 1, "np": 3, "mates": "normal", "timer": false },
+      "setup": { "mode": "local", "kind": "log", "mission": 1, "np": 3, "mates": "easy", "timer": false },
       "twist": null,
       "goal": { "type": "mission", "value": 1, "text": "Complete dive 1, Shallow Water: finish your one job." },
       "hints": true,
@@ -50,7 +50,7 @@
         { "text": "Complete it on the first attempt", "test": { "k": "attempts", "op": "<=", "v": 1 } },
         { "text": "Take the job yourself", "test": { "k": "myJobs", "op": ">=", "v": 1 } }
       ],
-      "easier": { "aiLevel": "easy", "twist": null, "setup": { "mode": "guided" }, "maxStars": 2, "text": "The guided deal is already the gentlest dive; the coach shows every step." },
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "mode": "local" }, "maxStars": 2, "text": "Easy crewmates and one small job; the lightbulb shows every step." },
       "unlock": [ { "type": "portrait", "id": "dag", "text": "Dag's portrait" } ]
     },
     {
