@@ -11,7 +11,7 @@ function newGame(mode, o) {
   o = o || {};
   const opt = Object.assign({}, DEF, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 3)), names = [], ai = [];
-  if (mode === 'guided') np = 2;
+  if (mode === 'guided' || mode === 'tutorial') np = 2;
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
   const chefs = mode === 'net' ? null : chefsFor(np, opt);
   if (mode !== 'net') for (let i = 0; i < np; i++) {
@@ -19,13 +19,14 @@ function newGame(mode, o) {
     if (mode === 'hot') { names.push(PN[c]); ai.push(null); }
     else if (mode === 'ai') { names.push(PN[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
+    else { names.push(PN[c]); ai.push(mode === 'tutorial' ? 'easy' : mode === 'guided' ? 'normal' : lv); }
   }
   UI.chefs = chefs;
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
-  G = KK.newGame({ players: np, seed, names, ai, twist: o.twist || null });
-  UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  const seed = mode === 'tutorial' ? 23 : UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
+  G = KK.newGame({ players: np, seed, names, ai, twist: o.twist || null, rounds: mode === 'tutorial' ? 1 : 0 });
+  if (mode === 'tutorial' && typeof tutDeal === 'function') tutDeal(G);
+  UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, tutorial: mode === 'tutorial' }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : UI.coach.userOff ? 'off' : 'light'), seen: {}, turn: '', keep: UI.coach.keep, userOff: UI.coach.userOff };
   if (mode === 'guided') UI.coach.level = 'full';
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
@@ -224,11 +225,11 @@ const SAVE_V = 2;
 function hasSave() { return !!lsGet('kk_save'); }
 function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
-  if (NET.on || !G || !UI.started || G.phase === 'over') return false;
+  if (NET.on || !G || !UI.started || G.phase === 'over' || UI.mode === 'tutorial') return false;
   try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
 // autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
-function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
+function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over' || UI.mode === 'tutorial') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
 function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;

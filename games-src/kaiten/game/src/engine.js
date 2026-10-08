@@ -86,6 +86,7 @@ function newGame(o) {
   const np = Math.max(2, Math.min(5, (o.players | 0) || 2));
   const seed = (o.seed === undefined ? Date.now() : o.seed) | 0;
   const G = { v: 1, np, seed, rng: seed, round: 1, turn: 1, hand: DATA.handSize[np], phase: 'pick', deck: [], discard: [], players: [], hist: [], rs: [], log: [], logN: 0, events: [], evN: 0, used: {}, winner: -1, winners: [], winText: '', final: null };
+  if (o.rounds) G.len = Math.max(1, Math.min(DATA.rounds, o.rounds | 0));   // staged tutorial only: a shorter meal
   for (let i = 0; i < np; i++) G.players.push({ seat: i, name: (o.names && o.names[i]) || NAMES[i], ai: (o.ai && o.ai[i]) || null, hand: [], table: [], pud: [], pick: null, picked: false, mem: [] });
   for (let i = 0; i < NCARDS; i++) G.deck.push(i);
   shuffle(G, G.deck);
@@ -182,7 +183,7 @@ function endRound(G) {
   const snap = G.players.map(p => p.table.map(e => ({ id: e.id, w: e.w })));
   G.rs.push(sc.map((s, i) => Object.assign({}, s, { table: snap[i] })));
   if (G.sim) { G.phase = 'simend'; return; }
-  const last = G.round === DATA.rounds;
+  const last = G.round === (G.len || DATA.rounds);
   ev(G, { t: 'score', round: G.round, seats: sc.map((s, i) => ({ seat: i, maki: s.maki, tempura: s.tempura, sashimi: s.sashimi, dumpling: s.dumpling, nigiri: s.nigiri, wasabi: s.wasabi, total: s.total, icons: s.icons, table: snap[i] })) });
   G.players.forEach((p, i) => {
     const s = sc[i];
