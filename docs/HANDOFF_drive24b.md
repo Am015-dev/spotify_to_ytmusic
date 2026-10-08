@@ -47,3 +47,13 @@ Coordinator 12:31: steering first; zig-zags at 36 OK unless a visible U-turn; RE
 - short ramp at corners (P,Q,R,T-W,X1-4): t90 1.8-1.9 but counter-yaw 20-31, wobble 90-125 — rejected
 - Y4 stIn 40, yrIn 40, stOut 30, yrOut 30 (less input→yaw lag): 0.96 / 16.5 / 1.87 / 1.28 / 131 / 1.82  ← best so far
 - settleX is bimodal: half the turns ~0.1 s, the rest 2-4 s = big turns where the driver re-centres onto the route line
+
+## Defaults chosen = Z1 (commit 'steering defaults = sweep Z1'): stIn 60, yrIn 60, stOut 45, yrOut 45, stLim 1.4, stRampLo .2
+v88e merged (od-r3 63f4fca = live cc9b68d, LIVE_MATCH proven); test pages new11_dbg.html (merged) / base_dbg_e.html (live v88e).
+Final vs live v88e (8 routes × 60+100 km/h; flips / counter-yaw / settle / settleX / t90):
+- key60   live 1.11/29.7/3.10/2.81/1.77 → new 1.11/23.7/1.71/0.99/1.77
+- touch60 live 1.33/32.0/3.13/2.92/1.82 → new 1.09/23.5/1.66/1.00/1.77
+- key30   live 1.12/30.1/2.69/2.25/1.73 → new 0.98/20.6/1.85/1.16/1.77
+- touch30 live 1.29/32.0/3.24/3.01/1.77 → new 0.92/20.0/1.99/1.34/1.77
+OPEN: hits 20 in 48 min (new) vs 6 (live) → investigating with hit positions (qa24b/h_*.json). Straight yaw-flip count up (155-180/km vs 110-155).
+Route 5 at 30 fps gets stuck on both builds (test route issue).
