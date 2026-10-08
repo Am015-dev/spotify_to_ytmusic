@@ -43,7 +43,11 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Route','TUNE.rtNarrow','Narrow-street extra ×',0,1,.05],['Route','TUNE.rtSimp','Route smoothing (m)',0,10,.5],['Route','TUNE.rtJog','Straighten jogs up to (m)',0,25,1],
  ['Route','TUNE.tcLead','Turn warning ahead (s)',2,10,.25],['Route','TUNE.tcMin','Turn warning at least (m)',30,250,5],
  ['Route','TUNE.fvRad','Followed car: corner radius (m)',4,40,1],['Route','TUNE.fvLat','Followed car: corner grip (m/s²)',1,12,.25],['Route','TUNE.fvDec','Followed car: braking (m/s²)',1,12,.25],
- ['Route','TUNE.fvBlink','Followed car: blinkers',0,1,1,'bool']];
+ ['Route','TUNE.fvBlink','Followed car: blinkers',0,1,1,'bool'],
+ // lively (98l_lively.js): world life. Master × each part; 0 = the v88i world (people/traffic spread over the whole city, nothing moving)
+ ['Life','TUNE.life','World life (master)',0,2,.05],['Life','TUNE.lvPed','People near you ×',0,1.6,.05],['Life','TUNE.lvWave','People wave as you pass',0,1,1,'bool'],
+ ['Life','TUNE.lvTraf','Traffic near you (0 = spread out)',0,1,1,'bool'],['Life','TUNE.lvBird','Pigeons + gulls ×',0,1.5,.05],['Life','TUNE.lvFlag','Rooftop flags × (next city load)',0,2,.05],
+ ['Life','TUNE.lvBlimp','Blimp in the sky',0,1,1,'bool'],['Life','TUNE.lvBoat','Boats on the Main × (next city load)',0,2,.05],['Life','TUNE.lvFac','Bold LEGO facade colours (next city load)',0,1,.05]];
 const TU_ROOT={TUNE,C26,W13S,W14_ST,RCAM,W:window};
 const TU_ref=id=>{const p=id.split('.');let o=TU_ROOT[p[0]];for(let i=1;i<p.length-1&&o;i++)o=o[p[i]];return o?[o,p[p.length-1]]:null};
 const TU_get=id=>{const r=TU_ref(id);return r?r[0][r[1]]:undefined};

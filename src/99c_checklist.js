@@ -3,6 +3,14 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88m',id:'life-people',text:'Drive 1 minute in Frankfurt: you see people on the pavements most of the time, and some wave both arms as you pass them.'},
+ {ver:'v88m',id:'life-traffic',text:'Traffic cars show up on the streets around you (not only far away), and they still do not block the inner lane.'},
+ {ver:'v88m',id:'life-pigeons',text:'Drive toward a group of grey pigeons on a pavement: they fly off before you reach them. White gulls circle high above.'},
+ {ver:'v88m',id:'life-sky',text:'Look around: red/white flags flap on some rooftops and a LEGO blimp slowly circles over the city (Athens: blue/white flags).'},
+ {ver:'v88m',id:'life-boats',text:'Frankfurt: boats sail up and down the Main. Drive the boat into one: you bounce off, you do not pass through it.'},
+ {ver:'v88m',id:'life-colours',text:'Frankfurt buildings have bold LEGO colours (red, yellow, blue, green); Athens old-town houses are warm yellow/orange. Nothing looks washed out.'},
+ {ver:'v88m',id:'life-fps',text:'On the phone the game runs as smoothly as before in a busy street (no new stutter).'},
+ {ver:'v88m',id:'life-knob',text:'⚙ TUNE → Life → "World life (master)" at 0 makes the streets quiet again; at 1.5 they get busier.'},
  {ver:'v88i',id:'big-rides',text:'Garage RIDES: the Sightseeing Bus, Box Truck, Stretch Limo and Monster Truck show up and look like LEGO vehicles; equip each one and SAVE & DRIVE.'},
  {ver:'v88i',id:'big-junction',text:'Drive the Bus or the Truck through 3 junctions in Frankfurt: it turns wider than a car but never gets stuck on a corner.'},
  {ver:'v88i',id:'big-feel',text:'A big car picks up speed more slowly than the Hot Rod, and the camera shows the whole vehicle.'},
