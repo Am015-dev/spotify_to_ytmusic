@@ -191,3 +191,15 @@ html.ph .arena.tight .row.mons{margin-bottom:6px}
 .btn.gxt-menu{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
 .btn.gxt-menu span{font-weight:600;font-size:.82em;opacity:.8}
 .btn.gxt-menu.gxt-first{border-color:#c99a35;box-shadow:0 0 0 2px rgba(201,154,53,.45)}
+/* painted extras */
+.ptokp{width:1.9em;height:1.9em;object-fit:cover;border-radius:50%;vertical-align:middle;background:#2a170b;margin-right:.3em}
+.ptoklog{width:1.7em;height:1.7em}
+.cast{list-style:none;padding-left:0}.cast li{display:flex;align-items:center;gap:.5em;margin:.2rem 0}
+.castp{flex:none;width:2.1em;height:2.1em;object-fit:cover;border-radius:50%;box-shadow:0 0 0 1.5px #f0c860,0 0 0 2.5px #2a170b}
+.pbk{position:relative;display:block;width:100%;height:100%}
+.pbk>i{position:absolute;inset:0;border-radius:inherit;background:center/100% 100% no-repeat}
+html[data-timg]:not([data-gfx="low"]) .felt.paper{background:radial-gradient(52% 48% at 50% 50%,rgba(8,3,0,.4),transparent 80%),var(--tbl-img) center/cover #5a3520}
+html[data-timg]:not([data-gfx="low"]) .felt.paper::after{display:block;background:radial-gradient(120% 105% at 50% 42%,transparent 62%,rgba(10,4,0,.5) 100%)}
+.winp{display:block;margin:0 auto 6px;width:84px;height:84px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 3px #f0c860,0 0 0 5px #2a170b,0 6px 14px rgba(0,0,0,.5)}
+.pbk>i{border-radius:6%/4.2%}
+.mine .who .ptokp{width:1.25em;height:1.25em;font-size:.78em;vertical-align:.05em;margin-right:.15em}

@@ -1,3 +1,6 @@
+// painted hero portraits (media/camp-<name>.webp)
+const DK_PORT=new Set(['hobb','pip','tansy','bodkin','grub','morwen','wrenna']);
+function dkPortrait(nm,cls){const k=String(nm||'').split(/[ ,]/)[0].toLowerCase();if(!DK_PORT.has(k))return '';return `<img class="${cls||''}" src="media/camp-${k}.webp" alt="" draggable="false" decoding="async">`}
 // ---------- coach: hints, warnings and the story layer. It only READS the game: every "what if" runs on a throw-away copy of G. ----------
 const PERSONA={Pip:['the Plucky','first through every door, rarely first out'],Morwen:['the Grudge-Keeper','never forgets a curse, and always pays it back'],Grub:['the Mercenary','helps anyone… for a price'],
   Tansy:['the Lucky','trips over treasure wherever she goes'],Bodkin:['the Braggart','loud, proud and usually wrong'],Wrenna:['the Schemer','smiles sweetly and plans three turns ahead']};
@@ -169,7 +172,7 @@ function recapHTML(){const W=G.winner?P(+G.winner.slice(1)-1):null;const me=view
     const nem=by.find(x=>x.x>=2);if(nem&&!(W&&W.i===me))L.push(`Your nemesis: ${esc(heroTitle(P(nem.i)))}.`)}
   return `<div class="recap">${L.map(x=>`<p>${x}</p>`).join('')}</div>`}
 function introHTML(n,mode){const names=(UI.names||HERO_NAMES).slice(0,n);const me=mode==='F'?names[0]:null;const riv=names.filter(x=>x!==me);
-  return `<p class="intro">The Doorkick Dungeon opens once a year. ${n} fools go in; one comes out a <b>Level 10 Legend</b>.</p><ul class="cast">${me?`<li><b>You: ${esc(me)} ${PERSONA[me]?PERSONA[me][0]:''}</b></li>`:''}${riv.map(x=>`<li><b>${esc(x)} ${PERSONA[x]?PERSONA[x][0]:''}</b>${PERSONA[x]?': '+PERSONA[x][1]:''}</li>`).join('')}</ul>`}
+  return `<p class="intro">The Doorkick Dungeon opens once a year. ${n} fools go in; one comes out a <b>Level 10 Legend</b>.</p><ul class="cast">${me?`<li>${dkPortrait(me,'castp')}<b>You: ${esc(me)} ${PERSONA[me]?PERSONA[me][0]:''}</b></li>`:''}${riv.map(x=>`<li>${dkPortrait(x,'castp')}<b>${esc(x)} ${PERSONA[x]?PERSONA[x][0]:''}</b>${PERSONA[x]?': '+PERSONA[x][1]:''}</li>`).join('')}</ul>`}
 // ---- auto-continue: skip a prompt where the only legal move is "pass" (and nothing is at stake) ----
 function autoPass(){if(G&&G.mode==='net')return;for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human)return;
   if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others'))||G.q)return;const vm=validMoves(s);if(vm.length!==1||vm[0].act!=='pass')return;if(G.cb&&winThreat(G.cb))return;

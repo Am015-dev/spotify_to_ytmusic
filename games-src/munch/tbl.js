@@ -72,3 +72,26 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
     const th=winThreat(cb);if(th&&!isMe(th.who)&&sideToAct()===me&&cb.stage==='others'&&!G.q){const c=coach(me).counter;const m=c&&(c.one||(c.two&&c.two[0]));
       if(m&&m.card!=null)h=h.replace('<div class="acts main">',`<div class="acts main"><button class="btn primary rec" data-mv='${esc(JSON.stringify(m))}'>${esc(bfCap('Stop: '+moveLabel(m).replace(/<[^>]+>/g,''),6))}</button>`)}
     return h}})();
+
+// ---- painted extras (media/*.webp, deployed beside the page): portraits, card backs, tables ----
+(function(){
+  if(typeof IS_JSDOM!=='undefined'&&IS_JSDOM)return;
+  const R=document.documentElement;
+  // seat and fight avatars: the hero's painted portrait (class art stays for unnamed heroes)
+  const _av=bfAv;bfAv=function(p,cls){return dkPortrait(p.nm,cls)||_av(p,cls)};
+  function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
+  // card backs: painted door/treasure backs; a campaign card-back unlock replaces the door back
+  const _cb=cardBack;
+  cardBack=function(kind){const door=kind!=='tr';const id=door?(unl('cardback')||'door'):'treasure';
+    return `<span class="pbk">${_cb(kind)}<i style="background-image:url(media/back-${id}.webp)"></i></span>`};
+  // tables: painted tavern (or an unlocked vault) over the CSS wood; the wood stays while loading and on Low graphics
+  const seen={};let cur='';
+  function tableApply(){const id=unl('table')||'tavern';const ph=id==='tavern'&&matchMedia('(orientation:portrait)').matches;const f=id==='tavern'&&ph?'table-tavern-phone':'table-'+id;
+    if(f===cur)return;
+    const go=()=>{cur=f;R.style.setProperty('--tbl-img',`url(media/${f}.webp)`);R.dataset.timg='1'};
+    if(seen[f])return go();const im=new Image();im.onload=()=>{seen[f]=1;go()};im.src='media/'+f+'.webp'}
+  const _r=render;render=function(){const r=_r.apply(this,arguments);tableApply();return r};
+  addEventListener('resize',tableApply);addEventListener('orientationchange',tableApply);
+  ['door','treasure','cellar-oak','corridor-brass','crypt-bone'].forEach(n=>{new Image().src='media/back-'+n+'.webp'});
+  tableApply();
+})();

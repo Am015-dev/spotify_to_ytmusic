@@ -61,3 +61,6 @@ All files are in `games/doorkick-dungeon/media/` (separate files, not inlined), 
 
 ## Optional
 - `slurper.mp4` (8 s, 16:9, laptop `cards\doorkick\`) is a test clip of the Sock Slurper.
+
+## Wired (2026-10-08)
+Portraits (story screens via `artBase`, rival seats and fight avatars via `bfAv`, title cast, diary, end screen), painted card backs (door/treasure; a campaign cardback unlock replaces the door back only), tavern table (phone variant in portrait; vault-stone/golden-vault unlocks; CSS wood while loading and on Low) with a dark centre vignette. Code: `dkPortrait` in coach.js, the extras block at the end of tbl.js, `.pbk`/`.felt` rules at the end of tbl.css. phone-check for this game flakes (off-screen cards / dead taps in landscape) at about 3 in 5 runs even without these changes; rerun.

@@ -983,6 +983,18 @@ html.ph .arena.tight .row.mons{margin-bottom:6px}
 .btn.gxt-menu{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
 .btn.gxt-menu span{font-weight:600;font-size:.82em;opacity:.8}
 .btn.gxt-menu.gxt-first{border-color:#c99a35;box-shadow:0 0 0 2px rgba(201,154,53,.45)}
+/* painted extras */
+.ptokp{width:1.9em;height:1.9em;object-fit:cover;border-radius:50%;vertical-align:middle;background:#2a170b;margin-right:.3em}
+.ptoklog{width:1.7em;height:1.7em}
+.cast{list-style:none;padding-left:0}.cast li{display:flex;align-items:center;gap:.5em;margin:.2rem 0}
+.castp{flex:none;width:2.1em;height:2.1em;object-fit:cover;border-radius:50%;box-shadow:0 0 0 1.5px #f0c860,0 0 0 2.5px #2a170b}
+.pbk{position:relative;display:block;width:100%;height:100%}
+.pbk>i{position:absolute;inset:0;border-radius:inherit;background:center/100% 100% no-repeat}
+html[data-timg]:not([data-gfx="low"]) .felt.paper{background:radial-gradient(52% 48% at 50% 50%,rgba(8,3,0,.4),transparent 80%),var(--tbl-img) center/cover #5a3520}
+html[data-timg]:not([data-gfx="low"]) .felt.paper::after{display:block;background:radial-gradient(120% 105% at 50% 42%,transparent 62%,rgba(10,4,0,.5) 100%)}
+.winp{display:block;margin:0 auto 6px;width:84px;height:84px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 3px #f0c860,0 0 0 5px #2a170b,0 6px 14px rgba(0,0,0,.5)}
+.pbk>i{border-radius:6%/4.2%}
+.mine .who .ptokp{width:1.25em;height:1.25em;font-size:.78em;vertical-align:.05em;margin-right:.15em}
 
 </style>
 <style>
@@ -5812,6 +5824,9 @@ if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DA
 
 </script>
 <script>
+// painted hero portraits (media/camp-<name>.webp)
+const DK_PORT=new Set(['hobb','pip','tansy','bodkin','grub','morwen','wrenna']);
+function dkPortrait(nm,cls){const k=String(nm||'').split(/[ ,]/)[0].toLowerCase();if(!DK_PORT.has(k))return '';return `<img class="${cls||''}" src="media/camp-${k}.webp" alt="" draggable="false" decoding="async">`}
 // ---------- coach: hints, warnings and the story layer. It only READS the game: every "what if" runs on a throw-away copy of G. ----------
 const PERSONA={Pip:['the Plucky','first through every door, rarely first out'],Morwen:['the Grudge-Keeper','never forgets a curse, and always pays it back'],Grub:['the Mercenary','helps anyone… for a price'],
   Tansy:['the Lucky','trips over treasure wherever she goes'],Bodkin:['the Braggart','loud, proud and usually wrong'],Wrenna:['the Schemer','smiles sweetly and plans three turns ahead']};
@@ -5983,7 +5998,7 @@ function recapHTML(){const W=G.winner?P(+G.winner.slice(1)-1):null;const me=view
     const nem=by.find(x=>x.x>=2);if(nem&&!(W&&W.i===me))L.push(`Your nemesis: ${esc(heroTitle(P(nem.i)))}.`)}
   return `<div class="recap">${L.map(x=>`<p>${x}</p>`).join('')}</div>`}
 function introHTML(n,mode){const names=(UI.names||HERO_NAMES).slice(0,n);const me=mode==='F'?names[0]:null;const riv=names.filter(x=>x!==me);
-  return `<p class="intro">The Doorkick Dungeon opens once a year. ${n} fools go in; one comes out a <b>Level 10 Legend</b>.</p><ul class="cast">${me?`<li><b>You: ${esc(me)} ${PERSONA[me]?PERSONA[me][0]:''}</b></li>`:''}${riv.map(x=>`<li><b>${esc(x)} ${PERSONA[x]?PERSONA[x][0]:''}</b>${PERSONA[x]?': '+PERSONA[x][1]:''}</li>`).join('')}</ul>`}
+  return `<p class="intro">The Doorkick Dungeon opens once a year. ${n} fools go in; one comes out a <b>Level 10 Legend</b>.</p><ul class="cast">${me?`<li>${dkPortrait(me,'castp')}<b>You: ${esc(me)} ${PERSONA[me]?PERSONA[me][0]:''}</b></li>`:''}${riv.map(x=>`<li>${dkPortrait(x,'castp')}<b>${esc(x)} ${PERSONA[x]?PERSONA[x][0]:''}</b>${PERSONA[x]?': '+PERSONA[x][1]:''}</li>`).join('')}</ul>`}
 // ---- auto-continue: skip a prompt where the only legal move is "pass" (and nothing is at stake) ----
 function autoPass(){if(G&&G.mode==='net')return;for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human)return;
   if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others'))||G.q)return;const vm=validMoves(s);if(vm.length!==1||vm[0].act!=='pass')return;if(G.cb&&winThreat(G.cb))return;
@@ -6230,7 +6245,7 @@ function mySeat(){if(!G)return 0;if(G.mode==='hot'){const s=sideToAct();if(s>=0&
 const viewSeat=()=>{const s=mySeat();return s<0?(G.mode==='net'?-1:G.active):s};
 const PCOL=['#e03131','#1c7ed6','#2f9e44','#f08c00','#7048e8','#d6336c'];
 const PSHAPE=['●','■','▲','◆','★','⬟'];
-const ptok=i=>`<span class="ptok" style="--c:${PCOL[i]}" aria-hidden="true">${PSHAPE[i]}</span>`;
+const ptok=i=>dkPortrait(P(i)&&P(i).nm,'ptok ptokp')||`<span class="ptok" style="--c:${PCOL[i]}" aria-hidden="true">${PSHAPE[i]}</span>`;
 // raw emoji become the SVG icon set (text nodes only, never inside a tag or attribute)
 const EMO={'💡':'hint','⚠':'warn','☁':'cloud','⚔':'sword','💰':'coin','✋':'hand','💀':'skull','🏆':'trophy','✨':'spark','🎉':'party','🎒':'bag','♂':'male','♀':'female','⏸':'pause','🐢':'slow','⏩':'fast','📜':'scroll','📖':'book','🤖':'bot','💬':'chat','✓':'check','✗':'cross','🧬':'race','🎓':'cls','🪖':'helm','👢':'boot','🛡':'shield','🗡':'sword','✦':'spark','⇆':'swap','🚪':'door','🏃':'run','🙋':'help','📉':'down','💥':'star','🔊':'sound','🔇':'mute','🎵':'music','▶':'play'};
 const EMORE=new RegExp('('+Object.keys(EMO).join('|')+')\uFE0F?','gu');
@@ -6419,7 +6434,7 @@ function monTips(cb){const t=[];for(const m of cb.mons){const c=mdef(m);t.push(`
 function abilityBtns(vm,recK){const k=new Set(vm.map(m=>m.act));let h='';const b=m=>`<button class="btn${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`;vm.filter(m=>['skip','shoo','charm','bribe'].includes(m.act)).forEach(m=>h+=b(m));
   const pw=['berserk','turn','flight','backstab'].filter(a=>k.has(a));if(pw.length)h+=`<span class="small muted">Class power: tap a card in your hand to ${pw.map(a=>({berserk:'go berserk',turn:'turn undead',flight:'cast flight',backstab:'backstab'})[a]).join(' or ')}.</span>`;return h}
 function actsHTML(vm,me){return ''}
-function logHTML(){return `<ol id="log" reversed>${G.log.slice(0,200).map(l=>`<li${l.s>=0?` style="border-left:4px solid ${PCOL[l.s]};padding-left:6px;list-style:none;margin-left:-1rem"`:' style="list-style:none;margin-left:-1rem"'}>${esc(l.t)}</li>`).join('')}</ol>`}
+function logHTML(){return `<ol id="log" reversed>${G.log.slice(0,200).map(l=>`<li${l.s>=0?` style="border-left:4px solid ${PCOL[l.s]};padding-left:6px;list-style:none;margin-left:-1rem"`:' style="list-style:none;margin-left:-1rem"'}>${l.s>=0&&G.pl[l.s]?dkPortrait(G.pl[l.s].nm,'ptok ptokp ptoklog'):''}${esc(l.t)}</li>`).join('')}</ol>`}
 // ---- card menu: everything this card can do right now ----
 function cardMoves(me,id){return myMoves(me).filter(m=>m.card===id)}
 function moveLabel(m){const c=m.card!=null?cd(m.card):null;const me=viewSeat();const cb=G.cb;const myFight=cb&&(cb.who===me||cb.help===me);switch(m.act){
@@ -6446,7 +6461,7 @@ function menuHTML(me){const u=UI.menu;
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
-  return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
+  return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?dkPortrait(w.nm,'winp'):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
   return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${typeof tutBtn==='function'?tutBtn('btn bigb'):''}${online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`}${online?'':introHTML(n,UI.mode||'F')}
    <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
@@ -6880,6 +6895,29 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
       if(m&&m.card!=null)h=h.replace('<div class="acts main">',`<div class="acts main"><button class="btn primary rec" data-mv='${esc(JSON.stringify(m))}'>${esc(bfCap('Stop: '+moveLabel(m).replace(/<[^>]+>/g,''),6))}</button>`)}
     return h}})();
 
+// ---- painted extras (media/*.webp, deployed beside the page): portraits, card backs, tables ----
+(function(){
+  if(typeof IS_JSDOM!=='undefined'&&IS_JSDOM)return;
+  const R=document.documentElement;
+  // seat and fight avatars: the hero's painted portrait (class art stays for unnamed heroes)
+  const _av=bfAv;bfAv=function(p,cls){return dkPortrait(p.nm,cls)||_av(p,cls)};
+  function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
+  // card backs: painted door/treasure backs; a campaign card-back unlock replaces the door back
+  const _cb=cardBack;
+  cardBack=function(kind){const door=kind!=='tr';const id=door?(unl('cardback')||'door'):'treasure';
+    return `<span class="pbk">${_cb(kind)}<i style="background-image:url(media/back-${id}.webp)"></i></span>`};
+  // tables: painted tavern (or an unlocked vault) over the CSS wood; the wood stays while loading and on Low graphics
+  const seen={};let cur='';
+  function tableApply(){const id=unl('table')||'tavern';const ph=id==='tavern'&&matchMedia('(orientation:portrait)').matches;const f=id==='tavern'&&ph?'table-tavern-phone':'table-'+id;
+    if(f===cur)return;
+    const go=()=>{cur=f;R.style.setProperty('--tbl-img',`url(media/${f}.webp)`);R.dataset.timg='1'};
+    if(seen[f])return go();const im=new Image();im.onload=()=>{seen[f]=1;go()};im.src='media/'+f+'.webp'}
+  const _r=render;render=function(){const r=_r.apply(this,arguments);tableApply();return r};
+  addEventListener('resize',tableApply);addEventListener('orientationchange',tableApply);
+  ['door','treasure','cellar-oak','corridor-brass','crypt-bone'].forEach(n=>{new Image().src='media/back-'+n+'.webp'});
+  tableApply();
+})();
+
 </script>
 <script>
 // ===================== help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
@@ -7299,7 +7337,7 @@ function campWatch(){if(!UI.cmp||!G)return;if(!G.winner){CMP_OVER=0;return}
   clearInterval(CMP_FIN);const g=G;UI.cmp=null;if(UI.hintsUser!=null){UI.hints=UI.hintsUser;UI.hintsUser=null}
   if(GXC.active())GXC.finish(g)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'doorkick',data:window.CAMPAIGN,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();if(typeof tutStart==='function')tutStart()});return [b]},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'doorkick',artBase:'media/',data:window.CAMPAIGN,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();if(typeof tutStart==='function')tutStart()});return [b]},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit(){clearInterval(CMP_FIN);UI.cmp=null;if(UI.hintsUser!=null){UI.hints=UI.hintsUser;UI.hintsUser=null}G=null;UI.info=true;render()},
     scores:g=>g.pl.map(p=>p.lvl),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
 function campOpen(){if(typeof GXC==='undefined')return;if(GX.open)GX.close();GXC.open()}
