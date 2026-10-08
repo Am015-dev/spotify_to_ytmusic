@@ -238,7 +238,7 @@ function renderMine(v) {
 function legalCards(v) {
   if (v < 0 || !G || UI.busy) return null;
   const ph = G.phase;
-  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; const t1 = tutOnly(); if (own && t1 >= 0) return new Set([t1]); return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
+  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
   if (UI.pingSel) return new Set(LD.pingMoves(G, v).map(m => m.c));
   if (ph === 'pass' && LD.moves(G, v).length) return new Set(LD.moves(G, v).map(m => m.c));
   return null;
@@ -246,7 +246,7 @@ function legalCards(v) {
 const ctlSeat = s => G.players[s].helper ? G.cap : s;
 // the cards of my hand that carry a ping spot right now (a signal round, or between tricks when it is my turn to lead)
 function pingSpots(v) {
-  const m = new Map(); if (v < 0 || !G || UI.busy || UI.mode === 'guided' || G.phase === 'over' || !iMustAct()) return m;
+  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || !iMustAct()) return m;
   if (G.phase === 'signal' || (G.phase === 'play' && G.trick && G.trick.plays.length === 0)) myMoves().forEach(x => { if (x.t === 'ping') m.set(x.c, x.k); });
   return m;
 }
@@ -358,7 +358,7 @@ function renderActs(v) {
   const M = actModel(v); pr.className = (M.cls || '') + (M.warn ? ' warn' : '');
   pr.textContent = M.p || '';
   const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
-  { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy && UI.mode !== 'guided') && !(pl && pl.childNodes.length)); }
+  { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
   ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
   M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
 }

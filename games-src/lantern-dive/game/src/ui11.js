@@ -72,7 +72,7 @@ const HLP_RULES = [
 // the phase the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase() {
   try {
-    if (!G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
+    if (tutOn() || !G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
     const st = $('#start'), rs = $('#rs'); if ((st && !st.hidden) || (rs && !rs.hidden)) return null;
     const v = viewSeat(); if (v < 0 || !iMustAct() || !myMoves().length) return null;
     if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') return null;
@@ -108,14 +108,13 @@ function hlpPlayWhy(v, c) {
 function hlpPlan() {
   const v = viewSeat(); if (!canAct() || !iMustAct() || G.phase === 'over') return null;
   let m = null;
-  if (G.phase === 'play' && UI.mode === 'guided' && tutOnly() >= 0) m = { t: 'play', c: tutOnly(), tut: 1 };
-  else { try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; } }
+  try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; }
   if (!m) return null;
   if (!myMoves().some(x => x.t === m.t && x.c === m.c && x.i === m.i && x.on === m.on && x.dir === m.dir)) return null;   // never advise an illegal move
   if (G.phase === 'play' && m.t === 'play') {
     const T = G.trick; if (G.players[T.turn].helper || ctlSeat(T.turn) !== v) return null;
     const card = () => document.querySelector('#hand .hc[data-id="' + m.c + '"]'), slot = () => document.querySelector('.tslot[data-seat="' + v + '"]') || document.querySelector('#felt');
-    return { m, from: card, to: slot, why: () => m.tut ? 'The training dive wants this card now.' : hlpPlayWhy(v, m.c) };
+    return { m, from: card, to: slot, why: () => hlpPlayWhy(v, m.c) };
   }
   if (G.phase === 'assign' && m.t === 'take') {
     const el = () => document.querySelector('#pool [data-key="job' + m.i + '"]');
