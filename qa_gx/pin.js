@@ -5,7 +5,7 @@ const E=require('../bc/enter.js');const fs=require('fs');const OUT=process.argv[
  const shot=async n=>{await W(2500);await p.screenshot({path:`${OUT}/${n}.png`,timeout:600000});console.log('shot',n,((Date.now()-t0)/1000|0)+'s')};
  const cov=()=>pe(()=>{const P=document.getElementById('odPin');if(!P||P.hidden)return'hidden';const a=P.getBoundingClientRect();const out=[];
   for(const e of document.querySelectorAll('body *')){if(P.contains(e)||e.contains(P))continue;const s=getComputedStyle(e);if(s.visibility==='hidden'||s.display==='none'||+s.opacity<.05||e.offsetParent===null&&s.position!=='fixed')continue;
-   if(!(e.matches('button,canvas:not(#c):not(#gbC),[id*=mini i],[id*=Mini],[id*=obj i],[id*=spd i],[id*=Speed],[class*=pill i]')))continue;const r=e.getBoundingClientRect();if(!r.width||r.width>700)continue;
+   if(!(e.matches('button,#roamArrow,#qTrk,#obj,canvas:not(#c):not(#gbC),[id*=mini i],[id*=Mini],[id*=obj i],[id*=spd i],[id*=Speed],[class*=pill i]')))continue;const r=e.getBoundingClientRect();if(!r.width||r.width>700)continue;
    const ix=Math.min(a.right,r.right)-Math.max(a.left,r.left),iy=Math.min(a.bottom,r.bottom)-Math.max(a.top,r.top);if(ix>2&&iy>2)out.push((e.id||e.className||e.tagName).toString().slice(0,30))}
   return{rect:[a.left|0,a.top|0,a.width|0,a.height|0],over:out}});
  const pin=()=>pe(()=>__chk.pinSt());

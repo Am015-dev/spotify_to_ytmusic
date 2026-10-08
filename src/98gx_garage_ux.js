@@ -163,7 +163,7 @@ window.__gx={S:GX,groups:()=>GX_groups(),hid:()=>[...GX.hid],make:()=>GX_make(),
  cat:k=>GB_PC[k]&&GB_PC[k].cat,ev:c=>__g9ev(c),
  cand:()=>{const t0=GB_.tool;GB_.tool='sel';try{return __gx._cand()}finally{GB_.tool=t0}},
  _cand:()=>{const L=GB_list(),out=[],C=$('#gbC').getBoundingClientRect(),H=b=>b.y+GB_PC[b.t].h;for(const b of L.slice().sort((a,c)=>H(c)-H(a))){const[w,d]=GB_dims(b),q=__b25.scr(b.x+w/2,b.z+d/2,H(b));
-  const el=document.elementFromPoint(q.x,q.y);if(!el||(el.closest&&el.closest('#gbBkP,#b25,#r2H,#r2R,#gxG,#slBar,#gsBar,#gsTip')))continue;const i=__sl.pick(q.x,q.y);if(i>=0&&!out.some(o=>o.i===i))out.push({i,x:q.x,y:q.y,t:b.t});if(out.length>=6)break}return out},
+  const el=document.elementFromPoint(q.x,q.y);if(!el||(el.closest&&el.closest('#gbBkP,#b25,#r2H,#r2R,#gxG,#slBar,#gsBar,#gsTip,#odPin')))continue;const i=__sl.pick(q.x,q.y);if(i>=0&&!out.some(o=>o.i===i))out.push({i,x:q.x,y:q.y,t:b.t});if(out.length>=6)break}return out},
  tris:()=>{const U=GB.mesh&&GB.mesh.userData;let n=0;for(const o of(U&&U.gbM)||[])if(o.geometry&&o.geometry.attributes.position)n+=o.geometry.attributes.position.count/3;return n|0}};
 SL_ui=(f=>function(){const r=f.apply(this,arguments);const s=$('#slBar [data-s="grp"] span');if(s&&s.textContent==='GROUP')s.textContent='MAKE GROUP';return r})(SL_ui);
 // ---- CLEAR (Alex, v88i: "the garage clear button on build is not clearing to an empty template or the base is showing weird overlaps").

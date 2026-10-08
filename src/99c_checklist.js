@@ -77,26 +77,33 @@ const OD_CHECKLIST=[
  // Folded: a "✓ 3/8" chip. It can only be dismissed (✕ on the chip) once every item of the version is answered. State lives in mho_chk._pin.
  // Touches on it never reach the controls under it and it never pauses the game.
  const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
+ let pinBkOpen=0;const pinBk=()=>{try{return !!GB_.bk}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  const pinR=()=>{const P=pst(),C=cur(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
   const busy=!ov.hidden||!n||P.done&&ans===n||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
-  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;
-  if(P.col)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
+  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen);
+  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
    `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
    `<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
-  pin.classList.toggle('col',!!P.col);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
+  pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
  // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
  const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
-  if(!vis(X)){pin.style.left='';pin.style.width='';pin.style.transform='';return}let L=0,R=innerWidth;
+  if(!vis(X)){pin.style.left='';pin.style.width='';pin.style.transform='';
+   // roam / race / missions: below the objective line (quest tracker, objective pill) when it sits at the top centre
+   if(innerWidth>900&&innerHeight>500){const g=document.querySelector('#tuG,#tuB,[id^="tu"][id$="G"]');let t=108;if(vis(g)){const r=g.getBoundingClientRect();if(r.top<160&&r.right>innerWidth-120)t=Math.round(r.bottom)+10}
+    pin.style.transform='none';pin.style.left=Math.round(innerWidth-16-pin.offsetWidth)+'px';pin.style.top=t+'px';return}
+   const a=pin.getBoundingClientRect();let t=54;for(const e of document.querySelectorAll('#roamArrow,#qTrk,#obj,[id*="Obj"],[class*="Pill"],[class*="pill"]')){if(pin.contains(e)||!vis(e))continue;const r=e.getBoundingClientRect();
+    if(r.top<110&&r.bottom<150&&r.right>a.left&&r.left<a.right&&r.height<70)t=Math.max(t,Math.round(r.bottom)+6)}
+   pin.style.top=t===54?'':`calc(env(safe-area-inset-top,0px) + ${t}px)`;return}pin.style.top='';let L=0,R=innerWidth;
   for(const q of['#r2R','#gxG','#slBar','#gsBar']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120)L=Math.max(L,r.right+6)}}
   for(const q of['#b25 .b25V','#gbx .gbp']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120&&r.left>L)R=Math.min(R,r.left-6)}}
   const w=Math.min(340,R-L),x=L+Math.max(0,(R-L-pin.offsetWidth)/2);if(w<200){pin.style.left='';pin.style.width='';pin.style.transform='';return}
   pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
  const P_col=()=>pin.classList.contains('col');
  pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=cur(),n=C.length;try{AU.sfx('pick')}catch(er){}
-  if(a==='col'){P.col=1}else if(a==='exp'){P.col=0}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();return}
+  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();return}
   else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
    if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
   psave(P);pinR();badge()});
