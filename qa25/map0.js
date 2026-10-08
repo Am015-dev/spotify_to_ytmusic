@@ -1,0 +1,2 @@
+const L=require('./lib.js'),R=require('./roam.js');(async()=>{const T=await L(process.argv[2],process.argv[3]);await R(T);await T.shot('roam');await T.tap('#roamMapBtn',1500);await T.shot('map');
+ console.log(JSON.stringify(await T.ev(()=>[...document.querySelectorAll('#roamMap button,#roamMap .mh,#ogMapP')].filter(e=>e.offsetParent).map(e=>{const r=e.getBoundingClientRect();return[e.id||e.className||e.textContent.slice(0,8),r.x|0,r.y|0,r.width|0,r.height|0]}))));await T.close()})();
