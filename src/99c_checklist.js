@@ -3,7 +3,15 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
- {ver:'v88o',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
+ {ver:'v88r',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
+ {ver:'v88p',id:'life-crowds',text:'Drive 1 minute in Frankfurt and in Athens: at most street corners ahead you see a group of 3-6 people standing together; they turn to look, wave and hop as you come by.'},
+ {ver:'v88p',id:'life-dodge',text:'Drive fast past a corner group: the people leap out of the way; nobody stands on the road.'},
+ {ver:'v88p',id:'life-stalls',text:'You pass market stalls (striped awnings, fruit boxes) and café tables with umbrellas on the pavements. Drive into one: it bursts into bricks and studs; it does not stop you dead.'},
+ {ver:'v88p',id:'life-parked',text:'Parked cars stand half on the kerb on many streets ahead; driving into one slowly bumps you off it, fast smashes it.'},
+ {ver:'v88p',id:'pop-ring',text:'While free-roaming, every ~30 s a coloured ring with a sign (RAMP JUMP, DRIFT ZONE, SMASH STREAK, CONE SLALOM) appears on the road ahead in your lane. Only one at a time, no new buttons or panels.'},
+ {ver:'v88p',id:'pop-play',text:'Drive through a ring: the objective line shows the challenge, the progress and the seconds left. Finish it: big brick burst and +150 studs. Miss it: a short MISSED message, nothing else.'},
+ {ver:'v88p',id:'pop-each',text:'Try all four: the ramp launches you, the drift counts only while drifting, the crates smash, the cones fly when you clip them.'},
+ {ver:'v88p',id:'life-fps2',text:'On the phone the game still runs smoothly in a busy street with a pop-up running.'},
  {ver:'v88o',id:'pin-strip',text:'This checklist stays on screen while you drive, race and build: answer with ✅ / ❌, ‹ › to move, tap the counter to fold it to a chip. Steering and gas keep working while you tap it.'},
  {ver:'v88o',id:'clear-base',text:'Garage BUILD → ⋯ MORE → CLEAR on a normal car and on the Bus: only the chassis and wheels stay, with one clean grid and nothing overlapping. UNDO brings the build back.'},
  {ver:'v88o',id:'gx-palette',text:'Garage BUILD (phone): the parts palette shows 2 rows of bigger tiles with names; swipe it sideways to see more. ▾ makes it small again.'},
@@ -90,12 +98,14 @@ const OD_CHECKLIST=[
  // Folded: a "✓ 3/8" chip. It can only be dismissed (✕ on the chip) once every item of the version is answered. State lives in mho_chk._pin.
  // Touches on it never reach the controls under it and it never pauses the game.
  const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
+ // the strip walks the items of the newest 3 versions (a small hotfix release must not hide the open items of the release before it)
+ const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver))};
  let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
  // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
  const pinCd=()=>{try{return state==='countdown'||(state==='race'&&raceT<3)}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
- const pinR=()=>{const P=pst(),C=cur(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
+ const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
   const busy=!ov.hidden||!n||P.done&&ans===n||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
   pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen)||pinCd();
   if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
@@ -117,7 +127,7 @@ const OD_CHECKLIST=[
   const w=Math.min(340,R-L),x=L+Math.max(0,(R-L-pin.offsetWidth)/2);if(w<200){pin.style.left='';pin.style.width='';pin.style.transform='';return}
   pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
  const P_col=()=>pin.classList.contains('col');
- pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=cur(),n=C.length;try{AU.sfx('pick')}catch(er){}
+ pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=pinItems(),n=C.length;try{AU.sfx('pick')}catch(er){}
   if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
   else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
    if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
