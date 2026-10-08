@@ -57,5 +57,5 @@ setInterval(()=>{try{MUS_tick()}catch(e){MUS.err=String(e)}},100);
 MUS.slots.push(MUS_slot(TUNE.musOn>0&&(SET.mus??1)>0?'auto':'none'),MUS_slot());if(MUS.slots[0].el.preload==='auto'){MUS.slots[0].el.src='music/menu.mp3';try{MUS.slots[0].el.load()}catch(e){}}
 // SET sliders / SOUND button keep working: AU.setVol re-applies the music + sfx knobs on top
 {const f0=AU.setVol;AU.setVol=function(){const r=f0.apply(this,arguments);MUS.synth=null;if(MUS.cur)MUS.cur.lv=-1;try{MUS_synth();MUS_sfx()}catch(e){}return r}}
-window.__mus={st:()=>({mode:MUS.mode,track:MUS.cur&&MUS.cur.name,unlocked:MUS.unlocked,ctx:AU.a&&AU.a.state,muted:!!AU.muted,level:+MUS_level().toFixed(3),duck:MUS.duck,synth:MUS.synth,
+window.__mus={knob:(t,s)=>{Object.assign(TUNE,t||{});Object.assign(SET,s||{});AU.setVol();return MUS_level()},st:()=>({mode:MUS.mode,track:MUS.cur&&MUS.cur.name,unlocked:MUS.unlocked,ctx:AU.a&&AU.a.state,muted:!!AU.muted,level:+MUS_level().toFixed(3),duck:MUS.duck,synth:MUS.synth,
   tTap:MUS.tTap,tPlay:MUS.tPlay,playing:MUS.slots.map(s=>({name:s.name,paused:s.el.paused,t:+(s.el.currentTime||0).toFixed(1),g:s.g?+s.g.gain.value.toFixed(3):0,rs:s.el.readyState,fail:s.fail||null})),dead:Object.keys(MUS.dead),err:MUS.err||null}),log:MUS.log,files:MUS_FILES};
