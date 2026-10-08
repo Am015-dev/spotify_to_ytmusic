@@ -6,7 +6,7 @@ const OUT = path.join(__dirname, 'playtest'); fs.mkdirSync(OUT, { recursive: tru
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const b = await PW.chromium.launch({ executablePath: process.env.CHROMIUM || '/opt/pw-browsers/chromium', args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const ctx = await b.newContext({ viewport: { width: 390, height: 763 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  const ctx = await b.newContext({ viewport: { width: 390, height: 763 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
   const p = await ctx.newPage(); p.on('pageerror', e => console.log('PAGE ERROR', e.message));
   await p.goto('https://gns.test/?phone=1&seed=5'); await sleep(900);
@@ -15,10 +15,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const tap = async sel => { const c = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, sel); if (!c) return false; await p.touchscreen.tap(c[0], c[1]); return true; };
   const bubble = async () => { for (let i = 0; i < 25; i++) { if (await p.evaluate(() => !!document.querySelector('.gxh-bub.on[data-phase]'))) return true; await sleep(150); } return false; };
   // a fortune card that asks something comes first: its bubble, then the answer; then the first-time bubble of the brew ("Pull a chip")
-  if (await p.evaluate(() => !!(G.players[0].q))) { await bubble(); await p.screenshot({ path: path.join(OUT, 'help-coach-card.png') }); await tap('#qbox [data-a=mv]'); await sleep(900); }
+  if (await p.evaluate(() => !!(G.players[0].q))) { await bubble(); await sleep(400); await p.screenshot({ path: path.join(OUT, 'help-coach-card.png') }); await tap('#qbox [data-a=mv]'); await sleep(900); }
   const ok = await bubble();
   console.log('coach bubble', ok, await p.evaluate(() => (document.querySelector('.gxh-bub.on') || {}).textContent));
-  await p.screenshot({ path: path.join(OUT, 'help-coach-bubble.png') });
+  await sleep(400); await p.screenshot({ path: path.join(OUT, 'help-coach-bubble.png') });
   await tap('#acts .bagb:not(.off)'); await sleep(900);
   // draw three chips so the bulb has something to say about the next one
   for (let k = 0; k < 2; k++) { await tap('#acts .bagb:not(.off)'); await sleep(900); }

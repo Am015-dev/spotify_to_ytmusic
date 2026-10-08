@@ -46,7 +46,7 @@ async function run(browser, W, H, mode) {
   await p.touchscreen.tap(tb[0], tb[1]); await sleep(600);
   await p.evaluate(m => { if (m !== 'anim') { UI.pullMs = 0; window.AIDELAY = 60; } }, mode);
   const state = () => p.evaluate(() => GXT.state());
-  const shot = async n => { if (W === 390 && H === 763 && mode === 'clean') { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, 'tutor-' + n + '.png') }); } };
+  const shot = async n => { if (W === 390 && H === 763 && mode === 'clean') { fs.mkdirSync(SHOTS, { recursive: true }); await sleep(500); await p.screenshot({ path: path.join(SHOTS, 'tutor-' + n + '.png') }); } };
   let lastSig = '', lastT = Date.now(), rotated = 0, left = false, seenIds = [];
   for (let guard = 0; guard < 4000; guard++) {
     const st = await state();
