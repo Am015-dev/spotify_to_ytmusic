@@ -17,7 +17,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
   const box={H:R('#r2H'),R:R('#r2R'),P:R('#gbx .gbp'),C:R('#r2C')||R('#gbBkP'),area:window.__r2.area()};const ov=(a,b)=>a&&b&&a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
   return{mode:__r2.mode().join('/'),buttons:nb,small:small.slice(0,12),tiny:tiny.slice(0,8),ovPC:ov(box.P,box.C),ovPR:ov(box.P,box.R),ovHP:ov(box.H,box.P),box}});
  const A=async n=>console.log('AUDIT',n,JSON.stringify(await audit()));
- await tap('#gbMenuBtn',2500);await A('open');await shot('m1_rides');
+ await shot('m0_start');await tap('#gbMenuBtn',2500);await A('open');await shot('m1_rides');
  await tap('#r2C [data-r2px="1"]',1500);await shot('m1b_rides_offroad');await tap('#r2C [data-r2px="0"]',1200);
  await tap('#r2R [data-r2m="build"]',2500);await A('build');await shot('m2_build');
  await tap('#gbBkP [data-r2b="cat"]');await shot('m2b_build_cat');await tap('#gbBkCt [data-ct="Slopes"]');await shot('m2c_build_slopes');
@@ -26,7 +26,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  // place one part by real taps (part from the strip, tap the car twice = hold + place)
  const n0=await ev(()=>__gb.list().length);await tap('#gbBkPc .gbPc:not([style*="none"])');let placed=0;
  for(const[i,j]of[[-1,-1],[0,0],[-1,1],[0,-2],[1,1]]){const s=await ev(([i,j])=>__gb.scr(i,j),[i,j]);if(!s||s.y<60||s.y>330)continue;await tapXY(s.x,s.y);if(!await ev(()=>__gs.held()))continue;await shot('m2f_build_held');await tapXY(s.x,s.y);if(await ev(()=>__gb.list().length)>n0){placed=1;break}}
- console.log('PLACED',placed,n0,'→',await ev(()=>__gb.list().length));await shot('m2g_build_placed');await tap('#r2H [data-r2h="undo"]');console.log('after undo',await ev(()=>__gb.list().length));
+ console.log('PLACED',placed,n0,'→',await ev(()=>__gb.list().length));await shot('m2g_build_placed');await A('placed');await tap('#r2H [data-r2h="undo"]');console.log('after undo',await ev(()=>__gb.list().length));
  await tap('#gbBkP [data-r2b="sel"]');await A('select');
  await tap('#gbBkP [data-r2b="cat"]');await tap('#gbBkCt [data-r2s="kits"]',2000);await A('kits');await pg.waitForTimeout(25000);console.log('KITPICS',await ev(()=>{const a=[...document.querySelectorAll('#gbBody img[data-r2kit]')];return a.filter(i=>i.src&&i.src.length>500).length+'/'+a.length}));await shot('m3_kits');await tap('#r2C [data-r2bs="horn"]',1500);await shot('m3b_horn');
  await tap('#r2R [data-r2m="paint"]',2000);await A('paint');await shot('m4_paint');

@@ -8,12 +8,13 @@
 // Also: locked kits / driver parts / liveries / horns show a picture under a lock; PAINT has finishes GLOSS / MATTE / METAL / CHROME / PEARL
 // (per vehicle set, saved with the set's paint in mho_gar.pa[set].fin, also used on the player's car while driving).
 // The old DOM and handlers stay (tests and other modules use them): the shell restyles, moves or proxies them.
-const R2={pk:0,skip:0,pop:null,af:0,area:null};
+const R2={pk:0,skip:0,pop:null,af:0,area:null,bz:1.75};
 const R2_M=[['rides','🚗','RIDES'],['build','🧱','BUILD'],['paint','🎨','PAINT'],['perks','⚡','PERKS'],['driver','👤','DRIVER']];
 // current mode from the old state: builder on = BUILD/bricks; tab veh = RIDES (or PERKS); parts/horn = BUILD/kits|horn
 function R2_cur(){if(GB_.bk)return['build','bricks'];const t=GB.tab;if(t==='veh')return[R2.pk?'perks':'rides',''];if(t==='parts')return['build','kits'];if(t==='horn'||t==='bricks')return['build','horn'];return[t,'']}
 function R2_slot(){const n=perkSlots(),e=perkEq0();return Math.min(n-1,e.length<n?e.length:0)}
-function R2_go(m,sub){const[cm,cs]=R2_cur();sub=m==='build'?(sub||'bricks'):'';if(m===cm&&sub===cs)return;try{AU.sfx('pick')}catch(e){}R2_pop(null);
+function R2_tipOff(){const t=$('#gsTip');if(t){t.classList.remove('on');clearTimeout(GS_tip.t)}}
+function R2_go(m,sub){const[cm,cs]=R2_cur();sub=m==='build'?(sub||'bricks'):'';if(m===cm&&sub===cs)return;try{AU.sfx('pick')}catch(e){}R2_pop(null);R2_tipOff();
  if(m==='build'&&sub==='bricks'){R2.pk=0;if(!GB_.bk)GB_enter();R2_sync();return}
  R2.pk=m==='perks'?1:0;if(R2.pk&&GPK_.pk==null)GPK_.pk=R2_slot();
  if(GB_.bk){R2.skip=1;try{GB_exit()}finally{R2.skip=0}}GB.tab={rides:'veh',perks:'veh',paint:'paint',driver:'driver',build:sub==='horn'?'horn':'parts'}[m];gbRender();const B=$('#gbBody');if(B)B.scrollTop=0}
@@ -69,14 +70,15 @@ function R2_bkSync(){const P=$('#gbBkP');if(!P)return;const c=P.querySelector('.
 function R2_sync(){R2_dom();const X=$('#gbx');if(!X)return;const[m,s]=R2_cur();for(const c of[...X.classList])if(c.startsWith('r2m-'))X.classList.remove(c);X.classList.add('r2m-'+m);if(s)X.classList.add('r2m-'+s);
  R2_hdr();R2_ctx();R2_bkSync();R2.af=0}
 // ---------- panel content: group the RIDES tab into rides/perks parts, pictures for locked items
-const R2_KIC={none:'—',crown:'👑',antenna:'📡',siren:'🚨',sfin:'🦈',flag:'🚩',dish:'📡',pilot:'🧑‍✈️',floats:'🛟'},R2_HIC={classic:'📯',train:'🚆',goose:'🪿',duck:'🦆',bells:'🔔',fanfare:'🎺',truck:'🚚'};
+const R2_CIC={nose:'🔺',wing:'🪽',rear:'🔧',roof:'🚨',side:'🛡'},R2_KIC={none:'—',crown:'👑',antenna:'📡',siren:'🚨',sfin:'🦈',flag:'🚩',dish:'📡',pilot:'🧑‍✈️',floats:'🛟'},R2_HIC={classic:'📯',train:'🚆',goose:'🪿',duck:'🦆',bells:'🔔',fanfare:'🎺',truck:'🚚'};
 function R2_post(){const B=$('#gbBody');if(!B)return;
  if(GB.tab==='veh'){let g='rides';for(const e of B.children){if(e.classList.contains('gbInfo')){e.dataset.r2='x';continue}if(e.classList.contains('gpkTop')){e.dataset.r2='perks';continue}
    if(e.tagName==='H5'){const t=e.textContent;g=/^UPGRADES/.test(t)?'perks':/^PREVIEW/.test(t)?'x':'rides'}else if(g==='x'&&e.classList.contains('gbRow')){e.dataset.r2='x';g='rides';continue}e.dataset.r2=g}
-  const h=B.querySelector('[data-r2="rides"]');if(h&&h.tagName==='H5')h.textContent='COLLECTION · tap a card to equip'}
+  const h=B.querySelector('[data-r2="rides"]');if(h&&h.tagName==='H5')h.textContent='COLLECTION · tap a card to equip'
+  B.querySelectorAll('.gpkTop h5').forEach(h=>{if(/SLOTS/.test(h.textContent))h.textContent=h.textContent.replace(/ · (\d)\/3 SLOTS/,' · $1/3').replace('DRIVER LEVEL','LV')})}
  const pic=(b,inner)=>{if(b.querySelector('.r2Pic'))return;const lk=b.disabled||/^🔒/.test((b.querySelector('b')||{}).textContent||'');b.classList.add('r2Pk');const s=document.createElement('span');s.className='r2Pic';s.innerHTML=inner+(lk?'<em class="r2Lk">🔒</em>':'');b.prepend(s);
   const t=b.querySelector('b');if(t&&t.firstChild&&t.firstChild.nodeType===3)t.firstChild.textContent=t.firstChild.textContent.replace(/^🔒 /,'')};
- B.querySelectorAll('.gbP[data-cat][data-id]').forEach(b=>pic(b,R2_KIC[b.dataset.id]?`<i>${R2_KIC[b.dataset.id]}</i>`:`<img alt="" data-r2kit="${b.dataset.id}">`));
+ B.querySelectorAll('.gbP[data-cat][data-id]').forEach(b=>{const id=b.dataset.id,u=R2_KT.get(id);pic(b,R2_KIC[id]?`<i>${R2_KIC[id]}</i>`:`<i class="r2Fb">${R2_CIC[b.dataset.cat]||'🔩'}</i>`+(u?`<img alt="" src="${u}">`:u===null?'':`<img alt="" data-r2kit="${id}">`))});
  B.querySelectorAll('.gbP[data-horn]').forEach(b=>pic(b,`<i>${R2_HIC[b.dataset.horn]||'📯'}</i>`));
  B.querySelectorAll('.gbP[data-pat]').forEach(b=>pic(b,`<img alt="" src="${R2_patTh(b.dataset.pat)}">`));
  B.querySelectorAll('.gbP[data-fc][data-fv]').forEach(b=>{if(!'hxt'.includes(b.dataset.fc))return;pic(b,`<img alt="" data-r2fig="${b.dataset.fc}|${b.dataset.fv}">`)});
@@ -87,19 +89,24 @@ function R2_pump(){if(R2.busy)return;R2.busy=1;const next=()=>{let im=null;try{i
 // kit picture: the kit's own geometry (kitParts) in red on a see-through grey body, drawn once by the 3D thumbnail renderer
 const R2_KT=new Map();
 function R2_kitTh(k){if(R2_KT.has(k))return R2_KT.get(k);if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;const host=new THREE.Group(),mt=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45}),ms=[mt('#e01e2b'),mt('#d8dde4'),mt('#2a2f38')];
- try{const body=new THREE.Mesh(new THREE.BoxGeometry(3.4,1.3,8.4),new THREE.MeshStandardMaterial({color:'#8a96aa',transparent:true,opacity:.4}));body.position.y=.5;host.add(body);const n0=host.children.length;
-  kitParts(k,host,ms[0],ms[1],ms[2],{glow:'#22e4ff',a:'#e01e2b',b:'#ffd12c',c:'#ffffff'});if(host.children.length>n0){const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),rad=Math.max(.5,bb.getSize(new THREE.Vector3()).length()/2);host.position.sub(ce);T.s.add(host);
-   const d=rad/Math.sin(15*Math.PI/180)*.95;T.cam.position.set(d*.62,d*.5,-d*.6);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host)}}catch(e){url=null}
+ try{const n0=host.children.length;
+  kitParts(k,host,ms[0],ms[1],ms[2],{glow:'#22e4ff',a:'#e01e2b',b:'#ffd12c',c:'#ffffff'});if(host.children.length>n0){const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),rad=Math.max(.15,bb.getSize(new THREE.Vector3()).length()/2);host.position.sub(ce);T.s.add(host);
+   const d=rad/Math.sin(15*Math.PI/180)*.9;T.cam.position.set(d*.62,d*.45,-d*.64);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host)}}catch(e){url=null}
  host.traverse(o=>{if(o.isMesh){o.geometry.dispose();if(!ms.includes(o.material)&&o.material.dispose&&!o.material.isShaderMaterial)o.material.dispose()}});ms.forEach(m=>m.dispose());R2_KT.set(k,url);return url}
 const R2_PT=new Map();
 function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]=cv(512,512),d=GB.d||{};g.fillStyle=d.a||'#e01e2b';g.fillRect(0,0,512,512);liveryPat({a:d.a||'#e01e2b',b:d.b||'#ffd12c',c:d.c||'#ffffff',pat:p,num:d.num||7},g);
   const[c2,g2]=cv(64,44);g2.drawImage(c,0,0,512,352,0,0,64,44);u=c2.toDataURL()}catch(e){u=''}R2_PT.set(p,u);return u}
 // ---------- paint finishes (one cached material per finish; the shared LEGO material stays for everything else)
-const R2_FP={matte:{roughness:1,clearcoat:0,envMapIntensity:.25,k:.9},metal:{metalness:.85,roughness:.34,clearcoat:.6,clearcoatRoughness:.3,envMapIntensity:2.6,k:.95},
- chrome:{metalness:1,roughness:.05,clearcoat:1,clearcoatRoughness:.02,envMapIntensity:4.5,k:2.3},pearl:{iridescence:1,iridescenceIOR:1.8,clearcoat:1,roughness:.2,sheen:.3,envMapIntensity:1.8,k:1}};
+// gloss = clear-coated LEGO plastic; matte = no coat, rough; metal = metallic flake under a clear coat; chrome = mirror (base hue mixed toward silver,
+// metalness 1, roughness .04, strong env); pearl = the base colour kept, a soft iridescent sheen on top (thin-film), no lightening
+const R2_FP={gloss:{roughness:.15,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.6,k:1},matte:{roughness:1,clearcoat:0,metalness:0,envMapIntensity:.15,k:.92,em:.12},
+ metal:{metalness:.75,roughness:.28,clearcoat:.8,clearcoatRoughness:.15,envMapIntensity:2.4,k:1.15,em:.1},
+ chrome:{metalness:1,roughness:.04,clearcoat:1,clearcoatRoughness:.02,envMapIntensity:3.2,k:1,mix:.62,em:.02},
+ pearl:{iridescence:.9,iridescenceIOR:1.35,clearcoat:1,clearcoatRoughness:.06,roughness:.22,envMapIntensity:1.5,k:1,mix:.12,em:.16}};
 const R2_MC={};
-function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(f==='pearl'){m.sheenColor=new THREE.Color(0xc8f0ff);m.iridescenceThicknessRange=[100,800]}
- m.onBeforeCompile=GB_MAT.onBeforeCompile;m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
+function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,mix,em,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(f==='pearl')m.iridescenceThicknessRange=[260,420];
+ const e=em==null?.16:em;m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>'+(mix?`\ndiffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.95,.98),${mix.toFixed(2)});`:''))
+  .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';')};m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
 const R2_fin=()=>{try{const f=GP_pa().fin;return R2_FP[f]?f:'gloss'}catch(e){return'gloss'}};
 function R2_finSet(o,f){if(!o)return 0;const M=R2_mat(f);let n=0;o.traverse(x=>{if(!x.isMesh||x.userData.r!=null||!x.material)return;if(x.material===GB_MAT||(x.material.userData&&x.material.userData.r2)){if(x.material!==M)x.material=M;n++}});return n}
 function R2_finPick(f){GP_save('fin',f==='gloss'?'gloss':f);if(GB.mesh)R2_finSet(GB.mesh,f);try{AU.sfx('pick')}catch(e){}R2_ctx()}
@@ -108,10 +115,10 @@ setInterval(()=>{try{if(typeof pl==='undefined'||!pl||!pl.mesh||state==='menu')r
 // ---------- camera: frame the car in the free area (right of the rail, under the header, above the context bar, left of the panel)
 function R2_calc(){const c=$('#gbC');if(!c)return null;const r=c.getBoundingClientRect();if(!r.width)return null;const vis=e=>e&&e.offsetParent&&getComputedStyle(e).display!=='none';
  const R=$('#r2R'),H=$('#r2H'),p=$('#gbx .gbp'),C=GB_.bk?$('#gbBkP'):$('#r2C');let l=0,t=0,R0=r.width,b=r.height;
- if(vis(R))l=R.getBoundingClientRect().right-r.left;if(vis(H))t=H.getBoundingClientRect().bottom-r.top;if(!GB_.bk&&vis(p))R0=p.getBoundingClientRect().left-r.left;
+ if(vis(R))l=R.getBoundingClientRect().right-r.left;if(GB_.bk)l+=(parseFloat(getComputedStyle($('#gbx')).getPropertyValue('--r2pad'))||62)+10;if(vis(H))t=H.getBoundingClientRect().bottom-r.top;if(!GB_.bk&&vis(p))R0=p.getBoundingClientRect().left-r.left;
  if(vis(C)){const q=C.querySelector('#gbBkPc')||C;const y=q.getBoundingClientRect().top-r.top;if(y>t+60)b=y}return{l,t,r:R0,b,w:r.width,h:r.height}}
 function R2_frame(C,bk){if(!C||$('#gbx').hidden)return;if(!R2.area||++R2.af>20){R2.area=R2_calc();R2.af=1}const A=R2.area;if(!A||A.r-A.l<80||A.b-A.t<60)return;
- const ox=Math.round(A.w/2-(A.l+A.r)/2),oy=Math.round(A.h/2-(A.t+A.b)/2),z=bk?1:Math.max(.8,Math.min(1.8,2.1*Math.min((A.r-A.l)/A.w,(A.b-A.t)/A.h)));const v=C.view;
+ const ox=Math.round(A.w/2-(A.l+A.r)/2),oy=Math.round(A.h/2-(A.t+A.b)/2),z=Math.max(.8,Math.min(1.8,(bk?R2.bz:2.1)*Math.min((A.r-A.l)/A.w,(A.b-A.t)/A.h)));const v=C.view;
  if(!v||!v.enabled||v.offsetX!==ox||v.offsetY!==oy||v.fullWidth!==A.w||v.fullHeight!==A.h||C.zoom!==z){C.zoom=z;C.setViewOffset(A.w,A.h,ox,oy,A.w,A.h)}C.updateMatrixWorld()}
 G8_band=function(){const A=R2.area||R2_calc();const c=$('#gbC').getBoundingClientRect();return A?[A.t+G8.T.top,A.b-G8.T.bot,c.height,c.width]:[0,c.height,c.height,c.width]};
 GB_cam=(f=>function(){f();R2_frame(GB.cam,GB_.bk)})(GB_cam);
@@ -120,16 +127,21 @@ addEventListener('resize',()=>{R2.af=99});
 // ---------- hooks
 gbRender=(f=>function(){if(R2.skip)return;if(R2.pk&&GB.tab==='veh'&&GPK_.pk==null)GPK_.pk=R2_slot();const r=f.apply(this,arguments);try{R2_post();R2_sync();if(GB.mesh)R2_finSet(GB.mesh,R2_fin())}catch(e){console.warn('R2',e)}return r})(gbRender);
 GB_refresh=(f=>function(){const r=f.apply(this,arguments);try{if(GB.mesh)R2_finSet(GB.mesh,R2_fin())}catch(e){}return r})(GB_refresh);
-GB_ui=(f=>function(){const r=f.apply(this,arguments);try{R2_hdr();R2_bkSync()}catch(e){}return r})(GB_ui);
+GB_ui=(f=>function(){const r=f.apply(this,arguments);try{R2_hdr();R2_bkSync();R2_pads()}catch(e){}return r})(GB_ui);
 GB_enter=(f=>function(){const r=f.apply(this,arguments);R2.pk=0;R2_sync();return r})(GB_enter);
 GB_exit=(f=>function(){R2_pop(null);const r=f.apply(this,arguments);if(!R2.skip)R2_sync();return r})(GB_exit);
+const R2_PL={place:'PLACE',rot:'TURN',cancel:'DROP'},R2_SL={rot:'TURN',up:'UP',none:'NONE'};
+function R2_pads(){const B=$('#gsBar');if(B)B.querySelectorAll('button').forEach(b=>{const t=b.dataset.g?R2_PL[b.dataset.g]:b.dataset.g8?(+b.dataset.g8>0?'UP':'DOWN'):null;if(t&&!b.dataset.r2l){b.dataset.r2l=1;b.innerHTML=`<i>${(b.querySelector('i')||{}).textContent||''}</i><span>${t}</span>`}});
+ const S=$('#slBar');if(S)S.querySelectorAll('button[data-s]').forEach(b=>{const t=R2_SL[b.dataset.s],sp=b.querySelector('span');if(t&&sp&&sp.textContent!==t)sp.textContent=t});
+ const h=!!(GS.held||(typeof SL!=='undefined'&&SL.carry));if(R2.held&&!h)R2_tipOff();R2.held=h}
+GS_ui=(f=>function(){const r=f.apply(this,arguments);try{R2_pads()}catch(e){}return r})(GS_ui);
 GB_msg=(f=>function(t){f(t);try{if(GB_.bk&&t)GS_tip(t)}catch(e){}})(GB_msg);
 CR_cat=(f=>function(ct){const r=f(ct);try{R2_bkSync()}catch(e){}return r})(CR_cat);
 gbOpen=(f=>function(){if(!GB.tab||GB.tab==='parts'||GB.tab==='bricks')GB.tab='veh';R2.pk=0;R2.af=99;R2_dom();const r=f.apply(this,arguments);R2_sync();return r})(gbOpen);
 R2_dom();
 // ---------- style: one tile style for every button in the garage (title-menu look: white tile, black outline, heavy italic; yellow = on)
 {const st=document.createElement('style');st.textContent=`
-#gbx.r2{--r2hh:52px;--r2rw:72px;--r2ch:52px;--r2pw:300px;--r2k:#141413;background:#0d1730;place-items:stretch}
+#gbx.r2{--r2hh:52px;--r2rw:72px;--r2pad:62px;--r2ch:52px;--r2pw:300px;--r2k:#141413;background:#0d1730;place-items:stretch}
 #gbx.r2 .gbw{position:absolute;inset:0;display:block;width:auto;height:auto}#gbx.r2 .gbv{position:absolute;inset:0;border:0;border-radius:0;background:none}#gbx.r2 #gbC{position:absolute;inset:0}
 #gbx.r2 .gbp>h2,#gbx.r2 .gbTabs,#gbx.r2 .gbp>.row,#gbx.r2 #gbBkT,#gbx.r2 #crSt{display:none!important}
 #gbx .r2T,#gbx.r2 .gbP,#gbx.r2 .g9Ty,#gbx.r2 .g9Ch,#gbx.r2 .g9Ed,#gbx.r2 .gbCt,#gbx.r2 #gsBar button,#gbx.r2 #slBar button,#gbx.r2 .gnbR button,#gbx.r2 .gnbX{border:2px solid var(--r2k,#141413);background:#fff;color:#141413;border-radius:10px;
@@ -166,7 +178,7 @@ R2_dom();
 #gbx.r2 .gbSw{gap:6px}#gbx.r2 .gbSw button{width:44px;height:44px;border:2px solid #141413;border-radius:10px;box-shadow:0 3px 0 #141413}#gbx.r2 .gbSw button.on{box-shadow:0 3px 0 #141413,0 0 0 3px #ffd400}
 #gbx.r2 .gbP.r2Pk{display:grid;grid-template-columns:48px 1fr;column-gap:7px;align-items:center;text-align:left;width:100%;box-sizing:border-box;padding:4px 6px}@media (min-width:900px) and (min-height:501px){#gbx.r2 .gbP.r2Pk{width:calc(50% - 4px)}}#gbx.r2 .gbP.r2Pk>*:not(.r2Pic){grid-column:2}
 #gbx.r2 .r2Pic{grid-row:1/span 2;position:relative;width:48px;height:40px;border-radius:7px;background:#e9edf3;display:grid;place-items:center;overflow:hidden}#gbx.r2 .r2Pic img{width:48px;height:40px;object-fit:contain;display:block}
-#gbx.r2 .r2Pic i{font-style:normal;font-size:22px}#gbx.r2 .gbP:disabled .r2Pic img,#gbx.r2 .gbP:disabled .r2Pic i{filter:grayscale(.7);opacity:.9}
+#gbx.r2 .r2Pic i{font-style:normal;font-size:22px}#gbx.r2 .r2Pic img{position:relative;z-index:1}#gbx.r2 .r2Pic img:not([src]){display:none}#gbx.r2 .r2Pic img[src]~.r2Lk{z-index:2}#gbx.r2 .r2Pic i.r2Fb{position:absolute;inset:0;display:grid;place-items:center}#gbx.r2 .r2Pic img[src]{background:#e9edf3}#gbx.r2 .gbP:disabled .r2Pic img,#gbx.r2 .gbP:disabled .r2Pic i{filter:grayscale(.7);opacity:.9}
 #gbx.r2 .r2Lk{position:absolute;right:1px;bottom:1px;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:12px;background:#141413}
 #gbx.r2 .garPre .gbP img{width:44px;height:44px}
 /* collection: 2 columns of white cards; the type/sort/filter bar moves to the context bar */
@@ -185,7 +197,9 @@ R2_dom();
 #gbx.r2 #r2More{left:auto;right:0;max-width:430px}#gbx.r2 #gbBkCl{left:auto;right:150px}
 #gbx.r2 #gbBkP.r2PopCt #gbBkCt,#gbx.r2 #gbBkP.r2PopCl #gbBkCl,#gbx.r2 #gbBkP.r2PopMo #r2More{display:flex}
 #gbx.r2 #gbBkCt .gbCt{height:44px;padding:0 12px}#gbx.r2 #gbBkCl .gbCl{width:44px;height:44px;border:2px solid #141413}#gbx.r2 #gbBkCl .gbCl.on{box-shadow:0 0 0 3px #ffd400}
-#gbx.r2 #gsBar,#gbx.r2 #slBar{left:calc(var(--r2rw) + 8px);top:calc(var(--r2hh) + 8px)}#gbx.r2 #gsBar button,#gbx.r2 #slBar button{height:44px}
+#gbx.r2 #gsBar,#gbx.r2 #slBar{left:calc(var(--r2rw) + 6px);top:calc(var(--r2hh) + 6px);gap:5px}#gbx.r2 #gsBar{display:flex;flex-direction:column}#gbx.r2 #gsBar[hidden],#gbx.r2 #slBar[hidden]{display:none}#gbx.r2 #slBar{grid-template-columns:repeat(2,auto)}
+#gbx.r2 #gsBar button,#gbx.r2 #slBar button{width:var(--r2pad);height:46px;flex-direction:column;justify-content:center;gap:1px;padding:0;font-size:12px;letter-spacing:0;line-height:1}#gbx.r2 #gsBar .gsPl{grid-column:auto;width:var(--r2pad)}
+#gbx.r2 #gsBar button i,#gbx.r2 #slBar button i{font-size:15px;width:auto}#gbx.r2 #slBar [data-s="move"]{background:#22c5e4}#gbx.r2 #slBar [data-s="del"]{background:#ff8a8a}#gbx.r2 #gsBar .gsPl:disabled{opacity:.5}
 #gbx.r2 #gsTip{top:calc(var(--r2hh) + 8px);left:calc(50% + var(--r2rw) / 2)}#gbx.r2 .gbHint{left:calc(var(--r2rw) + 10px)!important;right:auto!important;top:auto!important;bottom:calc(var(--r2ch) + 16px);font-size:12px}
 #gbx.r2 #gnbP{z-index:7}#gbx.r2:not(.gbBk) #gsTip{display:none}#gbx.r2 .gbFig p{font-size:12px}
 @media (min-height:501px) and (min-width:900px){#gbx.r2{--r2hh:58px;--r2rw:92px;--r2ch:60px;--r2pw:400px}#gbx .r2T{height:48px;font-size:13px}#r2H .r2Rib b{font-size:20px}#r2H .r2Nm b{font-size:18px}#r2H .r2Bud i{width:110px}#r2R .r2T{max-height:84px}#r2R .r2T i{font-size:24px}#r2R .r2T span{font-size:13px}#gbx.r2 #gbBkPc .gbPc{width:62px;height:50px}}
