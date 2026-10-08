@@ -29,7 +29,10 @@ function D24_side(R,s,v){if(!R.T)R.T=D24_turns(R.P,R.C);const t=R.T.find(q=>q.s1
 // TUNE.stRampLo s (standstill) to TUNE.stRampHi s (100 km/h) from a TUNE.stK0 start, and lets go at TUNE.stRet per s, so a tap is a
 // small correction and a hold is a full turn; (2) full input asks for TUNE.stLim × the grip limit at this speed, not more.
 // Drifting (DRIFT / BRAKE+steer) and analog input (gamepad stick, tilt, drag pad) keep the raw value.
-function D24_shape(c,dt){const raw=clamp(c.steer||0,-1,1);c.steerRaw=raw;if(RO.dDir||c.hb||!dt){RO.d24s=raw;return}
+// drive24b: on touch ◀/▶ c.steer is TOUCH.steer, which already has its own ramp (and a slow 7/s let-go); with the ramp below on top, a
+// lifted finger kept the steering BUILDING for a few frames and then let go at 7/s (~0.2 s of extra lag: touch had ~3 heading flips per
+// turn vs ~1 on keys). TUNE.stTouchDig=1: the buttons feed the same digital value as the arrow keys (TOUCH.dir), so touch = keys.
+function D24_shape(c,dt){let raw=clamp(c.steer||0,-1,1);if(TUNE.stTouchDig&&SET.touch==='buttons'&&TOUCH.on&&TOUCH.used&&!RO.dDir&&!c.hb){const kd=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0);raw=clamp((TOUCH.dir||0)+kd,-1,1)}c.steerRaw=raw;if(RO.dDir||c.hb||!dt){RO.d24s=raw;return}
   const dig=Math.abs(raw)>.98||raw===0||SET.touch==='buttons',sp=Math.abs(RO.v||0);let s=RO.d24s||0;
   if(dig){const Tin=TUNE.stRampLo+(TUNE.stRampHi-TUNE.stRampLo)*clamp(sp/27.8,0,1);if(raw!==0&&Math.sign(raw)===Math.sign(s||raw)&&Math.abs(s)<Math.abs(raw)){if(Math.abs(s)<TUNE.stK0)s=Math.sign(raw)*TUNE.stK0;s+=Math.sign(raw)*dt/Math.max(.02,Tin);if(Math.abs(s)>Math.abs(raw))s=raw}
     else{const d=raw-s;s+=clamp(d,-TUNE.stRet*dt,TUNE.stRet*dt)}}else s=raw;RO.d24s=s;

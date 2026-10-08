@@ -23,7 +23,7 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
  // ---- the driver runs in the page between frames (one evaluate per route): real DOM key events (keydown/keyup on window, e.code) or
  // real touch events on the on-screen buttons (#tL/#tR via #btnZone, #tG, #tB), dispatched exactly where a finger lands
  await p.evaluate(([touch,FPS])=>{window.__S=[];const M=__mho;
-  window.__mon=()=>{const R=M.RO;if(M.state!=='roam')return;let off=0;try{off=M.cid()==='ath'?((M.athRoad(R.x,R.z,48)||{e:9}).e>0?1:0):(M.roadD(R.x,R.z)>0?1:0)}catch(e){}__S.push([R.x,R.z,R.h,R.v,R.yr||0,off,M.K.ArrowDown||(M.touch&&M.touch.brake)?1:0,R.vh??R.h])};
+  window.__mon=()=>{const R=M.RO;if(M.state!=='roam')return;let off=0;try{off=M.cid()==='ath'?((M.athRoad(R.x,R.z,48)||{e:9}).e>0?1:0):(M.roadD(R.x,R.z)>0?1:0)}catch(e){}__S.push([R.x,R.z,R.h,R.v,R.yr||0,off,M.K.ArrowDown||(M.touch&&M.touch.brake)?1:0,R.vh??R.h,R.d24s||0,R.dl||0,R.camH??R.h,R.camL??R.h,(window.__dbg&&__dbg.camera?(f=>Math.atan2(f.x,f.z))(new __dbg.THREE.Vector3(0,0,-1).applyQuaternion(__dbg.camera.quaternion)):0)])};
   const kd=(c,on)=>dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{code:c,key:c,bubbles:true}));const F={};let tid=1;
   const tEl=s=>document.querySelector(s),tc=s=>{const r=tEl(s).getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]};
   const tch=(name,sel,on)=>{if(on){const[x,y]=tc(sel),t0=document.elementFromPoint(x,y)||tEl(sel);const T=new Touch({identifier:tid++,target:t0,clientX:x,clientY:y,radiusX:6,radiusY:6,force:1});F[name]=T;
@@ -66,9 +66,15 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
    for(let i=0;i<Math.round(.5*FPS);i++){await apply({steer:0,gas:true,brake:false});await W(1)}await p.evaluate(()=>{__S.length=0});await apply({steer:1,gas:true,brake:false});await W(Math.round(.35*FPS));await apply({steer:0,gas:true,brake:false});
    const i0=await p.evaluate(()=>__S.length);await W(Math.round(2.5*FPS));await rel();const S=await p.evaluate(()=>__S.slice());let fl=0,sg=0,pk=0,ov=0;for(let i=0;i<S.length;i++){const y=S[i][4];if(i<i0)pk=Math.max(pk,Math.abs(y));else{if(Math.abs(y)>.03){const g=Math.sign(y);if(sg&&g!==sg)fl++;sg=g}if(Math.sign(y)!==Math.sign(S[i0-1][4]))ov=Math.max(ov,Math.abs(y))}}
    let set=2.5;for(let i=i0;i<S.length;i++){if(S.slice(i).every(q=>Math.abs(q[4])<.03)){set=(i-i0)*DT;break}}res.pulse.push({V,vAt:+(Math.abs(S[i0][3])*3.6).toFixed(0),peakYaw:+(pk*57.3).toFixed(1),flips:fl,overshoot:+(ov*57.3).toFixed(1),settle:+set.toFixed(2)});console.log('pulse',JSON.stringify(res.pulse[res.pulse.length-1]))}}
+ // ---- time to a 90° turn at 50 km/h (drive24b): cruise at 50 km/h on route 0's start, then hold ◀ (or ▶) with gas held to keep ~50, until the
+ // heading has changed 90°; both sides, the mean is reported (must not get slower than live)
+ res.t90=[];for(const sd of[-1,1]){const P=resample(routes[0],2);const h0=Math.atan2(P[3][0]-P[0][0],P[3][1]-P[0][1]);await rel();await p.evaluate(([x,z,h])=>{__mho.warp(x,z,h,true);const R=__mho.RO;R.v=50/3.6;R.vh=h;R.yr=0},[P[0][0],P[0][1],h0]);
+  for(let i=0;i<Math.round(.3*FPS);i++){await apply({steer:0,gas:true,brake:false});await W(1)}
+  const r=await p.evaluate(([sd,FPS])=>{const R=__mho.RO,h0=R.h;let n=0;const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));while(n<5*FPS&&Math.abs(ad(R.h-h0))<Math.PI/2){__d24apply({steer:sd,gas:R.v<50/3.6,brake:false});__tick(1);n++}const v=R.v*3.6;__d24apply({steer:0,gas:false,brake:false});return{t:n/FPS,v}},[sd,FPS]);res.t90.push(r)}
+ console.log('t90',JSON.stringify(res.t90));
  // ---- summary
  const all=res.runs.flatMap(r=>r.turns),mins=res.runs.reduce((a,r)=>a+r.sec,0)/60;const avg=a=>a.length?+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2):null;const pct=(a,q)=>{a=a.slice().sort((x,y)=>x-y);return a.length?a[Math.floor((a.length-1)*q)]:null};
  res.sum={turns:all.length,flipsAvg:avg(all.map(t=>t.flips)),flipsP90:pct(all.map(t=>t.flips),.9),turnsWith2plusFlips:all.filter(t=>t.flips>=2).length,overAvgDeg:avg(all.map(t=>t.over)),settleAvg:avg(all.map(t=>t.settle)),settleP90:pct(all.map(t=>t.settle),.9),
   hitsPerMin:+(res.runs.reduce((a,r)=>a+r.hits,0)/mins).toFixed(2),depPerMin:+(res.runs.reduce((a,r)=>a+r.dep,0)/mins).toFixed(2),offPct:avg(res.runs.map(r=>r.offPct)),yawFlipsPerKmStraight:avg(res.runs.map(r=>r.yawFlipsPerKmStraight)),done:res.runs.filter(r=>r.done).length+'/'+res.runs.length,
-  pulseFlips:avg(res.pulse.map(q=>q.flips)),pulseSettle:avg(res.pulse.map(q=>q.settle)),pulseOver:avg(res.pulse.map(q=>q.overshoot)),errors:errs.length};
+  pulseFlips:avg(res.pulse.map(q=>q.flips)),pulseSettle:avg(res.pulse.map(q=>q.settle)),pulseOver:avg(res.pulse.map(q=>q.overshoot)),t90:avg(res.t90.map(q=>q.t)),errors:errs.length};
  fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(res,null,1));console.log('SUM',JSON.stringify(res.sum));if(errs.length)console.log('errors',errs.slice(0,4));await b.close()})();

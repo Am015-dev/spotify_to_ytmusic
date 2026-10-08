@@ -134,7 +134,15 @@ function D24_clean(P,I,noSimp,dMax=25){if(P.length<3)return;const n0=P.length;
   let w=0;for(let k=0;k<P.length;k++)if(keep[k]){P[w]=P[k];if(I)I[w]=I[k];w++}P.length=w;if(I)I.length=w;
   // (3) jogs: two opposite turns < 30 m apart (filler grid meets a street off-line) become one bend through their midpoint
   const hd=(a,b)=>Math.atan2(b[0]-a[0],b[1]-a[1]);for(let k=1;k<P.length-2;k++){const A=P[k-1],B=P[k],C=P[k+1],D=P[k+2],L=Math.hypot(C[0]-B[0],C[1]-B[1]);if(L>30)continue;
-    const t1=angDiff(hd(B,C),hd(A,B)),t2=angDiff(hd(C,D),hd(B,C));if(Math.abs(t1)<.4||Math.abs(t2)<.4||Math.sign(t1)===Math.sign(t2))continue;const M=[(B[0]+C[0])/2,(B[1]+C[1])/2];if(!D24_clr(A,M)||!D24_clr(M,D))continue;P.splice(k,2,M);if(I)I.splice(k,2,I[k])}}
+    const t1=angDiff(hd(B,C),hd(A,B)),t2=angDiff(hd(C,D),hd(B,C));if(Math.abs(t1)<.4||Math.abs(t2)<.4||Math.sign(t1)===Math.sign(t2))continue;const M=[(B[0]+C[0])/2,(B[1]+C[1])/2];if(!D24_clr(A,M)||!D24_clr(M,D))continue;P.splice(k,2,M);if(I)I.splice(k,2,I[k])}
+  // (4) S-jogs (drive24b, tools/tZig24.js): a route crossing a road or leaving a bridge through an off-line junction node turned ±30-55° and
+  // straight back within 25-90 m (10-15 m sideways). A driver goes straight: if the in and out headings agree within 35°, every point in
+  // between is within TUNE.rtJog m of the chord, the chord is within 30° of both headings and clear (D24_clr), the points in between are dropped.
+  const J=TUNE.rtJog;if(J>0)for(let i=1;i<P.length-2;i++){const hi=hd(P[i-1],P[i]);let best=-1;
+    for(let j=i+2,L=Math.hypot(P[i+1][0]-P[i][0],P[i+1][1]-P[i][1]);j<P.length-1;j++){L+=Math.hypot(P[j][0]-P[j-1][0],P[j][1]-P[j-1][1]);if(L>90)break;const ho=hd(P[j],P[j+1]),hc=hd(P[i],P[j]);
+      if(Math.abs(angDiff(ho,hi))>.61||Math.abs(angDiff(hc,hi))>.52||Math.abs(angDiff(ho,hc))>.52)continue;const dx=P[j][0]-P[i][0],dz=P[j][1]-P[i][1],L2=dx*dx+dz*dz||1;let ok=true;
+      for(let k=i+1;k<j&&ok;k++){const u=clamp(((P[k][0]-P[i][0])*dx+(P[k][1]-P[i][1])*dz)/L2,0,1);if(Math.hypot(P[i][0]+dx*u-P[k][0],P[i][1]+dz*u-P[k][1])>J)ok=false}if(ok&&D24_clr(P[i],P[j]))best=j}
+    if(best>0){P.splice(i+1,best-i-1);if(I)I.splice(i+1,best-i-1)}}}
 function qvCum(P){const c=[0];for(let i=1;i<P.length;i++)c.push(c[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));return c}
 function qvAt(P,C,s){s=clamp(s,0,C[C.length-1]);let i=1;while(i<C.length-1&&C[i]<s)i++;const a=P[i-1],b=P[i]||a,L=(C[i]-C[i-1])||1,t=clamp((s-C[i-1])/L,0,1);return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1]),i}}
 // ---- layout generation (seeded): points on the main road component inside distance bands, varied districts, no water/buildings

@@ -9,10 +9,10 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Steer','TUNE.stIn','Steer-in rate',2,30,.5],['Steer','TUNE.stOut','Return-to-centre rate',2,40,.5],
  ['Steer','TUNE.stMax','Max turn rate',.6,2.5,.05],['Steer','TUNE.stSpd','Turn-rate cut at top speed',0,1.2,.05],
  ['Steer','W14_ST.k0','Touch: start lock',0,.8,.01],['Steer','W14_ST.rk','Touch: ramp to full lock',.3,4,.05],
- ['Steer','TUNE.tRet','Touch: return speed',2,40,.5],['Steer','TUNE.assist','Lane assist (touch)',0,4,.1],
+ ['Steer','TUNE.tRet','Touch: return speed',2,40,.5],['Steer','TUNE.assist','Lane assist strength',0,4,.1],
  // drive24 (98d_drive24.js): ◀/▶ and keys build up to full lock instead of jumping there; full lock = × the grip limit at this speed
  ['Steer','TUNE.stOn','Progressive steering (drive24)',0,1,1,'bool'],['Steer','TUNE.stRampLo','Time to full lock, slow (s)',.02,1,.01],['Steer','TUNE.stRampHi','Time to full lock at 100 km/h (s)',.02,1.5,.01],
- ['Steer','TUNE.stK0','Steer start (first touch)',0,.6,.01],['Steer','TUNE.stRet','Let-go speed (/s)',2,40,.5],['Steer','TUNE.stLim','Full lock vs grip limit ×',.5,3,.05],['Steer','TUNE.yrOut','Stop turning on let-go (/s)',5,40,.5],
+ ['Steer','TUNE.stK0','Steer start (first touch)',0,.6,.01],['Steer','TUNE.stRet','Let-go speed (/s)',2,40,.5],['Steer','TUNE.stLim','Full lock vs grip limit ×',.5,3,.05],['Steer','TUNE.yrOut','Stop turning on let-go (/s)',5,40,.5],['Steer','TUNE.stTouchDig','Touch ◀▶ act like arrow keys',0,1,1,'bool'],['Steer','TUNE.asMax','Lane assist: widest angle (rad)',.1,1.2,.05],
  ['Grip','C26.muCity.road','Road grip',5,40,.5],['Grip','C26.muCity.dirt','Dirt grip',3,25,.5],['Grip','C26.muCity.water','Water grip',1,15,.5],
  ['Grip','TUNE.gripRoad','Lateral grip (lower = slides)',5,80,1],['Grip','C26.align','Self-straighten',0,6,.1],['Grip','C26.scrub','Slide scrub (speed loss)',0,5,.1],
  ['Grip','W.B2K_DMIN','Drift min speed (m/s)',4,30,.5],['Grip','W14_ST.hbCity','Touch BRAKE+steer drift speed (m/s)',10,60,.5],
@@ -40,7 +40,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Audio','TUNE.duckOn','Duck music under dialogue + boost',0,1,1,'bool'],['Audio','TUNE.duckAmt','Duck amount',0,1,.05],
  // drive24 ROUTE: mission GPS routes (41_career_quests.js qvAstar/D24_clean, next route), the turn cue on the arrow, followed cars (98d_drive24.js)
  ['Route','TUNE.rtTurn','Cost of a 90° turn (m)',0,400,5],['Route','TUNE.rtUturn','Cost of a U-turn (m)',0,3000,50],['Route','TUNE.rtGrid','Back-street cost ×',1,3,.05],
- ['Route','TUNE.rtNarrow','Narrow-street extra ×',0,1,.05],['Route','TUNE.rtSimp','Route smoothing (m)',0,10,.5],
+ ['Route','TUNE.rtNarrow','Narrow-street extra ×',0,1,.05],['Route','TUNE.rtSimp','Route smoothing (m)',0,10,.5],['Route','TUNE.rtJog','Straighten jogs up to (m)',0,25,1],
  ['Route','TUNE.tcLead','Turn warning ahead (s)',2,10,.25],['Route','TUNE.tcMin','Turn warning at least (m)',30,250,5],
  ['Route','TUNE.fvRad','Followed car: corner radius (m)',4,40,1],['Route','TUNE.fvLat','Followed car: corner grip (m/s²)',1,12,.25],['Route','TUNE.fvDec','Followed car: braking (m/s²)',1,12,.25],
  ['Route','TUNE.fvBlink','Followed car: blinkers',0,1,1,'bool']];
