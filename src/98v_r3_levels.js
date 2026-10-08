@@ -18,7 +18,7 @@ function R3_next(L){for(let n=L+1;n<=30;n++){const r=R3_road(n);if(r.length)retu
 const R3_xp=()=>{const x=(store.peek('mho_prof',{}).xp)||0,L=lvlOf(x),x0=150*(L-1)**2,x1=150*L**2;return{x,L,a:x-x0,m:x1-x0,max:L>=30}};
 const R3_base=L=>Math.round(40+60*(L-1)/29);
 // bars: level line (base for the level) + the equipped car's −3…+3 chips (3 points each) + the equipped perks' stat deltas
-const R3_ST=[['top','TOP SPEED'],['acc','ACCELERATION'],['hull','HEALTH'],['han','HANDLING']];
+const R3_ST=[['top','TOP SPEED'],['acc','ACCEL'],['hull','HEALTH'],['han','HANDLING']];
 function R3_stats(L){const b=R3_base(L),eq=perkEq0(),o={};let t=null,base=null;try{base=TEAMS[teamIdx];t=gbTeam(base,GB.d||gbBuild())}catch(e){}
  for(const[k]of R3_ST){const ch=t&&base?R1_chip(t[k],base[k]):0;let pc=0;for(const id of eq){const p=PERKS.find(q=>q.id===id);if(p&&p.st&&p.st[k])pc+=p.st[k]}
   o[k]={line:b,car:ch*3,perk:Math.round(b*pc),v:clamp(Math.round(b+ch*3+b*pc),2,100)}}return o}
@@ -28,7 +28,7 @@ function R3_hero(L,big){const X=R3_xp(),c=R3_CL[L>=20?2:L>=10?1:0],xl=L===X.L;
 function R3_bars(L,from){const S=R3_stats(L),F=from?R3_base(from):null;
  return`<div class="r3Bars">${R3_ST.map(([k,n])=>{const s=S[k],d=s.v-s.line;return`<div class="r3B" data-k="${k}"><i style="height:${s.v}%" ${F!=null?`data-from="${F}"`:''}></i><u style="bottom:${s.line}%"></u>${d?`<s class="${d>0?'up':'dn'}" style="bottom:${Math.min(s.v,s.line)}%;height:${Math.abs(d)}%"></s>`:''}<b>${s.v}</b><span>${n}</span></div>`}).join('')}</div>`}
 function R3_slots(L,tap){const e=perkEq0(),n=perkSlots();return`<div class="r3Sl">${[2,1,0].map(i=>{const p=e[i]&&PERKS.find(q=>q.id===e[i]),open=i<n;
-  return`<button class="r3S ${open?'':'lk'} ${tap&&GPK_.pk===i&&open?'on':''}" ${tap&&open?`data-r3sl="${i}"`:'disabled'}><em>${R3_CL[i]}</em>${open?(p?`<i>${p.icon}</i><b>${p.name}</b>`:'<i>＋</i><b>EMPTY</b>'):`<i>🔒</i><b>LVL ${R3_SL[i]}</b>`}</button>`}).join('')}</div>`}
+  return`<button class="r3S ${open?'':'lk'} ${tap&&GPK_.pk===i&&open?'on':''}" ${tap&&open?`data-r3sl="${i}"`:'disabled'}><em>${R3_CL[i]}</em><b>${open?(p?p.icon+' '+p.name:'＋ EMPTY'):'🔒 LVL '+R3_SL[i]}</b></button>`}).join('')}</div>`}
 const R3_nextHtml=L=>{const n=R3_next(L);return n?`<p class="r3Nx">Next: <b>${n}</b></p>`:''};
 // ---------- garage: PERKS mode = the 2K perks screen; DRIVER mode = driver profile card on top of the parts
 gbRender=(f=>function(){const r=f.apply(this,arguments);try{R3_garage()}catch(e){console.warn('R3',e)}return r})(gbRender);
@@ -96,9 +96,9 @@ gbClose=(f=>function(){R3_show(false);return f.apply(this,arguments)})(gbClose);
 .r3B u{position:absolute;left:-2px;right:-2px;height:3px;margin-bottom:-1px;background:#fff;box-shadow:0 0 6px #fff;text-decoration:none}.r3B s{position:absolute;left:0;right:0;text-decoration:none;opacity:.9}.r3B s.up{background:#3fd46a}.r3B s.dn{background:#ff4d4d}
 .r3B b{position:absolute;top:3px;left:0;right:0;text-align:center;font:italic 900 13px var(--hud);color:#fff;text-shadow:0 1px 2px #000}
 .r3B span{position:absolute;left:50%;bottom:6px;transform:translateX(-50%) rotate(180deg);writing-mode:vertical-rl;font:italic 900 12px var(--hud);color:#fff;letter-spacing:.03em;text-shadow:0 1px 2px #000;white-space:nowrap}
-.r3Sl{display:flex;flex-direction:column;gap:4px;width:104px;flex:none}.r3S{all:unset;box-sizing:border-box;position:relative;flex:1;min-height:44px;display:grid;grid-template-columns:20px 1fr;align-items:center;column-gap:4px;padding:2px 6px 2px 4px;border-radius:9px;background:#fff;border:3px solid #141413;color:#141413;cursor:pointer}
-.r3S em{grid-row:1/3;font:italic 900 15px var(--hud);color:#141413;background:#ffd12c;border-radius:5px;text-align:center}.r3S i{font-style:normal;font-size:14px;line-height:1}.r3S b{font:italic 900 12px/1.05 var(--hud);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;grid-column:2}
-.r3S i{grid-column:2;grid-row:1}.r3S.on{background:#ffd12c}.r3S.on em{background:#fff}.r3S.lk{background:#c9cfdb;cursor:default}.r3S.lk em{background:#9aa3b0}
+.r3Sl{display:flex;flex-direction:column;gap:4px;width:104px;flex:none}.r3S{all:unset;box-sizing:border-box;position:relative;flex:1;min-height:44px;display:flex;align-items:center;gap:5px;padding:2px 6px 2px 4px;border-radius:9px;background:#fff;border:3px solid #141413;color:#141413;cursor:pointer}
+.r3S em{flex:none;width:20px;font:italic 900 15px var(--hud);color:#141413;background:#ffd12c;border-radius:5px;text-align:center}.r3S b{flex:1;min-width:0;font:italic 900 12px/1.1 var(--hud);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r3S.on{background:#ffd12c}.r3S.on em{background:#fff}.r3S.lk{background:#c9cfdb;cursor:default}.r3S.lk em{background:#9aa3b0}
 .r3Nx{margin:6px 0 2px;font:700 12px system-ui;color:#c9d6ff}.r3Nx b{color:#ffd12c;font:italic 900 13px var(--hud)}.r3Hint{margin:2px 0 6px;font:700 12px system-ui;color:#8fb3c7}
 #gbx.r2m-perks #gbStats{display:none!important}#gbx.r2m-rides #gbBody .r3Pk{display:none!important}
 .r3Drv{margin:0 0 8px;padding:8px;border-radius:12px;background:linear-gradient(135deg,#1d2a6e,#2a1450);border:2px solid #141413}.r3DT{display:flex;gap:8px;align-items:center;margin-bottom:4px}.r3DT img{width:48px;height:48px;border-radius:10px;border:3px solid #141413;background:#cfe8ff}
@@ -107,8 +107,8 @@ gbClose=(f=>function(){R3_show(false);return f.apply(this,arguments)})(gbClose);
 #profile .r3Hero .r3Lv b{color:#141413;text-shadow:none}#profile .r3Hero .r3Lv small,#profile .r3Xp em{color:#6a3df0}#profile .r3Xp small{color:#4a5468}#profile .r3Hero{margin:4px 0 0}
 #profile .r3PfL{background:#1d2a6e}#profile .r3PfL h5{color:#ffd12c}#profile .r3PfL .r3Nx{color:#c9d6ff}#profile .r3Fold:not(.open)>:not(h5){display:none}
 .r3More{all:unset;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border-radius:999px;background:#fff;border:3px solid #141413;font:italic 900 13px var(--hud);color:#141413}
-#r3Up{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(5,3,15,.62);font-family:system-ui}#r3Up[hidden]{display:none}
-#r3Up .r3UC{position:relative;width:min(560px,94vw);max-height:94vh;overflow:auto;box-sizing:border-box;padding:16px 16px 12px;border-radius:18px;background:linear-gradient(135deg,#1d2a6e,#2a1450);border:4px solid #141413;box-shadow:0 8px 0 #141413,0 0 40px rgba(214,92,255,.5);color:#fff}
+#r3Up{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(5,3,15,.62);font-family:system-ui}#r3Up[hidden]{display:none}body:has(#r3Up:not([hidden])) #odNew{display:none!important}
+#r3Up .r3UC{position:relative;width:min(560px,94vw);max-height:calc(100vh - 28px);margin-top:14px;overflow:visible;box-sizing:border-box;padding:16px 16px 12px;border-radius:18px;background:linear-gradient(135deg,#1d2a6e,#2a1450);border:4px solid #141413;box-shadow:0 8px 0 #141413,0 0 40px rgba(214,92,255,.5);color:#fff}
 #r3Up .r3URib{position:absolute;left:-6px;top:-16px;padding:4px 16px;background:#e01e2b;border:3px solid #141413;color:#ffd12c;font:italic 900 18px var(--hud);transform:rotate(-4deg);box-shadow:0 4px 0 #141413}
 #r3Up .r3UB{display:flex;gap:10px}#r3Up .r3UB .r3Bars{flex:0 0 190px;height:120px}#r3Up ul{flex:1;min-width:0;list-style:none;margin:0;padding:0;display:grid;gap:5px;align-content:start}
 #r3Up li{display:grid;grid-template-columns:26px 1fr;column-gap:6px;padding:4px 8px;border-radius:9px;background:rgba(255,255,255,.1)}#r3Up li i{grid-row:1/3;font-style:normal;font-size:20px;align-self:center}#r3Up li b{font:italic 900 13px var(--hud);color:#ffd12c}#r3Up li small{font:700 12px system-ui;color:#dfe6ff}
@@ -127,5 +127,5 @@ gbClose=(f=>function(){R3_show(false);return f.apply(this,arguments)})(gbClose);
 #r3Sh .r3LoC{flex:1;min-width:0;display:grid;gap:2px;cursor:pointer}#r3Sh .r3LoC>small{font:italic 900 12px var(--hud);color:#c9d6ff}#r3Sh .r3LoC.on>small{color:#ffd12c}
 .r3Cd.sm{flex:none;display:grid;grid-template-columns:72px 1fr;column-gap:6px;padding:3px 6px;border-bottom-width:4px;transform:none;min-height:44px;align-items:center}.r3Cd.sm>*{transform:none}.r3Cd.sm img{grid-row:1/3;width:72px}.r3Cd.sm .r3Rr{display:none}.r3Cd.sm b{font-size:13px}
 @media (max-height:430px){.r3Cd{flex-basis:178px}#r3Sh .r3Car{padding-top:8px;padding-bottom:8px}}`;document.head.appendChild(st)}
-window.__r3={up:(a,b,m)=>R3_up(a,b,m),road:R3_road,next:R3_next,stats:L=>R3_stats(L||carStat().lvl),show:o=>R3_show(o),slots:()=>perkSlots(),
+window.__r3={up:(a,b,m)=>R3_up(a,b,m),road:R3_road,next:R3_next,stats:L=>R3_stats(L||carStat().lvl),show:o=>R3_show(o),slots:()=>perkSlots(),eq:()=>perkEq0(),
  setLvl:L=>{const p=prof();p.xp=150*(L-1)**2;store.set('mho_prof',p);return lvlOf(p.xp)},q:()=>R3U.q.length};

@@ -16,10 +16,10 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  const L=+(process.env.LVL||12);console.log('lvl',await ev(L=>__r3.setLvl(L),L),'slots',await ev(()=>__r3.slots()));
  await ev(()=>{const s=JSON.parse(localStorage.getItem('mho_perks')||'[]');});await shot('r0_start');
  await tap('#gbMenuBtn',2500);await tap('#r2R [data-r2m="perks"]',2500);await audit('#gbx');await shot('r1_perks');
- await tap('#gbBody .r3S[data-r3sl="0"]',1500);const pk=await p.$('#gbBody [data-gpk="hanb"]');if(pk){await tap('#gbBody [data-gpk="hanb"]',2000)}console.log('eq',await ev(()=>JSON.stringify(localStorage.getItem('mho_perks'))));
+ await tap('#gbBody .r3S[data-r3sl="0"]',1500);await ev(()=>{const e=document.querySelector('#gbBody [data-gpk="hanb"]');if(e)e.scrollIntoView({block:'center'})});await p.waitForTimeout(800);await tap('#gbBody [data-gpk="hanb"]',2500);console.log('eq',JSON.stringify(await ev(()=>__r3.eq())));
  await ev(()=>{const B=document.querySelector('#gbBody');B.scrollTop=0});await shot('r1b_perks_equipped');console.log('stats',JSON.stringify(await ev(()=>__r3.stats())));
  await tap('#r2R [data-r2m="driver"]',2500);await audit('#gbx');await shot('r2_driver');
- await tap('#r2R [data-r2m="rides"]',2500);await shot('r3_rides');await tap('#r2C [data-r3show]',3000);await audit('#r3Sh');await shot('r4_showroom');
+ await tap('#r2R [data-r2m="rides"]',2500);await shot('r3_rides');await tap('#r2C [data-r3show]',3000);await p.waitForTimeout(+(process.env.SHW||25000));console.log('show imgs',await ev(()=>{const a=[...document.querySelectorAll('#r3Sh img')];return a.filter(i=>i.src).length+'/'+a.length}));await audit('#r3Sh');await shot('r4_showroom');
  await tap('#r3Sh [data-r3t="off"]',2500);await shot('r4b_showroom_offroad');await tap('#r3Sh [data-r3x]',2000);
  await tap('#gbBack',3000);await ev(()=>__r3.up(9,10,false));await audit('#r3Up');await shot('r5_levelup');await tap('#r3Up [data-r3u="ok"]',1500);console.log('card hidden',await ev(()=>document.querySelector('#r3Up').hidden));
  await tap('#gpfBtn',2500);await audit('#profile');await shot('r6_profile');
