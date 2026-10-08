@@ -18,12 +18,12 @@ const totals={steps:0,wrong:0,runs:0,ids:[]};
 const SENT='{"sentinel":1}';
 
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();const d3=mode==='3d';const SLOW=d3?3:1;
-  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
+  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:!process.env.DESK,hasTouch:true});
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
   const p=await ctx.newPage();p.setDefaultTimeout(20000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{const t=m.text();if(m.type()==='warning'&&/rejected|gxt/.test(t))note(tag,'console '+t.slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(t))note(tag,'console error '+t.slice(0,160))});
-  await p.goto('https://gns.test/?phone=1'+(d3?'':'&2d'),{timeout:90000});await sleep(1100);
+  await p.goto('https://gns.test/?'+(process.env.DESK?'':'phone=1&')+(d3?'x=1':'2d'),{timeout:90000});await sleep(1100);
   await p.evaluate(S=>{try{localStorage.clear();localStorage.setItem('tidewake_save1',S)}catch(e){}},SENT);
   await p.reload();await sleep(1100*SLOW);
   const fast=()=>p.evaluate(()=>{UI.speed=40;AIDELAY=0;try{TWKit.setSpeed(40)}catch(e){}});
@@ -54,7 +54,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   if(mode==='story'){await tapEl('#start #storybtn')}else await tapEl('#start [data-gxt-open]');
   await sleep(600*SLOW);await fast();
   const state=()=>p.evaluate(()=>GXT.state());
-  const shot=async(n)=>{if(W===390&&H===763&&mode==='clean'){fs.mkdirSync(SHOTS,{recursive:true});await p.screenshot({path:path.join(SHOTS,'tutor-'+n+'.png')})}};
+  const shot=async(n)=>{if(W===390&&H===763&&mode==='clean'){await sleep(550);fs.mkdirSync(SHOTS,{recursive:true});await p.screenshot({path:path.join(SHOTS,'tutor-'+n+'.png')})}};
   let lastSig='',lastT=Date.now(),rotated=0,left=false,seenIds=[],shots={};
   for(let guard=0;guard<6000;guard++){
     const st=await state();
@@ -97,6 +97,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     }
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
     // screenshots at 390x763: an early step, a mid step, the sinking step
+    if(process.env.SHOTALL&&!shots['all'+id]){shots['all'+id]=1;await sleep(500);fs.mkdirSync('/tmp/claude-0/s/steps',{recursive:true});await p.screenshot({path:'/tmp/claude-0/s/steps/'+W+'-'+String(s.i).padStart(2,'0')+'-'+id+'.png'})}
     if(!shots[id]){if(id==='mark'){shots[id]=1;await shot('early')}if(id==='chain'){shots[id]=1;await shot('mid')}if(id==='sunk'){shots[id]=1;await shot('sinking')}}
     // rotations
     if(mode==='rotate'&&rotated===0&&s.id==='chain'){rotated=1;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900*SLOW);

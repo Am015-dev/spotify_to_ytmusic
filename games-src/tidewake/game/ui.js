@@ -1024,42 +1024,42 @@ const placeOn=()=>!!TQ.place();
 const doomOpt=h=>{try{return G.q.opts.findIndex(o=>o.h===h)}catch(e){return -1}};
 const waveLine=()=>{try{const l=G.log.map(x=>x.t).find(t=>/Rogue Wave \(rolled \d, needed \d\)/.test(t));const m=l&&l.match(/rolled (\d), needed (\d)/);return m?{r:m[1],n:m[2]}:null}catch(e){return null}};
 const dismissMph=()=>{PH.mphHide=UI.mph;try{phAfter();phStrip()}catch(e){}};
-function tutSteps(){return [
+function tutSteps(){const L=[
  {id:'goal',title:'Last junk afloat',say:'Steer your junk with current tiles. Stay afloat longer than every rival. Leviathans and the chart\'s edge sink you.',target:tq('#board'),wait:null,
    ready:()=>!!G&&UI.started&&G.phase==='setup'&&sideToAct()===0&&!UI.busy},
  {id:'mark',title:'Pick a start mark',say:'Tap the glowing gold mark at the bottom. Your junk starts there.',target:tutPipRect,
-   wait:{type:'tap',match:a=>a.what==='sq'&&a.x===TS.myStart.x&&a.y===TS.myStart.y},ready:()=>G.phase==='setup'&&!PH.pop&&sideToAct()===0&&!UI.busy&&!!tutPipRect()},
+   wait:{type:'tap',match:a=>(a.what==='sq'||a.what==='startmark'&&a.e===TS.myStart.e)&&a.x===TS.myStart.x&&a.y===TS.myStart.y},ready:()=>G.phase==='setup'&&!PH.pop&&sideToAct()===0&&!UI.busy&&!!tutPipRect()},
  {id:'mark2',title:'Set sail here',say:'Tap the glowing button to confirm this mark.',target:tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]'),
    wait:{type:'tap',match:a=>a.what==='startmark'&&a.x===TS.myStart.x&&a.y===TS.myStart.y&&a.e===TS.myStart.e},ready:()=>PH.pop==='start'&&!!tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]')()},
  {id:'stir',title:'Roll the dice',say:'Two dice are added. A 6, 7 or 8 wakes the leviathans: each moves a square or turns.',target:TQ.mph,wait:null,hold:c=>c==='mph',onNext:dismissMph,
    ready:()=>G.turn===2&&!UI.busy&&!!UI.mph&&UI.mph.wake&&!UI.mph.roll&&!!PH.cur&&PH.cur.kind==='mph'&&!!TQ.mph()},
- {id:'pick',title:'Pick a tile',say:'Tap the glowing tile in your hand to pick it.',target:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='card'&&a.t===0},
+ {id:'pick',side:'bottom',title:'Pick a tile',say:'Tap the glowing tile in your hand to pick it.',target:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='card'&&a.t===0},
    ready:()=>G.turn===2&&layReady()&&(UI.sel&&UI.sel.t===2&&UI.sel.r===0||tutSel(2,0))},
- {id:'turn',title:'Turn the tile',say:'A red cross: this tile sails off the chart and sinks you. Tap Turn.',target:TQ.turn,also:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='rot'&&a.d===1},
+ {id:'turn',side:'bottom',title:'Turn the tile',say:'A red cross: this tile sails off the chart and sinks you. Tap Turn.',target:TQ.turn,also:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='rot'&&a.d===1},
    ready:()=>G.turn===2&&layReady()&&!!UI.sel&&UI.sel.t===0&&UI.sel.r===0},
- {id:'place',title:'Lay it',say:'Green check: safe. Tap Place. Your junk sails along the new line.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},pauseAfter:true,
+ {id:'place',side:'bottom',title:'Lay it',say:'Green check: safe. Tap Place. Your junk sails along the new line.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},pauseAfter:true,
    ready:()=>G.turn===2&&layReady()&&!!UI.sel&&UI.sel.t===0&&UI.sel.r===1&&placeOn()},
  {id:'sail',title:'Your junk sails',say:'It followed the line to the end. Then you draw back up to three tiles.',target:tutShipRect(0),wait:null,onNext:()=>{TUTP.pause=false;schedule()},
    ready:()=>G.turn===3&&TUTP.pause&&!UI.busy&&!!tutShipRect(0)()},
  {id:'rivals',title:'Mind other junks',say:'Cobalt sails too. Never end on another junk\'s wake: two junks on one wake both sink.',target:tutShipRect(1),wait:null,
    ready:()=>G.turn===4&&layReady()&&!!tutShipRect(1)()},
- {id:'chain',title:'Join another tile',say:'This tile links to Cobalt\'s current. Tap Place: your junk sails across both.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
+ {id:'chain',side:'bottom',title:'Join another tile',say:'This tile links to Cobalt\'s current. Tap Place: your junk sails across both.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===4&&layReady()&&tutSel(0,0)&&placeOn()},
- {id:'keep',title:'A Deck Cannon',say:'You drew a Deck Cannon. Keep it: later it destroys a leviathan about to sink you.',target:TQ.q(0),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='cKeep'},
+ {id:'keep',side:'bottom',title:'A Deck Cannon',say:'You drew a Deck Cannon. Keep it: later it destroys a leviathan about to sink you.',target:TQ.q(0),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='cKeep'},
    ready:()=>!!G.q&&G.q.kind==='cannonDraw'&&!UI.busy&&!!PH.cur&&PH.cur.kind==='q'&&!!TQ.q(0)()},
  {id:'wave',title:'Rogue Wave',say:()=>{const w=waveLine();return w?'A Rogue Wave sweeps your row. You rolled '+w.r+'; it needs '+w.n+'+ or you capsize. You ride it.':'A Rogue Wave sweeps this row. Roll its strength or capsize.'},
    target:tutWaveRect,wait:null,ready:()=>G.turn===6&&!!G.wave&&!UI.busy&&sideToAct()===0&&!!tutWaveRect()},
- {id:'place3',title:'Lay a tile',say:'Lay this tile. Your path crosses the wave\'s row again, so you roll once more.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
+ {id:'place3',side:'bottom',title:'Lay a tile',say:'Lay this tile. Your path crosses the wave\'s row again, so you roll once more.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===6&&layReady()&&tutSel(0,0)&&placeOn()},
- {id:'cannon',title:'Fire the cannon!',say:()=>levName(4)+' blocks your junk and would sink it. Fire your Deck Cannon.',target:()=>TQ.q(doomOpt('dCannon'))(),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='dCannon'},
+ {id:'cannon',side:'bottom',title:'Fire the cannon!',say:()=>levName(4)+' blocks your junk and would sink it. Fire your Deck Cannon.',target:()=>TQ.q(doomOpt('dCannon'))(),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='dCannon'},
    ready:()=>!!G.q&&G.q.kind==='doom'&&doomOpt('dCannon')>=0&&!UI.busy&&!!PH.cur&&PH.cur.kind==='q'&&!!TQ.q(doomOpt('dCannon'))()},
- {id:'place4',title:'Keep sailing',say:'The leviathan is gone. Lay a tile to carry on.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
+ {id:'place4',side:'bottom',title:'Keep sailing',say:'The leviathan is gone. Lay a tile to carry on.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===8&&layReady()&&tutSel(0,2)&&placeOn()},
- {id:'sunk',title:'Leviathans sink junks',say:()=>levName(7)+' swam onto Cobalt\'s current: tile destroyed, junk sunk. Tap Continue.',target:tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]'),wait:{type:'tap',match:a=>a.what==='sunkok'},
+ {id:'sunk',side:'bottom',title:'Leviathans sink junks',say:()=>levName(7)+' swam onto Cobalt\'s current: tile destroyed, junk sunk. Tap Continue.',target:tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]'),wait:{type:'tap',match:a=>a.what==='sunkok'},
    ready:()=>!!G.over&&!UI.busy&&!!PH.cur&&PH.cur.kind==='sunk'},
  {id:'win',title:'Last junk afloat',say:'Only your junk is left, so you win. Real games add more captains, tiles and leviathans.',target:tq('#board'),wait:null,
    ready:()=>!!G.over&&!UI.busy&&!UI.sunk.length&&!!PH.cur&&PH.cur.kind==='over'}
-]}
+];return PH.on?L:L.filter(x=>x.id!=='mark2')}
 // ---------------------------------------------------------------- the staged game
 function tutNewGame(){
   try{GX.close()}catch(e){}
@@ -1103,6 +1103,10 @@ function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;cons
 {const o=phPick;phPick=function(p){
   if(tutOn()){let sq=null;if(p&&(p.kind==='square'||p.kind==='start'))sq=[p.c,p.r];else if(p&&p.kind==='ship'){const S=G.ships[+String(p.id).slice(1)];if(S&&S.x!=null)sq=[S.x,S.y]}
     if(!GXT.act({type:'tap',what:'sq',x:sq?sq[0]:-1,y:sq?sq[1]:-1}))return}
+  return o.apply(this,arguments)}}
+{const o=onPick;onPick=function(p){
+  if(tutOn()&&!PH.on&&p&&p.kind==='start'){if(!GXT.act({type:'tap',what:'startmark',x:p.c,y:p.r,e:p.port}))return}
+  else if(tutOn()&&!PH.on&&p&&(p.kind==='square'||p.kind==='ship'||p.kind==='start')){if(!GXT.act({type:'tap',what:'sq',x:p.c,y:p.r}))return}
   return o.apply(this,arguments)}}
 // taps on the game's own buttons (tiles, Turn, Place, pop-up and question buttons, Continue)
 document.addEventListener('click',e=>{if(!tutOn())return;const t=e.target&&e.target.closest&&e.target.closest('[data-a],[data-ph]');if(!t||t.disabled||t.closest('[data-help]'))return;
