@@ -23,17 +23,24 @@ Some knobs only apply later:
 - Race speed applies on the next race.
 - Car width, length and ride height are cosmetic and only affect the player car. Collision is unchanged.
 
-## drive24 knobs (v88e): steering build-up and mission routes
+## drive24 knobs (v88f): steering build-up and mission routes
 Steer tab (`src/98d_drive24.js` `D24_shape`, free roam only; races and drifting are unchanged):
 | knob | default | what it does |
 |---|---|---|
 | `TUNE.stOn` Progressive steering | ON | OFF = the old on/off steering (any ◀/▶ or arrow-key press = full lock in 0.1 s) |
-| `TUNE.stRampLo` Time to full lock, slow | 0.25 s | how long ◀/▶ (or a key) takes to reach full lock when slow |
+| `TUNE.stRampLo` Time to full lock, slow | 0.20 s | how long ◀/▶ (or a key) takes to reach full lock when slow |
 | `TUNE.stRampHi` Time to full lock at 100 km/h | 0.60 s | same at 100 km/h (in between: linear). A short tap = a small correction |
 | `TUNE.stK0` Steer start | 0.05 | the lock you get the instant you press |
 | `TUNE.stRet` Let-go speed | 12 /s | how fast the wheel comes back when you let go (12 = 0.08 s) |
-| `TUNE.stLim` Full lock vs grip limit | 1.10 | full lock asks for this × the turn the tyres can hold at this speed (was ~3× at 100 km/h) |
-| `TUNE.yrOut` Stop turning on let-go | 22 /s | how fast the car stops rotating when the steering eases off (was 7-11 /s, the car kept turning ~0.4 s) |
+| `TUNE.stLim` Full lock vs grip limit | 1.40 | full lock asks for this × the turn the tyres can hold at this speed (was ~3× at 100 km/h) |
+| `TUNE.yrOut` Stop turning on let-go | 45 /s | how fast the car stops rotating when the steering eases off (v88e: 22; before drive24 7-11 /s) |
+| `TUNE.yrIn` Turn build-up | 60 /s | how fast the rotation builds when you steer (0 = old 11→7 /s, ~0.1 s lag) |
+| `TUNE.stIn` / `TUNE.stOut` Steer-in / return rate | 60 / 45 /s | how fast the front wheels follow the steering (were 11 / 16 /s, ~0.09 s lag). Less lag = turns start sooner AND stop sooner, so less overshoot |
+| `TUNE.stTouchDig` Touch ◀▶ act like arrow keys | ON | touch buttons feed the same on/off value as the keys (before: two ramps stacked, the steering kept building ~0.2 s after the finger lifted) |
+| `TUNE.stRampV0` Slow ramp starts above | 0 km/h | the ramp is `stRampLo` up to this speed, then grows to `stRampHi` at 100 km/h |
+| `TUNE.stRampRev` Counter-steer ramp | 0 s | if > 0: a press against the way the car is rotating ramps over this many seconds |
+| `TUNE.stHold` / `TUNE.stRampFast` Hold = turn | 0.15 s / 0 (off) | if `stRampFast` > 0: after holding ◀/▶ this long the ramp speeds up to `stRampFast` s |
+| `TUNE.asMax` Lane assist: widest angle | 0.8 rad | the lane assist (`TUNE.assist`, with no steering input) only acts within this angle of the street (since drive24b it also works on back streets) |
 
 Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next route the game plans; `98d_drive24.js` for followed cars):
 | knob | default | what it does |
@@ -43,6 +50,7 @@ Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next r
 | `TUNE.rtGrid` Back-street cost | ×1.35 | filler-grid streets cost this much more than real streets |
 | `TUNE.rtNarrow` Narrow-street extra | 0.20 | up to +20 % on streets narrower than 24 m |
 | `TUNE.rtSimp` Route smoothing | 3 m | removes lane wiggles from the route line (0 = off) |
+| `TUNE.rtJog` Straighten jogs | 14 m | a route that bends 30-55° and straight back (crossing a road or leaving a bridge through an off-line junction) goes straight if it stays within this many metres (0 = off) |
 | `TUNE.tcLead` Turn warning ahead | 5 s | the arrow shows the next turn (left/right + metres) this long before it… |
 | `TUNE.tcMin` Turn warning at least | 90 m | …or this far before it, whichever is more. Amber when < 3 s |
 | `TUNE.fvRad` Followed car: corner radius | 16 m | Hilde, Kaiser, rivals and the escort car drive round corners on this radius |
