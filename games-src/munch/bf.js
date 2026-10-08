@@ -56,7 +56,8 @@ function bfKick(){const me=viewSeat();if(BF.kicking||!G||me<0||!validMoves(me).s
   if(typeof sfx==='function')sfx('smash');try{navigator.vibrate&&navigator.vibrate([25,40,60])}catch(e){}
   if(d)d.classList.add('bf-kicking');if(tb)tb.classList.add('bf-shake');
   setTimeout(()=>{if(typeof sfx==='function')sfx('door');if(tb)tb.classList.remove('bf-shake');BF.kicking=false;BF.mine=1;uiAct({act:'kick'})},520)}
-function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me&&G.mode!=='ai';const kind=c.t==='monster'?'mon':c.t==='curse'?'curse':'other';
+function bfReveal(id,who){if(cd(id).t==='monster'&&bfBossClip(id,who))return;bfRevealCard(id,who)}
+function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who===me&&G.mode!=='ai';const kind=c.t==='monster'?'mon':c.t==='curse'?'curse':'other';
   const ban=kind==='mon'?'A MONSTER!':kind==='curse'?'CURSED!':mine?'Into your hand':'Into '+P(who).nm+'’s hand';
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
@@ -65,22 +66,47 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
   const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
   if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur);
-  if(kind==='mon')bfBossClip(c.k)}
-// ---- boss reveal clip: six big monsters get a 6 s painted clip the first time they are revealed in a game ----
-// Muted, playsinline, tap/Esc to skip. It sits in a strip at the top and never blocks the board; a clip that cannot load or start is silently dropped.
+}
+// ---- boss reveal clip: six big monsters get a 6 s painted clip the first time they are kicked open in a game ----
+// The clip IS the reveal: the door card opens into the video, which fills the table (soft vignette edges, no box), the monster's name and level
+// show over it, then the video shrinks into the monster's card spot. The computer waits (UI.hold) and any tap/Esc/Space skips to the landed card.
+// No motion (reduced-motion, jsdom), a clip that fails to load, or no first frame within 700 ms: nothing is shown and the normal card reveal runs.
 const BOSS_CLIPS={wyrm:1,inferno:1,tentacles:1,pharaoh:1,skygrif:1,dread:1};let bossSeen={gid:null,k:{}};
-function bfBossClip(k){if(!k||!BOSS_CLIPS[k]||!BF.motion()||!G||typeof document==='undefined'||!document.body)return;
-  if(bossSeen.gid!==G.gid)bossSeen={gid:G.gid,k:{}};if(bossSeen.k[k]||document.getElementById('bfclip'))return;bossSeen.k[k]=1;
-  let box,v,fin=false,T,T2;
-  const end=()=>{if(fin)return;fin=true;clearTimeout(T);clearTimeout(T2);document.removeEventListener('keydown',esc,true);try{v.pause();v.removeAttribute('src');v.load()}catch(e){}if(box.parentNode)box.parentNode.removeChild(box)};
-  const esc=e=>{if(e.key==='Escape')end()};
-  try{box=document.createElement('div');box.id='bfclip';box.setAttribute('aria-hidden','true');
-    v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';v.autoplay=true;
-    box.appendChild(v);box.addEventListener('click',end);v.addEventListener('ended',end);v.addEventListener('error',end);
-    v.addEventListener('playing',()=>{box.classList.add('on');try{if(typeof sfx==='function')sfx('roar')}catch(e){}});
-    T=setTimeout(()=>{if(!box.classList.contains('on'))end()},4000);T2=setTimeout(end,12000);
-    document.addEventListener('keydown',esc,true);document.body.appendChild(box);v.src='media/doorkick-'+k+'-boss.mp4';
-    const p=v.play();if(p&&p.catch)p.catch(end)}catch(e){if(box&&box.parentNode)box.parentNode.removeChild(box)}}
+function bfResched(){try{if(typeof aiTimer!=='undefined'&&aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}catch(e){}}
+function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.motion()||!G||typeof document==='undefined'||!document.body||document.getElementById('bfclip'))return false;
+  const tb=document.querySelector('.table');const T=tb&&tb.getBoundingClientRect();if(!T||T.width<150||T.height<150)return false;
+  if(bossSeen.gid!==G.gid)bossSeen={gid:G.gid,k:{}};if(bossSeen.k[k])return false;
+  const mine=who===viewSeat()&&G.mode!=='ai';const door=document.querySelector('.bfdoor')||document.querySelector('.pile.pl');const D=door&&door.getBoundingClientRect();
+  let box,v,dim,nm,fin=false,live=false,t1,t2,t3,swallow=0;
+  const px=r=>({left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
+  const cleanup=()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);document.removeEventListener('keydown',key,true);document.removeEventListener('pointerdown',tap,true);
+    try{v.pause();v.removeAttribute('src');v.load()}catch(e){}if(box.parentNode)box.parentNode.removeChild(box);BF.clip=false;UI.hold=0;bfResched()};
+  // fly the clip into the monster card's spot (FLIP), then it is the card
+  const end=()=>{if(fin)return;fin=true;clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);nm.classList.remove('on');
+    const m=document.querySelector('.arena .row.mons .mon .card')||document.querySelector('.arena .row.mons .mon');const M=m&&m.getBoundingClientRect();
+    if(!live||!M||!M.width||!BF.motion()){cleanup();return}
+    try{const cur=box.getBoundingClientRect();const a=box.animate([{...px(cur),borderRadius:'0px',opacity:1},{...px(M),borderRadius:'6px',opacity:1,offset:.8},{...px(M),borderRadius:'6px',opacity:0}],{duration:460,easing:'cubic-bezier(.5,0,.2,1)',fill:'forwards'});
+      box.classList.add('fly');a.onfinish=cleanup;setTimeout(cleanup,700)}catch(e){cleanup()}};
+  const key=e=>{if(e.key==='Escape'||e.key===' '||e.key==='Enter'){e.preventDefault();e.stopPropagation();end()}};
+  const tap=e=>{e.stopPropagation();e.preventDefault();swallow=Date.now()+400;end()};
+  const eat=e=>{if(Date.now()<swallow){e.stopPropagation();e.preventDefault()}};
+  try{box=document.createElement('div');box.id='bfclip';box.setAttribute('aria-hidden','true');box.style.opacity='0';Object.assign(box.style,px(T));
+    dim=document.createElement('div');dim.className='bfc-dim';v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';v.autoplay=true;
+    nm=document.createElement('div');nm.className='bfc-name';nm.textContent=(c.n||'').toUpperCase()+' · LV '+c.lvl;box.append(dim,v,nm);
+    bossSeen.k[k]=1;BF.clip=true;UI.hold=Date.now()+7400;bfResched();
+    // no first frame in time / any error: silently drop it and show the normal card reveal
+    const bail=()=>{if(fin||live)return;fin=true;cleanup();bfRevealCard(id,who)};
+    v.addEventListener('error',()=>{if(live)end();else bail()});v.addEventListener('ended',end);
+    v.addEventListener('playing',()=>{if(live||fin)return;live=true;clearTimeout(t1);
+      box.style.opacity='1';if(D&&D.width){try{box.animate([{...px(D),borderRadius:'10px'},{...px(T),borderRadius:'0px'}],{duration:480,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}
+        try{door.animate([{transform:'perspective(500px) rotateY(0) scale(1)',opacity:1},{transform:'perspective(500px) rotateY(-75deg) scale(1.25)',opacity:0}],{duration:420,easing:'ease-in'})}catch(e){}}
+      try{if(typeof sfx==='function'){if(!mine)sfx('door');setTimeout(()=>{try{sfx('roar')}catch(e){}},mine?0:200)}}catch(e){}
+      t3=setTimeout(()=>nm.classList.add('on'),900);setTimeout(()=>nm.classList.remove('on'),2500);
+      t2=setTimeout(end,6200);UI.hold=Date.now()+6600});
+    t1=setTimeout(bail,700);
+    document.addEventListener('keydown',key,true);document.addEventListener('pointerdown',tap,true);document.addEventListener('click',eat,true);
+    document.body.appendChild(box);v.src='media/doorkick-'+k+'-boss.mp4';const p=v.play();if(p&&p.catch)p.catch(()=>{if(live)end();else bail()});
+    return true}catch(e){fin=true;try{cleanup()}catch(_){}return false}}
 // ---- cause and effect: cards fly from the rival who played them, numbers float up where they changed ----
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;

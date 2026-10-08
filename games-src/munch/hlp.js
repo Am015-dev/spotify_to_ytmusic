@@ -92,7 +92,7 @@ const QPHASE={help:'qHelp',ward:'qWard',rescue:'qRescue',pick:'qPick'};
 // the phase the player is deciding in (null when it is somebody else's move, or something else is on screen)
 function hlpPhase(){try{
   if(!G||G.winner||UI.pass!=null)return null;const me=viewSeat();if(me<0||!P(me)||!P(me).human||G.mode==='ai')return null;
-  if(sideToAct()!==me)return null;if(BF.kicking||document.getElementById('bfrev')||BF.drag)return null;
+  if(sideToAct()!==me)return null;if(BF.kicking||BF.clip||document.getElementById('bfrev')||BF.drag)return null;
   if(UI.menu||UI.zoom!=null||GX.open)return null;const md=document.getElementById('modal');if(md&&!md.hidden)return null;
   if(BF.ask)return 'ask';if(BF.pick!=null)return 'drop';if(UI.sell)return 'sell';
   if(G.q)return QPHASE[G.q.kind]||'qOffer';

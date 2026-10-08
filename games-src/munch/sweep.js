@@ -18,13 +18,13 @@ const PAGE = `(() => {
   const words = t => t.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w));
   window.__sw = {
     sig() { return JSON.stringify([G.turn, G.active, G.phase, G.ln, G.q && G.q.kind, G.cb && G.cb.stage, G.cb && G.cb.mons.length, G.cb && G.cb.os.length, UI.menu ? 1 : 0, UI.sell ? UI.sell.join('.') : 0, !!document.getElementById('bfrev'), BF.pick, !!BF.ask, GX.open || '', !document.getElementById('modal').hidden]); },
-    st() { const me = 0, s = sideToAct(); return { turn: G.turn, win: G.winner, mine: s === me && P(me).human, phase: G.phase, q: G.q && G.q.kind, rev: !!document.getElementById('bfrev'), kicking: BF.kicking, drag: !!BF.drag, pick: BF.pick, modal: !document.getElementById('modal').hidden, open: GX.open || '', menu: !!UI.menu, sell: !!UI.sell, ask: !!BF.ask }; },
+    st() { const me = 0, s = sideToAct(); return { turn: G.turn, win: G.winner, mine: s === me && P(me).human, phase: G.phase, q: G.q && G.q.kind, rev: !!document.getElementById('bfrev') || !!document.getElementById('bfclip'), kicking: BF.kicking, drag: !!BF.drag, pick: BF.pick, modal: !document.getElementById('modal').hidden, open: GX.open || '', menu: !!UI.menu, sell: !!UI.sell, ask: !!BF.ask }; },
     // things a player would tap right now (only glowing / lit things and the big buttons)
     cands() {
       const out = [], W = innerWidth, H = innerHeight;
       const add = (e, kind, pts) => { if (!vis(e) || e.disabled) return; const r = e.getBoundingClientRect();
         for (const [fx, fy] of pts || [[.5, .5]]) { const x = r.left + r.width * fx, y = r.top + r.height * fy; if (x < 2 || y < 2 || x > W - 2 || y > H - 2) continue; const t = document.elementFromPoint(x, y); if (t && (e === t || e.contains(t))) { out.push({ kind, x, y, id: e.dataset.card || e.dataset.bfz || e.dataset.opp || (e.textContent || '').trim().slice(0, 20), bfz: e.dataset.bfz || '' }); return } } };
-      if (document.getElementById('bfrev')) return out;
+      if (document.getElementById('bfrev') || document.getElementById('bfclip')) return out;
       const tg = [...document.querySelectorAll('[data-bfz]')];
       if (tg.length) { for (const e of tg) add(e, 'target', [[.5, .5], [.3, .4], [.7, .6], [.5, .25]]); return out }
       const mod = document.getElementById('modal'); if (!mod.hidden) { for (const b of mod.querySelectorAll('button')) { if (/new game|play again/i.test(b.textContent)) continue; add(b, 'modal') } return out }

@@ -36,5 +36,18 @@ The laptop made the pictures; the Linux session wires them in, tests and deploys
   - Clips are separate files (not inlined), so they don't count against the 4 MB page cap.
   - Reuse Crown's clip player in `../kot/media.js` if it fits.
 
+## Portraits, card backs and tables (new, 2026-10-08)
+All files are in `games/doorkick-dungeon/media/` (separate files, not inlined), 780 KB in total. They are Flow paintings in the card style; prompts are in laptop `game-assets/cards/doorkick/extras/*.json`.
+- **Portraits** `camp-<id>.webp`, 256×256: `hobb`, `pip`, `tansy`, `bodkin`, `grub`, `morwen`, `wrenna`.
+  - These are exactly the file names `campaign.json` already uses. Set `artBase: 'media/'` in the `GXC.init` call in `campaign.js` and the story screens show them instead of the emoji (`gx-campaign.js` line ~138).
+  - Also use them on the rival seats, the title cast list, the diary and the win screen. Pip is the player's hero.
+- **Card backs** `back-<id>.webp`, 300×426 (card shape 100:142):
+  - `door` and `treasure` are the default deck backs (piles and face-down cards).
+  - `cellar-oak`, `corridor-brass` and `crypt-bone` are the campaign `cardback` unlocks with the same ids.
+- **Tables** `table-<id>.webp`, 1376×768 (`table-tavern-phone` is 768×1376).
+  - `tavern` is the new default table, with a clear centre for the door/fight area. Use it in place of the CSS wood in `tbl.css`; that is where `--img-table` is set.
+  - `vault-stone` and `golden-vault` are the campaign `table` unlocks.
+  - Keep the CSS wood as the fallback while the image loads, and on Low graphics.
+
 ## Optional
 - `slurper.mp4` (8 s, 16:9, laptop `cards\doorkick\`) is a test clip of the Sock Slurper.

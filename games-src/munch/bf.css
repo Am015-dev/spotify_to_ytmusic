@@ -128,8 +128,10 @@ html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
 .story-btn{display:block;width:100%;min-height:56px;font-size:1.2rem!important;margin:8px 0 4px}
 
 /* boss reveal clip: a 16:9 strip at the top, invisible until the video plays, tap to skip, the board stays usable below it */
-#bfclip{position:fixed;left:0;right:0;top:0;z-index:120;aspect-ratio:16/9;max-height:34vh;margin:0 auto;opacity:0;transition:opacity .25s;background:#0b0618;box-shadow:0 6px 18px rgba(0,0,0,.55);cursor:pointer;touch-action:manipulation;pointer-events:none;overflow:hidden}
-#bfclip.on{opacity:1;pointer-events:auto}
-#bfclip video{width:100%;height:100%;object-fit:cover;display:block}
-#bfclip::after{content:'tap to skip';position:absolute;right:8px;bottom:6px;padding:2px 9px;border-radius:10px;background:rgba(0,0,0,.55);color:#fff;font:600 11px system-ui,sans-serif}
+#bfclip{position:fixed;z-index:120;overflow:hidden;pointer-events:none;touch-action:none;background:transparent}
+#bfclip .bfc-dim{position:absolute;inset:0;background:radial-gradient(ellipse 85% 80% at 50% 48%,rgba(8,4,14,.55),rgba(8,4,14,.92));-webkit-mask-image:radial-gradient(ellipse 54% 54% at 50% 50%,#000 66%,transparent 100%);mask-image:radial-gradient(ellipse 54% 54% at 50% 50%,#000 66%,transparent 100%)}
+#bfclip video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%;display:block;-webkit-mask-image:radial-gradient(ellipse 53% 52% at 50% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 53% 52% at 50% 50%,#000 58%,transparent 100%)}
+#bfclip.fly video,#bfclip.fly .bfc-dim{-webkit-mask-image:none;mask-image:none}
+#bfclip .bfc-name{position:absolute;left:50%;bottom:24%;translate:-50% 0;width:92%;text-align:center;font:900 clamp(20px,6.4vw,42px)/1.1 var(--title);letter-spacing:.04em;color:#fff2c0;text-shadow:0 3px 0 #4a0c02,0 0 22px #ff5a1a,0 0 3px #000;opacity:0;transition:opacity .35s}
+#bfclip .bfc-name.on{opacity:1}
 @media (prefers-reduced-motion: reduce){#bfclip{display:none}}
