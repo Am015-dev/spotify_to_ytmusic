@@ -23,6 +23,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  // roam: open the logbook ALL (TEST) tab
  await ev(()=>{__tm.roam()});await p.waitForFunction(()=>__tm.st().state==='roam'&&__tm.st().roam,null,{timeout:300000});await p.waitForTimeout(4000);
  console.log('ST',JSON.stringify(await ev(()=>__tm.st())));
+ for(let k=0;k<6;k++){const sk=await ev(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.offsetParent&&/SKIP/.test(b.textContent));if(!b)return null;const r=b.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]});if(!sk)break;await tapXY(sk[0],sk[1],2500)}
  console.log('roam gear',JSON.stringify(await gear()));await shot('t3_roam');
  if(!await tap('#roamLogBtn',1500)||await ev(()=>document.querySelector('#journal').hidden)){console.log('log btn hidden → journalOpen()');await ev(()=>__tm.log())}
  await tap('#journal .jt [data-t="tm"]',1500);console.log('all rows',await ev(()=>document.querySelectorAll('#jBody [data-tmi]').length),await ev(()=>[...document.querySelectorAll('#journal .tmH')].map(e=>e.textContent).join(' | ')));await shot('t4_logbook_all');
