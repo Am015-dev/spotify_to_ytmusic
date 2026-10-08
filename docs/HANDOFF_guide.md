@@ -14,3 +14,7 @@
 - Pattern: generator like SU_car, with st() step markers so the guide plays booklet order. Add to GAR_SETS (tpl:1), RIDES row, changelog/checklist.
 - Then make AI traffic + rivals use them (see 93_cars_lego.js LEGO traffic / CR_rivB).
 - Release: merge CURRENT live → tools/build.sh vXX → QUICK review → DEPLOY message to the coordinator (never deploy.sh).
+## Reviewer PASS c7cfa776 (2026-10-08); DEPLOY v88l sent to the coordinator. Fix with the next release (not blocking):
+- (a) BUILD IT: preselect the step's part AND colour in the palette (strip still shows red defaults).
+- (b) Guide parts panel is ~60 % empty: shrink it to its content (and let SB_area give the car the space).
+- (c) Ghost taps sometimes need 2–3 taps in automation: add checklist item "BUILD IT: one tap on the green ghost places it"; if Alex fails it, widen the hit area (nearest stud ±1) / find why GB_act is not reached.
