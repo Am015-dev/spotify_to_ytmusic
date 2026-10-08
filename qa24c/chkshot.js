@@ -1,0 +1,5 @@
+// v88f checklist shot: ⚙ → ✔ CHECKLIST → PASS on item 1 → shot; sizes (text ≥12 px, buttons ≥44 px); UPDATES header button; console errors
+const L=require('../qa25/lib.js');(async()=>{const T=await L(process.argv[2],process.argv[3]);const{ev,tap,shot,pg}=T;await pg.waitForTimeout(1500);
+ await tap('#tuG',800);await tap('#tuD .ckB',800);await tap('#odChk .ci .pa',600);await shot('chk_open');
+ console.log('SIZES',JSON.stringify(await ev(()=>{const o={small:[],btn:[]};for(const e of document.querySelectorAll('#odChk *')){const r=e.getBoundingClientRect();if(!r.width)continue;const fs=parseFloat(getComputedStyle(e).fontSize);if(e.childNodes[0]&&e.childNodes[0].nodeType===3&&e.textContent.trim()&&fs<12)o.small.push(e.textContent.slice(0,20)+':'+fs);if(e.tagName==='BUTTON'&&(r.height<44||r.width<44))o.btn.push(e.textContent+':'+Math.round(r.width)+'x'+Math.round(r.height))}o.text=__chk.text();return o})));
+ await tap('#odChk .x',500);await ev(()=>__upd.open());await T.pg.waitForTimeout(500);await shot('chk_updates');await T.close()})();
