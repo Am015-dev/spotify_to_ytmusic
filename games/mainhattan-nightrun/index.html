@@ -302,7 +302,8 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     if(this.int&&BT.mode==='file')this.isched(a);
     if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
-    while(BT.t0+this.step*s16<now+.12){this.play(this.step,BT.t0+this.step*s16,s16);this.step++;}},
+    const quiet=TR.list.length>0&&!/[?&]synth=1/.test(location.search);   // owner: never the old synth tune when real songs exist; the beat grid keeps running silently until the song is in
+    while(BT.t0+this.step*s16<now+.12){if(!quiet)this.play(this.step,BT.t0+this.step*s16,s16);this.step++;}},
   play(n,t,spb){const s=n%16,bar=Math.floor(n/16)%4,r=this.root+[0,0,-2,-4][bar];
     if(s%4===0)this.osc(t,'sine',150,.28,.9,this.mus,38);
     if(s===4||s===12){if(this.boss)this.noise(t,.16,.5,1200,this.mus,'bandpass');else if(BT.stage!=='stage1')this.noise(t,.1,.22,2500,this.mus,'bandpass');}
