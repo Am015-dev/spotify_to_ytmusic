@@ -1,21 +1,22 @@
 /* ---------- much more to buy: permanent TUNE perks in the garage (levels, scaling prices, a recommended pick), more pit-stop upgrades, five new power-ups
    that can be bought into the drop pool, and "you can afford N upgrades" prompts. Everything hooks in from here (wrappers), the shop/garage files stay as they were. ---------- */
+const RGN=[50,44,38,33,28,24];                                   // seconds per shield for Shield Regen levels 1 to 6
 const TP_DEF=[
-  {id:'dmg',n:'Power Core',   p:45, max:10,c:'#ff5a3d',pri:90,ic:'M13 2L4 14h6l-1 8 9-12h-6z',                                 t:l=>'+'+8*l+'% shot damage'},
-  {id:'rof',n:'Rapid Coil',   p:55, max:8, c:'#ffe14d',pri:80,ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z',                                 t:l=>'+'+6*l+'% double shots'},
-  {id:'shd',n:'Shield Plating',p:120,max:3, c:'#19e3ff',pri:95,ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z',                  t:l=>'Start with '+l+' shield'+(l>1?'s':'')},
-  {id:'rgn',n:'Shield Regen', p:150,max:4, c:'#19e3ff',pri:70,ic:'M12 4a8 8 0 106.3 3L21 4v7h-7l2.6-2.6A5.5 5.5 0 1012 17.5V20a8 8 0 010-16z',t:l=>'A shield every '+[50,42,36,30][l-1]+' s'},
-  {id:'hul',n:'Hull Plating', p:200,max:3, c:'#3dffb0',pri:100,ic:'M12 21s-8-5.5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 5.5-8 11-8 11z',t:l=>'+'+l+' max hull (now '+(5+l)+')'},
-  {id:'dsh',n:'Dash Capacitor',p:130,max:3, c:'#19e3ff',pri:75,ic:'M2 10h11V5l9 7-9 7v-5H2z',                                  t:l=>'+'+l+' dash charge'+(l>1?'s':'')},
-  {id:'mag',n:'Magnet Coil',  p:35, max:6, c:'#3dffb0',pri:40,ic:'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z',                    t:l=>'+'+20*l+'% pickup range'},
-  {id:'ckp',n:'Combo Keeper', p:50, max:6, c:'#ffb020',pri:65,ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',            t:l=>'Tier lasts +'+2*l+' beats'},
-  {id:'pwd',n:'Power Amp',    p:80, max:5, c:'#ff2d95',pri:60,ic:'M12 2l3 7 7 .8-5.3 4.7 1.6 7.2L12 18l-6.3 3.7 1.6-7.2L2 9.8 9 9z',t:l=>'Power-ups last +'+10*l+'%'},
-  {id:'crt',n:'Critical Core',p:60, max:8, c:'#ff5a3d',pri:62,ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z',     t:l=>l*4+'% shots hit 3x'},
-  {id:'drn',n:'Wingman Drone',p:260,max:3, c:'#c08aff',pri:85,ic:'M12 3l7 9-7 9-7-9zM12 8l-3 4 3 4 3-4z',                        t:l=>l+' drone'+(l>1?'s':'')+' fire with you'},
-  {id:'rev',n:'Revive Token', p:400,max:3, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
-  {id:'nmn',n:'Neon Mining',  p:70, max:8, c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
+  {id:'dmg',n:'Power Core',   p:45, max:12,c:'#ff5a3d',pri:90,ic:'M13 2L4 14h6l-1 8 9-12h-6z',                                 t:l=>'+'+8*l+'% shot damage'},
+  {id:'rof',n:'Rapid Coil',   p:55, max:12, c:'#ffe14d',pri:80,ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z',                                 t:l=>'+'+6*l+'% double shots'},
+  {id:'shd',n:'Shield Plating',p:120,max:5, c:'#19e3ff',pri:95,ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z',                  t:l=>'Start with '+l+' shield'+(l>1?'s':'')},
+  {id:'rgn',n:'Shield Regen', p:150,max:6, c:'#19e3ff',pri:70,ic:'M12 4a8 8 0 106.3 3L21 4v7h-7l2.6-2.6A5.5 5.5 0 1012 17.5V20a8 8 0 010-16z',t:l=>'A shield every '+RGN[l-1]+' s'},
+  {id:'hul',n:'Hull Plating', p:200,max:5, c:'#3dffb0',pri:100,ic:'M12 21s-8-5.5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 5.5-8 11-8 11z',t:l=>'+'+l+' max hull (now '+(5+l)+')'},
+  {id:'dsh',n:'Dash Capacitor',p:130,max:5, c:'#19e3ff',pri:75,ic:'M2 10h11V5l9 7-9 7v-5H2z',                                  t:l=>'+'+l+' dash charge'+(l>1?'s':'')},
+  {id:'mag',n:'Magnet Coil',  p:35, max:10,c:'#3dffb0',pri:40,ic:'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z',                    t:l=>'+'+20*l+'% pickup range'},
+  {id:'ckp',n:'Combo Keeper', p:50, max:10,c:'#ffb020',pri:65,ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',            t:l=>'Tier lasts +'+2*l+' beats'},
+  {id:'pwd',n:'Power Amp',    p:80, max:10,c:'#ff2d95',pri:60,ic:'M12 2l3 7 7 .8-5.3 4.7 1.6 7.2L12 18l-6.3 3.7 1.6-7.2L2 9.8 9 9z',t:l=>'Power-ups last +'+10*l+'%'},
+  {id:'crt',n:'Critical Core',p:60, max:12,c:'#ff5a3d',pri:62,ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z',     t:l=>l*4+'% shots hit 3x'},
+  {id:'drn',n:'Wingman Drone',p:260,max:5, c:'#c08aff',pri:85,ic:'M12 3l7 9-7 9-7-9zM12 8l-3 4 3 4 3-4z',                        t:l=>l+' drone'+(l>1?'s':'')+' fire with you'},
+  {id:'rev',n:'Revive Token', p:400,max:5, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
+  {id:'nmn',n:'Neon Mining',  p:70, max:12,c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
 const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
-const tpPrice=(d,l)=>Math.round(d.p*(1+.55*l+.09*l*l)/5)*5;                 // price of level l+1: 45, 70, 100, 135 ... (Power Core), a full set costs about 24,000 Neon
+const tpPrice=(d,l)=>Math.round(d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
 const TP={revLeft:0,rgnT:0,boost:{},
   l(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));}};
 GA.tune={};{const o=load('mnr_tune',{});if(o&&typeof o==='object'&&!Array.isArray(o))for(const d of TP_DEF)if(isFinite(o[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(o[d.id])));}
@@ -26,11 +27,11 @@ GA.tab='tune';
 UBY.lp.ok=null;                                              // Long Power works now (power-ups are 50% longer per level, see PW.give below)
 const NEWU=[
   {id:'dm',n:'Overcharge',  t:'+12% shot damage',        p:30,max:5,c:'#ff5a3d',ic:TP_BY.dmg.ic},
-  {id:'cr',n:'Crit Chip',   t:'+5% chance of a 3x hit',  p:32,max:4,c:'#ff5a3d',ic:TP_BY.crt.ic},
-  {id:'hl',n:'Hull Patch',  t:'Repair 1 hull now',       p:30,max:4,c:'#3dffb0',ic:TP_BY.hul.ic,ok:()=>P&&P.hp<P.max},
-  {id:'mh',n:'Hull Plating',t:'+1 max hull, repaired',   p:60,max:2,c:'#3dffb0',ic:TP_BY.hul.ic},
-  {id:'dr',n:'Drone',       t:'A wingman fires with you',p:50,max:2,c:'#c08aff',ic:TP_BY.drn.ic},
-  {id:'rv',n:'Revive Token',t:'Come back once',          p:90,max:2,c:'#ff2d95',ic:TP_BY.rev.ic}];
+  {id:'cr',n:'Crit Chip',   t:'+5% chance of a 3x hit',  p:32,max:5,c:'#ff5a3d',ic:TP_BY.crt.ic},
+  {id:'hl',n:'Hull Patch',  t:'Repair 1 hull now',       p:30,max:5,c:'#3dffb0',ic:TP_BY.hul.ic,ok:()=>P&&P.hp<P.max},
+  {id:'mh',n:'Hull Plating',t:'+1 max hull, repaired',   p:60,max:3,c:'#3dffb0',ic:TP_BY.hul.ic},
+  {id:'dr',n:'Drone',       t:'A wingman fires with you',p:50,max:3,c:'#c08aff',ic:TP_BY.drn.ic},
+  {id:'rv',n:'Revive Token',t:'Come back once',          p:90,max:3,c:'#ff2d95',ic:TP_BY.rev.ic}];
 for(const u of NEWU){SH.UPG.push(u);UBY[u.id]=u;}
 /* ----- effects (all through wrappers) ----- */
 const tpDmg=()=>1+.08*TP.l('dmg')+.12*SH.n('dm');
@@ -55,11 +56,11 @@ NR.on('runStart',()=>{TP.revLeft=TP.l('rev');TP.rgnT=0;TP.dn=0;TP.drones=[];
   const h=TP.l('hul');if(h){P.max=5+h;P.hp=Math.min(P.max,P.hp+h);}
   SH.sh+=TP.l('shd');SH.spare=Math.max(SH.spare,SH.dmax);});
 NR.on('tick',dt=>{if(!G.live||G.dead)return;
-  const r=TP.l('rgn');if(r){const cap=1+TP.l('shd');if(SH.sh<cap){TP.rgnT+=dt;if(TP.rgnT>=[50,42,36,30][r-1]){TP.rgnT=0;SH.sh++;floater(P.x,P.y-28,'SHIELD READY','#19e3ff');AU.sfx('up');}}else TP.rgnT=0;}
+  const r=TP.l('rgn');if(r){const cap=1+TP.l('shd');if(SH.sh<cap){TP.rgnT+=dt;if(TP.rgnT>=RGN[r-1]){TP.rgnT=0;SH.sh++;floater(P.x,P.y-28,'SHIELD READY','#19e3ff');AU.sfx('up');}}else TP.rgnT=0;}
   if(PW.on('bub'))P.inv=Math.min(P.inv,0);
   NR.mod.mag=PW.on('mag')?1500:TP.mag0;SH.nx=TP.nx0*(PW.on('nr')?2:1);
   const n=tpDrones(),ds=TP.drones;while(ds.length<n)ds.push({x:P.x,y:P.y});ds.length=n;      // drones follow the ship loosely
-  const offs=[[-14,-38],[-14,38],[-44,0]];ds.forEach((d,i)=>{d.x+=(P.x+offs[i][0]-d.x)*Math.min(1,dt*8);d.y+=(P.y+offs[i][1]-d.y)*Math.min(1,dt*8);});});
+  const offs=[[-14,-38],[-14,38],[-44,0],[-34,-72],[-34,72]];ds.forEach((d,i)=>{d.x+=(P.x+offs[i][0]-d.x)*Math.min(1,dt*8);d.y+=(P.y+offs[i][1]-d.y)*Math.min(1,dt*8);});});
 NR.on('fire',f=>{const ds=TP.drones;if(ds&&ds.length&&((TP.dn=(TP.dn||0)+1)%2===0)){const dm=tpDmg()*.7;for(const d of ds)G.pb.push({x:d.x+12,y:d.y,vx:900,vy:0,dm,pf:0,dr:1});}
   if(PW.on('tri')){G.pb.push({x:f.x,y:f.y-8,vx:860,vy:-170,dm:.8*tpDmg(),pf:0},{x:f.x,y:f.y+8,vx:860,vy:170,dm:.8*tpDmg(),pf:0});}});
 
@@ -86,6 +87,16 @@ Object.assign(PWK,{
 for(const [id,n,t,p,ic] of [['pu_mag','Magnet Storm','Power-up: pulls in every pickup',120,'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z'],['pu_bub','Bubble','Power-up: hits bounce off for 2 bars',160,'M12 3a9 9 0 100 18 9 9 0 000-18z'],
     ['pu_tri','Triple Shot','Power-up: two extra side shots',140,'M3 11h18v2H3zM4 5l17 4-1 2L3 7zM4 19l17-4-1-2L3 17z'],['pu_nr','Neon Rain','Power-up: kills pay double Neon',130,'M12 2l8.5 5v10L12 22l-8.5-5V7z'],
     ['pu_fix','Repair Kit','Power-up: +1 hull at once',100,'M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z']])CREW.push({id,n,t,p,ic});
+
+/* ----- what each level of a pit-stop upgrade does (shown on its card; the pips under it show the level) ----- */
+const LVT={fr:l=>['Extra shot on every 4th beat step','Extra shot on every 2nd step','Extra shot on every step','Plus a quarter-step shot','Plus a three-quarter shot'][l-1],
+  dc:l=>'Dash charges +'+l,mg:l=>'Pickup range +'+(70*l)+' px',sh:l=>l+' shield'+(l>1?'s':'')+' in total',lp:l=>'Power-ups last '+(30*l)+'% longer',
+  wd:l=>'On-beat window '+(14*l)+' ms wider',hm:l=>'Shots steer '+['a little','well','strongly','hard','almost always hit'][l-1],ck:l=>'Tier lasts '+(4*l)+' beats longer',
+  db:l=>'Dash hits for '+(5*l)+' damage',sb:l=>'Gold pulse shots +'+(30*l)+'%',nx:l=>'Kills drop +'+(30*l)+'% Neon',
+  dm:l=>'Shot damage +'+(12*l)+'%',cr:l=>(5*l)+'% chance of a 3x hit',mh:l=>'Max hull +'+l+', repaired',dr:l=>l+' wingman'+(l>1?' drones':''),rv:l=>'Come back '+l+' time'+(l>1?'s':''),
+  sc:l=>l+' pair'+(l>1?'s':'')+' of wing guns',rg:l=>['Shoots backwards','Backwards fan, more shots','Backwards fan, fires every shot'][l-1],pc:l=>'Shots pierce '+l+' enem'+(l>1?'ies':'y'),
+  cl:l=>'On-beat kills arc to '+(l+1)+' foes',bt:l=>'On-beat dash slows time '+(.4+.3*l).toFixed(1)+' s',rc:l=>'Shots bounce '+l+'x',as:l=>l+' auto-shield'+(l>1?'s':''),bd:l=>l+' orbiting gun'+(l>1?'s':'')};
+const lvText=(u,l)=>LVT[u.id]&&u.max>1?(LVT[u.id](l)||u.t):u.t;
 
 /* ----- recommended pick + afford counts ----- */
 const afford={tune:0,all:0,rec:null};
@@ -148,7 +159,7 @@ gaDraw();
 SH.draw=function(){const box=$('shCards');box.innerHTML='';const rec=recPit();let aff=0;
   this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),n=this.n(u.id),b=document.createElement('button');b.type='button';if(!c.sold&&this.neon>=pr)aff++;
     b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
-    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}</div><div class="t">${u.t}</div></div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`+(i===rec&&!c.sold?'<span class="rec">RECOMMENDED</span>':'');
+    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}</div><div class="t">${lvText(u,n+1)}</div>${u.max>1?`<div class="pp">${Array.from({length:u.max},(_,k)=>`<i class="${k<n?'on':''}"></i>`).join('')}</div>`:''}</div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`+(i===rec&&!c.sold?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
   $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
   $('shGo').textContent=this.picks?'GO':'SKIP';

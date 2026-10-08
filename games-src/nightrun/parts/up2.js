@@ -7,28 +7,28 @@ const IC={sc:'M3 9h8v2H3zM3 13h8v2H3zM13 4l8 8-8 8z',rg:'M21 9h-8v2h8zM21 13h-8v
   ni:'M12 1l9 11-9 11L3 12zm0 6v3H9v2h3v3h2v-3h3v-2h-3V7z',wn:'M12 2a10 10 0 100 20 10 10 0 000-20zm0 4l2 4h4l-3 3 1 5-4-2-4 2 1-5-3-3h4z',ec:'M4 9h14v6H4zM18 11h3v2h-3zM6 11h2v2H6zM10 11h2v2h-2z',lk:'M12 21s-8-5.5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 5.5-8 11-8 11zM11 8v3H8v2h3v3h2v-3h3v-2h-3V8z',
   tdl:'M12 3a9 9 0 100 18 9 9 0 000-18zm-1 4h2v5.5l3.5 2-1 1.7L11 13z',prc:'M2 11h14V8l6 4-6 4v-3H2z',nint:'M12 1l9 11-9 11L3 12zm0 6v3H9v2h3v3h2v-3h3v-2h-3V7z',sdc:'M3 9h8v2H3zM3 13h8v2H3zM13 4l8 8-8 8z'};
 const NEW2=[
-  {id:'sc',n:'Side Cannons',   t:'Wing guns fire with you',            p:44,max:2,c:'#ff8a3d',ic:IC.sc},
-  {id:'rg',n:'Rear Gun',       t:'Shoots backwards at flankers',       p:36,max:2,c:'#ffb020',ic:IC.rg},
-  {id:'pc',n:'Piercing Shots', t:'Shots pass through enemies',         p:46,max:2,c:'#ffffff',ic:IC.pc,x:'up_pc'},
-  {id:'cl',n:'Chain Lightning',t:'On-beat kills arc to nearby foes',   p:50,max:3,c:'#19e3ff',ic:IC.cl,x:'up_cl'},
-  {id:'bt',n:'Bullet Time',    t:'On-beat dash slows the world',       p:44,max:2,c:'#7dffd8',ic:IC.bt,x:'up_bt'},
-  {id:'rc',n:'Ricochet',       t:'Shots bounce off the edges',         p:34,max:2,c:'#c08aff',ic:IC.rc},
+  {id:'sc',n:'Side Cannons',   t:'Wing guns fire with you',            p:44,max:3,c:'#ff8a3d',ic:IC.sc},
+  {id:'rg',n:'Rear Gun',       t:'Shoots backwards at flankers',       p:36,max:3,c:'#ffb020',ic:IC.rg},
+  {id:'pc',n:'Piercing Shots', t:'Shots pass through enemies',         p:46,max:4,c:'#ffffff',ic:IC.pc,x:'up_pc'},
+  {id:'cl',n:'Chain Lightning',t:'On-beat kills arc to nearby foes',   p:50,max:5,c:'#19e3ff',ic:IC.cl,x:'up_cl'},
+  {id:'bt',n:'Bullet Time',    t:'On-beat dash slows the world',       p:44,max:4,c:'#7dffd8',ic:IC.bt,x:'up_bt'},
+  {id:'rc',n:'Ricochet',       t:'Shots bounce off the edges',         p:34,max:4,c:'#c08aff',ic:IC.rc},
   {id:'og',n:'Overdrive',      t:'Fill the gauge for double fire',     p:56,max:1,c:'#ff5a3d',ic:IC.og,x:'up_og'},
-  {id:'as',n:'Auto-Shield',    t:'Shield appears when hull is low',    p:46,max:2,c:'#19e3ff',ic:IC.as},
-  {id:'bd',n:'Beat Drone',     t:'Orbiting gun shoots every beat',     p:54,max:2,c:'#ffe14d',ic:IC.bd,x:'up_bd'},
-  {id:'sm',n:'Score Magnet',   t:'Shards fly in and pay more',         p:24,max:2,c:'#3dffb0',ic:IC.sm},
-  {id:'ni',n:'Neon Interest',  t:'Held Neon grows at every pit stop',  p:40,max:3,c:'#19e3ff',ic:IC.ni},
+  {id:'as',n:'Auto-Shield',    t:'Shield appears when hull is low',    p:46,max:3,c:'#19e3ff',ic:IC.as},
+  {id:'bd',n:'Beat Drone',     t:'Orbiting gun shoots every beat',     p:54,max:3,c:'#ffe14d',ic:IC.bd,x:'up_bd'},
+  {id:'sm',n:'Score Magnet',   t:'Shards fly in and pay more',         p:24,max:4,c:'#3dffb0',ic:IC.sm},
+  {id:'ni',n:'Neon Interest',  t:'Held Neon grows at every pit stop',  p:40,max:5,c:'#19e3ff',ic:IC.ni},
   {id:'wn',n:'Second Wind',    t:'A full-hull revive with a blast',    p:85,max:1,c:'#ff2d95',ic:IC.wn,x:'up_wn'},
   {id:'ec',n:'EMP Cell',       t:'EMP refills after every district',   p:28,max:1,c:'#ffb020',ic:IC.ec},
-  {id:'lk',n:'Lucky Drops',    t:'More hull and shard drops',          p:30,max:2,c:'#3dffb0',ic:IC.lk}];
+  {id:'lk',n:'Lucky Drops',    t:'More hull and shard drops',          p:30,max:4,c:'#3dffb0',ic:IC.lk}];
 for(const u of NEW2){SH.UPG.push(u);UBY[u.id]=u;}
 for(const [id,n,t,p,ic] of [['up_pc','Piercing Shots','Pit stop: shots pass through enemies',160,IC.pc],['up_cl','Chain Lightning','Pit stop: on-beat kills arc to foes',190,IC.cl],['up_bt','Bullet Time','Pit stop: on-beat dash slows the world',180,IC.bt],
     ['up_og','Overdrive','Pit stop: a gauge for double fire',220,IC.og],['up_bd','Beat Drone','Pit stop: an orbiting gun on the beat',240,IC.bd],['up_wn','Second Wind','Pit stop: a full-hull second revive',260,IC.wn]])CREW.push({id,n,t,p,ic});
 /* ----- four new garage perks (permanent levels, same price curve) ----- */
-TP_DEF.push({id:'tdl',n:'Time Dilator',  p:90, max:3,c:'#7dffd8',pri:55,ic:IC.tdl, t:l=>'On-beat dash slows time '+(.4+.3*l).toFixed(1)+' s'},
-  {id:'prc',n:'Piercing Rounds',p:110,max:3,c:'#ffffff',pri:58,ic:IC.prc, t:l=>'Shots pierce '+l+' enem'+(l>1?'ies':'y')},
-  {id:'nint',n:'Neon Interest', p:75, max:4,c:'#19e3ff',pri:30,ic:IC.nint,t:l=>'Pit stops pay '+2*l+'% interest'},
-  {id:'sdc',n:'Side Mounts',    p:150,max:2,c:'#ff8a3d',pri:68,ic:IC.sdc, t:l=>l+' pair'+(l>1?'s':'')+' of wing cannons from the start'});
+TP_DEF.push({id:'tdl',n:'Time Dilator',  p:90, max:6,c:'#7dffd8',pri:55,ic:IC.tdl, t:l=>'On-beat dash slows time '+(.4+.3*l).toFixed(1)+' s'},
+  {id:'prc',n:'Piercing Rounds',p:110,max:5,c:'#ffffff',pri:58,ic:IC.prc, t:l=>'Shots pierce '+l+' enem'+(l>1?'ies':'y')},
+  {id:'nint',n:'Neon Interest', p:75, max:8,c:'#19e3ff',pri:30,ic:IC.nint,t:l=>'Pit stops pay '+2*l+'% interest'},
+  {id:'sdc',n:'Side Mounts',    p:150,max:4,c:'#ff8a3d',pri:68,ic:IC.sdc, t:l=>l+' pair'+(l>1?'s':'')+' of wing cannons from the start'});
 for(const d of TP_DEF.slice(-4))TP_BY[d.id]=d;
 /* ----- two new ships with their own rhythm: Swing (long-short pairs) and Syncopator (a 3-2 clave, the shots fall between the beats) ----- */
 SHIPS.push({id:'swg',n:'Swing',       t:'Long-short pairs on the swing',  p:120,ic:'M4 8a3 3 0 110 6 3 3 0 010-6zM14 9a2 2 0 110 4 2 2 0 010-4zM19 9a2 2 0 110 4 2 2 0 010-4z'},
@@ -41,7 +41,7 @@ const SHIPX={swg:{gs:1/3,mk:c=>((c%3)+3)%3!==1,dmk:2.3,hk:1.5},syn:{gs:1/4,mk:c=
   SH.dmk=function(){const x=SHIPX[this.ship];return x?x.dmk:dmk0.call(this);};
   SH.shot=function(){const r=shot0.call(this),x=SHIPX[this.ship];if(x)r.heat*=x.hk;return r;};}
 /* ----- levels: pit-stop upgrade + garage perk where there is one ----- */
-const lvSide=()=>Math.min(3,SH.n('sc')+TP.l('sdc')),lvRear=()=>SH.n('rg'),lvPierce=()=>SH.n('pc')+TP.l('prc'),lvBT=()=>SH.n('bt')+TP.l('tdl');
+const lvSide=()=>Math.min(4,SH.n('sc')+TP.l('sdc')),lvRear=()=>SH.n('rg'),lvPierce=()=>SH.n('pc')+TP.l('prc'),lvBT=()=>SH.n('bt')+TP.l('tdl');
 const AX={od:0,odOn:0,odBeats:0,sw:0,asLeft:0,arcs:[],bd:[],lastBd:-1};
 {const rc=SH.recalc;SH.recalc=function(){rc.call(this);this.smk=1+.5*this.n('sm');this.smg=120*this.n('sm');this.lk=.03*this.n('lk');upsCalc();};}
 /* ----- bullets: piercing, ricochet, overdrive ----- */
@@ -50,7 +50,7 @@ const AX={od:0,odOn:0,odBeats:0,sw:0,asLeft:0,arcs:[],bd:[],lastBd:-1};
 /* ----- what happens on every shot of the ship ----- */
 NR.on('fire',f=>{
   const sd=lvSide();if(sd){const dm=.55*tpDmg();for(let k=1;k<=sd;k++){const a=k*85;G.pb.push({x:f.x-6,y:f.y-13*k,vx:860,vy:-a,dm,pf:0,sc:1},{x:f.x-6,y:f.y+13*k,vx:860,vy:a,dm,pf:0,sc:1});}}
-  const rg=lvRear();if(rg&&((AX.rgN=(AX.rgN||0)+1)%2===0)){const dm=.7*tpDmg();G.pb.push({x:f.x-46,y:f.y,vx:-820,vy:0,dm,pf:0,rg:1});if(rg>1){G.pb.push({x:f.x-46,y:f.y-6,vx:-780,vy:-170,dm:dm*.7,pf:0,rg:1},{x:f.x-46,y:f.y+6,vx:-780,vy:170,dm:dm*.7,pf:0,rg:1});}}
+  const rg=lvRear();if(rg&&((AX.rgN=(AX.rgN||0)+1)%(rg>=3?1:2)===0)){const dm=.7*tpDmg();G.pb.push({x:f.x-46,y:f.y,vx:-820,vy:0,dm,pf:0,rg:1});if(rg>1){G.pb.push({x:f.x-46,y:f.y-6,vx:-780,vy:-170,dm:dm*.7,pf:0,rg:1},{x:f.x-46,y:f.y+6,vx:-780,vy:170,dm:dm*.7,pf:0,rg:1});}}
   if(AX.odOn>0){const gs=SH.gridStep();G.delayed.push({t:gs*BT.spb/2,f:()=>{if(G.dead||!running||P.over)return;SH.volley(P.x+22,P.y+2,0);}});}});
 /* ----- overdrive gauge: kills, grazes and on-beat dashes fill it; full = 8 beats of double fire and +40% damage ----- */
 function odGain(v){if(!SH.n('og')||G.dead||AX.odOn>0)return;AX.od=Math.min(100,AX.od+v);
@@ -62,7 +62,7 @@ NR.on('kill',d=>{if(d.boss)return;odGain(d.e.pf?5:2.5);
 NR.on('perfect',d=>{if(d.kind==='dash'){odGain(14);const bl=lvBT();if(bl){G.bt=.4+.3*bl;G.btk=.55;}}else odGain(2.5);});
 NR.on('beat',()=>{if(AX.odOn>0&&--AX.odBeats<=0){AX.odOn=0;}
   // beat drones: orbit the ship a quarter turn per beat, one golden piercing shot per beat
-  const n=SH.n('bd');if(n&&!G.dead&&G.live){for(let k=0;k<n;k++){const a=G.bp*Math.PI/2+k*Math.PI,x=P.x+Math.cos(a)*46,y=P.y+Math.sin(a)*46;
+  const n=SH.n('bd');if(n&&!G.dead&&G.live){for(let k=0;k<n;k++){const a=G.bp*Math.PI/2+k*6.2832/n,x=P.x+Math.cos(a)*46,y=P.y+Math.sin(a)*46;
     G.pb.push({x:x+10,y,vx:900,vy:0,dm:2.2*tpDmg(),pf:1,big:1,px:new Set(),pn:1,bd:1});}}});
 /* ----- auto-shield, second wind, EMP cell, interest, drones that follow the ship ----- */
 {const hu=hurt;hurt=function(){const hp0=P.hp,sh0=SH.sh;hu();if(P.hp<hp0&&P.hp<=1&&P.hp>0&&SH.sh===0&&AX.asLeft>0){AX.asLeft--;SH.sh++;floater(P.x,P.y-30,'AUTO-SHIELD','#19e3ff');AU.sfx('up');}};}
@@ -87,7 +87,7 @@ NR.on('tick',dt=>{if(!G.live||G.dead)return;const r=SH.smg;if(r)for(const p of G
   if(this_ship()==='swg'){ctx.fillStyle='#ffe14d';ctx.fillRect(-10,-12,6,2);ctx.fillRect(-2,-12,3,2);}
   else if(this_ship()==='syn'){ctx.fillStyle='#ff2d95';for(const x of[-14,-9,-3,5,11])ctx.fillRect(x,-11.5,2.2,2);}
   ctx.restore();
-  const n=SH.n('bd');if(n){ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<n;k++){const a=G.bp*Math.PI/2+k*Math.PI,x=P.x+Math.cos(a)*46,y=P.y+Math.sin(a)*46;
+  const n=SH.n('bd');if(n){ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<n;k++){const a=G.bp*Math.PI/2+k*6.2832/n,x=P.x+Math.cos(a)*46,y=P.y+Math.sin(a)*46;
       G_(x,y,15,'#ffe14d',.55);ctx.globalCompositeOperation='source-over';ctx.fillStyle='#120a1f';ctx.strokeStyle='#ffe14d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(x+1,y-1,4,2);ctx.globalCompositeOperation='lighter';}ctx.restore();}
   if(SH.n('og')){ctx.save();ctx.lineWidth=3.2;const on=AX.odOn>0,f=on?AX.odBeats/8:AX.od/100;ctx.strokeStyle=on?'#ffb020':'#ff5a3d';ctx.globalAlpha=on?.95:.45+.4*f;
     ctx.beginPath();ctx.arc(P.x,P.y,30,-Math.PI/2,-Math.PI/2+6.2832*Math.max(.02,f));ctx.stroke();if(on){ctx.globalCompositeOperation='lighter';G_(P.x,P.y,52,'#ff5a3d',.35+.2*PUL);}ctx.restore();}};}
