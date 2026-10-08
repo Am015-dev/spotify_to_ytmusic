@@ -753,6 +753,7 @@ const TUNE={stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,as
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v88g',date:'8 Oct 2026',items:[{t:'FIXED',s:'The car no longer slides by itself: tapping BRAKE while holding GAS and steering used to start a drift at once. Now it just brakes.'},{t:'CHANGED',s:'Braking in a turn keeps the back of the car planted; outside a drift the car goes where it points.'},{t:'CHANGED',s:'To drift, use the DRIFT button (X on PC), or hold GAS + BRAKE together for about half a second while steering.'}]},
   {v:'v88f',date:'8 Oct 2026',items:[{t:'FIXED',s:'Steering through turns settles about twice as fast with less wobble, and touch ◀▶ stop steering as soon as you lift your finger.'},{t:'FIXED',s:'Mission routes follow real roads: far fewer left-right zig-zags, no fake U-turn when following Hilde, and the top line warns "left/right in … m" before each turn.'},{t:'NEW',s:'Garage BUILD: ▲▼ layer selector (layers above turn see-through) and TOP / SIDE / 3D views; map legend chips show or hide each kind of icon; garage popups no longer cover buttons.'},{t:'NEW',s:'✔ CHECKLIST (in ⚙ and UPDATES): mark each change PASS or FAIL while you play and copy the results.'}]},
   {v:'v88e',date:'8 Oct 2026',items:[{t:'NEW',s:'Levels matter: your driver level raises top speed, acceleration, handling and health, and the PERKS screen shows your level, XP and stat bars, 2K style.'},{t:'CHANGED',s:'Perk slots now open at level 1, 10 and 20 (was 8 and 16), so slot 2 waits until level 10. New race perks: Handling, Accel, Top Speed and Health Boost.'},{t:'NEW',s:'Level-up card shows what you unlocked; DRIVER tab and PROFILE show a driver card with your level line.'},{t:'FIXED',s:'English everywhere (LOGBOOK, Gold Rush, 3,000 studs); hints no longer sit on top of the logbook or other panels; the logbook lists the mission you are on.'}]},
   {v:'v88d',date:'8 Oct 2026',items:[{t:'FIXED',s:'Music starts on your first tap (the touch fix is for iPhone and the Claude app); the menu track now loads while the game loads.'},{t:'NEW',s:'TEST MODE: unlimited studs, every car, part, kit, paint and perk unlocked, and all missions and side quests open (logbook → ALL (TEST) takes you to any of them).'},{t:'NEW',s:'The ⚙ tuning drawer is on every screen: menu, garage, free roam, races and missions.'}]},
@@ -5470,7 +5471,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   {const mv=Math.hypot(RO.x-(RO.stkX??RO.x),RO.z-(RO.stkZ??RO.z));RO.stkX=RO.x;RO.stkZ=RO.z;if((c.thr&&!c.brk||boost||c.brk&&(RO.bz||0)>1.2)&&!busy&&!air&&mv<dt*2)RO.stkT=(RO.stkT||0)+dt;else RO.stkT=Math.max(0,(RO.stkT||0)-dt*2);
    if(RO.stkT>.6){let best=null,bd=9;for(let k=1;k<16;k++){const ang=RO.h+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/8,px=RO.x+Math.sin(ang)*7,pz=RO.z+Math.cos(ang)*7,N=roamTerr(px,pz,RO.y+.3);if(N.low||N.g>RO.y+1.4||roamHit(px,pz,2.4,RO.y)||(HUB.cars||[]).some(q=>!q.dead&&q.x!=null&&Math.hypot(q.x-px,q.z-pz)<5.5))continue;const d=Math.abs(angDiff(ang,RO.h));if(d<bd){bd=d;best=ang}}
      if(best!=null){RO.crTurn=best;RO.yr=0;RO.v=Math.max(RO.v,10);RO.stkT=0}else if(RO.stkT>2){RO.v=c.brk&&!c.thr?8:-8;RO.stkT=0;say('','UNSTUCK',.6)}}}
-  const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?(veh==='offroad'?20:14):TUNE.gripRoad)*(RO.dDir?(terr==='road'?TUNE.drGrip:.22):1);RO.vh=(RO.vh??RO.h)+(C26.on?C26_vhStep(RO,angDiff(RO.h,RO.vh??RO.h),grip,dt,sp,C26_cityMu(terr,veh),air||!!RO.dDir||busy):angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip));if(C26.on&&!RO.dDir){const b=angDiff(RO.h,RO.vh);if(Math.abs(b)>.6)RO.vh=RO.h-Math.sign(b)*.6;if(!air)RO.v-=RO.v*Math.sin(b)**2*C26.scrub*dt}s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
+  const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?(veh==='offroad'?20:14):TUNE.gripRoad)*(RO.dDir?(terr==='road'?TUNE.drGrip:.22):1);RO.vh=(RO.vh??RO.h)+(C26.on?C26_vhStep(RO,angDiff(RO.h,RO.vh??RO.h),grip,dt,sp,C26_cityMu(terr,veh),air||!!RO.dDir||busy):angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip));if(C26.on&&!RO.dDir){const b=angDiff(RO.h,RO.vh),sm=TUNE.slipMax??.6/* drive26: max slip outside drift (was .6) */;if(Math.abs(b)>sm)RO.vh=RO.h-Math.sign(b)*sm;if(!air)RO.v-=RO.v*Math.sin(b)**2*C26.scrub*dt}s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
   if(Math.abs(angDiff(RO.h,RO.vh))>.25&&sp>25&&!air&&(terr!=='road'))RO.v-=RO.v*.08*dt;
   const fx=Math.sin(RO.vh),fz=Math.cos(RO.vh);let nx=RO.x+fx*RO.v*dt,nz=RO.z+fz*RO.v*dt;
   const N=roamTerr(nx,nz,RO.y+.3);
@@ -10950,6 +10951,22 @@ function D24_shape(c,dt){let raw=clamp(c.steer||0,-1,1);if(TUNE.stTouchDig&&SET.
     else{const d=raw-s,s0=s;s+=clamp(d,-TUNE.stRet*dt,TUNE.stRet*dt);/* drive24b: ◀ straight to ▶ used to reach full opposite lock in 0.17 s through this let-go path; past centre it re-enters the ramp */if(raw!==0&&s0*raw<=0&&s*raw>0&&Math.abs(s)>TUNE.stK0)s=Math.sign(raw)*TUNE.stK0}}else s=raw;RO.d24s=s;
   const dm=TUNE.stAng/(1+sp/TUNE.stFall),mu=C26.muCity.road*((carStat().han)||1),k=sp>3?clamp(Math.atan(TUNE.stLim*mu*CR_WB/(sp*sp))/dm,.12,1):1;c.steer=s*k;RO.d24k=k}
 ctlPlayer=(f=>function(dtR){const c=f.apply(this,arguments);try{if(state==='roam'&&TUNE.stOn)D24_shape(c,Math.min(dtR||1/60,.05))}catch(e){}return c})(ctlPlayer);
+// ===== D26 (drive26): arcade grip. Alex after v88f: "the driving is extremely bad, it does not turn smoothly, only drifts".
+// Measured (tools/tTurn26.js, flat road, docs/research/REF_DRIVING.md): a plain steer turn slips < 1° (the car goes where it points), but
+// (1) a brake tap while gas is held and the car is steering started a full DRIFT at once (B2K GAS+BRAKE rule, keys Up+Down or the touch
+// seam between GAS and BRAKE): 44-48° slide; (2) braking in a turn cut rear grip by 38% (C26.kR): up to 8° slide at 80 km/h.
+// Fix: a GAS+BRAKE drift (and the touch BRAKE+steer drift above W14_ST.hbCity) only starts after BRAKE is held TUNE.gbHold s with
+// |steer| ≥ TUNE.gbSteer; before that it is a normal brake. DRIFT (button, X, Ctrl) drifts at once as before. Rear grip loss on braking
+// C26.kR .38 → .12; heading-vs-travel slip outside drift capped at TUNE.slipMax (was .6 rad, inline in 71 roamStep). Free roam only.
+// v88f values: gbHold 0, slipMax .6, C26.kR .38.
+TUNE.gbHold=.6;TUNE.gbSteer=.5;TUNE.slipMax=.12;C26.kR=.12;
+const D26={gbT:0,n:0,blocked:0};
+{const f0=ctlPlayer;ctlPlayer=function(){const c=f0.apply(this,arguments);try{if(state==='roam'){const dt=Math.min(arguments[0]||1/60,.05);
+  const ex=!!(K.KeyX||K.ControlLeft||TOUCH.hb);   // the DRIFT control itself: drift at once
+  if(c.hb&&!ex&&!RO.dDir){D26.gbT+=dt;if(D26.gbT<TUNE.gbHold||Math.abs(c.steer||0)<TUNE.gbSteer){c.hb=0;c.brk=1;c.thr=0;D26.blocked+=dt}else D26.n++}
+  else if(!c.hb)D26.gbT=0}}catch(e){}return c}}
+window.__d26=()=>({gbT:+D26.gbT.toFixed(2),drifts:D26.n,blocked:+D26.blocked.toFixed(2),slip:+((typeof RO!=='undefined'&&RO.vh!=null?angDiff(RO.h,RO.vh):0)*180/Math.PI).toFixed(2),
+  gbHold:TUNE.gbHold,gbSteer:TUNE.gbSteer,slipMax:TUNE.slipMax,kR:C26.kR});
 // ===== TUNE (tune20): Alex tunes the driving feel himself, live, with versioned saves. Docs: docs/TUNE.md
 // One table of knobs. A knob id is a path: 'TUNE.x' = the TUNE object (10_core.js, numbers that used to be inline literals),
 // 'C26.…' / 'W13S.…' / 'W14_ST.…' / 'RCAM.chase.…' = the existing settings objects, 'W.B2K_DMIN' = window. Defaults are read
@@ -10968,7 +10985,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Grip','C26.muCity.road','Road grip',5,40,.5],['Grip','C26.muCity.dirt','Dirt grip',3,25,.5],['Grip','C26.muCity.water','Water grip',1,15,.5],
  ['Grip','TUNE.gripRoad','Lateral grip (lower = slides)',5,80,1],['Grip','C26.align','Self-straighten',0,6,.1],['Grip','C26.scrub','Slide scrub (speed loss)',0,5,.1],
  ['Grip','W.B2K_DMIN','Drift min speed (m/s)',4,30,.5],['Grip','W14_ST.hbCity','Touch BRAKE+steer drift speed (m/s)',10,60,.5],
- ['Grip','TUNE.drSlip','Drift angle',.5,3,.05],['Grip','TUNE.drGrip','Drift grip',.01,.3,.005],
+ ['Grip','TUNE.gbHold','GAS+BRAKE drift: hold BRAKE (s, 0 = at once)',0,1,.05],['Grip','TUNE.gbSteer','GAS+BRAKE drift: min steer',0,1,.05],['Grip','TUNE.slipMax','Max slide outside drift (rad)',.02,.6,.01],['Grip','C26.kR','Rear grip lost when braking',0,.6,.01],['Grip','TUNE.drSlip','Drift angle',.5,3,.05],['Grip','TUNE.drGrip','Drift grip',.01,.3,.005],
  ['Grip','TUNE.drFill','Drift bar fill rate',5,60,1],['Grip','TUNE.drConv','Drift → boost gain',.1,1.5,.05],
  ['Engine','W13S.city','City top speed ×',.5,1.6,.01],['Engine','W13S.open','Open-road top speed ×',.5,1.6,.01],['Engine','TUNE.abTop','Autobahn top speed ×',.8,2,.01],
  ['Engine','TUNE.acc','Acceleration',.4,3,.05],['Engine','W13S.cp','Accel curve (higher = pulls to top)',.5,4,.1],['Engine','C26.thUp','Throttle response',.5,10,.1],
@@ -11292,6 +11309,11 @@ window.__b25={S:B25,scr:(fx,fz,y)=>{const m=GB.mesh.userData.m;GB.mesh.updateMat
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88g',id:'turn60',text:'Normal turn at a junction at 50–80 km/h with GAS only: the car turns cleanly where it points, no sliding sideways.'},
+ {ver:'v88g',id:'brake-turn',text:'Brake briefly before or in a turn (tap BRAKE, or ↓ while holding ↑ on PC): the car slows down and does NOT start a drift.'},
+ {ver:'v88g',id:'drift-btn',text:'DRIFT button (X on PC) while steering at speed: the car still slides on purpose, with the pink trail and a mini-turbo after.'},
+ {ver:'v88g',id:'drift-gb',text:'Hold GAS + BRAKE together while steering at 80+ km/h for about a second: it still becomes a drift.'},
+ {ver:'v88g',id:'phone-thumb',text:'Phone: rest your thumb near the line between GAS and BRAKE and tap BRAKE in a turn: no accidental drift.'},
  {ver:'v88f',id:'steer-turn',text:'Turn left or right at a junction at 60–80 km/h: the car settles straight within about a second, no wobbling.'},
  {ver:'v88f',id:'steer-tap',text:'Tap ◀ or ▶ briefly on a straight road: the car moves over a little, no jerk and no swinging back and forth.'},
  {ver:'v88f',id:'route-follow',text:'Hot Drop (follow Hilde): the yellow route follows the roads, no sudden U-turns, and the top line says "left/right in … m" a few seconds before each turn.'},
