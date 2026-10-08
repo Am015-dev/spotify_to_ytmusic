@@ -37,7 +37,9 @@ function D24_shape(c,dt){let raw=clamp(c.steer||0,-1,1);if(TUNE.stTouchDig&&SET.
   if(dig){const v0=TUNE.stRampV0/3.6,Tin=TUNE.stRampLo+(TUNE.stRampHi-TUNE.stRampLo)*clamp((sp-v0)/Math.max(1,27.8-v0),0,1)/* drive24b: short ramp up to TUNE.stRampV0 km/h (corners), longer above */;
     // drive24b: a press AGAINST the way the car is rotating (a counter-tap after a turn; trace qa24b/dA_*: ±50°/s limit cycle) ramps over
     // TUNE.stRampRev s instead; building a turn keeps the short ramp
-    const Tr=raw!==0&&(RO.yr||0)*Math.sign(RO.v||1)*raw>.15?Math.max(Tin,TUNE.stRampRev):Tin;if(raw!==0&&Math.sign(raw)===Math.sign(s||raw)&&Math.abs(s)<Math.abs(raw)){if(Math.abs(s)<TUNE.stK0)s=Math.sign(raw)*TUNE.stK0;s+=Math.sign(raw)*dt/Math.max(.02,Tr);if(Math.abs(s)>Math.abs(raw))s=raw}
+    RO.d24t=raw!==0&&raw===RO.d24r?(RO.d24t||0)+dt:0;RO.d24r=raw;
+    // drive24b: a HOLD longer than TUNE.stHold s means a turn, not a correction: from then on the ramp takes TUNE.stRampFast s (0 = off)
+    let Tr=raw!==0&&(RO.yr||0)*Math.sign(RO.v||1)*raw>.15?Math.max(Tin,TUNE.stRampRev):Tin;if(TUNE.stRampFast>0&&RO.d24t>TUNE.stHold)Tr=Math.min(Tr,TUNE.stRampFast);if(raw!==0&&Math.sign(raw)===Math.sign(s||raw)&&Math.abs(s)<Math.abs(raw)){if(Math.abs(s)<TUNE.stK0)s=Math.sign(raw)*TUNE.stK0;s+=Math.sign(raw)*dt/Math.max(.02,Tr);if(Math.abs(s)>Math.abs(raw))s=raw}
     else{const d=raw-s,s0=s;s+=clamp(d,-TUNE.stRet*dt,TUNE.stRet*dt);/* drive24b: ◀ straight to ▶ used to reach full opposite lock in 0.17 s through this let-go path; past centre it re-enters the ramp */if(raw!==0&&s0*raw<=0&&s*raw>0&&Math.abs(s)>TUNE.stK0)s=Math.sign(raw)*TUNE.stK0}}else s=raw;RO.d24s=s;
   const dm=TUNE.stAng/(1+sp/TUNE.stFall),mu=C26.muCity.road*((carStat().han)||1),k=sp>3?clamp(Math.atan(TUNE.stLim*mu*CR_WB/(sp*sp))/dm,.12,1):1;c.steer=s*k;RO.d24k=k}
 ctlPlayer=(f=>function(dtR){const c=f.apply(this,arguments);try{if(state==='roam'&&TUNE.stOn)D24_shape(c,Math.min(dtR||1/60,.05))}catch(e){}return c})(ctlPlayer);

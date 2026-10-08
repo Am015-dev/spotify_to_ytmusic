@@ -11,7 +11,7 @@ const TUNE={stAng:.55,stFall:14,stIn:11,stOut:16,stMax:1.35,stSpd:.75,tRet:14,as
   musOn:1,musVol:.5,sfxVol:1,duckOn:1,duckAmt:.7,
   // drive24 ROUTE (TUNE drawer Route tab, 41_career_quests.js qvAstar/D24_clean): metres added per 90° turn, per U-turn, filler-grid cost ×,
   // narrow-street extra, simplify tolerance (m); turn cue lead (s) + min distance (m); followed cars (98d_drive24.js): corner radius (m), corner grip (m/s²), brake (m/s²), blinker on/off
-  rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
+  rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   // drive24 STEER (98d_drive24.js D24_shape, roam only): on/off, ramp time to full lock at 0 and at 100 km/h (s), start fraction, let-go rate (/s), full lock = × grip limit,
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.25,stRampHi:.6,stK0:.05,stRet:12,stLim:1.1,yrOut:22};
