@@ -4,7 +4,7 @@
 const W=960,H=540,PR=1.5;
 const $=id=>document.getElementById(id);
 const cv=$('game'),frame=$('frame'),stage=$('stage');
-let ctx=cv.getContext('2d');                              // the context everything draws on right now
+let ctx=cv.getContext('2d',{alpha:false});                              // the context everything draws on right now
 const vctx=ctx;                                         // the visible canvas
 let wctx=ctx,wcv=cv,VS=1;                               // world layer: portrait draws the world on its own canvas, then turns it upright; VS = visible px per HUD unit
 let S=1,rotMode=false,touchUI=false;

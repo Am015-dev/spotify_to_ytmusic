@@ -109,9 +109,9 @@ function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierO
   if(running&&T_>1)tierGlow(ctx);
   if(PT){if(running)FXV.edges(t);
     ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);                // world, turned so that its right is the screen's up
-    ctx.setTransform(VS,0,0,VS,0,0);ctx.drawImage(scanP,0,0,PW_,PH_);
+    ctx.setTransform(VS,0,0,VS,0,0);ctx.drawImage(scanFor(true),0,0,PW_,PH_);
     if(running)drawHUDP(t);}
-  else{ctx.drawImage(scan,0,0,W,H);
+  else{ctx.drawImage(scanFor(false),0,0,W,H);
     if(running){FXV.edges(t);drawHUD(t);PW.hud(t);}}}
 
 /* ---------- menus, settings, flow ---------- */
@@ -206,7 +206,7 @@ newGame();G.banner.t=0;P.x=-200;
 let last=performance.now();
 let simOn=false;
 let fpsN=0,fpsT=0;
-function loop(now){const raw=now-last;if(SET.fps===30&&raw<30&&!simOn){requestAnimationFrame(loop);return;}   // 30 FPS cap: skip every other frame
+function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){requestAnimationFrame(loop);return;}   // FPS cap: 30 skips every other frame; 60 holds a 120/144/240 Hz screen to 60-80 draws a second (the game was drawing every refresh)
   let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
   if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
   if(CAL.on)calFrame();

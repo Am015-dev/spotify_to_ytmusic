@@ -3,7 +3,8 @@
 const K={};let pressed={};
 let touch=null,touchFire=false;
 const stampOf=e=>(e&&e.timeStamp>0?e.timeStamp:performance.now());
-const QD={L:1,M:1.5,H:2};                              // quality setting -> highest pixel ratio
+const QD={L:1,M:1.5,H:2};
+const PXB={L:.93e6,M:2.1e6,H:3.7e6};                   // backing-store budget in pixels (1280x720 / 1920x1080 / 2560x1440): a 4K or DPR-2 screen is not drawn at its full size, the browser scales the canvas up                              // quality setting -> highest pixel ratio
 function fit(){
   const st=stage.getBoundingClientRect();if(st.width<2||st.height<2)return;
   const was=rotMode;rotMode=touchUI&&st.height>st.width*1.05;   // portrait: a vertical play area, ship at the bottom
@@ -16,7 +17,7 @@ function fit(){
   stage.classList.toggle('p',rotMode);stage.classList.toggle('sd',side>0);stage.classList.toggle('tl',left);
   stage.style.setProperty('--strip',strip+'px');stage.style.setProperty('--shift',side?(left?40:-40)+'px':'0px');
   frame.style.width=w+'px';frame.style.height=h+'px';
-  const dpr=Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
+  const dpr=Math.max(.5,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
   if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch;}
   if(rotMode){                                           // the world keeps its landscape coordinates on its own canvas; render() turns it upright
     if(wcv===cv){wcv=document.createElement('canvas');wctx=wcv.getContext('2d');}
