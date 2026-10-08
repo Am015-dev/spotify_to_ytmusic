@@ -1,0 +1,3 @@
+kinds [["taxi",30,true],["sedan",12,true],["van",6,true],["suv",5,true],["delivery",3,true],["sedan-sports",3,true],["#troll",5,false],["#scoot",8,false],["su:t_su",2,true],["su:t_su_sky",3,true]]
+racer su:t_su_sky 187
+errors 0 

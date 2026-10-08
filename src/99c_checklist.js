@@ -4,7 +4,7 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'v88n',id:'life-people',text:'Drive 1 minute in Frankfurt: you see people on the pavements most of the time, and some wave both arms as you pass them.'},
- {ver:'v88n',id:'life-traffic',text:'Traffic cars show up on the streets around you (not only far away), including orange, pink and black-gold street racers; they still do not block the inner lane.'},
+ {ver:'v88n',id:'life-traffic',text:'Traffic cars show up on the streets around you (not only far away), including orange and pink street racers; they still do not block the inner lane.'},
  {ver:'v88n',id:'life-pigeons',text:'Drive toward a group of grey pigeons on a pavement: they fly off before you reach them. White gulls circle high above.'},
  {ver:'v88n',id:'life-sky',text:'Look around: red/white flags flap on some rooftops and a LEGO blimp slowly circles over the city (Athens: blue/white flags).'},
  {ver:'v88n',id:'life-boats',text:'Frankfurt: boats sail up and down the Main. Drive the boat into one: you bounce off, you do not pass through it.'},
