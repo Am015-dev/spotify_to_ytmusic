@@ -154,7 +154,7 @@ function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():nul
   pc.hidden=false;PH.cur.block=true;
   if(PH.pop&&(PH.pop!=='info'||kind==='pass'||kind==='over'||kind==='q')){PH.pop=null;PH.pd=null;phPopup()}
   // the wake roll card goes away by itself a few seconds after the animation ends
-  if(kind==='mph'&&!UI.busy&&!PH.tmr){const mp=UI.mph;PH.tmr=setTimeout(()=>{PH.tmr=0;if(UI.mph===mp&&!UI.busy){PH.mphHide=mp;phAfter()}},3500/(UI.tickRate||1))}
+  if(kind==='mph'&&!UI.busy&&!PH.tmr){const mp=UI.mph;PH.tmr=setTimeout(()=>{PH.tmr=0;if(typeof tutHold==='function'&&tutHold('mph'))return;if(UI.mph===mp&&!UI.busy){PH.mphHide=mp;phAfter()}},3500/(UI.tickRate||1))}
   if(kind!=='mph'){clearTimeout(PH.tmr);PH.tmr=0}}
 // ---------- one pass after every render ----------
 function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}catch(e){console.error(e)}}

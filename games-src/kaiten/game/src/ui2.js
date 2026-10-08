@@ -13,8 +13,8 @@ function render() {
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
   // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
-  const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + D.rounds : 'Round ' + rd + ' of ' + D.rounds) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + D.rounds + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand + ' · most points after round 3 wins');
+  const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, RN = G.len || D.rounds;
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand + (G.len ? '' : ' · most points after round 3 wins'));
 }
 function bankedOf(s) {
   const fzEnd = UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring);   // that round is already in G.rs: don't count it twice
@@ -222,6 +222,7 @@ function zeroTag(v, ty) {
 function promptText() {
   // one short line (8 words at most): the board shows the rest
   if (!G) return '';
+  if (tutOn()) return '';   // the tutorial bubbles speak
   if (UI.fz && UI.fz.msg) return UI.fz.msg;
   if (G.phase === 'over' && (!UI.fz || UI.fz.crown)) return winLine();
   const v = viewSeat();
@@ -250,7 +251,7 @@ function renderDock() {
   renderLabActs();
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
-  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
+  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
   // roster chips
   const ro = $('#roster'); if (ro) {
     const tab = tables(), info = seatScoreInfo(tab), v = viewSeat(), f = focusSeat();
