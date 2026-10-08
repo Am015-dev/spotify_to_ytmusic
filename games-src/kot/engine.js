@@ -203,7 +203,7 @@ function spendKwLater(p,src,id){if(src==='c'){const j=p.cards.indexOf(id);if(j>=
 function retireKw(p,src,id){if(src==='c'){const j=(G.limbo||[]).indexOf(id);if(j>=0){G.limbo.splice(j,1);G.disc.push(id)}}else{const j=p.evo.indexOf(id);if(j>=0){p.evo.splice(j,1);p.edisc.push(id)}}}
 function startRoll(p){
   const nd=diceCount(p);
-  G.dice=[];for(let k=0;k<nd;k++)G.dice.push({f:FACES[rnd(6)],k:false,x:k>=6});G.dice.push(...exDice(p));
+  G.dice=[];for(let k=0;k<nd;k++)G.dice.push({f:faceOf({}),k:false,x:k>=6});G.dice.push(...exDice(p));
   G.rolls=rerollsOf(p);G.rollId++;G.phase='roll';G.step=1;G.aiMarked=false;G.tf.uses={};snd('dice');if(p.human)setTimeout(()=>snd('turn'),650);
   lg(p.i,`${mname(p)} rolls ${nd} dice.`);refresh()}
 function diceCount(p){if(has(p,'skull'))cov('card:skull');if(has(p,'w_cyb'))cov('wick:cyb');if(p.tok.shrink)cov('card:shrink:less');if(curseOn('k_flood'))cov('curse:flood');if(curseOn('k_false'))cov('curse:false:dice');let n=6+has(p,'skull')+has(p,'w_cyb')-(p.tok.shrink||0)-(p.dmod||0);if(curseOn('k_flood'))n--;if(curseOn('k_false'))n+=2;if(G.cold>=0&&G.cold!==p.i){n--;cov('evo:14')}n-=G.less;return Math.max(0,n)}

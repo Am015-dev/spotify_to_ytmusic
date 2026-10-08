@@ -139,7 +139,7 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
 {const _ih=introHTML;introHTML=function(){if(!(phOn()&&!PHONE.land))return _ih.apply(this,arguments);const me=meSeat(),q=me>=0?G.pl[me]:null;if(!q)return _ih.apply(this,arguments);
   return `<div class="intro bfintro"><p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b></span></p>
    <p class="goal">First to <b>20 ★</b> wins.<br>Or be the last monster standing.</p>
-   <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn?'<small>First you pick a secret power</small>':''}</button></div></div>`}}
+   <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn?'<small>First you pick a secret power</small>':''}</button>${typeof tutBtn==='function'&&tutFirst()&&!G.tut?tutBtn('btn'):''}</div></div>`}}
 // ---- render hook ----
 // the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
 function bfPlaceChips(){const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips'),dk=document.querySelector('.gx-dock');if(!bar||!ch||!dk)return;
