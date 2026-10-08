@@ -54,3 +54,11 @@
    - re-shoot with t4/r2fin.js (normal mode, 30 s waits, closer clip).
 6. Gate still owed: start screen; a Frankfurt drive after SAVE & DRIVE per finish (t4/r2drive.js): car on the road, tyre gap ≤ 0.05, wheels dark, no see-through; PC 1280×720; iframe; console errors.
 Minor: m5 "1/3 SLOTS" wraps (it comes from GPK_html's h5): shorten it to "1/3" in the shell (rewrite the h5 text in R2_post).
+
+## R2b (2026-10-08 10:10): reviewer PASS, DEPLOY sent (cea720a, out/v88c)
+- Fixed: tip cleared per mode / on place; held pad = one 62 px column (labels PLACE/TURN/DROP/UP/DOWN, selection pad 2 cols), build area reserves it and zooms (R2.bz); panel modes zoom 2.6×area;
+  kit pictures = the part alone, framed tight, category emoji fallback; finishes R2_FP (gloss clone, matte, metal, chrome = silver mix + canvas studio env R2_env, pearl = rim sheen);
+  street car uses `chromeD` (mid-steel #8d939b, rough .3, no glow) because a mirror reflected the sky as blue/see-through; perks header via GPK_html wrap.
+- Harness: t4/r2shell.js IFRAME page needs a viewport meta (else 741×341); QUICK=1 = start + rides only; t4/r2drive.js FIN=<finish> + material dump.
+- Shots: docs/shots/r2b/ (phone, pc, iframe, drive, q2). Tyre gap 0.03. 0 console errors.
+- Open polish: street chrome has a slight mauve cast (make the base cooler); a blue dome is visible in low Frankfurt side views (world, not R2).
