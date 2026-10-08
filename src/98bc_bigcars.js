@@ -104,7 +104,7 @@ function BC_apply(d){const R=BC.ref||d,D0=BC.D0,rW=Math.max(1,d.W/R.W),rL=Math.m
   CR_WB=+(D0.wb*Math.max(1,R.WB?d.WB/R.WB:rL)).toFixed(3);OB_HW=D0.hw*rW;OB_HL=D0.hl+Math.max(0,ext);CR_PLH.l=D0.pl.l+Math.max(0,ext);CR_PLH.w=D0.pl.w*rW;
   const m=Math.max(1,rW*rL*rH);BC.m=m;BC.acc=Math.pow(m,-.3);BC.top=Math.pow(m,-.05);BC.cam=Math.pow(Math.max(rL,rH*1.1),.65);SC_K.cam=+(D0.cam*BC.cam).toFixed(3)}
  SC_rcam()}
-function BC_upd(){const s=pl,ud=s&&s.mesh&&s.mesh.userData;if(!ud||!ud.m||!BC.on||(s.boatK||0)>.5)return;CR_bodyPts(ud);const key=CR_PS.k+'|'+GAR_get().sel+'|'+(RO.vsel||''),now=++BC.f;
+function BC_upd(){const s=pl,ud=s&&s.mesh&&s.mesh.userData;if(!ud||!ud.m||!BC.on||(s.boatK||0)>.5)return;CR_bodyPts(ud);const key=CR_PS.k+'|'+(RO.vsel||''),now=++BC.f;
  // measure 36 sim steps (~0.6 s) after the car changes (the first frames still show the stock ship parts CR_fx hides, and CR_PS caches that box), then every 180 steps
  if(key!==BC.k){BC.k=key;BC.due=now+36;return}if(now<BC.due)return;BC.due=now+180;CR_PS.k='';
  const d=BC_dims(ud);if(!d)return;BC_apply(d)}
@@ -118,5 +118,5 @@ CR_minBack=(f=>function(){return f()*(BC.big?BC.cam:1)})(CR_minBack);
 // garage: the camera backs off for long / tall builds so the whole car stays framed
 GB_cam=(f=>function(){let L=[];try{L=GB.d?GB_list():[]}catch(e){}let z0=0,z1=0,y1=0;for(const b of L){const P=GB_PC[b.t];if(!P)continue;const[fw,fd]=GB_dims(b);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd);y1=Math.max(y1,b.y+P.h)}
  const k=Math.max(1,(z1-z0)/20,y1/34),d=GB_.dist;GB_.dist=d*k;try{return f()}finally{GB_.dist=d}})(GB_cam);
-window.__bc={S:BC,dims:()=>{const ud=pl&&pl.mesh.userData;return ud?BC_dims(ud):null},T:BC_T.map(t=>t.id),n:id=>{const S=GAR_set(id);return S&&S.car?S.car().length:0},
+window.__bc={S:BC,measure:()=>{const ud=pl&&pl.mesh.userData;if(!ud)return null;CR_PS.k='';const d=BC_dims(ud);if(d)BC_apply(d);return window.__bc.hull()},dims:()=>{const ud=pl&&pl.mesh.userData;return ud?BC_dims(ud):null},T:BC_T.map(t=>t.id),n:id=>{const S=GAR_set(id);return S&&S.car?S.car().length:0},
  hull:()=>({rad:SC_K.rad,off:SC_K.off,cam:SC_K.cam,wb:CR_WB,hw:OB_HW,hl:OB_HL,acc:BC.acc,top:BC.top,big:BC.big,m:BC.m||1})};
