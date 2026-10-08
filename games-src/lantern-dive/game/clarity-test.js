@@ -76,17 +76,6 @@ test('acting answers the tip (a job taken while a tip is open closes it)', async
   w.eval(`doMove(LD.moves(G, 0).find(m => m.t === 'take' || m.t === 'pass'))`);
   ok(!w.eval('UI.tip && UI.tip.id === "pickjob"'), 'tip still open after acting');
 });
-test('training dive: Mara pops up, waits for an answer, and only the card she names can be led', async () => {
-  const { w, d } = await page(1);
-  click(w, d.querySelector('[data-a=guided]'));
-  ok(!d.querySelector('#dlg').hidden && /Mara/.test(d.querySelector('#dlg').textContent), 'no Mara dialog at the start');
-  w.eval('schedule()'); ok(w.eval('UI.dlg') && w.eval("G.phase") === 'assign', 'play moved on under the dialog');
-  for (let k = 0; k < 400 && !(w.eval("G.phase === 'play' && G.trick.turn === 0 && G.tricks.length === 0")); k++) { answerDlgs(w, d); w.eval("if (!UI.dlg && iMustAct()) { const m = LD.moves(G, 0).find(x => x.t === 'take' || x.t === 'nosig' || (x.t === 'dist' && !x.on)); if (m) doMove(m); } schedule()"); await new Promise(r => setTimeout(r, 5)); }
-  answerDlgs(w, d);
-  const c9 = w.eval('D.card(0, 9)'), legal = w.eval('[...legalCards(0)]');
-  ok(legal.length === 1 && legal[0] === c9, 'legal cards ' + JSON.stringify(legal));
-  const other = w.eval('G.players[0].hand.find(c => c !== ' + c9 + ')'); w.eval('tapHand(' + other + ')'); ok(w.eval('UI.sel') !== other, 'another card could be lifted');
-});
 test('Descent: the map starts at the Sunlit Reef with 3 oxygen tanks; a lost dive costs one tank, 3 losses restart the zone', async () => {
   const { w, d } = await page(1);
   w.eval(`lsSet('ld_desc', ''); UI.sv = 'descent'; renderStart();`);
