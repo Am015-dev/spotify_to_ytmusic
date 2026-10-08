@@ -1,3 +1,11 @@
+# >>> drive24c (2026-10-08 15:05) — release v88f fast track (coordinator): merge od-build25 + live, QUICK REVIEW, DEPLOY msg
+Fixes this round: (1) follow/tail GPS = the leader's own route S.R (A* to the moving truck snapped to the far carriageway → false
+"U-turn in 60 m" on Hot Drop; now "bear right in 90 m", qa24c/mission). (2) D24_despike: out-and-back spikes + destination hooks.
+Athens U-turns: live 26 / branch 28 → 25 (7 left on tRoute's random 3-leg follow routes, Athens has no follow mission → open item).
+tPlay phone 60 fps live v88e vs branch (qa24c/live60, br60): FAILs on BOTH = pre-existing: fra stuck (5.4 live / 7.4 branch, earlier
+branch run 3.6), rotation DRIFT hidden, Athens start (player box ship-size, odd camera, random spawn → hits/reload vary by run).
+Road collider (530,-200): same static 6.6 m box h 21 on live (qa24c/probe2.js) → pre-existing. 30 fps A/B stopped (scope cut).
+
 # >>> drive24b HANDOFF (2026-10-08 14:20) — read this block + docs/HANDOFF_drive24b.md first
 Branch alex/od-drive24 (HEAD = this commit). v88e merged (od-r3 63f4fca = live cc9b68d, LIVE_MATCH proven in a worktree).
 Release candidate = current src (build: `tools/build.sh <ver> --local`). Steering defaults = sweep Z1. NO REVIEW sent yet, NO out/<ver> yet.
