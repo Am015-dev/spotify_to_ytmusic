@@ -17,7 +17,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   ctx.font='16px "Share Tech Mono",monospace';ctx.fillStyle=D.b;ctx.fillText(mu,138,31);
   ctx.fillStyle='#8c86b8';ctx.font='12px "Share Tech Mono",monospace';ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),18,48);
   ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(HARD?' · HARD':''),W-18,28);
-  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4);
+  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),4);
   ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);
   // bottom-left
   const by=H-20;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText('HULL',18,by-14);
@@ -51,7 +51,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   const sw=ctx.measureText(sc).width;ctx.font=`${16*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,14+sw+10,27*k);
   ctx.fillStyle='#8c86b8';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),14,44*k);
   ctx.textAlign='right';ctx.font=`700 ${15*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(DF===DIFFS.hard?' · HARD':''),w-14,26*k);
-  const pw=170*k,px=w-14-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,33*k,pw,4*k);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,33*k,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4*k);
+  const pw=170*k,px=w-14-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,33*k,pw,4*k);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,33*k,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),4*k);
   ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#8c86b8';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,w-14,50*k);
   // status row: hull, heat, dash, EMP, weapon level
   const y=76*k;ctx.textAlign='left';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#8c86b8';
@@ -90,7 +90,7 @@ function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierO
   for(const e of G.en)drawEnemy(e,t);
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
-  for(const b of G.pb){ctx.fillStyle=b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b;ctx.fillRect(b.x-10,b.y-1.5,b.big?(b.hv?46:22):16,b.big?(b.hv?10:4):3);G_(b.x,b.y,b.hv?26:b.big?12:8,b.pf?'#ffe14d':D.b,.6);}
+  for(const b of G.pb){ctx.fillStyle=b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b;ctx.fillRect(b.x-10,b.y-1.5,b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16,b.big?(b.hv?10:4):3);G_(b.x,b.y,b.hv?26:b.big?12:8,b.pf?'#ffe14d':D.b,.6);}
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
   for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.c,.9);
@@ -227,7 +227,7 @@ window.__mnr={get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DE
   simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},
   abort(){if(running){NR.emit('runEnd',{quit:true});running=false;}ST.on=false;ST.over=false;paused=false;touch=null;touchFire=false;pressed={};},
   skipTo(i){if(!running)return;G.loop=G.loop;G.en=[];G.eb=[];enterDistrict(i);},
-  bossNow(){if(running&&!G.boss&&!G.bossDone){G.dt=distLen();G.en=[];}}};
+  bossNow(){if(running&&!G.boss&&!G.bossDone){G.force=true;G.en=[];}},get spawnBoss(){return spawnBoss},bossShot,BCAP,fanAngle,get PWbs(){return PW.bs},get bsMnow(){return bsM()},get diffNow(){return diff()},DIR,UPS,TUNE2,PATS,MUTS,WARN,NEW2,SHIPX,SHIPS,AX,upsCalc,lvSide,lvRear,lvPierce,lvBT,get SONGM(){return SONGM},songBars,songEnergy,ORDER,nextDi,posOf};
 })();
 </script>
 

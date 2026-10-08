@@ -9,7 +9,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&Math.floor(t*20)%2)return;co
   const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}   // each tier: more glow on the ship
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();}
 
-const arming=e=>e.bf===1&&!G.dead&&(e.type==='drone'?e.x<W-30&&e.x>P.x+60:e.type==='turret'?e.t<6.5&&e.x<=e.stop:e.type==='gunship'?e.x<W-100:false);
+const arming=e=>!!e.arm&&!G.dead&&e.type!=='boss';          // e.arm: set a whole beat before the shot (b.js)
 function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y);const fl=e.flash>0;if(e.pw)PW.marker(e,t);
   if(arming(e)){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.7+1.3*k),'#ff3050',.22+.55*k);ctx.restore();   // fires on the next beat: glow + ring that closes on the beat
     ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,e.r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}

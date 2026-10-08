@@ -23,46 +23,51 @@ const STAGES=[
   {n:12,di:3,name:'KRONOS',        intro:'End the corporation. Last delivery.',goal:{k:'boss'},lead:28,   perf:20,waves:['gate','gunship','turret','chargers','droneSine']}];
 for(const s of STAGES){s.song=['stage1','stage2','stage3'][(s.n-1)%3];s.act=Math.floor((s.n-1)/4);}
 const ACTN=['ACT I','ACT II','ACT III'];
-const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+g.v:g.k==='kill'?'KILL '+g.v:g.k==='score'?'SCORE '+(g.v/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
+const stLen=s=>songBars(s.song);                          // stage length in bars = its song
+const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
+const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
+const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
-const ST={on:false,n:1,def:STAGES[0],lvl:0,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
+const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
   setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1];
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=1+TUNE.eh*L;
     this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
-    this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;},
+    this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
+    const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
+    this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
+    this.dk=1;},
   kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
   snapFor(n){const sn=sSave.snap[n];return sn?Object.assign({},sn):this.kit(n);},
   // the new run has just been created: put this stage's district, hull and upgrades in place
-  begin(){const D=DISTRICTS[this.def.di];G.di=this.def.di;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=2.4;G.waveWait=false;G.preload=true;bgFor(G.di);AU.root=D.root;AU.boss=false;
+  begin(){const D=DISTRICTS[this.def.di];G.di=this.def.di;G.pos=posOf(G.di);G.dt=0;G.d0=G.bc;DIR.plan(this.def.song);G.boss=null;G.bossDone=false;G.waveT=2.4;G.waveWait=false;G.preload=true;bgFor(G.di);AU.root=D.root;AU.boss=false;
     P.hp=this.hp0;P.max=5;banner(this.n+' · '+this.def.name,this.def.intro,false,3.4);},
   carry(){const got=this.snapFor(this.n);for(const id in got)for(let i=0;i<got[id];i++)SH.add(id);},
-  frac(){const g=this.def.goal;let f=0;
-    if(g.k==='survive')f=G.bc/(g.v*4);else if(g.k==='kill')f=G.kills/g.v;else if(g.k==='score')f=G.score/g.v;else f=G.boss||this.spawned?1:G.bc/(this.def.lead*4);
+  frac(){const g=this.def.goal,tf=G.dbar/this.len;let f=0;
+    if(g.k==='survive')f=tf;else if(g.k==='kill')f=Math.min(G.kills/this.kv,tf);else if(g.k==='score')f=Math.min(G.score/this.sv,tf);else f=G.boss||this.spawned?1:G.dbar/this.lead;
     return clamp(f,0,1);},
   label(){const g=this.def.goal;
-    if(g.k==='survive')return Math.min(g.v,Math.floor(G.bc/4))+' / '+g.v+' BARS';
-    if(g.k==='kill')return Math.min(g.v,G.kills)+' / '+g.v+' KILLS';
-    if(g.k==='score')return 'SCORE '+Math.min(g.v,G.score).toLocaleString('de-DE')+' / '+g.v.toLocaleString('de-DE');
+    if(g.k==='survive')return Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
+    if(g.k==='kill')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS';
+    if(g.k==='score')return 'SCORE '+Math.min(this.sv,G.score).toLocaleString('de-DE')+' / '+this.sv.toLocaleString('de-DE');
     return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?this.def.mini.nm:DISTRICTS[this.def.di].bossName);},
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
   tick(dt){
     if(this.over){this.cT-=dt;if(this.cT<=0&&!this.fin){this.fin=true;if(this.n>=STAGES.length||!SH.live)this.finish();else SH.pit(()=>this.finish());}return;}
     if(G.dead)return;
-    const g=this.def.goal;G.dt+=dt;this.d=this.d0*clamp(.8+.2*G.t/45,.8,1);
-    if(!G.boss&&!this.spawned){G.waveT-=dt;if(G.waveT<=0)G.waveWait=true;}
+    const g=this.def.goal;G.dt+=dt;DIR.tick(dt);const prog=clamp(G.dbar/this.len,0,1),up=G.dbar>=this.len-.5;this.d=this.d0*(.8+.3*prog);   // the ramp runs over the whole stage
     if(!this.pre&&G.t>5&&(g.k==='boss'||g.k==='mini')){this.pre=true;const k=DISTRICTS[this.def.di].boss,sg=g.k==='boss'?bossSong(k,false):null;if(sg)loadTrack(sg);}
-    if(g.k==='survive'){if(G.bc>=g.v*4)this.clear();}
-    else if(g.k==='kill'){if(G.kills>=g.v)this.clear();}
-    else if(g.k==='score'){if(G.score>=g.v)this.clear();}
-    else if(!this.spawned&&G.bc>=this.def.lead*4&&(G.en.length<=1||G.bc>=this.def.lead*4+8)){this.spawned=true;
+    if(g.k==='survive'){if(up)this.clear();}
+    else if(g.k==='kill'){if(G.kills>=this.kv&&up)this.clear();}
+    else if(g.k==='score'){if(G.score>=this.sv&&up)this.clear();}
+    else if(!this.spawned&&G.dbar>=this.lead&&(DIR.nonBoss()<=1||G.dbar>=this.lead+2)){this.spawned=true;
       if(g.k==='mini'){const m=this.def.mini;spawnBoss({mini:true,k:m.k,nm:m.nm,sub:BOSS_SUB[m.k],r:m.r,pats:m.pats,lbl:m.lbl,hp:this.bossHp(),score:3000,col:DISTRICTS[this.def.di].a});}
       else spawnBoss({hp:this.bossHp()});}},
   bossDown(e,pts){banner('STAGE CLEAR',(e.nm||'')+' down · +'+pts,false,3);this.clear(true);},
   clear(boss){if(this.over||G.dead)return;this.over=true;this.cT=boss?3.4:2.6;G.waveWait=false;G.eb=[];
     for(const e of G.en)if(e.type!=='boss')e.hp=0;
-    this.stars=[1,G.perf>=this.def.perf?1:0,this.hits===0?1:0];
+    this.stars=[1,G.perf>=this.pn?1:0,this.hits===0?1:0];
     if(!boss)banner('STAGE CLEAR',this.def.name,false,2.6);
     G.flash=Math.max(G.flash,.3*FX());AU.sfx('up');AU.intense(false);NR.emit('stageClear',{n:this.n});},
   fail(){running=false;NR.emit('runEnd',{story:this.n,score:G.score,di:G.di,kills:G.kills});
@@ -77,7 +82,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,he
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;$('srEye').textContent=n>=STAGES.length?'Story complete':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],s.perf+' PERFECT · you '+G.perf)+row(st[2],'No hull lost');
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost');
     $('srScore').textContent=G.score.toLocaleString('de-DE');
     $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},

@@ -53,8 +53,16 @@ const FX=()=>[0,.25,1][SET.flash];                      // strength of screen fl
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
 // currentTime when audio runs, and a plain game-time counter (fbT) when it does not, so the game also works silent.
 const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,boss2:140,endless:132,endless2:132};
-const distLen=()=>24*4*BT.spb;                            // a district is 24 bars of the current song
 const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds -> whole bars
+/* A district lasts as long as its song: SONGM (parts/songs.js, made by analysis/song-energy.py) has every song's length in bars and its loudness per bar.
+   A song that was decoded in this page wins over the table (same bpm and offset), so a replaced mp3 still sets the length. The boss comes in the last 32 bars. */
+const MINSHOT=190;                                          // an enemy never fires at a ship closer than this, or closer than its bullet travels in .85 s (about a second to react)
+const BOSS_BARS=32,MINI_BARS=14,BOSS_MIN_BAR=32;
+function songBars(stage){const m=SONGM[stage],t=TR.by[stage];
+  if(t){const b=TR.bufs[t.file];if(b&&b.duration>5)return Math.max(16,Math.floor((b.duration-t.offsetMs/1000)/(240/t.bpm)));
+    if(m&&m.bpm===t.bpm&&m.off===t.offsetMs)return m.bars;if(m)return Math.max(16,Math.floor((m.dur-t.offsetMs/1000)/(240/t.bpm)));}
+  return m?m.bars:72;}
+function songEnergy(stage,bar){const m=SONGM[stage];if(!m)return .6+.3*Math.sin(bar*.8);const n=m.e.length,i=Math.max(0,Math.floor(bar))%n;return(+m.e[i])/9;}
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
 /* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */

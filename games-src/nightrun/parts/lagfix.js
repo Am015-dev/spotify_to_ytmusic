@@ -10,9 +10,9 @@ function wantSongs(){
   if(!running||!G)return['menu','stage1','stage2'];
   if(ST.on){const o=[ST.def.song];if(ST.def.goal.k==='boss'){const sg=bossSong(DISTRICTS[ST.def.di].boss,false);if(sg)o.push(sg);}return o;}
   let di=G.di,L=G.loop,done=G.bossDone;
-  if(SH.active){di++;if(di>=DISTRICTS.length){di=0;L++;}done=false;}                       // pit stop: get ready for the district that comes next
+  if(SH.active){const nx=nextDi(di);di=nx.di;if(nx.wrap)L++;done=false;}                       // pit stop: get ready for the district that comes next
   const o=[songFor(di,L)],sg=bossSong(DISTRICTS[di].boss,false);if(sg&&!done)o.push(sg);
-  const n=di+1,Ln=n>=DISTRICTS.length?L+1:L;o.push(songFor(n%DISTRICTS.length,Ln));return o;}
+  const nx2=nextDi(di);o.push(songFor(nx2.di,nx2.wrap?L+1:L));return o;}
 TR.keepFn=file=>(TRQ.hold&&TRQ.hold.has(file))||wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);   // TRQ.hold: test hook that keeps extra songs decoded
 const trBusy=()=>{for(const k in TR.busy)if(TR.busy[k])return true;return false;};
 function pumpTracks(){if(!AU.a||trBusy())return;

@@ -14,6 +14,7 @@ const UPG=[
   {id:'nx',n:'Neon Boost',t:'Kills drop 50% more Neon',p:22,max:2,c:'#19e3ff',x:'up_nx',ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z'}];
 const UBY={};for(const u of UPG)UBY[u.id]=u;
 const PIT_SECS=10,PIT_LOCK=.6;
+const NEON_K=.04;                                         // Neon per kill: districts last as long as their song now (3 to 5 minutes), so a kill pays much less than it did
 const NEON_V={drone:.5,charger:.5,turret:1,gate:1,gunship:3,boss:8};     // fractions add up: about 40 Neon from a first district
 const p2d={};const path2=d=>p2d[d]||(p2d[d]=new Path2D(d));
 
@@ -27,7 +28,7 @@ const SH={UPG,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:
     NR.mod.mag=140+70*n('mg');NR.mod.win=20*n('wd');NR.mod.pw=1+.5*n('lp');
     this.ck=4*n('ck');this.hm=n('hm');this.sharp=1+.5*n('sb');this.nx=1+.5*n('nx');this.dmax=n('dc');this.db=n('db');this.fr=Math.pow(.8,n('fr'));},
   // ----- Neon -----
-  award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx;   // on-beat kills pay 1.5x, combos add up to +3
+  award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx*NEON_K;   // on-beat kills pay 1.5x, combos add up to +3
     const n=Math.floor(this.acc);if(n<1)return;this.acc-=n;this.neon+=n;this.earned+=n;this.flash=.35;if(n>=3)floater(e.x+14,e.y+8,'+'+n+' NEON','#19e3ff');},
   bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
@@ -78,6 +79,7 @@ const SH={UPG,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:
     const a=cur+clamp(want,-dt*2.2*k,dt*2.2*k);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;},
   // ----- weapon rhythms: the garage ships -----
   // the grid the ship shoots on, in beats: Courier a 16th, Echo an 8th, Triplet a third of a beat, Heavy every second beat
+  cellOn(cell){return true;},                                              // a ship may skip grid cells (Syncopator)
   gridStep(){const s=this.ship;return s==='tri'?1/3:s==='hv'?2:s==='ec'?1/2:1/4;},
   // damage per shot makes up for the grid being slower than the old free-running fire (same damage per second at every tempo)
   dmk(){const s=this.ship,old=Math.max(.09,BT.spb/6);return s==='std'?Math.min(2,this.gridStep()*BT.spb/old):s==='ec'?Math.min(2,this.gridStep()*BT.spb/Math.max(.12,old*2)):1;},
