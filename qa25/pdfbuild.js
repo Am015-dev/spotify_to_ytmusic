@@ -7,7 +7,7 @@ const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.a
  // NEW BUILD → Speed Champion chassis
  await t('#gbBkP [data-r2b="more"]');await t('#r2More [data-r2a="gnb"]',1200);await t('#gnbP [data-ch="sc8"]',2500);
  if(!await ev(()=>__gb.d().bp)){}
- await t('#gbBkP [data-r2b="more"]');await t('#r2More [data-r2a="clr"]',1200);
+ await t('#gbBkP [data-r2b="more"]');await T.swipeTo('#r2More','#r2More [data-r2a="clr"]');await t('#r2More [data-r2a="clr"]',1500);console.log('after CLEAR parts',await ev(()=>__gb.list().length));
  if(await ev(()=>__gb.GB_.mir))await t('#gbBkP [data-r2b="mir"]');if(LAY)await t('#b25 [data-b25="top"]',1200);await shot('00_chassis');
  const top0=+await ev(()=>__g9ev(`(()=>{const C={};for(const k in GB_.base){const[i,j]=k.split(',').map(Number),t=GB_top(i,j,GB_list());C[t]=(C[t]||0)+1}return Object.entries(C).sort((a,b)=>b[1]-a[1])[0][0]})()`));console.log('chassis parts',await ev(()=>__gb.list().length),'top plate',top0,'base cells',await ev(()=>__gb.cells().length));
  // PDF steps mapped to our grid: x 0-3 → i -2..1, z 0-9 → j -5..4; y = plates above the chassis top (dy)
