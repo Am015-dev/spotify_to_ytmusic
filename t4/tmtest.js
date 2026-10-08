@@ -23,14 +23,13 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  // roam: open the logbook ALL (TEST) tab
  await ev(()=>{__tm.roam()});await p.waitForFunction(()=>__tm.st().state==='roam'&&__tm.st().roam,null,{timeout:300000});await p.waitForTimeout(4000);
  console.log('ST',JSON.stringify(await ev(()=>__tm.st())));
+ for(let k=0;k<6;k++){const sk=await ev(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.offsetParent&&/SKIP/.test(b.textContent));if(!b)return null;const r=b.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]});if(!sk)break;await tapXY(sk[0],sk[1],2500)}
  console.log('roam gear',JSON.stringify(await gear()));await shot('t3_roam');
  if(!await tap('#roamLogBtn',1500)||await ev(()=>document.querySelector('#journal').hidden)){console.log('log btn hidden → journalOpen()');await ev(()=>__tm.log())}
  await tap('#journal .jt [data-t="tm"]',1500);console.log('all rows',await ev(()=>document.querySelectorAll('#jBody [data-tmi]').length),await ev(()=>[...document.querySelectorAll('#journal .tmH')].map(e=>e.textContent).join(' | ')));await shot('t4_logbook_all');
  // go to a rival race through the list (real taps), start it, ⚙ in the race
  const K=process.env.KIND||'rival';await ev(k=>window.__K=k,K);const ri=await ev(()=>{const r=[...document.querySelectorAll('#jBody [data-tmi]')].find(b=>__tm.kind(+b.dataset.tmi)===(window.__K||'rival'));return r?r.dataset.tmi:null});
- if(ri){await tap(`#jBody [data-tmi="${ri}"]`,6000);await p.waitForTimeout(6000);await ev(i=>{try{__tm.open(+i)}catch(e){}},ri);await p.waitForTimeout(1500);
-  const go=await ev(()=>{const c=[...document.querySelectorAll('button')].filter(b=>b.offsetParent&&/RACE ▶|START|GO/.test(b.textContent));return c.map(b=>b.id||b.textContent.trim().slice(0,12))});console.log('go buttons',JSON.stringify(go));
-  if(!await tap('#rcGo',2000)){const bt=await p.$('#roamCard button.go');if(bt)await bt.tap()}
-  if(K==='rival')await p.waitForFunction(()=>['race','countdown'].includes(__tm.st().state),null,{timeout:240000}).catch(()=>console.log('no race state'));else await p.waitForTimeout(4000);console.log('event',JSON.stringify(await ev(()=>__tm.st())));await p.waitForTimeout(5000);console.log('state',JSON.stringify(await ev(()=>__tm.st())),'gear',JSON.stringify(await gear()));await shot('t5_'+K+'_gear');
-  await tap('#tuG',1500);console.log('drawer in race',await ev(()=>document.querySelector('#tuD').classList.contains('on')));await shot('t5b_'+K+'_drawer');await tap('#tuD [data-a="x"]',800)}
+ if(ri){await ev(i=>__tm.go(+i),ri);await p.waitForTimeout(20000);
+  console.log('event',K,JSON.stringify(await ev(()=>__tm.st())),'gear',JSON.stringify(await gear()));await shot('t5_'+K+'_gear');
+  await tap('#tuG',1500);console.log('drawer',K,await ev(()=>document.querySelector('#tuD').classList.contains('on')));await shot('t5b_'+K+'_drawer');await tap('#tuD [data-a="x"]',800)}
  console.log('ERR',JSON.stringify(errs.slice(0,8)));await b.close()})();

@@ -35,5 +35,5 @@ if(TM_ON){
 body.tmGar #tuG{right:auto!important;left:var(--tmx)!important;top:calc(4px + env(safe-area-inset-top))!important}
 #journal .tmH{margin:8px 4px 2px;font:900 12px system-ui;color:#ffd12c;letter-spacing:.05em}#journal .jt button[data-t="tm"]{color:#ffd12c}`;document.head.appendChild(st)}
 }
-window.__tm={on:TM_ON,spend:n=>{const S=season();S.cr-=n;store.set('mho_season',S);return season().cr},roam:()=>enterRoam(),log:()=>journalOpen(),open:i=>roamOpen(RO.marks[i]),
+window.__tm={on:TM_ON,spend:n=>{const S=season();S.cr-=n;store.set('mho_season',S);return season().cr},roam:()=>enterRoam(),log:()=>journalOpen(),open:i=>roamOpen(RO.marks[i]),go:i=>{const m=RO.marks[i];RO.ftT=0;fastTravel(m,true);setTimeout(()=>{try{roamOpen(m);RO.cardPin=1;setTimeout(()=>{try{roamGo()}catch(e){console.warn(e)}},400)}catch(e){console.warn(e)}},1500)},
  st:()=>({state,roam:!!RO.on,ch:!!RO.ch,sp:!!RO.sp,card:!!RO.card,locked:RO.marks.filter(m=>markLocked(m)).length,unknown:RO.marks.filter(m=>!markKnown(m)).length,marks:RO.marks.length,slots:perkSlots()}),kind:i=>RO.marks[i]&&RO.marks[i].kind,cr:()=>season().cr,own:()=>GAR_get().own.length+'/'+GAR_SETS.length,raw:k=>localStorage.getItem(skey(k))};
