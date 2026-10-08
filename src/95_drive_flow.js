@@ -64,7 +64,7 @@ function DR_traffic(){const C=HUB.cars;if(!C||!C.length)return;const n0=C.length
   const per={};for(const c of keep.slice().sort((a,b)=>a.k-b.k||a.j-b.j)){c.j=per[c.k]=(per[c.k]??-1)+1;c.lane=.36}
   HUB.cim.forEach((im,k)=>{im.count=(per[k]??-1)+1;im.instanceMatrix.needsUpdate=true});C.length=0;C.push(...keep);DR.st.cars=[n0,C.length]}
 // a car stopped for 8 s that the player cannot see (behind or > 60 m) is recycled: queues never grow into walls
-function DR_unjam(dt){const hx=Math.sin(RO.h),hz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead>0||c.route){c.DRs=0;continue}if((c.cv??c.v)<.5)c.DRs=(c.DRs||0)+dt;else c.DRs=0;if(c.DRs<8)continue;
+function DR_unjam(dt){const hx=Math.sin(RO.h),hz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead>0||c.route||c.pk){c.DRs=0;continue}if((c.cv??c.v)<.5)c.DRs=(c.DRs||0)+dt;else c.DRs=0;if(c.DRs<8)continue;
   const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(d>60||dx*hx+dz*hz<0){c.dead=.05;c.DRs=0;DR.st.unjam=(DR.st.unjam||0)+1}}}
 // touch HUD: one-line mission card (title + count + bar), tap the title to show the text; plate and card right of the minimap
 if(DR.on){const st=document.createElement('style');st.textContent=`body.touch #qTrk{width:min(300px,38vw);padding:4px 8px 5px;border-width:2px;border-radius:10px}

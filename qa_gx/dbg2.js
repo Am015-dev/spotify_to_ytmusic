@@ -1,0 +1,5 @@
+const E=require('../bc/enter.js');
+(async()=>{const T=await E(process.argv[2],{gfx:'min'});const{p,tap,ev}=T;const W=t=>p.waitForTimeout(t);const pe=(f,a)=>p.evaluate(f,a);
+ await tap('#gbMenuBtn');await W(2500);await tap('#r2R [data-r2m="build"]');await W(3000);console.log(await pe(()=>{const b=document.querySelector('#gbBkP [data-r2b="more"]'),r=b.getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);b.click();return JSON.stringify({r:[r.left|0,r.top|0,r.width|0,r.height|0],hit:e&&(e.id||e.className||e.tagName),hitIsBtn:b.contains(e),cls:document.querySelector('#gbBkP').className})}));await tap('#gbBkP [data-r2b="more"]');await W(1000);
+ console.log(await pe(()=>{const m=document.querySelector('#r2More'),b=m.querySelector('[data-r2a="clr"]'),r=b.getBoundingClientRect(),q=m.getBoundingClientRect(),e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return JSON.stringify({pop:document.querySelector('#gbBkP').className,m:[q.left|0,q.top|0,q.width|0,q.height|0],disp:getComputedStyle(m).display,b:[r.left|0,r.top|0,r.width|0,r.height|0],hit:e&&(e.id||e.className||e.tagName)})}));
+ await T.b.close()})();

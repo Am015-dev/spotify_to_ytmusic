@@ -1,0 +1,2 @@
+(()=>{const C=HUB.cars;const d=C.map(c=>Math.round(Math.hypot(c.x-RO.x,c.z-RO.z)));const o={n:C.length,dead:C.filter(c=>c.dead>0).length,route:C.filter(c=>c.route).length,tr:C.filter(c=>c.tr).length,lt150:d.filter(x=>x<150).length,lt400:d.filter(x=>x<400).length,far:LV_trFar(),near:LV_trNear(),hid:C.filter(c=>c.hid||c.off).length,keys:Object.keys(C[0]).join(',')};
+for(let i=0;i<600;i++){hubRecycle()}const d2=C.map(c=>Math.round(Math.hypot(c.x-RO.x,c.z-RO.z)));o.after=d2.filter(x=>x<400).length;return JSON.stringify(o)})()
