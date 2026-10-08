@@ -99,7 +99,7 @@ function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]
 // gloss = clear-coated LEGO plastic; matte = no coat, rough; metal = metallic flake under a clear coat; chrome = mirror (base hue mixed toward silver,
 // metalness 1, roughness .04, strong env); pearl = the base colour kept, a soft iridescent sheen on top (thin-film), no lightening
 // gloss = clear-coated LEGO plastic; matte = no coat, rough; metal = metallic flake under a clear coat; chrome = mirror (base hue mixed toward silver,
-// metalness 1, roughness .04, its own bright studio reflection map); pearl = the base colour kept, a soft pearly sheen (warm face, cool rim) on top
+// metalness 1, roughness .04, its own bright studio reflection map); pearl = the base colour kept, a soft cool pearly sheen toward the rim
 const R2_FP={gloss:{roughness:.15,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.6,k:1},matte:{roughness:1,clearcoat:0,metalness:0,envMapIntensity:.15,k:.92,em:.12},
  metal:{metalness:.7,roughness:.26,clearcoat:.8,clearcoatRoughness:.12,envMapIntensity:1.4,k:1.1,em:.12,env:1},
  chrome:{metalness:1,roughness:.05,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.25,k:1,mix:.7,em:.03,env:1},
@@ -111,7 +111,7 @@ function R2_env(){if(R2_ENV)return R2_ENV;const[c,g]=cv(512,256),s=g.createLinea
  g.fillStyle='#fff';for(let i=0;i<4;i++)g.fillRect(40+i*128,24,52,70);const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;return R2_ENV=t}
 function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,mix,em,env,pearl,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(env)m.envMap=R2_env();
  const e=em==null?.16:em;m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>'+(mix?`\ndiffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.95,.98),${mix.toFixed(2)});`:''))
-  .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';'+(pearl?'\n{float r2v=1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.);totalEmissiveRadiance+=mix(vec3(1.,.86,.62),vec3(.55,.78,1.),r2v)*(.10+.42*r2v*r2v);}':''))};
+  .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';'+(pearl?'\n{float r2v=1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.);totalEmissiveRadiance+=mix(diffuseColor.rgb,vec3(.45,.62,1.),.55)*(.5*r2v*r2v*r2v);}':''))};
  m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
 const R2_fin=()=>{try{const f=GP_pa().fin;return R2_FP[f]?f:'gloss'}catch(e){return'gloss'}};
 function R2_finSet(o,f){if(!o)return 0;const M=R2_mat(f);let n=0;o.traverse(x=>{if(!x.isMesh||x.userData.r!=null||!x.material)return;if(x.material===GB_MAT||(x.material.userData&&x.material.userData.r2)){if(x.material!==M)x.material=M;n++}});return n}
