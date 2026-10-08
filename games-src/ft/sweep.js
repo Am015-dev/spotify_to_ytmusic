@@ -147,6 +147,7 @@ async function play(browser, job) {
   const issue = s => { if (res.issues.size < 12) res.issues.add(s); };
   const t0 = Date.now();
   const H = { tipsOn: idx % 4 !== 3, seen: new Set(), bulbN: 0 };
+  await ctx.addInitScript(() => { try { localStorage.setItem('soq_tutoffer', '1'); } catch (e) { } });   // the first-visit tutorial offer is tested in tutor-test.js
   if (!H.tipsOn) await ctx.addInitScript(() => { try { localStorage.setItem('gxh-sands-of-qamar', JSON.stringify({ on: false, seen: {} })); } catch (e) { } });
   try {
     if (story) { const n = +story.slice(1); const ch = {}; for (let k = 1; k < n; k++) ch['c' + k] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; await ctx.addInitScript(p => { try { localStorage.setItem('gns-campaign-sands', JSON.stringify({ v: 1, ch: p, unlocked: [], last: null })); } catch (e) { } }, ch); }
