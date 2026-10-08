@@ -150,7 +150,7 @@ table.stats{width:100%;border-collapse:collapse}table.stats td,table.stats th{bo
 
 /* ---- guidance layer ---- */
 .gx-gear{display:none}.gx-more{display:contents}
-@media (max-width:999px){.gx-gear{display:inline-flex}.gx-more{display:none;position:fixed;top:calc(var(--gx-bar-h) + 4px);right:8px;z-index:45;flex-direction:column;gap:6px;background:var(--panel);border:2px solid var(--gold);border-radius:12px;padding:8px;box-shadow:0 12px 40px #000}.gx-more.open{display:flex}.gx-more .btn{width:100%}}
+@media (max-width:1599px){.gx-gear{display:inline-flex}.gx-more{display:none;position:fixed;top:calc(var(--gx-bar-h) + 4px);right:8px;z-index:45;flex-direction:column;gap:6px;background:var(--panel);border:2px solid var(--gold);border-radius:12px;padding:8px;box-shadow:0 12px 40px #000}.gx-more.open{display:flex}.gx-more .btn{width:100%}}
 @media (max-width:700px){.gx-bar .btn[data-gx]{font-size:.78rem;padding:.25rem .45rem}.gx-bar h1{font-size:.92rem;margin-right:.2rem}}
 .legend{align-self:center;background:rgba(12,10,34,.78);border:1px solid var(--line);border-radius:8px;padding:2px 7px;font-size:.72rem;color:#dcdaf5;max-width:min(560px,calc(100vw - 110px));line-height:1.35}
 .legend b{font-weight:800;margin-left:4px}.legend .ps{color:var(--gold)}.legend .h{color:#ffd0a0}.legend .sh{color:#7fd4ff}.legend .f{color:#9f9}.legend .e{color:#8ef}.legend .sx{color:var(--bad)}.legend .l{color:#ff9}
@@ -650,6 +650,11 @@ html.bf #tags .tag .tgl{display:none}
 /* long-press popup with the full text of a shortened line (brief.js) */
 #fulltip{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80;max-width:min(86vw,420px);background:rgba(8,6,24,.96);border:2px solid #ffc86b;border-radius:14px;padding:14px 16px;color:#fff;font:600 15px/1.4 "Exo 2",sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.7);pointer-events:none}
 .tl{cursor:help}.brief .bico{font-weight:800;font-size:17px;margin:4px 0}.brief .bico2{margin:2px 0;font-size:15px}.brief .bico2 .hold{opacity:.65;font-size:12px;margin-left:8px}
+/* help kit: the bulb in the top bar, the Tips rows in the menu */
+.gx-bar .gxh-bulb{min-width:40px;min-height:40px;border:1.5px solid var(--line);border-radius:10px;background:transparent;padding:0 6px}
+.gxh-mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--ink)}.gxh-mrow .btn{min-height:40px}.gxh-mrow .btn[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
+@media (min-width:1600px){.gx-more .gxh-mrow{flex:0 0 auto;gap:6px}.gx-more .gxh-mrow:last-child>span:first-child{display:none}.gx-more .gxh-mrow .btn{padding:.2rem .5rem;min-height:36px;font-size:.78rem}}
+.gx-more .gxh-mrow .btn,html.ph .gx-more .gxh-mrow .btn{width:auto;flex:0 0 auto;display:inline-flex;justify-content:center;min-width:56px}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -790,6 +795,104 @@ html.bf #tags .tag .tgl{display:none}
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
 
+/* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
+   Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
+:root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub.on{visibility:visible}
+.gxh-bub *{box-sizing:border-box}
+.gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
+.gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
+.gxh-bub .gxh-sp svg{width:100%;height:100%}
+.gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
+.gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
+.gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
+.gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
+.gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring.round{border-radius:50%}
+.gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
+.gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+.gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gxh-bulb svg{width:24px;height:24px;display:block;fill:#ffd95a;stroke:#6b4a00;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,217,90,.7))}
+.gxh-bulb.gxh-float{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:calc(var(--gxh-z) - 2);width:44px;height:44px;border-radius:50%;border:2px solid var(--gxh-accent);background:#2a1820}
+.gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
+.gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
+.gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
+.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
+.gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
+.gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
+.gxh-rules .gxh-rx{font-weight:600;font-size:16px}
+.gxh-rules .gxh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.gxh-rules .gxh-nav button{min-height:44px;min-width:76px;padding:0 14px;border-radius:22px;border:2px solid var(--gxh-btn);background:transparent;color:var(--gxh-btn);font:800 15px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-nav button.gxh-next{background:var(--gxh-btn);color:var(--gxh-btn-ink)}
+.gxh-rules .gxh-nav button[disabled]{opacity:.3}
+.gxh-rules .gxh-dots{display:flex;gap:6px}
+.gxh-rules .gxh-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.25)}
+.gxh-rules .gxh-dots i.on{background:var(--gxh-btn)}
+.gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
+.gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.gxh-pics svg{width:64px;height:64px}
+.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
+.gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.gxh-set>span{flex:1 0 90px;font-weight:700}
+.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
+@keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
+/* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+
+/* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
+   Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
+:root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
+.gxt-cell{position:fixed;z-index:var(--gxt-z);background:var(--gxt-dim);touch-action:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.gxt-cell.gxt-clear{background:transparent}
+.gxt-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow,#ffe08a);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow,#ffe08a);animation:gxt-pulse 1.1s ease-in-out infinite}
+.gxt-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow,#ffe08a);opacity:.9;animation:none}
+.gxt-fin{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 3);pointer-events:none;width:0;height:0}
+.gxt-fin i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxt-fin b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
+.gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
+.gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
+.gxt-dots i.done{background:#c99a35}
+.gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
+.gxt-n{opacity:.85;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
+.gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
+.gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
+.gxt-et{font-weight:800;font-size:22px;line-height:1.15}
+.gxt-ex{font-weight:600;font-size:15px}
+.gxt-eb{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.gxt-b{min-height:48px;padding:0 16px;border-radius:24px;border:2px solid var(--gxh-btn,#7a1f31);background:transparent;color:var(--gxh-btn,#7a1f31);font:800 16px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-b.pri{background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc)}
+@keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
+@keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+
 </style>
 </head>
 <body>
@@ -800,6 +903,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <button class="btn gx-tb" data-gx="d-log" aria-expanded="false" title="Battle log">📜 Log</button>
   <button class="btn" data-a="rules">❔ Rules</button>
   <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
   <button class="btn gx-gear" data-a="menu" aria-expanded="false" aria-controls="more" aria-label="More controls">⚙</button>
   <div class="gx-more" id="more">
   <button class="btn" data-a="new">✦ New</button>
@@ -807,7 +911,6 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <button class="btn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
   <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
   <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)" aria-label="Pause the computer"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg></button>
-  <button class="btn" data-a="hints" id="hintbtn" title="Suggested maneuvers">💡 On</button>
   <button class="btn" data-a="gfx" id="gfxbtn" title="Graphics quality">Graphics</button>
   <button type="button" class="btn" data-perfhud="show" aria-pressed="false" title="Show the frame-rate overlay (F9)">Show speed</button><button type="button" class="btn" data-perfhud="test" title="Measure each graphics level and suggest one">Test speed</button>
   </div>
@@ -819,7 +922,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
     <svg id="map" viewBox="0 0 914 914" role="img" aria-label="The battlefield from above"></svg>
   </main>
   <aside class="gx-dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn na-guide" data-a="guide" aria-pressed="true">📘 Guide</button><button class="gx-ibtn na-adv" data-a="advise" aria-expanded="false" title="What should I do now, and why?">🧭 Advice</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn na-guide" data-a="guide" aria-pressed="true">📘 Guide</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
     <div class="gx-dock-top">
       <div id="steps" class="roadmap"></div>
       <div id="queue" class="queue"></div>
@@ -3382,6 +3485,612 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// gx-help.js: on-demand and first-time help for any game. Coach bubbles (once per phase), a lightbulb (suggested move + rules cards), a tips switch.
+// Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
+//   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
+//   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
+// Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
+(function () {
+  'use strict';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
+  function load() {
+    var raw = null; try { raw = localStorage.getItem(key()); } catch (e) { raw = mem || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    st = { on: o && typeof o.on === 'boolean' ? o.on : cfg.defaultOn !== false, seen: (o && o.seen && typeof o.seen === 'object') ? o.seen : {} };
+  }
+  function save() { var s = JSON.stringify(st); mem = s; try { localStorage.setItem(key(), s); } catch (e) {} }
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function inter(a, b) { return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)); }
+  function infl(r, p) { return { left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p }; }
+  // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
+  var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
+  function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
+  function avoidRects(k) {
+    var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
+    var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+    }
+    return out;
+  }
+  function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
+  function place(b, tr) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
+    var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
+    var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
+    var ks = [CORE, 32];
+    for (var ki = 0; ki < ks.length && !best; ki++) {
+      var av = avoidRects(ks[ki]);
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
+        var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (hit(c, T)) continue;
+        var ov = 0; for (var k = 0; k < av.length; k++) if (hit(c, av[k])) ov += inter(c, av[k]) || 1;
+        var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
+        if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
+      }
+    }
+    var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
+    b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
+    var side = c2.bottom <= tr.top + 2 ? 'bottom' : c2.top >= tr.bottom - 2 ? 'top' : c2.right <= tr.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + side;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (side === 'top' || side === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, tr.cx - c2.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return c2;
+  }
+  function ringAt(r, cls) {
+    var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
+    if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
+    D.body.appendChild(e); return e;
+  }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function fingerAt(fr, tr) {
+    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+    f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
+    if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
+  // ------------------------------------------------------------------ the one current help element
+  function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
+  function hide() {
+    if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
+    cur = null; D.removeEventListener('pointerdown', onDown, true);
+  }
+  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
+  function onDown(e) {
+    if (rulesEl || !cur) return;
+    var t = e.target;
+    if (t && t.closest) {
+      if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
+      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+    }
+    hide();   // the tap is not swallowed: it still reaches whatever was tapped
+  }
+  function draw() {   // (re)build the visible pieces for cur at the current layout
+    if (!cur) return;
+    clearEls();
+    var tr = toRect(cur.target); if (!tr) { hide(); return; }
+    var fr = cur.from ? toRect(cur.from) : null, els = [];
+    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    else els.push(ringAt(tr, 'soft'));
+    var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
+    place(b, tr);
+  }
+  // ------------------------------------------------------------------ coach bubbles
+  function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function tryShow(id, n) {
+    pend = null;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var tr = toRect(step.target);
+    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    st.seen[id] = 1; save(); shown.push(id);
+    cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd">' + (step.pic ? '<div class="gxh-sp">' + picHTML(step.pic) + '</div>' : '') + '<div><div class="gxh-tt">' + esc(step.title) + '</div><div class="gxh-tx">' + esc(step.text) + '</div></div></div><div class="gxh-row2"><button type="button" class="gxh-ok">Got it</button></div>';
+      b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
+      return b;
+    } };
+    draw(); arm();
+  }
+  function phase(id) {
+    if (!cfg) return;
+    if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (pend) { if (pend.id === id) return; cancelPend(); }
+    if (!st.on || st.seen[id] || !cfg.steps[id]) return;
+    pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
+  }
+  // ------------------------------------------------------------------ the lightbulb
+  var BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>';
+  function bulbOpen() {
+    if (!bulbOpts || Date.now() < skipUntil) return;
+    hide(); cancelPend();
+    var s = null, ph = null;
+    try { s = bulbOpts.suggest ? bulbOpts.suggest() : null; } catch (e) { console.warn('gxh suggest', e); }
+    try { ph = bulbOpts.rulesFor ? bulbOpts.rulesFor() : null; } catch (e) {}
+    if (!s || !s.target || !toRect(s.target)) { rules(ph); return; }
+    cur = { kind: 'bulb', phase: ph, target: s.target, from: s.from, sug: s, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub gxh-bulbb'); b.setAttribute('role', 'status');
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">' + esc(s.why || '') + '</div><div class="gxh-row2"><button type="button" class="gxh-link">How does this work?</button></div>';
+      b.querySelector('.gxh-link').addEventListener('click', function () { rules(ph); });
+      return b;
+    } };
+    if (bulbEl) bulbEl.classList.add('lit');
+    draw(); arm();
+  }
+  function bulb(o) {
+    if (!cfg) return; bulbOpts = o || {};
+    var e = o && o.el; if (typeof e === 'string') e = D.querySelector(e);
+    if (!e) { e = mk('button', 'gxh-bulb gxh-float'); e.type = 'button'; D.body.appendChild(e); }
+    if (bulbEl && bulbEl !== e) bulbEl.removeEventListener('click', bulbOpen);
+    bulbEl = e; e.classList.add('gxh-bulb'); e.setAttribute('data-help', ''); if (!e.getAttribute('aria-label')) e.setAttribute('aria-label', 'Help: suggest a move');
+    if (!e.querySelector('svg')) e.insertAdjacentHTML('afterbegin', BULB);
+    e.removeEventListener('click', bulbOpen); e.addEventListener('click', bulbOpen);
+    return e;
+  }
+  // ------------------------------------------------------------------ rules cards
+  function rulesList(ph) {
+    var all = cfg.rules || [], m = function (r) { return r.phase === ph || (Array.isArray(r.phase) && r.phase.indexOf(ph) >= 0); };
+    var l = ph != null ? all.filter(m) : []; if (!l.length) l = all.filter(function (r) { return r.phase == null; }); if (!l.length) l = all.slice();
+    return l;
+  }
+  function closeRules() { if (rulesEl) { if (rulesEl.parentNode) rulesEl.parentNode.removeChild(rulesEl); rulesEl = null; D.removeEventListener('keydown', onKey, true); } }
+  function onKey(e) { if (!rulesEl) return; if (e.key === 'Escape') closeRules(); else if (e.key === 'ArrowRight') rulesEl._go(1); else if (e.key === 'ArrowLeft') rulesEl._go(-1); }
+  function rules(ph) {
+    if (!cfg) return; var list = rulesList(ph); hide(); cancelPend(); closeRules(); if (!list.length) return;
+    var R = rulesEl = mk('div', 'gxh-rules'); R.setAttribute('role', 'dialog'); R.setAttribute('aria-modal', 'true'); R.setAttribute('aria-label', 'How this works');
+    R.innerHTML = '<div class="gxh-card" data-help><button type="button" class="gxh-x" aria-label="Close">×</button><div class="gxh-pic"></div><div class="gxh-rt"></div><div class="gxh-rx"></div><div class="gxh-nav"><button type="button" class="gxh-prev">Back</button><span class="gxh-dots"></span><button type="button" class="gxh-next">Next</button></div></div>';
+    var i = 0, q = function (s) { return R.querySelector(s); };
+    function show() {
+      var c = list[i]; q('.gxh-pic').innerHTML = picHTML(c.pic); q('.gxh-rt').textContent = c.title || ''; q('.gxh-rx').textContent = c.text || '';
+      q('.gxh-dots').innerHTML = list.length > 1 ? list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') : '';
+      q('.gxh-prev').disabled = i === 0; q('.gxh-prev').style.visibility = list.length > 1 ? 'visible' : 'hidden'; q('.gxh-next').textContent = i === list.length - 1 ? 'Done' : 'Next';
+      R.dataset.card = i; R.dataset.count = list.length;
+    }
+    R._go = function (d) { var n = i + d; if (n >= list.length) { closeRules(); return; } if (n < 0) return; i = n; show(); };
+    q('.gxh-x').addEventListener('click', closeRules); q('.gxh-prev').addEventListener('click', function () { R._go(-1); }); q('.gxh-next').addEventListener('click', function () { R._go(1); });
+    R.addEventListener('click', function (e) { if (e.target === R) closeRules(); });
+    var x0 = null; R.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    R.addEventListener('touchend', function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 45) R._go(dx < 0 ? 1 : -1); }, { passive: true });
+    D.addEventListener('keydown', onKey, true);
+    show(); D.body.appendChild(R);
+  }
+  // ------------------------------------------------------------------ settings: Tips on/off + Reset tips
+  function settingsHTML(o) {
+    o = o || {}; var rc = o.rowClass || 'gxh-set', sc = o.segClass || '', bc = o.btnClass || '';
+    var b = function (a, v, label, pr) { return '<button type="button" class="' + bc + '" data-gxh="' + a + '"' + (v != null ? ' data-v="' + v + '"' : '') + (pr != null ? ' aria-pressed="' + pr + '"' : '') + '>' + label + '</button>'; };
+    return '<div class="' + rc + ' gxh-set" data-help><span>Tips</span><span class="' + sc + '" style="display:inline-flex;gap:6px;flex:0 0 auto">' + b('tips', 1, 'On', st.on) + b('tips', 0, 'Off', !st.on) + '</span></div>' +
+      '<div class="' + rc + ' gxh-set" data-help><span>Show tips again</span>' + b('reset', null, 'Reset tips') + '</div>';
+  }
+  function settingsRow(o) { var d = D.createElement('div'); d.setAttribute('data-help', ''); d.innerHTML = settingsHTML(o); return d; }
+  function syncSettings() {
+    var l = D.querySelectorAll('[data-gxh=tips]');
+    for (var i = 0; i < l.length; i++) l[i].setAttribute('aria-pressed', String((l[i].dataset.v === '1') === st.on));
+  }
+  function onClick(e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-gxh]'); if (!t || !cfg) return;
+    if (t.dataset.gxh === 'tips') setEnabled(t.dataset.v === '1');
+    else if (t.dataset.gxh === 'reset') { reset(); var o = t.textContent; t.textContent = 'Done'; setTimeout(function () { t.textContent = o; }, 1400); }
+  }
+  function setEnabled(v) { if (!cfg) return; st.on = !!v; save(); if (!st.on) { cancelPend(); if (cur && cur.kind === 'coach') hide(); } syncSettings(); }
+  function reset() { if (!cfg) return; st.seen = {}; shown.length = 0; save(); }
+  // ------------------------------------------------------------------ relayout
+  function relayout() { if (!cfg || !cur || rulesEl) return; draw(); }
+  function init(o) {
+    cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
+    if (wired) return GXH; wired = true;
+    D.addEventListener('click', onClick, true);
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    return GXH;
+  }
+  var GXH = window.GXH = {
+    version: 1, init: init, phase: phase, bulb: bulb, rules: rules, hide: hide, relayout: relayout, setEnabled: setEnabled, reset: reset,
+    enabled: function () { return !!st.on; }, seen: function (id) { return !!st.seen[id]; }, settingsHTML: settingsHTML, settingsRow: settingsRow,
+    state: function () { return { on: st.on, seen: Object.keys(st.seen), shown: shown.slice(), cur: cur ? { kind: cur.kind, id: cur.id || null, phase: cur.phase } : null, rules: !!rulesEl, pending: pend ? pend.id : null }; }
+  };
+})();
+
+</script>
+<script>
+// gx-tutor.js: a staged tutorial game for any game (spotlight, one bubble per step, only the target accepts input, steps advance only on the
+// right action). Needs gx-tutor.css and gx-help.css (bubble styles). Uses GXV.watch (gx-viewport.js) for relayout when it is loaded. See GX-KIT.md section 10.
+//   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
+//              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
+//              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
+//   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
+//   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
+//   GXT.status(game) GXT.menuHTML({game, first, cls, launch}) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
+// Everything the kit draws carries data-help. Progress is remembered per game in localStorage 'gxt-<game>' {done, open, step}.
+(function () {
+  'use strict';
+  var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
+  var DIM = 'rgba(8,4,10,.62)';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
+  // ------------------------------------------------------------------ remembered progress
+  function key(g) { return 'gxt-' + g; }
+  function load(g) {
+    var raw = null; try { raw = localStorage.getItem(key(g)); } catch (e) { raw = mem[g] || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    return o && typeof o === 'object' ? o : null;
+  }
+  function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
+  // ------------------------------------------------------------------ geometry
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function holesOf(st) {
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var out = [p], al = null;
+    try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
+    if (al && !Array.isArray(al)) al = [al];
+    (al || []).forEach(function (a) { var r = toRect(a); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out;
+  }
+  function inflate(r, p, v) {
+    var l = Math.max(0, r.left - p), t = Math.max(0, r.top - p), rr = Math.min(v.w, r.right + p), b = Math.min(v.h, r.bottom + p);
+    return norm({ left: l, top: t, width: Math.max(1, rr - l), height: Math.max(1, b - t) });
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function moved(hs, key) {
+    if (!key) return true; var a = key.split('|'); if (a.length !== hs.length) return true;
+    for (var i = 0; i < hs.length; i++) { var q = a[i].split(',').map(Number), r = hs[i]; if (Math.abs(q[0] - r.left) > 3 || Math.abs(q[1] - r.top) > 3 || Math.abs(q[2] - r.width) > 4 || Math.abs(q[3] - r.height) > 4) return true; }
+    return false;
+  }
+  function rkey(hs) { return hs.map(function (r) { return Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.width) + ',' + Math.round(r.height); }).join('|'); }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  // ------------------------------------------------------------------ drawing
+  function clearVisuals() {
+    if (!S) return;
+    (S.vis || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); S.vis = []; S.bub = null; S.holes = null; S.cells = []; S.pill = null;
+  }
+  function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
+  function cell(l, t, w, h, clear) {
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    return c;
+  }
+  function swallow(e) { e.preventDefault(); e.stopPropagation(); }
+  function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
+  // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
+  function drawCells(hs, shield) {
+    var v = vp(), xs = [0, v.w], ys = [0, v.h];
+    hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
+    xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    ys = ys.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
+      var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
+      for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+    }
+    if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
+  }
+  function ring(r, cls) {
+    var e = mk('div', 'gxt-ring' + (cls ? ' ' + cls : ''));
+    e.style.cssText = 'left:' + Math.round(r.left) + 'px;top:' + Math.round(r.top) + 'px;width:' + Math.round(r.width) + 'px;height:' + Math.round(r.height) + 'px';
+    return add(e);
+  }
+  function finger(fr, tr) {
+    var f = mk('div', 'gxt-fin', '<i></i><b></b>'); add(f); f.setAttribute('aria-hidden', 'true');
+    f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy); if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function stepText(st, k) { var v = st[k]; try { if (typeof v === 'function') v = v(); } catch (e) { v = ''; } return v == null ? '' : String(v); }
+  function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
+  function topLimit() { return stripH() + 4; }
+  // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
+  function place(b, hs, side) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
+    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
+    function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
+    var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
+    var below = { left: x, top: hull.bottom + 12, right: x + w, bottom: hull.bottom + 12 + h }, above = { left: x, top: hull.top - 12 - h, right: x + w, bottom: hull.top - 12 };
+    var room = { below: bot - hull.bottom, above: hull.top - top }, order = side === 'top' ? ['above', 'below'] : side === 'bottom' ? ['below', 'above'] : (room.below >= room.above ? ['below', 'above'] : ['above', 'below']);
+    var best = null; order.forEach(function (n) { var c = n === 'below' ? below : above; if (!best && ok(c)) best = c; });
+    if (!best) {   // scan the whole screen for the free spot nearest the primary hole (any x, so a bubble can sit beside a big target)
+      var bs = 1e9, xs = [x, pad, Math.max(pad, v.w - w - pad)];
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 4) {
+        var c2 = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (!ok(c2)) continue; var d = Math.abs(c2.left + w / 2 - P.cx) * 0.5 + Math.abs(y + h / 2 - P.cy); if (d < bs) { bs = d; best = c2; }
+      }
+    }
+    if (!best) { var useBelow = room.below >= room.above; var yy = useBelow ? Math.min(bot - h, hull.bottom + 12) : Math.max(top, hull.top - 12 - h); best = { left: x, top: yy, right: x + w, bottom: yy + h }; }
+    b.style.left = Math.round(best.left) + 'px'; b.style.top = Math.round(best.top) + 'px';
+    var sd = best.bottom <= P.top + 2 ? 'bottom' : best.top >= P.bottom - 2 ? 'top' : best.right <= P.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + sd;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (sd === 'top' || sd === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, P.cx - best.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, P.cy - best.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return best;
+  }
+  function dots() {
+    var n = cfg.steps.length, h = '';
+    for (var i = 0; i < n; i++) h += '<i' + (i < S.i ? ' class="done"' : i === S.i ? ' class="on"' : '') + '></i>';
+    return '<span class="gxt-dots" role="img" aria-label="Step ' + (S.i + 1) + ' of ' + n + '">' + h + '</span><span class="gxt-n">' + (S.i + 1) + '/' + n + '</span>';
+  }
+  function topStrip() {
+    var t = mk('div', 'gxt-top', '<span class="gxt-prog">' + dots() + '</span><button type="button" class="gxt-skip" data-gxt-skip>Skip tutorial</button>');
+    t.style.height = stripH() + 'px'; t.querySelector('.gxt-skip').addEventListener('click', function (e) { e.stopPropagation(); skip(); });
+    return t;
+  }
+  // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
+  function draw() {   // (re)build the visible pieces for the current step at the current layout
+    var st = S.step, hs = holesOf(st); clearVisuals();
+    var v = vp();
+    if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
+    var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
+    S.holes = H; S.key = rkey(hs);
+    var nextStep = !st.wait;
+    drawCells(H, nextStep);
+    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    add(topStrip());
+    if (st.wait && st.wait.type !== 'event') {
+      var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
+    }
+    var say = stepText(st, 'say'), title = stepText(st, 'title');
+    var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
+    b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
+      (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
+    add(b); S.bub = b; S.say = say;
+    var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+    place(b, H, st.side);
+    return true;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
+    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  }
+  function enter(i) {
+    var st = cfg.steps[i]; if (!st) { finish(); return; }
+    S.i = i; S.step = st; S.count = 0; S.phase = 'pend'; S.key = ''; S.stable = 0; S.stable_k = ''; S.since = Date.now(); S.shown = false; S.misses = 0;
+    mark(cfg.game, { open: 1, step: i });
+    clearVisuals(); drawWaiting();
+    try { if (st.onEnter) st.onEnter(); } catch (e) { console.warn('gxt onEnter', e); }
+    if (st.ai) { try { var r = st.ai(); if (r && r.then) { S.aiBusy = true; r.then(function () { S.aiBusy = false; }, function () { S.aiBusy = false; }); } } catch (e) { console.warn('gxt ai', e); } }
+  }
+  function tick() {
+    if (!S || S.phase === 'gap' || S.phase === 'end') return;
+    var st = S.step; if (!st) return;
+    if (S.phase === 'pend') {
+      var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
+      var hs = rdy ? holesOf(st) : null;
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
+      if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
+      return;
+    }
+    if (S.phase === 'show') {
+      var hs2 = holesOf(st);
+      if (!hs2) { if (++S.misses >= 3) { S.misses = 0; S.phase = 'pend'; S.stable = 0; S.stable_k = ''; clearVisuals(); drawWaiting(); } return; }
+      S.misses = 0;
+      if (moved(hs2, S.key)) draw();
+    }
+  }
+  function advance() {
+    var st = S.step; S.phase = 'gap'; clearVisuals(); drawWaiting();
+    setTimeout(function () { if (!S || S.step !== st) return; try { if (st.onDone) st.onDone(); } catch (e) {} if (S.i + 1 >= cfg.steps.length) finish(); else enter(S.i + 1); }, 0);
+  }
+  function next() {
+    if (!S || S.phase !== 'show' || S.step.wait) return;
+    try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
+    advance();
+  }
+  var wrongT = 0;
+  function wrong() {
+    if (!S || S.phase !== 'show' || !S.bub) return;
+    var b = S.bub, st = S.step, tx = b.querySelector('.gxh-tx'); if (!tx) return;
+    b.classList.remove('gxt-shake'); void b.offsetWidth; b.classList.add('gxt-shake');
+    tx.textContent = st.wrong || (st.wait ? 'Tap the glowing one.' : 'Tap Next.');
+    clearTimeout(wrongT); wrongT = setTimeout(function () { if (S && S.bub === b && tx) { tx.textContent = S.say; b.classList.remove('gxt-shake'); } }, 1700);
+    S.wrongs = (S.wrongs || 0) + 1;
+  }
+  // the games call this from their input handlers; the return value says whether to go on with the action
+  function act(a) {
+    if (!S || S.phase === 'end') return true;
+    a = a || {};
+    if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    var st = S.step, w = st.wait;
+    if (a.type === 'event') {
+      if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
+      return true;
+    }
+    if (!w || w.type === 'event') { wrong(); return false; }
+    var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
+    if (!okm) { wrong(); return false; }
+    S.count++;
+    if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
+    return true;
+  }
+  // ------------------------------------------------------------------ end card, skip, stop
+  function teardown() {
+    if (S) { clearVisuals(); clearInterval(S.timer); }
+    S = null; closeDlg();
+  }
+  function finish() {
+    mark(cfg.game, { done: 1, open: 0, step: 0 });
+    clearVisuals(); S.phase = 'end';
+    var v = vp(); add(cell(0, 0, v.w, v.h, false));
+    var story = cfg.story !== false;
+    var c = mk('div', 'gxt-end'); c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', 'Tutorial finished');
+    c.innerHTML = '<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">' + esc(cfg.endTitle || 'You know the rules') + '</div><div class="gxt-ex">' + esc(cfg.endText || 'You can start a real game now.') + '</div>' +
+      '<div class="gxt-eb">' + (cfg.endButtons ? cfg.endButtons.map(function (b, i) { return '<button type="button" class="gxt-b' + (i ? '' : ' pri') + '" data-gxt-end="' + esc(b.id) + '">' + esc(b.label) + '</button>'; }).join('') : '<button type="button" class="gxt-b pri" data-gxt-end="play">Play a real game</button>' + (story ? '<button type="button" class="gxt-b" data-gxt-end="story">Story mode</button>' : '')) + '</div></div>';
+    add(c);
+    c.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-end]'); if (!b) return;
+      var choice = b.dataset.gxtEnd, done = cfg.onDone; teardown();
+      try { if (done) done({ choice: choice }); } catch (err) { console.warn('gxt onDone', err); }
+    });
+  }
+  function skip() {
+    if (!S) return; var g = cfg.game, ex = cfg.onExit;
+    mark(g, { open: 0, step: 0 }); teardown();
+    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+  }
+  function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
+  // ------------------------------------------------------------------ start
+  function lint(steps) {
+    var bad = [];
+    (steps || []).forEach(function (s, i) {
+      var tag = 'step ' + i + ' (' + (s.id || '?') + ')';
+      if (!s.id) bad.push(tag + ': no id');
+      if (typeof s.say === 'string' && words(s.say) > 20) bad.push(tag + ': say over 20 words (' + words(s.say) + ')');
+      if (typeof s.title === 'string' && words(s.title) > 4) bad.push(tag + ': title over 4 words');
+      if (typeof s.target !== 'function' && !(s.target && typeof s.target === 'object')) bad.push(tag + ': no target');
+      if (s.wait && s.wait.type !== 'event' && s.wait.type !== 'tap' && s.wait.type !== 'drag') bad.push(tag + ': wait.type must be tap, drag or event');
+    });
+    return bad;
+  }
+  function start(c) {
+    if (S) teardown();
+    cfg = c; cfg.steps = cfg.steps || []; wire();
+    var bad = lint(cfg.steps); if (bad.length) console.warn('gxt lint: ' + bad.join('; '));
+    mark(cfg.game, { open: 1, step: 0 });
+    S = { i: 0, step: null, phase: 'pend', vis: [], cells: [], timer: 0 };
+    try { if (cfg.setup) cfg.setup(); } catch (e) { console.error('gxt setup', e); }
+    S.timer = setInterval(tick, 100);
+    enter(0);
+    return GXT;
+  }
+  function relayout() { if (S && S.phase === 'show') draw(); else if (S && S.phase === 'end') { var e = S.vis[S.vis.length - 1]; if (e) { var v = vp(), c0 = S.vis[0]; if (c0) c0.style.cssText = 'left:0;top:0;width:' + v.w + 'px;height:' + v.h + 'px'; } } else if (S && (S.phase === 'pend' || S.phase === 'gap')) { clearVisuals(); drawWaiting(); } }
+  function wire() {
+    if (wired) return; wired = true;
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    D.addEventListener('click', onMenuClick, true);
+  }
+  // ------------------------------------------------------------------ menu helper: "New here? Learn in 5 minutes" / "Tutorial" / "Tutorial ✓"
+  function label(g, first) {
+    var s = status(g);
+    if (s.done) return 'Tutorial ✓';
+    if (first && !s.open) return 'New here? Learn in 5 minutes';
+    return s.open ? 'Tutorial (continue?)' : 'Tutorial';
+  }
+  function menuHTML(o) {
+    o = o || {}; var g = o.game; if (o.launch) launchers[g] = o.launch; wire();
+    var s = status(g), first = !!o.first && !s.done && !s.open, cls = (o.cls || '') + ' gxt-menu' + (first ? ' gxt-first' : '') + (s.done ? ' gxt-ok' : '');
+    var sub = o.sub === false ? '' : '<span>' + esc(s.done ? 'Done. Tap to play it again.' : first ? 'Short, one tap at a time, no reading' : s.open ? 'Restart or exit' : 'Learn by doing, step by step') + '</span>';
+    return '<button type="button" class="' + cls.trim() + '" data-gxt-open="' + esc(g) + '" data-help><b>' + esc(label(g, first)) + '</b>' + sub + '</button>';
+  }
+  function onMenuClick(e) {
+    var b = e.target && e.target.closest && e.target.closest('[data-gxt-open]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var g = b.dataset.gxtOpen, fn = launchers[g]; if (!fn) return;
+    if (status(g).open && !S) openDlg(g, fn); else fn();
+  }
+  function closeDlg() { if (dlg) { if (dlg.parentNode) dlg.parentNode.removeChild(dlg); dlg = null; } }
+  function openDlg(g, fn) {
+    closeDlg();
+    dlg = mk('div', 'gxt-end'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-label', 'Tutorial in progress');
+    dlg.innerHTML = '<div class="gxt-endc"><div class="gxt-et">You left the tutorial half way</div><div class="gxt-ex">Start it again from the first step, or leave it.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-gxt-dlg="restart">Restart tutorial</button><button type="button" class="gxt-b" data-gxt-dlg="exit">Exit</button></div></div>';
+    D.body.appendChild(dlg);
+    dlg.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-dlg]'); if (!b) return;
+      closeDlg(); if (b.dataset.gxtDlg === 'restart') fn(); else { mark(g, { open: 0, step: 0 }); var l = D.querySelectorAll('[data-gxt-open="' + g + '"]'); for (var i = 0; i < l.length; i++) { var bb = l[i].querySelector('b'); if (bb) bb.textContent = label(g, false); } }
+    });
+  }
+  function state() {
+    if (!S) return { active: false };
+    var st = S.step || {}, hs = S.holes && S.holes[0], b = S.bub && S.bub.getBoundingClientRect();
+    return { active: true, phase: S.phase, i: S.i, n: cfg.steps.length, id: st.id, shown: S.phase === 'show' && !!S.bub, wait: st.wait ? st.wait.type : null, times: st.wait && st.wait.times || 1, count: S.count,
+      say: S.say || '', title: stepText(st, 'title'), hole: hs ? { left: hs.left, top: hs.top, width: hs.width, height: hs.height, cx: hs.cx, cy: hs.cy } : null,
+      holes: (S.holes || []).map(function (r) { return { left: r.left, top: r.top, width: r.width, height: r.height, cx: r.cx, cy: r.cy }; }),
+      bubble: b ? { left: b.left, top: b.top, right: b.right, bottom: b.bottom } : null, wrongs: S.wrongs || 0, shownAt: S.shownAt || 0 };
+  }
+  var GXT = window.GXT = {
+    version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
+    index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
+    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
 // ---------- story and guidance texts: bios, briefing, radio chatter, sorties, crit explanations (no rules here) ----------
 const FACTION_BIO=['Tough, shielded ships flown by veterans.','Swarms of fast, unshielded fighters.','Hired guns in patched-up ships: unpredictable.'];
 const SHIP_BIO={lancer:'a sturdy, shielded Lancer heavy fighter',talon:'a fast Talon light fighter with no shields',anvil:'a slow, armoured Anvil bomber',talonx:'a shielded Talon Prime',
@@ -3532,9 +4241,7 @@ function coachKey(){if(tourOff()||!G||G.winner||UI.info)return null;if(G.phase==
   if(G.phase==='action')return 'action';if(G.phase==='target')return 'attack';return null}
 function coachStep(){const k=coachKey();if(UI.coachOn&&UI.coachOn!==k){UI.coachDone[UI.coachOn]=1;LS.set('na_coach',JSON.stringify(UI.coachDone));if(['dial','action','attack','end'].every(x=>UI.coachDone[x]))LS.set('na_tour','1')}
   UI.coachOn=k&&!UI.coachDone[k]?k:null;return UI.coachOn}
-function coachTag(){let el=document.getElementById('coachtag');const on=typeof guided==='function'&&guided()&&G&&G.phase==='target'&&humanTurn()&&typeof V3!=='undefined'&&V3.on&&G.cur&&ship(G.cur);
-  if(!on){if(el)el.remove();return}const s=ship(G.cur);if(!el){el=document.createElement('div');el.id='coachtag';el.className='tag coach';const t=$('tags');if(!t)return;t.appendChild(el)}
-  el.innerHTML='your arc ▼<br><small>shoot only inside this wedge</small>';const f=fwd(s.h);el._v=W(s.x+f.x*RANGE*1.7,s.y+f.y*RANGE*1.7,1);placeEl(el,el._v)}
+function coachTag(){const el=document.getElementById('coachtag');if(el)el.remove()}   // the old on-board arc tag is replaced by the help kit's coach bubbles (hlp.js)
 // ---- end-of-round recap ----
 function recapItems(R){const me=soloSide()>=0?soloSide():planSide();const ev=UI.ev[R]||[];const out=[];const isMine=n=>G.ships.some(s=>s.name===n&&s.side===me);
   for(const e of ev){let m;const t=e.t;
@@ -3983,8 +4690,8 @@ function renderModal(){const el=$('modal');let h=typeof netModalHTML==='function
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1)&&!(typeof NET!=='undefined'&&NET.on);// online games never show the pass-the-device screen
-function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
-  <p class="small">First time? Just press <b>Launch</b>: the defaults are a good first battle and the first round is guided. Everything below is optional.</p>
+function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div>${typeof tutBtn==='function'?`<div class="row">${tutBtn('btn'+(tutFirst()?' primary':''))}</div>`:''}<p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
+  <p class="small">First time? Take the lesson above, or just press <b>Launch</b>: the defaults are a good first battle. Everything below is optional.</p>
   ${typeof GXC!=='undefined'&&window.CAMPAIGN&&!NET.on?`<div class="row"><button class="btn primary" data-a="story">📖 Story mode<small>${esc(campLine())}</small></button></div>`:''}
   ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
   <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
@@ -4048,10 +4755,10 @@ function gameAct(ds,side){if(!G)return null;
 const ICON_PAUSE='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg>',ICON_PLAY='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg>';
 function toggleMenu(open){const m=$('more'),b=document.querySelector('[data-a="menu"]');if(!m)return;const on=open!=null?open:!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',String(on))}
 document.addEventListener('click',e=>{const m=$('more');if(m&&m.classList.contains('open')&&!e.target.closest('[data-a="menu"]')&&(!e.target.closest('#more')||e.target.closest('button')))setTimeout(()=>toggleMenu(false),0)},true);
-document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;sfx('click');
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'ui',act:ds.act,k:ds.k,a:ds.a,w:ds.w,a2:ds.a2}))return;sfx('click');
   if(ds.mode){UI.mode=ds.mode;render();return}if(ds.size){UI.size=ds.size;saveSetup();render();return}if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.exk){UI.ex[ds.exk]=!UI.ex[ds.exk];FACTIONS.forEach((f,i)=>{if(f.ex&&!UI.ex[f.ex]&&UI.fac.includes(i))UI.fac=UI.fac.map(x=>x===i?(i===UI.fac[0]?0:1):x)});saveSetup();render();return}
-  if(ds.start){startGame(ds.start);return}
+  if(ds.start){if(ds.start==='solo'&&typeof tutOffer==='function'&&tutOffer('solo'))return;startGame(ds.start);return}
   if(ds.a&&/^net/.test(ds.a)&&typeof netClick==='function'&&netClick(ds.a))return;
   if(ds.dial!=null){UI.draft[ds.ship]=+ds.dial;UI.hoverDial=null;const mine=alive().filter(s=>s.side===planSide());const nxt=mine.find(s=>UI.draft[s.id]==null);if(nxt&&ds.ship===UI.sel)UI.sel=nxt.id;render();return}
   if(ds.sel){UI.sel=ds.sel;render();return}
@@ -4078,7 +4785,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='recapok'){UI.recapSeen=G.round-1;render();return}if(ds.a==='recapoff'){UI.recapSeen=G.round-1;LS.set('na_recap','off');render();return}
   if(ds.a==='tourskip'){LS.set('na_tour','1');UI.coachOn=null;render();return}
   if(ds.a==='sortie'){startGame('solo',+ds.k);return}
-  if(ds.a==='story'){if(typeof GXC!=='undefined')GXC.open();return}
+  if(ds.a==='story'){if(typeof storyOpen==='function')storyOpen();else if(typeof GXC!=='undefined')GXC.open();return}
   if(ds.a==='speed'){const s=['slow','normal','fast'];UI.speed=s[(s.indexOf(UI.speed||'normal')+1)%3];AIDELAY={slow:1100,normal:600,fast:220}[UI.speed];$('speedbtn').textContent='⏩ '+UI.speed;return}
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
@@ -4316,6 +5023,7 @@ PHN.guided=()=>typeof guided==='function'&&guided();
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
 //   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
@@ -4478,6 +5186,7 @@ PHN.guided=()=>typeof guided==='function'&&guided();
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
     var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
     var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
     map.appendChild(path); s.appendChild(map);
@@ -4779,7 +5488,7 @@ function campDone(){if(!campOn()||!G||G.camp!==UI.camp.id)return false;try{GXC.f
 {const _sg=startGame;startGame=function(){UI.camp=null;return _sg.apply(this,arguments)}}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'Ten chapters, three bosses'}catch(e){return ''}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:window.CAMPAIGN.game,data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:window.CAMPAIGN.game,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit:()=>{UI.camp=null;UI.info=true;render()},
     scores:g=>g.pts||[0,0],seats:g=>[{name:'You',me:true},{name:sideName(1),ai:(g.players[1]&&g.players[1].lvl)||'normal'}]})}
 campInit();
@@ -4800,7 +5509,7 @@ const ARROW={T:['↰','↱'],B:['↖','↗'],S:['↑','↑'],K:['⤺','⤺']};
 const ACT_ICO={F:'◉',E:'✦',TL:'⌖',BR:'⇆',BO:'⇑',EH:'⇆',DD:'⤺',JK:'✦',MK:'◉',SL:'⌖',SB:'⚡',skip:'✕'};
 const ACT_W={F:'Focus',E:'Evade',TL:'Lock',BR:'Roll',BO:'Boost',EH:'Roll',skip:'Skip'};
 const off=/[?&]bf=0/.test(location.search||'');// ?bf=0: the older dock interface
-function want(){return !off&&!!(window.PHN&&PHN.on&&!PHN.land&&v3())}
+function want(){return !off&&!!(window.PHN&&PHN.on&&(!PHN.land||(typeof tutOn==='function'&&tutOn()))&&v3())}   // the lesson keeps the board-first layer in landscape too: every step points at the board
 function playing(){return !!G&&!UI.info&&UI.build==null&&!UI.rules&&!UI.stats&&!(G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())}
 const mineS=s=>!!s&&isHuman(s.side)&&(!net()||s.side===NET.mySide);
 const me=()=>{const k=soloSide();return k>=0?k:(planSide()>=0?planSide():0)};
@@ -4970,14 +5679,14 @@ function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use 
 function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
-function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
+function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
 function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);banner(`<b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${esc(w)}</span>`,1e9);setHint('');
   setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Enemy turn: ${esc(shortName(s))} aims`:`⏳ Enemy turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
-function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;e.preventDefault();e.stopPropagation();BF.taps++;const ds=t.dataset;sfx('click');
+function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();banner('<b>Asteroids placed</b>',900)}else bfRender();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
   if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();banner('<b>Dials revealed…</b>',900);const b=document.querySelector('[data-a="lock"]');lockIn();return}
@@ -4995,7 +5704,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
 function lockIn(){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render()}
 function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.selAt=performance.now();BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
 // a tap on the board itself (a ship, or empty space)
-PHN.tapBF=function(e){if(!BF.on||!G)return false;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+PHN.tapBF=function(e){if(!BF.on||!G)return false;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
   if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return true}
   let best=null,bd=1e9;for(const s of alive()){const p=px(s.x,s.y,1.2);const dd=Math.hypot(p[0]-x,p[1]-y);if(dd<Math.max(30,shipR(s)*1.4)&&dd<bd){bd=dd;best=s}}
   const k=ctx();
@@ -5020,16 +5729,16 @@ function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G
   svg.setAttribute('viewBox',`0 0 ${Wd} ${Ht}`);for(const p of BF.paths){const d=p.pts.map((q,i)=>{const v=px(q.x,q.y,p.h);return (i?'L':'M')+v[0].toFixed(1)+' '+v[1].toFixed(1)}).join('');if(p.el._d!==d){p.el._d=d;p.el.setAttribute('d',d)}}
   // the dice sit in the half of the board away from the two ships
   if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-100,want)))+'px'}}
-  if(BF.fing&&document.body.contains(BF.fing)&&BF.fing.offsetParent){const b=BF.fing.getBoundingClientRect(),o=ov.getBoundingClientRect();fing.hidden=false;const low=b.top-o.top+b.height*.55>o.height-48;fing.textContent='👆';fing.style.transform=`translate(${(b.left-o.left+b.width*(low?.62:.5)-6).toFixed(0)}px,${(low?b.top-o.top+2:b.top-o.top+b.height*.55).toFixed(0)}px)`}else fing.hidden=true}
+  if(BF.fing&&document.body.contains(BF.fing)&&BF.fing.offsetParent&&!(window.GXH&&GXH.state().cur&&GXH.state().cur.kind==='bulb')){const b=BF.fing.getBoundingClientRect(),o=ov.getBoundingClientRect();fing.hidden=false;const low=b.top-o.top+b.height*.55>o.height-48;fing.textContent='👆';fing.style.transform=`translate(${(b.left-o.left+b.width*(low?.62:.5)-6).toFixed(0)}px,${(low?b.top-o.top+2:b.top-o.top+b.height*.55).toFixed(0)}px)`}else fing.hidden=true}
 // ---- hooks ----
 const _sync=sync3D;sync3D=function(){try{if(BF.on&&ANIM&&G&&stepTwo())capture();}catch(e){console.error(e)}const r=_sync.apply(this,arguments);try{maybeRelease()}catch(e){console.error(e)}return r};
 const _render=render;render=function(){_render();try{bfRender()}catch(e){console.error(e)}};
 const _tap=PHN.tap;PHN.tap=function(e){if(BF.on)return PHN.tapBF(e)||(G&&G.phase==='ask'&&G.q&&humanTurn()?false:_tap(e));return _tap(e)};
 // tap anywhere on a result to move on at once
-document.addEventListener('pointerdown',e=>{if(!BF.on||!UI.hold||!G)return;if(e.target.closest('.gx-bar,#more,#modal,.gx-dock'))return;if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}setTimeout(()=>{if(UI.hold)releaseHold()},0)},true);
+document.addEventListener('pointerdown',e=>{if(!BF.on||!UI.hold||!G)return;if(typeof tutOn==='function'&&tutOn())return;if(e.target.closest('.gx-bar,#more,#modal,.gx-dock'))return;if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}setTimeout(()=>{if(UI.hold)releaseHold()},0)},true);
 const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(this,arguments);if(BF.on&&(V3.w!==w||V3.h!==h)){BF.fkey='';BF.key='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
-BF.render=bfRender;BF.fit=fit;BF.release=release;
+BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban)ban.hidden=true};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();
 
 </script>
@@ -5068,6 +5777,323 @@ document.addEventListener('click',e=>{if(tip&&Date.now()-shown>300){hide();e.sto
 window.BRIEF={clamp:run,show,hide,words};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
+
+</script>
+<script>
+// ===================== help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase, short, pointing at a glowing thing on the board. The bulb: the game's own advice (suggestDial / recAct / the best-shot
+// maths / recMod / recOpt, the same ones that draw the stars and the ghost finger) + a short why + rules cards. No advice appears on its own.
+// ---------------------------------------------------------------- pictures for the rules cards (small inline SVG in the game's colours)
+const HP=(()=>{
+  const S=(inner)=>'<svg viewBox="0 0 64 64" aria-hidden="true">'+inner+'</svg>';
+  const shipP=(x,y,rot,col)=>`<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M0-12L8 10 0 5-8 10z" fill="${col||'#f08a3a'}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></g>`;
+  const dieP=(sym,col)=>S(`<path d="M32 5L56 19V45L32 59 8 45V19z" fill="${col||'#c21830'}" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>${sym}`);
+  const star=(n,r0,r1,cx,cy)=>{let d='';for(let i=0;i<n*2;i++){const a=i/(n*2)*Math.PI*2-Math.PI/2,r=i%2?r1:r0;d+=(i?'L':'M')+(cx+Math.cos(a)*r).toFixed(1)+' '+(cy+Math.sin(a)*r).toFixed(1)}return d+'Z'};
+  return {
+    me:()=>S(shipP(32,38,0,'#f08a3a')),
+    foe:()=>S(shipP(32,28,180,'#e0304a')),
+    two:()=>S(shipP(32,50,0,'#f08a3a')+shipP(32,14,180,'#e0304a')+'<path d="M32 38V26" stroke="#ffc86b" stroke-width="2.5" stroke-dasharray="3 3"/>'),
+    arc:()=>S('<path d="M32 40L10 4h44z" fill="rgba(255,200,107,.35)" stroke="#ffc86b" stroke-width="2.5" stroke-linejoin="round"/>'+shipP(32,46,0,'#f08a3a')+shipP(32,14,180,'#e0304a')),
+    range:()=>S('<g fill="none" stroke="#ffc86b" stroke-width="2"><path d="M10 52Q32 8 54 52"/><path d="M18 52Q32 24 46 52" stroke-dasharray="3 3"/></g><text x="32" y="22" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">1 2 3</text>'+shipP(32,54,0,'#f08a3a')),
+    dial:()=>S('<g stroke="#fff" stroke-width="1.5"><rect x="8" y="8" width="14" height="14" rx="3" fill="#56e39a"/><rect x="25" y="8" width="14" height="14" rx="3" fill="#56e39a"/><rect x="42" y="8" width="14" height="14" rx="3" fill="#f3f3ff"/><rect x="8" y="25" width="14" height="14" rx="3" fill="#f3f3ff"/><rect x="25" y="25" width="14" height="14" rx="3" fill="#f3f3ff"/><rect x="42" y="25" width="14" height="14" rx="3" fill="#ff5a6a"/><rect x="8" y="42" width="14" height="14" rx="3" fill="#f3f3ff"/><rect x="25" y="42" width="14" height="14" rx="3" fill="#56e39a"/><rect x="42" y="42" width="14" height="14" rx="3" fill="#ff5a6a"/></g>'),
+    path:()=>S('<path d="M20 56C20 36 44 36 44 14" fill="none" stroke="#7fd4ff" stroke-width="4" stroke-dasharray="6 5" stroke-linecap="round"/>'+shipP(20,52,0,'#f08a3a')+'<g opacity=".6">'+shipP(44,16,20,'#7fd4ff')+'</g>'),
+    stress:()=>S('<circle cx="32" cy="32" r="22" fill="#ff5a6a" stroke="#fff" stroke-width="3"/><text x="32" y="42" text-anchor="middle" font-size="30" font-weight="800" fill="#fff">!</text>'),
+    rock:()=>S('<path d="M12 40l6-18 16-8 16 10 4 18-14 12-18-2z" fill="#8a8794" stroke="#4a4852" stroke-width="3" stroke-linejoin="round"/><circle cx="28" cy="32" r="3" fill="#6a6772"/><circle cx="40" cy="42" r="4" fill="#6a6772"/>'),
+    rockOff:()=>S('<path d="M8 8h48v48H8z" fill="none" stroke="#ffc86b" stroke-width="3" stroke-dasharray="5 4"/><path d="M40 30l12 0" stroke="#ff5a6a" stroke-width="4" stroke-linecap="round"/>'+shipP(56,30,90,'#f08a3a')),
+    shield:()=>S('<path d="M32 6L54 14v18c0 14-10 22-22 26C20 54 10 46 10 32V14z" fill="#4aa8ff" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>'),
+    hull:()=>S('<path d="M32 56C10 40 8 24 18 16c6-4 12-2 14 4 2-6 8-8 14-4 10 8 8 24-14 40z" fill="#ff5a6a" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>'),
+    hit:()=>dieP(`<path d="${star(8,16,7,32,32)}" fill="#fff3ea"/>`),
+    crit:()=>dieP(`<path d="${star(4,18,5,32,32)}" fill="#fff3ea"/><circle cx="32" cy="32" r="5" fill="#c21830"/>`),
+    focus:()=>dieP('<circle cx="32" cy="32" r="14" fill="none" stroke="#fff3ea" stroke-width="3.5"/><circle cx="32" cy="32" r="6" fill="#fff3ea"/>'),
+    evade:()=>dieP('<path d="M32 14Q35 29 50 32Q35 35 32 50Q29 35 14 32Q29 29 32 14z" fill="#effff5"/>','#1fa45a'),
+    blank:()=>dieP('','#7a0a18'),
+    tFocus:()=>S('<circle cx="32" cy="32" r="22" fill="#2a2a5a" stroke="#ffc86b" stroke-width="3"/><circle cx="32" cy="32" r="12" fill="none" stroke="#ffc86b" stroke-width="3"/><circle cx="32" cy="32" r="4" fill="#ffc86b"/>'),
+    tEvade:()=>S('<circle cx="32" cy="32" r="22" fill="#14463a" stroke="#56e39a" stroke-width="3"/><path d="M32 16Q35 29 48 32Q35 35 32 48Q29 35 16 32Q29 29 32 16z" fill="#56e39a"/>'),
+    tLock:()=>S('<circle cx="32" cy="32" r="22" fill="#4a1420" stroke="#ff5a6a" stroke-width="3"/><path d="M32 8v12M32 44v12M8 32h12M44 32h12" stroke="#ff5a6a" stroke-width="3.5"/><circle cx="32" cy="32" r="8" fill="none" stroke="#ff5a6a" stroke-width="3"/>'),
+    tap:()=>S('<circle cx="32" cy="32" r="18" fill="rgba(255,200,107,.2)" stroke="#ffc86b" stroke-width="4"/><path d="M30 14v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="#231a10" stroke-width="2.5" stroke-linejoin="round"/>'),
+    fly:()=>S('<path d="M10 32h36M34 18l14 14-14 14" fill="none" stroke="#ffc86b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>'),
+    round:()=>S('<g fill="none" stroke="#ffc86b" stroke-width="3"><circle cx="32" cy="32" r="22"/></g><g font-size="13" font-weight="800" fill="#fff" text-anchor="middle"><text x="32" y="17">Plan</text><text x="50" y="36">Fly</text><text x="32" y="55">Shoot</text><text x="13" y="36">End</text></g>'),
+    ask:()=>S('<rect x="10" y="14" width="44" height="36" rx="7" fill="#1c1944" stroke="#ffc86b" stroke-width="3"/><path d="M20 26h24M20 34h16" stroke="#fff" stroke-width="3" stroke-linecap="round"/>'),
+    skip:()=>S('<circle cx="32" cy="32" r="22" fill="none" stroke="#a3a0cc" stroke-width="5"/><path d="M16 48L48 16" stroke="#a3a0cc" stroke-width="5"/>')
+  }})();
+function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<span class="gxh-ar">&rarr;</span>':'<figure>'+(HP[it[0]]?HP[it[0]]():'')+(it[1]?'<figcaption>'+it[1]+'</figcaption>':'')+'</figure>').join('')+'</div>'}
+// ---------------------------------------------------------------- where each bubble points (the glowing thing of the phase)
+const hv=sel=>{for(const e of document.querySelectorAll(sel)){if(e.closest('[hidden],[data-help]'))continue;const r=e.getBoundingClientRect();if(r.width>2&&r.height>2&&getComputedStyle(e).visibility!=='hidden')return e}return null};
+const hfirst=(...sels)=>()=>{for(const s of sels){const e=hv(s);if(e)return e}return null};
+const HLP_STEPS={
+ brief:{target:hfirst('[data-bf=brief]'),title:'Your battle',text:'Destroy every enemy ship. Tap Start to place the asteroids and begin.',pic:()=>HP.two()},
+ setup:{target:hfirst('.bfspot.rec','#bfbtns .btn','#prompt [data-a=autoplace]'),title:'Place your ship',text:'Tap the glowing spot, or press Auto-place all.',pic:()=>HP.tap()},
+ planShip:{target:hfirst('.bfring.need','.ps-chip.need','#prompt .btn.primary'),title:'Plan your move',text:'Tap your ship, then choose where it will fly.',pic:()=>HP.me()},
+ planMove:{target:hfirst('.bfm.sug','.mv.sugg','.bfm:not(.small)','.mv'),title:'Pick a maneuver',text:'Tap a ghost ship to fly there. The starred one is suggested.',pic:()=>HP.path()},
+ planFly:{target:hfirst('[data-bf=fly]','[data-a=lock]'),title:'Ready? Fly!',text:'Every ship has a move. Tap Fly to reveal the dials.',pic:()=>HP.fly()},
+ action:{target:hfirst('.bfact.rec','.bfact:not(.skip)','#prompt .btn.rec','#prompt [data-act=action]'),title:'Take an action',text:'Tap an icon next to your ship. Focus is a safe choice.',pic:()=>HP.tFocus()},
+ sub:{target:hfirst('.bftgt.lock','.bfm.w'),title:'Choose where',text:'Tap the glowing spot, or the enemy you want to lock on.',pic:()=>HP.tLock()},
+ target:{target:hfirst('.bftgt.rec','.bftgt','#prompt .btn.rec','#prompt [data-act=fire]'),title:'Take your shot',text:'Tap a glowing enemy in your arc. Numbers are attack against defence dice.',pic:()=>HP.arc()},
+ amod:{target:hfirst('#bfbtns .btn.rec','#bfbtns .btn.primary','#prompt .btn.rec','#prompt .btn.primary'),title:'Improve your dice',text:'Use a token to improve the roll, then tap Roll.',pic:()=>HP.hit()},
+ dmod:{target:hfirst('#bfbtns .btn.rec','#bfbtns .btn.primary','#prompt .btn.rec','#prompt .btn.primary'),title:'Defend yourself',text:'Spend a token to cancel hits, or tap Done.',pic:()=>HP.evade()},
+ damod:{target:hfirst('#bfbtns .btn.primary','#prompt .btn.primary'),title:'Tamper with dice',text:'Optionally change their attack dice, or let the attack stand.',pic:()=>HP.blank()},
+ reroll:{target:hfirst('#bfdice .die.pick:not(.on)','#bfbtns .btn.primary','#prompt [data-act=ask]'),title:'Pick dice to reroll',text:'Tap the dice you want to roll again, then tap Reroll.',pic:()=>HP.blank()},
+ ask:{target:hfirst('#bfbtns .btn.primary','#prompt [data-act=ask].primary','#prompt [data-act=ask]','.bfm.w'),title:'Your choice',text:'Tap the highlighted button, or another one to decline.',pic:()=>HP.ask()}
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES=[
+ {title:'The goal',text:'Destroy every enemy ship before yours are destroyed. Shields go first, then the hull.',pic:()=>hpics([['two','Fight']])},
+ {title:'One round',text:'Plan secret moves. Ships fly, lowest pilot skill first. Then ships shoot, highest skill first.',pic:()=>hpics([['round','4 steps']])},
+ {title:'Hull and shields',text:'Shields soak up damage first. When the hull runs out, the ship is destroyed.',pic:()=>hpics([['shield','Shields'],'>',['hull','Hull']])},
+ {phase:'brief',title:'Your goal',text:'Destroy every enemy ship. Yours are at the bottom, theirs at the top.',pic:()=>hpics([['me','You'],['foe','Enemy']])},
+ {phase:'brief',title:'Hull and shields',text:'Shields soak up damage first. When the hull runs out, the ship is destroyed.',pic:()=>hpics([['shield','Shields'],'>',['hull','Hull']])},
+ {phase:'brief',title:'Four steps a round',text:'Plan secret moves. Ships fly, lowest pilot skill first. Then ships shoot, highest skill first.',pic:()=>hpics([['round','Round']])},
+ {phase:'setup',title:'Asteroids',text:'Flying into an asteroid hurts and skips your action. Shooting past one gives the defender an extra die.',pic:()=>hpics([['rock','Asteroid'],'>',['hit','Damage']])},
+ {phase:'setup',title:'Where to start',text:'Start near the middle so you can turn either way. Auto-place picks sensible spots for you.',pic:()=>hpics([['tap','Tap a spot'],'>',['me','Your ship']])},
+ {phase:'planShip',title:'Plan in secret',text:'Every ship picks one maneuver on its dial. The enemy picks at the same time, in secret.',pic:()=>hpics([['dial','Dial'],['foe','Enemy too']])},
+ {phase:'planShip',title:'Tap your ship',text:'Tap a ship with a pulsing ring to choose its move. Plan every ship, then press Fly.',pic:()=>hpics([['tap','Tap'],'>',['path','Move']])},
+ {phase:'planMove',title:'Speed and direction',text:'Each maneuver has a speed, 1 to 5, and a direction: straight, bank, turn or K-turn.',pic:()=>hpics([['dial','Dial'],'>',['path','Ghost']])},
+ {phase:'planMove',title:'Green, white, red',text:'Green is easy and clears stress. Red adds a stress token: no action, and no red moves next.',pic:()=>hpics([['dial','Colours'],'>',['stress','Stress']])},
+ {phase:'planMove',title:'Aim with your arc',text:'You can only shoot enemies inside your yellow arc, at range 1 to 3. Plan moves that end facing one.',pic:()=>hpics([['arc','Your arc'],['range','Range']])},
+ {phase:'planMove',title:'Rocks and edges',text:'A red mark means the move hits an asteroid. Flying off the battlefield destroys your ship.',pic:()=>hpics([['rock','Asteroid'],['rockOff','Edge']])},
+ {phase:'planFly',title:'Lock in the plan',text:'Press Fly when every ship has a move. Then ships move one at a time, lowest skill first.',pic:()=>hpics([['dial','Planned'],'>',['fly','Fly']])},
+ {phase:'planFly',title:'Pilot skill',text:'Pilot skill sets the order. Low skill moves first, high skill shoots first.',pic:()=>hpics([['me','Low: moves first'],['foe','High: shoots first']])},
+ {phase:'action',title:'One action',text:'After moving, each ship takes one action. Stressed or bumped ships cannot. Skip is always allowed.',pic:()=>hpics([['me','Ship'],'>',['tFocus','Action']])},
+ {phase:'action',title:'Focus',text:'Focus turns each focus result on your dice into a hit when you attack, or an evade when shot.',pic:()=>hpics([['focus','Focus result'],'>',['hit','Hit']])},
+ {phase:'action',title:'Evade and Lock',text:'Evade adds a dodge when shot. Target lock lets you reroll dice against the enemy you locked.',pic:()=>hpics([['tEvade','Evade'],['tLock','Lock']])},
+ {phase:'sub',title:'Choose where',text:'Tap a ghost ship to move there, or tap the enemy to lock on. Back cancels.',pic:()=>hpics([['path','Ghost'],['tLock','Lock']])},
+ {phase:'sub',title:'Locks last',text:'A target lock stays on that enemy until you spend it to reroll dice.',pic:()=>hpics([['tLock','Lock'],'>',['blank','Reroll']])},
+ {phase:'target',title:'Pick a target',text:'Tap an enemy inside your arc. The numbers show your attack dice against their defence dice.',pic:()=>hpics([['arc','In your arc']])},
+ {phase:'target',title:'Range matters',text:'Range 1 adds an attack die. Range 3 adds a defence die. Range 2 is even.',pic:()=>hpics([['range','Range 1-3']])},
+ {phase:'target',title:'Hold fire',text:'No good shot? Tap Hold fire. Nothing is lost.',pic:()=>hpics([['skip','Hold fire']])},
+ {phase:'amod',title:'Attack dice',text:'A hit or a crit is damage. A blank does nothing. Focus results count only if you spend focus.',pic:()=>hpics([['hit','Hit'],['crit','Crit'],['focus','Focus'],['blank','Blank']])},
+ {phase:'amod',title:'Improve the roll',text:'Spend focus to turn focus results into hits. Spend a target lock to reroll your blanks.',pic:()=>hpics([['tFocus','Focus'],['tLock','Lock']])},
+ {phase:'amod',title:'Then they dodge',text:'After Roll, the defender rolls evade dice. Each evade cancels one hit.',pic:()=>hpics([['hit','Hits'],'>',['evade','Evade']])},
+ {phase:'dmod',title:'Defend',text:'Spend focus or an evade token to cancel more hits before the damage lands.',pic:()=>hpics([['tFocus','Focus'],['tEvade','Evade']])},
+ {phase:'dmod',title:'Damage',text:'Shields absorb damage first, then hull. A crit also draws a damage card with a nasty effect.',pic:()=>hpics([['shield','Shields'],'>',['hull','Hull']])},
+ {phase:'dmod',title:'Nothing to spend?',text:'Tap Done. Unused focus and evade tokens vanish at the end of the round.',pic:()=>hpics([['skip','Done']])},
+ {phase:'damod',title:'Tamper with dice',text:'Some ships can change an enemy die before it counts. Tap the option you want.',pic:()=>hpics([['hit','Their die'],'>',['blank','Changed']])},
+ {phase:'damod',title:'It is optional',text:'Tap the main button to let the attack stand. Nothing is lost by skipping.',pic:()=>hpics([['skip','Skip']])},
+ {phase:'reroll',title:'Reroll dice',text:'Tap each die you want to roll again, then tap Reroll. Each die can be rerolled only once.',pic:()=>hpics([['blank','Blank'],'>',['hit','Better?']])},
+ {phase:'reroll',title:'Which dice?',text:'Reroll the blanks. Reroll focus results too if you have no focus to spend.',pic:()=>hpics([['blank','Blank'],['focus','Focus']])},
+ {phase:'ask',title:'A choice',text:'Some pilots and cards offer an optional power. The highlighted button is the usual pick.',pic:()=>hpics([['ask','Choice']])},
+ {phase:'ask',title:'Saying no',text:'No keeps the card for later. You never have to use it.',pic:()=>hpics([['skip','No']])}
+];
+// ---------------------------------------------------------------- phases
+// the moment the player is deciding in (null when there is nothing to decide on the board)
+function hlpPhase(){try{
+  if(typeof tutOn==='function'&&tutOn())return null;
+  if(!G||G.winner||UI.info||UI.stats||UI.rules||UI.build!=null||UI.hold)return null;
+  if(typeof PHN!=='undefined'&&PHN.pop)return null;
+  if(typeof BF!=='undefined'&&BF.on&&(BF.wave||performance.now()<BF.flyUntil))return null;
+  if(sumPending())return null;
+  if(G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&typeof bothHuman==='function'&&bothHuman())return null;
+  if(document.querySelector('#modal:not(.hidden) .dlg,.gxc:not([hidden])'))return null;
+  const bf=typeof BF!=='undefined'&&BF.on,ht=humanTurn();
+  if(G.round===0){if(bf&&BF.seenBrief!==G.seed&&(isHuman(0)||isHuman(1)))return 'brief';
+    if(G.phase==='ask'&&ht&&G.q&&(G.q.key==='rock'||G.q.key==='deploy'))return 'setup'}
+  if(G.phase==='plan'){const ps=planSide();if(ps<0)return null;const my=alive().filter(s=>s.side===ps);
+    if(bf&&BF.sel)return 'planMove';if(my.every(s=>UI.draft[s.id]!=null))return 'planFly';return bf?'planShip':'planMove'}
+  if(!ht)return null;
+  if(G.phase==='action')return bf&&BF.sub?'sub':'action';
+  if(G.phase==='target')return 'target';
+  if(G.phase==='amod'&&G.atk)return 'amod';
+  if(G.phase==='dmod'&&G.atk)return defMods().length?'dmod':null;   // nothing to spend: the game carries on by itself
+  if(G.phase==='damod'&&G.atk)return 'damod';
+  if(G.phase==='ask'&&G.q)return G.q.key==='dice'?'reroll':'ask';
+  return null}catch(e){return null}}
+// ---------------------------------------------------------------- the suggestion (one function per phase, from the game's own advice)
+const hplain=t=>{const d=document.createElement('div');d.innerHTML=String(t||'');return (d.textContent||'').replace(/[★◉✦⌖]/g,m=>m==='★'?'':m==='◉'?'focus':m==='✦'?'evade':'lock').replace(/\s+/g,' ').trim()};
+const hcap=(t,n)=>{const w=hplain(t).split(' ').filter(Boolean);return w.length<=n?w.join(' '):''};
+function whyDial(s,sg){const m=dialOf(s)[sg];const si=sugInfo(s,sg);const w=hplain(si.why);let t='';
+  let r;
+  if(r=/^puts (.+) in your arc at range (\d) while you stay out/.exec(w))t='Puts '+r[1]+' in your arc at range '+r[2]+', while you stay out of its arc.';
+  else if(r=/^lines up a shot on (.+) at range (\d)/.exec(w))t='Lines up a shot on '+r[1]+' at range '+r[2]+'. It may shoot back.';
+  else if(/^closes in/.test(w))t='Closes in, but stays out of their arcs.';
+  else if(/^stays out of their arcs/.test(w))t='Stays out of their arcs: they must come to you.';
+  else if(/^the best of the moves left/.test(w))t='The best move left, though you may end in an enemy arc.';
+  else if(/^every move from here touches an asteroid/.test(w))t='Every move touches an asteroid; this one does the least harm.';
+  if(t&&exColor(s,m).c==='r'&&hcap(t+' Red: stress.',15))t+=' Red: stress.';
+  return hcap(t,15)}
+function shotOpts(s){const o=[];for(const w of weaponsFor(s))for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);o.push({w,t,d,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}return o}
+const hcenter=sel=>()=>hv(sel);
+function hlpSuggest(){try{const ph=hlpPhase();if(!ph||!G)return null;const bf=typeof BF!=='undefined'&&BF.on;const s=G.cur&&ship(G.cur);
+  if(ph==='setup'){const q=G.q,r=recOpt(q);if(!r||!r.o)return null;const el=()=>hv('.bfspot.rec');if(!el())return null;
+    const why=hcap(advice().say,15)||'This spot is a good start.';return {why,target:el}}
+  if(ph==='planShip'){const el=()=>hv('.bfring.need');if(!el())return null;return {why:'Tap your ship, then choose where it flies.',target:el}}
+  if(ph==='planMove'){const sh=ship((bf&&BF.sel)||UI.sel);if(!sh||!sh.alive||sh.side!==planSide())return null;const sg=suggestDial(sh);if(sg==null||sg<0)return null;
+    const why=whyDial(sh,sg);if(!why)return null;const el=()=>hv(bf?'.bfm.sug':'.mv.sugg');if(!el())return null;return {why,target:el}}
+  if(ph==='planFly'){const el=()=>hv('[data-bf=fly],[data-a=lock]');if(!el())return null;return {why:'Every ship has a move. Tap Fly.',target:el}}
+  if(ph==='action'&&s){const rec=recAct(s);if(!rec)return null;const sel=bf?`.bfact[data-bfa="${rec}"]`:`[data-act=action][data-a2="${rec}"]`;const el=()=>hv(sel);if(!el())return null;
+    const mi=inArcOf(s),th=arcsOnMe(s);let why;
+    if(/^RP\d/.test(rec))why='Repair the damage first. It is worth more than one focus.';
+    else if(rec==='E'&&!mi.length&&th.length)why=`${shortName(th[0].e)} has you in its arc. An evade cancels a hit.`;
+    else if(rec==='F'&&mi.length)why=`${shortName(mi[0].e)} is in your arc. Focus turns your focus results into hits.`;
+    else if(rec==='F')why='Focus turns your focus results into hits, or evades when shot.';
+    else why='An evade token cancels one hit when you are shot.';
+    why=hcap(why,15)||hcap(rec==='F'?'Focus makes your focus results count.':'An evade cancels one hit.',15);return {why,target:el}}
+  if(ph==='target'&&s){const o=shotOpts(s).sort((a,b)=>b.e-a.e)[0];if(!o)return null;const el=()=>hv(bf?'.bftgt.rec':'#prompt [data-act=fire].rec');if(!el())return null;
+    return {why:hcap(`Range ${o.t.rg}: you roll ${o.n} attack dice, they roll ${o.m}.`,15)||`Range ${o.t.rg} is your best shot.`,target:el}}
+  if((ph==='amod'||ph==='dmod')&&G.atk){const rk=recMod();if(!rk)return null;const sel=`[data-act="${G.phase}"][data-k="${rk}"]`;const el=()=>hv('#bfbtns '+sel+',#prompt '+sel);if(!el())return null;
+    const W={tl:'Spend your target lock to reroll your blanks.',focus:G.phase==='amod'?'Spend focus: your focus results become hits.':'Spend focus: your focus results become evades.',evade:'Spend your evade token to cancel one more hit.',kael:'Use your pilot ability: a focus result becomes an evade.',
+      done:G.phase==='amod'?'Nothing left to improve. Tap Roll.':'Every hit is already cancelled. Tap Done.'};const why=W[rk];if(!why)return null;return {why:hcap(why,15),target:el}}
+  return null}catch(e){return null}}
+// ---------------------------------------------------------------- wiring
+let _hlpInit=false,_hlpT=0;
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+  GXH.init({game:'nebula-aces',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'#bfhint,.bfm.sug,.bfm.on,.bfact,.bftgt,.bfring.need,.bfspot.rec,#bfbtns .btn,#bfdice .die.pick,.mv.sugg,.rec,.ps-chip.need,#prompt .btn.primary'});
+  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
+  const m=document.getElementById('more');if(m&&!m.querySelector('.gxh-set'))m.insertAdjacentHTML('beforeend',GXH.settingsHTML({rowClass:'gxh-mrow',btnClass:'btn'}));
+  setInterval(hlpAfter,300);setInterval(hlpFollow,250)}
+// while the bulb's finger is up the camera or a marker may still be moving: keep the finger and ring on the suggestion
+function hlpFollow(){try{const s=GXH.state().cur;if(!s||s.kind!=='bulb')return;const f=document.querySelector('.gxh-finger');if(!f)return;const sg=hlpSuggest();if(!sg){GXH.hide();return}
+  const e=sg.target();if(!e)return;const r=e.getBoundingClientRect();if(Math.abs(r.left+r.width/2-(+f.dataset.tx))>2||Math.abs(r.top+r.height/2-(+f.dataset.ty))>2)GXH.relayout()}catch(err){}}
+// the camera eases for half a second after a pick: show the bubble only once the board holds still
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;if(document.hidden)return;
+  const ph=hlpPhase();if(ph&&typeof V3!=='undefined'&&V3.on&&V3.ez){clearTimeout(_hlpT);_hlpT=setTimeout(hlpAfter,160);return}
+  GXH.phase(ph)}
+(function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r};try{hlpInit()}catch(e){console.error(e)}})();
+
+</script>
+<script>
+// ===================== tutorial (shell/gx-tutor.js): a staged one-battle game that teaches every rule by doing it once =====================
+// RULES CHECKLIST (from the rules drawer, RULES_HTML in data.js, and rules-notes.md). Each line names the step that teaches it.
+//  goal: destroy every enemy ship ........................................ goal, win
+//  plan: secretly pick a maneuver on the dial (speed, direction) ......... ship, dial
+//  colours: green easy, white normal, red hard = stress token ............ marks, stress
+//  asteroids: a path through one hurts and skips the action ............. marks
+//  reveal: all dials stay hidden until Fly ............................... fly
+//  activation order: lowest pilot skill moves first ...................... order
+//  actions: focus, evade, target lock, barrel roll, boost (one a turn) .. action, lock, locktgt
+//  stress: no actions, no red moves until a green one ................... stress
+//  combat order: highest pilot skill shoots first ........................ order
+//  firing arc and range 1-3, target choice ............................... shoot
+//  attack dice (hit, crit, focus, blank) and range bonuses .............. shoot, dice
+//  focus token: focus results become hits ................................ usefocus
+//  defence dice (evade, focus, blank), evade cancels hits ................ res1
+//  evade token (the enemy spends one) ..................................... res1
+//  pilot ability (Kael: a focus result becomes an evade) ................. defend
+//  shields first, then hull; damage cards; crits face up ................. res2, torp
+//  target lock and the torpedo (range 2-3, spends the lock) ............. lock, locktgt, torp
+//  end of round: unused focus and evade tokens vanish, locks stay ........ res2
+//  how a battle ends: the last enemy ship is destroyed ................... win
+// Not taught by doing (explained by the rules cards and the bulb): barrel roll and boost moves, bumping, flying off the mat, initiative ties.
+const TUT_GAME='nebula-aces';
+const TUT={on:false,dice:[],seed:20261008};
+const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&TUT.on&&!!G&&!!G.tut;
+const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:tutStart});
+const tutFirst=()=>{try{return !localStorage.getItem('na_played')}catch(e){return true}};
+// ---------------------------------------------------------------- the staged battle: fixed squads, positions, rock, dice and enemy maneuvers
+const TUT_SQ=[[{p:'kael',u:['u_plasma']}],[{p:'slate',u:[]}]];
+const TUT_START={me:{x:457,y:140},foe:{x:457,y:710}};
+const TUT_ROCK={x:330,y:215,r:34,n:8,rot:.5,k:[1,.9,1.05,.85,1,.95,1.1,.9]};
+// the enemy: round 1 straight 2 (green) and an evade token; round 2 a red K-turn 3 (stress, so no action and no red next)
+const TUT_FOE=[{m:{s:2,t:'S'},act:'E'},{m:{s:3,t:'K'},act:null}];
+// the dice, in the order the engine rolls them (a = attack, d = defence): my shot (range 3), Slate's defence, Slate's shot, my defence, my shot (range 1), Slate's defence;
+// TUT.force holds the faces of the lock reroll (indexes into the attack die: 0 hit, 3 crit)
+const TUT_DICE=()=>[{k:'a',f:['hit','focus','blank']},{k:'d',f:['blank','blank','focus','blank']},{k:'a',f:['hit','hit']},{k:'d',f:['focus','blank','blank']},{k:'a',f:['hit','hit','blank','blank']},{k:'d',f:['evade','blank','blank']}];
+const TUT_REROLL=[3,0];
+// Kael's moves: round 1 straight 2, round 2 straight 1 (both green)
+const TUT_ME=[{s:2,t:'S'},{s:1,t:'S'}];
+const dialIx=(s,m)=>dialOf(s).findIndex(x=>x.s===m.s&&x.t===m.t&&(m.d==null||x.d===m.d));
+const tutRound=()=>Math.max(1,Math.min(2,G?G.round:1));
+{const o=rollN;rollN=function(faces,n){if(TUT.on&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
+    if(k&&TUT.dice[0].k===k){const q=TUT.dice.shift().f.slice(0,n);while(q.length<n)q.push(faces[rnd(8)]);return q}}
+  return o.apply(this,arguments)}}
+{const o=aiPlan;aiPlan=function(k){if(!(G&&G.tut&&k===1))return o.apply(this,arguments);
+    for(const s of alive().filter(x=>x.side===1)){const i=dialIx(s,TUT_FOE[tutRound()-1].m);if(i>=0)s.dial=i;else return o.apply(this,arguments)}}}
+{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&s.side===1))return o.apply(this,arguments);const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
+{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&s.side===0){const i=dialIx(s,TUT_ME[tutRound()-1]);if(i>=0)return i}return o.apply(this,arguments)}}
+{const o=rnd;rnd=function(n){if(TUT.on&&G&&G.tut&&TUT.force&&TUT.force.length&&n===8)return TUT.force.shift();return o.apply(this,arguments)}}
+{const o=applyAtkMod;applyAtkMod=function(k,sel){if(TUT.on&&G&&G.tut&&k==='tl'&&sel&&sel.length)TUT.force=TUT_REROLL.slice(0,sel.length);return o.apply(this,arguments)}}
+{const o=save;save=function(){if(TUT.on&&G&&G.tut)return;return o.apply(this,arguments)}}
+{const o=guided;guided=function(){return tutOn()?false:o()}}
+{const o=coachKey;coachKey=function(){return tutOn()?null:o()}}
+function tutStage(){
+  try{boot3D()}catch(e){}
+  if(typeof NET!=='undefined'&&NET.on)netLeave(true);
+  TUT.on=true;TUT.dice=TUT_DICE();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
+  Object.assign(UI,{mode:'solo',camp:null,info:false,stats:false,rules:false,build:null,draft:{},pass:null,sel:null,sugCache:null,autoSetup:false,advOpen:false,hints:false,hold:null,holdK:[],paused:false,sumSeen:0});
+  newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'hard'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
+  G.tut=1;G.rocks.push(Object.assign({},TUT_ROCK,{k:TUT_ROCK.k.slice()}));
+  while(G.phase==='ask'&&G.q&&G.q.key==='deploy'&&G.round===0){const q=G.q;resolveAsk(q.opts[Math.floor(q.opts.length/2)].k);if(G.q&&G.q.kid===q.kid)break}
+  const me=G.ships.find(s=>s.side===0),foe=G.ships.find(s=>s.side===1);
+  Object.assign(me,TUT_START.me,{h:Math.PI/2});Object.assign(foe,TUT_START.foe,{h:-Math.PI/2});
+  resetGuide();flowReset();UI.sumSeen=0;try{BF.seenBrief=G.seed;PHN.briefSeen=G.seed}catch(e){}
+  UI.wonSnd=G.seed;try{BF.hideBan()}catch(e){}camView('tilt');render()}
+// ---------------------------------------------------------------- where each step points
+const tq=sel=>()=>hv(sel);
+const tqAll=sel=>()=>[...document.querySelectorAll(sel)].filter(e=>!e.closest('[hidden],[data-help]')&&e.getBoundingClientRect().width>2);
+function shipRect(id){return()=>{try{const s=ship(id);if(!s||!s.alive||typeof V3==='undefined'||!V3.camera||!BF.px)return null;const c=V3.r.domElement.getBoundingClientRect();
+    const p=BF.shownXY(s),q=BF.px(p.x,p.y,1),r=Math.max(26,BF.shipR(s)*1.5);return {left:c.left+q[0]-r,top:c.top+q[1]-r,width:2*r,height:2*r}}catch(e){return null}}}
+const tutIdle=()=>!BF.wave&&performance.now()>=BF.flyUntil&&!V3.ez;
+const tutPlan=()=>!!(G&&BF.on&&G.phase==='plan'&&planSide()>=0&&!UI.hold&&tutIdle());
+const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdle());
+const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
+const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
+function tutSteps(){return [
+ // ---- round 1: goal, plan, reveal, order, action, shot, dice, damage
+ {id:'goal',title:'Your goal',say:'Destroy the enemy ship. Yours is at the bottom, theirs at the top.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutPlan()&&G.round===1},
+ {id:'ship',title:'Plan in secret',say:'Everyone picks a move in secret first. Tap your ship to see its moves.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
+ {id:'marks',title:'Red and rocks',say:'Red moves give a stress token. ! marks an asteroid: it hurts and skips your action.',target:tq('.bfm.danger'),also:tqAll('.bfm.danger,.bfm.r'),wait:null,ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm.danger')&&!!hv('.bfm.r')},
+ {id:'dial',title:'Pick a maneuver',say:'Number is speed, arrow is direction, green is easy. Tap the green straight 2.',target:()=>hv('.bfm[data-bfm="'+tutIx(0)+'"]'),wait:{type:'tap',match:a=>a.what==='dial'&&a.i===tutIx(0)},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm[data-bfm="'+tutIx(0)+'"]')},
+ {id:'fly',title:'Reveal the dials',say:'Dials stay secret until everyone is set. Tap Fly to reveal them.',target:tq('[data-bf=fly]'),wait:{type:'tap',match:a=>a.what==='fly'},ready:()=>tutPlan()&&!!hv('[data-bf=fly]:not([disabled])')},
+ {id:'order',title:'Skill sets the order',say:'Lowest pilot skill flies first: Slate (3), then Kael (8). The highest shoots first.',target:shipRect('s1'),also:shipRect('s2'),wait:null,ready:()=>tutMyTurn('action')&&G.round===1},
+ {id:'action',title:'One action',say:'After moving, a ship gets one action: focus, evade, lock, roll or boost. Tap Focus.',target:tq('.bfact[data-bfa="F"]'),wait:{type:'tap',match:a=>a.what==='action'&&a.a==='F'},ready:()=>tutMyTurn('action')&&!!hv('.bfact[data-bfa="F"]')},
+ {id:'shoot',title:'Take your shot',say:()=>{try{const s=ship('s1'),w=weaponsFor(s)[0],t=w.targets[0],sd=shotDice(s,w,t,ship(t.id));return `In your arc at range ${t.rg}: you roll ${sd.atk} dice, it rolls ${sd.def}. Tap it.`}catch(e){return 'The enemy is in your arc. Tap it to shoot.'}},
+   target:tq('.bftgt'),wait:{type:'tap',match:a=>a.what==='fire'&&a.t==='s2'},ready:()=>tutMyTurn('target')&&!!hv('.bftgt')},
+ {id:'dice',title:'Your attack dice',say:'Hit and crit deal damage. A focus result does nothing, unless you spend focus.',target:tq('#bfdice'),wait:null,ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&humanTurn()&&hv('#bfdice')&&tutIdle())},
+ {id:'usefocus',title:'Spend your focus',say:'Your focus token turns the focus result into a hit.',target:tq('#bfbtns [data-act=amod][data-k=focus]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='focus'},ready:()=>!!hv('#bfbtns [data-act=amod][data-k=focus]')},
+ {id:'roll',title:'Roll the defence',say:'Nothing else to improve. Tap Roll: the enemy then rolls its defence dice.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.dice.length&&!G.atk.dice.includes('focus')&&hv('#bfbtns [data-act=amod][data-k=done]'))},
+ {id:'res1',title:'Hits minus evades',say:'Each evade cancels one hit. Slate spent its evade token: one hit gets through.',target:tq('#bfdice'),wait:null,hold:c=>c==='res',ready:()=>tutHoldRes('a')&&!!hv('#bfdice'),onNext:()=>releaseHold()},
+ {id:'defend',title:'Pilot power',say:'Slate fires back. Kael may turn one focus result into an evade. Tap it.',target:tq('#bfbtns [data-act=dmod][data-k=kael]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='dmod'&&a.k==='kael'},ready:()=>!!(G&&G.phase==='dmod'&&G.atk&&G.atk.d==='s1'&&humanTurn()&&hv('#bfbtns [data-act=dmod][data-k=kael]'))},
+ {id:'res2',title:'Shields go first',say:'Damage strips shields before hull. Unused focus and evade tokens vanish at round end.',target:tq('#bfdice'),wait:null,hold:c=>c==='res',ready:()=>tutHoldRes('d')&&!!hv('#bfdice'),onNext:()=>releaseHold()},
+ // ---- round 2: stress, target lock and the reroll, a point-blank shot, victory
+ {id:'auto',title:'Round 2',say:'Tap Auto: the computer suggests a move for each ship. You can always choose your own.',target:tq('[data-bf=auto]'),wait:{type:'tap',match:a=>a.what==='auto'},ready:()=>tutPlan()&&G.round===2&&!!hv('[data-bf=auto]')},
+ {id:'fly2',title:'Fly again',say:'Tap Fly. Slate has the lower skill, so it moves before you.',target:tq('[data-bf=fly]'),wait:{type:'tap',match:a=>a.what==='fly'},ready:()=>tutPlan()&&G.round===2&&!!hv('[data-bf=fly]:not([disabled])')},
+ {id:'stress',title:'Red means stress',say:'Slate flew a red K-turn: stress token, no action, and it now faces away.',target:shipRect('s2'),also:shipRect('s1'),wait:null,ready:()=>tutMyTurn('action')&&G.round===2},
+ {id:'lock',title:'Target lock',say:'A lock lets you reroll attack dice against that enemy. Tap Lock.',target:tq('.bfact[data-bfa="TL"]'),wait:{type:'tap',match:a=>a.what==='action'&&a.a==='TL'},ready:()=>tutMyTurn('action')&&!!hv('.bfact[data-bfa="TL"]')},
+ {id:'shoot2',title:'Point blank',say:'Range 1 adds an attack die. Slate faces away, so it cannot shoot back. Tap it.',target:tq('.bftgt'),wait:{type:'tap',match:a=>a.what==='fire'&&a.t==='s2'},ready:()=>tutMyTurn('target')&&!!hv('.bftgt')},
+ {id:'reroll',title:'Spend your lock',say:'Two blanks. Spend the lock to roll them again.',target:tq('#bfbtns [data-act=amod][data-k=tl]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='tl'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&hv('#bfbtns [data-act=amod][data-k=tl]'))},
+ {id:'confirm',title:'Choose the dice',say:'The blank dice are ticked. Tap Reroll to roll just those.',target:tq('#bfbtns [data-bfq=ok]'),wait:{type:'tap',match:a=>a.what==='ask'&&a.k==='ok'},
+   ready:()=>{try{if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&!G.atk.pre){const bl=G.atk.dice.map((f,i)=>f==='blank'?i:-1).filter(i=>i>=0);const sel=G.q.opts.filter(o=>/^☑/.test(o.l)).length;
+       if(sel<bl.length){const k='t'+bl[sel];if(G.q.opts.some(o=>o.k===k))uiAct({act:'ask',k});return false}G.atk.pre=1}}catch(e){}
+     return !!(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'&&G.atk.pre&&hv('#bfbtns [data-bfq=ok]'))}},
+ {id:'roll2',title:'Roll and finish',say:'Better dice. Tap Roll to see if Slate survives.',target:tq('#bfbtns [data-act=amod][data-k=done]'),wait:{type:'tap',match:a=>a.what==='ui'&&a.act==='amod'&&a.k==='done'},ready:()=>!!(G&&G.phase==='amod'&&G.atk&&G.atk.a==='s1'&&G.atk.rr&&G.atk.rr.some(Boolean)&&hv('#bfbtns [data-act=amod][data-k=done]'))},
+ {id:'win',title:'Victory',say:'No enemy ships left. The battle ends when every ship on one side is destroyed. You won!',target:tq('#bftop'),wait:null,ready:()=>!!(G&&G.winner&&BF.on&&!UI.stats&&hv('#bftop')&&tutIdle())}
+]}
+// ---------------------------------------------------------------- the kit hooks
+function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
+// the games call this from their input handlers BEFORE applying the tap; false = not what the step asks
+function tutGate(a){return !tutOn()||GXT.act(Object.assign({type:'tap'},a))}
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen(){if(typeof GXC==='undefined')return;
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  tutClearOffer();
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
+    endTitle:'You know the rules',endText:o?'Plan, fly, act, shoot, defend. Now the Story begins.':'Plan, fly, act, shoot, defend. Shields, hull, stress and locks come with you.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    setup:()=>{try{GX.close()}catch(e){}try{toggleMenu(false)}catch(e){}try{GXC.close()}catch(e){}try{GXH.hide()}catch(e){}tutStage()},
+    onDone:r=>{tutLeave();const c=r&&r.choice;lsPlayed();
+      if(c==='chapter'&&first){GXC.play(first.id)}
+      else if(c==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}
+      else startGame('solo')},
+    onExit:()=>{tutLeave();UI.info=true;render()}})}
+// leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
+function tutLeave(){TUT.on=false;TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
+  UI.hold=null;UI.holdK=[];UI.stats=false;UI.draft={};try{GXH.hide()}catch(e){}if(G&&G.tut){G.tut=0}}
+function lsPlayed(){try{localStorage.setItem('na_played','1')}catch(e){}}
+// first-time players who tap Launch are offered the lesson first
+function tutOffer(mode){if(typeof GXT==='undefined'||!tutFirst()||GXT.status(TUT_GAME).seen||mode!=='solo')return false;tutClearOffer();
+  const d=document.createElement('div');d.className='gxt-end';d.id='tutoffer';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in about 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click',e=>{const b=e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();tutClearOffer();
+    if(b.dataset.tutoffer==='learn')tutStart();else{lsPlayed();startGame(mode)}});
+  return true}
+function tutClearOffer(){const d=document.getElementById('tutoffer');if(d)d.remove()}
+// the in-game menu keeps a Tutorial entry (first option) whose label follows the progress
+function tutMenu(){const m=document.getElementById('more');if(!m||typeof GXT==='undefined')return;const old=m.querySelector('[data-gxt-open]');const h=tutBtn('btn');
+  if(old)old.outerHTML=h;else m.insertAdjacentHTML('afterbegin',h)}
+{const o=toggleMenu;toggleMenu=function(open){try{tutMenu()}catch(e){}return o.apply(this,arguments)}}
+try{tutMenu()}catch(e){}
+{const o=startGame;startGame=function(){if(!TUT.on)lsPlayed();return o.apply(this,arguments)}}
 
 </script>
 </body>

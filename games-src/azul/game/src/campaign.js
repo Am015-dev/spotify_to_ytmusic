@@ -47,7 +47,7 @@ function campWatch(){if(!UI.cmp||!G)return;if(!G.over){CMP_OVER=0;return}
   clearInterval(CMP_FIN);const g=G;UI.cmp=null;campLvlReset();try{if(typeof BF!=='undefined')BF.resHide=true;if(BF.on)bfDraw()}catch(e){}
   if(GXC.active())GXC.finish(g)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'sunglaze',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'sunglaze',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit(){openStart()},scores:g=>g.pl.map(p=>p.score),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
 function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
 // a normal game (Begin) leaves story mode and restores the player's own guide setting

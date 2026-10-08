@@ -1,4 +1,4 @@
-// ===================== part 8: the Descent (zones, oxygen, bosses with curses), character dialogs, Mara's training dive =====================
+// ===================== part 8: the Descent (zones, oxygen, bosses with curses), character dialogs =====================
 // The Descent and the boss curses are our own addition on top of the published rules (see ../rules-notes.md, "Descent mode").
 // ---------- characters (code-drawn portraits; placeholders until painted art replaces them) ----------
 const CHAR = {
@@ -80,7 +80,7 @@ function descentEl() {
   box.append(map);
   const lab = p.z >= DESC.length ? 'Start a new descent' : cur.boss ? 'Fight ' + CHAR[cur.bossDef.id].name : 'Dive ' + (cur.si + 1) + ' of ' + cur.Z.name;
   goSlot.append(h('div.sgo', h('button.sbtn.big', { 'data-a': p.z >= DESC.length ? 'descreset' : 'descgo', type: 'button' }, h('b', lab), ' ', h('span', p.z >= DESC.length ? 'from the Sunlit Reef' : 'You + Nerea, Bram and Sumi · difficulty ' + cur.d + (cur.cmt === 'murky' ? ' · murky water' : ''))),
-    h('button.tlink', { 'data-a': 'guided', type: 'button' }, 'Training dive with Mara')));
+    h('div.tlink2', { html: tutBtn('tlink') })));
   return box;
 }
 function descGo() {
@@ -154,7 +154,6 @@ function storyCheck() {
       if (!UI.said['cu' + G.att + ':' + n]) { UI.said['cu' + G.att + ':' + n] = 1; UI.hitAt = Date.now(); UI.news = (UI.news || []).concat(['\u2620 Trick ' + (n + 1) + ': ' + B.name + ' casts ' + C.name + ' \u2014 ' + C.short.toLowerCase() + '.']).slice(-3); render(); }
     }
   }
-  if (UI.mode === 'guided') return tutCheck(once);
   return false;
 }
 // ---------- the boss bar on the table ----------
@@ -169,33 +168,4 @@ function bossBar() {
   const nx = G.boss.sched.findIndex((c, i) => i > G.tricks.length && c);
   bb.append(h('span.bpt', { html: portraitSVG(G.boss.id, 34) }), h('div.bmid', h('b', B.name), h('div.hp', { 'aria-label': 'Boss health ' + (n - done) + ' of ' + n }, ...Array.from({ length: n }, (_, i) => h('i' + (i < n - done ? '.on' : ''))))),
     cu ? h('span.bcu', { title: CURSE[cu].text }, '☠ ' + CURSE[cu].short) : h('span.bcu.calm', nx >= 0 ? 'Curse on trick ' + (nx + 1) : 'No curse'));
-}
-// ---------- Mara's training dive (replaces the old tip chain in guided mode) ----------
-// The guided deal is stacked (see data.js guided): you hold L4 L3 C2 C6 C9 T3 T7 K1 K5 K8 S2 S6 S9; your job is to win the Lantern 3.
-const TUT = { lead: [D.card(0, 9), D.card(1, 3), D.card(4, 3)] };
-function tutOnly() {
-  if (UI.mode !== 'guided' || !G || G.phase !== 'play' || G.trick.turn !== viewSeat()) return -1;
-  const L3 = D.card(4, 3);
-  if (G.trick.plays.length) return G.trick.ls === 4 && G.players[viewSeat()].hand.includes(L3) && !G.trick.plays.some(p => p.c > L3) ? L3 : -1;
-  const k = Math.min(G.tricks.length, 2), want = TUT.lead[k];
-  return G.players[viewSeat()].hand.includes(want) ? want : -1;
-}
-function tutCheck(once) {
-  return false;   // the training dive teaches with glow and a ghost finger, no dialogs
-  const v = viewSeat(), myTurn = G.phase === 'play' && G.trick.turn === v;
-  if (G.phase === 'assign' && G.tricks.length === 0) {
-    if (once('t0', { who: 'mara', title: 'Welcome, diver!', body: 'Whole crew wins or loses together.', btn: 'Show me' })) return true;
-    if (iMustAct() && once('t1', { who: 'mara', title: 'Take a job', body: 'Win the Lantern 3. Tap the job.', btn: 'Got it' })) return true;
-  }
-  if (G.phase === 'distress' && iMustAct() && once('tf', { who: 'mara', title: 'The distress flare', body: 'Press No flare.', btn: 'OK' })) return true;
-  if ((G.phase === 'signal' || G.phase === 'play' && G.tricks.length === 0) && iMustAct() && LD.pingMoves(G, v).length && once('ts', { who: 'mara', title: 'Signals', body: 'Press No signal.', btn: 'OK' })) return true;
-  if (myTurn && G.trick.plays.length === 0) {
-    if (G.tricks.length === 0 && once('t2', { who: 'mara', title: 'Your first trick', body: 'Lead your glowing Coral 9.', btn: 'Lead it' })) return true;
-    if (G.tricks.length === 1 && once('t3', { who: 'mara', title: 'You won it!', body: 'Lead your glowing Tide 3.', btn: 'Lead it' })) return true;
-    if (G.tricks.length >= 2 && G.players[v].hand.includes(D.card(4, 3)) && once('t5', { who: 'mara', title: 'Lanterns are trumps', body: 'Lead your glowing Lantern 3.', btn: 'Lead it' })) return true;
-  }
-  if (myTurn && G.trick.plays.length > 0 && tutOnly() >= 0 && once('t6', { who: 'mara', title: pname(G.trick.lead) + ' led a Lantern for you!', body: 'Play your Lantern 3.', btn: 'Play it' })) return true;
-  if (myTurn && G.trick.plays.length > 0 && G.trick.ls < 4 && LD.playable(G, v).length < G.players[v].hand.length && once('t4', { who: 'mara', title: 'Follow the colour', body: 'Follow the colour led.', btn: 'OK' })) return true;
-  if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'Fine: your job needs the Lantern 3.', btn: 'OK' })) return true;
-  return false;
 }

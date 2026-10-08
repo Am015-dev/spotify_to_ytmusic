@@ -109,8 +109,10 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
    <p class="lede">Giant monsters brawl for Crown City. Roll dice, smash your rivals and hold Downtown. First to <b>20 ★</b>, or the <b>last monster standing</b>, is crowned.</p>
    <div class="acts" style="margin:.5rem 0">
+    ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn big'):''}
     <button class="btn primary big" data-start="solo">▶ Play now (recommended)<small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
     ${typeof campStartBtn==='function'?campStartBtn():''}
+    ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
    </div>
    <p style="margin:.3rem 0 .2rem"><b>Your monster</b> <span class="small muted">(tap to choose)</span></p>

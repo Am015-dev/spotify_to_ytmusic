@@ -10,7 +10,7 @@ function hlpFit(t,alt){t=String(t||'').replace(/\s+/g,' ').trim();if(hlpWords(t)
   out=out.replace(/[,;:]$/,'.');return out&&hlpWords(out)>=3?out:(alt||'It is the safest pick here.')}
 function hlpChoiceOn(){const c=UI.choice;const el=document.getElementById('choice');return c&&el&&!el.classList.contains('hidden')&&!UI.intro?c:null}
 function hlpPhase(){
-  if(!G||G.winner||UI.info)return null;
+  if(!G||G.winner||UI.info||(typeof tutOn==='function'&&tutOn()))return null;
   if(document.querySelector('.gx-dock[data-bf="resolving"]'))return null;   // the dice are being resolved: nothing to decide, buttons hidden
   if(UI.intro)return 'intro';
   const c=hlpChoiceOn();

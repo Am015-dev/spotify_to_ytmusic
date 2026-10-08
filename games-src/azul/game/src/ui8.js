@@ -6,7 +6,7 @@ const PH_DOTS='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx
 // size of the layout viewport, measured from a fixed full-screen probe: iOS Safari fires resize/orientationchange while innerWidth/innerHeight still hold the OLD size
 function vpDims(){try{let p=document.getElementById('vpprobe');if(!p){p=document.createElement('div');p.id='vpprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;visibility:hidden;pointer-events:none';document.body.appendChild(p)}
   const w=p.offsetWidth,h=p.offsetHeight;if(w>0&&h>0)return {w,h}}catch(e){}return {w:innerWidth,h:innerHeight}}
-function phDetect(){try{const q=new URLSearchParams(location.search);if(q.has('phone'))return q.get('phone')!=='0'}catch(e){}
+function phDetect(){if(window.__tutPh)return true;try{const q=new URLSearchParams(location.search);if(q.has('phone'))return q.get('phone')!=='0'}catch(e){}
   const V=vpDims(),s=Math.min(V.w,V.h);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const q=new URLSearchParams(location.search);if(q.has('safe')){const a=q.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}

@@ -98,7 +98,7 @@ const HLP_RULES=[
  {phase:'qThief',title:'Read each button',text:'Each button says what you receive. You get only one.',pic:()=>hpics([['chip','Prize'],'>',['tap']])}
 ];
 // ---------------------------------------------------------------- phases
-function hlpBusy(){return !G||G.over||UI.modal||GX.open||UI.chz||UI.autoOn||!me()}
+function hlpBusy(){return !G||G.over||G.tut||UI.modal||GX.open||UI.chz||UI.autoOn||!me()}
 // the phase the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase(){try{if(hlpBusy())return null;const hp=me();
   if(G.q)return {claim:'qClaim',item:'qItem',djinn:'qDjinn',flute:'qFlute',kill:'qKill',thief:'qThief'}[G.q.kind]||null;
@@ -168,7 +168,7 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const hm=document.getElementById('gxhmenu');if(hm)hm.innerHTML=GXH.settingsHTML({rowClass:'',btnClass:'btn sm'});
   // a tap that lands on a bubble only dismisses it (the board under it must not act)
-  let sw=0;document.addEventListener('pointerdown',e=>{sw=0;const b=document.querySelector('.gxh-bub.on');if(!b||(e.target.closest&&e.target.closest('.gxh-link')))return;const r=b.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)sw=Date.now()},true);
+  let sw=0;document.addEventListener('pointerdown',e=>{sw=0;const b=document.querySelector('.gxh-bub.on:not(.gxt-bub)');if(!b||(e.target.closest&&e.target.closest('.gxh-link')))return;const r=b.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)sw=Date.now()},true);
   document.addEventListener('click',e=>{if(sw&&Date.now()-sw<800){sw=0;e.stopImmediatePropagation();e.preventDefault()}},true);
   // the ghost finger comes back after a bubble or the bulb is dismissed
   document.addEventListener('pointerup',()=>setTimeout(()=>{if(typeof placeFinger==='function'&&G)placeFinger()},80),true)}

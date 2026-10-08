@@ -100,7 +100,7 @@ const Prog = {
   },
   reset() { this.d = null; try { localStorage.removeItem('ld_prog'); } catch (e) { } this.load(); }
 };
-// ===================== part 10: the ghost finger (first move, and every move of the training dive) and dragging a card onto the table =====================
+// ===================== part 10: the ghost finger (the first move) and dragging a card onto the table =====================
 let _fing = '';
 function fingerDone() {
   if (UI.fingerOn) { UI.fingerOn = false; try { lsSet('ld_finger', String((+lsGet('ld_finger') || 0) + 1)); } catch (e) { } }
@@ -108,7 +108,7 @@ function fingerDone() {
 }
 function fingerTarget() {
   if (!G || !UI.started || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || G.phase === 'over' || viewSeat() < 0 || !iMustAct()) return null;
-  const train = UI.mode === 'guided'; if (!train && !UI.fingerOn) return null;
+  if (!UI.fingerOn) return null;
   const v = viewSeat(), ph = G.phase;
   if (ph === 'assign') {
     if (!myMoves().some(m => m.t === 'take')) return null;
@@ -116,14 +116,11 @@ function fingerTarget() {
     const sel = m && m.t === 'take' ? '#pool [data-key="job' + m.i + '"]' : '#pool .jcard.glow';
     return { sel, kind: 'tap' };
   }
-  if (!train) { if (ph !== 'play') return null; }
-  if (ph === 'distress') return { sel: '#acts [data-a=dist][data-on=false]', kind: 'tap' };
-  if (ph === 'signal') return { sel: '#acts [data-a=nosig]', kind: 'tap' };
+  if (ph !== 'play') return null;
   if (ph === 'play') {
     const T = G.trick, turn = T.turn; if (ctlSeat(turn) !== v) return null;
     if (G.players[turn].helper) return { sel: '#opp .dc.can', kind: 'tap' };
-    let c = tutOnly();
-    if (c < 0) { let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { } if (m && m.t === 'play') c = m.c; }
+    let c = -1; { let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { } if (m && m.t === 'play') c = m.c; }
     if (c >= 0) return { sel: '#hand .hc[data-id="' + c + '"]', kind: 'drag' };
   }
   return null;
@@ -191,8 +188,15 @@ function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it ===
 // ---------------------------------------------------------------- where each bubble points
 const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+// the box around all the glowing elements that match: the bubble then sits clear of every one of them, not just the first
+const hhull = (sel) => () => {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 3 && r.height > 3); if (!rs.length) return null;
+  const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+  const box = { left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t, x: l, y: t };
+  return { getBoundingClientRect: () => box };
+};
 const HLP_STEPS = {
-  jobs: { target: hfirst('#pool .jcard.glow', '#acts .btn'), title: 'Pick a job', text: 'Tap a glowing job card.', pic: () => HP.job() },
+  jobs: { target: () => hhull('#pool .jcard.glow')() || hfirst('#acts .btn')(), title: 'Pick a job', text: 'Tap a glowing job card.', pic: () => HP.job() },
   jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Answer with a button below. Each button says what happens next.', pic: () => HP.job() },
   vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who should take every job. You may pick yourself.', pic: () => HP.vote() },
   flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or tap the skip button.', pic: () => HP.flare() },
@@ -243,7 +247,7 @@ const HLP_RULES = [
 // the phase the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase() {
   try {
-    if (!G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
+    if (tutOn() || !G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
     const st = $('#start'), rs = $('#rs'); if ((st && !st.hidden) || (rs && !rs.hidden)) return null;
     const v = viewSeat(); if (v < 0 || !iMustAct() || !myMoves().length) return null;
     if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') return null;
@@ -279,14 +283,13 @@ function hlpPlayWhy(v, c) {
 function hlpPlan() {
   const v = viewSeat(); if (!canAct() || !iMustAct() || G.phase === 'over') return null;
   let m = null;
-  if (G.phase === 'play' && UI.mode === 'guided' && tutOnly() >= 0) m = { t: 'play', c: tutOnly(), tut: 1 };
-  else { try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; } }
+  try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; }
   if (!m) return null;
   if (!myMoves().some(x => x.t === m.t && x.c === m.c && x.i === m.i && x.on === m.on && x.dir === m.dir)) return null;   // never advise an illegal move
   if (G.phase === 'play' && m.t === 'play') {
     const T = G.trick; if (G.players[T.turn].helper || ctlSeat(T.turn) !== v) return null;
     const card = () => document.querySelector('#hand .hc[data-id="' + m.c + '"]'), slot = () => document.querySelector('.tslot[data-seat="' + v + '"]') || document.querySelector('#felt');
-    return { m, from: card, to: slot, why: () => m.tut ? 'The training dive wants this card now.' : hlpPlayWhy(v, m.c) };
+    return { m, from: card, to: slot, why: () => hlpPlayWhy(v, m.c) };
   }
   if (G.phase === 'assign' && m.t === 'take') {
     const el = () => document.querySelector('#pool [data-key="job' + m.i + '"]');
@@ -311,6 +314,189 @@ function hlpInit() {
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() { hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }
+// ===================== part 12: the tutorial (shell/gx-tutor.js): a staged, never-saved dive that teaches every rule by doing it once =====================
+// RULES CHECKLIST (from the rules drawer buildRules(), the help-kit rules cards HLP_RULES and rules-test.js). Each line names the step that teaches it by doing:
+//   [x] The goal: the whole crew wins or loses together; every job is done = the dive is won ............ goal, won
+//   [x] A job card is a task for ONE diver; it is met by the tricks that diver wins ...................... goal, take, mates
+//   [x] The Commander holds Lantern 4, picks a job first, then clockwise, one job at a turn .............. cmd, take, mates
+//   [x] A job is done when it is met and can no longer fail (green tick); a job that can no longer be met
+//       is broken (red cross) and loses the dive for everybody; try again .............................. lost, done1, won
+//   [x] The distress flare (optional card pass before signalling, costs an extra attempt) ................ flare
+//   [x] No talking about cards; the ping: once per dive show your highest, lowest or only card of a colour,
+//       between tricks; others read it; the token resets each attempt ................................... ping, readping, ping2
+//   [x] The Commander leads the first trick; the winner leads the next one ............................... lead, win2, done1, win3
+//   [x] The leader plays any card; everybody must follow its colour if they can ......................... lead, follow
+//   [x] The highest card of the led colour wins; other colours never win ................................ win1, win2, win3
+//   [x] You are never forced to win a trick ................................................................ lead2
+//   [x] No card of the led colour: play anything; Lanterns are trumps and beat every colour ............. trump, win4
+//   [x] The dive ends the moment every job is done; cards left in hand do not matter ..................... won
+//   [-] Not taught here (the lightbulb and the Rules drawer cover them): job-sharing dives, murky water, deep narcosis,
+//       the clock, predictions, the drone for two divers, the Last trick button.
+// The staged game: seat 0 = you (Commander, Lantern 4), seat 1 = Dag, seat 2 = Sumi. Jobs: you "Win the Lantern 3", Dag "Win the first trick" (data.js tutorial).
+// Attempt 1 ends on trick 1 on purpose: the player leads the Coral 9, wins, and breaks Dag's job. Attempt 2 (same deal, taken for you) is won in three tricks.
+const TUT_GAME = 'lantern-dive';
+const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial';
+const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls: cls, launch: tutStart });
+const tcard = t => { const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }; return D.card(L[t[0]], +t.slice(1)); };
+// ---------------------------------------------------------------- the scripted divers (Dag = seat 1, Sumi = seat 2)
+// the cards they play, by attempt (1, or 2 = every later one), trick number and seat
+const TUT_PLAY = { 1: [{ 1: 'C5', 2: 'C3' }], 2: [{ 1: 'C7', 2: 'C1' }, { 1: 'K4', 2: 'K9' }, { 2: 'T8', 1: 'T2' }] };
+function tutMove(s) {
+  const mv = LD.moves(G, s); if (!mv.length) return null;
+  if (G.phase === 'assign') return mv.find(m => m.t === 'take') || null;
+  if (G.phase === 'signal') {
+    const k9 = tcard('K9');
+    if (s === 2 && G.att === 1) { const p = mv.find(m => m.t === 'ping' && m.c === k9); if (p) return p; }
+    return mv.find(m => m.t === 'nosig') || null;
+  }
+  if (G.phase === 'play') {
+    const row = (TUT_PLAY[G.att > 1 ? 2 : 1] || [])[G.tricks.length]; const want = row && row[s]; if (!want) return null;
+    return mv.find(m => m.t === 'play' && m.c === tcard(want)) || null;
+  }
+  return null;
+}
+function tutAiStep() {
+  for (const s of LD.pending(G)) {
+    if (!G.players[s].ai) continue;
+    const m = tutMove(s); if (!m) continue;
+    const r = LD.apply(G, s, m); if (r.ok) return true;
+  }
+  return LD.AI.step(G);   // anything unscripted: the normal computer diver
+}
+// attempt 2 starts with the same jobs and no flare, taken for you: those are not the player's taps, so they do not go through the kit
+function tutAuto() {
+  if (!tutOn() || UI.busy || !G || G.att < 2 || !iMustAct()) return false;
+  let mv = null;
+  if (G.phase === 'assign') mv = myMoves().find(m => m.t === 'take' && m.i === 0);
+  else if (G.phase === 'distress') mv = myMoves().find(m => m.t === 'dist' && !m.on);
+  if (!mv) return false;
+  if (!UI._tutAutoT) UI._tutAutoT = setTimeout(() => { UI._tutAutoT = 0; if (tutOn() && G && !UI.busy) commit(0, mv); else schedule(); }, 420);
+  return true;
+}
+// a step that waits for "Next" must not have the computer move on under it
+function tutPaused() { try { const s = GXT.state(); return !!(s.active && s.shown && !s.wait); } catch (e) { return false; } }
+// the kit gate for every move the player makes (doMove in ui3.js)
+function tutGate(mv) { return GXT.act({ type: 'tap', what: 'move', mv }); }
+// the trick stays on the table, with its winner marked, while the current step explains it (playEvs in ui3.js)
+async function tutHoldWait() {
+  for (let g = 0; g < 900 && tutOn(); g++) { const st = GXT.current(); if (!(st && st.hold && st.hold())) return; await wait(80); }
+}
+// ---------------------------------------------------------------- where each step points
+
+// glowing things pulse a few pixels; a spotlight that follows every pulse would redraw its bubble all the time, so a rect only moves when it moved by more than 7 px
+function tutSteady(key, r) {
+  if (!r) { delete tutSteady.last[key]; return null; }
+  const o = tutSteady.last[key];
+  if (o && Math.abs(o.left - r.left) < 7 && Math.abs(o.top - r.top) < 7 && Math.abs(o.width - r.width) < 7 && Math.abs(o.height - r.height) < 7) return o;
+  return (tutSteady.last[key] = r);
+}
+tutSteady.last = {};
+const tq = sel => () => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? tutSteady('q' + sel, { left: r.left, top: r.top, width: r.width, height: r.height }) : null; };
+// a hand card's visible part (later cards overlap it), so the tap lands on that card
+function tutHandRect(id) {
+  return tutSteady('hc' + id, tutHandRect0(id));
+}
+function tutHandRect0(id) {
+  const e = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (!e) return null;
+  const r = e.getBoundingClientRect(); if (!r.width) return null;
+  let right = r.right, bottom = r.bottom, seen = false;
+  for (let q = e.nextElementSibling; q; q = q.nextElementSibling) {
+    if (!q.classList.contains('hc')) continue; const b = q.getBoundingClientRect();
+    if (b.right > r.left && b.left < r.right && b.bottom > r.top + 4 && b.top < r.bottom - 4) {
+      if (b.top < r.top + r.height * .5 && b.left > r.left + 6) right = Math.min(right, b.left);
+      else if (b.top > r.top + 6) bottom = Math.min(bottom, b.top);
+    }
+  }
+  seen = true;
+  return { left: r.left, top: r.top, width: Math.max(24, right - r.left), height: Math.max(24, bottom - r.top) };
+}
+const tutSpot = id => () => { const e = document.querySelector('#hand .hc[data-id="' + id + '"] .pspot'); return e && e.getBoundingClientRect().width ? e : null; };
+const tutSeat = s => () => { const e = document.querySelector('[data-key="seat' + s + '"]'); const b = e && (e.closest('.seat') || e.closest('.me') || e); return b && b.getBoundingClientRect().width ? b : null; };
+// a job's chip: my own sit under my hand (#mine), the others' inside their seat
+const tutJobChip = i => () => {
+  const o = G.tasks[i] && G.tasks[i].owner; if (o == null || o < 0) return null;
+  const chips = o === viewSeat() ? Array.from(document.querySelectorAll('#mine .jc.me')) : (() => { const k = document.querySelector('[data-key="seat' + o + '"]'), root = k && k.closest('.seat'); return root ? Array.from(root.querySelectorAll('.jc')) : []; })();
+  const el = chips.find(c => c.getBoundingClientRect().width); return el || null;
+};
+// the box around all the elements that match (the job cards on the table, the cards of the trick)
+const tutBox = sel => () => {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 4 && r.height > 4); if (!rs.length) return null;
+  const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+  return tutSteady('box' + sel, { left: l - 4, top: t - 4, width: r2 - l + 8, height: b - t + 8 });
+};
+const tutFelt = tutBox('#slots .tslot');
+const myTurnLead = () => G && G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !UI.busy && !UI.fz;
+const trickShown = () => !!(UI.fz && UI.fz.win);
+const cn2 = c => D.cardName(c);
+function lastTrickLine() { const k = G.tricks[G.tricks.length - 1]; return k; }
+function tutSteps() {
+  return [
+    { id: 'goal', title: 'One crew', say: 'You, Dag and Sumi win or lose together. Each job card is a task for one diver.', target: tutBox('#pool .jcard'), wait: null,
+      ready: () => G && G.phase === 'assign' && G.att === 1 && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard') },
+    { id: 'cmd', title: 'You are Commander', say: 'You hold Lantern 4, so you are the Commander. The Commander picks a job first.', target: () => tutHandRect(tcard('L4')), wait: null,
+      ready: () => G && G.phase === 'assign' && !UI.busy && !!tutHandRect(tcard('L4')) },
+    { id: 'take', title: 'Take a job', say: 'Tap the "Lantern 3" job: win that card. You hold Lantern 3 and 4, so it is safe.', target: tq('#pool [data-key="job0"]'),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' && a.mv.i === 0 }, ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy },
+    { id: 'mates', title: 'Dag takes one', say: 'Dag took "The first trick": he must win trick 1. Both jobs must be done to win.', target: tutJobChip(1), wait: null,
+      ready: () => G && G.phase === 'distress' && G.tasks[1].owner === 1 && !UI.busy && !!tutJobChip(1)() },
+    { id: 'flare', title: 'Distress flare', say: 'Optional: after a lost try, divers can swap cards. Not now: tap No flare.', target: tq('#acts [data-a=dist][data-on=false]'),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'dist' && !a.mv.on }, ready: () => G && G.phase === 'distress' && iMustAct() && !UI.busy },
+    { id: 'ping', title: 'No talking!', say: 'Cards stay secret. Your only message is a ping: show one colour card. Tap the ping on Coral 9.', target: tutSpot(tcard('C9')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'ping' && a.mv.c === tcard('C9') }, ready: () => G && G.att === 1 && G.phase === 'signal' && iMustAct() && !UI.busy && !!tutSpot(tcard('C9'))() },
+    { id: 'readping', title: 'Read the pings', say: 'Sumi shows her Kelp 9, her highest Kelp. Everyone pings once per dive, between tricks.', target: tutSeat(2), wait: null,
+      ready: () => G && G.att === 1 && G.phase === 'play' && !UI.busy && G.pings.some(p => p.seat === 2) && !!tutSeat(2)() },
+    { id: 'lead', title: 'Lead a card', say: 'You lead the first trick. Everyone must follow its colour. Tap your Coral 9.', target: () => tutHandRect(tcard('C9')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('C9') }, ready: () => G.att === 1 && myTurnLead() },
+    { id: 'win1', title: 'Highest card wins', say: () => 'Coral was led, so all played Coral. The highest Coral wins: your 9 beats ' + otherVals() + '.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 1 && trickShown() },
+    { id: 'lost', title: 'A job broke', say: 'Dag needed to win the first trick, but you did. One broken job loses the dive for all.', target: tutJobChip(1), wait: null,
+      onNext: () => nextAttempt(true), ready: () => G && G.phase === 'over' && !G.result.ok && !UI.busy && !UI.fz && !!tutJobChip(1)() },
+    { id: 'ping2', title: 'Tell Dag', say: 'Same cards. This time let Dag win. Ping your lowest Coral, the 2.', target: tutSpot(tcard('C2')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'ping' && a.mv.c === tcard('C2') }, ready: () => G && G.att === 2 && G.phase === 'signal' && iMustAct() && !UI.busy && !!tutSpot(tcard('C2'))() },
+    { id: 'lead2', title: 'Lead low', say: 'You never have to win. Lead your Coral 2 and let Dag take the trick.', target: () => tutHandRect(tcard('C2')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('C2') }, ready: () => G.att === 2 && G.tricks.length === 0 && myTurnLead() },
+    { id: 'win2', title: 'Dag wins', say: 'Dag\'s Coral 7 is the highest Coral. Whoever wins a trick leads the next one.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 2 && G.tricks.length === 1 && trickShown() },
+    { id: 'done1', title: 'Job done', say: 'A green tick: Dag\'s job is done for good. Only a job that can still fail stays open.', target: tutJobChip(1), wait: null,
+      ready: () => G.att === 2 && G.phase === 'play' && G.tricks.length === 1 && !UI.busy && !UI.fz && jobSt(1) > 0 && !!tutJobChip(1)() },
+    { id: 'follow', title: 'Follow the colour', say: 'Dag led Kelp. If you hold Kelp, you must play it. Tap your Kelp 3.', target: () => tutHandRect(tcard('K3')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('K3') }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz },
+    { id: 'win3', title: 'Who leads next', say: 'Sumi\'s Kelp 9 is the highest Kelp, so she wins and leads the next trick.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 2 && G.tricks.length === 2 && trickShown() },
+    { id: 'trump', title: 'Trumps!', say: 'Sumi led Tide. You have none, so play anything. A Lantern beats every colour: tap Lantern 3.', target: () => tutHandRect(tcard('L3')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('L3') }, ready: () => G.att === 2 && G.tricks.length === 2 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 1 && !UI.busy && !UI.fz },
+    { id: 'win4', title: 'Lantern wins', say: 'Your Lantern 3 beats Sumi\'s Tide 8. A higher Lantern would have won instead.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 2 && G.tricks.length === 3 && trickShown() },
+    { id: 'won', title: 'Dive won!', say: 'Both jobs are done, so the dive ends now and the crew wins. Cards left over do not matter.', target: tutJobChip(0), also: tutJobChip(1), wait: null,
+      ready: () => G && G.phase === 'over' && G.result && G.result.ok && !UI.busy && !UI.fz }
+  ];
+}
+function otherVals() { const k = UI.fz && UI.fz.plays ? UI.fz.plays.filter(p => p.s !== 0).map(p => valOf(p.c)) : []; return k.length === 2 ? k[0] + ' and ' + k[1] : 'the others'; }
+// ---------------------------------------------------------------- the kit hooks
+function tutStart(o) {
+  if (typeof GXT === 'undefined') return;
+  o = o && o.prologue ? o : null;
+  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  GXT.start({
+    game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+    endTitle: 'You know the rules',
+    endText: o ? 'Jobs, the Commander, pings, tricks, trumps. Now the Story begins.' : 'Jobs, the Commander, pings, tricks, trumps. Murky water, clocks and the drone are in the Rules and the lightbulb.',
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    setup: () => { try { GX.close(); } catch (e) { } try { GXC.close(); } catch (e) { } closePop(true); newGame('tutorial'); },
+    onDone: r => {
+      tutLeave(); const c = r && r.choice;
+      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
+      else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); }
+      else { showStart(); UI.sv = 'setup'; UI.cfgOpen = false; renderStart(); }
+    },
+    onExit: () => { tutLeave(); showStart(); }
+  });
+}
+// leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
+function tutLeave() {
+  clearTimeout(UI.tm); clearTimeout(UI._tutAutoT); UI._tutAutoT = 0; UI.seq++; UI.busy = false; UI.fz = null; UI.rq = []; UI.cards = []; UI.started = false;
+  try { GXH.hide(); } catch (e) { } try { const f = $('#finger'); if (f) f.hidden = true; } catch (e) { }
+}
 // ===================== part 2: the deep-sea table (seats, trick, job pool, hand, action tray) =====================
 // Play happens on the table: divers sit around it with their job tokens, the trick lies in the middle, your hand is along the bottom.
 // There is no text panel: one short status line (8 words or fewer) in the top bar, glows on what can be tapped, badges on the seats.
@@ -551,7 +737,7 @@ function renderMine(v) {
 function legalCards(v) {
   if (v < 0 || !G || UI.busy) return null;
   const ph = G.phase;
-  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; const t1 = tutOnly(); if (own && t1 >= 0) return new Set([t1]); return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
+  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
   if (UI.pingSel) return new Set(LD.pingMoves(G, v).map(m => m.c));
   if (ph === 'pass' && LD.moves(G, v).length) return new Set(LD.moves(G, v).map(m => m.c));
   return null;
@@ -559,7 +745,7 @@ function legalCards(v) {
 const ctlSeat = s => G.players[s].helper ? G.cap : s;
 // the cards of my hand that carry a ping spot right now (a signal round, or between tricks when it is my turn to lead)
 function pingSpots(v) {
-  const m = new Map(); if (v < 0 || !G || UI.busy || UI.mode === 'guided' || G.phase === 'over' || !iMustAct()) return m;
+  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || !iMustAct()) return m;
   if (G.phase === 'signal' || (G.phase === 'play' && G.trick && G.trick.plays.length === 0)) myMoves().forEach(x => { if (x.t === 'ping') m.set(x.c, x.k); });
   return m;
 }
@@ -605,7 +791,7 @@ function actModel(v) {
   const act = actorSeat(), who = act >= 0 ? pname(act) : '';
   const btn = (label, a, o) => M.acts.push(Object.assign({ label, a }, o || {}));
   if (!G) return M;
-  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; btn('Result', 'result'); return M; }
+  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; if (UI.mode !== 'tutorial') btn('Result', 'result'); return M; }
   if (hotSeat() && UI.holder < 0 && ph !== 'distress') { M.p = 'Pass the device on.'; return M; }
   switch (ph) {
     case 'assign': {
@@ -671,7 +857,7 @@ function renderActs(v) {
   const M = actModel(v); pr.className = (M.cls || '') + (M.warn ? ' warn' : '');
   pr.textContent = M.p || '';
   const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
-  { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy && UI.mode !== 'guided') && !(pl && pl.childNodes.length)); }
+  { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
   ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
   M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
 }
@@ -706,7 +892,7 @@ function missionFrom(opt) {
 }
 function resetUI(mode, cfg) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
+  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && mode !== 'tutorial' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
@@ -714,8 +900,7 @@ function newGame(mode, o) {
   o = o || {};
   const opt = Object.assign({}, DEF, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 4)), names = [], ai = [];
-  if (mode === 'guided') { np = 3; opt.kind = 'log'; opt.mission = 1; }
-  if (mode === 'guided') { try { hlpInit(); GXH.setEnabled(true); GXH.reset(); } catch (e) { } }   // the training dive shows every coach bubble
+  if (mode === 'tutorial') { np = 3; opt.kind = 'log'; opt.mission = 1; opt.seats = [3, 2]; }   // the staged tutorial (ui12.js): you, Dag and Sumi
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
   const chefs = mode === 'net' ? null : chefsFor(np, opt);
   if (mode !== 'net') for (let i = 0; i < np; i++) {
@@ -723,26 +908,25 @@ function newGame(mode, o) {
     if (mode === 'hot') { names.push(i === 0 ? 'Diver 1' : 'Diver ' + (i + 1)); ai.push(null); }
     else if (mode === 'ai') { names.push(D.names[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(D.names[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
+    else { names.push(D.names[c]); ai.push(mode === 'tutorial' ? 'normal' : lv); }
   }
   UI.chefs = chefs;
   let mission = mode === 'net' ? (opt.mission && typeof opt.mission === 'object' ? opt.mission : missionFrom(opt)) : missionFrom(opt);
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   let tries = 0;
-  // the guided first dive is a fixed, stacked deal that cannot be lost: you hold the Commander's Lantern 4 AND the Lantern 3, the job is to win the Lantern 3
-  const gs = mode === 'guided' ? guidedStack() : null;
+  // the staged tutorial is a fixed, stacked deal (data.js tutorial); the computer divers are scripted (ui12.js tutMove)
+  const gs = mode === 'tutorial' ? tutorialStack() : null;
   G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs, boss: mode === 'descent' ? opt.boss || null : null });
-  G.noProg = mission.kind !== 'log' && mission.kind !== 'deep';
+  G.noProg = mode === 'tutorial' || (mission.kind !== 'log' && mission.kind !== 'deep');
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
   UI.news = [];
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
-  if (mode === 'guided') UI.coach.level = 'off'; // Mara's dialogs teach the training dive (ui8.js)
+  UI.coach = { level: mode === 'tutorial' ? 'off' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
-function guidedStack() {
+function tutorialStack() {
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
-  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h), nopass: true };
+  return { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;
@@ -758,7 +942,7 @@ function nextAttempt(same) {
 function aiWants() {
   if (!G || G.phase === 'over') return false;
   for (const s of LD.pending(G)) if (G.players[s].ai) return true;
-  if (G.phase === 'play' && G.trick.plays.length === 0) for (const p of G.players) if (p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)) return true;
+  if (G.phase === 'play' && G.trick.plays.length === 0 && UI.mode !== 'tutorial') for (const p of G.players) if (p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)) return true;
   return false;
 }
 function schedule() {
@@ -768,7 +952,8 @@ function schedule() {
   if (UI.busy) return;
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length) return;
-  if (UI.tip && UI.mode === 'guided') return;
+  if (UI.mode === 'tutorial' && tutAuto()) return;
+  if (UI.mode === 'tutorial' && tutPaused()) { UI.tm = setTimeout(schedule, 200); return; }
   try { if (storyCheck()) return; } catch (e) { console.error(e); }
   if (G.clock && G.clockRun && UI.timerAt === 0) { UI.timerAt = Date.now(); UI.clockLeft = G.clock; startClock(); }
   if (aiWants()) {
@@ -780,7 +965,7 @@ function schedule() {
 }
 function aiTurn() {
   if (!G || UI.busy || G.phase === 'over') return;
-  let ok = false; try { ok = LD.AI.step(G); } catch (e) { console.error(e); }
+  let ok = false; try { ok = UI.mode === 'tutorial' ? tutAiStep() : LD.AI.step(G); } catch (e) { console.error(e); }
   if (!ok) { schedule(); return; }
   afterApply(G.events.slice());
 }
@@ -804,6 +989,7 @@ function afterApply(evs) {
 // ---------- human actions ----------
 function doMove(mv) {
   const v = viewSeat(); if (v < 0) return false;
+  if (tutOn() && !tutGate(mv)) return false;      // the staged tutorial: only the action the step asks for goes through
   fingerDone();
   if (isClient()) { netAct(mv); UI.sel = -1; UI.pingSel = false; UI.giveSel = -1; UI.job = -1; render(); return true; }
   return commit(v, mv);
@@ -818,7 +1004,6 @@ function tapHand(id) {
     const T = G.trick, turn = T.turn;
     if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards.' : 'Wait for ' + pname(turn) + '.'); return; }
     const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
-    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Play the glowing card.'); return; }
     UI.sel = id; UI.hint = null; playSel(); return;
   }
   toast('Not your turn yet.');
@@ -930,6 +1115,7 @@ async function playEvs(evs) {
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
       render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
       UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      await tutHoldWait(); if (tok !== UI.seq) return;
       UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1', 'plus'); await wait(520); if (tok !== UI.seq) return;
       UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(700); if (tok !== UI.seq) return; }
     } else {
@@ -968,7 +1154,7 @@ function startClock() {
 function hasSave() { return !!lsGet('ld_save'); }
 function autosave() { if (NET.on || !G || !UI.started) return false; return save(true); }
 function save(quiet) {
-  if (NET.on || !G || !UI.started) return false;
+  if (NET.on || !G || !UI.started || UI.mode === 'tutorial') return false;
   try { const g = LD.clone(G); delete g.events; lsSet('ld_save', JSON.stringify({ G: g, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, coach: UI.coach })); return true; } catch (e) { return false; }
 }
 function loadSave() {
@@ -978,25 +1164,21 @@ function loadSave() {
   G = o.G; G.events = [];
   try { if (G.phase !== 'over' && LD.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.hn ? o.chefs : null;
-  resetUI(o.mode || 'vs', o.cfg || null); if (o.coach) UI.coach = o.coach;
+  resetUI(o.mode === 'guided' || o.mode === 'tutorial' ? 'vs' : (o.mode || 'vs'), o.cfg || null); if (o.coach) UI.coach = o.coach;
   UI.timerAt = 0; placePrompt(); render(); sndMusic();
   if (G.phase === 'over') showResult(); else schedule();
   return true;
 }
 // ===================== part 4: guide tips, pop-ups (job, diver, last trick) and the result card =====================
-// ---------- tips: one at a time, never stacked; the guided dive shows all of them, other dives each tip once per device ----------
+// ---------- tips: one at a time, never stacked; each tip once per device ----------
 const TIPS = [
-  { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0, title: 'Welcome aboard', body: 'Your team wins or loses together. Each job card is a task for ONE diver. Do every job and the dive is won.', btn: 'Next' },
   { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card, so you pick a job first and lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Commander.' },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card, then "Take this job". Pick one your cards can do.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'Distress flare (optional)', body: 'Light it and everyone passes one card to a neighbour. It costs one extra attempt in the logbook. "No flare" is fine.' },
   { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per dive you may show the team one card: your highest, lowest or only card of a colour. Or skip.' },
-  { id: 'gplan', when: () => UI.mode === 'guided' && G.phase === 'play' && G.tricks.length === 0 && iMustAct() && G.trick.plays.length === 0, title: 'Your plan', body: 'Your job: win the Lantern 3. You also hold Lantern 4, so it is safe. First play a few colour cards to see how tricks work. The dive ends the moment your job is done.' },
-  { id: 'lead', when: () => UI.mode === 'guided' && G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !G.players[G.trick.turn].helper, title: 'You lead', body: 'Tap a card, then Play. Everyone plays one card; the highest card of the colour you led wins the trick.' },
   { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play the colour that was led if you have it (dim cards are not allowed). You never have to win.' },
   { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'None of that colour', body: 'Play anything. Another colour never wins; a Lantern always does.' },
   { id: 'trump', when: () => G.phase === 'play' && G.trick.plays.some(p => suitOf(p.c) === 4) || (UI.fz && UI.fz.plays.some(p => suitOf(p.c) === 4)), title: 'Lanterns are trumps', body: 'A Lantern beats every colour. With several Lanterns the highest wins.' },
-  { id: 'won', when: () => UI.mode === 'guided' && G.tricks.length >= 1 && G.phase === 'play' && !UI.busy && iMustAct(), title: 'The winner leads next', body: () => 'Whoever wins a trick leads the next one. The line above the buttons tells you who won and why.' },
   { id: 'jobdone', when: () => G.phase === 'play' && G.tasks.some((t, i) => jobSt(i) > 0) && !UI.busy, title: 'A job is done', body: 'Green tick = done for good. A red cross would end the dive.' }
 ];
 function seen(id) { return !!UI.coach.seen[id]; }
@@ -1068,6 +1250,7 @@ function openLast() {
 // ---------- the result card ----------
 function showResult() {
   if (!G || G.phase !== 'over' || UI.overShown) return; UI.overShown = true;
+  if (UI.mode === 'tutorial') return;   // the staged tutorial explains the end itself (ui12.js)
   try { Prog.ended(G); } catch (e) { console.error(e); }
   clearInterval(UI.clk);
   const rs = $('#rs'); rs.hidden = false; rs.innerHTML = ''; UI.rsOpen = true;
@@ -1082,8 +1265,7 @@ function showResult() {
     const st = R.tasks[i], det = R.det && R.det[i], nb = ok || st > 0 ? '' : st < 0 ? (det || 'It could not be met by the end of the dive.') : 'Not finished: the dive ended first.';
     box.append(h('div.rjob' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '.open'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : st < 0 ? KIT.iconSVG('cross', 24) : '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12H18"/></svg>' }), h('span', h('b', pname(t.owner) + ': '), jobText(i), nb ? h('small.why', nb) : null)));
   });
-  if (!ok && !guidedWon()) box.append(h('p.sm', 'Tip: the red cross marks the job that broke the dive. Grey jobs were still open.'));
-  if (ok && UI.mode === 'guided') guidedDebrief(box);
+  if (!ok) box.append(h('p.sm', 'Tip: the red cross marks the job that broke the dive. Grey jobs were still open.'));
   if (m.kind === 'log') {
     if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
     else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
@@ -1093,8 +1275,7 @@ function showResult() {
   const bt = h('div.cbtns');
   const host = !NET.on || isHost();
   if (ok) {
-    if (UI.mode === 'guided') bt.append(h('button.btn.go', { 'data-a': 'descgo', type: 'button' }, 'Start The Descent'));
-    else if (host && m.kind === 'log' && m.id < 32) bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next dive'));
+    if (host && m.kind === 'log' && m.id < 32) bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next dive'));
     else if (host && m.kind === 'log') bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Deep dive ' + D.deep.start));
     else if (host && m.kind === 'deep') bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next: deep dive ' + (m.d + 1)));
     else if (host) bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Play again'));
@@ -1106,23 +1287,13 @@ function showResult() {
   bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
   box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
 }
-function guidedWon() { return UI.mode === 'guided' && G && G.result && G.result.ok; }
-function guidedDebrief(box) {
-  const me = viewSeat(), mine = tricksWon()[me >= 0 ? me : 0] || 0;
-  box.append(h('div.debrief', h('b', 'What you just learned'), h('ul',
-    h('li', 'A job card tells ONE diver what to do with the tricks that diver wins. Yours: win the Lantern 3.'),
-    h('li', 'Lanterns are trumps: any Lantern beats every colour, and the highest Lantern wins. You held the two highest, so the job was safe.'),
-    h('li', 'The whole team wins when every job is done, and the dive ends at once. It took ' + G.tricks.length + ' trick' + (G.tricks.length === 1 ? '' : 's') + ' and you won ' + mine + '.'),
-    h('li', 'Next dives have jobs for every diver. Watch the job chips under each name, and use the signal token to tell your team one card you hold.'))),
-    h('div.say', h('span.dpt', { html: portraitSVG('mara', 52) }), h('p', h('b', 'Mara: '), 'You are ready. Now take on The Descent: four zones, and a boss at the bottom of each.')));
-}
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {
   if (!G || G.phase !== 'over' || NET.on && !isHost()) return;
   const m = G.mission; const o = Object.assign({}, UI.opt || {});
   if (m.kind === 'log') { if (m.id < 32) { o.kind = 'log'; o.mission = m.id + 1; } else { o.kind = 'deep'; o.deep = Math.max(D.deep.start, Prog.load().deep.level); } }
   else if (m.kind === 'deep') { o.kind = 'deep'; o.deep = m.d + 1; }
-  closeRS(); const mode = UI.mode === 'guided' ? 'vs' : UI.mode;
+  closeRS(); const mode = UI.mode;
   UI.opt = Object.assign(UI.opt || {}, { kind: o.kind, mission: o.mission, deep: o.deep });
   if (NET.on) { netStart(); return; }
   newGame(mode, Object.assign({}, UI.cfg || {}, { kind: o.kind, mission: o.mission, deep: o.deep, np: (UI.cfg && UI.cfg.np) || G.hn, seats: UI.cfg && UI.cfg.seats || undefined }));
@@ -1194,6 +1365,7 @@ function renderMenu() {
   if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New dive'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
+  if (!NET.on) { const tr = h('div.mrow', { html: tutBtn('btn') }); b.appendChild(tr); }
   try { hlpInit(); if (typeof GXH !== 'undefined') b.appendChild(GXH.settingsRow({ rowClass: 'mrow', btnClass: 'btn' })); } catch (e) { }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gg = gfxPref(); row('Graphics' + (PX.on ? (gg === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gg === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gg === v ? 'true' : 'false' }, n))); }
@@ -1207,6 +1379,7 @@ const SEAT_ORDER = [0, 1, 2, 3];
 function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice(), seats: DEF.seats.slice() }); if (!Array.isArray(o.seats)) o.seats = chefsFor(o.np || 4, o).slice(1); if (!o.lv) o.lv = DEF.lv.slice(); o.np = o.seats.length + 1; return o; }
 function setNp(n) { const o = optObj(), want = Math.max(1, Math.min(4, n - 1)); const st = o.seats.slice(); while (st.length > want) st.pop(); for (const c of SEAT_ORDER) { if (st.length >= want) break; if (st.indexOf(c) < 0) st.push(c); } o.seats = st; o.np = st.length + 1; }
 function toggleChef(c) { const o = optObj(), st = o.seats.slice(), i = st.indexOf(c); if (i >= 0) { if (st.length > 1) st.splice(i, 1); else { toast('At least one diver joins you.'); return; } } else if (st.length < 4) st.push(c); o.seats = st; o.np = st.length + 1; }
+function firstTime() { try { return !Object.keys(Prog.load().done || {}).length && !lsGet('ld_save') && !(typeof GXT !== 'undefined' && GXT.status('lantern-dive').seen); } catch (e) { return false; } }
 function logoSVG() { return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#0e2146" stroke="#ffd873" stroke-width="1.4"/><circle cx="13" cy="9" r="4.4" fill="#ffe9a6" stroke="#0b1f3a" stroke-width="1"/><path d="M13 13.4C13 16 10 16 8 19" fill="none" stroke="#ffd873" stroke-width="1.6" stroke-linecap="round"/></svg>'; }
 function missionLine(o) {
   const kind = o.kind || 'log';
@@ -1235,10 +1408,11 @@ function titleEl() {
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Lantern Dive')),
     h('p.tag', 'Dive together. Say nothing. Trust the lantern.'),
     h('div.tbtns',
+      firstTime() ? h('div.tutw', { html: tutBtn('tbtn go') }) : null,
       window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), ' ', h('span', campLine())) : null,
       h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
-      h('button.tbtn', { 'data-a': 'guided', type: 'button' }, h('b', 'Training'), ' ', h('span', 'a dive with Mara, step by step')),
       h('button.tbtn', { 'data-a': 'play', type: 'button' }, h('b', 'Free play'), ' ', h('span', 'any dive, any crew')),
+      firstTime() ? null : h('div.tutw', { html: tutBtn('tbtn') }),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), ' ', h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), ' ', h('span', 'your saved dive')) : null),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
@@ -1287,7 +1461,7 @@ function setupEl() {
   // first visit (nothing in the logbook yet): the guided dive is the big button, so a player who taps the big button learns first
   const fresh = (() => { try { return !Object.keys(Prog.load().done || {}).length; } catch (e) { return false; } })();
   const bStart = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the dive'), ' ', h('span', missionLine(o)));
-  const bGuided = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', big ? 'Guided first dive (start here)' : 'Guided first dive'), ' ', h('span', 'You + 2 computer divers, with tips'));
+  const bGuided = (big) => h('div.tutw', { html: tutBtn('sbtn' + (big ? ' big' : '')) });
   const go = h('div.sgo',
     fresh ? bGuided(true) : bStart(true),
     h('div.sgrid3',
@@ -1353,7 +1527,6 @@ document.addEventListener('click', ev => {
     case 'gfx': setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m); break;
-    case 'guided': newGame('guided'); break;
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'kind') { o.kind = d.v; if (d.v === 'log' && !o.mission) o.mission = Prog.load().cur > 32 ? 32 : Prog.load().cur; if (d.v === 'deep') o.deep = Math.max(D.deep.start, Prog.load().deep.level); } else if (d.k === 'timer') o.timer = d.v === '1'; else { o[d.k] = isNaN(+d.v) ? d.v : +d.v; } renderStart(); break; }
     case 'pickdive': { const o = optObj(); o.mission = +d.v; renderStart(); break; }
     case 'jobstep': { const o = optObj(); o.job = Math.max(1, Math.min(96, ((o.job | 0) || 1) + (+d.v))); renderStart(); break; }
@@ -1726,7 +1899,7 @@ function pxPainted() { try { const c = PX.app.renderer.extract.canvas({ target: 
 // test hook: where every sprite is and whether anything still moves (px-test.js)
 PX.state = () => ({ nPlay: PX.nPlay || 0, nSweep: PX.nSweep || 0, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err, blur: !!(PX.L.fx && PX.L.fx.filters && PX.L.fx.filters.length), canvasOK: pxPainted(),
   objs: [...PX.objs.values()].filter(o => !o.detached).map(o => ({ key: o.key, id: o.id, layer: o.layer, x: o.x, y: o.y, w: o.w, tx: o.tx, ty: o.ty, tw: o.tw, face: !!o.face && o.sp.texture === o.face, alpha: o.c.alpha })) });
-// ===================== part 8: the Descent (zones, oxygen, bosses with curses), character dialogs, Mara's training dive =====================
+// ===================== part 8: the Descent (zones, oxygen, bosses with curses), character dialogs =====================
 // The Descent and the boss curses are our own addition on top of the published rules (see ../rules-notes.md, "Descent mode").
 // ---------- characters (code-drawn portraits; placeholders until painted art replaces them) ----------
 const CHAR = {
@@ -1808,7 +1981,7 @@ function descentEl() {
   box.append(map);
   const lab = p.z >= DESC.length ? 'Start a new descent' : cur.boss ? 'Fight ' + CHAR[cur.bossDef.id].name : 'Dive ' + (cur.si + 1) + ' of ' + cur.Z.name;
   goSlot.append(h('div.sgo', h('button.sbtn.big', { 'data-a': p.z >= DESC.length ? 'descreset' : 'descgo', type: 'button' }, h('b', lab), ' ', h('span', p.z >= DESC.length ? 'from the Sunlit Reef' : 'You + Nerea, Bram and Sumi · difficulty ' + cur.d + (cur.cmt === 'murky' ? ' · murky water' : ''))),
-    h('button.tlink', { 'data-a': 'guided', type: 'button' }, 'Training dive with Mara')));
+    h('div.tlink2', { html: tutBtn('tlink') })));
   return box;
 }
 function descGo() {
@@ -1882,7 +2055,6 @@ function storyCheck() {
       if (!UI.said['cu' + G.att + ':' + n]) { UI.said['cu' + G.att + ':' + n] = 1; UI.hitAt = Date.now(); UI.news = (UI.news || []).concat(['\u2620 Trick ' + (n + 1) + ': ' + B.name + ' casts ' + C.name + ' \u2014 ' + C.short.toLowerCase() + '.']).slice(-3); render(); }
     }
   }
-  if (UI.mode === 'guided') return tutCheck(once);
   return false;
 }
 // ---------- the boss bar on the table ----------
@@ -1897,35 +2069,6 @@ function bossBar() {
   const nx = G.boss.sched.findIndex((c, i) => i > G.tricks.length && c);
   bb.append(h('span.bpt', { html: portraitSVG(G.boss.id, 34) }), h('div.bmid', h('b', B.name), h('div.hp', { 'aria-label': 'Boss health ' + (n - done) + ' of ' + n }, ...Array.from({ length: n }, (_, i) => h('i' + (i < n - done ? '.on' : ''))))),
     cu ? h('span.bcu', { title: CURSE[cu].text }, '☠ ' + CURSE[cu].short) : h('span.bcu.calm', nx >= 0 ? 'Curse on trick ' + (nx + 1) : 'No curse'));
-}
-// ---------- Mara's training dive (replaces the old tip chain in guided mode) ----------
-// The guided deal is stacked (see data.js guided): you hold L4 L3 C2 C6 C9 T3 T7 K1 K5 K8 S2 S6 S9; your job is to win the Lantern 3.
-const TUT = { lead: [D.card(0, 9), D.card(1, 3), D.card(4, 3)] };
-function tutOnly() {
-  if (UI.mode !== 'guided' || !G || G.phase !== 'play' || G.trick.turn !== viewSeat()) return -1;
-  const L3 = D.card(4, 3);
-  if (G.trick.plays.length) return G.trick.ls === 4 && G.players[viewSeat()].hand.includes(L3) && !G.trick.plays.some(p => p.c > L3) ? L3 : -1;
-  const k = Math.min(G.tricks.length, 2), want = TUT.lead[k];
-  return G.players[viewSeat()].hand.includes(want) ? want : -1;
-}
-function tutCheck(once) {
-  return false;   // the training dive teaches with glow and a ghost finger, no dialogs
-  const v = viewSeat(), myTurn = G.phase === 'play' && G.trick.turn === v;
-  if (G.phase === 'assign' && G.tricks.length === 0) {
-    if (once('t0', { who: 'mara', title: 'Welcome, diver!', body: 'Whole crew wins or loses together.', btn: 'Show me' })) return true;
-    if (iMustAct() && once('t1', { who: 'mara', title: 'Take a job', body: 'Win the Lantern 3. Tap the job.', btn: 'Got it' })) return true;
-  }
-  if (G.phase === 'distress' && iMustAct() && once('tf', { who: 'mara', title: 'The distress flare', body: 'Press No flare.', btn: 'OK' })) return true;
-  if ((G.phase === 'signal' || G.phase === 'play' && G.tricks.length === 0) && iMustAct() && LD.pingMoves(G, v).length && once('ts', { who: 'mara', title: 'Signals', body: 'Press No signal.', btn: 'OK' })) return true;
-  if (myTurn && G.trick.plays.length === 0) {
-    if (G.tricks.length === 0 && once('t2', { who: 'mara', title: 'Your first trick', body: 'Lead your glowing Coral 9.', btn: 'Lead it' })) return true;
-    if (G.tricks.length === 1 && once('t3', { who: 'mara', title: 'You won it!', body: 'Lead your glowing Tide 3.', btn: 'Lead it' })) return true;
-    if (G.tricks.length >= 2 && G.players[v].hand.includes(D.card(4, 3)) && once('t5', { who: 'mara', title: 'Lanterns are trumps', body: 'Lead your glowing Lantern 3.', btn: 'Lead it' })) return true;
-  }
-  if (myTurn && G.trick.plays.length > 0 && tutOnly() >= 0 && once('t6', { who: 'mara', title: pname(G.trick.lead) + ' led a Lantern for you!', body: 'Play your Lantern 3.', btn: 'Play it' })) return true;
-  if (myTurn && G.trick.plays.length > 0 && G.trick.ls < 4 && LD.playable(G, v).length < G.players[v].hand.length && once('t4', { who: 'mara', title: 'Follow the colour', body: 'Follow the colour led.', btn: 'OK' })) return true;
-  if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'Fine: your job needs the Lantern 3.', btn: 'OK' })) return true;
-  return false;
 }
 // ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
 // A chapter is a real logbook dive with its own crew and (at most) one twist. The twists exist only here; the normal rules never change.
@@ -1952,13 +2095,14 @@ function campStart(def) {
   let np = s.np || 4; if (t && t.id === 'big-team') np = t.param || 5;
   const o = { camp: def, np, kind: 'log', mission: s.mission || 1, seats: [0, 1, 2, 3], lv: [mates, mates, mates, mates], level: 'normal', timer: !!((t && t.id === 'clock-on') || s.timer) };
   UI.seed = s.seed != null ? s.seed : null;
-  newGame(s.mode === 'guided' ? 'guided' : 'vs', o);
+  newGame('vs', o);
   UI.camp = def;
-  if (s.mode !== 'guided') { UI.coach.level = def.hints ? 'full' : 'off'; render(); }
+  UI.coach.level = def.hints ? 'full' : 'off'; render();
   try { toast('Goal: ' + def.goal.text); } catch (e) { }
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
-function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
+// Story starts with the staged tutorial (Chapter 0) until it has been finished once; then it goes straight to the chapter map
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); if (typeof GXT !== 'undefined' && typeof tutStart === 'function' && !GXT.isDone('lantern-dive')) tutStart({ prologue: true }); else GXC.open(); }
 function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
 // result footer inside a story chapter (called from showResult)
 function campResult(box, ok) {
@@ -1981,7 +2125,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'lantern-dive', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    game: 'lantern-dive', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
     onExit: () => { UI.camp = null; showStart(); },
     scores: g => g.players.map(() => 0), seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
   });

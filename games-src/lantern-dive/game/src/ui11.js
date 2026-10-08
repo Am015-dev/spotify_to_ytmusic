@@ -20,8 +20,15 @@ function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it ===
 // ---------------------------------------------------------------- where each bubble points
 const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+// the box around all the glowing elements that match: the bubble then sits clear of every one of them, not just the first
+const hhull = (sel) => () => {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 3 && r.height > 3); if (!rs.length) return null;
+  const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+  const box = { left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t, x: l, y: t };
+  return { getBoundingClientRect: () => box };
+};
 const HLP_STEPS = {
-  jobs: { target: hfirst('#pool .jcard.glow', '#acts .btn'), title: 'Pick a job', text: 'Tap a glowing job card.', pic: () => HP.job() },
+  jobs: { target: () => hhull('#pool .jcard.glow')() || hfirst('#acts .btn')(), title: 'Pick a job', text: 'Tap a glowing job card.', pic: () => HP.job() },
   jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Answer with a button below. Each button says what happens next.', pic: () => HP.job() },
   vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who should take every job. You may pick yourself.', pic: () => HP.vote() },
   flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or tap the skip button.', pic: () => HP.flare() },
@@ -72,7 +79,7 @@ const HLP_RULES = [
 // the phase the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase() {
   try {
-    if (!G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
+    if (tutOn() || !G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
     const st = $('#start'), rs = $('#rs'); if ((st && !st.hidden) || (rs && !rs.hidden)) return null;
     const v = viewSeat(); if (v < 0 || !iMustAct() || !myMoves().length) return null;
     if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') return null;
@@ -108,14 +115,13 @@ function hlpPlayWhy(v, c) {
 function hlpPlan() {
   const v = viewSeat(); if (!canAct() || !iMustAct() || G.phase === 'over') return null;
   let m = null;
-  if (G.phase === 'play' && UI.mode === 'guided' && tutOnly() >= 0) m = { t: 'play', c: tutOnly(), tut: 1 };
-  else { try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; } }
+  try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; }
   if (!m) return null;
   if (!myMoves().some(x => x.t === m.t && x.c === m.c && x.i === m.i && x.on === m.on && x.dir === m.dir)) return null;   // never advise an illegal move
   if (G.phase === 'play' && m.t === 'play') {
     const T = G.trick; if (G.players[T.turn].helper || ctlSeat(T.turn) !== v) return null;
     const card = () => document.querySelector('#hand .hc[data-id="' + m.c + '"]'), slot = () => document.querySelector('.tslot[data-seat="' + v + '"]') || document.querySelector('#felt');
-    return { m, from: card, to: slot, why: () => m.tut ? 'The training dive wants this card now.' : hlpPlayWhy(v, m.c) };
+    return { m, from: card, to: slot, why: () => hlpPlayWhy(v, m.c) };
   }
   if (G.phase === 'assign' && m.t === 'take') {
     const el = () => document.querySelector('#pool [data-key="job' + m.i + '"]');
