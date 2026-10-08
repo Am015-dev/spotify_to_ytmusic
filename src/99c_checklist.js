@@ -3,6 +3,12 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88g',id:'big-rides',text:'Garage RIDES: the Sightseeing Bus, Box Truck, Stretch Limo and Monster Truck show up and look like LEGO vehicles; equip each one and SAVE & DRIVE.'},
+ {ver:'v88g',id:'big-junction',text:'Drive the Bus or the Truck through 3 junctions in Frankfurt: it turns wider than a car but never gets stuck on a corner.'},
+ {ver:'v88g',id:'big-feel',text:'A big car picks up speed more slowly than the Hot Rod, and the camera shows the whole vehicle.'},
+ {ver:'v88g',id:'big-tyres',text:'All four tyres of each big template sit on the road (no floating, no sinking), including the Monster Truck.'},
+ {ver:'v88g',id:'big-build',text:'Garage BUILD on a big template: you can place bricks along the full length and on the roof; the camera shows the whole car.'},
+ {ver:'v88g',id:'small-same',text:'Switch back to a normal car: it drives exactly like before.'},
  {ver:'v88f',id:'steer-turn',text:'Turn left or right at a junction at 60–80 km/h: the car settles straight within about a second, no wobbling.'},
  {ver:'v88f',id:'steer-tap',text:'Tap ◀ or ▶ briefly on a straight road: the car moves over a little, no jerk and no swinging back and forth.'},
  {ver:'v88f',id:'route-follow',text:'Hot Drop (follow Hilde): the yellow route follows the roads, no sudden U-turns, and the top line says "left/right in … m" a few seconds before each turn.'},
