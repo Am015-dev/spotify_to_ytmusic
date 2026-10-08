@@ -186,6 +186,6 @@ R2_dom();
 #gbx.r2 #gnbP{z-index:7}
 @media (min-height:501px) and (min-width:900px){#gbx.r2{--r2hh:58px;--r2rw:92px;--r2ch:60px;--r2pw:400px}#gbx .r2T{height:48px;font-size:13px}#r2H .r2Rib b{font-size:20px}#r2H .r2Nm b{font-size:18px}#r2H .r2Bud i{width:110px}#r2R .r2T{max-height:84px}#r2R .r2T i{font-size:24px}#r2R .r2T span{font-size:13px}#gbx.r2 #gbBkPc .gbPc{width:62px;height:50px}}
 @media (max-width:760px),(max-height:500px){#gbx.r2 #gbBkPc .gbPc{width:52px;height:44px}#gbx.r2 .r2BkT .r2T{padding:0 7px}#gbx.r2 .r2BkT .r2T{font-size:12px}}`;document.head.appendChild(st)}
-window.__r2={mode:()=>R2_cur(),go:(m,s)=>R2_go(m,s),fin:()=>R2_fin(),finMat:f=>R2_mat(f),area:()=>R2_calc(),kitTh:k=>R2_kitTh(k),
+window.__r2={mode:()=>R2_cur(),cand:(x,y)=>{const h=GB_pick(x,y),c=GB_cand(h);return{h:h&&{i:h.i,j:h.j,b:!!h.brick},c:c&&{x:c.x,z:c.z,y:c.y,bad:!!c.bad},cap:!!GB_.capHit}},go:(m,s)=>R2_go(m,s),fin:()=>R2_fin(),finMat:f=>R2_mat(f),area:()=>R2_calc(),kitTh:k=>R2_kitTh(k),
  plFin:()=>{try{let f=null;pl.mesh.traverse(x=>{if(x.isMesh&&x.material&&x.material.userData&&x.material.userData.r2)f=x.material.userData.r2});return f||'gloss'}catch(e){return null}},
  gbFin:()=>{let f=null;GB.mesh&&GB.mesh.traverse(x=>{if(x.isMesh&&x.material&&x.material.userData&&x.material.userData.r2)f=x.material.userData.r2});return f||'gloss'}};
