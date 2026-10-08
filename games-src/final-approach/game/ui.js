@@ -65,7 +65,7 @@ function mayAct(s) {      // may this device make seat s's moves right now?
 const mySeatMoves = () => { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) ? FA.validMoves(G, v) : []; };
 function prefs() { try { const p = JSON.parse(localStorage.getItem('fa_prefs') || '{}'); Object.assign(UI.prefs, p.prefs || {}); if (p.speed) AIDELAY = p.speed; UI.won = p.won || {}; } catch (e) { } }
 function savePrefs() { try { localStorage.setItem('fa_prefs', JSON.stringify({ prefs: UI.prefs, speed: AIDELAY, won: UI.won })); } catch (e) { } }
-function saveGame() { try { if (G && !G.result && UI.mode !== 'net') { localStorage.setItem('fa_save', JSON.stringify({ G, mode: UI.mode, seat: UI.seat, holder: UI.holder, cfg: UI.cfg })); return true; } } catch (e) { } return false; }
+function saveGame() { try { if (G && !G.result && UI.mode !== 'net' && !(UI.cfg && UI.cfg.tutorial)) { localStorage.setItem('fa_save', JSON.stringify({ G, mode: UI.mode, seat: UI.seat, holder: UI.holder, cfg: UI.cfg })); return true; } } catch (e) { } return false; }
 function hasSave() { try { return !!localStorage.getItem('fa_save'); } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('fa_save'); } catch (e) { } }
 // ---------- derived numbers for the panel ----------
@@ -151,8 +151,8 @@ function render() {
       w.classList.add('altc');
       const tm = rtEl();
       w.appendChild(h('div.altnow', h('b', R[0] + ' ft'), tm, h('span.fp.' + (R[1] ? 'c' : 'p'), fw(R[1]) + ' first')));
-      // one dot per round: colour and letter (P = Pilot, C = Co-pilot) say who places first, so colour is never the only cue
-      const dots = h('div.altdots', { title: 'Round ' + (G.round + 1) + ' of ' + n }); for (let i = 0; i < n; i++) { const Q = rows[i + G.row0]; dots.appendChild(h('i.ad.' + (Q[1] ? 'c' : 'p') + (i === G.round ? '.cur' : i < G.round ? '.past' : '') + (Q[2] ? '.rr' : ''), Q[1] ? 'C' : 'P')); } w.appendChild(dots);
+      // one dot per round: blue = Pilot first, orange = Co-pilot first (the line above says the name)
+      const dots = h('div.altdots', { title: 'Round ' + (G.round + 1) + ' of ' + n }); for (let i = 0; i < n; i++) { const Q = rows[i + G.row0]; dots.appendChild(h('i.ad.' + (Q[1] ? 'c' : 'p') + (i === G.round ? '.cur' : i < G.round ? '.past' : '') + (Q[2] ? '.rr' : ''), '')); } w.appendChild(dots);
     } else {
       const cw = r.alt.w / n;
       for (let i = 0; i < n; i++) { const R = rows[i + G.row0]; const el = h('div.ar' + (i === G.round ? '.cur' : (i < G.round ? '.past' : '')), { style: 'left:' + i * cw + 'px;width:' + cw + 'px;top:' + (isPh() ? 3 : 12) + 'px;bottom:0' }, h('span', String(R[0]), h('u', ' ft'), R[2] ? h('i.rr', { title: 'reroll token' }) : null), h('small', h('i.fpd.' + (R[1] ? 'c' : 'p')), h('span.fp.' + (R[1] ? 'c' : 'p'), fw(R[1])))); w.appendChild(el); }
@@ -167,13 +167,13 @@ function render() {
     const b = css(h('button.' + cls.replace(/ /g, '.'), { type: 'button', 'data-a': 'slot', 'data-slot': k, 'aria-label': slotName(k) + (dead[k] ? ' (this die here ends the flight)' : '') + ', ' + (d ? 'holds a ' + d.v : slotNeed(k) + (S.s === 0 ? ', pilot' : S.s === 1 ? ', co-pilot' : ', either crew')) }), q);
     b.style.setProperty('--u', Math.round(q.w) + 'px');
     if (d) b.appendChild(dvEl(d.v, d.k === 'i' ? 't' : d.k === 'x' ? 'k' : (d.s === 0 ? 'b' : 'o'))); else {
-      const pvw = legal.includes(k) && typeof act === 'number' && act >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && G.dice[act][UI.sel] ? slotPreview(k, act, G.dice[act][UI.sel].v + UI.cof) : null; if (pvw) b.classList.add('pvw'); const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', (S.s === 0 || S.s === 1) ? h('i.seat.' + (S.s ? 'c' : 'p'), { 'aria-hidden': 'true' }, S.s ? 'C' : 'P') : null, icoEl(S.grp))); if (lab) b.appendChild(h('span.sl', lab)); if (pvw) b.appendChild(h('span.pw' + (pvw.bad ? '.bad' : pvw.good ? '.good' : ''), h('b', pvw.big), h('small', pvw.cap))); }
+      const pvw = legal.includes(k) && typeof act === 'number' && act >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && G.dice[act][UI.sel] ? slotPreview(k, act, G.dice[act][UI.sel].v + UI.cof) : null; if (pvw) b.classList.add('pvw'); const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', icoEl(S.grp))); if (lab) b.appendChild(h('span.sl', lab)); if (pvw) b.appendChild(h('span.pw' + (pvw.bad ? '.bad' : pvw.good ? '.good' : ''), h('b', pvw.big), h('small', pvw.cap))); }
     const swOn = S.grp === 'gear' && G.pl.sw.lg[S.ix] || S.grp === 'flaps' && G.pl.sw.fl[S.ix] || S.grp === 'brakes' && G.pl.sw.br[S.ix];
     if (swOn) { b.appendChild(h('i.sw.on')); if (!d) { b.classList.add('done'); b.appendChild(h('i.dn', { 'aria-hidden': 'true' }, '✓')); b.setAttribute('aria-label', b.getAttribute('aria-label') + ', done'); } } else if (['gear', 'flaps', 'brakes'].includes(S.grp)) b.appendChild(h('i.sw'));
     pz.appendChild(b);
   }
   // ---- dial, gauge, brake readout
-  { const a = G.pl.axis, dl = h('div.dial.axd', { 'aria-label': 'Axis: ' + (a === 0 ? 'level' : Math.abs(a) + ' toward the ' + (a < 0 ? 'pilot' : 'co-pilot')) }, h('i', { style: 'transform:rotate(' + (a * 24) + 'deg)' + (UI.axA && Date.now() - UI.axA.t0 < 900 ? ';animation:axtilt .9s cubic-bezier(.3,1.5,.5,1) both;animation-delay:-' + (Date.now() - UI.axA.t0) + 'ms;--af:' + (UI.axA.from * 24) + 'deg;--at:' + (UI.axA.to * 24) + 'deg' : '') }), h('span', { style: 'position:relative;margin-top:44%' }, a === 0 ? 'level' : Math.abs(a) + (a < 0 ? ' left' : ' right'), a !== 0 ? h('small.spn', 'spin at 3') : null));
+  { const a = G.pl.axis, dl = h('div.dial.axd', { 'aria-label': 'Axis: ' + (a === 0 ? 'level' : Math.abs(a) + ' toward the ' + (a < 0 ? 'pilot' : 'co-pilot')) }, h('i', { style: 'transform:rotate(' + (a * 24) + 'deg)' + (UI.axA && Date.now() - UI.axA.t0 < 900 ? ';animation:axtilt .9s cubic-bezier(.3,1.5,.5,1) both;animation-delay:-' + (Date.now() - UI.axA.t0) + 'ms;--af:' + (UI.axA.from * 24) + 'deg;--at:' + (UI.axA.to * 24) + 'deg' : '') }), h('span', { style: 'position:relative;margin-top:44%' }, a === 0 ? 'level' : Math.abs(a) + (a < 0 ? ' left' : ' right')));
     pz.appendChild(css(dl, r.dial));
     // speed gauge: the blue marker (up to it the plane stays) and the orange marker (up to it one space, above it two) in their own corners, clear of the needles
     if (r.gauge && G.keys.includes('en0')) pz.appendChild(css(h('div.gau', { 'data-b': G.pl.aeroB, 'data-o': G.pl.aeroO, 'data-s': UI.gSpd || 0, 'aria-label': 'Speed gauge: engine sum up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves one space, more moves two' + (G.speed >= 0 ? '; last speed ' + G.speed : '') }, h('span.mk.b', { title: 'Blue marker: a sum up to this stays put' }, '≤' + G.pl.aeroB), h('span.mk.o', { title: 'Orange marker: up to this moves 1, above moves 2' }, '≤' + G.pl.aeroO)), r.gauge));
@@ -383,7 +383,7 @@ function newGame(mode, o) {
   else if (mode === 'net') { (cfg.ai || []).forEach((l, i) => ai[i] = l || null); }
   const seed = (UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0);
   const names = [D.crew[0].name, D.crew[1].name];
-  G = FA.newGame({ scenario: sc.id, seed, abil: mode === 'guided' ? [] : abil, names, ai, lad: mode === 'vs' ? (cfg.lad || 0) : 0 });
+  G = FA.newGame(Object.assign({ scenario: sc.id, seed, abil: mode === 'guided' ? [] : abil, names, ai, lad: mode === 'vs' ? (cfg.lad || 0) : 0 }, cfg.tutorial ? TUT_SETUP : {}));
   if (mode === 'guided') { G.script = GUIDED_SCRIPT.slice(); }
   if (o.camp && typeof campTwist === 'function') campTwist(G, o.camp.twist);
   UI.mode = mode; UI.seat = mode === 'guided' ? 0 : cfg.role; UI.holder = mode === 'hot' ? -1 : UI.seat; UI.started = true; UI.sel = -1; UI.cof = 0; UI.hint = null; UI.over = null; UI.overShown = false; UI.rrm = [false, false, false, false];
@@ -391,8 +391,8 @@ function newGame(mode, o) {
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
   if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.setEnabled(true); GXH.reset(); } }   // the guided flight: every bubble on, again
-  $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; clearSave(); render(); sndMusic(); coachTick(); schedule();
-  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
+  $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; if (!cfg.tutorial) clearSave(); render(); sndMusic(); coachTick(); schedule();
+  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !cfg.tutorial && !isPh()) showStory();
 }
 function suggestAbil(sc) { const order = ['mastery', 'control', 'antic', 'together', 'sync', 'adapt']; return order.slice(0, sc.ab); }
 // ---- applying a move (every route goes through here: a human tap, the computer, a remote player)
@@ -491,6 +491,7 @@ setInterval(() => {
 }, 250);
 // ---- the end
 function onEnd() {
+  if (UI.cfg && UI.cfg.tutorial) return;   // the staged tutorial flight has its own last step and end card (part 12); nothing is saved, scored or won
   if (UI.overShown) return; UI.overShown = true; clearSave(); hideRecap();   // no round card over the ending picture
   const win = G.result.win; try { if (win) { UI.won[G.sid] = 1; savePrefs(); } snd(win ? 'win' : 'lose'); } catch (e) { }
   const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showEndBoard(); };
@@ -608,6 +609,7 @@ function renderMenu() {
   if (typeof NET !== 'undefined' && NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, typeof isHost === 'function' && isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New flight'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Flight story card', ...[[true, 'On'], [false, 'Off']].map(([v, n]) => h('button.btn' + ((UI.prefs.story !== false) === v ? '' : '.alt'), { 'data-a': 'story', 'data-v': v ? '1' : '0', type: 'button' }, n))); }
+  { const tb = tutEl('btn'); if (tb) row('Learn', tb); }
   if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const g = UI.prefs.gfx || 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
@@ -630,10 +632,14 @@ function renderStart() {
   if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
   s.appendChild(setupEl());
 }
+// a first-time Play goes straight to chapter 1 of the flight school; everybody else picks a flight
+function playNow() { if (newPlayer()) { try { GXC.play('c1'); return; } catch (e) { } } UI.sv = 'setup'; renderStart(); }
+// the kit's menu button as an element (title, setup and in-game menu)
+function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typeof tutBtn === 'function' ? tutBtn(cls) : ''; return w.firstChild; }
 function titleEl() {
   const bg = ART.title ? h('img.ttl-bg', { src: ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
-    h('div.tbtns', typeof campLine === 'function' && window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'camp', type: 'button' }, h('b', 'Story'), h('span', campLine())) : null, h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
+    h('div.tbtns', firstTime() ? tutEl('tbtn go') : null, typeof campLine === 'function' && window.CAMPAIGN ? h('button.tbtn' + (firstTime() ? '' : '.go') + '.story', { 'data-a': 'camp', type: 'button' }, h('b', 'Story'), h('span', campLine())) : null, h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
 }
 function roleCard(s) {
@@ -656,7 +662,7 @@ function setupEl() {
     h('div.rolegrid', roleCard(0), roleCard(1)),
     h('div.seg', h('span.lbl', 'Computer crewmate'), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (o.level === v ? '.on' : ''), { 'data-a': 'level', 'data-v': v, type: 'button', 'aria-pressed': o.level === v ? 'true' : 'false' }, v))),
     scn, ab, ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
-  const go = h('div.sgo', h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the flight'), h('span', D.airports[sc.ap].name + ': you as ' + D.crew[o.role].role + ' with a computer ' + D.crew[1 - o.role].role.toLowerCase())),
+  const go = h('div.sgo', tutEl('sbtn' + (firstTime() ? ' big' : '')), h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the flight'), h('span', D.airports[sc.ap].name + ': you as ' + D.crew[o.role].role + ' with a computer ' + D.crew[1 - o.role].role.toLowerCase())),
     h('div.sgrid3', h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Flight school'), h('span', 'learn one control at a time')), h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', 'two people, one device')), h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'watch', type: 'button' }, h('b', 'Watch'), h('span', 'a computer crew flies it'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Pick an airport, your seat and how sharp the computer crewmate is. New to the game? Start with flight school.'), cfg, go);
 }
@@ -689,7 +695,7 @@ document.addEventListener('click', ev => {
     case 'rsclose': closeRS(); break;
     case 'again': { const c = UI.cfg || {}; const m = UI.mode, off = UI.coach && UI.coach.level === 'off'; closeRS(); if (m === 'net') { netStart(); break; } newGame(m === 'guided' ? 'vs' : m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil, tipsOff: off }); break; }
     case 'nextsc': { const c = UI.cfg || {}, i = D.scenarios.findIndex(s => s.id === c.scenario), n = D.scenarios[(i + 1) % D.scenarios.length]; closeRS(); const m = UI.mode === 'guided' ? 'vs' : UI.mode; UI.opt = Object.assign({}, UI.opt, { scenario: n.id, abil: [] }); newGame(m, { scenario: n.id, role: c.role, level: c.level, abil: [] }); break; }
-    case 'play': if (newPlayer()) { try { GXC.play('c1'); break; } catch (e) { } } UI.sv = 'setup'; renderStart(); break;
+    case 'play': if (firstTime() && typeof GXT !== 'undefined') { tutOffer(); break; } playNow(); break;
     case 'camp': campOpen(); break;
     case 'goalopen': GX.show('crewd'); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
@@ -1090,6 +1096,7 @@ function roundFx(r, info) {
 // the ghost finger shows the move on the first round of a first flight (and on the guided flight), later only after the Hint button
 function hintsOn() { return !!G && !G.result && (!!UI.hint || UI.mode === 'guided' || (UI.camp ? !!UI.camp.hints : !Object.keys(UI.won || {}).length && G.round < 1)); }
 function ghostPlan() {
+  if (typeof tutOn === 'function' && tutOn()) return null;   // the tutorial kit shows its own finger
   const v = actSeat(); if (!hintsOn() || typeof v !== 'number' || v < 0 || !mayAct(v) || G.phase !== 'place' || G.pend || G.turn !== v || UI.dragging) return null;
   const key = G.sid + ':' + G.seed + ':' + G.round + ':' + Object.keys(G.slots).length + ':' + (UI.mode || '');
   if (UI.gk !== key) { UI.gk = key; UI.gm = null; try { const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (m && m.t === 'place' && typeof m.d === 'number') UI.gm = m; } catch (e) { } }
@@ -1180,7 +1187,7 @@ function campStart(def) {
   try { toast(def.goal.text.length > 70 ? def.goal.text.slice(0, 67) + '...' : def.goal.text); } catch (e) { }
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
-function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); if (typeof storyGate === 'function' && storyGate()) return; GXC.open(); }
 function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
 { const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
 function campLine() {
@@ -1193,7 +1200,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'approach', data: window.CAMPAIGN, startChapter: campStart, isWon: g => campWon(g), metrics: campMetrics,
+    game: 'approach', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: g => campWon(g), metrics: campMetrics,
     onExit: () => { UI.camp = null; showStart(); },
     scores: g => [campWon(g) ? 1 : 0, 0], seats: () => CAMP_SEATS()
   });
@@ -1281,7 +1288,7 @@ const HLP_RULES = [
   { title: 'Win or lose together', text: 'A spin, a crash, an empty Axis or Engines space, or a failed landing loses for both.', pic: () => hpics([['stop', 'Any one']]) },
   { phase: 'brief', title: 'Talk plans, not dice', text: 'Tap a phrase to share a plan. Never say the values of your dice. Then tap Roll my dice.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll']]) },
   { phase: 'brief', title: 'Then stay silent', text: 'After the roll your placed dice are your only words. Watch where your partner puts theirs.', pic: () => hpics([['mute', 'Silence'], '>', ['die', 'Your word', 4]]) },
-  { phase: 'brief', title: 'Blue and orange', text: 'Pilot is blue, Co-pilot orange. Spaces marked P or C belong to that seat. Grey spaces take either.', pic: () => hpics([['seatP', 'Pilot'], ['seatC', 'Co-pilot']]) },
+  { phase: 'brief', title: 'Blue and orange', text: 'Pilot is blue, Co-pilot orange. Blue spaces are the Pilot’s, orange the Co-pilot’s. Grey spaces take either.', pic: () => hpics([['seatP', 'Pilot'], ['seatC', 'Co-pilot']]) },
   { phase: 'brief', title: 'The altitude strip', text: 'One row per round. Its colour says who places first. A purple dot adds a reroll token.', pic: () => hpics([['alt', 'One per round'], ['reroll', 'Reroll']]) },
   { phase: 'die', title: 'Axis: every round', text: 'Both crew put a die on the Axis. The plane tilts toward the higher die. Tilt of 3 loses.', pic: () => hpics([['axis', 'Higher side', 12], ['axis', 'Equal: level', 0]]) },
   { phase: 'die', title: 'Engines: every round', text: 'Both fill the Engines. Sum: up to blue marker stays, up to orange moves 1, above moves 2.', pic: () => hpics([['prop', 'Two dice'], '>', ['gauge', 'Speed']]) },
@@ -1361,7 +1368,7 @@ function hlpInit() {
 function hlpAfter() {
   hlpInit(); if (typeof GXH === 'undefined') return;
   const vis = id => { const e = document.getElementById(id); return !!(e && !e.hidden); };
-  const busy = !G || !UI.started || G.result || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
+  const busy = !G || !UI.started || G.result || (typeof tutOn === 'function' && tutOn()) || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
   GXH.phase(busy ? null : hlpPhase());
 }
 setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
@@ -1412,8 +1419,8 @@ function planeSVG(tilt, gear, flaps, id) {
     '<circle cx="-30" cy="13" r="6" fill="#8f9daa" stroke="#14202c" stroke-width="2"/><circle cx="30" cy="13" r="6" fill="#8f9daa" stroke="#14202c" stroke-width="2"/>' +
     '<rect x="-17" y="-14" width="34" height="5" rx="2" fill="#dfe8ef" stroke="#14202c" stroke-width="2"/><path d="M-3 -12L0 -36L3 -12Z" fill="#e8f0f6" stroke="#14202c" stroke-width="2" stroke-linejoin="round"/>' +
     '<ellipse cx="0" cy="1" rx="10" ry="12" fill="#f3f7fa" stroke="#14202c" stroke-width="2.200"/><path d="M-4 -4h8" stroke="#2f6fd0" stroke-width="3" stroke-linecap="round"/>' +
-    '<circle cx="-58" cy="0" r="7" fill="#2f6fd0" stroke="#fff" stroke-width="2"/><text x="-58" y="3.800" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" font-family="Arial,sans-serif">P</text>' +
-    '<circle cx="58" cy="0" r="7" fill="#e8821f" stroke="#fff" stroke-width="2"/><text x="58" y="3.800" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" font-family="Arial,sans-serif">C</text></g>';
+    '<circle cx="-58" cy="0" r="7" fill="#2f6fd0" stroke="#fff" stroke-width="2"/>' +
+    '<circle cx="58" cy="0" r="7" fill="#e8821f" stroke="#fff" stroke-width="2"/></g>';
 }
 function miniPlane(n) { return '<g><path d="M-9 1L-1 -1L1 -1L9 1L9 3L1 2L-1 2L-9 3Z" fill="#e8f0f6" stroke="#14202c" stroke-width="1.200" stroke-linejoin="round"/><path d="M0 -8L1.500 0L-1.500 0Z" fill="#e8f0f6" stroke="#14202c" stroke-width="1"/></g>'; }
 function sceneHTML(wpx, hpx, stripH, hz) {
@@ -1468,8 +1475,8 @@ function aiChip(m, seat) {
   if (!m || m.t !== 'place' || m.d === 'p') return null;
   const S = FA.SLOT[m.to], val = G.dice[seat][m.d].v + (m.c || 0), o = 1 - seat, last = FA.isFinal(G), wm = FA.windMod(G);
   switch (S.grp) {
-    case 'axis': { const x = G.slots['ax' + o]; if (!x) return 'Axis first. Your die answers.'; const nx = G.pl.axis + (seat === 0 ? x.v - val : val - x.v); return nx === 0 ? 'Keeps the plane level.' : 'Tilt ' + Math.abs(nx) + (nx < 0 ? ' left.' : ' right.') + (Math.abs(nx) >= 2 ? ' Watch it!' : ''); }
-    case 'engines': { const x = G.slots['en' + o]; if (!x) return 'Engines first. Your die adds.'; const sm = val + x.v + wm; if (last) return sm <= FA.brakeVal(G) ? 'Speed ' + sm + '. Slow enough.' : 'Speed ' + sm + '. Too fast!'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + (adv ? ': moves ' + adv + (adv > 1 ? ' spaces.' : ' space.') : ': holds position.'); }
+    case 'axis': { const x = G.slots['ax' + o]; if (!x) return 'Axis die down. Yours decides the tilt.'; const nx = G.pl.axis + (seat === 0 ? x.v - val : val - x.v); return nx === 0 ? 'Keeps the plane level.' : 'Tilt ' + Math.abs(nx) + (nx < 0 ? ' left.' : ' right.') + (Math.abs(nx) >= 2 ? ' Watch it!' : ''); }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) return 'Engine die down. Yours adds to it.'; const sm = val + x.v + wm; if (last) return sm <= FA.brakeVal(G) ? 'Speed ' + sm + '. Slow enough.' : 'Speed ' + sm + '. Too fast!'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + (adv ? ': moves ' + adv + (adv > 1 ? ' spaces.' : ' space.') : ': holds position.'); }
     case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'Radio clears the plane ahead.' : 'Radio: nothing to clear.'; }
     case 'gear': return G.pl.sw.lg[S.ix] ? 'Gear already down.' : 'Lowers a landing gear.';
     case 'flaps': return G.pl.sw.fl[S.ix] ? 'Flap already out.' : 'Extends a flap.';
@@ -1486,3 +1493,128 @@ function chipEl(r) {
   const e = h('div.rchip', { 'aria-hidden': 'true', style: 'left:' + Math.round(q.x + q.w / 2) + 'px;top:' + Math.round(Math.max(2, q.y - 6)) + 'px' }, txt);
   return e;
 }
+// ===================== part 12: the tutorial (shell/gx-tutor.js): a staged two-round flight that teaches every control by doing it once =====================
+// The staged flight is the end of a real flight at Port Alder: round 1 at 1000 ft (the plane must reach the airport) and the landing round at 0 ft. Some switches are already set
+// (two gears, one flap, the 2 brake), you hold one reroll token, the dice are made up (TUT_SCRIPT) and the co-pilot is scripted (TUT_AI), so every control has a die to teach with.
+// Each step spotlights one thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act). Nothing of it is saved.
+const TUT_GAME = 'final-approach';
+// dice per round [pilot x4, co-pilot x4]; the pilot's first die in the landing round is a 2 that the reroll turns into a 5 (TUT_SETUP.pre.rrScript)
+const TUT_SCRIPT = [[[3, 5, 2, 1], [5, 2, 6, 4]], [[2, 3, 5, 1], [2, 5, 3, 1]]];
+const TUT_SETUP = { scenario: 'tt', seed: 23, row0: 5, pre: { lg: [1, 1, 0], fl: [1, 0, 0, 0], br: [1, 0, 0], rr: 1, script: TUT_SCRIPT, rrScript: [[5, 0, 0, 0], [0, 0, 0, 0]] } };
+// the co-pilot's placements, in order: [slot, index of the die]
+const TUT_AI = [[['ax1', 0], ['fl1', 1], ['en1', 2], ['fl2', 3]], [['en1', 0], ['ax1', 2], ['fl3', 1], ['co0', 3]]];
+const tutGame = () => !!(UI.cfg && UI.cfg.tutorial && UI.started && G && G.sid === 'tt');
+const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && tutGame();
+const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls: cls, launch: tutStart });
+function firstTime() { try { return newPlayer() && !localStorage.getItem('fa_offer'); } catch (e) { return false; } }
+// ---------------------------------------------------------------- the computer crew is scripted
+function tutAI(g, seat) {
+  if (!tutGame() || seat !== 1 || !g || g.result) return null;
+  if (g.phase === 'brief') { if (!g.ready[1]) { if (g.round === 0 && !g.say[1].length) return { t: 'say', c: 'adv2' }; return { t: 'ready' }; } return null; }
+  if (g.pend && g.pend.h === 'rr') return g.pend.d.m[1] ? null : { t: 'rrpick', m: [false, false, false, false] };
+  if (g.phase !== 'place' || g.pend) return null;
+  const n = g.dice[1].filter(d => d.u).length, sq = TUT_AI[g.round], mv = sq && sq[n];
+  return mv ? { t: 'place', d: mv[1], to: mv[0], c: 0 } : null;
+}
+(function () { const o = FA.AI.move; FA.AI.move = function (g, seat, level, opt) { const m = tutAI(g, seat); return m || o.apply(this, arguments); }; })();
+// ---------------------------------------------------------------- where each step points
+const tq = sel => () => { const e = document.querySelector(sel); return e && e.getBoundingClientRect().width ? e : null; };
+const tDie = (s, d) => tq('#pz .die[data-s="' + s + '"][data-d="' + d + '"]');
+const tSlot = k => tq('#pz .slot[data-slot="' + k + '"]');
+const placed = () => Object.keys(G.slots).length;
+// my turn, in this round, after this many dice are on the panel, nothing pending
+const myMove = (round, n) => !!G && !G.result && G.round === round && G.phase === 'place' && !G.pend && G.turn === 0 && placed() === n;
+// the die is lifted already, so a placement step is one tap on the glowing space
+function tutPick(d) {
+  if (UI.sel === d) return true;
+  if (!G || G.phase !== 'place' || G.pend || G.turn !== 0 || G.dice[0][d].u) return false;
+  UI.sel = d; UI.cof = 0; UI.warnK = null; render(); return UI.sel === d;
+}
+const dv = d => G.dice[0][d].v;
+const rival = () => name(1);
+const planeAt = () => G.planes.findIndex(n => n > 0) + 1;
+// a step that puts die d on slot k: the slot is the target, the die stays lit, the finger drags from the die
+const placeStep = (id, title, say, round, n, d, k, extra) => Object.assign({ id, title, say, target: tSlot(k), also: tDie(0, d), from: tDie(0, d),
+  wait: { type: 'drag', match: a => a.what === 'slot' && a.ok && a.k === k }, ready: () => myMove(round, n) && tutPick(d) }, extra || {});
+function tutSteps() {
+  return [
+    { id: 'plane', title: 'Land together', say: () => 'You and ' + rival() + ' fly one plane. Reach the airport, then land. You win or crash together.', target: tq('#pz .w.appr'), wait: null, ready: () => G && G.phase === 'brief' },
+    { id: 'goal', title: 'Landing checklist', say: 'To land: no planes ahead, gear and flaps down, axis level, speed within the brakes.', target: tq('#goal'), wait: null, ready: () => G && G.phase === 'brief' },
+    { id: 'seats', title: 'Hidden dice', say: () => 'You are the blue Pilot: only you see your dice. ' + rival() + ', the orange Co-pilot, hides his.', target: tq('#pz .tray.p'), also: tq('#pz .tray.c'), wait: null, ready: () => G && G.phase === 'brief' },
+    { id: 'owners', title: 'Whose spaces?', say: () => 'Blue spaces are yours, orange are ' + rival() + '’s. Grey ones take anyone’s dice.', target: tSlot('ax0'), also: () => [tSlot('ax1')(), tSlot('co0')()].filter(Boolean), wait: null, ready: () => G && G.phase === 'brief' },
+    { id: 'rounds', title: 'Two rounds left', say: 'Each round: roll, then take turns, one die each. Axis and engines must both be filled.', target: tq('#pz .w.altw'), wait: null, ready: () => G && G.phase === 'brief' },
+    { id: 'roll', title: 'Roll the dice', say: 'Real crews plan out loud, never dice numbers. Roll now: after that, silence.', target: tq('#acts [data-a=ready]'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'ready' }, ready: () => G && G.phase === 'brief' && !G.ready[0] },
+    // ---- round 1: the co-pilot goes first
+    { id: 'axis1', title: 'Pick a die', say: () => rival() + ' put a ' + G.slots.ax1.v + ' on the axis. Tap your ' + dv(0) + ' to pick it up.', target: tDie(0, 0), wait: { type: 'tap', match: a => a.what === 'die' && a.s === 0 && a.d === 0 && !a.rr },
+      ready: () => myMove(0, 1) && !!G.slots.ax1 && UI.sel === -1 },
+    placeStep('axis2', 'Drop on the axis', 'The plane tilts toward the higher die, by the difference. A tilt of 3 is a spin: you lose.', 0, 1, 0, 'ax0'),
+    placeStep('radio', 'Clear the way', () => 'A plane waits on space ' + planeAt() + ': flying through it crashes you. Your ' + dv(2) + ' on the radio clears it.', 0, 3, 2, 'ra0'),
+    placeStep('engines', 'Engines set speed', () => 'Both engine dice add up: ' + G.slots.en1.v + ' + your ' + dv(1) + ' = ' + (G.slots.en1.v + dv(1)) + '. Blue ' + G.pl.aeroB + ' stays, orange ' + G.pl.aeroO + ' moves one, more moves two.', 0, 5, 1, 'en0'),
+    placeStep('coffee', 'Coffee tokens', 'The plane flew two! Spare die? Coffee takes any value and earns a token to nudge a die by one.', 0, 7, 3, 'co0'),
+    { id: 'round1', title: 'Round 1 done', say: 'The tilt carries over. The plane waits on the airport: flying past it would crash. Next: landing, 0 ft.', target: tq('#pz .w.altw'), wait: null, ready: () => G && !G.result && G.round === 1 && G.phase === 'brief' },
+    // ---- the landing round: you go first
+    { id: 'roll2', title: 'Landing round', say: 'Landing means no flying: speed must be within the brakes. Plan, then roll.', target: tq('#acts [data-a=ready]'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'ready' }, ready: () => G && G.round === 1 && G.phase === 'brief' && !G.ready[0] },
+    { id: 'rr1', title: 'Reroll token', say: () => 'Your ' + dv(0) + ' cannot lower the last gear: it needs 5-6. Spend your reroll token.', target: tq('#acts [data-a=rr]'), also: tq('#pz .badge.rrb'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'rr' },
+      ready: () => myMove(1, 0) && G.rrHand === 1 && !!document.querySelector('#acts [data-a=rr]') },
+    { id: 'rr2', title: 'Pick dice to reroll', say: () => 'Tap the die you want to roll again. ' + rival() + ' keeps his dice.', target: tDie(0, 0), wait: { type: 'tap', match: a => a.what === 'die' && a.s === 0 && a.d === 0 && a.rr },
+      ready: () => !!G && G.pend && G.pend.h === 'rr' && !G.pend.d.m[0] && !UI.rrm[0] },
+    { id: 'rr3', title: 'Roll it again', say: 'Tap the green button to roll it.', target: tq('#acts [data-a=rrpick]'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'rrpick' }, ready: () => !!G && G.pend && G.pend.h === 'rr' && !!UI.rrm[0] },
+    { id: 'cof', title: 'Spend coffee', say: () => 'The brake needs exactly 4. Tap + to spend your coffee token on your ' + dv(1) + '.', target: tq('[data-a=cof][aria-label="One more"]'), also: tDie(0, 1),
+      wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'cof' && a.c === 1 }, ready: () => myMove(1, 0) && G.rrHand === 0 && G.coffee > 0 && tutPick(1) && UI.cof === 0 && !!document.querySelector('[data-a=cof][aria-label="One more"]') },
+    placeStep('brake', 'Set the brake', 'Brakes go 2, then 4, then 6. The 2 is set: place the 4 now.', 1, 0, 1, 'br1', { ready: () => myMove(1, 0) && UI.sel === 1 && UI.cof === 1 }),
+    placeStep('gear', 'Lower the gear', () => 'Gear takes 1-2, 3-4 or 5-6, in any order. Your new ' + dv(0) + ' lowers the last gear.', 1, 2, 0, 'lg2'),
+    placeStep('axis3', 'Level for landing', () => 'The axis is ' + Math.abs(G.pl.axis) + ' ' + (G.pl.axis < 0 ? 'left' : 'right') + '. Your ' + dv(2) + ' against ' + rival() + '’s ' + G.slots.ax1.v + ' tips it back to level.', 1, 4, 2, 'ax0'),
+    { id: 'flaps', title: 'The Co-pilot’s job', say: () => 'Flaps are ' + rival() + '’s: four spaces, in order. Each flap or gear lifts a speed marker.', target: tSlot('fl3'), wait: null, ready: () => myMove(1, 6) && !!G.slots.fl3 },
+    placeStep('engines2', 'Landing speed', () => 'The plane stops now. Speed is your ' + dv(3) + ' plus ' + rival() + '’s ' + G.slots.en1.v + ' = ' + (dv(3) + G.slots.en1.v) + ', within the brakes ' + FA.brakeVal(G) + '.', 1, 6, 3, 'en0'),
+    { id: 'landed', title: 'Landed!', say: 'Track clear, gear and flaps down, axis level, speed within the brakes. You landed together.', target: tq('#pz .w.appr'), wait: null, ready: () => !!(G && G.result && G.result.win) }
+  ];
+}
+// ---------------------------------------------------------------- the kit hooks
+function tutStart(o) {
+  if (typeof GXT === 'undefined') return;
+  const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+    endTitle: 'You know the rules', endText: pro ? 'Axis, engines, radio, gear, flaps, brakes, coffee, rerolls. Now flight school begins.' : 'Axis, engines, radio, gear, flaps, brakes, coffee, rerolls. Real flights add fuel, wind and more.',
+    endButtons: pro && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    setup: () => { try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 450);
+      closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true }); },
+    onDone: r => { tutLeave(); const c = r && r.choice;
+      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
+      else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); }
+      else { showStart(); UI.sv = 'setup'; UI.cfgOpen = false; renderStart(); } },
+    onExit: () => { tutLeave(); showStart(); } });
+}
+// leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
+function tutLeave() {
+  clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
+  try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
+  $$('#fx .gh,#fx .endb,#fx .pop').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
+}
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
+function storyGate() {
+  if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer()) return false;
+  tutStart({ prologue: true }); return true;
+}
+// a first-time Play: offer the tutorial once ("New here? Learn in 5 minutes"), or just play
+function tutOffer() {
+  try { localStorage.setItem('fa_offer', '1'); } catch (e) { }
+  const d = document.createElement('div'); d.className = 'gxt-end'; d.setAttribute('data-help', ''); d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', 'New here?');
+  d.innerHTML = '<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn every control in about 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-offer="play">Just play</button></div></div>';
+  d.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-offer]'); if (!b) return; d.remove(); if (b.dataset.offer === 'learn') tutStart(); else playNow(); });
+  document.body.appendChild(d);
+}
+// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+(function () { const o = dieTap; dieTap = function (s, d) { if (tutOn() && !GXT.act({ type: 'tap', what: 'die', s, d, rr: !!(G.pend && G.pend.h === 'rr') })) return; return o(s, d); }; })();
+(function () {
+  const o = slotTap; slotTap = function (k) {
+    if (tutOn()) { const v = actSeat(), ok = typeof v === 'number' && v >= 0 && typeof UI.sel === 'number' && UI.sel >= 0 && !G.slots[k] && FA.validMoves(G, v).some(m => m.t === 'place' && m.d === UI.sel && m.to === k && (m.c || 0) === UI.cof);
+      if (!GXT.act({ type: 'tap', what: 'slot', k, ok })) return; }
+    return o(k);
+  };
+})();
+(function () {
+  const o = doAction; doAction = function (a, t) {
+    if (tutOn()) { if (!GXT.act({ type: 'tap', what: 'act', a, c: t && t.dataset && t.dataset.c != null ? +t.dataset.c : 0 })) return; if (a === 'rr') UI.rrAsk = true; }
+    return o(a, t);
+  };
+})();

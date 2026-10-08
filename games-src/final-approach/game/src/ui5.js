@@ -12,10 +12,14 @@ function renderStart() {
   if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
   s.appendChild(setupEl());
 }
+// a first-time Play goes straight to chapter 1 of the flight school; everybody else picks a flight
+function playNow() { if (newPlayer()) { try { GXC.play('c1'); return; } catch (e) { } } UI.sv = 'setup'; renderStart(); }
+// the kit's menu button as an element (title, setup and in-game menu)
+function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typeof tutBtn === 'function' ? tutBtn(cls) : ''; return w.firstChild; }
 function titleEl() {
   const bg = ART.title ? h('img.ttl-bg', { src: ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
-    h('div.tbtns', typeof campLine === 'function' && window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'camp', type: 'button' }, h('b', 'Story'), h('span', campLine())) : null, h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
+    h('div.tbtns', firstTime() ? tutEl('tbtn go') : null, typeof campLine === 'function' && window.CAMPAIGN ? h('button.tbtn' + (firstTime() ? '' : '.go') + '.story', { 'data-a': 'camp', type: 'button' }, h('b', 'Story'), h('span', campLine())) : null, h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
 }
 function roleCard(s) {
@@ -38,7 +42,7 @@ function setupEl() {
     h('div.rolegrid', roleCard(0), roleCard(1)),
     h('div.seg', h('span.lbl', 'Computer crewmate'), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (o.level === v ? '.on' : ''), { 'data-a': 'level', 'data-v': v, type: 'button', 'aria-pressed': o.level === v ? 'true' : 'false' }, v))),
     scn, ab, ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
-  const go = h('div.sgo', h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the flight'), h('span', D.airports[sc.ap].name + ': you as ' + D.crew[o.role].role + ' with a computer ' + D.crew[1 - o.role].role.toLowerCase())),
+  const go = h('div.sgo', tutEl('sbtn' + (firstTime() ? ' big' : '')), h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the flight'), h('span', D.airports[sc.ap].name + ': you as ' + D.crew[o.role].role + ' with a computer ' + D.crew[1 - o.role].role.toLowerCase())),
     h('div.sgrid3', h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Flight school'), h('span', 'learn one control at a time')), h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', 'two people, one device')), h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'watch', type: 'button' }, h('b', 'Watch'), h('span', 'a computer crew flies it'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Pick an airport, your seat and how sharp the computer crewmate is. New to the game? Start with flight school.'), cfg, go);
 }
@@ -71,7 +75,7 @@ document.addEventListener('click', ev => {
     case 'rsclose': closeRS(); break;
     case 'again': { const c = UI.cfg || {}; const m = UI.mode, off = UI.coach && UI.coach.level === 'off'; closeRS(); if (m === 'net') { netStart(); break; } newGame(m === 'guided' ? 'vs' : m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil, tipsOff: off }); break; }
     case 'nextsc': { const c = UI.cfg || {}, i = D.scenarios.findIndex(s => s.id === c.scenario), n = D.scenarios[(i + 1) % D.scenarios.length]; closeRS(); const m = UI.mode === 'guided' ? 'vs' : UI.mode; UI.opt = Object.assign({}, UI.opt, { scenario: n.id, abil: [] }); newGame(m, { scenario: n.id, role: c.role, level: c.level, abil: [] }); break; }
-    case 'play': if (newPlayer()) { try { GXC.play('c1'); break; } catch (e) { } } UI.sv = 'setup'; renderStart(); break;
+    case 'play': if (firstTime() && typeof GXT !== 'undefined') { tutOffer(); break; } playNow(); break;
     case 'camp': campOpen(); break;
     case 'goalopen': GX.show('crewd'); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;

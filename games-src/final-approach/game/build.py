@@ -10,7 +10,7 @@ ui = ''.join(rd(os.path.join(D, 'src', f)) for f in parts)
 open(os.path.join(D, 'ui.js'), 'w', encoding='utf-8').write(ui)
 audio = os.path.join(SP, 'audio', 'final-approach', 'audio-data.js')
 S = lambda f: os.path.join(D, 'src', f)
-SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-viewport.js': os.path.join(SP, 'shell', 'gx-viewport.js'), 'gx-help.js': os.path.join(SP, 'shell', 'gx-help.js'), 'gx-campaign.js': os.path.join(SP, 'shell', 'gx-campaign.js'), 'campaign-data.js': '', 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
+SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-viewport.js': os.path.join(SP, 'shell', 'gx-viewport.js'), 'gx-help.js': os.path.join(SP, 'shell', 'gx-help.js'), 'gx-tutor.js': os.path.join(SP, 'shell', 'gx-tutor.js'), 'gx-campaign.js': os.path.join(SP, 'shell', 'gx-campaign.js'), 'campaign-data.js': '', 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
        'art-data.js': '', 'data.js': S('data.js'), 'layout.js': S('layout.js'), 'engine.js': S('engine.js'), 'aiw.js': S('aiw.js'), 'ai.js': S('ai.js'), 'ui.js': os.path.join(D, 'ui.js'),
        'trystero.min.js': os.path.join(SP, 'net', 'trystero.min.js'), 'netroom.js': os.path.join(SP, 'net', 'netroom.js'), 'netstrip.js': S('netstrip.js'), 'net.js': S('net.js')}
 # ---- painted art: ../art/manifest.json maps id -> base name. <name>.png (a painting dropped in by hand) wins over <name>.webp (made by ../paint/paint.js).
@@ -33,8 +33,8 @@ def art_js():
 ART_JS = art_js()
 if os.path.exists(audio): SRC['audio-data.js'] = audio
 else: print('NOTE: audio-data.js missing, silent build', file=sys.stderr)
-ORDER = ['shell.js', 'gx-viewport.js', 'gx-help.js', 'gx-campaign.js', 'campaign-data.js', 'perfhud.js', 'trystero.min.js', 'netroom.js', 'art-data.js', 'data.js', 'layout.js', 'engine.js', 'aiw.js', 'ai.js', 'netstrip.js', 'gameaudio.js', 'audio-data.js', 'net.js', 'ui.js']
-h = rd(os.path.join(D, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css'))).replace('</head>', '<style>\n' + rd(os.path.join(SP, 'shell', 'gx-campaign.css')) + rd(os.path.join(SP, 'shell', 'gx-help.css')) + '\n</style>\n</head>', 1)
+ORDER = ['shell.js', 'gx-viewport.js', 'gx-help.js', 'gx-tutor.js', 'gx-campaign.js', 'campaign-data.js', 'perfhud.js', 'trystero.min.js', 'netroom.js', 'art-data.js', 'data.js', 'layout.js', 'engine.js', 'aiw.js', 'ai.js', 'netstrip.js', 'gameaudio.js', 'audio-data.js', 'net.js', 'ui.js']
+h = rd(os.path.join(D, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css'))).replace('</head>', '<style>\n' + rd(os.path.join(SP, 'shell', 'gx-campaign.css')) + rd(os.path.join(SP, 'shell', 'gx-help.css')) + rd(os.path.join(SP, 'shell', 'gx-tutor.css')) + '\n</style>\n</head>', 1)
 CAMP_JS = 'window.CAMPAIGN = ' + json.dumps(json.load(open(os.path.join(FP, 'campaign.json'), encoding='utf-8')), separators=(',', ':')) + ';\n'
 body = rd(os.path.join(D, 'body.html'))
 if 'audio-data.js' in SRC: body = body.replace('<script src="ui.js"></script>', '<script src="audio-data.js"></script>\n<script src="ui.js"></script>')
