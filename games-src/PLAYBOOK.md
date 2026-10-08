@@ -51,6 +51,7 @@ A game inlines them in its `build.py` from `../shell/` (never a local copy). Gam
    No AI testers for bugs.
 
 ## Efficiency rules (from CLAUDE.md)
+- Test once, at the end: one full sweep right before deploy. After merging origin, run only a quick sweep (RUNS=8) unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
 - One worker per game, a tiny brief that names the files; reports under 150 words; at most 2 subagents at once.
 - Always set the model: orchestrator on main, workers on Sonnet, plain copying/downloads on Haiku. No new cloud sessions.
 - Scripts do the checking (build-all, phone-check, sweep); AI testers only for new-game blind tests, never for bugs.

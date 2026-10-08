@@ -824,6 +824,14 @@ function render_game_to_text(){if(!G)return 'no game';const L=[`Turn ${G.turn}, 
   G.pl.forEach(p=>L.push(`${mname(p)}${p.alive?'':' (out)'}: ${p.hp}♥ ${p.vp}★ ${p.en}⚡${mbOn()?' mb'+p.mb:''}${exOn('wick')?' wk'+p.wk:''} ${where(p.i)} | ${p.cards.map(CN).join(', ')}${p.evo.length?' | evo: '+p.evo.map(evoName).join(', '):''}${p.hand.length?' | hand '+p.hand.length:''}`));
   L.push('Market: '+G.market.map(CN).join(', '));L.push('Dice: '+G.dice.map(d=>fname(d.f)+(d.k?'*':'')).join(' '));return L.join('\n')}
 const fname=f=>({'1':'1','2':'2','3':'3',E:'energy',C:'claw',H:'heart',C2:'double claw',E2:'double energy',O:'ouch',FE:'eye of fate',FW:'water',FS:'snake',FA:'ankh'}[f]||f);
-function refresh(){render();save();schedule()}
+/* a saved game must have the shape this build expects, or it is dropped (never a broken game) */
+function saveOK(g){try{return !!(g&&Array.isArray(g.pl)&&g.pl.length>=2&&Array.isArray(g.dice)&&Array.isArray(g.market)&&Array.isArray(g.deck)&&Number.isInteger(g.active)&&g.pl[g.active]&&g.pl.every(q=>q&&Number.isInteger(q.m)&&q.m>=0&&q.m<MONS.length&&Array.isArray(q.cards)&&Array.isArray(q.evo)&&typeof q.hp==='number'&&typeof q.vp==='number')&&typeof g.phase==='string'&&(!(g.ex&&g.ex.curse)||!!(typeof CURSES!=='undefined'&&CURSES[g.curse])))}catch(x){return false}}
+/* the roll step with no dice thrown (e.g. a game saved before the roll and resumed) never starts by itself: throw them now */
+function tfBase(){return {dealt:0,lost:{},wound:{},safe:{},left:[],hunt:null,sneaky:[],cheer:0,nofate:false,frenzyTurn:null,extra:false,startIn:[G.city,G.bay],uses:{}}}
+function fixRoll(){if(G&&!G.winner&&G.phase==='roll'&&!G.dice.length&&G.fixedTid!==G.tid&&G.pl[G.active]&&G.pl[G.active].alive){G.fixedTid=G.tid;const p=cur();G.tf=Object.assign(tfBase(),G.tf||{});startRoll(p);return true}return false}
+function refresh(){if(G&&G.phase==='roll'&&!G.dice.length&&!UI.choice&&!UI.pending&&!UI.busy&&!G.winner&&!G._fr){G._fr=1;try{if(fixRoll())return}finally{G._fr=0}}render();save();schedule()}
+/* watchdog: a turn stuck in its 'start' step with nothing to answer or wait for (4.5 s) goes on to the roll, so the dice always come */
+const WD={sig:'',n:0};setInterval(()=>{try{if(!G||G.winner||G.phase!=='start'||UI.choice||UI.pending||UI.busy||UI.intro||UI.info||UI.paused||(typeof NET!=='undefined'&&NET.on)){WD.n=0;return}
+  const sig=G.gid+':'+G.tid+':'+G.active;if(sig!==WD.sig){WD.sig=sig;WD.n=1;return}if(++WD.n>=3){WD.n=0;G.dice=[];G.tf=Object.assign(tfBase(),G.tf||{});startRoll(cur())}}catch(x){}},1500);
 function save(){try{if(G&&!(typeof NET!=='undefined'&&NET.on))localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
 function load(){try{const s=localStorage.getItem(SAVE);return s?JSON.parse(s):null}catch(e){return null}}

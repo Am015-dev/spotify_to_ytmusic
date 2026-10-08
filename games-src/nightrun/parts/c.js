@@ -41,7 +41,7 @@ let PUL=0,PHF=0,FD=0;
 function render(t,dt){FD=dt;ctx.setTransform(S,0,0,S,0,0);const sh=G.shake;ctx.save();if(sh)ctx.translate(rnd(-sh,sh)*.5,rnd(-sh,sh)*.5);
   drawBG(bgFor(G.di),t,dt,G.scroll);
   // rain back
-  ctx.strokeStyle='rgba(170,190,255,.18)';ctx.lineWidth=1;ctx.beginPath();for(const r of rain){if(!paused){r.y+=r.s*dt;r.x-=r.s*.25*dt;if(r.y>H){r.y=-20;r.x=rnd(0,W+100);}}ctx.moveTo(r.x,r.y);ctx.lineTo(r.x-r.l*.25,r.y+r.l);}ctx.stroke();
+  ctx.strokeStyle=SET.calm?'rgba(170,190,255,.09)':'rgba(170,190,255,.18)';ctx.lineWidth=1;ctx.beginPath();for(let ri=0;ri<rain.length;ri+=SET.calm?3:1){const r=rain[ri];if(!paused){r.y+=r.s*dt;r.x-=r.s*.25*dt;if(r.y>H){r.y=-20;r.x=rnd(0,W+100);}}ctx.moveTo(r.x,r.y);ctx.lineTo(r.x-r.l*.25,r.y+r.l);}ctx.stroke();
   drawPickups(t);
   for(const e of G.en)drawEnemy(e,t);
   // player bullets
@@ -51,9 +51,10 @@ function render(t,dt){FD=dt;ctx.setTransform(S,0,0,S,0,0);const sh=G.shake;ctx.s
   ctx.globalAlpha=1;
   for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.c,.9);
   ctx.globalCompositeOperation='source-over';
-  ctx.fillStyle='#fff';for(const b of G.eb){ctx.beginPath();ctx.arc(b.x,b.y,b.r*.55,0,7);ctx.fill();}
+  FXV.bullets();
   drawPlayer(t);
-  if(running&&SET.guide&&!G.dead){const r=18+(1-PHF)*36;ctx.strokeStyle=P.dashCd<=0?'#19e3ff':'#8c86b8';ctx.globalAlpha=.12+.4*PHF;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(P.x,P.y,r,0,7);ctx.stroke();ctx.globalAlpha=1;}
+  if(running&&!G.dead)FXV.ring(t);
+  PW.draw(t);
   for(const r of G.rings){const k=1-r.l/r.m;ctx.strokeStyle=r.c;ctx.globalAlpha=1-k;ctx.lineWidth=3*(1-k)+1;ctx.beginPath();ctx.arc(r.x,r.y,18+k*52,0,7);ctx.stroke();ctx.globalAlpha=1;}
   ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;ctx.fillText(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   ctx.restore();
@@ -61,7 +62,7 @@ function render(t,dt){FD=dt;ctx.setTransform(S,0,0,S,0,0);const sh=G.shake;ctx.s
   if(G.flash>0){ctx.fillStyle=`rgba(255,255,255,${G.flash*.5})`;ctx.fillRect(0,0,W,H);}
   if(G.glitch>0){for(let i=0;i<6;i++){const y=rnd(0,H),h=rnd(4,26);ctx.drawImage(cv,0,y*S,cv.width,h*S,rnd(-20,20),y,W,h);}ctx.fillStyle=`rgba(255,40,80,${G.glitch*.25})`;ctx.fillRect(0,0,W,H);}
   ctx.drawImage(scan,0,0,W,H);
-  if(running)drawHUD(t);}
+  if(running){FXV.edges(t);drawHUD(t);PW.hud(t);}}
 
 /* ---------- menus, settings, flow ---------- */
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
@@ -73,7 +74,7 @@ function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 function syncSet(){$('sMusic').value=Math.round(SET.music*100);$('vMusic').textContent=Math.round(SET.music*100)+'%';
   $('sSfx').value=Math.round(SET.sfx*100);$('vSfx').textContent=Math.round(SET.sfx*100)+'%';
   $('sSync').value=SET.sync;$('vSync').textContent=(SET.sync>0?'+':'')+SET.sync+' ms';
-  $('sReduce').checked=SET.reduce;$('sGuide').checked=SET.guide;$('sMute').checked=SET.mute;}
+  $('sReduce').checked=SET.reduce;$('sCalm').checked=SET.calm;$('sGuide').checked=SET.guide;$('sMute').checked=SET.mute;}
 let setFrom='title';
 function openSettings(from){setFrom=from;setEl.hidden=false;titleEl.hidden=true;pauseEl.hidden=true;syncSet();$('setBack').focus();}
 function closeSettings(){setEl.hidden=true;if(setFrom==='pause'){pauseEl.hidden=false;$('resumeBtn').focus();}else titleEl.hidden=false;}
@@ -81,6 +82,7 @@ $('sMusic').addEventListener('input',e=>{SET.music=+e.target.value/100;saveSet()
 $('sSfx').addEventListener('input',e=>{SET.sfx=+e.target.value/100;saveSet();AU.vol();syncSet();});
 $('sSync').addEventListener('input',e=>{SET.sync=+e.target.value;saveSet();syncSet();});
 $('sReduce').addEventListener('change',e=>{SET.reduce=e.target.checked;saveSet();});
+$('sCalm').addEventListener('change',e=>{SET.calm=e.target.checked;saveSet();});
 $('sGuide').addEventListener('change',e=>{SET.guide=e.target.checked;saveSet();});
 $('sMute').addEventListener('change',e=>{SET.mute=e.target.checked;saveSet();AU.vol();});
 $('setBack').addEventListener('click',closeSettings);
@@ -129,7 +131,7 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];
 [1500,2300,3100].forEach((ms,i)=>setTimeout(()=>{if(!running)bgFor(i+1);},ms));        // build the other districts' skylines while the title is up
 window.__mnr={get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
-  get SH(){return SH},get GA(){return GA},NR,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
+  get SH(){return SH},get GA(){return GA},NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,
   // test hooks: ?sim=1 has no audio clock; simOn stops the animation loop and step() advances the game by hand with the beat clock tied to game time
   simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},

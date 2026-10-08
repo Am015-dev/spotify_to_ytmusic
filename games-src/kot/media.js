@@ -17,7 +17,7 @@
     return new Promise(done=>{
       if(!has(key)||seen()[key]||!document.body)return done();
       let fin=false,v,box;
-      const end=()=>{if(fin)return;fin=true;clearTimeout(T);try{v.pause();v.removeAttribute('src');v.load()}catch(e){}if(box.parentNode)box.parentNode.removeChild(box);done()};
+      const end=()=>{if(fin)return;fin=true;clearTimeout(T);clearTimeout(T2);try{v.pause();v.removeAttribute('src');v.load()}catch(e){}if(box.parentNode)box.parentNode.removeChild(box);done()};
       box=document.createElement('div');box.className='ccclip';box.setAttribute('data-clip',key);
       v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';v.autoplay=true;
       const hint=document.createElement('div');hint.className='ccclip-skip';hint.textContent='Tap to skip';
@@ -25,7 +25,9 @@
       box.addEventListener('click',end);
       v.addEventListener('ended',end);v.addEventListener('error',end);
       v.addEventListener('playing',()=>{mark(key);box.classList.add('on');if(!box._ban)slam(box,key,()=>fin)});
-      const T=setTimeout(()=>{if(!box.classList.contains('on'))end()},6000); // never stuck if the clip cannot start
+      const T=setTimeout(()=>{if(!box.classList.contains('on'))end()},4000); // never stuck if the clip cannot start
+      const T2=setTimeout(end,45000); // and never longer than a boss clip can last (a stalled video must not block the game)
+      v.addEventListener('stalled',()=>setTimeout(()=>{if(!fin&&v.readyState<3)end()},4000));v.addEventListener('waiting',()=>setTimeout(()=>{if(!fin&&v.readyState<3)end()},5000));
       document.body.appendChild(box);
       v.src=BASE+key+'.mp4';
       const p=v.play();if(p&&p.catch)p.catch(end);

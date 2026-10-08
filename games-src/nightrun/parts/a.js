@@ -7,6 +7,7 @@ const cv=$('game'),ctx=cv.getContext('2d'),frame=$('frame'),stage=$('stage');
 let S=1,rotMode=false,touchUI=false;
 try{touchUI=matchMedia('(pointer:coarse)').matches;}catch(e){}
 
+const BULLET='#c6ff00';                                 // every enemy bullet: one high-contrast colour no background uses
 const rnd=(a,b)=>a+Math.random()*(b-a);                 // looks only (particles, rain)
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 function mul(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -30,7 +31,8 @@ let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
-const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
+let SMALL=false;try{SMALL=Math.min(screen.width,screen.height)<=500;}catch(e){}   // small phone: calm visuals are on by default
+const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,calm:SMALL,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
 const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
 if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
 const SIM=/[?&]sim=1/.test(location.search);            // test switch: no audio context at all, the page is stepped by hand (__mnr.step)
@@ -98,7 +100,8 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
 const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();this.m.connect(a.destination);
-    this.duck=a.createGain();this.duck.connect(this.m);                                     // music dips briefly under big effects
+    this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
+    this.duck=a.createGain();this.duck.connect(this.cutg);                                     // music dips briefly under big effects
     this.musv=a.createGain();this.musv.connect(this.duck);
     this.mus=a.createGain();this.mus.gain.value=.34;this.mus.connect(this.musv);          // synth soundtrack
     this.fb=a.createGain();this.fb.gain.value=.9;this.fb.connect(this.musv);               // music files

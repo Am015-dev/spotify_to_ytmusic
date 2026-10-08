@@ -103,7 +103,7 @@ function renderChoice(on){const el=document.getElementById('choice'),dk=document
   el.classList.remove('hidden');if(dk)dk.classList.add('choosing');el.setAttribute('aria-label',c.title);
   el.innerHTML=`<h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${(()=>{const hp=c.options.some(o=>o.primary);return c.options.map(o=>{const pr=o.primary||!hp&&(o.rec||/Recommended\./.test(o.d||''));return `<button class="btn ${pr?'primary':''} ${o.rec?'rec':''}" data-opt="${esc(o.k)}">${o.rec&&hp?'<span class="recchip">★ Recommended</span>':''}${esc(o.l)}${o.g?`<b class="gist">${esc(o.g)}</b>`:''}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`}).join('')})()}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div>`;
   const key=c.title+'|'+c.text;if(UI.choiceShown!==key){UI.choiceShown=key;if(window.GX&&GX.app){GX.showDock();if(GX.open)GX.close()}const b=document.getElementById('dockbody');if(b)b.scrollTop=0;const f=el.querySelector('button');if(f&&document.activeElement&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))try{f.focus({preventScroll:true})}catch(e){}}}
-function startScreen(){const saved=load();const xp=UI.xp;
+function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try{localStorage.removeItem(SAVE)}catch(e){}}const xp=UI.xp;
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
   const xpn={base:'classic rules',trial:'Brainjack Taster',exp:'Brainjack Full Set'}[xp];const lv={easy:'Easy',normal:'Normal',hard:'Hard'}[UI.lvl]||'Normal';
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
@@ -166,7 +166,7 @@ document.addEventListener('click',e=>{
   if(ds.preset){const on=ds.preset==='all';UI.evo=on;EXPS.forEach(x=>{if(x.k!=='evo')UI.ex[x.k]=on});saveSetup();render();return}
   if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.start){const k=ds.start;UI.info=false;
-    if(k==='load'){G=load();if(!G.gid)G.gid=Math.random();UI.choice=null;UI.busy=false;UI.fx={};if(G.phase==='resolve'||G.phase==='start'){G.phase='roll';G.step=1}refresh()}
+    if(k==='load'){G=load();if(!saveOK(G)){G=null;try{localStorage.removeItem(SAVE)}catch(e){}render();return}if(!G.gid)G.gid=Math.random();G.xq=G.xq||[];G.log=G.log||[];G.tf=Object.assign(tfBase(),G.tf||{});G.disc=G.disc||[];G.curseDeck=G.curseDeck||[];G.curseDisc=G.curseDisc||[];G.tower=G.tower||[-1,-1,-1];G.pl.forEach(q=>{q.tok=q.tok||{};q.hand=q.hand||[];q.edeck=q.edeck||[];q.edisc=q.edisc||[];q.mb=q.mb||0;q.cult=q.cult||0;q.wk=q.wk||0;q.dmod=q.dmod||0;q.stats=q.stats||{dmg:0,stars:0,cards:0,city:0,kos:0}});G.revealed=G.revealed||[];UI.choice=null;UI.busy=false;UI.pending=null;UI.fx={};if(G.phase==='start')G.dice=[];if(G.phase==='end'){G.phase='buy';G.step=4}if(G.phase==='resolve'||G.phase==='start'){G.phase='roll';G.step=1}fixRoll();refresh()}
     else{let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}UI.firstGame=!toured&&k==='solo';UI.intro=true;UI.adv=false;UI.coach=-1;UI.freeze=false;UI.tour=false;UI.tipSeen={};newGame(k)}return}
   if(ds.tour){tourClick(ds.tour);return}
   if(ds.emo){sendEmote(ds.emo);return}
