@@ -1,0 +1,12 @@
+// ath/perf.js <url> fra|ath : draw calls / triangles / frame ms at 3 street spots (normal gfx). LIFE=x sets TUNE.life before roam; SET='TUNE.a=1;...' extra
+const enter=require('../bc/enter.js');const URL=process.argv[2],CITY=process.argv[3]||'fra';
+(async()=>{const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`:`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))`;
+ const E=await enter(URL,{gfx:process.env.GFX||'normal',seed});const {p,errs}=E;p.setDefaultTimeout(900000);
+ if(process.env.LIFE)await p.evaluate(v=>__g9ev('TUNE.life='+v),process.env.LIFE);if(process.env.SET)await p.evaluate(v=>__g9ev(v),process.env.SET);await E.roamApi();
+ const spots=await p.evaluate(()=>{const N=__mho.HUB.nodes,ok=[];for(let i=0;i<N.length;i++){const a=N[i];if(a&&a.nb&&a.nb.length>=2&&!a.ab&&N[a.nb[0]])ok.push(i)}return [.1,.5,.9].map(f=>{const a=N[ok[Math.floor(f*ok.length)]],b=N[a.nb[0]];return[a.x,a.z,Math.atan2(b.x-a.x,b.z-a.z)]})});
+ const R=[];for(const [x,z,h] of spots){await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.x=x;R.z=z;R.y=M.gnd(x,z,R.y+60);R.v=0;R.vh=h;R.h=h},[x,z,h]);await p.waitForTimeout(7000);
+  R.push(await p.evaluate(()=>{const r=__g9ev('renderer'),C=__g9ev('composer');r.info.autoReset=false;r.info.reset();__tick(1);const calls=r.info.render.calls,tris=r.info.render.triangles;r.info.autoReset=true;
+   const f=n=>{const t0=performance.now();__tick(n);return (performance.now()-t0)/n};const w=f(30);const rr=C.render;C.render=()=>{};const c=f(120);C.render=rr;
+   let peds=0;try{peds=__g9ev("HUB.peds?(typeof LV_pn!=='undefined'?LV_pn(HUB.peds.length):HUB.pP.head.count):0")}catch(e){}let inst=0,meshes=0;__g9ev('scene').traverse(o=>{if(o.visible&&(o.isMesh)){meshes++;if(o.isInstancedMesh)inst+=o.count}});
+   return {calls,tris,msRender:+w.toFixed(1),msCpu:+c.toFixed(2),peds,meshes,inst,lv:+(__g9ev("typeof LV!=='undefined'?LV.ms||0:0")).toFixed(3)}}))}
+ const avg=k=>+(R.reduce((a,r)=>a+r[k],0)/R.length).toFixed(2);console.log(CITY,'life',process.env.LIFE??'def',JSON.stringify(R),'AVG calls',avg('calls'),'tris',avg('tris'),'cpu',avg('msCpu'),'render',avg('msRender'));console.log('errors',errs.length,errs.slice(0,3).join(' | '));await E.b.close()})();

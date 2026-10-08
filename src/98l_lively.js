@@ -128,12 +128,15 @@ const LV_cwave=(i,d)=>d<40&&i%4!==0;
 function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')))}
 // a pavement corner beside a street node min-max m ahead (cone cos ≥ cmin), clear of buildings and other clusters
 // street nodes min-max m away inside the forward cone (cos ≥ cmin), shuffled (hubNear samples 18 random nodes of a 1.25 km square: almost never one 20-90 m away)
-function LV_ahead(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,L=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[];
+// v88s perf: LV_ahead / LV_edges scan every street node of the 1.25 km square (Athens: thousands); results are cached ~12 frames per 15 m / heading step (was: every call, up to 36 scans a frame from hubRecycle)
+const LV_aC={};function LV_ahead(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_aC[key],st=LV_st();if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}const L=LV_ahead0(min,max,cmin);LV_aC[key]={st,L,r:0};return L}
+const LV_st=()=>Math.floor((LV.fr||0)/12)+'|'+Math.round(RO.x/15)+'|'+Math.round(RO.z/15)+'|'+Math.round(RO.h*4);
+function LV_ahead0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,L=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[];
   for(const i of L){const n=N[i];if(!n)continue;const dx=n.x-RO.x,dz=n.z-RO.z,d2=dx*dx+dz*dz;if(d2<min*min||d2>max*max)continue;const d=Math.sqrt(d2);if((dx*fx+dz*fz)/d>=cmin)o.push(i)}
   for(let k=o.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[o[k],o[j]]=[o[j],o[k]]}return o}
 // points every 10 m along the streets min-max m away inside the forward cone: {i,bi,s,L} (edge A→B, s m from A). Points within 26 m of a junction first (corners)
 const LV_eC={};
-function LV_edges(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_eC[key],st=(LV.fr||0)+'|'+Math.round(RO.x/10)+'|'+Math.round(RO.z/10);if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}
+function LV_edges(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_eC[key],st=LV_st();if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}
   const L=LV_edges0(min,max,cmin);LV_eC[key]={st,L,r:0};return L}
 function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,Ls=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[],q=[];
   for(const i of Ls){const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<16)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;
@@ -141,7 +144,10 @@ function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=H
       const e=Math.min(t,L-t)<26&&(A.nb.length>=3&&t<26||B.nb.length>=3&&L-t<26);(e?o:q).push({i,bi,s:t,L})}}}
   const sh=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};return sh(o).concat(sh(q))}
 // road mask: true if (x,z) is within W/2+m of any street edge nearby (the carriageway of ANY street, incl. the crossing one at a corner)
-function LV_onRoad(x,z,m){const N=HUB.nodes;for(const i of HUB.nc?HUB.nc.L:[]){const A=N[i];if(!A||!A.nb)continue;if(Math.abs(A.x-x)>400||Math.abs(A.z-z)>400)continue;for(const bi of A.nb){const B=N[bi];if(!B)continue;const dx=B.x-A.x,dz=B.z-A.z,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/l2)),ex=A.x+dx*t-x,ez=A.z+dz*t-z,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20))/2+m;if(ex*ex+ez*ez<W*W)return true}}return false}
+// v88s perf: edges in a 40 m grid (built once; the graph is static) instead of scanning every node near the player per call
+function LV_eGrid(){if(LV.eg&&LV.eg.N===HUB.nodes)return LV.eg.G;const N=HUB.nodes,G=new Map();for(let i=0;i<N.length;i++){const A=N[i];if(!A||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B)continue;
+  for(let kx=Math.floor((Math.min(A.x,B.x)-24)/40);kx<=Math.floor((Math.max(A.x,B.x)+24)/40);kx++)for(let kz=Math.floor((Math.min(A.z,B.z)-24)/40);kz<=Math.floor((Math.max(A.z,B.z)+24)/40);kz++){const k=kx*100000+kz;let L=G.get(k);if(!L)G.set(k,L=[]);L.push(i,bi)}}}LV.eg={N,G};return G}
+function LV_onRoad(x,z,m){const N=HUB.nodes,E=LV_eGrid().get(Math.floor(x/40)*100000+Math.floor(z/40));if(!E)return false;for(let q=0;q<E.length;q+=2){const A=N[E[q]];{const B=N[E[q+1]];const dx=B.x-A.x,dz=B.z-A.z,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/l2)),ex=A.x+dx*t-x,ez=A.z+dz*t-z,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20))/2+m;if(ex*ex+ez*ez<W*W)return true}}return false}
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
   const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
     const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:Math.max((A.pw||W/2+1.5)+1.1,W/2+2.6);/* Athens: right behind the walkers' line (A.pw), at the kerb */
