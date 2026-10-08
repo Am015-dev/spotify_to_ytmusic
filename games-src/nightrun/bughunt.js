@@ -18,6 +18,8 @@ async function layout(p, tag, sel) {                // every visible button in t
     for (const b of document.querySelectorAll(sel)) {
       const cs = getComputedStyle(b), rc = b.getBoundingClientRect(); if (cs.display === 'none' || cs.visibility === 'hidden' || rc.width < 2 || b.closest('[hidden]')) continue;
       const nm = (b.id || b.textContent || '').trim().slice(0, 24);
+      let sc = b.parentElement, scrolls = false; while (sc && sc !== document.body) { const o = getComputedStyle(sc).overflowY; if ((o === 'auto' || o === 'scroll') && sc.scrollHeight > sc.clientHeight + 2) { scrolls = true; break; } sc = sc.parentElement; }
+      if (scrolls) continue;
       if (rc.left < -1 || rc.top < -1 || rc.right > vw + 1 || rc.bottom > vh + 1) out.push('off screen: ' + nm + ' ' + [rc.left, rc.top, rc.right, rc.bottom].map(Math.round));
       const e = document.elementFromPoint(Math.min(vw - 1, Math.max(0, rc.left + rc.width / 2)), Math.min(vh - 1, Math.max(0, rc.top + rc.height / 2)));
       if (e && e !== b && !b.contains(e) && !e.contains(b)) out.push('covered: ' + nm + ' by ' + (e.id || e.className || e.tagName));
@@ -54,7 +56,7 @@ async function walk(br, port, cfg) {
   }
   await ev(() => { window.__wp.eq = ['pulse', 'swarm']; });
   // ---- pit stop ----
-  await ev(() => { const m = __mnr; m.G.en = []; m.G.eb = []; m.SH.neon = 900; m.G.transT = .1; m.G.bossDone = true; m.G.boss = null; m.NR.emit('districtEnd', { di: m.G.di }); m.SH.pit(() => { }); });
+  await ev(() => { const m = __mnr; m.G.en = []; m.G.eb = []; m.SH.neon = 900; m.G.transT = .1; m.G.bossDone = true; m.G.boss = null; });
   if (await until(() => __mnr.SH.active, 4000, 'pit stop did not open')) {
     await sleep(900); await layout(p, T + ' pit stop', '#shop button, #shopm button, button.card, #shGo, #shRe, #shWp');
     const cards = await ev(() => __mnr.SH.cards.map((c, i) => { const el = document.getElementById('shCards').children[i]; return { id: c.u.id, price: __mnr.SH.price(c.u), shown: el ? el.querySelector('.pr').textContent.replace(/\D+/g, '') : null, lv: __mnr.SH.n(c.u.id), name: el ? el.querySelector('.n').textContent : '', max: c.u.max }; }));
@@ -95,7 +97,7 @@ async function walk(br, port, cfg) {
   if (cfg.touch) await click('#bPause'); else await p.keyboard.press('Escape');
   if (await until(() => __mnr.paused, 2000, 'pause did not open')) {
     await layout(p, T + ' pause', '#pausem button'); const t0 = await ev(() => __mnr.G.t); await sleep(1200); const t1 = await ev(() => __mnr.G.t); if (t1 - t0 > .05) bug(T + ' pause', 'game clock ran while paused: ' + (t1 - t0));
-    if (await click('#pSetBtn')) { await sleep(300); await layout(p, T + ' settings', '#setm button, #setBack, #setDef'); await ev(() => { document.querySelectorAll('#setBody button').forEach((b, i) => { if (i % 5 === 0) b.click(); }); }); await sleep(300); await click('#setBack'); await sleep(200); }
+    if (await click('#pSetBtn')) { await sleep(300); await layout(p, T + ' settings', '#setm button, #setBack, #setDef'); await ev(() => { document.querySelectorAll('#setBody button').forEach((b, i) => { if (i % 5 === 1) b.click(); }); }); await sleep(300); await click('#setBack'); await sleep(200); }
     if (await click('#resumeBtn')) { if (!await until(() => !__mnr.paused, 2500, 'resume did not resume')) { } }
   }
   // ---- checklist ----
