@@ -17,6 +17,23 @@
 - probe.js <url> [tpl]: dims/hull numbers. garshot.js <url> <out>: real taps RIDES → card → shot, BUILD → shot (GFX normal). walls.js: wall hits/min (not to be run now, no play tests).
 - Review drive shots: `TPL=t_bus SEC=8 SIDE=1 node t4/g11drive.js http://127.0.0.1:8766/local_dbg.html bc/drive_bus` (tyre gap logged as tyre_rest).
 
+## Findings 2026-10-08 16:20
+- Harness: headless rAF stalls the loader with lowgfx flags → bc/enter.js installs tPlay's frame ticker (opt.tick:0 to disable, e.g. garage shots). With the ticker only ~0.25 sim steps/s
+  at normal gfx, so BC's 36-step settle delay is reached only in real play; probes call `__bc.measure()` (immediate).
+- First size measure must wait: CR_PS caches the body box from the first frames when stock ship parts are still visible (gave 2× size). BC re-measures 36 steps after a car change, then every 180.
+- Measured (m, W×L×H, wheelbase): Hot Rod 1.93×4.43×1.44 / 2.45 (= BC.ref); Rosso 1.56×4.24×1.08; Bus 2.36×9.06×2.61 / 5.14; Truck 2.36×10.07×3.34 / 6.61; Limo 2.00×7.85×1.28 / 4.90; Monster 2.57×5.87×1.96 / 3.43.
+- Bus hull: rad 1.41, off 3.41, CR_WB 5.67, acc ×0.64, top ×0.93, cam ×1.59 (chase back 8.97 vs 5.63). Normal cars: exact defaults (rad 1.15, off 1.35, WB 2.7, cam .72).
+
+## GARAGE UX NEXT (problems hit / seen while making the big templates)
+- Big templates are 100-150 parts: no way to select or hide a GROUP (e.g. "upper deck", "box body") to edit what is inside; you can only remove brick by brick.
+- No show/hide per part type or per layer range; the B25 layers dim everything above, but inner bricks of a long bus stay hard to reach.
+- The 5-tile part strip hides most parts (swipe needed); glass panes (new Window 1×4/1×2) and long bricks (B1x16 etc. exist only via templates) are not pickable as sizes: no length picker.
+- Height is one plate per STEP ▲▼ tap; a 26-plate bus deck = 26 taps.
+- 46-stud grid: the camera now backs off by build length (BC GB_cam), but tap targets on a far end get tiny on a phone; no "focus here"/zoom-to-part.
+- Old pick needs a ray hit on a mesh: empty cells next to bodies often answer "No room"; 2-wide parts land offset from the finger.
+- Low fps in the cloud makes taps long-presses (always use ?fast=1 for builder input tests).
+- Reference to study: LEGO 2K Drive garage = big part categories with many tiles, part groups/"sub-builds" you can toggle, snapping by attachment points, free camera orbit with focus.
+
 ## Next
 1. Read probe logs; check big=true for templates and big=false for rod/t_rosso; fix errors.
 2. garshot (garage + build shots), g11drive per template (Frankfurt few s + side view + tyre gap ≤0.05), start/PC/iframe shots, 0 console errors. LOOK at shots.
