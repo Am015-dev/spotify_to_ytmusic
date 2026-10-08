@@ -13,7 +13,7 @@ function wantSongs(){
   if(SH.active){di++;if(di>=DISTRICTS.length){di=0;L++;}done=false;}                       // pit stop: get ready for the district that comes next
   const o=[songFor(di,L)],sg=bossSong(DISTRICTS[di].boss,false);if(sg&&!done)o.push(sg);
   const n=di+1,Ln=n>=DISTRICTS.length?L+1:L;o.push(songFor(n%DISTRICTS.length,Ln));return o;}
-TR.keepFn=file=>wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);
+TR.keepFn=file=>(TRQ.hold&&TRQ.hold.has(file))||wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);   // TRQ.hold: test hook that keeps extra songs decoded
 const trBusy=()=>{for(const k in TR.busy)if(TR.busy[k])return true;return false;};
 function pumpTracks(){if(!AU.a||trBusy())return;
   for(const s of wantSongs()){const info=TR.by[s];if(!info||TR.bufs[info.file]||TR.bad[info.file])continue;
