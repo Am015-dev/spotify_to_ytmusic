@@ -7,7 +7,7 @@ const PW = require(process.env.PW || 'playwright'), path = require('path'), net 
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const SECS = +process.env.SECS || 70, sleep = ms => new Promise(r => setTimeout(r, ms));
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
-const LIMIT = { normal: 35, hard: 20 };
+const LIMIT = { normal: 35, hard: 22 };
 async function run(br, port, diff, mode) {
   const ctx = await br.newContext({ viewport: { width: 1280, height: 800 } }), p = await ctx.newPage(), errs = [];
   p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());

@@ -2579,7 +2579,7 @@ WP.draw();
    the score of kills and the multiplier decay, and a SNIPER LANE (a beam along the ship's row: it follows the ship for two beats, locks for one, fires on the
    next) comes round every 3 to 5 beats. Moving 50 px away (or dashing) resets everything; the beam is locked for a whole beat, so a ship that moves is never hit by it.
    DYE (declared in b.js): hull 2 -> song x0.92, hull 1 -> x0.85, death -> tape stop to x0.5. The beat clock follows (NR.music.setRate), so the rhythm stays in sync. */
-const STILL_FREE=3,STILL_RAMP=6,BEAM_Y=16;
+const STILLF=()=>HARD?2:3,STILL_RAMP=6,BEAM_Y=16;
 NR.on('runStart',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,ax:P.x,ay:P.y,beam:null,nb:0,said:false});Object.assign(DYE,{cur:1,q:1});});
 NR.on('runEnd',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,beam:null});if(DYE.q!==1||NR.music.rate!==1){DYE.cur=DYE.q=1;try{NR.music.setRate(1);}catch(e){}}});
 NR.on('tick',dt=>{if(!G.live)return;
@@ -2590,17 +2590,17 @@ NR.on('tick',dt=>{if(!G.live)return;
   /* --- stillness --- */
   if(Math.hypot(P.x-STILL.ax,P.y-STILL.ay)>50||P.dashT>0){STILL.ax=P.x;STILL.ay=P.y;STILL.t=Math.max(0,STILL.t-STILL.t*.5);if(STILL.t<.5)STILL.t=0;}
   else if(G.t>6&&G.transT<0)STILL.t+=dt;
-  const s=Math.max(0,STILL.t-STILL_FREE),k=Math.min(1,s/STILL_RAMP);STILL.k=k;
+  const s=Math.max(0,STILL.t-STILLF()),k=Math.min(1,s/STILL_RAMP);STILL.k=k;
   STILL.fk=1+1.4*k;STILL.bk=1+.22*k;STILL.sk=Math.max(.12,1-.88*k);
   if(s>0&&G.mult>1)G.mult=Math.max(1,G.mult-.4*dt);
-  if(STILL.t>STILL_FREE+.6&&!STILL.said){STILL.said=true;floater(P.x,P.y-44,'KEEP MOVING','#ff6a7a');}
+  if(STILL.t>STILLF()+.6&&!STILL.said){STILL.said=true;floater(P.x,P.y-44,'KEEP MOVING','#ff6a7a');}
   /* --- the sniper lane --- */
-  const B=STILL.beam;if(B){if(B.n<2)B.y+=(P.y-B.y)*Math.min(1,dt*7);if(B.fire>0){B.fire-=dt;if(!G.dead&&Math.abs(P.y-B.y)<BEAM_Y&&!B.hit){B.hit=1;hurt();}if(B.fire<=0)STILL.beam=null;}}});
+  const B=STILL.beam;if(B){if(B.n<(HARD?1:2))B.y+=(P.y-B.y)*Math.min(1,dt*7);if(B.fire>0){B.fire-=dt;if(!G.dead&&Math.abs(P.y-B.y)<BEAM_Y&&!B.hit){B.hit=1;hurt();}if(B.fire<=0)STILL.beam=null;}}});
 NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
-  if(B){B.n++;if(B.n===3){B.fire=.3;AU.sfx('big');shake(5);}return;}
-  if(STILL.t>STILL_FREE+.6&&G.bc>=STILL.nb&&!G.boss){STILL.beam={y:P.y,n:0,fire:0,hit:0};STILL.nb=G.bc+(HARD?5:6)-(STILL.k>=.5?1:0);AU.sfx('warn');}});   // 3 beats of beam + the gap
+  if(B){B.n++;if(B.n===(HARD?2:3)){B.fire=.3;AU.sfx('big');shake(5);}return;}
+  if(STILL.t>STILLF()+.6&&G.bc>=STILL.nb&&!G.boss){STILL.beam={y:P.y,n:0,fire:0,hit:0};STILL.nb=G.bc+(HARD?3:6)-(STILL.k>=.5&&!HARD?1:0);AU.sfx('warn');}});   // 3 beats of beam + the gap
 {const dp=drawPickups;drawPickups=function(t){dp(t);const B=STILL.beam;if(!B||G.dead)return;
-  ctx.save();ctx.globalCompositeOperation='lighter';const lock=B.n>=2,f=B.fire>0;
+  ctx.save();ctx.globalCompositeOperation='lighter';const lock=B.n>=(HARD?1:2),f=B.fire>0;
   if(f){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(0,B.y-BEAM_Y*.5,W,BEAM_Y);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}
   else{const pulse=SET.reduce?1:Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.45)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
     ctx.beginPath();ctx.moveTo(0,B.y);ctx.lineTo(W,B.y);ctx.stroke();ctx.setLineDash([]);if(lock){ctx.globalAlpha=.18*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}}
