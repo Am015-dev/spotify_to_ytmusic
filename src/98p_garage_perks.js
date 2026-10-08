@@ -10,7 +10,7 @@ const GPK_cls=L=>L>=20?'A':L>=10?'B':'C';
 function GPK_eq(slot,id){let e=perkEq0().filter(x=>x!==id);if(slot<e.length)e.splice(slot,1,id);else e.push(id);store.set('mho_perks',e.slice(0,perkSlots()))}
 function GPK_html(){const L=carStat().lvl,n=perkSlots(),e=perkEq0(),P=id=>PERKS.find(p=>p.id===id)||{};
  let h=`<h5>PERKS · DRIVER LEVEL ${L} · CLASS ${GPK_cls(L)} · ${n}/3 SLOTS</h5><div class="gbRow">`;
- for(let i=0;i<3;i++){const p=e[i]&&P(e[i]);h+=i<n?`<button class="gbP gpkS ${GPK_.pk===i?'on':''}" data-gslot="${i}"><b>${p?p.icon+' '+p.name:'＋ EMPTY SLOT'}</b><small>${p?p.d:'tap to pick a perk'}</small></button>`:`<button class="gbP gpkS" disabled><b>🔒 SLOT ${i+1}</b><small>driver level ${i===1?8:16}</small></button>`}
+ for(let i=0;i<3;i++){const p=e[i]&&P(e[i]);h+=i<n?`<button class="gbP gpkS ${GPK_.pk===i?'on':''}" data-gslot="${i}"><b>${p?p.icon+' '+p.name:'＋ EMPTY SLOT'}</b><small>${p?p.d:'tap to pick a perk'}</small></button>`:`<button class="gbP gpkS" disabled><b>🔒 SLOT ${i+1}</b><small>LVL ${i===1?10:20}</small></button>`}
  h+='</div>';if(GPK_.pk!=null&&GPK_.pk<n){h+=`<div class="gbRow">`;for(const p of[...PERKS].sort((a,b)=>perkUnlocked(b)-perkUnlocked(a))){const ok=perkUnlocked(p),on=e.includes(p.id);h+=`<button class="gbP ${on?'on':''}" ${ok?'':'disabled'} data-gpk="${p.id}"><b>${ok?'':'🔒 '}${p.icon} ${p.name}</b><small>${ok?p.d:perkReq(p)}</small></button>`}h+='</div>'}return h}
 GAR_tab=(f=>function(){f();const B=$('#gbBody');
  B.querySelectorAll('[data-gset]').forEach(b=>{const s=b.querySelector('small'),g=GPK_GRP[b.dataset.gset];if(s&&g)s.textContent=g+' · '+s.textContent});
