@@ -146,7 +146,7 @@ html body #tL.crSmF,html body #tR.crSmF{animation:crSmF .35s ease-out;background
 @media (max-height:520px){#crSmPop{font-size:30px}}
 body.crSmOn #roamTut{visibility:hidden!important}
 #crSmHint{position:fixed;left:-999px;top:0;z-index:7;pointer-events:none;font:900 13px/1 system-ui,sans-serif;letter-spacing:.06em;color:#241400;background:#ffd12c;border:2px solid #141413;border-radius:999px;padding:5px 10px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.35);display:none}
-#crSmHint.on{display:block;animation:crSmH 1.6s ease-in-out infinite}@keyframes crSmH{50%{transform:translateY(-3px)}}body.cine #crSmHint,body.cine #crSmPop{display:none}`;document.head.appendChild(st)})();
+#crSmHint.on{display:block;animation:crSmH 1.6s ease-in-out infinite}@keyframes crSmH{50%{transform:translateY(-3px)}}body.cine #crSmHint,body.cine #crSmPop{display:none}body.odPanel #crSmHint,body.odPanel #roamPrompt,body.odPanel #roamTut,body.odPanel #roamPop,body.odPanel #hitPop,body.odPanel #roamCombo,body.odPanel #crSmPop{display:none!important}`;document.head.appendChild(st)})();
 for(const ev of['dblclick','gesturestart','gesturechange'])document.addEventListener(ev,e=>{if(state==='roam'||state==='race'||state==='countdown')e.preventDefault()},{passive:false});
 const CRSM={d:0,t:-1e9,b:null,n:0,hn:0,pt:0,pd:0,acc:0};try{CRSM.hn=+(localStorage.getItem('mho_smHint')||0)||0}catch(e){}
 function CRSM_ts(e){const n=performance.now(),t=e&&e.timeStamp;return typeof t==='number'&&t>0&&Math.abs(n-t)<2000?t:n}
@@ -182,9 +182,12 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
  const r=f(t,col);try{const e=document.getElementById('hitPop'),u=document.getElementById('roamTut');if(e&&u&&!u.hidden&&u.getClientRects().length){const a=e.getBoundingClientRect(),b=u.getBoundingClientRect(),cx=(a.left+a.right)/2,cy=(a.top+a.bottom)/2,w=e.offsetWidth*1.2/2+6,h=e.offsetHeight*1.2/2+6;
   if(cx-w<b.right&&cx+w>b.left&&cy-h<b.bottom&&cy+h>b.top)CRSM_tutHide(1150)}}catch(e){}return r})(hitPop);
 // first-time hint above the arrows until 2 SMASHes
+// R3b: HUD hints (smash hint, prompts, tutorial, pops) hide while any panel or overlay is open
+const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
+function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='TAP TAP = SMASH';document.body.appendChild(h)}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
- const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk));
+ const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
  h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-8))+'px'}
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);

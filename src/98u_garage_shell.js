@@ -45,13 +45,14 @@ function R2_bkTap(e){const b=e.target.closest('button');if(!b)return;const T=$('
 // ---------- context bar for RIDES / PERKS / PAINT / DRIVER / BUILD-kits|horn (≤ 6 tiles; most are proxies of the panel's own buttons)
 const R2_FN=[['gloss','✨','GLOSS'],['matte','◼','MATTE'],['metal','⚙','METAL'],['chrome','◎','CHROME'],['pearl','◇','PEARL']];
 function R2_ctx(){const C=$('#r2C'),B=$('#gbBody');if(!C||!B)return;const[m,s]=R2_cur();let h='';
- if(m==='rides')h=[...B.querySelectorAll('#g9Col .g9Bar button')].map((b,i)=>`<button class="r2T ${b.classList.contains('on')?'on':''}" data-r2px="${i}">${b.innerHTML}</button>`).join('');
+ if(m==='rides')h=[...B.querySelectorAll('#g9Col .g9Bar button')].map((b,i)=>`<button class="r2T ${b.classList.contains('on')?'on':''}" data-r2px="${i}">${b.innerHTML}</button>`).join('')+(typeof R3_show==='function'?'<button class="r2T r3ShB" data-r3show><i>🏁</i>SHOWROOM</button>':'');
  else if(m==='perks')h=[...B.querySelectorAll('.gpkTop .gbRow:first-of-type button')].map((b,i)=>`<button class="r2T r2Slot ${GPK_.pk===i&&!b.disabled?'on':''}" ${b.disabled?'disabled':''} data-r2sl="${i}"><small>SLOT ${i+1}</small>${b.disabled?'🔒 '+((b.querySelector('small')||{}).textContent||'').toUpperCase():b.querySelector('b').innerHTML}</button>`).join('');
  else if(m==='paint'){const f=R2_fin();h=R2_FN.map(([k,i,n])=>`<button class="r2T ${f===k?'on':''}" data-r2fn="${k}"><i>${i}</i>${n}</button>`).join('')+`<button class="r2T" data-r2stock><i>↺</i>STOCK</button>`}
  else if(m==='driver')h=[...B.querySelectorAll('h5')].slice(0,6).map((e,i)=>`<button class="r2T" data-r2h5="${i}">${e.textContent.split(/[ ·/]/)[0]}</button>`).join('');
  else if(m==='build')h=[['bricks','🧱','BRICKS'],['kits','🔩','KITS'],['horn','📯','HORN']].map(([k,i,n])=>`<button class="r2T ${s===k?'on':''}" data-r2bs="${k}"><i>${i}</i>${n}</button>`).join('');
  if(C.innerHTML!==h)C.innerHTML=h}
 function R2_ctxTap(e){const b=e.target.closest('button');if(!b||b.disabled)return;const B=$('#gbBody'),d=b.dataset;
+ if(d.r3show!=null){try{AU.sfx('pick')}catch(_){}R3_show(true);return}
  if(d.r2px!=null){const t=B.querySelectorAll('#g9Col .g9Bar button')[+d.r2px];if(t)t.click();return}
  if(d.r2sl!=null){const i=+d.r2sl;if(GPK_.pk===i)return;GPK_.pk=i;try{AU.sfx('pick')}catch(_){}gbRender();return}
  if(d.r2fn){R2_finPick(d.r2fn);return}
