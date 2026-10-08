@@ -94,8 +94,8 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
   else if(a==='save'){const n=d.querySelector('#tuN');TU_save(n?n.value:'')}
   else if(a==='load')TU_load(+b.dataset.v);else if(a==='cur')TU_setCur(+b.dataset.v);else if(a==='exp')TU_export();else if(a==='ref')TU_list()});
  addEventListener('resize',()=>TU_fit());TU_render();
- // fix21: on the menu the ⚙ sat on top of SOUND ON (#topBtns, top right): drop it below those buttons while they show
- setInterval(()=>{const tb=document.getElementById('topBtns');let y=6;if(tb&&!tb.hidden&&tb.offsetWidth){const r=tb.getBoundingClientRect(),q=g.getBoundingClientRect();if(r.bottom>0&&r.left<q.right&&r.right>q.left)y=Math.round(r.bottom+6)}const v=`calc(${y}px + env(safe-area-inset-top))`;if(g.style.top!==v)g.style.top=v},400)}
+ // fix21: on the menu the ⚙ sat on top of SOUND ON (#topBtns, top right): sit just left of that button row while it shows
+ setInterval(()=>{const tb=document.getElementById('topBtns');let x=8;if(tb&&!tb.hidden&&tb.offsetWidth){const r=tb.getBoundingClientRect();if(r.bottom>0)x=Math.round(innerWidth-r.left+8)}const v=`calc(${x}px + env(safe-area-inset-right))`;if(g.style.right!==v)g.style.right=v},400)}
 function TU_toggle(on){TU.open=on==null?!TU.open:on;TU.el.classList.toggle('on',TU.open);if(TU.open){TU_render();TU_fit()}}
 // keep the drawer above every visible touch control it would cover (GAS/BRAKE/◀▶/DRIFT/BOOST): its bottom stops 6 px above them
 function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const W=innerWidth,H=innerHeight,C=[];
