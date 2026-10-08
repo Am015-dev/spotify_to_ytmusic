@@ -6,3 +6,6 @@
 .bf-bulb.gxh-bulb svg{width:26px;height:26px}
 .acts .gxt-menu{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
 .acts .gxt-menu span{font-weight:400;font-size:.78em;opacity:.85}
+.acts .gxt-menu{flex:1 1 100%;order:-1}
+.bf-bw{flex:none;display:inline-flex;width:44px;height:44px}
+@media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 7px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}}

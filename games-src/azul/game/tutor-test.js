@@ -90,7 +90,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     }
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
     // screenshots at 390x763
-    if(id==='goal')await shot('early');if(id==='middle2')await shot('mid');if(id==='chain1')await shot('score');
+    if(!/^Tap (the glowing|Next)/.test(info.say)){if(['goal','middle2','chain1'].includes(id))await sleep(500);if(id==='goal')await shot('early');if(id==='middle2')await shot('mid');if(id==='chain1')await shot('score')}
     // rotations
     if(mode==='rotate'&&rotated===0&&s.id==='take2'){rotated=1;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);
       const r=await state();if(!r.shown||!r.hole)note(tag,'after rotating to landscape the step is not on screen');else await p.screenshot({path:'/tmp/claude-0/tutor_rot_land.png'});continue}

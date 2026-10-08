@@ -2,7 +2,7 @@
 // Bubbles: once per phase (pick a colour / choose a row / choose a wall space), short, pointing at the board. The bulb: the game's own advice function
 // (adviceFor -> bestNetTake / bestWallCell, through bfAdvice) as a ghost finger plus a short why, and rules cards. No safe advice -> rules cards only.
 // Help lives on the board-first table (phone layout, also used by the tutorial on any screen); the old 3D desktop dock keeps its guide panel.
-const hT=(c,x,y,s)=>`<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 100 100"><use href="#gz${c}"/></svg>`;
+const hT=(c,x,y,s)=>`<use href="#gz${c}" x="${x}" y="${y}" width="${s}" height="${s}"/>`;   // no nested <svg>: the kit's css sizes every svg inside a picture
 const hSVG=b=>`<svg viewBox="0 0 64 64" role="img" aria-hidden="true">${b}</svg>`;
 const hRing=(x,y,w,h,r)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r||4}" fill="none" stroke="#ffd24a" stroke-width="2.4"/>`;
 const HPIC={
@@ -67,3 +67,6 @@ function hlpAfter(){if(typeof GXH==='undefined')return;hlpInit();
   const b=document.getElementById('bulbbtn');if(b&&b!==hlpAfter._b){hlpAfter._b=b}
   if(b)GXH.bulb({el:b,suggest:hlpSuggest,rulesFor:hlpPhase});
   GXH.phase(hlpPhase())}
+// a tap on a kit element (Got it, a bubble) must not also reach the board underneath: the kit removes the bubble on pointerdown, so the click would land on what was below it
+document.addEventListener('pointerdown',e=>{window.__hlpDown=e.target&&e.target.closest&&e.target.closest('[data-help]')?Date.now():0},true);
+hlpInit();

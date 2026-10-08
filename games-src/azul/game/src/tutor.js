@@ -45,7 +45,7 @@ function tutBuild(){UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;UI.fx.leng
   P(0).score=21;P(1).score=12;G.round=4;G.first=0;G.cur=0;G.markerIn='ctr';G.log=[];G.logN=0;G.turn=0;
   UI.fx.length=0;UI.fxSeen=0;BF.gk='';BF.q.length=0;BF.seen={};
   try{resetScene()}catch(e){}
-  refresh()}
+  TUT.t0=Date.now();refresh()}
 function tutOlive(n){const t=TUT_O[n];const m=t&&sideToAct()===1?validMoves(1).find(x=>x.src===t[0]&&x.c===t[1]&&x.line===t[2]&&!x.j):null;if(m)go(m);else console.error('tutor: Olive has no move '+n)}
 // ---------------------------------------------------------------- where each step points
 const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
@@ -56,7 +56,7 @@ const tRack=r=>()=>bfQ(r<5?`[data-bfrow="${r}"] .bf-rack`:'.bf-fl');
 const tSel=(src,c)=>!!UI.sel&&UI.sel.src===src&&UI.sel.c===c&&!!bfQ('.bf-row.ok');
 const tWall=(r,c)=>()=>bfSlot(`w0_${r}_${c}`);
 function tutSteps(){return [
- {id:'goal',title:'Tile the palace wall',say:'Set tiles onto your wall to score points. When the game ends, the most points wins.',target:tq('.bf-me'),wait:null,ready:()=>tYou()&&G.turn===0},
+ {id:'goal',title:'Tile the palace wall',say:'Set tiles onto your wall to score points. When the game ends, the most points wins.',target:tq('.bf-me'),wait:null,ready:()=>tYou()&&G.turn===0&&Date.now()-TUT.t0>2000},
  {id:'kilns',title:'Five kilns',say:'Each kiln holds four tiles. On your turn you take tiles from one kiln, or from the middle.',target:tq('.bf-table'),wait:null,ready:()=>tYou()&&G.turn===0},
  {id:'take1',title:'Take a colour',say:'Tap a Garnet tile. You take every Garnet on that kiln.',target:tTile(0,2),
    wait:{type:'tap',match:a=>a.what==='pick'&&a.src===0&&a.c===2},ready:()=>tYou()&&G.turn===0&&!UI.sel},
