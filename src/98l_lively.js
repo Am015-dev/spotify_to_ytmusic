@@ -142,7 +142,7 @@ function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=H
   const sh=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};return sh(o).concat(sh(q))}
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
   const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
-    const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=W/2+(fra?4.6:3.5);
+    const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:(A.pw||W/2+1.5)+1.1;/* Athens: right behind the walkers' line (A.pw), at the kerb */
     const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;
     const y=groundAt(x,z,(RO.y||0)+20);if(!(y>-1)||Math.abs(y-(RO.y||0))>14)continue;if(roamHit(x,z,1.8,y+.5)||roamHit(x-uz*sd*2,z+ux*sd*2,1.2,y+.5))continue;
     return{x,z,y:Math.max(0,y),h:Math.atan2(uz*sd,-ux*sd),ux,uz,sd,W,a:i,b:bi,al,L}}return null}
@@ -167,7 +167,7 @@ function LV_clProps(k,C){const S=LV.cl,ax=-Math.cos(C.h),az=Math.sin(C.h);C.pr=[
 function LV_clDraw(k,C){const S=LV.cl,g=C.gs;for(let j=0;j<2;j++){const i=k*2+j;for(const m of [S.s,S.a,S.c,S.u])m.setMatrixAt(i,_lvZ)}
   if(!C.on)return;for(const p of C.pr){if(p.dead)continue;const i=k*2+p.j;if(p.m==='s'){LV_set(S.s,i,p.x,C.y,p.z,0,C.h,0,g);LV_set(S.a,i,p.x,C.y,p.z,0,C.h,0,g)}else{LV_set(S.c,i,p.x,C.y,p.z,0,C.h+p.j*.9,0,g);LV_set(S.u,i,p.x,C.y,p.z,0,C.h,0,g)}}}
 const LV_clUpd=()=>{const S=LV.cl;for(const m of [S.s,S.a,S.c,S.u])m.instanceMatrix.needsUpdate=true};
-function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const sp=near?(k%2?LV_corner(20,45,.6,own)||LV_corner(18,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
+function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID!=='fra',sp=near?(k%2||ath&&k<4?LV_corner(ath?16:20,ath?40:45,.6,own)||LV_corner(15,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
   if(!sp){C.on=false;LV_clDraw(k,C);return false}Object.assign(C,{on:true,x:sp.x,z:sp.z,y:sp.y,h:sp.h,a:sp.a,b:sp.b,gs:near?1:.05,t:0,ux:sp.ux,uz:sp.uz,sd:sp.sd});LV_clProps(k,C);LV_clDraw(k,C);return true}
 // people of cluster k stand in a loose ring on the road side of the props (crowd: around a centre), facing each other
 function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),ax=-Math.cos(C.h),az=Math.sin(C.h);
@@ -253,8 +253,10 @@ function LVP_step(dt,busy){const M=LVP.m,C=LVP.c;
   if(!C){LVP.cd-=dt;if(LVP.cd>0||LVP_busy(busy)||Math.abs(RO.v)<8||LV.fr%10)return;if(!LVP_spawn())LVP.cd=1.5;return}
   if(C.st===0){// ring waiting on the road: grow in, spin the label, start when the car passes through (≤ 4.2 m from its centre)
     C.t+=dt;M.g.scale.setScalar(Math.min(1,.05+C.t*2.5));M.ring.rotation.z=Math.sin(C.t*2)*.08;const dx=RO.x-C.gx,dz=RO.z-C.gz,d=Math.hypot(dx,dz),al=dx*Math.sin(C.gh)+dz*Math.cos(C.gh);
-    if(d<5&&Math.abs((RO.y||0)-C.gy)<5){M.g.visible=false;LVP_start(C);return}
-    if(al>12||d>140||C.t>25||LVP_busy(busy)){M.g.visible=false;LVP.c=null;LVP.cd=6;return}return}
+    // decided at the ring plane: through it (≤ 5.2 m sideways) = start; past it outside = gone at once, so the chase camera never flies through the ring
+    // (v88p review blocker: an off-centre pass left the ring up until 12 m past and the camera crossed the torus + disc = a huge translucent wedge over the car)
+    const lt=Math.abs(dx*Math.cos(C.gh)-dz*Math.sin(C.gh));if(al>-1.5&&al<6&&lt<5.2&&Math.abs((RO.y||0)-C.gy)<5){M.g.visible=false;LVP_start(C);return}
+    if(al>-1.5||d>140||C.t>25||LVP_busy(busy)){M.g.visible=false;LVP.c=null;LVP.cd=6;return}return}
   // running
   C.t+=dt;const K=C.K;
   if(K.k==='jump'){if(pl&&pl.air)C.v+=dt}else if(K.k==='drift'){if(RO.dDir)C.v+=dt}else if(K.k==='smash'){
@@ -271,6 +273,8 @@ function LVP_hud(){const C=LVP.c;if(!C||RO.ch||RO.sp)return;const a=huQ('#roamAr
   const ang=tg?Math.atan2(tg.x-RO.x,tg.z-RO.z)-RO.h:0;huS(huQ('#roamArrow i'),'transform',`rotate(${(-ang).toFixed(3)}rad)`);
   const v=K.k==='smash'||K.k==='slalom'?Math.floor(C.v):C.v.toFixed(1);huT(huQ('#roamArrow span'),C.st===0?`${K.ico} ${K.name} → drive through the ring · ${Math.round(Math.hypot(C.gx-RO.x,C.gz-RO.z))} m`:`${K.ico} ${K.name} · ${v}/${K.goal} ${K.u} · ${Math.max(0,K.lim-C.t).toFixed(1)} s`)}
 {const _ps=popStep;popStep=(dt,busy)=>{if(LV_d('lvPop')<=0||RO.pop&&!LVP.c){if(LVP.c)LVP_end(LVP.c,false);return _ps(dt,busy)}RO.popCd=Math.max(RO.popCd??0,20);try{LVP_step(dt,busy)}catch(e){console.warn('LVP',e);LVP.c=null;LVP.cd=30}}}
+// no 'TAP TO OPEN' zone pill over the boost bar while a pop-up runs (reviewer v88p note 2)
+{const _rp=roamPrompt;roamPrompt=dt=>{if(LVP.c&&LVP.c.st===1){const el=document.getElementById('roamPrompt');if(el&&!el.hidden)el.hidden=true;return}return _rp(dt)}}
 {const _rh=roamHud;roamHud=()=>{_rh();try{LVP_hud()}catch(e){}}}
 window.__lv={LV,n:()=>({peds:HUB.peds?LV_pn(HUB.peds.length):0,flags:LV.flags?LV.flags.L.length:0,roofs:LV.n.flags||0,boats:LV.n.boats||0,birds:LV.birds?LV.birds.fl.filter(f=>f.on).length:0,blimp:!!LV.blimp,ms:LV.ms}),
   view:()=>{// people / cars / birds / boats inside the camera view within 120 m (the "is anything happening" count of the research doc)
