@@ -355,7 +355,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     const node=a.createMediaElementSource(el),g=a.createGain();g.gain.value=0;node.connect(g);g.connect(this.fb);
     const s={el,src:el,node,g,file:null,stage:'',info:null,blob:null,D:0,full:false,seek:false,err:0,tLoad:0,unlocked:false,playing:false,get duration(){return this.D;}};
     el.addEventListener('error',()=>{s.err=1;});this.slotReset(s);return s;},
-  slotReset(s){Object.assign(s,{loops:0,last:0,phase:'',hist:[],applied:0,ctx0:0,pos0:0,uPlay:0,stopAt:0,kickT:0,heldPlay:false,startFn:null,startAt:0});},
+  slotReset(s){Object.assign(s,{m0:undefined,steer:0,loops:0,last:0,phase:'',hist:[],applied:0,ctx0:0,pos0:0,uPlay:0,stopAt:0,kickT:0,heldPlay:false,startFn:null,startAt:0});},
   slotFor(info){let s=this.slots.find(x=>x.file===info.file);if(s)return s;
     const used=x=>x===this.cur||x===this.nxt||x===this.prev||x.playing||x.heldPlay||(BT.pend&&BT.pend.v.stage===x.stage);
     s=this.slots.find(x=>!x.file)||this.slots.find(x=>!used(x)&&!(TR.keepFn&&TR.keepFn(x.file)));
@@ -394,13 +394,19 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
       if(pl){s.ctx0+=pl;s.gapPlan=0;}                                   // a planned pre-roll wrap: the gap was expected, the grid does not move
       else{const tg=BT.pend&&s===this.cur?BT.pend.v:BT.stage===s.stage?BT:null;if(tg){tg.t0+=ge;s.applied+=ge;}}}   // a loop of the playing song: the music restarts one gap later, and so does the grid
     s.last=e;
-    const u=e+s.loops*D,rate=el.playbackRate||1;
+    const u=e+s.loops*D,rate=NR.music.rate,pend=BT.pend&&s===this.cur;
     if(s.phase==='wait'){if(u-s.uPlay>.03){s.phase='acq';s.acqT=pn+700;s.hist.length=0;}else return;}   // not playing yet
     const dd=(a.currentTime-s.ctx0)-(u-s.pos0)/rate;s.hist.push(dd);if(s.hist.length>40)s.hist.shift();
     const ga=s.gapAt;if(ga){ga.post.push(dd);if(ga.post.length>=10){s.gapAt=null;const md=x=>x.slice().sort((p,q)=>p-q)[x.length>>1];   // how long did the loop really pause? learn it for the next fade-in from the tail
       if(ga.pre&&s.info){const g=md(ga.post.slice(2))-md(ga.pre)+ga.pl;if(g>=0&&g<.2)s.info.gapMs=Math.round(s.info.gapMs*.4+g*1000*.6);}}}
-    if(s.hist.length<3)return;
+    if(s.hist.length<(pend?6:3))return;
     const m=s.hist.slice().sort((x,y)=>x-y)[s.hist.length>>1];
+    if(pend){                                                          // the incoming song, started early and silent: the grid keeps the plan (its first beat on the bar line),
+      const tl=BT.pend.at-a.currentTime;                                // the song is steered onto the plan by playing a hair faster (the pitch moves a little while it is still quiet)
+      if(s.m0===undefined){s.m0=m;if(s.tCall)this.lat=Math.max(0,Math.min(.3,this.lat*.6+.4*(s.ctx0+m-s.tCall)));s.tCall=0;}   // how late did it really start? remembered for the next start
+      let r=rate;if(tl>.3&&Math.abs(m)>.003){r=rate+m*rate/tl;r=Math.max(rate*.88,Math.min(rate*1.12,r));s.steer=1;}
+      if(Math.abs(el.playbackRate-r)>1e-4)el.playbackRate=r;s.drift=m;return;}
+    if(s.steer){s.steer=0;el.playbackRate=rate;}
     let ap;if(s.phase==='acq'){ap=m;if(pn>s.acqT){s.phase='track';if(s.tCall)this.lat=Math.max(0,Math.min(.3,this.lat*.6+.4*(s.ctx0+m-s.tCall)));s.tCall=0;}}                                  // first 700 ms of playing (and after a resume): take the measured start at once
     else{const er=m-s.applied,lim=Math.abs(er)>.03?.004:.001,st=er*.12;ap=s.applied+(st<-lim?-lim:st>lim?lim:st);}   // later: follow it smoothly (at most 1 ms a tick = 4% speed, 4 ms when far off)
     const dl=ap-s.applied;if(!dl)return;s.applied=ap;s.drift=m;
