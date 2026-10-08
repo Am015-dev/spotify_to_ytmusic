@@ -4,7 +4,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 (async()=>{const U=process.argv[2],O=process.argv[3],W=+(process.argv[4]||852),H=+(process.argv[5]||393);fs.mkdirSync(O,{recursive:true});
  const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:W<1000,hasTouch:true});const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(String(e)));pg.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
- let p=pg;if(process.env.IFRAME){await pg.setContent(`<html><body style="margin:0;background:#000"><iframe id="f" src="${U}" style="border:0;width:${W}px;height:${H}px"></iframe></body></html>`);await pg.waitForTimeout(3000);p=pg.frames().find(f=>f.url().startsWith(U.split('?')[0]))}else await pg.goto(U);
+ let p=pg;if(process.env.IFRAME){await pg.setContent(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#000"><iframe id="f" src="${U}" style="border:0;width:${W}px;height:${H}px"></iframe></body></html>`);await pg.waitForTimeout(3000);p=pg.frames().find(f=>f.url().startsWith(U.split('?')[0]))}else await pg.goto(U);
  await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});const cdp=await ctx.newCDPSession(pg);
  const tapXY=async(x,y,w=650)=>{const tp=[{x,y,id:1,radiusX:4,radiusY:4,force:1}];await Promise.all([cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:tp}),cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})]);await pg.waitForTimeout(w)};
  const tap=async(s,w)=>{const e=await p.$(s);if(!e){console.log('NO',s);return 0}const bb=await e.boundingBox();if(!bb){console.log('NOBOX',s);return 0}await tapXY(bb.x+bb.width/2,bb.y+bb.height/2,w);return 1};
@@ -17,7 +17,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
   const box={H:R('#r2H'),R:R('#r2R'),P:R('#gbx .gbp'),C:R('#r2C')||R('#gbBkP'),area:window.__r2.area()};const ov=(a,b)=>a&&b&&a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
   return{mode:__r2.mode().join('/'),buttons:nb,small:small.slice(0,12),tiny:tiny.slice(0,8),ovPC:ov(box.P,box.C),ovPR:ov(box.P,box.R),ovHP:ov(box.H,box.P),box}});
  const A=async n=>console.log('AUDIT',n,JSON.stringify(await audit()));
- await shot('m0_start');await tap('#gbMenuBtn',2500);await A('open');await shot('m1_rides');
+ await shot('m0_start');if(process.env.QUICK){await tap('#gbMenuBtn',2500);await shot('m1_rides');console.log('ERR',JSON.stringify(errs.slice(0,6)));await b.close();return}await tap('#gbMenuBtn',2500);await A('open');await shot('m1_rides');
  await tap('#r2C [data-r2px="1"]',1500);await shot('m1b_rides_offroad');await tap('#r2C [data-r2px="0"]',1200);
  await tap('#r2R [data-r2m="build"]',2500);await A('build');await shot('m2_build');
  await tap('#gbBkP [data-r2b="cat"]');await shot('m2b_build_cat');await tap('#gbBkCt [data-ct="Slopes"]');await shot('m2c_build_slopes');

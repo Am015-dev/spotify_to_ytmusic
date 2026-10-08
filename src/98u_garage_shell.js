@@ -103,16 +103,16 @@ function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]
 const R2_FP={gloss:{roughness:.15,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.6,k:1},matte:{roughness:1,clearcoat:0,metalness:0,envMapIntensity:.15,k:.92,em:.12},
  metal:{metalness:.7,roughness:.26,clearcoat:.8,clearcoatRoughness:.12,envMapIntensity:1.4,k:1.1,em:.12,env:1},
  chrome:{metalness:1,roughness:.05,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.25,k:1,mix:.7,em:.03,env:1},
- // chrome on the street car: the world sky dominates a pure mirror (it read blue/see-through), so less metal and a brighter silver base
- chromeD:{metalness:.55,roughness:.1,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:.8,k:1,mix:.8,em:.14,env:1},
+ // chrome on the street car: the world sky dominates a pure mirror (it read blue/see-through), so less metal, a mid-steel base (#8d939b) and real shading (no glow)
+ chromeD:{metalness:.6,roughness:.3,clearcoat:.5,clearcoatRoughness:.1,envMapIntensity:.9,k:1,mix:.85,mixC:'.55,.58,.61',em:0,env:1},
  pearl:{roughness:.2,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.5,k:1,em:.16,pearl:1}};
 const R2_MC={};
 // studio reflection map for chrome/metal: a plain canvas (works in the garage renderer and the game renderer alike): bright sky, soft-box strips, horizon, grey floor
 let R2_ENV=null;
 function R2_env(){if(R2_ENV)return R2_ENV;const[c,g]=cv(512,256),s=g.createLinearGradient(0,0,0,256);s.addColorStop(0,'#f4f4f4');s.addColorStop(.38,'#c9cbcf');s.addColorStop(.48,'#ffffff');s.addColorStop(.52,'#26282c');s.addColorStop(.7,'#6b6e74');s.addColorStop(1,'#3a3c40');g.fillStyle=s;g.fillRect(0,0,512,256);
  g.fillStyle='#fff';for(let i=0;i<4;i++)g.fillRect(40+i*128,24,52,70);g.fillStyle='#1a1b1e';for(let i=0;i<8;i++)g.fillRect(i*64+20,150,14,90);const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;return R2_ENV=t}
-function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,mix,em,env,pearl,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(env)m.envMap=R2_env();
- const e=em==null?.16:em;m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>'+(mix?`\ndiffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.95,.98),${mix.toFixed(2)});`:''))
+function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{k,mix,mixC,em,env,pearl,...P}=R2_FP[f],m=GB_MAT.clone();Object.assign(m,P);m.color.setScalar(k);if(env)m.envMap=R2_env();
+ const e=em==null?.16:em;m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>'+(mix?`\ndiffuseColor.rgb=mix(diffuseColor.rgb,vec3(${mixC||'.93,.95,.98'}),${mix.toFixed(2)});`:''))
   .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';'+(pearl?'\n{float r2v=1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.);totalEmissiveRadiance+=mix(diffuseColor.rgb,vec3(.45,.62,1.),.55)*(.5*r2v*r2v*r2v);}':''))};
  m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
 const R2_fin=()=>{try{const f=GP_pa().fin;return R2_FP[f]&&f!=='chromeD'?f:'gloss'}catch(e){return'gloss'}};
