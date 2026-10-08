@@ -103,6 +103,8 @@ function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]
 const R2_FP={gloss:{roughness:.15,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.6,k:1},matte:{roughness:1,clearcoat:0,metalness:0,envMapIntensity:.15,k:.92,em:.12},
  metal:{metalness:.7,roughness:.26,clearcoat:.8,clearcoatRoughness:.12,envMapIntensity:1.4,k:1.1,em:.12,env:1},
  chrome:{metalness:1,roughness:.05,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:1.25,k:1,mix:.7,em:.03,env:1},
+ // chrome on the street car: the world sky dominates a pure mirror (it read blue/see-through), so less metal and a brighter silver base
+ chromeD:{metalness:.55,roughness:.1,clearcoat:1,clearcoatRoughness:.03,envMapIntensity:.8,k:1,mix:.8,em:.14,env:1},
  pearl:{roughness:.2,clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.5,k:1,em:.16,pearl:1}};
 const R2_MC={};
 // studio reflection map for chrome/metal: a plain canvas (works in the garage renderer and the game renderer alike): bright sky, soft-box strips, horizon, grey floor
@@ -113,11 +115,11 @@ function R2_mat(f){if(!R2_FP[f])return GB_MAT;if(R2_MC[f])return R2_MC[f];const{
  const e=em==null?.16:em;m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>'+(mix?`\ndiffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.95,.98),${mix.toFixed(2)});`:''))
   .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*'+e.toFixed(2)+';'+(pearl?'\n{float r2v=1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.);totalEmissiveRadiance+=mix(diffuseColor.rgb,vec3(.45,.62,1.),.55)*(.5*r2v*r2v*r2v);}':''))};
  m.customProgramCacheKey=()=>'r2'+f;m.userData.r2=f;return R2_MC[f]=m}
-const R2_fin=()=>{try{const f=GP_pa().fin;return R2_FP[f]?f:'gloss'}catch(e){return'gloss'}};
+const R2_fin=()=>{try{const f=GP_pa().fin;return R2_FP[f]&&f!=='chromeD'?f:'gloss'}catch(e){return'gloss'}};
 function R2_finSet(o,f){if(!o)return 0;const M=R2_mat(f);let n=0;o.traverse(x=>{if(!x.isMesh||x.userData.r!=null||!x.material)return;if(x.material===GB_MAT||(x.material.userData&&x.material.userData.r2)){if(x.material!==M)x.material=M;n++}});return n}
 function R2_finPick(f){GP_save('fin',f==='gloss'?'gloss':f);if(GB.mesh)R2_finSet(GB.mesh,f);try{AU.sfx('pick')}catch(e){}R2_ctx()}
 // the player's car while driving: re-applied when the mesh or the set changes (cheap: a few dozen meshes, twice a second)
-setInterval(()=>{try{if(typeof pl==='undefined'||!pl||!pl.mesh||state==='menu')return;R2_finSet(pl.mesh,R2_fin())}catch(e){}},500);
+setInterval(()=>{try{if(typeof pl==='undefined'||!pl||!pl.mesh||state==='menu')return;const f=R2_fin();R2_finSet(pl.mesh,f==='chrome'?'chromeD':f)}catch(e){}},500);
 // ---------- camera: frame the car in the free area (right of the rail, under the header, above the context bar, left of the panel)
 function R2_calc(){const c=$('#gbC');if(!c)return null;const r=c.getBoundingClientRect();if(!r.width)return null;const vis=e=>e&&e.offsetParent&&getComputedStyle(e).display!=='none';
  const R=$('#r2R'),H=$('#r2H'),p=$('#gbx .gbp'),C=GB_.bk?$('#gbBkP'):$('#r2C');let l=0,t=0,R0=r.width,b=r.height;
@@ -212,5 +214,5 @@ R2_dom();
 @media (min-height:501px) and (min-width:900px){#gbx.r2{--r2hh:58px;--r2rw:92px;--r2ch:60px;--r2pw:400px}#gbx .r2T{height:48px;font-size:13px}#r2H .r2Rib b{font-size:20px}#r2H .r2Nm b{font-size:18px}#r2H .r2Bud i{width:110px}#r2R .r2T{max-height:84px}#r2R .r2T i{font-size:24px}#r2R .r2T span{font-size:13px}#gbx.r2 #gbBkPc .gbPc{width:62px;height:50px}}
 @media (max-width:760px),(max-height:500px){#gbx.r2 #gbBkPc .gbPc{width:52px;height:44px}#gbx.r2 .r2BkT .r2T{padding:0 7px}#gbx.r2 .r2BkT .r2T{font-size:12px}}`;document.head.appendChild(st)}
 window.__r2={mode:()=>R2_cur(),fr:()=>R2.fr,mats:()=>{const o={};GB.mesh&&GB.mesh.traverse(x=>{if(!x.isMesh)return;let v=x.visible;for(let p=x.parent;p;p=p.parent)v=v&&p.visible;const k=(x.material===GB_MAT?'GB':(x.material.userData&&x.material.userData.r2)||x.material.type)+(v?'':'(hid)')+(x.userData.r!=null?'w':'');o[k]=(o[k]||0)+1});return o},busy:()=>R2.busy+' '+(R2.perr||''),cand:(x,y)=>{const h=GB_pick(x,y),c=GB_cand(h);return{h:h&&{i:h.i,j:h.j,b:!!h.brick},c:c&&{x:c.x,z:c.z,y:c.y,bad:!!c.bad},cap:!!GB_.capHit}},go:(m,s)=>R2_go(m,s),fin:()=>R2_fin(),finMat:f=>R2_mat(f),area:()=>R2_calc(),kitTh:k=>R2_kitTh(k),
- plFin:()=>{try{let f=null;pl.mesh.traverse(x=>{if(x.isMesh&&x.material&&x.material.userData&&x.material.userData.r2)f=x.material.userData.r2});return f||'gloss'}catch(e){return null}},
+ plFin:()=>{try{let f=null;pl.mesh.traverse(x=>{if(x.isMesh&&x.material&&x.material.userData&&x.material.userData.r2)f=x.material.userData.r2});return(f||'gloss').replace('chromeD','chrome')}catch(e){return null}},
  gbFin:()=>{let f=null;GB.mesh&&GB.mesh.traverse(x=>{if(x.isMesh&&x.material&&x.material.userData&&x.material.userData.r2)f=x.material.userData.r2});return f||'gloss'}};
