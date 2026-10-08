@@ -25,6 +25,7 @@ function kitSettings() {
     sound: S => { S.appendChild(GX.row('Sound', GX.onoff(UI.sound !== false, v => { UI.sound = v; try { if (window.GA) { GA.setSfx(v); GA.setMusic(v); } } catch (e) { } sndMusic(); }, 'Sound and music'))); },
     help: S => {
       S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Cards & places')]));
+      if (typeof GXT !== 'undefined') { const tb = tutNode('gx-sb'); if (tb) { tb.querySelector('span') && tb.querySelector('span').remove(); S.appendChild(GX.row('Tutorial', tb)); } }
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
     },
     about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names, texts and pictures are our own; the pictures are drawn in code. Sounds and music are CC0 recordings (Kenney, OpenGameArt).' }
@@ -74,7 +75,7 @@ function kitRecap() { }
 function recapSeats() { GX.recap.clear(); const hs = humans(); GX.recap.seats(hs.length ? hs : [0]); }
 // ---- results, statistics, achievements
 function kitResult() {
-  if (!G || !G.over || UI.resultDone) return; UI.resultDone = true; if (UI.camp) return; // story chapters report through GXC.finish
+  if (!G || !G.over || UI.resultDone || (UI.cfg && UI.cfg.tutorial)) return; UI.resultDone = true; if (UI.camp) return; // story chapters report through GXC.finish
   const hs = humans(); if (!hs.length) return; // watching computers: not your game
   const ov = G.over, me = NET.on ? NET.mySeat : hs.length === 1 ? hs[0] : -1;
   const seats = G.players.map((p, i) => ({ name: p.name, ai: p.ai || null, me: i === me }));
