@@ -112,7 +112,7 @@ const OD_CHECKLIST=[
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
-  const busy=!ov.hidden||!n||P.done&&ans===n||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
+  const busy=!ov.hidden||!n||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
   pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen)||pinCd();
   if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
