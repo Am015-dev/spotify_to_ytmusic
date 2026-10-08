@@ -66,9 +66,21 @@ async function tutHoldWait() {
   for (let g = 0; g < 900 && tutOn(); g++) { const st = GXT.current(); if (!(st && st.hold && st.hold())) return; await wait(80); }
 }
 // ---------------------------------------------------------------- where each step points
-const tq = sel => () => { const e = document.querySelector(sel); return e && e.getBoundingClientRect().width ? e : null; };
+
+// glowing things pulse a few pixels; a spotlight that follows every pulse would redraw its bubble all the time, so a rect only moves when it moved by more than 7 px
+function tutSteady(key, r) {
+  if (!r) { delete tutSteady.last[key]; return null; }
+  const o = tutSteady.last[key];
+  if (o && Math.abs(o.left - r.left) < 7 && Math.abs(o.top - r.top) < 7 && Math.abs(o.width - r.width) < 7 && Math.abs(o.height - r.height) < 7) return o;
+  return (tutSteady.last[key] = r);
+}
+tutSteady.last = {};
+const tq = sel => () => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? tutSteady('q' + sel, { left: r.left, top: r.top, width: r.width, height: r.height }) : null; };
 // a hand card's visible part (later cards overlap it), so the tap lands on that card
 function tutHandRect(id) {
+  return tutSteady('hc' + id, tutHandRect0(id));
+}
+function tutHandRect0(id) {
   const e = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (!e) return null;
   const r = e.getBoundingClientRect(); if (!r.width) return null;
   let right = r.right, bottom = r.bottom, seen = false;
@@ -94,7 +106,7 @@ const tutJobChip = i => () => {
 const tutBox = sel => () => {
   const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 4 && r.height > 4); if (!rs.length) return null;
   const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
-  return { left: l - 4, top: t - 4, width: r2 - l + 8, height: b - t + 8 };
+  return tutSteady('box' + sel, { left: l - 4, top: t - 4, width: r2 - l + 8, height: b - t + 8 });
 };
 const tutFelt = tutBox('#slots .tslot');
 const myTurnLead = () => G && G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !UI.busy && !UI.fz;
@@ -107,9 +119,9 @@ function tutSteps() {
       ready: () => G && G.phase === 'assign' && G.att === 1 && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard') },
     { id: 'cmd', title: 'You are Commander', say: 'You hold Lantern 4, so you are the Commander. The Commander picks a job first.', target: () => tutHandRect(tcard('L4')), wait: null,
       ready: () => G && G.phase === 'assign' && !UI.busy && !!tutHandRect(tcard('L4')) },
-    { id: 'take', title: 'Take a job', say: 'Tap "Win the Lantern 3". You hold Lantern 3 and 4, so it is safe.', target: tq('#pool [data-key="job0"]'),
+    { id: 'take', title: 'Take a job', say: 'Tap the "Lantern 3" job: win that card. You hold Lantern 3 and 4, so it is safe.', target: tq('#pool [data-key="job0"]'),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' && a.mv.i === 0 }, ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy },
-    { id: 'mates', title: 'Dag takes one', say: 'Dag took "Win the first trick". Both jobs must be done to win the dive.', target: tutJobChip(1), wait: null,
+    { id: 'mates', title: 'Dag takes one', say: 'Dag took "The first trick": he must win trick 1. Both jobs must be done to win.', target: tutJobChip(1), wait: null,
       ready: () => G && G.phase === 'distress' && G.tasks[1].owner === 1 && !UI.busy && !!tutJobChip(1)() },
     { id: 'flare', title: 'Distress flare', say: 'Optional: after a lost try, divers can swap cards. Not now: tap No flare.', target: tq('#acts [data-a=dist][data-on=false]'),
       wait: { type: 'tap', match: a => a.mv && a.mv.t === 'dist' && !a.mv.on }, ready: () => G && G.phase === 'distress' && iMustAct() && !UI.busy },
