@@ -139,7 +139,7 @@ async function helpFlow(p, tag, st, o) {
 async function playGame(b, W, H, variant, tag, opt) {
   opt = opt || {}; const p = await newPage(b, W, H); const hst = { seen: new Set() }; let steps = 0, rotated = false, lastSig = '', lastT = Date.now(), maxStuck = 0;
   try {
-    await p.evaluate(v => { UI.speed = 30; UI.first = !!v.first; UI.setup.river = !!v.river; UI.setup.ic = !!v.ic; UI.setup.tb = !!v.tb; UI.setup.rivals = v.rivals || 1; UI.setup.lv = v.lv || 'normal'; try { localStorage.removeItem('rv_seen'); } catch (e) { } }, { ...variant, first: opt.first });
+    await p.evaluate(v => { UI.speed = 30; UI.first = !!v.first; UI.offered = true; UI.setup.river = !!v.river; UI.setup.ic = !!v.ic; UI.setup.tb = !!v.tb; UI.setup.rivals = v.rivals || 1; UI.setup.lv = v.lv || 'normal'; try { localStorage.removeItem('rv_seen'); } catch (e) { } }, { ...variant, first: opt.first });
     await p.evaluate(() => showStart()); await p.tap('[data-a=play]'); await sleep(500);
     const seen = new Set(); if (opt.tipsOff) await p.evaluate(() => GXH.setEnabled(false));
     for (let it = 0; it < 900; it++) {

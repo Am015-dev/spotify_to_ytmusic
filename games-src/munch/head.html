@@ -237,7 +237,7 @@ h3{font-size:1.02rem}
 .card.flip{animation:flip .75s cubic-bezier(.3,.7,.3,1.1);transform-style:preserve-3d}@keyframes flip{0%{transform:perspective(700px) rotateY(180deg) translateY(-30px) scale(1.15)}60%{transform:perspective(700px) rotateY(-12deg) scale(1.05)}}
 .card.flip .cback{animation:backside .75s linear}@keyframes backside{0%,44%{opacity:1}46%,100%{opacity:0}}
 .tableau{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
-.ghost{position:absolute;left:0;top:0;pointer-events:none;z-index:30;transform-origin:0 0;will-change:transform,opacity}
+.ghost:not(.gxc-btn){position:absolute;left:0;top:0;pointer-events:none;z-index:30;transform-origin:0 0;will-change:transform,opacity}
 .ghost .card{box-shadow:0 20px 30px rgba(0,0,0,.55)}
 .fxlayer{position:absolute;inset:0;pointer-events:none;z-index:4}
 /* dice: an ivory die with red pips */

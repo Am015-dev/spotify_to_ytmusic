@@ -30,6 +30,7 @@ function use(G, k, n) { G.used[k] = (G.used[k] || 0) + (n === undefined ? 1 : n)
 const effOf = (G, c) => c === 'W' ? 'none' : c === 'O' ? 'none' : c === 'K' ? 'black' : D.BOOKS[c][G.sets[c]].eff;
 const bookOut = (G, c) => G.round >= D.BOOK_ROUND[c];
 const price = (G, c, v) => { const b = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]]; const i = v === 1 ? 0 : v === 2 ? 1 : 2; return b.price[i]; };
+const lastOf = G => G.last || D.rounds;            // the number of days (9; a short staged game, e.g. the tutorial, sets G.last)
 const left = (G, s) => (s + 1) % G.np, right = (G, s) => (s - 1 + G.np) % G.np;
 const whiteSum = p => p.pot.reduce((a, c) => a + (c.c === 'W' ? c.v : 0), 0);
 const count = (arr, c) => arr.reduce((a, x) => a + (x.c === c ? 1 : 0), 0);
@@ -58,7 +59,7 @@ function newGame(o) {
   o = o || {};
   const np = Math.max(2, Math.min(4, (o.players | 0) || 2));
   const seed = (o.seed === undefined ? Date.now() : o.seed) | 0;
-  const G = { v: 1, np, seed, rng: seed, round: 1, phase: 'prep', start: 0, sets: {}, supply: clone(D.SUPPLY), nextId: 1, fdeck: [], fcard: null, fdisc: [], players: [], log: [], logN: 0, events: [], evN: 0, used: {}, hist: [], rep: null, over: false, winner: -1, winners: [], winText: '', ev: null, shopSeat: -1, opts: { setMode: o.setMode || 1, guided: !!o.guided }, force: o.firstCard || null };
+  const G = { v: 1, np, seed, rng: seed, round: 1, phase: 'prep', start: 0, sets: {}, supply: clone(D.SUPPLY), nextId: 1, fdeck: [], fcard: null, fdisc: [], players: [], log: [], logN: 0, events: [], evN: 0, used: {}, hist: [], rep: null, over: false, winner: -1, winners: [], winText: '', ev: null, shopSeat: -1, opts: { setMode: o.setMode || 1, guided: !!o.guided }, force: o.firstCard || null, last: o.length ? Math.max(1, Math.min(D.rounds, o.length | 0)) : D.rounds };
   const sets = o.sets;
   ['G', 'B', 'R', 'Y', 'P'].forEach(c => { G.sets[c] = sets ? sets[c] : (o.setMode === 'random' ? 1 + rnd(G, 4) : (o.setMode || 1)); });
   for (let i = 0; i < np; i++) {
@@ -68,7 +69,7 @@ function newGame(o) {
     for (const k of Object.keys(D.START_BAG)) for (let n = 0; n < D.START_BAG[k]; n++) p.bag.push(take(G, k));
   }
   G.fdeck = shuffleG(G, D.FORTUNE.map(f => f.id));
-  lg(G, 'The fair opens: ' + np + ' potion-makers, 9 days. Books: ' + ['G', 'B', 'R', 'Y', 'P'].map(c => D.COLORS[c].name + ' ' + G.sets[c]).join(', ') + '.');
+  lg(G, 'The fair opens: ' + np + ' potion-makers, ' + lastOf(G) + ' days. Books: ' + ['G', 'B', 'R', 'Y', 'P'].map(c => D.COLORS[c].name + ' ' + G.sets[c]).join(', ') + '.');
   startRound(G);
   adv(G);
   return G;
@@ -87,7 +88,7 @@ function startRound(G) {
   G.fcard = id; G.fdisc.push(id);
   const card = FORT[id]; use(G, 'fortune_' + id);
   ev(G, { t: 'round', round: G.round, start: G.start }); ev(G, { t: 'fortune', id });
-  lg(G, 'Day ' + G.round + ' of 9. ' + pn(G, G.start) + ' turns up the fortune card "' + card.name + '": ' + card.text);
+  lg(G, 'Day ' + G.round + ' of ' + lastOf(G) + '. ' + pn(G, G.start) + ' turns up the fortune card "' + card.name + '": ' + card.text);
   if (id !== 'clear') setRats(G);          // Clear the Pods gives points first: the rat tails are counted after the answers (see H 'clear')
   purple(G, id);
 }
@@ -105,7 +106,7 @@ const oneChips = G => ['O', 'G', 'B', 'R'].concat(bookOut(G, 'Y') ? ['Y'] : []);
 const chipsOfValue = (G, v) => ['G', 'B', 'R', 'Y'].filter(c => bookOut(G, c) && D.COLORS[c].vals.indexOf(v) >= 0 && G.supply[c + v] > 0).map(c => c + v);
 function ask(G, p, h, d) { p.q = { h, d: d || {} }; }
 function purple(G, id) {
-  const P = G.players, last = G.round === D.rounds;
+  const P = G.players, last = G.round === lastOf(G);
   const lowest = (fn) => { const m = Math.min.apply(null, P.map(fn)); return P.filter(p => fn(p) === m); };
   switch (id) {
     case 'pick': if (last) { for (const p of P) addRuby(G, p, 3, 'Pedlar\'s Pick'); lg(G, 'Last day: a chip could never be drawn, so everybody simply takes the 3 rubies.'); } else for (const p of P) ask(G, p, 'pick'); break;
@@ -306,7 +307,7 @@ function apply(G, seat, mv) {
   if (!mv || typeof mv !== 'object' || typeof mv.t !== 'string') return { ok: false, error: 'bad move' };
   const p = G.players[seat];
   // the last day: every cauldron secretly commits to "draw" or "stop", then all are revealed together ("Stir!")
-  if (G.round === D.rounds && G.phase === 'brew' && p.st === 'draw' && !p.q && (mv.t === 'draw' || mv.t === 'stop')) {
+  if (G.round === lastOf(G) && G.phase === 'brew' && p.st === 'draw' && !p.q && (mv.t === 'draw' || mv.t === 'stop')) {
     if (p.lock) return { ok: false, error: 'you have already chosen; wait for the others' };
     if (!moves(G, seat).some(x => x.t === mv.t)) return { ok: false, error: mv.t === 'stop' ? 'draw at least one chip first' : 'the bag is empty' };
     p.lock = true; p.h9 = mv.t; p.ver++; ev(G, { t: 'lock', seat }); lg(G, nm(G, p) + ' has decided.');
@@ -323,7 +324,7 @@ function apply(G, seat, mv) {
 }
 // day 9: when every cauldron that can still draw has committed, reveal all choices at once, starting with the start player
 function stir(G) {
-  if (G.round !== D.rounds || G.phase !== 'brew') return;
+  if (G.round !== lastOf(G) || G.phase !== 'brew') return;
   const P = G.players, ready = P.filter(p => p.lock);
   if (!ready.length) return;
   if (P.some(p => p.st === 'draw' && !p.lock && (p.q || moves(G, p.seat).some(x => x.t === 'draw' || x.t === 'stop')))) return;
@@ -533,7 +534,7 @@ function evalStep(G) {
         ev(G, { t: 'scored', seat: p.seat, space: p.res.space, boom: p.boom });
       }
       for (const p of P) if (G.fcard === 'lucky7' && !p.boom && whiteSum(p) === 7) { drop(G, p, 1, 'Lucky Seven'); use(G, 'lucky7hit'); }
-      if (G.fcard === 'spilled' && G.round < D.rounds) for (const p of P) if (p.boom) { const l = P[left(G, p.seat)]; if (chipsOfValue(G, 2).length) { ask(G, l, 'gift'); lg(G, pn(G, l.seat) + ' may take a 2-chip from ' + nm(G, p) + '\'s spilled brew.'); } }
+      if (G.fcard === 'spilled' && G.round < lastOf(G)) for (const p of P) if (p.boom) { const l = P[left(G, p.seat)]; if (chipsOfValue(G, 2).length) { ask(G, l, 'gift'); lg(G, pn(G, l.seat) + ' may take a 2-chip from ' + nm(G, p) + '\'s spilled brew.'); } }
       E.step = 'gifts'; return 'go';
     }
     case 'gifts': { if (hasQ(G)) return 'wait'; E.step = 'die'; return 'go'; }
@@ -556,7 +557,7 @@ function evalStep(G) {
       E.step = 'de'; for (const p of P) { const s = p.res.space; p.res.coins = D.COINS[s]; p.res.vp = D.VP[s]; p.res.spoon = s === SPOON; if (s === SPOON) use(G, 'spoon'); }
       for (const p of P) {
         if (p.boom && !p.prot) {
-          if (G.round === 9) { p.res.mode = Math.floor(p.res.coins / D.endCoinsPerVp) > p.res.vp ? 'buy' : 'vp'; }
+          if (G.round === lastOf(G)) { p.res.mode = Math.floor(p.res.coins / D.endCoinsPerVp) > p.res.vp ? 'buy' : 'vp'; }
           else if (p.res.coins > 0 || p.res.vp > 0) { ask(G, p, 'de', { vp: p.res.vp, coins: p.res.coins }); }
           else p.res.mode = 'vp';
         }
@@ -569,13 +570,13 @@ function evalStep(G) {
         const r = p.res;
         if (G.fcard === 'glint' && D.RUBY[r.space]) addVp(G, p, 2, 'Ruby Glint');
         if (r.mode === 'both' || r.mode === 'vp') { addVp(G, p, r.vp, 'the scoring space'); }
-        if (G.round === 9 && (r.mode === 'both' || r.mode === 'buy')) { const n = Math.floor(r.coins / D.endCoinsPerVp); if (n) addVp(G, p, n, r.coins + ' coins (5 coins = 1 point)'); }
+        if (G.round === lastOf(G) && (r.mode === 'both' || r.mode === 'buy')) { const n = Math.floor(r.coins / D.endCoinsPerVp); if (n) addVp(G, p, n, r.coins + ' coins (5 coins = 1 point)'); }
         r.gotVp = p.vp;
       }
       E.step = 'shop'; E.i = 0; return 'go';
     }
     case 'shop': {
-      if (G.round === 9) { E.step = 'ruby2'; return 'go'; }
+      if (G.round === lastOf(G)) { E.step = 'ruby2'; return 'go'; }
       for (; E.i < order.length; E.i++) {
         const p = order[E.i];
         if (p.q) { G.shopSeat = p.seat; return 'wait'; }
@@ -584,7 +585,7 @@ function evalStep(G) {
       G.shopSeat = -1; E.step = 'ruby2'; return 'go';
     }
     case 'ruby2': {
-      if (G.round === 9) { E.step = 'clean'; return 'go'; }
+      if (G.round === lastOf(G)) { E.step = 'clean'; return 'go'; }
       if (G.fcard === 'spring') { for (const p of P) if (!p.flask) { p.flask = true; ev(G, { t: 'refill', seat: p.seat, free: true }); } lg(G, 'Spring Water: every flask is refilled.'); }
       if (!E.rubyAsked) { E.rubyAsked = true; for (const p of P) if (p.rubies >= D.rubySpend) ask(G, p, 'ruby'); }
       if (hasQ(G)) return 'wait';
@@ -663,12 +664,12 @@ function blackAct(G, p) {
 function cleanup(G) {
   const P = G.players; if (G.rep) G.rep.logTo = G.logN;
   for (const p of P) {
-    if (G.round === 9) p.last9 = p.res.pos;
+    if (G.round === lastOf(G)) p.last9 = p.res.pos;
     G.hist.push({ round: G.round, seat: p.seat, gain: p.vp - p.res.vp0, rgain: p.rubies - p.res.ru0, space: p.res.space, coins: p.res.coins, vp: p.res.vp, boom: p.boom, prot: p.prot, mode: p.res.mode, bought: p.res.bought, die: p.res.die, chips: p.res.chips, white: p.res.white, after: p.vp, fortune: G.fcard });
     for (const c of p.pot) delete c.pos;
     p.bag = p.bag.concat(p.pot, p.hold, p.newChips); p.pot = []; p.hold = []; p.newChips = []; p.rat = 0; p.q = null;
   }
-  if (G.round >= D.rounds) { finish(G); return; }
+  if (G.round >= lastOf(G)) { finish(G); return; }
   G.round++; G.start = (G.start + 1) % G.np;
   if (G.round === D.extraWhiteRound) { for (const p of P) { const c = take(G, 'W1'); if (c) p.bag.push(c); } lg(G, 'Day 6: everyone adds a white 1 to their bag.'); ev(G, { t: 'extraWhite' }); }
   if (G.round === 2) { lg(G, 'The Sunroot stall opens (yellow chips can be bought).'); ev(G, { t: 'bookOut', c: 'Y' }); }
@@ -735,7 +736,7 @@ function render_game_to_text(G) {
   return JSON.stringify(o);
 }
 
-CF.newGame = newGame; CF.moves = moves; CF.apply = apply; CF.pending = pending; CF.sideToAct = sideToAct; CF.stripView = stripView; CF.score = score;
+CF.lastOf = lastOf; CF.newGame = newGame; CF.moves = moves; CF.apply = apply; CF.pending = pending; CF.sideToAct = sideToAct; CF.stripView = stripView; CF.score = score;
 CF.checkInvariants = checkInvariants; CF.render_game_to_text = render_game_to_text; CF.risk = risk;
 CF.whiteSum = whiteSum; CF.limitOf = limitOf; CF.spaceOf = spaceOf; CF.lastPos = lastPos; CF.startPos = startPos; CF.price = price; CF.bookOut = bookOut; CF.effOf = effOf; CF.nameOf = nameOf; CF.buyOptions = buyOptions; CF.buyList = buyList; CF.upgrades = upgrades; CF.moveOf = moveOf; CF.chipsOfValue = chipsOfValue;
 CF._ = { rnd, prnd, shuffleG, shuffleP, take, give, bagInsert, ev, lg, adv, startRound, placeChip, mkChip, ck, enterPost, evalStep, cleanup, rollDie, settle, putBack };

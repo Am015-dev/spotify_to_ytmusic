@@ -47,9 +47,18 @@ async function cutCheck(p, tag) {
   const bad = await p.evaluate(() => { const o = []; for (const e of document.querySelectorAll('.gx-bar button,#acts button,#prompt,#me')) { if (e.closest('[hidden]') || e.closest('details:not([open]) > :not(summary)')) continue; const r = e.getBoundingClientRect(); if (!r.width) continue; if (r.right > innerWidth + 1 || r.bottom > innerHeight + 1 || r.left < -1 || r.top < -1) { let sc = false; for (let a = e.parentElement; a && a !== document.body; a = a.parentElement) { const cs = getComputedStyle(a); if (/auto|scroll/.test(cs.overflowY) && a.scrollHeight > a.clientHeight + 1 && r.right <= innerWidth + 1) { sc = true; break; } } if (sc) continue; } else continue; const d = document.querySelector('#dockbody'); o.push(e.textContent.trim().slice(0, 25) + '|' + e.className + '|' + (d ? 'dockbody sh=' + d.scrollHeight + ' ch=' + d.clientHeight + ' ov=' + getComputedStyle(d).overflowY + ' ' : '') + (e.dataset.gx || e.dataset.a || e.id || e.className) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); } return o; });
   if (bad.length) { fail(tag, 'cut off', JSON.stringify(bad)); if (process.env.SHOTS) await p.screenshot({ path: process.env.SHOTS + '/cut-' + tag.replace(/\W+/g, '_') + '.png' }); }
 }
+// the lightbulb: its bubble (or rules card) opens, sits inside the screen, and its finger points at the suggestion
+async function helpPass(p, tag) {
+  await tapSel(p, tag, 'bulb', '#bulbbtn', { wait: 450 });
+  const o = await p.evaluate(() => { const b = document.querySelector('.gxh-bub.on,.gxh-rules .gxh-card'); const r = b && b.getBoundingClientRect(), f = document.querySelector('.gxh-finger'); let sg = null; try { sg = hlpSuggest(); } catch (e) { } const t = sg && sg.target && sg.target(), tr = t && t.getBoundingClientRect();
+    return { has: !!b, inside: !r || (r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1), finger: f && { x: +f.dataset.tx, y: +f.dataset.ty }, sug: tr && { x: tr.left + tr.width / 2, y: tr.top + tr.height / 2 } }; });
+  if (!o.has) fail(tag, 'the bulb opened nothing'); else if (!o.inside) fail(tag, 'help outside the screen');
+  if (o.finger && o.sug && (Math.abs(o.finger.x - o.sug.x) > 2 || Math.abs(o.finger.y - o.sug.y) > 2)) fail(tag, 'bulb finger is not on the suggestion');
+  await p.evaluate(() => GXH.hide());
+}
 // one pass over every visible control in the current orientation
 async function pass(p, tag) {
-  await toNextTurn(p, tag); await scrollCheck(p, tag); await cutCheck(p, tag);
+  await toNextTurn(p, tag); await scrollCheck(p, tag); await cutCheck(p, tag); await helpPass(p, tag);
   // game buttons: DRAW then Stop-adjacent controls
   await tapSel(p, tag, 'DRAW', '#acts .drawb');
   await p.waitForTimeout(900);
@@ -94,7 +103,10 @@ async function lat(p) { return p.evaluate(() => { const o = []; return new Promi
   for (const [LW, LH] of sizes.filter(s => s[0] > s[1])) {
     const p = await newPage(b, 390, 763); await startGame(p);
     await pass(p, `P(390x763)`);
-    await rotate(p, LW, LH); console.log(`rotated to ${LW}x${LH}; main-thread stall ms:`, await lat(p), 'html:', await p.evaluate(() => document.documentElement.className));
+    // a help bubble that is open while the phone turns is re-placed inside the new screen
+    await tapSel(p, 'P', 'bulb (open while rotating)', '#bulbbtn', { wait: 450 }); await rotate(p, LW, LH);
+    { const o = await p.evaluate(() => { const b = document.querySelector('.gxh-bub.on,.gxh-rules .gxh-card'); if (!b) return { gone: true }; const r = b.getBoundingClientRect(); return { inside: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 }; }); if (o.inside === false) fail('L(' + LW + 'x' + LH + ')', 'an open help bubble is outside the screen after rotating'); await p.evaluate(() => GXH.hide()); }
+    await rotate(p, 390, 763); await rotate(p, LW, LH); console.log(`rotated to ${LW}x${LH}; main-thread stall ms:`, await lat(p), 'html:', await p.evaluate(() => document.documentElement.className));
     await pass(p, `L(${LW}x${LH})`);
     await rotate(p, 390, 763); await pass(p, `P-again`);
     await rotate(p, LW, LH); await pass(p, `L-again(${LW}x${LH})`);
