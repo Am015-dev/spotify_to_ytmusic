@@ -29,3 +29,9 @@ The laptop made the pictures; the Linux session wires them in, tests and deploys
 
 ## Licence
 Google Flow (Nano Banana) image generation from our own prompts, with no reference to the original game, its art or its publisher. Add a credit line to the game's credits and `kit/ASSETS.md`.
+
+## Wired (2026-10-08)
+- Kingdom cards: `build.py` embeds `art/*.webp` as `TB_ART` (blob URLs in `ui1.js`); `kcSpec` sets `img`, the kit's `paintedArt()` draws it with `slice` (kc27 keeps the drawn art). Kit: edit `kit/kit.js` directly (`kit/parts/` is stale).
+- Extras in `ui13.js`: face-down card back (`back-default`, or the latest `cardback` unlock), table behind the map (`table-court` / `-phone`, or the latest `table` unlock; CSS vignette; CSS only while loading and on Low graphics). Portraits through `GXC.init({artBase:'media/'})`, title key art in `titleArt()`, end art in `overHTML()`.
+- Music: `games/thornbound/music/*.mp3` (a and b of tavern/main/fight/victory/defeat), `audio-data.js` points at them. `ui14.js` picks the track per screen (title = tavern, game = main, final round = fight, end card = victory/defeat) and has the Music panel (Menu, Settings and the title screen). Music is now on by default (`tb_mus` = 0 turns it off); choices are saved in `tb_mpick`.
+- Page size: 1.25 MB -> 1.82 MB. Screenshots: `playtest/`.

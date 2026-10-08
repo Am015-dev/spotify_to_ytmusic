@@ -438,8 +438,24 @@ function backPattern(f, P) {
   for (i = 0; i < 6; i++) for (j = 0; j < 8; j++) s += '<circle cx="' + (22 + i * 43.2) + '" cy="' + (22 + j * 47) + '" r="1.5" fill="' + P.accent + '" opacity=".28"/>';
   return s;
 }
+/* painted art (optional): TB.setArt({id: url}) for sp.img, TB.setBack(url) for the face-down back. Without them the procedural SVG art is used. */
+var IMG = {}, BACK = '';
+TB.setArt = function (m) { IMG = m || {}; TB.clearCache(); };
+TB.setBack = function (u) { if (u === BACK) return; BACK = u || ''; TB.clearCache(); };
+function paintedArt(sp) {
+  var u = sp.img && IMG[sp.img]; if (!u) return '';
+  return '<g clip-path="url(#tb-clip-art)"><image href="' + u + '" width="220" height="152" preserveAspectRatio="xMidYMid slice"/><rect width="220" height="152" fill="url(#tb-vig)" opacity=".45"/></g>';
+}
+function paintedBack(f, P, lite) {
+  var s = '<g clip-path="url(#tb-clip-card)"><rect width="260" height="372" fill="url(#tb-f-' + f + ')"/><image href="' + BACK + '" width="260" height="372" preserveAspectRatio="xMidYMid slice"/>';
+  s += '<rect x="5" y="5" width="250" height="362" rx="12" fill="none" stroke="' + P.main + '" stroke-width="10" opacity=".9"/></g>';
+  s += '<rect x="4" y="4" width="252" height="364" rx="13" fill="none" stroke="url(#tb-gold)" stroke-width="3"/><rect x="11" y="11" width="238" height="350" rx="7" fill="none" stroke="url(#tb-gold)" stroke-width="1.2" opacity=".85"/>';
+  s += '<g transform="translate(130 332)"><circle r="' + (lite ? 26 : 24) + '" fill="url(#tb-f-' + f + ')" stroke="url(#tb-gold)" stroke-width="2.4"/><g transform="scale(' + (lite ? 0.8 : 0.72) + ')">' + emblem(f) + '</g></g>';
+  return s;
+}
 function cardBackInner(f, lite) {
-  var P = fac(f), s = '<g clip-path="url(#tb-clip-card)"><rect width="260" height="372" fill="url(#tb-f-' + f + ')"/>';
+  var P = fac(f); if (BACK) return paintedBack(f, P, lite);
+  var s = '<g clip-path="url(#tb-clip-card)"><rect width="260" height="372" fill="url(#tb-f-' + f + ')"/>';
   s += '<rect width="260" height="372" fill="url(#tb-vig)" opacity=".8"/>' + backPattern(f, P);
   if (!lite) s += '<rect width="260" height="372" filter="url(#tb-grain)" opacity=".35"/>';
   s += '</g>';
@@ -464,7 +480,7 @@ function cardFaceInner(sp, lite) {
   if (lite) {
     /* compact layout for thumbnails: huge number, art, icon + cost */
     s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + P.main + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
-    s += '<g transform="translate(20 96)"><rect x="-2" y="-2" width="224" height="156" rx="7" fill="url(#tb-gold)"/>' + artSVG(sp.art, f, true) + '</g>';
+    s += '<g transform="translate(20 96)"><rect x="-2" y="-2" width="224" height="156" rx="7" fill="url(#tb-gold)"/>' + (paintedArt(sp) || artSVG(sp.art, f, true)) + '</g>';
     s += '<rect x="20" y="258" width="220" height="90" rx="6" fill="' + P.dark + '"/><g transform="translate(70 303) scale(3.6)">' + typeIcon(type, '#f1e3c3') + '</g>';
     if (sp.cost != null) s += '<g transform="translate(190 303)"><circle r="31" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="2"/><text y="14" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="40" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
     return s;
@@ -474,7 +490,7 @@ function cardFaceInner(sp, lite) {
   s += '<rect x="22" y="20" width="216" height="30" rx="4" fill="url(#tb-f-' + f + ')" stroke="url(#tb-gold)" stroke-width="1.6"/><path d="M26 23 H234" stroke="#fff" stroke-opacity=".18"/>';
   s += '<text x="130" y="' + n2(40.2 + (17.5 - tp) * .2) + '" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="' + tp + '" fill="' + P.glyph + '" stroke="rgba(0,0,0,.45)" stroke-width=".6" paint-order="stroke">' + esc(sp.title || '') + '</text>';
   /* art window */
-  s += '<g transform="translate(20 56)"><rect x="-2.5" y="-2.5" width="225" height="157" rx="8" fill="url(#tb-gold)"/><rect x="-.5" y="-.5" width="221" height="153" rx="6.5" fill="#1a110c"/>' + artSVG(sp.art, f, false) + '<rect width="220" height="152" rx="6" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.2"/></g>';
+  s += '<g transform="translate(20 56)"><rect x="-2.5" y="-2.5" width="225" height="157" rx="8" fill="url(#tb-gold)"/><rect x="-.5" y="-.5" width="221" height="153" rx="6.5" fill="#1a110c"/>' + (paintedArt(sp) || artSVG(sp.art, f, false)) + '<rect width="220" height="152" rx="6" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.2"/></g>';
   /* value badge */
   if (sp.value != null) s += '<g transform="translate(38 74)" filter="url(#tb-shadow)"><circle r="24.5" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="1.2"/><circle r="20" fill="url(#tb-f-' + f + ')" stroke="#2b1808" stroke-width="1"/><circle r="20" fill="url(#tb-seal)"/><text y="9.6" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="' + (String(sp.value).length > 1 ? 24 : 28) + '" fill="' + P.glyph + '" stroke="rgba(0,0,0,.55)" stroke-width="1.1" paint-order="stroke">' + esc(sp.value) + '</text></g>';
   /* cost coin */
@@ -500,7 +516,7 @@ function cardFaceInner(sp, lite) {
 }
 var cardCache = {}, tplCache = {}, cacheN = 0;
 function sizeToW(size) { if (size === 'small') return 60; if (size === 'medium') return 130; if (size === 'large' || size === 'enlarged') return 260; if (typeof size === 'object' && size) return size.w || size.width || 260; return +size || 260; }
-function cardKey(sp, lite) { return [sp.faceDown ? 'B' : 'F', sp.faction, sp.title, sp.value, sp.cost, sp.type, sp.typeLabel, sp.art, sp.text, sp.flavor, sp.tag, sp.num, lite ? 1 : 0].join('\u0001'); }
+function cardKey(sp, lite) { return [sp.faceDown ? 'B' : 'F', sp.faction, sp.title, sp.value, sp.cost, sp.type, sp.typeLabel, sp.art, sp.text, sp.flavor, sp.tag, sp.num, sp.img && IMG[sp.img] ? 1 : 0, lite ? 1 : 0].join('\u0001'); }
 function cardInner(sp, lite) {
   var k = cardKey(sp, lite);
   if (!cardCache[k]) { if (++cacheN > 600) { cardCache = {}; tplCache = {}; cacheN = 1; } cardCache[k] = sp.faceDown ? cardBackInner(FAC[sp.faction] ? sp.faction : 'neutral', lite) : cardFaceInner(sp, lite); }

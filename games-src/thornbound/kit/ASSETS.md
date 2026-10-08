@@ -12,3 +12,7 @@ Fallback stack when fonts fail: Palatino Linotype / Book Antiqua / Georgia / ser
 
 ## Tooling (not shipped in the game)
 Playwright 1.56 + Chromium (screenshots), fontTools + brotli (font subsetting), Pillow (screenshot crops). Build: `python3 build.py` joins `parts/p*.js` into `kit.js` and inlines it into `demo.html` from `demo-src.html`.
+
+## Painted art (2026-10-08)
+Kingdom-card paintings (`art/kc*.webp`, 256 px, 50 of 51), campaign portraits, card backs, court tables, title and end-screen art (`games/thornbound/media/*.webp`) were generated with Google Flow (Nano Banana) from our own prompts, with no reference to any existing game, its art or its publisher. The procedural SVG art above stays as the fallback (Herald of Applause and Low graphics).
+Music: ten Treblo tracks, see `../../audio/thornbound/ASSETS.md`.

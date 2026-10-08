@@ -173,7 +173,7 @@ const STORY={
  uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Lantern Rising if you enjoy bluffs, ambushes and knocking your rivals\' cards out of the game.',tag:'Tricks and ambushes · medium'},
  gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them, small cards win their fights, and patience is their weapon.',enjoy:'Choose the Pale Choir if you enjoy clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
 const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'full',levels:['normal','normal','normal','normal']};
-function titleArt(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
+function titleArtSvg(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
  '<linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a1c"/><stop offset=".45" stop-color="#3a1a30"/><stop offset=".72" stop-color="#8a3c3a"/><stop offset=".86" stop-color="#d98a52"/><stop offset="1" stop-color="#f2c27a"/></linearGradient>'+
  '<radialGradient id="tmoon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6d6"/><stop offset=".55" stop-color="#f6e2a8" stop-opacity=".9"/><stop offset="1" stop-color="#f6e2a8" stop-opacity="0"/></radialGradient>'+
  '<linearGradient id="tgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient>'+
@@ -199,6 +199,8 @@ function titleArt(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMi
 function hasSave(){const s=loadSave();return s&&s.G&&!s.G.over?s:null}
 function showStart(){try{GX.close()}catch(e){}closePop(true);hideGloss();const el=$('#start');el.hidden=false;document.body.classList.add('in-start');if(!NET.on){if(UI.joinCode&&!UI.linkShown){UI.linkShown=1;UI.sv='online'}else UI.sv=UI.onl&&UI.sv==='online'?'online':'title'}UI.cfgOpen=false;renderStart();
   const f=$('#start .tbtn.go,#start .sbtn.big');if(f)try{f.focus({preventScroll:true})}catch(e){}}
+// painted key art (desktop + phone) over the drawn scene, which stays as the fallback while it loads
+function titleArt(){return titleArtSvg()+'<picture><source media="(max-aspect-ratio:4/5)" srcset="media/title-phone.webp"><img class="tkey" src="media/title.webp" alt="" draggable="false" onerror="this.remove()"></picture>'}
 function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
 function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=el.scrollTop;
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
@@ -207,7 +209,7 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
       (firstTime()?tutBtn('tbtn go'):'')+(window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn'+(firstTime()?'':' go')+' story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'||firstTime()?'':' go')+'" data-a="play"><b>Play</b><span>against the computer</span></button>'+(firstTime()?'':tutBtn('tbtn'))+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
-      '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
+      '</div><div class="tlinks"><button class="tlink" data-a="rules">How to play</button><button class="tlink" data-a="music">Music</button></div></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
   const ONL=view==='online';
   el.innerHTML='<div class="setup"><div class="bgart">'+titleArt()+'</div>'+(ONL?onlineSetupHTML():setupHTML())+'</div>'+(UI.phone&&UI.cfgOpen&&!ONL?cfgDialogHTML():'');
   el.scrollTop=top}
