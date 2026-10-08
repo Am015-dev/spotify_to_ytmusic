@@ -1,3 +1,8 @@
+v88f: QUICK REVIEW PASS (79749841), out/v88f pushed, DEPLOY msg sent to coordinator. Reviewer's next-build items (not blocking):
+ 1. Hilde card: 2nd text line runs under the HIL avatar → padding-right ~64 px. 2. Map: ⚙ (#tuG) over AREA COMPLETION → hide while the
+ map is open; GARAGES-only view showed no garage icon → show ≥1 or a "nearest garage →" hint. 3. Map route diagonal leg through a block
+ → check the polyline follows road centrelines; add a checklist item.
+
 # >>> drive24c (2026-10-08 15:05) — release v88f fast track (coordinator): merge od-build25 + live, QUICK REVIEW, DEPLOY msg
 Fixes this round: (1) follow/tail GPS = the leader's own route S.R (A* to the moving truck snapped to the far carriageway → false
 "U-turn in 60 m" on Hot Drop; now "bear right in 90 m", qa24c/mission). (2) D24_despike: out-and-back spikes + destination hooks.
