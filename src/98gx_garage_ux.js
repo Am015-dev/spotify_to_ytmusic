@@ -45,11 +45,11 @@ function GX_pal(){const P=$('#gbBkP'),S=$('#gbBkPc');if(!P||!S)return;let C=$('#
    if(k==='fold'){GX.big=GX.big?0:1;GX_save();GX_lay();return}GX_cat(k)});
   // long-press a tile = ★ favourite (touch and mouse); right-click too. The click after a long-press does not pick the part.
   const clr=()=>{clearTimeout(GX.lp);GX.lp=null};
-  S.addEventListener('pointerdown',e=>{const b=e.target.closest('.gbPc');if(!b)return;clr();const x=e.clientX,y=e.clientY;GX.lpXY=[x,y];GX.lp=setTimeout(()=>{GX.lp=null;GX.lpT=performance.now();GX_star(b.dataset.p)},550)});
+  S.addEventListener('pointerdown',e=>{const b=e.target.closest('.gbPc');if(!b)return;clr();const x=e.clientX,y=e.clientY;GX.lpXY=[x,y];GX.lp=setTimeout(()=>{GX.lp=null;GX.lpT=performance.now();GX.lpP=b.dataset.p;GX_star(b.dataset.p)},550)});
   S.addEventListener('pointermove',e=>{if(GX.lp&&GX.lpXY&&Math.hypot(e.clientX-GX.lpXY[0],e.clientY-GX.lpXY[1])>10)clr()});
   for(const k of['pointerup','pointercancel','pointerleave'])S.addEventListener(k,clr);S.addEventListener('scroll',clr,{passive:true});
-  S.addEventListener('contextmenu',e=>{const b=e.target.closest('.gbPc');if(!b||!GB_.bk)return;e.preventDefault();GX.lpT=performance.now();GX_star(b.dataset.p)});
-  S.addEventListener('click',e=>{const b=e.target.closest('.gbPc');if(!b)return;if(performance.now()-GX.lpT<900){e.stopPropagation();e.preventDefault();return}GX_recent(b.dataset.p);setTimeout(GX_pal,0)},true);
+  S.addEventListener('contextmenu',e=>{const b=e.target.closest('.gbPc');if(!b||!GB_.bk)return;e.preventDefault();GX_star(b.dataset.p)});
+  S.addEventListener('click',e=>{const b=e.target.closest('.gbPc');if(!b)return;const lp=GX.lpP===b.dataset.p&&performance.now()-GX.lpT<900;GX.lpP=null;if(lp){e.stopPropagation();e.preventDefault();return}GX_recent(b.dataset.p);setTimeout(GX_pal,0)},true);
   for(const b of GX_tiles())b.dataset.n=(GB_PC[b.dataset.p]||{}).n||b.dataset.p}
  const cur=GX.cat||GB_.ct||'Bricks',chip=(k,t)=>`<button class="gxC ${cur===k?'on':''}" data-gxc="${k}">${t}</button>`;
  const h=`<button class="gxC gxF" data-gxc="fold" title="${GX.big?'Smaller palette':'Bigger palette'}">${GX.big?'▾':'▴'}</button>`+chip('fav','★ FAVS')+chip('rec','🕘 RECENT')+CR_CATS.map(c=>chip(c,c.toUpperCase())).join('');
@@ -69,7 +69,7 @@ function GX_do(a,g,btn){GX_sfx('pick');
  if(a==='close'){GX.open=0;GX.act=0;GX.ren=0;GX_ui();return}
  if(a==='all'){GX.hid.clear();GB_refresh();GS_tip('All parts shown');return}
  if(a==='mk'){if(SL.sel.length<1){GS_tip('SELECT parts first, then MAKE GROUP');return}GX_make();return}
- if(a==='eye'){if(GX.hid.has(g)){GX.hid.delete(g);GS_tip(GX_name(g)+' shown')}else{GX.hid.add(g);if(GX.act===g)GX.act=0;GS_tip(GX_name(g)+' hidden · it still saves')}GB_refresh();return}
+ if(a==='eye'){if(GX.hid.has(g)){GX.hid.delete(g);GS_tip(GX_name(g)+' shown')}else{GX.hid.add(g);if(GX.act===g)GX.act=0;SL_set(SL.sel);GS_tip(GX_name(g)+' hidden · it still saves')}GB_refresh();return}
  if(!g)return;
  if(GX.hid.has(g)&&a!=='ok'&&a!=='ren'){GS_tip('Hidden · tap 👁 to show it first');GX_sfx('bump');return}
  if(a==='pick'){if(GX.act===g){GX.act=0;SL_set([])}else GX_selG(g);GX_ui();return}
@@ -100,7 +100,7 @@ function GX_ui(){const X=$('#gbx');if(!X||!GB_.bk||X.hidden){const E=$('#gxG');i
  GX_pal();GX_grpBtn();GX_lay();const E=GX_panel(),gb=$('#gbBkP [data-gx="grp"]');if(gb)gb.classList.toggle('on',!!GX.open);
  const carry=typeof SL!=='undefined'&&SL.carry,show=GX.open&&!carry&&!GS.held;E.hidden=!show;X.classList.toggle('gxGO',!!show);if(!show)return;
  const G=GX_groups();if(GX.act&&!G.some(o=>o.g===GX.act))GX.act=0;if(GX.ren&&!G.some(o=>o.g===GX.ren))GX.ren=0;
- const hidN=G.filter(o=>GX.hid.has(o.g)).length,ns=SL.sel.length;
+ const hidN=G.filter(o=>GX.hid.has(o.g)).length,g0=SL.sel.length&&SL.sel[0].g,one=g0&&SL.sel.every(o=>o.g===g0),ns=one?0:SL.sel.length;
  let h=`<div class="gxH"><b>⛓ GROUPS · ${G.length}</b><button data-ga="close" title="Close">✕</button></div>`+
   `<div class="gxTop"><button data-ga="mk" class="${ns?'go':''}">＋ MAKE GROUP${ns?' ('+ns+')':''}</button>${hidN?`<button data-ga="all">👁 SHOW ALL</button>`:''}</div>`;
  if(!G.length)h+=`<p class="gxNo">No groups yet. Tap ☝ SELECT, tap the parts you want, then ＋ MAKE GROUP.</p>`;
@@ -125,8 +125,8 @@ addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKe
 #gxCh{display:none}#gbx.r2.gbBk.gxBig #gxCh,#gbx.r2.gbBk #gxCh{display:flex;align-items:center}
 #gxCh .gxC{flex:none;height:44px;padding:0 12px;border-radius:12px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 12px system-ui;white-space:nowrap;box-shadow:0 2px 0 #141413;cursor:pointer}
 #gxCh .gxC.on{background:#ffd400}#gxCh .gxF{width:44px;padding:0;font-size:16px;font-style:normal}
-#gbx.r2.gbBk #gbBkP .r2Cat{display:none}
-#gbx.r2.gbBk:not(.gxBig) #gxCh{flex:0 1 230px;min-width:96px;height:100%}
+#gbx.r2.gbBk.gxBig #gbBkP .r2Cat{display:none}
+#gbx.r2.gbBk:not(.gxBig) #gxCh{flex:none;height:100%;overflow:visible}#gbx.r2.gbBk:not(.gxBig) #gxCh .gxC:not(.gxF){display:none}#gbx.r2.gbBk.gxGO #gxCh{display:none!important}
 #gbx.r2.gbBk.gxBig #gbBkP{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:44px auto;row-gap:5px;height:auto;right:68px;align-items:center}
 #gbx.r2.gbBk.gxBig #gxCh{grid-row:1;grid-column:1;min-width:0;height:48px}#gbx.r2.gbBk.gxBig .r2BkT{grid-row:1;grid-column:2}
 #gbx.r2.gbBk.gxBig #gbBkPc{grid-row:2;grid-column:1/3;display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,58px);grid-auto-columns:72px;gap:5px;height:auto;overflow-x:auto;overflow-y:hidden;padding:2px 2px 4px;justify-content:start;align-items:stretch}
@@ -138,19 +138,20 @@ addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKe
 #gbx.r2 #gbBkPc .gxEm{grid-row:1/3;align-self:center;font:900 12px system-ui;color:#fff;background:rgba(20,20,19,.7);border-radius:10px;padding:10px 12px;white-space:nowrap}#gbx.r2 #gbBkPc .gxEm[hidden]{display:none}
 #gbx.r2.gbBk:not(.gxBig) #gbBkPc .gxEm{padding:6px 10px}
 #gbx.r2 #gbBkP [data-gx="grp"].on{background:#ffd400}
+#gbx.r2.gbBk.gxBig .r2BkT{gap:4px}#gbx.r2.gbBk.gxBig .r2BkT .r2T{flex-direction:column;justify-content:center;width:60px;height:46px;padding:0;gap:1px;font-size:12px;line-height:1}#gbx.r2.gbBk.gxBig .r2BkT .r2T i{margin:0}
 #gbx.r2 .r2BkT .r2T{white-space:nowrap}
 #gxG{position:absolute;left:calc(var(--r2rw,72px) + 6px);top:calc(var(--r2hh,52px) + 6px);bottom:calc(var(--r2ch,56px) + 14px);width:270px;z-index:5;display:flex;flex-direction:column;gap:5px;
  background:rgba(22,38,86,.94);border:2px solid #141413;border-radius:14px;padding:6px;box-shadow:0 4px 0 rgba(0,0,0,.35);color:#fff;font:900 12px system-ui}
 #gxG[hidden]{display:none}#gxG button{min-height:44px;border-radius:10px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 12px system-ui;cursor:pointer;box-shadow:0 2px 0 #141413}
 #gxG .gxH{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-left:4px}#gxG .gxH b{font-size:13px;letter-spacing:.02em}#gxG .gxH button{width:44px}
-#gxG .gxTop{display:flex;gap:5px}#gxG .gxTop button{flex:1}#gxG .gxTop .go{background:#7dff8a}
+#gxG .gxTop{display:flex;gap:5px;flex:none}#gxG .gxTop button{flex:1;height:44px}#gxG .gxH{flex:none}#gxG .gxTop .go{background:#7dff8a}
 #gxG .gxNo{margin:2px 4px;font-weight:700;line-height:1.35;color:#dfe8ff}
 #gxG .gxL{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin}
 #gxG .gxR{display:flex;gap:5px;align-items:stretch}#gxG .gxR .gxE{width:44px;flex:none;font-size:17px;font-style:normal}#gxG .gxR [data-ga="ren"],#gxG .gxR .gxOk{width:44px;flex:none;font-size:15px;font-style:normal}
 #gxG .gxR .gxN{flex:1;min-width:0;text-align:left;padding:2px 8px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 #gxG .gxR .gxN small{font:700 12px system-ui;color:#4a5468}#gxG .gxR.on .gxN{background:#ffd400}#gxG .gxR.hd .gxN{background:#c9ced8;color:#555}#gxG .gxR.hd .gxE{background:#c9ced8}
 #gxG .gxR input{flex:1;min-width:0;height:44px;border-radius:10px;border:2px solid #141413;padding:0 8px;font:900 14px system-ui;color:#141413}
-#gxG .gxA{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 0 4px 49px}#gxG .gxA button{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:1px;font-size:12px}
+#gxG .gxA{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 0 4px}#gxG .gxA button{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:1px;font-size:12px}
 #gxG .gxA button i{font-style:normal;font-size:14px}#gxG .gxA .gxD{background:#ff8a8a}
 #gbx.r2.gxGO #slBar{display:none!important}
 #b25 .gxHa{height:44px;min-width:56px;font-size:12px}#b25 .gxHa.on{background:#ffd12c}
@@ -158,5 +159,9 @@ addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKe
 @media (min-height:501px) and (min-width:900px){#gbx.r2.gbBk.gxBig #gbBkPc{grid-template-rows:repeat(2,70px);grid-auto-columns:86px}#gbx.r2.gbBk.gxBig #gbBkPc .gbPc{width:86px;height:70px}#gbx.r2.gbBk.gxBig #gbBkPc .gbPc.gsTh img{width:62px;height:44px}#gxG{width:320px}}`;document.head.appendChild(st)}
 window.__gx={S:GX,groups:()=>GX_groups(),hid:()=>[...GX.hid],make:()=>GX_make(),mirror:g=>GX_mirror(g),star:p=>GX_star(p),cat:c=>GX_cat(c),
  vis:()=>{const s=$('#gbBkPc');if(!s)return null;const r=s.getBoundingClientRect();return GX_tiles().filter(b=>{if(b.style.display==='none')return false;const q=b.getBoundingClientRect();return q.width>0&&q.left>=r.left-1&&q.right<=r.right+1&&q.bottom<=r.bottom+1}).map(b=>b.dataset.p)},
+ cat:k=>GB_PC[k]&&GB_PC[k].cat,ev:c=>__g9ev(c),
+ cand:()=>{const t0=GB_.tool;GB_.tool='sel';try{return __gx._cand()}finally{GB_.tool=t0}},
+ _cand:()=>{const L=GB_list(),out=[],C=$('#gbC').getBoundingClientRect(),H=b=>b.y+GB_PC[b.t].h;for(const b of L.slice().sort((a,c)=>H(c)-H(a))){const[w,d]=GB_dims(b),q=__b25.scr(b.x+w/2,b.z+d/2,H(b));
+  const el=document.elementFromPoint(q.x,q.y);if(!el||(el.closest&&el.closest('#gbBkP,#b25,#r2H,#r2R,#gxG,#slBar,#gsBar,#gsTip')))continue;const i=__sl.pick(q.x,q.y);if(i>=0&&!out.some(o=>o.i===i))out.push({i,x:q.x,y:q.y,t:b.t});if(out.length>=6)break}return out},
  tris:()=>{const U=GB.mesh&&GB.mesh.userData;let n=0;for(const o of(U&&U.gbM)||[])if(o.geometry&&o.geometry.attributes.position)n+=o.geometry.attributes.position.count/3;return n|0}};
 SL_ui=(f=>function(){const r=f.apply(this,arguments);const s=$('#slBar [data-s="grp"] span');if(s&&s.textContent==='GROUP')s.textContent='MAKE GROUP';return r})(SL_ui);

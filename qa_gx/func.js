@@ -16,16 +16,19 @@ const E=require('../bc/enter.js');const fs=require('fs');const OUT=process.argv[
  console.log('PAL',JSON.stringify(pal));ck('palette: 2 rows of bigger tiles',pal.rows>=2&&pal.tile[0]>=64&&pal.tile[1]>=56,JSON.stringify(pal.tile)+' rows '+pal.rows);
  ck('palette shows ≥ 10 parts at once (was 5)',pal.vis>=10,'visible '+pal.vis);ck('chips: ★ FAVS + RECENT + categories',pal.chips.some(c=>/FAVS/.test(c))&&pal.chips.some(c=>/RECENT/.test(c))&&pal.chips.length>=10);
  await shot('p1_palette');
- await tap('#gxCh [data-gxc="Plates"]');await W(800);const pl=await pe(()=>__gx.vis());ck('PLATES chip filters the tiles',pl.length>0&&pl.every(k=>GB_PC[k].cat==='Plates'),pl.slice(0,6).join(','));
- const fk=pl[1]||pl[0];await press(`#gbBkPc [data-p="${fk}"]`,900);ck('long-press stars a part',await pe(k=>__gx.S.fav.includes(k),fk),fk);
+ await tap('#gxCh [data-gxc="Plates"]');await W(800);const pc2=await pe(()=>__gx.vis().map(k=>[k,__gx.cat(k)])),pl=pc2.map(a=>a[0]);ck('PLATES chip filters the tiles',pl.length>0&&pc2.every(a=>a[1]==='Plates'),pl.slice(0,6).join(','));
+ const fk=pl[1]||pl[0];// cloud: CDP touch down+up arrive together (frames queue), so the hold is driven by page-side pointer events on the tile (game handlers unchanged)
+ const lpEv=t=>pe(([k,t])=>{const b=document.querySelector(`#gbBkPc [data-p="${k}"]`),r=b.getBoundingClientRect(),o={bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2,pointerId:77,pointerType:'touch',isPrimary:true};
+  if(t==='down')b.dispatchEvent(new PointerEvent('pointerdown',{...o,buttons:1}));else{b.dispatchEvent(new PointerEvent('pointerup',o));b.dispatchEvent(new MouseEvent('click',o))}},[fk,t]);
+ await lpEv('down');for(let k=0;k<30&&await pe(()=>__gx.S.lp!=null);k++)await W(500);console.log('lp dbg',JSON.stringify(await pe(()=>[__gx.S.fav,__gx.S.lp,__gx.S.cat])));const favNow=await pe(k=>__gx.S.fav.includes(k),fk);await lpEv('up');await W(800);
+ ck('long-press stars a part',favNow,fk);
  const pc0=await ev('GB_.pc');ck('long-press does not pick the part',pc0!==fk||pl.length===1,pc0);
  await tap(`#gbBkPc [data-p="${pl[0]}"]`);await W(600);await tap('#gxCh [data-gxc="fav"]');await W(800);const fv=await pe(()=>__gx.vis());ck('★ FAVS shows the starred part',fv.includes(fk),fv.join(','));await shot('p2_favs');
  await tap('#gxCh [data-gxc="rec"]');await W(800);const rc=await pe(()=>__gx.vis());ck('RECENT shows the part just picked first',rc[0]===pl[0],rc.join(','));
  await tap('#gxCh [data-gxc="fold"]');await W(800);ck('▾ folds the palette to one row',await pe(()=>!document.querySelector('#gbx').classList.contains('gxBig')));await tap('#gxCh [data-gxc="fold"]');await W(800);
  await tap('#gxCh [data-gxc="Bricks"]');
  // ---- groups: SELECT, tap 3 parts of the roof, MAKE GROUP
- const cand=await pe(()=>{const L=GB_list(),top=Math.max(...L.map(b=>b.y+GB_PC[b.t].h)),out=[];const C=document.querySelector('#gbC').getBoundingClientRect();
-  for(const b of L.slice().sort((a,c)=>(c.y+GB_PC[c.t].h)-(a.y+GB_PC[a.t].h))){const[w,d]=GB_dims(b);const q=__b25.scr(b.x+w/2,b.z+d/2,b.y+GB_PC[b.t].h);if(q.x<C.left+200||q.x>C.right-180||q.y<C.top+70||q.y>C.bottom-180)continue;const i=__sl.pick(q.x,q.y);if(i>=0&&!out.some(o=>o.i===i))out.push({i,x:q.x,y:q.y,t:b.t});if(out.length>=6)break}return out});
+ const cand=await pe(()=>__gx.cand());
  console.log('cand',JSON.stringify(cand));
  await tap('#gbBkP [data-r2b="sel"]');await W(600);for(const c of cand.slice(0,3)){await tapXY(c.x,c.y);await W(900)}const ns=await ev('SL.sel.length');ck('SELECT: tap parts adds them',ns>=2,'sel '+ns);await shot('g0_selected');
  await tap('#slBar [data-s="grp"]');await W(1000);let G=await pe(()=>__gx.groups());ck('MAKE GROUP → named group in the list',G.length===1&&/Group 1/.test(G[0].name)&&await pe(()=>!document.querySelector('#gxG').hidden),JSON.stringify(G));await shot('g1_group_made');
@@ -61,6 +64,6 @@ const E=require('../bc/enter.js');const fs=require('fs');const OUT=process.argv[
  // hidden group still saves
  await tap('#gbBkP [data-gx="grp"]');await W(600);G=await pe(()=>__gx.groups());await tap(`#gxG .gxR[data-g="${G[0].g}"] [data-ga="eye"]`);await W(1000);const nf=await n();
  await tap('#gbSave');await W(3000);const saved=await ev("(GAR_get().br[GAR_get().sel]||store.get('mho_build',{}).bricks||[]).length");ck('hidden group still saves (all parts)',saved===nf,`${saved}/${nf}`);
- ck('builder closed: car whole again',await ev('!GB_.bk')&&await pe(()=>{const U=GB.mesh.userData;return(U.gbM||[]).length>0}));
+ ck('builder closed: car whole again',await ev('!GB_.bk')&&await ev('(GB.mesh.userData.gbM||[]).length>0'));
  console.log('ERRS',T.errs.length,JSON.stringify(T.errs.slice(0,6)));ck('0 console errors',T.errs.length===0);
  console.log('RESULT',R.filter(r=>!r[1]).length?'FAIL':'PASS',R.filter(r=>r[1]).length+'/'+R.length);await T.b.close()})().catch(e=>{console.log('CRASH',e);process.exit(1)});

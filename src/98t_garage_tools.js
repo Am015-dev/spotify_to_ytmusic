@@ -49,7 +49,7 @@ GS_place=(f=>function(){const b=GS.held;if(!b||b.bad||b.y===G8_top(b))return f()
 GB_snap=(f=>function(){f.apply(this,arguments);G8.redo.length=0;G8_ui()})(GB_snap);
 GB_undo=function(){if(!GB_.undo.length)return 0;if(GS.held)GS_drop();G8.redo.push(JSON.stringify(GB_list()));GB.d.bricks=JSON.parse(GB_.undo.pop());GB_refresh();try{AU.sfx('pick')}catch(e){}G8_ui();return 1};
 function GB_redo(){if(!G8.redo.length)return 0;if(GS.held)GS_drop();GB_.undo.push(JSON.stringify(GB_list()));GB.d.bricks=JSON.parse(G8.redo.pop());GB_refresh();try{AU.sfx('pick')}catch(e){}G8_ui();return 1}
-addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||!(e.ctrlKey||e.metaKey))return;if(e.code==='KeyY'||(e.code==='KeyZ'&&e.shiftKey)){e.preventDefault();e.stopImmediatePropagation();GB_redo();GB_ui()}},true);
+addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||(e.target&&e.target.tagName==='INPUT')||!(e.ctrlKey||e.metaKey))return;if(e.code==='KeyY'||(e.code==='KeyZ'&&e.shiftKey)){e.preventDefault();e.stopImmediatePropagation();GB_redo();GB_ui()}},true);
 // ---------- UI: REDO button right after UNDO; STEP ▲ / STEP ▼ in the held-part bar
 function G8_ui(){const T=$('#gbBkT');if(T){let r=T.querySelector('[data-a="redo"]');const u=T.querySelector('[data-a="undo"]');
   if(!r&&u){r=document.createElement('button');r.dataset.a='redo';r.title='Redo (Ctrl+Y)';r.textContent='↷';r.addEventListener('click',()=>GB_redo());u.after(r)}
@@ -153,7 +153,7 @@ function SL_ui(){const T=$('#gbBkT');if(T&&!T.querySelector('[data-a="sel"]')){c
 GS_ui=(f=>function(){const r=f.apply(this,arguments);SL_ui();return r})(GS_ui);
 GB_ui=(f=>function(){const r=f.apply(this,arguments);SL_ui();return r})(GB_ui);
 GB_enter=(f=>function(){SL.sel=[];SL.carry=null;const r=f.apply(this,arguments);SL_ui();return r})(GB_enter);
-addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKey||e.altKey)return;if(e.code==='KeyS'){GB_.tool='sel';GB_ui();e.preventDefault()}},true);
+addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||(e.target&&e.target.tagName==='INPUT')||e.ctrlKey||e.metaKey||e.altKey)return;if(e.code==='KeyS'){GB_.tool='sel';GB_ui();e.preventDefault()}},true);
 {const st=document.createElement('style');st.textContent=`#slBar{position:absolute;left:8px;top:calc(56px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:repeat(2,auto);gap:5px;z-index:4}#slBar[hidden]{display:none}
 #slBar button{width:112px;height:42px;border-radius:12px;border:2px solid rgba(255,255,255,.75);background:#1b2433;color:#fff;font:900 12px system-ui;letter-spacing:.02em;display:flex;align-items:center;gap:6px;padding:0 8px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.35);white-space:nowrap}
 #slBar button i{font-style:normal;font-size:16px;width:18px;text-align:center}#slBar [data-s="move"]{background:linear-gradient(#22c5e4,#1585b8)}#slBar [data-s="del"]{background:#6b1d24}
