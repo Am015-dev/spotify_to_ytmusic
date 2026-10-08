@@ -1,6 +1,7 @@
-// bc/probe.js <url> [tpl]: equip a template via the saved garage state, enter roam (API), print size/hull numbers
-const E=require('./enter.js');const TPL=process.argv[3]||'';(async()=>{const T=await E(process.argv[2]);
- console.log('loaded');if(TPL)console.log('set',await T.ev(`(()=>{const G=GAR_get();G.sel='${TPL}';if(!G.own.includes('${TPL}'))G.own.push('${TPL}');GAR_put(G);GAR_load();return GAR_get().sel})()`));await T.roamApi();console.log('roam');
- console.log(await T.ev(`(()=>{const ud=pl.mesh.userData,s=new THREE.Vector3();ud.m.getWorldScale(s);CR_bodyPts(ud);const B=CR_PS.b;
- return JSON.stringify({sel:GAR_get().sel,sc:[s.x,s.y,s.z].map(v=>+v.toFixed(3)),B:B&&[B.min.toArray(),B.max.toArray()].map(a=>a.map(v=>+v.toFixed(2))),dims:__bc.dims(),ref:BC.ref,hull:__bc.hull(),stats:pl.stats,rc:RCAM.chase})})()`));
+// bc/probe.js <url> [tpl]: real taps: garage RIDES → template card → SAVE; enter roam (API); print size/hull numbers (+ forced re-measure)
+const E=require('./enter.js');const TPL=process.argv[3]||'';(async()=>{const T=await E(process.argv[2]);const{p,tap,ev}=T;console.log('loaded');
+ if(TPL){await tap('#gbMenuBtn');await p.waitForTimeout(1500);await tap('#gbx .gbTabs [data-t="veh"]');await p.waitForTimeout(1500);await tap(`#g9Col .g9Card[data-gc="${TPL}"] img`);await p.waitForTimeout(1000);console.log('sel',await ev('GAR_get().sel'));await tap('#gbSave');await p.waitForTimeout(1500)}
+ await T.roamApi();console.log('roam');
+ const q=`JSON.stringify({sel:GAR_get().sel,dims:__bc.dims(),hull:__bc.hull(),rcb:RCAM.chase.b,k:BC.k})`;console.log('A',await ev(q));
+ console.log('B',await ev(`(()=>{BC.k='';try{BC_upd()}catch(e){return 'ERR '+e.stack}return ${q}})()`));
  console.log('errs',T.errs.length,T.errs.slice(0,3));await T.b.close()})().catch(e=>{console.log('FAIL',e);process.exit(1)});

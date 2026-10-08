@@ -91,7 +91,7 @@ const BC_T=[
  for(const T of BC_T)GAR_SETS.push({id:T.id,n:T.n,tier:T.tier,req:null,car:T.car,off:R.off,boat:R.boat,tpl:1,ref:T.ref,forms:['car'],big:1,
   load:{car:{name:T.n.toUpperCase(),k:'Street',st:T.st,w:'Super Heavy',perk:'armor'},'4x4':L('4x4'),boat:L('boat')}})}
 // ---- size → driving
-const BC={k:'',big:0,acc:1,top:1,cam:1,d:null,on:1,ref:null,
+const BC={k:'',due:0,big:0,acc:1,top:1,cam:1,d:null,on:1,ref:null,
  D0:{rad:SC_K.rad,off:SC_K.off,cam:SC_K.cam,wb:CR_WB,hw:OB_HW,hl:OB_HL,pl:{...CR_PLH}}};
 const _bcS=new THREE.Vector3(),_bcP=new THREE.Vector3();
 function BC_dims(ud){CR_bodyPts(ud);const B=CR_PS.b;if(!B)return null;ud.m.updateMatrixWorld(true);ud.m.getWorldScale(_bcS);let x0=B.min.x,x1=B.max.x,z0=1e9,z1=-1e9;
@@ -104,7 +104,9 @@ function BC_apply(d){const R=BC.ref||d,D0=BC.D0,rW=Math.max(1,d.W/R.W),rL=Math.m
   CR_WB=+(D0.wb*Math.max(1,R.WB?d.WB/R.WB:rL)).toFixed(3);OB_HW=D0.hw*rW;OB_HL=D0.hl+Math.max(0,ext);CR_PLH.l=D0.pl.l+Math.max(0,ext);CR_PLH.w=D0.pl.w*rW;
   const m=Math.max(1,rW*rL*rH);BC.m=m;BC.acc=Math.pow(m,-.3);BC.top=Math.pow(m,-.05);BC.cam=Math.pow(Math.max(rL,rH*1.1),.65);SC_K.cam=+(D0.cam*BC.cam).toFixed(3)}
  SC_rcam()}
-function BC_upd(){const s=pl,ud=s&&s.mesh&&s.mesh.userData;if(!ud||!ud.m||!BC.on||(s.boatK||0)>.5)return;CR_bodyPts(ud);const key=CR_PS.k+'|'+GAR_get().sel+'|'+(RO.vsel||'');if(key===BC.k)return;BC.k=key;
+function BC_upd(){const s=pl,ud=s&&s.mesh&&s.mesh.userData;if(!ud||!ud.m||!BC.on||(s.boatK||0)>.5)return;CR_bodyPts(ud);const key=CR_PS.k+'|'+GAR_get().sel+'|'+(RO.vsel||''),now=performance.now();
+ // measure ~0.6 s after the car changes (the first frames still show the stock ship parts CR_fx hides, and CR_PS caches that box), then every 3 s
+ if(key!==BC.k){BC.k=key;BC.due=now+600;return}if(now<BC.due)return;BC.due=now+3000;CR_PS.k='';
  const d=BC_dims(ud);if(!d)return;BC_apply(d)}
 // reference = the Hot Rod (and every 8-wide template) as measured in roam with BC_dims (bc/probe.js, v88f): world metres
 BC.ref={W:1.93,L:4.43,H:1.44,WB:2.45};
