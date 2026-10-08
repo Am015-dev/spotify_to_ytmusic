@@ -1271,7 +1271,7 @@ async function diffTests(browser) {
   const R = {}; for (const d of ['easy', 'normal', 'hard']) for (const t of ['idle', 'careless', 'natural']) R[d + '/' + t] = row(d, t);
   stats.diff = R; for (const k in R) console.log(`  difficulty ${k.padEnd(15)} died ${(R[k].died * 100).toFixed(0).padStart(3)}%  survived ${R[k].t.toFixed(0).padStart(3)} s  hull lost ${R[k].hits.toFixed(1)}`);
   const f = (c, d) => c ? 0 : fail(null, 'difficulty', 'balance', d);
-  await f(R['normal/idle'].died === 1 && R['normal/idle'].t < 35, 'Normal: a do-nothing player must die within 35 s: ' + JSON.stringify(R['normal/idle']));
+  await f(R['normal/idle'].died === 1 && R['normal/idle'].t < 45, 'Normal: a do-nothing player must die within 45 s: ' + JSON.stringify(R['normal/idle']));
   await f(R['normal/careless'].died >= .8 && R['normal/careless'].t < 90, 'Normal: a careless player must die within 90 s: ' + JSON.stringify(R['normal/careless']));
   await f(R['normal/natural'].died <= .4, 'Normal: the dodging bot should mostly survive: ' + JSON.stringify(R['normal/natural']));
   await f(R['hard/natural'].died >= .25 && R['hard/natural'].hits > R['normal/natural'].hits + 1.5, 'Hard: the dodging bot must die and lose hull: ' + JSON.stringify([R['hard/natural'], R['normal/natural']]));

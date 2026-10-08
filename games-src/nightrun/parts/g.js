@@ -197,3 +197,5 @@ WP.draw();
 /* ===== 5. FAIR NET (b.js has the rest: bodies hurt only on screen, the bullet cap) =====
    Leaving the pit stop gives 1.2 s of safety, so the first shots of the next district never meet a ship that was still deciding. */
 {const close=SH.close;SH.close=function(){const was=this.active;close.call(this);if(was&&P)P.inv=Math.max(P.inv||0,1.2);};}
+// Hard: the safety blink after a hit is shorter (1 s instead of 1.5 s), so Hard stays hard while Normal and Easy are kinder
+{const h0=hurt;hurt=function(){const hp0=P.hp;h0();if(HARD&&P.hp<hp0)P.inv=Math.min(P.inv,1);};}
