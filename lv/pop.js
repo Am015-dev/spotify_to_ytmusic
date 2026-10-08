@@ -12,6 +12,7 @@ const enter=require('../bc/enter.js');const fs=require('fs');const URL=process.a
     await p.waitForTimeout(1500);ok=await ev(`(()=>{LVP.k=${k};LVP.cd=999;return !!LVP_path()&&LVP_spawn()})()`)===true}
   if(!ok){console.log('kind',k,'no straight street');continue}
   await p.waitForTimeout(2500);if(!process.env.NOSHOT)await p.screenshot({path:`${OUT}/${CITY}_pop${k}_gate.png`});console.log('gate',k,await ev(`JSON.stringify({k:LVP.c&&LVP.c.K.k,d:LVP.c&&Math.round(Math.hypot(LVP.c.gx-RO.x,LVP.c.gz-RO.z)),line:(document.querySelector('#roamArrow span')||{}).textContent||(document.querySelector('#m1Next .crD')||{}).textContent})`));
+  if(process.env.GATEONLY)continue;
   // headless sim runs ~0.3× real time: place the car 9 m before the ring at 15 m/s (the reviewer is told), then real GAS
   await ev(`(()=>{const C=LVP.c;RO.x=C.gx-Math.sin(C.gh)*9;RO.z=C.gz-Math.cos(C.gh)*9;RO.h=RO.vh=C.gh;RO.v=15;return 1})()`);
   await p.keyboard.down('ArrowUp');let shot=false;const t0=Date.now();

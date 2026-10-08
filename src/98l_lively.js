@@ -214,9 +214,9 @@ function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
 const LVP={c:null,cd:14,k:0,ok:0,miss:0};
 const LVP_K=[{k:'jump',name:'RAMP JUMP',ico:'🦘',col:'#ff8a1c',lim:9,goal:.9,u:'s air'},{k:'drift',name:'DRIFT ZONE',ico:'🌀',col:'#4ceaff',lim:10,goal:2.5,u:'s drift'},
   {k:'smash',name:'SMASH STREAK',ico:'💥',col:'#ff3d3d',lim:12,goal:5,u:'smashed'},{k:'slalom',name:'CONE SLALOM',ico:'🚧',col:'#5dff7a',lim:14,goal:5,u:'gates'}];
-function LVP_mesh(){if(LVP.m)return LVP.m;const g=new THREE.Group(),ring=new THREE.Mesh(new THREE.TorusGeometry(3.4,.32,8,28),new THREE.MeshStandardMaterial({color:'#ffffff',emissive:'#ffffff',emissiveIntensity:.9,roughness:.3}));ring.position.y=3.6;g.add(ring);
-  const disc=new THREE.Mesh(new THREE.CircleGeometry(3.1,28),new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:.18,side:THREE.DoubleSide,depthWrite:false}));disc.position.y=3.6;g.add(disc);
-  const [cv0,cx]=cv(256,128),sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv0),transparent:true,depthWrite:false}));sp.scale.set(7,3.5,1);sp.position.y=9;sp.renderOrder=4;g.add(sp);
+function LVP_mesh(){if(LVP.m)return LVP.m;const g=new THREE.Group(),ring=new THREE.Mesh(new THREE.TorusGeometry(4.2,.42,8,32),new THREE.MeshStandardMaterial({color:'#ffffff',emissive:'#ffffff',emissiveIntensity:.9,roughness:.3}));ring.position.y=4.5;g.add(ring);
+  const disc=new THREE.Mesh(new THREE.CircleGeometry(3.8,32),new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:.18,side:THREE.DoubleSide,depthWrite:false}));disc.position.y=4.5;g.add(disc);
+  const [cv0,cx]=cv(256,128),sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv0),transparent:true,depthWrite:false}));sp.scale.set(12,6,1);sp.position.y=12.5;sp.renderOrder=4;g.add(sp);
   // cones (slalom) and crates (smash) as two instanced meshes; 12 each
   const cone=mergeG([cbox(.7,.12,.7,0,.06,0,'#ff6a00'),ccyl(.08,.3,.9,0,.55,0,'#ff6a00',8),ccyl(.2,.24,.16,0,.62,0,'#ffffff',8)]);
   const crate=mergeG([cbox(1.6,1.6,1.6,0,.8,0,'#c8904c'),cbox(1.64,.2,1.64,0,1.3,0,'#8a5a30'),cbox(1.64,.2,1.64,0,.3,0,'#8a5a30'),ccyl(.24,.24,.18,-.4,1.69,-.4,'#c8904c',8),ccyl(.24,.24,.18,.4,1.69,.4,'#c8904c',8),ccyl(.24,.24,.18,-.4,1.69,.4,'#c8904c',8),ccyl(.24,.24,.18,.4,1.69,-.4,'#c8904c',8)]);
@@ -253,7 +253,7 @@ function LVP_step(dt,busy){const M=LVP.m,C=LVP.c;
   if(!C){LVP.cd-=dt;if(LVP.cd>0||LVP_busy(busy)||Math.abs(RO.v)<8||LV.fr%10)return;if(!LVP_spawn())LVP.cd=1.5;return}
   if(C.st===0){// ring waiting on the road: grow in, spin the label, start when the car passes through (≤ 4.2 m from its centre)
     C.t+=dt;M.g.scale.setScalar(Math.min(1,.05+C.t*2.5));M.ring.rotation.z=Math.sin(C.t*2)*.08;const dx=RO.x-C.gx,dz=RO.z-C.gz,d=Math.hypot(dx,dz),al=dx*Math.sin(C.gh)+dz*Math.cos(C.gh);
-    if(d<4.2&&Math.abs((RO.y||0)-C.gy)<4){M.g.visible=false;LVP_start(C);return}
+    if(d<5&&Math.abs((RO.y||0)-C.gy)<5){M.g.visible=false;LVP_start(C);return}
     if(al>12||d>140||C.t>25||LVP_busy(busy)){M.g.visible=false;LVP.c=null;LVP.cd=6;return}return}
   // running
   C.t+=dt;const K=C.K;
