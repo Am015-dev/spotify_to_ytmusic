@@ -92,7 +92,7 @@ function SB_sync(){if(!SB.diy||!GB.mesh)return;const host=SB_host();if(SB.gh){SB
  const M=[],L=[];for(const b of c.m)GB_brickGeo(b,M,L);if(M.length||L.length){SB.gh=new THREE.Mesh(mergeGeometries(M.concat(L)),SB.gm);SB.gh.userData.gbG=1;SB.gh.renderOrder=3;host.add(SB.gh)}
  GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;SB_pal(c.m[0],c.i);
  if(D){let u='';try{u=GS_thumb(c.m[0].t,c.m[0].c)}catch(e){}D.innerHTML=`<img src="${u}" alt=""><b>STEP ${c.i+1}/${SB.S.length}</b><small>place ${c.m.length}× ${(GB_PC[c.m[0].t]||{}).n||''} · tap the green ghost</small>`}}
-// v88r: preselect the step's part (and its colour when it is a palette colour) in the BUILD palette: open its category, mark it, scroll it into view.
+// v88t: preselect the step's part (and its colour when it is a palette colour) in the BUILD palette: open its category, mark it, scroll it into view.
 // Once per step, so the player's own picks are not overridden. Hidden template-only parts (no tile) keep just the category of the closest tile type.
 function SB_pal(b,i){const k=i+':'+b.t;if(SB.palK===k)return;SB.palK=k;try{const ci=GB_BC.indexOf(String(b.c).toLowerCase());if(ci>=0)GB_.col=ci;
  const T=document.querySelector(`#gbBkPc .gbPc[data-p="${b.t}"]`);if(T&&T.dataset.ct){if(typeof GX_cat==='function')GX_cat(T.dataset.ct);else CR_cat(T.dataset.ct)}

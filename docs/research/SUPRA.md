@@ -53,7 +53,7 @@ All are ≤ 10 studs wide and 18 long → BC size check keeps the default handli
 - Fallback order for templates without steps: bottom-up by layer y, then nose first (z), then x; every group is split into steps of 1–4 parts
   (same part + colour together, mirror twins kept together).
 
-## v88r SPEED SERIES: the booklet's companion sets (verified online 2026-10-08)
+## v88t SPEED SERIES: the booklet's companion sets (verified online 2026-10-08)
 | id | UI name | set | verified facts used | source |
 |---|---|---|---|---|
 | t_sc_tm | Time Coupe | 77256 Time Machine from Back to the Future | 357 pcs, 2 minifigs, flux capacitor, flexible "cables" along the sides, rear air vents, exhausts, doors don't open upwards, 2-in-1 (flying version) | https://brickbanter.com/?p=18888 , https://www.staples.ca/products/3138907-en-lego-speed-champions-time-machine-from-back-to-the-future , https://stonewars.com/news/lego-speed-champions-2026-august-releases/ |
