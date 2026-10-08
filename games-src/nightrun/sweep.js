@@ -83,6 +83,7 @@ const INIT = () => {
       for (const e of document.querySelectorAll(sels.join(','))) {
         if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
         const sb = e.closest('.sbody'); if (sb) { const sr = sb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // settings rows scroll: only the ones in view are checked
+        const gb = e.closest('#gaCards.tune'); if (gb) { const sr = gb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) { if (r.left < -1 || r.right > innerWidth + 1) out.bad.push('scroll list sticks out sideways ' + e.dataset.id); continue; } }   // the perk list scrolls: only the cards in view are checked
         if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) { out.bad.push('control off screen ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); continue; }
         const h = document.elementFromPoint(x, y); if (!(h && (e === h || e.contains(h) || (h.closest && h.closest('label') && h.closest('label') === e.closest('label'))))) out.bad.push('control covered ' + (e.id || e.textContent.trim().slice(0, 12)) + ' by ' + (h && (h.id || h.className || h.tagName)));
       }
@@ -94,7 +95,8 @@ const INIT = () => {
         const fin = v => Number.isFinite(v); out.nan = !(fin(P.x) && fin(P.y) && fin(P.hp) && fin(P.heat) && fin(G.score) && fin(G.mult) && G.eb.every(b => fin(b.x) && fin(b.y)) && G.en.every(e => fin(e.x) && fin(e.y) && fin(e.hp)));
         out.G = { t: G.t, score: G.score, kills: G.kills, di: G.di, loop: G.loop, dt: G.dt, en: G.en.length, eb: G.eb.length, dead: G.dead, bc: G.bc, bossDone: G.bossDone, transT: G.transT, banner: G.banner.t, daily: G.daily, perf: G.perf, pt: G.pt.length, calm: m.SET.calm };
         const b = G.boss; out.boss = b ? { x: b.x, y: b.y, hp: b.hp, max: b.max, ph: b.ph, bt: b.bt, r: b.r } : null;
-        out.P = { x: P.x, y: P.y, hp: P.hp, heat: P.heat, emp: P.emp, dashCd: P.dashCd, dashT: P.dashT, inv: P.inv, wl: P.wl };
+        out.sh = m.SH.sh; out.spare = m.SH.spare; out.dmax = m.SH.dmax; out.rev = m.TP.revLeft; out.drones = m.TP.drones ? m.TP.drones.length : 0;
+        out.P = { x: P.x, y: P.y, max: P.max, hp: P.hp, heat: P.heat, emp: P.emp, dashCd: P.dashCd, dashT: P.dashT, inv: P.inv, wl: P.wl };
         out.hud = Object.assign({}, m.HUD); out.C = m.C.n; out.J = m.J.n; out.Jok = m.J.ok; out.bt = { mode: m.BT.mode, bpm: m.BT.bpm, stage: m.BT.stage }; out.fps = m.FPS.t ? m.FPS.n / m.FPS.t * 1000 : 0; out.bp = m.bpos();
       }
       return out;
@@ -142,9 +144,10 @@ async function playRun(browser, cfg, i, kind) {
   stats.runs++; const t0 = Date.now(), maxMs = kind === 'econ' ? ECONSECS * 1000 : SECS * 1000 * (kind === 'boss' ? 4 : 1);
   try {
     if (!await startGame(p, cfg, T, kind === 'daily' ? 'daily' : 'start')) { await fail(p, tag, 'start', 'game did not start'); return; }
-    if (kind === 'late') await ev(p, i => window.__mnr.skipTo(i), 1 + (i % 3));
+    if (kind === 'late') await ev(p, i => window.__mnr.skipTo(i), 1 + (i % 4));
+    if (kind === 'ath') { await ev(p, () => window.__mnr.skipTo(4)); await sleep(700); const nm = await ev(p, () => window.__mnr.HUD.district); if (!/ATHINA/.test(nm)) await fail(p, tag, 'athens', 'skipTo(4) shows district ' + nm); }
     if (kind === 'boss') { await ev(p, () => { window.__mnr.god = true; window.__mnr.skipTo(0); window.__mnr.bossNow(); }); }
-    if (kind === 'bossN') { await ev(p, i => { window.__mnr.god = true; window.__mnr.skipTo(i); window.__mnr.bossNow(); }, 1 + (i % 3)); }
+    if (kind === 'bossN') { await ev(p, i => { window.__mnr.god = true; window.__mnr.skipTo(i); window.__mnr.bossNow(); }, 1 + (i % 4)); }
     let fx = cfg.w / 2, fy = cfg.h / 2, touching = false, keys = {}, lastProg = Date.now(), lastSig = '', lastHudFrame = -1, lastEn = Date.now(), stillSince = 0, lastPos = null, lastMoveCheck = Date.now();
     let pitN = 0, bossT0 = 0, bossHp0 = 0, bossSeen = false, over = false, nTick = 0, dashN = 0;
     if (!cfg.touch) { await p.keyboard.down('Space'); keys.Space = 1; }
@@ -163,14 +166,16 @@ async function playRun(browser, cfg, i, kind) {
       }
       if (s.paused) { await fail(p, tag, 'unexpected-pause', 'game paused by itself'); break; }
       if (s.actx !== 'running' && Date.now() - t0 > 3000) { await fail(p, tag, 'audio', 'AudioContext is ' + s.actx + ' while playing'); }
-      stats.maxDistrict = Math.max(stats.maxDistrict, s.G.di + 4 * s.G.loop);
+      stats.maxDistrict = Math.max(stats.maxDistrict, s.G.di + 5 * s.G.loop);
       if (s.G.calm) { stats.maxPt = Math.max(stats.maxPt || 0, s.G.pt); if (s.G.pt > PT_CAP) await fail(p, tag, 'particles', s.G.pt + ' particles on screen (cap ' + PT_CAP + ') in calm mode'); }
       // HUD text equals the engine state
       if (s.hud.frame > 0 && s.hud.frame !== lastHudFrame && !s.G.dead) {
         lastHudFrame = s.hud.frame; const h = s.hud;
         if (h.score !== String(s.G.score).padStart(8, '0') || h.hp !== s.P.hp || h.heat !== Math.round(s.P.heat) || h.emp !== s.P.emp || h.combo !== s.C || h.wl !== s.P.wl || h.neon !== s.neon)
           await fail(p, tag, 'HUD-mismatch', JSON.stringify({ hud: [h.score, h.hp, h.heat, h.emp, h.combo, h.wl, h.neon], eng: [s.G.score, s.P.hp, Math.round(s.P.heat), s.P.emp, s.C, s.P.wl, s.neon] }));
-        if (!(s.P.hp >= 0 && s.P.hp <= 5 && s.P.heat >= 0 && s.P.heat <= 100.01 && s.P.emp >= 0 && s.P.emp <= 3)) await fail(p, tag, 'HUD-range', JSON.stringify(s.P));
+        { const x = h.x; if (x && (x.hp !== s.P.hp || x.max !== s.P.max || x.sh !== s.sh || x.dashMax !== 1 + s.dmax || x.dash !== Math.min(1 + s.dmax, (s.P.dashCd <= 0 ? 1 : 0) + s.spare) || x.rev !== s.rev || x.drones !== s.drones))
+          await fail(p, tag, 'HUD-mismatch', 'ship stats ' + JSON.stringify(x) + ' vs ' + JSON.stringify({ hp: s.P.hp, max: s.P.max, sh: s.sh, dmax: s.dmax, spare: s.spare, dash: s.P.dashCd, rev: s.rev, drones: s.drones })); }
+        if (!(s.P.hp >= 0 && s.P.hp <= (s.P.max || 5) && s.P.heat >= 0 && s.P.heat <= 100.01 && s.P.emp >= 0 && s.P.emp <= 3)) await fail(p, tag, 'HUD-range', JSON.stringify(s.P));
       }
       // progress / stuck
       const sig = [Math.floor(s.G.t), s.G.bc, s.G.kills, s.G.score].join('/'); if (sig !== lastSig) { lastSig = sig; lastProg = Date.now(); }
@@ -772,8 +777,8 @@ async function shopTests(browser, cfg, full) {
       await chk(E.fr >= 1 && E.hm === 1 && E.ck === 4 && E.sharp === 1.5 && E.nx === 1.5 && E.mag > 140 && E.win === 20 && E.pw === 1.5, 'upgrade-effect', 'state ' + JSON.stringify(E));
       await chk(E.sh === 1 && E.spare >= 1, 'upgrade-effect', 'shield/dash charge not given ' + JSON.stringify(E));
       // shield soaks one hit
-      await ev(p, () => { const m = __mnr; m.god = false; m.G.en = []; m.G.eb = []; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
-      await sleep(120); const sh = await ev(p, () => ({ hp: __mnr.P.hp, sh: __mnr.SH.sh })); await chk(sh.hp === 5 && sh.sh === 0, 'upgrade-effect', 'shield did not absorb a hit ' + JSON.stringify(sh));
+      await ev(p, () => { const m = __mnr; window.__hp0 = m.P.hp; m.god = false; m.G.en = []; m.G.eb = []; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
+      await sleep(120); const sh = await ev(p, () => ({ hp: __mnr.P.hp, sh: __mnr.SH.sh, hp0: window.__hp0 })); await chk(sh.hp === sh.hp0 && sh.sh === 0, 'upgrade-effect', 'shield did not absorb a hit ' + JSON.stringify(sh));
       // spare dash charge: dash again while the first dash cools down
       await ev(p, () => { const m = __mnr; m.god = true; m.G.en = []; m.G.eb = []; m.P.dashCd = .9; m.P.dashT = 0; m.SH.spare = 1; });
       await p.keyboard.press('ShiftLeft'); await sleep(260); const dd = await ev(p, () => ({ t: __mnr.P.dashT, sp: __mnr.SH.spare })); await chk(dd.sp === 0, 'upgrade-effect', 'spare dash charge unused ' + JSON.stringify(dd));
@@ -794,6 +799,94 @@ async function shopTests(browser, cfg, full) {
   } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
   await p.context().close();
 }
+
+// ---------------- upgrades: garage TUNE perks, new pit-stop upgrades, new power-ups, afford prompts, ship stats HUD ----------------
+async function tuneTests(browser, cfg, full) {
+  const tag = cfg.name + '/tune', chk = (p, c, kind, d) => { stats.shopChecks++; return c ? Promise.resolve() : fail(p, tag, kind, d); };
+  const own = { pu_mag: true, pu_bub: true, pu_tri: true, pu_nr: true, pu_fix: true };
+  const { p, T } = await newPage(browser, cfg, { init: () => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('mnr_bank', '400'); localStorage.setItem('mnr_own', JSON.stringify({ pu_mag: true, pu_bub: true, pu_tri: true, pu_nr: true, pu_fix: true })); } } });
+  try {
+    await sleep(300);
+    // title: Neon and "N upgrades ready"
+    let t = await ev(p, () => ({ btn: document.getElementById('gaBtn').textContent, bank: __mnr.GA.bank })); await chk(p, /400/.test(t.btn) && /\d+ UPGRADES? READY/.test(t.btn), 'afford-prompt', 'title garage button: ' + t.btn);
+    await probe2(p, tag, 'title');
+    await press(p, cfg, T, '#gaBtn'); await sleep(300);
+    await probe2(p, tag, 'garage tune tab'); await p.screenshot({ path: path.join(OUT, 'tune-' + cfg.name + '.png') });
+    const ui = await ev(p, () => ({ n: document.querySelectorAll('#gaCards .card[data-kind="tune"]').length, rec: [...document.querySelectorAll('#gaCards .rec')].map(e => e.closest('.card').dataset.id), words: [...document.querySelectorAll('#gaCards .card .t')].every(e => e.textContent.trim().split(/\s+/).length <= 8), tab: document.querySelector('.tabs button.on').dataset.t }));
+    await chk(p, ui.n === 13 && ui.tab === 'tune' && ui.rec.length === 1, 'garage-ui', 'tune tab ' + JSON.stringify(ui)); await chk(p, ui.words, 'message-too-long', 'perk text over 8 words');
+    // buy: price scales with the level, bank drops, level saved, survives a reload
+    const before = await ev(p, () => ({ bank: __mnr.GA.bank, price: [0, 1, 2, 3].map(l => { const d = __mnr.TP_DEF[0]; return Math.round(d.p * (1 + .55 * l + .09 * l * l) / 5) * 5; }) }));
+    await chk(p, before.price[1] > before.price[0] && before.price[3] > before.price[2], 'price-scale', JSON.stringify(before.price));
+    const tapCard = async id => { await ev(p, id => document.querySelector(`#gaCards .card[data-id="${id}"]`).scrollIntoView({ block: 'center' }), id); await sleep(120); await press(p, cfg, T, `#gaCards .card[data-id="${id}"]`); await sleep(200); };
+    await tapCard('tp_dmg');
+    let a = await ev(p, () => ({ bank: __mnr.GA.bank, l: __mnr.GA.tune.dmg, saved: localStorage.getItem('mnr_tune') })); await chk(p, a.l === 1 && a.bank === before.bank - before.price[0] && /"dmg":1/.test(a.saved), 'tune-buy', 'Power Core: ' + JSON.stringify([before, a]));
+    await tapCard('tp_rev');
+    a = await ev(p, () => ({ bank: __mnr.GA.bank, l: __mnr.GA.tune.rev || 0, msg: document.getElementById('gaMsg').textContent })); await chk(p, a.l === 0 && /Need/.test(a.msg), 'tune-buy', 'bought an unaffordable perk ' + JSON.stringify(a));
+    await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
+    a = await ev(p, () => ({ l: __mnr.GA.tune.dmg, own: __mnr.GA.own.pu_bub })); await chk(p, a.l === 1 && a.own, 'tune-persist', 'perk level lost after reload ' + JSON.stringify(a));
+    if (!full) { await p.context().close(); return; }
+    // every perk at once: the run starts with them, and they do what the card says
+    await ev(p, () => { const G_ = __mnr.GA; for (const d of __mnr.TP_DEF) G_.tune[d.id] = d.max; G_.bank = 99999; });
+    if (!await startGame(p, cfg, T)) { await fail(p, tag, 'start', 'no start'); await p.context().close(); return; }
+    await sleep(500); await ev(p, () => { __mnr.god = true; });
+    let r = await ev(p, () => { const m = __mnr; return { max: m.P.max, hp: m.P.hp, sh: m.SH.sh, dmax: m.SH.dmax, spare: m.SH.spare, rev: m.TP.revLeft, mag: m.NR.mod.mag, pw: m.NR.mod.pw, ck: m.SH.ck, nx: m.SH.nx, drones: m.TP.drones.length }; });
+    await chk(p, r.max === 8 && r.hp === 8 && r.sh === 3 && r.dmax === 3 && r.spare === 3 && r.rev === 3 && r.mag === 140 + 28 * 6 && Math.abs(r.pw - 1.5) < 1e-9 && r.ck === 12 && Math.abs(r.nx - 1.4) < 1e-9 && r.drones === 3, 'tune-effect', 'run start ' + JSON.stringify(r));
+    const vol = () => ev(p, () => { const m = __mnr; m.G.pb = []; m.GA.tune.crt = 0; m.GA.tune.rof = 0; m.SH.volley(100, 100, 0); return m.G.pb.reduce((s, b) => s + b.dm, 0); });
+    await ev(p, () => { __mnr.GA.tune.dmg = 0; }); const d0 = await vol(); await ev(p, () => { __mnr.GA.tune.dmg = 10; }); const d1 = await vol();
+    await chk(p, Math.abs(d1 / d0 - 1.8) < .01, 'tune-effect', 'Power Core x10 should be +80% damage, got x' + (d1 / d0).toFixed(3));
+    await ev(p, () => { __mnr.GA.tune.crt = 8; __mnr.GA.tune.rof = 0; let c = 0, n = 0; for (let i = 0; i < 400; i++) { __mnr.G.pb = []; __mnr.SH.volley(100, 100, 0); for (const b of __mnr.G.pb) { n++; if (b.crit) c++; } } window.__crit = c / n; });
+    const cr = await ev(p, () => window.__crit); await chk(p, cr > .2 && cr < .45, 'tune-effect', 'crit rate ' + cr.toFixed(2) + ' (want about .32)');
+    // the HUD shows the ship stats (hull, shield, dash, drones, revive) correctly
+    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp })); await chk(p, h.x && h.x.max === 8 && h.x.hp === h.hp && h.x.sh === 3 && h.x.dashMax === 4 && h.x.drones === 3 && h.x.rev === 3 && h.x.perks === 12, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
+    await p.screenshot({ path: path.join(OUT, 'hud-' + cfg.name + '.png') });
+    // revive: a lethal hit brings the ship back with 4 hull and a short shield of invulnerability
+    await ev(p, () => { const m = __mnr; m.god = false; m.SH.sh = 0; m.G.en = []; m.G.eb = []; m.P.hp = 1; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
+    await sleep(250); r = await ev(p, () => ({ dead: __mnr.G.dead, hp: __mnr.P.hp, rev: __mnr.TP.revLeft })); await chk(p, !r.dead && r.hp === 4 && r.rev === 2, 'tune-effect', 'revive token ' + JSON.stringify(r));
+    // shield regen: a lost shield comes back after its time
+    await ev(p, () => { const m = __mnr; m.god = true; m.SH.sh = 0; m.TP.rgnT = 29.9; }); await sleep(450); r = await ev(p, () => __mnr.SH.sh); await chk(p, r === 1, 'tune-effect', 'shield regen gave ' + r);
+    // pit-stop upgrades (new): each one bought through the shop path does its job
+    await ev(p, () => { const m = __mnr; m.GA.tune = {}; m.SH.reset(); m.SH.live = true; m.TP.revLeft = 0; m.P.max = 5; m.P.hp = 2; m.SH.recalc(); });
+    const E = await ev(p, () => { const m = __mnr, h = m.SH, o = {}; const base = () => { m.G.pb = []; h.volley(100, 100, 0); return m.G.pb.reduce((s, b) => s + b.dm, 0); };
+      const b0 = base(); h.add('dm'); o.dm = base() / b0; h.add('hl'); o.hl = m.P.hp; h.add('mh'); o.mh = [m.P.max, m.P.hp]; h.add('dr'); o.dr = h.n('dr'); h.add('rv'); o.rv = m.TP.revLeft;
+      m.GA.tune.crt = 0; h.add('cr'); h.add('cr'); o.cr = h.n('cr'); return o; });
+    await chk(p, Math.abs(E.dm - 1.12) < .001 && E.hl === 3 && E.mh[0] === 6 && E.mh[1] === 4 && E.dr === 1 && E.rv === 1 && E.cr === 2, 'upgrade-effect', 'new pit-stop upgrades ' + JSON.stringify(E));
+    await sleep(300); r = await ev(p, () => __mnr.TP.drones.length); await chk(p, r === 1, 'upgrade-effect', 'Drone upgrade did not add a drone (' + r + ')');
+    // new power-ups: bought ones drop, unbought ones do not
+    const pk = await ev(p, () => { const o = {}; for (let i = 0; i < 600; i++) { const k = __mnr.PW.pick(); o[k] = (o[k] || 0) + 1; } return o; });
+    await chk(p, ['mag', 'bub', 'tri', 'nr', 'fix'].every(k => pk[k] > 0), 'powerup-pool', 'owned power-ups never drop ' + JSON.stringify(pk));
+    await ev(p, () => { __mnr.GA.own = {}; }); const pk2 = await ev(p, () => { const o = {}; for (let i = 0; i < 400; i++) { const k = __mnr.PW.pick(); o[k] = 1; } return Object.keys(o); });
+    await chk(p, !pk2.some(k => ['mag', 'bub', 'tri', 'nr', 'fix'].includes(k)), 'powerup-pool', 'unbought power-ups drop ' + pk2); await ev(p, o => { __mnr.GA.own = o; }, own);
+    const PU = await ev(p, () => { const m = __mnr, o = {}; m.god = false; m.SH.sh = 0; m.P.hp = 3; m.P.max = 6;
+      m.PW.give('bub', false); const hp0 = m.P.hp; m.P.inv = 0; m.P.dashT = 0; m.hurt(); o.bub = m.P.hp === hp0;           // the bubble bounces the hit
+      m.PW.give('fix', false); o.fix = m.P.hp; m.PW.give('mag', false); o.mag = m.PW.on('mag');
+      m.PW.give('tri', false); o.tri = m.PW.on('tri'); m.PW.give('nr', false); o.nr = m.PW.on('nr'); return o; });
+    await chk(p, PU.bub && PU.fix === 4 && PU.mag && PU.tri && PU.nr, 'powerup-effect', 'new power-ups ' + JSON.stringify(PU));
+    await sleep(200); const PE = await ev(p, () => { const m = __mnr; const n0 = m.G.pb.length; m.NR.emit('fire', { x: m.P.x + 22, y: m.P.y, pf: 0 }); return { mag: m.NR.mod.mag, nx: m.SH.nx, extra: m.G.pb.length - n0 }; });
+    await chk(p, PE.mag === 1500 && PE.extra >= 2 && PE.nx > 1.9, 'powerup-effect', 'running effects ' + JSON.stringify(PE));
+    await probe2(p, tag, 'run with all power-ups');
+    // pit stop: recommended badge and the afford prompt
+    await ev(p, () => { const m = __mnr; m.god = true; m.GA.bank = 600; m.P.hp = 2; m.SH.neon = 200; m.G.dt = 1e9; m.G.en = []; });
+    if (!await waitFor(p, () => __mnr.G.boss, null, 15000)) await fail(p, tag, 'pit-missing', 'no boss for the pit stop check'); else {
+      await ev(p, () => { __mnr.G.boss.hp = 0; }); if (!await waitFor(p, () => __mnr.SH.active, null, 9000)) await fail(p, tag, 'pit-missing', 'no pit stop'); else {
+        await unlock(p); await sleep(300); const pit = await ev(p, () => ({ rec: document.querySelectorAll('#shCards .rec').length, aff: document.getElementById('shAff').textContent, words: document.getElementById('shAff').textContent.trim().split(/\s+/).filter(w => /\w/.test(w)).length, lv: document.querySelectorAll('#shCards .lv').length }));
+        await chk(p, pit.rec === 1 && /afford \d+ upgrade/.test(pit.aff) && /Garage: \d+ ready/.test(pit.aff) && pit.words <= 8, 'afford-prompt', 'pit stop ' + JSON.stringify(pit));
+        await probe2(p, tag, 'pit stop'); await p.screenshot({ path: path.join(OUT, 'shop2-' + cfg.name + '.png') });
+      } }
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+async function lagTests() {                               // frame spikes and input delay with song switches and boss entries, alone on the machine (child process)
+  const r = cp.spawnSync('node', [path.join(__dirname, 'lag-probe.js')], { env: Object.assign({}, process.env, { GAME_DIR, DISTS: '4', PW: process.env.PW || 'playwright' }), encoding: 'utf8', timeout: 400000, maxBuffer: 1 << 24 });
+  let j = null; try { j = JSON.parse(r.stdout); } catch (e) { }
+  if (!j) return fail(null, 'lag', 'lag-probe', 'no result: ' + (r.stderr || '').slice(0, 200));
+  console.log(`  lag probe: ${j.frames} frames, max frame ${j.max} ms, frames over 55 ms ${j.over50}, long tasks ${j.longtasks} (max ${j.longtaskMax} ms), input-to-frame max ${j.inputMax} ms, songs decoded in a hurry ${j.urgent} (${j.midPlayUrgent} mid-play)`);
+  stats.lag = j;
+  if (j.over50 > 0) await fail(null, 'lag', 'frame-spike', j.over50 + ' frames over 55 ms: ' + j.spikesAt.join(', '));
+  if (j.inputMax > 50) await fail(null, 'lag', 'input-lag', 'a touchmove waited ' + j.inputMax + ' ms for the next frame');
+  if (j.midPlayUrgent > 0) await fail(null, 'lag', 'decode-mid-play', j.midPlayUrgent + ' songs were decoded during play ' + JSON.stringify(j.urgentLog));
+  if (j.errs.length) await fail(null, 'lag', 'page-error', j.errs[0]);
+}
 async function garageTests(browser, cfg, full) {
   const tag = cfg.name + '/garage', chk = (p, c, kind, d) => { stats.shopChecks++; return c ? Promise.resolve() : fail(p, tag, kind, d); };
   const { p, T } = await newPage(browser, cfg);
@@ -801,7 +894,7 @@ async function garageTests(browser, cfg, full) {
     await ev(p, () => { localStorage.setItem('mnr_bank', '500'); }); await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
     await press(p, cfg, T, '#gaBtn'); await sleep(250);
     let s = await ev(p, () => window.__bot.probe()); for (const b of s.bad) await fail(p, tag, 'layout', 'garage ' + b);
-    await chk(p, await ev(p, () => !document.getElementById('garage').hidden && document.querySelectorAll('#gaCards .card').length === 4), 'garage-ui', 'garage did not open with 4 cards');
+    await chk(p, await ev(p, () => !document.getElementById('garage').hidden && document.querySelectorAll('#gaCards .card').length === 13 && document.querySelector('.tabs button.on').dataset.t === 'tune'), 'garage-ui', 'garage did not open on the TUNE tab with 13 perks');
     await p.screenshot({ path: shotPath('garage-' + cfg.name) });
     const buy = async (tab, id) => { await press(p, cfg, T, `.tabs button[data-t="${tab}"]`); await sleep(100); await press(p, cfg, T, `#gaCards .card[data-id="${id}"]`); await sleep(150); };
     await ev(p, () => { __mnr.GA.bank = 10; }); await buy('ships', 'hv'); await chk(p, await ev(p, () => !__mnr.GA.own.ship_hv && __mnr.GA.bank === 10), 'garage-buy', 'bought a ship without the Neon');
@@ -912,9 +1005,9 @@ async function storyTests(browser, cfg, full) {
     if (!await ev(p, () => !document.getElementById('stsel').hidden)) return fail(p, tag, 'story', 'STORY did not open the stage select');
     await probe('stage select'); await shot('select');
     const tiles = await ev(p, () => [...document.querySelectorAll('#stsel .card')].map(c => ({ n: +c.dataset.n, lock: c.classList.contains('lock') })));
-    if (tiles.length !== 12) await fail(p, tag, 'story', 'stage select shows ' + tiles.length + ' stages, not 12');
+    if (tiles.length !== 16) await fail(p, tag, 'story', 'stage select shows ' + tiles.length + ' stages, not 16');
     if (tiles.some(t => t.lock)) await fail(p, tag, 'story', '?all=1 left stages locked');
-    const list = full ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : [1, 5, 12];
+    const list = full ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] : [1, 5, 12, 13, 16];
     const defs = await ev(p, () => __mnr.STAGES.map(s => ({ n: s.n, di: s.di, k: s.goal.k, v: s.goal.v || 0, lead: s.lead || 0, name: s.name, intro: s.intro, song: s.song })));
     for (const n of list) {
       const d = defs[n - 1], t = tag + '#' + n;
@@ -926,9 +1019,9 @@ async function storyTests(browser, cfg, full) {
       const s0 = await ev(p, () => ({ di: __mnr.G.di, hp: __mnr.P.hp, msgs: __mnr.MSGS.slice(-4), st: __mnr.ST.def.song }));
       if (s0.di !== d.di) await fail(p, t, 'story', 'stage ' + n + ' plays district ' + s0.di + ', want ' + d.di);
       if (!s0.msgs.includes(d.intro)) await fail(p, t, 'story', 'intro line not shown: ' + JSON.stringify(s0.msgs));
-      if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
+      if (n > 12 && d.di !== 4) await fail(p, t, 'story', 'Act IV stage ' + n + ' is not in Athens'); if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
       await sleep(900); const s1 = await probe('stage ' + n); if (!(await ev(p, () => __mnr.HUD.goal))) await fail(p, t, 'story', 'no goal on the HUD');
-      if (n === 1 || n === 6) await shot('play' + n);
+      if (n === 1 || n === 6 || n === 13 || n === 16) await shot('play' + n);
       // reach the goal
       const swBefore = await ev(p, () => __mnr.NR.sw.length);
       if (d.k === 'survive') await ev(p, v => { __mnr.G.bc = v * 4; }, d.v);
@@ -937,7 +1030,7 @@ async function storyTests(browser, cfg, full) {
       else {
         await ev(p, l => { __mnr.G.bc = l * 4; }, d.lead);
         if (!await waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 14000)) { await fail(p, t, 'story', 'boss/mini-boss of stage ' + n + ' never arrived'); continue; }
-        const isMini = d.k === 'mini', bossSong = n === 6 || n === 9 ? 'boss' : n === 12 ? 'boss2' : null;
+        const isMini = d.k === 'mini', bossSong = n === 6 || n === 9 || n === 16 ? 'boss' : n === 12 ? 'boss2' : null;
         if (n === 6) await shot('boss');
         if (bossSong) {
           if (!await waitFor(p, c => __mnr.NR.sw.length > c && !__mnr.BT.pend, swBefore, 16000)) await fail(p, t, 'switch', 'no song change for the boss of stage ' + n + ' ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT }))));
@@ -951,16 +1044,16 @@ async function storyTests(browser, cfg, full) {
         await ev(p, () => { if (__mnr.G.boss) __mnr.G.boss.hp = 0; });
       }
       if (!await waitFor(p, () => __mnr.ST.over, null, 9000)) { await fail(p, t, 'story', 'goal ' + d.k + ' did not complete the stage'); continue; }
-      if (n < 12) {
+      if (n < 16) {
         if (!await waitFor(p, () => __mnr.SH.active, null, 9000)) { await fail(p, t, 'story', 'no pit stop after stage ' + n); continue; }
         await sleep(800); await probe('pit after stage'); await press(p, cfg, T, '#shGo');
       }
       if (!await waitFor(p, () => !document.getElementById('stres').hidden, null, 9000)) { await fail(p, t, 'story', 'no result screen after stage ' + n); continue; }
       await sleep(300); const r = await ev(p, () => ({ title: document.getElementById('srTitle').textContent, rows: document.querySelectorAll('#srStars .sr').length, next: !document.getElementById('srNext').hidden, st: __mnr.sSave.stars[__mnr.ST.n], score: document.getElementById('srScore').textContent, g: __mnr.G.score, ok: document.querySelectorAll('#srStars .sr.ok').length }));
       if (r.title !== d.name || r.rows !== 3 || r.st < 1 || r.ok < 1) await fail(p, t, 'story', 'result screen wrong ' + JSON.stringify(r));
-      if (r.next !== (n < 12)) await fail(p, t, 'story', 'NEXT STAGE button ' + (r.next ? 'shown after the last stage' : 'missing'));
+      if (r.next !== (n < 16)) await fail(p, t, 'story', 'NEXT STAGE button ' + (r.next ? 'shown after the last stage' : 'missing'));
       if (r.score.replace(/\D/g, '') !== String(r.g)) await fail(p, t, 'HUD-mismatch', 'result score ' + r.score + ' vs ' + r.g);
-      await probe('result'); if (n === 1 || n === 12) await shot('result' + n);
+      await probe('result'); if (n === 1 || n === 16) await shot('result' + n);
       await press(p, cfg, T, '#srMenu'); await sleep(250);
       const sel = await ev(p, n => ({ shown: !document.getElementById('stsel').hidden, stars: document.querySelector(`#stsel .card[data-n="${n}"] .stars`).textContent }), n);
       if (!sel.shown || !sel.stars.includes('★')) await fail(p, t, 'story', 'stage select does not show the stars earned: ' + JSON.stringify(sel));
@@ -982,7 +1075,11 @@ async function storyTests(browser, cfg, full) {
   try {
     await sleep(400); await press(q, cfg, T2, '#storyBtn'); await sleep(300);
     const lk = await ev(q, () => [...document.querySelectorAll('#stsel .card')].map(c => c.classList.contains('lock')));
-    if (lk.length !== 12 || lk[0] || !lk.slice(1).every(Boolean)) await fail(q, t2, 'story', 'a fresh player should have only stage 1 open: ' + JSON.stringify(lk));
+    if (lk.length !== 16 || lk[0] || !lk.slice(1).every(Boolean)) await fail(q, t2, 'story', 'a fresh player should have only stage 1 open: ' + JSON.stringify(lk));
+    // Athens (Act IV) opens by playing: clearing stage 12 unlocks stage 13, and only that one
+    await ev(q, () => { for (let i = 1; i <= 12; i++) __mnr.sSave.stars[i] = 1; }); await press(q, cfg, T2, '#stBack'); await sleep(150); await press(q, cfg, T2, '#storyBtn'); await sleep(250);
+    const ath = await ev(q, () => [13, 14].map(n => document.querySelector(`#stsel .card[data-n="${n}"]`).classList.contains('lock'))); if (ath[0] || !ath[1]) await fail(q, t2, 'story', 'Athens does not open after stage 12: locks ' + JSON.stringify(ath));
+    await ev(q, () => { __mnr.sSave.stars = {}; }); await press(q, cfg, T2, '#stBack'); await sleep(150); await press(q, cfg, T2, '#storyBtn'); await sleep(250);
     await press(q, cfg, T2, '#stsel .card[data-n="2"]'); await sleep(300);
     if (await ev(q, () => __mnr.running)) await fail(q, t2, 'story', 'a locked stage started');
     if (!/first/i.test(await ev(q, () => document.getElementById('stMsg').textContent))) await fail(q, t2, 'story', 'no message on a locked stage');
@@ -1193,7 +1290,7 @@ async function probe2(p, tag, what) { const s = await ev(p, () => window.__bot.p
   const t0 = Date.now(); console.log('serving', URL_BASE, 'runs', RUNS, 'secs', SECS, 'par', PAR);
   try {
     const jobs = [];
-    if (want('runs')) { const kinds = ['', 'late', '', 'boss', '', 'reduce', 'daily', '', 'bossN', '', 'late']; for (let i = 0; i < RUNS; i++) { const cfg = CFGS[i % 4]; jobs.push(() => playRun(browser, cfg, i, kinds[i % kinds.length])); } }
+    if (want('runs')) { const kinds = ['', 'late', '', 'boss', '', 'reduce', 'daily', '', 'bossN', '', 'late', 'ath']; for (let i = 0; i < RUNS; i++) { const cfg = CFGS[i % 4]; jobs.push(() => playRun(browser, cfg, i, kinds[i % kinds.length])); } }
     const pre = [];
     if (want('input')) for (const c of CFGS) pre.push(() => inputTests(browser, c));
     const solo = [];                                       // tests that time the audio to a few ms run one at a time: another busy page makes the clock readings jitter
@@ -1212,10 +1309,12 @@ async function probe2(p, tag, what) { const s = await ev(p, () => window.__bot.p
     if (want('story')) CFGS.forEach((c, k) => pre.push(() => storyTests(browser, c, k === 0 || k === 3)));
     if (want('shop')) CFGS.forEach((c, k) => pre.push(() => shopTests(browser, c, k === 0 || k === 3)));
     if (want('garage')) CFGS.forEach((c, k) => pre.push(() => garageTests(browser, c, k === 0 || k === 3)));
+    if (want('tune')) CFGS.forEach((c, k) => pre.push(() => tuneTests(browser, c, k === 0)));
     for (let k = 0; k < ECON; k++) pre.push(() => playRun(browser, CFGS[k % 2], 100 + k, 'econ'));
     const all = pre.concat(jobs); let next = 0;
     await Promise.all(Array.from({ length: PAR }, async () => { while (next < all.length) { const j = all[next++]; await j(); } }));
     if (want('webkit')) await webkitTests();
+    if (want('lag')) await lagTests();
     if (want('power')) for (const sy of [false, true]) await powerTests(browser, sy);   // alone on the machine: they listen to the audio and time things to a few ms
     if (want('pshots')) await powerShots(browser);
     if (want('powerfps')) await powerFps(browser);

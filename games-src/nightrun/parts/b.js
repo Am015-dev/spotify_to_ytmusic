@@ -116,8 +116,8 @@ function fan(e,n,sp,s,c){n=Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan)
 function ring(e,n,s,off,c){n=Math.max(6,n+(ST.on?Math.floor(ST.lvl/2):0)+DF.fan);for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
 function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,mini=!!o.mini;
   const tab=[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']];
-  const pats=o.pats||tab[k];
-  const hp=o.hp||Math.round((340+110*k)*(1+.35*G.loop)*(G.loop||G.t>180?1:.85)*(DF.el?1.25:1));
+  const pats=o.pats||tab[k]||ATAB[k];
+  const hp=o.hp||Math.round((340+110*Math.min(k,4))*(1+.35*G.loop)*(G.loop||G.t>180?1:.85)*(DF.el?1.25:1));
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?8:16,p3:mini?16:32};
@@ -126,7 +126,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   return G.boss;}
 
 /* ---------- effects + scoring ---------- */
-function burst(x,y,col,n=18,sp=260,life=.6){if(!SET.part)return;if(SET.calm){if(FXV.near(x,y))return;n=Math.ceil(n*.3);life*=.55;}for(let i=0;i<n;i++){const a=rnd(0,7),s=rnd(40,sp);G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(life*.5,life),m:life,c:col,sz:rnd(1.5,3.5)});}}
+function burst(x,y,col,n=18,sp=260,life=.6){if(!SET.part)return;if(SET.calm){if(FXV.near(x,y))return;n=Math.ceil(n*.25);life*=.45;}for(let i=0;i<n;i++){const a=rnd(0,7),s=rnd(40,sp);G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(life*.5,life),m:life,c:col,sz:rnd(1.5,3.5)});}}
 function floater(x,y,txt,c='#ffffff'){G.fl.push({x,y,txt:say(txt),c,l:1});}
 const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));};
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers

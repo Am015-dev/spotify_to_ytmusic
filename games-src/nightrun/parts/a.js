@@ -103,7 +103,7 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
   TR.busy[info.file]=1;
   try{const r=await fetch(new URL('music/'+info.file,location.href),{cache:'force-cache'});if(!r.ok)throw 0;const ab=await r.arrayBuffer();
     const buf=await new Promise((ok,no)=>{const p=AU.a.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);});
-    for(const k in TR.bufs){const keep=k===info.file||(AU.cur&&TR.by[AU.cur.stage]&&TR.by[AU.cur.stage].file===k);if(!keep)delete TR.bufs[k];}   // decoded songs are big: keep the playing one and the new one only (iOS memory)
+    for(const k in TR.bufs){const keep=k===info.file||(AU.cur&&TR.by[AU.cur.stage]&&TR.by[AU.cur.stage].file===k)||(TR.keepFn&&TR.keepFn(k));if(!keep)delete TR.bufs[k];}   // decoded songs are big: keep the playing one and the new one only (iOS memory)
     TR.bufs[info.file]=buf;AU.trackReady(stage);}
   catch(e){TR.bad[info.file]=1;}
   TR.busy[info.file]=0;}
@@ -173,7 +173,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     if(BT.pend)return;                                    // sched() asks again once the pending change has landed
     if(BT.stage===stage){this.want=null;return;}
     const info=TR.by[stage];
-    if(info&&!TR.bufs[info.file]&&!TR.bad[info.file]){loadTrack(stage);if(!this.wantT)this.wantT=performance.now()+4000;if(performance.now()<this.wantT)return;}   // still loading: keep the current song
+    if(info&&!TR.bufs[info.file]&&!TR.bad[info.file]){loadTrack(stage,1);if(!this.wantT)this.wantT=performance.now()+4000;if(performance.now()<this.wantT)return;}   // still loading: keep the current song
     this.wantT=0;this.want=null;this.xfade(stage);},
   xfade(stage){const a=this.a,info=TR.by[stage],buf=info&&TR.bufs[info.file],now=mnow(),rate=NR.music.rate,bar=4*BT.spb,ctxOf=t=>a.currentTime+(t-now);
     const tb=BT.t0+BT.off+Math.ceil((now+bar+.08-BT.t0-BT.off)/bar)*bar;   // first bar line at least one bar + 80 ms away

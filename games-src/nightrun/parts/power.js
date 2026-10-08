@@ -74,7 +74,7 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
     if(s.wv>0){const k=1-s.wv/.7;ctx.strokeStyle='#b36bff';ctx.globalAlpha=1-k;ctx.lineWidth=14*(1-k)+2;ctx.beginPath();ctx.arc(P.x,P.y,k*1300,0,7);ctx.stroke();ctx.globalAlpha=1;}},
   hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
     if(s.drop){const d=s.drop,p=bpos();items.push({k:'drop',rem:d.blastB-p,tot:d.blastB-d.b0,txt:p<d.cutB?'CUT ON THE DOWNBEAT':'BLAST IN '+Math.max(1,Math.ceil((d.blastB-p)/4))+' BAR'});}
-    let y=y0==null?76:y0;
+    let y=y0==null?112:y0;
     for(const it of items){const K=PWK[it.k],n=Math.round(it.tot/4),bw=132,sw=bw/n;ctx.save();ctx.translate(x0,y);ctx.scale(k,k);
       ctx.fillStyle='#05030cb0';ctx.fillRect(-6,-20,232,40);
       ctx.translate(14,0);this.coin(it.k,11);ctx.translate(-14,0);
