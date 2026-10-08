@@ -95,7 +95,8 @@ function SB_sync(){if(!SB.diy||!GB.mesh)return;const host=SB_host();if(SB.gh){SB
 // v88t: preselect the step's part (and its colour when it is a palette colour) in the BUILD palette: open its category, mark it, scroll it into view.
 // Once per step, so the player's own picks are not overridden. Hidden template-only parts (no tile) keep just the category of the closest tile type.
 function SB_pal(b,i){const k=i+':'+b.t;if(SB.palK===k)return;SB.palK=k;try{const ci=GB_BC.indexOf(String(b.c).toLowerCase());if(ci>=0)GB_.col=ci;
- const T=document.querySelector(`#gbBkPc .gbPc[data-p="${b.t}"]`);if(T&&T.dataset.ct){if(typeof GX_cat==='function')GX_cat(T.dataset.ct);else CR_cat(T.dataset.ct)}
+ const q=t=>document.querySelector(`#gbBkPc .gbPc[data-p="${t}"]`),m=/^([PBT])(\d+)x(\d+)$/.exec(b.t),T=q(b.t)||(m&&q(m[1].toLowerCase()+Math.min(m[2],m[3])+Math.max(m[2],m[3])));
+ document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));if(T)T.classList.add('sbNx');if(T&&T.dataset.ct){if(typeof GX_cat==='function')GX_cat(T.dataset.ct);else CR_cat(T.dataset.ct)}
  GB_ui();if(T&&T.scrollIntoView)T.scrollIntoView({block:'nearest',inline:'center'})}catch(e){console.warn('SB pal',e)}}
 function SB_target(x,z,t){const c=SB_miss();if(!c)return null;let best=null,bd=1e9;for(const b of c.m){const[w,d]=GB_dims(b),dd=Math.abs(x-(b.x+(w-1)/2))+Math.abs(z-(b.z+(d-1)/2))-(b.t===t?.5:0);if(dd<bd){bd=dd;best=b}}return bd<=4?best:null}
 function SB_hint(){const c=SB_miss();if(!c)return;const b=c.m[0];if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh()}}
@@ -109,12 +110,12 @@ function SB_scr(cx,cy){const c=SB_miss();if(!c||!GB.mesh)return null;const R=$('
   host.localToWorld(v).project(GB.cam);const d=Math.hypot(R.left+(v.x+1)/2*R.width-cx,R.top+(1-v.y)/2*R.height-cy);if(d<bd){bd=d;best=b}}return best}
 GB_act=(f=>function(cx,cy,del){if(SB.diy&&!del&&GB_.tool==='add'){const b=SB_scr(cx,cy);if(b){if(typeof GS!=='undefined'){GS.held=null;GS.hit=null}if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh();try{GS_ui()}catch(e){}}return 1}}return f.apply(this,arguments)})(GB_act);
 GB_refresh=(f=>function(){const r=f.apply(this,arguments);try{SB_sync()}catch(e){console.warn('SB',e)}return r})(GB_refresh);
-function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
+function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
  if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!(keep||SB.ok))GB.d.bricks=SB.bak;GB_.undo=[];if(GB_.bk)GB_exit();else gbRender()}
-GB_exit=(f=>function(){if(SB.diy){SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh=null}if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!SB.ok)GB.d.bricks=SB.bak;GB_.undo=[]}return f.apply(this,arguments)})(GB_exit);
+GB_exit=(f=>function(){if(SB.diy){SB.diy=0;document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh=null}if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!SB.ok)GB.d.bricks=SB.bak;GB_.undo=[]}return f.apply(this,arguments)})(GB_exit);
 // SAVE / BACK while the guide or BUILD IT runs: leave it first (restores the ride unless it was finished)
 document.addEventListener('click',e=>{if(!(SB.on||SB.diy))return;const t=e.target.closest&&e.target.closest('#gbSave,#gbBack');if(!t)return;if(SB.on){SB.on=0;SB_clearDrop();$('#gbx').classList.remove('sbOn');GB.cam.clearViewOffset();gbRender()}if(SB.diy)SB_diyEnd(false)},true);
-{const st=document.createElement('style');st.textContent=`#sbG,#sbD{display:none}#gbx.sbOn>*:not(.gbw):not(#sbG){display:none!important}#gbx.sbOn .gbp,#gbx.sbOn #gbStats,#gbx.sbOn .gbHint,#gbx.sbOn #gsBar,#gbx.sbOn #gsBr{display:none!important}
+{const st=document.createElement('style');st.textContent=`#sbG,#sbD{display:none}#gbBkPc .gbPc.sbNx{outline:3px solid #2ad46a;outline-offset:-3px}#gbx.sbOn>*:not(.gbw):not(#sbG){display:none!important}#gbx.sbOn .gbp,#gbx.sbOn #gbStats,#gbx.sbOn .gbHint,#gbx.sbOn #gsBar,#gbx.sbOn #gsBr{display:none!important}
 #gbx.sbOn #sbG{display:block;position:absolute;inset:0;z-index:30;pointer-events:none;font:900 13px system-ui;color:#141413}
 #sbG button{pointer-events:auto;min-width:44px;min-height:44px;border:2px solid #141413;border-radius:10px;background:#fff;color:#141413;font:italic 900 13px var(--hud,system-ui);box-shadow:0 3px 0 #141413;cursor:pointer;padding:0 10px}
 #sbG button:active{transform:translateY(2px);box-shadow:0 1px 0 #141413}
