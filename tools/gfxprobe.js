@@ -47,8 +47,13 @@ const lap = (k, t0) => { T[k] = +((now() - t0) / 1000).toFixed(1); console.log(k
     t = now(); for (const q of pts) { await rawTap(q[0], q[1]); await p.waitForTimeout(100) } lap('10_taps_plain_cdp', t);
     R.tap_ms_b2b = await p.evaluate(() => __tp.splice(0)); console.log('page-seen down->up ms', JSON.stringify(R.tap_ms_b2b), 'under 900 ms:', R.tap_ms_b2b.filter(x => x < 900).length + '/10');
     R.tap_ms_plain = R.tap_ms_b2b;
-    t = now(); const hit = []; for (const q of pts) { hit.push(await heldTap(q[0], q[1])); await p.waitForTimeout(100) } console.log('events seen:', JSON.stringify(await p.evaluate(() => __tw.slice(-8)))); console.log('sync tap target:', hit.slice(0, 3).join(','), 'canvas rect', JSON.stringify(r), 'first pt', pts[0].map(Math.round)); lap('10_taps_sync', t);
-    R.tap_ms_sync = await p.evaluate(() => __tp.splice(0)); console.log('SYNC page-seen down->up ms', JSON.stringify(R.tap_ms_sync), 'under 900 ms:', R.tap_ms_sync.filter(x => x < 900).length + '/10');
+    // variant A: CDP's own tap gesture (browser-side timing)
+    t = now(); for (const q of pts) { await cdp.send('Input.synthesizeTapGesture', { x: q[0], y: q[1], duration: 30, gestureSourceType: 'touch' }); await p.waitForTimeout(100) } lap('10_taps_synthTapGesture', t);
+    R.tap_ms_gesture = await p.evaluate(() => __tp.splice(0)); console.log('GESTURE page-seen down->up ms', JSON.stringify(R.tap_ms_gesture), 'under 900 ms:', R.tap_ms_gesture.filter(x => x < 900).length + '/' + R.tap_ms_gesture.length);
+    // variant B: real touch, but wait until the page is quiet (no long frame) before each tap
+    const quiet = () => p.evaluate(() => new Promise(r => { let last = performance.now(), ok = 0; const f = () => { const n = performance.now(); ok = (n - last < 400) ? ok + 1 : 0; last = n; if (ok >= 3) r(); else requestAnimationFrame(f) }; requestAnimationFrame(f) }));
+    t = now(); for (const q of pts) { await quiet(); await rawTap(q[0], q[1]); } lap('10_taps_wait_quiet', t);
+    R.tap_ms_quiet = await p.evaluate(() => __tp.splice(0)); console.log('QUIET page-seen down->up ms', JSON.stringify(R.tap_ms_quiet), 'under 900 ms:', R.tap_ms_quiet.filter(x => x < 900).length + '/' + R.tap_ms_quiet.length);
     if (process.env.SKIP4F) { R.T = T; fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(R, null, 1)); console.log('DONE', JSON.stringify(R)); await b.close(); return }
     // old tPlay tap: down, wait 4 rendered frames, up
     const frames4 = () => p.evaluate(() => new Promise(r => { let n = 0; const f = () => { if (++n >= 4) r(); else requestAnimationFrame(f) }; requestAnimationFrame(f) }));
