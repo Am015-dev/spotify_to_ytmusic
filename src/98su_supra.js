@@ -8,32 +8,33 @@ CR_WH.wLG=Object.assign({},CR_WH.wL);GB_PC.wLG=Object.assign({},GB_PC.wL,{n:'Whe
 CR_wheel=(f=>function(t){if(t!=='wLG')return f(t);const k='suLG'+(CR_LO?'lo':'');if(CR_wgeo[k])return CR_wgeo[k];const g=f('wL').clone(),C=g.attributes.color,T=new THREE.Color('#c9a227');
  for(let i=0;i<C.count;i++){const r=C.getX(i),gg=C.getY(i),b=C.getZ(i);if(r>.35&&Math.abs(r-gg)<.08&&Math.abs(gg-b)<.1)C.setXYZ(i,T.r,T.g,T.b)}C.needsUpdate=true;return CR_wgeo[k]=g})(CR_wheel);
 // ---- body generator. o: B body, G graphic (lime), W wing colour, wing/spoiler/none, cab 'targa'|'coupe'|'open', wide (track flares), wh wheel type, eng (engine through the hood)
-function SU_car(o){const A=[],B=o.B,K=CR_K,DG=CR_DG,GR=o.G||'#a5ca18',S=o.S||B,add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
+function SU_car(o){const A=[],st=()=>A.steps.push(A.length),B=o.B,K=CR_K,DG=CR_DG,GR=o.G||'#a5ca18',S=o.S||B,add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
  sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wh=o.wh||'wL',wy=(.12-CR_WH[wh].r)/GB_PH,w=o.wide?1:0;
  // chassis 6605193 (8 wide) + 4 mudguards over silver-rim wheels, wheelbase 10 studs
- add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
- for(const z of[-7,3]){sym('arch',-4-w,z,0,o.A||B,0);sym(wh,-4-w,z,0,K,wy);if(w){sym('B1x4',-4,z,0,K,1);sym('C1x4',-5,z,0,o.F||B,6)}}
- if(w){sym('T1x6',-5,-3,0,K,0);sym('B1x6',-5,-3,0,B,1);sym('T1x6',-5,-3,0,GR,4)}
+ // A.steps = start index of each booklet step (v88l BUILD GUIDE; a property on the array, so plain-array consumers are unchanged)
+ A.steps=[];add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){st();sym('arch',-4-w,z,0,o.A||B,0);sym(wh,-4-w,z,0,K,wy);if(w){sym('B1x4',-4,z,0,K,1);sym('C1x4',-5,z,0,o.F||B,6)}}
+ if(w){st();sym('T1x6',-5,-3,0,K,0);sym('B1x6',-5,-3,0,B,1);sym('T1x6',-5,-3,0,GR,4)}
  // nose: black intake + low bumper, dark twin headlight clusters on curved slopes, rounded hood falling to the nose
- add('P8x1',-4,-8,0,K,1);add('grl',-2,-8,1,K,2);add('grl',0,-8,1,K,2);sym('B1x1',-4,-8,0,B,2);sym('B1x1',-3,-8,0,B,2);add('C8x1',-4,-8,0,B,3);
- add('B4x4',-2,-7,0,K,1);sym('cs14',-2,-7,0,B,4);sym('cs14',-1,-7,0,o.H||B,4);
+ st();add('P8x1',-4,-8,0,K,1);add('grl',-2,-8,1,K,2);add('grl',0,-8,1,K,2);sym('B1x1',-4,-8,0,B,2);sym('B1x1',-3,-8,0,B,2);add('C8x1',-4,-8,0,B,3);
+ st();add('B4x4',-2,-7,0,K,1);sym('cs14',-2,-7,0,B,4);sym('cs14',-1,-7,0,o.H||B,4);
  // twin round lamps flush on top of each front mudguard
- sym('rt',-4-w,-7,0,'#e8eef4',6);sym('rt',-3-w,-7,0,'#e8eef4',6);
- if(o.eng){add('eng',-2,-6,0,'#a0a5a9',6);add('scoop',-1,-6,0,K,10)}
+ st();sym('rt',-4-w,-7,0,'#e8eef4',6);sym('rt',-3-w,-7,0,'#e8eef4',6);
+ if(o.eng){st();add('eng',-2,-6,0,'#a0a5a9',6);add('scoop',-1,-6,0,K,10)}
  // flanks: door bricks, lime graphic plate (side stripe), body-colour belt line
- sym('B1x6',-4,-3,0,B,1);sym('T1x6',-4,-3,0,GR,4);sym('grl',-4,1,0,K,3);sym('T1x6',-4,-3,0,B,5);
+ st();sym('B1x6',-4,-3,0,B,1);sym('T1x6',-4,-3,0,GR,4);sym('grl',-4,1,0,K,3);sym('T1x6',-4,-3,0,B,5);
  // cabin: windscreen 6614372 over an open cockpit, two blue seats, driver on the left seat, black uprights behind the seats (targa)
- add('T6x6',-3,-3,0,K,1);add('drvL',-3,-1,0,B,2);
+ st();add('T6x6',-3,-3,0,K,1);add('drvL',-3,-1,0,B,2);
  const SE=()=>{const c=o.st||'#0055bf';add('P2x2',1,-1,0,c,2);add('B2x1',1,0,0,c,3);add('P2x1',-3,0,0,c,6)};
- if(o.cab==='coupe'){add('ws6',-3,-3,0,o.R||B,6);add('ws6',-3,0,2,o.R||B,6);add('T6x2',-3,-1,0,o.R||B,10);SE()}
+ st();if(o.cab==='coupe'){add('ws6',-3,-3,0,o.R||B,6);add('ws6',-3,0,2,o.R||B,6);add('T6x2',-3,-1,0,o.R||B,10);SE()}
  else{add('ws6',-3,-3,0,o.R||B,6);SE();if(o.cab!=='open'){sym('B1x2',-3,1,0,K,6);add('T6x1',-3,2,0,o.R||B,9)}}
  // rear deck: curved slopes sweeping to the tail, round taillights, black diffuser
- add('T4x4',-2,3,0,K,3);sym('cs14',-2,3,2,B,4);sym('cs14',-1,3,2,o.H||B,4);
+ st();add('T4x4',-2,3,0,K,3);sym('cs14',-2,3,2,B,4);sym('cs14',-1,3,2,o.H||B,4);
  // side graphic sweeping over the rear mudguards (the printed arches of the set)
- sym('T1x4',-4-w,3,0,GR,6);
- sym('tl',-4,7,2,'#d01712',1);sym('tl',-3,7,2,'#d01712',1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);add('diff',-2,8,0,K,0);
+ st();sym('T1x4',-4-w,3,0,GR,6);
+ st();sym('tl',-4,7,2,'#d01712',1);sym('tl',-3,7,2,'#d01712',1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);add('diff',-2,8,0,K,0);
  // rear wing on two struts (light grey blade, dark grey end plates on the real set) or a duck-tail
- if(o.rear==='wing')add('wing',-4,5,0,o.W||'#a0a5a9',o.wy||5);else if(o.rear==='spoiler')add('spoiler',-3,6,0,o.W||B,5);
+ st();if(o.rear==='wing')add('wing',-4,5,0,o.W||'#a0a5a9',o.wy||5);else if(o.rear==='spoiler')add('spoiler',-3,6,0,o.W||B,5);
  if(o.lp)add('lp',-1,8,0,o.lp,1);for(const e of o.x||[])add(...e);return A}
 const SU_O='#fe8a18';
 // family = 77260 + variations; similar = other Speed Champions street tuners (style only; no brands in the UI)
