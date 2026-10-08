@@ -98,6 +98,11 @@ GB_cand=(f=>function(hit){const r=f.apply(this,arguments);if(!SB.diy||!hit)retur
 GB_add=(f=>function(t,x,z,r,c,noUndo){if(!SB.diy)return f.apply(this,arguments);const m=SB_miss();if(!m)return 0;const b=m.m.find(o=>o.t===t&&o.x===x&&o.z===z&&o.r%4===r%4);
  if(!b){GB_msg('Follow the green ghost');try{AU.sfx('bump')}catch(e){}return 0}const add=[{...b}];if(GB_.mir){const w=GB_twin(b),tw=m.m.find(o=>o!==b&&o.t===w.t&&o.x===w.x&&o.z===w.z&&o.y===b.y);if(tw)add.push({...tw})}
  if(!noUndo)GB_snap();GB_list().push(...add);return add.length})(GB_add);
+// a tap within 70 px (screen) of a ghost part snaps it in (also when the tap hits empty air above the chassis)
+function SB_scr(cx,cy){const c=SB_miss();if(!c||!GB.mesh)return null;const R=$('#gbC').getBoundingClientRect(),host=SB_host();GB_cam();host.updateMatrixWorld(true);let best=null,bd=70;
+ for(const b of c.m){const M=[],L=[];try{GB_brickGeo(b,M,L)}catch(e){continue}if(!M.length)continue;const g=mergeGeometries(M);g.computeBoundingBox();const v=g.boundingBox.getCenter(new THREE.Vector3());g.dispose();
+  host.localToWorld(v).project(GB.cam);const d=Math.hypot(R.left+(v.x+1)/2*R.width-cx,R.top+(1-v.y)/2*R.height-cy);if(d<bd){bd=d;best=b}}return best}
+GB_act=(f=>function(cx,cy,del){if(SB.diy&&!del&&GB_.tool==='add'){const b=SB_scr(cx,cy);if(b){if(typeof GS!=='undefined'){GS.held=null;GS.hit=null}if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh();try{GS_ui()}catch(e){}}return 1}}return f.apply(this,arguments)})(GB_act);
 GB_refresh=(f=>function(){const r=f.apply(this,arguments);try{SB_sync()}catch(e){console.warn('SB',e)}return r})(GB_refresh);
 function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
  if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!(keep||SB.ok))GB.d.bricks=SB.bak;GB_.undo=[];if(GB_.bk)GB_exit();else gbRender()}
@@ -125,5 +130,5 @@ document.addEventListener('click',e=>{if(!(SB.on||SB.diy))return;const t=e.targe
 @media (min-height:501px) and (min-width:900px){#sbG .sbCall{width:150px}#sbG .sbPc{grid-template-columns:56px 1fr}#sbG .sbPc img{width:56px;height:56px}}`;document.head.appendChild(st)}
 gbOpen=(f=>function(){if(SB.on||SB.diy){SB.on=0;SB.diy=0;const X=$('#gbx');X.classList.remove('sbOn','sbDiy');if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;}return f.apply(this,arguments)})(gbOpen);
 setInterval(()=>{if(SB.diy){const g=SB.gh;if(g)SB.gm.opacity=.35+.25*Math.sin(performance.now()/200)}},50);
-window.__sb={S:SB,steps:SB_steps,open:SB_open,close:SB_close,go:SB_go,diy:SB_diy,hint:SB_hint,miss:()=>{const c=SB_miss();return c&&{i:c.i,n:c.m.length}}};
+window.__sb={scr:SB_scr,S:SB,steps:SB_steps,open:SB_open,close:SB_close,go:SB_go,diy:SB_diy,hint:SB_hint,miss:()=>{const c=SB_miss();return c&&{i:c.i,n:c.m.length}}};
 {const c=$('#credBox');if(c&&!c.querySelector('.sbCred'))c.insertAdjacentHTML('beforeend','<p class="sbCred"><b>Build guide</b>: step idea after the LDraw file format (ldraw.org) and three.js LDrawLoader (MIT) · no LDraw parts included</p>')}
