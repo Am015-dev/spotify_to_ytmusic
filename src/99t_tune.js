@@ -26,7 +26,15 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Camera','TUNE.fovSpd','FOV widen at speed',0,30,.5],['Camera','TUNE.camK','Turn follow (higher = less lag)',1,20,.1],['Camera','TUNE.camY','Height follow',1,30,.5],
  ['Body','TUNE.carW','Car width ×',.7,1.4,.01],['Body','TUNE.carL','Car length ×',.7,1.4,.01],['Body','TUNE.ride','Body ride height (m)',-.3,.5,.01],
  ['Body','C26.w','Suspension stiffness',3,25,.5],['Body','C26.z','Suspension damping',.05,1.5,.01],['Body','C26.pK','Pitch (brake/accel dive)',0,.012,.0002],['Body','C26.rK','Body roll',0,.012,.0002],
- ['Race','TUNE.rSpd','Race speed × (next race)',.8,1.8,.01],['Race','TUNE.rub','AI rubber-band ×',0,3,.05],['Race','TUNE.traf','Traffic density (next city load)',.1,2,.05]];
+ ['Race','TUNE.rSpd','Race speed × (next race)',.8,1.8,.01],['Race','TUNE.rub','AI rubber-band ×',0,3,.05],['Race','TUNE.traf','Traffic density (next city load)',.1,2,.05],
+ // fix21 FX: boost visuals, roam + races (1 = the default look). A 7th entry 'bool' = on/off switch
+ ['FX','TUNE.fxFlS','Flame size ×',0,2.5,.05],['FX','TUNE.fxFlL','Flame length ×',0,3,.05],['FX','TUNE.fxFlI','Flame brightness ×',0,3,.05],
+ ['FX','TUNE.fxSpk','Boost sparkles',0,1,1,'bool'],['FX','TUNE.fxSpkN','Sparkle count ×',0,3,.1],['FX','TUNE.fxSpkS','Sparkle size / spread ×',.2,3,.05],
+ ['FX','TUNE.fxLines','Speed lines on boost ×',0,3,.05],['FX','TUNE.fxGlow','Boost screen glow / blur ×',0,3,.05],
+ ['FX','TUNE.fxFov','Boost FOV kick ×',0,3,.05],['FX','TUNE.fxShake','Boost camera shake ×',0,3,.05],
+ // fix21 AUDIO: music tracks + synth music, SFX (engine, boost, smash), ducking (98m_music.js). The menu SOUND button still mutes everything
+ ['Audio','TUNE.musOn','Music',0,1,1,'bool'],['Audio','TUNE.musVol','Music volume',0,1,.05],['Audio','TUNE.sfxVol','SFX volume (engine, boost, smash) ×',0,2,.05],
+ ['Audio','TUNE.duckOn','Duck music under dialogue + boost',0,1,1,'bool'],['Audio','TUNE.duckAmt','Duck amount',0,1,.05]];
 const TU_ROOT={TUNE,C26,W13S,W14_ST,RCAM,W:window};
 const TU_ref=id=>{const p=id.split('.');let o=TU_ROOT[p[0]];for(let i=1;i<p.length-1&&o;i++)o=o[p[i]];return o?[o,p[p.length-1]]:null};
 const TU_get=id=>{const r=TU_ref(id);return r?r[0][r[1]]:undefined};
@@ -64,7 +72,7 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
 #tuD .tabs{display:flex;gap:3px;padding:5px 6px;overflow-x:auto;border-bottom:1px solid #4ceaff22;flex:none}#tuD .tabs button{flex:none;padding:4px 7px}#tuD .tabs button.on{background:#4ceaff;color:#04121c}
 #tuD .bd{overflow-y:auto;padding:4px 8px 8px;flex:1;min-height:0;overscroll-behavior:contain}
 #tuD .r{padding:4px 0;border-bottom:1px solid #ffffff10}#tuD .r .l{display:flex;justify-content:space-between;gap:6px;font-size:12px}#tuD .r .l span{color:#9fb6c8}#tuD .r .l b{color:#ffd12c;font-variant-numeric:tabular-nums}#tuD .r .l b.ch{color:#ff8ad0}
-#tuD input[type=range]{width:100%;height:26px;margin:0;accent-color:#4ceaff}
+#tuD input[type=range]{width:100%;height:26px;margin:0;accent-color:#4ceaff}#tuD label.tb{display:flex;align-items:center;gap:8px;min-height:34px}#tuD label.tb .l{flex:1}#tuD input[type=checkbox]{width:26px;height:26px;margin:0;accent-color:#4ceaff}
 #tuD .ft{display:flex;gap:5px;padding:6px 8px;border-top:1px solid #4ceaff33;flex-wrap:wrap}#tuD .msg{font-size:12px;color:#ffd12c;padding:0 8px 6px}
 #tuD .vl{display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid #ffffff10;font-size:12px}#tuD .vl div{flex:1;min-width:0}#tuD .vl small{display:block;color:#9fb6c8;font-size:12px}
 #tuD input[type=text]{flex:1;min-width:0;font:13px system-ui;background:#0d1a2c;color:#fff;border:1px solid #4ceaff55;border-radius:7px;padding:5px 7px}
@@ -78,14 +86,16 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
  g.addEventListener('click',e=>{e.stopPropagation();TU_toggle()});
  d.addEventListener('input',e=>{const t=e.target;if(t.type!=='range')return;const k=TUNE_K.find(q=>q[1]===t.dataset.k);if(!k)return;TU_set(k[1],+t.value);
   const b=t.parentNode.querySelector('b');if(b){b.textContent=TU_fmt(t.value,k[5]);b.classList.toggle('ch',Math.abs(+t.value-TU_DEF[k[1]])>k[5]/2)}});
- d.addEventListener('change',e=>{if(e.target.type==='range')e.target.blur()});
+ d.addEventListener('change',e=>{const t=e.target;if(t.type==='range')t.blur();if(t.type==='checkbox'&&t.dataset.k){TU_set(t.dataset.k,t.checked?1:0);const b=t.parentNode.querySelector('b');if(b){b.textContent=t.checked?'ON':'OFF';b.classList.toggle('ch',(t.checked?1:0)!==TU_DEF[t.dataset.k])}}});
  d.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
   if(a==='x')TU_toggle(false);else if(a==='tab'){TU.grp=b.dataset.g;TU.exp=null;TU_render()}
   else if(a==='reset'){for(const k of TUNE_K)if(k[0]===TU.grp)TU_set(k[1],TU_DEF[k[1]]);TU.msg=TU.grp+' reset to defaults';TU_render()}
   else if(a==='resetAll'){TU_apply(null);TU.src='defaults';TU.msg='all defaults';TU_render()}
   else if(a==='save'){const n=d.querySelector('#tuN');TU_save(n?n.value:'')}
   else if(a==='load')TU_load(+b.dataset.v);else if(a==='cur')TU_setCur(+b.dataset.v);else if(a==='exp')TU_export();else if(a==='ref')TU_list()});
- addEventListener('resize',()=>TU_fit());TU_render()}
+ addEventListener('resize',()=>TU_fit());TU_render();
+ // fix21: on the menu the ⚙ sat on top of SOUND ON (#topBtns, top right): sit just left of that button row while it shows
+ setInterval(()=>{const tb=document.getElementById('topBtns');let x=8;if(tb&&!tb.hidden&&tb.offsetWidth){const r=tb.getBoundingClientRect();if(r.bottom>0)x=Math.round(innerWidth-r.left+8)}const v=`calc(${x}px + env(safe-area-inset-right))`;if(g.style.right!==v)g.style.right=v},400)}
 function TU_toggle(on){TU.open=on==null?!TU.open:on;TU.el.classList.toggle('on',TU.open);if(TU.open){TU_render();TU_fit()}}
 // keep the drawer above every visible touch control it would cover (GAS/BRAKE/◀▶/DRIFT/BOOST): its bottom stops 6 px above them
 function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const W=innerWidth,H=innerHeight,C=[];
@@ -98,6 +108,7 @@ function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const W=innerWidth,H=inne
 function TU_render(){const d=TU.el;if(!d)return;const G=[...new Set(TUNE_K.map(k=>k[0]))],sv=TU.grp==='Saves';let h=`<div class="th"><b>TUNE</b><small>active: ${TU_esc(TU.src)}${TU.db?'':' · no db'}</small><button data-a="x" aria-label="close">✕</button></div><div class="tabs">`;
  for(const g of[...G,'Saves'])h+=`<button data-a="tab" data-g="${g}" class="${g===TU.grp?'on':''}">${g}</button>`;h+='</div><div class="bd">';
  if(!sv){for(const k of TUNE_K){if(k[0]!==TU.grp)continue;const v=TU_get(k[1]),ch=Math.abs(v-TU_DEF[k[1]])>k[5]/2;
+   if(k[6]==='bool'){h+=`<label class="r tb"><div class="l"><span>${TU_esc(k[2])}</span><b class="${ch?'ch':''}">${v?'ON':'OFF'}</b></div><input type="checkbox" data-k="${k[1]}" ${v?'checked':''}></label>`;continue}
    h+=`<div class="r"><div class="l"><span>${TU_esc(k[2])}</span><b class="${ch?'ch':''}">${TU_fmt(v,k[5])}</b></div><input type="range" data-k="${k[1]}" min="${k[3]}" max="${k[4]}" step="${k[5]}" value="${v}"></div>`}}
  else{h+=`<div class="vl"><input type="text" id="tuN" maxlength="120" placeholder="note, e.g. tighter steering"><button data-a="save">SAVE</button></div>`;
   if(!TU.db)h+='<div class="vl"><div><small>No artifact db on this page: SAVE needs the beta. EXPORT still works.</small></div></div>';

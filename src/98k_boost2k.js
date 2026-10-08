@@ -60,8 +60,11 @@ function B2K_hud(bm){const m=B2K.el;if(!m)return;const vis=(state==='roam'&&!RO.
   if(B2K.pulse>0){B2K.pulse=0;m.classList.remove('pulse');void m.offsetWidth;m.classList.add('pulse')}}
 // ---- car-local box (rear tyres, turbines)
 // roam: pl.mesh stays unrotated; its first child group carries the heading (yaw = h+π), so car-local work uses that child
-function B2K_frame(mesh){if(state==='roam'){const c=mesh.children[0];if(c&&c.isGroup)return c}return mesh}
-function B2K_rear(mesh){if(state==='roam')return 1; // body group yaw = h+π: local +z is the rear
+// fix21: races too. A race car's root stays unrotated and unscaled (posShip); heading + SHIP_K scale live on userData.m. Using the root in races
+// made the thrusters 1/SHIP_K too big, fixed to world axes (not the car) and the box heading-dependent: the "huge flames + weird sparkles" in races.
+function B2K_frame(mesh){const m=mesh.userData&&mesh.userData.m;if(m&&m.isObject3D&&m.parent===mesh)return m;if(state==='roam'){const c=mesh.children[0];if(c&&c.isGroup)return c}return mesh}
+function B2K_rear(mesh){if(state==='roam'||mesh.parent&&mesh.parent.userData&&mesh.parent.userData.m===mesh)return 1; // userData.m basis: local +z = rear
+  // body group yaw = h+π: local +z is the rear
   if(B2K.rsT===mesh&&B2K.rsS===state&&B2K.rs)return B2K.rs;const c=new THREE.Vector3().copy(camera.position);mesh.updateMatrixWorld();mesh.worldToLocal(c);if(Math.abs(c.z)>.5){B2K.rs=c.z<0?-1:1;B2K.rsT=mesh;B2K.rsS=state}return B2K.rs||-1}
 function B2K_box(mesh){if(B2K.tm===mesh&&B2K.tbox&&B2K.tst===state)return B2K.tbox;B2K.tst=state;mesh.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(mesh.matrixWorld).invert(),M=new THREE.Matrix4();
   const b=new THREE.Box3();const tv=B2K.turb&&B2K.turb.parent===mesh?B2K.turb.visible:null;if(tv!=null)B2K.turb.visible=false;
@@ -81,12 +84,15 @@ function B2K_turbines(s,on,dt){if(!s||!s.mesh)return;const mesh=B2K_frame(s.mesh
     for(const sd of[-1,1]){const parts=[[T.body,T.mB,0],[T.stud,T.mB,.245],[T.rim,T.mR,-.21],[T.flame,T.mF,-.21]].map(([geo,mat,z])=>{const m=new THREE.Mesh(geo,mat);m.matrixAutoUpdate=false;m.frustumCulled=false;m.userData.gbG=1;m.userData.z=z;m.userData.L=new THREE.Matrix4();
         m.onBeforeRender=function(){if(B2K.tCar){this.matrixWorld.multiplyMatrices(B2K.tCar.matrixWorld,this.userData.L)}};g.add(m);return m});g.units.push({sd,parts,spin:0})}
     B2K.turb=g;par.add(g)}
-  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz*(state==='race'?.7:1)),tx=sd=>sd*bx.hw*.4,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+Math.min(bx.hh*.4,.5*fz);
-  B2K.turb.visible=k>.02&&s.mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
+  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*bx.hw*.4,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+Math.min(bx.hh*.4,.5*fz);
+  B2K.turb.visible=k>.02&&s.mesh.visible;{const mF=B2K.turbG.mF,I=Math.max(0,TUNE.fxFlI);mF.color.setRGB(1,.54,.12).multiplyScalar(Math.max(.2,I));mF.opacity=.8*Math.min(1,I);mF.visible=I>0}const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
   for(const u of B2K.turb.units){u.spin+=dt;Pv.set(tx(u.sd),ty,tz);U.compose(Pv,Q.identity(),Sv);
-    for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(1,1,(B2K.bash?1.5:1)*rr(.75,1.2)));m.userData.L.multiplyMatrices(U,Pm)}}
-  if(on&&k>.6&&R()<.6){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld);for(const u of B2K.turb.units){pt.set(tx(u.sd),ty,tz+rs*.7*k*fz).applyMatrix4(mesh.matrixWorld);
-    emit(SPARK,pt,back.clone().multiplyScalar(rr(6,10)).add(V3(rr(-1,1),rr(0,1.2),rr(-1,1))),.18,B2K.bash?new THREE.Color(2.6,1.4,.3):new THREE.Color(2.6,1.2,.3))}}}
+    for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(TUNE.fxFlS,TUNE.fxFlS,TUNE.fxFlL*(B2K.bash?1.3:1)*rr(.85,1.1)));m.userData.L.multiplyMatrices(U,Pm)}}
+  if(on&&k>.6&&R()<B2K_spk(.3)){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld),S=TUNE.fxSpkS;for(const u of B2K.turb.units){pt.set(tx(u.sd),ty,tz+rs*.5*k*fz*TUNE.fxFlL).applyMatrix4(mesh.matrixWorld);
+    emit(SPARK,pt,back.clone().multiplyScalar(rr(2,4)*S).add(V3(rr(-.6,.6)*S,rr(0,.8)*S,rr(-.6,.6)*S)),.1,B2K.bash?new THREE.Color(2.2,1.3,.3):new THREE.Color(2.2,1.1,.3))}}}
+// boost sparks stay short and slow in world space (a spark's streak length = its own speed × 35 ms; adding the car's speed drew 2 m lines at the camera)
+// TUNE.fxSpk on/off, fxSpkN = count ×. Returns the scaled chance / count (0 when off)
+function B2K_spk(n){return TUNE.fxSpk>0?n*Math.max(0,TUNE.fxSpkN):0}
 // ---- pink drift trail (two ribbons from the rear tyres)
 function B2K_trailInit(par){const N=64,g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));
   const idx=[];for(let sd=0;sd<2;sd++)for(let i=0;i<N-1;i++){const a=(sd*N+i)*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(idx);
@@ -108,9 +114,9 @@ function B2K_drift(s,on,slip,sp,dt){if(on){const r=TUNE.drFill*clamp(sp/22,.5,1.
 function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.bm+B2K.dm*TUNE.drConv);const g=s.bm-b0;
   B2K.log.drift.push({s:+B2K.dT.toFixed(2),bar:+B2K.dm.toFixed(1),boost:+g.toFixed(1),slipAvg:+(B2K.slS/Math.max(1,B2K.slN)*57.3).toFixed(1),slipMax:+(B2K.slMax*57.3).toFixed(1)});if(B2K.log.drift.length>40)B2K.log.drift.shift();
   if(g>=1){B2K_pop('+'+Math.round(g)+' BOOST','#ff8ad0');B2K.pulse=1}B2K.dm=0;B2K.dT=0;B2K.slS=0;B2K.slN=0;B2K.slMax=0}
-function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,15);shake=Math.max(shake,.25);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
+function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,10*TUNE.fxFov);shake=Math.max(shake,.25*TUNE.fxShake);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
     if(roam)RO.bRamp=1;else s.boost=Math.max(s.boost||0,.25)}
-  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,12);shake=Math.max(shake,.3)}B2K.bash=bash;
+  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,8*TUNE.fxFov);shake=Math.max(shake,.3*TUNE.fxShake)}B2K.bash=bash;RO.bash=bash&&state==='roam';
   if(bash){s.bm=Math.min(100,s.bm+8*dt);if(roam){RO.turbo=Math.max(RO.turbo||0,.12);RO.inv=Math.max(RO.inv||0,.15)}else s.boost=Math.max(s.boost||0,.12)}B2K.wasB=boosting}
 // Brickbash in roam: traffic within reach is knocked aside (tumble + debris) instead of stopping the car
 function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
@@ -126,7 +132,7 @@ function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(R
   if(!boosting&&!RO.dDir&&(RO.bIdle||0)>.5&&s.bm<100)s.bm=Math.max(bm0,s.bm-(FL_RECH-TUNE.bRegen)*dt);
   const sp=Math.abs(RO.v),slip=Math.abs(angDiff(RO.h,RO.vh??RO.h));B2K_drift(s,!!RO.dDir,slip,sp,dt);if(d0&&!RO.dDir)B2K_driftEnd(s);
   B2K_boost(s,boosting,bm0,dt,true);B2K_turbines(s,boosting||B2K.bash,dt);B2K_trail(s,!!RO.dDir&&!(s.air),dt);
-  if(B2K.bash&&R()<.5)emit(SPARK,V3(RO.x+rr(-2,2),RO.y+rr(.5,2),RO.z+rr(-2,2)),V3(rr(-3,3),rr(1,4),rr(-3,3)),.3,new THREE.Color(2.6,1.8,.4))}catch(e){B2K.err=String(e)}B2K_hud(s.bm);return r}}
+  if(B2K.bash&&R()<B2K_spk(.15)){const S=TUNE.fxSpkS;emit(SPARK,V3(RO.x+rr(-1,1),RO.y+rr(.3,1),RO.z+rr(-1,1)),V3(rr(-2,2)*S,rr(.5,2)*S,rr(-2,2)*S),.15,new THREE.Color(2.2,1.6,.4))}}catch(e){B2K.err=String(e)}B2K_hud(s.bm);return r}}
 // races: wrap physPlayer the same way (race drift is s.hbDir/s.hbT; race boost is c.boost on s.bm)
 {const f0=physPlayer;physPlayer=function(s,c){if(!s||!s.isPlayer||state!=='race')return f0.apply(this,arguments);const bm0=s.bm,d0=s.hbDir,H0=(typeof H==='number'?H:1/60);const r=f0.apply(this,arguments);try{
   const dt=H0,boosting=!!(c&&c.boost)&&bm0>.5&&!s.air;if(s.hbDir){const base=boosting?Math.max(0,bm0-24*dt):bm0;s.bm-=Math.min(6*dt,Math.max(0,s.bm-base))}
