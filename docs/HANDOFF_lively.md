@@ -56,3 +56,10 @@
 - Review: full c73180ea FAIL (blue wedge = the drift ring kept up past its plane, so the camera flew through it) → fixed (the ring is decided at its plane; probe lv/p/q8.js) → QUICK PASS 4616fd8b with 2 conditions, both met: merged v88o; LV_onRoad road mask (clusters never on any carriageway, probe lv/p/q9.js: 0/87).
 - Reviewer notes still open (for the next worker): Athens spots 1-2 (hilly corridors) are still sparse; pop-up completion is untested headless (checklist pop-play/pop-each); Life master stays 1 until Alex answers life-fps2.
 - Next: after Alex's checklist answers, raise TUNE.life if FPS passes; more Athens plaza clusters (plazas are not HUB edges; use OG areas / squares).
+
+## LIVE: v88p (c2f0b47, from alex/od-lively 4aee8a04), 2026-10-08. The beta is republished. This session stops here.
+What's left (next worker, in this order):
+1. **Athens is still subtle** (reviewer note 3). Spots 1-2 of lv/shots.js (hilly corridors, 232,-1543 and -3036,1339) show few clusters, because there are few street corners within 16-40 m and the 40-60 m minifigs are 9-13 px. Ideas: plaza/square clusters (squares are not HUB edges: use OG areas or Athens landmark squares), larger groups (6-8) on the Athens kerb, café/stall rows along long straight edges (not only corners). Keep LV_onRoad (never on a carriageway) and ped scale ≤ 1.2×.
+2. **Life master default vs phone FPS.** TUNE.life stays 1. When Alex answers checklist items life-fps (v88n) / life-fps2 (v88p): if PASS, raise TUNE.life to 1.3 (walkers 91 + cluster peds 27 → capped at PED_N 110; lvCrowd, lvPark and lvBird scale too) in 10_core TUNE, tune.json and docs/TUNE.md. If FAIL, drop the flags first (5 draw calls), then lvCrowd to 0.7. Measured here (CPU, render stubbed): 5.2-5.6 ms per frame; LV code 0.07-0.46 ms.
+3. Pop-up completion is untested headless (checklist pop-play/pop-each). Win-checks are Alex's, via the checklist; fix whatever he reports.
+4. Athens has no parked cars by design (g-streets: traffic lane W=0, no kerb lane).
