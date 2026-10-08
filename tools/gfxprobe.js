@@ -17,7 +17,7 @@ const lap = (k, t0) => { T[k] = +((now() - t0) / 1000).toFixed(1); console.log(k
   let t = now(); await p.goto(URL); await p.waitForFunction(() => window.__mho && __mho.state === 'menu', null, { polling: 250 }); lap('load_to_menu', t);
   await p.evaluate(() => { localStorage.clear(); localStorage.setItem('mho_slot', '1') }); await G.seed(p, gfx);
   t = now(); await p.reload(); await p.waitForFunction(() => window.__mho && __mho.state === 'menu', null, { polling: 250 }); lap('reload_to_menu', t);
-  const heldTap = (x, y) => G.tap(p, x, y, { noClick: true });
+  const heldTap = (x, y) => G.tap(p, x, y, { noClick: true, sel: '#gbC' });
   const rawTap = async (x, y, holdMs) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 0 }] }); if (holdMs) await p.waitForTimeout(holdMs); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }) };
   const center = async sel => p.evaluate(s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return r.width > 4 ? [r.left + r.width / 2, r.top + r.height / 2] : null }, sel);
   const tap = async sel => { const c = await center(sel); if (!c) return false; await rawTap(c[0], c[1]); await p.waitForTimeout(150); return true };

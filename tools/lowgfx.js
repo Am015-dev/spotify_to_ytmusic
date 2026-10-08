@@ -34,13 +34,13 @@ exports.initScript = gfx => HOLD + (gfx !== 'min' ? '' :
 // keep real touch. The init script makes setPointerCapture tolerant of the synthetic pointer id.
 const HOLD = `(()=>{for(const k of['setPointerCapture','releasePointerCapture']){const o=Element.prototype[k];Element.prototype[k]=function(...a){try{return o.apply(this,a)}catch(e){}}}})();`;
 exports.HOLD = HOLD;
-exports.tap = (page, x, y, o) => page.evaluate(([x, y, click]) => {
-  const t = document.elementFromPoint(x, y); if (!t) return null;
+exports.tap = (page, x, y, o) => page.evaluate(([x, y, click, sel]) => {
+  const t = sel ? document.querySelector(sel) : document.elementFromPoint(x, y); if (!t) return null;   // sel: force the target (the builder only reacts to taps whose target is its canvas #gbC)
   const e = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 91, pointerType: 'touch', isPrimary: true, button: 0, width: 1, height: 1 };
   t.dispatchEvent(new PointerEvent('pointerdown', { ...e, buttons: 1 })); t.dispatchEvent(new PointerEvent('pointerup', { ...e, buttons: 0 }));
   if (click) t.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: x, clientY: y }));
   return t.id || t.tagName;
-}, [x, y, !(o && o.noClick)]);
+}, [x, y, !(o && o.noClick), o && o.sel]);
 // settings the game stores itself (SET in localStorage 'mho_set'): lowest quality tier, no dynamic-resolution surprises
 exports.seed = (page, gfx) => gfx !== 'min' ? Promise.resolve() :
   page.evaluate(s => { const k = 'mho_set'; let o = {}; try { o = JSON.parse(localStorage.getItem(k) || '{}') } catch (e) {} localStorage.setItem(k, JSON.stringify(Object.assign(o, s))) }, MIN_SET);
