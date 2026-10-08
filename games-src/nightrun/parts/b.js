@@ -81,8 +81,8 @@ function newGame(daily){
 // Easy / Normal / Hard (settings > Gameplay), tuned with d-sim.js. Endless: d = enemy pace and fire rate, bs = bullet speed, fr = fire rate, xw = extra waves joining each wave once the run is warm.
 // Story has its own ramp (ST.*, see story.js): sd, sbs, sfr scale it. fan = bullets added to every fan and ring, heal = hull drops, el = elite share.
 const DIFFS={easy:{d:.85,bs:.9,fr:.85,dn:.75,sd:.85,sbs:.92,sfr:.9,fan:-1,heal:1.5,el:0},
-  normal:{d:1.75,bs:1.2,fr:1,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
-  hard:{d:2.6,bs:1.45,fr:1.7,dn:1.3,sd:1.3,sbs:1.15,sfr:1.25,fan:2,heal:.5,el:1}};
+  normal:{d:1.75,bs:1.2,fr:1.15,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
+  hard:{d:2.6,bs:1.45,fr:2.3,dn:1.3,sd:1.3,sbs:1.15,sfr:1.25,fan:2,heal:.5,el:1}};
 let DF=DIFFS.normal;
 const STILL={t:0,k:0,fk:1,bk:1,sk:1,ax:0,ay:0,beam:null,nb:0,said:false};   // AFK pressure (h.js): a ship that stops moving is hunted harder and scores less
 const DYE={cur:1,q:1};                                     // dying slows the song (h.js)
