@@ -288,6 +288,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
   sched(){const a=this.a;if(a&&this.want&&running&&!paused)this.switchTo(this.want);
     if(!a||a.state!=='running'||!running||paused)return;
+    if(BT.mode==='synth'&&!BT.pend&&!this.want&&TR.by[BT.stage]&&TR.bufs[TR.by[BT.stage].file])this.trackReady(BT.stage);   // the song file arrived while a switch was pending: swap it in on the next bar
     if(this.int&&BT.mode==='file')this.isched(a);
     if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);

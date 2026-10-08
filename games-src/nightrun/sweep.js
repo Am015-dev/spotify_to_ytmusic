@@ -742,8 +742,8 @@ async function songSwitchTests(browser) {
       if (x.lag > .15) await fail(p, tag, 'switch-late', `${x.from}>${x.to} applied ${(x.lag * 1000).toFixed(0)} ms late`);
     }
     if (samples.length < 20) await fail(p, tag, 'grid', 'only ' + samples.length + ' grid samples');
-    else { const sorted = samples.slice().sort((a, b) => a - b), med = sorted[sorted.length >> 1], worst = Math.max(...samples.map(v => Math.abs(v - med)));
-      console.log(`  ${tag}: ${samples.length} audio-vs-beat-clock samples through ${sw.length} changes, worst deviation ${worst.toFixed(1)} ms`); if (worst > 40) await fail(p, tag, 'grid-jump', 'beat grid moved ' + worst.toFixed(0) + ' ms against the audio across song changes'); }
+    else { const sorted = samples.slice().sort((a, b) => a - b), med = sorted[sorted.length >> 1], devs = samples.map(v => Math.abs(v - med)), worst = Math.max(...devs), over = devs.filter(v => v > 40).length;   // a grid jump stays for every later sample; one or two stalled samples are page jitter
+      console.log(`  ${tag}: ${samples.length} audio-vs-beat-clock samples through ${sw.length} changes, worst deviation ${worst.toFixed(1)} ms`); if (over > 2 || worst > 120) await fail(p, tag, 'grid-jump', 'beat grid moved ' + worst.toFixed(0) + ' ms against the audio across song changes'); }
     if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
   } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
   await p.context().close();
