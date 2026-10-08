@@ -167,7 +167,7 @@ function LV_clProps(k,C){const S=LV.cl,ax=-Math.cos(C.h),az=Math.sin(C.h);C.pr=[
 function LV_clDraw(k,C){const S=LV.cl,g=C.gs;for(let j=0;j<2;j++){const i=k*2+j;for(const m of [S.s,S.a,S.c,S.u])m.setMatrixAt(i,_lvZ)}
   if(!C.on)return;for(const p of C.pr){if(p.dead)continue;const i=k*2+p.j;if(p.m==='s'){LV_set(S.s,i,p.x,C.y,p.z,0,C.h,0,g);LV_set(S.a,i,p.x,C.y,p.z,0,C.h,0,g)}else{LV_set(S.c,i,p.x,C.y,p.z,0,C.h+p.j*.9,0,g);LV_set(S.u,i,p.x,C.y,p.z,0,C.h,0,g)}}}
 const LV_clUpd=()=>{const S=LV.cl;for(const m of [S.s,S.a,S.c,S.u])m.instanceMatrix.needsUpdate=true};
-function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const sp=near?(LV_corner(22,70,.82,own)||LV_corner(20,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
+function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const sp=near?(k%2?LV_corner(20,45,.6,own)||LV_corner(18,60,.3,own):LV_corner(35,70,.82,own)||LV_corner(25,90,.5,own)):(LV_corner(60,115,.8,own)||LV_corner(55,130,.5,own));
   if(!sp){C.on=false;LV_clDraw(k,C);return false}Object.assign(C,{on:true,x:sp.x,z:sp.z,y:sp.y,h:sp.h,a:sp.a,b:sp.b,gs:near?1:.05,t:0,ux:sp.ux,uz:sp.uz,sd:sp.sd});LV_clProps(k,C);LV_clDraw(k,C);return true}
 // people of cluster k stand in a loose ring on the road side of the props (crowd: around a centre), facing each other
 function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),ax=-Math.cos(C.h),az=Math.sin(C.h);
