@@ -51,3 +51,8 @@
 - Tools: lv/shots.js (chase spots), lv/pop.js (GATEONLY=1 rings; NOSHOT=1 logic), t4/g11drive.js SIDE=1 ATH=1 (drive set + tyre gap). Review sheets: lv/v88p/*.png.
 - REVIEW sent for c73180ea. After PASS: fetch origin/alex/brave-carson-rbpmlk, merge live (garux v88o may have shipped; conflicts are likely only in 10_core changelog/TUNE, 99c, 99t, tune.json, TUNE.md), `tools/build.sh v88p`, `git add -f out/v88p`, push, then send coordinator session_017iH3DB4VyxwKSdMwsco4Ut "DEPLOY alex/od-lively <commit> out/v88p <msg>" + 3 bullets + shot paths.
 - Open: pop-up completion untested headless (checklist pop-play/pop-each); Life master stays 1 until Alex answers life-fps / life-fps2.
+
+## v88p status (2026-10-08 22:50): DEPLOY sent to the coordinator (alex/od-lively 4aee8a04, out/v88p, on live v88o = garux 0560e1d4, LIVE_MATCH d3eeb454)
+- Review: full c73180ea FAIL (blue wedge = the drift ring kept up past its plane, so the camera flew through it) → fixed (the ring is decided at its plane; probe lv/p/q8.js) → QUICK PASS 4616fd8b with 2 conditions, both met: merged v88o; LV_onRoad road mask (clusters never on any carriageway, probe lv/p/q9.js: 0/87).
+- Reviewer notes still open (for the next worker): Athens spots 1-2 (hilly corridors) are still sparse; pop-up completion is untested headless (checklist pop-play/pop-each); Life master stays 1 until Alex answers life-fps2.
+- Next: after Alex's checklist answers, raise TUNE.life if FPS passes; more Athens plaza clusters (plazas are not HUB edges; use OG areas / squares).
