@@ -3,7 +3,7 @@
 const RGN=[50,44,38,33,28,24];                                   // seconds per shield for Shield Regen levels 1 to 6
 const TP_DEF=[
   {id:'dmg',n:'Power Core',   p:45, max:12,c:'#ff5a3d',pri:90,ic:'M13 2L4 14h6l-1 8 9-12h-6z',                                 t:l=>'+'+8*l+'% shot damage'},
-  {id:'rof',n:'Rapid Coil',   p:55, max:12, c:'#ffe14d',pri:80,ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z',                                 t:l=>'+'+6*l+'% double shots'},
+  {id:'rof',n:'Rapid Coil',   p:55, max:12, c:'#ffe14d',pri:80,ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z',                                 t:l=>'+'+2.5*l+'% double shots'},
   {id:'shd',n:'Shield Plating',p:120,max:5, c:'#19e3ff',pri:95,ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z',                  t:l=>'Start with '+l+' shield'+(l>1?'s':'')},
   {id:'rgn',n:'Shield Regen', p:150,max:6, c:'#19e3ff',pri:70,ic:'M12 4a8 8 0 106.3 3L21 4v7h-7l2.6-2.6A5.5 5.5 0 1012 17.5V20a8 8 0 010-16z',t:l=>'A shield every '+RGN[l-1]+' s'},
   {id:'hul',n:'Hull Plating', p:200,max:5, c:'#3dffb0',pri:100,ic:'M12 21s-8-5.5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 5.5-8 11-8 11z',t:l=>'+'+l+' max hull (now '+(5+l)+')'},
@@ -11,8 +11,8 @@ const TP_DEF=[
   {id:'mag',n:'Magnet Coil',  p:35, max:10,c:'#3dffb0',pri:40,ic:'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z',                    t:l=>'+'+20*l+'% pickup range'},
   {id:'ckp',n:'Combo Keeper', p:50, max:10,c:'#ffb020',pri:65,ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',            t:l=>'Tier lasts +'+2*l+' beats'},
   {id:'pwd',n:'Power Amp',    p:80, max:10,c:'#ff2d95',pri:60,ic:'M12 2l3 7 7 .8-5.3 4.7 1.6 7.2L12 18l-6.3 3.7 1.6-7.2L2 9.8 9 9z',t:l=>'Power-ups last +'+10*l+'%'},
-  {id:'crt',n:'Critical Core',p:60, max:12,c:'#ff5a3d',pri:62,ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z',     t:l=>l*4+'% shots hit 3x'},
-  {id:'drn',n:'Wingman Drone',p:260,max:5, c:'#c08aff',pri:85,ic:'M12 3l7 9-7 9-7-9zM12 8l-3 4 3 4 3-4z',                        t:l=>l+' drone'+(l>1?'s':'')+' fire with you'},
+  {id:'crt',n:'Critical Core',p:60, max:12,c:'#ff5a3d',pri:62,ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z',     t:l=>l*2.5+'% shots hit 3x'},
+  {id:'drn',n:'Wingman Drone',p:260,max:3, c:'#c08aff',pri:85,ic:'M12 3l7 9-7 9-7-9zM12 8l-3 4 3 4 3-4z',                        t:l=>l+' drone'+(l>1?'s':'')+' fire with you'},
   {id:'rev',n:'Revive Token', p:400,max:5, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
   {id:'nmn',n:'Neon Mining',  p:70, max:12,c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
 const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
@@ -34,10 +34,11 @@ const NEWU=[
   {id:'rv',n:'Revive Token',t:'Come back once',          p:90,max:3,c:'#ff2d95',ic:TP_BY.rev.ic}];
 for(const u of NEWU){SH.UPG.push(u);UBY[u.id]=u;}
 /* ----- effects (all through wrappers) ----- */
-const tpDmg=()=>1+.08*TP.l('dmg')+.12*SH.n('dm');
-const tpCrit=()=>.04*TP.l('crt')+.05*SH.n('cr');
-const tpDouble=()=>.06*TP.l('rof');
-const tpDrones=()=>TP.l('drn')+SH.n('dr');
+const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'));   // stacking cap: damage perks together never more than x2.1
+const DRONE_CAP=3,DOUBLE_CAP=.3,CRIT_CAP=.3;
+const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr'));
+const tpDouble=()=>Math.min(DOUBLE_CAP,.025*TP.l('rof'));
+const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
 {const rc=SH.recalc;SH.recalc=function(){rc.call(this);
     NR.mod.mag+=28*TP.l('mag');NR.mod.pw+=.1*TP.l('pwd');this.ck+=2*TP.l('ckp');this.dmax+=TP.l('dsh');this.nx*=1+.05*TP.l('nmn');
     TP.mag0=NR.mod.mag;TP.nx0=this.nx;};
