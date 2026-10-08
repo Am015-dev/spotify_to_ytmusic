@@ -28,6 +28,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
   await p.waitForFunction(() => window.__mnr);
   const cdp = await ctx.newCDPSession(p);
   const touch = async (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: Math.round(x), y: Math.round(y), id: 1 }] });
+  await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { });   // the title buttons appear when the page is ready
   const r = await p.evaluate(() => { const b = document.getElementById('startBtn').getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; });
   await touch('touchStart', r[0], r[1]); await sleep(40); await touch('touchEnd');
   await p.waitForFunction(() => window.__mnr.running, null, { timeout: 5000 });
