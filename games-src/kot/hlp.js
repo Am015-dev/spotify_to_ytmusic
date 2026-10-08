@@ -121,6 +121,8 @@ function hlpSuggest(){
 {
   GXH.init({game:'crown-city-smash',defaultOn:true,steps:HLP_STEPS,rules:HLP_ALL,avoid:'.sugg,.rec,#pacts .btn,#choice .btn.primary,#pshop .ptile,#dice .die,.pchip,.gx-bar button'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
+  /* the dock scrolls (short desktop frames): a coach bubble is fixed to the screen, so lay it out again after any scroll, or it ends up on top of Reroll / Resolve */
+  {let _t=0;document.addEventListener('scroll',()=>{clearTimeout(_t);_t=setTimeout(()=>{try{GXH.relayout()}catch(e){}},50)},true)}
   const set=document.getElementById('gxhset');if(set)set.innerHTML=GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'});
   const _pr=phRender;phRender=function(){const r=_pr.apply(this,arguments);try{if(G)GXH.phase(GX&&GX.open?null:hlpPhase())}catch(e){console.error(e)}return r};
   const _r=render;render=function(){const r=_r.apply(this,arguments);try{GXH.phase(GX&&GX.open?null:hlpPhase())}catch(e){console.error(e)}return r};
