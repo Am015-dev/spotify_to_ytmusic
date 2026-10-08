@@ -523,6 +523,7 @@ function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[
   mesh(lathe([[1.16,.15],[1.13,.163],[1.1,.15]],64),new THREE.MeshStandardMaterial({color:0xd9a441,metalness:1,roughness:.3}),0,0,0,base,true);
   const shadow=mesh(new THREE.PlaneGeometry(3.4,3.4),new THREE.MeshBasicMaterial({map:V3.tex.blob,transparent:true,depthWrite:false,opacity:.75}),0,.012,0,R,true);shadow.rotation.x=-Math.PI/2;shadow.renderOrder=1;
   const mats=[];g.traverse(o=>{if(o.isMesh&&o.material&&(o.material.isMeshPhysicalMaterial||o.material.isMeshStandardMaterial)&&!mats.includes(o.material)){o.material=o.material.clone();mats.push(o.material);o.material.userData.c0=o.material.color.clone();o.material.userData.e0=o.material.emissive.clone()}});
+  {const gf=window.CCMedia&&CCMedia.model(m);if(gf)CCMedia.loadGLB(gf,m).then(obj=>{const old=g.children.slice();obj.traverse(x=>{if(x.isMesh&&x.material){x.material.userData.c0=x.material.color.clone();x.material.userData.e0=x.material.emissive.clone();mats.push(x.material)}});if(V3.r)applyEnv(obj);g.add(obj);old.forEach(x=>x.visible=false)}).catch(e=>console.warn('model',gf,e))} // the Flow character as a real 3D model; the built one stays if it cannot load
   R.traverse(o=>{if(o.material&&o.material.isMeshStandardMaterial)o.material.userData.hero=true});if(V3.r)applyEnv(R);R.scale.setScalar(MS);R.userData.s=MS;return {g:R,fig:g,anim,mats,phase:Math.random()*6}}
 // airbrushed shading baked into vertex colours: darker toward the feet and in the undersides, like a painted vinyl toy
 function airbrush(g){g.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(g.matrixWorld).invert();const v=new THREE.Vector3(),n=new THREE.Vector3(),nm=new THREE.Matrix3();
@@ -693,7 +694,8 @@ function animWorld(dt,t){
   V3.clouds.forEach((c,k)=>{c.position.x+=dt*(.4+k*.05);if(c.position.x>90)c.position.x=-90})}
 // ---- 3D portraits of the vinyl figures for the monster picker (the SVG art stays as the fallback) ----
 const MONPIC={};
-function monPic(k){const cf=window.CCMedia&&CCMedia.cutout(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
+function monFace(k,cls){const cf=window.CCMedia&&CCMedia.avatar(k);if(cf)return `<img class="${cls||'mface'}" src="${cf}" alt="" draggable="false">`;return `<svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(k)}</svg>`} // menu picture: the Flow character, or the drawn one
+function monPic(k){const cf=window.CCMedia&&CCMedia.avatar(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
 function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;const S=192;const r=V3.r;let rt;
   try{rt=new THREE.WebGLRenderTarget(S,S,{type:THREE.FloatType,samples:r.capabilities.isWebGL2?4:0})}catch(e){return}
   const ps=new THREE.Scene();ps.add(new THREE.HemisphereLight(0x9a90ff,0x2a1430,.9));const key=new THREE.DirectionalLight(0xffc9a0,2.6);key.position.set(-4,6,6);ps.add(key);

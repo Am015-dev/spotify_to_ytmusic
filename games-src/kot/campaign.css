@@ -20,3 +20,7 @@ html.ph .pchip .pav{position:absolute;right:1px;bottom:1px;width:40px;height:40p
 html.ph .pchip b,html.ph .pchip span{position:relative;z-index:1}
 html.ph .pchip.on .pav{opacity:.55}
 html.ph .pchip.ko .pav{filter:grayscale(1)}
+
+/* menu pictures of the monsters */
+.intro .you img.mface{width:54px;height:54px;flex:0 0 54px;object-fit:contain}
+html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:contain}

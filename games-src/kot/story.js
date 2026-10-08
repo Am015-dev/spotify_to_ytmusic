@@ -64,7 +64,7 @@ function mbHold(q){if(!(UI.firstGame&&G.mode==='solo'&&!UI.hadTurn))return false
 function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.map(x=>mname(x));
   const cast=names.slice(0,-1).join(', ')+' and '+names[names.length-1];
   return `<div class="intro"><h2>📰 Dawn over Crown City</h2><p>The portal over Crown City cracked open at dawn. ${G.pl.length} monsters rose: ${esc(cast)}. Whoever reaches <b>20 ★</b>, or is the <b>last one standing</b>, becomes the city's new King.</p>
-   ${q?`<p class="you" style="--mc:${MONS[q.m].c}"><svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(q.m)}</svg><span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
+   ${q?`<p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
 
    <p class="goal"><b>Your turn:</b> roll 6 dice up to 3 times, keep what you like, then use them. <b>Three of a kind</b> scores stars, claws hit, hearts heal, ⚡ buys cards.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button></div>
