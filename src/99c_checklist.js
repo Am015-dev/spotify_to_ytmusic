@@ -3,6 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88o',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
  {ver:'v88o',id:'pin-strip',text:'This checklist stays on screen while you drive, race and build: answer with ✅ / ❌, ‹ › to move, tap the counter to fold it to a chip. Steering and gas keep working while you tap it.'},
  {ver:'v88o',id:'clear-base',text:'Garage BUILD → ⋯ MORE → CLEAR on a normal car and on the Bus: only the chassis and wheels stay, with one clean grid and nothing overlapping. UNDO brings the build back.'},
  {ver:'v88o',id:'gx-palette',text:'Garage BUILD (phone): the parts palette shows 2 rows of bigger tiles with names; swipe it sideways to see more. ▾ makes it small again.'},
@@ -89,12 +90,14 @@ const OD_CHECKLIST=[
  // Folded: a "✓ 3/8" chip. It can only be dismissed (✕ on the chip) once every item of the version is answered. State lives in mho_chk._pin.
  // Touches on it never reach the controls under it and it never pauses the game.
  const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
- let pinBkOpen=0;const pinBk=()=>{try{return !!GB_.bk}catch(e){return false}};
+ let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
+ // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
+ const pinCd=()=>{try{return state==='countdown'||(state==='race'&&raceT<3)}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  const pinR=()=>{const P=pst(),C=cur(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
   const busy=!ov.hidden||!n||P.done&&ans===n||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
-  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen);
+  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen)||pinCd();
   if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
    `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
