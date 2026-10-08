@@ -3,6 +3,13 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88j',id:'gx-palette',text:'Garage BUILD (phone): the parts palette shows 2 rows of bigger tiles with names; swipe it sideways to see more. ▾ makes it small again.'},
+ {ver:'v88j',id:'gx-chips',text:'Tap the category chips (BRICKS, PLATES, SLOPES…): only those parts show. Pick a few parts, then tap 🕘 RECENT: the parts you just used are first.'},
+ {ver:'v88j',id:'gx-fav',text:'Long-press a part tile (right-click on PC): it gets a ★ and shows under ★ FAVS. Long-press again removes it. It is still there after a reload.'},
+ {ver:'v88j',id:'gx-make',text:'Tap ☝ SELECT, tap 3–4 parts, then MAKE GROUP: a group "Group 1" appears in the ⛓ GROUPS list. ✎ renames it.'},
+ {ver:'v88j',id:'gx-eye',text:'In ⛓ GROUPS tap the 👁 eye: the group disappears and its parts cannot be tapped; tap again to show it. SAVE & DRIVE with it hidden: the car you drive is complete.'},
+ {ver:'v88j',id:'gx-ops',text:'Tap a group name: MOVE, COPY, MIRROR and DELETE work on the whole group (UNDO brings a deleted group back).'},
+ {ver:'v88j',id:'gx-hideup',text:'Open a big template (Bus), step the LAYER ▼ down and tap HIDE UP: everything above the layer disappears so you can build inside; SHOW UP brings it back.'},
  {ver:'v88i',id:'big-rides',text:'Garage RIDES: the Sightseeing Bus, Box Truck, Stretch Limo and Monster Truck show up and look like LEGO vehicles; equip each one and SAVE & DRIVE.'},
  {ver:'v88i',id:'big-junction',text:'Drive the Bus or the Truck through 3 junctions in Frankfurt: it turns wider than a car but never gets stuck on a corner.'},
  {ver:'v88i',id:'big-feel',text:'A big car picks up speed more slowly than the Hot Rod, and the camera shows the whole vehicle.'},

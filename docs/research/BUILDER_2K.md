@@ -189,3 +189,15 @@ Comparison: the PDF racer is ≈4×12 studs. A fan semi tractor on LEGO Ideas is
     hard to understand (Rapid Reviews); dragster vs sports-car handling (Xbox Wire).
 12. **Group/lock a sub-assembly** so it moves as one piece (2K Group tool, TouchTapPlay); matches the PDF's
     sub-assemblies at steps 14, 16, 18.
+
+---
+
+## 6. Garage UX follow-up (garux, 8 Oct 2026): palette, groups, visibility
+Full sourced notes: [`BUILDER_2K_UX.md`](BUILDER_2K_UX.md) (every fact with a URL; snippet-only facts marked). Short version:
+- **Brick Drawer:** shape categories, cycle category and part on the controller; a width × length size filter; Season 3 Part Locator (search by part ID).
+  "Favorite tabs" exist (Season 3 crash-fix note); a Recent list, a name search and the grid size: **not found**.
+- **Group** is its own Body Shop mode: it locks bricks into one piece that moves as one. "Select up" grabs everything attached; multi-select to move or recolour.
+- **Mirror** tool confirmed (developer interview; patch note about parts "not mirroring").
+- **Hide / isolate / eye toggle:** **not found** in 2K Drive (4 searches). BrickLink Studio has Hide + Show All and named submodels; Mecabricks has groups with hide/show.
+- **What we built from it:** chips + ★ FAVS (2K favourite tabs) + 🕘 RECENT (ours); named groups with MOVE / COPY / MIRROR / DELETE (2K Group + mirror)
+  and the 👁 eye + SHOW ALL (Studio / Mecabricks); HIDE UP for the layers above (ours, not found anywhere).
