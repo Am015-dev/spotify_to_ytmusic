@@ -9,7 +9,7 @@ const fs=require('fs');const{chromium,INIT}=require('../tools/d24lib');const URL
  await p.click('#hcStory');await p.evaluate(()=>__tick(10));await p.click('#slotList .go');
  for(let i=0;i<150;i++){try{if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'))break}catch(e){}await p.waitForTimeout(2000)}await p.evaluate(()=>{window.__auto=false});
  await p.evaluate(()=>{for(let i=0;i<20;i++){__tick(5);for(const s of['#storyGo','#rcGo','.m1go','#tutSkip','#m1Cs']){const e=document.querySelector(s);if(e&&!e.hidden&&e.offsetWidth)e.click()}}});
- const res=await p.evaluate(([N])=>__g9ev(`(()=>{try{if(RO.ch)chEnd(false)}catch(e){}const G=qvGraph(),out=[];const rc=new THREE.Raycaster();const wv=o=>{for(let q=o;q;q=q.parent)if(!q.visible)return false;return true};
+ const res=await p.evaluate(([N])=>__g9ev(`(()=>{try{if(RO.ch)chEnd(false)}catch(e){}const G=qvGraph(),out=[];const rc=new THREE.Raycaster();rc.camera=camera;const wv=o=>{for(let q=o;q;q=q.parent)if(!q.visible)return false;return true};
   const idx=[];for(let k=0;k<${N};k++)idx.push(Math.floor((k+.5)*G.n/${N}));
   for(const i of idx){const x=G.X[i],z=G.Z[i];RO.ftT=0;const need=lzNeed(x,z);for(const L of need)lzRun(L);RO.ch=null;roamWarp(x,z,0);__tick(20);
    rc.set(new THREE.Vector3(RO.x,RO.y+60,RO.z),new THREE.Vector3(0,-1,0));rc.far=200;const H=rc.intersectObject(HUB.grp,true).filter(h=>wv(h.object));
