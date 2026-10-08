@@ -69,7 +69,7 @@ function newGame(o) {
     for (const k of Object.keys(D.START_BAG)) for (let n = 0; n < D.START_BAG[k]; n++) p.bag.push(take(G, k));
   }
   G.fdeck = shuffleG(G, D.FORTUNE.map(f => f.id));
-  lg(G, 'The fair opens: ' + np + ' potion-makers, 9 days. Books: ' + ['G', 'B', 'R', 'Y', 'P'].map(c => D.COLORS[c].name + ' ' + G.sets[c]).join(', ') + '.');
+  lg(G, 'The fair opens: ' + np + ' potion-makers, ' + lastOf(G) + ' days. Books: ' + ['G', 'B', 'R', 'Y', 'P'].map(c => D.COLORS[c].name + ' ' + G.sets[c]).join(', ') + '.');
   startRound(G);
   adv(G);
   return G;
@@ -88,7 +88,7 @@ function startRound(G) {
   G.fcard = id; G.fdisc.push(id);
   const card = FORT[id]; use(G, 'fortune_' + id);
   ev(G, { t: 'round', round: G.round, start: G.start }); ev(G, { t: 'fortune', id });
-  lg(G, 'Day ' + G.round + ' of 9. ' + pn(G, G.start) + ' turns up the fortune card "' + card.name + '": ' + card.text);
+  lg(G, 'Day ' + G.round + ' of ' + lastOf(G) + '. ' + pn(G, G.start) + ' turns up the fortune card "' + card.name + '": ' + card.text);
   if (id !== 'clear') setRats(G);          // Clear the Pods gives points first: the rat tails are counted after the answers (see H 'clear')
   purple(G, id);
 }

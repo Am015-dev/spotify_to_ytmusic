@@ -14,12 +14,12 @@ const HLP_STEPS = {
   brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Draw for more coins and points, or Stop to keep your space. Whites must stay at 7 or less.', pic: () => hpics([['chip', 'W2']]) },
   hot: { target: hfirst('#acts .stopb', '#acts .brow'), title: 'Close to boiling', text: 'Another white chip may explode the pot. Stop now, or use the flask on the last white.', pic: () => hpics([['ico', 'boom']]) },
   last: { target: hfirst('#acts .brow', '#acts .bagb'), title: 'The last day', text: 'Everyone secretly picks Draw or Stop, then all show together. No shopping today.', pic: () => hpics([['ico', 'bag']]) },
-  card: { target: hfirst('#qbox .opts', '#qbox'), title: 'Fortune card', text: 'Today\'s card lets you choose something. Tap the option you want.', pic: () => hpics([['ico', 'ruby']]) },
-  chip: { target: hfirst('#qbox .opts', '#qbox'), title: 'Chip power', text: 'A chip lets you choose. Place the chip it shows, or put it all back.', pic: () => hpics([['chip', 'B1']]) },
+  card: { target: hfirst('#qbox [data-a=mv].sug', '#qbox [data-a=mv]', '#qbox'), title: 'Fortune card', text: 'Today\'s card lets you choose something. Tap the option you want.', pic: () => hpics([['ico', 'ruby']]) },
+  chip: { target: hfirst('#qbox [data-a=mv].sug', '#qbox [data-a=mv]', '#qbox'), title: 'Chip power', text: 'A chip lets you choose. Place the chip it shows, or put it all back.', pic: () => hpics([['chip', 'B1']]) },
   boom: { target: hfirst('#rs .ds.me .dtile', '#rs .dtile', '#rs .dec'), title: 'Boom! Choose', text: 'Your pot exploded. Take the victory points, or the coins to go shopping.', pic: () => hpics([['ico', 'boom']]) },
-  shop: { target: hfirst('#rs .stalls', '#rs .mkt'), title: 'The fair stalls', text: 'Tap chips to buy them for your bag: up to two, different colours.', pic: () => hpics([['ico', 'coin']]) },
-  ruby: { target: hfirst('#rs .rpot', '#rs .rbar', '#rs .rboard'), title: 'Spend rubies', text: '2 rubies move your droplet one space on, or refill your flask. Then go on.', pic: () => hpics([['ico', 'ruby']]) },
-  power: { target: hfirst('#rs .dsheet', '#rs .dec', '#rs .rsbody'), title: 'Chip power', text: 'A chip in your pot earned a bonus. Tap the reward you want.', pic: () => hpics([['chip', 'G1']]) }
+  shop: { target: hfirst('#rs .tok.sug:not(.on):not([disabled])', '#rs .tok:not(.on):not([disabled])', '#rs .stalls'), title: 'The fair stalls', text: 'Tap chips to buy them for your bag: up to two, different colours.', pic: () => hpics([['ico', 'coin']]) },
+  ruby: { target: hfirst('#rs .rbt.rdrop', '#rs .rtg:not(.here)', '#rs .rbar', '#rs .rpot'), title: 'Spend rubies', text: '2 rubies move your droplet one space on, or refill your flask. Then go on.', pic: () => hpics([['ico', 'ruby']]) },
+  power: { target: hfirst('#rs .dec [data-a=mv].sug', '#rs .dec [data-a=mv]', '#rs .dsheet'), title: 'Chip power', text: 'A chip in your pot earned a bonus. Tap the reward you want.', pic: () => hpics([['chip', 'G1']]) }
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each); a card without a phase is general
 const HLP_RULES = [
@@ -76,7 +76,7 @@ function capW(t, n) { const w = String(t || '').replace(/\s+/g, ' ').trim().spli
 function hlpWhy(p, q, m) {
   const pct = () => Math.round(CF.risk(G, p.seat).pBoom * 100), sp = CF.spaceOf(p);
   if (!q) {
-    if (m.t === 'draw') return 'Only ' + pct() + '% to explode, so another chip is worth the risk.';
+    if (m.t === 'draw') return !p.pot.length ? 'Your pot is empty, so drawing a chip is safe.' : pct() === 0 ? 'No chip in your bag can explode you now. Draw again.' : 'Only ' + pct() + '% to explode, so another chip is worth the risk.';
     if (m.t === 'flask') return 'Too hot: the flask puts the last white chip back in the bag.';
     return pct() + '% to explode. Stop and keep ' + D.COINS[sp] + ' coins and ' + D.VP[sp] + ' points.';
   }
@@ -111,7 +111,8 @@ function hlpSuggest() {
     }
     if (G.phase !== 'brew' || p.st !== 'draw' || p.lock) return null;
     const legal = UI.legal[v] || mvList(v);
-    let m = CF.AI.choose(G, v, 'normal'); if (!m || (m.t !== 'draw' && m.t !== 'stop' && m.t !== 'flask')) return null;
+    const fm = legal.find(x => x.t === 'flask'), dec = bfDecide(p, null, fm);      // the brew line and the ghost finger first: the bulb never contradicts them
+    let m = dec.act ? { t: dec.act } : CF.AI.choose(G, v, 'normal'); if (!m || (m.t !== 'draw' && m.t !== 'stop' && m.t !== 'flask')) return null;
     if (G.round === LASTD() && m.t === 'flask') return null;
     const sel = m.t === 'draw' ? '#acts .bagb:not(.off)' : m.t === 'stop' ? '#acts .stopb:not(.off)' : '#acts .flb'; const why = capW(hlpWhy(p, null, m), 15);
     if (!why || !document.querySelector(sel) || !legal.some(x => x.t === m.t)) return null;

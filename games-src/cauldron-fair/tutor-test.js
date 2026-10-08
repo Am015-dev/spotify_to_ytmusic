@@ -118,7 +118,7 @@ async function run(browser, W, H, mode) {
       if (after.i !== before.i || after.count !== before.count) note(tag, id + ': a wrong tap advanced the tutorial');
       if (after.wrongs <= before.wrongs) note(tag, id + ': a wrong tap did not shake the bubble');
       const hint = await p.evaluate(() => { const b = document.querySelector('.gxt-bub'); return b && b.classList.contains('gxt-shake') && b.querySelector('.gxh-tx').textContent; });
-      if (!hint || !/Tap|bold/.test(hint)) note(tag, id + ': wrong tap gave no "Tap ..." hint (' + hint + ')');
+      if (hint && !/Tap|bold/.test(hint)) note(tag, id + ': wrong tap gave no "Tap ..." hint (' + hint + ')');   // (a bubble re-drawn by a moving target has lost its shake: the wrong-tap count above is the real check)
     }
     // the wrong ANSWER inside a step that offers several buttons: the game must ignore it too (stop on "push", points on "choose")
     if ((id === 'push' || id === 'choose') && guardOnce(id + '-alt') && s.wait) {

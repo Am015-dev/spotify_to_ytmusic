@@ -16,7 +16,7 @@ const TUT_RULES = [
   ['the fortune card (purple now, blue all day)', 'fortune', 'day2'],
   ['rubies: move the droplet / refill the flask', 'droplet', 'refill'],
   ['the droplet and the rat stone head start', 'droplet', 'day2'],
-  ['buying chips in the shop; each colour has a power', 'shops1', 'shops2', 'buy'],
+  ['buying chips in the shop; each colour has a power', 'shops1', 'shops2', 'shops3', 'buy'],
   ['a chip power at work (blue: peek and pick)', 'peek'],
   ['scoring at the end of a day', 'report', 'd2report'],
   ['the last day: secret Draw or Stop, no shop, 5 coins and 2 rubies = 1 point', 'd2draw', 'd2report'],
@@ -42,14 +42,14 @@ function tutFix() {
   UI.focus = 0;
   if (G.phase === 'brew' && G.round === 1 && !T.d1) { T.d1 = 1; tutOrder(me, ['W2', 'W3', 'W1']); tutOrder(wy, ['W2', 'O1', 'W1', 'G1', 'W1']); }
   if (G.round === 1 && T.d1 && !T.fl && me.flask === false) { T.fl = 1; tutOrder(me, ['W2', 'W1']); }        // the flask put the white 1 back at a random place
-  if (G.phase === 'brew' && G.round === 2 && !T.d2) { T.d2 = 1; tutOrder(me, ['B1', 'W2', 'W3']); tutOrder(wy, ['W2', 'O1']); }
+  if (G.phase === 'brew' && G.round === 2 && !T.d2) { T.d2 = 1; tutOrder(me, ['B1', 'W2', 'W3']); tutOrder(wy, ['W2']); }
 }
-// Wynne is scripted too: she takes a Wren Feather 2 from the card, draws 4 chips on day 1 and 2 on day 2, then stops; shopping and rubies are the normal computer's.
+// Wynne is scripted too: she takes a Wren Feather 2 from the card, draws 4 chips on day 1 and 1 on day 2, then stops; shopping and rubies are the normal computer's.
 function tutAI(Gx, seat) {
   if (UI.mode !== 'tutorial' || Gx !== G || seat !== 1) return null;
   const p = Gx.players[1], mv = CF.moves(Gx, 1);
   if (p.q) return p.q.h === 'pick' ? (mv.find(m => m.o === 'B2') || null) : null;
-  if (Gx.phase === 'brew' && p.st === 'draw') { const want = Gx.round === 1 ? 4 : 2; return mv.find(m => m.t === (p.pot.length >= want ? 'stop' : 'draw')) || null; }
+  if (Gx.phase === 'brew' && p.st === 'draw') { const want = Gx.round === 1 ? 4 : 1; return mv.find(m => m.t === (p.pot.length >= want ? 'stop' : 'draw')) || null; }
   return null;
 }
 (function () { const o = CF.AI.choose; CF.AI.choose = function (Gx, seat, level) { const m = tutAI(Gx, seat); return m || o.call(CF.AI, Gx, seat, level); }; })();
@@ -82,14 +82,16 @@ function tutSteps() {
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 2 && tp().flask === false && tws() === 5 },
     { id: 'push', title: 'Push your luck', say: 'At 7, any white chip explodes the pot. Stopping is safe, but be bold: draw!', target: tbag, also: tq('#acts .meter'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, wrong: 'Be bold: tap the bag.', ready: () => tbrew() && tp().pot.length === 3 && tws() === 7 },
-    { id: 'report', title: 'Counting the day', say: () => { const d = G.players[1].res && G.players[1].res.die; return 'Spaces pay coins and points. Only safe pots can roll the bonus die' + (d && d.length ? ': ' + G.players[1].name + '\'s did.' : '.'); }, target: tq('#rs .dtable'), wait: null,
-      ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .dtable')) },
+    { id: 'report', title: 'Counting the day', say: () => { const d = G.players[1].res && G.players[1].res.die; return 'Spaces pay coins and points. Only safe pots can roll the bonus die' + (d && d.length ? ': ' + G.players[1].name + '\'s did.' : '.'); }, target: tq('#rs .ds:not(.me) .dtile'), also: tq('#rs .ds:not(.me) .dout'), wait: null,
+      ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .ds:not(.me) .dtile')) },
     { id: 'choose', title: 'Boom: pick one', say: () => { const d = tp().q.d; return 'Exploded pots choose: ' + tn(d.vp, 'point') + ' or ' + d.coins + ' coins to shop. Take the coins.'; }, target: tq('#rs .dpick.dpc'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'de' && a.m.o === 'buy' }, ready: () => !!(UI.rsOpen && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .dpick.dpc')) },
-    { id: 'shops1', title: 'The fair stalls', say: 'Each stall sells one colour, and each colour has a power. Orange: none. Green: rubies. Blue: peek. Black: moth count.', target: tfirst('#rs .stalls'), wait: null,
-      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stalls')) },
-    { id: 'shops2', title: 'More stalls', say: 'Red slides further. Yellow opens on day 2, purple on day 3. Tap and hold a chip to read its power.', target: tfirst('#rs .stalls'), wait: null,
-      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stalls')) },
+    { id: 'shops1', title: 'The fair stalls', say: 'Marrow has no power: a cheap filler. Mossback gives rubies when it is one of your last two chips.', target: tq('#rs .stall.cO'), also: tq('#rs .stall.cG'), wait: null,
+      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stall.cG')) },
+    { id: 'shops2', title: 'More powers', say: 'Wren Feather peeks at extra chips when it lands. Scarlet Cap slides further for every Marrow already in your pot.', target: tq('#rs .stall.cB'), also: tq('#rs .stall.cR'), wait: null,
+      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stall.cR')) },
+    { id: 'shops3', title: 'Locked stalls', say: 'Cinder Moth: most moths win droplet steps. Sunroot opens on day 2 and Dusk Sigh on day 3.', target: tq('#rs .stall.cK'), also: tq('#rs .stall.cY'), wait: null,
+      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stall.cK')) },
     { id: 'buy', title: 'Buy a chip', say: 'You may buy up to two chips of different colours. Tap the Wren Feather: it peeks at extra chips.', target: tq('#rs .tok[data-k="B1"]'),
       wait: { type: 'tap', match: a => a.what === 'shopsel' && a.k === 'B1' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .tok[data-k="B1"]')) },
     { id: 'droplet', title: 'The droplet', say: '2 rubies move your droplet one space on. Your first chip starts further every day. Tap it.', target: tq('#rs .rbt.rdrop'),
@@ -106,9 +108,9 @@ function tutSteps() {
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'crow' && a.m.idx === 0 }, ready: () => !!(tp() && tp().q && tp().q.h === 'crow') },
     { id: 'd2stop', title: 'Stop here', say: 'Stop keeps your space: its coins and points are yours. Tap Stop.', target: tq('#acts .stopb:not(.off)'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'stop' }, wrong: 'Tap Stop.', ready: () => tbrew() && G.round === 2 && tp().pot.length === 2 },
-    { id: 'd2report', title: 'The final count', say: () => 'Last day: every 5 coins and every 2 rubies give 1 point. Tap to see who won.', target: tq('#rs [data-a=rscont]:not(.off)'), also: tq('#rs .dtable'),
+    { id: 'd2report', title: 'The final count', say: () => 'Last day: every 5 coins and every 2 rubies give 1 point. Tap to see who won.', target: tq('#rs [data-a=rscont]:not(.off)'), also: tq('#rs .ds.me .dtile'),
       wait: { type: 'tap', match: a => a.what === 'rscont' }, ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && G.phase === 'over' && document.querySelector('#rs [data-a=rscont]:not(.off)')) },
-    { id: 'end', title: 'You know the game', say: () => { const a = G.players[0].vp, b = G.players[1].vp; return (a > b ? 'You win, ' + a + ' to ' + b + '!' : a === b ? 'A tie, ' + a + ' each!' : G.players[1].name + ' wins, ' + b + ' to ' + a + '.') + ' A real game lasts 9 days.'; },
+    { id: 'end', title: 'You know the game', say: () => { const a = G.players[0].vp, b = G.players[1].vp; return (G.winner === 0 ? 'You win, ' + a + ' to ' + b + (a === b ? ' on the tie-break!' : '!') : G.winner < 0 ? 'A tie, ' + a + ' each!' : G.players[1].name + ' wins, ' + b + ' to ' + a + '.') + ' A real game lasts 9 days.'; },
       target: tfirst('#rs .win', '#rs .rsbody'), wait: null, ready: () => !!(G && G.phase === 'over' && UI.rsMode === 'final' && document.querySelector('#rs .win')) }
   ];
 }
@@ -124,7 +126,7 @@ function tutStart(o) {
   GXT.start({
     game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'You know the rules',
-    endText: o ? 'Draw, stop, explode, shop, rubies, the last day. Now the Story begins.' : 'Draw, stop, explode, shop, rubies, the last day. Rounds 3 to 8 bring more books: the lightbulb explains them.',
+    endText: o ? 'Draw, stop, explode, shop, rubies, the last day. Now the Story begins.' : 'Draw, stop, explode, shop, rubies, the last day. The lightbulb explains anything new.',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
     setup: () => { try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false; newGame('tutorial'); },
     onDone: r => {
