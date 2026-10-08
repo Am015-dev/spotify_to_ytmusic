@@ -33,7 +33,8 @@ let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catc
 const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
 const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
 if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
-const NOMUSIC=/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
+const SIM=/[?&]sim=1/.test(location.search);            // test switch: no audio context at all, the page is stepped by hand (__mnr.step)
+const NOMUSIC=SIM||/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
 try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}   // iOS: Web Audio ignores the silent switch only in the 'playback' session
 const FX=()=>SET.reduce?.25:1;                          // strength of flashes and shake
 
@@ -46,7 +47,7 @@ const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds ->
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
 /* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */
-const NR=window.NR={_h:{},on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
+const NR=window.NR={_h:{},sw:[],on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
   music:{rate:1,   // tempo change: song playbackRate and the beat length scale together, the beat position stays continuous
     setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
@@ -66,9 +67,11 @@ function mnow(){const a=AU.a,run=a&&a.state==='running'?1:0;if(run)AU.ran=true;
   if(dom!==BT.src){const d=raw-BT.lastRaw;BT.t0+=d;if(BT.pend){BT.pend.at+=d;BT.pend.v.t0+=d;}BT.src=dom;}
   if(run!==ckRun){ckRun=run;ckReset();}
   if(run)ckPush(a);
-  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
+  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){const pv=BT.pend,ob={stage:BT.stage,t0:BT.t0,off:BT.off,spb:BT.spb};Object.assign(BT,pv.v);BT.rev++;BT.pend=null;AU.step=0;
+    if(pv.sw){NR.sw.push({from:ob.stage,to:BT.stage,at:pv.at,lag:raw-pv.at,oldBeat:(pv.at-ob.t0-ob.off)/ob.spb,newBeat:(pv.at-BT.t0-BT.off)/BT.spb,spbOld:ob.spb,spbNew:BT.spb});NR.emit('songSwitch',NR.sw[NR.sw.length-1]);}if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
 function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
+  if(SIM){mnow();return fbT+SET.sync/1000;}
   const a=AU.a;mnow();const p=ts>0?ts:performance.now();
   if(BT.src&&a){if(a.state!=='running')return a.currentTime-(a.outputLatency||0)+SET.sync/1000;return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;}
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
@@ -79,7 +82,7 @@ const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beat
 /* ---------- tracks (lazy) ---------- */
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
 function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,title:String(t.title||'').slice(0,40),stage:t.stage};}
-try{if(location.protocol!=='file:'&&!NOMUSIC)fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
+try{if(location.protocol!=='file:'&&(!NOMUSIC||SIM))fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
   for(const t of arr){const n=normTrack(t);if(n&&!TR.by[n.stage]){TR.by[n.stage]=n;TR.list.push(n);}}
   if(AU.a&&!running)AU.menuMusic();}).catch(()=>{});}catch(e){}
 async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
@@ -93,7 +96,7 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
 
 /* ---------- audio ---------- */
 const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
-  init(){if(this.a)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
+  init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();this.m.connect(a.destination);
     this.duck=a.createGain();this.duck.connect(this.m);                                     // music dips briefly under big effects
     this.musv=a.createGain();this.musv.connect(this.duck);
@@ -120,23 +123,55 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   f(n){return 440*Math.pow(2,(n-69)/12);},
   menuMusic(){if(TR.by.menu){if(BT.stage!=='menu')this.startStage('menu');loadTrack('menu');}else if(BT.stage!==''&&BT.stage!=='menu')this.startStage('menu');},
   trackReady(stage){const info=TR.by[stage];if(!info||!this.a)return;
-    if(BT.stage===stage&&BT.mode!=='file'){const spb4=BT.spb*4,now=mnow();let at=now+.1;
-      if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
+    if(BT.stage===stage&&BT.mode!=='file'&&!BT.pend&&!this.want){const spb4=BT.spb*4,now=mnow(),fo=info.offsetMs/1000;let at=now+.1+fo;   // the file starts fo early so its first beat lands on the bar line
+      if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15+fo-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
   // switch to the music of a stage: the track file if it is loaded, otherwise the built-in synth at that stage's tempo
-  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];
+  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];if(!at){this.want=null;this.wantT=0;this.intense(false);}
     if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
     if(info)loadTrack(stage);
     const now=mnow(),t=at||now+.08,ctxT=a.currentTime+(t-now);
     if(this.cur&&this.cur.src){const c=this.cur;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);c.src.stop(ctxT+1);}catch(e){}}
     this.cur=null;
     const v={stage};
-    if(buf){const src=a.createBufferSource();src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT);g.gain.linearRampToValueAtTime(1,ctxT+.25);
-      src.playbackRate.value=NR.music.rate;src.connect(g);g.connect(this.fb);src.start(ctxT);this.cur={src,g,stage};
-      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/NR.music.rate,off:info.offsetMs/1000,t0:t,title:info.title});}
+    if(buf){const src=a.createBufferSource(),fo=at?info.offsetMs/1000:0;src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT-fo);g.gain.linearRampToValueAtTime(1,ctxT-fo+.25);
+      src.playbackRate.value=NR.music.rate;src.connect(g);g.connect(this.fb);src.start(ctxT-fo);this.cur={src,g,stage};   // with a start time the file begins early, so its first beat lands on the bar line
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/NR.music.rate,off:info.offsetMs/1000,t0:t-fo,title:info.title});}
     else if(stage==='menu'){Object.assign(v,{mode:'none',bpm:100,spb:.6,off:0,t0:t,title:''});}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/NR.music.rate,off:0,t0:t,title:''});}
     if(at){BT.pend={at:t,v};}
     else{Object.assign(BT,v);BT.rev++;BT.pend=null;this.step=0;if(v.mode==='file'&&v.title&&G&&G.live)G.note={t:4,txt:'♪ '+v.title};}},
+  // Song change inside a run: wait for a bar line of the current song, then crossfade over one bar. The new song starts so that its first beat
+  // lands exactly on that bar line, so the beat grid never jumps. NR.sw logs every change (old/new beat position at the switch; both must be whole bars).
+  switchTo(stage){const a=this.a;this.want=stage;
+    if(!a||!running||BT.mode==='none'||BT.src!==1||a.state!=='running'){this.want=null;if(BT.stage!==stage)this.startStage(stage);return;}
+    if(BT.pend)return;                                    // sched() asks again once the pending change has landed
+    if(BT.stage===stage){this.want=null;return;}
+    const info=TR.by[stage];
+    if(info&&!TR.bufs[info.file]&&!TR.bad[info.file]){loadTrack(stage);if(!this.wantT)this.wantT=performance.now()+4000;if(performance.now()<this.wantT)return;}   // still loading: keep the current song
+    this.wantT=0;this.want=null;this.xfade(stage);},
+  xfade(stage){const a=this.a,info=TR.by[stage],buf=info&&TR.bufs[info.file],now=mnow(),rate=NR.music.rate,bar=4*BT.spb,ctxOf=t=>a.currentTime+(t-now);
+    const tb=BT.t0+BT.off+Math.ceil((now+bar+.08-BT.t0-BT.off)/bar)*bar;   // first bar line at least one bar + 80 ms away
+    const v={stage},CIN=new Float32Array(32),COUT=new Float32Array(32);for(let i=0;i<32;i++){CIN[i]=Math.sin(i/31*Math.PI/2);COUT[i]=Math.cos(i/31*Math.PI/2);}
+    let xf=bar;
+    if(buf){const off=info.offsetMs/1000,D=buf.duration,pos=(((off-bar*rate)%D)+D)%D,src=a.createBufferSource(),g=a.createGain();
+      src.buffer=buf;src.loop=true;src.playbackRate.value=rate;g.gain.value=0;src.connect(g);g.connect(this.fb);
+      src.start(ctxOf(tb-bar),pos);g.gain.setValueCurveAtTime(CIN,ctxOf(tb-bar),bar);
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/rate,off,t0:tb-off,title:info.title});this.nxt={src,g,stage};}
+    else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/rate,off:0,t0:tb,title:''});xf=BT.spb;this.nxt=null;}
+    const c=this.cur;
+    if(c&&c.src){try{const g=c.g.gain,t1=ctxOf(tb-xf);g.cancelScheduledValues(t1);g.setValueAtTime(1,t1);g.setValueCurveAtTime(COUT,t1,xf);c.src.stop(ctxOf(tb)+.1);}catch(e){}}
+    this.cur=this.nxt;BT.pend={at:tb,v,sw:1};},
+  intense(on){on=!!on;if(this.int===on)return;this.int=on;const a=this.a;if(!a||!this.fb)return;const t=a.currentTime;
+    this.fb.gain.cancelScheduledValues(t);this.fb.gain.setTargetAtTime(on?1.15:.9,t,.5);this.mus.gain.setTargetAtTime(on?.42:.34,t,.5);},
+  // extra drum layer under a stage song while a mini-boss is up (kick on every beat, hats, snare accents), on the same grid
+  isched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime;
+    if(this.irev!==BT.rev||this.istep===undefined){this.irev=BT.rev;this.istep=Math.ceil((now-t0)/s16);}
+    if(t0+this.istep*s16<now-.02)this.istep=Math.ceil((now-t0)/s16);
+    while(t0+this.istep*s16<now+.12){const n=this.istep,t=t0+n*s16,s=((n%16)+16)%16;
+      if(s%4===0)this.osc(t,'sine',150,.22,.5,this.mus,40);
+      if(s%4===2)this.noise(t,.035,.15,8000,this.mus);
+      if(s===4||s===12)this.noise(t,.11,.28,1600,this.mus,'bandpass');
+      this.istep++;}},
   osc(t,type,freq,dur,vol,dest,slide,cut){const a=this.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
     if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+dur);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
@@ -145,7 +180,10 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   noise(t,dur,vol,freq,dest,type='highpass'){const a=this.a,s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=this.nb;
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
-  sched(){const a=this.a;if(!a||a.state!=='running'||!running||paused||BT.mode!=='synth')return;
+  sched(){const a=this.a;if(a&&this.want&&running&&!paused)this.switchTo(this.want);
+    if(!a||a.state!=='running'||!running||paused)return;
+    if(this.int&&BT.mode==='file')this.isched(a);
+    if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
     while(BT.t0+this.step*s16<now+.12){this.play(this.step,BT.t0+this.step*s16,s16);this.step++;}},
   play(n,t,spb){const s=n%16,bar=Math.floor(n/16)%4,r=this.root+[0,0,-2,-4][bar];

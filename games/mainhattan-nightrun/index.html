@@ -139,7 +139,8 @@ let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catc
 const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
 const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
 if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
-const NOMUSIC=/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
+const SIM=/[?&]sim=1/.test(location.search);            // test switch: no audio context at all, the page is stepped by hand (__mnr.step)
+const NOMUSIC=SIM||/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
 try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}   // iOS: Web Audio ignores the silent switch only in the 'playback' session
 const FX=()=>SET.reduce?.25:1;                          // strength of flashes and shake
 
@@ -152,7 +153,7 @@ const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds ->
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
 /* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */
-const NR=window.NR={_h:{},on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
+const NR=window.NR={_h:{},sw:[],on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
   music:{rate:1,   // tempo change: song playbackRate and the beat length scale together, the beat position stays continuous
     setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
@@ -172,9 +173,11 @@ function mnow(){const a=AU.a,run=a&&a.state==='running'?1:0;if(run)AU.ran=true;
   if(dom!==BT.src){const d=raw-BT.lastRaw;BT.t0+=d;if(BT.pend){BT.pend.at+=d;BT.pend.v.t0+=d;}BT.src=dom;}
   if(run!==ckRun){ckRun=run;ckReset();}
   if(run)ckPush(a);
-  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
+  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){const pv=BT.pend,ob={stage:BT.stage,t0:BT.t0,off:BT.off,spb:BT.spb};Object.assign(BT,pv.v);BT.rev++;BT.pend=null;AU.step=0;
+    if(pv.sw){NR.sw.push({from:ob.stage,to:BT.stage,at:pv.at,lag:raw-pv.at,oldBeat:(pv.at-ob.t0-ob.off)/ob.spb,newBeat:(pv.at-BT.t0-BT.off)/BT.spb,spbOld:ob.spb,spbNew:BT.spb});NR.emit('songSwitch',NR.sw[NR.sw.length-1]);}if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
 function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
+  if(SIM){mnow();return fbT+SET.sync/1000;}
   const a=AU.a;mnow();const p=ts>0?ts:performance.now();
   if(BT.src&&a){if(a.state!=='running')return a.currentTime-(a.outputLatency||0)+SET.sync/1000;return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;}
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
@@ -185,7 +188,7 @@ const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beat
 /* ---------- tracks (lazy) ---------- */
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
 function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,title:String(t.title||'').slice(0,40),stage:t.stage};}
-try{if(location.protocol!=='file:'&&!NOMUSIC)fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
+try{if(location.protocol!=='file:'&&(!NOMUSIC||SIM))fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
   for(const t of arr){const n=normTrack(t);if(n&&!TR.by[n.stage]){TR.by[n.stage]=n;TR.list.push(n);}}
   if(AU.a&&!running)AU.menuMusic();}).catch(()=>{});}catch(e){}
 async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
@@ -199,7 +202,7 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
 
 /* ---------- audio ---------- */
 const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
-  init(){if(this.a)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
+  init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();this.m.connect(a.destination);
     this.duck=a.createGain();this.duck.connect(this.m);                                     // music dips briefly under big effects
     this.musv=a.createGain();this.musv.connect(this.duck);
@@ -226,23 +229,55 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   f(n){return 440*Math.pow(2,(n-69)/12);},
   menuMusic(){if(TR.by.menu){if(BT.stage!=='menu')this.startStage('menu');loadTrack('menu');}else if(BT.stage!==''&&BT.stage!=='menu')this.startStage('menu');},
   trackReady(stage){const info=TR.by[stage];if(!info||!this.a)return;
-    if(BT.stage===stage&&BT.mode!=='file'){const spb4=BT.spb*4,now=mnow();let at=now+.1;
-      if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
+    if(BT.stage===stage&&BT.mode!=='file'&&!BT.pend&&!this.want){const spb4=BT.spb*4,now=mnow(),fo=info.offsetMs/1000;let at=now+.1+fo;   // the file starts fo early so its first beat lands on the bar line
+      if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15+fo-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
   // switch to the music of a stage: the track file if it is loaded, otherwise the built-in synth at that stage's tempo
-  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];
+  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];if(!at){this.want=null;this.wantT=0;this.intense(false);}
     if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
     if(info)loadTrack(stage);
     const now=mnow(),t=at||now+.08,ctxT=a.currentTime+(t-now);
     if(this.cur&&this.cur.src){const c=this.cur;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);c.src.stop(ctxT+1);}catch(e){}}
     this.cur=null;
     const v={stage};
-    if(buf){const src=a.createBufferSource();src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT);g.gain.linearRampToValueAtTime(1,ctxT+.25);
-      src.playbackRate.value=NR.music.rate;src.connect(g);g.connect(this.fb);src.start(ctxT);this.cur={src,g,stage};
-      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/NR.music.rate,off:info.offsetMs/1000,t0:t,title:info.title});}
+    if(buf){const src=a.createBufferSource(),fo=at?info.offsetMs/1000:0;src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT-fo);g.gain.linearRampToValueAtTime(1,ctxT-fo+.25);
+      src.playbackRate.value=NR.music.rate;src.connect(g);g.connect(this.fb);src.start(ctxT-fo);this.cur={src,g,stage};   // with a start time the file begins early, so its first beat lands on the bar line
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/NR.music.rate,off:info.offsetMs/1000,t0:t-fo,title:info.title});}
     else if(stage==='menu'){Object.assign(v,{mode:'none',bpm:100,spb:.6,off:0,t0:t,title:''});}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/NR.music.rate,off:0,t0:t,title:''});}
     if(at){BT.pend={at:t,v};}
     else{Object.assign(BT,v);BT.rev++;BT.pend=null;this.step=0;if(v.mode==='file'&&v.title&&G&&G.live)G.note={t:4,txt:'♪ '+v.title};}},
+  // Song change inside a run: wait for a bar line of the current song, then crossfade over one bar. The new song starts so that its first beat
+  // lands exactly on that bar line, so the beat grid never jumps. NR.sw logs every change (old/new beat position at the switch; both must be whole bars).
+  switchTo(stage){const a=this.a;this.want=stage;
+    if(!a||!running||BT.mode==='none'||BT.src!==1||a.state!=='running'){this.want=null;if(BT.stage!==stage)this.startStage(stage);return;}
+    if(BT.pend)return;                                    // sched() asks again once the pending change has landed
+    if(BT.stage===stage){this.want=null;return;}
+    const info=TR.by[stage];
+    if(info&&!TR.bufs[info.file]&&!TR.bad[info.file]){loadTrack(stage);if(!this.wantT)this.wantT=performance.now()+4000;if(performance.now()<this.wantT)return;}   // still loading: keep the current song
+    this.wantT=0;this.want=null;this.xfade(stage);},
+  xfade(stage){const a=this.a,info=TR.by[stage],buf=info&&TR.bufs[info.file],now=mnow(),rate=NR.music.rate,bar=4*BT.spb,ctxOf=t=>a.currentTime+(t-now);
+    const tb=BT.t0+BT.off+Math.ceil((now+bar+.08-BT.t0-BT.off)/bar)*bar;   // first bar line at least one bar + 80 ms away
+    const v={stage},CIN=new Float32Array(32),COUT=new Float32Array(32);for(let i=0;i<32;i++){CIN[i]=Math.sin(i/31*Math.PI/2);COUT[i]=Math.cos(i/31*Math.PI/2);}
+    let xf=bar;
+    if(buf){const off=info.offsetMs/1000,D=buf.duration,pos=(((off-bar*rate)%D)+D)%D,src=a.createBufferSource(),g=a.createGain();
+      src.buffer=buf;src.loop=true;src.playbackRate.value=rate;g.gain.value=0;src.connect(g);g.connect(this.fb);
+      src.start(ctxOf(tb-bar),pos);g.gain.setValueCurveAtTime(CIN,ctxOf(tb-bar),bar);
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/rate,off,t0:tb-off,title:info.title});this.nxt={src,g,stage};}
+    else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/rate,off:0,t0:tb,title:''});xf=BT.spb;this.nxt=null;}
+    const c=this.cur;
+    if(c&&c.src){try{const g=c.g.gain,t1=ctxOf(tb-xf);g.cancelScheduledValues(t1);g.setValueAtTime(1,t1);g.setValueCurveAtTime(COUT,t1,xf);c.src.stop(ctxOf(tb)+.1);}catch(e){}}
+    this.cur=this.nxt;BT.pend={at:tb,v,sw:1};},
+  intense(on){on=!!on;if(this.int===on)return;this.int=on;const a=this.a;if(!a||!this.fb)return;const t=a.currentTime;
+    this.fb.gain.cancelScheduledValues(t);this.fb.gain.setTargetAtTime(on?1.15:.9,t,.5);this.mus.gain.setTargetAtTime(on?.42:.34,t,.5);},
+  // extra drum layer under a stage song while a mini-boss is up (kick on every beat, hats, snare accents), on the same grid
+  isched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime;
+    if(this.irev!==BT.rev||this.istep===undefined){this.irev=BT.rev;this.istep=Math.ceil((now-t0)/s16);}
+    if(t0+this.istep*s16<now-.02)this.istep=Math.ceil((now-t0)/s16);
+    while(t0+this.istep*s16<now+.12){const n=this.istep,t=t0+n*s16,s=((n%16)+16)%16;
+      if(s%4===0)this.osc(t,'sine',150,.22,.5,this.mus,40);
+      if(s%4===2)this.noise(t,.035,.15,8000,this.mus);
+      if(s===4||s===12)this.noise(t,.11,.28,1600,this.mus,'bandpass');
+      this.istep++;}},
   osc(t,type,freq,dur,vol,dest,slide,cut){const a=this.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
     if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+dur);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
@@ -251,7 +286,10 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   noise(t,dur,vol,freq,dest,type='highpass'){const a=this.a,s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=this.nb;
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
-  sched(){const a=this.a;if(!a||a.state!=='running'||!running||paused||BT.mode!=='synth')return;
+  sched(){const a=this.a;if(a&&this.want&&running&&!paused)this.switchTo(this.want);
+    if(!a||a.state!=='running'||!running||paused)return;
+    if(this.int&&BT.mode==='file')this.isched(a);
+    if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
     while(BT.t0+this.step*s16<now+.12){this.play(this.step,BT.t0+this.step*s16,s16);this.step++;}},
   play(n,t,spb){const s=n%16,bar=Math.floor(n/16)%4,r=this.root+[0,0,-2,-4][bar];
@@ -488,17 +526,22 @@ function newGame(daily){
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
      daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
   SH.reset();enterDistrict(0);}
-function diff(){const ease=G.loop?1:clamp(.62+.38*G.t/180,.62,1);return(1+.13*G.di+.45*G.loop)*ease;}   // gentle first three minutes
+function diff(){if(ST.on)return ST.d;const ease=G.loop?1:clamp(.74+.26*G.t/150,.74,1);return(1+.16*G.di+.5*G.loop)*ease*(HARD?1.3:1);}   // endless: gentle first two and a half minutes; Hard adds 30%
 const bossStage=k=>k===3?'boss2':'boss';   // final boss gets its own song
-const stageFor=(i,boss)=>boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):G.loop?['endless','endless2'][i%2]:['stage1','stage2','stage3'][i%3];
+// Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
+const bossSong=(k,mini)=>mini||k===0?null:bossStage(k);
+const songFor=(i,loop)=>loop?['endless','endless2'][i%2]:['stage1','stage2','stage3'][i%3];
+const stageFor=(i,boss)=>ST.on?ST.def.song:boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):songFor(i,G.loop);
 function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:''),false,3.2);AU.root=D.root;AU.boss=false;
-  if(G.live)AU.startStage(stageFor(i,false));}
+  if(G.live)AU.switchTo(stageFor(i,false));}
 
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);return e;}
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1))*(ST.on?ST.eh:1));
+  if(!o.mini&&(type==='drone'||type==='charger'||type==='turret')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
+  e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -508,16 +551,22 @@ const WAVES={
   gunship(){en('gunship',{x:W+90,y:gr(160,H-220)});return 5.5;},
   gate(){en('gate',{x:W+30,gy:gr(150,H-200),gap:130});return 3.8;}
 };
-function eb(x,y,a,s,c='#ff3dbb',r=5){G.eb.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r,c,g:false});}
+const eliteP=()=>ST.on?ST.el:HARD?.2+.1*G.di:0;
+const bsM=()=>ST.on?ST.bs:HARD?1.2:1;                    // bullet speed: rises stage by stage in Story, +20% in Hard
+function eb(x,y,a,s,c='#ff3dbb',r=5){s*=bsM();G.eb.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r,c,g:false});}
 const aim=e=>Math.atan2(P.y-e.y,P.x-e.x);
-function fan(e,n,sp,s,c){const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a-sp/2+sp*i/(n-1),s,c);}
-function ring(e,n,s,off,c){for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
-function spawnBoss(){const D=DISTRICTS[G.di],k=D.boss;
-  const pats=[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']][k];
-  const hp=Math.round((340+110*k)*(1+.35*G.loop)*(G.loop||G.t>180?1:.85));
-  G.boss={type:'boss',k,x:W+120,y:H/2,r:k===3?54:46,hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:5000*(k+1),col:[D.a,D.b,D.a,D.a][k]};
-  G.en.push(G.boss);banner('WARNUNG',D.bossName+' · '+D.bossSub,true,3);AU.boss=true;AU.sfx('warn');
-  if(G.live)AU.startStage(bossStage(k));}
+function fan(e,n,sp,s,c){n+=ST.on?2*Math.floor(ST.lvl/4):HARD?2:0;const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a-sp/2+sp*i/(n-1),s,c);}
+function ring(e,n,s,off,c){n+=ST.on?Math.floor(ST.lvl/2):HARD?2:0;for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
+function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,mini=!!o.mini;
+  const tab=[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']];
+  const pats=o.pats||tab[k];
+  const hp=o.hp||Math.round((340+110*k)*(1+.35*G.loop)*(G.loop||G.t>180?1:.85)*(HARD?1.25:1));
+  const nm=o.nm||D.bossName;
+  G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
+    col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?8:16,p3:mini?16:32};
+  G.en.push(G.boss);banner('WARNUNG',nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
+  if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
+  return G.boss;}
 
 /* ---------- effects + scoring ---------- */
 function burst(x,y,col,n=18,sp=260,life=.6){for(let i=0;i<n;i++){const a=rnd(0,7),s=rnd(40,sp);G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(life*.5,life),m:life,c:col,sz:rnd(1.5,3.5)});}}
@@ -532,15 +581,16 @@ function onPerfect(kind,j,x,y){const first=C.last!==j.beat;J.ok++;
   try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}}
 function tryPerfect(kind,ts,x,y){const j=judge(ts);J.n++;J.last={kind,ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
   if(j.ok&&(kind!=='graze'||C.last!==j.beat))onPerfect(kind,j,x,y);return j.ok;}
+const healK=()=>ST.on?ST.heal:HARD?.5:1;
 function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false});const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);
   burst(e.x,e.y,D.a,e.type==='gunship'?50:22,e.type==='gunship'?380:260);burst(e.x,e.y,'#ffffff',8,160,.3);shake(e.type==='gunship'?12:5);AU.sfx('boom');
   const drop=(t,dx=0,dy=0)=>G.pk.push({t,x:e.x+dx,y:e.y+dy,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});
-  if(e.type==='drone'||e.type==='charger'){if(GX()<.6)drop('shard');}
+  if(e.type==='drone'||e.type==='charger'){if(GX()<.6||e.el)drop('shard');}
   else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GX()<.15)drop(P.wl<3?'up':'emp');}
   else if(e.type==='gunship'){drop(P.wl<3&&GX()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
-  if(GX()<.035&&P.hp<P.max)drop('hp');}
-function hurt(){if(P.inv>0||P.dashT>0||G.dead||godMode)return;if(SH.absorb())return;P.hp--;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);C.n=0;shake(14);G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
+  if(GX()<.035*healK()&&P.hp<P.max)drop('hp');}
+function hurt(){if(P.inv>0||P.dashT>0||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp--;ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);C.n=0;shake(14);G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
 
@@ -551,20 +601,22 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
   for(let i=G.lq+1;i<=q;i++){onTick(i);if(((i%4)+4)%4===0)onBeat(Math.floor(i/4));}
   G.lq=q;}
 function onTick(i){const e=G.boss;if(e&&e.x<=790&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
-  const sp=e.ph===3?1.1:1;e.sa+=.36;for(let j=0;j<3;j++)eb(e.x,e.y,e.sa+j*2.094,(150+10*diff())*sp,'#ff3dbb',5);}}
+  const sp=e.ph===3?1.1:1;e.sa+=.36;const arms=3+(ST.on?(ST.lvl>=6)+(ST.lvl>=10):HARD?1:0);for(let j=0;j<arms;j++)eb(e.x,e.y,e.sa+j*6.2832/arms,(150+10*diff())*sp,'#ff3dbb',5);}}
 function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
   if(C.n>0&&G.bc-C.lb>8+SH.ck)C.n=0;                           // combo drops after 8 beats without a PERFECT
-  if(G.waveWait&&i%4===0&&!G.dead&&!G.boss&&!G.bossDone){const D=DISTRICTS[G.di];G.waveWait=false;
-    G.waveT=barQ(WAVES[gpick(D.waves)]()/(0.8+0.2*d)*(G.loop?1:clamp(1.3-.3*G.t/180,1,1.3)));}
+  if(G.waveWait&&i%4===0&&!G.dead&&!G.boss&&!G.bossDone&&!ST.over){const D=DISTRICTS[G.di],wl=ST.on?ST.def.waves:D.waves;G.waveWait=false;
+    const ease=ST.on?ST.dens:G.loop?1:clamp(1.15-.15*G.t/150,1,1.15);
+    G.waveT=barQ(WAVES[gpick(wl)]()/(0.8+0.2*d)*ease);
+    if(ST.on){for(let k=ST.x;k>0;k--)if(k>=1||GR()<k)WAVES[gpick(wl)]();}}
   if(G.dead)return;
   for(const e of G.en){
     if(e.type==='boss'){bossBeat(e,d);continue;}
-    if(e.type==='drone'){if(--e.bf<=0){if(e.x<W-30&&e.x>P.x+60)eb(e.x,e.y,aim(e),150+22*d);e.bf=fireIn(gx(1.8,3)/d);}}
-    else if(e.type==='turret'){if(e.t<6.5&&e.x<=e.stop&&--e.bf<=0){fan(e,3+(d>1.4?2:0),.5,170+15*d,'#ffa02d');e.bf=fireIn(1.5/d);}}
+    if(e.type==='drone'){if(--e.bf<=0){if(e.x<W-30&&e.x>P.x+60){if(e.el)fan(e,3,.42,150+22*d,'#ffd23d');else eb(e.x,e.y,aim(e),150+22*d);}e.bf=fireIn(gx(1.8,3)/d/(e.el?1.3:1));}}
+    else if(e.type==='turret'){if(e.t<6.5&&e.x<=e.stop&&--e.bf<=0){fan(e,3+(d>1.4||e.el?2:0),.5,170+15*d,e.el?'#ffd23d':'#ffa02d');e.bf=fireIn(1.5/d);}}
     else if(e.type==='gunship'){if(e.x<W-100&&--e.bf<=0){e.bn++;if(e.bn%2)ring(e,12+2*G.di,120+12*d,e.t,'#ff3dbb');else fan(e,3,.3,210,'#ffa02d');e.bf=fireIn(1.4/d);}}
   }}
-function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=32?3:bar>=16?2:1;     // phases change on bar 16 and bar 32
-  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];banner(ph===2?'PHASE 2':'FINAL PHASE',DISTRICTS[G.di].bossName,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');return;}
+function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e.p2?2:1;     // phases change on bar 16 and bar 32 (mini-bosses: 8 and 16)
+  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');return;}
   if(e.x>790||G.dead)return;
   const list=e.lists[e.ph-1];e.pc++;if(e.pc<0)return;if(e.pc>=8){e.pc=0;e.pi=(e.pi+1)%list.length;e.cnt=0;}
   const c=e.pc,cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c2='#ffa02d';
@@ -572,9 +624,9 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=32?3:bar>=16?
     case'fan5':if(c%cad===0)fan(e,5,.9,(190+15*d)*sp,c2);break;
     case'fan7':if(c%cad===0)fan(e,7,1.2,(180+15*d)*sp,c2);break;
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
-    case'ring':if(c%cad===0){ring(e,14+2*e.k,(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
+    case'ring':if(c%cad===0){ring(e,14+2*Math.min(e.k,3),(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
     case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gx(60,H-100),amp:40,ph:gx(0,6)});en('charger',{x:W+60,y:gx(60,H-100)});}break;
-    case'laser':if(c%3===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}}
+    case'laser':if(c%(ST.on&&ST.lvl>=8||HARD?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}}
 
 /* ---------- update ---------- */
 function update(dt){
@@ -622,18 +674,19 @@ function update(dt){
   pressed={};
 
   /* waves & boss trigger */
-  if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;G.waveT-=dt;
+  if(ST.on){ST.tick(dt);}
+  else if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;G.waveT-=dt;
     if(G.dt>=distLen()){if(G.en.length===0||G.dt>distLen()+6)spawnBoss();}
     else if(G.waveT<=0)G.waveWait=true;                   // the wave itself enters on the next bar
     if(!G.preload&&G.dt>10){G.preload=true;const n=(G.di+1)%DISTRICTS.length;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
-  if(G.transT>=0){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}SH.pit(()=>enterDistrict(n));}}
+  if(G.transT>=0&&!ST.on){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}SH.pit(()=>enterDistrict(n));}}
 
   /* enemies */
   for(const e of G.en){e.t+=sdt;e.flash=Math.max(0,e.flash-dt);
     switch(e.type){
       case'drone':e.x-=(120+15*d)*sdt;e.y=e.by+Math.sin(G.bp*Math.PI/2+(e.ph||0))*(e.amp||0);break;
       case'turret':if(e.t<6.5){if(e.x>e.stop)e.x-=150*sdt;}else{e.x-=180*sdt;e.y-=40*sdt;}break;
-      case'charger':if(e.t<.7)e.x-=130*sdt;else if(e.t<1.3){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(600+60*d)*sdt;}break;
+      case'charger':if(e.t<.7)e.x-=130*sdt;else if(e.t<1.3){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(600+60*d)*sdt*(e.el?1.2:1);}break;
       case'gunship':if(e.x>W-170)e.x-=60*sdt;else e.y=e.by+Math.sin(e.t*.8)*60;
         if(e.t>13)e.x-=90*sdt;break;
       case'gate':e.x-=95*sdt;if(G.di>=3||G.loop)e.gy+=Math.sin(e.t*1.4)*40*sdt;{const cyc=e.t%2.8;e.on=cyc>1.1;e.tele=cyc>.7&&cyc<=1.1;}
@@ -691,9 +744,12 @@ function bossUpdate(e,dt,d){
   e.lasers=e.lasers.filter(l=>l.t<3.1*BT.spb);}
 function bossDown(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:true});const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-40,'+'+pts,D.b);
   for(let i=0;i<5;i++){const bx=e.x,by=e.y;G.delayed.push({t:i*.16,f:()=>{burst(bx+rnd(-40,40),by+rnd(-40,40),i%2?D.a:'#ffffff',40,420,1);AU.sfx('boom');}});}
-  AU.sfx('big');shake(22);G.flash=Math.max(G.flash,.4*FX());G.eb=[];G.boss=null;G.bossDone=true;AU.boss=false;
-  G.pk.push({t:'hp',x:e.x,y:e.y,vx:-80,vy:-40,bob:0},{t:P.wl<3?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
+  AU.sfx('big');shake(22);G.flash=Math.max(G.flash,.4*FX());G.eb=[];G.boss=null;G.bossDone=true;AU.boss=false;AU.intense(false);
+  if(!ST.on){const n=G.di+1,L=n>=DISTRICTS.length?G.loop+1:G.loop;if(G.live)AU.switchTo(songFor(n%DISTRICTS.length,L));}   // back to a stage song on the next bar line
+  if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-80,vy:-40,bob:0});
+  G.pk.push({t:P.wl<3?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});
+  if(ST.on){ST.bossDown(e,pts);return;}
   banner('SEKTOR FREI',D.name+' cleared · +'+pts,false,3);G.transT=4.5;}
 
 function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;const D=DISTRICTS[G.di];
@@ -707,6 +763,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();}
 
 function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y);const fl=e.flash>0;
+  if(e.el){ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(0,0,e.r+4,0,7);ctx.stroke();ctx.globalAlpha=1;}
   switch(e.type){
     case'drone':{ctx.fillStyle=fl?'#fff':'#141024';ctx.strokeStyle='#5a6aff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,0,14,8,0,0,7);ctx.fill();ctx.stroke();
       ctx.strokeStyle='#8890c0';ctx.lineWidth=1;for(const s of[-1,1]){ctx.beginPath();ctx.moveTo(s*10,-4);ctx.lineTo(s*16,-10);ctx.stroke();ctx.beginPath();ctx.ellipse(s*16,-11,8*Math.abs(Math.sin(t*40+s)),1.5,0,0,7);ctx.stroke();}
@@ -740,11 +797,13 @@ function drawBoss(e,t,fl){const c=e.col;
   if(e.k===0){for(const s of[-1,1]){ctx.beginPath();ctx.moveTo(-10,s*10);ctx.lineTo(30,s*(70+Math.sin(t*4)*8));ctx.lineTo(10,s*64);ctx.lineTo(40,s*52);ctx.lineTo(4,s*40);ctx.lineTo(30,s*30);ctx.closePath();ctx.fill();ctx.stroke();}}
   if(e.k===1){ctx.lineWidth=4;for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(10,0);for(let j=1;j<8;j++){const a=(i-2.5)*.35;ctx.lineTo(10+j*12,Math.sin(a)*j*14+Math.sin(t*3+j*.6+i)*8);}ctx.stroke();}ctx.lineWidth=2.5;}
   if(e.k===2){ctx.save();ctx.rotate(t*.8);ctx.strokeRect(-e.r*1.1,-e.r*1.1,e.r*2.2,e.r*2.2);ctx.rotate(.785);ctx.strokeRect(-e.r*.9,-e.r*.9,e.r*1.8,e.r*1.8);ctx.restore();}
+  if(e.k===4){ctx.fillRect(-e.r*1.5,-7,e.r*3,14);ctx.strokeRect(-e.r*1.5,-7,e.r*3,14);for(const s of[-1,1]){ctx.fillRect(s*e.r*1.2-6,-e.r*.9,12,e.r*1.8);ctx.strokeRect(s*e.r*1.2-6,-e.r*.9,12,e.r*1.8);}}
+  if(e.k===5){ctx.save();ctx.rotate(t*1.2);for(let i=0;i<4;i++){ctx.rotate(Math.PI/2);ctx.fillRect(e.r*.8,-4,e.r*.7,8);ctx.strokeRect(e.r*.8,-4,e.r*.7,8);}ctx.restore();}
   if(e.k===3){ctx.save();ctx.rotate(-t*.6);for(let i=0;i<8;i++){ctx.rotate(Math.PI/4);ctx.fillRect(e.r+4,-5,18,10);ctx.strokeRect(e.r+4,-5,18,10);}ctx.restore();}
   ctx.beginPath();ctx.arc(0,0,e.r,0,7);ctx.fill();ctx.stroke();
   ctx.beginPath();ctx.arc(0,0,e.r*.55,0,7);ctx.strokeStyle='#ffffff55';ctx.stroke();
   const a=aim(e);ctx.fillStyle='#fff';ctx.globalCompositeOperation='lighter';G_(Math.cos(a)*e.r*.3,Math.sin(a)*e.r*.3,e.r*.6,e.ph===3?'#ff3040':c,.95);ctx.globalCompositeOperation='source-over';
-  ctx.font='700 11px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffffffcc';ctx.fillText(e.k===2?'€':e.k===0?'ADLER':e.k===1?'':'K',0,e.k===0?-e.r-6:4);}
+  ctx.font='700 11px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffffffcc';ctx.fillText(e.lbl||(e.k===2?'€':e.k===0?'ADLER':e.k===1?'':'K'),0,e.k===0?-e.r-6:4);}
 
 function drawPickups(t){ctx.globalCompositeOperation='lighter';for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;
     const col={shard:'#19e3ff',hp:'#3dffb0',up:'#ff2d95',emp:'#ffb020'}[p.t];G_(p.x,y,p.t==='shard'?12:20,col,.8);}
@@ -985,17 +1044,187 @@ addEventListener('keydown',e=>{if(!SH.active)return;if(e.code==='Digit1'||e.code
 // "banked" line on the game-over screen
 {const d=document.createElement('div');d.className='stat';d.id='oNeon';$('oBest').after(d);}
 
+/* ---------- Nightrun Story: 12 stages in 3 acts, stage select, stars, Hard toggle for Endless ---------- */
+const ALL=/[?&]all=1/.test(location.search);             // ?all=1 opens every stage (test link); a long press on the title does the same and is remembered
+let HARD=!!load('mnr_hard',false);
+const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all};})();
+const sPersist=()=>save('mnr_story',sSave);
+// difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
+const TUNE={d0:.8,dd:.11,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.07,eh:.2,el0:2,eld:.07,hd:.09,hull:[5,5,5,5,5,5,5,5,4,4,4,4],lv:[2.2,3.3,3.7,3.8,5.2,6.6,5.3,6.2,8,7.8,8.55,9.4],bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
+const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
+const STAGES=[
+  {n:1, di:0,name:'FIRST RUN',     intro:'Deliver the data. Stay alive.',     goal:{k:'survive',v:46},perf:22,waves:['droneLine','droneV','droneSine']},
+  {n:2, di:0,name:'PATROL',        intro:'Drones on patrol. Shoot on the beat.',goal:{k:'kill',v:170},   perf:22,waves:['droneLine','droneSine','chargers','droneV']},
+  {n:3, di:0,name:'SEK-ADLER',     intro:'Police interceptor on your tail.',  goal:{k:'boss'},lead:22,   perf:22,waves:['droneLine','droneV','turret','chargers']},
+  {n:4, di:1,name:'RIVER ROAD',    intro:'Follow the river. Chain PERFECTs.', goal:{k:'score',v:180000},   perf:26,waves:['droneSine','chargers','droneV','turret']},
+  {n:5, di:1,name:'BRIDGE GUARD',  intro:'Something guards the old bridge.',  goal:{k:'mini'},lead:24,   perf:26,waves:['droneSine','chargers','turret'],
+     mini:{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}},
+  {n:6, di:1,name:'FLUSSKRAKE',    intro:'The river fights back.',            goal:{k:'boss'},lead:28,   perf:26,waves:['droneSine','chargers','turret','gunship']},
+  {n:7, di:2,name:'GATE RUN',      intro:'Laser gates ahead. Dash through.',  goal:{k:'survive',v:46},perf:30,waves:['gate','droneLine','turret','gate','chargers']},
+  {n:8, di:2,name:'GATE KEEPER',   intro:'The gates have a keeper.',          goal:{k:'mini'},lead:34,   perf:30,waves:['gate','turret','chargers'],
+     mini:{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}},
+  {n:9, di:2,name:'ZENTRAL-ICE',   intro:'Break the bank firewall.',          goal:{k:'boss'},lead:30,   perf:30,waves:['gate','turret','droneSine','gunship']},
+  {n:10,di:3,name:'TRADE FAIR',    intro:'Elite guards everywhere. Stay sharp.',goal:{k:'kill',v:230},     perf:34,waves:['droneV','chargers','turret','gunship','droneSine']},
+  {n:11,di:3,name:'RUSH HOUR',     intro:'Rack up score. Do not get hit.',    goal:{k:'score',v:800000},   perf:34,waves:['droneV','droneSine','turret','chargers','gate','gunship']},
+  {n:12,di:3,name:'KRONOS',        intro:'End the corporation. Last delivery.',goal:{k:'boss'},lead:28,   perf:34,waves:['gate','gunship','turret','chargers','droneSine']}];
+for(const s of STAGES){s.song=['stage1','stage2','stage3'][(s.n-1)%3];s.act=Math.floor((s.n-1)/4);}
+const ACTN=['ACT I','ACT II','ACT III'];
+const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+g.v:g.k==='kill'?'KILL '+g.v:g.k==='score'?'SCORE '+(g.v/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
+const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
+
+const ST={on:false,n:1,def:STAGES[0],lvl:0,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1];
+    this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=1+TUNE.eh*L;
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
+    this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;},
+  kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
+  snapFor(n){const sn=sSave.snap[n];return sn?Object.assign({},sn):this.kit(n);},
+  // the new run has just been created: put this stage's district, hull and upgrades in place
+  begin(){const D=DISTRICTS[this.def.di];G.di=this.def.di;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=2.4;G.waveWait=false;G.preload=true;bgFor(G.di);AU.root=D.root;AU.boss=false;
+    P.hp=this.hp0;P.max=5;banner(this.n+' · '+this.def.name,this.def.intro,false,3.4);},
+  carry(){const got=this.snapFor(this.n);for(const id in got)for(let i=0;i<got[id];i++)SH.add(id);},
+  frac(){const g=this.def.goal;let f=0;
+    if(g.k==='survive')f=G.bc/(g.v*4);else if(g.k==='kill')f=G.kills/g.v;else if(g.k==='score')f=G.score/g.v;else f=G.boss||this.spawned?1:G.bc/(this.def.lead*4);
+    return clamp(f,0,1);},
+  label(){const g=this.def.goal;
+    if(g.k==='survive')return Math.min(g.v,Math.floor(G.bc/4))+' / '+g.v+' BARS';
+    if(g.k==='kill')return Math.min(g.v,G.kills)+' / '+g.v+' KILLS';
+    if(g.k==='score')return 'SCORE '+Math.min(g.v,G.score).toLocaleString('de-DE')+' / '+g.v.toLocaleString('de-DE');
+    return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?this.def.mini.nm:DISTRICTS[this.def.di].bossName);},
+  bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
+    return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*k)*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
+  tick(dt){
+    if(this.over){this.cT-=dt;if(this.cT<=0&&!this.fin){this.fin=true;if(this.n>=STAGES.length||!SH.live)this.finish();else SH.pit(()=>this.finish());}return;}
+    if(G.dead)return;
+    const g=this.def.goal;G.dt+=dt;this.d=this.d0*clamp(.8+.2*G.t/45,.8,1);
+    if(!G.boss&&!this.spawned){G.waveT-=dt;if(G.waveT<=0)G.waveWait=true;}
+    if(!this.pre&&G.t>5&&(g.k==='boss'||g.k==='mini')){this.pre=true;const k=DISTRICTS[this.def.di].boss,sg=g.k==='boss'?bossSong(k,false):null;if(sg)loadTrack(sg);}
+    if(g.k==='survive'){if(G.bc>=g.v*4)this.clear();}
+    else if(g.k==='kill'){if(G.kills>=g.v)this.clear();}
+    else if(g.k==='score'){if(G.score>=g.v)this.clear();}
+    else if(!this.spawned&&G.bc>=this.def.lead*4&&(G.en.length<=1||G.bc>=this.def.lead*4+8)){this.spawned=true;
+      if(g.k==='mini'){const m=this.def.mini;spawnBoss({mini:true,k:m.k,nm:m.nm,sub:BOSS_SUB[m.k],r:m.r,pats:m.pats,lbl:m.lbl,hp:this.bossHp(),score:3000,col:DISTRICTS[this.def.di].a});}
+      else spawnBoss({hp:this.bossHp()});}},
+  bossDown(e,pts){banner('STAGE CLEAR',(e.nm||'')+' down · +'+pts,false,3);this.clear(true);},
+  clear(boss){if(this.over||G.dead)return;this.over=true;this.cT=boss?3.4:2.6;G.waveWait=false;G.eb=[];
+    for(const e of G.en)if(e.type!=='boss')e.hp=0;
+    this.stars=[1,G.perf>=this.def.perf?1:0,this.hits===0?1:0];
+    if(!boss)banner('STAGE CLEAR',this.def.name,false,2.6);
+    G.flash=Math.max(G.flash,.3*FX());AU.sfx('up');AU.intense(false);NR.emit('stageClear',{n:this.n});},
+  fail(){running=false;NR.emit('runEnd',{story:this.n,score:G.score,di:G.di,kills:G.kills});
+    $('overEyebrow').textContent='Stage '+this.n+' failed';$('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
+    const b=sSave.stars[this.n]||0;$('oBest').innerHTML=this.def.goal.k==='boss'||this.def.goal.k==='mini'?'Goal <strong>'+goalTxt(this.def)+'</strong>':'Goal <strong>'+goalTxt(this.def)+'</strong> · '+this.label();
+    $('stBtn2').hidden=false;
+    overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
+    G.over=true;},
+  finish(){running=false;const n=this.n,st=this.stars,sum=st[0]+st[1]+st[2];
+    if(sum>(sSave.stars[n]||0))sSave.stars[n]=sum;
+    if(n<STAGES.length){const got={};for(const id in SH.got)got[id]=SH.got[id];sSave.snap[n+1]=got;}
+    sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
+    const s=this.def;$('srEye').textContent=n>=STAGES.length?'Story complete':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
+    const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],s.perf+' PERFECT · you '+G.perf)+row(st[2],'No hull lost');
+    $('srScore').textContent=G.score.toLocaleString('de-DE');
+    $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
+    resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
+  totalStars(){let t=0;for(const k in sSave.stars)t+=sSave.stars[k]|0;return t;}};
+const unlocked=n=>n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1;
+
+function startStory(n){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;
+  ST.setLevel(n);ST.on=true;newGame(false);ST.begin();G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(ST.def.song);AU.intense(false);
+  NR.emit('runStart',{daily:false,story:n});ST.carry();FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
+
+let selEl,resEl;
+const lockI='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10V8a6 6 0 1112 0v2h1v12H5V10zm2 0h8V8a4 4 0 10-8 0z" fill="currentColor" fill-rule="evenodd"/></svg>';
+const stMsg=t=>{$('stMsg').textContent=t;clearTimeout(stMsg.h);stMsg.h=setTimeout(()=>{$('stMsg').textContent='';},1800);};
+function stDraw(){$('stStars').textContent='★ '+ST.totalStars()+' / '+STAGES.length*3;const box=$('stRows');box.innerHTML='';
+  for(let a=0;a<3;a++){const row=document.createElement('div');row.className='arow';row.innerHTML='<div class="alab">'+ACTN[a]+'</div>';
+    for(const s of STAGES.filter(x=>x.act===a)){const ok=unlocked(s.n),k=sSave.stars[s.n]|0,D=DISTRICTS[s.di],b=document.createElement('button');b.type='button';
+      b.className='card'+(ok?'':' lock');b.dataset.id='s'+s.n;b.dataset.n=s.n;b.style.setProperty('--c',D.a);
+      b.innerHTML=`<div class="hd"><span class="no">${s.n}</span>${ok?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:lockI}</div><div class="nm">${s.name}</div><div class="gl"><span class="ac">${ACTN[s.act]} · </span>${goalTxt(s)}</div>`;
+      b.addEventListener('click',()=>{if(!unlocked(s.n)){stMsg('Clear stage '+(s.n-1)+' first');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}startStory(s.n);});
+      row.appendChild(b);}
+    box.appendChild(row);}}
+function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;stDraw();}
+function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
+
+function storyUI(){
+/* ----- styles ----- */
+{const st=document.createElement('style');st.textContent=`
+#stsel .rows{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*1.4)}
+#stsel .arow{flex:1 1 0;min-height:0;display:flex;gap:calc(var(--u)*1.4);align-items:stretch}
+#stsel .alab{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;font-family:var(--mono);letter-spacing:.2em;color:var(--dim);font-size:clamp(9px,calc(var(--u)*3),13px);white-space:nowrap}
+#stsel .card{gap:calc(var(--u)*.6);padding:calc(var(--u)*.8);justify-content:space-between}
+#stsel .card .hd{display:flex;align-items:baseline;justify-content:space-between;width:100%;gap:4px}
+#stsel .card .no{font-weight:700;font-size:clamp(16px,calc(var(--u)*8),34px);line-height:1;color:var(--c)}
+#stsel .card .stars{font-size:clamp(9px,calc(var(--u)*3.4),15px);letter-spacing:0;color:#ffe14d;white-space:nowrap}
+#stsel .card .nm{font-weight:700;font-size:clamp(9px,calc(var(--u)*3.2),14px);line-height:1.05;color:var(--ink);text-align:left;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#stsel .card .gl{font-family:var(--mono);font-size:clamp(8px,calc(var(--u)*2.8),12px);color:var(--dim);text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stsel .card.lock{opacity:.5;border-style:dashed}
+#stsel .card.lock .no{color:var(--dim)}
+#stsel .card svg.lk{height:clamp(10px,calc(var(--u)*4),18px);width:auto;aspect-ratio:1;color:var(--dim)}
+@container (max-height:300px){#stsel .card .nm{display:none}}
+#stsel .card .gl .ac{display:none}
+@container (max-aspect-ratio:1/1){
+ #stsel .rows{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr)}
+ #stsel .arow{display:contents}
+ #stsel .alab{display:none}
+ #stsel .card{flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;gap:calc(var(--u)*.6);padding:calc(var(--u)*1.4)}
+ #stsel .card .gl .ac{display:inline;color:var(--c)}
+ #stsel .card .nm{display:block}
+ #stsel .card .no{font-size:clamp(18px,calc(var(--u)*7),34px)}
+}
+#stres .sr{font-family:var(--mono);font-size:clamp(13px,min(2vw,3.4vh),19px);color:var(--dim)}
+#stres .sr.ok{color:var(--ink)}#stres .sr .sg{color:#ffe14d;font-size:1.25em}
+#hardBtn.on{background:#ff3040;color:#fff}
+`;document.head.appendChild(st);}
+
+/* ----- stage select ----- */
+selEl=document.createElement('div');selEl.id='stsel';selEl.className='ov solid pg';selEl.hidden=true;
+selEl.innerHTML='<div class="top"><span class="ttl">STORY</span><span class="neon" id="stStars" style="color:#ffe14d"></span><span class="sp"></span><button class="go alt" id="stBack" type="button" style="padding:.3em 1.1em">BACK</button></div>'
+  +'<div class="rows" id="stRows"></div><div class="msg" id="stMsg"></div>';
+stage.appendChild(selEl);
+$('stBack').addEventListener('click',closeStages);
+addEventListener('keydown',e=>{if(!selEl.hidden&&e.code==='Escape')closeStages();});
+
+/* ----- stage result ----- */
+resEl=document.createElement('div');resEl.id='stres';resEl.className='ov solid';resEl.hidden=true;
+resEl.innerHTML='<div class="in"><div class="eyebrow" id="srEye">Stage clear</div><h1 id="srTitle">STAGE</h1><div id="srStars"></div>'
+  +'<div class="stat">Score <strong id="srScore">0</strong></div>'
+  +'<div class="row"><button class="go" id="srNext" type="button">NEXT STAGE</button><button class="go dim" id="srRetry" type="button">RETRY</button><button class="go dim" id="srMenu" type="button">STAGES</button></div></div>';
+stage.appendChild(resEl);
+$('srNext').addEventListener('click',()=>startStory(Math.min(STAGES.length,ST.n+1)));
+$('srRetry').addEventListener('click',()=>startStory(ST.n));
+$('srMenu').addEventListener('click',openStages);
+
+/* ----- title: STORY button, Hard toggle, hidden unlock-all ----- */
+{const sb=document.createElement('button');sb.className='go';sb.id='storyBtn';sb.type='button';sb.textContent='STORY';
+  const row=$('startBtn').parentNode,row1=document.createElement('div');row1.className='row';row.before(row1);row1.append(sb,$('startBtn'));
+  $('startBtn').textContent='ENDLESS';$('startBtn').classList.add('alt');$('dailyBtn').classList.remove('alt');$('dailyBtn').classList.add('dim');
+  const hb=document.createElement('button');hb.className='go dim';hb.id='hardBtn';hb.type='button';row1.append(hb);
+  const hardDraw=()=>{hb.textContent='HARD '+(HARD?'ON':'OFF');hb.classList.toggle('on',HARD);};hardDraw();
+  hb.addEventListener('click',()=>{HARD=!HARD;save('mnr_hard',HARD);hardDraw();});
+  sb.addEventListener('click',openStages);
+  // hidden: hold the title for a second to unlock every stage
+  const h1=titleEl.querySelector('h1');let lp=0;h1.style.touchAction='none';
+  h1.addEventListener('pointerdown',()=>{clearTimeout(lp);lp=setTimeout(()=>{sSave.all=true;sPersist();$('bestT').textContent='All stages unlocked';},1100);});
+  for(const ev of['pointerup','pointercancel','pointerleave'])h1.addEventListener(ev,()=>clearTimeout(lp));
+  h1.addEventListener('contextmenu',e=>e.preventDefault());}
+// extra button on the stage-failed screen
+{const b=document.createElement('button');b.className='go dim';b.id='stBtn2';b.type='button';b.textContent='STAGES';b.hidden=true;$('againBtn').after(b);b.addEventListener('click',openStages);}
+}
+
 
 function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   const sc=String(G.score).padStart(8,'0'),mu='×'+G.mult.toFixed(1),bs=String(Math.max(best.score,G.score)).padStart(8,'0');
   const hb=Math.floor(G.bp),bi=((hb%4)+4)%4;
-  Object.assign(HUDLOG,{score:sc,mult:mu,best:bs,hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,district:D.name+(G.loop?' +'+G.loop:''),boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:bi,frame:HUDLOG.frame+1});
+  Object.assign(HUDLOG,{score:sc,mult:mu,best:bs,hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,district:D.name+(G.loop?' +'+G.loop:''),story:ST.on?ST.n:0,goal:ST.on?ST.label():'',boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:bi,frame:HUDLOG.frame+1});
   ctx.font='700 22px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.textAlign='left';ctx.fillText(sc,18,32);
   ctx.font='16px "Share Tech Mono",monospace';ctx.fillStyle=D.b;ctx.fillText(mu,138,31);
   ctx.fillStyle='#8c86b8';ctx.font='12px "Share Tech Mono",monospace';ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),18,48);
-  ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(D.name+(G.loop?' +'+G.loop:''),W-18,28);
-  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4);
-  ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);
+  ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(HARD?' · HARD':''),W-18,28);
+  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4);
+  ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);
   // bottom-left
   const by=H-20;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText('HULL',18,by-14);
   for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(18+i*16,by-8,12,8);}
@@ -1015,7 +1244,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   SH.hud(ctx,t);
   // boss bar
   if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200,30,400,8);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200,30,400*clamp(b.hp/b.max,0,1),8);
-    ctx.textAlign='center';ctx.font='700 12px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.fillText(DISTRICTS[G.di].bossName+(b.ph>1?'  ·  PHASE '+b.ph:''),W/2,24);}
+    ctx.textAlign='center';ctx.font='700 12px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),W/2,24);}
   // banner
   if(G.banner.t>0){const k=G.banner.t,m=G.banner.m,a=Math.min(1,k*2,(m-k)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,H/2-58,W,96);const col=G.banner.warn?'#ff3040':D.a;
@@ -1077,12 +1306,12 @@ $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
 function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
   syncUI();if(on)$('resumeBtn').focus();}
-function start(daily){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
+function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
   newGame(daily);G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{daily:!!daily});
   FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
-function restart(){const dl=G.daily;running=false;paused=false;start(dl);}
-function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
-function gameOver(){if(!running)return;running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
+function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;running=false;paused=false;start(dl);}
+function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});ST.on=false;ST.over=false;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
+function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
   if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
@@ -1092,6 +1321,7 @@ function gameOver(){if(!running)return;running=false;NR.emit('runEnd',{score:G.s
   G.over=true;lastDaily=G.daily;}
 let lastDaily=false;
 $('startBtn').addEventListener('click',()=>start(false));
+storyUI();
 $('dailyBtn').addEventListener('click',()=>start(true));
 $('againBtn').addEventListener('click',()=>start(lastDaily));
 $('menuBtn').addEventListener('click',quitToTitle);
@@ -1102,7 +1332,8 @@ $('quitBtn').addEventListener('click',quitToTitle);
 // attract mode: demo background behind title
 newGame();G.banner.t=0;P.x=-200;
 let last=performance.now();
-function loop(now){const raw=now-last;let dt=Math.min(.05,raw/1000);last=now;
+let simOn=false;
+function loop(now){const raw=now-last;let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
   if(!paused)fbT+=dt;
   if(running&&!paused){update(dt);if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;}}
   else if(!running){G.t+=dt;G.scroll+=60*dt;for(const p of G.pt){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;}G.pt=G.pt.filter(p=>p.l>0);}
@@ -1115,6 +1346,10 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];
 window.__mnr={get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},NR,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
+  get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,
+  // test hooks: ?sim=1 has no audio clock; simOn stops the animation loop and step() advances the game by hand with the beat clock tied to game time
+  simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},
+  abort(){if(running){NR.emit('runEnd',{quit:true});running=false;}ST.on=false;ST.over=false;paused=false;touch=null;touchFire=false;pressed={};},
   skipTo(i){if(!running)return;G.loop=G.loop;G.en=[];G.eb=[];enterDistrict(i);},
   bossNow(){if(running&&!G.boss&&!G.bossDone){G.dt=distLen();G.en=[];}}};
 })();

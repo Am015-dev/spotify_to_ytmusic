@@ -43,11 +43,11 @@ async function startServer() {
 const INIT = () => {
   window.__spy = { starts: [], onsets: [] };
   const os = AudioBufferSourceNode.prototype.start;
-  AudioBufferSourceNode.prototype.start = function (when) { try { if (this.buffer && this.buffer.duration > 3) window.__spy.starts.push({ at: this.context.currentTime, when: when || 0, dur: this.buffer.duration }); } catch (e) { } return os.apply(this, arguments); };
+  AudioBufferSourceNode.prototype.start = function (when) { try { if (this.buffer && this.buffer.duration > 3) window.__spy.starts.push({ at: this.context.currentTime, when: when || 0, o: arguments[1] || 0, rate: this.playbackRate ? this.playbackRate.value : 1, dur: this.buffer.duration }); } catch (e) { } return os.apply(this, arguments); };
   window.__bot = {
     gridErr() {                                          // ms the game's beat position is off the real audio grid (file mode): last started song + offsetMs
       const m = window.__mnr, a = m.AU.a, sp = window.__spy.starts[window.__spy.starts.length - 1]; if (!sp || m.BT.mode !== 'file') return null;
-      const lat = a.outputLatency || 0, want = (a.currentTime - lat - (sp.when + m.BT.off)) / m.BT.spb; return (m.bpos() - want) * m.BT.spb * 1000;
+      const lat = a.outputLatency || 0, b0 = sp.when + ((((m.BT.off - sp.o) % sp.dur) + sp.dur) % sp.dur) / sp.rate, want = (a.currentTime - lat - b0) / m.BT.spb; return (m.bpos() - want) * m.BT.spb * 1000;   // b0: audio time at which file position BT.off plays (the song may start mid-file when it was cross-faded in)
     },
     scr(dx, dy) { const r = document.getElementById('frame').getBoundingClientRect(), rot = window.__mnr.rotMode; return rot ? [-dy * r.width / 540, dx * r.height / 960] : [dx * r.width / 960, dy * r.height / 540]; },
     decide() {
@@ -415,8 +415,9 @@ async function synthFallbackTests(browser) {           // ?nomusic=1 (no song fi
     // add-on hook API: events fire, setRate keeps the beat position continuous and scales the beat length
     const nr = await ev(p, async () => { const N = window.NR, got = {}; for (const e of ['beat', 'bar']) N.on(e, () => { got[e] = (got[e] || 0) + 1; }); const b0 = __mnr.bpos(), s0 = __mnr.BT.spb; N.music.setRate(1.25); const b1 = __mnr.bpos(), s1 = __mnr.BT.spb; await new Promise(r => setTimeout(r, 2500)); const r = { jump: b1 - b0, ratio: s0 / s1, got, beats: __mnr.bpos() - b1 }; N.music.setRate(1); return r; });
     if (Math.abs(nr.jump) > .15 || Math.abs(nr.ratio - 1.25) > .001 || !nr.got.beat || nr.got.beat < 3 || !nr.got.bar) await fail(p, tag, 'hook', 'NR hook API ' + JSON.stringify(nr));
-    for (const [i, st, bpm] of exp) { await ev(p, i => window.__mnr.skipTo(i), i); await sleep(900); const b = await ev(p, () => ({ ...__mnr.BT })); if (b.mode !== 'synth' || b.stage !== st || b.bpm !== bpm) await fail(p, tag, 'beat', `stage ${st}: ${JSON.stringify(b)}`); }
-    await ev(p, () => window.__mnr.bossNow()); await sleep(1500); let b = await ev(p, () => ({ ...__mnr.BT })); if (b.mode !== 'synth' || b.stage !== 'boss' || b.bpm !== 140) await fail(p, tag, 'beat', 'boss music ' + JSON.stringify(b));
+    for (const [i, st, bpm] of exp) { await ev(p, i => window.__mnr.skipTo(i), i); if (i > 0) await waitFor(p, st => __mnr.BT.stage === st && !__mnr.BT.pend, st, 9000); else await sleep(900); const b = await ev(p, () => ({ ...__mnr.BT })); if (b.mode !== 'synth' || b.stage !== st || b.bpm !== bpm) await fail(p, tag, 'beat', `stage ${st}: ${JSON.stringify(b)}`); }
+    await ev(p, () => window.__mnr.bossNow()); await waitFor(p, () => __mnr.BT.stage === 'boss' && !__mnr.BT.pend, null, 12000); let b = await ev(p, () => ({ ...__mnr.BT })); if (b.mode !== 'synth' || b.stage !== 'boss' || b.bpm !== 140) await fail(p, tag, 'beat', 'boss music ' + JSON.stringify(b));
+    for (const x of await ev(p, () => __mnr.NR.sw.slice())) { const o = Math.abs(x.oldBeat / 4 - Math.round(x.oldBeat / 4)) * 4 * x.spbOld * 1000, n = Math.abs(x.newBeat / 4 - Math.round(x.newBeat / 4)) * 4 * x.spbNew * 1000; stats.switches = (stats.switches || 0) + 1; if (o > 20 || n > 20) await fail(p, tag, 'bar-line', `${x.from}>${x.to} off the bar line (old ${o.toFixed(0)} ms, new ${n.toFixed(0)} ms)`); }
     // boss phases on bar 16 and 32 (64 and 128 beats): step the beat counter cheaply by checking the rule on the live boss
     const rule = await ev(p, () => { const f = bt => { const bar = Math.floor(bt / 4); return bar >= 32 ? 3 : bar >= 16 ? 2 : 1; }; return [f(63), f(64), f(127), f(128)]; });
     if (rule.join() !== '1,2,2,3') await fail(p, tag, 'beat', 'phase rule ' + rule.join());
@@ -460,7 +461,7 @@ async function songTests(browser, stageName, si) {
     if (over > 2)   // a stalled page on a loaded machine can spoil one or two samples; sustained drift cannot
        await fail(p, tag, 'beat', 'beat clock drifts ' + worst.toFixed(1) + ' ms from the file position');
     // 3) PERFECT on the beat, not 200 ms off; and after pause/resume
-    const sp = await ev(p, () => ({ ...window.__spy.starts[window.__spy.starts.length - 1] })), spb = 60 / info.bpm, grid0 = sp.when + info.offsetMs / 1000;
+    const sp = await ev(p, () => ({ ...window.__spy.starts[window.__spy.starts.length - 1] })), spb = 60 / info.bpm, grid0 = sp.when + ((((info.offsetMs / 1000 - sp.o) % sp.dur) + sp.dur) % sp.dur) / sp.rate;
     const sample = async (code, kind, delta) => {
       const r = await ev(p, async ([code, delta, grid0, kind, spb]) => {
         const m = window.__mnr, a = m.AU.a, lat = a.outputLatency || 0, nowT = a.currentTime - lat, k = Math.ceil((nowT - grid0) / spb) + 2, target = grid0 + k * spb + delta / 1000;
@@ -702,6 +703,159 @@ function econReport() {
   for (const e of E) console.log('   ', JSON.stringify(e));
 }
 
+
+// ---------------- music: song changes (real audio) ----------------
+// A mini-boss (and SEK-ADLER) keeps the stage song and gets a drum layer; a district boss switches to its own song; every switch lands on a bar line of the old song
+// with the new song's first beat on that same line (no beat-grid jump), and the audio keeps agreeing with the beat clock through the crossfade.
+async function songSwitchTests(browser) {
+  const tag = 'switch', cfg = CFGS[3], { p } = await newPage(browser, cfg);
+  try {
+    await p.keyboard.press('Enter'); if (!await waitFor(p, () => __mnr.running, null, 3000)) return fail(p, tag, 'start', 'no start');
+    await ev(p, () => { window.__mnr.god = true; });
+    if (!await waitFor(p, () => __mnr.BT.mode === 'file' && __mnr.BT.stage === 'stage1' && !__mnr.BT.pend, null, 20000)) return fail(p, tag, 'beat', 'stage song never became the beat clock');
+    const samples = []; const poll = setInterval(async () => { try { const g = await p.evaluate(() => (__mnr.BT.pend || __mnr.BT.mode !== 'file' || __mnr.paused || __mnr.SH.active) ? null : window.__bot.gridErr()); if (g !== null) samples.push(g); } catch (e) { } }, 70);
+    const swN = () => ev(p, () => __mnr.NR.sw.length);
+    const bossOn = async (di) => { await ev(p, () => { __mnr.loadTrack('boss'); __mnr.loadTrack('boss2'); }); await waitFor(p, () => __mnr.TR.bufs['boss.mp3'] || __mnr.TR.bufs['boss2.mp3'], null, 12000); await ev(p, d => { const m = window.__mnr; m.god = true; if (d > 0) m.skipTo(d); m.bossNow(); }, di); return waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 15000); };
+    const finish = async () => { await ev(p, () => { __mnr.G.boss.hp = 0; }); await waitFor(p, () => __mnr.SH.active, null, 9000); await sleep(800); await ev(p, () => { if (__mnr.SH.active) { __mnr.SH.lock = 0; __mnr.SH.close(); } }); };
+    // 1) SEK-ADLER (district 0 boss): stage song stays, drum layer on, then back to the next stage song on a bar line
+    if (!await bossOn(0)) await fail(p, tag, 'boss', 'ADLER never appeared'); else {
+      await sleep(6000); const s = await ev(p, () => ({ st: __mnr.BT.stage, pend: !!__mnr.BT.pend, int: !!__mnr.AU.int, sw: __mnr.NR.sw.length }));
+      if (s.st !== 'stage1' || s.pend || s.sw !== 0) await fail(p, tag, 'switch', 'ADLER changed the song: ' + JSON.stringify(s)); if (!s.int) await fail(p, tag, 'switch', 'no intensity layer during ADLER');
+      await finish(); if (!await waitFor(p, () => __mnr.NR.sw.length >= 1 && !__mnr.BT.pend, null, 14000)) await fail(p, tag, 'switch', 'no return to a stage song after ADLER'); else if (await ev(p, () => __mnr.BT.stage) !== 'stage2') await fail(p, tag, 'switch', 'after ADLER the song is ' + await ev(p, () => __mnr.BT.stage));
+    }
+    // 2) district bosses: FLUSSKRAKE -> boss song, back to the stage song; KRONOS -> boss2
+    for (const [di, want] of [[1, 'boss'], [3, 'boss2']]) {
+      const n0 = await swN(); await ev(p, () => { __mnr.G.boss = null; });
+      if (!await bossOn(di)) { await fail(p, tag, 'boss', 'district ' + di + ' boss never appeared'); continue; }
+      if (!await waitFor(p, (n) => __mnr.NR.sw.length > n && !__mnr.BT.pend, n0, 16000)) { await fail(p, tag, 'switch', 'no song change for the boss of district ' + di + ' ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT, want: __mnr.AU.want })))); continue; }
+      const st = await ev(p, () => __mnr.BT.stage); if (st !== want) await fail(p, tag, 'switch', 'boss of district ' + di + ' plays ' + st + ', want ' + want);
+      await sleep(2500); const g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 40) await fail(p, tag, 'grid', 'after the switch to ' + want + ' the beat clock is ' + g + ' ms off the audio');
+      await finish(); if (!await waitFor(p, (n) => __mnr.NR.sw.length > n + 1 && !__mnr.BT.pend, n0, 16000)) await fail(p, tag, 'switch', 'no return to a stage song after the boss of district ' + di);
+    }
+    clearInterval(poll);
+    const sw = await ev(p, () => __mnr.NR.sw.slice()); console.log(`  ${tag}: ${sw.length} song changes: ${sw.map(x => x.from + '>' + x.to).join(' ')}`);
+    stats.switches = (stats.switches || 0) + sw.length;
+    for (const x of sw) {
+      const ms = (b, spb) => Math.abs(b / 4 - Math.round(b / 4)) * 4 * spb * 1000, o = ms(x.oldBeat, x.spbOld), n = ms(x.newBeat, x.spbNew);
+      if (o > 20) await fail(p, tag, 'bar-line', `${x.from}>${x.to} changed ${o.toFixed(0)} ms off a bar line of the old song`);
+      if (n > 20) await fail(p, tag, 'grid-jump', `${x.from}>${x.to}: the new song's first beat is ${n.toFixed(0)} ms off that bar line`);
+      if (x.lag > .15) await fail(p, tag, 'switch-late', `${x.from}>${x.to} applied ${(x.lag * 1000).toFixed(0)} ms late`);
+    }
+    if (samples.length < 20) await fail(p, tag, 'grid', 'only ' + samples.length + ' grid samples');
+    else { const sorted = samples.slice().sort((a, b) => a - b), med = sorted[sorted.length >> 1], worst = Math.max(...samples.map(v => Math.abs(v - med)));
+      console.log(`  ${tag}: ${samples.length} audio-vs-beat-clock samples through ${sw.length} changes, worst deviation ${worst.toFixed(1)} ms`); if (worst > 40) await fail(p, tag, 'grid-jump', 'beat grid moved ' + worst.toFixed(0) + ' ms against the audio across song changes'); }
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+
+// ---------------- Story: stage select, every stage from the select screen, goal, boss music, result, locks, Hard ----------------
+async function storyTests(browser, cfg, full) {
+  const tag = cfg.name + '/story', { p, T } = await newPage(browser, cfg, { query: '?all=1' });
+  const probe = async (what) => { const s = await ev(p, () => window.__bot.probe()); for (const b of s.bad) await fail(p, tag, 'layout', what + ' ' + b); return s; };
+  const shot = async n => { if (cfg.w >= 375) try { await p.screenshot({ path: path.join(OUT, `story-${n}-${cfg.name}.png`) }); } catch (e) { } };
+  try {
+    await sleep(500); await press(p, cfg, T, '#storyBtn'); await sleep(400);
+    if (!await ev(p, () => !document.getElementById('stsel').hidden)) return fail(p, tag, 'story', 'STORY did not open the stage select');
+    await probe('stage select'); await shot('select');
+    const tiles = await ev(p, () => [...document.querySelectorAll('#stsel .card')].map(c => ({ n: +c.dataset.n, lock: c.classList.contains('lock') })));
+    if (tiles.length !== 12) await fail(p, tag, 'story', 'stage select shows ' + tiles.length + ' stages, not 12');
+    if (tiles.some(t => t.lock)) await fail(p, tag, 'story', '?all=1 left stages locked');
+    const list = full ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : [1, 5, 12];
+    const defs = await ev(p, () => __mnr.STAGES.map(s => ({ n: s.n, di: s.di, k: s.goal.k, v: s.goal.v || 0, lead: s.lead || 0, name: s.name, intro: s.intro, song: s.song })));
+    for (const n of list) {
+      const d = defs[n - 1], t = tag + '#' + n;
+      if (n > 1 && await ev(p, () => document.getElementById('stsel').hidden)) await ev(p, () => { window.__mnr.abort(); });
+      await ev(p, () => { if (document.getElementById('stsel').hidden && !__mnr.running) { document.getElementById('title').hidden = true; document.getElementById('stres').hidden = true; document.getElementById('stsel').hidden = false; } });
+      await press(p, cfg, T, `#stsel .card[data-n="${n}"]`);
+      if (!await waitFor(p, n => __mnr.running && __mnr.ST.on && __mnr.ST.n === n, n, 4000)) { await fail(p, t, 'story', 'stage ' + n + ' did not start from the stage select'); continue; }
+      await ev(p, () => { window.__mnr.god = true; }); stats.storyStages = (stats.storyStages || 0) + 1;
+      const s0 = await ev(p, () => ({ di: __mnr.G.di, hp: __mnr.P.hp, msgs: __mnr.MSGS.slice(-4), st: __mnr.ST.def.song }));
+      if (s0.di !== d.di) await fail(p, t, 'story', 'stage ' + n + ' plays district ' + s0.di + ', want ' + d.di);
+      if (!s0.msgs.includes(d.intro)) await fail(p, t, 'story', 'intro line not shown: ' + JSON.stringify(s0.msgs));
+      if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
+      await sleep(900); const s1 = await probe('stage ' + n); if (!(await ev(p, () => __mnr.HUD.goal))) await fail(p, t, 'story', 'no goal on the HUD');
+      if (n === 1 || n === 6) await shot('play' + n);
+      // reach the goal
+      const swBefore = await ev(p, () => __mnr.NR.sw.length);
+      if (d.k === 'survive') await ev(p, v => { __mnr.G.bc = v * 4; }, d.v);
+      else if (d.k === 'kill') await ev(p, v => { __mnr.G.kills = v; }, d.v);
+      else if (d.k === 'score') await ev(p, v => { __mnr.G.score = v; }, d.v);
+      else {
+        await ev(p, l => { __mnr.G.bc = l * 4; }, d.lead);
+        if (!await waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 14000)) { await fail(p, t, 'story', 'boss/mini-boss of stage ' + n + ' never arrived'); continue; }
+        const isMini = d.k === 'mini', bossSong = n === 6 || n === 9 ? 'boss' : n === 12 ? 'boss2' : null;
+        if (n === 6) await shot('boss');
+        if (bossSong) {
+          if (!await waitFor(p, c => __mnr.NR.sw.length > c && !__mnr.BT.pend, swBefore, 16000)) await fail(p, t, 'switch', 'no song change for the boss of stage ' + n + ' ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT }))));
+          else { const st = await ev(p, () => __mnr.BT.stage); if (st !== bossSong) await fail(p, t, 'switch', 'boss plays ' + st + ', want ' + bossSong);
+            const x = await ev(p, () => __mnr.NR.sw[__mnr.NR.sw.length - 1]), o = Math.abs(x.oldBeat / 4 - Math.round(x.oldBeat / 4)) * 4 * x.spbOld * 1000, nn = Math.abs(x.newBeat / 4 - Math.round(x.newBeat / 4)) * 4 * x.spbNew * 1000;
+            if (o > 20 || nn > 20) await fail(p, t, 'grid-jump', `boss song switch off the bar line (old ${o.toFixed(0)} ms, new ${nn.toFixed(0)} ms)`); }
+        } else {
+          await sleep(4500); const s = await ev(p, c => ({ n: __mnr.NR.sw.length - c, int: !!__mnr.AU.int, pend: !!__mnr.BT.pend }), swBefore);
+          if (s.n !== 0 || s.pend) await fail(p, t, 'switch', (isMini ? 'mini-boss' : 'SEK-ADLER') + ' switched the song'); if (!s.int) await fail(p, t, 'switch', 'no intensity layer on ' + (isMini ? 'the mini-boss' : 'SEK-ADLER'));
+        }
+        await ev(p, () => { if (__mnr.G.boss) __mnr.G.boss.hp = 0; });
+      }
+      if (!await waitFor(p, () => __mnr.ST.over, null, 9000)) { await fail(p, t, 'story', 'goal ' + d.k + ' did not complete the stage'); continue; }
+      if (n < 12) {
+        if (!await waitFor(p, () => __mnr.SH.active, null, 9000)) { await fail(p, t, 'story', 'no pit stop after stage ' + n); continue; }
+        await sleep(800); await probe('pit after stage'); await press(p, cfg, T, '#shGo');
+      }
+      if (!await waitFor(p, () => !document.getElementById('stres').hidden, null, 9000)) { await fail(p, t, 'story', 'no result screen after stage ' + n); continue; }
+      await sleep(300); const r = await ev(p, () => ({ title: document.getElementById('srTitle').textContent, rows: document.querySelectorAll('#srStars .sr').length, next: !document.getElementById('srNext').hidden, st: __mnr.sSave.stars[__mnr.ST.n], score: document.getElementById('srScore').textContent, g: __mnr.G.score, ok: document.querySelectorAll('#srStars .sr.ok').length }));
+      if (r.title !== d.name || r.rows !== 3 || r.st < 1 || r.ok < 1) await fail(p, t, 'story', 'result screen wrong ' + JSON.stringify(r));
+      if (r.next !== (n < 12)) await fail(p, t, 'story', 'NEXT STAGE button ' + (r.next ? 'shown after the last stage' : 'missing'));
+      if (r.score.replace(/\D/g, '') !== String(r.g)) await fail(p, t, 'HUD-mismatch', 'result score ' + r.score + ' vs ' + r.g);
+      await probe('result'); if (n === 1 || n === 12) await shot('result' + n);
+      await press(p, cfg, T, '#srMenu'); await sleep(250);
+      const sel = await ev(p, n => ({ shown: !document.getElementById('stsel').hidden, stars: document.querySelector(`#stsel .card[data-n="${n}"] .stars`).textContent }), n);
+      if (!sel.shown || !sel.stars.includes('★')) await fail(p, t, 'story', 'stage select does not show the stars earned: ' + JSON.stringify(sel));
+      if (p.errs.length) { await fail(p, t, 'page-error', p.errs[0]); break; }
+    }
+    // dying: the stage-failed screen, STAGES and FLY AGAIN both work
+    await ev(p, () => { __mnr.abort(); document.getElementById('stsel').hidden = false; document.getElementById('stres').hidden = true; document.getElementById('over').hidden = true; });
+    await press(p, cfg, T, '#stsel .card[data-n="1"]'); await waitFor(p, () => __mnr.running && __mnr.ST.on, null, 4000);
+    await ev(p, () => { const m = __mnr; m.god = false; m.P.inv = 0; m.P.hp = 1; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: true }); });
+    if (!await waitFor(p, () => !document.getElementById('over').hidden, null, 8000)) await fail(p, tag, 'story', 'no stage-failed screen after dying');
+    else { const o = await ev(p, () => ({ eye: document.getElementById('overEyebrow').textContent, st: !document.getElementById('stBtn2').hidden })); if (!/Stage 1 failed/.test(o.eye) || !o.st) await fail(p, tag, 'story', 'stage-failed screen wrong ' + JSON.stringify(o)); await probe('stage failed');
+      await press(p, cfg, T, '#againBtn'); if (!await waitFor(p, () => __mnr.running && __mnr.ST.on && __mnr.ST.n === 1 && __mnr.G.t < 1.5, null, 4000)) await fail(p, tag, 'story', 'FLY AGAIN did not retry the stage'); }
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+  if (!full) return;
+  // locks, the hidden long-press, Hard, back-and-forth between title and select (default URL: nothing unlocked but stage 1)
+  const t2 = cfg.name + '/story-lock', { p: q, T: T2 } = await newPage(browser, cfg);
+  try {
+    await sleep(400); await press(q, cfg, T2, '#storyBtn'); await sleep(300);
+    const lk = await ev(q, () => [...document.querySelectorAll('#stsel .card')].map(c => c.classList.contains('lock')));
+    if (lk.length !== 12 || lk[0] || !lk.slice(1).every(Boolean)) await fail(q, t2, 'story', 'a fresh player should have only stage 1 open: ' + JSON.stringify(lk));
+    await press(q, cfg, T2, '#stsel .card[data-n="2"]'); await sleep(300);
+    if (await ev(q, () => __mnr.running)) await fail(q, t2, 'story', 'a locked stage started');
+    if (!/first/i.test(await ev(q, () => document.getElementById('stMsg').textContent))) await fail(q, t2, 'story', 'no message on a locked stage');
+    await press(q, cfg, T2, '#stBack'); await sleep(200);
+    if (!await ev(q, () => !document.getElementById('title').hidden)) await fail(q, t2, 'story', 'BACK did not return to the title');
+    // long press on the title
+    const r = await ev(q, () => { const b = document.querySelector('#title h1').getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; });
+    if (cfg.touch) { await T2.down(5, r[0], r[1]); await sleep(1500); await T2.up(5); } else { await q.mouse.move(r[0], r[1]); await q.mouse.down(); await sleep(1500); await q.mouse.up(); }
+    await sleep(200); if (!await ev(q, () => __mnr.sSave.all)) await fail(q, t2, 'story', 'long press on the title did not unlock all stages');
+    await press(q, cfg, T2, '#storyBtn'); await sleep(300);
+    if ((await ev(q, () => document.querySelectorAll('#stsel .card.lock').length)) !== 0) await fail(q, t2, 'story', 'stages still locked after the long press');
+    await press(q, cfg, T2, '#stBack'); await sleep(200);
+    // Hard toggle for Endless
+    await press(q, cfg, T2, '#hardBtn'); await sleep(150);
+    if (!/ON/.test(await ev(q, () => document.getElementById('hardBtn').textContent)) || !await ev(q, () => __mnr.HARD)) await fail(q, t2, 'story', 'HARD toggle did not switch on');
+    await probe2(q, t2, 'title with hard');
+    await press(q, cfg, T2, '#startBtn'); if (!await waitFor(q, () => __mnr.running && !__mnr.paused, null, 4000)) await fail(q, t2, 'story', 'ENDLESS did not start'); else {
+      if (await ev(q, () => __mnr.ST.on)) await fail(q, t2, 'story', 'Endless started as Story');
+      await sleep(800); if (!await ev(q, () => __mnr.HARD)) await fail(q, t2, 'story', 'Hard lost in the run');
+    }
+    if (q.errs.length) await fail(q, t2, 'page-error', q.errs[0]);
+  } catch (err) { await fail(q, t2, 'script', err.message.split('\n')[0]); }
+  await q.context().close();
+}
+async function probe2(p, tag, what) { const s = await ev(p, () => window.__bot.probe()); for (const b of s.bad) await fail(p, tag, 'layout', what + ' ' + b); }
+
 (async () => {
   const srv = await startServer(); const browser = await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream'] });
   const t0 = Date.now(); console.log('serving', URL_BASE, 'runs', RUNS, 'secs', SECS, 'par', PAR);
@@ -716,6 +870,8 @@ function econReport() {
     if (want('beat')) pre.push(() => beatTests(browser));
     if (want('synth')) pre.push(() => synthFallbackTests(browser));
     if (want('songs')) ['stage1', 'stage2', 'stage3'].forEach((st, i) => pre.push(() => songTests(browser, st, i)));
+    if (want('switch')) pre.push(() => songSwitchTests(browser));
+    if (want('story')) CFGS.forEach((c, k) => pre.push(() => storyTests(browser, c, k === 0 || k === 3)));
     if (want('ios')) pre.push(() => iosTests(browser));
     if (want('shop')) CFGS.forEach((c, k) => pre.push(() => shopTests(browser, c, k === 0 || k === 3)));
     if (want('garage')) CFGS.forEach((c, k) => pre.push(() => garageTests(browser, c, k === 0 || k === 3)));
@@ -729,6 +885,7 @@ function econReport() {
       const f = await ev(p, () => window.__mnr.FPS.n / window.__mnr.FPS.t * 1000); console.log('  solo FPS (390x763, rotated, god mode, 10 s of full action):', f.toFixed(1)); stats.fps.push(f); if (f < 45) await fail(p, 'fps', 'FPS', 'solo fps ' + f.toFixed(1)); await p.context().close(); }
   } finally { await browser.close(); srv.kill(); }
   const avg = stats.fps.length ? stats.fps.reduce((a, b) => a + b, 0) / stats.fps.length : 0;
+  console.log(`story stages played from the select screen: ${stats.storyStages || 0}, song changes checked: ${stats.switches || 0}`);
   console.log(`\nruns ${stats.runs}, ticks ${stats.ticks}, avg FPS ${avg.toFixed(1)} (${stats.fps.length} runs), perfects ${stats.perfect}, kills ${stats.kills}, bosses reached ${stats.bosses}, furthest district index ${stats.maxDistrict}, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   if (stats.fps.length && avg < 45) fails.push({ tag: 'all', kind: 'FPS', detail: 'average FPS ' + avg.toFixed(1) });
   econReport(); console.log(`shop: ${stats.pits} pit stops played in runs, ${stats.shopChecks} shop/garage checks`);

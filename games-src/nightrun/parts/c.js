@@ -2,13 +2,13 @@
 function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   const sc=String(G.score).padStart(8,'0'),mu='×'+G.mult.toFixed(1),bs=String(Math.max(best.score,G.score)).padStart(8,'0');
   const hb=Math.floor(G.bp),bi=((hb%4)+4)%4;
-  Object.assign(HUDLOG,{score:sc,mult:mu,best:bs,hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,district:D.name+(G.loop?' +'+G.loop:''),boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:bi,frame:HUDLOG.frame+1});
+  Object.assign(HUDLOG,{score:sc,mult:mu,best:bs,hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,district:D.name+(G.loop?' +'+G.loop:''),story:ST.on?ST.n:0,goal:ST.on?ST.label():'',boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:bi,frame:HUDLOG.frame+1});
   ctx.font='700 22px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.textAlign='left';ctx.fillText(sc,18,32);
   ctx.font='16px "Share Tech Mono",monospace';ctx.fillStyle=D.b;ctx.fillText(mu,138,31);
   ctx.fillStyle='#8c86b8';ctx.font='12px "Share Tech Mono",monospace';ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),18,48);
-  ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(D.name+(G.loop?' +'+G.loop:''),W-18,28);
-  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4);
-  ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);
+  ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(HARD?' · HARD':''),W-18,28);
+  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4);
+  ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);
   // bottom-left
   const by=H-20;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText('HULL',18,by-14);
   for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(18+i*16,by-8,12,8);}
@@ -28,7 +28,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   SH.hud(ctx,t);
   // boss bar
   if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200,30,400,8);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200,30,400*clamp(b.hp/b.max,0,1),8);
-    ctx.textAlign='center';ctx.font='700 12px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.fillText(DISTRICTS[G.di].bossName+(b.ph>1?'  ·  PHASE '+b.ph:''),W/2,24);}
+    ctx.textAlign='center';ctx.font='700 12px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),W/2,24);}
   // banner
   if(G.banner.t>0){const k=G.banner.t,m=G.banner.m,a=Math.min(1,k*2,(m-k)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,H/2-58,W,96);const col=G.banner.warn?'#ff3040':D.a;
@@ -90,12 +90,12 @@ $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
 function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
   syncUI();if(on)$('resumeBtn').focus();}
-function start(daily){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
+function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
   newGame(daily);G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{daily:!!daily});
   FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
-function restart(){const dl=G.daily;running=false;paused=false;start(dl);}
-function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
-function gameOver(){if(!running)return;running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
+function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;running=false;paused=false;start(dl);}
+function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});ST.on=false;ST.over=false;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
+function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
   if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
@@ -105,6 +105,7 @@ function gameOver(){if(!running)return;running=false;NR.emit('runEnd',{score:G.s
   G.over=true;lastDaily=G.daily;}
 let lastDaily=false;
 $('startBtn').addEventListener('click',()=>start(false));
+storyUI();
 $('dailyBtn').addEventListener('click',()=>start(true));
 $('againBtn').addEventListener('click',()=>start(lastDaily));
 $('menuBtn').addEventListener('click',quitToTitle);
@@ -115,7 +116,8 @@ $('quitBtn').addEventListener('click',quitToTitle);
 // attract mode: demo background behind title
 newGame();G.banner.t=0;P.x=-200;
 let last=performance.now();
-function loop(now){const raw=now-last;let dt=Math.min(.05,raw/1000);last=now;
+let simOn=false;
+function loop(now){const raw=now-last;let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
   if(!paused)fbT+=dt;
   if(running&&!paused){update(dt);if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;}}
   else if(!running){G.t+=dt;G.scroll+=60*dt;for(const p of G.pt){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;}G.pt=G.pt.filter(p=>p.l>0);}
@@ -128,6 +130,10 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];
 window.__mnr={get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},NR,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
+  get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,
+  // test hooks: ?sim=1 has no audio clock; simOn stops the animation loop and step() advances the game by hand with the beat clock tied to game time
+  simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},
+  abort(){if(running){NR.emit('runEnd',{quit:true});running=false;}ST.on=false;ST.over=false;paused=false;touch=null;touchFire=false;pressed={};},
   skipTo(i){if(!running)return;G.loop=G.loop;G.en=[];G.eb=[];enterDistrict(i);},
   bossNow(){if(running&&!G.boss&&!G.bossDone){G.dt=distLen();G.en=[];}}};
 })();
