@@ -116,7 +116,7 @@ function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.b
   if(g>=1){B2K_pop('+'+Math.round(g)+' BOOST','#ff8ad0');B2K.pulse=1}B2K.dm=0;B2K.dT=0;B2K.slS=0;B2K.slN=0;B2K.slMax=0}
 function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,10*TUNE.fxFov);shake=Math.max(shake,.25*TUNE.fxShake);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
     if(roam)RO.bRamp=1;else s.boost=Math.max(s.boost||0,.25)}
-  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,8*TUNE.fxFov);shake=Math.max(shake,.3*TUNE.fxShake)}B2K.bash=bash;
+  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,8*TUNE.fxFov);shake=Math.max(shake,.3*TUNE.fxShake)}B2K.bash=bash;RO.bash=bash&&state==='roam';
   if(bash){s.bm=Math.min(100,s.bm+8*dt);if(roam){RO.turbo=Math.max(RO.turbo||0,.12);RO.inv=Math.max(RO.inv||0,.15)}else s.boost=Math.max(s.boost||0,.12)}B2K.wasB=boosting}
 // Brickbash in roam: traffic within reach is knocked aside (tumble + debris) instead of stopping the car
 function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
