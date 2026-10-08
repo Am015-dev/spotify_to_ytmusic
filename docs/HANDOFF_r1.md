@@ -21,3 +21,8 @@ Commits: fad2cd9 (R1 code + probes + after-shots), next (before-shots qa_r1/base
 - tPlay once on the split build (item 4 = driving): `node tools/tPlay.js http://127.0.0.1:8766/local_dbg.html qa_r1/tplay` (FAST=1), background.
 - Tyre gap ≤0.05 m measurement; REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with shots (race start, stat chips, Athens lamps + boost bar, grass at speed, Hilde card).
 - After PASS: rebuild on CURRENT live HEAD (verify_live), prepend OD_CHANGELOG v88b, tools/build.sh v88b, copy tune.json + music/*.mp3 from live, push out/v88b, send coordinator DEPLOY.
+
+## Status 07:25: DONE, handed to coordinator
+Reviewer PASS (0d4bd89). v88b built on live HEAD aa9297d6 (v88a LIVE_MATCH), OD_CHANGELOG v88b, out/v88b pushed (deb38685), DEPLOY sent.
+Gap 0.03 m everywhere; 0 console errors; tPlay 3 FAILs are pre-existing (identical on v88a, qa_r1/tplay_base).
+Follow-ups: (a) race track art still neon (Brick Day = lighting only); (b) garage label px → R2; (c) Fra wall hits 0.97/min vs 0 base; (d) tPlay rotation check steps=[]; (e) no phone vehicle button for 4×4.
