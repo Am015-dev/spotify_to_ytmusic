@@ -1,0 +1,242 @@
+{
+ "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
+ "items": {
+  "architect": "architect",
+  "bard": "bard",
+  "barge_toad": "barge_toad",
+  "castle": "castle",
+  "cemetery": "cemetery",
+  "chapel": "chapel",
+  "chip_sweep": "chip_sweep",
+  "clock_tower": "clock_tower",
+  "courthouse": "courthouse",
+  "crane": "crane",
+  "doctor": "doctor",
+  "dungeon": "dungeon",
+  "ever_tree": "ever_tree",
+  "fair_grounds": "fair_grounds",
+  "farm": "farm",
+  "fool": "fool",
+  "general_store": "general_store",
+  "historian": "historian",
+  "husband": "husband",
+  "inn": "inn",
+  "innkeeper": "innkeeper",
+  "judge": "judge",
+  "king": "king",
+  "mine": "mine",
+  "miner_mole": "miner_mole",
+  "monastery": "monastery",
+  "monk": "monk",
+  "palace": "palace",
+  "peddler": "peddler",
+  "post_office": "post_office",
+  "postal_pigeon": "postal_pigeon",
+  "queen": "queen",
+  "ranger": "ranger",
+  "resin_refinery": "resin_refinery",
+  "ruins": "ruins",
+  "school": "school",
+  "shepherd": "shepherd",
+  "shopkeeper": "shopkeeper",
+  "storehouse": "storehouse",
+  "teacher": "teacher",
+  "theater": "theater",
+  "twig_barge": "twig_barge",
+  "undertaker": "undertaker",
+  "university": "university",
+  "wanderer": "wanderer",
+  "wife": "wife",
+  "woodcarver": "woodcarver"
+ },
+ "size": {
+  "architect": [
+   256,
+   256
+  ],
+  "bard": [
+   256,
+   256
+  ],
+  "barge_toad": [
+   256,
+   256
+  ],
+  "castle": [
+   256,
+   256
+  ],
+  "cemetery": [
+   256,
+   256
+  ],
+  "chapel": [
+   256,
+   256
+  ],
+  "chip_sweep": [
+   256,
+   256
+  ],
+  "clock_tower": [
+   256,
+   256
+  ],
+  "courthouse": [
+   256,
+   256
+  ],
+  "crane": [
+   256,
+   256
+  ],
+  "doctor": [
+   256,
+   256
+  ],
+  "dungeon": [
+   256,
+   256
+  ],
+  "ever_tree": [
+   256,
+   256
+  ],
+  "fair_grounds": [
+   256,
+   256
+  ],
+  "farm": [
+   256,
+   256
+  ],
+  "fool": [
+   256,
+   256
+  ],
+  "general_store": [
+   256,
+   256
+  ],
+  "historian": [
+   256,
+   256
+  ],
+  "husband": [
+   256,
+   256
+  ],
+  "inn": [
+   256,
+   256
+  ],
+  "innkeeper": [
+   256,
+   256
+  ],
+  "judge": [
+   256,
+   256
+  ],
+  "king": [
+   256,
+   256
+  ],
+  "mine": [
+   256,
+   256
+  ],
+  "miner_mole": [
+   256,
+   256
+  ],
+  "monastery": [
+   256,
+   256
+  ],
+  "monk": [
+   256,
+   256
+  ],
+  "palace": [
+   256,
+   256
+  ],
+  "peddler": [
+   256,
+   256
+  ],
+  "post_office": [
+   256,
+   256
+  ],
+  "postal_pigeon": [
+   256,
+   256
+  ],
+  "queen": [
+   256,
+   256
+  ],
+  "ranger": [
+   256,
+   256
+  ],
+  "resin_refinery": [
+   256,
+   256
+  ],
+  "ruins": [
+   256,
+   256
+  ],
+  "school": [
+   256,
+   256
+  ],
+  "shepherd": [
+   256,
+   256
+  ],
+  "shopkeeper": [
+   256,
+   256
+  ],
+  "storehouse": [
+   256,
+   256
+  ],
+  "teacher": [
+   256,
+   256
+  ],
+  "theater": [
+   256,
+   256
+  ],
+  "twig_barge": [
+   256,
+   256
+  ],
+  "undertaker": [
+   256,
+   256
+  ],
+  "university": [
+   256,
+   256
+  ],
+  "wanderer": [
+   256,
+   256
+  ],
+  "wife": [
+   256,
+   256
+  ],
+  "woodcarver": [
+   256,
+   256
+  ]
+ }
+}
