@@ -46,6 +46,51 @@ const SU_T=[
  {id:'t_su_sky',n:'Silver Night Tuner',tier:'e',ref:'76917',k:'Street tuner coupe',fam:2,car:()=>SU_car({B:'#a0a5a9',G:'#0055bf',H:'#0055bf',cab:'coupe',R:'#a0a5a9',rear:'wing',W:'#a0a5a9'}),st:{top:1.08,acc:1.05,han:1.04,hull:1}},
  {id:'t_su_pink',n:'Pink Roadster',tier:'r',ref:'77241',k:'Roadster',fam:2,car:()=>SU_car({B:'#e4adc8',G:'#f4f4f4',cab:'open',st:CR_K,R:CR_K}),st:{top:1.05,acc:1.06,han:1.05,hull:.98}},
  {id:'t_su_v8',n:'Black Gold V8',tier:'l',ref:'77262',k:'Gymkhana muscle car',fam:2,car:()=>SU_car({B:CR_K,G:'#a0a5a9',A:CR_K,wide:1,F:CR_K,wh:'wLG',eng:1,cab:'coupe',R:CR_K,rear:'spoiler',W:CR_K,st:'#f4f4f4'}),st:{top:1.06,acc:1.08,han:1.03,hull:1.04}}];
+// ---- SC (v88t): Speed Champions companion sets of the 77260 booklet (p3), verified online 2026-10-08 (docs/research/SUPRA.md):
+// 77256 time machine car (357 pcs: flux capacitor, cables along the sides, rear vents + exhausts, reactor on the rear deck), 77261 endurance hypercar (329 pcs: low cockpit,
+// big roof air intake, rear wing + fin, yellow stripe over the roof and down the sides, white headlights, red driver suit), 77252 movie F1 car (268 pcs: black + pearl gold, open wheels).
+// Same 8-wide chassis + builder parts as SU_car; each emits booklet-like steps (A.steps) for the ▶ BUILD GUIDE. Wheelbase 10 studs, ≤ 10 wide, ≤ 18 long → default handling.
+function SC_kit(){const A=[];A.steps=[];const add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
+ sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},
+ wy=wh=>(.12-CR_WH[wh].r)/GB_PH;return{A,add,sym,wy,st:()=>A.steps.push(A.length)}}
+// time machine coupe (77256): steel-grey wedge, black bumpers, quad headlights, gull-wing roof, black cables on the door line, reactor + vents on the rear deck, twin exhausts
+function SC_time(){const{A,add,sym,st,wy}=SC_kit(),B='#a0a5a9',K=CR_K,W='#f4f4f4';
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){st();sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy('wL'))}
+ st();add('P8x1',-4,-8,0,K,1);sym('hl',-4,-8,0,W,2);sym('hl',-3,-8,0,W,2);add('grl',-2,-8,1,K,2);add('grl',0,-8,1,K,2);add('T8x1',-4,-8,0,B,5);
+ st();add('B4x4',-2,-7,0,K,1);add('p44',-2,-7,0,B,4);add('t44',-2,-7,0,B,5);
+ st();sym('B1x6',-4,-3,0,B,1);sym('T1x6',-4,-3,0,K,4);sym('T1x6',-4,-3,0,B,5);sym('sidep',-4,-3,0,K,6);
+ st();add('T6x6',-3,-3,0,K,1);add('drvL',-3,-1,0,W,2);add('P2x2',1,-1,0,K,2);add('B2x1',1,0,0,K,3);add('bar',-2,2,0,'#fac80a',3);
+ st();add('ws6',-3,-3,0,B,6);add('ws6',-3,0,2,B,6);add('T6x2',-3,-1,0,B,10);
+ st();add('B4x4',-2,3,0,K,1);add('p44',-2,3,0,B,4);add('grl',-2,6,1,K,5);add('grl',0,6,1,K,5);
+ st();add('rb22',-1,4,0,W,5);add('rt',-1,4,0,'#a0a5a9',8);
+ st();sym('tl',-4,7,2,'#d01712',1);sym('tl',-3,7,2,K,1);add('B4x1',-2,7,0,K,1);add('T8x1',-4,7,0,B,4);sym('exhaust',-2,8,0,'#a0a5a9',1);return A}
+// endurance hypercar (77261): red, black splitter/sills, thin white lights, yellow stripe down the sides and over the roof, roof intake, central fin + black rear wing
+function SC_hyper(o={}){const{A,add,sym,st,wy}=SC_kit(),B=o.B||'#d01712',Y=o.Y||'#fac80a',K=CR_K,W='#f4f4f4';
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){st();sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy('wL'))}
+ st();add('P8x1',-4,-8,0,K,1);add('grl',-2,-8,1,K,2);add('grl',0,-8,1,K,2);sym('B1x1',-4,-8,0,B,2);sym('B1x1',-3,-8,0,B,2);add('C8x1',-4,-8,0,B,3);sym('light',-4,-8,0,W,5);
+ st();add('B4x4',-2,-7,0,K,1);sym('cs14',-2,-7,0,B,4);sym('cs14',-1,-7,0,B,4);
+ st();sym('B1x6',-4,-3,0,K,1);sym('T1x6',-4,-3,0,Y,4);sym('T1x6',-4,-3,0,B,5);
+ st();add('T6x6',-3,-3,0,K,1);add('drvL',-3,-1,0,o.D||B,2);add('P2x2',1,-1,0,K,2);add('B2x1',1,0,0,K,3);
+ st();add('ws6',-3,-3,0,B,6);add('ws6',-3,0,2,B,6);add('T6x2',-3,-1,0,Y,10);add('scoop',-1,-1,0,K,11);
+ st();add('T4x4',-2,3,0,K,3);sym('cs14',-2,3,2,B,4);sym('cs14',-1,3,2,B,4);add('fin',-1,2,0,B,7);
+ st();sym('tl',-4,7,2,'#d01712',1);sym('tl',-3,7,2,'#d01712',1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);add('diff',-2,8,0,K,0);
+ st();add('wing',-4,5,0,K,6);return A}
+// movie F1 car (77252): black with pearl-gold accents, open wheels (no mudguards), 2-element front wing, narrow nose, sidepods, airbox, rear wing, rain light
+function SC_f1(){const{A,add,sym,st,wy}=SC_kit(),K=CR_K,G='#c9a227',w='wL';
+ add('T6x16',-3,-8,0,K,0);
+ st();sym(w,-4,-7,0,K,wy(w));sym(w,-4,3,0,K,wy(w));
+ st();add('T8x1',-4,-9,0,K,1);add('T8x1',-4,-8,0,G,2);sym('B1x1',-4,-9,0,K,1);
+ st();add('p24',-1,-7,0,K,1);add('cs24',-1,-7,0,K,2);
+ st();sym('B1x6',-3,-3,0,K,1);sym('T1x6',-3,-3,0,G,4);
+ st();add('T4x4',-2,-2,0,K,1);add('B4x1',-2,-3,0,K,1);add('drvL',-1,-1,0,K,2);sym('B1x4',-2,-2,0,K,2);
+ st();add('b22',-1,1,0,K,2);add('b22',-1,1,0,K,5);add('t22',-1,1,0,G,8);add('cs24',-1,3,2,K,2);
+ st();add('wing',-4,5,0,K,5);add('diff',-2,8,0,K,0);add('tl',-1,7,2,'#d01712',1);return A}
+SU_T.push(
+ {id:'t_sc_tm',n:'Time Coupe',tier:'e',ref:'77256',k:'Time machine coupe',fam:3,car:SC_time,st:{top:1.06,acc:1.05,han:1.02,hull:1.05}},
+ {id:'t_sc_hy',n:'Red Hypercar',tier:'l',ref:'77261',k:'Endurance hypercar',fam:3,car:()=>SC_hyper(),st:{top:1.09,acc:1.06,han:1.06,hull:1}},
+ {id:'t_sc_f1',n:'Gold Formula',tier:'l',ref:'77252',k:'Formula racer · open wheels',fam:3,car:SC_f1,st:{top:1.1,acc:1.08,han:1.07,hull:.94}});
 {const R=GAR_set('rod'),L=n=>JSON.parse(JSON.stringify(R.load[n]));
  for(const T of SU_T)GAR_SETS.push({id:T.id,n:T.n,tier:T.tier,req:null,car:T.car,off:R.off,boat:R.boat,tpl:1,ref:T.ref,forms:['car'],fam:T.fam,
   load:{car:{name:T.n.toUpperCase(),k:'Street',st:T.st,w:'Medium',perk:'slip'},'4x4':L('4x4'),boat:L('boat')}})}
@@ -54,7 +99,14 @@ function SU_rows(){const G=$('#g9Col .g9Grid');if(!G||G9C.type!=='car'||G9C.sort
  const card=id=>G.querySelector(`.g9Card[data-gc="${id}"]`),hd=(t,s)=>{const d=document.createElement('div');d.className='suHd';d.innerHTML=`<b>${t}</b><small>${s}</small>`;return d};
  const F=SU_T.filter(T=>T.fam===1).map(T=>card(T.id)).filter(Boolean),M=SU_T.filter(T=>T.fam===2).map(T=>card(T.id)).filter(Boolean);if(!F.length&&!M.length)return;
  const rest=hd('ALL RIDES',''),first=G.querySelector('.g9Card');G.insertBefore(hd('🧡 STREET RACER FAMILY','the orange racer + 3 variations'),first);for(const c of F)G.insertBefore(c,first);
- if(M.length){G.insertBefore(hd('🏁 TUNER FRIENDS','same street-tuner style'),first);for(const c of M)G.insertBefore(c,first)}G.insertBefore(rest,first)}
+ if(M.length){G.insertBefore(hd('🏁 TUNER FRIENDS','same street-tuner style'),first);for(const c of M)G.insertBefore(c,first)}
+ const S3=SU_T.filter(T=>T.fam===3).map(T=>card(T.id)).filter(Boolean);if(S3.length){G.insertBefore(hd('🏆 SPEED SERIES','movie and race cars'),first);for(const c of S3)G.insertBefore(c,first)}G.insertBefore(rest,first)}
 GAR_tab=(f=>function(){f();try{SU_rows()}catch(e){}})(GAR_tab);
 {const st=document.createElement('style');st.textContent=`#g9Col .suHd{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;padding:6px 2px 0;color:#fff}#g9Col .suHd b{font:900 13px system-ui;letter-spacing:.04em}#g9Col .suHd small{font:700 12px system-ui;color:#8fb3c7}`;document.head.appendChild(st)}
+// ---- SC traffic + rivals (v88t): the two road cars replace the sports sedan + SUV kinds in city traffic (own liveries; 'su:' kinds are built by CR_cityGeo from SU_T);
+// the 6 base racing teams drive Speed-Champions-style cars that match their team colours (story rivals v_* keep their own machines)
+{const sw=(k,v)=>{const i=HCAR.indexOf(k);if(i>=0)HCAR[i]=v};sw('sedan-sports','su:t_sc_hy');sw('suv','su:t_sc_tm')} // swap into existing kinds: same car count + draw calls (Alex: lag)
+const SC_RIV={kronos:SC_f1,nordend:()=>SU_car({B:SU_O,rear:'wing'}),ostend:()=>SU_car({B:'#1b2a34',G:'#8a12a8',W:'#1b2a34',A:'#1b2a34',H:'#8a12a8',st:'#8a12a8',rear:'wing'}),
+ zeil:()=>SU_car({B:'#e4adc8',G:'#f4f4f4',cab:'open',st:CR_K,R:CR_K}),helix:SC_time,aeppler:()=>SC_hyper({B:'#00852b',Y:'#fac80a',D:'#00852b'})};
+CR_rivB=(f=>function(team){const id=team&&team.id;if(id&&SC_RIV[id]&&!CR_RB[id])try{CR_RB[id]=SC_RIV[id]().map(([t,x,z,r,c,y])=>({t:t==='drv'?'drvR':t,x,z,y,r:r%4,m:0,c}))}catch(e){console.warn('SC',e)}return f.apply(this,arguments)})(CR_rivB);
 window.__su={T:SU_T,car:SU_car,n:id=>{const S=GAR_set(id);return S&&S.id===id?S.car().length:0}};

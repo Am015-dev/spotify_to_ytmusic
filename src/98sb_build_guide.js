@@ -81,7 +81,7 @@ GAR_tab=(f=>function(){f();try{const C=$('#g9Col');if(!C||C.dataset.sb)return;C.
  const P=$('#gbBkP');if(P)P.addEventListener('click',e=>{const b=e.target.closest('[data-r2a="sbg"]');if(b)setTimeout(()=>SB_open('build'),0)})}
 // ---------- BUILD IT YOURSELF: BUILD mode, the current step's missing parts as a pulsing green ghost; a tap within 4 studs snaps the part in
 function SB_diy(){if(!SB.on)return;const k=Math.min(SB.k,SB.S.length-1),B=SB.B,S=SB.S;SB.on=0;SB_clearDrop();$('#gbx').classList.remove('sbOn');GB.cam.clearViewOffset();
- SB.bak=JSON.parse(JSON.stringify(GB.d.bricks||[]));SB.b25=typeof B25!=='undefined'?B25.on:null;if(SB.b25!=null)B25.on=0;SB.diy=1;SB.ok=0;
+ SB.bak=JSON.parse(JSON.stringify(GB.d.bricks||[]));SB.b25=typeof B25!=='undefined'?B25.on:null;if(SB.b25!=null)B25.on=0;SB.diy=1;SB.ok=0;SB.palK='';
  const keep=[];for(let i=0;i<k;i++)for(const j of S[i])keep.push({...B[j]});GB.d.bricks=keep;SB.from='';gbRender();GB_enter();GB_.undo=[];$('#gbx').classList.add('sbDiy');SB_sync()}
 function SB_miss(){const L=GB_list();for(let i=0;i<SB.S.length;i++){const m=SB.S[i].map(j=>SB.B[j]).filter(b=>!L.some(o=>SB_same(o,b)));if(m.length)return{i,m}}return null}
 function SB_cur(){const c=SB_miss();SB_cur.done=!c;return c?c.i:SB.S.length}
@@ -90,8 +90,14 @@ function SB_sync(){if(!SB.diy||!GB.mesh)return;const host=SB_host();if(SB.gh){SB
  if(!c){if(!SB.ok){SB.ok=1;GB.d.bricks=SB.B.map(b=>({...b}));GB_attach(GB.mesh,GB_list(),GB_figGet(),false,!!GB.d.bp);try{AU.sfx('win')}catch(e){try{AU.sfx('pick')}catch(_){}}}
   if(D)D.innerHTML=`<b>🎉 YOU BUILT IT!</b><small>${SB.B.length} parts · tap ✕ to keep it</small>`;return}
  const M=[],L=[];for(const b of c.m)GB_brickGeo(b,M,L);if(M.length||L.length){SB.gh=new THREE.Mesh(mergeGeometries(M.concat(L)),SB.gm);SB.gh.userData.gbG=1;SB.gh.renderOrder=3;host.add(SB.gh)}
- GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;
+ GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;SB_pal(c.m[0],c.i);
  if(D){let u='';try{u=GS_thumb(c.m[0].t,c.m[0].c)}catch(e){}D.innerHTML=`<img src="${u}" alt=""><b>STEP ${c.i+1}/${SB.S.length}</b><small>place ${c.m.length}× ${(GB_PC[c.m[0].t]||{}).n||''} · tap the green ghost</small>`}}
+// v88t: preselect the step's part (and its colour when it is a palette colour) in the BUILD palette: open its category, mark it, scroll it into view.
+// Once per step, so the player's own picks are not overridden. Hidden template-only parts (no tile) keep just the category of the closest tile type.
+function SB_pal(b,i){const k=i+':'+b.t;if(SB.palK===k)return;SB.palK=k;try{const ci=GB_BC.indexOf(String(b.c).toLowerCase());if(ci>=0)GB_.col=ci;
+ const q=t=>document.querySelector(`#gbBkPc .gbPc[data-p="${t}"]`),m=/^([PBT])(\d+)x(\d+)$/.exec(b.t),T=q(b.t)||(m&&q(m[1].toLowerCase()+Math.min(m[2],m[3])+Math.max(m[2],m[3])));
+ document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));if(T)T.classList.add('sbNx');if(T&&T.dataset.ct){if(typeof GX_cat==='function')GX_cat(T.dataset.ct);else CR_cat(T.dataset.ct)}
+ GB_ui();if(T&&T.scrollIntoView)T.scrollIntoView({block:'nearest',inline:'center'})}catch(e){console.warn('SB pal',e)}}
 function SB_target(x,z,t){const c=SB_miss();if(!c)return null;let best=null,bd=1e9;for(const b of c.m){const[w,d]=GB_dims(b),dd=Math.abs(x-(b.x+(w-1)/2))+Math.abs(z-(b.z+(d-1)/2))-(b.t===t?.5:0);if(dd<bd){bd=dd;best=b}}return bd<=4?best:null}
 function SB_hint(){const c=SB_miss();if(!c)return;const b=c.m[0];if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh()}}
 GB_cand=(f=>function(hit){const r=f.apply(this,arguments);if(!SB.diy||!hit)return r;const t=SB_target(hit.i,hit.j,GB_.pc);if(t)return{...t,bad:false};return r?{...r,bad:true}:null})(GB_cand);
@@ -104,19 +110,19 @@ function SB_scr(cx,cy){const c=SB_miss();if(!c||!GB.mesh)return null;const R=$('
   host.localToWorld(v).project(GB.cam);const d=Math.hypot(R.left+(v.x+1)/2*R.width-cx,R.top+(1-v.y)/2*R.height-cy);if(d<bd){bd=d;best=b}}return best}
 GB_act=(f=>function(cx,cy,del){if(SB.diy&&!del&&GB_.tool==='add'){const b=SB_scr(cx,cy);if(b){if(typeof GS!=='undefined'){GS.held=null;GS.hit=null}if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh();try{GS_ui()}catch(e){}}return 1}}return f.apply(this,arguments)})(GB_act);
 GB_refresh=(f=>function(){const r=f.apply(this,arguments);try{SB_sync()}catch(e){console.warn('SB',e)}return r})(GB_refresh);
-function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
+function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
  if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!(keep||SB.ok))GB.d.bricks=SB.bak;GB_.undo=[];if(GB_.bk)GB_exit();else gbRender()}
-GB_exit=(f=>function(){if(SB.diy){SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh=null}if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!SB.ok)GB.d.bricks=SB.bak;GB_.undo=[]}return f.apply(this,arguments)})(GB_exit);
+GB_exit=(f=>function(){if(SB.diy){SB.diy=0;document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh=null}if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!SB.ok)GB.d.bricks=SB.bak;GB_.undo=[]}return f.apply(this,arguments)})(GB_exit);
 // SAVE / BACK while the guide or BUILD IT runs: leave it first (restores the ride unless it was finished)
 document.addEventListener('click',e=>{if(!(SB.on||SB.diy))return;const t=e.target.closest&&e.target.closest('#gbSave,#gbBack');if(!t)return;if(SB.on){SB.on=0;SB_clearDrop();$('#gbx').classList.remove('sbOn');GB.cam.clearViewOffset();gbRender()}if(SB.diy)SB_diyEnd(false)},true);
-{const st=document.createElement('style');st.textContent=`#sbG,#sbD{display:none}#gbx.sbOn>*:not(.gbw):not(#sbG){display:none!important}#gbx.sbOn .gbp,#gbx.sbOn #gbStats,#gbx.sbOn .gbHint,#gbx.sbOn #gsBar,#gbx.sbOn #gsBr{display:none!important}
+{const st=document.createElement('style');st.textContent=`#sbG,#sbD{display:none}#gbBkPc .gbPc.sbNx{outline:3px solid #2ad46a;outline-offset:-3px}#gbx.sbOn>*:not(.gbw):not(#sbG){display:none!important}#gbx.sbOn .gbp,#gbx.sbOn #gbStats,#gbx.sbOn .gbHint,#gbx.sbOn #gsBar,#gbx.sbOn #gsBr{display:none!important}
 #gbx.sbOn #sbG{display:block;position:absolute;inset:0;z-index:30;pointer-events:none;font:900 13px system-ui;color:#141413}
 #sbG button{pointer-events:auto;min-width:44px;min-height:44px;border:2px solid #141413;border-radius:10px;background:#fff;color:#141413;font:italic 900 13px var(--hud,system-ui);box-shadow:0 3px 0 #141413;cursor:pointer;padding:0 10px}
 #sbG button:active{transform:translateY(2px);box-shadow:0 1px 0 #141413}
 #sbG .sbTop{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:10px;padding:0 calc(8px + env(safe-area-inset-right,0px)) 0 calc(10px + env(safe-area-inset-left,0px));background:rgba(10,18,40,.86);border-bottom:2px solid #141413;color:#fff;pointer-events:auto}
 #sbG .sbTop b{font:italic 900 15px var(--hud,system-ui);color:#ffd400;-webkit-text-stroke:.5px #141413;white-space:nowrap}#sbG .sbNm{flex:1;min-width:0;font:800 13px system-ui;color:#cfe3f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #sbG .sbN{font:900 16px system-ui;color:#fff;background:#e8202a;border:2px solid #141413;border-radius:9px;padding:3px 10px;white-space:nowrap}#sbG .sbTop button{min-height:38px}
-#sbG .sbCall{position:absolute;left:calc(6px + env(safe-area-inset-left,0px));top:52px;bottom:66px;width:118px;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:6px;box-sizing:border-box;background:rgba(255,255,255,.94);border:2px solid #141413;border-radius:12px;pointer-events:auto}
+#sbG .sbCall{position:absolute;left:calc(6px + env(safe-area-inset-left,0px));top:52px;max-height:calc(100% - 118px);width:118px;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:6px;box-sizing:border-box;background:rgba(255,255,255,.94);border:2px solid #141413;border-radius:12px;pointer-events:auto}
 #sbG .sbCall p{margin:0;font:italic 900 15px var(--hud,system-ui);display:flex;flex-direction:column}#sbG .sbCall p small{font:700 12px system-ui;color:#4a5468;font-style:normal}#sbG .sbOk{color:#0a8a3a}
 #sbG .sbPc{position:relative;display:grid;grid-template-columns:44px 1fr;align-items:center;column-gap:4px;background:#e9eef5;border-radius:8px;padding:2px 4px}#sbG .sbPc img{width:44px;height:44px;grid-row:span 2}
 #sbG .sbPc i{font:900 15px system-ui;font-style:normal}#sbG .sbPc small{font:700 12px/1.1 system-ui;color:#4a5468;overflow-wrap:anywhere}body:has(#gbx.sbOn) #tuG{display:none!important}

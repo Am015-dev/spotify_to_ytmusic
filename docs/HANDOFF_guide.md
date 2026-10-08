@@ -14,3 +14,20 @@
 - Pattern: generator like SU_car, with st() step markers so the guide plays booklet order. Add to GAR_SETS (tpl:1), RIDES row, changelog/checklist.
 - Then make AI traffic + rivals use them (see 93_cars_lego.js LEGO traffic / CR_rivB).
 - Release: merge CURRENT live → tools/build.sh vXX → QUICK review → DEPLOY message to the coordinator (never deploy.sh).
+## v88t SPEED SERIES (this session, alex/od-supra on top of garux v88o 0560e1d4)
+- 3 cars in src/98su_supra.js (SC_time 77256, SC_hyper 77261, SC_f1 77252), pushed into SU_T as fam 3 → RIDES row "🏆 SPEED SERIES", GAR_SETS, ▶ GUIDE steps.
+- Traffic: su:t_sc_hy, su:t_sc_tm REPLACE sedan-sports, suv in HCAR (count unchanged). Rivals: SC_RIV for the 6 base teams via a CR_rivB wrapper.
+- Guide: SB_pal (98sb) preselects the step's part + colour in the BUILD palette once per step. Checklist sb-pal + sb-onetap.
+- OD_CHANGELOG v88t + 6 checklist items (sc-*, sb-*). Research: docs/research/SUPRA.md "v88t SPEED SERIES".
+- Shots: su/gar_q (garage per car), su/drive_q (F1 drive, side tyres), su/guide_q, look-dev su/th/t_sc_*.
+## Reviewer PASS c7cfa776 (2026-10-08); DEPLOY v88l sent to the coordinator. Fix with the next release (not blocking):
+- (a) BUILD IT: preselect the step's part AND colour in the palette (strip still shows red defaults).
+- (b) Guide parts panel is ~60 % empty: shrink it to its content (and let SB_area give the car the space).
+- (c) Ghost taps sometimes need 2–3 taps in automation: add checklist item "BUILD IT: one tap on the green ghost places it"; if Alex fails it, widen the hit area (nearest stud ±1) / find why GB_act is not reached.
+### v88t status (2026-10-08 23:20 UTC)
+- REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v for cd80d321. Base = live v88q (a273e33e) + v88p.
+- After PASS: merge CURRENT live (garux v88r and perf v88s may ship first; keep the v88t changelog entry on top), `tools/build.sh v88t`, `git add -f out/v88t`, push,
+  then send the coordinator "DEPLOY alex/od-supra <commit> out/v88t <msg>" + 3 bullets + shot paths. Never deploy.sh; never delete other out/<ver> dirs.
+- Done in v88t: guide follow-ups (a) preselect part + colour (SB_pal, .sbNx outline), (b) panel max-height, (c) sb-onetap checklist item.
+- Next batch (standing order): JDM/tuner sets (76896 GT-R NISMO, 76901 GR Supra; verify online). F1 could get wider rear tyres if a wider wheel part is added.
+- Tests: `TPL=<id> node su/guide.js <url> su/guide_q` (prints pal), `TPLS=a,b node bc/garshot.js <url> dir`, `TPL=<id> node t4/g11drive.js <url> dir`.

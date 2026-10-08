@@ -52,3 +52,16 @@ All are ≤ 10 studs wide and 18 long → BC size check keeps the default handli
 - LEGO Builder app UX copied as behaviour only: parts callout per step (count × part image), new parts highlighted, rotate/zoom, "12/48" counter.
 - Fallback order for templates without steps: bottom-up by layer y, then nose first (z), then x; every group is split into steps of 1–4 parts
   (same part + colour together, mirror twins kept together).
+
+## v88t SPEED SERIES: the booklet's companion sets (verified online 2026-10-08)
+| id | UI name | set | verified facts used | source |
+|---|---|---|---|---|
+| t_sc_tm | Time Coupe | 77256 Time Machine from Back to the Future | 357 pcs, 2 minifigs, flux capacitor, flexible "cables" along the sides, rear air vents, exhausts, doors don't open upwards, 2-in-1 (flying version) | https://brickbanter.com/?p=18888 , https://www.staples.ca/products/3138907-en-lego-speed-champions-time-machine-from-back-to-the-future , https://stonewars.com/news/lego-speed-champions-2026-august-releases/ |
+| t_sc_hy | Red Hypercar | 77261 Ferrari 499P | 329 pcs, 8-stud-wide proportions, low cockpit, large roof air intake, rear wing + fin between the exhausts, yellow stripe across the roof and down either side, white headlights, red driver suit | https://brickset.com/article/133148 , https://www.lego.com/en-mx/product/ferrari-499p-77261 (via retailer copies) |
+| t_sc_f1 | Gold Formula | 77252 APXGP Team Race Car (F1 The Movie) | 268 pcs, 2 minifigs, black + pearl gold livery, wider Pirelli rear tyres | https://www.newelementary.com/2025/11/reveal-77252-f1-movie-apxgp-team-race.html , https://app.brickpicker.com/lego-reviews/77252-apxgp-team-race-car |
+- NOT verified in text (taken from the cars' general look, flagged as such): the time machine's body colour (built in light bluish grey), the hypercar's main red, the F1's halo (left out).
+- Not built: the flying 2-in-1 mode; wider rear tyres on the F1 (same wheel L all round, for normal handling).
+- Generators: SC_time / SC_hyper(o) / SC_f1 in src/98su_supra.js (SC_kit = shared add/sym/step helpers), A.steps for the ▶ GUIDE.
+- Traffic: 'su:t_sc_hy' + 'su:t_sc_tm' replace the 'sedan-sports' + 'suv' kinds in HCAR (no extra cars or draw calls). Rivals: SC_RIV maps the 6 base teams (kronos F1, nordend orange racer, ostend midnight racer,
+  zeil pink roadster, helix time coupe, aeppler green hypercar) through a CR_rivB wrapper; story rivals v_* keep their own cars.
+- Next sets to research: JDM/tuner (76917 Skyline exists as style ref; 76896 GT-R NISMO, 76901 GR Supra).
