@@ -79,7 +79,7 @@ R2_calc=(f=>function(){const A=f.apply(this,arguments),e=$('#b25');if(A&&e&&GB_.
 function B25_ui(){const X=$('#gbx');if(!X)return;let E=$('#b25');if(!E){E=document.createElement('div');E.id='b25';X.appendChild(E);E.addEventListener('pointerdown',e=>e.stopPropagation());
   E.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();const a=b.dataset.b25;if(a==='up')B25_step(1);else if(a==='dn')B25_step(-1);
    else if(a==='lay'){B25.on=B25.on?0:1;B25_save();if(B25.on&&B25.L==null)B25.L=B25_def();if(GS.held)GS_drop();B25_grid();B25_look();try{AU.sfx('pick')}catch(_){}B25_ui()}else B25_view(a)})}
- const on=GB_.bk&&!X.hidden;E.hidden=!on;if(!on)return;const lay=B25.on,n=lay&&B25.L!=null?B25.L-B25_floor():null,why=lay&&GS.held&&GS.held.bad?B25.why:'';
+ const on=GB_.bk&&!X.hidden&&!(typeof R2!=='undefined'&&R2.pop);E.hidden=!on;if(!on)return;const lay=B25.on,n=lay&&B25.L!=null?B25.L-B25_floor():null,why=lay&&GS.held&&GS.held.bad?B25.why:'';
  const h=`<div class="b25V">${[['top','⬇','TOP'],['side','➡','SIDE'],['3d','⟲','3D']].map(([k,i,t])=>`<button data-b25="${k}" class="${B25.view===k?'on':''}"><i>${i}</i>${t}</button>`).join('')}</div>`+
   `<button data-b25="up" ${lay?'':'disabled'}><i>▲</i></button><button data-b25="lay" class="b25L ${lay?'on':''}"><small>${lay?'LAYER':'LAYERS'}</small><b>${lay?n:'AUTO'}</b></button><button data-b25="dn" ${lay?'':'disabled'}><i>▼</i></button>`+(why?`<em>${why}</em>`:'');
  if(E._h!==h){E._h=h;E.innerHTML=h}}
@@ -92,6 +92,8 @@ GNB_new=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk){B25.L=B25_def(
 GB_preset=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk){B25.L=B25_def();B25_grid();B25_look();B25_ui()}return r})(GB_preset);
 // the CATEGORY ▾ popup stayed open after picking a category and covered the car, the parts and ▼: close it once a category is picked
 addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#gbBkCt .gbCt');if(b&&!b.dataset.r2s)setTimeout(()=>{if(R2.pop==='cat')R2_pop(null)},0)},true);
+// the layer column steps aside while a CATEGORY / COLOUR / MORE popup is open (it covered their right end)
+R2_pop=(f=>function(){const r=f.apply(this,arguments);B25_ui();return r})(R2_pop);
 // STEP ▲/▼ on the held part moves the active layer too (one control for height)
 G8_step=(f=>function(d){if(!B25_act())return f.apply(this,arguments);return B25_step(d)})(G8_step);
 {const st=document.createElement('style');st.textContent=`#b25{position:absolute;right:6px;top:calc(var(--r2hh,52px) + 6px);display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:4}#b25[hidden]{display:none}
