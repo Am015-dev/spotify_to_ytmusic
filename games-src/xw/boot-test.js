@@ -24,6 +24,8 @@ const CASES=[['gpu',['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe
   const vis=await p.evaluate(()=>{const e=document.querySelector('[data-start]');if(!e)return 'none';const r=e.getBoundingClientRect();const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return (t===e||e.contains(t))?'ok':'covered by '+(t&&(t.id||t.className))});
   if(vis!=='ok')fail('Launch button '+vis);
   try{await p.tap('[data-start]',{timeout:5000})}catch(e){fail('Launch not tappable: '+e.message.split('\n')[0])}
+  // a first-time player is offered the lesson: "Just play" must start the normal battle
+  {await p.waitForTimeout(400);const off=await p.evaluate(()=>{const b=document.querySelector('#tutoffer [data-tutoffer=play]');if(!b)return null;const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});if(off){await p.touchscreen.tap(off[0],off[1])}else if(name==='gpu')fail('no tutorial offer on the first Launch of a fresh profile')}
   await p.waitForTimeout(mode==='cpu'?6000:2500);
   const st=await p.evaluate(()=>({g:typeof G!=='undefined'&&!!G,three:typeof V3!=='undefined'&&!!V3.on,flat:document.body.classList.contains('flat'),bf:typeof BF!=='undefined'&&!!BF.on,hint:(document.getElementById('bfhint')||{}).textContent,ctl:document.querySelectorAll('#bfl button').length}));
   if(!st.g)fail('game did not start');
