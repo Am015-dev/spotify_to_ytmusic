@@ -59,7 +59,7 @@ function R2_ctxTap(e){const b=e.target.closest('button');if(!b||b.disabled)retur
 // ---------- header + rail + builder tile states
 function R2_hdr(){if(!$('#r2H')||!GB.d)return;const k=GB_list().length,S=GAR_set(),p=Math.min(1,k/GB_MAX);
  $('#r2Name').textContent=S.n;$('#r2Sub').textContent=(GAR_TIER[S.tier]||[''])[0];$('#r2BrB').style.width=Math.round(p*100)+'%';$('#r2BrN').textContent=k+'/'+GB_MAX;
- $('#r2W').textContent='⚖ '+GNB_W(k).toUpperCase();$('#r2Cr').textContent='🟡 '+season().cr.toLocaleString('de-DE');
+ $('#r2W').textContent='⚖ '+(typeof R1_weight==='function'?R1_weight(k):GNB_W(k).toUpperCase());$('#r2Cr').textContent='🟡 '+season().cr.toLocaleString('de-DE');
  const[m]=R2_cur();document.querySelectorAll('#r2R [data-r2m]').forEach(b=>b.classList.toggle('on',b.dataset.r2m===m));
  const u=$('#r2H [data-r2h="undo"]'),r=$('#r2H [data-r2h="redo"]');if(u)u.disabled=!GB_.undo.length;if(r)r.disabled=!(G8.redo&&G8.redo.length)}
 function R2_bkSync(){const P=$('#gbBkP');if(!P)return;const c=P.querySelector('.r2Cat');if(c)c.innerHTML=`<i>▤</i>${(GB_.ct||'Bricks').toUpperCase()} ▾`;const sw=P.querySelector('.r2Sw');if(sw)sw.style.background=GB_BC[GB_.col]||'#fff';
@@ -130,13 +130,16 @@ R2_dom();
 {const st=document.createElement('style');st.textContent=`
 #gbx.r2{--r2hh:52px;--r2rw:72px;--r2ch:52px;--r2pw:300px;--r2k:#141413;background:#0d1730;place-items:stretch}
 #gbx.r2 .gbw{position:absolute;inset:0;display:block;width:auto;height:auto}#gbx.r2 .gbv{position:absolute;inset:0;border:0;border-radius:0;background:none}#gbx.r2 #gbC{position:absolute;inset:0}
-#gbx.r2 #gbStats,#gbx.r2 .gbp>h2,#gbx.r2 .gbTabs,#gbx.r2 .gbp>.row,#gbx.r2 #gbBkT,#gbx.r2 #crSt{display:none!important}
+#gbx.r2 .gbp>h2,#gbx.r2 .gbTabs,#gbx.r2 .gbp>.row,#gbx.r2 #gbBkT,#gbx.r2 #crSt{display:none!important}
 #gbx .r2T,#gbx.r2 .gbP,#gbx.r2 .g9Ty,#gbx.r2 .g9Ch,#gbx.r2 .g9Ed,#gbx.r2 .gbCt,#gbx.r2 #gsBar button,#gbx.r2 #slBar button,#gbx.r2 .gnbR button,#gbx.r2 .gnbX{border:2px solid var(--r2k,#141413);background:#fff;color:#141413;border-radius:10px;
  box-shadow:0 3px 0 #141413;font:italic 900 12px var(--hud);letter-spacing:.02em;cursor:pointer}
 #gbx .r2T{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:44px;height:44px;padding:0 10px;white-space:nowrap;flex:none;box-sizing:border-box}
 #gbx .r2T i{font-style:normal;font-size:16px;line-height:1}#gbx .r2T.on,#gbx.r2 .gbP.on,#gbx.r2 .g9Ty.on,#gbx.r2 .gbCt.on{background:#ffd400;color:#141413}
 #gbx .r2T:disabled{opacity:.6;background:#c9ced8;cursor:default}#gbx .r2T:active:not(:disabled),#gbx.r2 .gbP:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #141413}
 #gbx .r2T.r2Go,#gbx.r2 #gsBar .gsPl{background:#38d16a;color:#141413}
+/* R1 stat chips: a compact card top-left of the car area in RIDES + PERKS only (name + weight are in the header) */
+#gbx.r2 #gbStats{display:none;left:calc(var(--r2rw) + 8px);top:calc(var(--r2hh) + 8px);right:auto;bottom:auto;width:200px;padding:6px 8px;gap:2px;z-index:4;background:rgba(10,18,40,.85);border:2px solid #141413;border-radius:12px;box-sizing:border-box}
+#gbx.r2m-rides #gbStats,#gbx.r2m-perks #gbStats{display:grid}#gbx.r2 #gbStats h4{display:none}#gbx.r2 #gbStats div{grid-template-columns:76px 1fr 40px!important;gap:6px}
 /* header */
 #r2H{position:absolute;left:0;right:0;top:0;height:var(--r2hh);display:flex;align-items:center;gap:8px;padding:0 6px 0 0;background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25);z-index:6;color:#141413;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 #r2H .r2Rib{flex:none;height:100%;display:flex;align-items:center;padding:0 14px 0 calc(10px + env(safe-area-inset-left,0px));background:#e8202a;clip-path:polygon(0 0,100% 0,88% 100%,0 100%)}
