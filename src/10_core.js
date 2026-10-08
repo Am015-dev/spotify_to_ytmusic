@@ -16,6 +16,7 @@ const TUNE={stAng:.55,stFall:14,stIn:11,stOut:16,stMax:1.35,stSpd:.75,tRet:14,as
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.25,stRampHi:.6,stK0:.05,stRet:12,stLim:1.1,yrOut:22};
 const OD_CHANGELOG=[
+  {v:'v88d',date:'8 Oct 2026',items:[{t:'FIXED',s:'Music starts on your first tap (the touch fix is for iPhone and the Claude app); the menu track now loads while the game loads.'},{t:'NEW',s:'TEST MODE: unlimited studs, every car, part, kit, paint and perk unlocked, and all missions and side quests open (logbook → ALL (TEST) takes you to any of them).'},{t:'NEW',s:'The ⚙ tuning drawer is on every screen: menu, garage, free roam, races and missions.'}]},
   {v:'v88c',date:'8 Oct 2026',items:[{t:'CHANGED',s:'The garage is one tidy Body Shop: a header with SAVE & DRIVE, five modes on the left (RIDES, BUILD, PAINT, PERKS, DRIVER) and one row of big buttons at the bottom, with your car always in clear view.'},{t:'NEW',s:'PAINT finishes: GLOSS, MATTE, METAL, CHROME and PEARL, saved per car and shown while you drive.'},{t:'FIXED',s:'Building: a placed brick shows on the car right away, the PLACE/TURN/DROP buttons are a slim column that never covers the car, and the build tip only shows in BUILD.'},{t:'NEW',s:'Kits, driver parts, liveries and horns show a picture, with a lock on the ones you still have to earn.'}]},
   {v:'v88b',date:'8 Oct 2026',items:[{t:'FIXED',s:'Your car no longer turns into the off-road buggy when you drive onto grass; it stays your street car (it still becomes a boat on water).'},{t:'FIXED',s:'Oma Hilde\'s tips and the tutorial card now sit in one spot at the top of the screen, never over your car, the boost bar or the buttons.'},{t:'CHANGED',s:'Races start in sunny Brick Day by default, and Athens street lamps are a real 5.5 m in dark iron.'},{t:'NEW',s:'Garage stats show +/− chips and a weight class (Light, Heavy…) instead of numbers.'}]},
   {v:'v88a',date:'8 Oct 2026',items:[{t:'FIXED',s:'Hot Drop speed: holding BOOST in the city now tops out around 150 km/h (it ran away to 210+), and Hilde\'s tow truck and Kaiser drive at believable city speeds.'},{t:'FIXED',s:'No more teleporting goons: rammed cars slide back instead of jumping 10 m, and the two key vans no longer start stacked on each other.'},{t:'CHANGED',s:'Scene cuts, story warps and checkpoint restarts now flash through black instead of popping.'},{t:'FIXED',s:'The mission arrow says what to do (Follow, Ram, Tail, Drift) instead of always "Deliver"; the health text is bigger.'}]},
@@ -97,7 +98,7 @@ function CR_minBack(){const v=pl&&pl.vmode||'car';return v==='4x4'?5.5:v==='boat
 
 const CR_SMASHV=150/3.6;
 
-const ALL_OPEN=true;
+const ALL_OPEN=true,TEST_MODE=true; // TEST_MODE: Alex's test build (src/99x_test_mode.js): ∞ studs, everything unlocked, all events open, ⚙ everywhere. false = normal game
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
