@@ -6,26 +6,28 @@ function cfgOf(o) {
 }
 // players: seat 0 = you (or the first person), the others follow
 function newGame(mode, o) {
-  if (mode !== 'guided' && !UI.prefs.played) { UI.prefs.played = true; try { savePrefs(); } catch (e) { } }
+  if (mode !== 'guided' && mode !== 'tutorial' && !UI.prefs.played) { UI.prefs.played = true; try { savePrefs(); } catch (e) { } }
   o = o || {}; const c = cfgOf(o); clearTimeout(UI.tm0); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; UI.seq++;
   let np = Math.max(2, Math.min(4, c.np || 3)); const me = c.me != null ? c.me : 0;
   let chars = [me]; for (const s of c.seats) { if (chars.length >= np) break; if (chars.indexOf(s) < 0) chars.push(s); } for (let k = 0; chars.length < np; k++) if (chars.indexOf(k) < 0) chars.push(k);
   np = chars.length; let ai = [], sets = c.sets; const lvOf = ch => (c.lvBy && c.lvBy[ch]) || TEMPER[ch];
   if (mode === 'guided') { np = 2; sets = 1; chars = [me, me === 1 ? 2 : 1]; ai = [null, 'easy']; }
+  else if (mode === 'tutorial') { np = 2; sets = 1; chars = [2, 0]; ai = [null, 'easy']; }   // the staged tutorial: you (Tamsin) against Wynne, beginner books, two days
   else if (mode === 'hot') ai = new Array(np).fill(null);
   else if (mode === 'ai') ai = chars.map(ch => lvOf(ch));
   else ai = chars.map((ch, i) => i === 0 ? null : lvOf(ch));
   const names = chars.map(ch => PN[ch]); if (o.camp && o.camp.opponent && o.camp.opponent.name) names[1] = o.camp.opponent.name.split(' ').pop();   // short name for the table (the boss card shows the full one)
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0; UI.seed = null;
-  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
+  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', length: mode === 'tutorial' ? 2 : undefined, firstCard: mode === 'tutorial' ? 'pick' : mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
   if (o.camp) campTwist(G, o.camp.twist);
+  if (mode === 'tutorial') G.force = 'thick';      // day 2 (the last day) turns up Thick Skin: a blue card, the limit is 9 all day
   UI.camp = o.camp || null; UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
+  UI.coach = { level: mode === 'tutorial' ? 'off' : mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
   if (mode === 'guided' && UI.coach.level === 'off') UI.coach.level = 'full';
   campCoach(o.camp || null);
   window.G = G; try { const st = $('#start'); if (st) st.hidden = true; } catch (e) { }
   closeRS && closeRS(true); try { GX.close(); } catch (e) { }
-  if (mode !== 'ai') save();
+  if (mode !== 'ai' && mode !== 'tutorial') save();
   afterApply(true);
   sndMusic();
   if (mode === 'guided') tipStart();
@@ -45,8 +47,9 @@ function commit(seat, m) {
   afterApply(false); return true;
 }
 function afterApply(first) {
+  if (typeof tutFix === 'function') tutFix();       // the staged tutorial: fixed bag orders, set before anyone draws
   playEvents(first);
-  if (UI.mode !== 'ai' && !(typeof NET !== 'undefined' && NET.on)) { if (G.phase === 'over') clearSave(); else save(); }
+  if (UI.mode !== 'ai' && UI.mode !== 'tutorial' && !(typeof NET !== 'undefined' && NET.on)) { if (G.phase === 'over') clearSave(); else save(); }
   updateHolder();
   if (typeof netPush === 'function' && typeof NET !== 'undefined' && NET.on && isHost()) netPush(false);
   tipCheck();

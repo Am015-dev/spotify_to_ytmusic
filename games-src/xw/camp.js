@@ -23,7 +23,7 @@ function campDone(){if(!campOn()||!G||G.camp!==UI.camp.id)return false;try{GXC.f
 {const _sg=startGame;startGame=function(){UI.camp=null;return _sg.apply(this,arguments)}}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'Ten chapters, three bosses'}catch(e){return ''}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:window.CAMPAIGN.game,data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:window.CAMPAIGN.game,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit:()=>{UI.camp=null;UI.info=true;render()},
     scores:g=>g.pts||[0,0],seats:g=>[{name:'You',me:true},{name:sideName(1),ai:(g.players[1]&&g.players[1].lvl)||'normal'}]})}
 campInit();

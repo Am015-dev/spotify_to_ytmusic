@@ -187,7 +187,7 @@ function marketEl(p, q) {
     });
     st.appendChild(row); stalls.appendChild(st);
   }
-  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
+  if (p.rubies >= D.rubySpend && G.round < LASTD()) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
   wrap.appendChild(stalls);
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));

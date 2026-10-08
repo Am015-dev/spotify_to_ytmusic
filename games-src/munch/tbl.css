@@ -185,3 +185,9 @@ html.ph .opp.seat,html.ph-l .opp.seat,html.ph-p .opp.seat{min-height:44px}
 html.ph .arena.tight .hsav,html.ph .arena.tight .mon .row,html.ph .arena.tight>.row.small,html.ph .arena.tight>.rollbox .small{display:none}
 html.ph .arena.tight .score .num{margin-top:0}
 html.ph .arena.tight .row.mons{margin-bottom:6px}
+/* the tutorial's progress dots: 23+ steps must fit beside "Skip tutorial" on a 375px phone */
+.gxt-top .gxt-dots{gap:2px}.gxt-top .gxt-dots i{width:4px;height:4px}.gxt-top .gxt-dots i.on{transform:scale(1.5)}.gxt-top .gxt-n{font-size:11px}
+/* the tutorial entry in the start dialog and the menu */
+.btn.gxt-menu{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
+.btn.gxt-menu span{font-weight:600;font-size:.82em;opacity:.8}
+.btn.gxt-menu.gxt-first{border-color:#c99a35;box-shadow:0 0 0 2px rgba(201,154,53,.45)}

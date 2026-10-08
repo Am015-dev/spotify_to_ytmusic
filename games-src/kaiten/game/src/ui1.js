@@ -171,7 +171,7 @@ function buildNews(before, after, picks, scored) {
     if (!d && !why.length && keys.some(k => k === 'tempura' || k === 'sashimi')) notes.push('scores when the set is complete');
     return { s, d, served, why, notes };
   });
-  return { t: Date.now(), round: scored ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, turn: G.turn, lines };
+  return { t: Date.now(), round: scored ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, turn: G.turn, lines };
 }
 function newsDelta(s) { const n = UI.news; if (!n || Date.now() - n.t > 2600) return 0; const l = n.lines.find(x => x.s === s); return l ? l.d : 0; }
 function newsSig(s) { const d = newsDelta(s); return d ? UI.news.t + ':' + d : ''; }

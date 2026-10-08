@@ -7,14 +7,16 @@ function seatMode(s){const k=s.seats.slice(0,s.np).filter(x=>x==='human').length
 function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length:'10 chapters'}catch(e){return ''}}
-function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const saved=savedGame();const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;
+function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const saved=savedGame();const tutFirst=firstTime()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME);const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;
   let jobs='';for(const [a,b,label] of BOXES){jobs+=`<div class="box">${esc(label)}</div><div class="jobs">`;for(let k=a;k<=b;k++){const j=c.jobs[k];
       jobs+=`<button class="jt${j&&j.w?' done':''}${k===n?' sel':''}" data-a="job" data-n="${k}" aria-pressed="${k===n}" title="${esc(MISSIONS[k].nm)}"><b>${k}</b><span>${esc(MISSIONS[k].nm)}</span>${j&&j.w?'<i>✓</i>':''}${MISSIONS[k].audio||hasRule(k,'timer')?'<i class="t">⏱</i>':''}</button>`}jobs+='</div>'}
   const seatsTxt=nh===0?'Watch':nh===1?'You + computers':nh+' players, one phone';
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
-   <button class="big go" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
+   ${tutFirst?tutBtn('big go'):''}
+   <button class="big${tutFirst?'':' go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
    <button class="big blue" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
+   ${tutFirst?'':tutBtn('big')}
    ${saved?`<button class="big" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
@@ -26,7 +28,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
 document.addEventListener('toggle',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('more'))UI.moreOpen=e.target.open},true);
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
-function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
+function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
   if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.camp)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars&&s.chars[i]){chars[i]=s.chars[i];any=1}
@@ -40,7 +42,7 @@ function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names
   if(plan)netBound(plan)}finally{NET.starting=false}
   if(humans().length===1&&!NET.on)UI.holder=humans()[0];
   UI.prev=snap();try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}if(SND.gesture)musicStart();else SND.wantMusic=1;refresh()}
-function resumeSaved(){const s=savedGame();if(!s)return;kitReset();G=s.G;UI.holder=s.ui.holder;UI.rt=!!s.ui.rt;UI.brief=null;UI.started=true;UI.prev=snap();UI.sel=null;UI.campDone=0;UI.campShown=0;UI.camp=null;UI.ghost={info:0,turn:0};hideStart();if(SND.gesture)musicStart();refresh()}
+function resumeSaved(){const s=savedGame();if(!s)return;lsSet('sf_played',1);kitReset();G=s.G;UI.holder=s.ui.holder;UI.rt=!!s.ui.rt;UI.brief=null;UI.started=true;UI.prev=snap();UI.sel=null;UI.campDone=0;UI.campShown=0;UI.camp=null;UI.ghost={info:0,turn:0};hideStart();if(SND.gesture)musicStart();refresh()}
 function renderIdle(){const say=document.getElementById('say');if(say)say.textContent='Waiting for the host';for(const id of ['crew','mine','gear','tray','fuse','track','cutc','clk']){const e=document.getElementById(id);if(e){e._s=null;e.innerHTML=''}}const ov=document.getElementById('over');if(ov)ov.hidden=true}
 // ---------- story chapters (the shared campaign kit) ----------
 function campMetrics(G){const st=G.stats||{};return {won:!!(G.over&&G.over.win),misses:st.miss||0,left:G.dial!=null?G.dial:0,turns:G.turn,solos:st.solo||0,eqUsed:st.eqUse||0}}
@@ -50,7 +52,7 @@ function campStart(def){const np=def.setup.players||3;const lv=def.setup.level||
   startJob(s)}
 function campOver(){if(!UI.camp||typeof GXC==='undefined'||!GXC.active())return;setTimeout(()=>{if(!G||!G.over)return;UI.campShown=1;try{document.getElementById('over').hidden=true}catch(e){}try{GXC.finish(G)}catch(e){console.error(e)}},ANIM?2200:0)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'short-fuse',data:window.CAMPAIGN,startChapter:campStart,isWon:G=>!!(G&&G.over&&G.over.win),metrics:campMetrics,
+  GXC.init({game:'short-fuse',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:G=>!!(G&&G.over&&G.over.win),metrics:campMetrics,
     onExit:()=>{UI.camp=null;showStart()},scores:g=>[g.seats.length?g.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0):0],seats:g=>g.seats.map((q,i)=>({name:i===0?'You':q.nm,me:i===0,ai:q.human?undefined:q.lv}))})}
 // ---------- clicks on buttons that carry data-a ----------
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a;const V=UI.V;
@@ -74,8 +76,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'np':UI.setup.np=+b.dataset.v;fixSetup();renderStart();return;
   case 'lv':UI.setup.lv=b.dataset.v;renderStart();return;
   case 'preset':preset(b.dataset.v);return;
-  case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){GXC.open()}return;
-  case 'start':startJob(UI.setup);return;
+  case 'story':storyOpen();return;
+  case 'start':if(!isHost()&&tutOffer())return;startJob(UI.setup);return;
+  case 'offeryes':tutStart();return;
+  case 'offerno':{const d=document.getElementById('offer');if(d)d.remove();startJob(UI.setup);return}
   case 'resume':resumeSaved();return;
   case 'closestart':if(G){hideStart()}return;
   }});

@@ -116,13 +116,13 @@ function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;if(G.step==='place'){UI.user=false;refit(true)}}}
 // ---------- the main render ----------
 function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
-function save(){try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
+function save(){if(UI.tut)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
 function refresh(){if(UI.sim||!G)return;render();save();playFx();if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
-function rotate(){if(!myTurn('place')||UI.rots.length<2){return}const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');renderGlows();updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
-function onGlow(x,y){if(UI.moved||!myTurn('place'))return;const m={act:'place',x,y,r:UI.rot};if(!isLegal(m,sideToAct()))return;UI.hint=null;UI.humanTurns++;performMove(m,sideToAct())}
-function onFig(m){if(UI.moved||!myTurn('fig'))return;UI.hintFig=null;performMove(m,sideToAct());markSeen()}
-function onSkip(){if(!myTurn('fig'))return;UI.hintFig=null;performMove({act:'skip'},sideToAct());markSeen()}
+function rotate(){if(!myTurn('place')||UI.rots.length<2){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');renderGlows();updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
+function onGlow(x,y){if(UI.moved||!myTurn('place'))return;const m={act:'place',x,y,r:UI.rot};if(!isLegal(m,sideToAct()))return;if(!tutGate({what:'place',x,y}))return;UI.hint=null;UI.humanTurns++;performMove(m,sideToAct())}
+function onFig(m){if(UI.moved||!myTurn('fig'))return;if(!tutGate({what:'fig',k:m.k,l:m.l}))return;UI.hintFig=null;performMove(m,sideToAct());markSeen()}
+function onSkip(){if(!myTurn('fig'))return;if(!tutGate({what:'skip'}))return;UI.hintFig=null;performMove({act:'skip'},sideToAct());markSeen()}
 function markSeen(){if(UI.first&&UI.humanTurns>=2){UI.first=false;try{localStorage.setItem('rv_seen','1')}catch(e){}}}
 // ---------- computer turns: show its tile, then place, then the follower, each about half a second ----------
 function aiAct(){UI.aiT=0;if(!G||G.over)return;const s=sideToAct();if(s<0||P(s).human)return;const m=aiMove(s);if(!m)return;const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)}
@@ -142,9 +142,12 @@ function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.len
     setTimeout(()=>{const o=e._o;if(chip){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
     setTimeout(()=>e.remove(),final?1900:1700)})}
 // ---------- the end: unfinished features score one by one, then the result ----------
-function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;sfx('win');
-  const fs=finalScores();let n=0;const dets=fs.det.filter(d=>d.ty==='F'?d.n:true).slice(0,10);
+function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>d.ty==='F'?d.n:true).slice(0,10);
   for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),400+n*380);n++}
+  return n}
+function tutFinalPops(){if(UI.tut)finalPops()}
+function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.tut)return;sfx('win');
+  const n=finalPops();
   const wait=Math.min(4200,900+n*380+900);
   setTimeout(()=>{if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()},UI.reduce?300:wait)}
 function showResult(){const win=G.over.win,me=G.pl.find(p=>p.human);const iWon=me&&win.includes(me.i)&&win.length===1;
@@ -156,16 +159,16 @@ function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g
 function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame();
   const chips=(k,vals)=>vals.map(v=>`<button class="opt" data-k="${k}" data-v="${v[0]}" aria-pressed="${o[k]===v[0]}">${v[1]}</button>`).join('');
   const tg=(k,t)=>`<button class="opt" data-t="${k}" aria-pressed="${!!o[k]}">${t}</button>`;
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p><button class="btn big" data-a="play">Play vs computer</button>
-    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p>${tutFirst()?tutBtn('btn big'):''}<button class="btn ${tutFirst()?'alt':'big'}" data-a="play">Play vs computer</button>
+    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutFirst()?'':tutBtn('btn alt')}
     <div class="opts">${chips('rivals',[[1,'1 rival'],[2,'2 rivals'],[3,'3 rivals']])}</div><div class="opts">${chips('lv',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}</div>
     <div class="opts">${tg('river','River')}${tg('ic','Taverns')}${tg('tb','Merchants')}</div></div></div>`;
   const m=$('#modal');m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.dataset.k)o[b.dataset.k]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v;else o[b.dataset.t]=!o[b.dataset.t];showStart()});
-  m.querySelector('[data-a=play]').onclick=()=>beginGame();m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
+  m.querySelector('[data-a=play]').onclick=()=>{if(tutOffer())showOffer();else beginGame()};m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
   const c=m.querySelector('[data-a=cont]');if(c)c.onclick=loadSaved}
 function openMenu(){if($('#menu'))return closeMenu();const d=document.createElement('div');d.id='menu';d.className='menu';d.setAttribute('role','dialog');
-  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button><button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
-  document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.gxh)return;const a=b.dataset.a;closeMenu();
+  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
+  document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.gxh||b.hasAttribute('data-gxt-open'))return;const a=b.dataset.a;closeMenu();
     if(a==='fit')refit(true);else if(a==='rules')showRules();else if(a==='snd')toggleSound();else if(a==='mus')toggleMusic();else if(a==='spd'){UI.speed=UI.speed>1?1:3;try{localStorage.setItem('rv_fast',UI.speed>1?'1':'0')}catch(e){}}
     else if(a==='story'&&typeof campOpen==='function')campOpen();else if(a==='new'){UI.camp=null;showStart()}};
   setTimeout(()=>document.addEventListener('pointerdown',menuAway,true),0)}
