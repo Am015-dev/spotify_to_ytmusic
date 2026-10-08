@@ -108,7 +108,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       const b=s.bubble;const inB=(x,y)=>b&&x>=b.left-10&&x<=b.right+10&&y>=b.top-10&&y<=b.bottom+10;
       for(const [fx,fy] of [[.5,.5],[.15,.45],[.85,.45],[.5,.3],[.2,.7],[.8,.7],[.5,.62],[.1,.2],[.9,.2],[.5,.9]]){const x=V.w*fx,y=V.h*fy;if(y>40&&!inside(x,y)&&!inB(x,y))return {x,y}}return null},need);
     if(wp&&(guardOnce(s.id))){const before=await state();const gs0=await p.evaluate(()=>JSON.stringify([G.round,G.phase,G.cur,G.ships.map(s=>[s.x,s.y,s.sh,s.dmg.length,s.dial,s.focus]),UI.hold&&UI.hold.kind]));
-      await p.touchscreen.tap(wp.x,wp.y);await sleep(140);const after=await state();totals.wrong++;
+      await p.touchscreen.tap(wp.x,wp.y);await sleep(50);const after=await state();totals.wrong++;
       const gs1=await p.evaluate(()=>JSON.stringify([G.round,G.phase,G.cur,G.ships.map(s=>[s.x,s.y,s.sh,s.dmg.length,s.dial,s.focus]),UI.hold&&UI.hold.kind]));
       if(after.i!==before.i||after.count!==before.count)note(tag,id+': a wrong tap advanced the tutorial');
       if(gs0!==gs1)note(tag,id+': a wrong tap changed the game');
