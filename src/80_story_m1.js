@@ -19,7 +19,7 @@ function M1_P(x,z,R=320){const G=qvGraph();if(!G)return{x,z};const i=qvNear(x,z,
 // D24: via points snap to the nearest real street, each leg starts with the heading the previous leg ended on (no U-turn at a via point),
 // and spurs/loops are cut from the joined path before it is simplified
 function M1_path(pts){let P=[],h0;const G=qvGraph();pts=pts.map((p,k)=>{if(k===0||k===pts.length-1||!G)return p;const i=D24_nearMain(p.x,p.z);return i<0?p:{x:G.X[i],z:G.Z[i]}});
-  for(let k=1;k<pts.length;k++){const q=qvPath(pts[k-1].x,pts[k-1].z,pts[k].x,pts[k].z,h0,1);P=P.concat(k>1?q.slice(1):q);const n=P.length;if(n>1)h0=Math.atan2(P[n-1][0]-P[n-2][0],P[n-1][1]-P[n-2][1])}D24_clean(P,null,0,60);P=D24_round(P);const C=qvCum(P);return{P,C,L:C[C.length-1]}}
+  for(let k=1;k<pts.length;k++){const q=qvPath(pts[k-1].x,pts[k-1].z,pts[k].x,pts[k].z,h0,1);P=P.concat(k>1?q.slice(1):q);const n=P.length;if(n>1)h0=Math.atan2(P[n-1][0]-P[n-2][0],P[n-1][1]-P[n-2][1])}D24_clean(P,null,0,60);P=D24_round(P);D24_despike(P);const C=qvCum(P);return{P,C,L:C[C.length-1]}}
 function M1_car(geo,col,sc,trim){if(!/boat/.test(geo))try{const g=CR_npcVeh(geo,col);RO.grp.add(g);return g}catch(e){console.warn('CR npc',e)}const mat=kmMat('car').clone();mat.color=new THREE.Color(col);const g=new THREE.Group(),b=new THREE.Mesh(kmGeo(geo,sc),mat);g.add(b);if(trim){const s=new THREE.Mesh(new THREE.BoxGeometry(sc*.95,.25,sc*1.9),neonMat(trim,2.4));s.position.y=sc*.62;g.add(s)}RO.grp.add(g);return g}
 function M1_put(m,x,z,h){m.position.set(x,groundAt(x,z,(m.position.y||0)+4),z);if(h!=null)m.rotation.y=h}
 function M1_obj(o){M1.act.push(o);return o}
