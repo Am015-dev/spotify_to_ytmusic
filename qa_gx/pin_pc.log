@@ -1,0 +1,25 @@
+shot m0_menu 69s
+menu {"rect":[924,108,340,56],"over":[]}
+shot g0_garage 191s
+garage {"rect":[313,54,340,56],"over":[]}
+PASS garage: strip visible, covers nothing {"rect":[313,54,340,56],"over":[]}
+shot r1_roam_expanded 726s
+roam {"rect":[924,108,340,56],"over":[]}
+PASS roam: strip visible, covers no control/minimap/speed/objective {"rect":[924,108,340,56],"over":[]}
+PASS text ≥12 px, PASS/FAIL ≥44 px, ≤ ~340×70 {"fs":12,"pa":44,"w":340,"h":56}
+PASS ✅ answers the item and moves to the next i 0→1 answered 1
+PASS answering does not pause or leave roam roam
+shot r2_roam_answered 913s
+PASS › moves on 
+PASS ‹ moves back 
+PASS header folds to a chip 
+shot r3_roam_collapsed 1210s
+chip {"rect":[1194,108,70,52],"over":[]}
+PASS no ✕ on the chip while items are open 
+CRASH page.reload: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for navigation until "load"[22m
+
+    at /home/user/spotify_to_ytmusic/qa_gx/pin.js:26:10 {
+  name: 'TimeoutError'
+}

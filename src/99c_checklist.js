@@ -3,6 +3,47 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88t',id:'sc-rides',text:'Garage RIDES → STREET: a SPEED SERIES row shows Time Coupe, Red Hypercar and Gold Formula; each looks like a LEGO Speed Champions car (8 studs wide, chunky, real parts).'},
+ {ver:'v88t',id:'sc-drive',text:'Equip each of the 3 new cars, SAVE & DRIVE: all four tyres sit on the road and it handles like the other normal cars.'},
+ {ver:'v88t',id:'sc-guide',text:'▶ GUIDE on each of the 3 new cars plays it step by step (chassis → wheels → nose → sides → cockpit → rear → wing).'},
+ {ver:'v88t',id:'sc-traffic',text:'Drive around Frankfurt or Athens: you meet the grey Time Coupe and the red Hypercar in traffic. In a race, some rivals drive the new cars.'},
+ {ver:'v88t',id:'sb-pal',text:'In the guide tap ✋ BUILD IT: the next part is already selected (highlighted) in the parts palette, in its colour, and scrolled into view.'},
+ {ver:'v88t',id:'sb-onetap',text:'In BUILD IT, one tap on (or near) the green ghost places the part straight away; no second tap or PLACE needed.'},
+ {ver:'v88q',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
+ {ver:'v88p',id:'life-crowds',text:'Drive 1 minute in Frankfurt and in Athens: at most street corners ahead you see a group of 3-6 people standing together; they turn to look, wave and hop as you come by.'},
+ {ver:'v88p',id:'life-dodge',text:'Drive fast past a corner group: the people leap out of the way; nobody stands on the road.'},
+ {ver:'v88p',id:'life-stalls',text:'You pass market stalls (striped awnings, fruit boxes) and café tables with umbrellas on the pavements. Drive into one: it bursts into bricks and studs; it does not stop you dead.'},
+ {ver:'v88p',id:'life-parked',text:'Parked cars stand half on the kerb on many streets ahead; driving into one slowly bumps you off it, fast smashes it.'},
+ {ver:'v88p',id:'pop-ring',text:'While free-roaming, every ~30 s a coloured ring with a sign (RAMP JUMP, DRIFT ZONE, SMASH STREAK, CONE SLALOM) appears on the road ahead in your lane. Only one at a time, no new buttons or panels.'},
+ {ver:'v88p',id:'pop-play',text:'Drive through a ring: the objective line shows the challenge, the progress and the seconds left. Finish it: big brick burst and +150 studs. Miss it: a short MISSED message, nothing else.'},
+ {ver:'v88p',id:'pop-each',text:'Try all four: the ramp launches you, the drift counts only while drifting, the crates smash, the cones fly when you clip them.'},
+ {ver:'v88p',id:'life-fps2',text:'On the phone the game still runs smoothly in a busy street with a pop-up running.'},
+ {ver:'v88o',id:'pin-strip',text:'This checklist stays on screen while you drive, race and build: answer with ✅ / ❌, ‹ › to move, tap the counter to fold it to a chip. Steering and gas keep working while you tap it.'},
+ {ver:'v88o',id:'clear-base',text:'Garage BUILD → ⋯ MORE → CLEAR on a normal car and on the Bus: only the chassis and wheels stay, with one clean grid and nothing overlapping. UNDO brings the build back.'},
+ {ver:'v88o',id:'gx-palette',text:'Garage BUILD (phone): the parts palette shows 2 rows of bigger tiles with names; swipe it sideways to see more. ▾ makes it small again.'},
+ {ver:'v88o',id:'gx-chips',text:'Tap the category chips (BRICKS, PLATES, SLOPES…): only those parts show. Pick a few parts, then tap 🕘 RECENT: the parts you just used are first.'},
+ {ver:'v88o',id:'gx-fav',text:'Long-press a part tile (right-click on PC): it gets a ★ and shows under ★ FAVS. Long-press again removes it. It is still there after a reload.'},
+ {ver:'v88o',id:'gx-make',text:'Tap ☝ SELECT, tap 3–4 parts, then MAKE GROUP: a group "Group 1" appears in the ⛓ GROUPS list. ✎ renames it.'},
+ {ver:'v88o',id:'gx-eye',text:'In ⛓ GROUPS tap the 👁 eye: the group disappears and its parts cannot be tapped; tap again to show it. SAVE & DRIVE with it hidden: the car you drive is complete.'},
+ {ver:'v88o',id:'gx-ops',text:'Tap a group name: MOVE, COPY, MIRROR and DELETE work on the whole group (UNDO brings a deleted group back).'},
+ {ver:'v88o',id:'gx-hideup',text:'Open a big template (Bus), step the LAYER ▼ down and tap HIDE UP: everything above the layer disappears so you can build inside; SHOW UP brings it back.'},
+ {ver:'v88n',id:'life-people',text:'Drive 1 minute in Frankfurt: you see people on the pavements most of the time, and some wave both arms as you pass them.'},
+ {ver:'v88n',id:'life-traffic',text:'Traffic cars show up on the streets around you (not only far away), including orange and pink street racers; they still do not block the inner lane.'},
+ {ver:'v88n',id:'life-pigeons',text:'Drive toward a group of grey pigeons on a pavement: they fly off before you reach them. White gulls circle high above.'},
+ {ver:'v88n',id:'life-sky',text:'Look around: red/white flags flap on some rooftops and a LEGO blimp slowly circles over the city (Athens: blue/white flags).'},
+ {ver:'v88n',id:'life-boats',text:'Frankfurt: boats sail up and down the Main. Drive the boat into one: you bounce off, you do not pass through it.'},
+ {ver:'v88n',id:'life-colours',text:'Frankfurt buildings have bold LEGO colours (red, yellow, blue, green); Athens old-town houses are warm yellow/orange. Nothing looks washed out.'},
+ {ver:'v88n',id:'life-fps',text:'On the phone the game runs as smoothly as before in a busy street (no new stutter).'},
+ {ver:'v88n',id:'life-knob',text:'⚙ TUNE → Life → "World life (master)" at 0 makes the streets quiet again; at 1.5 they get busier.'},
+ {ver:'v88l',id:'sb-open',text:'Garage RIDES: every car card has ▶ GUIDE; tapping it plays that car being built step by step (parts drop in, a parts box on the left, a counter like 1/22 top right).'},
+ {ver:'v88l',id:'sb-ctrl',text:'In the guide: ◀ ▶ change the step, PLAY/PAUSE, ×1/×2, the slider jumps; no button covers the car on the phone; EXIT goes back to the garage with your car unchanged.'},
+ {ver:'v88l',id:'sb-more',text:'BUILD → ⋯ MORE → BUILD GUIDE works for any car (also the bus or your own build); EXIT returns to BUILD.'},
+ {ver:'v88l',id:'sb-diy',text:'In the guide tap ✋ BUILD IT: the next parts show as a green ghost; tapping near it snaps the part in; 💡 PLACE IT places it for you; ✕ before the end restores the car.'},
+ {ver:'v88k',id:'su-rides',text:'Garage RIDES → STREET: the row STREET RACER FAMILY shows 4 cars (Orange Street Racer + 3 variations), then TUNER FRIENDS with 3 more.'},
+ {ver:'v88k',id:'su-look',text:'Orange Street Racer looks like the LEGO set: orange, open top with blue seats, lime side graphics, grey wing on struts, silver wheels.'},
+ {ver:'v88k',id:'su-drive',text:'Equip the Orange Street Racer, SAVE & DRIVE: it drives like the other normal cars (not slow like the bus).'},
+ {ver:'v88k',id:'su-tyres',text:'All four tyres of every new car sit on the road, including the Widebody Track Racer and the Black Gold V8 (gold wheels).'},
+ {ver:'v88k',id:'su-build',text:'✎ BUILD on a new car: its parts load and you can remove the wing or recolour it.'},
  {ver:'v88i',id:'big-rides',text:'Garage RIDES: the Sightseeing Bus, Box Truck, Stretch Limo and Monster Truck show up and look like LEGO vehicles; equip each one and SAVE & DRIVE.'},
  {ver:'v88i',id:'big-junction',text:'Drive the Bus or the Truck through 3 junctions in Frankfurt: it turns wider than a car but never gets stuck on a corner.'},
  {ver:'v88i',id:'big-feel',text:'A big car picks up speed more slowly than the Hot Rod, and the camera shows the whole vehicle.'},
@@ -43,7 +84,7 @@ const OD_CHECKLIST=[
  for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown','wheel'])ov.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  for(const ev of['keydown','keyup'])ov.addEventListener(ev,e=>{if(e.target.tagName==='INPUT')e.stopPropagation()});
  const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>{const r=s[k(it)]||{};return `${it.ver} ${it.id}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')};
- const badge=()=>{const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
+ const badge=()=>{try{pinR()}catch(e){}const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
  const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
   for(const it of OD_CHECKLIST){const r=s[k(it)]||{};h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
   ov.innerHTML=h+'</div></div>';badge()};
@@ -58,4 +99,53 @@ const OD_CHECKLIST=[
  // ⚙ drawer header (re-rendered on every change) and the UPDATES screen header
  if(typeof TU_render==='function'){const r0=TU_render;TU_render=function(){r0.apply(this,arguments);const th=TU.el&&TU.el.querySelector('.th');if(th&&!th.querySelector('.ckB'))th.appendChild(mk());badge()}}
  if(typeof window.odUpdOpen==='function'){const u0=window.odUpdOpen;window.odUpdOpen=function(){u0.apply(this,arguments);const u=document.querySelector('#odUpd .ub');if(u&&!u.querySelector('.ckB')){const b=mk();b.style.cssText='display:block;margin:8px 0 2px';u.insertBefore(b,u.firstChild)}badge()}}
- window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST}}
+ // ---- PIN (Alex 2026-10-08: "the checklist should be staying while i am playing the game"): a mini checklist pinned on screen in roam, races,
+ // missions and the garage. Expanded: counter (tap = fold to a chip), item text (tap = full panel with notes + COPY RESULTS), ✅ / ❌, ‹ ›.
+ // Folded: a "✓ 3/8" chip. It can only be dismissed (✕ on the chip) once every item of the version is answered. State lives in mho_chk._pin.
+ // Touches on it never reach the controls under it and it never pauses the game.
+ const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
+ // the strip walks the items of the newest 3 versions (a small hotfix release must not hide the open items of the release before it)
+ const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver))};
+ let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
+ // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
+ const pinCd=()=>{try{return state==='countdown'||(state==='race'&&raceT<3)}catch(e){return false}};
+ const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
+ for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
+ const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
+  const busy=!ov.hidden||!n||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
+  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen)||pinCd();
+  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
+  else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
+   `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
+   `<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
+  pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
+ // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
+ const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
+  if(!vis(X)){pin.style.left='';pin.style.width='';pin.style.transform='';
+   // roam / race / missions: below the objective line (quest tracker, objective pill) when it sits at the top centre
+   if(innerWidth>900&&innerHeight>500){const g=document.querySelector('#tuG,#tuB,[id^="tu"][id$="G"]');let t=108;if(vis(g)){const r=g.getBoundingClientRect();if(r.top<160&&r.right>innerWidth-120)t=Math.round(r.bottom)+10}
+    pin.style.transform='none';pin.style.left=Math.round(innerWidth-16-pin.offsetWidth)+'px';pin.style.top=t+'px';return}
+   const a=pin.getBoundingClientRect();let t=54;for(const e of document.querySelectorAll('#roamArrow,#qTrk,#obj,[id*="Obj"],[class*="Pill"],[class*="pill"]')){if(pin.contains(e)||!vis(e))continue;const r=e.getBoundingClientRect();
+    if(r.top<110&&r.bottom<150&&r.right>a.left&&r.left<a.right&&r.height<70)t=Math.max(t,Math.round(r.bottom)+6)}
+   pin.style.top=t===54?'':`calc(env(safe-area-inset-top,0px) + ${t}px)`;return}pin.style.top='';let L=0,R=innerWidth;
+  for(const q of['#r2R','#gxG','#slBar','#gsBar']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120)L=Math.max(L,r.right+6)}}
+  for(const q of['#b25 .b25V','#gbx .gbp']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120&&r.left>L)R=Math.min(R,r.left-6)}}
+  const w=Math.min(340,R-L),x=L+Math.max(0,(R-L-pin.offsetWidth)/2);if(w<200){pin.style.left='';pin.style.width='';pin.style.transform='';return}
+  pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
+ const P_col=()=>pin.classList.contains('col');
+ pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=pinItems(),n=C.length;try{AU.sfx('pick')}catch(er){}
+  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
+  else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
+   if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
+  psave(P);pinR();badge()});
+ {const st2=document.createElement('style');st2.textContent=`#odPin{position:fixed;z-index:8990;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 54px);width:min(340px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:4px;
+ background:rgba(11,22,38,.88);border:2px solid #3ddc84;border-radius:12px;color:#e8f2fa;font:600 12px system-ui;user-select:none;-webkit-user-select:none;touch-action:manipulation;box-shadow:0 2px 0 rgba(0,0,0,.35)}#odPin[hidden]{display:none}
+#odPin button{min-height:44px;border-radius:9px;border:2px solid #4ceaff;background:#12304a;color:#fff;font:900 12px system-ui;padding:0;cursor:pointer;flex:none}
+#odPin .pn{width:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-color:#3ddc84}#odPin .pn b{font-size:13px}#odPin .pn small{font-size:12px;color:#9fe8bf;font-weight:800}
+#odPin p{flex:1;min-width:0;margin:0;line-height:15px;max-height:30px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;font-size:12px}
+#odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
+#odPin .pv{display:flex;flex-direction:column;gap:2px}#odPin .pv button{width:28px;min-height:21px;height:21px;font-size:15px;line-height:1}
+#odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}
+body.ckOn #odPin{display:none}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
+ setInterval(pinR,700);pinR();
+ window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
