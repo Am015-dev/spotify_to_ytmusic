@@ -694,7 +694,8 @@ function animWorld(dt,t){
   V3.clouds.forEach((c,k)=>{c.position.x+=dt*(.4+k*.05);if(c.position.x>90)c.position.x=-90})}
 // ---- 3D portraits of the vinyl figures for the monster picker (the SVG art stays as the fallback) ----
 const MONPIC={};
-function monPic(k){const cf=window.CCMedia&&CCMedia.cutout(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
+function monFace(k,cls){const cf=window.CCMedia&&CCMedia.avatar(k);if(cf)return `<img class="${cls||'mface'}" src="${cf}" alt="" draggable="false">`;return `<svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(k)}</svg>`} // menu picture: the Flow character, or the drawn one
+function monPic(k){const cf=window.CCMedia&&CCMedia.avatar(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
 function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;const S=192;const r=V3.r;let rt;
   try{rt=new THREE.WebGLRenderTarget(S,S,{type:THREE.FloatType,samples:r.capabilities.isWebGL2?4:0})}catch(e){return}
   const ps=new THREE.Scene();ps.add(new THREE.HemisphereLight(0x9a90ff,0x2a1430,.9));const key=new THREE.DirectionalLight(0xffc9a0,2.6);key.position.set(-4,6,6);ps.add(key);

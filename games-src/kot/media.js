@@ -3,8 +3,8 @@
    Clips: muted, playsinline, 9:16 first (contain => letterbox in landscape), tap to skip, once per chapter. */
 (function(){
   const M=window.CC_MEDIA||{},BASE='media/',clips=M.clips||[],pics=M.portraits||[];
-  /* ?preview=1 : open every chapter and let the clips play again (for checking). Normal play is untouched. */
-  try{if(/[?&]preview=1/.test(location.search)&&window.CAMPAIGN){
+  /* ?preview=1 (or any -next preview page): open every chapter and let the clips play again (for checking). Normal play is untouched. */
+  try{if((/[?&]preview=1/.test(location.search)||location.pathname.indexOf('-next')>=0)&&window.CAMPAIGN){
     const K='gns-campaign-crown';let P={};try{P=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
     if(!P||P.v!==1)P={v:1,ch:{},unlocked:[],last:null};P.ch=P.ch||{};P.unlocked=P.unlocked||[];
     window.CAMPAIGN.chapters.slice(0,-1).forEach(c=>{const r=P.ch[c.id]||(P.ch[c.id]={beaten:false,stars:0,best:null,tries:0,losses:0,easy:false});if(!r.beaten){r.beaten=true;r.stars=Math.max(r.stars||0,1)}});
