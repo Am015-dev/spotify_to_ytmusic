@@ -34,3 +34,10 @@ Coordinator 12:31: steering first; zig-zags at 36 OK unless a visible U-turn; RE
 
 ## Open
 - measure: touch/keys × 30/60 fps, new vs v88d; route fra+ath; time-to-90°; shots; tPlay; REVIEW; DEPLOY.
+
+## Notes (12:56)
+- Live is now v88e = cc9b68d (R3 levels/perks, English UI): merge its src (alex/od-r3) BEFORE building out/<ver>.
+- Bugs found in drive24 steering: (a) ◀ straight to ▶ skipped the ramp (stRet path → full opposite lock in 0.17 s), fixed;
+  (b) assist had no road direction on filler-grid streets (RO.rdT only from cityAt/Autobahn), fixed with fillAt.
+- t90 vs stability trade: a short ramp at corners brings back ~30°/s counter-yaw; testing a hold-accelerated ramp (stHold/stRampFast).
+- New metric settleX/flipsX: clock from turn exit (heading first < 8° off the new street); old settle includes ~0.8 s of the turn itself.
