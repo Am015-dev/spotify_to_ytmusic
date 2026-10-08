@@ -13,3 +13,9 @@
 ## Next
 1. Read lv/after3 + lv/rv (g11drive SIDE ATH: start, FRA drive, side traffic, tyres, Athens; garage). LOOK at them. Tyre gap from drive.log (tyre_rest).
 2. REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v. After PASS: merge live HEAD (origin/alex/brave-carson-rbpmlk; garux v88j / supra v88k-l may have shipped), letter per coordinator, rebuild split out/<ver>, git add -f out/<ver>, DEPLOY msg to coordinator.
+
+## Status (later)
+- Coordinator: live = v88l (supra c7cfa776, merged), my version = **v88n**. Street racers are in traffic: FRA list has 11 kinds (it must stay ODD, because DR halving drops every other car and an even count empties half the kinds); ATH adds t_su and t_su_sky via ATH_K 8,9.
+- Life 0 now keeps 70 pedestrians, spread out as in v88i.
+- REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v for 094992e6. Shot paths are listed in that message (lv/after3, lv/rv, lv/feat, lv/su).
+- After PASS: fetch origin/alex/brave-carson-rbpmlk and compare it with the live version. If live moved past v88l, merge that worker's branch. Then `tools/build.sh v88n`, `git add -f out/v88n`, push, and send the coordinator "DEPLOY alex/od-lively <commit> out/v88n <msg>".
