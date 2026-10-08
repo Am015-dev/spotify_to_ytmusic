@@ -753,6 +753,7 @@ const TUNE={life:1,lvPed:1,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v88o',date:'8 Oct 2026',items:[{t:'NEW',s:'The test checklist stays on screen while you play: answer each item with ✅ / ❌, ‹ › to move, tap the counter to fold it to a small chip.'},{t:'FIXED',s:'Garage BUILD → CLEAR now leaves one clean chassis with its wheels and a fresh grid (no leftover base, no floating grid). UNDO brings the build back.'},{t:'NEW',s:'Bigger parts palette in BUILD: 2 rows of named tiles, category chips, ★ FAVS (long-press a part) and 🕘 RECENT.'},{t:'NEW',s:'Groups in BUILD: select parts → MAKE GROUP, then 👁 hide/show, move, copy, mirror or delete the whole group. HIDE UP hides the layers above the one you build on.'}]},
  {v:'v88n',date:'8 Oct 2026',items:[{t:'NEW',s:'The cities feel alive: more people on the pavements near you (they wave as you pass), and traffic now drives where you can see it, including the new orange and pink street racers.'},{t:'NEW',s:'Pigeons that scatter when you drive up, gulls circling overhead, flags flapping on the rooftops, a LEGO blimp over each city and boats sailing on the Main.'},{t:'CHANGED',s:'Bolder LEGO colours on the buildings: Frankfurt districts are bright brick colours instead of pale pastels; the Athens old town is warmer.'},{t:'NEW',s:'⚙ TUNE → Life: a "World life" slider (0 = the old quiet city) plus one knob per part.'}]},
   {v:'v88l',date:'8 Oct 2026',items:[{t:'NEW',s:'BUILD GUIDE: tap ▶ GUIDE on any ride in RIDES (or ⋯ MORE → BUILD GUIDE in BUILD) to watch it being built step by step, 1–4 parts per step, with a parts box and a 12/48 counter.'},{t:'NEW',s:'Guide controls: ◀ ▶ step, PLAY/PAUSE, ×1/×2 speed, a step slider and EXIT. Drag to turn the car.'},{t:'NEW',s:'BUILD IT: build it yourself. The next parts glow green as a ghost, tap near them to snap them in (💡 PLACE IT helps). Leaving early keeps your ride as it was.'}]},
   {v:'v88k',date:'8 Oct 2026',items:[{t:'NEW',s:'Orange Street Racer in RIDES: a LEGO street tuner built from the real set\'s parts (open targa top, blue seats, lime side graphics, big grey wing).'},{t:'NEW',s:'Three variations of it: Midnight Street Racer (black and purple), Orange Street GT (hardtop, no wing) and Widebody Track Racer.'},{t:'NEW',s:'Three tuner friends in the same style: Silver Night Tuner, Pink Roadster and Black Gold V8. All 7 open in BUILD and drive like normal cars.'}]},
@@ -8738,7 +8739,7 @@ function GB_msg(t){const e=$('#gbBkN');if(!e)return;e.textContent=t;clearTimeout
 {const tabs=$('#gbx .gbTabs');for(const[t,n]of[['bricks','BRICKS'],['driver','DRIVER']]){const b=document.createElement('button');b.dataset.t=t;b.textContent=n;b.onclick=()=>{if(t==='bricks')return GB_enter();GB.tab=t;gbRender()};tabs.appendChild(b)}
  const v=$('#gbx .gbv'),T=document.createElement('div');T.id='gbBkT';T.innerHTML=`<span id="gbBkN"></span><button data-a="undo" title="Undo (Ctrl+Z)">↶</button><button data-a="rot" title="Rotate (R)">⟳</button><button data-a="mir" title="Symmetric mode (M)">⇋ MIRROR</button><button data-a="add" title="Place">✚</button><button data-a="paint" title="Recolour one part">🖌</button><button data-a="pbody" title="Paint the whole body">🎨 BODY</button><button data-a="del" title="Delete (right-click)">🗑</button><button data-a="bp" title="Blank baseplate or jet chassis">⬛ BASE</button><button data-a="clr">CLEAR</button><div id="gbBkS">${GB_PRE.map((p,i)=>`<button data-a="pre${i}">${p[0]}</button>`).join('')}</div><div id="crSt" hidden></div><button data-a="done" class="gbDone">✔ DONE</button>`;
  const P=document.createElement('div');P.id='gbBkP';P.innerHTML=`<div class="gbBkR" id="gbBkCt">${CR_CATS.map(c=>`<button class="gbCt" data-ct="${c}">${c}</button>`).join('')}</div><div class="gbBkR" id="gbBkPc">${Object.entries(GB_PC).filter(e=>!e[1].hide).map(([k,p])=>`<button class="gbPc" data-p="${k}" data-ct="${p.cat||'Deco'}"><i>${p.ic}</i>${p.n}</button>`).join('')}</div><div class="gbBkR" id="gbBkCl">${GB_BC.map((c,i)=>`<button class="gbCl" data-c="${i}" style="--c:${c}" title="colour ${i+1}"></button>`).join('')}</div>`;v.appendChild(T);v.appendChild(P);P.addEventListener('click',e=>{const b=e.target.closest('.gbCt');if(b)CR_cat(b.dataset.ct)});CR_cat(GB_.ct||'Bricks');
- T.onclick=e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;AU.sfx('pick');if(a==='undo')GB_undo();else if(a==='rot'){GB_.rot=(GB_.rot+1)%4;GB_hover()}else if(a==='mir')GB_.mir=GB_.mir?0:1;else if(a==='add'||a==='paint'||a==='del')GB_.tool=a;else if(a.startsWith('pre'))GB_preset(+a[3]);else if(a==='clr'){GB_snap();GB.d.bricks=[];GB_refresh()}else if(a==='bp'){GB_snap();GB.d.bricks=[];GB.d.bp=GB.d.bp?0:1;GB_scanBase();GB_gridMesh();GB_refresh()}else if(a==='pbody')CR_paintBody();else if(a==='done')GB_exit();GB_ui()};
+ T.onclick=e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;AU.sfx('pick');if(a==='undo')GB_undo();else if(a==='rot'){GB_.rot=(GB_.rot+1)%4;GB_hover()}else if(a==='mir')GB_.mir=GB_.mir?0:1;else if(a==='add'||a==='paint'||a==='del')GB_.tool=a;else if(a.startsWith('pre'))GB_preset(+a[3]);else if(a==='clr'){GB_clear()}else if(a==='bp'){GB_snap();GB.d.bricks=[];GB.d.bp=GB.d.bp?0:1;GB_scanBase();GB_gridMesh();GB_refresh()}else if(a==='pbody')CR_paintBody();else if(a==='done')GB_exit();GB_ui()};
  P.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.p){GB_.pc=b.dataset.p;GB_.tool='add'}else if(b.dataset.c!=null){GB_.col=+b.dataset.c;if(GB_.tool==='del')GB_.tool='paint'}AU.sfx('pick');GB_ui();GB_hover()};
  // pointer: tap = act, drag = orbit, two fingers = orbit + pinch zoom, wheel = zoom, right click = delete
  const cvs=$('#gbC'),pt=e=>({x:e.clientX,y:e.clientY});
@@ -8751,7 +8752,7 @@ function GB_msg(t){const e=$('#gbBkN');if(!e)return;e.textContent=t;clearTimeout
  const up=e=>{if(!GB_.bk)return;const q=GB_.ptr.get(e.pointerId);if(!q)return;e.stopPropagation();GB_.ptr.delete(e.pointerId);if(e.type==='pointerup'&&!GB_.multi&&!GB_.drag&&performance.now()-q.t<(e.pointerType==='mouse'?900:1500))GB_act(q.x0,q.y0,q.b===2);if(!GB_.ptr.size)GB_.multi=0};
  v.addEventListener('pointerup',up,true);v.addEventListener('pointercancel',up,true);v.addEventListener('wheel',e=>{if(!GB_.bk)return;e.preventDefault();GB_.dist=clamp(GB_.dist*(1+e.deltaY*.001),7,26)},{passive:false});
  v.addEventListener('contextmenu',e=>{if(GB_.bk)e.preventDefault()});
- addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden)return;const k=e.code;if(k==='Escape'){e.preventDefault();e.stopImmediatePropagation();GB_exit();return}
+ addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||(e.target&&e.target.tagName==='INPUT'))return;const k=e.code;if(k==='Escape'){e.preventDefault();e.stopImmediatePropagation();GB_exit();return}
   if(k==='KeyZ'&&(e.ctrlKey||e.metaKey))GB_undo();else if(k==='KeyR'){GB_.rot=(GB_.rot+1)%4;GB_hover()}else if(k==='KeyM')GB_.mir=GB_.mir?0:1;else if(k==='Delete'||k==='Backspace')GB_.tool=GB_.tool==='del'?'add':'del';else return;e.preventDefault();GB_ui()},true)}
 function GB_hover(){if(!GB_.bk||!GB_.mx||GB_.tool!=='add')return GB_ghostSet(null);const b=GB_cand(GB_pick(GB_.mx.x,GB_.mx.y));const o=GB_.hov;if(o&&b&&GB_same(o,b)&&o.r===b.r&&o.c===b.c)return;GB_ghostSet(b)}
 function GB_ui(){if(!GB.d)return;const L=GB_list(),md=GB_mods(L),fx=md?Object.entries(md).filter(([k,v])=>Math.abs(v-1)>.004).map(([k,v])=>`${{top:'top',acc:'acc',han:'grip',hull:'hull'}[k]} ${v>1?'+':''}${Math.round((v-1)*100)}%`).join(' · '):'';
@@ -10028,7 +10029,7 @@ GS_place=(f=>function(){const b=GS.held;if(!b||b.bad||b.y===G8_top(b))return f()
 GB_snap=(f=>function(){f.apply(this,arguments);G8.redo.length=0;G8_ui()})(GB_snap);
 GB_undo=function(){if(!GB_.undo.length)return 0;if(GS.held)GS_drop();G8.redo.push(JSON.stringify(GB_list()));GB.d.bricks=JSON.parse(GB_.undo.pop());GB_refresh();try{AU.sfx('pick')}catch(e){}G8_ui();return 1};
 function GB_redo(){if(!G8.redo.length)return 0;if(GS.held)GS_drop();GB_.undo.push(JSON.stringify(GB_list()));GB.d.bricks=JSON.parse(G8.redo.pop());GB_refresh();try{AU.sfx('pick')}catch(e){}G8_ui();return 1}
-addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||!(e.ctrlKey||e.metaKey))return;if(e.code==='KeyY'||(e.code==='KeyZ'&&e.shiftKey)){e.preventDefault();e.stopImmediatePropagation();GB_redo();GB_ui()}},true);
+addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||(e.target&&e.target.tagName==='INPUT')||!(e.ctrlKey||e.metaKey))return;if(e.code==='KeyY'||(e.code==='KeyZ'&&e.shiftKey)){e.preventDefault();e.stopImmediatePropagation();GB_redo();GB_ui()}},true);
 // ---------- UI: REDO button right after UNDO; STEP ▲ / STEP ▼ in the held-part bar
 function G8_ui(){const T=$('#gbBkT');if(T){let r=T.querySelector('[data-a="redo"]');const u=T.querySelector('[data-a="undo"]');
   if(!r&&u){r=document.createElement('button');r.dataset.a='redo';r.title='Redo (Ctrl+Y)';r.textContent='↷';r.addEventListener('click',()=>GB_redo());u.after(r)}
@@ -10132,7 +10133,7 @@ function SL_ui(){const T=$('#gbBkT');if(T&&!T.querySelector('[data-a="sel"]')){c
 GS_ui=(f=>function(){const r=f.apply(this,arguments);SL_ui();return r})(GS_ui);
 GB_ui=(f=>function(){const r=f.apply(this,arguments);SL_ui();return r})(GB_ui);
 GB_enter=(f=>function(){SL.sel=[];SL.carry=null;const r=f.apply(this,arguments);SL_ui();return r})(GB_enter);
-addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKey||e.altKey)return;if(e.code==='KeyS'){GB_.tool='sel';GB_ui();e.preventDefault()}},true);
+addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||(e.target&&e.target.tagName==='INPUT')||e.ctrlKey||e.metaKey||e.altKey)return;if(e.code==='KeyS'){GB_.tool='sel';GB_ui();e.preventDefault()}},true);
 {const st=document.createElement('style');st.textContent=`#slBar{position:absolute;left:8px;top:calc(56px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:repeat(2,auto);gap:5px;z-index:4}#slBar[hidden]{display:none}
 #slBar button{width:112px;height:42px;border-radius:12px;border:2px solid rgba(255,255,255,.75);background:#1b2433;color:#fff;font:900 12px system-ui;letter-spacing:.02em;display:flex;align-items:center;gap:6px;padding:0 8px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.35);white-space:nowrap}
 #slBar button i{font-style:normal;font-size:16px;width:18px;text-align:center}#slBar [data-s="move"]{background:linear-gradient(#22c5e4,#1585b8)}#slBar [data-s="del"]{background:#6b1d24}
@@ -11771,11 +11772,198 @@ window.__lv={LV,n:()=>({peds:HUB.peds?LV_pn(HUB.peds.length):0,flags:LV.flags?LV
     const fr=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse)),v=new THREE.Vector3(),c={peds:0,cars:0,birds:0,boats:0},inV=(x,y,z)=>fr.containsPoint(v.set(x,y+1,z))&&v.distanceTo(camera.position)<120;
     for(const p of HUB.peds||[])if(p._x!=null&&inV(p._x,p.y,p._z))c.peds++;for(const k of HUB.cars||[])if(k.dead<=0&&inV(k.x,k.y||0,k.z))c.cars++;
     if(LV.birds)for(const F of LV.birds.fl)if(F.on)for(const b of F.b)if(inV(b.x,b.y,b.z))c.birds++;if(LV.boats)for(const b of LV.boats.bt)if(inV(b.x,0,b.z))c.boats++;return c}};
+// ---- GX (garage UX). Alex: "the garage is quite unusable although it's in the correct direction; maybe more tiles; allow to group items to show and not show".
+// Research: docs/research/BUILDER_2K_UX.md (2K Brick Drawer categories + favourite tabs, Group tool, Select up, mirror; eye/hide from Studio + Mecabricks).
+// 1) PARTS palette: 2 rows of bigger tiles with names (scroll sideways), category chips plus ★ FAVS and 🕘 RECENT.
+//    Long-press a tile (or right-click) to star it; the last 16 parts you picked are in RECENT. ▾ folds the palette back to one row.
+// 2) GROUPS: select parts (SELECT, tap more parts) → MAKE GROUP gives a named group (Group 1, 2…; ✎ renames it). The ⛓ GROUPS list has an 👁 eye
+//    per group (hide / show) plus SELECT, MOVE, COPY, MIRROR and DELETE for the whole group. Hidden parts can't be picked or edited, but they stay in the build and save.
+// 3) HIDE ABOVE (layer column): the parts above the active layer disappear instead of showing as ghosts, so inner parts can be reached.
+// Names live in localStorage mho_gxn per vehicle; palette favourites / recent / fold state in mho_gx. Only the builder view is affected: the car you drive is whole.
+const GX={K:'mho_gx',KN:'mho_gxn',fav:[],rec:[],big:1,ha:0,cat:null,open:0,act:0,ren:0,hid:new Set(),hs:null,inR:0,lp:null,lpT:0};
+try{const s=JSON.parse(localStorage.getItem(GX.K)||'{}');if(Array.isArray(s.fav))GX.fav=s.fav;if(Array.isArray(s.rec))GX.rec=s.rec;if(s.big===0)GX.big=0;if(s.ha)GX.ha=1}catch(e){}
+const GX_save=()=>{try{localStorage.setItem(GX.K,JSON.stringify({fav:GX.fav,rec:GX.rec,big:GX.big,ha:GX.ha}))}catch(e){}};
+const GX_phone=()=>innerWidth<=760||innerHeight<=500;
+const GX_sid=()=>{try{return GAR_get().sel||'x'}catch(e){return'x'}};
+function GX_names(){try{const a=JSON.parse(localStorage.getItem(GX.KN)||'{}');return a[GX_sid()]||{}}catch(e){return{}}}
+function GX_setName(g,n){try{const a=JSON.parse(localStorage.getItem(GX.KN)||'{}'),k=GX_sid();a[k]=a[k]||{};if(n==null)delete a[k][g];else a[k][g]=String(n).slice(0,24);localStorage.setItem(GX.KN,JSON.stringify(a))}catch(e){}}
+const GX_name=g=>GX_names()[g]||'Group '+g;
+const GX_hidB=b=>!!(b&&b.g&&GX.hid.has(b.g));
+// groups in the build: [{g,n,name}] in id order
+function GX_groups(){const C=new Map();for(const b of GB_list())if(b.g)C.set(b.g,(C.get(b.g)||0)+1);return[...C.keys()].sort((a,b)=>a-b).map(g=>({g,n:C.get(g),name:GX_name(g)}))}
+const GX_of=g=>GB_list().filter(b=>b.g===g);
+const GX_newG=()=>1+Math.max(0,...GB_list().map(o=>o.g||0));
+const GX_sfx=k=>{try{AU.sfx(k)}catch(e){}};
+// ---------- hidden parts: the builder mesh skips them (while the builder rebuilds its own car only), so they can't be seen or picked
+GB_brickGeo=(f=>function(b){if(GX.inR&&GB_.bk&&GX_hidB(b))return;return f.apply(this,arguments)})(GB_brickGeo);
+GB_refresh=(f=>function(){GX.inR=1;let r;try{r=f.apply(this,arguments)}finally{GX.inR=0}GX_ui();return r})(GB_refresh);
+// a selection never holds hidden parts
+SL_set=(f=>function(list){return f.call(this,(list||[]).filter(b=>!GX_hidB(b)))})(SL_set);
+// HIDE ABOVE: drop the see-through ghost of the layers above the active one
+B25_look=(f=>function(){const r=f.apply(this,arguments);if(GX.ha&&B25.gh&&GB.mesh){const U=GB.mesh.userData;(U.carG||U.m).remove(B25.gh);B25.gh.geometry.dispose();B25.gh.material.dispose();B25.gh=null}return r})(B25_look);
+B25_ui=(f=>function(){const r=f.apply(this,arguments);const E=$('#b25');if(E&&!E.hidden&&!E.querySelector('.gxHa')){const b=document.createElement('button');b.className='gxHa';
+  b.addEventListener('click',e=>{e.stopPropagation();if(!B25.on)return;GX.ha=GX.ha?0:1;GX_save();B25_look();GX_sfx('pick');GS_tip(GX.ha?'Layers above hidden':'Layers above shown');B25_ui()});
+  const dn=E.querySelector('[data-b25="dn"]');if(dn)dn.after(b);else E.appendChild(b)}
+ const b=E&&E.querySelector('.gxHa');if(b){b.disabled=!B25.on;b.classList.toggle('on',!!GX.ha&&!!B25.on);b.innerHTML=GX.ha?'<i>◧</i>SHOW UP':'<i>◨</i>HIDE UP';b.title=GX.ha?'Show the layers above':'Hide the layers above the active layer'}return r})(B25_ui);
+// ---------- palette: chips (★ FAVS, 🕘 RECENT, categories), 2 rows of named tiles, long-press = favourite
+function GX_tiles(){return[...document.querySelectorAll('#gbBkPc .gbPc')]}
+function GX_cat(c){const S=$('#gbBkPc');if(!S)return;if(c==='fav'||c==='rec'){GX.cat=c;const L=c==='fav'?GX.fav:GX.rec;for(const b of GX_tiles()){const i=L.indexOf(b.dataset.p);b.style.display=i<0?'none':'';b.style.order=i<0?'':i}
+  try{GS_thumbs()}catch(e){}}else{GX.cat=null;for(const b of GX_tiles())b.style.order='';CR_cat(c)}S.scrollLeft=0;GX_pal()}
+CR_cat=(f=>function(ct){GX.cat=null;for(const b of GX_tiles())b.style.order='';const r=f.apply(this,arguments);GX_pal();return r})(CR_cat);
+function GX_star(p){const i=GX.fav.indexOf(p);if(i<0)GX.fav.unshift(p);else GX.fav.splice(i,1);GX_save();GX_sfx(i<0?'brick':'pick');
+ const P=GB_PC[p];GS_tip(i<0?'★ '+(P?P.n:p)+' added to FAVS':'Removed from FAVS');if(GX.cat==='fav')GX_cat('fav');else GX_pal()}
+function GX_recent(p){if(!GB_PC[p])return;const i=GX.rec.indexOf(p);if(i===0)return;if(i>0)GX.rec.splice(i,1);GX.rec.unshift(p);GX.rec.length=Math.min(GX.rec.length,16);GX_save()}
+function GX_pal(){const P=$('#gbBkP'),S=$('#gbBkPc');if(!P||!S)return;let C=$('#gxCh');
+ if(!C){C=document.createElement('div');C.id='gxCh';C.className='gbBkR';P.insertBefore(C,S);
+  C.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();GX_sfx('pick');const k=b.dataset.gxc;
+   if(k==='fold'){GX.big=GX.big?0:1;GX_save();GX_lay();return}GX_cat(k)});
+  // long-press a tile = ★ favourite (touch and mouse); right-click too. The click after a long-press does not pick the part.
+  const clr=()=>{clearTimeout(GX.lp);GX.lp=null};
+  S.addEventListener('pointerdown',e=>{const b=e.target.closest('.gbPc');if(!b)return;clr();const x=e.clientX,y=e.clientY;GX.lpXY=[x,y];GX.lp=setTimeout(()=>{GX.lp=null;GX.lpT=performance.now();GX.lpP=b.dataset.p;GX_star(b.dataset.p)},550)});
+  S.addEventListener('pointermove',e=>{if(GX.lp&&GX.lpXY&&Math.hypot(e.clientX-GX.lpXY[0],e.clientY-GX.lpXY[1])>10)clr()});
+  for(const k of['pointerup','pointercancel','pointerleave'])S.addEventListener(k,clr);S.addEventListener('scroll',clr,{passive:true});
+  S.addEventListener('contextmenu',e=>{const b=e.target.closest('.gbPc');if(!b||!GB_.bk)return;e.preventDefault();GX_star(b.dataset.p)});
+  S.addEventListener('click',e=>{const b=e.target.closest('.gbPc');if(!b)return;const lp=GX.lpP===b.dataset.p&&performance.now()-GX.lpT<900;GX.lpP=null;if(lp){e.stopPropagation();e.preventDefault();return}GX_recent(b.dataset.p);setTimeout(GX_pal,0)},true);
+  for(const b of GX_tiles())b.dataset.n=(GB_PC[b.dataset.p]||{}).n||b.dataset.p}
+ const cur=GX.cat||GB_.ct||'Bricks',chip=(k,t)=>`<button class="gxC ${cur===k?'on':''}" data-gxc="${k}">${t}</button>`;
+ const h=`<button class="gxC gxF" data-gxc="fold" title="${GX.big?'Smaller palette':'Bigger palette'}">${GX.big?'▾':'▴'}</button>`+chip('fav','★ FAVS')+chip('rec','🕘 RECENT')+CR_CATS.map(c=>chip(c,c.toUpperCase())).join('');
+ if(C._h!==h){C._h=h;C.innerHTML=h}
+ for(const b of GX_tiles()){const f=GX.fav.includes(b.dataset.p);b.classList.toggle('gxSt',f)}
+ let em=S.querySelector('.gxEm');const empty=(GX.cat==='fav'&&!GX.fav.length)||(GX.cat==='rec'&&!GX.rec.length);
+ if(empty&&!em){em=document.createElement('div');em.className='gxEm';S.appendChild(em)}if(em){em.hidden=!empty;em.textContent=GX.cat==='fav'?'Long-press a part to ★ it':'Parts you pick show up here'}}
+// ---------- groups panel
+function GX_grpBtn(){const z=$('#gbBkP .r2BkT');if(z&&!z.querySelector('[data-gx="grp"]')){const b=document.createElement('button');b.className='r2T';b.dataset.gx='grp';b.innerHTML='<i>⛓</i>GROUPS';
+  b.addEventListener('click',e=>{e.stopPropagation();GX_sfx('pick');GX.open=GX.open?0:1;GX.ren=0;if(GX.open){try{R2_pop(null)}catch(_){}if(GS.held)GS_drop()}else GX.act=0;GX_ui()});
+  const m=z.querySelector('[data-r2b="more"]');z.insertBefore(b,m||null)}}
+function GX_panel(){let E=$('#gxG');if(E)return E;E=document.createElement('div');E.id='gxG';$('#gbx').appendChild(E);E.addEventListener('pointerdown',e=>e.stopPropagation());
+ E.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();const a=b.dataset.ga,g=+(b.closest('[data-g]')||{dataset:{}}).dataset.g||0;GX_do(a,g,b)});
+ E.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();GX_do('ok',GX.ren)}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();GX.ren=0;GX_ui()}e.stopPropagation()});return E}
+function GX_selG(g){GB_.tool='sel';SL_set(GX_of(g));GX.act=g;try{R2_bkSync()}catch(e){}}
+function GX_do(a,g,btn){GX_sfx('pick');
+ if(a==='close'){GX.open=0;GX.act=0;GX.ren=0;GX_ui();return}
+ if(a==='all'){GX.hid.clear();GB_refresh();GS_tip('All parts shown');return}
+ if(a==='mk'){if(SL.sel.length<1){GS_tip('SELECT parts first, then MAKE GROUP');return}GX_make();return}
+ if(a==='eye'){if(GX.hid.has(g)){GX.hid.delete(g);GS_tip(GX_name(g)+' shown')}else{GX.hid.add(g);if(GX.act===g)GX.act=0;SL_set(SL.sel);GS_tip(GX_name(g)+' hidden · it still saves')}GB_refresh();return}
+ if(!g)return;
+ if(GX.hid.has(g)&&a!=='ok'&&a!=='ren'){GS_tip('Hidden · tap 👁 to show it first');GX_sfx('bump');return}
+ if(a==='pick'){if(GX.act===g){GX.act=0;SL_set([])}else GX_selG(g);GX_ui();return}
+ if(a==='ren'){GX.ren=g;GX_ui();const i=$('#gxG input');if(i){i.focus();i.select()}return}
+ if(a==='ok'){const i=$('#gxG input');const v=i&&i.value.trim();if(v)GX_setName(g,v);GX.ren=0;GX_ui();return}
+ if(a==='mv'||a==='dup'){GX_selG(g);GX.open=1;const nm=GX_name(g);SL_lift(a==='dup'?1:0);if(a==='dup'&&SL.carry)SL.carry.gxN=nm+' copy';GX_ui();return}
+ if(a==='mir'){GX_mirror(g);return}
+ if(a==='del'){const nm=GX_name(g);GX_selG(g);SL_delete();GX_setName(g,null);GX.act=0;GS_tip(nm+' deleted · UNDO brings it back');GX_ui();return}}
+// MAKE GROUP from the selection (the existing GROUP tool, with a name and the list)
+function GX_make(){const S=SL.sel.slice();if(!S.length)return 0;const g0=S[0].g;if(g0&&S.every(o=>o.g===g0)){GX.open=1;GX.act=g0;GX_ui();return g0}
+ GB_snap();const g=GX_newG();for(const o of S)o.g=g;const n=GX_groups().length;GX_setName(g,'Group '+n);GX.open=1;GX.act=g;SL_set(S);GX_sfx('brick');GS_tip('Group '+n+' made · '+S.length+' parts');GX_ui();return g}
+// MIRROR a group: a mirrored copy on the other side; a group across the middle is flipped in place
+function GX_mirror(g){const L=GB_list(),G=GX_of(g),T=G.map(b=>({...GB_twin(b),g}));if(!G.length)return 0;
+ const ovl=(a,b)=>SL_ov(a,b)&&a.y<b.y+SL_h(b)&&a.y+SL_h(a)>b.y;const self=T.some(w=>G.some(o=>ovl(w,o)));
+ const rest=L.filter(b=>b.g!==g),clash=T.some(w=>SL_clash(w,self?rest:L));
+ if(clash){GX_sfx('bump');GS_tip('No room on the other side');return 0}
+ if(!self&&L.length+T.length>GB_MAX){GB_msg('Brick budget full · '+GB_MAX);GX_sfx('bump');return 0}
+ GB_snap();if(self){G.forEach((b,i)=>{b.x=T[i].x;b.r=T[i].r;b.m=T[i].m});GB_refresh();GX_selG(g);GS_tip(GX_name(g)+' flipped')}
+ else{const ng=GX_newG();for(const w of T){w.g=ng;L.push(w)}GX_setName(ng,GX_name(g)+' ⇋');GB_refresh();GX_selG(ng);GS_tip('Mirrored copy · '+GX_name(ng))}
+ GX_sfx('brick');GX_ui();return 1}
+// a COPY placed from the groups list becomes its own named group
+SL_place=(f=>function(){const C=SL.carry,r=f.apply(this,arguments);if(r&&C&&C.gxN){const g=GX_newG();for(const b of SL.sel)b.g=g;GX_setName(g,C.gxN);GX.act=g;GS_tip(C.gxN+' placed')}GX_ui();return r})(SL_place);
+SL_cancel=(f=>function(){const r=f.apply(this,arguments);GX_ui();return r})(SL_cancel);
+// the GROUP button of the selection bar is MAKE GROUP (UNGROUP when the selection is one group)
+SL_group=(f=>function(){const S=SL.sel,g0=S.length&&S[0].g;if(S.length&&!(g0&&S.every(o=>o.g===g0)))return GX_make();const r=f.apply(this,arguments);if(g0)GX_setName(g0,null);GX.act=0;GX_ui();return r})(SL_group);
+const GX_esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function GX_ui(){const X=$('#gbx');if(!X||!GB_.bk||X.hidden){const E=$('#gxG');if(E)E.hidden=true;if(X)X.classList.remove('gxGO','gxBig');return}
+ GX_pal();GX_grpBtn();GX_lay();const E=GX_panel(),gb=$('#gbBkP [data-gx="grp"]');if(gb)gb.classList.toggle('on',!!GX.open);
+ const carry=typeof SL!=='undefined'&&SL.carry,show=GX.open&&!carry&&!GS.held;E.hidden=!show;X.classList.toggle('gxGO',!!show);if(!show)return;
+ const G=GX_groups();if(GX.act&&!G.some(o=>o.g===GX.act))GX.act=0;if(GX.ren&&!G.some(o=>o.g===GX.ren))GX.ren=0;
+ const hidN=G.filter(o=>GX.hid.has(o.g)).length,g0=SL.sel.length&&SL.sel[0].g,one=g0&&SL.sel.every(o=>o.g===g0),ns=one?0:SL.sel.length;
+ let h=`<div class="gxH"><b>⛓ GROUPS · ${G.length}</b><button data-ga="close" title="Close">✕</button></div>`+
+  `<div class="gxTop"><button data-ga="mk" class="${ns?'go':''}">＋ MAKE GROUP${ns?' ('+ns+')':''}</button>${hidN?`<button data-ga="all">👁 SHOW ALL</button>`:''}</div>`;
+ if(!G.length)h+=`<p class="gxNo">No groups yet. Tap ☝ SELECT, tap the parts you want, then ＋ MAKE GROUP.</p>`;
+ h+='<div class="gxL">'+G.map(o=>{const hd=GX.hid.has(o.g),on=GX.act===o.g;
+  const nm=GX.ren===o.g?`<input maxlength="24" value="${GX_esc(o.name)}" aria-label="Group name"><button data-ga="ok" class="gxOk">✔</button>`:
+   `<button data-ga="pick" class="gxN">${GX_esc(o.name)}<small>${o.n} parts${hd?' · hidden':''}</small></button><button data-ga="ren" title="Rename">✎</button>`;
+  return`<div class="gxR ${hd?'hd':''} ${on?'on':''}" data-g="${o.g}"><button data-ga="eye" class="gxE" title="${hd?'Show':'Hide'}">${hd?'🚫':'👁'}</button>${nm}</div>`+
+   (on&&!hd?`<div class="gxA" data-g="${o.g}"><button data-ga="mv"><i>✥</i>MOVE</button><button data-ga="dup"><i>⧉</i>COPY</button><button data-ga="mir"><i>⇋</i>MIRROR</button><button data-ga="del" class="gxD"><i>🗑</i>DELETE</button></div>`:'')}).join('')+'</div>';
+ if(E._h!==h){const ae=document.activeElement,keep=ae&&ae.tagName==='INPUT'&&E.contains(ae)?ae.value:null;E._h=h;E.innerHTML=h;if(keep!=null){const i=E.querySelector('input');if(i){i.value=keep;i.focus()}}const A=E.querySelector('.gxA')||E.querySelector('.gxR.on');if(A&&A.scrollIntoView)try{A.scrollIntoView({block:'nearest'})}catch(_){}}}
+// fold / unfold the big palette (the groups list folds it: less on screen)
+function GX_lay(){const X=$('#gbx');if(!X)return;const big=!!GX.big&&GB_.bk&&!GX.open;if(X.classList.contains('gxBig')!==big){X.classList.toggle('gxBig',big);try{R2.area=null}catch(e){}}}
+R2_calc=(f=>function(){const A=f.apply(this,arguments),c=$('#gbC'),C=$('#gxCh'),E=$('#gxG');if(!A||!c||!GB_.bk)return A;const r=c.getBoundingClientRect();
+ if(C&&C.offsetParent&&$('#gbx').classList.contains('gxBig')){const y=C.getBoundingClientRect().top-r.top-4;if(y>A.t+60)A.b=Math.min(A.b,y)}
+ if(E&&!E.hidden&&E.offsetParent){const x=E.getBoundingClientRect().right-r.left+6;if(A.r-x>160)A.l=Math.max(A.l,x)}return A})(R2_calc);
+GB_ui=(f=>function(){const r=f.apply(this,arguments);GX_ui();return r})(GB_ui);
+GS_ui=(f=>function(){const r=f.apply(this,arguments);GX_ui();return r})(GS_ui);
+GB_enter=(f=>function(){const was=GB_.bk;if(!was&&GX.hs!==GX_sid()){GX.hid.clear();GX.hs=GX_sid()}GX.act=0;GX.ren=0;const r=f.apply(this,arguments);GX_ui();return r})(GB_enter);
+// leaving the builder: the car is whole again (hidden groups only hide in the builder)
+GB_exit=(f=>function(){const was=GB_.bk,r=f.apply(this,arguments);if(was){GX.open=0;GX.act=0;GX_ui();if(GX.hid.size&&GB.mesh&&GB.d)try{GB_refresh()}catch(e){}}return r})(GB_exit);
+addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKey||e.altKey||(e.target&&e.target.tagName==='INPUT'))return;if(e.code==='KeyG'){GX.open=GX.open?0:1;GX_ui();e.preventDefault()}},true);
+{const st=document.createElement('style');st.textContent=`
+#gxCh{display:none}#gbx.r2.gbBk.gxBig #gxCh,#gbx.r2.gbBk #gxCh{display:flex;align-items:center}
+#gxCh .gxC{flex:none;height:44px;padding:0 12px;border-radius:12px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 12px system-ui;white-space:nowrap;box-shadow:0 2px 0 #141413;cursor:pointer}
+#gxCh .gxC.on{background:#ffd400}#gxCh .gxF{width:44px;padding:0;font-size:16px;font-style:normal}
+#gbx.r2.gbBk.gxBig #gbBkP .r2Cat{display:none}
+#gbx.r2.gbBk:not(.gxBig) #gxCh{flex:none;height:100%;overflow:visible}#gbx.r2.gbBk:not(.gxBig) #gxCh .gxC:not(.gxF){display:none}#gbx.r2.gbBk.gxGO #gxCh{display:none!important}
+#gbx.r2.gbBk.gxBig #gbBkP{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:44px auto;row-gap:5px;height:auto;right:68px;align-items:center}
+#gbx.r2.gbBk.gxBig #gxCh{grid-row:1;grid-column:1;min-width:0;height:48px}#gbx.r2.gbBk.gxBig .r2BkT{grid-row:1;grid-column:2}
+#gbx.r2.gbBk.gxBig #gbBkPc{grid-row:2;grid-column:1/3;display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,58px);grid-auto-columns:72px;gap:5px;height:auto;overflow-x:auto;overflow-y:hidden;padding:2px 2px 4px;justify-content:start;align-items:stretch}
+#gbx.r2.gbBk.gxBig #gbBkPc .gbPc{width:72px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0}
+#gbx.r2.gbBk.gxBig #gbBkPc .gbPc.gsTh img{width:50px;height:36px}
+#gbx.r2.gbBk.gxBig #gbBkPc .gbPc::after{content:attr(data-n);display:block;max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 12px system-ui;line-height:14px;color:#141413}
+#gbx.r2 #gbBkPc .gbPc{position:relative;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+#gbx.r2 #gbBkPc .gbPc.gxSt::before{content:'★';position:absolute;top:1px;right:3px;font:900 13px system-ui;color:#e8a400;text-shadow:0 0 2px #fff;line-height:1}
+#gbx.r2 #gbBkPc .gxEm{grid-row:1/3;align-self:center;font:900 12px system-ui;color:#fff;background:rgba(20,20,19,.7);border-radius:10px;padding:10px 12px;white-space:nowrap}#gbx.r2 #gbBkPc .gxEm[hidden]{display:none}
+#gbx.r2.gbBk:not(.gxBig) #gbBkPc .gxEm{padding:6px 10px}
+#gbx.r2 #gbBkP [data-gx="grp"].on{background:#ffd400}
+#gbx.r2.gbBk.gxBig .r2BkT{gap:4px}#gbx.r2.gbBk.gxBig .r2BkT .r2T{flex-direction:column;justify-content:center;width:60px;height:46px;padding:0;gap:1px;font-size:12px;line-height:1}#gbx.r2.gbBk.gxBig .r2BkT .r2T i{margin:0}
+#gbx.r2 .r2BkT .r2T{white-space:nowrap}
+#gxG{position:absolute;left:calc(var(--r2rw,72px) + 6px);top:calc(var(--r2hh,52px) + 6px);bottom:calc(var(--r2ch,56px) + 14px);width:270px;z-index:5;display:flex;flex-direction:column;gap:5px;
+ background:rgba(22,38,86,.94);border:2px solid #141413;border-radius:14px;padding:6px;box-shadow:0 4px 0 rgba(0,0,0,.35);color:#fff;font:900 12px system-ui}
+#gxG[hidden]{display:none}#gxG button{min-height:44px;border-radius:10px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 12px system-ui;cursor:pointer;box-shadow:0 2px 0 #141413}
+#gxG .gxH{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-left:4px}#gxG .gxH b{font-size:13px;letter-spacing:.02em}#gxG .gxH button{width:44px}
+#gxG .gxTop{display:flex;gap:5px;flex:none}#gxG .gxTop button{flex:1;height:44px}#gxG .gxH{flex:none}#gxG .gxTop .go{background:#7dff8a}
+#gxG .gxNo{margin:2px 4px;font-weight:700;line-height:1.35;color:#dfe8ff}
+#gxG .gxL{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin}
+#gxG .gxR{display:flex;gap:5px;align-items:stretch}#gxG .gxR .gxE{width:44px;flex:none;font-size:17px;font-style:normal}#gxG .gxR [data-ga="ren"],#gxG .gxR .gxOk{width:44px;flex:none;font-size:15px;font-style:normal}
+#gxG .gxR .gxN{flex:1;min-width:0;text-align:left;padding:2px 8px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#gxG .gxR .gxN small{font:700 12px system-ui;color:#4a5468}#gxG .gxR.on .gxN{background:#ffd400}#gxG .gxR.hd .gxN{background:#c9ced8;color:#555}#gxG .gxR.hd .gxE{background:#c9ced8}
+#gxG .gxR input{flex:1;min-width:0;height:44px;border-radius:10px;border:2px solid #141413;padding:0 8px;font:900 14px system-ui;color:#141413}
+#gxG .gxA{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 0 4px}#gxG .gxA button{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:1px;font-size:12px}
+#gxG .gxA button i{font-style:normal;font-size:14px}#gxG .gxA .gxD{background:#ff8a8a}
+#gbx.r2.gxGO #slBar{display:none!important}
+#b25{pointer-events:none}#b25 button,#b25 em,#b25 .b25V{pointer-events:auto}#b25 .b25V{pointer-events:none}#b25 .b25V button{pointer-events:auto}
+#b25 .gxHa{height:44px;min-width:56px;font-size:12px}#b25 .gxHa.on{background:#ffd12c}
+@media (max-width:760px),(max-height:500px){#gbx.r2 .r2BkT{gap:4px}#gbx.r2 .r2BkT .r2T{padding:0 7px}#gxG{width:258px}}
+@media (min-height:501px) and (min-width:900px){#gbx.r2.gbBk.gxBig #gbBkPc{grid-template-rows:repeat(2,70px);grid-auto-columns:86px}#gbx.r2.gbBk.gxBig #gbBkPc .gbPc{width:86px;height:70px}#gbx.r2.gbBk.gxBig #gbBkPc .gbPc.gsTh img{width:62px;height:44px}#gxG{width:320px}}`;document.head.appendChild(st)}
+window.__gx={S:GX,groups:()=>GX_groups(),hid:()=>[...GX.hid],make:()=>GX_make(),mirror:g=>GX_mirror(g),star:p=>GX_star(p),cat:c=>GX_cat(c),
+ vis:()=>{const s=$('#gbBkPc');if(!s)return null;const r=s.getBoundingClientRect();return GX_tiles().filter(b=>{if(b.style.display==='none')return false;const q=b.getBoundingClientRect();return q.width>0&&q.left>=r.left-1&&q.right<=r.right+1&&q.bottom<=r.bottom+1}).map(b=>b.dataset.p)},
+ cat:k=>GB_PC[k]&&GB_PC[k].cat,ev:c=>__g9ev(c),
+ cand:()=>{const t0=GB_.tool;GB_.tool='sel';try{return __gx._cand()}finally{GB_.tool=t0}},
+ _cand:()=>{const L=GB_list(),out=[],C=$('#gbC').getBoundingClientRect(),H=b=>b.y+GB_PC[b.t].h;for(const b of L.slice().sort((a,c)=>H(c)-H(a))){const[w,d]=GB_dims(b),q=__b25.scr(b.x+w/2,b.z+d/2,H(b));
+  const el=document.elementFromPoint(q.x,q.y);if(!el||(el.closest&&el.closest('#gbBkP,#b25,#r2H,#r2R,#gxG,#slBar,#gsBar,#gsTip,#odPin')))continue;const i=__sl.pick(q.x,q.y);if(i>=0&&!out.some(o=>o.i===i))out.push({i,x:q.x,y:q.y,t:b.t});if(out.length>=6)break}return out},
+ tris:()=>{const U=GB.mesh&&GB.mesh.userData;let n=0;for(const o of(U&&U.gbM)||[])if(o.geometry&&o.geometry.attributes.position)n+=o.geometry.attributes.position.count/3;return n|0}};
+SL_ui=(f=>function(){const r=f.apply(this,arguments);const s=$('#slBar [data-s="grp"] span');if(s&&s.textContent==='GROUP')s.textContent='MAKE GROUP';return r})(SL_ui);
+// ---- CLEAR (Alex, v88i: "the garage clear button on build is not clearing to an empty template or the base is showing weird overlaps").
+// Root cause: CLEAR emptied the brick list but kept the old base scan (GB_.base: stud grid + layer heights of the cleared body) and the old
+// chassis mode. A brick car (templates, big templates, My Build) lost its frame and wheels, so the builder fell back to the small 8×12
+// blueprint plate under a grid that still had the cleared body's heights: dots and the layer grid floated above an empty plate.
+// Now CLEAR keeps ONE clean chassis: the frame plates, tyres, seat/driver and steering wheel of the current build (same rule as NEW BUILD),
+// at the build's own length, then rescans the base. A hull car (bricks only decorate a fixed body) clears to its bare body as before,
+// with a fresh scan. UNDO restores everything.
+function GB_clear(){if(!GB.d)return;const L=GB_list(),brick=L.some(CR_isW);GB_snap();try{if(SL.carry)SL_cancel();SL_set([])}catch(e){}if(GS.held)try{GS_drop()}catch(e){}
+ GB.d.bricks=brick?L.filter(GNB_fr).map(b=>{const o={...b};delete o.g;return o}):[];GX.hid.clear();
+ GB_scanBase();GB_gridMesh();GB_refresh();GB_ui();try{GS_tip(brick?'Cleared · chassis and wheels kept · UNDO brings it back':'Cleared · UNDO brings it back')}catch(e){}return GB.d.bricks.length}
 // ===== CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate").
 // OD_CHECKLIST = items per version; each gets ✅ PASS / ❌ FAIL + an optional note, saved in localStorage 'mho_chk'. "COPY RESULTS" copies
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88o',id:'pin-strip',text:'This checklist stays on screen while you drive, race and build: answer with ✅ / ❌, ‹ › to move, tap the counter to fold it to a chip. Steering and gas keep working while you tap it.'},
+ {ver:'v88o',id:'clear-base',text:'Garage BUILD → ⋯ MORE → CLEAR on a normal car and on the Bus: only the chassis and wheels stay, with one clean grid and nothing overlapping. UNDO brings the build back.'},
+ {ver:'v88o',id:'gx-palette',text:'Garage BUILD (phone): the parts palette shows 2 rows of bigger tiles with names; swipe it sideways to see more. ▾ makes it small again.'},
+ {ver:'v88o',id:'gx-chips',text:'Tap the category chips (BRICKS, PLATES, SLOPES…): only those parts show. Pick a few parts, then tap 🕘 RECENT: the parts you just used are first.'},
+ {ver:'v88o',id:'gx-fav',text:'Long-press a part tile (right-click on PC): it gets a ★ and shows under ★ FAVS. Long-press again removes it. It is still there after a reload.'},
+ {ver:'v88o',id:'gx-make',text:'Tap ☝ SELECT, tap 3–4 parts, then MAKE GROUP: a group "Group 1" appears in the ⛓ GROUPS list. ✎ renames it.'},
+ {ver:'v88o',id:'gx-eye',text:'In ⛓ GROUPS tap the 👁 eye: the group disappears and its parts cannot be tapped; tap again to show it. SAVE & DRIVE with it hidden: the car you drive is complete.'},
+ {ver:'v88o',id:'gx-ops',text:'Tap a group name: MOVE, COPY, MIRROR and DELETE work on the whole group (UNDO brings a deleted group back).'},
+ {ver:'v88o',id:'gx-hideup',text:'Open a big template (Bus), step the LAYER ▼ down and tap HIDE UP: everything above the layer disappears so you can build inside; SHOW UP brings it back.'},
  {ver:'v88n',id:'life-people',text:'Drive 1 minute in Frankfurt: you see people on the pavements most of the time, and some wave both arms as you pass them.'},
  {ver:'v88n',id:'life-traffic',text:'Traffic cars show up on the streets around you (not only far away), including orange and pink street racers; they still do not block the inner lane.'},
  {ver:'v88n',id:'life-pigeons',text:'Drive toward a group of grey pigeons on a pavement: they fly off before you reach them. White gulls circle high above.'},
@@ -11833,7 +12021,7 @@ const OD_CHECKLIST=[
  for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown','wheel'])ov.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  for(const ev of['keydown','keyup'])ov.addEventListener(ev,e=>{if(e.target.tagName==='INPUT')e.stopPropagation()});
  const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>{const r=s[k(it)]||{};return `${it.ver} ${it.id}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')};
- const badge=()=>{const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
+ const badge=()=>{try{pinR()}catch(e){}const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
  const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
   for(const it of OD_CHECKLIST){const r=s[k(it)]||{};h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
   ov.innerHTML=h+'</div></div>';badge()};
@@ -11848,7 +12036,52 @@ const OD_CHECKLIST=[
  // ⚙ drawer header (re-rendered on every change) and the UPDATES screen header
  if(typeof TU_render==='function'){const r0=TU_render;TU_render=function(){r0.apply(this,arguments);const th=TU.el&&TU.el.querySelector('.th');if(th&&!th.querySelector('.ckB'))th.appendChild(mk());badge()}}
  if(typeof window.odUpdOpen==='function'){const u0=window.odUpdOpen;window.odUpdOpen=function(){u0.apply(this,arguments);const u=document.querySelector('#odUpd .ub');if(u&&!u.querySelector('.ckB')){const b=mk();b.style.cssText='display:block;margin:8px 0 2px';u.insertBefore(b,u.firstChild)}badge()}}
- window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST}}
+ // ---- PIN (Alex 2026-10-08: "the checklist should be staying while i am playing the game"): a mini checklist pinned on screen in roam, races,
+ // missions and the garage. Expanded: counter (tap = fold to a chip), item text (tap = full panel with notes + COPY RESULTS), ✅ / ❌, ‹ ›.
+ // Folded: a "✓ 3/8" chip. It can only be dismissed (✕ on the chip) once every item of the version is answered. State lives in mho_chk._pin.
+ // Touches on it never reach the controls under it and it never pauses the game.
+ const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
+ let pinBkOpen=0;const pinBk=()=>{try{return !!GB_.bk}catch(e){return false}};
+ const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
+ for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
+ const pinR=()=>{const P=pst(),C=cur(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
+  const busy=!ov.hidden||!n||P.done&&ans===n||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
+  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen);
+  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
+  else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
+   `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
+   `<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
+  pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
+ // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
+ const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
+  if(!vis(X)){pin.style.left='';pin.style.width='';pin.style.transform='';
+   // roam / race / missions: below the objective line (quest tracker, objective pill) when it sits at the top centre
+   if(innerWidth>900&&innerHeight>500){const g=document.querySelector('#tuG,#tuB,[id^="tu"][id$="G"]');let t=108;if(vis(g)){const r=g.getBoundingClientRect();if(r.top<160&&r.right>innerWidth-120)t=Math.round(r.bottom)+10}
+    pin.style.transform='none';pin.style.left=Math.round(innerWidth-16-pin.offsetWidth)+'px';pin.style.top=t+'px';return}
+   const a=pin.getBoundingClientRect();let t=54;for(const e of document.querySelectorAll('#roamArrow,#qTrk,#obj,[id*="Obj"],[class*="Pill"],[class*="pill"]')){if(pin.contains(e)||!vis(e))continue;const r=e.getBoundingClientRect();
+    if(r.top<110&&r.bottom<150&&r.right>a.left&&r.left<a.right&&r.height<70)t=Math.max(t,Math.round(r.bottom)+6)}
+   pin.style.top=t===54?'':`calc(env(safe-area-inset-top,0px) + ${t}px)`;return}pin.style.top='';let L=0,R=innerWidth;
+  for(const q of['#r2R','#gxG','#slBar','#gsBar']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120)L=Math.max(L,r.right+6)}}
+  for(const q of['#b25 .b25V','#gbx .gbp']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120&&r.left>L)R=Math.min(R,r.left-6)}}
+  const w=Math.min(340,R-L),x=L+Math.max(0,(R-L-pin.offsetWidth)/2);if(w<200){pin.style.left='';pin.style.width='';pin.style.transform='';return}
+  pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
+ const P_col=()=>pin.classList.contains('col');
+ pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=cur(),n=C.length;try{AU.sfx('pick')}catch(er){}
+  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
+  else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
+   if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
+  psave(P);pinR();badge()});
+ {const st2=document.createElement('style');st2.textContent=`#odPin{position:fixed;z-index:8990;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 54px);width:min(340px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:4px;
+ background:rgba(11,22,38,.88);border:2px solid #3ddc84;border-radius:12px;color:#e8f2fa;font:600 12px system-ui;user-select:none;-webkit-user-select:none;touch-action:manipulation;box-shadow:0 2px 0 rgba(0,0,0,.35)}#odPin[hidden]{display:none}
+#odPin button{min-height:44px;border-radius:9px;border:2px solid #4ceaff;background:#12304a;color:#fff;font:900 12px system-ui;padding:0;cursor:pointer;flex:none}
+#odPin .pn{width:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-color:#3ddc84}#odPin .pn b{font-size:13px}#odPin .pn small{font-size:12px;color:#9fe8bf;font-weight:800}
+#odPin p{flex:1;min-width:0;margin:0;line-height:15px;max-height:30px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;font-size:12px}
+#odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
+#odPin .pv{display:flex;flex-direction:column;gap:2px}#odPin .pv button{width:28px;min-height:21px;height:21px;font-size:15px;line-height:1}
+#odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}
+body.ckOn #odPin{display:none}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
+ setInterval(pinR,700);pinR();
+ window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
 window.__mho={pin:()=>{const p=PIN_S.cur,N=QV.nav,t=PIN_navPt(),G=QV.g;let snap=null;if(p&&G){const i=qvNear(p.x,p.z,50);snap=i<0?null:Math.hypot(G.X[i]-p.x,G.Z[i]-p.z)}return{ready:!!(G&&G.N===HUB.nodes),on:!!p,x:p&&p.x,z:p&&p.z,d:p&&p.d,athd:CID==='ath'?ATHD:null,snap,wp:!!p&&RO.wp===p,nav:N?{n:N.P.length,tx:N.tx,tz:N.tz,rem:N.rem,rec:N.rec}:null,tgt:t&&{x:t.x,z:t.z,gate:!!t.gate,to:t.to||null},dist:p?PIN_dist():null,log:{...PIN_S.log},menu:!!PIN_S.menu,beam:!!(PIN_S.mesh&&PIN_S.mesh.visible),clr:!!document.getElementById('pinClr')&&!document.getElementById('pinClr').hidden}},pinSet:(x,z)=>PIN_set(x,z,1),pinNode:(d,near)=>{const G=QV.g;if(!G)return null;let b=null,bd=1e18;for(const i of G.list){const x=G.X[i],z=G.Z[i];if(CID==='ath'){const[e,n]=RW(x,z);if(athDistAt(e,n)!==d)continue}const dd=Math.hypot(x-near.x,z-near.z);if(dd<bd){bd=dd;b=[x,z]}}return b},pinClear:()=>PIN_clear(1),pinMapXY:(x,z,c)=>{if(c!==false){RO.mapC={x,z};drawRoamMap()}const[px,py]=RO.mapP(x,z),r=document.getElementById('roamMapC').getBoundingClientRect(),k=DPR2();return[r.left+px/k,r.top+py/k]},pinMini:()=>{const p=PIN_S.cur;if(!p||!RO.miniTo)return null;const el=document.querySelector('#roamMini canvas'),W=el.width,c=W/2,R0=c-6;let[a,b]=RO.miniTo(p.x,p.z);const d=Math.hypot(a,b),lim=R0-12;if(d>lim){a*=lim/d;b*=lim/d}return[c+a,c+b,W]},CE:{junc:()=>JUNC.map(J=>[J.x,J.z,J.r]),info:()=>HUB.CE&&{...HUB.CE},prof:()=>{const P=HUB.props.slice(0,20000),o={};for(const[k,f]of[['city',(x,z)=>cityAt(x,z)],['fill',(x,z)=>fillAt(x,z)],['ab',(x,z)=>abAt(x,z)],['trail',(x,z)=>trailDist(x,z)],['mtn',(x,z)=>mtnDist(x,z)],['lz',(x,z)=>lzRoadD(x,z)],['ard',(x,z)=>athRoadD(x,z,40)],['onRoad',(x,z)=>CE_onRoad(x,z)],['riv',(x,z)=>inRiver(x,z,-2)],['deck',(x,z)=>onAnyDeck(x,z)],['gy',(x,z)=>groundY(x,z)]]){const t=performance.now();for(const p of P)f(p.x,p.z);o[k]=Math.round(performance.now()-t)}return o}},athPts:id=>CITY_S.filter(S=>S.r.id===id).flatMap(S=>S.pts.map(p=>[p.x,p.z,S.r.w])),shd:(x,z)=>{const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32))||[];const o={};for(let j=0;j<L.length;j+=2){const S=L[j];o[CITY_S.indexOf(S)]=(o[CITY_S.indexOf(S)]||0)+1}return [Math.floor(x/32),Math.floor(z/32),o]},ahh:(x,z)=>[athHillH(x,z),athShelfY(x,z,athHillH(x,z)),HILLS.map(h=>h.id+'='+athHill1(h,x,z).toFixed(1)).join(' ')],athPiece:(si,a,b)=>CITY_S[si].pts.slice(a,b).map((p,k)=>[a+k,+(p.y??0).toFixed(2),p.j?1:0,+p.s.toFixed(1),+athHillH(p.x,p.z).toFixed(1)]),athNear:(x,z,R=40)=>{const out=[];CITY_S.forEach((S,si)=>{let b=1e9,bi=-1;S.pts.forEach((p,i)=>{const d=Math.hypot(p.x-x,p.z-z);if(d<b){b=d;bi=i}});if(b<R){const p=S.pts[bi];out.push({si,name:S.r.name,cls:S.r.cls,w:S.r.w,d:+b.toFixed(1),y:+(p.y??0).toFixed(2),hs:!!S.hs,j:!!p.j,i:bi,n:S.pts.length})}});return out},hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120&&S.r.cls!=='ped'&&S.pts.every(p=>p.x>WX0+80&&p.x<WX1-80&&p.z>WZS+80&&p.z<WZN-80&&!(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<90))).sort((a,b)=>Math.max(...b.pts.map(p=>p.y||0))-Math.max(...a.pts.map(p=>p.y||0))).slice(0,4);return L.map(S=>{const a=S.pts.map(p=>[p.x,p.z]);a.name=(S.r.name||S.r.id)+' ('+Math.round(Math.max(...S.pts.map(p=>p.y||0)))+' m)';return a})},roadProf:()=>{let mg=0,mc=0,n=0;for(const S of CITY_S){if(!S.prof)continue;n++;const P=S.pts;for(let i=1;i<P.length-1;i++){const g=Math.abs(P[i].dy||0);mg=Math.max(mg,g);const a=P[i-1],b=P[i+1],d1=(P[i].y-a.y)/Math.max(.5,P[i].s-a.s),d2=(b.y-P[i].y)/Math.max(.5,b.s-P[i].s);mc=Math.max(mc,Math.abs(d2-d1)/Math.max(1,(b.s-a.s)/2))}}return{n,maxGrade:+mg.toFixed(3),maxCurv:+mc.toFixed(4)}},lmk:()=>(HUB.lmk||[]).map(L=>({id:L.id,name:L.name,x:L.x,z:L.z})),lmNear:(x,z)=>{const L=athLmNear(x,z);return L&&L.name},athd:()=>ATHD,athDist:()=>ATH_DIST,athGates:()=>SM_ON?SM_gates():HUB.gates||[],athGo:(d,x,z,h)=>athDistGo(d,x,z,h),athPick:d=>athDistPick(d),athGar:()=>GARAGES.filter(g=>g.x!=null).map(g=>({id:g.id,x:g.x,z:g.z,h:g.h})),eleni:()=>{const L=LM_BY['Garaz Psyrri'];return L&&{x:L.x,z:L.z,door:HUB.garage}},hillFit:()=>HILLS.map(h=>({id:h.id,fit:h.fit||1,max:+Math.max(0,...CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped').flatMap(S=>S.pts.filter(p=>p.x>h.x0&&p.x<h.x1&&p.z>h.z0&&p.z<h.z1).map(p=>athHill1(h,p.x,p.z)))).toFixed(1)})),shelfN:()=>CITY_S.filter(S=>S.hs).length,inA:(x,z)=>athInA(x,z),athRoad:(x,z,R)=>athRoadD(x,z,R),athConn:()=>athConn(),athOverlap:()=>athOverlap(),athB:()=>HUB.athB,bhProf:()=>{if(HUB.built)return null;const o={};let t=performance.now(),lab='start';for(const y of buildHubG()){const n=performance.now();o[lab]=(o[lab]||0)+n-t;if(y&&y[1])lab=y[1];t=n}o[lab]=(o[lab]||0)+performance.now()-t;for(const k in o)o[k]=Math.round(o[k]);return o},athRR:(x,z)=>HUB.athRR?HUB.athRR.get(x,z):null,qv:{G:()=>qvGraph(),graph:()=>{const G=qvGraph();return G&&{n:G.n,main:G.list.length,ms:G.ms,cut:G.cut}},path:(a,b,c,d)=>{const P=qvPath(a,b,c,d);return{P,ids:P.ids}},near:(x,z)=>qvNear(x,z),nodeW:i=>{const G=qvGraph();return G&&{x:G.X[i],z:G.Z[i],w:G.W[i]}},layout:(id,seed,x,z)=>{const m=RO.marks.find(q=>q.ev&&q.ev.id===id&&!q.dyn);return m&&qvLayout(m.ev,seed??qvSeed(m),{x:x??m.x,z:z??m.z})},use:id=>{const m=RO.marks.find(q=>q.ev&&q.ev.id===id);return m&&qvUse(m)},mark:id=>{const m=RO.marks.find(q=>(q.ev&&q.ev.id===id&&!q.dyn)||q.uid===id);return m&&{x:m.x,z:m.z,h:m.h,seed:qvSeed(m),use:qvUse(m)}},start:(id,o)=>{const m=RO.marks.find(q=>(q.ev&&q.ev.id===id&&!q.dyn)||q.uid===id);if(m)chStart(m,o);return !!RO.ch},restart:()=>qvRestart(),abandon:()=>qvAbandon(),retry:k=>qvRetry(k),next:()=>{if(RO.ch&&RO.ch.v2)qvNext(RO.ch)},spawn:()=>qvSpawn(),tick:dt=>qvTick(dt||0),enc:()=>RO.marks.filter(m=>m.dyn).map(m=>({id:m.ev.id,k:m.ev.kind,x:m.x,z:m.z,disc:m.disc,uid:m.uid})),encDrop:uid=>{const m=RO.marks.find(q=>q.uid===uid);if(m)qvEncDrop(m,1)},nav:()=>QV.nav&&{n:QV.nav.P.length,rec:QV.nav.rec,rem:QV.nav.rem,d:QV.nav.d,P:QV.nav.P,ids:QV.nav.P.ids},ch:()=>{const c=RO.ch;return c&&{kind:c.kind,v2:!!c.v2,si:c.v2?c.v2.si:-1,n:c.v2?c.v2.L.st.length:0,seed:c.seed,left:c.v2?c.v2.left:0,t:c.t,cd:c.cd,par:c.v2?c.v2.L.par:0,len:c.v2?c.v2.L.len:0,st:c.v2?c.v2.L.st.map(S=>({t:S.t,x:S.x,z:S.z,txt:S.txt,it:S.it?S.it.map(o=>[o.x,o.z]):null})):null,tgt:c.v2&&qvTgt(c)?{...qvTgt(c)}:null,S:c.v2?(({t,hit,s,vx,vz,amb,n})=>({t,hit,s,vx,vz,amb,n}))(c.v2.L.st[c.v2.si]||{}):null}},roadD:(x,z)=>{let d=1e9;const q=cityAt(x,z);if(q)d=Math.min(d,q.d-q.road.w/2);const sd=(ax,az,bx,bz,w)=>{const dx=bx-ax,dz=bz-az,L2=dx*dx+dz*dz||1,u=clamp(((x-ax)*dx+(z-az)*dz)/L2,0,1);return Math.hypot(ax+dx*u-x,az+dz*u-z)-w/2};for(const r of hubRoads())d=Math.min(d,sd(r.x0,r.z0,r.x1,r.z1,r.w));for(const b of BRIDGES){const[a1,c1]=deckPt(b,-b.half-4),[a2,c2]=deckPt(b,b.half+4);d=Math.min(d,sd(a1,c1,a2,c2,b.w))}return d},hit:(x,z)=>!!roamHit(x,z,1),spawnK:k=>{const t=QV_ENC.find(q=>q.k===k),G=qvGraph();if(!t||!G)return null;const i=qvNear(RO.x+Math.sin(RO.h)*220,RO.z+Math.cos(RO.h)*220,400);if(i<0)return null;return qvEncMark(t,G.X[i],G.Z[i],0,(Math.random()*4e9)>>>0,1).uid},sq:()=>RO.marks.filter(m=>m.sq).map(m=>({id:m.ev.id,x:m.x,z:m.z,k:m.ev.kind})),dbg:()=>QV.sqDbg,twist:()=>RO.ch&&RO.ch.v2&&RO.ch.v2.L.tw,stats:()=>({fr:QV.fr,ms:QV.ms,mn:QV.mn,mt:QV.mt,it:QV.it})},net:()=>({pieces:CITY_S.length,km:+(CITY_S.reduce((a,S)=>a+S.L,0)/1000).toFixed(1),aj:AJ.length,junc:JUNC.length,cls:CITY_S.reduce((o,S)=>(o[S.r.cls]=(o[S.r.cls]||0)+1,o),{})}),cover:(x,z,r=60)=>{const G=HUB.grid,k0=Math.floor(x/40),j0=Math.floor(z/40),n=Math.ceil(r/40);for(let a=-n;a<=n;a++)for(let b=-n;b<=n;b++){const L=G&&G.get((k0+a)*10000+j0+b);if(L)for(const q of L)if(Math.hypot(q.x-x,q.z-z)<r+Math.max(q.hw,q.hd))return 'bld'}const P=HUB.pgrid,m=Math.ceil(r/16),kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-m;a<=m;a++)for(let b=-m;b<=m;b++){const L=P&&P.get((kx+a)*10000+kz+b);if(L)for(const p of L)if(Math.hypot(p.x-x,p.z-z)<r)return 'prop'}const Z=zoneAt(x,z);if(Z&&(Z.t==='plaza'||Z.t==='grass'))return 'zone';return null},bh:()=>{if(HUB.built)return null;const t=performance.now();buildHub();const t1=performance.now();buildRoam();return[Math.round(t1-t),Math.round(performance.now()-t1)]},rsnap:(x,z,r)=>rfSnap(x,z,r||200),gbs:()=>(RO.gbs||[]).map(g=>({x:g.x,z:g.z,y:g.y})),packs:()=>(RO.packs||[]).map(g=>({x:g.x,z:g.z,y:g.y})),cars:()=>HUB.cars.map(c=>({k:HCAR[c.k],x:+c.x.toFixed(1),z:+c.z.toFixed(1),y:+c.y.toFixed(2),tr:!!c.tr,dead:c.dead>0})),athU:()=>HUB.athU||0,hills:()=>HILLS.map(h=>({id:h.id,cx:h.cx,cz:h.cz,H:h.H,shape:h.shape})),shelf:()=>SHELF.size,stS:id=>{const S=CITY_S.find(q=>q.r.id===id);return S&&S.pts.map(p=>[+p.x.toFixed(1),+p.z.toFixed(1),+(p.y??0).toFixed(2),+p.tx.toFixed(3),+p.tz.toFixed(3)])},cityT:(x,z)=>{const q=cityAt(x,z);return q&&{d:q.d,id:q.road.id,w:q.road.w,cls:q.road.cls,tx:q.p.tx,tz:q.p.tz}},athProbe:()=>{const p=pl;frameAt(TD,p.dist,F2);const rs=F2.p.clone().addScaledVector(F2.r,p.x),m=p.mesh.position;return{cy:+m.y.toFixed(2),ry:+rs.y.toFixed(2),gy:+athH(m.x,m.z).toFixed(2),x:+p.x.toFixed(2),M:MARGIN,dead:p.dead>0,air:!!p.air,tun:F2.p.y<-11,sec:TD.SEC[F2.i]}},
   athEdges:()=>{let bad=0,maxUp=-9,maxStep=0,n=0,worst='',wu='';const td=TF,f=mkF();for(let s=0;s<td.L;s+=8){if(inGapF(s)||inGapF(s+26)||inGapF(s-26))continue;frameAt(td,s,f);if(f.p.y<-1||/FLYOVER/.test(td.SEC[f.i]))continue;
     for(const sd of[-1,1]){const a=f.p.clone().addScaledVector(f.r,sd*(HALF-3)),e=f.p.clone().addScaledVector(f.r,sd*HALF),o=f.p.clone().addScaledVector(f.r,sd*(HALF+5));const up=athH(a.x,a.z)-a.y,st=Math.abs(athH(o.x,o.z)-e.y);n++;if(up>maxUp){maxUp=up;wu=td.SEC[f.i]+'@'+Math.round(s)}if(st>maxStep){maxStep=st;worst=td.SEC[f.i]+'@'+Math.round(s)}if(up>0||st>2)bad++}}
