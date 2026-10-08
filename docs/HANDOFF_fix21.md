@@ -22,7 +22,7 @@
   Shots and probes: docs/shots/fix21/.
 
 ## Next
-1. A combined QUICK review was sent to the reviewer at 8adefc6 (it replaces f7436fe). Wait for PASS.
+1. DONE: v87y DEPLOY sent (alex/od-fix21-fx 0411160, FX only); reviewer PASS 8adefc6 (audio); v87z DEPLOY sent (alex/od-fix21 c05ca90, out/v87z incl. music/). Coordinator deploys and must publish music/ to the beta too.
 2. On PASS:
    - `tools/verify_live.sh` must say LIVE_MATCH (else merge the live src);
    - prepend the `OD_CHANGELOG` v87y entry (10_core top);
