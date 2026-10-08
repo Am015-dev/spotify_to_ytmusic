@@ -11,3 +11,6 @@ qa_race/
 /tune.json
 qa20/base/
 /music/
+base_dbg.html
+new_dbg.html
+qa24/*.log
