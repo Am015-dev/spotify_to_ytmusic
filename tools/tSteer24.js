@@ -23,13 +23,13 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
  // ---- the driver runs in the page between frames (one evaluate per route): real DOM key events (keydown/keyup on window, e.code) or
  // real touch events on the on-screen buttons (#tL/#tR via #btnZone, #tG, #tB), dispatched exactly where a finger lands
  await p.evaluate(([touch,FPS])=>{window.__S=[];const M=__mho;
-  window.__mon=()=>{const R=M.RO;if(M.state!=='roam')return;let off=0;try{off=M.cid()==='ath'?((M.athRoad(R.x,R.z,48)||{e:9}).e>0?1:0):(M.roadD(R.x,R.z)>0?1:0)}catch(e){}__S.push([R.x,R.z,R.h,R.v,R.yr||0,off,M.K.ArrowDown||(M.touch&&M.touch.brake)?1:0,R.vh??R.h,R.d24s||0,R.dl||0,R.camH??R.h,R.camL??R.h,(window.__dbg&&__dbg.camera?(f=>Math.atan2(f.x,f.z))(new __dbg.THREE.Vector3(0,0,-1).applyQuaternion(__dbg.camera.quaternion)):0)])};
+  window.__mon=()=>{const R=M.RO;if(M.state!=='roam')return;let off=0;try{off=M.cid()==='ath'?((M.athRoad(R.x,R.z,48)||{e:9}).e>0?1:0):(M.roadD(R.x,R.z)>0?1:0)}catch(e){}__S.push([R.x,R.z,R.h,R.v,R.yr||0,off,M.K.ArrowDown||(M.touch&&M.touch.brake)?1:0,R.vh??R.h,R.d24s||0,R.dl||0,R.camH??R.h,R.camL??R.h,(window.__dbg&&__dbg.camera?(f=>Math.atan2(f.x,f.z))(new __dbg.THREE.Vector3(0,0,-1).applyQuaternion(__dbg.camera.quaternion)):0)],R.rdT?Math.atan2(R.rdT[0],R.rdT[1]):9,window.__d24cur?__d24cur.steer:0])};
   const kd=(c,on)=>dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{code:c,key:c,bubbles:true}));const F={};let tid=1;
   const tEl=s=>document.querySelector(s),tc=s=>{const r=tEl(s).getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]};
   const tch=(name,sel,on)=>{if(on){const[x,y]=tc(sel),t0=document.elementFromPoint(x,y)||tEl(sel);const T=new Touch({identifier:tid++,target:t0,clientX:x,clientY:y,radiusX:6,radiusY:6,force:1});F[name]=T;
      t0.dispatchEvent(new TouchEvent('touchstart',{changedTouches:[T],touches:Object.values(F),targetTouches:[T],bubbles:true,cancelable:true}))}
    else{const T=F[name];if(!T)return;delete F[name];T.target.dispatchEvent(new TouchEvent('touchend',{changedTouches:[T],touches:Object.values(F),targetTouches:[],bubbles:true,cancelable:true}))}};
-  const cur={steer:0,gas:false,brake:false};
+  const cur=window.__d24cur={steer:0,gas:false,brake:false};
   window.__d24apply=c=>{if(touch){if(c.gas!==cur.gas)tch('gas','#tG',c.gas);if(c.brake!==cur.brake)tch('brk','#tB',c.brake);if(c.steer!==cur.steer){if(cur.steer)tch('st',cur.steer<0?'#tL':'#tR',false);if(c.steer)tch('st',c.steer<0?'#tL':'#tR',true)}}
    else{if(c.gas!==cur.gas)kd('ArrowUp',c.gas);if(c.brake!==cur.brake)kd('ArrowDown',c.brake);if(c.steer!==cur.steer){if(cur.steer)kd(cur.steer<0?'ArrowLeft':'ArrowRight',false);if(c.steer)kd(c.steer<0?'ArrowLeft':'ArrowRight',true)}}Object.assign(cur,c)};
   const ad=a=>Math.atan2(Math.sin(a),Math.cos(a)),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
