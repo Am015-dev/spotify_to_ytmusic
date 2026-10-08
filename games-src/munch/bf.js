@@ -64,7 +64,23 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
   document.body.appendChild(o);const dur=mine?1900:1050;
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
   const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
-  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur)}
+  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur);
+  if(kind==='mon')bfBossClip(c.k)}
+// ---- boss reveal clip: six big monsters get a 6 s painted clip the first time they are revealed in a game ----
+// Muted, playsinline, tap/Esc to skip. It sits in a strip at the top and never blocks the board; a clip that cannot load or start is silently dropped.
+const BOSS_CLIPS={wyrm:1,inferno:1,tentacles:1,pharaoh:1,skygrif:1,dread:1};let bossSeen={gid:null,k:{}};
+function bfBossClip(k){if(!k||!BOSS_CLIPS[k]||!BF.motion()||!G||typeof document==='undefined'||!document.body)return;
+  if(bossSeen.gid!==G.gid)bossSeen={gid:G.gid,k:{}};if(bossSeen.k[k]||document.getElementById('bfclip'))return;bossSeen.k[k]=1;
+  let box,v,fin=false,T,T2;
+  const end=()=>{if(fin)return;fin=true;clearTimeout(T);clearTimeout(T2);document.removeEventListener('keydown',esc,true);try{v.pause();v.removeAttribute('src');v.load()}catch(e){}if(box.parentNode)box.parentNode.removeChild(box)};
+  const esc=e=>{if(e.key==='Escape')end()};
+  try{box=document.createElement('div');box.id='bfclip';box.setAttribute('aria-hidden','true');
+    v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';v.autoplay=true;
+    box.appendChild(v);box.addEventListener('click',end);v.addEventListener('ended',end);v.addEventListener('error',end);
+    v.addEventListener('playing',()=>{box.classList.add('on');try{if(typeof sfx==='function')sfx('roar')}catch(e){}});
+    T=setTimeout(()=>{if(!box.classList.contains('on'))end()},4000);T2=setTimeout(end,12000);
+    document.addEventListener('keydown',esc,true);document.body.appendChild(box);v.src='media/doorkick-'+k+'-boss.mp4';
+    const p=v.play();if(p&&p.catch)p.catch(end)}catch(e){if(box&&box.parentNode)box.parentNode.removeChild(box)}}
 // ---- cause and effect: cards fly from the rival who played them, numbers float up where they changed ----
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;

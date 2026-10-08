@@ -36,4 +36,6 @@ Rows for `doorkick` copied from `audio/ASSETS.md` (checked 2026-09-30). Every it
 
 ## Card paintings
 
-`art/*.webp` (37 monsters, 7 class/race cards, 320x320): generated with Google Flow from our own prompts (original monsters, no third-party names or references); cropped and converted to WebP. Added 2026-10-08.
+`art/*.webp` (all 147 cards: 44 monsters/heroes at 256x256, 103 others re-encoded to 192x192): generated with Google Flow from our own prompts (original monsters, no third-party names or references); cropped and converted to WebP. Added 2026-10-08.
+
+Boss clips `games/doorkick-dungeon/media/doorkick-<key>-boss.mp4` (wyrm, inferno, tentacles, pharaoh, skygrif, dread; 6 s, 854x480, no audio): Google Flow image-to-video from each monster's own card painting, our own prompts, no third-party names. Added 2026-10-08.

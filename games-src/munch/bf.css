@@ -126,3 +126,10 @@ html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
 .mine .hand .card.play.bf-mean{box-shadow:0 0 0 2px #ff6a5a,0 0 14px rgba(255,90,70,.75)!important}
 
 .story-btn{display:block;width:100%;min-height:56px;font-size:1.2rem!important;margin:8px 0 4px}
+
+/* boss reveal clip: a 16:9 strip at the top, invisible until the video plays, tap to skip, the board stays usable below it */
+#bfclip{position:fixed;left:0;right:0;top:0;z-index:120;aspect-ratio:16/9;max-height:34vh;margin:0 auto;opacity:0;transition:opacity .25s;background:#0b0618;box-shadow:0 6px 18px rgba(0,0,0,.55);cursor:pointer;touch-action:manipulation;pointer-events:none;overflow:hidden}
+#bfclip.on{opacity:1;pointer-events:auto}
+#bfclip video{width:100%;height:100%;object-fit:cover;display:block}
+#bfclip::after{content:'tap to skip';position:absolute;right:8px;bottom:6px;padding:2px 9px;border-radius:10px;background:rgba(0,0,0,.55);color:#fff;font:600 11px system-ui,sans-serif}
+@media (prefers-reduced-motion: reduce){#bfclip{display:none}}

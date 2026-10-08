@@ -40,7 +40,7 @@ const RULES_HTML=`
 <p class="small muted">A half-blood card lets you have two races, and a double-class card two classes. Curses can be played on anyone: here that's on your turn, during fights, or when someone else's turn starts. Names, card texts and art in this game are original. The rules follow the real card game.</p>
 <section class="credits-audio">
 <h3>Credits</h3>
-<p>Names, card text and art are original. Monster and hero card paintings were generated with Google Flow from our own prompts.</p>
+<p>Names, card text and art are original. All card paintings and the six boss reveal clips were generated with Google Flow from our own prompts.</p>
 <h4>Audio</h4>
 <p>With thanks to these public-domain (CC0) creators:</p>
 <ul>
