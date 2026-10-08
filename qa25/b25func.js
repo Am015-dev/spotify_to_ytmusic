@@ -5,7 +5,7 @@ const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.a
  await tap('#gbMenuBtn',2500);await tap('#r2R [data-r2m="build"]',3000);await tap('#gbBkP [data-r2b="more"]');await tap('#r2More [data-r2a="gnb"]',1200);await tap('#gnbP [data-ch="sc8"]',2500);
  if(!await ev(()=>__gb.GB_.mir))await tap('#gbBkP [data-r2b="mir"]');ck('layer mode on by default',await ev(()=>__b25.S.on===1&&__b25.S.L!=null));
  await tap('#b25 [data-b25="top"]',1200);await shot('f1_top');const L0=await ev(()=>__b25.S.L);
- await tap('#gbBkP [data-r2b="cat"]');await tap('#gbBkCt [data-ct="Plates"]');await tap('#gbBkPc [data-p="p24"]');
+ await tap('#gbBkP [data-r2b="cat"]');await tap('#gbBkCt [data-ct="Plates"]');await T.swipeTo('#gbBkPc','#gbBkPc [data-p="p24"]');await tap('#gbBkPc [data-p="p24"]');
  const n0=await n();let q=await ev(()=>__b25.scr(-3,-1));await tapXY(q.x,q.y);ck('tap holds a part on the layer',await ev(L=>{const h=__g8.held();return !!h&&h.y===L&&!h.bad},L0),JSON.stringify(await ev(()=>__g8.held())));
  await tap('#gsBar [data-g="place"]');const a=await last();ck('placed + mirror twin, both on the layer',await n()===n0+2&&a.every(b=>b.y===L0),JSON.stringify(a));await shot('f2_placed');
  await tap('#b25 [data-b25="up"]');const L1=await ev(()=>__b25.S.L);ck('▲ goes to the next surface',L1>L0,`${L0}→${L1}`);

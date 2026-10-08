@@ -16,7 +16,7 @@ const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.a
  let i=0;for(const[pc,cat,rot,i0,j0,dy,nm]of S){i++;const n0=await ev(()=>__gb.list().length),tp0=taps;
   const cur=await ev(()=>__gb.GB_.ct||'Bricks');if(cur!==cat){await t('#gbBkP [data-r2b="cat"]');await t(`#gbBkCt [data-ct="${cat}"]`)}
   const vis=await ev(p=>{const e=document.querySelector(`#gbBkPc [data-p="${p}"]`);if(!e)return'missing';const r=e.getBoundingClientRect(),s=document.querySelector('#gbBkPc').getBoundingClientRect();return r.left>=s.left-1&&r.right<=s.right+1?'ok':'scroll'},pc);
-  if(vis==='scroll'){fails.push(`S${i} ${pc}: part tile is off-screen in the strip, had to scroll`);await ev(p=>document.querySelector(`#gbBkPc [data-p="${p}"]`).scrollIntoView({inline:'center'}),pc)}
+  if(vis==='scroll'){fails.push(`S${i} ${pc}: part tile is off-screen in the strip, had to scroll`);taps++;await T.swipeTo('#gbBkPc',`#gbBkPc [data-p="${pc}"]`)}
   await t(`#gbBkPc [data-p="${pc}"]`);
   const P=await ev(p=>{const q=__gb.PC[p];return[q.w,q.d]},pc),[fw,fd]=rot%2?[P[1],P[0]]:P;
   // aim: visual centre of the target footprint, on top of whatever is there now

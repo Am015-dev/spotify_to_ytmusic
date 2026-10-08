@@ -86,11 +86,16 @@ function B25_ui(){const X=$('#gbx');if(!X)return;let E=$('#b25');if(!E){E=docume
 GB_enter=(f=>function(){const was=GB_.bk,r=f.apply(this,arguments);if(!was&&GB_.bk){B25.L=B25_def();B25.view='3d';B25.pv=null;B25_grid();B25_look();B25_ui();R2.area=null}return r})(GB_enter);
 GB_exit=(f=>function(){const U=GB.mesh&&GB.mesh.userData;if(U&&B25.grid){(U.carG||U.m).remove(B25.grid);B25.grid=null}if(U&&B25.gh){(U.carG||U.m).remove(B25.gh);B25.gh=null}const r=f.apply(this,arguments);B25_ui();return r})(GB_exit);
 GS_ui=(f=>function(){const r=f.apply(this,arguments);B25_ui();return r})(GS_ui);
+// a new chassis / template / blank base starts at its own deck
+GB_scanBase=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk&&GB.d){B25.L=B25_def();B25_grid()}return r})(GB_scanBase);
+GNB_new=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk){B25.L=B25_def();B25_grid();B25_look();B25_ui()}return r})(GNB_new);
+GB_preset=(f=>function(){const r=f.apply(this,arguments);if(GB_.bk){B25.L=B25_def();B25_grid();B25_look();B25_ui()}return r})(GB_preset);
 // STEP ▲/▼ on the held part moves the active layer too (one control for height)
 G8_step=(f=>function(d){if(!B25_act())return f.apply(this,arguments);return B25_step(d)})(G8_step);
 {const st=document.createElement('style');st.textContent=`#b25{position:absolute;right:6px;top:calc(var(--r2hh,52px) + 6px);display:flex;flex-direction:column;align-items:flex-end;gap:5px;z-index:4}#b25[hidden]{display:none}
 #b25 button{height:44px;min-width:56px;border-radius:12px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 12px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;padding:0 6px;line-height:1.05;box-shadow:0 2px 0 rgba(0,0,0,.35)}
 #b25 button i{font-style:normal;font-size:15px}#b25 button.on{background:#ffd12c}#b25 button:disabled{opacity:.4}
 #b25 .b25V{display:flex;gap:4px}#b25 .b25V button{min-width:52px}#b25 .b25L{width:56px;height:46px}#b25 .b25L small{font-size:12px}#b25 .b25L b{font-size:17px}#b25 .b25L:not(.on) b{font-size:12px}
+body.tmGar #r2H [data-r2h="redo"]{margin-right:50px}
 #b25 em{font:900 12px system-ui;font-style:normal;background:#ff4a4a;color:#fff;border:2px solid #141413;border-radius:8px;padding:3px 6px;max-width:170px;text-align:center}`;document.head.appendChild(st)}
 window.__b25={S:B25,scr:(fx,fz,y)=>{const m=GB.mesh.userData.m;GB.mesh.updateMatrixWorld(true);GB_cam();const p=m.localToWorld(V3(fx*GB_U,(y??B25.L)*GB_PH,fz*GB_U)).project(GB.cam),r=$('#gbC').getBoundingClientRect();return{x:r.left+(p.x+1)/2*r.width,y:r.top+(1-p.y)/2*r.height}},setLayer:L=>B25_set(L),step:d=>B25_step(d),view:v=>B25_view(v),surf:()=>B25_surf(),def:()=>B25_def(),floor:()=>B25_floor(),why:b=>B25_why(b)};

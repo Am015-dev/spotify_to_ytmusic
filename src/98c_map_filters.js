@@ -32,5 +32,6 @@ toggleMap=(f=>function(){const r=f.apply(this,arguments);if(RO.mapOpen)MF_ui();r
 #mfBar button{flex:none;height:44px;min-width:44px;padding:0 9px;border-radius:12px;border:2px solid rgba(255,255,255,.25);background:rgba(5,11,24,.82);color:#8a97a6;font:800 12px system-ui;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
 #mfBar button i{font-style:normal;font-size:15px;filter:grayscale(1);opacity:.55}#mfBar button em{font-style:normal;font-size:12px;opacity:.75;display:none}@media (min-width:1000px) and (min-height:600px){#mfBar button em{display:inline}}
 #mfBar button.on{background:#fff;color:#141413;border-color:#141413}#mfBar button.on i{filter:none;opacity:1}
+/* the TEST_MODE ⚙ (top right) covered the cutscene SKIP button */#m1Skip{right:calc(66px + env(safe-area-inset-right,0px))!important}
 #roamMap #ogMapP{max-height:calc(100% - 230px);overflow:auto}`;document.head.appendChild(st)}
 window.__mf={off:()=>[...MF.off],cat:MF_cat,count:MF_count,tap:k=>MF_tap(k)};

@@ -16,4 +16,6 @@ module.exports=async function(U,O,opt={}){fs.mkdirSync(O,{recursive:true});const
   const cov=await p.evaluate(([s,x,y])=>{const t=document.elementFromPoint(x,y),e=document.querySelector(s);return t&&(e===t||e.contains(t))?'':(t?(t.id||t.className||t.tagName):'none')},[s,bb.x+bb.width/2,bb.y+bb.height/2]);if(cov)console.log('COVERED',s,'by',cov);
   await tapXY(bb.x+bb.width/2,bb.y+bb.height/2,ms);return 1};
  const ev=(f,a)=>p.evaluate(f,a);const shot=async n=>{await pg.waitForTimeout(500);await pg.screenshot({path:`${O}/${n}.png`});console.log('shot',`${O}/${n}.png`)};
- return{b,pg,p,ctx,errs,tapXY,tap,drag,ev,shot,box,W,H,close:async()=>{console.log('ERR',JSON.stringify(errs.slice(0,8)));await b.close()}}};
+ // swipe a horizontal strip (real touch drag) until the element sits fully inside it
+ const swipeTo=async(strip,sel)=>{for(let k=0;k<8;k++){const r=await ev(([a,b])=>{const s=document.querySelector(a).getBoundingClientRect(),e=document.querySelector(b).getBoundingClientRect();return{sl:s.left,sr:s.right,el:e.left,er:e.right,y:s.top+s.height/2}},[strip,sel]);if(r.el>=r.sl-1&&r.er<=r.sr+1)return 1;const d=r.er>r.sr?-Math.min(220,r.er-r.sr+40):Math.min(220,r.sl-r.el+40),x0=(r.sl+r.sr)/2;await drag(x0,r.y,x0+d,r.y,10);await pg.waitForTimeout(250)}return 0};
+ return{swipeTo,b,pg,p,ctx,errs,tapXY,tap,drag,ev,shot,box,W,H,close:async()=>{console.log('ERR',JSON.stringify(errs.slice(0,8)));await b.close()}}};
