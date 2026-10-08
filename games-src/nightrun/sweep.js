@@ -132,7 +132,8 @@ class Touch {                                           // real touch events thr
   async move(id, x, y) { if (!this.pts.has(id)) return; this.pts.set(id, [x, y]); await this.send('touchMove'); }
   async up(id) { if (!this.pts.has(id)) return; this.pts.delete(id); await this.send('touchEnd'); }
   async tapAt(x, y, ms = 40) { await this.down(9, x, y); await sleep(ms); await this.up(9); }
-  async tap(p, sel) { const r = await p.evaluate(s => { const e = document.querySelector(s), b = e.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; }, sel); await this.tapAt(r[0], r[1]); }
+  async tap(p, sel) { for (let i = 0; i < 160 && !await p.evaluate(() => document.documentElement.classList.contains('rdy')); i++) await sleep(50);   // the title buttons appear when the page is ready
+    const r = await p.evaluate(s => { const e = document.querySelector(s), b = e.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; }, sel); await this.tapAt(r[0], r[1]); }
 }
 const ev = (p, f, a) => p.evaluate(f, a);
 async function gridOk(p) { let g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) { await sleep(800); const g2 = await ev(p, () => window.__bot.gridErr()); if (g2 !== null && (g === null || Math.abs(g2) < Math.abs(g))) g = g2; } return g; }   // one more look: clock readings jitter when the machine is busy
