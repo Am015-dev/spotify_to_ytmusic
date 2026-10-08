@@ -1,0 +1,227 @@
+{
+ "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
+ "items": {
+  "amazon": "amazon",
+  "barfabunny": "barfabunny",
+  "boulder": "boulder",
+  "cleric": "cleric",
+  "dread": "dread",
+  "duckbill": "duckbill",
+  "dwarf": "dwarf",
+  "elf": "elf",
+  "ficus": "ficus",
+  "gnawers": "gnawers",
+  "halfling": "halfling",
+  "hatmuncher": "hatmuncher",
+  "hellmouse": "hellmouse",
+  "horde": "horde",
+  "hound": "hound",
+  "imp": "imp",
+  "inferno": "inferno",
+  "leech": "leech",
+  "lizards": "lizards",
+  "mites": "mites",
+  "nerd": "nerd",
+  "pergola": "pergola",
+  "pharaoh": "pharaoh",
+  "pitchman": "pitchman",
+  "pixie": "pixie",
+  "pony": "pony",
+  "poser": "poser",
+  "pyramid": "pyramid",
+  "rattle": "rattle",
+  "rooster": "rooster",
+  "sirens": "sirens",
+  "skygrif": "skygrif",
+  "slobber": "slobber",
+  "slugs": "slugs",
+  "slurper": "slurper",
+  "sniffer": "sniffer",
+  "tentacles": "tentacles",
+  "thief": "thief",
+  "toads": "toads",
+  "troll": "troll",
+  "twins": "twins",
+  "warrior": "warrior",
+  "wizard": "wizard",
+  "wyrm": "wyrm"
+ },
+ "size": {
+  "amazon": [
+   320,
+   320
+  ],
+  "barfabunny": [
+   320,
+   320
+  ],
+  "boulder": [
+   320,
+   320
+  ],
+  "cleric": [
+   320,
+   320
+  ],
+  "dread": [
+   320,
+   320
+  ],
+  "duckbill": [
+   320,
+   320
+  ],
+  "dwarf": [
+   320,
+   320
+  ],
+  "elf": [
+   320,
+   320
+  ],
+  "ficus": [
+   320,
+   320
+  ],
+  "gnawers": [
+   320,
+   320
+  ],
+  "halfling": [
+   320,
+   320
+  ],
+  "hatmuncher": [
+   320,
+   320
+  ],
+  "hellmouse": [
+   320,
+   320
+  ],
+  "horde": [
+   320,
+   320
+  ],
+  "hound": [
+   320,
+   320
+  ],
+  "imp": [
+   320,
+   320
+  ],
+  "inferno": [
+   320,
+   320
+  ],
+  "leech": [
+   320,
+   320
+  ],
+  "lizards": [
+   320,
+   320
+  ],
+  "mites": [
+   320,
+   320
+  ],
+  "nerd": [
+   320,
+   320
+  ],
+  "pergola": [
+   320,
+   320
+  ],
+  "pharaoh": [
+   320,
+   320
+  ],
+  "pitchman": [
+   320,
+   320
+  ],
+  "pixie": [
+   320,
+   320
+  ],
+  "pony": [
+   320,
+   320
+  ],
+  "poser": [
+   320,
+   320
+  ],
+  "pyramid": [
+   320,
+   320
+  ],
+  "rattle": [
+   320,
+   320
+  ],
+  "rooster": [
+   320,
+   320
+  ],
+  "sirens": [
+   320,
+   320
+  ],
+  "skygrif": [
+   320,
+   320
+  ],
+  "slobber": [
+   320,
+   320
+  ],
+  "slugs": [
+   320,
+   320
+  ],
+  "slurper": [
+   320,
+   320
+  ],
+  "sniffer": [
+   320,
+   320
+  ],
+  "tentacles": [
+   320,
+   320
+  ],
+  "thief": [
+   320,
+   320
+  ],
+  "toads": [
+   320,
+   320
+  ],
+  "troll": [
+   320,
+   320
+  ],
+  "twins": [
+   320,
+   320
+  ],
+  "warrior": [
+   320,
+   320
+  ],
+  "wizard": [
+   320,
+   320
+  ],
+  "wyrm": [
+   320,
+   320
+  ]
+ }
+}
