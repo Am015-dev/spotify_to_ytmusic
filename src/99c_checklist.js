@@ -115,7 +115,7 @@ const OD_CHECKLIST=[
   pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
  const P_col=()=>pin.classList.contains('col');
  pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=cur(),n=C.length;try{AU.sfx('pick')}catch(er){}
-  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();return}
+  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
   else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
    if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
   psave(P);pinR();badge()});

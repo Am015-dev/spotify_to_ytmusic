@@ -1,11 +1,11 @@
-shot s0_start 10s
+shot s0_start 8s
 shot s1_palette 99s
 pod 3
 groups [{"g":1,"n":3,"name":"Side pod"},{"g":2,"n":3,"name":"Side pod ⇋"}]
-shot s4_mirrored 164s
+shot s4_mirrored 157s
 carry {"x":-5,"z":-6,"y":7,"bad":false}
-shot s4b_copy_held 189s
+shot s4b_copy_held 180s
 groups [{"g":1,"n":3,"name":"Side pod"},{"g":2,"n":3,"name":"Side pod ⇋"},{"g":3,"n":3,"name":"Side pod copy"}]
-shot s4c_copied 207s
-shot s6_checklist 233s
+shot s4c_copied 197s
+shot s6_checklist 221s
 ERRS 0 []
