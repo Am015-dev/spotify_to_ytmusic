@@ -98,7 +98,6 @@ function BC_dims(ud){CR_bodyPts(ud);const B=CR_PS.b;if(!B)return null;ud.m.updat
  ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;for(let q=w;q&&q!==ud.m;q=q.parent)if(!q.visible)return;w.getWorldPosition(_bcP);ud.m.worldToLocal(_bcP);if(!w.geometry.boundingBox)w.geometry.computeBoundingBox();const hw=(w.geometry.boundingBox.max.x-w.geometry.boundingBox.min.x)*w.scale.x;
   x0=Math.min(x0,_bcP.x-hw/2);x1=Math.max(x1,_bcP.x+hw/2);z0=Math.min(z0,_bcP.z);z1=Math.max(z1,_bcP.z)});
  return{W:(x1-x0)*_bcS.x,L:(B.max.z-B.min.z)*_bcS.z,H:(B.max.y-B.min.y)*_bcS.y,WB:z1>z0?(z1-z0)*_bcS.z:0}}
-// reference = the default street car (Hot Rod) measured once in the same frame/scale (BC.ref), so every rule above is a ratio
 function BC_apply(d){const R=BC.ref||d,D0=BC.D0,rW=Math.max(1,d.W/R.W),rL=Math.max(1,d.L/R.L),rH=Math.max(1,d.H/R.H),big=d.L>R.L*1.12||d.W>R.W*1.12||d.H>R.H*1.25;BC.big=big;BC.d=d;
  if(!big){Object.assign(SC_K,{rad:D0.rad,off:D0.off,cam:D0.cam});CR_WB=D0.wb;OB_HW=D0.hw;OB_HL=D0.hl;Object.assign(CR_PLH,D0.pl);BC.acc=BC.top=BC.cam=1}
  else{const rad=D0.rad*rW,ext=(d.L-R.L)/2;SC_K.rad=+rad.toFixed(3);SC_K.off=+Math.max(D0.off,D0.off+ext-(rad-D0.rad)).toFixed(3);
@@ -106,11 +105,9 @@ function BC_apply(d){const R=BC.ref||d,D0=BC.D0,rW=Math.max(1,d.W/R.W),rL=Math.m
   const m=Math.max(1,rW*rL*rH);BC.m=m;BC.acc=Math.pow(m,-.3);BC.top=Math.pow(m,-.05);BC.cam=Math.pow(Math.max(rL,rH*1.1),.65);SC_K.cam=+(D0.cam*BC.cam).toFixed(3)}
  SC_rcam()}
 function BC_upd(){const s=pl,ud=s&&s.mesh&&s.mesh.userData;if(!ud||!ud.m||!BC.on||(s.boatK||0)>.5)return;CR_bodyPts(ud);const key=CR_PS.k+'|'+GAR_get().sel+'|'+(RO.vsel||'');if(key===BC.k)return;BC.k=key;
- const d=BC_dims(ud);if(!d)return;if(!BC.ref)BC.ref=BC_refM();BC_apply(d)}
-// reference measurement: the Hot Rod parts list in the player's own scale (no scene change)
-function BC_refM(){const g=CR_grp(CR_ROD,'bcRef'),ud=pl.mesh.userData,B=new THREE.Box3(),s=new THREE.Vector3();ud.m.getWorldScale(s);let z0=1e9,z1=-1e9;
- g.traverse(o=>{if(!o.isMesh)return;o.geometry.computeBoundingBox();const bb=o.geometry.boundingBox.clone().translate(o.position);if(o.userData.r){z0=Math.min(z0,o.position.z);z1=Math.max(z1,o.position.z)}else B.union(bb)});
- return{W:(B.max.x-B.min.x)*s.x,L:(B.max.z-B.min.z)*s.z,H:(B.max.y-B.min.y)*s.y,WB:z1>z0?(z1-z0)*s.z:0}}
+ const d=BC_dims(ud);if(!d)return;BC_apply(d)}
+// reference = the Hot Rod (and every 8-wide template) as measured in roam with BC_dims (bc/probe.js, v88f): world metres
+BC.ref={W:1.93,L:4.43,H:1.44,WB:2.45};
 // collider with extra circles along long bodies (default size = the original 3-circle SC_hit, unchanged)
 SC_hit=(f=>function(x,z,y){if(!BC.big||!SC_S.on)return f(x,z,y);const fx=Math.sin(RO.h),fz=Math.cos(RO.h),r=SC_K.rad,o=SC_K.off,n=Math.max(1,Math.ceil(o/(r*1.1)));
  for(let i=0;i<=n;i++)for(const sg of i?[1,-1]:[0]){const k=sg*o*i/n,px=x+fx*k,pz=z+fz*k,b=roamHit(px,pz,r,y);if(b){SC_S.dx=px-x;SC_S.dz=pz-z;return b}}return null})(SC_hit);
