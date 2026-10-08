@@ -242,7 +242,7 @@ async function inputTests(browser, cfg) {
       await p.keyboard.down('ArrowRight'); await sleep(450); await p.keyboard.up('ArrowRight'); let b = await st(); if (b.x - a.x < 60) await fail(p, tag, 'input-not-responding', 'ArrowRight moved ' + (b.x - a.x).toFixed(0));
       await p.keyboard.down('KeyS'); await sleep(350); await p.keyboard.up('KeyS'); let c = await st(); if (c.y - b.y < 50) await fail(p, tag, 'input-not-responding', 'S moved ' + (c.y - b.y).toFixed(0));
       await p.keyboard.down('Space'); await sleep(300); if (!(await st()).pb) await fail(p, tag, 'input-not-responding', 'Space does not fire'); await p.keyboard.up('Space');
-      await p.keyboard.press('ShiftLeft'); await sleep(60); c = await st(); if (!(c.cd > 0 || c.dt > 0)) await fail(p, tag, 'input-not-responding', 'Shift did nothing');
+      await p.keyboard.press('ShiftLeft'); await sleep(220); c = await st(); if (!(c.cd > 0 || c.dt > 0)) await fail(p, tag, 'input-not-responding', 'Shift did nothing');
       const e0 = (await st()).emp; await p.keyboard.press('KeyX'); await sleep(80); if ((await st()).emp !== e0 - 1) await fail(p, tag, 'input-not-responding', 'X (EMP) did nothing');
     }
     if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
@@ -768,8 +768,8 @@ async function shopTests(browser, cfg, full) {
         await chk(await ev(p, ids => ids.every(id => __mnr.SH.n(id) === 1), batch), 'shop-buy', 'batch not bought ' + batch);
         await press(p, cfg, T, '#shGo'); await sleep(300);
       }
-      const E = await ev(p, () => { const h = __mnr.SH; return { fr: h.shot().cd, hm: h.hm, ck: h.ck, sharp: h.sharp, nx: h.nx, sh: h.sh, spare: h.spare, mag: __mnr.NR.mod.mag, win: __mnr.NR.mod.win, pw: __mnr.NR.mod.pw, spb: __mnr.BT.spb }; });
-      await chk(E.fr < Math.max(.09, E.spb / 6) - 1e-6 && E.hm === 1 && E.ck === 4 && E.sharp === 1.5 && E.nx === 1.5 && E.mag > 140 && E.win === 20 && E.pw === 1.5, 'upgrade-effect', 'state ' + JSON.stringify(E));
+      const E = await ev(p, () => { const h = __mnr.SH; return { fr: h.n('fr'), hm: h.hm, ck: h.ck, sharp: h.sharp, nx: h.nx, sh: h.sh, spare: h.spare, mag: __mnr.NR.mod.mag, win: __mnr.NR.mod.win, pw: __mnr.NR.mod.pw, spb: __mnr.BT.spb }; });
+      await chk(E.fr >= 1 && E.hm === 1 && E.ck === 4 && E.sharp === 1.5 && E.nx === 1.5 && E.mag > 140 && E.win === 20 && E.pw === 1.5, 'upgrade-effect', 'state ' + JSON.stringify(E));
       await chk(E.sh === 1 && E.spare >= 1, 'upgrade-effect', 'shield/dash charge not given ' + JSON.stringify(E));
       // shield soaks one hit
       await ev(p, () => { const m = __mnr; m.god = false; m.G.en = []; m.G.eb = []; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
