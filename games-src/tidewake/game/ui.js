@@ -1017,6 +1017,9 @@ const TQ={tile:t=>tfirst('#ppop .ph-t[data-t="'+t+'"]','#ps .pt[data-t="'+t+'"]'
   place:tfirst('#ppop [data-a=place]:not([disabled])','#ps [data-a=place]:not([disabled])','#pin [data-a=place]:not([disabled])'),
   q:i=>tfirst('#pc [data-a=q][data-i="'+i+'"]','#main [data-a=q][data-i="'+i+'"]'),
   mph:tfirst('#pc .mph','#res .mph')};
+// the wake-roll / end cards live in the pop-up card on the phone layout and in the side panel on a desktop
+const mphUp=()=>PH.on?!!PH.cur&&PH.cur.kind==='mph':!!UI.mph;
+const overUp=()=>PH.on?!!PH.cur&&PH.cur.kind==='over':!!document.querySelector('#main [data-over]');
 const layReady=()=>{try{return hlpPhase()==='lay'&&!UI.busy}catch(e){return false}};
 // keep a given tile turned a given way selected (the lay screen otherwise starts on the safest tile)
 function tutSel(t,r){if(!UI.sel||UI.sel.t!==t||UI.sel.r!==r||UI.sel.s!==0){UI.sel={t,r,s:0};UI.rots=[];UI.rots[t]=r;render()}return !!UI.sel&&UI.sel.t===t&&UI.sel.r===r}
@@ -1032,7 +1035,7 @@ function tutSteps(){const L=[
  {id:'mark2',title:'Set sail here',say:'Tap the glowing button to confirm this mark.',target:tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]'),
    wait:{type:'tap',match:a=>a.what==='startmark'&&a.x===TS.myStart.x&&a.y===TS.myStart.y&&a.e===TS.myStart.e},ready:()=>PH.pop==='start'&&!!tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]')()},
  {id:'stir',title:'Roll the dice',say:'Two dice are added. A 6, 7 or 8 wakes the leviathans: each moves a square or turns.',target:TQ.mph,wait:null,hold:c=>c==='mph',onNext:dismissMph,
-   ready:()=>G.turn===2&&!UI.busy&&!!UI.mph&&UI.mph.wake&&!UI.mph.roll&&!!PH.cur&&PH.cur.kind==='mph'&&!!TQ.mph()},
+   ready:()=>G.turn===2&&!UI.busy&&!!UI.mph&&UI.mph.wake&&!UI.mph.roll&&mphUp()&&!!TQ.mph()},
  {id:'pick',side:'bottom',title:'Pick a tile',say:'Tap the glowing tile in your hand to pick it.',target:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='card'&&a.t===0},
    ready:()=>G.turn===2&&layReady()&&(UI.sel&&UI.sel.t===2&&UI.sel.r===0||tutSel(2,0))},
  {id:'turn',side:'bottom',title:'Turn the tile',say:'A red cross: this tile sails off the chart and sinks you. Tap Turn.',target:TQ.turn,also:TQ.tile(0),wait:{type:'tap',match:a=>a.what==='rot'&&a.d===1},
@@ -1046,19 +1049,19 @@ function tutSteps(){const L=[
  {id:'chain',side:'bottom',title:'Join another tile',say:'This tile links to Cobalt\'s current. Tap Place: your junk sails across both.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===4&&layReady()&&tutSel(0,0)&&placeOn()},
  {id:'keep',side:'bottom',title:'A Deck Cannon',say:'You drew a Deck Cannon. Keep it: later it destroys a leviathan about to sink you.',target:TQ.q(0),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='cKeep'},
-   ready:()=>!!G.q&&G.q.kind==='cannonDraw'&&!UI.busy&&!!PH.cur&&PH.cur.kind==='q'&&!!TQ.q(0)()},
+   ready:()=>!!G.q&&G.q.kind==='cannonDraw'&&!UI.busy&&!!TQ.q(0)()},
  {id:'wave',title:'Rogue Wave',say:()=>{const w=waveLine();return w?'A Rogue Wave sweeps your row. You rolled '+w.r+'; it needs '+w.n+'+ or you capsize. You ride it.':'A Rogue Wave sweeps this row. Roll its strength or capsize.'},
    target:tutWaveRect,wait:null,ready:()=>G.turn===6&&!!G.wave&&!UI.busy&&sideToAct()===0&&!!tutWaveRect()},
  {id:'place3',side:'bottom',title:'Lay a tile',say:'Lay this tile. Your path crosses the wave\'s row again, so you roll once more.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===6&&layReady()&&tutSel(0,0)&&placeOn()},
  {id:'cannon',side:'bottom',title:'Fire the cannon!',say:()=>levName(4)+' blocks your junk and would sink it. Fire your Deck Cannon.',target:()=>TQ.q(doomOpt('dCannon'))(),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='dCannon'},
-   ready:()=>!!G.q&&G.q.kind==='doom'&&doomOpt('dCannon')>=0&&!UI.busy&&!!PH.cur&&PH.cur.kind==='q'&&!!TQ.q(doomOpt('dCannon'))()},
+   ready:()=>!!G.q&&G.q.kind==='doom'&&doomOpt('dCannon')>=0&&!UI.busy&&!!TQ.q(doomOpt('dCannon'))()},
  {id:'place4',side:'bottom',title:'Keep sailing',say:'The leviathan is gone. Lay a tile to carry on.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===8&&layReady()&&tutSel(0,2)&&placeOn()},
  {id:'sunk',side:'bottom',title:'Leviathans sink junks',say:()=>levName(7)+' swam onto Cobalt\'s current: tile destroyed, junk sunk. Tap Continue.',target:tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]'),wait:{type:'tap',match:a=>a.what==='sunkok'},
-   ready:()=>!!G.over&&!UI.busy&&!!PH.cur&&PH.cur.kind==='sunk'},
+   ready:()=>!!G.over&&!UI.busy&&!!tfirst('#pc [data-a=sunkok]','#cards [data-a=sunkok]')()},
  {id:'win',title:'Last junk afloat',say:'Only your junk is left, so you win. Real games add more captains, tiles and leviathans.',target:tq('#board'),wait:null,
-   ready:()=>!!G.over&&!UI.busy&&!UI.sunk.length&&!!PH.cur&&PH.cur.kind==='over'}
+   ready:()=>!!G.over&&!UI.busy&&!UI.sunk.length&&overUp()}
 ];return PH.on?L:L.filter(x=>x.id!=='mark2')}
 // ---------------------------------------------------------------- the staged game
 function tutNewGame(){
