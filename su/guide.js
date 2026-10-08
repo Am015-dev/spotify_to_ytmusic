@@ -13,7 +13,7 @@ const E=require('../bc/enter.js');const fs=require('fs');const OUT=process.argv[
  await p.evaluate(()=>{const s=document.querySelector('#sbG .sbSl');s.value=s.max;s.dispatchEvent(new Event('input'))});await shot('06_done',1500);await fit('done');
  await p.evaluate(()=>{const s=document.querySelector('#sbG .sbSl');s.value=5;s.dispatchEvent(new Event('input'))});await p.waitForTimeout(800);
  await tap('#sbG [data-sb="diy"]');await shot('07_diy',2000);console.log('diy',await ev('JSON.stringify(__sb.miss())'),'bricks',await ev('GB_list().length'));
- for(let i=0;i<3;i++){const xy=await ev(`(()=>{const g=SB.gh;if(!g)return null;g.geometry.computeBoundingBox();const v=g.geometry.boundingBox.getCenter(new THREE.Vector3());g.localToWorld(v);GB_cam();v.project(GB.cam);const c=$('#gbC').getBoundingClientRect();return[c.left+(v.x+1)/2*c.width,c.top+(1-v.y)/2*c.height]})()`);
+ for(let i=0;i<3;i++){const xy=await ev(`(()=>{const c=SB_miss();if(!c)return null;const M=[],L=[];GB_brickGeo(c.m[0],M,L);const g=mergeGeometries(M);g.computeBoundingBox();const v=g.boundingBox.getCenter(new THREE.Vector3());SB_host().localToWorld(v);GB_cam();v.project(GB.cam);const c=$('#gbC').getBoundingClientRect();return[c.left+(v.x+1)/2*c.width,c.top+(1-v.y)/2*c.height]})()`);
   console.log('ghost at',xy);if(!xy)break;await tapXY(xy[0],xy[1]);await p.waitForTimeout(700);const pl=await p.$('#gsBar [data-a="place"],#gsBar button');const s=await ev('JSON.stringify(__sb.miss())+" bricks "+GB_list().length+" held "+!!(typeof GS!=="undefined"&&GS.held)');console.log('after tap',s);
   if(await ev('typeof GS!=="undefined"&&!!GS.held')){await ev('GS_place()');console.log('placed via PLACE',await ev('JSON.stringify(__sb.miss())+" "+GB_list().length'))}}
  await shot('08_diy_tapped',800);
