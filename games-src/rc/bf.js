@@ -158,10 +158,10 @@ BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b
   el.addEventListener('pointerup',e=>{e.stopPropagation();cancel();if(!held&&Date.now()-t0<480)BF.skipAuto()});el.addEventListener('pointercancel',cancel);el.addEventListener('contextmenu',e=>e.preventDefault())};
 // ---------- the day resolves by itself (about 3 seconds); tap the island to speed up ----------
 const AUTOMS={dawn:900,morning:1000,prod:900,go:700,act:1250,finds:1100,weather:1700,night:900,event:2000,threat:2000,adventure:2000,mystery:2000,fight:2000};
-BF.autoOk=function(i){const b=UI.beats[i];if(!b||!AUTOMS[b.kind]||!BF.on||!G||G.over)return false;if(UI.auto||allAI())return false;if(i>=UI.beats.length-1&&humanQ())return false;return true};
+BF.autoOk=function(i){const b=UI.beats[i];if(!b||!AUTOMS[b.kind]||!BF.on||!G||G.over)return false;if(UI.auto||allAI())return false;if(i>=UI.beats.length-1&&humanQ())return false;if(typeof tutClaimed==='function'&&tutClaimed(i))return false;return true};
 BF.skipAuto=function(){if(BF.autoT==null)return false;clearTimeout(BF.autoT);BF.autoT=null;if(PHO.st==='story'&&BF.autoOk(storyIdx()))storyNext();return true};
 BF.autoSet=function(i){clearTimeout(BF.autoT);BF.autoT=null;if(!BF.autoOk(i))return;const b=UI.beats[i];let ms=AUTOMS[b.kind];if(b.kind==='go'){try{ms+=Math.min(6,Math.max(0,((beatState(i)||G).plan.acts||[]).length))*420}catch(e){}}
-  const fire=()=>{BF.autoT=null;if(!BF.on||PHO.st!=='story'||storyIdx()!==i)return;if(UI.pause||GX.open||document.hidden){BF.autoT=setTimeout(fire,600);return}storyNext()};BF.autoT=setTimeout(fire,ms/(UI.speed||1))};
+  const fire=()=>{BF.autoT=null;if(!BF.on||PHO.st!=='story'||storyIdx()!==i)return;if(UI.pause||GX.open||document.hidden||(typeof tutClaimed==='function'&&tutClaimed(i))){BF.autoT=setTimeout(fire,600);return}storyNext()};BF.autoT=setTimeout(fire,ms/(UI.speed||1))};
 BF.autoTap=function(e){if(BF.autoT==null||!BF.on||PHO.st!=='story')return;const t=e.target;if(t.closest&&t.closest('#bfzoom,#phview,#bfcard,.gx-bar,.gx-drawer,#modal'))return;BF.skipAuto()};
 // ---------- ghost finger: shows the first move, and is gone once you have made it ----------
 function ghostSpot(){if(BF.ghostDone||!BF.on||PHO.st!=='plan2'||G.round>1||G.plan.acts.length)return null;const cur=curPawn();const rt=recTile(cur);if(!rt)return null;

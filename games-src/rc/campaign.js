@@ -4,7 +4,7 @@ UI.cmpDef=null;UI.cmpDone=false;
 function campMetrics(g){return {won:!!(g.over&&g.over.win),rounds:g.round,wounds:g.stats.wounds,morale:g.morale,food:g.res.food+g.res.pfood,
   explored:g.stats.explored,crosses:(g.sc.crosses||[]).length,adaWounds:g.sc.ada||0}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'shipwreck',data:window.CAMPAIGN,
+  GXC.init({game:'shipwreck',data:window.CAMPAIGN,headButtons:()=>typeof tutHeadButtons==='function'?tutHeadButtons():[],
     startChapter(def){const s=def.setup||{};const chars=(s.chars||['carpenter','cook']).slice();
       UI.setup=Object.assign({},UI.setup,{scen:s.scen||'marooned',chars,ai:{},friday:s.friday!=null?s.friday:chars.length<=2,dog:!!s.dog,items:s.items!=null?s.items:2,diff:s.diff||'standard'});
       UI.cmpDef=def;UI.guide={on:!!def.hints&&!UI.guideOff,seen:UI.guide.seen||{}};beginGame()},
@@ -12,7 +12,7 @@ function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
     metrics:campMetrics,
     onExit(){openStart()},
     seats:g=>g.chars.map((c,i)=>({name:c.nm,me:i===0}))})}
-function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
+function campOpen(){if(typeof GXC==='undefined')return;if(typeof tutStoryGate==='function'&&tutStoryGate())return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
 // the game is over in a chapter: hand it to the campaign's result screen once
 function campOver(){if(typeof GXC==='undefined'||!GXC.active()||!G||!G.over)return false;if(!UI.cmpDone){UI.cmpDone=true;UI.overSeen=true;const g=G;setTimeout(()=>{try{localStorage.removeItem(SAVE)}catch(e){}GXC.finish(g)},400)}return true}
 // one line for the title: where the story stands

@@ -45,6 +45,7 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   G.beast=shuffle(BEASTS.map(b=>b.k));
   G.discs=shuffle(Object.keys(DISCS).flatMap(k=>Array(DISCS[k].cp).fill(k)));
   const its=shuffle(Object.keys(ITEMS));G.items=its.slice(0,o.items!=null?o.items:2).map(k=>({k,uses:2}));
+  if(o.tutorial&&typeof tutDeal==='function')tutDeal();   // the staged tutorial game (tutor.js): fixed decks
   G.first=0;SC().setup&&SC().setup();if(o.cmp)campSetup(o.cmp);UI.beats.length=0;UI.shown=-1;const fl=typeof FLAVOR!=='undefined'&&FLAVOR.scen&&FLAVOR.scen[sk];if(!o.noIntro)(fl&&fl.intro||[S.x]).forEach((p,i,a)=>beat('intro',{page:i,of:a.length,text:p}));
   lg(`Shipwrecked! ${G.chars.map(c=>c.nm).join(', ')}${G.fri?' and Friday':''}${G.dog?' (with the dog)':''} wash up on the beach. Scenario: ${S.n}.`,'big');
   G.stk.push({f:'round'});run();refresh()}

@@ -4,7 +4,7 @@ const PCOL=['#e0625c','#4f8fe6','#57b36a','#e8ad45','#a57ce0','#9a9a9a'];
 const RICON={food:'🍖',pfood:'🥫',wood:'🪵',fur:'🧶'};
 const PHASES=[['event','Event'],['morale','Morale'],['prod','Production'],['plan','Plan'],['act','Actions'],['weather','Weather'],['night','Night']];
 UI.tab='plan';UI.sel=null;UI.tileSel=null;UI.report=null;UI.seenLog=0;UI.fxSeen=0;UI.lastRollId=0;UI.toasts=[];
-function refresh(){if(UI.recBusy)return;if(G&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(UI.recBusy)return;if(G&&!G.tut&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){return}
   // the last beat always shows the live state; an ending gets its own scene
   const B=UI.beats;if(B.length){B[B.length-1].snap=null;B[B.length-1].obj=null}
@@ -151,7 +151,7 @@ function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
-   <div class="mb guided"><button class="btn go big" data-a="story">📖 Story: learn the island chapter by chapter ▶</button><small>New here? Start with chapter 1: survive three days. Each chapter adds one new idea. ${typeof campLine==='function'?campLine():''}</small></div>
+   ${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb guided"><button class="btn go big" data-a="story">📖 Story: learn the island chapter by chapter ▶</button><small>New here? Start with chapter 1: survive three days. Each chapter adds one new idea. ${typeof campLine==='function'?campLine():''}</small></div>${typeof tutBlock==='function'?tutBlock('after'):''}
    <h3 class="orfull">Or set up a full game</h3>
    ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
    ${typeof onlineBlock==='function'?onlineBlock():''}
@@ -252,7 +252,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'moveask':G.moveAsk=b.checked?1:0;return;
   case 'okreport':UI.report=null;render();return;
   case 'overok':UI.overSeen=true;render();return;
-  case 'new':openStart();return;case 'start':UI.guide.on=false;UI.cmpDef=null;beginGame();return;case 'story':campOpen();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};UI.cmpDef=null;beginGame();return;case 'continue':loadSaved();return;
+  case 'new':openStart();return;case 'start':if(typeof tutOffer==='function'&&tutOffer())return;UI.guide.on=false;UI.cmpDef=null;beginGame();return;case 'story':campOpen();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};UI.cmpDef=null;beginGame();return;case 'continue':loadSaved();return;
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;

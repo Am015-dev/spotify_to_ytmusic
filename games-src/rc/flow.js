@@ -18,7 +18,7 @@ const PH7=[
 const PHI=k=>PH7.findIndex(p=>p.k===k);
 const AUTO_PH=['morale','prod','weather','night'];
 UI.quick=false;try{UI.quick=localStorage.getItem('swi_quick')==='1'}catch(e){}
-function quickOn(r){return !!UI.quick&&r>=2}
+function quickOn(r){return !!UI.quick&&r>=2&&!(G&&G.tut)}
 function setQuick(v){UI.quick=!!v;try{localStorage.setItem('swi_quick',v?'1':'0')}catch(e){}}
 function phaseKey(ph){return {start:'event',event:'event',morale:'morale',prod:'prod',plan:'plan',act:'act',actdone:'act',weather:'weather',night:'night'}[ph]||'event'}
 function beatPhase(b){return b.kind==='daysum'?'done':b.kind==='intro'?null:b.kind==='over'?'over':phaseKey(b.phase)}

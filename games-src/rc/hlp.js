@@ -96,7 +96,7 @@ const HLP_RULES=[
 // ---------------------------------------------------------------- phases
 const hnet=()=>typeof NET!=='undefined'&&NET.on;
 // the phase the player is deciding in (null when there is nothing to decide)
-function hlpPhase(){try{if(!G||typeof UI==='undefined'||UI.modal||G.over||hnet()||allAI())return null;
+function hlpPhase(){try{if(!G||G.tut||typeof UI==='undefined'||UI.modal||G.over||hnet()||allAI())return null;
   if(storyActive()){const i=storyIdx();if(i<0)return null;const b=UI.beats[i];const last=i>=UI.beats.length-1;
     if(last&&humanQ()){if(BF.on&&typeof PHO!=='undefined'&&PHO.on&&BF.posQ())return 'place';return G.q.kind==='dice'?'dice':'choice'}
     if(b.kind==='intro')return 'intro';if(b.kind==='daysum')return 'daysum';return null}
@@ -143,7 +143,7 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   for(const [sel,pos] of [['#hlpset',null],['#rulesd .gx-drawer-head','afterend']]){const e=document.querySelector(sel);if(!e)continue;
     if(!pos)e.innerHTML=GXH.settingsHTML();else{const d=document.createElement('div');d.className='hlp-rules-set';d.innerHTML=GXH.settingsHTML();e.insertAdjacentElement(pos,d)}}}
 // no bubble while something else is open on top of the island (a pop-up, a drawer, the start or end screen)
-const hlpBusy=()=>!!(!G||UI.modal||G.over||(typeof GX!=='undefined'&&GX.open)||(typeof PHO!=='undefined'&&(PHO.pop||PHO.zoom)));
+const hlpBusy=()=>!!(!G||G.tut||UI.modal||G.over||(typeof GX!=='undefined'&&GX.open)||(typeof PHO!=='undefined'&&(PHO.pop||PHO.zoom)));
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||!G)return;
   if(UI.guide&&UI.guide.on&&!UI.guide.kit){UI.guide.kit=1;GXH.setEnabled(true);GXH.reset()}   // the guided game: every bubble again
   GXH.phase(hlpBusy()?null:hlpPhase())}
