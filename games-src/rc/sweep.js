@@ -13,7 +13,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
  await ctx.route('**/*',r=>new URL(r.request().url()).host==='swi.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));const tag=`${W}x${H} seed ${seed}`;const tipsOn=seed%5!==4;const prob=m=>{bad++;console.log(tag,'PROBLEM',m)};
  await p.goto('https://swi.test/');await p.waitForTimeout(900);
- await p.evaluate(([s,sc,tips])=>{try{localStorage.clear()}catch(e){}GXH.reset();GXH.setEnabled(tips);setSeed(s);AIDELAY=0;UI.speed=8;try{setGfx('low')}catch(e){}UI.setup.scen=sc;render()},[seed,SC[seed%4],tipsOn]);
+ await p.evaluate(([s,sc,tips])=>{try{localStorage.clear();localStorage.setItem('swi_tutoffer','1')}catch(e){}GXH.reset();GXH.setEnabled(tips);setSeed(s);AIDELAY=0;UI.speed=8;try{setGfx('low')}catch(e){}UI.setup.scen=sc;render()},[seed,SC[seed%4],tipsOn]);
  await p.tap('[data-a=start]');await p.waitForTimeout(1200);
  const innerWidthOf=w=>w;
  // ---- help kit checks

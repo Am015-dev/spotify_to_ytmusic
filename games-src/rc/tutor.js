@@ -59,7 +59,7 @@ function tutSteps(){return [
  {id:'threat',title:'A threat',say:'The card left a threat at camp. Deal with it within two days, or it strikes.',target:tcamp,wait:null,
    beat:bKind(2,'event'),ready:tbeat(bKind(2,'event')),onNext:tutNext},
  {id:'fog',title:'Fog',say:'Fog covers this place: jobs there need one extra pawn, and a fogged camp makes nothing.',target:tpt(TUT_FOG,56),wait:null,
-   onEnter:()=>{try{G.map[TUT_FOG].fog=1;refresh()}catch(e){}},ready:()=>tplan(2)},
+   onEnter:()=>{try{G.map[TUT_FOG].fog=1;UI.sel=null;refresh()}catch(e){}},ready:()=>tplan(2)},
  {id:'build1',title:'Build',say:'Carpenter builds a shelter. Tap the camp.',target:()=>tcamp(),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.id===G.camp.pos},ready:()=>tplan(2)&&tcur()==='c0_0'},
  {id:'build2',title:'A shelter',say:'A shelter costs 2 wood and stops night wounds. Tap it.',target:()=>tutRow('build',o=>o.tgt&&o.tgt.k==='shelter'),
