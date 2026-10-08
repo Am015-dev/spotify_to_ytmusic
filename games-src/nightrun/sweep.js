@@ -1024,11 +1024,11 @@ async function storyTests(browser, cfg, full) {
       if (n === 1 || n === 6 || n === 13 || n === 16) await shot('play' + n);
       // reach the goal
       const swBefore = await ev(p, () => __mnr.NR.sw.length);
-      if (d.k === 'survive') await ev(p, v => { __mnr.G.bc = v * 4; }, d.v);
-      else if (d.k === 'kill') await ev(p, v => { __mnr.G.kills = v; }, d.v);
-      else if (d.k === 'score') await ev(p, v => { __mnr.G.score = v; }, d.v);
+      if (d.k === 'survive') await ev(p, () => { __mnr.G.dbar = __mnr.ST.len; });                       // a stage lasts as long as its song: jump the bar clock
+      else if (d.k === 'kill') await ev(p, () => { __mnr.G.kills = __mnr.ST.kv; __mnr.G.dbar = __mnr.ST.len; });
+      else if (d.k === 'score') await ev(p, () => { __mnr.G.score = __mnr.ST.sv; __mnr.G.dbar = __mnr.ST.len; });
       else {
-        await ev(p, l => { __mnr.G.bc = l * 4; }, d.lead);
+        await ev(p, () => { __mnr.G.dbar = __mnr.ST.lead; });
         if (!await waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 14000)) { await fail(p, t, 'story', 'boss/mini-boss of stage ' + n + ' never arrived'); continue; }
         const isMini = d.k === 'mini', bossSong = n === 6 || n === 9 || n === 16 ? 'boss' : n === 12 ? 'boss2' : null;
         if (n === 6) await shot('boss');
