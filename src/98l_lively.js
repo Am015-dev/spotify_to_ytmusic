@@ -13,9 +13,9 @@ const LV_d=k=>Math.max(0,TUNE.life*(k==null?1:TUNE[k]));
 // ---------- 1 · people and traffic near the player (60_city_build.js pedStep/hubRecycle read these)
 // pedestrians: re-placed 35-170 m around the player once they are 200 m away (was 120-380 m / 460 m in Frankfurt: 70 people over ~1 km² = none in view)
 function LV_pedFar(){const d=LV_d('lvPed');return d<=0?(CID==='fra'?460:260):(CID==='fra'?200:180)}
-function LV_pedPut(p){const d=LV_d('lvPed');if(d<=0){CID==='fra'?pedPlace(p,120,380):pedPlace(p,60,220);return}const i=LV_near(30,160,.7);if(i<0){pedPlace(p,35,170);p.yc=0;p.y=(RO.y||0)+40;return}const n=HUB.nodes[i];if(n.ab||!n.nb.length)return;p.a=i;p.b=n.nb[Math.floor(R()*n.nb.length)];p.t=R();p.dir=1;p.side=R()<.5?-1:1;p.jy=0;p.jv=0;p.spin=0;p.jx=p.jz=0;p.yc=0;p.y=(RO.y||0)+40}
+function LV_pedPut(p){const d=LV_d('lvPed');if(d<=0){CID==='fra'?pedPlace(p,120,380):pedPlace(p,60,220);return}if(p.cw)return;const c=LV_edges(30,160,R()<.7?.5:-2),E=c[0];if(!E){pedPlace(p,35,170);p.yc=0;p.y=(RO.y||0)+40;return}p.a=E.i;p.b=E.bi;p.t=E.s/E.L;p.dir=1;p.side=R()<.5?-1:1;p.jy=0;p.jv=0;p.spin=0;p.jx=p.jz=0;p.yc=0;p.y=(RO.y||0)+40}
 // a street node min-max m away, in front of the car (±60°) with probability pa
-function LV_near(min,max,pa){const fx=Math.sin(RO.h),fz=Math.cos(RO.h),want=R()<pa;let i=-1;for(let k=0;k<8;k++){i=hubNear(min,max,false);if(i<0)return -1;if(!want)return i;const n=HUB.nodes[i],dx=n.x-RO.x,dz=n.z-RO.z;if(dx*fx+dz*fz>Math.hypot(dx,dz)*.5)return i}return i}
+function LV_near(min,max,pa){const c=LV_ahead(min,max,R()<pa?.5:-2);return c.length?c[0]:-1}
 // active pedestrians: 70 at 1, up to PED_N (110) at 1.6; knob 0 = the v88i 70, spread over the city
 function LV_pn(n){return Math.min(n,LV_walk(n)+(LV.cl?LV_crowdN():0))}
 // wave: arms up and waving when the car passes within 16 m (2 of 3 people), never while leaping
@@ -38,9 +38,8 @@ const LV_mat=()=>new THREE.MeshStandardMaterial({vertexColors:true,roughness:.45
 function LV_im(geo,n){const m=new THREE.InstancedMesh(geo,LV_mat(),Math.max(1,n));m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;for(let i=0;i<m.count;i++)m.setMatrixAt(i,_lvZ);HUB.grp.add(m);return m}
 const LV_set=(m,i,x,y,z,rx,ry,rz,s)=>{_lvE.set(rx,ry,rz,'YXZ');_lvQ.setFromEuler(_lvE);_lvM.compose(_lvP.set(x,y,z),_lvQ,_lvS.set(s,s,s));m.setMatrixAt(i,_lvM)};
 // a pavement spot near a street node: 'ahead' = in front of the car
-function LV_spot(min,max,ahead){const i=hubNear(min,max,false);if(i<0)return null;const N=HUB.nodes,A=N[i],B=N[A.nb&&A.nb.length?A.nb[0]:i];if(!A||!B||A.ab)return null;
-  if(ahead){const fx=Math.sin(RO.h),fz=Math.cos(RO.h),dx=A.x-RO.x,dz=A.z-RO.z;if(dx*fx+dz*fz<Math.hypot(dx,dz)*.3)return null}
-  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,t=R()*.8*L,sd=R()<.5?-1:1,off=(Math.min(A.w||20,B.w||20)/2)+(CID==='fra'?3.4:2.3);
+function LV_spot(min,max,ahead){const c=LV_edges(min,max,ahead?.3:-2),E=c[0];if(!E)return null;const N=HUB.nodes,A=N[E.i],B=N[E.bi];
+  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,t=E.s,sd=R()<.5?-1:1,off=(Math.min(A.w||20,B.w||20)/2)+(CID==='fra'?3.4:2.3);
   const x=A.x+dx*t-dz*off*sd,z=A.z+dz*t+dx*off*sd;return{x,z,y:Math.max(0,groundAt(x,z,(RO.y||0)+20))}}
 // ---------- 2 · birds: pigeon flocks (grey, on the pavement) + gulls (white, circling 26-40 m up). One body + one wing mesh for all.
 const LV_PF=6,LV_PB=7,LV_GF=3,LV_GB=4;
@@ -128,10 +127,22 @@ const LV_seen=(x,y,z)=>LV_seenF.containsPoint(_lvV.set(x,y+1,z));
 const LV_cwave=(i,d)=>d<40&&i%4!==0;
 function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')))}
 // a pavement corner beside a street node min-max m ahead (cone cos ≥ cmin), clear of buildings and other clusters
+// street nodes min-max m away inside the forward cone (cos ≥ cmin), shuffled (hubNear samples 18 random nodes of a 1.25 km square: almost never one 20-90 m away)
+function LV_ahead(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,L=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[];
+  for(const i of L){const n=N[i];if(!n)continue;const dx=n.x-RO.x,dz=n.z-RO.z,d2=dx*dx+dz*dz;if(d2<min*min||d2>max*max)continue;const d=Math.sqrt(d2);if((dx*fx+dz*fz)/d>=cmin)o.push(i)}
+  for(let k=o.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[o[k],o[j]]=[o[j],o[k]]}return o}
+// points every 10 m along the streets min-max m away inside the forward cone: {i,bi,s,L} (edge A→B, s m from A). Points within 26 m of a junction first (corners)
+const LV_eC={};
+function LV_edges(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_eC[key],st=(LV.fr||0)+'|'+Math.round(RO.x/10)+'|'+Math.round(RO.z/10);if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}
+  const L=LV_edges0(min,max,cmin);LV_eC[key]={st,L,r:0};return L}
+function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,Ls=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[],q=[];
+  for(const i of Ls){const A=N[i];if(!A||A.ab||A.g||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab||B.g)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<16)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;
+    for(let t=8;t<L-7;t+=10){const x=A.x+ux*t,z=A.z+uz*t,dx=x-RO.x,dz=z-RO.z,d2=dx*dx+dz*dz;if(d2<min*min||d2>max*max)continue;const d=Math.sqrt(d2);if((dx*fx+dz*fz)/d<cmin)continue;
+      const e=Math.min(t,L-t)<26&&(A.nb.length>=3&&t<26||B.nb.length>=3&&L-t<26);(e?o:q).push({i,bi,s:t,L})}}}
+  const sh=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};return sh(o).concat(sh(q))}
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
-  for(let k=0;k<14;k++){const i=hubNear(min,max,false);if(i<0)return null;const A=N[i];if(!A||A.ab||A.g||!A.nb||!A.nb.length)continue;const dx=A.x-RO.x,dz=A.z-RO.z,d=Math.hypot(dx,dz)||1;if((dx*fx+dz*fz)/d<cmin)continue;
-    if(A.nb.length<3&&k<7)continue;const bi=A.nb[Math.floor(R()*A.nb.length)],B=N[bi];if(!B||B.ab||B.g)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<16)continue;
-    const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=Math.min(L*.5,W/2+5+R()*7),off=W/2+(fra?4.6:3.5);
+  const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
+    const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=W/2+(fra?4.6:3.5);
     const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;
     const y=groundAt(x,z,(RO.y||0)+20);if(!(y>-1)||Math.abs(y-(RO.y||0))>14)continue;if(roamHit(x,z,1.8,y+.5)||roamHit(x-uz*sd*2,z+ux*sd*2,1.2,y+.5))continue;
     return{x,z,y:Math.max(0,y),h:Math.atan2(uz*sd,-ux*sd),ux,uz,sd,W,a:i,b:bi,al,L}}return null}
@@ -194,9 +205,8 @@ function LV_parkStep(){const C=HUB.cars;if(!C||!C.length)return;const want=Math.
 function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // take a car the player cannot see (behind or > 200 m), park it on a street ahead, never on top of a cluster
   let cand=null;for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))cand=c}
-  if(!cand)return;for(let k=0;k<10;k++){const i=hubNear(far?30:70,far?100:130,false);if(i<0)return;const A=N[i];if(!A||A.ab||A.g||!A.nb.length)continue;const dx=A.x-RO.x,dz=A.z-RO.z,d=Math.hypot(dx,dz)||1;if((dx*fx+dz*fz)/d<.6)continue;
-    const bi=A.nb[Math.floor(R()*A.nb.length)],B=N[bi];if(!B||B.ab||B.g)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<30)continue;const W=Math.min(A.w||20,B.w||20);if(W<9)continue;
-    const t=.3+R()*.4,lane=(W/2+.3)/W,x=A.x+(B.x-A.x)*t-(B.z-A.z)/L*lane*W,z=A.z+(B.z-A.z)*t+(B.x-A.x)/L*lane*W;
+  if(!cand)return;const nd=LV_edges(far?30:70,far?100:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>14);for(let k=0;k<Math.min(10,nd.length);k++){const E=nd[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L,W=Math.min(A.w||20,B.w||20);if(W<9)continue;const d=Math.hypot(A.x+(B.x-A.x)*E.s/L-RO.x,A.z+(B.z-A.z)*E.s/L-RO.z);
+    const t=E.s/L,lane=(W/2+.3)/W,x=A.x+(B.x-A.x)*t-(B.z-A.z)/L*lane*W,z=A.z+(B.z-A.z)*t+(B.x-A.x)/L*lane*W;
     if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;if(roamHit(x,z,1.4,groundY(x,z)+.5))continue;
     if(!far&&LV_seen(x,0,z)&&d<90)continue;
     Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:i,b:bi,t,lane,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;return}}
