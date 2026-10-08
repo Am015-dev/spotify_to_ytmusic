@@ -1,0 +1,37 @@
+shot 00_start
+NO #g9Col .g9Card[data-gc="t_su|car"] img
+t_su card 1 mesh gb 7 sel t_su parts 64
+shot t_su_garage
+shot t_su_build
+t_su build bricks 64 base cells 124
+NO #g9Col .g9Card[data-gc="t_su_mid|car"] img
+t_su_mid card 1 mesh gb 7 sel t_su_mid parts 64
+shot t_su_mid_garage
+shot t_su_mid_build
+t_su_mid build bricks 64 base cells 124
+NO #g9Col .g9Card[data-gc="t_su_gt|car"] img
+t_su_gt card 1 mesh gb 7 sel t_su_gt parts 63
+shot t_su_gt_garage
+shot t_su_gt_build
+t_su_gt build bricks 63 base cells 124
+NO #g9Col .g9Card[data-gc="t_su_wide|car"] img
+t_su_wide card 1 mesh gb 7 sel t_su_wide parts 79
+shot t_su_wide_garage
+shot t_su_wide_build
+t_su_wide build bricks 79 base cells 136
+NO #g9Col .g9Card[data-gc="t_su_sky|car"] img
+t_su_sky card 1 mesh gb 7 sel t_su_sky parts 63
+shot t_su_sky_garage
+shot t_su_sky_build
+t_su_sky build bricks 63 base cells 124
+NO #g9Col .g9Card[data-gc="t_su_pink|car"] img
+t_su_pink card 1 mesh gb 7 sel t_su_pink parts 60
+shot t_su_pink_garage
+shot t_su_pink_build
+t_su_pink build bricks 60 base cells 124
+NO #g9Col .g9Card[data-gc="t_su_v8|car"] img
+t_su_v8 card 1 mesh gb 7 sel t_su_v8 parts 79
+shot t_su_v8_garage
+shot t_su_v8_build
+t_su_v8 build bricks 79 base cells 136
+errs 0 []

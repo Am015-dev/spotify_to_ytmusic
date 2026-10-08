@@ -67,7 +67,7 @@ Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next r
 | `TUNE.fvDec` Followed car: braking | 4 m/s² | they brake this hard before a corner |
 | `TUNE.fvBlink` Followed car: blinkers | ON | amber blinkers on the side of a turn < 3 s ahead |
 
-## Life knobs (v88m lively, `src/98l_lively.js`): world life
+## Life knobs (v88n lively, `src/98l_lively.js`): world life
 Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (people and traffic spread over the whole city, nothing moving, pastel facades after a reload).
 | knob | default | what it does |
 |---|---|---|

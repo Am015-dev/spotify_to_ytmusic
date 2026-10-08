@@ -1,7 +1,7 @@
 # HANDOFF lively (alex/od-lively, PR #73 draft → base alex/od-bigcars)
 
 ## State (2026-10-08)
-- Base: v88i (5892dc26). Commit 575e3b9d holds the code; the version is v88m (provisional; the coordinator assigns the final one).
+- Base: v88i (5892dc26). Commit 575e3b9d holds the code; the version is v88n (provisional; the coordinator assigns the final one).
 - Code: new `src/98l_lively.js` (in ORDER after 98bc). `60_city_build.js` changes: PED_N 110, and pedInit/pedStep/hubRecycle call LV_pedPut, LV_pedFar, LV_pn, LV_wave, LV_trFar and LV_trNear. `10_core.js`: Life defaults in TUNE plus the changelog entry. `99t_tune.js`: the 'Life' knob group. `99c_checklist.js`: 8 checklist items. `src/assets/tune.json` and `docs/TUNE.md`.
 - Research and evidence: `docs/research/LIVELY_2K.md`. Before shots: `lv/before/*`, taken on the real v88i. After shots: `lv/after3/*` (final) and `lv/feat/sheet.png` (close-ups).
 - Tools:

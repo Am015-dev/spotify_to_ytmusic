@@ -1,4 +1,4 @@
-# Lively world: LEGO 2K Drive vs Mainhattan Overdrive (v88m, 2026-10-08)
+# Lively world: LEGO 2K Drive vs Mainhattan Overdrive (v88n, 2026-10-08)
 
 Alex: "in general we need to make the game more lively, it's quite boring and repetitive, check how 2K Drive looks and make it more lively".
 Older research (biomes, HUD, reference images): `LEGO2K_RESEARCH.md`. This file covers only what makes the world feel alive.
@@ -48,7 +48,7 @@ Why it reads as boring and repetitive (causes, with evidence):
 3. **Same pale blocks.** Frankfurt tints are near-white pastels on the same Kenney models, so districts look alike; Athens is white-on-white.
 4. Big empty asphalt and lawns (the DR change rightly removed road clutter; lesson 5), so the life has to come from the pavements, the sky and the water.
 
-## What we changed (v88m), life not clutter
+## What we changed (v88n), life not clutter
 | # | change | cost |
 |---|---|---|
 | 1 | Pedestrians and traffic stay within sight: people re-placed 35-170 m around you once 200 m away (110 pool, 70 active at 1×); traffic cars past 300 m are moved to streets 100-260 m around you, half in front. Pavement minifigs wave both arms as you pass (2 of 3). | same draw calls, same pools |

@@ -1,4 +1,4 @@
-// ===== LV (lively, v88m): Alex "the game is quite boring and repetitive, check how 2K Drive looks and make it more lively". Research + before/after: docs/research/LIVELY_2K.md
+// ===== LV (lively, v88n): Alex "the game is quite boring and repetitive, check how 2K Drive looks and make it more lively". Research + before/after: docs/research/LIVELY_2K.md
 // Measured on v88i (5 Frankfurt + 5 Athens street spots, 852×393): 0-1 pedestrians and 0 traffic cars in view, nothing moving, pastel facades.
 // Life, not clutter (lesson 5): nothing new stands on a drivable surface except pigeons that fly off before the car arrives.
 //  1 · pedestrians and traffic kept near the player (same pools, placed within sight instead of spread over the whole city); pavement minifigs wave as you pass
@@ -16,8 +16,8 @@ function LV_pedFar(){const d=LV_d('lvPed');return d<=0?(CID==='fra'?460:260):(CI
 function LV_pedPut(p){const d=LV_d('lvPed');if(d<=0){CID==='fra'?pedPlace(p,120,380):pedPlace(p,60,220);return}const i=LV_near(30,160,.7);if(i<0){pedPlace(p,35,170);p.yc=0;p.y=(RO.y||0)+40;return}const n=HUB.nodes[i];if(n.ab||!n.nb.length)return;p.a=i;p.b=n.nb[Math.floor(R()*n.nb.length)];p.t=R();p.dir=1;p.side=R()<.5?-1:1;p.jy=0;p.jv=0;p.spin=0;p.jx=p.jz=0;p.yc=0;p.y=(RO.y||0)+40}
 // a street node min-max m away, in front of the car (±60°) with probability pa
 function LV_near(min,max,pa){const fx=Math.sin(RO.h),fz=Math.cos(RO.h),want=R()<pa;let i=-1;for(let k=0;k<8;k++){i=hubNear(min,max,false);if(i<0)return -1;if(!want)return i;const n=HUB.nodes[i],dx=n.x-RO.x,dz=n.z-RO.z;if(dx*fx+dz*fz>Math.hypot(dx,dz)*.5)return i}return i}
-// active pedestrians: 70 at 1, up to PED_N (110) at 1.6, 0 at 0
-function LV_pn(n){const k=Math.round(70*LV_d('lvPed'));return Math.max(0,Math.min(n,k))}
+// active pedestrians: 70 at 1, up to PED_N (110) at 1.6; knob 0 = the v88i 70, spread over the city
+function LV_pn(n){if(TUNE.life<=0||TUNE.lvPed<=0)return Math.min(n,70);const k=Math.round(70*LV_d('lvPed'));return Math.max(0,Math.min(n,k))}
 // wave: arms up and waving when the car passes within 16 m (2 of 3 people), never while leaping
 const LV_wave=(i,d,sp)=>TUNE.lvWave&&LV_d('lvPed')>0&&d<16&&sp>4&&i%3!==0;
 // traffic: cars further than 300 m are moved to streets 100-260 m around, half of them ahead (was 650 / 480 m → 180-480 m, behind)
