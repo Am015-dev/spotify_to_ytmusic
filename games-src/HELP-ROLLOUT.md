@@ -34,3 +34,11 @@ staged never-saved mode (fixed seed, scripted computer), steps in rule order tea
 Story routes through it on first tap, menu "Tutorial" replay, tutor-test.js (390x763, 375x553, rotation, leave/return, skip, fresh Story run).
 Final Approach: its learn-by-chapters ladder is in progress; its Chapter 0 should teach the full cockpit staged.
 - Shelf filter: when a game gets its staged tutorial or lightbulb help, add its shelf id to TUTOR / HELP in games/index.html (orchestrator does this after reviewing).
+
+## Tutorial sessions running (8 Oct 2026, owner asked for all at once)
+final-approach session_015NDv9ESdPrEJTnfJKUDLtw · shipwreck-isle session_01VUNYo8922FwbNpyjiQhmv1 · hollowbough session_01NHtss5aHd9P92NSQAUmhf8 ·
+doorkick-dungeon session_016aP8q2iPCJLmH9jc27qUYR · sands-of-qamar session_018TBPe79x2EBEQueToqiwVX · rampart-and-vine session_01SWdevsDjN31VGnnVmswCyQ ·
+kaiten-kitchen session_01RtUPEgsfBFVT1S3WytVrkb · crown-city-smash session_01WwNGprwPu21nGLqgUVJ5Lr · short-fuse session_016Auy9sxZudGktJP9a1gjhq ·
+lantern-dive session_01JNYcvB65KFqwqBugP7sUYb · tidewake session_01JSeGDLjZpiUbouwyyZjYub · nebula-aces (+help kit) session_01R72ukY9Q1iKMGFnDSF2qsE ·
+sunglaze (+help kit) session_01WKGyjovMLeQZkFosF8UXSi · cauldron-fair (+help kit) session_01UDfNVi8Lw1ni5sYyBTZRp1.
+Orchestrator: check each with get_session on every owner message; review tutor-*.png; add the shelf id to TUTOR/HELP in games/index.html.
