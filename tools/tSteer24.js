@@ -54,7 +54,11 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
    const turnsM=[];for(const t of T){const kx=Math.round((t.s+15)/2);const i0=pr.findIndex(q=>q.k>=kx);if(i0<0)continue;const n3=Math.min(S.length,i0+3*FPS);let flips=0,sg=0,over=0;const dir=Math.sign(t.ang);
      for(let i=i0;i<n3;i++){const e=pr[i].e;if(Math.abs(e)>.052){const g=Math.sign(e);if(sg&&g!==sg)flips++;sg=g}const yr=S[i][4];if(i<i0+1.5*FPS&&Math.sign(yr)===-dir)over=Math.max(over,Math.abs(yr))}
      let set=4;for(let i=i0;i<Math.min(S.length,i0+4*FPS);i++){let ok=true;for(let k=i;k<Math.min(S.length,i+Math.round(.5*FPS));k++)if(Math.abs(pr[k].e)>.07){ok=false;break}if(ok){set=(i-i0)*DT;break}}
-     turnsM.push({ang:t.ang,v:+(Math.abs(S[i0][3])*3.6).toFixed(0),flips,over:+(over*57.3).toFixed(1),settle:+set.toFixed(2)})}
+     // settleAim (drive24b): same hold rule, but the heading error is to the driver's aim point (look-ahead 10 + 0.7 v m on the route),
+     // so it measures how fast the car points where the driver wants, without the lane offset the route centre line adds
+     const aimE=i=>{const q=S[i],v=Math.max(0,q[3]),ka=Math.min(P.length-1,pr[i].k+Math.round((10+.7*v)/2));return ad(Math.atan2(P[ka][0]-q[0],P[ka][1]-q[1])-q[2])};
+     let setA=4;for(let i=i0;i<Math.min(S.length,i0+4*FPS);i++){let ok=true;for(let k=i;k<Math.min(S.length,i+Math.round(.5*FPS));k++)if(Math.abs(aimE(k))>.07){ok=false;break}if(ok){setA=(i-i0)*DT;break}}
+     turnsM.push({ang:t.ang,v:+(Math.abs(S[i0][3])*3.6).toFixed(0),flips,over:+(over*57.3).toFixed(1),settle:+set.toFixed(2),settleAim:+setA.toFixed(2)})}
    // hits (speed drop > 25 % in 6 frames from > 6 m/s, not braking, near a collider) and lane departures (entries off the road)
    let hits=0,lh=-99,dep=0,offF=0;for(let i=6;i<S.length;i++){const v=Math.abs(S[i][3]),vm=Math.max(...S.slice(i-6,i).map(q=>Math.abs(q[3])));if(!S[i][6]&&vm>6&&v<vm*.75&&i-lh>36){lh=i;hits++}if(S[i][5]&&!S[i-1][5])dep++;offF+=S[i][5]}
    // yaw-rate sign flips per km on straight bits (no route turn within 40 m)
@@ -74,7 +78,7 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
  console.log('t90',JSON.stringify(res.t90));
  // ---- summary
  const all=res.runs.flatMap(r=>r.turns),mins=res.runs.reduce((a,r)=>a+r.sec,0)/60;const avg=a=>a.length?+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2):null;const pct=(a,q)=>{a=a.slice().sort((x,y)=>x-y);return a.length?a[Math.floor((a.length-1)*q)]:null};
- res.sum={turns:all.length,flipsAvg:avg(all.map(t=>t.flips)),flipsP90:pct(all.map(t=>t.flips),.9),turnsWith2plusFlips:all.filter(t=>t.flips>=2).length,overAvgDeg:avg(all.map(t=>t.over)),settleAvg:avg(all.map(t=>t.settle)),settleP90:pct(all.map(t=>t.settle),.9),
+ res.sum={turns:all.length,flipsAvg:avg(all.map(t=>t.flips)),flipsP90:pct(all.map(t=>t.flips),.9),turnsWith2plusFlips:all.filter(t=>t.flips>=2).length,overAvgDeg:avg(all.map(t=>t.over)),settleAvg:avg(all.map(t=>t.settle)),settleP90:pct(all.map(t=>t.settle),.9),settleAimAvg:avg(all.map(t=>t.settleAim)),
   hitsPerMin:+(res.runs.reduce((a,r)=>a+r.hits,0)/mins).toFixed(2),depPerMin:+(res.runs.reduce((a,r)=>a+r.dep,0)/mins).toFixed(2),offPct:avg(res.runs.map(r=>r.offPct)),yawFlipsPerKmStraight:avg(res.runs.map(r=>r.yawFlipsPerKmStraight)),done:res.runs.filter(r=>r.done).length+'/'+res.runs.length,
   pulseFlips:avg(res.pulse.map(q=>q.flips)),pulseSettle:avg(res.pulse.map(q=>q.settle)),pulseOver:avg(res.pulse.map(q=>q.overshoot)),t90:avg(res.t90.map(q=>q.t)),errors:errs.length};
  fs.mkdirSync(path.dirname(OUT),{recursive:true});fs.writeFileSync(OUT,JSON.stringify(res,null,1));console.log('SUM',JSON.stringify(res.sum));if(errs.length)console.log('errors',errs.slice(0,4));await b.close()})();
