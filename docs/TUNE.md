@@ -67,6 +67,20 @@ Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next r
 | `TUNE.fvDec` Followed car: braking | 4 m/s² | they brake this hard before a corner |
 | `TUNE.fvBlink` Followed car: blinkers | ON | amber blinkers on the side of a turn < 3 s ahead |
 
+## Life knobs (v88n lively, `src/98l_lively.js`): world life
+Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (people and traffic spread over the whole city, nothing moving, pastel facades after a reload).
+| knob | default | what it does |
+|---|---|---|
+| `TUNE.life` World life (master) | 1 | scales everything below (0-2) |
+| `TUNE.lvPed` People near you × | 1 | 70 minifig pedestrians kept 30-160 m around you, 70 % placed in front (pool 110: 1.6 = all) |
+| `TUNE.lvWave` People wave as you pass | ON | 2 of 3 pavement minifigs wave both arms when you pass within 16 m |
+| `TUNE.lvTraf` Traffic near you | ON | traffic cars further than 300 m are moved to streets 100-260 m around you, half of them in front (OFF = v88i: 650/480 m → 180-480 m) |
+| `TUNE.lvBird` Pigeons + gulls × | 1 | 6 pigeon flocks (7 birds) on the pavement ahead that scatter when you come within 22 m; 3 gull flocks circling 26-40 m up |
+| `TUNE.lvFlag` Rooftop flags × | 1 | 36 flags on the nearest roofs (9-60 m up) within 380 m; next city load |
+| `TUNE.lvBlimp` Blimp in the sky | ON | a 46 m LEGO blimp circling each city at 150 m |
+| `TUNE.lvBoat` Boats on the Main × | 1 | 5 LEGO cruisers on the Main (Frankfurt), pushed-off hull like a glancing hit; next city load |
+| `TUNE.lvFac` Bold LEGO facade colours | 1 | mixes the district facade tints toward saturated LEGO colours (Athens at 0.6 ×, the white city stays white); next page load |
+
 ## Where the values live
 - Beta artifact (db capability): collection `tune_versions` holds one doc `v<N>` per version: `{v, note, values, createdAt}`. Doc `tune/current` holds `{v}`.
   On load the page reads `tune/current`, then `tune_versions/v<N>`, and applies its `values`. Nothing is written on load, only on SAVE and ★ SET.

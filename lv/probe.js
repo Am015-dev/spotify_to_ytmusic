@@ -1,0 +1,5 @@
+// lv/probe.js <url> <code-file> [ath]: enter roam (min gfx), run the code via __g9ev, print the result
+const enter=require('../bc/enter.js');const fs=require('fs');const URL=process.argv[2],code=fs.readFileSync(process.argv[3],'utf8'),CITY=process.argv[4]||'fra';
+(async()=>{const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`:`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))`;
+ const E=await enter(URL,{gfx:'min',seed});const {p,errs}=E;p.setDefaultTimeout(900000);await E.roamApi();await p.waitForTimeout(4000);
+ console.log(await p.evaluate(c=>{try{return String(__g9ev(c))}catch(e){return 'ERR '+e}},code));console.log('errors',errs.length,errs.slice(0,3).join(' | '));await E.b.close()})();
