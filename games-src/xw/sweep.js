@@ -63,7 +63,7 @@ async function newPage(b, W, H) {
   const p = await ctx.newPage(); p.setDefaultTimeout(90000); p.errs = [];
   p.on('pageerror', e => p.errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g/.test(m.text())) p.errs.push('console ' + m.text()); });
   await p.goto('file://' + FILE + '?phone=1'); await p.waitForSelector('[data-start]', { timeout: 30000 }); await p.waitForTimeout(1200);
-  await p.evaluate(() => { AIDELAY = 70; try { localStorage.clear() } catch (e) { } }); return p;
+  await p.evaluate(() => { AIDELAY = 70; try { localStorage.clear(); localStorage.setItem('na_played', '1'); localStorage.setItem('gxt-nebula-aces', JSON.stringify({ done: 1, open: 0, step: 0 })) } catch (e) { } }); return p;   // the first-time lesson offer and the story prologue are covered by tutor-test.js
 }
 // choose the next tap like a player would: the glowing / recommended control, sometimes another one
 async function choose(p, st, r) {
