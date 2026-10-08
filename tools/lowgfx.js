@@ -25,8 +25,23 @@ exports.contextOpts = (gfx, o) => {
   return { viewport: { width: w, height: h }, deviceScaleFactor: gfx === 'min' ? 1 : (o.dsf || 3), isMobile: true, hasTouch: true };
 };
 // the game derives its WebGL pixel ratio from devicePixelRatio (the only use of it); overriding it shrinks every buffer, CSS stays the same
-exports.initScript = gfx => gfx !== 'min' ? '' :
-  `(()=>{try{Object.defineProperty(window,'devicePixelRatio',{get:()=>${MIN_DPR},configurable:true})}catch(e){}})();`;
+exports.initScript = gfx => HOLD + (gfx !== 'min' ? '' :
+  `(()=>{try{Object.defineProperty(window,'devicePixelRatio',{get:()=>${MIN_DPR},configurable:true})}catch(e){}})();`);
+// Frame hold (any gfx): the game only counts a builder tap if pointerdown->pointerup is < 900 ms of wall time, but with 1-5 fps the
+// touch events queue behind slow frames, so down->up took 2-7 s. While __gfxHold is set, requestAnimationFrame callbacks are parked (nothing is
+// drawn, the main thread is idle, events arrive in ms); __gfxRelease re-schedules them. Real touch events, real handlers, nothing in the game changes.
+const HOLD = `(()=>{const raf=window.requestAnimationFrame.bind(window),parked=[];window.__gfxHold=false;
+ window.requestAnimationFrame=cb=>raf(t=>{if(window.__gfxHold)parked.push(cb);else cb(t)});
+ window.__gfxRelease=()=>{window.__gfxHold=false;for(const f of parked.splice(0))raf(f)}})();`;
+exports.HOLD = HOLD;
+// a tap on a slow box: hold frames, down + up back to back, release. cdp = page's CDP session.
+exports.tap = async (page, cdp, x, y) => {
+  await page.evaluate(() => { window.__gfxHold = true });
+  await page.evaluate(() => new Promise(r => setTimeout(r, 0)));      // let a frame already in flight finish
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 0 }] });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.evaluate(() => window.__gfxRelease && window.__gfxRelease());
+};
 // settings the game stores itself (SET in localStorage 'mho_set'): lowest quality tier, no dynamic-resolution surprises
 exports.seed = (page, gfx) => gfx !== 'min' ? Promise.resolve() :
   page.evaluate(s => { const k = 'mho_set'; let o = {}; try { o = JSON.parse(localStorage.getItem(k) || '{}') } catch (e) {} localStorage.setItem(k, JSON.stringify(Object.assign(o, s))) }, MIN_SET);
