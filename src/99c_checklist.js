@@ -3,12 +3,12 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
- {ver:'v88q',id:'sc-rides',text:'Garage RIDES → STREET: a SPEED SERIES row shows Time Coupe, Red Hypercar and Gold Formula; each looks like a LEGO Speed Champions car (8 studs wide, chunky, real parts).'},
- {ver:'v88q',id:'sc-drive',text:'Equip each of the 3 new cars, SAVE & DRIVE: all four tyres sit on the road and it handles like the other normal cars.'},
- {ver:'v88q',id:'sc-guide',text:'▶ GUIDE on each of the 3 new cars plays it step by step (chassis → wheels → nose → sides → cockpit → rear → wing).'},
- {ver:'v88q',id:'sc-traffic',text:'Drive around Frankfurt or Athens: you meet the grey Time Coupe and the red Hypercar in traffic. In a race, some rivals drive the new cars.'},
- {ver:'v88q',id:'sb-pal',text:'In the guide tap ✋ BUILD IT: the next part is already selected (highlighted) in the parts palette, in its colour, and scrolled into view.'},
- {ver:'v88q',id:'sb-onetap',text:'In BUILD IT, one tap on (or near) the green ghost places the part straight away; no second tap or PLACE needed.'},
+ {ver:'v88r',id:'sc-rides',text:'Garage RIDES → STREET: a SPEED SERIES row shows Time Coupe, Red Hypercar and Gold Formula; each looks like a LEGO Speed Champions car (8 studs wide, chunky, real parts).'},
+ {ver:'v88r',id:'sc-drive',text:'Equip each of the 3 new cars, SAVE & DRIVE: all four tyres sit on the road and it handles like the other normal cars.'},
+ {ver:'v88r',id:'sc-guide',text:'▶ GUIDE on each of the 3 new cars plays it step by step (chassis → wheels → nose → sides → cockpit → rear → wing).'},
+ {ver:'v88r',id:'sc-traffic',text:'Drive around Frankfurt or Athens: you meet the grey Time Coupe and the red Hypercar in traffic. In a race, some rivals drive the new cars.'},
+ {ver:'v88r',id:'sb-pal',text:'In the guide tap ✋ BUILD IT: the next part is already selected (highlighted) in the parts palette, in its colour, and scrolled into view.'},
+ {ver:'v88r',id:'sb-onetap',text:'In BUILD IT, one tap on (or near) the green ghost places the part straight away; no second tap or PLACE needed.'},
  {ver:'v88p',id:'life-crowds',text:'Drive 1 minute in Frankfurt and in Athens: at most street corners ahead you see a group of 3-6 people standing together; they turn to look, wave and hop as you come by.'},
  {ver:'v88p',id:'life-dodge',text:'Drive fast past a corner group: the people leap out of the way; nobody stands on the road.'},
  {ver:'v88p',id:'life-stalls',text:'You pass market stalls (striped awnings, fruit boxes) and café tables with umbrellas on the pavements. Drive into one: it bursts into bricks and studs; it does not stop you dead.'},

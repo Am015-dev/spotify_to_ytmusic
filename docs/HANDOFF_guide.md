@@ -14,11 +14,11 @@
 - Pattern: generator like SU_car, with st() step markers so the guide plays booklet order. Add to GAR_SETS (tpl:1), RIDES row, changelog/checklist.
 - Then make AI traffic + rivals use them (see 93_cars_lego.js LEGO traffic / CR_rivB).
 - Release: merge CURRENT live → tools/build.sh vXX → QUICK review → DEPLOY message to the coordinator (never deploy.sh).
-## v88q SPEED SERIES (this session, alex/od-supra on top of garux v88o 0560e1d4)
+## v88r SPEED SERIES (this session, alex/od-supra on top of garux v88o 0560e1d4)
 - 3 cars in src/98su_supra.js (SC_time 77256, SC_hyper 77261, SC_f1 77252), pushed into SU_T as fam 3 → RIDES row "🏆 SPEED SERIES", GAR_SETS, ▶ GUIDE steps.
 - Traffic: HCAR += su:t_sc_tm, su:t_sc_hy (Athens ATH_K too). Rivals: SC_RIV for the 6 base teams via a CR_rivB wrapper.
 - Guide: SB_pal (98sb) preselects the step's part + colour in the BUILD palette once per step. Checklist sb-pal + sb-onetap.
-- OD_CHANGELOG v88q + 6 checklist items (sc-*, sb-*). Research: docs/research/SUPRA.md "v88q SPEED SERIES".
+- OD_CHANGELOG v88r + 6 checklist items (sc-*, sb-*). Research: docs/research/SUPRA.md "v88r SPEED SERIES".
 - Shots: su/gar_q (garage per car), su/drive_q (F1 drive, side tyres), su/guide_q, look-dev su/th/t_sc_*.
 ## Reviewer PASS c7cfa776 (2026-10-08); DEPLOY v88l sent to the coordinator. Fix with the next release (not blocking):
 - (a) BUILD IT: preselect the step's part AND colour in the palette (strip still shows red defaults).

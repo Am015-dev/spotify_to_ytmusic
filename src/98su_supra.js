@@ -46,7 +46,7 @@ const SU_T=[
  {id:'t_su_sky',n:'Silver Night Tuner',tier:'e',ref:'76917',k:'Street tuner coupe',fam:2,car:()=>SU_car({B:'#a0a5a9',G:'#0055bf',H:'#0055bf',cab:'coupe',R:'#a0a5a9',rear:'wing',W:'#a0a5a9'}),st:{top:1.08,acc:1.05,han:1.04,hull:1}},
  {id:'t_su_pink',n:'Pink Roadster',tier:'r',ref:'77241',k:'Roadster',fam:2,car:()=>SU_car({B:'#e4adc8',G:'#f4f4f4',cab:'open',st:CR_K,R:CR_K}),st:{top:1.05,acc:1.06,han:1.05,hull:.98}},
  {id:'t_su_v8',n:'Black Gold V8',tier:'l',ref:'77262',k:'Gymkhana muscle car',fam:2,car:()=>SU_car({B:CR_K,G:'#a0a5a9',A:CR_K,wide:1,F:CR_K,wh:'wLG',eng:1,cab:'coupe',R:CR_K,rear:'spoiler',W:CR_K,st:'#f4f4f4'}),st:{top:1.06,acc:1.08,han:1.03,hull:1.04}}];
-// ---- SC (v88q): Speed Champions companion sets of the 77260 booklet (p3), verified online 2026-10-08 (docs/research/SUPRA.md):
+// ---- SC (v88r): Speed Champions companion sets of the 77260 booklet (p3), verified online 2026-10-08 (docs/research/SUPRA.md):
 // 77256 time machine car (357 pcs: flux capacitor, cables along the sides, rear vents + exhausts, reactor on the rear deck), 77261 endurance hypercar (329 pcs: low cockpit,
 // big roof air intake, rear wing + fin, yellow stripe over the roof and down the sides, white headlights, red driver suit), 77252 movie F1 car (268 pcs: black + pearl gold, open wheels).
 // Same 8-wide chassis + builder parts as SU_car; each emits booklet-like steps (A.steps) for the ▶ BUILD GUIDE. Wheelbase 10 studs, ≤ 10 wide, ≤ 18 long → default handling.
@@ -103,7 +103,7 @@ function SU_rows(){const G=$('#g9Col .g9Grid');if(!G||G9C.type!=='car'||G9C.sort
  const S3=SU_T.filter(T=>T.fam===3).map(T=>card(T.id)).filter(Boolean);if(S3.length){G.insertBefore(hd('🏆 SPEED SERIES','movie and race cars'),first);for(const c of S3)G.insertBefore(c,first)}G.insertBefore(rest,first)}
 GAR_tab=(f=>function(){f();try{SU_rows()}catch(e){}})(GAR_tab);
 {const st=document.createElement('style');st.textContent=`#g9Col .suHd{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;padding:6px 2px 0;color:#fff}#g9Col .suHd b{font:900 13px system-ui;letter-spacing:.04em}#g9Col .suHd small{font:700 12px system-ui;color:#8fb3c7}`;document.head.appendChild(st)}
-// ---- SC traffic + rivals (v88q): the two road cars join city traffic (own liveries; 'su:' kinds are built by CR_cityGeo from SU_T);
+// ---- SC traffic + rivals (v88r): the two road cars join city traffic (own liveries; 'su:' kinds are built by CR_cityGeo from SU_T);
 // the 6 base racing teams drive Speed-Champions-style cars that match their team colours (story rivals v_* keep their own machines)
 HCAR.push('su:t_sc_tm','su:t_sc_hy');if(CID!=='fra')ATH_K.push(HCAR.length-2,0,HCAR.length-1,0);
 const SC_RIV={kronos:SC_f1,nordend:()=>SU_car({B:SU_O,rear:'wing'}),ostend:()=>SU_car({B:'#1b2a34',G:'#8a12a8',W:'#1b2a34',A:'#1b2a34',H:'#8a12a8',st:'#8a12a8',rear:'wing'}),
