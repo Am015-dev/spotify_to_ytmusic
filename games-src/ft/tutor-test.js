@@ -1,5 +1,5 @@
 // Tutorial test: plays the staged tutorial through the REAL page with touch taps, doing exactly what every step asks.
-//   node tutor-test.js [sizes=390x763,375x553]        Exit code 1 on any problem.
+//   node tutor-test.js [sizes=390x763,375x553] [only=clean,rotate,leave,skip,offer,story]        Exit code 1 on any problem.
 // Runs: a clean run per size; at the first size also a rotation run (portrait -> landscape -> portrait), a "leave and come back" run, a Skip run
 // (a saved game must survive untouched), a fresh-profile Story run (Chapter 0, then "Start chapter 1", then Story goes to the chapter map) and
 // the "New here?" offer when a first-time player taps Play.
@@ -198,7 +198,8 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
   const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'offer']);jobs.push([W0,H0,'story']);if(SIZES[1])jobs.push([SIZES[1][0],SIZES[1][1],'story']);
-  for(const j of jobs){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
+  const ONLY=process.argv[3]?process.argv[3].split(','):null;
+  for(const j of jobs){if(ONLY&&!ONLY.includes(j[2]))continue;guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();
   console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'step ids',totals.ids.join(','));
   console.log(probs.length?'PROBLEMS '+probs.length+'\n  '+probs.join('\n  '):'PROBLEMS 0');process.exit(probs.length?1:0)})();
