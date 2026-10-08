@@ -15,8 +15,8 @@ function campStart(def){const s=def.setup||{},op=def.opponent||{},opens=def.twis
   UI.camp=def;UI.lastOpts={camp:def,np:2,seats,lv,names,ex:s.ex||{},seed:s.seed};
   beginGame(UI.lastOpts);if(def.hints&&typeof GXH!=='undefined'){GXH.setEnabled(true);GXH.reset()}campTwist(def);refresh();UI.stepKey='';render()}
 function campFinish(){try{const c=UI.camp;const p=GXC.finish(G);UI.camp=null;return p}catch(e){console.error(e);UI.camp=null}}
-function campOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;GXC.open()}
+function campOpen(){if(typeof storyOpen==='function')storyOpen();else if(typeof GXC!=='undefined'&&window.CAMPAIGN)GXC.open()}
 (function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'rampart',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'rampart',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit:()=>{UI.camp=null;showStart()},scores:g=>g.pl.map(p=>p.score),
     seats:g=>g.pl.map((p,i)=>({name:p.human?'You':p.nm,me:p.human,ai:p.human?undefined:p.lv}))})})();

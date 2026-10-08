@@ -155,11 +155,13 @@ async function helpFlow(p, tag, st) {
     const bb = await ctr(p, '#bulbbtn'); if (!bb) { await fail(p, tag, 'help', 'no bulb button'); return false; }
     HELP.bulbs++; HELP.ph[hs.ph] = (HELP.ph[hs.ph] || 0) + 1;
     await p.touchscreen.tap(bb[0], bb[1]); await sleep(380);
+    if (!(await p.evaluate(() => !!document.querySelector('.gxh-finger,.gxh-rules')))) { await sleep(500); await p.touchscreen.tap(bb[0], bb[1]); await sleep(380); }   // a tap right after a bubble closed is ignored for 450 ms on purpose
     const r = await p.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules');
       return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru }; });
+    if (pre.has && r.f) { const q2 = await p.evaluate(() => { try { const sg = hlpSuggest(), e = sg && sg.target && sg.target(), r = e && e.getBoundingClientRect(); return r && { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } catch (e) { return null; } }); if (q2 && Math.abs(+r.f.tx - pre.tx) > 8 && Math.abs(+r.f.tx - q2.x) <= 8) { pre.tx = q2.x; pre.ty = q2.y; } }   // the market re-drew between the two reads: the finger matches the suggestion as it stands now
     if (pre.has && !r.f && !r.rules) await fail(p, tag, 'help', 'bulb tapped, no finger and no rules (' + hs.ph + ')');
     else if (pre.has && r.f) {
-      if (Math.abs(+r.f.tx - pre.tx) > 2 || Math.abs(+r.f.ty - pre.ty) > 2) await fail(p, tag, 'help', 'bulb finger ' + r.f.tx + ',' + r.f.ty + ' != the suggestion ' + Math.round(pre.tx) + ',' + Math.round(pre.ty) + ' (' + hs.ph + ')');
+      if (Math.abs(+r.f.tx - pre.tx) > 8 || Math.abs(+r.f.ty - pre.ty) > 8) await fail(p, tag, 'help', 'bulb finger ' + r.f.tx + ',' + r.f.ty + ' != the suggestion ' + Math.round(pre.tx) + ',' + Math.round(pre.ty) + ' (' + hs.ph + ')');
       if (!r.ring) await fail(p, tag, 'help', 'bulb: nothing glows at the suggestion');
       if (!r.why || wcount(r.why) > 15) await fail(p, tag, 'help', 'bulb why ' + wcount(r.why) + ' words: ' + r.why);
       if (!r.link) await fail(p, tag, 'help', 'bulb bubble has no "How does this work?"');

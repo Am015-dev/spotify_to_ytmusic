@@ -2,7 +2,7 @@
 // G is plain JSON. Every change goes through performMove(). Engine steps waiting to run sit on the agenda G.ag as {h,d}
 // (handler key + data, never closures); a pending question (a choice, an interrupt, a bonus swap) is G.q={who,kind,title,opts:[{l,h,d}]}
 // and is answered with the move {a:'q',i}. Cards are ints: 0-55 currents, 56 Rift Gate, 57-61 Deck Cannons. Leviathan ids: 0-9, 10 Rogue Wave, 11 Maelstrom.
-var ANIM=1,AIDELAY=500,DEFSEED=null;const SAVE='tidewake_save1';
+var ANIM=1,AIDELAY=500,DEFSEED=null,TUT=null;   // TUT: the staged tutorial's dice script (kind,arg)=>value|null; null = real diceconst SAVE='tidewake_save1';
 let G=null;const UI={sim:0};
 function rnd(n){let t=(G.rng=(G.rng+0x6D2B79F5)|0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
@@ -132,10 +132,10 @@ AG.arrFinal=d=>{const a=G.arr;if(!a)return;G.arr=null;
 function removeMon(id,why){const m=monById(id);if(m)G.mons.splice(G.mons.indexOf(m),1);if(G.arr&&G.arr.id===id)G.arr=null;if(why==='cannon')G.mdeck.push(id);else G.mgone.push(id)}
 AG.roll=d=>{if(G.opts.noMon)return;
   if(G.refill){G.refill=false;stat('refill');lg('The sea restores its leviathans; no monster roll this turn.');now('fill',{});now('check',{clear:1});return}
-  const a=d6(),b=d6();G.dice=[a,b];const t=a+b;lg(`${G.seats[G.cur].nm} rolls ${a}+${b}=${t}.`);
+  const tv=TUT&&TUT('roll');const a=tv?tv[0]:d6(),b=tv?tv[1]:d6();G.dice=[a,b];const t=a+b;lg(`${G.seats[G.cur].nm} rolls ${a}+${b}=${t}.`);
   if(t>=6&&t<=8){stat('monRoll');now('monList',{})}else{stat('calmRoll');if(G.mons.some(m=>m.k==='M'))now('mael',{})}};
 AG.monList=d=>{G.mq=G.mons.filter(m=>m.k==='L').map(m=>m.id).sort((a,b)=>LEV[a].order-LEV[b].order||LEV[b].gold-LEV[a].gold||a-b);now('monStep',{});now('afterMon',{})};
-AG.monStep=d=>{while(G.mq.length&&!monById(G.mq[0]))G.mq.shift();if(!G.mq.length)return;const id=G.mq.shift();now('monAct',{id,die:d6()});now('monStep',{})};
+AG.monStep=d=>{while(G.mq.length&&!monById(G.mq[0]))G.mq.shift();if(!G.mq.length)return;const id=G.mq.shift();now('monAct',{id,die:(TUT&&TUT('mon',id))||d6()});now('monStep',{})};
 AG.monAct=d=>{const m=monById(d.id);if(!m)return;
   if(d.die===6){stat('spawn6');lg(`${levName(m.id)} stays put: a new leviathan rises instead.`);now('spawn',{});return}
   const a=LEV[m.id].arr[d.die-1];
@@ -162,7 +162,7 @@ function waveSlot(s){const w=G.wave;if(!w||w.owner!==s||G.turn+1<=w.pt)return fa
   w.x+=DIR[w.r][0];w.y+=DIR[w.r][1];w.n++;stat('waveMove');
   if(!inB(w.x,w.y)){G.wave=null;G.mgone.push(WAVE_ID);stat('waveOff');lg('The Rogue Wave breaks on the far shore and is gone.');return true}
   lg(`The Rogue Wave rolls ${DNAME[w.r]} (strength ${waveStr()}).`);return true}
-AG.waveRoll=d=>{const s=G.ships[d.seat];if(!s.alive||!G.wave)return;const sq=posSq(s);if(!inRow(sq))return;const r=d6(),need=waveStr();stat('waveCheck');
+AG.waveRoll=d=>{const s=G.ships[d.seat];if(!s.alive||!G.wave)return;const sq=posSq(s);if(!inRow(sq))return;const r=(TUT&&TUT('wave',d.seat))||d6(),need=waveStr();stat('waveCheck');
   if(r>=need){lg(`${G.seats[d.seat].nm} rides the Rogue Wave (rolled ${r}, needed ${need}).`);return}
   stat('waveCapsize');lg(`${G.seats[d.seat].nm} rolls ${r} against the Rogue Wave (needs ${need}) and capsizes!`,'bad');now('doom',{seat:d.seat,cause:{k:'wave'},near:sq})};
 // ---------- turns ----------
