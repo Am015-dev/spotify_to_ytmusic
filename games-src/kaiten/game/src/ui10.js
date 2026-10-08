@@ -28,7 +28,7 @@ const HLP_RULES = [
 ];
 function hlpSticks() { return document.querySelector('#tbl .seat.me .grp.usable') || document.querySelector('#tbl .grp.usable'); }
 function hlpPhase() {
-  if (!G || !UI.started || UI.cards.length) return null;
+  if (!G || !UI.started || UI.cards.length || tutOn()) return null;
   const st = $('#start'); if (st && !st.hidden) return null;
   if (UI.rsOpen) return document.querySelector('#rs [data-a=rsnext]') ? 'tally' : null;
   if (G.phase !== 'pick' || !canPick() || UI.drag) return null;
@@ -52,7 +52,7 @@ function hlpWhy(v, mv) {
   return hlpCap(t.replace(/:\s*\+/, ': +'), 15);
 }
 function hlpSuggest() {
-  if (!G || !canPick() || UI.drag || UI.twin && UI.sel.length >= 2) return null;
+  if (tutOn() || !G || !canPick() || UI.drag || UI.twin && UI.sel.length >= 2) return null;
   const v = viewSeat(); let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return null; }
   if (!mv || !mv.pick || !mv.pick.length) return null;
   const why = hlpWhy(v, mv), cardAt = i => () => document.querySelector('#belt .hc[data-i="' + i + '"]');

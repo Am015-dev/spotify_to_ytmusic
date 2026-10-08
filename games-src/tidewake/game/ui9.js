@@ -112,7 +112,7 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const b=$('#bulbbtn');if(b)b.addEventListener('click',()=>{try{const c=GXH.state().cur;if(c&&c.kind==='bulb'&&G&&UI.started)UI.campHints=(UI.campHints||0)+1}catch(e){}})}
-function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet)return;GXH.phase(hlpPhase())}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet||(typeof tutOn==='function'&&tutOn()))return;GXH.phase(hlpPhase())}
 {const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r};
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
 hlpInit();
