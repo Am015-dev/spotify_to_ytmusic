@@ -5,14 +5,14 @@ const E=require('../bc/enter.js');const fs=require('fs');const OUT=process.argv[
  console.log('steps',await ev(`JSON.stringify(GAR_SETS.filter(S=>S.car).map(S=>{const A=S.car(),B=GAR_arr(A),St=SB_steps(B,A);return S.id+':'+B.length+'/'+St.length+(A.steps?'*':'')+(St.some(s=>s.length>4||!s.length)?'!BAD':'')+(St.flat().length!==B.length?'!MISS':'')}).join(' '))`));
  await tap('#gbMenuBtn');await p.waitForTimeout(2000);await tap('#r2R [data-r2m="rides"]');await p.waitForTimeout(1500);
  await shot('01_rides');
- if(!await tap('#g9Col [data-sbg="t_su"]'))return console.log('FAIL no guide button');
+ if(!await tap(`#g9Col [data-sbg="${process.env.TPL||'t_su'}"]`))return console.log('FAIL no guide button');
  await shot('02_step1',900);await fit('step1');
  await tap('#sbG [data-sb="play"]');for(let i=0;i<9;i++){await tap('#sbG [data-sb="next"]');await p.waitForTimeout(150)}await shot('03_step10',1200);await fit('step10');
  await tap('#sbG [data-sb="prev"]');await shot('04_prev',900);await fit('prev');
  await tap('#sbG [data-sb="sp"]');await tap('#sbG [data-sb="play"]');await shot('05_play_x2',4000);await fit('play');
  await p.evaluate(()=>{const s=document.querySelector('#sbG .sbSl');s.value=s.max;s.dispatchEvent(new Event('input'))});await shot('06_done',1500);await fit('done');
  await p.evaluate(()=>{const s=document.querySelector('#sbG .sbSl');s.value=5;s.dispatchEvent(new Event('input'))});await p.waitForTimeout(800);
- await tap('#sbG [data-sb="diy"]');await shot('07_diy',2000);console.log('diy',await ev('JSON.stringify(__sb.miss())'),'bricks',await ev('GB_list().length'));
+ await tap('#sbG [data-sb="diy"]');await shot('07_diy',2000);console.log('diy',await ev('JSON.stringify(__sb.miss())'),'bricks',await ev('GB_list().length'));console.log('pal',await ev(`JSON.stringify({pc:GB_.pc,col:GB_BC[GB_.col],on:[...document.querySelectorAll('#gbBkPc .gbPc.on')].map(b=>b.dataset.p+(b.offsetParent?':vis':':hid')),need:SB_miss()&&SB_miss().m[0]})`));
  for(let i=0;i<3;i++){const xy=await ev(`(()=>{const q=SB_miss();if(!q)return null;const M=[],L=[];GB_brickGeo(q.m[0],M,L);const g=mergeGeometries(M);g.computeBoundingBox();const v=g.boundingBox.getCenter(new THREE.Vector3());SB_host().localToWorld(v);GB_cam();v.project(GB.cam);const c=$('#gbC').getBoundingClientRect();return[c.left+(v.x+1)/2*c.width,c.top+(1-v.y)/2*c.height]})()`);
   console.log('ghost at',xy);if(!xy)break;await tapXY(xy[0],xy[1]);await p.waitForTimeout(700);const pl=await p.$('#gsBar [data-a="place"],#gsBar button');const s=await ev('JSON.stringify(__sb.miss())+" bricks "+GB_list().length+" held "+!!(typeof GS!=="undefined"&&GS.held)');console.log('after tap',s);
   if(await ev('typeof GS!=="undefined"&&!!GS.held')){await ev('GS_place()');console.log('placed via PLACE',await ev('JSON.stringify(__sb.miss())+" "+GB_list().length'))}}
