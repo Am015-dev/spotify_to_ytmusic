@@ -20,3 +20,7 @@
 - Guide: SB_pal (98sb) preselects the step's part + colour in the BUILD palette once per step. Checklist sb-pal + sb-onetap.
 - OD_CHANGELOG v88q + 6 checklist items (sc-*, sb-*). Research: docs/research/SUPRA.md "v88q SPEED SERIES".
 - Shots: su/gar_q (garage per car), su/drive_q (F1 drive, side tyres), su/guide_q, look-dev su/th/t_sc_*.
+## Reviewer PASS c7cfa776 (2026-10-08); DEPLOY v88l sent to the coordinator. Fix with the next release (not blocking):
+- (a) BUILD IT: preselect the step's part AND colour in the palette (strip still shows red defaults).
+- (b) Guide parts panel is ~60 % empty: shrink it to its content (and let SB_area give the car the space).
+- (c) Ghost taps sometimes need 2–3 taps in automation: add checklist item "BUILD IT: one tap on the green ghost places it"; if Alex fails it, widen the hit area (nearest stud ±1) / find why GB_act is not reached.
