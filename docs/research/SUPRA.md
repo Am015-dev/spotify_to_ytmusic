@@ -62,6 +62,6 @@ All are ≤ 10 studs wide and 18 long → BC size check keeps the default handli
 - NOT verified in text (taken from the cars' general look, flagged as such): the time machine's body colour (built in light bluish grey), the hypercar's main red, the F1's halo (left out).
 - Not built: the flying 2-in-1 mode; wider rear tyres on the F1 (same wheel L all round, for normal handling).
 - Generators: SC_time / SC_hyper(o) / SC_f1 in src/98su_supra.js (SC_kit = shared add/sym/step helpers), A.steps for the ▶ GUIDE.
-- Traffic: 'su:t_sc_tm' + 'su:t_sc_hy' pushed to HCAR (Athens: into ATH_K too). Rivals: SC_RIV maps the 6 base teams (kronos F1, nordend orange racer, ostend midnight racer,
+- Traffic: 'su:t_sc_hy' + 'su:t_sc_tm' replace the 'sedan-sports' + 'suv' kinds in HCAR (no extra cars or draw calls). Rivals: SC_RIV maps the 6 base teams (kronos F1, nordend orange racer, ostend midnight racer,
   zeil pink roadster, helix time coupe, aeppler green hypercar) through a CR_rivB wrapper; story rivals v_* keep their own cars.
 - Next sets to research: JDM/tuner (76917 Skyline exists as style ref; 76896 GT-R NISMO, 76901 GR Supra).

@@ -16,7 +16,7 @@
 - Release: merge CURRENT live → tools/build.sh vXX → QUICK review → DEPLOY message to the coordinator (never deploy.sh).
 ## v88t SPEED SERIES (this session, alex/od-supra on top of garux v88o 0560e1d4)
 - 3 cars in src/98su_supra.js (SC_time 77256, SC_hyper 77261, SC_f1 77252), pushed into SU_T as fam 3 → RIDES row "🏆 SPEED SERIES", GAR_SETS, ▶ GUIDE steps.
-- Traffic: HCAR += su:t_sc_tm, su:t_sc_hy (Athens ATH_K too). Rivals: SC_RIV for the 6 base teams via a CR_rivB wrapper.
+- Traffic: su:t_sc_hy, su:t_sc_tm REPLACE sedan-sports, suv in HCAR (count unchanged). Rivals: SC_RIV for the 6 base teams via a CR_rivB wrapper.
 - Guide: SB_pal (98sb) preselects the step's part + colour in the BUILD palette once per step. Checklist sb-pal + sb-onetap.
 - OD_CHANGELOG v88t + 6 checklist items (sc-*, sb-*). Research: docs/research/SUPRA.md "v88t SPEED SERIES".
 - Shots: su/gar_q (garage per car), su/drive_q (F1 drive, side tyres), su/guide_q, look-dev su/th/t_sc_*.

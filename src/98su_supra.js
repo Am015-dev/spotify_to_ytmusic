@@ -103,9 +103,9 @@ function SU_rows(){const G=$('#g9Col .g9Grid');if(!G||G9C.type!=='car'||G9C.sort
  const S3=SU_T.filter(T=>T.fam===3).map(T=>card(T.id)).filter(Boolean);if(S3.length){G.insertBefore(hd('🏆 SPEED SERIES','movie and race cars'),first);for(const c of S3)G.insertBefore(c,first)}G.insertBefore(rest,first)}
 GAR_tab=(f=>function(){f();try{SU_rows()}catch(e){}})(GAR_tab);
 {const st=document.createElement('style');st.textContent=`#g9Col .suHd{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;padding:6px 2px 0;color:#fff}#g9Col .suHd b{font:900 13px system-ui;letter-spacing:.04em}#g9Col .suHd small{font:700 12px system-ui;color:#8fb3c7}`;document.head.appendChild(st)}
-// ---- SC traffic + rivals (v88t): the two road cars join city traffic (own liveries; 'su:' kinds are built by CR_cityGeo from SU_T);
+// ---- SC traffic + rivals (v88t): the two road cars replace the sports sedan + SUV kinds in city traffic (own liveries; 'su:' kinds are built by CR_cityGeo from SU_T);
 // the 6 base racing teams drive Speed-Champions-style cars that match their team colours (story rivals v_* keep their own machines)
-HCAR.push('su:t_sc_tm','su:t_sc_hy');if(CID!=='fra')ATH_K.push(HCAR.length-2,0,HCAR.length-1,0);
+{const sw=(k,v)=>{const i=HCAR.indexOf(k);if(i>=0)HCAR[i]=v};sw('sedan-sports','su:t_sc_hy');sw('suv','su:t_sc_tm')} // swap into existing kinds: same car count + draw calls (Alex: lag)
 const SC_RIV={kronos:SC_f1,nordend:()=>SU_car({B:SU_O,rear:'wing'}),ostend:()=>SU_car({B:'#1b2a34',G:'#8a12a8',W:'#1b2a34',A:'#1b2a34',H:'#8a12a8',st:'#8a12a8',rear:'wing'}),
  zeil:()=>SU_car({B:'#e4adc8',G:'#f4f4f4',cab:'open',st:CR_K,R:CR_K}),helix:SC_time,aeppler:()=>SC_hyper({B:'#00852b',Y:'#fac80a',D:'#00852b'})};
 CR_rivB=(f=>function(team){const id=team&&team.id;if(id&&SC_RIV[id]&&!CR_RB[id])try{CR_RB[id]=SC_RIV[id]().map(([t,x,z,r,c,y])=>({t:t==='drv'?'drvR':t,x,z,y,r:r%4,m:0,c}))}catch(e){console.warn('SC',e)}return f.apply(this,arguments)})(CR_rivB);
