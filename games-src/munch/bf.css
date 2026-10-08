@@ -135,3 +135,14 @@ html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
 #bfclip .bfc-name{position:absolute;left:50%;bottom:24%;translate:-50% 0;width:92%;text-align:center;font:900 clamp(20px,6.4vw,42px)/1.1 var(--title);letter-spacing:.04em;color:#fff2c0;text-shadow:0 3px 0 #4a0c02,0 0 22px #ff5a1a,0 0 3px #000;opacity:0;transition:opacity .35s}
 #bfclip .bfc-name.on{opacity:1}
 @media (prefers-reduced-motion: reduce){#bfclip{display:none}}
+
+/* boss clip first, then the card: the monster card stays hidden until the clip lands in its spot */
+html.bf-clipping .arena .row.mons .mon{visibility:hidden}
+/* key art behind the title and end screens: cover, dark gradient so the paper card and buttons stay readable */
+.modal.art-title,.modal.art-win,.modal.art-lose{background-size:cover;background-position:50% 30%;background-repeat:no-repeat}
+.modal.art-title{background-image:linear-gradient(180deg,rgba(10,4,1,.15) 0%,rgba(10,4,1,.35) 45%,rgba(10,4,1,.82) 100%),url(media/title.webp)}
+.modal.art-win{background-image:linear-gradient(180deg,rgba(10,4,1,.1) 0%,rgba(10,4,1,.4) 50%,rgba(10,4,1,.85) 100%),url(media/end-win.webp)}
+.modal.art-lose{background-image:linear-gradient(180deg,rgba(10,4,1,.1) 0%,rgba(10,4,1,.4) 50%,rgba(10,4,1,.85) 100%),url(media/end-lose.webp)}
+@media (max-aspect-ratio:4/5){.modal.art-title{background-image:linear-gradient(180deg,rgba(10,4,1,.1) 0%,rgba(10,4,1,.3) 40%,rgba(10,4,1,.85) 100%),url(media/title-phone.webp)}}
+/* phone: leave the top half of the key art showing, the menu scrolls inside its sheet (Start stays pinned) */
+@media (orientation:portrait){html.ph .modal.art-title .dlg.start{max-height:50dvh}html.ph .modal.art-title{background-position:50% 0}}

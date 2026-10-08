@@ -84,14 +84,24 @@
       var q = S.pending[name] || []; delete S.pending[name];
       for (var i = 0; i < q.length; i++) { try { q[i](); } catch (e) {} }
     };
+    var dec = function (ab) {
+      if (!ab) return finish(null);
+      try {
+        var p = c.decodeAudioData(ab, function (b) { finish(b); }, function () { finish(null); });
+        if (p && typeof p.then === 'function') p.then(NOOP, function () { finish(null); });
+      } catch (e) { finish(null); }
+    };
+    // 'url:music/x.mp3' = a separate file, fetched when first wanted (keeps big tracks out of the page)
+    if (isUrl(name)) {
+      try { root.fetch(S.src[name].slice(4)).then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); }).then(dec, function () { finish(null); }); }
+      catch (e) { finish(null); }
+      return;
+    }
     var ab;
     try { ab = b64ToBuf(S.src[name]); } catch (e) { ab = null; }
-    if (!ab) return finish(null);
-    try {
-      var p = c.decodeAudioData(ab, function (b) { finish(b); }, function () { finish(null); });
-      if (p && typeof p.then === 'function') p.then(NOOP, function () { finish(null); });
-    } catch (e) { finish(null); }
+    dec(ab);
   }
+  function isUrl(n) { return typeof S.src[n] === 'string' && S.src[n].slice(0, 4) === 'url:' && typeof root.fetch === 'function'; }
 
   function decodeAll() {
     if (S.decoding || !S.ctx) return;
@@ -105,6 +115,7 @@
     (function next() {
       if (i >= names.length) { S.decoding = false; return; }
       var n = names[i++];
+      if (isUrl(n) && n !== S.wantMusic) return next();
       decodeOne(n, function () {
         if (n === S.wantMusic && S.musOn && S.curName !== n) startMusic(n, S._musOpt || {});
         setTimeout(next, 0);
@@ -188,8 +199,8 @@
     var b = S.buf[name], c = S.ctx;
     if (!b || !c) return false;
     if (S.loops[name]) { S.loops[name].g.gain.setTargetAtTime(clamp(o.vol != null ? o.vol : 1, 0, 2), c.currentTime, 0.1); return true; }
-    var src = c.createBufferSource(); src.buffer = b; src.loop = true;
-    src.loopStart = b._lp[0]; src.loopEnd = b._lp[1];
+    var src = c.createBufferSource(); src.buffer = b; src.loop = !o.once;
+    if (!o.once) { src.loopStart = b._lp[0]; src.loopEnd = b._lp[1]; }
     var g = c.createGain(), t = c.currentTime, f = o.fade != null ? o.fade : 0.8;
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(clamp(o.vol != null ? o.vol : 1, 0, 2), t + Math.max(0.01, f));
     src.connect(g); g.connect(S.sfxBus); src.start(t, b._lp[0]);
@@ -220,8 +231,8 @@
     var f = o.fade != null ? o.fade : 1.5;
     if (S.curName === name) return true;
     stopMusic(f);
-    var src = c.createBufferSource(); src.buffer = b; src.loop = true;
-    src.loopStart = b._lp[0]; src.loopEnd = b._lp[1];
+    var src = c.createBufferSource(); src.buffer = b; src.loop = !o.once;
+    if (!o.once) { src.loopStart = b._lp[0]; src.loopEnd = b._lp[1]; }
     var g = c.createGain(), t = c.currentTime;
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(clamp(o.vol != null ? o.vol : 1, 0, 2), t + Math.max(0.01, f));
     src.connect(g); g.connect(S.musBus); src.start(t, b._lp[0]);
@@ -238,6 +249,15 @@
     if (!S.buf[name]) { decodeOne(name, function () { if (S.wantMusic === name && S.musOn) startMusic(name, o); }); return false; }
     return startMusic(name, o);
   }
+
+  // hold the music bus at `level` (0..1) until duckTo(1) -- used while a video with its own sound plays
+  function duckTo(level, f) {
+    if (!S.ctx || !S.duckBus) return false;
+    var g = S.duckBus.gain, t = S.ctx.currentTime;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(clamp(level, 0, 1), t + Math.max(0.02, f != null ? f : 0.3));
+    S.duckUntil = 0; return true;
+  }
+  function preload(name) { if (S.ctx && S.src[name] && !S.buf[name]) decodeOne(name); return true; }
 
   function setSfx(on) {
     S.sfxOn = !!on; lsSet('sfx', S.sfxOn ? 1 : 0); applyVol();
@@ -268,6 +288,7 @@
     setSfx: safe(setSfx, false), setMusic: safe(setMusic, false), setVolume: safe(setVolume, 0),
     playing: safe(function () { return S.curName; }, null),
     state: safe(state, {}), unlock: safe(unlock, false), names: safe(names, []), duration: safe(duration, 0),
+    duckTo: safe(duckTo, false), preload: safe(preload, false),
     decode: safe(function (n, cb) { decodeOne(n, cb); return true; }, false)
   };
 })(typeof window !== 'undefined' ? window : this);

@@ -59,10 +59,17 @@ function sfx(name){if(!SND.on)return;const m=SND_MAP[name];
   case 'click':tone(1200,.03,{type:'triangle',v:.05});break;
   }}catch(e){}}
 // light background groove (optional)
-function musicStart(){if(window.GA)GA.music('main',{fade:1.5});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
-function musicStop(){if(window.GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
+// which recorded track fits the screen: title -> tavern, game -> main, fight with a level 12+ monster or a boss -> fight, end screens -> victory/defeat
+function musicWant(){if(typeof G==='undefined'||!G)return ['tavern',0];
+  if(G.winner){const me=typeof viewSeat==='function'?viewSeat():-1;const won=me>=0&&G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';return [won?'victory':'defeat',1]}
+  const cb=G.cb;if(cb&&cb.mons&&cb.mons.some(m=>{try{const d=mdef(m);return (d.lvl||0)>=12||(typeof BOSS_CLIPS!=='undefined'&&BOSS_CLIPS[d.k])}catch(e){return false}}))return ['fight',0];
+  return ['main',0]}
+function musicSync(){if(!window.GA||!SND.music)return;const w=musicWant();if(SND.want===w[0])return;SND.want=w[0];GA.music(w[0],{fade:w[1]?.6:1,once:!!w[1]});
+  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{GA.preload(w[0]==='tavern'?'main':'fight')}catch(e){}},4000)}}
+function musicStart(){SND.want=null;if(window.GA)musicSync();if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
+function musicStop(){SND.want=null;if(window.GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
 // the recorded track owns the music unless it failed to decode: then the synth groove below plays instead
-function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf('main')<0)}
+function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf(SND.want||'main')<0)}
 const BASS=[73.4,0,110,0,98,0,87.3,82.4,73.4,0,110,0,130.8,123.5,110,98];
 function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const step=60/124/2;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}
   while(SND.nextT<c.currentTime+.3){const k=SND.beat%16,at=SND.nextT-c.currentTime;

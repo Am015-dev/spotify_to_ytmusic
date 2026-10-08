@@ -42,9 +42,11 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
   const flip=/\bflip\b/.test(o.cls||'');
   return `<button class="${cls}" data-card="${id}" ${o.attr||''}${tip} aria-label="${esc(c.n)}: ${esc(c.x||'')}${o.badge?' ('+o.badge+')':''}${o.risk?' (warning: '+esc(o.risk)+')':''}"><i class="hit" aria-hidden="true"></i>${o.badge?`<span class="sugb">💡 ${o.badge}</span>`:o.risk?`<span class="sugb risk">⚠ you’d lose</span>`:''}<span class="cn">${esc(c.n)}</span><span class="aw">${svgArt(c,c.k)}${gem?`<span class="tag">${gem}</span>`:''}${gold?`<span class="gold">${gold}</span>`:''}</span><span class="kind">${kindLabel(c)}${cond?' · '+cond:''}</span>${c.x?`<span class="cx">${esc(o.notitle?c.x:c.x.split(/\s+/).slice(0,7).join(' ')+(c.x.split(/\s+/).length>7?'…':''))}</span>`:''}${flip&&typeof cardBack==='function'?`<span class="cback">${cardBack(c.d)}</span>`:''}</button>`}
 // ---- panels ----
+// key art behind the title and end screens (CSS reads the class; media/ files are deployed beside the page)
+function modalArt(k){const m=$('#modal');if(!m)return;['title','win','lose'].forEach(n=>m.classList.toggle('art-'+n,k===n))}
 function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netRender==='function')netRender();
-  if(!G){setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
-  scanLog();const me=viewSeat();sinceTrack(me);const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
+  if(!G){if(typeof musicSync==='function')musicSync();setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;modalArt('title');if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
+  scanLog();if(typeof musicSync==='function')musicSync();const me=viewSeat();sinceTrack(me);const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
   if(UI.menu&&UI.menu.ask&&!(me>=0&&validMoves(me).some(m=>m.act==='ask')))UI.menu=null;
   // hot-seat: hide the hand while the device passes between human players
   if(G.mode==='hot'&&s>=0&&P(s).human&&UI.lastSeat!==s&&!G.winner){UI.pass=s}
@@ -61,7 +63,7 @@ function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netR
   else{if(cardOn){UI.menu=null;UI.zoom=null}if(GX.open==='dkCard')GX.close()}
   let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();if(G.mode==='net'&&typeof netModalHTML==='function')m=netModalHTML()||m;
   if(m&&GX.open)GX.close();
-  setHTML($('#modal'),m);$('#modal').hidden=!m;$('#modal').classList.toggle('opaque',UI.pass!=null&&!G.winner);
+  setHTML($('#modal'),m);$('#modal').hidden=!m;modalArt(G.winner&&m?(musicWant()[0]==='victory'?'win':'lose'):'');$('#modal').classList.toggle('opaque',UI.pass!=null&&!G.winner);
   // a human decision is pending: make sure the dock is open (once per new decision)
   const need=me>=0&&s===me&&P(me).human&&!G.winner?JSON.stringify([G.turn,G.phase,G.q&&G.q.kind,G.cb&&G.cb.stage]):'';if(need&&need!==UI.needKey)GX.showDock();UI.needKey=need;
   $('#live').textContent=UI.toast&&UI.toast.until>Date.now()?'Ouch! '+UI.toast.t:(G.log[0]?G.log[0].t:'');

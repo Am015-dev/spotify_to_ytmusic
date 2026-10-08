@@ -241,3 +241,6 @@ Kenney zips: the "Continue without donating" link on each asset page (kenney.nl/
 ## Final Approach (reuse only)
 `final-approach/` ships 15 sfx and 1 music track that are copied, unchanged, from samples already listed above (no new source files, no new licences):
 click, error, hum (= engine_loop), switch (= token), beep (= lock), engine, boom, alarm (= stress), round (= turn), win, lose from `nebula/`; dieland (= clack), roll (= shake), whoosh from `crown/`; coffee (= coins) from `rampart/`; `music.main` = `shipwreck/music.calm` ("Seaside Village" by KarateStudios, CC0). Mapping, sizes and credits: `final-approach/ASSETS.md`, `final-approach/MAP.md`, `final-approach/credits.html`; licence snapshots copied to `final-approach/licence-snapshots/`.
+
+## Doorkick Dungeon music (2026-10-08)
+The Old Tower Inn track is retired from Doorkick Dungeon. Its music is now five Treblo tracks, shipped as separate files in `games/doorkick-dungeon/music/` (rows in `munch/ASSETS.md`; sources and licence note in `audio/doorkick/treblo/README.md`). `audio/doorkick/audio-data.js` was edited by hand to point at them (`url:music/<name>.mp3`): re-running `tools/bundle.py` would overwrite that.
