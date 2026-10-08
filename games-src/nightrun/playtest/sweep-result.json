@@ -3,7 +3,13 @@
   {
    "tag": "difficulty",
    "kind": "balance",
-   "detail": "Hard: the dodging bot must die and lose hull: [{\"died\":0.16666666666666666,\"t\":109.91666666666667,\"hits\":3},{\"died\":0,\"t\":120,\"hits\":1}]",
+   "detail": "Normal: a careless player must die within 90 s: {\"died\":0.6666666666666666,\"t\":92,\"hits\":4.333333333333333}",
+   "shot": ""
+  },
+  {
+   "tag": "difficulty",
+   "kind": "balance",
+   "detail": "Hard: the dodging bot must die and lose hull: [{\"died\":0,\"t\":120,\"hits\":2.8333333333333335},{\"died\":0,\"t\":120,\"hits\":1.3333333333333333}]",
    "shot": ""
   }
  ],
@@ -17,52 +23,52 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 41,
+  "shopChecks": 0,
   "diff": {
    "easy/idle": {
     "died": 1,
-    "t": 24.633333333333336,
+    "t": 22.700000000000003,
     "hits": 5
    },
    "easy/careless": {
-    "died": 0.3333333333333333,
-    "t": 102.16666666666667,
-    "hits": 3.5
+    "died": 0.8333333333333334,
+    "t": 99.85000000000001,
+    "hits": 4.833333333333333
    },
    "easy/natural": {
-    "died": 0.16666666666666666,
-    "t": 105.33333333333333,
-    "hits": 2
+    "died": 0.3333333333333333,
+    "t": 100.8,
+    "hits": 3.5
    },
    "normal/idle": {
     "died": 1,
-    "t": 20.099999999999998,
+    "t": 20.316666666666666,
     "hits": 5
    },
    "normal/careless": {
-    "died": 1,
-    "t": 89.06666666666666,
-    "hits": 5
+    "died": 0.6666666666666666,
+    "t": 92,
+    "hits": 4.333333333333333
    },
    "normal/natural": {
     "died": 0,
     "t": 120,
-    "hits": 1
+    "hits": 1.3333333333333333
    },
    "hard/idle": {
     "died": 1,
-    "t": 11.85,
+    "t": 11.399999999999999,
     "hits": 5
    },
    "hard/careless": {
     "died": 1,
-    "t": 53.900000000000006,
+    "t": 42.43333333333334,
     "hits": 5
    },
    "hard/natural": {
-    "died": 0.16666666666666666,
-    "t": 109.91666666666667,
-    "hits": 3
+    "died": 0,
+    "t": 120,
+    "hits": 2.8333333333333335
    }
   }
  },

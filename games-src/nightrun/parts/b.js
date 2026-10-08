@@ -81,8 +81,8 @@ function newGame(daily){
 // Easy / Normal / Hard (settings > Gameplay), tuned with d-sim.js. Endless: d = enemy pace and fire rate, bs = bullet speed, fr = fire rate, xw = extra waves joining each wave once the run is warm.
 // Story has its own ramp (ST.*, see story.js): sd, sbs, sfr scale it. fan = bullets added to every fan and ring, heal = hull drops, el = elite share.
 const DIFFS={easy:{d:.85,bs:.9,fr:.85,dn:.75,sd:.85,sbs:.92,sfr:.9,fan:-1,heal:1.5,el:0},
-  normal:{d:1.75,bs:1.2,fr:1.15,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
-  hard:{d:2.6,bs:1.45,fr:2.3,dn:1.3,sd:1.3,sbs:1.15,sfr:1.25,fan:2,heal:.5,el:1}};
+  normal:{d:1.75,bs:1.2,fr:1.3,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
+  hard:{d:2.6,bs:1.6,fr:3.8,dn:1.3,sd:1.3,sbs:1.15,sfr:1.25,fan:2,heal:.5,el:1}};
 let DF=DIFFS.normal;
 const STILL={t:0,k:0,fk:1,bk:1,sk:1,ax:0,ay:0,beam:null,nb:0,said:false};   // AFK pressure (h.js): a ship that stops moving is hunted harder and scores less
 const DYE={cur:1,q:1};                                     // dying slows the song (h.js)
@@ -123,7 +123,8 @@ const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*STILL.bk*(1+TUNE2.l
 const ebCap=()=>(touchUI||rotMode?18:HARD?35:25)+(G.boss&&G.boss.x<=bossX()?5:0);   // most enemy bullets alive at once; a fan or ring that does not fit is made smaller (odd, still aimed), never cut off                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
 function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
-const aim=e=>Math.atan2(P.y-e.y,P.x-e.x);
+const PV={x:0,y:0,px:0,py:0};   // the ship's smoothed velocity (h.js), for Hard's lead shots
+const aim=e=>{if(HARD&&e.type!=='boss'){const t=Math.min(.8,Math.hypot(P.x-e.x,P.y-e.y)/260)*.75;return Math.atan2(P.y+PV.y*t-e.y,P.x+PV.x*t-e.x);}return Math.atan2(P.y-e.y,P.x-e.x);};
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
 const odd=x=>{const f=Math.floor(x);return f%2?f:f-1;};   // fans are odd so the middle bullet is aimed at the ship
 const fanN=n=>{const m=Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.on?0:Math.floor(TUNE2.loopFan*Math.min(3,G.loop))));return m<=3?3:Math.max(3,odd(m*.72+.5));};
