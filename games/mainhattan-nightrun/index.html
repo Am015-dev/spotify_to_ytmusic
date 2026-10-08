@@ -205,7 +205,9 @@ const NR=window.NR={_h:{},sw:[],on(e,f){(this._h[e]=this._h[e]||[]).push(f);},em
     setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();if(BT.pend&&BT.pend.sw)AU.cancelSwitch();   // a tempo change moves the bar lines: drop the scheduled song change, it is planned again
     const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
-      const a=AU.a;if(a&&AU.cur&&AU.cur.src)try{AU.cur.src.playbackRate.setValueAtTime(x,a.currentTime);}catch(e){}}}};
+      AU.setRate(x);},
+    pos(){const c=AU.cur;return c&&c.playing?c.el.currentTime:0;},dur(){const c=AU.cur;return c?c.D:0;}}};   // pos / dur: where the playing song is and how long it is (seconds)
+NR.audioMem=()=>({streams:AU.slots?AU.slots.filter(s=>s.file).length:0,decodedMB:0});
 NR.mod=Object.assign({win:0,mag:140,pw:1},NR.mod||{});   // tuning numbers add-ons may change (wider PERFECT window in ms, pickup pull radius, power-up duration factor)
 const CK={h:[],d:0,at:0,has:0};                          // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
 function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;CK.has=0;}  // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping.
@@ -235,19 +237,24 @@ const winMs=()=>(WINS[SET.win]||110)+NR.mod.win;         // half-width of the on
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:(SET.all||Math.abs(dt)<=winMs())&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
 
-/* ---------- tracks (lazy) ---------- */
+/* ---------- tracks: streamed, never decoded ----------
+   The mp3 file is downloaded once into a blob (3-5 MB, compressed) and given to the element, so seeking and looping never wait for the network and servers without Range support work.
+   A song is an <audio> element (one of 5 pooled slots, see AU.slotFor) played through a MediaElementAudioSourceNode, so the browser streams and decodes it a little at a time
+   (a 3 MB mp3 in memory instead of 60-100 MB of PCM, and no 100-300 ms main-thread stall when a song ends). TR.bufs[file] is the slot once the file is fully buffered. */
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
-function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,title:String(t.title||'').slice(0,40),stage:t.stage};}
+function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,gapMs:t.gapMs>=0&&t.gapMs<200?+t.gapMs:24,title:String(t.title||'').slice(0,40),stage:t.stage};}
 try{if(location.protocol!=='file:'&&(!NOMUSIC||SIM))fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
   for(const t of arr){const n=normTrack(t);if(n&&!TR.by[n.stage]){TR.by[n.stage]=n;TR.list.push(n);}}
   if(AU.a&&!running)AU.menuMusic();}).catch(()=>{});}catch(e){}
+const slotReady=s=>{const e=s.el;if(!s.blob||!e||e.readyState<4||!(e.duration>0)||!isFinite(e.duration))return false;s.D=e.duration;
+  s.full=true;s.seek=e.seekable.length>0&&e.seekable.end(e.seekable.length-1)>=s.D-1;return true;};      // the file is in memory (a 3-5 MB blob) and the element can play it through
 async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
+  const s=AU.slotFor(info);if(!s)return;                          // every slot is playing or wanted: the pump asks again
   TR.busy[info.file]=1;
-  try{const r=await fetch(new URL('music/'+info.file,location.href),{cache:'force-cache'});if(!r.ok)throw 0;const ab=await r.arrayBuffer();
-    const buf=await new Promise((ok,no)=>{const p=AU.a.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);});
-    for(const k in TR.bufs){const keep=k===info.file||(AU.cur&&TR.by[AU.cur.stage]&&TR.by[AU.cur.stage].file===k)||(TR.keepFn&&TR.keepFn(k));if(!keep)delete TR.bufs[k];}   // decoded songs are big: keep the playing one and the new one only (iOS memory)
-    TR.bufs[info.file]=buf;AU.trackReady(stage);}
-  catch(e){TR.bad[info.file]=1;}
+  try{await new Promise((ok,no)=>{const t0=performance.now(),el=s.el,iv=setInterval(()=>{if(s.file!==info.file){clearInterval(iv);no('evicted');}else if(s.err||el.error){clearInterval(iv);no('error');}
+      else if(slotReady(s)){clearInterval(iv);ok();}else if(performance.now()-t0>60000){clearInterval(iv);no('timeout');}},80);});
+    TR.bufs[info.file]=s;AU.trackReady(stage);}
+  catch(e){if(e!=='evicted'){TR.bad[info.file]=1;AU.freeSlot(s);}}
   TR.busy[info.file]=0;}
 
 /* ---------- latency test (settings): clicks on the audio clock, the player taps, the median lateness becomes the Audio sync ---------- */
@@ -262,7 +269,9 @@ function calTap(ts){if(!CAL.on)return null;const h=audible(ts>0?ts:undefined)-SE
   return d;}
 
 /* ---------- audio ---------- */
-const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
+const silentWav=(()=>{let u=null;return()=>{if(u)return u;try{const n=1600,b=new Uint8Array(44+n),dv=new DataView(b.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)b[o+i]=t.charCodeAt(i);};w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,8000,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);b.fill(128,44);
+  u=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}catch(e){u='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';}return u;};})();   // 0.2 s of silence: unlocks an <audio> slot inside a tap
+const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();this.m.connect(a.destination);
     this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
@@ -275,35 +284,39 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     const d=a.createDelay();d.delayTime.value=.38;const fb=a.createGain();fb.gain.value=.33;const lp=a.createBiquadFilter();lp.frequency.value=2200;
     d.connect(lp);lp.connect(fb);fb.connect(d);lp.connect(this.mus);this.dly=d;
     const len=Math.floor(a.sampleRate*.5),b=a.createBuffer(1,len,a.sampleRate),dd=b.getChannelData(0);for(let i=0;i<len;i++)dd[i]=Math.random()*2-1;this.nb=b;
+    this.slots=[];try{for(let i=0;i<5;i++)this.slots.push(this.mkSlot());}catch(e){this.slots=[];}
     this.vol(true);setInterval(()=>this.sched(),25);
-    a.addEventListener&&a.addEventListener('statechange',()=>{if(a.state==='suspended'&&!this.hold&&!document.hidden)a.resume().catch(()=>{});});}catch(e){this.a=null;}},
+    a.addEventListener&&a.addEventListener('statechange',()=>{if(a.state==='suspended'&&!this.hold&&!document.hidden)a.resume().catch(()=>{});else if(a.state==='running'&&!this.hold)this.kickAll();});}catch(e){this.a=null;}},
   // iOS: must run inside touchend/click/keydown. Resume synchronously, start a silent buffer in the same gesture, and (without audioSession) play a silent <audio> so the ring switch does not mute us.
   unlock(){if(!this.a)this.init();const a=this.a;if(!a)return;
     if(a.state!=='running'&&!this.hold){try{const p=a.resume();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
     if(a.state!=='running'){try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0);}catch(e){}}   // silent unlock sound inside the gesture
     if(!navigator.audioSession&&!this.sil){try{const h=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=');h.loop=true;h.volume=.01;h.setAttribute('playsinline','');this.sil=h;const q=h.play();if(q&&q.catch)q.catch(()=>{this.sil=null;});}catch(e){}}
+    this.unlockSlots();
     if(!running&&!BT.stage)this.menuMusic();},
   duckMusic(){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
     this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
-  suspend(){this.hold=true;const a=this.a;if(a&&a.state==='running')a.suspend().catch(()=>{});},
-  resume(){this.hold=false;this.rUntil=performance.now()+700;const a=this.a;if(a&&a.state!=='running')a.resume().catch(()=>{});},
+  suspend(){this.hold=true;const a=this.a;for(const s of this.slots||[])if(s.playing&&!s.el.paused){s.heldPlay=true;try{s.el.pause();}catch(e){}}   // the songs keep their place
+    if(a&&a.state==='running')a.suspend().catch(()=>{});},
+  resume(){this.hold=false;this.rUntil=performance.now()+700;const a=this.a;if(a&&a.state!=='running')a.resume().catch(()=>{});this.kickAll();},
   f(n){return 440*Math.pow(2,(n-69)/12);},
   menuMusic(){if(TR.by.menu){if(BT.stage!=='menu')this.startStage('menu');loadTrack('menu');}else if(BT.stage!==''&&BT.stage!=='menu')this.startStage('menu');},
   trackReady(stage){const info=TR.by[stage];if(!info||!this.a)return;
     if(BT.stage===stage&&BT.mode!=='file'&&!BT.pend&&!this.want){const spb4=BT.spb*4,now=mnow(),fo=info.offsetMs/1000;let at=now+.1+fo;   // the file starts fo early so its first beat lands on the bar line
       if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15+fo-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
-  // switch to the music of a stage: the track file if it is loaded, otherwise the built-in synth at that stage's tempo
-  startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];if(!at){this.want=null;this.wantT=0;this.intense(false);}
+  // switch to the music of a stage: the streamed song if it is ready, otherwise the built-in synth grid at that stage's tempo
+  startStage(stage,at){const a=this.a,info=TR.by[stage],S=a&&info&&TR.bufs[info.file];if(!at){this.want=null;this.wantT=0;this.intense(false);}
     if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
     if(info)loadTrack(stage);
-    const now=mnow(),t=at||now+.08,ctxT=a.currentTime+(t-now);
-    if(this.cur&&this.cur.src){const c=this.cur;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);c.src.stop(ctxT+1);}catch(e){}}
+    const now=mnow(),t=at||now+.12,ctxT=a.currentTime+(t-now);
+    const c=this.cur;if(c&&c!==S){c.stopAt=Math.max(a.currentTime,ctxT)+1;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);}catch(e){}}
     this.cur=null;
     const v={stage};
-    if(buf){const src=a.createBufferSource(),fo=at?info.offsetMs/1000:0;src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT-fo);g.gain.linearRampToValueAtTime(1,ctxT-fo+.25);
-      src.playbackRate.value=NR.music.rate;src.connect(g);g.connect(this.fb);src.start(ctxT-fo);this.cur={src,g,stage};   // with a start time the file begins early, so its first beat lands on the bar line
-      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/NR.music.rate,off:info.offsetMs/1000,t0:t-fo,title:info.title});}
+    if(S){const off=info.offsetMs/1000,rate=NR.music.rate,g=S.g.gain;g.cancelScheduledValues(0);g.setValueAtTime(0,a.currentTime);S.stage=stage;
+      if(at){g.setValueAtTime(0,Math.max(a.currentTime,ctxT-.25));g.linearRampToValueAtTime(1,ctxT);}else{g.setValueAtTime(0,ctxT);g.linearRampToValueAtTime(1,ctxT+.25);}
+      this.strGo(S,ctxT,at?off:0,!at);this.cur=S;   // with a start time the song's first beat lands on that bar line (it is started early, silent, at the matching place in the file)
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/rate,off,t0:t-off-((at?off:0)-off)/rate,title:info.title});}
     else if(stage==='menu'){Object.assign(v,{mode:'none',bpm:100,spb:.6,off:0,t0:t,title:''});}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/NR.music.rate,off:0,t0:t,title:''});}
     if(at){BT.pend={at:t,v};}
@@ -317,23 +330,78 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     const info=TR.by[stage];
     if(info&&!TR.bufs[info.file]&&!TR.bad[info.file]){loadTrack(stage,1);if(!this.wantT)this.wantT=performance.now()+4000;if(performance.now()<this.wantT)return;}   // still loading: keep the current song
     this.wantT=0;this.want=null;this.xfade(stage);},
-  xfade(stage){const a=this.a,info=TR.by[stage],buf=info&&TR.bufs[info.file],now=mnow(),rate=NR.music.rate,bar=4*BT.spb,ctxOf=t=>a.currentTime+(t-now);
+  xfade(stage){const a=this.a,info=TR.by[stage],S=info&&TR.bufs[info.file],now=mnow(),rate=NR.music.rate,bar=4*BT.spb,ctxOf=t=>a.currentTime+(t-now);
     const tb=BT.t0+BT.off+Math.ceil((now+bar+.08-BT.t0-BT.off)/bar)*bar;   // first bar line at least one bar + 80 ms away
     const v={stage},CIN=new Float32Array(32),COUT=new Float32Array(32);for(let i=0;i<32;i++){CIN[i]=Math.sin(i/31*Math.PI/2);COUT[i]=Math.cos(i/31*Math.PI/2);}
     let xf=bar;
-    if(buf){const off=info.offsetMs/1000,D=buf.duration,pos=(((off-bar*rate)%D)+D)%D,src=a.createBufferSource(),g=a.createGain();
-      src.buffer=buf;src.loop=true;src.playbackRate.value=rate;g.gain.value=0;src.connect(g);g.connect(this.fb);
-      let w=ctxOf(tb-bar),fd=bar;const t1=a.currentTime+.01;if(w<t1){pos=(pos+(t1-w)*rate)%D;fd=bar-(t1-w);w=t1;}   // the page stalled since the bar line was chosen: start later but at the matching file position
-      src.start(w,pos);if(fd>.05)g.gain.setValueCurveAtTime(CIN,w,fd);else g.gain.value=1;
-      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/rate,off,t0:tb-off,title:info.title});this.nxt={src,g,stage};}
+    if(S){const off=info.offsetMs/1000,g=S.g.gain;S.stage=stage;g.cancelScheduledValues(0);g.setValueAtTime(0,a.currentTime);
+      // the new song is started now, silent, at the place in its file that reaches the first beat exactly on the bar line; it fades in over the bar before it
+      this.strGo(S,ctxOf(tb),off,false);
+      const w=ctxOf(tb-bar),fs=S.seek?Math.max(w,a.currentTime+.01):ctxOf(tb)-off/rate-.2,fd=ctxOf(tb)-(S.seek?0:off/rate)-fs;
+      if(fd>.05)g.setValueCurveAtTime(CIN,fs,fd);else g.setValueAtTime(1,fs);
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/rate,off,t0:tb-off,title:info.title});this.nxt=S;}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/rate,off:0,t0:tb,title:''});xf=BT.spb;this.nxt=null;}
     const c=this.cur;this.prev=c;
-    if(c&&c.src){try{const g=c.g.gain,t1=ctxOf(tb-xf);g.cancelScheduledValues(t1);g.setValueAtTime(1,t1);g.setValueCurveAtTime(COUT,t1,xf);c.src.stop(ctxOf(tb)+.1);}catch(e){}}
+    if(c&&c.playing){try{const g=c.g.gain,t1=ctxOf(tb-xf);g.cancelScheduledValues(t1);g.setValueAtTime(1,t1);g.setValueCurveAtTime(COUT,t1,xf);c.stopAt=ctxOf(tb)+.1;}catch(e){}}
     this.cur=this.nxt;BT.pend={at:tb,v,sw:1,dbg:{t0:BT.t0,off:BT.off,spb:BT.spb,now,mode:BT.mode,stage:BT.stage}};},
   cancelSwitch(){const a=this.a,p=BT.pend;if(!p||!p.sw)return;this.want=p.v.stage;
-    try{const t=a.currentTime;if(this.nxt&&this.nxt.src){this.nxt.g.gain.cancelScheduledValues(0);this.nxt.src.stop(t);}
-      const c=this.prev;if(c&&c.src){c.g.gain.cancelScheduledValues(0);c.g.gain.setValueAtTime(1,t);c.src.stop(t+3600);this.cur=c;}}catch(e){}
+    try{const t=a.currentTime;if(this.nxt){this.nxt.g.gain.cancelScheduledValues(0);this.nxt.g.gain.setValueAtTime(0,t);this.nxt.stopAt=t;this.nxt.startFn=null;}
+      const c=this.prev;if(c){c.g.gain.cancelScheduledValues(0);c.g.gain.setValueAtTime(1,t);c.stopAt=0;this.cur=c;}}catch(e){}
     BT.pend=null;},
+  /* ---- stream slots: 5 pooled <audio> elements, each wired to the music bus once. Pooled because iOS lets an element play from code only after it was
+     started inside a tap once; unlockSlots() does that for all of them in the first tap, and later a slot just gets another src. ---- */
+  mkSlot(){const a=this.a,el=new Audio();el.preload='auto';el.loop=true;el.setAttribute('playsinline','');el.setAttribute('webkit-playsinline','');
+    for(const k of['preservesPitch','webkitPreservesPitch','mozPreservesPitch'])try{if(k in el)el[k]=false;}catch(e){}   // tempo changes bend the pitch, as they did with a buffer source
+    const node=a.createMediaElementSource(el),g=a.createGain();g.gain.value=0;node.connect(g);g.connect(this.fb);
+    const s={el,src:el,node,g,file:null,stage:'',info:null,blob:null,D:0,full:false,seek:false,err:0,tLoad:0,unlocked:false,playing:false,get duration(){return this.D;}};
+    el.addEventListener('error',()=>{s.err=1;});this.slotReset(s);return s;},
+  slotReset(s){Object.assign(s,{loops:0,last:0,phase:'',hist:[],applied:0,ctx0:0,pos0:0,uPlay:0,stopAt:0,kickT:0,heldPlay:false,startFn:null,startAt:0});},
+  slotFor(info){let s=this.slots.find(x=>x.file===info.file);if(s)return s;
+    const used=x=>x===this.cur||x===this.nxt||x===this.prev||x.playing||x.heldPlay||(BT.pend&&BT.pend.v.stage===x.stage);
+    s=this.slots.find(x=>!x.file)||this.slots.find(x=>!used(x)&&!(TR.keepFn&&TR.keepFn(x.file)));
+    if(!s)return null;
+    this.freeSlot(s);s.file=info.file;s.stage=info.stage;s.info=info;s.tLoad=performance.now();s.err=0;
+    fetch(new URL('music/'+info.file,location.href),{cache:'force-cache'}).then(r=>r.ok?r.blob():Promise.reject(0)).then(b=>{if(s.file!==info.file)return;s.blob=URL.createObjectURL(b);s.el.src=s.blob;try{s.el.load();}catch(e){}}).catch(()=>{if(s.file===info.file)s.err=1;});
+    return s;},
+  freeSlot(s){if(s.file)delete TR.bufs[s.file];try{s.el.pause();}catch(e){}try{s.g.gain.cancelScheduledValues(0);s.g.gain.value=0;}catch(e){}
+    this.slotReset(s);s.playing=false;if(s.file){s.el.removeAttribute('src');try{s.el.load();}catch(e){}}if(s.blob){try{URL.revokeObjectURL(s.blob);}catch(e){}s.blob=null;}s.file=null;s.stage='';s.info=null;s.D=0;s.full=false;},
+  unlockSlots(){for(const s of this.slots||[]){if(s.playing&&s.el.paused&&!this.hold){this.kick(s);continue;}
+      if(s.unlocked||s.playing)continue;s.unlocked=true;const el=s.el;
+      try{if(!s.file)el.src=silentWav();const q=el.play(),done=()=>{if(!s.playing){try{el.pause();}catch(e){}if(!s.file)el.removeAttribute('src');}};if(q&&q.then)q.then(done,done);}catch(e){}}},
+  kick(s){s.kickT=performance.now();try{const q=s.el.play();if(q&&q.catch)q.catch(()=>{s.kickT=0;});}catch(e){}s.phase='wait';s.uPlay=s.el.currentTime;s.hist.length=0;},
+  kickAll(){for(const s of this.slots||[])if(s.playing&&s.el.paused&&!s.startFn){s.heldPlay=false;this.kick(s);}},
+  // start the song in slot s so that file position pAtB (seconds) is heard at AudioContext time tB. imm: start at pAtB itself right now (a fresh start).
+  // Otherwise it is started now, silent, early enough: at pAtB - (tB - now) * rate, wrapping round the end of the file (the pre-roll is the file's tail).
+  // The element cannot be scheduled sample-exactly, so (ctx0, pos0) is the plan and strSync() measures how far the real playback is from it.
+  strGo(s,tB,pAtB,imm){const a=this.a,el=s.el,rate=NR.music.rate,D=s.D||el.duration||1;let ctx0,p,gp=0;
+    if(imm||!s.seek){ctx0=tB-pAtB/rate;p=0;if(imm){ctx0=tB;p=pAtB;}}
+    else{ctx0=a.currentTime+this.lat;p=pAtB-(tB-ctx0)*rate;if(p<0){gp=(s.info?s.info.gapMs:24)/1000;p+=gp*rate;}p=((p%D)+D)%D;}   // a pre-roll that wraps round the end of the file loses gapMs when the element loops (mp3 padding): start that much later in the file.  lat: how long an element takes from play() to its first sound here (learned, see strSync)
+    this.slotReset(s);Object.assign(s,{ctx0,pos0:p,phase:'wait',playing:true,uPlay:p,last:p,gapPlan:gp});
+    const go=()=>{s.kickT=performance.now();s.tCall=a.currentTime;try{if(Math.abs(el.currentTime-p)>.02)el.currentTime=p;}catch(e){}el.playbackRate=rate;s.last=p;s.uPlay=p;
+      try{const q=el.play();if(q&&q.catch)q.catch(()=>{s.kickT=0;});}catch(e){}};
+    if(!s.seek&&!imm){s.startAt=ctx0-.04;s.startFn=go;}else go();},
+  setRate(x){const a=this.a;for(const s of this.slots||[])if(s.playing){s.el.playbackRate=x;if(!s.startFn&&!s.el.paused&&s.phase!=='wait'){s.ctx0=a.currentTime;s.pos0=s.el.currentTime+s.loops*s.D;s.applied=0;s.hist.length=0;}}},
+  // every 25 ms: start delayed songs, stop faded ones, keep the playing ones playing, and pull the beat grid onto what the element really plays
+  strTick(a){const pn=performance.now(),ct=a.currentTime,run=a.state==='running'&&!this.hold;
+    for(const s of this.slots){
+      if(s.startFn&&run&&ct>=s.startAt){const f=s.startFn;s.startFn=null;f();}
+      if(s.stopAt&&ct>=s.stopAt){s.stopAt=0;s.playing=false;s.phase='';try{s.el.pause();s.g.gain.cancelScheduledValues(0);s.g.gain.value=0;}catch(e){}continue;}
+      if(!s.playing||!run||s.startFn)continue;
+      if(s.el.paused){if(pn-s.kickT>600)this.kick(s);continue;}
+      this.strSync(s,a,pn);}},
+  strSync(s,a,pn){const el=s.el;if(el.seeking||el.readyState<2)return;
+    const e=el.currentTime,D=s.D||el.duration;if(e<s.last-D*.5){s.loops++;const pl=s.gapPlan||0;s.gapAt={pre:s.hist.length>=6?s.hist.slice(-8):null,post:[],pl};if(pl){s.ctx0+=pl;s.gapPlan=0;}}s.last=e;   // a planned pre-roll wrap: the gap was expected, the grid does not move
+    const u=e+s.loops*D,rate=el.playbackRate||1;
+    if(s.phase==='wait'){if(u-s.uPlay>.03){s.phase='acq';s.acqT=pn+700;s.hist.length=0;}else return;}   // not playing yet
+    const dd=(a.currentTime-s.ctx0)-(u-s.pos0)/rate;s.hist.push(dd);if(s.hist.length>40)s.hist.shift();
+    const ga=s.gapAt;if(ga){ga.post.push(dd);if(ga.post.length>=10){s.gapAt=null;const md=x=>x.slice().sort((p,q)=>p-q)[x.length>>1];   // how long did the loop really pause? learn it for the next fade-in from the tail
+      if(ga.pre&&s.info){const g=md(ga.post.slice(2))-md(ga.pre)+ga.pl;if(g>=0&&g<.2)s.info.gapMs=Math.round(s.info.gapMs*.4+g*1000*.6);}}}
+    if(s.hist.length<3)return;
+    const m=s.hist.slice().sort((x,y)=>x-y)[s.hist.length>>1];
+    let ap;if(s.phase==='acq'){ap=m;if(pn>s.acqT){s.phase='track';if(s.tCall)this.lat=Math.max(0,Math.min(.3,this.lat*.6+.4*(s.ctx0+m-s.tCall)));s.tCall=0;}}                                  // first 700 ms of playing (and after a resume): take the measured start at once
+    else{const er=m-s.applied,lim=Math.abs(er)>.03?.004:.001,st=er*.12;ap=s.applied+(st<-lim?-lim:st>lim?lim:st);}   // later: follow it smoothly (at most 1 ms a tick = 4% speed, 4 ms when far off)
+    const dl=ap-s.applied;if(!dl)return;s.applied=ap;s.drift=m;
+    const tg=BT.pend&&s===this.cur?BT.pend.v:BT.stage===s.stage?BT:null;if(tg)tg.t0+=dl;},   // the incoming song moves the grid that is waiting for it, the playing one moves the live grid
   intense(on){on=!!on;if(this.int===on)return;this.int=on;const a=this.a;if(!a||!this.fb)return;const t=a.currentTime;
     this.fb.gain.cancelScheduledValues(t);this.fb.gain.setTargetAtTime(on?1.15:.9,t,.5);this.mus.gain.setTargetAtTime(on?.42:.34,t,.5);},
   // extra drum layer under a stage song while a mini-boss is up (kick on every beat, hats, snare accents), on the same grid
@@ -365,7 +433,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   noise(t,dur,vol,freq,dest,type='highpass'){const a=this.a,s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=this.nb;
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
-  sched(){const a=this.a;if(a&&CAL.on&&a.state==='running')this.calsched(a);if(a&&this.want&&running&&!paused)this.switchTo(this.want);
+  sched(){const a=this.a;if(a&&this.slots)this.strTick(a);if(a&&CAL.on&&a.state==='running')this.calsched(a);if(a&&this.want&&running&&!paused)this.switchTo(this.want);
     if(!a||a.state!=='running'||!running||paused)return;
     if(BT.mode==='synth'&&!BT.pend&&!this.want&&TR.by[BT.stage]&&TR.bufs[TR.by[BT.stage].file])this.trackReady(BT.stage);   // the song file arrived while a switch was pending: swap it in on the next bar
     if(this.int&&BT.mode==='file')this.isched(a);
@@ -2238,14 +2306,13 @@ SH.hud=function(c,t,L){L=L||{nx:24,ny:57,dx:214,dy:H-30,sx:18,sy:H-34,ring:true}
   if(L.ring)this.ring(c,t);
   HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;};
 
-/* ---------- lag fix: decoding a song (60-100 MB of PCM) blocks the main thread for 100-300 ms when it ends, and that froze the ship.
-   Songs are now decoded ONE at a time and only while nothing needs steering: title, pause, pit stop, game over, and the first seconds of a district
-   (banner time). The songs a district will need (its own, its boss's, the next one) are queued from there; the pump keeps all of them in memory.
-   A song that is needed before it is ready still loads at once (urgent), and that is counted in NR.lag.urgent. ---------- */
+/* ---------- lag fix, part 2: songs are streamed (see parts/a.js "tracks"), nothing is decoded any more, so there is no stall to hide.
+   What is left of the old pump: keep the songs a district will need (its own, its boss's, the next one) buffered in their audio slots, ahead of time and one after
+   the other. A song that is needed before it is buffered is still asked for at once (urgent), and that is counted in NR.lag.urgent. ---------- */
 const _loadTrack0=loadTrack;
 const _loadTrack=async stage=>{const h=TRQ.hist;h.push(stage+' start '+(performance.now()|0)+(typeof SH!=='undefined'&&SH.active?' pit':''));await _loadTrack0(stage);h.push(stage+' end '+(performance.now()|0)+(typeof SH!=='undefined'&&SH.active?' pit':''));if(h.length>60)h.splice(0,h.length-60);};
 const TRQ=NR.lag={mid:0,urgent:0,loads:0,log:[],hist:[]};
-const calmNow=()=>!running||paused||(typeof SH!=='undefined'&&SH.active)||!G||G.dead||G.over||G.dt<3.5;
+const calmNow=()=>!running||paused||(typeof SH!=='undefined'&&SH.active)||!G||G.dead||G.over||G.dt<3.5;   // (kept for the tests: counts a late load as "during play")
 function wantSongs(){
   if(!running||!G)return['menu','stage1','stage2'];
   if(ST.on){const o=[ST.def.song];if(ST.def.goal.k==='boss'){const sg=bossSong(DISTRICTS[ST.def.di].boss,false);if(sg)o.push(sg);}return o;}
@@ -2253,15 +2320,13 @@ function wantSongs(){
   if(SH.active){const nx=nextDi(di);di=nx.di;if(nx.wrap)L++;done=false;}                       // pit stop: get ready for the district that comes next
   const o=[songFor(di,L)],sg=bossSong(DISTRICTS[di].boss,false);if(sg&&!done)o.push(sg);
   const nx2=nextDi(di);o.push(songFor(nx2.di,nx2.wrap?L+1:L));return o;}
-TR.keepFn=file=>(TRQ.hold&&TRQ.hold.has(file))||wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);   // TRQ.hold: test hook that keeps extra songs decoded
-const trBusy=()=>{for(const k in TR.busy)if(TR.busy[k])return true;return false;};
-function pumpTracks(){if(!AU.a||trBusy())return;
-  for(const s of wantSongs()){const info=TR.by[s];if(!info||TR.bufs[info.file]||TR.bad[info.file])continue;
-    if(!calmNow())return;TRQ.loads++;_loadTrack(s);return;}}
+TR.keepFn=file=>(TRQ.hold&&TRQ.hold.has(file))||wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);   // TRQ.hold: test hook that keeps extra songs buffered
+function pumpTracks(){if(!AU.a)return;
+  for(const s of wantSongs()){const info=TR.by[s];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file])continue;TRQ.loads++;_loadTrack(s);}}
 setInterval(pumpTracks,300);
 loadTrack=function(stage,urgent){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
-  if(urgent){TRQ.urgent++;if(!calmNow())TRQ.mid++;TRQ.log.push(stage+'@'+(G?G.t|0:0));if(TRQ.log.length>20)TRQ.log.shift();return _loadTrack(stage);}
-  if(calmNow()&&!trBusy()){TRQ.loads++;return _loadTrack(stage);}};      // otherwise the pump takes it when it is calm
+  if(urgent){TRQ.urgent++;if(!calmNow())TRQ.mid++;TRQ.log.push(stage+'@'+(G?G.t|0:0));if(TRQ.log.length>20)TRQ.log.shift();}
+  TRQ.loads++;return _loadTrack(stage);};
 
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre

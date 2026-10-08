@@ -1,61 +1,69 @@
 {
-  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, stage3, boss, boss2 (final boss), endless, endless2. Files are loudness-normalised to about -18 LUFS (true peak -1.5 dB); offsets measured by onset alignment.",
+  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, stage3, boss, boss2 (final boss), endless, endless2. Files are loudness-normalised to about -18 LUFS (true peak -1.5 dB); offsets measured by onset alignment. gapMs: how many milliseconds a looping <audio> element pauses at the end of the file (mp3 encoder padding); measured with games-src/nightrun/audio-test.js, default 24; the beat grid uses it when a song is faded in from the tail of its file.",
   "tracks": [
     {
       "file": "menu.mp3",
       "stage": "menu",
       "bpm": 112,
       "offsetMs": 234,
-      "title": "Wet Asphalt Boulevard"
+      "title": "Wet Asphalt Boulevard",
+      "gapMs": 30
     },
     {
       "file": "stage1.mp3",
       "stage": "stage1",
       "bpm": 92,
       "offsetMs": 86,
-      "title": "Midnight Circuit"
+      "title": "Midnight Circuit",
+      "gapMs": 27
     },
     {
       "file": "stage2.mp3",
       "stage": "stage2",
       "bpm": 126,
       "offsetMs": 242,
-      "title": "Chrome Skyway"
+      "title": "Chrome Skyway",
+      "gapMs": 27
     },
     {
       "file": "stage3.mp3",
       "stage": "stage3",
       "bpm": 128,
       "offsetMs": 58,
-      "title": "Neon Pursuit"
+      "title": "Neon Pursuit",
+      "gapMs": 19
     },
     {
       "file": "boss.mp3",
       "stage": "boss",
       "bpm": 100,
       "offsetMs": 280,
-      "title": "Last Boss Standing"
+      "title": "Last Boss Standing",
+      "gapMs": 19
     },
     {
       "file": "boss2.mp3",
       "stage": "boss2",
       "bpm": 110,
       "offsetMs": 270,
-      "title": "Final Protocol"
+      "title": "Final Protocol",
+      "gapMs": 10
     },
     {
       "file": "endless.mp3",
       "stage": "endless",
       "bpm": 136,
       "offsetMs": 220,
-      "title": "Neon Pixel Sprint"
+      "title": "Neon Pixel Sprint",
+      "gapMs": 24
     },
     {
       "file": "endless2.mp3",
       "stage": "endless2",
       "bpm": 84,
       "offsetMs": 20,
-      "title": "Stage Eight Clear"
+      "title": "Stage Eight Clear",
+      "gapMs": 22
     }
   ]
 }

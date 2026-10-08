@@ -620,7 +620,7 @@ async function powerTests(browser, synth) {
 
     // 2) TEMPO UP, collected off the beat: 8 bars, music x1.25, score x2, beat clock stays aligned while the speed changes and when it ends
     c = await collect('tempo', false); await sleep(2200);
-    let st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? __mnr.AU.cur.src.playbackRate.value : null, d: (__mnr.G.pw.act.find(a => a.k === 'tempo') || {}).d, bc: __mnr.G.bc }));
+    let st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null, d: (__mnr.G.pw.act.find(a => a.k === 'tempo') || {}).d, bc: __mnr.G.bc }));
     if (st.rate !== 1.25 || Math.abs(st.bpm - base.bpm * 1.25) > .01) await fail(p, tag, 'power', `TEMPO UP: rate ${st.rate} bpm ${st.bpm}, wanted x1.25 of ${base.bpm}`);
     if (!synth && Math.abs(st.pr - 1.25) > .001) await fail(p, tag, 'power', 'TEMPO UP: the song source plays at ' + st.pr);
     if (st.d !== 32) await fail(p, tag, 'power', 'off-beat TEMPO UP should last 32 beats, got ' + st.d);
@@ -629,7 +629,7 @@ async function powerTests(browser, synth) {
     await checkAlign('tempo x1.25', 3.5);
     if (!await waitEnd('tempo', 30)) await fail(p, tag, 'power', 'TEMPO UP did not end within 30 s');
     await timing('tempo', 32, await lastLog('tempo'));
-    await sleep(1500); st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? __mnr.AU.cur.src.playbackRate.value : null }));
+    await sleep(1500); st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null }));
     if (st.rate !== 1 || Math.abs(st.bpm - base.bpm) > .01 || (!synth && Math.abs(st.pr - 1) > .001)) await fail(p, tag, 'power', 'after TEMPO UP the music did not return to normal speed ' + JSON.stringify(st));
     await checkAlign('after tempo ends', 3.5);
 
@@ -637,7 +637,7 @@ async function powerTests(browser, synth) {
     await ev(p, () => { __mnr.eb(900, 40, Math.PI / 2, 1); __mnr.G.eb[__mnr.G.eb.length - 1].tag = 1; });   // a bullet that crawls at speed 1: it is still flying when the power-up ends
     const sp = () => ev(p, () => { const b = __mnr.G.eb.find(b => b.tag); return b ? Math.hypot(b.vx, b.vy) : -1; });
     const sp0 = await sp(); c = await collect('slow', false); await sleep(1500);
-    st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? __mnr.AU.cur.src.playbackRate.value : null, d: (__mnr.G.pw.act.find(a => a.k === 'slow') || {}).d }));
+    st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null, d: (__mnr.G.pw.act.find(a => a.k === 'slow') || {}).d }));
     if (st.rate !== .75 || Math.abs(st.bpm - base.bpm * .75) > .01) await fail(p, tag, 'power', `SLOW GROOVE: rate ${st.rate} bpm ${st.bpm}, wanted x0.75 of ${base.bpm}`);
     if (!synth && Math.abs(st.pr - .75) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
     const nb = await ev(p, () => { const n = __mnr.G.eb.length; __mnr.eb(900, 40, Math.PI / 2, 100); const b = __mnr.G.eb[__mnr.G.eb.length - 1]; return Math.hypot(b.vx, b.vy) / __mnr.DF.bs; });
