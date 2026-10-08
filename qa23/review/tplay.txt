@@ -1,0 +1,12 @@
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.waitForTimeout: Target page, context or browser has been closed
+    at gap (/home/user/spotify_to_ytmusic/tools/tPlay.js:87:121)
+    at up (/home/user/spotify_to_ytmusic/tools/tPlay.js:96:167)
+    at async apply (/home/user/spotify_to_ytmusic/tools/tPlay.js:104:40)
+    at async play (/home/user/spotify_to_ytmusic/tools/tPlay.js:168:4)
+    at async /home/user/spotify_to_ytmusic/tools/tPlay.js:219:64
+
+Node.js v22.22.0
