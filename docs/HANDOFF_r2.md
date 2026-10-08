@@ -41,3 +41,16 @@
 - Shots: docs/shots/r2/ (852×393 touch run s3 = ?fast=1 run: UI layout correct, 3D frame may lag; finishes sheet from a non-fast run with 30 s waits; before_v88a.png = old garage).
 - NOT done (for the next worker): Frankfurt drive after the garage + tyre gap (`node t4/r2drive.js http://127.0.0.1:8766/local_dbg.html <out>`), start-screen shot, PC 1280×720 run (`node t4/r2shell.js <url> <out> 1280 720`), iframe run (IFRAME=1), re-shoot RIDES (stat chips now on top of the panel; s3 rides shot shows the older top-left card), kit pictures in a non-fast run (they render slowly here).
 - A non-fast full tour (s4) was still running when REVIEW went out.
+
+## Reviewer FAIL on 66a5ab61 (08:25): todo for the next worker
+1. The build tip "✔ PLACE or tap again" leaks into PAINT/KITS/PERKS/DRIVER. A CSS fix is already in src (`#gbx.r2:not(.gbBk) #gsTip{display:none}`), committed after the s3 shots. Also hide it while in BUILD with nothing held, and clear it on every mode switch (R2_go → GS_tip off). Re-shoot without ?fast.
+2. m2g shows 47/120 but no visible new brick. Re-shoot without ?fast (the garage redraws only every ~5 s here) with a part colour that contrasts, plus its mirror. If it's still not there, it's a placement bug.
+3. The held pad (#gsBar: PLACE/ROTATE/CANCEL/STEP) covers the car's rear and the ghost. Make it compact: 2×2 small tiles at the left edge under the rail, or one row above the tile bar. Show the ghost in the shot.
+4. Kit thumbnails are blank: never show an empty white box. Show a flat icon fallback (category emoji) until the 3D image is ready, or pre-render at gbOpen.
+5. Finishes (R2_FP in 98u):
+   - pearl must keep the base hue (k=1 now, sheen .3): add sheen/iridescence without lightening;
+   - chrome reads as dark red: try a separate env for the garage, or a lighter tint (mix toward white) with metalness 1 and roughness ≤ .05;
+   - widen the gloss/matte/metal spread (matte roughness 1 + no clearcoat; gloss clearcoat 1 roughness .15; metal metalness .9 + roughness .25);
+   - re-shoot with t4/r2fin.js (normal mode, 30 s waits, closer clip).
+6. Gate still owed: start screen; a Frankfurt drive after SAVE & DRIVE per finish (t4/r2drive.js): car on the road, tyre gap ≤ 0.05, wheels dark, no see-through; PC 1280×720; iframe; console errors.
+Minor: m5 "1/3 SLOTS" wraps (it comes from GPK_html's h5): shorten it to "1/3" in the shell (rewrite the h5 text in R2_post).
