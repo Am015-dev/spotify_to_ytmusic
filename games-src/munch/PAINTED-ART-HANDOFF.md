@@ -49,5 +49,15 @@ All files are in `games/doorkick-dungeon/media/` (separate files, not inlined), 
   - `vault-stone` and `golden-vault` are the campaign `table` unlocks.
   - Keep the CSS wood as the fallback while the image loads, and on Low graphics.
 
+## Title and end-screen art, music prompts (new, 2026-10-08)
+- `media/title.webp` (1302×726) and `media/title-phone.webp` (744×1334) are the title-screen key art: the party kicking open the cellar door.
+  - The top has clear space for the "Doorkick Dungeon" logo text.
+  - Put the rules text below the art or behind a "How to play" button instead of the current wall of text.
+- `media/end-win.webp`: tavern feast with the golden boot. `media/end-lose.webp`: the hero sitting dazed in socks while monsters steal the gear.
+  - Use them on the game-over screen behind the result.
+- `MUSIC-PROMPTS.txt`: text-to-music prompts for a tavern menu loop, a new main loop, a fight loop, victory and defeat cues, stingers to replace the sax jingles, and a tavern ambience loop.
+  - The music isn't made yet: the owner generates it in a music tool.
+  - The tool's licence must allow public game use. Log each file in `ASSETS.md`.
+
 ## Optional
 - `slurper.mp4` (8 s, 16:9, laptop `cards\doorkick\`) is a test clip of the Sock Slurper.
