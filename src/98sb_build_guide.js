@@ -6,7 +6,7 @@
 // Watch: the garage camera orbits the build; earlier parts dimmed, the new parts drop in (+1.5 m, ease-out) and glow. Controls ◀ ▶, PLAY/PAUSE, ×1/×2,
 // slider, EXIT (≥ 44 px, in bars around the car). BUILD IT: BUILD mode with the next step as a green ghost; a tap near it snaps the part in place.
 const SB={on:0,diy:0,B:null,S:[],k:0,play:1,sp:1,t:0,drop:[],from:'',bak:null,z:1,R:{v:3,h:6},C:null,tg:null,want:null,gh:null,t0:0,done:0};
-SB.dm=GB_MAT.clone();SB.dm.color.setScalar(.62);SB.hm=GB_MAT.clone();SB.hm.emissive=new THREE.Color(0xffffff);SB.hm.emissiveIntensity=0;
+SB.dm=GB_MAT.clone();SB.dm.color.setScalar(.62);SB.hm=GB_MAT.clone();SB.hm.emissive=new THREE.Color(0xfff2b0);SB.hm.emissiveIntensity=0;
 SB.gm=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.55,depthWrite:false,color:0x7dffa0});
 const SB_same=(a,b)=>a.t===b.t&&a.x===b.x&&a.z===b.z&&a.y===b.y&&(a.r%4)===(b.r%4);
 function SB_steps(B,tpl){const G=[],n=B.length,ok=tpl&&tpl.steps&&tpl.length===n&&tpl.every((e,i)=>e[0]===B[i].t&&e[1]===B[i].x&&e[2]===B[i].z);
@@ -26,7 +26,7 @@ function SB_show(k,anim){if(!GB.mesh)return;SB_clearDrop();const n=SB.S.length;S
  for(const o of U.gbM)if(o.material===GB_MAT)o.material=SB.dm;
  const bb=new THREE.Box3();SB.S[k].forEach((j,i)=>{const g=new THREE.Group();g.userData.m=g;GB_attach(g,[SB.B[j]],null,false,false);g.traverse(o=>{if(o.material===GB_MAT)o.material=SB.hm});host.add(g);
   bb.union(SB_box(g));const d={g,t:anim?-i*.1:1};if(anim)g.position.y=1.5;SB.drop.push(d)});
- SB.want=SB.C.clone().lerp(bb.getCenter(new THREE.Vector3()),.35);if(anim)try{AU.sfx('pick')}catch(e){}SB_ui()}
+ SB.want=SB.C.clone().lerp(bb.getCenter(new THREE.Vector3()),.35);if(anim)try{AU.sfx('pick')}catch(e){}try{GS_shadows()}catch(e){}GB.r.shadowMap.needsUpdate=true;SB_ui()}
 function SB_go(k){if(!SB.on)return;SB_show(k,true)}
 // ---------- open / close
 function SB_open(from){if(!GB.mesh||!GB.d)return;const B=GB_list().map(b=>({...b}));if(!B.length){GB_msg&&GB_msg('Nothing to build yet');return}
@@ -41,7 +41,7 @@ function SB_close(){if(!SB.on)return;SB.on=0;SB_clearDrop();$('#gbx').classList.
 function SB_frame(){const now=performance.now(),dt=Math.min(.05,SB.t0?(now-SB.t0)/1000:.016);SB.t0=now;try{if(typeof GS_step==='function')GS_step(dt)}catch(e){}
  const sp=SB.sp;let land=0,all=1;for(const d of SB.drop){if(d.t<1){const t0=d.t;d.t+=dt*sp/.45;if(d.t>=1&&t0<1)land=1;const k=clamp(d.t,0,1);d.g.position.y=1.5*Math.pow(1-k,3);d.g.visible=d.t>0}if(d.t<1)all=0}
  if(land)try{AU.sfx('brick')}catch(e){}
- SB.t+=dt*sp;SB.hm.emissiveIntensity=all?.32*Math.max(0,Math.cos(Math.min(SB.t*2.2,Math.PI/2)))+.12*Math.max(0,Math.sin(SB.t*5))*(SB.t<1.4?1:0):.35;
+ SB.t+=dt*sp;SB.hm.emissiveIntensity=all?.14*Math.max(0,Math.cos(Math.min(SB.t*2.2,Math.PI/2)))+.06*Math.max(0,Math.sin(SB.t*5))*(SB.t<1.4?1:0):.14;if(!all||SB.sh){SB.sh=!all;GB.r.shadowMap.needsUpdate=true}
  if(SB.play&&all&&SB.t>1.5){if(SB.k<SB.S.length)SB_show(SB.k+1,true);else SB.play=0,SB_ui()}
  const cvs=$('#gbC'),W=cvs.clientWidth,H=cvs.clientHeight,C=GB.cam;if(!W||!H)return;if(cvs.width!==Math.round(W*DPR2())||SB.cw!==W+'x'+H){SB.cw=W+'x'+H;GB.r.setPixelRatio(DPR2());GB.r.setSize(W,H,false);C.aspect=W/H}
  const A=SB_area(W,H);if(GB.drag==null&&SB.play)GB.rot+=dt*.12;SB.tg.lerp(SB.want||SB.C,1-Math.exp(-dt*3));
