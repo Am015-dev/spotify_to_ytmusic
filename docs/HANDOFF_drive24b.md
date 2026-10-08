@@ -20,5 +20,17 @@ FULL review on the split build; DEPLOY message to the coordinator after PASS. Ne
    junction node (±30-55°, 10-15 m sideways in 25-90 m). Real staggered junctions (2 real 90° turns 55-70 m apart) stay.
    Fix: D24_clean step (4), TUNE.rtJog 14 m.
 
+## Results so far (tSteer24 keys, 60+100 km/h, 8 Frankfurt routes, 56 turns; t90 = hold ◀ at 50 km/h until 90°)
+| build / knobs | flips | counter-yaw °/s | settle s | straight wobble /km | t90 s |
+|---|---|---|---|---|---|
+| live v88d (base_dbg) | 1.13 | 28.4 | 2.97 | 140 | 1.77 |
+| drive24 defaults (ramp .25/.6) | 1.13 | 9.3-9.5 | 2.29-2.42 | 48 | 1.98 (slower!) |
+| A: ramp .1 up to 50 km/h (stRampV0 50), stLim 1.4, stK0 .35 | 1.13 | 31 | 2.98 | 123 | 1.80 |
+| B: A + asMax .35, assist 3 | 1.09 | 30 | 3.03 | 112 | 1.80 |
+Touch (60+100): v88d 1.25 flips / settle 3.19; drive24 1.16 / 2.40; with stTouchDig 1.15 / 2.56. 30 fps keys (drive24): 1.02 / 1.97.
+t90 sweep (qa24b/t90.sh): even no ramp gives 1.78 (shaping off = 1.76): the ramp is what costs turn speed.
+Routes Frankfurt zig-zags: 49 (drive24) → 36 (jog pass + deck-aware clearance), U-turns 4-5, turns/km 1.83.
+Coordinator 12:31: steering first; zig-zags at 36 OK unless a visible U-turn; REVIEW before ~400k context.
+
 ## Open
 - measure: touch/keys × 30/60 fps, new vs v88d; route fra+ath; time-to-90°; shots; tPlay; REVIEW; DEPLOY.
