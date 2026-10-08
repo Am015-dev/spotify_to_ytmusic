@@ -52,6 +52,7 @@ function renderStart() {
   const card = h('div.scard',
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
     h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
+    firstTime() ? tutNode('sbtn big') : null,
     h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player.')),
     window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
     h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
@@ -62,6 +63,7 @@ function renderStart() {
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 4 people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
     netBlock(),
+    firstTime() ? null : tutNode('sbtn'),
     h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play')));
   s.appendChild(card);
 }
@@ -89,10 +91,10 @@ document.addEventListener('click', ev => {
     case 'take': takeDevice(); break;
     case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
     case 'menu': UI.camp = null; showStart(); break;
-    case 'story': campOpen(); break;
+    case 'story': storyOpen(); break;
     case 'campfin': campFinish(); break;
-    case 'start': newGame(d.m); break;
-    case 'guided': newGame('guided'); break;
+    case 'start': if (d.m !== 'ai' && tutOffer(() => newGame(d.m))) break; newGame(d.m); break;
+    case 'guided': if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break;
     case 'opt': { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[d.k] = isNaN(+d.v) ? d.v : +d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'save': save(); toast('Game saved.'); break;
