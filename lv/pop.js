@@ -11,13 +11,13 @@ const enter=require('../bc/enter.js');const fs=require('fs');const URL=process.a
     const r=await ev(`(()=>{const N=HUB.nodes.filter(n=>n&&n.nb&&n.nb.length>=2&&!n.ab&&!n.g&&(n.w||0)>=10);const a0=N[Math.floor((${si}*.137%1)*N.length)],b=HUB.nodes[a0.nb[0]],L=Math.hypot(b.x-a0.x,b.z-a0.z),a={x:a0.x+(b.x-a0.x)*12/L,z:a0.z+(b.z-a0.z)*12/L};const h=Math.atan2(b.x-a0.x,b.z-a0.z);__mho.warp(a.x,a.z,h,performance.now());RO.x=a.x;RO.z=a.z;RO.y=__mho.gnd(a.x,a.z,RO.y+60);RO.v=0;RO.h=RO.vh=h;if(LVP.c)LVP_end(LVP.c,false);return 1})()`);
     await p.waitForTimeout(1500);ok=await ev(`(()=>{LVP.k=${k};LVP.cd=999;return !!LVP_path()&&LVP_spawn()})()`)===true}
   if(!ok){console.log('kind',k,'no straight street');continue}
-  await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${CITY}_pop${k}_gate.png`});console.log('gate',k,await ev(`JSON.stringify({k:LVP.c&&LVP.c.K.k,d:LVP.c&&Math.round(Math.hypot(LVP.c.gx-RO.x,LVP.c.gz-RO.z)),line:(document.querySelector('#roamArrow span')||{}).textContent||(document.querySelector('#m1Next .crD')||{}).textContent})`));
+  await p.waitForTimeout(2500);if(!process.env.NOSHOT)await p.screenshot({path:`${OUT}/${CITY}_pop${k}_gate.png`});console.log('gate',k,await ev(`JSON.stringify({k:LVP.c&&LVP.c.K.k,d:LVP.c&&Math.round(Math.hypot(LVP.c.gx-RO.x,LVP.c.gz-RO.z)),line:(document.querySelector('#roamArrow span')||{}).textContent||(document.querySelector('#m1Next .crD')||{}).textContent})`));
   // headless sim runs ~0.3× real time: place the car 9 m before the ring at 15 m/s (the reviewer is told), then real GAS
   await ev(`(()=>{const C=LVP.c;RO.x=C.gx-Math.sin(C.gh)*9;RO.z=C.gz-Math.cos(C.gh)*9;RO.h=RO.vh=C.gh;RO.v=15;return 1})()`);
   await p.keyboard.down('ArrowUp');let shot=false;const t0=Date.now();
   while(Date.now()-t0<150000){const st=await ev(`LVP.c?LVP.c.st+':'+LVP.c.t.toFixed(1)+':'+LVP.c.v.toFixed(1):'none'`);
-   if(!shot&&st.startsWith('1:')&&parseFloat(st.split(':')[1])>(k===0?0.3:0.6)){await p.screenshot({path:`${OUT}/${CITY}_pop${k}_run.png`});shot=true;console.log('run',k,st,await ev(`(document.querySelector('#roamArrow span')||{}).textContent+' | '+((document.querySelector('#m1Next .crD')||{}).textContent||'')`))}
+   if(!shot&&st.startsWith('1:')&&parseFloat(st.split(':')[1])>(k===0?0.3:0.6)){if(!process.env.NOSHOT)await p.waitForTimeout(2500);if(!process.env.NOSHOT)await p.screenshot({path:`${OUT}/${CITY}_pop${k}_run.png`});shot=true;console.log('run',k,st,await ev(`(document.querySelector('#roamArrow span')||{}).textContent+' | '+((document.querySelector('#m1Next .crD')||{}).textContent||'')`))}
    if(st==='none')break;await p.waitForTimeout(400)}
-  await p.keyboard.up('ArrowUp');await p.waitForTimeout(600);if(k===2||k===0)await p.screenshot({path:`${OUT}/${CITY}_pop${k}_end.png`});
+  await p.keyboard.up('ArrowUp');await p.waitForTimeout(600);if(!process.env.NOSHOT&&(k===2||k===0))await p.screenshot({path:`${OUT}/${CITY}_pop${k}_end.png`});
   console.log('end',k,await ev(`JSON.stringify({ok:LVP.ok,miss:LVP.miss,ramps:RO.ramps.length})`))}
  console.log('errors',errs.length,errs.slice(0,5).join(' | '));await E.b.close()})();

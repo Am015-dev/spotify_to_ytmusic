@@ -236,7 +236,7 @@ function LVP_spawn(){const Q=LVP_path();if(!Q)return false;const M=LVP_mesh(),K=
   if(roamHit(g.x,g.z,3.6,gy+2))return false;LVP_label(K);M.g.position.set(g.x,gy,g.z);M.g.rotation.set(0,g.h,0);M.g.visible=true;M.g.scale.setScalar(.05);
   LVP.c={K,st:0,t:0,v:0,gx:g.x,gz:g.z,gy,gh:g.h,Q,lat:Q.lat,obj:[],s0:0,dist:0};AU.sfx('pick');return true}
 // start: lay the course just past the ring
-function LVP_start(C){const K=C.K,M=LVP.m,Q=C.Q;C.st=1;C.t=0;C.s0=HUB.smashed;AU.sfx('go');say(K.ico+' '+K.name,K.lim+' s · '+K.goal+' '+K.u,1.4);
+function LVP_start(C){const K=C.K,M=LVP.m,Q=C.Q;M.g.visible=false;C.st=1;C.t=0;C.s0=HUB.smashed;AU.sfx('go');say(K.ico+' '+K.name,K.lim+' s · '+K.goal+' '+K.u,1.4);
   if(K.k==='jump'){const r=LVP_pt(Q,11,C.lat),y0=Math.max(0,groundAt(r.x,r.z,C.gy+6));addRamp(r.x,r.z,r.h,13,3,7,0xff8a1c,y0);C.ramp=RO.ramps[RO.ramps.length-1];C.rampM=RO.grp.children.slice(-3);C.tg=r}
   if(K.k==='slalom'){for(let j=0;j<5;j++){const o=C.lat+(j%2?-2.2:2.2),o2=clamp(o,-Math.max(2.2,Q.w/2-2.2),Math.max(2.2,Q.w/2-2.2)),a=LVP_pt(Q,11+j*3,o2);C.obj.push({x:a.x,z:a.z,h:a.h,tx:a.tx,tz:a.tz,y:Math.max(0,groundAt(a.x,a.z,C.gy+6)),pass:false,hit:[0,0]})}C.tg=C.obj[0]}
   if(K.k==='smash'){for(let j=0;j<6;j++){const o=clamp(C.lat+(j%2?-1.8:1.8),-Math.max(1.8,Q.w/2-1.6),Math.max(1.8,Q.w/2-1.6)),a=LVP_pt(Q,11+j*2.5,o);C.obj.push({x:a.x,z:a.z,h:a.h,y:Math.max(0,groundAt(a.x,a.z,C.gy+6)),dead:false})}C.tg=C.obj[0]}
