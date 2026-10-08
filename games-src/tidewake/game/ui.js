@@ -999,15 +999,16 @@ hlpInit();
 // (what each step teaches) is at the top of src/tutscript.js. Story opens through it as "Chapter 0" the first time; the menu replays it any time.
 const TUT_GAME='tidewake';
 const TUTP={pause:false};                                         // true = the computer waits (a step wants you to read what just happened)
-const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut;
-const firstTime=()=>{try{return !localStorage.getItem('tw_played')&&!localStorage.getItem('tw_offered')}catch(e){return true}};
-const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart});
+function tutOn(){return typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut}
+function firstTime(){try{return !localStorage.getItem('tw_played')&&!localStorage.getItem('tw_offered')}catch(e){return true}}
+function tutBtn(cls){return typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart})}
 // ---------------------------------------------------------------- where each step points
 const tq=sel=>()=>{const e=document.querySelector(sel);return e&&!e.closest('[hidden]')&&e.getBoundingClientRect().width?e:null};
 const tfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&!e.closest('[hidden]')&&e.getBoundingClientRect().width)return e}return null};
-// a small overlay tag (the junk's name, the wave) is only ~20px tall: spotlight a fingertip-sized box around it
-function tbox(sel,min){return ()=>{const e=document.querySelector(sel);if(!e||e.closest('[hidden]'))return null;const r=e.getBoundingClientRect();if(!r.width)return null;const m=min||52,w=Math.max(m,r.width),h=Math.max(m,r.height);
-  return {left:r.left+r.width/2-w/2,top:r.top+r.height/2-h/2,width:w,height:h}}}
+// pieces on the board (a junk, the wave): the phone layout hides their name tags, so spotlight the square where they are, projected onto the screen
+function tutProj(w,sz){try{const p=hproj(w[0],w[1],.3);return p?{left:p.x-sz/2,top:p.y-sz/2,width:sz,height:sz}:null}catch(e){return null}}
+const tutShipRect=i=>()=>{try{const sp=shipPos(G.ships[i]);if(!sp)return null;return tutProj(sp.port!=null?pw(sp.c,sp.r,sp.port):sqW(sp.c,sp.r),56)}catch(e){return null}};
+const tutWaveRect=()=>{try{return G.wave?tutProj(sqW(G.wave.x,G.wave.y),64):null}catch(e){return null}};
 // the gold mark you start from: where the game itself draws it (the same projection as the board's pips)
 function tutPipRect(){try{const d=sideToAct();const t=TS.myStart;const o=startInfo(d).find(q=>q.m.x===t.x&&q.m.y===t.y&&q.m.e===t.e);if(!o)return null;const p=hproj(o.w[0],o.w[1]);
   return p?{left:p.x-24,top:p.y-24,width:48,height:48}:null}catch(e){return null}}
@@ -1038,16 +1039,16 @@ function tutSteps(){return [
    ready:()=>G.turn===2&&layReady()&&!!UI.sel&&UI.sel.t===0&&UI.sel.r===0},
  {id:'place',title:'Lay it',say:'Green check: safe. Tap Place. Your junk sails along the new line.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},pauseAfter:true,
    ready:()=>G.turn===2&&layReady()&&!!UI.sel&&UI.sel.t===0&&UI.sel.r===1&&placeOn()},
- {id:'sail',title:'Your junk sails',say:'It followed the line to the end. Then you draw back up to three tiles.',target:tbox('.otag.ship.me'),wait:null,onNext:()=>{TUTP.pause=false;schedule()},
-   ready:()=>G.turn===3&&TUTP.pause&&!UI.busy&&!!document.querySelector('.otag.ship.me')},
- {id:'rivals',title:'Mind other junks',say:'Cobalt sails too. Never end on another junk\'s wake: two junks on one wake both sink.',target:tbox('.otag.ship:not(.me)'),wait:null,
-   ready:()=>G.turn===4&&layReady()&&!!document.querySelector('.otag.ship:not(.me)')},
+ {id:'sail',title:'Your junk sails',say:'It followed the line to the end. Then you draw back up to three tiles.',target:tutShipRect(0),wait:null,onNext:()=>{TUTP.pause=false;schedule()},
+   ready:()=>G.turn===3&&TUTP.pause&&!UI.busy&&!!tutShipRect(0)()},
+ {id:'rivals',title:'Mind other junks',say:'Cobalt sails too. Never end on another junk\'s wake: two junks on one wake both sink.',target:tutShipRect(1),wait:null,
+   ready:()=>G.turn===4&&layReady()&&!!tutShipRect(1)()},
  {id:'chain',title:'Join another tile',say:'This tile links to Cobalt\'s current. Tap Place: your junk sails across both.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===4&&layReady()&&tutSel(0,0)&&placeOn()},
  {id:'keep',title:'A Deck Cannon',say:'You drew a Deck Cannon. Keep it: later it destroys a leviathan about to sink you.',target:TQ.q(0),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='cKeep'},
    ready:()=>!!G.q&&G.q.kind==='cannonDraw'&&!UI.busy&&!!PH.cur&&PH.cur.kind==='q'&&!!TQ.q(0)()},
  {id:'wave',title:'Rogue Wave',say:()=>{const w=waveLine();return w?'A Rogue Wave sweeps your row. You rolled '+w.r+'; it needs '+w.n+'+ or you capsize. You ride it.':'A Rogue Wave sweeps this row. Roll its strength or capsize.'},
-   target:tbox('.otag.wave',60),wait:null,ready:()=>G.turn===6&&!!G.wave&&!UI.busy&&sideToAct()===0&&!!document.querySelector('.otag.wave')},
+   target:tutWaveRect,wait:null,ready:()=>G.turn===6&&!!G.wave&&!UI.busy&&sideToAct()===0&&!!tutWaveRect()},
  {id:'place3',title:'Lay a tile',say:'Lay this tile. Your path crosses the wave\'s row again, so you roll once more.',target:TQ.place,wait:{type:'tap',match:a=>a.what==='place'},
    ready:()=>G.turn===6&&layReady()&&tutSel(0,0)&&placeOn()},
  {id:'cannon',title:'Fire the cannon!',say:()=>levName(4)+' blocks your junk and would sink it. Fire your Deck Cannon.',target:()=>TQ.q(doomOpt('dCannon'))(),wait:{type:'tap',match:a=>a.what==='q'&&a.h==='dCannon'},
