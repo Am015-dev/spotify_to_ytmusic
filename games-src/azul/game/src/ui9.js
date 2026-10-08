@@ -197,9 +197,11 @@ function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;const d=document.createEl
 const BF_TIPS={nofit:'Red ✗ colours fit no row.',slide:'Leftovers slid to the middle.',tiling:'Full rows slide onto the wall!',chain:'Touching tiles score more!',
   floor:'Extra tiles break: minus points.',sun:'☀ costs 1, but you start next.',bonus:'Full column +7 at the end!',
   end:'A full wall row ends the game.',keep:'Unfinished rows wait for next round.'};
-function bfTip(k,force){if((!UI.coach&&!force)||BF.seen['tip_'+k])return;BF.seen['tip_'+k]=1;BF.tip=BF_TIPS[k];bfHintSet();
+function bfTipSeen(k){try{return (localStorage.getItem('sgz_tips')||'').split(',').includes(k)}catch(e){return false}}
+function bfTipMark(k){try{const a=(localStorage.getItem('sgz_tips')||'').split(',').filter(Boolean);if(!a.includes(k)){a.push(k);localStorage.setItem('sgz_tips',a.join(','))}}catch(e){}}
+function bfTip(k,force){if(UI.tut)return;if(!force&&(!UI.coach||(typeof GXH!=='undefined'&&!GXH.enabled())||bfTipSeen(k)))return;if(BF.seen['tip_'+k])return;BF.seen['tip_'+k]=1;if(!force)bfTipMark(k);BF.tip=BF_TIPS[k];bfHintSet();
   clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},4200)}
-function bfHintSet(){if(!BF.hint||!BF.disp||!G)return;BF.hint.innerHTML=bfHintHTML(BF.disp,BF.busy?null:me())}
+function bfHintSet(){if(!BF.hint||!BF.disp||!G)return;BF.hint.innerHTML=bfHintHTML(BF.disp,BF.busy?null:me());if(typeof hlpAfter==='function')hlpAfter()}
 // ---------- the engine's events go into a queue; each is played on the board in turn ----------
 function bfSync(){if(!G)return false;const gk=G.seed+':'+(G.gid||'');if(gk!==BF.gk){BF.gk=gk;BF.q.length=0;BF.disp=bfClone(G);BF.seen={};BF.resHide=false;BF.menu=false;BF.peek=null;BF.lastWarn=0;BF.adv=null;BF.advK='';BF.fingerOn=false;BF.deal=true;return true}return false}
 function bfFx(f){if(!G)return;bfSync();const x=f.x;let e=null;
@@ -212,13 +214,13 @@ async function bfRun(){if(BF.busy)return;BF.busy=true;const gk=BF.gk;clearTimeou
   finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
 async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
-  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);return}
+  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
   if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length))await bfFloors();
     S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
     bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
-  if(e.t==='win'){await bfFloors();await bfBonus();sfx('win');return}}
+  if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
 async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!a)throw Error('take: no source');
   const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
@@ -273,6 +275,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
     const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
   bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
   await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
+  if(UI.tut)await tutPause('wall'+x.r);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
   const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
@@ -359,14 +362,14 @@ function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
   else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
   else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
   if(BF.tip){say=BF.tip;chip='';tg=''}
-  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over?`<button class="bf-ib bf-bulb" data-bf="hint" aria-label="Show me a good move">${IC('bulb')}</button>`:''}${live&&G.over&&BF.resHide?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
+  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over&&!UI.tut?`<button class="bf-ib bf-bulb gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?"></button>`:''}${live&&G.over&&BF.resHide&&!UI.tut?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
 function bfOvHTML(){if(!G)return '';
   if(BF.boss&&UI.cmp&&UI.cmp.twist)return `<div class="bf-card bf-bosscard" role="dialog" aria-label="Rule"><b>${esc(UI.cmp.twist.text||'')}</b><button class="bf-go" data-bf="close">Got it</button></div>`;
   if(BF.busy)return '';
   if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
-    return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${b('guide','Guide: '+(UI.coach?'on':'off'),'data-a="coach"')}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}</div>`}
+    return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${typeof tutBtn==='function'?tutBtn('bf-mi',false):''}${b('guide','Guided game: '+(UI.coach?'on':'off'),'data-a="coach"')}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'bf-set',btnClass:'bf-mi'}):''}</div>`}
   if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?'<em>☀</em>':''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
-  if(G.over&&!BF.resHide){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
+  if(G.over&&!BF.resHide&&!UI.tut){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
     return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
       <div class="bf-rk"><span>tiles</span><span>broken</span><span>bonus</span></div>
       ${L.map(r=>{const p=P(r.p),s=r.s;const bon=s.rows+s.cols+s.colours;return `<div class="bf-rr" style="--pc:${PCOL[r.p]}"><i></i><b>${isYou(r.p)?'You':esc(p.nm)}</b><span class="g">+${s.place}</span><span class="r">${s.floor?String(s.floor).replace('-','−'):'0'}</span><span class="g">${bon?'+'+bon:''}</span><b class="t">★${s.total}</b></div>`}).join('')}
@@ -377,7 +380,7 @@ function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.
   BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);
   BF.me.style.setProperty('--pc',PCOL[fp.i]);BF.me.classList.toggle('turn',!!hp);
   const ov=bfOvHTML();BF.ov.innerHTML=ov;BF.ov.hidden=!ov;
-  if(live)bfGuide(hp)}
+  if(live)bfGuide(hp);if(typeof hlpAfter==='function')hlpAfter()}
 // ---------- the ghost finger: first move of the guided game, the bulb, or after a long pause ----------
 function bfAdvice(hp){const k=G.logN+':'+G.phase+':'+hp.i;if(BF.advK===k)return BF.adv;BF.advK=k;BF.adv=null;if(isClient())return null;try{const a=adviceFor(hp.i);BF.adv=a?a.m:null}catch(e){}return BF.adv}
 function bfFingerTarget(hp){const m=bfAdvice(hp);
@@ -388,14 +391,14 @@ function bfFingerTarget(hp){const m=bfAdvice(hp);
 function bfFinger(el){const f=bfQ('.bf-fing');if(!f)return;const r=bfR(el);if(!r){f.hidden=true;return}f.hidden=false;const s=Math.max(.8,Math.min(1.2,BF.cs/34));
   f.style.width=48*s+'px';f.style.height=56*s+'px';f.style.left=(r.left+r.width/2-18*s)+'px';f.style.top=(r.top+r.height/2-4*s)+'px'}
 function bfGuide(hp){clearTimeout(BF.idleT);
-  const guided=UI.coach&&!BF.seen.took&&hp&&G.phase==='offer'&&!G.over;
+  const guided=UI.coach&&!BF.seen.took&&hp&&G.phase==='offer'&&!G.over&&!UI.tut&&(typeof GXH==='undefined'||!GXH.enabled());
   if(hp&&!G.over&&(guided||BF.fingerOn))bfFinger(bfFingerTarget(hp));else bfFinger(null);
   if(hp&&!G.over&&!BF.fingerOn&&!guided)BF.idleT=setTimeout(()=>{if(!BF.busy&&me()){BF.fingerOn=true;bfDraw()}},UI.coach?9000:16000);
-  if(hp&&G.phase==='offer'&&!G.over){try{if(phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
+  if(hp&&G.phase==='offer'&&!G.over){try{if(!UI.tut&&phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
     if(G.markerIn==='ctr'&&G.ctr.length&&BF.seen.took)bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
 // ---------- input: everything is a tap on the thing itself ----------
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
-function bfClick(e){const t=e.target;const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
+function bfClick(e){const t=e.target;if(t.closest('[data-help]'))return;const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();return}
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
