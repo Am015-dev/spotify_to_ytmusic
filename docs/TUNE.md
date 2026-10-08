@@ -28,11 +28,12 @@ Steer tab (`src/98d_drive24.js` `D24_shape`, free roam only; races and drifting 
 | knob | default | what it does |
 |---|---|---|
 | `TUNE.stOn` Progressive steering | ON | OFF = the old on/off steering (any ◀/▶ or arrow-key press = full lock in 0.1 s) |
-| `TUNE.stRampLo` Time to full lock, slow | 0.12 s | how long ◀/▶ (or a key) takes to reach full lock when slow |
-| `TUNE.stRampHi` Time to full lock at 100 km/h | 0.40 s | same at 100 km/h (in between: linear). A short tap = a small correction |
-| `TUNE.stK0` Steer start | 0.10 | the lock you get the instant you press |
+| `TUNE.stRampLo` Time to full lock, slow | 0.25 s | how long ◀/▶ (or a key) takes to reach full lock when slow |
+| `TUNE.stRampHi` Time to full lock at 100 km/h | 0.60 s | same at 100 km/h (in between: linear). A short tap = a small correction |
+| `TUNE.stK0` Steer start | 0.05 | the lock you get the instant you press |
 | `TUNE.stRet` Let-go speed | 12 /s | how fast the wheel comes back when you let go (12 = 0.08 s) |
 | `TUNE.stLim` Full lock vs grip limit | 1.10 | full lock asks for this × the turn the tyres can hold at this speed (was ~3× at 100 km/h) |
+| `TUNE.yrOut` Stop turning on let-go | 22 /s | how fast the car stops rotating when the steering eases off (was 7-11 /s, the car kept turning ~0.4 s) |
 
 Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next route the game plans; `98d_drive24.js` for followed cars):
 | knob | default | what it does |
