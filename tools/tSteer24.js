@@ -32,14 +32,15 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
   const cur={steer:0,gas:false,brake:false};
   window.__d24apply=c=>{if(touch){if(c.gas!==cur.gas)tch('gas','#tG',c.gas);if(c.brake!==cur.brake)tch('brk','#tB',c.brake);if(c.steer!==cur.steer){if(cur.steer)tch('st',cur.steer<0?'#tL':'#tR',false);if(c.steer)tch('st',c.steer<0?'#tL':'#tR',true)}}
    else{if(c.gas!==cur.gas)kd('ArrowUp',c.gas);if(c.brake!==cur.brake)kd('ArrowDown',c.brake);if(c.steer!==cur.steer){if(cur.steer)kd(cur.steer<0?'ArrowLeft':'ArrowRight',false);if(c.steer)kd(c.steer<0?'ArrowLeft':'ArrowRight',true)}}Object.assign(cur,c)};
-  const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
-  // human driver on route P (2 m resampled) with turns T: 0.15 s perception lag, look-ahead 10 + 0.7 v m, anticipates the rotation 0.25 s,
-  // press beyond 4°, let go inside 1.5°,
+  const ad=a=>Math.atan2(Math.sin(a),Math.cos(a)),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  // human driver on route P (2 m resampled) with turns T: 0.15 s perception lag, look-ahead 10 + 0.7 v m, steers by rotation rate (see below),
   // slows to 50 / 65 / 80 km/h for turns ≥ 80° / 50° / 30° seen 25 + 1.2 v m ahead
   window.__d24drive=(P,T,V,maxF)=>{const DT=1/FPS,step=Math.max(1,Math.round(.05/DT)),lag=Math.max(1,Math.round(.15/(DT*step)));const R=M.RO,hist=[];let st=0,bi=0,brkT=0,f=0;
    while(f<maxF){hist.push([R.x,R.z,R.h,R.v,R.yr||0]);const o=hist[Math.max(0,hist.length-1-lag)];let bd=1e9;for(let k=Math.max(0,bi-10);k<Math.min(P.length,bi+60);k++){const d=Math.hypot(P[k][0]-o[0],P[k][1]-o[1]);if(d<bd){bd=d;bi=k}}if(bi>=P.length-4)break;
-    const v=Math.max(0,o[3]),Ld=10+.7*v,ka=Math.min(P.length-1,bi+Math.round(Ld/2));const e=ad(Math.atan2(P[ka][0]-o[0],P[ka][1]-o[1])-o[2])-o[4]*.25;  // a person sees the view turning: aims 0.25 s ahead of the rotation
-    if(st===0&&Math.abs(e)>.07)st=e>0?-1:1;else if(st!==0&&(Math.abs(e)<.026||Math.sign(e)===st))st=0;
+    const v=Math.max(0,o[3]),Ld=10+.7*v,ka=Math.min(P.length-1,bi+Math.round(Ld/2));const e=ad(Math.atan2(P[ka][0]-o[0],P[ka][1]-o[1])-o[2]);
+    // a person steers by how fast the view turns: wanted rotation = 1.8 × aim error (rad/s, ≤ 1.2); press while turning too slowly that
+    // way, let go when it turns fast enough (a 4° dead zone straight ahead)
+    const want=Math.abs(e)<.07&&Math.abs(o[4])<.1?0:clamp(1.8*e,-1.2,1.2),need=want-o[4];st=need>.08?-1:need<-.08?1:0;
     let vd=V/3.6;const sNow=bi*2;for(const t of T){const dd=t.s-sNow;if(dd>-10&&dd<25+1.2*v){const a=Math.abs(t.ang);vd=Math.min(vd,a>=80?50/3.6:a>=50?65/3.6:a>=30?80/3.6:vd)}}
     let gas=v<vd-.5,brake=false;if(v>vd+2.5||brkT>0){brake=v>vd+.5;gas=false;brkT=brake?Math.max(brkT,6):brkT-1}
     __d24apply({steer:st,gas,brake});__tick(step);f+=step}__d24apply({steer:0,gas:false,brake:false});return f}},[INPUT==="touch",FPS]);
