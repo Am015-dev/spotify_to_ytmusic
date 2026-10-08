@@ -25,3 +25,22 @@
 - (b) Scale: ped 1.67 m (SC_K.ped .44, unchanged since v88i) vs Hot Rod 1.44 m H = 1.16×, under the 1.2× gate. No new humanoid.
 - (c) The tutorial card is missing from the Athens after-shots only because the after-run seed sets tut:1 (lv/shots.js); no code hides it.
 - (d) The checklist items are present: life-fps, life-pigeons, life-boats, life-sky (blimp), life-traffic (street racers).
+
+## LIVE: v88n (bf87d40, from 35aea865), 2026-10-08. The beta is republished. This session stops here; a fresh worker continues.
+
+## Follow-up plan (next worker, in this order)
+1. **Life clusters in the chase view (reviewer note a).** In 4 of 5 Frankfurt pairs the "after" barely differs from "before".
+   - Groups of 3–6 peds at the nearest street corners 20–40 m ahead. They idle, chat and wave rather than walk. Use extra instances from the same ped pool (PED_N 110; 40 are free at lvPed 1).
+   - At least one parked or moving car within 60 m on most streets: bias `LV_trNear` to 60–200 m ahead, in the outer lane only (DR rule).
+   - Pigeon flocks 15–40 m ahead on the pavement (`LV_spot` range now 28–95).
+   - Measure with `lv/shots.js` (counts in view ≤ 120 m) and the before/after pairs. Target: people in every chase shot, and a car in 3 of 5.
+2. **Ped scale (reviewer note b):** 1.67 m minifig (SC_K.ped .44) vs Hot Rod 1.44 m = 1.16× (gate ≤ 1.2×; probe lv/q3.js; its carH reads the whole mesh box, so use the BIGCARS dims). Any new group or pose must keep the same scale.
+3. **Life defaults vs phone FPS.** Life code costs 0.05–0.19 ms per frame. Draw calls: Frankfurt +9 (birds 2, flags 5, blimp 1, boats 1) + 2 racer kinds × 3. Once Alex answers checklist item `life-fps`: if PASS, raise `TUNE.life` to 1.3 (lvPed then gives 91 peds), in tune.json + docs/TUNE.md. If FAIL, drop the flags first (5 calls) and set boats to 0 in Athens.
+4. **2K-style pop-up challenges.** In 2K Drive, On-the-Go events start when you drive through a blue holo-gate (LIVELY_2K.md L4/L8). We already have OG_* (85) and blue holo-gates. Next step: short roadside pop-ups that need no stop:
+   - "smash 5 in 10 s", "drift 3 s", "jump", "near-miss 3 cars";
+   - triggered by driving past a small floating icon, brick-burst juice + studs on success;
+   - only the existing objective line as HUD (no new HUD), at most 1 active, at least 45 s apart, knob in TUNE → Life.
+   Lesson 5: no clutter on the road.
+5. **Rules learnt here:**
+   - The Frankfurt HCAR list must keep an ODD length. DR halving drops every other car, so an even list empties every other kind.
+   - Headless tick is slow (~0.25 sim steps/s at normal gfx). Spawning that waits on frame counters is barely visible in shots, so force-spawn for close-ups (lv/feat.js).
