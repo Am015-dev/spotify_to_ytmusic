@@ -12,8 +12,10 @@ const enter=require('../bc/enter.js');const fs=require('fs');const URL=process.a
     await p.waitForTimeout(1500);ok=await ev(`(()=>{LVP.k=${k};LVP.cd=999;return !!LVP_path()&&LVP_spawn()})()`)===true}
   if(!ok){console.log('kind',k,'no straight street');continue}
   await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${CITY}_pop${k}_gate.png`});console.log('gate',k,await ev(`JSON.stringify({k:LVP.c&&LVP.c.K.k,d:LVP.c&&Math.round(Math.hypot(LVP.c.gx-RO.x,LVP.c.gz-RO.z)),line:(document.querySelector('#roamArrow span')||{}).textContent||(document.querySelector('#m1Next .crD')||{}).textContent})`));
+  // headless sim runs ~0.3× real time: place the car 9 m before the ring at 15 m/s (the reviewer is told), then real GAS
+  await ev(`(()=>{const C=LVP.c;RO.x=C.gx-Math.sin(C.gh)*9;RO.z=C.gz-Math.cos(C.gh)*9;RO.h=RO.vh=C.gh;RO.v=15;return 1})()`);
   await p.keyboard.down('ArrowUp');let shot=false;const t0=Date.now();
-  while(Date.now()-t0<60000){const st=await ev(`LVP.c?LVP.c.st+':'+LVP.c.t.toFixed(1)+':'+LVP.c.v.toFixed(1):'none'`);
+  while(Date.now()-t0<150000){const st=await ev(`LVP.c?LVP.c.st+':'+LVP.c.t.toFixed(1)+':'+LVP.c.v.toFixed(1):'none'`);
    if(!shot&&st.startsWith('1:')&&parseFloat(st.split(':')[1])>(k===0?0.3:0.6)){await p.screenshot({path:`${OUT}/${CITY}_pop${k}_run.png`});shot=true;console.log('run',k,st,await ev(`(document.querySelector('#roamArrow span')||{}).textContent+' | '+((document.querySelector('#m1Next .crD')||{}).textContent||'')`))}
    if(st==='none')break;await p.waitForTimeout(400)}
   await p.keyboard.up('ArrowUp');await p.waitForTimeout(600);if(k===2||k===0)await p.screenshot({path:`${OUT}/${CITY}_pop${k}_end.png`});
