@@ -142,7 +142,7 @@ pat('swarmRing',['swarm'],1.6,.8,10,()=>{const y=FY(180,H-230);for(let i=0;i<10;
 pat('eliteV',['elite'],1.8,.9,5,()=>{const y=FY(150,H-190);for(let i=-2;i<=2;i++){const e=en('drone',{x:W+30+Math.abs(i)*50,y:y+i*46,amp:0});if(!e.el){e.el=1;e.hp*=2;e.max=e.hp;e.r=Math.round(e.r*1.25);e.score*=2;}}return 3;},{free:1});
 pat('convoy',['elite','hazard'],2.2,.8,5,()=>{const y=FY(170,H-230);en('gunship',{x:W+90,y});for(let i=0;i<4;i++)en('drone',{x:W+140+i*40,y:y+(i%2?-70:70),amp:0});return 5;},{free:1});
 pat('mines',['hazard','swarm'],1.2,.9,4,()=>{const g=gr(140,H-200);for(let i=0;i<4;i++){const y=(g+i*120)%(H-90)+45;en('mine',{x:W+30+i*70,y,by:y,ph:i});}return 4;},{free:1});
-pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<8;i++)en('drone',{x:W+30+i*40,y,amp:90,ph:i*.9});return 3.4;},{free:1});
+pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;i++)en('drone',{x:W+30+i*48,y,amp:55,ph:i*.9});return 3.4;},{free:1});
 /* ---------- looks of the new enemy kinds (the rest is in draw.js) ---------- */
 {const de=drawEnemy;drawEnemy=function(e,t){
   if(e.type!=='flank'&&e.type!=='swarm'&&e.type!=='mine'){de(e,t);return;}

@@ -694,10 +694,10 @@ const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*(1+TUNE2.loopSpd*Ma
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
 function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
 const aim=e=>Math.atan2(P.y-e.y,P.x-e.x);
-const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.85);   // s = the bullet's speed before the global factors
+const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
 const fanN=n=>Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.on?0:Math.floor(TUNE2.loopFan*Math.min(3,G.loop))));
 const ringN=n=>Math.max(6,n+(ST.on?Math.floor(ST.lvl/2):0)+DF.fan+(ST.on?0:Math.floor(2*TUNE2.loopFan*Math.min(3,G.loop))));
-const FANSTEP=.15;                                         // adjacent bullets of a fan are never closer than this angle: about 60 px apart at the ship, a gap you can see and fly through
+const FANSTEP=.19;                                         // adjacent bullets of a fan are never closer than this angle: about 60 px apart at the ship, a gap you can see and fly through
 const fanAngle=(n,sp,i)=>{const st=Math.max(sp/(n-1),FANSTEP);return-st*(n-1)/2+st*i;};
 function fan(e,n,sp,s,c){n=fanN(n);const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a+fanAngle(n,sp,i),s,c);}
 function ring(e,n,s,off,c){n=ringN(n);for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
@@ -917,7 +917,7 @@ function update(dt){
     if(l<NR.mod.mag&&!G.dead){p.vx+=dx/l*1400*sdt;p.vy+=dy/l*1400*sdt;}else{p.vx+=(-70-p.vx)*sdt*2;p.vy*=1-sdt*2;}
     p.x+=p.vx*sdt;p.y+=p.vy*sdt;
     if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');
-      if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(1));G.score+=Math.round(50*G.mult*sk);}
+      if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(2));G.score+=Math.round(50*G.mult*sk);}
       if(p.t==='hp'){P.hp=Math.min(P.max,P.hp+1);floater(P.x,P.y-24,'HULL +1','#3dffb0');}
       if(p.t==='up'){P.wl=Math.min(3,P.wl+1);floater(P.x,P.y-24,'WEAPON LV'+P.wl,'#ff2d95');AU.sfx('up');}
       if(p.t==='emp'){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');}
@@ -1657,13 +1657,13 @@ setTimeout(()=>{if(!running)bgFor(ATH);},3900);                                 
    * Loops add mutators (hailstorm, minefield, turbo, tide, flank rush, elite guard), not only more hit points.
    * Fair: every shot is armed one beat before (b.js), nothing spawns within SPAWN_R of the ship, flankers and rain are announced by a marker for one beat. */
 const SPAWN_R=210;
-const TUNE2={loopD:.45,hpD:.35,hpK:1.1,densK:.35,dK:.1,bsK:.08,loopFan:1,loopSpd:.06,slope:.17,quad:0,lenK:.5,stDk:.4,stHeal:3,stFree:99};   // difficulty numbers of the director (tune with f-sim.js; __mnr.TUNE2 is live)
+const TUNE2={loopD:.9,hpD:.35,hpK:1.8,densK:.5,dK:.1,bsK:.08,loopFan:1.5,loopSpd:.1,slope:.2,quad:.014,lenK:.5,stDk:.4,stHeal:3,stFree:99,stHpK:1.1,stDensK:.35};   // difficulty numbers of the director (tune with f-sim.js; __mnr.TUNE2 is live)
 const UPS={d:1,hp:1,dens:1,bs:1,u:0,soft:0};             // soft scaling of the enemies with the player's upgrade level
 const UP_W={fr:.05,dc:.03,mg:.01,sh:.06,lp:.02,wd:.02,hm:.05,ck:.02,db:.04,sb:.05,nx:0,dm:.09,cr:.03,hl:0,mh:.05,dr:.08,rv:.06,
   sc:.07,rg:.04,pc:.06,cl:.06,bt:.05,rc:.04,og:.07,as:.05,bd:.08,sm:0,ni:0,sw:.07,ec:.02,lk:0};
 const TP_W={dmg:.07,rof:.05,shd:.06,rgn:.04,hul:.06,dsh:.04,mag:.005,ckp:.01,pwd:.01,crt:.04,drn:.09,rev:.06,nmn:0,ovc:.03,tdl:.04,prc:.05,nint:0};
 function upsCalc(){let u=0;try{for(const id in SH.got)u+=(UP_W[id]||.03)*SH.got[id];for(const d of TP_DEF)u+=(TP_W[d.id]||.03)*TP.l(d.id);}catch(e){}
-  const soft=1-Math.exp(-u/1.4);UPS.u=u;UPS.soft=soft;UPS.hp=1+TUNE2.hpK*soft;UPS.dens=1+TUNE2.densK*soft;UPS.d=1+TUNE2.dK*soft;UPS.bs=1+TUNE2.bsK*soft;}
+  const soft=1-Math.exp(-u/1.4);UPS.u=u;UPS.soft=soft;UPS.hp=1+(ST.on?TUNE2.stHpK:TUNE2.hpK)*soft;UPS.dens=1+(ST.on?TUNE2.stDensK:TUNE2.densK)*soft;UPS.d=1+TUNE2.dK*soft;UPS.bs=1+TUNE2.bsK*soft;}
 const MUTS=[{id:'hail',n:'HAILSTORM',t:'Slow rain from above'},{id:'mine',n:'MINEFIELD',t:'Mines drift in'},{id:'turbo',n:'TURBO',t:'Faster shots'},
   {id:'tide',n:'TIDE',t:'Swarms every phrase'},{id:'rush',n:'FLANK RUSH',t:'Flankers every bar'},{id:'guard',n:'ELITE GUARD',t:'More elites'}];
 const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B',sub:'Bridge sentinel, twin cannon'},
@@ -1792,7 +1792,7 @@ pat('swarmRing',['swarm'],1.6,.8,10,()=>{const y=FY(180,H-230);for(let i=0;i<10;
 pat('eliteV',['elite'],1.8,.9,5,()=>{const y=FY(150,H-190);for(let i=-2;i<=2;i++){const e=en('drone',{x:W+30+Math.abs(i)*50,y:y+i*46,amp:0});if(!e.el){e.el=1;e.hp*=2;e.max=e.hp;e.r=Math.round(e.r*1.25);e.score*=2;}}return 3;},{free:1});
 pat('convoy',['elite','hazard'],2.2,.8,5,()=>{const y=FY(170,H-230);en('gunship',{x:W+90,y});for(let i=0;i<4;i++)en('drone',{x:W+140+i*40,y:y+(i%2?-70:70),amp:0});return 5;},{free:1});
 pat('mines',['hazard','swarm'],1.2,.9,4,()=>{const g=gr(140,H-200);for(let i=0;i<4;i++){const y=(g+i*120)%(H-90)+45;en('mine',{x:W+30+i*70,y,by:y,ph:i});}return 4;},{free:1});
-pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<8;i++)en('drone',{x:W+30+i*40,y,amp:90,ph:i*.9});return 3.4;},{free:1});
+pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;i++)en('drone',{x:W+30+i*48,y,amp:55,ph:i*.9});return 3.4;},{free:1});
 /* ---------- looks of the new enemy kinds (the rest is in draw.js) ---------- */
 {const de=drawEnemy;drawEnemy=function(e,t){
   if(e.type!=='flank'&&e.type!=='swarm'&&e.type!=='mine'){de(e,t);return;}
@@ -2166,7 +2166,7 @@ const drawAthensP=(bg,t,dt,scroll)=>{const D=bg.D,L=ATHP||(ATHP=buildAthensP());
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#e8f2ff';for(let i=0;i<12;i++){const y=((i*83+scroll*.35)%PH_+PH_)%PH_,x=24+((i*47)%70);ctx.globalAlpha=.16+.1*Math.sin(t*2+i);ctx.fillRect(x,y,12+(i%4)*5,1.5);}ctx.restore();   // glints on the sea
   const hz=ctx.createLinearGradient(0,PH_-260,0,PH_);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'30');ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);};
 {const dbp=drawBGP;drawBGP=function(bg,t,dt,scroll){if(bg.D.name==='ATHINA')drawAthensP(bg,t,dt,scroll);else dbp(bg,t,dt,scroll);};}
-setTimeout(()=>{if(!running&&!ATHP)ATHP=buildAthensP();},4300);                      // build the portrait Athens while the title is up (no hitch when the district starts)
+NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});            // the pit stop freezes the world: build the Athens backdrops there, not when the district starts
 // the colour theme switch clears the caches
 {const pc=applyPal;applyPal=function(){const was=palOn;pc();if(palOn!==was)ATHP=null;};}
 

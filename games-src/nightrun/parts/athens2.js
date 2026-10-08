@@ -89,6 +89,6 @@ const drawAthensP=(bg,t,dt,scroll)=>{const D=bg.D,L=ATHP||(ATHP=buildAthensP());
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#e8f2ff';for(let i=0;i<12;i++){const y=((i*83+scroll*.35)%PH_+PH_)%PH_,x=24+((i*47)%70);ctx.globalAlpha=.16+.1*Math.sin(t*2+i);ctx.fillRect(x,y,12+(i%4)*5,1.5);}ctx.restore();   // glints on the sea
   const hz=ctx.createLinearGradient(0,PH_-260,0,PH_);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'30');ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);};
 {const dbp=drawBGP;drawBGP=function(bg,t,dt,scroll){if(bg.D.name==='ATHINA')drawAthensP(bg,t,dt,scroll);else dbp(bg,t,dt,scroll);};}
-setTimeout(()=>{if(!running&&!ATHP)ATHP=buildAthensP();},4300);                      // build the portrait Athens while the title is up (no hitch when the district starts)
+NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});            // the pit stop freezes the world: build the Athens backdrops there, not when the district starts
 // the colour theme switch clears the caches
 {const pc=applyPal;applyPal=function(){const was=palOn;pc();if(palOn!==was)ATHP=null;};}

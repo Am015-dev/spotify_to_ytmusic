@@ -17,7 +17,7 @@ Checks: `f-checks.js` (this update), `sweep.js` (whole page, once before a deplo
 
 ## Fair
 - Every enemy shot is armed one beat before it fires (`e.arm`: glow and a closing ring); the boss glows the beat before every volley, spirals and lasers too. A shooter that was not armed does not fire. Check: `f-checks.js telegraph` (0 of ~35000 shots unarmed).
-- Nothing spawns within 210 px of the ship (`DIR.safe`: it slides further off screen). Flankers and rain are announced by a marker for a beat. No enemy fires at a ship closer than `max(190 px, bullet speed * 0.85 s)`. Bullets never exceed 400 px/s. Fans keep their bullets at least 0.15 rad apart.
+- Nothing spawns within 210 px of the ship (`DIR.safe`: it slides further off screen). Flankers and rain are announced by a marker for a beat. No enemy fires at a ship closer than `max(190 px, bullet speed * 0.9 s)`. Bullets never exceed 400 px/s. Fans keep their bullets at least 0.19 rad apart.
 - One hit costs one pip and gives 1.5 s of invulnerability (existing). Gate beams and chargers warn for a full beat.
 - **Safe path** (`f-checks.js safepath`): a planner with exact knowledge of every bullet, enemy path, locked charger lane, gate beam, laser and the boss's next telegraphed volleys searches 1.3 s ahead for a path that touches nothing (ship speed 300 px/s, no dash). It flies every formation, every boss pattern and every mutator at the hardest setting (hard, loop 4) for 20 trials each.
 

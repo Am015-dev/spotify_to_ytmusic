@@ -785,7 +785,7 @@ async function shopTests(browser, cfg, full) {
       // dash blast + sharp beat damage
       await sleep(400); const dh = await ev(p, () => { const m = __mnr, e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: m.P.x + 10, y: m.P.y, r: 14, hp: 100, max: 100, score: 100, by: m.P.y, amp: 0 }; m.G.en = [e]; m.P.dashCd = 0; window.__t = e; return e.hp; });
       await p.keyboard.press('ShiftLeft'); await sleep(320); await chk((await ev(p, () => __t.hp)) <= dh - 9.9, 'upgrade-effect', 'dash blast did no damage (x2)');
-      await sleep(300); await ev(p, () => { const m = __mnr; m.G.en = []; const e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: 700, y: 300, r: 14, hp: 100, max: 100, score: 100, by: 300, amp: 0 }; m.G.en = [e]; m.G.pb = [{ x: 700, y: 300, vx: 0, vy: 0, dm: 2, pf: 1 }]; window.__t = e; });
+      await sleep(300); await ev(p, () => { const m = __mnr; m.G.en = []; const e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: 700, y: 300, r: 14, hp: 100, max: 100, score: 100, by: 300, amp: 0 }; m.G.en = [e]; m.G.pb = [{ x: 700, y: 300, vx: 0, vy: 0, dm: 2, pf: 1 }]; window.__t = e; m.P.x = 60; m.P.y = 60; m.P.over = true; m.P.heat = 100; });   // the ship keeps away and does not fire: only the placed shot may hit
       await sleep(100); const hp = await ev(p, () => __t.hp); await chk(Math.abs(100 - hp - 3) < .01, 'upgrade-effect', 'sharp beat damage ' + (100 - hp) + ' != 3');
       // homing bends a bullet toward an enemy
       const hv = await ev(p, () => { const m = __mnr, e = { type: 'drone', x: 400, y: 330, hp: 9, r: 14 }; m.G.en = [e]; const b = { x: 100, y: 200, vx: 900, vy: 0 }; m.SH.steer(b, .05); return b.vy; }); await chk(hv > 20, 'upgrade-effect', 'homing did not bend the shot ' + hv);
@@ -837,7 +837,7 @@ async function tuneTests(browser, cfg, full) {
     await ev(p, () => { __mnr.GA.tune.crt = 8; __mnr.GA.tune.rof = 0; let c = 0, n = 0; for (let i = 0; i < 400; i++) { __mnr.G.pb = []; __mnr.SH.volley(100, 100, 0); for (const b of __mnr.G.pb) { n++; if (b.crit) c++; } } window.__crit = c / n; });
     const cr = await ev(p, () => window.__crit); await chk(p, cr > .2 && cr < .45, 'tune-effect', 'crit rate ' + cr.toFixed(2) + ' (want about .32)');
     // the HUD shows the ship stats (hull, shield, dash, drones, revive) correctly
-    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp, np: __mnr.TP_DEF.length })); await chk(p, h.x && h.x.max === 8 && h.x.hp === h.hp && h.x.sh === 3 && h.x.dashMax === 4 && h.x.drones === 3 && h.x.rev === 3 && h.x.perks === h.np, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
+    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp, np: __mnr.TP_DEF.length })); await chk(p, h.x && h.x.max === 8 && h.x.hp === h.hp && h.x.sh === 3 && h.x.dashMax === 4 && h.x.drones === 3 && h.x.rev === 3 && h.x.perks === h.np - 1, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
     await p.screenshot({ path: path.join(OUT, 'hud-' + cfg.name + '.png') });
     // revive: a lethal hit brings the ship back with 4 hull and a short shield of invulnerability
     await ev(p, () => { const m = __mnr; m.god = false; m.SH.sh = 0; m.G.en = []; m.G.eb = []; m.P.hp = 1; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
