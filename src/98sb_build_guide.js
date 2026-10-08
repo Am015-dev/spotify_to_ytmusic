@@ -81,7 +81,7 @@ GAR_tab=(f=>function(){f();try{const C=$('#g9Col');if(!C||C.dataset.sb)return;C.
  const P=$('#gbBkP');if(P)P.addEventListener('click',e=>{const b=e.target.closest('[data-r2a="sbg"]');if(b)setTimeout(()=>SB_open('build'),0)})}
 // ---------- BUILD IT YOURSELF: BUILD mode, the current step's missing parts as a pulsing green ghost; a tap within 4 studs snaps the part in
 function SB_diy(){if(!SB.on)return;const k=Math.min(SB.k,SB.S.length-1),B=SB.B,S=SB.S;SB.on=0;SB_clearDrop();$('#gbx').classList.remove('sbOn');GB.cam.clearViewOffset();
- SB.bak=JSON.parse(JSON.stringify(GB.d.bricks||[]));SB.b25=typeof B25!=='undefined'?B25.on:null;if(SB.b25!=null)B25.on=0;SB.diy=1;SB.ok=0;
+ SB.bak=JSON.parse(JSON.stringify(GB.d.bricks||[]));SB.b25=typeof B25!=='undefined'?B25.on:null;if(SB.b25!=null)B25.on=0;SB.diy=1;SB.ok=0;SB.palK='';
  const keep=[];for(let i=0;i<k;i++)for(const j of S[i])keep.push({...B[j]});GB.d.bricks=keep;SB.from='';gbRender();GB_enter();GB_.undo=[];$('#gbx').classList.add('sbDiy');SB_sync()}
 function SB_miss(){const L=GB_list();for(let i=0;i<SB.S.length;i++){const m=SB.S[i].map(j=>SB.B[j]).filter(b=>!L.some(o=>SB_same(o,b)));if(m.length)return{i,m}}return null}
 function SB_cur(){const c=SB_miss();SB_cur.done=!c;return c?c.i:SB.S.length}
@@ -90,8 +90,13 @@ function SB_sync(){if(!SB.diy||!GB.mesh)return;const host=SB_host();if(SB.gh){SB
  if(!c){if(!SB.ok){SB.ok=1;GB.d.bricks=SB.B.map(b=>({...b}));GB_attach(GB.mesh,GB_list(),GB_figGet(),false,!!GB.d.bp);try{AU.sfx('win')}catch(e){try{AU.sfx('pick')}catch(_){}}}
   if(D)D.innerHTML=`<b>🎉 YOU BUILT IT!</b><small>${SB.B.length} parts · tap ✕ to keep it</small>`;return}
  const M=[],L=[];for(const b of c.m)GB_brickGeo(b,M,L);if(M.length||L.length){SB.gh=new THREE.Mesh(mergeGeometries(M.concat(L)),SB.gm);SB.gh.userData.gbG=1;SB.gh.renderOrder=3;host.add(SB.gh)}
- GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;
+ GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;SB_pal(c.m[0],c.i);
  if(D){let u='';try{u=GS_thumb(c.m[0].t,c.m[0].c)}catch(e){}D.innerHTML=`<img src="${u}" alt=""><b>STEP ${c.i+1}/${SB.S.length}</b><small>place ${c.m.length}× ${(GB_PC[c.m[0].t]||{}).n||''} · tap the green ghost</small>`}}
+// v88q: preselect the step's part (and its colour when it is a palette colour) in the BUILD palette: open its category, mark it, scroll it into view.
+// Once per step, so the player's own picks are not overridden. Hidden template-only parts (no tile) keep just the category of the closest tile type.
+function SB_pal(b,i){const k=i+':'+b.t;if(SB.palK===k)return;SB.palK=k;try{const ci=GB_BC.indexOf(String(b.c).toLowerCase());if(ci>=0)GB_.col=ci;
+ const T=document.querySelector(`#gbBkPc .gbPc[data-p="${b.t}"]`);if(T&&T.dataset.ct){if(typeof GX_cat==='function')GX_cat(T.dataset.ct);else CR_cat(T.dataset.ct)}
+ GB_ui();if(T&&T.scrollIntoView)T.scrollIntoView({block:'nearest',inline:'center'})}catch(e){console.warn('SB pal',e)}}
 function SB_target(x,z,t){const c=SB_miss();if(!c)return null;let best=null,bd=1e9;for(const b of c.m){const[w,d]=GB_dims(b),dd=Math.abs(x-(b.x+(w-1)/2))+Math.abs(z-(b.z+(d-1)/2))-(b.t===t?.5:0);if(dd<bd){bd=dd;best=b}}return bd<=4?best:null}
 function SB_hint(){const c=SB_miss();if(!c)return;const b=c.m[0];if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh()}}
 GB_cand=(f=>function(hit){const r=f.apply(this,arguments);if(!SB.diy||!hit)return r;const t=SB_target(hit.i,hit.j,GB_.pc);if(t)return{...t,bad:false};return r?{...r,bad:true}:null})(GB_cand);
