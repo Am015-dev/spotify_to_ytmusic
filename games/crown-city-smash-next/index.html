@@ -1031,6 +1031,10 @@ html.ph .pchip b,html.ph .pchip span{position:relative;z-index:1}
 html.ph .pchip.on .pav{opacity:.55}
 html.ph .pchip.ko .pav{filter:grayscale(1)}
 
+/* menu pictures of the monsters */
+.intro .you img.mface{width:54px;height:54px;flex:0 0 54px;object-fit:contain}
+html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:contain}
+
 /* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
    Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
 :root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
@@ -4361,7 +4365,8 @@ function animWorld(dt,t){
   V3.clouds.forEach((c,k)=>{c.position.x+=dt*(.4+k*.05);if(c.position.x>90)c.position.x=-90})}
 // ---- 3D portraits of the vinyl figures for the monster picker (the SVG art stays as the fallback) ----
 const MONPIC={};
-function monPic(k){const cf=window.CCMedia&&CCMedia.cutout(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
+function monFace(k,cls){const cf=window.CCMedia&&CCMedia.avatar(k);if(cf)return `<img class="${cls||'mface'}" src="${cf}" alt="" draggable="false">`;return `<svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(k)}</svg>`} // menu picture: the Flow character, or the drawn one
+function monPic(k){const cf=window.CCMedia&&CCMedia.avatar(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
 function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;const S=192;const r=V3.r;let rt;
   try{rt=new THREE.WebGLRenderTarget(S,S,{type:THREE.FloatType,samples:r.capabilities.isWebGL2?4:0})}catch(e){return}
   const ps=new THREE.Scene();ps.add(new THREE.HemisphereLight(0x9a90ff,0x2a1430,.9));const key=new THREE.DirectionalLight(0xffc9a0,2.6);key.position.set(-4,6,6);ps.add(key);
@@ -4976,7 +4981,7 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers.filter(p=>p.kind==='
    ${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}${NET.conn===false&&NET.on?'<p class="small muted">Connecting to the room…</p>':''}
    <h3 style="margin:.4rem 0 .2rem">Players here (${ps.length})</h3><ul class="plist">${rows}</ul>${NET.p2p&&ps.length<2?'<p class="small muted">⏳ Waiting for friends to join… Send them the code or link.</p>':''}
    <p style="margin:.4rem 0 .2rem"><b>Your monster</b> (if two players pick the same one, one gets a random monster):</p>
-   <div class="monpick">${MONS.map((M,k)=>k).filter(k=>UI.xp!=='base'||k<6).map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}"><svg viewBox="-66 -70 132 136">${monArt(k)}</svg><span>${esc(MONS[k].n)}</span></button>`).join('')}</div>
+   <div class="monpick">${MONS.map((M,k)=>k).filter(k=>UI.xp!=='base'||k<6).map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}">${monFace(k,'mp3')}<span>${esc(MONS[k].n)}</span></button>`).join('')}</div>
    ${host?`<p class="small">Game: <b>${UI.xp==='base'?'Base game':UI.xp==='trial'?'Brainjack Taster':'Brainjack Full Set'}</b> · Expansions: <b>${esc(exs)}</b> · Seats: <b>${Math.min(6,Math.max(UI.n,ps.length))}</b> (empty seats go to <b>${UI.lvl}</b> computer monsters). Change these on the start screen before hosting.</p>
      <div class="acts"><button class="btn primary" data-a="netstart" ${ps.length<1?'disabled':''}>Start the game with ${ps.length} player${ps.length===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the game…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
@@ -5059,7 +5064,7 @@ function mbHold(q){if(!(UI.firstGame&&G.mode==='solo'&&!UI.hadTurn))return false
 function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.map(x=>mname(x));
   const cast=names.slice(0,-1).join(', ')+' and '+names[names.length-1];
   return `<div class="intro"><h2>📰 Dawn over Crown City</h2><p>The portal over Crown City cracked open at dawn. ${G.pl.length} monsters rose: ${esc(cast)}. Whoever reaches <b>20 ★</b>, or is the <b>last one standing</b>, becomes the city's new King.</p>
-   ${q?`<p class="you" style="--mc:${MONS[q.m].c}"><svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(q.m)}</svg><span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
+   ${q?`<p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
 
    <p class="goal"><b>Your turn:</b> roll 6 dice up to 3 times, keep what you like, then use them. <b>Three of a kind</b> scores stars, claws hit, hearts heal, ⚡ buys cards.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button></div>
@@ -5659,7 +5664,7 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
   const r=el.getBoundingClientRect();f.style.left=(r.left+r.width*.55)+'px';f.style.top=(r.top+r.height*.55)+'px';f.classList.add('on')}
 // ---- the opening card on a portrait phone: who you are, the goal, one button ----
 {const _ih=introHTML;introHTML=function(){if(!(phOn()&&!PHONE.land))return _ih.apply(this,arguments);const me=meSeat(),q=me>=0?G.pl[me]:null;if(!q)return _ih.apply(this,arguments);
-  return `<div class="intro bfintro"><p class="you" style="--mc:${MONS[q.m].c}"><svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(q.m)}</svg><span>You are <b>${esc(UP(mname(q)))}</b></span></p>
+  return `<div class="intro bfintro"><p class="you" style="--mc:${MONS[q.m].c}">${monFace(q.m)}<span>You are <b>${esc(UP(mname(q)))}</b></span></p>
    <p class="goal">First to <b>20 ★</b> wins.<br>Or be the last monster standing.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn?'<small>First you pick a secret power</small>':''}</button></div></div>`}}
 // ---- render hook ----
@@ -5758,8 +5763,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
    Clips: muted, playsinline, 9:16 first (contain => letterbox in landscape), tap to skip, once per chapter. */
 (function(){
   const M=window.CC_MEDIA||{},BASE='media/',clips=M.clips||[],pics=M.portraits||[];
-  /* ?preview=1 : open every chapter and let the clips play again (for checking). Normal play is untouched. */
-  try{if(/[?&]preview=1/.test(location.search)&&window.CAMPAIGN){
+  /* ?preview=1 (or any -next preview page): open every chapter and let the clips play again (for checking). Normal play is untouched. */
+  try{if((/[?&]preview=1/.test(location.search)||location.pathname.indexOf('-next')>=0)&&window.CAMPAIGN){
     const K='gns-campaign-crown';let P={};try{P=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
     if(!P||P.v!==1)P={v:1,ch:{},unlocked:[],last:null};P.ch=P.ch||{};P.unlocked=P.unlocked||[];
     window.CAMPAIGN.chapters.slice(0,-1).forEach(c=>{const r=P.ch[c.id]||(P.ch[c.id]={beaten:false,stars:0,best:null,tries:0,losses:0,easy:false});if(!r.beaten){r.beaten=true;r.stars=Math.max(r.stars||0,1)}});
