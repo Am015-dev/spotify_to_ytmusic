@@ -1,0 +1,18 @@
+shot s0_start 7s
+shot s1_palette 92s
+shot s1b_palette_slopes 114s
+sel 42/107 y>=13
+shot s2_group_made 160s
+shot s3_group_hidden 177s
+shot s5a_layer_ghosts 227s
+shot s5_hide_above 243s
+NO #gnbP [data-ch="sc8"]
+pod 2
+groups [{"g":1,"n":42,"name":"Upper deck"},{"g":2,"n":2,"name":"Side pod"},{"g":3,"n":2,"name":"Side pod ⇋"}]
+shot s4_mirrored 345s
+carry {"x":-4,"z":3,"y":22,"bad":false}
+shot s4b_copy_held 369s
+groups [{"g":1,"n":42,"name":"Upper deck"},{"g":2,"n":2,"name":"Side pod"},{"g":3,"n":2,"name":"Side pod ⇋"},{"g":4,"n":2,"name":"Side pod copy"}]
+shot s4c_copied 384s
+shot s6_checklist 409s
+ERRS 0 []

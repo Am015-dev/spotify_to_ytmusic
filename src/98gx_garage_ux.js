@@ -109,7 +109,7 @@ function GX_ui(){const X=$('#gbx');if(!X||!GB_.bk||X.hidden){const E=$('#gxG');i
    `<button data-ga="pick" class="gxN">${GX_esc(o.name)}<small>${o.n} parts${hd?' · hidden':''}</small></button><button data-ga="ren" title="Rename">✎</button>`;
   return`<div class="gxR ${hd?'hd':''} ${on?'on':''}" data-g="${o.g}"><button data-ga="eye" class="gxE" title="${hd?'Show':'Hide'}">${hd?'🚫':'👁'}</button>${nm}</div>`+
    (on&&!hd?`<div class="gxA" data-g="${o.g}"><button data-ga="mv"><i>✥</i>MOVE</button><button data-ga="dup"><i>⧉</i>COPY</button><button data-ga="mir"><i>⇋</i>MIRROR</button><button data-ga="del" class="gxD"><i>🗑</i>DELETE</button></div>`:'')}).join('')+'</div>';
- if(E._h!==h){const ae=document.activeElement,keep=ae&&ae.tagName==='INPUT'&&E.contains(ae)?ae.value:null;E._h=h;E.innerHTML=h;if(keep!=null){const i=E.querySelector('input');if(i){i.value=keep;i.focus()}}}}
+ if(E._h!==h){const ae=document.activeElement,keep=ae&&ae.tagName==='INPUT'&&E.contains(ae)?ae.value:null;E._h=h;E.innerHTML=h;if(keep!=null){const i=E.querySelector('input');if(i){i.value=keep;i.focus()}}const A=E.querySelector('.gxA')||E.querySelector('.gxR.on');if(A&&A.scrollIntoView)try{A.scrollIntoView({block:'nearest'})}catch(_){}}}
 // fold / unfold the big palette (the groups list folds it: less on screen)
 function GX_lay(){const X=$('#gbx');if(!X)return;const big=!!GX.big&&GB_.bk&&!GX.open;if(X.classList.contains('gxBig')!==big){X.classList.toggle('gxBig',big);try{R2.area=null}catch(e){}}}
 R2_calc=(f=>function(){const A=f.apply(this,arguments),c=$('#gbC'),C=$('#gxCh'),E=$('#gxG');if(!A||!c||!GB_.bk)return A;const r=c.getBoundingClientRect();
