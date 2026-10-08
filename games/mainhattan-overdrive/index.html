@@ -741,8 +741,11 @@ body.touch #roamPlate small{white-space:nowrap}
 // in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 // TUNE (tune20): live-tunable driving numbers that used to be inline literals; defaults = the v87w values. Knob table + ?tune=1 drawer: src/99t_tune.js.
-const TUNE={stAng:.55,stFall:14,stIn:11,stOut:16,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0};
+const TUNE={stAng:.55,stFall:14,stIn:11,stOut:16,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
+  // fix21 boost FX (TUNE drawer "FX" tab): thruster flame size / length / brightness, boost sparks on/off + count + size, speed lines, screen blur/glow, FOV kick, shake (all ×, 1 = default look)
+  fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1};
 const OD_CHANGELOG=[
+  {v:'v87y',date:'8 Oct 2026',items:[{t:'FIXED',s:'Race boost: the flames are small again and sit at the exhaust, turning with the car (they were oversized and floating in races).'},{t:'FIXED',s:'No more stray white sparkles streaking across the screen when you boost in a race; just a few short sparks from the exhaust.'},{t:'NEW',s:'Tuning drawer (beta): new FX tab for the boost look: flame size, length and brightness, sparkles on/off, speed lines, glow, FOV kick and shake.'}]},
   {v:'v87x',date:'7 Oct 2026',items:[{t:'NEW',s:'Tuning drawer for Alex (beta only): tap ⚙ top-right to change steering, grip, speed, boost, camera and car feel with sliders while you drive; SAVE keeps numbered versions and ★ SET picks the one the beta starts with.'},{t:'CHANGED',s:'Nothing changes for normal players: with no saved tuning the car drives exactly like v87w.'}]},
   {v:'v87w',date:'7 Oct 2026',items:[{t:'FIXED',s:'Hot Drop: Oma Hilde\'s tow truck no longer jumps onto your car at the start (the big orange block over the screen); it waits up the road and drives off.'},{t:'FIXED',s:'Races: rival name tags no longer pile up; only the 3 nearest show, stacked neatly.'},{t:'FIXED',s:'City traffic sits on all four tyres (no more floating wheels on sloped roads).'},{t:'CHANGED',s:'Garage: the "drag to rotate" tip no longer covers the GARAGE sign and goes away once you have dragged.'}]},
   {v:'v87v',date:'7 Oct 2026',items:[{t:'NEW',s:'Garage COLLECTION: your cars sorted into Street, Off-road and Water tabs with rarity colours, sort, filter and favourites; tap a card to drive it.'},{t:'NEW',s:'9 ready-made cars inspired by real LEGO sets (wedge supercar, roadster, police car, F1 car, monster truck and more); tap BUILD to open and edit any of them.'}]},
@@ -2376,7 +2379,7 @@ function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
   s.aab=0;if(SET.assist!=='off'&&TOUCH.used&&!s.air&&state==='race'){let kA=0;for(let d=15;d<=135;d+=20){const kd=kAt(TD,s.dist+d);kA=Math.max(kA,Math.abs(kd)/Math.max(.35,1-kd*s.x))}const vr0=Math.min(1,s.v/st.top0),Rm=(1.32-.52*vr0)*st.han*{low:.85,normal:1,high:1.15}[SET.steer],need=kA*s.v,kL=kAt(TD,s.dist+12),cap=Math.min(Rm+(s.v>st.top0*.3?.5*st.han:0),C26.on?C26_muRace(s)*.95/Math.max(1,s.v):9);
     if(Math.abs(kL)*s.v>Rm*.72&&s.v>st.top0*.3&&!c.hb)s.aab=Math.sign(kL);if(need>cap*.8){c.thr=0;c.boost=0}if(need>cap*.98)c.brk=Math.max(c.brk,.7)}
   if(c.boost&&!s.bPrev){if(raceT-(s.bT??-9)<.32&&PK.has('_lock')&&state==='race'){s.spLock=!s.spLock;feed(s.spLock?'BOOST LOCK ON':'BOOST LOCK OFF',0,'#ffd12c');AU.sfx('pick')}s.bT=raceT}s.bPrev=!!c.boost;if(s.spLock){if(c.brk>0||s.dead>0)s.spLock=false;else c.thr=1}
-  s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,R15_on()?14:8);if(R15_on())R15_boostFx(s)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
+  s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,(R15_on()?10:8)*TUNE.fxFov);if(R15_on())R15_boostFx(s)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
   const top=st.top*(s.turbo>0?1.2:1)*(s.boost>0?1.12:1)*(s.nitro?1.3:1)*(s.spLock?1.06:1)*(s.r15k||1);
   const vr=Math.min(1,s.v/st.top0),Rmax=(1.32-.52*vr)*st.han*(s.air?.85:1)*{low:.85,normal:1,high:1.15}[SET.steer];
   if(SET.assist!=='off'&&TOUCH.used&&state==='race'){const u=c.steer,au=Math.abs(u);const R15B=R15_b(s,s.x),R15m=3.5*CR_LS;if(au>=.06||s.holdX==null)s.holdX=clamp(s.x+s.v*Math.sin(s.beta)*.17,R15B[0]+R15m,R15B[1]-R15m);else if(R15_on())s.holdX+=(R15_line(s)-s.holdX)*Math.min(1,H*.6);s.holdX=R15_hold(s,clamp(s.holdX,Math.min(R15B[0]+R15m,R15B[1]),Math.max(R15B[1]-R15m,R15B[0])));if(s.aab>0)c.abR=Math.max(c.abR,1);else if(s.aab<0)c.abL=Math.max(c.abL,1);
@@ -2733,9 +2736,9 @@ function updateCam(dt,snap){let s=pl;
   camLook.lerp(look,snap?1:1-Math.exp(-dt*16));camUp.lerp(up,snap?1:1-Math.exp(-dt*5)).normalize();if(snap){camPos.copy(want);camLook.copy(look)}
   {const al=camPos.clone().sub(F2.p).dot(F2.t),CF=updateCam.f||(updateCam.f=mkF());frameAt(TD,s.dist+al,CF);if(CF.p.y<-12){const rel=camPos.clone().sub(CF.p),l=rel.dot(CF.r),u=rel.dot(CF.u),R0=HALF+6,lc=clamp(l,-(R0-3),R0-3),ce=Math.pow(Math.max(.02,Math.sqrt(1-(lc/R0)**2)),.22)*20-3;if(u>ce||l!==lc)camPos.copy(CF.p).addScaledVector(CF.t,rel.dot(CF.t)).addScaledVector(CF.r,lc).addScaledVector(CF.u,Math.min(u,ce))}}const jit=Math.max(0,shake-.3)*1.6*fxK();camera.position.copy(camPos);if(jit>0){camera.position.x+=rr(-.5,.5)*jit;camera.position.y+=rr(-.5,.5)*jit}camera.up.copy(camUp);camera.lookAt(camLook);
   if(kind===0&&state!=='menu')camera.rotateZ(-(s.roll||0)*.16);
-  fovKick*=Math.exp(-9*dt);const fov=(kind===3?74:{narrow:56,normal:62,wide:70}[SET.fov])+26*Math.pow(clamp(spd,0,1.25),1.2)+(s.nitro||s.turbo>0?7:0)+fovKick;camera.fov+=(pFov(fov)-camera.fov)*Math.min(1,(dt||.016)*3);camera.updateProjectionMatrix();
-  FX.uniforms.uSpeed.value=lerp(FX.uniforms.uSpeed.value,(state==='menu'?.2:0)*fxK(),Math.min(1,dt*4));FX.uniforms.uBoost.value=lerp(FX.uniforms.uBoost.value,(s.nitro&&state!=='menu'?.6:(s.turbo>0?.4:0))*fxK(),Math.min(1,dt*6));
-  speedLines.mesh.material.opacity=state==='menu'?0:(clamp((spd-.45)*.7,0,.32)+(s.nitro?.25:0))*fxK()}
+  fovKick*=Math.exp(-9*dt);const fov=(kind===3?74:{narrow:56,normal:62,wide:70}[SET.fov])+26*Math.pow(clamp(spd,0,1.25),1.2)+(s.nitro||s.turbo>0?7*TUNE.fxFov:0)+fovKick;camera.fov+=(pFov(fov)-camera.fov)*Math.min(1,(dt||.016)*3);camera.updateProjectionMatrix();
+  FX.uniforms.uSpeed.value=lerp(FX.uniforms.uSpeed.value,(state==='menu'?.2:0)*fxK(),Math.min(1,dt*4));FX.uniforms.uBoost.value=lerp(FX.uniforms.uBoost.value,(s.nitro&&state!=='menu'?.3:(s.turbo>0?.3:0))*fxK()*TUNE.fxGlow,Math.min(1,dt*6));
+  speedLines.mesh.material.opacity=state==='menu'?0:(clamp((spd-.45)*.7,0,.32)+(s.nitro?.12*TUNE.fxLines:0))*fxK()}
 function cycleCam(){camMode=(camMode+1)%2}
 
 let winT=0;
@@ -2763,8 +2766,10 @@ function updWorld(dt,t){skyMat.uniforms.uT.value=t;
 
 
 // R15: boost burst: turbine flash + blue/white sparks out of the back and a short shake when BOOST kicks in
-function R15_boostFx(s){try{if(!s.mesh)return;frameAt(TD,s.dist,F2);const at=s.mesh.position.clone().add(s.mesh.userData.m.position).addScaledVector(F2.t,-2.6).addScaledVector(F2.u,.8);
- burst(SPARK,at,34,18,.45,new THREE.Color(.7,1.6,2.6),F2.t.clone().negate());burst(SPARK,at,14,10,.3,new THREE.Color(2.4,2.4,2.2));shake=Math.max(shake,.42);FX.uniforms.uBoost.value=Math.max(FX.uniforms.uBoost.value,.9*fxK())}catch(e){}}
+// fix21: was 48 sparks at 10-18 m/s in every direction (they flew at the camera as long white streaks); now a few short, slow ones out of the exhaust
+function R15_boostFx(s){try{if(!s.mesh)return;frameAt(TD,s.dist,F2);const at=s.mesh.position.clone().add(s.mesh.userData.m.position).addScaledVector(F2.t,-2.2).addScaledVector(F2.u,.5),n=Math.round(B2K_spk(10)),S=TUNE.fxSpkS;
+ for(let i=0;i<n;i++)emit(SPARK,at.clone().addScaledVector(F2.r,rr(-.8,.8)),V3(rr(-1.2,1.2)*S,rr(0,1.5)*S,rr(-1.2,1.2)*S).addScaledVector(F2.t,-rr(2,5)*S),rr(.1,.2),new THREE.Color(.7,1.6,2.6));
+ shake=Math.max(shake,.3*TUNE.fxShake);FX.uniforms.uBoost.value=Math.max(FX.uniforms.uBoost.value,.45*fxK()*TUNE.fxGlow)}catch(e){}}
 // R15: the racing line the AI uses (inside of the bends ahead); the touch assist drifts toward it when the player is not steering
 function R15_line(s){const q=R15_inLane(s);if(q)return R15_lane(s,q);const qm=R15_mouth(s);if(qm&&s.x*qm.sd>MARGIN-2)return R15_lane(s,qm);let ka=0;for(let d=30;d<=150;d+=20)ka+=kAt(TD,s.dist+d);ka/=7;const m=MARGIN-3.5*CR_LS;return clamp(ka*3200,-m,m)}
 // ===== R15 (race worker 15, v87q+): strategic routes. Per circuit, a WATER and an OFF-ROAD corridor run along the inside of a big bend:
@@ -5369,7 +5374,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   const fit=Math.max(.87,{ship:{road:1,dirt:.72,water:.78},boat:{road:.42,dirt:.38,water:1},offroad:{road:.93,dirt:1,water:.35}}[veh][terr]);
   if(((RO.abF=(RO.abF||0)+1)&3)===1){const a=abAt(RO.x,RO.z);RO.onAB=!!a&&!!a.road.ab&&Math.abs(a.lat)<a.road.w/2+1&&RO.y<groundY(RO.x,RO.z)+14;RO.abRoad=RO.onAB?a.road.name:null;const q=RO.onAB?null:cityAt(RO.x,RO.z);RO.inCity=!RO.onAB&&(RO.x>HX0&&RO.x<HX1&&RO.z>HZS&&RO.z<HZN||!!q&&q.d<q.road.w/2+30);const rq=RO.onAB?a:q&&q.d<q.road.w/2+2?q:null;RO.rdT=rq?[rq.p.tx,rq.p.tz]:null}
   const lvl=carStat();const top=s.stats.top*.8*lvl.top,boost=c.boost&&s.bm>1&&!busy;RO.boosting=boost||RO.turbo>0;RO.turbo=Math.max(0,(RO.turbo||0)-dt);
-  if(boost){RO.boostT=(RO.boostT||0)+dt;if(!RO.wasB){AU.sfx('nitro');fovKick=Math.max(fovKick,9)}s.bm=Math.max(0,s.bm-TUNE.bDrain*dt);RO.bIdle=0}else{RO.bIdle=(RO.bIdle||0)+dt;if(RO.bIdle>.5)s.bm=Math.min(100,s.bm+FL_RECH*dt)}RO.wasB=boost;s.nitro=boost||RO.turbo>0;RO.top=top;
+  if(boost){RO.boostT=(RO.boostT||0)+dt;if(!RO.wasB){AU.sfx('nitro');fovKick=Math.max(fovKick,9*TUNE.fxFov)}s.bm=Math.max(0,s.bm-TUNE.bDrain*dt);RO.bIdle=0}else{RO.bIdle=(RO.bIdle||0)+dt;if(RO.bIdle>.5)s.bm=Math.min(100,s.bm+FL_RECH*dt)}RO.wasB=boost;s.nitro=boost||RO.turbo>0;RO.top=top;
   // hop: Space / HOP button
   if(pressed.fire){pressed.fire=false;if(!busy&&!air&&RO.vy<=0){RO.tutHop=true;RO.vy=TUNE.hop;RO.y+=.05;AU.sfx('launch');fovKick=Math.max(fovKick,4)}}
   if(air)RO.airT=(RO.airT||0)+dt;
@@ -6963,7 +6968,7 @@ studBurst=(f=>function(at,fw,sp){AU_M.sb++;AU_M.sbF++;AU_M.sbAt=at;return f.appl
 // stud fountain: the studs of a smash shoot up instead of out
 smashCheck=(f=>function(dt){const n0=HUB.smashed;AU_M.sbF=0;AU_M.sbAt=null;const r=f.apply(this,arguments);if(HUB.smashed>n0)AU_fountain(AU_M.sbAt,AU_M.sbF);return r})(smashCheck);
 comboAdd=(f=>function(k){const m0=comboMult();const r=f.apply(this,arguments);const m1=comboMult();if(m1>m0&&!RO.ch)AU_pop('+COMBO ×'+m1,'#ffd12c');return r})(comboAdd);
-roamCam=(f=>function(dt){if(RO.ch)shake=0;else shake=Math.min(shake,.45);if(RO.boosting&&!RO.ch)fovKick=Math.max(fovKick,6);const b=!!RO.boosting;if(b!==AU_M.boostC){AU_M.boostC=b;document.body.classList.toggle('auBoost',b)}return f.apply(this,arguments)})(roamCam);
+roamCam=(f=>function(dt){if(RO.ch)shake=0;else shake=Math.min(shake,.45);if(RO.boosting&&!RO.ch)fovKick=Math.max(fovKick,6*TUNE.fxFov);const b=!!RO.boosting;if(b!==AU_M.boostC){AU_M.boostC=b;document.body.classList.toggle('auBoost',b)}return f.apply(this,arguments)})(roamCam);
 showResults=(f=>function(){const r=f.apply(this,arguments);try{if(pl&&pl.finished&&!pl.eliminated&&ships.length>1&&ships.every(o=>o===pl||!o.finished||o.finishTime>=pl.finishTime)){AU_M.win++;AU_confetti();AU_fanfare()}}catch(e){}return r})(showResults);
 chEnd=(f=>function(v){let won=false;try{const ch=RO.ch,e=ch.m.ev,g=ch.g||OTG_GOAL[e.kind],HI=ch.hi??OTG_HI[e.kind];won=v!=null&&(ch.cap!==0)&&(HI?v>=g[2]:v<=g[2])}catch(e){}const r=f.apply(this,arguments);if(won){AU_M.win++;AU_confetti();AU_fanfare()}return r})(chEnd);
 // UI clicks on any button
@@ -8013,8 +8018,8 @@ roamCam=(f=>function(dt){const c=camera;c.position.sub(JU.co);c.fov-=JU.cf;JU.co
   if(JU.la)c.rotateOnWorldAxis(JU.Y,JU.la);
   JU.cf=JU.fx+JU.kick*5;c.fov+=JU.cf;c.updateProjectionMatrix();
   // speed blur + speed lines: capped at the mission limits everywhere (uSpeed ≤ .25, uBoost ≤ .15, lines ≤ .3 in missions)
-  const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K-U.uBoost.value)*e;
-  {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
+  const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K*TUNE.fxGlow-U.uBoost.value)*e;
+  {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85*TUNE.fxLines:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
 // ---- wind rises with speed relative to the roam top speed, a low road rumble under it (one extra noise loop, made once)
 AU.engine=(f=>function(s,thr,on){f.call(this,s,thr,on);if(!JU.on||!this.a||state!=='roam'||!this.wind)return;const t=this.a.currentTime,x=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.3);
   if(!this.juR){try{const a=this.a,src=a.createBufferSource();src.buffer=this.nb;src.loop=true;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=110;const g=a.createGain();g.gain.value=0;src.connect(lp);lp.connect(g);g.connect(this.fx);src.start();this.juR=g}catch(e){this.juR={gain:{setTargetAtTime(){}}}}}
@@ -9145,7 +9150,7 @@ const ART_m=new THREE.Matrix4(),ART_q=new THREE.Quaternion(),ART_s=new THREE.Vec
 function ART_blobTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,4,32,32,31);r.addColorStop(0,'rgba(0,0,0,1)');r.addColorStop(.55,'rgba(0,0,0,.75)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);if(typeof KEEP_TEX!=='undefined')KEEP_TEX.add(t);return t}
 function ART_step(dt){if(!RO.on)return;
   // boost: blue speed lines + FOV kick
-  const b=!!(pl&&pl.nitro);document.body.classList.toggle('artBoost',b);if(b)fovKick=Math.max(fovKick,7);
+  const b=!!(pl&&pl.nitro);document.body.classList.toggle('artBoost',b);if(b)fovKick=Math.max(fovKick,7*TUNE.fxFov);if(ART3.fxL!==TUNE.fxLines){ART3.fxL=TUNE.fxLines;document.body.style.setProperty('--fxL',TUNE.fxLines)}
   const bar=ART3.bar||(ART3.bar=document.getElementById('artBoost'));if(bar&&pl){const v=Math.max(0,Math.min(100,pl.bm||0));if(ART3.bv!==(v|0)){ART3.bv=v|0;bar.firstChild.style.width=v+'%'}bar.classList.toggle('full',v>=99)}}
 
 // sky light columns: 140 m mission/garage beacons become 1.5 m glowing ground rings; 1600 m searchlight beams are hidden
@@ -9167,7 +9172,7 @@ body.touch #npcSay{left:calc(112px + env(safe-area-inset-left,0px))!important;to
 #artBoost i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3aa8ff,#7ae0ff);transition:width .15s}
 #artBoost.full i{background:linear-gradient(90deg,#3aa8ff,#bdf3ff);box-shadow:0 0 8px #7ae0ff}
 body[data-mode=roam] #artBoost{display:block}
-body.artBoost #speedFx{opacity:.55!important;filter:hue-rotate(10deg) saturate(2.2) drop-shadow(0 0 2px #3aa8ff)}
+body.artBoost #speedFx{opacity:calc(.55*var(--fxL,1))!important;filter:hue-rotate(10deg) saturate(2.2) drop-shadow(0 0 2px #3aa8ff)}
 .hcard h3,.hcard b,#home h2,#home h1{font-style:italic;font-weight:900;letter-spacing:.01em}`;document.head.appendChild(st);
  const b=document.createElement('div');b.id='artBoost';b.innerHTML='<i></i>';(document.getElementById('hud')||document.body).appendChild(b)}
 /*ART</art3.js>*/
@@ -10307,8 +10312,11 @@ function B2K_hud(bm){const m=B2K.el;if(!m)return;const vis=(state==='roam'&&!RO.
   if(B2K.pulse>0){B2K.pulse=0;m.classList.remove('pulse');void m.offsetWidth;m.classList.add('pulse')}}
 // ---- car-local box (rear tyres, turbines)
 // roam: pl.mesh stays unrotated; its first child group carries the heading (yaw = h+π), so car-local work uses that child
-function B2K_frame(mesh){if(state==='roam'){const c=mesh.children[0];if(c&&c.isGroup)return c}return mesh}
-function B2K_rear(mesh){if(state==='roam')return 1; // body group yaw = h+π: local +z is the rear
+// fix21: races too. A race car's root stays unrotated and unscaled (posShip); heading + SHIP_K scale live on userData.m. Using the root in races
+// made the thrusters 1/SHIP_K too big, fixed to world axes (not the car) and the box heading-dependent: the "huge flames + weird sparkles" in races.
+function B2K_frame(mesh){const m=mesh.userData&&mesh.userData.m;if(m&&m.isObject3D&&m.parent===mesh)return m;if(state==='roam'){const c=mesh.children[0];if(c&&c.isGroup)return c}return mesh}
+function B2K_rear(mesh){if(state==='roam'||mesh.parent&&mesh.parent.userData&&mesh.parent.userData.m===mesh)return 1; // userData.m basis: local +z = rear
+  // body group yaw = h+π: local +z is the rear
   if(B2K.rsT===mesh&&B2K.rsS===state&&B2K.rs)return B2K.rs;const c=new THREE.Vector3().copy(camera.position);mesh.updateMatrixWorld();mesh.worldToLocal(c);if(Math.abs(c.z)>.5){B2K.rs=c.z<0?-1:1;B2K.rsT=mesh;B2K.rsS=state}return B2K.rs||-1}
 function B2K_box(mesh){if(B2K.tm===mesh&&B2K.tbox&&B2K.tst===state)return B2K.tbox;B2K.tst=state;mesh.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(mesh.matrixWorld).invert(),M=new THREE.Matrix4();
   const b=new THREE.Box3();const tv=B2K.turb&&B2K.turb.parent===mesh?B2K.turb.visible:null;if(tv!=null)B2K.turb.visible=false;
@@ -10328,12 +10336,15 @@ function B2K_turbines(s,on,dt){if(!s||!s.mesh)return;const mesh=B2K_frame(s.mesh
     for(const sd of[-1,1]){const parts=[[T.body,T.mB,0],[T.stud,T.mB,.245],[T.rim,T.mR,-.21],[T.flame,T.mF,-.21]].map(([geo,mat,z])=>{const m=new THREE.Mesh(geo,mat);m.matrixAutoUpdate=false;m.frustumCulled=false;m.userData.gbG=1;m.userData.z=z;m.userData.L=new THREE.Matrix4();
         m.onBeforeRender=function(){if(B2K.tCar){this.matrixWorld.multiplyMatrices(B2K.tCar.matrixWorld,this.userData.L)}};g.add(m);return m});g.units.push({sd,parts,spin:0})}
     B2K.turb=g;par.add(g)}
-  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz*(state==='race'?.7:1)),tx=sd=>sd*bx.hw*.4,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+Math.min(bx.hh*.4,.5*fz);
-  B2K.turb.visible=k>.02&&s.mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
+  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*bx.hw*.4,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+Math.min(bx.hh*.4,.5*fz);
+  B2K.turb.visible=k>.02&&s.mesh.visible;{const mF=B2K.turbG.mF,I=Math.max(0,TUNE.fxFlI);mF.color.setRGB(1,.54,.12).multiplyScalar(Math.max(.2,I));mF.opacity=.8*Math.min(1,I);mF.visible=I>0}const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
   for(const u of B2K.turb.units){u.spin+=dt;Pv.set(tx(u.sd),ty,tz);U.compose(Pv,Q.identity(),Sv);
-    for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(1,1,(B2K.bash?1.5:1)*rr(.75,1.2)));m.userData.L.multiplyMatrices(U,Pm)}}
-  if(on&&k>.6&&R()<.6){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld);for(const u of B2K.turb.units){pt.set(tx(u.sd),ty,tz+rs*.7*k*fz).applyMatrix4(mesh.matrixWorld);
-    emit(SPARK,pt,back.clone().multiplyScalar(rr(6,10)).add(V3(rr(-1,1),rr(0,1.2),rr(-1,1))),.18,B2K.bash?new THREE.Color(2.6,1.4,.3):new THREE.Color(2.6,1.2,.3))}}}
+    for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(TUNE.fxFlS,TUNE.fxFlS,TUNE.fxFlL*(B2K.bash?1.3:1)*rr(.85,1.1)));m.userData.L.multiplyMatrices(U,Pm)}}
+  if(on&&k>.6&&R()<B2K_spk(.3)){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld),S=TUNE.fxSpkS;for(const u of B2K.turb.units){pt.set(tx(u.sd),ty,tz+rs*.5*k*fz*TUNE.fxFlL).applyMatrix4(mesh.matrixWorld);
+    emit(SPARK,pt,back.clone().multiplyScalar(rr(2,4)*S).add(V3(rr(-.6,.6)*S,rr(0,.8)*S,rr(-.6,.6)*S)),.1,B2K.bash?new THREE.Color(2.2,1.3,.3):new THREE.Color(2.2,1.1,.3))}}}
+// boost sparks stay short and slow in world space (a spark's streak length = its own speed × 35 ms; adding the car's speed drew 2 m lines at the camera)
+// TUNE.fxSpk on/off, fxSpkN = count ×. Returns the scaled chance / count (0 when off)
+function B2K_spk(n){return TUNE.fxSpk>0?n*Math.max(0,TUNE.fxSpkN):0}
 // ---- pink drift trail (two ribbons from the rear tyres)
 function B2K_trailInit(par){const N=64,g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));
   const idx=[];for(let sd=0;sd<2;sd++)for(let i=0;i<N-1;i++){const a=(sd*N+i)*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(idx);
@@ -10355,9 +10366,9 @@ function B2K_drift(s,on,slip,sp,dt){if(on){const r=TUNE.drFill*clamp(sp/22,.5,1.
 function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.bm+B2K.dm*TUNE.drConv);const g=s.bm-b0;
   B2K.log.drift.push({s:+B2K.dT.toFixed(2),bar:+B2K.dm.toFixed(1),boost:+g.toFixed(1),slipAvg:+(B2K.slS/Math.max(1,B2K.slN)*57.3).toFixed(1),slipMax:+(B2K.slMax*57.3).toFixed(1)});if(B2K.log.drift.length>40)B2K.log.drift.shift();
   if(g>=1){B2K_pop('+'+Math.round(g)+' BOOST','#ff8ad0');B2K.pulse=1}B2K.dm=0;B2K.dT=0;B2K.slS=0;B2K.slN=0;B2K.slMax=0}
-function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,15);shake=Math.max(shake,.25);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
+function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,10*TUNE.fxFov);shake=Math.max(shake,.25*TUNE.fxShake);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
     if(roam)RO.bRamp=1;else s.boost=Math.max(s.boost||0,.25)}
-  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,12);shake=Math.max(shake,.3)}B2K.bash=bash;
+  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,8*TUNE.fxFov);shake=Math.max(shake,.3*TUNE.fxShake)}B2K.bash=bash;
   if(bash){s.bm=Math.min(100,s.bm+8*dt);if(roam){RO.turbo=Math.max(RO.turbo||0,.12);RO.inv=Math.max(RO.inv||0,.15)}else s.boost=Math.max(s.boost||0,.12)}B2K.wasB=boosting}
 // Brickbash in roam: traffic within reach is knocked aside (tumble + debris) instead of stopping the car
 function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
@@ -10373,7 +10384,7 @@ function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(R
   if(!boosting&&!RO.dDir&&(RO.bIdle||0)>.5&&s.bm<100)s.bm=Math.max(bm0,s.bm-(FL_RECH-TUNE.bRegen)*dt);
   const sp=Math.abs(RO.v),slip=Math.abs(angDiff(RO.h,RO.vh??RO.h));B2K_drift(s,!!RO.dDir,slip,sp,dt);if(d0&&!RO.dDir)B2K_driftEnd(s);
   B2K_boost(s,boosting,bm0,dt,true);B2K_turbines(s,boosting||B2K.bash,dt);B2K_trail(s,!!RO.dDir&&!(s.air),dt);
-  if(B2K.bash&&R()<.5)emit(SPARK,V3(RO.x+rr(-2,2),RO.y+rr(.5,2),RO.z+rr(-2,2)),V3(rr(-3,3),rr(1,4),rr(-3,3)),.3,new THREE.Color(2.6,1.8,.4))}catch(e){B2K.err=String(e)}B2K_hud(s.bm);return r}}
+  if(B2K.bash&&R()<B2K_spk(.15)){const S=TUNE.fxSpkS;emit(SPARK,V3(RO.x+rr(-1,1),RO.y+rr(.3,1),RO.z+rr(-1,1)),V3(rr(-2,2)*S,rr(.5,2)*S,rr(-2,2)*S),.15,new THREE.Color(2.2,1.6,.4))}}catch(e){B2K.err=String(e)}B2K_hud(s.bm);return r}}
 // races: wrap physPlayer the same way (race drift is s.hbDir/s.hbT; race boost is c.boost on s.bm)
 {const f0=physPlayer;physPlayer=function(s,c){if(!s||!s.isPlayer||state!=='race')return f0.apply(this,arguments);const bm0=s.bm,d0=s.hbDir,H0=(typeof H==='number'?H:1/60);const r=f0.apply(this,arguments);try{
   const dt=H0,boosting=!!(c&&c.boost)&&bm0>.5&&!s.air;if(s.hbDir){const base=boosting?Math.max(0,bm0-24*dt):bm0;s.bm-=Math.min(6*dt,Math.max(0,s.bm-base))}
@@ -10419,7 +10430,12 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Camera','TUNE.fovSpd','FOV widen at speed',0,30,.5],['Camera','TUNE.camK','Turn follow (higher = less lag)',1,20,.1],['Camera','TUNE.camY','Height follow',1,30,.5],
  ['Body','TUNE.carW','Car width ×',.7,1.4,.01],['Body','TUNE.carL','Car length ×',.7,1.4,.01],['Body','TUNE.ride','Body ride height (m)',-.3,.5,.01],
  ['Body','C26.w','Suspension stiffness',3,25,.5],['Body','C26.z','Suspension damping',.05,1.5,.01],['Body','C26.pK','Pitch (brake/accel dive)',0,.012,.0002],['Body','C26.rK','Body roll',0,.012,.0002],
- ['Race','TUNE.rSpd','Race speed × (next race)',.8,1.8,.01],['Race','TUNE.rub','AI rubber-band ×',0,3,.05],['Race','TUNE.traf','Traffic density (next city load)',.1,2,.05]];
+ ['Race','TUNE.rSpd','Race speed × (next race)',.8,1.8,.01],['Race','TUNE.rub','AI rubber-band ×',0,3,.05],['Race','TUNE.traf','Traffic density (next city load)',.1,2,.05],
+ // fix21 FX: boost visuals, roam + races (1 = the default look). A 7th entry 'bool' = on/off switch
+ ['FX','TUNE.fxFlS','Flame size ×',0,2.5,.05],['FX','TUNE.fxFlL','Flame length ×',0,3,.05],['FX','TUNE.fxFlI','Flame brightness ×',0,3,.05],
+ ['FX','TUNE.fxSpk','Boost sparkles',0,1,1,'bool'],['FX','TUNE.fxSpkN','Sparkle count ×',0,3,.1],['FX','TUNE.fxSpkS','Sparkle size / spread ×',.2,3,.05],
+ ['FX','TUNE.fxLines','Speed lines on boost ×',0,3,.05],['FX','TUNE.fxGlow','Boost screen glow / blur ×',0,3,.05],
+ ['FX','TUNE.fxFov','Boost FOV kick ×',0,3,.05],['FX','TUNE.fxShake','Boost camera shake ×',0,3,.05]];
 const TU_ROOT={TUNE,C26,W13S,W14_ST,RCAM,W:window};
 const TU_ref=id=>{const p=id.split('.');let o=TU_ROOT[p[0]];for(let i=1;i<p.length-1&&o;i++)o=o[p[i]];return o?[o,p[p.length-1]]:null};
 const TU_get=id=>{const r=TU_ref(id);return r?r[0][r[1]]:undefined};
@@ -10457,7 +10473,7 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
 #tuD .tabs{display:flex;gap:3px;padding:5px 6px;overflow-x:auto;border-bottom:1px solid #4ceaff22;flex:none}#tuD .tabs button{flex:none;padding:4px 7px}#tuD .tabs button.on{background:#4ceaff;color:#04121c}
 #tuD .bd{overflow-y:auto;padding:4px 8px 8px;flex:1;min-height:0;overscroll-behavior:contain}
 #tuD .r{padding:4px 0;border-bottom:1px solid #ffffff10}#tuD .r .l{display:flex;justify-content:space-between;gap:6px;font-size:12px}#tuD .r .l span{color:#9fb6c8}#tuD .r .l b{color:#ffd12c;font-variant-numeric:tabular-nums}#tuD .r .l b.ch{color:#ff8ad0}
-#tuD input[type=range]{width:100%;height:26px;margin:0;accent-color:#4ceaff}
+#tuD input[type=range]{width:100%;height:26px;margin:0;accent-color:#4ceaff}#tuD label.tb{display:flex;align-items:center;gap:8px;min-height:34px}#tuD label.tb .l{flex:1}#tuD input[type=checkbox]{width:26px;height:26px;margin:0;accent-color:#4ceaff}
 #tuD .ft{display:flex;gap:5px;padding:6px 8px;border-top:1px solid #4ceaff33;flex-wrap:wrap}#tuD .msg{font-size:12px;color:#ffd12c;padding:0 8px 6px}
 #tuD .vl{display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid #ffffff10;font-size:12px}#tuD .vl div{flex:1;min-width:0}#tuD .vl small{display:block;color:#9fb6c8;font-size:12px}
 #tuD input[type=text]{flex:1;min-width:0;font:13px system-ui;background:#0d1a2c;color:#fff;border:1px solid #4ceaff55;border-radius:7px;padding:5px 7px}
@@ -10471,7 +10487,7 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
  g.addEventListener('click',e=>{e.stopPropagation();TU_toggle()});
  d.addEventListener('input',e=>{const t=e.target;if(t.type!=='range')return;const k=TUNE_K.find(q=>q[1]===t.dataset.k);if(!k)return;TU_set(k[1],+t.value);
   const b=t.parentNode.querySelector('b');if(b){b.textContent=TU_fmt(t.value,k[5]);b.classList.toggle('ch',Math.abs(+t.value-TU_DEF[k[1]])>k[5]/2)}});
- d.addEventListener('change',e=>{if(e.target.type==='range')e.target.blur()});
+ d.addEventListener('change',e=>{const t=e.target;if(t.type==='range')t.blur();if(t.type==='checkbox'&&t.dataset.k){TU_set(t.dataset.k,t.checked?1:0);const b=t.parentNode.querySelector('b');if(b){b.textContent=t.checked?'ON':'OFF';b.classList.toggle('ch',(t.checked?1:0)!==TU_DEF[t.dataset.k])}}});
  d.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
   if(a==='x')TU_toggle(false);else if(a==='tab'){TU.grp=b.dataset.g;TU.exp=null;TU_render()}
   else if(a==='reset'){for(const k of TUNE_K)if(k[0]===TU.grp)TU_set(k[1],TU_DEF[k[1]]);TU.msg=TU.grp+' reset to defaults';TU_render()}
@@ -10491,6 +10507,7 @@ function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const W=innerWidth,H=inne
 function TU_render(){const d=TU.el;if(!d)return;const G=[...new Set(TUNE_K.map(k=>k[0]))],sv=TU.grp==='Saves';let h=`<div class="th"><b>TUNE</b><small>active: ${TU_esc(TU.src)}${TU.db?'':' · no db'}</small><button data-a="x" aria-label="close">✕</button></div><div class="tabs">`;
  for(const g of[...G,'Saves'])h+=`<button data-a="tab" data-g="${g}" class="${g===TU.grp?'on':''}">${g}</button>`;h+='</div><div class="bd">';
  if(!sv){for(const k of TUNE_K){if(k[0]!==TU.grp)continue;const v=TU_get(k[1]),ch=Math.abs(v-TU_DEF[k[1]])>k[5]/2;
+   if(k[6]==='bool'){h+=`<label class="r tb"><div class="l"><span>${TU_esc(k[2])}</span><b class="${ch?'ch':''}">${v?'ON':'OFF'}</b></div><input type="checkbox" data-k="${k[1]}" ${v?'checked':''}></label>`;continue}
    h+=`<div class="r"><div class="l"><span>${TU_esc(k[2])}</span><b class="${ch?'ch':''}">${TU_fmt(v,k[5])}</b></div><input type="range" data-k="${k[1]}" min="${k[3]}" max="${k[4]}" step="${k[5]}" value="${v}"></div>`}}
  else{h+=`<div class="vl"><input type="text" id="tuN" maxlength="120" placeholder="note, e.g. tighter steering"><button data-a="save">SAVE</button></div>`;
   if(!TU.db)h+='<div class="vl"><div><small>No artifact db on this page: SAVE needs the beta. EXPORT still works.</small></div></div>';
