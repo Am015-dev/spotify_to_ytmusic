@@ -5415,6 +5415,7 @@ async function tutAct(seat,tok){const m=tutMove(seat);if(!m||!tutAlive(tok))retu
 // the crew plays until it is the human's turn again
 async function tutCrew(){const tok=UI.tutTok;for(let n=0;n<8&&tutAlive(tok)&&!G.over;n++){const s=sideToAct();if(s<0||isHuman(s))break;if(!await tutAct(s,tok))break}}
 // ---------------------------------------------------------------- the steps
+const tutCalm=()=>!document.querySelector('#tb .snap,#tb .buzz,#tb.shake,#fuse .burn,#fuse .phew');   // the cut / miss animation is over: the spotlight does not move
 const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,7)];return t&&t.cut};
 function tutSteps(){return [
  {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires before the fuse burns out. The whole crew wins or loses together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.q},
@@ -5428,14 +5429,14 @@ function tutSteps(){return [
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===7},ready:()=>tutMyTurn()&&!UI.sel},
  {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 2s. If Teal has a 2, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,7)},
- {id:'hit',title:'A hit!',say:'Match! Both 2s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over},
+ {id:'hit',title:'A hit!',say:'Match! Both 2s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
  {id:'crew1',title:'Crew turns',say:'Teal used your token to cut your 3. Plum held every 3 left, so he cut them alone.',target:tq('#crew'),wait:null,ai:tutCrew,ready:()=>tutMyTurn()},
  {id:'wrong1',title:'A wrong guess',say:'Let\'s guess wrong on purpose. Plum\'s wires are hidden: tap his second wire.',target:tutEl(2,3),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&!UI.sel},
  {id:'wrong2',title:'Name a number',say:'Say 2. It is really a 1, so this will miss.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(2,3)},
  {id:'wrongres',title:'A miss',say:()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Wrong! The fuse burned one step, and a token shows the true number: a '+(t?t.v:1)+'.'},
-   target:tutEl(2,3),also:tq('#fuse'),wait:null,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0},
+   target:tutEl(2,3),also:tq('#fuse'),wait:null,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
  {id:'crew2',title:'Using clues',say:'Teal used that token to cut a 1. Plum cut the last 1. Fully cut numbers get a green check.',target:tq('#track'),wait:null,ai:tutCrew,ready:()=>tutMyTurn()},
  {id:'probe',title:'Your Twin Probe',say:'Once per job, point at two wires and name one number. It hits if either wire matches.',target:tq('#mine .chip'),wait:null,ready:()=>tutMyTurn()&&!!document.querySelector('#mine .chip')},
  {id:'gear',title:'Use equipment',say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
