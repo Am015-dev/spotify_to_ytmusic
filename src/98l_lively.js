@@ -140,10 +140,12 @@ function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=H
     for(let t=8;t<L-7;t+=10){const x=A.x+ux*t,z=A.z+uz*t,dx=x-RO.x,dz=z-RO.z,d2=dx*dx+dz*dz;if(d2<min*min||d2>max*max)continue;const d=Math.sqrt(d2);if((dx*fx+dz*fz)/d<cmin)continue;
       const e=Math.min(t,L-t)<26&&(A.nb.length>=3&&t<26||B.nb.length>=3&&L-t<26);(e?o:q).push({i,bi,s:t,L})}}}
   const sh=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};return sh(o).concat(sh(q))}
+// road mask: true if (x,z) is within W/2+m of any street edge nearby (the carriageway of ANY street, incl. the crossing one at a corner)
+function LV_onRoad(x,z,m){const N=HUB.nodes;for(const i of HUB.nc?HUB.nc.L:[]){const A=N[i];if(!A||!A.nb)continue;if(Math.abs(A.x-x)>400||Math.abs(A.z-z)>400)continue;for(const bi of A.nb){const B=N[bi];if(!B)continue;const dx=B.x-A.x,dz=B.z-A.z,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/l2)),ex=A.x+dx*t-x,ez=A.z+dz*t-z,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20))/2+m;if(ex*ex+ez*ez<W*W)return true}}return false}
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
   const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
-    const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:(A.pw||W/2+1.5)+1.1;/* Athens: right behind the walkers' line (A.pw), at the kerb */
-    const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;
+    const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:Math.max((A.pw||W/2+1.5)+1.1,W/2+2.6);/* Athens: right behind the walkers' line (A.pw), at the kerb */
+    const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(LV_onRoad(x,z,2.4))continue;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;
     const y=groundAt(x,z,(RO.y||0)+20);if(!(y>-1)||Math.abs(y-(RO.y||0))>14)continue;if(roamHit(x,z,1.8,y+.5)||roamHit(x-uz*sd*2,z+ux*sd*2,1.2,y+.5))continue;
     return{x,z,y:Math.max(0,y),h:Math.atan2(uz*sd,-ux*sd),ux,uz,sd,W,a:i,b:bi,al,L}}return null}
 // ---------- 7 · clusters
