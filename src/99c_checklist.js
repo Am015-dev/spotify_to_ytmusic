@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88l',id:'sb-open',text:'Garage RIDES: every car card has ▶ GUIDE; tapping it plays that car being built step by step (parts drop in, a parts box on the left, a counter like 1/22 top right).'},
+ {ver:'v88l',id:'sb-ctrl',text:'In the guide: ◀ ▶ change the step, PLAY/PAUSE, ×1/×2, the slider jumps; no button covers the car on the phone; EXIT goes back to the garage with your car unchanged.'},
+ {ver:'v88l',id:'sb-more',text:'BUILD → ⋯ MORE → BUILD GUIDE works for any car (also the bus or your own build); EXIT returns to BUILD.'},
+ {ver:'v88l',id:'sb-diy',text:'In the guide tap ✋ BUILD IT: the next parts show as a green ghost; tapping near it snaps the part in; 💡 PLACE IT places it for you; ✕ before the end restores the car.'},
  {ver:'v88k',id:'su-rides',text:'Garage RIDES → STREET: the row STREET RACER FAMILY shows 4 cars (Orange Street Racer + 3 variations), then TUNER FRIENDS with 3 more.'},
  {ver:'v88k',id:'su-look',text:'Orange Street Racer looks like the LEGO set: orange, open top with blue seats, lime side graphics, grey wing on struts, silver wheels.'},
  {ver:'v88k',id:'su-drive',text:'Equip the Orange Street Racer, SAVE & DRIVE: it drives like the other normal cars (not slow like the bus).'},

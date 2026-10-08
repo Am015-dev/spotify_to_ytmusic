@@ -46,7 +46,7 @@ function SB_frame(){const now=performance.now(),dt=Math.min(.05,SB.t0?(now-SB.t0
  const cvs=$('#gbC'),W=cvs.clientWidth,H=cvs.clientHeight,C=GB.cam;if(!W||!H)return;if(cvs.width!==Math.round(W*DPR2())||SB.cw!==W+'x'+H){SB.cw=W+'x'+H;GB.r.setPixelRatio(DPR2());GB.r.setSize(W,H,false);C.aspect=W/H}
  const A=SB_area(W,H);if(GB.drag==null&&SB.play)GB.rot+=dt*.12;SB.tg.lerp(SB.want||SB.C,1-Math.exp(-dt*3));
  const pit=.42,vf=C.fov*Math.PI/360,tv=Math.tan(vf)*(A.b-A.t)/H,th=Math.tan(vf)*C.aspect*(A.r-A.l)/W,s=SB.sz,ev=(s.y*Math.cos(pit)+Math.max(s.x,s.z)*Math.sin(pit))/2,eh=Math.hypot(s.x,s.z)/2;
- const d=Math.max(ev/tv,eh/th,4)*1.08*SB.z+Math.max(s.x,s.z)*.3;C.position.set(SB.tg.x+Math.sin(GB.rot)*Math.cos(pit)*d,SB.tg.y+Math.sin(pit)*d,SB.tg.z+Math.cos(GB.rot)*Math.cos(pit)*d);C.lookAt(SB.tg);
+ const d=Math.max(ev/tv,eh/th,4)*1.16*SB.z+Math.max(s.x,s.z)*.3;C.position.set(SB.tg.x+Math.sin(GB.rot)*Math.cos(pit)*d,SB.tg.y+Math.sin(pit)*d,SB.tg.z+Math.cos(GB.rot)*Math.cos(pit)*d);C.lookAt(SB.tg);
  C.zoom=1;C.setViewOffset(W,H,Math.round(W/2-(A.l+A.r)/2),Math.round(H/2-(A.t+A.b)/2),W,H);C.updateMatrixWorld();GB.r.render(GB.sc,C)}
 // free screen rect for the car (canvas px): between the top bar, the bottom bar and the parts callout
 function SB_area(W,H){const c=$('#gbC').getBoundingClientRect(),r=e=>{const q=e&&e.getBoundingClientRect();return q&&q.width?q:null},T=r($('#sbG .sbTop')),Bt=r($('#sbG .sbBar')),L=r($('#sbG .sbCall'));
@@ -114,7 +114,7 @@ document.addEventListener('click',e=>{if(!(SB.on||SB.diy))return;const t=e.targe
 #sbG .sbCall{position:absolute;left:calc(6px + env(safe-area-inset-left,0px));top:52px;bottom:66px;width:118px;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:6px;box-sizing:border-box;background:rgba(255,255,255,.94);border:2px solid #141413;border-radius:12px;pointer-events:auto}
 #sbG .sbCall p{margin:0;font:italic 900 15px var(--hud,system-ui);display:flex;flex-direction:column}#sbG .sbCall p small{font:700 12px system-ui;color:#4a5468;font-style:normal}#sbG .sbOk{color:#0a8a3a}
 #sbG .sbPc{position:relative;display:grid;grid-template-columns:44px 1fr;align-items:center;column-gap:4px;background:#e9eef5;border-radius:8px;padding:2px 4px}#sbG .sbPc img{width:44px;height:44px;grid-row:span 2}
-#sbG .sbPc i{font:900 15px system-ui;font-style:normal}#sbG .sbPc small{font:700 12px system-ui;color:#4a5468;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sbG .sbPc i{font:900 15px system-ui;font-style:normal}#sbG .sbPc small{font:700 12px/1.1 system-ui;color:#4a5468;overflow-wrap:anywhere}body:has(#gbx.sbOn) #tuG{display:none!important}
 #sbG .sbBar{position:absolute;left:0;right:0;bottom:0;height:60px;display:flex;align-items:center;gap:8px;padding:0 calc(8px + env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) calc(8px + env(safe-area-inset-left,0px));background:rgba(10,18,40,.86);border-top:2px solid #141413;pointer-events:auto;box-sizing:border-box}
 #sbG .sbBar button{height:46px;font-size:15px}#sbG .sbPl{min-width:104px}#sbG .sbDiy{background:linear-gradient(90deg,#ffd12c,#ff7a1c)}
 #sbG .sbSl{flex:1;min-width:60px;height:44px;margin:0;accent-color:#ffd400;pointer-events:auto}
