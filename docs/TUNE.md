@@ -85,6 +85,7 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvPop` Roadside pop-up challenges | ON | (v88p) a ring 45-75 m ahead in your lane: RAMP JUMP, DRIFT ZONE, SMASH STREAK, CONE SLALOM. Drive through to start; timer on the objective line; at most 1; replaces the old random pop-ups |
 | `TUNE.lvPopGap` Pop-up gap (s) | 28 | seconds after one ends before the next ring (×0.6 after a miss) |
 | `TUNE.lvPopRw` Pop-up studs × | 1 | reward 150 studs × this, plus a brick burst |
+| `TUNE.lvLod` Far people/cars: fewer pose updates | ON | (v88u perf) people > 90 m away re-pose every 3rd frame, traffic cars > 250 m every 4th (they still move every frame). OFF = every frame, as before |
 
 ## Where the values live
 - Beta artifact (db capability): collection `tune_versions` holds one doc `v<N>` per version: `{v, note, values, createdAt}`. Doc `tune/current` holds `{v}`.

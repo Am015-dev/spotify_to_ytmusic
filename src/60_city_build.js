@@ -1000,6 +1000,7 @@ function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=
     const off=gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)),bx=p.cw?p.cx:A.x+(B.x-A.x)*p.t-dz*off,bz=p.cw?p.cz:A.z+(B.z-A.z)*p.t+dx*off;/* v88p: crowd peds (LV clusters) stand at p.cx/p.cz */
     let d=Math.hypot(bx+p.jx-RO.x,bz+p.jz-RO.z);
     if(!p.cw&&d>LV_pedFar()){LV_pedPut(p);continue}
+    if(TUNE.lvLod&&d>90&&p.jy<=0&&p._x!=null&&(i+HUB.fr)%3)continue;/* v88u perf: people > 90 m away re-pose every 3rd frame (9-13 px tall there) */
     if(p.jy<=0&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}
     const x=bx+p.jx,z=bz+p.jz;p._x=x;p._z=z;if(!p.yc||(i+HUB.fr)%8===0){p.y=groundAt(x,z,(p.y||0)+3);if(p.y<-1){pedPlace(p,120,380);continue}p.y=Math.max(0,p.y)}p.yc=1;
