@@ -8,6 +8,8 @@ const OD_CHECKLIST=[
  {ver:'v88i',id:'big-feel',text:'A big car picks up speed more slowly than the Hot Rod, and the camera shows the whole vehicle.'},
  {ver:'v88i',id:'big-tyres',text:'All four tyres of each big template sit on the road (no floating, no sinking), including the Monster Truck.'},
  {ver:'v88i',id:'big-build',text:'Garage BUILD on a big template: you can place bricks along the full length and on the roof; the camera shows the whole car.'},
+ {ver:'v88i',id:'big-pc-cam',text:'On PC: drive the Bus and the Box Truck; the camera sits above the roof and you can see the road ahead over the vehicle.'},
+ {ver:'v88i',id:'big-limo',text:'Drive the Stretch Limo through a few junctions: it turns wider than a car, tyres on the road, nothing stuck.'},
  {ver:'v88i',id:'small-same',text:'Switch back to a normal car: it drives exactly like before.'},
  {ver:'v88g',id:'turn60',text:'Normal turn at a junction at 50–80 km/h with GAS only: the car turns cleanly where it points, no sliding sideways.'},
  {ver:'v88g',id:'brake-turn',text:'Brake briefly before or in a turn (tap BRAKE, or ↓ while holding ↑ on PC): the car slows down and does NOT start a drift.'},

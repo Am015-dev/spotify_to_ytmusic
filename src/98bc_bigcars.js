@@ -123,3 +123,18 @@ GB_cam=(f=>function(){const k=BC_gk(),d=GB_.dist;GB_.dist=d*k;try{return f()}fin
 R2_frame=(f=>function(C,bk){const r=f.apply(this,arguments);if(!bk&&C&&C.view&&C.view.enabled){const k=BC_gk();if(k>1){C.zoom/=k;C.updateProjectionMatrix();C.updateMatrixWorld()}}return r})(R2_frame);
 window.__bc={S:BC,measure:()=>{const ud=pl&&pl.mesh.userData;if(!ud)return null;CR_PS.k='';const d=BC_dims(ud);if(d)BC_apply(d);return window.__bc.hull()},dims:()=>{const ud=pl&&pl.mesh.userData;return ud?BC_dims(ud):null},T:BC_T.map(t=>t.id),n:id=>{const S=GAR_set(id);return S&&S.car?S.car().length:0},
  hull:()=>({rad:SC_K.rad,off:SC_K.off,cam:SC_K.cam,wb:CR_WB,hw:OB_HW,hl:OB_HL,acc:BC.acc,top:BC.top,big:BC.big,m:BC.m||1})};
+// ---- review fixes (v88i QUICK review): tall-vehicle chase cam + garage shadow bounds
+// chase cam: for vehicles taller than 2.2 m (bus, truck; the monster truck stays as it is) the camera rises so the horizon sits above the roof and
+// ~15 % of the frame shows road over the vehicle: height ≥ roof + tan(10°) × (back + half length). Same lag (camY/camB easing), same wall pull-in.
+function BC_tall(d){if(!BC.big||!d||d.H<=2.2)return;const T=d.H+.3;for(const n in RCAM){if(n==='high')continue;const C=RCAM[n];C.h=+Math.max(C.h,T+.2+.176*(C.b+d.L/2)).toFixed(2)}}
+BC_apply=(f=>function(d){const r=f(d);BC_tall(d);return r})(BC_apply);
+// garage: fit the key light's shadow camera to the car (+ its cast shadow on the floor) + 2 m, 2048 map when it is bigger than the stock ±14 box
+const _bcV=new THREE.Vector3();
+function BC_gsShadow(){if(!GB.sc||!GB.mesh)return;let k=BC.gsL;if(!k||!k.parent){k=null;GB.sc.traverse(o=>{if(!k&&o.isDirectionalLight&&o.castShadow)k=o});BC.gsL=k}if(!k)return;
+ const B=new THREE.Box3().setFromObject(GB.mesh);if(B.isEmpty())return;k.updateMatrixWorld(true);k.target.updateMatrixWorld(true);const cam=k.shadow.camera,lp=new THREE.Vector3().setFromMatrixPosition(k.matrixWorld),tp=new THREE.Vector3().setFromMatrixPosition(k.target.matrixWorld);
+ cam.position.copy(lp);cam.lookAt(tp);cam.updateMatrixWorld(true);const dir=tp.clone().sub(lp).normalize(),y0=B.min.y,P=[];
+ for(const x of[B.min.x,B.max.x])for(const y of[B.min.y,B.max.y])for(const z of[B.min.z,B.max.z]){P.push(new THREE.Vector3(x,y,z));const t=(y-y0)/Math.max(.05,-dir.y);P.push(new THREE.Vector3(x+dir.x*t,y0,z+dir.z*t))}
+ let x0=1e9,x1=-1e9,y1=-1e9,ya=1e9,zf=0;for(const p of P){_bcV.copy(p).applyMatrix4(cam.matrixWorldInverse);x0=Math.min(x0,_bcV.x);x1=Math.max(x1,_bcV.x);ya=Math.min(ya,_bcV.y);y1=Math.max(y1,_bcV.y);zf=Math.max(zf,-_bcV.z)}
+ const m=2;cam.left=Math.min(-14,x0-m);cam.right=Math.max(14,x1+m);cam.bottom=Math.min(-14,ya-m);cam.top=Math.max(14,y1+m);cam.far=Math.max(50,zf+5);cam.updateProjectionMatrix();
+ const big=cam.right-cam.left>29||cam.top-cam.bottom>29,ms=big?2048:1024;if(k.shadow.mapSize.x!==ms){k.shadow.mapSize.set(ms,ms);if(k.shadow.map){k.shadow.map.dispose();k.shadow.map=null}}}
+GS_shadows=(f=>function(){const r=f.apply(this,arguments);try{BC_gsShadow()}catch(e){}return r})(GS_shadows);
