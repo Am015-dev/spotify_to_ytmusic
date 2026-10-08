@@ -128,7 +128,7 @@ function fxLand(m, seat, src, preChip) {
 }
 // ---- ghost finger: shows the first move (every move in the guided game)
 function fingerWanted() {
-  if (UI.noRec || !G || G.phase === 'over' || UI.cards.length || UI.animBusy) return false;
+  if ((UI.cfg && UI.cfg.tutorial) || UI.noRec || !G || G.phase === 'over' || UI.cards.length || UI.animBusy) return false;
   if (UI.mode === 'guided') return true;
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';

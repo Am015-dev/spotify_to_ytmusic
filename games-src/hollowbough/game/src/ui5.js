@@ -7,8 +7,10 @@ const DEF = { np: 2, level: 'normal', solo: 1 };
 function newGame(mode, o) {
   mode = mode || 'vs'; o = Object.assign({}, UI.opt || DEF, o || {});
   const cfg = { mode, np: o.np || 2, level: o.level || 'normal', solo: o.solo || 1, names: o.names };
+  if (mode === 'tutorial') cfg.tutorial = true; else { try { localStorage.setItem('hb_played', '1'); } catch (e) { } }
   let players, solo = null;
   if (mode === 'solo') { players = [{ name: 'You', ai: null }]; solo = { difficulty: cfg.solo }; }
+  else if (mode === 'tutorial') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
   else if (mode === 'guided') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
   else if (mode === 'hot') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: (cfg.names && cfg.names[i]) || 'Player ' + (i + 1), ai: null }); }
   else if (mode === 'net') { players = o.players; }
@@ -17,6 +19,7 @@ function newGame(mode, o) {
   if (o.camp && mode === 'vs') { const cn = o.camp.names || []; players.forEach((p, i) => { if (i > 0 && cn[i - 1]) p.name = cn[i - 1]; }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
   if (o.camp) campTwist(o.camp);
+  if (mode === 'tutorial') tutStage(G);
   UI.seed = null;
   UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.sel = null; UI.fingerSeen = false; UI.passArm = 0; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
@@ -137,10 +140,10 @@ function queueOver() {
     body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
     buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
-  clearSave(); render();
+  if (!(UI.cfg && UI.cfg.tutorial)) clearSave(); render();
 }
 // ---- save / load
-function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); if (!UI.savedFlag) { UI.savedFlag = 1; GNS.saved(GAME_ID, true); } } catch (e) { } }
+function save() { try { if (!G || G.phase === 'over' || NET.on || (UI.cfg && UI.cfg.tutorial)) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); if (!UI.savedFlag) { UI.savedFlag = 1; GNS.saved(GAME_ID, true); } } catch (e) { } }
 function clearSave() { try { localStorage.removeItem(SAVEKEY); UI.savedFlag = 0; GNS.saved(GAME_ID, false); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
 function loadSave() {
