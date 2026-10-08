@@ -120,6 +120,7 @@ html.land .gx-board{overflow:hidden}
 /* help bubbles never block the board: taps pass through them (only the bulb's link takes pointer events) */
 /* (a tap on a bubble dismisses it and goes no further: see hlpInit) */
 .gxh-bub,.gxh-bub .gxh-ok{pointer-events:none}.gxh-bub .gxh-link{pointer-events:auto}
-.gxh-bub.gxt-bub,.gxh-bub.gxt-bub .gxh-ok{pointer-events:auto}
+.gxt-ripple{position:fixed;z-index:99;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid rgba(255,224,138,.9);pointer-events:none;animation:gxt-rip .6s ease-out both}@keyframes gxt-rip{from{transform:scale(.4);opacity:1}to{transform:scale(1.5);opacity:0}}
+.gxh-bub.gxt-bub{pointer-events:none}.gxh-bub.gxt-bub .gxh-ok{pointer-events:auto}
 .gxt-menu{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}.gxt-menu span{display:block;font-weight:600;font-size:12px;opacity:.85}.gxt-menu.gxt-first{width:100%}
 .mbox .acts.big .gxt-menu{width:100%}

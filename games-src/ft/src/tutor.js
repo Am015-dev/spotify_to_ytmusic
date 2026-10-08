@@ -110,3 +110,6 @@ function tutLeave(){tutQuiet();G=null;resetScene();UI.modal=null;UI.fx.length=0;
   return o(i)}})();
 document.addEventListener('click',e=>{if(!tutOn())return;const b=e.target.closest&&e.target.closest('[data-sell]');
   if(b&&!GXT.act({type:'tap',what:'sell',k:b.dataset.sell})){e.stopImmediatePropagation();e.preventDefault()}},true);
+// every tap the dim shield catches leaves a small ripple where it landed (a wrong tap is never silent, not even the second one in a row)
+document.addEventListener('pointerdown',e=>{const t=e.target;if(!t||!t.classList||!t.classList.contains('gxt-cell'))return;
+  const r=document.createElement('i');r.className='gxt-ripple';r.setAttribute('data-help','');r.setAttribute('aria-hidden','true');r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),650)},true);
