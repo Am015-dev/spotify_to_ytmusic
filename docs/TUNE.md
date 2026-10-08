@@ -6,7 +6,7 @@ Nothing changes for normal players unless a tuning is published.
 ## Alex: how to use it
 1. Open the **beta artifact** in the Claude app, or any build with `?tune=1` added to the URL.
 2. Tap the small **⚙** at the top centre of the screen. A drawer slides out on the left. It stops above GAS/BRAKE/◀▶, so you can keep driving.
-3. Pick a tab: **Steer · Grip · Engine · Boost · Camera · Body · Race · FX · Audio**. Move a slider and it applies at once.
+3. Pick a tab: **Steer · Grip · Engine · Boost · Camera · Body · Race · FX · Audio · Route**. Move a slider and it applies at once.
    FX (since fix21) = boost visuals in roam and races: flame size/length/brightness, sparkles ON/OFF + count + size, speed lines, screen glow/blur, FOV kick, shake (all ×, 1 = default).
    Audio (since fix21) = music on/off, music volume (0.5 default), SFX volume ×, duck music under dialogue + boost (on/off + amount). Tracks: `src/assets/music/<name>.mp3` + the name in `MUS_FILES` (src/98m_music.js).
    The number next to a slider turns **pink** when it differs from the default.
@@ -22,6 +22,32 @@ Some knobs only apply later:
 - Traffic density applies on the next city load.
 - Race speed applies on the next race.
 - Car width, length and ride height are cosmetic and only affect the player car. Collision is unchanged.
+
+## drive24 knobs (v88e): steering build-up and mission routes
+Steer tab (`src/98d_drive24.js` `D24_shape`, free roam only; races and drifting are unchanged):
+| knob | default | what it does |
+|---|---|---|
+| `TUNE.stOn` Progressive steering | ON | OFF = the old on/off steering (any ◀/▶ or arrow-key press = full lock in 0.1 s) |
+| `TUNE.stRampLo` Time to full lock, slow | 0.12 s | how long ◀/▶ (or a key) takes to reach full lock when slow |
+| `TUNE.stRampHi` Time to full lock at 100 km/h | 0.40 s | same at 100 km/h (in between: linear). A short tap = a small correction |
+| `TUNE.stK0` Steer start | 0.10 | the lock you get the instant you press |
+| `TUNE.stRet` Let-go speed | 12 /s | how fast the wheel comes back when you let go (12 = 0.08 s) |
+| `TUNE.stLim` Full lock vs grip limit | 1.10 | full lock asks for this × the turn the tyres can hold at this speed (was ~3× at 100 km/h) |
+
+Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next route the game plans; `98d_drive24.js` for followed cars):
+| knob | default | what it does |
+|---|---|---|
+| `TUNE.rtTurn` Cost of a 90° turn | 110 m | a route takes a detour of up to this many metres to save one 90° turn (0 = old shortest path) |
+| `TUNE.rtUturn` Cost of a U-turn | 800 m | same for a U-turn (also a U-turn over two short hops across lanes) |
+| `TUNE.rtGrid` Back-street cost | ×1.35 | filler-grid streets cost this much more than real streets |
+| `TUNE.rtNarrow` Narrow-street extra | 0.20 | up to +20 % on streets narrower than 24 m |
+| `TUNE.rtSimp` Route smoothing | 3 m | removes lane wiggles from the route line (0 = off) |
+| `TUNE.tcLead` Turn warning ahead | 5 s | the arrow shows the next turn (left/right + metres) this long before it… |
+| `TUNE.tcMin` Turn warning at least | 90 m | …or this far before it, whichever is more. Amber when < 3 s |
+| `TUNE.fvRad` Followed car: corner radius | 16 m | Hilde, Kaiser, rivals and the escort car drive round corners on this radius |
+| `TUNE.fvLat` Followed car: corner grip | 4.5 m/s² | their corner speed = √(grip × radius) (16 m → 30 km/h) |
+| `TUNE.fvDec` Followed car: braking | 4 m/s² | they brake this hard before a corner |
+| `TUNE.fvBlink` Followed car: blinkers | ON | amber blinkers on the side of a turn < 3 s ahead |
 
 ## Where the values live
 - Beta artifact (db capability): collection `tune_versions` holds one doc `v<N>` per version: `{v, note, values, createdAt}`. Doc `tune/current` holds `{v}`.
