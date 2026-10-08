@@ -28,7 +28,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  for(const[i,j]of[[-1,-1],[0,0],[-1,1],[0,-2],[1,1]]){const s=await ev(([i,j])=>__gb.scr(i,j),[i,j]);if(!s||s.y<60||s.y>330)continue;await tapXY(s.x,s.y);if(!await ev(()=>__gs.held()))continue;await shot('m2f_build_held');await tapXY(s.x,s.y);if(await ev(()=>__gb.list().length)>n0){placed=1;break}}
  console.log('PLACED',placed,n0,'→',await ev(()=>__gb.list().length));await shot('m2g_build_placed');await tap('#r2H [data-r2h="undo"]');console.log('after undo',await ev(()=>__gb.list().length));
  await tap('#gbBkP [data-r2b="sel"]');await A('select');
- await tap('#gbBkP [data-r2b="cat"]');await tap('#gbBkCt [data-r2s="kits"]',2000);await A('kits');await shot('m3_kits');await tap('#r2C [data-r2bs="horn"]',1500);await shot('m3b_horn');
+ await tap('#gbBkP [data-r2b="cat"]');await tap('#gbBkCt [data-r2s="kits"]',2000);await A('kits');await pg.waitForTimeout(4000);console.log('KITPICS',await ev(()=>{const a=[...document.querySelectorAll('#gbBody img[data-r2kit]')];return a.filter(i=>i.src&&i.src.length>500).length+'/'+a.length}));await shot('m3_kits');await tap('#r2C [data-r2bs="horn"]',1500);await shot('m3b_horn');
  await tap('#r2R [data-r2m="paint"]',2000);await A('paint');await shot('m4_paint');
  for(const f of['matte','metal','chrome','pearl','gloss']){await tap(`#r2C [data-r2fn="${f}"]`,1200);console.log('fin',f,await ev(()=>__r2.gbFin()));if(f!=='gloss')await shot('m4_fin_'+f)}
  await tap('#r2C [data-r2fn="chrome"]',800);

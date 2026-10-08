@@ -44,7 +44,7 @@ function R2_bkTap(e){const b=e.target.closest('button');if(!b)return;const T=$('
 const R2_FN=[['gloss','✨','GLOSS'],['matte','◼','MATTE'],['metal','⚙','METAL'],['chrome','◎','CHROME'],['pearl','◇','PEARL']];
 function R2_ctx(){const C=$('#r2C'),B=$('#gbBody');if(!C||!B)return;const[m,s]=R2_cur();let h='';
  if(m==='rides')h=[...B.querySelectorAll('#g9Col .g9Bar button')].map((b,i)=>`<button class="r2T ${b.classList.contains('on')?'on':''}" data-r2px="${i}">${b.innerHTML}</button>`).join('');
- else if(m==='perks')h=[...B.querySelectorAll('.gpkTop .gbRow:first-of-type button')].map((b,i)=>`<button class="r2T r2Slot ${GPK_.pk===i&&!b.disabled?'on':''}" ${b.disabled?'disabled':''} data-r2sl="${i}"><small>SLOT ${i+1}</small>${b.querySelector('b').innerHTML}</button>`).join('');
+ else if(m==='perks')h=[...B.querySelectorAll('.gpkTop .gbRow:first-of-type button')].map((b,i)=>`<button class="r2T r2Slot ${GPK_.pk===i&&!b.disabled?'on':''}" ${b.disabled?'disabled':''} data-r2sl="${i}"><small>SLOT ${i+1}</small>${b.disabled?'🔒 '+((b.querySelector('small')||{}).textContent||'').toUpperCase():b.querySelector('b').innerHTML}</button>`).join('');
  else if(m==='paint'){const f=R2_fin();h=R2_FN.map(([k,i,n])=>`<button class="r2T ${f===k?'on':''}" data-r2fn="${k}"><i>${i}</i>${n}</button>`).join('')+`<button class="r2T" data-r2stock><i>↺</i>STOCK</button>`}
  else if(m==='driver')h=[...B.querySelectorAll('h5')].slice(0,6).map((e,i)=>`<button class="r2T" data-r2h5="${i}">${e.textContent.split(/[ ·/]/)[0]}</button>`).join('');
  else if(m==='build')h=[['bricks','🧱','BRICKS'],['kits','🔩','KITS'],['horn','📯','HORN']].map(([k,i,n])=>`<button class="r2T ${s===k?'on':''}" data-r2bs="${k}"><i>${i}</i>${n}</button>`).join('');
@@ -135,7 +135,7 @@ R2_dom();
  box-shadow:0 3px 0 #141413;font:italic 900 12px var(--hud);letter-spacing:.02em;cursor:pointer}
 #gbx .r2T{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:44px;height:44px;padding:0 10px;white-space:nowrap;flex:none;box-sizing:border-box}
 #gbx .r2T i{font-style:normal;font-size:16px;line-height:1}#gbx .r2T.on,#gbx.r2 .gbP.on,#gbx.r2 .g9Ty.on,#gbx.r2 .gbCt.on{background:#ffd400;color:#141413}
-#gbx .r2T:disabled{opacity:.4;cursor:default}#gbx .r2T:active:not(:disabled),#gbx.r2 .gbP:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #141413}
+#gbx .r2T:disabled{opacity:.6;background:#c9ced8;cursor:default}#gbx .r2T:active:not(:disabled),#gbx.r2 .gbP:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #141413}
 #gbx .r2T.r2Go,#gbx.r2 #gsBar .gsPl{background:#38d16a;color:#141413}
 /* header */
 #r2H{position:absolute;left:0;right:0;top:0;height:var(--r2hh);display:flex;align-items:center;gap:8px;padding:0 6px 0 0;background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25);z-index:6;color:#141413;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
@@ -160,10 +160,10 @@ R2_dom();
 #gbx.r2m-perks .gpkTop .gbRow:first-of-type{display:none}#gbx.r2 .gbP{min-height:44px;padding:5px 9px}#gbx.r2 .gbP b{font:italic 900 12px var(--hud)}#gbx.r2 .gbP small{color:#4a5468;font-style:normal;font-weight:700}
 #gbx.r2 .gbP:disabled{background:#c9ced8;color:#3a4252;opacity:1;cursor:default}#gbx.r2 .gbP:disabled small{color:#3a4252}
 #gbx.r2 .gbSw{gap:6px}#gbx.r2 .gbSw button{width:44px;height:44px;border:2px solid #141413;border-radius:10px;box-shadow:0 3px 0 #141413}#gbx.r2 .gbSw button.on{box-shadow:0 3px 0 #141413,0 0 0 3px #ffd400}
-#gbx.r2 .gbP.r2Pk{display:grid;grid-template-columns:48px 1fr;column-gap:7px;align-items:center;text-align:left;width:calc(50% - 4px);box-sizing:border-box;padding:4px 6px}#gbx.r2 .gbP.r2Pk>*:not(.r2Pic){grid-column:2}
+#gbx.r2 .gbP.r2Pk{display:grid;grid-template-columns:48px 1fr;column-gap:7px;align-items:center;text-align:left;width:100%;box-sizing:border-box;padding:4px 6px}@media (min-width:900px) and (min-height:501px){#gbx.r2 .gbP.r2Pk{width:calc(50% - 4px)}}#gbx.r2 .gbP.r2Pk>*:not(.r2Pic){grid-column:2}
 #gbx.r2 .r2Pic{grid-row:1/span 2;position:relative;width:48px;height:40px;border-radius:7px;background:#e9edf3;display:grid;place-items:center;overflow:hidden}#gbx.r2 .r2Pic img{width:48px;height:40px;object-fit:contain;display:block}
-#gbx.r2 .r2Pic i{font-style:normal;font-size:22px}#gbx.r2 .gbP:disabled .r2Pic img,#gbx.r2 .gbP:disabled .r2Pic i{filter:grayscale(1) brightness(.75);opacity:.75}
-#gbx.r2 .r2Lk{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:18px;background:rgba(20,20,19,.35)}
+#gbx.r2 .r2Pic i{font-style:normal;font-size:22px}#gbx.r2 .gbP:disabled .r2Pic img,#gbx.r2 .gbP:disabled .r2Pic i{filter:grayscale(.7);opacity:.9}
+#gbx.r2 .r2Lk{position:absolute;right:1px;bottom:1px;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:12px;background:#141413}
 #gbx.r2 .garPre .gbP img{width:44px;height:44px}
 /* collection: 2 columns of white cards; the type/sort/filter bar moves to the context bar */
 #gbx.r2 #g9Col .g9Bar{display:none}#gbx.r2 #g9Col .g9Cnt{color:#cfe0ff}#gbx.r2 #g9Col .g9Grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
