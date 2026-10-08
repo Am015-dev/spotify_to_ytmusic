@@ -37,7 +37,8 @@ function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||sco
 function planTurn(p){const cap=(LVL[p.lv]||LVL.normal).depth;let best=null,bv=-1e9;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(v>bv){bv=v;best=o}}return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
-function aiMove(s){const p=P(s);const vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
+function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}
+  const p=P(s);const vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
   if(G.q)return {act:'q',i:aiAnswer(G.q)};
   if(G.phase==='bid'){const v=bestTurnValue(p);const budget=Math.max(0,v*.35-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
   const dj=aiDjinn(p,vm);if(dj)return dj;const it=aiItem(p,vm);if(it)return it;

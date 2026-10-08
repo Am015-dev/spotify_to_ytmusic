@@ -121,6 +121,41 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
+/* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
+   Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
+:root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
+.gxt-cell{position:fixed;z-index:var(--gxt-z);background:var(--gxt-dim);touch-action:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.gxt-cell.gxt-clear{background:transparent}
+.gxt-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow,#ffe08a);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow,#ffe08a);animation:gxt-pulse 1.1s ease-in-out infinite}
+.gxt-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow,#ffe08a);opacity:.9;animation:none}
+.gxt-fin{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 3);pointer-events:none;width:0;height:0}
+.gxt-fin i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxt-fin b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
+.gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
+.gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
+.gxt-dots i.done{background:#c99a35}
+.gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
+.gxt-n{opacity:.85;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
+.gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
+.gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
+.gxt-et{font-weight:800;font-size:22px;line-height:1.15}
+.gxt-ex{font-weight:600;font-size:15px}
+.gxt-eb{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.gxt-b{min-height:48px;padding:0 16px;border-radius:24px;border:2px solid var(--gxh-btn,#7a1f31);background:transparent;color:var(--gxh-btn,#7a1f31);font:800 16px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-b.pri{background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc)}
+@keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
+@keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+
 [hidden]{display:none!important}
 :root{--ink:#1c1838;--cream:#fff2d4;--paper:#fff6e2;--paper2:#f5dfb4;--orange:#ff8a1f;--orange2:#e8681c;--teal:#16b3a6;--purple:#8f5bff;--green:#52c23a;--green2:#2e9e2a;--red:#ef3b2d;--red2:#b3140c;--yellow:#ffc928;--blue:#2f86ff;--blue2:#1c62d9;--navy:#2b2f63;--navy2:#1f2250;
   --fd:'Lilita One','Arial Black',Impact,system-ui,sans-serif;--fb:'Nunito','Trebuchet MS','Segoe UI',system-ui,sans-serif;
@@ -649,6 +684,9 @@ html.short .nc{height:24px;min-width:18px}
 /* help kit colours */
 :root{--gxh-bg:#fff6e2;--gxh-ink:#1c1838;--gxh-accent:#ff8a1f;--gxh-glow:#ffc928;--gxh-btn:#e8681c;--gxh-btn-ink:#fff;--gxh-font:var(--fb)}
 .gx-bar .gxh-bulb{background:linear-gradient(#3a3f86,#2b2f63);border:2px solid #14163a;box-shadow:0 3px 0 #14163a;min-height:40px;min-width:40px;border-radius:12px}
+/* tutorial entry in the menus (shell/gx-tutor.js) */
+.big.gxt-menu{flex-direction:column;gap:0;line-height:1.15}.big.gxt-menu span{font:800 .75rem var(--fb);opacity:.9;text-shadow:none}
+.btn.gxt-menu{display:inline-flex;flex-direction:column;align-items:center;gap:0}.btn.gxt-menu span{font:700 .7rem var(--fb);opacity:.8}
 
 </style>
 </head>
@@ -1013,9 +1051,345 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// gx-tutor.js: a staged tutorial game for any game (spotlight, one bubble per step, only the target accepts input, steps advance only on the
+// right action). Needs gx-tutor.css and gx-help.css (bubble styles). Uses GXV.watch (gx-viewport.js) for relayout when it is loaded. See GX-KIT.md section 10.
+//   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
+//              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
+//              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
+//   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
+//   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
+//   GXT.status(game) GXT.menuHTML({game, first, cls, launch}) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
+// Everything the kit draws carries data-help. Progress is remembered per game in localStorage 'gxt-<game>' {done, open, step}.
+(function () {
+  'use strict';
+  var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
+  var DIM = 'rgba(8,4,10,.62)';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
+  // ------------------------------------------------------------------ remembered progress
+  function key(g) { return 'gxt-' + g; }
+  function load(g) {
+    var raw = null; try { raw = localStorage.getItem(key(g)); } catch (e) { raw = mem[g] || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    return o && typeof o === 'object' ? o : null;
+  }
+  function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
+  // ------------------------------------------------------------------ geometry
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function holesOf(st) {
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var out = [p], al = null;
+    try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
+    if (al && !Array.isArray(al)) al = [al];
+    (al || []).forEach(function (a) { var r = toRect(a); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out;
+  }
+  function inflate(r, p, v) {
+    var l = Math.max(0, r.left - p), t = Math.max(0, r.top - p), rr = Math.min(v.w, r.right + p), b = Math.min(v.h, r.bottom + p);
+    return norm({ left: l, top: t, width: Math.max(1, rr - l), height: Math.max(1, b - t) });
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function moved(hs, key) {
+    if (!key) return true; var a = key.split('|'); if (a.length !== hs.length) return true;
+    for (var i = 0; i < hs.length; i++) { var q = a[i].split(',').map(Number), r = hs[i]; if (Math.abs(q[0] - r.left) > 3 || Math.abs(q[1] - r.top) > 3 || Math.abs(q[2] - r.width) > 4 || Math.abs(q[3] - r.height) > 4) return true; }
+    return false;
+  }
+  function rkey(hs) { return hs.map(function (r) { return Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.width) + ',' + Math.round(r.height); }).join('|'); }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  // ------------------------------------------------------------------ drawing
+  function clearVisuals() {
+    if (!S) return;
+    (S.vis || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); S.vis = []; S.bub = null; S.holes = null; S.cells = []; S.pill = null;
+  }
+  function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
+  function cell(l, t, w, h, clear) {
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    return c;
+  }
+  function swallow(e) { e.preventDefault(); e.stopPropagation(); }
+  function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
+  // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
+  function drawCells(hs, shield) {
+    var v = vp(), xs = [0, v.w], ys = [0, v.h];
+    hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
+    xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    ys = ys.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
+      var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
+      for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+    }
+    if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
+  }
+  function ring(r, cls) {
+    var e = mk('div', 'gxt-ring' + (cls ? ' ' + cls : ''));
+    e.style.cssText = 'left:' + Math.round(r.left) + 'px;top:' + Math.round(r.top) + 'px;width:' + Math.round(r.width) + 'px;height:' + Math.round(r.height) + 'px';
+    return add(e);
+  }
+  function finger(fr, tr) {
+    var f = mk('div', 'gxt-fin', '<i></i><b></b>'); add(f); f.setAttribute('aria-hidden', 'true');
+    f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy); if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function stepText(st, k) { var v = st[k]; try { if (typeof v === 'function') v = v(); } catch (e) { v = ''; } return v == null ? '' : String(v); }
+  function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
+  function topLimit() { return stripH() + 4; }
+  // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
+  function place(b, hs, side) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
+    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
+    function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
+    var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
+    var below = { left: x, top: hull.bottom + 12, right: x + w, bottom: hull.bottom + 12 + h }, above = { left: x, top: hull.top - 12 - h, right: x + w, bottom: hull.top - 12 };
+    var room = { below: bot - hull.bottom, above: hull.top - top }, order = side === 'top' ? ['above', 'below'] : side === 'bottom' ? ['below', 'above'] : (room.below >= room.above ? ['below', 'above'] : ['above', 'below']);
+    var best = null; order.forEach(function (n) { var c = n === 'below' ? below : above; if (!best && ok(c)) best = c; });
+    if (!best) {   // scan the whole screen for the free spot nearest the primary hole (any x, so a bubble can sit beside a big target)
+      var bs = 1e9, xs = [x, pad, Math.max(pad, v.w - w - pad)];
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 4) {
+        var c2 = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (!ok(c2)) continue; var d = Math.abs(c2.left + w / 2 - P.cx) * 0.5 + Math.abs(y + h / 2 - P.cy); if (d < bs) { bs = d; best = c2; }
+      }
+    }
+    if (!best) { var useBelow = room.below >= room.above; var yy = useBelow ? Math.min(bot - h, hull.bottom + 12) : Math.max(top, hull.top - 12 - h); best = { left: x, top: yy, right: x + w, bottom: yy + h }; }
+    b.style.left = Math.round(best.left) + 'px'; b.style.top = Math.round(best.top) + 'px';
+    var sd = best.bottom <= P.top + 2 ? 'bottom' : best.top >= P.bottom - 2 ? 'top' : best.right <= P.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + sd;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (sd === 'top' || sd === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, P.cx - best.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, P.cy - best.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return best;
+  }
+  function dots() {
+    var n = cfg.steps.length, h = '';
+    for (var i = 0; i < n; i++) h += '<i' + (i < S.i ? ' class="done"' : i === S.i ? ' class="on"' : '') + '></i>';
+    return '<span class="gxt-dots" role="img" aria-label="Step ' + (S.i + 1) + ' of ' + n + '">' + h + '</span><span class="gxt-n">' + (S.i + 1) + '/' + n + '</span>';
+  }
+  function topStrip() {
+    var t = mk('div', 'gxt-top', '<span class="gxt-prog">' + dots() + '</span><button type="button" class="gxt-skip" data-gxt-skip>Skip tutorial</button>');
+    t.style.height = stripH() + 'px'; t.querySelector('.gxt-skip').addEventListener('click', function (e) { e.stopPropagation(); skip(); });
+    return t;
+  }
+  // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
+  function draw() {   // (re)build the visible pieces for the current step at the current layout
+    var st = S.step, hs = holesOf(st); clearVisuals();
+    var v = vp();
+    if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
+    var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
+    S.holes = H; S.key = rkey(hs);
+    var nextStep = !st.wait;
+    drawCells(H, nextStep);
+    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    add(topStrip());
+    if (st.wait && st.wait.type !== 'event') {
+      var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
+    }
+    var say = stepText(st, 'say'), title = stepText(st, 'title');
+    var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
+    b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
+      (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
+    add(b); S.bub = b; S.say = say;
+    var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+    place(b, H, st.side);
+    return true;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
+    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  }
+  function enter(i) {
+    var st = cfg.steps[i]; if (!st) { finish(); return; }
+    S.i = i; S.step = st; S.count = 0; S.phase = 'pend'; S.key = ''; S.stable = 0; S.stable_k = ''; S.since = Date.now(); S.shown = false; S.misses = 0;
+    mark(cfg.game, { open: 1, step: i });
+    clearVisuals(); drawWaiting();
+    try { if (st.onEnter) st.onEnter(); } catch (e) { console.warn('gxt onEnter', e); }
+    if (st.ai) { try { var r = st.ai(); if (r && r.then) { S.aiBusy = true; r.then(function () { S.aiBusy = false; }, function () { S.aiBusy = false; }); } } catch (e) { console.warn('gxt ai', e); } }
+  }
+  function tick() {
+    if (!S || S.phase === 'gap' || S.phase === 'end') return;
+    var st = S.step; if (!st) return;
+    if (S.phase === 'pend') {
+      var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
+      var hs = rdy ? holesOf(st) : null;
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
+      if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
+      return;
+    }
+    if (S.phase === 'show') {
+      var hs2 = holesOf(st);
+      if (!hs2) { if (++S.misses >= 3) { S.misses = 0; S.phase = 'pend'; S.stable = 0; S.stable_k = ''; clearVisuals(); drawWaiting(); } return; }
+      S.misses = 0;
+      if (moved(hs2, S.key)) draw();
+    }
+  }
+  function advance() {
+    var st = S.step; S.phase = 'gap'; clearVisuals(); drawWaiting();
+    setTimeout(function () { if (!S || S.step !== st) return; try { if (st.onDone) st.onDone(); } catch (e) {} if (S.i + 1 >= cfg.steps.length) finish(); else enter(S.i + 1); }, 0);
+  }
+  function next() {
+    if (!S || S.phase !== 'show' || S.step.wait) return;
+    try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
+    advance();
+  }
+  var wrongT = 0;
+  function wrong() {
+    if (!S || S.phase !== 'show' || !S.bub) return;
+    var b = S.bub, st = S.step, tx = b.querySelector('.gxh-tx'); if (!tx) return;
+    b.classList.remove('gxt-shake'); void b.offsetWidth; b.classList.add('gxt-shake');
+    tx.textContent = st.wrong || (st.wait ? 'Tap the glowing one.' : 'Tap Next.');
+    clearTimeout(wrongT); wrongT = setTimeout(function () { if (S && S.bub === b && tx) { tx.textContent = S.say; b.classList.remove('gxt-shake'); } }, 1700);
+    S.wrongs = (S.wrongs || 0) + 1;
+  }
+  // the games call this from their input handlers; the return value says whether to go on with the action
+  function act(a) {
+    if (!S || S.phase === 'end') return true;
+    a = a || {};
+    if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    var st = S.step, w = st.wait;
+    if (a.type === 'event') {
+      if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
+      return true;
+    }
+    if (!w || w.type === 'event') { wrong(); return false; }
+    var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
+    if (!okm) { wrong(); return false; }
+    S.count++;
+    if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
+    return true;
+  }
+  // ------------------------------------------------------------------ end card, skip, stop
+  function teardown() {
+    if (S) { clearVisuals(); clearInterval(S.timer); }
+    S = null; closeDlg();
+  }
+  function finish() {
+    mark(cfg.game, { done: 1, open: 0, step: 0 });
+    clearVisuals(); S.phase = 'end';
+    var v = vp(); add(cell(0, 0, v.w, v.h, false));
+    var story = cfg.story !== false;
+    var c = mk('div', 'gxt-end'); c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', 'Tutorial finished');
+    c.innerHTML = '<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">' + esc(cfg.endTitle || 'You know the rules') + '</div><div class="gxt-ex">' + esc(cfg.endText || 'You can start a real game now.') + '</div>' +
+      '<div class="gxt-eb">' + (cfg.endButtons ? cfg.endButtons.map(function (b, i) { return '<button type="button" class="gxt-b' + (i ? '' : ' pri') + '" data-gxt-end="' + esc(b.id) + '">' + esc(b.label) + '</button>'; }).join('') : '<button type="button" class="gxt-b pri" data-gxt-end="play">Play a real game</button>' + (story ? '<button type="button" class="gxt-b" data-gxt-end="story">Story mode</button>' : '')) + '</div></div>';
+    add(c);
+    c.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-end]'); if (!b) return;
+      var choice = b.dataset.gxtEnd, done = cfg.onDone; teardown();
+      try { if (done) done({ choice: choice }); } catch (err) { console.warn('gxt onDone', err); }
+    });
+  }
+  function skip() {
+    if (!S) return; var g = cfg.game, ex = cfg.onExit;
+    mark(g, { open: 0, step: 0 }); teardown();
+    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+  }
+  function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
+  // ------------------------------------------------------------------ start
+  function lint(steps) {
+    var bad = [];
+    (steps || []).forEach(function (s, i) {
+      var tag = 'step ' + i + ' (' + (s.id || '?') + ')';
+      if (!s.id) bad.push(tag + ': no id');
+      if (typeof s.say === 'string' && words(s.say) > 20) bad.push(tag + ': say over 20 words (' + words(s.say) + ')');
+      if (typeof s.title === 'string' && words(s.title) > 4) bad.push(tag + ': title over 4 words');
+      if (typeof s.target !== 'function' && !(s.target && typeof s.target === 'object')) bad.push(tag + ': no target');
+      if (s.wait && s.wait.type !== 'event' && s.wait.type !== 'tap' && s.wait.type !== 'drag') bad.push(tag + ': wait.type must be tap, drag or event');
+    });
+    return bad;
+  }
+  function start(c) {
+    if (S) teardown();
+    cfg = c; cfg.steps = cfg.steps || []; wire();
+    var bad = lint(cfg.steps); if (bad.length) console.warn('gxt lint: ' + bad.join('; '));
+    mark(cfg.game, { open: 1, step: 0 });
+    S = { i: 0, step: null, phase: 'pend', vis: [], cells: [], timer: 0 };
+    try { if (cfg.setup) cfg.setup(); } catch (e) { console.error('gxt setup', e); }
+    S.timer = setInterval(tick, 100);
+    enter(0);
+    return GXT;
+  }
+  function relayout() { if (S && S.phase === 'show') draw(); else if (S && S.phase === 'end') { var e = S.vis[S.vis.length - 1]; if (e) { var v = vp(), c0 = S.vis[0]; if (c0) c0.style.cssText = 'left:0;top:0;width:' + v.w + 'px;height:' + v.h + 'px'; } } else if (S && (S.phase === 'pend' || S.phase === 'gap')) { clearVisuals(); drawWaiting(); } }
+  function wire() {
+    if (wired) return; wired = true;
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    D.addEventListener('click', onMenuClick, true);
+  }
+  // ------------------------------------------------------------------ menu helper: "New here? Learn in 5 minutes" / "Tutorial" / "Tutorial ✓"
+  function label(g, first) {
+    var s = status(g);
+    if (s.done) return 'Tutorial ✓';
+    if (first && !s.open) return 'New here? Learn in 5 minutes';
+    return s.open ? 'Tutorial (continue?)' : 'Tutorial';
+  }
+  function menuHTML(o) {
+    o = o || {}; var g = o.game; if (o.launch) launchers[g] = o.launch; wire();
+    var s = status(g), first = !!o.first && !s.done && !s.open, cls = (o.cls || '') + ' gxt-menu' + (first ? ' gxt-first' : '') + (s.done ? ' gxt-ok' : '');
+    var sub = o.sub === false ? '' : '<span>' + esc(s.done ? 'Done. Tap to play it again.' : first ? 'Short, one tap at a time, no reading' : s.open ? 'Restart or exit' : 'Learn by doing, step by step') + '</span>';
+    return '<button type="button" class="' + cls.trim() + '" data-gxt-open="' + esc(g) + '" data-help><b>' + esc(label(g, first)) + '</b>' + sub + '</button>';
+  }
+  function onMenuClick(e) {
+    var b = e.target && e.target.closest && e.target.closest('[data-gxt-open]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var g = b.dataset.gxtOpen, fn = launchers[g]; if (!fn) return;
+    if (status(g).open && !S) openDlg(g, fn); else fn();
+  }
+  function closeDlg() { if (dlg) { if (dlg.parentNode) dlg.parentNode.removeChild(dlg); dlg = null; } }
+  function openDlg(g, fn) {
+    closeDlg();
+    dlg = mk('div', 'gxt-end'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-label', 'Tutorial in progress');
+    dlg.innerHTML = '<div class="gxt-endc"><div class="gxt-et">You left the tutorial half way</div><div class="gxt-ex">Start it again from the first step, or leave it.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-gxt-dlg="restart">Restart tutorial</button><button type="button" class="gxt-b" data-gxt-dlg="exit">Exit</button></div></div>';
+    D.body.appendChild(dlg);
+    dlg.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-dlg]'); if (!b) return;
+      closeDlg(); if (b.dataset.gxtDlg === 'restart') fn(); else { mark(g, { open: 0, step: 0 }); var l = D.querySelectorAll('[data-gxt-open="' + g + '"]'); for (var i = 0; i < l.length; i++) { var bb = l[i].querySelector('b'); if (bb) bb.textContent = label(g, false); } }
+    });
+  }
+  function state() {
+    if (!S) return { active: false };
+    var st = S.step || {}, hs = S.holes && S.holes[0], b = S.bub && S.bub.getBoundingClientRect();
+    return { active: true, phase: S.phase, i: S.i, n: cfg.steps.length, id: st.id, shown: S.phase === 'show' && !!S.bub, wait: st.wait ? st.wait.type : null, times: st.wait && st.wait.times || 1, count: S.count,
+      say: S.say || '', title: stepText(st, 'title'), hole: hs ? { left: hs.left, top: hs.top, width: hs.width, height: hs.height, cx: hs.cx, cy: hs.cy } : null,
+      holes: (S.holes || []).map(function (r) { return { left: r.left, top: r.top, width: r.width, height: r.height, cx: r.cx, cy: r.cy }; }),
+      bubble: b ? { left: b.left, top: b.top, right: b.right, bottom: b.bottom } : null, wrongs: S.wrongs || 0, shownAt: S.shownAt || 0 };
+  }
+  var GXT = window.GXT = {
+    version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
+    index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
+    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
 //   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
@@ -1178,6 +1552,7 @@ const GX={key:'gx',open:null,
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
     var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
     var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
     map.appendChild(path); s.appendChild(map);
@@ -3725,7 +4100,7 @@ function hlpPlan(){const V=UI.V;if(!V||V.seat<0||!G||G.over||UI.brief||passTo()>
   if(m.a==='eq'&&EQUIP[m.id]&&eqMovesFor(V,m.id).length)return {kind:'eq',to:{eq:m.id},why:hlpWhy(EQUIP[m.id].n+' is worth using now.',15)};
   return null}
 function hlpEl(r){if(!r)return null;if(r.u!=null)return document.querySelector('#tb .tile[data-u="'+r.u+'"]');if(r.seat!=null)return document.querySelector('#tb .plate[data-seat="'+r.seat+'"]');if(r.eq!=null)return document.querySelector('#tb .eqk[data-eq="'+r.eq+'"]');if(r.chip!=null)return document.querySelector('#tb .chip[data-chip="'+r.chip+'"]');return null}
-function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p||!hlpEl(p.to))return null;
+function hlpSuggest(){if(UI.tut)return null;let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p||!hlpEl(p.to))return null;
   return {why:p.why,target:()=>hlpEl(p.to),from:p.from?()=>hlpEl(p.from):null}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
@@ -3733,7 +4108,7 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'short-fuse',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.sel,#tray .chip,#mine .chip,#over .big,#cover .big'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause;
+  const st=document.getElementById('start');const busy=!G||!UI.started||G.over||(st&&!st.hidden)||UI.brief||UI.pause||UI.tut;
   GXH.phase(busy?null:hlpPhase())}
 
 </script>
@@ -4634,7 +5009,7 @@ function renderSettings(){const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd" id="sndbtn">${ico('snd')}Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus" id="musbtn">${ico('music')}Music ${SND.music?'on':'off'}</button></div></div>
   <div><div class="lbl">Computer crew speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?`<button class="btn small" data-a="netleave">${ico('back')}Leave the online game</button>`:`${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart</button>`:''}<button class="btn small" data-a="newgame">${ico('map')}Jobs</button>`}</div></div>
-  <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>${typeof GXH!=='undefined'?`<div><div class="lbl">Tips</div>${GXH.settingsHTML({rowClass:"row",btnClass:"btn small"})}</div>`:''}`}
+  <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>${typeof GXH!=='undefined'?`<div><div class="lbl">Tips</div>${GXH.settingsHTML({rowClass:"row",btnClass:"btn small"})}</div>`:''}${typeof GXT!=='undefined'?`<div><div class="lbl">Learn</div><div class="row">${tutBtn('btn small')}</div></div>`:''}`}
 // ---------- campaign progress ----------
 function jobProg(){if(!UI.prog)UI.prog=lsGet('sf_camp',{v:1,jobs:{}});return UI.prog}
 function unlocked(n){const c=jobProg();return n===1||!!(c.jobs[n-1]&&c.jobs[n-1].w)||!!(c.jobs[n]&&c.jobs[n].p)}
@@ -4961,6 +5336,157 @@ else (function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};
 
 </script>
 <script>
+// ===================== tutor.js: the staged tutorial (shell/gx-tutor.js): a fixed little job that teaches every rule by doing it once =====================
+// RULES CHECKLIST (read from the rules drawer RULES_HTML, the glossary, hlp.js rules cards and rules-test.js), and the step that teaches each one:
+//   goal: cut every wire on every stand, together, before the fuse runs out ........ goal, win
+//   your stand is face up to you, sorted low to high; the crew's wires are hidden ... mine, crew
+//   the fuse: a miss burns a step, none left = boom; a red wire = boom ............... fuse, red
+//   opening info token on one of your own wires; tokens are clues for everyone ....... token, tokens2
+//   one action per turn, foreman first, then clockwise; teammates play the same ...... hit, crew1, crew2
+//   dual cut: point at a crewmate's wire + name a number YOU hold; a hit cuts both .. point, name, hit
+//   a miss: the fuse burns, a token shows the wire's true number, your wire stays hidden wrong1, wrong2, wrongres
+//   using sort order and tokens as clues (teammates use the token the miss revealed) . crew2
+//   validation token on the track when all four of a number are cut ................. crew2
+//   solo cut: you hold every wire left of a number (all four, or the last two) ...... solo (and Plum does one in crew1)
+//   equipment unlocks when two of its number are cut, then works once ................ hit (unlock), gear (use)
+//   personal tool: the Twin Probe, once per job ....................................... probe
+//   yellow wires: a yellow matches only a yellow, you must hold one to say "yellow" .. yellow1, yellow2
+//   red wires: never point at one; a hand of only reds is revealed for you ............ red, win
+// The staged job (never saved): three players (you = Amber, the foreman, then Teal, then Plum), 15 wires: blue 1-3 (four each), yellows 1.1 and 2.1, red 2.5.
+//   You   : Y 2 2 2 R 3        Teal: 1 1 2 3        Plum: 1 1 Y 3 3      fuse 3 steps, one gear card (Rewind, unlocked by two 2s)
+//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you miss on Plum's 2nd wire (token 1) · T5 Teal uses that token ·
+//   T6 Plum hits Teal's last 1 · T7 you use Rewind and cut the last yellow · T8 you solo your 2s, your red is revealed for you, defused.
+// The computer never moves by itself in here: the steps that say "the crew plays" run its scripted moves (tutMove) and wait for them.
+const TUT_GAME='short-fuse';
+const TUT={eqv:null,mission:false};
+const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut;
+const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart});
+function firstTime(){return !lsGet('sf_played',0)}
+const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
+// ---------------------------------------------------------------- the fixed layout (wire ids: blue v = (v-1)*4+j, red v.5 = 48+v-1, yellow v.1 = 59+v-1)
+const TUT_STANDS=[[59,4,5,6,49,8],[0,1,7,9],[2,3,60,10,11]];
+const tutIdx=(si,id)=>G.st[si].w.findIndex(x=>x.id===id);
+const tutEl=(si,id)=>()=>{if(!G)return null;const k=tutIdx(si,id);const sl=k>=0&&G.st[si].w[k];const e=sl&&tileEl(sl.u);return e&&e.getBoundingClientRect().width?e:null};
+const myTwoK=()=>G.st[0].w.findIndex(x=>!x.cut&&cv(x.id)===2);
+const tutMyTurn=()=>!!G&&!G.over&&G.phase==='turn'&&G.actor===0&&G.step==='act'&&!G.q&&!!(UI.V&&UI.V.legal);
+const tutSelTo=(si,id)=>!!UI.sel&&UI.sel.mode==='dual'&&UI.sel.tg.length===1&&UI.sel.tg[0].st===si&&UI.sel.tg[0].k===tutIdx(si,id);
+function tutRebuild(){const M=MISSIONS[67];
+  G.q=null;G.ag=[];G.agI=0;G.log=[];G.logN=0;G.uid=0;G.captain=0;G.pos=[0,1,2];G.phase='setup';G.step=null;G.turn=0;G.round=0;G.hist=[];G.ann=[];G.marks=[];G.valid=[];G.fin={};G.over=null;G.winText='';G.tfx={};
+  G.st=TUT_STANDS.map((ids,i)=>({i,pos:i,w:ids.slice().sort((a,b)=>sv(a)-sv(b)||a-b).map(newSlot),side:[]}));
+  G.tot={1:4,2:4,3:4,Y:2};G.tokSup=clone(INFO_TOKENS);G.gone=[];G.box=[];G.aside=[];G.pile=[];G.markers={red:[2.5],redQ:0,redN:1,yel:[1.1,2.1],yelQ:0,yelN:2};
+  G.eq=[{id:'eq6',st:'locked',down:0,cover:null,perm:0}];G.eqPool=[];G.eqDeck=[];G.eqOut=[];G.dial=3;G.stats={dual:0,dualOk:0,solo:0,miss:0,eqUse:0,turns:0};G.idle=0;
+  lg('Training run: you, Teal and Plum. You are the foreman.','big');
+  infoSetup(M);later('beginPlay');flow()}
+function tutNew(){
+  if(!MISSIONS[67]){MISSIONS[67]=Object.assign({},MISSIONS[1],{n:67,nm:'Training run',text:'A tiny practice bomb: 15 wires, three crew, one gear card.',pl:[3],blue:3,red:null,yel:null,eq:{n:0},rules:[],info:'std',tok:'num',audio:false,timer:null});BRIEFS[67]='A tiny practice bomb. Learn every rule here.';TUT.mission=true}
+  if(TUT.eqv==null){TUT.eqv=EQUIP.eq6.v;EQUIP.eq6.v=2}
+  UI.tut=true;UI.tutTok=(UI.tutTok||0)+1;
+  try{GX.close()}catch(e){}hideStart();try{GXH.hide()}catch(e){}
+  kitReset();clearTimeout(UI.aiT);UI.aiT=null;UI.rt=false;UI.started=false;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;UI.camp=null;UI.brief=null;UI.aiNotBefore=0;UI.lastPrompt=null;UI.ghost={info:0,turn:0};
+  UI.started=true;
+  newGame({np:3,mission:67,seats:['human','ai','ai'],level:'easy',names:DEFNAMES.slice(0,3),realtime:false,captain:0,seed:7});
+  tutRebuild();UI.holder=0;UI.prev=snap();refresh()}
+// leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
+function tutLeave(){UI.tut=false;UI.tutTok=(UI.tutTok||0)+1;clearTimeout(UI.aiT);UI.aiT=null;UI.started=false;UI.sel=null;UI.V=null;
+  if(TUT.eqv!=null){EQUIP.eq6.v=TUT.eqv;TUT.eqv=null}
+  if(TUT.mission){delete MISSIONS[67];delete BRIEFS[67];TUT.mission=false}
+  G=null;try{GXH.hide()}catch(e){}
+  for(const id of ['ghost']){const e=document.getElementById(id);if(e)e.remove()}
+  for(const id of ['over','cover']){const e=document.getElementById(id);if(e){e.hidden=true;e._s=''}}
+  for(const id of ['crew','mine','gear','tray','fuse','track','cutc','clk']){const e=document.getElementById(id);if(e){e._s=null;e.innerHTML=''}}}
+// ---------------------------------------------------------------- the scripted crew
+const tutWait=ms=>new Promise(r=>setTimeout(r,ms/Math.max(1,UI.speed||1)));
+function tutMove(seat){
+  if(G.q&&G.q.who===seat){if(G.q.kind!=='infoStd')return {a:'q',i:0};
+    const want=seat===1?7:10;                                  // Teal shows her 2, Plum shows a 3
+    const i=G.q.opts.findIndex(o=>{const f=findU(o.d.u);return f&&G.st[f.s].w[f.k].id===want});return {a:'q',i:Math.max(0,i)}}
+  const T=G.turn;
+  if(seat===1&&T===2)return {a:'dual',st:0,ks:[tutIdx(0,8)],v:3};                    // Teal uses your token: your 3
+  if(seat===2&&T===3)return {a:'solo',v:3};                                           // Plum holds both 3s left
+  if(seat===1&&T===5)return {a:'dual',st:2,ks:[tutIdx(2,3)],v:1};                     // Teal uses the token your miss put on Plum's wire
+  if(seat===2&&T===6)return {a:'dual',st:1,ks:[tutIdx(1,1)],v:1};                     // Plum finishes the 1s
+  return null}
+const tutAlive=tok=>!!G&&UI.tut&&UI.tutTok===tok;
+async function tutAct(seat,tok){const m=tutMove(seat);if(!m||!tutAlive(tok))return false;
+  if(m.a==='dual'){try{announce(m,seat)}catch(e){}await tutWait(700)}else await tutWait(400);
+  if(!tutAlive(tok))return false;
+  const err=legal(m,seat);if(err){console.warn('tutor move rejected: '+err+' '+JSON.stringify(m));return false}
+  applyMove(m,seat);await tutWait(1000);return true}
+// the crew plays until it is the human's turn again
+async function tutCrew(){const tok=UI.tutTok;for(let n=0;n<8&&tutAlive(tok)&&!G.over;n++){const s=sideToAct();if(s<0||isHuman(s))break;if(!await tutAct(s,tok))break}}
+// ---------------------------------------------------------------- the steps
+const tutCalm=()=>!document.querySelector('#tb .snap,#tb .buzz,#tb.shake,#fuse .burn,#fuse .phew');   // the cut / miss animation is over: the spotlight does not move
+const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,7)];return t&&t.cut};
+function tutSteps(){return [
+ {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires before the fuse burns out. The whole crew wins or loses together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.q},
+ {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
+ {id:'crew',title:'Their wires',say:'Teal and Plum hold the rest. You see only their backs, and they never see yours.',target:tq('#crew'),wait:null},
+ {id:'fuse',title:'The fuse',say:'A wrong cut burns one step. When none is left, or a red wire is cut, the bomb explodes.',target:tq('#fuse'),wait:null},
+ {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 3: a token tells the crew its number.',target:tutEl(0,8),
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===8},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},
+ {id:'tokens2',title:'Their tokens',say:'Teal and Plum each showed a wire too. Tokens are clues the whole crew can use.',target:tq('#crew'),wait:null,ai:tutCrew,ready:()=>!!G&&tutMyTurn()},
+ {id:'point',title:'Point at a wire',say:'Your turn. Teal\'s token says 2. Tap that wire to point at it.',target:tutEl(1,7),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===7},ready:()=>tutMyTurn()&&!UI.sel},
+ {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 2s. If Teal has a 2, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,7)},
+ {id:'hit',title:'A hit!',say:'Match! Both 2s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
+ {id:'crew1',title:'Crew turns',say:'Teal used your token to cut your 3. Plum held every 3 left, so he cut them alone.',target:tq('#crew'),wait:null,ai:tutCrew,ready:()=>tutMyTurn()},
+ {id:'wrong1',title:'A wrong guess',say:'Let\'s guess wrong on purpose. Plum\'s wires are hidden: tap his second wire.',target:tutEl(2,3),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&!UI.sel},
+ {id:'wrong2',title:'Name a number',say:'Say 2. It is really a 1, so this will miss.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(2,3)},
+ {id:'wrongres',title:'A miss',say:()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Wrong! The fuse burned one step, and a token shows the true number: a '+(t?t.v:1)+'.'},
+   target:tutEl(2,3),also:tq('#fuse'),wait:null,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
+ {id:'crew2',title:'Using clues',say:'Teal used that token to cut a 1. Plum cut the last 1. Fully cut numbers get a green check.',target:tq('#track'),wait:null,ai:tutCrew,ready:()=>tutMyTurn()},
+ {id:'probe',title:'Your Twin Probe',say:'Once per job, point at two wires and name one number. It hits if either wire matches.',target:tq('#mine .chip'),wait:null,ready:()=>tutMyTurn()&&!!document.querySelector('#mine .chip')},
+ {id:'gear',title:'Use equipment',say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
+   wait:{type:'tap',match:a=>a.what==='eq'&&a.id==='eq6'},ready:()=>tutMyTurn()&&!!document.querySelector('#gear .eqk.glow')},
+ {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s last wire must be the other: tap it.',target:tutEl(2,60),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===60},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
+ {id:'yellow2',title:'Say yellow',say:'Name your yellow wire. A yellow can only be matched with another yellow.',target:tutEl(0,59),
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,60)},
+ {id:'red',title:'Red wires',say:'Never point at red: the bomb explodes. If red is all you have left, it reveals itself.',target:tutEl(0,49),wait:null,ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,60)].cut},
+ {id:'solo',title:'Solo cut',say:'You hold every 2 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()},
+ {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.over&&G.over.win}
+]}
+// ---------------------------------------------------------------- the kit hooks
+function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
+    endTitle:'You know the rules',endText:o?'Point, name, tokens, the fuse, gear, yellow, red. Now the Story begins.':'Point, name, tokens, the fuse, gear, yellow, red. Real jobs add twists: the lightbulb explains them.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    setup:tutNew,
+    onDone:r=>{tutLeave();const c=r&&r.choice;
+      if(c==='chapter'&&first){showStart();GXC.play(first.id)}
+      else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
+      else showStart()},
+    onExit:()=>{tutLeave();showStart()}})}
+// the first time a player taps Play, offer the tutorial once
+function tutOffer(){if(typeof GXT==='undefined'||!firstTime()||GXT.isDone(TUT_GAME)||lsGet('sf_offered',0)||GXT.status(TUT_GAME).open)return false;
+  lsSet('sf_offered',1);const d=document.createElement('div');d.id='offer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn every rule in about 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-a="offeryes">Learn in 5 minutes</button><button type="button" class="gxt-b" data-a="offerno">Just play</button></div></div>';
+  document.body.appendChild(d);return true}
+// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+(function(){const o=tapTile;tapTile=function(si,k){
+  if(tutOn()){const V=UI.V;const own=!!V&&V.seat>=0&&ownerOf(si)===V.seat;const sl=G.st[si]&&G.st[si].w[k];
+    if(!sl||!GXT.act({type:'tap',what:'tile',si,k,own,id:sl.id}))return}
+  return o(si,k)}})();
+(function(){const o=eqTap;eqTap=function(id){if(tutOn()&&!GXT.act({type:'tap',what:'eq',id}))return;return o(id)}})();
+(function(){const o=chipTap;chipTap=function(n){if(tutOn()&&!GXT.act({type:'tap',what:'chip',n}))return;return o(n)}})();
+(function(){const o=plateTap;plateTap=function(s){if(tutOn()&&!GXT.act({type:'tap',what:'plate',s}))return;return o(s)}})();
+// the computer never moves by itself in the staged job, nothing is saved, no result is recorded, and the win/lose card is the kit's end card
+(function(){const o=schedule;schedule=function(){if(UI.tut)return;return o()}})();
+(function(){const o=saveNow;saveNow=function(){if(UI.tut)return;return o()}})();
+(function(){const o=recordResult;recordResult=function(){if(UI.tut)return;return o()}})();
+(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
+// while the crew waits for its scripted move the status line says whose turn it is (the real "is thinking" would be a lie)
+(function(){const o=sayText;sayText=function(V){const t=o(V);if(UI.tut&&G&&!G.over&&/ is thinking$| is choosing$/.test(t)){const s=decider();if(s>=0)return nm(s)+"'s turn"}return t}})();
+
+</script>
+<script>
 // ===================== start.js: the start screen, story chapters, starting a job, boot =====================
 // ---------- the start screen: one big Play button, the story, a job stepper ----------
 function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',chars:[],names:DEFNAMES.slice()};if(s)Object.assign(d,s,{names:(s.names||DEFNAMES).slice()});fixSetup(d);return d}
@@ -4970,14 +5496,16 @@ function seatMode(s){const k=s.seats.slice(0,s.np).filter(x=>x==='human').length
 function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length:'10 chapters'}catch(e){return ''}}
-function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const saved=savedGame();const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;
+function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const saved=savedGame();const tutFirst=firstTime()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME);const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;
   let jobs='';for(const [a,b,label] of BOXES){jobs+=`<div class="box">${esc(label)}</div><div class="jobs">`;for(let k=a;k<=b;k++){const j=c.jobs[k];
       jobs+=`<button class="jt${j&&j.w?' done':''}${k===n?' sel':''}" data-a="job" data-n="${k}" aria-pressed="${k===n}" title="${esc(MISSIONS[k].nm)}"><b>${k}</b><span>${esc(MISSIONS[k].nm)}</span>${j&&j.w?'<i>✓</i>':''}${MISSIONS[k].audio||hasRule(k,'timer')?'<i class="t">⏱</i>':''}</button>`}jobs+='</div>'}
   const seatsTxt=nh===0?'Watch':nh===1?'You + computers':nh+' players, one phone';
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
-   <button class="big go" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
+   ${tutFirst?tutBtn('big go'):''}
+   <button class="big${tutFirst?'':' go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
    <button class="big blue" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
+   ${tutFirst?'':tutBtn('big')}
    ${saved?`<button class="big" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
@@ -4989,7 +5517,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
 document.addEventListener('toggle',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('more'))UI.moreOpen=e.target.open},true);
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
-function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
+function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
   if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.camp)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars&&s.chars[i]){chars[i]=s.chars[i];any=1}
@@ -5003,7 +5531,7 @@ function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names
   if(plan)netBound(plan)}finally{NET.starting=false}
   if(humans().length===1&&!NET.on)UI.holder=humans()[0];
   UI.prev=snap();try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}if(SND.gesture)musicStart();else SND.wantMusic=1;refresh()}
-function resumeSaved(){const s=savedGame();if(!s)return;kitReset();G=s.G;UI.holder=s.ui.holder;UI.rt=!!s.ui.rt;UI.brief=null;UI.started=true;UI.prev=snap();UI.sel=null;UI.campDone=0;UI.campShown=0;UI.camp=null;UI.ghost={info:0,turn:0};hideStart();if(SND.gesture)musicStart();refresh()}
+function resumeSaved(){const s=savedGame();if(!s)return;lsSet('sf_played',1);kitReset();G=s.G;UI.holder=s.ui.holder;UI.rt=!!s.ui.rt;UI.brief=null;UI.started=true;UI.prev=snap();UI.sel=null;UI.campDone=0;UI.campShown=0;UI.camp=null;UI.ghost={info:0,turn:0};hideStart();if(SND.gesture)musicStart();refresh()}
 function renderIdle(){const say=document.getElementById('say');if(say)say.textContent='Waiting for the host';for(const id of ['crew','mine','gear','tray','fuse','track','cutc','clk']){const e=document.getElementById(id);if(e){e._s=null;e.innerHTML=''}}const ov=document.getElementById('over');if(ov)ov.hidden=true}
 // ---------- story chapters (the shared campaign kit) ----------
 function campMetrics(G){const st=G.stats||{};return {won:!!(G.over&&G.over.win),misses:st.miss||0,left:G.dial!=null?G.dial:0,turns:G.turn,solos:st.solo||0,eqUsed:st.eqUse||0}}
@@ -5013,7 +5541,7 @@ function campStart(def){const np=def.setup.players||3;const lv=def.setup.level||
   startJob(s)}
 function campOver(){if(!UI.camp||typeof GXC==='undefined'||!GXC.active())return;setTimeout(()=>{if(!G||!G.over)return;UI.campShown=1;try{document.getElementById('over').hidden=true}catch(e){}try{GXC.finish(G)}catch(e){console.error(e)}},ANIM?2200:0)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'short-fuse',data:window.CAMPAIGN,startChapter:campStart,isWon:G=>!!(G&&G.over&&G.over.win),metrics:campMetrics,
+  GXC.init({game:'short-fuse',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:G=>!!(G&&G.over&&G.over.win),metrics:campMetrics,
     onExit:()=>{UI.camp=null;showStart()},scores:g=>[g.seats.length?g.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0):0],seats:g=>g.seats.map((q,i)=>({name:i===0?'You':q.nm,me:i===0,ai:q.human?undefined:q.lv}))})}
 // ---------- clicks on buttons that carry data-a ----------
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a;const V=UI.V;
@@ -5037,8 +5565,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'np':UI.setup.np=+b.dataset.v;fixSetup();renderStart();return;
   case 'lv':UI.setup.lv=b.dataset.v;renderStart();return;
   case 'preset':preset(b.dataset.v);return;
-  case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){GXC.open()}return;
-  case 'start':startJob(UI.setup);return;
+  case 'story':storyOpen();return;
+  case 'start':if(!isHost()&&tutOffer())return;startJob(UI.setup);return;
+  case 'offeryes':tutStart();return;
+  case 'offerno':{const d=document.getElementById('offer');if(d)d.remove();startJob(UI.setup);return}
   case 'resume':resumeSaved();return;
   case 'closestart':if(G){hideStart()}return;
   }});

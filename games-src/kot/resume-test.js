@@ -32,7 +32,7 @@ const PROG = JSON.stringify({ v: 1, ch: Object.fromEntries(Array.from({ length: 
 // a page that talks to the game: standalone (fr === page) or inside the shelf's iframe (fr = the frame)
 async function open(b, { w, h, mode, ls, init, touch }) {
   const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: !!touch, isMobile: !!touch });
-  await ctx.addInitScript(l => { try { if (!sessionStorage.__seeded) { sessionStorage.__seeded = 1; for (const k in l) localStorage.setItem(k, l[k]) } } catch (e) { } }, ls || {});
+  await ctx.addInitScript(l => { try { if (!sessionStorage.__seeded) { sessionStorage.__seeded = 1; for (const k in l) localStorage.setItem(k, l[k]) } } catch (e) { } }, Object.assign({ 'gxt-crown-city-smash': '{"done":1}' }, ls || {}));   // the tutorial (Chapter 0) is done: Story opens the chapter map
   if (init) await ctx.addInitScript(init);
   const p = await ctx.newPage(); p.setDefaultTimeout(30000); const errs = []; p.errs = errs;
   p.on('pageerror', e => errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g|404|WebGL|certificate/i.test(m.text())) errs.push('console ' + m.text()) });

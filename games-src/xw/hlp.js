@@ -95,6 +95,7 @@ const HLP_RULES=[
 // ---------------------------------------------------------------- phases
 // the moment the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase(){try{
+  if(typeof tutOn==='function'&&tutOn())return null;
   if(!G||G.winner||UI.info||UI.stats||UI.rules||UI.build!=null||UI.hold)return null;
   if(typeof PHN!=='undefined'&&PHN.pop)return null;
   if(typeof BF!=='undefined'&&BF.on&&(BF.wave||performance.now()<BF.flyUntil))return null;

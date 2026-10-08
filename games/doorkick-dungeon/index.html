@@ -288,7 +288,7 @@ h3{font-size:1.02rem}
 .card.flip{animation:flip .75s cubic-bezier(.3,.7,.3,1.1);transform-style:preserve-3d}@keyframes flip{0%{transform:perspective(700px) rotateY(180deg) translateY(-30px) scale(1.15)}60%{transform:perspective(700px) rotateY(-12deg) scale(1.05)}}
 .card.flip .cback{animation:backside .75s linear}@keyframes backside{0%,44%{opacity:1}46%,100%{opacity:0}}
 .tableau{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
-.ghost{position:absolute;left:0;top:0;pointer-events:none;z-index:30;transform-origin:0 0;will-change:transform,opacity}
+.ghost:not(.gxc-btn){position:absolute;left:0;top:0;pointer-events:none;z-index:30;transform-origin:0 0;will-change:transform,opacity}
 .ghost .card{box-shadow:0 20px 30px rgba(0,0,0,.55)}
 .fxlayer{position:absolute;inset:0;pointer-events:none;z-index:4}
 /* dice: an ivory die with red pips */
@@ -948,6 +948,12 @@ html.ph .opp.seat,html.ph-l .opp.seat,html.ph-p .opp.seat{min-height:44px}
 html.ph .arena.tight .hsav,html.ph .arena.tight .mon .row,html.ph .arena.tight>.row.small,html.ph .arena.tight>.rollbox .small{display:none}
 html.ph .arena.tight .score .num{margin-top:0}
 html.ph .arena.tight .row.mons{margin-bottom:6px}
+/* the tutorial's progress dots: 23+ steps must fit beside "Skip tutorial" on a 375px phone */
+.gxt-top .gxt-dots{gap:2px}.gxt-top .gxt-dots i{width:4px;height:4px}.gxt-top .gxt-dots i.on{transform:scale(1.5)}.gxt-top .gxt-n{font-size:11px}
+/* the tutorial entry in the start dialog and the menu */
+.btn.gxt-menu{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
+.btn.gxt-menu span{font-weight:600;font-size:.82em;opacity:.8}
+.btn.gxt-menu.gxt-first{border-color:#c99a35;box-shadow:0 0 0 2px rgba(201,154,53,.45)}
 
 </style>
 <style>
@@ -1152,6 +1158,41 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+
+/* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
+   Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
+:root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
+.gxt-cell{position:fixed;z-index:var(--gxt-z);background:var(--gxt-dim);touch-action:none;-webkit-tap-highlight-color:transparent;cursor:default}
+.gxt-cell.gxt-clear{background:transparent}
+.gxt-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow,#ffe08a);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow,#ffe08a);animation:gxt-pulse 1.1s ease-in-out infinite}
+.gxt-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow,#ffe08a);opacity:.9;animation:none}
+.gxt-fin{position:fixed;left:0;top:0;z-index:calc(var(--gxt-z) + 3);pointer-events:none;width:0;height:0}
+.gxt-fin i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxt-fin b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
+.gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
+.gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
+.gxt-dots i.done{background:#c99a35}
+.gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
+.gxt-n{opacity:.85;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
+.gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
+.gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
+.gxt-et{font-weight:800;font-size:22px;line-height:1.15}
+.gxt-ex{font-weight:600;font-size:15px}
+.gxt-eb{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.gxt-b{min-height:48px;padding:0 16px;border-radius:24px;border:2px solid var(--gxh-btn,#7a1f31);background:transparent;color:var(--gxh-btn,#7a1f31);font:800 16px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-b.pri{background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc)}
+@keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
+@keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
 
 </style>
 </head>
@@ -1573,9 +1614,345 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// gx-tutor.js: a staged tutorial game for any game (spotlight, one bubble per step, only the target accepts input, steps advance only on the
+// right action). Needs gx-tutor.css and gx-help.css (bubble styles). Uses GXV.watch (gx-viewport.js) for relayout when it is loaded. See GX-KIT.md section 10.
+//   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
+//              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
+//              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
+//   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
+//   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
+//   GXT.status(game) GXT.menuHTML({game, first, cls, launch}) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
+// Everything the kit draws carries data-help. Progress is remembered per game in localStorage 'gxt-<game>' {done, open, step}.
+(function () {
+  'use strict';
+  var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
+  var DIM = 'rgba(8,4,10,.62)';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
+  // ------------------------------------------------------------------ remembered progress
+  function key(g) { return 'gxt-' + g; }
+  function load(g) {
+    var raw = null; try { raw = localStorage.getItem(key(g)); } catch (e) { raw = mem[g] || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    return o && typeof o === 'object' ? o : null;
+  }
+  function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
+  // ------------------------------------------------------------------ geometry
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function holesOf(st) {
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var out = [p], al = null;
+    try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
+    if (al && !Array.isArray(al)) al = [al];
+    (al || []).forEach(function (a) { var r = toRect(a); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out;
+  }
+  function inflate(r, p, v) {
+    var l = Math.max(0, r.left - p), t = Math.max(0, r.top - p), rr = Math.min(v.w, r.right + p), b = Math.min(v.h, r.bottom + p);
+    return norm({ left: l, top: t, width: Math.max(1, rr - l), height: Math.max(1, b - t) });
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function moved(hs, key) {
+    if (!key) return true; var a = key.split('|'); if (a.length !== hs.length) return true;
+    for (var i = 0; i < hs.length; i++) { var q = a[i].split(',').map(Number), r = hs[i]; if (Math.abs(q[0] - r.left) > 3 || Math.abs(q[1] - r.top) > 3 || Math.abs(q[2] - r.width) > 4 || Math.abs(q[3] - r.height) > 4) return true; }
+    return false;
+  }
+  function rkey(hs) { return hs.map(function (r) { return Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.width) + ',' + Math.round(r.height); }).join('|'); }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  // ------------------------------------------------------------------ drawing
+  function clearVisuals() {
+    if (!S) return;
+    (S.vis || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); S.vis = []; S.bub = null; S.holes = null; S.cells = []; S.pill = null;
+  }
+  function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
+  function cell(l, t, w, h, clear) {
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    return c;
+  }
+  function swallow(e) { e.preventDefault(); e.stopPropagation(); }
+  function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
+  // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
+  function drawCells(hs, shield) {
+    var v = vp(), xs = [0, v.w], ys = [0, v.h];
+    hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
+    xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    ys = ys.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
+    for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
+      var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
+      for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+    }
+    if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
+  }
+  function ring(r, cls) {
+    var e = mk('div', 'gxt-ring' + (cls ? ' ' + cls : ''));
+    e.style.cssText = 'left:' + Math.round(r.left) + 'px;top:' + Math.round(r.top) + 'px;width:' + Math.round(r.width) + 'px;height:' + Math.round(r.height) + 'px';
+    return add(e);
+  }
+  function finger(fr, tr) {
+    var f = mk('div', 'gxt-fin', '<i></i><b></b>'); add(f); f.setAttribute('aria-hidden', 'true');
+    f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy); if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function stepText(st, k) { var v = st[k]; try { if (typeof v === 'function') v = v(); } catch (e) { v = ''; } return v == null ? '' : String(v); }
+  function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
+  function topLimit() { return stripH() + 4; }
+  // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
+  function place(b, hs, side) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
+    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
+    function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
+    var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
+    var below = { left: x, top: hull.bottom + 12, right: x + w, bottom: hull.bottom + 12 + h }, above = { left: x, top: hull.top - 12 - h, right: x + w, bottom: hull.top - 12 };
+    var room = { below: bot - hull.bottom, above: hull.top - top }, order = side === 'top' ? ['above', 'below'] : side === 'bottom' ? ['below', 'above'] : (room.below >= room.above ? ['below', 'above'] : ['above', 'below']);
+    var best = null; order.forEach(function (n) { var c = n === 'below' ? below : above; if (!best && ok(c)) best = c; });
+    if (!best) {   // scan the whole screen for the free spot nearest the primary hole (any x, so a bubble can sit beside a big target)
+      var bs = 1e9, xs = [x, pad, Math.max(pad, v.w - w - pad)];
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 4) {
+        var c2 = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (!ok(c2)) continue; var d = Math.abs(c2.left + w / 2 - P.cx) * 0.5 + Math.abs(y + h / 2 - P.cy); if (d < bs) { bs = d; best = c2; }
+      }
+    }
+    if (!best) { var useBelow = room.below >= room.above; var yy = useBelow ? Math.min(bot - h, hull.bottom + 12) : Math.max(top, hull.top - 12 - h); best = { left: x, top: yy, right: x + w, bottom: yy + h }; }
+    b.style.left = Math.round(best.left) + 'px'; b.style.top = Math.round(best.top) + 'px';
+    var sd = best.bottom <= P.top + 2 ? 'bottom' : best.top >= P.bottom - 2 ? 'top' : best.right <= P.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + sd;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (sd === 'top' || sd === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, P.cx - best.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, P.cy - best.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return best;
+  }
+  function dots() {
+    var n = cfg.steps.length, h = '';
+    for (var i = 0; i < n; i++) h += '<i' + (i < S.i ? ' class="done"' : i === S.i ? ' class="on"' : '') + '></i>';
+    return '<span class="gxt-dots" role="img" aria-label="Step ' + (S.i + 1) + ' of ' + n + '">' + h + '</span><span class="gxt-n">' + (S.i + 1) + '/' + n + '</span>';
+  }
+  function topStrip() {
+    var t = mk('div', 'gxt-top', '<span class="gxt-prog">' + dots() + '</span><button type="button" class="gxt-skip" data-gxt-skip>Skip tutorial</button>');
+    t.style.height = stripH() + 'px'; t.querySelector('.gxt-skip').addEventListener('click', function (e) { e.stopPropagation(); skip(); });
+    return t;
+  }
+  // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
+  function draw() {   // (re)build the visible pieces for the current step at the current layout
+    var st = S.step, hs = holesOf(st); clearVisuals();
+    var v = vp();
+    if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
+    var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
+    S.holes = H; S.key = rkey(hs);
+    var nextStep = !st.wait;
+    drawCells(H, nextStep);
+    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    add(topStrip());
+    if (st.wait && st.wait.type !== 'event') {
+      var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
+    }
+    var say = stepText(st, 'say'), title = stepText(st, 'title');
+    var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
+    b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
+      (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
+    add(b); S.bub = b; S.say = say;
+    var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+    place(b, H, st.side);
+    return true;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
+    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  }
+  function enter(i) {
+    var st = cfg.steps[i]; if (!st) { finish(); return; }
+    S.i = i; S.step = st; S.count = 0; S.phase = 'pend'; S.key = ''; S.stable = 0; S.stable_k = ''; S.since = Date.now(); S.shown = false; S.misses = 0;
+    mark(cfg.game, { open: 1, step: i });
+    clearVisuals(); drawWaiting();
+    try { if (st.onEnter) st.onEnter(); } catch (e) { console.warn('gxt onEnter', e); }
+    if (st.ai) { try { var r = st.ai(); if (r && r.then) { S.aiBusy = true; r.then(function () { S.aiBusy = false; }, function () { S.aiBusy = false; }); } } catch (e) { console.warn('gxt ai', e); } }
+  }
+  function tick() {
+    if (!S || S.phase === 'gap' || S.phase === 'end') return;
+    var st = S.step; if (!st) return;
+    if (S.phase === 'pend') {
+      var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
+      var hs = rdy ? holesOf(st) : null;
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
+      if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
+      return;
+    }
+    if (S.phase === 'show') {
+      var hs2 = holesOf(st);
+      if (!hs2) { if (++S.misses >= 3) { S.misses = 0; S.phase = 'pend'; S.stable = 0; S.stable_k = ''; clearVisuals(); drawWaiting(); } return; }
+      S.misses = 0;
+      if (moved(hs2, S.key)) draw();
+    }
+  }
+  function advance() {
+    var st = S.step; S.phase = 'gap'; clearVisuals(); drawWaiting();
+    setTimeout(function () { if (!S || S.step !== st) return; try { if (st.onDone) st.onDone(); } catch (e) {} if (S.i + 1 >= cfg.steps.length) finish(); else enter(S.i + 1); }, 0);
+  }
+  function next() {
+    if (!S || S.phase !== 'show' || S.step.wait) return;
+    try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
+    advance();
+  }
+  var wrongT = 0;
+  function wrong() {
+    if (!S || S.phase !== 'show' || !S.bub) return;
+    var b = S.bub, st = S.step, tx = b.querySelector('.gxh-tx'); if (!tx) return;
+    b.classList.remove('gxt-shake'); void b.offsetWidth; b.classList.add('gxt-shake');
+    tx.textContent = st.wrong || (st.wait ? 'Tap the glowing one.' : 'Tap Next.');
+    clearTimeout(wrongT); wrongT = setTimeout(function () { if (S && S.bub === b && tx) { tx.textContent = S.say; b.classList.remove('gxt-shake'); } }, 1700);
+    S.wrongs = (S.wrongs || 0) + 1;
+  }
+  // the games call this from their input handlers; the return value says whether to go on with the action
+  function act(a) {
+    if (!S || S.phase === 'end') return true;
+    a = a || {};
+    if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    var st = S.step, w = st.wait;
+    if (a.type === 'event') {
+      if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
+      return true;
+    }
+    if (!w || w.type === 'event') { wrong(); return false; }
+    var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
+    if (!okm) { wrong(); return false; }
+    S.count++;
+    if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
+    return true;
+  }
+  // ------------------------------------------------------------------ end card, skip, stop
+  function teardown() {
+    if (S) { clearVisuals(); clearInterval(S.timer); }
+    S = null; closeDlg();
+  }
+  function finish() {
+    mark(cfg.game, { done: 1, open: 0, step: 0 });
+    clearVisuals(); S.phase = 'end';
+    var v = vp(); add(cell(0, 0, v.w, v.h, false));
+    var story = cfg.story !== false;
+    var c = mk('div', 'gxt-end'); c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', 'Tutorial finished');
+    c.innerHTML = '<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">' + esc(cfg.endTitle || 'You know the rules') + '</div><div class="gxt-ex">' + esc(cfg.endText || 'You can start a real game now.') + '</div>' +
+      '<div class="gxt-eb">' + (cfg.endButtons ? cfg.endButtons.map(function (b, i) { return '<button type="button" class="gxt-b' + (i ? '' : ' pri') + '" data-gxt-end="' + esc(b.id) + '">' + esc(b.label) + '</button>'; }).join('') : '<button type="button" class="gxt-b pri" data-gxt-end="play">Play a real game</button>' + (story ? '<button type="button" class="gxt-b" data-gxt-end="story">Story mode</button>' : '')) + '</div></div>';
+    add(c);
+    c.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-end]'); if (!b) return;
+      var choice = b.dataset.gxtEnd, done = cfg.onDone; teardown();
+      try { if (done) done({ choice: choice }); } catch (err) { console.warn('gxt onDone', err); }
+    });
+  }
+  function skip() {
+    if (!S) return; var g = cfg.game, ex = cfg.onExit;
+    mark(g, { open: 0, step: 0 }); teardown();
+    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+  }
+  function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
+  // ------------------------------------------------------------------ start
+  function lint(steps) {
+    var bad = [];
+    (steps || []).forEach(function (s, i) {
+      var tag = 'step ' + i + ' (' + (s.id || '?') + ')';
+      if (!s.id) bad.push(tag + ': no id');
+      if (typeof s.say === 'string' && words(s.say) > 20) bad.push(tag + ': say over 20 words (' + words(s.say) + ')');
+      if (typeof s.title === 'string' && words(s.title) > 4) bad.push(tag + ': title over 4 words');
+      if (typeof s.target !== 'function' && !(s.target && typeof s.target === 'object')) bad.push(tag + ': no target');
+      if (s.wait && s.wait.type !== 'event' && s.wait.type !== 'tap' && s.wait.type !== 'drag') bad.push(tag + ': wait.type must be tap, drag or event');
+    });
+    return bad;
+  }
+  function start(c) {
+    if (S) teardown();
+    cfg = c; cfg.steps = cfg.steps || []; wire();
+    var bad = lint(cfg.steps); if (bad.length) console.warn('gxt lint: ' + bad.join('; '));
+    mark(cfg.game, { open: 1, step: 0 });
+    S = { i: 0, step: null, phase: 'pend', vis: [], cells: [], timer: 0 };
+    try { if (cfg.setup) cfg.setup(); } catch (e) { console.error('gxt setup', e); }
+    S.timer = setInterval(tick, 100);
+    enter(0);
+    return GXT;
+  }
+  function relayout() { if (S && S.phase === 'show') draw(); else if (S && S.phase === 'end') { var e = S.vis[S.vis.length - 1]; if (e) { var v = vp(), c0 = S.vis[0]; if (c0) c0.style.cssText = 'left:0;top:0;width:' + v.w + 'px;height:' + v.h + 'px'; } } else if (S && (S.phase === 'pend' || S.phase === 'gap')) { clearVisuals(); drawWaiting(); } }
+  function wire() {
+    if (wired) return; wired = true;
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    D.addEventListener('click', onMenuClick, true);
+  }
+  // ------------------------------------------------------------------ menu helper: "New here? Learn in 5 minutes" / "Tutorial" / "Tutorial ✓"
+  function label(g, first) {
+    var s = status(g);
+    if (s.done) return 'Tutorial ✓';
+    if (first && !s.open) return 'New here? Learn in 5 minutes';
+    return s.open ? 'Tutorial (continue?)' : 'Tutorial';
+  }
+  function menuHTML(o) {
+    o = o || {}; var g = o.game; if (o.launch) launchers[g] = o.launch; wire();
+    var s = status(g), first = !!o.first && !s.done && !s.open, cls = (o.cls || '') + ' gxt-menu' + (first ? ' gxt-first' : '') + (s.done ? ' gxt-ok' : '');
+    var sub = o.sub === false ? '' : '<span>' + esc(s.done ? 'Done. Tap to play it again.' : first ? 'Short, one tap at a time, no reading' : s.open ? 'Restart or exit' : 'Learn by doing, step by step') + '</span>';
+    return '<button type="button" class="' + cls.trim() + '" data-gxt-open="' + esc(g) + '" data-help><b>' + esc(label(g, first)) + '</b>' + sub + '</button>';
+  }
+  function onMenuClick(e) {
+    var b = e.target && e.target.closest && e.target.closest('[data-gxt-open]'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var g = b.dataset.gxtOpen, fn = launchers[g]; if (!fn) return;
+    if (status(g).open && !S) openDlg(g, fn); else fn();
+  }
+  function closeDlg() { if (dlg) { if (dlg.parentNode) dlg.parentNode.removeChild(dlg); dlg = null; } }
+  function openDlg(g, fn) {
+    closeDlg();
+    dlg = mk('div', 'gxt-end'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-label', 'Tutorial in progress');
+    dlg.innerHTML = '<div class="gxt-endc"><div class="gxt-et">You left the tutorial half way</div><div class="gxt-ex">Start it again from the first step, or leave it.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-gxt-dlg="restart">Restart tutorial</button><button type="button" class="gxt-b" data-gxt-dlg="exit">Exit</button></div></div>';
+    D.body.appendChild(dlg);
+    dlg.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-gxt-dlg]'); if (!b) return;
+      closeDlg(); if (b.dataset.gxtDlg === 'restart') fn(); else { mark(g, { open: 0, step: 0 }); var l = D.querySelectorAll('[data-gxt-open="' + g + '"]'); for (var i = 0; i < l.length; i++) { var bb = l[i].querySelector('b'); if (bb) bb.textContent = label(g, false); } }
+    });
+  }
+  function state() {
+    if (!S) return { active: false };
+    var st = S.step || {}, hs = S.holes && S.holes[0], b = S.bub && S.bub.getBoundingClientRect();
+    return { active: true, phase: S.phase, i: S.i, n: cfg.steps.length, id: st.id, shown: S.phase === 'show' && !!S.bub, wait: st.wait ? st.wait.type : null, times: st.wait && st.wait.times || 1, count: S.count,
+      say: S.say || '', title: stepText(st, 'title'), hole: hs ? { left: hs.left, top: hs.top, width: hs.width, height: hs.height, cx: hs.cx, cy: hs.cy } : null,
+      holes: (S.holes || []).map(function (r) { return { left: r.left, top: r.top, width: r.width, height: r.height, cx: r.cx, cy: r.cy }; }),
+      bubble: b ? { left: b.left, top: b.top, right: b.right, bottom: b.bottom } : null, wrongs: S.wrongs || 0, shownAt: S.shownAt || 0 };
+  }
+  var GXT = window.GXT = {
+    version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
+    index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
+    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    menuHTML: menuHTML, label: label
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
 //   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
@@ -1738,6 +2115,7 @@ const GX={key:'gx',open:null,
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
     var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
     var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
     map.appendChild(path); s.appendChild(map);
@@ -5822,7 +6200,7 @@ function expireFx(){if(!G)return;const now=Date.now();if(UI.toast&&UI.toast.unti
 // only touch the DOM when the markup really changed (a click in flight keeps its button)
 function setHTML(el,h){if(!el)return;h=emo(h);if(el._h===h)return;el._h=h;el.innerHTML=h}
 function syncMenu(){const b=$('#dkMenuBody');if(!b)return;const so=typeof SND!=='undefined'?SND.on:true,mu=typeof SND!=='undefined'?SND.music:true;const sp=UI.speed<1?'slow':UI.speed>1?'fast':'normal';
-  b.innerHTML=`<div class="menu"><button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):''}<button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
+  b.innerHTML=`<div class="menu">${typeof tutBtn==='function'?tutBtn('btn'):''}<button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):''}<button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
 function syncGfxBtn(){const g=$('#gfxbtn');if(g&&typeof GFX!=='undefined')g.innerHTML=`${ic('gem')} ${GFX.name()}`;syncMenu()}
 function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
 function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
@@ -5969,7 +6347,7 @@ function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
-  return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`}${online?'':introHTML(n,UI.mode||'F')}
+  return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${typeof tutBtn==='function'?tutBtn('btn bigb'):''}${online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`}${online?'':introHTML(n,UI.mode||'F')}
    <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online||UI.mode==='ai'?'':`<button class="btn learn ${UI.learn===true?'on':''}" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Teach me as I play</button>`}
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
@@ -6521,6 +6899,203 @@ hlpAfter();
 
 </script>
 <script>
+// ===================== the tutorial (shell/gx-tutor.js): a staged, never-saved game that teaches every rule by doing it once =====================
+// The staged game is a real game (engine, board, buttons) with a FIXED deal: three heroes, you (Pip) first, the two computer heroes scripted (tutAI).
+// Each step spotlights one thing; only that thing answers; the step moves on only when the game reports exactly that action (GXT.act).
+//
+// RULES CHECKLIST (read from rules-html.js, hlp.js rules cards and rules-test.js) -> the step that teaches it by doing:
+//   goal: first to level 10, last level only from a monster ........ goal (Next), finale
+//   start: level 1, 4 door + 4 treasure cards, set up before the 1st turn . elf, powers, bucket, ready
+//   races and classes give powers (Elf +1 run; Warrior, Wizard, Thief, Cleric)  elf (do), powers (Next)
+//   items: wear automatically, add to strength, slots, lost items .. bucket (do), bad (lost hat)
+//   sell items worth 1,000 gold for a level ........................ sellbtn, sellpick, sellconfirm
+//   kick open the door: monster = fight; hand / curse / other ..... kick (monster), kick2 (card to hand); curse is played in curse
+//   combat strength = level + items; higher wins; ties to the monster . potion (compare), help (compare)
+//   one-shot potions add to either side ............................ potion
+//   monster boosts, anyone may meddle in a fight .................... meddle
+//   ask a rival for help, the helper's strength adds, Elf helper levels  help, who, fight
+//   win: levels + treasure (Treasure Pile draws 3) ................. win
+//   run away: roll 5 or 6, Elf +1, fail = Bad Stuff (even death) ... run, bad
+//   curses can be played on anyone, before their door .............. curse
+//   no monster behind the door: loot a card or look for trouble ..... trouble (do), text names loot
+//   charity: hand limit 5, extras go to the lowest level ............ charity
+//   what the computer does: kicks, fights, runs, curses by the same rules . curse step text, meddle (watch Morwen), finale
+//   how the game ends (level 10 by a monster) ....................... finale
+const TUT_GAME='doorkick-dungeon';
+let TUTG=false;
+const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(G&&G.tut);
+const tutFirst=()=>{try{return !localStorage.getItem('dkd_offer')&&!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')&&!localStorage.getItem(SAVE)}catch(e){return true}};
+const tutSkipped=()=>{try{return !!localStorage.getItem('dkd_tutskip')}catch(e){return false}};
+const tutBtn=cls=>typeof GXT==='undefined'||(G&&G.mode==='net'&&!G.winner)?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:()=>tutStart()});
+// ---------------------------------------------------------------- the fixed deal
+const TUT_SEED=20261008;
+const kdef=id=>G.C[id];                         // a card's key ('elf', 'imp', ...)
+const myId=key=>P(0).hand.find(i=>kdef(i)===key);
+function tutDeal(){
+  for(const p of G.pl){for(const id of p.hand.splice(0))(cd(id).d==='door'?G.door:G.tr).push(id)}
+  const take=key=>{for(const dk of [G.door,G.tr]){const i=dk.findIndex(id=>G.C[id]===key);if(i>=0)return dk.splice(i,1)[0]}throw new Error('tutorial card '+key)};
+  const deal=(s,keys)=>keys.forEach(k=>P(s).hand.push(take(k)));
+  deal(0,['elf','gargantuan','lizards','hexlvl','bucket','swash','fizz','rod']);
+  deal(1,['elf','dwarf','halfling','mixed','rascal','gooey','antler','kneecaps']);
+  deal(2,['dwarf','dwarf','elf','double','stompy','cudgel','pole','sandwich']);
+  P(1).lvl=3;P(2).lvl=3;P(1).lv='normal';P(2).lv='normal'}
+// the treasure you draw for beating the Lizards: first draw (Backstabber's Shiv), then the Treasure Pile (3 more cards at once: Sour Drink, Snooze Syrup, Jerkin)
+function tutStackTreasure(){const take=key=>{const i=G.tr.findIndex(id=>G.C[id]===key);return i>=0?G.tr.splice(i,1)[0]:null};
+  const order=['jerkin','snooze','sour','pile','shiv'].map(take).filter(x=>x!=null);   // pushed last = drawn first: shiv (first draw), pile, sour, snooze, jerkin
+  for(const id of order)G.tr.push(id)}
+function tutTop(key){const i=G.door.findIndex(id=>G.C[id]===key);if(i<0)return false;const id=G.door.splice(i,1)[0];G.door.push(id);return true}
+// the die: find a generator state whose next d6 is v (rnd() adds 0x6D2B79F5 to G.rng first)
+function tutRoll(v){for(let r=1;r<5000;r++){let t=r+0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);if(1+Math.floor(((t^t>>>14)>>>0)/4294967296*6)===v){G.rng=r;return true}}return false}
+// ---------------------------------------------------------------- the computer heroes are scripted, so every rule appears on cue
+function tutAI(s){if(!tutOn()||!G||s===0)return null;const vm=validMoves(s),p=P(s);const by=a=>vm.find(m=>m.act===a);
+  if(G.q){if(G.q.kind==='help')return {act:'opt',opt:s===1?'yes':'no'};return null}
+  switch(G.phase){
+    case 'setup':{const pl=vm.find(m=>(m.act==='play'||m.act==='equip')&&m.card!=null&&(cd(m.card).t==='item'||(cd(m.card).t==='race'&&!p.race.length))&&!(cd(m.card).t==='item'&&cd(m.card).req&&!!equipWhy(p,m.card)));return pl||by('ready')}
+    case 'window':return by('pass');
+    case 'main':if(s===1)tutTop('imp');else tutTop('double');return by('kick');
+    case 'after':return by('loot');
+    case 'post':return by('end');
+    case 'charity':return vm.slice().sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card))[0];
+    case 'combat':{const cb=G.cb;
+      if(cb.stage==='others')return by('pass');
+      if(cb.stage==='act'){if(winning(cb))return by('fight');tutRoll(1);return by('run')}}}
+  return null}
+(function(){const o=aiMove;aiMove=function(s){const m=tutAI(s);return m||o.apply(this,arguments)}})();
+// ---------------------------------------------------------------- never saved: the staged game does not touch the real saved game
+(function(){const o=refresh;refresh=function(){
+  if(TUTG||(G&&G.tut)){if(G&&!G.winner)autoPass();render();schedule();sounds();return}
+  return o.apply(this,arguments)}})();
+// the help kit stays quiet while the tutorial runs
+(function(){const o1=hlpPhase;hlpPhase=function(){return tutOn()?null:o1.apply(this,arguments)};
+  const o2=hlpSuggest;hlpSuggest=function(){return tutOn()?null:o2.apply(this,arguments)}})();
+// ---------------------------------------------------------------- where each step points
+const tvis=e=>{if(!e||e.closest('[hidden]'))return false;const r=e.getBoundingClientRect();return r.width>3&&r.height>3};
+const tq=(...sels)=>()=>{for(const s of sels)for(const e of document.querySelectorAll(s))if(tvis(e))return e;return null};
+// a button that pulses (scales) keeps the same place: its layout box, not its animated box
+const tstable=sel=>()=>{const e=document.querySelector(sel);if(!tvis(e))return null;const o=e.offsetParent;if(!o)return e;const r=o.getBoundingClientRect();return {left:r.left+e.offsetLeft,top:r.top+e.offsetTop,width:e.offsetWidth,height:e.offsetHeight}};
+const tchip=i=>tq(`#phopps [data-opp="${i}"]`,`#app .opps [data-opp="${i}"]`);
+const mv=a=>`#prompt [data-mv*='"act":"${a}"']`;
+function tcardEl(key){const id=myId(key);return id==null?null:document.querySelector(`.mine .hand [data-card="${id}"]`)}
+// the visible strip of a hand card (its neighbour overlaps it); the hand scrolls the card into view first
+function tcard(key){const e=tcardEl(key);if(!tvis(e))return null;let r=e.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4){try{e.scrollIntoView({inline:'center',block:'nearest'})}catch(x){}r=e.getBoundingClientRect()}return hslice(e)}
+const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&!GX.open&&document.getElementById('modal').hidden&&!BF.drag;
+const tmine=()=>!!G&&!G.winner&&sideToAct()===0&&!G.q&&tclear();
+const nowStr=()=>{const cb=G.cb;return cb?[sideStr(cb),monStr(cb)]:[0,0]};
+const tpick=key=>()=>myId(key);
+// ---------------------------------------------------------------- the steps
+function tutSteps(){
+  return [
+ {id:'goal',title:'Race to level 10',say:'Be first to reach level 10. The final level can only come from killing a monster.',target:tq('.bfbig','.mine .top'),wait:null,
+   ready:()=>G.phase==='setup'&&tmine()&&!!document.querySelector('.bfbig')},
+ {id:'elf',title:'Play your race',say:'Tap your Elf, then tap your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},
+ {id:'powers',title:'Races and classes',say:'Your Elf runs better. Classes add powers too: Warriors win ties, Wizards flee, Thieves stab, Clerics fight undead.',target:tq('.mine .gear'),wait:null,
+   ready:()=>G.phase==='setup'&&tmine()&&P(0).race.length>0},
+ {id:'bucket',title:'Wear an item',say:()=>'Items go on by themselves and add to your strength. Tap the Bucket, then your hero.',target:tq('.bfbig'),also:()=>tcard('bucket'),pick:tpick('bucket'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='bucket'},from:()=>tcard('bucket'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('bucket')&&!!document.querySelector('.bfbig')},
+ {id:'ready',title:'Ready!',say:'Everyone gears up before the first door. Tap Ready.',target:tq(mv('ready')),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ready'},ready:()=>G.phase==='setup'&&tmine()&&P(0).eq.some(e=>e.on)&&BF.pick==null},
+ {id:'sellbtn',title:'Sell for a level',say:'Every 1,000 gold of items you sell buys a level. Tap Sell.',target:tq('#prompt [data-a="sellmode"]'),
+   wait:{type:'tap',match:a=>a.what==='sellmode'},ready:()=>G.phase==='main'&&G.active===0&&tmine()&&!UI.sell},
+ {id:'sellpick',title:'Pick what to sell',say:()=>'Tap the Rod: it is worth '+cd(myId('rod')).g.toLocaleString('en')+' gold.',target:()=>tcard('rod'),
+   wait:{type:'tap',match:a=>a.what==='sellpick'&&kdef(a.id)==='rod'},ready:()=>tmine()&&!!UI.sell&&!!tcard('rod')},
+ {id:'sellconfirm',title:'Cash it in',say:'That is over 1,000 gold. Tap Sell for a free level.',target:tq('.sellbar .btn.primary'),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='sell'},ready:()=>tmine()&&!!UI.sell&&UI.sell.length>0&&!!tq('.sellbar .btn.primary:not([disabled])')()},
+ {id:'kick',title:'Kick open the door',say:'Tap the door and see what is behind it!',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
+   ready:()=>G.phase==='main'&&G.active===0&&tmine()&&P(0).lvl>=2&&!!document.querySelector('.bfdoor')&&(tutTop('hatmuncher'),true)},
+ {id:'potion',title:'A monster! Fight it',say:()=>{const [a,b]=nowStr();return 'Monster '+b+', you '+a+'. The higher number wins. Tap your potion, then your side.'},target:tq('.arena .score.hero'),also:()=>tcard('fizz'),pick:tpick('fizz'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='fizz'&&a.z==='fh'},from:()=>tcard('fizz'),
+   ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&BF.pick==null&&!!tcard('fizz')&&!!document.querySelector('.arena .score.hero')},
+ {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();return 'Still '+a+' against '+b+'. You lose. Run away: roll 5 or 6 to escape (Elves get +1).'},target:tq('.fbtns .runb'),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
+ {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+'. A failed run means the monster’s Bad Stuff: it ate your hat. Some even kill you.',target:tq('.mine .gear','.mine .top'),wait:null,
+   ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},
+ {id:'end1',title:'End your turn',say:'You may wear or sell more now. Then tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
+   ready:()=>G.phase==='post'&&tmine()},
+ {id:'curse',title:'Curse a rival',say:'Before Morwen kicks, you may curse her. Anyone can curse anyone. Tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='hexlvl'&&a.z==='p1'},from:()=>tcard('hexlvl'),
+   ready:()=>G.phase==='window'&&G.active===1&&tmine()&&BF.pick==null&&!!tcard('hexlvl')&&!!tchip(1)()},
+ {id:'meddle',title:'Meddle in her fight',say:'Morwen fights alone. Anyone may interfere! Tap Gargantuan, then her monster: +10 for it.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='gargantuan'},from:()=>tcard('gargantuan'),
+   ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
+ {id:'rivals',title:'The computer plays too',say:'Morwen and Grub follow the same rules: they kick doors, fight, run, curse and ask for help.',target:tq('#phopps','#app .opps'),wait:null,
+   ready:()=>G.active===2&&!G.winner},
+ {id:'kick2',title:'Your turn again',say:'Kick the door. Not every door hides a monster.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
+   ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
+ {id:'trouble',title:'Look for trouble',say:'No monster. You may loot a free card, or fight one from your hand: tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='lizards'},from:()=>tcard('lizards'),
+   ready:()=>G.phase==='after'&&tmine()&&BF.pick==null&&!!tcard('lizards')},
+ {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Lizards '+b+', you '+a+': you lose. Ask a rival to join you. Tap Help.'},target:tq('.fbtns .helpb'),
+   wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&!!document.querySelector('.fbtns .helpb')},
+ {id:'who',title:'Pick a helper',say:'Morwen is an Elf, so she helps for free. Others want treasure. Tap Morwen.',target:tchip(1),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>!!BF.ask&&!!tchip(1)()},
+ {id:'fight',title:'Fight!',say:()=>{const [a,b]=nowStr();return 'Together you have '+a+' against '+b+'. Higher wins, ties go to the monster. Tap Fight!'},target:tstable('.fbtns .fightb'),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='fight'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.help===1&&tmine()&&!!document.querySelector('.fbtns .fightb')},
+ {id:'win',title:'Victory!',say:'You beat it: +1 level, and you drew the treasure. A Treasure Pile gave 3 more cards. Tap End turn.',target:tq(mv('end')),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&G.out.won&&tmine()},
+ {id:'charity',title:'Too many cards',say:'You may keep 5 cards. Give the extras to the lowest-level hero: tap the Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='halfling'&&a.z==='p1'},from:()=>tcard('halfling'),
+   ready:()=>G.phase==='charity'&&tmine()&&BF.pick==null&&!!tcard('halfling')&&!!tchip(1)()},
+ {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins, and the last level needs a monster kill. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
+   ready:()=>G.active!==0&&!G.winner}
+  ]}
+// ---------------------------------------------------------------- the kit hooks
+function tutSetup(){try{GX.close()}catch(e){}
+  TUTG=true;clearTimeout(aiTimer);aiTimer=null;UI.pass=null;UI.lastSeat=-1;UI.menu=null;UI.zoom=null;UI.sell=null;UI.cmp=null;UI.pause=false;
+  BF.pick=null;BF.ask=null;BF.kicking=false;UI.spd0=UI.speed;UI.speed=Math.max(1.5,UI.speed||1);
+  const lvl0=UI.lvl,n0=UI.n,nm0=UI.names;UI.lvl='normal';UI.names=null;DEFSEED=TUT_SEED;
+  try{newGame('F',3)}finally{UI.lvl=lvl0;UI.n=n0;UI.names=nm0;DEFSEED=null}
+  G.tut=1;G.learn=false;G.rng=TUT_SEED;
+  G.active=G.first=0;G.setupOrd=[0,1,2];G.setupI=0;G.log=[];G.ln=0;lg(-1,'The tutorial dungeon opens: you, Morwen and Grub.');
+  tutDeal();tutStackTreasure();tutTop('hatmuncher');
+  UI.hints=false;render()}
+function tutLeave(){TUTG=false;UI.pause=false;clearTimeout(aiTimer);aiTimer=null;if(UI.spd0!=null){UI.speed=UI.spd0;UI.spd0=null}BF.pick=null;BF.ask=null;
+  try{GXH.hide()}catch(e){}G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;UI.pass=null;DEFSEED=null;render()}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
+    endTitle:'You know the rules',endText:o?'Gear up, kick, fight, run, help, curse, sell, charity. Now the Story begins.':'Gear up, kick, fight, run, help, curse, sell, charity. The lightbulb explains the rest.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    setup:tutSetup,
+    onDone:r=>{const c=r&&r.choice;tutLeave();
+      if(c==='chapter'&&first)GXC.play(first.id);
+      else if(c==='story'&&typeof campOpen==='function')campOpen()},
+    onExit:()=>{tutLeave();if(o&&typeof campOpen==='function'){try{localStorage.setItem('dkd_tutskip','1')}catch(e){}campOpen()}}})}   // skipping the Chapter 0 prologue goes on to the Story map, and Story does not ask again
+// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+(function(){const o=uiAct;uiAct=function(m){
+  if(tutOn()&&!UI._tutIn){if(m.act==='kick'){if(!UI._tutKick){render();return}UI._tutKick=0}else{if(!GXT.act({type:'tap',what:'move',m})){render();return}if(m.act==='run')tutRoll(1)}}
+  return o.apply(this,arguments)}})();
+(function(){const o=bfDrop;bfDrop=function(id,z,at){
+  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'drop',id,z}))return false;UI._tutIn=1;try{return o(id,z,at)}finally{UI._tutIn=0}}
+  return o(id,z,at)}})();
+(function(){const o=bfKick;bfKick=function(){if(tutOn()&&!BF.kicking){if(!GXT.act({type:'tap',what:'kick'}))return;UI._tutKick=1}return o.apply(this,arguments)}})();
+function tutBlock(e){e.stopPropagation();e.stopImmediatePropagation();e.preventDefault()}
+window.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest)return;
+  // Story: the first tap runs the tutorial as Chapter 0
+  if(t.closest('[data-a="story"]')&&!tutOn()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME)&&!GXT.running()&&!tutSkipped()){tutBlock(e);tutStart({prologue:true});return}
+  // Play for the first time: offer the tutorial once
+  const sb=t.closest('[data-start]');
+  if(sb&&sb.dataset.start!=='ai'&&sb.dataset.start!=='net'&&!UI._offerOk&&!tutOn()&&typeof GXT!=='undefined'&&tutFirst()&&!GXT.status(TUT_GAME).seen){tutBlock(e);tutOffer(sb);return}
+  if(!tutOn())return;
+  if(t.closest('[data-help],[data-gxt-skip]'))return;
+  const ak=t.closest('[data-a="askmenu"]');if(ak){if(!GXT.act({type:'tap',what:'askmenu'}))tutBlock(e);return}
+  const sm=t.closest('[data-a="sellmode"]');if(sm){if(!GXT.act({type:'tap',what:'sellmode'}))tutBlock(e);return}
+  const card=t.closest('.mine .hand [data-card],.mine .gear [data-card]');
+  if(card){const id=+card.dataset.card;
+    if(UI.sell){if(!GXT.act({type:'tap',what:'sellpick',id}))tutBlock(e);return}
+    const st=GXT.current(),pk=st&&st.pick?st.pick():null;
+    if(pk!=null&&pk===id&&BF.pick!==id)return;           // the card this step asks you to pick up: let the board lift it (no advance yet)
+    GXT.act({type:'tap',what:'card',id});tutBlock(e);return}
+  const ch=t.closest('[data-opp]');if(ch&&BF.pick==null&&!BF.ask){GXT.act({type:'tap',what:'chip'});tutBlock(e)}
+},true);
+// ---------------------------------------------------------------- the offer to first-time players, and the Skip/exit hooks
+function tutOffer(btn){let d=document.getElementById('tutoffer');if(d)d.remove();d=document.createElement('div');d.id='tutoffer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Learn the game');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in 5 minutes, one tap at a time. Or jump straight in.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+  document.body.appendChild(d);
+  d.addEventListener('click',ev=>{const b=ev.target.closest('[data-tutoffer]');if(!b)return;ev.stopPropagation();const k=b.dataset.tutoffer;d.remove();try{localStorage.setItem('dkd_offer','1')}catch(x){}
+    if(k==='learn')tutStart();else{UI._offerOk=1;try{btn.click()}finally{UI._offerOk=0}}})}
+
+</script>
+<script>
 // ---------- story mode: the shared chapter map (gx-campaign.js) wired to Doorkick Dungeon. Data: campaign.json ----------
 // A chapter is a normal game with its own table, computer levels and (at most) one twist. Twists exist only here; the rules never change.
 UI.cmp=null;UI.hintsUser=null;var CMP_FIN=null,CMP_OVER=0,CMP_GO=false;
@@ -6563,7 +7138,7 @@ function campWatch(){if(!UI.cmp||!G)return;if(!G.winner){CMP_OVER=0;return}
   clearInterval(CMP_FIN);const g=G;UI.cmp=null;if(UI.hintsUser!=null){UI.hints=UI.hintsUser;UI.hintsUser=null}
   if(GXC.active())GXC.finish(g)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'doorkick',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'doorkick',data:window.CAMPAIGN,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();if(typeof tutStart==='function')tutStart()});return [b]},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit(){clearInterval(CMP_FIN);UI.cmp=null;if(UI.hintsUser!=null){UI.hints=UI.hintsUser;UI.hintsUser=null}G=null;UI.info=true;render()},
     scores:g=>g.pl.map(p=>p.lvl),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
 function campOpen(){if(typeof GXC==='undefined')return;if(GX.open)GX.close();GXC.open()}

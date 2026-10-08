@@ -25,7 +25,7 @@ function campOpen(){if(typeof GXC==='undefined')return;try{GX.close()}catch(e){}
 function campOn(){return !!(UI.camp&&typeof GXC!=='undefined'&&GXC.active())}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'Ten chapters, three bosses'}catch(e){return ''}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'tidewake',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'tidewake',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit:()=>{UI.camp=null;showStart()},
     scores:g=>g.ships.map(s=>s.alive?1:0),seats:g=>g.seats.map((x,i)=>({name:i===0?'You':x.nm,me:i===0,ai:x.human?undefined:x.lv}))})}
 campInit();

@@ -36,6 +36,7 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   TT.forEach((d,t)=>{if(d.set==='base'||(d.set==='ic'&&ex.ic)||(d.set==='tb'&&ex.tb)){for(let c=0;c<d.c;c++){if(d.start&&!ex.river&&start<0){start=t;continue}main.push(t)}}
     if(d.set==='river'&&ex.river){if(d.spring)spring=t;else if(d.lake)lake=t;else for(let c=0;c<d.c;c++)river.push(t)}});
   G.stack=shuffle(main);G.total=main.length+(ex.river?river.length+2:1);
+  if(o.stack){G.stack=o.stack.slice();G.total=o.stack.length+1}   // the staged tutorial: a fixed tile order
   if(ex.river){G.rstack=shuffle(river);G.lake=lake;place(spring,0,0,0);G.rv={x:0,y:0,d:1,lt:0};lg('The river rises at its spring. River tiles come first; each must carry the river on, and it may not turn the same way twice in a row.','big')}
   else place(start,0,0,0);
   G.cur={p:G.np-1};lg(`A new valley waits for ${np} settlers${exList()}.`,'big');nextPlayer(true);if(typeof refresh==='function')refresh()}
