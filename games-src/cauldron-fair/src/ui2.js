@@ -48,7 +48,7 @@ function promptInfo() {
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
     if (p.st === 'draw' && p.lock) return { text: wn.length ? 'Decided. Waiting for others...' : 'Revealing...' };
-    if (p.st === 'draw') return { text: (G.round === 9 ? 'Last day: Draw or Stop, secretly.' : p.pot.length ? 'Draw another, or stop.' : 'Tap Draw for your first chip.'), mine: true };
+    if (p.st === 'draw') return { text: (G.round === LASTD() ? 'Last day: Draw or Stop, secretly.' : p.pot.length ? 'Draw another, or stop.' : 'Tap Draw for your first chip.'), mine: true };
     return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for others...' : 'Everyone is done.') };
   }
   if (G.phase === 'prep') return { text: wn.length ? 'Waiting for others...' : 'The day begins.' };
@@ -179,7 +179,7 @@ function renderQ(p, legal, qb) {
 }
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
-  if (!G) return; const dtxt = isPh() ? 'Day ' + G.round + '/' + D.rounds : 'Day ' + G.round + ' of ' + D.rounds;
+  if (!G) return; const dtxt = isPh() ? 'Day ' + G.round + '/' + LASTD() : 'Day ' + G.round + ' of ' + LASTD();
   bs.append(UI.camp ? h('button.dayn.gchip', { 'data-a': 'campgoal', type: 'button', 'aria-label': 'Day ' + G.round + '. Tap for the chapter goal' }, '\ud83c\udfaf ' + dtxt) : h('span.dayn', dtxt));
   const v0 = viewSeat(), f0 = focusSeat(), q0 = G.players[f0 >= 0 ? f0 : 0];
   if (isPh() && q0) bs.append(h('span.bst', { title: (f0 === v0 ? 'Your' : q0.name + '\'s') + ' points, rubies and flask' }, UI.camp ? null : h('span.bav', { html: avHTML(f0, 24) }), h('span', { html: ico('vp', 17) }), h('b', q0.vp), h('span', { html: ico('ruby', 16) }), h('b', q0.rubies), h('span.bfl', { html: ico('flask', 17, q0.flask) })));
@@ -187,7 +187,7 @@ function renderBar() {
 }
 let rndT = 0;
 function autoWatch() {   // once I have stopped, watch the computer that is still drawing; go back to my own pot when the day ends
-  const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim()) return; const me = G.players[v];
+  const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim() || tutOn()) return; const me = G.players[v];
   if (UI.autoF && (G.phase !== 'brew' || UI.autoF !== G.round)) { if (UI.focus !== v && UI.autoF) UI.focus = v; UI.autoF = 0; UI.fastAI = false; return; }
   if (!UI.autoF && G.phase === 'brew' && (me.lock || me.st === 'done') && UI.focus === v) { const c = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (c) { UI.focus = c.seat; UI.autoF = G.round; } }
   if (UI.autoF && UI.focus !== v) { const c = G.players[UI.focus]; if (c && c.st !== 'draw') { const n = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (n) UI.focus = n.seat; } }
@@ -200,6 +200,7 @@ function render() {
     const pi = promptInfo(), pr = $('#prompt'); if (pr) { pr.textContent = pi.text; pr.className = pi.mine ? 'mine' : ''; }
     renderHint(); renderLegend(); renderBlg(); renderDrawers(); renderNetBadge && renderNetBadge();
     bfHeat(); const db = $('#dockbody'); if (db) db.classList.toggle('deckon', !!document.querySelector('#acts .bdeck')); requestAnimationFrame(bfGhost);
+    if (typeof hlpAfter === 'function') hlpAfter();
   } catch (e) { console.error(e); if (window.__cfErr) window.__cfErr.push(String(e.stack || e)); }
 }
 function renderHint() { const e = $('#hint'); if (e) { e.hidden = true; e.innerHTML = ''; } }  // tips live in #pc (the tip card)
