@@ -154,6 +154,7 @@ addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||e.ctrlKey||e.metaKe
 #gxG .gxA{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 0 4px}#gxG .gxA button{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;gap:1px;font-size:12px}
 #gxG .gxA button i{font-style:normal;font-size:14px}#gxG .gxA .gxD{background:#ff8a8a}
 #gbx.r2.gxGO #slBar{display:none!important}
+#b25{pointer-events:none}#b25 button,#b25 em,#b25 .b25V{pointer-events:auto}#b25 .b25V{pointer-events:none}#b25 .b25V button{pointer-events:auto}
 #b25 .gxHa{height:44px;min-width:56px;font-size:12px}#b25 .gxHa.on{background:#ffd12c}
 @media (max-width:760px),(max-height:500px){#gbx.r2 .r2BkT{gap:4px}#gbx.r2 .r2BkT .r2T{padding:0 7px}#gxG{width:258px}}
 @media (min-height:501px) and (min-width:900px){#gbx.r2.gbBk.gxBig #gbBkPc{grid-template-rows:repeat(2,70px);grid-auto-columns:86px}#gbx.r2.gbBk.gxBig #gbBkPc .gbPc{width:86px;height:70px}#gbx.r2.gbBk.gxBig #gbBkPc .gbPc.gsTh img{width:62px;height:44px}#gxG{width:320px}}`;document.head.appendChild(st)}
@@ -165,3 +166,13 @@ window.__gx={S:GX,groups:()=>GX_groups(),hid:()=>[...GX.hid],make:()=>GX_make(),
   const el=document.elementFromPoint(q.x,q.y);if(!el||(el.closest&&el.closest('#gbBkP,#b25,#r2H,#r2R,#gxG,#slBar,#gsBar,#gsTip')))continue;const i=__sl.pick(q.x,q.y);if(i>=0&&!out.some(o=>o.i===i))out.push({i,x:q.x,y:q.y,t:b.t});if(out.length>=6)break}return out},
  tris:()=>{const U=GB.mesh&&GB.mesh.userData;let n=0;for(const o of(U&&U.gbM)||[])if(o.geometry&&o.geometry.attributes.position)n+=o.geometry.attributes.position.count/3;return n|0}};
 SL_ui=(f=>function(){const r=f.apply(this,arguments);const s=$('#slBar [data-s="grp"] span');if(s&&s.textContent==='GROUP')s.textContent='MAKE GROUP';return r})(SL_ui);
+// ---- CLEAR (Alex, v88i: "the garage clear button on build is not clearing to an empty template or the base is showing weird overlaps").
+// Root cause: CLEAR emptied the brick list but kept the old base scan (GB_.base: stud grid + layer heights of the cleared body) and the old
+// chassis mode. A brick car (templates, big templates, My Build) lost its frame and wheels, so the builder fell back to the small 8×12
+// blueprint plate under a grid that still had the cleared body's heights: dots and the layer grid floated above an empty plate.
+// Now CLEAR keeps ONE clean chassis: the frame plates, tyres, seat/driver and steering wheel of the current build (same rule as NEW BUILD),
+// at the build's own length, then rescans the base. A hull car (bricks only decorate a fixed body) clears to its bare body as before,
+// with a fresh scan. UNDO restores everything.
+function GB_clear(){if(!GB.d)return;const L=GB_list(),brick=L.some(CR_isW);GB_snap();try{if(SL.carry)SL_cancel();SL_set([])}catch(e){}if(GS.held)try{GS_drop()}catch(e){}
+ GB.d.bricks=brick?L.filter(GNB_fr).map(b=>{const o={...b};delete o.g;return o}):[];GX.hid.clear();
+ GB_scanBase();GB_gridMesh();GB_refresh();GB_ui();try{GS_tip(brick?'Cleared · chassis and wheels kept · UNDO brings it back':'Cleared · UNDO brings it back')}catch(e){}return GB.d.bricks.length}
