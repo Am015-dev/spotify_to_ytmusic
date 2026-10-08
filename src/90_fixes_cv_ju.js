@@ -206,11 +206,11 @@ function OC_altFix(){const R=LM_BY['Römer'],K=LM_BY['Kaiserdom'];if(!R||!K)retu
 {const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r}}
 // ---------- 4 · height audit (both cities): props, traffic, buildings (storeys), named landmarks, floating / buried
 const OC_REAL={Commerzbank:259,'Main Tower':240,Messeturm:257,'Athens Tower':103,Lycabettus:277,Parthenon:13.72+1.53+3.7};
-const OC_RANGE={tree:[6,12],lamp:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
+const OC_RANGE={tree:[6,12],lamp:CID==='ath'?[4.5,6.5]:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
 const OC_TREES=['tree','tree2','tree3','CE_pine','CE_cypress','CE_olive'],OC_CARS=['car','car2','car3','car4','CE_car','CE_car2','CE_taxi'];
 function OC_audit(){const D=HUB.ptypes,T=[],out={rows:T,bad:[],float:0,buried:0,fl:[],bu:[]},hgt=g=>{g.computeBoundingBox();return g.boundingBox.max.y-g.boundingBox.min.y};
   const row=(cls,name,v,lo,hi,real)=>{const ok=v>=lo-1e-6&&v<=hi+1e-6;T.push({cls,name,v:+v.toFixed(2),lo,hi,real,ok});if(!ok)out.bad.push(cls+':'+name+'='+v.toFixed(2))};
-  const used=t=>HUB.props.some(p=>p.t===t);for(const t of OC_TREES)if(D[t]&&used(t))row('tree',t,hgt(D[t].g),...OC_RANGE.tree);if(D.lamp)row('lamp','lamp',hgt(D.lamp.g),...OC_RANGE.lamp,8);
+  const used=t=>HUB.props.some(p=>p.t===t);for(const t of OC_TREES)if(D[t]&&used(t))row('tree',t,hgt(D[t].g),...OC_RANGE.tree);if(D.lamp)row('lamp','lamp',hgt(D.lamp.g),...OC_RANGE.lamp,CID==='ath'?5.5:8);
   for(const t of OC_CARS)if(D[t]&&used(t))row('car',t,hgt(D[t].g),...OC_RANGE.car,1.5);OC_traffic();for(const k in HUB.cim||{}){const g=HUB.cim[k].geometry;g.computeBoundingBox();const l=g.boundingBox.max.z-g.boundingBox.min.z;const w=g.boundingBox.max.x-g.boundingBox.min.x;if(w<1.2)row('two-wheeler','traffic#'+k+' (scooter + rider)',hgt(g),1.3,2,1.7);else if(l<5.2)row('car','traffic#'+k,hgt(g),...OC_RANGE.car,1.5);else row('heavy','traffic#'+k+' (van/truck/bus)',hgt(g),1.9,4.3,3.2)}
   // buildings: Athens instanced bodies (storeys by style), Frankfurt colliders (Altstadt storeys, named towers)
   if(CID!=='fra'){const st={},M=new THREE.Matrix4(),P=V3(),Q=new THREE.Quaternion(),S=V3();HUB.grp.traverse(o=>{const k=o.userData&&o.userData.athB;if(!o.isInstancedMesh||!['poly','neo','plaka'].includes(k))return;const fh=k==='poly'?3.1:3.3;
