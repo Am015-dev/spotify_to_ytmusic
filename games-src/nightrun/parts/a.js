@@ -51,7 +51,8 @@ let fbT=0;
 /* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */
 const NR=window.NR={_h:{},sw:[],on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
   music:{rate:1,   // tempo change: song playbackRate and the beat length scale together, the beat position stays continuous
-    setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();const p=bpos();this.rate=x;
+    setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();if(BT.pend&&BT.pend.sw)AU.cancelSwitch();   // a tempo change moves the bar lines: drop the scheduled song change, it is planned again
+    const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
       const a=AU.a;if(a&&AU.cur&&AU.cur.src)try{AU.cur.src.playbackRate.setValueAtTime(x,a.currentTime);}catch(e){}}}};
 NR.mod=Object.assign({win:0,mag:140,pw:1},NR.mod||{});   // tuning numbers add-ons may change (wider PERFECT window in ms, pickup pull radius, power-up duration factor)
@@ -70,7 +71,7 @@ function mnow(){const a=AU.a,run=a&&a.state==='running'?1:0;if(run)AU.ran=true;
   if(run!==ckRun){ckRun=run;ckReset();}
   if(run)ckPush(a);
   BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){const pv=BT.pend,ob={stage:BT.stage,t0:BT.t0,off:BT.off,spb:BT.spb};Object.assign(BT,pv.v);BT.rev++;BT.pend=null;AU.step=0;
-    if(pv.sw){NR.sw.push({from:ob.stage,to:BT.stage,at:pv.at,lag:raw-pv.at,oldBeat:(pv.at-ob.t0-ob.off)/ob.spb,newBeat:(pv.at-BT.t0-BT.off)/BT.spb,spbOld:ob.spb,spbNew:BT.spb});NR.emit('songSwitch',NR.sw[NR.sw.length-1]);}if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
+    if(pv.sw){NR.sw.push({from:ob.stage,to:BT.stage,at:pv.at,lag:raw-pv.at,oldBeat:(pv.at-ob.t0-ob.off)/ob.spb,newBeat:(pv.at-BT.t0-BT.off)/BT.spb,spbOld:ob.spb,spbNew:BT.spb,dbg:pv.dbg,ob});NR.emit('songSwitch',NR.sw[NR.sw.length-1]);}if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
 function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
   if(SIM){mnow();return fbT+SET.sync/1000;}
@@ -158,12 +159,17 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     let xf=bar;
     if(buf){const off=info.offsetMs/1000,D=buf.duration,pos=(((off-bar*rate)%D)+D)%D,src=a.createBufferSource(),g=a.createGain();
       src.buffer=buf;src.loop=true;src.playbackRate.value=rate;g.gain.value=0;src.connect(g);g.connect(this.fb);
-      src.start(ctxOf(tb-bar),pos);g.gain.setValueCurveAtTime(CIN,ctxOf(tb-bar),bar);
+      let w=ctxOf(tb-bar),fd=bar;const t1=a.currentTime+.01;if(w<t1){pos=(pos+(t1-w)*rate)%D;fd=bar-(t1-w);w=t1;}   // the page stalled since the bar line was chosen: start later but at the matching file position
+      src.start(w,pos);if(fd>.05)g.gain.setValueCurveAtTime(CIN,w,fd);else g.gain.value=1;
       Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/rate,off,t0:tb-off,title:info.title});this.nxt={src,g,stage};}
     else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/rate,off:0,t0:tb,title:''});xf=BT.spb;this.nxt=null;}
-    const c=this.cur;
+    const c=this.cur;this.prev=c;
     if(c&&c.src){try{const g=c.g.gain,t1=ctxOf(tb-xf);g.cancelScheduledValues(t1);g.setValueAtTime(1,t1);g.setValueCurveAtTime(COUT,t1,xf);c.src.stop(ctxOf(tb)+.1);}catch(e){}}
-    this.cur=this.nxt;BT.pend={at:tb,v,sw:1};},
+    this.cur=this.nxt;BT.pend={at:tb,v,sw:1,dbg:{t0:BT.t0,off:BT.off,spb:BT.spb,now,mode:BT.mode,stage:BT.stage}};},
+  cancelSwitch(){const a=this.a,p=BT.pend;if(!p||!p.sw)return;this.want=p.v.stage;
+    try{const t=a.currentTime;if(this.nxt&&this.nxt.src){this.nxt.g.gain.cancelScheduledValues(0);this.nxt.src.stop(t);}
+      const c=this.prev;if(c&&c.src){c.g.gain.cancelScheduledValues(0);c.g.gain.setValueAtTime(1,t);c.src.stop(t+3600);this.cur=c;}}catch(e){}
+    BT.pend=null;},
   intense(on){on=!!on;if(this.int===on)return;this.int=on;const a=this.a;if(!a||!this.fb)return;const t=a.currentTime;
     this.fb.gain.cancelScheduledValues(t);this.fb.gain.setTargetAtTime(on?1.15:.9,t,.5);this.mus.gain.setTargetAtTime(on?.42:.34,t,.5);},
   // extra drum layer under a stage song while a mini-boss is up (kick on every beat, hats, snare accents), on the same grid

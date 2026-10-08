@@ -284,7 +284,8 @@ async function pauseTests(browser, cfg, synth) {
     await press(p, cfg, T, '#setBack'); await sleep(200); if (!(await snap()).pm) await fail(p, tag, 'settings', 'Back did not return to the pause menu');
     // restart
     await press(p, cfg, T, '#restartBtn'); if (!await waitFor(p, () => __mnr.running && !__mnr.paused && __mnr.G.t < 1.5 && __mnr.G.score === 0 && __mnr.P.hp === 5, null, 3000)) await fail(p, tag, 'restart', 'RESTART did not give a fresh run');
-    await sleep(500); const gn = await ev(p, () => ({ g: __mnr.AU.musv ? __mnr.AU.musv.gain.value : -1, sg: __mnr.AU.sfxv ? __mnr.AU.sfxv.gain.value : -1, st: __mnr.AU.a ? __mnr.AU.a.state : '' }));
+    await sleep(500); const rdGain = () => ev(p, () => ({ g: __mnr.AU.musv ? __mnr.AU.musv.gain.value : -1, sg: __mnr.AU.sfxv ? __mnr.AU.sfxv.gain.value : -1, st: __mnr.AU.a ? __mnr.AU.a.state : '' }));
+    let gn = await rdGain(); for (let k = 0; k < 8 && gn.g >= 0 && (Math.abs(gn.g - .35) > .05 || Math.abs(gn.sg - .2) > .05); k++) { await sleep(500); gn = await rdGain(); }   // the gain ramp runs on the audio clock: a loaded machine needs a moment
     if (gn.g >= 0 && (Math.abs(gn.g - .35) > .05 || Math.abs(gn.sg - .2) > .05)) await fail(p, tag, 'settings', 'audio gain not applied after resume ' + JSON.stringify(gn));
     // tab hidden / window blur pauses and does not resume by itself
     await sleep(800);
@@ -862,9 +863,9 @@ async function songSwitchTests(browser) {
   const tag = 'switch', cfg = CFGS[3], { p } = await newPage(browser, cfg);
   try {
     await p.keyboard.press('Enter'); if (!await waitFor(p, () => __mnr.running, null, 3000)) return fail(p, tag, 'start', 'no start');
-    await ev(p, () => { window.__mnr.god = true; });
+    await ev(p, () => { window.__mnr.god = true; window.__mnr.PW.give = () => false; });   // no tempo power-ups: they change the song speed, and this test compares the audio with the grid at constant speed
     if (!await waitFor(p, () => __mnr.BT.mode === 'file' && __mnr.BT.stage === 'stage1' && !__mnr.BT.pend, null, 20000)) return fail(p, tag, 'beat', 'stage song never became the beat clock');
-    const samples = []; const poll = setInterval(async () => { try { const g = await p.evaluate(() => (__mnr.BT.pend || __mnr.BT.mode !== 'file' || __mnr.paused || __mnr.SH.active) ? null : window.__bot.gridErr()); if (g !== null) samples.push(g); } catch (e) { } }, 70);
+    const samples = []; const poll = setInterval(async () => { try { const g = await p.evaluate(() => (__mnr.BT.pend || __mnr.AU.want || __mnr.NR.music.rate !== 1 || __mnr.BT.mode !== 'file' || __mnr.paused || __mnr.SH.active) ? null : window.__bot.gridErr()); if (g !== null) samples.push(g); } catch (e) { } }, 70);
     const swN = () => ev(p, () => __mnr.NR.sw.length);
     const bossOn = async (di) => { await ev(p, () => { __mnr.loadTrack('boss'); __mnr.loadTrack('boss2'); }); await waitFor(p, () => __mnr.TR.bufs['boss.mp3'] || __mnr.TR.bufs['boss2.mp3'], null, 12000); await ev(p, d => { const m = window.__mnr; m.god = true; if (d > 0) m.skipTo(d); m.bossNow(); }, di); return waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 15000); };
     const finish = async () => { await ev(p, () => { __mnr.G.boss.hp = 0; }); await waitFor(p, () => __mnr.SH.active, null, 9000); await sleep(800); await ev(p, () => { if (__mnr.SH.active) { __mnr.SH.lock = 0; __mnr.SH.close(); } }); };
@@ -888,7 +889,7 @@ async function songSwitchTests(browser) {
     stats.switches = (stats.switches || 0) + sw.length;
     for (const x of sw) {
       const ms = (b, spb) => Math.abs(b / 4 - Math.round(b / 4)) * 4 * spb * 1000, o = ms(x.oldBeat, x.spbOld), n = ms(x.newBeat, x.spbNew);
-      if (o > 20) await fail(p, tag, 'bar-line', `${x.from}>${x.to} changed ${o.toFixed(0)} ms off a bar line of the old song`);
+      if (o > 20) await fail(p, tag, 'bar-line', `${x.from}>${x.to} changed ${o.toFixed(0)} ms off a bar line of the old song ${JSON.stringify({ dbg: x.dbg, ob: x.ob, at: x.at, lag: x.lag })}`);
       if (n > 20) await fail(p, tag, 'grid-jump', `${x.from}>${x.to}: the new song's first beat is ${n.toFixed(0)} ms off that bar line`);
       if (x.lag > .15) await fail(p, tag, 'switch-late', `${x.from}>${x.to} applied ${(x.lag * 1000).toFixed(0)} ms late`);
     }
