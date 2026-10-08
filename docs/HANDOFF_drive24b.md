@@ -41,3 +41,9 @@ Coordinator 12:31: steering first; zig-zags at 36 OK unless a visible U-turn; RE
   (b) assist had no road direction on filler-grid streets (RO.rdT only from cityAt/Autobahn), fixed with fillAt.
 - t90 vs stability trade: a short ramp at corners brings back ~30°/s counter-yaw; testing a hold-accelerated ramp (stHold/stRampFast).
 - New metric settleX/flipsX: clock from turn exit (heading first < 8° off the new street); old settle includes ~0.8 s of the turn itself.
+
+## Sweeps (keys 60+100, qa24b/sw_*.json; flips / counter-yaw / settle / settleX / straight wobble / t90)
+- S defaults new7: 1.07 / 8 / 2.17 / 1.66 / 46 / 1.98
+- short ramp at corners (P,Q,R,T-W,X1-4): t90 1.8-1.9 but counter-yaw 20-31, wobble 90-125 — rejected
+- Y4 stIn 40, yrIn 40, stOut 30, yrOut 30 (less input→yaw lag): 0.96 / 16.5 / 1.87 / 1.28 / 131 / 1.82  ← best so far
+- settleX is bimodal: half the turns ~0.1 s, the rest 2-4 s = big turns where the driver re-centres onto the route line
