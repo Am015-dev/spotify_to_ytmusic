@@ -8,7 +8,7 @@ const enter=require('../bc/enter.js');const fs=require('fs');const URL=process.a
  // straight streets: nodes whose LVP_path() is non-null after a warp
  const kinds=(process.env.KINDS||'0,1,2,3').split(',').map(Number);let si=+(process.env.SI||0);
  for(const k of kinds){let ok=false;for(let tries=0;tries<25&&!ok;tries++){si++;
-    const r=await ev(`(()=>{const N=HUB.nodes.filter(n=>n&&n.nb&&n.nb.length>=2&&!n.ab&&!n.g&&(n.w||0)>=10);const a=N[Math.floor((${si}*.137%1)*N.length)],b=HUB.nodes[a.nb[0]];const h=Math.atan2(b.x-a.x,b.z-a.z);__mho.warp(a.x,a.z,h,performance.now());RO.x=a.x;RO.z=a.z;RO.y=__mho.gnd(a.x,a.z,RO.y+60);RO.v=0;RO.h=RO.vh=h;if(LVP.c)LVP_end(LVP.c,false);return 1})()`);
+    const r=await ev(`(()=>{const N=HUB.nodes.filter(n=>n&&n.nb&&n.nb.length>=2&&!n.ab&&!n.g&&(n.w||0)>=10);const a0=N[Math.floor((${si}*.137%1)*N.length)],b=HUB.nodes[a0.nb[0]],L=Math.hypot(b.x-a0.x,b.z-a0.z),a={x:a0.x+(b.x-a0.x)*12/L,z:a0.z+(b.z-a0.z)*12/L};const h=Math.atan2(b.x-a0.x,b.z-a0.z);__mho.warp(a.x,a.z,h,performance.now());RO.x=a.x;RO.z=a.z;RO.y=__mho.gnd(a.x,a.z,RO.y+60);RO.v=0;RO.h=RO.vh=h;if(LVP.c)LVP_end(LVP.c,false);return 1})()`);
     await p.waitForTimeout(1500);ok=await ev(`(()=>{LVP.k=${k};LVP.cd=999;return !!LVP_path()&&LVP_spawn()})()`)===true}
   if(!ok){console.log('kind',k,'no straight street');continue}
   await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${CITY}_pop${k}_gate.png`});console.log('gate',k,await ev(`JSON.stringify({k:LVP.c&&LVP.c.K.k,d:LVP.c&&Math.round(Math.hypot(LVP.c.gx-RO.x,LVP.c.gz-RO.z)),line:(document.querySelector('#roamArrow span')||{}).textContent||(document.querySelector('#m1Next .crD')||{}).textContent})`));

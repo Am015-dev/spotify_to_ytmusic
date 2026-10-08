@@ -136,7 +136,7 @@ const LV_eC={};
 function LV_edges(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_eC[key],st=(LV.fr||0)+'|'+Math.round(RO.x/10)+'|'+Math.round(RO.z/10);if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}
   const L=LV_edges0(min,max,cmin);LV_eC[key]={st,L,r:0};return L}
 function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,Ls=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[],q=[];
-  for(const i of Ls){const A=N[i];if(!A||A.ab||A.g||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab||B.g)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<16)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;
+  for(const i of Ls){const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<16)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;
     for(let t=8;t<L-7;t+=10){const x=A.x+ux*t,z=A.z+uz*t,dx=x-RO.x,dz=z-RO.z,d2=dx*dx+dz*dz;if(d2<min*min||d2>max*max)continue;const d=Math.sqrt(d2);if((dx*fx+dz*fz)/d<cmin)continue;
       const e=Math.min(t,L-t)<26&&(A.nb.length>=3&&t<26||B.nb.length>=3&&L-t<26);(e?o:q).push({i,bi,s:t,L})}}}
   const sh=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};return sh(o).concat(sh(q))}
@@ -205,7 +205,7 @@ function LV_parkStep(){const C=HUB.cars;if(!C||!C.length)return;const want=Math.
 function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // take a car the player cannot see (behind or > 200 m), park it on a street ahead, never on top of a cluster
   let cand=null;for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))cand=c}
-  if(!cand)return;const nd=LV_edges(far?30:70,far?100:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>14);for(let k=0;k<Math.min(10,nd.length);k++){const E=nd[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L,W=Math.min(A.w||20,B.w||20);if(W<9)continue;const d=Math.hypot(A.x+(B.x-A.x)*E.s/L-RO.x,A.z+(B.z-A.z)*E.s/L-RO.z);
+  if(!cand)return;const nd=LV_edges(far?30:70,far?100:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>14&&!N[e.i].g&&!N[e.bi].g)/* g streets (all of Athens): traffic drives at lane 0, no kerb lane to park in */;for(let k=0;k<Math.min(10,nd.length);k++){const E=nd[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L,W=Math.min(A.w||20,B.w||20);if(W<9)continue;const d=Math.hypot(A.x+(B.x-A.x)*E.s/L-RO.x,A.z+(B.z-A.z)*E.s/L-RO.z);
     const t=E.s/L,lane=(W/2+.3)/W,x=A.x+(B.x-A.x)*t-(B.z-A.z)/L*lane*W,z=A.z+(B.z-A.z)*t+(B.x-A.x)/L*lane*W;
     if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;if(roamHit(x,z,1.4,groundY(x,z)+.5))continue;
     if(!far&&LV_seen(x,0,z)&&d<90)continue;
@@ -224,11 +224,13 @@ function LVP_mesh(){if(LVP.m)return LVP.m;const g=new THREE.Group(),ring=new THR
 function LVP_label(K){const M=LVP.m,g=M.cx;g.clearRect(0,0,256,128);g.fillStyle='rgba(12,14,30,.86)';g.beginPath();g.roundRect(6,10,244,108,30);g.fill();g.lineWidth=7;g.strokeStyle=K.col;g.stroke();
   g.textAlign='center';g.textBaseline='middle';g.font='64px system-ui';g.fillText(K.ico,52,64);g.fillStyle='#ffffff';g.font='italic 900 30px system-ui';const w=K.name.split(' ');g.fillText(w[0],160,46);g.fillText(w[1]||'',160,84);M.sp.material.map.needsUpdate=true;
   M.ring.material.color.set(K.col);M.ring.material.emissive.set(K.col);M.disc.material.color.set(K.col)}
-// the street ahead: points every 8 m along the current street in the driving direction (null if it bends or ends within 160 m)
-function LVP_path(){const q=cityAt(RO.x,RO.z);if(!q||!q.S||!q.S.pts||q.d>q.road.w/2+2)return null;const P=q.S.pts,dir=Math.sin(RO.h)*q.p.tx+Math.cos(RO.h)*q.p.tz>=0?1:-1,i0=q.i,j=i0+dir*20;if(j<0||j>=P.length)return null;
-  const a=P[i0],b=P[j];if(Math.abs(a.tx*b.tz-a.tz*b.tx)>.12||a.tx*b.tx+a.tz*b.tz<.95)return null;for(let k=i0;k!==j;k+=dir){const p=P[k];if(JUNC&&JUNC.some(J=>(J.x-p.x)**2+(J.z-p.z)**2<(J.r+6)**2)&&Math.abs(k-i0)>4&&Math.abs(k-i0)<16)return null}
-  const lat=((RO.x-a.x)*a.tz-(RO.z-a.z)*a.tx)*dir;return{P,dir,i0,w:q.road.w,lat:clamp(lat,-q.road.w/2+2.4,q.road.w/2-2.4)}}
-const LVP_pt=(Q,k,lat)=>{const p=Q.P[clamp(Q.i0+Q.dir*k,0,Q.P.length-1)],tx=p.tx*Q.dir,tz=p.tz*Q.dir;return{x:p.x+tz*lat,z:p.z-tx*lat,h:Math.atan2(tx,tz),tx,tz,y:p.y}};
+// the street ahead: the HUB street edge you drive along (|cos| > .9, within the road), with ≥ 125 m left before its end node. Q.P(k) = 8 m steps
+function LVP_path(){if(hubNear(1e9,1e9,false)<-9)return null;const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);let best=null,bd=1e9;
+  for(const i of HUB.nc?HUB.nc.L:[]){const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<40)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,c=ux*fx+uz*fz;if(Math.abs(c)<.9)continue;
+    const t=(RO.x-A.x)*ux+(RO.z-A.z)*uz;if(t<0||t>L)continue;const e=Math.abs((RO.x-A.x)*uz-(RO.z-A.z)*ux),W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20));if(e>W/2+1.5||e>=bd)continue;
+    const dir=c>0?1:-1,left=dir>0?L-t:t;if(left<125)continue;bd=e;best={i,bi,A,B,ux:ux*dir,uz:uz*dir,px:A.x+ux*t,pz:A.z+uz*t,w:W}}}
+  if(!best)return null;const Q=best,lat=(RO.x-Q.px)*Q.uz-(RO.z-Q.pz)*Q.ux;Q.lat=clamp(lat,-Q.w/2+2.4,Q.w/2-2.4);if(Q.w<9)Q.lat=0;return Q}
+const LVP_pt=(Q,k,lat)=>{const s=k*8;return{x:Q.px+Q.ux*s+Q.uz*lat,z:Q.pz+Q.uz*s-Q.ux*lat,h:Math.atan2(Q.ux,Q.uz),tx:Q.ux,tz:Q.uz}};
 function LVP_busy(busy){return busy||RO.ch||RO.sp||RO.card||RO.frozen||RO.mapOpen||RO.story||RO.pop||(typeof OG!=='undefined'&&OG.ev)||!roamSave().tut||state!=='roam'}
 function LVP_spawn(){const Q=LVP_path();if(!Q)return false;const M=LVP_mesh(),K=LVP_K[LVP.k++%LVP_K.length],g=LVP_pt(Q,7,Q.lat),gy=Math.max(0,groundAt(g.x,g.z,(RO.y||0)+8));
   if(roamHit(g.x,g.z,3.6,gy+2))return false;LVP_label(K);M.g.position.set(g.x,gy,g.z);M.g.rotation.set(0,g.h,0);M.g.visible=true;M.g.scale.setScalar(.05);
@@ -236,8 +238,8 @@ function LVP_spawn(){const Q=LVP_path();if(!Q)return false;const M=LVP_mesh(),K=
 // start: lay the course just past the ring
 function LVP_start(C){const K=C.K,M=LVP.m,Q=C.Q;C.st=1;C.t=0;C.s0=HUB.smashed;AU.sfx('go');say(K.ico+' '+K.name,K.lim+' s · '+K.goal+' '+K.u,1.4);
   if(K.k==='jump'){const r=LVP_pt(Q,11,C.lat),y0=Math.max(0,groundAt(r.x,r.z,C.gy+6));addRamp(r.x,r.z,r.h,13,3,7,0xff8a1c,y0);C.ramp=RO.ramps[RO.ramps.length-1];C.rampM=RO.grp.children.slice(-3);C.tg=r}
-  if(K.k==='slalom'){for(let j=0;j<5;j++){const o=C.lat+(j%2?-2.2:2.2),o2=clamp(o,-Q.w/2+2.2,Q.w/2-2.2),a=LVP_pt(Q,11+j*3,o2);C.obj.push({x:a.x,z:a.z,h:a.h,tx:a.tx,tz:a.tz,y:Math.max(0,groundAt(a.x,a.z,C.gy+6)),pass:false,hit:[0,0]})}C.tg=C.obj[0]}
-  if(K.k==='smash'){for(let j=0;j<6;j++){const o=clamp(C.lat+(j%2?-1.8:1.8),-Q.w/2+1.6,Q.w/2-1.6),a=LVP_pt(Q,11+j*2.5,o);C.obj.push({x:a.x,z:a.z,h:a.h,y:Math.max(0,groundAt(a.x,a.z,C.gy+6)),dead:false})}C.tg=C.obj[0]}
+  if(K.k==='slalom'){for(let j=0;j<5;j++){const o=C.lat+(j%2?-2.2:2.2),o2=clamp(o,-Math.max(2.2,Q.w/2-2.2),Math.max(2.2,Q.w/2-2.2)),a=LVP_pt(Q,11+j*3,o2);C.obj.push({x:a.x,z:a.z,h:a.h,tx:a.tx,tz:a.tz,y:Math.max(0,groundAt(a.x,a.z,C.gy+6)),pass:false,hit:[0,0]})}C.tg=C.obj[0]}
+  if(K.k==='smash'){for(let j=0;j<6;j++){const o=clamp(C.lat+(j%2?-1.8:1.8),-Math.max(1.8,Q.w/2-1.6),Math.max(1.8,Q.w/2-1.6)),a=LVP_pt(Q,11+j*2.5,o);C.obj.push({x:a.x,z:a.z,h:a.h,y:Math.max(0,groundAt(a.x,a.z,C.gy+6)),dead:false})}C.tg=C.obj[0]}
   if(K.k==='drift')C.tg=null;LVP_draw(C)}
 function LVP_draw(C){const M=LVP.m;for(let i=0;i<12;i++){M.cone.setMatrixAt(i,_lvZ);M.crate.setMatrixAt(i,_lvZ)}
   if(C&&C.K.k==='slalom')C.obj.forEach((o,j)=>{for(let s=0;s<2;s++){const i=j*2+s;if(o.hit[s]&&o.hit[s].t>1.2)continue;const sx=o.x+o.tz*(s?2.3:-2.3),sz=o.z-o.tx*(s?2.3:-2.3);if(o.hit[s]){const H=o.hit[s];LV_set(M.cone,i,sx+H.vx*H.t,o.y+H.vy*H.t-6*H.t*H.t,sz+H.vz*H.t,H.t*9,o.h,H.t*7,1.2)}else LV_set(M.cone,i,sx,o.y,sz,0,o.h,0,1.2)}});
