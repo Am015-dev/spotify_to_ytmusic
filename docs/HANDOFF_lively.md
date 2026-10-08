@@ -44,3 +44,10 @@
 5. **Rules learnt here:**
    - The Frankfurt HCAR list must keep an ODD length. DR halving drops every other car, so an even list empties every other kind.
    - Headless tick is slow (~0.25 sim steps/s at normal gfx). Spawning that waits on frame counters is barely visible in shots, so force-spawn for close-ups (lv/feat.js).
+
+## v88p (2026-10-08, this session): life you SEE from the chase cam + roadside pop-ups
+- Code: `src/98l_lively.js` sections 7-9 (LV_edges street points ahead, LV_cl* clusters, LV_park*, LVP_* pop-ups), `60_city_build.js` pedStep crowd branch (p.cw/cx/cz/ch/gs, LV_cwave), `70_roam_world.js` traffic target min(2,V), `95_drive_flow.js` DR_unjam skips c.pk, TUNE knobs lvCrowd/lvPark/lvPop/lvPopGap/lvPopRw (10_core, 99t, tune.json, TUNE.md), changelog v88p, 8 checklist items.
+- Lessons: HUB nodes are sparse junctions (166 per 1.25 km²) and hubNear samples only 18 random nodes, so use LV_edges (points every 10 m on edges). In Athens EVERY node has n.g=1 (traffic lane W=0, so no parked cars there). cityAt() does NOT match the HUB graph; use the HUB edge (LVP_path). The headless sim runs ~0.3× and renders ~0.8 s per frame, so screenshots lag one frame. At 852×393 a minifig 40-60 m ahead is 9-13 px tall, which is why half the clusters go to 20-45 m after a teleport.
+- Tools: lv/shots.js (chase spots), lv/pop.js (GATEONLY=1 rings; NOSHOT=1 logic), t4/g11drive.js SIDE=1 ATH=1 (drive set + tyre gap). Review sheets: lv/v88p/*.png.
+- REVIEW sent for c73180ea. After PASS: fetch origin/alex/brave-carson-rbpmlk, merge live (garux v88o may have shipped; conflicts are likely only in 10_core changelog/TUNE, 99c, 99t, tune.json, TUNE.md), `tools/build.sh v88p`, `git add -f out/v88p`, push, then send coordinator session_017iH3DB4VyxwKSdMwsco4Ut "DEPLOY alex/od-lively <commit> out/v88p <msg>" + 3 bullets + shot paths.
+- Open: pop-up completion untested headless (checklist pop-play/pop-each); Life master stays 1 until Alex answers life-fps / life-fps2.
