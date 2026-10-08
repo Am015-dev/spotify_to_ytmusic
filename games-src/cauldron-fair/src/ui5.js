@@ -33,7 +33,7 @@ function buildRules() {
   sec('Playing it', h('ul', ...li([
     'The ring on the spiral marks where you would score now. The box under the buttons shows the chance that the next chip explodes you.',
     'The small cauldrons at the top are the other players: tap one to watch it. Hot-seat plays one cauldron after the other with a pass screen, online everybody brews in parallel and the host collects every stop.',
-    'The Guide in the menu can be Full, Light or Off.'])));
+    'The lightbulb at the top gives a hint for this very moment. The Menu switches the tips on or off and replays the Tutorial.'])));
   root.appendChild(h('div', { html: typeof CF_CREDITS !== 'undefined' ? CF_CREDITS : '' }));
   root.appendChild(h('p.sm', 'Cauldron Fair is an original game. Names, text and art are original; the rules follow the box.'));
   return root;
@@ -70,7 +70,7 @@ function renderScores() {
   b.appendChild(t);
   b.appendChild(h('h3', 'Score track'));
   for (const p of order) { const w = Math.min(100, 100 * p.vp / mx); b.appendChild(h('div', { style: 'display:flex;align-items:center;gap:8px;margin:5px 0' }, h('span', { style: 'width:62px;font-weight:800;font-size:13px' }, p.name), h('div', { style: 'flex:1;height:16px;border-radius:8px;background:#e9dcc0;overflow:hidden' }, h('i', { style: 'display:block;height:100%;border-radius:8px;width:' + w + '%;background:' + pcol(p.seat) })), h('b', p.vp))); }
-  const ro = G.rep ? G.rep.round : 0; const days = []; for (let r = 1; r <= D.rounds; r++) if (G.hist.some(x => x.round === r)) days.push(r);
+  const ro = G.rep ? G.rep.round : 0; const days = []; for (let r = 1; r <= LASTD(); r++) if (G.hist.some(x => x.round === r)) days.push(r);
   if (days.length) { b.appendChild(h('h3', 'Each day')); const dt = h('table.reft'); const hr = h('tr', h('th', 'Cauldron')); days.forEach(r => hr.appendChild(h('th', 'D' + r))); dt.appendChild(hr); for (const p of G.players) { const rw = h('tr', h('td', p.name)); days.forEach(r => { const x = G.hist.find(y => y.round === r && y.seat === p.seat); rw.appendChild(h('td', x ? (x.boom ? '✖ ' : '') + '+' + x.gain : '')); }); dt.appendChild(rw); } b.appendChild(h('div', { style: 'overflow-x:auto' }, dt)); b.appendChild(h('p.sm', '✖ = the cauldron exploded that day.')); }
 }
 function renderDrawers() {
@@ -88,7 +88,8 @@ function renderMenu() {
   if (online) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  if (!online) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
+  if (!online) b.appendChild(tutNode('btn', true));
+  if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gp = typeof gfxPref === 'function' ? gfxPref() : 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (gp === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gp === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gp === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
@@ -120,8 +121,9 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
+      firstTime() ? tutNode('tbtn go') : null,
       h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), h('span', campLine() || 'Ten chapters, three bosses')),
-      h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
+      h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved fair')) : null,
       h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'))));
@@ -149,7 +151,7 @@ function setupEl() {
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const first = !UI.prefs.played;
   const bStart = h('button.sbtn' + (first ? '' : '.big'), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the fair'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
-  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? You and one computer maker, beginner books and short tips' : 'You and one computer maker, beginner books, tips'));
+  const bGuide = tutNode('sbtn' + (first ? ' big' : ''));
   const go = h('div.sgo', first ? [bGuide, bStart] : [bStart],
     h('div.sgrid3', first ? null : bGuide,
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
@@ -181,6 +183,7 @@ document.addEventListener('click', ev => {
         if (m.t === 'ratset' || m.t === 'draw') UI.ratOpen = false;
         if (m.t === 'draw') UI.drawT = Date.now();
         else if (t.closest && t.closest('#qbox') && Date.now() - (UI.drawT || 0) < 600) break;   // a second quick tap on Draw must not pick the option that just appeared under the finger
+        if (!tutAct({ what: 'mv', m })) break;      // the staged tutorial: only the asked move goes through (after every guard above, so the kit never moves on for a tap the game ignores)
         if (UI.tip && !UI.tip.modal && (m.t === 'draw' || m.t === 'stop')) { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; renderTip(); }
         if (m.t === 'draw' && !UI.prefs.drew) { UI.prefs.drew = true; savePrefs(); }
         if (m.t === 'stop' && !UI.prefs.stopped) { UI.prefs.stopped = true; savePrefs(); }
@@ -195,20 +198,20 @@ document.addEventListener('click', ev => {
     case 'tipmore': UI.tipOpen = !UI.tipOpen; renderTip(); break;
     case 'fort': t.classList.toggle('open'); break;
     case 'fortchip': lpShow(t); break;
-    case 'ratopen': UI.ratOpen = !UI.ratOpen; render(); break;
+    case 'ratopen': if (!tutAct({ what: 'ratopen' })) break; UI.ratOpen = !UI.ratOpen; render(); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
-    case 'rscont': repContinue(); break;
-    case 'shopsel': shopToggle(d.k); break;
-    case 'shopbuy': shopBuy(); break;
-    case 'rubysel': rubySelect(d.k); break;
-    case 'rubygo': rubyGo(); break;
+    case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
+    case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; shopToggle(d.k); break;
+    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; shopBuy(); break;
+    case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; rubySelect(d.k); break;
+    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
     case 'tipoff': UI.coach.level = 'off'; tipOk(); savePrefs(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; closeRS(true); UI.overShown = false; newGame(m === 'net' ? 'vs' : m, c); break; }
     case 'look': closeRS(true); UI.overShown = true; render(); break;
-    case 'story': campOpen(); break;
+    case 'story': storyOpen(); break;
     case 'campfin': closeRS(true); campFinish(); break;
     case 'campgoal': campGoalToast(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
@@ -221,7 +224,6 @@ document.addEventListener('click', ev => {
     case 'gfx': setGfx && setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m, optObj()); break;
-    case 'guided': newGame('guided', optObj()); break;
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
@@ -229,7 +231,6 @@ document.addEventListener('click', ev => {
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; savePrefs(); renderMenu(); tipCheck(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }

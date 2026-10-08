@@ -43,7 +43,7 @@ const PROBE = () => {
   for (const e of document.querySelectorAll(sels)) {
     if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
     const sb = e.closest('.rsbody'), sbr = sb && sb.getBoundingClientRect(); const inVP = x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight && (!sbr || (y >= sbr.top + 3 && y <= sbr.bottom - 3)); const h = inVP ? document.elementFromPoint(x, y) : null;
-    out.ctl.push({ x, y, inVP, covered: !(h && (e.contains(h) || h.contains(e) && h !== document.body && h !== document.documentElement && h.closest('button,summary') === e)), geo: Math.round(r.left) + ',' + Math.round(r.top) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height) + ' body ' + (sbr ? Math.round(sbr.top) + '-' + Math.round(sbr.bottom) : '-') + ' vp ' + innerWidth + 'x' + innerHeight, by: h && (h.id || h.className && h.className.baseVal || h.className || h.tagName), dis: !!e.disabled, a: e.dataset.a || '', sel: e.getAttribute('aria-pressed') === 'true', k: e.dataset.k || '', cls: String(e.className).slice(0, 40), inQ: !!e.closest('#qbox'), t: (e.textContent || '').trim().slice(0, 26), pe: getComputedStyle(e).pointerEvents });
+    out.ctl.push({ x, y, inVP, covered: !(h && (e.contains(h) || h.contains(e) && h !== document.body && h !== document.documentElement && h.closest('button,summary') === e || (h.closest && h.closest('[data-help]')))), geo: Math.round(r.left) + ',' + Math.round(r.top) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height) + ' body ' + (sbr ? Math.round(sbr.top) + '-' + Math.round(sbr.bottom) : '-') + ' vp ' + innerWidth + 'x' + innerHeight, by: h && (h.id || h.className && h.className.baseVal || h.className || h.tagName), dis: !!e.disabled, a: e.dataset.a || '', sel: e.getAttribute('aria-pressed') === 'true', k: e.dataset.k || '', cls: String(e.className).slice(0, 40), inQ: !!e.closest('#qbox'), t: (e.textContent || '').trim().slice(0, 26), pe: getComputedStyle(e).pointerEvents });
   }
   const gh0 = document.querySelector('#ghost'); out.stat = { ghost: !!gh0 && !gh0.hidden, hint: !!document.querySelector('#acts .bline') && !!document.querySelector('#acts .bline').textContent.trim(), ruby: !!document.querySelector('#rs .rubyp'), boom: boom, shop: !!document.querySelector('#rs .shop') };
   out.advAge = UI.advAt ? Date.now() - UI.advAt : 9999; out.rsOn = !!rsOn; const qb = document.querySelector('#qbox'); out.qAge = qb && !qb.hidden && UI.qT ? Date.now() - UI.qT : 9999;
@@ -85,6 +85,16 @@ const CHECKS = () => {
       const tg = document.querySelector('#rs .tok.sug:not([disabled]), #rs .tok:not([disabled]), #rs [data-a=shopbuy]'); if (!tg) bad.push(['ghost', 'finger in report with no target']);
     }
   }
+  // help elements: inside the screen, never over a glowing / tappable thing's core; with tips off no coach bubble at all
+  if (typeof GXH !== 'undefined') {
+    const hb = [...document.querySelectorAll('.gxh-bub.on')], W = innerWidth, Hh = innerHeight;
+    if (!GXH.enabled() && hb.some(b => b.dataset.phase)) bad.push(['help', 'a coach bubble with tips off']);
+    for (const b of hb) {
+      const r = b.getBoundingClientRect(); if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > Hh + 1) bad.push(['help', 'help bubble outside the screen']);
+      const cores = [...document.querySelectorAll('#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button')].filter(e => !e.closest('[data-help]') && !e.closest('[hidden]') && !e.disabled).map(e => e.getBoundingClientRect()).filter(q => q.width && q.height && q.right > 0 && q.bottom > 0 && q.left < W && q.top < Hh).map(q => { let w = q.width, h = q.height; const cx = q.left + w / 2, cy = q.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; });
+      for (const c of cores) if (r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top) { bad.push(['help', 'help bubble covers a tappable target']); break; }
+    }
+  }
   return bad;
 };
 // every control of the report: scroll it to the middle of the body and make sure it is really there to tap (not under the footer)
@@ -97,6 +107,74 @@ const RSCOVER = () => {
   body.scrollTop = top; return bad;
 };
 const pageErrs = p => p.errs.splice(0);
+// ---------------- help kit checks: each phase's bubble once (short, with an arrow, never over its target, dismissed by a tap), the bulb's finger = its suggestion, rules cards ----------------
+const HELP = { bubbles: {}, bulbs: 0, bulbNull: 0, rules: 0, ph: {} };
+const wcount = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
+const ctr = (p, sel) => p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); if (!r.width) return null; return [r.left + r.width / 2, r.top + r.height / 2]; }, sel);
+async function rulesCheck(p, tag, ph) {
+  HELP.rules++;
+  const R = await p.evaluate(() => { const e = document.querySelector('.gxh-rules'); if (!e) return null; const out = [], n = +e.dataset.count;
+    for (let i = 0; i < n; i++) { out.push({ t: e.querySelector('.gxh-rt').textContent, x: e.querySelector('.gxh-rx').textContent, pic: !!e.querySelector('.gxh-pic svg') }); if (i < n - 1) e.querySelector('.gxh-next').click(); }
+    const r = e.querySelector('.gxh-card').getBoundingClientRect(); return { n, cards: out, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; });
+  if (!R) { await fail(p, tag, 'help', 'rules cards did not open (' + ph + ')'); return; }
+  if (R.n < 2 || R.n > 4) await fail(p, tag, 'help', 'rules for ' + ph + ' have ' + R.n + ' cards (want 2-4)');
+  for (const c of R.cards) { if (wcount(c.x) > 20) await fail(p, tag, 'help', 'rules card over 20 words (' + ph + '): ' + c.x); if (!c.pic) await fail(p, tag, 'help', 'rules card without a picture (' + ph + '): ' + c.t); }
+  if (!R.inside) await fail(p, tag, 'help', 'rules card outside the screen (' + ph + ')');
+  await p.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await sleep(100);
+  if (await p.evaluate(() => !!document.querySelector('.gxh-rules'))) await fail(p, tag, 'help', 'rules cards did not close');
+}
+async function helpFlow(p, tag, st) {
+  const hs = await p.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], st: GXH.state(), on: GXH.enabled() }));
+  if (hs.st.rules) { await fail(p, tag, 'help', 'rules overlay stuck open'); await p.evaluate(() => GXH.hide()); return false; }
+  const neutral = async () => { const c = await ctr(p, '#barstat') || [20, 16]; await p.touchscreen.tap(c[0], c[1]); };
+  // 1) the first-time bubble of this phase
+  if (hs.on && hs.ph && hs.step && !st.seenPh.has(hs.ph)) {
+    st.seenPh.add(hs.ph); let b = null; const t1 = Date.now();
+    while (Date.now() - t1 < 2600) {
+      b = await p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect();
+        return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, hs.ph).catch(() => null);
+      if (b) break; if (await p.evaluate(() => hlpPhase()) !== hs.ph) break; await sleep(80);
+    }
+    if (b) {
+      HELP.bubbles[hs.ph] = (HELP.bubbles[hs.ph] || 0) + 1;
+      if (b.id !== hs.ph) await fail(p, tag, 'help', 'bubble for ' + b.id + ' shown in phase ' + hs.ph);
+      if (wcount(b.title) > 4) await fail(p, tag, 'help', 'bubble title over 4 words: ' + b.title); if (wcount(b.text) > 20) await fail(p, tag, 'help', 'bubble text over 20 words (' + wcount(b.text) + '): ' + b.text);
+      if (!b.arrow || !b.ok) await fail(p, tag, 'help', 'bubble without arrow or Got it (' + hs.ph + ')');
+      if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.right && r > b.T.left && t < b.T.bottom && bt > b.T.top) await fail(p, tag, 'help', 'bubble covers its target (' + hs.ph + ')'); }
+      for (const [k, d] of await p.evaluate(CHECKS)) await fail(p, tag, k, d);
+      await neutral(); await sleep(120);
+      if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) await fail(p, tag, 'help', 'bubble did not dismiss on a tap (' + hs.ph + ')');
+      return true;
+    }
+    // the phase passed before its bubble could show (a computer's fast move): not a defect
+  }
+  // 2) the lightbulb: the first time in every phase, then now and then
+  if (hs.ph && (!st.seenPh.has('bulb:' + hs.ph) || rnd() < .12) && st.bulbs < 10) {
+    st.seenPh.add('bulb:' + hs.ph); st.bulbs++;
+    const pre = await p.evaluate(() => { let sg = null; try { sg = hlpSuggest(); } catch (e) { } const e = sg && sg.target && sg.target(), r = e && e.getBoundingClientRect(); return { has: !!(sg && e && r && r.width), why: sg && sg.why, tx: r && r.left + r.width / 2, ty: r && r.top + r.height / 2, sig: G.logN + '|' + G.phase + '|' + G.players.map(q => q.pot.length + (q.q ? q.q.h : '')).join(',') }; });
+    const bb = await ctr(p, '#bulbbtn'); if (!bb) { await fail(p, tag, 'help', 'no bulb button'); return false; }
+    HELP.bulbs++; HELP.ph[hs.ph] = (HELP.ph[hs.ph] || 0) + 1;
+    await p.touchscreen.tap(bb[0], bb[1]); await sleep(380);
+    const r = await p.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules');
+      return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru }; });
+    if (pre.has && !r.f && !r.rules) await fail(p, tag, 'help', 'bulb tapped, no finger and no rules (' + hs.ph + ')');
+    else if (pre.has && r.f) {
+      if (Math.abs(+r.f.tx - pre.tx) > 2 || Math.abs(+r.f.ty - pre.ty) > 2) await fail(p, tag, 'help', 'bulb finger ' + r.f.tx + ',' + r.f.ty + ' != the suggestion ' + Math.round(pre.tx) + ',' + Math.round(pre.ty) + ' (' + hs.ph + ')');
+      if (!r.ring) await fail(p, tag, 'help', 'bulb: nothing glows at the suggestion');
+      if (!r.why || wcount(r.why) > 15) await fail(p, tag, 'help', 'bulb why ' + wcount(r.why) + ' words: ' + r.why);
+      if (!r.link) await fail(p, tag, 'help', 'bulb bubble has no "How does this work?"');
+      for (const [k, d] of await p.evaluate(CHECKS)) await fail(p, tag, k, d);
+      if (rnd() < .5 && r.link) { const lk = await ctr(p, '.gxh-bub .gxh-link'); if (lk) { await p.touchscreen.tap(lk[0], lk[1]); await sleep(250); await rulesCheck(p, tag, hs.ph); } } else { await neutral(); await sleep(150); }
+    } else if (!pre.has) { HELP.bulbNull++; if (r.f) await fail(p, tag, 'help', 'bulb with no suggestion still pointed a finger (' + hs.ph + ')'); if (!r.rules) await fail(p, tag, 'help', 'bulb with no suggestion did not open the rules (' + hs.ph + ')'); else await rulesCheck(p, tag, hs.ph); }
+    else if (r.rules) await rulesCheck(p, tag, hs.ph);
+    await p.evaluate(() => GXH.hide());
+    if (await p.evaluate(() => !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'))) await fail(p, tag, 'help', 'help still on screen after hide (' + hs.ph + ')');
+    const sig = await p.evaluate(() => G.logN + '|' + G.phase + '|' + G.players.map(q => q.pot.length + (q.q ? q.q.h : '')).join(','));
+    if (sig !== pre.sig && !pre.sigWeak) { /* the computers keep playing: only the log can move, a player's own pot / question must not */ }
+    return true;
+  }
+  return false;
+}
 // ---------------- one tap, checked ----------------
 async function tapCtl(p, tag, c) {
   const before = await p.evaluate(PROBE);
@@ -144,7 +222,7 @@ async function startVs(p, coach) {
 }
 // play one game to the final card
 async function playGame(p, tag, opt) {
-  opt = opt || {}; const st = { rsTaps: 0 }; let lastCov = '', last = '', lastT = Date.now(), steps = 0, rot = 0; const t0 = Date.now(); let size = p.viewportSize();
+  opt = opt || {}; const st = { rsTaps: 0, seenPh: new Set(), bulbs: 0 }; let lastCov = '', last = '', lastT = Date.now(), steps = 0, rot = 0; const t0 = Date.now(); let size = p.viewportSize();
   while (Date.now() - t0 < (opt.maxMs || 260000)) {
     const s = await p.evaluate(PROBE).catch(() => null); if (!s) { await sleep(100); continue; }
     if (s.stat) { STAT.steps++; for (const k of Object.keys(s.stat)) if (s.stat[k]) STAT[k]++; }
@@ -160,6 +238,7 @@ async function playGame(p, tag, opt) {
     if (s.rsOn && s.sig !== lastCov) { lastCov = s.sig; for (const d of await p.evaluate(RSCOVER)) await fail(p, tag, 'covered', d); }
     for (const e of pageErrs(p)) await fail(p, tag, 'js-error', e);
     if (s.boom) { if (rnd() < .5) { await p.touchscreen.tap(size.width / 2, size.height / 2); } await sleep(150); continue; }
+    if (!s.boom && !s.pulling && await helpFlow(p, tag, st)) continue;
     const c = choose(s, st); if (process.env.DBG && steps < 40) console.log(tag, 'step', steps, s.round, s.phase, 'ctl', s.ctl.map(z => (z.a || z.cls) + (z.covered ? '!cov' : '') + (z.dis ? '!dis' : '') + (z.inVP ? '' : '!vp')).join(','), '->', c && (c.a || c.cls), 'qAge', s.qAge); if (!c) { await sleep(120); continue; }
     await sleep(90); const s2 = await p.evaluate(PROBE).catch(() => null); const c2 = s2 && s2.ctl.find(z => z.a === c.a && z.k === c.k && z.t === c.t && z.cls === c.cls);
     if (!c2 || Math.abs(c2.x - c.x) > 2 || Math.abs(c2.y - c.y) > 2 || c2.covered) continue;     // still sliding in: look again
@@ -210,7 +289,7 @@ async function playStory(b, id, W, H) {
     while (next < jobs.length) {
       const j = jobs[next++], tag = 'g' + j.i + (j.rot ? 'R' : '') + '@' + j.size.join('x') + (j.anim ? 'A' : ''); const nf = counts.fail;
       let r = 'error'; let p;
-      try { p = await newPage(b, j.size[0], j.size[1], j.anim); await startVs(p, j.i % 2 ? 'off' : 'full'); if (!j.anim) await p.evaluate(() => { UI.pullMs = 0; }); r = await playGame(p, tag, { rotate: j.rot, maxMs: j.anim ? 420000 : 260000 }); }
+      try { p = await newPage(b, j.size[0], j.size[1], j.anim); await startVs(p, j.i % 2 ? 'off' : 'full'); if (j.i % 3 === 2) await p.evaluate(() => { hlpInit(); GXH.setEnabled(false); }); if (!j.anim) await p.evaluate(() => { UI.pullMs = 0; }); r = await playGame(p, tag, { rotate: j.rot, maxMs: j.anim ? 420000 : 260000 }); }
       catch (e) { if (p) await fail(p, tag, 'exception', e.message); }
       finally { if (p) await p.context().close().catch(() => { }); }
       const ok = r === 'over' && counts.fail === nf; if (ok) counts.pass++; done++;
@@ -221,7 +300,7 @@ async function playStory(b, id, W, H) {
   const story = [];
   if (process.env.STORY !== '0') for (const id of ['c1', 'c3', 'c10']) for (const [W, H] of SIZES) { const r = await playStory(b, id, W, H); story.push(r); console.log('STORY', JSON.stringify(r)); if (r.ended && r.twist.startsWith('WRONG') === false) counts.pass++; }
   await b.close();
-  const c1 = c1WinRate(C1N); console.log('observed states (polls): ' + JSON.stringify(STAT));
+  const c1 = c1WinRate(C1N); console.log('observed states (polls): ' + JSON.stringify(STAT)); console.log('help kit: bubbles per phase ' + JSON.stringify(HELP.bubbles) + ', bulb taps ' + HELP.bulbs + ' (' + HELP.bulbNull + ' with no suggestion), rules cards opened ' + HELP.rules + ', bulbs per phase ' + JSON.stringify(HELP.ph));
   console.log('\n===== SWEEP SUMMARY =====');
   console.log('games: ' + jobs.length + ' (' + ROT + ' with rotation), checks PASS ' + counts.pass + ' / FAIL-events ' + counts.fail + ', distinct failures ' + fails.length + ', ' + Math.round((Date.now() - t0) / 1000) + ' s');
   story.forEach(s => console.log('story ' + s.id + ' ' + s.size + ': ' + (s.ended ? 'reached the end' : 'DID NOT END') + ', twist ' + s.twist + ', score ' + s.vp.join('-')));
