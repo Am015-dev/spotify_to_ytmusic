@@ -34,7 +34,15 @@
 - Low fps in the cloud makes taps long-presses (always use ?fast=1 for builder input tests).
 - Reference to study: LEGO 2K Drive garage = big part categories with many tiles, part groups/"sub-builds" you can toggle, snapping by attachment points, free camera orbit with focus.
 
-## Next
+## Status 2026-10-08 17:15 UTC
+- QUICK REVIEW sent to reviewer for 103a3687 (base live v88g / drive26; bigcars entries renamed v88i, v88h reserved for the P0 city fix). Waiting for PASS.
+- Tyre gap 0.03 m (bus, truck, monster); 0 console errors. Garage RIDES view now zooms out for long builds (R2_frame wrap).
+- Open follow-ups: truck chase cam (tall box hides road centre → raise camera height for tall vehicles, e.g. scale RCAM h/hk by rH more than b);
+  PC + iframe runs; limo drive shot; garage preview in the cloud updates only after reopen (slow renderer; real devices not checked).
+- Harness notes: bc/drive.js = t4/g11drive.js + __bc.measure() before shots. Don't use pkill -f with a pattern that is in your own command line (kills the shell).
+- After PASS: merge live HEAD, pick next free letter (rename v88i if taken), tools/build.sh <ver>, git add -f out/<ver> (+ tune.json, music from live), DEPLOY message to coordinator.
+
+## Next (old)
 1. Read probe logs; check big=true for templates and big=false for rod/t_rosso; fix errors.
 2. garshot (garage + build shots), g11drive per template (Frankfurt few s + side view + tyre gap ≤0.05), start/PC/iframe shots, 0 console errors. LOOK at shots.
 3. REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v. After PASS: merge live HEAD, rebuild, out/<ver> (+tune.json, music), DEPLOY msg to coordinator.
