@@ -34,6 +34,11 @@
 - Low fps in the cloud makes taps long-presses (always use ?fast=1 for builder input tests).
 - Reference to study: LEGO 2K Drive garage = big part categories with many tiles, part groups/"sub-builds" you can toggle, snapping by attachment points, free camera orbit with focus.
 
+## FINAL 2026-10-08 17:35 UTC
+- Reviewer PASS (99dcae1c). DEPLOY sent to the coordinator: out/v88i at 5892dc26 (on live v88h).
+- Review fixes made: tall-vehicle chase cam (BC_tall: H>2.2 m → RCAM h ≥ roof+0.2+tan10°·(b+L/2)); garage shadow camera fits the car (BC_gsShadow).
+- Optional polish (reviewer): truck sits low in frame under the boost bar; lower pitch ~3° if Alex says the vehicle feels "lost".
+
 ## Status 2026-10-08 17:15 UTC
 - QUICK REVIEW sent to reviewer for 103a3687 (base live v88g / drive26; bigcars entries renamed v88i, v88h reserved for the P0 city fix). Waiting for PASS.
 - Tyre gap 0.03 m (bus, truck, monster); 0 console errors. Garage RIDES view now zooms out for long builds (R2_frame wrap).
