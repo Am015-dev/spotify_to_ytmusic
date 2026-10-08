@@ -40,7 +40,7 @@ function campWatch(){if(!UI.cmp||!G)return;if(!G.winner){CMP_OVER=0;return}
   clearInterval(CMP_FIN);const g=G;UI.cmp=null;if(UI.hintsUser!=null){UI.hints=UI.hintsUser;UI.hintsUser=null}
   if(GXC.active())GXC.finish(g)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'doorkick',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'doorkick',data:window.CAMPAIGN,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();if(typeof tutStart==='function')tutStart()});return [b]},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit(){clearInterval(CMP_FIN);UI.cmp=null;if(UI.hintsUser!=null){UI.hints=UI.hintsUser;UI.hintsUser=null}G=null;UI.info=true;render()},
     scores:g=>g.pl.map(p=>p.lvl),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
 function campOpen(){if(typeof GXC==='undefined')return;if(GX.open)GX.close();GXC.open()}

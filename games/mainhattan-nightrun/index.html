@@ -1563,7 +1563,7 @@ function athensP(bg,t,scroll){const D=bg.D;
   const g=ctx.createLinearGradient(0,0,PW_*.24,0);g.addColorStop(0,'#0a2a4af0');g.addColorStop(1,'#0a2a4a00');ctx.fillStyle=g;ctx.fillRect(0,0,PW_*.24,PH_);
   ctx.globalCompositeOperation='lighter';ctx.fillStyle='#2ee6d61c';for(let i=0;i<10;i++){const y=((i*131+scroll*.2)%PH_+PH_)%PH_;ctx.fillRect(6+(i*37)%50,y,26,1.5);}ctx.globalCompositeOperation='source-over';
   const span=2600,y=((scroll*.55)%span)-300;                                                          // the hill with the temple, once per ~2600 units of scroll
-  if(y>-260&&y<PH_+40){const x=PW_*.66;ctx.globalCompositeOperation='lighter';G_(x,y+90,170,D.a,.16);ctx.globalCompositeOperation='source-over';
+  if(y>-260&&y<PH_+40){const x=PW_*.66;ctx.globalAlpha=clamp((y-30)/260,0,1)*.9;ctx.globalCompositeOperation='lighter';G_(x,y+90,170,D.a,.16);ctx.globalCompositeOperation='source-over';
     ctx.fillStyle='#0b0816';ctx.fillRect(x-100,y,200,180);ctx.strokeStyle=D.a;ctx.globalAlpha=.3;ctx.lineWidth=2;ctx.strokeRect(x-100,y,200,180);ctx.globalAlpha=1;
     ctx.fillStyle='#e8d9a8';ctx.globalAlpha=.85;ctx.fillRect(x-62,y+40,124,10);ctx.fillRect(x-62,y+130,124,10);
     for(let i=0;i<9;i++){ctx.beginPath();ctx.arc(x-56+i*14,y+45,3.5,0,7);ctx.arc(x-56+i*14,y+135,3.5,0,7);ctx.fill();}ctx.globalAlpha=1;}}
@@ -1816,7 +1816,7 @@ function wantSongs(){
   if(SH.active){di++;if(di>=DISTRICTS.length){di=0;L++;}done=false;}                       // pit stop: get ready for the district that comes next
   const o=[songFor(di,L)],sg=bossSong(DISTRICTS[di].boss,false);if(sg&&!done)o.push(sg);
   const n=di+1,Ln=n>=DISTRICTS.length?L+1:L;o.push(songFor(n%DISTRICTS.length,Ln));return o;}
-TR.keepFn=file=>wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);
+TR.keepFn=file=>(TRQ.hold&&TRQ.hold.has(file))||wantSongs().some(s=>TR.by[s]&&TR.by[s].file===file);   // TRQ.hold: test hook that keeps extra songs decoded
 const trBusy=()=>{for(const k in TR.busy)if(TR.busy[k])return true;return false;};
 function pumpTracks(){if(!AU.a||trBusy())return;
   for(const s of wantSongs()){const info=TR.by[s];if(!info||TR.bufs[info.file]||TR.bad[info.file])continue;

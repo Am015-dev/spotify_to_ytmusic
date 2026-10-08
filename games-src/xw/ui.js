@@ -147,8 +147,8 @@ function renderModal(){const el=$('modal');let h=typeof netModalHTML==='function
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1)&&!(typeof NET!=='undefined'&&NET.on);// online games never show the pass-the-device screen
-function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
-  <p class="small">First time? Just press <b>Launch</b>: the defaults are a good first battle and the first round is guided. Everything below is optional.</p>
+function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div>${typeof tutBtn==='function'?`<div class="row">${tutBtn('btn'+(tutFirst()?' primary':''))}</div>`:''}<p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
+  <p class="small">First time? Take the lesson above, or just press <b>Launch</b>: the defaults are a good first battle. Everything below is optional.</p>
   ${typeof GXC!=='undefined'&&window.CAMPAIGN&&!NET.on?`<div class="row"><button class="btn primary" data-a="story">📖 Story mode<small>${esc(campLine())}</small></button></div>`:''}
   ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
   <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
@@ -212,10 +212,10 @@ function gameAct(ds,side){if(!G)return null;
 const ICON_PAUSE='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg>',ICON_PLAY='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg>';
 function toggleMenu(open){const m=$('more'),b=document.querySelector('[data-a="menu"]');if(!m)return;const on=open!=null?open:!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',String(on))}
 document.addEventListener('click',e=>{const m=$('more');if(m&&m.classList.contains('open')&&!e.target.closest('[data-a="menu"]')&&(!e.target.closest('#more')||e.target.closest('button')))setTimeout(()=>toggleMenu(false),0)},true);
-document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;sfx('click');
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'ui',act:ds.act,k:ds.k,a:ds.a,w:ds.w,a2:ds.a2}))return;sfx('click');
   if(ds.mode){UI.mode=ds.mode;render();return}if(ds.size){UI.size=ds.size;saveSetup();render();return}if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.exk){UI.ex[ds.exk]=!UI.ex[ds.exk];FACTIONS.forEach((f,i)=>{if(f.ex&&!UI.ex[f.ex]&&UI.fac.includes(i))UI.fac=UI.fac.map(x=>x===i?(i===UI.fac[0]?0:1):x)});saveSetup();render();return}
-  if(ds.start){startGame(ds.start);return}
+  if(ds.start){if(ds.start==='solo'&&typeof tutOffer==='function'&&tutOffer('solo'))return;startGame(ds.start);return}
   if(ds.a&&/^net/.test(ds.a)&&typeof netClick==='function'&&netClick(ds.a))return;
   if(ds.dial!=null){UI.draft[ds.ship]=+ds.dial;UI.hoverDial=null;const mine=alive().filter(s=>s.side===planSide());const nxt=mine.find(s=>UI.draft[s.id]==null);if(nxt&&ds.ship===UI.sel)UI.sel=nxt.id;render();return}
   if(ds.sel){UI.sel=ds.sel;render();return}
@@ -242,7 +242,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='recapok'){UI.recapSeen=G.round-1;render();return}if(ds.a==='recapoff'){UI.recapSeen=G.round-1;LS.set('na_recap','off');render();return}
   if(ds.a==='tourskip'){LS.set('na_tour','1');UI.coachOn=null;render();return}
   if(ds.a==='sortie'){startGame('solo',+ds.k);return}
-  if(ds.a==='story'){if(typeof GXC!=='undefined')GXC.open();return}
+  if(ds.a==='story'){if(typeof storyOpen==='function')storyOpen();else if(typeof GXC!=='undefined')GXC.open();return}
   if(ds.a==='speed'){const s=['slow','normal','fast'];UI.speed=s[(s.indexOf(UI.speed||'normal')+1)%3];AIDELAY={slow:1100,normal:600,fast:220}[UI.speed];$('speedbtn').textContent='⏩ '+UI.speed;return}
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
