@@ -116,7 +116,10 @@ SC_hit=(f=>function(x,z,y){if(!BC.big||!SC_S.on)return f(x,z,y);const fx=Math.si
 roamStep=(f=>function(dt){try{BC_upd()}catch(e){}const s=pl;if(!BC.big||!s||!s.stats)return f(dt);const a=s.stats.acc,t=s.stats.top;s.stats.acc=a*BC.acc;s.stats.top=t*BC.top;try{return f(dt)}finally{s.stats.acc=a;s.stats.top=t}})(roamStep);
 CR_minBack=(f=>function(){return f()*(BC.big?BC.cam:1)})(CR_minBack);
 // garage: the camera backs off for long / tall builds so the whole car stays framed
-GB_cam=(f=>function(){let L=[];try{L=GB.d?GB_list():[]}catch(e){}let z0=0,z1=0,y1=0;for(const b of L){const P=GB_PC[b.t];if(!P)continue;const[fw,fd]=GB_dims(b);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd);y1=Math.max(y1,b.y+P.h)}
- const k=Math.max(1,(z1-z0)/20,y1/34),d=GB_.dist;GB_.dist=d*k;try{return f()}finally{GB_.dist=d}})(GB_cam);
+function BC_gk(){let L=[];try{L=GB.d?GB_list():[]}catch(e){}const key=L.length+'|'+(GB.mesh&&GB.mesh.uuid);if(BC.gkK===key)return BC.gk;let z0=0,z1=0,y1=0;
+ for(const b of L){const P=GB_PC[b.t];if(!P)continue;const[fw,fd]=GB_dims(b);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd);y1=Math.max(y1,b.y+P.h)}BC.gkK=key;return BC.gk=Math.max(1,(z1-z0)/20,y1/34)}
+GB_cam=(f=>function(){const k=BC_gk(),d=GB_.dist;GB_.dist=d*k;try{return f()}finally{GB_.dist=d}})(GB_cam);
+// RIDES / garage view (not BUILD): R2_frame zooms the orbit camera to the free screen area; zoom out by the same build extent so a bus or truck stays in frame
+R2_frame=(f=>function(C,bk){const r=f.apply(this,arguments);if(!bk&&C&&C.view&&C.view.enabled){const k=BC_gk();if(k>1){C.zoom/=k;C.updateProjectionMatrix();C.updateMatrixWorld()}}return r})(R2_frame);
 window.__bc={S:BC,measure:()=>{const ud=pl&&pl.mesh.userData;if(!ud)return null;CR_PS.k='';const d=BC_dims(ud);if(d)BC_apply(d);return window.__bc.hull()},dims:()=>{const ud=pl&&pl.mesh.userData;return ud?BC_dims(ud):null},T:BC_T.map(t=>t.id),n:id=>{const S=GAR_set(id);return S&&S.car?S.car().length:0},
  hull:()=>({rad:SC_K.rad,off:SC_K.off,cam:SC_K.cam,wb:CR_WB,hw:OB_HW,hl:OB_HL,acc:BC.acc,top:BC.top,big:BC.big,m:BC.m||1})};
