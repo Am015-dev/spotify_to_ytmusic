@@ -72,7 +72,7 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | knob | default | what it does |
 |---|---|---|
 | `TUNE.life` World life (master) | 1 | scales everything below (0-2) |
-| `TUNE.lvPed` People near you × | 1 | 70 minifig pedestrians kept 30-160 m around you, 70 % placed in front (pool 110: 1.6 = all) |
+| `TUNE.lvPed` People near you × | 0.8 | (v88s: was 1; Alex "way too many people") 56 at 0.8, 70 at 1: pedestrians kept 30-160 m around you, 70 % placed in front (pool 110: 1.6 = all) |
 | `TUNE.lvWave` People wave as you pass | ON | 2 of 3 pavement minifigs wave both arms when you pass within 16 m |
 | `TUNE.lvTraf` Traffic near you | ON | traffic cars further than 300 m are moved to streets 100-260 m around you, half of them in front (OFF = v88i: 650/480 m → 180-480 m) |
 | `TUNE.lvBird` Pigeons + gulls × | 1 | 6 pigeon flocks (7 birds) on the pavement ahead that scatter when you come within 22 m; 3 gull flocks circling 26-40 m up |
@@ -80,7 +80,7 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvBlimp` Blimp in the sky | ON | a 46 m LEGO blimp circling each city at 150 m |
 | `TUNE.lvBoat` Boats on the Main × | 1 | 5 LEGO cruisers on the Main (Frankfurt), pushed-off hull like a glancing hit; next city load |
 | `TUNE.lvFac` Bold LEGO facade colours | 1 | mixes the district facade tints toward saturated LEGO colours (Athens at 0.6 ×, the white city stays white); next page load |
-| `TUNE.lvCrowd` Crowds, stalls, cafés ahead × | 1 | (v88p) 6 life clusters at street corners 20-115 m ahead: crowds of 3-6 minifigs (chat, face you, wave, cheer-hop, leap aside), market stalls, café tables. 27 people from the same pool (PED_N 110). Stalls/cafés smash on contact (collider = drawn size) |
+| `TUNE.lvCrowd` Crowds, stalls, cafés ahead × | 0.67 | (v88s: was 1 → 4 clusters, 18 people) (v88p) 6 life clusters at 1 at street corners 20-115 m ahead: crowds of 3-6 minifigs (chat, face you, wave, cheer-hop, leap aside), market stalls, café tables. 27 people from the same pool (PED_N 110). Stalls/cafés smash on contact (collider = drawn size) |
 | `TUNE.lvPark` Parked cars ahead × | 1 | (v88p) 5 traffic cars parked half on the kerb 30-130 m ahead (same mesh and box collider; smash one and it rejoins traffic) |
 | `TUNE.lvPop` Roadside pop-up challenges | ON | (v88p) a ring 45-75 m ahead in your lane: RAMP JUMP, DRIFT ZONE, SMASH STREAK, CONE SLALOM. Drive through to start; timer on the objective line; at most 1; replaces the old random pop-ups |
 | `TUNE.lvPopGap` Pop-up gap (s) | 28 | seconds after one ends before the next ring (×0.6 after a miss) |
