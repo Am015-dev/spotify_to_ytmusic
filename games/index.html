@@ -975,8 +975,8 @@ function render(){
 /* ---------- featured spotlight (switch games by changing FEATURED) ---------- */
 const FEATURED=['doorkick','thornbound','hollowbough'];let featI=0,featT=0;
 const FEAT={doorkick:{img:'doorkick-dungeon/media/title.webp',imgPh:'doorkick-dungeon/media/title-phone.webp',tag:'Kick doors. Fight monsters. Stab friends.',more:['See all 147 cards','doorkick-dungeon/cards.html']},
- thornbound:{img:'thornbound/media/title.webp',imgPh:'thornbound/media/title-phone.webp',tag:'Four heirs, one empty throne.'},
- hollowbough:{img:'hollowbough/media/title.webp',imgPh:'hollowbough/media/title-phone.webp',tag:'Four seasons to build a woodland city.'}};
+ thornbound:{img:'thornbound/media/title.webp',imgPh:'thornbound/media/title-phone.webp',tag:'Four heirs, one empty throne.',more:['See all 51 cards','thornbound/cards.html']},
+ hollowbough:{img:'hollowbough/media/title.webp',imgPh:'hollowbough/media/title-phone.webp',tag:'Four seasons to build a woodland city.',more:['See all 48 cards','hollowbough/cards.html']}};
 function renderFeat(){
   const el=$('#feat'),ids=FEATURED.filter(k=>byId(k)&&FEAT[k]);
   if(!el||!ids.length||view==='list'){if(el)el.hidden=true;return}
