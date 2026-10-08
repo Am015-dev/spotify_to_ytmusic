@@ -127,7 +127,12 @@ function qvPath(x0,z0,x1,z1,h0,raw){const t0=performance.now(),G=qvGraph(),line=
 // drive24b: the height test is per 4 m step (no step > 1.5 m: a deck edge, a quay), not end to end (that refused every chord on a hill),
 // on the drivable surface (groundAt follows a bridge deck; groundY read the river under it)
 const D24_clr=(a,b)=>{const L=Math.hypot(b[0]-a[0],b[1]-a[1]),k=Math.ceil(L/4);let y0=groundAt(a[0],a[1],99);for(let j=1;j<=k;j++){const x=a[0]+(b[0]-a[0])*j/k,z=a[1]+(b[1]-a[1])*j/k,y=groundAt(x,z,y0+1.5);if(Math.abs(y-y0)>1.5)return false;y0=y;if(j<k&&roamHit(x,z,1.2))return false}return true};
-function D24_clean(P,I,noSimp,dMax=25){if(P.length<3)return;const n0=P.length;
+// (5) drive24c: out-and-back spikes (a via point or a stop just past a node: 10-25 m there and straight back) and duplicate points
+// are dropped, so no false 'U-turn' at a via point and no hook at the destination (tools/tRoute24.js U column, qa24c/uturns.js)
+function D24_despike(P,I){for(let ch=1,n=0;ch&&n<50;n++){ch=0;for(let k=1;k<P.length-1;k++){const a=P[k-1],b=P[k],c=P[k+1],ux=b[0]-a[0],uz=b[1]-a[1],wx=c[0]-b[0],wz=c[1]-b[1],l1=Math.hypot(ux,uz),l2=Math.hypot(wx,wz);
+  if(l1<.5||l2>.5&&(ux*wx+uz*wz)/(l1*l2)<-.87&&Math.min(l1,l2)<25&&D24_clr(a,c)){P.splice(k,1);if(I)I.splice(k,1);ch=1;k--}}}}
+function D24_clean(P,I,noSimp,dMax){D24_clean0(P,I,noSimp,dMax);if(P.length>2)D24_despike(P,I)}
+function D24_clean0(P,I,noSimp,dMax=25){if(P.length<3)return;const n0=P.length;
   for(let i=0;i<P.length-2;i++){let A=0,cut=-1;for(let j=i+1;j<P.length&&A<800;j++){A+=Math.hypot(P[j][0]-P[j-1][0],P[j][1]-P[j-1][1]);if(j>i+1){const d=Math.hypot(P[j][0]-P[i][0],P[j][1]-P[i][1]);if(d<dMax&&A>2*d+15&&D24_clr(P[i],P[j]))cut=j}}
     if(cut>0){P.splice(i+1,cut-i-1);if(I)I.splice(i+1,cut-i-1)}}
   const e=TUNE.rtSimp;if(noSimp||!(e>0)||P.length<3)return;const keep=new Uint8Array(P.length);keep[0]=keep[P.length-1]=1;const stk=[[0,P.length-1]];
