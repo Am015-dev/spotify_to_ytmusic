@@ -1,4 +1,4 @@
-import re,sys
+import re,sys,os
 P='/home/user/spotify_to_ytmusic/games-src/nightrun/parts/'
 rd=lambda n:open(P+n,encoding='utf8').read()
 def rep(s,a,b,cnt=1):
@@ -15,8 +15,9 @@ dr=rep(dr,"const tele=l.t<.85;","const tele=l.t<2*BT.spb;")
 dr=rep(dr,"ctx.strokeStyle=Math.floor(l.t*14)%2?'#ff3040cc':'#ff304044';","ctx.strokeStyle=(SET.reduce||Math.floor(l.t*14)%2)?'#ff3040cc':'#ff304044';")
 dr=rep(dr,"e.hp<e.max*.5?'#ff3040':c","e.ph===3?'#ff3040':c")
 dr=rep(dr,"if(P.inv>0&&Math.floor(t*20)%2)return;","if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;")
-out=rd('head.html')+rd('a.js')+"\n"+rd('songs.js')+"\n"+bg+"\n"+b+"\n"+dr+"\n"+rd('garage.js')+"\n"+rd('shop.js')+"\n"+rd('fx.js')+"\n"+rd('power.js')+"\n"+rd('story.js')+"\n"+rd('athens.js')+"\n"+rd('dir.js')+"\n"+rd('upgrades.js')+"\n"+rd('up2.js')+"\n"+rd('athens2.js')+"\n"+rd('hud.js')+"\n"+rd('lagfix.js')+"\n"+rd('c.js')
-open('/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html','w',encoding='utf8').write(out)
+out=rd('head.html')+rd('a.js')+"\n"+rd('songs.js')+"\n"+bg+"\n"+b+"\n"+dr+"\n"+rd('garage.js')+"\n"+rd('shop.js')+"\n"+rd('fx.js')+"\n"+rd('power.js')+"\n"+rd('story.js')+"\n"+rd('athens.js')+"\n"+rd('dir.js')+"\n"+rd('upgrades.js')+"\n"+rd('up2.js')+"\n"+rd('athens2.js')+"\n"+rd('hud.js')+"\n"+rd('lagfix.js')+"\n"+rd('g.js')+"\n"+rd('c.js')
+OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
+open(OUT,'w',encoding='utf8').write(out)
 print(len(out))
 import subprocess
-subprocess.run(['python3','/home/user/spotify_to_ytmusic/games-src/scripts/stamp-copyright.py','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html'],check=True)
+if 'NR_OUT' not in os.environ:subprocess.run(['python3','/home/user/spotify_to_ytmusic/games-src/scripts/stamp-copyright.py',OUT],check=True)

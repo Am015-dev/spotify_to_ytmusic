@@ -5,6 +5,8 @@ let touch=null,touchFire=false;
 const stampOf=e=>(e&&e.timeStamp>0?e.timeStamp:performance.now());
 const QD={L:1,M:1.5,H:2};
 const PXB={L:.93e6,M:2.1e6,H:3.7e6};                   // backing-store budget in pixels (1280x720 / 1920x1080 / 2560x1440): a 4K or DPR-2 screen is not drawn at its full size, the browser scales the canvas up                              // quality setting -> highest pixel ratio
+// a phone is a phone from the first frame: waiting for the first touch to switch to the touch layout moved the buttons under the finger and the first tap was lost
+if(!touchUI&&(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)))touchUI=true;
 function fit(){
   const st=stage.getBoundingClientRect();if(st.width<2||st.height<2)return;
   const was=rotMode;rotMode=touchUI&&st.height>st.width*1.05;   // portrait: a vertical play area, ship at the bottom
@@ -115,8 +117,9 @@ const WAVES={
 };
 const eliteP=()=>ST.on?ST.el:Math.min(.55,Math.max(DF.el?.2+.1*G.pos:0,.09*Math.max(0,DIR.tierv()-2.2))+(DIR.has('guard')?.25:0));   // elites: from the third district on, more every district, plus the Elite Guard mutator
 const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
+const EBMAX=170,EBMAX_PHONE=95;                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
-function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
+function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=(touchUI||rotMode?EBMAX_PHONE:EBMAX))return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
 const aim=e=>Math.atan2(P.y-e.y,P.x-e.x);
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
 const fanN=n=>Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.on?0:Math.floor(TUNE2.loopFan*Math.min(3,G.loop))));
@@ -162,11 +165,11 @@ const healK=()=>(ST.on?ST.heal*TUNE2.stHeal:1)*DF.heal;
 function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false});const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);if(e.pf)tierGain(1,Math.round(bpos()),'kill',e.x,e.y);
   burst(e.x,e.y,D.a,e.type==='gunship'?50:22,e.type==='gunship'?380:260);burst(e.x,e.y,'#ffffff',8,160,.3);if(SET.calm)G.rings.push({x:e.x,y:e.y,l:.35,m:.35,c:D.a});AU.sfx('boom');
   const drop=(t,dx=0,dy=0)=>G.pk.push({t,x:e.x+dx,y:e.y+dy,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});
-  if(e.type==='drone'||e.type==='charger'||e.type==='flank'){if(GX()<.6+(SH.lk||0)*3||e.el)drop('shard');}
+  if(e.type==='drone'||e.type==='charger'||e.type==='flank'){if(GX()<.6+(SH.lk||0)*3||e.el)drop('shard');if(WP.canGain()&&GX()<.04)drop('up',10,-10);}
   else if(e.type==='swarm'){if(GX()<.25)drop('shard');}
   else if(e.type==='mine'){drop('shard');if(GX()<.2)drop('shard',6,6);}
-  else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GX()<.15)drop(P.wl<3?'up':'emp');}
-  else if(e.type==='gunship'){drop(P.wl<3&&GX()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
+  else if(e.type==='turret'){drop('shard',-8);drop('shard',8);if(GX()<.22)drop(WP.canGain()?'up':'emp');}
+  else if(e.type==='gunship'){drop(WP.canGain()&&GX()<.6?'up':'emp');for(let i=0;i<4;i++)drop('shard',rnd(-20,20),rnd(-20,20));}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
@@ -307,11 +310,11 @@ function update(dt){
       case'swarm':DIR.moveSwarm(e,sdt,d);break;
       case'mine':DIR.moveMine(e,sdt,d);break;
       case'boss':bossUpdate(e,sdt,d);break;}
-    if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+8){hurt();if(e.type!=='gunship')e.hp=0;}
+    if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+5){hurt();if(e.type!=='gunship')e.hp=0;}
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
   /* player bullets */
-  for(const b of G.pb){const hk=SH.hm||(SET.aim?.6:0);if(hk)SH.steer(b,sdt,hk);b.x+=b.vx*sdt;b.y+=b.vy*sdt;
+  for(const b of G.pb){const hk=Math.max(b.hk||0,SH.hm||(SET.aim?.6:0));if(hk)SH.steer(b,sdt,hk);b.x+=b.vx*sdt;b.y+=b.vy*sdt;
     for(const e of G.en){if(e.hp<=0||e.dying)continue;let hit=false;
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
@@ -343,7 +346,7 @@ function update(dt){
     if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');
       if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(2));G.score+=Math.round(50*G.mult*sk);}
       if(p.t==='hp'){P.hp=Math.min(P.max,P.hp+1);floater(P.x,P.y-24,'HULL +1','#3dffb0');}
-      if(p.t==='up'){P.wl=Math.min(3,P.wl+1);floater(P.x,P.y-24,'WEAPON LV'+P.wl,'#ff2d95');AU.sfx('up');}
+      if(p.t==='up'){WP.gain();AU.sfx('up');}
       if(p.t==='emp'){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');}
       if(p.t==='pw')NR.emit('pickup',p);}
     if(p.x<-30)p.dead=1;}
@@ -372,5 +375,5 @@ function bossDown(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:tr
   if(ST.on){ST.bossDown(e,pts);return;}
   banner('SEKTOR FREI',D.name+' cleared · +'+pts,false,3);G.transT=4.5;}
 function bossLoot(e){if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-80,vy:-40,bob:0});
-  G.pk.push({t:P.wl<3?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
+  G.pk.push({t:WP.canGain()?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});}

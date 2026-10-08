@@ -26,7 +26,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(112,by-8,90*P.heat/100,8);
   ctx.fillStyle='#8c86b8';ctx.fillText('DASH',214,by-14);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff1a';ctx.fillRect(214,by-8,36*(1-P.dashCd),8);
   ctx.fillStyle='#8c86b8';ctx.fillText('EMP',262,by-14);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(268+i*14,by-4,4.5,0,7);ctx.fill();}
-  ctx.fillStyle='#8c86b8';ctx.fillText('LV'+P.wl,312,by-2);
+  ctx.fillStyle='#8c86b8';WP.hud(ctx,312,by-2,1);
   tierMeter(W/2,H-8,1);
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(G.note.txt,W-18,H-12);ctx.globalAlpha=1;}
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle='#ffffff';ctx.fillText(G.hint.txt,W/2,H-62);ctx.globalAlpha=1;}
@@ -60,7 +60,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(hx,y,86*k*P.heat/100,9*k);
   const dx=hx+102*k;ctx.fillStyle='#8c86b8';ctx.fillText('DASH',dx,y-4*k);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff1a';ctx.fillRect(dx,y,40*k*(1-P.dashCd),9*k);
   const ex=dx+54*k;ctx.fillStyle='#8c86b8';ctx.fillText('EMP',ex,y-4*k);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(ex+5*k+i*15*k,y+4.5*k,4.5*k,0,7);ctx.fill();}
-  ctx.fillStyle='#8c86b8';ctx.fillText('LV'+P.wl,ex+52*k,y+9*k);
+  ctx.fillStyle='#8c86b8';WP.hud(ctx,ex+52*k,y+9*k,k);
   SH.hud(ctx,t,{nx:24*k,ny:112*k,dx:dx,dy:y+13*k,sx:14,sy:132*k,k:k});
   HUDX.ship(ctx,P.y,PH_-P.x,k,t);
   let ny=182*k;
@@ -90,7 +90,7 @@ function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierO
   for(const e of G.en)drawEnemy(e,t);
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
-  for(const b of G.pb){ctx.fillStyle=b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b;ctx.fillRect(b.x-10,b.y-1.5,b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16,b.big?(b.hv?10:4):3);G_(b.x,b.y,b.hv?26:b.big?12:8,b.pf?'#ffe14d':D.b,.6);}
+  for(const b of G.pb){ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);ctx.fillRect(b.x-10,b.y-(b.th||(b.big?4:3))/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),b.th||(b.big?(b.hv?10:4):3));G_(b.x,b.y,b.hv?26:b.big?12:8,b.pf?'#ffe14d':D.b,.6);}
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
   for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.c,.9);

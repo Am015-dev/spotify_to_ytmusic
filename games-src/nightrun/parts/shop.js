@@ -1,17 +1,17 @@
 /* ---------- Neon + pit stop: after every district a 10 s shop, upgrades stack for the rest of the run ---------- */
 const UPG=[
-  {id:'fr',n:'Rapid Fire',t:'Extra off-beat shots',p:28,max:3,c:'#ffe14d',ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z'},
-  {id:'dc',n:'Spare Dash',t:'+1 dash charge',p:34,max:2,c:'#19e3ff',ic:'M2 10h11V5l9 7-9 7v-5H2z'},
-  {id:'mg',n:'Magnet',t:'Pickups fly to you from farther',p:20,max:3,c:'#3dffb0',ic:'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z'},
-  {id:'sh',n:'Shield',t:'Absorbs the next hit',p:38,max:3,c:'#19e3ff',ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z'},
-  {id:'lp',n:'Long Power',t:'Power-ups last 50% longer',p:26,max:2,c:'#ff2d95',ic:'M13 2L4 14h6l-1 8 9-12h-6z',ok:()=>!!NR.timed},
-  {id:'wd',n:'Wide Beat',t:'On-beat window 20 ms wider',p:26,max:2,c:'#ffe14d',ic:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z'},
-  {id:'hm',n:'Homing',t:'Shots curve toward enemies',p:38,max:3,c:'#ff2d95',ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14 7 7 0 010-14zm0 4a3 3 0 100 6 3 3 0 000-6z'},
-  {id:'ck',n:'Tier Keeper',t:'Tier lasts 4 beats longer',p:22,max:3,c:'#ffb020',ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'},
+  {id:'fr',n:'Rapid Fire',t:'Extra off-beat shots',p:28,max:5,c:'#ffe14d',ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z'},
+  {id:'dc',n:'Spare Dash',t:'+1 dash charge',p:34,max:5,c:'#19e3ff',ic:'M2 10h11V5l9 7-9 7v-5H2z'},
+  {id:'mg',n:'Magnet',t:'Pickups fly to you from farther',p:20,max:5,c:'#3dffb0',ic:'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z'},
+  {id:'sh',n:'Shield',t:'Absorbs the next hit',p:38,max:5,c:'#19e3ff',ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z'},
+  {id:'lp',n:'Long Power',t:'Power-ups last 30% longer',p:26,max:5,c:'#ff2d95',ic:'M13 2L4 14h6l-1 8 9-12h-6z',ok:()=>!!NR.timed},
+  {id:'wd',n:'Wide Beat',t:'On-beat window 14 ms wider',p:26,max:5,c:'#ffe14d',ic:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z'},
+  {id:'hm',n:'Homing',t:'Shots curve toward enemies',p:38,max:5,c:'#ff2d95',ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14 7 7 0 010-14zm0 4a3 3 0 100 6 3 3 0 000-6z'},
+  {id:'ck',n:'Tier Keeper',t:'Tier lasts 4 beats longer',p:22,max:5,c:'#ffb020',ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'},
   // extras: only in the pool once bought in the garage
-  {id:'db',n:'Dash Blast',t:'Dashing hurts enemies you pass',p:34,max:2,c:'#ff5a3d',x:'up_db',ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z'},
-  {id:'sb',n:'Sharp Beat',t:'Gold pulse shots hit 50% harder',p:28,max:3,c:'#ffe14d',x:'up_sb',ic:'M12 1l9 11-9 11L3 12z'},
-  {id:'nx',n:'Neon Boost',t:'Kills drop 50% more Neon',p:22,max:2,c:'#19e3ff',x:'up_nx',ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z'}];
+  {id:'db',n:'Dash Blast',t:'Dashing hurts enemies you pass',p:34,max:5,c:'#ff5a3d',x:'up_db',ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z'},
+  {id:'sb',n:'Sharp Beat',t:'Gold pulse shots hit 30% harder',p:28,max:5,c:'#ffe14d',x:'up_sb',ic:'M12 1l9 11-9 11L3 12z'},
+  {id:'nx',n:'Neon Boost',t:'Kills drop 30% more Neon',p:22,max:5,c:'#19e3ff',x:'up_nx',ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z'}];
 const UBY={};for(const u of UPG)UBY[u.id]=u;
 const PIT_SECS=10,PIT_LOCK=.6;
 const NEON_K=.04;                                         // Neon per kill: districts last as long as their song now (3 to 5 minutes), so a kill pays much less than it did
@@ -25,15 +25,15 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     this.sh=0;this.spare=0;this.rch=0;this.prevCur=-1;this.tk=false;this.ship=GA.ship;this.recalc();shopEl.hidden=true;},
   n(id){return this.got[id]||0;},
   recalc(){const n=id=>this.n(id);
-    NR.mod.mag=140+70*n('mg');NR.mod.win=20*n('wd');NR.mod.pw=1+.5*n('lp');
-    this.ck=4*n('ck');this.hm=n('hm');this.sharp=1+.5*n('sb');this.nx=1+.5*n('nx');this.dmax=n('dc');this.db=n('db');this.fr=Math.pow(.8,n('fr'));},
+    NR.mod.mag=140+70*n('mg');NR.mod.win=14*n('wd');NR.mod.pw=1+.3*n('lp');
+    this.ck=4*n('ck');this.hm=n('hm');this.sharp=1+.3*n('sb');this.nx=1+.3*n('nx');this.dmax=n('dc');this.db=n('db');this.fr=Math.pow(.8,n('fr'));},
   // ----- Neon -----
   award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx*NEON_K;   // on-beat kills pay 1.5x, combos add up to +3
     const n=Math.floor(this.acc);if(n<1)return;this.acc-=n;this.neon+=n;this.earned+=n;this.flash=.35;if(n>=3)floater(e.x+14,e.y+8,'+'+n+' NEON','#19e3ff');},
   bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
   // ----- pit stop -----
-  price(u){return Math.round(u.p*(1+.3*this.n(u.id)));},
+  price(u){return Math.round(u.p*(1+.45*this.n(u.id)));},
   rerollPrice(){return 8+6*this.rerolls;},
   pool(){return UPG.filter(u=>this.n(u.id)<u.max&&(!u.x||GA.own[u.x])&&(!u.ok||u.ok()));},
   deal(){const pool=this.pool(),out=[];while(out.length<3&&pool.length){out.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}
@@ -85,11 +85,12 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
   dmk(){const s=this.ship,old=Math.max(.09,BT.spb/6);return s==='std'?Math.min(2,this.gridStep()*BT.spb/old):s==='ec'?Math.min(2,this.gridStep()*BT.spb/Math.max(.12,old*2)):1;},
   shot(){const s=this.ship,sec=this.gridStep()*BT.spb,cd0=Math.max(.09,BT.spb/6);       // heat per shot follows the interval, so heat per second stays about the same for every ship
     return{heat:s==='hv'?6:.7*1.65*sec/cd0};},
-  extra(cell,gs){const n=this.n('fr');if(!n||this.ship==='hv'||cell%(n===1?4:n===2?2:1))return;                  // Rapid Fire: an extra shot half a cell later, so it lands off the grid
-    G.delayed.push({t:gs*BT.spb/2,f:()=>{if(G.dead||!running||P.over)return;this.volley(P.x+22,P.y+2,0);}});},
+  extra(cell,gs){const n=this.n('fr');if(!n||this.ship==='hv')return;                                  // Rapid Fire: an extra shot half a cell later, so it lands off the grid; LV4 and LV5 add a quarter-cell shot each
+    const go=t=>G.delayed.push({t:gs*BT.spb*t,f:()=>{if(G.dead||!running||P.over)return;this.volley(P.x+22,P.y+2,0);}});
+    if(!(cell%(n===1?4:n===2?2:1)))go(.5);if(n>=4)go(.25);if(n>=5)go(.75);},
   volley(x,y,pf){const s=this.ship;
     const mk=(xx,yy,dm,ec)=>{const std=(vx,vy,d,o)=>G.pb.push(Object.assign({x:xx,y:yy,vx,vy,dm:d*dm*this.dmk(),pf,ec},o));
-      std(900,0,1,{y:yy-5});std(900,0,1,{y:yy+5});if(P.wl>=2){std(860,-150,1);std(860,150,1);}if(P.wl>=3)std(980,0,2,{big:1});
+      std(900,0,1,{y:yy-5});std(900,0,1,{y:yy+5});WP.shots(std,pf);
       if(s==='tri'){std(900,-80,1);std(900,80,1);}};
     if(s==='hv'){G.pb.push({x,y,vx:780,vy:0,dm:14+4*(P.wl-1),pf,big:1,hv:1,rad:12,px:new Set()});return;}
     mk(x,y,1,0);

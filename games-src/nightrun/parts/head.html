@@ -88,6 +88,9 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
 @media (max-height:520px){#setm .card h2{padding:8px 18px 4px;font-size:18px}#setm .sbody{padding:0 18px 4px}#setm h3{margin:8px 0 2px}#setm .sfoot{padding:6px 18px}}
 html.hc #stage{filter:contrast(1.08)}
 #mini{position:absolute;z-index:4;left:0;right:0;bottom:2px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--dim);pointer-events:none}
+/* the title buttons stay invisible (so nothing can be tapped while they still move or have no handler) until the script has built the page and the layout has settled: html.rdy, see parts/g.js; the animation is the fallback if the script never gets there */
+html:not(.rdy) #title .row{visibility:hidden;animation:rdyShow 0s 6s forwards}
+@keyframes rdyShow{to{visibility:visible}}
 @media (prefers-reduced-motion:reduce){h1{text-shadow:none}}
 </style></head><body>
 
