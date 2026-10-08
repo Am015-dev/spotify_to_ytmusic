@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Share+Tech+Mono&display=swap">
 <style>
-/* One full-bleed 16:9 arcade screen, letterboxed. On a touch phone held upright it turns sideways to fill the screen. HTML overlays for menus. */
+/* One full-bleed arcade screen: 16:9 letterboxed, or on a touch phone held upright a true portrait screen (vertical play area, ship at the bottom). HTML overlays for menus. */
 :root{
   --void:#05030c; --ink:#e9e6ff; --dim:#8c86b8;
   --pink:#ff2d95; --cyan:#19e3ff; --amber:#ffb020; --strip:0px;
@@ -16,8 +16,7 @@
 html,body{height:100%;margin:0;background:var(--void);color:var(--ink);overflow:hidden;font:14px var(--display);
   -webkit-user-select:none;user-select:none;touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}
 #stage{position:fixed;inset:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);overflow:hidden;}
-#frame{position:absolute;left:50%;top:calc((100% - var(--strip))/2);width:960px;height:540px;transform:translate(-50%,-50%);box-shadow:0 0 0 1px #2a1840,0 0 60px #ff2d9522;}
-#frame.rot{transform:translate(-50%,-50%) rotate(90deg);}
+#frame{position:absolute;left:calc(50% + var(--shift,0px));top:calc((100% - var(--strip))/2);width:960px;height:540px;transform:translate(-50%,-50%);box-shadow:0 0 0 1px #2a1840,0 0 60px #ff2d9522;}
 canvas{display:block;width:100%;height:100%;}
 .ov{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:flex-start;padding:10px 7%;overflow-y:auto;overflow-x:hidden;
   background:linear-gradient(90deg,#05030cf2 0%,#05030cc0 55%,#05030c40 100%);}
@@ -45,14 +44,49 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
 .set label.chk{grid-column:1/-1;display:flex;gap:10px;align-items:center;min-height:34px}
 .set input[type=checkbox]{width:22px;height:22px;accent-color:var(--pink)}
 .set .v{color:var(--amber);text-align:right}
-#touch{position:absolute;z-index:4;right:10px;bottom:10px;display:flex;gap:10px;align-items:center;}
-#touch button{width:clamp(54px,9vw,78px);aspect-ratio:1;border-radius:50%;border:2px solid var(--cyan);background:#19e3ff1c;padding:0;
+#touch{position:absolute;z-index:4;right:10px;bottom:10px;display:flex;gap:10px;align-items:center;--bs:clamp(54px,9vw,78px);}
+#stage.ds-S #touch{--bs:clamp(44px,7vw,60px)}
+#stage.ds-L #touch{--bs:clamp(68px,11vw,100px)}
+#stage.tl #touch{right:auto;left:10px;flex-direction:row-reverse}
+#touch button{width:var(--bs);aspect-ratio:1;border-radius:50%;border:2px solid var(--cyan);background:#19e3ff1c;padding:0;
   color:var(--cyan);font-family:var(--display);font-weight:700;font-size:clamp(11px,1.6vw,14px);letter-spacing:.08em;touch-action:none;}
 #touch button#bEmp{border-color:var(--amber);color:var(--amber);background:#ffb0201c;}
 #touch button#bPause{width:44px;height:44px;border-radius:10px;border-color:#8c86b8;color:var(--ink);background:#ffffff10;font-size:16px;letter-spacing:0}
+/* portrait: the buttons sit in a strip under the play area, or in a column beside it when that leaves the bigger screen */
 #stage.p #touch{left:0;right:0;bottom:0;height:var(--strip);justify-content:center;gap:22px}
-#stage.p #touch button{width:62px}
+#stage.p.tl #touch{flex-direction:row}
+#stage.p #touch button{width:min(var(--bs),62px)}
+#stage.p.ds-L #touch button{width:min(var(--bs),76px)}
 #stage.p #touch button#bPause{width:44px}
+#stage.p.sd #touch{top:0;bottom:0;right:0;left:auto;width:80px;height:auto;flex-direction:column;justify-content:center;gap:16px}
+#stage.p.sd.tl #touch{left:0;right:auto;flex-direction:column}
+#stage.p.sd #touch button{width:60px}
+#stage.p.sd #touch button#bPause{width:44px}
+#fpsEl{position:absolute;z-index:6;left:50%;top:2px;transform:translateX(-50%);font:11px var(--mono);color:#3dffb0;pointer-events:none;text-shadow:0 0 4px #000}
+/* settings: one card in Overdrive's look (dark panel, cyan edge, yellow group headings, pill segments) */
+#setm{align-items:center;justify-content:center;padding:8px}
+#setm .card{--panel:rgba(3,16,32,.96);--edge:#2f9cbc;--yel:#ffd23d;width:min(640px,100%);max-height:100%;box-sizing:border-box;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--edge);border-radius:12px;box-shadow:0 0 55px rgba(0,168,255,.18);overflow:hidden}
+#setm .card h2{margin:0;padding:12px 22px 8px;font:italic 900 24px/1 var(--display);letter-spacing:.04em}
+#setm .sbody{overflow-y:auto;overflow-x:hidden;padding:0 22px 8px;display:flex;flex-direction:column;gap:5px;touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#setm .sbody>*{flex:none}
+#setm h3{margin:12px 0 4px;font:italic 900 14px var(--display);letter-spacing:.12em;color:var(--yel);border-bottom:1px solid rgba(47,156,188,.35);padding-bottom:5px;text-transform:uppercase}
+#setm .seg,#setm .sl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:36px}
+#setm .seg>span,#setm .sl>span{font:italic 800 11px var(--display);letter-spacing:.14em;color:#8fb3c7;width:112px;flex:none;text-transform:uppercase}
+#setm .seg button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:0 12px;min-height:34px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#0a2437;border:1px solid #28627a;color:#cfe6f5}
+#setm .seg button[aria-pressed="true"]{background:linear-gradient(90deg,#00c8ee,#8c55ff);border-color:transparent;color:#021018}
+#setm .seg button:focus-visible,#setm .go:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+#setm .sl input{flex:1;min-width:90px;min-height:34px;accent-color:#00dfff;touch-action:pan-x}
+#setm .sl output{font:800 12px var(--mono);width:64px;text-align:right;color:var(--yel)}
+@media (max-width:520px){#setm .seg>span{width:100%}#setm .sl>span{width:84px}#setm .sl output{width:54px}#setm .sbody{padding:0 14px 6px}#setm h2{padding-left:14px!important}}
+#setm .sfoot{display:flex;gap:10px;padding:10px 22px 12px;border-top:1px solid rgba(76,234,255,.25);background:var(--panel)}
+#calBox{display:none;flex-direction:column;gap:6px;padding:8px 10px;border:1px solid #28627a;border-radius:8px;background:#06121e}
+#calBox.on{display:flex}
+#calPad{all:unset;box-sizing:border-box;cursor:pointer;min-height:84px;border-radius:10px;border:2px solid #00c8ee;background:#00c8ee18;color:#cfe6f5;font:italic 900 18px var(--display);letter-spacing:.1em;display:flex;align-items:center;justify-content:center;text-align:center;touch-action:none}
+#calPad.beat{background:#00c8ee66}
+#calInfo{font:12px var(--mono);color:#8fb3c7;min-height:1.4em}
+#calPips{display:flex;gap:6px}#calPips i{flex:1;height:8px;border-radius:4px;background:#ffffff1c}#calPips i.on{background:#00dfff}
+@media (max-height:520px){#setm .card h2{padding:8px 18px 4px;font-size:18px}#setm .sbody{padding:0 18px 4px}#setm h3{margin:8px 0 2px}#setm .sfoot{padding:6px 18px}}
+html.hc #stage{filter:contrast(1.08)}
 #mini{position:absolute;z-index:4;left:0;right:0;bottom:2px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--dim);pointer-events:none}
 @media (prefers-reduced-motion:reduce){h1{text-shadow:none}}
 </style></head><body>
@@ -66,12 +100,12 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
     <p class="lede">Fly stolen data across the skyline.</p>
     <div class="keys">
       <b class="kb">WASD / ←↑↓→</b><span class="kb">fly</span>
-      <b class="kb">SPACE / J</b><span class="kb">fire. Tap it on the beat</span>
-      <b class="kb">SHIFT / K</b><span class="kb">dash. Hit the beat for PERFECT</span>
+      <b class="kb">SPACE / J</b><span class="kb">fire (the ship also fires itself)</span>
+      <b class="kb">SHIFT / K</b><span class="kb">dash on the pulse to power up</span>
       <b class="kb">X / L</b><span class="kb">EMP: wipes every bullet</span>
       <b class="kb">P · M</b><span class="kb">pause · mute</span>
-      <b class="tc">DRAG</b><span class="tc">fly. Auto-fire</span>
-      <b class="tc">DASH</b><span class="tc">tap on the beat: PERFECT</span>
+      <b class="tc">DRAG</b><span class="tc">fly. The ship fires itself</span>
+      <b class="tc">DASH</b><span class="tc">dash on the pulse to power up</span>
       <b class="tc">EMP</b><span class="tc">wipes every bullet</span>
     </div>
     <div class="stat" id="bestT"></div>
@@ -90,18 +124,11 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
     <h1>PAUSE</h1>
     <div class="row"><button class="go" id="resumeBtn">RESUME</button><button class="go alt" id="restartBtn">RESTART</button><button class="go dim" id="pSetBtn">SETTINGS</button><button class="go dim" id="quitBtn">TITLE</button></div>
   </div></div>
-  <div id="setm" class="ov solid" hidden><div class="in">
-    <div class="eyebrow">Settings</div>
-    <div class="set">
-      <label for="sMusic">Music</label><input type="range" id="sMusic" min="0" max="100" step="5"><span class="v" id="vMusic"></span>
-      <label for="sSfx">Effects</label><input type="range" id="sSfx" min="0" max="100" step="5"><span class="v" id="vSfx"></span>
-      <label for="sSync">Audio sync</label><input type="range" id="sSync" min="-150" max="150" step="5"><span class="v" id="vSync"></span>
-      <label class="chk"><input type="checkbox" id="sReduce"> Reduced flashing</label>
-      <label class="chk"><input type="checkbox" id="sCalm"> Calm visuals (fewer sparks)</label>
-      <label class="chk"><input type="checkbox" id="sGuide"> Beat ring around ship</label>
-      <label class="chk"><input type="checkbox" id="sMute"> Mute all</label>
-    </div>
-    <div class="row"><button class="go" id="setBack">BACK</button></div>
+  <div id="setm" class="ov solid" hidden><div class="card" role="dialog" aria-label="Settings">
+    <h2>SETTINGS</h2>
+    <div class="sbody" id="setBody"></div>
+    <div class="sfoot"><button class="go" id="setBack" type="button">DONE</button><button class="go dim" id="setDef" type="button">DEFAULTS</button></div>
   </div></div>
+  <div id="fpsEl" hidden></div>
   <div id="touch" hidden><button id="bPause" aria-label="Pause">II</button><button id="bDash">DASH</button><button id="bEmp">EMP</button></div>
 </div>

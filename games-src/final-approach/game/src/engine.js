@@ -88,12 +88,20 @@ function newGame(o) {
   mods.fuel = mods.kero || mods.leak;
   const tr = D.tracks[sc.trk];
   mods.tabs = tr.sp.some(s => s[2]); mods.traffic = tr.sp.some(s => s[1] > 0);
-  const G = { v: 1, seed, rng: seed, sid: sc.id, tk: sc.trk, alt: sc.alt, row0: 0, mods, abil: lad ? [] : cleanAbil(o.abil, sc), lad, open: !!lad, nd: lad ? LADND[lad] : 4, autoBrake: lad >= 2 && lad <= 4 ? 6 : 0, names: (o.names || ['Captain Marlow', 'First Officer Okoro']).slice(0, 2), ai: o.ai ? o.ai.slice(0, 2) : [null, null],
+  const G = { v: 1, seed, rng: seed, sid: sc.id, tk: sc.trk, alt: sc.alt, row0: lad ? 0 : Math.max(0, Math.min(D.rounds - 2, o.row0 | 0)), mods, abil: lad ? [] : cleanAbil(o.abil, sc), lad, open: !!lad, nd: lad ? LADND[lad] : 4, autoBrake: lad >= 2 && lad <= 4 ? 6 : 0, names: (o.names || ['Captain Marlow', 'First Officer Okoro']).slice(0, 2), ai: o.ai ? o.ai.slice(0, 2) : [null, null],
     round: 0, phase: 'brief', first: 0, turn: 0, ready: [false, false], say: [[], []],
     pl: { axis: 0, aeroB: 4, aeroO: 8, pos: 1, kero: D.keroStart, wind: D.windStart, ice: 0, sw: { lg: [0, 0, 0], fl: [0, 0, 0, 0], br: [0, 0, 0] } },
     planes: tr.sp.map(s => s[0]), coffee: 0, rrHand: 0, rrTaken: -1,
     dice: [[], []], slots: {}, keys: lad ? ladKeys(lad, mods) : slotKeys(mods), pend: null, fl: { antic: false, sync: false, wt: false, keroUsed: false }, adaptUsed: [false, false],
     intern: [], internUsed: 0, speed: -1, landSpeed: -1, result: null, log: [], logN: 0, events: [], evN: 0, used: {}, nolog: false };
+  // the staged tutorial flight (UI part 12): a short flight cut from the end of the real game, with some switches already set, a reroll token in hand,
+  // made-up dice (G.script) and made-up reroll results (G.rrScript) so that every control has a die to teach with
+  if (!lad && o.pre) {
+    const q = o.pre; for (const g of ['lg', 'fl', 'br']) if (q[g]) G.pl.sw[g] = q[g].slice(0, G.pl.sw[g].length).map(x => x ? 1 : 0);
+    G.pl.aeroB = 4 + G.pl.sw.lg.reduce((a, b) => a + b, 0); G.pl.aeroO = 8 + G.pl.sw.fl.reduce((a, b) => a + b, 0);
+    if (q.rr) G.rrHand = Math.min(q.rr | 0, D.rerollTotal); if (q.coffee) G.coffee = Math.min(q.coffee | 0, D.coffeeMax);
+    if (Array.isArray(q.script)) G.script = q.script; if (Array.isArray(q.rrScript)) G.rrScript = q.rrScript;
+  }
   if (lad === 5) G.pl.sw.br[0] = 1;
   if (lad === 6) G.coffee = 2;   // the check ride starts with two coffee tokens so the new idea can be tried at once   // chapter 5 starts with the brakes at 2: you bring them up to 4 and 6 for a faster landing
   for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) G.dice[s].push({ v: 1, u: true });
@@ -362,7 +370,7 @@ function performMove(G, m, seat, trust) {
       const mask = m.m.map((b, i) => !!b && !G.dice[seat][i].u); G.pend.d.m[seat] = mask; ev(G, { t: 'rrdone', seat });
       if (G.pend.d.m[0] && G.pend.d.m[1]) {
         const n = [0, 0];
-        for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) if (G.pend.d.m[s][i]) { G.dice[s][i].v = d6(G); n[s]++; }
+        for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) if (G.pend.d.m[s][i]) { G.dice[s][i].v = d6(G); n[s]++; if (G.rrScript && G.rrScript[s] && G.rrScript[s][i]) G.dice[s][i].v = G.rrScript[s][i]; }
         ev(G, { t: 'reroll', n }); lg(G, 'Rerolled: Pilot ' + n[0] + ' dice, Co-pilot ' + n[1] + ' dice.'); G.pend = null;
       }
       break;
@@ -396,7 +404,7 @@ function same(a, b) {
 // ---------- hidden information ----------
 // What a seat may know: its own dice values, everything public (slots, tracks, tokens, who has dice left, who has chosen a reroll).
 function stripView(G, seat) {
-  const V = clone(G); V.rng = 0; V.seed = 0; delete V.script;
+  const V = clone(G); V.rng = 0; V.seed = 0; delete V.script; delete V.rrScript;
   if (!G.open) for (let s = 0; s < 2; s++) if (s !== seat) { for (const d of V.dice[s]) d.v = 0; }
   if (V.pend && V.pend.h === 'rr') V.pend.d.m = V.pend.d.m.map((m, s) => s === seat ? m : (m ? [] : null));
   if (V.pend && V.pend.h === 'wt' && V.pend.d.a !== seat) V.pend.d.ai = -1;

@@ -29,6 +29,7 @@ FA.DATA = {
   tracks: {
     "tut-a": {"size":5,"sp":[[0,0,null],[0,0,null],[0,0,null],[0,0,null],[0,0,null]]},
     "tut-b": {"size":6,"sp":[[0,0,null],[0,0,null],[1,0,null],[0,0,null],[1,0,null],[0,0,null]]},
+    "tut-c": {"size":3,"sp":[[0,0,null],[1,0,null],[0,0,null]]},
     "pad-g": {"size":7,"sp":[[0,0,null],[0,0,null],[1,0,null],[2,0,null],[1,0,null],[3,0,null],[2,0,null]]},
     "fox-g": {"size":6,"sp":[[0,1,null],[1,0,null],[1,1,null],[2,0,null],[2,1,null],[2,0,null]]},
     "sea-g": {"size":8,"sp":[[0,2,null],[1,0,null],[1,0,[-1,0]],[2,0,null],[1,0,[-2,-1]],[0,0,[-2,-1,0]],[2,0,null],[1,0,null]]},
@@ -56,6 +57,7 @@ FA.DATA = {
     {"id":"t2","lad":2,"ap":"pad","col":"green","trk":"tut-a","alt":"tu","mods":[],"ab":0,"title":"Speed and the runway","text":"Add the engines: fly the approach and stop on the airport."},
     {"id":"t3","lad":3,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Clear the way","text":"Add the radio: send planes away before you reach them."},
     {"id":"t4","lad":4,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Wheels and flaps","text":"Add landing gear and flaps: both must be down to land."},
+    {"id":"tt","lad":0,"ap":"pad","col":"green","trk":"tut-c","alt":"gy","mods":[],"ab":0,"title":"Tutorial flight","text":"A short flight cut from the end of a real one: the last two rounds, with some switches already set."},
     {"id":"t5","lad":5,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Brakes","text":"Add the brakes: they set how fast you may touch down."}
   ],
   airports: {

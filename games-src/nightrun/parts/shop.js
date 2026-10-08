@@ -1,16 +1,16 @@
 /* ---------- Neon + pit stop: after every district a 10 s shop, upgrades stack for the rest of the run ---------- */
 const UPG=[
-  {id:'fr',n:'Rapid Fire',t:'Shots fire 20% faster',p:28,max:3,c:'#ffe14d',ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z'},
+  {id:'fr',n:'Rapid Fire',t:'Extra off-beat shots',p:28,max:3,c:'#ffe14d',ic:'M3 5l9 7-9 7zM12 5l9 7-9 7z'},
   {id:'dc',n:'Spare Dash',t:'+1 dash charge',p:34,max:2,c:'#19e3ff',ic:'M2 10h11V5l9 7-9 7v-5H2z'},
   {id:'mg',n:'Magnet',t:'Pickups fly to you from farther',p:20,max:3,c:'#3dffb0',ic:'M5 3h5v9a2 2 0 004 0V3h5v9a7 7 0 01-14 0z'},
   {id:'sh',n:'Shield',t:'Absorbs the next hit',p:38,max:3,c:'#19e3ff',ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z'},
   {id:'lp',n:'Long Power',t:'Power-ups last 50% longer',p:26,max:2,c:'#ff2d95',ic:'M13 2L4 14h6l-1 8 9-12h-6z',ok:()=>!!NR.timed},
-  {id:'wd',n:'Wide Beat',t:'PERFECT window 20 ms wider',p:26,max:2,c:'#ffe14d',ic:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z'},
+  {id:'wd',n:'Wide Beat',t:'On-beat window 20 ms wider',p:26,max:2,c:'#ffe14d',ic:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z'},
   {id:'hm',n:'Homing',t:'Shots curve toward enemies',p:38,max:3,c:'#ff2d95',ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14 7 7 0 010-14zm0 4a3 3 0 100 6 3 3 0 000-6z'},
-  {id:'ck',n:'Combo Keeper',t:'Combo lasts 4 beats longer',p:22,max:3,c:'#ffb020',ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'},
+  {id:'ck',n:'Tier Keeper',t:'Tier lasts 4 beats longer',p:22,max:3,c:'#ffb020',ic:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'},
   // extras: only in the pool once bought in the garage
   {id:'db',n:'Dash Blast',t:'Dashing hurts enemies you pass',p:34,max:2,c:'#ff5a3d',x:'up_db',ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z'},
-  {id:'sb',n:'Sharp Beat',t:'PERFECT shots hit 50% harder',p:28,max:3,c:'#ffe14d',x:'up_sb',ic:'M12 1l9 11-9 11L3 12z'},
+  {id:'sb',n:'Sharp Beat',t:'Gold pulse shots hit 50% harder',p:28,max:3,c:'#ffe14d',x:'up_sb',ic:'M12 1l9 11-9 11L3 12z'},
   {id:'nx',n:'Neon Boost',t:'Kills drop 50% more Neon',p:22,max:2,c:'#19e3ff',x:'up_nx',ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z'}];
 const UBY={};for(const u of UPG)UBY[u.id]=u;
 const PIT_SECS=10,PIT_LOCK=.6;
@@ -27,7 +27,7 @@ const SH={UPG,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:
     NR.mod.mag=140+70*n('mg');NR.mod.win=20*n('wd');NR.mod.pw=1+.5*n('lp');
     this.ck=4*n('ck');this.hm=n('hm');this.sharp=1+.5*n('sb');this.nx=1+.5*n('nx');this.dmax=n('dc');this.db=n('db');this.fr=Math.pow(.8,n('fr'));},
   // ----- Neon -----
-  award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,Math.floor(C.n/5));this.acc=(this.acc||0)+v*this.nx;   // on-beat kills pay 1.5x, combos add up to +3
+  award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx;   // on-beat kills pay 1.5x, combos add up to +3
     const n=Math.floor(this.acc);if(n<1)return;this.acc-=n;this.neon+=n;this.earned+=n;this.flash=.35;if(n>=3)floater(e.x+14,e.y+8,'+'+n+' NEON','#19e3ff');},
   bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
@@ -73,34 +73,38 @@ const SH={UPG,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:
     if(dn&&this.db){const dm=5*this.db;for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
   absorb(){if(this.sh>0){this.sh--;P.inv=1.3;shake(8);G.flash=Math.max(G.flash,.12*FX());burst(P.x,P.y,'#19e3ff',26,320,.5);floater(P.x,P.y-24,'SHIELD','#19e3ff');AU.sfx('hurt');
       return true;}return false;},
-  steer(b,dt){let best=null,bd=1e9;for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.x<b.x-10||e.x>W+10)continue;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd&&d<420){bd=d;best=e;}}
+  steer(b,dt,k){k=k||this.hm;let best=null,bd=1e9;for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.x<b.x-10||e.x>W+10)continue;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd&&d<420){bd=d;best=e;}}
     if(!best)return;const sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx);let want=Math.atan2(best.y-b.y,best.x-b.x)-cur;want=Math.atan2(Math.sin(want),Math.cos(want));
-    const a=cur+clamp(want,-dt*2.2*this.hm,dt*2.2*this.hm);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;},
+    const a=cur+clamp(want,-dt*2.2*k,dt*2.2*k);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;},
   // ----- weapon rhythms: the garage ships -----
-  canFire(){return this.tk;},
-  shot(){const cd0=Math.max(.09,BT.spb/6),base=cd0*this.fr,s=this.ship;       // heat per shot follows the interval, so heat per second stays what the Courier has
-    if(s==='tri')return{cd:.02,heat:1.65*(BT.spb/3)/cd0};
-    if(s==='hv')return{cd:.02,heat:6};
-    if(s==='ec'){const cd=Math.max(.12,base*2);return{cd,heat:1.65*cd/cd0};}
-    const cd=Math.max(.06,base);return{cd,heat:1.65*cd/cd0};},
+  // the grid the ship shoots on, in beats: Courier a 16th, Echo an 8th, Triplet a third of a beat, Heavy every second beat
+  gridStep(){const s=this.ship;return s==='tri'?1/3:s==='hv'?2:s==='ec'?1/2:1/4;},
+  // damage per shot makes up for the grid being slower than the old free-running fire (same damage per second at every tempo)
+  dmk(){const s=this.ship,old=Math.max(.09,BT.spb/6);return s==='std'?Math.min(2,this.gridStep()*BT.spb/old):s==='ec'?Math.min(2,this.gridStep()*BT.spb/Math.max(.12,old*2)):1;},
+  shot(){const s=this.ship,sec=this.gridStep()*BT.spb,cd0=Math.max(.09,BT.spb/6);       // heat per shot follows the interval, so heat per second stays about the same for every ship
+    return{heat:s==='hv'?6:.7*1.65*sec/cd0};},
+  extra(cell,gs){const n=this.n('fr');if(!n||this.ship==='hv'||cell%(n===1?4:n===2?2:1))return;                  // Rapid Fire: an extra shot half a cell later, so it lands off the grid
+    G.delayed.push({t:gs*BT.spb/2,f:()=>{if(G.dead||!running||P.over)return;this.volley(P.x+22,P.y+2,0);}});},
   volley(x,y,pf){const s=this.ship;
-    const mk=(xx,yy,dm,ec)=>{const std=(vx,vy,d,o)=>G.pb.push(Object.assign({x:xx,y:yy,vx,vy,dm:d*dm,pf,ec},o));
+    const mk=(xx,yy,dm,ec)=>{const std=(vx,vy,d,o)=>G.pb.push(Object.assign({x:xx,y:yy,vx,vy,dm:d*dm*this.dmk(),pf,ec},o));
       std(900,0,1,{y:yy-5});std(900,0,1,{y:yy+5});if(P.wl>=2){std(860,-150,1);std(860,150,1);}if(P.wl>=3)std(980,0,2,{big:1});
       if(s==='tri'){std(900,-80,1);std(900,80,1);}};
     if(s==='hv'){G.pb.push({x,y,vx:780,vy:0,dm:14+4*(P.wl-1),pf,big:1,hv:1,rad:12,px:new Set()});return;}
     mk(x,y,1,0);
     if(s==='ec'){G.delayed.push({t:BT.spb,f:()=>{if(G.dead||!running)return;mk(P.x+22,P.y+2,.8,1);AU.sfx('shot');}});}},
   // ----- HUD (canvas): Neon counter, upgrade icons, shield / dash pips -----
-  hud(c,t){const f=this.flash>0?1+this.flash:1;
-    c.save();c.translate(24,57);c.scale(.5*f,.5*f);c.translate(-12,-12);c.fillStyle='#19e3ff';c.fill(path2(NEON_D));c.restore();
-    c.save();c.font=`700 ${Math.round(13*f)}px "Share Tech Mono",monospace`;c.fillStyle=this.flash>0?'#ffffff':'#19e3ff';c.textAlign='left';c.fillText(String(this.neon),34,62);
-    let x=34+String(this.neon).length*8+10;
-    for(const id of this.order){const u=UBY[id];c.save();c.translate(x,50);c.scale(.55,.55);c.fillStyle=u.c;c.fill(path2(u.ic),'evenodd');c.restore();
-      if(this.n(id)>1){c.font='10px "Share Tech Mono",monospace';c.fillStyle='#fff';c.fillText(this.n(id),x+14,62);}x+=this.n(id)>1?25:19;}
+  ring(c,t){if(this.sh>0&&!G.dead){c.save();c.strokeStyle='#19e3ff';c.globalAlpha=.55+.25*Math.sin(t*6);c.lineWidth=2;c.beginPath();c.arc(P.x,P.y,26,0,7);c.stroke();c.restore();}},
+  // L: where the pieces go (landscape default or the portrait HUD)
+  hud(c,t,L){L=L||{nx:24,ny:57,dx:214,dy:H-30,sx:18,sy:H-34,ring:true};const f=this.flash>0?1+this.flash:1,k=L.k||1;
+    c.save();c.translate(L.nx,L.ny);c.scale(.5*f*k,.5*f*k);c.translate(-12,-12);c.fillStyle='#19e3ff';c.fill(path2(NEON_D));c.restore();
+    c.save();c.font=`700 ${Math.round(13*f*k)}px "Share Tech Mono",monospace`;c.fillStyle=this.flash>0?'#ffffff':'#19e3ff';c.textAlign='left';c.fillText(String(this.neon),L.nx+10*k,L.ny+5*k);
+    let x=L.nx+(10+String(this.neon).length*8+10)*k;
+    for(const id of this.order){const u=UBY[id];c.save();c.translate(x,L.ny-7*k);c.scale(.55*k,.55*k);c.fillStyle=u.c;c.fill(path2(u.ic),'evenodd');c.restore();
+      if(this.n(id)>1){c.font=`${Math.round(10*k)}px "Share Tech Mono",monospace`;c.fillStyle='#fff';c.fillText(this.n(id),x+14*k,L.ny+5*k);}x+=(this.n(id)>1?25:19)*k;}
     c.restore();
-    if(this.sh>0&&!G.dead){c.save();c.strokeStyle='#19e3ff';c.globalAlpha=.55+.25*Math.sin(t*6);c.lineWidth=2;c.beginPath();c.arc(P.x,P.y,26,0,7);c.stroke();c.restore();}
-    if(this.dmax){c.save();c.fillStyle='#19e3ff';for(let i=0;i<this.dmax;i++){c.globalAlpha=i<this.spare?1:.2;c.fillRect(214+i*10,H-30,7,3);}c.restore();}
-    if(this.sh>0){c.save();c.fillStyle='#19e3ff';c.font='11px "Share Tech Mono",monospace';c.fillText('SHIELD'+(this.sh>1?' ×'+this.sh:''),18,H-34);c.restore();}
+    if(L.ring)this.ring(c,t);
+    if(this.dmax){c.save();c.fillStyle='#19e3ff';for(let i=0;i<this.dmax;i++){c.globalAlpha=i<this.spare?1:.2;c.fillRect(L.dx+i*10*k,L.dy,7*k,3*k);}c.restore();}
+    if(this.sh>0){c.save();c.fillStyle='#19e3ff';c.font=`${Math.round(11*k)}px "Share Tech Mono",monospace`;c.fillText('SHIELD'+(this.sh>1?' ×'+this.sh:''),L.sx,L.sy);c.restore();}
     HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;}
 };
 NR.on('kill',d=>SH.award(d.e));

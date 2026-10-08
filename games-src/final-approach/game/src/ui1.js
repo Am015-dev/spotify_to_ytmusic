@@ -65,7 +65,7 @@ function mayAct(s) {      // may this device make seat s's moves right now?
 const mySeatMoves = () => { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) ? FA.validMoves(G, v) : []; };
 function prefs() { try { const p = JSON.parse(localStorage.getItem('fa_prefs') || '{}'); Object.assign(UI.prefs, p.prefs || {}); if (p.speed) AIDELAY = p.speed; UI.won = p.won || {}; } catch (e) { } }
 function savePrefs() { try { localStorage.setItem('fa_prefs', JSON.stringify({ prefs: UI.prefs, speed: AIDELAY, won: UI.won })); } catch (e) { } }
-function saveGame() { try { if (G && !G.result && UI.mode !== 'net') { localStorage.setItem('fa_save', JSON.stringify({ G, mode: UI.mode, seat: UI.seat, holder: UI.holder, cfg: UI.cfg })); return true; } } catch (e) { } return false; }
+function saveGame() { try { if (G && !G.result && UI.mode !== 'net' && !(UI.cfg && UI.cfg.tutorial)) { localStorage.setItem('fa_save', JSON.stringify({ G, mode: UI.mode, seat: UI.seat, holder: UI.holder, cfg: UI.cfg })); return true; } } catch (e) { } return false; }
 function hasSave() { try { return !!localStorage.getItem('fa_save'); } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('fa_save'); } catch (e) { } }
 // ---------- derived numbers for the panel ----------
