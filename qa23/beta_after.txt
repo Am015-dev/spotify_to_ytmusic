@@ -1,0 +1,42 @@
+t 30 s {"st":"0:follow","tp":0,"vmax":134,"tv":94,"x":1636,"z":-22} 72s wall
+t 60 s {"st":"0:follow","tp":0,"vmax":134,"tv":94,"x":1191,"z":-178} 127s wall
+t 90 s {"st":"0:follow","tp":0,"vmax":134,"tv":94,"x":1056,"z":-488} 185s wall
+t 120 s {"st":"1:thieves","tp":0,"vmax":134,"tv":94,"x":452,"z":-374} 244s wall
+t 150 s {"st":"1:thieves","tp":0,"vmax":134,"tv":94,"x":248,"z":-742} 301s wall
+t 180 s {"st":"1:thieves","tp":0,"vmax":134,"tv":94,"x":127,"z":-893} 350s wall
+t 210 s {"st":"1:thieves","tp":0,"vmax":134,"tv":94,"x":114,"z":-956} 401s wall
+t 240 s {"st":"1:thieves","tp":0,"vmax":134,"tv":94,"x":-339,"z":-840} 450s wall
+t 270 s {"st":"1:thieves","tp":0,"vmax":134,"tv":94,"x":-473,"z":-836} 501s wall
+t 300 s {"st":"2:tail","tp":0,"vmax":134,"tv":94,"x":-260,"z":-708} 561s wall
+t 330 s {"st":"2:tail","tp":0,"vmax":148,"tv":94,"x":-630,"z":-603} 592s wall
+t 360 s {"st":"2:tail","tp":0,"vmax":148,"tv":94,"x":-861,"z":-402} 617s wall
+t 390 s {"st":"2:tail","tp":0,"vmax":148,"tv":94,"x":-395,"z":-131} 638s wall
+t 420 s {"st":"2:tail","tp":0,"vmax":148,"tv":94,"x":-50,"z":-126} 662s wall
+t 450 s {"st":"3:survive","tp":0,"vmax":148,"tv":94,"x":33,"z":-135} 689s wall
+t 480 s {"st":"3:survive","tp":0,"vmax":148,"tv":94,"x":-9,"z":-88} 710s wall
+t 510 s {"st":"4:driftzone","tp":0,"vmax":148,"tv":94,"x":-32,"z":-129} 734s wall
+MISSION END 31440 HOT DROP★★★NOT ENOUGH DRIFT · 0/420No stars this time · try again4/9 stages · 4.
+RESULT {"otp":60,"ydrop":[],"camj":3,"beta":true,"end":{"f":31440,"res":"HOT DROP★★★NOT ENOUGH DRIFT · 0/420No stars this time · try again4/9 stages · 4."},"gameSec":524,"teleports":0,"nan":0,"unstuck":0,"cp":[],"vmax":148,"truckMax":94,"vh":{"0":1597,"10":712,"20":1148,"30":3730,"40":6053,"50":5105,"60":3064,"70":2290,"80":1588,"90":1333,"100":1111,"110":1757,"120":1680,"130":183,"140":86},"stages":[{"f":1,"s":"0:follow","x":2064,"z":0},{"f":7039,"s":"1:thieves","x":451,"z":-378},{"f":16888,"s":"2:tail","x":-530,"z":-847},{"f":25606,"s":"3:survive","x":79,"z":-105},{"f":30027,"s":"4:driftzone","x":-17,"z":-140},{"f":31473,"s":"-","x":2,"z":-142}],"errs":[]}
+OTP {"f":9720,"who":"thief1","d":10.1,"distToCar":18,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":9721,"who":"thief1","d":10,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":11354,"who":"thief1","d":10.1,"distToCar":19,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":11355,"who":"thief1","d":10,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":11837,"who":"rammer3","d":6.2,"distToCar":96,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":11916,"who":"rammer3","d":7.2,"distToCar":66,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":12016,"who":"rammer3","d":9.6,"distToCar":16,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14400,"who":"thief2","d":10.1,"distToCar":19,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14401,"who":"thief2","d":10,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14997,"who":"thief2","d":10.2,"distToCar":19,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14998,"who":"thief2","d":9.9,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":25691,"who":"rammer4","d":6.4,"distToCar":127,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25692,"who":"rammer5","d":7.6,"distToCar":87,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25693,"who":"rammer6","d":5.5,"distToCar":165,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25769,"who":"rammer4","d":10.1,"distToCar":102,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25770,"who":"rammer5","d":4.8,"distToCar":72,"onScreen":true,"stage":"3:survive"}
+OTP {"f":25771,"who":"rammer6","d":6.8,"distToCar":172,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25847,"who":"rammer4","d":4.4,"distToCar":85,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25849,"who":"rammer6","d":6.8,"distToCar":184,"onScreen":false,"stage":"3:survive"}
+OTP {"f":25949,"who":"rammer4","d":4.6,"distToCar":79,"onScreen":false,"stage":"3:survive"}
+CAMJ {"f":16,"d":73.2,"stage":"0:follow","cs":false,"fade":true}
+CAMJ {"f":7039,"d":59.5,"stage":"1:thieves","cs":true,"fade":true}
+CAMJ {"f":7059,"d":59.9,"stage":"1:thieves","cs":false,"fade":true}
