@@ -31,3 +31,4 @@
 - Done in v88t: guide follow-ups (a) preselect part + colour (SB_pal, .sbNx outline), (b) panel max-height, (c) sb-onetap checklist item.
 - Next batch (standing order): JDM/tuner sets (76896 GT-R NISMO, 76901 GR Supra; verify online). F1 could get wider rear tyres if a wider wheel part is added.
 - Tests: `TPL=<id> node su/guide.js <url> su/guide_q` (prints pal), `TPLS=a,b node bc/garshot.js <url> dir`, `TPL=<id> node t4/g11drive.js <url> dir`.
+- 2026-10-08 23:40 UTC: reviewer PASS fb5571b8 (chip hidden in BUILD IT); out/v88t built on live v88q, pushed fe7a196b; DEPLOY sent to the coordinator. v88t DONE.
