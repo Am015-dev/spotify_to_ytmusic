@@ -42,6 +42,15 @@ Steer tab (`src/98d_drive24.js` `D24_shape`, free roam only; races and drifting 
 | `TUNE.stHold` / `TUNE.stRampFast` Hold = turn | 0.15 s / 0 (off) | if `stRampFast` > 0: after holding ◀/▶ this long the ramp speeds up to `stRampFast` s |
 | `TUNE.asMax` Lane assist: widest angle | 0.8 rad | the lane assist (`TUNE.assist`, with no steering input) only acts within this angle of the street (since drive24b it also works on back streets) |
 
+Grip tab, drive26 (`src/98e_drive26.js`, free roam only): the car goes where it points; it only slides when you ask for a drift.
+| knob | default | what it does |
+|---|---|---|
+| `TUNE.gbHold` GAS+BRAKE drift: hold BRAKE | 0.6 s | GAS+BRAKE+steer only starts a drift after BRAKE has been held this long; a shorter press is a normal brake (v88f: 0 = a brake tap while gas was held drifted at once, 44-48° slide). DRIFT (button / X / Ctrl) still drifts at once |
+| `TUNE.gbSteer` GAS+BRAKE drift: min steer | 0.5 | how far ◀/▶ must be in for GAS+BRAKE to become a drift |
+| `TUNE.slipMax` Max slide outside drift | 0.12 rad (7°) | the most the car's travel direction may differ from where it points when not drifting (v88f: 0.6 rad = 34°) |
+| `C26.kR` Rear grip lost when braking | 0.12 | braking in a turn takes this share of the rear grip away (v88f: 0.38 → up to 8° tail slide at 80 km/h; now ≤ 3.5°) |
+Back to v88f: gbHold 0, slipMax 0.6, kR 0.38. Measured with `node tools/tTurn26.js <url> <out.json>` (see docs/research/REF_DRIVING.md).
+
 Route tab (`src/41_career_quests.js` `qvAstar` / `D24_clean`, used by the next route the game plans; `98d_drive24.js` for followed cars):
 | knob | default | what it does |
 |---|---|---|

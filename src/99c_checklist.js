@@ -3,6 +3,21 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88i',id:'big-rides',text:'Garage RIDES: the Sightseeing Bus, Box Truck, Stretch Limo and Monster Truck show up and look like LEGO vehicles; equip each one and SAVE & DRIVE.'},
+ {ver:'v88i',id:'big-junction',text:'Drive the Bus or the Truck through 3 junctions in Frankfurt: it turns wider than a car but never gets stuck on a corner.'},
+ {ver:'v88i',id:'big-feel',text:'A big car picks up speed more slowly than the Hot Rod, and the camera shows the whole vehicle.'},
+ {ver:'v88i',id:'big-tyres',text:'All four tyres of each big template sit on the road (no floating, no sinking), including the Monster Truck.'},
+ {ver:'v88i',id:'big-build',text:'Garage BUILD on a big template: you can place bricks along the full length and on the roof; the camera shows the whole car.'},
+ {ver:'v88i',id:'big-pc-cam',text:'On PC: drive the Bus and the Box Truck; the camera sits above the roof and you can see the road ahead over the vehicle.'},
+ {ver:'v88i',id:'big-limo',text:'Drive the Stretch Limo through a few junctions: it turns wider than a car, tyres on the road, nothing stuck.'},
+ {ver:'v88i',id:'small-same',text:'Switch back to a normal car: it drives exactly like before.'},
+ {ver:'v88h',id:'city-reenter',text:'Leave free roam (menu, a race or garage SAVE & DRIVE), come back, then logbook ALL (TEST) → GO to Hot Drop: the city is fully built around you (road, kerbs, grass, buildings), no floating roofs.'},
+ {ver:'v88h',id:'city-far',text:'After coming back to free roam, drive or GO to the far side of town (2+ km): the streets and buildings there are drawn, not a pale empty plane.'},
+ {ver:'v88g',id:'turn60',text:'Normal turn at a junction at 50–80 km/h with GAS only: the car turns cleanly where it points, no sliding sideways.'},
+ {ver:'v88g',id:'brake-turn',text:'Brake briefly before or in a turn (tap BRAKE, or ↓ while holding ↑ on PC): the car slows down and does NOT start a drift.'},
+ {ver:'v88g',id:'drift-btn',text:'DRIFT button (X on PC) while steering at speed: the car still slides on purpose, with the pink trail and a mini-turbo after.'},
+ {ver:'v88g',id:'drift-gb',text:'Hold GAS + BRAKE together while steering at 80+ km/h for about a second: it still becomes a drift.'},
+ {ver:'v88g',id:'phone-thumb',text:'Phone: rest your thumb near the line between GAS and BRAKE and tap BRAKE in a turn: no accidental drift.'},
  {ver:'v88f',id:'steer-turn',text:'Turn left or right at a junction at 60–80 km/h: the car settles straight within about a second, no wobbling.'},
  {ver:'v88f',id:'steer-tap',text:'Tap ◀ or ▶ briefly on a straight road: the car moves over a little, no jerk and no swinging back and forth.'},
  {ver:'v88f',id:'route-follow',text:'Hot Drop (follow Hilde): the yellow route follows the roads, no sudden U-turns, and the top line says "left/right in … m" a few seconds before each turn.'},

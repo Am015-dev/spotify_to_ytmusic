@@ -8,7 +8,7 @@ const GNB_frame=id=>GAR_arr((GNB_CH.find(c=>c.id===id)||GNB_CH[0]).src()).filter
  load:Object.assign(JSON.parse(JSON.stringify(R.load)),{car:Object.assign({},R.load.car,{name:'MY BUILD',k:'Street'})})});try{GPK_GRP.mine='Built by you'}catch(e){}}
 // snap: parts never stack on a tyre (a mudguard wraps its wheel like on the real sets), and a blank base covers the whole floor plate of the chassis
 GB_top=(f=>function(i,j,list){return f(i,j,list.filter(b=>!CR_WH[b.t]))})(GB_top);
-GB_scanBase=(f=>function(){f();if(!GB.d||!GB.d.bp||!GB_.base)return;for(const b of GB_list()){if(CR_WH[b.t]||b.y>1||!/^T\d/.test(b.t))continue;const[fw,fd]=GB_dims(b);for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){const k=i+','+j;if(GB_.base[k]==null&&i>=GB_N0&&i<=GB_N1&&j>=GB_N0&&j<=GB_N1)GB_.base[k]=0}}})(GB_scanBase);
+GB_scanBase=(f=>function(){f();if(!GB.d||!GB.d.bp||!GB_.base)return;for(const b of GB_list()){if(CR_WH[b.t]||b.y>1||!/^T\d/.test(b.t))continue;const[fw,fd]=GB_dims(b);for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){const k=i+','+j;if(GB_.base[k]==null&&i>=GB_N0&&i<=GB_N1&&j>=GB_Z0&&j<=GB_Z1)GB_.base[k]=0}}})(GB_scanBase);
 // a mudguard tapped on or next to a tyre wraps that tyre (the tap ray hits the tyre's outer edge, one stud off)
 GB_cand=(f=>function(hit){if(!hit||!/^(arch|fender)$/.test(GB_.pc))return f(hit);const L=GB_list(),P=GB_PC[GB_.pc],r=GB_.rot,[fw,fd]=r%2?[P.d,P.w]:[P.w,P.d];
  const w=L.find(b=>{if(!CR_WH[b.t])return false;const[ww,wd]=GB_dims(b);return hit.i>=b.x-1&&hit.i<=b.x+ww&&hit.j>=b.z-1&&hit.j<=b.z+wd});if(!w)return f(hit);

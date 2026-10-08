@@ -22,7 +22,7 @@ if(!OB.off)FL_terr=function(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=R
   return raw};
 // ---- fix 2 · contact tests: the old checks were circles (props: r+2.1 m, traffic: 5 m) so passing a lamp, bin or a car in the next lane
 // 1–3 m away "smashed" it with a full brick burst. Now: the car's real footprint (oriented box) must touch the prop / the other car's box.
-const OB_HW=1.25,OB_HL=2.45;
+let OB_HW=1.25,OB_HL=2.45; // let: 98bc_bigcars.js sizes them to the player car
 function OB_touch(px,pz,r,ox=RO.x,oz=RO.z,oh=RO.h){const dx=px-ox,dz=pz-oz,s=Math.sin(oh),c=Math.cos(oh),a=dx*s+dz*c,b=dx*c-dz*s;
   const qa=Math.max(0,Math.abs(a)-OB_HL),qb=Math.max(0,Math.abs(b)-OB_HW);const g=Math.hypot(qa,qb),ok=g<r+.25;if(ok)OB.hit={k:'prop',f:OB.fr};else OB.pm.add(px*7919+pz);return ok||OB.off}
 function OB_obb(ax,az,ah,aw,al,bx,bz,bh,bw,bl){const A=[[Math.sin(ah),Math.cos(ah)],[Math.cos(ah),-Math.sin(ah)]],B=[[Math.sin(bh),Math.cos(bh)],[Math.cos(bh),-Math.sin(bh)]],d=[bx-ax,bz-az];

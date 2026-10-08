@@ -373,7 +373,7 @@ function CR_npcTilt(g){const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),f
 function FX19_camIn(g,H,fx,fz){const b=g.userData.crH;if(!b)return;const c=camera.position,cx=c.x-g.position.x,cz=c.z-g.position.z,al=cx*fx+cz*fz,sd=cx*fz-cz*fx,m=.9;
  b.visible=!(Math.abs(al)<H.L+m&&Math.abs(sd)<H.W+m&&c.y<g.position.y+4.5)}
 function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;FX19_camIn(g,H,fx,fz);
- if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+1.3-Math.abs(al),ps=H.W+1.05-Math.abs(sd);if(pl<=0||ps<=0)continue;
+ if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+CR_PLH.l-Math.abs(al),ps=H.W+CR_PLH.w-Math.abs(sd);if(pl<=0||ps<=0)continue;
  if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}RO.v*=.6}}
 
 
@@ -391,7 +391,7 @@ function CR_mhud(){const q=document.getElementById('qTrk'),a=document.getElement
 setInterval(CR_mhud,250);
 
 
-const CR_WB=2.7,CR_CAMK=1/.15;
+let CR_WB=2.7,CR_PLH={l:1.3,w:1.05};const CR_CAMK=1/.15; // CR_WB: let, set per car size by 98bc_bigcars.js
 const C26_cityMu=(terr,veh)=>(C26.muCity[terr]||C26.muCity.road)*(veh==='offroad'&&terr!=='road'?C26.muOff:1)*((carStat().han)||1);
 function CR_yaw(c,dt,ytg,maxR,air){const v=RO.v||0,sp=Math.abs(v),st=clamp(c.steer||0,-1,1),base=-st*maxR*Math.sign(v||1),dm=TUNE.stAng/(1+sp/TUNE.stFall),tg=st*dm,d0=RO.dl||0;
  RO.dl=d0+(tg-d0)*Math.min(1,dt*(Math.abs(tg)>Math.abs(d0)&&tg*d0>=0?TUNE.stIn:TUNE.stOut));

@@ -2,7 +2,8 @@
 // Bricks live in the ship's local frame (m, before SHIP_K): stud pitch GB_U, plate height GB_PH. A brick = {t,x,z,y,r,m,c}
 // (type, min cell x/z, bottom in plates, rotation 0-3, mirrored, colour index). The whole build + the driver merge into
 // ONE geometry (+1 emissive geometry for lights) -> ≤ 2 draw calls in the world. Bricks are visual; stats get small clamped mods.
-const GB_U=.6,GB_PH=.24,GB_N0=-9,GB_N1=8,GB_MAX=120,GB_CAP=48;
+// BC (bigcars): GB_N0/GB_N1 bound the width (x, unchanged 18 studs); GB_Z0/GB_Z1 the length (z, was -9..8, now 46 studs for bus/truck templates).
+const GB_U=.6,GB_PH=.24,GB_N0=-9,GB_N1=8,GB_Z0=-23,GB_Z1=22,GB_MAX=250,GB_CAP=72;
 const GB_BC=['#d01712','#fe8a18','#fac80a','#a5ca18','#00852b','#36aebf','#0055bf','#8a12a8','#ff698f','#f4f4f4','#a0a5a9','#1b2a34'];
 const GB_PC={b11:{n:'1×1',w:1,d:1,h:3,s:1,ic:'▪'},b12:{n:'1×2',w:1,d:2,h:3,s:1,ic:'▮'},b22:{n:'2×2',w:2,d:2,h:3,s:1,ic:'■'},b24:{n:'2×4',w:2,d:4,h:3,s:1,ic:'█'},
  slope:{n:'Slope',w:2,d:2,h:3,ic:'◢'},tile:{n:'Tile',w:1,d:2,h:1,ic:'▭'},round:{n:'Round',w:1,d:1,h:3,s:1,ic:'●'},wedge:{n:'Wedge',w:2,d:2,h:1,ic:'◣'},
@@ -95,7 +96,7 @@ shipMesh=(f=>function(team){const g=f(team);if(team&&(team.gbB||team.gbF))try{GB
 // ---------- builder state helpers
 function GB_cells(){const B=GB_.base;return B?Object.keys(B).map(k=>k.split(',').map(Number)):[]}
 function GB_top(i,j,list){let t=GB_.base[i+','+j];if(t==null)t=-1e9;for(const b of list){const[fw,fd]=GB_dims(b);if(i>=b.x&&i<b.x+fw&&j>=b.z&&j<b.z+fd)t=Math.max(t,b.y+GB_PC[b.t].h)}return t}
-function GB_fit(b,list){const[fw,fd]=GB_dims(b);let y=-1e9,bmax=-1e9;for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_N0||j>GB_N1)return null;y=Math.max(y,GB_top(i,j,list))}
+function GB_fit(b,list){const[fw,fd]=GB_dims(b);let y=-1e9,bmax=-1e9;for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_Z0||j>GB_Z1)return null;y=Math.max(y,GB_top(i,j,list))}
  if(y<-1e8)return null;for(const k in GB_.base)bmax=Math.max(bmax,GB_.base[k]);if(y+GB_PC[b.t].h>bmax+GB_CAP){GB_.capHit=1;return null}return y}
 const GB_twin=b=>{const[fw]=GB_dims(b);return{...b,x:-b.x-fw,r:(4-b.r)%4,m:b.m?0:1}};
 const GB_same=(a,b)=>a.t===b.t&&a.x===b.x&&a.z===b.z&&a.y===b.y;

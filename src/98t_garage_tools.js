@@ -28,7 +28,7 @@ function G8_shower(enter){if(G8.sh&&G8.sh.t0)G8.sh.t0-=400;const cv=document.cre
   requestAnimationFrame(draw)};requestAnimationFrame(draw)}
 // ---------- 3) STEP VERTICAL: the held part moves one plate up or down to the next spot where it touches something and overlaps nothing
 function G8_free(b,y,list){const[fw,fd]=GB_dims(b),h=GB_PC[b.t].h;let bmax=-1e9,floor=1e9,touch=0;for(const k in GB_.base){bmax=Math.max(bmax,GB_.base[k]);floor=Math.min(floor,GB_.base[k])}if(y+h>bmax+GB_CAP)return 0;
- for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_N0||j>GB_N1)return 0;const s=GB_.base[i+','+j];if(s!=null){if(s>y)return 0;if(s===y)touch=1}}
+ for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_Z0||j>GB_Z1)return 0;const s=GB_.base[i+','+j];if(s!=null){if(s>y)return 0;if(s===y)touch=1}}
  if(y<floor)return 0;
  for(let i=b.x-1;i<=b.x+fw;i++)for(let j=b.z-1;j<=b.z+fd;j++){const ins=i>=b.x&&i<b.x+fw&&j>=b.z&&j<b.z+fd;if(ins)continue;const s=GB_.base[i+','+j];if(s!=null&&s>y&&(i===b.x-1||i===b.x+fw)!==(j===b.z-1||j===b.z+fd))touch=1}
  for(const o of list){const[ow,od]=GB_dims(o),oh=GB_PC[o.t].h;const ox=o.x<b.x+fw&&o.x+ow>b.x,oz=o.z<b.z+fd&&o.z+od>b.z,vy=o.y<y+h&&o.y+oh>y;
@@ -71,7 +71,7 @@ window.__g8={S:G8,T:G8.T,redo:()=>GB_redo(),undo:()=>GB_undo(),step:d=>G8_step(d
 const SL={sel:[],carry:null,hl:null,gid:0};
 // ---------- dead taps: nearest cell where the held part fits (clamped into the grid first, then rings up to 3 cells)
 GB_cand=(f=>function(hit){const b=f(hit);if(b||!hit||!GB_PC[GB_.pc])return b;const P=GB_PC[GB_.pc],[fw,fd]=GB_.rot%2?[P.d,P.w]:[P.w,P.d],ox=Math.floor((fw-1)/2),oz=Math.floor((fd-1)/2);
- const ci=clamp(hit.i,GB_N0+ox,GB_N1-fw+1+ox),cj=clamp(hit.j,GB_N0+oz,GB_N1-fd+1+oz),O=[];for(let d=-3;d<=3;d++)for(let e=-3;e<=3;e++)O.push([d,e]);O.sort((a,c)=>Math.hypot(a[0],a[1])-Math.hypot(c[0],c[1]));
+ const ci=clamp(hit.i,GB_N0+ox,GB_N1-fw+1+ox),cj=clamp(hit.j,GB_Z0+oz,GB_Z1-fd+1+oz),O=[];for(let d=-3;d<=3;d++)for(let e=-3;e<=3;e++)O.push([d,e]);O.sort((a,c)=>Math.hypot(a[0],a[1])-Math.hypot(c[0],c[1]));
  for(const[d,e]of O){const r=f({...hit,i:ci+d,j:cj+e});if(r)return r}return null})(GB_cand);
 // ---------- selection helpers
 const SL_dims=b=>GB_dims(b),SL_h=b=>GB_PC[b.t].h;
@@ -97,7 +97,7 @@ function SL_lift(copy,rot){if(!SL.sel.length)return;const L=GB_list(),A=SL.sel[0
  if(rot)SL_rot();else SL_fitAt(A.x,A.z,A.y);try{AU.sfx('pick')}catch(e){}GS_tip(copy?'Copy · tap where it goes, then ✔ PLACE':'Tap where it goes, then ✔ PLACE');SL_ui()}
 const SL_at=(C,x,z,y)=>C.parts.map(p=>({t:p.t,x:x+p.dx,z:z+p.dz,y:y+p.dy,r:p.r,m:p.m,c:p.c,g:p.g}));
 function SL_clash(b,list){const[fw,fd]=SL_dims(b),h=SL_h(b);let bmax=-1e9,fl=1e9;for(const k in GB_.base){bmax=Math.max(bmax,GB_.base[k]);fl=Math.min(fl,GB_.base[k])}if(b.y<fl||b.y+h>bmax+GB_CAP)return 1;
- for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_N0||j>GB_N1)return 1;const s=GB_.base[i+','+j];if(s!=null&&s>b.y)return 1}
+ for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_Z0||j>GB_Z1)return 1;const s=GB_.base[i+','+j];if(s!=null&&s>b.y)return 1}
  for(const o of list)if(SL_ov(o,b)&&o.y<b.y+h&&o.y+SL_h(o)>b.y)return 1;return 0}
 function SL_ok(B){const L=GB_list();if(B.some(b=>SL_clash(b,L)))return 0;return B.some(b=>G8_free(b,b.y,L))}
 // put the cluster at cell (x,z): the lowest height where no part sinks into what is under it (y given = keep it if it fits)
