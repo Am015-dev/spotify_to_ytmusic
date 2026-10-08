@@ -27,16 +27,23 @@ function R3_hero(L,big){const X=R3_xp(),c=R3_CL[L>=20?2:L>=10?1:0],xl=L===X.L;
   <div class="r3Xp"><span><i style="width:${xl?(X.max?100:Math.round(100*X.a/X.m)):0}%"></i></span><small>${xl?(X.max?'MAX LEVEL':X.a.toLocaleString('en-US')+' / '+X.m.toLocaleString('en-US')+' XP'):''}</small><em>${L<30?L+1:'★'}</em></div></div>`}
 function R3_bars(L,from){const S=R3_stats(L),F=from?R3_base(from):null;
  return`<div class="r3Bars">${R3_ST.map(([k,n])=>{const s=S[k],d=s.v-s.line;return`<div class="r3B" data-k="${k}"><i style="height:${s.v}%" ${F!=null?`data-from="${F}"`:''}></i><u style="bottom:${s.line}%"></u>${d?`<s class="${d>0?'up':'dn'}" style="bottom:${Math.min(s.v,s.line)}%;height:${Math.abs(d)}%"></s>`:''}<b>${s.v}</b><span>${n}</span></div>`}).join('')}</div>`}
+// R3b: the C/B/A slot column is gone (reviewer: one scheme, SLOT 1/2/3 in the bottom bar); kept for reference
 function R3_slots(L,tap){const e=perkEq0(),n=perkSlots();return`<div class="r3Sl">${[2,1,0].map(i=>{const p=e[i]&&PERKS.find(q=>q.id===e[i]),open=i<n;
   return`<button class="r3S ${open?'':'lk'} ${tap&&GPK_.pk===i&&open?'on':''}" ${tap&&open?`data-r3sl="${i}"`:'disabled'}><em>${R3_CL[i]}</em><b>${open?(p?p.icon+' '+p.name:'＋ EMPTY'):'🔒 LVL '+R3_SL[i]}</b></button>`}).join('')}</div>`}
 const R3_nextHtml=L=>{const n=R3_next(L);return n?`<p class="r3Nx">Next: <b>${n}</b></p>`:''};
+// R3b: logbook TO DO lists the mission you are on (it said "No picked events yet" during HOT DROP); tap = back to the drive
+journalRender=(f=>function(){const r=f.apply(this,arguments);try{if((RO.jTab||'todo')!=='todo'||!RO.ch)return r;const ch=RO.ch,B=$('#jBody');if(!B||B.querySelector('.r3Act'))return r;
+ let nm='',kd='Mission',vb='';try{nm=ch.m?markTitle(ch.m):''}catch(e){}nm=nm||ch.name||(ch.m&&ch.m.ev&&ch.m.ev.name)||'Current mission';try{kd=KIND_N[ch.m&&ch.m.kind]||KIND_N[ch.kind]||'Mission'}catch(e){}try{vb=v85Verb(ch)||''}catch(e){}
+ const em=B.querySelector('p.jempty');if(em&&/No picked events/.test(em.textContent))em.remove();
+ B.insertAdjacentHTML('afterbegin',`<button class="jrow r3Act"><i>▶</i><div><b>${nm}</b><small>${kd} · active now${vb?' · '+vb:''}</small></div><span></span><u>ON IT</u></button>`);
+ B.querySelector('.r3Act').onclick=()=>journalClose()}catch(e){console.warn('R3b log',e)}return r})(journalRender);
 // ---------- garage: PERKS mode = the 2K perks screen; DRIVER mode = driver profile card on top of the parts
 gbRender=(f=>function(){const r=f.apply(this,arguments);try{R3_garage()}catch(e){console.warn('R3',e)}return r})(gbRender);
 function R3_garage(){const B=$('#gbBody');if(!B||$('#gbx').hidden)return;const L=carStat().lvl;
  if(GB.tab==='veh'&&!B.querySelector('.r3Pk')){const d=document.createElement('div');d.className='r3Pk';d.dataset.r2='perks';
-  d.innerHTML=R3_hero(L)+`<div class="r3Mid">${R3_bars(L)}${R3_slots(L,1)}</div>`+R3_nextHtml(L)+`<p class="r3Hint">Pick a slot, then a perk below. Perks work in races.</p>`;B.prepend(d);
+  d.innerHTML=R3_hero(L)+`<div class="r3Mid">${R3_bars(L)}</div>`+R3_nextHtml(L)+`<p class="r3Hint">Pick a slot, then a perk below. Perks work in races.</p>`;B.prepend(d);
   d.addEventListener('click',e=>{const b=e.target.closest('[data-r3sl]');if(!b)return;const i=+b.dataset.r3sl;if(GPK_.pk===i)return;GPK_.pk=i;try{AU.sfx('pick')}catch(_){}gbRender()});
-  const h=B.querySelector('.gpkTop h5');if(h)h.textContent='CHOOSE A PERK · SLOT '+R3_CL[GPK_.pk||0]}
+  const h=B.querySelector('.gpkTop h5');if(h)h.textContent='CHOOSE A PERK · SLOT '+((GPK_.pk||0)+1)}
  if(GB.tab==='driver'&&!B.querySelector('.r3Drv')){const d=document.createElement('div');d.className='r3Drv';const F=flags(),nf=RIVAL_EV.filter(e=>F[e.p]).length;
   d.innerHTML=`<div class="r3DT"><img alt="" src="${GB_portrait()}"><div><b>${(store.get('mho_name','')||'Rookie').toUpperCase()}</b><small>DRIVER PROFILE</small></div></div>`+R3_hero(L)+R3_nextHtml(L)+
    `<div class="r3Cn"><span>🚩 <b>${nf}/8</b> flags</span><span>🚗 <b>${GAR_SETS.filter(GAR_owned).length}/${GAR_SETS.length}</b> rides</span><span>⚡ <b>${PERKS.filter(perkUnlocked).length}/${PERKS.length}</b> perks</span></div>`;B.prepend(d)}}
@@ -45,7 +52,7 @@ profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;const L=carStat
  const d=B.querySelector('.pcard.drv');if(d&&!d.querySelector('.r3Hero')){const lv=d.querySelector('.lvl');if(lv)lv.remove();const w=d.querySelector('div:not(.lvl)');if(w){w.querySelectorAll('.pbar,small:last-child').forEach(e=>{if(e!==w.querySelector('small'))e.remove()});w.insertAdjacentHTML('beforeend',R3_hero(L))}}
  const st=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'')==='STATS');
  if(st&&!st.classList.contains('r3Fold')){st.classList.add('r3Fold');const h=st.querySelector('h5');h.innerHTML='<button class="r3More">MORE STATS ▾</button>';h.firstChild.onclick=()=>{st.classList.toggle('open');try{AU.sfx('pick')}catch(e){}}
-  st.insertAdjacentHTML('beforebegin',`<div class="pcard r3PfL"><h5>LEVEL LINE · CLASS ${R3_CL[L>=20?2:L>=10?1:0]}</h5><div class="r3Mid">${R3_bars(L)}${R3_slots(L,0)}</div>${R3_nextHtml(L)}</div>`)}})(profileOpen);
+  st.insertAdjacentHTML('beforebegin',`<div class="pcard r3PfL"><h5>LEVEL LINE · CLASS ${R3_CL[L>=20?2:L>=10?1:0]}</h5><div class="r3Mid">${R3_bars(L)}</div>${R3_nextHtml(L)}</div>`)}})(profileOpen);
 // ---------- level-up card (2K-style): hero, bars rising from the old level line, rewards, next. Menus: modal with CONTINUE; free roam: a small
 // card at the top that never blocks driving (auto-hides); races: queued until the race is over.
 const R3U={q:[]};

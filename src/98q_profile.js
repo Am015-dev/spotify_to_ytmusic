@@ -7,7 +7,7 @@ function GPF_col(){const nOwn=GAR_SETS.filter(GAR_owned).length,lv=GB_PATS.filte
  const t=(i,n,v,m)=>`<div class="gpfC"><i>${i}</i><b>${v}/${m}</b><small>${n}</small></div>`;
  return t('🚗','vehicles',nOwn,GAR_SETS.length)+t('🧑','drivers',GAR_PRE.length,GAR_PRE.length)+t('⭐','perks',pu,PERKS.length)+t('🎨','liveries',lv,GB_PATS.length)+t('📯','horns',hn,GB_HORNS.length)+t('🔧','parts',pOwn,parts)+t('📦','brick packs',pk,12)}
 function GPF_perks(){const L=carStat().lvl,n=perkSlots(),e=perkEq0(),nx=PERKS.filter(p=>p.lvl&&p.lvl>L).sort((a,b)=>a.lvl-b.lvl)[0];
- return`<h5>PERKS · CLASS ${drvClass()} · ${n}/3 SLOTS</h5><div class="pperks">${[0,1,2].map(i=>{const p=e[i]&&PERKS.find(q=>q.id===e[i]);return i<n?(p?`<span><i>${p.icon}</i>${p.name}</span>`:'<span class="gpfE">＋ empty</span>'):`<span class="gpfE">🔒 level ${i===1?10:20}</span>`}).join('')}</div><small>${nx?`Next: ${nx.icon} ${nx.name} at level ${nx.lvl}. `:''}Equip perks in the garage (PERKS tab).</small>`}
+ return`<h5>PERKS · CLASS ${drvClass()} · ${n}/3 SLOTS</h5><div class="pperks">${[0,1,2].map(i=>{const p=e[i]&&PERKS.find(q=>q.id===e[i]);return i<n?(p?`<span><i>${p.icon}</i>${p.name}</span>`:'<span class="gpfE">＋ empty</span>'):`<span class="gpfE">🔒 SLOT ${i+1} · LVL ${i===1?10:20}</span>`}).join('')}</div><small>${nx?`Next: ${nx.icon} ${nx.name} at level ${nx.lvl}. `:''}Equip perks in the garage (PERKS tab).</small>`}
 profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;
  const d=B.querySelector('.pcard.drv');if(d&&!d.querySelector('.gpfFig')){const im=document.createElement('img');im.className='gpfFig';im.src=GB_portrait();d.insertBefore(im,d.firstChild)}
  for(const c of B.querySelectorAll('.pcard')){const h=(c.querySelector('h5')||{}).textContent||'';
