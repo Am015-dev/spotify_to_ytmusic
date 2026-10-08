@@ -32,3 +32,8 @@ Rows for `doorkick` copied from `audio/ASSETS.md` (checked 2026-09-30). Every it
 | `rpg-audio/knifeSlice2.ogg` | [Kenney RPG Audio](https://kenney.nl/assets/rpg-audio) | Kenney (Kenney Vleugels) | CC0 1.0 | https://creativecommons.org/publicdomain/zero/1.0/ | 2026-09-30 | layered under another sound, layered, normalised (~-16 LUFS target, -1 dBFS peak limit), mono MP3 64 kbps | doorkick/smash (layer) |
 | `ui-audio/click3.ogg` | [Kenney UI Audio](https://kenney.nl/assets/ui-audio) | Kenney (Kenney Vleugels) | CC0 1.0 | https://creativecommons.org/publicdomain/zero/1.0/ | 2026-09-30 | trimmed silence, normalised (~-20 LUFS target, -1 dBFS peak limit), mono MP3 64 kbps | sands/click, crown/click, nebula/click, shipwreck/click, doorkick/click, sunglaze/click, rampart/click |
 | `ui-audio/rollover2.ogg` | [Kenney UI Audio](https://kenney.nl/assets/ui-audio) | Kenney (Kenney Vleugels) | CC0 1.0 | https://creativecommons.org/publicdomain/zero/1.0/ | 2026-09-30 | trimmed silence, normalised (~-24 LUFS target, -1 dBFS peak limit), mono MP3 64 kbps | sands/hover, crown/hover, nebula/hover, shipwreck/hover, doorkick/hover, sunglaze/hover, rampart/hover |
+
+
+## Card paintings
+
+`art/*.webp` (37 monsters, 7 class/race cards, 320x320): generated with Google Flow from our own prompts (original monsters, no third-party names or references); cropped and converted to WebP. Added 2026-10-08.

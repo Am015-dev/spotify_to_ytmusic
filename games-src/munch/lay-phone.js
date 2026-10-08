@@ -13,7 +13,7 @@ for(const [W,H] of SIZES){const land=W>H,short=Math.min(W,H);
   const errs=[],bad=[];const tag=`${W}x${H}`;const stats={minTap:1e9,minTapName:'',minFont:99,minFontName:'',turns:0,taps:0,popups:0};
   p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&!/ERR_|Failed to load|net::/.test(m.text())&&errs.push(m.text()));
   const B=(m)=>{if(!bad.includes(m))bad.push(m)};
-  await p.goto('file://'+process.cwd()+'/'+FILE+QUERY);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.goto('file://'+process.cwd()+'/'+FILE+QUERY);await p.waitForTimeout(400);
+  await p.goto('file://'+process.cwd()+'/'+FILE+QUERY);await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('dkd_offer','1')}catch(e){}});await p.goto('file://'+process.cwd()+'/'+FILE+QUERY);await p.waitForTimeout(400);
   if(!QUERY.includes('phone=0')&&!await p.evaluate(()=>document.documentElement.classList.contains('ph')))B('ph class not set');
   const FIT=require('../phfit.js');const shot=async s=>{(await FIT.run(p)).forEach(m=>B('FIT '+s+': '+m));return p.screenshot({path:`${OUT}/P_${tag}_${s}.png`})};
   // ---- generic probes ----
