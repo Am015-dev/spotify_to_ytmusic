@@ -340,14 +340,17 @@ function PIN_menu(px,py,cx,cy){PIN_menuClose();if(!RO.mapI)return;PIN_S.log.menu
 // ---- GPS: route to the current stage target (or to the waypoint in free roam), recomputed when off-route; minimap/map line + road chevrons
 function qvNavTgt(){const ch=RO.ch;if(ch&&ch.v2)return qvTgt(ch);if(ch)return chNext(ch)||null;if(RO.sp)return null;return RO.wp&&Number.isFinite(RO.wp.x)?(RO.wp===PIN_S.cur?PIN_navPt():RO.wp):null}
 function qvNavTick(dt){const t=qvNavTgt(),now=QV.gt=(QV.gt||0)+dt;if(!t){QV.nav=null;return}let N=QV.nav;const mv=N&&Math.hypot(N.tx-t.x,N.tz-t.z);
-  if(!N||mv>(RO.ch&&RO.ch.v2?60:25)&&now-N.at>1.5||N.off>1.5&&now-N.at>1.2){const P=qvPath(RO.x,RO.z,t.x,t.z,RO.v>3?(RO.vh??RO.h):undefined);N=QV.nav={tx:t.x,tz:t.z,P,C:qvCum(P),pi:0,off:0,at:now,rec:(N?N.rec+1:0)};N.T=D24_turns(N.P,N.C)}
+  // D24: following/tailing a car = its own route (S.R), not A* to a moving point (that snapped to the far carriageway: "U-turn in 60 m")
+  const ch=RO.ch,LS=ch&&ch.v2&&ch.v2.L.st[ch.v2.si],LR=LS&&(LS.t==='follow'||LS.t==='tail')&&LS.R&&LS.R.P&&LS.R.P.length>1?LS.R:null;
+  if(LR){if(!N||N.R!==LR){N=QV.nav={tx:t.x,tz:t.z,P:LR.P,C:LR.C||qvCum(LR.P),pi:0,off:0,at:now,rec:0,R:LR};N.T=D24_turns(N.P,N.C)}N.tx=t.x;N.tz=t.z}
+  else if(!N||N.R||mv>(RO.ch&&RO.ch.v2?60:25)&&now-N.at>1.5||N.off>1.5&&now-N.at>1.2){const P=qvPath(RO.x,RO.z,t.x,t.z,RO.v>3?(RO.vh??RO.h):undefined);N=QV.nav={tx:t.x,tz:t.z,P,C:qvCum(P),pi:0,off:0,at:now,rec:(N?N.rec+1:0)};N.T=D24_turns(N.P,N.C)}
   const P=N.P;let bi=N.pi,bd=1e18;for(let i=Math.max(0,N.pi-2);i<Math.min(P.length-1,N.pi+40);i++){const a=P[i],b=P[i+1],dx=b[0]-a[0],dz=b[1]-a[1],L2=dx*dx+dz*dz||1,u=clamp(((RO.x-a[0])*dx+(RO.z-a[1])*dz)/L2,0,1),d=(a[0]+dx*u-RO.x)**2+(a[1]+dz*u-RO.z)**2;if(d<bd){bd=d;bi=i;N.u=u}}
-  N.pi=bi;N.d=Math.sqrt(bd);N.off=N.d>45?N.off+dt:0;N.rem=N.C[N.C.length-1]-(N.C[bi]+(N.C[bi+1]-N.C[bi])*(N.u||0))}
+  N.pi=bi;N.d=Math.sqrt(bd);N.off=N.d>45?N.off+dt:0;N.rem=N.C[N.C.length-1]-(N.C[bi]+(N.C[bi+1]-N.C[bi])*(N.u||0));if(LR)N.rem=Math.max(0,LS.s-(N.C[bi]+(N.C[bi+1]-N.C[bi])*(N.u||0)))}
 // D24: turns of a route polyline (corners < 25 m apart merged, |angle| ≥ 30°): {s: where it starts, s1: where it ends, a: signed angle, + = left}
 function D24_turns(P,C){const T=[],h=k=>Math.atan2(P[k+1][0]-P[k][0],P[k+1][1]-P[k][1]);for(let k=1;k<P.length-1;k++){const a=angDiff(h(k),h(k-1));if(Math.abs(a)<.12)continue;const q=T[T.length-1];if(q&&C[k]-q.s1<25){q.a+=a;q.s1=C[k];continue}T.push({s:C[k],s1:C[k],a})}return T.filter(t=>Math.abs(t.a)>=.52)}
 // D24: turn-by-turn cue for the HUD arrow: the next turn on the GPS route once it is within max(TUNE.tcMin m, TUNE.tcLead s); else straight on.
 // null = no usable route (none, off it, or the target is close), the arrow then points straight at the target as before
-function D24_cue(){const N=QV.nav;if(!N||!N.T||N.P.length<2||N.d>30||N.rem<60)return null;const s0=N.C[N.pi]+(N.C[N.pi+1]-N.C[N.pi])*(N.u||0),v=Math.abs(RO.v),lead=Math.max(TUNE.tcMin,v*TUNE.tcLead);
+function D24_cue(){const N=QV.nav;if(!N||!N.T||N.P.length<2||N.d>30)return null;const s0=N.C[N.pi]+(N.C[N.pi+1]-N.C[N.pi])*(N.u||0);if((N.R?N.C[N.C.length-1]-s0:N.rem)<60)return null;const v=Math.abs(RO.v),lead=Math.max(TUNE.tcMin,v*TUNE.tcLead);
   const t=N.T.find(q=>q.s1>s0-3);if(t&&t.s-s0<lead){const d=Math.max(0,t.s-s0),A=Math.abs(t.a),w=A>2.4?'U-turn':(A<1?'bear ':'')+(t.a>0?'left':'right');QV.cue=t;return{ang:clamp(t.a,-2.4,2.4),txt:w+(d>12?' in '+Math.round(d/10)*10+' m':' now'),soon:d<v*3+12,d,t}}
   QV.cue=null;return{ang:0,txt:Math.round(N.rem/10)*10+' m',soon:false,d:N.rem,t:null}}
 function qvLook(){const N=QV.nav;if(!N||N.P.length<2)return null;const s=N.C[N.pi]+(N.C[N.pi+1]-N.C[N.pi])*(N.u||0)+45;return qvAt(N.P,N.C,s)}
