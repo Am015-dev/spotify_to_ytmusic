@@ -134,7 +134,7 @@ function FL_terr(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=RO.y>ground+
   if(FL.s==null){FL.s=raw;FL.cand=raw}
   if(!air&&raw!==FL.s){if(raw!==FL.cand){FL.cand=raw;FL.cT=0}FL.cT+=dt;if(FL.cT>=FL_HOLD&&FL.hold<=0){FL.s=raw;FL.hold=FL_MINHOLD;FL.cT=0}}else if(!air){FL.cand=FL.s;FL.cT=0}
   return raw}
-const FL_VEH={road:'ship',dirt:'offroad',water:'boat'};
+const FL_VEH={road:'ship',dirt:'ship',water:'boat'};  // R1: dirt was 'offroad' = the car turned into the buggy on grass at 100 km/h
 function FL_veh(){const v=(RO.vsel||'auto')==='auto'?FL_VEH[FL.s||'road']:RO.vsel;if(v!==FL.v&&!(pl&&pl.air)){if(FL.v){FL.log.push({v,s:FL.s,x:Math.round(RO.x),z:Math.round(RO.z)});if(FL.log.length>60)FL.log.shift();FL_burst(v)}FL.v=v}return FL.v||v}
 function FL_burst(v){if(!pl||!RO.on)return;const at=pl.mesh.position.clone();at.y+=1.2;
   CR_noGlow=1;try{debris(at,V3(0,5,0),8,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)),.45,RO.y);burst(SPARK,at,8,9,.25,new THREE.Color(1.3,1.2,.9))}finally{CR_noGlow=0}AU.sfx('boost');fovKick=Math.max(fovKick,4)}
