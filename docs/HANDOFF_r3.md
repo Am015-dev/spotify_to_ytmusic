@@ -78,3 +78,19 @@ Coordinator = session_017iH3DB4VyxwKSdMwsco4Ut, reviewer = session_01Y6FYerWwxv4
   - The giant tan box on the Frankfurt road in t5_quest_gear is pre-existing world art; the reviewer routed it to the coordinator.
 - Still open in TEST_MODE: DRIVER mode shows 1 disabled control (not identified).
 - R3 next: build on live v88d once it is deployed.
+
+## R3b status (13:00): v88e DEPLOY sent
+- REVIEW FULL FAIL (one slot scheme; stale profile shot; logbook TO DO empty during a mission), then QUICK re-review PASS on cbdf96d.
+- DEPLOY to the coordinator: `alex/od-r3 63f4fca out/v88e`. v88e = cbdf96d + the OD_CHANGELOG entry.
+- R3b changes:
+  - English UI: LOGBOOK, Platform Drift, Around the Henninger Turm, Spectacular!, Gold Rush.
+  - Numbers: a de-DE→en-US `toLocaleString` wrapper in 10_core (3,000 not 3.000). Dates are still de-DE.
+  - Hints hide under panels: `R3B_PANELS` + `body.odPanel` in 99_api.js (the list includes m1Cs).
+  - C/B/A slot column removed. One SLOT 1/2/3 scheme, lock text "LVL 10/20".
+  - Logbook TO DO shows the active mission (`journalRender` wrap in 98v).
+  - Profile ✕ 44 px.
+- Open (not blocking):
+  - The boost bar draws over the logbook overlay: add it to the odPanel CSS.
+  - The "My Build" showroom card shows only the chassis.
+  - Frankfurt drive speed is limited by this box (swiftshader ~1 fps).
+- Test gotcha: never wait with `pgrep -f "<pattern>"` from a bash -c that contains the same pattern. It matches itself and hangs.
