@@ -81,10 +81,13 @@ function newGame(daily){
 // Easy / Normal / Hard (settings > Gameplay), tuned with d-sim.js. Endless: d = enemy pace and fire rate, bs = bullet speed, fr = fire rate, xw = extra waves joining each wave once the run is warm.
 // Story has its own ramp (ST.*, see story.js): sd, sbs, sfr scale it. fan = bullets added to every fan and ring, heal = hull drops, el = elite share.
 const DIFFS={easy:{d:.85,bs:.9,fr:.85,dn:.75,sd:.85,sbs:.92,sfr:.9,fan:-1,heal:1.5,el:0},
-  normal:{d:1.75,bs:1.12,fr:1,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
-  hard:{d:2.6,bs:1.35,fr:1.7,dn:1.3,sd:1.3,sbs:1.15,sfr:1.25,fan:2,heal:.5,el:1}};
+  normal:{d:1.75,bs:1.2,fr:1,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
+  hard:{d:2.6,bs:1.45,fr:1.7,dn:1.3,sd:1.3,sbs:1.15,sfr:1.25,fan:2,heal:.5,el:1}};
 let DF=DIFFS.normal;
-const frK=()=>ST.on?DF.sfr:DF.fr;
+const STILL={t:0,k:0,fk:1,bk:1,sk:1,ax:0,ay:0,beam:null,nb:0,said:false};   // AFK pressure (h.js): a ship that stops moving is hunted harder and scores less
+const DYE={cur:1,q:1};                                     // dying slows the song (h.js)
+const FIRE_K=.62;                                          // enemy fire cadence: about 40% fewer bullets than before, each one aimed and telegraphed
+const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk;
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.14*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
 const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
 const bossStage=k=>k===3?'boss2':'boss';   // final boss gets its own song
@@ -116,18 +119,19 @@ const WAVES={
   gate(){en('gate',{x:W+30,gy:gr(150,H-200),gap:130});return 3.8;}
 };
 const eliteP=()=>ST.on?ST.el:Math.min(.55,Math.max(DF.el?.2+.1*G.pos:0,.09*Math.max(0,DIR.tierv()-2.2))+(DIR.has('guard')?.25:0));   // elites: from the third district on, more every district, plus the Elite Guard mutator
-const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
-const EBMAX=170,EBMAX_PHONE=95;                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
+const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*STILL.bk*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
+const ebCap=()=>(touchUI||rotMode?18:HARD?35:25)+(G.boss&&G.boss.x<=bossX()?10:0);   // most enemy bullets alive at once; a fan or ring that does not fit is made smaller (odd, still aimed), never cut off                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
-function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=(touchUI||rotMode?EBMAX_PHONE:EBMAX))return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
+function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
 const aim=e=>Math.atan2(P.y-e.y,P.x-e.x);
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
-const fanN=n=>Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.on?0:Math.floor(TUNE2.loopFan*Math.min(3,G.loop))));
-const ringN=n=>Math.max(6,n+(ST.on?Math.floor(ST.lvl/2):0)+DF.fan+(ST.on?0:Math.floor(2*TUNE2.loopFan*Math.min(3,G.loop))));
+const odd=x=>{const f=Math.floor(x);return f%2?f:f-1;};   // fans are odd so the middle bullet is aimed at the ship
+const fanN=n=>{const m=Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.on?0:Math.floor(TUNE2.loopFan*Math.min(3,G.loop))));return m<=3?3:Math.max(3,odd(m*.72+.5));};
+const ringN=n=>Math.max(6,Math.round((n+(ST.on?Math.floor(ST.lvl/2):0)+DF.fan+(ST.on?0:Math.floor(2*TUNE2.loopFan*Math.min(3,G.loop))))*.62));
 const FANSTEP=.19;                                         // adjacent bullets of a fan are never closer than this angle: about 60 px apart at the ship, a gap you can see and fly through
-const fanAngle=(n,sp,i)=>{const st=Math.max(sp/(n-1),FANSTEP);return-st*(n-1)/2+st*i;};
-function fan(e,n,sp,s,c){n=fanN(n);const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a+fanAngle(n,sp,i),s,c);}
-function ring(e,n,s,off,c){n=ringN(n);for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
+const fanAngle=(n,sp,i)=>{if(n<2)return 0;const st=Math.max(sp/(n-1),FANSTEP);return-st*(n-1)/2+st*i;};
+function fan(e,n,sp,s,c){n=fanN(n);const room=ebCap()-G.eb.length;if(room<n)n=room>=3?odd(room):room>=1?1:0;if(n<1)return;const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a+fanAngle(n,sp,i),s,c);}
+function ring(e,n,s,off,c){n=ringN(n);n=Math.min(n,Math.max(0,ebCap()-G.eb.length));if(n<4)return;for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
 function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,mini=!!o.mini;
   const tab=[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']];
   const pats=o.pats||tab[k]||ATAB[k];
@@ -162,7 +166,7 @@ function onPerfect(kind,j,x,y){J.ok++;G.rings.push({x,y,l:.5,m:.5,c:kind==='dash
 function tryPerfect(kind,ts,x,y){const j=judge(ts);J.n++;J.last={kind,ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
   if(j.ok&&(kind!=='graze'||C.last!==j.beat))onPerfect(kind,j,x,y);return j.ok;}
 const healK=()=>(ST.on?ST.heal*TUNE2.stHeal:1)*DF.heal;
-function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false});const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);if(e.pf)tierGain(1,Math.round(bpos()),'kill',e.x,e.y);
+function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false});const m=e.pf?2:1,pts=Math.max(1,Math.round(e.score*G.mult*comboK()*m*STILL.sk));G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);if(e.pf)tierGain(1,Math.round(bpos()),'kill',e.x,e.y);
   burst(e.x,e.y,D.a,e.type==='gunship'?50:22,e.type==='gunship'?380:260);burst(e.x,e.y,'#ffffff',8,160,.3);if(SET.calm)G.rings.push({x:e.x,y:e.y,l:.35,m:.35,c:D.a});AU.sfx('boom');
   const drop=(t,dx=0,dy=0)=>G.pk.push({t,x:e.x+dx,y:e.y+dy,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});
   if(e.type==='drone'||e.type==='charger'||e.type==='flank'){if(GX()<.6+(SH.lk||0)*3||e.el)drop('shard');if(WP.canGain()&&GX()<.04)drop('up',10,-10);}
@@ -183,8 +187,8 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
   if(q-G.lq>8)G.lq=q-1;                                  // after a stall, skip instead of firing a burst
   for(let i=G.lq+1;i<=q;i++){onTick(i);if(((i%4)+4)%4===0)onBeat(Math.floor(i/4));}
   G.lq=q;}
-function onTick(i){const e=G.boss;if(e&&e.x<=bossX()&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
-  const sp=e.ph===3?1.1:1;e.sa+=.36;const arms=3+(ST.on?(ST.lvl>=6)+(ST.lvl>=10):0)+(DF.el?1:0);eb.src=e;for(let j=0;j<arms;j++)eb(e.x,e.y,e.sa+j*6.2832/arms,(150+10*diff())*sp,'#ff3dbb',5);eb.src=null;}}
+function onTick(i){const e=G.boss;if(e&&((i%4)+4)%4===0&&e.x<=bossX()&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
+  const sp=e.ph===3?1.1:1;e.sa+=.9;const arms=3+(ST.on?(ST.lvl>=6)+(ST.lvl>=10):0)+(DF.el?1:0);eb.src=e;for(let j=0;j<arms;j++)eb(e.x,e.y,e.sa+j*6.2832/arms,(150+10*diff())*sp,'#ff3dbb',5);eb.src=null;}}
 function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
   if(C.n>0&&G.bc-C.lb>8+SH.ck)tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
   if(!G.dead&&!ST.over)DIR.beat(i);                     // the director spawns the waves (phrases of the song, density follows its loudness)
@@ -314,12 +318,12 @@ function update(dt){
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
   /* player bullets */
-  for(const b of G.pb){const hk=Math.max(b.hk||0,SH.hm||(SET.aim?.6:0));if(hk)SH.steer(b,sdt,hk);b.x+=b.vx*sdt;b.y+=b.vy*sdt;
+  for(const b of G.pb){const hk=Math.min(3,Math.max(b.hk||0,SH.hm||(SET.aim?.6:0)));if(hk)SH.steer(b,sdt,hk);b.x+=b.vx*sdt;b.y+=b.vy*sdt;
     for(const e of G.en){if(e.hp<=0||e.dying)continue;let hit=false;
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(Math.random()<.3)burst(b.x,b.y,'#ffffff',3,120,.2);AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}

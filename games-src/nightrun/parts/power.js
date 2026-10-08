@@ -29,7 +29,7 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
     for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(cur-a.s>=a.d){s.act.splice(i,1);this.stat.ended++;this.log.push({k:a.k,beats:cur-a.s,d:a.d,ob:a.ob,ms:performance.now()-a.w,spb:BT.spb});if(this.log.length>40)this.log.shift();this.off(a.k);}}
     const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2, waves come 1.5x as fast
     s.ls=G.score;
-    const rt=s.act.find(a=>PWK[a.k].rate),want=rt?PWK[rt.k].rate:1;if(NR.music.rate!==want)NR.music.setRate(want);   // asks again if a song swap blocked it
+    const rt=s.act.find(a=>PWK[a.k].rate),want=(rt?PWK[rt.k].rate:1)*DYE.q;if(NR.music.rate!==want)NR.music.setRate(want);   // asks again if a song swap blocked it
     if(s.drop)this.dropTick(s);
     if(s.wv>0)s.wv-=dt;},
   dropTick(s){const d=s.drop,a=AU.a,p=bpos(),R=B=>BT.t0+BT.off+B*BT.spb;

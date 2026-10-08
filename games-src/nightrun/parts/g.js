@@ -3,8 +3,15 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='G1';
+const NR_VER='H1';
 const NR_CHECKLIST=[
+ {ver:'H1',id:'afk',text:'Stop moving with your best guns: within about 30 seconds (20 on Hard) a red lane locks on your row and a beam hits you, and enemies shoot faster. Moving away always dodges it.'},
+ {ver:'H1',id:'afk-score',text:'Standing still pays less and less: kills score far fewer points and your multiplier melts. Keep moving to keep the score.'},
+ {ver:'H1',id:'fewer',text:'The screen has far fewer enemy bullets (25 at most on Normal, 35 on Hard, 18 on a phone), each one aimed at you and glowing a beat before it fires.'},
+ {ver:'H1',id:'quiet-shots',text:'Your own shots are thinner and dimmer, so the lime enemy bullets stand out clearly.'},
+ {ver:'H1',id:'dying-beat',text:'With 2 hull left the song slows a little and drops in pitch, with 1 hull left more; heal and it speeds back up. The beat cue still matches the music.'},
+ {ver:'H1',id:'death-stop',text:'When you die the music winds down like a tape stopping.'},
+ {ver:'H1',id:'caps',text:'Damage, crit, double-shot and drone perks stack only up to a limit, so the garage descriptions now match what you really get.'},
  {ver:'G1',id:'btn-first-tap',text:'Open the game and tap ENDLESS, STORY, DAILY RUN or SETTINGS the moment they appear (they now show up about a second after loading, and no longer move). Each reacts on the first tap, every time. Try it a few times, reloading each time.'},
  {ver:'G1',id:'btn-menus',text:'Pause, FLY AGAIN, TITLE, RESUME and the pit-stop buttons all react on the first tap, with no double action.'},
  {ver:'G1',id:'lvl-garage',text:'Garage TUNE: Shield, Hull, Dash, Drone and Revive go up to level 5 (Shield Regen to 6), the other perks to 10 or 12. Each level costs more than the last.'},
