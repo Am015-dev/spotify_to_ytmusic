@@ -46,7 +46,7 @@ const ad=a=>Math.atan2(Math.sin(a),Math.cos(a));
     __d24apply({steer:st,gas,brake});__tick(step);f+=step}__d24apply({steer:0,gas:false,brake:false});return f}},[INPUT==="touch",FPS]);
  const touch=INPUT==="touch";const DT=1/FPS;const res={city:CITY,input:INPUT,fps:FPS,runs:[],pulse:[]};
  const W=async n=>p.evaluate(n=>__tick(n),n);const rel=()=>p.evaluate(()=>__d24apply({steer:0,gas:false,brake:false}));const apply=c=>p.evaluate(c=>__d24apply(c),c);
- for(const V of SPEEDS){for(let ri=0;ri<routes.length;ri++){const P=resample(routes[ri],2),T=turns(routes[ri]).turns.filter(t=>Math.abs(t.ang)>=30);
+ for(const V of process.env.T90ONLY?[]:SPEEDS){for(let ri=0;ri<routes.length;ri++){const P=resample(routes[ri],2),T=turns(routes[ri]).turns.filter(t=>Math.abs(t.ang)>=30);
    const h0=Math.atan2(P[3][0]-P[0][0],P[3][1]-P[0][1]);await rel();await p.evaluate(([x,z,h])=>{__mho.warp(x,z,h,true);const R=__mho.RO;R.v=0;R.yr=0;R.vh=h;R.h=h},[P[0][0],P[0][1],h0]);await W(20);
    await p.evaluate(()=>{__S.length=0});const maxF=Math.round((P.length*2/(V/3.6)*2.2+20)*FPS);await p.evaluate(([P,T,V,m])=>__d24drive(P,T,V,m),[P,T,V,maxF]);await W(5);const S=await p.evaluate(()=>__S.slice());if(process.env.DUMP&&ri===+process.env.DUMP)fs.writeFileSync(OUT.replace('.json','_dump.json'),JSON.stringify({P,T,S}));
    // ---- metrics on the log

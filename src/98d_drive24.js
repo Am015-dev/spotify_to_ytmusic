@@ -34,7 +34,7 @@ function D24_side(R,s,v){if(!R.T)R.T=D24_turns(R.P,R.C);const t=R.T.find(q=>q.s1
 // turn vs ~1 on keys). TUNE.stTouchDig=1: the buttons feed the same digital value as the arrow keys (TOUCH.dir), so touch = keys.
 function D24_shape(c,dt){let raw=clamp(c.steer||0,-1,1);if(TUNE.stTouchDig&&SET.touch==='buttons'&&TOUCH.on&&TOUCH.used&&!RO.dDir&&!c.hb){const kd=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0);raw=clamp((TOUCH.dir||0)+kd,-1,1)}c.steerRaw=raw;if(RO.dDir||c.hb||!dt){RO.d24s=raw;return}
   const dig=Math.abs(raw)>.98||raw===0||SET.touch==='buttons',sp=Math.abs(RO.v||0);let s=RO.d24s||0;
-  if(dig){const Tin=TUNE.stRampLo+(TUNE.stRampHi-TUNE.stRampLo)*clamp(sp/27.8,0,1);if(raw!==0&&Math.sign(raw)===Math.sign(s||raw)&&Math.abs(s)<Math.abs(raw)){if(Math.abs(s)<TUNE.stK0)s=Math.sign(raw)*TUNE.stK0;s+=Math.sign(raw)*dt/Math.max(.02,Tin);if(Math.abs(s)>Math.abs(raw))s=raw}
+  if(dig){const v0=TUNE.stRampV0/3.6,Tin=TUNE.stRampLo+(TUNE.stRampHi-TUNE.stRampLo)*clamp((sp-v0)/Math.max(1,27.8-v0),0,1)/* drive24b: short ramp up to TUNE.stRampV0 km/h (corners), longer above */;if(raw!==0&&Math.sign(raw)===Math.sign(s||raw)&&Math.abs(s)<Math.abs(raw)){if(Math.abs(s)<TUNE.stK0)s=Math.sign(raw)*TUNE.stK0;s+=Math.sign(raw)*dt/Math.max(.02,Tin);if(Math.abs(s)>Math.abs(raw))s=raw}
     else{const d=raw-s;s+=clamp(d,-TUNE.stRet*dt,TUNE.stRet*dt)}}else s=raw;RO.d24s=s;
   const dm=TUNE.stAng/(1+sp/TUNE.stFall),mu=C26.muCity.road*((carStat().han)||1),k=sp>3?clamp(Math.atan(TUNE.stLim*mu*CR_WB/(sp*sp))/dm,.12,1):1;c.steer=s*k;RO.d24k=k}
 ctlPlayer=(f=>function(dtR){const c=f.apply(this,arguments);try{if(state==='roam'&&TUNE.stOn)D24_shape(c,Math.min(dtR||1/60,.05))}catch(e){}return c})(ctlPlayer);
