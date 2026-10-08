@@ -10,7 +10,7 @@ function newGame(mode, o) {
   else if (mode === 'net') { (cfg.ai || []).forEach((l, i) => ai[i] = l || null); }
   const seed = (UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0);
   const names = [D.crew[0].name, D.crew[1].name];
-  G = FA.newGame({ scenario: sc.id, seed, abil: mode === 'guided' ? [] : abil, names, ai, lad: mode === 'vs' ? (cfg.lad || 0) : 0 });
+  G = FA.newGame(Object.assign({ scenario: sc.id, seed, abil: mode === 'guided' ? [] : abil, names, ai, lad: mode === 'vs' ? (cfg.lad || 0) : 0 }, cfg.tutorial ? TUT_SETUP : {}));
   if (mode === 'guided') { G.script = GUIDED_SCRIPT.slice(); }
   if (o.camp && typeof campTwist === 'function') campTwist(G, o.camp.twist);
   UI.mode = mode; UI.seat = mode === 'guided' ? 0 : cfg.role; UI.holder = mode === 'hot' ? -1 : UI.seat; UI.started = true; UI.sel = -1; UI.cof = 0; UI.hint = null; UI.over = null; UI.overShown = false; UI.rrm = [false, false, false, false];
@@ -18,8 +18,8 @@ function newGame(mode, o) {
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
   if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.setEnabled(true); GXH.reset(); } }   // the guided flight: every bubble on, again
-  $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; clearSave(); render(); sndMusic(); coachTick(); schedule();
-  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
+  $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; if (!cfg.tutorial) clearSave(); render(); sndMusic(); coachTick(); schedule();
+  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !cfg.tutorial && !isPh()) showStory();
 }
 function suggestAbil(sc) { const order = ['mastery', 'control', 'antic', 'together', 'sync', 'adapt']; return order.slice(0, sc.ab); }
 // ---- applying a move (every route goes through here: a human tap, the computer, a remote player)
@@ -118,6 +118,7 @@ setInterval(() => {
 }, 250);
 // ---- the end
 function onEnd() {
+  if (UI.cfg && UI.cfg.tutorial) return;   // the staged tutorial flight has its own last step and end card (part 12); nothing is saved, scored or won
   if (UI.overShown) return; UI.overShown = true; clearSave(); hideRecap();   // no round card over the ending picture
   const win = G.result.win; try { if (win) { UI.won[G.sid] = 1; savePrefs(); } snd(win ? 'win' : 'lose'); } catch (e) { }
   const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showEndBoard(); };

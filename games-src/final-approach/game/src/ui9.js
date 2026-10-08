@@ -28,7 +28,7 @@ function campStart(def) {
   try { toast(def.goal.text.length > 70 ? def.goal.text.slice(0, 67) + '...' : def.goal.text); } catch (e) { }
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
-function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); if (typeof storyGate === 'function' && storyGate()) return; GXC.open(); }
 function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
 { const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
 function campLine() {
@@ -41,7 +41,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'approach', data: window.CAMPAIGN, startChapter: campStart, isWon: g => campWon(g), metrics: campMetrics,
+    game: 'approach', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: g => campWon(g), metrics: campMetrics,
     onExit: () => { UI.camp = null; showStart(); },
     scores: g => [campWon(g) ? 1 : 0, 0], seats: () => CAMP_SEATS()
   });

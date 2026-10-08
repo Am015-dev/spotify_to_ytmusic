@@ -77,7 +77,7 @@ const HLP_RULES = [
   { title: 'Win or lose together', text: 'A spin, a crash, an empty Axis or Engines space, or a failed landing loses for both.', pic: () => hpics([['stop', 'Any one']]) },
   { phase: 'brief', title: 'Talk plans, not dice', text: 'Tap a phrase to share a plan. Never say the values of your dice. Then tap Roll my dice.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll']]) },
   { phase: 'brief', title: 'Then stay silent', text: 'After the roll your placed dice are your only words. Watch where your partner puts theirs.', pic: () => hpics([['mute', 'Silence'], '>', ['die', 'Your word', 4]]) },
-  { phase: 'brief', title: 'Blue and orange', text: 'Pilot is blue, Co-pilot orange. Spaces marked P or C belong to that seat. Grey spaces take either.', pic: () => hpics([['seatP', 'Pilot'], ['seatC', 'Co-pilot']]) },
+  { phase: 'brief', title: 'Blue and orange', text: 'Pilot is blue, Co-pilot orange. Blue spaces are the Pilot’s, orange the Co-pilot’s. Grey spaces take either.', pic: () => hpics([['seatP', 'Pilot'], ['seatC', 'Co-pilot']]) },
   { phase: 'brief', title: 'The altitude strip', text: 'One row per round. Its colour says who places first. A purple dot adds a reroll token.', pic: () => hpics([['alt', 'One per round'], ['reroll', 'Reroll']]) },
   { phase: 'die', title: 'Axis: every round', text: 'Both crew put a die on the Axis. The plane tilts toward the higher die. Tilt of 3 loses.', pic: () => hpics([['axis', 'Higher side', 12], ['axis', 'Equal: level', 0]]) },
   { phase: 'die', title: 'Engines: every round', text: 'Both fill the Engines. Sum: up to blue marker stays, up to orange moves 1, above moves 2.', pic: () => hpics([['prop', 'Two dice'], '>', ['gauge', 'Speed']]) },
@@ -157,7 +157,7 @@ function hlpInit() {
 function hlpAfter() {
   hlpInit(); if (typeof GXH === 'undefined') return;
   const vis = id => { const e = document.getElementById(id); return !!(e && !e.hidden); };
-  const busy = !G || !UI.started || G.result || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
+  const busy = !G || !UI.started || G.result || (typeof tutOn === 'function' && tutOn()) || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
   GXH.phase(busy ? null : hlpPhase());
 }
 setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
