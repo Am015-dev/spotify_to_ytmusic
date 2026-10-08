@@ -23,6 +23,18 @@ The laptop made the pictures; the Linux session wires them in, tests and deploys
 4. **Check on a phone (the art window is small).** Monsters must still read at the smallest size. Hand/bench cards may not need the full picture.
 5. **Tests.** Run `arttest.js`, `cards-test.js`, `rules-test.js`, `board-test.js`, `clarity-test.js`, `gauntlet.js`, `click.js`, `click-ph.js` and `lay-phone.js` (the usual build-all phone-check and sweep). Then build, commit and deploy as in `../kot/MEDIA-HANDOFF.md`.
 
+## Boss reveal clips (new, 2026-10-08)
+- `games/doorkick-dungeon/media/doorkick-<key>-boss.mp4`: 6 clips, each 6 s, 854×480, H.264 main, **no audio**, faststart, 363–988 KB (3.6 MB in total).
+  - Keys: `wyrm` (Uranium Wyrm, 20), `inferno` (Horned Inferno, 18), `tentacles` (Tentaclopolis, 18), `pharaoh` (Pharaoh Wrappington, 16), `skygrif` (Stampeding Skygrif, 16), `dread` (The Nameless Dread, 14).
+  - The Grave Twins (16) has no clip: Flow refuses to take its card picture.
+- The raw 1280×720 Flow files are in `media/<key>-boss-raw.mp4`.
+- Made with Google Flow (Omni 1.1 Flash), image-to-video from each monster's own card painting. Prompts are in laptop `game-assets/cards/doorkick/video_prompts.json`.
+- **Wiring (Linux):** play the clip once per game when that monster is first revealed (door kicked open), over the board.
+  - Make it skippable (tap, Esc), never blocking: the fight UI is ready underneath.
+  - Muted autoplay with `playsinline`. Play the game's own `roar`/`door` sound with it.
+  - Skip clips under `prefers-reduced-motion` and in the jsdom tests.
+  - Clips are separate files (not inlined), so they don't count against the 4 MB page cap.
+  - Reuse Crown's clip player in `../kot/media.js` if it fits.
+
 ## Optional
 - `slurper.mp4` (8 s, 16:9, laptop `cards\doorkick\`) is a test clip of the Sock Slurper.
-- Boss reveal clips are being made for the level-16+ monsters (wyrm, inferno, tentacles, pharaoh, twins, skygrif). They are separate files, not inlined, like the Crown City boss clips. A separate hand-off will follow.
