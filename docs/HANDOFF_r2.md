@@ -29,3 +29,10 @@
 3. Garage → SAVE & DRIVE → short Frankfurt drive (tPlay, alex/od-qa `tools/tPlay.js`), tyre gap ≤ 0.05 m, no console errors; start-screen shot.
 4. REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with shots (5 modes, build+parts list, paint, locked part, start, Frankfurt drive).
 5. After PASS: merge CURRENT live (R1 may ship v88b), OD_CHANGELOG entry (next letter), `tools/build.sh <ver>`, copy tune.json + music/*.mp3, commit out/<ver>, send coordinator DEPLOY.
+
+## Update 08:30
+- Merged v88b (R1, live 887c4f7): verify_live = live + only 98u. R1 stat chips (#gbStats) moved to the top of the side panel, shown in RIDES/PERKS; header weight = R1_weight.
+- Placing works by real taps (test bug: send touchStart+touchEnd together with Promise.all; the page runs ~0.2–1 fps here).
+- **Test env facts:** the garage redraws only every ~5 s on this box, and NEVER with ?fast=1 (virtual rAF) → shots need ≥ 8 s waits, no fast mode (SW env in t4/r2shell.js). Kit thumbnails take seconds each here.
+- Finishes verified visually (t4/r2fin.js, 30 s waits): gloss/matte/metal/chrome/pearl differ.
+- Next: s4 full tour (non-fast) → t4/r2drive.js (PAINT chrome → SAVE & DRIVE → Frankfurt, tyre gap) → PC 1280×720 → REVIEW.
