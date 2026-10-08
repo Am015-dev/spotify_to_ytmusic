@@ -310,7 +310,7 @@ function update(dt){
       case'swarm':DIR.moveSwarm(e,sdt,d);break;
       case'mine':DIR.moveMine(e,sdt,d);break;
       case'boss':bossUpdate(e,sdt,d);break;}
-    if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+5){hurt();if(e.type!=='gunship')e.hp=0;}
+    if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+(HARD?8:5)){hurt();if(e.type!=='gunship')e.hp=0;}
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
   /* player bullets */
