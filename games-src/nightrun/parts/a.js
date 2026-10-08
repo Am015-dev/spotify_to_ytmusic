@@ -3,7 +3,10 @@
 "use strict";
 const W=960,H=540,PR=1.5;
 const $=id=>document.getElementById(id);
-const cv=$('game'),ctx=cv.getContext('2d'),frame=$('frame'),stage=$('stage');
+const cv=$('game'),frame=$('frame'),stage=$('stage');
+let ctx=cv.getContext('2d');                              // the context everything draws on right now
+const vctx=ctx;                                         // the visible canvas
+let wctx=ctx,wcv=cv,VS=1;                               // world layer: portrait draws the world on its own canvas, then turns it upright; VS = visible px per HUD unit
 let S=1,rotMode=false,touchUI=false;
 try{touchUI=matchMedia('(pointer:coarse)').matches;}catch(e){}
 
@@ -16,6 +19,7 @@ const gr=(a,b)=>a+GR()*(b-a),gx=(a,b)=>a+GX()*(b-a);
 const gpick=a=>a[Math.floor(GR()*a.length)];
 function mk(w,h){const c=document.createElement('canvas');c.width=Math.ceil(w*PR);c.height=Math.ceil(h*PR);const g=c.getContext('2d');g.scale(PR,PR);return[c,g];}
 function blit(c,x,y){ctx.drawImage(c,x,y,c.width/PR,c.height/PR);}
+function wtxt(s,x,y){if(wcv===cv){ctx.fillText(s,x,y);return;}ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/2);ctx.fillText(s,0,0);ctx.restore();}   // text inside the world: turned back upright in portrait
 
 /* ---------- glow sprites ---------- */
 const gc={};
@@ -31,14 +35,19 @@ let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
-let SMALL=false;try{SMALL=Math.min(screen.width,screen.height)<=500;}catch(e){}   // small phone: calm visuals are on by default
-const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,calm:SMALL,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
-const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
-if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
+// every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
+const DEFS={music:.45,sfx:.8,master:1,duck:true,mute:false,diff:'normal',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
+  part:1,shake:2,flash:RM?1:2,rm:RM,hc:false,pal:'neon',q:'M',fps:60,fpsc:false};
+const SET=Object.assign({},DEFS,load('mnr_set',{}));
+if(!SET.v3){SET.v3=1;if(SET.guide===false)SET.cue='off';if(SET.reduce){SET.rm=true;SET.flash=1;}SET.part=1;SET.music=Math.min(SET.music,.45);   // older saves: calm visuals everywhere, music under the effects
+  if(load('mnr_hard',false))SET.diff='hard';delete SET.guide;delete SET.calm;delete SET.reduce;delete SET.mv2;}
+SET.mute=load('mnr_mute',false);
+function deriveSet(){SET.calm=SET.part<2;SET.reduce=!!SET.rm||SET.flash<2;}deriveSet();   // calm = fewer sparks; reduce = no strobing blinks
+const saveSet=()=>{deriveSet();save('mnr_set',SET);save('mnr_mute',SET.mute);};
 const SIM=/[?&]sim=1/.test(location.search);            // test switch: no audio context at all, the page is stepped by hand (__mnr.step)
 const NOMUSIC=SIM||/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
 try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}   // iOS: Web Audio ignores the silent switch only in the 'playback' session
-const FX=()=>SET.reduce?.25:1;                          // strength of flashes and shake
+const FX=()=>[0,.25,1][SET.flash];                      // strength of screen flashes (settings: Flashing off / reduced / full)
 
 /* ---------- beat clock ---------- */
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
@@ -79,7 +88,9 @@ function audible(ts){                                    // music-clock seconds 
   if(BT.src&&a){if(a.state!=='running')return a.currentTime-(a.outputLatency||0)+SET.sync/1000;return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;}
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
-function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80+NR.mod.win&&p>-.3,dt,beat:n};}
+const WINS={tight:70,normal:110,loose:160};
+const winMs=()=>(WINS[SET.win]||110)+NR.mod.win;         // half-width of the on-beat window in ms
+function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:(SET.all||Math.abs(dt)<=winMs())&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
 
 /* ---------- tracks (lazy) ---------- */
@@ -96,6 +107,17 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
     TR.bufs[info.file]=buf;AU.trackReady(stage);}
   catch(e){TR.bad[info.file]=1;}
   TR.busy[info.file]=0;}
+
+/* ---------- latency test (settings): clicks on the audio clock, the player taps, the median lateness becomes the Audio sync ---------- */
+const CAL={on:false,dom:0,t0:0,per:.5,next:0,taps:[],need:8,done:null,last:null};
+const calNow=()=>audible()-SET.sync/1000;                // the clock the clicks are on, as heard (without the correction we are measuring)
+function calStart(){mnow();CAL.dom=BT.src?1:0;CAL.t0=calNow()+.9;CAL.next=0;CAL.taps=[];CAL.done=null;CAL.last=null;CAL.on=true;}
+function calStop(){CAL.on=false;}
+function calTap(ts){if(!CAL.on)return null;const h=audible(ts>0?ts:undefined)-SET.sync/1000,i=Math.round((h-CAL.t0)/CAL.per);if(i<0)return null;
+  const d=(h-(CAL.t0+i*CAL.per))*1000;if(Math.abs(d)>180){CAL.last='off';return d;}                    // way off: not a tap at the click
+  CAL.taps.push(d);CAL.last=d;
+  if(CAL.taps.length>=CAL.need){const a=CAL.taps.slice().sort((x,y)=>x-y),med=(a[3]+a[4])/2;SET.sync=clamp(Math.round(-med/5)*5,-150,150);saveSet();CAL.done=SET.sync;CAL.on=false;}
+  return d;}
 
 /* ---------- audio ---------- */
 const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
@@ -119,9 +141,9 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     if(a.state!=='running'){try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0);}catch(e){}}   // silent unlock sound inside the gesture
     if(!navigator.audioSession&&!this.sil){try{const h=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=');h.loop=true;h.volume=.01;h.setAttribute('playsinline','');this.sil=h;const q=h.play();if(q&&q.catch)q.catch(()=>{this.sil=null;});}catch(e){}}
     if(!running&&!BT.stage)this.menuMusic();},
-  duckMusic(){const a=this.a;if(!a||!this.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
+  duckMusic(){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
-    this.m.gain.setTargetAtTime(SET.mute?0:.55,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
+    this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
   suspend(){this.hold=true;const a=this.a;if(a&&a.state==='running')a.suspend().catch(()=>{});},
   resume(){this.hold=false;this.rUntil=performance.now()+700;const a=this.a;if(a&&a.state!=='running')a.resume().catch(()=>{});},
   f(n){return 440*Math.pow(2,(n-69)/12);},
@@ -181,6 +203,18 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
       if(s%4===2)this.noise(t,.035,.15,8000,this.mus);
       if(s===4||s===12)this.noise(t,.11,.28,1600,this.mus,'bandpass');
       this.istep++;}},
+  // power layers: every tier of the meter adds a part on the same grid (2: hats, 3: kick + clap, 4: pulsing bass line)
+  tier:1,
+  tlsched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime,T=this.tier;
+    if(this.trev!==BT.rev||this.tstep===undefined){this.trev=BT.rev;this.tstep=Math.ceil((now-t0)/s16);}
+    if(t0+this.tstep*s16<now-.02)this.tstep=Math.ceil((now-t0)/s16);
+    while(t0+this.tstep*s16<now+.12){const n=this.tstep,t=t0+n*s16,s=((n%16)+16)%16;
+      if(s%2===0)this.noise(t,.03,.08+.02*T,9000,this.mus);
+      if(T>=3){if(s%4===0&&!this.int)this.osc(t,'sine',150,.2,.4,this.mus,40);if(s===4||s===12)this.noise(t,.09,.2,1800,this.mus,'bandpass');}
+      if(T>=4&&s%2===0)this.osc(t,'square',this.f(this.root+12+[0,7,12,7][(s/2)%4]),.11,.05,this.mus,0,2400);
+      this.tstep++;}},
+  calsched(a){if(!CAL.on||CAL.dom!==1)return;const now=a.currentTime;                                  // latency test: a click every half second on the audio clock
+    while(CAL.t0+CAL.next*CAL.per<now+.12){const t=CAL.t0+CAL.next*CAL.per;if(t>=now-.02)this.osc(t,'square',1500,.05,.18,this.fx,900);CAL.next++;}},
   osc(t,type,freq,dur,vol,dest,slide,cut){const a=this.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
     if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+dur);
     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
@@ -189,10 +223,11 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   noise(t,dur,vol,freq,dest,type='highpass'){const a=this.a,s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=this.nb;
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
-  sched(){const a=this.a;if(a&&this.want&&running&&!paused)this.switchTo(this.want);
+  sched(){const a=this.a;if(a&&CAL.on&&a.state==='running')this.calsched(a);if(a&&this.want&&running&&!paused)this.switchTo(this.want);
     if(!a||a.state!=='running'||!running||paused)return;
     if(BT.mode==='synth'&&!BT.pend&&!this.want&&TR.by[BT.stage]&&TR.bufs[TR.by[BT.stage].file])this.trackReady(BT.stage);   // the song file arrived while a switch was pending: swap it in on the next bar
     if(this.int&&BT.mode==='file')this.isched(a);
+    if(this.tier>1&&BT.mode!=='none')this.tlsched(a);
     if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
     const quiet=TR.list.length>0&&!/[?&]synth=1/.test(location.search);   // owner: never the old synth tune when real songs exist; the beat grid keeps running silently until the song is in
@@ -217,6 +252,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
       case'warn':for(let i=0;i<3;i++){this.osc(t+i*.5,'square',this.f(81),.22,.12,F);this.osc(t+i*.5+.22,'square',this.f(76),.22,.12,F);}break;
       case'heat':this.osc(t,'sawtooth',180,.3,.2,F,90);break;
       case'up':[0,4,7,12].forEach((k,i)=>this.osc(t+i*.06,'square',this.f(72+k),.12,.08,F));break;
+      case'tier':[0,4,7,12,16].forEach((k,i)=>this.osc(t+i*.045,'triangle',this.f(84+k),.14,.12,F));break;
       case'perfect':this.osc(t,'triangle',this.f(100),.16,.2,F);this.osc(t+.05,'triangle',this.f(107),.24,.16,F);this.osc(t,'sine',this.f(112),.3,.06,F);break;
       case'phase':this.noise(t,.6,.5,500,F,'lowpass');this.osc(t,'sawtooth',this.f(52),.7,.35,F,this.f(40),900);[0,3,7].forEach((k,i)=>this.osc(t+.1+i*.1,'square',this.f(76+k),.2,.08,F));break;
     }}

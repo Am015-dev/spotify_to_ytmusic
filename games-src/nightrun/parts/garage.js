@@ -12,7 +12,7 @@ const THEMES=[
   {id:'ghost',n:'Ghost',t:'Cold, washed-out glow',p:60,f:'hue-rotate(20deg) saturate(.35) brightness(1.05)'}];
 const CREW=[
   {id:'up_db',n:'Dash Blast',t:'Dashing hurts enemies you pass',p:70,ic:'M12 1l2.5 7.5L22 12l-7.5 2.5L12 23l-2.5-8.5L2 12l7.5-3.5z'},
-  {id:'up_sb',n:'Sharp Beat',t:'PERFECT shots hit 50% harder',p:90,ic:'M12 1l9 11-9 11L3 12z'},
+  {id:'up_sb',n:'Sharp Beat',t:'Gold pulse shots hit 50% harder',p:90,ic:'M12 1l9 11-9 11L3 12z'},
   {id:'up_nx',n:'Neon Boost',t:'Kills drop 50% more Neon',p:110,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z'}];
 const GA={bank:0,own:{},ship:'std',theme:'neon',runs:0,tab:'ships',from:'title'};
 (()=>{const b=+load('mnr_bank',0),o=load('mnr_own',{}),s=load('mnr_ship','std'),t=load('mnr_theme','neon'),r=+load('mnr_runs',0);

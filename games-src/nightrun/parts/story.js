@@ -1,26 +1,26 @@
 /* ---------- Nightrun Story: 12 stages in 3 acts, stage select, stars, Hard toggle for Endless ---------- */
 const ALL=/[?&]all=1/.test(location.search);             // ?all=1 opens every stage (test link); a long press on the title does the same and is remembered
-let HARD=!!load('mnr_hard',false);
+let HARD=SET.diff==='hard';DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty lives in the settings (Easy / Normal / Hard); the title button cycles it
 const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all};})();
 const sPersist=()=>save('mnr_story',sSave);
 // difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
 const TUNE={d0:.8,dd:.11,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.07,eh:.2,el0:2,eld:.07,hd:.09,hull:[5,5,5,5,5,5,5,5,4,4,4,4],lv:[2.2,3.3,3.7,3.8,5.2,6.6,5.3,6.2,8,7.8,8.55,9.4],bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
 const STAGES=[
-  {n:1, di:0,name:'FIRST RUN',     intro:'Deliver the data. Stay alive.',     goal:{k:'survive',v:46},perf:22,waves:['droneLine','droneV','droneSine']},
-  {n:2, di:0,name:'PATROL',        intro:'Drones on patrol. Shoot on the beat.',goal:{k:'kill',v:170},   perf:22,waves:['droneLine','droneSine','chargers','droneV']},
-  {n:3, di:0,name:'SEK-ADLER',     intro:'Police interceptor on your tail.',  goal:{k:'boss'},lead:22,   perf:22,waves:['droneLine','droneV','turret','chargers']},
-  {n:4, di:1,name:'RIVER ROAD',    intro:'Follow the river. Chain PERFECTs.', goal:{k:'score',v:180000},   perf:26,waves:['droneSine','chargers','droneV','turret']},
-  {n:5, di:1,name:'BRIDGE GUARD',  intro:'Something guards the old bridge.',  goal:{k:'mini'},lead:24,   perf:26,waves:['droneSine','chargers','turret'],
+  {n:1, di:0,name:'FIRST RUN',     intro:'Deliver the data. Stay alive.',     goal:{k:'survive',v:46},perf:46,waves:['droneLine','droneV','droneSine']},
+  {n:2, di:0,name:'PATROL',        intro:'Drones on patrol. Shoot on the beat.',goal:{k:'kill',v:170},   perf:35,waves:['droneLine','droneSine','chargers','droneV']},
+  {n:3, di:0,name:'SEK-ADLER',     intro:'Police interceptor on your tail.',  goal:{k:'boss'},lead:22,   perf:19,waves:['droneLine','droneV','turret','chargers']},
+  {n:4, di:1,name:'RIVER ROAD',    intro:'Follow the river. Chain PERFECTs.', goal:{k:'score',v:180000},   perf:29,waves:['droneSine','chargers','droneV','turret']},
+  {n:5, di:1,name:'BRIDGE GUARD',  intro:'Something guards the old bridge.',  goal:{k:'mini'},lead:24,   perf:24,waves:['droneSine','chargers','turret'],
      mini:{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}},
-  {n:6, di:1,name:'FLUSSKRAKE',    intro:'The river fights back.',            goal:{k:'boss'},lead:28,   perf:26,waves:['droneSine','chargers','turret','gunship']},
+  {n:6, di:1,name:'FLUSSKRAKE',    intro:'The river fights back.',            goal:{k:'boss'},lead:28,   perf:22,waves:['droneSine','chargers','turret','gunship']},
   {n:7, di:2,name:'GATE RUN',      intro:'Laser gates ahead. Dash through.',  goal:{k:'survive',v:46},perf:30,waves:['gate','droneLine','turret','gate','chargers']},
-  {n:8, di:2,name:'GATE KEEPER',   intro:'The gates have a keeper.',          goal:{k:'mini'},lead:34,   perf:30,waves:['gate','turret','chargers'],
+  {n:8, di:2,name:'GATE KEEPER',   intro:'The gates have a keeper.',          goal:{k:'mini'},lead:34,   perf:22,waves:['gate','turret','chargers'],
      mini:{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}},
-  {n:9, di:2,name:'ZENTRAL-ICE',   intro:'Break the bank firewall.',          goal:{k:'boss'},lead:30,   perf:30,waves:['gate','turret','droneSine','gunship']},
+  {n:9, di:2,name:'ZENTRAL-ICE',   intro:'Break the bank firewall.',          goal:{k:'boss'},lead:30,   perf:22,waves:['gate','turret','droneSine','gunship']},
   {n:10,di:3,name:'TRADE FAIR',    intro:'Elite guards everywhere. Stay sharp.',goal:{k:'kill',v:230},     perf:34,waves:['droneV','chargers','turret','gunship','droneSine']},
-  {n:11,di:3,name:'RUSH HOUR',     intro:'Rack up score. Do not get hit.',    goal:{k:'score',v:800000},   perf:34,waves:['droneV','droneSine','turret','chargers','gate','gunship']},
-  {n:12,di:3,name:'KRONOS',        intro:'End the corporation. Last delivery.',goal:{k:'boss'},lead:28,   perf:34,waves:['gate','gunship','turret','chargers','droneSine']}];
+  {n:11,di:3,name:'RUSH HOUR',     intro:'Rack up score. Do not get hit.',    goal:{k:'score',v:800000},   perf:22,waves:['droneV','droneSine','turret','chargers','gate','gunship']},
+  {n:12,di:3,name:'KRONOS',        intro:'End the corporation. Last delivery.',goal:{k:'boss'},lead:28,   perf:20,waves:['gate','gunship','turret','chargers','droneSine']}];
 for(const s of STAGES){s.song=['stage1','stage2','stage3'][(s.n-1)%3];s.act=Math.floor((s.n-1)/4);}
 const ACTN=['ACT I','ACT II','ACT III'];
 const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+g.v:g.k==='kill'?'KILL '+g.v:g.k==='score'?'SCORE '+(g.v/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
@@ -155,9 +155,9 @@ $('srMenu').addEventListener('click',openStages);
 {const sb=document.createElement('button');sb.className='go';sb.id='storyBtn';sb.type='button';sb.textContent='STORY';
   const row=$('startBtn').parentNode,row1=document.createElement('div');row1.className='row';row.before(row1);row1.append(sb,$('startBtn'));
   $('startBtn').textContent='ENDLESS';$('startBtn').classList.add('alt');$('dailyBtn').classList.remove('alt');$('dailyBtn').classList.add('dim');
-  const hb=document.createElement('button');hb.className='go dim';hb.id='hardBtn';hb.type='button';row1.append(hb);
-  const hardDraw=()=>{hb.textContent='HARD '+(HARD?'ON':'OFF');hb.classList.toggle('on',HARD);};hardDraw();
-  hb.addEventListener('click',()=>{HARD=!HARD;save('mnr_hard',HARD);hardDraw();});
+  const hb=document.createElement('button');hb.className='go dim';hb.id='diffBtn';hb.type='button';row1.append(hb);
+  window.diffDraw=()=>{hb.textContent=SET.diff.toUpperCase();hb.classList.toggle('on',SET.diff==='hard');};diffDraw();
+  hb.addEventListener('click',()=>{const o=['easy','normal','hard'];setVal('diff',o[(o.indexOf(SET.diff)+1)%3]);});
   sb.addEventListener('click',openStages);
   // hidden: hold the title for a second to unlock every stage
   const h1=titleEl.querySelector('h1');let lp=0;h1.style.touchAction='none';

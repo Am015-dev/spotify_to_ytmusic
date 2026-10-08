@@ -57,7 +57,7 @@ const HLP_RULES = [
 // the moment the player is deciding in (null when there is nothing to decide on the board)
 function hlpPhase() {
   try {
-    if (!G || !UI.started || G.phase === 'over' || UI.cards.length || UI.pop || UI.cityOpen || UI.animBusy) return null;
+    if (!G || !UI.started || G.phase === 'over' || (UI.cfg && UI.cfg.tutorial) || UI.cards.length || UI.pop || UI.cityOpen || UI.animBusy) return null;
     const a = HB.actor(G); if (a < 0 || G.players[a].ai || a !== viewSeat()) return null;
     const mm = myMoves(); if (!mm.length) return null;
     if (UI.sel) return 'how';

@@ -68,20 +68,20 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
     ctx.translate(0,-e.r-24);this.coin(e.pw,10);ctx.restore();},
   pickup(p,y,t){const K=PWK[p.k];ctx.save();ctx.translate(p.x,y);ctx.globalCompositeOperation='lighter';G_(0,0,30,K.c,.7);ctx.globalCompositeOperation='source-over';
     ctx.strokeStyle=K.c;ctx.globalAlpha=.7;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.lineDashOffset=-t*16;ctx.beginPath();ctx.arc(0,0,19,0,7);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
-    this.coin(p.k,13);ctx.font='700 10px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillStyle=K.c;ctx.fillText(K.n.split(' ')[0],0,32);ctx.restore();},
+    this.coin(p.k,13);ctx.font='700 10px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillStyle=K.c;wtxt(K.n.split(' ')[0],0,32);ctx.restore();},
   draw(t){const s=G.pw;if(!s)return;
     const d=s.drop;if(d&&bpos()>=d.cutB){ctx.fillStyle='rgba(8,2,20,.28)';ctx.fillRect(0,0,W,H);}   // the bar without music
     if(s.wv>0){const k=1-s.wv/.7;ctx.strokeStyle='#b36bff';ctx.globalAlpha=1-k;ctx.lineWidth=14*(1-k)+2;ctx.beginPath();ctx.arc(P.x,P.y,k*1300,0,7);ctx.stroke();ctx.globalAlpha=1;}},
-  hud(t){const s=G.pw;if(!s)return;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
+  hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
     if(s.drop){const d=s.drop,p=bpos();items.push({k:'drop',rem:d.blastB-p,tot:d.blastB-d.b0,txt:p<d.cutB?'CUT ON THE DOWNBEAT':'BLAST IN '+Math.max(1,Math.ceil((d.blastB-p)/4))+' BAR'});}
-    let y=76;
-    for(const it of items){const K=PWK[it.k],n=Math.round(it.tot/4),bw=132,sw=bw/n;ctx.save();ctx.translate(18,y);
+    let y=y0==null?76:y0;
+    for(const it of items){const K=PWK[it.k],n=Math.round(it.tot/4),bw=132,sw=bw/n;ctx.save();ctx.translate(x0,y);ctx.scale(k,k);
       ctx.fillStyle='#05030cb0';ctx.fillRect(-6,-20,232,40);
       ctx.translate(14,0);this.coin(it.k,11);ctx.translate(-14,0);
       ctx.textAlign='left';ctx.font='700 14px "Chakra Petch",sans-serif';ctx.fillStyle=K.c;ctx.fillText(K.n,32,-3);
       ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#e9e6ff';ctx.fillText(it.txt||Math.max(1,Math.ceil(it.rem/4))+(Math.ceil(it.rem/4)>1?' BARS':' BAR'),220,-3);
       for(let i=0;i<n;i++){const f=clamp(it.rem/4-i,0,1);ctx.fillStyle='#ffffff26';ctx.fillRect(32+i*sw,8,sw-2,5);ctx.fillStyle=K.c;ctx.fillRect(32+i*sw,8,(sw-2)*f,5);}
-      ctx.restore();y+=46;}}
+      ctx.restore();y+=46*k;}}
 };
 NR.on('spawn',e=>{if(!G.live||e.type==='gate'||G.dead)return;const s=PW.st();if(--s.cnt>0)return;s.cnt=Math.round(gx(22,34));e.pw=PW.pick();});
 NR.on('kill',({e})=>{if(!G.live)return;if(e.pw||e.type==='boss')G.pk.push({t:'pw',k:e.pw||PW.pick(),x:e.x,y:e.y,vx:-30,vy:0,bob:0});});
