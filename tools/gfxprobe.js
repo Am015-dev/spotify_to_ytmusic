@@ -31,9 +31,9 @@ const lap = (k, t0) => { T[k] = +((now() - t0) / 1000).toFixed(1); console.log(k
   // garage: pause -> garage -> OPEN GARAGE BUILDER
   const vis = () => p.evaluate(() => [...document.querySelectorAll('button')].filter(b => b.offsetWidth > 4 && b.getBoundingClientRect().bottom > 0).map(b => b.textContent.trim().slice(0, 18)).slice(0, 14).join(' | '));
   // the builder refuses while an event runs ("FINISH THE EVENT FIRST"): abandon it from the pause menu first
-  await tap('#roamExit'); await p.waitForTimeout(600); console.log('pause:', await vis());
+  await tap('#tP'); await p.waitForTimeout(600); console.log('pause:', await vis());
   if (await tap('#roamPause [data-p=eva]')) { await p.waitForTimeout(800); console.log('after abandon:', await vis()); for (const s of ['#roamPause [data-p=resume]']) { if (await p.evaluate(() => !document.querySelector('#roamPause').hidden)) await tap(s) } await p.waitForTimeout(500) }
-  t = now(); if (await p.evaluate(() => document.querySelector('#roamPause').hidden)) { await tap('#roamExit'); await p.waitForTimeout(600) } const g1 = await tap('#roamPause [data-p=garage]'); await p.waitForTimeout(1500); console.log('garage:', await vis());
+  t = now(); if (await p.evaluate(() => document.querySelector('#roamPause').hidden)) { await tap('#tP'); await p.waitForTimeout(600) } const g1 = await tap('#roamPause [data-p=garage]'); await p.waitForTimeout(1500); console.log('garage:', await vis());
   const opened = await p.evaluate(() => { const b = [...document.querySelectorAll('button')].find(b => /OPEN GARAGE BUILDER/.test(b.textContent) && b.offsetWidth); if (b) { b.setAttribute('data-qa', 'gbo'); return true } return false });
   if (opened) await tap('[data-qa=gbo]'); await p.waitForFunction(() => { const c = document.querySelector('#gbC'); return c && c.offsetWidth > 100 }, null, { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(1500); lap('open_builder', t);
   const gbOk = await p.evaluate(() => { const c = document.querySelector('#gbC'); return !!c && c.offsetWidth > 100 }); R.builderOpen = gbOk; console.log('builder open', gbOk, 'garage btn', g1);
