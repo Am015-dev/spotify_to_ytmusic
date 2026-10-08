@@ -6,7 +6,9 @@ const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 // TUNE (tune20): live-tunable driving numbers that used to be inline literals; defaults = the v87w values. Knob table + ?tune=1 drawer: src/99t_tune.js.
 const TUNE={stAng:.55,stFall:14,stIn:11,stOut:16,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
   // fix21 boost FX (TUNE drawer "FX" tab): thruster flame size / length / brightness, boost sparks on/off + count + size, speed lines, screen blur/glow, FOV kick, shake (all ×, 1 = default look)
-  fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1};
+  fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
+  // fix21 audio (TUNE drawer AUDIO tab, 98m_music.js): music on/off + volume (0.5 = the old synth level), SFX ×, duck music under dialogue (on/off + how much)
+  musOn:1,musVol:.5,sfxVol:1,duckOn:1,duckAmt:.7};
 const OD_CHANGELOG=[
   {v:'v87x',date:'7 Oct 2026',items:[{t:'NEW',s:'Tuning drawer for Alex (beta only): tap ⚙ top-right to change steering, grip, speed, boost, camera and car feel with sliders while you drive; SAVE keeps numbered versions and ★ SET picks the one the beta starts with.'},{t:'CHANGED',s:'Nothing changes for normal players: with no saved tuning the car drives exactly like v87w.'}]},
   {v:'v87w',date:'7 Oct 2026',items:[{t:'FIXED',s:'Hot Drop: Oma Hilde\'s tow truck no longer jumps onto your car at the start (the big orange block over the screen); it waits up the road and drives off.'},{t:'FIXED',s:'Races: rival name tags no longer pile up; only the 3 nearest show, stacked neatly.'},{t:'FIXED',s:'City traffic sits on all four tyres (no more floating wheels on sloped roads).'},{t:'CHANGED',s:'Garage: the "drag to rotate" tip no longer covers the GARAGE sign and goes away once you have dragged.'}]},

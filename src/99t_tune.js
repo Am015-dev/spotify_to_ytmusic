@@ -31,7 +31,10 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['FX','TUNE.fxFlS','Flame size ×',0,2.5,.05],['FX','TUNE.fxFlL','Flame length ×',0,3,.05],['FX','TUNE.fxFlI','Flame brightness ×',0,3,.05],
  ['FX','TUNE.fxSpk','Boost sparkles',0,1,1,'bool'],['FX','TUNE.fxSpkN','Sparkle count ×',0,3,.1],['FX','TUNE.fxSpkS','Sparkle size / spread ×',.2,3,.05],
  ['FX','TUNE.fxLines','Speed lines on boost ×',0,3,.05],['FX','TUNE.fxGlow','Boost screen glow / blur ×',0,3,.05],
- ['FX','TUNE.fxFov','Boost FOV kick ×',0,3,.05],['FX','TUNE.fxShake','Boost camera shake ×',0,3,.05]];
+ ['FX','TUNE.fxFov','Boost FOV kick ×',0,3,.05],['FX','TUNE.fxShake','Boost camera shake ×',0,3,.05],
+ // fix21 AUDIO: music tracks + synth music, SFX (engine, boost, smash), ducking (98m_music.js). The menu SOUND button still mutes everything
+ ['Audio','TUNE.musOn','Music',0,1,1,'bool'],['Audio','TUNE.musVol','Music volume',0,1,.05],['Audio','TUNE.sfxVol','SFX volume (engine, boost, smash) ×',0,2,.05],
+ ['Audio','TUNE.duckOn','Duck music under dialogue + boost',0,1,1,'bool'],['Audio','TUNE.duckAmt','Duck amount',0,1,.05]];
 const TU_ROOT={TUNE,C26,W13S,W14_ST,RCAM,W:window};
 const TU_ref=id=>{const p=id.split('.');let o=TU_ROOT[p[0]];for(let i=1;i<p.length-1&&o;i++)o=o[p[i]];return o?[o,p[p.length-1]]:null};
 const TU_get=id=>{const r=TU_ref(id);return r?r[0][r[1]]:undefined};
@@ -90,7 +93,9 @@ function TU_ui(){if(TU.el)return;const st=document.createElement('style');st.tex
   else if(a==='resetAll'){TU_apply(null);TU.src='defaults';TU.msg='all defaults';TU_render()}
   else if(a==='save'){const n=d.querySelector('#tuN');TU_save(n?n.value:'')}
   else if(a==='load')TU_load(+b.dataset.v);else if(a==='cur')TU_setCur(+b.dataset.v);else if(a==='exp')TU_export();else if(a==='ref')TU_list()});
- addEventListener('resize',()=>TU_fit());TU_render()}
+ addEventListener('resize',()=>TU_fit());TU_render();
+ // fix21: on the menu the ⚙ sat on top of SOUND ON (#topBtns, top right): drop it below those buttons while they show
+ setInterval(()=>{const tb=document.getElementById('topBtns');let y=6;if(tb&&!tb.hidden&&tb.offsetWidth){const r=tb.getBoundingClientRect(),q=g.getBoundingClientRect();if(r.bottom>0&&r.left<q.right&&r.right>q.left)y=Math.round(r.bottom+6)}const v=`calc(${y}px + env(safe-area-inset-top))`;if(g.style.top!==v)g.style.top=v},400)}
 function TU_toggle(on){TU.open=on==null?!TU.open:on;TU.el.classList.toggle('on',TU.open);if(TU.open){TU_render();TU_fit()}}
 // keep the drawer above every visible touch control it would cover (GAS/BRAKE/◀▶/DRIFT/BOOST): its bottom stops 6 px above them
 function TU_fit(){const d=TU.el;if(!d||!TU.open)return;const W=innerWidth,H=innerHeight,C=[];
