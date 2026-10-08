@@ -19,3 +19,9 @@
 - Life 0 now keeps 70 pedestrians, spread out as in v88i.
 - REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v for 094992e6. Shot paths are listed in that message (lv/after3, lv/rv, lv/feat, lv/su).
 - After PASS: fetch origin/alex/brave-carson-rbpmlk and compare it with the live version. If live moved past v88l, merge that worker's branch. Then `tools/build.sh v88n`, `git add -f out/v88n`, push, and send the coordinator "DEPLOY alex/od-lively <commit> out/v88n <msg>".
+
+## Reviewer PASS (094992e6) + notes
+- (a) The effect is subtle in the chase view. Follow-up: groups of 3–6 peds at the nearest corners within 20–40 m, a car within 60 m on most streets, pigeons on the pavement ahead; raise the Life defaults if the phone FPS allows.
+- (b) Scale: ped 1.67 m (SC_K.ped .44, unchanged since v88i) vs Hot Rod 1.44 m H = 1.16×, under the 1.2× gate. No new humanoid.
+- (c) The tutorial card is missing from the Athens after-shots only because the after-run seed sets tut:1 (lv/shots.js); no code hides it.
+- (d) The checklist items are present: life-fps, life-pigeons, life-boats, life-sky (blimp), life-traffic (street racers).
