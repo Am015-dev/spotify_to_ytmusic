@@ -54,8 +54,8 @@ const NR_CHECKLIST=[
    if(e.target&&e.target.tagName==='INPUT')return;if(e.code==='Enter'||e.code==='Space')e.stopImmediatePropagation();},true);   // Enter / Space inside the sheet never starts the game
  window.nrChkOpen=()=>{render();ov.hidden=false};
  const mk=()=>{const b=document.createElement('button');b.type='button';b.className='go dim ckB';b.addEventListener('click',e=>{e.stopPropagation();nrChkOpen()});return b};
- const foot=document.querySelector('#setm .sfoot'),trow=document.querySelector('#title .row');
- if(foot)foot.insertBefore(mk(),foot.firstChild);
+ const trow=document.querySelector('#title .row');
+ {const sb=document.getElementById('setBody');if(sb){const w=document.createElement('div');w.style.cssText='margin:10px 0 4px';w.appendChild(mk());sb.appendChild(w);}}   // top of the settings list: the footer is too narrow for a third button on a small phone
  if(trow){const r2=document.createElement('div');r2.className='row';r2.id='titleRow2';r2.appendChild(mk());trow.after(r2);}
  badge();
  window.__chk={open:()=>nrChkOpen(),text,items:NR_CHECKLIST,left,ver:NR_VER};}

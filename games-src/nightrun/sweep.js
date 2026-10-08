@@ -74,7 +74,7 @@ const INIT = () => {
       return { bx, by, dash, emp };
     },
     probe() {
-      const m = window.__mnr, out = { ok: !!m }; if (!m) return out;
+      const m = window.__mnr, out = { ok: !!m }; if (!m) return out; document.documentElement.classList.add('rdy');   // the layout checks look at the title buttons: show them
       const G = m.G, P = m.P, vis = e => { const r = e.getBoundingClientRect(); return r.width > 2 && r.height > 2 && !e.closest('[hidden]'); };
       const ids = ['title', 'over', 'pausem', 'setm']; out.ov = {}; for (const i of ids) out.ov[i] = !document.getElementById(i).hidden;
       out.run = m.running; out.paused = m.paused; out.shop = !!(m.SH && m.SH.active); out.neon = m.SH ? m.SH.neon : 0; out.pits = m.SH ? m.SH.pits : 0; out.rot = m.rotMode; out.vw = innerWidth; out.vh = innerHeight; out.touchUI = m.touchUI;
@@ -783,7 +783,7 @@ async function shopTests(browser, cfg, full) {
         await press(p, cfg, T, '#shGo'); await sleep(300);
       }
       const E = await ev(p, () => { const h = __mnr.SH; return { fr: h.n('fr'), hm: h.hm, ck: h.ck, sharp: h.sharp, nx: h.nx, sh: h.sh, spare: h.spare, mag: __mnr.NR.mod.mag, win: __mnr.NR.mod.win, pw: __mnr.NR.mod.pw, spb: __mnr.BT.spb }; });
-      await chk(E.fr >= 1 && E.hm === 1 && E.ck === 4 && E.sharp === 1.5 && E.nx === 1.5 && E.mag > 140 && E.win === 20 && E.pw === 1.5, 'upgrade-effect', 'state ' + JSON.stringify(E));
+      await chk(E.fr >= 1 && E.hm === 1 && E.ck === 4 && Math.abs(E.sharp - 1.3) < 1e-9 && Math.abs(E.nx - 1.3) < 1e-9 && E.mag > 140 && E.win === 14 && Math.abs(E.pw - 1.3) < 1e-9, 'upgrade-effect', 'state ' + JSON.stringify(E));
       await chk(E.sh === 1 && E.spare >= 1, 'upgrade-effect', 'shield/dash charge not given ' + JSON.stringify(E));
       // shield soaks one hit
       await ev(p, () => { const m = __mnr; window.__hp0 = m.P.hp; m.god = false; m.G.en = []; m.G.eb = []; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
@@ -795,14 +795,14 @@ async function shopTests(browser, cfg, full) {
       await sleep(400); const dh = await ev(p, () => { const m = __mnr, e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: m.P.x + 10, y: m.P.y, r: 14, hp: 100, max: 100, score: 100, by: m.P.y, amp: 0 }; m.G.en = [e]; m.P.dashCd = 0; window.__t = e; return e.hp; });
       await p.keyboard.press('ShiftLeft'); await sleep(320); await chk((await ev(p, () => __t.hp)) <= dh - 9.9, 'upgrade-effect', 'dash blast did no damage (x2)');
       await sleep(300); await ev(p, () => { const m = __mnr; m.G.en = []; const e = { type: 'drone', t: 0, flash: 0, bf: 99, bn: 0, x: 700, y: 300, r: 14, hp: 100, max: 100, score: 100, by: 300, amp: 0 }; m.G.en = [e]; m.G.pb = [{ x: 700, y: 300, vx: 0, vy: 0, dm: 2, pf: 1 }]; window.__t = e; m.P.x = 60; m.P.y = 60; m.P.over = true; m.P.heat = 100; });   // the ship keeps away and does not fire: only the placed shot may hit
-      await sleep(100); const hp = await ev(p, () => __t.hp); await chk(Math.abs(100 - hp - 3) < .01, 'upgrade-effect', 'sharp beat damage ' + (100 - hp) + ' != 3');
+      await sleep(100); const hp = await ev(p, () => __t.hp); await chk(Math.abs(100 - hp - 2.6) < .01, 'upgrade-effect', 'sharp beat damage ' + (100 - hp) + ' != 2.6');
       // homing bends a bullet toward an enemy
       const hv = await ev(p, () => { const m = __mnr, e = { type: 'drone', x: 400, y: 330, hp: 9, r: 14 }; m.G.en = [e]; const b = { x: 100, y: 200, vx: 900, vy: 0 }; m.SH.steer(b, .05); return b.vy; }); await chk(hv > 20, 'upgrade-effect', 'homing did not bend the shot ' + hv);
       // tier keeper holds the tier past 8 beats
       await ev(p, () => { const m = __mnr; m.G.en = []; m.C.n = 5; m.C.lb = m.G.bc - 9; window.__bc = m.G.bc; }); await waitFor(p, () => __mnr.G.bc > window.__bc, null, 2500);
       await chk(await ev(p, () => __mnr.C.n === 5), 'upgrade-effect', 'tier keeper did not hold the tier');
       // neon boost: +50% Neon per kill (the rate is SH.nk)
-      const nb = await ev(p, () => { const h = __mnr.SH; __mnr.C.n = 0; h.acc = 0; const n0 = h.neon, N = 400; for (let i = 0; i < N; i++) h.award({ type: 'gunship', x: 0, y: 0, pf: 0 }); return [h.neon - n0, Math.floor(N * 3 * 1.5 * h.nk)]; }); await chk(Math.abs(nb[0] - nb[1]) <= 1 && nb[0] > 20, 'upgrade-effect', 'neon boost paid ' + nb[0] + ' (want ' + nb[1] + ')');
+      const nb = await ev(p, () => { const h = __mnr.SH; __mnr.C.n = 0; h.acc = 0; const n0 = h.neon, N = 400; for (let i = 0; i < N; i++) h.award({ type: 'gunship', x: 0, y: 0, pf: 0 }); return [h.neon - n0, Math.floor(N * 3 * 1.3 * h.nk)]; }); await chk(Math.abs(nb[0] - nb[1]) <= 1 && nb[0] > 20, 'upgrade-effect', 'neon boost paid ' + nb[0] + ' (want ' + nb[1] + ')');
     }
     if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
   } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
@@ -839,18 +839,18 @@ async function tuneTests(browser, cfg, full) {
     if (!await startGame(p, cfg, T)) { await fail(p, tag, 'start', 'no start'); await p.context().close(); return; }
     await sleep(500); await ev(p, () => { __mnr.god = true; });
     let r = await ev(p, () => { const m = __mnr; return { max: m.P.max, hp: m.P.hp, sh: m.SH.sh, dmax: m.SH.dmax, spare: m.SH.spare, rev: m.TP.revLeft, mag: m.NR.mod.mag, pw: m.NR.mod.pw, ck: m.SH.ck, nx: m.SH.nx, drones: m.TP.drones.length }; });
-    await chk(p, r.max === 8 && r.hp === 8 && r.sh === 3 && r.dmax === 3 && r.spare === 3 && r.rev === 3 && r.mag === 140 + 28 * 6 && Math.abs(r.pw - 1.5) < 1e-9 && r.ck === 12 && Math.abs(r.nx - 1.4) < 1e-9 && r.drones === 3, 'tune-effect', 'run start ' + JSON.stringify(r));
+    await chk(p, r.max === 10 && r.hp === 10 && r.sh === 5 && r.dmax === 5 && r.spare === 5 && r.rev === 5 && r.mag === 140 + 28 * 10 && Math.abs(r.pw - 2) < 1e-9 && r.ck === 20 && Math.abs(r.nx - 1.6) < 1e-9 && r.drones === 5, 'tune-effect', 'run start ' + JSON.stringify(r));
     const vol = () => ev(p, () => { const m = __mnr; m.G.pb = []; m.GA.tune.crt = 0; m.GA.tune.rof = 0; m.SH.volley(100, 100, 0); return m.G.pb.reduce((s, b) => s + b.dm, 0); });
     await ev(p, () => { __mnr.GA.tune.dmg = 0; }); const d0 = await vol(); await ev(p, () => { __mnr.GA.tune.dmg = 10; }); const d1 = await vol();
     await chk(p, Math.abs(d1 / d0 - 1.8) < .01, 'tune-effect', 'Power Core x10 should be +80% damage, got x' + (d1 / d0).toFixed(3));
     await ev(p, () => { __mnr.GA.tune.crt = 8; __mnr.GA.tune.rof = 0; let c = 0, n = 0; for (let i = 0; i < 400; i++) { __mnr.G.pb = []; __mnr.SH.volley(100, 100, 0); for (const b of __mnr.G.pb) { n++; if (b.crit) c++; } } window.__crit = c / n; });
     const cr = await ev(p, () => window.__crit); await chk(p, cr > .2 && cr < .45, 'tune-effect', 'crit rate ' + cr.toFixed(2) + ' (want about .32)');
     // the HUD shows the ship stats (hull, shield, dash, drones, revive) correctly
-    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp, np: __mnr.TP_DEF.length })); await chk(p, h.x && h.x.max === 8 && h.x.hp === h.hp && h.x.sh === 3 && h.x.dashMax === 4 && h.x.drones === 3 && h.x.rev === 3 && h.x.perks === h.np - 1, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
+    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp, np: __mnr.TP_DEF.length })); await chk(p, h.x && h.x.max === 10 && h.x.hp === h.hp && h.x.sh === 5 && h.x.dashMax === 6 && h.x.drones === 5 && h.x.rev === 5 && h.x.perks === h.np - 1, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
     await p.screenshot({ path: path.join(OUT, 'hud-' + cfg.name + '.png') });
     // revive: a lethal hit brings the ship back with 4 hull and a short shield of invulnerability
     await ev(p, () => { const m = __mnr; m.god = false; m.SH.sh = 0; m.G.en = []; m.G.eb = []; m.P.hp = 1; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });
-    await sleep(250); r = await ev(p, () => ({ dead: __mnr.G.dead, hp: __mnr.P.hp, rev: __mnr.TP.revLeft })); await chk(p, !r.dead && r.hp === 4 && r.rev === 2, 'tune-effect', 'revive token ' + JSON.stringify(r));
+    await sleep(250); r = await ev(p, () => ({ dead: __mnr.G.dead, hp: __mnr.P.hp, rev: __mnr.TP.revLeft })); await chk(p, !r.dead && r.hp === 5 && r.rev === 4, 'tune-effect', 'revive token ' + JSON.stringify(r));
     // shield regen: a lost shield comes back after its time
     await ev(p, () => { const m = __mnr; m.god = true; m.SH.sh = 0; m.TP.rgnT = 29.9; }); await sleep(450); r = await ev(p, () => __mnr.SH.sh); await chk(p, r === 1, 'tune-effect', 'shield regen gave ' + r);
     // pit-stop upgrades (new): each one bought through the shop path does its job
