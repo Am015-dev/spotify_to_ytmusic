@@ -27,21 +27,20 @@ exports.contextOpts = (gfx, o) => {
 // the game derives its WebGL pixel ratio from devicePixelRatio (the only use of it); overriding it shrinks every buffer, CSS stays the same
 exports.initScript = gfx => HOLD + (gfx !== 'min' ? '' :
   `(()=>{try{Object.defineProperty(window,'devicePixelRatio',{get:()=>${MIN_DPR},configurable:true})}catch(e){}})();`);
-// Frame hold (any gfx): the game only counts a builder tap if pointerdown->pointerup is < 900 ms of wall time, but with 1-5 fps the
-// touch events queue behind slow frames, so down->up took 2-7 s. While __gfxHold is set, requestAnimationFrame callbacks are parked (nothing is
-// drawn, the main thread is idle, events arrive in ms); __gfxRelease re-schedules them. Real touch events, real handlers, nothing in the game changes.
-const HOLD = `(()=>{const raf=window.requestAnimationFrame.bind(window),parked=[];window.__gfxHold=false;
- window.requestAnimationFrame=cb=>raf(t=>{if(window.__gfxHold)parked.push(cb);else cb(t)});
- window.__gfxRelease=()=>{window.__gfxHold=false;for(const f of parked.splice(0))raf(f)}})();`;
+// Sync tap: the game only counts a builder tap if pointerdown->pointerup is < 900 ms of wall time, but at 1-5 fps real touch events queue behind
+// slow frames and down->up measured 1.7-2.5 s (min) / 5-7 s (normal). (Parking requestAnimationFrame while tapping was tried: no pointer events arrived.)
+// G.tap dispatches pointerdown + pointerup (+ click) from ONE synchronous page task at the element under the point, so no frame can fall between them.
+// Handlers, hit-testing and coordinates are the game's own; only the event source is synthetic. Use it for canvas/builder taps; normal buttons can
+// keep real touch. The init script makes setPointerCapture tolerant of the synthetic pointer id.
+const HOLD = `(()=>{for(const k of['setPointerCapture','releasePointerCapture']){const o=Element.prototype[k];Element.prototype[k]=function(...a){try{return o.apply(this,a)}catch(e){}}}})();`;
 exports.HOLD = HOLD;
-// a tap on a slow box: hold frames, down + up back to back, release. cdp = page's CDP session.
-exports.tap = async (page, cdp, x, y) => {
-  await page.evaluate(() => { window.__gfxHold = true });
-  await page.evaluate(() => new Promise(r => setTimeout(r, 0)));      // let a frame already in flight finish
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 0 }] });
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await page.evaluate(() => window.__gfxRelease && window.__gfxRelease());
-};
+exports.tap = (page, x, y, o) => page.evaluate(([x, y, click]) => {
+  const t = document.elementFromPoint(x, y); if (!t) return null;
+  const e = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 91, pointerType: 'touch', isPrimary: true, button: 0, width: 1, height: 1 };
+  t.dispatchEvent(new PointerEvent('pointerdown', { ...e, buttons: 1 })); t.dispatchEvent(new PointerEvent('pointerup', { ...e, buttons: 0 }));
+  if (click) t.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: x, clientY: y }));
+  return t.id || t.tagName;
+}, [x, y, !(o && o.noClick)]);
 // settings the game stores itself (SET in localStorage 'mho_set'): lowest quality tier, no dynamic-resolution surprises
 exports.seed = (page, gfx) => gfx !== 'min' ? Promise.resolve() :
   page.evaluate(s => { const k = 'mho_set'; let o = {}; try { o = JSON.parse(localStorage.getItem(k) || '{}') } catch (e) {} localStorage.setItem(k, JSON.stringify(Object.assign(o, s))) }, MIN_SET);

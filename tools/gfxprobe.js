@@ -17,7 +17,7 @@ const lap = (k, t0) => { T[k] = +((now() - t0) / 1000).toFixed(1); console.log(k
   let t = now(); await p.goto(URL); await p.waitForFunction(() => window.__mho && __mho.state === 'menu', null, { polling: 250 }); lap('load_to_menu', t);
   await p.evaluate(() => { localStorage.clear(); localStorage.setItem('mho_slot', '1') }); await G.seed(p, gfx);
   t = now(); await p.reload(); await p.waitForFunction(() => window.__mho && __mho.state === 'menu', null, { polling: 250 }); lap('reload_to_menu', t);
-  const heldTap = (x, y) => G.tap(p, cdp, x, y);
+  const heldTap = (x, y) => G.tap(p, x, y, { noClick: true });
   const rawTap = async (x, y, holdMs) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 0 }] }); if (holdMs) await p.waitForTimeout(holdMs); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }) };
   const center = async sel => p.evaluate(s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return r.width > 4 ? [r.left + r.width / 2, r.top + r.height / 2] : null }, sel);
   const tap = async sel => { const c = await center(sel); if (!c) return false; await rawTap(c[0], c[1]); await p.waitForTimeout(150); return true };
@@ -47,8 +47,8 @@ const lap = (k, t0) => { T[k] = +((now() - t0) / 1000).toFixed(1); console.log(k
     t = now(); for (const q of pts) { await rawTap(q[0], q[1]); await p.waitForTimeout(100) } lap('10_taps_plain_cdp', t);
     R.tap_ms_b2b = await p.evaluate(() => __tp.splice(0)); console.log('page-seen down->up ms', JSON.stringify(R.tap_ms_b2b), 'under 900 ms:', R.tap_ms_b2b.filter(x => x < 900).length + '/10');
     R.tap_ms_plain = R.tap_ms_b2b;
-    t = now(); for (const q of pts) { await heldTap(q[0], q[1]); await p.waitForTimeout(100) } lap('10_taps_frame_hold', t);
-    R.tap_ms_hold = await p.evaluate(() => __tp.splice(0)); console.log('HOLD page-seen down->up ms', JSON.stringify(R.tap_ms_hold), 'under 900 ms:', R.tap_ms_hold.filter(x => x < 900).length + '/10');
+    t = now(); for (const q of pts) { await heldTap(q[0], q[1]); await p.waitForTimeout(100) } lap('10_taps_sync', t);
+    R.tap_ms_sync = await p.evaluate(() => __tp.splice(0)); console.log('SYNC page-seen down->up ms', JSON.stringify(R.tap_ms_sync), 'under 900 ms:', R.tap_ms_sync.filter(x => x < 900).length + '/10');
     if (process.env.SKIP4F) { R.T = T; fs.writeFileSync(path.join(OUT, 'probe.json'), JSON.stringify(R, null, 1)); console.log('DONE', JSON.stringify(R)); await b.close(); return }
     // old tPlay tap: down, wait 4 rendered frames, up
     const frames4 = () => p.evaluate(() => new Promise(r => { let n = 0; const f = () => { if (++n >= 4) r(); else requestAnimationFrame(f) }; requestAnimationFrame(f) }));
