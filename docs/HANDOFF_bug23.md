@@ -43,6 +43,7 @@ The bot fails Tail/Thieves both before and after (bot pinned on quay walls; stuc
 - Hilde's truck hidden behind the radio bubble at the follow start (852×393).
 - Goons > 600 m away are relocated 230 m behind the player (off-screen, left as is).
 
-## Status
-- Review set running: qa23/review (tPlay phone both cities, t4/nbside side + gap, t4/fx19gap traffic gap).
-- Next: rebuild v88a with the label fix, mid-drive shots (tM1 mid_*), REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v, then changelog + out/v88a (+music, tune.json) + DEPLOY.
+## Status (02:00 UTC)
+- Also fixed: Brickbash lifted the boost cap via turbo×1.25 (98k sets RO.bash; 71 ignores turbo top while bashing) → held boost max 150 km/h; #m1Hp 10→12 px.
+- Evidence: qa23/feel (turn strip, slip 1.6°, cam lag 0.062 s), qa23/feel2 (brake 145→0 3.8 s 81 m), fade strip, tPlay new vs live v87z baseline (qa23/review/tplay*.txt, ath_*.txt).
+- REVIEW re-sent 294d1f1 to session_01Y6FYerWwxv43FuKUcaUT4v. On PASS: add OD_CHANGELOG v88a entry (src/10_core.js top), rebuild on CURRENT live (verify live = v87z 3e9b243, else merge its src), `tools/build.sh v88a`, `git add -f out/v88a` (overdrive.html, km.js, index.html, tune.json, music/), DEPLOY to coordinator.
