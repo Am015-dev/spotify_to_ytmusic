@@ -98,6 +98,7 @@ function OPN_roadTex(){const[c,g]=cv(256,512);g.fillStyle='#5b5f66';g.fillRect(0
   g.fillStyle='#f1f1ea';g.fillRect(8,0,8,512);g.fillRect(240,0,8,512);g.fillStyle='#ffc81e';for(let y=0;y<512;y+=128)g.fillRect(122,y+10,12,84);return tex(c)}
 function OPN_grainTex(){const[c,g]=cv(128,128);g.fillStyle='#fff';g.fillRect(0,0,128,128);for(let i=0;i<1400;i++){const v=150+Math.random()*105|0;g.fillStyle=`rgb(${v},${v},${v})`;g.fillRect(Math.random()*128,Math.random()*128,3,3)}
   g.strokeStyle='rgba(0,0,0,.08)';g.lineWidth=2;for(let x=0;x<=128;x+=32){g.beginPath();g.moveTo(x,0);g.lineTo(x,128);g.stroke();g.beginPath();g.moveTo(0,x);g.lineTo(128,x);g.stroke()}return tex(c)}
+const OPN_AP=[new THREE.Color(0x6f7d34),new THREE.Color(0xc29a55),new THREE.Color(0xd9d2c0)];// Athens patches: olive scrub, ochre earth, pale stone
 function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.map(c=>new THREE.Color(c)),st=2;
   const P=(i,x,y,a)=>{const A=(i%N)*3;a.push(td.P[A]+td.R[A]*x+td.U[A]*y,td.P[A+1]+td.R[A+1]*x+td.U[A+1]*y,td.P[A+2]+td.R[A+2]*x+td.U[A+2]*y)};
   const gap=i=>!!jumpAt(td,i*td.ds+.5)||!!jumpAt(td,(i+st)*td.ds-.5);
@@ -110,7 +111,8 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
       if(prev>=0&&prev===K&&!(skip&&skip(i-st)))for(let k=0;k<K-1;k++){const a=b0-K+k,b=b0+k;if(inc)m.i.push(a,a+1,b,a+1,b+1,b);else m.i.push(a,b,a+1,a+1,b,b+1)}prev=K}};
   const grain=OPN_grainTex(),cTmp=new THREE.Color();
   const terCol=(i,x,sg)=>{const ri=OPN.RT[i%N];let t=OPN.TER[i%N];if(ri>=0&&OPN.SD[i%N]===sg&&Math.abs(x)>=OPN_I1-.6&&OPN.routes[ri].kind==='dirt')t=1;const sv=i*td.ds,bl=OPN_vn(sv/16,x/11),bl2=OPN_vn(sv/7+50,x/5);cTmp.copy(COL[t]);if(t===0&&bl>.72)cTmp.lerp(COL[1],clamp((bl-.72)*6,0,.85));else if(t===1&&bl<.25)cTmp.lerp(COL[0],clamp((.25-bl)*5,0,.7));
-    cTmp.multiplyScalar(.82+.3*bl2);return[cTmp.r,cTmp.g,cTmp.b]};
+    if(ath&&(t===0||t===2)){const b3=OPN_vn(sv/23+90,x/9);if(b3>.62)cTmp.lerp(OPN_AP[0],clamp((b3-.62)*4,0,.75));else if(b3<.3)cTmp.lerp(OPN_AP[1],clamp((.3-b3)*4,0,.7));if(bl2>.8)cTmp.lerp(OPN_AP[2],.45)}
+    cTmp.multiplyScalar(.78+.36*bl2);return[cTmp.r,cTmp.g,cTmp.b]};
   // terrain both sides (outer edge follows the cliff lip)
   {const m=MB(),XS=[0,.04,.09,.15,.22,.3,.38,.46,.55,.64,.73,.82,.9,.96,1];
     for(const sg of[-1,1])strip(m,i=>{const j=i%N,out=OPN.CL[j]===sg?Math.min(48,OPN.LIP[j]+.5):48;return XS.map(f=>{const x=sg*(OPN_ROAD+(out-OPN_ROAD)*f);return[x,0,...terCol(j,x,sg)]})},gap,(i,q)=>[q[0]/4,i*td.ds/4]);
@@ -124,12 +126,15 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
     strip(wm,i=>{const j=i%N,ri=OPN.RT[j];if(ri<0||OPN.routes[ri].kind!=='water')return null;const sd=OPN.SD[j];return[[sd*(OPN_I1-.6),.06],[sd*30,.06],[sd*47,.06],[sd*160,-.2]]},null,(i,q)=>[q[0]/24,i*td.ds/24]);
     add(wm,new THREE.MeshStandardMaterial({map:R15_tex('water'),color:0xffffff,roughness:.12,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.15}))}
   // cliff faces (rock) down to a quarry floor / the sea
-  {const m=MB(),rc=new THREE.Color(ath?0xc9b48e:0x9a8f80);
-    strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5),d=(c,k)=>[c.r*k,c.g*k,c.b*k];return[[cd*lp,0,...d(rc,1)],[cd*(lp+2),-6,...d(rc,.8)],[cd*(lp+5),-18,...d(rc,.7)],[cd*(lp+7),-30,...d(rc,.6)],[cd*(lp+160),-31,...d(ath?rc:COL[2],.75)]]},null,(i,q)=>[q[0]/10,q[1]/10]);
+  {const m=MB(),wf=MB(),rc=new THREE.Color(ath?0xa08a68:0x6f675e);
+    strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5),d=(c,k)=>[c.r*k,c.g*k,c.b*k];return[[cd*lp,0,...d(rc,1.15)],[cd*(lp+.8),-1.5,...d(rc,.9)],[cd*(lp+2),-9,...d(rc,.62)],[cd*(lp+3.5),-20,...d(rc,.45)],[cd*(lp+5),-30,...d(rc,.32)]]},null,(i,q)=>[q[0]/6,q[1]/4]);
+    // RO6: the ravine floor is water (river / sea) 30 m down, so the drop reads from the road
+    strip(wf,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return[[cd*(lp+4),-29],[cd*(lp+60),-29],[cd*(lp+260),-29]]},null,(i,q)=>[q[0]/24,i*td.ds/24]);
+    add(wf,new THREE.MeshStandardMaterial({map:R15_tex('water'),roughness:.15,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.25}));
     add(m,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,flatShading:true}))}
   // red/white kerb on the cliff lip (flat paint: no wall there, the cliff is the point)
   {const m=MB(),c=document.createElement('canvas');c.width=16;c.height=64;const g=c.getContext('2d');g.fillStyle='#e8231c';g.fillRect(0,0,16,32);g.fillStyle='#fff';g.fillRect(0,32,16,32);const kt=new THREE.CanvasTexture(c);kt.wrapS=kt.wrapT=THREE.RepeatWrapping;kt.colorSpace=THREE.SRGBColorSpace;
-    strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd||OPN.LIP[j]>45)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return[[cd*(lp-2.2),.05],[cd*lp,.05]]},null,(i,q)=>[0,i*td.ds/8]);add(m,new THREE.MeshStandardMaterial({map:kt,roughness:.6}))}
+    /* RO6: no kerb (it read as a 1 m step); the rock face + water floor show the drop */}
   // SHORTCUT signs on the island noses (above head height; the island itself is the collider)
   {const fr=mkF();for(const r of OPN.routes){const s0=r.s0+OPN_MOUTH+OPN_NOSE+6;frameAt(td,s0,fr);const sg=new THREE.Mesh(new THREE.PlaneGeometry(14,4.8),new THREE.MeshBasicMaterial({map:R15_signTex(r.kind,r.sd),side:THREE.DoubleSide}));
     const c=fr.p.clone().addScaledVector(fr.r,r.sd*(OPN_I0+OPN_I1)/2).addScaledVector(fr.u,7.4);sg.position.copy(c);sg.lookAt(c.clone().addScaledVector(fr.t,-10));WORLD.add(sg);
@@ -162,17 +167,18 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
         const s=i*td.ds,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg),yy=t<90?H*(.18+.37*(t-62)/28):t<140?H*(.55+.45*(t-90)/50):H*(1+.4*(t-140)/90);v.copy(fr.p).addScaledVector(fr.r,sg*t);trees.push([v.x,v.y+yy-.5,v.z,1+OPN_noise(i,sg)*.6])}}
     const inst=(geo,mat,L,sc)=>{if(!L.length)return;const im=new THREE.InstancedMesh(geo,mat,L.length),M=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler();L.forEach((a,k)=>{e.set(0,a[3]*6.28,0);q.setFromEuler(e);const s=sc(a);M.compose(V3(a[0],a[1]+(s.dy||0),a[2]),q,V3(s.x,s.y,s.z));im.setMatrixAt(k,M)});im.castShadow=false;im.receiveShadow=true;WORLD.add(im)};
     // RO5 dressing (shots read bare): a tree line on the hill foot, bushes at the edge, drive-through LEGO tufts + flowers on the open terrain (low, no collider needed)
-    const bush=[],tuft=[],flo=[],cyp=[],hy=(t,H)=>t<52?1.2*(t-48)/4:t<62?1.2+(H*.18-1.2)*(t-52)/10:H*(.18+.37*(t-62)/28);
+    const bush=[],tuft=[],flo=[],cyp=[],stn=[],hy=(t,H)=>t<52?1.2*(t-48)/4:t<62?1.2+(H*.18-1.2)*(t-52)/10:H*(.18+.37*(t-62)/28);
     for(let i=1;i<N;i+=2){if(gap(i))continue;frameAt(td,i*td.ds,fr);const s=i*td.ds,wl=OPN.RT[i]>=0&&OPN.routes[OPN.RT[i]].kind==='water';
       for(const sg of[-1,1]){const sea=ath&&OPN.SEA[i]&&sg===OPN.out,wat=wl&&OPN.SD[i]===sg,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg);
         if(OPN.CL[i]!==sg&&!sea&&!wat){if(i%3===0&&OPN_noise(i,sg*5)>.3){const t=51+OPN_noise(i,sg*13)*9;v.copy(fr.p).addScaledVector(fr.r,sg*t);(ath&&OPN_noise(i,sg*17)<.45?cyp:trees).push([v.x,v.y+hy(t,H)-.4,v.z,.8+OPN_noise(i,sg*19)*.5])}
           if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(46.5+OPN_noise(i,sg*29)*3));bush.push([v.x,v.y,v.z,.7+OPN_noise(i,sg*31)*.6])}}
         const lim=OPN.CL[i]===sg?OPN.LIP[i]-3:wat?OPN_I1-1:44;for(let k=0;k<3;k++){const n=OPN_noise(i*3+k,sg*37);if(n<.3)continue;const x=16+OPN_noise(i*3+k,sg*41)*(lim-16);if(x>lim)continue;
-          if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
+          if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:ath&&n<.45?stn:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
     inst(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:ath?0x8a9a48:0x3f9a3c,roughness:.8,flatShading:true}),bush,a=>({x:1.4*a[3],y:1.1*a[3],z:1.4*a[3],dy:.5*a[3]}));
     inst(new THREE.IcosahedronGeometry(.6,0),new THREE.MeshStandardMaterial({color:ath?0x96a04a:0x3c9a36,roughness:.85,flatShading:true}),tuft,a=>({x:1+a[3]*.8,y:.6+a[3]*.3,z:1+a[3]*.8,dy:.2}));
     inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xffd21c,roughness:.5,emissive:0x302000}),flo.filter((a,k)=>k%2),()=>({x:1,y:1,z:1,dy:.3}));
     inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xe8231c,roughness:.5,emissive:0x300000}),flo.filter((a,k)=>!(k%2)),()=>({x:1,y:1,z:1,dy:.3}));
+    inst(new THREE.IcosahedronGeometry(.8,0),new THREE.MeshStandardMaterial({color:0xcfc6b0,roughness:.9,flatShading:true}),stn,a=>({x:1+a[3],y:.22,z:.8+a[3]*.6,dy:.05}));// flat stones (drive-over, .2 m)
     if(cyp.length){inst(new THREE.ConeGeometry(1.1,8,7),new THREE.MeshStandardMaterial({color:0x2f5a2a,roughness:.8,flatShading:true}),cyp,a=>({x:a[3],y:a[3],z:a[3],dy:5*a[3]}))}
     inst(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({color:ath?0xd8ccb0:0x9da3a8,roughness:.8,flatShading:true}),rocks,a=>({x:1.8+a[3],y:1.2+a[3]*.6,z:2.2,dy:.3}));
     inst(new THREE.SphereGeometry(.7,10,8),new THREE.MeshStandardMaterial({color:0xff6a1a,roughness:.4,emissive:0x401000}),buoys,()=>({x:1,y:1,z:1,dy:.3}));
