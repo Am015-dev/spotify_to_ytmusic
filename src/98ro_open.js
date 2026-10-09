@@ -131,9 +131,15 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
   {const m=MB(),c=document.createElement('canvas');c.width=16;c.height=64;const g=c.getContext('2d');g.fillStyle='#e8231c';g.fillRect(0,0,16,32);g.fillStyle='#fff';g.fillRect(0,32,16,32);const kt=new THREE.CanvasTexture(c);kt.wrapS=kt.wrapT=THREE.RepeatWrapping;kt.colorSpace=THREE.SRGBColorSpace;
     strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd||OPN.LIP[j]>45)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return[[cd*(lp-2.2),.05],[cd*lp,.05]]},null,(i,q)=>[0,i*td.ds/8]);add(m,new THREE.MeshStandardMaterial({map:kt,roughness:.6}))}
   // SHORTCUT signs on the island noses (above head height; the island itself is the collider)
-  {const fr=mkF();for(const r of OPN.routes){const s0=r.s0+OPN_MOUTH+OPN_NOSE+6;frameAt(td,s0,fr);const sg=new THREE.Mesh(new THREE.PlaneGeometry(9,3.1),new THREE.MeshBasicMaterial({map:R15_signTex(r.kind,r.sd),side:THREE.DoubleSide}));
-    const c=fr.p.clone().addScaledVector(fr.r,r.sd*(OPN_I0+OPN_I1)/2).addScaledVector(fr.u,5.2);sg.position.copy(c);sg.lookAt(c.clone().addScaledVector(fr.t,-10));WORLD.add(sg);
-    for(const dx of[-2,2]){const po=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,4,6),new THREE.MeshStandardMaterial({color:0x333333}));po.position.copy(fr.p).addScaledVector(fr.r,r.sd*(OPN_I0+OPN_I1)/2+dx).addScaledVector(fr.u,2.6);WORLD.add(po)}}}
+  {const fr=mkF();for(const r of OPN.routes){const s0=r.s0+OPN_MOUTH+OPN_NOSE+6;frameAt(td,s0,fr);const sg=new THREE.Mesh(new THREE.PlaneGeometry(14,4.8),new THREE.MeshBasicMaterial({map:R15_signTex(r.kind,r.sd),side:THREE.DoubleSide}));
+    const c=fr.p.clone().addScaledVector(fr.r,r.sd*(OPN_I0+OPN_I1)/2).addScaledVector(fr.u,7.4);sg.position.copy(c);sg.lookAt(c.clone().addScaledVector(fr.t,-10));WORLD.add(sg);
+    for(const dx of[-2,2]){const po=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,4,6),new THREE.MeshStandardMaterial({color:0x333333}));po.position.copy(fr.p).addScaledVector(fr.r,r.sd*(OPN_I0+OPN_I1)/2+dx).addScaledVector(fr.u,2.6);po.scale.y=1.6;po.position.addScaledVector(fr.u,1.2);WORLD.add(po)}
+    // RO5: painted chevrons at the fork mouth trail from the road edge into the alt lane (the choice reads 3 s ahead; drive-through paint)
+    const ac=document.createElement('canvas');ac.width=ac.height=128;const ag=ac.getContext('2d');ag.fillStyle=r.kind==='water'?'#29b6ff':'#ff9a1f';ag.strokeStyle='#fff';ag.lineWidth=8;
+    ag.beginPath();ag.moveTo(64,6);ag.lineTo(122,70);ag.lineTo(90,70);ag.lineTo(90,122);ag.lineTo(38,122);ag.lineTo(38,70);ag.lineTo(6,70);ag.closePath();ag.fill();ag.stroke();
+    const at=new THREE.CanvasTexture(ac);at.colorSpace=THREE.SRGBColorSpace;const am=new THREE.MeshBasicMaterial({map:at,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
+    [[-24,7.5],[-8,11],[8,14.5],[24,18]].forEach(([ds,x])=>{frameAt(td,r.s0+ds,fr);const a=new THREE.Mesh(new THREE.PlaneGeometry(5.5,7),am),c2=fr.p.clone().addScaledVector(fr.r,r.sd*x).addScaledVector(fr.u,.08);a.position.copy(c2);
+      const fw=fr.t.clone().multiplyScalar(.87).addScaledVector(fr.r,r.sd*.5).normalize();a.up.copy(fw);a.lookAt(c2.clone().add(fr.u));WORLD.add(a)})}}
   // hills / beach beyond the edge (not on cliff sides, not on water lanes)
   {const m=MB(),gc=COL[0],sc=COL[2];
     for(const sg of[-1,1])strip(m,i=>{const j=i%N;if(OPN.CL[j]===sg||(OPN.RT[j]>=0&&OPN.SD[j]===sg&&OPN.routes[OPN.RT[j]].kind==='water'))return null;
@@ -151,10 +157,23 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
   {const rocks=[],buoys=[],trees=[],v=V3(),fr=mkF();
     for(let i=0;i<N;i+=3){if(gap(i))continue;frameAt(td,i*td.ds,fr);for(const sg of[-1,1]){const water=OPN.RT[i]>=0&&OPN.SD[i]===sg&&OPN.routes[OPN.RT[i]].kind==='water';if(OPN.CL[i]===sg)continue;
         if(ath&&OPN.SEA[i]&&sg===OPN.out&&i%9)continue;v.copy(fr.p).addScaledVector(fr.r,sg*(48.4+OPN_noise(i,sg)*1.2));(water?buoys:rocks).push([v.x,v.y,v.z,OPN_noise(i,sg*3)])}
-      if(OPN.IH[i]>2&&i%12===0){v.copy(fr.p).addScaledVector(fr.r,OPN.SD[i]*(OPN_I0+OPN_I1)/2).addScaledVector(fr.u,.8);trees.push([v.x,v.y,v.z,.7])}
+      if(OPN.IH[i]>2&&i%12===0){v.copy(fr.p).addScaledVector(fr.r,OPN.SD[i]*(OPN_I0+OPN_I1)/2).addScaledVector(fr.u,.8);trees.push([v.x,v.y,v.z,ath?.4:.55])}
       if(i%5===0)for(const sg of[-1,1]){if(OPN.CL[i]===sg||(ath&&OPN.SEA[i]&&sg===OPN.out)||OPN.RT[i]>=0&&OPN.SD[i]===sg&&OPN.routes[OPN.RT[i]].kind==='water')continue;const t=60+OPN_noise(i,sg*7)*150;if(OPN_noise(i,sg*11)<.45)continue;
         const s=i*td.ds,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg),yy=t<90?H*(.18+.37*(t-62)/28):t<140?H*(.55+.45*(t-90)/50):H*(1+.4*(t-140)/90);v.copy(fr.p).addScaledVector(fr.r,sg*t);trees.push([v.x,v.y+yy-.5,v.z,1+OPN_noise(i,sg)*.6])}}
     const inst=(geo,mat,L,sc)=>{if(!L.length)return;const im=new THREE.InstancedMesh(geo,mat,L.length),M=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler();L.forEach((a,k)=>{e.set(0,a[3]*6.28,0);q.setFromEuler(e);const s=sc(a);M.compose(V3(a[0],a[1]+(s.dy||0),a[2]),q,V3(s.x,s.y,s.z));im.setMatrixAt(k,M)});im.castShadow=false;im.receiveShadow=true;WORLD.add(im)};
+    // RO5 dressing (shots read bare): a tree line on the hill foot, bushes at the edge, drive-through LEGO tufts + flowers on the open terrain (low, no collider needed)
+    const bush=[],tuft=[],flo=[],cyp=[],hy=(t,H)=>t<52?1.2*(t-48)/4:t<62?1.2+(H*.18-1.2)*(t-52)/10:H*(.18+.37*(t-62)/28);
+    for(let i=1;i<N;i+=2){if(gap(i))continue;frameAt(td,i*td.ds,fr);const s=i*td.ds,wl=OPN.RT[i]>=0&&OPN.routes[OPN.RT[i]].kind==='water';
+      for(const sg of[-1,1]){const sea=ath&&OPN.SEA[i]&&sg===OPN.out,wat=wl&&OPN.SD[i]===sg,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg);
+        if(OPN.CL[i]!==sg&&!sea&&!wat){if(i%3===0&&OPN_noise(i,sg*5)>.3){const t=51+OPN_noise(i,sg*13)*9;v.copy(fr.p).addScaledVector(fr.r,sg*t);(ath&&OPN_noise(i,sg*17)<.45?cyp:trees).push([v.x,v.y+hy(t,H)-.4,v.z,.8+OPN_noise(i,sg*19)*.5])}
+          if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(46.5+OPN_noise(i,sg*29)*3));bush.push([v.x,v.y,v.z,.7+OPN_noise(i,sg*31)*.6])}}
+        const lim=OPN.CL[i]===sg?OPN.LIP[i]-3:wat?OPN_I1-1:44;for(let k=0;k<3;k++){const n=OPN_noise(i*3+k,sg*37);if(n<.3)continue;const x=16+OPN_noise(i*3+k,sg*41)*(lim-16);if(x>lim)continue;
+          if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
+    inst(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:ath?0x8a9a48:0x3f9a3c,roughness:.8,flatShading:true}),bush,a=>({x:1.4*a[3],y:1.1*a[3],z:1.4*a[3],dy:.5*a[3]}));
+    inst(new THREE.IcosahedronGeometry(.6,0),new THREE.MeshStandardMaterial({color:ath?0x96a04a:0x3c9a36,roughness:.85,flatShading:true}),tuft,a=>({x:1+a[3]*.8,y:.6+a[3]*.3,z:1+a[3]*.8,dy:.2}));
+    inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xffd21c,roughness:.5,emissive:0x302000}),flo.filter((a,k)=>k%2),()=>({x:1,y:1,z:1,dy:.3}));
+    inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xe8231c,roughness:.5,emissive:0x300000}),flo.filter((a,k)=>!(k%2)),()=>({x:1,y:1,z:1,dy:.3}));
+    if(cyp.length){inst(new THREE.ConeGeometry(1.1,8,7),new THREE.MeshStandardMaterial({color:0x2f5a2a,roughness:.8,flatShading:true}),cyp,a=>({x:a[3],y:a[3],z:a[3],dy:5*a[3]}))}
     inst(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({color:ath?0xd8ccb0:0x9da3a8,roughness:.8,flatShading:true}),rocks,a=>({x:1.8+a[3],y:1.2+a[3]*.6,z:2.2,dy:.3}));
     inst(new THREE.SphereGeometry(.7,10,8),new THREE.MeshStandardMaterial({color:0xff6a1a,roughness:.4,emissive:0x401000}),buoys,()=>({x:1,y:1,z:1,dy:.3}));
     const crown=ath?new THREE.IcosahedronGeometry(2.6,1):new THREE.ConeGeometry(3,7,8),tm=new THREE.MeshStandardMaterial({color:ath?0x7a8f3a:0x2f8f3a,roughness:.8,flatShading:true});
