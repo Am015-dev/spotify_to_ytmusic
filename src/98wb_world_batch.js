@@ -130,6 +130,10 @@ async function WB_cityBuild2(a,b){const t0=performance.now(),SL=a==null?6:14,grp
     // v89b STR: streaming keeps the items and builds the super cell's buffer only within range of the camera (STR_step); otherwise build it now as before
     if(!STR_on())for(const _ of WB_supMk(S,false));
     WBC.sup.push(S);WB_big(ti,'super '+nt);i+=S.cells.length;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5+.5*i/WBC.cells.size)}
+  // v89b STR: before the far LOD switches on, build the super cells within load range of the camera inside this (sliced) build, as live does for all
+  // of them; otherwise the first ~3 s after the switch show missing far blocks while STR_step catches up
+  if(STR_on()&&typeof camera!=='undefined')for(;;){const cx=camera.position.x,cz=camera.position.z,LD=STR_R()+TUNE.strLoad;let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;
+    for(const _ of WB_supMk(b,true))if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(1);STR.st.b++}
   {const sl=performance.now()-tt,S=WBC.st;if(sl>(S.slMax||0))S.slMax=Math.round(sl);if(sl>50)S.sl50=(S.sl50||0)+1;if(sl>100)S.sl100=(S.sl100||0)+1}
   WBC.on=true;WBC.sig='';WBC.st.ms=Math.round(performance.now()-t0);WBC.st.objs=WBC.objs.length;WBC.st.mobjs=WBC.mobjs.length;WBC.st.cells=WBC.cells.size}
 // v89b: one super cell's far buffer from its cells' items (keep=true: items stay for a later rebuild; the CPU copy is dropped after the GPU upload)
