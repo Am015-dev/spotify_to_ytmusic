@@ -215,7 +215,7 @@ addEventListener('pointerdown',e=>{if(!G13_pop.k)return;if(e.target.closest&&e.t
 // front of a part = -z (like the headlight 'hl'); SNOT studs face -z. Element lists: 40468 Yellow Taxi, 76916, 76920, 31127, 60371.
 if(!CR_CATS.includes('SNOT'))CR_CATS.splice(CR_CATS.indexOf('Slopes')+1,0,'SNOT');
 const G13_NEW={
- t2c:['Tile corner 2×2',2,2,1,'Tiles',14719],t11h:['Tile 1×1 half round',1,1,1,'Tiles',35399],t12h:['Tile 1×2 round end',1,2,1,'Tiles',1748],
+ t2c:['Tile corner 2×2',2,2,1,'Tiles',14719],t11h:['Tile 1×1 half round',1,1,1,'Tiles',35399],t12h:['Tile 1×2 half round',2,1,1,'Tiles',1748],
  t22c:['Tile 2×2 cut corner',2,2,1,'Tiles',35787],t2t:['Tile 2×2 triangle',2,2,1,'Tiles',27263],t12hd:['Tile 1×2 handle',1,2,1,'Tiles',2432],
  s11d:['Slope 45 1×1 double',1,1,2,'Slopes',35464],inv22:['Inv. slope 2×2',2,2,3,'Slopes',3660],cs31:['Curved slope 3×1',1,3,2,'Slopes',50950],
  s65:['Slope 65 2×2',2,2,6,'Slopes',3678],cwL:['Curved wedge 1×2 L',1,2,2,'Slopes',29120],cwR:['Curved wedge 1×2 R',1,2,2,'Slopes',29119],ib22:['Inv. curve 2×2',2,2,2,'Slopes',32803],
@@ -235,7 +235,7 @@ GB_piece=(f=>function(t,c,M,L){const P=GB_PC[t];if(!P||!G13_NEW[t])return f(t,c,
  const vplate=(xa,xb,ya,yb,nx,ny)=>{M.push(CR_bb(xa,xb,ya,yb,z0,z0+PH,col));for(let i=0;i<nx;i++)for(let j=0;j<ny;j++)sst(xa+(i+.5)*(xb-xa)/nx,ya+(j+.5)*(yb-ya)/ny,z0)};
  if(t==='t2c')M.push(CR_top([[x0,z0],[x1,z0],[x1,0],[0,0],[0,z1],[x0,z1]],0,H,col));
  else if(t==='t11h')M.push(CR_top([[x1,z1],[x0,z1],[x0,0]].concat(arc(0,0,W/2-g,Math.PI,2*Math.PI,12)),0,H,col));
- else if(t==='t12h')M.push(CR_top([[x1,z1],[x0,z1],[x0,z0+U/2]].concat(arc(0,z0+U/2,W/2-g,Math.PI,2*Math.PI,12)),0,H,col));
+ else if(t==='t12h')M.push(CR_top([[x1,z1],[x0,z1]].concat(arc(0,z1,W/2-g,Math.PI,1.5*Math.PI,10).map(([x,z])=>[x,z1+(z-z1)*(D-2*g)/(W/2-g)]),arc(0,z1,W/2-g,1.5*Math.PI,2*Math.PI,10).map(([x,z])=>[x,z1+(z-z1)*(D-2*g)/(W/2-g)])),0,H,col));
  else if(t==='t22c')M.push(CR_top([[x0+U,z0],[x1,z0],[x1,z1],[x0,z1],[x0,z0+U]],0,H,col));
  else if(t==='t2t')M.push(CR_top([[x1,z0],[x1,z1],[x0,z1]],0,H,col));
  else if(t==='t12hd'){M.push(CR_bb(x0,x1,0,H,z0,z1,col));for(const z of[z0+.12,z1-.12])M.push(GB_cyl(.07,.16,0,H,z,col,8));const q=new THREE.CylinderGeometry(.075,.075,D-.24,10);q.rotateX(Math.PI/2);q.translate(0,H+.16,0);M.push(GB_col(q,col))}
@@ -251,6 +251,8 @@ GB_piece=(f=>function(t,c,M,L){const P=GB_PC[t];if(!P||!G13_NEW[t])return f(t,c,
  else if(t==='pr12'){M.push(CR_top(arc(0,z1-U/2,W/2-g,0,Math.PI,10).concat(arc(0,z0+U/2,W/2-g,Math.PI,2*Math.PI,10)),0,H,col));CR_studs(M,1,2,H,col)}
  else if(t==='ph12'){M.push(CR_bb(x0,x1,0,H,z0+.1,z1,col));CR_studs(M,2,1,H,col);for(const x of[x0+.08,x1-.08])M.push(GB_box(x-.07,x+.07,.02,H-.02,z0-.1,z0+.12,col));bar(x0+.08,x1-.08,H/2,z0-.06,.075)}
  else if(t==='br11u'||t==='br11d'){const up=t==='br11u',yb=up?0:H-PH;M.push(CR_bb(x0,x1,yb,yb+PH,z0,z1,col));CR_stud(M,0,yb+PH,0,col);vplate(x0,x1,up?0:.04,up?H:H-PH,1,1)}
+ else if(t==='b11s'){M.push(CR_bb(x0,x1,0,H,z0,z1,col));CR_stud(M,0,H,0,col);sst(0,H/2,z0)}
+ else if(t==='br12u'||t==='br12d'){const up=t==='br12u',yb=up?0:H-PH;M.push(CR_bb(x0,x1,yb,yb+PH,z0,z1,col));CR_studs(M,2,1,yb+PH,col);vplate(x0,x1,up?0:.04,up?H:H-PH,2,1)}
  else if(t==='br22'||t==='br24'||t==='br14'){const yb=0;M.push(CR_bb(-U+g,U-g,yb,yb+PH,z0,z1,col));CR_stud(M,-U/2,PH,0,col);CR_stud(M,U/2,PH,0,col);vplate(x0,x1,0,H,P.w,t==='br14'?1:2)}
  else if(t==='b12s4'||t==='b12s'){M.push(CR_bb(x0,x1,0,H,z0,z1,col));CR_studs(M,2,1,H,col);for(const x of[-U/2,U/2]){sst(x,H/2,z0);if(t==='b12s4')sst(x,H/2,z1,1)}}
  else if(t==='gb12'||t==='pb14'){M.push(CR_bb(x0,x1,0,H,z0+.05,z1,col));CR_studs(M,P.w,1,H,col);const n=t==='gb12'?3:1;
