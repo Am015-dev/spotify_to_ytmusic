@@ -4,7 +4,7 @@ Sands draws its board in code. The laptop made Google Flow paintings as **separa
 
 ## Tiles `tile-<k>.webp` (384×384, top-down, opaque)
 - One per `TILEDEF` key: `village`, `sacred`, `oasis`, `small`, `large`, `workshop`, `exchange`, `lake`, `city`.
-- `tile-ravine` is still to come (Flow's safety check skipped it; it is queued again).
+- `tile-ravine` added 2026-10-09.
 - Draw the painting inside the tile in `tileHtml(t)` (as a `background-image` under the existing icons and numbers), keyed by `t.k`. Keep the drawn tile as the fallback when a file is missing.
 
 ## Media
