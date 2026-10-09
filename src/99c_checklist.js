@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88x',id:'ath-dress',text:'Athens: drive along streets for 1 minute: orange trees, green kiosks, parked scooters and bollards line the pavements; more crowds/cafés; smashing one gives a brick burst. Is Athens lively enough?'},
+ {ver:'v88x',id:'steg-tower',text:'Frankfurt: drive to the Eiserner Steg (red iron footbridge): the 4 towers at its ends have windows, a door and a red roof (no plain beige pillar).'},
+ {ver:'v88x',id:'crowd-car',text:'Look at crowds next to parked cars: nobody stands inside a car.'},
  {ver:'v88w',id:'bricks2x',text:'Drive slowly past houses and shops: walls show LEGO brick rows, low flat roofs show studs, nothing flickers or shimmers. Far away the city looks as before.'},
  {ver:'v88w',id:'world-smooth2',text:'PC and phone: drive 1 minute in Frankfurt and in Athens. ⚙ TUNE → Life → Show FPS: copy the line into the notes (draws about 200 or less). Map icons still float over missions.'},
  {ver:'v88w',id:'ath-popup',text:'Athens: drive along streets for 1–2 minutes: a pop-up challenge ring (RAMP JUMP, DRIFT ZONE…) appears ahead in your lane; drive through it to start.'},
