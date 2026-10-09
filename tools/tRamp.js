@@ -23,16 +23,16 @@ const TAG={0xffb020:'street',0xff5a1c:'hill/biome/autobahn',0xffcd03:'longjump',
      const q0=M.rsnap(ax-s*150,az-c*150,300);if(!q0)return null;let P=null;try{P=M.qv.path(q0[0],q0[1],ax,az).P}catch(e){}if(!P||P.length<2)return null;P.push([ax,az],[r.x,r.z],[r.x+s*r.len,r.z+c*r.len]);
      R.ch=null;R.sp=null;R.wk=null;R.hp=100;M.warp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]));R.v=0;R.takeoff=null;window.__P=P;window.__pi=0;return P.length},[r.i]);
    let rl=false,stuck=0,hitsR=0,lv=0;if(rt){await p.evaluate(()=>__tick(20));await p.keyboard.down('ArrowUp');let kL=false,kR=false;
-    for(let f=0;f<60*40;f+=3){const o=await p.evaluate(([i])=>{const R=__mho.RO,r=R.ramps[i],P=__P;let bi=__pi,bd=1e9;for(let k=__pi;k<Math.min(P.length,__pi+40);k++){const d=Math.hypot(P[k][0]-R.x,P[k][1]-R.z);if(d<bd){bd=d;bi=k}}__pi=bi;
+    for(let f=0;f<60*70;f+=3){const o=await p.evaluate(([i])=>{const R=__mho.RO,r=R.ramps[i],P=__P;let bi=__pi,bd=1e9;for(let k=__pi;k<Math.min(P.length,__pi+40);k++){const d=Math.hypot(P[k][0]-R.x,P[k][1]-R.z);if(d<bd){bd=d;bi=k}}__pi=bi;
        let k=bi,acc=0;while(k<P.length-1&&acc<10+Math.abs(R.v)*.5){acc+=Math.hypot(P[k+1][0]-P[k][0],P[k+1][1]-P[k][1]);k++}let e=Math.atan2(P[k][0]-R.x,P[k][1]-R.z)-R.h;e=Math.atan2(Math.sin(e),Math.cos(e));
        const a=(R.x-r.x)*Math.sin(r.h)+(R.z-r.z)*Math.cos(r.h);return{e,v:R.v,to:!!(R.takeoff&&R.takeoff.r===r),a,end:bi>=P.length-2}},[r.i]);
-     if(o.to)rl=true;if(rl&&o.a>r.len/2+20)break;if(Math.abs(o.v)<1)stuck++;else stuck=0;if(stuck>120){if(process.env.DBG)await shot(path.join(OUT,`${CITY}_stuck${r.i}.jpg`));break}if(lv>8&&o.v<lv*.7)hitsR++;lv=o.v;
+     if(o.to)rl=true;if(rl&&o.a>r.len/2+20)break;if(Math.abs(o.v)<1)stuck++;else stuck=0;if(stuck>240){if(process.env.DBG)await shot(path.join(OUT,`${CITY}_stuck${r.i}.jpg`));break}if(lv>8&&o.v<lv*.7)hitsR++;lv=o.v;
      const slow=Math.abs(o.e)>.6&&o.v>12;if(slow){await p.keyboard.up('ArrowUp')}else await p.keyboard.down('ArrowUp');
      const wl=o.e>.05,wr=o.e<-.05;if(wl!==kL){kL=wl;wl?await p.keyboard.down('ArrowLeft'):await p.keyboard.up('ArrowLeft')}if(wr!==kR){kR=wr;wr?await p.keyboard.down('ArrowRight'):await p.keyboard.up('ArrowRight')}
      await p.evaluate(()=>__tick(3))}
     await p.keyboard.up('ArrowUp');if(kL)await p.keyboard.up('ArrowLeft');if(kR)await p.keyboard.up('ArrowRight')}
    if(process.env.DBG)console.log('route end',JSON.stringify(await p.evaluate(([i])=>{const R=__mho.RO,r=R.ramps[i];return{x:R.x,z:R.z,v:R.v,pi:__pi,n:__P.length,P:__P.filter((_,k)=>k%4==0).map(q=>q.map(Math.round))}},[r.i])));
-   r.route=rt?{launched:rl,hits:hitsR,stuck:stuck>120}:'no road path'}
+   r.route=rt?{launched:rl,hits:hitsR,stuck:stuck>240,note:"waits up to 12 s behind stopped traffic (red light)"}:'no road path'}
   // real drive: warp 55 m behind the low end facing the ramp, hold ArrowUp, keep heading at the ramp line with arrow keys
   const st=await p.evaluate(([i])=>{const M=__mho,R=M.RO,r=R.ramps[i];const s=Math.sin(r.h),c=Math.cos(r.h);const d=r.len/2+55;R.ch=null;R.sp=null;R.wk=null;R.hp=100;M.warp(r.x-s*d,r.z-c*d,r.h);R.v=0;R.takeoff=null;return[R.x,R.z]},[r.i]);
   await p.evaluate(()=>__tick(20));await p.keyboard.down('ArrowUp');let kL=false,kR=false,maxAir=0,launched=false,hits=0,lastV=0,vAt=0,minD=1e9;
