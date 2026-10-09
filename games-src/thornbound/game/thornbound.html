@@ -6715,7 +6715,7 @@ const PX=(function(){
   function load(f,cb){if(seen[f])return cb();const im=new Image();im.onload=()=>{seen[f]=1;cb()};im.src='media/'+f+'.webp'}
   // face-down cards: the thorn-crown back, or the latest card back unlocked in the story
   function backApply(){const id=unl('cardback')||'default';if(id===curB)return;
-    load('back-'+id,()=>{curB=id;TBKit.setBack('media/back-'+id+'.webp');try{if(G&&UI.started)renderAll()}catch(e){}})}
+    load('back-'+id,()=>{curB=id;TBKit.setBack('media/back-'+id+'.webp')})}
   // table: the candlelit court (phone version in portrait), or an unlocked table, behind the map
   function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
     const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
