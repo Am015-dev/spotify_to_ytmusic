@@ -51,7 +51,7 @@ const OPN_lane=r=>r.sd*(OPN_I1+(r.kind==='water'?15:13));
 // surface under a car: road / cobbles → car, grass dirt sand → 4×4, a water route lane → boat; past a cliff lip → fall
 function OPN_ter(s){const i=OPN_i(s.dist),ax=Math.abs(s.x);s.r15w=false;if(s.air&&s.air.j.id==='ro_cliff'){if(s.air.t>=1.4)OPN_land(s);return s.terrain&&s.terrain!=='road'?s.terrain:null}
   if(OPN.CL[i]&&s.x*OPN.CL[i]>OPN.LIP[i]&&!s.air&&s.dead<=0){OPN_fall(s);s.r15k=1;return s.terrain&&s.terrain!=='road'?s.terrain:null}
-  const ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const r=OPN.routes[ri];if(r.kind==='water'){s.r15w=true;s.r15k=1.1;return'water'}s.r15k=1.1;return'dirt'}
+  const ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const r=OPN.routes[ri];if(r.kind==='water'){s.r15w=true;s.r15k=1.2;return'water'}s.r15k=1.2;return'dirt'}
   if(ax<=OPN_ROAD+.6){s.r15k=1;return null}const t=OPN.TER[i];s.r15k=OPN_K[t];if(t===3)return null;
   if(s.isPlayer&&!s.air&&R()<.03)shake=Math.max(shake,.22);return'dirt'}
 function OPN_fall(s){frameAt(TD,s.dist,F2);const y0=yAt(TD,s.dist)+1.4,sea=!!TRK.ro.seaCliff;
