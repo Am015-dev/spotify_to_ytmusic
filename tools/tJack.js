@@ -89,7 +89,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
  // target: the nearest parked traffic car (else your own); first walk ≥ 22 m along the street away from it so the walk is ≥ 30 m in total
  const JACKS=+(process.env.JACKS||2);const mets=[];
  // the driver's height + how far he ran (in-page; the probe never moves anything)
- const FL=()=>G.evaluate(()=>__oc.ev(`(()=>{const L=OF.fl;if(!L)return null;const B=new THREE.Box3();L.F.g.updateMatrixWorld(true);L.bub.visible=false;B.setFromObject(L.F.g);return{h:+(B.max.y-B.min.y).toFixed(3),ph:L.ph,t:+L.t.toFixed(2),d:+L.d.toFixed(1),dc:+Math.hypot(L.x-L.cx,L.z-L.cz).toFixed(1),dp:+Math.hypot(L.x-RO.x,L.z-RO.z).toFixed(1)}})()`));
+ const FL=()=>G.evaluate(()=>__oc.ev(`(()=>{const L=OF.fl;if(!L)return null;const B=new THREE.Box3();L.F.g.updateMatrixWorld(true);L.F.g.remove(L.bub);B.setFromObject(L.F.g);L.F.g.add(L.bub);return{h:+(B.max.y-B.min.y).toFixed(3),hs:L.F.h,s:+(L.F.s/OF.fig.s).toFixed(3),ph:L.ph,t:+L.t.toFixed(2),d:+L.d.toFixed(1),dc:+Math.hypot(L.x-L.cx,L.z-L.cz).toFixed(1),dp:+Math.hypot(L.x-RO.x,L.z-RO.z).toFixed(1)}})()`));
  // a person picks the nearest moving traffic car on their side of the road and steps into its lane a few metres ahead of it; it slows for them
  const pickT=()=>G.evaluate(()=>__oc.ev(`(()=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0||c.pk||c.tr||c.route||c.x==null||HCAR[c.k][0]==='#')continue;const d=Math.hypot(c.x-OF.x,c.z-OF.z);if(d>70||Math.abs((c.y||0)-OF.y)>2)continue;
    const h=OF_cH(c),fx=Math.sin(h),fz=Math.cos(h),ah=((OF.x-c.x)*fx+(OF.z-c.z)*fz);const sc=d+(ah<0?40:0);if(sc<bd){bd=sc;b={x:c.x,z:c.z,h,fx,fz,cv:+(c.cv||0).toFixed(1),d,ah,j:c.j,k:c.k}}}return b})()`));
@@ -103,7 +103,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
   let tgt=await pickT();log(jt+'_target',tgt);let took=false,shotA=null,lastC=null;
   for(let f=0;f<1500&&tgt;f+=6){s=await st();if(s.f.btn==='take'){took=true;break}
    if(f%12===0){const n=await nearC([tgt.j,tgt.k]);if(!n||n.d>80){tgt=await pickT();if(!tgt)break;continue}Object.assign(tgt,n)}
-   const ah=(s.f.x-tgt.x)*tgt.fx+(s.f.z-tgt.z)*tgt.fz,lead=ah>3?Math.min(ah,6):tgt.cv<1?0:3;const gx=tgt.x+tgt.fx*lead,gz=tgt.z+tgt.fz*lead,d=Math.hypot(gx-s.f.x,gz-s.f.z);
+   const ah=(s.f.x-tgt.x)*tgt.fx+(s.f.z-tgt.z)*tgt.fz,lead=tgt.cv<1?3:ah>3?Math.min(ah,6):3;if(process.env.DBG&&f%60===0)console.log('dbg',f,JSON.stringify({p:[+s.f.x.toFixed(1),+s.f.z.toFixed(1)],t:[+tgt.x.toFixed(1),+tgt.z.toFixed(1)],cv:tgt.cv,ah:+ah.toFixed(1),near:s.f.near,dbg:await G.evaluate(([j,k])=>__oc.ev(`(()=>{const c=HUB.cars.find(c=>c.j===${'$'}{j}&&c.k===${'$'}{k});if(!c)return null;const o={x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),ref:c};return{e:+OF_edge(o).toFixed(2),dy:+((c.y||0)-OF.y).toFixed(2),tr:c.tr,rt:!!c.route,crW:c.crW,cv:c.cv,dead:c.dead,pk:c.pk}})()`),[tgt.j,tgt.k])}));const gx=tgt.x+tgt.fx*lead,gz=tgt.z+tgt.fz*lead,d=Math.hypot(gx-s.f.x,gz-s.f.z);
    if(d<.8){await release();await tick(6);frames+=6;continue}let a=Math.atan2(gx-s.f.x,gz-s.f.z)-s.cy;a=Math.atan2(Math.sin(a),Math.cos(a));const m=d>3?1:.6;await push(-Math.sin(a)*m,Math.cos(a)*m);await tick(6);frames+=6}
   await release();await tick(4);s=await st();
   ok(took&&s.f.btn==='take',jt+' 🚗 TAKE offered at a traffic car',{btn:s.f.btn,near:s.f.near,frames});
@@ -112,7 +112,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
   const stars0=s.f.stars;if(phone)await tap('#tB');else{await key('KeyE',true);await key('KeyE',false)}
   // mid-pull (t ≈ 0.75 s), then the run
   await tick(40);s=await st();const prB=await shot('j'+J+'_b_pull');const fb=await FL();log(jt+'_pull',{state:s.f.state,jack:s.f.jack,flee:fb,calls:prB.calls});
-  ok(fb&&fb.h>=1.75&&fb.h<=1.85||fb&&fb.ph!=='run'&&fb.h>=1.75&&fb.h<=2.4,jt+' driver minifig 1.75–1.85 m (arms up)',fb);
+  ok(fb&&fb.hs>=1.75&&fb.hs<=1.85&&Math.abs(fb.s-1)<.01&&fb.h<=2.4,jt+' driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m)',fb);
   await tick(40);s=await st();ok(s.f.state==='car'&&!s.f.own,jt+' jacked → driving the traffic car',{state:s.f.state,own:s.f.own,taken:s.f.taken,log:s.f.log});
   ok(s.f.stars>=Math.min(5,stars0+1),jt+' +1 ★',{stars:s.f.stars,before:stars0});
   // first metres of the escape; the driver runs off behind
