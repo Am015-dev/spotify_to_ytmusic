@@ -753,6 +753,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v89e',date:'9 Oct 2026',items:[{t:'FIXED',s:'The city now loads around you while you drive and unloads behind you, using about 40% less memory (Athens) and half (Frankfurt): fewer crashes and reloads on iPhone.'},{t:'FIXED',s:'No small stutters when far districts appear, even flat out on the Autobahn.'}]},
   {v:'v89d',date:'9 Oct 2026',items:[{t:'NEW',s:'Walk up to a slowing or parked car and tap 🚗 TAKE (PC: F or E): you pull the driver out, he shouts "HEY!" and runs off, and you drive away. Taking a car gives you ★1.'},{t:'NEW',s:'The ★ shows next to your speed and drops after a minute without trouble. No police chase yet.'},{t:'NEW',s:'Athens: a few cars are now parked at the kerb, ready to borrow.'}]},
   {v:'v89b1',date:'9 Oct 2026',items:[{t:'FIXED',s:'On foot the camera no longer spins you in circles: it follows you, and only swings slowly behind you after you have walked straight for a moment.'},{t:'NEW',s:'Drag on the empty right side of the screen to look around while walking (up/down too). Double-tap there to put the camera behind you. PC: drag with the mouse, or Q / Z.'}]},
   {v:'v88z',date:'9 Oct 2026',items:[{t:'CHANGED',s:'Each car class has its own top speed: sports cars reach about 230 km/h on the Autobahn (boost about 270), SUVs and 4×4s about 155, vans, trucks and buses less. City streets are a bit slower.'},{t:'CHANGED',s:'More varied traffic: fewer police cars and trucks, city buses in Frankfurt, more scooters and fewer taxis in Athens.'},{t:'FIXED',s:'Street ramps sit on the road in your lane, and traffic no longer queues on them. Every ramp can be reached by driving there.'},{t:'FIXED',s:'Autobahn: no more hidden pit at the Frankfurter Kreuz flyover or bumps onto the Main bridges at full speed.'}]},
@@ -4704,6 +4705,8 @@ function lzRoad(L,pts,w,name){const S=polySamples(pts,8);S.w=w;S.name=name;L.roa
 class LBatch{constructor(T=1400){this.m=new Map();this.T=T}
   add(g,mat){if(g.index)g=g.toNonIndexed();if(!g.attributes.normal)g.computeVertexNormals();const P=g.attributes.position,N=g.attributes.normal,C=g.attributes.color,U=g.attributes.uv,n=P.count,k=mat.uuid+'#'+Math.floor(P.getX(0)/this.T)+','+Math.floor(P.getZ(0)/this.T);let E=this.m.get(k);if(!E)this.m.set(k,E={mat,p:[],n:[],c:[],u:[]});
     for(let i=0;i<n;i++){E.p.push(P.getX(i),P.getY(i),P.getZ(i));E.n.push(N.getX(i),N.getY(i),N.getZ(i));if(C)E.c.push(C.getX(i),C.getY(i),C.getZ(i));else E.c.push(1,1,1);if(U)E.u.push(U.getX(i),U.getY(i));else E.u.push(0,0)}}
+  // v89b: flush in ≤1.2 ms slices (the one-step flush of a big biome was a 15–20 ms frame while driving)
+  *flushG(parent){let t=performance.now();for(const E of this.m.values()){const g=new THREE.BufferGeometry();for(const [nm,A,k] of [['position',E.p,3],['normal',E.n,3],['color',E.c,3],['uv',E.u,2]]){const o=new Float32Array(A.length);for(let i=0;i<A.length;i+=65536){const e=Math.min(A.length,i+65536);for(let j=i;j<e;j++)o[j]=A[j];if(performance.now()-t>1.2){yield;t=performance.now()}}g.setAttribute(nm,new THREE.BufferAttribute(o,k))}E.p=E.n=E.c=E.u=null;const m=new THREE.Mesh(g,E.mat);m.receiveShadow=true;parent.add(m);yield;t=performance.now()}this.m.clear()}
   flush(parent){for(const E of this.m.values()){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(E.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(E.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(E.c,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(E.u,2));const m=new THREE.Mesh(g,E.mat);m.receiveShadow=true;parent.add(m)}this.m.clear()}}
 function lzPartGeo(P){const C=new THREE.Color(P.col);if(P.k==='b'){const tex=P.m==='glass'||P.m==='office'||P.m==='brick'||P.m==='gable'||P.m==='poly'||P.m==='neo'||P.m==='plaka',g=tex?bxUV(P.w,P.h,P.d,14,12):new THREE.BoxGeometry(P.w,P.h,P.d);if(P.ry)g.rotateY(P.ry);g.translate(P.x,P.y,P.z);return colorize(g,C)}
   if(P.k==='c')return ccyl(P.r1,P.r2,P.h,P.x,P.y,P.z,P.col,P.seg);if(P.k==='k'){const g=new THREE.ConeGeometry(P.r,P.h,P.seg);g.translate(P.x,P.y+P.h/2,P.z);return colorize(g,C)}
@@ -4711,7 +4714,7 @@ function lzPartGeo(P){const C=new THREE.Color(P.col);if(P.k==='b'){const tex=P.m
 function* lzBuildG(L){const BM=HUB.BM,bt=L.bt;if(L.pre)yield* L.pre(L);let t=performance.now();for(const P of L.parts){const g=lzPartGeo(P);if(g)bt.add(g,P.m==='flat'?HUB.flatMat:P.k==='b'&&BM[P.m]?BM[P.m]:BM.plain);if(performance.now()-t>1.2){yield;t=performance.now()}}
   yield;for(const S of L.roads){const P=S.pts;for(let i0=0;i0<P.length-1;i0+=140){const i1=Math.min(P.length-1,i0+140),m=new THREE.Mesh(abStrip(P,i0,i1,-S.w/2,S.w/2,.07,.07,32),HUB.M.street||HUB.M.road);m.receiveShadow=true;L.root.add(m)}yield}
   const by={};for(const o of L.km)(by[o.nm]=by[o.nm]||[]).push(o);for(const nm in by){const A=by[nm],im=new THREE.InstancedMesh(kmGeo(nm,1),kmMat(kmKit(nm)),A.length),c=new THREE.Color(),q=new THREE.Quaternion(),up=V3(0,1,0),P=V3();let ks=0;A.forEach((o,i)=>{_m.compose(P.set(o.x,groundY(o.x,o.z)-.1,o.z),q.setFromAxisAngle(up,o.ry),_ts.set(o.sc,o.sc,o.sc));ks=Math.max(ks,o.sc);im.setMatrixAt(i,_m);im.setColorAt(i,c.set(o.tint||'#ffffff'))});im.userData.ks=ks;im.computeBoundingSphere();L.root.add(im);yield}
-  if(L.post)yield* L.post(L);bt.flush(L.root);yield;yield* lzPropsG(L)}
+  if(L.post)yield* L.post(L);yield* bt.flushG(L.root);yield;yield* lzPropsG(L)}
 // biome props: same smashable instanced props as the city (HUB.props / HUB.pgrid), filtered against the city and the biome colliders
 function* lzPropsG(L){const D=HUB.ptypes;if(!D||!L.props.length)return;const G=new Map();gridAddTo(G,L.bld);const out=[],rnd=mul(L.id.length*977+L.props.length);let t0=performance.now();
   for(const[t,x,z,ry,y]of L.props){if(performance.now()-t0>1.2){yield;t0=performance.now()}const def=D[t];if(!def)continue;if(roamHit(x,z,def.r*.6)||gridHit(G,x,z,def.r*.6)||lzRoadD(x,z)<def.r*.6)continue;if(CID!=='fra'&&!CE_RX[t]&&CE_onRoad(x,z))continue;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))continue;if(OC_onRoad(t,x,z))continue;out.push({gp:y==null,t,x,z,y:y??OC_gy(t,x,z),ry:ry??rnd()*6.28,alive:true,rt:0})}
@@ -4725,7 +4728,7 @@ function lzFinish(L){HUB.bld.push(...L.bld);hubGridAdd(L.bld);const R=L.root;R.t
   R.visible=true;hubCullAdd(R);L.done=true;L.it=null;L.bt=null;L.tDone=performance.now();L.qd=true;HUB.cpos=null}
 function lzRun(L){if(L.done)return;const i=LZ.q.indexOf(L);if(i>=0)LZ.q.splice(i,1);lzStart(L);const t=performance.now();while(!L.it.next().done);L.ms+=performance.now()-t;lzFinish(L);if(LZ.cur===L)LZ.cur=null}
 // the per-frame step (called from hubTrafficStep): queue biomes within 2200 m, nearest first, and spend at most LZ.ms on generator steps
-function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(const L of LAZY)if(!L.done&&!L.qd&&lzD(L,x,z)<2200){L.qd=true;LZ.q.push(L);add=true}
+function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(const L of LAZY)if(!L.done&&!L.qd&&lzD(L,x,z)<(LZ.inR||2200)){L.qd=true;LZ.q.push(L);add=true}
   if(!LZ.cur&&!LZ.q.length)return;if(add)LZ.q.sort((a,b)=>lzD(a,x,z)-lzD(b,x,z));const t0=performance.now();let n=0;
   while(performance.now()-t0<LZ.ms){if(!LZ.cur){LZ.cur=LZ.q.shift();if(!LZ.cur)break;if(LZ.cur.done){LZ.cur=null;continue}lzStart(LZ.cur)}const L=LZ.cur,t1=performance.now(),r=L.it.next();L.ms+=performance.now()-t1;n++;if(r.done){lzFinish(L);LZ.cur=null}}
   if(!n)return;const dt=performance.now()-t0;LZ.steps++;LZ.tot+=dt;if(dt>LZ.max)LZ.max=dt;if(dt>8)LZ.over++;LZ.hist.push(+dt.toFixed(2));if(LZ.hist.length>900)LZ.hist.shift()}
@@ -4747,7 +4750,7 @@ const lzWoodM=()=>HUB.woodMat||(HUB.woodMat=new THREE.MeshStandardMaterial({vert
       let t0=performance.now();for(let i=0;i<n;i++){if(performance.now()-t0>1.2){yield;t0=performance.now()}const cx=r[0]+100+rnd()*(r[1]-r[0]-200),cz=r[2]+100+rnd()*(r[3]-r[2]-200),B=biomeAt(cx,cz),fo=(B&&B.g==='forest')||cz<-2600,m=fo?28:7,rad=fo?140:55;for(let k=0;k<m;k++){const x=cx+(rnd()-.5)*2*rad,z=cz+(rnd()-.5)*2*rad,sc=.8+rnd()*.6,t=TC[Math.floor(rnd()*TC.length)];if(inCity(x,z,350)||!outerFree2(x,z))continue;ti2.add(x,groundY(x,z)-.2,z,rnd()*6,sc,t)}}
       yield;for(const im of ti2.flush(L.root)){im.userData.nr=1;im.userData.nsh=1}}})}}
 // the Taunus and the Stadtwald trees
-lzReg('taunus','Taunus',[TAU_R.x0,TAU_R.x1,TAU_R.z0,TAU_R.z1],{build:function*(L){yield* taunusBuildG(L);L.bt.flush(L.root);yield;yield* lzPropsG(L)}});
+lzReg('taunus','Taunus',[TAU_R.x0,TAU_R.x1,TAU_R.z0,TAU_R.z1],{build:function*(L){yield* taunusBuildG(L);yield* L.bt.flushG(L.root);yield;yield* lzPropsG(L)}});
 lzReg('stadtwald','Stadtwald',[-1500,3300,-3250,-1750],{post:function*(L){for(const p of LZ.defer.stadtwald)L.props.push(p)}});
 // ---------- Stage 4 biome content (world metres; plans are deterministic and run once at boot)
 const LZH=['building-type-a','building-type-c','building-type-f','building-type-k','building-type-p','building-type-h'],LZC=['building-a','building-b','building-c','building-d','building-e','building-f','building-g','building-h'],LZLD=['low-detail-building-a','low-detail-building-c','low-detail-building-e','low-detail-building-g','low-detail-building-wide-a'],LZT2=['#ffffff','#ffe8d8','#e8f0ff','#fff4d0','#f0e8ff','#ffe0e0'];
@@ -12470,26 +12473,41 @@ async function WB_cityBuild2(a,b){const t0=performance.now(),SL=a==null?6:14,grp
   for(const o of objs){const ti=performance.now(),n=o.count,ck=new Float64Array(n),e={o,ck,ver:o.instanceMatrix.version,P:null,nc:0,cells:new Set()};
     for(let j=0;j<n;j++){o.getMatrixAt(j,M);W.multiplyMatrices(o.matrixWorld,M);const el=W.elements,s=Math.hypot(el[0],el[1],el[2]);if(s<1e-4){ck[j]=-1;continue}const k=WB_cellK(el[12],el[14]);ck[j]=k;e.cells.add(k);
       let c=WBC.cells.get(k);if(!c){const cx=Math.floor(el[12]/WBC.C)*WBC.C,cz=Math.floor(el[14]/WBC.C)*WBC.C;c={k,x0:cx,z0:cz,objs:new Set(),items:[],lod:null};WBC.cells.set(k,c)}c.objs.add(e);
-      const cell=TUNE.wbLodCell/s;if(o.instanceColor)o.getColorAt(j,col);else col.setRGB(1,1,1);c.items.push([WB_tpl(o.geometry,o.material,Math.pow(2,Math.round(Math.log2(cell)*4)/4)),W.clone(),col.r,col.g,col.b]);if(!WBC.fast&&(j&127)===127&&performance.now()-tt>SL)tt=await yl(.4*WBC.objs.length/objs.length)}
+      const cell=TUNE.wbLodCell/s;if(o.instanceColor)o.getColorAt(j,col);else col.setRGB(1,1,1);c.items.push([WB_tpl(o.geometry,o.material,Math.pow(2,Math.round(Math.log2(cell)*4)/4)),new Float32Array(W.elements),col.r,col.g,col.b]);if(!WBC.fast&&(j&127)===127&&performance.now()-tt>SL)tt=await yl(.4*WBC.objs.length/objs.length)}
     WB_big(ti,'inst '+n+'x'+(o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)+(o.material.map?' tex':''));WBC.objs.push(e);if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.4*WBC.objs.length/objs.length)}
   WBC.st.tI=Math.round(performance.now()-t0);const getC=(k,x,z)=>{let c=WBC.cells.get(k);if(!c){c={k,x0:Math.floor(x/WBC.C)*WBC.C,z0:Math.floor(z/WBC.C)*WBC.C,objs:new Set(),items:[],lod:null};WBC.cells.set(k,c)}return c};
   for(const {o,P:L} of prep?prep.L:[]){const e={o,mesh:1,pcs:L.map(q=>[q.k,q.m]),cells:new Set()};
-    for(const q of L){const kx=Math.floor(q.k/4096)-2048,kz=q.k%4096-2048,c=getC(q.k,kx*WBC.C+1,kz*WBC.C+1);c.objs.add(e);e.cells.add(q.k);const ti=performance.now();c.items.push([q.mk(),o.matrixWorld.clone(),1,1,1]);q.mk=null;WB_big(ti,'piece '+(q.m.geometry.drawRange.count)+(o.material.map?' tex':''));if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5)}
+    for(const q of L){const kx=Math.floor(q.k/4096)-2048,kz=q.k%4096-2048,c=getC(q.k,kx*WBC.C+1,kz*WBC.C+1);c.objs.add(e);e.cells.add(q.k);const ti=performance.now();c.items.push([q.mk(),new Float32Array(o.matrixWorld.elements),1,1,1]);q.mk=null;WB_big(ti,'piece '+(q.m.geometry.drawRange.count)+(o.material.map?' tex':''));if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5)}
     WBC.mobjs.push(e)}
   WBC.st.tM=Math.round(performance.now()-t0);WBC.mat=WBC.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.75,metalness:.05});let i=0;
   // v88w: 2x2 cells share ONE buffer (a "super cell"); each cell's far mesh is a drawRange view of it, the super mesh draws all four in 1 call far away
   const SUP=new Map();for(const c of WBC.cells.values()){const sk=WB_supK(c.k);let S=SUP.get(sk);if(!S){S={k:sk,cells:[],lod:null};SUP.set(sk,S)}S.cells.push(c)}
-  for(const S of SUP.values()){const ti=performance.now();let nt=0;for(const c of S.cells)for(const it of c.items)nt+=it[0].n;if(nt){const p=new Float32Array(nt*9),nn=new Int8Array(nt*9),cc=new Uint8Array(nt*9),v=new THREE.Vector3(),q=new THREE.Vector3(),r=new THREE.Vector3();let o=0;const rng=[];
-      for(const c of S.cells){const o0=o;for(const [t,Wm,cr,cg,cb] of c.items){const el=Wm.elements;for(let f=0;f<t.n;f++){for(let k=0;k<3;k++){const s=f*9+k*3,x=t.p[s],y=t.p[s+1],z=t.p[s+2];p[o+k*3]=el[0]*x+el[4]*y+el[8]*z+el[12];p[o+k*3+1]=el[1]*x+el[5]*y+el[9]*z+el[13];p[o+k*3+2]=el[2]*x+el[6]*y+el[10]*z+el[14]}
-        v.set(p[o+3]-p[o],p[o+4]-p[o+1],p[o+5]-p[o+2]);q.set(p[o+6]-p[o],p[o+7]-p[o+1],p[o+8]-p[o+2]);r.crossVectors(v,q).normalize();const R8=Math.round(r.x*127),G8=Math.round(r.y*127),B8=Math.round(r.z*127),c0=Math.min(255,Math.round(t.c[f*3]*cr*255)),c1=Math.min(255,Math.round(t.c[f*3+1]*cg*255)),c2=Math.min(255,Math.round(t.c[f*3+2]*cb*255));for(let k=0;k<3;k++){nn[o+k*3]=R8;nn[o+k*3+1]=G8;nn[o+k*3+2]=B8;cc[o+k*3]=c0;cc[o+k*3+1]=c1;cc[o+k*3+2]=c2}o+=9}}
-        rng.push([c,o0/3,(o-o0)/3]);c.items=null}
-      const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];
-      const mk=(st,n)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',A[0]);g.setAttribute('normal',A[1]);g.setAttribute('color',A[2]);g.setDrawRange(st,n);g.boundingSphere=WB_rangeSphere(p,st,n);
-        const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);return m};
-      for(const [c,st,n] of rng)if(n)c.lod=mk(st,n);if(rng.filter(q=>q[2]).length>1)S.lod=mk(0,nt*3);WBC.st.lodT=(WBC.st.lodT||0)+nt}else for(const c of S.cells)c.items=null;
+  for(const S of SUP.values()){const ti=performance.now();let nt=0;S.grp=grp;S.x0=Math.min(...S.cells.map(c=>c.x0));S.z0=Math.min(...S.cells.map(c=>c.z0));S.x1=Math.max(...S.cells.map(c=>c.x0))+WBC.C;S.z1=Math.max(...S.cells.map(c=>c.z0))+WBC.C;
+    for(const c of S.cells){WB_cpack(c);for(const t of c.T)nt+=t.n}S.nt=nt;
+    // v89b STR: streaming keeps the items and builds the super cell's buffer only within range of the camera (STR_step); otherwise build it now as before
+    if(!STR_on())for(const _ of WB_supMk(S,false));
     WBC.sup.push(S);WB_big(ti,'super '+nt);i+=S.cells.length;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5+.5*i/WBC.cells.size)}
+  // v89b STR: before the far LOD switches on, build the super cells within load range of the camera inside this (sliced) build, as live does for all
+  // of them; otherwise the first ~3 s after the switch show missing far blocks while STR_step catches up
+  if(STR_on()&&typeof camera!=='undefined')for(;;){const cx=camera.position.x,cz=camera.position.z,LD=STR_R()+TUNE.strLoad;let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;
+    for(const _ of WB_supMk(b,true))if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(1);STR.st.b++}
   {const sl=performance.now()-tt,S=WBC.st;if(sl>(S.slMax||0))S.slMax=Math.round(sl);if(sl>50)S.sl50=(S.sl50||0)+1;if(sl>100)S.sl100=(S.sl100||0)+1}
   WBC.on=true;WBC.sig='';WBC.st.ms=Math.round(performance.now()-t0);WBC.st.objs=WBC.objs.length;WBC.st.mobjs=WBC.mobjs.length;WBC.st.cells=WBC.cells.size}
+// v89b: one super cell's far buffer from its cells' items (keep=true: items stay for a later rebuild; the CPU copy is dropped after the GPU upload)
+// items → compact per-cell arrays: template refs + 3×4 matrix rows (12 floats) + colour (the [tpl,Float32Array,r,g,b] items cost ~250 B each)
+function WB_cpack(c){if(c.T)return;const n=c.items.length,M=new Float32Array(n*12),C=new Float32Array(n*3),T=new Array(n);for(let j=0;j<n;j++){const [t,e,r,g,b]=c.items[j];T[j]=t;for(let i=0;i<12;i++)M[j*12+i]=e[i+(i/3|0)];C[j*3]=r;C[j*3+1]=g;C[j*3+2]=b}c.T=T;c.M=M;c.C=C;c.items=null}
+function* WB_supMk(S,keep){const nt=S.nt,grp=S.grp;if(!nt){if(!keep)for(const c of S.cells)c.T=c.M=c.C=null;return}const p=new Float32Array(nt*9),nn=new Int8Array(nt*9),cc=new Uint8Array(nt*9),v=new THREE.Vector3(),q=new THREE.Vector3(),r=new THREE.Vector3();let o=0,ty=performance.now();const rng=[],bx=[1e9,1e9,1e9,-1e9,-1e9,-1e9];
+  const el=new Float32Array(16);for(const c of S.cells){const o0=o,B=[1e9,1e9,1e9,-1e9,-1e9,-1e9];for(let j=0;j<c.T.length;j++){const t=c.T[j],cr=c.C[j*3],cg=c.C[j*3+1],cb=c.C[j*3+2];for(let i=0;i<12;i++)el[i+(i/3|0)]=c.M[j*12+i];for(let f=0;f<t.n;f++){for(let k=0;k<3;k++){const s=f*9+k*3,x=t.p[s],y=t.p[s+1],z=t.p[s+2];p[o+k*3]=el[0]*x+el[4]*y+el[8]*z+el[12];p[o+k*3+1]=el[1]*x+el[5]*y+el[9]*z+el[13];p[o+k*3+2]=el[2]*x+el[6]*y+el[10]*z+el[14];for(let d=0;d<3;d++){const w=p[o+k*3+d];if(w<B[d])B[d]=w;if(w>B[d+3])B[d+3]=w}}
+      v.set(p[o+3]-p[o],p[o+4]-p[o+1],p[o+5]-p[o+2]);q.set(p[o+6]-p[o],p[o+7]-p[o+1],p[o+8]-p[o+2]);r.crossVectors(v,q).normalize();const R8=Math.round(r.x*127),G8=Math.round(r.y*127),B8=Math.round(r.z*127),c0=Math.min(255,Math.round(t.c[f*3]*cr*255)),c1=Math.min(255,Math.round(t.c[f*3+1]*cg*255)),c2=Math.min(255,Math.round(t.c[f*3+2]*cb*255));for(let k=0;k<3;k++){nn[o+k*3]=R8;nn[o+k*3+1]=G8;nn[o+k*3+2]=B8;cc[o+k*3]=c0;cc[o+k*3+1]=c1;cc[o+k*3+2]=c2}o+=9;if(keep&&(f&255)===255&&performance.now()-ty>STR.sl){yield;ty=performance.now()}}
+      if(keep&&performance.now()-ty>STR.sl){yield;ty=performance.now()}}
+    rng.push([c,o0/3,(o-o0)/3,B]);for(let d=0;d<3;d++){if(B[d]<bx[d])bx[d]=B[d];if(B[d+3]>bx[d+3])bx[d+3]=B[d+3]}if(!keep){c.T=c.M=c.C=null}}
+  if(keep)yield;
+  const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];if(keep&&TUNE.strFree){const rel=function(){STR.st.relMB+=this.array.byteLength/1048576;this.array=null};for(const a of A)a.onUpload(rel)}
+  const bs=B=>new THREE.Sphere(new THREE.Vector3((B[0]+B[3])/2,(B[1]+B[4])/2,(B[2]+B[5])/2),Math.hypot(B[3]-B[0],B[4]-B[1],B[5]-B[2])/2);  // v89b: bounds from the fill loop (a full rescan was the unsliced tail of a streamed build)
+  const mk=(st,n,B)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',A[0]);g.setAttribute('normal',A[1]);g.setAttribute('color',A[2]);g.setDrawRange(st,n);g.boundingSphere=bs(B);
+    const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);return m};
+  for(const [c,st,n,B] of rng)if(n)c.lod=mk(st,n,B);if(rng.filter(q=>q[2]).length>1)S.lod=mk(0,nt*3,bx);S.built=1;S.mb=nt*54/1048576;WBC.st.lodT=(WBC.st.lodT||0)+nt}
+function WB_supFree(S){const gs=new Set();for(const c of S.cells)if(c.lod){c.lod.removeFromParent();gs.add(c.lod.geometry);c.lod=null}if(S.lod){S.lod.removeFromParent();gs.add(S.lod.geometry);S.lod=null}for(const g of gs)g.dispose();S.built=0;WBC.st.lodT=Math.max(0,(WBC.st.lodT||0)-S.nt)}
 function WB_cityClear(keep){if(WBC.prep&&WBC.prep!==keep){for(const {P} of WBC.prep.L)for(const q of P)q.m.removeFromParent();WBC.prep=null}for(const c of WBC.cells.values())if(c.lod){c.lod.removeFromParent();c.lod.geometry.dispose()}for(const S of WBC.sup||[])if(S.lod){S.lod.removeFromParent();S.lod.geometry.dispose()}WBC.sup=[];for(const G of WBC.grps||[])if(G.P){G.P.removeFromParent();G.P.dispose()}WBC.grps=null;for(const e of WBC.mobjs){for(const [,m] of e.pcs)m.removeFromParent();for(const r of e.rm||[])r.removeFromParent()}WBC.cells.clear();WBC.objs=[];WBC.mobjs=[];WBC.tpl.clear();WBC.on=false;WBC.grp=null;WBC.built=null}
 // near proxy of one original: only its instances in near cells (rebuilt when the near set changes or the game rewrote the original)
 const WB_M=new THREE.Matrix4(),WB_Cl=new THREE.Color();
@@ -12559,6 +12577,49 @@ function WB_icoPre(cam){WBI.h.length=0;if(WBI.m)WBI.m.visible=false;if(!TUNE.wbI
 function WB_icoPost(){for(const s of WBI.h)s.visible=true;WBI.h.length=0}
 {const ob=scene.onBeforeRender,oa=scene.onAfterRender;scene.onBeforeRender=function(...a){const r=ob.apply(this,a);try{if(a[2]&&a[2].isPerspectiveCamera)WB_icoPre(a[2])}catch(e){WB_icoPost();console.warn('WBI',e)}return r};
  scene.onAfterRender=function(...a){try{WB_icoPost()}catch(e){}return oa.apply(this,a)}}
+// ===== STR (v89b): streaming. Owner: stream worker (alex/od-stream). =====
+// Measured live v89a: the JS heap after GC is flat (~140 MB Athens, ~75 MB Frankfurt) but geometry buffers grow from 68 → 222 MB (Athens) and
+// 114 → 215 MB (Frankfurt) in a tour, because the WB far city (2×2 "super cells", 54 B per far triangle, CPU copy + GPU copy) was built for the
+// whole map and never freed, and the Frankfurt LAZY outskirts were never disposed either.
+// Now: a super cell's far buffer is built only while its rectangle is within draw range + TUNE.strLoad of the camera (built in ≤ STR.sl ms
+// slices, at most STR.ms per frame) and disposed beyond draw range + TUNE.strUnload (hysteresis, no thrash); its CPU copy is dropped right after the
+// GPU upload. The items (shared model templates + one Float32 matrix per instance) stay, so a rebuild needs no source geometry.
+// LAZY regions (Frankfurt outskirts): meshes + props are disposed beyond draw range + TUNE.strLzOut (load at draw range + TUNE.strLzIn, was a fixed 2200 m) and rebuilt by lazyStep on return (colliders, map roads,
+// ramps and spots are plan data and stay, so collisions, missions and the minimap never depend on what is loaded).
+for(const [k,v] of Object.entries({strOn:1,strFree:1,strLoad:300,strUnload:900,strLzIn:100,strLzOut:800}))if(TUNE[k]===undefined)TUNE[k]=v;
+const STR={it:null,S:null,sl:2,ms:4,msC:12,lzT:0,st:{b:0,f:0,max:0,over:0,relMB:0,lzF:0,lzB:0,hist:[]}};
+const STR_on=()=>!!TUNE.strOn;
+const STR_R=()=>SET.q==='high'?2100:1600;
+const STR_d=(S,x,z)=>Math.hypot(Math.max(S.x0-x,0,x-S.x1),Math.max(S.z0-z,0,z-S.z1));
+function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof camera==='undefined')return;const t0=performance.now(),cx=camera.position.x,cz=camera.position.z,R=STR_R(),LD=R+TUNE.strLoad,UL=R+TUNE.strUnload;
+  if(STR.S&&(STR.S.grp!==WBC.grp||!WBC.sup.includes(STR.S))){STR.S=null;STR.it=null}
+  let nf=0;for(const S of WBC.sup)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++;if(++nf>=2)break}
+  // catch-up: a missing cell INSIDE draw range (after a warp, flight, garage or roam start) gets up to STR.msC minus this frame's LAZY time (instead of STR.ms), so the frame's stream work stays under 16 ms
+  // a frame whose LAZY step was already big builds nothing (frees still run): the frame's stream work stays under 16 ms
+  let n=0,bud=STR.lzT>16-STR.ms-STR.sl-2?0:STR.ms;while(performance.now()-t0<bud){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;if(bd<R)bud=Math.max(bud,STR.msC-STR.lzT);STR.S=b;STR.it=WB_supMk(b,true)}else if(STR_d(STR.S,cx,cz)<R)bud=Math.max(bud,STR.msC-STR.lzT);
+    n++;if(STR.it.next().done){STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
+  if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
+{const _ls=lazyStep;lazyStep=function(){const t=performance.now(),r=_ls.apply(this,arguments);STR.lzT=(STR.lzT0||0)+performance.now()-t;try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
+window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
+// LAZY unload: only regions built by the plain lzBuildG (their build has no side effects beyond L.root + props); Taunus/Wald/Attiki corridors stay
+// (their builders add terrain, colliders or lanes while building). Colliders were added once at the first finish and are kept.
+const STR_lzOk=L=>L.build===lzBuildG&&!L.pre&&L.done&&!L.it&&L.root&&LZ.cur!==L;
+function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)return true;return false};
+  if(HUB.props){const keep=[],gone=[];for(const p of HUB.props)(p.im&&inR(p.im)?gone:keep).push(p);if(gone.length){HUB.props.length=0;HUB.props.push(...keep);const PG=HUB.pgrid;if(PG)for(const p of gone){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16),A=PG.get(k);if(A){const i=A.indexOf(p);if(i>=0)A.splice(i,1)}}}}
+  if(HUB.cull){const C=HUB.cull.filter(c=>!inR(c.o));HUB.cull.length=0;HUB.cull.push(...C)}
+  R.removeFromParent();R.traverse(o=>{if(o.isInstancedMesh)o.dispose();else if(o.isMesh&&o.geometry)o.geometry.dispose()});
+  L.root=null;L.done=false;L.qd=false;L.it=null;L.bt=null;L.strRe=1;if(L.pN!=null)L.props.length=L.pN;HUB.cpos=null;STR.st.lzF++}
+// probe: the 3 biggest single LAZY build steps (ms, region, step index) in STR.st.lzBig
+STR.st.lzBig=[];
+{const _st=lzStart;lzStart=function(L){if(!L.it&&L.pN==null)L.pN=L.props.length;const fresh=!L.it,r=_st.apply(this,arguments);if(fresh&&L.it){const it=L.it;let k=0;L.it={next(){const t=performance.now(),q=it.next(),d=performance.now()-t;k++;if(d>6){const B=STR.st.lzBig;B.push([+d.toFixed(1),L.id,k,q.done?'end':'']);B.sort((a,b)=>b[0]-a[0]);B.length=Math.min(B.length,3)}return q},[Symbol.iterator](){return this}}}return r}}
+{const _fi=lzFinish;lzFinish=function(L){if(!L.strRe)return _fi.apply(this,arguments);const b=L.bld;L.bld=[];try{return _fi.apply(this,arguments)}finally{L.bld=b;STR.st.lzB++}}}
+function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>STR_R()+TUNE.strLzOut)STR_lzFree(L)}
+// per-frame cost of all streaming work (LAZY build + LAZY unload + far-cell build/free): STR.st.fr = frames, max ms, over 8/16/50 ms
+STR.st.fr={n:0,max:0,o8:0,o16:0,o50:0};
+{const _ls=lazyStep;lazyStep=function(){const t0=performance.now();try{STR_lzStep();STR.lzT0=performance.now()-t0;LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}finally{const dt=performance.now()-t0,F=STR.st.fr;if(dt>.05){F.n++;if(dt>F.max)F.max=+dt.toFixed(1);if(dt>8)F.o8++;if(dt>16)F.o16++;if(dt>50)F.o50++}}}}
+// SM3 (drop the CPU copy of single-use city meshes after the GPU upload) was Athens-only; Frankfurt kept ~106 MB of copies nobody reads
+if(TUNE.strSm3===undefined)TUNE.strSm3=1;
+if(TUNE.strSm3&&!SM3.on)try{SM3.on=localStorage.getItem('mho_sm3')!=='0'}catch(e){SM3.on=true}
 // ===== BW (v88w): 2x brick detail near the camera (Alex: "double the bricks and tiles, same for the city"). Owner: world worker (alex/od-world). =====
 // Everything here is NEAR ONLY: the far city cells (WB_city, WBC.mat) and far traffic copies never see it, so draws/tris stay in budget.
 // 1. BW_inject: building materials (Kenney com/sub atlas, the facade materials HUB.BM) get a world-space LEGO surface in the shader:
@@ -13178,6 +13239,8 @@ const OD_CHECKLIST=[
  {ver:'v88z',id:'ramps',text:'Drive along a street to a yellow ramp: it sits in your lane, no traffic queued on it, and you can jump it. Try the ramp on the Eiserner Steg footbridge.'},
  {ver:'v88z',id:'traffic',text:'Frankfurt: a few city buses, fewer police and trucks. Athens: more scooters, fewer taxis. Does the traffic look right?'},
  {ver:'v88z',id:'ath-walls',text:'Athens: drive around Eleni\'s Garage (Psyrri) and a RAMP JUMP pop-up ring. Any invisible walls or getting stuck between buildings?'},
+ {ver:'v89e',id:'stream-drive',text:'Drive 2 min fast on the Autobahn and then across Athens: no grey holes or buildings popping in close to you, no stutter.'},
+ {ver:'v89e',id:'stream-ios',text:'iPhone: play 10 min in Athens and Frankfurt: the page never reloads or crashes.'},
  {ver:'v89d',id:'jack-take',text:'Get out next to a street, step in front of a slow car or walk up to a parked one: the yellow button reads 🚗 TAKE. Tap it (PC: F).'},
  {ver:'v89d',id:'jack-pull',text:'After TAKE: the driver is pulled out, a "HEY!" bubble shows (not hidden under the cards at the top) and he runs off. Is he as tall as you?'},
  {ver:'v89d',id:'jack-drive',text:'Drive the taken car away: ★1 shows next to the speed, the camera is as far back as with your own car, and the tyres sit on the road.'},

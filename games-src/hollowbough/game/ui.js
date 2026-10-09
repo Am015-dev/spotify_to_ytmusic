@@ -422,19 +422,25 @@ function renderBoard() {
     strip.appendChild(R.tall && v >= 0 ? h('button.scount.htog', { 'data-a': 'handtog', type: 'button', 'aria-label': 'Hide my hand' }, '\u25BE ' + n + '/8') : h('span.scount', v >= 0 ? n + '/8' : ''));
     if (v < 0) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     else if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
+    // readable chips in a sideways-scrolling row: picture thumbnail + name + cost + points (tap = zoom)
+    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), chW = vert ? handBox.w - 8 : thW + 160, x0 = vert ? 4 : 40, gapc = 4;
+    const hs = placeBox(h('div.hscroll'), handBox), hin = h('div.hin'); hin.style.cssText = vert ? `width:${handBox.w}px;height:${n * (chH + gapc) + 22}px` : `width:${x0 + n * (chW + gapc) + 2}px;height:${handBox.h}px`; if (vert) hs.classList.add('vert'); hs.appendChild(hin); bd.appendChild(hs);
     hand.forEach((id, i) => {
-      const p = posStripCard(handBox, fit, n, i), tg = 'p:hand:' + id;
-      const b = h('button.sc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) }, cardEl(id, fit.cw));
-      let top = handBox.y + p.y;
-      if (R.fan && n > 1) { const mid = (n - 1) / 2, d = i - mid, rot = Math.max(-5, Math.min(5, d * Math.min(4.5, 26 / (n - 1)))), dy = Math.round(d * d * Math.min(1.5, R.fanDrop / (mid * mid + 1))); top = handBox.y + Math.min(handBox.h - fit.ch - 1, 3 + dy); b.style.setProperty('--rot', rot.toFixed(1) + 'deg'); b.classList.add('fan'); }
-      b.style.cssText += `;left:${handBox.x + p.x}px;top:${top}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
-      UI.cr['h' + id] = { x: handBox.x + p.x, y: top, w: fit.cw, h: fit.ch };
+      const tg = 'p:hand:' + id, sp = spec(id);
+      const b = h('button.sc.hc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) });
+      const th = cardEl(id, thW); th.classList.add('hct'); b.appendChild(th);
+      b.appendChild(h('span.hcx', h('b.hcn', sp.name), h('span.hcr', costEl(sp.cost, 14), h('span.hcp', ic('point', 13), h('b', sp.points || 0)))));
+      const left = vert ? x0 : x0 + i * (chW + gapc), top = vert ? 20 + i * (chH + gapc) : 2;
+      b.style.cssText += `;left:${left}px;top:${top}px;width:${chW}px;height:${chH}px;z-index:${i + 2}`;
+      UI.cr['h' + id] = { x: handBox.x + left, y: handBox.y + top, w: chW, h: chH };
       if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
       else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
       else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
       if (UI.sel && UI.sel.tg === tg) b.classList.add('sel');
-      bd.appendChild(b);
-    }); }
+      hin.appendChild(b);
+    });
+    hs.addEventListener('scroll', () => { UI.hsx = hs.scrollLeft; UI.hsy = hs.scrollTop; }, { passive: true }); hs.scrollLeft = UI.hsx || 0; hs.scrollTop = UI.hsy || 0;
+    { const g = (UI.rec && UI.rec.m && UI.tgEls && UI.tgEls[tgOf(UI.rec.m)]) || hin.querySelector('.glow'); if (g && g.closest('.hscroll') === hs) hscrollTo(g); } }
   // ---- action row / tray
   renderActs(mm, qm, qShown);
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
@@ -697,6 +703,10 @@ function fingerWanted() {
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
+// a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
+function hscrollTo(el) { const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
+  if (hs.classList.contains('vert')) { if (c < hs.scrollTop) hs.scrollTop = c - 4; else if (d > hs.scrollTop + hs.clientHeight) hs.scrollTop = d - hs.clientHeight + 4; UI.hsy = hs.scrollTop; }
+  else { if (a < hs.scrollLeft + 36) hs.scrollLeft = Math.max(0, a - 40); else if (b > hs.scrollLeft + hs.clientWidth) hs.scrollLeft = b - hs.clientWidth + 4; UI.hsx = hs.scrollLeft; } }
 function placeFinger() {
   let f = $('#finger'); if (!f) { f = h('div#finger', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 40 48"><rect x="13" y="2" width="13" height="30" rx="6.500" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/><rect x="7" y="22" width="27" height="25" rx="11" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/></svg>' }); $('#board').appendChild(f); }
   f.hidden = true;
@@ -706,6 +716,7 @@ function placeFinger() {
   let el = UI.tgEls && UI.tgEls[tg];
   if (!el && G.q) { const i = UI.rec.m.i; el = UI.tgEls['q:' + i]; }
   if (!el) return;
+  hscrollTo(el);
   const r = frameRect(el); if (!r || r.w < 4) return;
   const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
