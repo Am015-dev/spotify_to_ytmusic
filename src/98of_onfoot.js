@@ -36,7 +36,8 @@ function OF_figPose(dt){const F=OF.fig;if(!F)return;F.g.position.set(OF.x,OF.y,O
 const OF_cH=c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)return 0;return Math.atan2(B.x-A.x,B.z-A.z)};
 const OF_box=(x,z,h,hw=1.02,hd=2.35)=>({x,z,hw,hd,c:Math.cos(h),s:Math.sin(h),h:999});
 function OF_cars(withTraffic){const L=[];if(OF.car)L.push({k:'cur',x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,ref:OF.car});for(const v of OF.vs)L.push({k:'grp',x:v.x,z:v.z,y:v.y,h:v.h,hw:v.hw,hd:v.hd,ref:v});
-  if(withTraffic&&HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),ref:c})}return L}
+  if(withTraffic&&HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;// v89f: scooters / trolleybuses get their own size (was a 2 × 4.7 m car box: a stopped Athens scooter walled off the lane and the walker never reached the car behind it)
+    const dm=HCAR[c.k][0]==='#'&&typeof OB_cdim==='function'?OB_cdim(c.k):null;L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),hw:dm?dm[0]*.9:undefined,hd:dm?dm[1]*.95:undefined,ref:c})}return L}
 function OF_edge(o){const b=OF_box(o.x,o.z,o.h,o.hw,o.hd),dx=OF.x-b.x,dz=OF.z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.max(0,Math.abs(lx)-b.hw),ez=Math.max(0,Math.abs(lz)-b.hd);return Math.hypot(ex,ez)}
 function OF_nearCar(){let best=null,bd=OF_NEAR;for(const o of OF_cars(true)){if(Math.abs((o.y||0)-OF.y)>2.5)continue;let d=OF_edge(o);
   if(o.k==='traf'){if(o.ref.tr||o.ref.route||o.ref.crW||HCAR[o.ref.k][0]==='#'||(o.ref.cv||0)>OF_JV_MAX)continue;d-=OF_JREACH-OF_NEAR}if(d<bd){bd=d;best=o}}return best}
@@ -209,7 +210,7 @@ function OF_jack(o){const c=o.ref;OF.jk={c,o,t:0,ph:'walk',x0:OF.x,z0:OF.z};c.hi
 function OF_jackEnd(){const J=OF.jk;if(!J)return;if(J.c){J.c.hitT=0;J.c.ofJ=0}OF.jk=null}
 // returns true once the body swap ran (OF_step stops for this frame)
 function OF_jackStep(dt){const J=OF.jk;if(!J||!J.c){OF.jk=null;RO.foot='walk';return false}const c=J.c;J.t+=dt;
-  if(c.dead>0||c.x==null){OF_jackEnd();RO.foot='walk';return false}
+  if(c.dead>0||c.x==null){OF.log.push('jack-abort:'+(c.x==null?'gone':'dead'+(+c.dead).toFixed(2)));OF_jackEnd();RO.foot='walk';return false}
   c.hitT=99;c.cv=J.t>.35?0:Math.min(c.cv||0,OF_JV_MAX);
   const h=OF_cH(c),fx=Math.sin(h),fz=Math.cos(h),rx=-fz,rz=fx,dx=c.x-rx*1.45+fx*.55,dz=c.z-rz*1.45+fz*.55,k=Math.min(1,J.t/.4),e=k*k*(3-2*k);
   OF.x=J.x0+(dx-J.x0)*e;OF.z=J.z0+(dz-J.z0)*e;OF.y=groundAt(OF.x,OF.z,OF.y+1);OF.h+=angDiff(Math.atan2(rx,rz),OF.h)*Math.min(1,dt*12);OF.spd=k<1?OF_WALK:0;

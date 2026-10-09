@@ -48,10 +48,27 @@ function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z
     const runs=[];for(let i=0;i<cols;i++){let j=0;while(j<rows){if(!S[i*rows+j]){j++;continue}let k=j;while(k<rows&&S[i*rows+k])k++;runs.push({i0:i,i1:i,j0:j,j1:k});j=k}}
     const key=r=>r.j0+'|'+r.j1,open=new Map();for(const r of runs){const o=open.get(key(r));if(o&&o.i1===r.i0-1&&o.i1-o.i0<5){o.i1=r.i0;continue}const n={...r};open.set(key(r),n);R.push(n)}
     for(const r of R){r.x0=HX0+r.i0*C;r.x1=HX0+(r.i1+1)*C;r.z0=HZS+r.j0*C;r.z1=HZS+r.j1*C}}
-  DR.solid=R;if(!R.length)return;const G=[],col=CID==='fra'?['#e8dcc8','#a85a3c']:['#efe3c8','#c8643c'];
+  DR.solid=R;if(!R.length)return;if(CID!=='fra'&&DR_athFill(R))return;const G=[],col=CID==='fra'?['#e8dcc8','#a85a3c']:['#efe3c8','#c8643c'];
   for(const r of R){const cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,w=r.x1-r.x0,d=r.z1-r.z0;let lo=1e9,hi=-1e9;for(const[a,b]of[[r.x0,r.z0],[r.x1,r.z0],[r.x0,r.z1],[r.x1,r.z1],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
     const h=hi-lo+7.5;G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]),cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
   const m=new THREE.Mesh(mergeG(G),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));m.castShadow=false;m.receiveShadow=true;m.userData.dr=1;HUB.grp.add(m);DR.st.solid=R.length}
+// v89f (Alex: "long blank grey walls with no windows" ~1.5 km out of Athens): the Athens solid fill used to be one merged mesh of plain 7.5 m
+// boxes (beige walls, orange cap, no texture). In the outskirts these deep block interiors face parks and fields, so they read as long blank
+// walls. Now they are ordinary Athens apartment blocks: ≤ 32 m chunks, 3–5 floors, ATH_COL.poly colours, drawn with the same instanced
+// facade material as the street buildings (athIM: windows + balconies on every side), one InstancedMesh per hub tile + a roof slab each.
+// Colliders stay the solid rects (HUB.bld above); falls back to the old merged boxes if the facade material is not there.
+function DR_athFill(R){let mat=null;HUB.grp.traverse(o=>{if(!mat&&o.isInstancedMesh&&o.userData.athB==='poly')mat=o.material});if(!mat||typeof athUnitGeos!=='function')return false;
+  const GE=athUnitGeos(),RM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}),TL=new Map(),PC=ATH_COL.poly,hx=c=>parseInt(c.slice(1),16),CH=32;
+  const put=(k,x,y,z,sx,sy,sz,c)=>{const t=hubTile(x,z);let a=TL.get(t);if(!a)TL.set(t,a={b:[],r:[]});a[k].push(x,y,z,sx,sy,sz,c)};let n=0;
+  for(const r of R){const w=r.x1-r.x0,d=r.z1-r.z0,nx=Math.max(1,Math.round(w/CH)),nz=Math.max(1,Math.round(d/CH)),cw=w/nx,cd=d/nz;
+    for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const x0=r.x0+i*cw,z0=r.z0+j*cd,cx=x0+cw/2,cz=z0+cd/2;let lo=1e9,hi=-1e9;for(const[a,b]of[[x0,z0],[x0+cw,z0],[x0,z0+cd],[x0+cw,z0+cd],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
+      const q=DR_h(cx*.37,cz*.37),fl=3+Math.floor(q*3),h=hi-lo+.5+fl*3.1+.6,y0=lo-.5;
+      put('b',cx,y0,cz,cw-.2,h,cd-.2,hx(PC[Math.floor(DR_h(cz,cx)*PC.length)]));put('r',cx,y0+h,cz,cw+.1,.5,cd+.1,0xe2ded6);n++}}
+  const C=new THREE.Color();
+  for(const[,a]of TL)for(const k of['b','r']){const L=a[k],m=L.length/7;if(!m)continue;const im=new THREE.InstancedMesh(k==='b'?GE.body:GE.box,k==='b'?mat:RM,m),A=im.instanceMatrix.array,CA=new Float32Array(m*3);
+    for(let i=0;i<m;i++){const o=i*7,e=i*16;A.fill(0,e,e+16);A[e]=L[o+3];A[e+5]=L[o+4];A[e+10]=L[o+5];A[e+12]=L[o];A[e+13]=L[o+1];A[e+14]=L[o+2];A[e+15]=1;C.setHex(L[o+6]);CA[i*3]=C.r;CA[i*3+1]=C.g;CA[i*3+2]=C.b}
+    im.instanceColor=new THREE.InstancedBufferAttribute(CA,3);im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();im.castShadow=false;im.receiveShadow=true;if(k==='b')im.userData.nr=1;im.userData.drF=1;HUB.grp.add(im)}
+  DR.st.solid=R.length;DR.st.fill=n;return true}
 function DR_cull(L){const TC=new Set();let j=0,drop=0;for(const p of L){if(DR_keep(p.t,p.x,p.z,TC))L[j++]=p;else drop++}L.length=j;DR.st.drop=(DR.st.drop||0)+drop;DR.st.kept=j}
 if(DR.on){
  {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}
