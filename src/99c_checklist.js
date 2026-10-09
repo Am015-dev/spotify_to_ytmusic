@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89g',id:'ro_start',text:'RACE → Riverbank Rally (or Coast Rally in Athens). You start 8th at the back: you see the whole field ahead on a wide open course, and the big 8TH top-left changes as you pass cars.'},
+ {ver:'v89g',id:'ro_route',text:'At a fork, follow the orange arrows onto the dirt SHORTCUT (you turn into a 4×4), or the blue arrows into the water lane (you turn into a boat). Both feel faster than the road.'},
+ {ver:'v89g',id:'ro_jump',text:'Jump the creek (Frankfurt) or the olive crest (Athens) at full speed: you fly over and land on the far side.'},
+ {ver:'v89g',id:'ro_cliff',text:'Drive off the cliff edge on purpose: you see a real drop to the water, "OFF THE CLIFF!" appears, and you are back on the road within 3 s (tap to respawn at once). You keep your place.'},
  {ver:'v88z',id:'speed',text:'Take a sports car (Hot Rod) onto the Autobahn and hold GAS: the HUD reaches about 230 km/h, BOOST takes it past 260. A 4×4 tops out around 155. Steering feels the same as before.'},
  {ver:'v88z',id:'kreuz',text:'Autobahn west of the city, at the Frankfurter Kreuz: drive under the flyover at full speed, then take the A5 over it. No drop, no sudden stop, no invisible wall.'},
  {ver:'v88z',id:'ramps',text:'Drive along a street to a yellow ramp: it sits in your lane, no traffic queued on it, and you can jump it. Try the ramp on the Eiserner Steg footbridge.'},

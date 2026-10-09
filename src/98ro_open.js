@@ -126,14 +126,14 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
     strip(wm,i=>{const j=i%N,ri=OPN.RT[j];if(ri<0||OPN.routes[ri].kind!=='water')return null;const sd=OPN.SD[j];return[[sd*(OPN_I1-.6),.06],[sd*30,.06],[sd*47,.06],[sd*160,-.2]]},null,(i,q)=>[q[0]/24,i*td.ds/24]);
     add(wm,new THREE.MeshStandardMaterial({map:R15_tex('water'),color:0xffffff,roughness:.12,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.15}))}
   // cliff faces (rock) down to a quarry floor / the sea
-  {const m=MB(),wf=MB(),rc=new THREE.Color(ath?0xa08a68:0x6f675e);
+  {const m=MB(),wf=MB(),rc=new THREE.Color(ath?0xb49c78:0x8a8076);
     // RO7: solid stepped LEGO rock skirt from the ground top (overlaps the slab by .3 m: no seam) down below the water line
-    const STEP=[[-.3,.03,1.2],[.2,.03,1.1],[.2,-3,.72],[1.2,-3,.95],[1.2,-8,.62],[2.2,-8,.85],[2.2,-14,.55],[3.2,-14,.78],[3.2,-21,.48],[4.2,-21,.7],[4.2,-27,.42],[5,-27,.6],[5,-33,.36]];
+    const STEP=[[-1.8,.04,1.35],[-.6,.14,1.45],[.2,.14,1.25],[.2,-3,1.05],[1.2,-3,1.4],[1.2,-8,.95],[2.2,-8,1.3],[2.2,-14,.88],[3.2,-14,1.2],[3.2,-21,.8],[4.2,-21,1.1],[4.2,-27,.72],[5,-27,1],[5,-33,.62]];
     strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return STEP.map(([dx,y,k])=>[cd*(lp+dx),y,rc.r*k,rc.g*k,rc.b*k])},null,(i,q)=>[q[0]/6+q[1]/5,i*td.ds/6]);
     // RO6: the ravine floor is water (river / sea) 30 m down, so the drop reads from the road
     strip(wf,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return[[cd*(lp+4),-29],[cd*(lp+60),-29],[cd*(lp+260),-29]]},null,(i,q)=>[q[0]/24,i*td.ds/24]);
     add(wf,new THREE.MeshStandardMaterial({map:R15_tex('water'),roughness:.15,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.25}));
-    add(m,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,flatShading:true,side:THREE.DoubleSide}));
+    add(m,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,flatShading:true,side:THREE.DoubleSide,emissive:0x5a4c3c,emissiveIntensity:.6}));
     // RO7: the same rock skirt on both edges of every jump gap (the slab ended in a paper-thin edge)
     {const gm=MB();for(let i=0;i<=N;i+=st){const g0=gap(i),gp=gap(i-st);if(g0===gp)continue;const b=gm.n;for(const x of[-48.5,48.5])for(const y of[.03,-10]){P(i,x,y,gm.p);gm.c.push(rc.r*(y<0?.45:1.1),rc.g*(y<0?.45:1.1),rc.b*(y<0?.45:1.1));gm.u.push(x/6,y/5)}gm.n+=4;gm.i.push(b,b+1,b+2,b+1,b+3,b+2)}
       add(gm,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,side:THREE.DoubleSide}))}}
