@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88y',id:'gp-canvas',text:'Garage BUILD → MY PARTS → CANVAS: an empty green 32×32 baseplate. Place a few bricks, pinch to zoom and drag with two fingers to move the view, then ← CAR: your car is unchanged.'},
+ {ver:'v88y',id:'gp-part',text:'On the canvas: ☝ SELECT your bricks → ⛓ GROUPS → MAKE GROUP → 💾 SAVE PART. Back on the car, MY PARTS → tap the part, tap a spot at the side of the car, ✔ PLACE: it appears on both sides. SAVE & DRIVE, reload: it is still there.'},
+ {ver:'v88y',id:'gp-tiles',text:'BUILD → TILES: round, quarter, macaroni, slope, curve and printed tiles look like real LEGO tiles; nothing overlaps the buttons while holding or selecting a part.'},
  {ver:'v88x',id:'ath-dress',text:'Athens: drive along streets for 1 minute: orange trees, green kiosks, parked scooters and bollards line the pavements; more crowds/cafés; smashing one gives a brick burst. Is Athens lively enough?'},
  {ver:'v88x',id:'steg-tower',text:'Frankfurt: drive to the Eiserner Steg (red iron footbridge): the 4 towers at its ends have windows, a door and a red roof (no plain beige pillar).'},
  {ver:'v88x',id:'crowd-car',text:'Look at crowds next to parked cars: nobody stands inside a car.'},
