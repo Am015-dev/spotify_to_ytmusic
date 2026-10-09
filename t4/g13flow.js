@@ -51,9 +51,10 @@ module.exports=async({p,pg,cdp,tap,tapXY,shot,boot,log})=>{const ev=(f,a)=>p.eva
  await shot('08_group_actions');R.grp.audit=await audit();await tap('#slBar [data-s="move"]');const sm=await ev(()=>__gb.scr(-6,4));if(sm)await tapXY(sm.x,sm.y);R.grp.carry=await ev(()=>__sl.carry());
  await tap('#gsBar .gsPl');R.grp.moved=await ev(()=>__gb.list().filter(b=>b.t==='gb12').map(b=>b.x+','+b.z+','+b.y+',g'+(b.g||0)));
  for(const i of await ev(()=>__gb.list().map((b,i)=>b.t==='gb12'&&b.g?i:-1).filter(i=>i>=0).slice(0,1)))await selTap(i);
+ if(!(await ev(()=>__sl.sel())).length)for(const i of await ev(()=>__gb.list().map((b,i)=>b.t==='gb12'&&b.g?i:-1).filter(i=>i>=0).slice(0,1)))await selTap(i);
  if((await ev(()=>__sl.sel())).length){await tap('#slBar [data-s="grp"]');R.grp.ungrouped=await ev(()=>__gb.list().filter(b=>b.t==='gb12').every(b=>!b.g))}
  await tap('#gbBkP [data-r2b="sel"]');await tap('#gbBkP [data-r2b="sel"]');
- const J=await ev(()=>__gb.list().map((b,i)=>/^(tile|cs31|hl|grl|t14)/.test(b.t)&&!b.g?i:-1).filter(i=>i>=0).slice(0,10));for(const i of J)if(i>=0)await selTap(i);
+ const J=await ev(()=>{const L=__gb.list(),P=__gb.PC,fp=b=>{const D=P[b.t];return[b.x,b.z,b.x+(b.r%2?D.d:D.w),b.z+(b.r%2?D.w:D.d)]},cov=b=>{const f=fp(b);return L.some(c=>c!==b&&c.y>b.y&&(g=>g[0]<f[2]&&f[0]<g[2]&&g[1]<f[3]&&f[1]<g[3])(fp(c)))};return L.map((b,i)=>/^(tile|cs31|hl|grl|t14)/.test(b.t)&&!b.g&&!cov(b)?i:-1).filter(i=>i>=0).slice(0,10)});for(const i of J)if(i>=0)await selTap(i);
  R.join={sel:await ev(()=>__sl.sel()),comps:await ev(()=>__g13.comps(__sl.S.sel))};await tap('#slBar [data-g13s="join"]');await W(400);
  R.join.after=await ev(()=>({comps:__g13.comps(__sl.S.sel),g:__sl.S.sel.map(b=>(b.g||0)+(b.j?'j':'')),groups:__gx.groups()}));await shot('09_join');log('group/join',JSON.stringify(R.grp),JSON.stringify(R.join));
  // the joined piece → SAVE PART (⋯ MORE → GROUPS → the piece → 💾 SAVE PART) → back to the car → MY PARTS → append on the car
