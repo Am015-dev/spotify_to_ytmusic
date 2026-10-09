@@ -199,8 +199,9 @@ Per-frame hook: wrap `roamStep` as `const _rs=roamStep; roamStep=dt=>RO.foot&&RO
 **HUD:** the stars in the speed box flash while cooling down. The minimap shows police as blue dots, using the existing marker draw. No vision cones on the minimap; they are too busy for 852×393.
 
 **Perf**
-- The projectile pool is 1 InstancedMesh of 24 studs (+1 draw). The lock ring is +1. Police cars reuse the `HUB.cim` police instance, so +0.
-- Total P1–P4 ≤ v88w **+5 draws**, so ≤200 in Frankfurt (195+5) and Athens at ≤210. Tris +5 k.
+- The 24 stud projectiles and the lock ring share **one InstancedMesh (+1 draw)**. Police cars reuse the `HUB.cim` police instance, so +0.
+- Total P1–P4 ≤ v88w **+2 draws** (player fig + projectile pool). Tris +5 k.
+- CITY_LIFE_PLAN takes +3, so the combined total is ≤200 in Frankfurt and ≤210 in Athens (see CITY_LIFE_PLAN §6).
 - CPU: police pathing at most 1 `qvPath` call per unit per second.
 
 **tPlay**
