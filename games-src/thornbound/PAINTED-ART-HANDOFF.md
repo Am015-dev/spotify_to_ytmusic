@@ -3,8 +3,7 @@
 The laptop made the pictures; the Linux session wires them in, tests and deploys. The same pattern is already done for Doorkick Dungeon: see `../munch/PAINTED-ART-HANDOFF.md`.
 
 ## Card art: `art/<id>.webp` + `art/manifest.json`
-- 50 paintings, 256×256 WebP, one per kingdom card. `<id>` is the card `id` in `game/src/data.js` `KC` (`kc01`–`kc51`, for example `kc07` = The Lighthouse).
-  - **Missing:** `kc27` (Herald of Applause). Flow failed it once; it follows in the next push. Keep the drawn art as the fallback for it.
+- 51 paintings (all kingdom cards), 256×256 WebP. `<id>` is the card `id` in `game/src/data.js` `KC` (`kc01`–`kc51`, for example `kc07` = The Lighthouse).
 - Style: dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit.
 - Wiring (same as Doorkick):
   1. Embed in `game/build.py` as `var TB_ART` (copy `art_js()` from `../kaiten/game/build.py`).
