@@ -525,6 +525,10 @@ html.ph header.top{scroll-snap-align:start}
 /* featured spotlight */
 #feat{position:absolute;z-index:19;right:12px;top:66px;width:min(270px,26vw);min-width:236px;border-radius:12px;overflow:hidden;color:#fff6e4;background:#1a110b;box-shadow:0 6px 18px rgba(0,0,0,.5),0 0 0 1.5px rgba(242,192,90,.55)}
 #feat[hidden]{display:none}
+#feat .fd{position:absolute;right:8px;bottom:6px;display:flex;gap:2px}
+#feat .fd button{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+#feat .fd button::before{content:'';width:8px;height:8px;border-radius:50%;background:rgba(255,246,228,.45);box-shadow:0 1px 2px #000}
+#feat .fd button[aria-selected=true]::before{background:#f2c05a}
 #feat .fi{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%}
 #feat .fs{position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,8,5,.88) 0%,rgba(14,8,5,.55) 55%,rgba(14,8,5,.15) 100%)}
 #feat .fb{position:relative;display:grid;gap:3px;padding:9px 12px 8px;justify-items:start}
@@ -969,14 +973,20 @@ function render(){
   if(list){renderList();renderCont()}else renderRoom(ph);renderFeat();
   $('#tally').textContent=GAMES.length+' games on the shelf';applyFilter()}
 /* ---------- featured spotlight (switch games by changing FEATURED) ---------- */
-const FEATURED='doorkick';
-const FEAT={doorkick:{img:'doorkick-dungeon/media/title.webp',imgPh:'doorkick-dungeon/media/title-phone.webp',tag:'Kick doors. Fight monsters. Stab friends.',more:['See all 147 cards','doorkick-dungeon/cards.html']}};
+const FEATURED=['doorkick','thornbound','hollowbough'];let featI=0,featT=0;
+const FEAT={doorkick:{img:'doorkick-dungeon/media/title.webp',imgPh:'doorkick-dungeon/media/title-phone.webp',tag:'Kick doors. Fight monsters. Stab friends.',more:['See all 147 cards','doorkick-dungeon/cards.html']},
+ thornbound:{img:'thornbound/media/title.webp',imgPh:'thornbound/media/title-phone.webp',tag:'Four heirs, one empty throne.',more:['See all 51 cards','thornbound/cards.html']},
+ hollowbough:{img:'hollowbough/media/title.webp',imgPh:'hollowbough/media/title-phone.webp',tag:'Four seasons to build a woodland city.',more:['See all 48 cards','hollowbough/cards.html']}};
 function renderFeat(){
-  const el=$('#feat'),g=byId(FEATURED),f=FEAT[FEATURED];
-  if(!el||!g||!f||view==='list'){if(el)el.hidden=true;return}
+  const el=$('#feat'),ids=FEATURED.filter(k=>byId(k)&&FEAT[k]);
+  if(!el||!ids.length||view==='list'){if(el)el.hidden=true;return}
+  featI%=ids.length;const id=ids[featI],g=byId(id),f=FEAT[id];
   const ph=root.classList.contains('ph'),nm=esc(clean(g.name));
-  el.innerHTML=`<img class="fi" src="${ph?f.imgPh:f.img}" alt="" decoding="async"><div class="fs"></div><div class="fb"><span class="fk">Featured</span><b class="fn">${nm}</b><span class="ft">${esc(f.tag)}</span><div class="fr"><button type="button" class="fp" data-play="${g.id}" aria-label="Play ${nm}">PLAY</button>${f.more?`<a class="fc" href="${f.more[1]}">${esc(f.more[0])}</a>`:''}</div></div>`;
-  el.hidden=false}
+  const dots=ids.length>1?`<div class="fd" role="tablist" aria-label="Featured games">${ids.map((k,i)=>`<button type="button" role="tab" aria-selected="${i===featI}" aria-label="${esc(clean(byId(k).name))}" data-fi="${i}"></button>`).join('')}</div>`:'';
+  el.innerHTML=`<img class="fi" src="${ph?f.imgPh:f.img}" alt="" decoding="async"><div class="fs"></div><div class="fb"><span class="fk">Featured</span><b class="fn">${nm}</b><span class="ft">${esc(f.tag)}</span><div class="fr"><button type="button" class="fp" data-play="${g.id}" aria-label="Play ${nm}">PLAY</button>${f.more?`<a class="fc" href="${f.more[1]}">${esc(f.more[0])}</a>`:''}</div></div>${dots}`;
+  el.hidden=false;
+  clearTimeout(featT);if(ids.length>1&&!reduced())featT=setTimeout(()=>{if(!el.matches(':hover,:focus-within')){featI++;renderFeat()}else featT=setTimeout(renderFeat,4000)},8000)}
+document.addEventListener('click',e=>{const d=e.target.closest('#feat [data-fi]');if(!d)return;e.preventDefault();e.stopPropagation();featI=+d.dataset.fi;renderFeat()},true);
 function fit(){
   const cw=root.clientWidth,ph=isPh();
   root.classList.toggle('ph',ph);

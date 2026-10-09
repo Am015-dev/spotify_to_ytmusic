@@ -23,9 +23,13 @@ All sounds are real CC0 recordings (Kenney, OpenGameArt), processed with `tools/
 
 | name | track | author | source page | download | licence | loop cut | similarity | length | size |
 |---|---|---|---|---|---|---|---|---|---|
-| `main` | "Dark Forest Theme" | cynicmusic | https://opengameart.org/content/dark-forest-theme | https://opengameart.org/sites/default/files/GameMusic_ForestTheme_24_0.mp3 | CC0 1.0 | 9.40 s-29.43 s, 1.5 s equal-power cross-fade | 0.891 | 20.0 s | 100664 B (40 kbps) |
-| `tense` | "Dungeon Ambience" | yd | https://opengameart.org/content/dungeon-ambience | https://opengameart.org/sites/default/files/dungeon002_0.ogg | CC0 1.0 | 8.40 s-22.42 s, 1.5 s equal-power cross-fade | 0.891 | 14.0 s | 70604 B (40 kbps) |
+| `main` (retired 2026-10-08, no longer shipped) | "Dark Forest Theme" | cynicmusic | https://opengameart.org/content/dark-forest-theme | https://opengameart.org/sites/default/files/GameMusic_ForestTheme_24_0.mp3 | CC0 1.0 | 9.40 s-29.43 s, 1.5 s equal-power cross-fade | 0.891 | 20.0 s | 100664 B (40 kbps) |
+| `tense` (retired 2026-10-08, no longer shipped) | "Dungeon Ambience" | yd | https://opengameart.org/content/dungeon-ambience | https://opengameart.org/sites/default/files/dungeon002_0.ogg | CC0 1.0 | 8.40 s-22.42 s, 1.5 s equal-power cross-fade | 0.891 | 14.0 s | 70604 B (40 kbps) |
 
 Totals: SFX 79 KB + music 167 KB MP3; `audio-data.js` 328 KB (base64). Licence: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
 
 Rebuild: `python3 tools/build_real.py <raw> <work> && python3 tools/bundle_real.py <raw> <work>` (raw = Kenney zips unpacked + `mus/` with the OGA tracks).
+
+## Music (2026-10-08): Treblo, shipped as separate files in `games/thornbound/music/`
+Ten instrumental tracks (tavern = title, main = game, fight = final round, victory, defeat; versions a and b of each). Sources and licence note: `treblo/README.md`. Generated with Treblo (treblo.com) by the project owner's account; Treblo Terms of Service s.8: the user owns the outputs. No third-party samples; prompts name no artists or works.
+Processing (ffmpeg): tavern first 100 s, main first 110 s, fight a 56 s / b 80 s, each cut into a loop with a 1.5 s cross-fade; victory first 18 s and defeat first 10 s with a 3 s fade-out; all -18 LUFS, stereo 96 kbps MP3. `audio-data.js` was edited by hand to point at them (`url:music/<name>.mp3`): re-running `tools/bundle_real.py` would overwrite that.

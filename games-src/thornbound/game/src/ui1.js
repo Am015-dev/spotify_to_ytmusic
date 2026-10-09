@@ -1,4 +1,8 @@
 // ===================== part 1: core (state, engine adapter, events, AI adapter, turn pump) =====================
+// painted art: TB_ART (data URIs made by build.py) -> blob URLs, so the many card <svg>s only carry a short link. Without blob URLs (old browsers, jsdom) the kit keeps its vector art.
+const PA={};(function(){try{if(typeof TB_ART==='undefined'||/jsdom/i.test(navigator.userAgent||'')||!window.URL||!URL.createObjectURL||!window.Blob||!window.atob)return;
+  for(const k in TB_ART){const p=TB_ART[k].split(','),bin=atob(p[1]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);PA[k]=URL.createObjectURL(new Blob([u],{type:'image/webp'}))}
+  TBKit.setArt(PA)}catch(e){}})();
 // The engine (TB: newGame/moves/apply/pending/stripView) is never edited. Everything the UI needs on top of it lives here.
 var ANIM=1,AIDELAY=1000;
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
@@ -56,7 +60,7 @@ function cardSpec(id,opt){opt=opt||{};
   const spec={faction:f,title:i.name,value:i.kind==='hq'?null:i.strength,cost:i.cost>0?i.cost:null,type:i.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:i.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:txt||'No special ability.',tag:bits.join(' · ')||undefined};
   return spec}
 function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
-  return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],text:k.text,num:'No. '+n}}
+  return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],img:'kc'+String(n).padStart(2,'0'),text:k.text,num:'No. '+n}}
 function cardEl(id,w){return TBKit.card(cardSpec(id),w)}
 function kcEl(n,w){return TBKit.card(kcSpec(n),w)}
 // plain-words detail of a faction card (HTML), used by the enlarged card pop-up

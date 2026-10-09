@@ -753,6 +753,7 @@ const TUNE={life:1,lvPed:1,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v88t',date:'9 Oct 2026',items:[{t:'NEW',s:'3 new Speed-Champions-style cars in RIDES → STREET → SPEED SERIES: Time Coupe, Red Hypercar and Gold Formula (open wheels). Each one has its own ▶ GUIDE.'},{t:'NEW',s:'Time Coupe and Red Hypercar now drive in city traffic; the 6 base racing teams race in street-racer and Speed Series cars in their team colours.'},{t:'CHANGED',s:'BUILD IT (guide): the part you need next is picked for you in the parts palette, in the right colour.'}]},
   {v:'v88q',date:'9 Oct 2026',items:[{t:'CHANGED',s:'The pinned checklist folds to its small chip in the garage (it covered the car) and during the race countdown; tap the chip to open it.'}]},
  {v:'v88p',date:'8 Oct 2026',items:[{t:'NEW',s:'Street corners ahead come alive: groups of people chatting who turn, wave and cheer as you drive up (and leap aside), market stalls, café tables and parked cars on the kerb. Smash a stall for studs.'},{t:'NEW',s:'Roadside pop-up challenges like 2K Drive: a coloured ring appears on the road ahead; drive through it for a RAMP JUMP, DRIFT ZONE, SMASH STREAK or CONE SLALOM. Timer on the objective line, +150 studs and a brick burst if you make it.'},{t:'CHANGED',s:'Traffic and pigeons now show up closer, along the street you are driving.'}]},
   {v:'v88o',date:'8 Oct 2026',items:[{t:'NEW',s:'The test checklist stays on screen while you play: answer each item with ✅ / ❌, ‹ › to move, tap the counter to fold it to a small chip.'},{t:'FIXED',s:'Garage BUILD → CLEAR now leaves one clean chassis with its wheels and a fresh grid (no leftover base, no floating grid). UNDO brings the build back.'},{t:'NEW',s:'Bigger parts palette in BUILD: 2 rows of named tiles, category chips, ★ FAVS (long-press a part) and 🕘 RECENT.'},{t:'NEW',s:'Groups in BUILD: select parts → MAKE GROUP, then 👁 hide/show, move, copy, mirror or delete the whole group. HIDE UP hides the layers above the one you build on.'}]},
@@ -11507,6 +11508,51 @@ const SU_T=[
  {id:'t_su_sky',n:'Silver Night Tuner',tier:'e',ref:'76917',k:'Street tuner coupe',fam:2,car:()=>SU_car({B:'#a0a5a9',G:'#0055bf',H:'#0055bf',cab:'coupe',R:'#a0a5a9',rear:'wing',W:'#a0a5a9'}),st:{top:1.08,acc:1.05,han:1.04,hull:1}},
  {id:'t_su_pink',n:'Pink Roadster',tier:'r',ref:'77241',k:'Roadster',fam:2,car:()=>SU_car({B:'#e4adc8',G:'#f4f4f4',cab:'open',st:CR_K,R:CR_K}),st:{top:1.05,acc:1.06,han:1.05,hull:.98}},
  {id:'t_su_v8',n:'Black Gold V8',tier:'l',ref:'77262',k:'Gymkhana muscle car',fam:2,car:()=>SU_car({B:CR_K,G:'#a0a5a9',A:CR_K,wide:1,F:CR_K,wh:'wLG',eng:1,cab:'coupe',R:CR_K,rear:'spoiler',W:CR_K,st:'#f4f4f4'}),st:{top:1.06,acc:1.08,han:1.03,hull:1.04}}];
+// ---- SC (v88t): Speed Champions companion sets of the 77260 booklet (p3), verified online 2026-10-08 (docs/research/SUPRA.md):
+// 77256 time machine car (357 pcs: flux capacitor, cables along the sides, rear vents + exhausts, reactor on the rear deck), 77261 endurance hypercar (329 pcs: low cockpit,
+// big roof air intake, rear wing + fin, yellow stripe over the roof and down the sides, white headlights, red driver suit), 77252 movie F1 car (268 pcs: black + pearl gold, open wheels).
+// Same 8-wide chassis + builder parts as SU_car; each emits booklet-like steps (A.steps) for the ▶ BUILD GUIDE. Wheelbase 10 studs, ≤ 10 wide, ≤ 18 long → default handling.
+function SC_kit(){const A=[];A.steps=[];const add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
+ sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},
+ wy=wh=>(.12-CR_WH[wh].r)/GB_PH;return{A,add,sym,wy,st:()=>A.steps.push(A.length)}}
+// time machine coupe (77256): steel-grey wedge, black bumpers, quad headlights, gull-wing roof, black cables on the door line, reactor + vents on the rear deck, twin exhausts
+function SC_time(){const{A,add,sym,st,wy}=SC_kit(),B='#a0a5a9',K=CR_K,W='#f4f4f4';
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){st();sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy('wL'))}
+ st();add('P8x1',-4,-8,0,K,1);sym('hl',-4,-8,0,W,2);sym('hl',-3,-8,0,W,2);add('grl',-2,-8,1,K,2);add('grl',0,-8,1,K,2);add('T8x1',-4,-8,0,B,5);
+ st();add('B4x4',-2,-7,0,K,1);add('p44',-2,-7,0,B,4);add('t44',-2,-7,0,B,5);
+ st();sym('B1x6',-4,-3,0,B,1);sym('T1x6',-4,-3,0,K,4);sym('T1x6',-4,-3,0,B,5);sym('sidep',-4,-3,0,K,6);
+ st();add('T6x6',-3,-3,0,K,1);add('drvL',-3,-1,0,W,2);add('P2x2',1,-1,0,K,2);add('B2x1',1,0,0,K,3);add('bar',-2,2,0,'#fac80a',3);
+ st();add('ws6',-3,-3,0,B,6);add('ws6',-3,0,2,B,6);add('T6x2',-3,-1,0,B,10);
+ st();add('B4x4',-2,3,0,K,1);add('p44',-2,3,0,B,4);add('grl',-2,6,1,K,5);add('grl',0,6,1,K,5);
+ st();add('rb22',-1,4,0,W,5);add('rt',-1,4,0,'#a0a5a9',8);
+ st();sym('tl',-4,7,2,'#d01712',1);sym('tl',-3,7,2,K,1);add('B4x1',-2,7,0,K,1);add('T8x1',-4,7,0,B,4);sym('exhaust',-2,8,0,'#a0a5a9',1);return A}
+// endurance hypercar (77261): red, black splitter/sills, thin white lights, yellow stripe down the sides and over the roof, roof intake, central fin + black rear wing
+function SC_hyper(o={}){const{A,add,sym,st,wy}=SC_kit(),B=o.B||'#d01712',Y=o.Y||'#fac80a',K=CR_K,W='#f4f4f4';
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){st();sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy('wL'))}
+ st();add('P8x1',-4,-8,0,K,1);add('grl',-2,-8,1,K,2);add('grl',0,-8,1,K,2);sym('B1x1',-4,-8,0,B,2);sym('B1x1',-3,-8,0,B,2);add('C8x1',-4,-8,0,B,3);sym('light',-4,-8,0,W,5);
+ st();add('B4x4',-2,-7,0,K,1);sym('cs14',-2,-7,0,B,4);sym('cs14',-1,-7,0,B,4);
+ st();sym('B1x6',-4,-3,0,K,1);sym('T1x6',-4,-3,0,Y,4);sym('T1x6',-4,-3,0,B,5);
+ st();add('T6x6',-3,-3,0,K,1);add('drvL',-3,-1,0,o.D||B,2);add('P2x2',1,-1,0,K,2);add('B2x1',1,0,0,K,3);
+ st();add('ws6',-3,-3,0,B,6);add('ws6',-3,0,2,B,6);add('T6x2',-3,-1,0,Y,10);add('scoop',-1,-1,0,K,11);
+ st();add('T4x4',-2,3,0,K,3);sym('cs14',-2,3,2,B,4);sym('cs14',-1,3,2,B,4);add('fin',-1,2,0,B,7);
+ st();sym('tl',-4,7,2,'#d01712',1);sym('tl',-3,7,2,'#d01712',1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);add('diff',-2,8,0,K,0);
+ st();add('wing',-4,5,0,K,6);return A}
+// movie F1 car (77252): black with pearl-gold accents, open wheels (no mudguards), 2-element front wing, narrow nose, sidepods, airbox, rear wing, rain light
+function SC_f1(){const{A,add,sym,st,wy}=SC_kit(),K=CR_K,G='#c9a227',w='wL';
+ add('T6x16',-3,-8,0,K,0);
+ st();sym(w,-4,-7,0,K,wy(w));sym(w,-4,3,0,K,wy(w));
+ st();add('T8x1',-4,-9,0,K,1);add('T8x1',-4,-8,0,G,2);sym('B1x1',-4,-9,0,K,1);
+ st();add('p24',-1,-7,0,K,1);add('cs24',-1,-7,0,K,2);
+ st();sym('B1x6',-3,-3,0,K,1);sym('T1x6',-3,-3,0,G,4);
+ st();add('T4x4',-2,-2,0,K,1);add('B4x1',-2,-3,0,K,1);add('drvL',-1,-1,0,K,2);sym('B1x4',-2,-2,0,K,2);
+ st();add('b22',-1,1,0,K,2);add('b22',-1,1,0,K,5);add('t22',-1,1,0,G,8);add('cs24',-1,3,2,K,2);
+ st();add('wing',-4,5,0,K,5);add('diff',-2,8,0,K,0);add('tl',-1,7,2,'#d01712',1);return A}
+SU_T.push(
+ {id:'t_sc_tm',n:'Time Coupe',tier:'e',ref:'77256',k:'Time machine coupe',fam:3,car:SC_time,st:{top:1.06,acc:1.05,han:1.02,hull:1.05}},
+ {id:'t_sc_hy',n:'Red Hypercar',tier:'l',ref:'77261',k:'Endurance hypercar',fam:3,car:()=>SC_hyper(),st:{top:1.09,acc:1.06,han:1.06,hull:1}},
+ {id:'t_sc_f1',n:'Gold Formula',tier:'l',ref:'77252',k:'Formula racer · open wheels',fam:3,car:SC_f1,st:{top:1.1,acc:1.08,han:1.07,hull:.94}});
 {const R=GAR_set('rod'),L=n=>JSON.parse(JSON.stringify(R.load[n]));
  for(const T of SU_T)GAR_SETS.push({id:T.id,n:T.n,tier:T.tier,req:null,car:T.car,off:R.off,boat:R.boat,tpl:1,ref:T.ref,forms:['car'],fam:T.fam,
   load:{car:{name:T.n.toUpperCase(),k:'Street',st:T.st,w:'Medium',perk:'slip'},'4x4':L('4x4'),boat:L('boat')}})}
@@ -11515,9 +11561,16 @@ function SU_rows(){const G=$('#g9Col .g9Grid');if(!G||G9C.type!=='car'||G9C.sort
  const card=id=>G.querySelector(`.g9Card[data-gc="${id}"]`),hd=(t,s)=>{const d=document.createElement('div');d.className='suHd';d.innerHTML=`<b>${t}</b><small>${s}</small>`;return d};
  const F=SU_T.filter(T=>T.fam===1).map(T=>card(T.id)).filter(Boolean),M=SU_T.filter(T=>T.fam===2).map(T=>card(T.id)).filter(Boolean);if(!F.length&&!M.length)return;
  const rest=hd('ALL RIDES',''),first=G.querySelector('.g9Card');G.insertBefore(hd('🧡 STREET RACER FAMILY','the orange racer + 3 variations'),first);for(const c of F)G.insertBefore(c,first);
- if(M.length){G.insertBefore(hd('🏁 TUNER FRIENDS','same street-tuner style'),first);for(const c of M)G.insertBefore(c,first)}G.insertBefore(rest,first)}
+ if(M.length){G.insertBefore(hd('🏁 TUNER FRIENDS','same street-tuner style'),first);for(const c of M)G.insertBefore(c,first)}
+ const S3=SU_T.filter(T=>T.fam===3).map(T=>card(T.id)).filter(Boolean);if(S3.length){G.insertBefore(hd('🏆 SPEED SERIES','movie and race cars'),first);for(const c of S3)G.insertBefore(c,first)}G.insertBefore(rest,first)}
 GAR_tab=(f=>function(){f();try{SU_rows()}catch(e){}})(GAR_tab);
 {const st=document.createElement('style');st.textContent=`#g9Col .suHd{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;padding:6px 2px 0;color:#fff}#g9Col .suHd b{font:900 13px system-ui;letter-spacing:.04em}#g9Col .suHd small{font:700 12px system-ui;color:#8fb3c7}`;document.head.appendChild(st)}
+// ---- SC traffic + rivals (v88t): the two road cars replace the sports sedan + SUV kinds in city traffic (own liveries; 'su:' kinds are built by CR_cityGeo from SU_T);
+// the 6 base racing teams drive Speed-Champions-style cars that match their team colours (story rivals v_* keep their own machines)
+{const sw=(k,v)=>{const i=HCAR.indexOf(k);if(i>=0)HCAR[i]=v};sw('sedan-sports','su:t_sc_hy');sw('suv','su:t_sc_tm')} // swap into existing kinds: same car count + draw calls (Alex: lag)
+const SC_RIV={kronos:SC_f1,nordend:()=>SU_car({B:SU_O,rear:'wing'}),ostend:()=>SU_car({B:'#1b2a34',G:'#8a12a8',W:'#1b2a34',A:'#1b2a34',H:'#8a12a8',st:'#8a12a8',rear:'wing'}),
+ zeil:()=>SU_car({B:'#e4adc8',G:'#f4f4f4',cab:'open',st:CR_K,R:CR_K}),helix:SC_time,aeppler:()=>SC_hyper({B:'#00852b',Y:'#fac80a',D:'#00852b'})};
+CR_rivB=(f=>function(team){const id=team&&team.id;if(id&&SC_RIV[id]&&!CR_RB[id])try{CR_RB[id]=SC_RIV[id]().map(([t,x,z,r,c,y])=>({t:t==='drv'?'drvR':t,x,z,y,r:r%4,m:0,c}))}catch(e){console.warn('SC',e)}return f.apply(this,arguments)})(CR_rivB);
 window.__su={T:SU_T,car:SU_car,n:id=>{const S=GAR_set(id);return S&&S.id===id?S.car().length:0}};
 // ===== SB (v88l BUILD GUIDE, Alex's request): ▶ step-by-step build player for every ride + "build it yourself" ghost mode =====
 // Ideas (no code copied, see docs/research/SUPRA.md): LDraw "0 STEP" = a part list split into steps (three.js LDrawLoader, MIT; brick-viewer, Apache-2.0:
@@ -11602,7 +11655,7 @@ GAR_tab=(f=>function(){f();try{const C=$('#g9Col');if(!C||C.dataset.sb)return;C.
  const P=$('#gbBkP');if(P)P.addEventListener('click',e=>{const b=e.target.closest('[data-r2a="sbg"]');if(b)setTimeout(()=>SB_open('build'),0)})}
 // ---------- BUILD IT YOURSELF: BUILD mode, the current step's missing parts as a pulsing green ghost; a tap within 4 studs snaps the part in
 function SB_diy(){if(!SB.on)return;const k=Math.min(SB.k,SB.S.length-1),B=SB.B,S=SB.S;SB.on=0;SB_clearDrop();$('#gbx').classList.remove('sbOn');GB.cam.clearViewOffset();
- SB.bak=JSON.parse(JSON.stringify(GB.d.bricks||[]));SB.b25=typeof B25!=='undefined'?B25.on:null;if(SB.b25!=null)B25.on=0;SB.diy=1;SB.ok=0;
+ SB.bak=JSON.parse(JSON.stringify(GB.d.bricks||[]));SB.b25=typeof B25!=='undefined'?B25.on:null;if(SB.b25!=null)B25.on=0;SB.diy=1;SB.ok=0;SB.palK='';
  const keep=[];for(let i=0;i<k;i++)for(const j of S[i])keep.push({...B[j]});GB.d.bricks=keep;SB.from='';gbRender();GB_enter();GB_.undo=[];$('#gbx').classList.add('sbDiy');SB_sync()}
 function SB_miss(){const L=GB_list();for(let i=0;i<SB.S.length;i++){const m=SB.S[i].map(j=>SB.B[j]).filter(b=>!L.some(o=>SB_same(o,b)));if(m.length)return{i,m}}return null}
 function SB_cur(){const c=SB_miss();SB_cur.done=!c;return c?c.i:SB.S.length}
@@ -11611,8 +11664,14 @@ function SB_sync(){if(!SB.diy||!GB.mesh)return;const host=SB_host();if(SB.gh){SB
  if(!c){if(!SB.ok){SB.ok=1;GB.d.bricks=SB.B.map(b=>({...b}));GB_attach(GB.mesh,GB_list(),GB_figGet(),false,!!GB.d.bp);try{AU.sfx('win')}catch(e){try{AU.sfx('pick')}catch(_){}}}
   if(D)D.innerHTML=`<b>🎉 YOU BUILT IT!</b><small>${SB.B.length} parts · tap ✕ to keep it</small>`;return}
  const M=[],L=[];for(const b of c.m)GB_brickGeo(b,M,L);if(M.length||L.length){SB.gh=new THREE.Mesh(mergeGeometries(M.concat(L)),SB.gm);SB.gh.userData.gbG=1;SB.gh.renderOrder=3;host.add(SB.gh)}
- GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;
+ GB_.pc=c.m[0].t;GB_.rot=c.m[0].r%4;SB_pal(c.m[0],c.i);
  if(D){let u='';try{u=GS_thumb(c.m[0].t,c.m[0].c)}catch(e){}D.innerHTML=`<img src="${u}" alt=""><b>STEP ${c.i+1}/${SB.S.length}</b><small>place ${c.m.length}× ${(GB_PC[c.m[0].t]||{}).n||''} · tap the green ghost</small>`}}
+// v88t: preselect the step's part (and its colour when it is a palette colour) in the BUILD palette: open its category, mark it, scroll it into view.
+// Once per step, so the player's own picks are not overridden. Hidden template-only parts (no tile) keep just the category of the closest tile type.
+function SB_pal(b,i){const k=i+':'+b.t;if(SB.palK===k)return;SB.palK=k;try{const ci=GB_BC.indexOf(String(b.c).toLowerCase());if(ci>=0)GB_.col=ci;
+ const q=t=>document.querySelector(`#gbBkPc .gbPc[data-p="${t}"]`),m=/^([PBT])(\d+)x(\d+)$/.exec(b.t),T=q(b.t)||(m&&q(m[1].toLowerCase()+Math.min(m[2],m[3])+Math.max(m[2],m[3])));
+ document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));if(T)T.classList.add('sbNx');if(T&&T.dataset.ct){if(typeof GX_cat==='function')GX_cat(T.dataset.ct);else CR_cat(T.dataset.ct)}
+ GB_ui();if(T&&T.scrollIntoView)T.scrollIntoView({block:'nearest',inline:'center'})}catch(e){console.warn('SB pal',e)}}
 function SB_target(x,z,t){const c=SB_miss();if(!c)return null;let best=null,bd=1e9;for(const b of c.m){const[w,d]=GB_dims(b),dd=Math.abs(x-(b.x+(w-1)/2))+Math.abs(z-(b.z+(d-1)/2))-(b.t===t?.5:0);if(dd<bd){bd=dd;best=b}}return bd<=4?best:null}
 function SB_hint(){const c=SB_miss();if(!c)return;const b=c.m[0];if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh()}}
 GB_cand=(f=>function(hit){const r=f.apply(this,arguments);if(!SB.diy||!hit)return r;const t=SB_target(hit.i,hit.j,GB_.pc);if(t)return{...t,bad:false};return r?{...r,bad:true}:null})(GB_cand);
@@ -11625,19 +11684,19 @@ function SB_scr(cx,cy){const c=SB_miss();if(!c||!GB.mesh)return null;const R=$('
   host.localToWorld(v).project(GB.cam);const d=Math.hypot(R.left+(v.x+1)/2*R.width-cx,R.top+(1-v.y)/2*R.height-cy);if(d<bd){bd=d;best=b}}return best}
 GB_act=(f=>function(cx,cy,del){if(SB.diy&&!del&&GB_.tool==='add'){const b=SB_scr(cx,cy);if(b){if(typeof GS!=='undefined'){GS.held=null;GS.hit=null}if(GB_add(b.t,b.x,b.z,b.r,b.c)){try{AU.sfx('brick');GS_pop(b)}catch(e){}GB_refresh();try{GS_ui()}catch(e){}}return 1}}return f.apply(this,arguments)})(GB_act);
 GB_refresh=(f=>function(){const r=f.apply(this,arguments);try{SB_sync()}catch(e){console.warn('SB',e)}return r})(GB_refresh);
-function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
+function SB_diyEnd(keep){if(!SB.diy)return;SB.diy=0;document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh.geometry.dispose();SB.gh=null}
  if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!(keep||SB.ok))GB.d.bricks=SB.bak;GB_.undo=[];if(GB_.bk)GB_exit();else gbRender()}
-GB_exit=(f=>function(){if(SB.diy){SB.diy=0;$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh=null}if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!SB.ok)GB.d.bricks=SB.bak;GB_.undo=[]}return f.apply(this,arguments)})(GB_exit);
+GB_exit=(f=>function(){if(SB.diy){SB.diy=0;document.querySelectorAll('#gbBkPc .sbNx').forEach(e=>e.classList.remove('sbNx'));$('#gbx').classList.remove('sbDiy');if(SB.gh){SB.gh.parent&&SB.gh.parent.remove(SB.gh);SB.gh=null}if(SB.b25!=null&&typeof B25!=='undefined')B25.on=SB.b25;if(!SB.ok)GB.d.bricks=SB.bak;GB_.undo=[]}return f.apply(this,arguments)})(GB_exit);
 // SAVE / BACK while the guide or BUILD IT runs: leave it first (restores the ride unless it was finished)
 document.addEventListener('click',e=>{if(!(SB.on||SB.diy))return;const t=e.target.closest&&e.target.closest('#gbSave,#gbBack');if(!t)return;if(SB.on){SB.on=0;SB_clearDrop();$('#gbx').classList.remove('sbOn');GB.cam.clearViewOffset();gbRender()}if(SB.diy)SB_diyEnd(false)},true);
-{const st=document.createElement('style');st.textContent=`#sbG,#sbD{display:none}#gbx.sbOn>*:not(.gbw):not(#sbG){display:none!important}#gbx.sbOn .gbp,#gbx.sbOn #gbStats,#gbx.sbOn .gbHint,#gbx.sbOn #gsBar,#gbx.sbOn #gsBr{display:none!important}
+{const st=document.createElement('style');st.textContent=`#sbG,#sbD{display:none}#gbBkPc .gbPc.sbNx{outline:3px solid #2ad46a;outline-offset:-3px}#gbx.sbOn>*:not(.gbw):not(#sbG){display:none!important}#gbx.sbOn .gbp,#gbx.sbOn #gbStats,#gbx.sbOn .gbHint,#gbx.sbOn #gsBar,#gbx.sbOn #gsBr{display:none!important}
 #gbx.sbOn #sbG{display:block;position:absolute;inset:0;z-index:30;pointer-events:none;font:900 13px system-ui;color:#141413}
 #sbG button{pointer-events:auto;min-width:44px;min-height:44px;border:2px solid #141413;border-radius:10px;background:#fff;color:#141413;font:italic 900 13px var(--hud,system-ui);box-shadow:0 3px 0 #141413;cursor:pointer;padding:0 10px}
 #sbG button:active{transform:translateY(2px);box-shadow:0 1px 0 #141413}
 #sbG .sbTop{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:10px;padding:0 calc(8px + env(safe-area-inset-right,0px)) 0 calc(10px + env(safe-area-inset-left,0px));background:rgba(10,18,40,.86);border-bottom:2px solid #141413;color:#fff;pointer-events:auto}
 #sbG .sbTop b{font:italic 900 15px var(--hud,system-ui);color:#ffd400;-webkit-text-stroke:.5px #141413;white-space:nowrap}#sbG .sbNm{flex:1;min-width:0;font:800 13px system-ui;color:#cfe3f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #sbG .sbN{font:900 16px system-ui;color:#fff;background:#e8202a;border:2px solid #141413;border-radius:9px;padding:3px 10px;white-space:nowrap}#sbG .sbTop button{min-height:38px}
-#sbG .sbCall{position:absolute;left:calc(6px + env(safe-area-inset-left,0px));top:52px;bottom:66px;width:118px;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:6px;box-sizing:border-box;background:rgba(255,255,255,.94);border:2px solid #141413;border-radius:12px;pointer-events:auto}
+#sbG .sbCall{position:absolute;left:calc(6px + env(safe-area-inset-left,0px));top:52px;max-height:calc(100% - 118px);width:118px;overflow:auto;display:flex;flex-direction:column;gap:5px;padding:6px;box-sizing:border-box;background:rgba(255,255,255,.94);border:2px solid #141413;border-radius:12px;pointer-events:auto}
 #sbG .sbCall p{margin:0;font:italic 900 15px var(--hud,system-ui);display:flex;flex-direction:column}#sbG .sbCall p small{font:700 12px system-ui;color:#4a5468;font-style:normal}#sbG .sbOk{color:#0a8a3a}
 #sbG .sbPc{position:relative;display:grid;grid-template-columns:44px 1fr;align-items:center;column-gap:4px;background:#e9eef5;border-radius:8px;padding:2px 4px}#sbG .sbPc img{width:44px;height:44px;grid-row:span 2}
 #sbG .sbPc i{font:900 15px system-ui;font-style:normal}#sbG .sbPc small{font:700 12px/1.1 system-ui;color:#4a5468;overflow-wrap:anywhere}body:has(#gbx.sbOn) #tuG{display:none!important}
@@ -12121,6 +12180,12 @@ function GB_clear(){if(!GB.d)return;const L=GB_list(),brick=L.some(CR_isW);GB_sn
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88t',id:'sc-rides',text:'Garage RIDES → STREET: a SPEED SERIES row shows Time Coupe, Red Hypercar and Gold Formula; each looks like a LEGO Speed Champions car (8 studs wide, chunky, real parts).'},
+ {ver:'v88t',id:'sc-drive',text:'Equip each of the 3 new cars, SAVE & DRIVE: all four tyres sit on the road and it handles like the other normal cars.'},
+ {ver:'v88t',id:'sc-guide',text:'▶ GUIDE on each of the 3 new cars plays it step by step (chassis → wheels → nose → sides → cockpit → rear → wing).'},
+ {ver:'v88t',id:'sc-traffic',text:'Drive around Frankfurt or Athens: you meet the grey Time Coupe and the red Hypercar in traffic. In a race, some rivals drive the new cars.'},
+ {ver:'v88t',id:'sb-pal',text:'In the guide tap ✋ BUILD IT: the next part is already selected (highlighted) in the parts palette, in its colour, and scrolled into view.'},
+ {ver:'v88t',id:'sb-onetap',text:'In BUILD IT, one tap on (or near) the green ghost places the part straight away; no second tap or PLACE needed.'},
  {ver:'v88q',id:'pin-fold',text:'Garage RIDES: the checklist shows as a small ✓ chip and does not cover the car; tap it to open. In a race it stays folded during the 3-2-1-GO countdown, then opens again.'},
  {ver:'v88p',id:'life-crowds',text:'Drive 1 minute in Frankfurt and in Athens: at most street corners ahead you see a group of 3-6 people standing together; they turn to look, wave and hop as you come by.'},
  {ver:'v88p',id:'life-dodge',text:'Drive fast past a corner group: the people leap out of the way; nobody stands on the road.'},
@@ -12224,7 +12289,7 @@ const OD_CHECKLIST=[
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
-  const busy=!ov.hidden||!n||P.done&&ans===n||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
+  const busy=!ov.hidden||!n||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
   pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const fold=P.col||(pinBk()&&!pinBkOpen)||pinCd();
   if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+

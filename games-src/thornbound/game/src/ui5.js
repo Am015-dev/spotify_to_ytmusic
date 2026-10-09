@@ -60,9 +60,14 @@ document.addEventListener('click',e=>{
    case 'guided':newGame('guided');break;
    case 'cont':{const s=loadSave();if(s){hideStart();resumeGame(s);afterStart()}break}
    case 'rules':GX.show('rulesd');break;
+   case 'music':renderMusic();GX.show('musd');break;
+   case 'mpick':musicPick(t.dataset.s,t.dataset.c);renderMusic();break;
+   case 'mprev':musicPreview(t.dataset.s);renderMusic();break;
+   case 'mprevx':musicPreviewStop();renderMusic();break;
+   case 'mmus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMusic();break;
    case 'gdset':UI.guide=t.dataset.v;renderMenu();break;
    case 'snd':UI.sound=!UI.sound;try{localStorage.setItem('tb_snd',UI.sound?'1':'0')}catch(x){}if(window.GA)GA.setSfx(UI.sound);renderMenu();break;
-   case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);renderMenu();break;
+   case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMenu();break;
    case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
    case 'newgame':GX.close();showStart();break;
@@ -85,9 +90,9 @@ function renderMenu(){const el=$('#setbody');if(!el)return;
    (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
-   '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
+   '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button><button class="btn" data-a="music">Pick the songs…</button></div>'+
    '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
-   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original and drawn procedurally. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Sound: placeholder synthesised tones.</p>'}
+   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original: painted pictures made with Google Flow from our own prompts, plus procedural drawings. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Music: ten instrumental tracks made with Treblo from our own prompts. Sound effects: Kenney (CC0).</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
   const P=UI.V.pl[s];let h=popRival(s).replace(/^<div class="pp-h">.*?<\/div><div class="pp-b[^"]*">/,'<div>');h=h.replace(/<\/div>$/,'');
   h+='<h5>Site of Power</h5><div class="piles">'+P.site.map(id=>'<div class="sitec"><button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1">'+cardEl(id,64).outerHTML+'</button><small>cost '+cinfo(id).cost+'</small></div>').join('')+'</div>';
@@ -128,5 +133,6 @@ function setupDrawers(){
   GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);
   GX.drawer('logd','Log',(()=>{const d=document.createElement('div');d.id='logbody';return d})());
   GX.drawer('boardd','My board and piles',(()=>{const d=document.createElement('div');d.id='boardbody';return d})());
+  GX.drawer('musd','Music',(()=>{const d=document.createElement('div');d.id='musbody';return d})());
   GX.drawer('setd','Menu',(()=>{const d=document.createElement('div');d.id='setbody';return d})());
   GX.onShow=id=>{if(id==='logd')renderLog();if(id==='setd')renderMenu();if(id==='boardd')renderBoardDrawer()}}

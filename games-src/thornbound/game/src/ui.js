@@ -1,4 +1,8 @@
 // ===================== part 1: core (state, engine adapter, events, AI adapter, turn pump) =====================
+// painted art: TB_ART (data URIs made by build.py) -> blob URLs, so the many card <svg>s only carry a short link. Without blob URLs (old browsers, jsdom) the kit keeps its vector art.
+const PA={};(function(){try{if(typeof TB_ART==='undefined'||/jsdom/i.test(navigator.userAgent||'')||!window.URL||!URL.createObjectURL||!window.Blob||!window.atob)return;
+  for(const k in TB_ART){const p=TB_ART[k].split(','),bin=atob(p[1]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);PA[k]=URL.createObjectURL(new Blob([u],{type:'image/webp'}))}
+  TBKit.setArt(PA)}catch(e){}})();
 // The engine (TB: newGame/moves/apply/pending/stripView) is never edited. Everything the UI needs on top of it lives here.
 var ANIM=1,AIDELAY=1000;
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
@@ -56,7 +60,7 @@ function cardSpec(id,opt){opt=opt||{};
   const spec={faction:f,title:i.name,value:i.kind==='hq'?null:i.strength,cost:i.cost>0?i.cost:null,type:i.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:i.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:txt||'No special ability.',tag:bits.join(' · ')||undefined};
   return spec}
 function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
-  return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],text:k.text,num:'No. '+n}}
+  return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],img:'kc'+String(n).padStart(2,'0'),text:k.text,num:'No. '+n}}
 function cardEl(id,w){return TBKit.card(cardSpec(id),w)}
 function kcEl(n,w){return TBKit.card(kcSpec(n),w)}
 // plain-words detail of a faction card (HTML), used by the enlarged card pop-up
@@ -719,7 +723,8 @@ function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)ret
   setTimeout(()=>{const key=UI._cardKey;cp.play().then(()=>{if(UI._cardKey===key)fin()})},350)}
 function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const me=vs();const iWon=(NET.on||humans().length===1)&&win===me;
   const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';const nmS=s=>(s===me&&(NET.on||humans().length===1))?'You ('+sideName(s)+')':shortName(s);
-  const body='<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(nmS(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
+  const endImg='<img class="endart" src="media/end-'+((iWon||(!NET.on&&humans().length!==1))?'win':'lose')+'.webp" alt="" draggable="false" onerror="this.remove()">';
+  const body=endImg+'<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(nmS(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
   const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
   const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. Suggestions show in rounds 1 and 2; after that tap Suggest a move when you want one.')+'</p>':'';
   return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}
@@ -785,9 +790,14 @@ document.addEventListener('click',e=>{
    case 'guided':newGame('guided');break;
    case 'cont':{const s=loadSave();if(s){hideStart();resumeGame(s);afterStart()}break}
    case 'rules':GX.show('rulesd');break;
+   case 'music':renderMusic();GX.show('musd');break;
+   case 'mpick':musicPick(t.dataset.s,t.dataset.c);renderMusic();break;
+   case 'mprev':musicPreview(t.dataset.s);renderMusic();break;
+   case 'mprevx':musicPreviewStop();renderMusic();break;
+   case 'mmus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMusic();break;
    case 'gdset':UI.guide=t.dataset.v;renderMenu();break;
    case 'snd':UI.sound=!UI.sound;try{localStorage.setItem('tb_snd',UI.sound?'1':'0')}catch(x){}if(window.GA)GA.setSfx(UI.sound);renderMenu();break;
-   case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);renderMenu();break;
+   case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMenu();break;
    case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
    case 'newgame':GX.close();showStart();break;
@@ -810,9 +820,9 @@ function renderMenu(){const el=$('#setbody');if(!el)return;
    (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
-   '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
+   '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button><button class="btn" data-a="music">Pick the songs…</button></div>'+
    '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
-   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original and drawn procedurally. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Sound: placeholder synthesised tones.</p>'}
+   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original: painted pictures made with Google Flow from our own prompts, plus procedural drawings. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Music: ten instrumental tracks made with Treblo from our own prompts. Sound effects: Kenney (CC0).</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
   const P=UI.V.pl[s];let h=popRival(s).replace(/^<div class="pp-h">.*?<\/div><div class="pp-b[^"]*">/,'<div>');h=h.replace(/<\/div>$/,'');
   h+='<h5>Site of Power</h5><div class="piles">'+P.site.map(id=>'<div class="sitec"><button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1">'+cardEl(id,64).outerHTML+'</button><small>cost '+cinfo(id).cost+'</small></div>').join('')+'</div>';
@@ -853,6 +863,7 @@ function setupDrawers(){
   GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);
   GX.drawer('logd','Log',(()=>{const d=document.createElement('div');d.id='logbody';return d})());
   GX.drawer('boardd','My board and piles',(()=>{const d=document.createElement('div');d.id='boardbody';return d})());
+  GX.drawer('musd','Music',(()=>{const d=document.createElement('div');d.id='musbody';return d})());
   GX.drawer('setd','Menu',(()=>{const d=document.createElement('div');d.id='setbody';return d})());
   GX.onShow=id=>{if(id==='logd')renderLog();if(id==='setd')renderMenu();if(id==='boardd')renderBoardDrawer()}}
 // ===================== part 6: sound, phone layout, boot, test hooks =====================
@@ -865,7 +876,7 @@ let _lastInf=null;
 function snd(mv,res){if(!mv)return;const t=mv.t,k=G&&G.q?G.q.kind:'';
   if(t==='bid')sfx('bid');else if(t==='place')sfx('place');else if(t==='pick'&&mv.loc!=null&&k==='herald')sfx('herald');else if(t==='take'||t==='steal')sfx('bid');else sfx('tap');
   try{const inf=G.pl.reduce((a,p)=>a+p.inf,0);if(_lastInf!=null&&inf>_lastInf)setTimeout(()=>sfx('inf'),200);_lastInf=inf;if(G.over)setTimeout(()=>sfx(G.pl[G.over.winner].ai?'lose':'fanfare'),300)}catch(e){}}
-function musicFor(){try{if(!window.GA||!UI.music)return;GA.music(G&&G.round>=G.rounds?'tense':'main',{fade:1.5})}catch(e){}}
+function musicFor(){musicSync()}
 // ---------------------------------------------------------------- phone mode + board-first layout
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
@@ -900,12 +911,12 @@ try{if(window.visualViewport)visualViewport.addEventListener('resize',onResize)}
 try{if(window.ResizeObserver){const bd=document.getElementById('board');if(bd)new ResizeObserver(onResize).observe(bd)}}catch(e){}
 // ---------------------------------------------------------------- boot
 function boot(){
-  try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')==='1';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}
+  try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')!=='0';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}
   try{if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tbt'});GA.setSfx(UI.sound);GA.setMusic(UI.music)}}catch(e){}
   try{if(window.PerfHUD)PerfHUD.register({game:'Thornbound Throne',levels:['high','low'],names:{high:'High',low:'Low'},getLevel:()=>UI.lowGfx?'low':'high',isAuto:()=>false,setLevel:(l,why)=>{if(why==='apply'){UI.lowGfx=l==='low';UI.mapReset=true;G&&renderAll()}},isAnimating:()=>UI.busy,anchor:'.gx-board',corner:'tl'})}catch(e){}
   GX.init({key:'tb'});setupDrawers();phApply();netInit();
   TBKit.ready.then(()=>{document.documentElement.classList.add('tb-ready');if(!UI.started)showStart()});
-  document.addEventListener('pointerdown',()=>{try{if(window.GA)GA.unlock();if(UI.music)musicFor()}catch(e){}},{once:true})}
+  document.addEventListener('pointerdown',()=>{try{if(window.GA)GA.unlock();musicSync()}catch(e){}},{once:true});setInterval(()=>{try{musicSync()}catch(e){}},700)}
 function startUiReady(){return TBKit.ready}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 // ===================== part 7: plain words (log lines, glossary), the guided first game, title + setup screens =====================
@@ -1083,7 +1094,7 @@ const STORY={
  uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Lantern Rising if you enjoy bluffs, ambushes and knocking your rivals\' cards out of the game.',tag:'Tricks and ambushes · medium'},
  gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them, small cards win their fights, and patience is their weapon.',enjoy:'Choose the Pale Choir if you enjoy clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
 const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'full',levels:['normal','normal','normal','normal']};
-function titleArt(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
+function titleArtSvg(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
  '<linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a1c"/><stop offset=".45" stop-color="#3a1a30"/><stop offset=".72" stop-color="#8a3c3a"/><stop offset=".86" stop-color="#d98a52"/><stop offset="1" stop-color="#f2c27a"/></linearGradient>'+
  '<radialGradient id="tmoon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6d6"/><stop offset=".55" stop-color="#f6e2a8" stop-opacity=".9"/><stop offset="1" stop-color="#f6e2a8" stop-opacity="0"/></radialGradient>'+
  '<linearGradient id="tgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient>'+
@@ -1109,6 +1120,8 @@ function titleArt(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMi
 function hasSave(){const s=loadSave();return s&&s.G&&!s.G.over?s:null}
 function showStart(){try{GX.close()}catch(e){}closePop(true);hideGloss();const el=$('#start');el.hidden=false;document.body.classList.add('in-start');if(!NET.on){if(UI.joinCode&&!UI.linkShown){UI.linkShown=1;UI.sv='online'}else UI.sv=UI.onl&&UI.sv==='online'?'online':'title'}UI.cfgOpen=false;renderStart();
   const f=$('#start .tbtn.go,#start .sbtn.big');if(f)try{f.focus({preventScroll:true})}catch(e){}}
+// painted key art (desktop + phone) over the drawn scene, which stays as the fallback while it loads
+function titleArt(){return titleArtSvg()+'<picture><source media="(max-aspect-ratio:4/5)" srcset="media/title-phone.webp"><img class="tkey" src="media/title.webp" alt="" draggable="false" onerror="this.remove()"></picture>'}
 function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
 function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=el.scrollTop;
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
@@ -1117,7 +1130,7 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
       (firstTime()?tutBtn('tbtn go'):'')+(window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn'+(firstTime()?'':' go')+' story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'||firstTime()?'':' go')+'" data-a="play"><b>Play</b><span>against the computer</span></button>'+(firstTime()?'':tutBtn('tbtn'))+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
-      '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
+      '</div><div class="tlinks"><button class="tlink" data-a="rules">How to play</button><button class="tlink" data-a="music">Music</button></div></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
   const ONL=view==='online';
   el.innerHTML='<div class="setup"><div class="bgart">'+titleArt()+'</div>'+(ONL?onlineSetupHTML():setupHTML())+'</div>'+(UI.phone&&UI.cfgOpen&&!ONL?cfgDialogHTML():'');
   el.scrollTop=top}
@@ -1316,7 +1329,7 @@ function campOver(){if(!UI.camp||UI.campDone||typeof GXC==='undefined'||!GXC.act
   setTimeout(()=>{if(G===g&&GXC.active()){try{clearSave()}catch(e){}GXC.finish(g)}},window.CAMP_WAIT!=null?window.CAMP_WAIT:2200)}
 function campLine(){try{const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'chapters, bosses, three acts'}catch(e){return 'chapters, bosses, three acts'}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'thornbound',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'thornbound',artBase:'media/',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
     onExit(){showStart()},scores:g=>g.pl.map(p=>p.inf),seats:g=>g.pl.map((p,i)=>({name:p.name,me:i===0,ai:i?p.ai:undefined}))})}
 campInit();
 // ===================== part 10: board-first play =====================
@@ -1758,3 +1771,57 @@ function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._
   if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;if(!GXT.act({type:'tap',what:'order',r}))return;
     UI._tutIn=1;try{return o(r)}finally{UI._tutIn=0}}
   return o(r)}})();
+// ===================== part 13: painted extras (media/*.webp beside the page): card back and table =====================
+// The drawn card back and the CSS table stay while a picture loads, in jsdom, and (table only) on Low graphics.
+const PX=(function(){
+  if(/jsdom/i.test(navigator.userAgent||''))return {tick(){}};
+  const R=document.documentElement,seen={};let curT='',curB='';
+  function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
+  function load(f,cb){if(seen[f])return cb();const im=new Image();im.onload=()=>{seen[f]=1;cb()};im.src='media/'+f+'.webp'}
+  // face-down cards: the thorn-crown back, or the latest card back unlocked in the story
+  function backApply(){const id=unl('cardback')||'default';if(id===curB)return;
+    load('back-'+id,()=>{curB=id;TBKit.setBack('media/back-'+id+'.webp');try{if(G&&UI.started)renderAll()}catch(e){}})}
+  // table: the candlelit court (phone version in portrait), or an unlocked table, behind the map
+  function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
+    const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
+    if(f===curT)return;load(f,()=>{curT=f;R.style.setProperty('--tbl-img','url(media/'+f+'.webp)');R.dataset.timg='1'})}
+  function tick(){backApply();tableApply()}
+  ['back-default','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
+  return {tick};
+})();
+// ===================== part 14: music per screen + the Music picker =====================
+// Slots: tavern = title/menu, main = the game, fight = the last round, victory / defeat = the end card. Each has a saved choice: a, b, shuffle or off.
+const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Final round'],['victory','Victory'],['defeat','Defeat']];
+const MTITLE={'tavern-a':'The Gilded Hall at Midnight','tavern-b':'Whispers Beneath the Throne','main-a':'The Quiet Ledger','main-b':'Velvet Daggers','fight-a':'Siege of the Glass Kingdom','fight-b':'Thornfield Advance','victory-a':'All Hail the Victor','victory-b':'Fanfare for a New King','defeat-a':'Lanterns in the Frostwood','defeat-b':'A Lullaby for Empty Halls'};
+const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0};
+try{Object.assign(MS.pick,JSON.parse(localStorage.getItem('tb_mpick')||'{}'))}catch(e){}
+function musicWant(){const st=$('#start');if(!G||!UI.started||(st&&!st.hidden))return ['tavern',0];
+  if(G.over){const me=vs(),single=NET.on||humans().length===1,won=single?G.over.winner===me:humans().length!==0;return [won?'victory':'defeat',1]}
+  return [G.round>=G.rounds?'fight':'main',0]}
+function musicName(slot){const c=MS.pick[slot]||MDEF[slot];if(c==='off')return '-';
+  if(c==='shuffle'){if(!MS.res[slot]){MS.sh[slot]=MS.sh[slot]===undefined?(Math.random()<.5?0:1):1-MS.sh[slot];MS.res[slot]=slot+'-'+'ab'[MS.sh[slot]]}return MS.res[slot]}
+  return slot+'-'+(c==='b'?'b':'a')}
+function musicPick(slot,c){MS.pick[slot]=c;MS.res[slot]=null;try{localStorage.setItem('tb_mpick',JSON.stringify(MS.pick))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musicName(slot))}catch(e){}
+  if(MS.wslot===slot&&!MS.prev){MS.want=null;musicSync()}}
+// one cross-faded track at a time; called from a slow tick, the first tap, and after the music button or a pick
+function musicSync(){try{PX.tick()}catch(e){}
+  if(!window.GA||!UI.music||MS.prev)return;const w=musicWant();if(MS.wslot!==w[0]){MS.wslot=w[0];MS.res[w[0]]=null}
+  const n=musicName(w[0]);if(MS.want===n)return;MS.want=n;
+  if(n==='-'){GA.music(null,{fade:1});return}
+  GA.music(n,{fade:w[1]?.6:1,once:!!w[1]});
+  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=MS.pick[nx];if(c!=='off'&&c!=='shuffle')GA.preload(musicName(nx))}catch(e){}},4000)}}
+function musicPreview(slot){if(!window.GA||!UI.music||MS.wslot===slot)return;try{GA.unlock()}catch(e){}const n=musicName(slot);if(n==='-')return;
+  clearTimeout(MS.prevT);MS.prev=slot;MS.want=null;GA.music(n,{fade:.5,once:true});
+  MS.prevT=setTimeout(()=>{MS.prev=null;MS.want=null;musicSync();renderMusic()},8000)}
+function musicPreviewStop(){if(!MS.prev)return;clearTimeout(MS.prevT);MS.prev=null;MS.want=null;musicSync()}
+function renderMusic(){const b=$('#musbody');if(!b)return;const on=UI.music;let vol=.5;try{vol=GA.state().musVol}catch(e){}
+  const rows=MSLOTS.map(([k,nm])=>{const cur=MS.pick[k],act=MS.wslot===k&&on&&cur!=='off';
+    const ch=['a','b'].map(v=>'<button class="mchip'+(cur===v?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="'+v+'">'+esc(MTITLE[k+'-'+v])+'</button>');
+    ch.push('<button class="mchip'+(cur==='shuffle'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="shuffle">⇄ Shuffle</button>','<button class="mchip'+(cur==='off'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="off">Off</button>');
+    const pv=MS.prev===k?'<button class="mchip prev" data-a="mprevx" data-s="'+k+'">■ Stop preview</button>':(!act&&cur!=='off'&&on?'<button class="mchip prev" data-a="mprev" data-s="'+k+'">▶ Preview</button>':'');
+    return '<div class="mrow2"><h5>'+nm+(act?' <small>playing now</small>':'')+'</h5><div class="mchips">'+ch.join('')+pv+'</div></div>'}).join('');
+  const h='<div class="music"><div class="mtop"><button class="mchip'+(on?' on':'')+'" data-a="mmus">Music: '+(on?'on':'off')+'</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="'+vol+'" aria-label="Music volume"></label></div>'+rows+'</div>';
+  if(b._h!==h){b._h=h;b.innerHTML=h}}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
