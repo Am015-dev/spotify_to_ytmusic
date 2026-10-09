@@ -399,6 +399,8 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 #act .btn b{background:#7c1b2c;color:#fff;border-radius:999px;min-width:20px;height:20px;line-height:20px;font-size:.8rem;text-align:center;padding:0 3px}
 #handw{flex:0 0 auto;position:relative;padding:0 4px;height:calc(var(--ch,72px) + 24px);overflow:visible}
 #handw[hidden]{display:block;visibility:hidden}
+#handw:has(.roadrow){height:calc(var(--ch,72px) + 24px + var(--roadx,40px))}
+@media (min-aspect-ratio:115/100){#handw:has(.roadrow){height:calc(var(--ch,72px) + 24px)}}
 .hand{position:relative;margin:0;z-index:0;isolation:isolate}
 .hc{position:absolute;top:10px;padding:0;border:0;background:none;line-height:0;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;transform-origin:50% 140%;transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));transition:transform .16s,opacity .16s}
 .hc.on{transform:translateY(-16px) scale(1.14) rotate(0deg)}
@@ -413,7 +415,8 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 .kcb.glow svg,.kcb.glow>*{filter:drop-shadow(0 0 6px #ffd24a)}
 .kcb.rg>*{filter:drop-shadow(0 0 10px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
 .kcb.dim{opacity:.5}
-.kcb{display:flex;flex-direction:column;align-items:center;gap:2px}.roadrow .kcb{flex:0 1 76px;min-width:62px}.kcb .kn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;width:100%;font:700 .7rem/1.05 var(--fb);color:#fff3cf;text-align:center;overflow:hidden;text-shadow:0 1px 2px #000,0 0 3px #000}
+.kcb{display:flex;flex-direction:column;align-items:center;gap:3px}.roadrow .kcb{flex:0 1 96px;min-width:0}.roadrow{overflow:hidden;padding:0 2px}.kcb .kn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;width:100%;font:700 .78rem/1.08 var(--fb);color:#fff3cf;text-align:center;overflow:hidden;text-shadow:0 1px 2px #000,0 0 3px #000}
+@media (max-height:600px){.kcb{gap:1px}.kcb .kn{font-size:.74rem;width:calc(100% + 8px);margin:0 -4px}}
 .kcb.steal{outline:3px solid var(--fc,#c23a48);outline-offset:1px}
 .kcb .stl{position:absolute;right:-4px;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--fc,#c23a48);border:2px solid #fff3c4;display:flex;align-items:center;justify-content:center}.kcb .stl .ico{width:13px;height:13px;stroke:#fff;stroke-width:3}
 /* the decision sheet: only for the rare choices the board cannot show */

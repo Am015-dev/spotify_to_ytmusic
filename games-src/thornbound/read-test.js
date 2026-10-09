@@ -113,6 +113,10 @@ async function run(browser,W,H){
       if(st.k==='bid'){await snap('hand');await snap('rivals');
         await p.evaluate(()=>{const id=document.querySelector('#handw .hc')&&+document.querySelector('#handw .hc').dataset.id;openPop('card',{id})});await snap('inspect-hand');await p.evaluate(()=>closePop());}
       if(st.k==='bidRes'){await snap('road');
+        {const m=await p.evaluate(()=>[...document.querySelectorAll('#handw .kcb')].map(b=>{const c=b.querySelector('svg,.card,[class*=kc]'),r=(c||b).getBoundingClientRect(),n=b.querySelector('.kn'),nr=n.getBoundingClientRect();return {sh:n.scrollHeight,ch:n.clientHeight,nw:Math.round(nr.width),bb:Math.round(nr.bottom),w:Math.round(r.width),fs:parseFloat(getComputedStyle(n).fontSize),clip:n.scrollHeight>n.clientHeight+5,over:nr.bottom>innerHeight||b.getBoundingClientRect().bottom>innerHeight+1,name:n.textContent}}));
+          const land=W>=H*1.15;console.log(size,'road kcards',m.map(x=>x.w+'px/'+x.fs.toFixed(1)).join(' '));
+          if(!m.length)fails.push(size+' road: no kingdom cards');
+          for(const x of m){if(!land&&x.w<(H<600?42:52))fails.push(size+' road: kingdom card only '+x.w+'px wide ('+x.name+')');if(x.fs<11.5)fails.push(size+' road: name '+x.fs+'px ('+x.name+')');if(x.clip)fails.push(size+' road: name clipped ('+x.name+') sh'+x.sh+' ch'+x.ch+' nw'+x.nw+' bottom'+x.bb);if(x.over)fails.push(size+' road: card runs off screen ('+x.name+')')}}
         await p.evaluate(()=>{const b=document.querySelector('#handw .kcb');if(b)openPop('kc',{n:+b.dataset.n})});await snap('inspect-kc');await p.evaluate(()=>closePop());}
       if(st.k==='bid'&&!done.has('clash')){ // hold the reveal on screen so the played cards can be shot
         await p.evaluate(()=>{window.__hold=1;const o=window.bfAuto;window.bfAuto=function(c,ms){if(window.__hold&&c&&c.ev&&/^(bids|clash)$/.test(c.ev.t)){window.__held=c.ev.t;return}return o.apply(this,arguments)}});}

@@ -448,6 +448,8 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 #act .btn b{background:#7c1b2c;color:#fff;border-radius:999px;min-width:20px;height:20px;line-height:20px;font-size:.8rem;text-align:center;padding:0 3px}
 #handw{flex:0 0 auto;position:relative;padding:0 4px;height:calc(var(--ch,72px) + 24px);overflow:visible}
 #handw[hidden]{display:block;visibility:hidden}
+#handw:has(.roadrow){height:calc(var(--ch,72px) + 24px + var(--roadx,40px))}
+@media (min-aspect-ratio:115/100){#handw:has(.roadrow){height:calc(var(--ch,72px) + 24px)}}
 .hand{position:relative;margin:0;z-index:0;isolation:isolate}
 .hc{position:absolute;top:10px;padding:0;border:0;background:none;line-height:0;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;transform-origin:50% 140%;transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));transition:transform .16s,opacity .16s}
 .hc.on{transform:translateY(-16px) scale(1.14) rotate(0deg)}
@@ -462,7 +464,8 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 .kcb.glow svg,.kcb.glow>*{filter:drop-shadow(0 0 6px #ffd24a)}
 .kcb.rg>*{filter:drop-shadow(0 0 10px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
 .kcb.dim{opacity:.5}
-.kcb{display:flex;flex-direction:column;align-items:center;gap:2px}.roadrow .kcb{flex:0 1 76px;min-width:62px}.kcb .kn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;width:100%;font:700 .7rem/1.05 var(--fb);color:#fff3cf;text-align:center;overflow:hidden;text-shadow:0 1px 2px #000,0 0 3px #000}
+.kcb{display:flex;flex-direction:column;align-items:center;gap:3px}.roadrow .kcb{flex:0 1 96px;min-width:0}.roadrow{overflow:hidden;padding:0 2px}.kcb .kn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;width:100%;font:700 .78rem/1.08 var(--fb);color:#fff3cf;text-align:center;overflow:hidden;text-shadow:0 1px 2px #000,0 0 3px #000}
+@media (max-height:600px){.kcb{gap:1px}.kcb .kn{font-size:.74rem;width:calc(100% + 8px);margin:0 -4px}}
 .kcb.steal{outline:3px solid var(--fc,#c23a48);outline-offset:1px}
 .kcb .stl{position:absolute;right:-4px;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--fc,#c23a48);border:2px solid #fff3c4;display:flex;align-items:center;justify-content:center}.kcb .stl .ico{width:13px;height:13px;stroke:#fff;stroke-width:3}
 /* the decision sheet: only for the rare choices the board cannot show */
@@ -5527,15 +5530,16 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
     h+='<button class="hc'+(on?' on':'')+(pl?' glow pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,cw).outerHTML+'</button>'});
   h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
+const roadX=()=>{const x=innerHeight<600?16:40;document.documentElement.style.setProperty('--roadx',x+'px');return x}; // extra height the kingdom-card row gets on a portrait phone, so the paintings and names can be read
 function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal');const V=UI.V;const items=[];
   for(let i=0;i<V.road.length;i++){const kc=V.road[i];if(!kc)continue;items.push({kc,m:take.find(x=>x.kc===kc&&x.i===i)||null})}
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
   for(const m of steal)items.push({kc:m.kc,m,steal:1});
   if(!items.length)return '<div class="hand roadrow"></div>';
-  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24;const w=Math.max(34,Math.min(60,Math.floor((zone-30)/1.4308),Math.floor(W/items.length)-8));const rk=recK();
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());const w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
     const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
-    return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+(w+4)+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+    return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
 // ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
 function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;
