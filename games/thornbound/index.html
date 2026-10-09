@@ -1112,7 +1112,7 @@ const GX={key:'gx',open:null,
     return o && typeof o === 'object' ? o : null;
   }
   function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
-  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), skipped: !!(o && o.skipped), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
   function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
   // ------------------------------------------------------------------ geometry
   function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
@@ -1339,8 +1339,9 @@ const GX={key:'gx',open:null,
   }
   function skip() {
     if (!S) return; var g = cfg.game, ex = cfg.onExit;
-    mark(g, { open: 0, step: 0 }); teardown();
-    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+    // a skipped tutorial counts as seen: Story must not force it again
+    mark(g, { open: 0, step: 0, skipped: 1 }); teardown();
+    try { if (ex) ex({ skipped: true }); } catch (e) { console.warn('gxt onExit', e); }
   }
   function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
   // ------------------------------------------------------------------ start
@@ -1415,7 +1416,7 @@ const GX={key:'gx',open:null,
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
     index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
-    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
 })();
@@ -5734,6 +5735,7 @@ document.addEventListener('click',e=>{
    case 'mmus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMusic();break;
    case 'gdset':UI.guide=t.dataset.v;renderMenu();break;
    case 'snd':UI.sound=!UI.sound;try{localStorage.setItem('tb_snd',UI.sound?'1':'0')}catch(x){}if(window.GA)GA.setSfx(UI.sound);renderMenu();break;
+   case 'cback':try{localStorage.setItem('tb_back',t.dataset.v==='court'?'court':'default')}catch(x){}renderMenu();break;
    case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMenu();break;
    case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
@@ -5758,6 +5760,7 @@ function renderMenu(){const el=$('#setbody');if(!el)return;
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button><button class="btn" data-a="music">Pick the songs…</button></div>'+
+   (()=>{let c='default';try{c=localStorage.getItem('tb_back')==='court'?'court':'default'}catch(e){}const st=GXC&&GXC.unlocked?GXC.unlocked().some(x=>x.type==='cardback'):false;return '<div class="mrow"><span>Card back</span><button class="btn" data-a="cback" data-v="default" aria-pressed="'+(c==='default')+'">Thorn crown</button><button class="btn" data-a="cback" data-v="court" aria-pressed="'+(c==='court')+'">Crowned stag</button>'+(st?'<span class="small">An unlocked story back is used while you have one.</span>':'')+'</div>'})()+
    '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
    '<h4>Credits</h4><p class="small">Art, map, cards and icons are original: painted pictures made with Google Flow from our own prompts, plus procedural drawings. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Music: ten instrumental tracks made with Treblo from our own prompts. Sound effects: Kenney (CC0).</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
@@ -6693,7 +6696,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(o&&typeof GXC!=='undefined')GXC.open()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
@@ -6716,14 +6719,15 @@ const PX=(function(){
   function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
   function load(f,cb){if(seen[f])return cb();const im=new Image();im.onload=()=>{seen[f]=1;cb()};im.src='media/'+f+'.webp'}
   // face-down cards: the thorn-crown back, or the latest card back unlocked in the story
-  function backApply(){const id=unl('cardback')||'default';if(id===curB)return;
+  function backApply(){let pb='default';try{pb=localStorage.getItem('tb_back')==='court'?'court':'default'}catch(e){}
+    const id=unl('cardback')||pb;if(id===curB)return;
     load('back-'+id,()=>{curB=id;TBKit.setBack('media/back-'+id+'.webp')})}
   // table: the candlelit court (phone version in portrait), or an unlocked table, behind the map
   function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
     const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
     if(f===curT)return;load(f,()=>{curT=f;R.style.setProperty('--tbl-img','url(media/'+f+'.webp)');R.dataset.timg='1'})}
   function tick(){backApply();tableApply()}
-  ['back-default','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
+  ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();
 // ===================== part 14: music per screen + the Music picker =====================

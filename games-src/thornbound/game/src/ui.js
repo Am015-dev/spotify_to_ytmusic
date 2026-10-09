@@ -1759,7 +1759,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(o&&typeof GXC!=='undefined')GXC.open()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
