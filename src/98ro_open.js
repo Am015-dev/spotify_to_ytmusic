@@ -171,7 +171,7 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
     for(let i=1;i<N;i+=2){if(gap(i))continue;frameAt(td,i*td.ds,fr);const s=i*td.ds,wl=OPN.RT[i]>=0&&OPN.routes[OPN.RT[i]].kind==='water';
       for(const sg of[-1,1]){const sea=ath&&OPN.SEA[i]&&sg===OPN.out,wat=wl&&OPN.SD[i]===sg,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg);
         if(OPN.CL[i]!==sg&&!sea&&!wat){if(i%3===0&&OPN_noise(i,sg*5)>.3){const t=51+OPN_noise(i,sg*13)*9;v.copy(fr.p).addScaledVector(fr.r,sg*t);(ath&&OPN_noise(i,sg*17)<.45?cyp:trees).push([v.x,v.y+hy(t,H)-.4,v.z,.8+OPN_noise(i,sg*19)*.5])}
-          if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(46.5+OPN_noise(i,sg*29)*3));bush.push([v.x,v.y,v.z,.7+OPN_noise(i,sg*31)*.6])}}
+          if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(49.6+OPN_noise(i,sg*29)*2.4));bush.push([v.x,v.y+hy(49.6,H)*.5,v.z,.7+OPN_noise(i,sg*31)*.6])}}
         const lim=OPN.CL[i]===sg?OPN.LIP[i]-3:wat?OPN_I1-1:44;for(let k=0;k<3;k++){const n=OPN_noise(i*3+k,sg*37);if(n<.3)continue;const x=16+OPN_noise(i*3+k,sg*41)*(lim-16);if(x>lim)continue;
           if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:ath&&n<.45?stn:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
     inst(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:ath?0x8a9a48:0x3f9a3c,roughness:.8,flatShading:true}),bush,a=>({x:1.4*a[3],y:1.1*a[3],z:1.4*a[3],dy:.5*a[3]}));
