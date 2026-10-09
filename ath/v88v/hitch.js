@@ -9,5 +9,5 @@ const enter=require('../../bc/enter.js');const URL=process.argv[2],CITY=process.
  while(Date.now()-t0<600000){const s=await p.evaluate(()=>({on:__wb.WBC.on,err:__wb.WBC.err||null}));if(s.on||s.err)break;await p.waitForTimeout(2000)}
  await p.waitForTimeout(15000);
  const r=await p.evaluate(()=>{const S=__wb.WBC.st,d=__hf.d,on=__hf.on;let i0=on.findIndex(x=>x);const dur=d.slice(0,i0),aft=d.slice(i0);const st=a=>{const s=[...a].sort((x,y)=>x-y);return{n:a.length,worst:Math.round(s[s.length-1]||0),p50:Math.round(s[s.length>>1]||0),over50:a.filter(x=>x>50).length,over100:a.filter(x=>x>100).length}};
-   return{build:{ms:S.ms,slices:S.slN,slMax:S.slMax,sl50:S.sl50||0,sl100:S.sl100||0,tPrep:S.tPrep,cells:S.cells,err:__wb.WBC.err||null},framesDuringBuild:st(dur),framesAfter:st(aft)}});
+   return{build:{ms:S.ms,slices:S.slN,slMax:S.slMax,sl50:S.sl50||0,sl100:S.sl100||0,big:S.big,pixN:S.pixN,pixMs:S.pixMs,pixMax:S.pixMax,tPrep:S.tPrep,cells:S.cells,err:__wb.WBC.err||null},framesDuringBuild:st(dur),framesAfter:st(aft)}});
  console.log(CITY,'HITCH',JSON.stringify(r));console.log('errors',errs.length,errs.slice(0,3).join(' | '));await E.b.close()})();
