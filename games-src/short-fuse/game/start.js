@@ -4,8 +4,8 @@ function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats
 function fixSetup(s){s=s||UI.setup;if(!MISSIONS[s.job])s.job=1;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
 function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];s.picked=v;renderStart()}
 function seatMode(s){const k=s.seats.slice(0,s.np).filter(x=>x==='human').length;return k===0?'watch':k===1?'solo':'hot'}
-function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
-function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
+function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicSlot('tavern');$('#start').hidden=false;renderStart();try{titleArt()}catch(e){}sndLoop('clock_loop',false)}
+function hideStart(){$('#start').hidden=true;sndLoop('hum',false);if(G&&UI.started&&!G.over&&SND.slot==='tavern')musicStart()}
 function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length:'10 chapters'}catch(e){return ''}}
 function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const saved=savedGame();const tutFirst=firstTime()&&typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME);const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;
   let jobs='';for(const [a,b,label] of BOXES){jobs+=`<div class="box">${esc(label)}</div><div class="jobs">`;for(let k=a;k<=b;k++){const j=c.jobs[k];
@@ -41,8 +41,8 @@ function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
   if(plan)netBound(plan)}finally{NET.starting=false}
   if(humans().length===1&&!NET.on)UI.holder=humans()[0];
-  UI.prev=snap();try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}if(SND.gesture)musicStart();else SND.wantMusic=1;refresh()}
-function resumeSaved(){const s=savedGame();if(!s)return;lsSet('sf_played',1);kitReset();G=s.G;UI.holder=s.ui.holder;UI.rt=!!s.ui.rt;UI.brief=null;UI.started=true;UI.prev=snap();UI.sel=null;UI.campDone=0;UI.campShown=0;UI.camp=null;UI.ghost={info:0,turn:0};hideStart();if(SND.gesture)musicStart();refresh()}
+  UI.prev=snap();try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}musicStart();refresh()}
+function resumeSaved(){const s=savedGame();if(!s)return;lsSet('sf_played',1);kitReset();G=s.G;UI.holder=s.ui.holder;UI.rt=!!s.ui.rt;UI.brief=null;UI.started=true;UI.prev=snap();UI.sel=null;UI.campDone=0;UI.campShown=0;UI.camp=null;UI.ghost={info:0,turn:0};hideStart();musicStart();refresh()}
 function renderIdle(){const say=document.getElementById('say');if(say)say.textContent='Waiting for the host';for(const id of ['crew','mine','gear','tray','fuse','track','cutc','clk']){const e=document.getElementById(id);if(e){e._s=null;e.innerHTML=''}}const ov=document.getElementById('over');if(ov)ov.hidden=true}
 // ---------- story chapters (the shared campaign kit) ----------
 function campMetrics(G){const st=G.stats||{};return {won:!!(G.over&&G.over.win),misses:st.miss||0,left:G.dial!=null?G.dial:0,turns:G.turn,solos:st.solo||0,eqUsed:st.eqUse||0}}
@@ -52,7 +52,7 @@ function campStart(def){const np=def.setup.players||3;const lv=def.setup.level||
   startJob(s)}
 function campOver(){if(!UI.camp||typeof GXC==='undefined'||!GXC.active())return;setTimeout(()=>{if(!G||!G.over)return;UI.campShown=1;try{document.getElementById('over').hidden=true}catch(e){}try{GXC.finish(G)}catch(e){console.error(e)}},ANIM?2200:0)}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'short-fuse',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:G=>!!(G&&G.over&&G.over.win),metrics:campMetrics,
+  GXC.init({game:'short-fuse',artBase:'media/',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:campStart,isWon:G=>!!(G&&G.over&&G.over.win),metrics:campMetrics,
     onExit:()=>{UI.camp=null;showStart()},scores:g=>[g.seats.length?g.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0):0],seats:g=>g.seats.map((q,i)=>({name:i===0?'You':q.nm,me:i===0,ai:q.human?undefined:q.lv}))})}
 // ---------- clicks on buttons that carry data-a ----------
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a;const V=UI.V;
@@ -86,7 +86,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.sel&&!GX.open){UI.sel=null;refresh()}});
 // ---------- boot ----------
 function boot(){GX.init({key:'sf'});paintIcons();loadSettings();
-  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
+  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='musicd')renderMusic();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
   GX.onClose=()=>sfx('close');
   setInterval(clockTick,250);setInterval(()=>{if(G&&UI.started&&timedJob()&&!G.over){const p=document.querySelector('#timerpill span');if(p&&UI.V){const c=clockLeft(knowledge(Math.max(0,UI.V.seat)));if(c){p.textContent=fmt(c.left)+(UI.pause?' ⏸':'');const cl=p.parentNode;if(cl)cl.classList.toggle('low',c.real<30)}}}},1000);
   campInit();netInit();showStart();if(UI.netOpen)netRender()}

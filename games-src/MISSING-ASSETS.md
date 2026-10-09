@@ -953,12 +953,7 @@ Files that exist in the repo but the live game does not use yet. This is our wor
 
 ### Short Fuse (56 files)
 
-- [ ] 32 card paintings in games-src/short-fuse/art/ (18 equipment, 9 crew, 5 tools) + manifest.json: embed as SF_ART in build.py and show on the cards (32)
-- [ ] 6 portraits media/camp-*.webp: no artBase set (6)
-- [ ] 2 card backs media/back-default.webp and back-clock-key.webp (2)
-- [ ] 3 tables media/table-workbench, table-tower-floor, table-clockface (the page has no table image at all yet) (3)
-- [ ] 3 key art pictures media/title.webp, end-win.webp, end-lose.webp (3)
-- [ ] Treblo music: games-src/audio/short-fuse/treblo/ has 10 tracks; nothing in games/short-fuse/music/ (10)
+- [x] Short Fuse: all painted art and Treblo music wired and deployed 9 Oct (32 cards, portraits, backs, 3 tables, title/end art, music with picker, cards.html). Still to make: title-phone and table-workbench-phone.
 
 ### The Thornbound Throne (1 files)
 
