@@ -973,11 +973,11 @@ Files that exist in the repo but the live game does not use yet. This is our wor
 - [x] Treblo music (10 tracks in `games/cauldron-fair/music/`), per-screen crossfades, Music picker
 - [ ] Still to make: Tamsin redo (char-tamsin.png, Flow drew a bearded man), table-phone.png and title-phone.png (9:16)
 
-### Final Approach (42 files)
+### Final Approach (42 files): wired and deployed 9 Oct (paintings, portraits, backs, 3 table skins, Treblo music with Music picker incl. Shuffle all songs, end art)
 
-- [ ] 17 Flow paintings in games-src/final-approach/art/*.png (sky x4, terrain x5, planes x2, crew x2, title, end-land, end-crash; committed 9 Oct, built page is the 8 Oct one): rebuild and deploy (17)
-- [ ] 10 portraits media/camp-*.webp: no artBase set (10)
-- [ ] 2 card backs media/back-default.webp and back-spires.webp (2)
-- [ ] 3 table skins media/table-night-lake.webp, table-storm.webp, table-valley.webp (3)
-- [ ] Treblo music: games-src/audio/final-approach/treblo/ has 10 tracks; nothing in games/final-approach/music/ (10)
+- [x] 17 Flow paintings in games-src/final-approach/art/*.png (sky x4, terrain x5, planes x2, crew x2, title, end-land, end-crash; committed 9 Oct, built page is the 8 Oct one): rebuild and deploy (17)
+- [x] 10 portraits media/camp-*.webp: no artBase set (10)
+- [x] 2 card backs media/back-default.webp and back-spires.webp (2)
+- [x] 3 table skins media/table-night-lake.webp, table-storm.webp, table-valley.webp (3)
+- [x] Treblo music: games-src/audio/final-approach/treblo/ has 10 tracks; nothing in games/final-approach/music/ (10)
 

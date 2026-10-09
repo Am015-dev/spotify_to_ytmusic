@@ -4806,13 +4806,12 @@ function renderMusic() {
   });
 }
 document.addEventListener('input', e => { if (e.target && e.target.id === 'mvol' && window.GA) GA.setVolume('music', +e.target.value); });
-// iPhone: the first touch unlocks audio, then the right track starts
-document.addEventListener('pointerdown', function u() { try { if (window.GA) { GA.unlock(); musicSync(); } } catch (e) { } }, { capture: true, once: true });
+// iPhone: gameaudio.js unlocks audio on the first touch; the slow tick below then starts the right track
 function extrasBoot() {
   GX.drawer('musicd', 'Music', h('div#musicbody'));
   ['back-default', 'back-spires'].forEach(preImg);
   tableApply();
-  setInterval(() => { try { sndMusic(); tableApply(); tableRetry(); } catch (e) { } }, 800);
+  setInterval(() => { try { musicSync(); tableApply(); tableRetry(); } catch (e) { } }, 800);
 }
 // the debrief picks up the end art after each draw
 (function () {
