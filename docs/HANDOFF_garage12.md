@@ -42,3 +42,9 @@ Then re-send REVIEW as QUICK with 08, 10 and one iframe frame.
 
 ## Open / next
 - Before DEPLOY: merge alex/od-world, alex/od-quick, live; OD_CHANGELOG v88y entry (top of src/10_core.js); 99c checklist items; build split out/v88y.
+
+## Outcome
+- Fixes 1–4 for the review are done (palette offset via --paL when #gsBar/#slBar is visible, GROUP label, checklist pin folded in BUILD in 99c, layer view follows the
+  attached part). QUICK re-review PASS on b82237c; 131d9025 = b82237c + fix 4. Merged od-world v88x; OD_CHANGELOG v88y + 3 checklist items in.
+- out/v88y split pair committed (131d9025); DEPLOY sent to the coordinator. od-quick v88z not merged (not live).
+- Reviewer optional nit: the ghost brackets are thin at phone size; a translucent green fill would read better (not done).
