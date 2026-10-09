@@ -1,4 +1,25 @@
-# HANDOFF race (race worker, 2026-10-09): "the races are boring"
+# HANDOFF race (race worker, 2026-10-09): "the races are boring" → NOW: wide open race courses
+
+## >>> READ FIRST (finisher session, 2026-10-09 ~16:50; HEAD = this commit)
+- The scope changed at 16:34. Alex scored the narrow city races 2/10. The coordinator's brief is in `docs/RACE_PLAN.md` §3: open courses, 3-vehicle swap, respawn, rivals on alt routes, gate shots next to the reference. **Do not ship the narrow version.**
+- Done this session:
+  - Reviewer FAIL fixes (all 3 carry into the new build):
+    - The checklist chip is parked under LAP while racing and hidden only during the FINISH text.
+    - On the results card the chip sits at the top-right (clear of the studs line).
+    - The ▲ place pop sits 8 px left of ⚙. The old check used offsetParent, which is null for fixed elements.
+    - Verified at 852×393 in `qa_race/rf7` (grand_mid/end/results, akro_results).
+  - RF8 respawn banner `#rfRsp` (98rf_race_fun.js tail). NOT yet run in a browser: test it first, with a wrong-way U-turn and a stopped car.
+- Still owed for release (reviewer item 1): an OD_CHANGELOG entry (next free version at deploy) + 3 OD_CHECKLIST items (start 8th → can reach top 3; boost refills, faster behind a rival; podium on results) + items for the open course/respawn.
+- tRace on the narrow tracks (rf5/rf6/rf7) gave bot places of 3–8/8: the bot loses ~200 m to crashes/slow water. near20 50–82 s, 11–26 place changes, dead ≤16 s, tyre p50 0.000–0.003 m, 0 errors. It's noisy; don't tune further for narrow tracks.
+- NEXT (in order):
+  1. Build the open course per RACE_PLAN §3.2. A def with `open:1,w15:96` and its own RO_build ground/scenery instead of buildCity, plus a surface-by-x hook in R15_ter. Start with `fra_ufer`.
+  2. Respawn on a cliff fall.
+  3. AI inside-terrain routes.
+  4. `ath_akti`.
+  5. tRace metrics (≥2 rivals on screen %, route choices, respawns).
+  6. Side-by-side shots vs `docs/race_ref` → coordinator → REVIEW → DEPLOY message.
+  Write a handoff at ~120k context.
+
 
 - Branch: `alex/od-race`, draft PR #78 (base `alex/od-cam`).
 - It started from live src v89b1 (alex/od-cam 72822916); `tools/verify_live.sh` gave LIVE_MATCH.
