@@ -31,7 +31,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 92 | `92_garage_builder.js` | 17 | GB brick builder core: pieces GB_PC GB_piece GB_brickGeo, minifig GB_FIG GB_figGeo, GB_geo GB_attach GB_mods, snapping, mirror, undo |
 | 93 | `93_cars_lego.js` | 66 | LEGO cars (CR_): part geometry (CR_bb CR_side CR_wheel CR_more), Speed-Champions presets, loadouts, rival/boss cars, LEGO traffic (instanced, suspension), CAR5  |
 | 94 | `94_garage_ui.js` | 19 | garage builder scene + pointer picking + UI (#gbx), garage blocked during events, cutscene portrait |
-| 95 | `95_drive_flow.js` | 13 | DR probe window.__dr + driving flow: fewer breakables/traffic, smash keeps speed, solid blocks, compact touch mission card (DR_) |
+| 95 | `95_drive_flow.js` | 17 | DR probe window.__dr + driving flow: fewer breakables/traffic, smash keeps speed, solid blocks, compact touch mission card (DR_) |
 | 96 | `96_scale_qa.js` | 33 | SC/SC2 real scale (SC_: 1.8 m humans, road setback), QA human-play fixes (QA_), QA7 rotation-proof touch, QA8 no giants/fewer rings, V85 tweaks |
 | 97 | `97_art.js` | 33 | ART steps (ART_ ART4_ ART6_ ART7_): LEGO-2K sky/look, brick trees, boost FX + HUD skin, cars ON road / boats IN water, road surfaces, contact patches, hill gras |
 | 98 | `98_garage_driver.js` | 50 | GAR1 driver minifig at real proportions (GAR_), 8 ready-made drivers (garage DRIVER tab), window.__gar |
@@ -69,7 +69,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98pa | `98pa_garage_parts.js` | 24 | PA (v88y garage): BUILD CANVAS + MY PARTS + TILES. Alex (2026-10-09): "since we have now groups we can work in garage in parts and then append them. but we need |
 | 98gb | `98gb_garage13.js` | 38 | G13 (v89d garage). Alex (2026-10-09, with the 40468 Yellow Taxi instructions): "the garage is missing several items; there is not full control to rotate in diff |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
-| 99c | `99c_checklist.js` | 32 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 34 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
@@ -169,9 +169,9 @@ uses: 92(184), 10(34), 20(23), 30(9), 94(7), 53(7), 96(4), 60(2), 98bc(1), 98su(
 defines: GB_hullMeshes GB_scanBase GB_gridMesh GB_refresh GB_ghostSet GB_pick GB_cand GB_act GB_msg GB_hover GB_ui GB_enter GB_exit GB_cam __cr
 uses: 92(185), 10(27), 20(9), 93(9), 30(8), 80(6), 71(3), 98gb(2), 98gx(1), 41(1)
 
-## 95_drive_flow.js — 13 KB
-defines: DR_edge __dr DR DR_KEEP DR_h DR_edgeX DR_keep DR_inSolid DR_solidBuild DR_cull DR_traffic DR_unjam W10_bump W10_brake __drFix
-uses: 53(37), 51(22), 10(17), 30(14), 60(13), 70(6), 20(2), 99(1), 40(1)
+## 95_drive_flow.js — 17 KB
+defines: DR_edge __dr DR DR_KEEP DR_h DR_edgeX DR_keep DR_inSolid DR_solidBuild DR_athFill DR_cull DR_traffic DR_unjam W10_bump W10_brake __drFix
+uses: 53(41), 51(24), 10(18), 60(15), 30(14), 70(6), 20(2), 99(1), 40(1)
 
 ## 96_scale_qa.js — 33 KB
 defines: SC_K SC_S SC_cam SC_fold SC_ship SC_hit SC_push SC_RC0 __sc __sm __sm3 QA_KEYS QA_untouchKeys QA_S QA7 QA7_release QA7_relayout QA7_rot QA8 QA8_h QA8_figs QA8_kind QA8_step __qaHumans css st v85offT v85Off v85Off v85Verb brief lastCh lastRes lastPlate v85tick V v85Road V85_EM V85_IC V85_item V85W
@@ -321,9 +321,9 @@ uses: 92(97), 93(46), 98gx(22), 98s(18), 30(13), 94(12), 98t(9), 20(7), 10(3), 9
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
 uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 92(7)
 
-## 99c_checklist.js — 32 KB
+## 99c_checklist.js — 34 KB
 defines: OD_CHECKLIST
-uses: 10(19), 30(13), 20(12), 99t(5), 92(4), 41(2), 72(1)
+uses: 10(19), 30(13), 20(12), 99t(5), 41(4), 92(4), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
