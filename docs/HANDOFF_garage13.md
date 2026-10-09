@@ -55,3 +55,18 @@
    - Run `tools/build.sh <ver>` and `git add -f out/<ver>`, then push.
    - Send the coordinator `DEPLOY alex/od-garage13 <commit> out/<ver> <msg>`.
 - **Known size mismatches** in existing parts (not changed): ws4 4 plates (should be 6), cs24 3 (should be 2), arch 2 deep (should be 2.5).
+
+## Update 2026-10-09 evening: v89f sent to DEPLOY (cbfdc0bf, out/v89f, on live v89e)
+- Reviewer PASS on 69fb4d2. DEPLOY message sent to the coordinator.
+- Game fixes this round:
+  - The PAINT button never opened the colour chips: the rename marker data-g13 hit the bar's [data-g13] click handler. It's now data-g13l, and #gbBkPc uses data-g13p.
+  - The 'Build on 🧩' pill hides when part tiles share the grid and fits its text.
+- Test-only fixes in t4/g13flow.js:
+  - ▲ layer before stacking.
+  - Append taps on real car cells.
+  - UNGROUP re-select.
+- The flow's JOIN selection still taps only 1 part. JOIN→save is proven by the canvas probe (t4/g13/taxi/join.png) and append by a probe.
+- t4/g13pc.js needs `?fast=1`: 1280×720 swiftshader runs at 3.4 s/frame.
+- New tests:
+  - `t4/g13taxi.js`: a yellow taxi built from the new parts, then a drive.
+  - `t4/g13pad.js`: a quick 07 re-shot.
