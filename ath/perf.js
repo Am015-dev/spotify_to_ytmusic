@@ -2,7 +2,7 @@
 const enter=require('../bc/enter.js');const URL=process.argv[2],CITY=process.argv[3]||'fra';
 (async()=>{const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`:`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))`;
  const E=await enter(URL,{gfx:process.env.GFX||'normal',seed});const {p,errs}=E;p.setDefaultTimeout(900000);
- if(process.env.LIFE)await p.evaluate(v=>__g9ev('TUNE.life='+v),process.env.LIFE);if(process.env.SET)await p.evaluate(v=>__g9ev(v),process.env.SET);await E.roamApi();
+ if(process.env.LIFE)await p.evaluate(v=>__g9ev('TUNE.life='+v),process.env.LIFE);if(process.env.SET)await p.evaluate(v=>__g9ev(v),process.env.SET);await E.roamApi();await p.evaluate(()=>window.__wb&&window.__wb.fast&&window.__wb.fast());
  const spots=await p.evaluate(()=>{const N=__mho.HUB.nodes,ok=[];for(let i=0;i<N.length;i++){const a=N[i];if(a&&a.nb&&a.nb.length>=2&&!a.ab&&N[a.nb[0]])ok.push(i)}return [.1,.5,.9].map(f=>{const a=N[ok[Math.floor(f*ok.length)]],b=N[a.nb[0]];return[a.x,a.z,Math.atan2(b.x-a.x,b.z-a.z)]})});
  const R=[];for(const [x,z,h] of spots){await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.x=x;R.z=z;R.y=M.gnd(x,z,R.y+60);R.v=0;R.vh=h;R.h=h},[x,z,h]);await p.waitForTimeout(7000);
   R.push(await p.evaluate(()=>{const r=__g9ev('renderer'),C=__g9ev('composer');r.info.autoReset=false;r.info.reset();__tick(1);const calls=r.info.render.calls,tris=r.info.render.triangles;r.info.autoReset=true;
