@@ -161,7 +161,9 @@ function OF_step(dt){if(!pl)return;dt=Math.min(dt,.05);const T0=OF.tw;
   // the world follows the walker (culling, peds, traffic braking, minimap); the parked car stays where it is
   RO.x=OF.x;RO.z=OF.z;RO.y=OF.y;RO.h=RO.vh=OF.h;RO.v=0;RO.vy=0;
   if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.y,OF.car.z);
-  OF.near=RO.foot==='walk'?OF_nearCar():null;OF_figPose(dt);
+  OF.near=RO.foot==='walk'?OF_nearCar():null;
+  // a traffic car you can TAKE brakes and waits while you are within reach (resumes 0.4 s after you step away)
+  if(OF.near&&OF.near.k==='traf')OF.near.ref.hitT=Math.max(OF.near.ref.hitT||0,.4);OF_figPose(dt);
   if(AU.engine)AU.engine(pl,0,false);if(AU.scrape)AU.scrape(false);
   try{hubTrafficStep(dt)}catch(e){if(!OF.e1){OF.e1=1;console.warn('OF traffic',e)}}try{studFXStep(dt)}catch(e){}try{roamHud()}catch(e){}
   try{const s=$('#rgSpd');if(s)s.textContent='🚶'}catch(e){}OF_btns()}
