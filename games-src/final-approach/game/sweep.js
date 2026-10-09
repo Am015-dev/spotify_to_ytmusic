@@ -124,7 +124,7 @@ async function playGame(browser, size, gi) {
   await ctx.addInitScript(() => { try { localStorage.setItem('fa_prefs', JSON.stringify({ prefs: { gfx: 'low' } })); } catch (e) { } });
   const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, drags: 0, rr: 0, hints: 0, audits: 0, end: '?', bulbs: 0, bulbNull: 0, rules: 0, bubbles: {} };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
+  page.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|Fetch API cannot load file:/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
   const shot = async why => { if (process.env.SHOTS) await page.screenshot({ path: path.join(process.env.SHOTS, tag.replace(/\W+/g, '_') + '_' + why.replace(/\W+/g, '_').slice(0, 30) + '.png') }).catch(() => { }); };
   try {
     await page.goto('file://' + FILE); await sleep(900);
