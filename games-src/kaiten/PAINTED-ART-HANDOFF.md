@@ -10,8 +10,8 @@ Like Cauldron Fair, most of this needs **no wiring**: `game/build.py` already pr
   - `counter` (4:1)
   - `back`: the card back, indigo seigaiha waves with a plate medallion
   - `title`: the diner at night
-- **Still the old stand-ins:** `sashimi`, `roll3`, `squid`, `egg`, `wasabi`, `wasabi-nigiri`, `pudding`, `chef-mina`, `chef-taro`, `chef-odile`, `chef-kofi`.
-  - Flow painted most of these on a square linen placemat, which looks wrong next to the round stand-ins. `ART-PROMPTS.md`'s style block asks for a placemat, so I dropped that phrase for the retry.
+- **Repainted without the placemat (2026-10-09):** `sashimi`, `roll3`, `squid`, `egg`, `wasabi`, `wasabi-nigiri`, `pudding` (round plates, keyed) and `chef-mina`, `chef-taro`, `chef-odile`, `chef-kofi` (round portraits). Every plate and chef now has a Flow painting.
+  - `ART-PROMPTS.md`'s style block asks for a placemat; Flow painted a square linen mat under them, so the retry prompts drop that phrase. Media adds `camp-mina`/`taro`/`odile`/`kofi` (from the chefs) and `table-dinner-counter`.
   - They are being regenerated without the mat and follow in the next push.
 - Check them on a phone. The prompts and the style block come from `ART-PROMPTS.md`.
 

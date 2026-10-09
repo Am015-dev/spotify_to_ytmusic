@@ -35,10 +35,12 @@ function renderMusic(){const b=document.getElementById('musicbody');if(!b)return
   const on=SND.music;
   const chip=(cls,at,label)=>`<button type="button" class="mchip${cls}" ${at}>${label}</button>`;
   let h=`<div class="mtop">${chip(on?' on':'','data-a="mmus"','Music: '+(on?'on':'off'))}<label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step=".05" value="${vol}" aria-label="Music volume"></label></div>`;
+  const allOn=MLOOPS.every(k=>MUS.pick[k]==='all');h+=`<div class="mtop">${chip(allOn?' on':'','data-a="mall"','⇄ Shuffle all songs')}</div>`;
   for(const [k,nm] of MSLOTS){const cur=MUS.pick[k],act=SND.slot===k&&on&&cur!=='off'&&!MUS.prev;
     let row='';
     for(const v of 'ab')row+=chip(cur===v?' on':'',`data-a="mpick" data-s="${k}" data-c="${v}"`,esc(MTITLE[k+'-'+v]));
     row+=chip(cur==='shuffle'?' on':'',`data-a="mpick" data-s="${k}" data-c="shuffle"`,'⇄ Shuffle');
+    if(MLOOPS.includes(k))row+=chip(cur==='all'?' on':'',`data-a="mpick" data-s="${k}" data-c="all"`,'⇄ All songs');
     row+=chip(cur==='off'?' on':'',`data-a="mpick" data-s="${k}" data-c="off"`,'Off');
     if(MUS.prev===k)row+=chip(' prev',`data-a="mprevx" data-s="${k}"`,'■ Stop preview');
     else if(!act&&cur!=='off'&&on)row+=chip(' prev',`data-a="mprev" data-s="${k}"`,'▶ Preview');
@@ -46,11 +48,12 @@ function renderMusic(){const b=document.getElementById('musicbody');if(!b)return
   b.innerHTML=h;const sl=document.getElementById('mvol');if(sl)sl.addEventListener('input',()=>{try{GA.setVolume('music',+sl.value)}catch(e){}})}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
   if(a==='mpick'){musicPick(t.dataset.s,t.dataset.c);renderMusic()}
+  else if(a==='mall'){const on=MLOOPS.every(k=>MUS.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?'a':'all'));renderMusic()}
   else if(a==='mprev'){musicPreview(t.dataset.s);renderMusic()}
   else if(a==='mprevx'){musicPreviewStop();renderMusic()}
   else if(a==='mmus'){toggleMusic();renderMusic();try{renderSettings()}catch(x){}}
   else if(a==='gfx'){LOWGFX=!LOWGFX;try{localStorage.setItem('sf_gfx',LOWGFX?'low':'hi')}catch(x){}artApply();backApply();tableApply();titleArt();renderSettings()}});
 function extrasBoot(){artBoot();artApply();endArt();backApply();tableApply();titleArt();
   ['back-default','back-clock-key','camp-brix','camp-tally','camp-wren','end-win','end-lose'].forEach(preImg);
-  setInterval(()=>{try{backApply();tableApply()}catch(e){}},800)}
+  setInterval(()=>{try{backApply();tableApply();if(SND.wantMusic&&SND.music&&MUS.pick[SND.slot]==='all')musSync()}catch(e){}},800)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',extrasBoot);else extrasBoot();
