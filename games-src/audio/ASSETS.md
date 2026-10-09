@@ -214,7 +214,7 @@ CC BY 4.0 (required, shown in Sunglaze credits):
 
 Modified: cut to a seamless loop, loudness-normalised, re-encoded.
 
-CC0 (optional thanks, shown in every game): Kenney; Pro Sensory, LEGIT Audio (OpenGameArt music / ambience, Kaiten Kitchen); Spring Spring, stereoscopic, Tozan, Indieteur, cynicmusic, yd (OpenGameArt music, Hollowbough / Thornbound); rubberduck, StarNinjas, AntumDeluge, Bashar3A (OpenGameArt sound effects); iamoneabe, Joth, vitalezzz, KarateStudios, Eldritch Grim, RandomMind (OpenGameArt music).
+CC0 (optional thanks, shown in every game): Kenney; LEGIT Audio (OpenGameArt ambience, Kaiten Kitchen); Spring Spring, stereoscopic, Tozan, Indieteur, cynicmusic, yd (OpenGameArt music, Hollowbough / Thornbound); rubberduck, StarNinjas, AntumDeluge, Bashar3A (OpenGameArt sound effects); iamoneabe, Joth, vitalezzz, KarateStudios, Eldritch Grim, RandomMind (OpenGameArt music).
 
 ## Download URLs (music)
 
