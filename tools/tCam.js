@@ -117,9 +117,9 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
  await shot('cam_2_street_end');}
  // F: orbit — drag the empty right half (phone) or mouse drag / Q R (desk)
  const cy0=(await st()).cy;
- if(phone){const pt=await G.evaluate(()=>{for(const [fx,fy] of[[.62,.3],[.55,.25],[.7,.22],[.5,.4]]){const x=innerWidth*fx,y=innerHeight*fy,e=document.elementFromPoint(x,y);if(e&&e.id==='ofCam')return[x,y]}const e=document.elementFromPoint(innerWidth*.62,innerHeight*.3);return{miss:e&&(e.id||e.className||e.tagName)}});
+ if(phone){const pt=await G.evaluate(()=>{for(const [fx,fy] of[[.6,.5],[.56,.56],[.66,.45],[.6,.35],[.7,.3]]){const x=innerWidth*fx,y=innerHeight*fy;let okk=true;for(const [dx,dy] of[[0,0],[-24,0],[24,0],[0,-24],[0,24]]){const e=document.elementFromPoint(x+dx,y+dy);if(!e||e.id!=='ofCam')okk=false}if(okk)return[x,y]}const e=document.elementFromPoint(innerWidth*.62,innerHeight*.3);return{miss:e&&(e.id||e.className||e.tagName)}});
    ok(Array.isArray(pt),tag+' F empty right half is the camera drag zone',pt);
-   if(Array.isArray(pt)){await down('cam',pt);for(let i=1;i<=10;i++){await move('cam',[pt[0]+i*15,pt[1]+i*3]);await tick(3)}log('Fdbg',await G.evaluate(()=>__oc.ev('JSON.stringify({cy:OF.cy,cam:OF.cam,camT:OF.camT,foot:RO.foot})')));const mid=await shot('cam_3_orbit_mid');await up('cam');await tick(6)}}
+   if(Array.isArray(pt)){await down('cam',pt);for(let i=1;i<=10;i++){await move('cam',[pt[0]+i*15,pt[1]+i*3]);await tick(3)}log('Fdbg',await G.evaluate(()=>__oc.ev('JSON.stringify({cy:OF.cy,cam:OF.cam,camT:OF.camT,foot:RO.foot,ev:OF.camEv,tg:OF.camTg})')));const mid=await shot('cam_3_orbit_mid');await up('cam');await tick(6)}}
  else{const c=await G.evaluate(()=>[innerWidth*.62,innerHeight*.35]);await p.mouse.move(c[0],c[1]);await p.mouse.down();for(let i=1;i<=10;i++){await p.mouse.move(c[0]+i*15,c[1]+i*3);await tick(3)}await shot('cam_3_orbit_mid');await p.mouse.up();await tick(6)}
  const cy1=(await st()).cy;const dF=Math.atan2(Math.sin(cy1-cy0),Math.cos(cy1-cy0));log('F',{cy0,cy1,d:dF});ok(Math.abs(dF)>=.4,tag+' F drag orbits the camera',+dF.toFixed(2));
  if(!phone){const c0=(await st()).cy;await key('KeyQ',true);await tick(30);await key('KeyQ',false);const c1=(await st()).cy;ok(Math.abs(Math.atan2(Math.sin(c1-c0),Math.cos(c1-c0)))>=.3,tag+' F Q orbits the camera',+(c1-c0).toFixed(2))}

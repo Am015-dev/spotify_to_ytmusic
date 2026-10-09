@@ -206,9 +206,12 @@ function OF_camDrag(dx,dy){OF.cy-=dx*OF_CAMK;OF.cp=clamp(OF.cp+dy*OF_CAMP,-.25,.
 function OF_camDom(cz){const C=OF.cam;
   const st=(id,x,y)=>{if(C.id!=null)return;C.id=id;C.x=x;C.y=y;C.mv=0;const n=performance.now();if(n-C.tap<320){OF.recen=true;OF.camT=0}C.tap=n};
   const mv=(id,x,y)=>{if(id!==C.id)return;const dx=x-C.x,dy=y-C.y;C.x=x;C.y=y;C.mv+=Math.abs(dx)+Math.abs(dy);if(C.mv>12)C.tap=0;OF_camDrag(dx,dy)};const en=id=>{if(id===C.id)C.id=null};
-  cz.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];st('t'+t.identifier,t.clientX,t.clientY)},{passive:false});
-  cz.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches)mv('t'+t.identifier,t.clientX,t.clientY)},{passive:false});
-  const te=e=>{for(const t of e.changedTouches)en('t'+t.identifier)};cz.addEventListener('touchend',te);cz.addEventListener('touchcancel',te);
+  // window-level (capture): a touch that lands on the drag zone or the bare game view (not a button / the stick) orbits
+  const onCam=t=>RO.foot==='walk'&&state==='roam'&&t&&(t.id==='ofCam'||t.tagName==='CANVAS');OF.camEv=0;
+  addEventListener('touchstart',e=>{for(const t of e.changedTouches){OF.camEv++;OF.camTg=(t.target&&(t.target.id||t.target.tagName))+'@'+Math.round(t.clientX)+','+Math.round(t.clientY);if(onCam(t.target)){st('t'+t.identifier,t.clientX,t.clientY);break}}},{capture:true,passive:true});
+  addEventListener('touchmove',e=>{if(C.id==null)return;for(const t of e.changedTouches)mv('t'+t.identifier,t.clientX,t.clientY)},{capture:true,passive:true});
+  const te=e=>{for(const t of e.changedTouches)en('t'+t.identifier)};addEventListener('touchend',te,{capture:true,passive:true});addEventListener('touchcancel',te,{capture:true,passive:true});
+  cz.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});cz.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
   // PC: mouse drag anywhere on the game view (not on buttons) while on foot
   addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0||RO.foot!=='walk'||state!=='roam')return;const t=e.target;if(!(t&&(t.tagName==='CANVAS'||t.id==='ofCam')))return;st('m',e.clientX,e.clientY)});
   addEventListener('pointermove',e=>{if(e.pointerType!=='touch')mv('m',e.clientX,e.clientY)});addEventListener('pointerup',e=>{if(e.pointerType!=='touch')en('m')})}
