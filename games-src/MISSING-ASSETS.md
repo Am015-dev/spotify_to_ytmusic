@@ -450,62 +450,62 @@ Style block (paste in front of every art prompt for this game):
 
 **Campaign portraits (games/sunglaze/media/)**
 
-- [ ] `games/sunglaze/media/camp-ochre.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-ochre.webp` (1:1, target 256x256 WebP)
   - Prompt: Mother Ochre, a warm elderly master tile-maker with a clay-stained apron and kind eyes, a kiln glow behind her, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-tamsin.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-tamsin.webp` (1:1, target 256x256 WebP)
   - Prompt: Tamsin Reed, a cheerful fellow apprentice with a messy braid and glaze-splattered smock, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-bram.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-bram.webp` (1:1, target 256x256 WebP)
   - Prompt: Bram Kettle, a big-handed kiln stoker with soot on his cheeks and a leather apron, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-saffra.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-saffra.webp` (1:1, target 256x256 WebP)
   - Prompt: Saffra Vell, Keeper of the Courtyard, a proud woman with a sun-gold sash and a tall collar, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-cobb.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-cobb.webp` (1:1, target 256x256 WebP)
   - Prompt: Cobb the Sorter, a careful guild sorter with spectacles and a tray of tiles, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-iris.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-iris.webp` (1:1, target 256x256 WebP)
   - Prompt: Iris Prismwright, a dreamy glass artist with rainbow light on her face and a prism pendant, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-garnet.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-garnet.webp` (1:1, target 256x256 WebP)
   - Prompt: Master Garnet Hale, a stern guild master in deep red robes with a measuring rod, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-nell.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-nell.webp` (1:1, target 256x256 WebP)
   - Prompt: Nell Frost, a cool patient gatekeeper in pale blue with frosted hair pins, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-twins.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-twins.webp` (1:1, target 256x256 WebP)
   - Prompt: The Lumen Twins, two playful lamp-lighters grinning side by side holding little lamps, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-vesper.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-vesper.webp` (1:1, target 256x256 WebP)
   - Prompt: Vesper Ash, a quiet precise servant of the Black Kiln in charcoal robes with ash-grey hair, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/sunglaze/media/camp-umbra.webp` (1:1, target 256x256 WebP)
+- [x] `games/sunglaze/media/camp-umbra.webp` (1:1, target 256x256 WebP)
   - Prompt: Lady Umbra of the Black Kiln, a cold elegant mistress in black glazed-tile armour with violet eyes, bust portrait, head and shoulders, centred, plain simple background
 
 **Card backs, tables, title and end art (games/sunglaze/media/)**
 
-- [ ] `games/sunglaze/media/back-default.webp` (3:4, target 300x426 WebP)
+- [x] `games/sunglaze/media/back-default.webp` (3:4, target 300x426 WebP)
   - Prompt: a tile back with a repeating tiny sun and mosaic pattern in glazed blue and gold, a small sun medallion in the centre, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Default card/tile back.
-- [ ] `games/sunglaze/media/back-guild-seal.webp` (3:4, target 300x426 WebP)
+- [x] `games/sunglaze/media/back-guild-seal.webp` (3:4, target 300x426 WebP)
   - Prompt: a round guild seal in gold on deep blue glazed tile backs, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock: Guild seal tile backs
-- [ ] `games/sunglaze/media/back-lamplight.webp` (3:4, target 300x426 WebP)
+- [x] `games/sunglaze/media/back-lamplight.webp` (3:4, target 300x426 WebP)
   - Prompt: a warm lamp glow over cream tile backs with a faint pattern, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock: Lamplight tile backs
 - [ ] `games/sunglaze/media/table-default.webp` (16:9, target 1376x768 WebP)
   - Prompt: a tile-workshop table top seen from above: pale plaster surface with clay dust, brushes and glaze jars at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Default table behind the board.
-- [ ] `games/sunglaze/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
+- [x] `games/sunglaze/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
   - Prompt: a tile-workshop table top seen from above: pale plaster surface with clay dust, brushes and glaze jars at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle, portrait orientation
   - Note: Phone version of the default table.
-- [ ] `games/sunglaze/media/table-prism-light.webp` (16:9, target 1376x768 WebP)
+- [x] `games/sunglaze/media/table-prism-light.webp` (16:9, target 1376x768 WebP)
   - Prompt: soft rainbow prism light patterns on a pale stone surface, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Prism-light table
-- [ ] `games/sunglaze/media/table-unmarked-slate.webp` (16:9, target 1376x768 WebP)
+- [x] `games/sunglaze/media/table-unmarked-slate.webp` (16:9, target 1376x768 WebP)
   - Prompt: plain dark slate slab with chalk marks at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Unmarked slate table
-- [ ] `games/sunglaze/media/table-sun-palace.webp` (16:9, target 1376x768 WebP)
+- [x] `games/sunglaze/media/table-sun-palace.webp` (16:9, target 1376x768 WebP)
   - Prompt: a golden sunburst mosaic floor of a palace courtyard at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Sun Palace table
-- [ ] `games/sunglaze/media/title.webp` (16:9, target 1302x726 WebP)
+- [x] `games/sunglaze/media/title.webp` (16:9, target 1302x726 WebP)
   - Prompt: a glowing mosaic workshop with a half-finished sunburst tile wall, apprentices carrying trays of bright glazed tiles, a big kiln glowing at the back, keep the top of the picture calm and clear for the game logo
-- [ ] `games/sunglaze/media/title-phone.webp` (9:16, target 744x1334 WebP)
+- [x] `games/sunglaze/media/title-phone.webp` (9:16, target 744x1334 WebP)
   - Prompt: a glowing mosaic workshop with a half-finished sunburst tile wall, apprentices carrying trays of bright glazed tiles, a big kiln glowing at the back, keep the top of the picture calm and clear for the game logo, portrait orientation
-- [ ] `games/sunglaze/media/end-win.webp` (16:9, target 1302x726 WebP)
+- [x] `games/sunglaze/media/end-win.webp` (16:9, target 1302x726 WebP)
   - Prompt: the finished sunburst mosaic wall lit by golden light, the apprentices cheering and tossing tiles, no text
-- [ ] `games/sunglaze/media/end-lose.webp` (16:9, target 1302x726 WebP)
+- [x] `games/sunglaze/media/end-lose.webp` (16:9, target 1302x726 WebP)
   - Prompt: a cracked unfinished mosaic and a cold black kiln, scattered grey tiles, no text
 
 **Music (one CC0 loop is in the game, nothing new yet)**
