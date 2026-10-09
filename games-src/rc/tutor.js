@@ -101,7 +101,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prolog
       if(c==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);
       else if(c==='story'&&typeof GXC!=='undefined')campOpen();
       else openStart()},
-    onExit:()=>{tutLeave();openStart()}})}
+    onExit:()=>{tutLeave();openStart();if(pro&&typeof GXC!=='undefined')campOpen()}})}   // skipping the Story prologue goes on to the chapter map
 // ---------------------------------------------------------------- menus: the title, the in-game menu, the chapter list, the first Play and the first Story tap
 const tutFirst=()=>{try{return typeof GXT!=='undefined'&&!GXT.status(TUT_GAME).seen&&!localStorage.getItem(SAVE)&&!localStorage.getItem('swi_ghost')&&!localStorage.getItem('swi_tutoffer')}catch(e){return false}};
 function tutBlock(pos){if(typeof GXT==='undefined')return '';const f=tutFirst();
