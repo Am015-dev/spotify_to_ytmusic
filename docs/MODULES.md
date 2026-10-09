@@ -72,7 +72,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 99c | `99c_checklist.js` | 32 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
-| 98zp | `98zp_perf_ctx.js` | 12 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
+| 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -334,9 +334,9 @@ uses: 30(38), 10(19), 40(6), 20(1)
 defines: OPN_TER OPN_K OPN_I0 OPN_I1 OPN_MOUTH OPN_NOSE OPN_ROAD OPN OPN_cp OPN_DEFS OPN_prep OPN_i OPN_b OPN_lane OPN_ter OPN_fall OPN_land OPN_falling OPN_aiXt OPN_pads OPN_rt OPN_noise OPN_vn OPN_roadTex OPN_grainTex OPN_AP OPN_build __ro OPN_segStep __ro2
 uses: 10(91), 20(27), 30(25), 31(17), 98rf(10), 53(6), 51(6), 72(2), 40(1)
 
-## 98zp_perf_ctx.js — 12 KB
+## 98zp_perf_ctx.js — 13 KB
 defines: P1 P1_rt P1_free P1_draw P1_off P1_img P1_readAsync P1_CRC P1_png P1_view P1_attach P1_detach P1_gbDraw P1_thSet P1_tq __P1 P2_after P2_compile P2_warm
-uses: 10(45), 20(3), 72(3), 92(3), 30(2), 98s(2), 98y(1)
+uses: 10(45), 72(4), 20(3), 92(3), 30(2), 98s(2), 98y(1)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25

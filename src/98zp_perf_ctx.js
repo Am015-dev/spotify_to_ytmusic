@@ -66,24 +66,24 @@ new MutationObserver(()=>{if($('#gbx').hidden)P1_detach()}).observe($('#gbx'),{a
 // while the builder owns the main canvas: no game render into it and no resize of it (resize runs when the garage closes)
 composer.render=(f=>function(...a){if(P1.gb){if($('#gbx').hidden)P1_detach();else return}return f.apply(this,a)})(composer.render);
 resize=(f=>function(){if(P1.gb)return;return f.apply(this,arguments)})(resize);
-// ---- garage thumbnails: lazy, a few per frame (visible tiles first), cached per part + colour
+// ---- garage thumbnails: lazy, a few per frame (≥2, ~10 ms; visible tiles first), cached per part + colour
 GS_thumbs=function(){if(!GB_.bk)return;const c=GB_.col;document.querySelectorAll('#gbBkPc .gbPc').forEach(b=>{if(b.style.display==='none'||b.dataset.tc===String(c))return;
   const key=b.dataset.p+'|'+c;if(GS.thC.has(key))P1_thSet(b,c,GS.thC.get(key));else if(!P1.q.some(q=>q.b===b&&q.c===c))P1.q.push({b,c})});P1_tq()};
 function P1_thSet(b,c,u){if(!u)return;b.dataset.tc=c;let im=b.querySelector('img');if(!im){im=document.createElement('img');im.alt='';b.insertBefore(im,b.firstChild)}im.src=u;b.classList.add('gsTh')}
 function P1_tq(){if(P1.qOn||!P1.q.length)return;P1.qOn=true;requestAnimationFrame(function step(){const t0=performance.now(),vh=innerHeight,vw=innerWidth;
   P1.q=P1.q.filter(q=>q.c===GB_.col&&q.b.isConnected&&q.b.dataset.tc!==String(q.c)&&!$('#gbx').hidden);
   const vis=q=>{const r=q.b.getBoundingClientRect();return r.width>0&&r.right>0&&r.left<vw&&r.bottom>0&&r.top<vh};P1.q.sort((a,b)=>vis(b)-vis(a));
-  while(P1.q.length&&(performance.now()-t0<6)){const q=P1.q.shift();try{P1_thSet(q.b,q.c,GS_thumb(q.b.dataset.p,q.c))}catch(e){}}
+  let n=0;while(P1.q.length&&(n++<2||performance.now()-t0<10)){const q=P1.q.shift();try{P1_thSet(q.b,q.c,GS_thumb(q.b.dataset.p,q.c))}catch(e){}}
   if(P1.q.length)requestAnimationFrame(step);else P1.qOn=false})}
 window.__P1={P1,off:P1_off,draw:P1_draw,gb:()=>GB,R:renderer,ctx:()=>P1,progs:()=>renderer.info.programs.map(p=>p.name+'#'+p.usedTimes),keys:()=>renderer.info.programs.map(p=>p.cacheKey)};
 // ============================================================ PERF2 (v89i): shader warm-up off the critical path
 // renderer.compile only issues compile/link to the GPU process; the main thread blocks later, at the first draw that needs a program
-// (three reads its uniforms). So: link programs early and in the background (compileAsync waits with KHR_parallel_shader_compile where the
-// browser has it), and never ask for programs the next frame does not draw.
+// (three reads its uniforms). So: link programs early and in the background (the existing ldPrewarm polls KHR_parallel_shader_compile where the browser has it), and never ask for programs the next frame does not draw.
 function P2_after(fn){requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn()}catch(e){console.warn('P2',e)}}))}
 // every warm-up compiled with no render target bound, i.e. the canvas variant (sRGB out + tone mapping). The game draws the scene through the
 // composer (RenderPass -> linear HalfFloat target, no tone mapping): a different program. So each warm-up linked ~50 programs that were never used,
 // and the real ones still linked at the first frame. P2_compile compiles for the composer's target.
-function P2_compile(sc,cam,async){const R=renderer,t=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);
- try{return async?R.compileAsync(sc,cam):R.compile(sc,cam)}finally{R.setRenderTarget(t,f,l)}}
-function P2_warm(sc,cam){try{const p=P2_compile(sc,cam,true);if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function P2_compile(sc,cam){const R=renderer,t=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);
+ try{return R.compile(sc,cam)}finally{R.setRenderTarget(t,f,l)}}
+// (plain compile: issuing the links is enough; three r164 compileAsync can throw on a material without a program while polling)
+function P2_warm(sc,cam){try{P2_compile(sc,cam)}catch(e){}}
