@@ -12,8 +12,9 @@ function snd(name, o) {
 function sndMusic() {
   try {
     if (!window.GA) return;
-    if (UI.prefs.music === false || !G || !UI.started) { GA.music(null); GA.stopLoop && GA.stopLoop('belt'); return; }
-    GA.music('main', { vol: .32 }); if (GA.loop) GA.loop('belt', { vol: .16, fade: 1.5 });
+    if (UI.prefs.music === false) { MUS.want = null; GA.music(null); GA.stopLoop && GA.stopLoop('belt'); return; }
+    musicSync();
+    if (G && UI.started && G.phase !== 'over') { if (GA.loop) GA.loop('belt', { vol: .16, fade: 1.5 }); } else GA.stopLoop && GA.stopLoop('belt');
   } catch (e) { }
 }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.hc,[data-a=serve],[data-a=rsnext]')) snd('click'); }, true);

@@ -89,8 +89,9 @@ function snd(name, o) {
 function sndMusic() {
   try {
     if (!window.GA) return;
-    if (UI.prefs.music === false || !G || !UI.started) { GA.music(null); GA.stopLoop && GA.stopLoop('bubbling'); return; }
-    GA.music('main', { vol: .3 }); if (GA.has && GA.has('bubbling') && GA.loop) GA.loop('bubbling', { vol: .12, fade: 1.5 });
+    if (typeof musicSync === 'function') musicSync(); else GA.music(UI.prefs.music === false || !G || !UI.started ? null : 'main', { vol: .3 });
+    if (UI.prefs.music === false || !G || !UI.started) { GA.stopLoop && GA.stopLoop('bubbling'); return; }
+    if (GA.has && GA.has('bubbling') && GA.loop) GA.loop('bubbling', { vol: .12, fade: 1.5 });
   } catch (e) { }
 }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.drawb,.stopb,[data-a=mv]')) snd('click'); }, true);
@@ -265,8 +266,8 @@ function renderFort() {
   const e = $('#fort'); if (!e) return; const c = D.FORTUNE.find(x => x.id === G.fcard);
   let fc = $('#fortchip'); if (!fc) { const bd = $('#bd'); if (bd) { fc = h('button#fortchip', { type: 'button', 'data-a': 'fortchip', 'data-lp': 'fort' }); bd.appendChild(fc); } }
   if (!c || G.phase === 'over') { e.hidden = true; if (fc) fc.hidden = true; return; } e.hidden = false; e.className = c.kind; e.setAttribute('data-lp', 'fort');
-  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
-  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
+  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(fortImg(c, 'fpic'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
+  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(fortImg(c, 'fcimg'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';
@@ -290,7 +291,7 @@ function renderActs() {
 function renderQ(p, legal, qb) {
   const q = p.q, info = QINFO[q.h]; if (qb.hidden) UI.qT = Date.now(); qb.hidden = false;
   const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
-  qb.append(h('div.qt', h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div.qx', info[1](p, q.d))));
+  qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div.qx', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
@@ -627,8 +628,8 @@ function buildRef() {
   bk.appendChild(h('p.sm', 'The books of this game' + (G ? '' : ' (set 1 shown)') + ':')); ['O', 'K', 'G', 'B', 'R', 'Y', 'P'].forEach(c => bk.appendChild(bookRow(c, sets[c] || 1, true)));
   sec('Ingredient books in this game', true, bk);
   for (let s = 1; s <= 4; s++) { const d = h('div'); ['G', 'B', 'R', 'Y', 'P'].forEach(c => d.appendChild(bookRow(c, s, G && sets[c] === s))); sec(D.SET_NAMES[s] + ': all five books', false, d); }
-  const fc = h('div'); D.FORTUNE.forEach(c => fc.appendChild(h('div.rcard', h('span', { style: 'flex:0 0 auto;width:44px;height:44px;border-radius:10px;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:12px;background:' + (c.kind === 'blue' ? '#3b82d6' : '#7a4ab5') }, c.kind === 'blue' ? 'DAY' : 'NOW'), h('div.rt', h('b', c.name + ' (1)'), h('div', c.text)))));
-  sec('Fortune cards (24: 11 blue, 13 purple)', false, h('p.sm', 'Blue cards last the whole day, purple cards happen at once. Options that name yellow or purple chips only work once that stall is open.'), fc);
+  const fc = h('div'); D.FORTUNE.forEach(c => fc.appendChild(h('div.rcard', h('span.rfort.' + c.kind, fortImg(c, 'rfimg'), h('i', c.kind === 'blue' ? 'DAY' : 'NOW')), h('div.rt', h('b', c.name + ' (1)'), h('div', c.text)))));
+  sec('Fortune cards (24: 11 blue, 13 purple)', false, h('p.sm', 'Blue cards last the whole day, purple cards happen at once. Options that name yellow or purple chips only work once that stall is open. ', h('a', { href: 'cards.html', target: '_blank', rel: 'noopener' }, 'See all 24 fortune paintings')), fc);
   const tt = h('table.reft'); tt.appendChild(h('tr', h('th', 'Space'), h('th', 'Coins'), h('th', 'VP'), h('th', 'Ruby')));
   for (let i = 1; i < D.TRACK_LEN; i++) tt.appendChild(h('tr', h('td', i === D.SPOON ? '53 (spoon)' : i), h('td', D.COINS[i]), h('td', D.VP[i]), h('td', D.RUBY[i] ? '◆' : '')));
   sec('The cauldron spiral (spaces 1 to 53)', false, h('p.sm', 'Chips sit on spaces 1 to 52. Your scoring space is the one after your last chip. Past 52 the chip stays on 52 and you score the spoon.'), tt);
@@ -665,7 +666,7 @@ function renderMenu() {
   if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   if (!online) b.appendChild(tutNode('btn', true));
   if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
-  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
+  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Choose music'));
   { const gp = typeof gfxPref === 'function' ? gfxPref() : 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (gp === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gp === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gp === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'logd', type: 'button' }, 'Log'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'refd', type: 'button' }, 'Chips and cards'), h('span.tinyc', { html: sp }));
@@ -803,6 +804,11 @@ document.addEventListener('click', ev => {
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'drawer': GX.show(d.v); break;
+    case 'musicopen': try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); break;
+    case 'mpick': musicPick(d.s, d.c); renderMusic(); break;
+    case 'mprev': musicPreview(d.s); renderMusic(); break;
+    case 'mprevx': musicPreviewStop(); renderMusic(); break;
+    case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
@@ -851,6 +857,7 @@ function boot() {
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('scored', 'Scores and players', h('div#scorebody'));
   GX.drawer('setd', 'Menu', h('div#setbody'));
+  extrasBoot();
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
@@ -1405,7 +1412,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'cauldron', data: window.CAMPAIGN,
+    game: 'cauldron', artBase: 'media/', data: window.CAMPAIGN,
     headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; },
     startChapter: campStart,
     isWon: campIsWon, metrics: campMetrics,
@@ -1445,7 +1452,7 @@ function lpHide() { const b = $('#lpb'); if (b) b.remove(); clearTimeout(LP.hide
 function lpShow(el) {
   const k = el.dataset.lp || ''; let icon = '', title = '', text = '', full = false;
   if (k.indexOf('chip:') === 0) { const key = k.slice(5); icon = chipHTML(key, 40); title = D.COLORS[key[0]].name; text = chipShort(key); }
-  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'ALL DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; }
+  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'ALL DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; icon = '<img class="lpimg" src="media/fortune-' + c.id + '.webp" alt="" onerror="this.remove()">' + icon; }
   else return;
   lpHide(); const b = h('div#lpb', { role: 'dialog', 'aria-modal': 'true', 'aria-label': title }, h('span.lpi', { html: icon }), h('div.lpt', h('b', title), h('div', text), full && full !== text ? h('div.lpfull', full) : null));
   document.body.appendChild(b);
@@ -1932,3 +1939,106 @@ function tutLeave() {
   try { stgAbort(); } catch (e) { } try { GXH.hide(); } catch (e) { }
   document.documentElement.classList.remove('pulling'); $$('.boomfx,.bfchip,.dfly,#ghost').forEach(e => e.remove());
 }
+// ===================== part 12: painted extras (bag skins, table cloths, end art, fortune paintings) and music (per screen + the Music picker) =====================
+const MEDIA = 'media/';
+const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
+const IMG_OK = {};
+const preImg = f => { if (IMG_OK[f] !== undefined) return; IMG_OK[f] = 0; const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };
+// ---- fortune cards: the painting on every place a fortune card is shown (the picture hides itself if the file is missing)
+function fortImg(c, cls) { const i = h('img.' + cls, { src: MEDIA + 'fortune-' + c.id + '.webp', alt: '', draggable: 'false' }); i.onerror = () => i.remove(); return i; }
+// ---- bag skins: the campaign unlocks moss-bag and ember-bag replace the painted bag (files bag-moss / bag-ember)
+const BAGFILE = { 'moss-bag': 'bag-moss', 'ember-bag': 'bag-ember' };
+let bagCur = '';
+function bagApply() {
+  const id = unl('cardback'), f = BAGFILE[id]; if (!f || f === bagCur) return;
+  preImg(f); if (!IMG_OK[f]) return;
+  bagCur = f; const u = MEDIA + f + '.webp'; KIT.ART.bag = u;
+  document.querySelectorAll('img.bagimg,img.sbimg').forEach(i => { i.src = u; });
+}
+// ---- table: the painted market table behind the cauldron; campaign unlocks (market-cloth, judges-tent) replace it. The brown CSS gradient stays underneath while it loads, in the simple view and if a file is missing
+let tblCur = '';
+function tableApply() {
+  const R = document.documentElement, id = unl('table'), f = id && /^(market-cloth|judges-tent)$/.test(id) ? 'table-' + id : '';
+  const key = f || 'default'; if (key === tblCur) return;
+  if (!f) { const a = KIT.ART.table; if (a) { tblCur = key; R.style.setProperty('--tbl-img', 'url(' + a + ')'); } return; }
+  const im = new Image(); im.onload = () => { tblCur = key; R.style.setProperty('--tbl-img', 'url(' + MEDIA + f + '.webp)'); }; im.src = MEDIA + f + '.webp';
+}
+// ---- end art: a painted banner on top of the final scores
+function cfWon() {
+  if (!G || G.phase !== 'over') return true; const w = G.winners || [];
+  if (typeof NET !== 'undefined' && NET.on) return w.indexOf(NET.mySeat) >= 0;
+  const hs = humans(); if (!hs.length || hs.length > 1) return true;
+  return w.indexOf(hs[0]) >= 0;
+}
+function endBanner() {
+  const b = document.querySelector('#rs .rsbody'); if (!b || b.querySelector('.endart')) return;
+  const won = cfWon(); if (!IMG_OK[won ? 'end-win' : 'end-lose']) return;
+  b.insertBefore(h('div.endart.' + (won ? 'win' : 'lose'), { 'aria-hidden': 'true' }), b.firstChild);
+}
+// ---- music: five slots (Menu, Game, Last day, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / off
+const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last day'], ['victory', 'Victory'], ['defeat', 'Defeat']];
+const MTITLE = { 'tavern-a': 'Potion Steam Waltz', 'tavern-b': 'Six Bells Over Kettlemoor', 'main-a': 'Cauldron Clockwork', 'main-b': 'Tiny Risky Potions', 'fight-a': 'Push the Pot', 'fight-b': 'Tremolo Gambit', 'victory-a': 'Fireworks Over the Fairground', 'victory-b': 'Brass and Confetti', 'defeat-a': 'Pfft!', 'defeat-b': 'The Slow Leak Waltz' };
+const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0 };
+try { Object.assign(MUS.pick, JSON.parse(localStorage.getItem('cf_mpick') || '{}')); } catch (e) { }
+function musicSlot() {
+  const st = $('#start');
+  if (!G || !UI.started || (st && !st.hidden)) return ['tavern', 0];
+  if (G.phase === 'over' && UI.overShown) return [cfWon() ? 'victory' : 'defeat', 1];
+  if (UI.mode !== 'tutorial' && ((UI.camp && UI.camp.boss) || G.round >= LASTD())) return ['fight', 0];
+  return ['main', 0];
+}
+function musicName(slot) {
+  const c = MUS.pick[slot] || MDEF[slot]; if (c === 'off') return '-';
+  if (c === 'shuffle') { if (!MUS.res[slot]) { MUS.sh[slot] = MUS.sh[slot] === undefined ? (Math.random() < .5 ? 0 : 1) : 1 - MUS.sh[slot]; MUS.res[slot] = slot + '-' + 'ab'[MUS.sh[slot]]; } return MUS.res[slot]; }
+  return slot + '-' + (c === 'b' ? 'b' : 'a');
+}
+function musicPick(slot, c) {
+  MUS.pick[slot] = c; MUS.res[slot] = null; try { localStorage.setItem('cf_mpick', JSON.stringify(MUS.pick)); } catch (e) { }
+  if (window.GA && c !== 'off' && c !== 'shuffle') try { GA.preload(musicName(slot)); } catch (e) { }
+  if (MUS.wslot === slot && !MUS.prev) { MUS.want = null; musicSync(); }
+}
+// one cross-faded track at a time; called from a slow tick, the first tap and after the music button or a pick
+function musicSync() {
+  if (!window.GA || MUS.prev) return;
+  if (UI.prefs.music === false) { MUS.want = null; GA.music(null, { fade: .6 }); return; }
+  const w = musicSlot(); if (MUS.wslot !== w[0]) { MUS.wslot = w[0]; MUS.res[w[0]] = null; }
+  const n = musicName(w[0]); if (MUS.want === n) return; MUS.want = n;
+  if (n === '-') { GA.music(null, { fade: 1 }); return; }
+  GA.music(n, { fade: w[1] ? .6 : 1, once: !!w[1] });
+  if (w[0] === 'tavern' || w[0] === 'main') setTimeout(() => { try { const nx = w[0] === 'tavern' ? 'main' : 'fight', c = MUS.pick[nx]; if (c !== 'off' && c !== 'shuffle') GA.preload(musicName(nx)); } catch (e) { } }, 4000);
+}
+function musicPreview(slot) {
+  if (!window.GA || UI.prefs.music === false || MUS.wslot === slot) return; try { GA.unlock(); } catch (e) { }
+  const n = musicName(slot); if (n === '-') return;
+  clearTimeout(MUS.prevT); MUS.prev = slot; MUS.want = null; GA.music(n, { fade: .5, once: true });
+  MUS.prevT = setTimeout(() => { MUS.prev = null; MUS.want = null; musicSync(); renderMusic(); }, 8000);
+}
+function musicPreviewStop() { if (!MUS.prev) return; clearTimeout(MUS.prevT); MUS.prev = null; MUS.want = null; musicSync(); }
+function renderMusic() {
+  const b = $('#musicbody'); if (!b) return; const on = UI.prefs.music !== false; let vol = .5; try { vol = GA.state().musVol; } catch (e) { }
+  const chip = (cls, at, t) => h('button.mchip' + cls, Object.assign({ type: 'button' }, at), t);
+  const top = h('div.mtop', chip(on ? '.on' : '', { 'data-a': 'mmus' }, 'Music: ' + (on ? 'on' : 'off')), h('label.mvol', 'Volume ', h('input#mvol', { type: 'range', min: '0', max: '1', step: '0.05', value: String(vol), 'aria-label': 'Music volume' })));
+  const sig = JSON.stringify([on, MUS.pick, MUS.prev, MUS.wslot]); if (b._sig === sig) return; b._sig = sig;
+  b.innerHTML = ''; b.appendChild(top);
+  MSLOTS.forEach(([k, nm]) => {
+    const cur = MUS.pick[k], act = MUS.wslot === k && on && cur !== 'off', row = h('div.mchips');
+    ['a', 'b'].forEach(v => row.appendChild(chip(cur === v ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': v }, MTITLE[k + '-' + v])));
+    row.appendChild(chip(cur === 'shuffle' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'shuffle' }, '⇄ Shuffle'));
+    row.appendChild(chip(cur === 'off' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'off' }, 'Off'));
+    if (MUS.prev === k) row.appendChild(chip('.prev', { 'data-a': 'mprevx', 'data-s': k }, '■ Stop preview'));
+    else if (!act && cur !== 'off' && on) row.appendChild(chip('.prev', { 'data-a': 'mprev', 'data-s': k }, '▶ Preview'));
+    b.appendChild(h('div.mrow2', h('h5', nm, act ? h('small', ' playing now') : null), row));
+  });
+}
+document.addEventListener('input', e => { if (e.target && e.target.id === 'mvol' && window.GA) GA.setVolume('music', +e.target.value); });
+function extrasBoot() {
+  GX.drawer('musicd', 'Music', h('div#musicbody'));
+  ['bag-moss', 'bag-ember', 'end-win', 'end-lose'].forEach(preImg);
+  tableApply();
+  setInterval(() => { try { sndMusic(); bagApply(); tableApply(); } catch (e) { } }, 800);
+}
+// the final scores pick up the end art after each draw
+(function () {
+  const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { endBanner(); } catch (e) { } return r; };
+})();

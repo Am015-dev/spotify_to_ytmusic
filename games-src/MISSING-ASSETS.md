@@ -938,24 +938,14 @@ Files that exist in the repo but the live game does not use yet. This is our wor
 
 - [ ] games/thornbound/media/back-court.webp (the "crowned stag" deck back) is not used by the page; only back-default and the campaign unlocks are. (1)
 
-### Kaiten Kitchen (29 files)
+### Kaiten Kitchen: all wired and deployed 9 Oct (11 paintings, artBase portraits, 3 card backs, midnight-belt table, end art, Treblo music with Music picker)
 
-- [ ] 11 Flow paintings in games-src/kaiten/art/*.png (tempura, dumpling, roll1, roll2, salmon, chop, chef-pip, belt, counter, back, title; committed 9 Oct, the built page is the 8 Oct one): rebuild and deploy (11)
-- [ ] 2 portraits media/camp-suzu.webp and camp-pip.webp: no artBase set (2)
-- [ ] 3 card backs media/back-lunch-belt, back-custard, back-golden (3)
-- [ ] 1 table skin media/table-midnight-belt.webp (1)
-- [ ] 2 end screens media/end-win.webp and end-lose.webp (2)
-- [ ] Treblo music: games-src/audio/kaiten/treblo/ has 10 tracks; nothing in games/kaiten-kitchen/music/ (10)
+### Cauldron Fair (done 9 Oct 2026, live)
 
-### Cauldron Fair (73 files)
-
-- [ ] 27 Flow paintings in games-src/cauldron-fair/art/*.png (committed 9 Oct, built page is still the 8 Oct one with painted stand-ins): rebuild with build.py and deploy (27)
-- [ ] 6 portraits media/camp-*.webp: GXC.init has no artBase: "media/" (6)
-- [ ] 2 bag skins media/bag-moss.webp and bag-ember.webp (campaign cardback ids are moss-bag and ember-bag, so the names need a mapping) (2)
-- [ ] 24 fortune cards media/fortune-<id>.webp: no code shows them yet (24)
-- [ ] 2 end screens media/end-win.webp and end-lose.webp (2)
-- [ ] 2 table skins media/table-market-cloth.webp and table-judges-tent.webp (2)
-- [ ] Treblo music: games-src/audio/cauldron-fair/treblo/ has 10 tracks (5 cues x a/b); none in games/cauldron-fair/music/ yet (pick or ship both, cut loops, add audio-data) (10)
+- [x] 27 Flow paintings rebuilt and deployed; portraits via artBase `media/`; bag skins (moss-bag, ember-bag), table skins (market-cloth, judges-tent) and end-win/end-lose wired
+- [x] 24 fortune cards shown on the fortune bar, chip, long-press card, option box and card list; `games/cauldron-fair/cards.html` (built by `cauldron-fair/cards-page.js`)
+- [x] Treblo music (10 tracks in `games/cauldron-fair/music/`), per-screen crossfades, Music picker
+- [ ] Still to make: Tamsin redo (char-tamsin.png, Flow drew a bearded man), table-phone.png and title-phone.png (9:16)
 
 ### Final Approach (42 files)
 

@@ -214,7 +214,7 @@ CC BY 4.0 (required, shown in Sunglaze credits):
 
 Modified: cut to a seamless loop, loudness-normalised, re-encoded.
 
-CC0 (optional thanks, shown in every game): Kenney; Pro Sensory, LEGIT Audio (OpenGameArt music / ambience, Kaiten Kitchen); Spring Spring, stereoscopic, Tozan, Indieteur, cynicmusic, yd (OpenGameArt music, Hollowbough / Thornbound); rubberduck, StarNinjas, AntumDeluge, Bashar3A (OpenGameArt sound effects); iamoneabe, Joth, vitalezzz, KarateStudios, Eldritch Grim, RandomMind (OpenGameArt music).
+CC0 (optional thanks, shown in every game): Kenney; LEGIT Audio (OpenGameArt ambience, Kaiten Kitchen); Spring Spring, stereoscopic, Tozan, Indieteur, cynicmusic, yd (OpenGameArt music, Hollowbough / Thornbound); rubberduck, StarNinjas, AntumDeluge, Bashar3A (OpenGameArt sound effects); iamoneabe, Joth, vitalezzz, KarateStudios, Eldritch Grim, RandomMind (OpenGameArt music).
 
 ## Download URLs (music)
 
@@ -250,3 +250,6 @@ The four CC0 season beds are retired. Music is ten Treblo tracks (five slots, ve
 
 ## Shipwreck Isle music (2026-10-09)
 The two CC0 tracks (Seaside Village, Storm Chasers) are retired from Shipwreck Isle and removed from its page. Music is ten Treblo tracks (five slots, versions a and b) shipped as separate files in `games/shipwreck-isle/music/`, made by `tools/music_treblo.py` from `audio/shipwreck/treblo/` (loops at most 150 s with a 2 s cross-fade; victory 18 s, defeat 11 s; -18 LUFS, 96 kbps). Treblo Terms of Service section 8 (Output): the user owns the Outputs; no third-party samples; no warranty that a track can be copyrighted. Titles: Menu (Island Menu Theme / Gentle Shoreline), Game (Patient Sunrise / Quiet Provision), Fight (Storm Rumble / Beast in the Dark), Victory (Harbor Horn Rising / Safe Return), Defeat (Fading Tide / The Last Watch Ashore); default a. Card paintings and the default card back: Google Flow (see `rc/PAINTED-ART-HANDOFF.md`).
+
+### Cauldron Fair (Treblo music, 9 Oct 2026)
+The CC0 "Medieval: Market Day" loop is retired. Music is ten Treblo tracks (five slots, versions a and b) shipped as separate files in `games/cauldron-fair/music/`, made by `tools/music_treblo.py` from `audio/cauldron-fair/treblo/` (-18 LUFS, 96 kbps; loops cross-faded, victory 18 s and defeat 11 s cues with fades). `cauldron-fair/audio/audio-data.js` points at them (`url:music/<name>.mp3`); `bundle_cauldron.py` now emits the same. Licence note: `audio/cauldron-fair/treblo/README.md` (Treblo Terms of Service section 8: the user owns the Outputs). The sound effects stay Kenney and rubberduck (CC0).

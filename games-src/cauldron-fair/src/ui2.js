@@ -145,8 +145,8 @@ function renderFort() {
   const e = $('#fort'); if (!e) return; const c = D.FORTUNE.find(x => x.id === G.fcard);
   let fc = $('#fortchip'); if (!fc) { const bd = $('#bd'); if (bd) { fc = h('button#fortchip', { type: 'button', 'data-a': 'fortchip', 'data-lp': 'fort' }); bd.appendChild(fc); } }
   if (!c || G.phase === 'over') { e.hidden = true; if (fc) fc.hidden = true; return; } e.hidden = false; e.className = c.kind; e.setAttribute('data-lp', 'fort');
-  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
-  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
+  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(fortImg(c, 'fpic'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
+  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(fortImg(c, 'fcimg'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';
@@ -170,7 +170,7 @@ function renderActs() {
 function renderQ(p, legal, qb) {
   const q = p.q, info = QINFO[q.h]; if (qb.hidden) UI.qT = Date.now(); qb.hidden = false;
   const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
-  qb.append(h('div.qt', h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div.qx', info[1](p, q.d))));
+  qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div.qx', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
