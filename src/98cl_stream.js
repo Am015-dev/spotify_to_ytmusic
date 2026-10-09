@@ -14,7 +14,7 @@ const STR_R=()=>SET.q==='high'?2100:1600;
 const STR_d=(S,x,z)=>Math.hypot(Math.max(S.x0-x,0,x-S.x1),Math.max(S.z0-z,0,z-S.z1));
 function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof camera==='undefined')return;const t0=performance.now(),cx=camera.position.x,cz=camera.position.z,R=STR_R(),LD=R+TUNE.strLoad,UL=R+TUNE.strUnload;
   if(STR.S&&(STR.S.grp!==WBC.grp||!WBC.sup.includes(STR.S))){STR.S=null;STR.it=null}
-  for(const S of WBC.sup)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++}
+  let nf=0;for(const S of WBC.sup)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++;if(++nf>=2)break}
   let n=0;while(performance.now()-t0<STR.ms){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;STR.S=b;STR.it=WB_supMk(b,true)}
     n++;if(STR.it.next().done){STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
   if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
