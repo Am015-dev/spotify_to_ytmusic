@@ -64,15 +64,15 @@ function G13_turn(ax,dir=1){if(!GB_.bk)return 0;let ok=0;
  if(ok){try{AU.sfx('pick')}catch(e){}G13_gizShow(ax);G13.last=ax;GS_tip('Turned '+G13_AXN[ax]+(GS.pt==='mouse'?' · R / T / F':''));G13_ui()}return ok}
 // ---------- gizmo: red X, green Y, blue Z through the held / selected part; a ring on the axis just used
 function G13_gizMk(){const g=new THREE.Group(),mk=(c,ax)=>{const m=new THREE.MeshBasicMaterial({color:c,depthTest:false,depthWrite:false,transparent:true,opacity:.95,toneMapped:false}),
-  s=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.5,8).translate(0,.75,0),m),h=new THREE.Mesh(new THREE.ConeGeometry(.11,.28,12).translate(0,1.62,0),m),a=new THREE.Group();a.add(s,h);
-  if(ax==='x')a.rotation.z=-Math.PI/2;else if(ax==='z')a.rotation.x=Math.PI/2;a.userData.ax=ax;const r=new THREE.Mesh(new THREE.TorusGeometry(.95,.04,6,40),m);r.userData.ring=ax;
+  s=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,1.9,8).translate(0,.95,0),m),h=new THREE.Mesh(new THREE.ConeGeometry(.17,.4,12).translate(0,2.08,0),m),a=new THREE.Group();a.add(s,h);
+  if(ax==='x')a.rotation.z=-Math.PI/2;else if(ax==='z')a.rotation.x=Math.PI/2;a.userData.ax=ax;const r=new THREE.Mesh(new THREE.TorusGeometry(1.25,.06,6,40),m);r.userData.ring=ax;
   if(ax==='y')r.rotation.x=Math.PI/2;else if(ax==='x')r.rotation.y=Math.PI/2;g.add(a,r)};
  mk(0xff3b30,'x');mk(0x34d058,'y');mk(0x2f7bff,'z');g.traverse(o=>{o.renderOrder=20;o.frustumCulled=false});return g}
 function G13_gizAt(){let B=null;if(GS.held)B=[GS.held];else if(SL.sel.length&&GB_.tool==='sel')B=SL.sel;else if(GB_.hov)B=[GB_.hov];if(!B||!B.length)return null;
  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,z0=1e9,z1=-1e9;for(const b of B){const[fw,fd]=GB_dims(b);x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+fw);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd);y0=Math.min(y0,b.y);y1=Math.max(y1,b.y+G13_ht(b))}
  return[(x0+x1)/2*GB_U,(y0+y1)/2*GB_PH,(z0+z1)/2*GB_U]}
 function G13_gizShow(ax,ms=1800){const U=GB.mesh&&GB.mesh.userData;if(!U)return;const host=U.carG||U.m,p=G13_gizAt();if(!host||!p)return;if(!G13.giz)G13.giz=G13_gizMk();const g=G13.giz;
- if(g.parent!==host){if(g.parent)g.parent.remove(g);host.add(g)}g.position.set(p[0],p[1],p[2]);g.visible=true;
+ if(g.parent!==host){if(g.parent)g.parent.remove(g);host.add(g)}g.position.set(p[0],p[1],p[2]);g.scale.setScalar(clamp((GB_.dist||14)/9,1,3.5));g.visible=true;
  g.traverse(o=>{if(o.userData.ring)o.visible=o.userData.ring===(ax==='q'?'y':ax)});clearTimeout(G13.gizT);if(ms)G13.gizT=setTimeout(()=>{if(!G13.pad&&G13.giz)G13.giz.visible=false},ms)}
 function G13_gizHide(){clearTimeout(G13.gizT);if(G13.giz)G13.giz.visible=false}
 // ---------- keys (PC): R / T / F, Shift = the other way (called first by the builder's key handler in 94_garage_ui.js)
@@ -92,12 +92,12 @@ GS_tip=(f=>function(t){if(typeof t==='string')t=t.replace('✔ PLACE or tap agai
 
 // ---------- 2) search + ▾ category list (replaces the 13-chip row)
 const G13_ID={};// design ids for search (filled with the parts below)
-function G13_score(b,q){const p=b.dataset.p||'';if(!p)return 0;const P=GB_PC[p]||{},n=(P.n||b.dataset.n||p).toLowerCase(),ct=(b.dataset.ct||P.cat||'').toLowerCase(),id=String(G13_ID[p]||'');
+function G13_score(b,q){const p=b.dataset.p||'';if(!p)return 0;const P=GB_PC[p]||{},n=((P.n||b.dataset.n||p)+' '+(G13_AL[p]||'')).toLowerCase(),ct=(b.dataset.ct||P.cat||'').toLowerCase(),id=String(G13_ID[p]||'');
  let s=0;for(const w of q.split(/\s+/).filter(Boolean)){const v=w.replace('x','×');if(n.startsWith(v)||n.startsWith(w))s+=4;else if(n.includes(v)||n.includes(w))s+=3;else if(id&&id.startsWith(w))s+=5;else if(ct.startsWith(w))s+=2;else if(p.toLowerCase()===w)s+=2;else return 0}return s}
 function G13_search(q){G13.q=q=(q||'').trim().toLowerCase();const S=$('#gbBkPc');if(!S)return;
- if(!q){G13_cat(G13.tray?'tray':(GX.cat||GB_.ct||'Bricks'));return}let n=0;
+ if(!q){G13_cat(G13.tray?'tray':(GX.cat||GB_.ct||'Bricks'));return}G13.tray=0;G13_badges();let n=0;
  const R=GX_tiles().map(b=>[b,G13_score(b,q)]).sort((a,c)=>c[1]-a[1]);R.forEach(([b,s],i)=>{b.style.display=s?'':'none';b.style.order=s?i:'';if(s)n++});
- for(const e of S.querySelectorAll('.gxEm,.paCard'))e.style.display='none';S.scrollLeft=0;G13_em(n?'':'No part called “'+q+'” · try tile, slope, 3069');try{GS_thumbs()}catch(e){}G13_ui()}
+ for(const e of S.querySelectorAll('.gxEm,.paC,.paEm'))e.style.display='none';S.scrollLeft=0;G13_em(n?'':'No part called “'+q+'” · try tile, slope, 3069');try{GS_thumbs()}catch(e){}G13_ui()}
 function G13_em(t){const S=$('#gbBkPc');if(!S)return;let e=S.querySelector('.g13Em');if(!e){e=document.createElement('div');e.className='g13Em gxEm';S.appendChild(e)}e.hidden=!t;e.textContent=t;e.style.display=t?'':'none'}
 function G13_catList(){const C=$('#gxCh');return C?[...C.querySelectorAll('.gxC')].filter(b=>b.dataset.gxc!=='fold').map(b=>[b.dataset.gxc,b.textContent.trim()]):[]}
 function G13_catName(){if(G13.q)return'🔍 '+G13.q;if(G13.tray)return'🧺 TRAY';const k=GX.cat||GB_.ct||'Bricks',c=G13_catList().find(a=>a[0]===k);return c?c[1]:String(k).toUpperCase()}
@@ -110,7 +110,7 @@ function G13_tAdd(p,d){const o=G13_tGet();o[p]=Math.max(0,(o[p]||0)+d);if(!o[p])
  GS_tip(d>0?'🧺 '+(P?P.n:p)+' ×'+o[p]+' in the tray':'🧺 '+(P?P.n:p)+(o[p]?' ×'+o[p]:' removed'));if(G13.tray)G13_trayShow();G13_badges()}
 const G13_used=p=>GB_list().filter(b=>G13_base(b.t)===p).length;
 function G13_trayShow(){const o=G13_tGet(),K=Object.keys(o);let n=0;GX_tiles().forEach(b=>{const i=K.indexOf(b.dataset.p);b.style.display=i<0?'none':'';b.style.order=i<0?'':i;if(i>=0)n++});
- const S=$('#gbBkPc');if(S){for(const e of S.querySelectorAll('.gxEm:not(.g13Em),.paCard'))e.style.display='none';S.scrollLeft=0}G13_em(n?'':'Tray empty · tap + on a part to collect it');G13_badges();try{GS_thumbs()}catch(e){}}
+ const S=$('#gbBkPc');if(S){for(const e of S.querySelectorAll('.gxEm:not(.g13Em),.paC,.paEm'))e.style.display='none';S.scrollLeft=0}G13_em(n?'':'Tray empty · tap + on a part to collect it');G13_badges();try{GS_thumbs()}catch(e){}}
 function G13_badges(){const o=G13_tGet();for(const b of GX_tiles()){let a=b.querySelector('.g13Add');if(!a){a=document.createElement('span');a.className='g13Add';b.appendChild(a)}
   let c=b.querySelector('.g13Ct');const p=b.dataset.p,n=o[p]||0;if(n&&!c){c=document.createElement('span');c.className='g13Ct';b.appendChild(c)}
   if(c){c.hidden=!n;if(n)c.textContent=G13.tray?G13_used(p)+'/'+n:'×'+n;c.classList.toggle('ok',G13.tray&&G13_used(p)>=n)}a.textContent=G13.tray?'−':'+';a.title=G13.tray?'Take one out of the tray':'Add to the tray'}}
@@ -183,6 +183,7 @@ addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#b25 .b
 addEventListener('pointerdown',e=>{if(!G13_pop.k)return;if(e.target.closest&&e.target.closest('#g13Pop,#g13Ch'))return;G13_pop(null)},true);
 {const st=document.createElement('style');st.textContent=`
 #gbx.r2.gbBk #gxCh{display:none!important}
+#gbx.r2 #r2More{max-width:min(700px,calc(100vw - 160px));gap:8px 10px}#gbx.r2 #r2More .r2T{height:40px;min-width:0;padding:0 10px;flex-direction:row;gap:4px}
 #gbx.r2.gbBk #g13Ch{pointer-events:auto;display:flex;align-items:center;gap:12px;min-width:0;height:48px}#gbx:not(.gbBk) #g13Ch{display:none}
 #gbx.r2.gbBk.gxBig #g13Ch{grid-row:1;grid-column:1}
 #g13Ch .g13Q{display:flex;align-items:center;gap:4px;height:44px;flex:0 1 168px;min-width:104px;padding:0 8px;border:2px solid #141413;border-radius:12px;background:#fff;box-shadow:0 2px 0 #141413}
@@ -204,10 +205,59 @@ addEventListener('pointerdown',e=>{if(!G13_pop.k)return;if(e.target.closest&&e.t
 #g13Pad{position:absolute;z-index:31;display:grid;grid-template-columns:repeat(2,64px);gap:8px}#g13Pad[hidden]{display:none}
 #g13Pad button{height:44px;border-radius:10px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 12px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;box-shadow:0 2px 0 #141413}
 #g13Pad button i{font-style:normal;font-size:16px}#g13Pad .g13Ax{border-color:#d0281e}#g13Pad .g13Ay{border-color:#1f9d45}#g13Pad .g13Az{border-color:#1f5fd6}#g13Pad.g13Sel .g13Aup,#g13Pad.g13Sel .g13Adn{display:none}
-#gbx.r2 #gsBar .g8St{display:none!important}#gbx.r2 #gsBar [data-g13p].on,#gbx.r2 #slBar [data-g13s].on{background:#ffd400}
+#gbx.r2 #gsBar .g8St{display:none!important}#gbx.r2 #gsBar,#gbx.r2 #slBar{gap:12px}#gbx.r2 #gsBar [data-g13p].on,#gbx.r2 #slBar [data-g13s].on{background:#ffd400}
 #gbx.r2 #slBar [data-s="rot"],#gbx.r2 #slBar [data-s="col"],#gbx.r2 #slBar [data-s="del"],#gbx.r2 #slBar [data-s="up"],#gbx.r2 #slBar [data-s="none"],#gbx.r2 #slBar [data-s="dup"]{display:none}
 #gbx.r2 #slBar.g13X [data-s="col"],#gbx.r2 #slBar.g13X [data-s="del"],#gbx.r2 #slBar.g13X [data-s="up"],#gbx.r2 #slBar.g13X [data-s="none"],#gbx.r2 #slBar.g13X [data-s="dup"]{display:flex}
 #gbx.r2 #slBar.g13X [data-s="grp"],#gbx.r2 #slBar.g13X [data-s="move"],#gbx.r2 #slBar.g13X [data-g13s="join"],#gbx.r2 #slBar.g13X [data-g13s="turn"]{display:none}
 #gbx.r2 #slBar [data-g13s="more"]{order:9}#gbx.r2 #slBar.g13X [data-g13s="more"]{background:#ffd400}
 `;document.head.appendChild(st)}
-window.__g13={turn:G13_turn,ori:t=>G13_ori(t),def:k=>GB_PC[k],search:G13_search,tray:()=>G13_tGet(),tAdd:G13_tAdd,join:G13_join,comps:S=>G13_comps(S).length,st:()=>({held:!!GS.held,sel:SL.sel.length,tool:GB_.tool,n:GB_list().length,q:G13.q,tray:G13.tray,pad:G13.pad,pc:GB_.pc,rot:GB_.rot,giz:!!(G13.giz&&G13.giz.visible)})};
+// ---------- 6) new parts (docs/GARAGE13_PARTS.md): true LEGO proportions, stud 8 mm = GB_U, plate 3.2 mm = GB_PH, brick = 3 plates.
+// front of a part = -z (like the headlight 'hl'); SNOT studs face -z. Element lists: 40468 Yellow Taxi, 76916, 76920, 31127, 60371.
+if(!CR_CATS.includes('SNOT'))CR_CATS.splice(CR_CATS.indexOf('Slopes')+1,0,'SNOT');
+const G13_NEW={
+ t2c:['Tile corner 2×2',2,2,1,'Tiles',14719],t11h:['Tile 1×1 half round',1,1,1,'Tiles',35399],t12h:['Tile 1×2 round end',1,2,1,'Tiles',1748],
+ t22c:['Tile 2×2 cut corner',2,2,1,'Tiles',35787],t2t:['Tile 2×2 triangle',2,2,1,'Tiles',27263],t12hd:['Tile 1×2 handle',1,2,1,'Tiles',2432],
+ s11d:['Slope 45 1×1 double',1,1,2,'Slopes',35464],inv22:['Inv. slope 2×2',2,2,3,'Slopes',3660],cs31:['Curved slope 3×1',1,3,2,'Slopes',50950],
+ s65:['Slope 65 2×2',2,2,6,'Slopes',3678],cwL:['Curved wedge 1×2 L',1,2,2,'Slopes',29120],cwR:['Curved wedge 1×2 R',1,2,2,'Slopes',29119],ib22:['Inv. curve 2×2',2,2,2,'Slopes',32803],
+ wp22:['Wedge plate 2×2',2,2,1,'Plates',26601],cp22:['Corner plate 2×2',2,2,1,'Plates',2420],pr12:['Plate 1×2 rounded',1,2,1,'Plates',35480],ph12:['Plate 1×2 handle',2,1,1,'Plates',2540],
+ br11u:['Bracket 1×1 up',1,1,3,'SNOT',36840],br11d:['Bracket 1×1 down',1,1,3,'SNOT',36841],br22:['Bracket 1×2–2×2',2,1,5,'SNOT',21712],br24:['Bracket 1×2–2×4',4,1,5,'SNOT',21731],
+ br14:['Bracket 1×2–1×4',4,1,3,'SNOT',28802],b12s4:['Brick 1×2 4 side studs',2,1,3,'SNOT',52107],b12s:['Brick 1×2 side studs',2,1,3,'SNOT',11211],
+ gb12:['Grille brick 1×2',2,1,3,'SNOT',2877],pb14:['Profile brick 1×4',4,1,3,'SNOT',15533],rp1h:['Round plate 1×1 hole',1,1,1,'Round',28626],pbar:['Plate 1×1 with bar',1,1,3,'Vehicle',31561]};
+for(const k in G13_NEW){const[n,w,d,h,cat,id]=G13_NEW[k];GB_PC[k]={n,w,d,h,cat,ic:'▭',g:cat==='Tiles'?'T':undefined};G13_ID[k]=id}
+Object.assign(G13_ID,{b11:3005,b12:3004,b22:3003,b24:3001,b13:3622,b14:3010,b16:3009,b18:3008,b23:3002,b26:2456,b28:3007,p11:3024,p12:3023,p13:3623,p14:3710,p16:3666,p18:3460,p22:3022,p23:3021,p24:3020,p26:3795,p28:3034,p44:3031,p46:3032,p66:3958,
+ t11:3070,tile:3069,t13:63864,t14:2431,t16:6636,t18:4162,t22:3068,t23:26603,t24:87079,t26:69729,t44:1751,grl:2412,jmp:15573,rt:98138,rt22:14769,qt11:25269,mac:27925,st12:85984,ch:54200,s21:3040,s22:3039,inv:3665,cs12:11477,cs14:11153,cs22:15068,cs24:88930,ics:24201,hl:4070,wl:41770,wr:41769});
+const G13_AL={hl:'headlight brick',grl:'grille tile radiator',gb12:'grille profile',jmp:'jumper',ch:'cheese slope',b12s:'snot',b12s4:'snot',br22:'angle plate',br24:'angle plate',br14:'angle plate',br11u:'snot',br11d:'snot',t12hd:'clamp',pbar:'antenna mirror shaft',rp1h:'exhaust lamp'};
+GB_piece=(f=>function(t,c,M,L){const P=GB_PC[t];if(!P||!G13_NEW[t])return f(t,c,M,L);
+ const U=GB_U,W=P.w*U,D=P.d*U,H=P.h*GB_PH,g=.008,col=GB_BC[c]||c,x0=-W/2+g,x1=W/2-g,z0=-D/2+g,z1=D/2-g,PH=GB_PH,dk='#1b1d22';
+ const arc=(cx,cz,r,a0,a1,n)=>{const o=[];for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n;o.push([cx+Math.cos(a)*r,cz+Math.sin(a)*r])}return o};
+ const sst=(x,y,z,s=-1)=>{const q=new THREE.CylinderGeometry(.18,.18,.11,12);q.rotateX(s*Math.PI/2);q.translate(x,y,z+s*.055);M.push(GB_col(q,col))};// a stud facing ±z
+ const bar=(x0_,x1_,y,z,r=.12)=>{const q=new THREE.CylinderGeometry(r,r,x1_-x0_,10);q.rotateZ(Math.PI/2);q.translate((x0_+x1_)/2,y,z);M.push(GB_col(q,col))};
+ const vplate=(xa,xb,ya,yb,nx,ny)=>{M.push(CR_bb(xa,xb,ya,yb,z0,z0+PH,col));for(let i=0;i<nx;i++)for(let j=0;j<ny;j++)sst(xa+(i+.5)*(xb-xa)/nx,ya+(j+.5)*(yb-ya)/ny,z0)};
+ if(t==='t2c')M.push(CR_top([[x0,z0],[x1,z0],[x1,0],[0,0],[0,z1],[x0,z1]],0,H,col));
+ else if(t==='t11h')M.push(CR_top([[x1,z1],[x0,z1],[x0,0]].concat(arc(0,0,W/2-g,Math.PI,2*Math.PI,12)),0,H,col));
+ else if(t==='t12h')M.push(CR_top([[x1,z1],[x0,z1],[x0,z0+U/2]].concat(arc(0,z0+U/2,W/2-g,Math.PI,2*Math.PI,12)),0,H,col));
+ else if(t==='t22c')M.push(CR_top([[x0+U,z0],[x1,z0],[x1,z1],[x0,z1],[x0,z0+U]],0,H,col));
+ else if(t==='t2t')M.push(CR_top([[x1,z0],[x1,z1],[x0,z1]],0,H,col));
+ else if(t==='t12hd'){M.push(CR_bb(x0,x1,0,H,z0,z1,col));for(const z of[z0+.12,z1-.12])M.push(GB_cyl(.07,.16,0,H,z,col,8));const q=new THREE.CylinderGeometry(.075,.075,D-.24,10);q.rotateX(Math.PI/2);q.translate(0,H+.16,0);M.push(GB_col(q,col))}
+ else if(t==='s11d'){M.push(CR_side([[z1,0],[z1,H*.15],[0,H],[z0,H*.15],[z0,0]],x0,x1,col))}
+ else if(t==='inv22'){M.push(CR_side([[z0,H],[z1,H],[z1,0],[z1-.06,0],[z0,H*.62]],x0,x1,col));CR_studs(M,P.w,P.d,H,col)}
+ else if(t==='cs31')M.push(CR_side([[z1,0],[z1,H],['q',z0+D*.35,H,z0,H*.14],[z0,0]],x0,x1,col));
+ else if(t==='s65'){M.push(CR_side([[z1,0],[z1,H],[z1-U*.5,H],[z0,H*.12],[z0,0]],x0,x1,col));CR_studs(M,P.w,1,H,col);for(let i=M.length-P.w*2;i<M.length;i++)M[i].translate(0,0,D/2-U/2-.02)}
+ else if(t==='cwL'||t==='cwR'){const s=t==='cwL'?1:-1,pts=[[x0,z1],[x1,z1],[x1,z0+U*.9],[x0,z0+U*.1]].map(([x,z])=>[x*s,z]);M.push(CR_top(s>0?pts:pts.reverse(),0,PH,col));
+  M.push(CR_side([[z1,PH],[z1,H],['q',z0+D*.4,H,z0+U*.5,PH]],x0,x1,col))}
+ else if(t==='ib22'){M.push(CR_side([[z0,H],[z1,H],[z1,0],['q',z0+D*.2,0,z0,H*.75]],x0,x1,col));CR_studs(M,P.w,P.d,H,col)}
+ else if(t==='wp22'){M.push(CR_top([[x0+U,z0],[x1,z0],[x1,z1],[x0,z1],[x0,z0+U]],0,H,col));CR_studs(M,2,2,H,col,(x,z)=>!(x<0&&z<0))}
+ else if(t==='cp22'){M.push(CR_top([[x0,z0],[x1,z0],[x1,0],[0,0],[0,z1],[x0,z1]],0,H,col));CR_studs(M,2,2,H,col,(x,z)=>!(x>0&&z>0))}
+ else if(t==='pr12'){M.push(CR_top(arc(0,z1-U/2,W/2-g,0,Math.PI,10).concat(arc(0,z0+U/2,W/2-g,Math.PI,2*Math.PI,10)),0,H,col));CR_studs(M,1,2,H,col)}
+ else if(t==='ph12'){M.push(CR_bb(x0,x1,0,H,z0+.1,z1,col));CR_studs(M,2,1,H,col);for(const x of[x0+.08,x1-.08])M.push(GB_box(x-.07,x+.07,.02,H-.02,z0-.1,z0+.12,col));bar(x0+.08,x1-.08,H/2,z0-.06,.075)}
+ else if(t==='br11u'||t==='br11d'){const up=t==='br11u',yb=up?0:H-PH;M.push(CR_bb(x0,x1,yb,yb+PH,z0,z1,col));CR_stud(M,0,yb+PH,0,col);vplate(x0,x1,up?0:.04,up?H:H-PH,1,1)}
+ else if(t==='br22'||t==='br24'||t==='br14'){const yb=0;M.push(CR_bb(-U+g,U-g,yb,yb+PH,z0,z1,col));CR_stud(M,-U/2,PH,0,col);CR_stud(M,U/2,PH,0,col);vplate(x0,x1,0,H,P.w,t==='br14'?1:2)}
+ else if(t==='b12s4'||t==='b12s'){M.push(CR_bb(x0,x1,0,H,z0,z1,col));CR_studs(M,2,1,H,col);for(const x of[-U/2,U/2]){sst(x,H/2,z0);if(t==='b12s4')sst(x,H/2,z1,1)}}
+ else if(t==='gb12'||t==='pb14'){M.push(CR_bb(x0,x1,0,H,z0+.05,z1,col));CR_studs(M,P.w,1,H,col);const n=t==='gb12'?3:1;
+  for(let i=0;i<=n;i++){const y0=n===1?0:i*H/n,y1=n===1?H:y0;if(n===1){M.push(GB_box(x0,x1,0,H*.38,z0,z0+.06,col));M.push(GB_box(x0,x1,H*.62,H,z0,z0+.06,col))}else if(i<n)M.push(GB_box(x0,x1,i*H/n+.05,(i+1)*H/n-.08,z0,z0+.06,col))}}
+ else if(t==='rp1h'){M.push(GB_cyl(W/2-g,H,0,0,0,col,20));const d=new THREE.CircleGeometry(.12,14);d.rotateX(-Math.PI/2);d.translate(0,H+.003,0);M.push(GB_col(d,dk))}
+ else if(t==='pbar'){M.push(CR_bb(x0,x1,0,PH,z0,z1,col));M.push(GB_cyl(.12,H-PH,0,PH,0,col,10))}})(GB_piece);
+// palette tiles for the new parts (the palette was built before this module), sorted into their category
+{const S=$('#gbBkPc');if(S)for(const k in G13_NEW){const P=GB_PC[k];if(S.querySelector(`.gbPc[data-p="${k}"]`))continue;const b=document.createElement('button');b.className='gbPc';b.dataset.p=k;b.dataset.ct=P.cat;b.dataset.n=P.n;b.innerHTML=`<i>${P.ic}</i>${P.n}`;b.style.display=GB_.ct===P.cat?'':'none';
+  const last=[...S.querySelectorAll(`.gbPc[data-ct="${P.cat}"]`)].pop();if(last)last.after(b);else S.appendChild(b)}}
+window.__g13={pc:()=>Object.entries(GB_PC).map(([k,v])=>k+':'+v.n+':'+v.w+'x'+v.d+'x'+v.h+':'+(v.cat||'')).join('|'),turn:G13_turn,ori:t=>G13_ori(t),def:k=>GB_PC[k],search:G13_search,tray:()=>G13_tGet(),tAdd:G13_tAdd,join:G13_join,comps:S=>G13_comps(S).length,st:()=>({held:!!GS.held,sel:SL.sel.length,tool:GB_.tool,n:GB_list().length,q:G13.q,tray:G13.tray,pad:G13.pad,pc:GB_.pc,rot:GB_.rot,giz:!!(G13.giz&&G13.giz.visible)})};

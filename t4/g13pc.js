@@ -1,0 +1,14 @@
+// t4/g13pc.js <url> <outdir>: PC (mouse + keyboard, 1280x720): BUILD → search "tile 1x2" → hover the car → R / T / F / Shift+R turn the ghost →
+// click places it → S select it → T tips it in place → Ctrl+Z. Prints the orientation after each key; shot 13_pc_keys.png
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const p=await (await b.newContext({viewport:{width:1280,height:720}})).newPage();
+ const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});const st=()=>p.evaluate(()=>__g13.st());const out=process.argv[3];
+ await p.goto(process.argv[2]);await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});
+ await p.evaluate(()=>document.querySelector('#gbMenuBtn').click());await p.waitForTimeout(1500);await p.evaluate(()=>document.querySelector('#r2R [data-r2m="build"]').click());await p.waitForTimeout(2500);
+ await p.screenshot({path:out+'/13_pc_build.png'});console.log(await p.evaluate(()=>[!!document.querySelector('#gbBkP .r2BkT'),document.querySelector('#gbx').className,!!document.querySelector('#g13Ch')]));await p.click('#g13Qi');await p.keyboard.type('tile 1x2');await p.waitForTimeout(500);await p.click('#gbBkPc .gbPc[data-p="tile"]');await p.waitForTimeout(300);
+ const c=await p.evaluate(()=>{const r=document.querySelector('#gbC').getBoundingClientRect();return[r.x+r.width*.5,r.y+r.height*.3]});
+ const R={};for(const[x,y]of[[0,0],[0,-30],[40,-20],[-40,-10],[0,20]]){await p.mouse.move(c[0]+x,c[1]+y);await p.waitForTimeout(400);if(await p.evaluate(()=>!!__gb.GB_.hov))break}
+ R.hover=await p.evaluate(()=>__gb.GB_.hov&&__gb.GB_.hov.t);const log=[];for(const k of['r','t','f','Shift+R','Shift+T']){await p.keyboard.press(k);await p.waitForTimeout(300);const s=await st();log.push(k+'→'+s.pc+'/'+s.rot)}R.keys=log;
+ R.hov2=await p.evaluate(()=>__gb.GB_.hov&&(__gb.GB_.hov.t+'/'+__gb.GB_.hov.r));await p.screenshot({path:out+'/13_pc_keys.png'});
+ const n0=await p.evaluate(()=>__gb.list().length);await p.mouse.down();await p.mouse.up();await p.waitForTimeout(600);R.placed=(await p.evaluate(()=>__gb.list().length))-n0;
+ R.last=await p.evaluate(()=>__gb.list().slice(-2).map(b=>b.t+'/'+b.r));console.log(JSON.stringify(R));console.log('ERR',JSON.stringify(errs.filter(e=>!/GPU stall|GL Driver/.test(e)).slice(0,6)));await b.close()})();
