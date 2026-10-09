@@ -51,56 +51,76 @@ function WB_post(){for(const [im,n,nw,ng] of WB.act){const u=im.userData;im.inst
 // they are only switched off for the duration of each render. Collisions are separate boxes (hubAddB) and do not change.
 const WBC={C:320,on:false,objs:[],mobjs:[],cells:new Map(),tpl:new Map(),px:new Map(),near:new Set(),sig:'',st:{lod:0,prox:0,ms:0},mat:null};
 function WB_srgb(c){return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4)}
-function WB_pix(tex){if(!tex||!tex.image)return null;let e=WBC.px.get(tex.uuid);if(e!==undefined)return e;try{const im=tex.image,w=im.width,h=im.height;if(!w||!h)return null;const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);e={w,h,d:x.getImageData(0,0,w,h).data,fy:tex.flipY}}catch(err){e=null}WBC.px.set(tex.uuid,e);return e}
+function WB_pix(tex){if(!tex||!tex.image)return null;let e=WBC.px.get(tex.uuid);if(e!==undefined)return e;try{const im=tex.image,W0=im.width,H0=im.height;if(!W0||!H0)return null;const sc=Math.min(1,256/Math.max(W0,H0)),w=Math.max(1,Math.round(W0*sc)),h=Math.max(1,Math.round(H0*sc));const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,w,h);e={w,h,d:x.getImageData(0,0,w,h).data,fy:tex.flipY,lin:Float32Array.from({length:256},(_,i)=>WB_srgb(i/255))}}catch(err){e=null}WBC.px.set(tex.uuid,e);return e}
 // simplified template of one model at one size: per-triangle positions (local) + linear colour (texel × material colour × vertex colour)
+// vertex clustering with open-addressing hash tables on typed arrays (the Map/Set version cost ~1 µs per source triangle = +3.5 s load)
+const WBH={k:new Float64Array(0),v:new Int32Array(0)};
+function WB_hash(n){let z=1<<Math.ceil(Math.log2(Math.max(64,n*2)));if(WBH.k.length<z){WBH.k=new Float64Array(z);WBH.v=new Int32Array(z)}WBH.k.fill(-1,0,z);return z-1}
 function WB_tpl(geo,mat,cell,nocache){const key=geo.uuid+'|'+mat.uuid+'|'+cell.toFixed(3);let t=nocache?null:WBC.tpl.get(key);if(t)return t;
   const P=geo.attributes.position,U=geo.attributes.uv,C=mat.vertexColors?geo.attributes.color:null,I=geo.index,n=I?I.count:P.count,px=mat.map?WB_pix(mat.map):null,mc=mat.color||new THREE.Color(1,1,1);
-  const cm=new Map(),cs=[],ids=new Int32Array(P.count);for(let i=0;i<P.count;i++){const x=P.getX(i),y=P.getY(i),z=P.getZ(i),k=(Math.floor(x/cell)+4096)+(Math.floor(y/cell)+4096)*8192+(Math.floor(z/cell)+4096)*67108864;let c=cm.get(k);if(c===undefined){c=cs.length>>2;cm.set(k,c);cs.push(0,0,0,0)}c*=4;cs[c]+=x;cs[c+1]+=y;cs[c+2]+=z;cs[c+3]++;ids[i]=c}
-  const pos=[],col=[],seen=new Set();for(let f=0;f+2<n;f+=3){const a=I?I.getX(f):f,b=I?I.getX(f+1):f+1,d=I?I.getX(f+2):f+2,A=ids[a],B=ids[b],D=ids[d];if(A===B||B===D||A===D)continue;
-    const s=A<B?(B<D?A+','+B+','+D:A<D?A+','+D+','+B:D+','+A+','+B):(A<D?B+','+A+','+D:B<D?B+','+D+','+A:D+','+B+','+A);if(seen.has(s))continue;seen.add(s);
-    let r=mc.r,g=mc.g,bb=mc.b;if(px&&U){let u=(U.getX(a)+U.getX(b)+U.getX(d))/3,v=(U.getY(a)+U.getY(b)+U.getY(d))/3;u-=Math.floor(u);v-=Math.floor(v);const X=Math.min(px.w-1,(u*px.w)|0),Y=Math.min(px.h-1,((px.fy?1-v:v)*px.h)|0),o=(Y*px.w+X)*4;r*=WB_srgb(px.d[o]/255);g*=WB_srgb(px.d[o+1]/255);bb*=WB_srgb(px.d[o+2]/255)}
+  const PA=!P.isInterleavedBufferAttribute&&!P.normalized&&P.itemSize===3?P.array:null,IA=I?I.array:null,ic=1/cell;
+  // pass 1: cluster id per corner (corners, not vertices: indexed views may reference few of many vertices)
+  let mask=WB_hash(n),HK=WBH.k,HV=WBH.v,nc=0;const cid=new Int32Array(n),acc=new Float64Array(n*4);
+  for(let f=0;f<n;f++){const i=IA?IA[f]:f,x=PA?PA[i*3]:P.getX(i),y=PA?PA[i*3+1]:P.getY(i),z=PA?PA[i*3+2]:P.getZ(i),ix=Math.floor(x*ic),iy=Math.floor(y*ic),iz=Math.floor(z*ic),k=(ix+4096)+(iy+4096)*8192+(iz+4096)*67108864;
+    let h=((ix*73856093)^(iy*19349663)^(iz*83492791))&mask;while(HK[h]!==-1&&HK[h]!==k)h=(h+1)&mask;let c;if(HK[h]===-1){HK[h]=k;c=HV[h]=nc++}else c=HV[h];
+    cid[f]=c;const o=c*4;acc[o]+=x;acc[o+1]+=y;acc[o+2]+=z;acc[o+3]++}
+  // corners of the same vertex were summed once per use: the mean is still the mean of the cell's corners (weighted by use), fine for a far LOD
+  // pass 2: surviving triangles, deduplicated
+  mask=WB_hash(n/3);HK=WBH.k;const pos=new Float32Array(n*3),col=new Float32Array(n);let nt=0;
+  for(let f=0;f+2<n;f+=3){const A=cid[f],B=cid[f+1],D=cid[f+2];if(A===B||B===D||A===D)continue;let a1=A,b1=B,d1=D,q;if(a1>b1){q=a1;a1=b1;b1=q}if(b1>d1){q=b1;b1=d1;d1=q}if(a1>b1){q=a1;a1=b1;b1=q}
+    const s=(a1*nc+b1)*nc+d1;let h=((a1*73856093)^(b1*19349663)^(d1*83492791))&mask;while(HK[h]!==-1&&HK[h]!==s)h=(h+1)&mask;if(HK[h]===s)continue;HK[h]=s;
+    const a=IA?IA[f]:f,b=IA?IA[f+1]:f+1,d=IA?IA[f+2]:f+2;let r=mc.r,g=mc.g,bb=mc.b;
+    if(px&&U){let u=(U.getX(a)+U.getX(b)+U.getX(d))/3,v=(U.getY(a)+U.getY(b)+U.getY(d))/3;u-=Math.floor(u);v-=Math.floor(v);const X=Math.min(px.w-1,(u*px.w)|0),Y=Math.min(px.h-1,((px.fy?1-v:v)*px.h)|0),o=(Y*px.w+X)*4;r*=px.lin[px.d[o]];g*=px.lin[px.d[o+1]];bb*=px.lin[px.d[o+2]]}
     if(C){r*=(C.getX(a)+C.getX(b)+C.getX(d))/3;g*=(C.getY(a)+C.getY(b)+C.getY(d))/3;bb*=(C.getZ(a)+C.getZ(b)+C.getZ(d))/3}
     if(mat.emissiveMap&&mat.emissiveIntensity){const k=1+mat.emissiveIntensity*.5;r*=k;g*=k;bb*=k}
-    for(const v of[A,B,D])pos.push(cs[v]/cs[v+3],cs[v+1]/cs[v+3],cs[v+2]/cs[v+3]);col.push(r,g,bb)}
-  t={p:new Float32Array(pos),c:new Float32Array(col),n:col.length/3};if(!nocache)WBC.tpl.set(key,t);return t}
+    const o9=nt*9;let w=0;for(const v of[A,B,D]){const o=v*4,m=1/acc[o+3];pos[o9+w]=acc[o]*m;pos[o9+w+1]=acc[o+1]*m;pos[o9+w+2]=acc[o+2]*m;w+=3}col[nt*3]=r;col[nt*3+1]=g;col[nt*3+2]=bb;nt++}
+  t={p:pos.slice(0,nt*9),c:col.slice(0,nt*3),n:nt};if(!nocache)WBC.tpl.set(key,t);return t}
 const WB_skipUD=['keep','lz','sky','a8s','wbLo','cv','trG','trPl','nr','ramp','art6','gb','sim'];
 function WB_cand(o){if(!o.isInstancedMesh||o.count<1||o.frustumCulled===false&&!TUNE.wbNfc||o.instanceMatrix.usage!==THREE.StaticDrawUsage)return false;const m=o.material;if(!m||Array.isArray(m)||!m.isMeshStandardMaterial||m.transparent||m.opacity<1||m.alphaTest>0||m.polygonOffset)return false;
   for(const k of WB_skipUD)if(o.userData[k])return false;if(HUB.cim&&HUB.cim.includes(o))return false;return !!(o.geometry&&o.geometry.attributes.position)}
 function WB_mcand(o,mats){if(!o.isMesh||o.isInstancedMesh||o.frustumCulled===false||Object.keys(o.userData).length)return false;const m=o.material,g=o.geometry;if(!m||Array.isArray(m)||!m.isMeshStandardMaterial||m.transparent||m.opacity<1||m.alphaTest>0)return false;
-  if(!g||!g.attributes.position||g.morphAttributes.position||g.drawRange.start||g.drawRange.count!==Infinity||g.groups.length)return false;return (g.index?g.index.count:g.attributes.position.count)>=36}
+  if(!g||!g.attributes.position||g.morphAttributes.position||g.drawRange.start||g.drawRange.count!==Infinity||g.groups.length)return false;for(const nm in g.attributes)if(!g.attributes[nm].array)return false;if(g.index&&!g.index.array)return false;/* arrays freed after the GPU upload */
+  return (g.index?g.index.count:g.attributes.position.count)>=36}
 // sort a merged (non-indexed) mesh's triangles by cell in place; each cell's run becomes a piece mesh that SHARES the attributes (no copy)
-function WB_split(o,lift){const g=o.geometry,P=g.attributes.position,I=g.index,nt=(I?I.count:P.count)/3|0,e=o.matrixWorld.elements,key=new Float64Array(nt),ord=new Uint32Array(nt);
+function WB_split(o,lift){const T0=performance.now(),Q=WBC.st;const g=o.geometry,P=g.attributes.position,I=g.index,nt=(I?I.count:P.count)/3|0,e=o.matrixWorld.elements,key=new Float64Array(nt),ord=new Uint32Array(nt);
   for(let t=0;t<nt;t++){let x=0,z=0;for(let k=0;k<3;k++){const i=I?I.getX(t*3+k):t*3+k,X=P.getX(i),Y=P.getY(i),Z=P.getZ(i);x+=e[0]*X+e[4]*Y+e[8]*Z+e[12];z+=e[2]*X+e[6]*Y+e[10]*Z+e[14]}key[t]=WB_cellK(x/3,z/3);ord[t]=t}
-  ord.sort((a,b)=>key[a]-key[b]);if(I){const src=I.array.slice();for(let t=0;t<nt;t++){I.array[t*3]=src[ord[t]*3];I.array[t*3+1]=src[ord[t]*3+1];I.array[t*3+2]=src[ord[t]*3+2]}I.needsUpdate=true}else for(const nm in g.attributes){const A=g.attributes[nm];if(A.isInterleavedBufferAttribute)return null;const w=A.itemSize*3,src=A.array.slice();for(let t=0;t<nt;t++)A.array.set(src.subarray(ord[t]*w,ord[t]*w+w),t*w);A.needsUpdate=true}
-  const runs=[];let s0=0;for(let t=1;t<=nt;t++)if(t===nt||key[ord[t]]!==key[ord[s0]]){runs.push([key[ord[s0]],s0*3,(t-s0)*3]);s0=t}
+  Q.sk=(Q.sk||0)+performance.now()-T0;ord.sort((a,b)=>key[a]-key[b]);Q.so=(Q.so||0)+performance.now()-T0;if(I){const src=I.array.slice();for(let t=0;t<nt;t++){I.array[t*3]=src[ord[t]*3];I.array[t*3+1]=src[ord[t]*3+1];I.array[t*3+2]=src[ord[t]*3+2]}I.needsUpdate=true}else for(const nm in g.attributes){const A=g.attributes[nm];if(A.isInterleavedBufferAttribute)return null;const w=A.itemSize*3,src=A.array.slice();for(let t=0;t<nt;t++)A.array.set(src.subarray(ord[t]*w,ord[t]*w+w),t*w);A.needsUpdate=true}
+  Q.pe=(Q.pe||0)+performance.now()-T0;const runs=[];let s0=0;for(let t=1;t<=nt;t++)if(t===nt||key[ord[t]]!==key[ord[s0]]){runs.push([key[ord[s0]],s0*3,(t-s0)*3]);s0=t}
   const out=[],b=new THREE.Box3(),v=new THREE.Vector3();for(const [k,st,cn] of runs){const pg=new THREE.BufferGeometry();for(const nm in g.attributes)pg.setAttribute(nm,g.attributes[nm]);if(I)pg.setIndex(I);pg.setDrawRange(st,cn);b.makeEmpty();for(let i=st;i<st+cn;i++)b.expandByPoint(v.fromBufferAttribute(P,I?I.getX(i):i));pg.boundingBox=b.clone();pg.boundingSphere=b.getBoundingSphere(new THREE.Sphere());
     const m=new THREE.Mesh(pg,o.material);m.position.copy(o.position);m.quaternion.copy(o.quaternion);m.scale.copy(o.scale);m.castShadow=o.castShadow;m.receiveShadow=o.receiveShadow;m.renderOrder=o.renderOrder;m.visible=false;m.userData.keep=1;m.userData.wbM=1;m.raycast=()=>{};o.parent.add(m);
-    // its far version: a temporary view of the run (subarrays, no copy) clustered like the instanced models
-    const tg=new THREE.BufferGeometry();if(I){for(const nm of['position','uv','color'])if(g.attributes[nm])tg.setAttribute(nm,g.attributes[nm]);tg.setIndex(new THREE.BufferAttribute(I.array.subarray(st,st+cn),1))}else for(const nm of['position','uv','color']){const A=g.attributes[nm];if(A)tg.setAttribute(nm,new THREE.BufferAttribute(A.array.subarray(st*A.itemSize,(st+cn)*A.itemSize),A.itemSize,A.normalized))}
-    const tp=WB_tpl(tg,o.material,TUNE.wbLodCell,true);if(lift)for(let i=1;i<tp.p.length;i+=3)tp.p[i]+=lift;out.push({k,m,tpl:tp})}return out}
+    // its far version: built later in the background from the run's CPU arrays (kept by reference: SM_upload drops them from the attributes)
+    const A={};for(const nm of['position','uv','color'])if(g.attributes[nm]){const X=g.attributes[nm];A[nm]=[X.array,X.itemSize,X.normalized]}const IA=I?I.array:null,mat=o.material;
+    out.push({k,m,mk:()=>{const tg=new THREE.BufferGeometry();for(const nm in A){const [arr,sz,nz]=A[nm];tg.setAttribute(nm,IA?new THREE.BufferAttribute(arr,sz,nz):new THREE.BufferAttribute(arr.subarray(st*sz,(st+cn)*sz),sz,nz))}if(IA)tg.setIndex(new THREE.BufferAttribute(IA.subarray(st,st+cn),1));
+      const tp=WB_tpl(tg,mat,TUNE.wbLodCell,true);if(lift)for(let i=1;i<tp.p.length;i+=3)tp.p[i]+=lift;return tp}})}Q.all=(Q.all||0)+performance.now()-T0;return out}
+// loading screen, before SM_upload: sort the merged tiles by cell (~0.2 s) while their CPU arrays still exist
+function WB_cityPrep(){if(!TUNE.wbCity||!TUNE.wbMerged||!HUB||!HUB.grp)return;WB_cityClear();const t0=performance.now();HUB.grp.updateMatrixWorld(true);
+  const mobjs=[],mats=new Set(Object.values(HUB.M||{}).concat(HUB.flatMat||[])),geos=new Map();const walk=o=>{if(o===RO.grp||o.userData.lz||o.userData.keep||o.visible===false&&!o.isMesh)return;if(!WB_cand(o)&&WB_mcand(o,mats)){mobjs.push(o);geos.set(o.geometry,(geos.get(o.geometry)||0)+1)}for(const c of o.children)walk(c)};walk(HUB.grp);
+  const L=[];for(const o of mobjs){if(geos.get(o.geometry)>1)continue;const P=WB_split(o,o.material.polygonOffset||mats.has(o.material)?.25:0);if(P)L.push({o,P})}WBC.prep={grp:HUB.grp,L};WBC.st.tPrep=Math.round(performance.now()-t0)}
 const WB_cellK=(x,z)=>(Math.floor(x/WBC.C)+2048)*4096+(Math.floor(z/WBC.C)+2048);
 // build once per city, inside the loading screen (time-sliced so the bar keeps moving)
-async function WB_cityBuild(a,b){if(!TUNE.wbCity||!HUB||!HUB.grp||WBC.grp===HUB.grp)return;const t0=performance.now();WB_cityClear();WBC.grp=HUB.grp;HUB.grp.updateMatrixWorld(true);
-  const objs=[],mobjs=[],mats=new Set(Object.values(HUB.M||{}).concat(HUB.flatMat||[])),geos=new Map();const walk=o=>{if(o===RO.grp||o.userData.lz||o.userData.keep||o.visible===false&&!o.isMesh)return;if(WB_cand(o))objs.push(o);else if(TUNE.wbMerged&&WB_mcand(o,mats)){mobjs.push(o);geos.set(o.geometry,(geos.get(o.geometry)||0)+1)}for(const c of o.children)walk(c)};walk(HUB.grp);
+async function WB_cityBuild(a,b){if(!TUNE.wbCity||!HUB||!HUB.grp||WBC.built===HUB.grp||WBC.busy)return;WBC.busy=1;try{await WB_cityBuild2(a,b)}finally{WBC.busy=0}}
+// a==null: in-game background build, ~5 ms slices; aborts if the city changes under it
+async function WB_cityBuild2(a,b){const t0=performance.now(),SL=a==null?6:14,grp=HUB.grp,gone=()=>HUB.grp!==grp||!TUNE.wbCity;const yl=async(f)=>{if(a!=null&&typeof ldSet==='function'){ldSet(a+(b-a)*f,'Simplifying far streets');await nextFrame()}else await nextFrame();if(gone())throw 'WBabort';return performance.now()};const prep=WBC.prep&&WBC.prep.grp===grp?WBC.prep:null;WBC.prep=null;WB_cityClear(prep);WBC.grp=grp;WBC.built=grp;grp.updateMatrixWorld(true);
+  const objs=[];const walk=o=>{if(o===RO.grp||o.userData.lz||o.userData.keep||o.visible===false&&!o.isMesh)return;if(WB_cand(o))objs.push(o);for(const c of o.children)walk(c)};walk(grp);
   const M=new THREE.Matrix4(),W=new THREE.Matrix4(),col=new THREE.Color();let tt=performance.now();
   for(const o of objs){const n=o.count,ck=new Float64Array(n),e={o,ck,ver:o.instanceMatrix.version,P:null,nc:0,cells:new Set()};
     for(let j=0;j<n;j++){o.getMatrixAt(j,M);W.multiplyMatrices(o.matrixWorld,M);const el=W.elements,s=Math.hypot(el[0],el[1],el[2]);if(s<1e-4){ck[j]=-1;continue}const k=WB_cellK(el[12],el[14]);ck[j]=k;e.cells.add(k);
       let c=WBC.cells.get(k);if(!c){const cx=Math.floor(el[12]/WBC.C)*WBC.C,cz=Math.floor(el[14]/WBC.C)*WBC.C;c={k,x0:cx,z0:cz,objs:new Set(),items:[],lod:null};WBC.cells.set(k,c)}c.objs.add(e);
       const cell=TUNE.wbLodCell/s;if(o.instanceColor)o.getColorAt(j,col);else col.setRGB(1,1,1);c.items.push([WB_tpl(o.geometry,o.material,Math.pow(2,Math.round(Math.log2(cell)*4)/4)),W.clone(),col.r,col.g,col.b])}
-    WBC.objs.push(e);if(performance.now()-tt>14){ldSet&&ldSet(a+(b-a)*.5*WBC.objs.length/objs.length,'Simplifying far streets');await nextFrame();tt=performance.now()}}
+    WBC.objs.push(e);if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.4*WBC.objs.length/objs.length)}
   WBC.st.tI=Math.round(performance.now()-t0);const getC=(k,x,z)=>{let c=WBC.cells.get(k);if(!c){c={k,x0:Math.floor(x/WBC.C)*WBC.C,z0:Math.floor(z/WBC.C)*WBC.C,objs:new Set(),items:[],lod:null};WBC.cells.set(k,c)}return c};
-  for(const o of mobjs){if(geos.get(o.geometry)>1)continue;const L=WB_split(o,o.material.polygonOffset||mats.has(o.material)?.25:0);if(!L)continue;const e={o,mesh:1,pcs:L.map(q=>[q.k,q.m]),cells:new Set()};
-    for(const q of L){const kx=Math.floor(q.k/4096)-2048,kz=q.k%4096-2048,c=getC(q.k,kx*WBC.C+1,kz*WBC.C+1);c.objs.add(e);e.cells.add(q.k);c.items.push([q.tpl,o.matrixWorld.clone(),1,1,1])}
-    WBC.mobjs.push(e);if(performance.now()-tt>14){ldSet&&ldSet(a+(b-a)*.5,'Simplifying far streets');await nextFrame();tt=performance.now()}}
+  for(const {o,P:L} of prep?prep.L:[]){const e={o,mesh:1,pcs:L.map(q=>[q.k,q.m]),cells:new Set()};
+    for(const q of L){const kx=Math.floor(q.k/4096)-2048,kz=q.k%4096-2048,c=getC(q.k,kx*WBC.C+1,kz*WBC.C+1);c.objs.add(e);e.cells.add(q.k);c.items.push([q.mk(),o.matrixWorld.clone(),1,1,1]);q.mk=null;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5)}
+    WBC.mobjs.push(e)}
   WBC.st.tM=Math.round(performance.now()-t0);WBC.mat=WBC.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.75,metalness:.05});let i=0;
   for(const c of WBC.cells.values()){let nt=0;for(const it of c.items)nt+=it[0].n;if(nt){const p=new Float32Array(nt*9),nn=new Int8Array(nt*9),cc=new Uint8Array(nt*9),v=new THREE.Vector3(),q=new THREE.Vector3(),r=new THREE.Vector3();let o=0;
       for(const [t,Wm,cr,cg,cb] of c.items){const el=Wm.elements;for(let f=0;f<t.n;f++){for(let k=0;k<3;k++){const s=f*9+k*3,x=t.p[s],y=t.p[s+1],z=t.p[s+2];p[o+k*3]=el[0]*x+el[4]*y+el[8]*z+el[12];p[o+k*3+1]=el[1]*x+el[5]*y+el[9]*z+el[13];p[o+k*3+2]=el[2]*x+el[6]*y+el[10]*z+el[14]}
         v.set(p[o+3]-p[o],p[o+4]-p[o+1],p[o+5]-p[o+2]);q.set(p[o+6]-p[o],p[o+7]-p[o+1],p[o+8]-p[o+2]);r.crossVectors(v,q).normalize();const R8=Math.round(r.x*127),G8=Math.round(r.y*127),B8=Math.round(r.z*127),c0=Math.min(255,Math.round(t.c[f*3]*cr*255)),c1=Math.min(255,Math.round(t.c[f*3+1]*cg*255)),c2=Math.min(255,Math.round(t.c[f*3+2]*cb*255));for(let k=0;k<3;k++){nn[o+k*3]=R8;nn[o+k*3+1]=G8;nn[o+k*3+2]=B8;cc[o+k*3]=c0;cc[o+k*3+1]=c1;cc[o+k*3+2]=c2}o+=9}}
       const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('normal',new THREE.BufferAttribute(nn,3,true));g.setAttribute('color',new THREE.BufferAttribute(cc,3,true));g.computeBoundingSphere();
-      const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;HUB.grp.add(m);c.lod=m;WBC.st.lodT=(WBC.st.lodT||0)+nt}
-    c.items=null;if(performance.now()-tt>14){ldSet&&ldSet(a+(b-a)*(.5+.5*++i/WBC.cells.size),'Simplifying far streets');await nextFrame();tt=performance.now()}else i++}
+      const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);c.lod=m;WBC.st.lodT=(WBC.st.lodT||0)+nt}
+    c.items=null;i++;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5+.5*i/WBC.cells.size)}
   WBC.on=true;WBC.sig='';WBC.st.ms=Math.round(performance.now()-t0);WBC.st.objs=WBC.objs.length;WBC.st.mobjs=WBC.mobjs.length;WBC.st.cells=WBC.cells.size}
-function WB_cityClear(){for(const c of WBC.cells.values())if(c.lod){c.lod.removeFromParent();c.lod.geometry.dispose()}for(const e of WBC.objs)if(e.P){e.P.removeFromParent();e.P.dispose()}for(const e of WBC.mobjs)for(const [,m] of e.pcs)m.removeFromParent();WBC.cells.clear();WBC.objs=[];WBC.mobjs=[];WBC.tpl.clear();WBC.on=false;WBC.grp=null}
+function WB_cityClear(keep){if(WBC.prep&&WBC.prep!==keep){for(const {P} of WBC.prep.L)for(const q of P)q.m.removeFromParent();WBC.prep=null}for(const c of WBC.cells.values())if(c.lod){c.lod.removeFromParent();c.lod.geometry.dispose()}for(const e of WBC.objs)if(e.P){e.P.removeFromParent();e.P.dispose()}for(const e of WBC.mobjs)for(const [,m] of e.pcs)m.removeFromParent();WBC.cells.clear();WBC.objs=[];WBC.mobjs=[];WBC.tpl.clear();WBC.on=false;WBC.grp=null;WBC.built=null}
 // near proxy of one original: only its instances in near cells (rebuilt when the near set changes or the game rewrote the original)
 const WB_M=new THREE.Matrix4(),WB_Cl=new THREE.Color();
 function WB_prox(e){const o=e.o;let n=0;for(let j=0;j<o.count;j++)if(e.ck[j]>=0&&WBC.near.has(e.ck[j]))n++;e.ver=o.instanceMatrix.version;e.nc=n;if(!n){if(e.P)e.P.count=0;return}
@@ -123,7 +143,9 @@ const WBF={L:[],t:0,h:[]};function WB_figPre(cam){WBF.h.length=0;const D=TUNE.wb
   const cx=cam.matrixWorld.elements[12],cz=cam.matrixWorld.elements[14],D2=D*D;for(const g of WBF.L){if(!g.visible)continue;const e=g.matrixWorld.elements;if((e[12]-cx)**2+(e[14]-cz)**2>D2){g.visible=false;WBF.h.push(g)}}}
 function WB_figPost(){for(const g of WBF.h)g.visible=true;WBF.h.length=0}
 function WB_cityPost(){if(!WBC_v.length)return;const L=WBC.objs,n=L.length,M=WBC.mobjs;for(let i=0;i<n&&i<WBC_v.length;i++)L[i].o.visible=WBC_v[i];for(let i=0;i<M.length&&n+i<WBC_v.length;i++)M[i].o.visible=WBC_v[n+i];WBC_v.length=0}
-{const ob=scene.onBeforeRender,oa=scene.onAfterRender;scene.onBeforeRender=function(...a){try{WB_pre(...a)}catch(e){WB.act.length=0;console.warn('WB',e)}try{if(a[2]&&a[2].isPerspectiveCamera)WB_cityPre(a[2])}catch(e){WB_cityPost();console.warn('WBC',e)}try{if(a[2]&&a[2].isPerspectiveCamera)WB_figPre(a[2])}catch(e){WB_figPost()}return ob.apply(this,a)};
+{const ob=scene.onBeforeRender,oa=scene.onAfterRender;scene.onBeforeRender=function(...a){try{WB_pre(...a)}catch(e){WB.act.length=0;WB.err=String(e)+(e.stack||'').slice(0,300);console.warn('WB',e)}try{if(a[2]&&a[2].isPerspectiveCamera)WB_cityPre(a[2])}catch(e){WB_cityPost();console.warn('WBC',e)}try{if(a[2]&&a[2].isPerspectiveCamera)WB_figPre(a[2])}catch(e){WB_figPost()}return ob.apply(this,a)};
  scene.onAfterRender=function(...a){try{WB_post()}catch(e){}try{WB_cityPost()}catch(e){}try{WB_figPost()}catch(e){}return oa.apply(this,a)}}
-{const _lp=ldPrewarm;ldPrewarm=async function(a,b){try{await WB_cityBuild(a,a+(b-a)*.4)}catch(e){console.warn('WBC build',e);try{WB_cityClear()}catch(_){}}return _lp.call(this,a+(b-a)*.4,b)}}
-window.__wb={WB,WBC};
+{const _lp=ldPrewarm;ldPrewarm=async function(...a){try{WB_cityPrep()}catch(e){console.warn('WBC prep',e);try{WB_cityClear()}catch(_){}}return _lp.apply(this,a)}}
+{const _rp=roamPost;roamPost=function(...a){const r=_rp.apply(this,a);setTimeout(()=>{WB_cityBuild(null).catch(e=>{WBC.err=String(e)+' '+(e&&e.stack||'').slice(0,400);if(e!=='WBabort')console.warn('WBC build',e);try{WB_cityClear()}catch(_){}})},1500);return r}}
+// tests: __wb.fast() finishes a running/pending background build without yielding (headless frames are ~300 ms each)
+window.__wb={WB,WBC,fast:()=>{WBC.fast=1;return new Promise(r=>{const t=performance.now(),w=()=>WBC.on||WBC.err||performance.now()-t>120000?r(WBC.st):setTimeout(w,50);w()})}};
