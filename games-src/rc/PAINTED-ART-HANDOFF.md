@@ -35,7 +35,7 @@ The prompts are in laptop `game-assets/cards/shipwreck/*.json`.
   - `back-cross` and `back-lifeboat`, the campaign `cardback` unlocks.
   - `table-beach` (the new default table), plus `table-temple-ruins` and `table-homestead` (the `table` unlocks).
   - `title`, `end-win` and `end-lose`.
-- Still missing: `title-phone` and `table-beach-phone` (Flow keeps failing 9:16); crop the desktop versions for now.
+- Phone versions added (2026-10-09): `media/title-phone.webp` (744×1334) and `media/table-beach-phone.webp` (768×1376, calm driftwood centre).
 - Page size: keep loading these as separate files, as part 1 does. The page is already about 4 MB.
 
 ## Music
