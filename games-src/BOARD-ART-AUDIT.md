@@ -12,6 +12,7 @@ Which play surfaces are still the old CSS/SVG/canvas placeholders, what is alrea
 | Kaiten Kitchen | `media/title-phone.webp` unused (title is embedded `KK_ART.title`, `:7675`). | Portrait title. |
 | Short Fuse | `media/title-phone.webp` unused (only `title.webp`, `:5461`). | Portrait title. |
 | Final Approach | `media/title-phone.webp` unused. No default table file: the Pixi plate is the procedural stand-in (`src/ui7.js:35`). | Portrait title; default table (being painted, below). |
+| Shelf (`games-src/suite/src.html`, built `games/index.html`) | Painted app icon replaces `games/icons/icon-180/192/512(-maskable).png` (same names: works as is). New `icons/favicon-32.png` and `icons/share.jpg` (1200×630) are not linked yet. | Add `<link rel="icon" href="icons/favicon-32.png" sizes="32x32">`, `og:image` / `twitter:image` = absolute URL of `icons/share.jpg` (+ `og:image:width` 1200, `height` 630, `twitter:card` `summary_large_image`). Painted box covers already replaced `games/covers/<id>.jpg` in place (Nebula still to come). |
 | Crown City Smash, Nebula Aces, Sunglaze, Tidewake | No loader reads `media/table-*`, `back-*`, `title*`, `end-*` at all. | Port the loader from `cauldron-fair/src/ui12.js:34,103` / `lantern-dive/game/src/ui2.js:23`; `campaign.json` portraits drop in via `artBase`. |
 
 ## 2. Being painted on the laptop now (queued in Google Flow; pushed per game when done)
