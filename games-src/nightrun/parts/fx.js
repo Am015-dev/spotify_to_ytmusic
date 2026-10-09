@@ -14,12 +14,12 @@ const FXV={
     ctx.restore();},
   ring(t){                                               // the pulse: a ring closes onto the ship and meets the target ring ON the beat; it turns white inside the on-beat window
     if(SET.cue==='off')return;const K=CUE[SET.cue],T=tierOf(C.n),rdy=P.dashCd<=0,dr=PW.on('drum');
-    const col=!rdy?'#8c86b8':T>1?TIERC[T-1]:dr?'#ffe14d':'#19e3ff',r0=22*K+4,r1=r0+50*K*(1-PHF),dtMs=(PHF<.5?PHF:PHF-1)*BT.spb*1000,inWin=SET.all||Math.abs(dtMs)<=winMs();
+    const col=!rdy?'#8c86b8':T>1?TIERC[T-1]:dr?'#ffe14d':'#19e3ff',m=HUDMIN(),r0=(m?15:22)*K+4,r1=r0+(m?34:50)*K*(1-PHF),dtMs=(PHF<.5?PHF:PHF-1)*BT.spb*1000,inWin=SET.all||Math.abs(dtMs)<=winMs();
     if(rdy&&!this.rdy)this.rf=.3;this.rdy=rdy;this.rf=Math.max(0,this.rf-FD);
     ctx.save();ctx.lineCap='round';
-    ctx.strokeStyle=col;ctx.globalAlpha=.4+.3*PUL;ctx.lineWidth=2.5*Math.max(.8,K);ctx.beginPath();ctx.arc(P.x,P.y,r0,0,7);ctx.stroke();          // target
-    ctx.strokeStyle=inWin&&rdy?'#ffffff':col;ctx.globalAlpha=Math.min(1,.3+.7*PHF+.4*PUL);ctx.lineWidth=(2+4*PHF)*Math.max(.8,K)+(inWin&&rdy?2:0);ctx.beginPath();ctx.arc(P.x,P.y,r1,0,7);ctx.stroke();   // closing ring
-    if(PUL>.04||this.rf>0){ctx.globalCompositeOperation='lighter';G_(P.x,P.y,r0*2.4,col,Math.min(1,(.55*PUL+(this.rf>0?.5:0))*[.3,.6,1][SET.flash]));}
+    ctx.strokeStyle=col;ctx.globalAlpha=m?.16+.14*PUL:.4+.3*PUL;ctx.lineWidth=(m?1.4:2.5)*Math.max(.8,K);ctx.beginPath();ctx.arc(P.x,P.y,r0,0,7);ctx.stroke();          // target
+    ctx.strokeStyle=inWin&&rdy?'#ffffff':col;ctx.globalAlpha=m?Math.min(.8,.15+.55*PHF*PHF+.2*PUL):Math.min(1,.3+.7*PHF+.4*PUL);ctx.lineWidth=m?(1.2+2*PHF)*Math.max(.8,K)+(inWin&&rdy?1:0):(2+4*PHF)*Math.max(.8,K)+(inWin&&rdy?2:0);ctx.beginPath();ctx.arc(P.x,P.y,r1,0,7);ctx.stroke();   // closing ring
+    if(!m&&(PUL>.04||this.rf>0)){ctx.globalCompositeOperation='lighter';G_(P.x,P.y,r0*2.4,col,Math.min(1,(.55*PUL+(this.rf>0?.5:0))*[.3,.6,1][SET.flash]));}
     ctx.restore();},
   bullets(){                                             // dark rim + bright body + white core: readable on every backdrop (high contrast: bigger, with a white halo)
     if(!G.eb.length)return;const hc=SET.hc;

@@ -1,12 +1,5 @@
 {
- "fails": [
-  {
-   "tag": "difficulty",
-   "kind": "balance",
-   "detail": "Hard: the dodging bot must die and lose hull: [{\"died\":0.5,\"t\":112.38333333333333,\"hits\":3.6666666666666665},{\"died\":0.16666666666666666,\"t\":103.5,\"hits\":2.1666666666666665}]",
-   "shot": ""
-  }
- ],
+ "fails": [],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -18,53 +11,7 @@
   "pits": 0,
   "econ": [],
   "shopChecks": 0,
-  "diff": {
-   "easy/idle": {
-    "died": 1,
-    "t": 19,
-    "hits": 5
-   },
-   "easy/careless": {
-    "died": 1,
-    "t": 90.21666666666668,
-    "hits": 5
-   },
-   "easy/natural": {
-    "died": 0.16666666666666666,
-    "t": 113.38333333333333,
-    "hits": 1.6666666666666667
-   },
-   "normal/idle": {
-    "died": 1,
-    "t": 17.183333333333334,
-    "hits": 5
-   },
-   "normal/careless": {
-    "died": 1,
-    "t": 88.13333333333334,
-    "hits": 5
-   },
-   "normal/natural": {
-    "died": 0.16666666666666666,
-    "t": 103.5,
-    "hits": 2.1666666666666665
-   },
-   "hard/idle": {
-    "died": 1,
-    "t": 12.233333333333334,
-    "hits": 5
-   },
-   "hard/careless": {
-    "died": 1,
-    "t": 41.15,
-    "hits": 5
-   },
-   "hard/natural": {
-    "died": 0.5,
-    "t": 112.38333333333333,
-    "hits": 3.6666666666666665
-   }
-  }
+  "sChecks": 63
  },
  "avg": 0
 }

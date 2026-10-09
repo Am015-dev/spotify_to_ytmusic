@@ -36,7 +36,7 @@ const todayN=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
-const DEFS={music:.45,sfx:.8,master:1,duck:true,mute:false,diff:'normal',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
+const DEFS={music:.45,sfx:.8,master:1,duck:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
   part:1,shake:2,flash:RM?1:2,rm:RM,hc:false,pal:'neon',q:'M',fps:60,fpsc:false};
 const SET=Object.assign({},DEFS,load('mnr_set',{}));
 if(!SET.v3){SET.v3=1;if(SET.guide===false)SET.cue='off';if(SET.reduce){SET.rm=true;SET.flash=1;}SET.part=1;SET.music=Math.min(SET.music,.45);   // older saves: calm visuals everywhere, music under the effects

@@ -1197,7 +1197,7 @@ async function settingsTests(browser, cfg) {
   try {
     const open = async () => { await press(p, cfg, T, '#setBtn'); await sleep(250); };
     await open(); const rows = await ev(p, () => ({ groups: [...document.querySelectorAll('#setBody h3')].map(h => h.textContent), seg: document.querySelectorAll('#setBody .seg').length, sl: document.querySelectorAll('#setBody input[type=range]').length }));
-    await chk(rows.groups.join() === 'Gameplay,Controls,Rhythm,Audio,Visuals,Accessibility' && rows.seg === 19 && rows.sl === 5, 'settings', 'groups/rows ' + JSON.stringify(rows));
+    await chk(rows.groups.join() === 'Gameplay,Controls,Rhythm,Audio,Visuals,Accessibility' && rows.seg === 20 && rows.sl === 5, 'settings', 'groups/rows ' + JSON.stringify(rows));
     for (const b of (await ev(p, () => window.__bot.probe().bad))) await fail(p, tag, 'layout', 'settings ' + b);
     // press real controls (scrolled into view first, then touched or clicked like a player)
     const hit = async (k, i) => { const sel = `#setBody .seg[data-k="${k}"] button:nth-of-type(${i + 1})`; await ev(p, sel => document.querySelector(sel).scrollIntoView({ block: 'center' }), sel); await sleep(60); await press(p, cfg, T, sel); await sleep(70); };

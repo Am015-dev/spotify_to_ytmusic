@@ -64,8 +64,6 @@ ART.paintBG=(bg,t,scroll)=>{const D=bg.D,di=DISTRICTS.indexOf(D);bg._p=false;if(
   const far=ART.bm['ly-far-'+n],mid=ART.strip('ly-mid-'+n,310),nr=ART.strip('ly-near-'+D.near,130);if(!far||!mid||!nr)return false;
   const so=(scroll*.03)%(2*W);ctx.globalAlpha=1;
   for(let j=Math.floor(so/W);j*W-so<W;j++){const x=j*W-so;if(j&1){ctx.save();ctx.translate(x+W,0);ctx.scale(-1,1);ctx.drawImage(sky.c,0,0,W,H);ctx.restore();}else ctx.drawImage(sky.c,x,0,W,H);}
-  ctx.save();ctx.globalAlpha=.1;ctx.font='700 46px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;
-  const adw=(bg.adw||(bg.adw=ctx.measureText(D.ad).width))+400;ctx.fillText(D.ad,W-((scroll*.06)%(adw+W)),84);ctx.restore();
   ART.tiles(mid,H-30-mid.h,scroll,.3,.88);
   const hz=bg.hzG||(bg.hzG=(()=>{const q=ctx.createLinearGradient(0,H-220,0,H);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'38');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
   ART.tiles(nr,H-nr.h,scroll,1.1,.92);bg._p=true;return true;};

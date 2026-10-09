@@ -96,7 +96,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     mk(x,y,1,0);
     if(s==='ec'){G.delayed.push({t:BT.spb,f:()=>{if(G.dead||!running)return;mk(P.x+22,P.y+2,.8,1);AU.sfx('shot');}});}},
   // ----- HUD (canvas): Neon counter, upgrade icons, shield / dash pips -----
-  ring(c,t){if(this.sh>0&&!G.dead){c.save();c.strokeStyle='#19e3ff';c.globalAlpha=.55+.25*Math.sin(t*6);c.lineWidth=2;c.beginPath();c.arc(P.x,P.y,26,0,7);c.stroke();c.restore();}},
+  ring(c,t){if(this.sh>0&&!G.dead){c.save();c.strokeStyle='#19e3ff';c.globalAlpha=HUDMIN()?.2+.1*Math.sin(t*6):.55+.25*Math.sin(t*6);c.lineWidth=HUDMIN()?1.2:2;c.beginPath();c.arc(P.x,P.y,HUDMIN()?22:26,0,7);c.stroke();c.restore();}},
   // L: where the pieces go (landscape default or the portrait HUD)
   hud(c,t,L){L=L||{nx:24,ny:57,dx:214,dy:H-30,sx:18,sy:H-34,ring:true};const f=this.flash>0?1+this.flash:1,k=L.k||1;
     c.save();c.translate(L.nx,L.ny);c.scale(.5*f*k,.5*f*k);c.translate(-12,-12);c.fillStyle='#19e3ff';c.fill(path2(NEON_D));c.restore();
