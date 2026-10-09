@@ -1,0 +1,25 @@
+[
+ {
+  "i": 0,
+  "x": -1,
+  "z": -276,
+  "h": -2.86,
+  "len": 18,
+  "hgt": 3.5,
+  "w": 10,
+  "y0": 9,
+  "dk": true,
+  "col": 16764163,
+  "appBlk": [],
+  "bodyBlk": [],
+  "landBlk": [],
+  "kerb": 0.16,
+  "roadPct": 0,
+  "tag": "longjump",
+  "launched": true,
+  "maxAir": 15.9,
+  "vLip": 97,
+  "hits": 0,
+  "minD": 0
+ }
+]

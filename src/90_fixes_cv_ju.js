@@ -27,7 +27,7 @@ function OB_touch(px,pz,r,ox=RO.x,oz=RO.z,oh=RO.h){const dx=px-ox,dz=pz-oz,s=Mat
   const qa=Math.max(0,Math.abs(a)-OB_HL),qb=Math.max(0,Math.abs(b)-OB_HW);const g=Math.hypot(qa,qb),ok=g<r+.25;if(ok)OB.hit={k:'prop',f:OB.fr};else OB.pm.add(px*7919+pz);return ok||OB.off}
 function OB_obb(ax,az,ah,aw,al,bx,bz,bh,bw,bl){const A=[[Math.sin(ah),Math.cos(ah)],[Math.cos(ah),-Math.sin(ah)]],B=[[Math.sin(bh),Math.cos(bh)],[Math.cos(bh),-Math.sin(bh)]],d=[bx-ax,bz-az];
   for(const u of[...A,...B]){const ra=al*Math.abs(A[0][0]*u[0]+A[0][1]*u[1])+aw*Math.abs(A[1][0]*u[0]+A[1][1]*u[1]),rb=bl*Math.abs(B[0][0]*u[0]+B[0][1]*u[1])+bw*Math.abs(B[1][0]*u[0]+B[1][1]*u[1]);if(Math.abs(d[0]*u[0]+d[1]*u[1])>ra+rb+.2)return false}return true}
-const OB_cdim=k=>{const n=HCAR[k]||'';return n==='#troll'?[1.4,6]:n==='#scoot'?[.5,1.1]:/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]};
+const OB_cdim=k=>{const n=HCAR[k]||'';return n==='#troll'||n==='bus'?[1.4,6]:n==='#scoot'?[.5,1.1]:/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]};
 function OB_car(x,z,dx,dz,c){const k=c.k,[w,l]=OB_cdim(k),r=OB_obb(RO.x,RO.z,RO.h,OB_HW,OB_HL,x,z,Math.atan2(dx,dz),w,l);if(r)OB.hit={k:'car',f:OB.fr};else OB.cm.add(c);return r||OB.off}
 function OB_carP(k,P){const N=HUB.nodes,A=N[k.a],B=N[k.b];const h=A&&B?Math.atan2(B.x-A.x,B.z-A.z):0;const[w,l]=OB_cdim(k.k);return OB_obb(P.x,P.z,P.h??RO.h,OB_HW,OB_HL,k.x,k.z,h,w,l)}
 OB.cm=new Set();OB.pm=new Set();OB.fr=0;
@@ -317,7 +317,7 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
         if(go)for(const o of res.keys()){if(o===c||same(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
         if(go&&d<6)res.set(c,CV.t);else if(!go)vm=Math.sqrt(10*Math.max(0,d-3.2))}}
       else{vm=Math.min(vm,6+Math.max(0,d)*.6);const o=J.of===CV.fr?J.oc.find(o=>o!==c&&Math.abs(o.CVhx*c.CVhx+o.CVhz*c.CVhz)<.7):null;if(o&&d>2&&(c.CVw=(c.CVw||0)+dt)<4)vm=Math.min(vm,Math.sqrt(10*Math.max(0,d-3.2)));else if(!o)c.CVw=0}}
-    if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng);if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
+    if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
     if(!g){c.CVp=0;if(!J&&!In)c.CVx=null}
     const Jb=In&&In.sig?In:J;if(Jb&&Jb.sig&&(In===Jb||Jb.res&&Jb.res.has(c))){const R=Jb.res,pc=R&&R.has(c)?R.get(c):1e9;let hold=0;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);
       for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,dd=Math.hypot(rx,rz);if(dd>8)continue;const al=rx*c.CVhx+rz*c.CVhz;if(al<-.5)continue;

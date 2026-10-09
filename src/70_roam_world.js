@@ -61,7 +61,7 @@ function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(cam
     if(!N[c.b]||!N[c.a]){c.a=Math.floor(R()*N.ng);c.b=N[c.a].nb[0]??c.a;c.t=0;continue}const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;
     // brake behind the player
     const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt);
-    c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a);if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
+    c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
     // v88u perf: cars > 250 m away get their pose (ground probe, suspension, matrix) every 4th frame only; they still move every frame
     if(TUNE.lvLod&&c.dead<=0&&!c.route&&!c.pk&&(HUB.fr+c.j+c.k)%4&&(c.x-RO.x)**2+(c.z-RO.z)**2>62500)continue;
     const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*c.lane,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
@@ -125,9 +125,9 @@ function rfCheckpoints(m,river){if(river)return[850,650,480,280,120,-150].map(e=
 
 const markKey=m=>m.dyn?'enc:'+m.uid:m.kind==='flight'?'flight':m.kind==='garage'?(m.id&&m.id!=='g_city'?m.id:'garage'):m.kind==='season'?'season':m.kind==='rival'||m.kind==='boss'?m.ev.p:m.kind==='challenge'?m.ev.id:m.kind==='mode'?m.ev.k:m.ev.id;
 let RAMPT=null;function addRamp(x,z,h,len,hgt,w,col,Y0){if(!RAMPT){const[c,g2]=cv(128,128);g2.fillStyle='#1b1c22';g2.fillRect(0,0,128,128);g2.fillStyle='#ffffff';for(let k=-128;k<256;k+=32){g2.beginPath();g2.moveTo(k,0);g2.lineTo(k+16,0);g2.lineTo(k+16-128,128);g2.lineTo(k-128,128);g2.fill()}RAMPT=tex(c);RAMPT.wrapS=RAMPT.wrapT=THREE.RepeatWrapping;RAMPT.repeat.set(2,3);KEEP_TEX.add(RAMPT)}
-  const y0=Y0??groundY(x,z),g=new THREE.Mesh(new THREE.BoxGeometry(w,.6,Math.hypot(len,hgt)),new THREE.MeshStandardMaterial({color:col||0xffcd03,map:RAMPT,roughness:.45,metalness:.1,emissive:new THREE.Color(col||0xffcd03),emissiveIntensity:.15}));
+  const y0=Y0??Math.min(groundY(x,z),groundY(x-Math.sin(h)*len/2,z-Math.cos(h)*len/2))/* v88z: the lip sits on the ground at the low end (was the centre's height: up to 2.2 m floating step on slopes) */,g=new THREE.Mesh(new THREE.BoxGeometry(w,.6,Math.hypot(len,hgt)),new THREE.MeshStandardMaterial({color:col||0xffcd03,map:RAMPT,roughness:.45,metalness:.1,emissive:new THREE.Color(col||0xffcd03),emissiveIntensity:.15}));
   g.position.set(x,y0+hgt/2,z);g.rotation.set(-Math.atan2(hgt,len),h,0,'YXZ');g.castShadow=g.receiveShadow=true;g.userData.ramp=1;RO.grp.add(g);for(const sd of[-1,1]){const st=new THREE.Mesh(new THREE.BoxGeometry(.35,.35,Math.hypot(len,hgt)),neonMat('#ffffff',1.2));st.userData.ramp=1;st.position.set(x+Math.cos(h)*sd*w/2,y0+hgt/2+.35,z-Math.sin(h)*sd*w/2);st.rotation.copy(g.rotation);RO.grp.add(st)}
-  RO.ramps.push({x,z,h,len,hgt,w,y0,dk:Y0!=null})}
+  RO.ramps.push({x,z,h,len,hgt,w,y0,dk:Y0!=null,col:col||0xffcd03})}
 // 30 Athens golden bricks: hill tops (Lycabettus, the Acropolis plateau x3, Philopappou, Strefi, Ardittos, Areopagus, Tourkovounia), squares, parks, Plaka, Gazi, Koukaki, Chalandri, Psychiko and halfway up the Lycabettus road
 function athGbSpots(){const A=athGbSpots0().map((s,i)=>[s[0],s[1],s[2],i]);return SM_ON?A:A.filter(s=>athIn(ATHD,...RW(s[0],s[1])))}
 function athGbSpots0(){const out=[],add=(x,z)=>{for(let k=0;k<50;k++){const a=k*2.4,r=k*2,px=x+Math.cos(a)*r,pz=z+Math.sin(a)*r,gy=groundY(px,pz);if(!roamHit(px,pz,3.5,gy+1)&&!lzHit(px,pz,3.5)){out.push([px,pz,gy+2.5]);return}}out.push([x,z,groundY(x,z)+2.5])};
