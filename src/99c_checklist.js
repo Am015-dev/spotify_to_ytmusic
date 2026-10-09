@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89h',id:'ath-take2',text:'Athens: stop near traffic, get out and walk up to a car that stops for you (walk round a scooter if one is in front): 🚗 TAKE appears and you drive off with ★1.'},
+ {ver:'v89h',id:'ath-fill',text:'Athens: drive 1 to 1.5 km out from the centre and look between the streets: blocks have windows and balconies, no long blank grey or beige walls.'},
+ {ver:'v89h',id:'pin-yield',text:'Phone: at the story start Oma Hilde\'s tip is fully readable, and tapping ❚❚ shows the whole PAUSE card (RESUME not covered). The checklist bar comes back afterwards.'},
  {ver:'v89g',id:'ro_start',text:'RACE → Riverbank Rally (or Coast Rally in Athens). You start 8th at the back: you see the whole field ahead on a wide open course, and the big 8TH top-left changes as you pass cars.'},
  {ver:'v89g',id:'ro_route',text:'At a fork, follow the orange arrows onto the dirt SHORTCUT (you turn into a 4×4), or the blue arrows into the water lane (you turn into a boat). Both feel faster than the road.'},
  {ver:'v89g',id:'ro_jump',text:'Jump the creek (Frankfurt) or the olive crest (Athens) at full speed: you fly over and land on the far side.'},
@@ -191,6 +194,16 @@ const OD_CHECKLIST=[
 #odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
 #odPin .pv{display:flex;flex-direction:column;gap:2px}#odPin .pv button{width:28px;min-height:21px;height:21px;font-size:15px;line-height:1}
 #odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}
-body.ckOn #odPin{display:none}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
+body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:none!important}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
  setInterval(pinR,700);pinR();
+ // v89h: the strip never draws over a card (Alex: tip hidden at the start; PAUSE card's RESUME + title covered in roam). While any modal/card
+ // is open that covers most of the screen or comes within 8 px of the strip's spot, the strip steps aside (body.odYield); it returns when it closes.
+ // Races and results keep their own chip placement (RF5: under LAP, inside the results card's top-right corner).
+ const YS='#npcSay,#roamPause,#pause,#results,#settings,#chRes,#spRes,#roamPop,#journal,#roamMap,#story,#roamCard,#cmap,#slots,#profile,#gbx,#odChk,#credBox,[role=dialog],.modal';
+ let pinBox=null;const yVis=e=>{if(e.hidden||e.closest('[hidden]'))return null;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return null;const r=e.getBoundingClientRect();return r.width>4&&r.height>4?r:null};
+ const yieldStep=()=>{try{const P=document.getElementById('odPin');if(!P)return;if(!P.hidden&&!document.body.classList.contains('odYield')){const r=P.getBoundingClientRect();if(r.width>4)pinBox={l:r.left,t:r.top,r:r.right,b:r.bottom}}
+   let y=false;if(pinBox&&!P.hidden&&!pinCd()&&!pinRun()){const VA=innerWidth*innerHeight;for(const e of document.querySelectorAll(YS)){if(e===P||P.contains(e))continue;const r=yVis(e);if(!r)continue;
+     if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
+   document.body.classList.toggle('odYield',y)}catch(e){}};
+ {const st3=document.createElement('style');st3.textContent='body.odYield #odPin{display:none!important}';document.head.appendChild(st3)}setInterval(yieldStep,120);
  window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}

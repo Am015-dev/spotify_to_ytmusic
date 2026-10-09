@@ -1,5 +1,14 @@
 # HANDOFF race (race worker, 2026-10-09): "the races are boring" → NOW: wide open race courses
 
+## >>> READ FIRST (2026-10-09 20:15; HEAD 19449fa6)
+- v89g reviewer PASS (a11dac87). DEPLOY sent to the coordinator: out/v89g on live v89f (od-garage13 cbfdc0bf) + od-modmap. Waiting for the coordinator to deploy.
+- RO6/RO7 added: a big place ordinal (98rf, CSS scoped by body[data-mode=race|elim]), a thick minimap (40_hud buildMap/drawMap), a stepped rock skirt on the cliff and the jump-gap edges, Athens patches/stones, edge bushes outside the margin, the v89g changelog and 4 checklist items.
+- Bot place in 1-lap fast tRace is noisy (2–8/8). Roam tPlay FAILs are the same as base 20d1a45 (not this branch).
+- Open follow-ups:
+  - the checklist strip covers the pause card (pre-existing; the reviewer routed it);
+  - brick debris on transform/respawn;
+  - the bot rarely podiums in 1 lap.
+
 ## >>> READ FIRST (RO5 finisher, 2026-10-09 ~18:40; HEAD 4a80ce9+)
 - RO5 done: terrain dressing (tree line, bushes, tufts, flowers, Athens cypresses), painted route arrows at each fork + 1.6x SHORTCUT sign, smaller island trees. All in `src/98ro_open.js` (OPN_build).
 - Gate side-by-sides `qa_race/ro5/sbs/1..8` (force-added) sent to the coordinator; waiting for its OK → then REVIEW → DEPLOY.
