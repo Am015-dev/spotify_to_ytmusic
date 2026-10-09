@@ -8,4 +8,8 @@ const fs=require('fs');const{chromium,boot}=require('../tools/d24lib');const URL
  if(!n){console.log('no tip seen',JSON.stringify(await R()));await shot(`${OUT}/start_none.jpg`)}
  // after the tip: the pin comes back
  for(let i=0;i<30;i++)await p.evaluate(()=>__tick(10));console.log('after',JSON.stringify(await R()));await shot(`${OUT}/start_after.jpg`);
+ const vis=()=>p.evaluate(()=>{const P=document.getElementById('odPin'),cs=getComputedStyle(P);const R=e=>{if(!e||e.hidden)return null;const q=e.getBoundingClientRect();return q.width?[q.left|0,q.top|0,q.right|0,q.bottom|0]:null};return{pin:cs.display!=='none'&&!P.hidden?R(P):null,yieldCls:document.body.classList.contains('odYield'),pause:R(document.getElementById('roamPause')),cards:[...document.querySelectorAll('#roamPause button,#roamPause h1,#roamPause h2,#roamPause b')].slice(0,6).map(e=>e.textContent.trim().slice(0,14)+':'+JSON.stringify(R(e)))}});
+ console.log('drive',JSON.stringify(await vis()));
+ {const t=await p.$('#tP');const bb=t&&await t.boundingBox();if(bb){await p.touchscreen.tap(bb.x+bb.width/2,bb.y+bb.height/2)}else console.log('no #tP')}await p.waitForTimeout(400);for(let i=0;i<3;i++)await p.evaluate(()=>__tick(1));
+ console.log('pause',JSON.stringify(await vis()));await shot(`${OUT}/pause.jpg`);
  console.log('errs',JSON.stringify(errs));await b.close()})();
