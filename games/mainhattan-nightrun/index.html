@@ -767,8 +767,8 @@ let DF=DIFFS.normal;
 const STILL={t:0,k:0,fk:1,bk:1,sk:1,ax:0,ay:0,beam:null,nb:0,said:false};   // AFK pressure (h.js): a ship that stops moving is hunted harder and scores less
 const DYE={cur:1,q:1};                                     // dying slows the song (h.js)
 const FIRE_K=.62;                                          // enemy fire cadence: about 40% fewer bullets than before, each one aimed and telegraphed
-const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk;
-function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.14*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
+const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk();
+function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
 const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
 const bossStage=k=>k===3?'boss2':k===6?'boss3':'boss';   // final boss gets its own song
 // Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
@@ -785,7 +785,7 @@ function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.for
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp)));
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK())));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
   e.arm=e.bf===1&&type!=='charger';DIR.safe(e);
   e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);return e;}
@@ -802,9 +802,9 @@ const eliteP=()=>ST.on?ST.el:Math.min(.55,Math.max(DF.el?.2+.1*G.pos:0,.09*Math.
 const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*STILL.bk*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
 const ebCap=()=>(touchUI||rotMode?18:HARD?35:25)+(G.boss&&G.boss.x<=bossX()?5:0);   // most enemy bullets alive at once; a fan or ring that does not fit is made smaller (odd, still aimed), never cut off                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
-function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1});}
+function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:(eb.src&&eb.src.type==='gunship'&&AIQ()>=5&&Math.random()<.4)?1.5:0});}
 const PV={x:0,y:0,px:0,py:0};   // the ship's smoothed velocity (h.js), for Hard's lead shots
-const aim=e=>{if(HARD&&e.type!=='boss'){const t=Math.min(.8,Math.hypot(P.x-e.x,P.y-e.y)/260)*.75;return Math.atan2(P.y+PV.y*t-e.y,P.x+PV.x*t-e.x);}return Math.atan2(P.y-e.y,P.x-e.x);};
+const aim=e=>{if((HARD||AIQ()>=4)&&e.type!=='boss'){const t=Math.min(.8,Math.hypot(P.x-e.x,P.y-e.y)/260)*.75;return Math.atan2(P.y+PV.y*t-e.y,P.x+PV.x*t-e.x);}return Math.atan2(P.y-e.y,P.x-e.x);};
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
 const odd=x=>{const f=Math.floor(x);return f%2?f:f-1;};   // fans are odd so the middle bullet is aimed at the ship
 const fanN=n=>{const m=Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.on?0:Math.floor(TUNE2.loopFan*Math.min(3,G.loop))));return m<=3?3:Math.max(3,odd(m*.72+.5));};
@@ -1004,7 +1004,7 @@ function update(dt){
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
@@ -1526,33 +1526,61 @@ setInterval(()=>PW.drums(),25);
 /* ---------- Nightrun Story: 12 stages in 3 acts, stage select, stars, Hard toggle for Endless ---------- */
 const ALL=/[?&]all=1/.test(location.search);             // ?all=1 opens every stage (test link); a long press on the title does the same and is remembered
 let HARD=SET.diff==='hard';DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty lives in the settings (Easy / Normal / Hard); the title button cycles it
-const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all};})();
+const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all,v30:!!o.v30};})();
 const sPersist=()=>save('mnr_story',sSave);
 // difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
-const TUNE={d0:.8,dd:.11,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.07,eh:.2,el0:2,eld:.07,hd:.09,hull:[6,6,6,6,6,6,6,6,5,5,5,5],lv:[2.2,3.3,3.7,3.8,4.6,5.2,5.4,6.4,8.2,8.2,9,9.8],bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
+const TUNE={d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:Array.from({length:30},(_,i)=>i<20?6:5),lv:Array.from({length:30},(_,i)=>+(2.4+i*.3+(i>=20?.35:0)).toFixed(2)),bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
-const STAGES=[
-  {n:1, di:0,name:'FIRST RUN',     intro:'Deliver the data. Stay alive.',     goal:{k:'survive',v:46},perf:46,waves:['droneLine','droneV','droneSine']},
-  {n:2, di:0,name:'PATROL',        intro:'Drones on patrol. Shoot on the beat.',goal:{k:'kill',v:170},   perf:35,waves:['droneLine','droneSine','chargers','droneV']},
-  {n:3, di:0,name:'SEK-ADLER',     intro:'Police interceptor on your tail.',  goal:{k:'boss'},lead:22,   perf:19,waves:['droneLine','droneV','turret','chargers']},
-  {n:4, di:1,name:'RIVER ROAD',    intro:'Follow the river. Chain PERFECTs.', goal:{k:'score',v:180000},   perf:29,waves:['droneSine','chargers','droneV','turret']},
-  {n:5, di:1,name:'BRIDGE GUARD',  intro:'Something guards the old bridge.',  goal:{k:'mini'},lead:24,   perf:24,waves:['droneSine','chargers','turret'],
-     mini:{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}},
-  {n:6, di:1,name:'FLUSSKRAKE',    intro:'The river fights back.',            goal:{k:'boss'},lead:28,   perf:22,waves:['droneSine','chargers','turret','gunship']},
-  {n:7, di:2,name:'GATE RUN',      intro:'Laser gates ahead. Dash through.',  goal:{k:'survive',v:46},perf:30,waves:['gate','droneLine','turret','gate','chargers']},
-  {n:8, di:2,name:'GATE KEEPER',   intro:'The gates have a keeper.',          goal:{k:'mini'},lead:34,   perf:22,waves:['gate','turret','chargers'],
-     mini:{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}},
-  {n:9, di:2,name:'ZENTRAL-ICE',   intro:'Break the bank firewall.',          goal:{k:'boss'},lead:30,   perf:22,waves:['gate','turret','droneSine','gunship']},
-  {n:10,di:3,name:'TRADE FAIR',    intro:'Elite guards everywhere. Stay sharp.',goal:{k:'kill',v:230},     perf:34,waves:['droneV','chargers','turret','gunship','droneSine']},
-  {n:11,di:3,name:'RUSH HOUR',     intro:'Rack up score. Do not get hit.',    goal:{k:'score',v:800000},   perf:22,waves:['droneV','droneSine','turret','chargers','gate','gunship']},
-  {n:12,di:3,name:'KRONOS',        intro:'End the corporation. Last delivery.',goal:{k:'boss'},lead:28,   perf:20,waves:['gate','gunship','turret','chargers','droneSine']}];
-for(const s of STAGES){s.song=['stage1','stage2','stage3'][(s.n-1)%3];s.act=Math.floor((s.n-1)/4);}
-const ACTN=['ACT I','ACT II','ACT III'];
+/* 30 stages, six per city: a run through, a hunt, a gimmick stage, the city's mini-boss, a hard convoy (squad leaders) and the boss. Levels (TUNE.lv) rise along the whole list. */
+const CITYS=[
+ {di:0,st:[
+  ['FIRST RUN','Deliver the data. Stay alive.',{k:'survive',v:46},46,['droneLine','droneV','droneSine']],
+  ['PATROL','Drones on patrol. Shoot on the beat.',{k:'kill',v:170},35,['droneLine','droneSine','chargers','droneV']],
+  ['ZEIL','Shop windows and swarms.',{k:'score',v:150000},30,['droneSine','droneV','chargers','turret']],
+  ['TRESOR-WART','The vault has a keeper.',{k:'mini'},24,['droneLine','turret','chargers'],{k:5,nm:'TRESOR-WART',r:38,pats:['laser','fan5','ring','laser'],lbl:'T'}],
+  ['KONVOI','A squad leader. Kill it first.',{k:'kill',v:210},30,['droneV','droneSine','chargers','turret','gunship']],
+  ['SEK-ADLER','Police interceptor on your tail.',{k:'boss'},19,['droneLine','droneV','turret','chargers']]]},
+ {di:1,st:[
+  ['RIVER ROAD','Follow the river. Chain PERFECTs.',{k:'score',v:180000},29,['droneSine','chargers','droneV','turret']],
+  ['EISERNER STEG','Narrow bridge, tight lanes.',{k:'survive',v:46},30,['droneSine','chargers','gate','turret']],
+  ['BRIDGE GUARD','Something guards the old bridge.',{k:'mini'},24,['droneSine','chargers','turret'],{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}],
+  ['ROEMER','Old town, new guns.',{k:'kill',v:240},32,['droneV','chargers','turret','gunship']],
+  ['FLOTTE','Patrol boats with a leader.',{k:'survive',v:46},28,['droneSine','droneV','gunship','chargers','turret']],
+  ['FLUSSKRAKE','The river fights back.',{k:'boss'},22,['droneSine','chargers','turret','gunship']]]},
+ {di:2,st:[
+  ['GATE RUN','Laser gates ahead. Dash through.',{k:'survive',v:46},30,['gate','droneLine','turret','gate','chargers']],
+  ['FREIGHT YARD','Rails, gates and chargers.',{k:'kill',v:230},30,['gate','chargers','turret','droneSine']],
+  ['GATE KEEPER','The gates have a keeper.',{k:'mini'},22,['gate','turret','chargers'],{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}],
+  ['FIREWALL','Gates and gunships together.',{k:'score',v:500000},26,['gate','gunship','turret','droneSine']],
+  ['CORDON','The last cordon. Leaders hold the line.',{k:'survive',v:46},26,['gate','droneV','gunship','turret','chargers']],
+  ['ZENTRAL-ICE','Break the bank firewall.',{k:'boss'},22,['gate','turret','droneSine','gunship']]]},
+ {di:3,st:[
+  ['TRADE FAIR','Elite guards everywhere. Stay sharp.',{k:'kill',v:230},34,['droneV','chargers','turret','gunship','droneSine']],
+  ['RUSH HOUR','Rack up score. Do not get hit.',{k:'score',v:800000},22,['droneV','droneSine','turret','chargers','gate','gunship']],
+  ['HAMMERING MAN','The hammer keeps the beat.',{k:'survive',v:46},26,['droneV','turret','gunship','gate','chargers']],
+  ['MESSE-WÄCHTER','The fair has a guardian.',{k:'mini'},22,['droneV','turret','chargers','gunship'],{k:4,nm:'MESSE-WÄCHTER',r:42,pats:['fan7','ring','spiral','fan9'],lbl:'M'}],
+  ['BOARDROOM','Everything shoots. Leaders everywhere.',{k:'kill',v:260},30,['gate','gunship','turret','chargers','droneSine','droneV']],
+  ['KRONOS','End the corporation. Last delivery.',{k:'boss'},20,['gate','gunship','turret','chargers','droneSine']]]},
+ {di:4,st:[
+  ['PLAKA NIGHTS','Rooftops and kiosks. Hold the block.',{k:'survive',v:46},30,['phalanx','droneSine','chargers','turret']],
+  ['HARBOUR WATCH','Piraeus is closed. Dash the pillars.',{k:'score',v:900000},26,['pillars','wedge','turret','phalanx','gunship']],
+  ['LYCABETTUS','Climb the hill under fire.',{k:'kill',v:250},28,['phalanx','wedge','turret','droneSine','gunship']],
+  ['HOPLITE','The shield wall walks.',{k:'mini'},24,['phalanx','wedge','turret'],{k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H'}],
+  ['AGORA','Phalanx and leaders. No gaps.',{k:'survive',v:46},26,['phalanx','wedge','pillars','gunship','turret']],
+  ['TALOS','Bronze guardian of the harbour.',{k:'boss'},20,['phalanx','wedge','pillars','gunship','turret']]]}];
+const STAGES=[];
+CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci};
+  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
+/* the story grew from 16 to 30 stages: progress saved under the old numbers moves to the same stage by name (once) */
+if(!sSave.v30){const old=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],mv=k=>{const i=STAGES.findIndex(x=>x.name===old[k-1]);return i<0?null:i+1;},st={},sn={};
+  for(const k in sSave.stars){const m=mv(+k);if(m)st[m]=sSave.stars[k];}for(const k in sSave.snap){const m=mv(+k);if(m)sn[m]=sSave.snap[k];}
+  sSave.stars=st;sSave.snap=sn;sSave.v30=1;sPersist();}
+const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
 const stLen=s=>songBars(s.song);                          // stage length in bars = its song
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
 const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
-const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
+const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
   setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1];
@@ -1612,7 +1640,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
   totalStars(){let t=0;for(const k in sSave.stars)t+=sSave.stars[k]|0;return t;}};
-const unlocked=n=>n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1;
+const unlocked=n=>n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1||Object.keys(sSave.stars).some(k=>+k>=n&&(sSave.stars[k]|0)>=1);   // a later stage cleared (older saves) opens the ones before it
 
 function startStory(n){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;
   ST.setLevel(n);ST.on=true;newGame(false);ST.begin();G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(ST.def.song);AU.intense(false);
@@ -1782,18 +1810,9 @@ function drawBossX(e,t){ctx.fillStyle='#100a1c';ctx.strokeStyle=e.col;ctx.lineWi
     ctx.beginPath();ctx.arc(0,-e.r-4,16,Math.PI,0);ctx.lineTo(10,-e.r-4);ctx.lineTo(-10,-e.r-4);ctx.closePath();ctx.fill();ctx.stroke();}                       // crest of the helmet
   else{ctx.beginPath();ctx.arc(-e.r*.9,0,e.r*.75,-Math.PI/2,Math.PI/2);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillRect(e.r*.6,-3,e.r*1.2,6);ctx.strokeRect(e.r*.6,-3,e.r*1.2,6);}}   // shield and spear
 
-/* ----- story act IV: stages 13-16 ----- */
-STAGES.push(
-  {n:13,di:ATH,name:'PLAKA NIGHTS', intro:'Rooftops and kiosks. Hold the block.',goal:{k:'survive',v:46},perf:30,waves:['phalanx','droneSine','chargers','turret']},
-  {n:14,di:ATH,name:'HARBOUR WATCH',intro:'Piraeus is closed. Dash the pillars.',goal:{k:'score',v:900000},perf:26,waves:['pillars','wedge','turret','phalanx','gunship']},
-  {n:15,di:ATH,name:'HOPLITE',      intro:'The shield wall walks.',             goal:{k:'mini'},lead:26,   perf:24,waves:['phalanx','wedge','turret'],
-     mini:{k:7,nm:'HOPLITE',r:40,pats:ATAB[7],lbl:'H'}},
-  {n:16,di:ATH,name:'TALOS',        intro:'Bronze guardian of the harbour.',    goal:{k:'boss'},lead:28,   perf:20,waves:['phalanx','wedge','pillars','gunship','turret']});
-for(const s of STAGES){if(s.n>12){s.song=s.n===14?'athina2':'athina';s.act=3;}}   // Athens has its own songs (Treblo, measured grids in music/tracks.json); TALOS switches to 'boss3' (bossStage)
+/* story act V: the stages are in story.js (CITYS) */
+BOSS_SUB[7]='Shield wall, spear rig';
 DISTRICTS[ATH].song='athina';
-ACTN.push('ACT IV');
-TUNE.lv.push(7.8,8.8,8.4,8.6);TUNE.hull.push(5,5,5,5);BOSS_SUB[7]='Shield wall, spear rig';
-KIT.push('dc','hm','sh','wd');
 setTimeout(()=>{if(!running)bgFor(ATH);},3900);                                                       // build the skyline while the title is up
 
 /* ---------- the director: every district lasts as long as its song; the waves follow the song ----------
@@ -2382,7 +2401,9 @@ ART.wave=(x,y,r,a)=>{const b=ART.bm['fx-shockwave'];if(!b)return false;ctx.save(
 /* ----- painted backdrops ----- */
 ART.bigGet=(k,mk)=>{let o=ART.big[k];if(o)return o;o=mk();if(!o)return null;ART.big[k]=o;ART.bigN.push(k);while(ART.bigN.length>10)delete ART.big[ART.bigN.shift()];return o;};
 ART.bgOf=(di,port,u,w,h,dim)=>{const n='bg-'+ART.dn[di]+(port?'-phone':'');const b=ART.bm[n];if(!b)return null;
-  return ART.bigGet(n+'|'+Math.round(u*100),()=>{const c=document.createElement('canvas');c.width=Math.round(w*u);c.height=Math.round(h*u);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,0,0,c.width,c.height);
+  const fb=port?null:ART.bm['ly-far-'+ART.dn[di]];       // the painted far skyline is baked into the backdrop tile: one layer, no extra blit per frame
+  return ART.bigGet(n+'|'+Math.round(u*100)+(fb?'f':''),()=>{const c=document.createElement('canvas');c.width=Math.round(w*u);c.height=Math.round(h*u);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,0,0,c.width,c.height);
+    if(fb){const fh=w*fb.height/fb.width;g.globalAlpha=.75;g.drawImage(fb,0,(h-60-fh)*u,c.width,fh*u);g.globalAlpha=1;}
     g.fillStyle='rgba(6,3,16,'+dim+')';g.fillRect(0,0,c.width,c.height);return{c,w,h};});};
 /* tile a scaled strip horizontally; every other tile is mirrored, so there is never a seam */
 ART.tiles=(o,y,scroll,par,al)=>{const tw=o.w,off=(scroll*par)%(2*tw),j0=Math.floor(off/tw);ctx.globalAlpha=al;
@@ -2426,6 +2447,44 @@ NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,
 setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame();const port=wcv!==cv;
   for(const di of[G.di,nextDi(G.di).di]){if(!ART.paintReady(di))continue;const n=ART.dn[di];
     if(port)ART.bgOf(di,true,VS,PW_,PH_,.5);else{ART.bgOf(di,false,S,W,H,.52);ART.strip('ly-mid-'+n,310);ART.strip('ly-near-'+DISTRICTS[di].near,130);}}},700);
+
+/* ---------- smarter enemies (the answer to "too easy with all the perks"), all gated by the level q ----------
+   q = story level (2.4 .. 11.5), in endless 2 + district*1.6 + loop*3.
+   - predictive aim: from q>=4 every shooter leads the ship, not only on Hard
+   - dodging drones: from q>=3.5 almost half of the drones slide out of the lane of a shot that is about to hit them
+   - squad leaders: from q>=3 a wave can come with a LEADER (gold crown, 3.5x hull). While it lives, the drones near it are shield-linked (they take under half damage);
+     it fires a 5-way fan every fourth beat, with a red warning ring one beat before. Kill it and its squad panics (faster, shoots at once)
+   - homing orbs: from q>=5 some gunship shots curve toward the ship for 1.5 s (ringed in white), turning slowly enough to dodge
+   - perk pressure: every perk and upgrade you own adds a little hull to the enemies and a little speed to their fire (capped), so a maxed ship is still in a fight */
+function AIQ(){return ST.on?ST.lvl:2+G.pos*1.6+(G.loop||0)*3;}
+const AI={perks(){let n=0;try{for(const k in SH.got)n+=SH.got[k]|0;for(const d of TP_DEF)n+=TP.l(d.id)|0;}catch(e){}return n;},
+  hpK(){return Math.min(1.7,1+.014*this.perks());},fk(){return 1+Math.min(.28,.022*Math.max(0,AIQ()-1))+Math.min(.12,.004*this.perks());},
+  ldrs(){return G.en.filter(e=>e.ldr&&e.hp>0);}};
+NR.on('spawn',e=>{if(!G.live||G.dead||e.mini)return;const q=AIQ();
+  if(e.type==='drone'){if(q>=3.5&&Math.random()<.2+.03*Math.min(q,10))e.dg=1;
+    if(q>=3&&G.t-(G.lastSp||-9)>.05&&G.t-(G.ldT||-99)>Math.max(9,22-1.6*q)){G.ldT=G.t;e.ldr=1;e.lc=0;e.r=Math.round(e.r*1.35);e.hp=Math.round(e.hp*3.5);e.max=e.hp;e.score*=3;e.dg=0;}}
+  G.lastSp=G.t;});
+NR.on('tick',dt=>{if(!G.live||G.dead||G.over)return;const q=AIQ(),L=AI.ldrs();
+  for(const e of G.en){if(e.type==='boss'||e.type==='gate'||e.hp<=0)continue;
+    e.shl=false;if(!e.ldr&&L.length){for(const l of L)if(Math.abs(l.x-e.x)<250&&Math.abs(l.y-e.y)<200){e.shl=true;e.lk=l;break;}}   // (e.lk: the leader that shields it, drawn as a link)
+    if(e.rg)e.x-=90*dt;
+    if(e.dg&&e.type==='drone'&&e.x<W-20&&e.flash<=0){for(const b of G.pb){if(b.vx>0&&b.x<e.x&&e.x-b.x<300&&Math.abs(b.y-e.y)<e.r+14){e.by=clamp(e.by+(e.y>=b.y?1:-1)*(120+12*q)*dt,44,H-44);break;}}}}
+  for(const b of G.eb){if(b.hm>0){b.hm-=dt;const sp=Math.hypot(b.vx,b.vy),a=Math.atan2(b.vy,b.vx),t=Math.atan2(P.y-b.y,P.x-b.x);let d=t-a;d=Math.atan2(Math.sin(d),Math.cos(d));
+      const na=a+clamp(d,-1.1*dt,1.1*dt);b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp;}}});
+NR.on('beat',()=>{if(!G.live||G.dead||ST.over)return;
+  for(const e of G.en){if(!e.ldr||e.hp<=0||e.x>W-40)continue;
+    if(e.lArm){e.lArm=false;if(Math.hypot(e.x-P.x,e.y-P.y)>110){eb.src=e;fan(e,5,.5,175+8*AIQ(),'#ffd23d');eb.src=null;}}
+    else if(++e.lc>=4){e.lc=0;e.lArm=true;}}});
+NR.on('kill',({e})=>{if(!e||!e.ldr)return;G.score+=e.score;floater(e.x,e.y-30,'LEADER DOWN','#ffd23d');
+  for(const f of G.en){if(f.lk===e&&f.hp>0){f.rg=1;f.shl=false;f.bf=Math.min(f.bf,2);}}});
+{const de=drawEnemy;drawEnemy=function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
+  if(e.ldr){ctx.save();ctx.translate(e.x,e.y);ctx.strokeStyle='#ffd23d';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,e.r+7,0,7);ctx.stroke();ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,e.r+12,0,7);ctx.stroke();
+    ctx.fillStyle='#ffd23d';ctx.beginPath();const cy=-e.r-14;ctx.moveTo(-8,cy+8);ctx.lineTo(-8,cy);ctx.lineTo(-4,cy+4);ctx.lineTo(0,cy-3);ctx.lineTo(4,cy+4);ctx.lineTo(8,cy);ctx.lineTo(8,cy+8);ctx.closePath();ctx.fill();   // crown
+    if(e.lArm){const k=PHF;ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.8+1.2*k),'#ff3050',.25+.5*k);ctx.globalCompositeOperation='source-over';ctx.strokeStyle='#ff7080';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,e.r+16+14*(1-k),0,7);ctx.stroke();}
+    hpBar(-18,-e.r-26,36,e.hp/e.max);ctx.restore();}
+  else if(e.shl&&e.lk){ctx.save();ctx.strokeStyle='#19e3ff';ctx.globalAlpha=.7;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(e.x,e.y,e.r+5,0,7);ctx.moveTo(e.x,e.y);ctx.lineTo(e.lk.x,e.lk.y);ctx.stroke();ctx.restore();}   // shield link to the leader
+  else if(e.rg){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*2,'#ff3050',.4);ctx.restore();}};}
+{const fb=FXV.bullets;FXV.bullets=function(){fb.call(this);let any=false;for(const b of G.eb)if(b.hm>0){if(!any){ctx.save();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.85;ctx.beginPath();any=true;}ctx.moveTo(b.x+b.r+3.5,b.y);ctx.arc(b.x,b.y,b.r+3.5,0,7);}if(any){ctx.stroke();ctx.restore();}};}
 
 /* ---------- ship stats: a little cluster round the ship (hull, dash charges, shield count, power-up timers, revive, drones, bubble) and a compact strip
    in the HUD (hull, shield, dash, drones, revive + the garage perks you own). Labels are <= 8 words. Numbers are logged in HUDLOG.x for the tests. ---------- */
@@ -2512,8 +2571,14 @@ setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I1';
+const NR_VER='I2';
 const NR_CHECKLIST=[
+ {ver:'I2',id:'stories30',text:'Story now has 30 stages, six per city (Bankenviertel, Mainufer, Ostend, Messe, Athina): a run, a hunt, a special stage, a mini-boss, a hard convoy stage and the boss. Your old stars moved to the same stages.'},
+ {ver:'I2',id:'leaders',text:'From stage 4 on a wave can come with a LEADER: gold crown, big hull, a bar over its head. Drones near it have a cyan shield link (they take under half damage). Kill the leader first: the squad panics and speeds up. It fires a 5-way fan every fourth beat, with a red warning ring first.'},
+ {ver:'I2',id:'dodgers',text:'From about stage 8 some drones slide sideways out of your shots, so keep your aim on them or use wide weapons.'},
+ {ver:'I2',id:'smart-aim',text:'From stage 6 on every shooter aims where your ship is going, not where it is. Keep changing direction.'},
+ {ver:'I2',id:'homing',text:'From about stage 14 some gunship shots are ringed in white and curve toward you for a moment. They turn slowly: dash or sidestep.'},
+ {ver:'I2',id:'harder',text:'With a fully upgraded ship the game still fights back: enemies get tougher and shoot faster the more perks you own, and later stages are tougher. Is it hard enough now? Tell us where it is still too easy.'},
  {ver:'I1',id:'ships',text:'Your ship is now a painted ship. Pick each ship in the garage (Courier, Triplet, Half-time Heavy, Echo, Swing, Synth): each looks different in the garage card and in the run, with a flickering engine jet that follows the beat.'},
  {ver:'I1',id:'enemies',text:'Drones (with spinning rotors), turrets (the barrel turns to aim), chargers, gunships, gates, flankers, swarm and mines are painted sprites that bob a little and flash white when hit. Hit boxes feel the same as before.'},
  {ver:'I1',id:'bosses',text:'Each boss is a painted boss: Adler, Flusskrake, Zentral-ICE, Kronos, Talos (Athens) and the Hoplite mini-boss. A phase change pulses a glow, hits tint it red, and the boss portrait shows above the warning banner.'},

@@ -78,16 +78,7 @@ function drawBossX(e,t){ctx.fillStyle='#100a1c';ctx.strokeStyle=e.col;ctx.lineWi
     ctx.beginPath();ctx.arc(0,-e.r-4,16,Math.PI,0);ctx.lineTo(10,-e.r-4);ctx.lineTo(-10,-e.r-4);ctx.closePath();ctx.fill();ctx.stroke();}                       // crest of the helmet
   else{ctx.beginPath();ctx.arc(-e.r*.9,0,e.r*.75,-Math.PI/2,Math.PI/2);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillRect(e.r*.6,-3,e.r*1.2,6);ctx.strokeRect(e.r*.6,-3,e.r*1.2,6);}}   // shield and spear
 
-/* ----- story act IV: stages 13-16 ----- */
-STAGES.push(
-  {n:13,di:ATH,name:'PLAKA NIGHTS', intro:'Rooftops and kiosks. Hold the block.',goal:{k:'survive',v:46},perf:30,waves:['phalanx','droneSine','chargers','turret']},
-  {n:14,di:ATH,name:'HARBOUR WATCH',intro:'Piraeus is closed. Dash the pillars.',goal:{k:'score',v:900000},perf:26,waves:['pillars','wedge','turret','phalanx','gunship']},
-  {n:15,di:ATH,name:'HOPLITE',      intro:'The shield wall walks.',             goal:{k:'mini'},lead:26,   perf:24,waves:['phalanx','wedge','turret'],
-     mini:{k:7,nm:'HOPLITE',r:40,pats:ATAB[7],lbl:'H'}},
-  {n:16,di:ATH,name:'TALOS',        intro:'Bronze guardian of the harbour.',    goal:{k:'boss'},lead:28,   perf:20,waves:['phalanx','wedge','pillars','gunship','turret']});
-for(const s of STAGES){if(s.n>12){s.song=s.n===14?'athina2':'athina';s.act=3;}}   // Athens has its own songs (Treblo, measured grids in music/tracks.json); TALOS switches to 'boss3' (bossStage)
+/* story act V: the stages are in story.js (CITYS) */
+BOSS_SUB[7]='Shield wall, spear rig';
 DISTRICTS[ATH].song='athina';
-ACTN.push('ACT IV');
-TUNE.lv.push(7.8,8.8,8.4,8.6);TUNE.hull.push(5,5,5,5);BOSS_SUB[7]='Shield wall, spear rig';
-KIT.push('dc','hm','sh','wd');
 setTimeout(()=>{if(!running)bgFor(ATH);},3900);                                                       // build the skyline while the title is up

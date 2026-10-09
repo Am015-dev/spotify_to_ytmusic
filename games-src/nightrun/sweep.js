@@ -1014,9 +1014,9 @@ async function storyTests(browser, cfg, full) {
     if (!await ev(p, () => !document.getElementById('stsel').hidden)) return fail(p, tag, 'story', 'STORY did not open the stage select');
     await probe('stage select'); await shot('select');
     const tiles = await ev(p, () => [...document.querySelectorAll('#stsel .card')].map(c => ({ n: +c.dataset.n, lock: c.classList.contains('lock') })));
-    if (tiles.length !== 16) await fail(p, tag, 'story', 'stage select shows ' + tiles.length + ' stages, not 16');
+    const nSt = await ev(p, () => __mnr.STAGES.length); if (tiles.length !== nSt) await fail(p, tag, 'story', 'stage select shows ' + tiles.length + ' stages, not ' + nSt);
     if (tiles.some(t => t.lock)) await fail(p, tag, 'story', '?all=1 left stages locked');
-    const list = full ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] : [1, 5, 12, 13, 16];
+    const list = full ? Array.from({ length: nSt }, (_, i) => i + 1) : [1, 4, 6, 12, 24, 25, 30];
     const defs = await ev(p, () => __mnr.STAGES.map(s => ({ n: s.n, di: s.di, k: s.goal.k, v: s.goal.v || 0, lead: s.lead || 0, name: s.name, intro: s.intro, song: s.song })));
     for (const n of list) {
       const d = defs[n - 1], t = tag + '#' + n;
@@ -1028,9 +1028,9 @@ async function storyTests(browser, cfg, full) {
       const s0 = await ev(p, () => ({ di: __mnr.G.di, hp: __mnr.P.hp, msgs: __mnr.MSGS.slice(-4), st: __mnr.ST.def.song }));
       if (s0.di !== d.di) await fail(p, t, 'story', 'stage ' + n + ' plays district ' + s0.di + ', want ' + d.di);
       if (!s0.msgs.includes(d.intro)) await fail(p, t, 'story', 'intro line not shown: ' + JSON.stringify(s0.msgs));
-      if (n > 12 && d.di !== 4) await fail(p, t, 'story', 'Act IV stage ' + n + ' is not in Athens'); if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
+      if (n > 24 && d.di !== 4) await fail(p, t, 'story', 'Act V stage ' + n + ' is not in Athens'); if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
       await sleep(900); const s1 = await probe('stage ' + n); if (!(await ev(p, () => __mnr.HUD.goal))) await fail(p, t, 'story', 'no goal on the HUD');
-      if (n === 1 || n === 6 || n === 13 || n === 16) await shot('play' + n);
+      if (n === 1 || n === 6 || n === 25 || n === 30) await shot('play' + n);
       // reach the goal
       const swBefore = await ev(p, () => __mnr.NR.sw.length);
       if (d.k === 'survive') await ev(p, () => { __mnr.G.dbar = __mnr.ST.len; });                       // a stage lasts as long as its song: jump the bar clock
@@ -1039,7 +1039,7 @@ async function storyTests(browser, cfg, full) {
       else {
         await ev(p, () => { __mnr.G.dbar = __mnr.ST.lead; });
         if (!await waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 14000)) { await fail(p, t, 'story', 'boss/mini-boss of stage ' + n + ' never arrived'); continue; }
-        const isMini = d.k === 'mini', bossSong = n === 6 || n === 9 || n === 16 ? 'boss' : n === 12 ? 'boss2' : null;
+        const isMini = d.k === 'mini', bossSong = d.k === 'boss' ? [null, 'boss', 'boss', 'boss2', 'boss3'][d.di] : null;
         if (n === 6) await shot('boss');
         if (bossSong) {
           if (!await waitFor(p, c => __mnr.NR.sw.length > c && !__mnr.BT.pend, swBefore, 16000)) await fail(p, t, 'switch', 'no song change for the boss of stage ' + n + ' ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT }))));
@@ -1062,7 +1062,7 @@ async function storyTests(browser, cfg, full) {
       if (r.title !== d.name || r.rows !== 3 || r.st < 1 || r.ok < 1) await fail(p, t, 'story', 'result screen wrong ' + JSON.stringify(r));
       if (r.next !== (n < 16)) await fail(p, t, 'story', 'NEXT STAGE button ' + (r.next ? 'shown after the last stage' : 'missing'));
       if (r.score.replace(/\D/g, '') !== String(r.g)) await fail(p, t, 'HUD-mismatch', 'result score ' + r.score + ' vs ' + r.g);
-      await probe('result'); if (n === 1 || n === 16) await shot('result' + n);
+      await probe('result'); if (n === 1 || n === 30) await shot('result' + n);
       await press(p, cfg, T, '#srMenu'); await sleep(250);
       const sel = await ev(p, n => ({ shown: !document.getElementById('stsel').hidden, stars: document.querySelector(`#stsel .card[data-n="${n}"] .stars`).textContent }), n);
       if (!sel.shown || !sel.stars.includes('★')) await fail(p, t, 'story', 'stage select does not show the stars earned: ' + JSON.stringify(sel));

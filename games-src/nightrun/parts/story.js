@@ -1,33 +1,61 @@
 /* ---------- Nightrun Story: 12 stages in 3 acts, stage select, stars, Hard toggle for Endless ---------- */
 const ALL=/[?&]all=1/.test(location.search);             // ?all=1 opens every stage (test link); a long press on the title does the same and is remembered
 let HARD=SET.diff==='hard';DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty lives in the settings (Easy / Normal / Hard); the title button cycles it
-const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all};})();
+const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all,v30:!!o.v30};})();
 const sPersist=()=>save('mnr_story',sSave);
 // difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
-const TUNE={d0:.8,dd:.11,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.07,eh:.2,el0:2,eld:.07,hd:.09,hull:[6,6,6,6,6,6,6,6,5,5,5,5],lv:[2.2,3.3,3.7,3.8,4.6,5.2,5.4,6.4,8.2,8.2,9,9.8],bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
+const TUNE={d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:Array.from({length:30},(_,i)=>i<20?6:5),lv:Array.from({length:30},(_,i)=>+(2.4+i*.3+(i>=20?.35:0)).toFixed(2)),bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
-const STAGES=[
-  {n:1, di:0,name:'FIRST RUN',     intro:'Deliver the data. Stay alive.',     goal:{k:'survive',v:46},perf:46,waves:['droneLine','droneV','droneSine']},
-  {n:2, di:0,name:'PATROL',        intro:'Drones on patrol. Shoot on the beat.',goal:{k:'kill',v:170},   perf:35,waves:['droneLine','droneSine','chargers','droneV']},
-  {n:3, di:0,name:'SEK-ADLER',     intro:'Police interceptor on your tail.',  goal:{k:'boss'},lead:22,   perf:19,waves:['droneLine','droneV','turret','chargers']},
-  {n:4, di:1,name:'RIVER ROAD',    intro:'Follow the river. Chain PERFECTs.', goal:{k:'score',v:180000},   perf:29,waves:['droneSine','chargers','droneV','turret']},
-  {n:5, di:1,name:'BRIDGE GUARD',  intro:'Something guards the old bridge.',  goal:{k:'mini'},lead:24,   perf:24,waves:['droneSine','chargers','turret'],
-     mini:{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}},
-  {n:6, di:1,name:'FLUSSKRAKE',    intro:'The river fights back.',            goal:{k:'boss'},lead:28,   perf:22,waves:['droneSine','chargers','turret','gunship']},
-  {n:7, di:2,name:'GATE RUN',      intro:'Laser gates ahead. Dash through.',  goal:{k:'survive',v:46},perf:30,waves:['gate','droneLine','turret','gate','chargers']},
-  {n:8, di:2,name:'GATE KEEPER',   intro:'The gates have a keeper.',          goal:{k:'mini'},lead:34,   perf:22,waves:['gate','turret','chargers'],
-     mini:{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}},
-  {n:9, di:2,name:'ZENTRAL-ICE',   intro:'Break the bank firewall.',          goal:{k:'boss'},lead:30,   perf:22,waves:['gate','turret','droneSine','gunship']},
-  {n:10,di:3,name:'TRADE FAIR',    intro:'Elite guards everywhere. Stay sharp.',goal:{k:'kill',v:230},     perf:34,waves:['droneV','chargers','turret','gunship','droneSine']},
-  {n:11,di:3,name:'RUSH HOUR',     intro:'Rack up score. Do not get hit.',    goal:{k:'score',v:800000},   perf:22,waves:['droneV','droneSine','turret','chargers','gate','gunship']},
-  {n:12,di:3,name:'KRONOS',        intro:'End the corporation. Last delivery.',goal:{k:'boss'},lead:28,   perf:20,waves:['gate','gunship','turret','chargers','droneSine']}];
-for(const s of STAGES){s.song=['stage1','stage2','stage3'][(s.n-1)%3];s.act=Math.floor((s.n-1)/4);}
-const ACTN=['ACT I','ACT II','ACT III'];
+/* 30 stages, six per city: a run through, a hunt, a gimmick stage, the city's mini-boss, a hard convoy (squad leaders) and the boss. Levels (TUNE.lv) rise along the whole list. */
+const CITYS=[
+ {di:0,st:[
+  ['FIRST RUN','Deliver the data. Stay alive.',{k:'survive',v:46},46,['droneLine','droneV','droneSine']],
+  ['PATROL','Drones on patrol. Shoot on the beat.',{k:'kill',v:170},35,['droneLine','droneSine','chargers','droneV']],
+  ['ZEIL','Shop windows and swarms.',{k:'score',v:150000},30,['droneSine','droneV','chargers','turret']],
+  ['TRESOR-WART','The vault has a keeper.',{k:'mini'},24,['droneLine','turret','chargers'],{k:5,nm:'TRESOR-WART',r:38,pats:['laser','fan5','ring','laser'],lbl:'T'}],
+  ['KONVOI','A squad leader. Kill it first.',{k:'kill',v:210},30,['droneV','droneSine','chargers','turret','gunship']],
+  ['SEK-ADLER','Police interceptor on your tail.',{k:'boss'},19,['droneLine','droneV','turret','chargers']]]},
+ {di:1,st:[
+  ['RIVER ROAD','Follow the river. Chain PERFECTs.',{k:'score',v:180000},29,['droneSine','chargers','droneV','turret']],
+  ['EISERNER STEG','Narrow bridge, tight lanes.',{k:'survive',v:46},30,['droneSine','chargers','gate','turret']],
+  ['BRIDGE GUARD','Something guards the old bridge.',{k:'mini'},24,['droneSine','chargers','turret'],{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}],
+  ['ROEMER','Old town, new guns.',{k:'kill',v:240},32,['droneV','chargers','turret','gunship']],
+  ['FLOTTE','Patrol boats with a leader.',{k:'survive',v:46},28,['droneSine','droneV','gunship','chargers','turret']],
+  ['FLUSSKRAKE','The river fights back.',{k:'boss'},22,['droneSine','chargers','turret','gunship']]]},
+ {di:2,st:[
+  ['GATE RUN','Laser gates ahead. Dash through.',{k:'survive',v:46},30,['gate','droneLine','turret','gate','chargers']],
+  ['FREIGHT YARD','Rails, gates and chargers.',{k:'kill',v:230},30,['gate','chargers','turret','droneSine']],
+  ['GATE KEEPER','The gates have a keeper.',{k:'mini'},22,['gate','turret','chargers'],{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}],
+  ['FIREWALL','Gates and gunships together.',{k:'score',v:500000},26,['gate','gunship','turret','droneSine']],
+  ['CORDON','The last cordon. Leaders hold the line.',{k:'survive',v:46},26,['gate','droneV','gunship','turret','chargers']],
+  ['ZENTRAL-ICE','Break the bank firewall.',{k:'boss'},22,['gate','turret','droneSine','gunship']]]},
+ {di:3,st:[
+  ['TRADE FAIR','Elite guards everywhere. Stay sharp.',{k:'kill',v:230},34,['droneV','chargers','turret','gunship','droneSine']],
+  ['RUSH HOUR','Rack up score. Do not get hit.',{k:'score',v:800000},22,['droneV','droneSine','turret','chargers','gate','gunship']],
+  ['HAMMERING MAN','The hammer keeps the beat.',{k:'survive',v:46},26,['droneV','turret','gunship','gate','chargers']],
+  ['MESSE-WÄCHTER','The fair has a guardian.',{k:'mini'},22,['droneV','turret','chargers','gunship'],{k:4,nm:'MESSE-WÄCHTER',r:42,pats:['fan7','ring','spiral','fan9'],lbl:'M'}],
+  ['BOARDROOM','Everything shoots. Leaders everywhere.',{k:'kill',v:260},30,['gate','gunship','turret','chargers','droneSine','droneV']],
+  ['KRONOS','End the corporation. Last delivery.',{k:'boss'},20,['gate','gunship','turret','chargers','droneSine']]]},
+ {di:4,st:[
+  ['PLAKA NIGHTS','Rooftops and kiosks. Hold the block.',{k:'survive',v:46},30,['phalanx','droneSine','chargers','turret']],
+  ['HARBOUR WATCH','Piraeus is closed. Dash the pillars.',{k:'score',v:900000},26,['pillars','wedge','turret','phalanx','gunship']],
+  ['LYCABETTUS','Climb the hill under fire.',{k:'kill',v:250},28,['phalanx','wedge','turret','droneSine','gunship']],
+  ['HOPLITE','The shield wall walks.',{k:'mini'},24,['phalanx','wedge','turret'],{k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H'}],
+  ['AGORA','Phalanx and leaders. No gaps.',{k:'survive',v:46},26,['phalanx','wedge','pillars','gunship','turret']],
+  ['TALOS','Bronze guardian of the harbour.',{k:'boss'},20,['phalanx','wedge','pillars','gunship','turret']]]}];
+const STAGES=[];
+CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci};
+  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
+/* the story grew from 16 to 30 stages: progress saved under the old numbers moves to the same stage by name (once) */
+if(!sSave.v30){const old=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],mv=k=>{const i=STAGES.findIndex(x=>x.name===old[k-1]);return i<0?null:i+1;},st={},sn={};
+  for(const k in sSave.stars){const m=mv(+k);if(m)st[m]=sSave.stars[k];}for(const k in sSave.snap){const m=mv(+k);if(m)sn[m]=sSave.snap[k];}
+  sSave.stars=st;sSave.snap=sn;sSave.v30=1;sPersist();}
+const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
 const stLen=s=>songBars(s.song);                          // stage length in bars = its song
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
 const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
-const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
+const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
   setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1];
@@ -87,7 +115,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
   totalStars(){let t=0;for(const k in sSave.stars)t+=sSave.stars[k]|0;return t;}};
-const unlocked=n=>n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1;
+const unlocked=n=>n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1||Object.keys(sSave.stars).some(k=>+k>=n&&(sSave.stars[k]|0)>=1);   // a later stage cleared (older saves) opens the ones before it
 
 function startStory(n){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;
   ST.setLevel(n);ST.on=true;newGame(false);ST.begin();G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(ST.def.song);AU.intense(false);

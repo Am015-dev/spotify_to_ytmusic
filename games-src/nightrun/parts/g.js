@@ -3,8 +3,14 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I1';
+const NR_VER='I2';
 const NR_CHECKLIST=[
+ {ver:'I2',id:'stories30',text:'Story now has 30 stages, six per city (Bankenviertel, Mainufer, Ostend, Messe, Athina): a run, a hunt, a special stage, a mini-boss, a hard convoy stage and the boss. Your old stars moved to the same stages.'},
+ {ver:'I2',id:'leaders',text:'From stage 4 on a wave can come with a LEADER: gold crown, big hull, a bar over its head. Drones near it have a cyan shield link (they take under half damage). Kill the leader first: the squad panics and speeds up. It fires a 5-way fan every fourth beat, with a red warning ring first.'},
+ {ver:'I2',id:'dodgers',text:'From about stage 8 some drones slide sideways out of your shots, so keep your aim on them or use wide weapons.'},
+ {ver:'I2',id:'smart-aim',text:'From stage 6 on every shooter aims where your ship is going, not where it is. Keep changing direction.'},
+ {ver:'I2',id:'homing',text:'From about stage 14 some gunship shots are ringed in white and curve toward you for a moment. They turn slowly: dash or sidestep.'},
+ {ver:'I2',id:'harder',text:'With a fully upgraded ship the game still fights back: enemies get tougher and shoot faster the more perks you own, and later stages are tougher. Is it hard enough now? Tell us where it is still too easy.'},
  {ver:'I1',id:'ships',text:'Your ship is now a painted ship. Pick each ship in the garage (Courier, Triplet, Half-time Heavy, Echo, Swing, Synth): each looks different in the garage card and in the run, with a flickering engine jet that follows the beat.'},
  {ver:'I1',id:'enemies',text:'Drones (with spinning rotors), turrets (the barrel turns to aim), chargers, gunships, gates, flankers, swarm and mines are painted sprites that bob a little and flash white when hit. Hit boxes feel the same as before.'},
  {ver:'I1',id:'bosses',text:'Each boss is a painted boss: Adler, Flusskrake, Zentral-ICE, Kronos, Talos (Athens) and the Hoplite mini-boss. A phase change pulses a glow, hits tint it red, and the boss portrait shows above the warning banner.'},
