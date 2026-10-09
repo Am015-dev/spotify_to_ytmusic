@@ -86,6 +86,14 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvPopGap` Pop-up gap (s) | 28 | seconds after one ends before the next ring (×0.6 after a miss) |
 | `TUNE.lvPopRw` Pop-up studs × | 1 | reward 150 studs × this, plus a brick burst |
 | `TUNE.lvLod` Far people/cars: fewer pose updates | ON | (v88u perf) people > 90 m away re-pose every 3rd frame, traffic cars > 250 m every 4th (they still move every frame). OFF = every frame, as before |
+| `TUNE.wbCarLod` Traffic cars: simple model far away | ON | (v88v perf, `src/98wb_world_batch.js`) traffic cars beyond `wbNear` draw a simplified copy of the same car (same colours, ~10 % of the triangles); cars outside the view are not drawn. OFF = full brick model for every car at any distance, as before |
+| `TUNE.wbNear` Traffic full detail within | 70 m | full brick model + wheels + glass inside this distance |
+| `TUNE.wbFar` Traffic drawn up to | 900 m | cars farther than this are not drawn |
+| `TUNE.wbCity` City: simple far blocks | ON | (v88v perf) the city is cut into 320 m cells; cells farther than `wbLodD` draw as ONE simplified mesh each (buildings, trees, lamps, roads; colours from the same textures). Near cells draw the real models. Collisions are unchanged (separate boxes). OFF = every model drawn, as before. Needs a city reload to rebuild after a change of the build knobs |
+| `TUNE.wbLodD` City full detail within | 220 m | cells whose edge is closer than this keep full detail |
+| `TUNE.wbLodCell` (no slider) far block detail | 3 m | size of the merge grid for the far blocks; next city load |
+| `TUNE.wbMerged` / `TUNE.wbNfc` (no slider) | ON / ON | also simplify the merged street/building tiles / the always-drawn instanced props; next city load |
+| `TUNE.wbFig` (no slider) hide far minifigs/markers | 260 m | mission-giver minifigs, the 1.5 m beacon stubs and ramp parts beyond this are not drawn (they are a few px tall there) |
 | `TUNE.perfHud` Show FPS · worst frame · draws · tris | OFF | (v88u) one small line (bottom left, under the steer buttons) with fps, the worst frame of the last 2 s, JS ms per frame, the frame's real draw calls and triangles. For perf reports from a real PC/phone |
 
 ## Where the values live
