@@ -10,6 +10,9 @@ import json,base64
 def art_js():
     A=os.path.join(SP,'thornbound','art');man=json.load(open(A+'/manifest.json',encoding='utf-8'))
     out={k:'data:image/webp;base64,'+base64.b64encode(open(os.path.join(A,v+'.webp'),'rb').read()).decode() for k,v in man['items'].items() if os.path.exists(os.path.join(A,v+'.webp'))}
+    for f in ('gilded','heath','lantern','choir'):
+        fp=os.path.join(A,'basic-%s.webp'%f)
+        if os.path.exists(fp): out['basic-'+f]='data:image/webp;base64,'+base64.b64encode(open(fp,'rb').read()).decode()
     return 'var TB_ART = '+json.dumps(out,separators=(',',':'))+';'
 h=rd(S+'/head.html').replace('/*SHELL_CSS*/',rd(SP+'/shell/shell.css'));h=h.replace('</style>',rd(SP+'/shell/gx-campaign.css')+rd(SP+'/shell/gx-help.css')+rd(SP+'/shell/gx-tutor.css')+'</style>',1);body=rd(S+'/body.html')
 for f,p in SRC.items():

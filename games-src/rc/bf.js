@@ -151,7 +151,7 @@ BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b
   try{if(k==='weather'){const w=(viewState()||G).lastWx;const r=w&&w.rain||0,s=w&&w.snow||0;ic=w&&w.storm?'⛈️':r?'🌧️'.repeat(Math.min(3,r)):s?'❄️'.repeat(Math.min(3,s)):'☀️';BF.rain(pos,r,s,w&&w.storm);if(w&&w.storm)cls+=' storm'}
     else if(d.card!=null&&CARD[d.card]){const c=CARD[d.card];const ti=c.icon&&TYICON[c.icon];ic=(CARDICON[k]||'🎴')+(ti?ti:'')}}catch(e){}
   const el=document.createElement('div');el.id='bfcard';el.className='bfcard '+cls;el.setAttribute('role','button');el.setAttribute('aria-label',w8(capFor(i))+' (hold for the full text)');
-  el.innerHTML=`<div class="in"><div class="fr"><span class="bfic">${ic}</span><span class="bftt">${E(w8(capFor(i)))}</span></div></div>`;ov.appendChild(el);
+  el.innerHTML=`<div class="in"><div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span></div></div>`;ov.appendChild(el);
   // hold to read the full card text; a quick tap moves on
   let t0=0,tm=null,held=false;const cancel=()=>{clearTimeout(tm);tm=null};
   el.addEventListener('pointerdown',e=>{e.stopPropagation();t0=Date.now();held=false;cancel();tm=setTimeout(()=>{held=true;BF.info()},480)});

@@ -256,6 +256,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
   if(a==='music'){renderMusic();GX.show('dkMusic');return}
+  if(a==='mall'){const on=MLOOPS.every(k=>SND.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?MDEF[k]:'all'));renderMusic();return}
   if(a==='mpick'){musicPick(t.dataset.s,t.dataset.c);renderMusic();return}
   if(a==='mprev'){musicPreview(t.dataset.s);renderMusic();return}
   if(a==='mprevx'){musicPreviewStop();renderMusic();return}
@@ -291,10 +292,12 @@ function renderMusic(){const b=$('#dkMusicBody');if(!b||typeof MSLOTS==='undefin
   const rows=MSLOTS.map(([k,nm])=>{const cur=SND.pick[k],act=SND.wslot===k&&on&&cur!=='off';
     const ch=[['a'],['b']].map(([v])=>`<button class="mchip${cur===v?' on':''}" data-a="mpick" data-s="${k}" data-c="${v}">${MTITLE[k+'-'+v]}</button>`);
     if(k!=='victory'&&k!=='defeat')ch.push(`<button class="mchip${cur==='classic'?' on':''}" data-a="mpick" data-s="${k}" data-c="classic">Classic</button>`);
-    ch.push(`<button class="mchip${cur==='shuffle'?' on':''}" data-a="mpick" data-s="${k}" data-c="shuffle">⇄ Shuffle</button>`,`<button class="mchip${cur==='off'?' on':''}" data-a="mpick" data-s="${k}" data-c="off">Off</button>`);
+    ch.push(`<button class="mchip${cur==='shuffle'?' on':''}" data-a="mpick" data-s="${k}" data-c="shuffle">⇄ Shuffle</button>`);
+    if(MLOOPS.includes(k))ch.push(`<button class="mchip${cur==='all'?' on':''}" data-a="mpick" data-s="${k}" data-c="all">⇄ All songs</button>`);
+    ch.push(`<button class="mchip${cur==='off'?' on':''}" data-a="mpick" data-s="${k}" data-c="off">Off</button>`);
     const pv=SND.prev===k?`<button class="mchip prev" data-a="mprevx" data-s="${k}">■ Stop preview</button>`:(!act&&cur!=='off'&&on?`<button class="mchip prev" data-a="mprev" data-s="${k}">▶ Preview</button>`:'');
     return `<div class="mrow2"><h3>${nm}${act?' <small>playing now</small>':''}</h3><div class="mchips">${ch.join('')}${pv}</div></div>`}).join('');
-  setHTML(b,`<div class="music"><div class="mtop"><button class="mchip${on?' on':''}" data-a="mmus">${ic('music')} Music: ${on?'on':'off'}</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div>${rows}</div>`)}
+  setHTML(b,`<div class="music"><div class="mtop"><button class="mchip${on?' on':''}" data-a="mmus">${ic('music')} Music: ${on?'on':'off'}</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div><div class="mtop"><button class="mchip${MLOOPS.every(k=>SND.pick[k]==='all')?' on':''}" data-a="mall">⇄ Shuffle all songs</button></div>${rows}</div>`)}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
 GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
 $('#speedbtn').innerHTML=SPEEDN(UI.speed);if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}

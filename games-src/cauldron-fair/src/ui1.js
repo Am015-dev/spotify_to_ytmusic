@@ -89,8 +89,9 @@ function snd(name, o) {
 function sndMusic() {
   try {
     if (!window.GA) return;
-    if (UI.prefs.music === false || !G || !UI.started) { GA.music(null); GA.stopLoop && GA.stopLoop('bubbling'); return; }
-    GA.music('main', { vol: .3 }); if (GA.has && GA.has('bubbling') && GA.loop) GA.loop('bubbling', { vol: .12, fade: 1.5 });
+    if (typeof musicSync === 'function') musicSync(); else GA.music(UI.prefs.music === false || !G || !UI.started ? null : 'main', { vol: .3 });
+    if (UI.prefs.music === false || !G || !UI.started) { GA.stopLoop && GA.stopLoop('bubbling'); return; }
+    if (GA.has && GA.has('bubbling') && GA.loop) GA.loop('bubbling', { vol: .12, fade: 1.5 });
   } catch (e) { }
 }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.drawb,.stopb,[data-a=mv]')) snd('click'); }, true);

@@ -33,7 +33,7 @@ function thriftyTarget(){let best=null,bw=0;for(const a of G.plan.acts){if(a.typ
 function useSkill(ci,k){const why=skillWhy(ci,k);if(why)return why;const c=P(ci);const s=CHARS[c.k].skills.find(x=>x.k===k);c.det-=s.c;c.used[k]=1;lg(`${c.nm} uses ${s.n}.`,'step');fx('skill',ci);
   switch(k){
   case 'thrifty':{const t=thriftyTarget();lg(`${actLabel(t)} costs 1 wood less.`,'good');G.plan.thrifty=t.id;break}
-  case 'idea':{const top=G.inv.deck.slice(0,5);ask(ci,'Bright Idea: put one invention on the board',top.map(x=>({l:`${INVENTIONS[x].n}: ${INVENTIONS[x].x}`,frames:[{f:'fn',k:'addInv',key:x}]})),{kind:'inv',force:1});break}
+  case 'idea':{const top=G.inv.deck.slice(0,5);ask(ci,'Bright Idea: put one invention on the board',top.map(x=>({l:`${INVENTIONS[x].n}: ${INVENTIONS[x].x}`,art:'inv-'+x,frames:[{f:'fn',k:'addInv',key:x}]})),{kind:'inv',force:1});break}
   case 'hands':G.plan.hands=1;lg('An extra pawn for a build action this round.','good');break;
   case 'remedy':{pay('food',1,[],true);const o=living().filter(x=>x.w>0).map(x=>({l:`${x.nm} heals 2`,ops:[['heal',x.i,2]]}));if(living().filter(x=>x.w>0).length>1)o.push({l:'Split: 1 each to the two most hurt',ops:living().filter(x=>x.w>0).sort((a,b)=>b.w-a.w).slice(0,2).map(x=>['heal',x.i,1])});ask(ci,'Home Remedy: who is treated?',o,{kind:'heal'});break}
   case 'broth':gain('food',1,{});break;

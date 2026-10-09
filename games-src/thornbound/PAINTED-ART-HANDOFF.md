@@ -34,3 +34,9 @@ Google Flow (Nano Banana) image generation from our own prompts, with no referen
 - Extras in `ui13.js`: face-down card back (`back-default`, or the latest `cardback` unlock), table behind the map (`table-court` / `-phone`, or the latest `table` unlock; CSS vignette; CSS only while loading and on Low graphics). Portraits through `GXC.init({artBase:'media/'})`, title key art in `titleArt()`, end art in `overHTML()`.
 - Music: `games/thornbound/music/*.mp3` (a and b of tavern/main/fight/victory/defeat), `audio-data.js` points at them. `ui14.js` picks the track per screen (title = tavern, game = main, final round = fight, end card = victory/defeat) and has the Music panel (Menu, Settings and the title screen). Music is now on by default (`tb_mus` = 0 turns it off); choices are saved in `tb_mpick`.
 - Page size: 1.25 MB -> 1.82 MB. Screenshots: `playtest/`.
+
+## Painted look pass (2026-10-09)
+- Basic cards (and the Heir): `cardSpec` sets `img:'basic-<faction>'`. `art/basic-<faction>.webp` (gilded, heath, lantern, choir) is embedded in `TB_ART` by `build.py` when it exists; until then `ui13.js` uses a crop of `media/camp-halvard|ysolde|rook|orlen.webp`.
+- Map: kit `TB.setMapImg()`; `ui13.js` loads `media/map.webp` / `map-phone.webp` when present (`html[data-mapimg]`). Without them the drawn land is a light parchment wash over the table (`.tb-bg-*` classes in `head.html`).
+- Title overlay lightened (56% tall, .62); kingdom-card inspect shows the card up to 300 px wide, centred.
+- Missing: see `games-src/MISSING-ASSETS.md` (Thornbound).

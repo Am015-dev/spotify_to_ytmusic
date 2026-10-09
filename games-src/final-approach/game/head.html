@@ -286,12 +286,18 @@ html .gx-scrim{z-index:63}html .gx-drawer{z-index:64}
 /* ---- pass screen, end card, netbox ---- */
 #pass{position:fixed;inset:0;z-index:62;background:radial-gradient(ellipse at 50% 40%,#2f5a68,#0a141c 75%);display:flex;align-items:center;justify-content:center;padding:14px}
 .passbox{background:var(--paper);border:3px solid #14202c;border-radius:18px;padding:18px;width:min(420px,100%);display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.5)}
-.passbox img{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#ccd6df}
+.passbox{position:relative}.passbox img.cback{position:absolute;top:10px;right:10px;width:44px;height:auto;border-radius:6px;border:2px solid #14202c;transform:rotate(6deg);background:none;object-fit:cover}.passbox img{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#ccd6df}
 .passbox h2{margin:0;font-size:1.4rem;font-weight:900}.passbox p{margin:0;font-size:14.5px}
 #rs.story{z-index:70}
 .stbox .stimg{width:100%;height:110px;object-fit:cover;border-radius:10px;border:2px solid #14202c}
 html.ph .stbox .stimg{height:64px}
 #rs{position:fixed;inset:0;z-index:55;background:rgba(8,16,24,.55);display:flex;align-items:flex-end;justify-content:center;padding:8px}
+.rsbox img.endart{width:100%;height:auto;max-height:26vh;object-fit:cover;border-radius:10px;border:2px solid #14202c;flex:0 0 auto}html.ph .rsbox img.endart{max-height:15vh}
+#musicbody .mtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.mvol{display:flex;align-items:center;gap:6px;font-weight:800}.mvol input{width:120px}
+.mrow2{margin:0 0 12px}.mrow2 h5{margin:0 0 6px;font-size:15px}.mrow2 small{font-weight:600;color:#2d7a1c}.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid var(--gx-line,#445);background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center}
+.mchip.on{background:var(--gx-accent,#f0a83a);color:#1a1208;border-color:var(--gx-accent,#f0a83a)}.mchip.prev{border-style:dashed}
+html.tbl #board{background:var(--tbl-img) center/cover no-repeat}
 .rsbox{background:var(--paper);border:3px solid #14202c;border-radius:16px;width:min(560px,100%);max-height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 44px rgba(0,0,0,.55);overscroll-behavior:contain}
 .rsbox .cbtns{position:sticky;bottom:-8px;background:var(--paper);padding:6px 0 8px;margin-top:auto;z-index:2}
 html.ph-l .rsbox .kv{display:none}

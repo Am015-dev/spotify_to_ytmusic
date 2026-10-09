@@ -23,7 +23,7 @@ Wiring:
 - **Tables:**
   - `table-workbench` is the new default defusal workbench with a calm centre; the page has no table image yet, so add it behind the board like the other games.
   - `table-tower-floor` and `table-clockface` are the campaign `table` unlocks.
-- **Key art:** `title.webp`, `end-win.webp` and `end-lose.webp`. The phone versions follow if Flow manages them.
+- **Key art:** `title.webp`, `end-win.webp` and `end-lose.webp`. `title-phone.webp` is the portrait title; a phone table is still to come (crop `table-workbench` until then).
 
 ## Music
 `../audio/short-fuse/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.

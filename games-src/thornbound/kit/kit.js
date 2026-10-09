@@ -673,6 +673,17 @@ function mapDefs() {
     lg('tbm-ribbon', [[0, '#e8d9b0'], [1, '#c1ab78']], 0, 0, 0, 1) + lg('tbm-lane', [[0, '#120b07'], [1, '#2a1a10']], 0, 0, 0, 1);
 }
 
+/* painted map (optional): TB.setMapImg(url) puts a painting under the roads, locations and track; CSS html[data-mapimg] then lets it show through. */
+var MAPIMG = '';
+function mapImgEl(W, H) { return '<image class="tb-bg-img" href="' + MAPIMG + '" x="0" y="0" width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice"/>'; }
+TB.setMapImg = function (u) {
+  MAPIMG = u || '';
+  Array.prototype.forEach.call(document.querySelectorAll('.tb-m-static'), function (g) {
+    var old = g.querySelector('.tb-bg-img'); if (old) old.remove();
+    var v = g.querySelector('.tb-bg-void'), vb = g.ownerSVGElement && g.ownerSVGElement.viewBox.baseVal;
+    if (MAPIMG && v && vb) v.insertAdjacentHTML('afterend', mapImgEl(vb.width, vb.height));
+  });
+};
 TB.map = function (opts) {
   opts = opts || {}; TB.mount();
   var W = opts.w || 1000, H = opts.h || 1000, cx = W / 2, cy = H / 2, N = opts.trackLen || 40, seed = opts.seed || 7, low = opts.quality === 'low';
@@ -693,15 +704,15 @@ TB.map = function (opts) {
     var R = rngf(seed), s = '', i, land = rrWalk(98, 98, W - 196, H - 196, 120), pts = [], np = 56, lp;
     for (i = 0; i < np; i++) { lp = land.at(i * land.L / np); var j = (R() - .5) * 26; pts.push([lp.x + lp.nx * j, lp.y + lp.ny * j]); }
     var landD = smoothClosed(pts);
-    s += '<rect width="' + W + '" height="' + H + '" fill="url(#tbm-void)"/>';
+    s += '<rect class="tb-bg-void" width="' + W + '" height="' + H + '" fill="url(#tbm-void)"/>' + (MAPIMG ? mapImgEl(W, H) : '');
     /* outer frame + track lane */
-    s += '<rect x="5" y="5" width="' + (W - 10) + '" height="' + (H - 10) + '" rx="40" fill="#1b110b" stroke="url(#tb-gold)" stroke-width="6"/>' + '<rect x="14" y="14" width="' + (W - 28) + '" height="' + (H - 28) + '" rx="34" fill="none" stroke="#6e4c14" stroke-width="1.6"/>' + (low ? '' : '<rect x="6" y="6" width="' + (W - 12) + '" height="' + (H - 12) + '" rx="38" filter="url(#tb-grain)" opacity=".55"/>');
+    s += '<rect class="tb-bg-frame" x="5" y="5" width="' + (W - 10) + '" height="' + (H - 10) + '" rx="40" fill="#1b110b" stroke="url(#tb-gold)" stroke-width="6"/>' + '<rect x="14" y="14" width="' + (W - 28) + '" height="' + (H - 28) + '" rx="34" fill="none" stroke="#6e4c14" stroke-width="1.6"/>' + (low ? '' : '<rect x="6" y="6" width="' + (W - 12) + '" height="' + (H - 12) + '" rx="38" filter="url(#tb-grain)" opacity=".55"/>');
     var lane = 'M' + (46 + 56) + ' 46 H' + (W - 102) + ' A56 56 0 0 1 ' + (W - 46) + ' 102 V' + (H - 102) + ' A56 56 0 0 1 ' + (W - 102) + ' ' + (H - 46) + ' H102 A56 56 0 0 1 46 ' + (H - 102) + ' V102 A56 56 0 0 1 102 46Z';
     s += '<path d="' + lane + '" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="66"/><path d="' + lane + '" fill="none" stroke="#150d08" stroke-width="62"/><path d="' + lane + '" fill="none" stroke="url(#tb-gold)" stroke-width="64" stroke-opacity=".0"/><path d="' + lane + '" fill="none" stroke="#8a6a24" stroke-width="1.4" transform="translate(0 0)" opacity=".0"/>';
     /* the land */
     s += '<defs><clipPath id="tbm-landclip"><path d="' + landD + '"/></clipPath></defs>';
     s += '<path d="' + landD + '" fill="#000" opacity=".6" transform="translate(0 5)"' + filt('tb-soft') + '/>';
-    s += '<g clip-path="url(#tbm-landclip)"><g' + filt('tb-paint') + '>';
+    s += '<g class="tb-bg-land" clip-path="url(#tbm-landclip)"><g' + filt('tb-paint') + '>';
     s += '<path d="' + landD + '" fill="url(#tbm-land)"/><rect x="0" y="0" width="' + W + '" height="' + H + '" fill="url(#tbm-landR)"/>';
     /* colour washes */
     var wc = ['#6f8a45', '#4a5f2f', '#8a7a45', '#3c4a3a', '#566b3a', '#2d3d26'];

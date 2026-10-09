@@ -22,13 +22,13 @@ Generated 9 Oct 2026 from the card data, art manifests, campaign files, hand-off
 | Short Fuse | 2 | 56 |
 | Tidewake | 31 | 0 |
 | Hollowbough | 0 | 0 |
-| The Thornbound Throne | 0 | 1 |
+| The Thornbound Throne | 6 | 1 |
 | Kaiten Kitchen | 13 | 29 |
 | Lantern Dive | 42 | 0 |
 | Cauldron Fair | 3 | 73 |
 | Final Approach | 2 | 42 |
 | Mainhattan Nightrun | 0 | 0 |
-| **Total** | **305** | **262** |
+| **Total** | **311** | **262** |
 
 ## To make, per game
 
@@ -193,7 +193,7 @@ Style block (paste in front of every art prompt for this game):
 
 ### Shipwreck Isle (`games/shipwreck-isle/`)
 
-**51 to make.** 50 card paintings and the default back are made but not in the game yet. Part 2 (discoveries, wrecks, characters, portraits, backs, tables, title and end screens) is still to make; Flow paused it with an "unusual activity" refusal.
+**51 to make.** (2026-10-09: the 50 card paintings, the default back and the Treblo music are now wired in; card list page `games/shipwreck-isle/cards.html`.) Part 2 (discoveries, wrecks, characters, portraits, backs, tables, title and end screens) is still to make; Flow paused it with an "unusual activity" refusal.
 
 Style block (paste in front of every art prompt for this game):
 
@@ -705,9 +705,35 @@ Style block (paste in front of every art prompt for this game):
 
 ### The Thornbound Throne (`games/thornbound/`)
 
-**0 to make.** All 51 kingdom cards (kc01 to kc51, including kc27), portraits, backs, tables, title/end art and music are made. One back is unused.
+**6 to make.** All 51 kingdom cards (kc01 to kc51, including kc27), portraits, backs, tables, title/end art and music are made. Left: 4 faction Basic-card paintings and the painted kingdom map (2). Until they exist, the Basic cards show a crop of the faction's campaign portrait and the map shows the painted table through a parchment wash; the page picks the new files up automatically.
 
-- Optional: The faction Basic cards (14 per faction) are not painted; they use the faction colour.
+Style block (paste in front of every art prompt for this game):
+
+> Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.
+
+**Faction Basic cards (one painting per faction, used behind all 14 of that faction's Basic cards)**
+
+- [ ] `games-src/thornbound/art/basic-gilded.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Gilded Line: a noble court: a gold-trimmed crimson banner, a jewelled signet ring and a tall candle on dark green velvet, a gilded hall behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-gilded`.
+- [ ] `games-src/thornbound/art/basic-heath.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Tidebound (heath clans): a windswept heath: a standing stone, a driftwood-and-rope clan standard and a tide-pool lantern, grey sea and heather behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-heath`.
+- [ ] `games-src/thornbound/art/basic-lantern.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Ember Guild (lantern uprising): a lantern-lit alley: a crowd of raised lanterns and a torn orange pennant, rooftops and warm ember glow behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-lantern`.
+- [ ] `games-src/thornbound/art/basic-choir.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Pale Vigil (moth choir): a candlelit vigil: pale moths around a single white candle and a violet veil, silver thread, an arched chapel behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-choir`.
+
+**Painted kingdom map (wired automatically when present; locations, roads and the track are drawn on top)**
+
+- [ ] `games/thornbound/media/map.webp` (16:9, 1376x768 WebP)
+  - Prompt: a painted parchment map of a small thorn-hedged kingdom seen from above on a candlelit table: a ring of road around the edge, six marked places (two uplands, two tablelands, two marshes) with a crowned throne hill in the centre, a winding river, forests and ruins, ink linework in tarnished gold and green, lots of empty calm space for tokens, parchment edges fading to transparent green felt, no text, no lettering
+  - Note: the page loads `map-phone` in portrait, `map` otherwise.
+- [ ] `games/thornbound/media/map-phone.webp` (9:16, 768x1376 WebP)
+  - Prompt: the same painted parchment kingdom map composed upright for a phone: ring road around the edge, six marked places, crowned throne hill in the centre, winding river, forests and ruins, ink linework in tarnished gold and green, calm empty space for tokens, parchment edges fading to green felt, no text, no lettering
+  - Note: the page loads `map-phone` in portrait, `map` otherwise.
 
 ### Kaiten Kitchen (`games/kaiten-kitchen/`)
 
@@ -933,30 +959,20 @@ Files that exist in the repo but the live game does not use yet. This is our wor
 
 - [ ] games/thornbound/media/back-court.webp (the "crowned stag" deck back) is not used by the page; only back-default and the campaign unlocks are. (1)
 
-### Kaiten Kitchen (29 files)
+### Kaiten Kitchen: all wired and deployed 9 Oct (11 paintings, artBase portraits, 3 card backs, midnight-belt table, end art, Treblo music with Music picker)
 
-- [ ] 11 Flow paintings in games-src/kaiten/art/*.png (tempura, dumpling, roll1, roll2, salmon, chop, chef-pip, belt, counter, back, title; committed 9 Oct, the built page is the 8 Oct one): rebuild and deploy (11)
-- [ ] 2 portraits media/camp-suzu.webp and camp-pip.webp: no artBase set (2)
-- [ ] 3 card backs media/back-lunch-belt, back-custard, back-golden (3)
-- [ ] 1 table skin media/table-midnight-belt.webp (1)
-- [ ] 2 end screens media/end-win.webp and end-lose.webp (2)
-- [ ] Treblo music: games-src/audio/kaiten/treblo/ has 10 tracks; nothing in games/kaiten-kitchen/music/ (10)
+### Cauldron Fair (done 9 Oct 2026, live)
 
-### Cauldron Fair (73 files)
+- [x] 27 Flow paintings rebuilt and deployed; portraits via artBase `media/`; bag skins (moss-bag, ember-bag), table skins (market-cloth, judges-tent) and end-win/end-lose wired
+- [x] 24 fortune cards shown on the fortune bar, chip, long-press card, option box and card list; `games/cauldron-fair/cards.html` (built by `cauldron-fair/cards-page.js`)
+- [x] Treblo music (10 tracks in `games/cauldron-fair/music/`), per-screen crossfades, Music picker
+- [ ] Still to make: Tamsin redo (char-tamsin.png, Flow drew a bearded man), table-phone.png and title-phone.png (9:16)
 
-- [ ] 27 Flow paintings in games-src/cauldron-fair/art/*.png (committed 9 Oct, built page is still the 8 Oct one with painted stand-ins): rebuild with build.py and deploy (27)
-- [ ] 6 portraits media/camp-*.webp: GXC.init has no artBase: "media/" (6)
-- [ ] 2 bag skins media/bag-moss.webp and bag-ember.webp (campaign cardback ids are moss-bag and ember-bag, so the names need a mapping) (2)
-- [ ] 24 fortune cards media/fortune-<id>.webp: no code shows them yet (24)
-- [ ] 2 end screens media/end-win.webp and end-lose.webp (2)
-- [ ] 2 table skins media/table-market-cloth.webp and table-judges-tent.webp (2)
-- [ ] Treblo music: games-src/audio/cauldron-fair/treblo/ has 10 tracks (5 cues x a/b); none in games/cauldron-fair/music/ yet (pick or ship both, cut loops, add audio-data) (10)
+### Final Approach (42 files): wired and deployed 9 Oct (paintings, portraits, backs, 3 table skins, Treblo music with Music picker incl. Shuffle all songs, end art)
 
-### Final Approach (42 files)
-
-- [ ] 17 Flow paintings in games-src/final-approach/art/*.png (sky x4, terrain x5, planes x2, crew x2, title, end-land, end-crash; committed 9 Oct, built page is the 8 Oct one): rebuild and deploy (17)
-- [ ] 10 portraits media/camp-*.webp: no artBase set (10)
-- [ ] 2 card backs media/back-default.webp and back-spires.webp (2)
-- [ ] 3 table skins media/table-night-lake.webp, table-storm.webp, table-valley.webp (3)
-- [ ] Treblo music: games-src/audio/final-approach/treblo/ has 10 tracks; nothing in games/final-approach/music/ (10)
+- [x] 17 Flow paintings in games-src/final-approach/art/*.png (sky x4, terrain x5, planes x2, crew x2, title, end-land, end-crash; committed 9 Oct, built page is the 8 Oct one): rebuild and deploy (17)
+- [x] 10 portraits media/camp-*.webp: no artBase set (10)
+- [x] 2 card backs media/back-default.webp and back-spires.webp (2)
+- [x] 3 table skins media/table-night-lake.webp, table-storm.webp, table-valley.webp (3)
+- [x] Treblo music: games-src/audio/final-approach/treblo/ has 10 tracks; nothing in games/final-approach/music/ (10)
 

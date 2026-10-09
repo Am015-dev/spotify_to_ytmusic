@@ -23,7 +23,7 @@
     return o && typeof o === 'object' ? o : null;
   }
   function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
-  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), skipped: !!(o && o.skipped), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
   function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
   // ------------------------------------------------------------------ geometry
   function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
@@ -250,8 +250,9 @@
   }
   function skip() {
     if (!S) return; var g = cfg.game, ex = cfg.onExit;
-    mark(g, { open: 0, step: 0 }); teardown();
-    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+    // a skipped tutorial counts as seen: Story must not force it again
+    mark(g, { open: 0, step: 0, skipped: 1 }); teardown();
+    try { if (ex) ex({ skipped: true }); } catch (e) { console.warn('gxt onExit', e); }
   }
   function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
   // ------------------------------------------------------------------ start
@@ -326,7 +327,7 @@
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
     index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
-    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
 })();

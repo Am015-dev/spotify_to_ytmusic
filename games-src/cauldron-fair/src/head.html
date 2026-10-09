@@ -22,7 +22,7 @@ svg{display:block}
 #barstat .dayn{background:rgba(242,184,30,.2);border:1px solid rgba(242,184,30,.55);border-radius:12px;padding:1px 9px}
 #barprompt{flex:1;min-width:0;display:none}
 .gx-board{background:#4a3224}
-#bd{position:absolute;inset:0;display:flex;flex-direction:column;min-width:0;min-height:0;background:radial-gradient(ellipse at 50% 38%,#6a4630,#3d281c 72%)}
+#bd{position:absolute;inset:0;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--tbl-img,none) center/cover no-repeat,radial-gradient(ellipse at 50% 38%,#6a4630,#3d281c 72%)}
 #bd.hasart{background-size:cover;background-position:center}
 #pxc{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 /* ---- other cauldrons: small thumbnails you can tap ---- */
@@ -642,5 +642,22 @@ html.ph.ph-l #fortchip{left:auto;right:6px}
 .ratb svg{display:block}
 .ratrow{display:flex;flex-direction:column;gap:4px;background:rgba(248,238,216,.97);border:2px solid var(--ink);border-radius:12px;padding:5px}
 .rgems.cmp{gap:3px;flex:0 0 100%;font-size:15px}.rgems .rcs{color:#ff9aa8}
+
+/* ===== part 12: fortune paintings, end art, Music picker ===== */
+.fpic{flex:0 0 auto;width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid rgba(58,36,56,.5);background:#f1e8fb}
+html.ph #fort:not(.open) .fpic{display:none}html.ph #fort.open .fpic{width:84px;height:84px}
+.fcimg{flex:0 0 auto;width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid #fff6dc}
+.qfimg{float:left;width:46px;height:46px;border-radius:10px;object-fit:cover;margin:0 8px 2px 0;border:2px solid rgba(58,36,56,.5)}
+#lpb .lpi{flex-direction:column;align-items:center;gap:4px}#lpb .lpimg{width:84px;height:84px;border-radius:10px;object-fit:cover;border:2px solid #3a2438}
+.rfort{flex:0 0 auto;position:relative;width:56px;height:56px;border-radius:10px;overflow:hidden;display:block;background:#7a4ab5}.rfort.blue{background:#3b82d6}
+.rfimg{display:block;width:100%;height:100%;object-fit:cover}
+.rfort i{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font:900 10px/1 var(--font);text-align:center;padding:2px 0;font-style:normal}
+.endart{height:clamp(84px,22vh,190px);flex:0 0 auto;margin:0 0 8px;border-radius:12px;border:2px solid var(--ink);background:center/cover no-repeat}
+.endart.win{background-image:url(media/end-win.webp)}.endart.lose{background-image:url(media/end-lose.webp)}
+#musicbody .mtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.mvol{display:flex;align-items:center;gap:6px;font-weight:800}.mvol input{width:120px}
+.mrow2{margin:0 0 12px}.mrow2 h5{margin:0 0 6px;font-size:15px}.mrow2 small{font-weight:600;color:#2d7a1c}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid var(--ink);background:#f4ecd2;color:#3a2438;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
+.mchip.on{background:#3a2438;color:#fff6dc}.mchip.prev{border-style:dashed}
 </style></head>
 

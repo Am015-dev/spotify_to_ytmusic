@@ -58,6 +58,7 @@ function cardSpec(id,opt){opt=opt||{};
   const txt=((tr.length?tr.join(', ')+'. ':'')+(i.text||'')).trim();
   const bits=[];if(i.votes)bits.push(i.votes+' vote'+(i.votes>1?'s':''));if(i.lore)bits.push(i.lore+' lore');
   const spec={faction:f,title:i.name,value:i.kind==='hq'?null:i.strength,cost:i.cost>0?i.cost:null,type:i.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:i.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:txt||'No special ability.',tag:bits.join(' · ')||undefined};
+  if(i.kind==='basic'||i.kind==='heir')spec.img='basic-'+f;
   return spec}
 function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
   return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],img:'kc'+String(n).padStart(2,'0'),text:k.text,num:'No. '+n}}
@@ -611,7 +612,7 @@ function renderPop(){const el=$('#ppop');if(!el)return;
   el.dataset.kind=UI.pop;
   sizePopCard()}
 function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-card');if(!c)return;const W=el.clientWidth,H=el.clientHeight;
-  const w=Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
+  const big=c.dataset.kc!=null;const w=big?Math.max(120,Math.min(300,W*.74,(innerHeight*.86-130)/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
 function popCard(id){const s=vs();const i=cinfo(id);const mine=ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
@@ -792,11 +793,13 @@ document.addEventListener('click',e=>{
    case 'rules':GX.show('rulesd');break;
    case 'music':renderMusic();GX.show('musd');break;
    case 'mpick':musicPick(t.dataset.s,t.dataset.c);renderMusic();break;
+   case 'mall':{const on=MLOOPS.every(k=>MS.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?MDEF[k]:'all'));renderMusic();break}
    case 'mprev':musicPreview(t.dataset.s);renderMusic();break;
    case 'mprevx':musicPreviewStop();renderMusic();break;
    case 'mmus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMusic();break;
    case 'gdset':UI.guide=t.dataset.v;renderMenu();break;
    case 'snd':UI.sound=!UI.sound;try{localStorage.setItem('tb_snd',UI.sound?'1':'0')}catch(x){}if(window.GA)GA.setSfx(UI.sound);renderMenu();break;
+   case 'cback':try{localStorage.setItem('tb_back',t.dataset.v==='court'?'court':'default')}catch(x){}renderMenu();break;
    case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMenu();break;
    case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
@@ -821,6 +824,7 @@ function renderMenu(){const el=$('#setbody');if(!el)return;
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button><button class="btn" data-a="music">Pick the songs…</button></div>'+
+   (()=>{let c='default';try{c=localStorage.getItem('tb_back')==='court'?'court':'default'}catch(e){}const st=GXC&&GXC.unlocked?GXC.unlocked().some(x=>x.type==='cardback'):false;return '<div class="mrow"><span>Card back</span><button class="btn" data-a="cback" data-v="default" aria-pressed="'+(c==='default')+'">Thorn crown</button><button class="btn" data-a="cback" data-v="court" aria-pressed="'+(c==='court')+'">Crowned stag</button>'+(st?'<span class="small">An unlocked story back is used while you have one.</span>':'')+'</div>'})()+
    '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
    '<h4>Credits</h4><p class="small">Art, map, cards and icons are original: painted pictures made with Google Flow from our own prompts, plus procedural drawings. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Music: ten instrumental tracks made with Treblo from our own prompts. Sound effects: Kenney (CC0).</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
@@ -1756,7 +1760,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(o&&typeof GXC!=='undefined')GXC.open()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
@@ -1779,14 +1783,24 @@ const PX=(function(){
   function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
   function load(f,cb){if(seen[f])return cb();const im=new Image();im.onload=()=>{seen[f]=1;cb()};im.src='media/'+f+'.webp'}
   // face-down cards: the thorn-crown back, or the latest card back unlocked in the story
-  function backApply(){const id=unl('cardback')||'default';if(id===curB)return;
+  function backApply(){let pb='default';try{pb=localStorage.getItem('tb_back')==='court'?'court':'default'}catch(e){}
+    const id=unl('cardback')||pb;if(id===curB)return;
     load('back-'+id,()=>{curB=id;TBKit.setBack('media/back-'+id+'.webp')})}
   // table: the candlelit court (phone version in portrait), or an unlocked table, behind the map
   function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
     const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
     if(f===curT)return;load(f,()=>{curT=f;R.style.setProperty('--tbl-img','url(media/'+f+'.webp)');R.dataset.timg='1'})}
-  function tick(){backApply();tableApply()}
-  ['back-default','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
+  // painted kingdom map (map.webp / map-phone.webp), used when present; locations stay on top
+  let curM='';
+  function mapApply(){const f=matchMedia('(orientation:portrait)').matches?'map-phone':'map';if(f===curM||UI.lowGfx)return;
+    const im=new Image();im.onload=()=>{curM=f;TBKit.setMapImg('media/'+f+'.webp');R.dataset.mapimg='1'};im.src='media/'+f+'.webp'}
+  // Basic cards: art/basic-<faction>.webp (embedded in TB_ART, already in PA) when it exists, else a crop of the faction's campaign portrait
+  const BFB={gilded:'camp-halvard',heath:'camp-ysolde',lantern:'camp-rook',choir:'camp-orlen'};let bdone=false;
+  function basicApply(){if(bdone)return;bdone=true;const extra={};let n=0;const fin=()=>{if(--n>0)return;TBKit.setArt(Object.assign({},PA,extra));if(typeof renderAll==='function'&&typeof G!=='undefined'&&G)try{renderAll()}catch(e){}};
+    const ks=Object.keys(BFB).filter(f=>!PA['basic-'+f]);n=ks.length;if(!n)return;
+    ks.forEach(f=>{const im=new Image();im.onload=()=>{extra['basic-'+f]='media/'+BFB[f]+'.webp';fin()};im.onerror=fin;im.src='media/'+BFB[f]+'.webp'})}
+  function tick(){backApply();tableApply();mapApply();basicApply()}
+  ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();
 // ===================== part 14: music per screen + the Music picker =====================
@@ -1794,24 +1808,28 @@ const PX=(function(){
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Final round'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'The Gilded Hall at Midnight','tavern-b':'Whispers Beneath the Throne','main-a':'The Quiet Ledger','main-b':'Velvet Daggers','fight-a':'Siege of the Glass Kingdom','fight-b':'Thornfield Advance','victory-a':'All Hail the Victor','victory-b':'Fanfare for a New King','defeat-a':'Lanterns in the Frostwood','defeat-b':'A Lullaby for Empty Halls'};
 const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
-const MS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0};
+const MS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
+// 'all' = shuffle through every looping song (menu, game and final-round tracks), a new one every ~2.5 min
+const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MS.pick,JSON.parse(localStorage.getItem('tb_mpick')||'{}'))}catch(e){}
 function musicWant(){const st=$('#start');if(!G||!UI.started||(st&&!st.hidden))return ['tavern',0];
   if(G.over){const me=vs(),single=NET.on||humans().length===1,won=single?G.over.winner===me:humans().length!==0;return [won?'victory':'defeat',1]}
   return [G.round>=G.rounds?'fight':'main',0]}
 function musicName(slot){const c=MS.pick[slot]||MDEF[slot];if(c==='off')return '-';
+  if(c==='all'){if(!MS.res[slot]){const pool=MALL.filter(k=>k!==MS.last);MS.res[slot]=pool[Math.floor(Math.random()*pool.length)]}return MS.res[slot]}
   if(c==='shuffle'){if(!MS.res[slot]){MS.sh[slot]=MS.sh[slot]===undefined?(Math.random()<.5?0:1):1-MS.sh[slot];MS.res[slot]=slot+'-'+'ab'[MS.sh[slot]]}return MS.res[slot]}
   return slot+'-'+(c==='b'?'b':'a')}
 function musicPick(slot,c){MS.pick[slot]=c;MS.res[slot]=null;try{localStorage.setItem('tb_mpick',JSON.stringify(MS.pick))}catch(e){}
-  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musicName(slot))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle'&&c!=='all')try{GA.preload(musicName(slot))}catch(e){}
   if(MS.wslot===slot&&!MS.prev){MS.want=null;musicSync()}}
 // one cross-faded track at a time; called from a slow tick, the first tap, and after the music button or a pick
 function musicSync(){try{PX.tick()}catch(e){}
   if(!window.GA||!UI.music||MS.prev)return;const w=musicWant();if(MS.wslot!==w[0]){MS.wslot=w[0];MS.res[w[0]]=null}
-  const n=musicName(w[0]);if(MS.want===n)return;MS.want=n;
+  else if(MS.pick[w[0]]==='all'&&!w[1]&&MS.since&&Date.now()-MS.since>MALL_MS)MS.res[w[0]]=null;
+  const n=musicName(w[0]);if(MS.want===n)return;MS.want=n;MS.since=Date.now();if(n!=='-')MS.last=n;
   if(n==='-'){GA.music(null,{fade:1});return}
   GA.music(n,{fade:w[1]?.6:1,once:!!w[1]});
-  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=MS.pick[nx];if(c!=='off'&&c!=='shuffle')GA.preload(musicName(nx))}catch(e){}},4000)}}
+  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=MS.pick[nx];if(c!=='off'&&c!=='shuffle'&&c!=='all')GA.preload(musicName(nx))}catch(e){}},4000)}}
 function musicPreview(slot){if(!window.GA||!UI.music||MS.wslot===slot)return;try{GA.unlock()}catch(e){}const n=musicName(slot);if(n==='-')return;
   clearTimeout(MS.prevT);MS.prev=slot;MS.want=null;GA.music(n,{fade:.5,once:true});
   MS.prevT=setTimeout(()=>{MS.prev=null;MS.want=null;musicSync();renderMusic()},8000)}
@@ -1819,9 +1837,9 @@ function musicPreviewStop(){if(!MS.prev)return;clearTimeout(MS.prevT);MS.prev=nu
 function renderMusic(){const b=$('#musbody');if(!b)return;const on=UI.music;let vol=.5;try{vol=GA.state().musVol}catch(e){}
   const rows=MSLOTS.map(([k,nm])=>{const cur=MS.pick[k],act=MS.wslot===k&&on&&cur!=='off';
     const ch=['a','b'].map(v=>'<button class="mchip'+(cur===v?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="'+v+'">'+esc(MTITLE[k+'-'+v])+'</button>');
-    ch.push('<button class="mchip'+(cur==='shuffle'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="shuffle">⇄ Shuffle</button>','<button class="mchip'+(cur==='off'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="off">Off</button>');
+    ch.push('<button class="mchip'+(cur==='shuffle'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="shuffle">⇄ Shuffle</button>',(MLOOPS.includes(k)?'<button class="mchip'+(cur==='all'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="all">⇄ All songs</button>':''),'<button class="mchip'+(cur==='off'?' on':'')+'" data-a="mpick" data-s="'+k+'" data-c="off">Off</button>');
     const pv=MS.prev===k?'<button class="mchip prev" data-a="mprevx" data-s="'+k+'">■ Stop preview</button>':(!act&&cur!=='off'&&on?'<button class="mchip prev" data-a="mprev" data-s="'+k+'">▶ Preview</button>':'');
     return '<div class="mrow2"><h5>'+nm+(act?' <small>playing now</small>':'')+'</h5><div class="mchips">'+ch.join('')+pv+'</div></div>'}).join('');
-  const h='<div class="music"><div class="mtop"><button class="mchip'+(on?' on':'')+'" data-a="mmus">Music: '+(on?'on':'off')+'</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="'+vol+'" aria-label="Music volume"></label></div>'+rows+'</div>';
+  const h='<div class="music"><div class="mtop"><button class="mchip'+(on?' on':'')+'" data-a="mmus">Music: '+(on?'on':'off')+'</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="'+vol+'" aria-label="Music volume"></label></div><div class="mtop"><button class="mchip'+(MLOOPS.every(k=>MS.pick[k]==='all')?' on':'')+'" data-a="mall">⇄ Shuffle all songs</button></div>'+rows+'</div>';
   if(b._h!==h){b._h=h;b.innerHTML=h}}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});

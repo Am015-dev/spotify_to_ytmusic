@@ -1,7 +1,9 @@
 {
  "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
  "items": {
+  "beast-alligator": "beast-alligator",
   "beast-bear": "beast-bear",
+  "beast-birds": "beast-birds",
   "beast-boa": "beast-boa",
   "beast-chamois": "beast-chamois",
   "beast-cheetah": "beast-cheetah",
@@ -15,6 +17,27 @@
   "beast-tiger": "beast-tiger",
   "beast-wild-dog": "beast-wild-dog",
   "beast-wild-pig": "beast-wild-pig",
+  "char-carpenter": "char-carpenter",
+  "char-cook": "char-cook",
+  "char-explorer": "char-explorer",
+  "char-friday": "char-friday",
+  "disc-candles": "disc-candles",
+  "disc-fallentree": "disc-fallentree",
+  "disc-goat": "disc-goat",
+  "disc-healherbs": "disc-healherbs",
+  "disc-herbs": "disc-herbs",
+  "disc-larvae": "disc-larvae",
+  "disc-leaves": "disc-leaves",
+  "disc-machete": "disc-machete",
+  "disc-poison": "disc-poison",
+  "disc-sc1": "disc-sc1",
+  "disc-sc2": "disc-sc2",
+  "disc-sc3": "disc-sc3",
+  "disc-sc4": "disc-sc4",
+  "disc-thorns": "disc-thorns",
+  "disc-tobacco": "disc-tobacco",
+  "disc-treasure": "disc-treasure",
+  "disc-veggies": "disc-veggies",
   "inv-basket": "inv-basket",
   "inv-bed": "inv-bed",
   "inv-belts": "inv-belts",
@@ -45,15 +68,28 @@
   "inv-snare": "inv-snare",
   "inv-spear": "inv-spear",
   "inv-wall": "inv-wall",
+  "item-bible": "item-bible",
   "item-biscuits": "item-biscuits",
   "item-bottle": "item-bottle",
   "item-hammer": "item-hammer",
   "item-pipe": "item-pipe",
   "item-pistol": "item-pistol",
-  "item-rum": "item-rum"
+  "item-rum": "item-rum",
+  "item-stormglass": "item-stormglass",
+  "wreck-crates": "wreck-crates",
+  "wreck-dinghy": "wreck-dinghy",
+  "wreck-seachest": "wreck-seachest"
  },
  "size": {
+  "beast-alligator": [
+   256,
+   256
+  ],
   "beast-bear": [
+   256,
+   256
+  ],
+  "beast-birds": [
    256,
    256
   ],
@@ -106,6 +142,90 @@
    256
   ],
   "beast-wild-pig": [
+   256,
+   256
+  ],
+  "char-carpenter": [
+   256,
+   256
+  ],
+  "char-cook": [
+   256,
+   256
+  ],
+  "char-explorer": [
+   256,
+   256
+  ],
+  "char-friday": [
+   256,
+   256
+  ],
+  "disc-candles": [
+   256,
+   256
+  ],
+  "disc-fallentree": [
+   256,
+   256
+  ],
+  "disc-goat": [
+   256,
+   256
+  ],
+  "disc-healherbs": [
+   256,
+   256
+  ],
+  "disc-herbs": [
+   256,
+   256
+  ],
+  "disc-larvae": [
+   256,
+   256
+  ],
+  "disc-leaves": [
+   256,
+   256
+  ],
+  "disc-machete": [
+   256,
+   256
+  ],
+  "disc-poison": [
+   256,
+   256
+  ],
+  "disc-sc1": [
+   256,
+   256
+  ],
+  "disc-sc2": [
+   256,
+   256
+  ],
+  "disc-sc3": [
+   256,
+   256
+  ],
+  "disc-sc4": [
+   256,
+   256
+  ],
+  "disc-thorns": [
+   256,
+   256
+  ],
+  "disc-tobacco": [
+   256,
+   256
+  ],
+  "disc-treasure": [
+   256,
+   256
+  ],
+  "disc-veggies": [
    256,
    256
   ],
@@ -229,6 +349,10 @@
    256,
    256
   ],
+  "item-bible": [
+   256,
+   256
+  ],
   "item-biscuits": [
    256,
    256
@@ -250,6 +374,22 @@
    256
   ],
   "item-rum": [
+   256,
+   256
+  ],
+  "item-stormglass": [
+   256,
+   256
+  ],
+  "wreck-crates": [
+   256,
+   256
+  ],
+  "wreck-dinghy": [
+   256,
+   256
+  ],
+  "wreck-seachest": [
    256,
    256
   ]

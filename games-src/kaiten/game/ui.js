@@ -927,7 +927,7 @@ function buildRules() {
     ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: ten instrumental tracks made with Treblo from our own prompts. Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
 function renderRival(seat) {
@@ -963,7 +963,7 @@ function renderMenu() {
   if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   try { hlpInit(); const t = h('div'); t.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); b.append(...t.childNodes); } catch (e) { }
   row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('grab1', UI.prefs.grab1 !== false, 'One tap grabs'), UI.prefs.grab1 === false ? tog('tap2', UI.prefs.tap2, 'Tap twice to serve') : null);
-  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
+  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Pick the songs\u2026'));
   { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn')); b.appendChild(tr); }
@@ -1009,6 +1009,7 @@ function titleEl() {
       h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'),
+    h('button.tlink', { 'data-a': 'musicopen', type: 'button' }, '\u266A Music'),
     firstTime() ? null : tutNode('tlink', { sub: false })));
 }
 function dinerCard(c, o) {
@@ -1128,6 +1129,7 @@ function boot() {
   pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
   netInit();
+  extrasBoot();
   renderStart();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
@@ -1145,8 +1147,9 @@ function snd(name, o) {
 function sndMusic() {
   try {
     if (!window.GA) return;
-    if (UI.prefs.music === false || !G || !UI.started) { GA.music(null); GA.stopLoop && GA.stopLoop('belt'); return; }
-    GA.music('main', { vol: .32 }); if (GA.loop) GA.loop('belt', { vol: .16, fade: 1.5 });
+    if (UI.prefs.music === false) { MUS.want = null; GA.music(null); GA.stopLoop && GA.stopLoop('belt'); return; }
+    musicSync();
+    if (G && UI.started && G.phase !== 'over') { if (GA.loop) GA.loop('belt', { vol: .16, fade: 1.5 }); } else GA.stopLoop && GA.stopLoop('belt');
   } catch (e) { }
 }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.hc,[data-a=serve],[data-a=rsnext]')) snd('click'); }, true);
@@ -1869,7 +1872,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'kaiten', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    game: 'kaiten', artBase: 'media/', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
     onExit: () => { UI.camp = null; campParams(null); showStart(); },
     scores: g => (g.final ? g.final.totals : g.players.map(() => 0)), seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
   });
@@ -2073,3 +2076,112 @@ function tutStart(o) {
 { const o = showFinal; showFinal = function () {
   if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); markWinners(); } catch (e) { } return; }
   return o.apply(this, arguments); }; }
+// ===================== part 12: painted extras (unlocked card backs and table, end art) and music (per screen + the Music picker) =====================
+const MEDIA = 'media/';
+const unlAll = t => { try { return GXC.unlocked().filter(x => x.type === t).map(x => x.id).reverse(); } catch (e) { return []; } };
+const IMG_OK = {};
+const preImg = f => { const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };
+// ---- card backs: the campaign unlocks (lunch-belt, custard, golden) replace the default back; the file is fetched once and
+// handed to the kit as a data URL (the kit also draws backs into canvases); a missing file keeps the default back
+let backCur = '';
+function backApply() {
+  if (!window.fetch || !window.FileReader || /jsdom/i.test(navigator.userAgent || '')) return;
+  const id = unlAll('cardback')[0] || ''; if (id === backCur) return; backCur = id;
+  if (!id) return;
+  fetch(MEDIA + 'back-' + id + '.webp').then(r => r.ok ? r.blob() : Promise.reject()).then(b => new Promise(ok => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.readAsDataURL(b); }))
+    .then(u => { if (backCur !== id) return; KIT.setArt({ back: u }); if (G && UI.started) render(); }).catch(() => { });
+}
+// ---- tables: the unlocked painted counter behind the board; the plain wood stays while it loads, if the file is missing and in Low graphics
+let tblCur = '';
+function tableApply() {
+  const R = document.documentElement, ids = unlAll('table'), key = ids.join(','); if (key === tblCur) return; tblCur = key;
+  delete R.dataset.timg; R.style.removeProperty('--tbl-img');
+  const tryNext = i => { if (i >= ids.length) return; const f = 'table-' + ids[i] + '.webp', im = new Image(); im.onload = () => { if (tblCur !== key) return; R.style.setProperty('--tbl-img', 'url(' + MEDIA + f + ')'); R.dataset.timg = '1'; }; im.onerror = () => tryNext(i + 1); im.src = MEDIA + f; };
+  tryNext(0);
+}
+// ---- end art: a painted banner above the Play again / Menu buttons
+function kkWon() {
+  if (!G || G.phase !== 'over') return true; const ws = G.winners || [];
+  if (NET.on) { const me = viewSeat(); return me >= 0 && ws.includes(me); }
+  if (!humans().length) return true;
+  return ws.some(s => G.players[s] && !G.players[s].ai);
+}
+function endBanner() {
+  const rs = $('#rs'); if (!rs || rs.hidden || rs.querySelector('.endart')) return;
+  const w = kkWon(); if (!IMG_OK[w ? 'end-win' : 'end-lose']) return;
+  rs.classList.add('has-art'); rs.insertBefore(h('div.endart.' + (w ? 'win' : 'lose'), { 'aria-hidden': 'true' }), rs.firstChild);
+}
+// ---- music: five slots (Menu, Game, Last round, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / off
+const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last round'], ['victory', 'Victory'], ['defeat', 'Defeat']];
+const MTITLE = { 'tavern-a': 'Warm Counter Seat', 'tavern-b': 'Noren at Noon', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
+const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0 };
+try { Object.assign(MUS.pick, JSON.parse(localStorage.getItem('kk_mpick') || '{}')); } catch (e) { }
+function musicSlot() {
+  const st = $('#start');
+  if (!G || !UI.started || (st && !st.hidden)) return ['tavern', 0];
+  if (G.phase === 'over') return [kkWon() ? 'victory' : 'defeat', 1];
+  if (UI.camp && UI.camp.boss) return ['fight', 0];
+  if (!(UI.cfg && UI.cfg.tutorial) && G.round >= (G.len || D.rounds)) return ['fight', 0];
+  return ['main', 0];
+}
+function musicName(slot) {
+  const c = MUS.pick[slot] || MDEF[slot]; if (c === 'off') return '-';
+  if (c === 'shuffle') { if (!MUS.res[slot]) { MUS.sh[slot] = MUS.sh[slot] === undefined ? (Math.random() < .5 ? 0 : 1) : 1 - MUS.sh[slot]; MUS.res[slot] = slot + '-' + 'ab'[MUS.sh[slot]]; } return MUS.res[slot]; }
+  return slot + '-' + (c === 'b' ? 'b' : 'a');
+}
+function musicSync() {
+  if (UI.prefs.music === false || !window.GA || MUS.prev) return;
+  const w = musicSlot(); if (MUS.wslot !== w[0]) { MUS.wslot = w[0]; MUS.res[w[0]] = null; }
+  const n = musicName(w[0]); if (MUS.want === n) return; MUS.want = n;
+  if (n === '-') { GA.music(null, { fade: 1 }); return; }
+  GA.music(n, { fade: w[1] ? .6 : 1, once: !!w[1] });
+  if (w[0] === 'tavern' || w[0] === 'main') setTimeout(() => { try { const nx = w[0] === 'tavern' ? 'main' : 'fight', c = MUS.pick[nx]; if (c !== 'off' && c !== 'shuffle') GA.preload(musicName(nx)); } catch (e) { } }, 4000);
+}
+function musicPick(slot, c) {
+  MUS.pick[slot] = c; MUS.res[slot] = null; try { localStorage.setItem('kk_mpick', JSON.stringify(MUS.pick)); } catch (e) { }
+  if (window.GA && c !== 'off' && c !== 'shuffle') try { GA.preload(musicName(slot)); } catch (e) { }
+  if (MUS.wslot === slot && !MUS.prev) { MUS.want = null; musicSync(); }
+}
+function musicPreview(slot) {
+  if (!window.GA || UI.prefs.music === false || MUS.wslot === slot) return; const n = musicName(slot); if (n === '-') return;
+  clearTimeout(MUS.prevT); MUS.prev = slot; MUS.want = null; GA.music(n, { fade: .5, once: true });
+  MUS.prevT = setTimeout(() => { MUS.prev = null; MUS.want = null; musicSync(); renderMusic(); }, 8000);
+}
+function musicPreviewStop() { if (!MUS.prev) return; clearTimeout(MUS.prevT); MUS.prev = null; MUS.want = null; musicSync(); }
+function renderMusic() {
+  const b = $('#musicbody'); if (!b) return; b.innerHTML = '';
+  const on = UI.prefs.music !== false; let vol = .5; try { vol = GA.state().musVol; } catch (e) { }
+  const chip = (cls, at, label) => h('button.mchip' + cls, Object.assign({ type: 'button' }, at), label);
+  const slider = h('input#mvol', { type: 'range', min: 0, max: 1, step: .05, value: vol, 'aria-label': 'Music volume' });
+  slider.addEventListener('input', () => { try { GA.setVolume('music', +slider.value); } catch (e) { } });
+  b.appendChild(h('div.mtop', chip(on ? '.on' : '', { 'data-a': 'mmus' }, 'Music: ' + (on ? 'on' : 'off')), h('label.mvol', 'Volume ', slider)));
+  MSLOTS.forEach(([k, nm]) => {
+    const cur = MUS.pick[k], act = MUS.wslot === k && on && cur !== 'off';
+    const row = h('div.mchips');
+    ['a', 'b'].forEach(v => row.appendChild(chip(cur === v ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': v }, MTITLE[k + '-' + v])));
+    row.appendChild(chip(cur === 'shuffle' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'shuffle' }, '⇄ Shuffle'));
+    row.appendChild(chip(cur === 'off' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'off' }, 'Off'));
+    if (MUS.prev === k) row.appendChild(chip('.prev', { 'data-a': 'mprevx', 'data-s': k }, '■ Stop preview'));
+    else if (!act && cur !== 'off' && on) row.appendChild(chip('.prev', { 'data-a': 'mprev', 'data-s': k }, '▶ Preview'));
+    b.appendChild(h('div.mrow2', h('h3', nm, act ? h('small', ' playing now') : null), row));
+  });
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-a]'); if (!t) return; const a = t.dataset.a;
+  if (a === 'musicopen') { try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); }
+  else if (a === 'mpick') { musicPick(t.dataset.s, t.dataset.c); renderMusic(); }
+  else if (a === 'mprev') { musicPreview(t.dataset.s); renderMusic(); }
+  else if (a === 'mprevx') { musicPreviewStop(); renderMusic(); }
+  else if (a === 'mmus') { UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); }
+});
+function extrasBoot() {
+  GX.drawer('musicd', 'Music', h('div#musicbody'));
+  backApply(); tableApply();
+  ['end-win', 'end-lose'].forEach(preImg);
+  setInterval(() => { try { sndMusic(); backApply(); tableApply(); } catch (e) { } }, 800);
+}
+(function () {
+  const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { endBanner(); } catch (e) { } return r; };
+  const rs = renderStart; renderStart = function () { const r = rs.apply(this, arguments); try { sndMusic(); } catch (e) { } return r; };
+})();

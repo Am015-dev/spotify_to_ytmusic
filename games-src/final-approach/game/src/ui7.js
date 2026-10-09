@@ -46,7 +46,7 @@ function pxApplyQ() { PX.q = gfxLevel(); pxSetRes(pxBasePR()); PX.dirty = true; 
 function setGfx(v) { UI.prefs.gfx = v; savePrefs(); PX.autoQ = null; if (PX.on) { pxApplyQ(); pxPerfReg(); } }
 function pxResize(force) {
   if (!PX.app) return; const bd = $('#bd'); if (!bd) return; const w = bd.clientWidth, h = bd.clientHeight; if (w < 8 || h < 8) return;
-  if (force || PX.w !== w || PX.h !== h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h); } catch (e) { } if (PX.bgS) { PX.bgS.width = w; PX.bgS.height = h; } PX.dirty = true; if (G && UI.started) setTimeout(pxSync, 0); }
+  if (force || PX.w !== w || PX.h !== h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h); } catch (e) { } if (PX.bgS) { if (typeof pxFitBg === 'function') pxFitBg(); else { PX.bgS.width = w; PX.bgS.height = h; } } PX.dirty = true; if (G && UI.started) setTimeout(pxSync, 0); }
 }
 // ---- textures ----
 async function pxTextures() {

@@ -96,7 +96,13 @@ document.addEventListener('click', ev => {
     case 'story': UI.prefs.story = d.v === '1'; savePrefs(); renderMenu(); break;
     case 'gfx': if (typeof setGfx === 'function') setGfx(d.v); UI.prefs.gfx = d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
-    case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
+    case 'musicopen': try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); break;
+    case 'mpick': musicPick(d.s, d.c); renderMusic(); break;
+    case 'mall': { const on = MLOOPS.every(k => MUS.pick[k] === 'all'); MLOOPS.forEach(k => musicPick(k, on ? MDEF[k] : 'all')); renderMusic(); break; }
+    case 'mprev': musicPreview(d.s); renderMusic(); break;
+    case 'mprevx': musicPreviewStop(); renderMusic(); break;
+    case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
+    case 'music': MUS.want = null; UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideRecap(); if (UI.rsOpen && G && G.result) closeRS(); else if (UI.sel !== -1 && UI.sel != null) { UI.sel = -1; UI.cof = 0; render(); } } });
@@ -119,6 +125,7 @@ function boot() {
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('crewd', 'Flight briefing', h('div#crewbody'));
   GX.drawer('setd', 'Menu', h('div#setbody'));
+  extrasBoot();
   GX.onShow = id => { renderDrawers(); };
   prefs(); applyPhone();
   if (window.GXV) GXV.watch(() => { applyPhone(); if (G && UI.started) render(); else { const st = $('#start'); if (st && !st.hidden && UI.sv === 'setup') renderStart(); } }); else { addEventListener('resize', onResize); addEventListener('orientationchange', onResize); }

@@ -19,4 +19,4 @@ Load order: `gameaudio.js`, `audio-data.js`, then the game. `GA.init({sfx:GA_DAT
 | `alarm` | nebula/stress | 4 KB | warning: axis, fuel or collision close |
 | `boom` | nebula/boom | 14 KB | crash |
 | `hum` | nebula/engine_loop | 36 KB | cabin engine hum, loop under the music |
-| `music.main` | shipwreck/music.calm | 704 KB | background music, loop |
+| `music.<slot>-a/b` | Treblo files in games/final-approach/music/, fetched when first wanted | tavern = menu, main = flight, fight = last round or boss airport, victory / defeat = end cues |
