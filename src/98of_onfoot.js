@@ -217,7 +217,7 @@ OF_figPose=(f=>function(dt){f(dt);const J=OF.jk,F=OF.fig;if(!F||RO.foot!=='jack'
 function OF_bubble(){const cv0=document.createElement('canvas');cv0.width=128;cv0.height=64;const g=cv0.getContext('2d');g.fillStyle='#ffffff';g.beginPath();g.roundRect(4,4,120,46,16);g.fill();
   g.beginPath();g.moveTo(52,48);g.lineTo(64,62);g.lineTo(72,48);g.fill();g.lineWidth=5;g.strokeStyle='#e0301e';g.beginPath();g.roundRect(4,4,120,46,16);g.stroke();
   g.fillStyle='#1b1d22';g.font='900 italic 32px system-ui';g.textAlign='center';g.textBaseline='middle';g.fillText('HEY!',64,28);
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv0),transparent:true,depthWrite:false}));s.scale.set(1.3,.65,1);s.position.y=2.45;s.renderOrder=5;return s}
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv0),transparent:true,depthWrite:false,depthTest:false}));s.scale.set(1.3,.65,1);s.position.y=2.45;s.renderOrder=5;return s}
 function OF_fleeStart(c,h){OF_fleeEnd();const im=HUB.cim[c.k],col=new THREE.Color('#d8302a');try{if(im&&im.instanceColor)im.getColorAt(c.j,col)}catch(e){}
   const F=OF_figMake(GAR_riv('#'+col.getHexString()),{armsUp:1}),fx=Math.sin(h),fz=Math.cos(h),rx=-fz,rz=fx,y0=c.y!=null?c.y:OF.y,bub=OF_bubble();F.g.add(bub);F.g.rotation.order='YXZ';
   HUB.grp.add(F.g);F.g.visible=true;
@@ -297,5 +297,7 @@ function OF_camDom(cz){const C=OF.cam;
 // lifted instances (body + glass + wheels, ud.m frame) and run BC_apply with them; BC_upd waits while the body is borrowed and re-measures your own car after.
 function OF_bcBody(ud,body){if(typeof BC_apply!=='function')return;const m4=new THREE.Matrix4(),b=new THREE.Box3(),U=new THREE.Box3(),Wb=new THREE.Box3(),sc=new THREE.Vector3();ud.m.updateMatrixWorld(true);ud.m.getWorldScale(sc);
   body.forEach((q,i)=>{if(!q)return;if(!q.geometry.boundingBox)q.geometry.computeBoundingBox();q.getMatrixAt(0,m4);b.copy(q.geometry.boundingBox).applyMatrix4(m4);U.union(b);if(i===1)Wb.copy(b)});if(U.isEmpty())return;
-  const d={W:(U.max.x-U.min.x)*sc.x,L:(U.max.z-U.min.z)*sc.z,H:(U.max.y-U.min.y)*sc.y,WB:Wb.isEmpty()?0:Math.max(0,(Wb.max.z-Wb.min.z-(Wb.max.y-Wb.min.y))*sc.z)};OF.bcD=d;BC_apply(d);if(BC.d)BC.d.of=1}
+  const d={W:(U.max.x-U.min.x)*sc.x,L:(U.max.z-U.min.z)*sc.z,H:(U.max.y-U.min.y)*sc.y,WB:Wb.isEmpty()?0:Math.max(0,(Wb.max.z-Wb.min.z-(Wb.max.y-Wb.min.y))*sc.z)};OF.bcD=d;BC_apply(d);if(BC.d)BC.d.of=1;
+  // wider-than-reference bodies (not 'big' for 98bc) still get the chase distance scaled by the width ratio, so the car is never larger on screen than your own
+  const R=BC.ref||d,c=Math.max(BC.cam||1,d.W/R.W,Math.pow(Math.max(1,d.L/R.L,d.H/R.H*1.1),.65));if(c>(BC.cam||1)+1e-3){BC.cam=c;SC_K.cam=+(BC.D0.cam*c).toFixed(3);SC_rcam()}}
 if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)return;if(BC.d&&BC.d.of){BC.d=null;BC.k=''}return f()})(BC_upd);
