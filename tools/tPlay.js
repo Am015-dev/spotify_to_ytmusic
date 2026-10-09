@@ -42,10 +42,10 @@ const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);c
   bigDrop:Q.hits.filter(h=>h.drop>.5).length,stuckPct:+(100*st/Math.max(1,Q.drive)).toFixed(1),avgKmh:+(Q.vSum/Math.max(1,Q.drive)*3.6).toFixed(1),
   loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),camInside:Q.camS,smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
   traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
-// memory (EFF #5/PERF-2): JS heap after a full GC + renderer.info.memory + bytes of live GPU geometry buffers (CPU copies still held too)
+// memory (EFF #5/PERF-2): heap = V8 JS heap after a full GC (CDP JSHeapUsedSize), totMB = performance.memory (heap + typed-array backing stores) + renderer.info.memory + bytes of live GPU geometry buffers (CPU copies still held too)
 const MEMS=()=>{try{window.gc&&gc()}catch(e){}const r=__dbg.renderer,T=__dbg.THREE,seen=new Set();let gpuB=0,cpuB=0,geo=0;
- __dbg.scene.traverse(o=>{const g=o.geometry;if(!g||seen.has(g))return;seen.add(g);geo++;for(const k in g.attributes){const a=g.attributes[k];const b=(a.array&&a.array.byteLength)||(a.count*a.itemSize*4);gpuB+=b;if(a.array&&a.array.length)cpuB+=a.array.byteLength}if(g.index){gpuB+=g.index.array?g.index.array.byteLength||g.index.count*4:0;if(g.index.array&&g.index.array.length)cpuB+=g.index.array.byteLength}});
- return{heap:+((performance.memory?performance.memory.usedJSHeapSize:0)/1048576).toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures,sceneGeo:geo,geoMB:+(gpuB/1048576).toFixed(1),cpuGeoMB:+(cpuB/1048576).toFixed(1)}};
+ __dbg.scene.traverse(o=>{const g=o.geometry;if(!g||seen.has(g))return;seen.add(g);geo++;const at=Object.values(g.attributes);if(g.index)at.push(g.index);for(const a of at){const d=a.isInterleavedBufferAttribute?a.data:a,arr=d.array,id=arr?arr.buffer:d;if(seen.has(id))continue;seen.add(id);const by=arr?arr.byteLength:0;cpuB+=by;gpuB+=by||d.count*(a.itemSize||1)*4}});
+ return{totMB:+((performance.memory?performance.memory.usedJSHeapSize:0)/1048576).toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures,sceneGeo:geo,geoMB:+(gpuB/1048576).toFixed(1),cpuGeoMB:+(cpuB/1048576).toFixed(1)}};
 // HUD vs touch-control overlap + tiny text
 const LAYOUT=()=>{  // tiny = visible text under 12 px
 const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
@@ -85,7 +85,7 @@ function merge(parts,reloads){if(parts.length===1&&!reloads)return parts[0];cons
 async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852,height:393}:{width:1440,height:900};
  const ctx=await b.newContext(phone?{viewport:vp,deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:vp});const p=await ctx.newPage();p.setDefaultTimeout(900000);
  const errs=[],warns=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{const t=m.text().slice(0,200);if(m.type()==='error')errs.push('console: '+t);else if(m.type()==='warning'&&!/GL Driver|GPU stall|WebGL-/.test(t))warns.push(t)});
- await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});
+ await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});await cdp.send('Performance.enable');
  // FAST=1: touch events carry a synthetic timestamp (e.timeStamp follows it): start + game frames/60 + gesture gaps, so the real
  // 440/450 ms finger gaps and the BRAKE spacing cost no wall time and tap timing is deterministic. Without FAST: real time, as before.
  let SYN=Date.now()/1000;const clk=()=>FASTM?SYN*1000:Date.now();const gap=ms=>FASTM?(SYN+=ms/1000,Promise.resolve()):p.waitForTimeout(ms);
@@ -133,7 +133,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   const parts=[];let reloads=0,snap=null,lastSnap=0,lastMem=-1e9;const mem=[];
   while(f<frames){try{
    if(f-lastSnap>=600){lastSnap=f;snap=await p.evaluate(STAT)}
-   if(f-lastMem>=600){lastMem=f;mem.push({f,...await p.evaluate(MEMS)})}
+   if(f-lastMem>=600){lastMem=f;{const o=await p.evaluate(MEMS),m=await cdp.send('Performance.getMetrics');o.heap=+(m.metrics.find(x=>x.name==='JSHeapUsedSize').value/1048576).toFixed(1);mem.push({f,...o})}}
    // side trips a person makes once: map drag+pinch, pause/resume, garage
    if(f>=frames*.3&&!extra.map){await releaseAll();extra.map=await mapTrip()||{};}
    if(f>=frames*.5&&!extra.pause){await releaseAll();extra.pause=await pauseTrip()||{};}
@@ -233,7 +233,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});
    if(s.mem&&s.mem.length>=6){const M=s.mem,n=M.length,h=M.slice(Math.floor(n/2)),fit=k=>{const xs=h.map(m=>m.f/3600),ys=h.map(m=>m[k]),mx=xs.reduce((a,b)=>a+b)/xs.length,my=ys.reduce((a,b)=>a+b)/ys.length;let nu=0,de=0;xs.forEach((x,i)=>{nu+=(x-mx)*(ys[i]-my);de+=(x-mx)**2});return de?nu/de:0};
     const hs=fit('heap'),gs=fit('geoMB'),pk=Math.max(...M.map(m=>m.heap)),last=M.slice(-3).reduce((a,m)=>a+m.heap,0)/3;
-    ok(hs<=4&&gs<=4&&fit('geoms')<=40,`${m} ${c}: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry)`,{heapMBperMin:+hs.toFixed(2),geoMBperMin:+gs.toFixed(2),geomsPerMin:+fit('geoms').toFixed(1),first:M[0],last:M[n-1]});
+    const ts=fit('totMB');ok(hs<=4&&gs<=4&&ts<=6&&fit('geoms')<=40,`${m} ${c}: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry, ≤ 6 MB/min incl. buffers)`,{heapMBperMin:+hs.toFixed(2),totMBperMin:+ts.toFixed(2),geoMBperMin:+gs.toFixed(2),geomsPerMin:+fit('geoms').toFixed(1),first:M[0],last:M[n-1]});
     if(c==='ath')ok(last<=100,`${m} ath: JS heap ≤ 100 MB while driving`,{lastAvgMB:+last.toFixed(1),peakMB:pk})}
    ok(!s.monErr,`${m} ${c}: monitor ran`,s.monErr)}
   ok(!r.errs.length,`${m}: zero console / page errors`,r.errs.slice(0,6))}

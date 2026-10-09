@@ -1,4 +1,4 @@
-// PERF-2 memory probe: enter roam (CITY=fra|ath, ?fast=1), drive, then garage open/close. Samples:
+// PERF-2 memory probe: enter roam (CITY=fra|ath, DPR 0.35), drive, then garage open/close. Samples:
 //  heapMB = V8 heap after full GC (CDP JSHeapUsedSize) · totMB = performance.memory (heap + typed-array backing stores)
 //  glMB = live WebGL buffer bytes (bufferData/deleteBuffer hook, exact) · texMB (texImage2D/texStorage2D estimate) · geoms/tex = renderer.info.memory
 //  cpuMB = typed arrays still attached to scene geometries (dedup by ArrayBuffer) · own = top owners of cpu/gpu bytes in the scene
@@ -13,11 +13,11 @@ const SAMPLE=()=>{gc();const r=__dbg.renderer,seen=new Set(),own={};let cpu=0;co
  const top=Object.entries(own).map(([k,v])=>[k,v.n,+(v.cpu/1048576).toFixed(1),+(v.gpu/1048576).toFixed(1)]).sort((a,b)=>b[3]-a[3]).slice(0,14);
  return{totMB:+(performance.memory.usedJSHeapSize/1048576).toFixed(1),glMB:+(__GLM.buf/1048576).toFixed(1),cpuMB:+(cpu/1048576).toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures,progs:r.info.programs.length,top}};
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info','--js-flags=--expose-gc']});
-const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(HOOK);
+const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();await p.addInitScript("Object.defineProperty(window,'devicePixelRatio',{get:()=>0.35,configurable:true})");p.setDefaultTimeout(1800000);await p.addInitScript(HOOK);
 const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,160)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});
 const cdp=await ctx.newCDPSession(p);await cdp.send('Performance.enable');const R={city:CITY,s:[]};
 const samp=async lbl=>{const s=await p.evaluate(SAMPLE);const m=await cdp.send('Performance.getMetrics');s.heapMB=+(m.metrics.find(x=>x.name==='JSHeapUsedSize').value/1048576).toFixed(1);s.lbl=lbl;R.s.push(s);const{top,...o}=s;console.log(JSON.stringify(o))};
-await p.goto(URL+'?fast=1');await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});
+await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});
 await p.evaluate(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));if(c==='ath'){localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},CITY);
 await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});await samp('menu');
 let t=Date.now();await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{polling:200});R.enter_s=(Date.now()-t)/1000;console.log('enter',R.enter_s);await samp('roam');
