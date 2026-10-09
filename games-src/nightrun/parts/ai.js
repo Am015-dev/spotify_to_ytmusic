@@ -25,7 +25,7 @@ NR.on('beat',()=>{if(!G.live||G.dead||ST.over)return;
   for(const e of G.en){if(!e.ldr||e.hp<=0||e.x>W-40)continue;
     if(e.lArm){e.lArm=false;if(Math.hypot(e.x-P.x,e.y-P.y)>110){eb.src=e;fan(e,5,.5,175+8*AIQ(),'#ffd23d');eb.src=null;}}
     else if(++e.lc>=4){e.lc=0;e.lArm=true;}}});
-NR.on('kill',({e})=>{if(!e||!e.ldr)return;G.score+=e.score;floater(e.x,e.y-30,'LEADER DOWN','#ffd23d');
+NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;floater(e.x,e.y-30,'LEADER DOWN','#ffd23d');
   for(const f of G.en){if(f.lk===e&&f.hp>0){f.rg=1;f.shl=false;f.bf=Math.min(f.bf,2);}}});
 {const de=drawEnemy;drawEnemy=function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
   if(e.ldr){ctx.save();ctx.translate(e.x,e.y);if(!ART.have('spr-en-leader')){const g=ART.sil('spr-en-drone',e.r*2.9,'#ffd23d');if(g)ART.put(g,0,0,0,.3);}   // a gold sheen on the drone body until the leader sprite exists
