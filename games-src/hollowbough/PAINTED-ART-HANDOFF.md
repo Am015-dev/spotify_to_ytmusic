@@ -3,8 +3,7 @@
 The laptop made the pictures; the Linux session wires them in, tests and deploys. The same pattern is already done for Doorkick Dungeon: see `../munch/PAINTED-ART-HANDOFF.md`.
 
 ## Card art: `art/<key>.webp` + `art/manifest.json`
-- 47 paintings, 256×256 WebP, 817 KB (about 1.1 MB as base64). `<key>` is the card's `role`, which `game/gen-data.py` writes as `key` in `HB.DATA.cards` (for example `architect` = Master Lathwright).
-  - **Missing:** `lookout` (Spyglass Perch). Flow failed it once; it follows in the next push. Keep the drawn art as the fallback for it.
+- 48 paintings (every card), 256×256 WebP, about 830 KB (about 1.1 MB as base64). `<key>` is the card's `role`, which `game/gen-data.py` writes as `key` in `HB.DATA.cards` (for example `architect` = Master Lathwright).
 - Style: storybook watercolour and gouache, woodland critters and buildings in autumn colours.
 - Wiring (same as Doorkick):
   1. Embed in `game/build.py` the way `../kaiten/game/build.py` `art_js()` does, as `var HB_ART`.

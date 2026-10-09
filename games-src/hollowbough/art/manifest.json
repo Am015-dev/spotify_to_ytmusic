@@ -24,6 +24,7 @@
   "innkeeper": "innkeeper",
   "judge": "judge",
   "king": "king",
+  "lookout": "lookout",
   "mine": "mine",
   "miner_mole": "miner_mole",
   "monastery": "monastery",
@@ -139,6 +140,10 @@
    256
   ],
   "king": [
+   256,
+   256
+  ],
+  "lookout": [
    256,
    256
   ],
