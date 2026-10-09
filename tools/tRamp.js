@@ -22,17 +22,27 @@ const TAG={0xffb020:'street',0xff5a1c:'hill/biome/autobahn',0xffcd03:'longjump',
   if(process.env.ROUTE){const rt=await p.evaluate(([i])=>{const M=__mho,R=M.RO,r=R.ramps[i];const s=Math.sin(r.h),c=Math.cos(r.h),d=r.len/2+45,ax=r.x-s*d,az=r.z-c*d;
      const q0=M.rsnap(ax-s*150,az-c*150,300);if(!q0)return null;let P=null;try{P=M.qv.path(q0[0],q0[1],ax,az).P}catch(e){}if(!P||P.length<2)return null;P.push([ax,az],[r.x,r.z],[r.x+s*r.len,r.z+c*r.len]);
      R.ch=null;R.sp=null;R.wk=null;R.hp=100;M.warp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]));R.v=0;R.takeoff=null;window.__P=P;window.__pi=0;return P.length},[r.i]);
-   let rl=false,stuck=0,hitsR=0,lv=0;if(rt){await p.evaluate(()=>__tick(20));await p.keyboard.down('ArrowUp');let kL=false,kR=false;
+   let rl=false,stuck=0,hitsR=0,lv=0,unst=0;if(rt){await p.evaluate(()=>{window.__off=0;window.__unst=0});await p.evaluate(()=>__tick(20));await p.keyboard.down('ArrowUp');let kL=false,kR=false;
     for(let f=0;f<60*70;f+=3){const o=await p.evaluate(([i])=>{const R=__mho.RO,r=R.ramps[i],P=__P;let bi=__pi,bd=1e9;for(let k=__pi;k<Math.min(P.length,__pi+40);k++){const d=Math.hypot(P[k][0]-R.x,P[k][1]-R.z);if(d<bd){bd=d;bi=k}}__pi=bi;
-       let k=bi,acc=0;while(k<P.length-1&&acc<10+Math.abs(R.v)*.5){acc+=Math.hypot(P[k+1][0]-P[k][0],P[k+1][1]-P[k][1]);k++}let e=Math.atan2(P[k][0]-R.x,P[k][1]-R.z)-R.h;e=Math.atan2(Math.sin(e),Math.cos(e));
-       const a=(R.x-r.x)*Math.sin(r.h)+(R.z-r.z)*Math.cos(r.h);return{e,v:R.v,to:!!(R.takeoff&&R.takeoff.r===r),a,end:bi>=P.length-2}},[r.i]);
+       let k=bi,acc=0;while(k<P.length-1&&acc<10+Math.abs(R.v)*.5){acc+=Math.hypot(P[k+1][0]-P[k][0],P[k+1][1]-P[k][1]);k++}
+       // overtaking (like tSpeed): a car ahead within 45 m on the line the bot drives → move 4 m to the other lane / around it; back to the line
+       // for the last 70 m (run-up + ramp: aim straight). Lateral offset is applied to the GPS target point.
+       const k1=Math.min(P.length-1,bi+1),k0=Math.max(0,k1-1),tx=P[k1][0]-P[k0][0],tz=P[k1][1]-P[k0][1],tl=Math.hypot(tx,tz)||1,nx=tz/tl,nz=-tx/tl;
+       const dR=Math.hypot(r.x-R.x,r.z-R.z);window.__off=window.__off||0;
+       if(dR<r.len/2+70)__off*=.9;else for(const c of __mho.HUB.cars){if(c.dead>0)continue;const dx=c.x-R.x,dz=c.z-R.z,fw=(dx*tx+dz*tz)/tl,lat=(c.x-P[bi][0])*nx+(c.z-P[bi][1])*nz;
+        if(fw>-2&&fw<45&&Math.abs(lat-__off)<2.8){__off=lat>__off?__off-4:__off+4;__off=Math.max(-7,Math.min(7,__off))}}
+       if(window.__unst>0){window.__unst--;__off=window.__uoff}
+       let e=Math.atan2(P[k][0]+nx*__off-R.x,P[k][1]+nz*__off-R.z)-R.h;e=Math.atan2(Math.sin(e),Math.cos(e));
+       const a=(R.x-r.x)*Math.sin(r.h)+(R.z-r.z)*Math.cos(r.h);return{e,v:R.v,to:!!(R.takeoff&&R.takeoff.r===r),a,end:bi>=P.length-2,off:__off}},[r.i]);
      if(o.to)rl=true;if(rl&&o.a>r.len/2+20)break;if(Math.abs(o.v)<1)stuck++;else stuck=0;if(stuck>240){if(process.env.DBG)await shot(path.join(OUT,`${CITY}_stuck${r.i}.jpg`));break}if(lv>8&&o.v<lv*.7)hitsR++;lv=o.v;
+     if(stuck===60||stuck===150){await p.keyboard.up('ArrowUp');await p.keyboard.down('ArrowDown');await p.evaluate(()=>__tick(50));await p.keyboard.up('ArrowDown');
+      await p.evaluate(([s])=>{window.__uoff=(__off>=0?-1:1)*(s===60?5:7);window.__unst=80},[stuck]);unst++}
      const slow=Math.abs(o.e)>.6&&o.v>12;if(slow){await p.keyboard.up('ArrowUp')}else await p.keyboard.down('ArrowUp');
      const wl=o.e>.05,wr=o.e<-.05;if(wl!==kL){kL=wl;wl?await p.keyboard.down('ArrowLeft'):await p.keyboard.up('ArrowLeft')}if(wr!==kR){kR=wr;wr?await p.keyboard.down('ArrowRight'):await p.keyboard.up('ArrowRight')}
      await p.evaluate(()=>__tick(3))}
     await p.keyboard.up('ArrowUp');if(kL)await p.keyboard.up('ArrowLeft');if(kR)await p.keyboard.up('ArrowRight')}
    if(process.env.DBG)console.log('route end',JSON.stringify(await p.evaluate(([i])=>{const R=__mho.RO,r=R.ramps[i];return{x:R.x,z:R.z,v:R.v,pi:__pi,n:__P.length,P:__P.filter((_,k)=>k%4==0).map(q=>q.map(Math.round))}},[r.i])));
-   r.route=rt?{launched:rl,hits:hitsR,stuck:stuck>240,note:"waits up to 12 s behind stopped traffic (red light)"}:'no road path'}
+   r.route=rt?{launched:rl,hits:hitsR,stuck:stuck>240,unstick:unst,note:"overtakes traffic ahead (4 m lane offset); stuck 3 s → reverse 1 s + swing round; gives up at 12 s"}:'no road path'}
   // real drive: warp 55 m behind the low end facing the ramp, hold ArrowUp, keep heading at the ramp line with arrow keys
   const st=await p.evaluate(([i])=>{const M=__mho,R=M.RO,r=R.ramps[i];const s=Math.sin(r.h),c=Math.cos(r.h);const d=r.len/2+55;R.ch=null;R.sp=null;R.wk=null;R.hp=100;M.warp(r.x-s*d,r.z-c*d,r.h);R.v=0;R.takeoff=null;return[R.x,R.z]},[r.i]);
   await p.evaluate(()=>__tick(20));await p.keyboard.down('ArrowUp');let kL=false,kR=false,maxAir=0,launched=false,hits=0,lastV=0,vAt=0,minD=1e9;
