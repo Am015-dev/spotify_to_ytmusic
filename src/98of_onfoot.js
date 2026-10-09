@@ -120,7 +120,8 @@ function OF_finishEnter(o){const ud=pl.mesh.userData;
       if(c.pk){c.v=c.pv||c.v||16;c.lane=.36}c.dead=20;c.pk=0;c.hitT=0;c.ofJ=0;c.ofW=0;OF.taken.push(c);
       // lowest tyre point in the body's local frame (ud.m): kept on the road every frame by OF_lift (CR_carPose only grounds real wheel meshes)
       const lb=new THREE.Box3();let lowL=1e9;for(const q of body.slice(0,2)){if(!q.geometry.boundingBox)q.geometry.computeBoundingBox();q.getMatrixAt(0,m4);lb.copy(q.geometry.boundingBox).applyMatrix4(m4);lowL=Math.min(lowL,lb.min.y)}
-      OF.cur={own:false,inst:body,lowL};OF.n.swap++;try{OF_bcBody(ud,body)}catch(e){console.warn('OF bc',e)}try{OF_seat(ud,body)}catch(e){console.warn('OF seat',e)}}}
+      const wb=new THREE.Box3();if(body[1]){body[1].getMatrixAt(0,m4);wb.copy(body[1].geometry.boundingBox).applyMatrix4(m4)}
+      OF.cur={own:false,inst:body,lowL,wb:wb.isEmpty()?null:wb};OF.n.swap++;try{OF_bcBody(ud,body)}catch(e){console.warn('OF bc',e)}try{OF_seat(ud,body)}catch(e){console.warn('OF seat',e)}}}
   else OF_poseCar(OF.car.x,OF.car.z,OF.car.y,OF.car.h);
   OF_drv(pl.mesh,true);OF.car=null;if(OF.fig)OF.fig.g.visible=false;RO.foot='car';OF.idle=0;camSnap=true;OF.n.enter++;TOUCH.gas=TOUCH.brake=TOUCH.boost=false;
   // far static bodies are dropped (borrowed ones only; your own car always stays where you left it)
@@ -176,7 +177,9 @@ if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foo
 // borrowed body: lift ud.m so its lowest tyre point sits CR_TYRE_Y above the road (same rule as CR_carPose for real wheels)
 const OF_v3=new THREE.Vector3();
 function OF_lift(){const C=OF.cur;if(C.own||C.lowL==null||!pl||pl.air||(pl.boatK||0)>.5)return;const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);OF_v3.set(0,C.lowL,0).applyMatrix4(ud.m.matrixWorld);
-  const lift=clamp(groundAt(RO.x,RO.z,RO.y+1)+CR_TYRE_Y-OF_v3.y,-.4,.4);ud.m.position.y+=lift/(pl.mesh.scale.y||1);ud.m.updateMatrixWorld(true)}
+  // lowest tyre point under each wheel corner (pitch/roll included) vs the ground there: the lowest corner gap is held at CR_TYRE_Y (no float on a crowned road or by a kerb)
+  let lift=-1e9;const W=C.wb;if(W){for(let i=0;i<4;i++){OF_v3.set(i&1?W.max.x:W.min.x,C.lowL,i&2?W.max.z:W.min.z).applyMatrix4(ud.m.matrixWorld);lift=Math.max(lift,groundAt(OF_v3.x,OF_v3.z,OF_v3.y+1)+CR_TYRE_Y-OF_v3.y)}}
+  else lift=groundAt(RO.x,RO.z,RO.y+1)+CR_TYRE_Y-OF_v3.y;lift=clamp(lift,-.4,.4);ud.m.position.y+=lift/(pl.mesh.scale.y||1);ud.m.updateMatrixWorld(true)}
 // --- per-frame hooks (outermost wrappers: none of the car-only wrappers run on foot)
 roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen)OF_step(dt);return}
   const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}try{OF_fleeStep(dt||0);OF_starStep(dt||0)}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF flee',e)}}OF_dom();OF_btns();return r})(roamStep);
