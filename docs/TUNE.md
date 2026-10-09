@@ -86,6 +86,29 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvPopGap` Pop-up gap (s) | 28 | seconds after one ends before the next ring (×0.6 after a miss) |
 | `TUNE.lvPopRw` Pop-up studs × | 1 | reward 150 studs × this, plus a brick burst |
 | `TUNE.lvLod` Far people/cars: fewer pose updates | ON | (v88u perf) people > 90 m away re-pose every 3rd frame, traffic cars > 250 m every 4th (they still move every frame). OFF = every frame, as before |
+| `TUNE.wbCarLod` Traffic cars: simple model far away | ON | (v88v perf, `src/98wb_world_batch.js`) traffic cars beyond `wbNear` draw a simplified copy of the same car (same colours, ~10 % of the triangles); cars outside the view are not drawn. OFF = full brick model for every car at any distance, as before |
+| `TUNE.wbLoShare` (no slider) far traffic: shared models | 1.35 | (v88w) far copies of traffic types whose body box is within this factor of another type's (every axis) draw as that type, scaled to size: one draw per size class instead of per type; 0 = off |
+| `TUNE.wbIcon` (no slider) map icons in one batch | ON | (v88w) the ~70 floating mission/garage/event icons draw as one instanced quad batch from a texture atlas instead of one draw each; OFF = one sprite each, as before |
+| `TUNE.wbNear` Traffic full detail within | 70 m | full brick model + wheels + glass inside this distance |
+| `TUNE.wbFar` Traffic drawn up to | 900 m | cars farther than this are not drawn |
+| `TUNE.wbCity` City: simple far blocks | ON | (v88v perf) the city is cut into 320 m cells; cells farther than `wbLodD` draw as ONE simplified mesh each (buildings, trees, lamps, roads; colours from the same textures). Near cells draw the real models. Collisions are unchanged (separate boxes). OFF = every model drawn, as before. Needs a city reload to rebuild after a change of the build knobs |
+| `TUNE.wbLodD` City full detail within | 190 m (v88w; was 220) | cells whose edge is closer than this keep full detail |
+| `TUNE.wbLodCell` (no slider) far block detail | 3 m | size of the merge grid for the far blocks; next city load |
+| `TUNE.wbMerged` / `TUNE.wbNfc` (no slider) | ON / ON | also simplify the merged street/building tiles / the always-drawn instanced props; next city load |
+| `TUNE.wbFig` (no slider) hide far minifigs/markers | 260 m | mission-giver minifigs, the 1.5 m beacon stubs and ramp parts beyond this are not drawn (they are a few px tall there) |
+| `TUNE.wbRingCam` (no slider) ring camera guard | 6 m | a ring (torus ≥ 3 m radius: story/quest/event/pop-up) is not drawn while the camera is within this distance of its plane and inside its radius + this; 0 = off |
+| `TUNE.bwOn` City: brick courses + tiles up close | ON | (v88w, `src/98bw_bricks2x.js`) building walls (Kenney houses/shops, facade blocks, quay/bridge stone) show LEGO brick courses with staggered joints, flat tops a tile grid, glass a frame grid. Shader only: 0 extra draws/triangles |
+| `TUNE.bwFade` Brick detail drawn up to | 90 m | full detail to 60 % of this, faded out at this distance |
+| `TUNE.bwCourse` (no slider) brick course height | 0.48 m | one brick row; bricks are 2× as long, tiles 1.5× as wide |
+| `TUNE.bwStud` City: studs on low roofs | ON | real studs on flat roofs/ledges 2-16 m above the ground (`bwStudH`/`bwStudTop`), ONE instanced mesh (1 draw); studs above the camera are skipped |
+| `TUNE.bwStudD` Roof studs drawn within | 60 m | radius around the camera; cells are generated in the background (~3 ms per frame) up to this + 90 m ahead |
+| `TUNE.bwStudP` / `bwStudMax` (no slider) | 1.2 m / 8000 | stud pitch (radius 0.3×, height 0.2× of it) / most studs drawn at once |
+| `TUNE.bwCar` (no slider) finer traffic parts | ON | traffic cars keep mirrors, number plates and exhausts and get smooth curves (next page load); far copies are re-simplified from them |
+| `TUNE.wbSuperD` Far blocks: merge 2×2 beyond | 700 m | four far city cells (2×2) draw as one mesh when all four are farther than this (fewer draw calls); 0 = off |
+| `TUNE.wbTerr` (no slider) merge ground tiles | ON | the 400 m / 1000 m ground tiles and the small lot plates are merged into 800 m / 2000 m blocks at load (~25 fewer draws); next city load |
+| `TUNE.bwRampSh` (no slider) ramp shadows within | 70 m | stunt-ramp parts cast shadows only this close to the camera (each was its own shadow draw); 0 = always |
+| `TUNE.wbRuns` (no slider) join near street pieces | ON | neighbouring near cells of a merged street/building tile draw as one piece |
+| `TUNE.wbLzD` (no slider) hide far small extras | 420 m | stud lines, crates and markers (geometry < 3 m) of story/biome zones and the hub are not drawn when all of them are farther than this |
 | `TUNE.perfHud` Show FPS · worst frame · draws · tris | OFF | (v88u) one small line (bottom left, under the steer buttons) with fps, the worst frame of the last 2 s, JS ms per frame, the frame's real draw calls and triangles. For perf reports from a real PC/phone |
 
 ## Where the values live
