@@ -1,0 +1,13 @@
+phone fra {"min":1.63,"hits":13,"kinds":{"other":1,"traffic":10,"ped":1,"wall":1},"wallHits":1,"wallPerMin":0.61,"hitsPerMin":7.99,"bigDrop":5,"stuckPct":16.6,"avgKmh":49.1,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":5.5,"traffic120m":23,"missions":[{"f":1,"start":"Hot Drop"}],"worst":[{"ctx":"GO!","f":4011,"v0":35,"v1":10,"drop":0.71,"kind":"traffic","x":1617,"z":-67,"dy":0},{"ctx":"GO!","f":2582,"v0":102,"v1":33,"drop":0.68,"kind":"traffic","x":1736,"z":-14,"dy":0},{"ctx":"GO!","f":5308,"v0":49,"v1":17,"drop":0.65,"kind":"wall","x":1275,"z":-18,"dy":0},{"ctx":"GO!","f":2949,"v0":38,"v1":15,"drop":0.62,"kind":"traffic","x":1721,"z":-13,"dy":0},{"ctx":"GO!","f":5833,"v0":50,"v1":23,"drop":0.55,"kind":"traffic","x":1210,"z":-13,"dy":0}],"monErr":null,"rot":{"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]},"scale":{"pedH":1.8,"carL":4.32,"carH":1.49,"player":{"h":2.1,"l":4.48,"w":1.98},"pedRel":1.04,"pedVsPlayer":1,"nPed":8,"nCar":8},"road":{"roadPts":898,"blocked":0,"pct":0,"colliders":0,"sample":[]},"roadEnd":{"roadPts":1273,"blocked":0,"pct":0,"colliders":0,"sample":[]},"overlap":[],"hudOverlap":["#npcSay×#odPin","#wrongWay×#odPin"],"tiny":[],"extra":{"map":{"opened":false,"drag":null,"pinch":null},"pause":{"tP_settings":false,"opts":[],"opened":true,"frozen":true,"resumed":false},"garage":{"pause":false,"btn":false,"back":false},"otg":null},"events":[],"perf":{"calls":167,"tris":1120666,"jsMs":0,"geoms":307,"tex":119},"wallSec":832}
+PASS phone fra: wall/building hits ≤ 1/min · {"wallPerMin":0.61,"bigDrop":5,"hits":13}
+FAIL phone fra: stuck ≤ 3 % · {"stuckPct":16.6}
+PASS phone fra: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.8,"carL":4.32,"carH":1.49,"player":{"h":2.1,"l":4.48,"w":1.98},"pedRel":1.04,"pedVsPlayer":1,"nPed":8,"nCar":8}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone fra: no HUD text under 12 px · []
+PASS phone fra: no HUD element over a touch control · []
+PASS phone fra: no collider on the paved road (invisible walls / oversize hulls) · {"pts":2171,"start":0,"end":0,"ex":[]}
+PASS phone fra: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone fra: monitor ran · null
+PASS phone: zero console / page errors · []
+TPLAY FAIL 2 · 832 s · qa_tp89z_a/phone-fra/tPlay.json

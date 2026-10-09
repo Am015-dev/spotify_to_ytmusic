@@ -1,0 +1,44 @@
+[
+ {
+  "wrecks": 0,
+  "form": "offroad",
+  "road": "autobahn",
+  "cls": "spSuv",
+  "veh": "4x4",
+  "onAB": true,
+  "inCity": false,
+  "top": {
+   "max": 153,
+   "plateau": 153,
+   "t100": 4.6,
+   "hud": 153
+  },
+  "boost": {
+   "max": 181,
+   "plateau": 181,
+   "t100": 0,
+   "hud": 181
+  }
+ },
+ {
+  "wrecks": 0,
+  "form": "offroad",
+  "road": "city",
+  "cls": "spSuv",
+  "veh": "4x4",
+  "onAB": false,
+  "inCity": true,
+  "top": {
+   "max": 142,
+   "plateau": 139,
+   "t100": 4.8,
+   "hud": 131
+  },
+  "boost": {
+   "max": 150,
+   "plateau": 78,
+   "t100": 0,
+   "hud": 0
+  }
+ }
+]
