@@ -26,7 +26,14 @@ Ideas: bigger far cells (2 levels: 640 m blocks when all 4 sub-cells are far); o
 - Reviewer notes for next pass: (a) Life crowd cluster spawns minifigs inside parked cars (fra_0.5_car after): reject cluster spots within parked-car bbox+0.5 m (98l). (b) plain beige pillar/tower by the Frankfurt bridge (fra_0.2_wall) still windowless.
 - Shots: ath/v88w/cmp (before/after stacked), ath/v88w/std, ath/v88w/after/ath_popup.png. v88v reference build: `git worktree add wb88v 7ef0c6c` + build --local.
 
-## v88x plan: Athens busier (NOT started)
+## v88x: DONE, reviewer PASS (0ad85129), DEPLOY sent (alex/od-world 138cf816, out/v88x, on live v88w fa29abe)
+- Athens dressing: `src/98la_ath_dress.js` (AD_*): orange trees / kiosks / scooters / bollards behind the walkers' line, placed lazily per 40 m cell (LV_eGrid), 4 InstancedMesh, smashable; knobs TUNE.lvDress, TUNE.lvAthCr (Athens clusters ×1.5). ATH_K 5/27 scooters.
+- Crowd-in-car: 98l LV_carNear (cluster spot ≥ 9 m from parked/stopped cars) + LV_clear (figures ≥ 3.4 m from cars, out of colliders).
+- Pillar = Eiserner Steg stair towers (60 stegBuild) → stegTower() red sandstone, windows/doors/roof, same collider.
+- Numbers (ath/v88x/m): Ath draws 198→201, tris 1.08→1.09M, CPU 5.28→5.69 ms. Tyre gap 0.03/0.033. Shots: ath/v88x/{cmp,after,fra,std}. Tools: ath/v88x/close.js (waits for AD), adprobe.js (dressing stats + top view), pillar.js (raycast a HUB.bld).
+- Next (reviewer): street-level Athens looks nearly the same as v88w (wide grass verges keep dressing far from the chase cam): narrow the verges or put dressing on the verge edge by the road; also make the old v88x plan items evzones + #bus if Alex asks.
+
+## v88x plan (original): Athens busier
 1. Fix (a) above first (crowd-in-parked-car, 98l LV cluster placement), cheap.
 2. Kerb dressing instanced (bollards, kiosks, orange trees, café chairs) along Athens streets near the player: 1–3 draws via InstancedMesh, recycled like lively peds.
 3. Crowd clusters denser in Athens (lvCrowd ×1.3 Athens only, Plaka/Monastiraki), evzones pair at Syntagma, one #bus line (blue-white) on a main avenue.
