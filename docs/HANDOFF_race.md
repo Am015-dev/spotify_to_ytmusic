@@ -12,8 +12,10 @@
   Solo route timing: `qa_race/ro3/seg_run.js` (RUN= for tOpen; scripted steering through each route road vs alt, real physics, render off).
 - Measured (ro2/ro3, 1 lap, phone, real touch): 0 errors, 0 wall hits/min, rivals ≥2 on screen 100 % of the time, bot used both alt routes, AI took alt routes 21–43 % of route-laps, tyre p50 road −0.01 / dirt 0.00–0.01 / boat hull 0.15, tris 0.93 M vs city 1.0–1.19 M, calls 135 vs 185–220.
 - Verified in a browser: cliff fall → respawn (fra + ath), STUCK! SPAWN IN 3 banner. WRONG WAY cannot happen: race physics caps the heading at ±1.5 rad (cos > −0.1). Upside-down: no roll in race physics; wrecks already go to the respawn banner. Deep water without the boat: n/a (auto boat).
-- OPEN: alt routes were not faster with the tRace bot (pack noise). Solo timing run in progress → tune `r15k` lane factors so alt beats road by ~0.6–1 s.
-- NEXT: (1) route tuning, (2) gate shots next to refs (`tools/sideBySide.py out ours ref caption`): start pack, wide terrain, shortcut, water/boat, jump, cliff respawn, finish → coordinator FIRST, (3) REVIEW, (4) DEPLOY msg (OD_CHANGELOG + checklist items).
+- Route tuning DONE (RO4): lane factor `r.kf||1.2` (fra water kf 1.45). Solo timing (qa_race/ro3/seg_run.js, alt vs road): ath water −0.70 s, ath dirt −0.49, fra dirt −0.65, fra water ≈−0.4 (its road baseline read 10.17 twice, then 11.18 once: unexplained). tRace with the pack NOT re-run since the tuning.
+- Coordinator FYI: live is v89d (src alex/od-p2 08f37b5e): merge it before DEPLOY; the version is assigned then.
+- Visual nits seen: grass reads as a flat carpet in some shots (blotches added in RO2, not re-shot); cliff lip has a red/white kerb (not re-shot).
+- NEXT: (1) re-run tRace both courses (LAPS=2, MAXMIN=7) and placed shots (`env $(cat qa_race/ro1/shots_fra.env) node tools/tOpen.js URL qa_race/roN`; TRACK=ath_akti with shots_ath.env) and LOOK, (2) gate shots next to refs (`tools/sideBySide.py out ours ref caption`): start pack, wide terrain, shortcut, water/boat, jump, cliff respawn, finish → coordinator FIRST, (3) REVIEW, (4) DEPLOY msg (OD_CHANGELOG + checklist items).
 
 ## >>> READ FIRST (finisher session, 2026-10-09 ~16:50; HEAD = this commit)
 - The scope changed at 16:34. Alex scored the narrow city races 2/10. The coordinator's brief is in `docs/RACE_PLAN.md` §3: open courses, 3-vehicle swap, respawn, rivals on alt routes, gate shots next to the reference. **Do not ship the narrow version.**
