@@ -165,7 +165,7 @@ function OF_cam(dt){if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.y,OF.car.
   OF_camYaw(dt);
   const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+2.2+Math.sin(OF.cp)*4.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5,carUp=0;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)){back=Math.max(.25,d-.5);break}if(!carUp&&PC.some(b=>bHit(b,x,z,.3)))carUp=1}
   OF.camB=back<OF.camB?back:OF.camB+(back-OF.camB)*Math.min(1,dt*3);const cx=OF.x-fx*OF.camB,cz=OF.z-fz*OF.camB;
-  OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);camera.lookAt(OF.x+fx*2.5,OF.y+1.25,OF.z+fz*2.5);
+  OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);{const la=2.5*clamp((OF.camB-.4)/3.6,0,1);camera.lookAt(OF.x+fx*la,OF.y+1.25-(1-la/2.5)*.4,OF.z+fz*la)};
   if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
 // parked cars stay parked while you walk (the lively-city parker would re-park them relative to the walker)
 if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(LV_parkStep);
