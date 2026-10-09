@@ -32,3 +32,6 @@ function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)
 {const _fi=lzFinish;lzFinish=function(L){if(!L.strRe)return _fi.apply(this,arguments);const b=L.bld;L.bld=[];try{return _fi.apply(this,arguments)}finally{L.bld=b;STR.st.lzB++}}}
 function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>STR_R()+TUNE.strLzOut)STR_lzFree(L)}
 {const _ls=lazyStep;lazyStep=function(){STR_lzStep();LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}}
+// SM3 (drop the CPU copy of single-use city meshes after the GPU upload) was Athens-only; Frankfurt kept ~106 MB of copies nobody reads
+if(TUNE.strSm3===undefined)TUNE.strSm3=1;
+if(TUNE.strSm3&&!SM3.on)try{SM3.on=localStorage.getItem('mho_sm3')!=='0'}catch(e){SM3.on=true}
