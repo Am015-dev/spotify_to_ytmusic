@@ -142,8 +142,10 @@ function W13_carImg(t){const W=240,H=120,K=2;if(W13_TC[t.id])return W13_TC[t.id]
  cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.clear();r.render(sc,cam);
  const o=r.canvas();sc.remove(g);
  clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){P1_free('o'+W*K+'x'+H*K);W13_TR=null}},4000);return W13_TC[t.id]=o}
-function teamCard(t){try{const[c,g]=cv(480,240),im=W13_carImg(t);
-  g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();g.drawImage(im,0,0);c.className='w13car';return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
+// PERF1: the card shows at once; its 3D car is drawn after the first menu frame, one card per frame (each needs a GPU readback), then cached
+function teamCard(t){try{const[c,g]=cv(480,240);
+  g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();c.className='w13car';
+  const put=()=>{try{g.drawImage(W13_carImg(t),0,0)}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}};if(W13_TC[t.id])put();else P1_later(put);return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
 function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
   const gl=g.createRadialGradient(0,20,0,0,20,110);gl.addColorStop(0,t.glow+'66');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(-120,-64,240,120);
   g.fillStyle=t.a;g.beginPath();g.moveTo(-100,26);g.lineTo(-18,-10);g.lineTo(0,-40);g.lineTo(18,-10);g.lineTo(100,26);g.lineTo(96,34);g.lineTo(-96,34);g.closePath();g.fill();

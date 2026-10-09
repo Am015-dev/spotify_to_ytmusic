@@ -287,7 +287,7 @@ function setupRace(cfg){if(cfg.type!=='roam')hubLeave();endCrashCam();ccCool=0;c
   startLights.forEach(l=>l.material.color.setHex(0x220a0e));
   ships.forEach(s=>posShip(s,1/60,true));updateCam(1,true);
   // compile anything new for this race (ghost, liveries) now, during the countdown, instead of mid-race
-  if(booted)renderer.compile(scene,camera)}
+  if(booted)P2_compile(scene,camera)}
 const trkTag=()=>TRK.id==='grand'&&!mirror?'':TRK.id+(mirror?'M':'')+'_';
 const recKey=()=>RC.ev?`mho_rec_${RC.ev.id}`:`mho_rec_${trkTag()}${cls.id}_${dir}_${RC.type}`;const ghostKey=()=>`mho_ghost_${trkTag()}${cls.id}_${dir}`;
 

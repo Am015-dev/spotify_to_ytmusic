@@ -1,0 +1,390 @@
+{
+ "city": "fra",
+ "load_event": 8.14,
+ "menu_ready": 8.19,
+ "trace_ms": {
+  "FunctionCall": 6539,
+  "V8.GC_MC_BACKGROUND_MARKING": 187,
+  "V8.CompileCode": 154,
+  "V8.ParseProgram": 117,
+  "ParseHTML": 112,
+  "V8.GC_BACKGROUND_YOUNG_ARRAY_BUFFER_SWEEP": 97,
+  "V8.PreParse": 92,
+  "V8.CompileScript": 68,
+  "MinorGC": 65,
+  "V8.GCScavenger": 63,
+  "V8.GC_SCAVENGER": 60,
+  "V8.GC_SCAVENGER_SCAVENGE": 59
+ },
+ "paint": [
+  [
+   "first-paint",
+   72
+  ],
+  [
+   "first-contentful-paint",
+   72
+  ]
+ ],
+ "nav": {
+  "ttfb": 2,
+  "dcl": 1555,
+  "load": 8113
+ },
+ "res": [
+  {
+   "n": "km.js",
+   "kb": 1916,
+   "dec": 1916,
+   "ms": 12,
+   "st": 21
+  },
+  {
+   "n": "three.module.js",
+   "kb": 250,
+   "dec": 1245,
+   "ms": 549,
+   "st": 172
+  },
+  {
+   "n": "EffectComposer.js",
+   "kb": 1,
+   "dec": 5,
+   "ms": 484,
+   "st": 173
+  },
+  {
+   "n": "UnrealBloomPass.js",
+   "kb": 3,
+   "dec": 12,
+   "ms": 536,
+   "st": 173
+  },
+  {
+   "n": "RenderPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 542,
+   "st": 173
+  },
+  {
+   "n": "ShaderPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 604,
+   "st": 173
+  },
+  {
+   "n": "OutputPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 604,
+   "st": 173
+  },
+  {
+   "n": "Reflector.js",
+   "kb": 2,
+   "dec": 7,
+   "ms": 627,
+   "st": 173
+  },
+  {
+   "n": "BufferGeometryUtils.js",
+   "kb": 7,
+   "dec": 31,
+   "ms": 673,
+   "st": 173
+  },
+  {
+   "n": "CopyShader.js",
+   "kb": 1,
+   "dec": 1,
+   "ms": 168,
+   "st": 675
+  },
+  {
+   "n": "MaskPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 169,
+   "st": 676
+  },
+  {
+   "n": "Pass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 202,
+   "st": 710
+  },
+  {
+   "n": "LuminosityHighPassShader.js",
+   "kb": 1,
+   "dec": 1,
+   "ms": 216,
+   "st": 710
+  },
+  {
+   "n": "OutputShader.js",
+   "kb": 1,
+   "dec": 1,
+   "ms": 176,
+   "st": 779
+  },
+  {
+   "n": "tune.json",
+   "kb": 2,
+   "dec": 2,
+   "ms": 2,
+   "st": 1545
+  }
+ ],
+ "menu_heapMB": 24,
+ "menu_nodes": 2761,
+ "menu_gl": {
+  "calls": 305,
+  "tris": 1099660,
+  "cbMs": 8.3,
+  "frames": 2,
+  "progs": 110
+ },
+ "menu_fps": {
+  "fps": 4.2,
+  "worstMs": 318
+ },
+ "ctx_menu": 1,
+ "roam_enter_s": 23.8,
+ "roam_heapMB": 70,
+ "roam_nodes": 3031,
+ "roam_idle_gl": {
+  "calls": 511,
+  "tris": 1946066,
+  "cbMs": 24.7,
+  "frames": 4,
+  "progs": 162
+ },
+ "roam_idle_fps": {
+  "fps": 1.4,
+  "worstMs": 917
+ },
+ "drive": [
+  {
+   "fps": 0.6,
+   "worstMs": 2060,
+   "calls": 510,
+   "tris": 2003149,
+   "cbMs": 28.1,
+   "frames": 2
+  },
+  {
+   "fps": 0.8,
+   "worstMs": 1840,
+   "calls": 496,
+   "tris": 1998081,
+   "cbMs": 31.1,
+   "frames": 2
+  },
+  {
+   "fps": 0.7,
+   "worstMs": 2117,
+   "calls": 498,
+   "tris": 2003184,
+   "cbMs": 29.4,
+   "frames": 2
+  },
+  {
+   "fps": 1,
+   "worstMs": 1512,
+   "calls": 497,
+   "tris": 2003265,
+   "cbMs": 22.5,
+   "frames": 3
+  }
+ ],
+ "roam_after_drive_heapMB": 81,
+ "roam_after_drive_nodes": 3038,
+ "cpu": {
+  "LayoutDuration": 0.1,
+  "RecalcStyleDuration": 0.1,
+  "DevToolsCommandDuration": 0.3,
+  "ScriptDuration": 18.1,
+  "V8CompileDuration": 0,
+  "TaskDuration": 49.3,
+  "TaskOtherDuration": 30.6
+ },
+ "garage_open_s": 9.87,
+ "garage_heapMB": 83,
+ "garage_nodes": 3747,
+ "garage_gl": {
+  "calls": 39,
+  "tris": 73980,
+  "cbMs": 1.6,
+  "frames": 16,
+  "progs": 179
+ },
+ "garage_fps": {
+  "fps": 11,
+  "worstMs": 424
+ },
+ "ctx_garage": 1,
+ "menu2_heapMB": 90,
+ "menu2_nodes": 6498,
+ "race_state": "countdown",
+ "race_enter_s": 0.24,
+ "race_heapMB": 94,
+ "race_nodes": 6491,
+ "race_gl": {
+  "calls": 281,
+  "tris": 1031150,
+  "cbMs": 11.4,
+  "frames": 10,
+  "progs": 132
+ },
+ "race_fps": {
+  "fps": 4.3,
+  "worstMs": 497
+ },
+ "ctx_total": 1,
+ "garage_progs": 132,
+ "errs": [],
+ "net": [
+  {
+   "f": "index.html",
+   "kB": 2690,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "city_fra.mp3",
+   "kB": 2456,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "race.mp3",
+   "kB": 1987,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "km.js",
+   "kB": 1916,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "three.module.js",
+   "kB": 250,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "BufferGeometryUtils.js",
+   "kB": 8,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "UnrealBloomPass.js",
+   "kB": 4,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "Reflector.js",
+   "kB": 3,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "EffectComposer.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "RenderPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "ShaderPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "OutputPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "Pass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "OutputShader.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "tune.json",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "tune.json",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "tune.json",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "CopyShader.js",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "MaskPass.js",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "LuminosityHighPassShader.js",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "index.html",
+   "kB": 0,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "index.html",
+   "kB": 0,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "km.js",
+   "kB": 0,
+   "enc": "",
+   "cc": ""
+  }
+ ],
+ "net_total_kB": 9335
+}

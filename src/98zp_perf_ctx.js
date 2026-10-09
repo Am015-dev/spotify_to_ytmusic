@@ -67,3 +67,17 @@ function P1_tq(){if(P1.qOn||!P1.q.length)return;P1.qOn=true;requestAnimationFram
   while(P1.q.length&&(performance.now()-t0<6)){const q=P1.q.shift();try{P1_thSet(q.b,q.c,GS_thumb(q.b.dataset.p,q.c))}catch(e){}}
   if(P1.q.length)requestAnimationFrame(step);else P1.qOn=false})}
 window.__P1={P1,off:P1_off,draw:P1_draw,gb:()=>GB,R:renderer,ctx:()=>P1,progs:()=>renderer.info.programs.map(p=>p.name+'#'+p.usedTimes),keys:()=>renderer.info.programs.map(p=>p.cacheKey)};
+// ============================================================ PERF2 (v89i): shader warm-up off the critical path
+// renderer.compile only issues compile/link to the GPU process; the main thread blocks later, at the first draw that needs a program
+// (three reads its uniforms). So: link programs early and in the background (compileAsync waits with KHR_parallel_shader_compile where the
+// browser has it), and never ask for programs the next frame does not draw.
+// P1_later: small GPU jobs (menu card renders) queued until the first menu frame has shown, then one per frame
+P1.lq=[];P1.up=false;function P1_later(fn){P1.lq.push(fn);if(P1.up&&P1.lq.length===1)P1_lrun()}
+function P1_lrun(){requestAnimationFrame(()=>{const f=P1.lq.shift();if(f)try{f()}catch(e){};if(P1.lq.length)P1_lrun()})}
+function P2_after(fn){requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn()}catch(e){console.warn('P2',e)}}))}
+// every warm-up compiled with no render target bound, i.e. the canvas variant (sRGB out + tone mapping). The game draws the scene through the
+// composer (RenderPass -> linear HalfFloat target, no tone mapping): a different program. So each warm-up linked ~50 programs that were never used,
+// and the real ones still linked at the first frame. P2_compile compiles for the composer's target.
+function P2_compile(sc,cam,async){const R=renderer,t=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);
+ try{return async?R.compileAsync(sc,cam):R.compile(sc,cam)}finally{R.setRenderTarget(t,f,l)}}
+function P2_warm(sc,cam){try{const p=P2_compile(sc,cam,true);if(p&&p.catch)p.catch(()=>{})}catch(e){}}
