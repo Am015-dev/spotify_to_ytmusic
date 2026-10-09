@@ -115,7 +115,7 @@ function tutSteps(){return [
 // ---------------------------------------------------------------- the kit hooks
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:o?'Point, name, tokens, the fuse, gear, yellow, red. Now the Story begins.':'Point, name, tokens, the fuse, gear, yellow, red. Real jobs add twists: the lightbulb explains them.',
@@ -125,7 +125,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else showStart()},
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map
 // the first time a player taps Play, offer the tutorial once
 function tutOffer(){if(typeof GXT==='undefined'||!firstTime()||GXT.isDone(TUT_GAME)||lsGet('sf_offered',0)||GXT.status(TUT_GAME).open)return false;
   lsSet('sf_offered',1);const d=document.createElement('div');d.id='offer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');

@@ -1110,7 +1110,7 @@ const GX={key:'gx',open:null,
     return o && typeof o === 'object' ? o : null;
   }
   function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
-  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), skipped: !!(o && o.skipped), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
   function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
   // ------------------------------------------------------------------ geometry
   function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
@@ -1337,8 +1337,9 @@ const GX={key:'gx',open:null,
   }
   function skip() {
     if (!S) return; var g = cfg.game, ex = cfg.onExit;
-    mark(g, { open: 0, step: 0 }); teardown();
-    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+    // a skipped tutorial counts as seen: Story must not force it again
+    mark(g, { open: 0, step: 0, skipped: 1 }); teardown();
+    try { if (ex) ex({ skipped: true }); } catch (e) { console.warn('gxt onExit', e); }
   }
   function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
   // ------------------------------------------------------------------ start
@@ -1413,7 +1414,7 @@ const GX={key:'gx',open:null,
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
     index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
-    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
 })();
@@ -4590,22 +4591,27 @@ function sndLoop(name,on){const L=SND_LOOP[name];if(!L)return;if(on===!!SND.loop
 // the player's pick (a, b, shuffle, off) is saved. GA cross-fades between them; if the files fail, a quiet synth bass plays in game.
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last seconds'],['victory','Win'],['defeat','Lose']];
 const MTITLE={'tavern-a':'Lamplit Workshop','tavern-b':'Late Shift Lobby','main-a':'Ninety Beats to Focus','main-b':'Clockwork Study','fight-a':'Final Wires','fight-b':'Brass on the Clock','victory-a':'Brass and Bells','victory-b':'Victory Fanfare','defeat-a':'Six Second Deflate','defeat-b':'Sad Tuba Plop'};
-const MUS={pick:{tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0};
+const MUS={pick:{tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0,last:null,since:0};
+// 'all' = shuffle through every looping song (menu, game and last-seconds tracks), a new one every ~2.5 min
+const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('sf_mpick')||'{}'))}catch(e){}
 SND.slot='tavern';
 function musName(slot){const c=MUS.pick[slot]||'a';if(c==='off')return '-';
+  if(c==='all'){if(!MUS.res[slot]){const pool=MALL.filter(k=>k!==MUS.last);MUS.res[slot]=pool[Math.floor(Math.random()*pool.length)]}return MUS.res[slot]}
   if(c==='shuffle'){if(!MUS.res[slot]){MUS.sh[slot]=MUS.sh[slot]===undefined?(Math.random()<.5?0:1):1-MUS.sh[slot];MUS.res[slot]=slot+'-'+'ab'[MUS.sh[slot]]}return MUS.res[slot]}
   return slot+'-'+(c==='b'?'b':'a')}
-function musSync(){if(!window.GA||!SND.music||MUS.prev)return;const n=musName(SND.slot);if(MUS.cur===n)return;MUS.cur=n;
+function musSync(){if(!window.GA||!SND.music||MUS.prev)return;
+  if(MUS.pick[SND.slot]==='all'&&MUS.since&&Date.now()-MUS.since>MALL_MS&&SND.slot!=='victory'&&SND.slot!=='defeat')MUS.res[SND.slot]=null;
+  const n=musName(SND.slot);if(MUS.cur===n)return;MUS.cur=n;MUS.since=Date.now();if(n!=='-')MUS.last=n;
   if(n==='-'){GA.music(null,{fade:1});return}
   const once=SND.slot==='victory'||SND.slot==='defeat';GA.music(n,{fade:once?.5:1.2,once});
-  if(SND.slot==='tavern'||SND.slot==='main')setTimeout(()=>{try{const nx=SND.slot==='tavern'?'main':'fight';if(MUS.pick[nx]!=='off'&&MUS.pick[nx]!=='shuffle')GA.preload(musName(nx))}catch(e){}},4000)}
+  if(SND.slot==='tavern'||SND.slot==='main')setTimeout(()=>{try{const nx=SND.slot==='tavern'?'main':'fight';if(MUS.pick[nx]!=='off'&&MUS.pick[nx]!=='shuffle'&&MUS.pick[nx]!=='all')GA.preload(musName(nx))}catch(e){}},4000)}
 function musicSlot(slot){if(SND.slot!==slot){SND.slot=slot;MUS.res[slot]=null;MUS.cur=null}SND.wantMusic=1;musSync()}
 function musicStart(){SND.wantMusic=1;musicSlot(SND.mood==='tension'||(typeof UI!=='undefined'&&UI.camp&&UI.camp.boss)?'fight':'main');if(!SND.music||!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,250)}
 function musicStop(f){SND.wantMusic=0;MUS.cur=null;if(window.GA)GA.music(null,{fade:f!=null?f:1});clearInterval(SND.mTimer);SND.mTimer=null}
 function musicMood(m){if(m===SND.mood)return;SND.mood=m;if(SND.slot==='main'||SND.slot==='fight')musicSlot(m==='tension'||(typeof UI!=='undefined'&&UI.camp&&UI.camp.boss)?'fight':'main')}
 function musicPick(slot,c){MUS.pick[slot]=c;MUS.res[slot]=null;try{localStorage.setItem('sf_mpick',JSON.stringify(MUS.pick))}catch(e){}
-  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musName(slot))}catch(e){}if(SND.slot===slot&&!MUS.prev){MUS.cur=null;musSync()}}
+  if(window.GA&&c!=='off'&&c!=='shuffle'&&c!=='all')try{GA.preload(musName(slot))}catch(e){}if(SND.slot===slot&&!MUS.prev){MUS.cur=null;musSync()}}
 function musicPreview(slot){if(!window.GA||!SND.music||SND.slot===slot)return;const n=musName(slot);if(n==='-')return;
   clearTimeout(MUS.prevT);MUS.prev=slot;MUS.cur=null;GA.music(n,{fade:.5,once:true});MUS.prevT=setTimeout(()=>{MUS.prev=null;MUS.cur=null;musSync();if(typeof renderMusic==='function')renderMusic()},8000)}
 function musicPreviewStop(){if(!MUS.prev)return;clearTimeout(MUS.prevT);MUS.prev=null;MUS.cur=null;musSync()}
@@ -5461,10 +5467,12 @@ function renderMusic(){const b=document.getElementById('musicbody');if(!b)return
   const on=SND.music;
   const chip=(cls,at,label)=>`<button type="button" class="mchip${cls}" ${at}>${label}</button>`;
   let h=`<div class="mtop">${chip(on?' on':'','data-a="mmus"','Music: '+(on?'on':'off'))}<label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step=".05" value="${vol}" aria-label="Music volume"></label></div>`;
+  const allOn=MLOOPS.every(k=>MUS.pick[k]==='all');h+=`<div class="mtop">${chip(allOn?' on':'','data-a="mall"','⇄ Shuffle all songs')}</div>`;
   for(const [k,nm] of MSLOTS){const cur=MUS.pick[k],act=SND.slot===k&&on&&cur!=='off'&&!MUS.prev;
     let row='';
     for(const v of 'ab')row+=chip(cur===v?' on':'',`data-a="mpick" data-s="${k}" data-c="${v}"`,esc(MTITLE[k+'-'+v]));
     row+=chip(cur==='shuffle'?' on':'',`data-a="mpick" data-s="${k}" data-c="shuffle"`,'⇄ Shuffle');
+    if(MLOOPS.includes(k))row+=chip(cur==='all'?' on':'',`data-a="mpick" data-s="${k}" data-c="all"`,'⇄ All songs');
     row+=chip(cur==='off'?' on':'',`data-a="mpick" data-s="${k}" data-c="off"`,'Off');
     if(MUS.prev===k)row+=chip(' prev',`data-a="mprevx" data-s="${k}"`,'■ Stop preview');
     else if(!act&&cur!=='off'&&on)row+=chip(' prev',`data-a="mprev" data-s="${k}"`,'▶ Preview');
@@ -5472,13 +5480,14 @@ function renderMusic(){const b=document.getElementById('musicbody');if(!b)return
   b.innerHTML=h;const sl=document.getElementById('mvol');if(sl)sl.addEventListener('input',()=>{try{GA.setVolume('music',+sl.value)}catch(e){}})}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
   if(a==='mpick'){musicPick(t.dataset.s,t.dataset.c);renderMusic()}
+  else if(a==='mall'){const on=MLOOPS.every(k=>MUS.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?'a':'all'));renderMusic()}
   else if(a==='mprev'){musicPreview(t.dataset.s);renderMusic()}
   else if(a==='mprevx'){musicPreviewStop();renderMusic()}
   else if(a==='mmus'){toggleMusic();renderMusic();try{renderSettings()}catch(x){}}
   else if(a==='gfx'){LOWGFX=!LOWGFX;try{localStorage.setItem('sf_gfx',LOWGFX?'low':'hi')}catch(x){}artApply();backApply();tableApply();titleArt();renderSettings()}});
 function extrasBoot(){artBoot();artApply();endArt();backApply();tableApply();titleArt();
   ['back-default','back-clock-key','camp-brix','camp-tally','camp-wren','end-win','end-lose'].forEach(preImg);
-  setInterval(()=>{try{backApply();tableApply()}catch(e){}},800)}
+  setInterval(()=>{try{backApply();tableApply();if(SND.wantMusic&&SND.music&&MUS.pick[SND.slot]==='all')musSync()}catch(e){}},800)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',extrasBoot);else extrasBoot();
 
 </script>
@@ -5600,7 +5609,7 @@ function tutSteps(){return [
 // ---------------------------------------------------------------- the kit hooks
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:'You know the rules',endText:o?'Point, name, tokens, the fuse, gear, yellow, red. Now the Story begins.':'Point, name, tokens, the fuse, gear, yellow, red. Real jobs add twists: the lightbulb explains them.',
@@ -5610,7 +5619,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else showStart()},
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map
 // the first time a player taps Play, offer the tutorial once
 function tutOffer(){if(typeof GXT==='undefined'||!firstTime()||GXT.isDone(TUT_GAME)||lsGet('sf_offered',0)||GXT.status(TUT_GAME).open)return false;
   lsSet('sf_offered',1);const d=document.createElement('div');d.id='offer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
