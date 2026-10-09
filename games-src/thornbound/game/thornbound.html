@@ -218,7 +218,7 @@ button{font:inherit;color:inherit}
 .ttl{position:relative;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;box-sizing:border-box;padding:max(12px,var(--sat)) 16px calc(18px + var(--sab))}
 .ttl-art{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 .ttl-art svg{width:100%;height:100%;display:block}
-.ttl::after{content:'';position:fixed;left:0;right:0;bottom:0;height:62%;background:linear-gradient(rgba(12,7,9,0),rgba(12,7,9,.86) 62%);pointer-events:none}
+.ttl::after{content:'';position:fixed;left:0;right:0;bottom:0;height:56%;background:linear-gradient(rgba(12,7,9,0),rgba(12,7,9,.62) 55%);pointer-events:none}
 .ttl-in{position:relative;z-index:1;width:min(520px,100%);display:flex;flex-direction:column;align-items:center;gap:10px}
 .logo{margin:0;text-align:center;font:700 clamp(2.1rem,9vw,3.6rem)/1.02 var(--fd);color:var(--gold);letter-spacing:.02em;text-shadow:0 2px 0 #3a1a10,0 4px 18px rgba(0,0,0,.9)}
 .logo small{display:block;font-size:.42em;letter-spacing:.32em;color:#f6e6b4;margin-bottom:4px}
@@ -512,6 +512,16 @@ html.bf-w .ppop:not([hidden]){left:var(--bs,50vw)}
 .ttl-art{overflow:hidden}.ttl-art picture{display:contents}
 .tlinks{display:flex;gap:6px;justify-content:center}
 .endart{display:block;width:100%;height:auto;max-height:34vh;flex:none;object-fit:cover;object-position:50% 30%;border-radius:8px;margin:0 0 10px;box-shadow:0 0 0 2px rgba(232,200,103,.5)}
+/* painted table shows through the map; a painted map (data-mapimg) replaces the drawn land */
+html[data-timg]:not([data-gfx="low"]) .tb-bg-void{opacity:0}
+html[data-timg]:not([data-gfx="low"]) .tb-bg-frame{fill:#e8d5a2;fill-opacity:.3}
+html[data-timg]:not([data-gfx="low"]) .tb-bg-land{opacity:.55;filter:sepia(.55) saturate(1.2) brightness(1.5)}
+html[data-mapimg]:not([data-gfx="low"]) .tb-bg-land{opacity:0}
+html[data-mapimg]:not([data-gfx="low"]) .tb-bg-frame{fill-opacity:0}
+/* kingdom card inspect: the painting big, centred above the text */
+.ppop[data-kind=kc]:not([hidden]){max-height:86dvh}
+.ppop[data-kind=kc] .pp-row{flex-direction:column;align-items:center}.ppop[data-kind=kc] .pp-info{width:100%}
+.ttl .logo,.ttl .tag{text-shadow:0 2px 8px rgba(8,4,6,.9),0 0 2px rgba(8,4,6,.8)}
 html[data-timg]:not([data-gfx="low"]) .gx-board{background:radial-gradient(ellipse at 50% 46%,rgba(8,4,6,0) 42%,rgba(8,4,6,.6) 100%),var(--tbl-img) center/cover #0d0709}
 .music{display:flex;flex-direction:column;gap:14px;padding-bottom:12px}
 .music h5{margin:0 0 6px;font-size:1.05rem}.music h5 small{font-weight:400;opacity:.75;font-size:.8rem;margin-left:6px}
@@ -2285,6 +2295,17 @@ function mapDefs() {
     lg('tbm-ribbon', [[0, '#e8d9b0'], [1, '#c1ab78']], 0, 0, 0, 1) + lg('tbm-lane', [[0, '#120b07'], [1, '#2a1a10']], 0, 0, 0, 1);
 }
 
+/* painted map (optional): TB.setMapImg(url) puts a painting under the roads, locations and track; CSS html[data-mapimg] then lets it show through. */
+var MAPIMG = '';
+function mapImgEl(W, H) { return '<image class="tb-bg-img" href="' + MAPIMG + '" x="0" y="0" width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice"/>'; }
+TB.setMapImg = function (u) {
+  MAPIMG = u || '';
+  Array.prototype.forEach.call(document.querySelectorAll('.tb-m-static'), function (g) {
+    var old = g.querySelector('.tb-bg-img'); if (old) old.remove();
+    var v = g.querySelector('.tb-bg-void'), vb = g.ownerSVGElement && g.ownerSVGElement.viewBox.baseVal;
+    if (MAPIMG && v && vb) v.insertAdjacentHTML('afterend', mapImgEl(vb.width, vb.height));
+  });
+};
 TB.map = function (opts) {
   opts = opts || {}; TB.mount();
   var W = opts.w || 1000, H = opts.h || 1000, cx = W / 2, cy = H / 2, N = opts.trackLen || 40, seed = opts.seed || 7, low = opts.quality === 'low';
@@ -2305,15 +2326,15 @@ TB.map = function (opts) {
     var R = rngf(seed), s = '', i, land = rrWalk(98, 98, W - 196, H - 196, 120), pts = [], np = 56, lp;
     for (i = 0; i < np; i++) { lp = land.at(i * land.L / np); var j = (R() - .5) * 26; pts.push([lp.x + lp.nx * j, lp.y + lp.ny * j]); }
     var landD = smoothClosed(pts);
-    s += '<rect width="' + W + '" height="' + H + '" fill="url(#tbm-void)"/>';
+    s += '<rect class="tb-bg-void" width="' + W + '" height="' + H + '" fill="url(#tbm-void)"/>' + (MAPIMG ? mapImgEl(W, H) : '');
     /* outer frame + track lane */
-    s += '<rect x="5" y="5" width="' + (W - 10) + '" height="' + (H - 10) + '" rx="40" fill="#1b110b" stroke="url(#tb-gold)" stroke-width="6"/>' + '<rect x="14" y="14" width="' + (W - 28) + '" height="' + (H - 28) + '" rx="34" fill="none" stroke="#6e4c14" stroke-width="1.6"/>' + (low ? '' : '<rect x="6" y="6" width="' + (W - 12) + '" height="' + (H - 12) + '" rx="38" filter="url(#tb-grain)" opacity=".55"/>');
+    s += '<rect class="tb-bg-frame" x="5" y="5" width="' + (W - 10) + '" height="' + (H - 10) + '" rx="40" fill="#1b110b" stroke="url(#tb-gold)" stroke-width="6"/>' + '<rect x="14" y="14" width="' + (W - 28) + '" height="' + (H - 28) + '" rx="34" fill="none" stroke="#6e4c14" stroke-width="1.6"/>' + (low ? '' : '<rect x="6" y="6" width="' + (W - 12) + '" height="' + (H - 12) + '" rx="38" filter="url(#tb-grain)" opacity=".55"/>');
     var lane = 'M' + (46 + 56) + ' 46 H' + (W - 102) + ' A56 56 0 0 1 ' + (W - 46) + ' 102 V' + (H - 102) + ' A56 56 0 0 1 ' + (W - 102) + ' ' + (H - 46) + ' H102 A56 56 0 0 1 46 ' + (H - 102) + ' V102 A56 56 0 0 1 102 46Z';
     s += '<path d="' + lane + '" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="66"/><path d="' + lane + '" fill="none" stroke="#150d08" stroke-width="62"/><path d="' + lane + '" fill="none" stroke="url(#tb-gold)" stroke-width="64" stroke-opacity=".0"/><path d="' + lane + '" fill="none" stroke="#8a6a24" stroke-width="1.4" transform="translate(0 0)" opacity=".0"/>';
     /* the land */
     s += '<defs><clipPath id="tbm-landclip"><path d="' + landD + '"/></clipPath></defs>';
     s += '<path d="' + landD + '" fill="#000" opacity=".6" transform="translate(0 5)"' + filt('tb-soft') + '/>';
-    s += '<g clip-path="url(#tbm-landclip)"><g' + filt('tb-paint') + '>';
+    s += '<g class="tb-bg-land" clip-path="url(#tbm-landclip)"><g' + filt('tb-paint') + '>';
     s += '<path d="' + landD + '" fill="url(#tbm-land)"/><rect x="0" y="0" width="' + W + '" height="' + H + '" fill="url(#tbm-landR)"/>';
     /* colour washes */
     var wc = ['#6f8a45', '#4a5f2f', '#8a7a45', '#3c4a3a', '#566b3a', '#2d3d26'];
@@ -4995,6 +5016,7 @@ function cardSpec(id,opt){opt=opt||{};
   const txt=((tr.length?tr.join(', ')+'. ':'')+(i.text||'')).trim();
   const bits=[];if(i.votes)bits.push(i.votes+' vote'+(i.votes>1?'s':''));if(i.lore)bits.push(i.lore+' lore');
   const spec={faction:f,title:i.name,value:i.kind==='hq'?null:i.strength,cost:i.cost>0?i.cost:null,type:i.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:i.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:txt||'No special ability.',tag:bits.join(' · ')||undefined};
+  if(i.kind==='basic'||i.kind==='heir')spec.img='basic-'+f;
   return spec}
 function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
   return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],img:'kc'+String(n).padStart(2,'0'),text:k.text,num:'No. '+n}}
@@ -5548,7 +5570,7 @@ function renderPop(){const el=$('#ppop');if(!el)return;
   el.dataset.kind=UI.pop;
   sizePopCard()}
 function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-card');if(!c)return;const W=el.clientWidth,H=el.clientHeight;
-  const w=Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
+  const big=c.dataset.kc!=null;const w=big?Math.max(120,Math.min(300,W*.74,(innerHeight*.86-130)/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
 function popCard(id){const s=vs();const i=cinfo(id);const mine=ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
@@ -6726,7 +6748,16 @@ const PX=(function(){
   function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
     const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
     if(f===curT)return;load(f,()=>{curT=f;R.style.setProperty('--tbl-img','url(media/'+f+'.webp)');R.dataset.timg='1'})}
-  function tick(){backApply();tableApply()}
+  // painted kingdom map (map.webp / map-phone.webp), used when present; locations stay on top
+  let curM='';
+  function mapApply(){const f=matchMedia('(orientation:portrait)').matches?'map-phone':'map';if(f===curM||UI.lowGfx)return;
+    const im=new Image();im.onload=()=>{curM=f;TBKit.setMapImg('media/'+f+'.webp');R.dataset.mapimg='1'};im.src='media/'+f+'.webp'}
+  // Basic cards: art/basic-<faction>.webp (embedded in TB_ART, already in PA) when it exists, else a crop of the faction's campaign portrait
+  const BFB={gilded:'camp-halvard',heath:'camp-ysolde',lantern:'camp-rook',choir:'camp-orlen'};let bdone=false;
+  function basicApply(){if(bdone)return;bdone=true;const extra={};let n=0;const fin=()=>{if(--n>0)return;TBKit.setArt(Object.assign({},PA,extra));if(typeof renderAll==='function'&&typeof G!=='undefined'&&G)try{renderAll()}catch(e){}};
+    const ks=Object.keys(BFB).filter(f=>!PA['basic-'+f]);n=ks.length;if(!n)return;
+    ks.forEach(f=>{const im=new Image();im.onload=()=>{extra['basic-'+f]='media/'+BFB[f]+'.webp';fin()};im.onerror=fin;im.src='media/'+BFB[f]+'.webp'})}
+  function tick(){backApply();tableApply();mapApply();basicApply()}
   ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();
