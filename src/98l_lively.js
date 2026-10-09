@@ -114,7 +114,7 @@ function LV_boatStep(dt){const B=LV.boats;if(!B)return;const L=B.L;
 function LV_init(){if(LV.init||!HUB.grp||!HUB.nodes||!HUB.nodes.length||!HUB.bld||!HUB.bld.length)return;LV.init=true;
   try{LV_birdInit()}catch(e){console.warn('LV birds',e)}try{LV_flagInit()}catch(e){console.warn('LV flags',e)}try{LV_blimpInit()}catch(e){console.warn('LV blimp',e)}try{LV_boatInit()}catch(e){console.warn('LV boats',e)}try{LV_clInit()}catch(e){console.warn('LV clusters',e)}
   // v88s perf: pre-warm the shaders of the Life meshes and the (lazily built) pop-up ring, so the first stall / first pop-up does not stall a frame on a shader compile
-  try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;renderer.compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
+  try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;P2_compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
 function LV_step(dt){if(!RO.on)return;LV_init();if(!LV.init)return;LV.t+=dt;LV.fr++;const t0=performance.now();camera.updateMatrixWorld();LV_seenF.setFromProjectionMatrix(_lvPM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   LV_birdStep(dt);LV_flagStep();LV_blimpStep();LV_boatStep(dt);try{LV_clStep(dt)}catch(e){if(!LV.e1){LV.e1=1;console.warn('LV cl',e)}}try{LV_parkStep()}catch(e){if(!LV.e2){LV.e2=1;console.warn('LV park',e)}}LV.ms=LV.ms==null?0:LV.ms*.95+(performance.now()-t0)*.05}
 {const _lvHT=hubTrafficStep;hubTrafficStep=dt=>{_lvHT(dt);LV_step(dt)}}

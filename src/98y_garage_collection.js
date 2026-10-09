@@ -84,7 +84,7 @@ function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car
  if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;try{const host=new THREE.Group(),g={userData:{m:host}};GB_attach(g,G9C_bricks(S,f),null,false,false);
   host.rotation.y=G9C.ry;host.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());host.position.sub(ce);T.s.add(host);
   T.r.setSize(W,Hh,false);T.cam.aspect=W/Hh;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.6)*1.75;T.cam.position.set(0,d*.42,d*.9);T.cam.lookAt(0,-sz.y*.04,0);
-  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('G9C',e);url=null}
+  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('G9C',e);url=null}
  finally{T.r.setSize(112,112,false);T.cam.aspect=1;T.cam.updateProjectionMatrix()}G9C.th.set(key,url);return url}
 function G9C_pump(){if(G9C.busy)return;const next=()=>{const im=document.querySelector('#g9Col img[data-k]:not([src])');if(!im||$('#gbx').hidden){G9C.busy=0;return}
   const S=GAR_set(im.dataset.s),u=G9C_render(S,im.dataset.f);if(u)im.src=u;else im.removeAttribute('data-k');setTimeout(next,16)};G9C.busy=1;setTimeout(next,30)}

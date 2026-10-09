@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89i',id:'perf-thumbs',text:'Garage: part pictures and car cards all show (no blank tiles), and PAINT recolours them.'},
+ {ver:'v89i',id:'perf-ctx',text:'iPhone: open and close the garage 3×, then drive: no black screen, no reload.'},
  {ver:'v89h',id:'ath-take2',text:'Athens: stop near traffic, get out and walk up to a car that stops for you (walk round a scooter if one is in front): 🚗 TAKE appears and you drive off with ★1.'},
  {ver:'v89h',id:'ath-fill',text:'Athens: drive 1 to 1.5 km out from the centre and look between the streets: blocks have windows and balconies, no long blank grey or beige walls.'},
  {ver:'v89h',id:'pin-yield',text:'Phone: at the story start Oma Hilde\'s tip is fully readable, and tapping ❚❚ shows the whole PAUSE card (RESUME not covered). The checklist bar comes back afterwards.'},

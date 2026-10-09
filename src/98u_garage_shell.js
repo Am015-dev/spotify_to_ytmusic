@@ -91,7 +91,7 @@ const R2_KT=new Map();
 function R2_kitTh(k){if(R2_KT.has(k))return R2_KT.get(k);if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;const host=new THREE.Group(),mt=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45}),ms=[mt('#e01e2b'),mt('#d8dde4'),mt('#2a2f38')];
  try{const n0=host.children.length;
   kitParts(k,host,ms[0],ms[1],ms[2],{glow:'#22e4ff',a:'#e01e2b',b:'#ffd12c',c:'#ffffff'});if(host.children.length>n0){const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),rad=Math.max(.15,bb.getSize(new THREE.Vector3()).length()/2);host.position.sub(ce);T.s.add(host);
-   const d=rad/Math.sin(15*Math.PI/180)*.9;T.cam.position.set(d*.62,d*.45,-d*.64);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host)}}catch(e){url=null}
+   const d=rad/Math.sin(15*Math.PI/180)*.9;T.cam.position.set(d*.62,d*.45,-d*.64);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host)}}catch(e){url=null}
  host.traverse(o=>{if(o.isMesh){o.geometry.dispose();if(!ms.includes(o.material)&&o.material.dispose&&!o.material.isShaderMaterial)o.material.dispose()}});ms.forEach(m=>m.dispose());R2_KT.set(k,url);return url}
 const R2_PT=new Map();
 function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]=cv(512,512),d=GB.d||{};g.fillStyle=d.a||'#e01e2b';g.fillRect(0,0,512,512);liveryPat({a:d.a||'#e01e2b',b:d.b||'#ffd12c',c:d.c||'#ffffff',pat:p,num:d.num||7},g);

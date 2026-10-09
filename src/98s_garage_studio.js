@@ -53,9 +53,9 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  const crew=[[{h:'grin',x:'cap',t:'plain',l:'#2b3a67',c:'#c4281c'},-11,-6,.9],[{h:'smile',x:'short',t:'hoodie',l:'#1b1d22',c:'#36d17a'},11.5,-9,-.6],[{h:'wink',x:'cap',t:'logo',l:'#2b3a67',c:'#2f7bff'},-10.5,8,2.2],[{h:'smile',x:'long',t:'plain',l:'#8a8f99',c:'#ff7a1c'},12,7,-2.4],[{h:'grin',x:'cap',t:'logo',l:'#1b1d22',c:'#fac80a'},-12,14,2.6],[{h:'smile',x:'short',t:'plain',l:'#2b3a67',c:'#0055bf'},-2,16,3.1]];
  GS.crew=[];for(const[f,x,z,ry]of crew){const M=[],L=[];GB_figGeo(f,M,L,false);const o=new THREE.Group();o.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)o.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));o.traverse(m=>{if(m.isMesh)m.castShadow=true});
   o.position.set(x,y0-.5,z);o.rotation.y=ry;o.userData.ph=Math.random()*6;G.add(o);GS.crew.push(o)}
- // soft studio reflections for the glossy bricks
- try{const pm2=new THREE.PMREMGenerator(R),es=new THREE.Scene();es.background=new THREE.Color(0x56607a);const lm=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=-2;i<=2;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(2,.2,30),lm);s.position.set(i*5,8,0);es.add(s)}
-  const fm=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshBasicMaterial({color:0x2a2f38}));fm.rotation.x=-Math.PI/2;fm.position.y=-2;es.add(fm);S.environment=pm2.fromScene(es,.04).texture;S.environmentIntensity=.55;pm2.dispose()}catch(e){}
+ // soft studio reflections for the glossy bricks (PERF1: built with the main renderer, the builder draws in its context)
+ const cc0=renderer.getClearColor(new THREE.Color()),ca0=renderer.getClearAlpha();try{const pm2=new THREE.PMREMGenerator(renderer),es=new THREE.Scene();es.background=new THREE.Color(0x56607a);const lm=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=-2;i<=2;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(2,.2,30),lm);s.position.set(i*5,8,0);es.add(s)}
+  const fm=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshBasicMaterial({color:0x2a2f38}));fm.rotation.x=-Math.PI/2;fm.position.y=-2;es.add(fm);S.environment=pm2.fromScene(es,.04).texture;S.environmentIntensity=.55;pm2.dispose()}catch(e){console.warn('GS env',e)}renderer.setClearColor(cc0,ca0);
  GS_fitY()}
 // the platform sits exactly under the tyres (measured from the wheel meshes; the old disc top was -0.25)
 function GS_fitY(){if(!GS.g||!GB.mesh)return;GB.mesh.updateMatrixWorld(true);let y=null;const P=new THREE.Vector3(),Sc=new THREE.Vector3();
@@ -105,11 +105,11 @@ let GS_t0=0;gbLoop=(f=>function(){const now=performance.now(),dt=Math.min(.05,GS
 gbRender=(f=>function(){const r=f.apply(this,arguments);GS_fitY();GS_shadows();return r})(gbRender);
 // ---------- 3D part thumbnails: one small offscreen renderer, each part drawn once per colour, only for the open category
 function GS_thumb(t,c){const key=t+'|'+c;if(GS.thC.has(key))return GS.thC.get(key);let T=GS.th;
- if(!T){const cv=document.createElement('canvas');cv.width=cv.height=112;const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.setPixelRatio(1);r.setSize(112,112,false);
+ if(!T){const cv=null,r=P1_off(112,112);r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.setPixelRatio(1);r.setSize(112,112,false);
   const s=new THREE.Scene();s.add(new THREE.HemisphereLight(0xffffff,0x606878,2.2));const d=new THREE.DirectionalLight(0xffffff,2.2);d.position.set(3,6,4);s.add(d);T=GS.th={r,s,cam:new THREE.PerspectiveCamera(30,1,.01,100),cv}}
  let url=null;try{const M=[],L=[];GB_brickGeo({t,x:0,z:0,y:0,r:0,m:0,c},M,L);if(M.length||L.length){const o=new THREE.Group();if(M.length)o.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)o.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));
   const bb=new THREE.Box3().setFromObject(o),ce=bb.getCenter(new THREE.Vector3()),rad=Math.max(.2,bb.getSize(new THREE.Vector3()).length()/2);o.position.sub(ce);T.s.add(o);
-  const d=rad/Math.sin(15*Math.PI/180)*1.02;T.cam.position.set(d*.55,d*.55,d*.63);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(o);o.traverse(m=>{if(m.isMesh)m.geometry.dispose()})}}catch(e){url=null}
+  const d=rad/Math.sin(15*Math.PI/180)*1.02;T.cam.position.set(d*.55,d*.55,d*.63);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(o);o.traverse(m=>{if(m.isMesh)m.geometry.dispose()})}}catch(e){url=null}
  GS.thC.set(key,url);return url}
 function GS_thumbs(){if(!GB_.bk)return;const c=GB_.col;document.querySelectorAll('#gbBkPc .gbPc').forEach(b=>{if(b.style.display==='none')return;if(b.dataset.tc===String(c))return;const u=GS_thumb(b.dataset.p,c);if(!u)return;b.dataset.tc=c;let im=b.querySelector('img');if(!im){im=document.createElement('img');im.alt='';b.insertBefore(im,b.firstChild)}im.src=u;b.classList.add('gsTh')})}
 CR_cat=(f=>function(ct){const r=f(ct);try{GS_thumbs()}catch(e){}return r})(CR_cat);
