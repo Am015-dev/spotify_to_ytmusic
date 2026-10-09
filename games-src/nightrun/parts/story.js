@@ -110,7 +110,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;$('srEye').textContent=n>=STAGES.length?'Story complete':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost');
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost')+`<img class="md" src="media/medal-${['bronze','silver','gold'][Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1))]}.webp" alt="">`;
     $('srScore').textContent=G.score.toLocaleString('de-DE');
     $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},

@@ -3,8 +3,9 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I4';
+const NR_VER='I5';
 const NR_CHECKLIST=[
+ {ver:'I5',id:'placeholders',text:'Placeholder art is in: kit perk icons (Garage TUNE and LOAD), the SOON cards and the medal on the stage clear screen show a hatched PLACEHOLDER box with the file name. games-src/nightrun/ASSETS-NEEDED.md lists every file, its size and where it goes.'},
  {ver:'I4',id:'no-slow',text:'The song NEVER slows down any more: low hull, SLOW GROOVE and dying keep the tempo. At 1 hull the screen edges pulse red on the beat and a soft heartbeat thumps under the music. Does it sound good now?'},
  {ver:'I4',id:'lab-smooth',text:'TEST LAB: clicking any button (difficulty, god mode, Neon, unlock, spawn) no longer makes the game hitch, also right after loading.'},
  {ver:'I4',id:'kits',text:'Garage > TUNE has 15 new STARTING KIT perks (Wing Cannons, Rear Guard, Piercer, Arc Chain, Chrono Dash, Ricochet, Aegis, Orbit Guns, Seeker Shots, Score Magnet, Neon Interest, Fortune, Second Wind, Overdrive Core, EMP Cell). Equip them in LOAD; they give you that upgrade from the first second of the run.'},

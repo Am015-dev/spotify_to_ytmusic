@@ -101,6 +101,9 @@ html:not(.rdy) #title .row{visibility:hidden;animation:rdyShow 0s 6s forwards}
 #stage.p #stres{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-win.webp) 70% center/cover no-repeat}
 .pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 0 6px var(--c,#0000))}
 @container (max-aspect-ratio:1/1){.pg .card img.shp{height:clamp(44px,calc(var(--u)*13),72px)}}
+.pg .card img.ki{height:clamp(30px,calc(var(--u)*9),48px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto}
+#gaCards.tune .card>img.ki{height:36px;width:36px}
+#srStars .md{display:block;height:72px;width:auto;margin-top:8px}
 </style></head><body>
 
 <div id="stage"><div id="frame">
@@ -1642,7 +1645,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;$('srEye').textContent=n>=STAGES.length?'Story complete':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost');
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost')+`<img class="md" src="media/medal-${['bronze','silver','gold'][Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1))]}.webp" alt="">`;
     $('srScore').textContent=G.score.toLocaleString('de-DE');
     $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
@@ -2126,10 +2129,11 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 /* ----- the garage: a TUNE tab with levels; the old tabs keep working ----- */
 {const tabs=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='tune';b.type='button';b.textContent='TUNE';tabs.prepend(b);b.addEventListener('click',()=>{GA.tab='tune';gaDraw();});}
 const gaItems0=gaItems;
+function perkIcon(d){return d.uid?`<img class="ki" src="media/kit-${d.uid}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
   for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
-    b.innerHTML=svgI(d.ic)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
+    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
       +`<div class="pr">${pr?neonI+' '+pr:'MAX'}</div>`+(d.id===rec?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>tuneBuy(d,b));box.appendChild(b);}}
 function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
@@ -2555,7 +2559,7 @@ function loadDraw(box){const sl=eqSlots(),n=eqCount(),own=TP_DEF.filter(d=>TP.ra
   if(!own.length){const e=document.createElement('div');e.className='slots';e.style.gridColumn='1/-1';e.textContent='Buy perks in TUNE first.';box.append(e);}
   for(const d of own){const l=TP.raw(d.id),on=!!GA.eq[d.id],c=document.createElement('div');c.className='card d'+(on?' sel':'');c.style.setProperty('--c',on?d.c:'#8c86b8');c.dataset.id='lo_'+d.id;c.dataset.kind='load';
     const refund=Math.round(tpPrice(d,l-1)*.6);
-    c.innerHTML=svgI(d.ic)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${d.t(l)}</div></div><div class="bt"><button class="go ${on?'':'alt'}" data-a="eq" type="button">${on?'UNEQUIP':'EQUIP'}</button><button class="go dim" data-a="sell" type="button">SELL +${refund}</button></div>`;
+    c.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${d.t(l)}</div></div><div class="bt"><button class="go ${on?'':'alt'}" data-a="eq" type="button">${on?'UNEQUIP':'EQUIP'}</button><button class="go dim" data-a="sell" type="button">SELL +${refund}</button></div>`;
     c.querySelector('[data-a=eq]').addEventListener('click',()=>{if(!on&&eqCount()>=eqSlots()){gaMsg('All '+eqSlots()+' slots are full: unequip one first');return;}GA.eq[d.id]=!on;eqsave();SH.recalc();AU.sfx('up');gaDraw();});
     c.querySelector('[data-a=sell]').addEventListener('click',()=>{GA.bank+=refund;GA.tune[d.id]=l-1;if(l-1<=0)GA.eq[d.id]=false;tsave();eqsave();gsave();SH.recalc();gaMsg(d.n+' sold for '+refund);gaDraw();});
     box.append(c);}}
@@ -2565,8 +2569,8 @@ function mktDraw(box){const h=document.createElement('div');h.className='slots';
     c.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${lvText(u,1)}</div></div><div class="pr">${got?'BOUGHT':neonI+' '+pr}</div>`;
     c.addEventListener('click',()=>{if(got)return;if(!MK.left()){gaMsg('No purchases left today');return;}if(GA.bank<pr){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return;}
       GA.bank-=pr;MK.s.b.push(id);MK.save();GA.queue.push(id);qsave();gsave();AU.sfx('up');gaMsg(u.n+' is in your cargo');gaDraw();});box.append(c);}}
-const SOON=[['Weapon Forge','Craft and swap weapon mods between runs.','media/pk-up.webp'],['Contracts','Three daily missions that pay Neon and slots.','media/pk-tempo.webp'],['Pilot Ranks','Level up your pilot for passive bonuses.','media/pk-shard.webp'],
-  ['Boss Trophies','A gallery of the bosses you beat, with their stats.','media/boss-kronos.webp'],['Ship Skins','Paint jobs for every ship.','media/ship-swg.webp'],['Squad Roster','Hire and level wingmen with their own skills.','media/pk-drum.webp'],['Leaderboards','Daily and weekly scores, friends first.','media/pk-emp.webp']];
+const SOON=[['Weapon Forge','Craft and swap weapon mods between runs.','media/soon-weapon-forge.webp'],['Contracts','Three daily missions that pay Neon and slots.','media/soon-contracts.webp'],['Pilot Ranks','Level up your pilot for passive bonuses.','media/soon-pilot-ranks.webp'],
+  ['Boss Trophies','A gallery of the bosses you beat, with their stats.','media/soon-boss-trophies.webp'],['Ship Skins','Paint jobs for every ship.','media/soon-ship-skins.webp'],['Squad Roster','Hire and level wingmen with their own skills.','media/soon-squad-roster.webp'],['Leaderboards','Daily and weekly scores, friends first.','media/soon-leaderboards.webp']];
 function soonDraw(box){for(const [n,t,im] of SOON){const c=document.createElement('div');c.className='card d no';c.style.setProperty('--c','#8c86b8');c.dataset.kind='soon';c.innerHTML=`<span class="ph">PLACEHOLDER</span><img class="pi" src="${im}" alt=""><div class="tx"><div class="n">${n}</div><div class="t">${t}</div></div><div class="pr">SOON</div>`;box.append(c);}}
 /* the market cargo goes into the next run (story or endless) */
 NR.on('runStart',()=>setTimeout(()=>{if(!GA.queue.length)return;for(const id of GA.queue)SH.add(id);G.note={t:4,txt:'Cargo: '+GA.queue.map(id=>UBY[id].n).join(', ')};GA.queue=[];qsave();},60));
@@ -2683,8 +2687,9 @@ setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I4';
+const NR_VER='I5';
 const NR_CHECKLIST=[
+ {ver:'I5',id:'placeholders',text:'Placeholder art is in: kit perk icons (Garage TUNE and LOAD), the SOON cards and the medal on the stage clear screen show a hatched PLACEHOLDER box with the file name. games-src/nightrun/ASSETS-NEEDED.md lists every file, its size and where it goes.'},
  {ver:'I4',id:'no-slow',text:'The song NEVER slows down any more: low hull, SLOW GROOVE and dying keep the tempo. At 1 hull the screen edges pulse red on the beat and a soft heartbeat thumps under the music. Does it sound good now?'},
  {ver:'I4',id:'lab-smooth',text:'TEST LAB: clicking any button (difficulty, god mode, Neon, unlock, spawn) no longer makes the game hitch, also right after loading.'},
  {ver:'I4',id:'kits',text:'Garage > TUNE has 15 new STARTING KIT perks (Wing Cannons, Rear Guard, Piercer, Arc Chain, Chrono Dash, Ricochet, Aegis, Orbit Guns, Seeker Shots, Score Magnet, Neon Interest, Fortune, Second Wind, Overdrive Core, EMP Cell). Equip them in LOAD; they give you that upgrade from the first second of the run.'},
