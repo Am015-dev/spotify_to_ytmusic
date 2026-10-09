@@ -17,7 +17,7 @@ const OPN_DEFS=[
   jumps:[{id:'ro_creek',name:'CREEK',kind:'pit',at:[(470+2600)/S,(-566+400)/S],half:22,floor:-8,style:'creek',msg:'INTO THE CREEK'},
    {id:'ro_rail',name:'RAIL CUT',kind:'pit',at:[(-170+2600)/S,(-75+400)/S],half:20,floor:-6,style:'rail',msg:'INTO THE RAIL CUT'}],
   ro:{ter:{'MAINUFER':'grass','PARK HILLS':'grass','PARK SHORTCUT':'dirt','CREEK':'grass','MAIN CROSSING':'grass','QUARRY CLIFF':'sand','RAIL CUT':'dirt','COBBLE QUAY':'cobble'},
-   routes:[{a:3,b:6,kind:'dirt'},{a:8,b:10,kind:'water'}],cliffs:[{a:11,b:13,lip:20}],sky:1,col:[0x58b43a,0x9b6a3c,0xe2c98a,0x9a948a]}},
+   routes:[{a:3,b:6,kind:'dirt'},{a:8,b:10,kind:'water',kf:1.45}],cliffs:[{a:11,b:13,lip:20}],sky:1,col:[0x58b43a,0x9b6a3c,0xe2c98a,0x9a948a]}},
  {id:'ath_akti',city:'ath',name:'Saronic Coast Rally',short:'Coast Rally',open:1,w:96,w15:96,laps:3,bank:.25,mood:'athnoon',tunnel:'',clear:[],
   desc:'Open course on the Saronic coast: beach sand, a lagoon lane for the boat, olive hills, a pine shortcut and the cape cliff above the sea.',
   cp:OPN_cp([[0,0,4,'AKTI'],[280,10,4,'AKTI'],[540,-20,5,'BEACH'],[740,-110,4,'BEACH'],[860,-280,3,'LAGOON'],[840,-470,3,'LAGOON'],[720,-590,8,'OLIVE HILLS'],
@@ -51,7 +51,7 @@ const OPN_lane=r=>r.sd*(OPN_I1+(r.kind==='water'?15:13));
 // surface under a car: road / cobbles → car, grass dirt sand → 4×4, a water route lane → boat; past a cliff lip → fall
 function OPN_ter(s){const i=OPN_i(s.dist),ax=Math.abs(s.x);s.r15w=false;if(s.air&&s.air.j.id==='ro_cliff'){if(s.air.t>=1.4)OPN_land(s);return s.terrain&&s.terrain!=='road'?s.terrain:null}
   if(OPN.CL[i]&&s.x*OPN.CL[i]>OPN.LIP[i]&&!s.air&&s.dead<=0){OPN_fall(s);s.r15k=1;return s.terrain&&s.terrain!=='road'?s.terrain:null}
-  const ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const r=OPN.routes[ri];if(r.kind==='water'){s.r15w=true;s.r15k=1.2;return'water'}s.r15k=1.2;return'dirt'}
+  const ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const r=OPN.routes[ri];s.r15k=r.kf||1.2;if(r.kind==='water'){s.r15w=true;return'water'}return'dirt'}
   if(ax<=OPN_ROAD+.6){s.r15k=1;return null}const t=OPN.TER[i];s.r15k=OPN_K[t];if(t===3)return null;
   if(s.isPlayer&&!s.air&&R()<.03)shake=Math.max(shake,.22);return'dirt'}
 function OPN_fall(s){frameAt(TD,s.dist,F2);const y0=yAt(TD,s.dist)+1.4,sea=!!TRK.ro.seaCliff;
