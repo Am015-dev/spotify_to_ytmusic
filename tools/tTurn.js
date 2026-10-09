@@ -13,7 +13,7 @@ const URL=process.argv[2],FORMS=(process.argv[3]||'ship,offroad').split(','),SP=
    await st({gas:o.v<v,st:o.e>.03?-1:o.e<-.03?1:0});if(Math.abs(o.v-v)<3&&o.stable&&Math.abs(o.e)<.03&&f>120){ok=true;break}await p.evaluate(()=>__tick(3))}
   // the turn: hold ◀ 1.0 s, gas pulsed to hold speed
   const h0=await p.evaluate(()=>__mho.RO.h);let pk=0,v0=await p.evaluate(()=>__mho.RO.v*3.6),hs=[];await st({gas:true,st:-1});
-  for(let f=0;f<60;f+=2){await p.evaluate(()=>__tick(2));const o=await p.evaluate(()=>({h:__mho.RO.h,yr:__mho.RO.yr||0,v:__mho.RO.v*3.6}));hs.push(o.h);pk=Math.max(pk,Math.abs(o.yr));await st({gas:o.v<v,st:-1})}
+  for(let f=0;f<(+process.env.HOLD||60);f+=2){await p.evaluate(()=>__tick(2));const o=await p.evaluate(()=>({h:__mho.RO.h,yr:__mho.RO.yr||0,v:__mho.RO.v*3.6}));hs.push(o.h);pk=Math.max(pk,Math.abs(o.yr));await st({gas:o.v<v,st:-1})}
   await st({gas:false,st:0});const v1=await p.evaluate(()=>__mho.RO.v*3.6);
-  const r={form,kmh:v,reached:ok?Math.round(v0):'no',yawDegS:+((hs[hs.length-1]-h0)*180/Math.PI/1.0).toFixed(1),peakDegS:+(pk*180/Math.PI).toFixed(1),lostKmh:Math.round(v0-v1)};out.push(r);console.log(JSON.stringify(r))}
+  const r={form,kmh:v,reached:ok?Math.round(v0):'no',yawDegS:+((hs[hs.length-1]-h0)*180/Math.PI/((+process.env.HOLD||60)/60)).toFixed(1),peakDegS:+(pk*180/Math.PI).toFixed(1),lostKmh:Math.round(v0-v1)};out.push(r);console.log(JSON.stringify(r))}
  console.log('TURN done errs',errs.length);await b.close()})();

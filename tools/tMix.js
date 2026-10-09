@@ -14,6 +14,7 @@ const URL=process.argv[2],CITY=process.argv[3]||'fra',MIN=+(process.argv[4]||2),
   if(Math.abs(o.v)<1&&f%180===0)P=null;
   const wl=o.e>.06,wr=o.e<-.06;if(wl!=kL){kL=wl;wl?await p.keyboard.down('ArrowLeft'):await p.keyboard.up('ArrowLeft')}if(wr!=kR){kR=wr;wr?await p.keyboard.down('ArrowRight'):await p.keyboard.up('ArrowRight')}
   if(Math.abs(o.e)>.7&&o.v>12)await p.keyboard.up('ArrowUp');else await p.keyboard.down('ArrowUp');
+  if(f%60===0)await p.evaluate(()=>{for(const b of document.querySelectorAll('button'))if(b.offsetWidth&&/^(LATER|CONTINUE|OK)$/i.test(b.textContent.trim()))b.click()}); // a person closes the mission card
   await p.evaluate(()=>__tick(6))}
  const cnt={};for(const k of seen.values())cnt[k]=(cnt[k]||0)+1;const all={};for(const c of await p.evaluate(()=>__mho.cars()))all[c.k]=(all[c.k]||0)+1;
  const tv=await p.evaluate(()=>{const v=__mho.HUB.cars.filter(c=>!(c.dead>0)).map(c=>Math.abs(c.v)*3.6);return{avg:+(v.reduce((a,b)=>a+b,0)/v.length).toFixed(0),min:Math.round(Math.min(...v)),max:Math.round(Math.max(...v))}});
