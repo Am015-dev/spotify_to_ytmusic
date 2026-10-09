@@ -62,6 +62,7 @@ document.addEventListener('click',e=>{
    case 'rules':GX.show('rulesd');break;
    case 'music':renderMusic();GX.show('musd');break;
    case 'mpick':musicPick(t.dataset.s,t.dataset.c);renderMusic();break;
+   case 'mall':{const on=MLOOPS.every(k=>MS.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?MDEF[k]:'all'));renderMusic();break}
    case 'mprev':musicPreview(t.dataset.s);renderMusic();break;
    case 'mprevx':musicPreviewStop();renderMusic();break;
    case 'mmus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);musicSync();renderMusic();break;
