@@ -1,5 +1,18 @@
 {
- "fails": [],
+ "fails": [
+  {
+   "tag": "beat/offset0",
+   "kind": "beat",
+   "detail": "bpos differs from the true beat position by -0.117 beats",
+   "shot": "fail1-beat.png"
+  },
+  {
+   "tag": "beat/offset130",
+   "kind": "beat",
+   "detail": "bpos differs from the true beat position by -0.323 beats",
+   "shot": "fail2-beat.png"
+  }
+ ],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -11,53 +24,7 @@
   "pits": 0,
   "econ": [],
   "shopChecks": 0,
-  "diff": {
-   "easy/idle": {
-    "died": 1,
-    "t": 24.666666666666668,
-    "hits": 5
-   },
-   "easy/careless": {
-    "died": 1,
-    "t": 90.64999999999999,
-    "hits": 5
-   },
-   "easy/natural": {
-    "died": 0.6666666666666666,
-    "t": 75.83333333333333,
-    "hits": 3.6666666666666665
-   },
-   "normal/idle": {
-    "died": 1,
-    "t": 18.599999999999998,
-    "hits": 5
-   },
-   "normal/careless": {
-    "died": 1,
-    "t": 74.31666666666668,
-    "hits": 5
-   },
-   "normal/natural": {
-    "died": 0,
-    "t": 120,
-    "hits": 0.8333333333333334
-   },
-   "hard/idle": {
-    "died": 1,
-    "t": 10.700000000000001,
-    "hits": 5
-   },
-   "hard/careless": {
-    "died": 1,
-    "t": 36.36666666666667,
-    "hits": 5
-   },
-   "hard/natural": {
-    "died": 0.6666666666666666,
-    "t": 98,
-    "hits": 4.5
-   }
-  }
+  "judged": 16
  },
  "avg": 0
 }
