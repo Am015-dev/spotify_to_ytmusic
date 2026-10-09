@@ -32,7 +32,6 @@ const SND_MAP={
   sting_lose:{s:'sting_lose',vol:1,duck:true,jitter:0}
 };
 const SND_LOOP={clock_loop:{s:'clock_loop',vol:.5},hum:{s:'hum',vol:.35}};
-const SND_MUS={main:'main',tension:'tension'};
 const SND={ctx:null,on:true,music:true,vol:.7,last:{},nb:null,fired:{},mood:'main',loops:{},mTimer:null,beat:0};
 try{SND.on=localStorage.getItem('sf_snd')!=='0';SND.music=localStorage.getItem('sf_mus')!=='0'}catch(e){}
 function audioInit(){if(SND.ctx)return true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -88,13 +87,32 @@ function sfx(name,o){o=o||{};if(!SND.on)return;const m=SND_MAP[name];const now=p
 // loops (timer clock, lobby hum): never stack copies
 function sndLoop(name,on){const L=SND_LOOP[name];if(!L)return;if(on===!!SND.loops[name])return;SND.loops[name]=on?1:0;
   if(!window.GA)return;if(on&&SND.on){if(GA.has(L.s))GA.loop(L.s,{vol:L.vol,fade:.6});else SND.loops[name]=0}else GA.stopLoop(L.s,{fade:.8})}
-// music: GA plays "main" and cross-fades to "tension"; if the samples failed, a quiet synth spy bass plays instead
-function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf(SND_MUS[SND.mood])<0)}
-function musicStart(){SND.wantMusic=1;if(!SND.music)return;if(window.GA)GA.music(SND_MUS[SND.mood]||'main',{fade:1.5});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,250)}
-function musicStop(f){SND.wantMusic=0;if(window.GA)GA.music(null,{fade:f!=null?f:1});clearInterval(SND.mTimer);SND.mTimer=null}
-function musicMood(m){if(m===SND.mood)return;SND.mood=m;if(SND.music&&SND.wantMusic&&window.GA)GA.music(SND_MUS[m],{fade:m==='tension'?1:1.5})}
+// music: five slots (tavern = menu, main = game, fight = last seconds / boss, victory, defeat), two Treblo songs each (a / b),
+// the player's pick (a, b, shuffle, off) is saved. GA cross-fades between them; if the files fail, a quiet synth bass plays in game.
+const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last seconds'],['victory','Win'],['defeat','Lose']];
+const MTITLE={'tavern-a':'Lamplit Workshop','tavern-b':'Late Shift Lobby','main-a':'Ninety Beats to Focus','main-b':'Clockwork Study','fight-a':'Final Wires','fight-b':'Brass on the Clock','victory-a':'Brass and Bells','victory-b':'Victory Fanfare','defeat-a':'Six Second Deflate','defeat-b':'Sad Tuba Plop'};
+const MUS={pick:{tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0};
+try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('sf_mpick')||'{}'))}catch(e){}
+SND.slot='tavern';
+function musName(slot){const c=MUS.pick[slot]||'a';if(c==='off')return '-';
+  if(c==='shuffle'){if(!MUS.res[slot]){MUS.sh[slot]=MUS.sh[slot]===undefined?(Math.random()<.5?0:1):1-MUS.sh[slot];MUS.res[slot]=slot+'-'+'ab'[MUS.sh[slot]]}return MUS.res[slot]}
+  return slot+'-'+(c==='b'?'b':'a')}
+function musSync(){if(!window.GA||!SND.music||MUS.prev)return;const n=musName(SND.slot);if(MUS.cur===n)return;MUS.cur=n;
+  if(n==='-'){GA.music(null,{fade:1});return}
+  const once=SND.slot==='victory'||SND.slot==='defeat';GA.music(n,{fade:once?.5:1.2,once});
+  if(SND.slot==='tavern'||SND.slot==='main')setTimeout(()=>{try{const nx=SND.slot==='tavern'?'main':'fight';if(MUS.pick[nx]!=='off'&&MUS.pick[nx]!=='shuffle')GA.preload(musName(nx))}catch(e){}},4000)}
+function musicSlot(slot){if(SND.slot!==slot){SND.slot=slot;MUS.res[slot]=null;MUS.cur=null}SND.wantMusic=1;musSync()}
+function musicStart(){SND.wantMusic=1;musicSlot(SND.mood==='tension'||(typeof UI!=='undefined'&&UI.camp&&UI.camp.boss)?'fight':'main');if(!SND.music||!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,250)}
+function musicStop(f){SND.wantMusic=0;MUS.cur=null;if(window.GA)GA.music(null,{fade:f!=null?f:1});clearInterval(SND.mTimer);SND.mTimer=null}
+function musicMood(m){if(m===SND.mood)return;SND.mood=m;if(SND.slot==='main'||SND.slot==='fight')musicSlot(m==='tension'||(typeof UI!=='undefined'&&UI.camp&&UI.camp.boss)?'fight':'main')}
+function musicPick(slot,c){MUS.pick[slot]=c;MUS.res[slot]=null;try{localStorage.setItem('sf_mpick',JSON.stringify(MUS.pick))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musName(slot))}catch(e){}if(SND.slot===slot&&!MUS.prev){MUS.cur=null;musSync()}}
+function musicPreview(slot){if(!window.GA||!SND.music||SND.slot===slot)return;const n=musName(slot);if(n==='-')return;
+  clearTimeout(MUS.prevT);MUS.prev=slot;MUS.cur=null;GA.music(n,{fade:.5,once:true});MUS.prevT=setTimeout(()=>{MUS.prev=null;MUS.cur=null;musSync();if(typeof renderMusic==='function')renderMusic()},8000)}
+function musicPreviewStop(){if(!MUS.prev)return;clearTimeout(MUS.prevT);MUS.prev=null;MUS.cur=null;musSync()}
 const BASS=[55,55,65.4,55,73.4,65.4,55,49];
-function musicTick(){const c=SND.ctx;if(!c||c.state!=='running'||!SND.music)return;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}
+function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf(MUS.cur)<0)}
+function musicTick(){const c=SND.ctx;if(!c||c.state!=='running'||!SND.music)return;if(SND.slot!=='main'&&SND.slot!=='fight'||MUS.cur==='-'||gaMusicOk()){SND.nextT=c.currentTime+.1;return}
   const step=SND.mood==='tension'?.165:.2;while(SND.nextT<c.currentTime+.6){const at=SND.nextT-c.currentTime,k=SND.beat;
     if(k%2===0)tone(BASS[(k>>1)%8],step*1.6,{type:'triangle',v:.12,lp:500,at,bus:SND.musBus});
     if(k%4===2)noise(.04,{f:6000,q:2,v:.05,at,bus:SND.musBus});
@@ -102,6 +120,6 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running'||!SND.music)retu
     SND.nextT+=step;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('sf_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA)GA.setSfx(SND.on);if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;
   if(!SND.on)for(const k in SND.loops)if(SND.loops[k]){SND.loops[k]=0;if(window.GA)GA.stopLoop(SND_LOOP[k].s,{fade:.2})}if(SND.on)sfx('click')}
-function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('sf_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.music);if(SND.music){audioInit();if(SND.wantMusic!==0)musicStart()}else{const w=SND.wantMusic;musicStop(.6);SND.wantMusic=w}}
+function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('sf_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.music);if(SND.music){audioInit();MUS.cur=null;if(SND.wantMusic!==0)musSync()}else{const w=SND.wantMusic;musicStop(.6);SND.wantMusic=w}}
 // GA shares the synth's AudioContext (created on the first gesture only), so nothing plays before the player touches the page.
 if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'sf',sfxVol:.8,musVol:.45,duck:['boom','phew','win','lose','alarm','sting_win','sting_lose'],ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.music)}

@@ -240,3 +240,36 @@ html.short .nc{height:24px;min-width:18px}
 /* tutorial entry in the menus (shell/gx-tutor.js) */
 .big.gxt-menu{flex-direction:column;gap:0;line-height:1.15}.big.gxt-menu span{font:800 .75rem var(--fb);opacity:.9;text-shadow:none}
 .btn.gxt-menu{display:inline-flex;flex-direction:column;align-items:center;gap:0}.btn.gxt-menu span{font:700 .7rem var(--fb);opacity:.8}
+
+/* ---- painted extras: card paintings, backs, table, title and end art, music panel (the plain colours stay as fallback) ---- */
+.eqk.art{background-image:linear-gradient(180deg,rgba(14,16,50,0) 38%,rgba(14,16,50,.88)),var(--ai,linear-gradient(#4a50a6,#2b2f63));background-size:cover;background-position:center;background-repeat:no-repeat}
+.eqk.art.ready{background-image:linear-gradient(180deg,rgba(14,16,50,0) 38%,rgba(14,16,50,.82)),var(--ai,linear-gradient(#5aa7ff,#2f6fd6));box-shadow:0 0 0 2px #5aa7ff}
+.eqk.art .en{text-shadow:0 1px 2px #0b0d2b,0 0 3px #0b0d2b}
+.eqk.art.locked .nd{text-shadow:0 1px 2px #0b0d2b}
+.eqk.lk{background:linear-gradient(rgba(14,16,50,.15),rgba(14,16,50,.15)),var(--back-img,repeating-linear-gradient(45deg,#454d8e 0 5px,#3a4180 5px 10px)) center/cover no-repeat}
+.eqk.lk b{text-shadow:0 1px 3px #0b0d2b,0 0 6px #0b0d2b}
+#gear.mini .eqk.art{background-image:linear-gradient(rgba(14,16,50,.12),rgba(14,16,50,.35)),var(--ai,linear-gradient(#4a50a6,#2b2f63))}
+.plate .pdot{background:var(--ai,var(--sc));background-size:cover;background-position:center 20%}
+.plate .pdot[style*="--ai"]{width:18px;height:18px;margin-left:-3px}
+.plate u.tl{width:16px;height:16px;border-radius:4px;background:var(--ai,#16b3a6);background-size:cover;background-position:center;border:1.5px solid #14163a}.plate u.tl.used{filter:grayscale(1) brightness(.6)}
+.eqb{display:flex;gap:8px;align-items:stretch;padding:6px 8px 0}.eqb .ex{padding:0;flex:1;min-width:0}
+.eqp{flex:none;width:72px;height:72px;border-radius:10px;border:2.5px solid var(--ink);background:var(--ai,#3a3f86) center/cover no-repeat}
+.eqp.back,.eqc.locked .eqp.back{background:var(--back-img,repeating-linear-gradient(45deg,#454d8e 0 5px,#3a4180 5px 10px)) center/cover no-repeat}
+.eqt{display:inline-block;vertical-align:middle;width:26px;height:26px;border-radius:7px;border:2px solid var(--ink);background:var(--ai,#16b3a6) center/cover;margin-right:6px}
+html[data-timg] .gx-board{background:#17463f}
+html[data-timg] #tb{background:radial-gradient(ellipse at 50% 45%,rgba(8,14,22,.1) 45%,rgba(8,14,22,.5) 100%),linear-gradient(rgba(8,14,22,.28),rgba(8,14,22,.28)),var(--tbl-img) center/cover no-repeat,#17463f}
+html[data-timg] #tb::before{display:none}
+#start.art{background:linear-gradient(180deg,rgba(28,24,56,.1),rgba(28,24,56,.35)),url(media/title.webp) center top/cover no-repeat,#f2a86a}
+#start.art .st-head{background:linear-gradient(rgba(43,47,99,.92),rgba(31,34,80,.92))}
+#start.art .pane{background:rgba(255,246,226,.95)}
+#over .card2.end .endart{height:min(24dvh,170px);margin:-12px -16px 8px;border-radius:16px 16px 0 0;background:center/cover no-repeat #2b2f63;border-bottom:3px solid var(--ink)}
+#over .card2.end.win .endart{background-image:linear-gradient(180deg,rgba(0,0,0,0) 60%,rgba(0,0,0,.2)),var(--end-win)}
+#over .card2.end.lose .endart{background-image:linear-gradient(180deg,rgba(0,0,0,0) 60%,rgba(0,0,0,.25)),var(--end-lose)}
+html[data-lowgfx] #over .card2.end .endart{display:none}
+html.short #over .card2.end .endart{height:16dvh}
+#musicbody{display:flex;flex-direction:column;gap:14px;padding:4px 2px 12px}
+#musicbody h3{margin:0 0 6px;font:1.05rem var(--fd)}#musicbody h3 small{font:700 .8rem var(--fb);opacity:.75}
+.mtop{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.mvol{display:flex;align-items:center;gap:8px;flex:1 1 160px;font:800 .9rem var(--fb)}.mvol input{flex:1;min-height:44px}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2.5px solid var(--ink);background:#fff7e8;color:var(--ink);font:800 .85rem var(--fb);cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
+.mchip.on{background:#ffc928}.mchip.prev{border-style:dashed}

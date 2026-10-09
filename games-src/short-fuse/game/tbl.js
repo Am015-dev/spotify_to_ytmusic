@@ -54,9 +54,9 @@ function sideHTML(st){if(!st.side||!st.side.length)return '';return `<span class
 function standHTML(V,st,mine,g){return `<div class="stand${mine?' mine':''}" data-st="${st.i}">${st.slots.map((x,k)=>tileHTML(x,st.i,k,mine,g)).join('')}${sideHTML(st)}</div>`}
 function plateHTML(V,q,mine,g){const cur=!G.over&&decider()===q.i;const ox=V.ms.oxygen?`<u class="ox">O₂${q.ox}</u>`:'';const con=q.con&&!V.ms.mole?`<u class="cn${q.conDown?' dn':''}">${esc(q.con)}</u>`:'';
   const gl=g.plates.has(q.i);const star=q.i===G.captain?'<span class="star" title="Foreman">★</span>':'';
-  const tool=q.ch&&ITEMS[CHARS[q.ch].item]?`<u class="tl${q.chUsed?' used':''}" title="${esc(ITEMS[CHARS[q.ch].item].n)}"></u>`:'';
+  const tool=q.ch&&ITEMS[CHARS[q.ch].item]?`<u class="tl${q.chUsed?' used':''}" style="--ai:var(--a-${CHARS[q.ch].item})" title="${esc(ITEMS[CHARS[q.ch].item].n)}"></u>`:'';
   const tag=gl?'button':'div';
-  return `<${tag} class="plate${cur?' cur':''}${gl?' glow g-plate':''}${q.nUncut?'':' out'}${mine?' mine':''}" data-seat="${q.i}" style="--sc:${SEATC[posOf(q.i)%5]}"><i class="pdot"></i><b>${esc(mine&&modeOf()==='solo'?'You':q.nm)}</b>${star}${q.human?'':ico('robot','pbot')}<em>${q.nUncut}</em>${tool}${con}${ox}</${tag}>`}
+  return `<${tag} class="plate${cur?' cur':''}${gl?' glow g-plate':''}${q.nUncut?'':' out'}${mine?' mine':''}" data-seat="${q.i}" style="--sc:${SEATC[posOf(q.i)%5]}"><i class="pdot"${q.ch&&!q.chDown?` style="--ai:var(--a-${q.ch})"`:''}></i><b>${esc(mine&&modeOf()==='solo'?'You':q.nm)}</b>${star}${q.human?'':ico('robot','pbot')}<em>${q.nUncut}</em>${tool}${con}${ox}</${tag}>`}
 function crewOrder(V){const me=V.seat>=0?V.seat:kitMe();const o=[];for(let j=1;j<G.np;j++)o.push(G.pos.indexOf((posOf(me)+j)%G.np));return V.seat>=0?o:(function(){const a=[];for(let p=0;p<G.np;p++)a.push(G.pos.indexOf(p));return a})()}
 // ---------- the fuse ----------
 function fuseTotal(){if(G.dial==null)return G.ms.robotFuse?12:0;const M=MISSIONS[G.mission];let st=M.dial==='players'?G.np:M.dial==='players+1'?Math.min(DIAL_MAX,G.np+1):M.dial;if(G.twist&&G.twist.id==='short-fuse')st-=G.twist.param||1;st=Math.max(1,st);UI.fuseMax=Math.max(UI.fuseMax||0,st,G.dial);if(UI.fuseG!==G.seed+':'+G.mission){UI.fuseG=G.seed+':'+G.mission;UI.fuseMax=Math.max(st,G.dial)}return UI.fuseMax}
@@ -74,7 +74,8 @@ function gearHTML(V){let h='';
     const badge=`<b>${E.v==='Y'?'Y':E.v}</b>`;
     const st=e.st==='locked'?`<i class="lkc">${ico('lock')}</i><span class="nd">${need}${E.v==='Y'?'Y':E.v}</span>`:'';
     const nm=E.n.replace(/ Probe$/,' Pr.');
-    h+=gl?`<button class="eqk ${e.st} glow g-eq" data-eq="${e.id}" aria-label="${esc(E.n)}">${badge}<span class="en">${esc(nm)}</span></button>`:`<div class="eqk ${e.st}" data-gx="geard" role="button" tabindex="0" aria-label="${esc(E.n)}, ${e.st}">${badge}<span class="en">${esc(nm)}</span>${st}</div>`});
+    const art=` style="--ai:var(--a-${e.id})"`;
+    h+=gl?`<button class="eqk art ${e.st} glow g-eq" data-eq="${e.id}"${art} aria-label="${esc(E.n)}">${badge}<span class="en">${esc(nm)}</span></button>`:`<div class="eqk art ${e.st}" data-gx="geard" role="button" tabindex="0"${art} aria-label="${esc(E.n)}, ${e.st}">${badge}<span class="en">${esc(nm)}</span>${st}</div>`});
   const mc=missionCards(V);
   if(mc.numbers.length)h+=`<div class="jc nums" data-gx="missiond" role="button" tabindex="0" aria-label="Number cards">${mc.numbers.map((c,i)=>`<i class="nc${c.done?' dn':''}${mc.sequence&&mc.sequence.at===i?' cur':''}">${esc(c.value)}</i>`).join('')}</div>`;
   for(const c of mc.constraints)if(c.seat==null)h+=`<div class="jc cn" data-gx="missiond" role="button" tabindex="0" aria-label="Rule card"><u>${esc(c.letter)}</u></div>`;
@@ -193,7 +194,7 @@ function renderOverlays(V){const ov=document.getElementById('over'),cv=document.
   else if(p>=0){cv.hidden=false;const h=`<div class="card2 pass"><h2>${esc(nm(p))}</h2><button class="big go" data-a="take" data-seat="${p}">${ico('eye')}I am ${esc(nm(p))}</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=h}}
   else{cv.hidden=true;cv._s=''}
   if(G.over){if(UI.camp&&UI.campShown){ov.hidden=true}else{ov.hidden=false;const w=!!G.over.win;const next=G.mission<66?G.mission+1:null;const why=w?'':overWhy(G.over.why);
-    const h=`<div class="card2 end ${w?'win':'lose'}"><h2>${w?'DEFUSED!':'BOOM!'}</h2>${why?`<p>${esc(why)}</p>`:''}${isClient()?'<p>Wait for the host</p>':`<div class="row">${w&&next&&!UI.camp?`<button class="big go" data-a="next">${ico('fwd')}Next job</button>`:''}<button class="big${w&&next&&!UI.camp?'':' go'}" data-a="again">${ico('flip')}Again</button><button class="big" data-a="board">${ico('map')}Jobs</button></div>`}</div>`;
+    const h=`<div class="card2 end ${w?'win':'lose'}"><div class="endart" aria-hidden="true"></div><h2>${w?'DEFUSED!':'BOOM!'}</h2>${why?`<p>${esc(why)}</p>`:''}${isClient()?'<p>Wait for the host</p>':`<div class="row">${w&&next&&!UI.camp?`<button class="big go" data-a="next">${ico('fwd')}Next job</button>`:''}<button class="big${w&&next&&!UI.camp?'':' go'}" data-a="again">${ico('flip')}Again</button><button class="big" data-a="board">${ico('map')}Jobs</button></div>`}</div>`;
     if(ov._s!==h){ov._s=h;ov.innerHTML=h}}}
   else{ov.hidden=true;ov._s=''}}
 function paintHTML(h){return h}
