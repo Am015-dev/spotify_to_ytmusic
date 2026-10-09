@@ -413,7 +413,7 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 .kcb.glow svg,.kcb.glow>*{filter:drop-shadow(0 0 6px #ffd24a)}
 .kcb.rg>*{filter:drop-shadow(0 0 10px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
 .kcb.dim{opacity:.5}
-.kcb{display:flex;flex-direction:column;align-items:center;gap:2px}.kcb .kn{display:block;max-width:100%;font:700 .78rem/1.1 var(--fb);color:#f6e6b4;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kcb{display:flex;flex-direction:column;align-items:center;gap:2px}.roadrow .kcb{flex:0 1 76px;min-width:62px}.kcb .kn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;width:100%;font:700 .7rem/1.05 var(--fb);color:#fff3cf;text-align:center;overflow:hidden;text-shadow:0 1px 2px #000,0 0 3px #000}
 .kcb.steal{outline:3px solid var(--fc,#c23a48);outline-offset:1px}
 .kcb .stl{position:absolute;right:-4px;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--fc,#c23a48);border:2px solid #fff3c4;display:flex;align-items:center;justify-content:center}.kcb .stl .ico{width:13px;height:13px;stroke:#fff;stroke-width:3}
 /* the decision sheet: only for the rare choices the board cannot show */
@@ -470,8 +470,8 @@ html[data-timg]:not([data-gfx="low"]) .tb-bg-land{opacity:.55;filter:sepia(.55) 
 html[data-mapimg]:not([data-gfx="low"]) .tb-bg-land{opacity:0}
 html[data-mapimg]:not([data-gfx="low"]) .tb-bg-frame{fill-opacity:0}
 /* kingdom card inspect: the painting big, centred above the text */
-.ppop[data-kind=kc]:not([hidden]){max-height:86dvh}
-.ppop[data-kind=kc] .pp-row{flex-direction:column;align-items:center}.ppop[data-kind=kc] .pp-info{width:100%}
+.ppop[data-kind=kc]:not([hidden]),.ppop[data-kind=card]:not([hidden]){max-height:86dvh}
+.ppop[data-kind=kc] .pp-row,.ppop[data-kind=card] .pp-row{flex-direction:column;align-items:center}.ppop[data-kind=kc] .pp-info,.ppop[data-kind=card] .pp-info{width:100%}
 .ttl .logo,.ttl .tag{text-shadow:0 2px 8px rgba(8,4,6,.9),0 0 2px rgba(8,4,6,.8)}
 html[data-timg]:not([data-gfx="low"]) .gx-board{background:radial-gradient(ellipse at 50% 46%,rgba(8,4,6,0) 42%,rgba(8,4,6,.6) 100%),var(--tbl-img) center/cover #0d0709}
 .music{display:flex;flex-direction:column;gap:14px;padding-bottom:12px}
