@@ -938,14 +938,7 @@ Files that exist in the repo but the live game does not use yet. This is our wor
 
 - [ ] games/thornbound/media/back-court.webp (the "crowned stag" deck back) is not used by the page; only back-default and the campaign unlocks are. (1)
 
-### Kaiten Kitchen (29 files)
-
-- [ ] 11 Flow paintings in games-src/kaiten/art/*.png (tempura, dumpling, roll1, roll2, salmon, chop, chef-pip, belt, counter, back, title; committed 9 Oct, the built page is the 8 Oct one): rebuild and deploy (11)
-- [ ] 2 portraits media/camp-suzu.webp and camp-pip.webp: no artBase set (2)
-- [ ] 3 card backs media/back-lunch-belt, back-custard, back-golden (3)
-- [ ] 1 table skin media/table-midnight-belt.webp (1)
-- [ ] 2 end screens media/end-win.webp and end-lose.webp (2)
-- [ ] Treblo music: games-src/audio/kaiten/treblo/ has 10 tracks; nothing in games/kaiten-kitchen/music/ (10)
+### Kaiten Kitchen: all wired and deployed 9 Oct (11 paintings, artBase portraits, 3 card backs, midnight-belt table, end art, Treblo music with Music picker)
 
 ### Cauldron Fair (73 files)
 

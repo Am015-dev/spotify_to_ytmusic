@@ -41,8 +41,9 @@ for(const [name,W,H] of [['390x763',390,763],['1280x800',1280,800]]){
   // play out a whole meal fast, then check the end art, the result music and the screenshot
   for(const want of ['win','lose']){
     await p.evaluate(()=>{UI.seed=7;AIDELAY=0;ANIM=0;newGame('vs')});await p.waitForTimeout(800);
-    for(let k=0;k<900;k++){const o=await p.evaluate(()=>({over:G.phase==='over'&&UI.overShown,pk:canPick()}));if(o.over)break;if(o.pk)await p.evaluate((w)=>{ if(G.phase==='pick'){UI.sel=[w==='lose'?G.players[0].hand.length-1:0];serveSel()} },want);await p.waitForTimeout(40);}
+    for(let k=0;k<1500;k++){const o=await p.evaluate(()=>({over:G.phase==='over'&&UI.overShown,pk:canPick(),rs:!$('#rs').hidden}));if(o.over)break;if(o.rs){await p.evaluate(()=>{const n=document.querySelector('#rs [data-a=rsnext]');if(n)n.click()})}else if(o.pk)await p.evaluate((w)=>{ if(G.phase==='pick'){UI.sel=[w==='lose'?G.players[0].hand.length-1:0];serveSel()} },want);await p.waitForTimeout(40);}
     await p.waitForTimeout(1500);
+    if(want==='win')await p.evaluate(()=>{G.winners=[0];closeRS();showFinal();sndMusic()});else await p.evaluate(()=>{G.winners=[1];closeRS();showFinal();sndMusic()});await p.waitForTimeout(2200);
     const info=await p.evaluate(()=>({won:kkWon(),art:!!document.querySelector('#rs .endart'),pl:GA.playing()}));
     ok(info.art,'['+name+'] end art shown ('+want+', won='+info.won+')');
     ok(info.pl===(info.won?'victory-a':'defeat-a'),'['+name+'] result music '+info.pl);
