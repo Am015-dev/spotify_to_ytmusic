@@ -3,7 +3,7 @@
 // (type, min cell x/z, bottom in plates, rotation 0-3, mirrored, colour index). The whole build + the driver merge into
 // ONE geometry (+1 emissive geometry for lights) -> ≤ 2 draw calls in the world. Bricks are visual; stats get small clamped mods.
 // BC (bigcars): GB_N0/GB_N1 bound the width (x, unchanged 18 studs); GB_Z0/GB_Z1 the length (z, was -9..8, now 46 studs for bus/truck templates).
-const GB_U=.6,GB_PH=.24,GB_N0=-9,GB_N1=8,GB_Z0=-23,GB_Z1=22,GB_MAX=250,GB_CAP=72;
+const GB_U=.6,GB_PH=.24,GB_MAX=250,GB_CAP=72;let GB_N0=-9,GB_N1=8,GB_Z0=-23,GB_Z1=22;
 const GB_BC=['#d01712','#fe8a18','#fac80a','#a5ca18','#00852b','#36aebf','#0055bf','#8a12a8','#ff698f','#f4f4f4','#a0a5a9','#1b2a34'];
 const GB_PC={b11:{n:'1×1',w:1,d:1,h:3,s:1,ic:'▪'},b12:{n:'1×2',w:1,d:2,h:3,s:1,ic:'▮'},b22:{n:'2×2',w:2,d:2,h:3,s:1,ic:'■'},b24:{n:'2×4',w:2,d:4,h:3,s:1,ic:'█'},
  slope:{n:'Slope',w:2,d:2,h:3,ic:'◢'},tile:{n:'Tile',w:1,d:2,h:1,ic:'▭'},round:{n:'Round',w:1,d:1,h:3,s:1,ic:'●'},wedge:{n:'Wedge',w:2,d:2,h:1,ic:'◣'},
