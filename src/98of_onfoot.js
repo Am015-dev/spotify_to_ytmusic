@@ -33,9 +33,9 @@ function OF_figPose(dt){const F=OF.fig;if(!F)return;F.g.position.set(OF.x,OF.y,O
 // --- cars around the walker: the parked current body, static parked bodies, parked traffic (pk) — and moving traffic as obstacles
 const OF_cH=c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)return 0;return Math.atan2(B.x-A.x,B.z-A.z)};
 const OF_box=(x,z,h,hw=1.02,hd=2.35)=>({x,z,hw,hd,c:Math.cos(h),s:Math.sin(h),h:999});
-function OF_cars(withTraffic){const L=[];if(OF.car)L.push({k:'cur',x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,ref:OF.car});for(const v of OF.vs)L.push({k:'grp',x:v.x,z:v.z,y:v.y,h:v.h,ref:v});
+function OF_cars(withTraffic){const L=[];if(OF.car)L.push({k:'cur',x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,ref:OF.car});for(const v of OF.vs)L.push({k:'grp',x:v.x,z:v.z,y:v.y,h:v.h,hw:v.hw,hd:v.hd,ref:v});
   if(withTraffic&&HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),ref:c})}return L}
-function OF_edge(o){const b=OF_box(o.x,o.z,o.h),dx=OF.x-b.x,dz=OF.z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.max(0,Math.abs(lx)-b.hw),ez=Math.max(0,Math.abs(lz)-b.hd);return Math.hypot(ex,ez)}
+function OF_edge(o){const b=OF_box(o.x,o.z,o.h,o.hw,o.hd),dx=OF.x-b.x,dz=OF.z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.max(0,Math.abs(lx)-b.hw),ez=Math.max(0,Math.abs(lz)-b.hd);return Math.hypot(ex,ez)}
 function OF_nearCar(){let best=null,bd=OF_NEAR;for(const o of OF_cars(true)){if(o.k==='traf')continue;if(Math.abs((o.y||0)-OF.y)>2.5)continue;const d=OF_edge(o);if(d<bd){bd=d;best=o}}return best}
 // --- touch: floating stick in the left 40 %, button relabels
 function OF_dom(){if(OF.dom)return OF.dom;const T=$('#touch');if(!T)return null;const z=document.createElement('div');z.id='ofZone';z.innerHTML='<div id="ofRing"><i></i></div><div id="ofHint">DRAG TO WALK</div>';T.insertBefore(z,T.firstChild);
@@ -57,26 +57,36 @@ body.onfoot #roamGauge small{font-size:12px!important}#tB.ofDoor{background:line
   const te=e=>{for(const t of e.changedTouches)end('t'+t.identifier)};z.addEventListener('touchend',te);z.addEventListener('touchcancel',te);
   z.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;try{z.setPointerCapture(e.pointerId)}catch(_){}start('p'+e.pointerId,e.clientX,e.clientY)});
   z.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')mv('p'+e.pointerId,e.clientX,e.clientY)});const pe=e=>{if(e.pointerType!=='touch')end('p'+e.pointerId)};z.addEventListener('pointerup',pe);z.addEventListener('pointercancel',pe);
-  addEventListener('resize',()=>{if(S.id==null)setTimeout(home,50)});
+  addEventListener('resize',()=>{if(S.id==null)setTimeout(home,50);setTimeout(()=>{const B=$('#tB');if(B)OF_doorPlace(B,B.classList.contains('ofDoor'))},80)});
   // BRAKE slot: in door mode a fresh press is EXIT / ENTER (claimed before the BRAKE handlers; no brake, no PARK double-tap)
   const B=$('#tB');const door=e=>{if(!B||!B.classList.contains('ofDoor'))return;if(e.type==='pointerdown'&&e.pointerType==='mouse'&&!e.isTrusted)return;e.preventDefault();e.stopImmediatePropagation();
     const n=performance.now();if(n-(OF.dT||-1e9)<350)return;OF.dT=n;AU.init();OF_door()};
   if(B)for(const ev of['touchstart','pointerdown','mousedown'])B.addEventListener(ev,door,{capture:true,passive:false});
   OF.dom={z,R,K,H,home};setTimeout(home,0);return OF.dom}
 let OF_lbl0=null;
+// the door button sits left of BOOST/JUMP (#tN), vertically centred on it, ≥ 12 px from #tN and #tG (BRAKE's own spot touches GAS on phones)
+function OF_doorPlace(B,on){const P=['left','top','right','bottom','transform'];if(!on){for(const k of P)B.style.removeProperty(k);OF.doorGap=null;return}
+  for(const k of P)B.style.removeProperty(k);const N=$('#tN'),G=$('#tG');if(!N||!N.offsetWidth)return;const n=N.getBoundingClientRect(),b=B.getBoundingClientRect(),par=(B.offsetParent||document.body).getBoundingClientRect();
+  let x=n.left-b.width-14,y=n.top+(n.height-b.height)/2;if(G&&G.offsetWidth){const g=G.getBoundingClientRect();if(x+b.width>g.left-12&&y+b.height>g.top-12)y=Math.min(y,g.top-12-b.height)}y=Math.max(par.top+60,y);
+  B.style.setProperty('left',(x-par.left)+'px','important');B.style.setProperty('top',(y-par.top)+'px','important');B.style.setProperty('right','auto','important');B.style.setProperty('bottom','auto','important');B.style.setProperty('transform','none','important');
+  const r=B.getBoundingClientRect(),gap=e=>{if(!e||!e.offsetWidth)return 999;const q=e.getBoundingClientRect();return Math.round(Math.max(q.left-r.right,r.left-q.right,q.top-r.bottom,r.top-q.bottom))};OF.doorGap={n:gap(N),g:gap(G)}}
 function OF_btns(){const B=$('#tB'),G=$('#tG'),N=$('#tN');if(!B)return;if(!OF_lbl0)OF_lbl0={g:G&&G.innerHTML,n:N&&N.innerHTML};
   const foot=RO.foot!=='car';document.body.classList.toggle('onfoot',foot);let want;
   if(foot)want=RO.foot==='walk'&&OF.near?'enter':'hide';else want=OF_canExit()?'exit':'brake';
   if(want!==OF.btn){OF.btn=want;B.classList.toggle('ofDoor',want==='exit'||want==='enter');B.classList.toggle('ofHide',want==='hide');
-    if(want==='exit')B.textContent='🚪 EXIT';else if(want==='enter')B.textContent='🚪 ENTER';else B.textContent=TOUCH.park?'GO ▶':'BRAKE'}
+    if(want==='exit')B.textContent='🚪 EXIT';else if(want==='enter')B.textContent='🚪 ENTER';else B.textContent=TOUCH.park?'GO ▶':'BRAKE';OF_doorPlace(B,want==='exit'||want==='enter')}
   if(foot!==!!OF.lblFoot){OF.lblFoot=foot;if(G)G.innerHTML=foot?'RUN':OF_lbl0.g;if(N)N.innerHTML=foot?'JUMP':OF_lbl0.n;const u=document.querySelector('#roamGauge small');if(u)u.textContent=foot?'ON FOOT':'KM/H';if(foot&&OF.dom)requestAnimationFrame(()=>OF.dom.home())}}
 // EXIT is offered only when the car is stopped and idle (no gas/brake held for 0.5 s), on the ground, not in a cutscene/menu/event, not a boat
 function OF_canExit(){if(state!=='roam'||!RO.on||RO.frozen||RO.wk||!pl||pl.air||RO.sp||RO.card||RO.mapOpen||RO.story)return false;if(typeof M1!=='undefined'&&M1.cs)return false;
   if(pl.boatMode||(pl.vmode&&pl.vmode!=='car'&&pl.vmode!=='4x4'))return false;if(TOUCH.park)return Math.abs(RO.v)<2.2;return Math.abs(RO.v)<2.2&&OF.idle>.5}
 function OF_door(){if(RO.foot==='car'){if(OF_canExit())OF_exit()}else if(RO.foot==='walk'&&OF.near)OF_enter(OF.near)}
 // --- EXIT: car stops, driver hidden, minifig at the driver's door (left), else right, else behind
+// half extents of the driven body in its own frame (metres), clamped to car-like sizes
+function OF_ext(){try{const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(ud.m.matrixWorld).invert(),B=new THREE.Box3(),b=new THREE.Box3(),m=new THREE.Matrix4(),sc=new THREE.Vector3();ud.m.getWorldScale(sc);
+  ud.m.traverseVisible(o=>{if(!o.isMesh||!o.geometry||(o.material&&o.material.transparent))return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();m.multiplyMatrices(inv,o.matrixWorld);if(o.isInstancedMesh){const k=new THREE.Matrix4();o.getMatrixAt(0,k);m.multiply(k)}b.copy(o.geometry.boundingBox).applyMatrix4(m);B.union(b)});
+  if(B.isEmpty())return{};return{hw:clamp(Math.max(-B.min.x,B.max.x)*sc.x,.8,1.5),hd:clamp(Math.max(-B.min.z,B.max.z)*sc.z,1.8,3.3)}}catch(e){return{}}}
 function OF_exit(){const F=OF_figBuild();if(!F.g.parent)HUB.grp.add(F.g);const h=RO.h,fx=Math.sin(h),fz=Math.cos(h),rx=-fz,rz=fx;
-  if(TOUCH.park)try{parkSet(false)}catch(e){}OF.car={x:RO.x,z:RO.z,y:RO.y,h,own:OF.cur.own};RO.v=0;RO.vy=0;TOUCH.gas=TOUCH.brake=TOUCH.boost=TOUCH.hb=false;
+  if(TOUCH.park)try{parkSet(false)}catch(e){}OF.car=Object.assign({x:RO.x,z:RO.z,y:RO.y,h,own:OF.cur.own},OF_ext());RO.v=0;RO.vy=0;TOUCH.gas=TOUCH.brake=TOUCH.boost=TOUCH.hb=false;
   let px=RO.x-rx*1.75,pz=RO.z-rz*1.75;const ok=(x,z)=>!roamHit(x,z,OF_R,RO.y+1)&&!(CID==='fra'&&inRiver(x,z))&&Math.abs(groundAt(x,z,RO.y+1)-RO.y)<1.2;
   if(!ok(px,pz)){px=RO.x+rx*1.75;pz=RO.z+rz*1.75}if(!ok(px,pz)){px=RO.x-fx*3.4;pz=RO.z-fz*3.4}
   OF.x=RO.x-rx*.6;OF.z=RO.z-rz*.6;OF.y=groundAt(OF.x,OF.z,RO.y+1);OF.h=h-Math.PI/2;OF.vx=OF.vz=OF.vy=0;OF.spd=0;OF.air=false;
@@ -91,7 +101,7 @@ function OF_poseCar(x,z,y,h){RO.x=x;RO.z=z;RO.y=y;RO.h=RO.vh=h;RO.v=0;RO.vy=0;if
 function OF_finishEnter(o){const ud=pl.mesh.userData;
   if(o.k!=='cur'){// park the body we are leaving as a static group at its current world pose
     pl.mesh.updateMatrixWorld(true);const S=new THREE.Group();S.matrixAutoUpdate=false;S.matrix.copy(ud.m.matrixWorld);S.matrixWorldNeedsUpdate=true;for(const c of OF_bodyKids(ud))S.add(c);
-    S.userData.of=1;HUB.grp.add(S);const st={g:S,x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,own:OF.cur.own,wheels:ud.wheels,inst:OF.cur.inst||null,lowL:OF.cur.lowL};if(OF.cur.own)ud.wheels=OF_noW;OF.vs.push(st);
+    S.userData.of=1;HUB.grp.add(S);const st={g:S,x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,own:OF.cur.own,wheels:ud.wheels,inst:OF.cur.inst||null,lowL:OF.cur.lowL};if(OF.cur.own)ud.wheels=OF_noW;OF.vs.push(st);
     // a kerb-parked traffic car is driven off from the lane next to it (1.6 m towards the road centre) so its kerb trees/lamps don't pin the car
     let sx=0,sz=0;if(o.k==='park'){const dx=Math.sin(o.h),dz=Math.cos(o.h);for(const k of[1.6,1.1,.6,0]){if(!roamHit(o.x+dz*k,o.z-dx*k,2,groundY(o.x,o.z)+.5)){sx=dz*k;sz=-dx*k;break}}}
     OF_poseCar(o.x+sx,o.z+sz,o.k==='park'?groundY(o.x+sx,o.z+sz):o.y,o.h);const inv=new THREE.Matrix4().copy(ud.m.matrixWorld).invert(),m4=new THREE.Matrix4();
@@ -118,7 +128,7 @@ function OF_input(){const S=OF.stick;let fx=0,fy=0,run=false,jump=false;
   else{const kx=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),ky=(K.KeyW||K.ArrowUp?1:0)-(K.KeyS||K.ArrowDown?1:0),l=Math.hypot(kx,ky);if(l){fx=kx/l;fy=ky/l}run=!!(K.ShiftLeft||K.ShiftRight)}
   if(TOUCH.gas)run=true;jump=!!(TOUCH.boost||K.Space);return{fx,fy,run,jump}}
 function OF_collide(x,z,y){for(let it=0;it<4;it++){const b=roamHit(x,z,OF_R,y+1);if(!b)break;const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}
-  for(const o of OF_cars(true)){if(Math.abs((o.y||0)-y)>2)continue;const b=OF_box(o.x,o.z,o.h);if(bHit(b,x,z,OF_R)){const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}}
+  for(const o of OF_cars(true)){if(Math.abs((o.y||0)-y)>2)continue;const b=OF_box(o.x,o.z,o.h,o.hw,o.hd);if(bHit(b,x,z,OF_R)){const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}}
   const PG=HUB.pgrid,D=HUB.ptypes;if(PG&&D){const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const L=PG.get((kx+a)*10000+kz+c);if(!L)continue;
     for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;const r=Math.max(.15,Math.min(1.1,d.r*.45))+OF_R,dx=x-p.x,dz=z-p.z,l=Math.hypot(dx,dz);if(l<r&&l>1e-4){x=p.x+dx/l*r;z=p.z+dz/l*r}}}}
   return[x,z]}
@@ -149,7 +159,7 @@ function OF_step(dt){if(!pl)return;dt=Math.min(dt,.05);const T0=OF.tw;
 // --- foot camera: 4.5 m back, 2.2 m up, yaw follows the walking direction (not when walking towards the camera), pulled in before walls
 function OF_cam(dt){if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.y,OF.car.z);
   if(OF.spd>.3){const a=angDiff(OF.h,OF.cy),w=clamp((Math.cos(a)+.2)/1.2,0,1);OF.cy+=a*Math.min(1,dt*3*w*Math.min(1,OF.spd/OF_WALK))}
-  const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+2.2;let back=4.5;for(let d=.3;d<=4.8;d+=.3)if(roamHit(OF.x-fx*d,OF.z-fz*d,.35,hy)){back=Math.max(.25,d-.5);break}
+  const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+2.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)||PC.some(b=>bHit(b,x,z,.3))){back=Math.max(.25,d-.5);break}}
   OF.camB=back<OF.camB?back:OF.camB+(back-OF.camB)*Math.min(1,dt*3);const cx=OF.x-fx*OF.camB,cz=OF.z-fz*OF.camB;
   const cyv=Math.max(hy,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);camera.lookAt(OF.x+fx*2.5,OF.y+1.25,OF.z+fz*2.5);
   if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
@@ -174,5 +184,5 @@ const OF_m1=()=>typeof M1!=='undefined'&&(M1.cs||M1.inv||(typeof M1_wpn==='funct
 addEventListener('keydown',e=>{if(state!=='roam'||e.repeat||!(e.code==='KeyF'||e.code==='KeyE'))return;if(!$('#settings').hidden||RO.jOpen)return;
   if(RO.foot==='walk'){e.preventDefault();if(OF.near)OF_enter(OF.near)}else if(RO.foot==='car'&&!OF_m1()&&OF_canExit()){e.preventDefault();OF_exit()}},true);
 function OF_api(){return{state:RO.foot,x:+OF.x.toFixed(2),z:+OF.z.toFixed(2),y:+OF.y.toFixed(2),h:+OF.h.toFixed(3),spd:+OF.spd.toFixed(2),air:OF.air,near:OF.near&&{k:OF.near.k,x:+OF.near.x.toFixed(1),z:+OF.near.z.toFixed(1)},
-  car:OF.car&&{x:+OF.car.x.toFixed(1),z:+OF.car.z.toFixed(1),h:+OF.car.h.toFixed(3)},parked:OF.vs.length,taken:OF.taken.length,own:OF.cur.own,btn:OF.btn,figH:OF.figH,n:Object.assign({},OF.n),log:OF.log.slice(-8),stk:OF.stk||[],canExit:OF_canExit(),idle:+OF.idle.toFixed(2),
+  car:OF.car&&{x:+OF.car.x.toFixed(1),z:+OF.car.z.toFixed(1),h:+OF.car.h.toFixed(3)},parked:OF.vs.length,taken:OF.taken.length,own:OF.cur.own,btn:OF.btn,figH:OF.figH,n:Object.assign({},OF.n),log:OF.log.slice(-8),stk:OF.stk||[],canExit:OF_canExit(),doorGap:OF.doorGap,idle:+OF.idle.toFixed(2),
   stars:0,hp:100,lock:null,ko:0}}
