@@ -150,7 +150,7 @@ GB_ui=(f=>function(){const r=f.apply(this,arguments);const C=typeof SL!=='undefi
 function PA_thumb(p){if(PA.th.has(p.id))return PA.th.get(p.id);if(!GS.th)try{GS_thumb('b11',0)}catch(e){}const T=GS.th;if(!T)return null;let url=null;
  try{const host=new THREE.Group(),g={userData:{m:host}};GB_attach(g,p.b,null,false,false);host.rotation.y=.75;host.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());
   host.position.sub(ce);T.s.add(host);T.r.setSize(100,72,false);T.cam.aspect=100/72;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.5)*1.6+.5;T.cam.position.set(0,d*.5,d*.85);T.cam.lookAt(0,0,0);
-  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('PA',e);url=null}
+  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('PA',e);url=null}
  finally{try{T.r.setSize(112,112,false);T.cam.aspect=1;T.cam.updateProjectionMatrix()}catch(e){}}PA.th.set(p.id,url);return url}
 // palette: the MY PARTS tab (first card = the canvas), cards follow the palette's category / favourites filtering
 CR_CATS.unshift(PA_CAT);
