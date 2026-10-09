@@ -230,6 +230,7 @@ document.addEventListener('click', ev => {
     case 'drawer': GX.show(d.v); break;
     case 'musicopen': try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); break;
     case 'mpick': musicPick(d.s, d.c); renderMusic(); break;
+    case 'mall': { const on = MLOOPS.every(k => MUS.pick[k] === 'all'); MLOOPS.forEach(k => musicPick(k, on ? MDEF[k] : 'all')); renderMusic(); break; }
     case 'mprev': musicPreview(d.s); renderMusic(); break;
     case 'mprevx': musicPreviewStop(); renderMusic(); break;
     case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
