@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
+ {ver:'v89a',id:'foot-walk',text:'On foot: drag on the left half of the screen to walk, push far to run; RUN and JUMP work. Walk 30 m along a street: no getting stuck on kerbs, the camera stays behind you and never inside a wall. Your minifig is as tall as the people around.'},
+ {ver:'v89a',id:'foot-enter',text:'Walk up to a parked car at the kerb (Frankfurt) or back to your own car: 🚪 ENTER appears. Tap it, drive away 100 m: the car sits on the road, all controls work as before.'},
  {ver:'v88x',id:'ath-dress',text:'Athens: drive along streets for 1 minute: orange trees, green kiosks, parked scooters and bollards line the pavements; more crowds/cafés; smashing one gives a brick burst. Is Athens lively enough?'},
  {ver:'v88x',id:'steg-tower',text:'Frankfurt: drive to the Eiserner Steg (red iron footbridge): the 4 towers at its ends have windows, a door and a red roof (no plain beige pillar).'},
  {ver:'v88x',id:'crowd-car',text:'Look at crowds next to parked cars: nobody stands inside a car.'},
