@@ -3,6 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89k',id:'gold-brick',text:'Golden bricks look like a big gold 2×2 LEGO brick at car-roof height (no pole), and you collect it by driving through.'},
  {ver:'v89j',id:'tip-avatar',text:'Oma Hilde\'s tip text never runs under her picture.'},
  {ver:'v89j',id:'walls-pill',text:'Frankfurt: no plain beige walls; the TAP TO OPEN pill doesn\'t cover the speed bar.'},
  {ver:'v89i',id:'perf-thumbs',text:'Garage: part pictures and car cards all show (no blank tiles), and PAINT recolours them.'},
