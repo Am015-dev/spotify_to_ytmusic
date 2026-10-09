@@ -5,6 +5,7 @@
 const OD_CHECKLIST=[
  {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
  {ver:'v89a',id:'foot-walk',text:'On foot: drag on the left half of the screen to walk, push far to run; RUN and JUMP work. Walk 30 m along a street: no getting stuck on kerbs, the camera stays behind you and never inside a wall. Your minifig is as tall as the people around.'},
+ {ver:'v89a',id:'foot-pc',text:'PC: stop the car, press F (or E) to get out, walk with WASD (Shift runs, Space jumps), press F next to a car to get in.'},
  {ver:'v89a',id:'foot-enter',text:'Walk up to a parked car at the kerb (Frankfurt) or back to your own car: 🚪 ENTER appears. Tap it, drive away 100 m: the car sits on the road, all controls work as before.'},
  {ver:'v88y',id:'gp-canvas',text:'Garage BUILD → MY PARTS → CANVAS: an empty green 32×32 baseplate. Place a few bricks, pinch to zoom and drag with two fingers to move the view, then ← CAR: your car is unchanged.'},
  {ver:'v88y',id:'gp-part',text:'On the canvas: ☝ SELECT your bricks → ⛓ GROUPS → MAKE GROUP → 💾 SAVE PART. Back on the car, MY PARTS → tap the part, tap a spot at the side of the car, ✔ PLACE: it appears on both sides. SAVE & DRIVE, reload: it is still there.'},
