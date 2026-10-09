@@ -95,7 +95,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
    const sd=Math.sqrt(d.reduce((a,b)=>a+(b-m)**2,0)/Math.max(1,d.length));const tail=cy.slice(-60);
    return{name,n:S.length,camTurn:+(cy[cy.length-1]-cy[0]).toFixed(2),camAbs:+d.reduce((a,b)=>a+Math.abs(b),0).toFixed(2),heroTurn:+(h[h.length-1]-h[0]).toFixed(2),jitter:+(sd*60).toFixed(3),maxRate:+(Math.max(...d.map(Math.abs))*60).toFixed(2),lastRate:+(Math.abs(tail[tail.length-1]-tail[0])/Math.max(1,tail.length-1)*60).toFixed(3),onScreen:+(100*S.filter(r=>r[2]).length/S.length).toFixed(1)}};
  const R={};const hold=async(ax,ay,frames)=>{for(let f=0;f<frames;f+=6){await push(ax,ay);await tick(6)}};
- await take();
+ await take();if(process.env.ONLYF){R.A=R.B=R.C=R.D={onScreen:100,lastRate:0,camTurn:0,heroTurn:0}}else{
  // A: stick straight up
  await hold(0,1,240);await release();await tick(10);R.A=stats('straight',await take());log('A',R.A);
  ok(R.A.lastRate<=.02&&Math.abs(R.A.camTurn)<=.05,tag+' A stick straight: camera yaw rate 0',R.A);
@@ -114,12 +114,12 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
  while(fE<3600){s=await st();const a=s.cy;const tx=s.f.x+Math.sin(a)*80,tz=s.f.z+Math.cos(a)*80;const w=await walkTo(tx,tz,3,Math.min(900,3600-fE));fE+=Math.max(60,w.f)}
  R.E=stats('street',await take());const n1=(await st()).f.n;R.E.stuck=+(100*(n1.stuckF-n0.stuckF)/Math.max(1,n1.walkF-n0.walkF)).toFixed(1);R.E.camIn=+(100*(n1.camIn-n0.camIn)/Math.max(1,n1.walkF-n0.walkF)).toFixed(1);log('E',R.E);
  ok(R.E.onScreen>=99.5,tag+' E street walk: player on screen ≥99.5 %',R.E.onScreen);ok(R.E.jitter<=1.0,tag+' E camera yaw jitter ≤1 rad/s sd',R.E.jitter);ok(R.E.camIn<=2,tag+' E camera in building ≤2 %',R.E.camIn);
- await shot('cam_2_street_end');
+ await shot('cam_2_street_end');}
  // F: orbit — drag the empty right half (phone) or mouse drag / Q R (desk)
  const cy0=(await st()).cy;
  if(phone){const pt=await G.evaluate(()=>{for(const [fx,fy] of[[.62,.3],[.55,.25],[.7,.22],[.5,.4]]){const x=innerWidth*fx,y=innerHeight*fy,e=document.elementFromPoint(x,y);if(e&&e.id==='ofCam')return[x,y]}const e=document.elementFromPoint(innerWidth*.62,innerHeight*.3);return{miss:e&&(e.id||e.className||e.tagName)}});
    ok(Array.isArray(pt),tag+' F empty right half is the camera drag zone',pt);
-   if(Array.isArray(pt)){await down('cam',pt);for(let i=1;i<=10;i++){await move('cam',[pt[0]+i*15,pt[1]+i*3]);await tick(3)}const mid=await shot('cam_3_orbit_mid');await up('cam');await tick(6)}}
+   if(Array.isArray(pt)){await down('cam',pt);for(let i=1;i<=10;i++){await move('cam',[pt[0]+i*15,pt[1]+i*3]);await tick(3)}log('Fdbg',await G.evaluate(()=>__oc.ev('JSON.stringify({cy:OF.cy,cam:OF.cam,camT:OF.camT,foot:RO.foot})')));const mid=await shot('cam_3_orbit_mid');await up('cam');await tick(6)}}
  else{const c=await G.evaluate(()=>[innerWidth*.62,innerHeight*.35]);await p.mouse.move(c[0],c[1]);await p.mouse.down();for(let i=1;i<=10;i++){await p.mouse.move(c[0]+i*15,c[1]+i*3);await tick(3)}await shot('cam_3_orbit_mid');await p.mouse.up();await tick(6)}
  const cy1=(await st()).cy;const dF=Math.atan2(Math.sin(cy1-cy0),Math.cos(cy1-cy0));log('F',{cy0,cy1,d:dF});ok(Math.abs(dF)>=.4,tag+' F drag orbits the camera',+dF.toFixed(2));
  if(!phone){const c0=(await st()).cy;await key('KeyQ',true);await tick(30);await key('KeyQ',false);const c1=(await st()).cy;ok(Math.abs(Math.atan2(Math.sin(c1-c0),Math.cos(c1-c0)))>=.3,tag+' F Q orbits the camera',+(c1-c0).toFixed(2))}
