@@ -30,3 +30,16 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 - Added ⚙ TUNE → Life → "Show FPS" (TUNE.perfHud): bottom-left line with fps, worst frame, JS ms, the frame's real draws and tris (the old #fps showed the last composer pass only). The perf-smooth checklist item asks Alex for a screenshot of it.
 - QUICK REVIEW sent for b9192327 (shots ath/v88u/sheet.png, ath/v88u/ath_monastiraki.png). After PASS: fetch live, merge if moved, `tools/build.sh v88u`, `git add -f out/v88u`, push, then DEPLOY to the coordinator.
 - QUICK PASS (b9192327). Review notes fixed: FPS line shortened to one ~320 px line; checklist perf-pc added. DEPLOY sent: alex/od-athens dadad854 out/v88u (on live v88t). This session stops here (context limit); a fresh worker starts at "Next: root cause (step 2)" above.
+
+## LIVE: v88u (2026-10-09, from alex/od-athens dadad854). The beta is republished.
+
+## Plan for the next worker (in this order; each ships separately with a review)
+### A · World draw calls / triangles (the real lag)
+- First measure: traverse `scene` at 3 Frankfurt + 3 Athens spots (ath/perf.js style); for every visible mesh record triangles × instance count, material, parent name/userData; print the top 30 + the sum per category (buildings/Kenney kits, terrain/ground, trees, clouds 150×6 boxes, landmarks, props, traffic, peds, Life). Write the table here.
+- Suspects: Kenney building kits at full detail at any distance (most of the 2.5M tris in Frankfurt); per-building meshes not merged per material (the ~430 draws); the cloud InstancedMesh (900 boxes, cheap but fills); terrain resolution.
+- Fix: merge static city geometry per material per ~200 m chunk (BufferGeometryUtils.mergeGeometries; keep colliders untouched); distance LOD per chunk (full ≤ 150 m, a simple box/roof per building beyond, nothing past fog); frustum culling per chunk (the cull code is hubCull* in 70_roam_world.js). Target: draws ≤ v88m + 10 % (~400 Frankfurt, ~275 Athens) and triangles roughly halved; check with the Show FPS line + perf.js; before/after shots at the same spots (lesson 7: no visual loss up close).
+- CPU (smaller): 150-car loop (groundAt + CR_susp each frame; v88u already thins far cars), miniDraw reads el.offsetParent (a layout read) every 2nd frame, allocations in LV_edges (slice/concat) and debris V3s.
+### B · 2× brick detail (Alex: "double the number of bricks and tiles … same for the city")
+- Only on top of A. Cars (93_cars_lego.js CR_*) and city facades: finer bricks, visible studs, tiles/plates/SNOT bands. Add the detail as merged geometry or normal-mapped/texture detail (studs as one instanced stud mesh per chunk), full detail ≤ 40-60 m, simplified beyond. Budget: draws ≤ v88m + 10 %, frame time ≤ v88u. Before/after shots at the same spots, side views of cars; the tyre gap must stay ≤ 0.05 m.
+### C · Athens busier (the original brief of this branch)
+- See the "Athens" bullet in "Next: root cause (step 2)" above; before-shots in ath/before/sheet.png from `node ath/shots6.js <url> <out>` (SET='TUNE.perfHud=1' shows the perf line). Keep the v88u people defaults unless Alex's perf-pc numbers allow more; the Athens dressing must be instanced (≤ +10 draws).
