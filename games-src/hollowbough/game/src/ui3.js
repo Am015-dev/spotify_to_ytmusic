@@ -133,6 +133,10 @@ function fingerWanted() {
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
+// a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
+function hscrollTo(el) { const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
+  if (hs.classList.contains('vert')) { if (c < hs.scrollTop) hs.scrollTop = c - 4; else if (d > hs.scrollTop + hs.clientHeight) hs.scrollTop = d - hs.clientHeight + 4; UI.hsy = hs.scrollTop; }
+  else { if (a < hs.scrollLeft + 36) hs.scrollLeft = Math.max(0, a - 40); else if (b > hs.scrollLeft + hs.clientWidth) hs.scrollLeft = b - hs.clientWidth + 4; UI.hsx = hs.scrollLeft; } }
 function placeFinger() {
   let f = $('#finger'); if (!f) { f = h('div#finger', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 40 48"><rect x="13" y="2" width="13" height="30" rx="6.500" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/><rect x="7" y="22" width="27" height="25" rx="11" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/></svg>' }); $('#board').appendChild(f); }
   f.hidden = true;
@@ -142,6 +146,7 @@ function placeFinger() {
   let el = UI.tgEls && UI.tgEls[tg];
   if (!el && G.q) { const i = UI.rec.m.i; el = UI.tgEls['q:' + i]; }
   if (!el) return;
+  hscrollTo(el);
   const r = frameRect(el); if (!r || r.w < 4) return;
   const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');

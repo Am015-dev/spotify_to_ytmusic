@@ -32,10 +32,17 @@ function collect() {
     const cr = svg.getBoundingClientRect();
     out.push({ kind: 'svg', cat, txt: txt.slice(0, 40), fs, cardW: cr.width, rect: [r.left, r.top, r.right, r.bottom], color: getComputedStyle(t).fill, id: svg.closest('[data-card]') ? svg.closest('[data-card]').dataset.card : '' });
   });
-  document.querySelectorAll('.zinfo b,.zinfo p,.zinfo .sm,.rc b,.rc .sm,.cb b,.cb span').forEach(t => {
+  document.querySelectorAll('.zinfo b,.zinfo p,.zinfo .sm,.rc b,.rc .sm,.cb b,.cb span,.sc.hc .hcn,.sc.hc .ci b,.sc.hc .hcp b').forEach(t => {
     const r = t.getBoundingClientRect(); if (!vis(t, r)) return; if (!t.childNodes.length || ![...t.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) return;
+    if (t.closest('.sc.hc')) { const cx = Math.min(vw - 1, Math.max(0, (r.left + r.right) / 2)), cy = Math.min(vh - 1, Math.max(0, (r.top + r.bottom) / 2)), top = document.elementsFromPoint(cx, cy).find(e => !e.matches('.glow,.gxh-ring')); if (!top || !t.closest('.sc.hc').contains(top)) return; }   // covered by an overlay (zoom, city) = not visible
     const s = getComputedStyle(t), txt = t.textContent.trim();
     out.push({ kind: 'html', cat: t.matches('p') || t.matches('.sm') ? 'rules' : 'name', txt: txt.slice(0, 40), fs: parseFloat(s.fontSize), cardW: 0, rect: [r.left, r.top, r.right, r.bottom], color: s.color, id: '' });
+  });
+  // hand chips: every card in hand must show its name, cost and points, unclipped, inside the screen row
+  document.querySelectorAll('.sc.hc').forEach(c => {
+    const nm = c.querySelector('.hcn'), r = nm && nm.getBoundingClientRect(), cr = c.getBoundingClientRect();
+    out.push({ kind: 'chip', cat: 'chip', txt: nm ? nm.textContent : '?', fs: 99, cardW: 0, rect: [0, 0, 0, 0], color: 'rgb(0,0,0)', id: c.dataset.id,
+      clip: !nm || nm.scrollHeight > nm.clientHeight + 1 || !c.querySelector('.cost') || !c.querySelector('.hcp b') || [...c.querySelectorAll('.hcr > *')].some(e => e.getBoundingClientRect().right > cr.right - 1) });
   });
   return out;
 }
@@ -43,7 +50,7 @@ async function measure(p, tag, scene, phone) {
   await p.evaluate(() => { if (!document.getElementById('rt-nofinger')) { const st = document.createElement('style'); st.id = 'rt-nofinger'; st.textContent = '[class*=finger],[id*=finger],.gxh-bub,.gxh-ring{display:none!important}'; document.head.appendChild(st); } });   // the tutorial hand is a pointer, not card text
   const items = await p.evaluate(collect);
   // contrast: hide the measured texts, screenshot what is really behind them, sample the pixels in each text box
-  await p.evaluate(() => { const st = document.createElement('style'); st.id = 'rt-hide'; st.textContent = 'svg[data-art] text,.zinfo b,.zinfo p,.zinfo .sm,.rc b,.rc .sm,.cb b,.cb span{visibility:hidden!important}'; document.head.appendChild(st); });
+  await p.evaluate(() => { const st = document.createElement('style'); st.id = 'rt-hide'; st.textContent = 'svg[data-art] text,.zinfo b,.zinfo p,.zinfo .sm,.rc b,.rc .sm,.cb b,.cb span,.sc.hc .hcn,.sc.hc .ci b,.sc.hc .hcp b{visibility:hidden!important}'; document.head.appendChild(st); });
   await sleep(60);
   const buf = await p.screenshot({ type: 'png' });
   const res = await p.evaluate(async ([b64, items]) => {
@@ -61,8 +68,9 @@ async function measure(p, tag, scene, phone) {
     });
   }, [buf.toString('base64'), items]);
   await p.evaluate(() => { const s = document.getElementById('rt-hide'); if (s) s.remove(); });
-  const MIN = { name: phone ? 11 : 10, num: phone ? 11 : 10, rules: 10, label: 8, other: 8 };
+  const MIN = { chip: 0, name: phone ? 11 : 10, num: phone ? 11 : 10, rules: 10, label: 8, other: 8 };
   items.forEach((it, i) => {
+    if (it.cat === 'chip') { if (it.clip) fail(`${tag} ${scene}`, `hand chip "${it.txt}" #${it.id} clips its name/cost/points`, scene + ' chip clipped', 0); return; }
     const c = res[i], where = `${tag} ${scene}`, what = `${it.cat} "${it.txt}"${it.id ? ' #' + it.id : ''} (card ${Math.round(it.cardW)}px)`;
     if (it.fs < MIN[it.cat] - .05) fail(where, `font ${it.fs.toFixed(1)}px < ${MIN[it.cat]} ${what}`, scene + ' font ' + it.cat + ' <' + MIN[it.cat], it.fs);
     if (c.mean < 4.5) fail(where, `contrast ${c.mean.toFixed(1)}:1 < 4.5 ${what}`, scene + ' contrast ' + it.cat, c.mean);
@@ -104,6 +112,7 @@ async function play(p) {   // the human seat plays like the computer until the c
     console.log(tag, 'hand card widths', await p.evaluate(() => [...document.querySelectorAll('.sc svg[data-art]')].map(e => Math.round(e.getBoundingClientRect().width)).join(',')));
     const shot = async name => { if (SHOTS) await p.screenshot({ path: path.join(OUT, `${PREFIX}-${name}-${tag}.png`) }); };
     // 1) the table: meadow cards and my hand
+    { const hc = await p.evaluate(() => [document.querySelectorAll('.sc.hc').length, G.players[0].hand.length, Math.round(document.querySelector('.hscroll') ? document.querySelector('.hscroll').getBoundingClientRect().top : 0), innerHeight]); if (hc[0] !== hc[1]) fail(tag, 'hand chips ' + hc[0] + ' != hand ' + hc[1]); console.log(tag, 'hand chips', hc.join(' ')); }
     await shot('hand'); const n1 = await measure(p, tag, 'table', phone);
     // 2) zoom on a meadow card and a hand card
     for (const [sel, nm] of [['.mc [data-card]', 'zoom-meadow'], ['.sc [data-card]', 'zoom-hand']]) {
