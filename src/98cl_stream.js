@@ -1,0 +1,34 @@
+// ===== STR (v89b): streaming. Owner: stream worker (alex/od-stream). =====
+// Measured live v89a: the JS heap after GC is flat (~140 MB Athens, ~75 MB Frankfurt) but geometry buffers grow from 68 → 222 MB (Athens) and
+// 114 → 215 MB (Frankfurt) in a tour, because the WB far city (2×2 "super cells", 54 B per far triangle, CPU copy + GPU copy) was built for the
+// whole map and never freed, and the Frankfurt LAZY outskirts were never disposed either.
+// Now: a super cell's far buffer is built only while its rectangle is within draw range + TUNE.strLoad of the camera (built in ≤ STR.sl ms
+// slices, at most STR.ms per frame) and disposed beyond draw range + TUNE.strUnload (hysteresis, no thrash); its CPU copy is dropped right after the
+// GPU upload. The items (shared model templates + one Float32 matrix per instance) stay, so a rebuild needs no source geometry.
+// LAZY regions (Frankfurt outskirts): meshes + props are disposed beyond draw range + TUNE.strLzOut (load at draw range + TUNE.strLzIn, was a fixed 2200 m) and rebuilt by lazyStep on return (colliders, map roads,
+// ramps and spots are plan data and stay, so collisions, missions and the minimap never depend on what is loaded).
+for(const [k,v] of Object.entries({strOn:1,strFree:1,strLoad:300,strUnload:900,strLzIn:100,strLzOut:800}))if(TUNE[k]===undefined)TUNE[k]=v;
+const STR={it:null,S:null,sl:2,ms:4,st:{b:0,f:0,max:0,over:0,relMB:0,lzF:0,lzB:0,hist:[]}};
+const STR_on=()=>!!TUNE.strOn;
+const STR_R=()=>SET.q==='high'?2100:1600;
+const STR_d=(S,x,z)=>Math.hypot(Math.max(S.x0-x,0,x-S.x1),Math.max(S.z0-z,0,z-S.z1));
+function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof camera==='undefined')return;const t0=performance.now(),cx=camera.position.x,cz=camera.position.z,R=STR_R(),LD=R+TUNE.strLoad,UL=R+TUNE.strUnload;
+  if(STR.S&&(STR.S.grp!==WBC.grp||!WBC.sup.includes(STR.S))){STR.S=null;STR.it=null}
+  for(const S of WBC.sup)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++}
+  let n=0;while(performance.now()-t0<STR.ms){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;STR.S=b;STR.it=WB_supMk(b,true)}
+    n++;if(STR.it.next().done){STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
+  if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
+{const _ls=lazyStep;lazyStep=function(){const r=_ls.apply(this,arguments);try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
+window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
+// LAZY unload: only regions built by the plain lzBuildG (their build has no side effects beyond L.root + props); Taunus/Wald/Attiki corridors stay
+// (their builders add terrain, colliders or lanes while building). Colliders were added once at the first finish and are kept.
+const STR_lzOk=L=>L.build===lzBuildG&&!L.pre&&L.done&&!L.it&&L.root&&LZ.cur!==L;
+function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)return true;return false};
+  if(HUB.props){const keep=[],gone=new Set();for(const p of HUB.props)(p.im&&inR(p.im)?gone:keep).push(p);if(gone.size){HUB.props.length=0;HUB.props.push(...keep);const PG=HUB.pgrid;if(PG)for(const p of gone){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16),A=PG.get(k);if(A){const i=A.indexOf(p);if(i>=0)A.splice(i,1)}}}}
+  if(HUB.cull){const C=HUB.cull.filter(c=>!inR(c.o));HUB.cull.length=0;HUB.cull.push(...C)}
+  R.removeFromParent();R.traverse(o=>{if(o.isInstancedMesh)o.dispose();else if(o.isMesh&&o.geometry)o.geometry.dispose()});
+  L.root=null;L.done=false;L.qd=false;L.it=null;L.bt=null;L.strRe=1;if(L.pN!=null)L.props.length=L.pN;HUB.cpos=null;STR.st.lzF++}
+{const _st=lzStart;lzStart=function(L){if(!L.it&&L.pN==null)L.pN=L.props.length;return _st.apply(this,arguments)}}
+{const _fi=lzFinish;lzFinish=function(L){if(!L.strRe)return _fi.apply(this,arguments);const b=L.bld;L.bld=[];try{return _fi.apply(this,arguments)}finally{L.bld=b;STR.st.lzB++}}}
+function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>STR_R()+TUNE.strLzOut)STR_lzFree(L)}
+{const _ls=lazyStep;lazyStep=function(){STR_lzStep();LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}}

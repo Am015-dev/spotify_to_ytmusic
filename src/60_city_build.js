@@ -622,7 +622,7 @@ function lzFinish(L){HUB.bld.push(...L.bld);hubGridAdd(L.bld);const R=L.root;R.t
   R.visible=true;hubCullAdd(R);L.done=true;L.it=null;L.bt=null;L.tDone=performance.now();L.qd=true;HUB.cpos=null}
 function lzRun(L){if(L.done)return;const i=LZ.q.indexOf(L);if(i>=0)LZ.q.splice(i,1);lzStart(L);const t=performance.now();while(!L.it.next().done);L.ms+=performance.now()-t;lzFinish(L);if(LZ.cur===L)LZ.cur=null}
 // the per-frame step (called from hubTrafficStep): queue biomes within 2200 m, nearest first, and spend at most LZ.ms on generator steps
-function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(const L of LAZY)if(!L.done&&!L.qd&&lzD(L,x,z)<2200){L.qd=true;LZ.q.push(L);add=true}
+function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(const L of LAZY)if(!L.done&&!L.qd&&lzD(L,x,z)<(LZ.inR||2200)){L.qd=true;LZ.q.push(L);add=true}
   if(!LZ.cur&&!LZ.q.length)return;if(add)LZ.q.sort((a,b)=>lzD(a,x,z)-lzD(b,x,z));const t0=performance.now();let n=0;
   while(performance.now()-t0<LZ.ms){if(!LZ.cur){LZ.cur=LZ.q.shift();if(!LZ.cur)break;if(LZ.cur.done){LZ.cur=null;continue}lzStart(LZ.cur)}const L=LZ.cur,t1=performance.now(),r=L.it.next();L.ms+=performance.now()-t1;n++;if(r.done){lzFinish(L);LZ.cur=null}}
   if(!n)return;const dt=performance.now()-t0;LZ.steps++;LZ.tot+=dt;if(dt>LZ.max)LZ.max=dt;if(dt>8)LZ.over++;LZ.hist.push(+dt.toFixed(2));if(LZ.hist.length>900)LZ.hist.shift()}
