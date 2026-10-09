@@ -7,8 +7,8 @@ const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setIt
  const brk=()=>p.evaluate(()=>{const sc=__g9ev('scene'),r=__g9ev('renderer');const seen=new Set();let geo=0,geoB=0,inst=0,instB=0;const byP={};
   const ab=a=>{if(!a||!a.array||seen.has(a.array))return 0;seen.add(a.array);return a.array.byteLength};
   sc.traverse(o=>{if(!o.geometry)return;const g=o.geometry;let b=0;if(!seen.has(g)){seen.add(g);geo++;for(const k in g.attributes)b+=ab(g.attributes[k]);b+=ab(g.index)}if(o.isInstancedMesh){inst++;b+=ab(o.instanceMatrix)+ab(o.instanceColor)}geoB+=b;
-   let q=o,top='';while(q.parent&&q.parent!==sc){q=q.parent}top=(q.name||q.userData.lz||q.type)+'';byP[top]=(byP[top]||0)+b});
-  const top=Object.entries(byP).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>k+':'+(v/1048576).toFixed(1));
+   const ch=[];let q=o;while(q&&q!==sc){ch.unshift(q);q=q.parent}const nm=x=>x?(x.name||x.userData.lz||(x.userData.wbLod?'wbLod':'')||(x.userData.wbM?'wbM':'')||(x.userData.wbP?'wbP':'')||x.type)+'':'';const top=nm(ch[0])+'/'+nm(ch[1])+'/'+nm(ch[2]);byP[top]=(byP[top]||0)+b});
+  const top=Object.entries(byP).sort((a,b)=>b[1]-a[1]).slice(0,25).map(([k,v])=>k+':'+(v/1048576).toFixed(1));
   return {geos:geo,sceneGeoMB:+(geoB/1048576).toFixed(1),inst,rGeo:r.info.memory.geometries,rTex:r.info.memory.textures,calls:r.info.render.calls,top}});
  const h0=await heap(),b0=await brk();console.log(JSON.stringify({city:CITY,load_s:tLoad,heapMB:h0,...b0}));
  if(DRIVE){const M=await p.evaluate(()=>{const N=__mho.HUB.nodes;return N.filter(a=>a&&a.nb&&a.nb.length).map(a=>[a.x,a.z])});
