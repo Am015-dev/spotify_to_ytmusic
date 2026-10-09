@@ -1,5 +1,12 @@
 # HANDOFF race (race worker, 2026-10-09): "the races are boring" → NOW: wide open race courses
 
+## >>> READ FIRST (RO5 finisher, 2026-10-09 ~18:40; HEAD 4a80ce9+)
+- RO5 done: terrain dressing (tree line, bushes, tufts, flowers, Athens cypresses), painted route arrows at each fork + 1.6x SHORTCUT sign, smaller island trees. All in `src/98ro_open.js` (OPN_build).
+- Gate side-by-sides `qa_race/ro5/sbs/1..8` (force-added) sent to the coordinator; waiting for its OK → then REVIEW → DEPLOY.
+- tRace (final build, ro5f, fast=1 → 1 lap): fra 2/8, ath 6/8; 0 wall/min, 0 errors, vis2 94.5/100 %, AI alt share 50/29 %.
+- Placed-shot envs: `qa_race/ro5g/gate_*.env`. Do NOT place AI by o.dist (they vanish); use tRace shots for the pack. A 5-frame setup hides the car in the transform effect; use ≥40 frames.
+- DEPLOY: merge origin/alex/od-stream (live v89e bd26d579) first, then take the next free letter (garage may take v89f).
+
 ## >>> READ FIRST (open-course builder session, 2026-10-09 ~18:30; HEAD = this commit)
 - NEW module `src/98ro_open.js` (ORDER: after 98rf, before 99_api). Prefix `OPN_` (`RO` is the roam state!). Two courses, both in the RACE menu:
   `fra_ufer` "Riverbank Rally" (Frankfurt tab) and `ath_akti` "Coast Rally" (Athens tab). Built on race entry by a `loadTrack` wrap (no city build, no download).
