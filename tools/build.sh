@@ -10,6 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 VER="${1:?usage: tools/build.sh <ver> [--local]}"; OUT="out/$VER"; mkdir -p "$OUT"
 for f in src/*.js src/*.html; do grep -qx "$(basename "$f")" src/ORDER || { echo "BUILD FAIL: $f not in src/ORDER"; exit 1; }; done
+python3 tools/modmap.py || echo "WARN: modmap failed (docs/MODULES.md not refreshed)"   # keep docs/MODULES.md in step with src/
 ( cd src && cat $(cat ORDER) ) > "$OUT/overdrive.html"
 cp src/assets/km.js "$OUT/km.js"
 # published tuning (TUNE drawer, docs/TUNE.md): the page fetches ./tune.json next to itself; deploy.sh copies it when present
