@@ -43,3 +43,11 @@ Keep the existing sax stingers until short stingers exist. Treblo makes full son
 - Treblo Terms of Service, section 8 (Output): the user owns the Outputs, and Treblo assigns its rights to the user. The commercial-use limits in the rest of the terms "do not limit Your use of Your Outputs".
 - Outputs may not be unique, and Treblo gives no warranty about whether a track can be copyrighted.
 - No third-party samples were used. The prompts are our own and name no artists or works.
+
+## Short menu loops (2026-10-09)
+Shorter alternatives for the menu/title screen (Doorkick has no tavern cue, so these are short `main` loops), generated with Treblo's Duration Control (max 1:00, which Treblo treats as a guide). Anything longer was trimmed to 58 s with a fade-out, so loop these with a short crossfade.
+
+| file | length | note |
+|---|---|---|
+| `main-short-a.mp3` | 0:58 | trimmed from 90 s, 3 s fade-out |
+| `main-short-b.mp3` | 0:46 | as generated |

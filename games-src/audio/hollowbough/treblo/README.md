@@ -34,3 +34,11 @@ Victory and defeat are full songs, not short cues. Cut them with ffmpeg, for exa
 - Treblo Terms of Service, section 8 (Output): the user owns the Outputs, and Treblo assigns its rights to the user. The commercial-use limits in the rest of the terms "do not limit Your use of Your Outputs".
 - Outputs may not be unique, and Treblo gives no warranty about whether a track can be copyrighted.
 - No third-party samples were used. The prompts are our own and name no artists or works.
+
+## Short menu loops (2026-10-09)
+Shorter alternatives for the menu/title screen, generated with Treblo's Duration Control (max 1:00, which Treblo treats as a guide). Anything longer was trimmed to 58 s with a fade-out, so loop these with a short crossfade.
+
+| file | length | note |
+|---|---|---|
+| `tavern-short-a.mp3` | 0:44 | as generated |
+| `tavern-short-b.mp3` | 0:37 | as generated |
