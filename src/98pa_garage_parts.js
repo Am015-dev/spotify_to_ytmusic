@@ -134,9 +134,11 @@ function PA_append(id){const p=PA_get().find(o=>o.id===id);if(!p||!GB_.bk)return
  const B=p.b.filter(b=>GB_PC[b.t]).map(b=>({...b}));if(!B.length)return 0;if(GB_list().length+B.length>GB_MAX){GB_msg('Brick budget full · '+GB_MAX);GX_sfx('bump');return 0}
  const A=B[0],W=Math.max(...B.map(b=>b.x+GB_dims(b)[0])),D=Math.max(...B.map(b=>b.z+GB_dims(b)[1]));
  SL.carry={parts:B.map(o=>({...o,dx:o.x-A.x,dz:o.z-A.z,dy:o.y-A.y})),copy:1,snap:JSON.stringify(GB_list()),x:0,z:0,y:0,bad:0,ap:p.id,gxN:p.n};PA.mir=GB_.mir;
- SL_fitAt(A.x-Math.floor(W/2),A.z-Math.floor(D/2),null);GX_sfx('pick');GS_tip(p.n+' · tap where it goes, ⟳ turns it, ✔ PLACE'+(GB_.mir?' · ⇋ mirror on':''));SL_ui();GX_ui();return 1}
+ SL_fitAt(A.x-Math.floor(W/2),A.z-Math.floor(D/2),null);PA_lay();GX_sfx('pick');GS_tip(p.n+' · tap where it goes, ⟳ turns it, ✔ PLACE'+(GB_.mir?' · ⇋ mirror on':''));SL_ui();GX_ui();return 1}
+// the layer view follows the carried part, so its ghost is never hidden in the see-through layers above the active one (review v88y)
+function PA_lay(){try{const C=SL.carry;if(C&&B25.on&&B25.L!=null&&C.y>B25.L)B25_set(C.y)}catch(e){}}
 // mirror twins of an appended part (only when it sits off the centre line and the other side has room)
-SL_fitAt=(f=>function(x,z,y){const C=SL.carry;if(!C||!C.ap)return f.apply(this,arguments);C.parts=C.parts.filter(p=>!p.tw);const r=f.apply(this,arguments);PA_twins();return r})(SL_fitAt);
+SL_fitAt=(f=>function(x,z,y){const C=SL.carry;if(!C||!C.ap)return f.apply(this,arguments);C.parts=C.parts.filter(p=>!p.tw);const r=f.apply(this,arguments);PA_twins();PA_lay();return r})(SL_fitAt);
 function PA_twins(){const C=SL.carry;if(!C)return;C.parts=C.parts.filter(p=>!p.tw);C.tw=0;if(GB_.mir){const B=SL_at(C,C.x,C.z,C.y),T=B.map(GB_twin),L=GB_list();
   if(!T.some(w=>B.some(o=>PA_ov3(w,o)))&&!T.some(w=>SL_clash(w,L))&&L.length+B.length*2<=GB_MAX){for(const w of T)C.parts.push({t:w.t,r:w.r,m:w.m,c:w.c,tw:1,dx:w.x-C.x,dz:w.z-C.z,dy:w.y-C.y});C.tw=1}}
  C.bad=!SL_ok(SL_at(C,C.x,C.z,C.y));SL_ghost()}
