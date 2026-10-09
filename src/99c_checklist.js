@@ -3,11 +3,25 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89g',id:'ro_start',text:'RACE → Riverbank Rally (or Coast Rally in Athens). You start 8th at the back: you see the whole field ahead on a wide open course, and the big 8TH top-left changes as you pass cars.'},
+ {ver:'v89g',id:'ro_route',text:'At a fork, follow the orange arrows onto the dirt SHORTCUT (you turn into a 4×4), or the blue arrows into the water lane (you turn into a boat). Both feel faster than the road.'},
+ {ver:'v89g',id:'ro_jump',text:'Jump the creek (Frankfurt) or the olive crest (Athens) at full speed: you fly over and land on the far side.'},
+ {ver:'v89g',id:'ro_cliff',text:'Drive off the cliff edge on purpose: you see a real drop to the water, "OFF THE CLIFF!" appears, and you are back on the road within 3 s (tap to respawn at once). You keep your place.'},
  {ver:'v88z',id:'speed',text:'Take a sports car (Hot Rod) onto the Autobahn and hold GAS: the HUD reaches about 230 km/h, BOOST takes it past 260. A 4×4 tops out around 155. Steering feels the same as before.'},
  {ver:'v88z',id:'kreuz',text:'Autobahn west of the city, at the Frankfurter Kreuz: drive under the flyover at full speed, then take the A5 over it. No drop, no sudden stop, no invisible wall.'},
  {ver:'v88z',id:'ramps',text:'Drive along a street to a yellow ramp: it sits in your lane, no traffic queued on it, and you can jump it. Try the ramp on the Eiserner Steg footbridge.'},
  {ver:'v88z',id:'traffic',text:'Frankfurt: a few city buses, fewer police and trucks. Athens: more scooters, fewer taxis. Does the traffic look right?'},
  {ver:'v88z',id:'ath-walls',text:'Athens: drive around Eleni\'s Garage (Psyrri) and a RAMP JUMP pop-up ring. Any invisible walls or getting stuck between buildings?'},
+ {ver:'v89f',id:'g13-search',text:'Garage BUILD: type “headlight” in Search parts: the headlight brick shows up; tap + to put it in the TRAY.'},
+ {ver:'v89f',id:'g13-turn',text:'Hold a part and turn it on X, Y and Z (⟲ AXES pad, or PC R / T / F), then ✔ PLACE it on the car.'},
+ {ver:'v89f',id:'g13-join',text:'SELECT 3 loose parts → JOIN: they become one 🔗 Piece; save it and find it in MY PARTS.'},
+ {ver:'v89f',id:'g13-paint',text:'Tap PAINT in the BUILD bar: the colour chips open and the next part uses the colour you tapped.'},
+ {ver:'v89e',id:'stream-drive',text:'Drive 2 min fast on the Autobahn and then across Athens: no grey holes or buildings popping in close to you, no stutter.'},
+ {ver:'v89e',id:'stream-ios',text:'iPhone: play 10 min in Athens and Frankfurt: the page never reloads or crashes.'},
+ {ver:'v89d',id:'jack-take',text:'Get out next to a street, step in front of a slow car or walk up to a parked one: the yellow button reads 🚗 TAKE. Tap it (PC: F).'},
+ {ver:'v89d',id:'jack-pull',text:'After TAKE: the driver is pulled out, a "HEY!" bubble shows (not hidden under the cards at the top) and he runs off. Is he as tall as you?'},
+ {ver:'v89d',id:'jack-drive',text:'Drive the taken car away: ★1 shows next to the speed, the camera is as far back as with your own car, and the tyres sit on the road.'},
+ {ver:'v89d',id:'ath-park',text:'Athens: look for cars parked at the kerb. Walk up to one and tap ENTER to drive it.'},
  {ver:'v89b1',id:'foot-cam',text:'On foot, hold the stick a little to the right for 10 s: you walk a wide curve or straight line, NOT endless circles, and the camera does not keep spinning.'},
  {ver:'v89b1',id:'foot-orbit',text:'On foot, drag on the empty right side of the screen: the camera turns around you (and up/down). Double-tap there: it goes back behind you. Buttons still work.'},
  {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
@@ -135,11 +149,12 @@ const OD_CHECKLIST=[
  const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver))};
  let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
  // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
- const pinCd=()=>{try{return state==='countdown'||(state==='race'&&raceT<3)}catch(e){return false}};
+ // RF5 (reviewer): folded chip in races, parked under LAP; hidden only while the big FINISH place text shows; on results at the card's top-right corner
+ const pinCd=()=>{try{return state==='countdown'||state==='race'||state==='results'}catch(e){return false}},pinRun=()=>{try{return state==='finished'}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
-  const busy=!ov.hidden||!n||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
+  const busy=!ov.hidden||!n||pinRun()||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
   pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const pinBld=pinBk()&&typeof GB_!=='undefined'&&GB_.bk,fold=P.col||(pinBk()&&(!pinBkOpen||pinBld))||pinCd();
   if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
@@ -148,6 +163,9 @@ const OD_CHECKLIST=[
   pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
  // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
  const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
+  {const st=(()=>{try{return state}catch(e){return''}})(),at=(x,y)=>{pin.style.transform='none';pin.style.width='';pin.style.left=Math.round(x)+'px';pin.style.top=Math.round(y)+'px'};
+   if(st==='countdown'||st==='race'){const l=document.getElementById('lap');if(vis(l)){const r=l.getBoundingClientRect();at(r.left,r.bottom+10);return}}
+   if(st==='results'){const c=document.querySelector('#results .card');if(vis(c)){const r=c.getBoundingClientRect();at(r.right-12-pin.offsetWidth,r.top+8);return}}}
   if(!vis(X)){pin.style.left='';pin.style.width='';pin.style.transform='';
    // roam / race / missions: below the objective line (quest tracker, objective pill) when it sits at the top centre
    if(innerWidth>900&&innerHeight>500){const g=document.querySelector('#tuG,#tuB,[id^="tu"][id$="G"]');let t=108;if(vis(g)){const r=g.getBoundingClientRect();if(r.top<160&&r.right>innerWidth-120)t=Math.round(r.bottom)+10}

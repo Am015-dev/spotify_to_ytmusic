@@ -2,10 +2,10 @@
 const mapC=$('#map'),mg=mapC.getContext('2d');let mapBG=null,mapXf=null;
 function buildMap(){const Z=300,[c,g]=cv(Z,Z);let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;for(let i=0;i<TF.N;i++){const x=TF.P[i*3],z=TF.P[i*3+2];x0=Math.min(x0,x);x1=Math.max(x1,x);z0=Math.min(z0,z);z1=Math.max(z1,z)}
   const sc=270/Math.max(x1-x0,z1-z0),ox=Z/2-(x0+x1)/2*sc,oz=Z/2-(z0+z1)/2*sc;mapXf=(x,z)=>[ox+x*sc,oz+z*sc];
-  g.lineJoin=g.lineCap='round';for(const[w,col]of[[13,'rgba(0,10,25,.75)'],[6,'rgba(120,230,255,.95)']]){g.lineWidth=w;g.strokeStyle=col;g.beginPath();let pen=false;for(let i=0;i<=TF.N;i+=2){const k=i%TF.N;const[x,y]=mapXf(TF.P[k*3],TF.P[k*3+2]);if(inGapF(k*TF.ds)){pen=false;continue}pen?g.lineTo(x,y):g.moveTo(x,y);pen=true}g.stroke()}
-  const[sx,sy]=mapXf(TF.P[0],TF.P[2]);g.fillStyle='#ffd12c';g.fillRect(sx-6,sy-2,12,4);mapBG=c}
-function drawMap(){mg.clearRect(0,0,300,300);mg.drawImage(mapBG,0,0);for(const s of ships){if(s.dead>0||s.eliminated||s===pl)continue;const p=s.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle=s.team.c1;mg.beginPath();mg.arc(x,y,6,0,7);mg.fill()}
-  if(pl&&!pl.eliminated){const p=pl.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle='#ffd12c';mg.strokeStyle='#021018';mg.lineWidth=3;mg.beginPath();mg.arc(x,y,11,0,7);mg.fill();mg.stroke()}}
+  g.lineJoin=g.lineCap='round';for(const[w,col]of[[38,'rgba(0,10,25,.8)'],[24,'rgba(120,230,255,.95)']]){g.lineWidth=w;g.strokeStyle=col;g.beginPath();let pen=false;for(let i=0;i<=TF.N;i+=2){const k=i%TF.N;const[x,y]=mapXf(TF.P[k*3],TF.P[k*3+2]);if(inGapF(k*TF.ds)){pen=false;continue}pen?g.lineTo(x,y):g.moveTo(x,y);pen=true}g.stroke()}
+  const[sx,sy]=mapXf(TF.P[0],TF.P[2]);g.fillStyle='#ffd12c';g.fillRect(sx-16,sy-5,32,10);mapBG=c}
+function drawMap(){mg.clearRect(0,0,300,300);mg.drawImage(mapBG,0,0);for(const s of ships){if(s.dead>0||s.eliminated||s===pl)continue;const p=s.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle=s.team.c1;mg.strokeStyle='#021018';mg.lineWidth=5;mg.beginPath();mg.arc(x,y,17,0,7);mg.fill();mg.stroke()}
+  if(pl&&!pl.eliminated){const p=pl.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle='#ffd12c';mg.strokeStyle='#021018';mg.lineWidth=7;mg.beginPath();mg.arc(x,y,27,0,7);mg.fill();mg.stroke()}}
 let msgTimer=0;function say(a,b,t=1){const m=$('#msg'),sb=$('#sub'),rm=state==='roam';m.classList.toggle('roamMsg',rm);sb.classList.toggle('roamMsg',rm);if(a!==''){m.textContent=a;m.style.opacity=1;m.classList.remove('pop');void m.offsetWidth;m.classList.add('pop')}else m.style.opacity=0;sb.textContent=b||'';sb.style.opacity=b?1:0;msgTimer=t}
 let stIndEl=null;function drawStInd(v){stIndEl=stIndEl||document.querySelector('#stInd i');if(stIndEl)stIndEl.style.transform=`translateX(${(v*55).toFixed(1)}px)`}
 function buzz(ms){try{if(TOUCH.used&&navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
@@ -20,7 +20,7 @@ const duelAt=d=>{const f=duelGhost.f;let lo=0,hi=f.length/2-1;while(lo<hi){const
 function updHud(){if(!pl)return;const n=ships.filter(active).length;
   if(RC.type==='zone'){setT(hudEl.pos,'pos',`${pad2(RC.zone.k)}<small> ZONE</small>`);setT(hudEl.lap,'lap',(pl.dist/1000).toFixed(2)+' KM')}
   else if(RC.type==='duel'){const ahead=!duelGhost||pl.dist>=duelGhost.f[Math.min(duelGhost.f.length-2,Math.floor(raceT*20)*2)];setT(hudEl.pos,'pos',duelGhost?`${ahead?'01':'02'}<small> / GHOST</small>`:'SOLO')}
-  else setT(hudEl.pos,'pos',RC.type==='tt'?'TT':`${pad2(pl.place)}<small> / ${pad2(n)}</small>`);
+  else setT(hudEl.pos,'pos',RC.type==='tt'?'TT':RC.type==='race'||RC.type==='elim'?`${ord(pl.place)}<small>/${n}</small>`:`${pad2(pl.place)}<small> / ${pad2(n)}</small>`);
   if(RC.type!=='zone')setT(hudEl.lap,'lap',RC.type==='elim'||RC.type==='arena'||lapAttack()?`LAP ${Math.max(1,pl.lap+1)}`:`LAP ${clamp(pl.lap+1,1,RC.laps)} / ${RC.laps}`);
   setT(hudEl.tLap,'tl',fmt(Math.max(0,raceT-pl.lapStart)));setT(hudEl.tBest,'tb',fmt(ghost?Math.min(ghost.t,pl.best):pl.best));setT(hudEl.tRace,'tr',fmt(raceT));
   if(duelGhost&&state==='race'){const d=raceT-duelAt(pl.dist);setT(hudEl.tGhost,'tg',(d>=0?'+':'−')+Math.abs(d).toFixed(2))}
