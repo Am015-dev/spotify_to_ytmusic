@@ -28,7 +28,7 @@ function lpHide() { const b = $('#lpb'); if (b) b.remove(); clearTimeout(LP.hide
 function lpShow(el) {
   const k = el.dataset.lp || ''; let icon = '', title = '', text = '', full = false;
   if (k.indexOf('chip:') === 0) { const key = k.slice(5); icon = chipHTML(key, 40); title = D.COLORS[key[0]].name; text = chipShort(key); }
-  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'ALL DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; }
+  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'ALL DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; icon = '<img class="lpimg" src="media/fortune-' + c.id + '.webp" alt="" onerror="this.remove()">' + icon; }
   else return;
   lpHide(); const b = h('div#lpb', { role: 'dialog', 'aria-modal': 'true', 'aria-label': title }, h('span.lpi', { html: icon }), h('div.lpt', h('b', title), h('div', text), full && full !== text ? h('div.lpfull', full) : null));
   document.body.appendChild(b);

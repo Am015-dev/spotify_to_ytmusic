@@ -247,3 +247,6 @@ The Old Tower Inn track is retired from Doorkick Dungeon. Its music is now five 
 
 ## Hollowbough music (2026-10-09)
 The four CC0 season beds are retired. Music is ten Treblo tracks (five slots, versions a and b) shipped as separate files in `games/hollowbough/music/`, made by `tools/music_treblo.py` from `audio/hollowbough/treblo/`; rows in `audio/hollowbough/ASSETS.md`. `audio/hollowbough/audio-data.js` was edited by hand to point at them (`url:music/<name>.mp3`): re-running `tools/bundle_real.py` would overwrite that.
+
+### Cauldron Fair (Treblo music, 9 Oct 2026)
+The CC0 "Medieval: Market Day" loop is retired. Music is ten Treblo tracks (five slots, versions a and b) shipped as separate files in `games/cauldron-fair/music/`, made by `tools/music_treblo.py` from `audio/cauldron-fair/treblo/` (-18 LUFS, 96 kbps; loops cross-faded, victory 18 s and defeat 11 s cues with fades). `cauldron-fair/audio/audio-data.js` points at them (`url:music/<name>.mp3`); `bundle_cauldron.py` now emits the same. Licence note: `audio/cauldron-fair/treblo/README.md` (Treblo Terms of Service section 8: the user owns the Outputs). The sound effects stay Kenney and rubberduck (CC0).

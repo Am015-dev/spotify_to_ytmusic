@@ -58,7 +58,7 @@ function campLine() {
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
   GXC.init({
-    game: 'cauldron', data: window.CAMPAIGN,
+    game: 'cauldron', artBase: 'media/', data: window.CAMPAIGN,
     headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; },
     startChapter: campStart,
     isWon: campIsWon, metrics: campMetrics,

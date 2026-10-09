@@ -52,8 +52,8 @@ function buildRef() {
   bk.appendChild(h('p.sm', 'The books of this game' + (G ? '' : ' (set 1 shown)') + ':')); ['O', 'K', 'G', 'B', 'R', 'Y', 'P'].forEach(c => bk.appendChild(bookRow(c, sets[c] || 1, true)));
   sec('Ingredient books in this game', true, bk);
   for (let s = 1; s <= 4; s++) { const d = h('div'); ['G', 'B', 'R', 'Y', 'P'].forEach(c => d.appendChild(bookRow(c, s, G && sets[c] === s))); sec(D.SET_NAMES[s] + ': all five books', false, d); }
-  const fc = h('div'); D.FORTUNE.forEach(c => fc.appendChild(h('div.rcard', h('span', { style: 'flex:0 0 auto;width:44px;height:44px;border-radius:10px;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:12px;background:' + (c.kind === 'blue' ? '#3b82d6' : '#7a4ab5') }, c.kind === 'blue' ? 'DAY' : 'NOW'), h('div.rt', h('b', c.name + ' (1)'), h('div', c.text)))));
-  sec('Fortune cards (24: 11 blue, 13 purple)', false, h('p.sm', 'Blue cards last the whole day, purple cards happen at once. Options that name yellow or purple chips only work once that stall is open.'), fc);
+  const fc = h('div'); D.FORTUNE.forEach(c => fc.appendChild(h('div.rcard', h('span.rfort.' + c.kind, fortImg(c, 'rfimg'), h('i', c.kind === 'blue' ? 'DAY' : 'NOW')), h('div.rt', h('b', c.name + ' (1)'), h('div', c.text)))));
+  sec('Fortune cards (24: 11 blue, 13 purple)', false, h('p.sm', 'Blue cards last the whole day, purple cards happen at once. Options that name yellow or purple chips only work once that stall is open. ', h('a', { href: 'cards.html', target: '_blank', rel: 'noopener' }, 'See all 24 fortune paintings')), fc);
   const tt = h('table.reft'); tt.appendChild(h('tr', h('th', 'Space'), h('th', 'Coins'), h('th', 'VP'), h('th', 'Ruby')));
   for (let i = 1; i < D.TRACK_LEN; i++) tt.appendChild(h('tr', h('td', i === D.SPOON ? '53 (spoon)' : i), h('td', D.COINS[i]), h('td', D.VP[i]), h('td', D.RUBY[i] ? '◆' : '')));
   sec('The cauldron spiral (spaces 1 to 53)', false, h('p.sm', 'Chips sit on spaces 1 to 52. Your scoring space is the one after your last chip. Past 52 the chip stays on 52 and you score the spoon.'), tt);
@@ -90,7 +90,7 @@ function renderMenu() {
   if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   if (!online) b.appendChild(tutNode('btn', true));
   if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
-  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
+  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Choose music'));
   { const gp = typeof gfxPref === 'function' ? gfxPref() : 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (gp === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gp === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gp === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'logd', type: 'button' }, 'Log'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'refd', type: 'button' }, 'Chips and cards'), h('span.tinyc', { html: sp }));
@@ -228,6 +228,11 @@ document.addEventListener('click', ev => {
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'drawer': GX.show(d.v); break;
+    case 'musicopen': try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); break;
+    case 'mpick': musicPick(d.s, d.c); renderMusic(); break;
+    case 'mprev': musicPreview(d.s); renderMusic(); break;
+    case 'mprevx': musicPreviewStop(); renderMusic(); break;
+    case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
@@ -276,6 +281,7 @@ function boot() {
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('scored', 'Scores and players', h('div#scorebody'));
   GX.drawer('setd', 'Menu', h('div#setbody'));
+  extrasBoot();
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
