@@ -1,4 +1,4 @@
-# Shipwreck Isle: painted art hand-off (laptop → Linux session, 2026-10-09). PART 1
+# Shipwreck Isle: painted art hand-off (laptop → Linux session, 2026-10-09)
 
 Shipwreck Isle had no raster art. The laptop made the pictures; the Linux session wires them in, tests and deploys. Follow the Doorkick pattern in `../munch/PAINTED-ART-HANDOFF.md`.
 
@@ -24,6 +24,19 @@ Generation paused because Google Flow started refusing with "unusual activity". 
 - Title and end screens.
 
 The prompts are in laptop `game-assets/cards/shipwreck/*.json`.
+
+
+## Part 2 (2026-10-09, this push): now complete except the phone versions
+- `art/<key>.webp` adds:
+  - `beast-alligator`, `beast-birds`, `item-stormglass` and `item-bible`, so all 16 beasts and all 8 items are done.
+  - All 17 discoveries `disc-*` (`DISCS` keys), the 3 wrecks `wreck-*`, and the 5 characters `char-carpenter`/`cook`/`explorer`/`soldier`/`friday`.
+- `games/shipwreck-isle/media/` adds:
+  - All 17 campaign portraits `camp-*`. The five people match their `char-*` faces; the threats (hunger, rain, prowlers, horizon, whisper, altar, shroud, gale, winter, undertow) are atmospheric scenes.
+  - `back-cross` and `back-lifeboat`, the campaign `cardback` unlocks.
+  - `table-beach` (the new default table), plus `table-temple-ruins` and `table-homestead` (the `table` unlocks).
+  - `title`, `end-win` and `end-lose`.
+- Still missing: `title-phone` and `table-beach-phone` (Flow keeps failing 9:16); crop the desktop versions for now.
+- Page size: keep loading these as separate files, as part 1 does. The page is already about 4 MB.
 
 ## Music
 `../audio/shipwreck/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.
