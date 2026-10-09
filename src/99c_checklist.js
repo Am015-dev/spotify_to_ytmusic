@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88w',id:'bricks2x',text:'Drive slowly past houses and shops: walls show LEGO brick rows, low flat roofs show studs, nothing flickers or shimmers. Far away the city looks as before.'},
+ {ver:'v88w',id:'world-smooth2',text:'PC and phone: drive 1 minute in Frankfurt and in Athens. ⚙ TUNE → Life → Show FPS: copy the line into the notes (draws about 200 or less). Map icons still float over missions.'},
+ {ver:'v88w',id:'ath-popup',text:'Athens: drive along streets for 1–2 minutes: a pop-up challenge ring (RAMP JUMP, DRIFT ZONE…) appears ahead in your lane; drive through it to start.'},
  {ver:'v88v',id:'world-smooth',text:'PC and phone: drive 1 minute fast in Frankfurt and in Athens. It feels smoother than before. ⚙ TUNE → Life → Show FPS: copy the line into the notes (draws should be about 250 or less, tris about 1 M).'},
  {ver:'v88v',id:'world-look',text:'Look far down long streets and from bridges: the far city still looks like the city (same colours, no holes, no flicker). Up close, buildings, trees and cars look exactly as before.'},
  {ver:'v88v',id:'world-cars',text:'Traffic cars look normal up close; far away they look simpler but have the right colour and shape, and no car pops in or out right in front of you.'},
