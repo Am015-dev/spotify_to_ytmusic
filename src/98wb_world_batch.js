@@ -126,18 +126,20 @@ async function WB_cityBuild2(a,b){const t0=performance.now(),SL=a==null?6:14,grp
   // v88w: 2x2 cells share ONE buffer (a "super cell"); each cell's far mesh is a drawRange view of it, the super mesh draws all four in 1 call far away
   const SUP=new Map();for(const c of WBC.cells.values()){const sk=WB_supK(c.k);let S=SUP.get(sk);if(!S){S={k:sk,cells:[],lod:null};SUP.set(sk,S)}S.cells.push(c)}
   for(const S of SUP.values()){const ti=performance.now();let nt=0;S.grp=grp;S.x0=Math.min(...S.cells.map(c=>c.x0));S.z0=Math.min(...S.cells.map(c=>c.z0));S.x1=Math.max(...S.cells.map(c=>c.x0))+WBC.C;S.z1=Math.max(...S.cells.map(c=>c.z0))+WBC.C;
-    for(const c of S.cells)for(const it of c.items)nt+=it[0].n;S.nt=nt;
+    for(const c of S.cells){WB_cpack(c);for(const t of c.T)nt+=t.n}S.nt=nt;
     // v89b STR: streaming keeps the items and builds the super cell's buffer only within range of the camera (STR_step); otherwise build it now as before
     if(!STR_on())for(const _ of WB_supMk(S,false));
     WBC.sup.push(S);WB_big(ti,'super '+nt);i+=S.cells.length;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5+.5*i/WBC.cells.size)}
   {const sl=performance.now()-tt,S=WBC.st;if(sl>(S.slMax||0))S.slMax=Math.round(sl);if(sl>50)S.sl50=(S.sl50||0)+1;if(sl>100)S.sl100=(S.sl100||0)+1}
   WBC.on=true;WBC.sig='';WBC.st.ms=Math.round(performance.now()-t0);WBC.st.objs=WBC.objs.length;WBC.st.mobjs=WBC.mobjs.length;WBC.st.cells=WBC.cells.size}
 // v89b: one super cell's far buffer from its cells' items (keep=true: items stay for a later rebuild; the CPU copy is dropped after the GPU upload)
-function* WB_supMk(S,keep){const nt=S.nt,grp=S.grp;if(!nt){if(!keep)for(const c of S.cells)c.items=null;return}const p=new Float32Array(nt*9),nn=new Int8Array(nt*9),cc=new Uint8Array(nt*9),v=new THREE.Vector3(),q=new THREE.Vector3(),r=new THREE.Vector3();let o=0,ty=performance.now();const rng=[];
-  for(const c of S.cells){const o0=o;for(const [t,el,cr,cg,cb] of c.items){for(let f=0;f<t.n;f++){for(let k=0;k<3;k++){const s=f*9+k*3,x=t.p[s],y=t.p[s+1],z=t.p[s+2];p[o+k*3]=el[0]*x+el[4]*y+el[8]*z+el[12];p[o+k*3+1]=el[1]*x+el[5]*y+el[9]*z+el[13];p[o+k*3+2]=el[2]*x+el[6]*y+el[10]*z+el[14]}
+// items → compact per-cell arrays: template refs + 3×4 matrix rows (12 floats) + colour (the [tpl,Float32Array,r,g,b] items cost ~250 B each)
+function WB_cpack(c){if(c.T)return;const n=c.items.length,M=new Float32Array(n*12),C=new Float32Array(n*3),T=new Array(n);for(let j=0;j<n;j++){const [t,e,r,g,b]=c.items[j];T[j]=t;for(let i=0;i<12;i++)M[j*12+i]=e[i+(i/3|0)];C[j*3]=r;C[j*3+1]=g;C[j*3+2]=b}c.T=T;c.M=M;c.C=C;c.items=null}
+function* WB_supMk(S,keep){const nt=S.nt,grp=S.grp;if(!nt){if(!keep)for(const c of S.cells)c.T=c.M=c.C=null;return}const p=new Float32Array(nt*9),nn=new Int8Array(nt*9),cc=new Uint8Array(nt*9),v=new THREE.Vector3(),q=new THREE.Vector3(),r=new THREE.Vector3();let o=0,ty=performance.now();const rng=[];
+  const el=new Float32Array(16);for(const c of S.cells){const o0=o;for(let j=0;j<c.T.length;j++){const t=c.T[j],cr=c.C[j*3],cg=c.C[j*3+1],cb=c.C[j*3+2];for(let i=0;i<12;i++)el[i+(i/3|0)]=c.M[j*12+i];for(let f=0;f<t.n;f++){for(let k=0;k<3;k++){const s=f*9+k*3,x=t.p[s],y=t.p[s+1],z=t.p[s+2];p[o+k*3]=el[0]*x+el[4]*y+el[8]*z+el[12];p[o+k*3+1]=el[1]*x+el[5]*y+el[9]*z+el[13];p[o+k*3+2]=el[2]*x+el[6]*y+el[10]*z+el[14]}
       v.set(p[o+3]-p[o],p[o+4]-p[o+1],p[o+5]-p[o+2]);q.set(p[o+6]-p[o],p[o+7]-p[o+1],p[o+8]-p[o+2]);r.crossVectors(v,q).normalize();const R8=Math.round(r.x*127),G8=Math.round(r.y*127),B8=Math.round(r.z*127),c0=Math.min(255,Math.round(t.c[f*3]*cr*255)),c1=Math.min(255,Math.round(t.c[f*3+1]*cg*255)),c2=Math.min(255,Math.round(t.c[f*3+2]*cb*255));for(let k=0;k<3;k++){nn[o+k*3]=R8;nn[o+k*3+1]=G8;nn[o+k*3+2]=B8;cc[o+k*3]=c0;cc[o+k*3+1]=c1;cc[o+k*3+2]=c2}o+=9}
       if(keep&&performance.now()-ty>STR.sl){yield;ty=performance.now()}}
-    rng.push([c,o0/3,(o-o0)/3]);if(!keep)c.items=null}
+    rng.push([c,o0/3,(o-o0)/3]);if(!keep){c.T=c.M=c.C=null}}
   const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];if(keep&&TUNE.strFree){const rel=function(){STR.st.relMB+=this.array.byteLength/1048576;this.array=null};for(const a of A)a.onUpload(rel)}
   const mk=(st,n)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',A[0]);g.setAttribute('normal',A[1]);g.setAttribute('color',A[2]);g.setDrawRange(st,n);g.boundingSphere=WB_rangeSphere(p,st,n);
     const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);return m};
