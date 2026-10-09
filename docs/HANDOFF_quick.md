@@ -47,3 +47,42 @@ All new code is in `src/98qs_speed.js` (prefix `QS_`, in ORDER right before 99t_
 5. After PASS: merge latest alex/od-world, alex/od-garage12 (if pushed) and live; rebuild on CURRENT live; OD_CHANGELOG v88z entry + checklist;
    `tools/build.sh v88z`; `git add -f out/v88z`; push; DEPLOY message to the coordinator (session_017iH3DB4VyxwKSdMwsco4Ut). Never deploy.sh.
 Gotcha: never `pkill -f <pattern>` in a command whose own text contains the pattern (it kills the shell: exit 144).
+
+## STATUS at handoff (2026-10-09 12:30 UTC; session stopped by the coordinator at 447k context)
+Branch alex/od-quick = v88z src merged with origin/alex/od-world (v88x live, merge clean). Last code change: QS_clear also moves cars on
+ramp streets that are close but out of view (LV_seen). Test outputs are committed under qa_ramp/ qa_speed/ qa_mix/ qa_turn/ qa_std/ (force-added).
+
+**Ramps** (qa_ramp/*.log; tools/tRamp.js). Straight run-up from 55 m: 68/68 launch (fra 47, ath 21). Validator log: qa_ramp/fit_{fra,ath}.log
+(Athens widths 6.5-7.5 m, Höchst out of the river, 0 'bad'). Route test (ROUTE=1, GPS road path from 150 m back): first full sweep 49/68.
+Retry2 of the failures on the latest build, bot waits 12 s behind stopped traffic: ath 8, 9, 14 now launch; ath 11, 17 still fail (3-5 hits,
+not stuck); fra 11 launches; fra 0 (Eiserner Steg footbridge deck: the route test starts on a street, the deck may not connect), 6, 7, 14, 18, 19,
+20, 21 stuck. Shots of the stuck cases (DBG=1): qa_ramp/fra_stuck6.jpg, fra_stuck7.jpg, fra_stuck19.jpg: the bot rear-ends traffic
+queued at a red light ~130 m before the ramp. That is a test-driver limit (no overtaking, my bot), NOT proof the ramp is blocked, but it
+is UNPROVEN: next worker should make the route bot overtake/pass on the other lane (like tSpeed's lane offset) and rerun:
+  ROUTE=1 node tools/tRamp.js "http://127.0.0.1:8766/local_dbg.html?fast=1" qa_ramp fra 0 6 7 14 18 19 20 21
+  ROUTE=1 node tools/tRamp.js "http://127.0.0.1:8766/local_dbg.html?fast=1" qa_ramp ath 11 17
+Before-fix evidence: qa_ramp/fra_stuck2.jpg (traffic queued on the ramp itself). Airborne-after-ramp shots: qa_ramp/{fra_ramp0,6,11,14,ath_ramp8,9,17}.jpg.
+
+**Speeds** (qa_speed_dbg.log, qa_speed/hud_*.jpg; tools/tSpeed.js, DEBUG=1 for per-second log). Hot Rod (sports 230/290): Autobahn 230 reached
+at ~38 s (then hit something at x≈4064 z≈-3362 at 44 s, so Autobahn boost top not measured); city top 193 (target 189; peaks 214 downhill), city
+boost 234 (target 238). 4×4 (SUV 165/195 × 0.93 asphalt): Autobahn 157 / boost 184; city 138. 0-100 km/h 4.1-4.8 s (unchanged).
+Turn rate vs speed (qa_turn/v88w_h05.log vs v88z_h05.log, tools/tTurn.js HOLD=30): identical within 0.3 °/s at 50/100/150 km/h for both forms
+(car 43.4/18.9/12.4 °/s). Steering code reads the old RO.top, not the class.
+
+**Traffic** (qa_mix/*.json, tools/tMix.js, 2-min drive). Frankfurt live 75: before 28 heavy (37 %), 7 police, 0 bus → after truck 3, delivery 5,
+van 6, bus 3, police 2; traffic 58→49 km/h avg (max 86→58). Athens fleet: before taxis 30/75, scooters 8 → after taxis 15/78, scooters 16,
+trolleybus 6; traffic 67→43 km/h. Shot qa_mix/after_fra.jpg.
+
+**tPlay** (qa_tplay88z/, MIN=3 phone, merged build) vs v88x live (qa_tplay88x/ 1 min, qa_tplay88x3/ Athens 3 min): fails that live ALSO fails:
+stuck fra 19.8 % (live 22.1), stuck ath 5.9 % (live 16.8), Athens reload + loading screen (live too), DRIFT hidden after rotation (live too).
+Athens walls 1.99/min vs live 1.2 (all at the Akropolis Cup start x≈2040 z≈-1640, a live hotspot too); Frankfurt walls 0.62 PASS.
+perf: fra 213 calls / 1.35 M tris (live 216 / 1.33 M), ath 202 / 0.99 M (live 227 / 1.25 M): no worse.
+
+**Standard shots** (qa_std/, t4/g11drive.js ATH=1): 01_start, 02_frankfurt_drive, 03_side_traffic, 04_side_tyres, 05_athens_start,
+06_athens_drive (looked at: fine). Tyre gap: player max 0.03 m, traffic max 0.04 m, 0 over 0.05.
+Commands: `ATH=1 node t4/g11drive.js http://127.0.0.1:8766/local_dbg.html qa_std` · `MIN=3 SHOTS=1 tools/tplay_fast.sh <url> <out>` ·
+`tools/build.sh v88z --local` (setup: python3 -m http.server 8766 in the repo root; v88w/v88x baselines: git worktree wt_v88w (f0a4e32) / wt_v88x (origin/alex/od-world), build --local inside).
+
+**Left:** route-bot overtaking + rerun the 10 ramps above; Autobahn boost top shot; HUD shots at top/boost for 2 classes are qa_speed/hud_ship_city_*.jpg
+and hud_offroad_*.jpg (Autobahn ship shots show the crash, retake); REVIEW (include the turn-rate table, the traffic-off-ramp-streets change and
+fra_stuck2.jpg as evidence per the coordinator); then merge/changelog/out/v88z/DEPLOY message.
