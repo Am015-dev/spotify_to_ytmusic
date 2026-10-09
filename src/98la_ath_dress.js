@@ -15,7 +15,7 @@ function AD_geo(){
   return[tree,kiosk,scoot,boll]}
 // one pass over the street graph: slots every 8.5 m on both kerbs of every Athens street longer than 30 m
 function* AD_place(){const N=HUB.nodes,r=mul(8817),I=[],G=new Map(),seen=new Set(),occ=new Set(),ng=N.ng||N.length,t0=performance.now();
-  const free=(x,z,q)=>{const k=Math.round(x/3)+'|'+Math.round(z/3);if(occ.has(k))return false;if(LV_onRoad(x,z,.9))return false;if(roamHit(x,z,q+.3,groundY(x,z)+.5))return false;occ.add(k);return true};
+  const rj=AD.n.rej=[0,0,0],free=(x,z,q)=>{const k=Math.round(x/3)+'|'+Math.round(z/3);if(occ.has(k)){rj[0]++;return false}if(LV_onRoad(x,z,.9)){rj[1]++;return false}if(roamHit(x,z,q+.3,groundY(x,z)+.5)){rj[2]++;return false}occ.add(k);return true};
   for(let i=0;i<ng&&I.length<14000;i++){if(i%40===0)yield 0;const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab||bi>=ng)continue;const ek=i<bi?i+'|'+bi:bi+'|'+i;if(seen.has(ek))continue;seen.add(ek);
     const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<30)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20);if(W<7)continue;
     for(const sd of[-1,1]){const off=W/2+1.15;let kl=-99;for(let s=12;s<L-12;s+=8.5){const q=r();let t=q<.34?0:q<.56?3:q<.70?2:q<.715&&s-kl>40?1:-1;if(t<0)continue;
