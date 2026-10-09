@@ -13,7 +13,8 @@ function sndMusic() {
   try {
     if (!window.GA) return;
     if (UI.prefs.music === false || !G || !UI.started) { GA.music(null); GA.stopLoop && GA.stopLoop('hum'); return; }
-    GA.music('main', { vol: .28 }); if (GA.loop) GA.loop('hum', { vol: .12, fade: 1.5 });
+    if (typeof musicSync === 'function') musicSync(); else GA.music(null);
+    if (GA.has && GA.has('hum') && GA.loop) GA.loop('hum', { vol: .12, fade: 1.5 });
   } catch (e) { }
 }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.die,.slot')) snd('click'); }, true);
