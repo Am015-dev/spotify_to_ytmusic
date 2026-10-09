@@ -4,11 +4,11 @@
 const INK = '#3b2f2a', PAPER = '#f6ecd6', PAPER2 = '#ecdcba';
 const FONT = "'Palatino Linotype','Book Antiqua',Palatino,'Iowan Old Style','Hoefler Text',Georgia,'DejaVu Serif',serif";
 const TYPES = {
-  traveler:   { c: '#b98f55', t: '#e6d2a6', label: 'Traveler' },
-  production: { c: '#5f8f4a', t: '#cfe0b4', label: 'Production' },
-  destination:{ c: '#b04a38', t: '#ecc1b0', label: 'Destination' },
-  governance: { c: '#46749f', t: '#bcd3e6', label: 'Governance' },
-  prosperity: { c: '#7f5496', t: '#d9c4e4', label: 'Prosperity' }
+  traveler:   { c: '#b98f55', d: '#7d5a2a', t: '#e6d2a6', label: 'Traveler' },
+  production: { c: '#5f8f4a', d: '#3d6b2c', t: '#cfe0b4', label: 'Production' },
+  destination:{ c: '#b04a38', d: '#8a3322', t: '#ecc1b0', label: 'Destination' },
+  governance: { c: '#46749f', d: '#2f5680', t: '#bcd3e6', label: 'Governance' },
+  prosperity: { c: '#7f5496', d: '#5e3a76', t: '#d9c4e4', label: 'Prosperity' }
 };
 const RES = { twig: '#8a6240', resin: '#e0a02c', pebble: '#8d949a', berry: '#c2364c' };
 const PLAYER = [
