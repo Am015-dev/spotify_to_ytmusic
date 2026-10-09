@@ -23,6 +23,13 @@ The laptop made the pictures; the Linux session wires them in, tests and deploys
   - `frostwood` and `elderheart` are the campaign `table` unlocks.
 - **Key art:** `title.webp` / `title-phone.webp` for the title screen (clear sky at the top for the logo), `end-win.webp` and `end-lose.webp` for game over.
 
+## Places and events (2026-10-09)
+39 paintings in `art/`, named by the in-game key. They replace the SVG drawings returned by `spotArt(kind, key, i)` in `game/src/ui10.js`.
+- `forest_*` (11), `bev_*` (4) and `sev_*` (16): 256×256, for the square spot art (`kind` `forest`, `bev`, `sev`).
+- `basic_*` (8): 320×205 (100:64, the same shape as the `basic` SVG viewBox).
+- To wire them, add each key to `art/manifest.json` `items` so `build.py` `art_js()` embeds it in `HB_ART`. Then have `spotArt` return an `<img>` (or a background) from `HB_ART[key]`, and keep the SVG as the fallback when the key is missing. About 1 MB in total if every key is embedded.
+- Also see `../BOARD-ART-AUDIT.md` (the `.tbl` CSS layer hides the painted table).
+
 ## Music
 `../audio/hollowbough/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.
 
