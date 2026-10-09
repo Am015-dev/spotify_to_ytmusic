@@ -741,7 +741,7 @@ body.touch #roamPlate small{white-space:nowrap}
 // in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 // TUNE (tune20): live-tunable driving numbers that used to be inline literals; defaults = the v87w values. Knob table + ?tune=1 drawer: src/99t_tune.js.
-const TUNE={life:1,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
+const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
   // fix21 boost FX (TUNE drawer "FX" tab): thruster flame size / length / brightness, boost sparks on/off + count + size, speed lines, screen blur/glow, FOV kick, shake (all ×, 1 = default look)
   fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
   // fix21 audio (TUNE drawer AUDIO tab, 98m_music.js): music on/off + volume (0.5 = the old synth level), SFX ×, duck music under dialogue (on/off + how much)
@@ -753,6 +753,7 @@ const TUNE={life:1,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:90
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v88x',date:'9 Oct 2026',items:[{t:'NEW',s:'Athens is busier: orange trees, kiosks, parked scooters and bollards along the streets, more crowds, cafés and market stalls, and more scooters in traffic. All of it can be smashed.'},{t:'FIXED',s:'The plain beige towers at the Eiserner Steg bridge in Frankfurt are now red sandstone towers with windows, doors and a roof.'},{t:'FIXED',s:'People in street crowds no longer stand inside parked cars.'}]},
   {v:'v88w',date:'9 Oct 2026',items:[{t:'NEW',s:'Buildings up close now show real LEGO brick rows, flat roofs and ledges near you have studs, and traffic cars keep their mirrors, number plates and exhausts.'},{t:'FIXED',s:'Less lag: Frankfurt draws about 195 things per frame instead of 250 (Athens 245 → 205). Map icons and far traffic cars are now drawn together.'},{t:'FIXED',s:'Athens: roadside pop-up challenges (ramp jump, drift zone, slalom, smash streak) now appear on the streets again.'}]},
   {v:'v88v',date:'9 Oct 2026',items:[{t:'FIXED',s:'Less lag: traffic cars far away now use a simple model of the same car, and cars behind you are not drawn (about half the triangles of the city were traffic).'},{t:'FIXED',s:'Less lag: the city far away (beyond ~250 m) is drawn as simple blocks with the same colours. Up close nothing changed. It switches on a few seconds after the city loads, without stutter.'},{t:'CHANGED',s:'Frankfurt now draws about 250 things per frame instead of 435, and about 1 million triangles instead of 2.5 million (Athens 1.6 → 1.0 million).'},{t:'FIXED',s:'Pop-up challenge rings no longer cover the screen as a big arc when the camera reaches them just before your car does.'}]},
   {v:'v88u',date:'9 Oct 2026',items:[{t:'FIXED',s:'Smoother driving in busy streets: the street life no longer re-scans the whole street map many times a frame, and far-away people and cars update less often.'},{t:'CHANGED',s:'Fewer people on the streets (about 74 instead of 97): fewer walkers and 4 corner groups instead of 6.'},{t:'FIXED',s:'No hitch the first time a stall or a pop-up ring appears (its graphics are prepared while the city loads).'},{t:'NEW',s:'⚙ TUNE → Life → Show FPS: a small line with fps, the worst frame, draw calls and triangles, so you can send us a screenshot if it still lags.'}]},
@@ -4374,11 +4375,20 @@ function stegBuild(b,bt,BM){const V=new THREE.Vector3(),O=new THREE.Vector3(),up
   const beam=(p,q,t)=>{const dx=q[0]-p[0],dyy=q[1]-p[1],dz=q[2]-p[2],L=Math.hypot(dx,dyy,dz);let g;if(Math.abs(dx)+Math.abs(dz)<1e-3)g=new THREE.BoxGeometry(t,L,t);else{g=new THREE.BoxGeometry(t,t,L);Mx.lookAt(V.set(dx,dyy,dz),O.set(0,0,0),up);g.applyMatrix4(Mx)}g.translate((p[0]+q[0])/2,(p[1]+q[1])/2,(p[2]+q[2])/2);bt.add(colorize(g,rust),BM.plain)};
   let topY=0;for(const sd of[-1,1]){const c=sd*(b.w/2+.45);for(const k of[-1,1]){const a0=k*1.5,a1=k*(b.half-3),N=12,T=[],B=[];for(let i=0;i<=N;i++){const a=a0+(a1-a0)*i/N,y=dy(a)+1.2,yt=y+1.5+8.5*Math.sin(Math.PI*i/N);B.push(P3(a,c,y));T.push(P3(a,c,yt));topY=Math.max(topY,yt)}
     for(let i=0;i<N;i++){beam(T[i],T[i+1],.55);beam(B[i],T[i+1],.3)}for(let i=1;i<N;i++)beam(B[i],T[i],.32)}}
-  const yaw=Math.atan2(b.ux,b.uz);for(const k of[-1,1])for(const sd of[-1,1]){const[x,z]=deckPt(b,k*(b.hw+2),sd*(b.w/2+4));bt.add(cbox(6,12,6,x,6,z,'#b9ad98',yaw),BM.plain);bt.add(cbox(6.6,.8,6.6,x,12.4,z,'#7b2d26',yaw),BM.plain);hubAddB({x,z,hw:3,hd:3,h:13,ry:yaw})}
+  const yaw=Math.atan2(b.ux,b.uz);for(const k of[-1,1])for(const sd of[-1,1]){const[x,z]=deckPt(b,k*(b.hw+2),sd*(b.w/2+4));stegTower(bt,BM,x,z,yaw);hubAddB({x,z,hw:3,hd:3,h:13,ry:yaw})}
   const r=mul(1105),LC=['#e8302a','#ffd12c','#2a7ad8','#3aa04a','#ff7ac0','#ff7a1c','#c0c0c0'];for(let i=0;i<90;i++){const sd=r()<.5?-1:1,a=(r()*2-1)*b.hw*.9,[x,z]=deckPt(b,a,sd*(b.w/2+.3));bt.add(cbox(.32,.4,.22,x,dy(a)+.6+r()*.6,z,LC[Math.floor(r()*LC.length)],yaw),BM.plain)}
   // rail colliders: 14 oriented segments per side (local x along the deck)
   const ry=Math.atan2(-b.uz,b.ux),NS=14;for(const sd of[-1,1])for(let i=0;i<NS;i++){const a0=-b.half+2*b.half*i/NS,a1=a0+2*b.half/NS,am=(a0+a1)/2,[x,z]=deckPt(b,am,sd*(b.w/2+.3)),lo=Math.min(dy(a0),dy(a1)),hi=Math.max(dy(a0),dy(a1));hubAddB({x,z,hw:b.half/NS,hd:.35,h:hi+1.8,ry,y0:lo-1.6})}
   const[tx,tz]=deckPt(b,b.half/2,b.w/2+.45);LM_BY['Eiserner Steg']={id:'steg',name:'Eiserner Steg',x:b.cx,z:b.cz,r:30,h:topY+.3,top:[tx,tz],bridge:b}}
+// v88x: Steg stair tower (was a plain 6×12×6 beige box, "windowless pillar"): red Main-sandstone body, light quoins + cornice,
+// a door and two windows with sills on every face, rust hip roof + finial. Same 6×6 footprint/collider, merged into the same batch (0 draws)
+function stegTower(bt,BM,x,z,yaw){const c=Math.cos(yaw),s=Math.sin(yaw),P=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c],add=g=>bt.add(g,BM.plain),Lt='#e6dac2',Gl='#26405c';
+  add(cbox(6.5,1.1,6.5,x,.55,z,'#8f8474',yaw));add(cbox(6,11.4,6,x,6.6,z,'#b5634b',yaw));add(cbox(6.4,.45,6.4,x,8.1,z,Lt,yaw));add(cbox(6.5,.5,6.5,x,12.05,z,Lt,yaw));
+  for(const a of[-1,1])for(const b of[-1,1]){const[px,pz]=P(a*2.75,b*2.75);add(cbox(.75,11,.75,px,6.6,pz,Lt,yaw))}
+  for(const f of[0,1,2,3]){const ax=f<2,sg=f%2?-1:1,F=(t,y,w,h,d,col)=>{const[px,pz]=ax?P(sg*(3+d/2),t):P(t,sg*(3+d/2));add(ax?cbox(d,h,w,px,y,pz,col,yaw):cbox(w,h,d,px,y,pz,col,yaw))};
+    F(0,2.3,1.7,2.6,.16,'#5a3420');F(0,3.75,2.1,.3,.3,Lt);
+    for(const y of[5.9,10.1]){F(0,y,1.15,1.9,.14,Gl);F(0,y-1.08,1.5,.2,.36,Lt);F(0,y+1.08,1.5,.24,.24,Lt)}}
+  const r=new THREE.ConeGeometry(4.75,3.2,4,1);r.rotateY(Math.PI/4+yaw);r.translate(x,13.9,z);add(colorize(r,new THREE.Color('#7b2d26')));add(ccyl(.14,.14,1.4,x,15.9,z,'#ffd12c',6));add(ccyl(.3,.3,.3,x,16.7,z,'#ffd12c',8))}
 // far skyline: hexagonal prisms hidden inside the real towers (never culled), so the skyline still reads beyond the tile cull range
 function skylineBuild(grp){const L=LMI.sky;if(!L.length)return;const g=new THREE.CylinderGeometry(1,1,1,6);g.translate(0,.5,0);const im=new THREE.InstancedMesh(g,new THREE.MeshStandardMaterial({roughness:.55,metalness:.25}),L.length),M4=new THREE.Matrix4(),q=new THREE.Quaternion(),P=new THREE.Vector3(),Sc=new THREE.Vector3(),c=new THREE.Color();
   L.forEach(([x,z,y,r,h,col,sx,sz],i)=>{M4.compose(P.set(x,y,z),q,Sc.set(sx||r,h,sz||r));im.setMatrixAt(i,M4);im.setColorAt(i,c.set(col))});im.frustumCulled=false;im.userData.sky=1;grp.add(im);HUB.sky=im}
@@ -5028,7 +5038,7 @@ function studFXStep(dt){const mag=roamMagnet();for(const s of HUB.studFX){if(!s.
     s.vel.y-=28*dt;p.addScaledVector(s.vel,dt);const g=groundAt(p.x,p.z,p.y);if(p.y<g+.6){p.y=g+.6;s.vel.y=Math.abs(s.vel.y)*.4;s.vel.x*=.7;s.vel.z*=.7}if(s.t>9){s.alive=false;s.m.visible=false}}}
 // ---------- AI traffic: Kenney cars on the street grid, two lanes each way, smashable
 const HCAR=CID==='fra'?['sedan','sedan-sports','taxi','van','truck','delivery','police','suv','garbage-truck','su:t_su','su:t_su_pink']:['taxi','sedan','van','suv','delivery','sedan-sports','#troll','#scoot','su:t_su','su:t_su_sky'],HCOL=CID==='fra'?['#d8302a','#2a7ad8','#ffd12c','#ffffff','#3aa04a','#8c55ff','#2f3640','#ff7a1c','#5dffb0']:['#ffffff','#d8dce0','#a8adb4','#3a4250','#e8e4dc','#2a4a7a','#7a2a2a','#f0f0f0'];
-const ATH_K=[0,1,0,2,0,3,0,1,0,4,0,5,0,1,7,0,2,0,1,7,0,3,7,0,6,8,9],TRL=['sofias','alex','panep'];
+const ATH_K=[0,1,0,2,0,3,0,1,7,4,0,5,0,1,7,0,2,7,1,7,0,3,7,0,6,8,9]/* v88x: 5 of 27 scooters (was 3) */,TRL=['sofias','alex','panep'];
 function athVeh(nm){if(nm==='#troll'){const pole=x=>{const g=new THREE.BoxGeometry(.09,.09,6.4);g.rotateX(-.32);g.translate(x,4.45,-2.6);return colorize(g,new THREE.Color('#2a2a2a'))};return mergeG([cbox(2.5,1.25,12,0,1.05,0,'#f2c200'),cbox(2.5,1.5,12,0,2.4,0,'#ffffff'),cbox(2.54,.95,11.2,0,2.35,0,'#26323c'),cbox(2.54,.95,.1,0,2.35,6.01,'#26323c'),cbox(2.3,.3,10,0,3.3,-.5,'#e6e6e6'),pole(-.45),pole(.45),cbox(2.6,.95,.95,0,.48,4,'#1a1a1a'),cbox(2.6,.95,.95,0,.48,-4,'#1a1a1a')])}
   return mergeG([cbox(.55,.55,1.6,0,.62,0,'#ffffff'),cbox(.46,.25,.8,0,1.02,-.25,'#2a2a2a'),cbox(.09,1,.09,0,1.15,.7,'#3a3a3a'),cbox(.8,.08,.08,0,1.65,.7,'#3a3a3a'),cbox(.16,.56,.56,0,.28,.75,'#1a1a1a'),cbox(.16,.56,.56,0,.28,-.65,'#1a1a1a'),cbox(.6,.75,.4,0,1.55,-.2,'#e8e4dc'),ccyl(.26,.26,.4,0,2.15,-.15,'#f0f0f0',8),cbox(.18,.5,.18,-.32,1.0,-.15,'#2b3a67'),cbox(.18,.5,.18,.32,1.0,-.15,'#2b3a67')])}
 function buildHubTraffic(){const N=[],idx=new Map();const node=(x,z,w)=>{const k=Math.round(x)+'|'+Math.round(z);let i=idx.get(k);if(i==null){i=N.length;idx.set(k,i);N.push({x,z,nb:[],w:w||20})}else if(w)N[i].w=Math.max(N[i].w,w);return i};
@@ -11035,7 +11045,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Life','TUNE.life','World life (master)',0,2,.05],['Life','TUNE.lvPed','People near you ×',0,1.6,.05],['Life','TUNE.lvWave','People wave as you pass',0,1,1,'bool'],
  ['Life','TUNE.lvTraf','Traffic near you (0 = spread out)',0,1,1,'bool'],['Life','TUNE.lvBird','Pigeons + gulls ×',0,1.5,.05],['Life','TUNE.lvFlag','Rooftop flags × (next city load)',0,2,.05],
  ['Life','TUNE.lvBlimp','Blimp in the sky',0,1,1,'bool'],['Life','TUNE.lvBoat','Boats on the Main × (next city load)',0,2,.05],['Life','TUNE.lvFac','Bold LEGO facade colours (next city load)',0,1,.05],
- ['Life','TUNE.lvCrowd','Crowds, stalls, cafés ahead ×',0,2,.05],['Life','TUNE.lvPark','Parked cars ahead ×',0,2,.05],['Life','TUNE.lvPop','Roadside pop-up challenges',0,1,1,'bool'],['Life','TUNE.lvPopGap','Pop-up gap (s)',8,90,1],['Life','TUNE.lvPopRw','Pop-up studs ×',0,3,.1],['Life','TUNE.lvLod','Far people/cars: fewer pose updates (perf)',0,1,1,'bool'],['Life','TUNE.wbCarLod','Traffic cars: simple model far away (perf)',0,1,1,'bool'],['Life','TUNE.wbNear','Traffic full detail within (m)',20,300,5],['Life','TUNE.wbFar','Traffic drawn up to (m)',200,2600,50],['Life','TUNE.wbCity','City: simple far blocks (perf)',0,1,1,'bool'],['Life','TUNE.wbLodD','City full detail within (m)',100,800,20],['Life','TUNE.bwOn','City: brick courses + tiles up close',0,1,1,'bool'],['Life','TUNE.bwFade','Brick detail drawn up to (m)',30,200,5],['Life','TUNE.bwStud','City: studs on low roofs',0,1,1,'bool'],['Life','TUNE.bwStudD','Roof studs drawn within (m)',20,150,5],['Life','TUNE.wbSuperD','Far blocks: merge 2×2 beyond (m), 0 = off',0,2000,50],['Life','TUNE.perfHud','Show FPS · worst frame · draws · tris',0,1,1,'bool']];
+ ['Life','TUNE.lvCrowd','Crowds, stalls, cafés ahead ×',0,2,.05],['Life','TUNE.lvPark','Parked cars ahead ×',0,2,.05],['Life','TUNE.lvAthCr','Athens: extra crowds ×',0,2,.05],['Life','TUNE.lvDress','Athens: orange trees, kiosks, scooters ×',0,2,.05],['Life','TUNE.lvPop','Roadside pop-up challenges',0,1,1,'bool'],['Life','TUNE.lvPopGap','Pop-up gap (s)',8,90,1],['Life','TUNE.lvPopRw','Pop-up studs ×',0,3,.1],['Life','TUNE.lvLod','Far people/cars: fewer pose updates (perf)',0,1,1,'bool'],['Life','TUNE.wbCarLod','Traffic cars: simple model far away (perf)',0,1,1,'bool'],['Life','TUNE.wbNear','Traffic full detail within (m)',20,300,5],['Life','TUNE.wbFar','Traffic drawn up to (m)',200,2600,50],['Life','TUNE.wbCity','City: simple far blocks (perf)',0,1,1,'bool'],['Life','TUNE.wbLodD','City full detail within (m)',100,800,20],['Life','TUNE.bwOn','City: brick courses + tiles up close',0,1,1,'bool'],['Life','TUNE.bwFade','Brick detail drawn up to (m)',30,200,5],['Life','TUNE.bwStud','City: studs on low roofs',0,1,1,'bool'],['Life','TUNE.bwStudD','Roof studs drawn within (m)',20,150,5],['Life','TUNE.wbSuperD','Far blocks: merge 2×2 beyond (m), 0 = off',0,2000,50],['Life','TUNE.perfHud','Show FPS · worst frame · draws · tris',0,1,1,'bool']];
 const TU_ROOT={TUNE,C26,W13S,W14_ST,RCAM,W:window};
 const TU_ref=id=>{const p=id.split('.');let o=TU_ROOT[p[0]];for(let i=1;i<p.length-1&&o;i++)o=o[p[i]];return o?[o,p[p.length-1]]:null};
 const TU_get=id=>{const r=TU_ref(id);return r?r[0][r[1]]:undefined};
@@ -11848,7 +11858,7 @@ const LV_seenF=new THREE.Frustum(),_lvPM=new THREE.Matrix4(),_lvV=new THREE.Vect
 const LV_seen=(x,y,z)=>LV_seenF.containsPoint(_lvV.set(x,y+1,z));
 // crowd peds: wave when the car is within 40 m (3 of 4), the rest keep chatting
 const LV_cwave=(i,d)=>d<40&&i%4!==0;
-function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')))}
+function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')*(CID==='fra'?1:TUNE.lvAthCr)))}/* v88x: Athens ×1.5 (6 clusters, ~27 people) */
 // a pavement corner beside a street node min-max m ahead (cone cos ≥ cmin), clear of buildings and other clusters
 // street nodes min-max m away inside the forward cone (cos ≥ cmin), shuffled (hubNear samples 18 random nodes of a 1.25 km square: almost never one 20-90 m away)
 // v88s perf: LV_ahead / LV_edges scan every street node of the 1.25 km square (Athens: thousands); results are cached ~12 frames per 15 m / heading step (was: every call, up to 36 scans a frame from hubRecycle)
@@ -11874,9 +11884,13 @@ function LV_onRoad(x,z,m){const N=HUB.nodes,E=LV_eGrid().get(Math.floor(x/40)*10
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
   const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
     const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:Math.max((A.pw||W/2+1.5)+1.1,W/2+2.6);/* Athens: right behind the walkers' line (A.pw), at the kerb */
-    const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(LV_onRoad(x,z,2.4))continue;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;
+    const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(LV_onRoad(x,z,2.4))continue;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;if(LV_carNear(x,z,9))continue;/* v88x: never next to a parked/stopped car (people were standing inside them) */
     const y=groundAt(x,z,(RO.y||0)+20);if(!(y>-1)||Math.abs(y-(RO.y||0))>14)continue;if(roamHit(x,z,1.8,y+.5)||roamHit(x-uz*sd*2,z+ux*sd*2,1.2,y+.5))continue;
     return{x,z,y:Math.max(0,y),h:Math.atan2(uz*sd,-ux*sd),ux,uz,sd,W,a:i,b:bi,al,L}}return null}
+// v88x: keep cluster people out of cars and props: a parked/stopped traffic car is a 2.9 m circle + .5 m; a building/prop collider (roamHit) pulls the figure toward the cluster centre
+function LV_carNear(x,z,r){const C=HUB.cars;if(!C)return false;for(const c of C)if(!(c.dead>0)&&(c.pk||(c.cv||0)<1)&&(c.x-x)**2+(c.z-z)**2<r*r)return true;return false}
+function LV_clear(p,C){const H=HUB.cars||[];for(const c of H){if(c.dead>0||!(c.pk||(c.cv||0)<1))continue;const dx=p.cx-c.x,dz=p.cz-c.z,d=Math.hypot(dx,dz),R0=3.4;if(d<R0){const k=(R0-d)/(d||1);p.cx+=dx*k||R0;p.cz+=dz*k}}
+  for(let i=0;i<4&&roamHit(p.cx,p.cz,.35,C.y+.5);i++){p.cx=(p.cx+C.x)/2;p.cz=(p.cz+C.z)/2}}
 // ---------- 7 · clusters
 function LV_clInit(){const n=12;// capacity: 2 stalls / 2 café sets per cluster
   const wood='#8a5a30',stall=mergeG([cbox(2.6,.9,1.1,0,.45,0,wood),cbox(2.7,.08,1.2,0,.92,0,'#c8904c'),cbox(.08,2.4,.08,-1.25,1.2,.5,'#e8e8e8'),cbox(.08,2.4,.08,1.25,1.2,.5,'#e8e8e8'),cbox(.08,2.4,.08,-1.25,1.2,-.5,'#e8e8e8'),cbox(.08,2.4,.08,1.25,1.2,-.5,'#e8e8e8'),
@@ -11904,7 +11918,7 @@ function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID
 function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),ax=-Math.cos(C.h),az=Math.sin(C.h);
   for(let j=0;j<n;j++){const p=P[base+j];if(!p)return;p.cw=1;p.a=C.a;p.b=C.b;p.t=0;const fr=(j+.5)/n-.5;let ox,oz;
     if(C.k==='crowd'){const a=j/n*6.283+k;ox=Math.sin(a)*1.3+rx*.9;oz=Math.cos(a)*1.3+rz*.9}else{ox=ax*fr*4.2+rx*(1.25+(j%2)*.45);oz=az*fr*4.2+rz*(1.25+(j%2)*.45)}
-    p.cx=C.x+ox;p.cz=C.z+oz;p.mx=C.x+rx*(C.k==='crowd'?.9:1.6);p.mz=C.z+rz*(C.k==='crowd'?.9:1.6);p.jy=0;p.jv=0;p.jx=p.jz=0;p.spin=0;p.yc=0;p.y=C.y;p.gs=C.gs}}
+    p.cx=C.x+ox;p.cz=C.z+oz;LV_clear(p,C);p.mx=C.x+rx*(C.k==='crowd'?.9:1.6);p.mz=C.z+rz*(C.k==='crowd'?.9:1.6);p.jy=0;p.jv=0;p.jx=p.jz=0;p.spin=0;p.yc=0;p.y=C.y;p.gs=C.gs}}
 function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=LV_cn(),walk=LV_walk(P.length),sp=Math.abs(RO.v),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // warp / teleport (> 60 m in one frame) or first frame: re-place every cluster close (no pop-in is visible across a teleport)
   const jump=LV.px==null||Math.hypot(RO.x-LV.px,RO.z-LV.pz)>60;LV.px=RO.x;LV.pz=RO.z;if(jump)LV.parkJ=90;
@@ -12015,6 +12029,50 @@ window.__lv={LV,n:()=>({peds:HUB.peds?LV_pn(HUB.peds.length):0,flags:LV.flags?LV
     const fr=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse)),v=new THREE.Vector3(),c={peds:0,cars:0,birds:0,boats:0},inV=(x,y,z)=>fr.containsPoint(v.set(x,y+1,z))&&v.distanceTo(camera.position)<120;
     for(const p of HUB.peds||[])if(p._x!=null&&inV(p._x,p.y,p._z))c.peds++;for(const k of HUB.cars||[])if(k.dead<=0&&inV(k.x,k.y||0,k.z))c.cars++;
     if(LV.birds)for(const F of LV.birds.fl)if(F.on)for(const b of F.b)if(inV(b.x,b.y,b.z))c.birds++;if(LV.boats)for(const b of LV.boats.bt)if(inV(b.x,0,b.z))c.boats++;return c}};
+// ===== v88x: Athens street dressing (Alex: "lively city"). Bitter-orange trees, periptero kiosks, parked scooters and "babas" bollards
+// along the Athens kerbs. Placed once per city load at the kerb line (behind the kerb, never on a road, never inside a building collider),
+// drawn from 4 InstancedMeshes (4 draws, no shadows) refilled around the player every 12 frames. Everything is smashable like the stalls:
+// fast contact = brick burst + studs + a little speed loss; slow contact pushes the car out (collider = drawn size). TUNE.lvDress scales it.
+const AD={grp:null,I:null,G:null,M:null,dead:new Set(),fr:0,px:1e9,pz:1e9,n:{}};
+const AD_T=[{k:'tree',r:1,cap:260},{k:'kiosk',r:2,cap:24},{k:'scoot',r:.8,cap:120},{k:'boll',r:.35,cap:260}];
+function AD_geo(){
+  const tree=mergeG([ccyl(.22,.26,1.6,0,.8,0,'#7a4a24',6),ccyl(.5,.5,.12,0,.06,0,'#8f8474',8),cbox(1.9,.9,1.9,0,1.95,0,'#2f8a3a'),cbox(1.5,.8,1.5,0,2.75,0,'#38a046'),cbox(.9,.5,.9,0,3.35,0,'#45b450'),
+    ...[[.75,2.1,.55],[-.6,2.3,.78],[.3,2.9,-.62],[-.7,2.0,-.5],[.62,2.75,.2],[0,3.5,.3]].map(([x,y,z])=>ccyl(.13,.13,.14,x,y+(Math.abs(x)>.7||Math.abs(z)>.7?0:.42),z,'#ff8c1a',6))]);
+  const kiosk=mergeG([cbox(2.3,2.3,1.7,0,1.15,0,'#2f7d4a'),cbox(2.7,.18,2.1,0,2.42,0,'#f2f2f2'),cbox(2.4,.4,.08,0,2.1,.9,'#ffd12c'),cbox(1.9,.9,.1,0,1.2,.89,'#f4f4f4'),
+    ...[0,1,2,3].map(j=>cbox(.38,.5,.06,-.66+j*.44,1.25,.95,['#e8302a','#2a7ad8','#ffd12c','#ff7ac0'][j])),cbox(.7,1.6,.6,1.55,.8,.25,'#f8f8f8'),cbox(.62,1.2,.04,1.55,.95,.56,'#9ad0ff'),cbox(.3,.3,.3,-1.3,.15,.6,'#c8282c')]);
+  const scoot=mergeG([cbox(.42,.5,1.15,0,.48,0,'#ffffff'),cbox(.36,.14,.6,0,.8,-.18,'#222222'),cbox(.4,.7,.16,0,.75,.55,'#ffffff'),ccyl(.03,.03,.5,0,1.1,.55,'#444444',5),cbox(.6,.06,.06,0,1.34,.55,'#444444'),
+    ...[.52,-.48].map(z=>{const g=new THREE.CylinderGeometry(.24,.24,.14,10);g.rotateZ(Math.PI/2);g.translate(0,.24,z);return colorize(g,new THREE.Color('#1c1c1c'))}),cbox(.2,.12,.08,0,1.1,.68,'#ffe9a0')]);
+  const boll=mergeG([ccyl(.14,.16,.85,0,.425,0,'#3a4a44',8),ccyl(.15,.15,.12,0,.62,0,'#e8e8e8',8),ccyl(.12,.14,.1,0,.9,0,'#3a4a44',8)]);
+  return[tree,kiosk,scoot,boll]}
+// placed lazily per 40 m cell (Athens has hundreds of km of streets): slots every 6 m on both kerbs of each street edge
+// (random phase per edge, seeded by the edge, so a cell always gets the same items), 10 m clear of junctions; a slot belongs to the cell it falls in
+function AD_cell(cx,cz){const key=cx*100000+cz;let a=AD.C.get(key);if(a)return a;a=[];AD.C.set(key,a);const N=HUB.nodes,E=LV_eGrid().get(key),seen=new Set(),occ=AD.occ;if(!E)return a;
+  const free=(x,z,q)=>{const k=Math.round(x/3)+'|'+Math.round(z/3);if(occ.has(k))return false;if(LV_onRoad(x,z,.9))return false;if(roamHit(x,z,q+.3,groundY(x,z)+.5))return false;occ.add(k);return true};
+  for(let e=0;e<E.length;e+=2){let i=E[e],bi=E[e+1];if(i>bi){const t=i;i=bi;bi=t}const ek=i*1e6+bi;if(seen.has(ek))continue;seen.add(ek);const A=N[i],B=N[bi];if(!A||!B||A.ab||B.ab)continue;
+    const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<2)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20);if(W<7)continue;const j0=A.nb.length>2?10:0,j1=L-(B.nb&&B.nb.length>2?10:0),r=mul(i*7919+bi*104729+1);
+    for(const sd of[-1,1]){const off=Math.max(W/2+1.15,(Math.min(A.pw||0,B.pw||0)||W/2+.5)+1.0);/* behind the walkers' line (pw), like the café clusters */
+      for(let s=r()*6;s<L;s+=6){const q=r(),h0=r(),sc=r();if(s<j0||s>j1)continue;const t=q<.38?0:q<.58?3:q<.78?2:q<.795?1:-1;if(t<0)continue;
+        const o=t===1?off+.6:off,X=A.x+ux*s-uz*o*sd,Z=A.z+uz*s+ux*o*sd;if(Math.floor(X/40)!==cx||Math.floor(Z/40)!==cz)continue;if(!free(X,Z,AD_T[t].r))continue;
+        const y=Math.max(0,groundY(X,Z)),h=Math.atan2(ux,uz)+(t===2?(sd>0?1.2:-1.2)+(h0-.5)*.5:t===1?(sd>0?-Math.PI/2:Math.PI/2):h0*6.28);
+        a.push({t,x:X,z:Z,y,h,s:t===0?1.35+sc*.3:t===1?1.2:1});if(t===3){const x2=X+ux*1.6,z2=Z+uz*1.6;if(free(x2,z2,.35))a.push({t:3,x:x2,z:z2,y,h:0,s:1})}}}}
+  AD.n.items=(AD.n.items||0)+a.length;AD.n.cells=AD.C.size;return a}
+function AD_init(){AD.grp=HUB.grp;AD.dead=new Set();AD.C=new Map();AD.occ=new Set();AD.n={};AD.px=AD.pz=1e9;const g=AD_geo(),col=new THREE.Color(),SC=['#ffffff','#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ff7ac0','#2b2b2b','#8fd0ff'];
+  AD.M=AD_T.map((T,j)=>{const m=LV_im(g[j],T.cap);m.count=0;m.name='ad_'+T.k;return m});
+  for(let i=0;i<AD_T[2].cap;i++)AD.M[2].setColorAt(i,col.set(SC[i%SC.length]));AD.M[2].instanceColor.needsUpdate=true}
+function AD_fill(){const R0=Math.round(115*Math.min(1.6,Math.sqrt(LV_d('lvDress')))),cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40),cr=Math.ceil(R0/40),near=[],cnt=[0,0,0,0],t0=performance.now();let todo=false;
+  for(let a=cx-cr;a<=cx+cr;a++)for(let b=cz-cr;b<=cz+cr;b++){const k=a*100000+b;if(!AD.C.has(k)&&performance.now()-t0>4){todo=true;continue}/* ≤ ~4 ms of new cells per fill; the rest next frame */for(const it of AD_cell(a,b)){const d2=(it.x-RO.x)**2+(it.z-RO.z)**2;if(d2<R0*R0)near.push([d2,it])}}
+  near.sort((p,q)=>p[0]-q[0]);const keep=new Set();
+  const CL=LV.cl?LV.cl.L.filter(q=>q.on):[];for(const [,it] of near){keep.add(it);if(AD.dead.has(it))continue;const T=AD_T[it.t];if(CL.some(q=>(q.x-it.x)**2+(q.z-it.z)**2<36))continue;/* a café/market/crowd cluster stands here now */if(cnt[it.t]>=T.cap)continue;LV_set(AD.M[it.t],cnt[it.t]++,it.x,it.y,it.z,0,it.h,0,it.s)}
+  for(const it of AD.dead)if(!keep.has(it))AD.dead.delete(it);// smashed pieces come back once you are out of range
+  for(let t=0;t<4;t++){AD.M[t].count=cnt[t];AD.M[t].instanceMatrix.needsUpdate=true}AD.n.drawn=cnt.join('/');if(todo)AD.px=1e9}
+function AD_hit(){const sp=Math.abs(RO.v),cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40);for(let a=cx-1;a<=cx+1;a++)for(let b=cz-1;b<=cz+1;b++)for(const it of AD.C.get(a*100000+b)||[]){if(AD.dead.has(it))continue;const T=AD_T[it.t],ex=RO.x-it.x,ez=RO.z-it.z,e2=ex*ex+ez*ez,rr=T.r+1.1;
+    if(e2>rr*rr||Math.abs((RO.y||0)-it.y)>3)continue;
+    if(sp>6){AD.dead.add(it);const at=V3(it.x,it.y+1,it.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.4).add(V3(0,6,0)),it.t===1?14:8,(['#38a046,#ff8c1a,#7a4a24','#2f7d4a,#ffd12c,#f2f2f2,#e8302a','#ffffff,#222222,#e8302a','#3a4a44,#e8e8e8'][it.t]).split(',').map(c=>new THREE.Color(c)),.7,it.y);
+      studBurst(at,fw,sp);HUB.smashed++;comboAdd(1);RO.v*=it.t===1?.9:.97;AU.sfx('crash');AD.n.smash=(AD.n.smash||0)+1;AD.px=1e9}
+    else{const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
+function AD_step(){if(CID==='fra'||!HUB.grp||!HUB.nodes||!HUB.bld||!HUB.bld.length)return;if(LV_d('lvDress')<=0){if(AD.M)for(const m of AD.M)m.count=0;return}
+  if(AD.grp!==HUB.grp)AD_init();AD.fr++;if(AD.fr%12===0||Math.hypot(RO.x-AD.px,RO.z-AD.pz)>25){AD.px=RO.x;AD.pz=RO.z;AD_fill()}AD_hit()}
+{const _adLS=LV_step;LV_step=dt=>{_adLS(dt);if(!RO.on||!LV.init)return;try{AD_step()}catch(e){if(!AD.e){AD.e=1;console.warn('AD dress',e)}}}}
 // ---- GX (garage UX). Alex: "the garage is quite unusable although it's in the correct direction; maybe more tiles; allow to group items to show and not show".
 // Research: docs/research/BUILDER_2K_UX.md (2K Brick Drawer categories + favourite tabs, Group tool, Select up, mirror; eye/hide from Studio + Mecabricks).
 // 1) PARTS palette: 2 rows of bigger tiles with names (scroll sideways), category chips plus ★ FAVS and 🕘 RECENT.
@@ -12516,6 +12574,9 @@ if(window.__wb&&window.__wb.fast){const f=window.__wb.fast;window.__wb.fast=func
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88x',id:'ath-dress',text:'Athens: drive along streets for 1 minute: orange trees, green kiosks, parked scooters and bollards line the pavements; more crowds/cafés; smashing one gives a brick burst. Is Athens lively enough?'},
+ {ver:'v88x',id:'steg-tower',text:'Frankfurt: drive to the Eiserner Steg (red iron footbridge): the 4 towers at its ends have windows, a door and a red roof (no plain beige pillar).'},
+ {ver:'v88x',id:'crowd-car',text:'Look at crowds next to parked cars: nobody stands inside a car.'},
  {ver:'v88w',id:'bricks2x',text:'Drive slowly past houses and shops: walls show LEGO brick rows, low flat roofs show studs, nothing flickers or shimmers. Far away the city looks as before.'},
  {ver:'v88w',id:'world-smooth2',text:'PC and phone: drive 1 minute in Frankfurt and in Athens. ⚙ TUNE → Life → Show FPS: copy the line into the notes (draws about 200 or less). Map icons still float over missions.'},
  {ver:'v88w',id:'ath-popup',text:'Athens: drive along streets for 1–2 minutes: a pop-up challenge ring (RAMP JUMP, DRIFT ZONE…) appears ahead in your lane; drive through it to start.'},

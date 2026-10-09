@@ -479,7 +479,7 @@ function cardFaceInner(sp, lite) {
   s += '<rect x="14" y="14" width="232" height="336" rx="5" fill="' + P.paper + '"/>' + (lite ? '' : '<rect x="15" y="15" width="230" height="334" rx="5" filter="url(#tb-stain)" opacity=".5"/>');
   if (lite) {
     /* compact layout for thumbnails: huge number, art, icon + cost */
-    s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + P.main + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
+    s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + mix(P.main, '#1a0a0c', .55) + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
     s += '<g transform="translate(20 96)"><rect x="-2" y="-2" width="224" height="156" rx="7" fill="url(#tb-gold)"/>' + (paintedArt(sp) || artSVG(sp.art, f, true)) + '</g>';
     s += '<rect x="20" y="258" width="220" height="90" rx="6" fill="' + P.dark + '"/><g transform="translate(70 303) scale(3.6)">' + typeIcon(type, '#f1e3c3') + '</g>';
     if (sp.cost != null) s += '<g transform="translate(190 303)"><circle r="31" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="2"/><text y="14" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="40" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
@@ -487,7 +487,7 @@ function cardFaceInner(sp, lite) {
   }
   /* title banner */
   var tp = fitTitle(sp.title || '', 196, 17.5, 12);
-  s += '<rect x="22" y="20" width="216" height="30" rx="4" fill="url(#tb-f-' + f + ')" stroke="url(#tb-gold)" stroke-width="1.6"/><path d="M26 23 H234" stroke="#fff" stroke-opacity=".18"/>';
+  s += '<rect x="22" y="20" width="216" height="30" rx="4" fill="url(#tb-f-' + f + ')" stroke="url(#tb-gold)" stroke-width="1.6"/><rect x="22" y="20" width="216" height="30" rx="4" fill="#120a0c" opacity=".42"/><path d="M26 23 H234" stroke="#fff" stroke-opacity=".18"/>';
   s += '<text x="130" y="' + n2(40.2 + (17.5 - tp) * .2) + '" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="' + tp + '" fill="' + P.glyph + '" stroke="rgba(0,0,0,.45)" stroke-width=".6" paint-order="stroke">' + esc(sp.title || '') + '</text>';
   /* art window */
   s += '<g transform="translate(20 56)"><rect x="-2.5" y="-2.5" width="225" height="157" rx="8" fill="url(#tb-gold)"/><rect x="-.5" y="-.5" width="221" height="153" rx="6.5" fill="#1a110c"/>' + (paintedArt(sp) || artSVG(sp.art, f, false)) + '<rect width="220" height="152" rx="6" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.2"/></g>';
@@ -497,7 +497,8 @@ function cardFaceInner(sp, lite) {
   if (sp.cost != null) s += '<g transform="translate(224 72)" filter="url(#tb-shadow)"><circle r="18" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="1.2"/><circle r="14" fill="none" stroke="#5c3d0c" stroke-width=".9" stroke-dasharray="1.6 2.2"/><text y="7.6" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="21" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
   /* type strip */
   s += '<rect x="22" y="214" width="216" height="22" rx="4" fill="' + P.dark + '"/><rect x="22" y="214" width="216" height="22" rx="4" fill="none" stroke="url(#tb-gold)" stroke-width=".9"/><g transform="translate(37 225)">' + typeIcon(type, P.glyph) + '</g>';
-  s += '<text x="54" y="229.4" font-family="' + DISPLAY + '" font-weight="700" font-size="11.6" letter-spacing="1.2" fill="' + P.glyph + '">' + esc(String(tl).toUpperCase()) + '</text>';
+  var tlp = fitTitle(String(tl).toUpperCase(), sp.tag ? 118 : 172, 13.5, 11);
+  s += '<text x="54" y="' + n2(229.8 + (13.5 - tlp) * .1) + '" font-family="' + DISPLAY + '" font-weight="700" font-size="' + tlp + '" letter-spacing=".6" fill="' + P.glyph + '">' + esc(String(tl).toUpperCase()) + '</text>';
   if (sp.tag) s += '<text x="232" y="229.4" text-anchor="end" font-family="' + BODY + '" font-style="italic" font-size="13" fill="' + P.glyph + '" opacity=".9">' + esc(sp.tag) + '</text>';
   /* effect text */
   s += '<g transform="translate(22 240)"><rect width="216" height="100" rx="4" fill="rgba(255,250,235,.38)" stroke="' + P.accent2 + '" stroke-opacity=".7" stroke-width="1"/>';
@@ -510,8 +511,8 @@ function cardFaceInner(sp, lite) {
   s += '</g>';
   /* footer */
   s += '<g transform="translate(130 362) scale(.4)" opacity=".95">' + emblem(f) + '</g>';
-  s += '<text x="20" y="364" font-family="' + DISPLAY + '" font-weight="700" font-size="8.5" letter-spacing="1.4" fill="' + P.glyph + '" opacity=".8">' + esc(P.short.toUpperCase()) + '</text>';
-  if (sp.num != null) s += '<text x="240" y="364" text-anchor="end" font-family="' + DISPLAY + '" font-weight="700" font-size="8.5" letter-spacing="1" fill="' + P.glyph + '" opacity=".8">' + esc(sp.num) + '</text>';
+  s += '<text x="20" y="364" font-family="' + DISPLAY + '" font-weight="700" font-size="10" letter-spacing="1.2" fill="' + P.glyph + '" opacity="1">' + esc(P.short.toUpperCase()) + '</text>';
+  if (sp.num != null) s += '<text x="240" y="364" text-anchor="end" font-family="' + DISPLAY + '" font-weight="700" font-size="10" letter-spacing="1" fill="' + P.glyph + '" opacity="1">' + esc(sp.num) + '</text>';
   return s;
 }
 var cardCache = {}, tplCache = {}, cacheN = 0;
