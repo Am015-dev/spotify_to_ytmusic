@@ -34,7 +34,7 @@ Nightrun draws everything procedurally today (no `new Image` anywhere in `parts/
 - `boss-<name>.webp` (384×384, square portraits) for boss intro cards.
 - `ship-<id>.webp` (256×256, square portraits) for the garage and shop.
 
-## Coming in the next push (already queued on the laptop)
+## Shots, effects, pickups and parallax strips (delivered 2026-10-09)
 - **Shots and effects `fx-*`:** light on BLACK. Draw them with `ctx.globalCompositeOperation='lighter'` so the black vanishes.
   - Shots: `fx-shot-std` (neutral, so it can be tinted to `D.b`), `-hv`, `-ec`, `-perfect`.
   - Enemy bullets: `fx-bullet-enemy` (lime, matches `BULLET`).
