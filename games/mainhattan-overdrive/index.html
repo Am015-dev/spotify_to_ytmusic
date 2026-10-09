@@ -753,6 +753,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v89j',date:'9 Oct 2026',items:[{t:'FIXED',s:'Oma Hilde\'s tip card: the text no longer runs under her picture.'},{t:'FIXED',s:'The "TAP TO OPEN" pill no longer sits on the boost bar.'},{t:'CHANGED',s:'Golden bricks now look like chunky LEGO bricks with big studs (no more white disc under them).'},{t:'FIXED',s:'Frankfurt: the long blank beige walls between streets now have windows.'},{t:'FIXED',s:'The checklist strip no longer covers the CHOOSE ACTIVITY title or the first-drive tip card.'}]},
   {v:'v89i',date:'9 Oct 2026',items:[{t:'CHANGED',s:'Faster: the garage opens about 20% faster and the game now uses one graphics context instead of up to four (less memory, fewer crashes on iPhone).'},{t:'CHANGED',s:'Faster loading: the game no longer prepares about 50 graphics programs it never used (40% fewer at the menu and in the city).'}]},
   {v:'v89h',date:'9 Oct 2026',items:[{t:'FIXED',s:'Athens on foot: a stopped scooter no longer blocks the whole lane, so you can walk round it to the car behind and 🚗 TAKE it.'},{t:'FIXED',s:'Oma Hilde\'s tips at the start are no longer hidden under the checklist bar. The bar also steps aside while PAUSE or any other card is open.'},{t:'FIXED',s:'Athens outskirts: the long blank grey and beige walls behind the streets are now apartment blocks with windows, balconies and different heights.'}]},
   {v:'v89g',date:'9 Oct 2026',items:[{t:'NEW',s:'Two new open races: Riverbank Rally (Frankfurt) and Coast Rally (Athens). Wide courses on grass, dirt and sand, with rivals racing side by side.'},{t:'NEW',s:'Pick your route: orange arrows lead to a dirt SHORTCUT (4×4), blue arrows to a water lane where you turn into a boat. Jump the creek, but stay off the cliff edge: fall off and you respawn on the road (tap to respawn at once).'},{t:'CHANGED',s:'Races show your place as a big number top-left (8TH), and the minimap has a thick track with big dots for you and every rival.'}]},
@@ -5288,7 +5289,7 @@ function buildRoam(){const grp=new THREE.Group();HUB.grp.add(grp);RO.grp=grp;RO.
   RO.nR0=RO.ramps.length;abRoam(put);
   for(const L of LAZY){for(const q of L.ramps){addRamp(q[0],q[1],q[2],q[3]||24,q[4]||7,q[5]||16,q[6]||0xff5a1c);const r=RO.ramps[RO.ramps.length-1];for(let j=1;j<=8;j++){const d=r.len/2+j*8;put(r.x+Math.sin(r.h)*d,r.z+Math.cos(r.h)*d,r.y0+r.hgt+Math.sin(j/9*Math.PI)*9,j===4?100:10)}}
     for(const[x,z,v]of L.studs)if(!lzHit(x,z,1.2))put(x,z,groundY(x,z)+1.4,v||10)}
-  const gs=RO.studs.filter(s=>s.v<=10),bs=RO.studs.filter(s=>s.v>10);{const gm=new THREE.MeshStandardMaterial({color:0xffc21a,emissive:new THREE.Color('#ffa000'),emissiveIntensity:.7,metalness:.85,roughness:.22}),geo=mergeG([cbox(4,2.4,2,0,0,0,'#ffffff'),...[-1.5,-.5,.5,1.5].flatMap(x=>[ccyl(.42,.42,.4,x,1.4,-.5,'#ffffff',10),ccyl(.42,.42,.4,x,1.4,.5,'#ffffff',10)])]),bmM=new THREE.MeshBasicMaterial({color:glowCol('#ffd12c',1.2),transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false});
+  const gs=RO.studs.filter(s=>s.v<=10),bs=RO.studs.filter(s=>s.v>10);{const gm=new THREE.MeshStandardMaterial({color:0xffc21a,emissive:new THREE.Color('#ffa000'),emissiveIntensity:.35,metalness:.3,roughness:.4}),geo=mergeG([cbox(4,2.4,2,0,0,0,'#e8a820'),...[-1.5,-.5,.5,1.5].flatMap(x=>[ccyl(.5,.5,.8,x,1.6,-.5,'#fff0a0',12),ccyl(.5,.5,.8,x,1.6,.5,'#fff0a0',12)])]),/* v89i: opacity 0: the art pass squashed this 90 m beam into a 3 m white disc that read as a plinth under the brick */bmM=new THREE.MeshBasicMaterial({color:glowCol('#ffd12c',1.2),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
    const spots=[];for(const r of RO.ramps.slice(0,RO.nR0))spots.push([r.x+Math.sin(r.h)*(r.len/2+34),r.z+Math.cos(r.h)*(r.len/2+34),r.y0+r.hgt+7]);
    for(const B of HUB.blocks.filter(b=>b.t==='park'||b.t==='plaza'||b.t==='yard').slice(0,6))spots.push([(B.x0+B.x1)/2,(B.z0+B.z1)/2,2.5]);for(const b of BRIDGES){const[x,z]=deckPt(b,0,b.w/2+14);spots.push([x,z,HWY+2])}{const S=LM_BY['Deutsche Bank Park'];if(S)spots.push([S.x,S.z,2.5])}
    if(CID!=='fra'){spots.length=0;spots.push(...athGbSpots())}packInit(grp);const got=roamSave().gb||[];RO.gbs=spots.slice(0,SM_ON?999:30).map(([x,z,y,gi],i0)=>{const i=gi??i0;const m=new THREE.Mesh(geo,gm);m.position.set(x,y,z);m.visible=!got.includes(i);const beam=new THREE.Mesh(new THREE.CylinderGeometry(.8,2.5,90,10,1,true),bmM);beam.position.y=45;m.add(beam);grp.add(m);return{i,x,z,y,m,beam}})}
@@ -8881,10 +8882,12 @@ function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z
     const runs=[];for(let i=0;i<cols;i++){let j=0;while(j<rows){if(!S[i*rows+j]){j++;continue}let k=j;while(k<rows&&S[i*rows+k])k++;runs.push({i0:i,i1:i,j0:j,j1:k});j=k}}
     const key=r=>r.j0+'|'+r.j1,open=new Map();for(const r of runs){const o=open.get(key(r));if(o&&o.i1===r.i0-1&&o.i1-o.i0<5){o.i1=r.i0;continue}const n={...r};open.set(key(r),n);R.push(n)}
     for(const r of R){r.x0=HX0+r.i0*C;r.x1=HX0+(r.i1+1)*C;r.z0=HZS+r.j0*C;r.z1=HZS+r.j1*C}DR.inS=(x,z)=>{const i=Math.floor((x-HX0)/C),j=Math.floor((z-HZS)/C);return i>=0&&j>=0&&i<cols&&j<rows&&S[i*rows+j]===1}}
-  DR.solid=R;if(!R.length)return;if(CID!=='fra'&&DR_athFill(R))return;const G=[],col=CID==='fra'?['#e8dcc8','#a85a3c']:['#efe3c8','#c8643c'];
+  DR.solid=R;if(!R.length)return;if(CID!=='fra'&&DR_athFill(R))return;const G=[],col=CID==='fra'?['#e8dcc8','#a85a3c']:['#efe3c8','#c8643c'];/* v89i: the plain beige filler boxes read as long blank walls: walls now carry the street-building window facade (12 m repeat) */const BMs=HUB.BM&&HUB.BM.office,W=[],TN=['#e8dcc8','#e2c9a8','#d9b99b','#ecdfc4','#d8c4b0'];
   for(const r of R){const cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,w=r.x1-r.x0,d=r.z1-r.z0;let lo=1e9,hi=-1e9;for(const[a,b]of[[r.x0,r.z0],[r.x1,r.z0],[r.x0,r.z1],[r.x1,r.z1],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
-    const h=hi-lo+7.5;G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]),cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
-  const m=new THREE.Mesh(mergeG(G),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));m.castShadow=false;m.receiveShadow=true;m.userData.dr=1;HUB.grp.add(m);DR.st.solid=R.length}
+    const h=hi-lo+7.5;if(BMs){const g=bxUV(w,h,d,12,13.2);g.translate(cx,lo-.5+h/2,cz);W.push(colorize(g,new THREE.Color(TN[Math.floor(DR_h(cx*.31,cz*.31)*TN.length)])))}else G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]));G.push(cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
+  const m=new THREE.Mesh(mergeG(G),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));m.castShadow=false;m.receiveShadow=true;m.userData.dr=1;HUB.grp.add(m);if(W.length){const mw=new THREE.Mesh(DR_mergeUV(W),HUB.BM.office);mw.castShadow=false;mw.receiveShadow=true;mw.userData.dr=1;HUB.grp.add(mw)}DR.st.solid=R.length}
+// v89i: merge keeping the UV set (mergeG drops it): the filler walls need their facade texture
+function DR_mergeUV(list){const A={position:[3,[]],normal:[3,[]],uv:[2,[]],color:[3,[]]},r=new THREE.BufferGeometry();for(let g of list){g=g.index?g.toNonIndexed():g;for(const k in A){const at=g.attributes[k],n=A[k][0];for(let i=0;i<at.count;i++)for(let c=0;c<n;c++)A[k][1].push(at.getComponent?at.getComponent(i,c):at.array[i*n+c])}}for(const k in A)r.setAttribute(k,new THREE.Float32BufferAttribute(A[k][1],A[k][0]));return r}
 // v89f (Alex: "long blank grey walls with no windows" ~1.5 km out of Athens): the Athens solid fill (deep block interiors ≥ 22 m from every
 // street, 74 km² of it) was one merged mesh of plain 7.5 m boxes, beige walls + orange cap, no texture; where it borders fields and parks it read
 // as long blank walls. Now its walls carry the Athens apartment facade (the street buildings' texture: 12 m per repeat across, 4 floors per
@@ -11287,7 +11290,7 @@ window.__tune={K:TUNE_K,DEF:TU_DEF,get:TU_get,set:TU_set,vals:TU_vals,apply:TU_a
 {const st=document.createElement('style');st.id='r1Css';st.textContent=`
 html body #roam #npcSay,html body #roam #roamTut{left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;
  top:calc(84px + env(safe-area-inset-top,0px))!important;max-width:min(420px,48vw)!important;box-sizing:border-box}
-html body #roam #npcSay>div{border:0!important;background:none!important;min-width:0!important;padding:0 6px 2px 0!important;box-shadow:none!important}
+html body #roam #npcSay>div{border:0!important;background:none!important;min-width:0!important;padding:0 34px 2px 0!important;box-shadow:none!important}
 html body #roam:has(#npcSay:not([hidden])) #roamTut{visibility:hidden!important}
 @media (orientation:landscape) and (max-height:500px){
  html body #roam #npcSay,html body #roam #roamTut{top:calc(80px + env(safe-area-inset-top,0px))!important;max-width:min(400px,47vw)!important}
@@ -13542,6 +13545,8 @@ if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)retur
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89j',id:'tip-avatar',text:'Oma Hilde\'s tip text never runs under her picture.'},
+ {ver:'v89j',id:'walls-pill',text:'Frankfurt: no plain beige walls; the TAP TO OPEN pill doesn\'t cover the speed bar.'},
  {ver:'v89i',id:'perf-thumbs',text:'Garage: part pictures and car cards all show (no blank tiles), and PAINT recolours them.'},
  {ver:'v89i',id:'perf-ctx',text:'iPhone: open and close the garage 3×, then drive: no black screen, no reload.'},
  {ver:'v89h',id:'ath-take2',text:'Athens: stop near traffic, get out and walk up to a car that stops for you (walk round a scooter if one is in front): 🚗 TAKE appears and you drive off with ★1.'},
@@ -13738,11 +13743,12 @@ const OD_CHECKLIST=[
 body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:none!important}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
  setInterval(pinR,700);pinR();
  // v89h: the strip never draws over a card (Alex: tip hidden at the start; PAUSE card's RESUME + title covered in roam). While any modal/card
+ // v89j: + the first-drive tutorial card, the main menu's CHOOSE ACTIVITY title and garage dropdown lists (same 8 px rule).
  // is open that covers most of the screen or comes within 8 px of the strip's spot, the strip steps aside (body.odYield); it returns when it closes.
  // Races and results keep their own chip placement (RF5: under LAP, inside the results card's top-right corner).
- const YS='#npcSay,#roamPause,#pause,#results,#settings,#chRes,#spRes,#roamPop,#journal,#roamMap,#story,#roamCard,#cmap,#slots,#profile,#gbx,#odChk,#credBox,[role=dialog],.modal';
+ const YS='#npcSay,#roamPause,#pause,#results,#settings,#chRes,#spRes,#roamPop,#journal,#roamMap,#story,#roamCard,#cmap,#slots,#profile,#gbx,#odChk,#credBox,[role=dialog],.modal,#roamTut,#home .hbar h2,[role=listbox],[role=menu],.r2Pop,.r2Menu,.r2List,.gbDrop';
  let pinBox=null;const yVis=e=>{if(e.hidden||e.closest('[hidden]'))return null;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return null;const r=e.getBoundingClientRect();return r.width>4&&r.height>4?r:null};
- const yieldStep=()=>{try{const P=document.getElementById('odPin');if(!P)return;if(!P.hidden&&!document.body.classList.contains('odYield')){const r=P.getBoundingClientRect();if(r.width>4)pinBox={l:r.left,t:r.top,r:r.right,b:r.bottom}}
+ const yieldStep=()=>{try{const P=document.getElementById('odPin');if(!P)return;if(!P.hidden&&(!document.body.classList.contains('odYield')||!pinBox)){const r=P.getBoundingClientRect();if(r.width>4)pinBox={l:r.left,t:r.top,r:r.right,b:r.bottom}}
    let y=false;if(pinBox&&!P.hidden&&!pinCd()&&!pinRun()){const VA=innerWidth*innerHeight;for(const e of document.querySelectorAll(YS)){if(e===P||P.contains(e))continue;const r=yVis(e);if(!r)continue;
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};
@@ -14144,7 +14150,7 @@ html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!impor
 OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
 
 (()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
-html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(46px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
+html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 
