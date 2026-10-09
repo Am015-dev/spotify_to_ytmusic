@@ -127,11 +127,16 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
     add(wm,new THREE.MeshStandardMaterial({map:R15_tex('water'),color:0xffffff,roughness:.12,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.15}))}
   // cliff faces (rock) down to a quarry floor / the sea
   {const m=MB(),wf=MB(),rc=new THREE.Color(ath?0xa08a68:0x6f675e);
-    strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5),d=(c,k)=>[c.r*k,c.g*k,c.b*k];return[[cd*lp,0,...d(rc,1.15)],[cd*(lp+.8),-1.5,...d(rc,.9)],[cd*(lp+2),-9,...d(rc,.62)],[cd*(lp+3.5),-20,...d(rc,.45)],[cd*(lp+5),-30,...d(rc,.32)]]},null,(i,q)=>[q[0]/6,q[1]/4]);
+    // RO7: solid stepped LEGO rock skirt from the ground top (overlaps the slab by .3 m: no seam) down below the water line
+    const STEP=[[-.3,.03,1.2],[.2,.03,1.1],[.2,-3,.72],[1.2,-3,.95],[1.2,-8,.62],[2.2,-8,.85],[2.2,-14,.55],[3.2,-14,.78],[3.2,-21,.48],[4.2,-21,.7],[4.2,-27,.42],[5,-27,.6],[5,-33,.36]];
+    strip(m,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return STEP.map(([dx,y,k])=>[cd*(lp+dx),y,rc.r*k,rc.g*k,rc.b*k])},null,(i,q)=>[q[0]/6+q[1]/5,i*td.ds/6]);
     // RO6: the ravine floor is water (river / sea) 30 m down, so the drop reads from the road
     strip(wf,i=>{const j=i%N,cd=OPN.CL[j];if(!cd)return null;const lp=Math.min(48,OPN.LIP[j]+.5);return[[cd*(lp+4),-29],[cd*(lp+60),-29],[cd*(lp+260),-29]]},null,(i,q)=>[q[0]/24,i*td.ds/24]);
     add(wf,new THREE.MeshStandardMaterial({map:R15_tex('water'),roughness:.15,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.25}));
-    add(m,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,flatShading:true}))}
+    add(m,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,flatShading:true,side:THREE.DoubleSide}));
+    // RO7: the same rock skirt on both edges of every jump gap (the slab ended in a paper-thin edge)
+    {const gm=MB();for(let i=0;i<=N;i+=st){const g0=gap(i),gp=gap(i-st);if(g0===gp)continue;const b=gm.n;for(const x of[-48.5,48.5])for(const y of[.03,-10]){P(i,x,y,gm.p);gm.c.push(rc.r*(y<0?.45:1.1),rc.g*(y<0?.45:1.1),rc.b*(y<0?.45:1.1));gm.u.push(x/6,y/5)}gm.n+=4;gm.i.push(b,b+1,b+2,b+1,b+3,b+2)}
+      add(gm,new THREE.MeshStandardMaterial({vertexColors:true,map:grain,roughness:.95,side:THREE.DoubleSide}))}}
   // red/white kerb on the cliff lip (flat paint: no wall there, the cliff is the point)
   {const m=MB(),c=document.createElement('canvas');c.width=16;c.height=64;const g=c.getContext('2d');g.fillStyle='#e8231c';g.fillRect(0,0,16,32);g.fillStyle='#fff';g.fillRect(0,32,16,32);const kt=new THREE.CanvasTexture(c);kt.wrapS=kt.wrapT=THREE.RepeatWrapping;kt.colorSpace=THREE.SRGBColorSpace;
     /* RO6: no kerb (it read as a 1 m step); the rock face + water floor show the drop */}
