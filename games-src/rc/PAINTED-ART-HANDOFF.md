@@ -27,3 +27,10 @@ The prompts are in laptop `game-assets/cards/shipwreck/*.json`.
 
 ## Music
 `../audio/shipwreck/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.
+
+## Wired (2026-10-09)
+- 50 paintings live in `games/shipwreck-isle/art/` as separate files (`rc/extras.js` `artImg()`; `build.py` lists `art/` into `ART_HAVE`, so missing ones show nothing). Shown on: the fight card on the board and in the story card, the boost/tracker question, starting-item and built-invention rows, invention build rows, Bright Idea options, and the card list (beasts, inventions, items).
+- `media/back-default.webp` is the card back in the Decks list (`.dk .cb`).
+- Treblo music: `games/shipwreck-isle/music/*.mp3` (see `audio/ASSETS.md`); per-screen slots and the Music picker are in `rc/extras.js` (menu: "Pick songs"). Saved choice key `swi_mpick`.
+- `node cards-page.js` (in `rc/`) rebuilds `games/shipwreck-isle/cards.html`; then `python3 ../scripts/stamp-copyright.py ../../games/shipwreck-isle/cards.html`.
+- Still to wire when part 2 arrives: discoveries, wrecks, characters, camp portraits, other backs, tables, title/end screens.

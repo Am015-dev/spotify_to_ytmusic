@@ -291,7 +291,7 @@ FN.fight=fr=>{const b=fr.beast;const c=fr.who>=0?P(fr.who):null;
   const base={beast:b,who:fr.who,ctx:fr.ctx,str:fr.str,boost:fr.boost};
   // temporary weapon boosts the fighter may use once the beast is known
   const boosts=boostOpts(c);const short=fr.str-(G.weapon+fr.boost);
-  if(short>0&&boosts.length){ask(c?c.i:'team',`Fighting ${b.n} (strength ${fr.str}) with weapon ${G.weapon}${fr.boost?' +'+fr.boost:''}: use a boost?`,boosts.map(o=>({l:o.l,frames:[{f:'fn',k:'boost',o:o.k,fr:JSON.parse(JSON.stringify(base))}]})).concat([{l:'No boost, fight now',frames:[{f:'fn',k:'fight2',fr:base}]}]),{kind:'boost',force:1});return}
+  if(short>0&&boosts.length){ask(c?c.i:'team',`Fighting ${b.n} (strength ${fr.str}) with weapon ${G.weapon}${fr.boost?' +'+fr.boost:''}: use a boost?`,boosts.map(o=>({l:o.l,frames:[{f:'fn',k:'boost',o:o.k,fr:JSON.parse(JSON.stringify(base))}]})).concat([{l:'No boost, fight now',frames:[{f:'fn',k:'fight2',fr:base}]}]),{kind:'boost',force:1,art:b.k?'beast-'+b.k:null});return}
   push({f:'fn',k:'fight2',fr:base})};
 FN.boost=f=>{const fr=f.fr;const k=f.o;const c=fr.who>=0?P(fr.who):null;fr.boost+=3;
   if(k==='pistol'){const it=G.items.find(i=>i.k==='pistol');if(it)it.uses--}else if(k==='rage'&&c){c.used.rage=1;c.det-=3}else if((k==='saber'||k==='ritualknife')&&c){wound(c,1,k==='saber'?'the cutlass bites back':'the ritual knife')}else if(k==='m_rifle'||k==='e_surprise'||k==='sc_pistol'){delete G.kept[k]}

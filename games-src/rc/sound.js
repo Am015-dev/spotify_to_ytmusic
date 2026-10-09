@@ -68,10 +68,10 @@ function sfx(name){if(!SND.on)return;const m=SND_MAP[name];
   }}catch(e){}}
 // ambience: surf that swells with the weather, a slow modal pad, rain hiss when it rains
 const PAD=[[146.8,220,293.7],[130.8,196,261.6],[116.5,174.6,233.1],[130.8,196,261.6]];
-function musicStart(){if(window.GA)GA.music(SND_MUS[SND.mood]||SND_MUS.calm,{fade:2});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,250)}
-function musicStop(){if(window.GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
+function musicStart(){if(window.GA){musicForget();musicSync()}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,250)}
+function musicStop(){if(window.GA){GA.music(null);musicForget()}clearInterval(SND.mTimer);SND.mTimer=null}
 // the recorded track owns the music unless it failed to decode: then the synth groove below plays instead
-function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf(SND_MUS[SND.mood]||SND_MUS.calm)<0)}
+function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&(!MUS.want||MUS.want==='-'||s.failed.indexOf(MUS.want)<0))}
 function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const bar=4.8;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}
   while(SND.nextT<c.currentTime+.6){const at=SND.nextT-c.currentTime,k=SND.beat;const storm=(typeof V3!=='undefined'&&V3.weather)?V3.weather.storm:0;const rain=(typeof V3!=='undefined'&&V3.weather)?V3.weather.rain:0;
     noise(bar*.9,{ft:'lowpass',f:500+storm*600,fto:180,v:.18+storm*.2,a:bar*.4,at,bus:SND.musBus});
@@ -79,12 +79,12 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const bar
     if(k%4===1)tone(PAD[(k>>1)%4][2]*2,.9,{type:'triangle',v:.035,a:.05,at:at+1.2,bus:SND.musBus});
     if(rain>.1)noise(bar,{ft:'highpass',f:3500,v:.06*rain,a:.5,at,bus:SND.musBus});
     SND.nextT+=bar;SND.beat++}}
-function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('swi_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA){GA.setSfx(SND.on);audioMood()}if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
-function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('swi_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
+function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('swi_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA){GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music);musicForget();musicSync();audioMood()}if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
+function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('swi_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.on&&SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(typeof setBtn==='function'){setBtn(a,SND.on?'snd':'mute','');setBtn(b,'wave',SND.music?'On':'Off');return}if(a)a.textContent=SND.on?'🔊':'🔇';if(b)b.textContent=SND.music?'🌊 On':'🌊 Off'}
 // ---------- recorded audio: init, and the weather / night / camp-fire mood ----------
 // GA shares the synth's AudioContext (created on the first gesture only), so nothing plays before the player touches the page.
-if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'swi',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.music)}
+if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'swi',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music)}
 // what the island looks like right now: the same weather the 3D scene shows (forecast while planning, the real clouds in the weather phase)
 function moodNow(){if(typeof G==='undefined'||!G)return null;try{const S=SCENARIOS[G.scen];const dice=(S&&S.wx[G.round])||[];
   const w=G.phase==='weather'&&G.wxNow?G.wxNow:{rain:(dice.includes('rain')?1.2:0)+G.wx.rain,snow:(dice.includes('snow')?1.2:0)+G.wx.snow,storm:G.wx.storm};
@@ -92,7 +92,7 @@ function moodNow(){if(typeof G==='undefined'||!G)return null;try{const S=SCENARI
   const night=G.phase==='night'||!!(G.over&&!G.over.win);
   return {rain,snow,storm,night,win:!!(G.over&&G.over.win),bad:night||!!w.storm||storm>=.5||(G.phase==='weather'&&(w.rain||0)+(w.snow||0)>=1)}}catch(e){return null}}
 function audioMood(){if(!window.GA)return;const m=typeof withView==='function'?withView(moodNow):moodNow();
-  const mood=m&&m.bad&&!m.win?'storm':'calm';if(mood!==SND.mood){SND.mood=mood;if(SND.music)GA.music(SND_MUS[mood],{fade:2.5})}
+  const mood=m&&m.bad&&!m.win?'storm':'calm';if(mood!==SND.mood){SND.mood=mood}
   const want={rain:0,wind:0,fire:0};
   if(m&&SND.on){want.rain=m.rain>0?SND_AMB.rain.vol*(.45+.55*m.rain):0;                  // rain hiss with the rain clouds
     want.wind=m.storm>.2||m.snow>0?SND_AMB.wind.vol*(.4+.6*Math.max(m.storm,m.snow)):0;   // wind with storms and snow

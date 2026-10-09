@@ -26,12 +26,11 @@ const RULES_HTML=`<h2>How to play</h2>
 <p class="muted small">Names, card text and art in this game are original. Its rules and numbers follow a published co-operative survival board game. Details that the sources left open are listed in the game's rules notes.</p>
 <section class="credits-audio">
 <h3>Credits</h3>
-<p>Names, card text and art are original.</p>
+<p>Names and card text are original. The card paintings and the card back were painted for this game with Google Flow.</p>
 <h4>Audio</h4>
 <p>With thanks to these public-domain (CC0) creators:</p>
 <ul>
-<li>Music: &ldquo;Seaside Village&rdquo; by KarateStudios (<a href="https://opengameart.org/content/seaside-village">OpenGameArt</a>, CC0)</li>
-<li>Music: &ldquo;Storm Chasers&rdquo; by Eldritch Grim (<a href="https://opengameart.org/content/storm-chasers">OpenGameArt</a>, CC0)</li>
+<li>Music: ten instrumental songs made with Treblo (treblo.com) for this game, used under Treblo's terms (the user owns the outputs).</li>
 <li>Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl">Kenney</a> (CC0)</li>
 <li>Sound effects: &ldquo;100 CC0 SFX #2&rdquo; by rubberduck (<a href="https://opengameart.org/content/100-cc0-sfx-2">OpenGameArt</a>, CC0)</li>
 <li>Sound effects: &ldquo;30 CC0 SFX loops&rdquo; by rubberduck (<a href="https://opengameart.org/content/30-cc0-sfx-loops">OpenGameArt</a>, CC0)</li>

@@ -685,5 +685,19 @@ html.ph .gx-bar .gxh-bulb,.gx-bar .gxh-bulb{min-width:40px}
 @media (min-width:761px){html:not(.ph) .hlpset{display:none}}
 .tutset{display:contents}.gxt-menu{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}.gxt-menu b{font-weight:800}.gxt-menu span{font-size:12px;font-weight:500;opacity:.85}
 .mb .gxt-menu.big{width:100%;min-height:62px}.mb .gxt-menu.big b{font-size:18px}
+
+/* painted cards, card backs and the music picker */
+.cart{display:block;width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #c7b183;background:#e9dcc0;flex:none}
+.cart.rowart{margin-right:8px}.row:has(>.cart),.job:has(>.cart){display:flex;align-items:center}
+.card.hasart{position:relative;padding-left:84px;min-height:84px}.card.hasart .cart.big{position:absolute;left:10px;top:10px;width:64px;height:64px}
+.scard .cart.big,.qart .cart.big{width:112px;height:112px;margin:0 auto 6px;border-radius:12px}.qart{text-align:center}
+.opt .cart.opt{display:inline-block;vertical-align:middle;width:40px;height:40px;margin:0 8px 0 0}
+.bfcard .cart.bfart{width:44px;height:44px;border-radius:10px}
+.decks{display:flex;flex-wrap:wrap;gap:10px}.dk{display:inline-grid;grid-template-columns:auto auto;align-items:center;gap:0 8px;font-size:.8rem}.dk .cb{width:34px;height:48px;border-radius:5px;border:1px solid #6b5230;background:#355 var(--back-img,none) center/cover;grid-row:span 2;box-shadow:2px 2px 0 rgba(0,0,0,.18),4px 4px 0 rgba(0,0,0,.1)}.dk b{font-size:1.05rem}.dk em{font-style:normal;color:#6b5a3c}
+.mtop{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.mvol{display:flex;align-items:center;gap:8px;flex:1 1 160px}.mvol input{flex:1;min-height:44px}
+.mrow2{margin-top:12px}.mrow2 h3{margin:0 0 6px;font:1.05rem var(--title)}.mrow2 small{font:.75rem system-ui;color:#2c7a4b}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #8a6a43;background:#fbf4e2;color:#2a1a0a;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
+.mchip.on{background:#d9a53a;border-color:#7a5413;font-weight:700}.mchip.prev{border-style:dashed}
 </style>
 </head>

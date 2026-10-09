@@ -193,7 +193,7 @@ Style block (paste in front of every art prompt for this game):
 
 ### Shipwreck Isle (`games/shipwreck-isle/`)
 
-**51 to make.** 50 card paintings and the default back are made but not in the game yet. Part 2 (discoveries, wrecks, characters, portraits, backs, tables, title and end screens) is still to make; Flow paused it with an "unusual activity" refusal.
+**51 to make.** (2026-10-09: the 50 card paintings, the default back and the Treblo music are now wired in; card list page `games/shipwreck-isle/cards.html`.) Part 2 (discoveries, wrecks, characters, portraits, backs, tables, title and end screens) is still to make; Flow paused it with an "unusual activity" refusal.
 
 Style block (paste in front of every art prompt for this game):
 
