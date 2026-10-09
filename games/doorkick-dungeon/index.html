@@ -995,6 +995,12 @@ html[data-timg]:not([data-gfx="low"]) .felt.paper::after{display:block;backgroun
 .winp{display:block;margin:0 auto 6px;width:84px;height:84px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 3px #f0c860,0 0 0 5px #2a170b,0 6px 14px rgba(0,0,0,.5)}
 .pbk>i{border-radius:6%/4.2%}
 .mine .who .ptokp{width:1.25em;height:1.25em;font-size:.78em;vertical-align:.05em;margin-right:.15em}
+/* landscape: the outer cards of the fan dipped 3 px below the screen edge; lift the whole fan */
+html.ph-l .mine .hand .card,html.ph-l .mine .hand .card:hover{translate:0 calc(var(--arc,0px) - 14px)}
+html.ph-l .mine .hand .card.play,html.ph-l .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 22px)}
+html.ph-l .mine .hand .card.bf-picked{translate:0 -30px!important}
+/* an open drawer (diary, cards, menu) sits over the board: the board under it takes no taps and shows no glowing targets */
+html:has(.gx-drawer.on) .gx-main{pointer-events:none}
 
 </style>
 <style>
@@ -1681,7 +1687,7 @@ const GX={key:'gx',open:null,
     return o && typeof o === 'object' ? o : null;
   }
   function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
-  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), skipped: !!(o && o.skipped), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
   function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
   // ------------------------------------------------------------------ geometry
   function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
@@ -1908,8 +1914,9 @@ const GX={key:'gx',open:null,
   }
   function skip() {
     if (!S) return; var g = cfg.game, ex = cfg.onExit;
-    mark(g, { open: 0, step: 0 }); teardown();
-    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+    // a skipped tutorial counts as seen: Story must not force it again
+    mark(g, { open: 0, step: 0, skipped: 1 }); teardown();
+    try { if (ex) ex({ skipped: true }); } catch (e) { console.warn('gxt onExit', e); }
   }
   function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
   // ------------------------------------------------------------------ start
@@ -1984,7 +1991,7 @@ const GX={key:'gx',open:null,
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
     index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
-    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
 })();
@@ -5787,18 +5794,22 @@ const MSLOTS=[['tavern','Menu'],['main','Dungeon'],['fight','Fight'],['victory',
 const MTITLE={'tavern-a':'Six Copper Cups','tavern-b':'Tavern of the Lazy Lantern','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
 const MDEF={tavern:'a',main:'b',fight:'a',victory:'b',defeat:'a'};
 SND.pick=Object.assign({},MDEF);try{Object.assign(SND.pick,JSON.parse(localStorage.getItem('dkd_mpick')||'{}'))}catch(e){}
-SND.res={};SND.wslot=null;SND.prev=null;
+SND.res={};SND.wslot=null;SND.prev=null;SND.last=null;SND.since=0;
+// 'all' = shuffle through every looping song (menu, dungeon and fight tracks), a new one every ~2.5 min
+const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 function musicName(slot){let c=SND.pick[slot]||MDEF[slot];if(c==='off')return '-';if(c==='classic'&&slot!=='victory'&&slot!=='defeat')return 'classic';
+  if(c==='all'){if(!SND.res[slot]){const pool=MALL.filter(k=>k!==SND.last);SND.res[slot]=pool[Math.floor(Math.random()*pool.length)]}return SND.res[slot]}
   if(c==='shuffle'){if(!SND.res[slot]){SND.sh=SND.sh||{};SND.sh[slot]=SND.sh[slot]===undefined?(Math.random()<.5?0:1):1-SND.sh[slot];SND.res[slot]=slot+'-'+'ab'[SND.sh[slot]]}return SND.res[slot]}
   return slot+'-'+(c==='b'?'b':'a')}
 function musicPick(slot,c){SND.pick[slot]=c;SND.res[slot]=null;try{localStorage.setItem('dkd_mpick',JSON.stringify(SND.pick))}catch(e){}
-  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musicName(slot))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle'&&c!=='all')try{GA.preload(musicName(slot))}catch(e){}
   if(SND.wslot===slot&&!SND.prev){SND.want=null;musicSync()}}
 function musicSync(){if(!window.GA||!SND.music||SND.prev)return;const w=musicWant();if(SND.wslot!==w[0]){SND.wslot=w[0];SND.res[w[0]]=null}
-  const n=musicName(w[0]);if(SND.want===n)return;SND.want=n;
+  else if(SND.pick[w[0]]==='all'&&!w[1]&&SND.since&&Date.now()-SND.since>MALL_MS)SND.res[w[0]]=null;
+  const n=musicName(w[0]);if(SND.want===n)return;SND.want=n;SND.since=Date.now();if(n!=='-')SND.last=n;
   if(n==='-'){GA.music(null,{fade:1});return}
   GA.music(n,{fade:w[1]?.6:1,once:!!w[1]});
-  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=SND.pick[nx];if(c!=='off'&&c!=='shuffle')GA.preload(musicName(nx))}catch(e){}},4000)}}
+  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=SND.pick[nx];if(c!=='off'&&c!=='shuffle'&&c!=='all')GA.preload(musicName(nx))}catch(e){}},4000)}}
 function musicPreview(slot){if(!window.GA||!SND.music||!SND.ctx||SND.wslot===slot)return;const n=musicName(slot);if(n==='-')return;
   clearTimeout(SND.prevT);SND.prev=slot;SND.want=null;GA.music(n,{fade:.5,once:true});
   SND.prevT=setTimeout(()=>{SND.prev=null;SND.want=null;musicSync();if(typeof renderMusic==='function')renderMusic()},8000)}
@@ -6463,7 +6474,7 @@ function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?dkPortrait(w.nm,'winp'):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
-  return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${typeof tutBtn==='function'?tutBtn('btn bigb'):''}${online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`}${online?'':introHTML(n,UI.mode||'F')}
+  return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick doors. Fight monsters. Stab friends.</p>${typeof tutBtn==='function'?tutBtn('btn bigb'):''}${online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`}${online?'':introHTML(n,UI.mode||'F')}
    <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online||UI.mode==='ai'?'':`<button class="btn learn ${UI.learn===true?'on':''}" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Teach me as I play</button>`}
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
@@ -6496,13 +6507,14 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
   if(a==='music'){renderMusic();GX.show('dkMusic');return}
+  if(a==='mall'){const on=MLOOPS.every(k=>SND.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?MDEF[k]:'all'));renderMusic();return}
   if(a==='mpick'){musicPick(t.dataset.s,t.dataset.c);renderMusic();return}
   if(a==='mprev'){musicPreview(t.dataset.s);renderMusic();return}
   if(a==='mprevx'){musicPreviewStop();renderMusic();return}
   if(a==='mmus'&&typeof toggleMusic==='function'){toggleMusic();renderMusic();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
   if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
-  if(t.dataset.opp!=null&&t.dataset.card===undefined){if(document.documentElement.classList.contains('ph'))return;UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
+  if(t.dataset.opp!=null&&t.dataset.card===undefined){UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
   if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);if(G){G.learn=UI.learn===true&&t.dataset.start!=='ai';render()}return}
   if(t.dataset.card!==undefined&&G){const id=+t.dataset.card;const me=viewSeat();
     if(t.closest('.dlg')||t.closest('#dkCard')){return}
@@ -6531,10 +6543,12 @@ function renderMusic(){const b=$('#dkMusicBody');if(!b||typeof MSLOTS==='undefin
   const rows=MSLOTS.map(([k,nm])=>{const cur=SND.pick[k],act=SND.wslot===k&&on&&cur!=='off';
     const ch=[['a'],['b']].map(([v])=>`<button class="mchip${cur===v?' on':''}" data-a="mpick" data-s="${k}" data-c="${v}">${MTITLE[k+'-'+v]}</button>`);
     if(k!=='victory'&&k!=='defeat')ch.push(`<button class="mchip${cur==='classic'?' on':''}" data-a="mpick" data-s="${k}" data-c="classic">Classic</button>`);
-    ch.push(`<button class="mchip${cur==='shuffle'?' on':''}" data-a="mpick" data-s="${k}" data-c="shuffle">⇄ Shuffle</button>`,`<button class="mchip${cur==='off'?' on':''}" data-a="mpick" data-s="${k}" data-c="off">Off</button>`);
+    ch.push(`<button class="mchip${cur==='shuffle'?' on':''}" data-a="mpick" data-s="${k}" data-c="shuffle">⇄ Shuffle</button>`);
+    if(MLOOPS.includes(k))ch.push(`<button class="mchip${cur==='all'?' on':''}" data-a="mpick" data-s="${k}" data-c="all">⇄ All songs</button>`);
+    ch.push(`<button class="mchip${cur==='off'?' on':''}" data-a="mpick" data-s="${k}" data-c="off">Off</button>`);
     const pv=SND.prev===k?`<button class="mchip prev" data-a="mprevx" data-s="${k}">■ Stop preview</button>`:(!act&&cur!=='off'&&on?`<button class="mchip prev" data-a="mprev" data-s="${k}">▶ Preview</button>`:'');
     return `<div class="mrow2"><h3>${nm}${act?' <small>playing now</small>':''}</h3><div class="mchips">${ch.join('')}${pv}</div></div>`}).join('');
-  setHTML(b,`<div class="music"><div class="mtop"><button class="mchip${on?' on':''}" data-a="mmus">${ic('music')} Music: ${on?'on':'off'}</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div>${rows}</div>`)}
+  setHTML(b,`<div class="music"><div class="mtop"><button class="mchip${on?' on':''}" data-a="mmus">${ic('music')} Music: ${on?'on':'off'}</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div><div class="mtop"><button class="mchip${MLOOPS.every(k=>SND.pick[k]==='all')?' on':''}" data-a="mall">⇄ Shuffle all songs</button></div>${rows}</div>`)}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
 GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
 $('#speedbtn').innerHTML=SPEEDN(UI.speed);if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
@@ -7287,10 +7301,10 @@ window.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest)return;
   const ch=t.closest('[data-opp]');if(ch&&BF.pick==null&&!BF.ask){GXT.act({type:'tap',what:'chip'});tutBlock(e)}
 },true);
 // ---------------------------------------------------------------- the offer to first-time players, and the Skip/exit hooks
-function tutOffer(btn){let d=document.getElementById('tutoffer');if(d)d.remove();d=document.createElement('div');d.id='tutoffer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Learn the game');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in 5 minutes, one tap at a time. Or jump straight in.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+function tutOffer(btn){const hadPulse=btn.classList.contains('pulse');btn.classList.remove('pulse');let d=document.getElementById('tutoffer');if(d)d.remove();d=document.createElement('div');d.id='tutoffer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Learn the game');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in 5 minutes, one tap at a time. Or jump straight in.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b pulse" data-tutoffer="play">Just play</button></div></div>';
   document.body.appendChild(d);
-  d.addEventListener('click',ev=>{const b=ev.target.closest('[data-tutoffer]');if(!b)return;ev.stopPropagation();const k=b.dataset.tutoffer;d.remove();try{localStorage.setItem('dkd_offer','1')}catch(x){}
+  d.addEventListener('click',ev=>{const b=ev.target.closest('[data-tutoffer]');if(!b)return;ev.stopPropagation();const k=b.dataset.tutoffer;d.remove();if(hadPulse)btn.classList.add('pulse');try{localStorage.setItem('dkd_offer','1')}catch(x){}
     if(k==='learn')tutStart();else{UI._offerOk=1;try{btn.click()}finally{UI._offerOk=0}}})}
 
 </script>

@@ -203,3 +203,9 @@ html[data-timg]:not([data-gfx="low"]) .felt.paper::after{display:block;backgroun
 .winp{display:block;margin:0 auto 6px;width:84px;height:84px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 3px #f0c860,0 0 0 5px #2a170b,0 6px 14px rgba(0,0,0,.5)}
 .pbk>i{border-radius:6%/4.2%}
 .mine .who .ptokp{width:1.25em;height:1.25em;font-size:.78em;vertical-align:.05em;margin-right:.15em}
+/* landscape: the outer cards of the fan dipped 3 px below the screen edge; lift the whole fan */
+html.ph-l .mine .hand .card,html.ph-l .mine .hand .card:hover{translate:0 calc(var(--arc,0px) - 14px)}
+html.ph-l .mine .hand .card.play,html.ph-l .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 22px)}
+html.ph-l .mine .hand .card.bf-picked{translate:0 -30px!important}
+/* an open drawer (diary, cards, menu) sits over the board: the board under it takes no taps and shows no glowing targets */
+html:has(.gx-drawer.on) .gx-main{pointer-events:none}

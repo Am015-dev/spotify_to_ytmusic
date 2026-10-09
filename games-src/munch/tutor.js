@@ -187,8 +187,8 @@ window.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest)return;
   const ch=t.closest('[data-opp]');if(ch&&BF.pick==null&&!BF.ask){GXT.act({type:'tap',what:'chip'});tutBlock(e)}
 },true);
 // ---------------------------------------------------------------- the offer to first-time players, and the Skip/exit hooks
-function tutOffer(btn){let d=document.getElementById('tutoffer');if(d)d.remove();d=document.createElement('div');d.id='tutoffer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Learn the game');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in 5 minutes, one tap at a time. Or jump straight in.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+function tutOffer(btn){const hadPulse=btn.classList.contains('pulse');btn.classList.remove('pulse');let d=document.getElementById('tutoffer');if(d)d.remove();d=document.createElement('div');d.id='tutoffer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Learn the game');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in 5 minutes, one tap at a time. Or jump straight in.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b pulse" data-tutoffer="play">Just play</button></div></div>';
   document.body.appendChild(d);
-  d.addEventListener('click',ev=>{const b=ev.target.closest('[data-tutoffer]');if(!b)return;ev.stopPropagation();const k=b.dataset.tutoffer;d.remove();try{localStorage.setItem('dkd_offer','1')}catch(x){}
+  d.addEventListener('click',ev=>{const b=ev.target.closest('[data-tutoffer]');if(!b)return;ev.stopPropagation();const k=b.dataset.tutoffer;d.remove();if(hadPulse)btn.classList.add('pulse');try{localStorage.setItem('dkd_offer','1')}catch(x){}
     if(k==='learn')tutStart();else{UI._offerOk=1;try{btn.click()}finally{UI._offerOk=0}}})}
