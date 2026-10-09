@@ -74,23 +74,23 @@ GX_names=(f=>function(){return PA.on?PA_nm():f.apply(this,arguments)})(GX_names)
 GX_setName=(f=>function(g,n){if(!PA.on)return f.apply(this,arguments);const a=PA_nm();if(n==null)delete a[g];else a[g]=String(n).slice(0,24);try{localStorage.setItem(PA.KN,JSON.stringify(a))}catch(e){}})(GX_setName);
 function PA_redo0(){try{if(typeof G8!=='undefined'&&G8.redo)G8.redo.length=0}catch(e){}}
 function PA_enter(){if(PA.on||!GB.mesh||!GB.d)return 0;if(!GB_.bk)GB_enter();if(SL.carry)SL_cancel();if(GS.held)GS_drop();SL_set([]);
- PA.st={d:GB.d,undo:GB_.undo,cam:[GB_.yaw,GB_.pit,GB_.dist],b:[GB_N0,GB_N1,GB_Z0,GB_Z1],hid:[...GX.hid]};PA.on=1;PA_redo0();
+ PA.st={d:GB.d,undo:GB_.undo,cam:[GB_.yaw,GB_.pit,GB_.dist],b:[GB_N0,GB_N1,GB_Z0,GB_Z1],hid:[...GX.hid],L:typeof B25!=='undefined'?B25.L:null};PA.on=1;PA_redo0();
  GX.hid.clear();GX.open=0;GX.act=0;GX.ren=0;GB_N0=-PA_N;GB_N1=PA_N-1;GB_Z0=-PA_N;GB_Z1=PA_N-1;
  GB.d=Object.assign({},PA.st.d,{bricks:PA_cvGet(),bp:1,cv:1});GB_.undo=[];PA.px=0;PA.pz=0;
- GB_scanBase();GB_gridMesh();GB_refresh();GB_.yaw=Math.PI*.78;GB_.pit=.82;GB_.dist=16;GB_.tool='add';
+ GB_scanBase();GB_gridMesh();GB_refresh();GB_.yaw=Math.PI*.78;GB_.pit=.7;GB_.dist=12;GB_.tool='add';try{B25_set(0)}catch(e){}
  GX_sfx('brick');GS_tip('🧩 CANVAS · build here, then ⛓ GROUP → 💾 SAVE PART');PA_ui();PA_cards(1);return 1}
 function PA_exit(){if(!PA.on)return 0;if(SL.carry)SL_cancel();if(GS.held)GS_drop();SL_set([]);if(GB.d&&GB.d.cv)PA_cvPut(GB_list());const S=PA.st;
  PA.on=0;PA.st=null;PA_redo0();[GB_N0,GB_N1,GB_Z0,GB_Z1]=S.b;GB.d=S.d;GB_.undo=S.undo;[GB_.yaw,GB_.pit,GB_.dist]=S.cam;PA.px=0;PA.pz=0;
  GX.hid.clear();for(const g of S.hid)GX.hid.add(g);GX.open=0;GX.act=0;GX.ren=0;
- if(GB.mesh){GB_refresh();GB_scanBase();GB_gridMesh();GB_refresh()}PA_ui();PA_cards(1);return 1}
+ if(GB.mesh){GB_refresh();GB_scanBase();GB_gridMesh();GB_refresh();try{if(S.L!=null)B25_set(S.L)}catch(e){}}PA_ui();PA_cards(1);return 1}
 GB_exit=(f=>function(){if(PA.on)PA_exit();return f.apply(this,arguments)})(GB_exit);
 gbClose=(f=>function(){if(PA.on)PA_exit();return f.apply(this,arguments)})(gbClose);
 GNB_new=(f=>function(){if(PA.on)PA_exit();return f.apply(this,arguments)})(GNB_new);
 GB_enter=(f=>function(){const r=f.apply(this,arguments);PA_ui();return r})(GB_enter);
 // camera: further out on the canvas (zoom range ×1.65) and a pan target
 GB_cam=(f=>function(){if(!PA.on)return f.apply(this,arguments);const d=GB_.dist;GB_.dist=d*PA_K;try{f.apply(this,arguments)}finally{GB_.dist=d}
- const C=GB.cam;C.position.x+=PA.px;C.position.z+=PA.pz;C.lookAt(PA.px,.5,PA.pz);C.updateMatrixWorld()})(GB_cam);
-function PA_pan(dx,dy){const C=GB.cam,cvs=$('#gbC');if(!C||!cvs)return;const d=C.position.distanceTo(V3(PA.px,.5,PA.pz)),k=d*2*Math.tan(C.fov*Math.PI/360)/Math.max(200,cvs.clientHeight),
+ const C=GB.cam;C.position.x+=PA.px;C.position.z+=PA.pz;C.updateMatrixWorld()})(GB_cam);
+function PA_pan(dx,dy){const C=GB.cam,cvs=$('#gbC');if(!C||!cvs)return;const d=GB_.dist*PA_K*1.3,k=d*2*Math.tan(C.fov*Math.PI/360)/Math.max(200,cvs.clientHeight),
  s=Math.sin(GB_.yaw),c=Math.cos(GB_.yaw),sp=1/Math.max(.45,Math.sin(GB_.pit));let lim=PA_N*GB_U;try{const v=new THREE.Vector3();GB.mesh.userData.m.getWorldScale(v);lim*=v.x}catch(e){}
  PA.px=clamp(PA.px-c*dx*k-s*dy*k*sp,-lim,lim);PA.pz=clamp(PA.pz+s*dx*k-c*dy*k*sp,-lim,lim)}
 {const v=$('#gbx .gbv'),cvs=$('#gbC'),P=new Map();
@@ -109,7 +109,9 @@ function PA_pan(dx,dy){const C=GB.cam,cvs=$('#gbC');if(!C||!cvs)return;const d=C
 function PA_ui(){const X=$('#gbx');if(!X)return;let E=$('#paCvB');if(!E){const v=$('#gbx .gbv');if(!v)return;E=document.createElement('div');E.id='paCvB';
   E.innerHTML='<b>🧩 CANVAS 32×32</b><button data-pa="back"><i>←</i>CAR</button>';v.appendChild(E);E.addEventListener('pointerdown',e=>e.stopPropagation());
   E.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();GX_sfx('pick');PA_exit();GS_tip('Back to your car · MY PARTS has your parts')})}
- E.hidden=!(PA.on&&GB_.bk&&!X.hidden);X.classList.toggle('paOn',!!(PA.on&&GB_.bk))}
+ const busy=(typeof SL!=='undefined'&&(SL.carry||SL.sel.length))||GS.held;E.hidden=!(PA.on&&GB_.bk&&!X.hidden)||!!busy;X.classList.toggle('paOn',!!(PA.on&&GB_.bk))}
+GS_ui=(f=>function(){const r=f.apply(this,arguments);PA_ui();return r})(GS_ui);
+SL_ui=(f=>function(){const r=f.apply(this,arguments);PA_ui();return r})(SL_ui);
 GNB_pick=(f=>function(){const r=f.apply(this,arguments);const R=$('#gnbP .gnbR');if(R&&!R.querySelector('[data-pa]')){const b=document.createElement('button');b.dataset.pa='cv';
   b.innerHTML='<i>🧩</i><b>BUILD CANVAS</b><small>empty 32×32 plate · build parts</small>';b.addEventListener('click',()=>{setTimeout(PA_enter,0)});R.appendChild(b)}return r})(GNB_pick);
 
@@ -168,7 +170,7 @@ GX_ui=(f=>function(){const r=f.apply(this,arguments);const E=$('#gxG'),A=E&&!E.h
   R.innerHTML=`<button data-pa="save"><i>💾</i>SAVE PART</button>${PA.on?'':'<button data-pa="tocv"><i>🧩</i>TO CANVAS</button>'}`;A.after(R);
   R.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();if(b.dataset.pa==='save')PA_save(g);else PA_toCv(g)})}return r})(GX_ui);
 {const st=document.createElement('style');st.textContent=`
-#paCvB{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--r2hh,52px) + 6px);z-index:4;display:flex;align-items:center;gap:8px;padding:3px 3px 3px 12px;border-radius:14px;border:2px solid #141413;background:#ffd400;box-shadow:0 3px 0 #141413;font:italic 900 13px system-ui;color:#141413;white-space:nowrap}
+#paCvB{position:absolute;left:calc(var(--r2rw,72px) + 8px);top:calc(var(--r2hh,52px) + 6px);z-index:4;display:flex;align-items:center;gap:8px;padding:3px 3px 3px 12px;border-radius:14px;border:2px solid #141413;background:#ffd400;box-shadow:0 3px 0 #141413;font:italic 900 13px system-ui;color:#141413;white-space:nowrap}
 #paCvB[hidden]{display:none}#paCvB button{height:40px;min-width:72px;border-radius:10px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 13px system-ui;display:flex;align-items:center;gap:4px;padding:0 10px;cursor:pointer}#paCvB button i{font-style:normal;font-size:16px}
 #gbx.r2 #gbBkPc .gbPc.paC{background:#fff}#gbx.r2 #gbBkPc .gbPc.paC img{width:50px;height:36px;object-fit:contain;display:block}#gbx.r2 #gbBkPc .gbPc.paC i{font-style:normal;font-size:22px}
 #gbx.r2 #gbBkPc .gbPc.paCv{background:#ffd400}#gbx.r2 #gbBkPc .gbPc.paDel{background:#ff8a8a}
