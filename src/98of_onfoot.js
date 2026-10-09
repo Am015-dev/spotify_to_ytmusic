@@ -177,8 +177,8 @@ if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foo
 // borrowed body: lift ud.m so its lowest tyre point sits CR_TYRE_Y above the road (same rule as CR_carPose for real wheels)
 const OF_v3=new THREE.Vector3();
 function OF_lift(){const C=OF.cur;if(C.own||C.lowL==null||!pl||pl.air||(pl.boatK||0)>.5)return;const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);OF_v3.set(0,C.lowL,0).applyMatrix4(ud.m.matrixWorld);
-  // lowest tyre point under each wheel corner (pitch/roll included) vs the ground there: the lowest corner gap is held at CR_TYRE_Y (no float on a crowned road or by a kerb)
-  let lift=-1e9;const W=C.wb;if(W){for(let i=0;i<4;i++){OF_v3.set(i&1?W.max.x:W.min.x,C.lowL,i&2?W.max.z:W.min.z).applyMatrix4(ud.m.matrixWorld);lift=Math.max(lift,groundAt(OF_v3.x,OF_v3.z,OF_v3.y+1)+CR_TYRE_Y-OF_v3.y)}}
+  // lowest tyre point under each wheel's contact patch (box corner moved in by the tyre radius) (pitch/roll included) vs the ground there: the lowest corner gap is held at CR_TYRE_Y (no float on a crowned road or by a kerb)
+  let lift=-1e9;const W=C.wb;if(W){for(let i=0;i<4;i++){const r=Math.min((W.max.y-W.min.y)/2,(W.max.z-W.min.z)/4);OF_v3.set(i&1?W.max.x:W.min.x,C.lowL,i&2?W.max.z-r:W.min.z+r).applyMatrix4(ud.m.matrixWorld);lift=Math.max(lift,groundAt(OF_v3.x,OF_v3.z,OF_v3.y+1)+CR_TYRE_Y-OF_v3.y)}}
   else lift=groundAt(RO.x,RO.z,RO.y+1)+CR_TYRE_Y-OF_v3.y;lift=clamp(lift,-.4,.4);ud.m.position.y+=lift/(pl.mesh.scale.y||1);ud.m.updateMatrixWorld(true)}
 // --- per-frame hooks (outermost wrappers: none of the car-only wrappers run on foot)
 roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen)OF_step(dt);return}
