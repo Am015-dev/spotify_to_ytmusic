@@ -15,6 +15,7 @@ s=open(p,encoding='utf8').read(); j=s.find('>',s.find('<body'))+1
 open(p,'w',encoding='utf8').write(s[:j]+open(b,encoding='utf8').read()+'</body></html>')
 PY
 cp "$OUT/km.js" "$W/$D/km.js"
+[ -f "$OUT/tune.json" ] && cp "$OUT/tune.json" "$W/$D/tune.json"   # published TUNE values (docs/TUNE.md), optional
 cd "$W"; git add "$D"
 git commit -q -m "$MSG" -m "$(printf "%b" "${DEPLOY_TRAILER:-}")"
 git push -q origin "HEAD:$BR"; echo "pushed $(git rev-parse --short HEAD)"

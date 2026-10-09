@@ -1,0 +1,1 @@
+const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.argv[3]);console.log(await T.ev(()=>__g9ev(`JSON.stringify({cats:CR_CATS,pc:Object.entries(GB_PC).map(([k,p])=>k+':'+p.n+':'+p.w+'x'+p.d+'x'+p.h+':'+(p.cat||'Deco')+(p.hide?':H':'')).join(' | '),N:[GB_N0,GB_N1,GB_MAX,GB_CAP,GB_U,GB_PH]})`)));await T.close()})();

@@ -1,0 +1,2 @@
+fra HITCH {"build":{"ms":99883,"slices":119,"slMax":32,"sl50":0,"sl100":0,"pixN":18,"pixMs":681,"pixMax":615,"tPix":687,"tPrep":272,"cells":740,"err":null},"framesDuringBuild":{"n":121,"worst":9242,"p50":23,"over50":18,"over100":14},"framesAfter":{"n":39,"worst":7001,"p50":16,"over50":3,"over100":3},"first10After":[42,17,17,16,11,14,18,15,12,7001]}
+errors 0 

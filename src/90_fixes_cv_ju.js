@@ -22,7 +22,7 @@ if(!OB.off)FL_terr=function(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=R
   return raw};
 // ---- fix 2 · contact tests: the old checks were circles (props: r+2.1 m, traffic: 5 m) so passing a lamp, bin or a car in the next lane
 // 1–3 m away "smashed" it with a full brick burst. Now: the car's real footprint (oriented box) must touch the prop / the other car's box.
-const OB_HW=1.25,OB_HL=2.45;
+let OB_HW=1.25,OB_HL=2.45; // let: 98bc_bigcars.js sizes them to the player car
 function OB_touch(px,pz,r,ox=RO.x,oz=RO.z,oh=RO.h){const dx=px-ox,dz=pz-oz,s=Math.sin(oh),c=Math.cos(oh),a=dx*s+dz*c,b=dx*c-dz*s;
   const qa=Math.max(0,Math.abs(a)-OB_HL),qb=Math.max(0,Math.abs(b)-OB_HW);const g=Math.hypot(qa,qb),ok=g<r+.25;if(ok)OB.hit={k:'prop',f:OB.fr};else OB.pm.add(px*7919+pz);return ok||OB.off}
 function OB_obb(ax,az,ah,aw,al,bx,bz,bh,bw,bl){const A=[[Math.sin(ah),Math.cos(ah)],[Math.cos(ah),-Math.sin(ah)]],B=[[Math.sin(bh),Math.cos(bh)],[Math.cos(bh),-Math.sin(bh)]],d=[bx-ax,bz-az];
@@ -206,11 +206,11 @@ function OC_altFix(){const R=LM_BY['Römer'],K=LM_BY['Kaiserdom'];if(!R||!K)retu
 {const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r}}
 // ---------- 4 · height audit (both cities): props, traffic, buildings (storeys), named landmarks, floating / buried
 const OC_REAL={Commerzbank:259,'Main Tower':240,Messeturm:257,'Athens Tower':103,Lycabettus:277,Parthenon:13.72+1.53+3.7};
-const OC_RANGE={tree:[6,12],lamp:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
+const OC_RANGE={tree:[6,12],lamp:CID==='ath'?[4.5,6.5]:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
 const OC_TREES=['tree','tree2','tree3','CE_pine','CE_cypress','CE_olive'],OC_CARS=['car','car2','car3','car4','CE_car','CE_car2','CE_taxi'];
 function OC_audit(){const D=HUB.ptypes,T=[],out={rows:T,bad:[],float:0,buried:0,fl:[],bu:[]},hgt=g=>{g.computeBoundingBox();return g.boundingBox.max.y-g.boundingBox.min.y};
   const row=(cls,name,v,lo,hi,real)=>{const ok=v>=lo-1e-6&&v<=hi+1e-6;T.push({cls,name,v:+v.toFixed(2),lo,hi,real,ok});if(!ok)out.bad.push(cls+':'+name+'='+v.toFixed(2))};
-  const used=t=>HUB.props.some(p=>p.t===t);for(const t of OC_TREES)if(D[t]&&used(t))row('tree',t,hgt(D[t].g),...OC_RANGE.tree);if(D.lamp)row('lamp','lamp',hgt(D.lamp.g),...OC_RANGE.lamp,8);
+  const used=t=>HUB.props.some(p=>p.t===t);for(const t of OC_TREES)if(D[t]&&used(t))row('tree',t,hgt(D[t].g),...OC_RANGE.tree);if(D.lamp)row('lamp','lamp',hgt(D.lamp.g),...OC_RANGE.lamp,CID==='ath'?5.5:8);
   for(const t of OC_CARS)if(D[t]&&used(t))row('car',t,hgt(D[t].g),...OC_RANGE.car,1.5);OC_traffic();for(const k in HUB.cim||{}){const g=HUB.cim[k].geometry;g.computeBoundingBox();const l=g.boundingBox.max.z-g.boundingBox.min.z;const w=g.boundingBox.max.x-g.boundingBox.min.x;if(w<1.2)row('two-wheeler','traffic#'+k+' (scooter + rider)',hgt(g),1.3,2,1.7);else if(l<5.2)row('car','traffic#'+k,hgt(g),...OC_RANGE.car,1.5);else row('heavy','traffic#'+k+' (van/truck/bus)',hgt(g),1.9,4.3,3.2)}
   // buildings: Athens instanced bodies (storeys by style), Frankfurt colliders (Altstadt storeys, named towers)
   if(CID!=='fra'){const st={},M=new THREE.Matrix4(),P=V3(),Q=new THREE.Quaternion(),S=V3();HUB.grp.traverse(o=>{const k=o.userData&&o.userData.athB;if(!o.isInstancedMesh||!['poly','neo','plaka'].includes(k))return;const fh=k==='poly'?3.1:3.3;
@@ -468,8 +468,8 @@ roamCam=(f=>function(dt){const c=camera;c.position.sub(JU.co);c.fov-=JU.cf;JU.co
   if(JU.la)c.rotateOnWorldAxis(JU.Y,JU.la);
   JU.cf=JU.fx+JU.kick*5;c.fov+=JU.cf;c.updateProjectionMatrix();
   // speed blur + speed lines: capped at the mission limits everywhere (uSpeed ≤ .25, uBoost ≤ .15, lines ≤ .3 in missions)
-  const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K-U.uBoost.value)*e;
-  {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
+  const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K*TUNE.fxGlow-U.uBoost.value)*e;
+  {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85*TUNE.fxLines:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
 // ---- wind rises with speed relative to the roam top speed, a low road rumble under it (one extra noise loop, made once)
 AU.engine=(f=>function(s,thr,on){f.call(this,s,thr,on);if(!JU.on||!this.a||state!=='roam'||!this.wind)return;const t=this.a.currentTime,x=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.3);
   if(!this.juR){try{const a=this.a,src=a.createBufferSource();src.buffer=this.nb;src.loop=true;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=110;const g=a.createGain();g.gain.value=0;src.connect(lp);lp.connect(g);g.connect(this.fx);src.start();this.juR=g}catch(e){this.juR={gain:{setTargetAtTime(){}}}}}
@@ -492,3 +492,19 @@ window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.s
   aimTraffic:(v=38)=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>30){bd=d;b=c}}if(!b)return null;const N=HUB.nodes,A=N[b.a],B=N[b.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L;
     RO.x=b.x-dx*26;RO.z=b.z-dz*26;RO.y=groundAt(RO.x,RO.z,b.y+3);RO.vy=0;RO.h=RO.vh=Math.atan2(dx,dz);RO.yr=0;RO.v=v;camSnap=true;return{x:b.x,z:b.z}}};
 
+// ---- W12 · car paint reads as LEGO colours (Bright Red read pink-magenta, blue lavender, yellow pale). Two causes, measured on a side view:
+// 1) the player's glossy paint mirrored the sky environment at envMapIntensity 1.2 (traffic is capped at .6): base specular + clearcoat add
+//    a blue-white veil, which in sRGB lifts the near-zero channels of a saturated paint (red 208,23,18 → 245,51,69). Env off → 224,6,6.
+// 2) the OutputPass Neutral tone map desaturates every pixel whose brightest channel passes ~0.76 toward white; sunlit paint gets there.
+// Fix, car materials only (world look unchanged): player paint env capped at .6 like traffic, and a hue-preserving soft knee before the tone
+// map keeps a saturated paint's brightest channel under 0.76; white/grey highlights (low saturation) are left to the tone map as before.
+const W12P={t:0,K:.55,M:.76,env:.6};
+function W12_paint(m){if(!m||m.userData.w12||!(m.isMeshStandardMaterial))return;m.userData.w12=1;const ob=m.onBeforeCompile,pk=m.customProgramCacheKey;
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.fragmentShader=sh.fragmentShader.replace('#include <opaque_fragment>',
+   `#include <opaque_fragment>\n{vec3 w12c=gl_FragColor.rgb;float w12p=max(w12c.r,max(w12c.g,w12c.b));if(w12p>${W12P.K.toFixed(3)}){float w12d=${(W12P.M-W12P.K).toFixed(3)},w12s=clamp((w12p-min(w12c.r,min(w12c.g,w12c.b)))/w12p*1.4,0.,1.);
+     gl_FragColor.rgb=w12c*mix(1.,(${W12P.K.toFixed(3)}+w12d*(1.-exp(-(w12p-${W12P.K.toFixed(3)})/w12d)))/w12p,w12s);}}`)};
+  m.customProgramCacheKey=function(){const cur=this.onBeforeCompile;this.onBeforeCompile=ob;const k=pk.call(this);this.onBeforeCompile=cur;return k+'|w12'};m.needsUpdate=true}
+function W12_cars(){try{if(typeof ART10!=='undefined')ART10.mats.forEach(W12_paint)}catch(e){}
+  if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material)){W12_paint(m);if(W12P.env&&m&&m.vertexColors&&!m.transparent&&m.roughness>=.1&&m.userData.a10e!==undefined&&m.userData.a10e>W12P.env){m.userData.a10e=W12P.env;m.envMapIntensity=Math.min(m.envMapIntensity,W12P.env)}}});
+  if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(!im)continue;for(const m of[].concat(im.material))W12_paint(m);const u=im.userData||{};for(const q of[u.w,u.g])if(q)for(const m of[].concat(q.material))W12_paint(m)}}
+roamStep=(f=>function(dt){f(dt);const t=performance.now();if(t-W12P.t>500){W12P.t=t;W12_cars()}})(roamStep);
