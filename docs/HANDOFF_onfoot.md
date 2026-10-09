@@ -36,3 +36,16 @@ Shots `qa_foot/<mode>_<city>_{1_drive_exitbtn,2_standing,3_walking,4_enter_promp
 - A borrowed traffic car has no driver figure (traffic geometry has none).
 - On foot, events/missions (`chStep`) are paused; the M1 weapon does not fire on foot.
 - Test variance: traffic is random; a stopped traffic car in the walker's path costs ~0.3 s of "stuck" per encounter.
+
+## Status (2026-10-09)
+- Reviewer PASS (QUICK, f02c034). DEPLOY sent to the coordinator: `alex/od-p1` a773a592, `out/v89a` (built on live v88y; od-garage12 merged; od-quick not shipped/merged).
+- Review fixes: the door button (EXIT/ENTER) is placed left of BOOST/JUMP (`OF_doorPlace`, gaps 14/20 px at 852×393); own-car collider from measured extents (`OF_ext`);
+  foot camera rises 1.6 m over a parked car behind the fig instead of pulling in (`OF.camU`).
+- Last results: qa_foot_q (phone+desk × fra+ath, 65/65 PASS). Earlier desk_ath stuck 7.1 / 9.3 % (keys pinned on one Athens building) dropped to 0.9 % after the camera change; watch it.
+
+## P2 next steps (car-jacking, +1★; plan §4 P2)
+- ENTER near a MOVING/stopped traffic car (`OF_cars` kind 'traf'): stop it (`c.hitT`, `c.cv=0`), driver minifig hops out (`GAR_fig` with `GAR_riv` colours), "HEY!" via `feed()`, runs off; then reuse the body swap in `OF_finishEnter` (k:'park' path).
+- Athens: make `CE_car*` prop cars enterable (instanced props in `HUB.pgrid`, `p.im`): same one-instance body lift + `OF_lift`; mark the prop dead.
+- Borrowed cars: add a seated driver (GAR_fig sit pose) to the lifted body.
+- Stars: `WNT_` module (P4) owns the wanted level; P2 only increments a counter and shows ★ in the HUD line.
+- Keep the outermost-wrapper rule: on foot nothing car-only runs; add new per-frame work inside `OF_step`.
