@@ -33,6 +33,12 @@ function fitStrip(n, W, H, baseW) {
   const cw = 30, ch = 42, st = cw * 0.42, per = Math.max(1, Math.floor((W - cw) / st) + 1);
   return { cw, ch, rows: Math.ceil(n / per), per, step: st };
 }
+// the hand and my city can be tucked into one thin bar (tap to raise them again); they stay up whenever a card of mine is a target
+function handHidden() {
+  if (!UI.handHide || !G || G.phase === 'over' || (UI.cfg && UI.cfg.tutorial) || document.documentElement.classList.contains('ph-l')) return false;
+  if (innerWidth >= innerHeight) return false;
+  try { return !G.q && !myMoves().some(m => m.type === 'play' || String(tgOf(m)).startsWith('d:')); } catch (e) { return false; }
+}
 function boardLayout(W, H) {
   const wide = W >= H * 1.0 || (document.documentElement.classList.contains('ph-l'));
   const tall = !wide, g = 2, pad = 4;
@@ -47,11 +53,12 @@ function boardLayout(W, H) {
   if (tall) {
     // bands from the top: scores, event pennants, 2 rows of basic places (1 row when short), forest/haven/road, the meadow bench, my stock; the
     // table under the picture: my city strip, my fanned hand, the action row. Every band shrinks until the meadow cards are readable.
+    const col = handHidden();
     const meas = (mode, t) => {
       const L = (a, b) => Math.round(b + (a - b) * t), tight = mode === 'tight';
-      const m = { mode, t, chip: L(36, 30), ev: L(46, 30), br: tight ? L(46, 36) : L(58, 42), r3: L(60, 40), res: L(34, 26), hand: L(100, 60), city: L(46, 32), acts: L(46, 40), rg: tight ? 0 : 7, sg: tight ? 3 : 5, rows: tight ? 1 : 2 };
+      const m = { mode, t, chip: L(36, 30), ev: L(46, 30), br: tight ? L(46, 36) : L(58, 42), r3: L(60, 40), res: L(34, 26), hand: col ? 0 : L(100, 60), city: col ? 0 : L(46, 32), bar: col ? 28 : 0, acts: L(46, 40), rg: tight ? 0 : 7, sg: tight ? 3 : 5, rows: tight ? 1 : 2 };
       let y = 3 + m.chip + m.sg; m.evY = y; y += m.ev + m.sg; m.bY = y; y += m.rows * m.br + (m.rows - 1) * m.rg + m.sg; m.r3Y = y; y += m.r3 + m.sg + 3; m.mTop = y;
-      let yb = H - pad; m.actsY = yb - m.acts; yb = m.actsY - 3; m.handY = yb - m.hand; yb = m.handY - 3; m.cityY = yb - m.city; m.sceneB = m.cityY - 3;
+      let yb = H - pad; m.actsY = yb - m.acts; yb = m.actsY - 3; if (col) { m.barY = yb - m.bar; yb = m.barY - 3; } m.handY = yb - m.hand; if (!col) yb = m.handY - 3; m.cityY = yb - m.city; m.sceneB = m.cityY - 3;
       m.resY = m.sceneB - 3 - m.res; m.mBot = m.resY - 3;
       const bp = 5, avail = m.mBot - m.mTop - 2 * bp - 4; m.ch = avail / 2; m.cw = Math.min(104, m.ch / CARD_AR, (W - 2 * pad - 2 * bp - 3 * 6) / 4);
       return m;
@@ -85,8 +92,8 @@ function boardLayout(W, H) {
     R.path = []; rowsArr.forEach((row, k) => (k % 2 ? row.slice().reverse() : row).forEach(t => R.path.push({ x: t.x + t.w / 2, y: t.y + t.h / 2 })));
     R.scene = { x: 0, y: 0, w: W, h: m.sceneB }; R.tbl = { x: 0, y: m.sceneB, w: W, h: H - m.sceneB };
     R.city = { x: pad, y: m.cityY, w: W - 2 * pad, h: m.city }; R.hand = { x: pad, y: m.handY, w: W - 2 * pad, h: m.hand }; R.acts = { x: pad, y: m.actsY, w: W - 2 * pad, h: m.acts };
-    R.slots = true; R.fan = true;
-    const cw0 = Math.min(40, Math.floor((m.city - 6) / CARD_AR)), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
+    R.slots = true; R.fan = true; R.col = col; if (col) R.hbar = { x: pad, y: m.barY, w: W - 2 * pad, h: m.bar };
+    const cw0 = Math.max(10, Math.min(40, Math.floor((m.city - 6) / CARD_AR))), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
     R.fanDrop = tight ? 7 : 9;
     R.strip = { hand: fitStrip(nHand, R.hand.w - 22, R.hand.h - R.fanDrop - 3, 70), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
   } else {
@@ -289,7 +296,10 @@ function renderBoard() {
     else if (live && qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
     else if (!plain) { b.setAttribute('data-a', 'city'); b.setAttribute('data-t', 'x:c' + it.id); }
   };
-  { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
+  if (R.col) {
+    const hb = placeBox(h('button.handbar', { 'data-a': 'handtog', type: 'button', 'aria-label': 'Show my hand and city' }), R.hbar); bd.appendChild(hb);
+    hb.appendChild(h('span', '\u25B4 Hand ' + (v >= 0 ? G.players[v].hand.length : 0) + '/8 \u00B7 City ' + me.city.length + '/15'));
+  } else { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
     const fit = R.strip.city, n = cityList.length;
     if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
     strip.appendChild(h('span.scount', (me.city.length) + '/15'));
@@ -311,9 +321,9 @@ function renderBoard() {
     r.appendChild(h('span.rs.wk', { 'data-res': 'worker' }, pawn(fs, rp - 2), h('b', availW(me) + '/' + me.workers)));
     bd.appendChild(r); }
   // ---- my hand (a fan at the bottom)
-  { const handBox = R.hand, strip = placeBox(h('div.strip.hand'), handBox); bd.appendChild(strip);
+  if (!R.col) { const handBox = R.hand, strip = placeBox(h('div.strip.hand'), handBox); bd.appendChild(strip);
     const hand = v >= 0 ? G.players[v].hand : [], fit = R.strip.hand, n = hand.length;
-    strip.appendChild(h('span.scount', v >= 0 ? n + '/8' : ''));
+    strip.appendChild(R.tall && v >= 0 ? h('button.scount.htog', { 'data-a': 'handtog', type: 'button', 'aria-label': 'Hide my hand' }, '\u25BE ' + n + '/8') : h('span.scount', v >= 0 ? n + '/8' : ''));
     if (v < 0) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     else if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     hand.forEach((id, i) => {
