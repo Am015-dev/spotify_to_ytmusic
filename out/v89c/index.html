@@ -1,4 +1,4 @@
-<title>Mainhattan Overdrive</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body><title>Mainhattan Overdrive</title>
 <style>
 /* Layout: full-bleed WebGL race; HUD in the four corners in heavy italic numerals; menu is one glowing panel on the left over a live attract race. Single dark look by choice. */
 :root{
@@ -753,7 +753,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
-  {v:'v89d',date:'9 Oct 2026',items:[{t:'NEW',s:'Walk up to a slowing or parked car and tap 🚗 TAKE (PC: F or E): you pull the driver out, he shouts "HEY!" and runs off, and you drive away. Taking a car gives you ★1.'},{t:'NEW',s:'The ★ shows next to your speed and drops after a minute without trouble. No police chase yet.'},{t:'NEW',s:'Athens: a few cars are now parked at the kerb, ready to borrow.'}]},
+  {v:'v89c',date:'9 Oct 2026',items:[{t:'NEW',s:'Walk up to a slowing or parked car and tap 🚗 TAKE (PC: F or E): you pull the driver out, he shouts "HEY!" and runs off, and you drive away. Taking a car gives you ★1.'},{t:'NEW',s:'The ★ shows next to your speed and drops after a minute without trouble. No police chase yet.'},{t:'NEW',s:'Athens: a few cars are now parked at the kerb, ready to borrow.'}]},
   {v:'v89b1',date:'9 Oct 2026',items:[{t:'FIXED',s:'On foot the camera no longer spins you in circles: it follows you, and only swings slowly behind you after you have walked straight for a moment.'},{t:'NEW',s:'Drag on the empty right side of the screen to look around while walking (up/down too). Double-tap there to put the camera behind you. PC: drag with the mouse, or Q / Z.'}]},
   {v:'v88z',date:'9 Oct 2026',items:[{t:'CHANGED',s:'Each car class has its own top speed: sports cars reach about 230 km/h on the Autobahn (boost about 270), SUVs and 4×4s about 155, vans, trucks and buses less. City streets are a bit slower.'},{t:'CHANGED',s:'More varied traffic: fewer police cars and trucks, city buses in Frankfurt, more scooters and fewer taxis in Athens.'},{t:'FIXED',s:'Street ramps sit on the road in your lane, and traffic no longer queues on them. Every ramp can be reached by driving there.'},{t:'FIXED',s:'Autobahn: no more hidden pit at the Frankfurter Kreuz flyover or bumps onto the Main bridges at full speed.'}]},
   {v:'v89a',date:'9 Oct 2026',items:[{t:'NEW',s:'Get out and walk: stop the car and the BRAKE button turns into 🚪 EXIT (PC: F or E). Your minifig steps out and the car stays parked.'},{t:'NEW',s:'On foot: drag anywhere on the left half to walk (push far to run), RUN and JUMP on the right. PC: WASD or arrows, Shift runs, Space jumps.'},{t:'NEW',s:'Walk up to your own car or any parked car and tap 🚪 ENTER (PC: F or E) to drive it. Moving traffic cannot be taken yet.'},{t:'CHANGED',s:'Not yet: a borrowed car has no driver inside, and Athens has no kerb-parked cars to borrow (get back into your own car there).'}]},
@@ -13178,10 +13178,10 @@ const OD_CHECKLIST=[
  {ver:'v88z',id:'ramps',text:'Drive along a street to a yellow ramp: it sits in your lane, no traffic queued on it, and you can jump it. Try the ramp on the Eiserner Steg footbridge.'},
  {ver:'v88z',id:'traffic',text:'Frankfurt: a few city buses, fewer police and trucks. Athens: more scooters, fewer taxis. Does the traffic look right?'},
  {ver:'v88z',id:'ath-walls',text:'Athens: drive around Eleni\'s Garage (Psyrri) and a RAMP JUMP pop-up ring. Any invisible walls or getting stuck between buildings?'},
- {ver:'v89d',id:'jack-take',text:'Get out next to a street, step in front of a slow car or walk up to a parked one: the yellow button reads 🚗 TAKE. Tap it (PC: F).'},
- {ver:'v89d',id:'jack-pull',text:'After TAKE: the driver is pulled out, a "HEY!" bubble shows (not hidden under the cards at the top) and he runs off. Is he as tall as you?'},
- {ver:'v89d',id:'jack-drive',text:'Drive the taken car away: ★1 shows next to the speed, the camera is as far back as with your own car, and the tyres sit on the road.'},
- {ver:'v89d',id:'ath-park',text:'Athens: look for cars parked at the kerb. Walk up to one and tap ENTER to drive it.'},
+ {ver:'v89c',id:'jack-take',text:'Get out next to a street, step in front of a slow car or walk up to a parked one: the yellow button reads 🚗 TAKE. Tap it (PC: F).'},
+ {ver:'v89c',id:'jack-pull',text:'After TAKE: the driver is pulled out, a "HEY!" bubble shows (not hidden under the cards at the top) and he runs off. Is he as tall as you?'},
+ {ver:'v89c',id:'jack-drive',text:'Drive the taken car away: ★1 shows next to the speed, the camera is as far back as with your own car, and the tyres sit on the road.'},
+ {ver:'v89c',id:'ath-park',text:'Athens: look for cars parked at the kerb. Walk up to one and tap ENTER to drive it.'},
  {ver:'v89b1',id:'foot-cam',text:'On foot, hold the stick a little to the right for 10 s: you walk a wide curve or straight line, NOT endless circles, and the camera does not keep spinning.'},
  {ver:'v89b1',id:'foot-orbit',text:'On foot, drag on the empty right side of the screen: the camera turns around you (and up/down). Double-tap there: it goes back behind you. Buttons still work.'},
  {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
@@ -13553,3 +13553,4 @@ updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((sta
  if(CC&&CC.s){const w=CC.s;camera.lookAt(w.mesh.position.clone().add(w.mesh.userData.m.position))}else camera.lookAt(camLook)}catch(e){}})(updateCam);
 try{Object.defineProperty(window.__mho,'foot',{get:()=>OF_api(),configurable:true})}catch(e){} // v89a on foot (98of_onfoot.js)
 </script>
+</body></html>

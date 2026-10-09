@@ -86,4 +86,4 @@ Base = live v88z src + live v89b1 camera (origin/alex/od-cam merged; conflicts o
 - Known test noise: Athens drive can cross a district border → page reload ("Execution context was destroyed"); desk drives sometimes stuck behind queued traffic.
 - Not done (plan extras): 20 % van/truck drivers shove back; old car recycled after 60 s (own car stays, as P1).
 - Review: FAIL 21e76ab7 (release notes, jacked-car cam, HEY! under cards) → fixed → PASS 3356d6ea. Also: wheel-contact grounding (OF_lift), car waits while TAKE offered.
-- Built out/v89d on live v89b1 (LIVE_MATCH 0eeb1dc4; od-stream/v89c not live). DEPLOY sent to the coordinator. If v89c ships first: merge live, rebuild, re-split; re-REVIEW only on conflicts in 98of/10_core/99c.
+- Built out/v89c (renamed from v89d at the coordinator's request; streaming becomes v89d) on live v89b1 (LIVE_MATCH 0eeb1dc4; od-stream/v89c not live). DEPLOY sent to the coordinator. If v89c ships first: merge live, rebuild, re-split; re-REVIEW only on conflicts in 98of/10_core/99c.
