@@ -15,11 +15,11 @@ Mostly **no wiring**: as `ART-PROMPTS.md` says, `game/build.py` embeds `art/<id>
 
 ## `games/final-approach/media/` (separate files)
 - **Portraits** `camp-<id>.webp`, 256×256: `voss`, `ravi`, `alder`, `foxmere`, `seabright`, `bowlrock`, `cloudspire`, `orrin`, `castlemoor`, `spires`.
-  - `palmreach` is still to come.
+  - `palmreach` too (all 11).
   - Set `artBase: 'media/'` in the `GXC.init` call.
 - **Card backs** `back-default.webp` (crew cards) and `back-spires.webp` (the campaign `cardback` unlock `spires`).
 - **Tables:** `table-night-lake`, `table-storm` and `table-valley`, the campaign `table` unlocks.
-- `title-phone` is not made yet.
+- `title-phone.webp` (portrait title).
 
 ## Music
 `../audio/final-approach/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.

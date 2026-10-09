@@ -612,7 +612,7 @@ function renderPop(){const el=$('#ppop');if(!el)return;
   el.dataset.kind=UI.pop;el.dataset.read=a.read?'1':'';
   sizePopCard()}
 function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-card');if(!c)return;const W=el.clientWidth,H=el.clientHeight;
-  const big=c.dataset.kc!=null||el.dataset.read==='1';const w=big?Math.max(120,Math.min(300,W*.74,(innerHeight*.86-130)/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
+  const big=c.dataset.kc!=null||el.dataset.kind==='card';const w=big?Math.max(120,Math.min(c.dataset.kc!=null?300:270,W*.74,(innerHeight*.86-(c.dataset.kc!=null?130:190))/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
 function popCard(id,read){const s=vs();const i=cinfo(id);const mine=!read&&ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
@@ -1760,7 +1760,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(o&&typeof GXC!=='undefined')GXC.open()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
