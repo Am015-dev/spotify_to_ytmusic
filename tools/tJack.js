@@ -63,7 +63,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
   else{await key('ArrowUp',c.g);await key('ArrowDown',c.b);await key('ArrowLeft',c.s<0);await key('ArrowRight',c.s>0)}Object.assign(ctl,c)};
  const drive=async(meters,maxF)=>{let s=await st();const x0=s.x,z0=s.z;let P=await route(260),f=0,stk=0;while(f<maxF){s=await st();if(s.busy){await apply({g:false,b:false,s:0});await through();await tick(12);f+=12;continue}
    if(Math.hypot(s.x-x0,s.z-z0)>=meters)break;if(!P||f%240===0)P=await route(260)||P;let sv=P?steerTo(s,P):0;if(s.v<0)sv=-sv;if(Math.abs(s.v)<1)stk+=6;else stk=0;
-   const rev=stk>90&&stk<160;await apply({g:!rev,b:rev,s:rev?-sv:sv});await tick(6);f+=6}const d=Math.hypot(s.x-x0,s.z-z0);
+   if(process.env.DBG&&f%180===0)console.log('dbgD',f,JSON.stringify({v:+s.v.toFixed(1),d:+Math.hypot(s.x-x0,s.z-z0).toFixed(0),sv,stk,f:s.f.state,k:await G.evaluate(()=>__oc.ev('JSON.stringify({K:Object.keys(K).filter(k=>K[k]),T:[TOUCH.gas,TOUCH.brake,TOUCH.park],fr:RO.frozen,on:RO.on,wk:RO.wk,v:RO.v,air:pl&&pl.air})'))}));const rev=stk>90&&stk<160;await apply({g:!rev,b:rev,s:rev?-sv:sv});await tick(6);f+=6}const d=Math.hypot(s.x-x0,s.z-z0);
   await apply({g:false,b:true,s:0});for(let i=0;i<40;i++){await tick(6);s=await st();if(Math.abs(s.v)<.4)break}await apply({g:false,b:false,s:0});await tick(45);return d};
  const d1=await drive(60,900);let s=await st();log('drive1',{m:+d1.toFixed(0),v:s.v,btn:s.f.btn,canExit:s.f.canExit});
  const pr0=await shot('1_drive_exitbtn');if(phone){const g=await G.evaluate(()=>__mho.foot.doorGap);log('exitGap',g);ok(g&&g.n>=8&&g.g>=8,tag+' EXIT ≥8 px from BOOST and GAS',g)}let lay=await G.evaluate(LAYOUT);log('layout_car',lay);
