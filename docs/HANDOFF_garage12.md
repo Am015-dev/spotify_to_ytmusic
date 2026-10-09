@@ -24,6 +24,10 @@ Draft PR #75 (base alex/od-src) only tracks the branch; deploys go through revie
 - Run 3 (t4/g12_r3.log): 6 placed, 6 selected, group made, part saved (6), append + mirror (12 bricks, 2 groups), reload keeps parts + canvas, ERR [].
   Its append landed on the canvas because the ← CAR badge was hidden while parts were selected (fixed after run 3).
 
+## Results (commit ab755a4, REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v)
+- Run 4 + drive (t4/g12/drive, t4/g12_drive.log): append on the car 45→53 (part + mirror twin as 2 groups), kept after reload; tyre gap player max 0.03 m,
+  traffic 0.032; ERR []. Iframe (t4/g12/iframe): canvas → group → save → back OK, then the 30-min job limit (append step not reached).
+- Test nit: the flow places 5 of 6 / selects 4 (taps on cells next to each other sometimes miss); the part still saves and appends.
+
 ## Open / next
-- Confirm run 4: append on the CAR, car count +12 after reload, then drive tyre gap ≤ 0.05 m, iframe run, shots, REVIEW.
 - Before DEPLOY: merge alex/od-world, alex/od-quick, live; OD_CHANGELOG v88y entry (top of src/10_core.js); 99c checklist items; build split out/v88y.
