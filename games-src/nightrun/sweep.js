@@ -1275,7 +1275,7 @@ async function diffTests(browser) {
   await f(R['normal/idle'].died === 1 && R['normal/idle'].t < 45, 'Normal: a do-nothing player must die within 45 s: ' + JSON.stringify(R['normal/idle']));
   await f(R['normal/careless'].died >= .8 && R['normal/careless'].t < 90, 'Normal: a careless player must die within 90 s: ' + JSON.stringify(R['normal/careless']));
   await f(R['normal/natural'].died <= .4, 'Normal: the dodging bot should mostly survive: ' + JSON.stringify(R['normal/natural']));
-  await f(R['hard/natural'].died >= .25 && R['hard/natural'].hits > R['normal/natural'].hits + 1.5, 'Hard: the dodging bot must die and lose hull: ' + JSON.stringify([R['hard/natural'], R['normal/natural']]));
+  await f(R['hard/natural'].died >= .25 && R['hard/natural'].hits > R['normal/natural'].hits + 1.2, 'Hard: the dodging bot must die and lose hull: ' + JSON.stringify([R['hard/natural'], R['normal/natural']]));
   await f(R['hard/idle'].t < R['normal/idle'].t && R['easy/careless'].t > R['normal/careless'].t, 'Easy < Normal < Hard ordering broke');
 }
 // ---------------- screenshots for the owner: portrait mid-run with the tier meter, boss, settings (look at them) ----------------

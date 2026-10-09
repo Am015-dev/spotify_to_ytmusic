@@ -105,7 +105,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalAlpha=1;
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
-  for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.c,.9);
+  for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.gc||b.c,b.k?.5:.9);
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
   ART.fxDraw();

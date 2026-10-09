@@ -20,11 +20,14 @@ NR.on('tick',dt=>{if(!G.live)return;
   STILL.fk=1+1.4*k;STILL.bk=1+.22*k;STILL.sk=Math.max(.12,1-.88*k);
   if(s>0&&G.mult>1)G.mult=Math.max(1,G.mult-.4*dt);
   if(STILL.t>STILLF()+.6&&!STILL.said){STILL.said=true;floater(P.x,P.y-44,'KEEP MOVING','#ff6a7a');}
+  /* static discharge: staying in one spot for long drains hull that shields and invulnerability cannot stop, however strong the ship is. Moving resets it. */
+  if(STILL.t>STILLF()+6&&!godMode&&!ST.over&&!G.over&&G.transT<0&&!SH.active){STILL.dr=(STILL.dr||0)+dt;STILL.dg=1;const IV=STILL.t>STILLF()+20?1.2:2;STILL.iv=IV;if(STILL.dr>=IV){STILL.dr=0;P.hp=Math.max(0,P.hp-1);G.flash=Math.max(G.flash,.2*FX());G.glitch=.3*FX();AU.sfx('hurt');floater(P.x,P.y-30,'STATIC DISCHARGE','#ff3050');burst(P.x,P.y,'#ff3050',16,240);if(P.hp<=0)die();}}
+  else{STILL.dr=0;STILL.dg=0;}
   /* --- the sniper lane --- */
-  const B=STILL.beam;if(B){if(B.n<(HARD?1:2))B.y+=(P.y-B.y)*Math.min(1,dt*7);if(B.fire>0){B.fire-=dt;if(!G.dead&&Math.abs(P.y-B.y)<BEAM_Y&&!B.hit){B.hit=1;hurt();}if(B.fire<=0)STILL.beam=null;}}});
+  const B=STILL.beam;if(B){if(B.n<(HARD?1:2))B.y+=(P.y-B.y)*Math.min(1,dt*7);if(B.fire>0){B.fire-=dt;if(!G.dead&&Math.abs(P.y-B.y)<BEAM_Y&&!B.hit){B.hit=1;hurt(B.dmg);}if(B.fire<=0)STILL.beam=null;}}});
 NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
   if(B){B.n++;if(B.n===(HARD?2:3)){B.fire=.3;AU.sfx('big');shake(5);}return;}
-  if(STILL.t>STILLF()+.6&&G.bc>=STILL.nb&&!G.boss){STILL.beam={y:P.y,n:0,fire:0,hit:0};STILL.nb=G.bc+(HARD?3:6)-(STILL.k>=.5&&!HARD?1:0);AU.sfx('warn');}});   // 3 beats of beam + the gap
+  if(STILL.t>STILLF()+.6&&G.bc>=STILL.nb&&!G.boss){STILL.beam={y:P.y,n:0,fire:0,hit:0,dmg:1+(STILL.k>=1?1:0)+(STILL.t>STILLF()+14?1:0)};STILL.nb=G.bc+(STILL.k>=1?2:HARD?3:6)-(STILL.k>=.5&&!HARD?1:0);/* standing still: the lane comes more often and hits harder the longer you stay */AU.sfx('warn');}});   // 3 beats of beam + the gap
 {const dp=drawPickups;drawPickups=function(t){dp(t);const B=STILL.beam;if(!B||G.dead)return;
   ctx.save();ctx.globalCompositeOperation='lighter';const lock=B.n>=(HARD?1:2),f=B.fire>0;
   if(f){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(0,B.y-BEAM_Y*.5,W,BEAM_Y);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}

@@ -82,7 +82,7 @@ function newGame(daily){
 // Story has its own ramp (ST.*, see story.js): sd, sbs, sfr scale it. fan = bullets added to every fan and ring, heal = hull drops, el = elite share.
 const DIFFS={easy:{d:.85,bs:.9,fr:.85,dn:.75,sd:.85,sbs:.92,sfr:.9,fan:-1,heal:1.5,el:0},
   normal:{d:1.9,bs:1.25,fr:1.45,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
-  hard:{d:3.4,bs:1.9,fr:5,dn:1.4,sd:1.4,sbs:1.2,sfr:1.3,fan:3,heal:.4,el:1.2,aq:2.5},
+  hard:{d:3.6,bs:2,fr:5.6,dn:1.45,sd:1.45,sbs:1.22,sfr:1.35,fan:3,heal:.35,el:1.3,aq:3},
   vhard:{d:4,bs:2.15,fr:5.8,dn:1.6,sd:1.7,sbs:1.35,sfr:1.5,fan:4,heal:.3,el:1.5,aq:4},       // VERY HARD: faster, denser, more elites, almost no repairs
   legend:{d:4.7,bs:2.4,fr:6.6,dn:1.8,sd:2,sbs:1.5,sfr:1.7,fan:5,heal:.15,el:1.9,aq:6}};         // LEGEND: the full set of smart enemy tricks from the start
 const HARDS=['hard','vhard','legend'];
@@ -125,7 +125,7 @@ const eliteP=()=>ST.on?ST.el:Math.min(.55,Math.max(DF.el?.2+.1*G.pos:0,.09*Math.
 const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*STILL.bk*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
 const ebCap=()=>(touchUI||rotMode?18:HARD?35:25)+(G.boss&&G.boss.x<=bossX()?5:0);   // most enemy bullets alive at once; a fan or ring that does not fit is made smaller (odd, still aimed), never cut off                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
-function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:(eb.src&&eb.src.type==='gunship'&&AIQ()>=5&&Math.random()<.4)?1.5:0});}
+function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push(AI.kind({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:0},eb.src));}
 const PV={x:0,y:0,px:0,py:0};   // the ship's smoothed velocity (h.js), for Hard's lead shots
 const aim=e=>{if((HARD||AIQ()>=4)&&e.type!=='boss'){const t=Math.min(.8,Math.hypot(P.x-e.x,P.y-e.y)/260)*.75;return Math.atan2(P.y+PV.y*t-e.y,P.x+PV.x*t-e.x);}return Math.atan2(P.y-e.y,P.x-e.x);};
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
@@ -181,7 +181,8 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
-function hurt(){if(P.inv>0||P.dashT>0||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp--;ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
+function hurt(n){n=n>1?n:1;if(P.inv>0||P.dashT>0||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp=Math.max(0,P.hp-n);if(n>1){shake(12);G.flash=Math.max(G.flash,.3*FX());}   // a heavy shell takes 2 hull
+  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;shake(16);burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
 
@@ -342,8 +343,8 @@ function update(dt){
   for(const b of G.eb){b.x+=b.vx*sdt;b.y+=b.vy*sdt;if(b.x<-30||b.x>W+30||b.y<-30||b.y>H+30){b.dead=1;continue;}
     if(G.dead)continue;const dd=Math.hypot(b.x-P.x,b.y-P.y);
     if(P.dashT>0&&dd<26){b.dead=1;G.score+=Math.round(25*G.mult*(P.dashPf?2:1));P.heat=Math.max(0,P.heat-6);burst(b.x,b.y,D.b,4,120,.3);continue;}
-    if(dd<b.r+3){b.dead=1;hurt();continue;}
-    if(!b.g&&dd<24){b.g=1;const pf=tryPerfect('graze',null,P.x,P.y);G.score+=Math.round(10*G.mult*(pf?2:1));P.heat=Math.max(0,P.heat-4);G.mult=Math.min(9.9,G.mult+.02);
+    if(dd<b.r+3){b.dead=1;hurt(b.dmg);continue;}
+    if(!b.g&&dd<24+Math.max(0,b.r-6)){b.g=1;const pf=tryPerfect('graze',null,P.x,P.y);G.score+=Math.round(10*G.mult*(pf?2:1));P.heat=Math.max(0,P.heat-4);G.mult=Math.min(9.9,G.mult+.02);
       if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');}}
   G.eb=G.eb.filter(b=>!b.dead);
 

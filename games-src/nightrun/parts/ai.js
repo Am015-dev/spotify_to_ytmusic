@@ -8,7 +8,7 @@
    - perk pressure: every perk and upgrade you own adds a little hull to the enemies and a little speed to their fire (capped), so a maxed ship is still in a fight */
 function AIQ(){return (ST.on?ST.lvl:2+G.pos*1.6+(G.loop||0)*3)+(DF.aq||0);}
 const AI={perks(){let n=0;try{for(const k in SH.got)n+=SH.got[k]|0;for(const d of TP_DEF)n+=TP.l(d.id)|0;}catch(e){}return n;},
-  hpK(){return Math.min(1.7,1+.014*this.perks());},fk(){return 1+Math.min(.28,.022*Math.max(0,AIQ()-1))+Math.min(.12,.004*this.perks());},
+  hpK(){return Math.min(3,1+.02*this.perks());},fk(){return 1+Math.min(.28,.022*Math.max(0,AIQ()-1))+Math.min(.12,.004*this.perks());},
   ldrs(){return G.en.filter(e=>e.ldr&&e.hp>0);}};
 NR.on('spawn',e=>{if(!G.live||G.dead||e.mini)return;const q=AIQ();
   if(e.type==='drone'){if(q>=3.5&&Math.random()<.2+.03*Math.min(q,10))e.dg=1;
@@ -39,3 +39,37 @@ NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;
 {const fb=FXV.bullets;FXV.bullets=function(){fb.call(this);let any=false;for(const b of G.eb)if(b.hm>0){if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;ctx.save();ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.restore();continue;}if(!any){ctx.save();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.85;ctx.beginPath();any=true;}ctx.moveTo(b.x+b.r+3.5,b.y);ctx.arc(b.x,b.y,b.r+3.5,0,7);}if(any){ctx.stroke();ctx.restore();}};}
 /* low hull: the song keeps its tempo; the screen edges pulse red on the beat and a soft heartbeat thumps under the music */
 NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='running')return;try{AU.osc(AU.a.currentTime+.02,'sine',58,.2,.5,AU.musv,38);}catch(e){}});
+
+/* ---------- bullet kinds: size, speed, look and impact differ now ----------
+   orb    r5  lime, 1 hull (the default: turret fans, gunship rings)
+   needle r3  thin and fast, 1 hull (drones, flankers, squad leaders)
+   shell  r11 big and slow, orange, takes 2 hull (gunship rings, elite turrets, bosses)
+   rocket r7  a missile that homes for 1.3 s, can be shot down (2 hits) and bursts into 5 pellets */
+AI.n=0;
+AI.kind=function(o,src){const q=AIQ(),n=++AI.n,sp=Math.hypot(o.vx,o.vy);const scale=f=>{const t=Math.min(f*sp,BCAP)/Math.max(1,sp);o.vx*=t;o.vy*=t;};
+  if(!src)return o;const ty=src.type;
+  if((ty==='drone'||ty==='flank')&&q>=2){o.k='n';o.r=3.2;o.dmg=1;o.gc='#e8ffb0';scale(1.3);if(src.ldr){o.r=3.6;scale(1.1);}}
+  else if(ty==='gunship'){if(q>=4&&n%5===0){o.k='r';o.r=7;o.dmg=1;o.hp=2;o.hm=1.3;o.gc='#9fb0ff';scale(.8);}
+    else if(q>=2.5&&n%4===0){o.k='s';o.r=11;o.dmg=2;o.gc='#ff8a2d';scale(.62);}}
+  else if(ty==='turret'){if(q>=5&&n%5===0){o.k='s';o.r=10;o.dmg=2;o.gc='#ff8a2d';scale(.62);}}
+  else if(ty==='boss'){if(n%7===0){o.k='s';o.r=12;o.dmg=2;o.gc='#ff8a2d';scale(.6);}else if(q>=6&&n%11===0){o.k='r';o.r=7;o.dmg=1;o.hp=2;o.hm=1.3;o.gc='#9fb0ff';scale(.8);}}
+  else if(src.el&&q>=3&&n%6===0){o.k='s';o.r=9;o.dmg=2;o.gc='#ff8a2d';scale(.66);}
+  return o;};
+/* shooting a rocket down: two hits, then it bursts into five pellets */
+NR.on('tick',()=>{if(!G.live||G.dead)return;let any=false;for(const b of G.eb)if(b.k==='r'){any=true;break;}if(!any)return;
+  for(const r of G.eb){if(r.k!=='r'||r.dead)continue;for(const b of G.pb){if(b.dead)continue;if((b.x-r.x)**2+(b.y-r.y)**2<(r.r+5+(b.rad||0))**2){if(!b.px)b.dead=1;r.hp-=1;burst(r.x,r.y,'#9fb0ff',3,100,.25);
+        if(r.hp<=0){r.dead=1;G.score+=60;for(let i=0;i<5;i++){const a=i*Math.PI*2/5+Math.random();G.eb.push({x:r.x,y:r.y,vx:Math.cos(a)*130,vy:Math.sin(a)*130,r:3.5,c:BULLET,g:true,sl:false,hm:0,dmg:1});}ART.boom('explosion-small',r.x,r.y,44,.3);AU.sfx('hit');}break;}}}});
+/* drawing the three kinds that are not orbs (the base pass draws the orbs; c.js draws a glow under every bullet) */
+{const fb2=FXV.bullets;FXV.bullets=function(){const all=G.eb;let sp=false;for(const b of all)if(b.k){sp=true;break;}
+  if(!sp){fb2.call(this);return;}G.eb=all.filter(b=>!b.k);fb2.call(this);G.eb=all;
+  ctx.save();for(const b of all){if(!b.k)continue;const a=Math.atan2(b.vy,b.vx);
+    if(b.k==='n'){ctx.strokeStyle='#07030f';ctx.lineWidth=b.r*2.1;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b.x-Math.cos(a)*9,b.y-Math.sin(a)*9);ctx.lineTo(b.x+Math.cos(a)*5,b.y+Math.sin(a)*5);ctx.stroke();
+      ctx.strokeStyle='#d8ff7a';ctx.lineWidth=b.r*1.1;ctx.beginPath();ctx.moveTo(b.x-Math.cos(a)*8,b.y-Math.sin(a)*8);ctx.lineTo(b.x+Math.cos(a)*4,b.y+Math.sin(a)*4);ctx.stroke();}
+    else if(b.k==='s'){const pu=.5+.5*Math.sin(G.t*9+b.x*.05);ctx.fillStyle='#07030f';ctx.beginPath();ctx.arc(b.x,b.y,b.r+3,0,7);ctx.fill();ctx.fillStyle='#ff8a2d';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.fill();
+      ctx.fillStyle='#ffd9a0';ctx.beginPath();ctx.arc(b.x,b.y,b.r*(.45+.15*pu),0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.globalAlpha=.7;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(b.x,b.y,b.r+5,0,7);ctx.stroke();ctx.globalAlpha=1;}
+    else if(b.k==='r'){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(a);ctx.fillStyle='#07030f';ctx.fillRect(-12,-b.r-2,22,b.r*2+4);ctx.fillStyle='#c9d2ff';ctx.fillRect(-10,-b.r+1,17,b.r*2-2);ctx.fillStyle='#ff3050';ctx.beginPath();ctx.moveTo(7,-b.r+1);ctx.lineTo(13,0);ctx.lineTo(7,b.r-1);ctx.fill();
+      ctx.globalCompositeOperation='lighter';G_(-14,0,7+Math.random()*3,'#ffa02d',.9);ctx.restore();}}
+  ctx.restore();};}
+
+/* the discharge warning: a red ring that tightens around the ship as the next tick nears */
+{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(!STILL.dg||G.dead)return;const k=(STILL.dr||0)/(STILL.iv||2);ctx.save();ctx.strokeStyle='#ff3050';ctx.globalAlpha=.4+.5*k;ctx.lineWidth=2+3*k;ctx.setLineDash([6,5]);ctx.lineDashOffset=-t*40;ctx.beginPath();ctx.arc(P.x,P.y,46-24*k,0,7);ctx.stroke();ctx.restore();};}
