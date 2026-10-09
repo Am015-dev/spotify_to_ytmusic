@@ -96,44 +96,44 @@ Style block (paste in front of every art prompt for this game):
 
 **Campaign portraits (games/nebula-aces/media/)**
 
-- [ ] `games/nebula-aces/media/camp-brecken.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-brecken.webp` (1:1, target 256x256 WebP)
   - Prompt: Marshal Odile Brecken, a stern middle-aged woman fleet marshal in a high-collared uniform with silver braid, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-kael.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-kael.webp` (1:1, target 256x256 WebP)
   - Prompt: Kael Varro, a young eager rookie pilot with a flight helmet under his arm and a nervous grin, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-quill.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-quill.webp` (1:1, target 256x256 WebP)
   - Prompt: Quill Marren, a bookish wing pilot with round goggles pushed up on a flight cap and a notebook, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-drill.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-drill.webp` (1:1, target 256x256 WebP)
   - Prompt: Drill Wing Flight Officer, a young officer in a bright training flight suit with a trainer-wing patch, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-knife.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-knife.webp` (1:1, target 256x256 WebP)
   - Prompt: "Knifepoint", a lean daring ace pilot with a scar and a sharp grin, visor pushed up, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-hammer.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-hammer.webp` (1:1, target 256x256 WebP)
   - Prompt: Hammer Squadron Lead, a broad heavy-armour bomber commander with huge shoulders and a stern jaw, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-hex.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-hex.webp` (1:1, target 256x256 WebP)
   - Prompt: "Hex", a mysterious woman pilot swarm leader with a jinx charm necklace and glowing eyes under her visor, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-sorin.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-sorin.webp` (1:1, target 256x256 WebP)
   - Prompt: Sorin Vael, a proud fearless pilot in red armour with a flame-red scarf, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-kira.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-kira.webp` (1:1, target 256x256 WebP)
   - Prompt: Kira Scald, a patient gunship hunter with a steady stare and scorched armour, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-wailer.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-wailer.webp` (1:1, target 256x256 WebP)
   - Prompt: "Wailer", a loud swarm wing leader with a bellowing open mouth and a cracked helmet, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/nebula-aces/media/camp-castigan.webp` (1:1, target 256x256 WebP)
+- [x] `games/nebula-aces/media/camp-castigan.webp` (1:1, target 256x256 WebP)
   - Prompt: Lord Castigan, a cold exact dark-lord admiral in black and silver armour with a high collar, bust portrait, head and shoulders, centred, plain simple background
 
 **Card backs, tables, title and end art (games/nebula-aces/media/)**
 
-- [ ] `games/nebula-aces/media/back-default.webp` (3:4, target 300x426 WebP)
+- [x] `games/nebula-aces/media/back-default.webp` (3:4, target 300x426 WebP)
   - Prompt: a deep-space card back with a faint star field and a small golden compass-star in the centre, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Default card/tile back.
-- [ ] `games/nebula-aces/media/back-rift-crown.webp` (3:4, target 300x426 WebP)
+- [x] `games/nebula-aces/media/back-rift-crown.webp` (3:4, target 300x426 WebP)
   - Prompt: a crown-shaped tear in space glowing violet and gold on a starfield card back, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock: Card back: The Rift Crown
-- [ ] `games/nebula-aces/media/table-default.webp` (16:9, target 1376x768 WebP)
+- [x] `games/nebula-aces/media/table-default.webp` (16:9, target 1376x768 WebP)
   - Prompt: an empty deep-space battle mat with faint star dust and a very subtle dark blue grid at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Default table behind the board.
-- [ ] `games/nebula-aces/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
+- [x] `games/nebula-aces/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
   - Prompt: an empty deep-space battle mat with faint star dust and a very subtle dark blue grid at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle, portrait orientation
   - Note: Phone version of the default table.
-- [ ] `games/nebula-aces/media/table-nebula7.webp` (16:9, target 1376x768 WebP)
+- [x] `games/nebula-aces/media/table-nebula7.webp` (16:9, target 1376x768 WebP)
   - Prompt: swirling rusty-orange nebula dust over black space at the edges, calm dark centre, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Battlefield skin: Nebula-7 dust
 - [ ] `games/nebula-aces/media/title.webp` (16:9, target 1302x726 WebP)
@@ -142,7 +142,7 @@ Style block (paste in front of every art prompt for this game):
   - Prompt: two starfighters in a close dogfight in front of a huge glowing nebula, engine trails, a small fleet far behind, keep the top of the picture calm and clear for the game logo, portrait orientation
 - [ ] `games/nebula-aces/media/end-win.webp` (16:9, target 1302x726 WebP)
   - Prompt: a squadron of starfighters flying home in victory formation past a shining ringed planet, no text
-- [ ] `games/nebula-aces/media/end-lose.webp` (16:9, target 1302x726 WebP)
+- [x] `games/nebula-aces/media/end-lose.webp` (16:9, target 1302x726 WebP)
   - Prompt: a crippled starfighter drifting with sparks and smoke, the silhouette of an enemy cruiser behind, no text
 
 **Music (one CC0 loop is in the game, nothing new yet)**
