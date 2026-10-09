@@ -630,58 +630,58 @@ Style block (paste in front of every art prompt for this game):
 
 **Campaign portraits (games/tidewake/media/)**
 
-- [ ] `games/tidewake/media/camp-osk.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-osk.webp` (1:1, target 256x256 WebP)
   - Prompt: Grandmother Osk, a wise old sea-wife with a lantern, white braids and a knitted shawl, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-wick.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-wick.webp` (1:1, target 256x256 WebP)
   - Prompt: Wick, a cheerful young cabin hand with a woollen cap and a rope coil, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-harrow.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-harrow.webp` (1:1, target 256x256 WebP)
   - Prompt: Gull Harrow, a swaggering toll-taker with a tricorn hat and a gull on his shoulder, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-brann.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-brann.webp` (1:1, target 256x256 WebP)
   - Prompt: Brann Ashkeel, a loud cannoneer with a soot-streaked face and a lit fuse, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-saltshade.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-saltshade.webp` (1:1, target 256x256 WebP)
   - Prompt: Saltshade, a patient leviathan with one huge calm eye surfacing, barnacle-crusted scales, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-sabel.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-sabel.webp` (1:1, target 256x256 WebP)
   - Prompt: Sabel Riftwright, a calm navigator with a brass sextant and a long coat, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-vey.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-vey.webp` (1:1, target 256x256 WebP)
   - Prompt: Corsair Vey, a cold elegant corsair with an eyepatch and a plumed hat, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-crown.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-crown.webp` (1:1, target 256x256 WebP)
   - Prompt: The Abyssal Crown, the eldest leviathan with a ring of black coral like a crown, glowing eyes in the deep, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/tidewake/media/camp-ysolde.webp` (1:1, target 256x256 WebP)
+- [x] `games/tidewake/media/camp-ysolde.webp` (1:1, target 256x256 WebP)
   - Prompt: Admiral Ysolde, a ruthless admiral in a navy greatcoat with gold epaulettes and a sharp stare, bust portrait, head and shoulders, centred, plain simple background
 
 **Card backs, tables, title and end art (games/tidewake/media/)**
 
-- [ ] `games/tidewake/media/back-default.webp` (3:4, target 300x426 WebP)
+- [x] `games/tidewake/media/back-default.webp` (3:4, target 300x426 WebP)
   - Prompt: a tile back with repeating wave and scale pattern in deep teal, a small lantern medallion in the centre, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Default card/tile back.
-- [ ] `games/tidewake/media/back-scales.webp` (3:4, target 300x426 WebP)
+- [x] `games/tidewake/media/back-scales.webp` (3:4, target 300x426 WebP)
   - Prompt: overlapping leviathan scales in teal and silver on a tile back, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock: Leviathan-scale tile back
-- [ ] `games/tidewake/media/back-night.webp` (3:4, target 300x426 WebP)
+- [x] `games/tidewake/media/back-night.webp` (3:4, target 300x426 WebP)
   - Prompt: a night-watch tile back: dark navy with a tiny lantern and stars, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock: Night-watch tile back
-- [ ] `games/tidewake/media/table-default.webp` (16:9, target 1376x768 WebP)
+- [x] `games/tidewake/media/table-default.webp` (16:9, target 1376x768 WebP)
   - Prompt: a ship chart table seen from above: aged chart paper, brass dividers and a compass at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Default table behind the board.
-- [ ] `games/tidewake/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
+- [x] `games/tidewake/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
   - Prompt: a ship chart table seen from above: aged chart paper, brass dividers and a compass at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle, portrait orientation
   - Note: Phone version of the default table.
-- [ ] `games/tidewake/media/table-dawn.webp` (16:9, target 1376x768 WebP)
+- [x] `games/tidewake/media/table-dawn.webp` (16:9, target 1376x768 WebP)
   - Prompt: calm dawn shallows, pale turquoise water with soft sunrise glints at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Dawn-shallows board skin
-- [ ] `games/tidewake/media/table-storm.webp` (16:9, target 1376x768 WebP)
+- [x] `games/tidewake/media/table-storm.webp` (16:9, target 1376x768 WebP)
   - Prompt: storm-tossed dark water with white foam streaks at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Storm-reach board skin
-- [ ] `games/tidewake/media/table-lantern.webp` (16:9, target 1376x768 WebP)
+- [x] `games/tidewake/media/table-lantern.webp` (16:9, target 1376x768 WebP)
   - Prompt: night sea dotted with floating lantern glows at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Lantern-night board skin
-- [ ] `games/tidewake/media/title.webp` (16:9, target 1302x726 WebP)
+- [x] `games/tidewake/media/title.webp` (16:9, target 1302x726 WebP)
   - Prompt: a small lantern-lit ship sailing between rocky islands at dusk while a giant leviathan eye and scaled back rise from the dark water behind it, keep the top of the picture calm and clear for the game logo
-- [ ] `games/tidewake/media/title-phone.webp` (9:16, target 744x1334 WebP)
+- [x] `games/tidewake/media/title-phone.webp` (9:16, target 744x1334 WebP)
   - Prompt: a small lantern-lit ship sailing between rocky islands at dusk while a giant leviathan eye and scaled back rise from the dark water behind it, keep the top of the picture calm and clear for the game logo, portrait orientation
-- [ ] `games/tidewake/media/end-win.webp` (16:9, target 1302x726 WebP)
+- [x] `games/tidewake/media/end-win.webp` (16:9, target 1302x726 WebP)
   - Prompt: the ship sailing into a calm golden harbour with lanterns lit on the pier and the leviathan sinking peacefully away, no text
-- [ ] `games/tidewake/media/end-lose.webp` (16:9, target 1302x726 WebP)
+- [x] `games/tidewake/media/end-lose.webp` (16:9, target 1302x726 WebP)
   - Prompt: a lantern floating alone on dark water with huge leviathan coils circling, the ship mast tilting under the waves, no text
 
 **Music (one CC0 loop is in the game, nothing new yet)**
