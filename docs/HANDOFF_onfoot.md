@@ -72,3 +72,18 @@ Done in code (src/98of_onfoot.js end block "OF P2" + small edits; one hook in 70
 - Athens: `LV_park1` wrapped → `OF_athPark1` parks cars on g-streets at offset W/2−1.3 (`c.ofW`, lane=off/W).
 - Test `tools/tJack.js` (from tFoot; walks to intercept a traffic car, TAKE, pull/flee/drive shots, Athens parked shot). Never run to the end yet.
 Not done: van/truck shove-back (20 %), PC/iframe runs, shots, review, DEPLOY.
+
+## P2 status (v89c/v89d car-jacking, branch alex/od-p2, 2026-10-09 ~16:00 UTC)
+Base = live v88z src + live v89b1 camera (origin/alex/od-cam merged; conflicts only in the OF literal and the OF_api tail). od-stream not live yet (takes v89c → P2 ships as the next free letter, likely v89d).
+- Code: all in `src/98of_onfoot.js` (+1 line in 70_roam_world.js: `c.ofW` lane width for kerb-parked cars). `OF_jack` / `OF_jackStep` (state `RO.foot='jack'`: car brakes to 0,
+  walker steps to the driver door 0.4 s, pull at 0.45 s, swap at 1.25 s through `OF_finishEnter`), `OF_flee*` (GAR_riv driver, arms up, HEY! sprite, out → stumble → turn → run
+  ahead-left from 1.15 s at 5 m/s for ≤ 7.5 s), `OF_seat` (sit-pose fig scaled to fit the cabin), `OF_crime`/`OF_star*` (★ chip `#ofStar` in `#roamGauge`, −1 per 60 s quiet),
+  `OF_athPark1` (Athens kerb parking replaces LV_park1 there: edges ≥ 7.5 m from nodes, W ≥ 8, offset W/2 − 1.3).
+- TAKE rule: traffic car (not tram/route/crW/'#' types), cv ≤ 7 m/s, edge distance ≤ 3 m (`OF_JREACH`).
+- Test: `tools/tJack.js` (env JACKS, DBG=1 traces the approach and the drive). Shots qa_jack*/ ; std shots qa_std89d/ (t4/g11drive.js ATH=1).
+- Results: tyre gap after jack 0.02–0.05 everywhere (was −0.13…−0.4: seated fig feet below the floor, fixed); draws vs live v89b1 at the same spot within noise
+  (qa_draw_live*/qa_draw_p2*: fra car 183/174 vs 180/183, ath 158/178 vs 190/179); 0 console errors.
+- Known test noise: Athens drive can cross a district border → page reload ("Execution context was destroyed"); desk drives sometimes stuck behind queued traffic.
+- Not done (plan extras): 20 % van/truck drivers shove back; old car recycled after 60 s (own car stays, as P1).
+- Review: FAIL 21e76ab7 (release notes, jacked-car cam, HEY! under cards) → fixed → PASS 3356d6ea. Also: wheel-contact grounding (OF_lift), car waits while TAKE offered.
+- Built out/v89d on live v89b1 (LIVE_MATCH 0eeb1dc4; od-stream/v89c not live). DEPLOY sent to the coordinator. If v89c ships first: merge live, rebuild, re-split; re-REVIEW only on conflicts in 98of/10_core/99c.
