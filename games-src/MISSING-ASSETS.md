@@ -22,13 +22,13 @@ Generated 9 Oct 2026 from the card data, art manifests, campaign files, hand-off
 | Short Fuse | 2 | 56 |
 | Tidewake | 31 | 0 |
 | Hollowbough | 0 | 0 |
-| The Thornbound Throne | 0 | 1 |
+| The Thornbound Throne | 6 | 1 |
 | Kaiten Kitchen | 13 | 29 |
 | Lantern Dive | 42 | 0 |
 | Cauldron Fair | 3 | 73 |
 | Final Approach | 2 | 42 |
 | Mainhattan Nightrun | 0 | 0 |
-| **Total** | **305** | **262** |
+| **Total** | **311** | **262** |
 
 ## To make, per game
 
@@ -705,9 +705,35 @@ Style block (paste in front of every art prompt for this game):
 
 ### The Thornbound Throne (`games/thornbound/`)
 
-**0 to make.** All 51 kingdom cards (kc01 to kc51, including kc27), portraits, backs, tables, title/end art and music are made. One back is unused.
+**6 to make.** All 51 kingdom cards (kc01 to kc51, including kc27), portraits, backs, tables, title/end art and music are made. Left: 4 faction Basic-card paintings and the painted kingdom map (2). Until they exist, the Basic cards show a crop of the faction's campaign portrait and the map shows the painted table through a parchment wash; the page picks the new files up automatically.
 
-- Optional: The faction Basic cards (14 per faction) are not painted; they use the faction colour.
+Style block (paste in front of every art prompt for this game):
+
+> Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.
+
+**Faction Basic cards (one painting per faction, used behind all 14 of that faction's Basic cards)**
+
+- [ ] `games-src/thornbound/art/basic-gilded.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Gilded Line: a noble court: a gold-trimmed crimson banner, a jewelled signet ring and a tall candle on dark green velvet, a gilded hall behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-gilded`.
+- [ ] `games-src/thornbound/art/basic-heath.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Tidebound (heath clans): a windswept heath: a standing stone, a driftwood-and-rope clan standard and a tide-pool lantern, grey sea and heather behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-heath`.
+- [ ] `games-src/thornbound/art/basic-lantern.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Ember Guild (lantern uprising): a lantern-lit alley: a crowd of raised lanterns and a torn orange pennant, rooftops and warm ember glow behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-lantern`.
+- [ ] `games-src/thornbound/art/basic-choir.webp` (1:1, 256x256 WebP; make at 1024 px)
+  - Prompt: a card-art vignette for The Pale Vigil (moth choir): a candlelit vigil: pale moths around a single white candle and a violet veil, silver thread, an arched chapel behind; centred subject, calm lower third so a big number reads on top
+  - Note: embedded automatically (like the kingdom paintings) as `basic-choir`.
+
+**Painted kingdom map (wired automatically when present; locations, roads and the track are drawn on top)**
+
+- [ ] `games/thornbound/media/map.webp` (16:9, 1376x768 WebP)
+  - Prompt: a painted parchment map of a small thorn-hedged kingdom seen from above on a candlelit table: a ring of road around the edge, six marked places (two uplands, two tablelands, two marshes) with a crowned throne hill in the centre, a winding river, forests and ruins, ink linework in tarnished gold and green, lots of empty calm space for tokens, parchment edges fading to transparent green felt, no text, no lettering
+  - Note: the page loads `map-phone` in portrait, `map` otherwise.
+- [ ] `games/thornbound/media/map-phone.webp` (9:16, 768x1376 WebP)
+  - Prompt: the same painted parchment kingdom map composed upright for a phone: ring road around the edge, six marked places, crowned throne hill in the centre, winding river, forests and ruins, ink linework in tarnished gold and green, calm empty space for tokens, parchment edges fading to green felt, no text, no lettering
+  - Note: the page loads `map-phone` in portrait, `map` otherwise.
 
 ### Kaiten Kitchen (`games/kaiten-kitchen/`)
 

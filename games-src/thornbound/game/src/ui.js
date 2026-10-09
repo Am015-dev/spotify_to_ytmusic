@@ -58,6 +58,7 @@ function cardSpec(id,opt){opt=opt||{};
   const txt=((tr.length?tr.join(', ')+'. ':'')+(i.text||'')).trim();
   const bits=[];if(i.votes)bits.push(i.votes+' vote'+(i.votes>1?'s':''));if(i.lore)bits.push(i.lore+' lore');
   const spec={faction:f,title:i.name,value:i.kind==='hq'?null:i.strength,cost:i.cost>0?i.cost:null,type:i.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:i.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:txt||'No special ability.',tag:bits.join(' · ')||undefined};
+  if(i.kind==='basic'||i.kind==='heir')spec.img='basic-'+f;
   return spec}
 function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
   return {faction:'neutral',title:k.name,value:null,cost:null,type:SUIT_TYPE[k.suit]||'omen',typeLabel:SUIT_N[k.suit]+' · Kingdom',art:arts[n%arts.length],img:'kc'+String(n).padStart(2,'0'),text:k.text,num:'No. '+n}}
@@ -611,7 +612,7 @@ function renderPop(){const el=$('#ppop');if(!el)return;
   el.dataset.kind=UI.pop;
   sizePopCard()}
 function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-card');if(!c)return;const W=el.clientWidth,H=el.clientHeight;
-  const w=Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
+  const big=c.dataset.kc!=null;const w=big?Math.max(120,Math.min(300,W*.74,(innerHeight*.86-130)/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
 function popCard(id){const s=vs();const i=cinfo(id);const mine=ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
@@ -1789,7 +1790,16 @@ const PX=(function(){
   function tableApply(){R.dataset.gfx=UI.lowGfx?'low':'high';
     const id=unl('table')||'court',ph=id==='court'&&matchMedia('(orientation:portrait)').matches,f=ph?'table-court-phone':'table-'+id;
     if(f===curT)return;load(f,()=>{curT=f;R.style.setProperty('--tbl-img','url(media/'+f+'.webp)');R.dataset.timg='1'})}
-  function tick(){backApply();tableApply()}
+  // painted kingdom map (map.webp / map-phone.webp), used when present; locations stay on top
+  let curM='';
+  function mapApply(){const f=matchMedia('(orientation:portrait)').matches?'map-phone':'map';if(f===curM||UI.lowGfx)return;
+    const im=new Image();im.onload=()=>{curM=f;TBKit.setMapImg('media/'+f+'.webp');R.dataset.mapimg='1'};im.src='media/'+f+'.webp'}
+  // Basic cards: art/basic-<faction>.webp (embedded in TB_ART, already in PA) when it exists, else a crop of the faction's campaign portrait
+  const BFB={gilded:'camp-halvard',heath:'camp-ysolde',lantern:'camp-rook',choir:'camp-orlen'};let bdone=false;
+  function basicApply(){if(bdone)return;bdone=true;const extra={};let n=0;const fin=()=>{if(--n>0)return;TBKit.setArt(Object.assign({},PA,extra));if(typeof renderAll==='function'&&typeof G!=='undefined'&&G)try{renderAll()}catch(e){}};
+    const ks=Object.keys(BFB).filter(f=>!PA['basic-'+f]);n=ks.length;if(!n)return;
+    ks.forEach(f=>{const im=new Image();im.onload=()=>{extra['basic-'+f]='media/'+BFB[f]+'.webp';fin()};im.onerror=fin;im.src='media/'+BFB[f]+'.webp'})}
+  function tick(){backApply();tableApply();mapApply();basicApply()}
   ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();
