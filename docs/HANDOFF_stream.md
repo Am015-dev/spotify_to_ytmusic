@@ -1,4 +1,26 @@
-# HANDOFF stream (alex/od-stream): v89b streaming. NOT reviewed, NOT built for deploy
+# HANDOFF stream (alex/od-stream): streaming ships as **v89e**. NOT reviewed yet
+
+## STATUS 2026-10-09 ~17:40 (read this first)
+- Merged live src: od-cam (v89b1) and then **08f37b5e** (live v89d; od-p2 HEAD 36843abe only relabels v89d→v89c, do NOT merge it). `_base/` worktree = 08f37b5e, builds byte-identical to live v89d.
+- Fixes since 8bea0dd:
+  - far-cell bounds come from the fill loop;
+  - the triangle loop yields every 256 triangles;
+  - in-range cells are built inside the WB background build before the far LOD switches on;
+  - catch-up budget STR.msC=12 for missing in-range cells, minus this frame's LAZY time (STR.lzT, including LAZY unload);
+  - no build in a frame whose LAZY step was big;
+  - LBatch.flushG (sliced flush, 60_city_build).
+- Probes: `__str.st.fr` (per-frame stream cost: max, o16, o50), `__str.st.lzBig`. Tools: `ath/v89b/popin.js` (holes at speed + long views), `chk5.js` (garage + kiosks), `tPlayS.js` (tPlay + stream stats), `final*.sh` chains.
+- Results (pre-merge v89c build, `ath/v89b/final/`):
+  - normal phone tPlay: stream frame max 13.6 ms, 0 frames >16;
+  - pop-in: 0 holes at Fra 200 km/h and Ath 110 km/h;
+  - draws ≤ live at the same 5 spots;
+  - heap+geo: Ath 360→248, Fra 290→144;
+  - tyre gap 0.03; garage OK.
+- Warp stress (30 warps) still has ~12 frames >16 ms (max 25–38), 0 >50. It is not a normal drive.
+- Open: tFoot Athens FAILED on stream+od-cam (camIn 13 %, stuck 4.6 %; own car 40–65 m away). `final3.sh` re-checks on merged v89e vs live v89d.
+- Athens tPlay wall hits 4 vs 2: the same building is hit on live (bot cuts the grass), so it is noise.
+- Next: read `ath/v89b/final3/*`. If tFoot ath passes like live → REVIEW (reviewer session_01Y6...) with the memory table, hitch numbers, draws and shots (final/side/*, final/pop/new/*_long*, final/spots/new/*, final/chk/fra_garage.png). After PASS: OD_CHANGELOG v89e + 2 checklist items (drafted: 'far city streams in/out, ~40–50 % less memory', 'no stutter when far districts appear'), `tools/build.sh v89e`, `git add -f out/v89e`, then DEPLOY to the coordinator.
+
 
 Coordinator: session_017iH3DB4VyxwKSdMwsco4Ut. Reviewer: session_01Y6FYerWwxv43FuKUcaUT4v. Base: v89a src (live brave-carson 653400a).
 Parallel: alex/od-quick (traffic mix, speeds in 99_api, ramps). This branch does not touch those.
