@@ -227,19 +227,20 @@ function OF_fleeStart(c,h){OF_fleeEnd();const im=HUB.cim[c.k],col=new THREE.Colo
 function OF_fleeEnd(){const L=OF.fl;if(!L)return;if(L.F.g.parent)L.F.g.parent.remove(L.F.g);L.F.g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.isSprite){o.material.map.dispose();o.material.dispose()}});OF.fl=null}
 function OF_fleeStep(dt){const L=OF.fl;if(!L)return;L.t+=dt;const F=L.F,M=F.M;let pitch=0,legs=0;
   if(L.t<.45){const k=L.t/.45,e=k*k*(3-2*k);L.x=L.s.x+(L.o.x-L.s.x)*e;L.z=L.s.z+(L.o.z-L.s.z)*e;const g=groundAt(L.x,L.z,L.y0+1.5);L.y=g+(L.y0+.45-g)*(1-k)+Math.sin(k*Math.PI)*.35;pitch=-.35*e;legs=.6}
-  else if(L.t<1.05){const k=(L.t-.45)/.6,e=1-(1-k)*(1-k);L.x=L.o.x+(L.l.x-L.o.x)*e;L.z=L.o.z+(L.l.z-L.o.z)*e;L.y=groundAt(L.x,L.z,L.y0+1.5)+Math.sin(k*Math.PI)*.25;pitch=-.35+Math.sin(k*Math.PI*2.5)*.45*(1-k);L.lph+=dt*14;legs=Math.sin(L.lph)*.6;L.ph='stumble'}
-  else if(L.t<1.5){L.y=groundAt(L.x,L.z,L.y+1);L.h+=angDiff(L.ra,L.h)*Math.min(1,dt*10);L.ph='turn';L.lph+=dt*10;legs=Math.sin(L.lph)*.3}
+  else if(L.t<.95){const k=(L.t-.45)/.5,e=1-(1-k)*(1-k);L.x=L.o.x+(L.l.x-L.o.x)*e;L.z=L.o.z+(L.l.z-L.o.z)*e;L.y=groundAt(L.x,L.z,L.y0+1.5)+Math.sin(k*Math.PI)*.25;pitch=-.35+Math.sin(k*Math.PI*2.5)*.45*(1-k);L.lph+=dt*14;legs=Math.sin(L.lph)*.6;L.ph='stumble'}
+  else if(L.t<1.15){L.y=groundAt(L.x,L.z,L.y+1);L.h+=angDiff(L.ra,L.h)*Math.min(1,dt*14);L.ph='turn';L.lph+=dt*10;legs=Math.sin(L.lph)*.3}
   else{L.ph='run';const v=OF_RUN;let ok=false;for(const da of[0,.45,-.45,.9,-.9,1.5,-1.5,2.4,-2.4]){const a=L.ra+da,nx=L.x+Math.sin(a)*v*dt,nz=L.z+Math.cos(a)*v*dt,g=groundAt(nx,nz,L.y+.6);
       if(g>L.y+.5||roamHit(nx,nz,.3,L.y+1)||(CID==='fra'&&inRiver(nx,nz)))continue;L.ra=a;L.d+=Math.hypot(nx-L.x,nz-L.z);L.x=nx;L.z=nz;L.y=g;ok=true;break}
     if(!ok)L.ra+=Math.PI*.5;L.h+=angDiff(L.ra,L.h)*Math.min(1,dt*10);L.lph+=dt*3.4*6.283;legs=Math.sin(L.lph)*.8;L.y+=Math.abs(Math.sin(L.lph))*.04}
   F.g.position.set(L.x,L.y,L.z);F.g.rotation.set(pitch,L.h+Math.PI,0);if(M.lL)M.lL.rotation.x=legs;if(M.lR)M.lR.rotation.x=-legs;
   if(M.b)M.b.position.y=0;L.bub.visible=L.t>.25&&L.t<2.1;if(L.bub.visible)L.bub.material.rotation=Math.sin(L.t*20)*.06;
   if(L.t>7.5||Math.hypot(L.x-RO.x,L.z-RO.z)>120)OF_fleeEnd()}
-// --- your minifig in the seat of a borrowed body (traffic geometry has no driver): GAR_fig sit pose, same scale as the walker, hidden on EXIT
+// --- your minifig in the seat of a borrowed body (traffic geometry has no driver): GAR_fig sit pose, same scale as the walker, hidden on EXIT.
+// Head under the glass top, but never lower than 0.3 m above the body's underside (low cars: the head shows above the roof line instead of feet through the road)
 function OF_seat(ud,body){const F=OF_figBuild(),P=[],Q=[];GAR_fig(GB_figGet(),P,Q,true);const g=mergeGeometries(P.concat(Q).map(q=>{q=q.index?q.toNonIndexed():q;for(const a of Object.keys(q.attributes))if(a!=='position'&&a!=='normal'&&a!=='color')q.deleteAttribute(a);return q}));
   g.computeBoundingBox();const fb=g.boundingBox;ud.m.updateMatrixWorld(true);const m4=new THREE.Matrix4(),bx=new THREE.Box3(),B=new THREE.Box3(),G=new THREE.Box3();
   for(let i=0;i<body.length;i++){const q=body[i];if(i===1||!q)continue;if(!q.geometry.boundingBox)q.geometry.computeBoundingBox();q.getMatrixAt(0,m4);m4.premultiply(ud.m.matrixWorld);bx.copy(q.geometry.boundingBox).applyMatrix4(m4);(i===2?G:B).union(bx)}
-  const top=(G.isEmpty()?B.max.y-.12:Math.min(G.max.y,B.max.y)-.06),h=RO.h,s=F.s,y=top-fb.max.y*s,cz=G.isEmpty()?0:((G.min.x+G.max.x)/2-RO.x)*Math.sin(h)+((G.min.z+G.max.z)/2-RO.z)*Math.cos(h);
+  const top=(G.isEmpty()?B.max.y-.12:Math.min(G.max.y,B.max.y)-.06),h=RO.h,s=F.s,y=Math.max(top-fb.max.y*s,B.min.y+.3-fb.min.y*s),cz=G.isEmpty()?0:((G.min.x+G.max.x)/2-RO.x)*Math.sin(h)+((G.min.z+G.max.z)/2-RO.z)*Math.cos(h);
   const w=new THREE.Matrix4().compose(new THREE.Vector3(RO.x+Math.sin(h)*(cz-.15),y,RO.z+Math.cos(h)*(cz-.15)),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),h+Math.PI),new THREE.Vector3(s,s,s));
   w.premultiply(new THREE.Matrix4().copy(ud.m.matrixWorld).invert());const m=new THREE.Mesh(g,GB_MAT);w.decompose(m.position,m.quaternion,m.scale);m.userData.ofSeat=1;m.userData.of=1;m.castShadow=false;ud.m.add(m);OF.seat=m;return m}
 // --- wanted stars (stub for P4): +n per crime, one star drops after 60 s without a new crime
