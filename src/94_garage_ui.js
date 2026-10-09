@@ -51,6 +51,7 @@ function GB_msg(t){const e=$('#gbBkN');if(!e)return;e.textContent=t;clearTimeout
  v.addEventListener('pointerup',up,true);v.addEventListener('pointercancel',up,true);v.addEventListener('wheel',e=>{if(!GB_.bk)return;e.preventDefault();GB_.dist=clamp(GB_.dist*(1+e.deltaY*.001),7,26)},{passive:false});
  v.addEventListener('contextmenu',e=>{if(GB_.bk)e.preventDefault()});
  addEventListener('keydown',e=>{if(!GB_.bk||$('#gbx').hidden||(e.target&&e.target.tagName==='INPUT'))return;const k=e.code;if(k==='Escape'){e.preventDefault();e.stopImmediatePropagation();GB_exit();return}
+  if(typeof G13_keys==='function'&&G13_keys(e))return;
   if(k==='KeyZ'&&(e.ctrlKey||e.metaKey))GB_undo();else if(k==='KeyR'){GB_.rot=(GB_.rot+1)%4;GB_hover()}else if(k==='KeyM')GB_.mir=GB_.mir?0:1;else if(k==='Delete'||k==='Backspace')GB_.tool=GB_.tool==='del'?'add':'del';else return;e.preventDefault();GB_ui()},true)}
 function GB_hover(){if(!GB_.bk||!GB_.mx||GB_.tool!=='add')return GB_ghostSet(null);const b=GB_cand(GB_pick(GB_.mx.x,GB_.mx.y));const o=GB_.hov;if(o&&b&&GB_same(o,b)&&o.r===b.r&&o.c===b.c)return;GB_ghostSet(b)}
 function GB_ui(){if(!GB.d)return;const L=GB_list(),md=GB_mods(L),fx=md?Object.entries(md).filter(([k,v])=>Math.abs(v-1)>.004).map(([k,v])=>`${{top:'top',acc:'acc',han:'grip',hull:'hull'}[k]} ${v>1?'+':''}${Math.round((v-1)*100)}%`).join(' · '):'';
