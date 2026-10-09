@@ -25,9 +25,10 @@ const PROBE=()=>__oc.ev(`(()=>{const F=__mho.foot,T=THREE,B=new T.Box3(),m4=new 
  // tyre gap: lowest visible point of the player's body vs the ground under it (instanced bodies: geometry box × instance × world)
  let low=1e9,lowN='';if(pl&&RO.foot==='car'){pl.mesh.updateMatrixWorld(true);const ud=pl.mesh.userData;ud.m.traverseVisible(o=>{if(!o.isMesh||!o.geometry||(o.material&&(o.material.transparent||o.material.blending===T.AdditiveBlending)))return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();
    if(o.isInstancedMesh){o.getMatrixAt(0,m4);m4.premultiply(o.matrixWorld)}else m4.copy(o.matrixWorld);const p=o.geometry.attributes.position;for(let i=0;i<p.count;i+=3){v.fromBufferAttribute(p,i).applyMatrix4(m4);if(Math.hypot(v.x-RO.x,v.z-RO.z)<3.2&&v.y<RO.y+.7){const c=v.y-groundAt(v.x,v.z,v.y+1);if(c<low){low=c;lowN=(o.userData.ofSeat?'seat':o.isInstancedMesh?'inst':'mesh')+':'+(o.geometry.attributes.position.count)}}}})}
- const gap=low<1e8?+low.toFixed(3):null;
+ const gap=low<1e8?+low.toFixed(3):null;let scr=null;if(pl&&RO.foot==='car'){const U=new T.Box3(),bb=new T.Box3();pl.mesh.userData.m.traverseVisible(o=>{if(!o.isMesh||o.userData.ofSeat||!o.geometry)return;if(o.isInstancedMesh){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();o.getMatrixAt(0,m4);m4.premultiply(o.matrixWorld);bb.copy(o.geometry.boundingBox).applyMatrix4(m4)}else bb.setFromObject(o);if(bb.max.y-bb.min.y<6)U.union(bb)});
+  if(!U.isEmpty()){let x0=9,x1=-9,y0=9,y1=-9;for(let i=0;i<8;i++){v.set(i&1?U.max.x:U.min.x,i&2?U.max.y:U.min.y,i&4?U.max.z:U.min.z).project(camera);x0=Math.min(x0,v.x);x1=Math.max(x1,v.x);y0=Math.min(y0,v.y);y1=Math.max(y1,v.y)}scr={w:+((x1-x0)/2).toFixed(3),top:+((1-y1)/2).toFixed(3)}}}
  let pc=null;try{let n=0;for(const c of HUB.cars)if(c.pk&&!(c.dead>0)&&Math.hypot(c.x-RO.x,c.z-RO.z)<150)n++;pc=n}catch(e){}
- return{F,fig,peds,gap,lowN,parkedNear:pc,cy:+OF.cy.toFixed(3),RO:{x:RO.x,z:RO.z,y:RO.y,h:RO.h,v:RO.v},calls:__dbg.renderer.info.render.calls,tris:__dbg.renderer.info.render.triangles}})()`);
+ return{F,fig,peds,gap,lowN,scr,parkedNear:pc,cy:+OF.cy.toFixed(3),RO:{x:RO.x,z:RO.z,y:RO.y,h:RO.h,v:RO.v},calls:__dbg.renderer.info.render.calls,tris:__dbg.renderer.info.render.triangles}})()`);
 async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:852,height:393}:{width:1440,height:900};const tag=mode+'_'+city;
  const ctx=await b.newContext(phone?{viewport:vp,deviceScaleFactor:2,isMobile:true,hasTouch:true}:{viewport:vp});const p=await ctx.newPage();p.setDefaultTimeout(900000);
  const errs=[];const onP=pg=>{pg.on('pageerror',e=>errs.push(e.message.slice(0,200)));pg.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))})};onP(p);
@@ -112,18 +113,18 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
   const tb=await G.evaluate(()=>{const b=document.querySelector('#tB');return b&&b.textContent});ok(/TAKE/.test(tb||''),jt+' button reads TAKE',tb);
   const stars0=s.f.stars;if(phone)await tap('#tB');else{await key('KeyE',true);await key('KeyE',false)}
   // mid-pull (t ≈ 0.75 s), then the run
-  await tick(40);s=await st();const prB=await shot('j'+J+'_b_pull');const fb=await FL();log(jt+'_pull',{state:s.f.state,jack:s.f.jack,flee:fb,calls:prB.calls});
+  await tick(40);s=await st();const prB=await shot('j'+J+'_b_pull');const fb=await FL();log(jt+'_pull',{state:s.f.state,jack:s.f.jack,flee:fb,calls:prB.calls,bub:s.f.bub});
   ok(fb&&fb.hs>=1.75&&fb.hs<=1.85&&Math.abs(fb.s-1)<.01&&fb.h<=2.4,jt+' driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m)',fb);
   await tick(40);s=await st();ok(s.f.state==='car'&&!s.f.own,jt+' jacked → driving the traffic car',{state:s.f.state,own:s.f.own,taken:s.f.taken,log:s.f.log});
   ok(s.f.stars>=Math.min(5,stars0+1),jt+' +1 ★',{stars:s.f.stars,before:stars0});
   // first metres of the escape; the driver runs off behind
-  await apply({g:true,b:false,s:0});await tick(36);await apply({g:false,b:false,s:0});const fc=await FL();const prC=await shot('j'+J+'_c_flee');log(jt+'_flee',{flee:fc,calls:prC.calls});
+  await apply({g:true,b:false,s:0});await tick(36);await apply({g:false,b:false,s:0});const fc=await FL();const prC=await shot('j'+J+'_c_flee');log(jt+'_flee',{flee:fc,calls:prC.calls,scr:prC.scr,bub:s.f.bub});
   ok(fc&&fc.dc>=3,jt+' driver ran off ≥3 m from the car',fc);
   const jackS=(await G.evaluate(()=>__oc.ev('HUB.fr||0'))-fr0)/60;ok(frames/60<=20,jt+' jack ≤20 s after EXIT',{walkS:+(frames/60).toFixed(1)});
   const wh0=await wallHits();const d2=await drive(100,2700);s=await st();const prD=await shot('j'+J+'_d_drive_star');const wh1=await wallHits();
   const star=await G.evaluate(()=>{const e=document.querySelector('#ofStar');return e&&{t:e.textContent,vis:e.offsetWidth>0,fs:getComputedStyle(e).fontSize}});
   ok(d2>=100,jt+' drove 100 m in the stolen car',+d2.toFixed(0));ok(prD.gap!=null&&Math.abs(prD.gap)<=.05,jt+' tyre gap ≤0.05 m',prD.gap);ok(star&&star.vis&&/★/.test(star.t),jt+' ★ chip visible',star);
-  log(jt+'_drive',{m:+d2.toFixed(0),gap:prD.gap,lowN:prD.lowN,calls:prD.calls,callsCar0:pr0.calls,wall:[wh0,wh1]});mets.push({walkS:+(frames/60).toFixed(1),gap:prD.gap,calls:{car0:pr0.calls,take:shotA.calls,pull:prB.calls,flee:prC.calls,drive:prD.calls},flee:fc,wall:wh1-wh0,stars:s.f.stars})}
+  log(jt+'_drive',{m:+d2.toFixed(0),gap:prD.gap,lowN:prD.lowN,scr:prD.scr,scr0:pr0.scr,bc:s.f.bc,calls:prD.calls,callsCar0:pr0.calls,wall:[wh0,wh1]});mets.push({walkS:+(frames/60).toFixed(1),gap:prD.gap,calls:{car0:pr0.calls,take:shotA.calls,pull:prB.calls,flee:prC.calls,drive:prD.calls},flee:fc,wall:wh1-wh0,stars:s.f.stars})}
  if(city==='ath'){// an Athens kerb-parked car (the lively parker now uses g-streets): look at the nearest one from the pavement side
   const pk=await G.evaluate(()=>__oc.ev(`(()=>{let b=null,bd=1e9,n=0;for(const c of HUB.cars){if(!c.pk||c.dead>0)continue;n++;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd){bd=d;b={x:c.x,z:c.z,y:c.y,h:OF_cH(c),d,W:c.ofW}}}const N=HUB.nodes,E=LV_edges(30,130,.6);let cands=0;for(const c of HUB.cars){if(c.pk||c.route||c.tr||c.dead>0||c.crW||c.ofJ||HCAR[c.k][0]==='#')continue;cands++}return{b,n,athPk:OF.athPk||0,nE:E.length,ws:E.slice(0,8).map(e=>[N[e.i].w,N[e.bi].w,!!N[e.i].g,Math.round(e.L),e.s]),cands,want:LV_d('lvPark'),park:LV.n.park}})()`));log('ath_parked',pk);
   ok(pk.n>=1,tag+' Athens has kerb-parked cars',pk);
