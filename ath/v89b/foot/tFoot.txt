@@ -1,0 +1,61 @@
+phone_fra drive1 {"m":60,"v":0,"btn":"exit","canExit":true}
+phone_fra exitGap {"n":14,"g":20}
+PASS phone_fra EXIT ≥8 px from BOOST and GAS · {"n":14,"g":20}
+phone_fra layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:🚪 EXIT","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tN:10px"]}
+PASS phone_fra EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":true,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS phone_fra EXIT → on foot · {"state":"walk"}
+phone_fra scale {"fig":1.8,"peds":[1.74,1.72,1.77,1.77,1.76,1.77],"figH":1.8,"calls":190,"callsCar":176}
+PASS phone_fra minifig 1.75–1.85 m · 1.8
+PASS phone_fra peds near 1.8–2.0 m · [1.74,1.72,1.77,1.77,1.76,1.77]
+phone_fra zone {"z":[0,70.734375,340.796875,322.265625],"ring":[60,233,146],"hit":"ofZone","hh":"<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di","par":"touch<BODY<HTML","t":393}
+phone_fra layout_foot {"ctl":["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"],"n":5,"ov":[],"tiny":[]}
+PASS phone_fra ≤5 controls on foot · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"]
+PASS phone_fra no HUD over controls · []
+PASS phone_fra text ≥12 px · []
+phone_fra walkshot {"spd":5,"calls":189}
+phone_fra walk1 {"trav":32,"n":{"exit":1,"enter":0,"swap":0,"stuckF":3,"walkF":462,"camIn":0}}
+phone_fra target {"x":1988,"z":11.3,"k":"park","d":33.525674425632104}
+PASS phone_fra walked ≥30 m with the stick · 61.5
+phone_fra doorGap {"n":14,"g":20}
+PASS phone_fra ENTER ≥8 px from JUMP and RUN · {"n":14,"g":20}
+phone_fra near {"stkWhat":[""],"stk":[[1983,2,"car/prop"]],"near":{"k":"park","x":1988,"z":11.3},"btn":"enter","trav":29.6,"n":{"exit":1,"enter":0,"swap":0,"stuckF":9,"walkF":840,"camIn":0}}
+PASS phone_fra ENTER offered at the car · {"btn":"enter","near":{"k":"park","x":1988,"z":11.3}}
+PASS phone_fra ENTER → driving (park) · {"state":"car","own":false,"taken":1}
+phone_fra reenter {"gap":0.034,"calls":178,"callsCar":176,"callsFoot":190,"own":false,"parked":1}
+phone_fra drive2 {"m":101,"gap":0.026,"calls":199}
+PASS phone_fra drove 100 m after ENTER · 101
+PASS phone_fra tyre gap ≤0.05 m after re-entry · 0.026
+PASS phone_fra stuck ≤3 % on foot · 1.1
+PASS phone_fra camera in building ≤2 % · 0
+PASS phone_fra 0 console errors · []
+phone_ath drive1 {"m":60,"v":0,"btn":"exit","canExit":true}
+phone_ath exitGap {"n":14,"g":20}
+PASS phone_ath EXIT ≥8 px from BOOST and GAS · {"n":14,"g":20}
+phone_ath layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:🚪 EXIT","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tN:10px"]}
+PASS phone_ath EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":false,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"park\":false,\"v\":0}"}
+PASS phone_ath EXIT → on foot · {"state":"walk"}
+phone_ath scale {"fig":1.8,"peds":[1.76,1.75,1.74,1.72,1.77,1.73],"figH":1.8,"calls":170,"callsCar":165}
+PASS phone_ath minifig 1.75–1.85 m · 1.8
+PASS phone_ath peds near 1.8–2.0 m · [1.76,1.75,1.74,1.72,1.77,1.73]
+phone_ath zone {"z":[0,70.734375,340.796875,322.265625],"ring":[60,233,146],"hit":"ofZone","hh":"<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di","par":"touch<BODY<HTML","t":393}
+phone_ath layout_foot {"ctl":["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"],"n":5,"ov":[],"tiny":[]}
+PASS phone_ath ≤5 controls on foot · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"]
+PASS phone_ath no HUD over controls · []
+PASS phone_ath text ≥12 px · []
+phone_ath walkshot {"spd":5,"calls":174}
+phone_ath walk1 {"trav":33.5,"n":{"exit":1,"enter":0,"swap":0,"stuckF":3,"walkF":480,"camIn":0}}
+phone_ath target {"x":2134.6541494251637,"z":-1630.826925281799,"k":"cur","d":37.03784485928792}
+PASS phone_ath walked ≥30 m with the stick · 67.5
+phone_ath doorGap {"n":14,"g":20}
+PASS phone_ath ENTER ≥8 px from JUMP and RUN · {"n":14,"g":20}
+phone_ath near {"stkWhat":[""],"stk":[[2135,-1633,"car/prop"]],"near":{"k":"cur","x":2134.7,"z":-1630.8},"btn":"enter","trav":34,"n":{"exit":1,"enter":0,"swap":0,"stuckF":9,"walkF":918,"camIn":0}}
+PASS phone_ath ENTER offered at the car · {"btn":"enter","near":{"k":"cur","x":2134.7,"z":-1630.8}}
+PASS phone_ath ENTER → driving (cur) · {"state":"car","own":true,"taken":0}
+phone_ath reenter {"gap":0.022,"calls":181,"callsCar":165,"callsFoot":170,"own":true,"parked":0}
+phone_ath drive2 {"m":100,"gap":0.023,"calls":157}
+PASS phone_ath drove 100 m after ENTER · 100
+PASS phone_ath tyre gap ≤0.05 m after re-entry · 0.023
+PASS phone_ath stuck ≤3 % on foot · 1
+PASS phone_ath camera in building ≤2 % · 0
+PASS phone_ath 0 console errors · []
+TFOOT_PASS

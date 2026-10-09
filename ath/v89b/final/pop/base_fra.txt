@@ -1,0 +1,5 @@
+fra route m 9066 pts 152 kmh 200
+fra POPIN {"frames":9720,"holeFrames":0,"holeMax":0,"hole1k":0,"lzHoleFrames":0,"lzHoleMax":0,"frMax":0,"fr16":0,"fr50":0,"shotsAt":[],"pc":[3273.4667034185386,-3367.2675647079004],"str":null,"lz":{"max":8.9,"over":1,"big":null}}
+shot ath/v89b/final/pop/base/fra_long900.png {"calls":240,"tris":1406420,"holes":0}
+shot ath/v89b/final/pop/base/fra_long1500.png {"calls":247,"tris":1306201,"holes":0}
+errors 0 
