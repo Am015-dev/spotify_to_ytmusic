@@ -19,7 +19,7 @@ const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
 const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
 const TP={revLeft:0,rgnT:0,boost:{},
   raw(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));},                 // the level you own
-  l(id){return GA.eq&&GA.eq[id]?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
+  l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
 GA.tune={};{const o=load('mnr_tune',{});if(o&&typeof o==='object'&&!Array.isArray(o))for(const d of TP_DEF)if(isFinite(o[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(o[d.id])));}
 const tsave=()=>save('mnr_tune',GA.tune);
 /* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 15 story stars (up to 8). Existing players start with their best perks equipped. */
@@ -135,15 +135,17 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 /* ----- the garage: a TUNE tab with levels; the old tabs keep working ----- */
 {const tabs=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='tune';b.type='button';b.textContent='TUNE';tabs.prepend(b);b.addEventListener('click',()=>{GA.tab='tune';gaDraw();});}
 const gaItems0=gaItems;
+function perkIcon(d){return d.uid&&ART.isReal('kit-'+d.uid)?`<img class="ki" src="media/kit-${d.uid}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
   for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
-    b.innerHTML=svgI(d.ic)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
+    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
       +`<div class="pr">${pr?neonI+' '+pr:'MAX'}</div>`+(d.id===rec?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>tuneBuy(d,b));box.appendChild(b);}}
 function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
   if(GA.bank<pr){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return false;}
-  GA.bank-=pr;GA.tune[d.id]=l+1;tsave();gsave();SH.recalc();gaMsg(d.n+' level '+(l+1));AU.sfx('up');gaDraw();return true;}
+  GA.bank-=pr;GA.tune[d.id]=l+1;if(l===0&&eqCount()<eqSlots()){GA.eq[d.id]=true;eqsave();}   // a new perk goes into a free slot at once
+  tsave();gsave();SH.recalc();gaMsg(d.n+' level '+(l+1));AU.sfx('up');gaDraw();return true;}
 gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.classList.remove('tune');
@@ -151,7 +153,7 @@ gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
   else{box.innerHTML='';
     for(const it of gaItems()){const own=!it.k||GA.own[it.k],b=document.createElement('button');b.type='button';
       b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
-      const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:svgI(it.ic);
+      const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:it.kind==='ship'?shipPortrait(it):svgI(it.ic);
       const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
       b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
       b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}

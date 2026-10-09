@@ -91,10 +91,10 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); else notes.push('ok ' + m
     let d = xs.map(v => { let q = v - K.k; q -= Math.round(q); return q * K.spb * 1000; }), mx = d.reduce((a, b) => Math.max(a, Math.abs(b)), 0); check(mx <= 40, `tempo x1.25: grid stays on the song for 5 s (max ${mx.toFixed(1)} ms)`); }
   await p.waitForFunction(() => __mnr.NR.music.rate === 1, null, { timeout: 40000 }).catch(() => fails.push('tempo power-up never ended')); await sleep(2500);
   await truthRun(2500, 'after the tempo is back');
-  // dying: hull 1 slows the song to x0.85 (pitch follows), the grid stays on it; healed, it is back at 1
+  // dying: hull 1 no longer slows the song (heartbeat and red pulse instead)
   await p.evaluate(() => { __mnr.P.hp = 1; }); await sleep(2000);
   const DY = await p.evaluate(() => { const m = __mnr, s = m.AU.slots.find(x => x.stage === m.BT.stage && x.playing); return { rate: s.el.playbackRate, mr: m.NR.music.rate, pp: s.el.preservesPitch }; });
-  check(Math.abs(DY.mr - .85) < .011 && Math.abs(DY.rate - .85) < .05 && DY.pp === false, `hull 1: song slowed (music ${DY.mr}, element ${DY.rate.toFixed(3)}, preservesPitch ${DY.pp})`);
+  check(DY.mr === 1 && Math.abs(DY.rate - 1) < .02, `hull 1: song keeps its tempo (music ${DY.mr}, element ${DY.rate.toFixed(3)})`);
   await truthRun(3000, 'while the ship is dying');
   await p.evaluate(() => { __mnr.P.hp = __mnr.P.max; }); await sleep(2000);
   check(await p.evaluate(() => __mnr.NR.music.rate === 1), 'healed: song back at 1'); await truthRun(2500, 'after healing');

@@ -1,18 +1,5 @@
 {
- "fails": [
-  {
-   "tag": "difficulty",
-   "kind": "balance",
-   "detail": "Normal: a careless player must die within 90 s: {\"died\":0.6666666666666666,\"t\":92,\"hits\":4.333333333333333}",
-   "shot": ""
-  },
-  {
-   "tag": "difficulty",
-   "kind": "balance",
-   "detail": "Hard: the dodging bot must die and lose hull: [{\"died\":0,\"t\":120,\"hits\":2.8333333333333335},{\"died\":0,\"t\":120,\"hits\":1.3333333333333333}]",
-   "shot": ""
-  }
- ],
+ "fails": [],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -23,54 +10,7 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 0,
-  "diff": {
-   "easy/idle": {
-    "died": 1,
-    "t": 22.700000000000003,
-    "hits": 5
-   },
-   "easy/careless": {
-    "died": 0.8333333333333334,
-    "t": 99.85000000000001,
-    "hits": 4.833333333333333
-   },
-   "easy/natural": {
-    "died": 0.3333333333333333,
-    "t": 100.8,
-    "hits": 3.5
-   },
-   "normal/idle": {
-    "died": 1,
-    "t": 20.316666666666666,
-    "hits": 5
-   },
-   "normal/careless": {
-    "died": 0.6666666666666666,
-    "t": 92,
-    "hits": 4.333333333333333
-   },
-   "normal/natural": {
-    "died": 0,
-    "t": 120,
-    "hits": 1.3333333333333333
-   },
-   "hard/idle": {
-    "died": 1,
-    "t": 11.399999999999999,
-    "hits": 5
-   },
-   "hard/careless": {
-    "died": 1,
-    "t": 42.43333333333334,
-    "hits": 5
-   },
-   "hard/natural": {
-    "died": 0,
-    "t": 120,
-    "hits": 2.8333333333333335
-   }
-  }
+  "shopChecks": 41
  },
  "avg": 0
 }

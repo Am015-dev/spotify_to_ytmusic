@@ -75,7 +75,9 @@ function buildBG(i){const D=DISTRICTS[i];
   {const g=mid.c.getContext('2d');g.save();g.globalCompositeOperation='lighter';g.globalAlpha=.5;mid.lights.forEach(([lx,ly],k)=>{if(k%2)return;g.drawImage(glow('#ff3030'),lx-6,ly-6,12,12);});g.restore();}   // red tower lights are part of the layer (they were ~12 glow draws a frame)
   const lms=D.lm.filter(k=>k!=='hammer').map(k=>lmSprite(k,D));
   return{D,far,mid,lms,hammer:D.lm.includes('hammer')};}
-const BGC={};function bgFor(i){return BGC[i]||(BGC[i]=buildBG(i));}
+const BGC={};function bgFor(i){if(BGC[i])return BGC[i];
+  if(ART.stubOk(i,false))return BGC[i]={D:DISTRICTS[i],stub:1,lms:[]};     // painted district: no procedural skyline to build (building one was a 20-80 ms hitch)
+  return BGC[i]=buildBG(i);}
 
 // Scanlines + vignette: rebuilt at the canvas's own pixel size (1 canvas pixel per output pixel, no scaling pass) and drawn as one image a frame.
 const SCN={l:null,p:null};
@@ -104,6 +106,7 @@ function skyFor(bg,port){const w=cv.width,h=cv.height,s=SKYS[port?'p':'l'];if(s&
 
 function drawBG(bg,t,dt,scroll){const D=bg.D;
   if(ART.paintBG(bg,t,scroll))return;                    // painted backdrop + painted parallax strips (art.js); the procedural sky and skylines below are the fallback
+  if(bg.stub){const i=DISTRICTS.indexOf(D);if(!ART.failed(i,false)){ctx.drawImage(skyFor(bg,false),0,0,W,H);return;}D.nostub=1;delete BGC[i];bg=bgFor(i);}     // still loading: the plain sky; a file failed: build the real skyline
   ctx.drawImage(skyFor(bg,false),0,0,W,H);                // sky gradient + moon haze, drawn once per district and size (see skyFor)
   ctx.save();ctx.globalAlpha=.1;ctx.font='700 46px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;
   const adw=(bg.adw||(bg.adw=ctx.measureText(D.ad).width))+400;const ax=W-((scroll*.06)%(adw+W));ctx.fillText(D.ad,ax,84);ctx.restore();
@@ -170,11 +173,12 @@ function roofLayer(h,o){const[c,g]=mk(PW_,h);const r=mul(o.seed);let y=0;
 function buildBGP(i){const D=DISTRICTS[i];
   return{far:roofLayer(1100,{seed:31+i*7,minW:50,maxW:130,minH:70,maxH:170,body:'#0d0a1e',edge:D.b,ea:.18,detail:'#1a1536',win:D.win,winP:.1,cell:3,fill:.8,gap:16}),
          near:roofLayer(1500,{seed:77+i*13,minW:70,maxW:170,minH:120,maxH:260,body:'#07050f',edge:D.a,ea:.55,detail:'#140e24',win:D.win,winP:.16,cell:4,fill:.7,gap:30,beacon:1})};}
-const BGPC={};function bgpFor(i){return BGPC[i]||(BGPC[i]=buildBGP(i));}
+const BGPC={};function bgpFor(i){if(BGPC[i])return BGPC[i];if(ART.stubOk(i,true))return BGPC[i]={stub:1};return BGPC[i]=buildBGP(i);}
 
-function drawBGP(bg,t,dt,scroll){const D=bg.D,L=bgpFor(DISTRICTS.indexOf(D));
+function drawBGP(bg,t,dt,scroll){const D=bg.D;let L=bgpFor(DISTRICTS.indexOf(D));
   const PA=ART.paintP(bg,scroll);if(!PA)ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);   // painted phone backdrop, the roofs on top fainter
-  for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=PA?0:al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
+  if(!PA&&L.stub&&ART.failed(DISTRICTS.indexOf(D),true)){const i=DISTRICTS.indexOf(D);D.nostubP=1;delete BGPC[i];L=bgpFor(i);}
+  if(!PA&&!L.stub)for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
   ctx.globalAlpha=1;
   if(D.near==='river'&&!PA){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';

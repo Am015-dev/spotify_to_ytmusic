@@ -81,4 +81,4 @@ function drawBossX(e,t){ctx.fillStyle='#100a1c';ctx.strokeStyle=e.col;ctx.lineWi
 /* story act V: the stages are in story.js (CITYS) */
 BOSS_SUB[7]='Shield wall, spear rig';
 DISTRICTS[ATH].song='athina';
-setTimeout(()=>{if(!running)bgFor(ATH);},3900);                                                       // build the skyline while the title is up
+                                                       // build the skyline while the title is up

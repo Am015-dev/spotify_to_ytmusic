@@ -7,7 +7,7 @@
 const PWK={
   drum:{n:'DRUM BURST',tip:'Auto-fire on every beat',c:'#ffe14d',bars:8,w:3},
   tempo:{n:'TEMPO UP',tip:'Faster beat · score ×2',c:'#ff7a3d',bars:8,w:3,rate:1.25},
-  slow:{n:'SLOW GROOVE',tip:'Slower beat and bullets',c:'#5b8cff',bars:8,w:2,rate:.75},
+  slow:{n:'SLOW GROOVE',tip:'Slower enemy bullets',c:'#5b8cff',bars:8,w:2},
   drop:{n:'DROP',tip:'Blast on the downbeat',c:'#b36bff',bars:2,w:2}};
 const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended:0},log:[],
   st(){return G.pw||(G.pw={act:[],drop:null,ls:G.score,cnt:16,wv:0});},

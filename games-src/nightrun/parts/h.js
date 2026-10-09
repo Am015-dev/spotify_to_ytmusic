@@ -9,7 +9,8 @@ NR.on('runEnd',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,beam:null});if(D
 NR.on('tick',dt=>{if(!G.live)return;
   if(dt>0){const k=Math.min(1,dt*8);PV.x+=((P.x-PV.px)/dt-PV.x)*k;PV.y+=((P.y-PV.py)/dt-PV.y)*k;PV.px=P.x;PV.py=P.y;if(P.dashT>0){PV.x*=.3;PV.y*=.3;}}
   /* --- dying slows the beat --- */
-  const tgt=G.dead?.5:P.hp<=1?.85:P.hp<=2?.92:1,tau=G.dead?.33:.2;DYE.cur+=(tgt-DYE.cur)*Math.min(1,dt/tau);if(Math.abs(DYE.cur-tgt)<.004)DYE.cur=tgt;
+  const tgt=1,tau=.2;   // the song never slows down any more (it sounded bad): low hull is shown by a red pulse and a heartbeat instead, see ai.js
+  DYE.cur+=(tgt-DYE.cur)*Math.min(1,dt/tau);if(Math.abs(DYE.cur-tgt)<.004)DYE.cur=tgt;
   const q=Math.round(DYE.cur*100)/100;if(q!==DYE.q){DYE.q=q;const rt=PW.st().act.find(a=>PWK[a.k].rate),want=(rt?PWK[rt.k].rate:1)*q;if(Math.abs(NR.music.rate-want)>=.005)NR.music.setRate(want);}
   if(G.dead){STILL.beam=null;return;}
   /* --- stillness --- */

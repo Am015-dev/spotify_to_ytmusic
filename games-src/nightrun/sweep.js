@@ -647,12 +647,12 @@ async function powerTests(browser, synth) {
     const sp = () => ev(p, () => { const b = __mnr.G.eb.find(b => b.tag); return b ? Math.hypot(b.vx, b.vy) : -1; });
     const sp0 = await sp(); c = await collect('slow', false); await sleep(1500);
     st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null, d: (__mnr.G.pw.act.find(a => a.k === 'slow') || {}).d }));
-    if (st.rate !== .75 || Math.abs(st.bpm - base.bpm * .75) > .01) await fail(p, tag, 'power', `SLOW GROOVE: rate ${st.rate} bpm ${st.bpm}, wanted x0.75 of ${base.bpm}`);
-    if (!synth && Math.abs(st.pr - .75) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
+    if (st.rate !== 1 || Math.abs(st.bpm - base.bpm) > .01) await fail(p, tag, 'power', `SLOW GROOVE must not change the music: rate ${st.rate} bpm ${st.bpm}, wanted x1 of ${base.bpm}`);
+    if (!synth && Math.abs(st.pr - 1) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
     const nb = await ev(p, () => { const n = __mnr.G.eb.length; __mnr.eb(900, 40, Math.PI / 2, 100); const b = __mnr.G.eb[__mnr.G.eb.length - 1]; return Math.hypot(b.vx, b.vy) / __mnr.DF.bs / __mnr.STILL.bk; });   // a ship that stands still makes bullets quicker (STILL.bk): not part of this check
     if (Math.abs(nb - 60) > .5) await fail(p, tag, 'power', 'SLOW GROOVE: a new enemy bullet of speed 100 flies at ' + nb.toFixed(1) + ' (want 60)');
     if (sp0 > 0 && Math.abs((await sp()) - sp0 * .6) > .05) await fail(p, tag, 'power', 'SLOW GROOVE did not slow a bullet that was already flying');
-    await checkAlign('tempo x0.75', 3.5);
+    await checkAlign('slow groove, tempo unchanged', 3.5);
     if (!await waitEnd('slow', 40)) await fail(p, tag, 'power', 'SLOW GROOVE did not end within 40 s');
     await timing('slow', 32, await lastLog('slow'));
     const back = await ev(p, () => ({ bs: __mnr.PW.bs, bad: __mnr.G.eb.filter(b => b.sl).length, rate: __mnr.NR.music.rate }));
@@ -824,7 +824,7 @@ async function tuneTests(browser, cfg, full) {
     const ui = await ev(p, () => ({ n: document.querySelectorAll('#gaCards .card[data-kind="tune"]').length, rec: [...document.querySelectorAll('#gaCards .rec')].map(e => e.closest('.card').dataset.id), words: [...document.querySelectorAll('#gaCards .card .t')].every(e => e.textContent.trim().split(/\s+/).length <= 8), tab: document.querySelector('.tabs button.on').dataset.t, total: __mnr.TP_DEF.length }));
     await chk(p, ui.n === ui.total && ui.tab === 'tune' && ui.rec.length === 1, 'garage-ui', 'tune tab ' + JSON.stringify(ui)); await chk(p, ui.words, 'message-too-long', 'perk text over 8 words');
     // buy: price scales with the level, bank drops, level saved, survives a reload
-    const before = await ev(p, () => ({ bank: __mnr.GA.bank, price: [0, 1, 2, 3].map(l => { const d = __mnr.TP_DEF[0]; return Math.round(d.p * (1 + .55 * l + .09 * l * l) / 5) * 5; }) }));
+    const before = await ev(p, () => ({ bank: __mnr.GA.bank, price: [0, 1, 2, 3].map(l => { const d = __mnr.TP_DEF[0]; return Math.round(1.5 * d.p * (1 + .55 * l + .09 * l * l) / 5) * 5; }) }));
     await chk(p, before.price[1] > before.price[0] && before.price[3] > before.price[2], 'price-scale', JSON.stringify(before.price));
     const tapCard = async id => { await ev(p, id => document.querySelector(`#gaCards .card[data-id="${id}"]`).scrollIntoView({ block: 'center' }), id); await sleep(120); await press(p, cfg, T, `#gaCards .card[data-id="${id}"]`); await sleep(200); };
     await tapCard('tp_dmg');
@@ -833,6 +833,7 @@ async function tuneTests(browser, cfg, full) {
     a = await ev(p, () => ({ bank: __mnr.GA.bank, l: __mnr.GA.tune.rev || 0, msg: document.getElementById('gaMsg').textContent })); await chk(p, a.l === 0 && /Need/.test(a.msg), 'tune-buy', 'bought an unaffordable perk ' + JSON.stringify(a));
     await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
     a = await ev(p, () => ({ l: __mnr.GA.tune.dmg, own: __mnr.GA.own.pu_bub })); await chk(p, a.l === 1 && a.own, 'tune-persist', 'perk level lost after reload ' + JSON.stringify(a));
+    await ev(p, () => { __mnr.GA.eqAll = true; });   // the effect tests set levels directly: count them all as equipped
     if (!full) { await p.context().close(); return; }
     // every perk at once: the run starts with them, and they do what the card says
     await ev(p, () => { const G_ = __mnr.GA; for (const d of __mnr.TP_DEF) G_.tune[d.id] = d.max; G_.bank = 99999; });
@@ -1207,7 +1208,7 @@ async function settingsTests(browser, cfg) {
     const got = await ev(p, () => ({ S: Object.assign({}, __mnr.SET), st: JSON.parse(localStorage.getItem('mnr_set')), mute: localStorage.getItem('mnr_mute'), hard: __mnr.HARD, df: __mnr.DF.d, cls: [...document.getElementById('stage').classList], hc: document.documentElement.classList.contains('hc'), fpsEl: !document.getElementById('fpsEl').hidden, pressed: [...document.querySelectorAll('#setBody .seg[data-k="diff"] button')].map(b => b.getAttribute('aria-pressed')).join() }));
     for (const k in want) await chk(got.S[k] === want[k][0] && got.st[k] === want[k][0], 'settings', `${k} = ${got.S[k]} (saved ${got.st && got.st[k]}), wanted ${want[k][0]}`);
     await chk(got.S.sens === 5 && got.S.master === .6 && got.S.music === .3 && got.S.sfx === .4 && got.S.sync === -35, 'settings', 'sliders ' + JSON.stringify([got.S.sens, got.S.master, got.S.music, got.S.sfx, got.S.sync]));
-    await chk(got.hard && got.df > 2 && got.cls.includes('tl') && got.cls.includes('ds-L') && got.hc && got.fpsEl && got.mute === 'true' && got.pressed === 'false,false,true', 'settings', 'not applied live ' + JSON.stringify({ hard: got.hard, df: got.df, cls: got.cls, hc: got.hc, fpsEl: got.fpsEl, mute: got.mute, pressed: got.pressed }));
+    await chk(got.hard && got.df > 2 && got.cls.includes('tl') && got.cls.includes('ds-L') && got.hc && got.fpsEl && got.mute === 'true' && got.pressed === 'false,false,true,false,false', 'settings', 'not applied live ' + JSON.stringify({ hard: got.hard, df: got.df, cls: got.cls, hc: got.hc, fpsEl: got.fpsEl, mute: got.mute, pressed: got.pressed }));
     await chk(got.S.reduce === true && got.S.calm === true, 'settings', 'derived reduce/calm wrong');
     await press(p, cfg, T, '#setBack'); await sleep(150);
     // applied in a run: touch buttons on the chosen side and bigger, no particles, mute silences the master gain, 30 fps cap halves the frame rate
