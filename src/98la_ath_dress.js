@@ -3,7 +3,7 @@
 // drawn from 4 InstancedMeshes (4 draws, no shadows) refilled around the player every 12 frames. Everything is smashable like the stalls:
 // fast contact = brick burst + studs + a little speed loss; slow contact pushes the car out (collider = drawn size). TUNE.lvDress scales it.
 const AD={grp:null,I:null,G:null,M:null,dead:new Set(),fr:0,px:1e9,pz:1e9,n:{}};
-const AD_T=[{k:'tree',r:.9,cap:260},{k:'kiosk',r:1.7,cap:24},{k:'scoot',r:.8,cap:120},{k:'boll',r:.35,cap:260}];
+const AD_T=[{k:'tree',r:1,cap:260},{k:'kiosk',r:2,cap:24},{k:'scoot',r:.8,cap:120},{k:'boll',r:.35,cap:260}];
 function AD_geo(){
   const tree=mergeG([ccyl(.22,.26,1.6,0,.8,0,'#7a4a24',6),ccyl(.5,.5,.12,0,.06,0,'#8f8474',8),cbox(1.9,.9,1.9,0,1.95,0,'#2f8a3a'),cbox(1.5,.8,1.5,0,2.75,0,'#38a046'),cbox(.9,.5,.9,0,3.35,0,'#45b450'),
     ...[[.75,2.1,.55],[-.6,2.3,.78],[.3,2.9,-.62],[-.7,2.0,-.5],[.62,2.75,.2],[0,3.5,.3]].map(([x,y,z])=>ccyl(.13,.13,.14,x,y+(Math.abs(x)>.7||Math.abs(z)>.7?0:.42),z,'#ff8c1a',6))]);
@@ -23,7 +23,7 @@ function AD_cell(cx,cz){const key=cx*100000+cz;let a=AD.C.get(key);if(a)return a
       for(let s=r()*6;s<L;s+=6){const q=r(),h0=r(),sc=r();if(s<j0||s>j1)continue;const t=q<.38?0:q<.58?3:q<.78?2:q<.795?1:-1;if(t<0)continue;
         const o=t===1?off+.6:off,X=A.x+ux*s-uz*o*sd,Z=A.z+uz*s+ux*o*sd;if(Math.floor(X/40)!==cx||Math.floor(Z/40)!==cz)continue;if(!free(X,Z,AD_T[t].r))continue;
         const y=Math.max(0,groundY(X,Z)),h=Math.atan2(ux,uz)+(t===2?(sd>0?1.2:-1.2)+(h0-.5)*.5:t===1?(sd>0?-Math.PI/2:Math.PI/2):h0*6.28);
-        a.push({t,x:X,z:Z,y,h,s:t===0?.9+sc*.25:1});if(t===3){const x2=X+ux*1.6,z2=Z+uz*1.6;if(free(x2,z2,.35))a.push({t:3,x:x2,z:z2,y,h:0,s:1})}}}}
+        a.push({t,x:X,z:Z,y,h,s:t===0?1.35+sc*.3:t===1?1.2:1});if(t===3){const x2=X+ux*1.6,z2=Z+uz*1.6;if(free(x2,z2,.35))a.push({t:3,x:x2,z:z2,y,h:0,s:1})}}}}
   AD.n.items=(AD.n.items||0)+a.length;AD.n.cells=AD.C.size;return a}
 function AD_init(){AD.grp=HUB.grp;AD.dead=new Set();AD.C=new Map();AD.occ=new Set();AD.n={};AD.px=AD.pz=1e9;const g=AD_geo(),col=new THREE.Color(),SC=['#ffffff','#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ff7ac0','#2b2b2b','#8fd0ff'];
   AD.M=AD_T.map((T,j)=>{const m=LV_im(g[j],T.cap);m.count=0;m.name='ad_'+T.k;return m});
