@@ -21,16 +21,15 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Engine','W13S.city','City top speed ×',.5,1.6,.01],['Engine','W13S.open','Open-road top speed ×',.5,1.6,.01],['Engine','TUNE.abTop','Autobahn top speed ×',.8,2,.01],
  ['Engine','TUNE.acc','Acceleration',.4,3,.05],['Engine','W13S.cp','Accel curve (higher = pulls to top)',.5,4,.1],['Engine','C26.thUp','Throttle response',.5,10,.1],
  ['Engine','C26.brkCity','Brake force',4,40,.5],['Engine','TUNE.rev','Reverse top (m/s)',5,30,1],
- // v88z (98qs_speed.js): real top speeds per class in km/h (open road / Autobahn); city × spCity; boost adds spBoost. OFF = the old tops
- ['Engine','TUNE.spOn','Real class top speeds (v88z)',0,1,1,'bool'],['Engine','TUNE.spCar','Street car / Hot Rod top (km/h)',120,360,5],['Engine','TUNE.spTuner','Street tuner top (km/h)',120,360,5],
- ['Engine','TUNE.spGT','GT top (km/h)',120,360,5],['Engine','TUNE.spSuper','Supercar top (km/h)',150,400,5],['Engine','TUNE.spHyper','Hypercar top (km/h)',150,400,5],
- ['Engine','TUNE.spRoad','Roadster top (km/h)',120,360,5],['Engine','TUNE.spCoupe','Time coupe top (km/h)',120,360,5],['Engine','TUNE.spOff','Off-road 4x4 top (km/h)',80,300,5],
- ['Engine','TUNE.spBoat','Boat top (km/h)',40,200,5],['Engine','TUNE.spBus','Bus top (km/h)',60,200,5],['Engine','TUNE.spTruck','Truck top (km/h)',60,200,5],
- ['Engine','TUNE.spLimo','Limo top (km/h)',100,300,5],['Engine','TUNE.spMT','Monster truck top (km/h)',60,250,5],['Engine','TUNE.spCity','City streets: share of top',.3,1,.01],
- ['Engine','TUNE.spOpen','Open road: share of top',.5,1.2,.01],['Engine','TUNE.spMax','Top-speed cap (km/h, level + upgrades)',200,450,5],
- ['Boost','TUNE.spBoost','Boost / turbo: extra top speed ×',0,1,.01],
- // v88z traffic (next city load): city cruise speeds in km/h, ±15 %; trOn OFF = the old mix (every type equally often) and 50-86 km/h
- ['Life','TUNE.trOn','Realistic traffic mix + speeds (v88z)',0,1,1,'bool'],['Life','TUNE.trCar','Traffic cars cruise (km/h)',20,90,1],['Life','TUNE.trHeavy','Trucks/buses cruise (km/h)',20,90,1],['Life','TUNE.trScoot','Scooters cruise (km/h)',20,90,1],['Life','TUNE.rampClear','Traffic keeps off ramp streets (v88z)',0,1,1,'bool'],
+ // v88z (98qs_speed.js): per-class roam top / boost top in km/h (open road + Autobahn); city streets × spCityK. OFF = the old 174/224 cap
+ ['Engine','TUNE.spOn','Per-class top speeds (v88z)',0,1,1,'bool'],['Engine','TUNE.spCityK','City streets: share of top',.4,1.2,.01],['Engine','TUNE.spOpen','Open road: share of top',.5,1.3,.01],
+ ['Engine','TUNE.spSport','Sports (Hot Rod, tuners) top',100,400,5],['Engine','TUNE.spSportB','Sports boost top',100,450,5],['Engine','TUNE.spSuper','Supercar (GT, Gold, hypercar) top',100,400,5],['Engine','TUNE.spSuperB','Supercar boost top',100,450,5],
+ ['Engine','TUNE.spSuv','SUV / 4x4 / limo top',60,300,5],['Engine','TUNE.spSuvB','SUV boost top',60,350,5],['Engine','TUNE.spVan','Van / monster truck top',60,250,5],['Engine','TUNE.spVanB','Van boost top',60,300,5],
+ ['Engine','TUNE.spHeavy','Truck / bus top',50,200,5],['Engine','TUNE.spHeavyB','Truck / bus boost top',50,250,5],['Engine','TUNE.spCar','City car top',60,250,5],['Engine','TUNE.spCarB','City car boost top',60,300,5],
+ ['Engine','TUNE.spBoat','Boat top',30,200,5],['Engine','TUNE.spBoatB','Boat boost top',30,250,5],['Engine','TUNE.spMax','Top-speed cap (level + upgrades)',150,450,5],
+ // v88z traffic (next city load): mix + city cruise ±10 % (Autobahn 100-130, trucks 80-90); trHour = count follows the hour; rampClear/rampFit = ramps
+ ['Life','TUNE.trOn','Realistic traffic mix + speeds (v88z)',0,1,1,'bool'],['Life','TUNE.trHour','Traffic count follows the hour',0,1,1,'bool'],['Life','TUNE.trCar','Traffic cars cruise (km/h)',20,90,1],['Life','TUNE.trHeavy','Trucks/buses cruise (km/h)',20,90,1],['Life','TUNE.trScoot','Scooters cruise (km/h)',20,90,1],
+ ['Life','TUNE.rampClear','Traffic keeps off ramp streets (v88z)',0,1,1,'bool'],['Life','TUNE.rampFit','Ramps fitted to the street (v88z, next load)',0,1,1,'bool'],
  ['Boost','TUNE.bPush','Boost burst push',0,60,1],['Boost','TUNE.bTop','Boost top-speed bonus ×',0,3,.05],['Boost','TUNE.bDrain','Boost use per s',5,60,1],
  ['Boost','TUNE.bRegen','Meter regen per s',0,9,.25],['Boost','TUNE.bashT','Brickbash after (s)',.5,6,.1],
  ['Boost','TUNE.hop','Hop height',4,24,.5],['Boost','TUNE.grav','Gravity',10,60,1],
