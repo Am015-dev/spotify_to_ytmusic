@@ -4,7 +4,7 @@ const enter=require('../bc/enter.js');const fs=require('fs');const URL=process.a
 const S=[['plaka',380,-260,600,-560],['syntagma',760,-40,1007,-91],['monastiraki',40,40,46,-15],['acropolis',260,-650,40,-480],['syngrou',380,-1500,572,-656],['pangrati',1750,-950,1369,-865]];
 (async()=>{const seed=`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`;
  const E=await enter(URL,{gfx:process.env.GFX||'normal',seed});const {p,errs}=E;p.setDefaultTimeout(900000);
- if(process.env.LIFE)await p.evaluate(v=>__g9ev('TUNE.life='+v),process.env.LIFE);await E.roamApi();
+ if(process.env.LIFE)await p.evaluate(v=>__g9ev('TUNE.life='+v),process.env.LIFE);if(process.env.SET)await p.evaluate(v=>__g9ev(v),process.env.SET);await E.roamApi();
  const dis=async()=>{for(let i=0;i<4;i++){const l=p.getByText('CONTINUE',{exact:false}).first();if(await l.count()&&await l.isVisible()){await E.tapEl(await l.elementHandle());await p.waitForTimeout(800)}else break}};await dis();
  const only=process.env.ONLY?process.env.ONLY.split(','):null;
  for(const [nm,e,n,le,ln] of S){if(only&&!only.includes(nm))continue;

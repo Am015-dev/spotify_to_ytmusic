@@ -86,6 +86,7 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvPopGap` Pop-up gap (s) | 28 | seconds after one ends before the next ring (×0.6 after a miss) |
 | `TUNE.lvPopRw` Pop-up studs × | 1 | reward 150 studs × this, plus a brick burst |
 | `TUNE.lvLod` Far people/cars: fewer pose updates | ON | (v88u perf) people > 90 m away re-pose every 3rd frame, traffic cars > 250 m every 4th (they still move every frame). OFF = every frame, as before |
+| `TUNE.perfHud` Show FPS · worst frame · draws · tris | OFF | (v88u) one small line (bottom left, under the steer buttons) with fps, the worst frame of the last 2 s, JS ms per frame, the frame's real draw calls and triangles. For perf reports from a real PC/phone |
 
 ## Where the values live
 - Beta artifact (db capability): collection `tune_versions` holds one doc `v<N>` per version: `{v, note, values, createdAt}`. Doc `tune/current` holds `{v}`.

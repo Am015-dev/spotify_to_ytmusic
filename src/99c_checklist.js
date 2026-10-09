@@ -3,7 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
- {ver:'v88u',id:'perf-smooth',text:'The game runs smoothly on PC and phone in Frankfurt and in Athens: drive 1 minute fast through busy streets, no stutter.'},
+ {ver:'v88u',id:'perf-smooth',text:'The game runs smoothly on PC and phone in Frankfurt and in Athens: drive 1 minute fast through busy streets, no stutter. If it still lags: ⚙ TUNE → Life → turn on "Show FPS" and send a screenshot of the line at the bottom while driving.'},
  {ver:'v88u',id:'perf-people',text:'Streets still feel alive but not crowded: a few groups of people ahead, not a crowd everywhere.'},
  {ver:'v88u',id:'perf-pop',text:'The first pop-up ring of a drive appears without a hitch.'},
  {ver:'v88t',id:'sc-rides',text:'Garage RIDES → STREET: a SPEED SERIES row shows Time Coupe, Red Hypercar and Gold Formula; each looks like a LEGO Speed Champions car (8 studs wide, chunky, real parts).'},
