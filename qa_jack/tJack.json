@@ -1,0 +1,451 @@
+[
+ {
+  "mode": "phone",
+  "city": "fra",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 61,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.74,
+      1.72,
+      1.73,
+      1.73,
+      1.76,
+      1.77
+     ],
+     "figH": 1.8,
+     "calls": 184,
+     "callsCar": 181
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚪 ENTER",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "phone_fra_j1_target",
+    {
+     "x": 1994.1004951918837,
+     "z": 7.92,
+     "h": 1.5707963267948966,
+     "fx": 1,
+     "fz": 6.123233995736766e-17,
+     "cv": 2,
+     "d": 5.477985279348595,
+     "ah": 7.25875461887631,
+     "j": 1,
+     "k": 8
+    }
+   ],
+   [
+    "phone_fra_j1_pull",
+    {
+     "state": "jack",
+     "jack": {
+      "t": 0.8,
+      "ph": "pull"
+     },
+     "flee": {
+      "h": 2.684,
+      "ph": "out",
+      "t": 0.37,
+      "d": 0,
+      "dc": 1.5,
+      "dp": 0.9
+     },
+     "calls": 187
+    }
+   ],
+   [
+    "phone_fra_j1_flee",
+    {
+     "flee": {
+      "h": 2.781,
+      "ph": "run",
+      "t": 1.63,
+      "d": 0.7,
+      "dc": 3.6,
+      "dp": 4
+     },
+     "calls": 192
+    }
+   ],
+   [
+    "phone_fra_j1_drive",
+    {
+     "m": 102,
+     "gap": -0.044,
+     "calls": 191,
+     "callsCar0": 181,
+     "wall": [
+      null,
+      null
+     ]
+    }
+   ],
+   [
+    "phone_fra_j2_target",
+    {
+     "x": 2135.328751176915,
+     "z": 7.92,
+     "h": 1.5707963267948966,
+     "fx": 1,
+     "fz": 6.123233995736766e-17,
+     "cv": 0,
+     "d": 4.733971199506863,
+     "ah": 12.909017039657101,
+     "j": 2,
+     "k": 7
+    }
+   ],
+   [
+    "phone_fra_j2_pull",
+    {
+     "state": "car",
+     "jack": null,
+     "flee": null,
+     "calls": 179
+    }
+   ],
+   [
+    "phone_fra_j2_flee",
+    {
+     "flee": null,
+     "calls": 176
+    }
+   ],
+   [
+    "phone_fra_j2_drive",
+    {
+     "m": 101,
+     "gap": -0.042,
+     "calls": 159,
+     "callsCar0": 181,
+     "wall": [
+      null,
+      null
+     ]
+    }
+   ]
+  ],
+  "metrics": {
+   "jacks": [
+    {
+     "walkS": 1.2,
+     "gap": -0.044,
+     "calls": {
+      "car0": 181,
+      "take": 193,
+      "pull": 187,
+      "flee": 192,
+      "drive": 191
+     },
+     "flee": {
+      "h": 2.781,
+      "ph": "run",
+      "t": 1.63,
+      "d": 0.7,
+      "dc": 3.6,
+      "dp": 4
+     },
+     "wall": null,
+     "stars": 1
+    },
+    {
+     "walkS": 25,
+     "gap": -0.042,
+     "calls": {
+      "car0": 181,
+      "take": 188,
+      "pull": 179,
+      "flee": 176,
+      "drive": 159
+     },
+     "flee": null,
+     "wall": null,
+     "stars": 0
+    }
+   ],
+   "errs": []
+  }
+ },
+ {
+  "mode": "phone",
+  "city": "ath",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 61,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.76,
+      1.76,
+      1.74,
+      1.76,
+      1.77,
+      1.77
+     ],
+     "figH": 1.8,
+     "calls": 189,
+     "callsCar": 187
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚪 ENTER",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "phone_ath_j1_target",
+    {
+     "x": 2136.30983265737,
+     "z": -1627.683445837984,
+     "h": -1.7619806684844923,
+     "fx": -0.981779872995267,
+     "fz": -0.19002179080673162,
+     "cv": 0,
+     "d": 6.95773126185202,
+     "ah": 5.0020806162133375,
+     "j": 1,
+     "k": 9
+    }
+   ],
+   [
+    "phone_ath_j1_pull",
+    {
+     "state": "car",
+     "jack": null,
+     "flee": null,
+     "calls": 191
+    }
+   ],
+   [
+    "phone_ath_j1_flee",
+    {
+     "flee": null,
+     "calls": 185
+    }
+   ],
+   [
+    "phone_ath_j1_drive",
+    {
+     "m": 100,
+     "gap": 0.023,
+     "calls": 164,
+     "callsCar0": 187,
+     "wall": [
+      null,
+      null
+     ]
+    }
+   ],
+   [
+    "phone_ath_j2_target",
+    null
+   ],
+   [
+    "phone_ath_j2_pull",
+    {
+     "state": "car",
+     "jack": null,
+     "flee": null,
+     "calls": 156
+    }
+   ],
+   [
+    "phone_ath_j2_flee",
+    {
+     "flee": null,
+     "calls": 155
+    }
+   ],
+   [
+    "phone_ath_j2_drive",
+    {
+     "m": 101,
+     "gap": 0.023,
+     "calls": 150,
+     "callsCar0": 187,
+     "wall": [
+      null,
+      null
+     ]
+    }
+   ],
+   [
+    "ath_parked",
+    {
+     "b": null,
+     "n": 0,
+     "athPk": 0
+    }
+   ]
+  ],
+  "metrics": {
+   "jacks": [
+    {
+     "walkS": 25,
+     "gap": 0.023,
+     "calls": {
+      "car0": 187,
+      "take": 199,
+      "pull": 191,
+      "flee": 185,
+      "drive": 164
+     },
+     "flee": null,
+     "wall": null,
+     "stars": 0
+    },
+    {
+     "walkS": 0,
+     "gap": 0.023,
+     "calls": {
+      "car0": 187,
+      "take": 159,
+      "pull": 156,
+      "flee": 155,
+      "drive": 150
+     },
+     "flee": null,
+     "wall": null,
+     "stars": 0
+    }
+   ],
+   "errs": []
+  }
+ }
+]
