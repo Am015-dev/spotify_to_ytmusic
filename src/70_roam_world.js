@@ -61,7 +61,7 @@ function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(cam
     if(!N[c.b]||!N[c.a]){c.a=Math.floor(R()*N.ng);c.b=N[c.a].nb[0]??c.a;c.t=0;continue}const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;
     // brake behind the player
     const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt);
-    c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a);if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
+    c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
     // v88u perf: cars > 250 m away get their pose (ground probe, suspension, matrix) every 4th frame only; they still move every frame
     if(TUNE.lvLod&&c.dead<=0&&!c.route&&!c.pk&&(HUB.fr+c.j+c.k)%4&&(c.x-RO.x)**2+(c.z-RO.z)**2>62500)continue;
     const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*c.lane,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;

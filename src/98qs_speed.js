@@ -25,4 +25,19 @@ let QS_K=null,QS_KC='';function QS_kind(i){if(QS_KC!==CID){QS_K=null;QS_KC=CID}i
  return QS_K[i%QS_K.length]}
 // city cruise speeds (km/h → m/s, ±15 %): 50 km/h limit on Frankfurt and Athens city streets
 function QS_v0(k){if(!TUNE.trOn)return HCAR[k]==='#scoot'?rr(15,22):rr(14,24);const nm=HCAR[k]||'',m=nm==='#scoot'?TUNE.trScoot:/truck|delivery|bus|#troll/.test(nm)?TUNE.trHeavy:TUNE.trCar;return m/3.6*(.85+.3*R())}
-window.__qs={line:ab=>{const S=ab?abSamples().filter(S=>S.r.ab&&!S.r.c):CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped'&&!S.prof);S.sort((a,b)=>b.L-a.L);return S[0].pts.map(p=>[p.x,p.z])},kmh:()=>QS_kmh(carStat()),cls:QS_cls,mix:()=>{const n={};for(const c of HUB.cars){const k=HCAR[c.k];n[k]=(n[k]||0)+1}return n}};
+// ---- ramps stay clear (v88z): traffic was queueing on the ramps' run-ups (ramps sit across the lanes) and the player hit it or stopped
+// behind it. Traffic now never turns onto a street edge that carries a free-roam ramp (run-up 40 m, landing 20 m), cars already on one
+// out of sight (> 110 m) move to the next free edge, and no car parks there. TUNE.rampClear 0 = as before.
+TUNE.rampClear=1;let QS_SH=null,QS_SHk='';
+const QS_segD=(x,z,A,B)=>{const dx=B.x-A.x,dz=B.z-A.z,L2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/L2));return Math.hypot(A.x+dx*t-x,A.z+dz*t-z)};
+function QS_pts(r){const s=Math.sin(r.h),c=Math.cos(r.h);return[-r.len/2-40,-r.len/2-20,0,r.len/2+20].map(a=>[r.x+s*a,r.z+c*a])}
+function QS_shutSet(){const N=HUB.nodes;if(!N||!RO.ramps)return null;const key=RO.ramps.length+':'+N.ng;if(QS_SH&&QS_SHk===key&&QS_SH.N===N)return QS_SH;const S=new Set();S.N=N;
+ for(const r of RO.ramps){if(r.dk)continue;const P=QS_pts(r);for(let i=0;i<N.ng;i++)for(const j of N[i].nb){if(j<=i||j>=N.ng)continue;if(P.some(([x,z])=>QS_segD(x,z,N[i],N[j])<r.w/2+6))S.add(i*100000+j)}}
+ QS_SH=S;QS_SHk=key;return S}
+function QS_shut(a,b){if(!TUNE.rampClear||a==null||b==null)return false;const S=QS_shutSet();return!!S&&S.has(Math.min(a,b)*100000+Math.max(a,b))}
+function QS_rampNear(x,z){if(!TUNE.rampClear)return false;for(const r of RO.ramps||[])if(!r.dk&&QS_pts(r).some(([px,pz])=>Math.hypot(px-x,pz-z)<r.w/2+12))return true;return false}
+let QS_ct=0;function QS_clear(dt){if(!TUNE.rampClear||!HUB.cars||!HUB.nodes||(QS_ct+=dt)<.5)return;QS_ct=0;const N=HUB.nodes;
+ for(const c of HUB.cars){if(c.pk||c.tr||c.dead>0||c.route||!QS_shut(c.a,c.b)||Math.hypot(c.x-RO.x,c.z-RO.z)<110)continue;const A=N[c.a];if(!A)continue;
+  const nx=A.nb.filter(n=>n<N.ng&&n!==c.b&&!QS_shut(c.a,n));if(nx.length){c.b=nx[Math.floor(R()*nx.length)];c.t=0}}}
+hubTrafficStep=(f=>function(dt){try{QS_clear(dt)}catch(e){}return f.apply(this,arguments)})(hubTrafficStep);
+window.__qs={shut:()=>{const S=QS_shutSet();return S?S.size:0},fill:()=>{if(pl)pl.bm=100},veh:()=>CR_MODE,line:ab=>{const S=ab?abSamples().filter(S=>S.r.ab&&!S.r.c):CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped'&&!S.prof);S.sort((a,b)=>b.L-a.L);return S[0].pts.map(p=>[p.x,p.z])},kmh:()=>QS_kmh(carStat()),cls:QS_cls,mix:()=>{const n={};for(const c of HUB.cars){const k=HCAR[c.k];n[k]=(n[k]||0)+1}return n}};
