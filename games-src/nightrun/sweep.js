@@ -824,7 +824,7 @@ async function tuneTests(browser, cfg, full) {
     const ui = await ev(p, () => ({ n: document.querySelectorAll('#gaCards .card[data-kind="tune"]').length, rec: [...document.querySelectorAll('#gaCards .rec')].map(e => e.closest('.card').dataset.id), words: [...document.querySelectorAll('#gaCards .card .t')].every(e => e.textContent.trim().split(/\s+/).length <= 8), tab: document.querySelector('.tabs button.on').dataset.t, total: __mnr.TP_DEF.length }));
     await chk(p, ui.n === ui.total && ui.tab === 'tune' && ui.rec.length === 1, 'garage-ui', 'tune tab ' + JSON.stringify(ui)); await chk(p, ui.words, 'message-too-long', 'perk text over 8 words');
     // buy: price scales with the level, bank drops, level saved, survives a reload
-    const before = await ev(p, () => ({ bank: __mnr.GA.bank, price: [0, 1, 2, 3].map(l => { const d = __mnr.TP_DEF[0]; return Math.round(d.p * (1 + .55 * l + .09 * l * l) / 5) * 5; }) }));
+    const before = await ev(p, () => ({ bank: __mnr.GA.bank, price: [0, 1, 2, 3].map(l => { const d = __mnr.TP_DEF[0]; return Math.round(1.5 * d.p * (1 + .55 * l + .09 * l * l) / 5) * 5; }) }));
     await chk(p, before.price[1] > before.price[0] && before.price[3] > before.price[2], 'price-scale', JSON.stringify(before.price));
     const tapCard = async id => { await ev(p, id => document.querySelector(`#gaCards .card[data-id="${id}"]`).scrollIntoView({ block: 'center' }), id); await sleep(120); await press(p, cfg, T, `#gaCards .card[data-id="${id}"]`); await sleep(200); };
     await tapCard('tp_dmg');
@@ -833,6 +833,7 @@ async function tuneTests(browser, cfg, full) {
     a = await ev(p, () => ({ bank: __mnr.GA.bank, l: __mnr.GA.tune.rev || 0, msg: document.getElementById('gaMsg').textContent })); await chk(p, a.l === 0 && /Need/.test(a.msg), 'tune-buy', 'bought an unaffordable perk ' + JSON.stringify(a));
     await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__bot);
     a = await ev(p, () => ({ l: __mnr.GA.tune.dmg, own: __mnr.GA.own.pu_bub })); await chk(p, a.l === 1 && a.own, 'tune-persist', 'perk level lost after reload ' + JSON.stringify(a));
+    await ev(p, () => { __mnr.GA.eqAll = true; });   // the effect tests set levels directly: count them all as equipped
     if (!full) { await p.context().close(); return; }
     // every perk at once: the run starts with them, and they do what the card says
     await ev(p, () => { const G_ = __mnr.GA; for (const d of __mnr.TP_DEF) G_.tune[d.id] = d.max; G_.bank = 99999; });

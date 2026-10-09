@@ -7,9 +7,10 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
+  const shv=SHIPSHAPE[shipDef().id];if(shv)ctx.scale(shv[0],shv[1]);          // the planned ships have no painted sprite yet: the same hull, stretched and coloured
   ctx.fillStyle='#16102a';ctx.beginPath();ctx.moveTo(26,2);ctx.lineTo(8,-9);ctx.lineTo(-18,-8);ctx.lineTo(-22,-2);ctx.lineTo(-22,8);ctx.lineTo(-14,11);ctx.lineTo(14,10);ctx.closePath();ctx.fill();
-  ctx.strokeStyle=D.b;ctx.lineWidth=1.5;ctx.stroke();
-  ctx.fillStyle=D.b;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,-2);ctx.lineTo(4,-8);ctx.lineTo(-6,-7);ctx.lineTo(-4,-1);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+  ctx.strokeStyle=shv?shv[2]:D.b;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=shv?shv[2]:D.b;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,-2);ctx.lineTo(4,-8);ctx.lineTo(-6,-7);ctx.lineTo(-4,-1);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
   ctx.fillStyle=D.a;ctx.fillRect(-16,8,26,2);ctx.fillStyle='#fff';ctx.fillRect(22,1,4,2);
   ctx.restore();
   const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}   // each tier: more glow on the ship
@@ -21,7 +22,7 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
     ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,e.r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
   if(e.el){ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(0,0,e.r+4,0,7);ctx.stroke();ctx.globalAlpha=1;}
   switch(e.type){
-    case'drone':{if(ART.dflash('spr-en-drone',e.r*2.9,0,Math.sin(t*4+eb_(e))*1.5,0,fl)){ctx.strokeStyle='#8890c0';ctx.lineWidth=1.2;
+    case'drone':{if(ART.dflash(e.ldr&&ART.have('spr-en-leader')?'spr-en-leader':'spr-en-drone',e.r*2.9,0,Math.sin(t*4+eb_(e))*1.5,0,fl)){ctx.strokeStyle='#8890c0';ctx.lineWidth=1.2;
         for(const s of[-1,1]){ctx.beginPath();ctx.ellipse(s*9,-e.r*.85,8*Math.abs(Math.sin(t*40+s)),1.6,0,0,7);ctx.stroke();}   // spinning rotors
         const red=(Math.floor(G.bp)+Math.floor(e.by))%2;ctx.globalCompositeOperation='lighter';G_(0,-e.r*.55,7,red?'#ff2030':'#2050ff',.9);ctx.globalCompositeOperation='source-over';break;}
       ctx.fillStyle=fl?'#fff':'#141024';ctx.strokeStyle='#5a6aff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,0,14,8,0,0,7);ctx.fill();ctx.stroke();

@@ -110,7 +110,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;$('srEye').textContent=n>=STAGES.length?'Story complete':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost')+`<img class="md" src="media/medal-${['bronze','silver','gold'][Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1))]}.webp" alt="">`;
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)));
     $('srScore').textContent=G.score.toLocaleString('de-DE');
     $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
@@ -193,7 +193,7 @@ $('srMenu').addEventListener('click',openStages);
   const row=$('startBtn').parentNode,row1=document.createElement('div');row1.className='row';row.before(row1);row1.append(sb,$('startBtn'));
   $('startBtn').textContent='ENDLESS';$('startBtn').classList.add('alt');$('dailyBtn').classList.remove('alt');$('dailyBtn').classList.add('dim');
   const hb=document.createElement('button');hb.className='go dim';hb.id='diffBtn';hb.type='button';row1.append(hb);
-  window.diffDraw=()=>{hb.textContent=(SET.diff==='vhard'?'VERY HARD':SET.diff).toUpperCase();hb.classList.toggle('on',HARDS.includes(SET.diff));};diffDraw();
+  window.diffDraw=()=>{hb.innerHTML=(()=>{try{return diffBadge(SET.diff);}catch(e){return '';}})()+(SET.diff==='vhard'?'VERY HARD':SET.diff).toUpperCase();hb.classList.toggle('on',HARDS.includes(SET.diff));};diffDraw();
   hb.addEventListener('click',()=>{const o=['easy','normal','hard','vhard','legend'];setVal('diff',o[(o.indexOf(SET.diff)+1)%5]);});
   sb.addEventListener('click',openStages);
   // hidden: hold the title for a second to unlock every stage
