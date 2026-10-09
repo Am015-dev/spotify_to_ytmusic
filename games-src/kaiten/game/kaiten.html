@@ -3512,7 +3512,7 @@ const GX={key:'gx',open:null,
     return o && typeof o === 'object' ? o : null;
   }
   function save(g, o) { var s = JSON.stringify(o); mem[g] = s; try { localStorage.setItem(key(g), s); } catch (e) {} }
-  function status(g) { var o = load(g); return { done: !!(o && o.done), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
+  function status(g) { var o = load(g); return { done: !!(o && o.done), skipped: !!(o && o.skipped), open: !!(o && o.open && !o.done), step: o && o.step || 0, seen: !!o }; }
   function mark(g, patch) { var o = load(g) || {}; for (var k in patch) o[k] = patch[k]; save(g, o); }
   // ------------------------------------------------------------------ geometry
   function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
@@ -3739,8 +3739,9 @@ const GX={key:'gx',open:null,
   }
   function skip() {
     if (!S) return; var g = cfg.game, ex = cfg.onExit;
-    mark(g, { open: 0, step: 0 }); teardown();
-    try { if (ex) ex(); } catch (e) { console.warn('gxt onExit', e); }
+    // a skipped tutorial counts as seen: Story must not force it again
+    mark(g, { open: 0, step: 0, skipped: 1 }); teardown();
+    try { if (ex) ex({ skipped: true }); } catch (e) { console.warn('gxt onExit', e); }
   }
   function stop() { if (cfg && S) mark(cfg.game, { open: 0, step: 0 }); teardown(); }
   // ------------------------------------------------------------------ start
@@ -3815,7 +3816,7 @@ const GX={key:'gx',open:null,
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
     index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
-    status: status, isDone: function (g) { return status(g).done; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
+    status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
 })();
@@ -8732,7 +8733,7 @@ function tutLeave() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen() { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
-  if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null;
+  if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue); o = pro ? o : null;
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'You know the rules',
@@ -8743,7 +8744,7 @@ function tutStart(o) {
       if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
       else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); campOpen(); }
       else { showStart(); UI.sv = 'setup'; renderStart(); } },
-    onExit: () => { tutLeave(); showStart(); } });
+    onExit: () => { tutLeave(); showStart(); if (pro && typeof GXC !== 'undefined') campOpen(); } });
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 { const o = tapHand; tapHand = function (i) {
@@ -8795,7 +8796,9 @@ function endBanner() {
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last round'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'Warm Counter Seat', 'tavern-b': 'Noren at Noon', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
 const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
-const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0 };
+const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
+// 'all' = shuffle through every looping song (menu, game and last-round tracks), a new one every ~2.5 min
+const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;
 try { Object.assign(MUS.pick, JSON.parse(localStorage.getItem('kk_mpick') || '{}')); } catch (e) { }
 function musicSlot() {
   const st = $('#start');
@@ -8807,20 +8810,22 @@ function musicSlot() {
 }
 function musicName(slot) {
   const c = MUS.pick[slot] || MDEF[slot]; if (c === 'off') return '-';
+  if (c === 'all') { if (!MUS.res[slot]) { const pool = MALL.filter(k => k !== MUS.last); MUS.res[slot] = pool[Math.floor(Math.random() * pool.length)]; } return MUS.res[slot]; }
   if (c === 'shuffle') { if (!MUS.res[slot]) { MUS.sh[slot] = MUS.sh[slot] === undefined ? (Math.random() < .5 ? 0 : 1) : 1 - MUS.sh[slot]; MUS.res[slot] = slot + '-' + 'ab'[MUS.sh[slot]]; } return MUS.res[slot]; }
   return slot + '-' + (c === 'b' ? 'b' : 'a');
 }
 function musicSync() {
   if (UI.prefs.music === false || !window.GA || MUS.prev) return;
   const w = musicSlot(); if (MUS.wslot !== w[0]) { MUS.wslot = w[0]; MUS.res[w[0]] = null; }
-  const n = musicName(w[0]); if (MUS.want === n) return; MUS.want = n;
+  else if (MUS.pick[w[0]] === 'all' && !w[1] && MUS.since && Date.now() - MUS.since > MALL_MS) MUS.res[w[0]] = null;
+  const n = musicName(w[0]); if (MUS.want === n) return; MUS.want = n; MUS.since = Date.now(); if (n !== '-') MUS.last = n;
   if (n === '-') { GA.music(null, { fade: 1 }); return; }
   GA.music(n, { fade: w[1] ? .6 : 1, once: !!w[1] });
-  if (w[0] === 'tavern' || w[0] === 'main') setTimeout(() => { try { const nx = w[0] === 'tavern' ? 'main' : 'fight', c = MUS.pick[nx]; if (c !== 'off' && c !== 'shuffle') GA.preload(musicName(nx)); } catch (e) { } }, 4000);
+  if (w[0] === 'tavern' || w[0] === 'main') setTimeout(() => { try { const nx = w[0] === 'tavern' ? 'main' : 'fight', c = MUS.pick[nx]; if (c !== 'off' && c !== 'shuffle' && c !== 'all') GA.preload(musicName(nx)); } catch (e) { } }, 4000);
 }
 function musicPick(slot, c) {
   MUS.pick[slot] = c; MUS.res[slot] = null; try { localStorage.setItem('kk_mpick', JSON.stringify(MUS.pick)); } catch (e) { }
-  if (window.GA && c !== 'off' && c !== 'shuffle') try { GA.preload(musicName(slot)); } catch (e) { }
+  if (window.GA && c !== 'off' && c !== 'shuffle' && c !== 'all') try { GA.preload(musicName(slot)); } catch (e) { }
   if (MUS.wslot === slot && !MUS.prev) { MUS.want = null; musicSync(); }
 }
 function musicPreview(slot) {
@@ -8836,11 +8841,14 @@ function renderMusic() {
   const slider = h('input#mvol', { type: 'range', min: 0, max: 1, step: .05, value: vol, 'aria-label': 'Music volume' });
   slider.addEventListener('input', () => { try { GA.setVolume('music', +slider.value); } catch (e) { } });
   b.appendChild(h('div.mtop', chip(on ? '.on' : '', { 'data-a': 'mmus' }, 'Music: ' + (on ? 'on' : 'off')), h('label.mvol', 'Volume ', slider)));
+  const allOn = MLOOPS.every(k => MUS.pick[k] === 'all');
+  b.appendChild(h('div.mtop', chip(allOn ? '.on' : '', { 'data-a': 'mall' }, '⇄ Shuffle all songs')));
   MSLOTS.forEach(([k, nm]) => {
     const cur = MUS.pick[k], act = MUS.wslot === k && on && cur !== 'off';
     const row = h('div.mchips');
     ['a', 'b'].forEach(v => row.appendChild(chip(cur === v ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': v }, MTITLE[k + '-' + v])));
     row.appendChild(chip(cur === 'shuffle' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'shuffle' }, '⇄ Shuffle'));
+    if (MLOOPS.includes(k)) row.appendChild(chip(cur === 'all' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'all' }, '⇄ All songs'));
     row.appendChild(chip(cur === 'off' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'off' }, 'Off'));
     if (MUS.prev === k) row.appendChild(chip('.prev', { 'data-a': 'mprevx', 'data-s': k }, '■ Stop preview'));
     else if (!act && cur !== 'off' && on) row.appendChild(chip('.prev', { 'data-a': 'mprev', 'data-s': k }, '▶ Preview'));
@@ -8851,6 +8859,7 @@ document.addEventListener('click', e => {
   const t = e.target.closest('[data-a]'); if (!t) return; const a = t.dataset.a;
   if (a === 'musicopen') { try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); }
   else if (a === 'mpick') { musicPick(t.dataset.s, t.dataset.c); renderMusic(); }
+  else if (a === 'mall') { const on = MLOOPS.every(k => MUS.pick[k] === 'all'); MLOOPS.forEach(k => musicPick(k, on ? MDEF[k] : 'all')); renderMusic(); }
   else if (a === 'mprev') { musicPreview(t.dataset.s); renderMusic(); }
   else if (a === 'mprevx') { musicPreviewStop(); renderMusic(); }
   else if (a === 'mmus') { UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); }

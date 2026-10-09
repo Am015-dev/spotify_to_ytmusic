@@ -101,7 +101,7 @@ function tutLeave() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen() { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
-  if (typeof GXT === 'undefined') return; o = o && o.prologue ? o : null;
+  if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue); o = pro ? o : null;
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({ game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'You know the rules',
@@ -112,7 +112,7 @@ function tutStart(o) {
       if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
       else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); campOpen(); }
       else { showStart(); UI.sv = 'setup'; renderStart(); } },
-    onExit: () => { tutLeave(); showStart(); } });
+    onExit: () => { tutLeave(); showStart(); if (pro && typeof GXC !== 'undefined') campOpen(); } });
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 { const o = tapHand; tapHand = function (i) {
