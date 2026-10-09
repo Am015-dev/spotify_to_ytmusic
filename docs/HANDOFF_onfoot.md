@@ -49,3 +49,26 @@ Shots `qa_foot/<mode>_<city>_{1_drive_exitbtn,2_standing,3_walking,4_enter_promp
 - Borrowed cars: add a seated driver (GAR_fig sit pose) to the lifted body.
 - Stars: `WNT_` module (P4) owns the wanted level; P2 only increments a counter and shows ★ in the HUD line.
 - Keep the outermost-wrapper rule: on foot nothing car-only runs; add new per-frame work inside `OF_step`.
+
+## v89b1 camera hotfix (branch `alex/od-cam`, base 8556d66 = live build)
+Alex (live, phone): "the walk in the street is impossible … it's doing rounds". Cause, measured (tools/tCam.js, old code): stick held 45° → the camera
+turned 14.4 rad in 8 s at a constant 1.75 rad/s and the walker 14.9 rad. The stick was camera-relative and `OF_cam` turned the yaw towards the walker's
+facing every frame (rate 3/s): a loop. Fix (end of `src/98of_onfoot.js`, `OF_camYaw OF_camDrag OF_camDom`, + `OF_walk` input frame):
+- `OF.cyIn` = the stick's frame: frozen while the stick direction is held (re-locked when the stick moves > 20°, is released, or the camera is dragged).
+- Camera yaw changes only by a drag (touch on `#ofCam` = right 60 % below 12 %, or the bare canvas; window-level capture listeners), mouse drag (PC),
+  Q / Z keys (E = ENTER, R = restart), double-tap on the zone = recentre (5 rad/s); and a slow recentre (≤ 1.2 rad/s) after 1.5 s of steady movement
+  (turn rate < 0.35 rad/s) with no camera input for 1.5 s. Pitch `OF.cp` ∈ [−0.25, 0.6] (camera height 2.2 + 4.2·sin cp).
+- Test: `node tools/tCam.js <url> qa_cam` (A straight, B hold 45°, C circle, D figure-8, E 60 s street, F drag orbit, G after orbit; `ONLYF=1` = F only).
+  After (phone+desk fra): B camera 0.78 rad then 0; A/C/D yaw rate 0; street jitter 0.13; on screen 100 %; desk drag/Q PASS.
+
+## P2 car-jacking: WIP on `alex/od-p2` (commit "v89c WIP", not tested yet; merge alex/od-cam into it first)
+Done in code (src/98of_onfoot.js end block "OF P2" + small edits; one hook in 70_roam_world.js `W=c.pk&&c.ofW?c.ofW:…`):
+- `OF_nearCar` also returns moving traffic (`k:'traf'`, cv < 7 m/s, edge ≤ 2.6 m, not tr/route/'#' kinds); button `🚗 TAKE` (`want='take'`).
+- `OF_jack` → state `'jack'`, `OF_jackStep`: car `hitT=99`, stopped by 0.35 s; walker to the driver door; at 0.45 s `OF_fleeStart` (driver =
+  `OF_figMake(GAR_riv(car colour),{armsUp:1})`, 3 meshes + "HEY!" sprite, out → stumble → run 5 m/s 6 s, `OF_fleeStep` runs in car mode too);
+  at 1.25 s `OF_crime(1,'jack')` + `OF_finishEnter(o)` (instanced-body lift path). Traffic slot recycles (`dead=20`, was 1e9).
+- `OF_seat`: your sitting minifig added to a borrowed body (`userData.ofSeat`, hidden on EXIT via `OF_drv`). Position is a guess: CHECK in a side shot.
+- Stars: `OF.star` (+1 per jack, one star drops per 60 s), chip `#ofStar` in `#roamGauge`; `__mho.foot.stars/starT/jack/flee/athPk`.
+- Athens: `LV_park1` wrapped → `OF_athPark1` parks cars on g-streets at offset W/2−1.3 (`c.ofW`, lane=off/W).
+- Test `tools/tJack.js` (from tFoot; walks to intercept a traffic car, TAKE, pull/flee/drive shots, Athens parked shot). Never run to the end yet.
+Not done: van/truck shove-back (20 %), PC/iframe runs, shots, review, DEPLOY.
