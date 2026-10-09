@@ -49,7 +49,7 @@ function boardLayout(W, H) {
     // table under the picture: my city strip, my fanned hand, the action row. Every band shrinks until the meadow cards are readable.
     const meas = (mode, t) => {
       const L = (a, b) => Math.round(b + (a - b) * t), tight = mode === 'tight';
-      const m = { mode, t, chip: L(36, 30), ev: L(46, 30), br: tight ? L(46, 36) : L(58, 42), r3: L(60, 40), res: L(34, 26), hand: L(88, 60), city: L(46, 32), acts: L(46, 40), rg: tight ? 0 : 7, sg: tight ? 3 : 5, rows: tight ? 1 : 2 };
+      const m = { mode, t, chip: L(36, 30), ev: L(46, 30), br: tight ? L(46, 36) : L(58, 42), r3: L(60, 40), res: L(34, 26), hand: L(100, 60), city: L(42, 30), acts: L(46, 40), rg: tight ? 0 : 7, sg: tight ? 3 : 5, rows: tight ? 1 : 2 };
       let y = 3 + m.chip + m.sg; m.evY = y; y += m.ev + m.sg; m.bY = y; y += m.rows * m.br + (m.rows - 1) * m.rg + m.sg; m.r3Y = y; y += m.r3 + m.sg + 3; m.mTop = y;
       let yb = H - pad; m.actsY = yb - m.acts; yb = m.actsY - 3; m.handY = yb - m.hand; yb = m.handY - 3; m.cityY = yb - m.city; m.sceneB = m.cityY - 3;
       m.resY = m.sceneB - 3 - m.res; m.mBot = m.resY - 3;
@@ -87,8 +87,8 @@ function boardLayout(W, H) {
     R.city = { x: pad, y: m.cityY, w: W - 2 * pad, h: m.city }; R.hand = { x: pad, y: m.handY, w: W - 2 * pad, h: m.hand }; R.acts = { x: pad, y: m.actsY, w: W - 2 * pad, h: m.acts };
     R.slots = true; R.fan = true;
     const cw0 = Math.min(40, Math.floor((m.city - 6) / CARD_AR)), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
-    R.fanDrop = tight ? 7 : 11;
-    R.strip = { hand: fitStrip(nHand, R.hand.w - 22, R.hand.h - R.fanDrop - 3, 66), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
+    R.fanDrop = tight ? 7 : 9;
+    R.strip = { hand: fitStrip(nHand, R.hand.w - 22, R.hand.h - R.fanDrop - 3, 70), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
   } else {
     const rail = Math.round(Math.max(236, Math.min(340, W * .32))), LW = W - rail - pad;
     const chipH = 34, actH = 44, resH = 30;

@@ -19,12 +19,12 @@ function dims(size) {
   return [size.w, size.h || Math.round(size.w * 1.4)];
 }
 const tmpl = new Map(); let stats = { built: 0, cloned: 0 };
-const specKey = (sp, lay) => lay + '|' + [sp.art, paintedHref(sp.key) ? sp.key : '', sp.type, sp.kind || '', sp.name, sp.unique ? 1 : 0, sp.points, JSON.stringify(sp.cost || {}), lay === 'l' ? sp.text || '' : ''].join('|');
+const specKey = (sp, lay, w) => lay + (lay === 's' ? Math.round(w / 2) * 2 : '') + '|' + [sp.art, paintedHref(sp.key) ? sp.key : '', sp.type, sp.kind || '', sp.name, sp.unique ? 1 : 0, sp.points, JSON.stringify(sp.cost || {}), lay === 'l' ? sp.text || '' : ''].join('|');
 function card(spec, size, opts) {
   mount();
-  const [w, h] = dims(size), lay = w <= 120 ? 's' : 'l', k = specKey(spec, lay);
+  const [w, h] = dims(size), lay = w <= 150 ? 's' : 'l', k = specKey(spec, lay, w);
   let t = tmpl.get(k);
-  if (!t) { t = parse(cardString(spec, lay)); tmpl.set(k, t); stats.built++; }
+  if (!t) { t = parse(cardString(spec, lay, false, Math.round(w / 2) * 2)); tmpl.set(k, t); stats.built++; }
   const e = t.cloneNode(true); stats.cloned++;
   e.setAttribute('width', w); e.setAttribute('height', h); e.style.display = 'block'; e.style.overflow = 'visible';
   e.setAttribute('role', 'img'); e.setAttribute('aria-label', (spec.name || spec.art) + (spec.text ? '. ' + spec.text : ''));
@@ -34,8 +34,8 @@ function card(spec, size, opts) {
 const urlCache = new Map();
 function toURL(svgStr) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr); }
 function cardURL(spec, size) { // standalone data-URL (defs embedded) for <img>/canvas use; browser caches the decode
-  const [w, h] = dims(size), lay = w <= 120 ? 's' : 'l', k = specKey(spec, lay) + '#url';
-  let u = urlCache.get(k); if (!u) { u = toURL(cardString(spec, lay, true).replace(/^(<svg[^>]*>)/, '$1' + DEFS2)); urlCache.set(k, u); }
+  const [w, h] = dims(size), lay = w <= 150 ? 's' : 'l', k = specKey(spec, lay, w) + '#url';
+  let u = urlCache.get(k); if (!u) { u = toURL(cardString(spec, lay, true, Math.round(w / 2) * 2).replace(/^(<svg[^>]*>)/, '$1' + DEFS2)); urlCache.set(k, u); }
   return u;
 }
 function cardImg(spec, size) { const [w, h] = dims(size), i = new Image(); i.width = w; i.height = h; i.src = cardURL(spec, size); i.alt = spec.name || spec.art; i.draggable = false; return i; }
