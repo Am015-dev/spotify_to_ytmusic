@@ -753,6 +753,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v88z',date:'9 Oct 2026',items:[{t:'CHANGED',s:'Each car class has its own top speed: sports cars reach about 230 km/h on the Autobahn (boost about 270), SUVs and 4×4s about 155, vans, trucks and buses less. City streets are a bit slower.'},{t:'CHANGED',s:'More varied traffic: fewer police cars and trucks, city buses in Frankfurt, more scooters and fewer taxis in Athens.'},{t:'FIXED',s:'Street ramps sit on the road in your lane, and traffic no longer queues on them. Every ramp can be reached by driving there.'},{t:'FIXED',s:'Autobahn: no more hidden pit at the Frankfurter Kreuz flyover or bumps onto the Main bridges at full speed.'}]},
   {v:'v89a',date:'9 Oct 2026',items:[{t:'NEW',s:'Get out and walk: stop the car and the BRAKE button turns into 🚪 EXIT (PC: F or E). Your minifig steps out and the car stays parked.'},{t:'NEW',s:'On foot: drag anywhere on the left half to walk (push far to run), RUN and JUMP on the right. PC: WASD or arrows, Shift runs, Space jumps.'},{t:'NEW',s:'Walk up to your own car or any parked car and tap 🚪 ENTER (PC: F or E) to drive it. Moving traffic cannot be taken yet.'},{t:'CHANGED',s:'Not yet: a borrowed car has no driver inside, and Athens has no kerb-parked cars to borrow (get back into your own car there).'}]},
   {v:'v88y',date:'9 Oct 2026',items:[{t:'NEW',s:'Garage BUILD → MY PARTS → CANVAS: a big empty 32×32 baseplate to build parts on (two fingers zoom and move the view).'},
    {t:'NEW',s:'Save a group as a part (⛓ GROUPS → 💾 SAVE PART) and add it to any car from MY PARTS; it snaps to the studs and is mirrored to the other side.'},
@@ -3614,7 +3615,10 @@ function rivClear(x,z){let b=1e9;for(const S of WATERS)for(let i=0;i<S.pts.lengt
 function rivSide(x,z){if(!MAINR)return 1;const P=MAINR.pts;let b=1e18,bi=0;for(let i=0;i<P.length;i+=4){const d=(P[i].x-x)**2+(P[i].z-z)**2;if(d<b){b=d;bi=i}}const p=P[bi];return (x-p.x)*p.tz-(z-p.z)*p.tx>=0?1:-1}
 // ---------- oriented decks: {cx,cz,ux,uz (unit along the deck), half, w, prof 'hump'|'ramp', H, L}
 function deckLocal(b,x,z){const dx=x-b.cx,dz=z-b.cz;return[dx*b.ux+dz*b.uz,dx*b.uz-dz*b.ux]}
-function deckY(b,a){const A=Math.abs(a);if(A>b.half)return null;if(b.prof==='ramp')return A>b.half-b.L?b.H*(b.half-A)/b.L:b.H;const t=A/b.half;return b.H*(1-t*t)}
+function deckY(b,a){if(b.yA!=null){const v=deckY0(b,a);return v==null?null:v+b.yA+(b.yB-b.yA)*(a+b.half)/(2*b.half)}return deckY0(b,a)}
+/* v88z: Autobahn decks (AB_BRIDGES) carry yA/yB = terrain at their two ends and rise from there (were from y=0: the Frankfurter Kreuz deck
+   sat 22 m under the real terrain, so the A3 and A5 dropped into a pit there; the Main bridges had 5-6 m steps at both ends) */
+function deckY0(b,a){const A=Math.abs(a);if(A>b.half)return null;if(b.prof==='ramp')return A>b.half-b.L?b.H*(b.half-A)/b.L:b.H;const t=A/b.half;return b.H*(1-t*t)}
 function deckAt(b,x,z){if(Math.abs(x-b.cx)>b.r||Math.abs(z-b.cz)>b.r)return null;const dx=x-b.cx,dz=z-b.cz,c=dx*b.uz-dz*b.ux;if(Math.abs(c)>=b.w/2)return null;return deckY(b,dx*b.ux+dz*b.uz)}
 const deckPt=(b,a,c=0)=>[b.cx+a*b.ux+c*b.uz,b.cz+a*b.uz-c*b.ux];
 // the real bridges: centre snapped to the river, axis = river normal (no hand-entered angles), hump decks meet the quay roads at grade
@@ -3972,7 +3976,7 @@ function abAt(x,z){const S0=abSamples();if(!AB_G){AB_G=new Map();S0.forEach((S,s
 function abBridgesAuto(){const out=[];for(const S of abSamples()){const r=S.r;if(!r.ab||r.c)continue;const P=S.pts,step=S.L/(P.length-1);let i=0;while(i<P.length){if(!inRiver(P[i].x,P[i].z)){i++;continue}let j=i;while(j+1<P.length&&inRiver(P[j+1].x,P[j+1].z))j++;const m=P[(i+j)>>1],wl=(j-i+1)*step,L=160,half=wl/2+40+L;
     out.push({id:'ab_'+r.id,name:r.id==='A5'?'Schwanheimer Brücke (A5)':r.id==='A661'?'Kaiserleibrücke (A661)':r.id+' Mainbrücke',kind:'ab',cx:m.x,cz:m.z,ux:m.tx,uz:m.tz,w:r.w+2,H:12,prof:'ramp',L,half,road:r,r:half+r.w});i=j+1}}
   {const S=abSamples().find(q=>q.r.id==='A5'),X=AB_X.find(q=>q.name==='Frankfurter Kreuz');if(S&&X){const p=S.pts[abNearI(S,X.x,X.z)[0]];out.push({id:'ab_fk',name:'Frankfurter Kreuz (A5 über A3)',kind:'ab',cx:p.x,cz:p.z,ux:p.tx,uz:p.tz,w:40,H:9,prof:'ramp',L:120,half:180,road:AB[0],r:220})}}return out}
-AB_BRIDGES=abBridgesAuto();ALL_DECKS=[...BRIDGES,...AB_BRIDGES];
+AB_BRIDGES=abBridgesAuto();for(const b of AB_BRIDGES){b.yA=TR_Y(b.cx-b.ux*b.half,b.cz-b.uz*b.half);b.yB=TR_Y(b.cx+b.ux*b.half,b.cz+b.uz*b.half)}ALL_DECKS=[...BRIDGES,...AB_BRIDGES];
 const abSkip=(x,z,m=0)=>(abSamples(),AB_X).some(q=>Math.hypot(x-q.x,z-q.z)<520)||AB_BRIDGES.some(b=>{if(Math.abs(x-b.cx)>b.r+40+m||Math.abs(z-b.cz)>b.r+40+m)return false;const[a,c]=deckLocal(b,x,z);return Math.abs(a)<b.half+20+m&&Math.abs(c)<b.w+m});
 function abClear(x,z){const a=abAt(x,z);if(a&&a.d<a.road.w/2+10)return false;return !GARAGES.some(g=>g.x!=null&&Math.hypot(x-g.x,z-g.z)<70)&&mtnDist(x,z)>20}
 let MTN_S=null;function mtnSamples(){if(MTN_S)return MTN_S;MTN_S=MTN.map(r=>{const c=new THREE.CatmullRomCurve3(r.pts.map(p=>V3(p[0],0,p[1])));const L=c.getLength(),n=Math.ceil(L/6);return{r,pts:c.getSpacedPoints(n).map(v=>({x:v.x,z:v.z})),L}});return MTN_S}
@@ -5072,8 +5076,8 @@ function buildHubTraffic(){const N=[],idx=new Map();const node=(x,z,w)=>{const k
      const s0=N[ids[0]],s1=N[ids[ids.length-1]],toX=i=>{const n=N[i],m=N[n.nb[0]];return m&&((m.x-n.x)*(X.x-n.x)+(m.z-n.z)*(X.z-n.z))>0},fromX=i=>{const n=N[i],m=N[n.nb[0]];return m&&((m.x-n.x)*(n.x-X.x)+(m.z-n.z)*(n.z-X.z))>0};
      const a=near(s0.x,s0.z,toX),b=near(s1.x,s1.z,fromX);if(a>=0)N[a].nb.push(ids[0]);if(b>=0)s1.nb.push(b)}}}
   HUB.nodes=N;HUB.ngrid=null;HUB.nc=null;HUB.cars=[];
-  const per=HCAR.map(()=>0),NC=150;for(let i=0;i<NC;i++){const k=CID==='fra'?i%HCAR.length:ATH_K[i%ATH_K.length];let a=Math.floor(R()*N.ng);if(!N[a].nb.length)a=0;const b=N[a].nb[Math.floor(R()*N[a].nb.length)];HUB.cars.push({k,j:per[k]++,a,b,t:R(),v:rr(14,24),lane:R()<.5?.18:.36,dead:0,x:0,z:0,y:0})}
-  if(CID!=='fra'){HUB.trn=[];for(let i=0;i<N.ng;i++)if(N[i].tr&&N[i].nb.some(n=>N[n].tr))HUB.trn.push(i);for(const c of HUB.cars){const nm=HCAR[c.k];if(nm==='#troll'&&HUB.trn.length){c.tr=1;c.a=HUB.trn[Math.floor(R()*HUB.trn.length)];c.b=N[c.a].nb.find(n=>N[n].tr);c.v=rr(10,13)}else if(nm==='#scoot')c.v=rr(15,22)}}
+  const per=HCAR.map(()=>0),NC=150;for(let i=0;i<NC;i++){const k=QS_kind(i);let a=Math.floor(R()*N.ng);if(!N[a].nb.length)a=0;const b=N[a].nb[Math.floor(R()*N[a].nb.length)];HUB.cars.push({k,j:per[k]++,a,b,t:R(),v:QS_v0(k),lane:R()<.5?.18:.36,dead:0,x:0,z:0,y:0})}
+  if(CID!=='fra'){HUB.trn=[];for(let i=0;i<N.ng;i++)if(N[i].tr&&N[i].nb.some(n=>N[n].tr))HUB.trn.push(i);for(const c of HUB.cars){const nm=HCAR[c.k];if(nm==='#troll'&&HUB.trn.length){c.tr=1;c.a=HUB.trn[Math.floor(R()*HUB.trn.length)];c.b=N[c.a].nb.find(n=>N[n].tr);c.v=rr(10,13)}else if(nm==='#scoot')c.v=QS_v0(c.k)}}
   HUB.cim=HCAR.map((nm,k)=>{const cu=nm[0]==='#',cg=CR_cityGeo(nm),im=new THREE.InstancedMesh(cg?cg.body:cu?athVeh(nm):kmGeo(nm,2.3),cg?CR_CM:cu?(HUB.vehM||(HUB.vehM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.5,metalness:.1}))):kmMat('car'),per[k]);im.frustumCulled=false;const c=new THREE.Color();for(let j=0;j<per[k];j++){c.set(nm.startsWith('su:')||CID!=='fra'&&(nm[0]==='#'||nm==='taxi')&&nm!=='#scoot'?'#ffffff':HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.45);im.setColorAt(j,c)}HUB.grp.add(im);CR_cityPost(im,nm,k,per[k]);return im});pedInit()}
 // shortest route over the street graph (grid + street chains, no Autobahn): used by scripted cars (escort)
 function navPath(x0,z0,x1,z1){const N=HUB.nodes;if(!N||!N.length)return[[x1,z1]];const near=(x,z)=>{let b=0,bd=1e18;for(let i=0;i<N.ng;i++){const d=(N[i].x-x)**2+(N[i].z-z)**2;if(d<bd){bd=d;b=i}}return b};const s=near(x0,z0),t=near(x1,z1);
@@ -5179,7 +5183,7 @@ function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(cam
     if(!N[c.b]||!N[c.a]){c.a=Math.floor(R()*N.ng);c.b=N[c.a].nb[0]??c.a;c.t=0;continue}const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;
     // brake behind the player
     const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt);
-    c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a);if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
+    c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
     // v88u perf: cars > 250 m away get their pose (ground probe, suspension, matrix) every 4th frame only; they still move every frame
     if(TUNE.lvLod&&c.dead<=0&&!c.route&&!c.pk&&(HUB.fr+c.j+c.k)%4&&(c.x-RO.x)**2+(c.z-RO.z)**2>62500)continue;
     const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*c.lane,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
@@ -5243,9 +5247,9 @@ function rfCheckpoints(m,river){if(river)return[850,650,480,280,120,-150].map(e=
 
 const markKey=m=>m.dyn?'enc:'+m.uid:m.kind==='flight'?'flight':m.kind==='garage'?(m.id&&m.id!=='g_city'?m.id:'garage'):m.kind==='season'?'season':m.kind==='rival'||m.kind==='boss'?m.ev.p:m.kind==='challenge'?m.ev.id:m.kind==='mode'?m.ev.k:m.ev.id;
 let RAMPT=null;function addRamp(x,z,h,len,hgt,w,col,Y0){if(!RAMPT){const[c,g2]=cv(128,128);g2.fillStyle='#1b1c22';g2.fillRect(0,0,128,128);g2.fillStyle='#ffffff';for(let k=-128;k<256;k+=32){g2.beginPath();g2.moveTo(k,0);g2.lineTo(k+16,0);g2.lineTo(k+16-128,128);g2.lineTo(k-128,128);g2.fill()}RAMPT=tex(c);RAMPT.wrapS=RAMPT.wrapT=THREE.RepeatWrapping;RAMPT.repeat.set(2,3);KEEP_TEX.add(RAMPT)}
-  const y0=Y0??groundY(x,z),g=new THREE.Mesh(new THREE.BoxGeometry(w,.6,Math.hypot(len,hgt)),new THREE.MeshStandardMaterial({color:col||0xffcd03,map:RAMPT,roughness:.45,metalness:.1,emissive:new THREE.Color(col||0xffcd03),emissiveIntensity:.15}));
+  const y0=Y0??Math.min(groundY(x,z),groundY(x-Math.sin(h)*len/2,z-Math.cos(h)*len/2))/* v88z: the lip sits on the ground at the low end (was the centre's height: up to 2.2 m floating step on slopes) */,g=new THREE.Mesh(new THREE.BoxGeometry(w,.6,Math.hypot(len,hgt)),new THREE.MeshStandardMaterial({color:col||0xffcd03,map:RAMPT,roughness:.45,metalness:.1,emissive:new THREE.Color(col||0xffcd03),emissiveIntensity:.15}));
   g.position.set(x,y0+hgt/2,z);g.rotation.set(-Math.atan2(hgt,len),h,0,'YXZ');g.castShadow=g.receiveShadow=true;g.userData.ramp=1;RO.grp.add(g);for(const sd of[-1,1]){const st=new THREE.Mesh(new THREE.BoxGeometry(.35,.35,Math.hypot(len,hgt)),neonMat('#ffffff',1.2));st.userData.ramp=1;st.position.set(x+Math.cos(h)*sd*w/2,y0+hgt/2+.35,z-Math.sin(h)*sd*w/2);st.rotation.copy(g.rotation);RO.grp.add(st)}
-  RO.ramps.push({x,z,h,len,hgt,w,y0,dk:Y0!=null})}
+  RO.ramps.push({x,z,h,len,hgt,w,y0,dk:Y0!=null,col:col||0xffcd03})}
 // 30 Athens golden bricks: hill tops (Lycabettus, the Acropolis plateau x3, Philopappou, Strefi, Ardittos, Areopagus, Tourkovounia), squares, parks, Plaka, Gazi, Koukaki, Chalandri, Psychiko and halfway up the Lycabettus road
 function athGbSpots(){const A=athGbSpots0().map((s,i)=>[s[0],s[1],s[2],i]);return SM_ON?A:A.filter(s=>athIn(ATHD,...RW(s[0],s[1])))}
 function athGbSpots0(){const out=[],add=(x,z)=>{for(let k=0;k<50;k++){const a=k*2.4,r=k*2,px=x+Math.cos(a)*r,pz=z+Math.sin(a)*r,gy=groundY(px,pz);if(!roamHit(px,pz,3.5,gy+1)&&!lzHit(px,pz,3.5)){out.push([px,pz,gy+2.5]);return}}out.push([x,z,groundY(x,z)+2.5])};
@@ -5481,7 +5485,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   // hop: Space / HOP button
   if(pressed.fire){pressed.fire=false;if(!busy&&!air&&RO.vy<=0){RO.tutHop=true;RO.vy=TUNE.hop;RO.y+=.05;AU.sfx('launch');fovKick=Math.max(fovKick,4)}}
   if(air)RO.airT=(RO.airT||0)+dt;
-  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+(RO.inCity?.25:.3)*TUNE.bTop*RO.bRamp)*(RO.turbo>0&&!RO.bash?1.25:1)*fit*V85OFF*(RO.onAB?TUNE.abTop:RO.inCity?W13S.city:W13S.open);C26_ramp(RO,c,C26.on?dt:1);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*TUNE.acc*lvl.acc*Math.max(0,1-(RO.v>0?(RO.v/tt)**W13S.cp:RO.v/tt))*W13_lift(c)*(boost||RO.turbo>0||!C26.on?1:Math.max(.05,RO.thA))+(TUNE.bPush*RO.bRamp+(RO.turbo>0?16:0))*BG23_cap(RO.v,tt))*dt;else if(C26.on){const cd=(Math.abs(RO.v)*.08+.9)*dt;RO.v=Math.abs(RO.v)<=cd?0:RO.v-Math.sign(RO.v)*cd}else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-(C26.on?C26.brkCity*(.1+.9*RO.bkA):75)*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-TUNE.rev,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt;W13_corner(c,dt)}
+  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=TUNE.spOn?QS_tt(lvl,fit*V85OFF)/* v88z: real class top speeds (98qs_speed.js) */:top*(1+(RO.inCity?.25:.3)*TUNE.bTop*RO.bRamp)*(RO.turbo>0&&!RO.bash?1.25:1)*fit*V85OFF*(RO.onAB?TUNE.abTop:RO.inCity?W13S.city:W13S.open);C26_ramp(RO,c,C26.on?dt:1);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*TUNE.acc*lvl.acc*Math.max(0,1-(RO.v>0?(RO.v/tt)**W13S.cp:RO.v/tt))*W13_lift(c)*(boost||RO.turbo>0||!C26.on?1:Math.max(.05,RO.thA))+(TUNE.bPush*RO.bRamp+(RO.turbo>0?16:0))*BG23_cap(RO.v,tt))*dt;else if(C26.on){const cd=(Math.abs(RO.v)*.08+.9)*dt;RO.v=Math.abs(RO.v)<=cd?0:RO.v-Math.sign(RO.v)*cd}else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-(C26.on?C26.brkCity*(.1+.9*RO.bkA):75)*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-TUNE.rev,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt;W13_corner(c,dt)}
   // boost pads
   for(const pd of RO.pads||[]){if(!air&&Math.hypot(pd.x-RO.x,pd.z-RO.z)<7&&(RO.padT||0)<=0){RO.turbo=Math.max(RO.turbo,1.8);RO.v=Math.max(RO.v,top*1.05);RO.padT=.8;award(s,'BOOST PAD',8,100,'#ffd12c');comboAdd(1);AU.sfx('boost');fovKick=Math.max(fovKick,10)}}RO.padT=Math.max(0,(RO.padT||0)-dt);
   // steering: target yaw rate eases in; sharper when slow, calmer when fast; velocity heading follows with surface grip (slight slide on dirt/water)
@@ -7692,7 +7696,7 @@ function OB_touch(px,pz,r,ox=RO.x,oz=RO.z,oh=RO.h){const dx=px-ox,dz=pz-oz,s=Mat
   const qa=Math.max(0,Math.abs(a)-OB_HL),qb=Math.max(0,Math.abs(b)-OB_HW);const g=Math.hypot(qa,qb),ok=g<r+.25;if(ok)OB.hit={k:'prop',f:OB.fr};else OB.pm.add(px*7919+pz);return ok||OB.off}
 function OB_obb(ax,az,ah,aw,al,bx,bz,bh,bw,bl){const A=[[Math.sin(ah),Math.cos(ah)],[Math.cos(ah),-Math.sin(ah)]],B=[[Math.sin(bh),Math.cos(bh)],[Math.cos(bh),-Math.sin(bh)]],d=[bx-ax,bz-az];
   for(const u of[...A,...B]){const ra=al*Math.abs(A[0][0]*u[0]+A[0][1]*u[1])+aw*Math.abs(A[1][0]*u[0]+A[1][1]*u[1]),rb=bl*Math.abs(B[0][0]*u[0]+B[0][1]*u[1])+bw*Math.abs(B[1][0]*u[0]+B[1][1]*u[1]);if(Math.abs(d[0]*u[0]+d[1]*u[1])>ra+rb+.2)return false}return true}
-const OB_cdim=k=>{const n=HCAR[k]||'';return n==='#troll'?[1.4,6]:n==='#scoot'?[.5,1.1]:/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]};
+const OB_cdim=k=>{const n=HCAR[k]||'';return n==='#troll'||n==='bus'?[1.4,6]:n==='#scoot'?[.5,1.1]:/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]};
 function OB_car(x,z,dx,dz,c){const k=c.k,[w,l]=OB_cdim(k),r=OB_obb(RO.x,RO.z,RO.h,OB_HW,OB_HL,x,z,Math.atan2(dx,dz),w,l);if(r)OB.hit={k:'car',f:OB.fr};else OB.cm.add(c);return r||OB.off}
 function OB_carP(k,P){const N=HUB.nodes,A=N[k.a],B=N[k.b];const h=A&&B?Math.atan2(B.x-A.x,B.z-A.z):0;const[w,l]=OB_cdim(k.k);return OB_obb(P.x,P.z,P.h??RO.h,OB_HW,OB_HL,k.x,k.z,h,w,l)}
 OB.cm=new Set();OB.pm=new Set();OB.fr=0;
@@ -7982,7 +7986,7 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
         if(go)for(const o of res.keys()){if(o===c||same(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
         if(go&&d<6)res.set(c,CV.t);else if(!go)vm=Math.sqrt(10*Math.max(0,d-3.2))}}
       else{vm=Math.min(vm,6+Math.max(0,d)*.6);const o=J.of===CV.fr?J.oc.find(o=>o!==c&&Math.abs(o.CVhx*c.CVhx+o.CVhz*c.CVhz)<.7):null;if(o&&d>2&&(c.CVw=(c.CVw||0)+dt)<4)vm=Math.min(vm,Math.sqrt(10*Math.max(0,d-3.2)));else if(!o)c.CVw=0}}
-    if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng);if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
+    if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
     if(!g){c.CVp=0;if(!J&&!In)c.CVx=null}
     const Jb=In&&In.sig?In:J;if(Jb&&Jb.sig&&(In===Jb||Jb.res&&Jb.res.has(c))){const R=Jb.res,pc=R&&R.has(c)?R.get(c):1e9;let hold=0;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);
       for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,dd=Math.hypot(rx,rz);if(dd>8)continue;const al=rx*c.CVhx+rz*c.CVhz;if(al<-.5)continue;
@@ -8577,7 +8581,7 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
   case'police':A=CR_car({body:'#f4f4f4',acc:'#0055bf',noWing:1,x:[['bar',-2,-1,0,K,13]]});break;
   case'suv':A=CR_suv({body:W,acc:W});wid=2.15;break;
   case'van':A=CR_van({body:W});wid=2.2;break;case'delivery':A=CR_truck({body:W});wid=2.4;break;case'truck':A=CR_truck({body:W});wid=2.55;break;
-  case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;
+  case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;case'bus':A=BC_bus();wid=2.55;break;/* v88z QS: city bus (the big-car template) */
   default:{const T=nm.startsWith('su:')&&SU_T.find(t=>t.id===nm.slice(3));if(!T)return CR_CG[nm]=null;A=T.car();wid=2.0}} // LV (v88n): street racers from 98su as traffic, own livery colours
   if(['sedan','sedan-sports','taxi','police'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!(TUNE.bwCar?['drv','drvR','stw','flag']:['drv','drvR','stw','mir','lp','pipes','flag']).includes(b.t));CR_LO=TUNE.bwCar?3:2;/* BW (v88w): bwCar = full-detail studs/curves/wheels + mirrors, plates, exhausts on near traffic; the far copy is re-clustered from this */CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
@@ -10999,6 +11003,88 @@ const D26={gbT:0,n:0,blocked:0};
   else if(!c.hb)D26.gbT=0}}catch(e){}return c}}
 window.__d26=()=>({gbT:+D26.gbT.toFixed(2),drifts:D26.n,blocked:+D26.blocked.toFixed(2),slip:+((typeof RO!=='undefined'&&RO.vh!=null?angDiff(RO.h,RO.vh):0)*180/Math.PI).toFixed(2),
   gbHold:TUNE.gbHold,gbSteer:TUNE.gbSteer,slipMax:TUNE.slipMax,kR:C26.kR});
+// ==== QS (v88z quick wins, coordinator plan docs/CITY_LIFE_PLAN.md Q1-Q3 on alex/od-onfoot): per-class top speeds, traffic mix, ramps ====
+// Speeds: free roam only (races unchanged). Each class has a roam top and a boost top (km/h on the HUD, open road and Autobahn). City
+// streets (RO.inCity) run at TUNE.spCityK of both (×0.82 as before). They replace the single 174 / 224 km/h cap in 99_api.js (CR_VMAX/CR_VBOOST).
+// Boost keeps its push (bPush) and fill sources; real nitrous mostly adds acceleration (+≈10 % top), so the boost top is near the class's real top.
+// Handling is untouched: steering, camera and FX still scale with the OLD RO.top, so the car turns as before at any given speed.
+Object.assign(TUNE,{spOn:1,spCityK:.82,spOpen:1,spMax:345,
+ spCar:150,spCarB:175,spVan:130,spVanB:150,spHeavy:90,spHeavyB:100,spSuv:165,spSuvB:195,spSport:230,spSportB:290,spSuper:260,spSuperB:330,spBoat:90,spBoatB:105,
+ trOn:1,trHour:1,trCar:55,trHeavy:45,trScoot:45});
+// garage set id → class (template description): sports = the default Hot Rod and the street tuners/roadster/coupe; supercar = GT, Gold Rush, hypercar
+const QS_CLS={rod:'spSport',ebbel:'spSport',posei:'spSuper',gold:'spSuper',t_su:'spSport',t_su_mid:'spSport',t_su_gt:'spSport',t_su_wide:'spSport',t_su_sky:'spSport',
+ t_su_pink:'spSport',t_sc_tm:'spSport',t_sc_hy:'spSuper',t_bus:'spHeavy',t_truck:'spHeavy',t_limo:'spSuv',t_mt:'spVan'};
+function QS_cls(){if(CR_MODE==='boat')return'spBoat';if(CR_MODE==='4x4')return'spSuv';let id='rod';try{id=GAR_set().id}catch(e){}return QS_CLS[id]||'spSport'}
+// [roam top, boost top] km/h, open road: class × player level × BOOSTER upgrade, capped at spMax
+function QS_kmh(lvl){let up=1;try{if(CR_MODE==='car')up=GAR_upMul(GAR_ups(),'top')}catch(e){}const k=QS_cls(),m=(lvl?lvl.top:1)*up;return[Math.min(TUNE.spMax,TUNE[k]*m),Math.min(TUNE.spMax*1.3,TUNE[k+'B']*m)]}
+// speed target (m/s) replacing the old tt in roamStep (kf = surface fit × v85 offroad factor); also sets RO.qsV / RO.qsVB, the plain and boosted
+// caps the weight layer in 99_api.js uses
+function QS_tt(lvl,kf){const a=RO.onAB?1:RO.inCity?TUNE.spCityK:TUNE.spOpen,b=Math.max(RO.bRamp||0,RO.turbo>0&&!RO.bash?1:0),q=QS_kmh(lvl),v=q[0]/3.6*a*kf,vb=q[1]/3.6*a*kf;RO.qsV=v;RO.qsVB=vb;return v+(vb-v)*b}
+// ---- traffic mix (of HUB.cars, 150; DR_traffic keeps every 2nd → the mix holds). Plan Q1 targets: Frankfurt trucks 4 %, buses 4 %, police 2 %
+// (was i%11: 36 % heavy, 9 % police, no buses); Athens scooters 22 %, taxis 20 % (was 41 % taxis). Sources: Berlin city streets 5.5 % heavy
+// vehicles; Attica fleet ≈24 % two-wheelers (EL.STAT via NTUA); see the plan's Sources.
+// Frankfurt slots (HCAR after the swaps): 0 sedan,1 hypercar,2 taxi,3 van,4 truck,5 delivery,6 police,7 time coupe,8 bus,9 tuner,10 roadster
+// Athens: 0 taxi,1 sedan,2 van,3 suv,4 delivery,5 sports,6 trolleybus,7 scooter,8 tuner,9 silver tuner
+const QS_MIX={fra:[50,6,12,12,6,9,3,18,6,15,13],ath:[30,35,10,15,5,5,7,33,5,5]};
+{const i=HCAR.indexOf('garbage-truck');if(i>=0)HCAR[i]='bus'} // same type count = same draw calls; garbage trucks are < 1 % of city traffic
+let QS_K=null,QS_KC='';function QS_kind(i){if(QS_KC!==CID){QS_K=null;QS_KC=CID}if(!TUNE.trOn)return CID==='fra'?i%HCAR.length:ATH_K[i%ATH_K.length];
+ if(!QS_K){const W=QS_MIX[CID==='fra'?'fra':'ath'],T=W.reduce((a,b)=>a+b,0),half=n=>{const c=W.map(w=>Math.floor(w*n/T)),r=W.map((w,k)=>w*n/T-c[k]);let left=n-c.reduce((a,b)=>a+b,0);for(const k of r.map((v,k)=>k).sort((a,b)=>r[b]-r[a]))if(left-->0)c[k]++;const L=[];c.forEach((m,k)=>{for(let q=0;q<m;q++)L.push(k)});
+  const g=mul(919+n);for(let q=L.length-1;q>0;q--){const t=Math.floor(g()*(q+1));[L[q],L[t]]=[L[t],L[q]]}return L};const A=half(75),B=half(75);QS_K=[];for(let q=0;q<75;q++)QS_K.push(A[q],B[q])} // even slots (the half DR_traffic keeps) carry the exact mix
+ return QS_K[i%QS_K.length]}
+// city cruise speeds (km/h → m/s, ±15 %): 50 km/h limit on Frankfurt and Athens city streets
+function QS_v0(k,ab){if(!TUNE.trOn)return HCAR[k]==='#scoot'?rr(15,22):rr(14,24);const nm=HCAR[k]||'',hv=/truck|delivery|bus|#troll/.test(nm);
+ if(ab)return(hv?rr(80,90):rr(100,130))/3.6;const m=nm==='#scoot'?TUNE.trScoot:hv?TUNE.trHeavy:TUNE.trCar;return m/3.6*(.9+.2*R())}
+// ---- ramps stay clear (v88z): traffic was queueing on the ramps' run-ups (ramps sit across the lanes) and the player hit it or stopped
+// behind it. Traffic now never turns onto a street edge that carries a free-roam ramp (run-up 40 m, landing 20 m), cars already on one
+// out of sight (> 110 m) move to the next free edge, and no car parks there. TUNE.rampClear 0 = as before.
+TUNE.rampClear=1;let QS_SH=null,QS_SHk='';
+const QS_segD=(x,z,A,B)=>{const dx=B.x-A.x,dz=B.z-A.z,L2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/L2));return Math.hypot(A.x+dx*t-x,A.z+dz*t-z)};
+function QS_pts(r){const s=Math.sin(r.h),c=Math.cos(r.h);return[-r.len/2-40,-r.len/2-20,0,r.len/2+20].map(a=>[r.x+s*a,r.z+c*a])}
+function QS_shutSet(){const N=HUB.nodes;if(!N||!RO.ramps)return null;const key=RO.ramps.length+':'+N.ng;if(QS_SH&&QS_SHk===key&&QS_SH.N===N)return QS_SH;const S=new Set();S.N=N;
+ for(const r of RO.ramps){if(r.dk)continue;const P=QS_pts(r);for(let i=0;i<N.ng;i++)for(const j of N[i].nb){if(j<=i||j>=N.ng)continue;if(P.some(([x,z])=>QS_segD(x,z,N[i],N[j])<r.w/2+6))S.add(i*100000+j)}}
+ QS_SH=S;QS_SHk=key;return S}
+function QS_shut(a,b){if(!TUNE.rampClear||a==null||b==null)return false;const S=QS_shutSet();return!!S&&S.has(Math.min(a,b)*100000+Math.max(a,b))}
+function QS_rampNear(x,z){if(!TUNE.rampClear)return false;for(const r of RO.ramps||[])if(!r.dk&&QS_pts(r).some(([px,pz])=>Math.hypot(px-x,pz-z)<r.w/2+12))return true;return false}
+// traffic count follows the hour (FL day cycle): live cars × QS_hourK/1.2; extra cars out of sight (> 200 m) are parked off-map for 20-40 s
+function QS_hourK(){let h=12;try{h=FL_time()*24}catch(e){}const ath=CID!=='fra';if(h<5)return ath?.5:.35;if(h<7)return .7;if(h<9.5)return 1.2;if(h<14.5)return 1;if(h<15.5)return ath?1.2:1;if(h<16)return 1;if(h<19.5)return 1.2;return ath?(h<23?1:.5):.7}
+let QS_ct=0;function QS_clear(dt){if(!HUB.cars||!HUB.nodes||(QS_ct+=dt)<.5)return;QS_ct=0;const N=HUB.nodes;
+ if(TUNE.trHour){const C=HUB.cars,live=C.filter(c=>!(c.dead>0)).length,want=Math.round(C.length*QS_hourK()/1.2);let over=live-want;
+  for(const c of C){if(over<=0)break;if(c.dead>0||c.pk||c.tr||c.route||c.crW||Math.hypot(c.x-RO.x,c.z-RO.z)<200)continue;c.dead=20+R()*20;over--}}
+ for(const c of HUB.cars){if(TUNE.trOn&&!c.pk&&!c.tr&&N[c.a]&&N[c.b]){const ab=!!(N[c.a].ab&&N[c.b].ab);if(c.qsAb!==ab){c.qsAb=ab;c.v=QS_v0(c.k,ab)}}/* Autobahn 100-130 (trucks 80-90), city 50-60 km/h */
+  if(c.pk||c.tr||c.dead>0||c.route||!QS_shut(c.a,c.b)||Math.hypot(c.x-RO.x,c.z-RO.z)<110&&LV_seen(c.x,c.y||0,c.z))continue;/* close but out of view (behind you, round a corner) moves too */const A=N[c.a];if(!A)continue;
+  const nx=A.nb.filter(n=>n<N.ng&&n!==c.b&&!QS_shut(c.a,n));if(nx.length){c.b=nx[Math.floor(R()*nx.length)];c.t=0}}}
+hubTrafficStep=(f=>function(dt){try{QS_clear(dt)}catch(e){}return f.apply(this,arguments)})(hubTrafficStep);
+// ---- ramp validator (plan Q3): every ramp built without a fixed base height (street, biome, Taunus, long-jump, Autobahn, pop-up) goes through
+// QS_rampFit before it is built: on a city street it snaps to the centreline with the street's heading, width ≤ road − 1 m (Athens streets are
+// 7.5-8.5 m; ramps were 16 m and their edges sat in walls), the base must be level (entry vs lip ≤ 0.5 m), and the 30 m run-up, the ramp and
+// the 40 m landing must be free of colliders, water and junction discs. If the spot fails it slides along the street (±160 m), then to the
+// nearest street within 400 m (Höchst ramp in the river, Homburg ramp 290 m off-road). Fixed-height ramps (bridge deck, story, roadside pop-ups)
+// and Autobahn shoulder ramps keep their spot. Log: __qs.ramps(). TUNE.rampFit 0 = as before.
+TUNE.rampFit=1;const QS_RL=[];
+function QS_rampOk(x,z,h,len,w){const s=Math.sin(h),c=Math.cos(h),why=[];const P=(a,b)=>[x+s*a+c*b,z+c*a-s*b];
+ const ge=groundY(...P(-len/2,0)),gl=groundY(...P(len/2,0));if(Math.abs(ge-gl)>.5)why.push('slope '+(gl-ge).toFixed(1));
+ for(let a=-len/2-30;a<=len/2+40;a+=3)for(const b of[-w/2+.6,0,w/2-.6]){const[px,pz]=P(a,b),g=groundY(px,pz);
+  if(roamHit(px,pz,.9,g+.6)){why.push('collider@'+Math.round(a));a=1e9;break}if(typeof inRiver==='function'&&inRiver(px,pz,-1)){why.push('water@'+Math.round(a));a=1e9;break}}
+ for(const J of JUNC||[])for(const a of[-len/2-30,-len/2-15,-len/2,0,len/2,len/2+20])if(Math.hypot(P(a,0)[0]-J.x,P(a,0)[1]-J.z)<J.r+2){why.push('junction@'+a);break}
+ return why}
+// every drivable road as 8 m samples {x,z,tx,tz}: city streets, lazy biome roads (outer towns), Taunus mountain roads
+let QS_RD=null;function QS_roads(){if(QS_RD)return QS_RD;const R=[],add=(P,w,cls)=>{if(!P||P.length<2)return;const Q=[];for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],L=Math.hypot(b.x-a.x,b.z-a.z);if(L<.01)continue;
+  const n=Math.max(1,Math.ceil(L/8));for(let k=0;k<n;k++)Q.push({x:a.x+(b.x-a.x)*k/n,z:a.z+(b.z-a.z)*k/n,tx:(b.x-a.x)/L,tz:(b.z-a.z)/L})}if(Q.length>8)R.push({pts:Q,w,cls})};
+ for(const S of CITY_S)if(S.r.cls!=='ped')add(S.pts,S.r.w,S.r.cls);try{for(const S of LZ.roads||[])add(S.pts,S.w||(S.r&&S.r.w)||8,'lz')}catch(e){}try{for(const S of mtnSamples())add(S.pts,(S.r&&S.r.w)||9,'mtn')}catch(e){}
+ return QS_RD=R}
+function QS_rampFit(x,z,h,len,w){const o={x0:Math.round(x),z0:Math.round(z),w0:w};
+ const ab=typeof abAt==='function'?abAt(x,z):null;if(ab&&ab.road&&ab.road.ab&&Math.abs(ab.lat)<ab.road.w/2+2){o.keep='autobahn';QS_RL.push(o);return null}
+ let B=null;for(const r of QS_roads())for(let i=0;i<r.pts.length;i++){const p=r.pts[i],d=Math.hypot(p.x-x,p.z-z);if(!B||d<B.d)B={r,i,d}}
+ if(!B||B.d>400){o.keep='no road within 400 m';QS_RL.push(o);return null}
+ if(B.d>B.r.w/2+4){const why=QS_rampOk(x,z,h,len,w);if(!why.length){o.keep='off-road ok';QS_RL.push(o);return null}o.why0=why.slice(0,3).join(',')}
+ const P=B.r.pts,W=Math.max(5,Math.min(w,B.r.w-1));let best=null;
+ for(let k=0;k<=20&&!best;k++)for(const sg of k?[1,-1]:[1]){const j=B.i+sg*k*2;if(j<3||j>P.length-4)continue;const p=P[j],f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1,hh=Math.atan2(p.tx*f,p.tz*f);
+  if(RO.ramps&&RO.ramps.some(r=>Math.hypot(r.x-p.x,r.z-p.z)<120))continue;if(!QS_rampOk(p.x,p.z,hh,len,W).length){best=[p.x,p.z,hh];break}}
+ if(!best){const p=P[Math.min(P.length-1,Math.max(0,B.i))],f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1,hh=Math.atan2(p.tx*f,p.tz*f);o.why=QS_rampOk(p.x,p.z,hh,len,W).slice(0,3).join(',');best=[p.x,p.z,hh];o.bad=/collider|water|junction/.test(o.why)?1:0/* a slope alone is fine: the lip sits on the ground at the low end, the ramp just gets steeper or flatter */}
+ Object.assign(o,{x:Math.round(best[0]),z:Math.round(best[1]),w:W,road:B.r.cls,moved:Math.round(Math.hypot(best[0]-x,best[1]-z))});QS_RL.push(o);return[best[0],best[1],best[2],W]}
+addRamp=(f=>function(x,z,h,len,hgt,w,col,Y0){if(TUNE.rampFit&&Y0==null&&!QS_rampSkip(col)){try{const r=QS_rampFit(x,z,h,len,w);if(r)[x,z,h,w]=r}catch(e){console.warn('QS ramp',e)}}return f.call(this,x,z,h,len,hgt,w,col,Y0)})(addRamp);
+function QS_rampSkip(col){return col===0xffd12c/* OTG roof ramp: leads onto its roof deck */}
+window.__qs={shutQ:(a,b)=>QS_shut(a,b),ramps:()=>QS_RL,shut:()=>{const S=QS_shutSet();return S?S.size:0},fill:()=>{if(pl)pl.bm=100},veh:()=>CR_MODE,line:ab=>{const S=ab?abSamples().filter(S=>S.r.ab&&!S.r.c):CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped'&&!S.prof);S.sort((a,b)=>b.L-a.L);return S[0].pts.map(p=>[p.x,p.z])},kmh:()=>QS_kmh(carStat()),cls:QS_cls,mix:()=>{const n={};for(const c of HUB.cars){const k=HCAR[c.k];n[k]=(n[k]||0)+1}return n}};
 // ===== TUNE (tune20): Alex tunes the driving feel himself, live, with versioned saves. Docs: docs/TUNE.md
 // One table of knobs. A knob id is a path: 'TUNE.x' = the TUNE object (10_core.js, numbers that used to be inline literals),
 // 'C26.…' / 'W13S.…' / 'W14_ST.…' / 'RCAM.chase.…' = the existing settings objects, 'W.B2K_DMIN' = window. Defaults are read
@@ -11022,6 +11108,15 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Engine','W13S.city','City top speed ×',.5,1.6,.01],['Engine','W13S.open','Open-road top speed ×',.5,1.6,.01],['Engine','TUNE.abTop','Autobahn top speed ×',.8,2,.01],
  ['Engine','TUNE.acc','Acceleration',.4,3,.05],['Engine','W13S.cp','Accel curve (higher = pulls to top)',.5,4,.1],['Engine','C26.thUp','Throttle response',.5,10,.1],
  ['Engine','C26.brkCity','Brake force',4,40,.5],['Engine','TUNE.rev','Reverse top (m/s)',5,30,1],
+ // v88z (98qs_speed.js): per-class roam top / boost top in km/h (open road + Autobahn); city streets × spCityK. OFF = the old 174/224 cap
+ ['Engine','TUNE.spOn','Per-class top speeds (v88z)',0,1,1,'bool'],['Engine','TUNE.spCityK','City streets: share of top',.4,1.2,.01],['Engine','TUNE.spOpen','Open road: share of top',.5,1.3,.01],
+ ['Engine','TUNE.spSport','Sports (Hot Rod, tuners) top',100,400,5],['Engine','TUNE.spSportB','Sports boost top',100,450,5],['Engine','TUNE.spSuper','Supercar (GT, Gold, hypercar) top',100,400,5],['Engine','TUNE.spSuperB','Supercar boost top',100,450,5],
+ ['Engine','TUNE.spSuv','SUV / 4x4 / limo top',60,300,5],['Engine','TUNE.spSuvB','SUV boost top',60,350,5],['Engine','TUNE.spVan','Van / monster truck top',60,250,5],['Engine','TUNE.spVanB','Van boost top',60,300,5],
+ ['Engine','TUNE.spHeavy','Truck / bus top',50,200,5],['Engine','TUNE.spHeavyB','Truck / bus boost top',50,250,5],['Engine','TUNE.spCar','City car top',60,250,5],['Engine','TUNE.spCarB','City car boost top',60,300,5],
+ ['Engine','TUNE.spBoat','Boat top',30,200,5],['Engine','TUNE.spBoatB','Boat boost top',30,250,5],['Engine','TUNE.spMax','Top-speed cap (level + upgrades)',150,450,5],
+ // v88z traffic (next city load): mix + city cruise ±10 % (Autobahn 100-130, trucks 80-90); trHour = count follows the hour; rampClear/rampFit = ramps
+ ['Life','TUNE.trOn','Realistic traffic mix + speeds (v88z)',0,1,1,'bool'],['Life','TUNE.trHour','Traffic count follows the hour',0,1,1,'bool'],['Life','TUNE.trCar','Traffic cars cruise (km/h)',20,90,1],['Life','TUNE.trHeavy','Trucks/buses cruise (km/h)',20,90,1],['Life','TUNE.trScoot','Scooters cruise (km/h)',20,90,1],
+ ['Life','TUNE.rampClear','Traffic keeps off ramp streets (v88z)',0,1,1,'bool'],['Life','TUNE.rampFit','Ramps fitted to the street (v88z, next load)',0,1,1,'bool'],
  ['Boost','TUNE.bPush','Boost burst push',0,60,1],['Boost','TUNE.bTop','Boost top-speed bonus ×',0,3,.05],['Boost','TUNE.bDrain','Boost use per s',5,60,1],
  ['Boost','TUNE.bRegen','Meter regen per s',0,9,.25],['Boost','TUNE.bashT','Brickbash after (s)',.5,6,.1],
  ['Boost','TUNE.hop','Hop height',4,24,.5],['Boost','TUNE.grav','Gravity',10,60,1],
@@ -11956,7 +12051,7 @@ function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   let cand=null;for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))cand=c}
   if(!cand)return;const nd=LV_edges(far?30:70,far?100:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>14&&!N[e.i].g&&!N[e.bi].g)/* g streets (all of Athens): traffic drives at lane 0, no kerb lane to park in */;for(let k=0;k<Math.min(10,nd.length);k++){const E=nd[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L,W=Math.min(A.w||20,B.w||20);if(W<9)continue;const d=Math.hypot(A.x+(B.x-A.x)*E.s/L-RO.x,A.z+(B.z-A.z)*E.s/L-RO.z);
     const t=E.s/L,lane=(W/2+.3)/W,x=A.x+(B.x-A.x)*t-(B.z-A.z)/L*lane*W,z=A.z+(B.z-A.z)*t+(B.x-A.x)/L*lane*W;
-    if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;if(roamHit(x,z,1.4,groundY(x,z)+.5))continue;
+    if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;if(roamHit(x,z,1.4,groundY(x,z)+.5))continue;if(QS_rampNear(x,z))continue;/* v88z: never park on a ramp run-up */
     if(!far&&LV_seen(x,0,z)&&d<90)continue;
     Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:i,b:bi,t,lane,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;return}}
 // ---------- 9 · roadside pop-up challenges (2K "On-the-Go" style, but no stop): one at a time, ring 45-75 m ahead in your lane
@@ -12956,6 +13051,11 @@ function OF_api(){return{state:RO.foot,x:+OF.x.toFixed(2),z:+OF.z.toFixed(2),y:+
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88z',id:'speed',text:'Take a sports car (Hot Rod) onto the Autobahn and hold GAS: the HUD reaches about 230 km/h, BOOST takes it past 260. A 4×4 tops out around 155. Steering feels the same as before.'},
+ {ver:'v88z',id:'kreuz',text:'Autobahn west of the city, at the Frankfurter Kreuz: drive under the flyover at full speed, then take the A5 over it. No drop, no sudden stop, no invisible wall.'},
+ {ver:'v88z',id:'ramps',text:'Drive along a street to a yellow ramp: it sits in your lane, no traffic queued on it, and you can jump it. Try the ramp on the Eiserner Steg footbridge.'},
+ {ver:'v88z',id:'traffic',text:'Frankfurt: a few city buses, fewer police and trucks. Athens: more scooters, fewer taxis. Does the traffic look right?'},
+ {ver:'v88z',id:'ath-walls',text:'Athens: drive around Eleni\'s Garage (Psyrri) and a RAMP JUMP pop-up ring. Any invisible walls or getting stuck between buildings?'},
  {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
  {ver:'v89a',id:'foot-walk',text:'On foot: drag on the left half of the screen to walk, push far to run; RUN and JUMP work. Walk 30 m along a street: no getting stuck on kerbs, the camera stays behind you and never inside a wall. Your minifig is as tall as the people around.'},
  {ver:'v89a',id:'foot-pc',text:'PC: stop the car, press F (or E) to get out, walk with WASD (Shift runs, Space jumps), press F next to a car to get in.'},
@@ -13173,7 +13273,7 @@ const CR_acc=(v,vm,b)=>Math.max(0,(b?14:7.5)*(1-Math.pow(Math.max(0,v)/vm,2)));
 roamStep=(f=>function(dt){if(state!=='roam'||!pl||RO.wk||RO.frozen||!dt)return f(dt);const v0=RO.v||0,nb0=typeof SC_S!=='undefined'?SC_S.nb:0,air0=!!pl.air,c=CTL||{};
  if(RO.crTurn!=null&&Math.abs(c.steer||0)>.3)RO.crTurn=null;if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),W14_PIV*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
  const r=f(dt);if(RO.wk||!pl)return r;const bumped=(typeof SC_S!=='undefined'?SC_S.nb:0)!==nb0;
- if(!bumped&&!air0&&!pl.air){const boost=!!(RO.boosting||RO.turbo>0),vm=boost?CR_VBOOST:CR_VMAX;
+ if(!bumped&&!air0&&!pl.air){const boost=!!(RO.boosting||RO.turbo>0),vm=TUNE.spOn&&RO.qsV?(boost?RO.qsVB:RO.qsV)/* v88z: class top speeds (98qs_speed.js) */:boost?CR_VBOOST:CR_VMAX;
   if(RO.v>v0&&RO.v>0)RO.v=Math.min(RO.v,v0+CR_acc(v0,vm,boost)*dt);
   if(RO.v>vm)RO.v=Math.max(vm,Math.min(RO.v,v0)-(Math.min(RO.v,v0)-vm)*1.6*dt);
   if(c.brk&&v0>0&&RO.v<v0)RO.v=Math.max(RO.v,v0-11*dt)}
