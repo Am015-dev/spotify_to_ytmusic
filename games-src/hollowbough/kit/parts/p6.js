@@ -19,7 +19,7 @@ function dims(size) {
   return [size.w, size.h || Math.round(size.w * 1.4)];
 }
 const tmpl = new Map(); let stats = { built: 0, cloned: 0 };
-const specKey = (sp, lay) => lay + '|' + [sp.art, sp.type, sp.kind || '', sp.name, sp.unique ? 1 : 0, sp.points, JSON.stringify(sp.cost || {}), lay === 'l' ? sp.text || '' : ''].join('|');
+const specKey = (sp, lay) => lay + '|' + [sp.art, paintedHref(sp.key) ? sp.key : '', sp.type, sp.kind || '', sp.name, sp.unique ? 1 : 0, sp.points, JSON.stringify(sp.cost || {}), lay === 'l' ? sp.text || '' : ''].join('|');
 function card(spec, size, opts) {
   mount();
   const [w, h] = dims(size), lay = w <= 120 ? 's' : 'l', k = specKey(spec, lay);
@@ -35,7 +35,7 @@ const urlCache = new Map();
 function toURL(svgStr) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr); }
 function cardURL(spec, size) { // standalone data-URL (defs embedded) for <img>/canvas use; browser caches the decode
   const [w, h] = dims(size), lay = w <= 120 ? 's' : 'l', k = specKey(spec, lay) + '#url';
-  let u = urlCache.get(k); if (!u) { u = toURL(cardString(spec, lay).replace(/^(<svg[^>]*>)/, '$1' + DEFS2)); urlCache.set(k, u); }
+  let u = urlCache.get(k); if (!u) { u = toURL(cardString(spec, lay, true).replace(/^(<svg[^>]*>)/, '$1' + DEFS2)); urlCache.set(k, u); }
   return u;
 }
 function cardImg(spec, size) { const [w, h] = dims(size), i = new Image(); i.width = w; i.height = h; i.src = cardURL(spec, size); i.alt = spec.name || spec.art; i.draggable = false; return i; }

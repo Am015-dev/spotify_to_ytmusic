@@ -244,3 +244,6 @@ click, error, hum (= engine_loop), switch (= token), beep (= lock), engine, boom
 
 ## Doorkick Dungeon music (2026-10-08)
 The Old Tower Inn track is retired from Doorkick Dungeon. Its music is now five Treblo tracks, shipped as separate files in `games/doorkick-dungeon/music/` (rows in `munch/ASSETS.md`; sources and licence note in `audio/doorkick/treblo/README.md`). `audio/doorkick/audio-data.js` was edited by hand to point at them (`url:music/<name>.mp3`): re-running `tools/bundle.py` would overwrite that.
+
+## Hollowbough music (2026-10-09)
+The four CC0 season beds are retired. Music is ten Treblo tracks (five slots, versions a and b) shipped as separate files in `games/hollowbough/music/`, made by `tools/music_treblo.py` from `audio/hollowbough/treblo/`; rows in `audio/hollowbough/ASSETS.md`. `audio/hollowbough/audio-data.js` was edited by hand to point at them (`url:music/<name>.mp3`): re-running `tools/bundle_real.py` would overwrite that.
