@@ -23,11 +23,20 @@ function P1_draw(k,w,h,sc,cam,o){const R=renderer,sm=R.shadowMap,S={rt:R.getRend
 // ---- offscreen renderer: render -> pixels (top-down, straight alpha, like drawImage of an alpha WebGL canvas)
 function P1_off(w,h){return{w,h,toneMapping:THREE.NoToneMapping,toneMappingExposure:1,outputColorSpace:THREE.SRGBColorSpace,cc:new THREE.Color(0),ca:0,px:null,
  setPixelRatio(){},setSize(w,h){this.w=w;this.h=h},setClearColor(c,a=1){this.cc.set(c);this.ca=a},clear(){},
- render(sc,cam){const w=this.w,h=this.h,t=P1_draw('o'+w+'x'+h,w,h,sc,cam,{tm:this.toneMapping,ex:this.toneMappingExposure,cc:this.cc,ca:this.ca}),b=new Uint8Array(w*h*4);renderer.readRenderTargetPixels(t,0,0,w,h,b);
-  const d=new Uint8ClampedArray(w*h*4),r=w*4;for(let y=0;y<h;y++){const s=(h-1-y)*r,o=y*r;for(let i=0;i<r;i+=4){const a=b[s+i+3];d[o+i+3]=a;if(a===255||a===0){d[o+i]=b[s+i];d[o+i+1]=b[s+i+1];d[o+i+2]=b[s+i+2]}else{const k=255/a;d[o+i]=b[s+i]*k;d[o+i+1]=b[s+i+1]*k;d[o+i+2]=b[s+i+2]*k}}}
-  this.px=new ImageData(d,w,h)},
+ render(sc,cam){const w=this.w,h=this.h,t=P1_draw('o'+w+'x'+h,w,h,sc,cam,{tm:this.toneMapping,ex:this.toneMappingExposure,cc:this.cc,ca:this.ca}),b=new Uint8Array(w*h*4);renderer.readRenderTargetPixels(t,0,0,w,h,b);this.px=P1_img(b,w,h)},
+ // same, but the pixels come back through a pixel-pack buffer + fence (WebGL2): the main thread never waits for the GPU queue
+ renderAsync(sc,cam,cb){const w=this.w,h=this.h,t=P1_draw('o'+w+'x'+h,w,h,sc,cam,{tm:this.toneMapping,ex:this.toneMappingExposure,cc:this.cc,ca:this.ca});
+  P1_readAsync(t,w,h,b=>{const o=P1_off(w,h);o.px=P1_img(b,w,h);cb(o.canvas())})},
  canvas(){const c=document.createElement('canvas');c.width=this.w;c.height=this.h;if(this.px)c.getContext('2d').putImageData(this.px,0,0);return c},
  url(){return this.px?P1_png(this.px):null}}}
+// GL rows (bottom-up, premultiplied by the blend) -> ImageData (top-down, straight alpha)
+function P1_img(b,w,h){const d=new Uint8ClampedArray(w*h*4),r=w*4;for(let y=0;y<h;y++){const s=(h-1-y)*r,o=y*r;for(let i=0;i<r;i+=4){const a=b[s+i+3];d[o+i+3]=a;if(a===255||a===0){d[o+i]=b[s+i];d[o+i+1]=b[s+i+1];d[o+i+2]=b[s+i+2]}else{const k=255/a;d[o+i]=b[s+i]*k;d[o+i+1]=b[s+i+1]*k;d[o+i+2]=b[s+i+2]*k}}}return new ImageData(d,w,h)}
+function P1_readAsync(t,w,h,cb){const R=renderer,gl=R.getContext(),sync=()=>{const b=new Uint8Array(w*h*4);R.readRenderTargetPixels(t,0,0,w,h,b);cb(b)};
+ if(!R.capabilities.isWebGL2||!gl.fenceSync)return sync();let buf,f;
+ try{buf=gl.createBuffer();gl.bindBuffer(gl.PIXEL_PACK_BUFFER,buf);gl.bufferData(gl.PIXEL_PACK_BUFFER,w*h*4,gl.STREAM_READ);R.state.bindFramebuffer(gl.FRAMEBUFFER,R.properties.get(t).__webglFramebuffer);
+  gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,0);f=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush()}catch(e){f=null}finally{gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);R.state.bindFramebuffer(gl.FRAMEBUFFER,null);R.setRenderTarget(R.getRenderTarget())}
+ if(!f){if(buf)gl.deleteBuffer(buf);return sync()}
+ const poll=()=>{const st=gl.clientWaitSync(f,0,0);if(st===gl.TIMEOUT_EXPIRED){setTimeout(poll,16);return}gl.deleteSync(f);const b=new Uint8Array(w*h*4);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,buf);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,0,b);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);gl.deleteBuffer(buf);cb(b)};setTimeout(poll,16)}
 // minimal PNG (stored deflate blocks): sync, a few hundred µs for a thumbnail, any browser decodes it
 const P1_CRC=(()=>{const T=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;T[n]=c>>>0}return T})();
 function P1_png(im){const w=im.width,h=im.height,px=im.data,row=w*4+1,raw=new Uint8Array(row*h);for(let y=0;y<h;y++)raw.set(px.subarray(y*w*4,(y+1)*w*4),y*row+1);
@@ -71,9 +80,6 @@ window.__P1={P1,off:P1_off,draw:P1_draw,gb:()=>GB,R:renderer,ctx:()=>P1,progs:()
 // renderer.compile only issues compile/link to the GPU process; the main thread blocks later, at the first draw that needs a program
 // (three reads its uniforms). So: link programs early and in the background (compileAsync waits with KHR_parallel_shader_compile where the
 // browser has it), and never ask for programs the next frame does not draw.
-// P1_later: small GPU jobs (menu card renders) queued until the first menu frame has shown, then one per frame
-P1.lq=[];P1.up=false;function P1_later(fn){P1.lq.push(fn);if(P1.up&&P1.lq.length===1)P1_lrun()}
-function P1_lrun(){requestAnimationFrame(()=>{const f=P1.lq.shift();if(f)try{f()}catch(e){};if(P1.lq.length)P1_lrun()})}
 function P2_after(fn){requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn()}catch(e){console.warn('P2',e)}}))}
 // every warm-up compiled with no render target bound, i.e. the canvas variant (sRGB out + tone mapping). The game draws the scene through the
 // composer (RenderPass -> linear HalfFloat target, no tone mapping): a different program. So each warm-up linked ~50 programs that were never used,

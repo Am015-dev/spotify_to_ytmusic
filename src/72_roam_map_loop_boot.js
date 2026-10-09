@@ -212,7 +212,7 @@ function boot(){MAT.roof=new THREE.MeshStandardMaterial({color:0x0c0e1e,roughnes
   warmTextures(scene);
   // PERF2: the first menu frame links only the programs it draws; the rest of the scene (particles, props off screen) is queued right after it,
   // so the GPU process links them while the menu idles instead of before the menu can show
-  setTimeout(()=>{done();P2_after(()=>{const warm=[V3(0,0,-5),V3(0,-5,-5)];for(const w of warm){emitS(SMOKE,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,true);emitS(FIREB,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,false)}P2_warm(scene,camera);P1.up=true;if(P1.lq.length)P1_lrun();P2_after(()=>{try{GS_thumb('b11',0)}catch(e){}})})},0)}
+  setTimeout(()=>{done();P2_after(()=>{const warm=[V3(0,0,-5),V3(0,-5,-5)];for(const w of warm){emitS(SMOKE,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,true);emitS(FIREB,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,false)}P2_warm(scene,camera)})},0)}
 setTimeout(boot,30);
 // ---- Career map: neon Frankfurt hub screen (nodes for every career event; free roam is the optional Cruise node)
 const CM={on:false,nodes:[],raf:0,t:0,P:null};

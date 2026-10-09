@@ -134,18 +134,18 @@ $('#setBtn').onclick=openSettings;$('#pSet').onclick=openSettings;$('#setDone').
 // The old 2D plane silhouette (pre-LEGO ship era) stays only as the fallback if WebGL fails.
 const W13_TC={};let W13_TR=null,W13_TT=0;
 function W13_visBox(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
-function W13_carImg(t){const W=240,H=120,K=2;if(W13_TC[t.id])return W13_TC[t.id];
+// PERF1: cb(canvas) gets the card; the pixels come back from the GPU asynchronously (no stall), pending requests share one render
+const W13_PD={};function W13_carImg(t,cb){const W=240,H=120,K=2;if(W13_TC[t.id]){cb(W13_TC[t.id]);return}if(W13_PD[t.id]){W13_PD[t.id].push(cb);return}W13_PD[t.id]=[cb];
  if(!W13_TR){const c=null,r=P1_off(W*K,H*K);r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=renderer.toneMapping;r.toneMappingExposure=renderer.toneMappingExposure;r.setClearColor(0,0);
   const sc=new THREE.Scene();sc.add(new THREE.HemisphereLight(0xffffff,0x5a6470,1.7));const d=new THREE.DirectionalLight(0xffffff,2.3);d.position.set(5,9,-7);sc.add(d);W13_TR={r,sc,c,cam:new THREE.PerspectiveCamera(24,W/H,.1,300)}}
  const{r,sc,c,cam}=W13_TR,g=shipMesh(t),U=g.userData;for(const k of['boat','wheels','shield','under','shadow','flares'])if(U[k])U[k].visible=false;for(const rb of U.ribbons||[])rb.visible=false;
  sc.add(g);const B=W13_visBox(g),m=B.getCenter(new THREE.Vector3()),s=B.getSize(new THREE.Vector3()),R=Math.hypot(s.x,s.y,s.z)*1.55;
- cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.clear();r.render(sc,cam);
- const o=r.canvas();sc.remove(g);
- clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){P1_free('o'+W*K+'x'+H*K);W13_TR=null}},4000);return W13_TC[t.id]=o}
-// PERF1: the card shows at once; its 3D car is drawn after the first menu frame, one card per frame (each needs a GPU readback), then cached
+ cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.renderAsync(sc,cam,o=>{W13_TC[t.id]=o;const L=W13_PD[t.id]||[];delete W13_PD[t.id];for(const f of L)f(o)});sc.remove(g);
+ clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){P1_free('o'+W*K+'x'+H*K);W13_TR=null}},4000)}
+// PERF1: the card shows at once; its 3D car is drawn into it when the GPU readback arrives (a frame or two later), then cached
 function teamCard(t){try{const[c,g]=cv(480,240);
   g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();c.className='w13car';
-  const put=()=>{try{g.drawImage(W13_carImg(t),0,0)}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}};if(W13_TC[t.id])put();else P1_later(put);return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
+  try{W13_carImg(t,o=>g.drawImage(o,0,0))}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
 function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
   const gl=g.createRadialGradient(0,20,0,0,20,110);gl.addColorStop(0,t.glow+'66');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(-120,-64,240,120);
   g.fillStyle=t.a;g.beginPath();g.moveTo(-100,26);g.lineTo(-18,-10);g.lineTo(0,-40);g.lineTo(18,-10);g.lineTo(100,26);g.lineTo(96,34);g.lineTo(-96,34);g.closePath();g.fill();

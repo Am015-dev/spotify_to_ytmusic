@@ -14,7 +14,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 20 | `20_race_world.js` | 104 | race circuits: neon Frankfurt world (buildRoad buildCity buildLandmarks loadTrack disposeWorld applyQuality), Athens race world (athPrep athTex athStands hazard |
 | 30 | `30_race.js` | 116 | race traffic (setupTraffic stepTraffic drawTraffic), props/Baustelle, particles (emit burst puff SPARK pools debris), audio AU, race state + race physics (stepS |
 | 31 | `31_race_r15.js` | 14 | R15 (race worker 15, v87q+): strategic routes. Per circuit, a WATER and an OFF-ROAD corridor run along the inside of a big bend: the inner wall opens at a signe |
-| 40 | `40_hud_input_menu.js` | 32 | race HUD (updHud buildMap drawMap flashHud), input (keys K, tilt, touch steer pad steerDraw, parkSet), menu/pause/settings (togglePause openSettings buildSettin |
+| 40 | `40_hud_input_menu.js` | 33 | race HUD (updHud buildMap drawMap flashHud), input (keys K, tilt, touch steer pad steerDraw, parkSet), menu/pause/settings (togglePause openSettings buildSettin |
 | 41 | `41_career_quests.js` | 105 | career = free roam: XP/level (carStat addXP), RO (roam state object), side quests (QUESTS qStart qStep), quests v2 road graph + GPS (qvGraph qvPath qvLayout), m |
 | 50 | `50_kenney_data.js` | 78 | DATA: KM_IDX (model index), KM_TEX (atlas PNGs), KM_BIN=window.__KM_BIN (blob lives in assets/km.js) |
 | 51 | `51_city_net.js` | 40 | Kenney loader (kmGeo kmKit kmMat), real Frankfurt layout CITYCFG RF WP, Athens street net decode, the Main (riverAt inRiver rivSide), decks/bridges BRIDGES deck |
@@ -72,7 +72,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 99c | `99c_checklist.js` | 32 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
-| 98zp | `98zp_perf_ctx.js` | 11 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
+| 98zp | `98zp_perf_ctx.js` | 12 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -102,9 +102,9 @@ uses: 10(518), 40(79), 20(48), 31(20), 93(4), 70(4), 41(3), 72(3), 99(2), 98rf(2
 defines: R15C R15_sw R15_why R15_e R15_find R15_ntd R15_ntd0 R15_pts R15_at R15_mouth R15_div R15_g R15_dvq R15_b R15_cx R15_inLane R15_hold R15_lane R15_ahead R15_ter R15_open R15_aiXt __rt15 R15_pads R15_tex R15_signTex R15_arrowTex R15_mesh R15_camB
 uses: 10(76), 20(10), 30(8), 51(4)
 
-## 40_hud_input_menu.js — 32 KB
-defines: mapC mg buildMap drawMap msgTimer stIndEl buzz flashHud feedEl feedClear hudEl setT cells duelAt updHud K SENS TILT tiltRead tiltZero tiltOn TOUCH tb SZ SR SK SH steerDraw steerHome steerEnd BZ TL TR bzSide bzSet bzEnd parkSet togglePause credShow openSettings closeSettings buildSettings W13_TC W13_visBox W13_carImg teamCard W13_teamCard0 unlocked thumbs refreshAttract GOALS seaView worldPick
-uses: 30(93), 10(87), 72(23), 71(18), 70(16), 41(12), 51(5), 20(4), 98w(3), 98zp(2)
+## 40_hud_input_menu.js — 33 KB
+defines: mapC mg buildMap drawMap msgTimer stIndEl buzz flashHud feedEl feedClear hudEl setT cells duelAt updHud K SENS TILT tiltRead tiltZero tiltOn TOUCH tb SZ SR SK SH steerDraw steerHome steerEnd BZ TL TR bzSide bzSet bzEnd parkSet togglePause credShow openSettings closeSettings buildSettings W13_TC W13_visBox W13_PD teamCard W13_teamCard0 unlocked thumbs refreshAttract GOALS seaView worldPick
+uses: 30(93), 10(87), 72(22), 71(18), 70(16), 41(12), 51(5), 20(4), 98w(3), 98zp(2)
 
 ## 41_career_quests.js — 105 KB
 defines: RO roamSave roamStore prof lvlOf carStat roamMagnet addXP MODE_EV OTG OTG_GOAL OTG_HI OTG_U QUESTS QCH QAV minifig npcSay qStart PHOTO_T photoTowers qFlag qStep QK qHud QV QV_COACH qvGraph qvGraphGen qvNear D24_nearMain qvAstar qvPath D24_clr D24_despike D24_clean D24_clean0 qvCum qvAt qvSnap qvHash qvPk qvAround QV_PH QV_D QV_LEGS QV_GEN qvLayout QV_FIX QV_TW QV_TWN QV_RB qvFixed qvUse qvPos qvSeed qvPreview qvCardG qvKm qvBrief qvStart qvCrates qvObj qvFig qvVan qvEnter qvRamp qvTgt qvNext qvFail qvStep qvTwist qvRival qvChasers qvAssist qvCue qvFinale qvLand qvClean qvAfter qvResOpen qvRetry qvRestart qvAbandon qvMove qvPlace PIN_S PIN_save PIN_mk PIN_load PIN_away PIN_navPt PIN_dist PIN_set PIN_clear PIN_arrive PIN_tap PIN_hit PIN_mapDraw PIN_tex PIN_beam PIN_tick PIN_pill PIN_pillGo PIN_ui PIN_menuClose PIN_ftGar PIN_menu qvNavTgt qvNavTick D24_turns D24_cue qvLook qvChev qvMini qvMiniQ qvMapPath qvMapPins qvHud QV_ENC QV_TX qvEncEv qvMk qvEncMark qvDisc qvEncSave qvEncDrop qvEncLoad qvEncOk qvSpawn qvTick QV_SQ qvSqEv qvSqMark qvSqInit qvSqDone
@@ -140,7 +140,7 @@ uses: 10(202), 30(152), 41(61), 70(56), 53(44), 20(32), 72(19), 51(13), 96(12), 
 
 ## 72_roam_map_loop_boot.js — 51 KB
 defines: picks pickAdd pickDrop journalOpen journalClose KIND_N journalRender toggleMap buildWorld buildWorldAth buildSeason buildMenu CUPS CUP_CLS totStars cupSel cupState cupSave cupCfg buildCup cupResults selTeam showRec toMenu SPR_TRACK startRace PERF frame LD LDTIPS ldTip ldSet ldShow ldHide ldPrewarm SM3 SMM SMM_grids SMM_tile SMM_shade SMM_center SMM_tick SM_qvLoad SM_upload roamLoad ldFlash booted boot CM TCOL CMB cmCatalog cmProj cmDraw cmLoop cmLayout cmBuild openCareerMap cmResume cmClose
-uses: 30(312), 10(220), 70(64), 40(38), 71(20), 51(17), 53(16), 20(13), 98zp(7), 60(7)
+uses: 30(312), 10(220), 70(64), 40(38), 71(20), 51(17), 53(16), 20(13), 60(7), 41(6)
 
 ## 80_story_m1.js — 90 KB
 defines: M1 M1_WHO M1_av M1_radio M1_snd M1_st M1_save M1_initState M1_rep M1_gated M1_wpn M1_P M1_path M1_car M1_put M1_obj M1_ui M1_tw BG23_cut M1_scene M1_csNext M1_csEnd M1_csTick M1_csCam M1_GK M1_goon M1_spawn M1_hitGoon M1_takedown BG23_knock BG23_rp M1_goonStep M1_loseCrate M1_crate M1_clear M1_ramp M1_BOXG M1_BOXM M1_boxesCity M1_itemStep M1_IN M1_mine M1_fire M1_rivalStep M1_LM M1_L M1_bridge M1_DEF M1_STORY M1_hilde M1_SC M1_warp M1_STD FX19_side M1_setup M1_stage M1_hooks M1_RADIO M1_restore M1_rivalInit M1_allow M1_camGuard M1_camInside M1_locked M1_mkMark M1_marks M1_mark M1_done M1_autoRoute M1_END M1_next M1_nextGo M1_startHotDrop M1_pill M1_tick M1_retryCp M1_hint __m1 M1_CSS BA_CSS BF_hold BF_inT BF_rescue LK LK_LV LK_sky LK_VS LK_VP LK_FS LK_inject LK_paint _lkF LK_shadow LK_lvl LK_roamLook LK_apply _lkAQ LK_feed __lk
@@ -334,9 +334,9 @@ uses: 30(38), 10(19), 40(6), 20(1)
 defines: OPN_TER OPN_K OPN_I0 OPN_I1 OPN_MOUTH OPN_NOSE OPN_ROAD OPN OPN_cp OPN_DEFS OPN_prep OPN_i OPN_b OPN_lane OPN_ter OPN_fall OPN_land OPN_falling OPN_aiXt OPN_pads OPN_rt OPN_noise OPN_vn OPN_roadTex OPN_grainTex OPN_AP OPN_build __ro OPN_segStep __ro2
 uses: 10(91), 20(27), 30(25), 31(17), 98rf(10), 53(6), 51(6), 72(2), 40(1)
 
-## 98zp_perf_ctx.js — 11 KB
-defines: P1 P1_rt P1_free P1_draw P1_off P1_CRC P1_png P1_view P1_attach P1_detach P1_gbDraw P1_thSet P1_tq __P1 P1_lrun P2_after P2_compile P2_warm
-uses: 10(43), 72(5), 20(3), 92(3), 98s(2), 40(1), 98y(1)
+## 98zp_perf_ctx.js — 12 KB
+defines: P1 P1_rt P1_free P1_draw P1_off P1_img P1_readAsync P1_CRC P1_png P1_view P1_attach P1_detach P1_gbDraw P1_thSet P1_tq __P1 P2_after P2_compile P2_warm
+uses: 10(45), 20(3), 72(3), 92(3), 30(2), 98s(2), 98y(1)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25
