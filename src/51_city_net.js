@@ -62,7 +62,10 @@ function rivClear(x,z){let b=1e9;for(const S of WATERS)for(let i=0;i<S.pts.lengt
 function rivSide(x,z){if(!MAINR)return 1;const P=MAINR.pts;let b=1e18,bi=0;for(let i=0;i<P.length;i+=4){const d=(P[i].x-x)**2+(P[i].z-z)**2;if(d<b){b=d;bi=i}}const p=P[bi];return (x-p.x)*p.tz-(z-p.z)*p.tx>=0?1:-1}
 // ---------- oriented decks: {cx,cz,ux,uz (unit along the deck), half, w, prof 'hump'|'ramp', H, L}
 function deckLocal(b,x,z){const dx=x-b.cx,dz=z-b.cz;return[dx*b.ux+dz*b.uz,dx*b.uz-dz*b.ux]}
-function deckY(b,a){const A=Math.abs(a);if(A>b.half)return null;if(b.prof==='ramp')return A>b.half-b.L?b.H*(b.half-A)/b.L:b.H;const t=A/b.half;return b.H*(1-t*t)}
+function deckY(b,a){if(b.yA!=null){const v=deckY0(b,a);return v==null?null:v+b.yA+(b.yB-b.yA)*(a+b.half)/(2*b.half)}return deckY0(b,a)}
+/* v88z: Autobahn decks (AB_BRIDGES) carry yA/yB = terrain at their two ends and rise from there (were from y=0: the Frankfurter Kreuz deck
+   sat 22 m under the real terrain, so the A3 and A5 dropped into a pit there; the Main bridges had 5-6 m steps at both ends) */
+function deckY0(b,a){const A=Math.abs(a);if(A>b.half)return null;if(b.prof==='ramp')return A>b.half-b.L?b.H*(b.half-A)/b.L:b.H;const t=A/b.half;return b.H*(1-t*t)}
 function deckAt(b,x,z){if(Math.abs(x-b.cx)>b.r||Math.abs(z-b.cz)>b.r)return null;const dx=x-b.cx,dz=z-b.cz,c=dx*b.uz-dz*b.ux;if(Math.abs(c)>=b.w/2)return null;return deckY(b,dx*b.ux+dz*b.uz)}
 const deckPt=(b,a,c=0)=>[b.cx+a*b.ux+c*b.uz,b.cz+a*b.uz-c*b.ux];
 // the real bridges: centre snapped to the river, axis = river normal (no hand-entered angles), hump decks meet the quay roads at grade

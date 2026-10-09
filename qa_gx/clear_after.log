@@ -1,0 +1,19 @@
+posei before {"n":59,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 arch wL hl B1x1 grl C8x1 B4x4 cs14 B1x6 T6x6 drvL ws6 T6x2 T1x2 T4x4 tl B4x1 diff spoiler mir lp","L":6,"plate":7}
+shot posei_1_before 52s
+posei after {"n":15,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 wL T6x6 drvL T4x4 diff","L":1,"plate":5}
+shot posei_2_cleared 93s
+PASS posei: CLEAR leaves only chassis + wheels {"n":15,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 wL T6x6 drvL T4x4 diff","L":1,"plate":5}
+PASS posei: base rescanned, layer on the chassis deck (no floating grid) cells 124 highest 0 (before 0)
+PASS posei: UNDO restores the build 
+posei set posei
+t_bus before {"n":107,"w":4,"bp":1,"base":360,"hi":0,"ty":"T10x36 arch wL P1x4 B1x2 B1x17 B1x8 B10x1 B8x1 hl bump T1x35 T10x1 P1x35 P10x1 G10x1 G1x8 G1x12 B1x1 tl B6x1 T8x1 P8x1 G8x1 drvL B1x35 P8x34 G10x1h5 G1x17 G1x16 seat T6x1 mir","L":18,"plate":7}
+shot t_bus_1_before 235s
+t_bus after {"n":10,"w":4,"bp":1,"base":360,"hi":0,"ty":"T10x36 wL drvL T1x35 T10x1 T8x1","L":1,"plate":5}
+shot t_bus_2_cleared 272s
+PASS t_bus: CLEAR leaves only chassis + wheels {"n":10,"w":4,"bp":1,"base":360,"hi":0,"ty":"T10x36 wL drvL T1x35 T10x1 T8x1","L":1,"plate":5}
+PASS t_bus: base rescanned, layer on the chassis deck (no floating grid) cells 360 highest 0 (before 0)
+PASS t_bus: UNDO restores the build 
+t_bus set t_bus
+ERRS 0 []
+PASS 0 console errors 
+RESULT PASS 7/7

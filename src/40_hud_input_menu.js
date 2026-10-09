@@ -2,10 +2,10 @@
 const mapC=$('#map'),mg=mapC.getContext('2d');let mapBG=null,mapXf=null;
 function buildMap(){const Z=300,[c,g]=cv(Z,Z);let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;for(let i=0;i<TF.N;i++){const x=TF.P[i*3],z=TF.P[i*3+2];x0=Math.min(x0,x);x1=Math.max(x1,x);z0=Math.min(z0,z);z1=Math.max(z1,z)}
   const sc=270/Math.max(x1-x0,z1-z0),ox=Z/2-(x0+x1)/2*sc,oz=Z/2-(z0+z1)/2*sc;mapXf=(x,z)=>[ox+x*sc,oz+z*sc];
-  g.lineJoin=g.lineCap='round';for(const[w,col]of[[13,'rgba(0,10,25,.75)'],[6,'rgba(120,230,255,.95)']]){g.lineWidth=w;g.strokeStyle=col;g.beginPath();let pen=false;for(let i=0;i<=TF.N;i+=2){const k=i%TF.N;const[x,y]=mapXf(TF.P[k*3],TF.P[k*3+2]);if(inGapF(k*TF.ds)){pen=false;continue}pen?g.lineTo(x,y):g.moveTo(x,y);pen=true}g.stroke()}
-  const[sx,sy]=mapXf(TF.P[0],TF.P[2]);g.fillStyle='#ffd12c';g.fillRect(sx-6,sy-2,12,4);mapBG=c}
-function drawMap(){mg.clearRect(0,0,300,300);mg.drawImage(mapBG,0,0);for(const s of ships){if(s.dead>0||s.eliminated||s===pl)continue;const p=s.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle=s.team.c1;mg.beginPath();mg.arc(x,y,6,0,7);mg.fill()}
-  if(pl&&!pl.eliminated){const p=pl.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle='#ffd12c';mg.strokeStyle='#021018';mg.lineWidth=3;mg.beginPath();mg.arc(x,y,11,0,7);mg.fill();mg.stroke()}}
+  g.lineJoin=g.lineCap='round';for(const[w,col]of[[38,'rgba(0,10,25,.8)'],[24,'rgba(120,230,255,.95)']]){g.lineWidth=w;g.strokeStyle=col;g.beginPath();let pen=false;for(let i=0;i<=TF.N;i+=2){const k=i%TF.N;const[x,y]=mapXf(TF.P[k*3],TF.P[k*3+2]);if(inGapF(k*TF.ds)){pen=false;continue}pen?g.lineTo(x,y):g.moveTo(x,y);pen=true}g.stroke()}
+  const[sx,sy]=mapXf(TF.P[0],TF.P[2]);g.fillStyle='#ffd12c';g.fillRect(sx-16,sy-5,32,10);mapBG=c}
+function drawMap(){mg.clearRect(0,0,300,300);mg.drawImage(mapBG,0,0);for(const s of ships){if(s.dead>0||s.eliminated||s===pl)continue;const p=s.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle=s.team.c1;mg.strokeStyle='#021018';mg.lineWidth=5;mg.beginPath();mg.arc(x,y,17,0,7);mg.fill();mg.stroke()}
+  if(pl&&!pl.eliminated){const p=pl.mesh.position,[x,y]=mapXf(p.x,p.z);mg.fillStyle='#ffd12c';mg.strokeStyle='#021018';mg.lineWidth=7;mg.beginPath();mg.arc(x,y,27,0,7);mg.fill();mg.stroke()}}
 let msgTimer=0;function say(a,b,t=1){const m=$('#msg'),sb=$('#sub'),rm=state==='roam';m.classList.toggle('roamMsg',rm);sb.classList.toggle('roamMsg',rm);if(a!==''){m.textContent=a;m.style.opacity=1;m.classList.remove('pop');void m.offsetWidth;m.classList.add('pop')}else m.style.opacity=0;sb.textContent=b||'';sb.style.opacity=b?1:0;msgTimer=t}
 let stIndEl=null;function drawStInd(v){stIndEl=stIndEl||document.querySelector('#stInd i');if(stIndEl)stIndEl.style.transform=`translateX(${(v*55).toFixed(1)}px)`}
 function buzz(ms){try{if(TOUCH.used&&navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
@@ -20,7 +20,7 @@ const duelAt=d=>{const f=duelGhost.f;let lo=0,hi=f.length/2-1;while(lo<hi){const
 function updHud(){if(!pl)return;const n=ships.filter(active).length;
   if(RC.type==='zone'){setT(hudEl.pos,'pos',`${pad2(RC.zone.k)}<small> ZONE</small>`);setT(hudEl.lap,'lap',(pl.dist/1000).toFixed(2)+' KM')}
   else if(RC.type==='duel'){const ahead=!duelGhost||pl.dist>=duelGhost.f[Math.min(duelGhost.f.length-2,Math.floor(raceT*20)*2)];setT(hudEl.pos,'pos',duelGhost?`${ahead?'01':'02'}<small> / GHOST</small>`:'SOLO')}
-  else setT(hudEl.pos,'pos',RC.type==='tt'?'TT':`${pad2(pl.place)}<small> / ${pad2(n)}</small>`);
+  else setT(hudEl.pos,'pos',RC.type==='tt'?'TT':RC.type==='race'||RC.type==='elim'?`${ord(pl.place)}<small>/${n}</small>`:`${pad2(pl.place)}<small> / ${pad2(n)}</small>`);
   if(RC.type!=='zone')setT(hudEl.lap,'lap',RC.type==='elim'||RC.type==='arena'||lapAttack()?`LAP ${Math.max(1,pl.lap+1)}`:`LAP ${clamp(pl.lap+1,1,RC.laps)} / ${RC.laps}`);
   setT(hudEl.tLap,'tl',fmt(Math.max(0,raceT-pl.lapStart)));setT(hudEl.tBest,'tb',fmt(ghost?Math.min(ghost.t,pl.best):pl.best));setT(hudEl.tRace,'tr',fmt(raceT));
   if(duelGhost&&state==='race'){const d=raceT-duelAt(pl.dist);setT(hudEl.tGhost,'tg',(d>=0?'+':'−')+Math.abs(d).toFixed(2))}
@@ -130,7 +130,23 @@ function buildSettings(){const B=$('#setBody');B.innerHTML='';
 $('#setBtn').onclick=openSettings;$('#pSet').onclick=openSettings;$('#setDone').onclick=closeSettings;$('#setCred').onclick=()=>credShow($('#credBox').hidden);$('#setReset').onclick=()=>{Object.assign(SET,SET_DEF);saveSet();applyQuality();AU.setVol();buildSettings()};$('#pMute').onclick=()=>{AU.init();AU.toggle()};
 
 // small livery preview for the team cards
-function teamCard(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
+// W13: TEAM SELECT shows each team's real LEGO race car (the same shipMesh the race spawns), rendered once per team and cached.
+// The old 2D plane silhouette (pre-LEGO ship era) stays only as the fallback if WebGL fails.
+const W13_TC={};let W13_TR=null,W13_TT=0;
+function W13_visBox(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
+// PERF1: cb(canvas) gets the card; the pixels come back from the GPU asynchronously (no stall), pending requests share one render
+const W13_PD={};function W13_carImg(t,cb){const W=240,H=120,K=2;if(W13_TC[t.id]){cb(W13_TC[t.id]);return}if(W13_PD[t.id]){W13_PD[t.id].push(cb);return}W13_PD[t.id]=[cb];
+ if(!W13_TR){const c=null,r=P1_off(W*K,H*K);r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=renderer.toneMapping;r.toneMappingExposure=renderer.toneMappingExposure;r.setClearColor(0,0);
+  const sc=new THREE.Scene();sc.add(new THREE.HemisphereLight(0xffffff,0x5a6470,1.7));const d=new THREE.DirectionalLight(0xffffff,2.3);d.position.set(5,9,-7);sc.add(d);W13_TR={r,sc,c,cam:new THREE.PerspectiveCamera(24,W/H,.1,300)}}
+ const{r,sc,c,cam}=W13_TR,g=shipMesh(t),U=g.userData;for(const k of['boat','wheels','shield','under','shadow','flares'])if(U[k])U[k].visible=false;for(const rb of U.ribbons||[])rb.visible=false;
+ sc.add(g);const B=W13_visBox(g),m=B.getCenter(new THREE.Vector3()),s=B.getSize(new THREE.Vector3()),R=Math.hypot(s.x,s.y,s.z)*1.55;
+ cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.renderAsync(sc,cam,o=>{W13_TC[t.id]=o;const L=W13_PD[t.id]||[];delete W13_PD[t.id];for(const f of L)f(o)});sc.remove(g);
+ clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){P1_free('o'+W*K+'x'+H*K);W13_TR=null}},4000)}
+// PERF1: the card shows at once; its 3D car is drawn into it when the GPU readback arrives (a frame or two later), then cached
+function teamCard(t){try{const[c,g]=cv(480,240);
+  g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();c.className='w13car';
+  try{W13_carImg(t,o=>g.drawImage(o,0,0))}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
+function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
   const gl=g.createRadialGradient(0,20,0,0,20,110);gl.addColorStop(0,t.glow+'66');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(-120,-64,240,120);
   g.fillStyle=t.a;g.beginPath();g.moveTo(-100,26);g.lineTo(-18,-10);g.lineTo(0,-40);g.lineTo(18,-10);g.lineTo(100,26);g.lineTo(96,34);g.lineTo(-96,34);g.closePath();g.fill();
   g.fillStyle=t.b;g.beginPath();g.moveTo(-6,-34);g.lineTo(6,-34);g.lineTo(10,32);g.lineTo(-10,32);g.fill();g.fillStyle=t.c;g.fillRect(-1,-30,2,60);

@@ -139,8 +139,9 @@ function frame(now){requestAnimationFrame(frame);if(LD.on)return;if(ENVD)buildEn
   if(state==='roam'){if(!RO.frozen){roamStep(dt);studSync()}else if(pl){AU.engine(pl,0,false);AU.scrape(false)}roamCam(dt)}else{for(const s of ships)posShip(s,dt);updateCam(dt)}drawTraffic(dt);updWorld(dt,T);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);waterTick(dt);updStreaks();updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);
   if(msgTimer>0){msgTimer-=dt;if(msgTimer<=0){$('#msg').style.opacity=0;$('#sub').style.opacity=0}}
   if(pl&&(state==='race'||state==='countdown'||state==='finished')){updHud();AU.engine(pl,CTL.thr,!paused&&!pl.dead&&!pl.eliminated);AU.scrape(pl.wall>0&&!paused);if(pl.wrong>1&&state==='race'&&msgTimer<=0)say('','WRONG WAY',.5)}
-  PERF.js=lerp(PERF.js,performance.now()-pf0,.1);if(!(CM.on&&CM.light))composer.render();
-  if(SET.perf){PERF.fps=lerp(PERF.fps||60,1000/Math.max(1,now-(PERF.last||now-16)),.05);PERF.last=now;if((PERF.tick=(PERF.tick||0)+1)%20===0){const el=$('#fps');el.hidden=false;el.textContent=`${Math.round(PERF.fps)} fps · ${innerWidth}×${innerHeight} @${renderer.getPixelRatio().toFixed(2)}x · ${renderer.info.render.calls} draws · ${SET.q}`}}else if(PERF.tick){$('#fps').hidden=true;PERF.tick=0}}
+  PERF.js=lerp(PERF.js,performance.now()-pf0,.1);const pfOn=SET.perf||TUNE.perfHud;if(pfOn){renderer.info.autoReset=false;renderer.info.reset()}if(!(CM.on&&CM.light))composer.render();
+  // v88u: TUNE.perfHud (⚙ TUNE → Life) shows the same line with the frame's real draw calls (all passes; autoReset counted only the last pass = 1-3), triangles, JS ms and the worst frame of the last 2 s
+  if(pfOn){const fm=now-(PERF.last||now-16);PERF.fps=lerp(PERF.fps||60,1000/Math.max(1,fm),.05);PERF.last=now;PERF.wm=Math.max(PERF.wm||0,fm);const ri=renderer.info.render;renderer.info.autoReset=true;if((PERF.tick=(PERF.tick||0)+1)%20===0){const el=$('#fps');el.hidden=false;el.textContent=`${Math.round(PERF.fps)}fps · worst ${Math.round(PERF.wm)}ms · JS ${Math.round(PERF.js)} · ${ri.calls}dc · ${(ri.triangles/1e6).toFixed(1)}M`;el.title=`${innerWidth}×${innerHeight} @${renderer.getPixelRatio().toFixed(2)}x · ${SET.q}`;if(PERF.tick%120===0)PERF.wm=0}}else if(PERF.tick){$('#fps').hidden=true;PERF.tick=0}}
 
 /* ---------- loading screen: first free-roam entry builds Frankfurt in time slices with a real progress bar */
 const LD={on:false,busy:null,ti:0,k:0};const nextFrame=()=>new Promise(r=>requestAnimationFrame(()=>r()));
@@ -150,7 +151,7 @@ function ldSet(f,t){const p=Math.round(clamp(f,0,1)*100);$('#ldBar').style.width
 function ldShow(t){const el=$('#ld2');LD.on=true;el.hidden=false;el.classList.remove('out');LD.k=Math.floor(Math.random()*LDTIPS.length);$('#ldTip').textContent=LDTIPS[LD.k++%LDTIPS.length];$('#ldTipW').style.opacity=1;{const F=$('#ldFly');if(F){F.hidden=!LD.fly;if(LD.fly){$('#ldFa').textContent=LD.fly.a;$('#ldFb').textContent=LD.fly.b}}}ldSet(0,t);clearInterval(LD.ti);LD.ti=setInterval(ldTip,2800)}
 function ldHide(){clearInterval(LD.ti);LD.on=false;LD.fly=null;const el=$('#ld2');el.classList.add('out');setTimeout(()=>{if(!LD.on&&el.classList.contains('out'))el.hidden=true},260)}
 // link all programs the hub scene needs before the first drive (KHR_parallel_shader_compile polls without blocking; otherwise one program per slice)
-async function ldPrewarm(a,b){if(ENVD)buildEnv();await nextFrame();try{renderer.compile(scene,camera)}catch(e){return}const P=renderer.info.programs.slice();let t=performance.now(),i=0;
+async function ldPrewarm(a,b){if(ENVD)buildEnv();await nextFrame();try{P2_compile(scene,camera)}catch(e){return}const P=renderer.info.programs.slice();let t=performance.now(),i=0;
   for(const p of P){let w=0;while(!p.isReady()&&w++<120){await nextFrame();t=performance.now()}try{p.getUniforms()}catch(e){}i++;if(performance.now()-t>12){ldSet(a+(b-a)*i/P.length);await nextFrame();t=performance.now()}}}
 const SM3={n:0,mb:0,ms:0,on:CID==='ath'&&(()=>{try{return localStorage.getItem('mho_sm3')!=='0'}catch(e){return true}})()};
 const SMM={T:250,N:13,q:[],have:new Set(),st:{tiles:0,max:0,ms:0,shift:0}};
@@ -196,20 +197,22 @@ async function SM_upload(a,b){if(!SM3.on||!HUB.grp||SM3.done)return;SM3.done=1;c
   finally{renderer.setRenderTarget(prev);rt.dispose();mt.dispose()}SM3.ms=Math.round(performance.now()-t0)}
 async function roamLoad(atMark){const st=state;ldShow('Warming up the engine');try{await nextFrame();await nextFrame();state='loading';roamPre();setupRace(ROAMCFG);state='loading';ldSet(.06,CCF.raise);await nextFrame();
     let t=performance.now();for(const [f,lab] of buildHubG()){if(performance.now()-t>12){ldSet(.06+f*.6,lab);await nextFrame();t=performance.now()}else if(lab)$('#ldStep').textContent=lab}
-    ldSet(.68,'Switching on the street lights');await nextFrame();hubEnter();ldSet(.74,'Placing rivals & events');await nextFrame();if(!RO.built)buildRoam();{const sv=roamSave(),fm=RO.arrive&&flightMark(),sp=atMark&&atMark.x!=null?[atMark.x,atMark.z]:fm?[fm.x,fm.z]:sv.pos&&sv.lay===LAYOUT_VER?[sv.pos.x,sv.pos.z]:null,need=sp?lzNeed(sp[0],sp[1]):[];if(need.length){ldSet(.76,LZT[need[0].id]||'Outskirts');await lzLoad(need,.76,.8)}}
+    ldSet(.68,'Switching on the street lights');await nextFrame();hubEnter();P2_warm(scene,camera);ldSet(.74,'Placing rivals & events');await nextFrame();if(!RO.built)buildRoam();{const sv=roamSave(),fm=RO.arrive&&flightMark(),sp=atMark&&atMark.x!=null?[atMark.x,atMark.z]:fm?[fm.x,fm.z]:sv.pos&&sv.lay===LAYOUT_VER?[sv.pos.x,sv.pos.z]:null,need=sp?lzNeed(sp[0],sp[1]):[];if(need.length){ldSet(.76,LZT[need[0].id]||'Outskirts');await lzLoad(need,.76,.8)}}
     ldSet(.8,'Painting the sky');await nextFrame();await SM_qvLoad(.82,.86);await ldPrewarm(.86,.95);await SM_upload(.95,.99);ldSet(1,'Ready');await nextFrame();
     roamPost(atMark);try{composer.render()}catch(e){}}
   catch(e){console.error(e);if(state==='loading')state=st;throw e}finally{LD.busy=null;ldHide()}}
 // far fast travel: short loader instead of the black flash
-async function ldFlash(fn){ldShow('Fast travel');fn();LD.on=false;try{renderer.compile(scene,camera)}catch(e){}ldSet(.45,'Arriving');for(const f of[.7,.9,1]){await nextFrame();ldSet(f)}ldHide()}
+async function ldFlash(fn){ldShow('Fast travel');fn();LD.on=false;try{P2_compile(scene,camera)}catch(e){}ldSet(.45,'Arriving');for(const f of[.7,.9,1]){await nextFrame();ldSet(f)}ldHide()}
 
 /* ============================================================ boot */
 let booted=false;
 function boot(){MAT.roof=new THREE.MeshStandardMaterial({color:0x0c0e1e,roughness:.6,metalness:.4});buildAmbient();buildTrafficMeshes();loadTrack(menuTrack);
   SPARK=linePool(700);FIRE=pointPool(900,5);SMOKE=spritePool(520,false);FIREB=spritePool(320,true);buildDebris();buildPropMeshes();buildStreaks();GLOWP=pointPool(120,6);WATER=pointPool(400,3);
   toMenu();const done=()=>{booted=true;$('#loading').hidden=true;{const d=document.createElement('div');d.id='gfxNote';d.textContent='Graphics: '+TEXVAR.name;d.style.cssText='font:11px system-ui,sans-serif;opacity:.5;margin-top:10px;letter-spacing:.04em';$('.mpanel').appendChild(d)}$('#topBtns').hidden=false;$('#muteBtn').textContent=$('#pMute').textContent=AU.muted?'SOUND OFF':'SOUND ON';requestAnimationFrame(frame);if(BOOTF&&BOOTF.go==='roam'){if(BOOTF.arrive){RO.arrive=BOOTF.arrive;LD.fly={a:BOOTF.from==='ath'?'ATH':'FRA',b:CCF.code,to:CID,arr:1}}setTimeout(()=>{homeShow(false);enterRoam()},0)}};
-  warmTextures(scene);const warm=[V3(0,0,-5),V3(0,-5,-5)];for(const w of warm){emitS(SMOKE,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,true);emitS(FIREB,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,false)}
-  renderer.compile(scene,camera);setTimeout(done,0)}
+  warmTextures(scene);
+  // PERF2: the first menu frame links only the programs it draws; the rest of the scene (particles, props off screen) is queued right after it,
+  // so the GPU process links them while the menu idles instead of before the menu can show
+  setTimeout(()=>{done();P2_after(()=>{const warm=[V3(0,0,-5),V3(0,-5,-5)];for(const w of warm){emitS(SMOKE,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,true);emitS(FIREB,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,false)}P2_warm(scene,camera)})},0)}
 setTimeout(boot,30);
 // ---- Career map: neon Frankfurt hub screen (nodes for every career event; free roam is the optional Cruise node)
 const CM={on:false,nodes:[],raf:0,t:0,P:null};

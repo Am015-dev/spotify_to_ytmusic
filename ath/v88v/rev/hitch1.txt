@@ -1,0 +1,4 @@
+fra HITCH {"build":{"ms":222748,"slices":147,"slMax":14167,"sl50":13,"sl100":13,"tPrep":444,"cells":740,"err":null},"framesDuringBuild":{"n":193,"worst":17272,"p50":29,"over50":61,"over100":51},"framesAfter":{"n":20,"worst":13292,"p50":19,"over50":2,"over100":2}}
+errors 0 
+ath HITCH {"build":{"ms":243320,"slices":217,"slMax":8505,"sl50":11,"sl100":9,"tPrep":570,"cells":1088,"err":null},"framesDuringBuild":{"n":396,"worst":38839,"p50":24,"over50":75,"over100":51},"framesAfter":{"n":22,"worst":8188,"p50":16,"over50":2,"over100":2}}
+errors 0 

@@ -3,7 +3,7 @@
 // No warps, no enterRoam(), no clicks on hidden UI. Time: requestAnimationFrame is driven by the test (exactly 60 frames per game second)
 // so the real game loop (frame → roamStep, loading screens, HUD, camera) runs at full fidelity on a slow software-GL box.
 // usage: node tools/tPlay.js <url-of-local_dbg.html> [outdir]
-//   env FAST=1 (fast test mode: ?fast=1 + THROTTLE=1) · MODE=phone|desk|both (default both) · MIN=minutes per city (default 4) · CITIES=fra,ath · THROTTLE=4 · SHOTS=1
+//   env FPS=30 (drive24b: game clock 1/30 s per frame; per-minute counts then cover 2 game minutes = stricter) · FAST=1 (fast test mode: ?fast=1 + THROTTLE=1) · MODE=phone|desk|both (default both) · MIN=minutes per city (default 4) · CITIES=fra,ath · THROTTLE=4 · SHOTS=1
 // Fails when (per city): wall/building hits > 1 per minute · stuck > 3 % · any console error · any loading screen in Athens ·
 //   pedestrian > 1.2× adult scale relative to a car · any visible HUD element overlapping a touch control.
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const path=require('path');
@@ -13,7 +13,7 @@ const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.en
 const results=[];let fails=0;const ok=(c,m,i)=>{console.log((c?'PASS ':'FAIL ')+m+(i!==undefined?' · '+JSON.stringify(i):''));if(!c)fails++};
 // ---- in-page: test-driven rAF clock + per-frame monitor
 const INIT=`(()=>{const q=[];let t=0;window.__auto=true;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
- window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(window.__mon)try{window.__mon()}catch(e){window.__monErr=String(e)}
+ window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/${+(process.env.FPS||60)};const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(window.__mon)try{window.__mon()}catch(e){window.__monErr=String(e)}
   if(window.__auto&&window.__fast&&window.__mho&&__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on)){window.__auto=false;break}}return t};  // FAST: auto-ticking ends on the exact frame roam is ready (no wall-clock-dependent idle frames)
 
  setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
