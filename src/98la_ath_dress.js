@@ -13,31 +13,32 @@ function AD_geo(){
     ...[.52,-.48].map(z=>{const g=new THREE.CylinderGeometry(.24,.24,.14,10);g.rotateZ(Math.PI/2);g.translate(0,.24,z);return colorize(g,new THREE.Color('#1c1c1c'))}),cbox(.2,.12,.08,0,1.1,.68,'#ffe9a0')]);
   const boll=mergeG([ccyl(.14,.16,.85,0,.425,0,'#3a4a44',8),ccyl(.15,.15,.12,0,.62,0,'#e8e8e8',8),ccyl(.12,.14,.1,0,.9,0,'#3a4a44',8)]);
   return[tree,kiosk,scoot,boll]}
-// one pass over the street graph: slots every 8.5 m on both kerbs of every Athens street longer than 30 m
-function* AD_place(){const N=HUB.nodes,r=mul(8817),I=[],G=new Map(),seen=new Set(),occ=new Set(),ng=N.ng||N.length,t0=performance.now();
-  const rj=AD.n.rej=[0,0,0],free=(x,z,q)=>{const k=Math.round(x/3)+'|'+Math.round(z/3);if(occ.has(k)){rj[0]++;return false}if(LV_onRoad(x,z,.9)){rj[1]++;return false}if(roamHit(x,z,q+.3,groundY(x,z)+.5)){rj[2]++;return false}occ.add(k);return true};
-  for(let i=0;i<ng&&I.length<14000;i++){if(i%10===0)yield 0;const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab||bi>=ng)continue;const ek=i<bi?i+'|'+bi:bi+'|'+i;if(seen.has(ek))continue;seen.add(ek);
-    const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<30)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20);if(W<7)continue;
-    for(const sd of[-1,1]){const off=Math.max(W/2+1.15,(Math.min(A.pw||0,B.pw||0)||W/2+.5)+1.0);/* behind the walkers' line (pw), like the café clusters */let kl=-99;for(let s=12;s<L-12;s+=8.5){const q=r();let t=q<.34?0:q<.56?3:q<.70?2:q<.715&&s-kl>40?1:-1;if(t<0)continue;
-      const x=A.x+ux*s-uz*off*sd,z=A.z+uz*s+ux*off*sd,o=t===1?off+.6:off,X=A.x+ux*s-uz*o*sd,Z=A.z+uz*s+ux*o*sd;if(!free(X,Z,AD_T[t].r))continue;if(t===1)kl=s;
-      const y=Math.max(0,groundY(X,Z)),h=Math.atan2(ux,uz)+(t===2?(sd>0?1.2:-1.2)+(r()-.5)*.5:t===1?(sd>0?-Math.PI/2:Math.PI/2):r()*6.28);
-      const it={t,x:X,z:Z,y,h,s:t===0?.9+r()*.25:1,c:Math.floor(r()*1e6)};I.push(it);if(t===3){const x2=X+ux*1.6,z2=Z+uz*1.6;if(free(x2,z2,.35))I.push({t:3,x:x2,z:z2,y,h:0,s:1,c:0})}}}}}
-  for(let j=0;j<I.length;j++){const it=I[j],k=Math.floor(it.x/40)*100000+Math.floor(it.z/40);let a=G.get(k);if(!a)G.set(k,a=[]);a.push(j)}
-  AD.I=I;AD.G=G;AD.n.items=I.length;AD.n.placeMs=Math.round(performance.now()-t0)}// (wall time; spread over frames at ≤ 6 ms each)
-function AD_init(){AD.grp=HUB.grp;AD.dead.clear();AD.px=AD.pz=1e9;const g=AD_geo(),col=new THREE.Color(),SC=['#ffffff','#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ff7ac0','#2b2b2b','#8fd0ff'];
+// placed lazily per 40 m cell (Athens has hundreds of km of streets): slots every 8.5 m on both kerbs of each street edge
+// (random phase per edge, seeded by the edge, so a cell always gets the same items), 10 m clear of junctions; a slot belongs to the cell it falls in
+function AD_cell(cx,cz){const key=cx*100000+cz;let a=AD.C.get(key);if(a)return a;a=[];AD.C.set(key,a);const N=HUB.nodes,E=LV_eGrid().get(key),seen=new Set(),occ=AD.occ;if(!E)return a;
+  const free=(x,z,q)=>{const k=Math.round(x/3)+'|'+Math.round(z/3);if(occ.has(k))return false;if(LV_onRoad(x,z,.9))return false;if(roamHit(x,z,q+.3,groundY(x,z)+.5))return false;occ.add(k);return true};
+  for(let e=0;e<E.length;e+=2){let i=E[e],bi=E[e+1];if(i>bi){const t=i;i=bi;bi=t}const ek=i*1e6+bi;if(seen.has(ek))continue;seen.add(ek);const A=N[i],B=N[bi];if(!A||!B||A.ab||B.ab)continue;
+    const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<2)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20);if(W<7)continue;const j0=A.nb.length>2?10:0,j1=L-(B.nb&&B.nb.length>2?10:0),r=mul(i*7919+bi*104729+1);
+    for(const sd of[-1,1]){const off=Math.max(W/2+1.15,(Math.min(A.pw||0,B.pw||0)||W/2+.5)+1.0);/* behind the walkers' line (pw), like the café clusters */
+      for(let s=r()*8.5;s<L;s+=8.5){const q=r(),h0=r(),sc=r();if(s<j0||s>j1)continue;const t=q<.34?0:q<.56?3:q<.70?2:q<.716?1:-1;if(t<0)continue;
+        const o=t===1?off+.6:off,X=A.x+ux*s-uz*o*sd,Z=A.z+uz*s+ux*o*sd;if(Math.floor(X/40)!==cx||Math.floor(Z/40)!==cz)continue;if(!free(X,Z,AD_T[t].r))continue;
+        const y=Math.max(0,groundY(X,Z)),h=Math.atan2(ux,uz)+(t===2?(sd>0?1.2:-1.2)+(h0-.5)*.5:t===1?(sd>0?-Math.PI/2:Math.PI/2):h0*6.28);
+        a.push({t,x:X,z:Z,y,h,s:t===0?.9+sc*.25:1});if(t===3){const x2=X+ux*1.6,z2=Z+uz*1.6;if(free(x2,z2,.35))a.push({t:3,x:x2,z:z2,y,h:0,s:1})}}}}
+  AD.n.items=(AD.n.items||0)+a.length;AD.n.cells=AD.C.size;return a}
+function AD_init(){AD.grp=HUB.grp;AD.dead=new Set();AD.C=new Map();AD.occ=new Set();AD.n={};AD.px=AD.pz=1e9;const g=AD_geo(),col=new THREE.Color(),SC=['#ffffff','#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ff7ac0','#2b2b2b','#8fd0ff'];
   AD.M=AD_T.map((T,j)=>{const m=LV_im(g[j],T.cap);m.count=0;m.name='ad_'+T.k;return m});
-  for(let i=0;i<AD_T[2].cap;i++)AD.M[2].setColorAt(i,col.set(SC[i%SC.length]));AD.M[2].instanceColor.needsUpdate=true;AD.I=null;AD.gen=AD_place()}
-function AD_fill(){const R0=Math.round(115*Math.min(1.6,Math.sqrt(LV_d('lvDress')))),G=AD.G,I=AD.I,cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40),cr=Math.ceil(R0/40),near=[],cnt=[0,0,0,0];
-  for(let a=cx-cr;a<=cx+cr;a++)for(let b=cz-cr;b<=cz+cr;b++){const L=G.get(a*100000+b);if(!L)continue;for(const j of L){const it=I[j],d2=(it.x-RO.x)**2+(it.z-RO.z)**2;if(d2<R0*R0)near.push([d2,j])}}
+  for(let i=0;i<AD_T[2].cap;i++)AD.M[2].setColorAt(i,col.set(SC[i%SC.length]));AD.M[2].instanceColor.needsUpdate=true}
+function AD_fill(){const R0=Math.round(115*Math.min(1.6,Math.sqrt(LV_d('lvDress')))),cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40),cr=Math.ceil(R0/40),near=[],cnt=[0,0,0,0],t0=performance.now();let todo=false;
+  for(let a=cx-cr;a<=cx+cr;a++)for(let b=cz-cr;b<=cz+cr;b++){const k=a*100000+b;if(!AD.C.has(k)&&performance.now()-t0>4){todo=true;continue}/* ≤ ~4 ms of new cells per fill; the rest next frame */for(const it of AD_cell(a,b)){const d2=(it.x-RO.x)**2+(it.z-RO.z)**2;if(d2<R0*R0)near.push([d2,it])}}
   near.sort((p,q)=>p[0]-q[0]);const keep=new Set();
-  const CL=LV.cl?LV.cl.L.filter(q=>q.on):[];for(const [,j] of near){keep.add(j);if(AD.dead.has(j))continue;const it=I[j],T=AD_T[it.t];if(CL.some(q=>(q.x-it.x)**2+(q.z-it.z)**2<36))continue;/* a café/market/crowd cluster stands here now */if(cnt[it.t]>=T.cap)continue;LV_set(AD.M[it.t],cnt[it.t]++,it.x,it.y,it.z,0,it.h,0,it.s)}
-  for(const j of AD.dead)if(!keep.has(j))AD.dead.delete(j);// smashed pieces come back once you are out of range
-  for(let t=0;t<4;t++){AD.M[t].count=cnt[t];AD.M[t].instanceMatrix.needsUpdate=true}AD.n.drawn=cnt.join('/')}
-function AD_hit(){const sp=Math.abs(RO.v),I=AD.I,cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40);for(let a=cx-1;a<=cx+1;a++)for(let b=cz-1;b<=cz+1;b++)for(const j of AD.G.get(a*100000+b)||[]){if(AD.dead.has(j))continue;const it=I[j],T=AD_T[it.t],ex=RO.x-it.x,ez=RO.z-it.z,e2=ex*ex+ez*ez,rr=T.r+1.1;
+  const CL=LV.cl?LV.cl.L.filter(q=>q.on):[];for(const [,it] of near){keep.add(it);if(AD.dead.has(it))continue;const T=AD_T[it.t];if(CL.some(q=>(q.x-it.x)**2+(q.z-it.z)**2<36))continue;/* a café/market/crowd cluster stands here now */if(cnt[it.t]>=T.cap)continue;LV_set(AD.M[it.t],cnt[it.t]++,it.x,it.y,it.z,0,it.h,0,it.s)}
+  for(const it of AD.dead)if(!keep.has(it))AD.dead.delete(it);// smashed pieces come back once you are out of range
+  for(let t=0;t<4;t++){AD.M[t].count=cnt[t];AD.M[t].instanceMatrix.needsUpdate=true}AD.n.drawn=cnt.join('/');if(todo)AD.px=1e9}
+function AD_hit(){const sp=Math.abs(RO.v),cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40);for(let a=cx-1;a<=cx+1;a++)for(let b=cz-1;b<=cz+1;b++)for(const it of AD.C.get(a*100000+b)||[]){if(AD.dead.has(it))continue;const T=AD_T[it.t],ex=RO.x-it.x,ez=RO.z-it.z,e2=ex*ex+ez*ez,rr=T.r+1.1;
     if(e2>rr*rr||Math.abs((RO.y||0)-it.y)>3)continue;
-    if(sp>6){AD.dead.add(j);const at=V3(it.x,it.y+1,it.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.4).add(V3(0,6,0)),it.t===1?14:8,(['#38a046,#ff8c1a,#7a4a24','#2f7d4a,#ffd12c,#f2f2f2,#e8302a','#ffffff,#222222,#e8302a','#3a4a44,#e8e8e8'][it.t]).split(',').map(c=>new THREE.Color(c)),.7,it.y);
+    if(sp>6){AD.dead.add(it);const at=V3(it.x,it.y+1,it.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.4).add(V3(0,6,0)),it.t===1?14:8,(['#38a046,#ff8c1a,#7a4a24','#2f7d4a,#ffd12c,#f2f2f2,#e8302a','#ffffff,#222222,#e8302a','#3a4a44,#e8e8e8'][it.t]).split(',').map(c=>new THREE.Color(c)),.7,it.y);
       studBurst(at,fw,sp);HUB.smashed++;comboAdd(1);RO.v*=it.t===1?.9:.97;AU.sfx('crash');AD.n.smash=(AD.n.smash||0)+1;AD.px=1e9}
     else{const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
 function AD_step(){if(CID==='fra'||!HUB.grp||!HUB.nodes||!HUB.bld||!HUB.bld.length)return;if(LV_d('lvDress')<=0){if(AD.M)for(const m of AD.M)m.count=0;return}
-  if(AD.grp!==HUB.grp)AD_init();if(AD.gen){const t=performance.now();while(performance.now()-t<6)if(AD.gen.next().done){AD.gen=null;break}if(AD.gen)return}AD.fr++;if(AD.fr%12===0||Math.hypot(RO.x-AD.px,RO.z-AD.pz)>25){AD.px=RO.x;AD.pz=RO.z;AD_fill()}AD_hit()}
+  if(AD.grp!==HUB.grp)AD_init();AD.fr++;if(AD.fr%12===0||Math.hypot(RO.x-AD.px,RO.z-AD.pz)>25){AD.px=RO.x;AD.pz=RO.z;AD_fill()}AD_hit()}
 {const _adLS=LV_step;LV_step=dt=>{_adLS(dt);if(!RO.on||!LV.init)return;try{AD_step()}catch(e){if(!AD.e){AD.e=1;console.warn('AD dress',e)}}}}
