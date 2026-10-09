@@ -20,7 +20,7 @@ function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof came
   let n=0,bud=STR.lzT>16-STR.ms-STR.sl-2?0:STR.ms;while(performance.now()-t0<bud){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;if(bd<R)bud=Math.max(bud,STR.msC-STR.lzT);STR.S=b;STR.it=WB_supMk(b,true)}else if(STR_d(STR.S,cx,cz)<R)bud=Math.max(bud,STR.msC-STR.lzT);
     n++;if(STR.it.next().done){STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
   if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
-{const _ls=lazyStep;lazyStep=function(){const t=performance.now(),r=_ls.apply(this,arguments);STR.lzT=performance.now()-t;try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
+{const _ls=lazyStep;lazyStep=function(){const t=performance.now(),r=_ls.apply(this,arguments);STR.lzT=(STR.lzT0||0)+performance.now()-t;try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
 window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
 // LAZY unload: only regions built by the plain lzBuildG (their build has no side effects beyond L.root + props); Taunus/Wald/Attiki corridors stay
 // (their builders add terrain, colliders or lanes while building). Colliders were added once at the first finish and are kept.
@@ -37,7 +37,7 @@ STR.st.lzBig=[];
 function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>STR_R()+TUNE.strLzOut)STR_lzFree(L)}
 // per-frame cost of all streaming work (LAZY build + LAZY unload + far-cell build/free): STR.st.fr = frames, max ms, over 8/16/50 ms
 STR.st.fr={n:0,max:0,o8:0,o16:0,o50:0};
-{const _ls=lazyStep;lazyStep=function(){const t0=performance.now();try{STR_lzStep();LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}finally{const dt=performance.now()-t0,F=STR.st.fr;if(dt>.05){F.n++;if(dt>F.max)F.max=+dt.toFixed(1);if(dt>8)F.o8++;if(dt>16)F.o16++;if(dt>50)F.o50++}}}}
+{const _ls=lazyStep;lazyStep=function(){const t0=performance.now();try{STR_lzStep();STR.lzT0=performance.now()-t0;LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}finally{const dt=performance.now()-t0,F=STR.st.fr;if(dt>.05){F.n++;if(dt>F.max)F.max=+dt.toFixed(1);if(dt>8)F.o8++;if(dt>16)F.o16++;if(dt>50)F.o50++}}}}
 // SM3 (drop the CPU copy of single-use city meshes after the GPU upload) was Athens-only; Frankfurt kept ~106 MB of copies nobody reads
 if(TUNE.strSm3===undefined)TUNE.strSm3=1;
 if(TUNE.strSm3&&!SM3.on)try{SM3.on=localStorage.getItem('mho_sm3')!=='0'}catch(e){SM3.on=true}
