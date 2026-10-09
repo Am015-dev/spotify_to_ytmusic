@@ -13,14 +13,14 @@ function AD_geo(){
     ...[.52,-.48].map(z=>{const g=new THREE.CylinderGeometry(.24,.24,.14,10);g.rotateZ(Math.PI/2);g.translate(0,.24,z);return colorize(g,new THREE.Color('#1c1c1c'))}),cbox(.2,.12,.08,0,1.1,.68,'#ffe9a0')]);
   const boll=mergeG([ccyl(.14,.16,.85,0,.425,0,'#3a4a44',8),ccyl(.15,.15,.12,0,.62,0,'#e8e8e8',8),ccyl(.12,.14,.1,0,.9,0,'#3a4a44',8)]);
   return[tree,kiosk,scoot,boll]}
-// placed lazily per 40 m cell (Athens has hundreds of km of streets): slots every 8.5 m on both kerbs of each street edge
+// placed lazily per 40 m cell (Athens has hundreds of km of streets): slots every 6 m on both kerbs of each street edge
 // (random phase per edge, seeded by the edge, so a cell always gets the same items), 10 m clear of junctions; a slot belongs to the cell it falls in
 function AD_cell(cx,cz){const key=cx*100000+cz;let a=AD.C.get(key);if(a)return a;a=[];AD.C.set(key,a);const N=HUB.nodes,E=LV_eGrid().get(key),seen=new Set(),occ=AD.occ;if(!E)return a;
   const free=(x,z,q)=>{const k=Math.round(x/3)+'|'+Math.round(z/3);if(occ.has(k))return false;if(LV_onRoad(x,z,.9))return false;if(roamHit(x,z,q+.3,groundY(x,z)+.5))return false;occ.add(k);return true};
   for(let e=0;e<E.length;e+=2){let i=E[e],bi=E[e+1];if(i>bi){const t=i;i=bi;bi=t}const ek=i*1e6+bi;if(seen.has(ek))continue;seen.add(ek);const A=N[i],B=N[bi];if(!A||!B||A.ab||B.ab)continue;
     const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<2)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20);if(W<7)continue;const j0=A.nb.length>2?10:0,j1=L-(B.nb&&B.nb.length>2?10:0),r=mul(i*7919+bi*104729+1);
     for(const sd of[-1,1]){const off=Math.max(W/2+1.15,(Math.min(A.pw||0,B.pw||0)||W/2+.5)+1.0);/* behind the walkers' line (pw), like the café clusters */
-      for(let s=r()*8.5;s<L;s+=8.5){const q=r(),h0=r(),sc=r();if(s<j0||s>j1)continue;const t=q<.34?0:q<.56?3:q<.70?2:q<.716?1:-1;if(t<0)continue;
+      for(let s=r()*6;s<L;s+=6){const q=r(),h0=r(),sc=r();if(s<j0||s>j1)continue;const t=q<.38?0:q<.58?3:q<.78?2:q<.795?1:-1;if(t<0)continue;
         const o=t===1?off+.6:off,X=A.x+ux*s-uz*o*sd,Z=A.z+uz*s+ux*o*sd;if(Math.floor(X/40)!==cx||Math.floor(Z/40)!==cz)continue;if(!free(X,Z,AD_T[t].r))continue;
         const y=Math.max(0,groundY(X,Z)),h=Math.atan2(ux,uz)+(t===2?(sd>0?1.2:-1.2)+(h0-.5)*.5:t===1?(sd>0?-Math.PI/2:Math.PI/2):h0*6.28);
         a.push({t,x:X,z:Z,y,h,s:t===0?.9+sc*.25:1});if(t===3){const x2=X+ux*1.6,z2=Z+uz*1.6;if(free(x2,z2,.35))a.push({t:3,x:x2,z:z2,y,h:0,s:1})}}}}
