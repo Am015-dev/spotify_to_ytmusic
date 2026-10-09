@@ -94,6 +94,7 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.wbLodCell` (no slider) far block detail | 3 m | size of the merge grid for the far blocks; next city load |
 | `TUNE.wbMerged` / `TUNE.wbNfc` (no slider) | ON / ON | also simplify the merged street/building tiles / the always-drawn instanced props; next city load |
 | `TUNE.wbFig` (no slider) hide far minifigs/markers | 260 m | mission-giver minifigs, the 1.5 m beacon stubs and ramp parts beyond this are not drawn (they are a few px tall there) |
+| `TUNE.wbRingCam` (no slider) ring camera guard | 6 m | a ring (torus ≥ 3 m radius: story/quest/event/pop-up) is not drawn while the camera is within this distance of its plane and inside its radius + this; 0 = off |
 | `TUNE.perfHud` Show FPS · worst frame · draws · tris | OFF | (v88u) one small line (bottom left, under the steer buttons) with fps, the worst frame of the last 2 s, JS ms per frame, the frame's real draw calls and triangles. For perf reports from a real PC/phone |
 
 ## Where the values live
