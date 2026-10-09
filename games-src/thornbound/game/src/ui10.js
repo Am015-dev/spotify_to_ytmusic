@@ -148,7 +148,7 @@ function hideTip(){const t=$('#tip');if(t&&!t.hidden){t.hidden=true;t.innerHTML=
     const p=mapPt(x,y);if(p)for(let r=0;r<3;r++){const b=REGBOX[r];if(p.x>=b.x-20&&p.x<=b.x+b.w+20&&p.y>=b.y-20&&p.y<=b.y+b.h+20)return {type:'region',r}}return null};
   document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#handw .hc');if(!b||(e.button&&e.button>0))return;
     const id=+b.dataset.id;d={id,b,x:e.clientX,y:e.clientY,drag:false,pid:e.pointerId,g:null};
-    d.lp=setTimeout(()=>{if(d&&!d.drag){const i=d.id;d=null;UI._nc=1;UI.hand=null;openPop('card',{id:i})}},520)},true);
+    d.lp=setTimeout(()=>{if(d&&!d.drag){const i=d.id;d=null;UI._nc=1;UI.hand=null;openPop('card',{id:i,read:1})}},520)},true);
   document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.pid)return;
     if(!d.drag){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<12)return;clearTimeout(d.lp);
       if(!cardDriven(UI.bf)||!cardMoves(d.id).length){d=null;return}
