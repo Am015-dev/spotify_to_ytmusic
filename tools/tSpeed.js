@@ -14,10 +14,10 @@ const URL=process.argv[2],OUT=process.argv[3]||'qa_speed',FORMS=(process.argv[4]
      // a driver changes lane for traffic ahead (within 90 m, 3 m of the line he is on)
      window.__off=window.__off||0;for(const c of __mho.HUB.cars){if(c.dead>0)continue;const dx=c.x-R.x,dz=c.z-R.z,fw=dx*tx0/tl+dz*tz0/tl,lat=(c.x-L[bi][0])*nx+(c.z-L[bi][1])*nz;if(fw>0&&fw<90&&Math.abs(lat-__off)<3.2){__off=lat>__off?__off-4:__off+4;__off=Math.max(-9,Math.min(9,__off))}}
      let e=Math.atan2(L[k][0]+nx*__off-R.x,L[k][1]+nz*__off-R.z)-R.h;e=Math.atan2(Math.sin(e),Math.cos(e));
-     return{e,v:Math.abs(R.v)*3.6,end:k>=L.length-2,ab:!!R.onAB,city:!!R.inCity,veh:__qs.veh(),cls:__qs.cls(),wk:!!R.wk}});
+     return{e,v:Math.abs(R.v)*3.6,end:k>=L.length-2,ab:!!R.onAB,city:!!R.inCity,veh:__qs.veh(),cls:__qs.cls(),wk:!!R.wk,dbg:[Math.round(R.x),Math.round(R.z),bi,L.length,Math.round(__off),!!R.card,!!R.story,!!R.frozen,Math.round(R.y-__mho.gnd(R.x,R.z,R.y+.3))]}});
     hist.push(o.v);if(o.wk)res.wk=(res.wk||0)+1;mx=Math.max(mx,o.v);if(t100==null&&o.v>=100)t100=+(f/60).toFixed(1);if(o.end)break;
     const wl=o.e>.03,wr=o.e<-.03;if(wl!=kL){kL=wl;wl?await p.keyboard.down('ArrowLeft'):await p.keyboard.up('ArrowLeft')}if(wr!=kR){kR=wr;wr?await p.keyboard.down('ArrowRight'):await p.keyboard.up('ArrowRight')}
-    await p.evaluate(()=>{for(const b of document.querySelectorAll('[data-r3u],#resBtn,#storyGo'))if(b.offsetWidth&&!b.closest('[hidden]'))b.click();__tick(6)});if(f%60===0)res.last=o}  // a person taps level-up / result cards away
+    await p.evaluate(()=>{for(const b of document.querySelectorAll('[data-r3u],#resBtn,#storyGo'))if(b.offsetWidth&&!b.closest('[hidden]'))b.click();__tick(6)});if(f%60===0){res.last=o;if(process.env.DEBUG)console.log(tag,f/60,Math.round(o.v),o.end,o.ab,o.city,o.wk,o.dbg)}}  // a person taps level-up / result cards away
    if(process.env.SHOTS){await shot(path.join(OUT,`hud_${form}_${ab?'autobahn':'city'}_${tag}.jpg`))}
    const h=await hud();if(boost)await p.keyboard.up('Shift');if(kL)await p.keyboard.up('ArrowLeft');if(kR)await p.keyboard.up('ArrowRight');
    const tail=hist.slice(-10);return{max:Math.round(mx),plateau:Math.round(tail.reduce((a,b)=>a+b,0)/Math.max(1,tail.length)),t100,hud:h}};
