@@ -45,4 +45,9 @@ showResults=(f=>function(){const r=f.apply(this,arguments);try{if(!pl||!['race']
   el.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:4px 0 8px';
   el.innerHTML=at.map(i=>{const s=o[i];if(!s)return'';return `<div style="text-align:center;min-width:92px"><div style="font:800 13px/1.2 system-ui;color:${s===pl?'#7dff6a':'#fff'};white-space:nowrap">${s===pl?'YOU':s.name}</div><div style="height:${hs[i]}px;background:${cols[i]};border-radius:6px 6px 0 0;color:#111;font:900 italic 18px/${hs[i]}px system-ui">${ord(i+1).toUpperCase()}</div></div>`}).join('')+
    (rv?`<div style="align-self:center;margin-left:10px;font:900 italic 16px/1.1 system-ui;color:${beat?'#7dff6a':'#ff5a6a'}">${beat?'RIVAL<br>BEATEN!':'RIVAL<br>AHEAD'}</div>`:'')}catch(e){console.warn('RF pod',e)}return r})(showResults);
-window.__rf={st:()=>({place:RFX.place,grid:ships.map(s=>[s.name,Math.round(s.dist),+s.x.toFixed(1),+s.skill.toFixed(3)]),rub:ships.map(s=>+(s.rubber||1).toFixed(3))})};
+window.__rf={st:()=>({place:RFX.place,draft:+(RFX.draft||0).toFixed(1),grid:ships.map(s=>[s.name,Math.round(s.dist),+s.x.toFixed(1),+s.skill.toFixed(3)]),rub:ships.map(s=>+(s.rubber||1).toFixed(3))})};
+// boost refill (2K: "the meter refills over time, faster from smashing and drifting"; the frames show boost jets ~60 % of the time).
+// Races only: +3/s passive, +10/s more in a rival's slipstream (4–30 m behind, within 7 m sideways): being in the pack pays.
+physPlayer=(f=>function(s,c){const r=f.apply(this,arguments);try{if(state==='race'&&RC.type==='race'&&s.isPlayer&&!s.nitro&&!s.finished){let g=3;
+  for(const o of ships){if(o===s||o.eliminated||o.finished)continue;const dd=tdd(o.dist,s.dist);if(dd>4&&dd<30&&Math.abs(o.x-s.x)<7){g+=10;RFX.draft=(RFX.draft||0)+H;break}}
+  s.bm=Math.min(100,s.bm+g*H)}}catch(e){}return r})(physPlayer);
