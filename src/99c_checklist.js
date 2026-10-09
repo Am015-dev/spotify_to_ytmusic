@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88v',id:'world-smooth',text:'PC and phone: drive 1 minute fast in Frankfurt and in Athens. It feels smoother than before. ⚙ TUNE → Life → Show FPS: copy the line into the notes (draws should be about 250 or less, tris about 1 M).'},
+ {ver:'v88v',id:'world-look',text:'Look far down long streets and from bridges: the far city still looks like the city (same colours, no holes, no flicker). Up close, buildings, trees and cars look exactly as before.'},
+ {ver:'v88v',id:'world-cars',text:'Traffic cars look normal up close; far away they look simpler but have the right colour and shape, and no car pops in or out right in front of you.'},
  {ver:'v88u',id:'perf-smooth',text:'The game runs smoothly on PC and phone in Frankfurt and in Athens: drive 1 minute fast through busy streets, no stutter. If it still lags: ⚙ TUNE → Life → turn on "Show FPS" and send a screenshot of the line at the bottom while driving.'},
  {ver:'v88u',id:'perf-pc',text:'Turn on ⚙ TUNE → Life → Show FPS on PC, drive in Frankfurt for 30 s, and copy the line at the bottom left into the notes here.'},
  {ver:'v88u',id:'perf-people',text:'Streets still feel alive but not crowded: a few groups of people ahead, not a crowd everywhere.'},
