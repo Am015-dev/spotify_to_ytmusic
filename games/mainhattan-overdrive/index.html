@@ -753,6 +753,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v89a',date:'9 Oct 2026',items:[{t:'NEW',s:'Get out and walk: stop the car and the BRAKE button turns into 🚪 EXIT (PC: F or E). Your minifig steps out and the car stays parked.'},{t:'NEW',s:'On foot: drag anywhere on the left half to walk (push far to run), RUN and JUMP on the right. PC: WASD or arrows, Shift runs, Space jumps.'},{t:'NEW',s:'Walk up to your own car or any parked car and tap 🚪 ENTER (PC: F or E) to drive it. Moving traffic cannot be taken yet.'},{t:'CHANGED',s:'Not yet: a borrowed car has no driver inside, and Athens has no kerb-parked cars to borrow (get back into your own car there).'}]},
   {v:'v88y',date:'9 Oct 2026',items:[{t:'NEW',s:'Garage BUILD → MY PARTS → CANVAS: a big empty 32×32 baseplate to build parts on (two fingers zoom and move the view).'},
    {t:'NEW',s:'Save a group as a part (⛓ GROUPS → 💾 SAVE PART) and add it to any car from MY PARTS; it snaps to the studs and is mirrored to the other side.'},
    {t:'NEW',s:'A TILES tab with 21 real LEGO tiles: flat 1×1 to 2×6, round, quarter-round, macaroni, slope 30, curved 1×3, grille, jumper and printed headlight, number plate and gauge.'}]},
@@ -12762,11 +12763,203 @@ body.paOn #odPin{display:none!important}#gbx.r2.gbBk.paPad #gbBkP{left:var(--paL
 window.__pa={S:PA,on:()=>PA.on,parts:()=>PA_get(),cv:()=>PA_cvGet(),enter:()=>PA_enter(),exit:()=>PA_exit(),save:g=>PA_save(g),toCv:g=>PA_toCv(g),append:id=>PA_append(id),
  carry:()=>SL.carry&&{n:SL.carry.parts.length,tw:SL.carry.tw||0,bad:!!SL.carry.bad,x:SL.carry.x,z:SL.carry.z,y:SL.carry.y,ap:SL.carry.ap||null},
  bounds:()=>[GB_N0,GB_N1,GB_Z0,GB_Z1],pan:()=>[PA.px,PA.pz],cam:()=>[GB_.yaw,GB_.pit,GB_.dist],tiles:()=>PA_TILES.filter(k=>GB_PC[k])};
+// ===== OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a
+// floating left stick (touch) or WASD/arrows + Shift + Space (PC); camera behind; ENTER near your own car or any parked car (traffic cars with c.pk).
+// State RO.foot: 'car' | 'exit' (0.35 s step-out) | 'walk' | 'enter' (0.45 s tween to the door). BRAKE (#tB) becomes 🚪 EXIT only once the car is
+// stopped and idle, and 🚪 ENTER on foot near a car (hidden otherwise). On foot: ◀ ▶ DRIFT FIRE hidden, GAS = RUN, BOOST = JUMP (5 controls with ❚❚).
+// Entering another car swaps bodies: the body you leave becomes a static parked group, the parked traffic car's instanced body is lifted into the
+// player car (3 one-instance meshes, same geometry/material/tint), its pool slot is retired (dead = 1e9). Physics stay the player car's.
+const OF={st:'car',fig:null,x:0,z:0,y:0,h:0,vx:0,vz:0,vy:0,air:false,ph:0,spd:0,cy:0,camB:4.5,car:null,vs:[],taken:[],near:null,tw:null,idle:0,btn:'',
+  stick:{id:null,on:false,x0:0,y0:0,dx:0,dy:0},keys:{},n:{exit:0,enter:0,swap:0,stuckF:0,walkF:0,camIn:0},cur:{own:true},figH:0,log:[]};
+const OF_R=.35,OF_STEP=.45,OF_WALK=1.6,OF_RUN=5,OF_G=18,OF_JV=Math.sqrt(2*18*.9),OF_FIGH=1.8,OF_NEAR=1.7;
+RO.foot='car';
+// --- seated-driver hiding: GB_geo remembers the brick types so the 'drv*' triangles of the player's car can be collapsed while he is out
+GB_geo=(f=>function(bricks,fig){const r=f(bricks,fig);const T=(bricks||[]).map(b=>b&&b.t);for(const g of[r&&r.m,r&&r.l])if(g)g.userData.bt=T;return r})(GB_geo);
+const OF_DG=new WeakMap();
+function OF_drvGeo(g){if(OF_DG.has(g))return OF_DG.get(g);const id=g.userData.bid,T=g.userData.bt;let out=null;
+  if(id&&T&&T.some(t=>/^drv/.test(t||''))){const p=g.attributes.position;let n=0;const c=g.clone(),q=c.attributes.position;
+    for(let t=0;t<id.length;t++){const b=id[t];if(b<0||!/^drv/.test(T[b]||''))continue;n++;for(let k=0;k<3;k++)q.setXYZ(t*3+k,0,-50,0)}if(n){q.needsUpdate=true;c.computeBoundingSphere();out=c}else c.dispose()}
+  OF_DG.set(g,out);return out}
+function OF_drv(root,show){if(!root)return;root.traverse(o=>{if(!o.isMesh||o.isInstancedMesh)return;const u=o.userData;
+  if(show){if(u.ofG0){o.geometry=u.ofG0;u.ofG0=null}return}if(u.ofG0||!o.geometry||!o.geometry.userData)return;const h=OF_drvGeo(o.geometry);if(h){u.ofG0=o.geometry;o.geometry=h}})}
+// --- the player minifig: GAR_fig standing pose split into body / 2 legs / 2 arms (5 meshes, swing pivots at hip and shoulders), scaled to 1.8 m
+function OF_figBuild(){if(OF.fig)return OF.fig;const P=[],Q=[];GAR_fig(GB_figGet(),P,Q,false);const parts={b:[],lL:[],lR:[],aL:[],aR:[]},bb=new THREE.Box3();
+  for(const g of[...P,...Q]){g.computeBoundingBox();const B=g.boundingBox,cx=(B.min.x+B.max.x)/2,cy=(B.min.y+B.max.y)/2,dz=B.max.z-B.min.z;bb.union(B);
+    if(B.max.y<=.37&&Math.abs(cx)>.005)parts[cx<0?'lL':'lR'].push(g);else if(Math.abs(cx)>.17&&cy>.45&&cy<.86&&dz>.02)parts[cx<0?'aL':'aR'].push(g);else parts.b.push(g)}
+  const s=OF_FIGH/(bb.max.y-Math.min(0,bb.min.y)),grp=new THREE.Group(),inner=new THREE.Group();inner.scale.setScalar(s);grp.add(inner);
+  const piv={b:[0,0,0],lL:[0,.36,0],lR:[0,.36,0],aL:[-.215,.8,0],aR:[.215,.8,0]},M={};
+  for(const k in parts){if(!parts[k].length)continue;const g=mergeGeometries(parts[k].map(q=>{q=q.index?q.toNonIndexed():q;for(const a of Object.keys(q.attributes))if(a!=='position'&&a!=='normal'&&a!=='color')q.deleteAttribute(a);return q}));
+    const p=piv[k];g.translate(-p[0],-p[1],-p[2]);const m=new THREE.Mesh(g,GB_MAT);m.position.set(p[0],p[1],p[2]);m.castShadow=false;m.receiveShadow=false;inner.add(m);M[k]=m}
+  grp.userData.qaFig=1;grp.userData.of=1;grp.visible=false;OF.fig={g:grp,M,s};OF.figH=+(s*(bb.max.y-Math.min(0,bb.min.y))).toFixed(3);return OF.fig}
+function OF_figPose(dt){const F=OF.fig;if(!F)return;F.g.position.set(OF.x,OF.y,OF.z);F.g.rotation.y=OF.h+Math.PI;
+  const k=Math.min(1,OF.spd/OF_WALK),run=OF.spd>OF_WALK*1.4,hz=run?3.4:2.2;OF.ph+=dt*hz*6.283*Math.min(1,OF.spd/OF_WALK+.15);
+  const a=OF.air?.5:Math.sin(OF.ph)*(run?.75:.5)*k,M=F.M;if(M.lL)M.lL.rotation.x=a;if(M.lR)M.lR.rotation.x=-a;if(M.aL)M.aL.rotation.x=-a*.9-(OF.air?.9:0);if(M.aR)M.aR.rotation.x=a*.9-(OF.air?.9:0);
+  if(M.b)M.b.position.y=OF.air?0:Math.abs(Math.sin(OF.ph))*.02*k}
+// --- cars around the walker: the parked current body, static parked bodies, parked traffic (pk) — and moving traffic as obstacles
+const OF_cH=c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)return 0;return Math.atan2(B.x-A.x,B.z-A.z)};
+const OF_box=(x,z,h,hw=1.02,hd=2.35)=>({x,z,hw,hd,c:Math.cos(h),s:Math.sin(h),h:999});
+function OF_cars(withTraffic){const L=[];if(OF.car)L.push({k:'cur',x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,ref:OF.car});for(const v of OF.vs)L.push({k:'grp',x:v.x,z:v.z,y:v.y,h:v.h,hw:v.hw,hd:v.hd,ref:v});
+  if(withTraffic&&HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),ref:c})}return L}
+function OF_edge(o){const b=OF_box(o.x,o.z,o.h,o.hw,o.hd),dx=OF.x-b.x,dz=OF.z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.max(0,Math.abs(lx)-b.hw),ez=Math.max(0,Math.abs(lz)-b.hd);return Math.hypot(ex,ez)}
+function OF_nearCar(){let best=null,bd=OF_NEAR;for(const o of OF_cars(true)){if(o.k==='traf')continue;if(Math.abs((o.y||0)-OF.y)>2.5)continue;const d=OF_edge(o);if(d<bd){bd=d;best=o}}return best}
+// --- touch: floating stick in the left 40 %, button relabels
+function OF_dom(){if(OF.dom)return OF.dom;const T=$('#touch');if(!T)return null;const z=document.createElement('div');z.id='ofZone';z.innerHTML='<div id="ofRing"><i></i></div><div id="ofHint">DRAG TO WALK</div>';T.insertBefore(z,T.firstChild);
+  const st=document.createElement('style');st.id='ofCss';st.textContent=`#ofZone{position:absolute;left:0;top:18%;width:40%;bottom:0;display:none;touch-action:none;z-index:1;pointer-events:auto}
+body.onfoot #ofZone{display:block}#ofRing{position:absolute;width:140px;height:140px;margin:-70px 0 0 -70px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(10,14,30,.22);pointer-events:none;opacity:.55}
+#ofZone.on #ofRing{opacity:1}#ofRing i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#ofHint{position:absolute;font:800 12px system-ui;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px #000;transform:translate(-50%,0);pointer-events:none;white-space:nowrap}#ofZone.used #ofHint{display:none}
+body.onfoot #btnZone,body.onfoot #steerZone,body.onfoot #tD,body.onfoot #tF,body.onfoot #tW,body.onfoot #roamVeh,body.onfoot #roamHorn{display:none!important}
+body.onfoot #tN::after,body.onfoot #tG::before{display:none!important}body.onfoot #tN{background:#183a5c!important;color:#fff!important;font-size:13px!important}body.onfoot #tG{font-size:13px!important}
+body.onfoot #roamGauge small{font-size:12px!important}#tB.ofDoor{background:linear-gradient(#ffd12c,#f0a400)!important;color:#1b1d22!important;font-weight:900;font-size:13px!important;border-color:#fff!important}#tB.ofHide{display:none!important}`;document.head.appendChild(st);
+  const R=z.querySelector('#ofRing'),K=R.querySelector('i'),H=z.querySelector('#ofHint'),S=OF.stick;
+  const home=()=>{const r=z.getBoundingClientRect();if(!r.width)return;S.x0=Math.min(130,r.width*.45);S.y0=r.height-Math.min(90,r.height*.3);R.style.left=S.x0+'px';R.style.top=S.y0+'px';H.style.left=S.x0+'px';H.style.top=(S.y0+76)+'px';K.style.transform=''};
+  const set=(cx,cy)=>{let dx=cx-S.x0,dy=cy-S.y0;const l=Math.hypot(dx,dy);if(l>70){dx*=70/l;dy*=70/l}S.dx=dx/70;S.dy=-dy/70;K.style.transform=`translate(${dx}px,${dy}px)`};
+  const start=(id,x,y)=>{if(S.id!=null)return;AU.init();TOUCH.on=TOUCH.used=true;const r=z.getBoundingClientRect();S.id=id;S.on=true;S.x0=clamp(x-r.left,60,r.width-20);S.y0=clamp(y-r.top,60,r.height-40);R.style.left=S.x0+'px';R.style.top=S.y0+'px';S.dx=S.dy=0;K.style.transform='';z.classList.add('on','used')};
+  const mv=(id,x,y)=>{if(id!==S.id)return;const r=z.getBoundingClientRect();set(x-r.left,y-r.top)};
+  const end=id=>{if(id!==S.id)return;S.id=null;S.on=false;S.dx=S.dy=0;z.classList.remove('on');home()};
+  z.addEventListener('touchstart',e=>{e.preventDefault();const t=e.changedTouches[0];start('t'+t.identifier,t.clientX,t.clientY)},{passive:false});
+  z.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches)mv('t'+t.identifier,t.clientX,t.clientY)},{passive:false});
+  const te=e=>{for(const t of e.changedTouches)end('t'+t.identifier)};z.addEventListener('touchend',te);z.addEventListener('touchcancel',te);
+  z.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;try{z.setPointerCapture(e.pointerId)}catch(_){}start('p'+e.pointerId,e.clientX,e.clientY)});
+  z.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')mv('p'+e.pointerId,e.clientX,e.clientY)});const pe=e=>{if(e.pointerType!=='touch')end('p'+e.pointerId)};z.addEventListener('pointerup',pe);z.addEventListener('pointercancel',pe);
+  addEventListener('resize',()=>{if(S.id==null)setTimeout(home,50);setTimeout(()=>{const B=$('#tB');if(B)OF_doorPlace(B,B.classList.contains('ofDoor'))},80)});
+  // BRAKE slot: in door mode a fresh press is EXIT / ENTER (claimed before the BRAKE handlers; no brake, no PARK double-tap)
+  const B=$('#tB');const door=e=>{if(!B||!B.classList.contains('ofDoor'))return;if(e.type==='pointerdown'&&e.pointerType==='mouse'&&!e.isTrusted)return;e.preventDefault();e.stopImmediatePropagation();
+    const n=performance.now();if(n-(OF.dT||-1e9)<350)return;OF.dT=n;AU.init();OF_door()};
+  if(B)for(const ev of['touchstart','pointerdown','mousedown'])B.addEventListener(ev,door,{capture:true,passive:false});
+  OF.dom={z,R,K,H,home};setTimeout(home,0);return OF.dom}
+let OF_lbl0=null;
+// the door button sits left of BOOST/JUMP (#tN), vertically centred on it, ≥ 12 px from #tN and #tG (BRAKE's own spot touches GAS on phones)
+function OF_doorPlace(B,on){const P=['left','top','right','bottom','transform'];if(!on){for(const k of P)B.style.removeProperty(k);OF.doorGap=null;return}
+  for(const k of P)B.style.removeProperty(k);const N=$('#tN'),G=$('#tG');if(!N||!N.offsetWidth)return;const n=N.getBoundingClientRect(),b=B.getBoundingClientRect(),par=(B.offsetParent||document.body).getBoundingClientRect();
+  let x=n.left-b.width-14,y=n.top+(n.height-b.height)/2;if(G&&G.offsetWidth){const g=G.getBoundingClientRect();if(x+b.width>g.left-12&&y+b.height>g.top-12)y=Math.min(y,g.top-12-b.height)}y=Math.max(par.top+60,y);
+  B.style.setProperty('left',(x-par.left)+'px','important');B.style.setProperty('top',(y-par.top)+'px','important');B.style.setProperty('right','auto','important');B.style.setProperty('bottom','auto','important');B.style.setProperty('transform','none','important');
+  const r=B.getBoundingClientRect(),gap=e=>{if(!e||!e.offsetWidth)return 999;const q=e.getBoundingClientRect();return Math.round(Math.max(q.left-r.right,r.left-q.right,q.top-r.bottom,r.top-q.bottom))};OF.doorGap={n:gap(N),g:gap(G)}}
+function OF_btns(){const B=$('#tB'),G=$('#tG'),N=$('#tN');if(!B)return;if(!OF_lbl0)OF_lbl0={g:G&&G.innerHTML,n:N&&N.innerHTML};
+  const foot=RO.foot!=='car';document.body.classList.toggle('onfoot',foot);let want;
+  if(foot)want=RO.foot==='walk'&&OF.near?'enter':'hide';else want=OF_canExit()?'exit':'brake';
+  if(want!==OF.btn){OF.btn=want;B.classList.toggle('ofDoor',want==='exit'||want==='enter');B.classList.toggle('ofHide',want==='hide');
+    if(want==='exit')B.textContent='🚪 EXIT';else if(want==='enter')B.textContent='🚪 ENTER';else B.textContent=TOUCH.park?'GO ▶':'BRAKE';OF_doorPlace(B,want==='exit'||want==='enter')}
+  if(foot!==!!OF.lblFoot){OF.lblFoot=foot;if(G)G.innerHTML=foot?'RUN':OF_lbl0.g;if(N)N.innerHTML=foot?'JUMP':OF_lbl0.n;const u=document.querySelector('#roamGauge small');if(u)u.textContent=foot?'ON FOOT':'KM/H';if(foot&&OF.dom)requestAnimationFrame(()=>OF.dom.home())}}
+// EXIT is offered only when the car is stopped and idle (no gas/brake held for 0.5 s), on the ground, not in a cutscene/menu/event, not a boat
+function OF_canExit(){if(state!=='roam'||!RO.on||RO.frozen||RO.wk||!pl||pl.air||RO.sp||RO.card||RO.mapOpen||RO.story)return false;if(typeof M1!=='undefined'&&M1.cs)return false;
+  if(pl.boatMode||(pl.vmode&&pl.vmode!=='car'&&pl.vmode!=='4x4'))return false;if(TOUCH.park)return Math.abs(RO.v)<2.2;return Math.abs(RO.v)<2.2&&OF.idle>.5}
+function OF_door(){if(RO.foot==='car'){if(OF_canExit())OF_exit()}else if(RO.foot==='walk'&&OF.near)OF_enter(OF.near)}
+// --- EXIT: car stops, driver hidden, minifig at the driver's door (left), else right, else behind
+// half extents of the driven body in its own frame (metres), clamped to car-like sizes
+function OF_ext(){try{const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(ud.m.matrixWorld).invert(),B=new THREE.Box3(),b=new THREE.Box3(),m=new THREE.Matrix4(),sc=new THREE.Vector3();ud.m.getWorldScale(sc);
+  ud.m.traverseVisible(o=>{if(!o.isMesh||!o.geometry||(o.material&&o.material.transparent))return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();m.multiplyMatrices(inv,o.matrixWorld);if(o.isInstancedMesh){const k=new THREE.Matrix4();o.getMatrixAt(0,k);m.multiply(k)}b.copy(o.geometry.boundingBox).applyMatrix4(m);B.union(b)});
+  if(B.isEmpty())return{};return{hw:clamp(Math.max(-B.min.x,B.max.x)*sc.x,.8,1.5),hd:clamp(Math.max(-B.min.z,B.max.z)*sc.z,1.8,3.3)}}catch(e){return{}}}
+function OF_exit(){const F=OF_figBuild();if(!F.g.parent)HUB.grp.add(F.g);const h=RO.h,fx=Math.sin(h),fz=Math.cos(h),rx=-fz,rz=fx;
+  if(TOUCH.park)try{parkSet(false)}catch(e){}OF.car=Object.assign({x:RO.x,z:RO.z,y:RO.y,h,own:OF.cur.own},OF_ext());RO.v=0;RO.vy=0;TOUCH.gas=TOUCH.brake=TOUCH.boost=TOUCH.hb=false;
+  let px=RO.x-rx*1.75,pz=RO.z-rz*1.75;const ok=(x,z)=>!roamHit(x,z,OF_R,RO.y+1)&&!(CID==='fra'&&inRiver(x,z))&&Math.abs(groundAt(x,z,RO.y+1)-RO.y)<1.2;
+  if(!ok(px,pz)){px=RO.x+rx*1.75;pz=RO.z+rz*1.75}if(!ok(px,pz)){px=RO.x-fx*3.4;pz=RO.z-fz*3.4}
+  OF.x=RO.x-rx*.6;OF.z=RO.z-rz*.6;OF.y=groundAt(OF.x,OF.z,RO.y+1);OF.h=h-Math.PI/2;OF.vx=OF.vz=OF.vy=0;OF.spd=0;OF.air=false;
+  OF.tw={t:0,d:.35,x0:OF.x,z0:OF.z,x1:px,z1:pz,h1:h-Math.PI/2};OF_drv(pl.mesh,false);F.g.visible=true;RO.foot='exit';OF.cy=h;OF.camB=4.5;OF.n.exit++;
+  if(AU.engine)AU.engine(pl,0,false);if(AU.scrape)AU.scrape(false);AU.sfx&&AU.sfx('pick');OF.log.push('exit@'+Math.round(RO.x)+','+Math.round(RO.z));OF_btns()}
+// --- ENTER: tween to the door, then (own body) restore or (other car) swap bodies
+function OF_enter(o){const fx=Math.sin(o.h),fz=Math.cos(o.h),rx=-fz,rz=fx,dx=o.x-rx*1.4,dz=o.z-rz*1.4;
+  OF.tw={t:0,d:.45,x0:OF.x,z0:OF.z,x1:dx,z1:dz,h1:Math.atan2(o.x-dx,o.z-dz),o};RO.foot='enter';OF.stick.dx=OF.stick.dy=0;OF_btns()}
+const OF_noW=new THREE.Group();OF_noW.visible=false;
+function OF_bodyKids(ud){const keep=new Set([...(ud.ribbons||[]),...(ud.flares||[])]);return ud.m.children.filter(c=>!keep.has(c))}
+function OF_poseCar(x,z,y,h){RO.x=x;RO.z=z;RO.y=y;RO.h=RO.vh=h;RO.v=0;RO.vy=0;if(pl){pl.air=false;pl.mesh.position.set(x,y,z);try{roamPose(pl,1/60)}catch(e){}pl.mesh.updateMatrixWorld(true)}}
+function OF_finishEnter(o){const ud=pl.mesh.userData;
+  if(o.k!=='cur'){// park the body we are leaving as a static group at its current world pose
+    pl.mesh.updateMatrixWorld(true);const S=new THREE.Group();S.matrixAutoUpdate=false;S.matrix.copy(ud.m.matrixWorld);S.matrixWorldNeedsUpdate=true;for(const c of OF_bodyKids(ud))S.add(c);
+    S.userData.of=1;HUB.grp.add(S);const st={g:S,x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,own:OF.cur.own,wheels:ud.wheels,inst:OF.cur.inst||null,lowL:OF.cur.lowL};if(OF.cur.own)ud.wheels=OF_noW;OF.vs.push(st);
+    // a kerb-parked traffic car is driven off from the lane next to it (1.6 m towards the road centre) so its kerb trees/lamps don't pin the car
+    let sx=0,sz=0;if(o.k==='park'){const dx=Math.sin(o.h),dz=Math.cos(o.h);for(const k of[1.6,1.1,.6,0]){if(!roamHit(o.x+dz*k,o.z-dx*k,2,groundY(o.x,o.z)+.5)){sx=dz*k;sz=-dx*k;break}}}
+    OF_poseCar(o.x+sx,o.z+sz,o.k==='park'?groundY(o.x+sx,o.z+sz):o.y,o.h);const inv=new THREE.Matrix4().copy(ud.m.matrixWorld).invert(),m4=new THREE.Matrix4();
+    if(o.k==='grp'){const G=o.ref;OF.cur={own:G.own,inst:G.inst,lowL:G.lowL};G.g.updateMatrixWorld(true);for(const c of[...G.g.children]){c.updateMatrix();m4.multiplyMatrices(G.g.matrixWorld,c.matrix);m4.premultiply(inv);m4.decompose(c.position,c.quaternion,c.scale);ud.m.add(c)}
+      HUB.grp.remove(G.g);OF.vs.splice(OF.vs.indexOf(G),1);if(G.own){ud.wheels=G.wheels}}
+    else{const c=o.ref,im=HUB.cim[c.k];im.updateMatrixWorld(true);const body=[],bx=new THREE.Box3();let lo=1e9;
+      // tyres on the road: the lowest point of the parked body (wheels) is put exactly on the ground under the car
+      for(const src of[im,im.userData.w]){if(!src)continue;if(!src.geometry.boundingBox)src.geometry.computeBoundingBox();src.getMatrixAt(c.j,m4);m4.premultiply(src.matrixWorld);bx.copy(src.geometry.boundingBox).applyMatrix4(m4);lo=Math.min(lo,bx.min.y)}
+      const T=new THREE.Matrix4().makeTranslation(sx,lo<1e8?RO.y-lo:0,sz);
+      for(const src of[im,im.userData.w,im.userData.g]){if(!src)continue;const one=new THREE.InstancedMesh(src.geometry,src.material,1);src.getMatrixAt(c.j,m4);m4.premultiply(src.matrixWorld).premultiply(T).premultiply(inv);one.setMatrixAt(0,m4);
+        if(src.instanceColor){const col=new THREE.Color();src.getColorAt(c.j,col);one.setColorAt(0,col)}one.frustumCulled=false;one.renderOrder=src.renderOrder;one.castShadow=src.castShadow;one.receiveShadow=src.receiveShadow;one.userData.of=1;ud.m.add(one);body.push(one)}
+      c.dead=1e9;c.pk=0;OF.taken.push(c);
+      // lowest tyre point in the body's local frame (ud.m): kept on the road every frame by OF_lift (CR_carPose only grounds real wheel meshes)
+      const lb=new THREE.Box3();let lowL=1e9;for(const q of body.slice(0,2)){if(!q.geometry.boundingBox)q.geometry.computeBoundingBox();q.getMatrixAt(0,m4);lb.copy(q.geometry.boundingBox).applyMatrix4(m4);lowL=Math.min(lowL,lb.min.y)}
+      OF.cur={own:false,inst:body,lowL};OF.n.swap++}}
+  else OF_poseCar(OF.car.x,OF.car.z,OF.car.y,OF.car.h);
+  if(OF.cur.own)OF_drv(pl.mesh,true);OF.car=null;if(OF.fig)OF.fig.g.visible=false;RO.foot='car';OF.idle=0;camSnap=true;OF.n.enter++;TOUCH.gas=TOUCH.brake=TOUCH.boost=false;
+  // far static bodies are dropped (borrowed ones only; your own car always stays where you left it)
+  for(const v of[...OF.vs])if(!v.own&&Math.hypot(v.x-RO.x,v.z-RO.z)>300){HUB.grp.remove(v.g);OF.vs.splice(OF.vs.indexOf(v),1)}
+  AU.sfx&&AU.sfx('go');OF.log.push('enter:'+o.k+'@'+Math.round(RO.x)+','+Math.round(RO.z));OF_btns()}
+// --- walking physics: camera-relative stick, accel 20 m/s², turn 720°/s, buildings (roamHit + bldPush), cars (oriented boxes), props, kerbs ≤ 0.45 m
+function OF_input(){const S=OF.stick;let fx=0,fy=0,run=false,jump=false;
+  if(S.on){const l=Math.hypot(S.dx,S.dy);if(l>.1){const m=Math.min(1,(l-.1)/.9),c=m*m;fx=S.dx/l*c;fy=S.dy/l*c;run=l>.85}}
+  else{const kx=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),ky=(K.KeyW||K.ArrowUp?1:0)-(K.KeyS||K.ArrowDown?1:0),l=Math.hypot(kx,ky);if(l){fx=kx/l;fy=ky/l}run=!!(K.ShiftLeft||K.ShiftRight)}
+  if(TOUCH.gas)run=true;jump=!!(TOUCH.boost||K.Space);return{fx,fy,run,jump}}
+function OF_collide(x,z,y){for(let it=0;it<4;it++){const b=roamHit(x,z,OF_R,y+1);if(!b)break;const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}
+  for(const o of OF_cars(true)){if(Math.abs((o.y||0)-y)>2)continue;const b=OF_box(o.x,o.z,o.h,o.hw,o.hd);if(bHit(b,x,z,OF_R)){const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}}
+  const PG=HUB.pgrid,D=HUB.ptypes;if(PG&&D){const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const L=PG.get((kx+a)*10000+kz+c);if(!L)continue;
+    for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;const r=Math.max(.15,Math.min(1.1,d.r*.45))+OF_R,dx=x-p.x,dz=z-p.z,l=Math.hypot(dx,dz);if(l<r&&l>1e-4){x=p.x+dx/l*r;z=p.z+dz/l*r}}}}
+  return[x,z]}
+function OF_walk(dt){const I=OF_input(),cy=OF.cy,fw=[Math.sin(cy),Math.cos(cy)],rt=[-Math.cos(cy),Math.sin(cy)];
+  const wx=fw[0]*I.fy+rt[0]*I.fx,wz=fw[1]*I.fy+rt[1]*I.fx,m=Math.min(1,Math.hypot(wx,wz)),top=I.run?OF_RUN:OF_WALK,tv=m*top;
+  const tx=m>1e-3?wx/Math.hypot(wx,wz)*tv:0,tz=m>1e-3?wz/Math.hypot(wx,wz)*tv:0,ax=tx-OF.vx,az=tz-OF.vz,al=Math.hypot(ax,az),amax=20*dt*(OF.air?.35:1);
+  if(al>amax){OF.vx+=ax/al*amax;OF.vz+=az/al*amax}else{OF.vx=tx;OF.vz=tz}
+  OF.spd=Math.hypot(OF.vx,OF.vz);if(OF.spd>.2){const want=Math.atan2(OF.vx,OF.vz),e=angDiff(want,OF.h),k=Math.min(Math.abs(e),12.57*dt);OF.h+=Math.sign(e)*k}
+  if(I.jump&&!OF.air&&!OF.jHeld){OF.vy=OF_JV;OF.air=true;AU.sfx&&AU.sfx('pick')}OF.jHeld=I.jump;
+  let nx=OF.x+OF.vx*dt,nz=OF.z+OF.vz*dt;const g1=groundAt(nx,nz,OF.y+OF_STEP+.05);
+  let why='';if(g1>OF.y+OF_STEP||(CID==='fra'&&inRiver(nx,nz)&&g1<=HWY+.3)){nx=OF.x;nz=OF.z;why=g1>OF.y+OF_STEP?'step'+(g1-OF.y).toFixed(2):'river'}
+  [nx,nz]=OF_collide(nx,nz,OF.y);if(roamHit(nx,nz,OF_R*.6,OF.y+1)){nx=OF.x;nz=OF.z}
+  const moved=Math.hypot(nx-OF.x,nz-OF.z);if(m>.3&&moved<tv*dt*.25){OF.n.stuckF++;if((OF.stk||(OF.stk=[])).length<12&&OF.n.stuckF%10===1)OF.stk.push([Math.round(OF.x),Math.round(OF.z),why||(roamHit(OF.x,OF.z,OF_R+.1,OF.y+1)?'bld':'car/prop')])}if(m>.3)OF.n.walkF++;
+  OF.x=nx;OF.z=nz;const g=groundAt(OF.x,OF.z,OF.y+OF_STEP+.05);
+  if(OF.air||OF.y>g+.05){OF.vy-=OF_G*dt;OF.y+=OF.vy*dt;if(OF.y<=g){OF.y=g;OF.vy=0;OF.air=false}else OF.air=true}else{OF.y=g;OF.vy=0}
+  if(Math.hypot(OF.vx,OF.vz)>0)OF.spd=moved/Math.max(dt,1e-4)}
+function OF_step(dt){if(!pl)return;dt=Math.min(dt,.05);const T0=OF.tw;
+  if(RO.foot==='exit'||RO.foot==='enter'){T0.t+=dt;const k=Math.min(1,T0.t/T0.d),e=k*k*(3-2*k);OF.x=T0.x0+(T0.x1-T0.x0)*e;OF.z=T0.z0+(T0.z1-T0.z0)*e;OF.y=groundAt(OF.x,OF.z,OF.y+1);OF.h+=angDiff(T0.h1,OF.h)*Math.min(1,dt*12);OF.spd=OF_WALK;
+    if(k>=1){if(RO.foot==='exit'){RO.foot='walk';OF.spd=0}else{OF_finishEnter(T0.o);return}}}
+  else OF_walk(dt);
+  // the world follows the walker (culling, peds, traffic braking, minimap); the parked car stays where it is
+  RO.x=OF.x;RO.z=OF.z;RO.y=OF.y;RO.h=RO.vh=OF.h;RO.v=0;RO.vy=0;
+  if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.y,OF.car.z);
+  OF.near=RO.foot==='walk'?OF_nearCar():null;OF_figPose(dt);
+  if(AU.engine)AU.engine(pl,0,false);if(AU.scrape)AU.scrape(false);
+  try{hubTrafficStep(dt)}catch(e){if(!OF.e1){OF.e1=1;console.warn('OF traffic',e)}}try{studFXStep(dt)}catch(e){}try{roamHud()}catch(e){}
+  try{const s=$('#rgSpd');if(s)s.textContent='🚶'}catch(e){}OF_btns()}
+// --- foot camera: 4.5 m back, 2.2 m up, yaw follows the walking direction (not when walking towards the camera), pulled in before walls
+function OF_cam(dt){if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.y,OF.car.z);
+  if(OF.spd>.3){const a=angDiff(OF.h,OF.cy),w=clamp((Math.cos(a)+.2)/1.2,0,1);OF.cy+=a*Math.min(1,dt*3*w*Math.min(1,OF.spd/OF_WALK))}
+  const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+2.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5,carUp=0;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)){back=Math.max(.25,d-.5);break}if(!carUp&&PC.some(b=>bHit(b,x,z,.3)))carUp=1}
+  OF.camB=back<OF.camB?back:OF.camB+(back-OF.camB)*Math.min(1,dt*3);const cx=OF.x-fx*OF.camB,cz=OF.z-fz*OF.camB;
+  OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);camera.lookAt(OF.x+fx*2.5,OF.y+1.25,OF.z+fz*2.5);
+  if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
+// parked cars stay parked while you walk (the lively-city parker would re-park them relative to the walker)
+if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(LV_parkStep);
+// borrowed body: lift ud.m so its lowest tyre point sits CR_TYRE_Y above the road (same rule as CR_carPose for real wheels)
+const OF_v3=new THREE.Vector3();
+function OF_lift(){const C=OF.cur;if(C.own||C.lowL==null||!pl||pl.air||(pl.boatK||0)>.5)return;const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);OF_v3.set(0,C.lowL,0).applyMatrix4(ud.m.matrixWorld);
+  const lift=clamp(groundAt(RO.x,RO.z,RO.y+1)+CR_TYRE_Y-OF_v3.y,-.4,.4);ud.m.position.y+=lift/(pl.mesh.scale.y||1);ud.m.updateMatrixWorld(true)}
+// --- per-frame hooks (outermost wrappers: none of the car-only wrappers run on foot)
+roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen)OF_step(dt);return}
+  const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}OF_dom();OF_btns();return r})(roamStep);
+roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);return f(dt)})(roamCam);
+// leaving roam (menu, district change, wreck reset) puts you back in the car
+function OF_reset(){if(RO.foot==='car'&&!OF.car)return;try{if(OF.car)OF_poseCar(OF.car.x,OF.car.z,OF.car.y,OF.car.h)}catch(e){}OF.car=null;if(OF.fig)OF.fig.g.visible=false;RO.foot='car';try{if(OF.cur.own)OF_drv(pl&&pl.mesh,true)}catch(e){}OF_btns()}
+if(typeof exitRoam==='function')exitRoam=(f=>function(){OF_reset();return f.apply(this,arguments)})(exitRoam);
+if(typeof roamWarp==='function')roamWarp=(f=>function(){OF_reset();return f.apply(this,arguments)})(roamWarp);
+enterRoam=(f=>function(){RO.foot='car';OF.car=null;OF.vs=[];OF.taken=[];OF.cur={own:true};OF.btn='';if(OF.fig){if(OF.fig.g.parent)OF.fig.g.parent.remove(OF.fig.g);OF.fig.g.visible=false}const r=f.apply(this,arguments);return r})(enterRoam);
+// no M1 weapon on foot (P3/P4 bring punches and blasters); F / E = EXIT / ENTER when no M1 weapon is out
+if(typeof M1_fire==='function')M1_fire=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(M1_fire);
+const OF_m1=()=>typeof M1!=='undefined'&&(M1.cs||M1.inv||(typeof M1_wpn==='function'&&M1_wpn()));
+addEventListener('keydown',e=>{if(state!=='roam'||e.repeat||!(e.code==='KeyF'||e.code==='KeyE'))return;if(!$('#settings').hidden||RO.jOpen)return;
+  if(RO.foot==='walk'){e.preventDefault();if(OF.near)OF_enter(OF.near)}else if(RO.foot==='car'&&!OF_m1()&&OF_canExit()){e.preventDefault();OF_exit()}},true);
+function OF_api(){return{state:RO.foot,x:+OF.x.toFixed(2),z:+OF.z.toFixed(2),y:+OF.y.toFixed(2),h:+OF.h.toFixed(3),spd:+OF.spd.toFixed(2),air:OF.air,near:OF.near&&{k:OF.near.k,x:+OF.near.x.toFixed(1),z:+OF.near.z.toFixed(1)},
+  car:OF.car&&{x:+OF.car.x.toFixed(1),z:+OF.car.z.toFixed(1),h:+OF.car.h.toFixed(3)},parked:OF.vs.length,taken:OF.taken.length,own:OF.cur.own,btn:OF.btn,figH:OF.figH,n:Object.assign({},OF.n),log:OF.log.slice(-8),stk:OF.stk||[],canExit:OF_canExit(),doorGap:OF.doorGap,idle:+OF.idle.toFixed(2),
+  stars:0,hp:100,lock:null,ko:0}}
 // ===== CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate").
 // OD_CHECKLIST = items per version; each gets ✅ PASS / ❌ FAIL + an optional note, saved in localStorage 'mho_chk'. "COPY RESULTS" copies
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
+ {ver:'v89a',id:'foot-walk',text:'On foot: drag on the left half of the screen to walk, push far to run; RUN and JUMP work. Walk 30 m along a street: no getting stuck on kerbs, the camera stays behind you and never inside a wall. Your minifig is as tall as the people around.'},
+ {ver:'v89a',id:'foot-pc',text:'PC: stop the car, press F (or E) to get out, walk with WASD (Shift runs, Space jumps), press F next to a car to get in.'},
+ {ver:'v89a',id:'foot-enter',text:'Walk up to a parked car at the kerb (Frankfurt) or back to your own car: 🚪 ENTER appears. Tap it, drive away 100 m: the car sits on the road, all controls work as before.'},
  {ver:'v88y',id:'gp-canvas',text:'Garage BUILD → MY PARTS → CANVAS: an empty green 32×32 baseplate. Place a few bricks, pinch to zoom and drag with two fingers to move the view, then ← CAR: your car is unchanged.'},
  {ver:'v88y',id:'gp-part',text:'On the canvas: ☝ SELECT your bricks → ⛓ GROUPS → MAKE GROUP → 💾 SAVE PART. Back on the car, MY PARTS → tap the part, tap a spot at the side of the car, ✔ PLACE: it appears on both sides. SAVE & DRIVE, reload: it is still there.'},
  {ver:'v88y',id:'gp-tiles',text:'BUILD → TILES: round, quarter, macaroni, slope, curve and printed tiles look like real LEGO tiles; nothing overlaps the buttons while holding or selecting a part.'},
@@ -13130,5 +13323,6 @@ updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((sta
  frameAt(TD,s.dist,F2);const c=camera.position,al=(c.x-F2.p.x)*F2.t.x+(c.y-F2.p.y)*F2.t.y+(c.z-F2.p.z)*F2.t.z;frameAt(TD,s.dist+al,_cr25F);const F=_cr25F;
  const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);const CB=typeof R15_camB==='function'?R15_camB(s.dist+al):null,lo=CB?CB[0]:-lim,hi=CB?CB[1]:lim;if(l>=lo&&l<=hi)return;CR_CAMX.n++;const dl=(l>hi?hi:lo)-l;c.addScaledVector(F.r,dl);
  if(CC&&CC.s){const w=CC.s;camera.lookAt(w.mesh.position.clone().add(w.mesh.userData.m.position))}else camera.lookAt(camLook)}catch(e){}})(updateCam);
+try{Object.defineProperty(window.__mho,'foot',{get:()=>OF_api(),configurable:true})}catch(e){} // v89a on foot (98of_onfoot.js)
 </script>
 </body></html>
