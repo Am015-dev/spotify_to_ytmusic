@@ -51,3 +51,20 @@ window.__rf={st:()=>({place:RFX.place,draft:+(RFX.draft||0).toFixed(1),grid:ship
 physPlayer=(f=>function(s,c){const r=f.apply(this,arguments);try{if(state==='race'&&RC.type==='race'&&s.isPlayer&&!s.nitro&&!s.finished){let g=3;
   for(const o of ships){if(o===s||o.eliminated||o.finished)continue;const dd=tdd(o.dist,s.dist);if(dd>4&&dd<30&&Math.abs(o.x-s.x)<7){g+=10;RFX.draft=(RFX.draft||0)+H;break}}
   s.bm=Math.min(100,s.bm+g*H)}}catch(e){}return r})(physPlayer);
+// RF8 respawn (2K-style, never ends the race): wrong way 3 s, stuck 3 s, or a fall/wreck → "SPAWN IN n" banner;
+// tap it or press R to respawn now, on the centre line facing forward, place kept (dist is not moved back)
+const RSP={el:null,t:0,why:'',n:0};
+function RF_rspEl(){if(RSP.el)return RSP.el;const e=document.createElement('button');e.id='rfRsp';e.type='button';
+  e.style.cssText='position:fixed;z-index:7;left:50%;top:calc(env(safe-area-inset-top,0px) + 58px);transform:translateX(-50%);min-height:44px;padding:6px 18px;border-radius:12px;border:3px solid #ffd12c;background:rgba(10,14,30,.85);color:#fff;font:900 italic 18px/1.1 system-ui,sans-serif;letter-spacing:.03em;text-shadow:0 2px 0 #000;cursor:pointer;display:none';
+  for(const ev of['touchstart','pointerdown','mousedown'])e.addEventListener(ev,x=>{x.stopPropagation();x.preventDefault();RF_rspNow()},{passive:false});
+  document.body.appendChild(e);return RSP.el=e}
+function RF_rspNow(){const s=pl;if(!s||state!=='race')return;if(s.dead>0){s.dead=1e-3;RSP.t=0;return}if(RSP.t<=0)return;
+  s.x=0;s.yaw=s.beta=s.yawRate=0;s.v=s.stats.top*.35;s.inv=2;s.wrong=0;RSP.stk=0;RSP.t=0;RSP.n++;try{AU.sfx('pick')}catch(e){}}
+function RF_rsp(){const e=RF_rspEl();const s=pl;if(!s||state!=='race'||!RC||RC.type==='arena'){e.style.display='none';RSP.t=0;return}
+  const now=performance.now(),H=Math.min(.1,(now-(RSP.lt||now))/1000);RSP.lt=now;RSP.stk=(s.dead<=0&&s.v<4&&raceT>3)?(RSP.stk||0)+H:0;let why='';
+  if(s.dead>0)why='';else if(s.wrong>=3)why='WRONG WAY!';else if(RSP.stk>=3)why='STUCK!';
+  if(s.dead>0){e.style.display='';e.textContent='RESPAWN · TAP';return}
+  if(why&&RSP.t<=0)RSP.t=3;if(!why&&RSP.t>0&&s.wrong<.5&&RSP.stk<.5)RSP.t=0;
+  if(RSP.t>0){RSP.t-=H;if(RSP.t<=0){RSP.t=1e-3;RF_rspNow();e.style.display='none';return}e.style.display='';e.textContent=(why||'WRONG WAY!')+' SPAWN IN '+Math.ceil(RSP.t)+' · TAP'}else e.style.display='none'}
+updHud=(f=>function(){f.apply(this,arguments);try{RF_rsp()}catch(e){}})(updHud);
+addEventListener('keydown',e=>{if(e.code==='KeyR'&&typeof state!=='undefined'&&state==='race'&&pl&&(pl.dead>0||RSP.t>0)){e.preventDefault();e.stopImmediatePropagation();RF_rspNow()}},true);// capture: R otherwise restarts the race (40_hud)

@@ -65,3 +65,25 @@ Video: youtube.com/watch?v=UDpcEFCvkEo, "Lego 2K Drive – Rival Race Max Speed,
    - the crowd podium scene in the world.
 
 ## 3. After (RF build) — see the bottom of this file (filled in after the tRace runs)
+
+## 3. NEW SCOPE (coordinator, 2026-10-09 16:34): wide open race courses (Alex scored the narrow city races 2/10)
+Alex: "the screenshots give lot of freedom to run in the track with multiple roads and terrains/water to leverage the builds of all 3 cars. ours is quite narrow. When the car falls off a cliff it respawns, so the fun is kept."
+Mandatory before REVIEW: (1) ≥1 open course per city outside the blocks: road ≥14 m, drivable terrain ≥30 m each side, ≥2 alternative routes (off-road shortcut + water), ≥2 big jumps, a cliff/drop; rounded colliders, walls only at the edges. (2) Auto 3-vehicle swap by surface (garage builds per slot). (3) Respawn: cliff, deep water, upside down 2 s, wrong way 3 s → "SPAWN IN 3" + tap/R; never end the race. (4) Rivals use the alt routes. (5) Loaded only on race entry; split ≤3.6 MB; phone fps ≥ city.
+Gate: 852×393 shots NEXT TO the matching ref frame (start pack, wide mixed terrain, shortcut, water/boat swap, jump, cliff respawn, finish), sent to the coordinator BEFORE the REVIEW; tRace on the new course: % time ≥2 rivals on screen, route choices, respawns.
+
+### 3.1 What already exists (code map, file:line in src/)
+- Races are 1D: a car is `dist` along the centreline + lateral `x`; `frameAt(td,s)` 10_core.js:680; `buildTrackData` :653 (CatmullRom of `def.cp` [x,y,z,'SECTOR']). Width `W=R15_trackW(def)` = `def.w15||38` (20_race_world.js:361), HALF=W/2. "Walls" = clamp of x to `R15_b()` (31_race_r15.js), no colliders.
+- Every race already has its own WORLD built by `loadTrack(id)` (20_race_world.js:362) on race entry → (5) streaming is satisfied by construction; keep the course procedural (tiny bytes).
+- Surface: `waterStep` (20_race_world.js:299): `R15_ter(s)` first, else water when track y < WATER_Y=-5.5, dirt when the sector name has 'PISTE'. Sets s.boatMode/s.dirtMode → `vehMode` (:616) swaps car/4x4/boat; `CR_vis` (93_cars_lego.js:233) shows the garage brick model + per-form stats `CR_LOAD.car/4x4/boat` (garage slots `mho_gar.off/.boat`, 98_garage_driver.js:171-207). → (2) mostly exists; needs the LEGO poof + per-surface speed balance.
+- Shortcuts: `R15_find` ≤2 corridors (water, dirt) inside bends, AI take them by skill roll (`R15_aiXt`). Jumps: def.jumps kinds river/pit/sky (10_core.js:668), `crashJump` 30_race.js:384 (dead=1.6, put at s1+30).
+- Respawn: only after crashJump/explode (`dead` → revive in stepSim 30_race.js:486). Wrong way only shows text (`s.wrong`, :370). No roll (yaw clamped ±1.5) → "upside down" = wreck/explode case.
+- Garage builds per slot: exist.
+
+### 3.2 Design (in progress, module 98rf_race_fun.js unless it grows; then 98ro_open.js in ORDER before 99_api)
+- OPEN COURSE = a track def with `open:1, w15:96` (HALF 48): asphalt road |x|≤7 (yellow centre line), drivable terrain 7–45 m each side (grass/dirt/sand by sector), rounded rock/fence edge at ±HALF only. No buildCity: own `RO_build()` makes a terrain ribbon + hills beyond ±HALF (heightfield along the frames), tree/rock clusters, a skyline silhouette (Frankfurt) / Parthenon + sea (Athens).
+- Surface by x in R15_ter hook for open defs: |x|≤8 road → car; terrain → 4x4; sector 'WATER' (full width, river/sea crossing) → boat; 'CLIFF' sector: x beyond the cliff lip (one side) → fall: dead=1.6, respawn banner.
+- Route choice matters: terrain inside of a bend is shorter (ds=v/(1-k·x) already) but bumpy (top ×0.94 for the 4x4 off its tuned top); water: boat lane with boost rings; each form tuned fastest on its own surface (car 1.0 road / 0.8 terrain impossible since auto-swap; so tune 4x4 top on terrain = 0.97 car-road top, boat on water = 0.95 + rings).
+- Courses: `fra_ufer` "Main Riverbank Rally" (riverbank road, park hills, Main crossing by water, a quarry cliff, 2 ramps over a creek and a rail cut), `ath_akti` "Saronic Coast Rally" (coastal hill road, beach sand section, sea crossing, cliff above the sea, 2 ramps). Placed in their own WORLD, so coordinates are free (keep y via cp).
+- AI: per-AI per-lap route roll by skill: inside-terrain line on bends (xt toward the inside up to 30 m) or road line; everyone boats across WATER.
+- Respawn: DONE in RF8 (98rf): wrong way ≥3 s or stuck (<4 m/s) ≥3 s → "WRONG WAY! SPAWN IN 3 · TAP" banner (#rfRsp, 44 px, top centre), auto at 0; tap or R (capture listener; R otherwise restarts the race) → x=0, yaw 0, v=35 % top, inv 2, dist kept (place kept). During dead>0 (fall/wreck) the banner says "RESPAWN · TAP" and tap revives at once. Counter `RSP.n`.
+- tRace metrics to add: % time ≥2 rivals on screen (project AI mesh positions with the camera), route choices (|x|>10 on terrain, water sectors), respawns (RSP.n via __rf.st()).
