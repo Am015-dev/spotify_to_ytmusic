@@ -1,0 +1,16 @@
+t 30 s {"st":"0:follow","tp":0,"vmax":127,"tv":94,"x":1649,"z":-8} 37s wall
+t 60 s {"st":"0:follow","tp":0,"vmax":131,"tv":94,"x":1173,"z":-242} 70s wall
+t 90 s {"st":"0:follow","tp":0,"vmax":131,"tv":94,"x":1074,"z":-453} 94s wall
+t 150 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":355,"z":-479} 161s wall
+t 180 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":184,"z":-786} 194s wall
+t 210 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":135,"z":-963} 223s wall
+t 240 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":130,"z":-960} 249s wall
+t 270 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":142,"z":-963} 275s wall
+t 300 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":135,"z":-947} 304s wall
+t 330 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":128,"z":-947} 334s wall
+t 360 s {"st":"1:thieves","tp":0,"vmax":141,"tv":94,"x":-276,"z":-837} 357s wall
+MISSION END 22740 HOT DROP★★★TIME UPNo stars this time · try again1/9 stages · 4.9 km · ★★★ 04:30.
+RESULT {"otp":0,"ydrop":[],"camj":3,"beta":true,"end":{"f":22740,"res":"HOT DROP★★★TIME UPNo stars this time · try again1/9 stages · 4.9 km · ★★★ 04:30."},"gameSec":379,"teleports":0,"nan":0,"unstuck":0,"cp":[],"vmax":141,"truckMax":94,"vh":{"0":2965,"10":1118,"20":1043,"30":3215,"40":4664,"50":3331,"60":1430,"70":1229,"80":931,"90":817,"100":705,"110":563,"120":618,"130":103,"140":3},"stages":[{"f":1,"s":"0:follow","x":2064,"z":0},{"f":7096,"s":"1:thieves","x":443,"z":-376},{"f":22754,"s":"-","x":-396,"z":-852}],"errs":[]}
+CAMJ {"f":16,"d":73.2,"stage":"0:follow","cs":false,"fade":true}
+CAMJ {"f":7096,"d":58.3,"stage":"1:thieves","cs":true,"fade":true}
+CAMJ {"f":7099,"d":58.6,"stage":"1:thieves","cs":false,"fade":true}

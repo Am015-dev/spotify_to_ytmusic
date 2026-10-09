@@ -1,0 +1,86 @@
+[
+ {
+  "wrecks": 0,
+  "form": "ship",
+  "road": "autobahn",
+  "cls": "spSport",
+  "veh": "car",
+  "onAB": true,
+  "inCity": false,
+  "top": {
+   "max": 230,
+   "plateau": 12,
+   "t100": 4.1,
+   "hud": 6
+  },
+  "boost": {
+   "max": 198,
+   "plateau": 70,
+   "t100": 2,
+   "hud": 24
+  }
+ },
+ {
+  "wrecks": 0,
+  "form": "ship",
+  "road": "city",
+  "cls": "spSport",
+  "veh": "car",
+  "onAB": false,
+  "inCity": true,
+  "top": {
+   "max": 214,
+   "plateau": 193,
+   "t100": 4.1,
+   "hud": 214
+  },
+  "boost": {
+   "max": 235,
+   "plateau": 234,
+   "t100": 0,
+   "hud": 236
+  }
+ },
+ {
+  "wrecks": 0,
+  "form": "offroad",
+  "road": "autobahn",
+  "cls": "spSuv",
+  "veh": "4x4",
+  "onAB": true,
+  "inCity": false,
+  "top": {
+   "max": 157,
+   "plateau": 157,
+   "t100": 4.4,
+   "hud": 157
+  },
+  "boost": {
+   "max": 184,
+   "plateau": 184,
+   "t100": 0,
+   "hud": 185
+  }
+ },
+ {
+  "wrecks": 0,
+  "form": "offroad",
+  "road": "city",
+  "cls": "spSuv",
+  "veh": "4x4",
+  "onAB": false,
+  "inCity": true,
+  "top": {
+   "max": 144,
+   "plateau": 138,
+   "t100": 4.8,
+   "hud": 130
+  },
+  "boost": {
+   "max": 151,
+   "plateau": 33,
+   "t100": 0,
+   "hud": 2
+  }
+ }
+]

@@ -1,0 +1,2 @@
+ath life def [{"calls":214,"tris":948211,"msRender":32.6,"msCpu":5.57,"peds":74,"meshes":1165,"inst":46611,"lv":0.088},{"calls":298,"tris":1222498,"msRender":625.6,"msCpu":5.78,"peds":74,"meshes":1246,"inst":50009,"lv":0.08},{"calls":220,"tris":764238,"msRender":17.1,"msCpu":6.41,"peds":74,"meshes":1037,"inst":29070,"lv":0.069}] AVG calls 244 tris 978315.67 cpu 5.92 render 225.1
+errors 0 

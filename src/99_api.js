@@ -47,9 +47,9 @@ posShip=(f=>function(s,dt,snap){f(s,dt,snap);try{if(!s||!s.mesh||(s.wreck&&s.dea
 const CR_VMAX=174/3.6,CR_VBOOST=224/3.6;
 const CR_acc=(v,vm,b)=>Math.max(0,(b?14:7.5)*(1-Math.pow(Math.max(0,v)/vm,2)));
 roamStep=(f=>function(dt){if(state!=='roam'||!pl||RO.wk||RO.frozen||!dt)return f(dt);const v0=RO.v||0,nb0=typeof SC_S!=='undefined'?SC_S.nb:0,air0=!!pl.air,c=CTL||{};
- if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),5*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
+ if(RO.crTurn!=null&&Math.abs(c.steer||0)>.3)RO.crTurn=null;if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),W14_PIV*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
  const r=f(dt);if(RO.wk||!pl)return r;const bumped=(typeof SC_S!=='undefined'?SC_S.nb:0)!==nb0;
- if(!bumped&&!air0&&!pl.air){const boost=!!(RO.boosting||RO.turbo>0),vm=boost?CR_VBOOST:CR_VMAX;
+ if(!bumped&&!air0&&!pl.air){const boost=!!(RO.boosting||RO.turbo>0),vm=TUNE.spOn&&RO.qsV?(boost?RO.qsVB:RO.qsV)/* v88z: class top speeds (98qs_speed.js) */:boost?CR_VBOOST:CR_VMAX;
   if(RO.v>v0&&RO.v>0)RO.v=Math.min(RO.v,v0+CR_acc(v0,vm,boost)*dt);
   if(RO.v>vm)RO.v=Math.max(vm,Math.min(RO.v,v0)-(Math.min(RO.v,v0)-vm)*1.6*dt);
   if(c.brk&&v0>0&&RO.v<v0)RO.v=Math.max(RO.v,v0-11*dt)}
@@ -124,11 +124,14 @@ const CR_HB={el:null,pool:[],v:V3()};
 function CR_hbStep(){let E=CR_HB.el;if(!E){E=CR_HB.el=document.createElement('div');E.id='crHB';document.body.appendChild(E)}
  const on=state==='race'&&pl&&!CC&&!paused;if(!on){if(E.childElementCount)for(const d of CR_HB.pool)d.style.display='none';return}
  const L=[];for(const s of ships){if(s===pl||s.dead>0||s.eliminated||s.finished)continue;const dd=s.dist-pl.dist;if(dd<-12||dd>90)continue;L.push([Math.abs(dd),s])}L.sort((a,b)=>a[0]-b[0]);
- let k=0;const P=[];for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
-  const sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;if(P.some(q=>Math.abs(q[0]-sx)<84&&Math.abs(q[1]-sy)<40))continue;P.push([sx,sy]);
-  let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}k++;
-  const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl}
-  b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.display='';d.style.left=((v.x+1)/2*innerWidth).toFixed(0)+'px';d.style.top=((1-v.y)/2*innerHeight).toFixed(0)+'px'}
+ // FX19: only the nearest 3 rivals get a tag (3rd one faded); a tag that would overlap one already placed is stacked above it, else hidden
+ let k=0;const P=[];for(const[,s]of L.slice(0,3)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
+  let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}
+  const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl;d._w=0}
+  if(d.style.display==='none'){d.style.visibility='hidden';d.style.display=''}if(!d._w){d._w=d.offsetWidth||90;d._h=d.offsetHeight||40}
+  const sx=(v.x+1)/2*innerWidth,w=d._w+8,th=d._h+4,hit=y=>P.some(q=>Math.abs(q[0]-sx)<(q[2]+w)/2&&Math.abs(q[1]-y)<(q[3]+th)/2);let sy=(1-v.y)/2*innerHeight;
+  for(let t=0;t<2&&hit(sy);t++)sy-=th;if(hit(sy)||sy-th<34){d.style.display='none';d.style.visibility='';continue}P.push([sx,sy,w,th]);k++;
+  b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.visibility='';d.style.display='';d.style.opacity=k>2?'.45':'1';d.style.left=sx.toFixed(0)+'px';d.style.top=sy.toFixed(0)+'px'}
  for(let i=k;i<CR_HB.pool.length;i++)CR_HB.pool[i].style.display='none'}
 // ---- CAR25: race camera never leaves the track box (walls at +-HALF)
 const _cr25F=mkF(),CR_CAMX={pre:0,n:0},CR_WL=[];
@@ -143,7 +146,7 @@ html body #tL.crSmF,html body #tR.crSmF{animation:crSmF .35s ease-out;background
 @media (max-height:520px){#crSmPop{font-size:30px}}
 body.crSmOn #roamTut{visibility:hidden!important}
 #crSmHint{position:fixed;left:-999px;top:0;z-index:7;pointer-events:none;font:900 13px/1 system-ui,sans-serif;letter-spacing:.06em;color:#241400;background:#ffd12c;border:2px solid #141413;border-radius:999px;padding:5px 10px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.35);display:none}
-#crSmHint.on{display:block;animation:crSmH 1.6s ease-in-out infinite}@keyframes crSmH{50%{transform:translateY(-3px)}}body.cine #crSmHint,body.cine #crSmPop{display:none}`;document.head.appendChild(st)})();
+#crSmHint.on{display:block;animation:crSmH 1.6s ease-in-out infinite}@keyframes crSmH{50%{transform:translateY(-3px)}}body.cine #crSmHint,body.cine #crSmPop{display:none}body.odPanel #crSmHint,body.odPanel #roamPrompt,body.odPanel #roamTut,body.odPanel #roamPop,body.odPanel #hitPop,body.odPanel #roamCombo,body.odPanel #crSmPop{display:none!important}`;document.head.appendChild(st)})();
 for(const ev of['dblclick','gesturestart','gesturechange'])document.addEventListener(ev,e=>{if(state==='roam'||state==='race'||state==='countdown')e.preventDefault()},{passive:false});
 const CRSM={d:0,t:-1e9,b:null,n:0,hn:0,pt:0,pd:0,acc:0};try{CRSM.hn=+(localStorage.getItem('mho_smHint')||0)||0}catch(e){}
 function CRSM_ts(e){const n=performance.now(),t=e&&e.timeStamp;return typeof t==='number'&&t>0&&Math.abs(n-t)<2000?t:n}
@@ -179,9 +182,12 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
  const r=f(t,col);try{const e=document.getElementById('hitPop'),u=document.getElementById('roamTut');if(e&&u&&!u.hidden&&u.getClientRects().length){const a=e.getBoundingClientRect(),b=u.getBoundingClientRect(),cx=(a.left+a.right)/2,cy=(a.top+a.bottom)/2,w=e.offsetWidth*1.2/2+6,h=e.offsetHeight*1.2/2+6;
   if(cx-w<b.right&&cx+w>b.left&&cy-h<b.bottom&&cy+h>b.top)CRSM_tutHide(1150)}}catch(e){}return r})(hitPop);
 // first-time hint above the arrows until 2 SMASHes
+// R3b: HUD hints (smash hint, prompts, tutorial, pops) hide while any panel or overlay is open
+const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
+function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
 function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='TAP TAP = SMASH';document.body.appendChild(h)}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
- const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk));
+ const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
  h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-8))+'px'}
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
@@ -191,6 +197,7 @@ placeTraffic=(f=>function(c,a,b){f(c,a,b);try{if(RC&&RC.type==='junction'){c.x=c
 window.__cr25={get cars(){return HUB.cars},get ships(){return ships},get traffic(){return traffic},get W(){return W},get HALF(){return HALF},get MARGIN(){return MARGIN},get CC(){return !!CC},cam:CR_CAMX,wl:CR_WL,get LS(){return CR_LS},demo(x,y,z,h){const g=CR_grp(CR_car({body:'#d01712',acc:'#fac80a',wing:'#fac80a'}),'cr25demo');const b=new THREE.Box3().setFromObject(g),k=2.05/(b.max.x-b.min.x);g.scale.setScalar(k);g.position.set(x,y-b.min.y*k+.03,z);g.rotation.y=h;scene.add(g);return g}};
 updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((state!=='race'&&state!=='countdown'&&state!=='finished')||!TD)return;const s=CC&&CC.s?CC.s:pl;if(!s)return;
  frameAt(TD,s.dist,F2);const c=camera.position,al=(c.x-F2.p.x)*F2.t.x+(c.y-F2.p.y)*F2.t.y+(c.z-F2.p.z)*F2.t.z;frameAt(TD,s.dist+al,_cr25F);const F=_cr25F;
- const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);if(Math.abs(l)<=lim)return;CR_CAMX.n++;const dl=Math.sign(l)*lim-l;c.addScaledVector(F.r,dl);
+ const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);const CB=typeof R15_camB==='function'?R15_camB(s.dist+al):null,lo=CB?CB[0]:-lim,hi=CB?CB[1]:lim;if(l>=lo&&l<=hi)return;CR_CAMX.n++;const dl=(l>hi?hi:lo)-l;c.addScaledVector(F.r,dl);
  if(CC&&CC.s){const w=CC.s;camera.lookAt(w.mesh.position.clone().add(w.mesh.userData.m.position))}else camera.lookAt(camLook)}catch(e){}})(updateCam);
+try{Object.defineProperty(window.__mho,'foot',{get:()=>OF_api(),configurable:true})}catch(e){} // v89a on foot (98of_onfoot.js)
 </script>
