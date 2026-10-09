@@ -434,7 +434,7 @@ svg{display:block}
 /* ---- pop-ups ---- */
 .ppop,.pcard{position:absolute;left:0;right:0;background:var(--paper);display:flex;flex-direction:column;z-index:12;box-shadow:0 -4px 14px rgba(0,0,0,.35);border-top:3px solid var(--wood2)}
 .ppop[hidden],.pcard[hidden]{display:none}
-.pcard{top:0;bottom:0;z-index:14}
+.pcard{top:0;bottom:0;z-index:48}
 .ph-head{display:flex;align-items:center;gap:6px;padding:6px 8px 4px 12px;flex:0 0 auto;background:var(--paper2);border-bottom:1px solid rgba(0,0,0,.15)}
 .ph-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.ph-t b{font-size:16px}.ph-t span{font-size:13px;opacity:.75}
 .px{appearance:none;border:2px solid var(--ink);background:#fff8e6;border-radius:10px;width:44px;height:44px;font-size:26px;line-height:1;cursor:pointer;flex:0 0 auto}
@@ -6798,7 +6798,8 @@ function tutOffer(go) {
 // ===================== part 13: painted extras (card backs, tables, title and end art, portraits) and music (per screen + picker) =====================
 const MEDIA = 'media/';
 const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
-const preImg = f => { const i = new Image(); i.src = MEDIA + f + '.webp'; };
+const IMG_OK = {};
+const preImg = f => { const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };
 // ---- card backs: the deck tile and the help pictures wear the painted back; campaign unlocks (sprout, frost) replace the default
 function backApply() {
   const R = document.documentElement, id = unl('cardback') || 'default';
@@ -6828,7 +6829,8 @@ function hbWon() {
 }
 function endBanner() {
   const pc = $('#pc'); if (!pc || pc.getAttribute('data-card') !== 'over' || pc.querySelector('.endart')) return;
-  pc.insertBefore(h('div.endart.' + (hbWon() ? 'win' : 'lose'), { 'aria-hidden': 'true' }), pc.firstChild);
+  const w = hbWon(); if (!IMG_OK[w ? 'end-win' : 'end-lose']) return;
+  pc.insertBefore(h('div.endart.' + (w ? 'win' : 'lose'), { 'aria-hidden': 'true' }), pc.firstChild);
 }
 // ---- campaign portraits on the rival drawer
 function portraitFor(name) {

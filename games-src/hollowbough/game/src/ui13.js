@@ -1,7 +1,8 @@
 // ===================== part 13: painted extras (card backs, tables, title and end art, portraits) and music (per screen + picker) =====================
 const MEDIA = 'media/';
 const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
-const preImg = f => { const i = new Image(); i.src = MEDIA + f + '.webp'; };
+const IMG_OK = {};
+const preImg = f => { const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };
 // ---- card backs: the deck tile and the help pictures wear the painted back; campaign unlocks (sprout, frost) replace the default
 function backApply() {
   const R = document.documentElement, id = unl('cardback') || 'default';
@@ -31,7 +32,8 @@ function hbWon() {
 }
 function endBanner() {
   const pc = $('#pc'); if (!pc || pc.getAttribute('data-card') !== 'over' || pc.querySelector('.endart')) return;
-  pc.insertBefore(h('div.endart.' + (hbWon() ? 'win' : 'lose'), { 'aria-hidden': 'true' }), pc.firstChild);
+  const w = hbWon(); if (!IMG_OK[w ? 'end-win' : 'end-lose']) return;
+  pc.insertBefore(h('div.endart.' + (w ? 'win' : 'lose'), { 'aria-hidden': 'true' }), pc.firstChild);
 }
 // ---- campaign portraits on the rival drawer
 function portraitFor(name) {

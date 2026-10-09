@@ -17,7 +17,12 @@ function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>>
 async function playGame(browser, W, H, gi, mode) {
   const tag = `${W}x${H} g${gi}`, R = rng(1000 + gi * 7 + W);
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
-  await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+  // the page is served from memory; its painted media (title, tables, backs, portraits, end art) come from games/hollowbough/media so the real layout is swept; music files stay blocked
+  const MEDIA = path.join(__dirname, '..', '..', '..', 'games', 'hollowbough', 'media');
+  await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort();
+    if (u.pathname.startsWith('/media/')) { const f = path.join(MEDIA, path.basename(u.pathname)); return fs.existsSync(f) ? r.fulfill({ status: 200, contentType: 'image/webp', body: fs.readFileSync(f) }) : r.abort(); }
+    if (u.pathname.startsWith('/music/')) return r.abort();
+    return r.fulfill({ status: 200, contentType: 'text/html', body: html }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(8000);
   p.on('pageerror', e => fail(tag, 'pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) fail(tag, 'console ' + m.text().slice(0, 100)); });
   await p.goto('https://gns.test/'); await sleep(500);
