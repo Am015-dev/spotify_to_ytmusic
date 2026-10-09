@@ -135,8 +135,8 @@ const OD_CHECKLIST=[
  const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver))};
  let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
  // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
- // RF5: hidden while driving an event (the chip sat on the big FINISH place text), folded to its chip on the results card (the open card covered "Nth PLACE")
- const pinCd=()=>{try{return state==='results'}catch(e){return false}},pinRun=()=>{try{return state==='countdown'||state==='race'||state==='finished'}catch(e){return false}};
+ // RF5 (reviewer): folded chip in races, parked under LAP; hidden only while the big FINISH place text shows; on results at the card's top-right corner
+ const pinCd=()=>{try{return state==='countdown'||state==='race'||state==='results'}catch(e){return false}},pinRun=()=>{try{return state==='finished'}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
@@ -149,6 +149,9 @@ const OD_CHECKLIST=[
   pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
  // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
  const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
+  {const st=(()=>{try{return state}catch(e){return''}})(),at=(x,y)=>{pin.style.transform='none';pin.style.width='';pin.style.left=Math.round(x)+'px';pin.style.top=Math.round(y)+'px'};
+   if(st==='countdown'||st==='race'){const l=document.getElementById('lap');if(vis(l)){const r=l.getBoundingClientRect();at(r.left,r.bottom+10);return}}
+   if(st==='results'){const c=document.querySelector('#results .card');if(vis(c)){const r=c.getBoundingClientRect();at(r.right-12-pin.offsetWidth,r.top+8);return}}}
   if(!vis(X)){pin.style.left='';pin.style.width='';pin.style.transform='';
    // roam / race / missions: below the objective line (quest tracker, objective pill) when it sits at the top centre
    if(innerWidth>900&&innerHeight>500){const g=document.querySelector('#tuG,#tuB,[id^="tu"][id$="G"]');let t=108;if(vis(g)){const r=g.getBoundingClientRect();if(r.top<160&&r.right>innerWidth-120)t=Math.round(r.bottom)+10}

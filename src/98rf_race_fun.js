@@ -25,7 +25,7 @@ function RF_popEl(){if(RFX.el)return RFX.el;const e=document.createElement('div'
   document.body.appendChild(e);return RFX.el=e}
 function RF_pop(){if(!pl||!RC||!['race','elim'].includes(RC.type))return;const e=RF_popEl();
   if(state==='race'&&raceT>1.5&&RFX.place&&pl.place!==RFX.place){const up=pl.place<RFX.place;e.textContent=(up?'▲ ':'▼ ')+ord(pl.place).toUpperCase();e.style.color=up?'#7dff6a':'#ff5a6a';
-    const p=hudEl.pos&&hudEl.pos.getBoundingClientRect();if(p&&p.width){const g=document.getElementById('tuG'),gr=g&&g.offsetParent?g.getBoundingClientRect():null,top=p.bottom+4,r=gr&&gr.width&&gr.bottom>top&&gr.top<top+30?innerWidth-gr.left+6:innerWidth-p.right;/* RF5: left of the ⚙ button, not under it */e.style.top=Math.round(top)+'px';e.style.right=Math.round(r)+'px';e.style.left='auto'}e.style.opacity=1;RFX.popT=performance.now()+1300;if(up&&AU.sfx)AU.sfx('pick')}
+    const p=hudEl.pos&&hudEl.pos.getBoundingClientRect();if(p&&p.width){const g=document.getElementById('tuG'),gr=g&&g.getClientRects().length?g.getBoundingClientRect():null,top=p.bottom+4,r=gr&&gr.width&&gr.bottom>top&&gr.top<top+30?innerWidth-gr.left+8:innerWidth-p.right;/* RF5: left of the ⚙ button, not under it */e.style.top=Math.round(top)+'px';e.style.right=Math.round(r)+'px';e.style.left='auto'}e.style.opacity=1;RFX.popT=performance.now()+1300;if(up&&AU.sfx)AU.sfx('pick')}
   RFX.place=pl.place;if(RFX.popT&&performance.now()>RFX.popT){e.style.opacity=0;RFX.popT=0}if(state!=='race'&&state!=='finished')e.style.opacity=0}
 updHud=(f=>function(){f.apply(this,arguments);try{RF_pop()}catch(e){}})(updHud);
 // countdown showcase + finish orbit (only the camera; the chase camera keeps running underneath so the cut back is clean)
