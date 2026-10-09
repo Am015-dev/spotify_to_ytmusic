@@ -29,5 +29,16 @@ Draft PR #75 (base alex/od-src) only tracks the branch; deploys go through revie
   traffic 0.032; ERR []. Iframe (t4/g12/iframe): canvas → group → save → back OK, then the 30-min job limit (append step not reached).
 - Test nit: the flow places 5 of 6 / selects 4 (taps on cells next to each other sometimes miss); the part still saves and appends.
 
+## REVIEW ab755a4 = FAIL (reviewer session_01Y6FYerWwxv43FuKUcaUT4v, 2026-10-09): feature good, 4 UI defects to fix
+1. 08_append_ghost: the held-part pad #gsBar (PLACE/TURN/DROP/UP/DOWN, left column) overlaps the palette chip row (#gxCh) and the left tile
+   column (CANVAS card, Group 1 card). Fix: while a part is held/carried, the pad owns its column (hide the left tiles, shift the chip row right).
+2. 10_appended_34: the selection bar #slBar (8 buttons) overlaps the chip row: "MAKE GROU" clipped under ★ FAVS, NONE too. Same fix while SELECT is active.
+   Likely cause: my My-parts cards + chip row in the big palette sit at the left where #gsBar/#slBar live (check R2_calc / gxBig layout in 98gx + 98u).
+3. 08 + 10: the checklist strip (#odPin, "1/10 Drive slowly…") is EXPANDED in BUILD; it must stay the chip in garage modes (07 shows it right).
+   Something in the append / selection flow re-expands it. Note my `body.paOn #odPin{display:none}` only applies on the canvas.
+4. 08: the appended part's ghost is not visible on the car (it sits on the roof at y=12, likely hidden by layer view / HIDE UP ghosting).
+   Make the carried ghost clearly visible (outline or translucent, above the layer ghosting); re-shoot.
+Then re-send REVIEW as QUICK with 08, 10 and one iframe frame.
+
 ## Open / next
 - Before DEPLOY: merge alex/od-world, alex/od-quick, live; OD_CHANGELOG v88y entry (top of src/10_core.js); 99c checklist items; build split out/v88y.
