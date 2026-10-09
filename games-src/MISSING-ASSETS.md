@@ -42,7 +42,7 @@ Style block (paste in front of every art prompt for this game):
 
 **Clampede (the only monster without a picture)**
 
-- [ ] `games/crown-city-smash/camp-clampede.webp` (1:1, target 512x512 WebP)
+- [x] `games/crown-city-smash/camp-clampede.webp` (1:1, target 512x512 WebP)
   - Prompt: Clampede, a clam-headed centipede monster with a teal shell, many little legs and a toothy grin, crawling out of a glowing portal in a night city, bust portrait, centred
 - [ ] `games/crown-city-smash/cut-clampede.webp` (1:1 on plain white or transparent, we key it)
   - Prompt: the same Clampede, full body, front three-quarter view, cut-out on a plain white background, same framing as the other cut-*.webp monsters
@@ -53,22 +53,22 @@ Style block (paste in front of every art prompt for this game):
 - [ ] `games/crown-city-smash/media/back-bulletin.webp` (3:4, target 300x426 WebP)
   - Prompt: a card back made of old newspaper print texture with one bold black-ink star in the centre, only grey scribble lines instead of readable words, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock "Bulletin newsprint card back".
-- [ ] `games/crown-city-smash/media/back-brass-beetle.webp` (3:4, target 300x426 WebP)
+- [x] `games/crown-city-smash/media/back-brass-beetle.webp` (3:4, target 300x426 WebP)
   - Prompt: a brass clockwork scarab beetle emblem in the centre of a dark teal card back, riveted border, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock "Brass Beetle card back".
-- [ ] `games/crown-city-smash/media/table-harbor-night.webp` (16:9, target 1376x768 WebP)
+- [x] `games/crown-city-smash/media/table-harbor-night.webp` (16:9, target 1376x768 WebP)
   - Prompt: a city harbour at night: dark water, wooden piers, neon reflections at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign table unlock "Harbor at Night".
-- [ ] `games/crown-city-smash/media/table-spire-gold.webp` (16:9, target 1376x768 WebP)
+- [x] `games/crown-city-smash/media/table-spire-gold.webp` (16:9, target 1376x768 WebP)
   - Prompt: a golden plaza paving with an art-deco star inlay, brass railings at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign table unlock "Golden Spire".
-- [ ] `games/crown-city-smash/media/title.webp` (16:9, target 1302x726 WebP)
+- [x] `games/crown-city-smash/media/title.webp` (16:9, target 1302x726 WebP)
   - Prompt: giant friendly monsters (a boar with lightning tusks, a one-eyed squid, a lava crab, a mushroom brute, a robot) stomping through a neon city at night, a golden crown glinting above the tallest tower, keep the top of the picture calm and clear for the game logo
-- [ ] `games/crown-city-smash/media/title-phone.webp` (9:16, target 744x1334 WebP)
+- [x] `games/crown-city-smash/media/title-phone.webp` (9:16, target 744x1334 WebP)
   - Prompt: giant friendly monsters (a boar with lightning tusks, a one-eyed squid, a lava crab, a mushroom brute, a robot) stomping through a neon city at night, a golden crown glinting above the tallest tower, keep the top of the picture calm and clear for the game logo, portrait orientation
-- [ ] `games/crown-city-smash/media/end-win.webp` (16:9, target 1302x726 WebP)
+- [x] `games/crown-city-smash/media/end-win.webp` (16:9, target 1302x726 WebP)
   - Prompt: the winning monster on top of the tallest skyscraper wearing a golden crown, confetti and fireworks, other monsters cheering below, no text
-- [ ] `games/crown-city-smash/media/end-lose.webp` (16:9, target 1302x726 WebP)
+- [x] `games/crown-city-smash/media/end-lose.webp` (16:9, target 1302x726 WebP)
   - Prompt: the monster flattened in a smoky street with dizzy stars circling its head, its dropped crown rolling away, no text
 
 **Music (none new yet: one CC0 loop is in the game)**
