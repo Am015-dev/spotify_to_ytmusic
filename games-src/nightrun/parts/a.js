@@ -52,7 +52,7 @@ const FX=()=>[0,.25,1][SET.flash];                      // strength of screen fl
 /* ---------- beat clock ---------- */
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
 // currentTime when audio runs, and a plain game-time counter (fbT) when it does not, so the game also works silent.
-const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,boss2:140,endless:132,endless2:132};
+const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,boss2:140,endless:132,endless2:132,athina:123.35,athina2:90,boss3:118};   // synth fallback tempo = the measured tempo of the song files (a missing file must not give NaN)
 const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds -> whole bars
 /* A district lasts as long as its song: SONGM (parts/songs.js, made by analysis/song-energy.py) has every song's length in bars and its loudness per bar.
    A song that was decoded in this page wins over the table (same bpm and offset), so a replaced mp3 still sets the length. The boss comes in the last 32 bars. */

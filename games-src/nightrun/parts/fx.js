@@ -23,5 +23,8 @@ const FXV={
     ctx.restore();},
   bullets(){                                             // dark rim + bright body + white core: readable on every backdrop (high contrast: bigger, with a white halo)
     if(!G.eb.length)return;const hc=SET.hc;
-    for(const [col,k] of hc?[['#ffffff',1.7],['#07030f',1.4],[BULLET,1.05],['#ffffff',.45]]:[['#07030f',1.2],[BULLET,.9],['#ffffff',.4]]){ctx.fillStyle=col;ctx.beginPath();for(const b of G.eb){const r=b.r*k;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}}
+    const pb=!hc&&ART.sp('fx-bullet-enemy',5*2*1.5);                         // painted lime orb in place of the flat body (the dark rim and white core stay)
+    for(const [col,k] of hc?[['#ffffff',1.7],['#07030f',1.4],[BULLET,1.05],['#ffffff',.45]]:[['#07030f',1.2],[BULLET,.9],['#ffffff',.4]]){
+      if(pb&&k===.9){ctx.globalCompositeOperation='lighter';for(const b of G.eb){const w=b.r*3.1;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalCompositeOperation='source-over';continue;}
+      ctx.fillStyle=col;ctx.beginPath();for(const b of G.eb){const r=b.r*k;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}}
 };

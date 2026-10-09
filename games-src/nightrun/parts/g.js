@@ -3,8 +3,17 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='H1';
+const NR_VER='I1';
 const NR_CHECKLIST=[
+ {ver:'I1',id:'ships',text:'Your ship is now a painted ship. Pick each ship in the garage (Courier, Triplet, Half-time Heavy, Echo, Swing, Synth): each looks different in the garage card and in the run, with a flickering engine jet that follows the beat.'},
+ {ver:'I1',id:'enemies',text:'Drones (with spinning rotors), turrets (the barrel turns to aim), chargers, gunships, gates, flankers, swarm and mines are painted sprites that bob a little and flash white when hit. Hit boxes feel the same as before.'},
+ {ver:'I1',id:'bosses',text:'Each boss is a painted boss: Adler, Flusskrake, Zentral-ICE, Kronos, Talos (Athens) and the Hoplite mini-boss. A phase change pulses a glow, hits tint it red, and the boss portrait shows above the warning banner.'},
+ {ver:'I1',id:'backdrops',text:'Every district has a painted night backdrop with painted skyline strips that scroll at different speeds (phone upright: a painted portrait backdrop). It is dimmed so shots and bullets stay easy to read.'},
+ {ver:'I1',id:'effects',text:'Shots, muzzle flashes, hit sparks, explosions (bigger for gunships and bosses) and the EMP shockwave are painted light effects. Enemy bullets are still the brightest, easiest things to see on screen.'},
+ {ver:'I1',id:'pickups',text:'Shards (spinning), hull, weapon upgrade, EMP and the four music power coins (Drum, Tempo, Slow, Drop) are painted pickups, also in the power-up bar.'},
+ {ver:'I1',id:'title-end',text:'Title screen, GAME OVER and STAGE CLEAR now have painted key art behind the text, in landscape and on a phone held upright. Buttons stay readable and tappable.'},
+ {ver:'I1',id:'athina-music',text:'Athens (stages 13 to 16 and free play) has its own music, and TALOS has his own boss track. Dash and shoot on the beat: the PERFECT ring still meets the beat.'},
+ {ver:'I1',id:'perf-art',text:'Nothing got slower: a whole stage and a boss fight with the new art run as smoothly as before (FPS counter in settings), also on a phone.'},
  {ver:'H1',id:'afk',text:'Stop moving with your best guns: within about 30 seconds (20 on Hard) a red lane locks on your row and a beam hits you, and enemies shoot faster. Moving away always dodges it.'},
  {ver:'H1',id:'afk-score',text:'Standing still pays less and less: kills score far fewer points and your multiplier melts. Keep moving to keep the score.'},
  {ver:'H1',id:'fewer',text:'The screen has far fewer enemy bullets (25 at most on Normal, 35 on Hard, 18 on a phone), each one aimed at you and glowing a beat before it fires.'},

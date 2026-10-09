@@ -36,6 +36,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     ctx.textAlign='center';ctx.font='700 12px "Chakra Petch",sans-serif';ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),W/2,24);}
   // banner
   if(G.banner.t>0){const k=G.banner.t,m=G.banner.m,a=Math.min(1,k*2,(m-k)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
+    if(G.banner.pic!=null)ART.portrait(G.banner.pic,W/2,H/2-58-106,100,Math.max(0,a));
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,H/2-58,W,96);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,H/2-58,W,2);ctx.fillRect(0,H/2+36,W,2);
     ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&Math.floor(t*6)%2?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2+4);
@@ -71,6 +72,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#8c86b8';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font=`700 ${17*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(G.hint.txt,w/2,h-170*k);ctx.globalAlpha=1;}
   if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
+    if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,h/2-58*k,w,2);ctx.fillRect(0,h/2+36*k,w,2);
     ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&Math.floor(t*6)%2?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2+4*k);
@@ -79,7 +81,14 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
 
 let PUL=0,PHF=0,FD=0;
 function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.012*(T-1)+.02*(T-1)*PUL*FX();c.fillStyle=TIERC[T-1];c.fillRect(0,0,W,H);c.restore();}   // each tier lifts the whole picture a little
-function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierOf(C.n);
+function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.55,sy;      // the ship's own shots stay thinner and dimmer than the lime enemy bullets
+  if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
+  else if(b.ec){o=ART.sp('fx-shot-ec',30);al=.65;}
+  else if(b.pf&&!b.big){o=ART.sp('fx-shot-perfect',32);al=.8;}
+  else{const L=b.len||(b.big?22:b.pn!=null?28:20);o=ART.tint('fx-shot-std',L*(b.big?1.2:1),b.col||(b.big?'#ffffff':D.b));al=b.big?.8:.55;if(o)sy=Math.max(.8,Math.min(3,(b.th||(b.big?4:3))*.7/o.h));}
+  if(!o)return;const d=o.w/2-10;ART.put(o,b.x+Math.cos(ang)*d,b.y+Math.sin(ang)*d,ang,al,1,sy);
+  if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierOf(C.n);
   const PT=wcv!==cv;                                     // portrait: the world is drawn on its own canvas (landscape coordinates) and turned upright afterwards
   if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);drawBGP(bgFor(G.di),t,dt,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
   else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
@@ -91,13 +100,15 @@ function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierO
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
-  for(const b of G.pb){ctx.globalAlpha=.5;ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+  const PS=ART.have('fx-shot-std');
+  for(const b of G.pb){if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=.5;ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
   ctx.globalAlpha=1;
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
   for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.c,.9);
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
+  ART.fxDraw();
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
@@ -105,7 +116,8 @@ function render(t,dt){FD=dt;G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierO
   ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);
   ctx.restore();
-  if(G.empT>0){ctx.strokeStyle='#ffb020';ctx.lineWidth=6*G.empT;ctx.beginPath();ctx.arc(P.x,P.y,(0.6-G.empT)*1400,0,7);ctx.stroke();}
+  if(G.empT>0&&ART.wave(P.x,P.y,(0.6-G.empT)*1400,G.empT*2.2)){}
+  else if(G.empT>0){ctx.strokeStyle='#ffb020';ctx.lineWidth=6*G.empT;ctx.beginPath();ctx.arc(P.x,P.y,(0.6-G.empT)*1400,0,7);ctx.stroke();}
   if(G.flash>0){ctx.fillStyle=`rgba(255,255,255,${G.flash*.5})`;ctx.fillRect(0,0,W,H);}
   if(G.glitch>0){for(let i=0;i<6;i++){const y=rnd(0,H),h=rnd(4,26);ctx.drawImage(wcv,0,y*S,wcv.width,h*S,rnd(-20,20),y,W,h);}ctx.fillStyle=`rgba(255,40,80,${G.glitch*.25})`;ctx.fillRect(0,0,W,H);}
   if(running&&T_>1)tierGlow(ctx);
@@ -221,7 +233,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
 [1500,2300,3100].forEach((ms,i)=>setTimeout(()=>{if(!running)bgFor(i+1);},ms));        // build the other districts' skylines while the title is up
-window.__mnr={STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={ART,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,

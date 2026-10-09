@@ -64,6 +64,30 @@
       "offsetMs": 20,
       "title": "Stage Eight Clear",
       "gapMs": 22
+    },
+    {
+      "file": "athina.mp3",
+      "stage": "athina",
+      "bpm": 123.35,
+      "offsetMs": 31,
+      "title": "Neon Aegean",
+      "gapMs": 24
+    },
+    {
+      "file": "athina2.mp3",
+      "stage": "athina2",
+      "bpm": 90.0,
+      "offsetMs": 453,
+      "title": "Stage Select: Athens 2087",
+      "gapMs": 24
+    },
+    {
+      "file": "boss3.mp3",
+      "stage": "boss3",
+      "bpm": 118.0,
+      "offsetMs": 70,
+      "title": "Titan's Threshold",
+      "gapMs": 24
     }
   ]
 }

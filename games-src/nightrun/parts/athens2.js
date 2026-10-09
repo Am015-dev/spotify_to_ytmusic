@@ -18,7 +18,7 @@
   ctx.fillStyle='#e8f2ff';for(let i=0;i<16;i++){const y=wy+4+i*(H-30-wy)/16,hw=3+i*2.2,j=Math.sin(t*1.7+i*1.9);ctx.globalAlpha=.55-.025*i;ctx.fillRect(mx+j*(2+i*.9)-hw,y,hw*2,1.4);}
   ctx.globalAlpha=1;ctx.restore();};}
 {const db=drawBG;drawBG=function(bg,t,dt,scroll){db(bg,t,dt,scroll);
-  if(bg.D.name!=='ATHINA')return;ctx.save();ctx.globalCompositeOperation='lighter';const mx=W*.64,my=H*.2;G_(mx,my,120,'#bcd6ff',.2);ctx.globalCompositeOperation='source-over';
+  if(bg.D.name!=='ATHINA'||bg._p)return;ctx.save();ctx.globalCompositeOperation='lighter';const mx=W*.64,my=H*.2;G_(mx,my,120,'#bcd6ff',.2);ctx.globalCompositeOperation='source-over';
   ctx.fillStyle='#f4f1e6';ctx.beginPath();ctx.arc(mx,my,17,0,7);ctx.fill();ctx.fillStyle='#d6d9e8';ctx.beginPath();ctx.arc(mx+5,my-3,5,0,7);ctx.arc(mx-6,my+6,3.5,0,7);ctx.fill();ctx.restore();};}
 
 /* ----- portrait ----- */
@@ -88,7 +88,7 @@ const drawAthensP=(bg,t,dt,scroll)=>{const D=bg.D,L=ATHP||(ATHP=buildAthensP());
   {const o=(scroll*.5)%L.near.h;ctx.globalAlpha=.86;ctx.drawImage(L.near.c,0,o-L.near.h,PW_,L.near.h);ctx.drawImage(L.near.c,0,o,PW_,L.near.h);ctx.globalAlpha=1;}
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#e8f2ff';for(let i=0;i<12;i++){const y=((i*83+scroll*.35)%PH_+PH_)%PH_,x=24+((i*47)%70);ctx.globalAlpha=.16+.1*Math.sin(t*2+i);ctx.fillRect(x,y,12+(i%4)*5,1.5);}ctx.restore();   // glints on the sea
   const hz=ctx.createLinearGradient(0,PH_-260,0,PH_);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'30');ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);};
-{const dbp=drawBGP;drawBGP=function(bg,t,dt,scroll){if(bg.D.name==='ATHINA')drawAthensP(bg,t,dt,scroll);else dbp(bg,t,dt,scroll);};}
+{const dbp=drawBGP;drawBGP=function(bg,t,dt,scroll){if(bg.D.name==='ATHINA'&&!ART.bm['bg-athina-phone'])drawAthensP(bg,t,dt,scroll);else dbp(bg,t,dt,scroll);};}
 NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});            // the pit stop freezes the world: build the Athens backdrops there, not when the district starts
 // the colour theme switch clears the caches
 {const pc=applyPal;applyPal=function(){const was=palOn;pc();if(palOn!==was)ATHP=null;};}

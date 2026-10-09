@@ -103,6 +103,7 @@ function skyFor(bg,port){const w=cv.width,h=cv.height,s=SKYS[port?'p':'l'];if(s&
   SKYS[port?'p':'l']={bg,c};return c;}
 
 function drawBG(bg,t,dt,scroll){const D=bg.D;
+  if(ART.paintBG(bg,t,scroll))return;                    // painted backdrop + painted parallax strips (art.js); the procedural sky and skylines below are the fallback
   ctx.drawImage(skyFor(bg,false),0,0,W,H);                // sky gradient + moon haze, drawn once per district and size (see skyFor)
   ctx.save();ctx.globalAlpha=.1;ctx.font='700 46px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;
   const adw=(bg.adw||(bg.adw=ctx.measureText(D.ad).width))+400;const ax=W-((scroll*.06)%(adw+W));ctx.fillText(D.ad,ax,84);ctx.restore();
@@ -146,7 +147,7 @@ function drawNear(bg,t,scroll){const D=bg.D,ty=H-58;
     const pil=180,po=(scroll*1.3)%pil;ctx.fillStyle='#0b0814';for(let x=-po;x<W+pil;x+=pil){ctx.fillRect(x,ty,16,H-ty);}
     ctx.fillStyle='#0e0a1a';ctx.fillRect(0,ty,W,12);ctx.fillStyle=D.a;ctx.fillRect(0,ty,W,1.5);
     if(D.near==='street'){const lo=(scroll*1.3)%120;ctx.globalCompositeOperation='lighter';for(let x=-lo;x<W+120;x+=120){G_(x+8,ty-4,18,D.b,.5);}ctx.globalCompositeOperation='source-over';}
-    trainX-=scroll>0?7:0;if(trainX<-900)trainX=W+rnd(800,2600);
+    trainX-=scroll>0?420*FD:0;if(trainX<-900)trainX=W+rnd(800,2600);
     if(trainX<W){ctx.fillStyle='#120c20';ctx.fillRect(trainX,ty-26,820,24);ctx.fillStyle=D.b;for(let k=0;k<40;k++)ctx.fillRect(trainX+8+k*20,ty-20,12,8);
       ctx.globalCompositeOperation='lighter';G_(trainX,ty-14,20,'#ffffff',.8);ctx.globalCompositeOperation='source-over';
       ctx.font='700 11px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText('S8 → FLUGHAFEN',trainX+40,ty-30);}
@@ -172,12 +173,12 @@ function buildBGP(i){const D=DISTRICTS[i];
 const BGPC={};function bgpFor(i){return BGPC[i]||(BGPC[i]=buildBGP(i));}
 
 function drawBGP(bg,t,dt,scroll){const D=bg.D,L=bgpFor(DISTRICTS.indexOf(D));
-  ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);
-  for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
+  const PA=ART.paintP(bg,scroll);if(!PA)ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);   // painted phone backdrop, the roofs on top fainter
+  for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=PA?0:al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
   ctx.globalAlpha=1;
-  if(D.near==='river'){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
+  if(D.near==='river'&&!PA){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';
   ctx.globalCompositeOperation='source-over';
   const hz=bg.hzP||(bg.hzP=(()=>{const q=ctx.createLinearGradient(0,PH_-260,0,PH_);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'30');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);
-  if(D.near==='sea')athensP(bg,t,scroll);
+  if(D.near==='sea'&&!PA)athensP(bg,t,scroll);
 }

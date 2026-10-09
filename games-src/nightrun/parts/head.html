@@ -92,6 +92,15 @@ html.hc #stage{filter:contrast(1.08)}
 html:not(.rdy) #title .row{visibility:hidden;animation:rdyShow 0s 6s forwards}
 @keyframes rdyShow{to{visibility:visible}}
 @media (prefers-reduced-motion:reduce){h1{text-shadow:none}}
+/* painted key art (media/): title, game over, stage clear; ship portraits in the garage */
+#title{background:linear-gradient(90deg,#05030cf2 0%,#05030cc0 42%,#05030c30 100%),#05030c url(media/title.webp) center/cover no-repeat}
+#stage.p #title{background:linear-gradient(180deg,#05030cf0 0%,#05030c99 38%,#05030c44 58%,#05030cdd 100%),#05030c url(media/title-phone.webp) center/cover no-repeat}
+#over{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/end-lose.webp) center/cover no-repeat}
+#stage.p #over{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-lose.webp) 70% center/cover no-repeat}
+#stres{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/end-win.webp) center/cover no-repeat}
+#stage.p #stres{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-win.webp) 70% center/cover no-repeat}
+.pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 0 6px var(--c,#0000))}
+@container (max-aspect-ratio:1/1){.pg .card img.shp{height:clamp(44px,calc(var(--u)*13),72px)}}
 </style></head><body>
 
 <div id="stage"><div id="frame">

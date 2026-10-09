@@ -86,7 +86,7 @@ function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
   const box=$('gaCards');box.innerHTML='';
   for(const it of gaItems()){const own=!it.k||GA.own[it.k],b=document.createElement('button');b.type='button';
     b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
-    const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:svgI(it.ic);
+    const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:it.kind==='ship'?`<img class="shp" src="media/ship-${it.id}.webp" alt="" decoding="async">`:svgI(it.ic);
     const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
     b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
     b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}

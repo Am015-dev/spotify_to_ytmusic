@@ -85,7 +85,8 @@ STAGES.push(
   {n:15,di:ATH,name:'HOPLITE',      intro:'The shield wall walks.',             goal:{k:'mini'},lead:26,   perf:24,waves:['phalanx','wedge','turret'],
      mini:{k:7,nm:'HOPLITE',r:40,pats:ATAB[7],lbl:'H'}},
   {n:16,di:ATH,name:'TALOS',        intro:'Bronze guardian of the harbour.',    goal:{k:'boss'},lead:28,   perf:20,waves:['phalanx','wedge','pillars','gunship','turret']});
-for(const s of STAGES){if(s.n>12){s.song=['stage1','stage2','stage3'][(s.n-1)%3];s.act=3;}}
+for(const s of STAGES){if(s.n>12){s.song=s.n===14?'athina2':'athina';s.act=3;}}   // Athens has its own songs (Treblo, measured grids in music/tracks.json); TALOS switches to 'boss3' (bossStage)
+DISTRICTS[ATH].song='athina';
 ACTN.push('ACT IV');
 TUNE.lv.push(7.8,8.8,8.4,8.6);TUNE.hull.push(5,5,5,5);BOSS_SUB[7]='Shield wall, spear rig';
 KIT.push('dc','hm','sh','wd');
