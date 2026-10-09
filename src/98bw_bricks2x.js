@@ -97,8 +97,11 @@ function BW_lzPre(cam){BWZ.h.length=0;const D=TUNE.wbLzD;if(!D||typeof LAZY==='u
   // HUB-level instanced small things (stud lines, crates, markers) whose whole instance spread is farther than D
   if(!BWZ.hub||BWZ.hubG!==HUB.grp||performance.now()-BWZ.ht>3000){BWZ.hub=[];BWZ.hubG=HUB.grp;BWZ.ht=performance.now();for(const o of HUB.grp.children){if(!o.isInstancedMesh||o.userData.keep||Object.keys(o.userData).length||!o.geometry)continue;const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(g.boundingSphere.radius>=3)continue;if(!o.boundingSphere||o.userData.bwV!==o.instanceMatrix.version){o.computeBoundingSphere();}BWZ.hub.push(o)}}
   for(const o of BWZ.hub){if(!o.visible||!o.parent||!o.boundingSphere)continue;const b=o.boundingSphere.center.clone().applyMatrix4(o.matrixWorld),d=Math.hypot(b.x-cx,b.z-cz)-o.boundingSphere.radius;if(d>D){o.visible=false;BWZ.h.push(o)}}}
+// ramp parts cast shadows only within TUNE.bwRampSh m (each was its own shadow draw: ~15 per frame)
+const BWR={L:[],t:0};function BW_rampSh(cam){const D=TUNE.bwRampSh;if(!D)return;const now=performance.now();if(now-BWR.t>2000){BWR.t=now;BWR.L=[];scene.traverse(o=>{if(o.isMesh&&o.userData.ramp&&(o.castShadow||o.userData.bwCs)){o.userData.bwCs=1;BWR.L.push(o)}})}
+  const e=cam.matrixWorld.elements,cx=e[12],cz=e[14],v=new THREE.Vector3();for(const o of BWR.L){o.getWorldPosition(v);o.castShadow=Math.hypot(v.x-cx,v.z-cz)<D}}
 function BW_lzPost(){for(const o of BWZ.h)o.visible=true;BWZ.h.length=0}
-WB_figPre=(f=>function(cam){try{BW_lzPre(cam)}catch(e){BW_lzPost()}return f.apply(this,arguments)})(WB_figPre);
+WB_figPre=(f=>function(cam){try{BW_lzPre(cam)}catch(e){BW_lzPost()}try{BW_rampSh(cam)}catch(e){}return f.apply(this,arguments)})(WB_figPre);
 WB_figPost=(f=>function(){BW_lzPost();return f.apply(this,arguments)})(WB_figPost);
 // hooks: flag materials + stud update once per perspective render (WB_cityPre runs there); merged soups at WB_cityPrep time
 WB_cityPre=(f=>function(cam){try{BW.U.uBwOn.value=TUNE.bwOn?1:0;BW.U.uBwF.value=TUNE.bwFade;BW.U.uBwC.value=TUNE.bwCourse;if(TUNE.bwOn)BW_flagAll();BW_studPre(cam)}catch(e){if(BW.mesh)BW.mesh.visible=false;BW.err=String(e)}return f.apply(this,arguments)})(WB_cityPre);

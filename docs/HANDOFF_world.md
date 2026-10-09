@@ -19,12 +19,28 @@ Breakdown at spot 0.1 (`ath/v88v/top.js DET=b SPOT=0.1`): city proxies + LOD + p
 misc (studs in RO.grp, sprites, gb car, points) ~40, remaining merged/HUB.M ~30.
 Ideas: bigger far cells (2 levels: 640 m blocks when all 4 sub-cells are far); one far InstancedMesh for all traffic types; drop ART8 twins beyond ~40 m; fewer near proxies.
 
-## v88w plan (2× brick detail, Alex's ask, + Frankfurt ≤ 200 draws), NOT STARTED; FULL review with close-up before/after shots
-- Near only (≤ 60 m, i.e. inside wbNear / the near cells): add bricks/studs/tiles/SNOT bands as extra geometry that the far LOD never sees.
-- City: studs on roofs and ledges as ONE instanced stud mesh per near cell (proxy scheme already knows near cells); brick courses / window frames as a detail texture
-  or merged geometry on the BM facade materials (TBatch), so draws stay within +10 %.
-- Cars: finer parts in CR_cityGeo / CR_car templates (93_cars_lego.js); the far copy is rebuilt automatically (WB_loOf keys on geometry uuid).
-- Before/after close-ups (cars side view, facades at 10-20 m), draws/tris with perf.js, tyre gap ≤ 0.05.
+## v88w status (IN PROGRESS, not reviewed). Branch alex/od-world, live = v88v (a1b848d, built from 7ef0c6c3)
+Code: NEW `src/98bw_bricks2x.js` (in ORDER after 98wb), edits in 98wb (super cells, piece runs, grouped proxies), 93 (bwCar), 98l (LVP_ahead), knobs in 10_core/99t/tune.json/TUNE.md.
+1. **Bricks (shader, 0 draws/tris)**: BW_flag wraps onBeforeCompile of KMM.com/sub + all HUB.BM materials (needs LK's vLkW): brick courses 0.48 m (`bwCourse`), staggered joints,
+   lit top edge, tiles on tops, glass frame grid; full to 0.6×`bwFade` (90 m), gone at 90 m. Verified visible: `ath/v88w/after/fra_*_wall.png` (houses, piers).
+2. **Roof studs**: per-cell lazy generation near the camera (BW_cellGen ≤3 ms/frame, cells within bwStudD+90), sources = Kenney com/sub instances (WB_tpl exact, texel colours) +
+   merged facade soups captured in WB_cityPrep (BW_mergedPrep). One InstancedMesh, ≤8000, only roofs 2–16 m above ground (`bwStudH/bwStudTop`) and below camera eye. City-wide would be 775k studs, hence lazy.
+   NOT yet looked at: `_roof.png` shots (camera 28 m up) of the after set don't exist yet (rerun close.js on the current build).
+3. **Cars** (`bwCar`, CR_LO=3 in CR_cityGeo): keeps mirrors/plates/exhausts, curveSegments 8, studs as LO (6 seg). Full LO=0 was 3.5× tris (truck 80k), rejected. Tri count of LO=3 not re-measured.
+4. **Draw budget**: wbSuperD 700 (2×2 far cells share one buffer, super mesh when all 4 far), wbTerr (trG/trPl merged 800/2000 m blocks at load, 197 meshes fewer),
+   wbRuns (contiguous near pieces one drawRange), grouped near proxies (2635 originals → 84 groups), wbLzD 420 (far small HUB/lazy instanced hidden), bwRampSh 70 (ramp shadows), wbLodD 220→190.
+5. **Athens pop-ups**: LVP_path walks chained straight edges (LVP_ahead); probe: 74/300 street spots now get a path (was 0). Not yet seen spawning in a drive.
+
+### Numbers (perf.js avg of 3 spots)
+Frankfurt: v88v 264 / 1.08 M → now **209–213 draws / 1.16–1.18 M tris** (noise ±5 from traffic). Athens (before proxies/ramp/190): 222 / 1.08 M (v88v 242 / 0.98 M).
+Still > 200 in Frankfurt. Left at the worst spot (top.js SPOT=0.1, 249 before ramp fix): proxies ~45, non-WB dynamic instanced (lively/parked/smashables) 17, map icon sprites 11 (70 mission icons, 1 draw each),
+traffic far lo 11 (1/type), wbM ~19, far LOD ~22, terrain ~14. Next ideas: share far lo between plain white types (sedan+sports, suv+van, delivery+truck, scaled) −3;
+mission icon sprites → one Points/instanced quad atlas −10; ART8 twins on traffic beyond 40 m −2.
+
+### Shots
+`ath/v88w/close.js <url> fra|ath <out>`: per fixed spot (ath/v88w/spots_<city>.json): _fac (street level 40°), _car (traffic side), _wall (12 m from nearest building), _roof (28 m up), + chase draws.
+Before (v88v, served from wb88v/local_dbg.html = live v88v copy): `ath/v88w/before/` fra complete; ath was rerunning (before_ath.log). After: `ath/v88w/after/` fra (no _roof yet), ath not yet.
+Then: standard set + tyre gap (ATH=1 node ath/v88v/g11drive.js …), REVIEW, OD_CHANGELOG v88w + checklist (99c), split out/v88w on CURRENT live, DEPLOY to coordinator. v88x (Athens busier) after.
 
 ## Athens busier (after v88w): see docs/HANDOFF_perf.md "Next" (kerb dressing instanced, crowd clusters, evzones, #bus).
 

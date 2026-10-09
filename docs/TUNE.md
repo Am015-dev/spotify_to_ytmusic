@@ -90,7 +90,7 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.wbNear` Traffic full detail within | 70 m | full brick model + wheels + glass inside this distance |
 | `TUNE.wbFar` Traffic drawn up to | 900 m | cars farther than this are not drawn |
 | `TUNE.wbCity` City: simple far blocks | ON | (v88v perf) the city is cut into 320 m cells; cells farther than `wbLodD` draw as ONE simplified mesh each (buildings, trees, lamps, roads; colours from the same textures). Near cells draw the real models. Collisions are unchanged (separate boxes). OFF = every model drawn, as before. Needs a city reload to rebuild after a change of the build knobs |
-| `TUNE.wbLodD` City full detail within | 220 m | cells whose edge is closer than this keep full detail |
+| `TUNE.wbLodD` City full detail within | 190 m (v88w; was 220) | cells whose edge is closer than this keep full detail |
 | `TUNE.wbLodCell` (no slider) far block detail | 3 m | size of the merge grid for the far blocks; next city load |
 | `TUNE.wbMerged` / `TUNE.wbNfc` (no slider) | ON / ON | also simplify the merged street/building tiles / the always-drawn instanced props; next city load |
 | `TUNE.wbFig` (no slider) hide far minifigs/markers | 260 m | mission-giver minifigs, the 1.5 m beacon stubs and ramp parts beyond this are not drawn (they are a few px tall there) |
@@ -104,6 +104,8 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.bwCar` (no slider) finer traffic parts | ON | traffic cars keep mirrors, number plates and exhausts and get smooth curves (next page load); far copies are re-simplified from them |
 | `TUNE.wbSuperD` Far blocks: merge 2×2 beyond | 700 m | four far city cells (2×2) draw as one mesh when all four are farther than this (fewer draw calls); 0 = off |
 | `TUNE.wbTerr` (no slider) merge ground tiles | ON | the 400 m / 1000 m ground tiles and the small lot plates are merged into 800 m / 2000 m blocks at load (~25 fewer draws); next city load |
+| `TUNE.bwRampSh` (no slider) ramp shadows within | 70 m | stunt-ramp parts cast shadows only this close to the camera (each was its own shadow draw); 0 = always |
+| `TUNE.wbRuns` (no slider) join near street pieces | ON | neighbouring near cells of a merged street/building tile draw as one piece |
 | `TUNE.wbLzD` (no slider) hide far small extras | 420 m | stud lines, crates and markers (geometry < 3 m) of story/biome zones and the hub are not drawn when all of them are farther than this |
 | `TUNE.perfHud` Show FPS · worst frame · draws · tris | OFF | (v88u) one small line (bottom left, under the steer buttons) with fps, the worst frame of the last 2 s, JS ms per frame, the frame's real draw calls and triangles. For perf reports from a real PC/phone |
 
