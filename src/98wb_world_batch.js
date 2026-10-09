@@ -22,23 +22,29 @@ function WB_loOf(im){const u=im.userData,key=im.geometry.uuid+(u.w?u.w.geometry.
   const parts=[{g:im.geometry,col:new THREE.Color(1,1,1)}];if(u.w)parts.push({g:u.w.geometry,col:new THREE.Color(.08,.08,.09)});if(u.g)parts.push({g:u.g.geometry,col:new THREE.Color(.12,.2,.3)});
   if(!im.geometry.boundingSphere)im.geometry.computeBoundingSphere();const R=im.geometry.boundingSphere.radius||3;
   const geo=WB_cluster(parts,Math.max(.12,R*TUNE.wbCell));const mat=[].concat(im.material)[0];
-  const m=new THREE.InstancedMesh(geo,mat,im.instanceMatrix.count);m.count=0;m.frustumCulled=false;m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.userData.wbLo=1;m.raycast=()=>{};
+  let cap=0;for(const c of HUB.cim)if(c&&c.instanceMatrix)cap+=c.instanceMatrix.count;const m=new THREE.InstancedMesh(geo,mat,Math.max(cap,im.instanceMatrix.count));m.count=0;m.frustumCulled=false;m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.userData.wbLo=1;m.raycast=()=>{};
   if(im.instanceColor){m.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(im.instanceColor.array.length),3);m.instanceColor.setUsage(THREE.DynamicDrawUsage)}
-  e={key,m,R,hiT:WB_tris(im.geometry)+(u.w?WB_tris(u.w.geometry):0)+(u.g?WB_tris(u.g.geometry):0),loT:WB_tris(geo)};WB.lo.set(im,e);return e}
+  if(!im.geometry.boundingBox)im.geometry.computeBoundingBox();const bs=im.geometry.boundingBox.getSize(new THREE.Vector3());
+  e={key,m,R,mat,bs,cap:m.instanceMatrix.count,l:0,hiT:WB_tris(im.geometry)+(u.w?WB_tris(u.w.geometry):0)+(u.g?WB_tris(u.g.geometry):0),loT:WB_tris(geo)};WB.lo.set(im,e);return e}
 const WB_save=a=>{let b=WB.bk.get(a);if(!b||b.length!==a.array.length){b=new Float32Array(a.array.length);WB.bk.set(a,b)}b.set(a.array);return b};
 function WB_pre(r,sc,cam){WB.act.length=0;for(const e of WB.lo.values())e.m.visible=false;if(!TUNE.wbCarLod||typeof state==='undefined'||state!=='roam'||typeof HUB==='undefined'||!HUB.cim||!cam||!cam.isPerspectiveCamera)return;
   WB.pm.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);WB.fr.setFromProjectionMatrix(WB.pm);const cx=cam.matrixWorld.elements[12],cy=cam.matrixWorld.elements[13],cz=cam.matrixWorld.elements[14];
   const n2=TUNE.wbNear*TUNE.wbNear,f2=TUNE.wbFar*TUNE.wbFar;let hi=0,lo=0,cut=0;
+  // v88w: far copies share one model per size class (a type within wbLoShare× of a leader's body box in every axis draws as the leader, scaled) → fewer draws
+  const Ls=[];for(const im of HUB.cim){if(!im||!im.visible||!im.parent||!im.geometry||WB_tris(im.geometry)<600)continue;const L=WB_loOf(im);L.l=0;L.T=L;L.s=null;Ls.push(L)}
+  const thr=TUNE.wbLoShare||0;if(thr>1)for(let i=0;i<Ls.length;i++){const B=Ls[i];for(let j=0;j<i;j++){const A=Ls[j];if(A.T!==A||A.mat!==B.mat)continue;const sx=B.bs.x/A.bs.x,sy=B.bs.y/A.bs.y,sz=B.bs.z/A.bs.z;
+    if(Math.max(sx,1/sx,sy,1/sy,sz,1/sz)<=thr){B.T=A;B.s=[sx,sy,sz];break}}}
   for(const im of HUB.cim){if(!im||!im.visible||!im.parent||!im.geometry||WB_tris(im.geometry)<600)continue;const u=im.userData,L=WB_loOf(im);if(L.m.parent!==im.parent)im.parent.add(L.m);
     const n=im.count,M=WB_save(im.instanceMatrix),Cc=im.instanceColor?WB_save(im.instanceColor):null,W=u.w?WB_save(u.w.instanceMatrix):null,G=u.g?WB_save(u.g.instanceMatrix):null;
-    const am=im.instanceMatrix.array,ac=im.instanceColor&&im.instanceColor.array,aw=u.w&&u.w.instanceMatrix.array,ag=u.g&&u.g.instanceMatrix.array,lm=L.m.instanceMatrix.array,lc=L.m.instanceColor&&L.m.instanceColor.array;
+    const T=L.T,S=L.s,am=im.instanceMatrix.array,ac=im.instanceColor&&im.instanceColor.array,aw=u.w&&u.w.instanceMatrix.array,ag=u.g&&u.g.instanceMatrix.array,lm=T.m.instanceMatrix.array,lc=T.m.instanceColor&&T.m.instanceColor.array;
     let h=0,l=0;for(let j=0;j<n;j++){const o=j*16,s2=M[o]*M[o]+M[o+1]*M[o+1]+M[o+2]*M[o+2];if(s2<1e-6)continue;const x=M[o+12],y=M[o+13],z=M[o+14],d2=(x-cx)**2+(y-cy)**2+(z-cz)**2;
       WB.sp.center.set(x,y,z);WB.sp.radius=L.R*Math.sqrt(s2)+1;if(d2>f2||!WB.fr.intersectsSphere(WB.sp)){cut++;continue}
       if(d2<=n2){const q=h*16;for(let i=0;i<16;i++)am[q+i]=M[o+i];if(aw)for(let i=0;i<16;i++)aw[q+i]=W[o+i];if(ag)for(let i=0;i<16;i++)ag[q+i]=G[o+i];if(ac){ac[h*3]=Cc[j*3];ac[h*3+1]=Cc[j*3+1];ac[h*3+2]=Cc[j*3+2]}h++}
-      else{const q=l*16;for(let i=0;i<16;i++)lm[q+i]=M[o+i];if(lc){lc[l*3]=Cc[j*3];lc[l*3+1]=Cc[j*3+1];lc[l*3+2]=Cc[j*3+2]}l++}}
+      else{if(T.l>=T.cap){cut++;continue}const k=T.l++,q=k*16;for(let i=0;i<16;i++)lm[q+i]=M[o+i];if(S)for(let c=0;c<3;c++)for(let i=0;i<3;i++)lm[q+c*4+i]*=S[c];if(lc&&Cc){lc[k*3]=Cc[j*3];lc[k*3+1]=Cc[j*3+1];lc[k*3+2]=Cc[j*3+2]}l++}}
     WB.act.push([im,n,u.w?u.w.count:0,u.g?u.g.count:0]);im.count=h;im.instanceMatrix.needsUpdate=true;if(ac)im.instanceColor.needsUpdate=true;
     if(u.w){u.w.count=Math.min(h,u.w.count);u.w.instanceMatrix.needsUpdate=true}if(u.g){u.g.count=Math.min(h,u.g.count);u.g.instanceMatrix.needsUpdate=true}
-    L.m.count=l;L.m.visible=l>0;L.m.instanceMatrix.needsUpdate=true;if(lc)L.m.instanceColor.needsUpdate=true;hi+=h;lo+=l}
+    hi+=h;lo+=l}
+  for(const L of Ls){L.m.count=L.l;L.m.visible=L.l>0;if(L.l){L.m.instanceMatrix.needsUpdate=true;if(L.m.instanceColor)L.m.instanceColor.needsUpdate=true}}
   WB.st.hi=hi;WB.st.lo=lo;WB.st.cut=cut}
 function WB_post(){for(const [im,n,nw,ng] of WB.act){const u=im.userData;im.instanceMatrix.array.set(WB.bk.get(im.instanceMatrix));im.count=n;if(im.instanceColor)im.instanceColor.array.set(WB.bk.get(im.instanceColor));
   if(u.w){u.w.instanceMatrix.array.set(WB.bk.get(u.w.instanceMatrix));u.w.count=nw}if(u.g){u.g.instanceMatrix.array.set(WB.bk.get(u.g.instanceMatrix));u.g.count=ng}}WB.act.length=0}
@@ -178,3 +184,24 @@ function WB_pixPrep(){if(!TUNE.wbCity||!HUB||!HUB.grp)return;const t0=performanc
 {const _rp=roamPost;roamPost=function(...a){const r=_rp.apply(this,a);setTimeout(()=>{WB_cityBuild(null).catch(e=>{WBC.err=String(e)+' '+(e&&e.stack||'').slice(0,400);if(e!=='WBabort')console.warn('WBC build',e);try{WB_cityClear()}catch(_){}})},1500);return r}}
 // tests: __wb.fast() finishes a running/pending background build without yielding (headless frames are ~300 ms each)
 window.__wb={WB,WBC,fast:()=>{WBC.fast=1;return new Promise(r=>{const t=performance.now(),w=()=>WBC.on||WBC.err||performance.now()-t>120000?r(WBC.st):setTimeout(w,50);w()})}};
+// v88w: map icons (≈70 mission/garage/event sprites, 1 draw each) draw as ONE instanced camera-facing quad from a 16×8 atlas of their 128 px canvases.
+// Pre-render: visible icon sprites are hidden and copied into the batch; post-render they are shown again (game code keeps using m.sp as before).
+const WBI={slot:new Map(),free:[],h:[],m:null,cv:null,tx:null};
+function WB_icoInit(){const c=document.createElement('canvas');c.width=2048;c.height=1024;WBI.cv=c;WBI.cx=c.getContext('2d');for(let i=127;i>=0;i--)WBI.free.push(i);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;WBI.tx=t;const N=160,geo=new THREE.PlaneGeometry(1,1),ia=new THREE.InstancedBufferAttribute(new Float32Array(N*3),3);ia.setUsage(THREE.DynamicDrawUsage);geo.setAttribute('iA',ia);
+  const mat=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false});mat.onBeforeCompile=s=>{s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nattribute vec3 iA;varying float vIA;').replace('#include <uv_vertex>','#include <uv_vertex>\nvMapUv=vMapUv*vec2(.0625,.125)+iA.xy;vIA=iA.z;');
+    s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nvarying float vIA;').replace('#include <map_fragment>','#include <map_fragment>\ndiffuseColor.a*=vIA;')};mat.customProgramCacheKey=()=>'wbIco';
+  const m=new THREE.InstancedMesh(geo,mat,N);m.count=0;m.frustumCulled=false;m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.raycast=()=>{};m.name='WB_icons';WBI.m=m;WBI.ia=ia;scene.add(m)}
+function WB_icoSlot(t){let k=WBI.slot.get(t);if(k!=null)return k;const img=t&&t.image;if(!img||!img.width||!WBI.free.length)return -1;k=WBI.free.pop();const x=(k%16)*128,y=Math.floor(k/16)*128;
+  WBI.cx.clearRect(x,y,128,128);WBI.cx.drawImage(img,x,y,128,128);WBI.tx.needsUpdate=true;WBI.slot.set(t,k);t.addEventListener('dispose',()=>{if(WBI.slot.get(t)===k){WBI.slot.delete(t);WBI.free.push(k)}});return k}
+const _wbiQ=new THREE.Quaternion(),_wbiP=new THREE.Vector3(),_wbiS=new THREE.Vector3(),_wbiM=new THREE.Matrix4();
+function WB_icoPre(cam){WBI.h.length=0;if(WBI.m)WBI.m.visible=false;if(!TUNE.wbIcon||typeof state==='undefined'||state!=='roam'||typeof RO==='undefined'||!RO||!RO.marks)return;if(!WBI.m)WB_icoInit();
+  const m=WBI.m,a=WBI.ia.array;let n=0;cam.getWorldQuaternion(_wbiQ);
+  for(const mk of RO.marks){const sp=mk&&mk.sp;if(!sp||!sp.visible||n>=160)continue;let o=sp.parent,vis=!!o;while(o){if(!o.visible){vis=false;break}if(o===scene)break;o=o.parent;if(!o)vis=false}if(!vis)continue;
+    const mt=sp.material;if(!mt||mt.depthTest===false||sp.renderOrder)continue;const k=WB_icoSlot(mt.map);if(k<0)continue;const e=sp.matrixWorld.elements;
+    _wbiP.set(e[12],e[13],e[14]);_wbiS.set(Math.hypot(e[0],e[1],e[2]),Math.hypot(e[4],e[5],e[6]),1);_wbiM.compose(_wbiP,_wbiQ,_wbiS);m.setMatrixAt(n,_wbiM);
+    a[n*3]=(k%16)*.0625;a[n*3+1]=1-(Math.floor(k/16)+1)*.125;a[n*3+2]=mt.opacity;n++;sp.visible=false;WBI.h.push(sp)}
+  m.count=n;m.visible=n>0;if(n){m.instanceMatrix.needsUpdate=true;WBI.ia.needsUpdate=true}}
+function WB_icoPost(){for(const s of WBI.h)s.visible=true;WBI.h.length=0}
+{const ob=scene.onBeforeRender,oa=scene.onAfterRender;scene.onBeforeRender=function(...a){const r=ob.apply(this,a);try{if(a[2]&&a[2].isPerspectiveCamera)WB_icoPre(a[2])}catch(e){WB_icoPost();console.warn('WBI',e)}return r};
+ scene.onAfterRender=function(...a){try{WB_icoPost()}catch(e){}return oa.apply(this,a)}}

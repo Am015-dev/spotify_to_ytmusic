@@ -87,6 +87,8 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 | `TUNE.lvPopRw` Pop-up studs × | 1 | reward 150 studs × this, plus a brick burst |
 | `TUNE.lvLod` Far people/cars: fewer pose updates | ON | (v88u perf) people > 90 m away re-pose every 3rd frame, traffic cars > 250 m every 4th (they still move every frame). OFF = every frame, as before |
 | `TUNE.wbCarLod` Traffic cars: simple model far away | ON | (v88v perf, `src/98wb_world_batch.js`) traffic cars beyond `wbNear` draw a simplified copy of the same car (same colours, ~10 % of the triangles); cars outside the view are not drawn. OFF = full brick model for every car at any distance, as before |
+| `TUNE.wbLoShare` (no slider) far traffic: shared models | 1.35 | (v88w) far copies of traffic types whose body box is within this factor of another type's (every axis) draw as that type, scaled to size: one draw per size class instead of per type; 0 = off |
+| `TUNE.wbIcon` (no slider) map icons in one batch | ON | (v88w) the ~70 floating mission/garage/event icons draw as one instanced quad batch from a texture atlas instead of one draw each; OFF = one sprite each, as before |
 | `TUNE.wbNear` Traffic full detail within | 70 m | full brick model + wheels + glass inside this distance |
 | `TUNE.wbFar` Traffic drawn up to | 900 m | cars farther than this are not drawn |
 | `TUNE.wbCity` City: simple far blocks | ON | (v88v perf) the city is cut into 320 m cells; cells farther than `wbLodD` draw as ONE simplified mesh each (buildings, trees, lamps, roads; colours from the same textures). Near cells draw the real models. Collisions are unchanged (separate boxes). OFF = every model drawn, as before. Needs a city reload to rebuild after a change of the build knobs |
