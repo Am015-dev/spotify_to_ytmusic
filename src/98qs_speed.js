@@ -13,7 +13,8 @@ function QS_cls(){if(CR_MODE==='boat')return'spBoat';if(CR_MODE==='4x4')return's
 // base top (km/h, open road, no boost): class × player level × BOOSTER upgrade, capped at spMax
 function QS_kmh(lvl){let up=1;try{if(CR_MODE==='car')up=GAR_upMul(GAR_ups(),'top')}catch(e){}return Math.min(TUNE.spMax,TUNE[QS_cls()]*(lvl?lvl.top:1)*up)}
 // speed target (m/s) replacing the old tt in roamStep; k = surface fit × v85 offroad factor
-function QS_tt(lvl,k){const a=RO.onAB?1:RO.inCity?TUNE.spCity:TUNE.spOpen,b=Math.max(RO.bRamp||0,RO.turbo>0&&!RO.bash?1:0);return QS_kmh(lvl)/3.6*a*(1+TUNE.spBoost*b)*k}
+// also sets RO.qsV / RO.qsVB: the plain and boosted caps the weight layer in 99_api.js uses (it held every car at 174 / 224 km/h)
+function QS_tt(lvl,k){const a=RO.onAB?1:RO.inCity?TUNE.spCity:TUNE.spOpen,b=Math.max(RO.bRamp||0,RO.turbo>0&&!RO.bash?1:0),v=QS_kmh(lvl)/3.6*a*k;RO.qsV=v;RO.qsVB=v*(1+TUNE.spBoost);return v*(1+TUNE.spBoost*b)}
 // ---- traffic mix (of HUB.cars, 150): urban counts are mostly cars; delivery vans ~10-14 % (Vienna count: 13.5 % delivery vehicles),
 // heavy trucks a few %, buses a few %; Athens: two-wheelers ~24 % of the Attica fleet (EL.STAT via NTUA) → 15 % scooters on the road.
 // Frankfurt slots (HCAR after the swaps below): 0 sedan,1 hypercar,2 taxi,3 van,4 truck,5 delivery,6 police,7 time coupe,8 bus,9 tuner,10 roadster
