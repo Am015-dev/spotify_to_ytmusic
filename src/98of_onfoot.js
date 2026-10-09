@@ -4,7 +4,7 @@
 // stopped and idle, and 🚪 ENTER on foot near a car (hidden otherwise). On foot: ◀ ▶ DRIFT FIRE hidden, GAS = RUN, BOOST = JUMP (5 controls with ❚❚).
 // Entering another car swaps bodies: the body you leave becomes a static parked group, the parked traffic car's instanced body is lifted into the
 // player car (3 one-instance meshes, same geometry/material/tint), its pool slot is retired (dead = 1e9). Physics stay the player car's.
-const OF={st:'car',fig:null,x:0,z:0,y:0,h:0,vx:0,vz:0,vy:0,air:false,ph:0,spd:0,cy:0,camB:4.5,car:null,vs:[],taken:[],near:null,tw:null,idle:0,btn:'',
+const OF={cyIn:0,cp:0,camT:9,steady:0,inA:null,hPrev:null,recen:false,cam:{id:null,x:0,y:0,t0:0,tap:0},st:'car',fig:null,x:0,z:0,y:0,h:0,vx:0,vz:0,vy:0,air:false,ph:0,spd:0,cy:0,camB:4.5,car:null,vs:[],taken:[],near:null,tw:null,idle:0,btn:'',
   stick:{id:null,on:false,x0:0,y0:0,dx:0,dy:0},keys:{},n:{exit:0,enter:0,swap:0,jack:0,stuckF:0,walkF:0,camIn:0},star:{n:0,t:0},jk:null,fl:null,cur:{own:true},figH:0,log:[]};
 const OF_R=.35,OF_STEP=.45,OF_WALK=1.6,OF_RUN=5,OF_G=18,OF_JV=Math.sqrt(2*18*.9),OF_FIGH=1.8,OF_NEAR=1.7,OF_JV_MAX=7,OF_JREACH=3;
 RO.foot='car';
@@ -41,9 +41,9 @@ function OF_edge(o){const b=OF_box(o.x,o.z,o.h,o.hw,o.hd),dx=OF.x-b.x,dz=OF.z-b.
 function OF_nearCar(){let best=null,bd=OF_NEAR;for(const o of OF_cars(true)){if(Math.abs((o.y||0)-OF.y)>2.5)continue;let d=OF_edge(o);
   if(o.k==='traf'){if(o.ref.tr||o.ref.route||o.ref.crW||HCAR[o.ref.k][0]==='#'||(o.ref.cv||0)>OF_JV_MAX)continue;d-=OF_JREACH-OF_NEAR}if(d<bd){bd=d;best=o}}return best}
 // --- touch: floating stick in the left 40 %, button relabels
-function OF_dom(){if(OF.dom)return OF.dom;const T=$('#touch');if(!T)return null;const z=document.createElement('div');z.id='ofZone';z.innerHTML='<div id="ofRing"><i></i></div><div id="ofHint">DRAG TO WALK</div>';T.insertBefore(z,T.firstChild);
+function OF_dom(){if(OF.dom)return OF.dom;const T=$('#touch');if(!T)return null;const z=document.createElement('div');z.id='ofZone';z.innerHTML='<div id="ofRing"><i></i></div><div id="ofHint">DRAG TO WALK</div>';T.insertBefore(z,T.firstChild);const cz=document.createElement('div');cz.id='ofCam';T.insertBefore(cz,T.firstChild);
   const st=document.createElement('style');st.id='ofCss';st.textContent=`#ofZone{position:absolute;left:0;top:18%;width:40%;bottom:0;display:none;touch-action:none;z-index:1;pointer-events:auto}
-body.onfoot #ofZone{display:block}#ofRing{position:absolute;width:140px;height:140px;margin:-70px 0 0 -70px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(10,14,30,.22);pointer-events:none;opacity:.55}
+#ofCam{position:absolute;left:40%;right:0;top:12%;bottom:0;display:none;touch-action:none;z-index:0;pointer-events:auto}body.onfoot #ofZone,body.onfoot #ofCam{display:block}#ofRing{position:absolute;width:140px;height:140px;margin:-70px 0 0 -70px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:rgba(10,14,30,.22);pointer-events:none;opacity:.55}
 #ofZone.on #ofRing{opacity:1}#ofRing i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 #ofHint{position:absolute;font:800 12px system-ui;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px #000;transform:translate(-50%,0);pointer-events:none;white-space:nowrap}#ofZone.used #ofHint{display:none}
 body.onfoot #btnZone,body.onfoot #steerZone,body.onfoot #tD,body.onfoot #tF,body.onfoot #tW,body.onfoot #roamVeh,body.onfoot #roamHorn{display:none!important}
@@ -65,6 +65,7 @@ body.onfoot #roamGauge small{font-size:12px!important}#tB.ofDoor{background:line
   const B=$('#tB');const door=e=>{if(!B||!B.classList.contains('ofDoor'))return;if(e.type==='pointerdown'&&e.pointerType==='mouse'&&!e.isTrusted)return;e.preventDefault();e.stopImmediatePropagation();
     const n=performance.now();if(n-(OF.dT||-1e9)<350)return;OF.dT=n;AU.init();OF_door()};
   if(B)for(const ev of['touchstart','pointerdown','mousedown'])B.addEventListener(ev,door,{capture:true,passive:false});
+  OF_camDom(cz);
   OF.dom={z,R,K,H,home};setTimeout(home,0);return OF.dom}
 let OF_lbl0=null;
 // the door button sits left of BOOST/JUMP (#tN), vertically centred on it, ≥ 12 px from #tN and #tG (BRAKE's own spot touches GAS on phones)
@@ -93,7 +94,7 @@ function OF_exit(){const F=OF_figBuild();if(!F.g.parent)HUB.grp.add(F.g);const h
   let px=RO.x-rx*1.75,pz=RO.z-rz*1.75;const ok=(x,z)=>!roamHit(x,z,OF_R,RO.y+1)&&!(CID==='fra'&&inRiver(x,z))&&Math.abs(groundAt(x,z,RO.y+1)-RO.y)<1.2;
   if(!ok(px,pz)){px=RO.x+rx*1.75;pz=RO.z+rz*1.75}if(!ok(px,pz)){px=RO.x-fx*3.4;pz=RO.z-fz*3.4}
   OF.x=RO.x-rx*.6;OF.z=RO.z-rz*.6;OF.y=groundAt(OF.x,OF.z,RO.y+1);OF.h=h-Math.PI/2;OF.vx=OF.vz=OF.vy=0;OF.spd=0;OF.air=false;
-  OF.tw={t:0,d:.35,x0:OF.x,z0:OF.z,x1:px,z1:pz,h1:h-Math.PI/2};OF_drv(pl.mesh,false);F.g.visible=true;RO.foot='exit';OF.cy=h;OF.camB=4.5;OF.n.exit++;
+  OF.tw={t:0,d:.35,x0:OF.x,z0:OF.z,x1:px,z1:pz,h1:h-Math.PI/2};OF_drv(pl.mesh,false);F.g.visible=true;RO.foot='exit';OF.cy=OF.cyIn=h;OF.cp=0;OF.camT=9;OF.steady=0;OF.inA=null;OF.recen=false;OF.camB=4.5;OF.n.exit++;
   if(AU.engine)AU.engine(pl,0,false);if(AU.scrape)AU.scrape(false);AU.sfx&&AU.sfx('pick');OF.log.push('exit@'+Math.round(RO.x)+','+Math.round(RO.z));OF_btns()}
 // --- ENTER: tween to the door, then (own body) restore or (other car) swap bodies
 function OF_enter(o){if(o.k==='traf')return OF_jack(o);const fx=Math.sin(o.h),fz=Math.cos(o.h),rx=-fz,rz=fx,dx=o.x-rx*1.4,dz=o.z-rz*1.4;
@@ -135,7 +136,10 @@ function OF_collide(x,z,y){for(let it=0;it<4;it++){const b=roamHit(x,z,OF_R,y+1)
   const PG=HUB.pgrid,D=HUB.ptypes;if(PG&&D){const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const L=PG.get((kx+a)*10000+kz+c);if(!L)continue;
     for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;const r=Math.max(.15,Math.min(1.1,d.r*.45))+OF_R,dx=x-p.x,dz=z-p.z,l=Math.hypot(dx,dz);if(l<r&&l>1e-4){x=p.x+dx/l*r;z=p.z+dz/l*r}}}}
   return[x,z]}
-function OF_walk(dt){const I=OF_input(),cy=OF.cy,fw=[Math.sin(cy),Math.cos(cy)],rt=[-Math.cos(cy),Math.sin(cy)];
+function OF_walk(dt){const I=OF_input(),il=Math.hypot(I.fx,I.fy),ia=Math.atan2(I.fx,I.fy);
+  // v89b1: the stick's frame is the camera yaw, frozen while the stick direction is held (an auto-recentre never steers the walker = no "rounds"); follows a manual orbit
+  if(il<.05||OF.camT<.05||OF.inA==null||Math.abs(angDiff(ia,OF.inA))>.35){OF.cyIn=OF.cy;OF.inA=il<.05?null:ia}
+  const cy=OF.cyIn,fw=[Math.sin(cy),Math.cos(cy)],rt=[-Math.cos(cy),Math.sin(cy)];
   const wx=fw[0]*I.fy+rt[0]*I.fx,wz=fw[1]*I.fy+rt[1]*I.fx,m=Math.min(1,Math.hypot(wx,wz)),top=I.run?OF_RUN:OF_WALK,tv=m*top;
   const tx=m>1e-3?wx/Math.hypot(wx,wz)*tv:0,tz=m>1e-3?wz/Math.hypot(wx,wz)*tv:0,ax=tx-OF.vx,az=tz-OF.vz,al=Math.hypot(ax,az),amax=20*dt*(OF.air?.35:1);
   if(al>amax){OF.vx+=ax/al*amax;OF.vz+=az/al*amax}else{OF.vx=tx;OF.vz=tz}
@@ -162,10 +166,10 @@ function OF_step(dt){if(!pl)return;dt=Math.min(dt,.05);const T0=OF.tw;
   try{const s=$('#rgSpd');if(s)s.textContent='🚶'}catch(e){}OF_btns()}
 // --- foot camera: 4.5 m back, 2.2 m up, yaw follows the walking direction (not when walking towards the camera), pulled in before walls
 function OF_cam(dt){if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.y,OF.car.z);
-  if(OF.spd>.3){const a=angDiff(OF.h,OF.cy),w=clamp((Math.cos(a)+.2)/1.2,0,1);OF.cy+=a*Math.min(1,dt*3*w*Math.min(1,OF.spd/OF_WALK))}
-  const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+2.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5,carUp=0;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)){back=Math.max(.25,d-.5);break}if(!carUp&&PC.some(b=>bHit(b,x,z,.3)))carUp=1}
+  OF_camYaw(dt);
+  const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+2.2+Math.sin(OF.cp)*4.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5,carUp=0;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)){back=Math.max(.25,d-.5);break}if(!carUp&&PC.some(b=>bHit(b,x,z,.3)))carUp=1}
   OF.camB=back<OF.camB?back:OF.camB+(back-OF.camB)*Math.min(1,dt*3);const cx=OF.x-fx*OF.camB,cz=OF.z-fz*OF.camB;
-  OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);camera.lookAt(OF.x+fx*2.5,OF.y+1.25,OF.z+fz*2.5);
+  OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);{const la=2.5*clamp((OF.camB-.4)/3.6,0,1);camera.lookAt(OF.x+fx*la,OF.y+1.25-(1-la/2.5)*.4,OF.z+fz*la)};
   if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
 // parked cars stay parked while you walk (the lively-city parker would re-park them relative to the walker)
 if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(LV_parkStep);
@@ -254,3 +258,28 @@ function OF_athPark1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h
     if(roamHit(x,z,1.4,y+.5)||roamHit(x+ux*2.2,z+uz*2.2,1.2,y+.5)||roamHit(x-ux*2.2,z-uz*2.2,1.2,y+.5))continue;if(typeof QS_rampNear==='function'&&QS_rampNear(x,z))continue;if(!far&&LV_seen(x,0,z)&&d<90)continue;
     Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:E.i,b:E.bi,t,lane:off/W,ofW:W,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;OF.athPk=(OF.athPk||0)+1;return}}
 if(typeof LV_park1==='function')LV_park1=(f=>function(C,far){if(CID==='ath')return OF_athPark1(C,far);return f.apply(this,arguments)})(LV_park1);
+
+// ===== v89b1 camera hotfix (Alex: "the walk in the street is impossible … it's doing rounds"). Cause: the stick was camera-relative AND the camera
+// turned towards the walker's facing every frame (rate 3/s), so a stick held off-centre turned the walker, which turned the camera, which turned the
+// walker … = endless circles. Now (GTA / LEGO City Undercover style): the camera only follows the position; its yaw changes by (1) a drag on the
+// empty right part of the screen / mouse drag / Q Z keys (yaw + limited pitch; double-tap = recentre), (2) a slow recentre behind the walker after
+// 1.5 s of steady movement with no camera input, never while he is turning. The stick's frame is frozen while its direction is held (OF_walk).
+const OF_CAMK=.0065,OF_CAMP=.004;
+function OF_camYaw(dt){OF.camT+=dt;const tr=OF.hPrev==null?0:Math.abs(angDiff(OF.h,OF.hPrev))/Math.max(dt,1e-4);OF.hPrev=OF.h;
+  const kq=(K.KeyQ?1:0)-(K.KeyZ?1:0);if(kq&&RO.foot==='walk'){OF.cy+=kq*1.8*dt;OF.camT=0;OF.recen=false}
+  if(OF.recen){const a=angDiff(OF.h,OF.cy),r=Math.min(Math.abs(a),dt*5);OF.cy+=Math.sign(a)*r;OF.cp+=(0-OF.cp)*Math.min(1,dt*6);if(Math.abs(a)<.01)OF.recen=false;return}
+  if(OF.spd>1&&tr<.35&&OF.camT>1.5)OF.steady+=dt;else OF.steady=0;
+  if(OF.steady>1.5){const a=angDiff(OF.h,OF.cy);if(Math.abs(a)<2.3&&Math.abs(a)>.005){const r=Math.min(Math.abs(a),dt*Math.min(1.2,Math.abs(a)*1.5+.08));OF.cy+=Math.sign(a)*r}}}
+function OF_camDrag(dx,dy){OF.cy-=dx*OF_CAMK;OF.cp=clamp(OF.cp+dy*OF_CAMP,-.25,.6);OF.camT=0;OF.recen=false}
+function OF_camDom(cz){const C=OF.cam;
+  const st=(id,x,y)=>{if(C.id!=null)return;C.id=id;C.x=x;C.y=y;C.mv=0;const n=performance.now();if(n-C.tap<320){OF.recen=true;OF.camT=0}C.tap=n};
+  const mv=(id,x,y)=>{if(id!==C.id)return;const dx=x-C.x,dy=y-C.y;C.x=x;C.y=y;C.mv+=Math.abs(dx)+Math.abs(dy);if(C.mv>12)C.tap=0;OF_camDrag(dx,dy)};const en=id=>{if(id===C.id)C.id=null};
+  // window-level (capture): a touch that lands on the drag zone or the bare game view (not a button / the stick) orbits
+  const onCam=t=>RO.foot==='walk'&&state==='roam'&&t&&(t.id==='ofCam'||t.tagName==='CANVAS');OF.camEv=0;
+  addEventListener('touchstart',e=>{for(const t of e.changedTouches){OF.camEv++;OF.camTg=(t.target&&(t.target.id||t.target.tagName))+'@'+Math.round(t.clientX)+','+Math.round(t.clientY);if(onCam(t.target)){st('t'+t.identifier,t.clientX,t.clientY);break}}},{capture:true,passive:true});
+  addEventListener('touchmove',e=>{if(C.id==null)return;for(const t of e.changedTouches)mv('t'+t.identifier,t.clientX,t.clientY)},{capture:true,passive:true});
+  const te=e=>{for(const t of e.changedTouches)en('t'+t.identifier)};addEventListener('touchend',te,{capture:true,passive:true});addEventListener('touchcancel',te,{capture:true,passive:true});
+  cz.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});cz.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+  // PC: mouse drag anywhere on the game view (not on buttons) while on foot
+  addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0||RO.foot!=='walk'||state!=='roam')return;const t=e.target;if(!(t&&(t.tagName==='CANVAS'||t.id==='ofCam')))return;st('m',e.clientX,e.clientY)});
+  addEventListener('pointermove',e=>{if(e.pointerType!=='touch')mv('m',e.clientX,e.clientY)});addEventListener('pointerup',e=>{if(e.pointerType!=='touch')en('m')})}
