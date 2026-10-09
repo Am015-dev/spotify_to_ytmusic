@@ -45,13 +45,13 @@
 | rf1 (back of grid) | 6→1 by 40 s, then alone 100–290 m ahead, fin 1/8 | fin 5/8 | stuck 8th 60 s, leader 500 m ahead, fin 4/8 |
 | rf2 (+corner rubber) | 8→1 by 50 s, fin 1/8, near20 46 s | fin 8/8 | fin 4/8 |
 | rf3 (−20 % hold) | fin 3/8, near20 33 s | fin 7/8, near20 73 s, 25 place ch, dead 0 | fin 7/8, near20 88 s/120, 29 place ch, dead 0 |
-| rf4 (+boost refill) | RF4_GRAND | RF4_HAFEN | RF4_AKRO |
+| **rf4 (+boost refill) = current HEAD** | 6→3 by 40 s, 1st from 100 s, fin 3/8 (place at the probe after the line), near20 48 s, 18 place ch, spread at 90 s 215 m | 7→3, fin 3/8, near20 48 s, 25 place ch, dead 0 | 4→2, fin 2/8, near20 79 s/115, 23 place ch, dead 0 |
 - Reading: rf3 gives close racing (near20 up to 73 % of the race, no dead stretches), but the tRace bot finishes 6th–8th on hafen/akro.
   - The bot only holds a line and never steers out to overtake, so it is stuck in the pack. A human overtakes.
   - Don't over-tune to the bot. The target is a decent human reaching the top 3 and fighting for 1st.
 
 ## Left (exact next steps)
-1. Read the rf4 row above. If the bot still ends 7–8th, add an overtake swerve to the tRace bot (steer ±6 m when a car is 5–25 m ahead within 4 m sideways) so it behaves like a person. Then re-run before touching the tuning again.
+1. rf4 looks right (the bot climbs from the back to the top 3, fights all race, no stolen wins). Confirm with a 2nd run per track (1 run is noisy). Only if the bot ends 7–8th again: add an overtake swerve to the tRace bot (steer ±6 m when a car is 5–25 m ahead within 4 m sideways) so it behaves like a person. Then re-run before touching the tuning again.
    Command: `for t in fra:grand fra:hafen ath:akro; do CITY=${t%%:*} TRACK=${t##*:} LAPS=9 MAXMIN=6 SHOTS=0 TAG=${t##*:}_ node tools/tRace.js http://127.0.0.1:8766/local_dbg.html qa_race/rfN > qa_race/rfN/${t##*:}.log & done`
    Setup: `python3 -m http.server 8766` in the repo root, then `tools/build.sh rfN --local`.
 2. LOOK at shots still unchecked:
@@ -66,3 +66,6 @@
    - `tools/build.sh <ver>`, `git add -f out/<ver>`, push;
    - send the coordinator `DEPLOY alex/od-race <commit> out/<ver> <msg>` + 3 bullets + shots.
 5. Not done, ideas ranked in RACE_PLAN §2.7: checkpoint gates with split gaps, a bigger ordinal position HUD, a crowd podium in the world.
+
+## Gotcha
+- Never wait with `pgrep -f tRace.js` inside a backgrounded bash: it matches its own command line and never ends. Use `ps aux | grep "node tools/tRace" | grep -v grep`, or `wait` in the same shell.
