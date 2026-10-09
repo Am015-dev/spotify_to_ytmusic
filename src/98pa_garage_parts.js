@@ -109,9 +109,13 @@ function PA_pan(dx,dy){const C=GB.cam,cvs=$('#gbC');if(!C||!cvs)return;const d=G
 function PA_ui(){const X=$('#gbx');if(!X)return;let E=$('#paCvB');if(!E){const v=$('#gbx .gbv');if(!v)return;E=document.createElement('div');E.id='paCvB';
   E.innerHTML='<b>🧩 CANVAS 32×32</b><button data-pa="back"><i>←</i>CAR</button>';v.appendChild(E);E.addEventListener('pointerdown',e=>e.stopPropagation());
   E.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();GX_sfx('pick');PA_exit();GS_tip('Back to your car · MY PARTS has your parts')})}
- const busy=(typeof SL!=='undefined'&&SL.carry)||GS.held;E.hidden=!(PA.on&&GB_.bk&&!X.hidden)||!!busy;X.classList.toggle('paOn',!!(PA.on&&GB_.bk));document.body.classList.toggle('paOn',!!(PA.on&&GB_.bk&&!X.hidden))}
+ const busy=(typeof SL!=='undefined'&&SL.carry)||GS.held;E.hidden=!(PA.on&&GB_.bk&&!X.hidden)||!!busy;X.classList.toggle('paOn',!!(PA.on&&GB_.bk));
+ // the held-part pad (#gsBar) and the selection bar (#slBar) own the left column: the palette (chips + tiles) starts right of them (review v88y)
+ let pr=0;if(GB_.bk&&!X.hidden)for(const id of['gsBar','slBar']){const B=document.getElementById(id);if(B&&!B.hidden&&B.offsetParent){const r=B.getBoundingClientRect();if(r.width)pr=Math.max(pr,r.right-X.getBoundingClientRect().left)}}
+ if(pr){const v=Math.round(pr+6)+'px';if(X.style.getPropertyValue('--paL')!==v)X.style.setProperty('--paL',v)}if(X.classList.contains('paPad')!==!!pr){X.classList.toggle('paPad',!!pr);try{R2.area=null}catch(e){}}document.body.classList.toggle('paOn',!!(PA.on&&GB_.bk&&!X.hidden))}
 GS_ui=(f=>function(){const r=f.apply(this,arguments);PA_ui();return r})(GS_ui);
-SL_ui=(f=>function(){const r=f.apply(this,arguments);PA_ui();return r})(SL_ui);
+// the selection bar's MAKE GROUP label was clipped at 852×393: GROUP (the ⛓ icon stays)
+SL_ui=(f=>function(){const r=f.apply(this,arguments);const g=$('#slBar [data-s="grp"] span');if(g&&g.textContent==='MAKE GROUP')g.textContent='GROUP';PA_ui();return r})(SL_ui);
 GNB_pick=(f=>function(){const r=f.apply(this,arguments);const R=$('#gnbP .gnbR');if(R&&!R.querySelector('[data-pa]')){const b=document.createElement('button');b.dataset.pa='cv';
   b.innerHTML='<i>🧩</i><b>BUILD CANVAS</b><small>empty 32×32 plate · build parts</small>';b.addEventListener('click',()=>{setTimeout(PA_enter,0)});R.appendChild(b)}return r})(GNB_pick);
 
@@ -170,7 +174,7 @@ GX_ui=(f=>function(){const r=f.apply(this,arguments);const E=$('#gxG'),A=E&&!E.h
   R.innerHTML=`<button data-pa="save"><i>💾</i>SAVE PART</button>${PA.on?'':'<button data-pa="tocv"><i>🧩</i>TO CANVAS</button>'}`;A.after(R);
   R.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();if(b.dataset.pa==='save')PA_save(g);else PA_toCv(g)})}return r})(GX_ui);
 {const st=document.createElement('style');st.textContent=`
-body.paOn #odPin{display:none!important}
+body.paOn #odPin{display:none!important}#gbx.r2.gbBk.paPad #gbBkP{left:var(--paL)!important}
 #paCvB{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--r2hh,52px) + 6px);z-index:4;display:flex;align-items:center;gap:8px;padding:3px 3px 3px 12px;border-radius:14px;border:2px solid #141413;background:#ffd400;box-shadow:0 3px 0 #141413;font:italic 900 13px system-ui;color:#141413;white-space:nowrap}
 #paCvB[hidden]{display:none}#paCvB button{height:40px;min-width:72px;border-radius:10px;border:2px solid #141413;background:#fff;color:#141413;font:italic 900 13px system-ui;display:flex;align-items:center;gap:4px;padding:0 10px;cursor:pointer}#paCvB button i{font-style:normal;font-size:16px}
 #gbx.r2 #gbBkPc .gbPc.paC{background:#fff}#gbx.r2 #gbBkPc .gbPc.paC img{width:50px;height:36px;object-fit:contain;display:block}#gbx.r2 #gbBkPc .gbPc.paC i{font-style:normal;font-size:22px}
