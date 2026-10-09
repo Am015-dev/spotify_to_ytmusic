@@ -132,3 +132,54 @@ Every part = `TUNE.life` (master) × its own knob. Master 0 = the v88i world (pe
 ## Beta artifact capabilities
 Declare `capabilities: {db:{}, user:{}}`. db is the store, and user is recommended by the db capability.
 Everyone who can open the beta can read the versions. Contributors and up can save and ★ SET; viewers get "save failed: not_granted".
+
+## v88z speeds, traffic and ramps (`src/98qs_speed.js`, free roam only; races unchanged)
+Alex (2026-10-09): "make realistic speeds of cars including boost", "traffic has lot of trucks", "lot of ramps are not accessible".
+
+**Speeds.** The HUD shows true km/h (`|RO.v|×3.6`). Before v88z every player car was held at 174 km/h (224 with boost) by the weight layer in
+`99_api.js` (`CR_VMAX/CR_VBOOST`), and the city at ~120. Now each class has its real top speed on open road and the Autobahn; city streets
+(the whole street grid, `RO.inCity`) run at `spCity` of it. BOOST, drift turbos and boost pads add `spBoost` on top. That is a nitrous-style
+gain: a modest top-speed rise; most of what you feel is the push (`bPush`). Steering, camera, FOV and sound still scale with the OLD
+top (`RO.top`), so the car turns exactly as before at any given speed. The acceleration curve is unchanged (0-100 km/h ≈ 4.2 s).
+Player level (+1.2 %/level) and the BOOSTER upgrade raise the top, capped at `spMax`.
+
+| class knob | our templates (garage) | real reference | top km/h (open/Autobahn) | city (×0.66) | boost top (+15 %) open / city |
+|---|---|---|---|---|---|
+| `TUNE.spCar` | Hot Rod, Ebbelwoi GT, custom builds | German sports cars are governed at 250 | 250 | 165 | 288 / 190 |
+| `TUNE.spTuner` | Street-tuner family (77260/76917) | 4-door/coupé tuners, 250 governed | 250 | 165 | 288 / 190 |
+| `TUNE.spRoad` | Pink Roadster | small roadster | 210 | 139 | 242 / 160 |
+| `TUNE.spCoupe` | Time Coupe | coupé | 230 | 152 | 265 / 175 |
+| `TUNE.spGT` | Poseidon GT | GT car | 300 | 198 | 345 / 228 |
+| `TUNE.spSuper` | Gold Rush | supercar 320-340 | 330 | 218 | 380 / 250 |
+| `TUNE.spHyper` | Red Hypercar | endurance hypercar | 340 | 224 | 391 / 258 |
+| `TUNE.spOff` | every 4×4 form | off-roader | 180 (≈167 on asphalt: surface fit 0.93) | 119 | 207 / 137 |
+| `TUNE.spBoat` | every boat form | sport boat ≈ 50 kn | 90 | – | 104 |
+| `TUNE.spBus` | Sightseeing Bus | coach, 100 governed | 100 | 66 | 115 / 76 |
+| `TUNE.spTruck` | Box Truck | EU trucks are speed-limited to 90 | 90 | 59 | 104 / 68 |
+| `TUNE.spLimo` | Stretch Limo | limousine | 200 | 132 | 230 / 152 |
+| `TUNE.spMT` | Monster Truck | show truck | 110 | 73 | 127 / 84 |
+
+Other knobs: `TUNE.spOn` (0 = the old tops), `TUNE.spCity` 0.66, `TUNE.spOpen` 1, `TUNE.spBoost` 0.15, `TUNE.spMax` 345.
+On boost in other games: GTA V's tested top for its fastest supercars is ≈196 km/h (gtabase, Broughy1322 tests), well under the real cars:
+GTA compresses speeds. No reliable source states how much nitro raises top speed in Forza or LEGO 2K Drive; in 2K Drive the boost is a
+burst refilled by drifting and smashing (lego.2k.com "Driving techniques"). Real nitrous adds power, so a moderate 15 % on top is the call.
+
+**Traffic mix** (next city load). Before, every type was equally common. In Frankfurt that made 4/11 = 36 % vans and trucks (van, truck,
+delivery, garbage truck); in Athens 41 % were taxis. Now (of 150 cars):
+- Frankfurt: 81 % cars (sedan 52, taxi 14, time coupe 18, tuners 27, police 5, hypercar 6), vans 10 %, delivery + trucks 4.7 %, city buses 4 %.
+  The garbage-truck slot became the bus (same draw count). Frankfurt has no motorbike model, so there are none.
+- Athens: cars 70 % (sedan 52, taxi 18, SUV 18, sports 5, tuners 12), scooters 15 %, vans 8.7 %, delivery trucks 2.7 %, trolleybuses 4 %.
+Sources: a Vienna count found delivery vehicles are 13.5 % of urban road traffic (WU Vienna, CEP study); two-wheelers are ~24 % of the
+Attica fleet (EL.STAT data via NTUA). No public type split was found for Frankfurt itself.
+| knob | default | what it does |
+|---|---|---|
+| `TUNE.trOn` | ON | realistic mix + cruise speeds (OFF = the old mix at 50-86 km/h) |
+| `TUNE.trCar` | 45 km/h | traffic cars cruise ±15 % (city limit 50) |
+| `TUNE.trHeavy` | 38 km/h | trucks, delivery, buses, trolleybuses |
+| `TUNE.trScoot` | 40 km/h | Athens scooters (were 54-79 km/h) |
+
+**Ramps.** Root cause of "ramps not accessible": the 20 street ramps sit across the traffic lanes, so traffic queued on the run-ups and on the
+ramps; the player hit the queue or stopped behind it. Since v88z traffic never turns onto a street edge that carries a ramp (run-up 40 m,
+landing 20 m), cars already on one out of sight (> 110 m) move to the next free edge, and no car parks there (`TUNE.rampClear`, 0 = as before).
+The ramp lip also sits on the ground at its low end now: it used the centre's height, which left floating steps up to 2.2 m on slopes.
+Probe: `tools/tRamp.js <url> <out> fra|ath` (ROUTE=1: drive there along the GPS road path from 150 m back).

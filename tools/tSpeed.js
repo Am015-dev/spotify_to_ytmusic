@@ -14,7 +14,7 @@ const URL=process.argv[2],OUT=process.argv[3]||'qa_speed',FORMS=(process.argv[4]
      return{e,v:Math.abs(R.v)*3.6,end:k>=L.length-2,ab:!!R.onAB,city:!!R.inCity,veh:__qs.veh(),cls:__qs.cls()}});
     hist.push(o.v);mx=Math.max(mx,o.v);if(t100==null&&o.v>=100)t100=+(f/60).toFixed(1);if(o.end)break;
     const wl=o.e>.03,wr=o.e<-.03;if(wl!=kL){kL=wl;wl?await p.keyboard.down('ArrowLeft'):await p.keyboard.up('ArrowLeft')}if(wr!=kR){kR=wr;wr?await p.keyboard.down('ArrowRight'):await p.keyboard.up('ArrowRight')}
-    await p.evaluate(()=>__tick(6));if(f%60===0)res.last=o}
+    await p.evaluate(()=>{for(const b of document.querySelectorAll('[data-r3u],#resBtn,#storyGo'))if(b.offsetWidth&&!b.closest('[hidden]'))b.click();__tick(6)});if(f%60===0)res.last=o}  // a person taps level-up / result cards away
    if(process.env.SHOTS){await shot(path.join(OUT,`hud_${form}_${ab?'autobahn':'city'}_${tag}.jpg`))}
    const h=await hud();if(boost)await p.keyboard.up('Shift');if(kL)await p.keyboard.up('ArrowLeft');if(kR)await p.keyboard.up('ArrowRight');
    const tail=hist.slice(-10);return{max:Math.round(mx),plateau:Math.round(tail.reduce((a,b)=>a+b,0)/Math.max(1,tail.length)),t100,hud:h}};

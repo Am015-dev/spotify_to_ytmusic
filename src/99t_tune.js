@@ -30,7 +30,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Engine','TUNE.spOpen','Open road: share of top',.5,1.2,.01],['Engine','TUNE.spMax','Top-speed cap (km/h, level + upgrades)',200,450,5],
  ['Boost','TUNE.spBoost','Boost / turbo: extra top speed ×',0,1,.01],
  // v88z traffic (next city load): city cruise speeds in km/h, ±15 %; trOn OFF = the old mix (every type equally often) and 50-86 km/h
- ['Life','TUNE.trOn','Realistic traffic mix + speeds (v88z)',0,1,1,'bool'],['Life','TUNE.trCar','Traffic cars cruise (km/h)',20,90,1],['Life','TUNE.trHeavy','Trucks/buses cruise (km/h)',20,90,1],['Life','TUNE.trScoot','Scooters cruise (km/h)',20,90,1],
+ ['Life','TUNE.trOn','Realistic traffic mix + speeds (v88z)',0,1,1,'bool'],['Life','TUNE.trCar','Traffic cars cruise (km/h)',20,90,1],['Life','TUNE.trHeavy','Trucks/buses cruise (km/h)',20,90,1],['Life','TUNE.trScoot','Scooters cruise (km/h)',20,90,1],['Life','TUNE.rampClear','Traffic keeps off ramp streets (v88z)',0,1,1,'bool'],
  ['Boost','TUNE.bPush','Boost burst push',0,60,1],['Boost','TUNE.bTop','Boost top-speed bonus ×',0,3,.05],['Boost','TUNE.bDrain','Boost use per s',5,60,1],
  ['Boost','TUNE.bRegen','Meter regen per s',0,9,.25],['Boost','TUNE.bashT','Brickbash after (s)',.5,6,.1],
  ['Boost','TUNE.hop','Hop height',4,24,.5],['Boost','TUNE.grav','Gravity',10,60,1],
