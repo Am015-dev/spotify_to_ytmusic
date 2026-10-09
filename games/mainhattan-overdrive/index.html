@@ -753,6 +753,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v89i',date:'9 Oct 2026',items:[{t:'CHANGED',s:'Faster: the garage opens about 20% faster and the game now uses one graphics context instead of up to four (less memory, fewer crashes on iPhone).'},{t:'CHANGED',s:'Faster loading: the game no longer prepares about 50 graphics programs it never used (40% fewer at the menu and in the city).'}]},
   {v:'v89h',date:'9 Oct 2026',items:[{t:'FIXED',s:'Athens on foot: a stopped scooter no longer blocks the whole lane, so you can walk round it to the car behind and 🚗 TAKE it.'},{t:'FIXED',s:'Oma Hilde\'s tips at the start are no longer hidden under the checklist bar. The bar also steps aside while PAUSE or any other card is open.'},{t:'FIXED',s:'Athens outskirts: the long blank grey and beige walls behind the streets are now apartment blocks with windows, balconies and different heights.'}]},
   {v:'v89g',date:'9 Oct 2026',items:[{t:'NEW',s:'Two new open races: Riverbank Rally (Frankfurt) and Coast Rally (Athens). Wide courses on grass, dirt and sand, with rivals racing side by side.'},{t:'NEW',s:'Pick your route: orange arrows lead to a dirt SHORTCUT (4×4), blue arrows to a water lane where you turn into a boat. Jump the creek, but stay off the cliff edge: fall off and you respawn on the road (tap to respawn at once).'},{t:'CHANGED',s:'Races show your place as a big number top-left (8TH), and the minimap has a thick track with big dots for you and every rival.'}]},
   {v:'v89f',date:'9 Oct 2026',items:[{t:'NEW',s:'Garage: search parts by name or number, and keep the parts you picked in a TRAY.'},{t:'NEW',s:'Turn parts on all 3 axes (⟲ AXES pad, a tap on the held part, a two-finger twist; PC: R / T / F).'},{t:'NEW',s:'JOIN parts into your own piece and save it in MY PARTS. 31 new parts, including headlight and grille bricks, tiles and SNOT brackets.'},{t:'FIXED',s:'PAINT now opens the colour chips, and the BUILD bar is simpler (fewer buttons on screen).'}]},
@@ -959,7 +960,7 @@ function hornPlay(){const b=gbBuild(),h=(b&&b.horn)||'classic',A=AU,a=A.a;if(!a)
   if(state==='roam')for(const c of HUB.cars)if(Math.hypot(c.x-RO.x,c.z-RO.z)<40)c.hitT=Math.max(c.hitT||0,1.5)}
 const GB={d:null,tab:'parts',r:null,sc:null,cam:null,mesh:null,rot:.6,raf:0,drag:null};
 function gbOpen(){const cur=gbBuild(),base=TEAMS[teamIdx];GB.d=cur?JSON.parse(JSON.stringify(cur)):{on:true,a:base.a,b:base.b,c:base.c,glow:base.glow,trail:base.trail,pat:'racing',num:Math.floor(R()*90+10),parts:{nose:'none',wing:'none',rear:'none',roof:'none',side:'none'},horn:'classic'};GB.d.on=true;if(!(GB.d.bricks&&GB.d.bricks.length)){GB.d.bricks=CR_DEF().map(b=>({...b}));GB.d.bp=1}
-  $('#gbx').hidden=false;if(!GB.r){const cvs=$('#gbC');GB.r=new THREE.WebGLRenderer({canvas:cvs,antialias:true,alpha:true});GB.r.outputColorSpace=THREE.SRGBColorSpace;GB.r.toneMapping=THREE.ACESFilmicToneMapping;GB.sc=new THREE.Scene();GB.sc.add(new THREE.HemisphereLight(0xe8ecff,0x40384a,1.6));const d=new THREE.DirectionalLight(0xffffff,2.4);d.position.set(5,9,6);GB.sc.add(d);const d2=new THREE.DirectionalLight(0x88ccff,1);d2.position.set(-6,3,-5);GB.sc.add(d2);
+  $('#gbx').hidden=false;if(!GB.r){const cvs=$('#gbC');GB.r=P1_view(cvs);GB.r.outputColorSpace=THREE.SRGBColorSpace;GB.r.toneMapping=THREE.ACESFilmicToneMapping;GB.sc=new THREE.Scene();GB.sc.add(new THREE.HemisphereLight(0xe8ecff,0x40384a,1.6));const d=new THREE.DirectionalLight(0xffffff,2.4);d.position.set(5,9,6);GB.sc.add(d);const d2=new THREE.DirectionalLight(0x88ccff,1);d2.position.set(-6,3,-5);GB.sc.add(d2);
     const fl=new THREE.Mesh(new THREE.CylinderGeometry(9,9,.3,48),new THREE.MeshStandardMaterial({color:0x1b2440,roughness:.6}));fl.position.y=-.4;GB.sc.add(fl);const rg=new THREE.Mesh(new THREE.TorusGeometry(9,.08,6,64),neonMat('#22e4ff',2));rg.rotation.x=Math.PI/2;rg.position.y=-.2;GB.sc.add(rg);GB.cam=new THREE.PerspectiveCamera(35,1,.1,100);
     cvs.addEventListener('pointerdown',e=>{GB.drag=e.clientX;cvs.setPointerCapture(e.pointerId)});cvs.addEventListener('pointermove',e=>{if(GB.drag!=null){GB.rot+=(e.clientX-GB.drag)*.01;GB.drag=e.clientX}});cvs.addEventListener('pointerup',()=>GB.drag=null)}
   gbRender();gbLoop()}
@@ -2381,7 +2382,7 @@ function setupRace(cfg){if(cfg.type!=='roam')hubLeave();endCrashCam();ccCool=0;c
   startLights.forEach(l=>l.material.color.setHex(0x220a0e));
   ships.forEach(s=>posShip(s,1/60,true));updateCam(1,true);
   // compile anything new for this race (ghost, liveries) now, during the countdown, instead of mid-race
-  if(booted)renderer.compile(scene,camera)}
+  if(booted)P2_compile(scene,camera)}
 const trkTag=()=>TRK.id==='grand'&&!mirror?'':TRK.id+(mirror?'M':'')+'_';
 const recKey=()=>RC.ev?`mho_rec_${RC.ev.id}`:`mho_rec_${trkTag()}${cls.id}_${dir}_${RC.type}`;const ghostKey=()=>`mho_ghost_${trkTag()}${cls.id}_${dir}`;
 
@@ -3058,16 +3059,18 @@ $('#setBtn').onclick=openSettings;$('#pSet').onclick=openSettings;$('#setDone').
 // The old 2D plane silhouette (pre-LEGO ship era) stays only as the fallback if WebGL fails.
 const W13_TC={};let W13_TR=null,W13_TT=0;
 function W13_visBox(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
-function W13_carImg(t){const W=240,H=120,K=2;if(W13_TC[t.id])return W13_TC[t.id];
- if(!W13_TR){const c=document.createElement('canvas');c.width=W*K;c.height=H*K;const r=new THREE.WebGLRenderer({canvas:c,antialias:true,alpha:true,preserveDrawingBuffer:true});r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=renderer.toneMapping;r.toneMappingExposure=renderer.toneMappingExposure;r.setClearColor(0,0);
+// PERF1: cb(canvas) gets the card; the pixels come back from the GPU asynchronously (no stall), pending requests share one render
+const W13_PD={};function W13_carImg(t,cb){const W=240,H=120,K=2;if(W13_TC[t.id]){cb(W13_TC[t.id]);return}if(W13_PD[t.id]){W13_PD[t.id].push(cb);return}W13_PD[t.id]=[cb];
+ if(!W13_TR){const c=null,r=P1_off(W*K,H*K);r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=renderer.toneMapping;r.toneMappingExposure=renderer.toneMappingExposure;r.setClearColor(0,0);
   const sc=new THREE.Scene();sc.add(new THREE.HemisphereLight(0xffffff,0x5a6470,1.7));const d=new THREE.DirectionalLight(0xffffff,2.3);d.position.set(5,9,-7);sc.add(d);W13_TR={r,sc,c,cam:new THREE.PerspectiveCamera(24,W/H,.1,300)}}
  const{r,sc,c,cam}=W13_TR,g=shipMesh(t),U=g.userData;for(const k of['boat','wheels','shield','under','shadow','flares'])if(U[k])U[k].visible=false;for(const rb of U.ribbons||[])rb.visible=false;
  sc.add(g);const B=W13_visBox(g),m=B.getCenter(new THREE.Vector3()),s=B.getSize(new THREE.Vector3()),R=Math.hypot(s.x,s.y,s.z)*1.55;
- cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.clear();r.render(sc,cam);
- const o=document.createElement('canvas');o.width=W*K;o.height=H*K;o.getContext('2d').drawImage(c,0,0);sc.remove(g);
- clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){W13_TR.r.dispose();W13_TR.r.forceContextLoss();W13_TR=null}},4000);return W13_TC[t.id]=o}
-function teamCard(t){try{const[c,g]=cv(480,240),im=W13_carImg(t);
-  g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();g.drawImage(im,0,0);c.className='w13car';return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
+ cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.renderAsync(sc,cam,o=>{W13_TC[t.id]=o;const L=W13_PD[t.id]||[];delete W13_PD[t.id];for(const f of L)f(o)});sc.remove(g);
+ clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){P1_free('o'+W*K+'x'+H*K);W13_TR=null}},4000)}
+// PERF1: the card shows at once; its 3D car is drawn into it when the GPU readback arrives (a frame or two later), then cached
+function teamCard(t){try{const[c,g]=cv(480,240);
+  g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();c.className='w13car';
+  try{W13_carImg(t,o=>g.drawImage(o,0,0))}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
 function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
   const gl=g.createRadialGradient(0,20,0,0,20,110);gl.addColorStop(0,t.glow+'66');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(-120,-64,240,120);
   g.fillStyle=t.a;g.beginPath();g.moveTo(-100,26);g.lineTo(-18,-10);g.lineTo(0,-40);g.lineTo(18,-10);g.lineTo(100,26);g.lineTo(96,34);g.lineTo(-96,34);g.closePath();g.fill();
@@ -4742,7 +4745,7 @@ const LZT={fraport:'Approaching Fraport…',taunus:'Up into the Taunus…',hombu
 const lzNeed=(x,z,r=900)=>LAZY.filter(L=>!L.done&&lzD(L,x,z)<r).sort((a,b)=>lzD(a,x,z)-lzD(b,x,z));
 // far fast travel into an unbuilt biome: the loading screen stays up while it builds (LEGO 2K style), then the warp
 async function ldTravel(go,need){if(LD.busy)return;const st=state;LD.busy=1;LZ.trav=(LZ.trav||0)+1;ldShow(LZT[need[0].id]||'Fast travel');state='loading';
-  try{await nextFrame();await lzLoad(need,.05,.85);state=st;go();ldSet(.9,'Arriving');try{renderer.compile(scene,camera)}catch(e){}for(const f of[.95,1]){await nextFrame();ldSet(f)}}
+  try{await nextFrame();await lzLoad(need,.05,.85);state=st;go();ldSet(.9,'Arriving');try{P2_compile(scene,camera)}catch(e){}for(const f of[.95,1]){await nextFrame();ldSet(f)}}
   catch(e){console.error(e)}finally{if(state==='loading')state=st;LD.busy=null;ldHide()}}
 // outer woods: copses of pines per 4 km tile (dense in the forest biomes and the south band), built lazily like a biome
 const outerFree2=(x,z)=>{if(!outerFree(x,z))return false;const B=biomeAt(x,z);return !(B&&(B.g==='air'||B.g==='town'||B.g==='city'))&&!lzHit(x,z,8)&&lzRoadD(x,z)>6};
@@ -5915,7 +5918,7 @@ function ldSet(f,t){const p=Math.round(clamp(f,0,1)*100);$('#ldBar').style.width
 function ldShow(t){const el=$('#ld2');LD.on=true;el.hidden=false;el.classList.remove('out');LD.k=Math.floor(Math.random()*LDTIPS.length);$('#ldTip').textContent=LDTIPS[LD.k++%LDTIPS.length];$('#ldTipW').style.opacity=1;{const F=$('#ldFly');if(F){F.hidden=!LD.fly;if(LD.fly){$('#ldFa').textContent=LD.fly.a;$('#ldFb').textContent=LD.fly.b}}}ldSet(0,t);clearInterval(LD.ti);LD.ti=setInterval(ldTip,2800)}
 function ldHide(){clearInterval(LD.ti);LD.on=false;LD.fly=null;const el=$('#ld2');el.classList.add('out');setTimeout(()=>{if(!LD.on&&el.classList.contains('out'))el.hidden=true},260)}
 // link all programs the hub scene needs before the first drive (KHR_parallel_shader_compile polls without blocking; otherwise one program per slice)
-async function ldPrewarm(a,b){if(ENVD)buildEnv();await nextFrame();try{renderer.compile(scene,camera)}catch(e){return}const P=renderer.info.programs.slice();let t=performance.now(),i=0;
+async function ldPrewarm(a,b){if(ENVD)buildEnv();await nextFrame();try{P2_compile(scene,camera)}catch(e){return}const P=renderer.info.programs.slice();let t=performance.now(),i=0;
   for(const p of P){let w=0;while(!p.isReady()&&w++<120){await nextFrame();t=performance.now()}try{p.getUniforms()}catch(e){}i++;if(performance.now()-t>12){ldSet(a+(b-a)*i/P.length);await nextFrame();t=performance.now()}}}
 const SM3={n:0,mb:0,ms:0,on:CID==='ath'&&(()=>{try{return localStorage.getItem('mho_sm3')!=='0'}catch(e){return true}})()};
 const SMM={T:250,N:13,q:[],have:new Set(),st:{tiles:0,max:0,ms:0,shift:0}};
@@ -5961,20 +5964,22 @@ async function SM_upload(a,b){if(!SM3.on||!HUB.grp||SM3.done)return;SM3.done=1;c
   finally{renderer.setRenderTarget(prev);rt.dispose();mt.dispose()}SM3.ms=Math.round(performance.now()-t0)}
 async function roamLoad(atMark){const st=state;ldShow('Warming up the engine');try{await nextFrame();await nextFrame();state='loading';roamPre();setupRace(ROAMCFG);state='loading';ldSet(.06,CCF.raise);await nextFrame();
     let t=performance.now();for(const [f,lab] of buildHubG()){if(performance.now()-t>12){ldSet(.06+f*.6,lab);await nextFrame();t=performance.now()}else if(lab)$('#ldStep').textContent=lab}
-    ldSet(.68,'Switching on the street lights');await nextFrame();hubEnter();ldSet(.74,'Placing rivals & events');await nextFrame();if(!RO.built)buildRoam();{const sv=roamSave(),fm=RO.arrive&&flightMark(),sp=atMark&&atMark.x!=null?[atMark.x,atMark.z]:fm?[fm.x,fm.z]:sv.pos&&sv.lay===LAYOUT_VER?[sv.pos.x,sv.pos.z]:null,need=sp?lzNeed(sp[0],sp[1]):[];if(need.length){ldSet(.76,LZT[need[0].id]||'Outskirts');await lzLoad(need,.76,.8)}}
+    ldSet(.68,'Switching on the street lights');await nextFrame();hubEnter();P2_warm(scene,camera);ldSet(.74,'Placing rivals & events');await nextFrame();if(!RO.built)buildRoam();{const sv=roamSave(),fm=RO.arrive&&flightMark(),sp=atMark&&atMark.x!=null?[atMark.x,atMark.z]:fm?[fm.x,fm.z]:sv.pos&&sv.lay===LAYOUT_VER?[sv.pos.x,sv.pos.z]:null,need=sp?lzNeed(sp[0],sp[1]):[];if(need.length){ldSet(.76,LZT[need[0].id]||'Outskirts');await lzLoad(need,.76,.8)}}
     ldSet(.8,'Painting the sky');await nextFrame();await SM_qvLoad(.82,.86);await ldPrewarm(.86,.95);await SM_upload(.95,.99);ldSet(1,'Ready');await nextFrame();
     roamPost(atMark);try{composer.render()}catch(e){}}
   catch(e){console.error(e);if(state==='loading')state=st;throw e}finally{LD.busy=null;ldHide()}}
 // far fast travel: short loader instead of the black flash
-async function ldFlash(fn){ldShow('Fast travel');fn();LD.on=false;try{renderer.compile(scene,camera)}catch(e){}ldSet(.45,'Arriving');for(const f of[.7,.9,1]){await nextFrame();ldSet(f)}ldHide()}
+async function ldFlash(fn){ldShow('Fast travel');fn();LD.on=false;try{P2_compile(scene,camera)}catch(e){}ldSet(.45,'Arriving');for(const f of[.7,.9,1]){await nextFrame();ldSet(f)}ldHide()}
 
 /* ============================================================ boot */
 let booted=false;
 function boot(){MAT.roof=new THREE.MeshStandardMaterial({color:0x0c0e1e,roughness:.6,metalness:.4});buildAmbient();buildTrafficMeshes();loadTrack(menuTrack);
   SPARK=linePool(700);FIRE=pointPool(900,5);SMOKE=spritePool(520,false);FIREB=spritePool(320,true);buildDebris();buildPropMeshes();buildStreaks();GLOWP=pointPool(120,6);WATER=pointPool(400,3);
   toMenu();const done=()=>{booted=true;$('#loading').hidden=true;{const d=document.createElement('div');d.id='gfxNote';d.textContent='Graphics: '+TEXVAR.name;d.style.cssText='font:11px system-ui,sans-serif;opacity:.5;margin-top:10px;letter-spacing:.04em';$('.mpanel').appendChild(d)}$('#topBtns').hidden=false;$('#muteBtn').textContent=$('#pMute').textContent=AU.muted?'SOUND OFF':'SOUND ON';requestAnimationFrame(frame);if(BOOTF&&BOOTF.go==='roam'){if(BOOTF.arrive){RO.arrive=BOOTF.arrive;LD.fly={a:BOOTF.from==='ath'?'ATH':'FRA',b:CCF.code,to:CID,arr:1}}setTimeout(()=>{homeShow(false);enterRoam()},0)}};
-  warmTextures(scene);const warm=[V3(0,0,-5),V3(0,-5,-5)];for(const w of warm){emitS(SMOKE,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,true);emitS(FIREB,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,false)}
-  renderer.compile(scene,camera);setTimeout(done,0)}
+  warmTextures(scene);
+  // PERF2: the first menu frame links only the programs it draws; the rest of the scene (particles, props off screen) is queued right after it,
+  // so the GPU process links them while the menu idles instead of before the menu can show
+  setTimeout(()=>{done();P2_after(()=>{const warm=[V3(0,0,-5),V3(0,-5,-5)];for(const w of warm){emitS(SMOKE,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,true);emitS(FIREB,camera.position.clone().add(w),V3(),.05,new THREE.Color(0,0,0),1,1,0,false)}P2_warm(scene,camera)})},0)}
 setTimeout(boot,30);
 // ---- Career map: neon Frankfurt hub screen (nodes for every career event; free roam is the optional Cruise node)
 const CM={on:false,nodes:[],raf:0,t:0,P:null};
@@ -9952,9 +9957,9 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  const crew=[[{h:'grin',x:'cap',t:'plain',l:'#2b3a67',c:'#c4281c'},-11,-6,.9],[{h:'smile',x:'short',t:'hoodie',l:'#1b1d22',c:'#36d17a'},11.5,-9,-.6],[{h:'wink',x:'cap',t:'logo',l:'#2b3a67',c:'#2f7bff'},-10.5,8,2.2],[{h:'smile',x:'long',t:'plain',l:'#8a8f99',c:'#ff7a1c'},12,7,-2.4],[{h:'grin',x:'cap',t:'logo',l:'#1b1d22',c:'#fac80a'},-12,14,2.6],[{h:'smile',x:'short',t:'plain',l:'#2b3a67',c:'#0055bf'},-2,16,3.1]];
  GS.crew=[];for(const[f,x,z,ry]of crew){const M=[],L=[];GB_figGeo(f,M,L,false);const o=new THREE.Group();o.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)o.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));o.traverse(m=>{if(m.isMesh)m.castShadow=true});
   o.position.set(x,y0-.5,z);o.rotation.y=ry;o.userData.ph=Math.random()*6;G.add(o);GS.crew.push(o)}
- // soft studio reflections for the glossy bricks
- try{const pm2=new THREE.PMREMGenerator(R),es=new THREE.Scene();es.background=new THREE.Color(0x56607a);const lm=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=-2;i<=2;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(2,.2,30),lm);s.position.set(i*5,8,0);es.add(s)}
-  const fm=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshBasicMaterial({color:0x2a2f38}));fm.rotation.x=-Math.PI/2;fm.position.y=-2;es.add(fm);S.environment=pm2.fromScene(es,.04).texture;S.environmentIntensity=.55;pm2.dispose()}catch(e){}
+ // soft studio reflections for the glossy bricks (PERF1: built with the main renderer, the builder draws in its context)
+ const cc0=renderer.getClearColor(new THREE.Color()),ca0=renderer.getClearAlpha();try{const pm2=new THREE.PMREMGenerator(renderer),es=new THREE.Scene();es.background=new THREE.Color(0x56607a);const lm=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=-2;i<=2;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(2,.2,30),lm);s.position.set(i*5,8,0);es.add(s)}
+  const fm=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshBasicMaterial({color:0x2a2f38}));fm.rotation.x=-Math.PI/2;fm.position.y=-2;es.add(fm);S.environment=pm2.fromScene(es,.04).texture;S.environmentIntensity=.55;pm2.dispose()}catch(e){console.warn('GS env',e)}renderer.setClearColor(cc0,ca0);
  GS_fitY()}
 // the platform sits exactly under the tyres (measured from the wheel meshes; the old disc top was -0.25)
 function GS_fitY(){if(!GS.g||!GB.mesh)return;GB.mesh.updateMatrixWorld(true);let y=null;const P=new THREE.Vector3(),Sc=new THREE.Vector3();
@@ -10004,11 +10009,11 @@ let GS_t0=0;gbLoop=(f=>function(){const now=performance.now(),dt=Math.min(.05,GS
 gbRender=(f=>function(){const r=f.apply(this,arguments);GS_fitY();GS_shadows();return r})(gbRender);
 // ---------- 3D part thumbnails: one small offscreen renderer, each part drawn once per colour, only for the open category
 function GS_thumb(t,c){const key=t+'|'+c;if(GS.thC.has(key))return GS.thC.get(key);let T=GS.th;
- if(!T){const cv=document.createElement('canvas');cv.width=cv.height=112;const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.setPixelRatio(1);r.setSize(112,112,false);
+ if(!T){const cv=null,r=P1_off(112,112);r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.setPixelRatio(1);r.setSize(112,112,false);
   const s=new THREE.Scene();s.add(new THREE.HemisphereLight(0xffffff,0x606878,2.2));const d=new THREE.DirectionalLight(0xffffff,2.2);d.position.set(3,6,4);s.add(d);T=GS.th={r,s,cam:new THREE.PerspectiveCamera(30,1,.01,100),cv}}
  let url=null;try{const M=[],L=[];GB_brickGeo({t,x:0,z:0,y:0,r:0,m:0,c},M,L);if(M.length||L.length){const o=new THREE.Group();if(M.length)o.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)o.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));
   const bb=new THREE.Box3().setFromObject(o),ce=bb.getCenter(new THREE.Vector3()),rad=Math.max(.2,bb.getSize(new THREE.Vector3()).length()/2);o.position.sub(ce);T.s.add(o);
-  const d=rad/Math.sin(15*Math.PI/180)*1.02;T.cam.position.set(d*.55,d*.55,d*.63);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(o);o.traverse(m=>{if(m.isMesh)m.geometry.dispose()})}}catch(e){url=null}
+  const d=rad/Math.sin(15*Math.PI/180)*1.02;T.cam.position.set(d*.55,d*.55,d*.63);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(o);o.traverse(m=>{if(m.isMesh)m.geometry.dispose()})}}catch(e){url=null}
  GS.thC.set(key,url);return url}
 function GS_thumbs(){if(!GB_.bk)return;const c=GB_.col;document.querySelectorAll('#gbBkPc .gbPc').forEach(b=>{if(b.style.display==='none')return;if(b.dataset.tc===String(c))return;const u=GS_thumb(b.dataset.p,c);if(!u)return;b.dataset.tc=c;let im=b.querySelector('img');if(!im){im=document.createElement('img');im.alt='';b.insertBefore(im,b.firstChild)}im.src=u;b.classList.add('gsTh')})}
 CR_cat=(f=>function(ct){const r=f(ct);try{GS_thumbs()}catch(e){}return r})(CR_cat);
@@ -10332,7 +10337,7 @@ function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car
  if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;try{const host=new THREE.Group(),g={userData:{m:host}};GB_attach(g,G9C_bricks(S,f),null,false,false);
   host.rotation.y=G9C.ry;host.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());host.position.sub(ce);T.s.add(host);
   T.r.setSize(W,Hh,false);T.cam.aspect=W/Hh;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.6)*1.75;T.cam.position.set(0,d*.42,d*.9);T.cam.lookAt(0,-sz.y*.04,0);
-  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('G9C',e);url=null}
+  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('G9C',e);url=null}
  finally{T.r.setSize(112,112,false);T.cam.aspect=1;T.cam.updateProjectionMatrix()}G9C.th.set(key,url);return url}
 function G9C_pump(){if(G9C.busy)return;const next=()=>{const im=document.querySelector('#g9Col img[data-k]:not([src])');if(!im||$('#gbx').hidden){G9C.busy=0;return}
   const S=GAR_set(im.dataset.s),u=G9C_render(S,im.dataset.f);if(u)im.src=u;else im.removeAttribute('data-k');setTimeout(next,16)};G9C.busy=1;setTimeout(next,30)}
@@ -10718,7 +10723,7 @@ const R2_KT=new Map();
 function R2_kitTh(k){if(R2_KT.has(k))return R2_KT.get(k);if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;const host=new THREE.Group(),mt=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45}),ms=[mt('#e01e2b'),mt('#d8dde4'),mt('#2a2f38')];
  try{const n0=host.children.length;
   kitParts(k,host,ms[0],ms[1],ms[2],{glow:'#22e4ff',a:'#e01e2b',b:'#ffd12c',c:'#ffffff'});if(host.children.length>n0){const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),rad=Math.max(.15,bb.getSize(new THREE.Vector3()).length()/2);host.position.sub(ce);T.s.add(host);
-   const d=rad/Math.sin(15*Math.PI/180)*.9;T.cam.position.set(d*.62,d*.45,-d*.64);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host)}}catch(e){url=null}
+   const d=rad/Math.sin(15*Math.PI/180)*.9;T.cam.position.set(d*.62,d*.45,-d*.64);T.cam.lookAt(0,0,0);T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host)}}catch(e){url=null}
  host.traverse(o=>{if(o.isMesh){o.geometry.dispose();if(!ms.includes(o.material)&&o.material.dispose&&!o.material.isShaderMaterial)o.material.dispose()}});ms.forEach(m=>m.dispose());R2_KT.set(k,url);return url}
 const R2_PT=new Map();
 function R2_patTh(p){if(R2_PT.has(p))return R2_PT.get(p);let u='';try{const[c,g]=cv(512,512),d=GB.d||{};g.fillStyle=d.a||'#e01e2b';g.fillRect(0,0,512,512);liveryPat({a:d.a||'#e01e2b',b:d.b||'#ffd12c',c:d.c||'#ffffff',pat:p,num:d.num||7},g);
@@ -11985,7 +11990,7 @@ function LV_boatStep(dt){const B=LV.boats;if(!B)return;const L=B.L;
 function LV_init(){if(LV.init||!HUB.grp||!HUB.nodes||!HUB.nodes.length||!HUB.bld||!HUB.bld.length)return;LV.init=true;
   try{LV_birdInit()}catch(e){console.warn('LV birds',e)}try{LV_flagInit()}catch(e){console.warn('LV flags',e)}try{LV_blimpInit()}catch(e){console.warn('LV blimp',e)}try{LV_boatInit()}catch(e){console.warn('LV boats',e)}try{LV_clInit()}catch(e){console.warn('LV clusters',e)}
   // v88s perf: pre-warm the shaders of the Life meshes and the (lazily built) pop-up ring, so the first stall / first pop-up does not stall a frame on a shader compile
-  try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;renderer.compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
+  try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;P2_compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
 function LV_step(dt){if(!RO.on)return;LV_init();if(!LV.init)return;LV.t+=dt;LV.fr++;const t0=performance.now();camera.updateMatrixWorld();LV_seenF.setFromProjectionMatrix(_lvPM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   LV_birdStep(dt);LV_flagStep();LV_blimpStep();LV_boatStep(dt);try{LV_clStep(dt)}catch(e){if(!LV.e1){LV.e1=1;console.warn('LV cl',e)}}try{LV_parkStep()}catch(e){if(!LV.e2){LV.e2=1;console.warn('LV park',e)}}LV.ms=LV.ms==null?0:LV.ms*.95+(performance.now()-t0)*.05}
 {const _lvHT=hubTrafficStep;hubTrafficStep=dt=>{_lvHT(dt);LV_step(dt)}}
@@ -12919,7 +12924,7 @@ GB_ui=(f=>function(){const r=f.apply(this,arguments);const C=typeof SL!=='undefi
 function PA_thumb(p){if(PA.th.has(p.id))return PA.th.get(p.id);if(!GS.th)try{GS_thumb('b11',0)}catch(e){}const T=GS.th;if(!T)return null;let url=null;
  try{const host=new THREE.Group(),g={userData:{m:host}};GB_attach(g,p.b,null,false,false);host.rotation.y=.75;host.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());
   host.position.sub(ce);T.s.add(host);T.r.setSize(100,72,false);T.cam.aspect=100/72;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.5)*1.6+.5;T.cam.position.set(0,d*.5,d*.85);T.cam.lookAt(0,0,0);
-  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('PA',e);url=null}
+  T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('PA',e);url=null}
  finally{try{T.r.setSize(112,112,false);T.cam.aspect=1;T.cam.updateProjectionMatrix()}catch(e){}}PA.th.set(p.id,url);return url}
 // palette: the MY PARTS tab (first card = the canvas), cards follow the palette's category / favourites filtering
 CR_CATS.unshift(PA_CAT);
@@ -13537,6 +13542,8 @@ if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)retur
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89i',id:'perf-thumbs',text:'Garage: part pictures and car cards all show (no blank tiles), and PAINT recolours them.'},
+ {ver:'v89i',id:'perf-ctx',text:'iPhone: open and close the garage 3×, then drive: no black screen, no reload.'},
  {ver:'v89h',id:'ath-take2',text:'Athens: stop near traffic, get out and walk up to a car that stops for you (walk round a scooter if one is in front): 🚗 TAKE appears and you drive off with ★1.'},
  {ver:'v89h',id:'ath-fill',text:'Athens: drive 1 to 1.5 km out from the centre and look between the streets: blocks have windows and balconies, no long blank grey or beige walls.'},
  {ver:'v89h',id:'pin-yield',text:'Phone: at the story start Oma Hilde\'s tip is fully readable, and tapping ❚❚ shows the whole PAUSE card (RESUME not covered). The checklist bar comes back afterwards.'},
@@ -14027,6 +14034,95 @@ window.__ro2=()=>{if(!OPN_on()||!pl)return null;const v=V3(),o={vis:0};camera.up
   for(const s of ships){if(s===pl||!s.mesh)continue;const dx=s.mesh.position.x-camera.position.x,dy=s.mesh.position.y-camera.position.y,dz=s.mesh.position.z-camera.position.z,fw=camera.getWorldDirection(V3());if(dx*fw.x+dy*fw.y+dz*fw.z<=0)continue;v.copy(s.mesh.position).project(camera);if(v.z<1&&Math.abs(v.x)<1&&Math.abs(v.y)<1&&s.mesh.position.distanceTo(camera.position)<180)o.vis++}
   const lane=s=>{const i=OPN_i(s.dist),ri=OPN.RT[i];return ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5?OPN.routes[ri].kind+ri+'@'+s.lap:null};
   o.pl=lane(pl);o.ai=ships.filter(s=>s!==pl).map(s=>s.name+'|'+lane(s));o.rsp=typeof RSP!=='undefined'?RSP.n:0;o.fp=OPN.fallsP;o.fa=OPN.falls-OPN.fallsP;o.nr=OPN.routes.length;o.ter=pl.terrain||'road';o.ax=Math.abs(pl.x);OPN_segStep();o.seg=Object.fromEntries(Object.entries(OPN.seg||{}).map(([k,v])=>[k,v.list]));return o};
+// ============================================================ PERF1 (v89i): one WebGL context
+// The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had their own
+// WebGLRenderer = a second/third/fourth context, every shader compiled again, and PNG encodes of WebGL canvases (toDataURL) on garage open.
+// Now all of them draw with the main renderer:
+//  - P1_off(w,h): an offscreen "renderer" (same API subset the old code used) that renders into a 4x MSAA render target and reads the pixels back;
+//    .canvas() gives a 2D canvas, .url() a blob URL (tiny uncompressed PNG, no canvas encode).
+//  - P1_view(cvs): the builder's "renderer". While the garage is open the main canvas #c is moved under the (now transparent) #gbC,
+//    sized to it, and the builder draws there (4x MSAA target + one copy pass); the main game render is skipped (it was hidden by #gbx anyway).
+//    Closing the garage puts #c back and calls resize().
+// Render targets keep the canvas look: same tone mapping, sRGB encode in the shader (isXRRenderTarget path of three r164), RGBA8 storage.
+const P1={gb:false,rt:{},q:[],qOn:false,qs:null,qc:null,qm:null};
+function P1_rt(k,w,h){let t=P1.rt[k];if(t&&t.width===w&&t.height===h)return t;if(t)t.dispose();
+ // allocate as linear RGBA8 (MSAA renderbuffer and resolve texture must match), then switch the texture to sRGB so three encodes in the shader
+ t=new THREE.WebGLRenderTarget(w,h,{samples:renderer.capabilities.isWebGL2?4:0,type:THREE.UnsignedByteType,depthBuffer:true});t.isXRRenderTarget=true;
+ const prev=renderer.getRenderTarget();renderer.setRenderTarget(t);renderer.setRenderTarget(prev);t.texture.colorSpace=THREE.SRGBColorSpace;return P1.rt[k]=t}
+function P1_free(k){const t=P1.rt[k];if(t){t.dispose();delete P1.rt[k]}}
+// draw scene into render target k with the given tone mapping / clear / shadow settings; restores the main renderer afterwards
+function P1_draw(k,w,h,sc,cam,o){const R=renderer,sm=R.shadowMap,S={rt:R.getRenderTarget(),tm:R.toneMapping,ex:R.toneMappingExposure,cc:R.getClearColor(new THREE.Color()),ca:R.getClearAlpha(),ac:R.autoClear,se:sm.enabled,st:sm.type,su:sm.autoUpdate,sn:sm.needsUpdate,ar:R.info.autoReset};
+ const t=P1_rt(k,w,h);try{R.info.autoReset=false;R.toneMapping=o.tm;R.toneMappingExposure=o.ex;R.setClearColor(o.cc,o.ca);R.autoClear=true;
+  if(o.sm){sm.enabled=o.sm.enabled;sm.type=o.sm.type;sm.autoUpdate=o.sm.autoUpdate;sm.needsUpdate=o.sm.needsUpdate}else sm.enabled=false;
+  R.setRenderTarget(t);R.clear();R.render(sc,cam);if(o.sm)o.sm.needsUpdate=sm.needsUpdate}
+ finally{R.setRenderTarget(S.rt);R.toneMapping=S.tm;R.toneMappingExposure=S.ex;R.setClearColor(S.cc,S.ca);R.autoClear=S.ac;sm.enabled=S.se;sm.type=S.st;sm.autoUpdate=S.su;sm.needsUpdate=S.sn;R.info.autoReset=S.ar}return t}
+// ---- offscreen renderer: render -> pixels (top-down, straight alpha, like drawImage of an alpha WebGL canvas)
+function P1_off(w,h){return{w,h,toneMapping:THREE.NoToneMapping,toneMappingExposure:1,outputColorSpace:THREE.SRGBColorSpace,cc:new THREE.Color(0),ca:0,px:null,
+ setPixelRatio(){},setSize(w,h){this.w=w;this.h=h},setClearColor(c,a=1){this.cc.set(c);this.ca=a},clear(){},
+ render(sc,cam){const w=this.w,h=this.h,t=P1_draw('o'+w+'x'+h,w,h,sc,cam,{tm:this.toneMapping,ex:this.toneMappingExposure,cc:this.cc,ca:this.ca}),b=new Uint8Array(w*h*4);renderer.readRenderTargetPixels(t,0,0,w,h,b);this.px=P1_img(b,w,h)},
+ // same, but the pixels come back through a pixel-pack buffer + fence (WebGL2): the main thread never waits for the GPU queue
+ renderAsync(sc,cam,cb){const w=this.w,h=this.h,t=P1_draw('o'+w+'x'+h,w,h,sc,cam,{tm:this.toneMapping,ex:this.toneMappingExposure,cc:this.cc,ca:this.ca});
+  P1_readAsync(t,w,h,b=>{const o=P1_off(w,h);o.px=P1_img(b,w,h);cb(o.canvas())})},
+ canvas(){const c=document.createElement('canvas');c.width=this.w;c.height=this.h;if(this.px)c.getContext('2d').putImageData(this.px,0,0);return c},
+ url(){return this.px?P1_png(this.px):null}}}
+// GL rows (bottom-up, premultiplied by the blend) -> ImageData (top-down, straight alpha)
+function P1_img(b,w,h){const d=new Uint8ClampedArray(w*h*4),r=w*4;for(let y=0;y<h;y++){const s=(h-1-y)*r,o=y*r;for(let i=0;i<r;i+=4){const a=b[s+i+3];d[o+i+3]=a;if(a===255||a===0){d[o+i]=b[s+i];d[o+i+1]=b[s+i+1];d[o+i+2]=b[s+i+2]}else{const k=255/a;d[o+i]=b[s+i]*k;d[o+i+1]=b[s+i+1]*k;d[o+i+2]=b[s+i+2]*k}}}return new ImageData(d,w,h)}
+function P1_readAsync(t,w,h,cb){const R=renderer,gl=R.getContext(),sync=()=>{const b=new Uint8Array(w*h*4);R.readRenderTargetPixels(t,0,0,w,h,b);cb(b)};
+ if(!R.capabilities.isWebGL2||!gl.fenceSync)return sync();let buf,f;
+ try{buf=gl.createBuffer();gl.bindBuffer(gl.PIXEL_PACK_BUFFER,buf);gl.bufferData(gl.PIXEL_PACK_BUFFER,w*h*4,gl.STREAM_READ);R.state.bindFramebuffer(gl.FRAMEBUFFER,R.properties.get(t).__webglFramebuffer);
+  gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,0);f=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush()}catch(e){f=null}finally{gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);R.state.bindFramebuffer(gl.FRAMEBUFFER,null);R.setRenderTarget(R.getRenderTarget())}
+ if(!f){if(buf)gl.deleteBuffer(buf);return sync()}
+ const poll=()=>{const st=gl.clientWaitSync(f,0,0);if(st===gl.TIMEOUT_EXPIRED){setTimeout(poll,16);return}gl.deleteSync(f);const b=new Uint8Array(w*h*4);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,buf);gl.getBufferSubData(gl.PIXEL_PACK_BUFFER,0,b);gl.bindBuffer(gl.PIXEL_PACK_BUFFER,null);gl.deleteBuffer(buf);cb(b)};setTimeout(poll,16)}
+// minimal PNG (stored deflate blocks): sync, a few hundred µs for a thumbnail, any browser decodes it
+const P1_CRC=(()=>{const T=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;T[n]=c>>>0}return T})();
+function P1_png(im){const w=im.width,h=im.height,px=im.data,row=w*4+1,raw=new Uint8Array(row*h);for(let y=0;y<h;y++)raw.set(px.subarray(y*w*4,(y+1)*w*4),y*row+1);
+ const nb=Math.max(1,Math.ceil(raw.length/65535)),z=new Uint8Array(2+raw.length+nb*5+4);z[0]=0x78;z[1]=1;let p=2,a=1,b2=0;
+ for(let i=0;i<nb;i++){const s=i*65535,n=Math.min(65535,raw.length-s);z[p++]=i===nb-1?1:0;z[p++]=n&255;z[p++]=n>>8;z[p++]=~n&255;z[p++]=(~n>>8)&255;z.set(raw.subarray(s,s+n),p);p+=n}
+ for(let i=0;i<raw.length;i++){a=(a+raw[i])%65521;b2=(b2+a)%65521}const ad=((b2<<16)|a)>>>0;z[p++]=ad>>>24;z[p++]=(ad>>16)&255;z[p++]=(ad>>8)&255;z[p++]=ad&255;
+ const ch=(ty,d)=>{const o=new Uint8Array(12+d.length),v=new DataView(o.buffer);v.setUint32(0,d.length);for(let i=0;i<4;i++)o[4+i]=ty.charCodeAt(i);o.set(d,8);let c=0xffffffff;for(let i=4;i<8+d.length;i++)c=P1_CRC[(c^o[i])&255]^(c>>>8);v.setUint32(8+d.length,(c^0xffffffff)>>>0);return o};
+ const hd=new Uint8Array(13),hv=new DataView(hd.buffer);hv.setUint32(0,w);hv.setUint32(4,h);hd[8]=8;hd[9]=6;
+ return URL.createObjectURL(new Blob([new Uint8Array([137,80,78,71,13,10,26,10]),ch('IHDR',hd),ch('IDAT',z),ch('IEND',new Uint8Array(0))],{type:'image/png'}))}
+// ---- garage builder view: draws into the main canvas, which sits under the transparent #gbC while the garage is open
+function P1_view(cvs){return{domElement:cvs,toneMapping:THREE.NoToneMapping,toneMappingExposure:1,outputColorSpace:THREE.SRGBColorSpace,pr:1,cc:new THREE.Color(0),ca:0,
+ shadowMap:{enabled:false,type:THREE.PCFShadowMap,autoUpdate:true,needsUpdate:false},
+ setPixelRatio(p){this.pr=p},getPixelRatio(){return this.pr},setSize(w,h){cvs.width=Math.floor(w*this.pr);cvs.height=Math.floor(h*this.pr)},setClearColor(c,a=1){this.cc.set(c);this.ca=a},
+ render(sc,cam){P1_gbDraw(this,sc,cam)}}}
+function P1_attach(cvs){if(P1.gb)return;const c=renderer.domElement;P1.par=c.parentNode;P1.nx=c.nextSibling;P1.gb=true;cvs.parentNode.insertBefore(c,cvs);$('#gbx').classList.add('p1on');P1.box=''}
+function P1_detach(){if(!P1.gb)return;const c=renderer.domElement;P1.gb=false;if(P1.par)P1.par.insertBefore(c,P1.nx&&P1.nx.parentNode===P1.par?P1.nx:null);c.style.cssText='';$('#gbx').classList.remove('p1on');P1_free('gb');try{resize()}catch(e){}}
+function P1_gbDraw(V,sc,cam){const cvs=V.domElement;if($('#gbx').hidden)return;P1_attach(cvs);const R=renderer,c=R.domElement,W=cvs.width,H=cvs.height;if(!W||!H)return;
+ const bx=cvs.offsetLeft+','+cvs.offsetTop+','+cvs.clientWidth+','+cvs.clientHeight;if(bx!==P1.box){P1.box=bx;c.style.cssText=`position:absolute;inset:auto;left:${cvs.offsetLeft}px;top:${cvs.offsetTop}px;width:${cvs.clientWidth}px;height:${cvs.clientHeight}px;pointer-events:none`}
+ if(R.getPixelRatio()!==1)R.setPixelRatio(1);if(c.width!==W||c.height!==H)R.setSize(W,H,false);
+ const t=P1_draw('gb',W,H,sc,cam,{tm:V.toneMapping,ex:V.toneMappingExposure,cc:V.cc,ca:V.ca,sm:V.shadowMap});
+ if(!P1.qs){P1.qm=new THREE.ShaderMaterial({uniforms:{t:{value:null},bg:{value:new THREE.Vector3(0x31/255,0x3a/255,0x4c/255)}},depthTest:false,depthWrite:false,toneMapped:false,
+   vertexShader:'varying vec2 u;void main(){u=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:'uniform sampler2D t;uniform vec3 bg;varying vec2 u;void main(){vec4 c=texture2D(t,u);gl_FragColor=vec4(c.rgb+bg*(1.-c.a),1.);}'});
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(2,2),P1.qm);m.frustumCulled=false;P1.qs=new THREE.Scene();P1.qs.add(m);P1.qc=new THREE.OrthographicCamera(-1,1,1,-1,0,1)}
+ P1.qm.uniforms.t.value=t.texture;const ac=R.autoClear,ar=R.info.autoReset;R.info.autoReset=false;R.autoClear=false;try{R.setRenderTarget(null);R.render(P1.qs,P1.qc)}finally{R.autoClear=ac;R.info.autoReset=ar}}
+{const st=document.createElement('style');st.textContent='#gbx.p1on #gbC{opacity:0}';document.head.appendChild(st)}
+new MutationObserver(()=>{if($('#gbx').hidden)P1_detach()}).observe($('#gbx'),{attributes:true,attributeFilter:['hidden']});
+// while the builder owns the main canvas: no game render into it and no resize of it (resize runs when the garage closes)
+composer.render=(f=>function(...a){if(P1.gb){if($('#gbx').hidden)P1_detach();else return}return f.apply(this,a)})(composer.render);
+resize=(f=>function(){if(P1.gb)return;return f.apply(this,arguments)})(resize);
+// ---- garage thumbnails: lazy, a few per frame (≥2, ~10 ms; visible tiles first), cached per part + colour
+GS_thumbs=function(){if(!GB_.bk)return;const c=GB_.col;document.querySelectorAll('#gbBkPc .gbPc').forEach(b=>{if(b.style.display==='none'||b.dataset.tc===String(c))return;
+  const key=b.dataset.p+'|'+c;if(GS.thC.has(key))P1_thSet(b,c,GS.thC.get(key));else if(!P1.q.some(q=>q.b===b&&q.c===c))P1.q.push({b,c})});P1_tq()};
+function P1_thSet(b,c,u){if(!u)return;b.dataset.tc=c;let im=b.querySelector('img');if(!im){im=document.createElement('img');im.alt='';b.insertBefore(im,b.firstChild)}im.src=u;b.classList.add('gsTh')}
+function P1_tq(){if(P1.qOn||!P1.q.length)return;P1.qOn=true;requestAnimationFrame(function step(){const t0=performance.now(),vh=innerHeight,vw=innerWidth;
+  P1.q=P1.q.filter(q=>q.c===GB_.col&&q.b.isConnected&&q.b.dataset.tc!==String(q.c)&&!$('#gbx').hidden);
+  const vis=q=>{const r=q.b.getBoundingClientRect();return r.width>0&&r.right>0&&r.left<vw&&r.bottom>0&&r.top<vh};P1.q.sort((a,b)=>vis(b)-vis(a));
+  let n=0;while(P1.q.length&&(n++<2||performance.now()-t0<10)){const q=P1.q.shift();try{P1_thSet(q.b,q.c,GS_thumb(q.b.dataset.p,q.c))}catch(e){}}
+  if(P1.q.length)requestAnimationFrame(step);else P1.qOn=false})}
+window.__P1={P1,off:P1_off,draw:P1_draw,gb:()=>GB,R:renderer,ctx:()=>P1,progs:()=>renderer.info.programs.map(p=>p.name+'#'+p.usedTimes),keys:()=>renderer.info.programs.map(p=>p.cacheKey)};
+// ============================================================ PERF2 (v89i): shader warm-up off the critical path
+// renderer.compile only issues compile/link to the GPU process; the main thread blocks later, at the first draw that needs a program
+// (three reads its uniforms). So: link programs early and in the background (the existing ldPrewarm polls KHR_parallel_shader_compile where the browser has it), and never ask for programs the next frame does not draw.
+function P2_after(fn){requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn()}catch(e){console.warn('P2',e)}}))}
+// every warm-up compiled with no render target bound, i.e. the canvas variant (sRGB out + tone mapping). The game draws the scene through the
+// composer (RenderPass -> linear HalfFloat target, no tone mapping): a different program. So each warm-up linked ~50 programs that were never used,
+// and the real ones still linked at the first frame. P2_compile compiles for the composer's target.
+function P2_compile(sc,cam){const R=renderer,t=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);
+ try{return R.compile(sc,cam)}finally{R.setRenderTarget(t,f,l)}}
+// (plain compile: issuing the links is enough; three r164 compileAsync can throw on a material without a program while polling)
+function P2_warm(sc,cam){try{P2_compile(sc,cam)}catch(e){}}
 window.__mho={pin:()=>{const p=PIN_S.cur,N=QV.nav,t=PIN_navPt(),G=QV.g;let snap=null;if(p&&G){const i=qvNear(p.x,p.z,50);snap=i<0?null:Math.hypot(G.X[i]-p.x,G.Z[i]-p.z)}return{ready:!!(G&&G.N===HUB.nodes),on:!!p,x:p&&p.x,z:p&&p.z,d:p&&p.d,athd:CID==='ath'?ATHD:null,snap,wp:!!p&&RO.wp===p,nav:N?{n:N.P.length,tx:N.tx,tz:N.tz,rem:N.rem,rec:N.rec}:null,tgt:t&&{x:t.x,z:t.z,gate:!!t.gate,to:t.to||null},dist:p?PIN_dist():null,log:{...PIN_S.log},menu:!!PIN_S.menu,beam:!!(PIN_S.mesh&&PIN_S.mesh.visible),clr:!!document.getElementById('pinClr')&&!document.getElementById('pinClr').hidden}},pinSet:(x,z)=>PIN_set(x,z,1),pinNode:(d,near)=>{const G=QV.g;if(!G)return null;let b=null,bd=1e18;for(const i of G.list){const x=G.X[i],z=G.Z[i];if(CID==='ath'){const[e,n]=RW(x,z);if(athDistAt(e,n)!==d)continue}const dd=Math.hypot(x-near.x,z-near.z);if(dd<bd){bd=dd;b=[x,z]}}return b},pinClear:()=>PIN_clear(1),pinMapXY:(x,z,c)=>{if(c!==false){RO.mapC={x,z};drawRoamMap()}const[px,py]=RO.mapP(x,z),r=document.getElementById('roamMapC').getBoundingClientRect(),k=DPR2();return[r.left+px/k,r.top+py/k]},pinMini:()=>{const p=PIN_S.cur;if(!p||!RO.miniTo)return null;const el=document.querySelector('#roamMini canvas'),W=el.width,c=W/2,R0=c-6;let[a,b]=RO.miniTo(p.x,p.z);const d=Math.hypot(a,b),lim=R0-12;if(d>lim){a*=lim/d;b*=lim/d}return[c+a,c+b,W]},CE:{junc:()=>JUNC.map(J=>[J.x,J.z,J.r]),info:()=>HUB.CE&&{...HUB.CE},prof:()=>{const P=HUB.props.slice(0,20000),o={};for(const[k,f]of[['city',(x,z)=>cityAt(x,z)],['fill',(x,z)=>fillAt(x,z)],['ab',(x,z)=>abAt(x,z)],['trail',(x,z)=>trailDist(x,z)],['mtn',(x,z)=>mtnDist(x,z)],['lz',(x,z)=>lzRoadD(x,z)],['ard',(x,z)=>athRoadD(x,z,40)],['onRoad',(x,z)=>CE_onRoad(x,z)],['riv',(x,z)=>inRiver(x,z,-2)],['deck',(x,z)=>onAnyDeck(x,z)],['gy',(x,z)=>groundY(x,z)]]){const t=performance.now();for(const p of P)f(p.x,p.z);o[k]=Math.round(performance.now()-t)}return o}},athPts:id=>CITY_S.filter(S=>S.r.id===id).flatMap(S=>S.pts.map(p=>[p.x,p.z,S.r.w])),shd:(x,z)=>{const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32))||[];const o={};for(let j=0;j<L.length;j+=2){const S=L[j];o[CITY_S.indexOf(S)]=(o[CITY_S.indexOf(S)]||0)+1}return [Math.floor(x/32),Math.floor(z/32),o]},ahh:(x,z)=>[athHillH(x,z),athShelfY(x,z,athHillH(x,z)),HILLS.map(h=>h.id+'='+athHill1(h,x,z).toFixed(1)).join(' ')],athPiece:(si,a,b)=>CITY_S[si].pts.slice(a,b).map((p,k)=>[a+k,+(p.y??0).toFixed(2),p.j?1:0,+p.s.toFixed(1),+athHillH(p.x,p.z).toFixed(1)]),athNear:(x,z,R=40)=>{const out=[];CITY_S.forEach((S,si)=>{let b=1e9,bi=-1;S.pts.forEach((p,i)=>{const d=Math.hypot(p.x-x,p.z-z);if(d<b){b=d;bi=i}});if(b<R){const p=S.pts[bi];out.push({si,name:S.r.name,cls:S.r.cls,w:S.r.w,d:+b.toFixed(1),y:+(p.y??0).toFixed(2),hs:!!S.hs,j:!!p.j,i:bi,n:S.pts.length})}});return out},hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120&&S.r.cls!=='ped'&&S.pts.every(p=>p.x>WX0+80&&p.x<WX1-80&&p.z>WZS+80&&p.z<WZN-80&&!(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<90))).sort((a,b)=>Math.max(...b.pts.map(p=>p.y||0))-Math.max(...a.pts.map(p=>p.y||0))).slice(0,4);return L.map(S=>{const a=S.pts.map(p=>[p.x,p.z]);a.name=(S.r.name||S.r.id)+' ('+Math.round(Math.max(...S.pts.map(p=>p.y||0)))+' m)';return a})},roadProf:()=>{let mg=0,mc=0,n=0;for(const S of CITY_S){if(!S.prof)continue;n++;const P=S.pts;for(let i=1;i<P.length-1;i++){const g=Math.abs(P[i].dy||0);mg=Math.max(mg,g);const a=P[i-1],b=P[i+1],d1=(P[i].y-a.y)/Math.max(.5,P[i].s-a.s),d2=(b.y-P[i].y)/Math.max(.5,b.s-P[i].s);mc=Math.max(mc,Math.abs(d2-d1)/Math.max(1,(b.s-a.s)/2))}}return{n,maxGrade:+mg.toFixed(3),maxCurv:+mc.toFixed(4)}},lmk:()=>(HUB.lmk||[]).map(L=>({id:L.id,name:L.name,x:L.x,z:L.z})),lmNear:(x,z)=>{const L=athLmNear(x,z);return L&&L.name},athd:()=>ATHD,athDist:()=>ATH_DIST,athGates:()=>SM_ON?SM_gates():HUB.gates||[],athGo:(d,x,z,h)=>athDistGo(d,x,z,h),athPick:d=>athDistPick(d),athGar:()=>GARAGES.filter(g=>g.x!=null).map(g=>({id:g.id,x:g.x,z:g.z,h:g.h})),eleni:()=>{const L=LM_BY['Garaz Psyrri'];return L&&{x:L.x,z:L.z,door:HUB.garage}},hillFit:()=>HILLS.map(h=>({id:h.id,fit:h.fit||1,max:+Math.max(0,...CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped').flatMap(S=>S.pts.filter(p=>p.x>h.x0&&p.x<h.x1&&p.z>h.z0&&p.z<h.z1).map(p=>athHill1(h,p.x,p.z)))).toFixed(1)})),shelfN:()=>CITY_S.filter(S=>S.hs).length,inA:(x,z)=>athInA(x,z),athRoad:(x,z,R)=>athRoadD(x,z,R),athConn:()=>athConn(),athOverlap:()=>athOverlap(),athB:()=>HUB.athB,bhProf:()=>{if(HUB.built)return null;const o={};let t=performance.now(),lab='start';for(const y of buildHubG()){const n=performance.now();o[lab]=(o[lab]||0)+n-t;if(y&&y[1])lab=y[1];t=n}o[lab]=(o[lab]||0)+performance.now()-t;for(const k in o)o[k]=Math.round(o[k]);return o},athRR:(x,z)=>HUB.athRR?HUB.athRR.get(x,z):null,qv:{G:()=>qvGraph(),graph:()=>{const G=qvGraph();return G&&{n:G.n,main:G.list.length,ms:G.ms,cut:G.cut}},path:(a,b,c,d)=>{const P=qvPath(a,b,c,d);return{P,ids:P.ids}},near:(x,z)=>qvNear(x,z),nodeW:i=>{const G=qvGraph();return G&&{x:G.X[i],z:G.Z[i],w:G.W[i]}},layout:(id,seed,x,z)=>{const m=RO.marks.find(q=>q.ev&&q.ev.id===id&&!q.dyn);return m&&qvLayout(m.ev,seed??qvSeed(m),{x:x??m.x,z:z??m.z})},use:id=>{const m=RO.marks.find(q=>q.ev&&q.ev.id===id);return m&&qvUse(m)},mark:id=>{const m=RO.marks.find(q=>(q.ev&&q.ev.id===id&&!q.dyn)||q.uid===id);return m&&{x:m.x,z:m.z,h:m.h,seed:qvSeed(m),use:qvUse(m)}},start:(id,o)=>{const m=RO.marks.find(q=>(q.ev&&q.ev.id===id&&!q.dyn)||q.uid===id);if(m)chStart(m,o);return !!RO.ch},restart:()=>qvRestart(),abandon:()=>qvAbandon(),retry:k=>qvRetry(k),next:()=>{if(RO.ch&&RO.ch.v2)qvNext(RO.ch)},spawn:()=>qvSpawn(),tick:dt=>qvTick(dt||0),enc:()=>RO.marks.filter(m=>m.dyn).map(m=>({id:m.ev.id,k:m.ev.kind,x:m.x,z:m.z,disc:m.disc,uid:m.uid})),encDrop:uid=>{const m=RO.marks.find(q=>q.uid===uid);if(m)qvEncDrop(m,1)},nav:()=>QV.nav&&{n:QV.nav.P.length,rec:QV.nav.rec,rem:QV.nav.rem,d:QV.nav.d,P:QV.nav.P,ids:QV.nav.P.ids},ch:()=>{const c=RO.ch;return c&&{kind:c.kind,v2:!!c.v2,si:c.v2?c.v2.si:-1,n:c.v2?c.v2.L.st.length:0,seed:c.seed,left:c.v2?c.v2.left:0,t:c.t,cd:c.cd,par:c.v2?c.v2.L.par:0,len:c.v2?c.v2.L.len:0,st:c.v2?c.v2.L.st.map(S=>({t:S.t,x:S.x,z:S.z,txt:S.txt,it:S.it?S.it.map(o=>[o.x,o.z]):null})):null,tgt:c.v2&&qvTgt(c)?{...qvTgt(c)}:null,S:c.v2?(({t,hit,s,vx,vz,amb,n})=>({t,hit,s,vx,vz,amb,n}))(c.v2.L.st[c.v2.si]||{}):null}},roadD:(x,z)=>{let d=1e9;const q=cityAt(x,z);if(q)d=Math.min(d,q.d-q.road.w/2);const sd=(ax,az,bx,bz,w)=>{const dx=bx-ax,dz=bz-az,L2=dx*dx+dz*dz||1,u=clamp(((x-ax)*dx+(z-az)*dz)/L2,0,1);return Math.hypot(ax+dx*u-x,az+dz*u-z)-w/2};for(const r of hubRoads())d=Math.min(d,sd(r.x0,r.z0,r.x1,r.z1,r.w));for(const b of BRIDGES){const[a1,c1]=deckPt(b,-b.half-4),[a2,c2]=deckPt(b,b.half+4);d=Math.min(d,sd(a1,c1,a2,c2,b.w))}return d},hit:(x,z)=>!!roamHit(x,z,1),spawnK:k=>{const t=QV_ENC.find(q=>q.k===k),G=qvGraph();if(!t||!G)return null;const i=qvNear(RO.x+Math.sin(RO.h)*220,RO.z+Math.cos(RO.h)*220,400);if(i<0)return null;return qvEncMark(t,G.X[i],G.Z[i],0,(Math.random()*4e9)>>>0,1).uid},sq:()=>RO.marks.filter(m=>m.sq).map(m=>({id:m.ev.id,x:m.x,z:m.z,k:m.ev.kind})),dbg:()=>QV.sqDbg,twist:()=>RO.ch&&RO.ch.v2&&RO.ch.v2.L.tw,stats:()=>({fr:QV.fr,ms:QV.ms,mn:QV.mn,mt:QV.mt,it:QV.it})},net:()=>({pieces:CITY_S.length,km:+(CITY_S.reduce((a,S)=>a+S.L,0)/1000).toFixed(1),aj:AJ.length,junc:JUNC.length,cls:CITY_S.reduce((o,S)=>(o[S.r.cls]=(o[S.r.cls]||0)+1,o),{})}),cover:(x,z,r=60)=>{const G=HUB.grid,k0=Math.floor(x/40),j0=Math.floor(z/40),n=Math.ceil(r/40);for(let a=-n;a<=n;a++)for(let b=-n;b<=n;b++){const L=G&&G.get((k0+a)*10000+j0+b);if(L)for(const q of L)if(Math.hypot(q.x-x,q.z-z)<r+Math.max(q.hw,q.hd))return 'bld'}const P=HUB.pgrid,m=Math.ceil(r/16),kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-m;a<=m;a++)for(let b=-m;b<=m;b++){const L=P&&P.get((kx+a)*10000+kz+b);if(L)for(const p of L)if(Math.hypot(p.x-x,p.z-z)<r)return 'prop'}const Z=zoneAt(x,z);if(Z&&(Z.t==='plaza'||Z.t==='grass'))return 'zone';return null},bh:()=>{if(HUB.built)return null;const t=performance.now();buildHub();const t1=performance.now();buildRoam();return[Math.round(t1-t),Math.round(performance.now()-t1)]},rsnap:(x,z,r)=>rfSnap(x,z,r||200),gbs:()=>(RO.gbs||[]).map(g=>({x:g.x,z:g.z,y:g.y})),packs:()=>(RO.packs||[]).map(g=>({x:g.x,z:g.z,y:g.y})),cars:()=>HUB.cars.map(c=>({k:HCAR[c.k],x:+c.x.toFixed(1),z:+c.z.toFixed(1),y:+c.y.toFixed(2),tr:!!c.tr,dead:c.dead>0})),athU:()=>HUB.athU||0,hills:()=>HILLS.map(h=>({id:h.id,cx:h.cx,cz:h.cz,H:h.H,shape:h.shape})),shelf:()=>SHELF.size,stS:id=>{const S=CITY_S.find(q=>q.r.id===id);return S&&S.pts.map(p=>[+p.x.toFixed(1),+p.z.toFixed(1),+(p.y??0).toFixed(2),+p.tx.toFixed(3),+p.tz.toFixed(3)])},cityT:(x,z)=>{const q=cityAt(x,z);return q&&{d:q.d,id:q.road.id,w:q.road.w,cls:q.road.cls,tx:q.p.tx,tz:q.p.tz}},athProbe:()=>{const p=pl;frameAt(TD,p.dist,F2);const rs=F2.p.clone().addScaledVector(F2.r,p.x),m=p.mesh.position;return{cy:+m.y.toFixed(2),ry:+rs.y.toFixed(2),gy:+athH(m.x,m.z).toFixed(2),x:+p.x.toFixed(2),M:MARGIN,dead:p.dead>0,air:!!p.air,tun:F2.p.y<-11,sec:TD.SEC[F2.i]}},
   athEdges:()=>{let bad=0,maxUp=-9,maxStep=0,n=0,worst='',wu='';const td=TF,f=mkF();for(let s=0;s<td.L;s+=8){if(inGapF(s)||inGapF(s+26)||inGapF(s-26))continue;frameAt(td,s,f);if(f.p.y<-1||/FLYOVER/.test(td.SEC[f.i]))continue;
     for(const sd of[-1,1]){const a=f.p.clone().addScaledVector(f.r,sd*(HALF-3)),e=f.p.clone().addScaledVector(f.r,sd*HALF),o=f.p.clone().addScaledVector(f.r,sd*(HALF+5));const up=athH(a.x,a.z)-a.y,st=Math.abs(athH(o.x,o.z)-e.y);n++;if(up>maxUp){maxUp=up;wu=td.SEC[f.i]+'@'+Math.round(s)}if(st>maxStep){maxStep=st;worst=td.SEC[f.i]+'@'+Math.round(s)}if(up>0||st>2)bad++}}
