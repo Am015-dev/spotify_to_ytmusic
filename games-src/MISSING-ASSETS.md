@@ -798,92 +798,92 @@ Style block (paste in front of every art prompt for this game):
 
 **In-game art: Flow paintings to replace the stand-ins (games-src/lantern-dive/art/, prompts from its ART-PROMPTS.md)**
 
-- [ ] `games-src/lantern-dive/art/emb0.png` (320x320 PNG, transparent)
+- [x] `games-src/lantern-dive/art/emb0.png` (320x320 PNG, transparent)
   - Prompt: a single branching coral fan in raspberry pink-red, thick rounded branches, a few tiny bubbles, flat front view
   - Note: Coral suit emblem (pink-red, colour 1 of 4), printed large in the middle of cards 1-9
-- [ ] `games-src/lantern-dive/art/emb1.png` (320x320 PNG, transparent)
+- [x] `games-src/lantern-dive/art/emb1.png` (320x320 PNG, transparent)
   - Prompt: a single curling ocean wave crest in cobalt blue with a foam curl and two small droplets, flat front view
   - Note: Tide suit emblem (blue)
-- [ ] `games-src/lantern-dive/art/emb2.png` (320x320 PNG, transparent)
+- [x] `games-src/lantern-dive/art/emb2.png` (320x320 PNG, transparent)
   - Prompt: a single swaying kelp frond with three leaf blades in sea green, a small holdfast at the bottom, flat front view
   - Note: Kelp suit emblem (green)
-- [ ] `games-src/lantern-dive/art/emb3.png` (320x320 PNG, transparent)
+- [x] `games-src/lantern-dive/art/emb3.png` (320x320 PNG, transparent)
   - Prompt: a single plump five-armed starfish in golden yellow with a dotted texture on the arms, flat front view
   - Note: Sunstar suit emblem (yellow)
-- [ ] `games-src/lantern-dive/art/emb4.png` (320x320 PNG, transparent)
+- [x] `games-src/lantern-dive/art/emb4.png` (320x320 PNG, transparent)
   - Prompt: a glowing brass diving lantern with a warm pale-gold flame inside a round glass, a small ring on top, soft halo, flat front view
   - Note: Lantern emblem (the four trump cards)
-- [ ] `games-src/lantern-dive/art/back.png` (320x448 PNG, opaque)
+- [x] `games-src/lantern-dive/art/back.png` (320x448 PNG, opaque)
   - Prompt: a portrait card back: deep navy water with a faint pattern of tiny rising bubbles and one small pale-gold lantern glow in the middle, a thin gold inner border drawn as part of the painting, symmetrical
   - Note: Card back, shown for face-down cards and the hot-seat pass screen
-- [ ] `games-src/lantern-dive/art/ping.png` (192x192 PNG, transparent)
+- [x] `games-src/lantern-dive/art/ping.png` (192x192 PNG, transparent)
   - Prompt: a round brass sonar ping token seen from the front: concentric pale-gold ripple rings around a small bright centre, slight dent texture on the metal
   - Note: The ping token shown over a card when a diver signals
-- [ ] `games-src/lantern-dive/art/flare.png` (192x192 PNG, transparent)
+- [x] `games-src/lantern-dive/art/flare.png` (192x192 PNG, transparent)
   - Prompt: a small emergency flare stick with a bright orange-red flame and a puff of pink smoke, held at a slight angle, readable as a flare
   - Note: The distress flare token
-- [ ] `games-src/lantern-dive/art/cmd.png` (192x192 PNG, transparent)
+- [x] `games-src/lantern-dive/art/cmd.png` (192x192 PNG, transparent)
   - Prompt: a round brass badge with a four-pointed compass star and a tiny lantern at its centre, a short ribbon below
   - Note: The Commander badge
-- [ ] `games-src/lantern-dive/art/drone.png` (256x256 PNG, transparent)
+- [x] `games-src/lantern-dive/art/drone.png` (256x256 PNG, transparent)
   - Prompt: a cute small yellow-and-teal underwater drone with one round glass eye, two little propellers and a tiny lantern on top, friendly, seen from the front
   - Note: Echo, the drone in 2-diver dives (avatar)
-- [ ] `games-src/lantern-dive/art/diver0.png` (256x256 PNG, transparent)
+- [x] `games-src/lantern-dive/art/diver0.png` (256x256 PNG, transparent)
   - Prompt: a friendly diver portrait in a round brass helmet with the glass open, warm brown skin, short dark curls, calm focused expression, pink-red collar, shoulders up
   - Note: Diver 1 avatar (Nerea: harbour pilot, careful)
-- [ ] `games-src/lantern-dive/art/diver1.png` (256x256 PNG, transparent)
+- [x] `games-src/lantern-dive/art/diver1.png` (256x256 PNG, transparent)
   - Prompt: a friendly diver portrait in a round brass helmet with the glass open, light skin, sandy beard and a knitted blue cap under the helmet rim, relaxed half smile, shoulders up
   - Note: Diver 2 avatar (Bram: pump fixer, steady)
-- [ ] `games-src/lantern-dive/art/diver2.png` (256x256 PNG, transparent)
+- [x] `games-src/lantern-dive/art/diver2.png` (256x256 PNG, transparent)
   - Prompt: a friendly diver portrait in a round brass helmet with the glass open, East Asian features, black bob haircut, bright curious eyes, small green notebook strap on the shoulder, shoulders up
   - Note: Diver 3 avatar (Sumi: fish scientist, signals often)
-- [ ] `games-src/lantern-dive/art/diver3.png` (256x256 PNG, transparent)
+- [x] `games-src/lantern-dive/art/diver3.png` (256x256 PNG, transparent)
   - Prompt: a friendly diver portrait in a round brass helmet with the glass open, freckled face, red-blond tufts of hair, a wide cheerful grin, a slightly too-big yellow collar, shoulders up
   - Note: Diver 4 avatar (Dag: new, cheerful)
-- [ ] `games-src/lantern-dive/art/diver4.png` (256x256 PNG, transparent)
+- [x] `games-src/lantern-dive/art/diver4.png` (256x256 PNG, transparent)
   - Prompt: a friendly diver portrait in a round brass helmet with the glass open, dark skin, a short grey-streaked beard, kind eyes, an orange scarf, shoulders up
   - Note: Diver 5 avatar (Lio: the extra diver in 5-diver crews)
-- [ ] `games-src/lantern-dive/art/table.png` (1280x720 PNG, opaque)
+- [x] `games-src/lantern-dive/art/table.png` (1280x720 PNG, opaque)
   - Prompt: a wide view into deep ocean water, deep blue at the top fading to near-navy at the bottom, a few soft light shafts from the surface, tall kelp silhouettes at the far left and far right edges, very quiet in the centre (the cards go there), soft blurred light pools instead of line patterns (no scribbles, no thin bright lines, no outlines on the water), a little sand and a few rounded pebbles at the bottom edge, no creatures in the middle
   - Note: Table background behind the felt, drawn under all the UI
-- [ ] `games-src/lantern-dive/art/title.png` (1440x810 PNG, opaque)
+- [x] `games-src/lantern-dive/art/title.png` (1440x810 PNG, opaque)
   - Prompt: a wide scene: a small crew of three divers on a rocky ledge looking down into a deep blue trench, each holding a glowing lantern, the lanterns reflecting in the water, a faint outline of a huge friendly whale far below, rays of light from the surface, dark navy at the bottom, leave the central lower third calm because the title and buttons sit there
   - Note: Title screen painting
 
 **Portraits, campaign backs and table, phone title, end art (games/lantern-dive/media/)**
 
-- [ ] `games/lantern-dive/media/camp-brack.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-brack.webp` (1:1, target 256x256 WebP)
   - Prompt: Chief Ottilie Brack, a stern but warm harbour chief in a yellow oilskin with a brass whistle, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-nerea.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-nerea.webp` (1:1, target 256x256 WebP)
   - Prompt: Nerea, a careful harbour pilot in a diving helmet with the visor up, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-bram.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-bram.webp` (1:1, target 256x256 WebP)
   - Prompt: Bram, a steady pump fixer in a patched diving suit with a wrench, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-sumi.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-sumi.webp` (1:1, target 256x256 WebP)
   - Prompt: Sumi, a fish scientist in a diving suit holding a glowing sample jar, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-dag.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-dag.webp` (1:1, target 256x256 WebP)
   - Prompt: Dag, a new cheerful diver with a too-big helmet and a big grin, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-echo.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-echo.webp` (1:1, target 256x256 WebP)
   - Prompt: Echo, a small round brass drone with one glowing eye and a little propeller, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-undertow.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-undertow.webp` (1:1, target 256x256 WebP)
   - Prompt: The Grey Undertow, a swirling grey current with faint hollow eyes dragging at a diver light, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-maze.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-maze.webp` (1:1, target 256x256 WebP)
   - Prompt: The Thousand Turns, a drowned stone maze of endless arches and turns with a faint playful glow, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/camp-lampless.webp` (1:1, target 256x256 WebP)
+- [x] `games/lantern-dive/media/camp-lampless.webp` (1:1, target 256x256 WebP)
   - Prompt: The Lampless One, a vast dark shape with soft eyes that swallows the lantern light, bust portrait, head and shoulders, centred, plain simple background
-- [ ] `games/lantern-dive/media/back-wreck-brass.webp` (3:4, target 300x426 WebP)
+- [x] `games/lantern-dive/media/back-wreck-brass.webp` (3:4, target 300x426 WebP)
   - Prompt: corroded wreck brass plates and rivets on a deep teal card back, a tiny lantern in the middle, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock "Wreck-brass card back".
-- [ ] `games/lantern-dive/media/back-last-light.webp` (3:4, target 300x426 WebP)
+- [x] `games/lantern-dive/media/back-last-light.webp` (3:4, target 300x426 WebP)
   - Prompt: a single pale-gold lantern glow in pitch-dark water on a card back, tiny bubbles, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock "Last-light card back".
 - [ ] `games/lantern-dive/media/table-tunnel-glow.webp` (16:9, target 1376x768 WebP)
   - Prompt: a drowned tunnel floor: dark stone, glowing algae and a faint gold glow at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock "Tunnel-glow table".
-- [ ] `games/lantern-dive/media/title-phone.webp` (9:16, target 744x1334 WebP)
+- [x] `games/lantern-dive/media/title-phone.webp` (9:16, target 744x1334 WebP)
   - Prompt: a small crew of divers with lanterns swimming down a drowned road lined with ruins, a huge dark shape in the deep behind them, keep the top of the picture calm and clear for the game logo, portrait orientation
-- [ ] `games/lantern-dive/media/end-win.webp` (16:9, target 1302x726 WebP)
+- [x] `games/lantern-dive/media/end-win.webp` (16:9, target 1302x726 WebP)
   - Prompt: the divers surfacing into a bright dawn with their lanterns lit, a drone circling happily, no text
-- [ ] `games/lantern-dive/media/end-lose.webp` (16:9, target 1302x726 WebP)
+- [x] `games/lantern-dive/media/end-lose.webp` (16:9, target 1302x726 WebP)
   - Prompt: a lone lantern sinking into black water, bubbles rising, a drowned road below, no text
 
 **Music (a CC0 underwater loop and a water pad are in the game; nothing new)**
