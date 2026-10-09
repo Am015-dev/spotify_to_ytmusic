@@ -606,14 +606,14 @@ function popShell(title,body,cls){return '<div class="pp-h"><b>'+title+'</b><but
 function renderPop(){const el=$('#ppop');if(!el)return;
   if(!UI.pop||!G||(UI.card&&UI.card.kind!=='tip')){el.hidden=true;el.innerHTML='';return}
   const a=UI.popArg||{};let html='';
-  try{switch(UI.pop){case 'confirm':html=confirmHTML(a.k);break;case 'card':html=popCard(a.id);break;case 'loc':html=popLoc(a.l);break;case 'region':html=popRegion(a.r);break;case 'rival':html=popRival(a.s);break;case 'kingdom':html=popKingdom();break;case 'kc':html=popKC(a.n);break;default:html=''}}catch(e){console.warn('pop',e.message);html=''}
+  try{switch(UI.pop){case 'confirm':html=confirmHTML(a.k);break;case 'card':html=popCard(a.id,a.read);break;case 'loc':html=popLoc(a.l);break;case 'region':html=popRegion(a.r);break;case 'rival':html=popRival(a.s);break;case 'kingdom':html=popKingdom();break;case 'kc':html=popKC(a.n);break;default:html=''}}catch(e){console.warn('pop',e.message);html=''}
   if(!html){el.hidden=true;return}
   const first=el.hidden;el.hidden=false;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.innerHTML=html;if(first)el.classList.add('in');else el.classList.remove('in');
-  el.dataset.kind=UI.pop;
+  el.dataset.kind=UI.pop;el.dataset.read=a.read?'1':'';
   sizePopCard()}
 function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-card');if(!c)return;const W=el.clientWidth,H=el.clientHeight;
-  const big=c.dataset.kc!=null;const w=big?Math.max(120,Math.min(300,W*.74,(innerHeight*.86-130)/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
-function popCard(id){const s=vs();const i=cinfo(id);const mine=ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
+  const big=c.dataset.kc!=null||el.dataset.kind==='card';const w=big?Math.max(120,Math.min(c.dataset.kc!=null?300:270,W*.74,(innerHeight*.86-(c.dataset.kc!=null?130:190))/1.4308)):Math.max(96,Math.min(260,W*.42,(H-150)/1.4308));c.innerHTML='';c.appendChild(c.dataset.kc!=null?kcEl(+c.dataset.kc,w):cardEl(+c.dataset.cid,w))}
+function popCard(id,read){const s=vs();const i=cinfo(id);const mine=!read&&ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
   else if(mine)h+='<p class="hint">Nothing to do with this card right now.</p>';
@@ -1486,7 +1486,7 @@ function hideTip(){const t=$('#tip');if(t&&!t.hidden){t.hidden=true;t.innerHTML=
     const p=mapPt(x,y);if(p)for(let r=0;r<3;r++){const b=REGBOX[r];if(p.x>=b.x-20&&p.x<=b.x+b.w+20&&p.y>=b.y-20&&p.y<=b.y+b.h+20)return {type:'region',r}}return null};
   document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#handw .hc');if(!b||(e.button&&e.button>0))return;
     const id=+b.dataset.id;d={id,b,x:e.clientX,y:e.clientY,drag:false,pid:e.pointerId,g:null};
-    d.lp=setTimeout(()=>{if(d&&!d.drag){const i=d.id;d=null;UI._nc=1;UI.hand=null;openPop('card',{id:i})}},520)},true);
+    d.lp=setTimeout(()=>{if(d&&!d.drag){const i=d.id;d=null;UI._nc=1;UI.hand=null;openPop('card',{id:i,read:1})}},520)},true);
   document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.pid)return;
     if(!d.drag){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<12)return;clearTimeout(d.lp);
       if(!cardDriven(UI.bf)||!cardMoves(d.id).length){d=null;return}
