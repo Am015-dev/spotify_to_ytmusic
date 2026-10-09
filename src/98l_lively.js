@@ -236,10 +236,13 @@ function LVP_label(K){const M=LVP.m,g=M.cx;g.clearRect(0,0,256,128);g.fillStyle=
   M.ring.material.color.set(K.col);M.ring.material.emissive.set(K.col);M.disc.material.color.set(K.col)}
 // the street ahead: the HUB street edge you drive along (|cos| > .9, within the road), with ≥ 125 m left before its end node. Q.P(k) = 8 m steps
 function LVP_path(){if(hubNear(1e9,1e9,false)<-9)return null;const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);let best=null,bd=1e9;
-  for(const i of HUB.nc?HUB.nc.L:[]){const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<40)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,c=ux*fx+uz*fz;if(Math.abs(c)<.9)continue;
+  for(const i of HUB.nc?HUB.nc.L:[]){const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<8)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,c=ux*fx+uz*fz;if(Math.abs(c)<.9)continue;
     const t=(RO.x-A.x)*ux+(RO.z-A.z)*uz;if(t<0||t>L)continue;const e=Math.abs((RO.x-A.x)*uz-(RO.z-A.z)*ux),W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20));if(e>W/2+1.5||e>=bd)continue;
-    const dir=c>0?1:-1,left=dir>0?L-t:t;if(left<125)continue;bd=e;best={i,bi,A,B,ux:ux*dir,uz:uz*dir,px:A.x+ux*t,pz:A.z+uz*t,w:W}}}
+    const dir=c>0?1:-1,left=LVP_ahead(N,dir>0?B:A,dir>0?A:B,ux*dir,uz*dir,A.x+ux*t,A.z+uz*t,dir>0?L-t:t);if(left<125)continue;bd=e;best={i,bi,A,B,ux:ux*dir,uz:uz*dir,px:A.x+ux*t,pz:A.z+uz*t,w:W}}}
   if(!best)return null;const Q=best,lat=(RO.x-Q.px)*Q.uz-(RO.z-Q.pz)*Q.ux;Q.lat=clamp(lat,-Q.w/2+2.4,Q.w/2-2.4);if(Q.w<9)Q.lat=0;return Q}
+// v88w: Athens street edges are ≤ 38 m, so one edge never had 125 m left: follow the chain of nearly straight edges (≤ 14° turn, ≤ 2.5 m off the straight course line)
+function LVP_ahead(N,E,P,ux,uz,px,pz,acc){for(let n=0;n<16&&acc<125;n++){let nx=null,bc=.97,bl=0;for(const j of E.nb||[]){const C=N[j];if(!C||C===P||C.ab)continue;const l=Math.hypot(C.x-E.x,C.z-E.z);if(l<1)continue;const c=((C.x-E.x)*ux+(C.z-E.z)*uz)/l;
+      if(c<=bc||Math.abs((C.x-px)*uz-(C.z-pz)*ux)>2.5)continue;bc=c;nx=C;bl=l}if(!nx)break;acc+=bl;P=E;E=nx}return acc}
 const LVP_pt=(Q,k,lat)=>{const s=k*8;return{x:Q.px+Q.ux*s+Q.uz*lat,z:Q.pz+Q.uz*s-Q.ux*lat,h:Math.atan2(Q.ux,Q.uz),tx:Q.ux,tz:Q.uz}};
 function LVP_busy(busy){return busy||RO.ch||RO.sp||RO.card||RO.frozen||RO.mapOpen||RO.story||RO.pop||(typeof OG!=='undefined'&&OG.ev)||!roamSave().tut||state!=='roam'}
 function LVP_spawn(){const Q=LVP_path();if(!Q)return false;const M=LVP_mesh(),K=LVP_K[LVP.k++%LVP_K.length],g=LVP_pt(Q,7,Q.lat),gy=Math.max(0,groundAt(g.x,g.z,(RO.y||0)+8));
