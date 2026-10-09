@@ -635,7 +635,7 @@ const LZT={fraport:'Approaching Fraport…',taunus:'Up into the Taunus…',hombu
 const lzNeed=(x,z,r=900)=>LAZY.filter(L=>!L.done&&lzD(L,x,z)<r).sort((a,b)=>lzD(a,x,z)-lzD(b,x,z));
 // far fast travel into an unbuilt biome: the loading screen stays up while it builds (LEGO 2K style), then the warp
 async function ldTravel(go,need){if(LD.busy)return;const st=state;LD.busy=1;LZ.trav=(LZ.trav||0)+1;ldShow(LZT[need[0].id]||'Fast travel');state='loading';
-  try{await nextFrame();await lzLoad(need,.05,.85);state=st;go();ldSet(.9,'Arriving');try{renderer.compile(scene,camera)}catch(e){}for(const f of[.95,1]){await nextFrame();ldSet(f)}}
+  try{await nextFrame();await lzLoad(need,.05,.85);state=st;go();ldSet(.9,'Arriving');try{P2_compile(scene,camera)}catch(e){}for(const f of[.95,1]){await nextFrame();ldSet(f)}}
   catch(e){console.error(e)}finally{if(state==='loading')state=st;LD.busy=null;ldHide()}}
 // outer woods: copses of pines per 4 km tile (dense in the forest biomes and the south band), built lazily like a biome
 const outerFree2=(x,z)=>{if(!outerFree(x,z))return false;const B=biomeAt(x,z);return !(B&&(B.g==='air'||B.g==='town'||B.g==='city'))&&!lzHit(x,z,8)&&lzRoadD(x,z)>6};
