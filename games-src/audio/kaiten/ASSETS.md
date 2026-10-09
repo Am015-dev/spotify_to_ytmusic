@@ -28,3 +28,6 @@ All sounds are real CC0 recordings (Kenney packs, OpenGameArt), cut/layered/norm
 Totals: SFX 38 KB + music/ambience 242 KB MP3 = 281 KB; `audio-data.js` 375 KB (base64). Licence: CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/
 
 Rebuild: `python3 build_kaiten.py <raw> <work> && python3 bundle_kaiten.py <work>` (raw = Kenney zips unpacked + `mus/` with `jazz_slower.wav` and `fridge2.mp3` downloaded from the URLs above).
+
+## Music (2026-10-09): Treblo, replaces the CC0 jazz bed
+Ten instrumental tracks made with Treblo (model v3, no vocals) from our own prompts: `treblo/*-a|b.mp3` are the sources. `audio/tools/music_treblo.py` cuts them (loops cross-faded at the seam, victory 18 s and defeat 11 s with fades), -18 LUFS, 96 kbps, into `games/kaiten-kitchen/music/` (fetched on demand: `url:music/<slot>-<a|b>.mp3` in `audio-data.js`). Slots: Menu (tavern), Game (main), Last round / boss (fight), Victory, Defeat; the Music picker (title, Menu) saves a / b / shuffle / off per slot. The belt hum ambience stays under the game.

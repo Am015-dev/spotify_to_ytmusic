@@ -38,7 +38,7 @@ function buildRules() {
     ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: ten instrumental tracks made with Treblo from our own prompts. Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
 function renderRival(seat) {
@@ -74,7 +74,7 @@ function renderMenu() {
   if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   try { hlpInit(); const t = h('div'); t.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); b.append(...t.childNodes); } catch (e) { }
   row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('grab1', UI.prefs.grab1 !== false, 'One tap grabs'), UI.prefs.grab1 === false ? tog('tap2', UI.prefs.tap2, 'Tap twice to serve') : null);
-  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
+  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Pick the songs\u2026'));
   { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   if (!NET.on) { const tr = h('div.mrow'); tr.appendChild(tutNode('btn')); b.appendChild(tr); }
@@ -120,6 +120,7 @@ function titleEl() {
       h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'),
+    h('button.tlink', { 'data-a': 'musicopen', type: 'button' }, '\u266A Music'),
     firstTime() ? null : tutNode('tlink', { sub: false })));
 }
 function dinerCard(c, o) {
@@ -239,6 +240,7 @@ function boot() {
   pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
   netInit();
+  extrasBoot();
   renderStart();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
