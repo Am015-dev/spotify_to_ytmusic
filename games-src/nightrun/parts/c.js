@@ -51,7 +51,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   ctx.textAlign='left';ctx.font=`700 ${22*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,14,28*k);
   const sw=ctx.measureText(sc).width;ctx.font=`${16*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,14+sw+10,27*k);
   ctx.fillStyle='#8c86b8';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),14,44*k);
-  ctx.textAlign='right';ctx.font=`700 ${15*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(DF===DIFFS.hard?' · HARD':''),w-14,26*k);
+  ctx.textAlign='right';ctx.font=`700 ${15*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(DF===DIFFS.hard?' · HARD':DF===DIFFS.vhard?' · VERY HARD':DF===DIFFS.legend?' · LEGEND':''),w-14,26*k);
   const pw=170*k,px=w-14-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,33*k,pw,4*k);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,33*k,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),4*k);
   ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#8c86b8';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,w-14,50*k);
   // status row: hull, heat, dash, EMP, weapon level
@@ -138,7 +138,7 @@ function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 /* ---------- settings (one card, Overdrive's look): the schema drives the rows; every change is saved and applied live ---------- */
 const OFFON=[[false,'Off'],[true,'On']];
 const SCHEMA=[
-  {g:'Gameplay',rows:[{k:'diff',l:'Difficulty',o:[['easy','Easy'],['normal','Normal'],['hard','Hard']]},{k:'auto',l:'Auto-fire',o:[[true,'On'],[false,'Off']]},{k:'aim',l:'Aim assist',o:OFFON}]},
+  {g:'Gameplay',rows:[{k:'diff',l:'Difficulty',o:[['easy','Easy'],['normal','Normal'],['hard','Hard'],['vhard','Very hard'],['legend','Legend']]},{k:'auto',l:'Auto-fire',o:[[true,'On'],[false,'Off']]},{k:'aim',l:'Aim assist',o:OFFON}]},
   {g:'Controls',rows:[{k:'layout',l:'Touch layout',o:[['left','Left'],['right','Right']]},{k:'sens',l:'Sensitivity',s:[1,5,1],f:v=>String(v)},{k:'dsize',l:'Button size',o:[['S','Small'],['M','Medium'],['L','Large']]}]},
   {g:'Rhythm',rows:[{k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']]},{k:'all',l:'Everything counts',o:OFFON},{k:'cue',l:'Beat cue',o:[['off','Off'],['S','Small'],['M','Medium'],['L','Large']]},
     {k:'sync',l:'Latency',s:[-150,150,5],f:v=>(v>0?'+':'')+v+' ms',tap:1}]},
@@ -151,7 +151,7 @@ let palOn='neon';
 function applyPal(){if(palOn===SET.pal)return;palOn=SET.pal;const th=PALS[SET.pal];
   for(const D of DISTRICTS){if(!D.a0){D.a0=D.a;D.b0=D.b;}D.a=th?th.a:D.a0;D.b=th?th.b:D.b0;}
   for(const k in BGC)delete BGC[k];for(const k in BGPC)delete BGPC[k];}
-function applySet(){deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=SET.diff==="hard";applyPal();
+function applySet(){deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
   stage.classList.toggle('ds-S',SET.dsize==='S');stage.classList.toggle('ds-L',SET.dsize==='L');document.documentElement.classList.toggle('hc',!!SET.hc);
   $('fpsEl').hidden=!SET.fpsc;fit();
   if(typeof diffDraw==='function')diffDraw();}

@@ -6,7 +6,7 @@
      it fires a 5-way fan every fourth beat, with a red warning ring one beat before. Kill it and its squad panics (faster, shoots at once)
    - homing orbs: from q>=5 some gunship shots curve toward the ship for 1.5 s (ringed in white), turning slowly enough to dodge
    - perk pressure: every perk and upgrade you own adds a little hull to the enemies and a little speed to their fire (capped), so a maxed ship is still in a fight */
-function AIQ(){return ST.on?ST.lvl:2+G.pos*1.6+(G.loop||0)*3;}
+function AIQ(){return (ST.on?ST.lvl:2+G.pos*1.6+(G.loop||0)*3)+(DF.aq||0);}
 const AI={perks(){let n=0;try{for(const k in SH.got)n+=SH.got[k]|0;for(const d of TP_DEF)n+=TP.l(d.id)|0;}catch(e){}return n;},
   hpK(){return Math.min(1.7,1+.014*this.perks());},fk(){return 1+Math.min(.28,.022*Math.max(0,AIQ()-1))+Math.min(.12,.004*this.perks());},
   ldrs(){return G.en.filter(e=>e.ldr&&e.hp>0);}};

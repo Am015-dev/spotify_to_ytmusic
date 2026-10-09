@@ -14,7 +14,7 @@ const UPG=[
   {id:'nx',n:'Neon Boost',t:'Kills drop 30% more Neon',p:22,max:5,c:'#19e3ff',x:'up_nx',ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z'}];
 const UBY={};for(const u of UPG)UBY[u.id]=u;
 const PIT_SECS=10,PIT_LOCK=.6;
-const NEON_K=.04;                                         // Neon per kill: districts last as long as their song now (3 to 5 minutes), so a kill pays much less than it did
+const NEON_K=.032;                                         // Neon per kill: districts last as long as their song now (3 to 5 minutes), so a kill pays much less than it did
 const NEON_V={drone:.5,charger:.5,turret:1,gate:1,gunship:3,boss:8};     // fractions add up: about 40 Neon from a first district
 const p2d={};const path2=d=>p2d[d]||(p2d[d]=new Path2D(d));
 
@@ -33,7 +33,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
   bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
   // ----- pit stop -----
-  price(u){return Math.round(u.p*(1+.45*this.n(u.id)));},
+  price(u){return Math.round(1.25*u.p*(1+.5*this.n(u.id)));},
   rerollPrice(){return 8+6*this.rerolls;},
   pool(){return UPG.filter(u=>this.n(u.id)<u.max&&(!u.x||GA.own[u.x])&&(!u.ok||u.ok()));},
   deal(){const pool=this.pool(),out=[];while(out.length<3&&pool.length){out.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}

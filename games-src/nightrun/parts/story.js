@@ -1,6 +1,6 @@
 /* ---------- Nightrun Story: 12 stages in 3 acts, stage select, stars, Hard toggle for Endless ---------- */
 const ALL=/[?&]all=1/.test(location.search);             // ?all=1 opens every stage (test link); a long press on the title does the same and is remembered
-let HARD=SET.diff==='hard';DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty lives in the settings (Easy / Normal / Hard); the title button cycles it
+let HARD=HARDS.includes(SET.diff);DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty lives in the settings (Easy / Normal / Hard); the title button cycles it
 const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all,v30:!!o.v30};})();
 const sPersist=()=>save('mnr_story',sSave);
 // difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
@@ -193,8 +193,8 @@ $('srMenu').addEventListener('click',openStages);
   const row=$('startBtn').parentNode,row1=document.createElement('div');row1.className='row';row.before(row1);row1.append(sb,$('startBtn'));
   $('startBtn').textContent='ENDLESS';$('startBtn').classList.add('alt');$('dailyBtn').classList.remove('alt');$('dailyBtn').classList.add('dim');
   const hb=document.createElement('button');hb.className='go dim';hb.id='diffBtn';hb.type='button';row1.append(hb);
-  window.diffDraw=()=>{hb.textContent=SET.diff.toUpperCase();hb.classList.toggle('on',SET.diff==='hard');};diffDraw();
-  hb.addEventListener('click',()=>{const o=['easy','normal','hard'];setVal('diff',o[(o.indexOf(SET.diff)+1)%3]);});
+  window.diffDraw=()=>{hb.textContent=(SET.diff==='vhard'?'VERY HARD':SET.diff).toUpperCase();hb.classList.toggle('on',HARDS.includes(SET.diff));};diffDraw();
+  hb.addEventListener('click',()=>{const o=['easy','normal','hard','vhard','legend'];setVal('diff',o[(o.indexOf(SET.diff)+1)%5]);});
   sb.addEventListener('click',openStages);
   // hidden: hold the title for a second to unlock every stage
   const h1=titleEl.querySelector('h1');let lp=0;h1.style.touchAction='none';

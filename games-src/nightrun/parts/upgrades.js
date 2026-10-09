@@ -16,11 +16,18 @@ const TP_DEF=[
   {id:'rev',n:'Revive Token', p:400,max:5, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
   {id:'nmn',n:'Neon Mining',  p:70, max:12,c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
 const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
-const tpPrice=(d,l)=>Math.round(d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
+const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
 const TP={revLeft:0,rgnT:0,boost:{},
-  l(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));}};
+  raw(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));},                 // the level you own
+  l(id){return GA.eq&&GA.eq[id]?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
 GA.tune={};{const o=load('mnr_tune',{});if(o&&typeof o==='object'&&!Array.isArray(o))for(const d of TP_DEF)if(isFinite(o[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(o[d.id])));}
 const tsave=()=>save('mnr_tune',GA.tune);
+/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 15 story stars (up to 8). Existing players start with their best perks equipped. */
+GA.eq={};{const o=load('mnr_eq',null);if(o&&typeof o==='object'){for(const d of TP_DEF)GA.eq[d.id]=!!o[d.id];}
+  else{const own=TP_DEF.filter(d=>(GA.tune[d.id]|0)>0).sort((a,b)=>b.pri-a.pri);for(const d of own.slice(0,4))GA.eq[d.id]=true;}}
+const eqsave=()=>save('mnr_eq',GA.eq);
+const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/15));
+const eqCount=()=>TP_DEF.filter(d=>GA.eq[d.id]&&(GA.tune[d.id]|0)>0).length;
 GA.tab='tune';
 
 /* ----- pit-stop upgrades (this run only), more levels and the same themes as the perks ----- */
@@ -101,8 +108,8 @@ const lvText=(u,l)=>LVT[u.id]&&u.max>1?(LVT[u.id](l)||u.t):u.t;
 
 /* ----- recommended pick + afford counts ----- */
 const afford={tune:0,all:0,rec:null};
-function tuneNext(d){const l=TP.l(d.id);return l>=d.max?0:tpPrice(d,l);}
-function recTune(){let best=null,bs=-1e9;for(const d of TP_DEF){const pr=tuneNext(d);if(!pr||pr>GA.bank)continue;const s=d.pri-7*TP.l(d.id)+(pr<GA.bank*.5?3:0);if(s>bs){bs=s;best=d.id;}}return best;}
+function tuneNext(d){const l=TP.raw(d.id);return l>=d.max?0:tpPrice(d,l);}
+function recTune(){let best=null,bs=-1e9;for(const d of TP_DEF){const pr=tuneNext(d);if(!pr||pr>GA.bank)continue;const s=d.pri-7*TP.raw(d.id)+(pr<GA.bank*.5?3:0);if(s>bs){bs=s;best=d.id;}}return best;}
 function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr&&pr<=GA.bank)n++;}
   for(const s of SHIPS)if(s.p&&!GA.own['ship_'+s.id]&&s.p<=GA.bank)n++;
   for(const c of CREW)if(!GA.own[c.id]&&c.p<=GA.bank)n++;
@@ -129,12 +136,12 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 {const tabs=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='tune';b.type='button';b.textContent='TUNE';tabs.prepend(b);b.addEventListener('click',()=>{GA.tab='tune';gaDraw();});}
 const gaItems0=gaItems;
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
-  for(const d of TP_DEF){const l=TP.l(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
+  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
     b.innerHTML=svgI(d.ic)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
       +`<div class="pr">${pr?neonI+' '+pr:'MAX'}</div>`+(d.id===rec?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>tuneBuy(d,b));box.appendChild(b);}}
-function tuneBuy(d,b){const l=TP.l(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
+function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
   if(GA.bank<pr){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return false;}
   GA.bank-=pr;GA.tune[d.id]=l+1;tsave();gsave();SH.recalc();gaMsg(d.n+' level '+(l+1));AU.sfx('up');gaDraw();return true;}
 gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';

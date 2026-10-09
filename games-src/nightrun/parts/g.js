@@ -3,8 +3,14 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I2';
+const NR_VER='I3';
 const NR_CHECKLIST=[
+ {ver:'I3',id:'diff5',text:'Settings > Difficulty (and the title button) now has Easy, Normal, Hard, Very hard and Legend. Very hard and Legend have faster fire, more elites, almost no repairs and the smart-enemy tricks from the start.'},
+ {ver:'I3',id:'loadout',text:'Garage > LOAD: only EQUIPPED perks work. You have 4 slots (+1 per 15 story stars). Equip and unequip freely, and SELL a level to get 60% of its price back.'},
+ {ver:'I3',id:'prices',text:'Prices are tougher: perks cost 1.5x, pit-stop cards 1.25x and kills pay less Neon. Do you now have to choose what to buy?'},
+ {ver:'I3',id:'market',text:'Garage > SHOP: three daily offers (they change each day), at most two purchases a day, and they apply to your next run only.'},
+ {ver:'I3',id:'soon',text:'Garage > SOON lists placeholders for features we may add (Weapon Forge, Contracts, Pilot Ranks, Boss Trophies, Ship Skins, Squad Roster, Leaderboards). Tell us which you want first.'},
+ {ver:'I3',id:'lab',text:'Title screen > LAB (and the pause menu): open all stages, set the difficulty, god mode, add Neon, unlock or reset the garage, and in a run spawn a boss, a leader or a gunship, skip a district.'},
  {ver:'I2',id:'stories30',text:'Story now has 30 stages, six per city (Bankenviertel, Mainufer, Ostend, Messe, Athina): a run, a hunt, a special stage, a mini-boss, a hard convoy stage and the boss. Your old stars moved to the same stages.'},
  {ver:'I2',id:'leaders',text:'From stage 4 on a wave can come with a LEADER: gold crown, big hull, a bar over its head. Drones near it have a cyan shield link (they take under half damage). Kill the leader first: the squad panics and speeds up. It fires a 5-way fan every fourth beat, with a red warning ring first.'},
  {ver:'I2',id:'dodgers',text:'From about stage 8 some drones slide sideways out of your shots, so keep your aim on them or use wide weapons.'},
