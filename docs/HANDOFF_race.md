@@ -1,5 +1,20 @@
 # HANDOFF race (race worker, 2026-10-09): "the races are boring" → NOW: wide open race courses
 
+## >>> READ FIRST (open-course builder session, 2026-10-09 ~18:30; HEAD = this commit)
+- NEW module `src/98ro_open.js` (ORDER: after 98rf, before 99_api). Prefix `OPN_` (`RO` is the roam state!). Two courses, both in the RACE menu:
+  `fra_ufer` "Riverbank Rally" (Frankfurt tab) and `ath_akti` "Coast Rally" (Athens tab). Built on race entry by a `loadTrack` wrap (no city build, no download).
+- Design: ribbon W=96 (HALF 48, MARGIN 46.5). Road |x|≤7.2 (yellow centre line). Terrain by sector (`def.ro.ter`): grass/dirt/sand → 4×4 (top ×.9/.93/.86), cobble → car (×.97).
+  Routes (`def.ro.routes`, cp index a→b, side = inside of the bend): an island at |x| 9–14 with rounded noses (`OPN_b` lateral limits), lane beyond = dirt (4×4) or water (boat), lane top ×1.1, boost pads (`OPN_pads`).
+  Cliffs (`def.ro.cliffs`, outside of the bend): no wall past the lip (lip 20 m, tapers to the edge over 70 m); past it → `OPN_fall` (air fall) → after 1.4 s `crashJump` (dead 1.6) → respawn x=0 at the same dist (place kept). Banner: "OFF THE CLIFF! SPAWN IN 3 · TAP" (tap or R = now; wraps RF_rsp/RF_rspNow).
+  Jumps: def.jumps `pit` full width (gap 40–44 m) with a hazard kicker. Grid: 4 wide, player last. No civilian traffic, forward only.
+- Tests: `tools/tOpen.js` (start via startRace, placed shots: env SHOTS="name~frames~setup~cam@@…", HOLD, INFO, RUN). Shot envs: `qa_race/ro1/shots_fra.env`, `shots_ath.env`.
+  tRace prints `open{vis2Pct,plRoutes,aiByRoute,aiRouteShare,respawnsPl,cliffFallsPl/AI,offRoadPct,waterPct,seg}`; env ROUTE=road makes the bot skip the alt routes (`window.__roAlt=false`).
+  Solo route timing: `qa_race/ro3/seg_run.js` (RUN= for tOpen; scripted steering through each route road vs alt, real physics, render off).
+- Measured (ro2/ro3, 1 lap, phone, real touch): 0 errors, 0 wall hits/min, rivals ≥2 on screen 100 % of the time, bot used both alt routes, AI took alt routes 21–43 % of route-laps, tyre p50 road −0.01 / dirt 0.00–0.01 / boat hull 0.15, tris 0.93 M vs city 1.0–1.19 M, calls 135 vs 185–220.
+- Verified in a browser: cliff fall → respawn (fra + ath), STUCK! SPAWN IN 3 banner. WRONG WAY cannot happen: race physics caps the heading at ±1.5 rad (cos > −0.1). Upside-down: no roll in race physics; wrecks already go to the respawn banner. Deep water without the boat: n/a (auto boat).
+- OPEN: alt routes were not faster with the tRace bot (pack noise). Solo timing run in progress → tune `r15k` lane factors so alt beats road by ~0.6–1 s.
+- NEXT: (1) route tuning, (2) gate shots next to refs (`tools/sideBySide.py out ours ref caption`): start pack, wide terrain, shortcut, water/boat, jump, cliff respawn, finish → coordinator FIRST, (3) REVIEW, (4) DEPLOY msg (OD_CHANGELOG + checklist items).
+
 ## >>> READ FIRST (finisher session, 2026-10-09 ~16:50; HEAD = this commit)
 - The scope changed at 16:34. Alex scored the narrow city races 2/10. The coordinator's brief is in `docs/RACE_PLAN.md` §3: open courses, 3-vehicle swap, respawn, rivals on alt routes, gate shots next to the reference. **Do not ship the narrow version.**
 - Done this session:
