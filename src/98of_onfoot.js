@@ -221,8 +221,8 @@ function OF_bubble(){const cv0=document.createElement('canvas');cv0.width=128;cv
 function OF_fleeStart(c,h){OF_fleeEnd();const im=HUB.cim[c.k],col=new THREE.Color('#d8302a');try{if(im&&im.instanceColor)im.getColorAt(c.j,col)}catch(e){}
   const F=OF_figMake(GAR_riv('#'+col.getHexString()),{armsUp:1}),fx=Math.sin(h),fz=Math.cos(h),rx=-fz,rz=fx,y0=c.y!=null?c.y:OF.y,bub=OF_bubble();F.g.add(bub);F.g.rotation.order='YXZ';
   HUB.grp.add(F.g);F.g.visible=true;
-  // seat (inside, left of the centre line) → out through the door → thrown 1.2 m further back, a stumble, then the run (away from the car's left side)
-  const s={x:c.x-rx*.3-fx*.1,z:c.z-rz*.3-fz*.1},o={x:c.x-rx*1.6-fx*.4,z:c.z-rz*1.6-fz*.4},l={x:c.x-rx*2.6-fx*1.3,z:c.z-rz*2.6-fz*1.3};let ra=Math.atan2(-rx-fx*.5,-rz-fz*.5);
+  // seat (inside, left of the centre line) → out through the door → thrown 1.2 m further back, a stumble, then the run (ahead-left, onto the pavement, where you see him as you drive off)
+  const s={x:c.x-rx*.3-fx*.1,z:c.z-rz*.3-fz*.1},o={x:c.x-rx*1.6-fx*.4,z:c.z-rz*1.6-fz*.4},l={x:c.x-rx*2.6-fx*1.3,z:c.z-rz*2.6-fz*1.3};let ra=Math.atan2(-rx+fx*.7,-rz+fz*.7);
   OF.fl={F,bub,t:0,ph:'out',s,o,l,y0,x:s.x,z:s.z,y:y0+.45,h:Math.atan2(rx,rz),ra,d:0,lph:0,cx:c.x,cz:c.z}}
 function OF_fleeEnd(){const L=OF.fl;if(!L)return;if(L.F.g.parent)L.F.g.parent.remove(L.F.g);L.F.g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.isSprite){o.material.map.dispose();o.material.dispose()}});OF.fl=null}
 function OF_fleeStep(dt){const L=OF.fl;if(!L)return;L.t+=dt;const F=L.F,M=F.M;let pitch=0,legs=0;
@@ -236,11 +236,11 @@ function OF_fleeStep(dt){const L=OF.fl;if(!L)return;L.t+=dt;const F=L.F,M=F.M;le
   if(M.b)M.b.position.y=0;L.bub.visible=L.t>.25&&L.t<2.1;if(L.bub.visible)L.bub.material.rotation=Math.sin(L.t*20)*.06;
   if(L.t>7.5||Math.hypot(L.x-RO.x,L.z-RO.z)>120)OF_fleeEnd()}
 // --- your minifig in the seat of a borrowed body (traffic geometry has no driver): GAR_fig sit pose, same scale as the walker, hidden on EXIT.
-// Head under the glass top, but never lower than 0.3 m above the body's underside (low cars: the head shows above the roof line instead of feet through the road)
+// Fits the cabin like the own car's driver bricks: head under the glass top, seat ≥ 0.3 m above the body's underside (scaled down in low cars, never feet through the road)
 function OF_seat(ud,body){const F=OF_figBuild(),P=[],Q=[];GAR_fig(GB_figGet(),P,Q,true);const g=mergeGeometries(P.concat(Q).map(q=>{q=q.index?q.toNonIndexed():q;for(const a of Object.keys(q.attributes))if(a!=='position'&&a!=='normal'&&a!=='color')q.deleteAttribute(a);return q}));
   g.computeBoundingBox();const fb=g.boundingBox;ud.m.updateMatrixWorld(true);const m4=new THREE.Matrix4(),bx=new THREE.Box3(),B=new THREE.Box3(),G=new THREE.Box3();
   for(let i=0;i<body.length;i++){const q=body[i];if(i===1||!q)continue;if(!q.geometry.boundingBox)q.geometry.computeBoundingBox();q.getMatrixAt(0,m4);m4.premultiply(ud.m.matrixWorld);bx.copy(q.geometry.boundingBox).applyMatrix4(m4);(i===2?G:B).union(bx)}
-  const top=(G.isEmpty()?B.max.y-.12:Math.min(G.max.y,B.max.y)-.06),h=RO.h,s=F.s,y=Math.max(top-fb.max.y*s,B.min.y+.3-fb.min.y*s),cz=G.isEmpty()?0:((G.min.x+G.max.x)/2-RO.x)*Math.sin(h)+((G.min.z+G.max.z)/2-RO.z)*Math.cos(h);
+  const top=(G.isEmpty()?B.max.y-.12:Math.min(G.max.y,B.max.y)-.06),h=RO.h,fl=B.min.y+.3,s=Math.min(F.s,(top-fl)/Math.max(.1,fb.max.y-fb.min.y)),y=top-fb.max.y*s,cz=G.isEmpty()?0:((G.min.x+G.max.x)/2-RO.x)*Math.sin(h)+((G.min.z+G.max.z)/2-RO.z)*Math.cos(h);
   const w=new THREE.Matrix4().compose(new THREE.Vector3(RO.x+Math.sin(h)*(cz-.15),y,RO.z+Math.cos(h)*(cz-.15)),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),h+Math.PI),new THREE.Vector3(s,s,s));
   w.premultiply(new THREE.Matrix4().copy(ud.m.matrixWorld).invert());const m=new THREE.Mesh(g,GB_MAT);w.decompose(m.position,m.quaternion,m.scale);m.userData.ofSeat=1;m.userData.of=1;m.castShadow=false;ud.m.add(m);OF.seat=m;return m}
 // --- wanted stars (stub for P4): +n per crime, one star drops after 60 s without a new crime
