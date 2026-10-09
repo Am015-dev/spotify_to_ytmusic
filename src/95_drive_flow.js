@@ -73,7 +73,7 @@ function DR_athFill(R){let mat=null;HUB.grp.traverse(o=>{if(!mat&&o.isInstancedM
       const ns=Math.max(1,Math.round(len/32)),sl=len/ns,dep=Math.min(12,(nx?r.x1-r.x0:r.z1-r.z0)/2-.5);
       for(let k=0;k<ns;k++){const ax=sx+dx*k*sl,az=sz+dz*k*sl,bx=ax+dx*sl,bz=az+dz*sl,mx=(ax+bx)/2,mz=(az+bz)/2;st.seg++;
         if(inS(mx+nx*8,mz+nz*8)){st.int++;continue}
-        const h=DR_h(mx*.11,mz*.13),open=DR_edgeX(mx+nx*25,mz+nz*25)>=6,fl=open&&dep>4&&k>0&&k<ns-1&&h<.75?1+(h<.3?1:0):0;
+        const h=DR_h(mx*.11,mz*.13),open=DR_edgeX(mx+nx*25,mz+nz*25)>=6,fl=open&&dep>4&&h<.7?1+(h<.28?1:0):0;
         if(!fl){quad(ax,az,bx,bz,y0,y1,y0,nx,nz,c);if(!open)st.str++;continue}
         // wing: front to the taller top, two sides and the back above the core roof, its own roof
         const yt=y1+fl*3.1,ix=-nx*dep,iz=-nz*dep;st.wing++;c2.set(PC[Math.floor(DR_h(mz,mx)*PC.length)]);
