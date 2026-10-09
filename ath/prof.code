@@ -1,0 +1,1 @@
+window.__pf={};for(const n of ['pedStep','hubTrafficStep','LV_clStep','LV_parkStep','hubRecycle','roamStep','hubCull','studFXStep','miniDraw','roamHud','popStep','CR_hud'])try{const f=eval(n);if(typeof f!=='function')continue;eval(n+'=function(){const t0=performance.now();const r=f.apply(this,arguments);__pf["'+n+'"]=(__pf["'+n+'"]||0)+performance.now()-t0;return r}')}catch(e){}

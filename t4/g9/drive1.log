@@ -1,0 +1,32 @@
+shot 01_rides
+shot 02_picker
+shot 03_chassis
+n 🧱 15/120 · Super Light
+put hl -4 -8 +2 {"h":{"i":-4,"j":-8,"b":"T1x1"},"c":{"t":"hl","x":-4,"z":-8,"y":1,"r":0,"m":0,"c":0,"bad":false},"base":0}
+put tl -4 7 +2 {"h":{"i":1,"j":2,"b":"T4x4"},"c":{"t":"tl","x":1,"z":2,"y":2,"r":2,"m":0,"c":0,"bad":false},"base":0}
+put arch -4 -6 +2 {"h":{"i":-2,"j":-7,"b":"T6x16"},"c":{"t":"arch","x":-2,"z":-8,"y":1,"r":0,"m":0,"c":0,"bad":false},"base":0}
+put arch -4 4 +2 {"h":{"i":1,"j":0,"b":"drvL"},"c":{"t":"arch","x":1,"z":-1,"y":5,"r":0,"m":0,"c":0,"bad":false},"base":0}
+put b16 -4 -1 +2 {"h":{"i":2,"j":-6,"b":null},"c":{"t":"b16","x":2,"z":-8,"y":2,"r":0,"m":0,"c":0,"bad":false},"base":0}
+put ws4 -1 -4 +2 {"h":{"i":3,"j":-7,"b":null},"c":{"t":"ws4","x":2,"z":-7,"y":5,"r":0,"m":0,"c":0,"bad":false}}
+put cs24 -2 -7 +2 {"h":{"i":-2,"j":-7,"b":"arch"},"c":{"t":"cs24","x":-2,"z":-8,"y":7,"r":0,"m":0,"c":0,"bad":false},"base":0}
+put cs24 -2 4 +2 {"h":{"i":-2,"j":4,"b":"T4x4"},"c":{"t":"cs24","x":-2,"z":3,"y":4,"r":2,"m":0,"c":0,"bad":false},"base":0}
+put spoiler -1 5 +2 {"h":{"i":2,"j":1,"b":"arch"},"c":{"t":"spoiler","x":0,"z":1,"y":11,"r":0,"m":0,"c":0,"bad":false},"base":0}
+put t16 -4 -1 +2 {"h":{"i":5,"j":-8,"b":null},"c":{"t":"t16","x":5,"z":-9,"y":9,"r":0,"m":0,"c":0,"bad":false}}
+shot 04_parts
+n 🧱 35/120 · Light
+paint cs24 9 false
+paint cs24 9 false
+paint cs24 9 false
+paint t16 9 true
+shot 05_painted
+cols ["drvL:#0055bf","diff:#1b2a34","hl:0","hl:0","tl:0","tl:0","arch:0","arch:0","arch:0","arch:0","b16:0","b16:0","ws4:0","ws4:0","cs24:0","cs24:0","cs24:0","cs24:0","spoiler:0","spoiler:0","t16:9","t16:9"]
+shot 06_rides_mine
+save {"sel":"mine","saved":35,"live":35}
+wait 0 menu|false
+shot 07_roam
+shot 08_drive
+tyre [0.03,0.03,0.03,0.03] kmh 37
+shot 09_side_traffic {"traffic":null}
+shot 10_side_tyres {"traffic":null}
+tyre_rest [0.03,0.03,0.03,0.03]
+ERR []

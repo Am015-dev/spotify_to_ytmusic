@@ -1,0 +1,8 @@
+// ath/v88x/adprobe.js <url> : Athens dressing stats at the 3 close.js spots
+const enter=require('../../bc/enter.js');const URL=process.argv[2];
+(async()=>{const seed=`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`;
+ const E=await enter(URL,{gfx:'normal',seed});const {p,errs}=E;p.setDefaultTimeout(900000);await E.roamApi();await p.waitForTimeout(4000);console.log(await p.evaluate(()=>__g9ev('(()=>{const t=performance.now();return JSON.stringify({ms:performance.now()-t,n:AD.n})})()')));
+ for(const [x,z,h] of JSON.parse(require('fs').readFileSync('ath/v88w/spots_ath.json','utf8'))){await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.x=x;R.z=z;R.y=M.gnd(x,z,R.y+60);R.v=0;R.vh=h;R.h=h},[x,z,h]);await p.waitForTimeout(3000);
+  console.log(await p.evaluate(()=>{const N=__g9ev('HUB.nodes'),R=__g9ev('RO');let b=null,bd=1e9;for(const n of N){const d=(n.x-R.x)**2+(n.z-R.z)**2;if(d<bd&&!n.ab){bd=d;b=n}}return JSON.stringify([__g9ev('AD.n'),{w:b.w,pw:b.pw,g:b.g}])}))}
+ await p.evaluate(()=>{const R=__mho.RO,g=__mho.gnd(R.x,R.z,R.y+.3);__gnb.cam([R.x-Math.sin(R.h)*25,g+30,R.z-Math.cos(R.h)*25,R.x+Math.sin(R.h)*25,g,R.z+Math.cos(R.h)*25])});await p.waitForTimeout(2500);await p.screenshot({path:'ath/v88x/after/ath_top.png'});console.log(await p.evaluate(()=>__g9ev('JSON.stringify(AD.C.get(Math.floor(RO.x/40)*100000+Math.floor(RO.z/40)).slice(0,5).map(i=>[i.t,(i.x-RO.x).toFixed(1),(i.z-RO.z).toFixed(1)]))')));console.log('errors',errs.length,errs.slice(0,3));process.exit(0)})();
+

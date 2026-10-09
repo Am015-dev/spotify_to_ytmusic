@@ -1,0 +1,15 @@
+posei before {"n":59,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 arch wL hl B1x1 grl C8x1 B4x4 cs14 B1x6 T6x6 drvL ws6 T6x2 T1x2 T4x4 tl B4x1 diff spoiler mir lp","L":6,"plate":7}
+shot posei_1_before 198s
+posei after {"n":0,"w":0,"bp":1,"base":124,"hi":0,"ty":"","L":6,"plate":2}
+shot posei_2_cleared 279s
+FAIL posei: CLEAR leaves only chassis + wheels {"n":0,"w":0,"bp":1,"base":124,"hi":0,"ty":"","L":6,"plate":2}
+PASS posei: base rescanned (grid at the chassis, no floating heights) cells 124 highest 0 (before 0)
+PASS posei: UNDO restores the build 
+t_bus before {"n":59,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 arch wL hl B1x1 grl C8x1 B4x4 cs14 B1x6 T6x6 drvL ws6 T6x2 T1x2 T4x4 tl B4x1 diff spoiler mir lp","L":6,"plate":7}
+shot t_bus_1_before 539s
+CRASH cdpSession.send: Target page, context or browser has been closed
+    at tapXY (/home/user/spotify_to_ytmusic/bc/enter.js:10:226)
+    at async tapEl (/home/user/spotify_to_ytmusic/bc/enter.js:11:108)
+    at async tap (/home/user/spotify_to_ytmusic/bc/enter.js:12:79)
+    at async clear (/home/user/spotify_to_ytmusic/qa_gx/clear.js:7:24)
+    at async /home/user/spotify_to_ytmusic/qa_gx/clear.js:14:3
