@@ -21,7 +21,7 @@ The laptop made the pictures; the Linux session rebuilds, tests and deploys. Unl
   - Wiring: show the picture on the fortune card when the file exists.
 - **End screens:** `end-win.webp` and `end-lose.webp`.
 - **Unlock tables:** `table-market-cloth.webp` and `table-judges-tent.webp` (campaign `table` unlocks `market-cloth` and `judges-tent`).
-- **Phone versions:** `title-phone` and `table-phone` are not made yet (Flow failed twice). Crop the desktop `art/title.png` and `art/table.png` until then.
+- **Phone versions:** `title-phone.webp` and `table-phone.webp` (portrait).
 
 ## Music
 `../audio/cauldron-fair/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.
