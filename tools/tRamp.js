@@ -5,7 +5,7 @@ const fs=require('fs'),path=require('path');const {chromium}=require('/opt/node2
 const URL=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',OUT=process.argv[3]||'qa_ramp',CITY=process.argv[4]||'fra',ONLY=process.argv.slice(5).map(Number);fs.mkdirSync(OUT,{recursive:true});
 const TAG={0xffb020:'street',0xff5a1c:'hill/biome/autobahn',0xffcd03:'longjump',0xff2d55:'M1 story',0xffd12c:'OTG roof',0x5dffb0:'OTG big',0xff2d95:'OTG',0xff8a1c:'lively'};
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const {p,errs,shot}=await boot(b,{city:CITY,url:URL,phone:false});
+ const {p,errs,shot}=await boot(b,{city:CITY,url:URL,phone:!!process.env.PHONE});  // PHONE=1: iPhone touch context (touch HUD); default desktop (no touch controls, desktop minimap)
  const list=await p.evaluate(()=>{const M=__mho,R=M.RO,ath=M.cid()==='ath';
   const onRoad=(x,z)=>{try{if(ath){const r=M.athRoad(x,z,48);return!!r&&r.e<=0}return!(M.roadD(x,z)>0)}catch(e){return null}};
   return R.ramps.map((r,i)=>{const s=Math.sin(r.h),c=Math.cos(r.h),pt=(a,b)=>[r.x+s*a+c*b,r.z+c*a-s*b];const lo=-r.len/2;

@@ -86,3 +86,16 @@ Commands: `ATH=1 node t4/g11drive.js http://127.0.0.1:8766/local_dbg.html qa_std
 **Left:** route-bot overtaking + rerun the 10 ramps above; Autobahn boost top shot; HUD shots at top/boost for 2 classes are qa_speed/hud_ship_city_*.jpg
 and hud_offroad_*.jpg (Autobahn ship shots show the crash, retake); REVIEW (include the turn-rate table, the traffic-off-ramp-streets change and
 fra_stuck2.jpg as evidence per the coordinator); then merge/changelog/out/v88z/DEPLOY message.
+
+## OUTCOME (2026-10-09 14:20 UTC, v88z worker 2)
+Merged live v89a (alex/od-p1, verify_live: LIVE_MATCH). REVIEW f5949d3 → CONDITIONAL PASS (reviewer). The open point (fra_ramp0 minimap big, no controls)
+was tRamp's desktop context: PHONE=1 now gives the touch HUD (qa_rshots_phone/fra_ramp0.jpg = normal HUD). OD_CHANGELOG v88z + 5 checklist items
+(speed, kreuz, ramps, traffic, ath-walls). out/v88z split pair built on it; DEPLOY sent to the coordinator.
+New fix: AB bridge decks (AB_BRIDGES) carry yA/yB = terrain at both ends; deckY() = deckY0() + that base (51_city_net.js). Was: Frankfurter Kreuz
+deck 22 m under the terrain → pit on the A3/A5; Main bridges 5-6 m steps.
+Ramps: 67/68 by GPS road route + fra 18 from its own street (GPS route blocked by a light queue 140 m out). ath 11/17: the qv path is coarse in west Athens.
+tRamp: overtaking, LATER on event cards, ROUTE=street STREET=55, PHONE=1. New tools: tAbProbe.js, tCupStart.js, tMixShot.js.
+Open (checklist ath-walls): Athens tPlay walls mean 1.29/min (0.39/1.16/2.33) vs live 0.62 (0/1.23): slow off-road scrapes near the RAMP JUMP pop-up
+and the Eleni's Garage marker; not at the Akropolis Cup start (colliders identical, qa_cup/). Reviewer note: EXIT shows whenever stopped (6 HUD buttons);
+consider EXIT only after 1.5 s stopped (od-p1 owner).
+Speeds: Hot Rod AB 230 / boost 271 (12 s, still climbing), city 183/235; 4x4 AB 153/181, city 142/150.

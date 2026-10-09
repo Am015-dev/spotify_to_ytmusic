@@ -3,6 +3,11 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88z',id:'speed',text:'Take a sports car (Hot Rod) onto the Autobahn and hold GAS: the HUD reaches about 230 km/h, BOOST takes it past 260. A 4×4 tops out around 155. Steering feels the same as before.'},
+ {ver:'v88z',id:'kreuz',text:'Autobahn west of the city, at the Frankfurter Kreuz: drive under the flyover at full speed, then take the A5 over it. No drop, no sudden stop, no invisible wall.'},
+ {ver:'v88z',id:'ramps',text:'Drive along a street to a yellow ramp: it sits in your lane, no traffic queued on it, and you can jump it. Try the ramp on the Eiserner Steg footbridge.'},
+ {ver:'v88z',id:'traffic',text:'Frankfurt: a few city buses, fewer police and trucks. Athens: more scooters, fewer taxis. Does the traffic look right?'},
+ {ver:'v88z',id:'ath-walls',text:'Athens: drive around Eleni\'s Garage (Psyrri) and a RAMP JUMP pop-up ring. Any invisible walls or getting stuck between buildings?'},
  {ver:'v89a',id:'foot-exit',text:'Drive, then stop and let go of the pedals: BRAKE turns into a yellow 🚪 EXIT. Tap it (PC: F). Your minifig steps out next to the car, the driver seat is empty, the car stays parked.'},
  {ver:'v89a',id:'foot-walk',text:'On foot: drag on the left half of the screen to walk, push far to run; RUN and JUMP work. Walk 30 m along a street: no getting stuck on kerbs, the camera stays behind you and never inside a wall. Your minifig is as tall as the people around.'},
  {ver:'v89a',id:'foot-pc',text:'PC: stop the car, press F (or E) to get out, walk with WASD (Shift runs, Space jumps), press F next to a car to get in.'},
