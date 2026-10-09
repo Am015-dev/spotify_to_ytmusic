@@ -46,7 +46,7 @@ let QS_ct=0;function QS_clear(dt){if(!HUB.cars||!HUB.nodes||(QS_ct+=dt)<.5)retur
  if(TUNE.trHour){const C=HUB.cars,live=C.filter(c=>!(c.dead>0)).length,want=Math.round(C.length*QS_hourK()/1.2);let over=live-want;
   for(const c of C){if(over<=0)break;if(c.dead>0||c.pk||c.tr||c.route||c.crW||Math.hypot(c.x-RO.x,c.z-RO.z)<200)continue;c.dead=20+R()*20;over--}}
  for(const c of HUB.cars){if(TUNE.trOn&&!c.pk&&!c.tr&&N[c.a]&&N[c.b]){const ab=!!(N[c.a].ab&&N[c.b].ab);if(c.qsAb!==ab){c.qsAb=ab;c.v=QS_v0(c.k,ab)}}/* Autobahn 100-130 (trucks 80-90), city 50-60 km/h */
-  if(c.pk||c.tr||c.dead>0||c.route||!QS_shut(c.a,c.b)||Math.hypot(c.x-RO.x,c.z-RO.z)<110)continue;const A=N[c.a];if(!A)continue;
+  if(c.pk||c.tr||c.dead>0||c.route||!QS_shut(c.a,c.b)||Math.hypot(c.x-RO.x,c.z-RO.z)<110&&LV_seen(c.x,c.y||0,c.z))continue;/* close but out of view (behind you, round a corner) moves too */const A=N[c.a];if(!A)continue;
   const nx=A.nb.filter(n=>n<N.ng&&n!==c.b&&!QS_shut(c.a,n));if(nx.length){c.b=nx[Math.floor(R()*nx.length)];c.t=0}}}
 hubTrafficStep=(f=>function(dt){try{QS_clear(dt)}catch(e){}return f.apply(this,arguments)})(hubTrafficStep);
 // ---- ramp validator (plan Q3): every ramp built without a fixed base height (street, biome, Taunus, long-jump, Autobahn, pop-up) goes through
