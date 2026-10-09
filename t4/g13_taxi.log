@@ -1,0 +1,14 @@
+car t_su_gt
+bk true 63
+yellow 2
+roof 11 {"z0":-8,"z1":8,"x0":-4,"x1":3}
+roof sign placed 3
+shot taxi_garage_roof
+front placed 0 front z 9
+shot taxi_garage_front
+HID #gbBkT [data-a="done"]
+saved car types ["grl","hl","t14"] n 69
+shot taxi_drive
+gap [0.03,0.03,0.03,0.03]
+shot taxi_side
+ERR []

@@ -108,7 +108,7 @@ studBurst=(f=>function(at,fw,sp){AU_M.sb++;AU_M.sbF++;AU_M.sbAt=at;return f.appl
 // stud fountain: the studs of a smash shoot up instead of out
 smashCheck=(f=>function(dt){const n0=HUB.smashed;AU_M.sbF=0;AU_M.sbAt=null;const r=f.apply(this,arguments);if(HUB.smashed>n0)AU_fountain(AU_M.sbAt,AU_M.sbF);return r})(smashCheck);
 comboAdd=(f=>function(k){const m0=comboMult();const r=f.apply(this,arguments);const m1=comboMult();if(m1>m0&&!RO.ch)AU_pop('+COMBO ×'+m1,'#ffd12c');return r})(comboAdd);
-roamCam=(f=>function(dt){if(RO.ch)shake=0;else shake=Math.min(shake,.45);if(RO.boosting&&!RO.ch)fovKick=Math.max(fovKick,6);const b=!!RO.boosting;if(b!==AU_M.boostC){AU_M.boostC=b;document.body.classList.toggle('auBoost',b)}return f.apply(this,arguments)})(roamCam);
+roamCam=(f=>function(dt){if(RO.ch)shake=0;else shake=Math.min(shake,.45);if(RO.boosting&&!RO.ch)fovKick=Math.max(fovKick,6*TUNE.fxFov);const b=!!RO.boosting;if(b!==AU_M.boostC){AU_M.boostC=b;document.body.classList.toggle('auBoost',b)}return f.apply(this,arguments)})(roamCam);
 showResults=(f=>function(){const r=f.apply(this,arguments);try{if(pl&&pl.finished&&!pl.eliminated&&ships.length>1&&ships.every(o=>o===pl||!o.finished||o.finishTime>=pl.finishTime)){AU_M.win++;AU_confetti();AU_fanfare()}}catch(e){}return r})(showResults);
 chEnd=(f=>function(v){let won=false;try{const ch=RO.ch,e=ch.m.ev,g=ch.g||OTG_GOAL[e.kind],HI=ch.hi??OTG_HI[e.kind];won=v!=null&&(ch.cap!==0)&&(HI?v>=g[2]:v<=g[2])}catch(e){}const r=f.apply(this,arguments);if(won){AU_M.win++;AU_confetti();AU_fanfare()}return r})(chEnd);
 // UI clicks on any button
@@ -134,7 +134,7 @@ function FL_terr(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=RO.y>ground+
   if(FL.s==null){FL.s=raw;FL.cand=raw}
   if(!air&&raw!==FL.s){if(raw!==FL.cand){FL.cand=raw;FL.cT=0}FL.cT+=dt;if(FL.cT>=FL_HOLD&&FL.hold<=0){FL.s=raw;FL.hold=FL_MINHOLD;FL.cT=0}}else if(!air){FL.cand=FL.s;FL.cT=0}
   return raw}
-const FL_VEH={road:'ship',dirt:'offroad',water:'boat'};
+const FL_VEH={road:'ship',dirt:'ship',water:'boat'};  // R1: dirt was 'offroad' = the car turned into the buggy on grass at 100 km/h
 function FL_veh(){const v=(RO.vsel||'auto')==='auto'?FL_VEH[FL.s||'road']:RO.vsel;if(v!==FL.v&&!(pl&&pl.air)){if(FL.v){FL.log.push({v,s:FL.s,x:Math.round(RO.x),z:Math.round(RO.z)});if(FL.log.length>60)FL.log.shift();FL_burst(v)}FL.v=v}return FL.v||v}
 function FL_burst(v){if(!pl||!RO.on)return;const at=pl.mesh.position.clone();at.y+=1.2;
   CR_noGlow=1;try{debris(at,V3(0,5,0),8,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)),.45,RO.y);burst(SPARK,at,8,9,.25,new THREE.Color(1.3,1.2,.9))}finally{CR_noGlow=0}AU.sfx('boost');fovKick=Math.max(fovKick,4)}

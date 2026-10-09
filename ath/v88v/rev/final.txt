@@ -1,0 +1,6 @@
+fra HITCH {"build":{"ms":83483,"slices":105,"slMax":20,"sl50":0,"sl100":0,"big":[[9795,"inst 216x276 tex"]],"pixN":18,"pixMs":556,"pixMax":505,"tPix":561,"tPrep":318,"cells":740,"err":null},"framesDuringBuild":{"n":107,"worst":9801,"p50":24,"over50":15,"over100":12},"framesAfter":{"n":29,"worst":7586,"p50":16,"over50":3,"over100":3},"first10After":[4048,24,19,14,11,12,18,22,11,7586]}
+errors 0 
+fra life def [{"calls":295,"tris":1268229,"msRender":165.8,"msCpu":3.52,"peds":74,"meshes":1940,"inst":15285,"lv":0.085},{"calls":245,"tris":932783,"msRender":115.1,"msCpu":2.61,"peds":74,"meshes":1708,"inst":13880,"lv":0.072},{"calls":252,"tris":1049367,"msRender":221.2,"msCpu":2.74,"peds":74,"meshes":1975,"inst":17173,"lv":0.122}] AVG calls 264 tris 1083459.67 cpu 2.96 render 167.37
+errors 0 
+ath life def [{"calls":212,"tris":945181,"msRender":210.5,"msCpu":5.28,"peds":74,"meshes":1165,"inst":46583,"lv":0.056},{"calls":296,"tris":1218768,"msRender":527.5,"msCpu":4.89,"peds":74,"meshes":1247,"inst":50071,"lv":0.06},{"calls":218,"tris":767828,"msRender":14.9,"msCpu":3.94,"peds":74,"meshes":1036,"inst":29069,"lv":0.08}] AVG calls 242 tris 977259 cpu 4.7 render 250.97
+errors 0 

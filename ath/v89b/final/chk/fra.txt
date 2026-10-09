@@ -1,0 +1,5 @@
+before {"state":"roam","str":{"sup":284,"built":14,"mb":21.8,"lodT":422675},"b":14,"f":0,"kiosk":0}
+garage button visible true
+garage open {"gbx":true}
+after {"state":"roam","str":{"sup":284,"built":38,"mb":52.1,"lodT":1010916},"b":40,"f":2,"kiosk":0}
+errors 0 
