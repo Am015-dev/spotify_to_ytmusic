@@ -58,7 +58,7 @@ body[data-mode="zone"] #hBL .lt,body[data-mode="arena"] #hBL .lt{display:none}
 #cine{position:fixed;inset:0;pointer-events:none;z-index:2}#cine:before,#cine:after{content:'';position:absolute;left:0;right:0;height:0;background:#000;transition:height .25s}#cine:before{top:0}#cine:after{bottom:0}
 #cine span{position:absolute;left:50%;bottom:3vh;transform:translateX(-50%);font:italic 900 12px var(--hud);letter-spacing:.3em;color:var(--pink);opacity:0;transition:opacity .2s;z-index:1}
 body.cine #cine:before,body.cine #cine:after{height:10vh}body.cine #msg{font-size:clamp(30px,6vw,64px);top:12vh}body.cine #sub{top:calc(12vh + clamp(34px,6.4vw,70px));font-size:12px}body.cine #cine span{opacity:1}body.cine #hud>*:not(#msg):not(#sub){opacity:0}
-#fps{position:fixed;left:50%;bottom:calc(4px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font:700 11px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.55);padding:2px 8px;border-radius:5px;z-index:7;pointer-events:none}
+#fps{position:fixed;left:calc(8px + env(safe-area-inset-left,0px));bottom:calc(3px + env(safe-area-inset-bottom,0px));white-space:nowrap;font:700 12px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.55);padding:2px 8px;border-radius:5px;z-index:7;pointer-events:none}
 #flash{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(255,40,70,.5));opacity:0;transition:opacity .25s}
 /* ---------- menu & cards ---------- */
 .screen{position:fixed;inset:0;display:flex}
@@ -741,7 +741,7 @@ body.touch #roamPlate small{white-space:nowrap}
 // in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 // TUNE (tune20): live-tunable driving numbers that used to be inline literals; defaults = the v87w values. Knob table + ?tune=1 drawer: src/99t_tune.js.
-const TUNE={life:1,lvPed:1,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:1,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
+const TUNE={life:1,lvLod:1,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
   // fix21 boost FX (TUNE drawer "FX" tab): thruster flame size / length / brightness, boost sparks on/off + count + size, speed lines, screen blur/glow, FOV kick, shake (all ×, 1 = default look)
   fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
   // fix21 audio (TUNE drawer AUDIO tab, 98m_music.js): music on/off + volume (0.5 = the old synth level), SFX ×, duck music under dialogue (on/off + how much)
@@ -753,6 +753,7 @@ const TUNE={life:1,lvPed:1,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v88u',date:'9 Oct 2026',items:[{t:'FIXED',s:'Smoother driving in busy streets: the street life no longer re-scans the whole street map many times a frame, and far-away people and cars update less often.'},{t:'CHANGED',s:'Fewer people on the streets (about 74 instead of 97): fewer walkers and 4 corner groups instead of 6.'},{t:'FIXED',s:'No hitch the first time a stall or a pop-up ring appears (its graphics are prepared while the city loads).'},{t:'NEW',s:'⚙ TUNE → Life → Show FPS: a small line with fps, the worst frame, draw calls and triangles, so you can send us a screenshot if it still lags.'}]},
   {v:'v88t',date:'9 Oct 2026',items:[{t:'NEW',s:'3 new Speed-Champions-style cars in RIDES → STREET → SPEED SERIES: Time Coupe, Red Hypercar and Gold Formula (open wheels). Each one has its own ▶ GUIDE.'},{t:'NEW',s:'Time Coupe and Red Hypercar now drive in city traffic; the 6 base racing teams race in street-racer and Speed Series cars in their team colours.'},{t:'CHANGED',s:'BUILD IT (guide): the part you need next is picked for you in the parts palette, in the right colour.'}]},
   {v:'v88q',date:'9 Oct 2026',items:[{t:'CHANGED',s:'The pinned checklist folds to its small chip in the garage (it covered the car) and during the race countdown; tap the chip to open it.'}]},
  {v:'v88p',date:'8 Oct 2026',items:[{t:'NEW',s:'Street corners ahead come alive: groups of people chatting who turn, wave and cheer as you drive up (and leap aside), market stalls, café tables and parked cars on the kerb. Smash a stall for studs.'},{t:'NEW',s:'Roadside pop-up challenges like 2K Drive: a coloured ring appears on the road ahead; drive through it for a RAMP JUMP, DRIFT ZONE, SMASH STREAK or CONE SLALOM. Timer on the objective line, +150 studs and a brick burst if you make it.'},{t:'CHANGED',s:'Traffic and pigeons now show up closer, along the street you are driving.'}]},
@@ -5089,6 +5090,7 @@ function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=
     const off=gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)),bx=p.cw?p.cx:A.x+(B.x-A.x)*p.t-dz*off,bz=p.cw?p.cz:A.z+(B.z-A.z)*p.t+dx*off;/* v88p: crowd peds (LV clusters) stand at p.cx/p.cz */
     let d=Math.hypot(bx+p.jx-RO.x,bz+p.jz-RO.z);
     if(!p.cw&&d>LV_pedFar()){LV_pedPut(p);continue}
+    if(TUNE.lvLod&&d>90&&p.jy<=0&&p._x!=null&&(i+HUB.fr)%3)continue;/* v88u perf: people > 90 m away re-pose every 3rd frame (9-13 px tall there) */
     if(p.jy<=0&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}
     const x=bx+p.jx,z=bz+p.jz;p._x=x;p._z=z;if(!p.yc||(i+HUB.fr)%8===0){p.y=groundAt(x,z,(p.y||0)+3);if(p.y<-1){pedPlace(p,120,380);continue}p.y=Math.max(0,p.y)}p.yc=1;
@@ -5162,6 +5164,8 @@ function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(cam
     // brake behind the player
     const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt);
     c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a);if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
+    // v88u perf: cars > 250 m away get their pose (ground probe, suspension, matrix) every 4th frame only; they still move every frame
+    if(TUNE.lvLod&&c.dead<=0&&!c.route&&!c.pk&&(HUB.fr+c.j+c.k)%4&&(c.x-RO.x)**2+(c.z-RO.z)**2>62500)continue;
     const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*c.lane,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
     c.x=x;c.z=z;c.y=A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);
     _m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);CR_susp(c,dx,dz,dt,im,_m);
@@ -5871,8 +5875,9 @@ function frame(now){requestAnimationFrame(frame);if(LD.on)return;if(ENVD)buildEn
   if(state==='roam'){if(!RO.frozen){roamStep(dt);studSync()}else if(pl){AU.engine(pl,0,false);AU.scrape(false)}roamCam(dt)}else{for(const s of ships)posShip(s,dt);updateCam(dt)}drawTraffic(dt);updWorld(dt,T);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);waterTick(dt);updStreaks();updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);
   if(msgTimer>0){msgTimer-=dt;if(msgTimer<=0){$('#msg').style.opacity=0;$('#sub').style.opacity=0}}
   if(pl&&(state==='race'||state==='countdown'||state==='finished')){updHud();AU.engine(pl,CTL.thr,!paused&&!pl.dead&&!pl.eliminated);AU.scrape(pl.wall>0&&!paused);if(pl.wrong>1&&state==='race'&&msgTimer<=0)say('','WRONG WAY',.5)}
-  PERF.js=lerp(PERF.js,performance.now()-pf0,.1);if(!(CM.on&&CM.light))composer.render();
-  if(SET.perf){PERF.fps=lerp(PERF.fps||60,1000/Math.max(1,now-(PERF.last||now-16)),.05);PERF.last=now;if((PERF.tick=(PERF.tick||0)+1)%20===0){const el=$('#fps');el.hidden=false;el.textContent=`${Math.round(PERF.fps)} fps · ${innerWidth}×${innerHeight} @${renderer.getPixelRatio().toFixed(2)}x · ${renderer.info.render.calls} draws · ${SET.q}`}}else if(PERF.tick){$('#fps').hidden=true;PERF.tick=0}}
+  PERF.js=lerp(PERF.js,performance.now()-pf0,.1);const pfOn=SET.perf||TUNE.perfHud;if(pfOn){renderer.info.autoReset=false;renderer.info.reset()}if(!(CM.on&&CM.light))composer.render();
+  // v88u: TUNE.perfHud (⚙ TUNE → Life) shows the same line with the frame's real draw calls (all passes; autoReset counted only the last pass = 1-3), triangles, JS ms and the worst frame of the last 2 s
+  if(pfOn){const fm=now-(PERF.last||now-16);PERF.fps=lerp(PERF.fps||60,1000/Math.max(1,fm),.05);PERF.last=now;PERF.wm=Math.max(PERF.wm||0,fm);const ri=renderer.info.render;renderer.info.autoReset=true;if((PERF.tick=(PERF.tick||0)+1)%20===0){const el=$('#fps');el.hidden=false;el.textContent=`${Math.round(PERF.fps)}fps · worst ${Math.round(PERF.wm)}ms · JS ${Math.round(PERF.js)} · ${ri.calls}dc · ${(ri.triangles/1e6).toFixed(1)}M`;el.title=`${innerWidth}×${innerHeight} @${renderer.getPixelRatio().toFixed(2)}x · ${SET.q}`;if(PERF.tick%120===0)PERF.wm=0}}else if(PERF.tick){$('#fps').hidden=true;PERF.tick=0}}
 
 /* ---------- loading screen: first free-roam entry builds Frankfurt in time slices with a real progress bar */
 const LD={on:false,busy:null,ti:0,k:0};const nextFrame=()=>new Promise(r=>requestAnimationFrame(()=>r()));
@@ -11028,7 +11033,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['Life','TUNE.life','World life (master)',0,2,.05],['Life','TUNE.lvPed','People near you ×',0,1.6,.05],['Life','TUNE.lvWave','People wave as you pass',0,1,1,'bool'],
  ['Life','TUNE.lvTraf','Traffic near you (0 = spread out)',0,1,1,'bool'],['Life','TUNE.lvBird','Pigeons + gulls ×',0,1.5,.05],['Life','TUNE.lvFlag','Rooftop flags × (next city load)',0,2,.05],
  ['Life','TUNE.lvBlimp','Blimp in the sky',0,1,1,'bool'],['Life','TUNE.lvBoat','Boats on the Main × (next city load)',0,2,.05],['Life','TUNE.lvFac','Bold LEGO facade colours (next city load)',0,1,.05],
- ['Life','TUNE.lvCrowd','Crowds, stalls, cafés ahead ×',0,2,.05],['Life','TUNE.lvPark','Parked cars ahead ×',0,2,.05],['Life','TUNE.lvPop','Roadside pop-up challenges',0,1,1,'bool'],['Life','TUNE.lvPopGap','Pop-up gap (s)',8,90,1],['Life','TUNE.lvPopRw','Pop-up studs ×',0,3,.1]];
+ ['Life','TUNE.lvCrowd','Crowds, stalls, cafés ahead ×',0,2,.05],['Life','TUNE.lvPark','Parked cars ahead ×',0,2,.05],['Life','TUNE.lvPop','Roadside pop-up challenges',0,1,1,'bool'],['Life','TUNE.lvPopGap','Pop-up gap (s)',8,90,1],['Life','TUNE.lvPopRw','Pop-up studs ×',0,3,.1],['Life','TUNE.lvLod','Far people/cars: fewer pose updates (perf)',0,1,1,'bool'],['Life','TUNE.perfHud','Show FPS · worst frame · draws · tris',0,1,1,'bool']];
 const TU_ROOT={TUNE,C26,W13S,W14_ST,RCAM,W:window};
 const TU_ref=id=>{const p=id.split('.');let o=TU_ROOT[p[0]];for(let i=1;i<p.length-1&&o;i++)o=o[p[i]];return o?[o,p[p.length-1]]:null};
 const TU_get=id=>{const r=TU_ref(id);return r?r[0][r[1]]:undefined};
@@ -11826,7 +11831,9 @@ function LV_boatStep(dt){const B=LV.boats;if(!B)return;const L=B.L;
   B.m.instanceMatrix.needsUpdate=true}
 // ---------- init + per-frame (runs after the traffic step; free roam only)
 function LV_init(){if(LV.init||!HUB.grp||!HUB.nodes||!HUB.nodes.length||!HUB.bld||!HUB.bld.length)return;LV.init=true;
-  try{LV_birdInit()}catch(e){console.warn('LV birds',e)}try{LV_flagInit()}catch(e){console.warn('LV flags',e)}try{LV_blimpInit()}catch(e){console.warn('LV blimp',e)}try{LV_boatInit()}catch(e){console.warn('LV boats',e)}try{LV_clInit()}catch(e){console.warn('LV clusters',e)}}
+  try{LV_birdInit()}catch(e){console.warn('LV birds',e)}try{LV_flagInit()}catch(e){console.warn('LV flags',e)}try{LV_blimpInit()}catch(e){console.warn('LV blimp',e)}try{LV_boatInit()}catch(e){console.warn('LV boats',e)}try{LV_clInit()}catch(e){console.warn('LV clusters',e)}
+  // v88s perf: pre-warm the shaders of the Life meshes and the (lazily built) pop-up ring, so the first stall / first pop-up does not stall a frame on a shader compile
+  try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;renderer.compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
 function LV_step(dt){if(!RO.on)return;LV_init();if(!LV.init)return;LV.t+=dt;LV.fr++;const t0=performance.now();camera.updateMatrixWorld();LV_seenF.setFromProjectionMatrix(_lvPM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   LV_birdStep(dt);LV_flagStep();LV_blimpStep();LV_boatStep(dt);try{LV_clStep(dt)}catch(e){if(!LV.e1){LV.e1=1;console.warn('LV cl',e)}}try{LV_parkStep()}catch(e){if(!LV.e2){LV.e2=1;console.warn('LV park',e)}}LV.ms=LV.ms==null?0:LV.ms*.95+(performance.now()-t0)*.05}
 {const _lvHT=hubTrafficStep;hubTrafficStep=dt=>{_lvHT(dt);LV_step(dt)}}
@@ -11842,12 +11849,15 @@ const LV_cwave=(i,d)=>d<40&&i%4!==0;
 function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')))}
 // a pavement corner beside a street node min-max m ahead (cone cos ≥ cmin), clear of buildings and other clusters
 // street nodes min-max m away inside the forward cone (cos ≥ cmin), shuffled (hubNear samples 18 random nodes of a 1.25 km square: almost never one 20-90 m away)
-function LV_ahead(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,L=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[];
+// v88s perf: LV_ahead / LV_edges scan every street node of the 1.25 km square (Athens: thousands); results are cached ~12 frames per 15 m / heading step (was: every call, up to 36 scans a frame from hubRecycle)
+const LV_aC={};function LV_ahead(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_aC[key],st=LV_st();if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}const L=LV_ahead0(min,max,cmin);LV_aC[key]={st,L,r:0};return L}
+const LV_st=()=>Math.floor((LV.fr||0)/12)+'|'+Math.round(RO.x/15)+'|'+Math.round(RO.z/15)+'|'+Math.round(RO.h*4);
+function LV_ahead0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,L=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[];
   for(const i of L){const n=N[i];if(!n)continue;const dx=n.x-RO.x,dz=n.z-RO.z,d2=dx*dx+dz*dz;if(d2<min*min||d2>max*max)continue;const d=Math.sqrt(d2);if((dx*fx+dz*fz)/d>=cmin)o.push(i)}
   for(let k=o.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[o[k],o[j]]=[o[j],o[k]]}return o}
 // points every 10 m along the streets min-max m away inside the forward cone: {i,bi,s,L} (edge A→B, s m from A). Points within 26 m of a junction first (corners)
 const LV_eC={};
-function LV_edges(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_eC[key],st=(LV.fr||0)+'|'+Math.round(RO.x/10)+'|'+Math.round(RO.z/10);if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}
+function LV_edges(min,max,cmin){const key=min+'|'+max+'|'+cmin,c=LV_eC[key],st=LV_st();if(c&&c.st===st){c.r=(c.r+1)%Math.max(1,c.L.length);return c.r?c.L.slice(c.r).concat(c.L.slice(0,c.r)):c.L}
   const L=LV_edges0(min,max,cmin);LV_eC[key]={st,L,r:0};return L}
 function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=HUB.nodes,Ls=HUB.nc?HUB.nc.L:[],fx=Math.sin(RO.h),fz=Math.cos(RO.h),o=[],q=[];
   for(const i of Ls){const A=N[i];if(!A||A.ab||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<16)continue;const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;
@@ -11855,7 +11865,10 @@ function LV_edges0(min,max,cmin){if(hubNear(1e9,1e9,false)<-9)return[];const N=H
       const e=Math.min(t,L-t)<26&&(A.nb.length>=3&&t<26||B.nb.length>=3&&L-t<26);(e?o:q).push({i,bi,s:t,L})}}}
   const sh=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(R()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};return sh(o).concat(sh(q))}
 // road mask: true if (x,z) is within W/2+m of any street edge nearby (the carriageway of ANY street, incl. the crossing one at a corner)
-function LV_onRoad(x,z,m){const N=HUB.nodes;for(const i of HUB.nc?HUB.nc.L:[]){const A=N[i];if(!A||!A.nb)continue;if(Math.abs(A.x-x)>400||Math.abs(A.z-z)>400)continue;for(const bi of A.nb){const B=N[bi];if(!B)continue;const dx=B.x-A.x,dz=B.z-A.z,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/l2)),ex=A.x+dx*t-x,ez=A.z+dz*t-z,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20))/2+m;if(ex*ex+ez*ez<W*W)return true}}return false}
+// v88s perf: edges in a 40 m grid (built once; the graph is static) instead of scanning every node near the player per call
+function LV_eGrid(){if(LV.eg&&LV.eg.N===HUB.nodes)return LV.eg.G;const N=HUB.nodes,G=new Map();for(let i=0;i<N.length;i++){const A=N[i];if(!A||!A.nb)continue;for(const bi of A.nb){const B=N[bi];if(!B)continue;
+  for(let kx=Math.floor((Math.min(A.x,B.x)-24)/40);kx<=Math.floor((Math.max(A.x,B.x)+24)/40);kx++)for(let kz=Math.floor((Math.min(A.z,B.z)-24)/40);kz<=Math.floor((Math.max(A.z,B.z)+24)/40);kz++){const k=kx*100000+kz;let L=G.get(k);if(!L)G.set(k,L=[]);L.push(i,bi)}}}LV.eg={N,G};return G}
+function LV_onRoad(x,z,m){const N=HUB.nodes,E=LV_eGrid().get(Math.floor(x/40)*100000+Math.floor(z/40));if(!E)return false;for(let q=0;q<E.length;q+=2){const A=N[E[q]];{const B=N[E[q+1]];const dx=B.x-A.x,dz=B.z-A.z,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/l2)),ex=A.x+dx*t-x,ez=A.z+dz*t-z,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20))/2+m;if(ex*ex+ez*ez<W*W)return true}}return false}
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
   const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
     const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:Math.max((A.pw||W/2+1.5)+1.1,W/2+2.6);/* Athens: right behind the walkers' line (A.pw), at the kerb */
@@ -12180,6 +12193,10 @@ function GB_clear(){if(!GB.d)return;const L=GB_list(),brick=L.some(CR_isW);GB_sn
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v88u',id:'perf-smooth',text:'The game runs smoothly on PC and phone in Frankfurt and in Athens: drive 1 minute fast through busy streets, no stutter. If it still lags: ⚙ TUNE → Life → turn on "Show FPS" and send a screenshot of the line at the bottom while driving.'},
+ {ver:'v88u',id:'perf-pc',text:'Turn on ⚙ TUNE → Life → Show FPS on PC, drive in Frankfurt for 30 s, and copy the line at the bottom left into the notes here.'},
+ {ver:'v88u',id:'perf-people',text:'Streets still feel alive but not crowded: a few groups of people ahead, not a crowd everywhere.'},
+ {ver:'v88u',id:'perf-pop',text:'The first pop-up ring of a drive appears without a hitch.'},
  {ver:'v88t',id:'sc-rides',text:'Garage RIDES → STREET: a SPEED SERIES row shows Time Coupe, Red Hypercar and Gold Formula; each looks like a LEGO Speed Champions car (8 studs wide, chunky, real parts).'},
  {ver:'v88t',id:'sc-drive',text:'Equip each of the 3 new cars, SAVE & DRIVE: all four tyres sit on the road and it handles like the other normal cars.'},
  {ver:'v88t',id:'sc-guide',text:'▶ GUIDE on each of the 3 new cars plays it step by step (chassis → wheels → nose → sides → cockpit → rear → wing).'},
