@@ -1,0 +1,4 @@
+gfxNote visible false
+picker open, shower canvas over it per 250 ms: [[false,true],[false,true],[false,true],[false,true],[false,true],[false,true]]
+after pick: shower true showers 0 → 2
+ERR []

@@ -1,0 +1,19 @@
+TAB car {"bar":5,"minFont":12,"minE":"SPAN:TOP SPEED","cards":13,"cnt":"owned 10 / 13 · locked 3"}
+shot tab_car
+TAB off {"bar":5,"minFont":12,"minE":"SPAN:TOP SPEED","cards":5,"cnt":"owned 2 / 5 · locked 3"}
+shot tab_off
+TAB boat {"bar":5,"minFont":12,"minE":"SPAN:TOP SPEED","cards":4,"cnt":"owned 1 / 4 · locked 3"}
+shot tab_boat
+equip street → t_rosso
+equip off → t_beast street still t_rosso
+FAVS filter → ["t_papaya"]
+shot favs
+sort A–Z → ["t_bianco","t_patrol","ebbel","t_flame"]
+sort NEW → ["t_racer","t_flame","t_viola","t_patrol"]
+builder true sel t_bianco parts 54
+shot builder_bianco
+placed 1 parts 54 → 55
+shot builder_placed
+saved {"sel":"t_bianco","live":55,"card":55,"saved":55}
+after reload {"sel":"t_bianco","live":0,"card":55,"saved":55} eq t_bianco bricks 55
+ERR []

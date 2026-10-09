@@ -1,0 +1,99 @@
+{
+ "mode": "ui",
+ "url": "http://127.0.0.1:8766/local_dbg.html",
+ "gear": {
+  "x": 810,
+  "y": 6,
+  "w": 34,
+  "h": 34
+ },
+ "dbAtLoad": 0,
+ "ctl": [
+  {
+   "id": "tL",
+   "x": 38,
+   "y": 270.6875,
+   "w": 94.3125,
+   "h": 94.3125
+  },
+  {
+   "id": "tR",
+   "x": 136.3125,
+   "y": 270.6875,
+   "w": 94.3125,
+   "h": 94.3125
+  },
+  {
+   "id": "tG",
+   "x": 721.6875,
+   "y": 264.6875,
+   "w": 94.3125,
+   "h": 94.3125
+  },
+  {
+   "id": "tB",
+   "x": 647.6875,
+   "y": 293,
+   "w": 70,
+   "h": 70
+  },
+  {
+   "id": "tN",
+   "x": 746,
+   "y": 174.6875,
+   "w": 70,
+   "h": 70
+  },
+  {
+   "id": "tP",
+   "x": 28,
+   "y": 8,
+   "w": 46,
+   "h": 38
+  }
+ ],
+ "gearOverlap": [],
+ "turnDefault": {
+  "kmh": 13.7,
+  "kmhEnd": 27,
+  "yawDegS": 44.2
+ },
+ "drawer": {
+  "x": 236.625,
+  "y": 6,
+  "w": 407.0625,
+  "h": 383
+ },
+ "drawerOverlap": [],
+ "stAng": 1.01,
+ "turnChanged": {
+  "kmh": 30.3,
+  "kmhEnd": 43.1,
+  "yawDegS": 50
+ },
+ "camB": 18.7,
+ "list": [
+  {
+   "v": 2,
+   "note": "default steer",
+   "stAng": 0.55,
+   "camB": 18.7
+  },
+  {
+   "v": 1,
+   "note": "far cam + sharp steer",
+   "stAng": 1.01,
+   "camB": 18.7
+  }
+ ],
+ "cur": 1,
+ "afterLoad2": 0.55,
+ "exportLen": 1233,
+ "reload": {
+  "src": "v1",
+  "stAng": 1.01,
+  "camB": 18.7,
+  "writesOnLoad": 0
+ },
+ "errors": []
+}

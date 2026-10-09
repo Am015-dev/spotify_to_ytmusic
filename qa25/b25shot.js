@@ -1,0 +1,3 @@
+const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.argv[3]);const{ev,tap,shot}=T;
+ await tap('#gbMenuBtn',2500);await tap('#r2R [data-r2m="build"]',3000);await shot('b0');console.log(JSON.stringify(await ev(()=>({L:__b25.S.L,f:__b25.floor(),surf:__b25.surf(),on:__b25.S.on}))));
+ await tap('#b25 [data-b25="up"]');await tap('#b25 [data-b25="up"]');await shot('b1_up2');await tap('#b25 [data-b25="top"]',1200);await shot('b2_top');await tap('#b25 [data-b25="side"]',1200);await shot('b3_side');await tap('#b25 [data-b25="3d"]',1200);await shot('b4_3d');await T.close()})();

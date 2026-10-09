@@ -130,7 +130,21 @@ function buildSettings(){const B=$('#setBody');B.innerHTML='';
 $('#setBtn').onclick=openSettings;$('#pSet').onclick=openSettings;$('#setDone').onclick=closeSettings;$('#setCred').onclick=()=>credShow($('#credBox').hidden);$('#setReset').onclick=()=>{Object.assign(SET,SET_DEF);saveSet();applyQuality();AU.setVol();buildSettings()};$('#pMute').onclick=()=>{AU.init();AU.toggle()};
 
 // small livery preview for the team cards
-function teamCard(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
+// W13: TEAM SELECT shows each team's real LEGO race car (the same shipMesh the race spawns), rendered once per team and cached.
+// The old 2D plane silhouette (pre-LEGO ship era) stays only as the fallback if WebGL fails.
+const W13_TC={};let W13_TR=null,W13_TT=0;
+function W13_visBox(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
+function W13_carImg(t){const W=240,H=120,K=2;if(W13_TC[t.id])return W13_TC[t.id];
+ if(!W13_TR){const c=document.createElement('canvas');c.width=W*K;c.height=H*K;const r=new THREE.WebGLRenderer({canvas:c,antialias:true,alpha:true,preserveDrawingBuffer:true});r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=renderer.toneMapping;r.toneMappingExposure=renderer.toneMappingExposure;r.setClearColor(0,0);
+  const sc=new THREE.Scene();sc.add(new THREE.HemisphereLight(0xffffff,0x5a6470,1.7));const d=new THREE.DirectionalLight(0xffffff,2.3);d.position.set(5,9,-7);sc.add(d);W13_TR={r,sc,c,cam:new THREE.PerspectiveCamera(24,W/H,.1,300)}}
+ const{r,sc,c,cam}=W13_TR,g=shipMesh(t),U=g.userData;for(const k of['boat','wheels','shield','under','shadow','flares'])if(U[k])U[k].visible=false;for(const rb of U.ribbons||[])rb.visible=false;
+ sc.add(g);const B=W13_visBox(g),m=B.getCenter(new THREE.Vector3()),s=B.getSize(new THREE.Vector3()),R=Math.hypot(s.x,s.y,s.z)*1.55;
+ cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.clear();r.render(sc,cam);
+ const o=document.createElement('canvas');o.width=W*K;o.height=H*K;o.getContext('2d').drawImage(c,0,0);sc.remove(g);
+ clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){W13_TR.r.dispose();W13_TR.r.forceContextLoss();W13_TR=null}},4000);return W13_TC[t.id]=o}
+function teamCard(t){try{const[c,g]=cv(480,240),im=W13_carImg(t);
+  g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();g.drawImage(im,0,0);c.className='w13car';return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
+function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
   const gl=g.createRadialGradient(0,20,0,0,20,110);gl.addColorStop(0,t.glow+'66');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(-120,-64,240,120);
   g.fillStyle=t.a;g.beginPath();g.moveTo(-100,26);g.lineTo(-18,-10);g.lineTo(0,-40);g.lineTo(18,-10);g.lineTo(100,26);g.lineTo(96,34);g.lineTo(-96,34);g.closePath();g.fill();
   g.fillStyle=t.b;g.beginPath();g.moveTo(-6,-34);g.lineTo(6,-34);g.lineTo(10,32);g.lineTo(-10,32);g.fill();g.fillStyle=t.c;g.fillRect(-1,-30,2,60);
