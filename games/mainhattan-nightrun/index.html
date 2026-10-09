@@ -2393,12 +2393,12 @@ ART.strip=(n,h)=>{const b=ART.bm[n];return b?ART.sp(n,h*b.width/b.height):null;}
 ART.paintReady=di=>{const n=ART.dn[di];if(n&&!ART.bm['ly-mid-'+n])ART.warm(di);return !!(n&&ART.bm['bg-'+n]&&ART.bm['ly-far-'+n]&&ART.bm['ly-mid-'+n]);};
 ART.paintBG=(bg,t,scroll)=>{const D=bg.D,di=DISTRICTS.indexOf(D);bg._p=false;if(!ART.paintReady(di)||!ART.bm['ly-near-'+D.near])return false;
   const sky=ART.bgOf(di,false,S,W,H,.52);if(!sky)return false;const n=ART.dn[di];
-  const far=ART.strip('ly-far-'+n,250),mid=ART.strip('ly-mid-'+n,310),nr=ART.strip('ly-near-'+D.near,130);if(!far||!mid||!nr)return false;
+  const far=ART.bm['ly-far-'+n],mid=ART.strip('ly-mid-'+n,310),nr=ART.strip('ly-near-'+D.near,130);if(!far||!mid||!nr)return false;
   const so=(scroll*.03)%(2*W);ctx.globalAlpha=1;
   for(let j=Math.floor(so/W);j*W-so<W;j++){const x=j*W-so;if(j&1){ctx.save();ctx.translate(x+W,0);ctx.scale(-1,1);ctx.drawImage(sky.c,0,0,W,H);ctx.restore();}else ctx.drawImage(sky.c,x,0,W,H);}
   ctx.save();ctx.globalAlpha=.1;ctx.font='700 46px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;
   const adw=(bg.adw||(bg.adw=ctx.measureText(D.ad).width))+400;ctx.fillText(D.ad,W-((scroll*.06)%(adw+W)),84);ctx.restore();
-  ART.tiles(far,H-60-far.h,scroll,.08,.8);ART.tiles(mid,H-30-mid.h,scroll,.3,.88);
+  ART.tiles(mid,H-30-mid.h,scroll,.3,.88);
   const hz=bg.hzG||(bg.hzG=(()=>{const q=ctx.createLinearGradient(0,H-220,0,H);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'38');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
   ART.tiles(nr,H-nr.h,scroll,1.1,.92);bg._p=true;return true;};
 ART.paintP=(bg,scroll)=>{const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.dn[di]+'-phone'])ART.warm(di);const o=ART.bgOf(di,true,VS,PW_,PH_,.5);if(!o)return false;
@@ -2425,7 +2425,7 @@ NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,
 /* the scaled copies of the next backdrop are built in calm moments, never in the middle of a fight */
 setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame();const port=wcv!==cv;
   for(const di of[G.di,nextDi(G.di).di]){if(!ART.paintReady(di))continue;const n=ART.dn[di];
-    if(port)ART.bgOf(di,true,VS,PW_,PH_,.5);else{ART.bgOf(di,false,S,W,H,.52);ART.strip('ly-far-'+n,250);ART.strip('ly-mid-'+n,310);ART.strip('ly-near-'+DISTRICTS[di].near,130);}}},700);
+    if(port)ART.bgOf(di,true,VS,PW_,PH_,.5);else{ART.bgOf(di,false,S,W,H,.52);ART.strip('ly-mid-'+n,310);ART.strip('ly-near-'+DISTRICTS[di].near,130);}}},700);
 
 /* ---------- ship stats: a little cluster round the ship (hull, dash charges, shield count, power-up timers, revive, drones, bubble) and a compact strip
    in the HUD (hull, shield, dash, drones, revive + the garage perks you own). Labels are <= 8 words. Numbers are logged in HUDLOG.x for the tests. ---------- */
