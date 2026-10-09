@@ -16,12 +16,12 @@ The laptop made the pictures; the Linux session rebuilds, tests and deploys. Unl
 - **Portraits** `camp-<id>.webp`: `hask`, `vesper`, and `wynne`, `odo`, `tamsin`, `mirabel`.
   - The last four reuse the maker busts so the faces match.
   - Set `artBase: 'media/'` in the `GXC.init` call; `campaign.json` already uses these names.
-- **Bag skins** `bag-moss.webp` (transparent): the campaign `cardback` unlock `moss-bag`.
-  - `bag-ember` (unlock `ember-bag`) follows in the next push.
-- **Fortune cards** `fortune-<id>.webp`, 256×256: 22 of 24, keyed by the `FORTUNE` ids in `src/data.js`.
-  - `bribe` and `fork` follow in the next push.
+- **Bag skins** `bag-moss.webp` and `bag-ember.webp` (transparent): the campaign `cardback` unlocks `moss-bag` and `ember-bag`.
+- **Fortune cards** `fortune-<id>.webp`, 256×256: all 24, keyed by the `FORTUNE` ids in `src/data.js`.
   - Wiring: show the picture on the fortune card when the file exists.
-- **End screen:** `end-win.webp`. `end-lose`, the unlock tables `table-market-cloth` / `table-judges-tent`, and `title-phone` / `table-phone` follow in the next push.
+- **End screens:** `end-win.webp` and `end-lose.webp`.
+- **Unlock tables:** `table-market-cloth.webp` and `table-judges-tent.webp` (campaign `table` unlocks `market-cloth` and `judges-tent`).
+- **Phone versions:** `title-phone` and `table-phone` are not made yet (Flow failed twice). Crop the desktop `art/title.png` and `art/table.png` until then.
 
 ## Music
 `../audio/cauldron-fair/treblo/`: ten Treblo instrumentals (5 cues × a/b). See the README there.
