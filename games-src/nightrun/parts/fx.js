@@ -8,7 +8,7 @@ const FXV={
     return Math.abs(x-W/2)<150&&Math.abs(y-H/2)<110;},
   edges(t){                                              // the beat pulse also lives at the four screen edges (never over the action)
     if(G.dead||SET.cue==='off')return;const K=CUE[SET.cue],T=tierOf(C.n),a=PUL*(.3+.1*T)*K*[.25,.5,1][SET.flash];if(a<.01)return;
-    const c=T>1?TIERC[T-1]:DISTRICTS[G.di].a,ew=24+18*K,bar=(w,h,x0,y0,x1,y1,rx,ry)=>{const k=c+'|'+x0+'|'+y0+'|'+x1+'|'+y1;let g=EDG[k];if(!g){g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,c);g.addColorStop(1,c+'00');EDG[k]=g;}ctx.fillStyle=g;ctx.fillRect(rx,ry,w,h);};   // gradients are cached: no new object per edge per frame
+    const c=P.hp<=1?'#ff3040':T>1?TIERC[T-1]:DISTRICTS[G.di].a,ew=24+18*K,bar=(w,h,x0,y0,x1,y1,rx,ry)=>{const k=c+'|'+x0+'|'+y0+'|'+x1+'|'+y1;let g=EDG[k];if(!g){g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,c);g.addColorStop(1,c+'00');EDG[k]=g;}ctx.fillStyle=g;ctx.fillRect(rx,ry,w,h);};   // gradients are cached: no new object per edge per frame
     ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,a);
     bar(ew,H,0,0,ew,0,0,0);bar(ew,H,W,0,W-ew,0,W-ew,0);bar(W,ew*.6,0,0,0,ew*.6,0,0);bar(W,ew*.6,0,H,0,H-ew*.6,0,H-ew*.6);
     ctx.restore();},

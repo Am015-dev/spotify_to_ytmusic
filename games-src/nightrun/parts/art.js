@@ -10,8 +10,9 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
 ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
   im.onload=()=>{const done=b=>{ART.bm[n]=b;};if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
-  im.onerror=()=>{};im.src=ART.base+n+'.webp';};
+  im.onerror=()=>{ART.err[n]=1;};im.src=ART.base+n+'.webp';};
 ART.have=n=>!!ART.bm[n];
+ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
   if(running&&P){if(G.dead&&!ART.dead)ART.boom('explosion-big',P.x,P.y,170,.6);else if(!G.dead&&P.hp<ART.hp)ART.boom('explosion-small',P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
 /* a copy of image n that is w world units wide, at the pixel size it will be drawn at ({c,w,h}); null while loading */
@@ -73,6 +74,9 @@ ART.paintP=(bg,scroll)=>{const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.d
   for(let j=j0;j*PH_-off<PH_;j++){const y=PH_-(j*PH_-off)-PH_;      // moves down the screen like the roofs
     if(j&1){ctx.save();ctx.translate(0,y+PH_);ctx.scale(1,-1);ctx.drawImage(o.c,0,0,PW_,PH_);ctx.restore();}else ctx.drawImage(o.c,0,y,PW_,PH_);}
   return true;};
+/* painted districts get a stub instead of the procedural skyline (building one is a 20-80 ms hitch); the real one is built only if a painted file failed to load */
+ART.stubOk=(di,port)=>{const D=DISTRICTS[di];return !!ART.dn[di]&&!(port?D.nostubP:D.nostub);};
+ART.failed=(di,port)=>{const n=ART.dn[di],D=DISTRICTS[di];return !!(ART.err['bg-'+n+(port?'-phone':'')]||(!port&&(ART.err['ly-mid-'+n]||ART.err['ly-near-'+D.near])));};
 ART.warm=di=>{const n=ART.dn[di];if(!n)return;ART.load('bg-'+n);ART.load('ly-far-'+n);ART.load('ly-mid-'+n);ART.load('ly-near-'+DISTRICTS[di].near);if(wcv!==cv)ART.load('bg-'+n+'-phone');};
 /* ----- boss intro portrait (drawn above the banner) ----- */
 ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;ctx.save();ctx.globalAlpha=al;

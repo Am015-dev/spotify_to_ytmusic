@@ -647,12 +647,12 @@ async function powerTests(browser, synth) {
     const sp = () => ev(p, () => { const b = __mnr.G.eb.find(b => b.tag); return b ? Math.hypot(b.vx, b.vy) : -1; });
     const sp0 = await sp(); c = await collect('slow', false); await sleep(1500);
     st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null, d: (__mnr.G.pw.act.find(a => a.k === 'slow') || {}).d }));
-    if (st.rate !== .75 || Math.abs(st.bpm - base.bpm * .75) > .01) await fail(p, tag, 'power', `SLOW GROOVE: rate ${st.rate} bpm ${st.bpm}, wanted x0.75 of ${base.bpm}`);
-    if (!synth && Math.abs(st.pr - .75) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
+    if (st.rate !== 1 || Math.abs(st.bpm - base.bpm) > .01) await fail(p, tag, 'power', `SLOW GROOVE must not change the music: rate ${st.rate} bpm ${st.bpm}, wanted x1 of ${base.bpm}`);
+    if (!synth && Math.abs(st.pr - 1) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
     const nb = await ev(p, () => { const n = __mnr.G.eb.length; __mnr.eb(900, 40, Math.PI / 2, 100); const b = __mnr.G.eb[__mnr.G.eb.length - 1]; return Math.hypot(b.vx, b.vy) / __mnr.DF.bs / __mnr.STILL.bk; });   // a ship that stands still makes bullets quicker (STILL.bk): not part of this check
     if (Math.abs(nb - 60) > .5) await fail(p, tag, 'power', 'SLOW GROOVE: a new enemy bullet of speed 100 flies at ' + nb.toFixed(1) + ' (want 60)');
     if (sp0 > 0 && Math.abs((await sp()) - sp0 * .6) > .05) await fail(p, tag, 'power', 'SLOW GROOVE did not slow a bullet that was already flying');
-    await checkAlign('tempo x0.75', 3.5);
+    await checkAlign('slow groove, tempo unchanged', 3.5);
     if (!await waitEnd('slow', 40)) await fail(p, tag, 'power', 'SLOW GROOVE did not end within 40 s');
     await timing('slow', 32, await lastLog('slow'));
     const back = await ev(p, () => ({ bs: __mnr.PW.bs, bad: __mnr.G.eb.filter(b => b.sl).length, rate: __mnr.NR.music.rate }));

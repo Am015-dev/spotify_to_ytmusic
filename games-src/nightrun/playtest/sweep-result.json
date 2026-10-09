@@ -1,18 +1,5 @@
 {
- "fails": [
-  {
-   "tag": "beat/offset0",
-   "kind": "beat",
-   "detail": "bpos differs from the true beat position by -0.117 beats",
-   "shot": "fail1-beat.png"
-  },
-  {
-   "tag": "beat/offset130",
-   "kind": "beat",
-   "detail": "bpos differs from the true beat position by -0.323 beats",
-   "shot": "fail2-beat.png"
-  }
- ],
+ "fails": [],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -23,8 +10,7 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 0,
-  "judged": 16
+  "shopChecks": 0
  },
  "avg": 0
 }

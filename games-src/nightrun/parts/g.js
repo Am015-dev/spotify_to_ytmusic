@@ -3,8 +3,12 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I3';
+const NR_VER='I4';
 const NR_CHECKLIST=[
+ {ver:'I4',id:'no-slow',text:'The song NEVER slows down any more: low hull, SLOW GROOVE and dying keep the tempo. At 1 hull the screen edges pulse red on the beat and a soft heartbeat thumps under the music. Does it sound good now?'},
+ {ver:'I4',id:'lab-smooth',text:'TEST LAB: clicking any button (difficulty, god mode, Neon, unlock, spawn) no longer makes the game hitch, also right after loading.'},
+ {ver:'I4',id:'kits',text:'Garage > TUNE has 15 new STARTING KIT perks (Wing Cannons, Rear Guard, Piercer, Arc Chain, Chrono Dash, Ricochet, Aegis, Orbit Guns, Seeker Shots, Score Magnet, Neon Interest, Fortune, Second Wind, Overdrive Core, EMP Cell). Equip them in LOAD; they give you that upgrade from the first second of the run.'},
+ {ver:'I4',id:'market2',text:'Garage > SHOP offers can now be the new weapon upgrades too (wing cannons, piercing, chain lightning, orbit guns ...).'},
  {ver:'I3',id:'diff5',text:'Settings > Difficulty (and the title button) now has Easy, Normal, Hard, Very hard and Legend. Very hard and Legend have faster fire, more elites, almost no repairs and the smart-enemy tricks from the start.'},
  {ver:'I3',id:'loadout',text:'Garage > LOAD: only EQUIPPED perks work. You have 4 slots (+1 per 15 story stars). Equip and unequip freely, and SELL a level to get 60% of its price back.'},
  {ver:'I3',id:'prices',text:'Prices are tougher: perks cost 1.5x, pit-stop cards 1.25x and kills pay less Neon. Do you now have to choose what to buy?'},
@@ -30,8 +34,6 @@ const NR_CHECKLIST=[
  {ver:'H1',id:'afk-score',text:'Standing still pays less and less: kills score far fewer points and your multiplier melts. Keep moving to keep the score.'},
  {ver:'H1',id:'fewer',text:'The screen has far fewer enemy bullets (25 at most on Normal, 35 on Hard, 18 on a phone), each one aimed at you and glowing a beat before it fires.'},
  {ver:'H1',id:'quiet-shots',text:'Your own shots are thinner and dimmer, so the lime enemy bullets stand out clearly.'},
- {ver:'H1',id:'dying-beat',text:'With 2 hull left the song slows a little and drops in pitch, with 1 hull left more; heal and it speeds back up. The beat cue still matches the music.'},
- {ver:'H1',id:'death-stop',text:'When you die the music winds down like a tape stopping.'},
  {ver:'H1',id:'caps',text:'Damage, crit, double-shot and drone perks stack only up to a limit, so the garage descriptions now match what you really get.'},
  {ver:'G1',id:'btn-first-tap',text:'Open the game and tap ENDLESS, STORY, DAILY RUN or SETTINGS the moment they appear (they now show up about a second after loading, and no longer move). Each reacts on the first tap, every time. Try it a few times, reloading each time.'},
  {ver:'G1',id:'btn-menus',text:'Pause, FLY AGAIN, TITLE, RESUME and the pit-stop buttons all react on the first tap, with no double action.'},

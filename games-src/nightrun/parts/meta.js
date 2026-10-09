@@ -23,12 +23,12 @@ const qsave=()=>save('mnr_q',GA.queue);
 {const tabs=garageEl.querySelector('.tabs');for(const [t,l] of [['load','LOAD'],['mkt','SHOP'],['soon','SOON']]){const b=document.createElement('button');b.className='go dim';b.dataset.t=t;b.type='button';b.textContent=l;tabs.append(b);b.addEventListener('click',()=>{GA.tab=t;gaDraw();});}}
 const day=()=>new Date().toISOString().slice(0,10);
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
-const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc'].filter(id=>UBY[id]);
+const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc','sc','pc','cl','bt','as','bd','sm','lk','ni','rc'].filter(id=>UBY[id]);
 const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?o:{day:day(),b:[]};})(),
   offers(){const r=mul(hash(day()));const pool=MKP.slice(),o=[];while(o.length<3&&pool.length)o.push(pool.splice(Math.floor(r()*pool.length),1)[0]);return o;},
   price(id){return Math.round(UBY[id].p*3.2/5)*5;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
 const gd0=gaDraw;
-gaDraw=function(){if(!['load','mkt','soon'].includes(GA.tab)){gd0();return;}
+gaDraw=function(){if(garageEl.hidden&&!labEl.hidden){garageDirty=true;return;}if(!['load','mkt','soon'].includes(GA.tab)){gd0();return;}
   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.innerHTML='';box.classList.add('tune');
   if(GA.tab==='load')loadDraw(box);else if(GA.tab==='mkt')mktDraw(box);else soonDraw(box);affUpd();};
@@ -55,21 +55,27 @@ NR.on('runStart',()=>setTimeout(()=>{if(!GA.queue.length)return;for(const id of 
 /* ----- LAB: the test menu ----- */
 const labEl=document.createElement('div');labEl.id='lab';labEl.hidden=true;stage.appendChild(labEl);
 let labFrom=null;
-function labRow(l,items){const r=document.createElement('div');r.className='rw';for(const [t,f,on,dis] of items){const b=document.createElement('button');b.type='button';b.className='go dim'+(on?' on':'');b.textContent=t;b.disabled=!!dis;b.addEventListener('click',()=>{f();labNote(t);labDraw();});r.append(b);}
+/* the LAB page is built once; a click only flips the state of the buttons (rebuilding the whole page every click was a visible hitch) */
+const LABS=[];
+function labRow(l,items){const r=document.createElement('div');r.className='rw';for(const it of items){const b=document.createElement('button');b.type='button';b.className='go dim';b.textContent=it[0];b.addEventListener('click',()=>{it[1]();labNote(b.textContent);labSync();});r.append(b);LABS.push({b,it});}
   const s=document.createElement('div');s.className='sec';s.textContent=l;labEl.append(s,r);}
-const labNote=t=>{const n=$('labNt');if(n){n.textContent=t+' done';}};
-function labDraw(){labEl.innerHTML='<h2>TEST LAB</h2><div class="nt" id="labNt"></div>';const live=running&&G&&!G.dead;
-  labRow('STORY',[[sSave.all?'ALL STAGES OPEN: ON':'OPEN ALL STAGES',()=>{sSave.all=!sSave.all;sPersist();},sSave.all],['RESET STORY',()=>{sSave.stars={};sSave.snap={};sSave.all=false;sPersist();}]]);
-  labRow('DIFFICULTY',[['easy','Easy'],['normal','Normal'],['hard','Hard'],['vhard','Very hard'],['legend','Legend']].map(([k,n])=>[n,()=>{setVal('diff',k);diffDraw();},SET.diff===k]));
-  labRow('PLAYER',[[godMode?'GOD MODE: ON':'GOD MODE',()=>{godMode=!godMode;},godMode],[SET.fpsc?'FPS COUNTER: ON':'FPS COUNTER',()=>setVal('fpsc',!SET.fpsc),!!SET.fpsc]]);
-  labRow('NEON',[['+1,000',()=>{GA.bank+=1000;gsave();gaDraw();}],['+10,000',()=>{GA.bank+=10000;gsave();gaDraw();}],['SET 0',()=>{GA.bank=0;gsave();gaDraw();}]]);
-  labRow('GARAGE',[['UNLOCK + MAX EVERYTHING',()=>{for(const s of SHIPS)if(s.p)GA.own['ship_'+s.id]=true;for(const c of CREW)GA.own[c.id]=true;for(const h of THEMES)if(h.p)GA.own['th_'+h.id]=true;for(const d of TP_DEF){GA.tune[d.id]=d.max;}tsave();gsave();SH.recalc();gaDraw();}],
+const labNote=t=>{const n=$('labNt');if(n)n.textContent=t+' done';};
+function labSync(){const live=running&&G&&!G.dead;for(const {b,it} of LABS){const on=typeof it[2]==='function'?it[2]():false,dis=typeof it[3]==='function'?it[3](live):false;
+    b.classList.toggle('on',!!on);b.disabled=!!dis;if(it[4]){const t=it[4](on);if(b.textContent!==t)b.textContent=t;}}}
+function labBuild(){labEl.innerHTML='<h2>TEST LAB</h2><div class="nt" id="labNt"></div>';LABS.length=0;const live=g=>!g;
+  labRow('STORY',[['OPEN ALL STAGES',()=>{sSave.all=!sSave.all;sPersist();},()=>sSave.all,null,on=>on?'ALL STAGES OPEN: ON':'OPEN ALL STAGES'],['RESET STORY',()=>{sSave.stars={};sSave.snap={};sSave.all=false;sPersist();}]]);
+  labRow('DIFFICULTY',[['easy','Easy'],['normal','Normal'],['hard','Hard'],['vhard','Very hard'],['legend','Legend']].map(([k,n])=>[n,()=>{SET.diff=k;saveSet();DF=DIFFS[k];HARD=HARDS.includes(k);diffDraw();},()=>SET.diff===k]));   // no applySet here: it resizes the canvases
+  labRow('PLAYER',[['GOD MODE',()=>{godMode=!godMode;},()=>godMode,null,on=>on?'GOD MODE: ON':'GOD MODE'],['FPS COUNTER',()=>{SET.fpsc=!SET.fpsc;saveSet();$('fpsEl').hidden=!SET.fpsc;},()=>!!SET.fpsc,null,on=>on?'FPS COUNTER: ON':'FPS COUNTER']]);
+  labRow('NEON',[['+1,000',()=>{GA.bank+=1000;gsave();garageDirty=true;}],['+10,000',()=>{GA.bank+=10000;gsave();garageDirty=true;}],['SET 0',()=>{GA.bank=0;gsave();garageDirty=true;}]]);
+  labRow('GARAGE',[['UNLOCK + MAX EVERYTHING',()=>{for(const s of SHIPS)if(s.p)GA.own['ship_'+s.id]=true;for(const c of CREW)GA.own[c.id]=true;for(const h of THEMES)if(h.p)GA.own['th_'+h.id]=true;for(const d of TP_DEF){GA.tune[d.id]=d.max;}tsave();gsave();SH.recalc();garageDirty=true;}],
     ['EQUIP BEST',()=>{GA.eq={};for(const d of TP_DEF.slice().sort((a,b)=>b.pri-a.pri).slice(0,eqSlots()))if(TP.raw(d.id))GA.eq[d.id]=true;eqsave();SH.recalc();}],['EQUIP ALL (TEST)',()=>{for(const d of TP_DEF)if(TP.raw(d.id))GA.eq[d.id]=true;eqsave();SH.recalc();}],
-    ['RESET GARAGE',()=>{GA.own={};GA.tune={};GA.eq={};GA.bank=0;GA.ship='std';GA.queue=[];qsave();tsave();eqsave();gsave();SH.recalc();gaDraw();}]]);
-  labRow('IN A RUN'+(live?'':' (start a run first)'),[['BOSS NOW',()=>{G.force=true;G.en=[];},false,!live],['NEXT DISTRICT',()=>{G.en=[];G.eb=[];enterDistrict(nextDi(G.di).di);},false,!live],['FULL HULL',()=>{P.hp=P.max;},false,!live],['+3 EMP',()=>{P.emp=Math.min(9,P.emp+3);},false,!live],
-    ['KILL ALL',()=>{for(const e of G.en)if(e.type!=='boss')e.hp=0;G.eb=[];},false,!live],['SPAWN LEADER',()=>{const e=en('drone',{x:W-90,y:H/2,amp:0});if(!e.ldr){e.ldr=1;e.lc=0;e.r=Math.round(e.r*1.35);e.hp=Math.round(e.hp*3.5);e.max=e.hp;}},false,!live],['SPAWN GUNSHIP',()=>{en('gunship',{x:W-90,y:H/2});},false,!live]]);
+    ['RESET GARAGE',()=>{GA.own={};GA.tune={};GA.eq={};GA.bank=0;GA.ship='std';GA.queue=[];qsave();tsave();eqsave();gsave();SH.recalc();garageDirty=true;}]]);
+  const dis=l=>!l,lv='IN A RUN (start a run first)';
+  labRow(lv,[['BOSS NOW',()=>{G.force=true;G.en=[];},null,dis],['NEXT DISTRICT',()=>{G.en=[];G.eb=[];enterDistrict(nextDi(G.di).di);},null,dis],['FULL HULL',()=>{P.hp=P.max;},null,dis],['+3 EMP',()=>{P.emp=Math.min(9,P.emp+3);},null,dis],
+    ['KILL ALL',()=>{for(const e of G.en)if(e.type!=='boss')e.hp=0;G.eb=[];},null,dis],['SPAWN LEADER',()=>{const e=en('drone',{x:W-90,y:H/2,amp:0});if(!e.ldr){e.ldr=1;e.lc=0;e.r=Math.round(e.r*1.35);e.hp=Math.round(e.hp*3.5);e.max=e.hp;}},null,dis],['SPAWN GUNSHIP',()=>{en('gunship',{x:W-90,y:H/2});},null,dis]]);
   const b=document.createElement('button');b.className='go';b.type='button';b.textContent='CLOSE';b.addEventListener('click',labClose);labEl.append(document.createElement('div'),b);}
-function labOpen(from){labFrom=from;labDraw();labEl.hidden=false;}
-function labClose(){labEl.hidden=true;if(labFrom==='pause'&&running)pauseEl.hidden=false;showBest();}
+let garageDirty=false;
+function labOpen(from){labFrom=from;if(!LABS.length)labBuild();labSync();labEl.hidden=false;}
+function labClose(){labEl.hidden=true;if(garageDirty){garageDirty=false;gaDraw();}if(labFrom==='pause'&&running)pauseEl.hidden=false;showBest();}
 {const tb=document.createElement('button');tb.className='go dim';tb.id='labBtn';tb.type='button';tb.textContent='LAB';$('setBtn').after(tb);tb.addEventListener('click',()=>labOpen('title'));
   const pr=$('pausem').querySelector('.row'),pb=document.createElement('button');pb.className='go dim';pb.id='labBtn2';pb.type='button';pb.textContent='LAB';(pr||$('pausem').querySelector('.in')).append(pb);pb.addEventListener('click',()=>{pauseEl.hidden=true;labOpen('pause');});}
