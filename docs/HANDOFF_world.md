@@ -19,30 +19,27 @@ Breakdown at spot 0.1 (`ath/v88v/top.js DET=b SPOT=0.1`): city proxies + LOD + p
 misc (studs in RO.grp, sprites, gb car, points) ~40, remaining merged/HUB.M ~30.
 Ideas: bigger far cells (2 levels: 640 m blocks when all 4 sub-cells are far); one far InstancedMesh for all traffic types; drop ART8 twins beyond ~40 m; fewer near proxies.
 
-## v88w status (IN PROGRESS, not reviewed). Branch alex/od-world, live = v88v (a1b848d, built from 7ef0c6c3)
-Code: NEW `src/98bw_bricks2x.js` (in ORDER after 98wb), edits in 98wb (super cells, piece runs, grouped proxies), 93 (bwCar), 98l (LVP_ahead), knobs in 10_core/99t/tune.json/TUNE.md.
-1. **Bricks (shader, 0 draws/tris)**: BW_flag wraps onBeforeCompile of KMM.com/sub + all HUB.BM materials (needs LK's vLkW): brick courses 0.48 m (`bwCourse`), staggered joints,
-   lit top edge, tiles on tops, glass frame grid; full to 0.6×`bwFade` (90 m), gone at 90 m. Verified visible: `ath/v88w/after/fra_*_wall.png` (houses, piers).
-2. **Roof studs**: per-cell lazy generation near the camera (BW_cellGen ≤3 ms/frame, cells within bwStudD+90), sources = Kenney com/sub instances (WB_tpl exact, texel colours) +
-   merged facade soups captured in WB_cityPrep (BW_mergedPrep). One InstancedMesh, ≤8000, only roofs 2–16 m above ground (`bwStudH/bwStudTop`) and below camera eye. City-wide would be 775k studs, hence lazy.
-   NOT yet looked at: `_roof.png` shots (camera 28 m up) of the after set don't exist yet (rerun close.js on the current build).
-3. **Cars** (`bwCar`, CR_LO=3 in CR_cityGeo): keeps mirrors/plates/exhausts, curveSegments 8, studs as LO (6 seg). Full LO=0 was 3.5× tris (truck 80k), rejected. Tri count of LO=3 not re-measured.
-4. **Draw budget**: wbSuperD 700 (2×2 far cells share one buffer, super mesh when all 4 far), wbTerr (trG/trPl merged 800/2000 m blocks at load, 197 meshes fewer),
-   wbRuns (contiguous near pieces one drawRange), grouped near proxies (2635 originals → 84 groups), wbLzD 420 (far small HUB/lazy instanced hidden), bwRampSh 70 (ramp shadows), wbLodD 220→190.
-5. **Athens pop-ups**: LVP_path walks chained straight edges (LVP_ahead); probe: 74/300 street spots now get a path (was 0). Not yet seen spawning in a drive.
+## v88w: DONE, reviewer PASS (4ca31b6), DEPLOY sent (alex/od-world f0a4e32b, out/v88w, on live v88v a1b848d)
+- Last cuts: `wbIcon` (98wb end: map icon sprites of RO.marks → 1 InstancedMesh, 16×8 atlas, hidden/restored around render), `wbLoShare` 1.35 (far traffic types within 1.35× body box share the leader's lo mesh, scaled).
+- Numbers (ath/v88w/m/): Fra 253→195 draws, tris avg 1.05→1.16M (peaks 1.34M perf spot, 1.62M close.js chase 0.2); Ath 244→203, 0.98→1.10M (peak 1.44M). CPU ms Fra 3.24→3.34, Ath 5.92→5.28. Tyre gap 0.03/0.033.
+- Reviewer: keep wbTerr=1 until Alex's Show FPS says otherwise (wbTerr=0 = peak tris down, +~25 draws).
+- Reviewer notes for next pass: (a) Life crowd cluster spawns minifigs inside parked cars (fra_0.5_car after): reject cluster spots within parked-car bbox+0.5 m (98l). (b) plain beige pillar/tower by the Frankfurt bridge (fra_0.2_wall) still windowless.
+- Shots: ath/v88w/cmp (before/after stacked), ath/v88w/std, ath/v88w/after/ath_popup.png. v88v reference build: `git worktree add wb88v 7ef0c6c` + build --local.
 
-### Numbers (perf.js avg of 3 spots)
-Frankfurt: v88v 264 / 1.08 M → now **209–213 draws / 1.16–1.18 M tris** (noise ±5 from traffic). Athens (before proxies/ramp/190): 222 / 1.08 M (v88v 242 / 0.98 M).
-Still > 200 in Frankfurt. Left at the worst spot (top.js SPOT=0.1, 249 before ramp fix): proxies ~45, non-WB dynamic instanced (lively/parked/smashables) 17, map icon sprites 11 (70 mission icons, 1 draw each),
-traffic far lo 11 (1/type), wbM ~19, far LOD ~22, terrain ~14. Next ideas: share far lo between plain white types (sedan+sports, suv+van, delivery+truck, scaled) −3;
-mission icon sprites → one Points/instanced quad atlas −10; ART8 twins on traffic beyond 40 m −2.
+## v88x: DONE, reviewer PASS (0ad85129), DEPLOY sent (alex/od-world 138cf816, out/v88x, on live v88w fa29abe)
+- Athens dressing: `src/98la_ath_dress.js` (AD_*): orange trees / kiosks / scooters / bollards behind the walkers' line, placed lazily per 40 m cell (LV_eGrid), 4 InstancedMesh, smashable; knobs TUNE.lvDress, TUNE.lvAthCr (Athens clusters ×1.5). ATH_K 5/27 scooters.
+- Crowd-in-car: 98l LV_carNear (cluster spot ≥ 9 m from parked/stopped cars) + LV_clear (figures ≥ 3.4 m from cars, out of colliders).
+- Pillar = Eiserner Steg stair towers (60 stegBuild) → stegTower() red sandstone, windows/doors/roof, same collider.
+- Numbers (ath/v88x/m): Ath draws 198→201, tris 1.08→1.09M, CPU 5.28→5.69 ms. Tyre gap 0.03/0.033. Shots: ath/v88x/{cmp,after,fra,std}. Tools: ath/v88x/close.js (waits for AD), adprobe.js (dressing stats + top view), pillar.js (raycast a HUB.bld).
+- Next (reviewer): street-level Athens looks nearly the same as v88w (wide grass verges keep dressing far from the chase cam): narrow the verges or put dressing on the verge edge by the road; also make the old v88x plan items evzones + #bus if Alex asks.
 
-### Shots
-`ath/v88w/close.js <url> fra|ath <out>`: per fixed spot (ath/v88w/spots_<city>.json): _fac (street level 40°), _car (traffic side), _wall (12 m from nearest building), _roof (28 m up), + chase draws.
-Before (v88v, served from wb88v/local_dbg.html = live v88v copy): `ath/v88w/before/` fra complete; ath was rerunning (before_ath.log). After: `ath/v88w/after/` fra (no _roof yet), ath not yet.
-Then: standard set + tyre gap (ATH=1 node ath/v88v/g11drive.js …), REVIEW, OD_CHANGELOG v88w + checklist (99c), split out/v88w on CURRENT live, DEPLOY to coordinator. v88x (Athens busier) after.
+## v88x plan (original): Athens busier
+1. Fix (a) above first (crowd-in-parked-car, 98l LV cluster placement), cheap.
+2. Kerb dressing instanced (bollards, kiosks, orange trees, café chairs) along Athens streets near the player: 1–3 draws via InstancedMesh, recycled like lively peds.
+3. Crowd clusters denser in Athens (lvCrowd ×1.3 Athens only, Plaka/Monastiraki), evzones pair at Syntagma, one #bus line (blue-white) on a main avenue.
+4. Budget: Athens ≤215 draws, tris avg ≤1.2M; measure with ath/perf.js; shots: close.js ath + g11drive ATH=1 + popup.js.
 
-## Athens busier (after v88w): see docs/HANDOFF_perf.md "Next" (kerb dressing instanced, crowd clusters, evzones, #bus).
+## Athens busier, older notes: see docs/HANDOFF_perf.md "Next" (kerb dressing instanced, crowd clusters, evzones, #bus).
 
 ## Tools (ath/v88v/, run from the repo root; server :8766 = `python3 -m http.server 8766`)
 - `top.js <url> fra|ath` (DET=b SPOT=f): draws/tris per object category at one spot (hooks renderBufferDirect).

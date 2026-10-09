@@ -127,7 +127,7 @@ const LV_seenF=new THREE.Frustum(),_lvPM=new THREE.Matrix4(),_lvV=new THREE.Vect
 const LV_seen=(x,y,z)=>LV_seenF.containsPoint(_lvV.set(x,y+1,z));
 // crowd peds: wave when the car is within 40 m (3 of 4), the rest keep chatting
 const LV_cwave=(i,d)=>d<40&&i%4!==0;
-function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')))}
+function LV_cn(){return Math.round(6*Math.min(2,LV_d('lvCrowd')*(CID==='fra'?1:TUNE.lvAthCr)))}/* v88x: Athens ×1.5 (6 clusters, ~27 people) */
 // a pavement corner beside a street node min-max m ahead (cone cos ≥ cmin), clear of buildings and other clusters
 // street nodes min-max m away inside the forward cone (cos ≥ cmin), shuffled (hubNear samples 18 random nodes of a 1.25 km square: almost never one 20-90 m away)
 // v88s perf: LV_ahead / LV_edges scan every street node of the 1.25 km square (Athens: thousands); results are cached ~12 frames per 15 m / heading step (was: every call, up to 36 scans a frame from hubRecycle)
@@ -153,9 +153,13 @@ function LV_onRoad(x,z,m){const N=HUB.nodes,E=LV_eGrid().get(Math.floor(x/40)*10
 function LV_corner(min,max,cmin,avoid){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h),fra=CID==='fra';
   const cand=LV_edges(min,max,cmin);for(let k=0;k<Math.min(20,cand.length);k++){const E=cand[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L;
     const ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||20,B.w||20),sd=R()<.5?-1:1,al=E.s,off=fra?W/2+4.6:Math.max((A.pw||W/2+1.5)+1.1,W/2+2.6);/* Athens: right behind the walkers' line (A.pw), at the kerb */
-    const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(LV_onRoad(x,z,2.4))continue;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;
+    const x=A.x+ux*al-uz*off*sd,z=A.z+uz*al+ux*off*sd;if(LV_onRoad(x,z,2.4))continue;if(avoid&&avoid.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<22*22))continue;if(LV_carNear(x,z,9))continue;/* v88x: never next to a parked/stopped car (people were standing inside them) */
     const y=groundAt(x,z,(RO.y||0)+20);if(!(y>-1)||Math.abs(y-(RO.y||0))>14)continue;if(roamHit(x,z,1.8,y+.5)||roamHit(x-uz*sd*2,z+ux*sd*2,1.2,y+.5))continue;
     return{x,z,y:Math.max(0,y),h:Math.atan2(uz*sd,-ux*sd),ux,uz,sd,W,a:i,b:bi,al,L}}return null}
+// v88x: keep cluster people out of cars and props: a parked/stopped traffic car is a 2.9 m circle + .5 m; a building/prop collider (roamHit) pulls the figure toward the cluster centre
+function LV_carNear(x,z,r){const C=HUB.cars;if(!C)return false;for(const c of C)if(!(c.dead>0)&&(c.pk||(c.cv||0)<1)&&(c.x-x)**2+(c.z-z)**2<r*r)return true;return false}
+function LV_clear(p,C){const H=HUB.cars||[];for(const c of H){if(c.dead>0||!(c.pk||(c.cv||0)<1))continue;const dx=p.cx-c.x,dz=p.cz-c.z,d=Math.hypot(dx,dz),R0=3.4;if(d<R0){const k=(R0-d)/(d||1);p.cx+=dx*k||R0;p.cz+=dz*k}}
+  for(let i=0;i<4&&roamHit(p.cx,p.cz,.35,C.y+.5);i++){p.cx=(p.cx+C.x)/2;p.cz=(p.cz+C.z)/2}}
 // ---------- 7 · clusters
 function LV_clInit(){const n=12;// capacity: 2 stalls / 2 café sets per cluster
   const wood='#8a5a30',stall=mergeG([cbox(2.6,.9,1.1,0,.45,0,wood),cbox(2.7,.08,1.2,0,.92,0,'#c8904c'),cbox(.08,2.4,.08,-1.25,1.2,.5,'#e8e8e8'),cbox(.08,2.4,.08,1.25,1.2,.5,'#e8e8e8'),cbox(.08,2.4,.08,-1.25,1.2,-.5,'#e8e8e8'),cbox(.08,2.4,.08,1.25,1.2,-.5,'#e8e8e8'),
@@ -183,7 +187,7 @@ function LV_clPut(k,C,near){const S=LV.cl,own=S.L.filter(q=>q!==C);const ath=CID
 function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),ax=-Math.cos(C.h),az=Math.sin(C.h);
   for(let j=0;j<n;j++){const p=P[base+j];if(!p)return;p.cw=1;p.a=C.a;p.b=C.b;p.t=0;const fr=(j+.5)/n-.5;let ox,oz;
     if(C.k==='crowd'){const a=j/n*6.283+k;ox=Math.sin(a)*1.3+rx*.9;oz=Math.cos(a)*1.3+rz*.9}else{ox=ax*fr*4.2+rx*(1.25+(j%2)*.45);oz=az*fr*4.2+rz*(1.25+(j%2)*.45)}
-    p.cx=C.x+ox;p.cz=C.z+oz;p.mx=C.x+rx*(C.k==='crowd'?.9:1.6);p.mz=C.z+rz*(C.k==='crowd'?.9:1.6);p.jy=0;p.jv=0;p.jx=p.jz=0;p.spin=0;p.yc=0;p.y=C.y;p.gs=C.gs}}
+    p.cx=C.x+ox;p.cz=C.z+oz;LV_clear(p,C);p.mx=C.x+rx*(C.k==='crowd'?.9:1.6);p.mz=C.z+rz*(C.k==='crowd'?.9:1.6);p.jy=0;p.jv=0;p.jx=p.jz=0;p.spin=0;p.yc=0;p.y=C.y;p.gs=C.gs}}
 function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=LV_cn(),walk=LV_walk(P.length),sp=Math.abs(RO.v),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // warp / teleport (> 60 m in one frame) or first frame: re-place every cluster close (no pop-in is visible across a teleport)
   const jump=LV.px==null||Math.hypot(RO.x-LV.px,RO.z-LV.pz)>60;LV.px=RO.x;LV.pz=RO.z;if(jump)LV.parkJ=90;
