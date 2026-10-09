@@ -29,8 +29,8 @@ module.exports=async({p,pg,cdp,tap,tapXY,shot,boot,log})=>{const ev=(f,a)=>p.eva
  // build the front from the tray: 2 grille bricks + 2 headlight bricks in a row, 2 curved slopes behind, tile 1×4 + 2 grille tiles on top, + 1 more grille brick
  let ok=0;const pick=async(k,c)=>{await tap(`#gbBkPc .gbPc[data-p="${k}"]`);await W(200);if(c!=null){await tap('#gbBkP [data-r2b="col"]');await tap(`#gbBkCl .gbCl[data-c="${c}"]`);await W(200)}};
  await pick('gb12',11);ok+=await place(0,-2);ok+=await place(0,0);await pick('hl',9);ok+=await place(0,-3);ok+=await place(0,2);
- await pick('cs31',2);ok+=await place(1,-2);ok+=await place(1,1);await pick('t14',2);ok+=await place(0,-2);await pick('grl',11);ok+=await place(0,-3);ok+=await place(0,2);
- await pick('gb12');ok+=await place(3,-1);R.placed=ok;R.cv=await ev(()=>__gb.list().map(b=>b.t+'@'+b.x+','+b.z+','+b.y));log('placed',ok,JSON.stringify(R.cv));await shot('05_front_built');
+ await pick('cs31',2);ok+=await place(1,-2);ok+=await place(1,1);await tap('#b25 [data-b25="up"]');await pick('t14',2);ok+=await place(0,-2);await pick('grl',11);ok+=await place(0,-3);ok+=await place(0,2);
+ await tap('#b25 [data-b25="dn"]');await pick('gb12');ok+=await place(3,-1);R.placed=ok;R.cv=await ev(()=>__gb.list().map(b=>b.t+'@'+b.x+','+b.z+','+b.y));log('placed',ok,JSON.stringify(R.cv));await shot('05_front_built');
  // ROTATION: hold a tile 1×2, then the ⟲ pad X, Z, 45°, Y; a tap on the held part; a two-finger twist; keys
  await search('tile 1x2');await pick('tile',2);const s0=await ev(()=>__gb.scr(-4,-4));await tapXY(s0.x,s0.y);R.rot={held:await held()};
  await tap('#gsBar [data-g13p]');R.rot.pad=(await st()).pad;await tap('#g13Pad [data-g13a="x"]');R.rot.x=(await st()).pc;await shot('06_rotation_gizmo');
@@ -63,7 +63,7 @@ module.exports=async({p,pg,cdp,tap,tapXY,shot,boot,log})=>{const ev=(f,a)=>p.eva
  await tap('#gxG .paRow [data-pa="save"]');R.saved=await ev(()=>__pa.parts().map(o=>({n:o.n,k:o.b.length})));if(await V('#gxG [data-ga="close"]'))await tap('#gxG [data-ga="close"]');
  await tap('#paCvB [data-pa="back"]');await W(1500);R.back=await ev(()=>({on:__pa.on(),n:__gb.list().length}));
  await cat('My parts');await tap('#gbBkPc .paC[data-pa^="p"]');const n0=await ev(()=>__gb.list().length);
- for(const[i,j]of[[0,-12],[0,-13],[0,-11],[1,-12],[0,-14],[-1,-12],[0,-10],[0,-15]]){const s=await ev(([a,b])=>__gb.scr(a,b),[i,j]);if(!s||s.y<40||s.y>385)continue;await tapXY(s.x,s.y);const c=await ev(()=>__pa.carry());if(!c)break;if(!c.bad){await tap('#gsBar .gsPl');break}}
+ for(const[i,j]of[[0,-4],[0,-5],[1,-4],[0,0],[2,2],[-2,0],[0,3]]){const s=await ev(([a,b])=>__gb.scr(a,b),[i,j]);if(!s||s.y<40||s.y>385)continue;await tapXY(s.x,s.y);const c=await ev(()=>__pa.carry());if(!c)break;if(!c.bad){await tap('#gsBar .gsPl');break}}
  R.appended=(await ev(()=>__gb.list().length))-n0;log('saved',JSON.stringify(R.saved),'appended',R.appended);
  await ev(()=>{__gb.GB_.yaw=Math.PI*.12;__gb.GB_.pit=.35});await shot('10_car_front_tiles');
  await cat('Tiles');await shot('11_new_parts_catalogue');await cat('SNOT');await shot('12_snot_catalogue');
