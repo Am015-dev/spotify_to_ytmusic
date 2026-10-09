@@ -1,0 +1,48 @@
+
+// ===== RF (race fun, 2026-10-09): Alex "we have functionalities but the races are boring". Reference: LEGO 2K Drive rival race
+// (docs/race_ref, docs/RACE_PLAN.md). Measured before (tRace, phone): the player started on POLE and led ~75 % of the race alone,
+// then a +13 % catch-up rubber band passed him in the last 20 s (final 2nd/5th/6th). 2K: start 8th behind the pack, climb to 1st,
+// short fights later, a fair finish.
+//  - grid: the player starts LAST in a full field (not elimination/arena/tt/zone), the best AI on pole
+//  - rubber band (RF_rub, called from 30_race stepSim): leaders wait for the player early on, the catch-up from behind fades out
+//    over the last 25 % so nobody steals the win at the line
+//  - ▲ 4TH / ▼ 5TH pop under the position counter on every place change
+//  - countdown: the camera swings from the front of the player's car to behind it (2K-style car showcase), big 3·2·1
+//  - finish: a slow orbit around the player's car; results get a top-3 podium strip (+ RIVAL BEATEN! in rival races)
+const RF_GRID=()=>RC&&RC.type==='race'&&ships.length>=2&&pl;
+function RF_rub(s,gap,ld){const P=clamp(pl.dist/Math.max(1,(RC.laps||1)*TD.L),0,1),fadeB=P<.75?1:clamp((1-P)/.25,0,1),holdA=P<.7?1:.5;
+  let r=1;if(gap>0)r+=Math.min(.09,gap/240*.09)*(.2+.8*fadeB);else r-=Math.min(.2,Math.max(0,-gap-30)/200*.2)*holdA;
+  return r+Math.min(.03,Math.max(0,ld-s.dist)/400*.03)}
+// corner speed ∝ √grip: grip × rubber² makes the rubber band act in corners too (it only scaled top speed, so on twisty tracks a leader 400 m ahead never waited)
+function RF_lat(s){const r=s.rubber||1;return R15_on()&&RC.type!=='arena'&&!s.isPlayer?r*r:1}
+setupRace=(f=>function(cfg){const r=f.apply(this,arguments);try{if(RF_GRID()){
+  const ai=ships.filter(s=>s!==pl).sort((a,b)=>b.skill-a.skill),grid=[...ai,pl];
+  grid.forEach((s,i)=>{const row=Math.floor(i/2),col=i%2;s.dist=-14-row*16-(col?8:0);s.x=(col?8:-8)*CR_LS;s.v=0;s.place=i+1});
+  ships.forEach(s=>posShip(s,1/60,true));updateCam(1,true);RFX.place=ships.length}RFX.cd0=cdT}catch(e){console.warn('RF grid',e)}return r})(setupRace);
+const RFX={place:0,popT:0,el:null,orb:0};
+function RF_popEl(){if(RFX.el)return RFX.el;const e=document.createElement('div');e.id='rfPop';
+  e.style.cssText='position:fixed;z-index:6;pointer-events:none;font:900 italic 22px/1 system-ui,sans-serif;letter-spacing:.02em;padding:4px 10px;border-radius:8px;background:rgba(10,14,30,.72);opacity:0;transition:opacity .15s;text-shadow:0 2px 0 #000';
+  document.body.appendChild(e);return RFX.el=e}
+function RF_pop(){if(!pl||!RC||!['race','elim'].includes(RC.type))return;const e=RF_popEl();
+  if(state==='race'&&raceT>1.5&&RFX.place&&pl.place!==RFX.place){const up=pl.place<RFX.place;e.textContent=(up?'▲ ':'▼ ')+ord(pl.place).toUpperCase();e.style.color=up?'#7dff6a':'#ff5a6a';
+    const p=hudEl.pos&&hudEl.pos.getBoundingClientRect();if(p&&p.width){e.style.top=Math.round(p.bottom+4)+'px';e.style.right=Math.round(innerWidth-p.right)+'px';e.style.left='auto'}e.style.opacity=1;RFX.popT=performance.now()+1300;if(up&&AU.sfx)AU.sfx('pick')}
+  RFX.place=pl.place;if(RFX.popT&&performance.now()>RFX.popT){e.style.opacity=0;RFX.popT=0}if(state!=='race'&&state!=='finished')e.style.opacity=0}
+updHud=(f=>function(){f.apply(this,arguments);try{RF_pop()}catch(e){}})(updHud);
+// countdown showcase + finish orbit (only the camera; the chase camera keeps running underneath so the cut back is clean)
+updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{if(!pl||!RC||RC.type==='tt'||CC&&CC.s)return;
+  const cd=state==='countdown'&&cdT>.55,fin=state==='finished'&&RC.type!=='zone'&&pl.finished&&!pl.eliminated;if(!cd&&!fin){RFX.orb=0;return}
+  const F=RFX.F||(RFX.F=mkF());frameAt(TD,pl.dist,F);const c=pl.mesh.position.clone().add(pl.mesh.userData.m.position);let a,r,h;
+  if(cd){const k=clamp(1-(cdT-.55)/Math.max(.5,(RFX.cd0||4.2)-.55),0,1),e=k*k*(3-2*k);a=lerp(.35,Math.PI-.15,e);r=lerp(7.5,10.5,e);h=lerp(1.6,3.2,e)}
+  else{RFX.orb+=(dt||.016)*.55;a=Math.PI*.15+RFX.orb;r=9.5;h=2.6}
+  const P=c.clone().addScaledVector(F.t,Math.cos(a)*r).addScaledVector(F.r,Math.sin(a)*r).addScaledVector(F.u,h);camera.position.copy(P);camera.up.copy(F.u);camera.lookAt(c.clone().addScaledVector(F.u,.9));
+  camera.fov=58;camera.updateProjectionMatrix();speedLines.mesh.material.opacity=0}catch(e){}})(updateCam);
+// results: top-3 podium strip above the table (+ RIVAL BEATEN! card line in rival races)
+showResults=(f=>function(){const r=f.apply(this,arguments);try{if(!pl||!['race'].includes(RC.type)||ships.length<2)return r;
+  const est=s=>s.finished?s.finishTime:1e5+raceT+Math.max(0,(RC.laps*TD.L-s.dist))/Math.max(40,s.v||60),o=[...ships].sort((a,b)=>est(a)-est(b));
+  let el=document.getElementById('rfPod');if(!el){el=document.createElement('div');el.id='rfPod';const t=document.getElementById('resTable');t.parentNode.insertBefore(el,t)}
+  const cols=['#ffd23c','#d9e2ec','#e09a5a'],hs=[44,32,24],at=[1,0,2];
+  const rv=RC.rival?ships.find(s=>s.pid===RC.rival):null,beat=rv&&o.indexOf(pl)<o.indexOf(rv);
+  el.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:4px 0 8px';
+  el.innerHTML=at.map(i=>{const s=o[i];if(!s)return'';return `<div style="text-align:center;min-width:92px"><div style="font:800 13px/1.2 system-ui;color:${s===pl?'#7dff6a':'#fff'};white-space:nowrap">${s===pl?'YOU':s.name}</div><div style="height:${hs[i]}px;background:${cols[i]};border-radius:6px 6px 0 0;color:#111;font:900 italic 18px/${hs[i]}px system-ui">${ord(i+1).toUpperCase()}</div></div>`}).join('')+
+   (rv?`<div style="align-self:center;margin-left:10px;font:900 italic 16px/1.1 system-ui;color:${beat?'#7dff6a':'#ff5a6a'}">${beat?'RIVAL<br>BEATEN!':'RIVAL<br>AHEAD'}</div>`:'')}catch(e){console.warn('RF pod',e)}return r})(showResults);
+window.__rf={st:()=>({place:RFX.place,grid:ships.map(s=>[s.name,Math.round(s.dist),+s.x.toFixed(1),+s.skill.toFixed(3)]),rub:ships.map(s=>+(s.rubber||1).toFixed(3))})};

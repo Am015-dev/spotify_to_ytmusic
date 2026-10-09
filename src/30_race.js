@@ -401,7 +401,7 @@ function physAI(s){const st=s.stats,sk=s.skill*(TUNE.rub===1?s.rubber:1+(s.rubbe
   s.aiN=(s.aiN||0)-H;s.aiNcd=(s.aiNcd??rr(4,9))-H;if(s.aiNcd<=0&&Math.abs(kAt(TD,s.dist+80))<1/600&&RC.type!=='attract'){s.aiN=rr(1.8,3);s.aiNcd=rr(5,10)*(1.15-sk*.2)}
   s.nitro=s.aiN>0;
   let vmax=st.top*sk*(s.turbo>0?1.2:1)*(s.boost>0?1.12:1)*(s.nitro?1.26:1)*(s.r15k||1);const look=Math.max(80,s.v*1.8);
-  const aiLat=C26.on?C26_muRace(s)*C26.aiMu*(.9+.1*sk):AI_LAT*sk*st.han*cls.mul;for(let d=10;d<look;d+=12){const kd=kAt(TD,s.dist+d),kk=Math.abs(kd)/Math.max(.35,1-kd*s.x);const vc=Math.sqrt(aiLat/Math.max(kk,1e-5));vmax=Math.min(vmax,Math.sqrt(vc*vc+2*AI_BRK*cls.mul*Math.max(0,d-10)))}
+  const aiLat=(C26.on?C26_muRace(s)*C26.aiMu*(.9+.1*sk):AI_LAT*sk*st.han*cls.mul)*RF_lat(s);for(let d=10;d<look;d+=12){const kd=kAt(TD,s.dist+d),kk=Math.abs(kd)/Math.max(.35,1-kd*s.x);const vc=Math.sqrt(aiLat/Math.max(kk,1e-5));vmax=Math.min(vmax,Math.sqrt(vc*vc+2*AI_BRK*cls.mul*Math.max(0,d-10)))}
   let ka=0;for(let d=30;d<=150;d+=20)ka+=kAt(TD,s.dist+d);ka/=7;let xt=clamp(ka*3200+s.laneBias,-MARGIN+1.2,MARGIN-1.2);
   for(const o of ships){if(o===s||o.dead||o.eliminated)continue;const dd=o.dist-s.dist;if(dd>0&&dd<26&&Math.abs(o.x-s.x)<4)xt=clamp(o.x+CR_dodge(s,o)*6,-MARGIN+1,MARGIN-1)}
   for(const m of mines){const dd=m.dist-s.dist;if(dd>0&&dd<60&&Math.abs(m.x-s.x)<4)xt=clamp(m.x+(m.x>0?-4:4),-MARGIN+1,MARGIN-1)}
@@ -495,7 +495,7 @@ function stepSim(){const racing=state==='race'||state==='menu'||state==='finishe
     else if(s.isPlayer&&s.finished){s.rubber=1;physAI(s);s.nitro=false}
     else{if(pl&&!pl.finished&&RC.type!=='tt'){const gap=pl.dist-s.dist;if(R15_on()&&RC.type!=='arena'){let ld=s.dist;for(const o of ships)if(!o.eliminated&&o.dist>ld)ld=o.dist;
         // R17: the 38 m tracks at ×1.2 strung the field out (1st→last 630 m at 60 s vs live ~220 m): a stronger pull toward the player and toward the leader
-        s.rubber=1+(gap>0?Math.min(.13,gap/260*.13):-Math.min(.05,Math.max(0,-gap-90)/360*.05))+Math.min(.05,(ld-s.dist)/400*.05)}else s.rubber=1+(gap>0?Math.min(.06,gap/400*.06):-Math.min(.03,Math.max(0,-gap-150)/600*.03))}else s.rubber=1;physAI(s);
+        s.rubber=RF_rub(s,gap,ld)}else s.rubber=1+(gap>0?Math.min(.06,gap/400*.06):-Math.min(.03,Math.max(0,-gap-150)/600*.03))}else s.rubber=1;physAI(s);
       if(s.item){s.aiFire-=H;if(s.aiFire<=0){let use=false;const it=s.item;
         if(it==='turbo')use=Math.abs(kAt(TD,s.dist+100))<1/900;else if(it==='shield')use=raceT-s.lastHit<.5||R()<.002;else if(it==='mines'||it==='wall'||it==='oil')use=ships.some(o=>o!==s&&s.dist-o.dist>10&&s.dist-o.dist<150);else if(it==='magnet')use=ships.some(o=>o!==s&&!o.dead&&o.dist-s.dist>30&&o.dist-s.dist<300);else if(it==='storm')use=ships.some(o=>o!==s&&!o.dead&&o.dist>s.dist+10);
         else use=ships.some(o=>o!==s&&!o.dead&&!o.eliminated&&o.dist-s.dist>15&&o.dist-s.dist<(it==='missile'||it==='tornado'||it==='web'?500:160)&&(it==='missile'||it==='tornado'||it==='web'||Math.abs(o.x-s.x)<5));
