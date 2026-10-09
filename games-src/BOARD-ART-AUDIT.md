@@ -15,16 +15,16 @@ Which play surfaces are still the old CSS/SVG/canvas placeholders, what is alrea
 | Shelf (`games-src/suite/src.html`, built `games/index.html`) | Painted app icon replaces `games/icons/icon-180/192/512(-maskable).png` (same names: works as is). New `icons/favicon-32.png` and `icons/share.jpg` (1200×630) are not linked yet. | Add `<link rel="icon" href="icons/favicon-32.png" sizes="32x32">`, `og:image` / `twitter:image` = absolute URL of `icons/share.jpg` (+ `og:image:width` 1200, `height` 630, `twitter:card` `summary_large_image`). Painted box covers already replaced `games/covers/<id>.jpg` in place (Nebula still to come). |
 | Crown City Smash, Nebula Aces, Sunglaze, Tidewake | No loader reads `media/table-*`, `back-*`, `title*`, `end-*` at all. | Port the loader from `cauldron-fair/src/ui12.js:34,103` / `lantern-dive/game/src/ui2.js:23`; `campaign.json` portraits drop in via `artBase`. |
 
-## 2. Being painted on the laptop now (queued in Google Flow; pushed per game when done)
-- **Thornbound:** `media/map.webp` + `map-phone.webp` (hook `mapApply`, `:6752`, already there: this is the real fix for the old SVG board), the 4 faction `art/basic-*.webp`, plus `thornbound-throne` (keyed centrepiece for `buildThrone`, `:2374`) and `thornbound-track` (track lane space, `:2370`).
-- **Hollowbough:** the 39 location/event paintings (forest, basic, events; keys = in-game keys, wiring in `ui10.js` `spotArt` + `build.py` `art_js`), `hollowbough-bench` (the meadow bench) and `hollowbough-mat` (wood tray for the player `.strip`, `:521`).
-- **Cauldron Fair:** `cauldron-stage` (market stage `#rs.stg`, `:569`), `cauldron-pass` (+`-phone`, pass screen `.passc`, `:249`), Tamsin redo.
-- **Kaiten Kitchen:** `kaiten-stage` (`#stage`, `:455`), `kaiten-belt` (tileable belt for the Pixi tiling sprite, `:5202`).
-- **Final Approach:** `approach-table` + `-phone` (default table for `tableApply`, `ui13.js:7-22`).
-- **Mainhattan Nightrun:** `nightrun-garage` (+`-phone`, garage/pit-stop `.pg`, `head.html:22`) and `nightrun-pause` (`#pausem`/`#setm`, `head.html:23`); keep the dark overlay on top for legibility.
-- **Rampart & Vine:** table skins, portraits (names already in `campaign.json`), backs, title/end and field textures (`tex-*` under the SVG tiles only; the edge-matching SVG stays).
-- **Crown City Smash, Nebula Aces, Sunglaze, Tidewake, Lantern Dive:** every image item in `MISSING-ASSETS.md` (106), plus their Treblo music (5 cues × 2 each).
-- **Shelf:** painted box covers for the 10 games whose cover is a screenshot, a painted app icon (+ favicon) and a share image (`og:image`).
+## 2. Painted on the laptop (status 2026-10-09; files pushed, the Linux session wires them)
+- **Thornbound (done):** `media/map.webp` + `map-phone.webp` (hook `mapApply`, `:6752`, loads by itself: the real fix for the old SVG board), `art/basic-{gilded,heath,lantern,choir}.webp` (embedded on the next build), `media/throne.webp` (789x984, transparent, centrepiece for `buildThrone`, `:2374`), `media/track.webp` (256 tile, track lane space, `:2370`).
+- **Hollowbough (done):** the 39 place/event paintings in `games-src/hollowbough/art/` (wiring in its `PAINTED-ART-HANDOFF.md`), `media/bench.webp` (1200x367, transparent, replaces the drawn meadow bench) and `media/mat.webp` (1200x291, transparent wood tray for the player `.strip`, `:521`).
+- **Cauldron Fair (done):** `media/stage.webp` (market stage `#rs.stg`, `:569`), `media/pass.webp` + `pass-phone.webp` (pass screen `.passc`, `:249`), Tamsin redo.
+- **Kaiten Kitchen:** `media/stage.webp` done (`#stage`, `:455`); the tileable belt (`:5202`) is painted again (the first one had plates baked in).
+- **Final Approach (done):** `media/table-default.webp` + `-phone`. `tableApply` (`ui13.js:14`) still uses the Pixi plate when no table is unlocked: load `table-default` in that branch.
+- **Mainhattan Nightrun (done):** `media/garage.webp` + `garage-phone.webp` (garage/pit-stop `.pg`, `head.html:22`), `media/pause.webp` (`#pausem`/`#setm`, `head.html:23`); keep the dark overlay on top for legibility. The 53 items in `nightrun/ASSETS-NEEDED.md` are queued.
+- **Rampart & Vine (done):** see `carc/PAINTED-ART-HANDOFF.md`; `tex-town`, `tex-roof`, `camp-baron` queued again.
+- **Shelf (done):** 9 painted box covers, app icon, favicon, share image (see row above); the Nebula cover is painted again.
+- **Crown City Smash, Nebula Aces, Sunglaze, Tidewake, Lantern Dive:** every image item in `MISSING-ASSETS.md` (106) is painting now; their Treblo music is pushed.
 
 ## 3. Keep in code (pixel-exact, functional or text-heavy)
 Dice faces (Doorkick `.die3`, Crown, Nebula d8, Tidewake), wake-tile route lines (Tidewake), Rampart tile edges, Final Approach instrument panels and atlases, Sunglaze tile glyphs and score tracks (glaze textures only with care: the 5 colours must stay distinct), Short Fuse wire colours and numbers, Thornbound faction tokens, HUD pips (Nightrun), all text cards, chips and buttons.
