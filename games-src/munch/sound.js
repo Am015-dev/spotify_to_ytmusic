@@ -69,18 +69,22 @@ const MSLOTS=[['tavern','Menu'],['main','Dungeon'],['fight','Fight'],['victory',
 const MTITLE={'tavern-a':'Six Copper Cups','tavern-b':'Tavern of the Lazy Lantern','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
 const MDEF={tavern:'a',main:'b',fight:'a',victory:'b',defeat:'a'};
 SND.pick=Object.assign({},MDEF);try{Object.assign(SND.pick,JSON.parse(localStorage.getItem('dkd_mpick')||'{}'))}catch(e){}
-SND.res={};SND.wslot=null;SND.prev=null;
+SND.res={};SND.wslot=null;SND.prev=null;SND.last=null;SND.since=0;
+// 'all' = shuffle through every looping song (menu, dungeon and fight tracks), a new one every ~2.5 min
+const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 function musicName(slot){let c=SND.pick[slot]||MDEF[slot];if(c==='off')return '-';if(c==='classic'&&slot!=='victory'&&slot!=='defeat')return 'classic';
+  if(c==='all'){if(!SND.res[slot]){const pool=MALL.filter(k=>k!==SND.last);SND.res[slot]=pool[Math.floor(Math.random()*pool.length)]}return SND.res[slot]}
   if(c==='shuffle'){if(!SND.res[slot]){SND.sh=SND.sh||{};SND.sh[slot]=SND.sh[slot]===undefined?(Math.random()<.5?0:1):1-SND.sh[slot];SND.res[slot]=slot+'-'+'ab'[SND.sh[slot]]}return SND.res[slot]}
   return slot+'-'+(c==='b'?'b':'a')}
 function musicPick(slot,c){SND.pick[slot]=c;SND.res[slot]=null;try{localStorage.setItem('dkd_mpick',JSON.stringify(SND.pick))}catch(e){}
-  if(window.GA&&c!=='off'&&c!=='shuffle')try{GA.preload(musicName(slot))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle'&&c!=='all')try{GA.preload(musicName(slot))}catch(e){}
   if(SND.wslot===slot&&!SND.prev){SND.want=null;musicSync()}}
 function musicSync(){if(!window.GA||!SND.music||SND.prev)return;const w=musicWant();if(SND.wslot!==w[0]){SND.wslot=w[0];SND.res[w[0]]=null}
-  const n=musicName(w[0]);if(SND.want===n)return;SND.want=n;
+  else if(SND.pick[w[0]]==='all'&&!w[1]&&SND.since&&Date.now()-SND.since>MALL_MS)SND.res[w[0]]=null;
+  const n=musicName(w[0]);if(SND.want===n)return;SND.want=n;SND.since=Date.now();if(n!=='-')SND.last=n;
   if(n==='-'){GA.music(null,{fade:1});return}
   GA.music(n,{fade:w[1]?.6:1,once:!!w[1]});
-  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=SND.pick[nx];if(c!=='off'&&c!=='shuffle')GA.preload(musicName(nx))}catch(e){}},4000)}}
+  if(w[0]==='tavern'||w[0]==='main'){setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=SND.pick[nx];if(c!=='off'&&c!=='shuffle'&&c!=='all')GA.preload(musicName(nx))}catch(e){}},4000)}}
 function musicPreview(slot){if(!window.GA||!SND.music||!SND.ctx||SND.wslot===slot)return;const n=musicName(slot);if(n==='-')return;
   clearTimeout(SND.prevT);SND.prev=slot;SND.want=null;GA.music(n,{fade:.5,once:true});
   SND.prevT=setTimeout(()=>{SND.prev=null;SND.want=null;musicSync();if(typeof renderMusic==='function')renderMusic()},8000)}
