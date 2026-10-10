@@ -754,6 +754,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90g',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: 16 more LEGO vehicles, among them a Street Sweeper, Fire Truck, Tow Rig, Recycle Truck, Classic Patrol, Highway Bike, a Z06 racer and the five tiny Racers (new RACERS filter in the garage).'},{t:'NEW',s:'Frankfurt: a Pizza To Go shop, a phone booth, a LEGO fountain on the lawn and a speedboat on the river. Athens: a little lighthouse and a house on display plinths.'},{t:'CHANGED',s:'The yellow Big Rig drives in Frankfurt traffic again, on wide roads only. Planters, dumpsters, Athens street lamps and the Syntagma race palms are now LEGO parts.'}]},
   {v:'v90f',date:'10 Oct 2026',items:[{t:'FIXED',s:'Rides keep their real LEGO width (no more squeezed-thin cars and trucks).'},{t:'FIXED',s:'All LEGO City and Town rides are true minifig size with a LEGO driver in the cab; the four 1979 Town cars now drive forwards.'},{t:'NEW',s:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker.'},{t:'CHANGED',s:'Frankfurt: trees, street lamps, park fences and crates are now real LEGO parts, and a LEGO House (4956) stands near the start.'}]},
   {v:'v90e',date:'10 Oct 2026',items:[{t:'NEW',s:'City traffic is now real LEGO sets: the family car, the patrol car, the mail van, the service van, the camper, the LEGO taxi and Speed Champions cars drive the streets.'},{t:'CHANGED',s:'Each traffic car keeps its real set colours, and crashing into one uses its own size.'},{t:'NEW',s:'RIDES: Town Cruiser, another 1979 LEGO Town car. Garage ride pictures now draw the cards on screen first.'}]},
   {v:'v90d',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: four little 1979 LEGO Town vehicles from real model files: Town Roadster, Town Coupe, Ladder Truck and Town Tipper.'}]},
@@ -10362,7 +10363,7 @@ const G9C_forms=S=>S.forms||['car','off','boat'];
 const G9C_name=(S,f)=>{const L=S.load&&S.load[f==='off'?'4x4':f];return f==='car'?S.n:(L&&L.name?L.name.charAt(0)+L.name.slice(1).toLowerCase():S.n)};
 function G9C_eq(f){const G=GAR_get();return f==='car'?G.sel:(G[f]&&GAR_owned(GAR_set(G[f]))?G[f]:G.sel)}
 function G9C_list(f){const G=GAR_get(),fav=G.fav||[];let A=[];GAR_SETS.forEach((S,i)=>{if(G9C_forms(S).includes(f))A.push({S,f,i,own:GAR_owned(S),fav:fav.includes(G9C_key(S,f))})});
- const all=A.length,own=A.filter(e=>e.own).length;if(G9C.filt==='own')A=A.filter(e=>e.own);else if(G9C.filt==='fav')A=A.filter(e=>e.fav);
+ const all=A.length,own=A.filter(e=>e.own).length;if(G9C.filt==='own')A=A.filter(e=>e.own);else if(G9C.filt==='fav')A=A.filter(e=>e.fav);else if(G9C.filt==='rac')A=A.filter(e=>e.S.grp==='racers');
  const nm=e=>G9C_name(e.S,e.f);A.sort(G9C.sort==='az'?(a,b)=>nm(a).localeCompare(nm(b)):G9C.sort==='new'?(a,b)=>b.i-a.i:(a,b)=>(b.own-a.own)||G9C_RK[a.S.tier]-G9C_RK[b.S.tier]||a.i-b.i);return{A,all,own}}
 function G9C_equip(S,f){if(!GAR_owned(S)){try{AU.sfx('bump')}catch(e){}return 0}if(f==='car')GAR_select(S.id);else{const G=GAR_get();G[f]=S.id;GAR_put(G);GAR_load();try{AU.sfx('pick')}catch(e){}}gbRender();return 1}
 function G9C_favT(S,f){const G=GAR_get(),k=G9C_key(S,f),F=G.fav=G.fav||[],i=F.indexOf(k);if(i<0)F.push(k);else F.splice(i,1);GAR_put(G);try{AU.sfx('pick')}catch(e){}}
@@ -10379,7 +10380,7 @@ function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car
 function G9C_pump(){if(G9C.busy)return;const next=()=>{const L=[...document.querySelectorAll('#g9Col img[data-k]:not([src])')],V=$('#g9Col'),vr=V&&V.getBoundingClientRect(),vis=e=>{const r=e.getBoundingClientRect();return vr&&r.bottom>vr.top&&r.top<vr.bottom&&r.right>vr.left&&r.left<vr.right},im=L.find(vis)||L[0];/* v90e: on-screen cards first (the newest rides sit at the end of the list) */if(!im||$('#gbx').hidden){G9C.busy=0;return}
   const S=GAR_set(im.dataset.s),u=G9C_render(S,im.dataset.f);if(u)im.src=u;else im.removeAttribute('data-k');setTimeout(next,16)};G9C.busy=1;setTimeout(next,30)}
 // ---------- UI: replaces the VEHICLES row at the top of RIDES
-function G9C_html(){const f=G9C.type,{A,all,own}=G9C_list(f),eq=G9C_eq(f),SL={rar:'RARITY',az:'A–Z',new:'NEW'},FL={all:'ALL',own:'OWNED',fav:'★ FAVS'};
+function G9C_html(){const f=G9C.type,{A,all,own}=G9C_list(f),eq=G9C_eq(f),SL={rar:'RARITY',az:'A–Z',new:'NEW'},FL={all:'ALL',own:'OWNED',fav:'★ FAVS',rac:'🏁 RACERS'};
  let h=`<div id="g9Col"><div class="g9Bar">${G9C_TY.map(([k,ic,n])=>{const L=G9C_list(k);return`<button class="g9Ty ${k===f?'on':''}" data-gty="${k}">${ic} ${n} <small>${L.own}/${L.all}</small></button>`}).join('')}
  <button class="g9Ch" data-gso>⇅ ${SL[G9C.sort]}</button><button class="g9Ch" data-gfi>${FL[G9C.filt]}</button></div>
  <div class="g9Cnt">owned ${own} / ${all} · locked ${all-own}</div><div class="g9Grid">`;
@@ -10394,7 +10395,7 @@ GAR_tab=(f=>function(){f();const B=$('#gbBody');if(!B)return;const row=B.querySe
  C.addEventListener('click',e=>{const t=e.target.closest('button,.g9Card');if(!t)return;e.stopPropagation();
   if(t.dataset.gty){G9C.type=t.dataset.gty;GAR_.pv=t.dataset.gty==='off'?'4x4':t.dataset.gty;try{AU.sfx('pick')}catch(_){}gbRender();return}
   if(t.hasAttribute('data-gso')){G9C.sort={rar:'az',az:'new',new:'rar'}[G9C.sort];gbRender();return}
-  if(t.hasAttribute('data-gfi')){G9C.filt={all:'own',own:'fav',fav:'all'}[G9C.filt];gbRender();return}
+  if(t.hasAttribute('data-gfi')){G9C.filt={all:'own',own:'fav',fav:'rac',rac:'all'}[G9C.filt];gbRender();return}
   if(t.dataset.gfav){G9C_favT(GAR_set(t.dataset.gfav),G9C.type);gbRender();return}
   if(t.dataset.ged){const S=GAR_set(t.dataset.ged);if(GAR_get().sel!==S.id)GAR_select(S.id);GB_enter();return}
   if(t.dataset.gc){const S=GAR_set(t.dataset.gc);G9C_equip(S,G9C.type);GAR_.pv=G9C.type==='off'?'4x4':G9C.type}});G9C_pump()})(GAR_tab);
@@ -13562,10 +13563,12 @@ function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_S
  const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:(CID==='fra'?{x:2061,z:0}:{x:0,z:0}),a0=(P.a||0)*Math.PI/180;
  if(P.water)return LDW_boat(P,near,far,box,c,hw,hd,st,a0);
  /* v90a: the road setback uses the WHOLE scaled model (baseplate, low parts) as x/z half-sizes, not the tall-part collider: 6362's base slab sat on the kerb */const fw=(box.max.x-box.min.x)*SW/2,fd=(box.max.z-box.min.z)*SW/2,S=LDW_spot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),fw+.5,fd+.5,P.road||10);if(!S)return;const best=S.yaw;
- const a=best*Math.PI/2,y=groundY(S.x,S.z)-(P.sink||0)*SW*GB_PH;
+ const a=best*Math.PI/2,g0=groundY(S.x,S.z),pl=P.plinth||0,y=g0+pl-(P.sink||0)*SW*GB_PH;
  const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(SW,SW,SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
  const E={id:P.model,x:S.x,z:S.z,near:[],far:[],tris:0,ftris:0};
  for(const[L,set,key]of[[near,E.near,'tris'],[far,E.far,'ftris']])for(const[g,mat]of L){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name='ldw_'+P.model;o.receiveShadow=true;o.userData.cd=P.cd||900;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);set.push(o);E[key]+=(g.index?g.index.count:g.attributes.position.count)/3}
+ if(pl){/* rescue-1: a micro set shown as a LEGO model on display (true size at minifig scale) stands on a stone plinth */const g=new THREE.BoxGeometry(fw*2+.8,pl,fd*2+.8);g.rotateY(a);g.translate(S.x,g0+pl/2,S.z);g.computeBoundingSphere();
+  const o=new THREE.Mesh(g,LDW.pm||(LDW.pm=new THREE.MeshStandardMaterial({color:0xb9b2a3,roughness:.85})));o.name='ldw_plinth';o.receiveShadow=true;o.userData.cd=P.cd||900;HUB.grp.add(o);hubCullAdd(o);E.near.push(o);E.tris+=12}
  const cs=Math.cos(a),sn=Math.sin(a),odd=best%2,col={x:S.x+ox*cs+oz*sn,z:S.z-ox*sn+oz*cs,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*SW};
  HUB.bld.push(col);hubGridAdd([col]);E.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};E.col=col;LDW.on.push(E)}
 // boats (P.water): moored in the nearest river/harbour reach to the anchor that is wide enough, near the bank, bow along the flow, hull P.sink plates under the water
@@ -13620,9 +13623,9 @@ const LDS_tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
 // street lamp (swap 2): LEGO 2039 Support 2x2x7 Lamppost (as in 10184 Town Plan, CCAL 2.0) + 3062b round brick lamp + 4740 dish shade, one lathe
 // (profile from tools/ld/lProfile.py 2039.dat / 3062b.dat, LDU), 6 sides; replaces the Kenney CC0 'light-curved' (92 tris). Colours by height.
 LDS.L={p:[[25,0],[8,12],[6,150],[10,168],[10,190],[20,192],[20,196],[0,198]],h:6.5,c:[[168,'#3a3f48'],[191,'#ffe9a0'],[999,'#2a2e36']]};
-function LDS_lamp(){const L=LDS.L,k=L.h/198,g=new THREE.LatheGeometry(L.p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),6).toNonIndexed(),p=g.attributes.position,keep=[];
+function LDS_lamp(h,cols){const L=LDS.L,k=(h||L.h)/198,g=new THREE.LatheGeometry(L.p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),6).toNonIndexed(),p=g.attributes.position,keep=[];
  for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()>1e-10)keep.push(a,b,d)}
- const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],C=new THREE.Color();for(let i=0;i<keep.length;i+=3){const ym=(keep[i].y+keep[i+1].y+keep[i+2].y)/3/k;C.set(L.c.find(e=>ym<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
+ const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],C=new THREE.Color();for(let i=0;i<keep.length;i+=3){const ym=(keep[i].y+keep[i+1].y+keep[i+2].y)/3/k;C.set((cols||L.c).find(e=>ym<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
  q.setAttribute('color',new THREE.Float32BufferAttribute(c,3));q.computeVertexNormals();q.computeBoundingBox();q.computeBoundingSphere();return q}
 // park fence (swap 3): LEGO 3633 Fence Lattice 1x4x1 (LDraw part, CCAL 2.0) instead of the Kenney CC0 'fence-1x3' (204 tris): top rail 80x8x20 LDU,
 // end posts, bottom rail and the diamond lattice (4+4 diagonal bars), boxes in LDU from the part file; stretched to the old fence's length.
@@ -13630,7 +13633,7 @@ function LDS_fence(old){old.computeBoundingBox();const ob=old.boundingBox,ox=ob.
  add(80,8,20,0,20,0);add(4,16,6,-38,8,0);add(4,16,6,38,8,0);add(80,4,6,0,2,0);const L=Math.hypot(18,12)+2,a=Math.atan2(12,18);for(let i=0;i<4;i++){const x=-27+i*18;add(L,2,4,x,10,0,a);add(L,2,4,x,10,0,-a)}
  const g=mergeG(G);
  g.scale(s,Math.min(s,(ob.max.y-ob.min.y)/24),s);if(oz>ox)g.rotateY(Math.PI/2);g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
-ART_trees=(f=>function(D){f.apply(this,arguments);if(CID!=='fra')return;const st={};try{if(D.lamp&&!D.lamp.lds){const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp();D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}}catch(e){console.warn('LDS lamp',e)}try{for(const t in LDS.P){const d=D[t];if(!d)continue;const P=LDS.P[t],old=LDS_tri(d.g);
+ART_trees=(f=>function(D){f.apply(this,arguments);if(CID==='ath'&&D.lamp&&!D.lamp.lds)try{const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp(7.43,LDS.LA);D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';LDS.st=LDS.st||{};LDS.st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}catch(e){console.warn('LDS lamp ath',e)}if(CID!=='fra')return;const st={};try{if(D.lamp&&!D.lamp.lds){const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp();D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}}catch(e){console.warn('LDS lamp',e)}try{for(const t in LDS.P){const d=D[t];if(!d)continue;const P=LDS.P[t],old=LDS_tri(d.g);
   d.gOld=d.g;d.g=LDS_lathe(P.n,8);d.gFar=LDS_lathe(P.f,6);d.lds=t;st[t]={src:P.src,old,near:LDS_tri(d.g),far:LDS_tri(d.gFar)}}}catch(e){console.warn('LDS trees',e)}LDS.st=st;LDS.on=[]})(ART_trees);
 // crate (swap 4): LEGO 61780 Container 2x2x2 Crate (LDraw part, CCAL 2.0): open box of slats, 40x48x40 LDU: floor + 2 rings of 4 slats with the gaps of
 // the part, instead of the Kenney CC0 'box' (124 tris); fitted to the old crate's footprint, reddish brown like the part's usual colour
@@ -13641,13 +13644,44 @@ function LDS_crate(old){old.computeBoundingBox();const ob=old.boundingBox,w=Math
 kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID==='fra'&&D.fence&&!D.fence.lds)try{const old=LDS_tri(D.fence.g);D.fence.gOld=D.fence.g;D.fence.mOld=D.fence.mat;D.fence.g=LDS_fence(D.fence.g);
  D.fence.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0});D.fence.lds='fence';if(LDS.st)LDS.st.fence={src:'3633',old,near:LDS_tri(D.fence.g),far:LDS_tri(D.fence.g)}}catch(e){console.warn('LDS fence',e)}if(CID==='fra'&&D.crate&&!D.crate.lds)try{const old=LDS_tri(D.crate.g);D.crate.gOld=D.crate.g;D.crate.mOld=D.crate.mat;D.crate.g=LDS_crate(D.crate.g);D.crate.mat=D.fence.mat;D.crate.lds='crate';if(LDS.st)LDS.st.crate={src:'61780',old,near:LDS_tri(D.crate.g),far:LDS_tri(D.crate.g)}}catch(e){console.warn('LDS crate',e)}
  return r})(kmProps);
+// planter (swap 5): LEGO flower bed instead of the Kenney CC0 'planter' (204 tris): a 2x4 bed brick (80x24x40 LDU, reddish brown) + 3020 Plate 2x4 (green),
+// on its 8 studs 4 flowers (3741-style thin stem + 33291 Plate 1x1 Round with Tabs, red/yellow) and 4 leaf clumps (6255 Plant 1x1 with 3 Leaves),
+// low-poly in LDU (LDraw parts, CCAL 2.0); fitted to the old planter's footprint, long side kept
+function LDS_fit(G,old,L){const g=mergeG(G);old.computeBoundingBox();const ob=old.boundingBox,ox=ob.max.x-ob.min.x,oz=ob.max.z-ob.min.z,s=Math.max(ox,oz)/L;g.scale(s,s,s);if(oz>ox)g.rotateY(Math.PI/2);
+ g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
+function LDS_planter(old){const G=[],B=(w,h,d,x,y,z,c)=>G.push(cbox(w,h,d,x,y,z,c)),Y=(r1,r2,h,x,y,z,c,n)=>G.push(ccyl(r1,r2,h,x,y,z,c,n));
+ B(80,24,40,0,12,0,'#7a4a28');B(80,8,40,0,28,0,'#3f8a2e');
+ for(let i=0;i<4;i++)for(let j=0;j<2;j++){const x=-30+i*20,z=j?10:-10;if((i+j)%2){const t=new THREE.CylinderGeometry(3,3,22,3,1,true);t.translate(x,43,z);G.push(colorize(t,new THREE.Color('#4f9a36')));Y(10,10,6,x,57,z,i<2?'#d8302a':'#ffd12c',5)}else{const c=new THREE.ConeGeometry(15,20,5,1,true);c.translate(x,42,z);G.push(colorize(c,new THREE.Color('#2f7a2a')))}}
+ return LDS_fit(G,old,80)}
+// dumpster (swap 6): LEGO brick-built dumpster (as in LEGO City garbage sets): dark green 2x4 body two bricks high (80x48x40 LDU), black 2x4 tile lid
+// tilted open a little, 2 black handle bars (bar holders) and 4 black 1x1 round wheels; replaces the Kenney CC0 'dumpster' (234 tris)
+function LDS_dumpster(old){const G=[],B=(w,h,d,x,y,z,c,rx)=>{const g=new THREE.BoxGeometry(w,h,d);if(rx)g.rotateX(rx);g.translate(x,y,z);G.push(colorize(g,new THREE.Color(c)))};
+ B(80,48,40,0,32,0,'#2a7a4a');B(84,4,44,0,59,-2,'#2f3640',-.12);B(84,6,4,0,44,22,'#2a7a4a');B(4,4,8,-40,40,0,'#2f3640');B(4,4,8,40,40,0,'#2f3640');
+ for(const x of[-30,30])for(const z of[-14,14])B(8,8,8,x,4,z,'#2f3640');return LDS_fit(G,old,80)}
+// Athens street lamp (swap 8): the same LEGO 2039 lamp post in Athens' dark grey; R1 (kmProps) scales it to 5.5 m like the old Kenney lamp
+LDS.LA=[[168,'#4a4a44'],[191,'#ffe9a0'],[999,'#2e302c']];
+kmProps=(f=>function(D){const r=f.apply(this,arguments);const d=D.lamp;if(CID==='ath'&&d&&d.lds==='lamp'&&!d.athFix){d.athFix=1;d.mat.color.set('#ffffff');const k=5.5/7.43;d.gOld=d.gOld.clone().scale(k,k,k);d.mOld=d.mOld.clone();d.mOld.color=new THREE.Color('#5a5a52')}return r})(kmProps);
+LDS.SW={planter:[LDS_planter,'LEGO flower bed 3020+33291+6255'],dumpster:[LDS_dumpster,'LEGO brick dumpster']};
+kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='fra')return r;for(const t in LDS.SW){const d=D[t];if(!d||d.lds)continue;try{const old=LDS_tri(d.g);d.gOld=d.g;d.mOld=d.mat;d.g=LDS.SW[t][0](d.g);
+  d.mat=LDS.mat||(LDS.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0}));d.lds=t;if(LDS.st)LDS.st[t]={src:LDS.SW[t][1],old,near:LDS_tri(d.g),far:LDS_tri(d.g)}}catch(e){console.warn('LDS '+t,e)}}return r})(kmProps);
+// Athens palm (swap 7, Syntagma race palms, TRK.tree 'palm'): LEGO palm as built in set 6376 Breezeway Cafe (ld/land/l_palm.ldr, OMR, CCAL 2.0):
+// 2563 base (r 20 LDU), stacked 2536 trunk segments (r 11 -> 14 each), 2566 top and 4 x 2518 Palm Leaf Large (176 LDU long, 90 wide, drooping 43);
+// trunk = 5-sided lathe of that profile, each leaf = 2-sided quad + tip triangle; scaled to the old 9.5 m trunk. Replaces athTreeBy0('palm') (108 tris).
+LDS.PALM={p:[[20,0],[20,38],[11,40],[14,98],[11,100],[14,160],[11,162],[14,198],[0,216]],k:9.5/198};
+function LDS_palm(){const{p,k}=LDS.PALM,g=new THREE.LatheGeometry(p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),5).toNonIndexed(),q=g.attributes.position,V=[],C=[],tb=new THREE.Color('#6b4a2a'),lf=new THREE.Color('#2f8a3a');
+ for(let i=0;i<q.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(q,i),b=new THREE.Vector3().fromBufferAttribute(q,i+1),d=new THREE.Vector3().fromBufferAttribute(q,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()<1e-12)continue;V.push(a,b,d);for(let j=0;j<3;j++)C.push(tb.r,tb.g,tb.b)}
+ const y0=204*k,tri=(a,b,d)=>{for(const T of[[a,b,d],[a,d,b]]){V.push(...T);for(let j=0;j<3;j++)C.push(lf.r,lf.g,lf.b)}};
+ for(let i=0;i<4;i++){const ang=i*Math.PI/2+Math.PI/4,cx=Math.cos(ang),cz=Math.sin(ang),P=(r,w,y)=>new THREE.Vector3((cx*r-cz*w)*k,y0+y*k,(cz*r+cx*w)*k);
+  const a=P(4,-10,0),b=P(4,10,0),c=P(80,45,6),d=P(80,-45,6),t=P(176,0,-43);tri(a,b,c);tri(a,c,d);tri(d,c,t)}
+ const G=new THREE.BufferGeometry().setFromPoints(V);G.setAttribute('color',new THREE.Float32BufferAttribute(C,3));G.computeVertexNormals();G.computeBoundingBox();G.computeBoundingSphere();G.userData.ldsPalm=1;return G}
+ART_athTreeBy=(f=>function(k){if(k==='palm'&&!LDS.palmOff)try{const g=LDS_palm();LDS.palm=g;LDS.st=LDS.st||{};LDS.st.palm={src:'6376 palm',old:108,near:LDS_tri(g),far:LDS_tri(g)};return g}catch(e){console.warn('LDS palm',e)}return f.apply(this,arguments)})(ART_athTreeBy);
 // LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
 function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
  for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
 // test hook (before/after shots of the same spot): ab(1) draws the old trees again
-function LDS_ab(off){for(const DL of['lamp','fence','crate'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
-window.__ld.lds=LDS;window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
+function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
+window.__ld.lds=LDS;LDS.race=t=>setupRace({type:'attract',laps:99,traffic:0,items:false,aggr:0,track:t,mood:(TRACK_DEFS.find(d=>d.id===t)||{}).mood||'brick'});LDS.cam=()=>camera;LDS.palm0=()=>athTreeBy0('palm');window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
 // ---- LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module
 // (window.__LDQ, run here at boot) and window.__LDX (chunk urls, mesh key -> chunk, preset -> models). The meshes + brick lists of each model live in
 // models/<id>.js and load on demand: a ride when it is selected/equipped or its thumbnail is drawn, world props when their city builds, and at boot
@@ -13688,7 +13722,7 @@ window.__ld.need=LD_need;window.__ld.L=LDL;window.__ld.probe=LD_probe;window.__l
 // (CT_dim, read by OB_cdim). A model missing from models.js (lazy load not finished) falls back to the old procedural kind (CT_FB).
 const CT={geo:{},dim:{},fb:{},stat:[]};
 // slot swaps (after QS/SU swaps): name → new kind. Frankfurt: 0 sedan,1 hypercar,2 taxi,3 van,4 truck,5 delivery,6 police,7 coupe,8 bus,9 tuner,10 roadster
-const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1',/* v90e: Big Rig (3.84 m wide) dropped from traffic until a lane-fit shot proves it (integrator) */
+const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1','truck':'ld:truck:v3221_1',/* rescue-1: Big Rig back; it keeps its lane via CT_wide below (v90e had dropped it: 3.84 m wide, lane fit unproven) */
   'delivery':'ld:delivery:v60054_1','police':'ld:police:v4436_1','su:t_sc_tm':'ld:car:v75893_1b'},
  ath:{'taxi':'ld:car:tx','sedan':'ld:car:v6633_1','van':'ld:van:v7639_1',/* su:t_sc_tm kept: swapping it together with the taxi added ~110 MB JS heap in Athens (cause open, docs/HANDOFF_city1.md) */'delivery':'ld:delivery:v60054_1','su:t_sc_hy':'ld:car:v75892_1'}};
 if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];const ex=(location.search.match(/[?&]ctx=([^&]*)/)||[])[1]||'';/* test: ctx=<old kinds kept> */for(let i=0;i<HCAR.length;i++){const v=!ex.split(',').includes(HCAR[i])&&S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
@@ -13715,8 +13749,25 @@ CR_cityGeo=(f=>function(nm){if(!nm||!nm.startsWith('ld:'))return f(nm);if(CR_CG[
 CR_cityPost=(f=>function(im,nm,k,n){f(im,nm,k,n);if(!nm||!nm.startsWith('ld:')||!CR_CG[nm])return;im.userData.sc=1;/* true scale: the 96 SC width cap must not squeeze it */const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)})(CR_cityPost);
 // collision half sizes [half width, half length] of a kind, from its own model (OB_cdim reads this first)
 function CT_dim(k){const n=HCAR[k];return n&&CT.dim[n]&&CR_CG[n]?CT.dim[n]:null}
+// ---- CT_wide (rescue-1): lane fit for traffic wider than a lane (the 3221 Big Rig, 3.84 m incl. mirrors). Traffic drives at c.lane × road width W
+// off the centre line (.36 W), which puts a rig over the kerb or the centre line on roads under ~11 m. A wide kind instead: (1) drives at the offset that
+// keeps it between the centre line (+.15 m) and the kerb (−.3 m), (2) only uses road segments wide enough for that (W ≥ 4·hw + 1), choosing its next
+// segment among those (U-turn back the way it came at a dead end) and (3) spawns on one. Junction segments (W 0) keep lane 0 like every car.
+const CT_WD={hw:1.3,st:{n:0,re:0,ut:0,bad:0}};
+function CT_segW(N,a,b){const A=N[a],B=N[b];if(!A||!B)return 0;return A.ab||A.g||B.g?99:Math.min(A.w||20,B.w||20)}
+function CT_wideHw(c){const n=HCAR[c.k],d=n&&CT.dim[n]&&CR_CG[n]?CT.dim[n]:null;return d&&d[0]>CT_WD.hw?d[0]:0}
+function CT_wideOk(N,a,b,hw){return CT_segW(N,a,b)>=4*hw+1}
+buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);try{const N=HUB.nodes,C=HUB.cars;if(!N||!C)return r;const W=[];
+ for(let i=0;i<N.ng;i++)for(const n of N[i].nb||[])if(n<N.ng&&CT_segW(N,i,n)>=9&&CT_segW(N,i,n)<99)W.push([i,n]);
+ for(const c of C){const hw=CT_wideHw(c);if(!hw)continue;CT_WD.st.n++;if(!CT_wideOk(N,c.a,c.b,hw)&&W.length){const q=W[(c.j*7919+c.k*31)%W.length];c.a=q[0];c.b=q[1];c.t=.5;CT_WD.st.re++}c._wa=c.a}}catch(e){console.warn('CT wide',e)}return r})(buildHubTraffic);
+hubTrafficStep=(f=>function(dt){const r=f.apply(this,arguments);try{const N=HUB.nodes,C=HUB.cars;if(!N||!C)return r;
+ for(const c of C){const hw=CT_wideHw(c);if(!hw||c.route)continue;
+  if(c.a!==c._wa){/* just turned onto a new segment: keep to wide roads */if(!CT_wideOk(N,c.a,c.b,hw)){const nx=(N[c.a].nb||[]).filter(n=>n<N.ng&&n!==c._wa&&CT_wideOk(N,c.a,n,hw)&&!QS_shut(c.a,n));
+    if(nx.length)c.b=nx[(c.j+c.a)%nx.length];else{c.b=c._wa;CT_WD.st.ut++}}c._wa=c.a}
+  const w=CT_segW(N,c.a,c.b);if(w>=99)continue;if(!CT_wideOk(N,c.a,c.b,hw))CT_WD.st.bad++;c.lane=Math.max((hw+.15)/w,Math.min(.36,.5-(hw+.3)/w))}}catch(e){}return r})(hubTrafficStep);
 window.__ct={CT,swap:CT_SWAP,hcar:()=>HCAR.slice(),geo:nm=>CR_cityGeo(nm),r:()=>renderer,
  cars:()=>(HUB.cars||[]).filter(c=>!(c.dead>0)&&c.x!=null).map(c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];return{nm:HCAR[c.k],x:c.x,z:c.z,y:c.y||0,h:A&&B?Math.atan2(B.x-A.x,B.z-A.z):0,d:Math.hypot(c.x-RO.x,c.z-RO.z)}}).sort((a,b)=>a.d-b.d),
+ wide:()=>{const N=HUB.nodes,o=[];for(const c of HUB.cars||[]){const hw=CT_wideHw(c);if(!hw)continue;const w=CT_segW(N,c.a,c.b);o.push({hw:+hw.toFixed(2),W:w,lane:+c.lane.toFixed(3),off:+(c.lane*w).toFixed(2),kerb:+(w/2-c.lane*w-hw).toFixed(2),mid:+(c.lane*w-hw).toFixed(2),x:c.x,z:c.z})}return{st:CT_WD.st,cars:o}},
  freeze:on=>{if(on){if(!CT.hts){CT.hts=hubTrafficStep;hubTrafficStep=()=>{}}}else if(CT.hts){hubTrafficStep=CT.hts;CT.hts=null}}};
 // ---- CTB (city-1): BUILDINGS. The generic filler buildings (Frankfurt: the Kenney street rows/frontage via putK; Athens: the small 'plaka'
 // houses and villas via put) become real LEGO sets at minifig scale (LD_SW × LD_FIG: a figure fits the door). A filler slot is filled along its
@@ -13787,7 +13838,10 @@ window.__ctb={CTB,pos:()=>({x:RO.x,z:RO.z}),V:CTB_V,stat:()=>({...CTB.st,kinds:O
 // Traffic / other code can use SZ_k(bricks) (1 or 1.6) and SZ_add(bricks) to get the same scale.
 const RSZ={MS:['30313','30572','3179','3180','3221','4436','4914','60017','60054','60059','60083','7639','7731'],k:LD_FIG,fig:2.36};
 GB_PC.drvM={n:'Minifig driver',w:2,d:2,h:9,ic:'🧑',hide:1};
-function SZ_k(B){return(B||[]).some(b=>b&&(b.t||b[0])==='drvM')?RSZ.k:1}
+// rescue-1 (Alex: "we don't skip work that has already been done"): the RACERS group (7611/7612/7613/8120/8121) are 4-wide tiny-scale sets. A hidden 'szR'
+// marker scales them ×RSZ.rk (2: 4 studs at 2× = the 8-wide Speed Champions width, a car next to traffic). Their cockpits are closed canopies: no driver.
+RSZ.rk=2;GB_PC.szR={n:'Racers scale',w:1,d:1,h:1,ic:'🏁',hide:1};
+function SZ_k(B){let k=1;for(const b of B||[]){const t=b&&(b.t||b[0]);if(t==='drvM')return RSZ.k;if(t==='szR')k=RSZ.rk}return k}
 // the driver sits behind the steering wheel ('stw', r 2 = facing -z like the LDraw sets, r 0 = +z), 3 plates under it
 function SZ_add(B){if(!Array.isArray(B)||!B.length||SZ_k(B)>1)return B;const w=B.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');const A=B.slice();
  if(w){const r=w.r&2?2:0;A.push({t:'drvM',x:w.x,z:r?w.z+1:w.z-2,y:w.y-3,r,m:0,c:'#0055bf'})}else A.push({t:'drvM',x:-1,z:-1,y:-99,r:2,m:0,c:'#0055bf',hide:1});return A}
@@ -13796,12 +13850,14 @@ GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);cons
  const s=1.5*(typeof SC_S!=='undefined'&&SC_S&&SC_S.drv?SC_K.drv:1),k=RSZ.fig;
  for(const[A,D]of[[tm,M],[tl,L]])for(const g of A){g.translate(0,-(.74-.42*s),1.55);g.scale(k/s,k/s,k/s);g.translate(0,.1,.25);D.push(g)}})(GB_piece);
 // a driver brick with no wheel to sit behind is only the scale marker
-GB_brickGeo=(f=>function(b){if(b&&b.t==='drvM'&&b.y<=-90)return;return f.apply(this,arguments)})(GB_brickGeo);
+GB_brickGeo=(f=>function(b){if(b&&(b.t==='szR'||b.t==='drvM'&&b.y<=-90))return;return f.apply(this,arguments)})(GB_brickGeo);
 RSZ.mini=S=>!!(S&&S.car&&/^t_v/.test(S.id)&&S.ref&&!LD_SCRE.test(S.ref));// v90f: every LDraw City/Town ride (shared rule LD_SCRE), not a fixed list
-for(const S of GAR_SETS)if(RSZ.mini(S)){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
+RSZ.rac=S=>!!(S&&S.grp==='racers');const SZ_rac=B=>Array.isArray(B)&&B.length&&SZ_k(B)===1?B.concat([{t:'szR',x:0,z:0,y:-99,r:0,m:0,c:'#000000',hide:1}]):B;
+for(const S of GAR_SETS)if(RSZ.rac(S)){const c=S.car;S.car=function(){return SZ_rac(c.apply(this,arguments))};S.ms=2}
+for(const S of GAR_SETS)if(!RSZ.rac(S)&&RSZ.mini(S)){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
 // saved copies of these rides (bricks stored before this fix) get the driver too
-G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?SZ_add(B):B})(G9C_bricks);
-gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
+G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?(S.ms===2?SZ_rac(B):SZ_add(B)):B})(G9C_bricks);
+gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=S.ms===2?SZ_rac(t.gbB):SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
 // the ride scale: uniform, no width squeeze for brick rides; driver height checks use the same k
 GB_attach=(f=>function(g,bricks){const r=f.apply(this,arguments);try{if(g&&g.userData){g.userData.szK=SZ_k(bricks);g.userData.szB=!!(bricks&&bricks.length)}}catch(e){}return r})(GB_attach);
 SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(ud.szB||ud.szK>1))return f.apply(this,arguments);SC_fold(ud);
@@ -14126,6 +14182,12 @@ if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)retur
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90g',id:'rides16',text:'Garage → RIDES: Street Sweeper, Fire Truck (4208), Tow Rig, Recycle Truck, Red Line Racer, Diesel Daredevil, Classic Patrol, Tow Truck (7638), Highway Bike, Z06 Racer, Repair Truck, Tipper Lorry, Sport Coupe, Road Rebel, Trail Ranger, Diesel Dumper: each looks complete; drive two.'},
+ {ver:'v90g',id:'racers',text:'Garage → RIDES: the filter chip cycles ALL → OWNED → ★ FAVS → 🏁 RACERS; RACERS shows the five tiny racers (Tiny Patrol, Tiny Muscle, Track Racer, Rally Sprinter, Track Marshal), car-sized on the road.'},
+ {ver:'v90g',id:'fra-props',text:'Frankfurt: Pizza To Go shop (a person fits through the door), a phone booth, the LEGO fountain on a lawn, and a speedboat IN the river.'},
+ {ver:'v90g',id:'ath-display',text:'Athens: the little lighthouse and the house stand on low display plinths, true LEGO size (not blown up).'},
+ {ver:'v90g',id:'bigrig',text:'Frankfurt: drive 2 minutes: the yellow Big Rig appears in traffic only on wide roads and never cuts a kerb or a corner.'},
+ {ver:'v90g',id:'land2',text:'Frankfurt planters/dumpsters, Athens street lamps and the Syntagma race palms look like LEGO parts; both cities run as smoothly as before.'},
  {ver:'v90f',id:'town-fwd',text:'Equip Town Roadster, then Ladder Truck: the bonnet/cab points forward and the car drives forwards.'},
  {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker look complete; drive two of them.'},
  {ver:'v90f',id:'w4956',text:'Frankfurt: a LEGO House (4956) stands by a street near the start; a person fits through its door.'},
