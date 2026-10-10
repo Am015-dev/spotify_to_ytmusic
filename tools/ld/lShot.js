@@ -17,11 +17,12 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
    D.g.computeBoundingBox();const h=D.g.boundingBox.max.y-D.g.boundingBox.min.y,sz=Math.max(D.g.boundingBox.max.x-D.g.boundingBox.min.x,D.g.boundingBox.max.z-D.g.boundingBox.min.z);
    const x0=__mho.RO?__mho.RO.x:2061,z0=__mho.RO?__mho.RO.z:0,M=new THREE.Matrix4(),S=new THREE.Vector3(),Q=new THREE.Quaternion(),c=[];
    for(const o of ms)for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);const P=new THREE.Vector3();M.decompose(P,Q,S);if(S.x<.05)continue;c.push({o,i,P,s:S.y,d:Math.hypot(P.x-x0,P.z-z0)})}
-   c.sort((a,b)=>a.d-b.d);const R=new THREE.Raycaster(),objs=__art.scene.children;R.camera=__ld.lds.cam();let tried=0;
+   c.sort((a,b)=>a.d-b.d);const R=new THREE.Raycaster(),objs=[];R.camera=__ld.lds.cam();__art.scene.traverseVisible(o=>{const g=o.geometry;if(!o.isMesh||!g||!g.attributes.position||!g.attributes.position.array||(g.index&&!g.index.array))return;for(const k in g.attributes)if(!g.attributes[k].array)return;objs.push(o)});// meshes with CPU data (some arrays are freed after upload)
+   let tried=0;
    for(const q of c.slice(0,80)){const H=h*q.s,Dd=Math.max(7,H*1.3,sz*q.s*2),ty=q.P.y+Math.min(H*.45,1.2+H*.3),tgt=new THREE.Vector3(q.P.x,ty,q.P.z);
     for(let k=0;k<12;k++){tried++;const a=k*Math.PI/6,cam=new THREE.Vector3(q.P.x+Math.cos(a)*Dd,q.P.y+1.5,q.P.z+Math.sin(a)*Dd),dir=tgt.clone().sub(cam),L=dir.length();dir.normalize();
-     R.set(cam,dir);R.far=L+sz*q.s;const h1=R.intersectObjects(objs,true).find(x=>x.object.visible);if(!h1||h1.object!==q.o||h1.instanceId!==q.i)continue;
-     R.set(tgt,dir.clone().negate());R.far=L;const h2=R.intersectObjects(objs,true).filter(x=>x.object!==q.o&&x.object.visible&&!x.object.isSprite);if(h2.length)continue;
+     R.set(cam,dir);R.far=L+sz*q.s;const h1=R.intersectObjects(objs,false).find(x=>x.object.visible);if(!h1||h1.object!==q.o||h1.instanceId!==q.i)continue;
+     R.set(tgt,dir.clone().negate());R.far=L;const h2=R.intersectObjects(objs,false).filter(x=>x.object!==q.o&&x.object.visible&&!x.object.isSprite);if(h2.length)continue;
      return{cam:[cam.x,cam.y,cam.z,tgt.x,tgt.y,tgt.z],at:[q.P.x,q.P.y,q.P.z].map(v=>+v.toFixed(1)),H:+H.toFixed(2),D:+Dd.toFixed(1),tried,n:c.length}}}
    return{err:'no clear view',tried,n:c.length}},t);
   console.log('SPOT',t,JSON.stringify(r));if(r.err)continue;
