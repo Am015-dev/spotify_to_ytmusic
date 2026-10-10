@@ -95,7 +95,7 @@ function SL_lift(copy,rot){if(!SL.sel.length)return;const L=GB_list(),A=SL.sel[0
  const parts=SL.sel.map(o=>({...o,dx:o.x-A.x,dz:o.z-A.z,dy:o.y-A.y}));if(copy)for(const p of parts)delete p.g;
  if(!copy)GB.d.bricks=L.filter(o=>!SL.sel.includes(o));SL.carry={parts,copy,snap,x:A.x,z:A.z,y:A.y,bad:0};SL.sel=[];GB_refresh();
  if(rot)SL_rot();else SL_fitAt(A.x,A.z,A.y);try{AU.sfx('pick')}catch(e){}GS_tip(copy?'Copy · tap where it goes, then ✔ PLACE':'Tap where it goes, then ✔ PLACE');SL_ui()}
-const SL_at=(C,x,z,y)=>C.parts.map(p=>({t:p.t,x:x+p.dx,z:z+p.dz,y:y+p.dy,r:p.r,m:p.m,c:p.c,g:p.g}));
+const SL_at=(C,x,z,y)=>C.parts.map(p=>({t:p.t,x:x+p.dx,z:z+p.dz,y:y+p.dy,r:p.r,m:p.m,c:p.c,g:p.g,ox:p.ox,oy:p.oy,oz:p.oz}));
 function SL_clash(b,list){const[fw,fd]=SL_dims(b),h=SL_h(b);let bmax=-1e9,fl=1e9;for(const k in GB_.base){bmax=Math.max(bmax,GB_.base[k]);fl=Math.min(fl,GB_.base[k])}if(b.y<fl||b.y+h>bmax+GB_CAP)return 1;
  for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){if(i<GB_N0||i>GB_N1||j<GB_Z0||j>GB_Z1)return 1;const s=GB_.base[i+','+j];if(s!=null&&s>b.y)return 1}
  for(const o of list)if(SL_ov(o,b)&&o.y<b.y+h&&o.y+SL_h(o)>b.y)return 1;return 0}

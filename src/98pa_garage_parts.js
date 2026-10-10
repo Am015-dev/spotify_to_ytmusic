@@ -20,7 +20,7 @@ const PA_h=b=>(GB_PC[b.t]||{h:1}).h;
 const PA_ov3=(a,b)=>SL_ov(a,b)&&a.y<b.y+PA_h(b)&&a.y+PA_h(a)>b.y;
 // a brick list → a part: offsets from its lowest/front-left corner, no group ids
 function PA_norm(G){const mx=Math.min(...G.map(b=>b.x)),mz=Math.min(...G.map(b=>b.z)),my=Math.min(...G.map(b=>b.y));
- return G.map(o=>({t:o.t,x:o.x-mx,z:o.z-mz,y:o.y-my,r:o.r||0,m:o.m?1:0,c:o.c}))}
+ return G.map(o=>({t:o.t,x:o.x-mx,z:o.z-mz,y:o.y-my,r:o.r||0,m:o.m?1:0,c:o.c,ox:o.ox,oy:o.oy,oz:o.oz}))}
 
 // ---------- TILES (Tiles tab): new parts + geometry; existing tile-like parts move into the tab
 Object.assign(GB_PC,{t18:{n:'Tile 1×8',w:1,d:8,h:1,g:'T',ic:'▭'},t23:{n:'Tile 2×3',w:2,d:3,h:1,g:'T',ic:'▭'},t26:{n:'Tile 2×6',w:2,d:6,h:1,g:'T',ic:'▭'},
