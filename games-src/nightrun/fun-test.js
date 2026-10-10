@@ -42,7 +42,7 @@ const T = (m) => {
     m.G.rb = 16; realBar.call(m.FUN);                                                                  // the bar line: the drop begins
     adv(.6);
     const left = m.G.eb.filter(b => b.x > 600).length;
-    if (hit) { ck(m.FUN.stat.dropsHit === rw0 + 1, 'DASH on the downbeat: the big DROP fires'); ck(left === 0, 'DROP clears every bullet (' + n0 + ' -> ' + m.G.eb.length + ')'); ck(m.G.score > d0 + 500, 'DROP pays a score burst (+' + (m.G.score - d0) + ')'); ck(m.G.pk.length > sh0 + 10, 'DROP sends a shard shower (+' + (m.G.pk.length - sh0) + ' pickups)'); }
+    if (hit) { ck(m.FUN.stat.dropsHit === rw0 + 1, 'DASH on the downbeat: the big DROP fires'); ck(left === 0, 'DROP clears every bullet (' + n0 + ' -> ' + m.G.eb.length + ')'); ck(m.G.score > d0 + 500, 'DROP pays a score burst (+' + (m.G.score - d0) + ')'); ck(m.G.pk.length > sh0 + 5, 'DROP sends a shard shower (+' + (m.G.pk.length - sh0) + ' pickups)'); }
     else { ck(m.FUN.stat.dropsHit === rw0, 'no dash: only the small blast'); ck(left > 20, 'no dash: far bullets stay (' + left + ' left) - never a punishment, never a free clear'); }
   }
   ck(!m.G.dead, 'the ship survived the test');

@@ -29,9 +29,9 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
     if(hit){this.stat.dropsHit++;let k=0;for(const b of G.eb){G.score+=5;k++;}G.eb=[];
       for(const e of G.en)if(e.type!=='boss'&&e.x<W-10){e.hp-=22;e.flash=.2;}
       const pts=800*T*(1+Math.min(3,Math.floor(G.rb/16)));G.score+=pts;tierSet(C.n+3,'drop');
-      G.flash=Math.max(G.flash,.55*FX());shake(14);PW.st().wv=.8;banner('DROP!','+'+pts,false,1.5);floater(P.x,P.y-36,'DROP! ×'+T,'#b36bff');
+      G.flash=Math.max(G.flash,.55*FX());shake(14);PW.st().wv=.7;banner('DROP!','+'+pts,false,1.5);floater(P.x,P.y-36,'DROP! ×'+T,'#b36bff');
       this.shardShower(14+4*T);AU.sfx('big');try{const a=AU.a;if(a&&a.state==='running'){AU.noise(a.currentTime,.7,.35,300,AU.fx,'lowpass');AU.osc(a.currentTime,'sine',140,.5,.6,AU.fx,30);}}catch(e){}this.stat.rewards++;}
-    else{let k=0;G.eb=G.eb.filter(b=>{if(Math.hypot(b.x-P.x,b.y-P.y)<230){G.score+=5;return false;}return true;});   // a miss: only the bullets close to the ship vanish
+    else{let k=0;if(!HARD)G.eb=G.eb.filter(b=>{if(Math.hypot(b.x-P.x,b.y-P.y)<170){G.score+=5;return false;}return true;});   // a miss: only the bullets close to the ship vanish
       G.flash=Math.max(G.flash,.2*FX());PW.st().wv=.5;floater(P.x,P.y-36,'DROP','#8c86b8');}
     NR.emit('drop',{hit});},
   tick(dt){if(!G.live||G.dead)return;
