@@ -22,5 +22,10 @@ LD_br=(f=>function(id){if(!LD_MODELS[id]&&LDL.X.c[id]){if(LDL.miss)LDL.miss.add(
 GAR_select=(f=>function(id){const S=GAR_set(id),G=GAR_get();if(!GAR_owned(S))return f.apply(this,arguments);
  const m=LD_probe(()=>[].concat(GAR_arr(S.car()),GAR_arr(S.off()),GAR_arr(S.boat()),G.br[id]||[]));if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>{f(id);LD_redraw()})})(GAR_select);
 G9C_equip=(f=>function(S,fm){if(!GAR_owned(S))return f.apply(this,arguments);const m=LD_probe(()=>G9C_bricks(S,fm));if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>f(S,fm));return 1})(G9C_equip);
-G9C_render=(f=>function(S,fm){const m=LD_probe(()=>G9C_bricks(S,fm));if(m.length){LDL.rd=1;LD_need(m);return null}return f.apply(this,arguments)})(G9C_render);
+// the first unloaded thumbnail fetches every ride at once (one redraw when all are in, not one per ride)
+G9C_render=(f=>function(S,fm){const m=LD_probe(()=>G9C_bricks(S,fm));if(m.length){LDL.rd=1;LD_need(m.concat(...Object.values(LDL.X.s)));return null}return f.apply(this,arguments)})(G9C_render);
+// BUILD on a ride whose model is still loading: enter once it is in (GAR_select above swaps the bricks first)
+GB_enter=(f=>function(){if(!LDL.wait.size)return f.apply(this,arguments);const t=this,a=arguments;Promise.all([...LDL.wait.values()].map(w=>w.p)).then(()=>setTimeout(()=>f.apply(t,a),0))})(GB_enter);
+// garage-17 (98fb_form_build.js): BUILD on an OFF-ROAD / WATER ride copies S.off() / S.boat() into the builder; wait for its model first
+FB_begin=(f=>function(S,fm){const m=S&&typeof S[fm]==='function'?LD_probe(()=>GAR_arr(S[fm]())):[];if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>{f(S,fm);LD_redraw()});return 1})(FB_begin);
 window.__ld.need=LD_need;window.__ld.L=LDL;window.__ld.probe=LD_probe;window.__ld.sel=id=>GAR_select(id);window.__ld.set=id=>GAR_set(id);window.__ld.gar=()=>GAR_get();// test hooks
