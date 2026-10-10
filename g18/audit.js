@@ -33,7 +33,7 @@ const ONLY=process.argv[4]?process.argv[4].split(','):null;
   for(let i=0;i<40;i++){await p.waitForTimeout(500);const s=JSON.parse(await ev(`JSON.stringify({w:LDL.wait.size,ba:BA.on})`));if(!s.w&&!s.ba&&i>3)break}
   await p.waitForTimeout(600);
   const r=JSON.parse(await ev(M));
-  const th=await p.evaluate(id=>{const i=document.querySelector(`#g9Col .g9Card[data-gc="${id}"] img`);return i&&i.src&&i.src.startsWith('data:')?i.src:null},id);
+  const th=await p.evaluate(id=>{const i=document.querySelector(`#g9Col .g9Card[data-gc="${id}"] img`);if(!i||!i.complete||!i.naturalWidth)return null;if(i.src.startsWith('data:'))return i.src;const c=document.createElement('canvas');c.width=i.naturalWidth;c.height=i.naturalHeight;c.getContext('2d').drawImage(i,0,0);try{return c.toDataURL()}catch(e){return null}},id);
   const f=`${OUT}/${ty}_${id}`;if(th)fs.writeFileSync(f+'_th.png',Buffer.from(th.split(',')[1],'base64'));
   // stage only (hide the RIDES panel? keep the real view: the panel is what Alex sees)
   await p.screenshot({path:f+'.png'});
