@@ -1,12 +1,12 @@
 import re
 h=open('head.html').read()
 extra=open('extra.css').read()+'\n'+open('../shell/shell.css').read()+'\n'+open('layout.css').read()+'\n'+open('polish.css').read()
-extra+='\n'+open('phone.css').read()+'\n'+open('board.css').read()+'\n'+open('../shell/gx-campaign.css').read()+'\n'+open('campaign.css').read()+'\n'+open('../shell/gx-help.css').read()+'\n'+open('../shell/gx-tutor.css').read()
+extra+='\n'+open('phone.css').read()+'\n'+open('board.css').read()+'\n'+open('../shell/gx-skin.css').read()+'\n'+open('skin.css').read()+'\n'+open('../shell/gx-campaign.css').read()+'\n'+open('campaign.css').read()+'\n'+open('../shell/gx-help.css').read()+'\n'+open('../shell/gx-tutor.css').read()
 h=h.replace('</style>',extra+'\n</style>')
 h=h.replace('</head>','<script>\n'+open('phboot.js').read()+'\n</script>\n</head>',1)
 b=open('body2.html').read()
-SRC={'shell.js':'../shell/shell.js','perfhud.js':'../perf/perfhud.js','gameaudio.js':'../audio/gameaudio.js','audio-data.js':'../audio/crown/audio-data.js','trystero.min.js':'../net/trystero.min.js','netroom.js':'../net/netroom.js','gx-music.js':'../shell/gx-music.js','gx-campaign.js':'../shell/gx-campaign.js','gx-viewport.js':'../shell/gx-viewport.js','gx-help.js':'../shell/gx-help.js','gx-tutor.js':'../shell/gx-tutor.js'}
-for f in ['shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-music.js','gx-campaign.js','campaign-data.js','media-data.js','perfhud.js','data.js','engine.js','ai.js','three.min.js','exp.js','art.js','three3d.js','gameaudio.js','audio-data.js','sound.js','trystero.min.js','netroom.js','net.js','story.js','ui.js','ui-ph.js','board.js','brief.js','media.js','campaign.js','paint.js','hlp.js','tutor.js']:
+SRC={'shell.js':'../shell/shell.js','perfhud.js':'../perf/perfhud.js','gameaudio.js':'../audio/gameaudio.js','audio-data.js':'../audio/crown/audio-data.js','trystero.min.js':'../net/trystero.min.js','netroom.js':'../net/netroom.js','gx-music.js':'../shell/gx-music.js','gx-campaign.js':'../shell/gx-campaign.js','gx-viewport.js':'../shell/gx-viewport.js','gx-help.js':'../shell/gx-help.js','gx-tutor.js':'../shell/gx-tutor.js','gx-skin.js':'../shell/gx-skin.js'}
+for f in ['shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-skin.js','gx-music.js','gx-campaign.js','campaign-data.js','media-data.js','perfhud.js','data.js','engine.js','ai.js','three.min.js','exp.js','art.js','three3d.js','gameaudio.js','audio-data.js','sound.js','trystero.min.js','netroom.js','net.js','story.js','ui.js','ui-ph.js','board.js','brief.js','media.js','campaign.js','paint.js','hlp.js','tutor.js']:
     b=b.replace(f'<script src="{f}"></script>','<script>\n'+(('window.CAMPAIGN = '+__import__('json').dumps(__import__('json').load(open('campaign.json',encoding='utf-8')),separators=(',',':'),ensure_ascii=False)+';') if f=='campaign-data.js' else ('window.CC_MEDIA = '+open('../../games/crown-city-smash/media/media.json').read().strip()+';') if f=='media-data.js' else (lambda t:'!'+t[t.index('),')+2:])(open('../node_modules/three/build/three.min.js').read()) if f=='three.min.js' else open(SRC.get(f,f)).read())+'\n</script>')
 out=h+b
 open('kot2.html','w').write(out)

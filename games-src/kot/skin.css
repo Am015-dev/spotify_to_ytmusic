@@ -1,0 +1,71 @@
+/* Crown City Smash skin (facelift): painted kit wired by gx-skin.css/js (dark panels); Crown-specific selectors live here. */
+html.sk{--sk-ink:#f3e9ff;--sk-cream:#fbefd6}
+/* light ink + dark glass inside every painted panel */
+html.sk #modal .dlg:not(.paper),html.sk .gx-drawer,html.sk .gx-dock-head{--ink:#f3e9ff;--ink2:#e6d9f2;--muted:#cdbddb;--card:rgba(22,8,50,.62);--paper:#2a1650;color:#f3e9ff}
+html.sk .gx-drawer h3,html.sk #modal .dlg:not(.paper) h3{color:#ffd9f0}
+html.sk .gx-drawer-head h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.7)}
+/* top bar */
+html.sk header.gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241048;border-bottom:0;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+html.sk header.gx-bar::before{display:none}
+/* icon buttons: phone = round metal knobs, desktop = labelled power pills */
+html.sk header.gx-bar .gx-ibtn.btn{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#f6ecff;min-height:44px;padding:0 2px;font-size:.9rem;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk header.gx-bar .gx-ibtn.btn:hover:not([disabled]){box-shadow:none;filter:drop-shadow(0 0 6px rgba(255,140,220,.8))}
+html.sk header.gx-bar .gx-ibtn[aria-expanded="true"]{background:none;box-shadow:none;filter:drop-shadow(0 0 7px #ffd36a)}
+html.sk.ph header.gx-bar .gx-ibtn.btn{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;width:44px;height:44px;min-width:44px;padding:0;color:#2a1650;text-shadow:none;font-size:0}
+html.sk header.gx-bar .gx-ibtn .ico,html.sk header.gx-bar .gx-ibtn .pz{filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
+html.sk header.gx-bar .gxh-bulb{min-width:44px}
+html.sk .gx-drawer-head .gx-x{background:none;border:0;box-shadow:none;color:var(--sk-cream);font-size:1.8rem}
+html.sk header.gx-bar h1{-webkit-text-stroke:0;text-shadow:0 2px 3px rgba(0,0,0,.75),0 0 10px rgba(255,79,160,.5)}
+/* panels: dialogs over the table + the dock boxes */
+html.sk #modal .dlg:not(.paper){background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;box-sizing:border-box}
+html.sk #modal .dlg.paper{box-shadow:0 14px 26px rgba(0,0,0,.55)}
+html.sk #modal .dlg h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.6)}
+html.sk .cc-hero{margin:-6px -14px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+html.sk .cc-endart{margin:-6px -14px 6px}
+html.sk .dlg.start details.custom{border:2px dashed rgba(243,233,255,.45);background:rgba(20,8,48,.35)}
+html.sk .gx-dock{background:none}
+html.sk .gx-dock-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a1a60;border-bottom:0;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-dock-head .gx-dt{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.7)}
+html.sk .gx-dock #prompt.box,html.sk .gx-dock #choice.box,html.sk .gx-dock #youbox.box,html.sk .gx-dock #coach.box,html.sk .gx-dock #advice.box{background:none;border:22px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/22px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));--ink:#f3e9ff;--ink2:#e6d9f2;--muted:#cdbddb;color:#f3e9ff;padding:0 4px}
+html.sk .gx-dock #prompt .box,html.sk .gx-dock #choice .box{background:rgba(20,8,48,.45);border-color:rgba(243,233,255,.35);box-shadow:none;color:#f3e9ff}
+html.sk #news{color:#f3e9ff}
+/* buttons: cream pill = normal, go (orange) = primary, purple = selected/danger */
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.mini{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#2a1650;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;animation:none}
+html.sk .btn:hover:not([disabled]){box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4)) brightness(1.07)}
+html.sk .btn:active:not([disabled]){box-shadow:none;transform:translateY(2px)}
+html.sk .btn[disabled]{opacity:.5}
+html.sk .btn small{color:inherit;opacity:.85}
+html.sk .btn.primary{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .btn.on,html.sk .btn.danger{border-image-source:url(media/ui-button-power-c.webp);color:#f6ecff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .btn.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .btn.primary:not([disabled]){animation:nudge 1.8s ease-in-out infinite}
+html.sk .btn.rec:not(.primary){outline:0;filter:drop-shadow(0 0 6px #ffd23f) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .btn.mini{min-height:44px;min-width:44px;border-width:0 14px;border-image-width:0 14px;margin-left:.3rem}
+html.sk .btn.sm,html.sk .btn.xs{min-height:44px}
+html.sk .btn.big{min-height:60px}
+html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:0 16px;border-image-width:0 16px}
+html.sk #pacts .btn,html.sk #choice .acts .btn{padding:0 2px}
+html.sk .gx-reopen.btn{color:#f6ecff;border-image-source:url(media/ui-button-power-c.webp)}
+/* menu rows */
+html.sk .btn.mrow{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;color:#f3e9ff;min-height:56px;margin:2px 0;text-align:left;text-shadow:0 1px 2px rgba(0,0,0,.6);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 4px}
+html.sk .btn.mrow small{color:#d7c6e8;opacity:1;font-size:.78rem}
+html.sk .gx-drawer .seg button,html.sk .gx-drawer [data-gxt-slot] .btn{min-height:44px}
+/* story map / chapter sheet inherit dark ink from gx-skin; keep chip text readable */
+html.sk .gxc-btn{min-height:48px}
+/* fixes after first look */
+html.sk .btn{padding:9px 2px}
+html.sk .btn.mini{padding:2px 2px}
+html.sk .btn.mrow{padding:8px 4px 8px 20px}
+html.sk .btn:focus-visible,html.sk header.gx-bar .gx-ibtn:focus-visible{outline:none;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px #ffd36a)}
+html.sk .gx-drawer-head h2{font-size:1.5rem}
+html.sk.ph .dlg .acts:has(>.btn.primary){background:linear-gradient(rgba(30,10,70,0),rgba(30,10,70,.9) 16px)}
+html.sk .gxh-set button,html.sk .gxh-set button.btn{background:none;color:#2a1650;border-width:0 22px}
+html.sk .gxh-set button[aria-pressed=true]{background:none;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+/* dark panels: cream buttons keep dark ink (the shared skin sets light ink for dark mode) */
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{color:#2a1650}
+html.sk .gxc-btn.go{color:#fff8ec}
+html.sk .gxh-ring,html.sk .gxt-ring{border-radius:28px}
+html.sk .gx-dock,html.sk .gx-dock-body{background:linear-gradient(#2b1655,#190a33);--gx-panel:#24114a}
+html.sk .gx-dock #prompt .head,html.sk .gx-dock .head{color:#ff9db1}
+html.sk header.gx-bar h1{background:rgba(22,8,50,.62);padding:2px 12px 0;border-radius:10px}
+html.sk .gx-dock #news,html.sk #news .newsbtn{color:#2a1650}
