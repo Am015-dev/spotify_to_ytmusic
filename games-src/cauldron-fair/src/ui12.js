@@ -1,5 +1,6 @@
 // ===================== part 12: painted extras (bag skins, table cloths, end art, fortune paintings) and music (per screen + the Music picker) =====================
 const MEDIA = 'media/';
+const MODELS = 'models/';
 const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
 const IMG_OK = {};
 const preImg = f => { if (IMG_OK[f] !== undefined) return; IMG_OK[f] = 0; const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };
@@ -101,6 +102,7 @@ document.addEventListener('input', e => { if (e.target && e.target.id === 'mvol'
 function extrasBoot() {
   GX.drawer('musicd', 'Music', h('div#musicbody'));
   ['bag-moss', 'bag-ember', 'end-win', 'end-lose'].forEach(preImg);
+  ['bag', 'chip'].forEach(n => { const i = new Image(); i.src = MODELS + n + '.webp'; });   // 3D sprites, loaded once
   tableApply();
   setInterval(() => { try { sndMusic(); bagApply(); tableApply(); } catch (e) { } }, 800);
 }

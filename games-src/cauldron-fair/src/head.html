@@ -390,6 +390,13 @@ html.ph .gx-dock:has(#qbox:not([hidden])) #promptDock{display:none}
 .bagimg{width:72px;height:72px;display:block;object-fit:contain;filter:drop-shadow(0 4px 4px rgba(0,0,0,.5));transform-origin:50% 90%}
 .bagn{position:absolute;right:-6px;bottom:2px;background:#2d1f3a;color:#fff6dc;border:2px solid #f2b81e;border-radius:12px;font-size:13px;font-weight:900;padding:0 6px;line-height:20px}
 .bagb .bl{font-weight:900;font-size:15px;letter-spacing:.5px;text-transform:uppercase;line-height:1}
+.bag3d{position:absolute;left:0;top:0;width:72px;height:72px;object-fit:contain;opacity:0;pointer-events:none;transform-origin:50% 92%;filter:drop-shadow(0 4px 5px rgba(0,0,0,.55)) brightness(1.35) saturate(1.2)}
+.bagb.pull .bag3d{opacity:1;left:-10px;top:-14px;width:92px;height:92px;animation:bagshake .26s ease-in-out infinite}
+.bagb.pull .bagimg{opacity:0;animation:none}
+@keyframes bagshake{0%,100%{transform:rotate(-9deg) scale(1.12,.98)}50%{transform:rotate(9deg) scale(.98,1.14) translateY(-3px)}}
+.bftum{position:fixed;z-index:90;pointer-events:none;object-fit:contain;opacity:0}
+html.ph-short .bag3d{width:52px;height:52px}
+@media (prefers-reduced-motion:reduce){.bagb.pull .bag3d{animation:none;opacity:1}}
 .hand{position:absolute;left:50%;top:-30px;width:40px;height:40px;margin-left:-20px;opacity:0;pointer-events:none}
 .hand svg{width:100%;height:100%;transform:rotate(180deg)}
 .bagb.pull .bagimg{animation:rummage .32s ease-in-out infinite}

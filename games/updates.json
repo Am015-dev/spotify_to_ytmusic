@@ -1,6 +1,19 @@
 [
  {
   "date": "2026-10-10",
+  "game": "cauldron",
+  "title": "3D bag and tumbling chips",
+  "items": [
+   "New painted stage and pass screens",
+   "Phone table, new Tamsin art",
+   "Shorter menu music loops",
+   "The bag swings and shakes as you reach in",
+   "Each chip tumbles out of the bag in its own colour"
+  ],
+  "check": "Tap the bag and watch it shake, then the chip flip out"
+ },
+ {
+  "date": "2026-10-10",
   "game": "thornbound",
   "title": "Bigger PC layout",
   "items": [
@@ -144,17 +157,6 @@
    "Music with a Music picker"
   ],
   "check": "Start a dive and look at the cards."
- },
- {
-  "date": "2026-10-10",
-  "game": "cauldron",
-  "title": "Cauldron Fair: stage and pass screens",
-  "items": [
-   "New painted stage and pass screens",
-   "Phone table, new Tamsin art",
-   "Shorter menu music loops"
-  ],
-  "check": "Play a day and pass the device."
  },
  {
   "date": "2026-10-10",
