@@ -99,7 +99,7 @@ html:not(.rdy) #title .row{visibility:hidden;animation:rdyShow 0s 6s forwards}
 #stage.p #over{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-lose.webp) 70% center/cover no-repeat}
 #stres{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/end-win.webp) center/cover no-repeat}
 #stage.p #stres{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-win.webp) 70% center/cover no-repeat}
-.pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 0 6px var(--c,#0000))}
+.pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:cover;border-radius:50%;border:2px solid var(--c,#8c86b8);box-sizing:border-box;flex:0 0 auto;box-shadow:0 0 10px var(--c,#0000),inset 0 0 8px #05030c}   /* the painted ship scene sits in a deliberate round badge, never a bare square crop */
 @container (max-aspect-ratio:1/1){.pg .card img.shp{height:clamp(44px,calc(var(--u)*13),72px)}}
 .pg .card img.ki{height:clamp(30px,calc(var(--u)*9),48px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto}
 #gaCards.tune .card>img.ki{height:36px;width:36px}
@@ -217,7 +217,7 @@ let fbT=0;
 /* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */
 const NR=window.NR={_h:{},sw:[],on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
   music:{rate:1,   // tempo change: song playbackRate and the beat length scale together, the beat position stays continuous
-    setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();if(BT.pend&&BT.pend.sw)AU.cancelSwitch();   // a tempo change moves the bar lines: drop the scheduled song change, it is planned again
+    setRate(x){x=1;   /* the song ALWAYS plays at 1.0 and natural pitch: power-ups change the game, never the music */const old=this.rate;if(x===old)return;mnow();if(BT.pend&&BT.pend.sw)AU.cancelSwitch();   // a tempo change moves the bar lines: drop the scheduled song change, it is planned again
     const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
       AU.setRate(x);},
@@ -288,7 +288,7 @@ const silentWav=(()=>{let u=null;return()=>{if(u)return u;try{const n=1600,b=new
   u=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}catch(e){u='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';}return u;};})();   // 0.2 s of silence: unlocks an <audio> slot inside a tap
 const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
-    this.m=a.createGain();this.m.connect(a.destination);
+    this.m=a.createGain();try{const L=this.lim=a.createDynamicsCompressor();L.threshold.value=-4;L.knee.value=3;L.ratio.value=20;L.attack.value=.003;L.release.value=.12;this.m.connect(L);L.connect(a.destination);}catch(e){this.m.connect(a.destination);}   // master limiter: nothing clips, however many effects stack
     this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
     this.duck=a.createGain();this.duck.connect(this.cutg);                                     // music dips briefly under big effects
     this.musv=a.createGain();this.musv.connect(this.duck);
@@ -309,6 +309,9 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     if(!navigator.audioSession&&!this.sil){try{const h=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=');h.loop=true;h.volume=.01;h.setAttribute('playsinline','');this.sil=h;const q=h.play();if(q&&q.catch)q.catch(()=>{this.sil=null;});}catch(e){}}
     this.unlockSlots();
     if(!running&&!BT.stage)this.menuMusic();},
+  slowColour(on){const a=this.a;if(!a||!this.cutg||!this.m)return;on=!!on;if(this.slc===on)return;this.slc=on;
+    try{if(!this.lpf){this.lpf=a.createBiquadFilter();this.lpf.type='lowpass';this.lpf.Q.value=.5;this.lpf.frequency.value=20000;this.cutg.disconnect();this.cutg.connect(this.lpf);this.lpf.connect(this.m);}
+      const f=this.lpf.frequency,t=a.currentTime;f.cancelScheduledValues(t);f.setTargetAtTime(on?3200:20000,t,.25);}catch(e){}},   // SLOW: a gentle low-pass on the song, no pitch change
   duckMusic(){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
     this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
@@ -366,7 +369,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   /* ---- stream slots: 5 pooled <audio> elements, each wired to the music bus once. Pooled because iOS lets an element play from code only after it was
      started inside a tap once; unlockSlots() does that for all of them in the first tap, and later a slot just gets another src. ---- */
   mkSlot(){const a=this.a,el=new Audio();el.preload='auto';el.loop=true;el.setAttribute('playsinline','');el.setAttribute('webkit-playsinline','');
-    for(const k of['preservesPitch','webkitPreservesPitch','mozPreservesPitch'])try{if(k in el)el[k]=false;}catch(e){}   // tempo changes bend the pitch, as they did with a buffer source
+    for(const k of['preservesPitch','webkitPreservesPitch','mozPreservesPitch'])try{if(k in el)el[k]=true;}catch(e){}   // natural pitch always (the rate is locked at 1 anyway)
     const node=a.createMediaElementSource(el),g=a.createGain();g.gain.value=0;node.connect(g);g.connect(this.fb);
     const s={el,src:el,node,g,file:null,stage:'',info:null,blob:null,D:0,full:false,seek:false,err:0,tLoad:0,unlocked:false,playing:false,get duration(){return this.D;}};
     el.addEventListener('error',()=>{s.err=1;});this.slotReset(s);return s;},
@@ -395,7 +398,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     const go=()=>{s.kickT=performance.now();s.tCall=a.currentTime;try{if(Math.abs(el.currentTime-p)>.02)el.currentTime=p;}catch(e){}el.playbackRate=rate;s.last=p;s.uPlay=p;
       try{const q=el.play();if(q&&q.catch)q.catch(()=>{s.kickT=0;});}catch(e){}};
     if(!s.seek&&!imm){s.startAt=ctx0-.04;s.startFn=go;}else go();},
-  setRate(x){const a=this.a;for(const s of this.slots||[])if(s.playing){s.el.playbackRate=x;if(!s.startFn&&!s.el.paused&&s.phase!=='wait'){s.ctx0=a.currentTime;s.pos0=s.el.currentTime+s.loops*s.D;s.applied=0;s.hist.length=0;}}},
+  setRate(x){x=1;const a=this.a;for(const s of this.slots||[])if(s.playing){s.el.playbackRate=x;if(!s.startFn&&!s.el.paused&&s.phase!=='wait'){s.ctx0=a.currentTime;s.pos0=s.el.currentTime+s.loops*s.D;s.applied=0;s.hist.length=0;}}},
   // every 25 ms: start delayed songs, stop faded ones, keep the playing ones playing, and pull the beat grid onto what the element really plays
   strTick(a){const pn=performance.now(),ct=a.currentTime,run=a.state==='running'&&!this.hold;
     for(const s of this.slots){
@@ -677,6 +680,8 @@ function drawBGP(bg,t,dt,scroll){const D=bg.D;let L=bgpFor(DISTRICTS.indexOf(D))
   const PA=ART.paintP(bg,scroll);if(!PA)ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);   // painted phone backdrop, the roofs on top fainter
   if(!PA&&L.stub&&ART.failed(DISTRICTS.indexOf(D),true)){const i=DISTRICTS.indexOf(D);D.nostubP=1;delete BGPC[i];L=bgpFor(i);}
   if(!PA&&!L.stub)for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
+  if(PA){const lb=ART.bm['ly-phone-'+ART.dn[DISTRICTS.indexOf(D)]];if(lb){const lh=PW_*lb.height/lb.width,off=(scroll*.5)%(2*lh);ctx.globalAlpha=.5;   // the painted rooftops seen from above, mirrored tiles so there is no seam
+      for(let j=-2;j*lh+off<PH_;j++){const y=j*lh+off;if(y+lh<=0)continue;if(j&1){ctx.save();ctx.translate(0,y+lh);ctx.scale(1,-1);ctx.drawImage(lb,0,0,PW_,lh);ctx.restore();}else ctx.drawImage(lb,0,y,PW_,lh);}}}
   ctx.globalAlpha=1;
   if(D.near==='river'&&!PA){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';
@@ -935,7 +940,7 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
 function update(dt){
   if(SH.active){SH.tick(dt);return;}                      // pit stop: the world waits
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
-  const btk=G.bt>0?(G.btk||.5):1,sdt=dt*G.slow*btk,pdt=dt*G.slow;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
+  const btk=G.bt>0?(G.btk||.5):1,sdt=dt*G.slow*btk*PW.wk,pdt=dt*G.slow;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
   if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);
@@ -1133,8 +1138,8 @@ const eb_=e=>e._b==null?(e._b=Math.random()*6.28):e._b;      // per-enemy phase 
 function gatePost(y,up,fl){const o=ART.sp('spr-en-gate',26);if(!o)return false;const cy=y+(up?-1:1)*(o.h/2-12);ART.put(o,0,cy,0,null,1,up?1:-1);
   if(fl)ART.put(ART.sil('spr-en-gate',26,'#ffffff'),0,cy,0,.8,1,up?1:-1);return true;}
 function hpBar(x,y,w,f){ctx.fillStyle='#00000099';ctx.fillRect(x,y,w,4);ctx.fillStyle='#ff3dbb';ctx.fillRect(x,y,w*clamp(f,0,1),4);}
-function bossPaint(e,t,fl,c){const nm=ART.bossN[e.k],b=nm&&ART.bm['spr-boss-'+nm];if(!b)return false;
-  const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4][e.k],by=Math.sin(t*1.6)*3,tl=Math.sin(t*.9)*.035;
+function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm['spr-boss-'+nm];if(!b)return false;
+  const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],by=Math.sin(t*1.6)*3,tl=Math.sin(t*.9)*.035;
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
   return ART.dflash('spr-boss-'+nm,wd,0,by,tl,fl,'#ff4058',.32);}   // damage: a red tint
@@ -1442,16 +1447,16 @@ const FXV={
 
 /* ---------- music power-ups: glowing enemies drop them, collecting one exactly on the beat gives +50% time ----------
    DRUM BURST  drum layer + an auto-shot on every beat, on-beat presses fire double
-   TEMPO UP    music x1.25, score x2, more enemies
-   SLOW GROOVE music x0.75, enemy bullets slower
+   TEMPO UP    double-time fire on 8th notes, score x2, faster waves (the song never changes speed or pitch)
+   SLOW GROOVE bullet time: world at 0.6x, the song plays on, a gentle low-pass colours it
    DROP        the music cuts for one bar, then a screen-clearing blast on the next downbeat
    Durations are counted in bars of the music, not seconds. Works with the song files and with the synth. */
 const PWK={
   drum:{n:'DRUM BURST',tip:'Auto-fire on every beat',c:'#ffe14d',bars:8,w:3},
-  tempo:{n:'TEMPO UP',tip:'Faster beat · score ×2',c:'#ff7a3d',bars:8,w:3,rate:1.25},
-  slow:{n:'SLOW GROOVE',tip:'Slower enemy bullets',c:'#5b8cff',bars:8,w:2},
+  tempo:{n:'TEMPO UP',tip:'Double-time fire · score ×2',c:'#ff7a3d',bars:8,w:3,dbl8:1},
+  slow:{n:'SLOW GROOVE',tip:'Bullet time · enemies slow',c:'#5b8cff',bars:8,w:2},
   drop:{n:'DROP',tip:'Blast on the downbeat',c:'#b36bff',bars:2,w:2}};
-const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended:0},log:[],
+const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended:0},log:[],
   st(){return G.pw||(G.pw={act:[],drop:null,ls:G.score,cnt:16,wv:0});},
   on(k){return !!(G&&G.pw&&G.pw.act.some(a=>a.k===k));},
   cur(){return G.bc+PHF;},                                // position in beats that never jumps when the song changes
@@ -1459,19 +1464,21 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
   give(kind,ob){const s=this.st(),K=PWK[kind];this.stat.given++;
     if(kind==='drop'){if(s.drop)return false;const p=bpos();let cutB=Math.ceil(p/4)*4;if((cutB-p)*BT.spb<.1)cutB+=4;
       s.drop={cutB,blastB:cutB+4,b0:p,rev:BT.rev,ob,cs:0,rs:0};}
-    else{for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(a.k===kind||(K.rate&&PWK[a.k].rate)){s.act.splice(i,1);this.off(a.k);}}   // one tempo power at a time
+    else{for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(a.k===kind||false){s.act.splice(i,1);this.off(a.k);}}   // one tempo power at a time
       s.act.push({k:kind,s:this.cur(),d:K.bars*4*(ob?1.5:1),ob,w:performance.now()});
-      if(kind==='slow'){this.bs=.6;for(const b of G.eb)if(!b.sl){b.vx*=.6;b.vy*=.6;b.sl=true;}}}
+      }
     floater(P.x,P.y-24,K.n,K.c);if(ob)floater(P.x,P.y-42,'ON BEAT +50% TIME','#ffe14d');
     G.hint={t:3,txt:say(K.tip)};AU.sfx('up');return true;},
-  off(kind){if(kind==='slow'){this.bs=1;for(const b of G.eb)if(b.sl){b.vx/=.6;b.vy/=.6;b.sl=false;}}},
+  off(kind){},
   reset(){this.bs=1;this.dstep=-1;try{const a=AU.a;if(a&&AU.cutg){const g=AU.cutg.gain;g.cancelScheduledValues(a.currentTime);g.setTargetAtTime(1,a.currentTime,.01);}}catch(e){}
-    if(G)G.pw=null;if(BT.stage&&NR.music.rate!==1)NR.music.setRate(1);},
+    this.wk=1;AU.slowColour(false);if(G)G.pw=null;},
   tick(dt){const s=this.st(),cur=this.cur();
     for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(cur-a.s>=a.d){s.act.splice(i,1);this.stat.ended++;this.log.push({k:a.k,beats:cur-a.s,d:a.d,ob:a.ob,ms:performance.now()-a.w,spb:BT.spb});if(this.log.length>40)this.log.shift();this.off(a.k);}}
     const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2, waves come 1.5x as fast
     s.ls=G.score;
-    const rt=s.act.find(a=>PWK[a.k].rate),want=(rt?PWK[rt.k].rate:1)*DYE.q;if(NR.music.rate!==want)NR.music.setRate(want);   // asks again if a song swap blocked it
+    if(s.act.some(a=>a.k==='tempo')&&!G.dead){const h=Math.floor(bpos()*2);if(s.h8===undefined)s.h8=h;if(h!==s.h8){s.h8=h;if(h%2){const x=P.x+22,y=P.y;G.pb.push({x,y:y-5,vx:900,vy:-40,dm:1,pf:0},{x,y:y+5,vx:900,vy:40,dm:1,pf:0});   // the off-beat 8th note: double-time fire
+        try{const a=AU.a;if(a&&a.state==='running')AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats
+    this.wk+=((s.act.some(a=>a.k==='slow')?.6:1)-this.wk)*Math.min(1,dt*6);if(Math.abs(this.wk-1)<.004)this.wk=1;AU.slowColour(this.wk<.97);   // bullet time eases in and out; only a gentle low-pass touches the song
     if(s.drop)this.dropTick(s);
     if(s.wv>0)s.wv-=dt;},
   dropTick(s){const d=s.drop,a=AU.a,p=bpos(),R=B=>BT.t0+BT.off+B*BT.spb;
@@ -1850,8 +1857,8 @@ const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral
   {k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H',sub:'Shield wall, spear rig'}];
 const WARN=[];                                           // spawn markers: shown for one beat before something enters from an edge or falls
 const DIR={
-  sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:64,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
-  reset(){this.q=[];this.nextMini=64;this.minis=0;this.lastTheme='';this.log={spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0};WARN.length=0;G.rb=0;upsCalc();},
+  sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:20,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
+  reset(){this.q=[];this.nextMini=20;this.minis=0;this.lastTheme='';this.log={spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0};WARN.length=0;G.rb=0;upsCalc();},
   tag(){return'';},
   tierv(){return ST.on?clamp((ST.lvl-2)*.5,0,5):G.pos+G.loop*5+(G.dprog||0);},
   plan(stage,bossBars){this.stage=stage;this.sb=songBars(stage);this.bossBar=Math.max(24,this.sb-(bossBars||BOSS_BARS));this.bar=-1;this.theme=null;this.acc=.6;this.idle=9;this.emptyB=0;this.q=[];WARN.length=0;G.dbar=0;this.ldt=0;},
@@ -1887,8 +1894,8 @@ const DIR={
   barLine(i){const bar=Math.max(0,Math.round(ST.on?G.dbar:G.dbar));G.rb++;
     if(bar<=this.bar&&this.bar>=0&&!ST.on)return;this.bar=bar;
     const ph=Math.floor(bar/8);if(this.theme==null||ph!==this.phr){this.phr=ph;this.pickTheme(bar);}
-    // mini-boss about every 64 bars of play, never in the first 10 bars of a district or right before the boss
-    if(!ST.on&&G.rb>=this.nextMini&&bar>=10&&bar<this.bossBar-12){this.nextMini+=64;this.spawnMini();return;}
+    // mini-boss about every 26 bars (~50 s) of play, never in the first 10 bars of a district or right before the boss
+    if(!ST.on&&G.rb>=this.nextMini&&bar>=10&&bar<this.bossBar-8){this.nextMini+=26;this.spawnMini();return;}
     const E=this.energy(bar),dn=(DF.dn||1),t=this.tierv();
     let n=(.95+TUNE2.slope*t+TUNE2.quad*t*t)*(.42+1.15*E)*dn*UPS.dens*Math.pow(66/Math.max(40,this.sb),TUNE2.lenK)*(ST.on?ST.dk:1);   // a long song (4 minutes) is calmer per bar than a short one: the district is about equally hard in total
     if(this.thName==='breath')n*=.6;
@@ -2131,7 +2138,7 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 /* ----- the garage: a TUNE tab with levels; the old tabs keep working ----- */
 {const tabs=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='tune';b.type='button';b.textContent='TUNE';tabs.prepend(b);b.addEventListener('click',()=>{GA.tab='tune';gaDraw();});}
 const gaItems0=gaItems;
-function perkIcon(d){return d.uid&&ART.isReal('kit-'+d.uid)?`<img class="ki" src="media/kit-${d.uid}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
+function perkIcon(d){let real=false;try{real=ART.isReal('kit-'+(d.uid||d.id));}catch(e){}return real?`<img class="ki" src="media/kit-${d.uid||d.id}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
   for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
@@ -2388,10 +2395,11 @@ NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});
    Nothing is filtered or blurred per frame; scaled copies are cached and rebuilt only when the canvas scale S changes. */
 const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   dn:['bankenviertel','mainufer','ostend','messe','athina'],
-  bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite'],
+  bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite','tresor-wart','messe-waechter'],
+  artK:e=>e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
   shipN:['std','tri','hv','ec','swg','syn'],
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
-  fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine'],
+  fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link'],
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
 ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
   im.onload=()=>{const done=b=>{ART.bm[n]=b;};if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
@@ -2460,11 +2468,13 @@ ART.paintP=(bg,scroll)=>{const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.d
 /* painted districts get a stub instead of the procedural skyline (building one is a 20-80 ms hitch); the real one is built only if a painted file failed to load */
 ART.stubOk=(di,port)=>{const D=DISTRICTS[di];return !!ART.dn[di]&&!(port?D.nostubP:D.nostub);};
 ART.failed=(di,port)=>{const n=ART.dn[di],D=DISTRICTS[di];return !!(ART.err['bg-'+n+(port?'-phone':'')]||(!port&&(ART.err['ly-mid-'+n]||ART.err['ly-near-'+D.near])));};
-ART.warm=di=>{const n=ART.dn[di];if(!n)return;ART.load('bg-'+n);ART.load('ly-far-'+n);ART.load('ly-mid-'+n);ART.load('ly-near-'+DISTRICTS[di].near);if(wcv!==cv)ART.load('bg-'+n+'-phone');};
+ART.warm=di=>{const n=ART.dn[di];if(!n)return;ART.load('bg-'+n);ART.load('ly-far-'+n);ART.load('ly-mid-'+n);ART.load('ly-near-'+DISTRICTS[di].near);if(wcv!==cv){ART.load('bg-'+n+'-phone');ART.load('ly-phone-'+n);}};
 /* ----- boss intro portrait (drawn above the banner) ----- */
-ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;ctx.save();ctx.globalAlpha=al;
-  ctx.fillStyle='#05030cdd';ctx.fillRect(cx-sz/2-3,y-3,sz+6,sz+6);ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.strokeRect(cx-sz/2-3,y-3,sz+6,sz+6);
-  ctx.drawImage(b,cx-sz/2,y,sz,sz);ctx.restore();};
+ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;const px=Math.max(64,Math.round(sz*S*1.5)),key='pt|'+k+'|'+px;let o=ART.sc[key];
+  if(!o){const c=document.createElement('canvas');c.width=c.height=px;const g=c.getContext('2d'),r=px/2;g.imageSmoothingQuality='high';   // a deliberate round badge: feathered edge, dark vignette, neon rim (never a bare square crop)
+    g.save();g.beginPath();g.arc(r,r,r-3,0,7);g.clip();g.drawImage(b,0,0,px,px);const v=g.createRadialGradient(r,r,r*.55,r,r,r);v.addColorStop(0,'rgba(5,3,12,0)');v.addColorStop(1,'rgba(5,3,12,.85)');g.fillStyle=v;g.fillRect(0,0,px,px);g.restore();
+    g.strokeStyle='#ff3040';g.lineWidth=Math.max(2,px/48);g.shadowColor='#ff3040';g.shadowBlur=px/20;g.beginPath();g.arc(r,r,r-3-g.lineWidth/2,0,7);g.stroke();o=ART.sc[key]=c;}
+  ctx.save();ctx.globalAlpha=al;ctx.drawImage(o,cx-sz/2,y,sz,sz);ctx.restore();};
 /* ----- start-up: the gameplay sprites first, bosses and the rest of the districts one at a time while the title is up ----- */
 {for(const n of ART.shipN)ART.load('spr-ship-'+n);for(const n of ART.enN)ART.load('spr-en-'+n);for(const n of ART.fxN)ART.load('fx-'+n);for(const n of ART.pkN)ART.load('pk-'+n);
   ART.warm(0);
@@ -2474,7 +2484,7 @@ NR.on('kill',({e,boss})=>{
   if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(i===4?'explosion-boss':'explosion-big',bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
   ART.boom(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e.x,e.y,e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6),.42);});
 NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,.09);});
-{const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=G.boss.k;};}   // boss intro / phase banners carry the boss portrait
+{const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=ART.artK(G.boss);};}   // boss intro / phase banners carry the boss portrait
 {const _e=enterDistrict;enterDistrict=function(i){ART.warm(i);ART.warm(nextDi(i).di);return _e.apply(this,arguments);};}
 /* the scaled copies of the next backdrop are built in calm moments, never in the middle of a fight */
 setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame();const port=wcv!==cv;
@@ -2517,7 +2527,8 @@ NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;
     else{ctx.fillStyle='#ffd23d';ctx.beginPath();ctx.moveTo(-8,cy+8);ctx.lineTo(-8,cy);ctx.lineTo(-4,cy+4);ctx.lineTo(0,cy-3);ctx.lineTo(4,cy+4);ctx.lineTo(8,cy);ctx.lineTo(8,cy+8);ctx.closePath();ctx.fill();}   // crown (painted when fx-crown is ready)
     if(e.lArm){const k=PHF;ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.8+1.2*k),'#ff3050',.25+.5*k);ctx.globalCompositeOperation='source-over';ctx.strokeStyle='#ff7080';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,e.r+16+14*(1-k),0,7);ctx.stroke();}
     hpBar(-18,-e.r-26,36,e.hp/e.max);ctx.restore();}
-  else if(e.shl&&e.lk){ctx.save();ctx.strokeStyle='#19e3ff';ctx.globalAlpha=.7;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(e.x,e.y,e.r+5,0,7);ctx.moveTo(e.x,e.y);ctx.lineTo(e.lk.x,e.lk.y);ctx.stroke();ctx.restore();}   // shield link to the leader
+  else if(e.shl&&e.lk){ctx.save();ctx.strokeStyle='#19e3ff';ctx.globalAlpha=.7;ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(e.x,e.y,e.r+5,0,7);if(!ART.have('fx-shield-link')){ctx.moveTo(e.x,e.y);ctx.lineTo(e.lk.x,e.lk.y);}ctx.stroke();ctx.restore();
+    const sl=ART.bm['fx-shield-link'];if(sl){const dx=e.lk.x-e.x,dy=e.lk.y-e.y,d=Math.hypot(dx,dy);ctx.save();ctx.translate(e.x,e.y);ctx.rotate(Math.atan2(dy,dx));ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.75;ctx.drawImage(sl,0,-7,d,14);ctx.restore();}}   // shield link to the leader
   else if(e.rg){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*2,'#ff3050',.4);ctx.restore();}};}
 {const fb=FXV.bullets;FXV.bullets=function(){fb.call(this);let any=false;for(const b of G.eb)if(b.hm>0){if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;ctx.save();ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.restore();continue;}if(!any){ctx.save();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.85;ctx.beginPath();any=true;}ctx.moveTo(b.x+b.r+3.5,b.y);ctx.arc(b.x,b.y,b.r+3.5,0,7);}if(any){ctx.stroke();ctx.restore();}};}
 /* low hull: the song keeps its tempo; the screen edges pulse red on the beat and a soft heartbeat thumps under the music */
@@ -2797,8 +2808,13 @@ setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I9';
+const NR_VER='J1';
 const NR_CHECKLIST=[
+ {ver:'J1',id:'music-clean',text:'The music NEVER distorts or changes pitch: grab TEMPO UP (the song stays the same speed, you shoot double-time and score x2), grab SLOW GROOVE (enemies and bullets slow to bullet time, the song only gets a soft muffle), drop to 1 hull, and die. The song is clean every time, no chipmunk, no crackle.'},
+ {ver:'J1',id:'no-crops',text:'No picture looks cropped: boss intro portraits and the ship cards in the garage and shop sit in round neon badges, pickups, perks, medals and badges have no square backgrounds, and the phone view has painted rooftops scrolling at the sides.'},
+ {ver:'J1',id:'all-painted',text:'Every screen is painted: both mini-bosses (Tresor-Wart, Messe-Waechter) have their own art, the shield link between a leader and its drones is a painted beam. Only the 13 base perk icons are still line icons (they are on the missing-assets page).'},
+ {ver:'J1',id:'set-pieces',text:'In one minute of play something new happens every 8 to 10 seconds: a WEAVE of drones crossing on the beat, a LASER FENCE across the screen (find the green gap, it fires on the bar line), a mini-boss about every 50 s. Clear a set piece and a shower of shards sweeps across the screen.'},
+ {ver:'J1',id:'drop-moment',text:'Every 16 bars: DROP counts down 4-3-2-1 at the top, and a DASH on the downbeat blows the screen clear (all bullets, score burst, tier up, shard shower). Miss it and only the bullets near you vanish. Does it feel big?'},
  {ver:'I9',id:'painted-icons',text:'All the grey placeholder boxes are gone: painted kit perk icons (Garage TUNE and LOAD), painted SOON cards (no PLACEHOLDER tag), difficulty badges, stage medals, squad leader with painted crown, glowing homing orbs and the Drift, Lancer and Nova ships. Anything still a plain shape?'},
  {ver:'I9',id:'painted-chest',text:'Boss chest: painted closed chest and card backs, painted card faces, and the chest opens when you pick a card.'},
  {ver:'I9',id:'painted-surfaces',text:'Garage / pit stop screens and the pause + settings screens now sit on painted backgrounds (dark wash on top). Is every card and button still easy to read, on the phone upright and sideways?'},
@@ -3040,16 +3056,16 @@ WP.draw();
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,
    the score of kills and the multiplier decay, and a SNIPER LANE (a beam along the ship's row: it follows the ship for two beats, locks for one, fires on the
    next) comes round every 3 to 5 beats. Moving 50 px away (or dashing) resets everything; the beam is locked for a whole beat, so a ship that moves is never hit by it.
-   DYE (declared in b.js): hull 2 -> song x0.92, hull 1 -> x0.85, death -> tape stop to x0.5. The beat clock follows (NR.music.setRate), so the rhythm stays in sync. */
+   The song never changes speed or pitch (dying included). */
 const STILLF=()=>HARD?2:3,STILL_RAMP=6,BEAM_Y=16;
 NR.on('runStart',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,ax:P.x,ay:P.y,beam:null,nb:0,said:false});Object.assign(DYE,{cur:1,q:1});});
-NR.on('runEnd',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,beam:null});if(DYE.q!==1||NR.music.rate!==1){DYE.cur=DYE.q=1;try{NR.music.setRate(1);}catch(e){}}});
+NR.on('runEnd',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,beam:null});DYE.cur=DYE.q=1;});
 NR.on('tick',dt=>{if(!G.live)return;
   if(dt>0){const k=Math.min(1,dt*8);PV.x+=((P.x-PV.px)/dt-PV.x)*k;PV.y+=((P.y-PV.py)/dt-PV.y)*k;PV.px=P.x;PV.py=P.y;if(P.dashT>0){PV.x*=.3;PV.y*=.3;}}
   /* --- dying slows the beat --- */
   const tgt=1,tau=.2;   // the song never slows down any more (it sounded bad): low hull is shown by a red pulse and a heartbeat instead, see ai.js
   DYE.cur+=(tgt-DYE.cur)*Math.min(1,dt/tau);if(Math.abs(DYE.cur-tgt)<.004)DYE.cur=tgt;
-  const q=Math.round(DYE.cur*100)/100;if(q!==DYE.q){DYE.q=q;const rt=PW.st().act.find(a=>PWK[a.k].rate),want=(rt?PWK[rt.k].rate:1)*q;if(Math.abs(NR.music.rate-want)>=.005)NR.music.setRate(want);}
+  const q=Math.round(DYE.cur*100)/100;DYE.q=q;
   if(G.dead){STILL.beam=null;return;}
   /* --- stillness --- */
   if(Math.hypot(P.x-STILL.ax,P.y-STILL.ay)>50||P.dashT>0){STILL.ax=P.x;STILL.ay=P.y;STILL.t=Math.max(0,STILL.t-STILL.t*.5);if(STILL.t<.5)STILL.t=0;}
@@ -3072,6 +3088,70 @@ NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
   else{const pulse=SET.reduce?1:Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.45)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
     ctx.beginPath();ctx.moveTo(0,B.y);ctx.lineTo(W,B.y);ctx.stroke();ctx.setLineDash([]);if(lock){ctx.globalAlpha=.18*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}}
   ctx.restore();};}
+
+/* ---------- FUN pass: something new every ~8-10 s ----------
+   SET PIECES   every 6 bars (~12 s) a signature formation per district that moves on the beat (WEAVE) or a LASER FENCE across the screen on the bar line;
+                clear one and a shard shower sweeps across the screen
+   DROP         every 16 bars: a bar of countdown, then on the downbeat DASH to blow the screen clear (all bullets, +score, +tier, shard shower);
+                miss the dash and you still get a small blast round the ship (never a punishment)
+   MINI-BOSS    about every 26 bars (~50 s, see dir.js)
+   Never touches the music: only game logic, light and a clean effect sound. */
+const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
+  reset(){this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},
+  ROWS:[30,90,150,210,270,330,390,450,510],
+  /* the bot (sweep.js / d-sim.js) asks: is a ship at height y on a firing beam row? */
+  cost(y){const f=this.fence;if(!f||f.phase<1)return 0;for(const r of f.rows)if(Math.abs(y-r)<26)return 3000;return 0;},
+  shardShower(n,x0){for(let i=0;i<n;i++)G.pk.push({t:'shard',x:(x0==null?W-40:x0)+gr(-30,30),y:gr(50,H-50),vx:-gr(120,300),vy:gr(-40,40),bob:0});this.shower=.9;},
+  track(f){const n0=G.en.length;f();return G.en.slice(n0);},
+  setPiece(){const di=G.di,sig=['turretLine','swarm','wedge','turretLine','phalanx'][di%5],k=Math.floor(this.n/6)%3,t=DIR.tierv();
+    const kind=k===1?'fence':k===2?'weave':(PATS[sig]&&PATS[sig].t<=t+.01?sig:'weave');
+    if(kind==='fence'){if(!this.fence)this.startFence();return;}
+    let es;if(kind==='weave')es=this.track(()=>{const y=FY(150,H-190);for(let i=0;i<6;i++)en('drone',{x:W+30+i*56,y,amp:120,ph:(i%2)*Math.PI});});
+    else es=this.track(()=>PATS[kind].f());
+    if(es.length){this.sets.push({es,n:es.length,kind});this.stat.sets++;G.hint={t:2.4,txt:say(kind==='weave'?'WEAVE: shoot on the beat':'SET PIECE')};NR.emit('setpiece',{kind});}},
+  startFence(){const gy=clamp(P.y+gr(-80,80),110,H-110),rows=this.ROWS.filter(y=>Math.abs(y-gy)>75);
+    this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');G.hint={t:2.6,txt:say('LASER FENCE: find the gap')};},
+  bar(){const n=this.n=G.rb;if(G.boss||G.dead||SH.active)return;
+    if(n>=3&&n%6===3&&DIR.nonBoss()<8&&(ST.on||G.dbar<DIR.bossBar-6))this.setPiece();
+    if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;G.hint={t:3.4,txt:say('DROP COMING: DASH ON THE DOWNBEAT')};}
+    if(n%16===0&&n>=16&&this.dropAt===n)this.dropStart();},
+  dropStart(){this.dropAt=-1;this.dw={t:G.t,hit:false,until:G.t+.28};if(this.pdash>0||G.t-this.lastDash<.22)this.drop(true);},
+  drop(hit){const w=this.dw;if(!w||w.done)return;w.done=1;this.stat.drops++;const T=tierOf(C.n);
+    if(hit){this.stat.dropsHit++;let k=0;for(const b of G.eb){G.score+=5;k++;}G.eb=[];
+      for(const e of G.en)if(e.type!=='boss'&&e.x<W-10){e.hp-=22;e.flash=.2;}
+      const pts=800*T*(1+Math.min(3,Math.floor(G.rb/16)));G.score+=pts;tierSet(C.n+3,'drop');
+      G.flash=Math.max(G.flash,.55*FX());shake(14);PW.st().wv=.8;banner('DROP!','+'+pts,false,1.5);floater(P.x,P.y-36,'DROP! ×'+T,'#b36bff');
+      this.shardShower(14+4*T);AU.sfx('big');try{const a=AU.a;if(a&&a.state==='running'){AU.noise(a.currentTime,.7,.35,300,AU.fx,'lowpass');AU.osc(a.currentTime,'sine',140,.5,.6,AU.fx,30);}}catch(e){}this.stat.rewards++;}
+    else{let k=0;G.eb=G.eb.filter(b=>{if(Math.hypot(b.x-P.x,b.y-P.y)<230){G.score+=5;return false;}return true;});   // a miss: only the bullets close to the ship vanish
+      G.flash=Math.max(G.flash,.2*FX());PW.st().wv=.5;floater(P.x,P.y-36,'DROP','#8c86b8');}
+    NR.emit('drop',{hit});},
+  tick(dt){if(!G.live||G.dead)return;
+    if(P.dashT>0&&!this.pdash)this.lastDash=G.t;this.pdash=P.dashT>0?1:0;
+    const w=this.dw;if(w&&!w.done){if(!w.hit&&(this.pdash||G.t-this.lastDash<.3&&this.lastDash>=w.t-.2)){w.hit=true;this.drop(true);}else if(G.t>w.until)this.drop(false);}
+    if(w&&w.done&&G.t>w.t+2)this.dw=null;
+    for(let i=this.sets.length-1;i>=0;i--){const s=this.sets[i];if(s.es.some(e=>G.en.includes(e)))continue;this.sets.splice(i,1);
+      const killed=s.es.filter(e=>e.hp<=0).length;if(killed>=s.n*.5){this.stat.rewards++;G.score+=250*s.n;floater(W*.6,H*.4,'SET CLEARED +'+250*s.n,'#ffe14d');this.shardShower(6+s.n);AU.sfx('up');}}
+    const f=this.fence;if(f){const ph=G.bc-f.b0;if(f.phase<1&&ph>=3){f.phase=1;AU.sfx('warn');}
+      if(f.fire>0){f.fire-=dt;if(!f.hit&&!G.dead)for(const r of f.rows)if(Math.abs(P.y-r)<13){f.hit=1;hurt(1);break;}if(f.fire<=0)this.endFence();}}
+    if(this.shower>0)this.shower-=dt;},
+  endFence(){const f=this.fence;if(!f)return;this.fence=null;if(!f.hit){this.stat.rewards++;G.score+=1000;floater(W*.5,H*.45,'FENCE CLEARED +1000','#19e3ff');this.shardShower(10);AU.sfx('up');}},
+  beat(){const f=this.fence;if(f&&f.phase>=1&&f.fire<=0&&G.bc-f.b0>=4&&!f.fired){f.fired=1;f.fire=.35;AU.sfx('big');shake(7);}},
+  draw(t){if(!G||G.dead)return;
+    const T=tierOf(C.n);if(T>=3){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,34+10*T+4*PUL,TIERC[T-1],.14+.06*T);ctx.restore();}   // tier 3+: the ship glows in the tier colour
+    const f=this.fence;if(f){ctx.save();const lock=f.phase>=1,fire=f.fire>0,pulse=SET.reduce?1:(Math.floor(t*(lock?18:8))%2?1:.6);ctx.globalCompositeOperation='lighter';
+      for(const r of f.rows){if(fire){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,r-4,W,8);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-12,W,24);}
+        else{ctx.globalAlpha=(lock?.9:.45)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);ctx.beginPath();ctx.moveTo(0,r);ctx.lineTo(W,r);ctx.stroke();ctx.setLineDash([]);
+          if(lock){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-10,W,20);}}}
+      ctx.globalAlpha=lock?.5:.3;ctx.strokeStyle='#19ffb0';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(10,f.gy-70,W-20,140);ctx.setLineDash([]);   // the safe gap
+      ctx.restore();}
+    if(this.dropAt>0&&!this.dw){const cnt=Math.max(1,Math.min(4,this.dropB-G.bc));ctx.save();ctx.textAlign='center';ctx.font='700 46px "Chakra Petch",sans-serif';ctx.globalAlpha=.55+.4*PUL;ctx.fillStyle='#b36bff';wtxt('DROP '+cnt,W/2,92);ctx.restore();
+      ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(.5,(4-cnt)*.14+.06);ctx.strokeStyle='#b36bff';ctx.lineWidth=10;ctx.strokeRect(5,5,W-10,H-10);ctx.restore();}}
+};
+NR.on('runStart',()=>FUN.reset());NR.on('runEnd',()=>FUN.reset());
+NR.on('tick',dt=>FUN.tick(dt));NR.on('beat',()=>FUN.beat());
+NR.on('tier',({tier,why})=>{if(why==='drop'||!G.live||tier<2)return;FUN.shardShower(2+tier*2,P.x+260);if(tier>=3){shake(4);G.flash=Math.max(G.flash,.12*FX());}});   // every tier up pays out a few shards
+{const bl=DIR.barLine;DIR.barLine=function(i){bl.call(this,i);try{FUN.bar();}catch(e){}};}
+{const dp=drawPickups;drawPickups=function(t){dp(t);FUN.draw(t);};}
 
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre
@@ -3314,7 +3394,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={ART,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={ART,FUN,DIR,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,

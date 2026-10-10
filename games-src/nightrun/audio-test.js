@@ -83,19 +83,22 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); else notes.push('ok ' + m
   if (process.env.DEBUG) console.log(log.map((r, i) => i + ':' + (r.tr === null ? 'n' : r.tr.toFixed(0)) + (r.pend ? 'P' : '') + ' ' + r.st).join(' | '));
   const last = log[log.length - 1]; check(last.st === 'stage2' && !last.pend && last.g.stage1 && !last.g.stage1[1], 'old stream stopped, new song is the beat clock');
   await truthRun(3000, 'after the change');
-  // tempo change (Tempo power-up): the stream plays faster, the grid keeps its place and follows it
-  await p.evaluate(() => { __mnr.PW.give('tempo', false); }); await sleep(2200);
-  const K = await p.evaluate(() => { const m = __mnr, s = m.AU.slots.find(x => x.stage === m.BT.stage && x.playing), info = m.TR.by[s.stage]; window.__Kc = () => { const lat = m.AU.a.outputLatency || 0, want = (s.el.currentTime - lat - info.offsetMs / 1000) / (60 / info.bpm); let d = m.bpos() - want; return d; }; return { k: window.__Kc(), rate: s.el.playbackRate, pp: s.el.preservesPitch, spb: m.BT.spb, bpm: info.bpm }; });
-  check(Math.abs(K.rate - 1.25) < 1e-6 && K.pp === false, `tempo x1.25: the stream plays at ${K.rate}, pitch follows (preservesPitch ${K.pp})`);
-  { const xs = []; const e = Date.now() + 5000; while (Date.now() < e) { xs.push(await p.evaluate(() => window.__Kc())); await sleep(60); }
-    let d = xs.map(v => { let q = v - K.k; q -= Math.round(q); return q * K.spb * 1000; }), mx = d.reduce((a, b) => Math.max(a, Math.abs(b)), 0); check(mx <= 40, `tempo x1.25: grid stays on the song for 5 s (max ${mx.toFixed(1)} ms)`); }
-  await p.waitForFunction(() => __mnr.NR.music.rate === 1, null, { timeout: 40000 }).catch(() => fails.push('tempo power-up never ended')); await sleep(2500);
-  await truthRun(2500, 'after the tempo is back');
+  // MUSIC NEVER DISTORTS: TEMPO UP, SLOW GROOVE, low hull and death never touch the song's rate or pitch, and nothing clips at the output
+  await p.evaluate(() => { const m = __mnr, an = m.AU.a.createAnalyser(); an.fftSize = 2048; m.AU.lim.connect(an); window.__an = an; window.__peak = 0; window.__rates = []; window.__mnrPoll = setInterval(() => { const b = new Float32Array(an.fftSize); an.getFloatTimeDomainData(b); for (const v of b) window.__peak = Math.max(window.__peak, Math.abs(v)); for (const s of m.AU.slots) if (s.playing) window.__rates.push([s.el.playbackRate, s.el.preservesPitch ? 1 : 0]); }, 40); });
+  const rateOk = async (label) => { const r = await p.evaluate(() => ({ mr: __mnr.NR.music.rate, rs: window.__rates.slice(), pk: window.__peak })); await p.evaluate(() => { window.__rates.length = 0; });
+    check(r.mr === 1 && r.rs.length > 3 && r.rs.every(x => Math.abs(x[0] - 1) < .13 && x[1] === 1), `${label}: song rate stays 1 with natural pitch (music ${r.mr}, ${r.rs.length} samples, max |rate-1| ${r.rs.reduce((a, x) => Math.max(a, Math.abs(x[0] - 1)), 0).toFixed(3)})`);   // 0.12 = the tiny steer of a song that is still silent
+    check(r.pk <= 1.0001, `${label}: output peak ${r.pk.toFixed(3)} never clips`); };
+  await p.evaluate(() => { __mnr.PW.give('tempo', false); }); await sleep(3500); await rateOk('TEMPO UP');
+  check(await p.evaluate(() => __mnr.PW.on('tempo')), 'TEMPO UP is active during the test');
+  await p.evaluate(() => { __mnr.PW.give('slow', false); }); await sleep(3500); await rateOk('SLOW GROOVE');
+  check(await p.evaluate(() => Math.abs(__mnr.PW.wk - .6) < .05), 'SLOW GROOVE slows the world (0.6x), not the song');
+  await p.evaluate(() => { __mnr.PW.give('drop', false); }); await sleep(2500); await rateOk('DROP');
+  await truthRun(2500, 'after the power-ups');
   // dying: hull 1 no longer slows the song (heartbeat and red pulse instead)
   await p.evaluate(() => { __mnr.P.hp = 1; }); await sleep(2000);
   const DY = await p.evaluate(() => { const m = __mnr, s = m.AU.slots.find(x => x.stage === m.BT.stage && x.playing); return { rate: s.el.playbackRate, mr: m.NR.music.rate, pp: s.el.preservesPitch }; });
   check(DY.mr === 1 && Math.abs(DY.rate - 1) < .02, `hull 1: song keeps its tempo (music ${DY.mr}, element ${DY.rate.toFixed(3)})`);
-  await truthRun(3000, 'while the ship is dying');
+  await rateOk('hull 1'); await truthRun(3000, 'while the ship is dying');
   await p.evaluate(() => { __mnr.P.hp = __mnr.P.max; }); await sleep(2000);
   check(await p.evaluate(() => __mnr.NR.music.rate === 1), 'healed: song back at 1'); await truthRun(2500, 'after healing');
   // many fast changes: nothing piles up

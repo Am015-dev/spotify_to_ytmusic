@@ -23,7 +23,7 @@ const BOT = (o) => {
       const cx = P.x + ix * 24, cy = P.y + iy * 24; if (cx < 30 || cx > 900 || cy < 40 || cy > 480) continue; let c = 0;
       for (const b of G.eb) { const px = b.x + b.vx * .14, py = b.y + b.vy * .14, d = Math.hypot(px - cx, py - cy); if (d < 70) c += (70 - d) * (70 - d) * (d < 26 ? 30 : 1); }
       for (const e of G.en) { if (e.type === 'gate') { if (Math.abs(e.x - cx) < 60 && (cy < e.gy - e.gap / 2 + 12 || cy > e.gy + e.gap / 2 - 12)) c += 3000; continue; } const d = Math.hypot(e.x - cx, e.y - cy), r = e.r + 55; if (d < r) c += (r - d) * (r - d) * 3; }
-      c += Math.abs(cy - ty) * .6 + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; }
+      c += (m.FUN ? m.FUN.cost(cy) : 0); c += Math.abs(cy - ty) * .6 + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; }
     }
     const near = G.eb.some(b => Math.hypot(b.x + b.vx * .08 - P.x, b.y + b.vy * .08 - P.y) < 30);
     return { bx, by, near, emp: P.emp > 0 && (G.eb.length > 45 || (P.hp <= 1 && near)) };
@@ -50,7 +50,7 @@ const BOT = (o) => {
     if (o.stage && m.ST.over) { cleared = true; break; }
   }
   const G = m.G, P = m.P;
-  const r = { dead: !!G.dead, t: +G.t.toFixed(1), hits: hp0 - P.hp, firstHit: +firstHit.toFixed(1), tier: +(tierSum / Math.max(1, tierN)).toFixed(2), score: G.score, kills: G.kills, di: G.di, cleared };
+  const r = { dead: !!G.dead, t: +G.t.toFixed(1), hits: hp0 - P.hp, firstHit: +firstHit.toFixed(1), tier: +(tierSum / Math.max(1, tierN)).toFixed(2), score: G.score, kills: G.kills, di: G.di, cleared, fun: m.FUN ? Object.assign({}, m.FUN.stat) : null, minis: m.DIR && m.DIR.log ? m.DIR.log.mini : 0 };
   m.abort(); return r;
 };
 module.exports = { BOT };
@@ -76,5 +76,6 @@ if (require.main === module) (async () => {
     const row = { died: Math.round(100 * a.filter(x => x.dead).length / a.length), t: avg(a, 't'), fh: avg(a.filter(x => x.firstHit >= 0), 'firstHit'), hits: avg(a, 'hits'), tier: avg(a, 'tier'), score: avg(a, 'score'), clear: Math.round(100 * a.filter(x => x.cleared).length / a.length) };
     out[diff + '/' + type] = row;
     console.log(diff.padEnd(7), type.padEnd(9), String(row.died).padStart(5) + '%', row.t.toFixed(0).padStart(9), row.fh.toFixed(1).padStart(11), row.hits.toFixed(1).padStart(6), row.tier.toFixed(2).padStart(7), row.score.toFixed(0).padStart(8), STAGE ? String(row.clear).padStart(6) + '%' : ''); }
+  { const f = Object.values(res).flat().filter(x => x.fun); if (f.length) console.log('fun events per run (' + f.length + ' runs): ' + ['sets', 'fences', 'drops', 'dropsHit', 'rewards'].map(k => k + ' ' + (f.reduce((a, x) => a + x.fun[k], 0) / f.length).toFixed(1)).join(', ') + ', minis ' + (f.reduce((a, x) => a + x.minis, 0) / f.length).toFixed(1)); }
   fs.writeFileSync(path.join(__dirname, 'playtest', 'd-sim' + (STAGE ? '-s' + STAGE : '') + '.json'), JSON.stringify(out, null, 1));
 })().catch(e => { console.error(e); process.exit(2); });

@@ -248,7 +248,7 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
 function update(dt){
   if(SH.active){SH.tick(dt);return;}                      // pit stop: the world waits
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
-  const btk=G.bt>0?(G.btk||.5):1,sdt=dt*G.slow*btk,pdt=dt*G.slow;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
+  const btk=G.bt>0?(G.btk||.5):1,sdt=dt*G.slow*btk*PW.wk,pdt=dt*G.slow;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
   if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);

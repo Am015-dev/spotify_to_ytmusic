@@ -4,6 +4,11 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Mainhattan Nightrun J1 (10 Oct 2026)
+- Music is locked at playbackRate 1 with natural pitch (`NR.music.setRate` ignores everything but 1); TEMPO UP = double-time fire + score x2, SLOW GROOVE = world at 0.6x (`PW.wk`) + soft low-pass, master limiter. `audio-test.js` asserts rate 1 and no clipping through TEMPO, SLOW, DROP, low hull.
+- `parts/fun.js`: set pieces every 6 bars (WEAVE, LASER FENCE, district formation), DROP every 16 bars (dash on the downbeat), shard showers; mini-boss every ~26 bars. `fun-test.js` covers it; bots call `FUN.cost(y)`.
+- Art: boss portraits and ship cards in round badges, phone rooftop strips (`fix-art.py`), both mini-boss paintings and the shield-link beam wired. Still to paint: 13 base perk icons (`assets-extra.md`, `games/missing.html`).
+
 ## Standing rules
 - Never write an original game's, publisher's or designer's name in the public repo or the site. No model names
   in files or commits.

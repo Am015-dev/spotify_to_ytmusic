@@ -21,8 +21,8 @@ const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral
   {k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H',sub:'Shield wall, spear rig'}];
 const WARN=[];                                           // spawn markers: shown for one beat before something enters from an edge or falls
 const DIR={
-  sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:64,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
-  reset(){this.q=[];this.nextMini=64;this.minis=0;this.lastTheme='';this.log={spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0};WARN.length=0;G.rb=0;upsCalc();},
+  sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:20,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
+  reset(){this.q=[];this.nextMini=20;this.minis=0;this.lastTheme='';this.log={spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0};WARN.length=0;G.rb=0;upsCalc();},
   tag(){return'';},
   tierv(){return ST.on?clamp((ST.lvl-2)*.5,0,5):G.pos+G.loop*5+(G.dprog||0);},
   plan(stage,bossBars){this.stage=stage;this.sb=songBars(stage);this.bossBar=Math.max(24,this.sb-(bossBars||BOSS_BARS));this.bar=-1;this.theme=null;this.acc=.6;this.idle=9;this.emptyB=0;this.q=[];WARN.length=0;G.dbar=0;this.ldt=0;},
@@ -58,8 +58,8 @@ const DIR={
   barLine(i){const bar=Math.max(0,Math.round(ST.on?G.dbar:G.dbar));G.rb++;
     if(bar<=this.bar&&this.bar>=0&&!ST.on)return;this.bar=bar;
     const ph=Math.floor(bar/8);if(this.theme==null||ph!==this.phr){this.phr=ph;this.pickTheme(bar);}
-    // mini-boss about every 64 bars of play, never in the first 10 bars of a district or right before the boss
-    if(!ST.on&&G.rb>=this.nextMini&&bar>=10&&bar<this.bossBar-12){this.nextMini+=64;this.spawnMini();return;}
+    // mini-boss about every 26 bars (~50 s) of play, never in the first 10 bars of a district or right before the boss
+    if(!ST.on&&G.rb>=this.nextMini&&bar>=10&&bar<this.bossBar-8){this.nextMini+=26;this.spawnMini();return;}
     const E=this.energy(bar),dn=(DF.dn||1),t=this.tierv();
     let n=(.95+TUNE2.slope*t+TUNE2.quad*t*t)*(.42+1.15*E)*dn*UPS.dens*Math.pow(66/Math.max(40,this.sb),TUNE2.lenK)*(ST.on?ST.dk:1);   // a long song (4 minutes) is calmer per bar than a short one: the district is about equally hard in total
     if(this.thName==='breath')n*=.6;

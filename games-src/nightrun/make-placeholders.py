@@ -56,5 +56,6 @@ out += ['## Sound (no placeholder files yet)', '', 'Short effects, MP3 or OGG, a
        '| `sfx-heartbeat` | 0.4 s | the soft thump on every beat at 1 hull (synth sine today) |', '| `sfx-equip` / `sfx-unequip` | 0.3 s | garage LOAD tab equip and unequip clicks |', '| `sfx-sell` | 0.5 s | coins dropping, selling a perk level |', '| `sfx-buy` | 0.4 s | buying in the garage or the daily shop |',
        '| `sfx-leader-warn` | 0.8 s | a squad leader is about to fire its fan (low brass stab) |', '| `sfx-leader-down` | 1.0 s | leader killed, squad panics |', '| `sfx-medal` | 1.5 s | medal on the stage clear screen |', '| `sfx-chest` | 2.0 s | boss chest reveal (planned feature) |', '',
        '## Music', '', 'Menu song for the garage/shop (2 min loop, calm, same -18 LUFS as the others, with `bpm` and `offsetMs` measured for `tracks.json`). Optional: a short stinger for LEGEND difficulty.', '']
+out.append(open(os.path.join(HERE, 'assets-extra.md')).read() if os.path.exists(os.path.join(HERE, 'assets-extra.md')) else '')
 open(os.path.join(HERE, 'ASSETS-NEEDED.md'), 'w').write('\n'.join(out))
 print('ASSETS-NEEDED.md written')

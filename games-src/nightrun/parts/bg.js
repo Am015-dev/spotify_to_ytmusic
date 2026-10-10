@@ -179,6 +179,8 @@ function drawBGP(bg,t,dt,scroll){const D=bg.D;let L=bgpFor(DISTRICTS.indexOf(D))
   const PA=ART.paintP(bg,scroll);if(!PA)ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);   // painted phone backdrop, the roofs on top fainter
   if(!PA&&L.stub&&ART.failed(DISTRICTS.indexOf(D),true)){const i=DISTRICTS.indexOf(D);D.nostubP=1;delete BGPC[i];L=bgpFor(i);}
   if(!PA&&!L.stub)for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
+  if(PA){const lb=ART.bm['ly-phone-'+ART.dn[DISTRICTS.indexOf(D)]];if(lb){const lh=PW_*lb.height/lb.width,off=(scroll*.5)%(2*lh);ctx.globalAlpha=.5;   // the painted rooftops seen from above, mirrored tiles so there is no seam
+      for(let j=-2;j*lh+off<PH_;j++){const y=j*lh+off;if(y+lh<=0)continue;if(j&1){ctx.save();ctx.translate(0,y+lh);ctx.scale(1,-1);ctx.drawImage(lb,0,0,PW_,lh);ctx.restore();}else ctx.drawImage(lb,0,y,PW_,lh);}}}
   ctx.globalAlpha=1;
   if(D.near==='river'&&!PA){const g=ctx.createLinearGradient(0,0,PW_,0);g.addColorStop(0,'#08203a00');g.addColorStop(.5,'#0a2a4acc');g.addColorStop(1,'#08203a00');ctx.fillStyle=g;ctx.fillRect(PW_*.3,0,PW_*.4,PH_);}   // the river runs down the middle
   ctx.globalCompositeOperation='lighter';

@@ -1,15 +1,15 @@
 /* ---------- music power-ups: glowing enemies drop them, collecting one exactly on the beat gives +50% time ----------
    DRUM BURST  drum layer + an auto-shot on every beat, on-beat presses fire double
-   TEMPO UP    music x1.25, score x2, more enemies
-   SLOW GROOVE music x0.75, enemy bullets slower
+   TEMPO UP    double-time fire on 8th notes, score x2, faster waves (the song never changes speed or pitch)
+   SLOW GROOVE bullet time: world at 0.6x, the song plays on, a gentle low-pass colours it
    DROP        the music cuts for one bar, then a screen-clearing blast on the next downbeat
    Durations are counted in bars of the music, not seconds. Works with the song files and with the synth. */
 const PWK={
   drum:{n:'DRUM BURST',tip:'Auto-fire on every beat',c:'#ffe14d',bars:8,w:3},
-  tempo:{n:'TEMPO UP',tip:'Faster beat · score ×2',c:'#ff7a3d',bars:8,w:3,rate:1.25},
-  slow:{n:'SLOW GROOVE',tip:'Slower enemy bullets',c:'#5b8cff',bars:8,w:2},
+  tempo:{n:'TEMPO UP',tip:'Double-time fire · score ×2',c:'#ff7a3d',bars:8,w:3,dbl8:1},
+  slow:{n:'SLOW GROOVE',tip:'Bullet time · enemies slow',c:'#5b8cff',bars:8,w:2},
   drop:{n:'DROP',tip:'Blast on the downbeat',c:'#b36bff',bars:2,w:2}};
-const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended:0},log:[],
+const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended:0},log:[],
   st(){return G.pw||(G.pw={act:[],drop:null,ls:G.score,cnt:16,wv:0});},
   on(k){return !!(G&&G.pw&&G.pw.act.some(a=>a.k===k));},
   cur(){return G.bc+PHF;},                                // position in beats that never jumps when the song changes
@@ -17,19 +17,21 @@ const PW={bs:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,ended
   give(kind,ob){const s=this.st(),K=PWK[kind];this.stat.given++;
     if(kind==='drop'){if(s.drop)return false;const p=bpos();let cutB=Math.ceil(p/4)*4;if((cutB-p)*BT.spb<.1)cutB+=4;
       s.drop={cutB,blastB:cutB+4,b0:p,rev:BT.rev,ob,cs:0,rs:0};}
-    else{for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(a.k===kind||(K.rate&&PWK[a.k].rate)){s.act.splice(i,1);this.off(a.k);}}   // one tempo power at a time
+    else{for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(a.k===kind||false){s.act.splice(i,1);this.off(a.k);}}   // one tempo power at a time
       s.act.push({k:kind,s:this.cur(),d:K.bars*4*(ob?1.5:1),ob,w:performance.now()});
-      if(kind==='slow'){this.bs=.6;for(const b of G.eb)if(!b.sl){b.vx*=.6;b.vy*=.6;b.sl=true;}}}
+      }
     floater(P.x,P.y-24,K.n,K.c);if(ob)floater(P.x,P.y-42,'ON BEAT +50% TIME','#ffe14d');
     G.hint={t:3,txt:say(K.tip)};AU.sfx('up');return true;},
-  off(kind){if(kind==='slow'){this.bs=1;for(const b of G.eb)if(b.sl){b.vx/=.6;b.vy/=.6;b.sl=false;}}},
+  off(kind){},
   reset(){this.bs=1;this.dstep=-1;try{const a=AU.a;if(a&&AU.cutg){const g=AU.cutg.gain;g.cancelScheduledValues(a.currentTime);g.setTargetAtTime(1,a.currentTime,.01);}}catch(e){}
-    if(G)G.pw=null;if(BT.stage&&NR.music.rate!==1)NR.music.setRate(1);},
+    this.wk=1;AU.slowColour(false);if(G)G.pw=null;},
   tick(dt){const s=this.st(),cur=this.cur();
     for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(cur-a.s>=a.d){s.act.splice(i,1);this.stat.ended++;this.log.push({k:a.k,beats:cur-a.s,d:a.d,ob:a.ob,ms:performance.now()-a.w,spb:BT.spb});if(this.log.length>40)this.log.shift();this.off(a.k);}}
     const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2, waves come 1.5x as fast
     s.ls=G.score;
-    const rt=s.act.find(a=>PWK[a.k].rate),want=(rt?PWK[rt.k].rate:1)*DYE.q;if(NR.music.rate!==want)NR.music.setRate(want);   // asks again if a song swap blocked it
+    if(s.act.some(a=>a.k==='tempo')&&!G.dead){const h=Math.floor(bpos()*2);if(s.h8===undefined)s.h8=h;if(h!==s.h8){s.h8=h;if(h%2){const x=P.x+22,y=P.y;G.pb.push({x,y:y-5,vx:900,vy:-40,dm:1,pf:0},{x,y:y+5,vx:900,vy:40,dm:1,pf:0});   // the off-beat 8th note: double-time fire
+        try{const a=AU.a;if(a&&a.state==='running')AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats
+    this.wk+=((s.act.some(a=>a.k==='slow')?.6:1)-this.wk)*Math.min(1,dt*6);if(Math.abs(this.wk-1)<.004)this.wk=1;AU.slowColour(this.wk<.97);   // bullet time eases in and out; only a gentle low-pass touches the song
     if(s.drop)this.dropTick(s);
     if(s.wv>0)s.wv-=dt;},
   dropTick(s){const d=s.drop,a=AU.a,p=bpos(),R=B=>BT.t0+BT.off+B*BT.spb;

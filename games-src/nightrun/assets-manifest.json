@@ -374,7 +374,7 @@
   "w": 256,
   "h": 32,
   "group": "Effects",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: shield link between leader and squad (code-drawn dashes now)",
   "notes": "Tileable cyan energy beam, light on black.",
   "kind": "fx"
@@ -444,7 +444,7 @@
   "w": 512,
   "h": 330,
   "group": "Mini-bosses",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: own sprite (re-uses another boss sprite now)",
   "notes": "Tresor-Wart (Bankenviertel mini-boss). Faces LEFT, 512 px wide, transparent.",
   "kind": "sprite"
@@ -454,7 +454,7 @@
   "w": 384,
   "h": 384,
   "group": "Mini-bosses",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: boss intro portrait",
   "notes": "Tresor-Wart (Bankenviertel mini-boss). Square portrait.",
   "kind": "icon"
@@ -464,7 +464,7 @@
   "w": 512,
   "h": 330,
   "group": "Mini-bosses",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: own sprite (re-uses another boss sprite now)",
   "notes": "Messe-Waechter (Messe mini-boss). Faces LEFT, 512 px wide, transparent.",
   "kind": "sprite"
@@ -474,7 +474,7 @@
   "w": 384,
   "h": 384,
   "group": "Mini-bosses",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: boss intro portrait",
   "notes": "Messe-Waechter (Messe mini-boss). Square portrait.",
   "kind": "icon"
@@ -484,7 +484,7 @@
   "w": 768,
   "h": 600,
   "group": "Portrait parallax",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
   "notes": "bankenviertel: a keyed strip seen from above, tileable vertically, transparent sky.",
   "kind": "layer"
@@ -494,7 +494,7 @@
   "w": 768,
   "h": 600,
   "group": "Portrait parallax",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
   "notes": "mainufer: a keyed strip seen from above, tileable vertically, transparent sky.",
   "kind": "layer"
@@ -504,7 +504,7 @@
   "w": 768,
   "h": 600,
   "group": "Portrait parallax",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
   "notes": "ostend: a keyed strip seen from above, tileable vertically, transparent sky.",
   "kind": "layer"
@@ -514,7 +514,7 @@
   "w": 768,
   "h": 600,
   "group": "Portrait parallax",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
   "notes": "messe: a keyed strip seen from above, tileable vertically, transparent sky.",
   "kind": "layer"
@@ -524,7 +524,7 @@
   "w": 768,
   "h": 600,
   "group": "Portrait parallax",
-  "status": "RESERVED",
+  "status": "WIRED",
   "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
   "notes": "athina: a keyed strip seen from above, tileable vertically, transparent sky.",
   "kind": "layer"

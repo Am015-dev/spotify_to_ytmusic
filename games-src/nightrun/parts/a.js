@@ -68,7 +68,7 @@ let fbT=0;
 /* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */
 const NR=window.NR={_h:{},sw:[],on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
   music:{rate:1,   // tempo change: song playbackRate and the beat length scale together, the beat position stays continuous
-    setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();if(BT.pend&&BT.pend.sw)AU.cancelSwitch();   // a tempo change moves the bar lines: drop the scheduled song change, it is planned again
+    setRate(x){x=1;   /* the song ALWAYS plays at 1.0 and natural pitch: power-ups change the game, never the music */const old=this.rate;if(x===old)return;mnow();if(BT.pend&&BT.pend.sw)AU.cancelSwitch();   // a tempo change moves the bar lines: drop the scheduled song change, it is planned again
     const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
       AU.setRate(x);},
@@ -139,7 +139,7 @@ const silentWav=(()=>{let u=null;return()=>{if(u)return u;try{const n=1600,b=new
   u=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}catch(e){u='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';}return u;};})();   // 0.2 s of silence: unlocks an <audio> slot inside a tap
 const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
-    this.m=a.createGain();this.m.connect(a.destination);
+    this.m=a.createGain();try{const L=this.lim=a.createDynamicsCompressor();L.threshold.value=-4;L.knee.value=3;L.ratio.value=20;L.attack.value=.003;L.release.value=.12;this.m.connect(L);L.connect(a.destination);}catch(e){this.m.connect(a.destination);}   // master limiter: nothing clips, however many effects stack
     this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
     this.duck=a.createGain();this.duck.connect(this.cutg);                                     // music dips briefly under big effects
     this.musv=a.createGain();this.musv.connect(this.duck);
@@ -160,6 +160,9 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     if(!navigator.audioSession&&!this.sil){try{const h=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=');h.loop=true;h.volume=.01;h.setAttribute('playsinline','');this.sil=h;const q=h.play();if(q&&q.catch)q.catch(()=>{this.sil=null;});}catch(e){}}
     this.unlockSlots();
     if(!running&&!BT.stage)this.menuMusic();},
+  slowColour(on){const a=this.a;if(!a||!this.cutg||!this.m)return;on=!!on;if(this.slc===on)return;this.slc=on;
+    try{if(!this.lpf){this.lpf=a.createBiquadFilter();this.lpf.type='lowpass';this.lpf.Q.value=.5;this.lpf.frequency.value=20000;this.cutg.disconnect();this.cutg.connect(this.lpf);this.lpf.connect(this.m);}
+      const f=this.lpf.frequency,t=a.currentTime;f.cancelScheduledValues(t);f.setTargetAtTime(on?3200:20000,t,.25);}catch(e){}},   // SLOW: a gentle low-pass on the song, no pitch change
   duckMusic(){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
     this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
@@ -217,7 +220,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   /* ---- stream slots: 5 pooled <audio> elements, each wired to the music bus once. Pooled because iOS lets an element play from code only after it was
      started inside a tap once; unlockSlots() does that for all of them in the first tap, and later a slot just gets another src. ---- */
   mkSlot(){const a=this.a,el=new Audio();el.preload='auto';el.loop=true;el.setAttribute('playsinline','');el.setAttribute('webkit-playsinline','');
-    for(const k of['preservesPitch','webkitPreservesPitch','mozPreservesPitch'])try{if(k in el)el[k]=false;}catch(e){}   // tempo changes bend the pitch, as they did with a buffer source
+    for(const k of['preservesPitch','webkitPreservesPitch','mozPreservesPitch'])try{if(k in el)el[k]=true;}catch(e){}   // natural pitch always (the rate is locked at 1 anyway)
     const node=a.createMediaElementSource(el),g=a.createGain();g.gain.value=0;node.connect(g);g.connect(this.fb);
     const s={el,src:el,node,g,file:null,stage:'',info:null,blob:null,D:0,full:false,seek:false,err:0,tLoad:0,unlocked:false,playing:false,get duration(){return this.D;}};
     el.addEventListener('error',()=>{s.err=1;});this.slotReset(s);return s;},
@@ -246,7 +249,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     const go=()=>{s.kickT=performance.now();s.tCall=a.currentTime;try{if(Math.abs(el.currentTime-p)>.02)el.currentTime=p;}catch(e){}el.playbackRate=rate;s.last=p;s.uPlay=p;
       try{const q=el.play();if(q&&q.catch)q.catch(()=>{s.kickT=0;});}catch(e){}};
     if(!s.seek&&!imm){s.startAt=ctx0-.04;s.startFn=go;}else go();},
-  setRate(x){const a=this.a;for(const s of this.slots||[])if(s.playing){s.el.playbackRate=x;if(!s.startFn&&!s.el.paused&&s.phase!=='wait'){s.ctx0=a.currentTime;s.pos0=s.el.currentTime+s.loops*s.D;s.applied=0;s.hist.length=0;}}},
+  setRate(x){x=1;const a=this.a;for(const s of this.slots||[])if(s.playing){s.el.playbackRate=x;if(!s.startFn&&!s.el.paused&&s.phase!=='wait'){s.ctx0=a.currentTime;s.pos0=s.el.currentTime+s.loops*s.D;s.applied=0;s.hist.length=0;}}},
   // every 25 ms: start delayed songs, stop faded ones, keep the playing ones playing, and pull the beat grid onto what the element really plays
   strTick(a){const pn=performance.now(),ct=a.currentTime,run=a.state==='running'&&!this.hold;
     for(const s of this.slots){

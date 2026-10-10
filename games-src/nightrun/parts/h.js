@@ -2,16 +2,16 @@
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,
    the score of kills and the multiplier decay, and a SNIPER LANE (a beam along the ship's row: it follows the ship for two beats, locks for one, fires on the
    next) comes round every 3 to 5 beats. Moving 50 px away (or dashing) resets everything; the beam is locked for a whole beat, so a ship that moves is never hit by it.
-   DYE (declared in b.js): hull 2 -> song x0.92, hull 1 -> x0.85, death -> tape stop to x0.5. The beat clock follows (NR.music.setRate), so the rhythm stays in sync. */
+   The song never changes speed or pitch (dying included). */
 const STILLF=()=>HARD?2:3,STILL_RAMP=6,BEAM_Y=16;
 NR.on('runStart',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,ax:P.x,ay:P.y,beam:null,nb:0,said:false});Object.assign(DYE,{cur:1,q:1});});
-NR.on('runEnd',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,beam:null});if(DYE.q!==1||NR.music.rate!==1){DYE.cur=DYE.q=1;try{NR.music.setRate(1);}catch(e){}}});
+NR.on('runEnd',()=>{Object.assign(STILL,{t:0,k:0,fk:1,bk:1,sk:1,beam:null});DYE.cur=DYE.q=1;});
 NR.on('tick',dt=>{if(!G.live)return;
   if(dt>0){const k=Math.min(1,dt*8);PV.x+=((P.x-PV.px)/dt-PV.x)*k;PV.y+=((P.y-PV.py)/dt-PV.y)*k;PV.px=P.x;PV.py=P.y;if(P.dashT>0){PV.x*=.3;PV.y*=.3;}}
   /* --- dying slows the beat --- */
   const tgt=1,tau=.2;   // the song never slows down any more (it sounded bad): low hull is shown by a red pulse and a heartbeat instead, see ai.js
   DYE.cur+=(tgt-DYE.cur)*Math.min(1,dt/tau);if(Math.abs(DYE.cur-tgt)<.004)DYE.cur=tgt;
-  const q=Math.round(DYE.cur*100)/100;if(q!==DYE.q){DYE.q=q;const rt=PW.st().act.find(a=>PWK[a.k].rate),want=(rt?PWK[rt.k].rate:1)*q;if(Math.abs(NR.music.rate-want)>=.005)NR.music.setRate(want);}
+  const q=Math.round(DYE.cur*100)/100;DYE.q=q;
   if(G.dead){STILL.beam=null;return;}
   /* --- stillness --- */
   if(Math.hypot(P.x-STILL.ax,P.y-STILL.ay)>50||P.dashT>0){STILL.ax=P.x;STILL.ay=P.y;STILL.t=Math.max(0,STILL.t-STILL.t*.5);if(STILL.t<.5)STILL.t=0;}

@@ -3,10 +3,11 @@
    Nothing is filtered or blurred per frame; scaled copies are cached and rebuilt only when the canvas scale S changes. */
 const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   dn:['bankenviertel','mainufer','ostend','messe','athina'],
-  bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite'],
+  bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite','tresor-wart','messe-waechter'],
+  artK:e=>e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
   shipN:['std','tri','hv','ec','swg','syn'],
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
-  fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine'],
+  fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link'],
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
 ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
   im.onload=()=>{const done=b=>{ART.bm[n]=b;};if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
@@ -75,11 +76,13 @@ ART.paintP=(bg,scroll)=>{const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.d
 /* painted districts get a stub instead of the procedural skyline (building one is a 20-80 ms hitch); the real one is built only if a painted file failed to load */
 ART.stubOk=(di,port)=>{const D=DISTRICTS[di];return !!ART.dn[di]&&!(port?D.nostubP:D.nostub);};
 ART.failed=(di,port)=>{const n=ART.dn[di],D=DISTRICTS[di];return !!(ART.err['bg-'+n+(port?'-phone':'')]||(!port&&(ART.err['ly-mid-'+n]||ART.err['ly-near-'+D.near])));};
-ART.warm=di=>{const n=ART.dn[di];if(!n)return;ART.load('bg-'+n);ART.load('ly-far-'+n);ART.load('ly-mid-'+n);ART.load('ly-near-'+DISTRICTS[di].near);if(wcv!==cv)ART.load('bg-'+n+'-phone');};
+ART.warm=di=>{const n=ART.dn[di];if(!n)return;ART.load('bg-'+n);ART.load('ly-far-'+n);ART.load('ly-mid-'+n);ART.load('ly-near-'+DISTRICTS[di].near);if(wcv!==cv){ART.load('bg-'+n+'-phone');ART.load('ly-phone-'+n);}};
 /* ----- boss intro portrait (drawn above the banner) ----- */
-ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;ctx.save();ctx.globalAlpha=al;
-  ctx.fillStyle='#05030cdd';ctx.fillRect(cx-sz/2-3,y-3,sz+6,sz+6);ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.strokeRect(cx-sz/2-3,y-3,sz+6,sz+6);
-  ctx.drawImage(b,cx-sz/2,y,sz,sz);ctx.restore();};
+ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;const px=Math.max(64,Math.round(sz*S*1.5)),key='pt|'+k+'|'+px;let o=ART.sc[key];
+  if(!o){const c=document.createElement('canvas');c.width=c.height=px;const g=c.getContext('2d'),r=px/2;g.imageSmoothingQuality='high';   // a deliberate round badge: feathered edge, dark vignette, neon rim (never a bare square crop)
+    g.save();g.beginPath();g.arc(r,r,r-3,0,7);g.clip();g.drawImage(b,0,0,px,px);const v=g.createRadialGradient(r,r,r*.55,r,r,r);v.addColorStop(0,'rgba(5,3,12,0)');v.addColorStop(1,'rgba(5,3,12,.85)');g.fillStyle=v;g.fillRect(0,0,px,px);g.restore();
+    g.strokeStyle='#ff3040';g.lineWidth=Math.max(2,px/48);g.shadowColor='#ff3040';g.shadowBlur=px/20;g.beginPath();g.arc(r,r,r-3-g.lineWidth/2,0,7);g.stroke();o=ART.sc[key]=c;}
+  ctx.save();ctx.globalAlpha=al;ctx.drawImage(o,cx-sz/2,y,sz,sz);ctx.restore();};
 /* ----- start-up: the gameplay sprites first, bosses and the rest of the districts one at a time while the title is up ----- */
 {for(const n of ART.shipN)ART.load('spr-ship-'+n);for(const n of ART.enN)ART.load('spr-en-'+n);for(const n of ART.fxN)ART.load('fx-'+n);for(const n of ART.pkN)ART.load('pk-'+n);
   ART.warm(0);
@@ -89,7 +92,7 @@ NR.on('kill',({e,boss})=>{
   if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(i===4?'explosion-boss':'explosion-big',bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
   ART.boom(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e.x,e.y,e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6),.42);});
 NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,.09);});
-{const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=G.boss.k;};}   // boss intro / phase banners carry the boss portrait
+{const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=ART.artK(G.boss);};}   // boss intro / phase banners carry the boss portrait
 {const _e=enterDistrict;enterDistrict=function(i){ART.warm(i);ART.warm(nextDi(i).di);return _e.apply(this,arguments);};}
 /* the scaled copies of the next backdrop are built in calm moments, never in the middle of a fight */
 setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame();const port=wcv!==cv;

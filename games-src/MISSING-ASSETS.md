@@ -27,7 +27,7 @@ Generated 9 Oct 2026 from the card data, art manifests, campaign files, hand-off
 | Lantern Dive | 42 | 0 |
 | Cauldron Fair | 3 | 73 |
 | Final Approach | 2 | 42 |
-| Mainhattan Nightrun | 0 | 0 |
+| Mainhattan Nightrun | 13 | 0 |
 | **Total** | **311** | **262** |
 
 ## To make, per game
@@ -939,7 +939,52 @@ Style block (paste in front of every art prompt for this game):
 
 ### Mainhattan Nightrun (`games/mainhattan-nightrun/`)
 
-**0 to make.** Nothing missing: all 8 stage tracks (menu, 3 stages, 2 bosses, 2 endless) are in games/mainhattan-nightrun/music/ and wired. Owned by the Game Night orchestrator.
+**13 to make** (garage perk icons, 128x128 transparent). Music is all in and wired. Owned by the Game Night orchestrator.
+
+Style block (paste in front of every art prompt for this game):
+
+Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers
+
+**Garage perk icons**
+
+- [ ] `games/mainhattan-nightrun/media/kit-dmg.webp` (1:1, target 128x128 WebP)
+  - Prompt: Power Core: a glowing red-orange reactor core with a lightning crack
+
+- [ ] `games/mainhattan-nightrun/media/kit-rof.webp` (1:1, target 128x128 WebP)
+  - Prompt: Rapid Coil: a coil of copper wire charged with yellow sparks, two forward chevrons behind it
+
+- [ ] `games/mainhattan-nightrun/media/kit-shd.webp` (1:1, target 128x128 WebP)
+  - Prompt: Shield Plating: a cyan shield made of layered armour plates
+
+- [ ] `games/mainhattan-nightrun/media/kit-rgn.webp` (1:1, target 128x128 WebP)
+  - Prompt: Shield Regen: a cyan shield with a circular refill arrow around it
+
+- [ ] `games/mainhattan-nightrun/media/kit-hul.webp` (1:1, target 128x128 WebP)
+  - Prompt: Hull Plating: a riveted steel hull plate with a green plus cut into it
+
+- [ ] `games/mainhattan-nightrun/media/kit-dsh.webp` (1:1, target 128x128 WebP)
+  - Prompt: Dash Capacitor: a capacitor cylinder with a bright motion streak behind it
+
+- [ ] `games/mainhattan-nightrun/media/kit-mag.webp` (1:1, target 128x128 WebP)
+  - Prompt: Magnet Coil: a coil magnet pulling small neon crystals toward it
+
+- [ ] `games/mainhattan-nightrun/media/kit-ckp.webp` (1:1, target 128x128 WebP)
+  - Prompt: Combo Keeper: a padlock holding a glowing orange multiplier flame
+
+- [ ] `games/mainhattan-nightrun/media/kit-pwd.webp` (1:1, target 128x128 WebP)
+  - Prompt: Power Amp: a speaker amplifier cone with magenta shock rings
+
+- [ ] `games/mainhattan-nightrun/media/kit-crt.webp` (1:1, target 128x128 WebP)
+  - Prompt: Critical Core: a faceted red crystal with a white starburst at its heart
+
+- [ ] `games/mainhattan-nightrun/media/kit-drn.webp` (1:1, target 128x128 WebP)
+  - Prompt: Wingman Drone: a small round gunmetal drone with two thrusters and a cyan eye
+
+- [ ] `games/mainhattan-nightrun/media/kit-rev.webp` (1:1, target 128x128 WebP)
+  - Prompt: Revive Token: a golden coin with a heartbeat glow, a thin halo above it
+
+- [ ] `games/mainhattan-nightrun/media/kit-nmn.webp` (1:1, target 128x128 WebP)
+  - Prompt: Neon Mining: a pickaxe striking a cluster of neon crystals
 
 ## Made but NOT wired (work for us, not the owner)
 

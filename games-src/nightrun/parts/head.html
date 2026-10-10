@@ -99,7 +99,7 @@ html:not(.rdy) #title .row{visibility:hidden;animation:rdyShow 0s 6s forwards}
 #stage.p #over{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-lose.webp) 70% center/cover no-repeat}
 #stres{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/end-win.webp) center/cover no-repeat}
 #stage.p #stres{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-win.webp) 70% center/cover no-repeat}
-.pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 0 6px var(--c,#0000))}
+.pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:cover;border-radius:50%;border:2px solid var(--c,#8c86b8);box-sizing:border-box;flex:0 0 auto;box-shadow:0 0 10px var(--c,#0000),inset 0 0 8px #05030c}   /* the painted ship scene sits in a deliberate round badge, never a bare square crop */
 @container (max-aspect-ratio:1/1){.pg .card img.shp{height:clamp(44px,calc(var(--u)*13),72px)}}
 .pg .card img.ki{height:clamp(30px,calc(var(--u)*9),48px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto}
 #gaCards.tune .card>img.ki{height:36px;width:36px}
