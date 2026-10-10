@@ -4,6 +4,17 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'v89w',id:'sc-rides',text:'Garage → RIDES → STREET: Senna GTR, Hyper 16, Demon 18 and Charger 70 each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
+ {ver:'v89z',id:'lazy',text:'Start the game: it loads at least as fast as before; your equipped ride looks complete at once (also a LEGO ride you equipped earlier).'},
+ {ver:'v89z',id:'lazyg',text:'Garage → RIDES: every LEGO ride picture appears within a few seconds; equipping one shows it complete.'},
+ {ver:'v89z',id:'recycler',text:'Garage → RIDES → STREET: Recycler (green recycle truck) looks complete; drive it: it sits on the road and steers.'},
+ {ver:'v89z',id:'tinyp',text:'RIDES: Tiny Patrol (police car) looks complete and drives.'},
+ {ver:'v89z',id:'tinym',text:'RIDES: Tiny Muscle looks complete and drives.'},
+ {ver:'v89z',id:'rsprint',text:'RIDES: Rally Sprinter looks complete and drives.'},
+ {ver:'v89z',id:'tmarsh',text:'RIDES: Track Marshal looks complete and drives.'},
+ {ver:'v89z',id:'tracer',text:'RIDES: Track Racer looks complete and drives.'},
+ {ver:'v89z',id:'family',text:'RIDES: Family Car looks complete and drives.'},
+ {ver:'v89z',id:'w6362',text:'Frankfurt: a red LEGO shop with a blue roof stands by a street near the start; a person fits through its door.'},
+ {ver:'v89z',id:'w6360',text:'Athens: a yellow LEGO cottage with a red roof and garden stands by a street near the start; a person fits through its door.'},
  {ver:'v89y',id:'trucks',text:'Garage → RIDES → STREET: the 9 new trucks/vans (Flatbed, Repair Truck, Logger, Big Rig, Mail Van, Tanker Cab, Service Van, Bin Truck, Snowplow) each show complete; drive two of them: they sit on the road and steer.'},
  {ver:'v89y',id:'rboat',text:'Frankfurt: the blue Speedboat sits IN the river by the bank (not floating above, not on land).'},
  {ver:'v89x',id:'fig-scale',text:'Walk (on foot) up to the Corner Garage, Town Bank and Town House in Frankfurt: a person fits through the doors with headroom; the buildings still stand on their lots, off the road.'},
