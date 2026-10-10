@@ -53,3 +53,19 @@ The brief comes from the coordinator (session_017iH3DB4VyxwKSdMwsco4Ut).
 - What this pass did remove is the build peak: about −90 MB in real time.
 - To get under 100 MB: struct-of-arrays props and colliders (typed x/z/y/ry + type index). That touches smash, traffic, CE, OC, TR, lively and 99_api, so it is a multi-module refactor for its own worker. Merging the per-tile prop InstancedMeshes is a second option.
 - Bake caches: a lower `BK_MAX` (8000 now) would cut the 16 MB at entry, at some cost to entry speed. Untested.
+
+## NEXT TASK (coordinator, 2026-10-10 04:19): Frankfurt GPU geometry growth on live v89n
+play-4 measured +5.8–12 MB/min of GPU geometry over 4 game-minutes in Frankfurt (`qa_leak/n1`, `qa_leak/n2` on alex/od-play). My gate run showed 0.00.
+
+Asks:
+1. Reproduce it on a 15-min Frankfurt drive along play-4's route.
+2. Check that the far-LOD disposal beyond +900 m (`WB_supFree` → `geometry.dispose`, STR in `98cl_stream.js`) really frees GPU buffers, using `renderer.info.memory` and the memprobe `bufferData`/`deleteBuffer` hook (`glMB`).
+3. If the leak is real, fix it and make the gate catch it. Then REVIEW and DEPLOY on the next free version.
+
+Leads from PERF-3:
+- tPlay's `geoMB` is a scene-traverse number. It counts attributes whose CPU array was released as `count*itemSize*4`, so the Int8/Uint8 WB normal and colour attributes count 4× too big. It is NOT the GPU total. In my runs `renderer.info.memory.geometries` stayed flat while `geoMB` grew.
+- Use memprobe's `glMB` (exact live WebGL buffer bytes) as the truth.
+- Growth is expected while STR builds super cells in newly explored areas. It is bounded only if `WB_supFree` runs beyond `STR_R()+TUNE.strUnload`. Check `__str.st.f` (frees) against `.b` (builds), and `__str.sup().built`/`mb` over time.
+- Check the LAZY regions too (`STR_lzFree` disposes InstancedMesh/geometry; are the materials or the region's merged geometry held elsewhere, e.g. `HUB.cull`?).
+- WB near-proxy buffers (`G.P` in `WB_gprox`) and `WB_mruns` pieces could be rebuilt without disposing the old ones. Grep for `new THREE.InstancedMesh` / `BufferGeometry` in `WB_gprox` and `WB_mruns`.
+- `tools/eff/geodiff.js` gives the owner diff over time. Needs `DRIVE=900`, and the car must actually move: keyboard alone left it parked, so use tPlay's touch route or `__mho` warps along play-4's route.
