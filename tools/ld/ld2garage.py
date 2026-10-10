@@ -215,6 +215,7 @@ def main():
             g = Yw @ (S * (A @ (M[:3, :3] @ c0 + M[:3, 3]))); rr = 0 if abs(ax[0]) >= abs(ax[2]) else 1
             if any(b.get('wheel') and np.linalg.norm(b['g'] - g) < 0.3 for b in bricks): continue  # the same wheel twice (tyre + rim/tyre assembly)
             bricks.append({'t': t, 'r': rr, 'g': g, 'col': 0, 'ld': name, 'wheel': 1, 'M': M}); continue
+        if abs(abs(np.linalg.det(M[:3, :3])) - 1) > 0.05: warn.append('%s: scaled matrix (inline cable/hose primitive), skipped' % name); r['how'] += ' (scaled, skipped)'; continue
         s, C, d = calib_any(name, t)
         O = Yw @ A @ M[:3, :3] @ A.T @ C.T
         if abs(abs(np.linalg.det(M[:3, :3])) - 1) > 1e-3: warn.append('%s: scaled matrix' % name)
