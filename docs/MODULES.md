@@ -324,7 +324,7 @@ uses: 92(97), 93(46), 98gx(22), 98s(18), 30(13), 94(12), 98t(9), 20(7), 10(3), 9
 
 ## 98tx_taxi40468.js — 16 KB
 defines: TX TX_NEW TX_F TX_txt TX_o TX_AX TX_off TX_nudge TX_mk TX_ids TX_ui TX_CAR __tx
-uses: 92(38), 93(20), 98gb(15), 20(6), 98t(3), 30(2), 94(2), 98s(2), 98(2), 10(1)
+uses: 92(40), 93(20), 98gb(15), 20(6), 30(3), 98t(3), 96(3), 10(2), 94(2), 98s(2)
 
 ## 98ld0_data.js — 163 KB
 defines: LD_MESH LD_MODELS

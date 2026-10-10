@@ -90,7 +90,7 @@ G13_ui=(f=>function(){const r=f.apply(this,arguments);try{TX_ui()}catch(e){conso
 {const S=$('#gbBkPc');if(S)for(const k in TX_NEW){const P=GB_PC[k];if(S.querySelector(`.gbPc[data-p="${k}"]`))continue;const b=document.createElement('button');b.className='gbPc';b.dataset.p=k;b.dataset.ct=P.cat;b.dataset.n=P.n;b.innerHTML=`<i>${P.ic}</i>${P.n}`;b.style.display=GB_.ct===P.cat?'':'none';
   const last=[...S.querySelectorAll(`.gbPc[data-ct="${P.cat}"]`)].pop();if(last)last.after(b);else S.appendChild(b)}}
 // ---------- the 40468 preset, step by step from docs/TAXI_40468_STEPS.md (x across −3..3, z front −7 … back 7, y in plates; front = −z)
-function TX_CAR(){const A=[],Y='#fac80a',W='#f4f4f4',K=CR_K,DSG='#6c6e68',MSG='#a0a5a9',BL='#0055bf',G='#00852b',TC='~#dfe9f0',TR='*#ff3b2a';
+function TX_CAR(){const A=[],Y='#fac80a',W='#f4f4f4',K=CR_K,DSG='#6c6e68',MSG='#a0a5a9',BL='#0055bf',G='#00852b',TC='~#b4dcff',TR='*#ff3b2a';
  const dim=(t,r)=>{CR_reg(t);const P=GB_PC[t];return[r%2?P.d:P.w,r%2?P.w:P.d,P.h]};
  // C: centre (studs, studs, plates) → cell + offsets; B: footprint box + bottom
  const C=(t,r,c,cx,cz,cy)=>{const[fw,fd,h]=dim(t,r),x=Math.round(cx-fw/2+1e-6),z=Math.round(cz-fd/2+1e-6),y=Math.round(cy-h/2+1e-6),b={t,x,z,y,r,m:0,c},
@@ -119,6 +119,8 @@ function TX_CAR(){const A=[],Y='#fac80a',W='#f4f4f4',K=CR_K,DSG='#6c6e68',MSG='#
  for(const a of[-3,-1,1])B('s22',0,TC,a,a+2,-3,-1,7);for(const[a,b]of S)B('b12',1,TC,a,b,-1,0,7);
  B('b11',0,K,-2.5,-1.5,0,1,7);B('b14',1,K,-1.5,2.5,0,1,7);B('b11',0,TC,-2.5,-1.5,1,2,7);B('b11',0,TC,1.5,2.5,1,2,7);
  B('s21',2,Y,-2.5,-1.5,2,4,7);B('s21',2,Y,1.5,2.5,2,4,7);B('s21',2,TC,-1.5,-.5,3,5,7);B('s21',2,TC,.5,1.5,3,5,7);
+ // garage-16 (readability, not in the set): black seats + dash inside the cabin, so the windows read as windows through the glass in the drive camera
+ B('b22',0,K,-1,1,-1,1,2);B('b22',0,K,-1,1,1,3,2);B('p12',1,K,-1,1,0,1,5);B('p12',1,K,-1,1,2,3,5);
  // 26-30 hood, mirrors, roof (5 wide on the ½ offset)
  B('p24',1,Y,-2,2,-5,-3,6);B('lh11',1,Y,-3,-2,-4,-3,6);B('lh11',3,Y,2,3,-4,-3,6);
  B('p14',1,Y,-2,2,-7,-6,6);B('t13',0,Y,-3,-2,-7,-4,6);B('t13',0,Y,2,3,-7,-4,6);
@@ -133,4 +135,8 @@ function TX_CAR(){const A=[],Y='#fac80a',W='#f4f4f4',K=CR_K,DSG='#6c6e68',MSG='#
 {const R=GAR_set('rod'),L=n=>JSON.parse(JSON.stringify(R.load[n]));
  GAR_SETS.push({id:'t_taxi',n:'Yellow Taxi (40468)',tier:'c',req:null,car:TX_CAR,off:R.off,boat:R.boat,tpl:1,ref:'40468',forms:['car'],
   load:{car:{name:'YELLOW TAXI',k:'Street',st:{top:1.03,acc:1.04,han:1.04,hull:1.04},w:'Medium',perk:'start'},'4x4':L('4x4'),boat:L('boat')}})}
+// garage-16: in roam every car is squeezed to 75 % width (SC_K.shipX, made for the old winged ships). The taxi is a true 6-wide build at real
+// scale (1.9 m wide unsqueezed, a real car is 1.8 m), so the squeeze made it read long and flat. Builds with the TAXI door brick keep their width.
+GB_attach=(f=>function(g,bricks){const r=f.apply(this,arguments);try{if(g&&g.userData)g.userData.txW=!!(bricks||[]).some(b=>b&&b.t==='tx12')}catch(e){}return r})(GB_attach);
+SC_ship=(f=>function(g){const r=f.apply(this,arguments);const ud=g&&g.userData;if(ud&&ud.txW&&ud.scOn&&ud.m&&ud.m.scale.x!==ud.m.scale.y)ud.m.scale.x=ud.m.scale.y;return r})(SC_ship);
 window.__tx={car:TX_CAR,nudge:TX_nudge,o:TX_o,S:TX,txt:TX_txt};
