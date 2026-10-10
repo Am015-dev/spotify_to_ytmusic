@@ -1,0 +1,6 @@
+0 FILE l_lamp.ldr
+0 Street lamp: 2039 Support 2x2x7 Lamppost (as used in 10184 Town Plan, Marc Giraudet, OMR CCAL 2.0) + 3062b round brick lamp + 4740 dish shade
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+1 0 0 0 0 1 0 0 0 1 0 0 0 1 2039.dat
+1 46 0 -168 0 1 0 0 0 1 0 0 0 1 3062b.dat
+1 0 0 -192 0 1 0 0 0 -1 0 0 0 -1 4740.dat

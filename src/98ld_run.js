@@ -28,4 +28,5 @@ G9C_render=(f=>function(S,fm){const m=LD_probe(()=>G9C_bricks(S,fm));if(m.length
 GB_enter=(f=>function(){if(!LDL.wait.size)return f.apply(this,arguments);const t=this,a=arguments;Promise.all([...LDL.wait.values()].map(w=>w.p)).then(()=>setTimeout(()=>f.apply(t,a),0))})(GB_enter);
 // garage-17 (98fb_form_build.js): BUILD on an OFF-ROAD / WATER ride copies S.off() / S.boat() into the builder; wait for its model first
 FB_begin=(f=>function(S,fm){const m=S&&typeof S[fm]==='function'?LD_probe(()=>GAR_arr(S[fm]())):[];if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>{f(S,fm);LD_redraw()});return 1})(FB_begin);
+window.__ld.equip=id=>{gbOpen();return LD_need(LD_probe(()=>GAR_arr(GAR_set(id).car()))).then(()=>{GAR_select(id);gbClose(true);return GAR_get().sel})};// test hook: equip a ride and SAVE & DRIVE
 window.__ld.need=LD_need;window.__ld.L=LDL;window.__ld.probe=LD_probe;window.__ld.sel=id=>GAR_select(id);window.__ld.set=id=>GAR_set(id);window.__ld.gar=()=>GAR_get();// test hooks

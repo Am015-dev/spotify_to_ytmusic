@@ -72,7 +72,7 @@ const G9C_forms=S=>S.forms||['car','off','boat'];
 const G9C_name=(S,f)=>{const L=S.load&&S.load[f==='off'?'4x4':f];return f==='car'?S.n:(L&&L.name?L.name.charAt(0)+L.name.slice(1).toLowerCase():S.n)};
 function G9C_eq(f){const G=GAR_get();return f==='car'?G.sel:(G[f]&&GAR_owned(GAR_set(G[f]))?G[f]:G.sel)}
 function G9C_list(f){const G=GAR_get(),fav=G.fav||[];let A=[];GAR_SETS.forEach((S,i)=>{if(G9C_forms(S).includes(f))A.push({S,f,i,own:GAR_owned(S),fav:fav.includes(G9C_key(S,f))})});
- const all=A.length,own=A.filter(e=>e.own).length;if(G9C.filt==='own')A=A.filter(e=>e.own);else if(G9C.filt==='fav')A=A.filter(e=>e.fav);
+ const all=A.length,own=A.filter(e=>e.own).length;if(G9C.filt==='own')A=A.filter(e=>e.own);else if(G9C.filt==='fav')A=A.filter(e=>e.fav);else if(G9C.filt==='rac')A=A.filter(e=>e.S.grp==='racers');
  const nm=e=>G9C_name(e.S,e.f);A.sort(G9C.sort==='az'?(a,b)=>nm(a).localeCompare(nm(b)):G9C.sort==='new'?(a,b)=>b.i-a.i:(a,b)=>(b.own-a.own)||G9C_RK[a.S.tier]-G9C_RK[b.S.tier]||a.i-b.i);return{A,all,own}}
 function G9C_equip(S,f){if(!GAR_owned(S)){try{AU.sfx('bump')}catch(e){}return 0}if(f==='car')GAR_select(S.id);else{const G=GAR_get();G[f]=S.id;GAR_put(G);GAR_load();try{AU.sfx('pick')}catch(e){}}gbRender();return 1}
 function G9C_favT(S,f){const G=GAR_get(),k=G9C_key(S,f),F=G.fav=G.fav||[],i=F.indexOf(k);if(i<0)F.push(k);else F.splice(i,1);GAR_put(G);try{AU.sfx('pick')}catch(e){}}
@@ -86,10 +86,10 @@ function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car
   T.r.setSize(W,Hh,false);T.cam.aspect=W/Hh;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.6)*1.75;T.cam.position.set(0,d*.42,d*.9);T.cam.lookAt(0,-sz.y*.04,0);
   T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.r.url();T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('G9C',e);url=null}
  finally{T.r.setSize(112,112,false);T.cam.aspect=1;T.cam.updateProjectionMatrix()}G9C.th.set(key,url);return url}
-function G9C_pump(){if(G9C.busy)return;const next=()=>{const im=document.querySelector('#g9Col img[data-k]:not([src])');if(!im||$('#gbx').hidden){G9C.busy=0;return}
+function G9C_pump(){if(G9C.busy)return;const next=()=>{const L=[...document.querySelectorAll('#g9Col img[data-k]:not([src])')],V=$('#g9Col'),vr=V&&V.getBoundingClientRect(),vis=e=>{const r=e.getBoundingClientRect();return vr&&r.bottom>vr.top&&r.top<vr.bottom&&r.right>vr.left&&r.left<vr.right},im=L.find(vis)||L[0];/* v90e: on-screen cards first (the newest rides sit at the end of the list) */if(!im||$('#gbx').hidden){G9C.busy=0;return}
   const S=GAR_set(im.dataset.s),u=G9C_render(S,im.dataset.f);if(u)im.src=u;else im.removeAttribute('data-k');setTimeout(next,16)};G9C.busy=1;setTimeout(next,30)}
 // ---------- UI: replaces the VEHICLES row at the top of RIDES
-function G9C_html(){const f=G9C.type,{A,all,own}=G9C_list(f),eq=G9C_eq(f),SL={rar:'RARITY',az:'A–Z',new:'NEW'},FL={all:'ALL',own:'OWNED',fav:'★ FAVS'};
+function G9C_html(){const f=G9C.type,{A,all,own}=G9C_list(f),eq=G9C_eq(f),SL={rar:'RARITY',az:'A–Z',new:'NEW'},FL={all:'ALL',own:'OWNED',fav:'★ FAVS',rac:'🏁 RACERS'};
  let h=`<div id="g9Col"><div class="g9Bar">${G9C_TY.map(([k,ic,n])=>{const L=G9C_list(k);return`<button class="g9Ty ${k===f?'on':''}" data-gty="${k}">${ic} ${n} <small>${L.own}/${L.all}</small></button>`}).join('')}
  <button class="g9Ch" data-gso>⇅ ${SL[G9C.sort]}</button><button class="g9Ch" data-gfi>${FL[G9C.filt]}</button></div>
  <div class="g9Cnt">owned ${own} / ${all} · locked ${all-own}</div><div class="g9Grid">`;
@@ -104,7 +104,7 @@ GAR_tab=(f=>function(){f();const B=$('#gbBody');if(!B)return;const row=B.querySe
  C.addEventListener('click',e=>{const t=e.target.closest('button,.g9Card');if(!t)return;e.stopPropagation();
   if(t.dataset.gty){G9C.type=t.dataset.gty;GAR_.pv=t.dataset.gty==='off'?'4x4':t.dataset.gty;try{AU.sfx('pick')}catch(_){}gbRender();return}
   if(t.hasAttribute('data-gso')){G9C.sort={rar:'az',az:'new',new:'rar'}[G9C.sort];gbRender();return}
-  if(t.hasAttribute('data-gfi')){G9C.filt={all:'own',own:'fav',fav:'all'}[G9C.filt];gbRender();return}
+  if(t.hasAttribute('data-gfi')){G9C.filt={all:'own',own:'fav',fav:'rac',rac:'all'}[G9C.filt];gbRender();return}
   if(t.dataset.gfav){G9C_favT(GAR_set(t.dataset.gfav),G9C.type);gbRender();return}
   if(t.dataset.ged){const S=GAR_set(t.dataset.ged);if(GAR_get().sel!==S.id)GAR_select(S.id);GB_enter();return}
   if(t.dataset.gc){const S=GAR_set(t.dataset.gc);G9C_equip(S,G9C.type);GAR_.pv=G9C.type==='off'?'4x4':G9C.type}});G9C_pump()})(GAR_tab);

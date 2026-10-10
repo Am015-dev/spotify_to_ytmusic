@@ -6,12 +6,12 @@
 // (CT_dim, read by OB_cdim). A model missing from models.js (lazy load not finished) falls back to the old procedural kind (CT_FB).
 const CT={geo:{},dim:{},fb:{},stat:[]};
 // slot swaps (after QS/SU swaps): name → new kind. Frankfurt: 0 sedan,1 hypercar,2 taxi,3 van,4 truck,5 delivery,6 police,7 coupe,8 bus,9 tuner,10 roadster
-const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1','truck':'ld:truck:v3221_1',
+const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1','truck':'ld:truck:v3221_1',/* rescue-1: Big Rig back; it keeps its lane via CT_wide below (v90e had dropped it: 3.84 m wide, lane fit unproven) */
   'delivery':'ld:delivery:v60054_1','police':'ld:police:v4436_1','su:t_sc_tm':'ld:car:v75893_1b'},
  ath:{'taxi':'ld:car:tx','sedan':'ld:car:v6633_1','van':'ld:van:v7639_1',/* su:t_sc_tm kept: swapping it together with the taxi added ~110 MB JS heap in Athens (cause open, docs/HANDOFF_city1.md) */'delivery':'ld:delivery:v60054_1','su:t_sc_hy':'ld:car:v75892_1'}};
 if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];const ex=(location.search.match(/[?&]ctx=([^&]*)/)||[])[1]||'';/* test: ctx=<old kinds kept> */for(let i=0;i<HCAR.length;i++){const v=!ex.split(',').includes(HCAR[i])&&S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
 // target body widths per class (m): Town sets are 4–6 studs wide, Speed Champions 8, so each is scaled uniformly to a road width
-const CT_SC=/^v(758|7689)/;// Speed Champions
+const CT_SC=LD_SCRE;// Speed Champions (shared rule, 98ld_import.js)
 const CT_W={tx:1.72/* 6-wide 40468: keep its height near the others */,car:1.9,police:1.95,van:2.1,delivery:2.2,truck:2.4};
 // lazy models (v89z LD_need): start loading the traffic sets of both cities at boot, so they are in before roam builds (else: CT_FB fallback)
 try{LD_need([...new Set(Object.values(CT_SWAP.fra).concat(Object.values(CT_SWAP.ath)).map(n=>n.split(':')[2]).filter(id=>id!=='tx'))])}catch(e){}
@@ -33,8 +33,25 @@ CR_cityGeo=(f=>function(nm){if(!nm||!nm.startsWith('ld:'))return f(nm);if(CR_CG[
 CR_cityPost=(f=>function(im,nm,k,n){f(im,nm,k,n);if(!nm||!nm.startsWith('ld:')||!CR_CG[nm])return;im.userData.sc=1;/* true scale: the 96 SC width cap must not squeeze it */const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)})(CR_cityPost);
 // collision half sizes [half width, half length] of a kind, from its own model (OB_cdim reads this first)
 function CT_dim(k){const n=HCAR[k];return n&&CT.dim[n]&&CR_CG[n]?CT.dim[n]:null}
+// ---- CT_wide (rescue-1): lane fit for traffic wider than a lane (the 3221 Big Rig, 3.84 m incl. mirrors). Traffic drives at c.lane × road width W
+// off the centre line (.36 W), which puts a rig over the kerb or the centre line on roads under ~11 m. A wide kind instead: (1) drives at the offset that
+// keeps it between the centre line (+.15 m) and the kerb (−.3 m), (2) only uses road segments wide enough for that (W ≥ 4·hw + 1), choosing its next
+// segment among those (U-turn back the way it came at a dead end) and (3) spawns on one. Junction segments (W 0) keep lane 0 like every car.
+const CT_WD={hw:1.3,st:{n:0,re:0,ut:0,bad:0}};
+function CT_segW(N,a,b){const A=N[a],B=N[b];if(!A||!B)return 0;return A.ab||A.g||B.g?99:Math.min(A.w||20,B.w||20)}
+function CT_wideHw(c){const n=HCAR[c.k],d=n&&CT.dim[n]&&CR_CG[n]?CT.dim[n]:null;return d&&d[0]>CT_WD.hw?d[0]:0}
+function CT_wideOk(N,a,b,hw){return CT_segW(N,a,b)>=4*hw+1}
+buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);try{const N=HUB.nodes,C=HUB.cars;if(!N||!C)return r;const W=[];
+ for(let i=0;i<N.ng;i++)for(const n of N[i].nb||[])if(n<N.ng&&CT_segW(N,i,n)>=9&&CT_segW(N,i,n)<99)W.push([i,n]);
+ for(const c of C){const hw=CT_wideHw(c);if(!hw)continue;CT_WD.st.n++;if(!CT_wideOk(N,c.a,c.b,hw)&&W.length){const q=W[(c.j*7919+c.k*31)%W.length];c.a=q[0];c.b=q[1];c.t=.5;CT_WD.st.re++}c._wa=c.a}}catch(e){console.warn('CT wide',e)}return r})(buildHubTraffic);
+hubTrafficStep=(f=>function(dt){const r=f.apply(this,arguments);try{const N=HUB.nodes,C=HUB.cars;if(!N||!C)return r;
+ for(const c of C){const hw=CT_wideHw(c);if(!hw||c.route)continue;
+  if(c.a!==c._wa){/* just turned onto a new segment: keep to wide roads */if(!CT_wideOk(N,c.a,c.b,hw)){const nx=(N[c.a].nb||[]).filter(n=>n<N.ng&&n!==c._wa&&CT_wideOk(N,c.a,n,hw)&&!QS_shut(c.a,n));
+    if(nx.length)c.b=nx[(c.j+c.a)%nx.length];else{c.b=c._wa;CT_WD.st.ut++}}c._wa=c.a}
+  const w=CT_segW(N,c.a,c.b);if(w>=99)continue;if(!CT_wideOk(N,c.a,c.b,hw))CT_WD.st.bad++;c.lane=Math.max((hw+.15)/w,Math.min(.36,.5-(hw+.3)/w))}}catch(e){}return r})(hubTrafficStep);
 window.__ct={CT,swap:CT_SWAP,hcar:()=>HCAR.slice(),geo:nm=>CR_cityGeo(nm),r:()=>renderer,
  cars:()=>(HUB.cars||[]).filter(c=>!(c.dead>0)&&c.x!=null).map(c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];return{nm:HCAR[c.k],x:c.x,z:c.z,y:c.y||0,h:A&&B?Math.atan2(B.x-A.x,B.z-A.z):0,d:Math.hypot(c.x-RO.x,c.z-RO.z)}}).sort((a,b)=>a.d-b.d),
+ wide:()=>{const N=HUB.nodes,o=[];for(const c of HUB.cars||[]){const hw=CT_wideHw(c);if(!hw)continue;const w=CT_segW(N,c.a,c.b);o.push({hw:+hw.toFixed(2),W:w,lane:+c.lane.toFixed(3),off:+(c.lane*w).toFixed(2),kerb:+(w/2-c.lane*w-hw).toFixed(2),mid:+(c.lane*w-hw).toFixed(2),x:c.x,z:c.z})}return{st:CT_WD.st,cars:o}},
  freeze:on=>{if(on){if(!CT.hts){CT.hts=hubTrafficStep;hubTrafficStep=()=>{}}}else if(CT.hts){hubTrafficStep=CT.hts;CT.hts=null}}};
 // ---- CTB (city-1, city-2 2026-10-10): BUILDINGS. Alex: "replace the generic city buildings with real LEGO buildings at minifig scale (a LEGO human
 // fits the door)". The generic filler buildings (Frankfurt: the Kenney street rows/frontage via putK; Athens: the small 'plaka' houses and villas via
