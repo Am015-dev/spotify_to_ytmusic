@@ -17,7 +17,6 @@ function FB_drop(){for(const k in CR_VC)if(k.indexOf('gar|')===0)delete CR_VC[k]
 // start editing a form (S = the set, f = 'off' | 'boat')
 function FB_begin(S,f){if(!GB.d||!S||!S[f])return 0;if(FB.s)FB_end(1);const d=GB.d;
  FB.s={id:S.id,f,car:d.bricks||[],bp:d.bp,pv:GAR_.pv,dist:GB_.dist};d.bricks=FB_cur(S,f);d.bp=1;GAR_.pv='car';
- let m=0;for(const b of d.bricks){const P=GB_PC[b.t];if(P)m=Math.max(m,Math.abs(b.x)+P.w,Math.abs(b.z)+P.d)}GB_.dist=Math.max(GB_.dist||14,m*GB_U*1.7);
  if(!$('#gbx').hidden)gbRender();FB_tag();return 1}
 // save the form's bricks (only when they differ from the preset; an empty form falls back to the preset)
 function FB_save(){const s=FB.s;if(!s||!GB.d)return;const S=GAR_set(s.id),B=JSON.parse(JSON.stringify(GB.d.bricks||[])),G=GAR_get(),F=G.fb=G.fb||{},k=FB_K(s.id,s.f),
