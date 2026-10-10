@@ -10,7 +10,7 @@ files = [b for b in re.split(r'(?m)^(?=0 FILE )', txt) if b.startswith('0 FILE')
 fn = lambda b: b.split('\n', 1)[0][7:].strip()
 pick = [fn(b) for b in files if fn(b).lower() in (name.lower(), name.lower() + '.ldr')]
 assert pick, 'no FILE ' + name
-ref = re.search(r'(?m)^1 (\d+) (?:\S+ ){12}%s\s*$' % re.escape(pick[0]), txt)
+ref = re.search(r'(?m)^1 (\d+) (?:\S+ ){12}%s\s*$' % re.escape(pick[0]), txt, re.I)
 col = ref.group(1) if ref else '16'
 root = '0 FILE root - %s\n0 %s (root wrapper, colour %s from the set scene)\n1 %s 0 0 0 1 0 0 0 1 0 0 0 1 %s\n0 NOFILE\n' % (pick[0], pick[0], col, col, pick[0])
 open(out, 'w').write(root + ''.join(files))
