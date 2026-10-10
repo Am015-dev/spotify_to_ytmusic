@@ -37,7 +37,9 @@ function LDW_spot(x0,z0,hw,hd,road){for(let r=12;r<400;r+=6)for(let a=0;a<36;a++
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;if(!ok)continue;
    for(const q of[0,1,2,3]){if(q%2!==rot)continue;const A=q*Math.PI/2,fx=-Math.sin(A),fz=-Math.cos(A);let hit=0;
     for(let k=1;k<=road;k++){const px=x+fx*(hd+k),pz=z+fz*(hd+k);if(roamHit(px,pz,.5))break;if(FL_road(px,pz,0)){hit=1;break}}if(hit)return{x,z,rot,yaw:q}}}}return null}
-function LDW_build(){if(!HUB.grp||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}}
+// v89z: the city's prop models load first (models/<id>.js, 98ld_run.js), then build; a city switch meanwhile drops the stale build
+function LDW_build(){if(!HUB.grp||LDW.on.length||LDW.busy===HUB.grp)return;const g=HUB.grp,cid=CID;LDW.busy=g;
+ LD_need(LDW_P.filter(P=>P.city===cid).map(P=>P.model)).then(()=>{if(LDW.busy===g)LDW.busy=0;if(HUB.grp!==g||CID!==cid||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}})}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);LDW_build();return r})(buildRoam);
 // LOD: after the hub cull, near mesh within LDW.lod m of the camera, big-parts mesh beyond
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDW.on.length)return;const cx=camera.position.x,cz=camera.position.z;
