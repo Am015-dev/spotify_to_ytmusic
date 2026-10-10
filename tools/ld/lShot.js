@@ -13,7 +13,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  await p.setViewportSize({width:852,height:393});await p.waitForTimeout(2000);
  await p.evaluate(()=>{const cv=__art.renderer.domElement;for(const e of document.body.querySelectorAll('*'))if(e!==cv&&!e.contains(cv))e.style.visibility='hidden'});
  for(const t of TY.split(',')){
-  const r=await p.evaluate(t=>{const THREE=__art.THREE,D=__mho.HUB.ptypes[t];if(!D||!D.lds)return{err:'no swap '+t};const ms=[];__mho.HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===D.g||o.geometry===D.gFar))ms.push(o)});
+  const r=await p.evaluate(([t,camy])=>{const THREE=__art.THREE,D=__mho.HUB.ptypes[t];if(!D||!D.lds)return{err:'no swap '+t};const ms=[];__mho.HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===D.g||o.geometry===D.gFar))ms.push(o)});
    D.g.computeBoundingBox();const h=D.g.boundingBox.max.y-D.g.boundingBox.min.y,sz=Math.max(D.g.boundingBox.max.x-D.g.boundingBox.min.x,D.g.boundingBox.max.z-D.g.boundingBox.min.z);
    const x0=__mho.RO?__mho.RO.x:2061,z0=__mho.RO?__mho.RO.z:0,M=new THREE.Matrix4(),S=new THREE.Vector3(),Q=new THREE.Quaternion(),c=[];
    for(const o of ms)for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);const P=new THREE.Vector3();M.decompose(P,Q,S);if(S.x<.05)continue;c.push({o,i,P,Q:Q.clone(),s:S.y,d:Math.hypot(P.x-x0,P.z-z0)})}
@@ -21,11 +21,11 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
    let tried=0;
    for(const q of c.slice(0,80)){const H=h*q.s,Dd=Math.max(7,H*1.3,sz*q.s*2),ty=q.P.y+Math.min(H*.45,1.2+H*.3),tgt=new THREE.Vector3(q.P.x,ty,q.P.z);
     const bx=D.g.boundingBox,lx=bx.max.x-bx.min.x>bx.max.z-bx.min.z,yaw=new THREE.Euler().setFromQuaternion(Q.copy(q.Q)).y,a0=-yaw+(lx?Math.PI/2:0);// long props (barrier): look across the long side first
-    for(let k=0;k<12;k++){tried++;const a=a0+[0,6,1,5,7,11,2,4,8,10,3,9][k]*Math.PI/6,cam=new THREE.Vector3(q.P.x+Math.cos(a)*Dd,q.P.y+(+process.env.CAMY||1.5),q.P.z+Math.sin(a)*Dd),dir=tgt.clone().sub(cam),L=dir.length();dir.normalize();
+    for(let k=0;k<12;k++){tried++;const a=a0+[0,6,1,5,7,11,2,4,8,10,3,9][k]*Math.PI/6,cam=new THREE.Vector3(q.P.x+Math.cos(a)*Dd,q.P.y+camy,q.P.z+Math.sin(a)*Dd),dir=tgt.clone().sub(cam),L=dir.length();dir.normalize();
      R.set(cam,dir);R.far=L+sz*q.s;const h1=R.intersectObjects(objs,false).find(x=>x.object.visible);if(!h1||h1.object!==q.o||h1.instanceId!==q.i)continue;
      R.set(tgt,dir.clone().negate());R.far=L;const h2=R.intersectObjects(objs,false).filter(x=>x.object!==q.o&&x.object.visible&&!x.object.isSprite);if(h2.length)continue;
      return{cam:[cam.x,cam.y,cam.z,tgt.x,tgt.y,tgt.z],at:[q.P.x,q.P.y,q.P.z].map(v=>+v.toFixed(1)),H:+H.toFixed(2),D:+Dd.toFixed(1),tried,n:c.length}}}
-   return{err:'no clear view',tried,n:c.length}},t);
+   return{err:'no clear view',tried,n:c.length}},[t,+process.env.CAMY||1.5]);
   console.log('SPOT',t,JSON.stringify(r));if(r.err)continue;
   for(const[off,nm]of[[0,'after'],[1,'before']]){await p.evaluate(o=>__ld.ldsAB(o),off);await p.evaluate(c=>__gnb.cam(c),r.cam);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${t}_${nm}.png`});console.log('shot',`${OUT}/${t}_${nm}.png`)}
   await p.evaluate(()=>__ld.ldsAB(0))}
