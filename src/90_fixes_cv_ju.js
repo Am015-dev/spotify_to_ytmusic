@@ -72,7 +72,10 @@ function OC_beamGeo(){const NL=14,NW=8,L=20,P=[],C=[],I=[];
   for(let i=0;i<NL;i++)for(let j=0;j<NW;j++){const a=i*(NW+1)+j,b=a+1,c=a+NW+1,d=c+1;I.push(a,c,b,b,c,d)}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.setIndex(I);g.setAttribute('uv',new THREE.Float32BufferAttribute(new Array(P.length/3*2).fill(0),2));g.computeVertexNormals();return g}
 FL_headlights=function(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.cars.length+1;
-  if(!H||H.parent!==HUB.grp||H.count<N){if(H&&H.parent)H.parent.remove(H);
+  // PERF-4: capacity = instanceMatrix.count. H.count is the drawn count set below, so `H.count<N` rebuilt the mesh every call while any car was hidden
+  // (most of the time), and the old one was never disposed: its geometry + instance buffer stayed on the GPU (+0.7 MB per area, ~1 rebuild/s at dusk/night).
+  if(H&&H.parent!==HUB.grp&&H.instanceMatrix.count>=N)HUB.grp.add(H);
+  if(!H||H.instanceMatrix.count<N){if(H){H.removeFromParent();H.geometry.dispose();H.material.dispose();H.dispose()}
     const L=[cbox(.42,.26,.12,-.72,.85,2.25,'#fff6d8'),cbox(.42,.26,.12,.72,.85,2.25,'#fff6d8'),cbox(.36,.2,.1,-.74,.9,-2.25,'#ff2a20'),cbox(.36,.2,.1,.74,.9,-2.25,'#ff2a20')];L.push(OC_beamGeo());
     const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,color:0x000000,fog:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4});
     H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+8);H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1;H.userData.oc=1}

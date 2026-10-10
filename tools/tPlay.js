@@ -9,14 +9,15 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const path=require('path');
 const URL0=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',URL=process.env.FAST==='1'&&!/[?&]fast=1/.test(URL0)?URL0+(URL0.includes('?')?'&':'?')+'fast=1':URL0,OUT=process.argv[3]||'qa';fs.mkdirSync(OUT,{recursive:true});
 const FASTM=process.env.FAST==='1';  // FAST=1: game URL gets ?fast=1 (src/test/fast.js) and no CPU throttle (results are frame-stepped, so throttle only changes wall time)
+const RENDER=+(process.env.RENDER||20);  // RENDER=N: draw every Nth game frame (default 20: real GPU uploads, so glMB is what a player's GPU holds and the no-leak gate can see GPU leaks); 0 = no drawing except shots
 const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.env.CITIES||'fra,ath').split(','),THR=+(process.env.THROTTLE||(FASTM?1:4)),SHOTS=process.env.SHOTS!=='0';
 const results=[];let fails=0;const ok=(c,m,i)=>{console.log((c?'PASS ':'FAIL ')+m+(i!==undefined?' · '+JSON.stringify(i):''));if(!c)fails++};
 // ---- in-page: test-driven rAF clock + per-frame monitor
-const INIT=`(()=>{const q=[];let t=0;window.__auto=true;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
+const INIT=`(()=>{const q=[];let t=0;window.__auto=true;let rc=0;window.__rStub=function(){if(${RENDER}&&++rc%${RENDER}===0&&window.__fastR)return window.__fastR.apply(this,arguments)};window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/${+(process.env.FPS||60)};const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(window.__mon)try{window.__mon()}catch(e){window.__monErr=String(e)}
   if(window.__auto&&window.__fast&&window.__mho&&__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on)){window.__auto=false;break}}return t};  // FAST: auto-ticking ends on the exact frame roam is ready (no wall-clock-dependent idle frames)
 
- setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
+ setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=window.__rStub}if(window.__auto)window.__tick(1)},16)})();`;
 // monitor: hits (speed loss not from the brake), stuck, speed, loading screens, smashes, camera inside a building
 const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck:0,stEp:0,ld:0,ldOn:false,ldT:[],camIn:0,smash:0,traf:0,trafN:0,hist:[],lastHit:-99,pos:[],ev:[],ch:null,yh:[],bh:[],y0:0,camS:[]};
  const Q=__Q;let sm0=null;
@@ -49,7 +50,13 @@ const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);c
 // memory (EFF #5/PERF-2): heap = V8 JS heap after a full GC (CDP JSHeapUsedSize), totMB = performance.memory (heap + typed-array backing stores) + renderer.info.memory + bytes of live GPU geometry buffers (CPU copies still held too)
 const MEMS=()=>{try{window.gc&&gc()}catch(e){}const r=__dbg.renderer,T=__dbg.THREE,seen=new Set();let gpuB=0,cpuB=0,geo=0;
  __dbg.scene.traverse(o=>{const g=o.geometry;if(!g||seen.has(g))return;seen.add(g);geo++;const at=Object.values(g.attributes);if(g.index)at.push(g.index);for(const a of at){const d=a.isInterleavedBufferAttribute?a.data:a,arr=d.array,id=arr?arr.buffer:d;if(seen.has(id))continue;seen.add(id);const by=arr?arr.byteLength:0;cpuB+=by;gpuB+=by||d.count*(a.itemSize||1)*4}});
- return{totMB:+((performance.memory?performance.memory.usedJSHeapSize:0)/1048576).toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures,sceneGeo:geo,geoMB:+(gpuB/1048576).toFixed(1),cpuGeoMB:+(cpuB/1048576).toFixed(1)}};
+ return{totMB:+((performance.memory?performance.memory.usedJSHeapSize:0)/1048576).toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures,sceneGeo:geo,geoMB:+(gpuB/1048576).toFixed(1),cpuGeoMB:+(cpuB/1048576).toFixed(1),glMB:window.__GLM?+(__GLM.buf/1048576).toFixed(1):null,str:window.__str?{...__str.sup(),b:__str.st.b,f:__str.st.f,lzB:__str.st.lzB,lzF:__str.st.lzF,
+  upMB:window.__oc?+__oc.ev(`(()=>{let b=0;for(const S of WBC.sup||[]){const m=S.built&&(S.lod||(S.cells.find(c=>c.lod)||{}).lod);if(m&&!m.geometry.attributes.position.array)b+=S.mb}return b})()`).toFixed(1):0}:null}};  // upMB: streamed far cells already on the GPU (CPU copy released at upload)
+// glMB (PERF-4): exact bytes of live WebGL buffers (bufferData/deleteBuffer hook, as memprobe). This is what the GPU holds; geoMB above is a scene traverse
+// that counts never-drawn CPU copies and counts released Int8/Uint8 attributes as 4 B per component, so it is NOT the GPU total.
+const GLHOOK=`(()=>{const B=new WeakMap();const G={buf:0};window.__GLM=G;for(const C of [window.WebGL2RenderingContext,window.WebGLRenderingContext]){if(!C)continue;const P=C.prototype;
+ const bd=P.bufferData;P.bufferData=function(t,d,u){const b=this.getParameter(t===this.ELEMENT_ARRAY_BUFFER?this.ELEMENT_ARRAY_BUFFER_BINDING:this.ARRAY_BUFFER_BINDING);const n=typeof d==='number'?d:(d&&d.byteLength)||0;if(b){G.buf+=n-(B.get(b)||0);B.set(b,n)}return bd.apply(this,arguments)};
+ const db=P.deleteBuffer;P.deleteBuffer=function(b){if(b&&B.has(b)){G.buf-=B.get(b);B.delete(b)}return db.apply(this,arguments)}}})();`;
 // HUD vs touch-control overlap + tiny text
 const LAYOUT=()=>{  // tiny = visible text under 12 px
 const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
@@ -89,12 +96,12 @@ function merge(parts,reloads){if(parts.length===1&&!reloads)return parts[0];cons
 async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852,height:393}:{width:1440,height:900};
  const ctx=await b.newContext(phone?{viewport:vp,deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:vp});const p=await ctx.newPage();p.setDefaultTimeout(900000);
  const errs=[],warns=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{const t=m.text().slice(0,200);if(m.type()==='error')errs.push('console: '+t);else if(m.type()==='warning'&&!/GL Driver|GPU stall|WebGL-/.test(t))warns.push(t)});
- await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});await cdp.send('Performance.enable');
+ await p.addInitScript(INIT);await p.addInitScript(GLHOOK);const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});await cdp.send('Performance.enable');
  // FAST=1: touch events carry a synthetic timestamp (e.timeStamp follows it): start + game frames/60 + gesture gaps, so the real
  // 440/450 ms finger gaps and the BRAKE spacing cost no wall time and tap timing is deterministic. Without FAST: real time, as before.
  let SYN=Date.now()/1000;const clk=()=>FASTM?SYN*1000:Date.now();const gap=ms=>FASTM?(SYN+=ms/1000,Promise.resolve()):p.waitForTimeout(ms);
  if(FASTM){const s0=cdp.send.bind(cdp);cdp.send=(m,o)=>s0(m,m==='Input.dispatchTouchEvent'?{...o,timestamp:SYN}:o)}
- const shot=async name=>{if(!SHOTS)return;await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,`${mode}_${name}.jpg`),type:'jpeg',quality:62,timeout:900000});await p.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})};
+ const shot=async name=>{if(!SHOTS)return;await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,`${mode}_${name}.jpg`),type:'jpeg',quality:62,timeout:900000});await p.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=window.__rStub}})};
  // ---- input: touch fingers (CDP multi-touch) or keys
  const F={};const pts=()=>Object.values(F).map(f=>({x:f.x,y:f.y,id:f.id,radiusX:6,radiusY:6,force:1}));
  const center=sel=>p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();const cs=getComputedStyle(e);if(r.width<4||cs.display==='none'||cs.visibility==='hidden')return null;for(let a=e;a;a=a.parentElement)if(a.hidden)return null;return[r.left+r.width/2,r.top+r.height/2]},sel);
@@ -138,7 +145,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   const parts=[];let reloads=0,snap=null,lastSnap=0,lastMem=-1e9;const mem=[];
   while(f<frames){try{
    if(f-lastSnap>=600){lastSnap=f;snap=await p.evaluate(STAT)}
-   if(f-lastMem>=600){lastMem=f;{const o=await p.evaluate(MEMS),m=await cdp.send('Performance.getMetrics');o.heap=+(m.metrics.find(x=>x.name==='JSHeapUsedSize').value/1048576).toFixed(1);mem.push({f,...o})}}
+   if(f-lastMem>=600){lastMem=f;{const o=await p.evaluate(MEMS),m=await cdp.send('Performance.getMetrics');o.heap=+(m.metrics.find(x=>x.name==='JSHeapUsedSize').value/1048576).toFixed(1);mem.push({f,...o});if(process.env.MEMLOG)console.log('MEM',JSON.stringify({f,heap:o.heap,glMB:o.glMB,geoMB:o.geoMB,cpuGeoMB:o.cpuGeoMB,str:o.str}))}}
    // side trips a person makes once: map drag+pinch, pause/resume, garage
    if(f>=frames*.3&&!extra.map){await releaseAll();extra.map=await mapTrip()||{};}
    if(f>=frames*.5&&!extra.pause){await releaseAll();extra.pause=await pauseTrip()||{};}
@@ -184,7 +191,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
     for(let i=0;i<90;i++){try{await p.waitForTimeout(2000);const st2=await p.evaluate(()=>window.__mho&&__mho.state);if(st2==='roam')break;if(st2==='menu'){await tap('#hcStory');await tick(10);await tap('#slotList .go')}}catch(_){}}
     await p.evaluate(()=>{window.__auto=false});await shot(`${city}_reload${reloads}`);await p.evaluate(MON);lastSnap=f;f+=60;continue}}
   ttl(city+' drive done');await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);st.wallList=(st.allHits||[]).filter(h=>h.kind==="wall");delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
-  const perf=await p.evaluate(()=>{const r=__dbg.renderer;window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;r.info.autoReset=false;r.info.reset();__tick(1);r.info.autoReset=true;window.__shooting=0;const i=r.info.render;const o={calls:i.calls,tris:i.triangles,jsMs:+__mho.PERF.js.toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures};window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{};return o});
+  const perf=await p.evaluate(()=>{const r=__dbg.renderer;window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;r.info.autoReset=false;r.info.reset();__tick(1);r.info.autoReset=true;window.__shooting=0;const i=r.info.render;const o={calls:i.calls,tris:i.triangles,jsMs:+__mho.PERF.js.toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures};window.__fastR=__dbg.composer.render;__dbg.composer.render=window.__rStub;return o});
   ttl(city+' end');cityRes[city]={...st,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,mem,wallSec:Math.round((Date.now()-T0)/1000)};
   console.log(mode,city,JSON.stringify(cityRes[city]));
  }
@@ -240,7 +247,10 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});
    if(s.mem&&s.mem.length>=6){const M=s.mem,n=M.length,h=M.slice(Math.floor(n/2)),fit=k=>{const xs=h.map(m=>m.f/3600),ys=h.map(m=>m[k]),mx=xs.reduce((a,b)=>a+b)/xs.length,my=ys.reduce((a,b)=>a+b)/ys.length;let nu=0,de=0;xs.forEach((x,i)=>{nu+=(x-mx)*(ys[i]-my);de+=(x-mx)**2});return de?nu/de:0};
     const hs=fit('heap'),gs=fit('geoMB'),pk=Math.max(...M.map(m=>m.heap)),last=M.slice(-3).reduce((a,m)=>a+m.heap,0)/3;
-    const ts=fit('totMB');ok(hs<=4&&gs<=4&&ts<=6&&fit('geoms')<=40,`${m} ${c}: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry, ≤ 6 MB/min incl. buffers)`,{heapMBperMin:+hs.toFixed(2),totMBperMin:+ts.toFixed(2),geoMBperMin:+gs.toFixed(2),geomsPerMin:+fit('geoms').toFixed(1),first:M[0],last:M[n-1]});
+    // PERF-4: GPU = glMB (exact live WebGL buffer bytes) minus the streamed far cells on the GPU (str.upMB: they grow while exploring and are freed past
+    // the unload radius; bounded by strMax). geoMB (scene traverse) is reported only: it counts never-drawn CPU copies and Int8/Uint8 attributes ×4.
+    for(const q of M)q.glFix=q.glMB==null?null:q.glMB-(q.str&&q.str.upMB||0);const hasGL=M.every(q=>q.glFix!=null),gl=hasGL?fit('glFix'):0,strMax=Math.max(0,...M.map(q=>q.str&&q.str.mb||0));
+    const ts=fit('totMB');ok(hs<=4&&gl<=1.5&&ts<=6&&fit('geoms')<=40&&strMax<=110,`${m} ${c}: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap, ≤ 1.5 MB/min GPU buffers excl. streamed far cells, ≤ 6 MB/min incl. buffers; far cells ≤ 110 MB)`,{heapMBperMin:+hs.toFixed(2),glMBperMin:hasGL?+gl.toFixed(2):'n/a (no hook)',totMBperMin:+ts.toFixed(2),geoMBperMin_info:+gs.toFixed(2),geomsPerMin:+fit('geoms').toFixed(1),strMaxMB:strMax,first:{...M[0],str:undefined},last:{...M[n-1],str:undefined}});
     if(c==='ath')ok(last<=100,`${m} ath: JS heap ≤ 100 MB while driving`,{lastAvgMB:+last.toFixed(1),peakMB:pk})}
    ok(!s.monErr,`${m} ${c}: monitor ran`,s.monErr)}
   ok(!r.errs.length,`${m}: zero console / page errors`,r.errs.slice(0,6))}
