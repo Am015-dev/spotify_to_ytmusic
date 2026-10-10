@@ -104,10 +104,19 @@ function LDS_palm(){const{p,k}=LDS.PALM,g=new THREE.LatheGeometry(p.map(([r,y])=
   const a=P(4,-10,0),b=P(4,10,0),c=P(80,45,6),d=P(80,-45,6),t=P(176,0,-43);tri(a,b,c);tri(a,c,d);tri(d,c,t)}
  const G=new THREE.BufferGeometry().setFromPoints(V);G.setAttribute('color',new THREE.Float32BufferAttribute(C,3));G.computeVertexNormals();G.computeBoundingBox();G.computeBoundingSphere();G.userData.ldsPalm=1;return G}
 ART_athTreeBy=(f=>function(k){if(k==='palm'&&!LDS.palmOff)try{const g=LDS_palm();LDS.palm=g;LDS.st=LDS.st||{};LDS.st.palm={src:'6376 palm',old:108,near:LDS_tri(g),far:LDS_tri(g)};return g}catch(e){console.warn('LDS palm',e)}return f.apply(this,arguments)})(ART_athTreeBy);
+// palms off the painted streets (reviewer, v90g): athGroundTex paints 2 asphalt streets per 150 m tile (px 96 / 352 of 512, ±30 px with the
+// sidewalk) in x and z; a LEGO palm that lands on one moves to the nearer band edge + 1 m (still off the track and buildings), else it is dropped
+LDS.onSt=v=>{const p=((v/150)%1+1)%1*512;return[96,352].find(c=>Math.abs(p-c)<31)};
+TInst.prototype.add=(f=>function(x,y,z,...a){if(!(this.geo&&this.geo.userData&&this.geo.userData.ldsPalm))return f.call(this,x,y,z,...a);LDS.pm=LDS.pm||{moved:0,drop:0,ok:0};
+ const fix=v=>{const c=LDS.onSt(v);if(c==null)return[v];const p=((v/150)%1+1)%1*512,base=v-p*150/512;return[base+(c-32)*150/512-1,base+(c+32)*150/512+1]};
+ const ok=(px,pz)=>LDS.onSt(px)==null&&LDS.onSt(pz)==null&&nearestTrackDist(px,pz,HALF+8)>=HALF+3&&!CITY.some(b=>Math.abs(b.x-px)<b.hw+3&&Math.abs(b.z-pz)<b.hd+3);
+ if(ok(x,z)){LDS.pm.ok++;return f.call(this,x,y,z,...a)}
+ const C=[];for(const px of fix(x))for(const pz of fix(z))C.push([px,pz]);C.sort((A,B)=>Math.hypot(A[0]-x,A[1]-z)-Math.hypot(B[0]-x,B[1]-z));
+ for(const[px,pz]of C)if(ok(px,pz)){LDS.pm.moved++;return f.call(this,px,athH(px,pz)-.2,pz,...a)}LDS.pm.drop++;return this})(TInst.prototype.add);
 // LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
 function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
  for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
 // test hook (before/after shots of the same spot): ab(1) draws the old trees again
 function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster','cone','barrier','clight','sign','rock','CE_pine','CE_olive','CE_cypress','CE_rock'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;if(DL.mOld)o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
-window.__ld.lds=LDS;LDS.race=t=>setupRace({type:'attract',laps:99,traffic:0,items:false,aggr:0,track:t,mood:(TRACK_DEFS.find(d=>d.id===t)||{}).mood||'brick'});LDS.cam=()=>camera;LDS.palm0=()=>athTreeBy0('palm');window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
+window.__ld.lds=LDS;LDS.race=t=>setupRace({type:'attract',laps:99,traffic:0,items:false,aggr:0,track:t,mood:(TRACK_DEFS.find(d=>d.id===t)||{}).mood||'brick'});LDS.cam=()=>camera;LDS.palm0=()=>athTreeBy0('palm');LDS.inB=(x,z)=>CITY.some(b=>Math.abs(b.x-x)<b.hw+2&&Math.abs(b.z-z)<b.hd+2);LDS.probe=(x,z)=>({d:nearestTrackDist(x,z,999),HALF,W,ath:athH(x,z)});window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
