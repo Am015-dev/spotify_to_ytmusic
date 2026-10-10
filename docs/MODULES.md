@@ -322,7 +322,7 @@ uses: 92(97), 93(46), 98gx(22), 98s(18), 30(13), 94(12), 98t(9), 20(7), 10(3), 9
 
 ## 98tx_taxi40468.js — 16 KB
 defines: TX TX_NEW TX_F TX_txt TX_o TX_AX TX_off TX_nudge TX_mk TX_ids TX_ui TX_CAR __tx
-uses: 92(38), 93(20), 98gb(15), 20(6), 98t(3), 30(2), 94(2), 98s(2), 98(2), 10(1)
+uses: 92(40), 93(20), 98gb(15), 20(6), 30(3), 98t(3), 96(3), 10(2), 94(2), 98s(2)
 
 ## 98of_onfoot.js — 45 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
