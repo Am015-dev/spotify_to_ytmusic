@@ -88,9 +88,9 @@ function LDS_rock(old,cl,ch){const{V,F}=LDS.ROCK,P=[],c=[],lo=new THREE.Color(cl
 Object.assign(LDS.SW,{cone:[LDS_cone,'4589 cone'],barrier:[LDS_barrier,'4083 barrier'],clight:[LDS_clight,'4032+3062b warning light'],sign:[LDS_sign,'30260p01 stop sign + 3957a'],rock:[LDS_rock,'42284+42291 rock']});
 // Athens CE_* procedural props (land-3, swaps 14-17), same LEGO parts as Frankfurt in Athens colours; set right after CE_defs (buildHubProps)
 // CE_pine -> 3471 Plant Tree Pyramidal 4x4x6⅔ (264 tris of icospheres), CE_olive -> 3470 Plant Tree Oval in olive sage (184), CE_rock -> the 42284/42291 boulder
-// in tan (160), CE_cypress -> 3778 Plant Tree Columnar 4x4x11.5: its 12 stacked tiers as 4 (lProfile 3778.dat, 6 sides)
+// in tan (160), CE_cypress -> 3778 Plant Tree Columnar 4x4x11.5: its stacked tiers as 2, 5 sides (35 tris: 14k cypresses, ≤ the old 41)
 LDS.CE={CE_pine:[()=>LDS_lth(LDS.P.tree3.n,8,[[48,'#6b4a2a'],[999,'#3e6b34']]),'3471',7.2],CE_olive:[()=>LDS_lth(LDS.P.tree.n,7,[[48,'#6a5848'],[999,'#8a9a68']]),'3470',4.1],
- CE_cypress:[()=>LDS_lth([[6,0],[6,36],[44,48],[16,70],[47,96],[18,130],[44,150],[14,190],[34,200],[0,280]],6,[[38,'#5a4030'],[999,'#2d5a32']]),'3778',8.6]};
+ CE_cypress:[()=>LDS_lth([[6,0],[44,40],[20,110],[46,124],[0,280]],5,[[30,'#5a4030'],[999,'#2d5a32']]),'3778',8.6]};
 CE_defs=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='ath')return r;LDS.st=LDS.st||{};for(const t in LDS.CE){const d=D[t];if(!d||d.lds)continue;try{const[fn,src,h]=LDS.CE[t],old=LDS_tri(d.g),g=fn();g.computeBoundingBox();const k=h/g.boundingBox.max.y;g.scale(k,k,k);g.computeBoundingBox();g.computeBoundingSphere();d.gOld=d.g;d.g=g;d.lds=t;LDS.st[t]={src,old,near:LDS_tri(g),far:LDS_tri(g)}}catch(e){console.warn('LDS '+t,e)}}
  const d=D.CE_rock;if(d&&!d.lds)try{const old=LDS_tri(d.g),g=LDS_rock(d.g,'#c8b48a','#a89c84');d.gOld=d.g;d.g=g;d.lds='CE_rock';LDS.st.CE_rock={src:'42284+42291 rock',old,near:LDS_tri(g),far:LDS_tri(g)}}catch(e){console.warn('LDS CE_rock',e)}return r})(CE_defs);
 // Athens palm (swap 7, Syntagma race palms, TRK.tree 'palm'): LEGO palm as built in set 6376 Breezeway Cafe (ld/land/l_palm.ldr, OMR, CCAL 2.0):
