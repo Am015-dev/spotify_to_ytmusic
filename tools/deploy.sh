@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # One-command deploy of a split build to the live game (owner pre-approved every deploy).
-# Usage: DEPLOY_TRAILER="Co-Authored-By: ...\nClaude-Session: ..." bash tools/deploy.sh <outdir with overdrive.html+km.js> "<commit message>"
+# Usage: DEPLOY_TRAILER="Co-Authored-By: ...\nClaude-Session: ..." bash tools/deploy.sh <outdir with overdrive.html+km.js(+models.js)> "<commit message>"
 set -euo pipefail
 OUT=$(cd "$1" && pwd); MSG="$2"; BR=alex/brave-carson-rbpmlk; D=games/mainhattan-overdrive
 URL=https://am015-dev.github.io/spotify_to_ytmusic/mainhattan-overdrive/
 [ -f "$OUT/overdrive.html" ] && [ -f "$OUT/km.js" ] || { echo "need $OUT/overdrive.html and km.js"; exit 1; }
+! grep -q 'src="models.js"' "$OUT/overdrive.html" || [ -f "$OUT/models.js" ] || { echo "need $OUT/models.js (the page loads it; since v89v)"; exit 1; }
+! grep -q "__LDX" "$OUT/models.js" 2>/dev/null || [ -d "$OUT/models" ] || { echo "need $OUT/models/ (models.js loads its chunks; since v89z)"; exit 1; }
 grep -q 'ALL_OPEN=true' "$OUT/overdrive.html" || { echo "ALL_OPEN=true missing"; exit 1; }
 grep -q 'by Alex' "$OUT/overdrive.html" || { echo "credits missing"; exit 1; }
 W=$(mktemp -d); git clone -q --depth 1 -b "$BR" "$(git remote get-url origin)" "$W"
@@ -15,6 +17,8 @@ s=open(p,encoding='utf8').read(); j=s.find('>',s.find('<body'))+1
 open(p,'w',encoding='utf8').write(s[:j]+open(b,encoding='utf8').read()+'</body></html>')
 PY
 cp "$OUT/km.js" "$W/$D/km.js"
+[ -f "$OUT/models.js" ] && cp "$OUT/models.js" "$W/$D/models.js"   # LDraw model index (since v89v, src/MODELS)
+if [ -d "$OUT/models" ]; then rm -rf "$W/$D/models"; cp -r "$OUT/models" "$W/$D/models"; fi   # v89z: one chunk per model, loaded on demand
 [ -f "$OUT/tune.json" ] && cp "$OUT/tune.json" "$W/$D/tune.json"   # published TUNE values (docs/TUNE.md), optional
 cd "$W"; git add "$D"
 git commit -q -m "$MSG" -m "$(printf "%b" "${DEPLOY_TRAILER:-}")"

@@ -5,7 +5,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 
 ## How to build (since v87a: src/ modules on alex/od-src)
 - Source = `src/` (27 modules, ≤ 200 KB). Read `src/MAP.md`, then ONLY your modules. Steps: `HOW-TO-WORK.md`.
-- `tools/build.sh <ver> [--local]` → `out/<ver>/overdrive.html + km.js` (the split deploy pair; deploy.sh unchanged). `tools/verify_live.sh` = src builds live byte for byte.
+- `tools/build.sh <ver> [--local]` → `out/<ver>/overdrive.html + km.js + models.js` (since v89v the LDraw model data, src/MODELS, lives in models.js, not in the page; deploy.sh copies it). `tools/verify_live.sh` = src builds live byte for byte.
 - Old pXXX.py anchor patches: `python3 tools/patch_to_src.py pXXX.py` lands each anchor in its module. reapply.sh/base.html are legacy.
 - `OD_CHANGELOG` is at the top of `src/10_core.js`. Tests: add `?fast=1` for the fast test mode.
 

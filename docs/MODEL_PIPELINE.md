@@ -76,6 +76,11 @@ One-time setup: the parts library (`curl -o c.zip https://library.ldraw.org/libr
 Front of a car/boat = −z in the garage: pick `--yaw` with the A/B sheet. A file with trailing spaces in `0 FILE` names needs
 `sed 's/[ \t]*$//'` for LDrawLoader (the converter does not care).
 
+## 5b. models.js (since v89v)
+Model data modules are listed in `src/MODELS` (not src/ORDER) and built into `out/<ver>/models.js`, loaded by `<script src="models.js">` after km.js.
+Each module is wrapped as a function and run by `src/98ld_run.js` (after 98ld_w.js) with LD_MESH, LD_MODELS, GB_PC, G13_ID, GAR_SETS, GAR_set, LD_br, LDW_P, LDW_reg.
+A new model = a new data module + one line in src/MODELS; it may only use those names. The page size stays flat.
+
 ## 6. Gaps
 - Stickers and printed tiles are not converted (OMR files mark "missing stickers"; prints map to the plain part).
 - Imported parts are hidden from the part palette (searchable by id later; ~66 new real parts could become a "LDraw" category).
