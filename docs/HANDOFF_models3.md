@@ -24,3 +24,17 @@ Known conflict spot: tools/ld/ld2src.py HAVE line (keep ours: skips meshes of ev
 ## Next (my lane)
 Page size is the limit now (3.64 MB). Prefer small sets; consider moving LD data into a separate fetched file only with the coordinator's OK (deploy.sh copies
 overdrive.html + km.js + tune.json + music only). Roam still does not load headless here (garage shots only).
+
+## Update 16:10 UTC
+- LIVE: v89v (models.js split), v89w (4 Speed Champions rides + Athens lighthouse). READY: v89x at 248fe7e9 (buildings ×1.6 = minifig scale).
+- **models.js** (since v89v): data modules are listed in src/MODELS (NOT src/ORDER) → out/<ver>/models.js; 98ld_stub.js (consts) + 98ld_run.js (runs them
+  with LD_MESH, LD_MODELS, GB_PC, G13_ID, GAR_SETS, GAR_set, LD_br, LDW_P, LDW_reg). Integrating a converter's model = merge + one line in src/MODELS.
+  deploy.sh copies models.js; verify_live.sh compares it.
+- **Minifig scale** (Alex): world buildings use LD_SW × LD_FIG (1.6). Proof: `node tools/ld/ldDoor.js <url> <outdir> bank cga+cgb w6372 ...` (game minifig 1.9 m
+  in the lowest door, 852×393; shots in docs/shots/models3/door/). Rule forwarded to build-5.
+- A release can go live while you prepare the next one: always check live's changelog version before adding an entry (v89w nearly got two entries).
+
+## Update 16:00 UTC
+- LIVE v89x (minifig scale). READY v89y at 52e026cc: 9 build-4 trucks, build-5 2882 boat + 6350 pizzeria, 30023 lighthouse removed (micro set, breaks the minifig rule; 7796 deleted by build-5).
+- build-5 stood down; **build-6** owns world props (docs/HANDOFF_mdlw.md). New rules go to build-6. build-4 told: page size is no longer a limit (models.js).
+- Next integrator: fetch od-mdl-veh / od-mdl-world, merge, add new files to src/MODELS (drop micro sets), changelog for the NEXT unreleased version (check live first).

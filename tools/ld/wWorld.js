@@ -11,5 +11,5 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  const L=await p.evaluate(()=>__ld.w.on.map(E=>({id:E.id,at:E.at,tris:E.tris,ftris:E.ftris,col:E.col&&{hw:+E.col.hw.toFixed(1),hd:+E.col.hd.toFixed(1)},water:E.water||0})));
  console.log('LDW',CITY,JSON.stringify(L));
  for(const id of (IDS||'').split(',').filter(Boolean)){const E=L.find(q=>q.id===id);if(!E){console.log('MISSING',id);continue}const {x,z,y}=E.at,a=E.water?E.at.yaw:E.at.yaw*Math.PI/2,fx=-Math.sin(a),fz=-Math.cos(a),R=Math.max(E.col.hw,E.col.hd)+4;
-  await p.evaluate(c=>__gnb.cam(c),[x+fx*R*2.2+fz*R*1.4,y+R*.9,z+fz*R*2.2-fx*R*1.4,x,y+1,z]);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${id}_${CITY}.png`});console.log('shot',`${OUT}/${id}_${CITY}.png`)}
+  await p.evaluate(c=>__gnb.cam(c),[x+fx*R*(+process.env.WD||2.2)+fz*R*.8,y+R*(+process.env.WH||.9),z+fz*R*(+process.env.WD||2.2)-fx*R*.8,x,y+1,z]);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${id}_${CITY}.png`});console.log('shot',`${OUT}/${id}_${CITY}.png`)}
  console.log('ERR',JSON.stringify(errs.slice(0,6)));await b.close()})();
