@@ -12,7 +12,7 @@ Which play surfaces are still the old CSS/SVG/canvas placeholders, what is alrea
 | Kaiten Kitchen | `media/title-phone.webp` unused (title is embedded `KK_ART.title`, `:7675`). | Portrait title. |
 | Short Fuse | `media/title-phone.webp` unused (only `title.webp`, `:5461`). | Portrait title. |
 | Final Approach | `media/title-phone.webp` unused. No default table file: the Pixi plate is the procedural stand-in (`src/ui7.js:35`). | Portrait title; default table (being painted, below). |
-| Shelf (`games-src/suite/src.html`, built `games/index.html`) | Painted app icon replaces `games/icons/icon-180/192/512(-maskable).png` (same names: works as is). New `icons/favicon-32.png` and `icons/share.jpg` (1200×630) are not linked yet. | Add `<link rel="icon" href="icons/favicon-32.png" sizes="32x32">`, `og:image` / `twitter:image` = absolute URL of `icons/share.jpg` (+ `og:image:width` 1200, `height` 630, `twitter:card` `summary_large_image`). Painted box covers already replaced `games/covers/<id>.jpg` in place (Nebula still to come). |
+| Shelf (`games-src/suite/src.html`, built `games/index.html`) | Painted app icon replaces `games/icons/icon-180/192/512(-maskable).png` (same names: works as is). New `icons/favicon-32.png` and `icons/share.jpg` (1200×630) are not linked yet. | Add `<link rel="icon" href="icons/favicon-32.png" sizes="32x32">`, `og:image` / `twitter:image` = absolute URL of `icons/share.jpg` (+ `og:image:width` 1200, `height` 630, `twitter:card` `summary_large_image`). Painted box covers already replaced `games/covers/<id>.jpg` in place. Nebula added 2026-10-10. |
 | Crown City Smash, Nebula Aces, Sunglaze, Tidewake | No loader reads `media/table-*`, `back-*`, `title*`, `end-*` at all. | Port the loader from `cauldron-fair/src/ui12.js:34,103` / `lantern-dive/game/src/ui2.js:23`; `campaign.json` portraits drop in via `artBase`. |
 
 ## 2. Painted on the laptop (status 2026-10-09; files pushed, the Linux session wires them)
@@ -23,7 +23,7 @@ Which play surfaces are still the old CSS/SVG/canvas placeholders, what is alrea
 - **Final Approach (done):** `media/table-default.webp` + `-phone`. `tableApply` (`ui13.js:14`) still uses the Pixi plate when no table is unlocked: load `table-default` in that branch.
 - **Mainhattan Nightrun (done):** `media/garage.webp` + `garage-phone.webp` (garage/pit-stop `.pg`, `head.html:22`), `media/pause.webp` (`#pausem`/`#setm`, `head.html:23`); keep the dark overlay on top for legibility. The 53 items in `nightrun/ASSETS-NEEDED.md` are queued.
 - **Rampart & Vine (done):** see `carc/PAINTED-ART-HANDOFF.md`; `tex-town`, `tex-roof`, `camp-baron` queued again.
-- **Shelf (done):** 9 painted box covers, app icon, favicon, share image (see row above); the Nebula cover is painted again.
+- **Shelf (done):** 10 painted box covers, app icon, favicon, share image (see row above).
 - **Crown City Smash, Nebula Aces, Sunglaze, Tidewake, Lantern Dive:** every image item in `MISSING-ASSETS.md` (106) is painting now; their Treblo music is pushed.
 
 ## 3. Keep in code (pixel-exact, functional or text-heavy)
