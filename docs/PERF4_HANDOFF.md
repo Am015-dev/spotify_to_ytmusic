@@ -28,6 +28,11 @@ The brief comes from the coordinator (session_017iH3DB4VyxwKSdMwsco4Ut). Live v8
 - **Probe:** `tools/eff/strtour.js`. Its `TRACK=1` option lists drawn geometries that are off-scene and not disposed, grouped by creation stack.
 
 ## Status / next
-- [ ] p15_fast (v89p, 15 min FAST Frankfurt): expect a flat glMB. Result goes in `qa_mem4/p15_fast.log`.
+- [x] p15_fast (v89p, 15 min FAST Frankfurt):
+  - glMB levels off at 167–179 MB and drops as cells free, ending at 172 MB (v89n: 283 MB).
+  - Leak gate PASS: glMB 0.37 MB/min, heap 0.27 MB/min, far cells ≤ 68 MB.
+  - The only FAIL is the existing 10 px CHECKPOINT label.
+- [x] Night shots, same drive (`tools/eff/nightshot.js`): `qa_mem4/shots/v89p_night.png` vs `v89o_night.png` look the same.
+  - The headlight mesh id is stable on v89p and changes every second on live v89o. 0 console errors on both.
 - [ ] REVIEW (quick: no visual change; headlight shot at dusk + 0 console errors), then the OD_CHANGELOG entry and checklist item, push `out/v89p`, and send DEPLOY.
 - Other FAILs in the baseline run were already there on v89n and are not this task: stuck 4.5 %, CHECKPOINT 10 px text.
