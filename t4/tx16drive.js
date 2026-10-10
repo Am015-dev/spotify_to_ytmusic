@@ -3,13 +3,13 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const OUT=pr
 (async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true});
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});const ev=(f,a)=>p.evaluate(f,a),W=ms=>p.waitForTimeout(ms);
  await p.goto(process.argv[2]);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:240000});
- await ev(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');0},CAR);await p.reload();
+ await ev(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(c.ath){localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},{ath:process.env.CITY==='ath'});await p.reload();
  await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:240000});const cdp=await ctx.newCDPSession(p);
  const tapXY=async(x,y)=>{const tp=[{x,y,id:1,radiusX:4,radiusY:4,force:1}];await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:tp});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await W(700)};
  const tap=async s=>{const e=await p.$(s);if(!e||!await e.isVisible())return 0;await e.scrollIntoViewIfNeeded().catch(()=>{});await W(300);const bb=await e.boundingBox();if(!bb)return 0;await tapXY(bb.x+bb.width/2,bb.y+bb.height/2);return 1};
  if(CAR!=='rod'){await tap('#gbMenuBtn');await W(1500);await tap('#r2R [data-r2m="rides"]');await W(1200);console.log('pick',await tap('[data-gc="'+CAR+'"]'));await W(2000);await p.screenshot({path:OUT+'/pick.png'});console.log('eq0',await ev(()=>__g9c.eq('car')));console.log('save',await tap('#gbSave'));await W(3000);console.log('eq',await ev(()=>__g9c.eq('car')))}
  console.log('sel',await ev(()=>{try{return JSON.parse(localStorage.getItem('mho_gar')).sel}catch(e){return 'x'}}));
- await tap('#hcStory');await W(800);await tap('#slotList .go');
+ await p.screenshot({path:OUT+'/menu0.png'});console.log('story',await tap('#hcStory'));await W(1500);await p.screenshot({path:OUT+'/slots.png'});console.log('go',await tap('#slotList .go'),await ev(()=>[...document.querySelectorAll('#slotList .go')].map(e=>e.textContent).join('|')));
  for(let i=0;i<150;i++){await W(2000);const s=await ev(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(i%10==0)console.log('wait',i,s);if(s==='roam|false')break;if(s.startsWith('menu')&&i%5==4){await tap('#hcStory');await W(800);await tap('#slotList .go')}}
  if(process.env.OLD)for(let i=0;i<10;i++){let hit=0;for(const l of[p.getByText('SKIP',{exact:false}),p.getByText('TAP TO CONTINUE'),p.locator('#m1Next')]){const e=l.first();if(await e.count()&&await e.isVisible()){const bb=await e.boundingBox();console.log('oldtap',await e.evaluate(x=>(x.id||x.className||x.tagName)+':'+x.textContent.slice(0,40)));await tapXY(bb.x+bb.width/2,bb.y+bb.height/2);hit=1;break}}if(!hit&&i>3)break;await W(1500)}
  else for(let i=0;i<12;i++){let hit=0;for(const s of['#storyGo','#m1Cs','#rcGo','.m1go','#resBtn','#tutSkip','#m1Next']){if(await tap(s)){hit=1;break}}if(!hit&&i>3)break;await W(1200)}
@@ -23,7 +23,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const OUT=pr
  console.log('bbox',JSON.stringify(await BB()));
  const cam=async(n,f)=>{await ev(f);await W(2500);await p.screenshot({path:OUT+'/'+n+'.png'});console.log('shot',n)};
  await cam('side_low',()=>{const R=__mho.RO,g=__mho.gnd(R.x,R.z,R.y+.3),sx=Math.cos(R.h),sz=-Math.sin(R.h);__gnb.cam([R.x+sx*6,g+.9,R.z+sz*6,R.x,g+1.6,R.z])});
- await cam('f34',()=>{const R=__mho.RO,g=__mho.gnd(R.x,R.z,R.y+.3),fx=Math.sin(R.h),fz=Math.cos(R.h),sx=Math.cos(R.h),sz=-Math.sin(R.h);__gnb.cam([R.x+fx*5+sx*3.6,g+1.8,R.z+fz*5+sz*3.6,R.x,g+1.7,R.z])});
+ await cam('f34',()=>{const R=__mho.RO,g=__mho.gnd(R.x,R.z,R.y+.3),fx=Math.sin(R.h),fz=Math.cos(R.h),sx=Math.cos(R.h),sz=-Math.sin(R.h);__gnb.cam([R.x+fx*3.4+sx*2.4,g+1.5,R.z+fz*3.4+sz*2.4,R.x,g+1.45,R.z])});
  await cam('f34b',()=>{const R=__mho.RO,g=__mho.gnd(R.x,R.z,R.y+.3),fx=-Math.sin(R.h),fz=-Math.cos(R.h),sx=Math.cos(R.h),sz=-Math.sin(R.h);__gnb.cam([R.x+fx*5+sx*3.6,g+1.8,R.z+fz*5+sz*3.6,R.x,g+1.7,R.z])});
  console.log('gap',JSON.stringify(await ev(()=>{try{return __gnb.gap()}catch(e){return String(e)}})));
  await cam('traffic_low',()=>{const M=__mho,R=M.RO;let c=null,bd=1e9;for(const q of M.HUB.cars||[]){if(q.dead)continue;const d=Math.hypot(q.x-R.x,q.z-R.z);if(d<bd){bd=d;c=q}}if(!c)return;const g=M.gnd(c.x,c.z,(c.y||0)+.3);__gnb.cam([c.x+4.5,g+.8,c.z+4.5,c.x,g+1.3,c.z]);window.__tcD=Math.round(bd)});console.log('traffic dist',await ev(()=>window.__tcD));
