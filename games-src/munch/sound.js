@@ -67,7 +67,7 @@ function musicWant(){if(typeof G==='undefined'||!G)return ['tavern',0];
 // ---- music picker: each slot (tavern=Menu, main=Dungeon, fight, victory, defeat) has a saved choice: a, b, shuffle, off or classic
 const MSLOTS=[['tavern','Menu'],['main','Dungeon'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'Menu loop A','tavern-b':'Menu loop B','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
-const MDEF={tavern:'a',main:'b',fight:'a',victory:'b',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'b',defeat:'a'};
 SND.pick=Object.assign({},MDEF);try{Object.assign(SND.pick,JSON.parse(localStorage.getItem('dkd_mpick')||'{}'))}catch(e){}
 SND.res={};SND.wslot=null;SND.prev=null;SND.last=null;SND.since=0;
 // 'all' = shuffle through every looping song (menu, dungeon and fight tracks), a new one every ~2.5 min

@@ -29,7 +29,7 @@ function kitSettings() {
       if (typeof GXT !== 'undefined') { const tb = tutNode('gx-sb'); if (tb) { tb.querySelector('span') && tb.querySelector('span').remove(); S.appendChild(GX.row('Tutorial', tb)); } }
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
     },
-    about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names and texts are our own. The pictures are painted with Google Flow and the music is made with Treblo. Sound effects are CC0 recordings (Kenney).' }
+    about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names and texts are our own. Art and music by Am015-dev.' }
   });
 }
 // ---- component reference

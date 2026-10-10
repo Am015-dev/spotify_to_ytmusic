@@ -38,7 +38,7 @@ function buildRules() {
     ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: ten instrumental tracks made with Treblo from our own prompts. Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
 function renderRival(seat) {

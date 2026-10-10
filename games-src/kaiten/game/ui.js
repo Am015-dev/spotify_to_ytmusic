@@ -927,7 +927,7 @@ function buildRules() {
     ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: ten instrumental tracks made with Treblo from our own prompts. Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
 function renderRival(seat) {
@@ -2112,10 +2112,10 @@ function endBanner() {
   const w = kkWon(); if (!IMG_OK[w ? 'end-win' : 'end-lose']) return;
   rs.classList.add('has-art'); rs.insertBefore(h('div.endart.' + (w ? 'win' : 'lose'), { 'aria-hidden': 'true' }), rs.firstChild);
 }
-// ---- music: five slots (Menu, Game, Last round, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / off
+// ---- music: five slots (Menu, Game, Last round, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last round'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and last-round tracks), a new one every ~2.5 min
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;

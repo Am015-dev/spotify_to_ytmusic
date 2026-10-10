@@ -43,12 +43,9 @@ const RULES_HTML=`<div class="rules">
 <h3>Credits</h3>
 <section class="credits-audio">
 <h4>Audio</h4>
-<p>Music was made for this game with Treblo (our own prompts). Sound effects are public-domain (CC0):</p>
 <ul>
-<li>Music: ten instrumental tracks generated with Treblo (treblo.com)</li>
-<li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
-</ul>
+<li>Art and music by Am015-dev</li></ul>
 <p class="muted small">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
 </section>
-<p class="muted small">Names, card text and art are original; the paintings were made with Google Flow from our own prompts.</p>
+<p class="muted small">Names, card text and art are original; the paintings are by Am015-dev.</p>
 </div>`;

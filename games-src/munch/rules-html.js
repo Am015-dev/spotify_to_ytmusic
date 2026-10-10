@@ -40,15 +40,9 @@ const RULES_HTML=`
 <p class="small muted">A half-blood card lets you have two races, and a double-class card two classes. Curses can be played on anyone: here that's on your turn, during fights, or when someone else's turn starts. Names, card texts and art in this game are original. The rules follow the real card game.</p>
 <section class="credits-audio">
 <h3>Credits</h3>
-<p>Names, card text and art are original. All card paintings and the six boss reveal clips were generated with Google Flow from our own prompts.</p>
+<p>Names, card text and art are original. All card paintings and the six boss reveal clips were painted by Am015-dev.</p>
 <h4>Audio</h4>
-<p>With thanks to these public-domain (CC0) creators:</p>
 <ul>
-<li>Music: five instrumental tracks (tavern, dungeon, fight, victory, defeat) generated with Treblo (treblo.com) from our own prompts; the project owner owns the outputs under Treblo's Terms of Service, section 8</li>
-<li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl">Kenney</a> (CC0)</li>
-<li>Sound effects: &ldquo;100 CC0 SFX&rdquo; by rubberduck (<a href="https://opengameart.org/content/100-cc0-sfx">OpenGameArt</a>, CC0)</li>
-<li>Sound effects: &ldquo;100 CC0 SFX #2&rdquo; by rubberduck (<a href="https://opengameart.org/content/100-cc0-sfx-2">OpenGameArt</a>, CC0)</li>
-<li>Sound effects: &ldquo;80 CC0 creature SFX&rdquo; by rubberduck (<a href="https://opengameart.org/content/80-cc0-creature-sfx">OpenGameArt</a>, CC0)</li>
-</ul>
+<li>Art and music by Am015-dev</li></ul>
 <p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p>
 </section>`;

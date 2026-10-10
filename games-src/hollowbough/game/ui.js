@@ -1091,7 +1091,7 @@ function kitSettings() {
       if (typeof GXT !== 'undefined') { const tb = tutNode('gx-sb'); if (tb) { tb.querySelector('span') && tb.querySelector('span').remove(); S.appendChild(GX.row('Tutorial', tb)); } }
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
     },
-    about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names and texts are our own. The pictures are painted with Google Flow and the music is made with Treblo. Sound effects are CC0 recordings (Kenney).' }
+    about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names and texts are our own. Art and music by Am015-dev.' }
   });
 }
 // ---- component reference
@@ -1645,10 +1645,10 @@ function rivalPortrait() {
   const im = h('img.rport', { src: MEDIA + p.portrait, alt: '', draggable: 'false' }); im.style.borderColor = p.color; im.onerror = () => im.remove();
   b.insertBefore(h('div.rhead', im, h('b', p.name)), b.firstChild.nextSibling);
 }
-// ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / off
+// ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Fight'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'The Village Wakes', 'tavern-b': 'Sunlight Through the Canopy', 'main-a': 'Quiet Cartographer', 'main-b': 'Meadowlight Turn', 'fight-a': 'Last Harvest Before Winter', 'fight-b': "Fiddle at the Wood's Edge", 'victory-a': 'Grove of Golden Light', 'victory-b': 'Tambourine at the Woodland Gate', 'defeat-a': 'Late October', 'defeat-b': 'Last Chord, Golden Light' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and fight tracks), a new one every ~2.5 min
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;

@@ -18,7 +18,7 @@
   function title(n) { return (C.titles && C.titles[n]) || ('Song ' + n.slice(-1).toUpperCase()); }
   function isLoop(k) { return C.loops.indexOf(k) >= 0; }
   function allPool() { return names().filter(function (n) { return isLoop(n.replace(/-[ab]$/, '')); }); }
-  function pickOf(slot) { return P[slot] || DEF[slot] || 'a'; }
+  function pickOf(slot) { return P[slot] || (isLoop(slot) ? 'all' : DEF[slot]) || 'a'; }
   function nameOf(slot) {
     var c = pickOf(slot); if (c === 'off') return '-';
     if (c === 'all') { if (!MUS.res[slot]) { var pool = allPool().filter(function (k) { return k !== MUS.last; }); MUS.res[slot] = pool[Math.floor(Math.random() * pool.length)]; } return MUS.res[slot]; }
@@ -59,7 +59,7 @@
     b.innerHTML = '';
     var top = el('div', 'gxm-top'); top.appendChild(chip(on, { 'data-m': 'on' }, 'Music: ' + (on ? 'on' : 'off')));
     var lab = el('label', 'gxm-vol', 'Volume '); var rg = el('input', null, null, { type: 'range', min: '0', max: '1', step: '0.05', value: String(vol), 'aria-label': 'Music volume' }); rg.id = 'gxm-vol'; lab.appendChild(rg); top.appendChild(lab); b.appendChild(top);
-    var allOn = C.loops.every(function (k) { return P[k] === 'all'; });
+    var allOn = C.loops.every(function (k) { return pickOf(k) === 'all'; });
     var t2 = el('div', 'gxm-top'); t2.appendChild(chip(allOn, { 'data-m': 'allsongs' }, '⇄ Shuffle all songs')); b.appendChild(t2);
     C.slots.forEach(function (s) {
       var k = s[0], cur = pickOf(k), act = MUS.wslot === k && on && cur !== 'off', row = el('div', 'gxm-chips');
@@ -76,7 +76,7 @@
   function onClick(e) {
     var t = e.target && e.target.closest && e.target.closest('[data-m]'); if (!t || !t.closest('#gxm-body')) return; var m = t.dataset.m;
     if (m === 'on') { if (C.toggle) C.toggle(); sync(); }
-    else if (m === 'allsongs') { var all = C.loops.every(function (k) { return P[k] === 'all'; }); C.loops.forEach(function (k) { P[k] = all ? 'a' : 'all'; MUS.res[k] = null; }); save(); MUS.want = null; sync(); }
+    else if (m === 'allsongs') { var all = C.loops.every(function (k) { return pickOf(k) === 'all'; }); C.loops.forEach(function (k) { P[k] = all ? 'a' : 'all'; MUS.res[k] = null; }); save(); MUS.want = null; sync(); }
     else if (m === 'pick') pick(t.dataset.s, t.dataset.c);
     else if (m === 'prev') preview(t.dataset.s);
     else if (m === 'prevx') previewStop();
@@ -102,5 +102,5 @@
     sync();
   }
   function open() { try { if (typeof GX !== 'undefined') { GX.close && GX.close(); var b = document.getElementById('gxm-body'); if (b) b._sig = ''; render(); GX.show('gxm-d'); } } catch (e) { } }
-  root.GXMUS = { init: init, sync: sync, open: open, render: render, state: function () { return { pick: P, want: MUS.want, slot: MUS.wslot }; } };
+  root.GXMUS = { init: init, sync: sync, open: open, render: render, state: function () { var e = {}; if (C) C.slots.forEach(function (x) { e[x[0]] = pickOf(x[0]); }); return { pick: P, eff: e, want: MUS.want, slot: MUS.wslot }; } };
 })(typeof window !== 'undefined' ? window : this);

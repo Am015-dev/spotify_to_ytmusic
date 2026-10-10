@@ -34,7 +34,7 @@ figcaption span{color:var(--mut)}
 a{color:var(--acc)}
 </style></head><body>
 <h1>Shipwreck Isle: ${n} cards</h1>
-<p><a href="index.html">&larr; Back to the game</a> · Paintings made with Google Flow.</p>
+<p><a href="index.html">&larr; Back to the game</a> · Paintings painted by Am015-dev.</p>
 <input id="q" type="search" placeholder="Search cards" aria-label="Search cards">
 ${h}
 <script>

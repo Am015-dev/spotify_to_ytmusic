@@ -17,14 +17,8 @@ const RULES_HTML=`<div class="rules">
 <h3>Credits</h3>
 <section class="credits-audio">
 <h4>Audio</h4>
-<p>Used under Creative Commons Attribution:</p>
 <ul>
-<li>Music: original songs made for this game with Treblo (treblo.com)</li>
-</ul>
-<p>With thanks to these public-domain (CC0) creators:</p>
-<ul>
-<li>Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
-</ul>
+<li>Art and music by Am015-dev</li></ul>
 <p class="small muted">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
 </section>
 <p class="small muted">Names, card text and art are original; the rules follow the published game.</p></div>`;

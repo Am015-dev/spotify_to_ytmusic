@@ -6855,7 +6855,7 @@ function buildRules() {
   sec('Modules', h('div', ...Object.keys(D.mods).map(k => h('div.rcard', h('div.rt', h('b', D.mods[k].name), h('div', D.mods[k].text))))));
   sec('Ability cards', h('div', ...Object.keys(D.abilities).map(k => h('div.rcard', h('div.rt', h('b', D.abilities[k].name), h('div', D.abilities[k].text))))));
   sec('Playing on a phone', h('ul', ...['Tap a die in your tray, then tap a glowing space. Tap the die again to put it back.', 'Coffee buttons appear under the selected die when you hold tokens.', 'Hot-seat: a pass screen hides everything between turns. Online: you only ever see your own dice.', 'Hint shows what the computer crew would do and why, under the selected die (never over the buttons).', 'Each control space is labelled (Axis, Engine, Radio, Gear, Flap, Brake, Coffee). The altitude strip colour shows who places first. The ✓ button lists the landing checklist.'].map(t => h('li', t))));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Sound effects and jingles by Kenney (kenney.nl, CC0); ambience and music from OpenGameArt contributors under CC0 (full list in the licence log). Painted art is original and made by the generator in the repository. Names, text and art are original; the rules follow the rulebook.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Names, text and art are original; the rules follow the rulebook.</p></section>' }));
   return root;
 }
 function buildRef() {
@@ -7942,7 +7942,7 @@ function endBanner() {
   const u = ART[G.result.win ? 'end-land' : 'end-crash']; if (!u) return;
   b.insertBefore(h('img.endart', { src: u, alt: '' }), b.firstChild);
 }
-// ---- music: five slots (Menu, Flight, Last round, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / all / off
+// ---- music: five slots (Menu, Flight, Last round, Victory, Defeat), two tracks each, saved choice a / b / shuffle / all / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Flight'], ['fight', 'Last round'], ['victory', 'Landed'], ['defeat', 'Crashed']];
 const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Holding Pattern', 'main-b': 'Felt Keys and Flight Paths', 'fight-a': 'Runway Lights', 'fight-b': 'Ninety Seconds Out', 'victory-a': 'Applause at Altitude', 'victory-b': 'Homecoming Fanfare', 'defeat-a': 'Deflating Plink', 'defeat-b': 'Oops, Trombone' };
 const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };

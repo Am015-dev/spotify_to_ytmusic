@@ -11,10 +11,10 @@ function artBy(kind,key){return key?artImg(kind,key):''}
 function backStack(label,n){return `<span class="dk" title="${esc(label)}"><i class="cb" aria-hidden="true"></i><b>${n}</b><em>${esc(label)}</em></span>`}
 (function(){const R=document.documentElement;R.style.setProperty('--back-img','url('+MEDIA+'back-default.webp)')})();
 
-// ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two Treblo tracks each; saved choice a / b / shuffle / off
+// ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two tracks each; saved choice a / b / shuffle / off
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'Island Menu Theme','tavern-b':'Gentle Shoreline','main-a':'Patient Sunrise','main-b':'Quiet Provision','fight-a':'Storm Rumble','fight-b':'Beast in the Dark','victory-a':'Harbor Horn Rising','victory-b':'Safe Return','defeat-a':'Fading Tide','defeat-b':'The Last Watch Ashore'};
-const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 // 'all' = shuffle through every looping song (menu, game and fight tracks), a new one every ~2.5 min
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;

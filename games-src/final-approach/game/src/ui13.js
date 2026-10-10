@@ -33,10 +33,10 @@ function endBanner() {
   const u = ART[G.result.win ? 'end-land' : 'end-crash']; if (!u) return;
   b.insertBefore(h('img.endart', { src: u, alt: '' }), b.firstChild);
 }
-// ---- music: five slots (Menu, Flight, Last round, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / all / off
+// ---- music: five slots (Menu, Flight, Last round, Victory, Defeat), two tracks each, saved choice a / b / shuffle / all / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Flight'], ['fight', 'Last round'], ['victory', 'Landed'], ['defeat', 'Crashed']];
 const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Holding Pattern', 'main-b': 'Felt Keys and Flight Paths', 'fight-a': 'Runway Lights', 'fight-b': 'Ninety Seconds Out', 'victory-a': 'Applause at Altitude', 'victory-b': 'Homecoming Fanfare', 'defeat-a': 'Deflating Plink', 'defeat-b': 'Oops, Trombone' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, flight and last-round tracks), a new one every ~2.5 min
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;

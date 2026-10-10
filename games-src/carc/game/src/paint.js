@@ -36,10 +36,10 @@ function endBanner(box,won){if(!box||box.querySelector('.endart')||!PAINT_ON)ret
   const d=document.createElement('div');d.className='endart '+(won?'win':'lose');d.setAttribute('aria-hidden','true');d.style.backgroundImage='url('+MEDIA+f+'.webp)';box.insertBefore(d,box.firstChild)}
 (function(){const sr=showResult;showResult=function(){sr.apply(this,arguments);try{const win=G.over.win,me=G.pl.find(p=>p.human),w=!human()||(me&&win.includes(me.i)&&win.length===1);endBanner($('#modal .card[aria-label=Result]'),w)}catch(e){}}})();
 new MutationObserver(()=>{const r=document.querySelector('.gxc-res-on .gxc-res');if(r&&!r.querySelector('.endart'))endBanner(r,/\bwon\b/.test(r.closest('.gxc-res-on').className))}).observe(document.body,{childList:true,subtree:true});
-// ---------- music: five slots (Menu, Game, Last tiles, Victory, Defeat), two Treblo tracks each; choice a / b / shuffle / all / off ----------
+// ---------- music: five slots (Menu, Game, Last tiles, Victory, Defeat), two tracks each; choice a / b / shuffle / all / off ----------
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last tiles'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'Lute of the Meadow Fair','tavern-b':'Hearthlight Jig','main-a':"The Mason's Morning",'main-b':'Lute and Limewash','fight-a':'Keep of Hours','fight-b':'Ramshackle Round','victory-a':"The Jester's Triumph",'victory-b':'Crown of Green Fields','defeat-a':'Wistful Vale','defeat-b':'Fading to Grey'};
-const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('rv_mpick')||'{}'))}catch(e){}

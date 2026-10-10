@@ -5,7 +5,7 @@ def art_have():
     return 'const ART_HAVE='+repr(sorted(f[:-5] for f in os.listdir('art') if f.endswith('.webp')))+';\n'
 
 def audio_js():
-    # sound effects stay embedded; the Treblo songs are separate files in games/shipwreck-isle/music/ (GA fetches them when first wanted)
+    # sound effects stay embedded; the songs are separate files in games/shipwreck-isle/music/ (GA fetches them when first wanted)
     t=open(SRC['audio-data.js']).read();t=t[:t.index('},music:{')]
     names=[s+'-'+v for s in ('tavern','main','fight','victory','defeat') for v in 'ab']
     return t+'},music:{'+','.join('"%s":"url:music/%s.mp3"'%(n,n) for n in names)+'}};\n'

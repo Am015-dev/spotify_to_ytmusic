@@ -87,11 +87,11 @@ function sfx(name,o){o=o||{};if(!SND.on)return;const m=SND_MAP[name];const now=p
 // loops (timer clock, lobby hum): never stack copies
 function sndLoop(name,on){const L=SND_LOOP[name];if(!L)return;if(on===!!SND.loops[name])return;SND.loops[name]=on?1:0;
   if(!window.GA)return;if(on&&SND.on){if(GA.has(L.s))GA.loop(L.s,{vol:L.vol,fade:.6});else SND.loops[name]=0}else GA.stopLoop(L.s,{fade:.8})}
-// music: five slots (tavern = menu, main = game, fight = last seconds / boss, victory, defeat), two Treblo songs each (a / b),
+// music: five slots (tavern = menu, main = game, fight = last seconds / boss, victory, defeat), two songs each (a / b),
 // the player's pick (a, b, shuffle, off) is saved. GA cross-fades between them; if the files fail, a quiet synth bass plays in game.
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last seconds'],['victory','Win'],['defeat','Lose']];
 const MTITLE={'tavern-a':'Menu loop A','tavern-b':'Menu loop B','main-a':'Ninety Beats to Focus','main-b':'Clockwork Study','fight-a':'Final Wires','fight-b':'Brass on the Clock','victory-a':'Brass and Bells','victory-b':'Victory Fanfare','defeat-a':'Six Second Deflate','defeat-b':'Sad Tuba Plop'};
-const MUS={pick:{tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0,last:null,since:0};
+const MUS={pick:{tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0,last:null,since:0};
 // 'all' = shuffle through every looping song (menu, game and last-seconds tracks), a new one every ~2.5 min
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('sf_mpick')||'{}'))}catch(e){}

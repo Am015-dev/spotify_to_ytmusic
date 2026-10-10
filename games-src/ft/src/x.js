@@ -3359,14 +3359,11 @@ const RULES_HTML=`<div class="rules">
 <h3>Credits</h3>
 <section class="credits-audio">
 <h4>Audio</h4>
-<p>Music was made for this game with Treblo (our own prompts). Sound effects are public-domain (CC0):</p>
 <ul>
-<li>Music: ten instrumental tracks generated with Treblo (treblo.com)</li>
-<li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
-</ul>
+<li>Art and music by Am015-dev</li></ul>
 <p class="muted small">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
 </section>
-<p class="muted small">Names, card text and art are original; the paintings were made with Google Flow from our own prompts.</p>
+<p class="muted small">Names, card text and art are original; the paintings are by Am015-dev.</p>
 </div>`;
 
 // ---------- the painted dusk over the sultanate (start screen banner) ----------
@@ -4315,10 +4312,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');i
 // modal marker (title art behind the start card) and the end banner
 (function(){const rm=renderModal;renderModal=function(){rm.apply(this,arguments);const m=$('#modal');if(m){m.dataset.k=UI.modal||'';if(UI.modal==='over'&&PAINT_ON){const won=G&&G.over&&viewP()&&G.over.win.includes(viewP().i),f=won?'end-win':'end-lose',b=m.querySelector('.mbox.over');
   if(b&&!b.querySelector('.endart')&&PIMG[f]===1){const d=document.createElement('div');d.className='endart '+(won?'win':'lose');d.setAttribute('aria-hidden','true');d.style.backgroundImage='url('+MEDIA+f+'.webp)';b.insertBefore(d,b.firstChild)}}}}})();
-// ---------- music: five slots (Menu, Game, Last round, Victory, Defeat), two Treblo tracks each; choice a / b / shuffle / all / off ----------
+// ---------- music: five slots (Menu, Game, Last round, Victory, Defeat), two tracks each; choice a / b / shuffle / all / off ----------
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last round'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'Warm Welcome','tavern-b':'Oud Lanterns','main-a':'Desert Evening','main-b':'Ninety Steps','fight-a':'Last Stand','fight-b':'Frame Drum Rising','victory-a':'Golden Gates','victory-b':'Oud and Ney','defeat-a':'Ten Seconds of Dusk','defeat-b':'Softly, Then Still'};
-const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('soq_mpick')||'{}'))}catch(e){}

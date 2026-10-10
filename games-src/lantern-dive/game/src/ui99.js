@@ -38,10 +38,10 @@ function endBanner(box, won) {
 }
 (function () { const sr = showResult; showResult = function () { const r = sr.apply(this, arguments); try { if (G && G.result) endBanner(document.querySelector('#rs .rsbox'), !!G.result.ok); } catch (e) { } return r; }; })();
 new MutationObserver(() => { const r = document.querySelector('.gxc-res-on .gxc-res'); if (r && !r.querySelector('.endart')) endBanner(r, /\bwon\b/.test(r.closest('.gxc-res-on').className)); }).observe(document.body, { childList: true, subtree: true });
-// ---- music: five slots (Menu, Dive, Boss, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / all / off
+// ---- music: five slots (Menu, Dive, Boss, Victory, Defeat), two tracks each, saved choice a / b / shuffle / all / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Dive'], ['fight', 'Boss'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'Menu tune A', 'tavern-b': 'Menu tune B', 'main-a': 'Dive tune A', 'main-b': 'Dive tune B', 'fight-a': 'Boss tune A', 'fight-b': 'Boss tune B', 'victory-a': 'Victory A', 'victory-b': 'Victory B', 'defeat-a': 'Defeat A', 'defeat-b': 'Defeat B' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;
 try { Object.assign(MUS.pick, JSON.parse(localStorage.getItem('ld_mpick') || '{}')); } catch (e) { }
