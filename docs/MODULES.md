@@ -351,7 +351,7 @@ uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 9
 
 ## 99c_checklist.js — 42 KB
 defines: OD_CHECKLIST
-uses: 30(28), 10(19), 20(12), 99t(5), 41(4), 92(4), 40(1), 72(1)
+uses: 30(28), 10(19), 20(12), 99t(5), 41(4), 92(4), 40(2), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
