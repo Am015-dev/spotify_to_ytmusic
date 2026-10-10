@@ -34,5 +34,6 @@ The brief comes from the coordinator (session_017iH3DB4VyxwKSdMwsco4Ut). Live v8
   - The only FAIL is the existing 10 px CHECKPOINT label.
 - [x] Night shots, same drive (`tools/eff/nightshot.js`): `qa_mem4/shots/v89p_night.png` vs `v89o_night.png` look the same.
   - The headlight mesh id is stable on v89p and changes every second on live v89o. 0 console errors on both.
-- [ ] REVIEW (quick: no visual change; headlight shot at dusk + 0 console errors), then the OD_CHANGELOG entry and checklist item, push `out/v89p`, and send DEPLOY.
+- [x] Reviewer QUICK PASS (f8dfbccd). OD_CHANGELOG v89p + checklist item night-mem added; out/v89p built; DEPLOY sent to the coordinator.
+- Reviewer queue (pre-existing, live too): two flat opaque pink rectangles beside the player car rear wheels at night (taillight glow drawn as solid quads).
 - Other FAILs in the baseline run were already there on v89n and are not this task: stuck 4.5 %, CHECKPOINT 10 px text.

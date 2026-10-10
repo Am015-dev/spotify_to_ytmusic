@@ -3,6 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89p',id:'night-mem',text:'iPhone: drive 15 min in Frankfurt at dusk/night: no slowdown, no reload.'},
  {ver:'v89o',id:'gar-stop',text:'Drive through Eleni\'s garage ring without stopping: no menu pops up; stop in it: the menu opens.'},
  {ver:'v89o',id:'ath-gb-road',text:'Athens: golden bricks are on roads, not in blocks or on the hill.'},
  {ver:'v89o',id:'plate-gear',text:'Phone: the district name in the top right is fully visible below the ⚙ button, also during a challenge.'},
