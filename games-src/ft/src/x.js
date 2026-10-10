@@ -3359,14 +3359,14 @@ const RULES_HTML=`<div class="rules">
 <h3>Credits</h3>
 <section class="credits-audio">
 <h4>Audio</h4>
-<p>With thanks to these public-domain (CC0) creators:</p>
+<p>Music was made for this game with Treblo (our own prompts). Sound effects are public-domain (CC0):</p>
 <ul>
-<li>Music: &ldquo;Desert Loop&rdquo; by iamoneabe (<a href="https://opengameart.org/content/desert-loop" target="_blank" rel="noopener">OpenGameArt</a>, CC0)</li>
+<li>Music: ten instrumental tracks generated with Treblo (treblo.com)</li>
 <li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
 </ul>
 <p class="muted small">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
 </section>
-<p class="muted small">Names, card text and art are original.</p>
+<p class="muted small">Names, card text and art are original; the paintings were made with Google Flow from our own prompts.</p>
 </div>`;
 
 // ---------- the painted dusk over the sultanate (start screen banner) ----------
@@ -3426,7 +3426,7 @@ document.addEventListener('keydown',()=>{if(audioInit()&&SND.ctx.state==='suspen
 const HAS_GA=typeof GA!=='undefined'&&typeof GA_DATA!=='undefined';
 if(HAS_GA){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'soq',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.music)}
 // the recorded music takes over unless Web Audio is missing or its track failed to decode
-function gaMusicOk(){if(!HAS_GA)return false;const st=GA.state();return !!GA.playing()||(st.audio&&(st.failed||[]).indexOf('main')<0)}
+function gaMusicOk(){if(!HAS_GA)return false;const st=GA.state();return !!GA.playing()||(st.audio&&(st.failed||[]).indexOf(typeof MUS!=='undefined'&&MUS.want||'main')<0)}
 function env(g,t,a,peak,dur){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+dur)}
 function tone(f,dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const osc=c.createOscillator(),g=c.createGain();osc.type=o.type||'sine';
   osc.frequency.setValueAtTime(f,t);if(o.to)osc.frequency.exponentialRampToValueAtTime(o.to,t+dur);if(o.det)osc.detune.value=o.det;
@@ -3457,8 +3457,8 @@ function sfx(name){if(!SND.on)return;const m=SND_MAP[name];
   }}catch(e){}}
 // ambience: an oud-like drone and soft hand-drum pattern
 const OUD=[146.8,164.8,174.6,196,220,233.1,261.6];
-function musicStart(){if(HAS_GA)GA.music('main',{fade:2});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,200)}
-function musicStop(){if(HAS_GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
+function musicStart(){if(HAS_GA){if(typeof musicSync==='function'){MUS.want=null;musicSync()}else GA.music('tavern-a',{fade:2})}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,200)}
+function musicStop(){if(HAS_GA){GA.music(null);if(typeof MUS!=='undefined')MUS.want=null}clearInterval(SND.mTimer);SND.mTimer=null}
 function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}const st=.36;
   while(SND.nextT<c.currentTime+.5){const at=SND.nextT-c.currentTime,k=SND.beat%16;
     if(k===0)tone(73.4,st*15,{type:'sine',v:.08,a:.5,at,bus:SND.musBus});
@@ -3975,6 +3975,8 @@ function overHtml(){const mp=viewP();const win=G.over.win;const won=mp&&win.incl
   return `<div class="mbox over"><h2>${mp?(won?(win.length>1?'You share the win':'You win!'):'You lose'):esc(G.winText)}</h2>${scoreTable()}<div class="acts"><button class="btn go" data-ui="again">Play again</button><button class="btn" data-ui="closeover">View the board</button></div></div>`}
 function renderSettings(){const el=$('#setbody');if(!el)return;const seg=(attr,cur,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button ${attr}="${v}" class="${String(cur)===String(v)?'on':''}">${l}</button>`).join('')}</div>`;
   el.innerHTML=`<div class="setrow"><h4>Sound</h4><div class="seg"><button data-a="snd" class="${typeof SND==='undefined'||SND.on?'on':''}">${ICON('snd')} Effects</button><button data-a="mus" class="${typeof SND!=='undefined'&&SND.music?'on':''}">${ICON('mus')} Music</button></div></div>
+   <div class="setrow"><h4>Music</h4><button class="btn" data-gx="musicd">🎼 Choose music</button></div>
+   <div class="setrow"><h4>Pictures</h4><div class="seg"><button data-paint="1" class="${typeof PAINT_ON==='undefined'||PAINT_ON?'on':''}">Painted</button><button data-paint="0" class="${typeof PAINT_ON!=='undefined'&&!PAINT_ON?'on':''}">Simple</button></div></div>
    <div class="setrow"><h4>Computer speed</h4>${seg('data-spd',UI.speed||1,[[.5,'Slow'],[1,'Normal'],[3,'Fast']])}</div>`+(typeof GXH!=='undefined'?`<div class="setrow"><h4>Help</h4>${GXH.settingsHTML({rowClass:'',btnClass:''})}</div>`:'')}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-spd]');if(!b)return;UI.speed=+b.dataset.spd;if(G)render();renderSettings()});
 // ---------- story mode (the shared campaign kit): ten chapters in three acts, bosses with a rule of their own ----------
@@ -3986,7 +3988,7 @@ function campStart(def){const s=def.setup||{},op=def.opponent||{};const np=s.np|
 function campMetrics(g){const p=g.pl[0],s=scoreOf(p);const rivals=g.pl.slice(1).map(q=>scoreOf(q).total);const best=Math.max(...rivals);const won=!!g.over&&g.over.win.includes(0);
   return {won,score:s.total,margin:s.total-best,coins:p.coins,goods:s.goods,tiles:g.board.filter(t=>owner(t)===0).length,djinns:p.dj.length,advisors:p.vz,cities:g.board.filter(t=>t.k==='city'&&owner(t)===0).length,palaces:s.palaces,rounds:g.round}}
 function campIsWon(g,def){const m=campMetrics(g);if(!m.won)return false;const gl=def.goal||{};switch(gl.type){case 'score':return m.score>=gl.value;case 'margin':return m.margin>=gl.value;case 'before-round':return m.rounds<gl.value;case 'custom':return gl.test?GXC.testStar(gl.test,m):true}return true}
-function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;GXC.init({game:'sands',data:window.CAMPAIGN,headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,onExit:()=>{UI.camp=null;UI.modal='start';render()},
+function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;GXC.init({game:'sands',data:window.CAMPAIGN,artBase:'media/',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,onExit:()=>{UI.camp=null;UI.modal='start';render()},
   scores:g=>g.pl.map(p=>scoreOf(p).total),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:p.human?undefined:p.lv}))})}
 // ---------- start ----------
 function boot(){GX.init({key:'soq'});paintIcons();GX.onShow=id=>{if(id==='setd')renderSettings();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(id==='djd'&&G)renderDjPop();if(id==='menud'&&typeof tutMenuFill==='function')tutMenuFill();if(G)render()};
@@ -4286,3 +4288,79 @@ document.addEventListener('click',e=>{if(!tutOn())return;const b=e.target.closes
 // every tap the dim shield catches leaves a small ripple where it landed (a wrong tap is never silent, not even the second one in a row)
 document.addEventListener('pointerdown',e=>{const t=e.target;if(!t||!t.classList||!t.classList.contains('gxt-cell'))return;
   const r=document.createElement('i');r.className='gxt-ripple';r.setAttribute('data-help','');r.setAttribute('aria-hidden','true');r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),650)},true);
+
+// ---------- painted art (tiles, table, card backs, title and end art) and music (per screen + the Music picker) ----------
+// Every picture is a separate file in media/. Each layer switches itself on only after its file has loaded, so the
+// drawn board stays as the fallback while loading, on "Simple pictures" and if a file is missing.
+const MEDIA='media/',HR=document.documentElement;
+let PAINT_ON=true;try{PAINT_ON=localStorage.getItem('soq_paint')!=='0'}catch(e){}
+const PIMG={};
+function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[f]=0;const i=new Image();i.onload=()=>{PIMG[f]=1;if(cb)cb()};i.src=MEDIA+f+'.webp'}
+function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
+const TABLES=['workshop','court','night','palace'],BACKS=['copper','lamp'];
+function paintApply(){
+  HR.classList.toggle('tp',PAINT_ON&&PIMG['tile-village']===1);HR.classList.toggle('ti',PAINT_ON&&PIMG['title']===1);
+  const tb=unl('table'),tf=TABLES.includes(tb)?'table-'+tb:'';
+  if(PAINT_ON&&tf)pimg(tf,()=>{HR.style.setProperty('--tbl','url('+MEDIA+tf+'.webp)');HR.classList.add('tbl','tbl-u')});
+  else if(PAINT_ON){HR.style.removeProperty('--tbl');HR.classList.remove('tbl-u');if(PIMG['table-default']===1)HR.classList.add('tbl')}
+  if(!PAINT_ON)HR.classList.remove('tbl','tbl-u');
+  const cb=unl('cardback'),cf=BACKS.includes(cb)?'back-'+cb:'back-default';
+  if(PAINT_ON)pimg(cf,()=>HR.style.setProperty('--cb','url('+MEDIA+cf+'.webp)'));
+  HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1);
+}
+function paintBoot(){['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
+  ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply()}
+// painted pictures on/off (Settings)
+document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');if(!b)return;PAINT_ON=b.dataset.paint==='1';try{localStorage.setItem('soq_paint',PAINT_ON?'1':'0')}catch(x){}paintApply();if(G)render();renderSettings()});
+// modal marker (title art behind the start card) and the end banner
+(function(){const rm=renderModal;renderModal=function(){rm.apply(this,arguments);const m=$('#modal');if(m){m.dataset.k=UI.modal||'';if(UI.modal==='over'&&PAINT_ON){const won=G&&G.over&&viewP()&&G.over.win.includes(viewP().i),f=won?'end-win':'end-lose',b=m.querySelector('.mbox.over');
+  if(b&&!b.querySelector('.endart')&&PIMG[f]===1){const d=document.createElement('div');d.className='endart '+(won?'win':'lose');d.setAttribute('aria-hidden','true');d.style.backgroundImage='url('+MEDIA+f+'.webp)';b.insertBefore(d,b.firstChild)}}}}})();
+// ---------- music: five slots (Menu, Game, Last round, Victory, Defeat), two Treblo tracks each; choice a / b / shuffle / all / off ----------
+const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last round'],['victory','Victory'],['defeat','Defeat']];
+const MTITLE={'tavern-a':'Warm Welcome','tavern-b':'Oud Lanterns','main-a':'Desert Evening','main-b':'Ninety Steps','fight-a':'Last Stand','fight-b':'Frame Drum Rising','victory-a':'Golden Gates','victory-b':'Oud and Ney','defeat-a':'Ten Seconds of Dusk','defeat-b':'Softly, Then Still'};
+const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
+const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
+try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('soq_mpick')||'{}'))}catch(e){}
+function musicSlot(){
+  const st=$('#modal');if(!G||UI.modal==='start'||UI.modal==='lobby'||UI.modal==='offer')return['tavern',0];
+  if(G.over&&!G.tut){const mp=viewP(),w=!mp||G.over.win.includes(mp.i);return[w?'victory':'defeat',1]}
+  if(!G.tut&&(G.endTrig||(UI.camp&&UI.camp.boss)))return['fight',0];
+  return['main',0]}
+function musicName(slot){const c=MUS.pick[slot]||MDEF[slot];if(c==='off')return'-';
+  if(c==='all'){if(!MUS.res[slot]){const pool=MALL.filter(k=>k!==MUS.last);MUS.res[slot]=pool[Math.floor(Math.random()*pool.length)]}return MUS.res[slot]}
+  if(c==='shuffle'){if(!MUS.res[slot]){MUS.sh[slot]=MUS.sh[slot]===undefined?(Math.random()<.5?0:1):1-MUS.sh[slot];MUS.res[slot]=slot+'-'+'ab'[MUS.sh[slot]]}return MUS.res[slot]}
+  return slot+'-'+(c==='b'?'b':'a')}
+function musicPick(slot,c){MUS.pick[slot]=c;MUS.res[slot]=null;try{localStorage.setItem('soq_mpick',JSON.stringify(MUS.pick))}catch(e){}
+  if(window.GA&&c!=='off'&&c!=='shuffle'&&c!=='all')try{GA.preload(musicName(slot))}catch(e){}
+  if(MUS.wslot===slot&&!MUS.prev){MUS.want=null;musicSync()}}
+// one cross-faded track at a time; called from a slow tick, the first tap and after the music button or a pick
+function musicSync(){if(!window.GA||typeof GA_DATA==='undefined'||MUS.prev)return;
+  if(!SND.music){MUS.want=null;GA.music(null,{fade:.6});return}
+  const w=musicSlot();if(MUS.wslot!==w[0]){MUS.wslot=w[0];MUS.res[w[0]]=null}
+  else if(MUS.pick[w[0]]==='all'&&!w[1]&&MUS.since&&Date.now()-MUS.since>MALL_MS)MUS.res[w[0]]=null;
+  const n=musicName(w[0]);if(MUS.want===n)return;MUS.want=n;MUS.since=Date.now();if(n!=='-')MUS.last=n;
+  if(n==='-'){GA.music(null,{fade:1});return}
+  GA.music(n,{fade:w[1]?.6:1,once:!!w[1]});
+  if(w[0]==='tavern'||w[0]==='main')setTimeout(()=>{try{const nx=w[0]==='tavern'?'main':'fight',c=MUS.pick[nx];if(c!=='off'&&c!=='shuffle'&&c!=='all')GA.preload(musicName(nx))}catch(e){}},4000)}
+function musicPreview(slot){if(!window.GA||!SND.music||MUS.wslot===slot)return;try{GA.unlock()}catch(e){}
+  const n=musicName(slot);if(n==='-')return;clearTimeout(MUS.prevT);MUS.prev=slot;MUS.want=null;GA.music(n,{fade:.5,once:true});
+  MUS.prevT=setTimeout(()=>{MUS.prev=null;MUS.want=null;musicSync();renderMusic()},8000)}
+function musicPreviewStop(){if(!MUS.prev)return;clearTimeout(MUS.prevT);MUS.prev=null;MUS.want=null;musicSync();renderMusic()}
+function renderMusic(){const b=$('#musicbody');if(!b)return;const on=SND.music;let vol=.5;try{vol=GA.state().musVol}catch(e){}
+  const chip=(cls,at,t)=>`<button type="button" class="mchip${cls}" ${Object.entries(at).map(([k,v])=>`${k}="${v}"`).join(' ')}>${t}</button>`;
+  const sig=JSON.stringify([on,MUS.pick,MUS.prev,MUS.wslot]);if(b._sig===sig)return;b._sig=sig;
+  const allOn=MLOOPS.every(k=>MUS.pick[k]==='all');
+  b.innerHTML=`<div class="mtop">${chip(on?' on':'',{'data-m':'mus'},'Music: '+(on?'on':'off'))}<label class="mvol">Volume <input id="mvol" type="range" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div>
+   <div class="mtop">${chip(allOn?' on':'',{'data-m':'all'},'⇄ Shuffle all songs')}</div>`+MSLOTS.map(([k,nm])=>{const cur=MUS.pick[k],act=MUS.wslot===k&&on&&cur!=='off';
+    return `<div class="mrow2"><h5>${nm}${act?' <small>playing now</small>':''}</h5><div class="mchips">`+['a','b'].map(v=>chip(cur===v?' on':'',{'data-m':'pick','data-s':k,'data-c':v},MTITLE[k+'-'+v])).join('')
+     +chip(cur==='shuffle'?' on':'',{'data-m':'pick','data-s':k,'data-c':'shuffle'},'⇄ Shuffle')+(MLOOPS.includes(k)?chip(cur==='all'?' on':'',{'data-m':'pick','data-s':k,'data-c':'all'},'⇄ All songs'):'')+chip(cur==='off'?' on':'',{'data-m':'pick','data-s':k,'data-c':'off'},'Off')
+     +(MUS.prev===k?chip(' prev',{'data-m':'prevx'},'■ Stop preview'):(!act&&cur!=='off'&&on?chip(' prev',{'data-m':'prev','data-s':k},'▶ Preview'):''))+'</div></div>'}).join('')}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
+  if(m==='mus')toggleMusic();else if(m==='all'){const on=MLOOPS.every(k=>MUS.pick[k]==='all');MLOOPS.forEach(k=>musicPick(k,on?MDEF[k]:'all'))}
+  else if(m==='pick')musicPick(b.dataset.s,b.dataset.c);else if(m==='prev')musicPreview(b.dataset.s);else if(m==='prevx'){musicPreviewStop();return}
+  const mb=$('#musicbody');if(mb)mb._sig=null;renderMusic()});
+function paintInit(){paintBoot();if(typeof GX!=='undefined'){const os=GX.onShow;GX.onShow=id=>{if(os)os(id);if(id==='musicd'){const mb=$('#musicbody');if(mb)mb._sig=null;renderMusic()}}}
+  setInterval(()=>{try{paintApply();musicSync()}catch(e){}},800);document.addEventListener('pointerdown',()=>setTimeout(()=>{try{musicSync()}catch(e){}},60),{capture:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paintInit);else paintInit();
