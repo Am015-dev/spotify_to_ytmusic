@@ -20,3 +20,4 @@
 - alex/od-size bc35e81f = od-models d6b0c858 + the collider cap RSZ.capW 3.2 (BC_dims wrap). Sent to build-7, the reviewer and the coordinator, with plow_lane.png and new_rides_driver.png.
 - Dark object in the contact shots = live traffic at shot time, not a leftover (one ride mesh after a real switch + drive).
 - Open: 604/606/620/622 have no 'stw', so no driver; big trucks get the BC mass factor (acc about 0.53–0.65).
+- 18:00: the coordinator is not deploying alex/od-size (its out/v90f predates the merge). build-7 folds the cap into v90f. size-1 stood down.
