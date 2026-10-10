@@ -60,6 +60,17 @@ function LDS_dumpster(old){const G=[],B=(w,h,d,x,y,z,c,rx)=>{const g=new THREE.B
 LDS.SW={planter:[LDS_planter,'LEGO flower bed 3020+33291+6255'],dumpster:[LDS_dumpster,'LEGO brick dumpster']};
 kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='fra')return r;for(const t in LDS.SW){const d=D[t];if(!d||d.lds)continue;try{const old=LDS_tri(d.g);d.gOld=d.g;d.mOld=d.mat;d.g=LDS.SW[t][0](d.g);
   d.mat=LDS.mat||(LDS.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0}));d.lds=t;if(LDS.st)LDS.st[t]={src:LDS.SW[t][1],old,near:LDS_tri(d.g),far:LDS_tri(d.g)}}catch(e){console.warn('LDS '+t,e)}}return r})(kmProps);
+// Athens palm (swap 7, Syntagma race palms, TRK.tree 'palm'): LEGO palm as built in set 6376 Breezeway Cafe (ld/land/l_palm.ldr, OMR, CCAL 2.0):
+// 2563 base (r 20 LDU), stacked 2536 trunk segments (r 11 -> 14 each), 2566 top and 4 x 2518 Palm Leaf Large (176 LDU long, 90 wide, drooping 43);
+// trunk = 5-sided lathe of that profile, each leaf = 2-sided quad + tip triangle; scaled to the old 9.5 m trunk. Replaces athTreeBy0('palm') (108 tris).
+LDS.PALM={p:[[20,0],[20,38],[11,40],[14,98],[11,100],[14,160],[11,162],[14,198],[0,216]],k:9.5/198};
+function LDS_palm(){const{p,k}=LDS.PALM,g=new THREE.LatheGeometry(p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),5).toNonIndexed(),q=g.attributes.position,V=[],C=[],tb=new THREE.Color('#6b4a2a'),lf=new THREE.Color('#2f8a3a');
+ for(let i=0;i<q.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(q,i),b=new THREE.Vector3().fromBufferAttribute(q,i+1),d=new THREE.Vector3().fromBufferAttribute(q,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()<1e-12)continue;V.push(a,b,d);for(let j=0;j<3;j++)C.push(tb.r,tb.g,tb.b)}
+ const y0=204*k,tri=(a,b,d)=>{for(const T of[[a,b,d],[a,d,b]]){V.push(...T);for(let j=0;j<3;j++)C.push(lf.r,lf.g,lf.b)}};
+ for(let i=0;i<4;i++){const ang=i*Math.PI/2+Math.PI/4,cx=Math.cos(ang),cz=Math.sin(ang),P=(r,w,y)=>new THREE.Vector3((cx*r-cz*w)*k,y0+y*k,(cz*r+cx*w)*k);
+  const a=P(4,-10,0),b=P(4,10,0),c=P(80,45,6),d=P(80,-45,6),t=P(176,0,-43);tri(a,b,c);tri(a,c,d);tri(d,c,t)}
+ const G=new THREE.BufferGeometry().setFromPoints(V);G.setAttribute('color',new THREE.Float32BufferAttribute(C,3));G.computeVertexNormals();G.computeBoundingBox();G.computeBoundingSphere();return G}
+ART_athTreeBy=(f=>function(k){if(k==='palm'&&!LDS.palmOff)try{const g=LDS_palm();LDS.palm=g;LDS.st=LDS.st||{};LDS.st.palm={src:'6376 palm',old:108,near:LDS_tri(g),far:LDS_tri(g)};return g}catch(e){console.warn('LDS palm',e)}return f.apply(this,arguments)})(ART_athTreeBy);
 // LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
 function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
