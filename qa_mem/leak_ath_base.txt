@@ -1,0 +1,48 @@
+{"city":"ath","heapBefore":175.4,"heapAfter":234.5,"liveSampledMB":70.6,"errs":[]}
+--self
+  36.29 Float32Array@0
+  31.48 WB_cityBuild2@12511
+   1.38 push@0
+   0.27 Float64Array@0
+   0.20 (IDLE_EXTERNAL)@0
+   0.17 Set@0
+   0.16 add@0
+   0.06 Object3D@7118
+   0.05 join@0
+   0.05 pedStep@5118
+   0.05 cloneUniforms@12072
+   0.03 (anon)@7001
+   0.03 setup@15017
+   0.03 get@0
+   0.03 Float32BufferAttribute@10409
+   0.02 makeTranslation@6374
+   0.02 setValueM4@18353
+   0.02 needsUpdate@15141
+   0.02 (anon)@8113
+   0.02 (anon)@2974
+   0.02 SMM_tick@5945
+   0.02 InstancedBufferAttribute@32406
+   0.02 createBindingState@15109
+   0.02 WB_tpl@12463
+   0.02 disable@22914
+--stacks
+  36.29 (root)@0 < (anon)@0 < WB_cityBuild2@12511 < Float32Array@0
+  31.48 (root)@0 < (anon)@0 < WB_cityBuild2@12511
+   1.38 (root)@0 < (anon)@0 < WB_cityBuild2@12511 < push@0
+   0.27 (root)@0 < (anon)@0 < WB_cityBuild2@12511 < Float64Array@0
+   0.20 (root)@0 < (IDLE_EXTERNAL)@0
+   0.17 (root)@0 < (anon)@0 < WB_cityBuild2@12511 < Set@0
+   0.16 (root)@0 < (anon)@0 < WB_cityBuild2@12511 < add@0
+   0.05 setProgram@29948 < getProgram@29800 < getProgramCacheKey@20760 < join@0
+   0.05 hubTrafficStep@6451 < hubTrafficStep@5193 < pedStep@8024 < pedStep@5118
+   0.05 setProgram@29948 < getProgram@29800 < getUniforms@20950 < cloneUniforms@12072
+   0.03 (root)@0 < (anon)@7001
+   0.03 renderObjects@29746 < renderObject@29769 < WebGLRenderer.renderBufferDirect@28948 < setup@15017
+   0.03 (anon)@0 < WB_cityBuild2@12511 < WB_tpl@12463 < get@0
+   0.03 minifig@3140 < B@3140 < Mesh@11502 < Object3D@7118
+   0.02 FL_emis@7171 < FL_headlights@7756 < cbox@4086 < makeTranslation@6374
+   0.02 WebGLRenderer.renderBufferDirect@28948 < setProgram@29948 < setValue@19128 < setValueM4@18353
+   0.02 renderObject@29769 < WebGLRenderer.renderBufferDirect@28948 < setup@15017 < needsUpdate@15141
+   0.02 hubTrafficStep@5193 < pedStep@8024 < pedStep@5118 < (anon)@8113
+   0.02 (root)@0 < (anon)@2974
+   0.02 hubTrafficStep@5193 < (anon)@11359 < (anon)@5948 < SMM_tick@5945
