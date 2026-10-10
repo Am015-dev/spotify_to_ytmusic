@@ -44,13 +44,13 @@ Style block (paste in front of every art prompt for this game):
 
 - [x] `games/crown-city-smash/camp-clampede.webp` (1:1, target 512x512 WebP)
   - Prompt: Clampede, a clam-headed centipede monster with a teal shell, many little legs and a toothy grin, crawling out of a glowing portal in a night city, bust portrait, centred
-- [ ] `games/crown-city-smash/cut-clampede.webp` (1:1 on plain white or transparent, we key it)
+- [x] `games/crown-city-smash/cut-clampede.webp` (1:1 on plain white or transparent, we key it)
   - Prompt: the same Clampede, full body, front three-quarter view, cut-out on a plain white background, same framing as the other cut-*.webp monsters
   - Note: Used as the avatar chip next to scores.
 
 **Campaign unlocks, title and end art (games/crown-city-smash/media/)**
 
-- [ ] `games/crown-city-smash/media/back-bulletin.webp` (3:4, target 300x426 WebP)
+- [x] `games/crown-city-smash/media/back-bulletin.webp` (3:4, target 300x426 WebP)
   - Prompt: a card back made of old newspaper print texture with one bold black-ink star in the centre, only grey scribble lines instead of readable words, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock "Bulletin newsprint card back".
 - [x] `games/crown-city-smash/media/back-brass-beetle.webp` (3:4, target 300x426 WebP)
@@ -136,11 +136,11 @@ Style block (paste in front of every art prompt for this game):
 - [x] `games/nebula-aces/media/table-nebula7.webp` (16:9, target 1376x768 WebP)
   - Prompt: swirling rusty-orange nebula dust over black space at the edges, calm dark centre, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock: Battlefield skin: Nebula-7 dust
-- [ ] `games/nebula-aces/media/title.webp` (16:9, target 1302x726 WebP)
+- [x] `games/nebula-aces/media/title.webp` (16:9, target 1302x726 WebP)
   - Prompt: two starfighters in a close dogfight in front of a huge glowing nebula, engine trails, a small fleet far behind, keep the top of the picture calm and clear for the game logo
-- [ ] `games/nebula-aces/media/title-phone.webp` (9:16, target 744x1334 WebP)
+- [x] `games/nebula-aces/media/title-phone.webp` (9:16, target 744x1334 WebP)
   - Prompt: two starfighters in a close dogfight in front of a huge glowing nebula, engine trails, a small fleet far behind, keep the top of the picture calm and clear for the game logo, portrait orientation
-- [ ] `games/nebula-aces/media/end-win.webp` (16:9, target 1302x726 WebP)
+- [x] `games/nebula-aces/media/end-win.webp` (16:9, target 1302x726 WebP)
   - Prompt: a squadron of starfighters flying home in victory formation past a shining ringed planet, no text
 - [x] `games/nebula-aces/media/end-lose.webp` (16:9, target 1302x726 WebP)
   - Prompt: a crippled starfighter drifting with sparks and smoke, the silhouette of an enemy cruiser behind, no text
@@ -484,7 +484,7 @@ Style block (paste in front of every art prompt for this game):
 - [x] `games/sunglaze/media/back-lamplight.webp` (3:4, target 300x426 WebP)
   - Prompt: a warm lamp glow over cream tile backs with a faint pattern, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock: Lamplight tile backs
-- [ ] `games/sunglaze/media/table-default.webp` (16:9, target 1376x768 WebP)
+- [x] `games/sunglaze/media/table-default.webp` (16:9, target 1376x768 WebP)
   - Prompt: a tile-workshop table top seen from above: pale plaster surface with clay dust, brushes and glaze jars at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Default table behind the board.
 - [x] `games/sunglaze/media/table-default-phone.webp` (9:16, target 768x1376 WebP)
@@ -876,7 +876,7 @@ Style block (paste in front of every art prompt for this game):
 - [x] `games/lantern-dive/media/back-last-light.webp` (3:4, target 300x426 WebP)
   - Prompt: a single pale-gold lantern glow in pitch-dark water on a card back, tiny bubbles, portrait card back filling the whole card edge to edge, symmetrical, flat, no text
   - Note: Campaign unlock "Last-light card back".
-- [ ] `games/lantern-dive/media/table-tunnel-glow.webp` (16:9, target 1376x768 WebP)
+- [x] `games/lantern-dive/media/table-tunnel-glow.webp` (16:9, target 1376x768 WebP)
   - Prompt: a drowned tunnel floor: dark stone, glowing algae and a faint gold glow at the edges, seen from above, big calm empty area in the centre for the game pieces, edges busier than the middle
   - Note: Campaign unlock "Tunnel-glow table".
 - [x] `games/lantern-dive/media/title-phone.webp` (9:16, target 744x1334 WebP)
