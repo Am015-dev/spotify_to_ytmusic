@@ -95,7 +95,7 @@ def mesh_part(name, title, i):
     k = 'ld' + re.sub(r'[^0-9a-z]', '', i.lower())
     if k not in MESH:
         m = ldmesh.mesh(name, keep=float(os.environ.get('LD_KEEP', .45)), min_tris=int(os.environ.get('LD_MINT', 160)))  # world props: LD_KEEP=.2 LD_MINT=48
-        if not m or m['tris'] > 1600: return None
+        if not m or m['tris'] > int(os.environ.get('LD_MAXT', 1600)): return None  # LD_MAXT: rescue-1, 7242's 2498 brush (2.5k tris)
         dd = [-m['c'][0], -m['c'][1] - m['h'] * PH / 2, -m['c'][2]]  # piece frame (bottom at 0) -> body-centre frame
         m.update(k=k, n=title, id=i, cal={'s': 0, 'C': np.eye(3).astype(int).tolist(), 'd': dd}); MESH[k] = m
     return k

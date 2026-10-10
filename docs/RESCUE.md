@@ -21,9 +21,9 @@ MODEL_CATALOG (alex/od-mdl-land), git logs of alex/od-mdl-veh, alex/od-mdl-world
 | 6522 Highway Patrol bike (veh) | converter IndexError (dropping both sub-files left nothing) | one bike only (ld/omr/6522-1b.mpd), --only biker; rider placed on the seat by hand (no steering-wheel part). RIDES 'Highway Bike' | docs/shots/rescue/ab_v6522_1.png, r6522_g.png |
 | 75870 Corvette Z06 (veh) | 25 wide: the file holds the car twice + a camera stand | one car (ld/omr/75870-1b.mpd), --only body,wheel,windscreen: 6.6 wide Speed Champions scale. RIDES 'Z06 Racer' | docs/shots/rescue/ab_v75870_1.png, r75870_g.png |
 | 1069 boat (world) | downloaded, never tried | open |
-| 1572 Tow Truck, 6668 Recycle Truck, 6526 Red Line Racer, 6669 Diesel Daredevil (build-8) | dark dithered patch on the garage floor (g_34) | queued here; the floor patch itself is garage-18's (session_019vNFjqrqunwBDfw4daimsX) |
-| 7242 Street Sweeper (build-8) | brushes convert to box placeholders | queued: real mesh for the brush part |
-| 4208 (build-8) | broken size | queued |
+| 1572 Tow Truck, 6668 Recycle Truck, 6526 Red Line Racer, 6669 Diesel Daredevil (build-8) | dark dithered patch on the garage floor (g_34) | converted with build-8's options and shipped: the models are fine, the patch is a garage render bug (also under 621) = garage-18's (session_019vNFjqrqunwBDfw4daimsX), told | docs/shots/rescue/r1572_g.png, r6668_g.png, r6526_g.png, r6669_g.png |
+| 7242 Street Sweeper (build-8) | brushes became box placeholders (2498 brush mesh 3.1k tris > the 1,600 mesh cap) | LD_MAXT=3200 for this conversion (new env in ld2garage.py): real brush meshes, A/B matches | docs/shots/rescue/ab_v7242_1.png, r7242_g.png |
+| 4208 Fire Truck (build-8) | broken size: the truck sits 40° turned in the file's main (192 off-grid parts), tyre is an embedded 92402 subfile | ld/omr/4208-1b.mpd: truck placed square, library 92402 tyre; --yaw 1; A/B matches | docs/shots/rescue/ab_v4208_1.png, r4208_g.png |
 | 3718, 6376 (world) | rejected before conversion: no 1×4 door | not converted work; same doorway fix as 6350 applies |
 | Palm tree `l_palm` (land) | converted, not placed | land lane (alex/od-mdl-land): Athens seafront candidate |
 | Bush 2417/2423 (land) | 1,119 tris vs ~500 brick bush | land lane: LD_KEEP low-poly retry |
