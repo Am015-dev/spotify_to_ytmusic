@@ -4,7 +4,7 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'v90f',id:'town-fwd',text:'Equip Town Roadster, then Ladder Truck: the bonnet/cab points forward and the car drives forwards.'},
- {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck and Fire Chief Car look complete and drive.'},
+ {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck, Fire Chief Car and Precinct Cruiser look complete and drive.'},
  {ver:'v90f',id:'plow',text:'Drive the Snowplow (the widest ride, ~4.7 m) down a Frankfurt street: it stays in its lane, passes traffic and turns corners without scraping the kerb.'},
  {ver:'v90f',id:'ride-width',text:'Drive the Hot Rod, the Rally S1 and the Sightseeing Bus: none looks squeezed thin; each still sits on the road and steers like before.'},
  {ver:'v90f',id:'truck-size',text:'Garage → RIDES → STREET: drive the Big Rig, Logger and Fire Chief: each is minifig size (truck taller and longer than a traffic car), a LEGO driver sits inside the cab, and it fits through normal streets.'},
