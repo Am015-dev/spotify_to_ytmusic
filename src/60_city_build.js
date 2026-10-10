@@ -878,7 +878,7 @@ function CE_lots(add0,rnd,D){const add=(t,...a)=>{if(t==='CE_car'||t==='CE_car2'
     const sty=athStyleAt(x,z);if(sty!=='town'&&sty!=='villa'&&sty!=='outer'&&rnd()<.6){for(let i=-2;i<=2;i++)for(const r of[-3,3])if(rnd()<.7){const t=C[Math.floor(rnd()*C.length)],lx=i*2.9,lz=r;if(CE_onRoad(x+lx*c+lz*s,z-lx*s+lz*c))continue;add(t,x+lx*c+lz*s,z-lx*s+lz*c,ry+Math.PI/2+(r<0?Math.PI:0));if(HUB.CE_L.length>n)n0[t]=(n0[t]||0)+1}lots++}
     else{for(let k=0;k<4;k++){const t=rnd()<.6?'CE_olive':rnd()<.5?'bush':'CE_cypress';add(t,x+(rnd()-.5)*12,z+(rnd()-.5)*12)}grov++}occ.add(ck(x,z))}
   HUB.CE=Object.assign(HUB.CE||{},{lots,grov,lotMs:Math.round(performance.now()-T0)})}
-function buildHubProps(rnd,rr2,pick){const D=kmProps(propDefs());if(CID!=='fra')athProps(D);CE_defs(D);HUB.ptypes=D;const CT=[performance.now()];const L=[];const add=(t,x,z,ry=rnd()*6.28,y)=>{if(roamHit(x,z,D[t].r*.6))return;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))return;L.push({t,x,z,y:y??groundY(x,z),ry,alive:true,rt:0})};
+function buildHubProps(rnd,rr2,pick){const D=kmProps(propDefs());if(CID!=='fra')athProps(D);CE_defs(D);HUB.ptypes=D;const CT=[performance.now()];const L=[];const add=(t,x,z,ry=rnd()*6.28,y)=>{if(roamHit(x,z,D[t].r*.6))return;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))return;L.push({t,x,z,y:y??groundY(x,z),ry,alive:true,rt:0,i:0,im:null,col:null})};
   const lampRy=(vx,vz)=>Math.atan2(vx,vz)-Math.atan2(D.lamp.head.x,D.lamp.head.z);
   // sidewalks (filler roads and real streets): lamps facing the road, trees, benches, bins, dumpsters, hydrants, bus stops, parked cars at the curb
   const side=(px,pz,ux,uz,w,k,boul,self,sid,M7=7,pr=.07,pc=.012)=>{for(const sd of[-1,1]){const nx=uz*sd,nz=-ux*sd,off=w/2+3.2,x=px+nx*off,z=pz+nz*off,ry=Math.atan2(-nx,-nz);
