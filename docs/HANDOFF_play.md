@@ -94,3 +94,8 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
   GPS (qvPath + D24_clean chords) checked on (a): the route there is on the road (routeprobe: 0 off-road samples), so not a GPS bug there.
   D24_clr only tests colliders (r 1.2) and height steps, not road surface: chords CAN cross lawns elsewhere; worth a check for (b).
 - New in the merged build: tPlay "JS heap ≤ 100 MB while driving" fails (158 MB avg) — came with od-mem; check against v89n before blaming v89o.
+- REVIEW v89o sent 2026-10-10 ~04:10 (alex/od-play 262c2248). After PASS: rebuild on CURRENT live (merge latest live src), OD_CHANGELOG v89o entry
+  (FIXED: Eleni's garage card opens only when you stop on the pad; FIXED: arrow no longer pulls you back to a garage you visited;
+  CHANGED: Athens golden bricks sit on roads) + a checklist item, tools/build.sh v89o, git add -f out/v89o, DEPLOY to coordinator.
+- Open check: od-mem heap/leak tPlay tests (Athens heap ~157 MB > 100, Frankfurt geo +16 MB/min) — run them on v89n to see whether pre-existing.
+- Next build (Athens ≤ 0.8/min): challenge targets (GO!, van chase, RAMP, DRIFT) — check whether chNext/route targets sit off-road; lawn strip (a).
