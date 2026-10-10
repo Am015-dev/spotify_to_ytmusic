@@ -9,6 +9,7 @@
 const PW=require('/opt/node22/lib/node_modules/playwright');
 const fs=require('fs'),path=require('path');
 const FILE=path.resolve(process.env.FILE||path.join(__dirname,'nebula.html'));
+const URL_BASE=process.env.URL||('file://'+FILE);
 const SIZES=(process.argv[2]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));
 const SHOTS=path.join(__dirname,'playtest');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -16,40 +17,42 @@ const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg
 const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
 const totals={steps:0,wrong:0,runs:0,ids:[]};
 const ARGS=['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'];
+const MOUSE=!!process.env.MOUSE;
+const tapAt=(p,x,y)=>(MOUSE||p._mouse)?p.mouse.click(x,y):p.touchscreen.tap(x,y);
 const ctr=(p,sel)=>p.evaluate(sel=>{const e=[...document.querySelectorAll(sel)].find(x=>x.offsetParent!==null||x.getClientRects().length);if(!e)return null;const r=e.getBoundingClientRect();return r.width?[r.left+r.width/2,r.top+r.height/2]:null},sel);
 
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();
-  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  const p=await ctx.newPage();p.setDefaultTimeout(20000);
+  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:!MOUSE&&mode!=='desk',hasTouch:!MOUSE&&mode!=='desk'});
+  const p=await ctx.newPage();p.setDefaultTimeout(20000);p._mouse=mode==='desk';
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{const t=m.text();if(m.type()==='warning'&&/rejected|gxt/.test(t))note(tag,'console '+t.slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon|fonts\.g/.test(t))note(tag,'console error '+t.slice(0,160))});
-  await p.goto('file://'+FILE+'?phone=1');await p.waitForSelector('[data-start]',{timeout:30000});await sleep(900);
+  await p.goto(URL_BASE+(mode==='desk'?'':'?phone=1'));await p.waitForSelector('[data-start]',{timeout:30000});await sleep(900);
   await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});
   await p.reload();await p.waitForSelector('[data-start]',{timeout:30000});await sleep(900);
   // first visit: the title shows "New here? Learn in 5 minutes" as the first option
   const first=await p.evaluate(()=>{const b=document.querySelector('#modal .dlg.start [data-gxt-open]');return b?{t:b.textContent,first:b===document.querySelector('#modal .dlg.start .row button')}:null});
   if(!first||!/New here/.test(first.t)||!first.first)note(tag,'first menu option is not "New here? Learn in 5 minutes": '+JSON.stringify(first));
   if(mode==='offer'){
-    const l=await ctr(p,'[data-start="solo"]');await p.touchscreen.tap(l[0],l[1]);await sleep(500);
+    const l=await ctr(p,'[data-start="solo"]');await tapAt(p,l[0],l[1]);await sleep(500);
     const o=await p.evaluate(()=>({offer:!!document.querySelector('#tutoffer'),btns:[...document.querySelectorAll('#tutoffer [data-tutoffer]')].map(b=>b.textContent),started:typeof G!=='undefined'&&!!G&&G.round>=0&&!!UI&&!UI.info}));
     if(!o.offer||o.btns.length!==2)note(tag,'first Launch did not offer the tutorial: '+JSON.stringify(o));
-    else{const b=await ctr(p,'#tutoffer [data-tutoffer=play]');await p.touchscreen.tap(b[0],b[1]);await sleep(1200);
+    else{const b=await ctr(p,'#tutoffer [data-tutoffer=play]');await tapAt(p,b[0],b[1]);await sleep(1200);
       const g=await p.evaluate(()=>({g:typeof G!=='undefined'&&!!G&&!G.tut,bf:BF.on,info:UI.info,offer:!!document.querySelector('#tutoffer'),played:localStorage.getItem('na_played')}));
       if(!g.g||g.info||g.offer||!g.played)note(tag,'"Just play" did not start a normal game: '+JSON.stringify(g));
       await p.evaluate(()=>{UI.info=true;render()});await sleep(300);
-      const l2=await ctr(p,'[data-start="solo"]');await p.touchscreen.tap(l2[0],l2[1]);await sleep(600);
+      const l2=await ctr(p,'[data-start="solo"]');await tapAt(p,l2[0],l2[1]);await sleep(600);
       const o2=await p.evaluate(()=>({offer:!!document.querySelector('#tutoffer'),info:UI.info}));if(o2.offer)note(tag,'the offer came back on the second Launch');
       // the offer's other button starts the tutorial
       await p.evaluate(()=>{localStorage.clear();UI.info=true;render()});await sleep(300);
-      const l3=await ctr(p,'[data-start="solo"]');await p.touchscreen.tap(l3[0],l3[1]);await sleep(500);
-      const lb=await ctr(p,'#tutoffer [data-tutoffer=learn]');if(!lb)note(tag,'no Learn button');else{await p.touchscreen.tap(lb[0],lb[1]);await sleep(1200);
+      const l3=await ctr(p,'[data-start="solo"]');await tapAt(p,l3[0],l3[1]);await sleep(500);
+      const lb=await ctr(p,'#tutoffer [data-tutoffer=learn]');if(!lb)note(tag,'no Learn button');else{await tapAt(p,lb[0],lb[1]);await sleep(1200);
         const r=await p.evaluate(()=>GXT.running()&&!!G&&!!G.tut);if(!r)note(tag,'"Learn in 5 minutes" did not start the tutorial')}}
     totals.runs++;console.log(tag,'done');await ctx.close();return}
   // start it with a finger
   const start=mode==='story'?'[data-a=story]':'#modal .dlg.start [data-gxt-open]';
   const tb=await ctr(p,start);if(!tb){note(tag,'no start button '+start);await ctx.close();return}
-  await p.touchscreen.tap(tb[0],tb[1]);await sleep(900);
-  await p.evaluate(()=>{AIDELAY=150});
+  await tapAt(p,tb[0],tb[1]);await sleep(900);
+  if(!process.env.REALTIME)await p.evaluate(()=>{AIDELAY=150});
   const state=()=>p.evaluate(()=>GXT.state());
   const shot=async(n)=>{if(W===390&&H===763&&mode==='clean'){fs.mkdirSync(SHOTS,{recursive:true});await p.screenshot({path:path.join(SHOTS,'tutor-'+n+'.png')})}};
   let lastSig='',lastT=Date.now(),rotated=0,left=false,seenIds=[];const shots={};
@@ -108,7 +111,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       const b=s.bubble;const inB=(x,y)=>b&&x>=b.left-10&&x<=b.right+10&&y>=b.top-10&&y<=b.bottom+10;
       for(const [fx,fy] of [[.5,.5],[.15,.45],[.85,.45],[.5,.3],[.2,.7],[.8,.7],[.5,.62],[.1,.2],[.9,.2],[.5,.9]]){const x=V.w*fx,y=V.h*fy;if(y>40&&!inside(x,y)&&!inB(x,y))return {x,y}}return null},need);
     if(wp&&(guardOnce(s.id))){const before=await state();const gs0=await p.evaluate(()=>JSON.stringify([G.round,G.phase,G.cur,G.ships.map(s=>[s.x,s.y,s.sh,s.dmg.length,s.dial,s.focus]),UI.hold&&UI.hold.kind]));
-      await p.touchscreen.tap(wp.x,wp.y);await sleep(50);const after=await state();totals.wrong++;
+      await tapAt(p,wp.x,wp.y);await sleep(50);const after=await state();totals.wrong++;
       const gs1=await p.evaluate(()=>JSON.stringify([G.round,G.phase,G.cur,G.ships.map(s=>[s.x,s.y,s.sh,s.dmg.length,s.dial,s.focus]),UI.hold&&UI.hold.kind]));
       if(after.i!==before.i||after.count!==before.count)note(tag,id+': a wrong tap advanced the tutorial');
       if(gs0!==gs1)note(tag,id+': a wrong tap changed the game');
@@ -116,7 +119,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       const hint=await p.evaluate(()=>{const b=document.querySelector('.gxt-bub');return b&&b.classList.contains('gxt-shake')&&b.querySelector('.gxh-tx').textContent});
       if(!['res1','res2','win'].includes(id)&&(!hint||!/Tap/.test(hint)))note(tag,id+': wrong tap gave no "Tap ..." hint ('+hint+')')}
     // "Skip tutorial": once, at step 3: everything goes away, the menu is back, the tutorial is not marked done
-    if(mode==='skip'&&s.i>=3){const sk=info.skip;await p.touchscreen.tap((sk.left+sk.right)/2,(sk.top+sk.bottom)/2);await sleep(600);
+    if(mode==='skip'&&s.i>=3){const sk=info.skip;await tapAt(p,(sk.left+sk.right)/2,(sk.top+sk.bottom)/2);await sleep(600);
       const o=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-top,.gxt-end').length,start:UI.info&&!!document.querySelector('#modal .dlg.start'),
         btn:(document.querySelector('#modal .dlg.start [data-gxt-open] b')||{}).textContent,st:JSON.parse(localStorage.getItem('gxt-nebula-aces')||'{}'),saved:!!localStorage.getItem(SAVE),tut:TUT.on}));
       if(o.run||o.dom)note(tag,'Skip left tutorial elements on screen ('+o.dom+')');if(!o.start)note(tag,'Skip did not return to the menu');
@@ -129,17 +132,17 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       const o=await p.evaluate(()=>({t:(document.querySelector('#modal .dlg.start [data-gxt-open]')||{}).textContent,active:GXT.active()}));
       if(o.active)note(tag,'tutorial still running after a reload');
       const bb=await ctr(p,'#modal .dlg.start [data-gxt-open]');
-      await p.touchscreen.tap(bb[0],bb[1]);await sleep(300);
+      await tapAt(p,bb[0],bb[1]);await sleep(300);
       const d=await p.evaluate(()=>({dlg:!!document.querySelector('.gxt-end [data-gxt-dlg=restart]'),exit:!!document.querySelector('.gxt-end [data-gxt-dlg=exit]')}));
       if(!d.dlg||!d.exit)note(tag,'reopening a half-done tutorial offered no restart/exit ('+JSON.stringify(d)+')');
-      else{const rb=await ctr(p,'[data-gxt-dlg=restart]');await p.touchscreen.tap(rb[0],rb[1]);await sleep(900);await p.evaluate(()=>{AIDELAY=150});
+      else{const rb=await ctr(p,'[data-gxt-dlg=restart]');await tapAt(p,rb[0],rb[1]);await sleep(900);if(!process.env.REALTIME)if(!process.env.REALTIME)await p.evaluate(()=>{AIDELAY=150});
         const r2=await state();if(!r2.active||r2.i!==0)note(tag,'restart did not start at step 0 ('+JSON.stringify({a:r2.active,i:r2.i})+')');lastSig='';lastT=Date.now();seenIds=[]}
       continue}
     // ---- do exactly what the step asks
-    if(!s.wait){const nx=info.next;await p.touchscreen.tap((nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
+    if(!s.wait){const nx=info.next;await tapAt(p,(nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
     else{
       const before=await state();
-      await p.touchscreen.tap(h.cx,h.cy);
+      await tapAt(p,h.cx,h.cy);
       const t1=Date.now();let moved=false;
       while(Date.now()-t1<2500){await sleep(60);const a=await state();if(a.i!==before.i||a.count!==before.count||a.phase!=='show'){moved=true;break}}
       if(!moved){note(tag,id+': tapping the target did not advance '+JSON.stringify({hole:h,under:info.under,g:info.gstate}));await p.screenshot({path:'/tmp/claude-0/tutor_dead_'+W+'_'+mode+'.png'}).catch(()=>{});break}
@@ -154,17 +157,17 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await sleep(300);
     const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');return c&&[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom]})()}))});
     if(!e||e.length!==1||e[0].k!=='chapter'||!/Start chapter 1/.test(e[0].t))note(tag,'story prologue end card buttons: '+JSON.stringify(e));
-    else{await p.touchscreen.tap((e[0].r[0]+e[0].r[2])/2,(e[0].r[1]+e[0].r[3])/2);await sleep(1200);
+    else{await tapAt(p,(e[0].r[0]+e[0].r[2])/2,(e[0].r[1]+e[0].r[3])/2);await sleep(1200);
       const sc=await p.evaluate(()=>({scene:!!document.querySelector('.gxc:not([hidden])'),camp:!!UI.camp}));
       if(!sc.scene&&!sc.camp)note(tag,'chapter 1 did not start after the tutorial');
       else{for(let k=0;k<10;k++){const q=await p.evaluate(()=>({camp:!!UI.camp&&!!G&&!UI.info&&!G.tut&&document.querySelectorAll('.gxc:not([hidden])').length===0}));if(q.camp)break;
-          const t=await ctr(p,'.gxc-btn.ghost, .gxc .gxc-btn.go, .gxc-btn');if(t)await p.touchscreen.tap(t[0],t[1]);await sleep(600)}
+          const t=await ctr(p,'.gxc-btn.ghost, .gxc .gxc-btn.go, .gxc-btn');if(t)await tapAt(p,t[0],t[1]);await sleep(600)}
         const ok=await p.evaluate(()=>!!UI.camp&&!!G&&!G.winner&&!G.tut&&!TUT.on);
         if(!ok)note(tag,'chapter 1 did not start after its intro')}}
     const st2=await p.evaluate(()=>JSON.parse(localStorage.getItem('gxt-nebula-aces')||'{}'));if(!st2.done)note(tag,'prologue not remembered as done');
     // second time: Story goes straight to the chapter map; the chapter list has a Tutorial button
     await p.evaluate(()=>{try{GXC.close()}catch(e){}UI.info=true;UI.camp=null;render()});await sleep(300);
-    const sb=await ctr(p,'[data-a=story]');await p.touchscreen.tap(sb[0],sb[1]);await sleep(700);
+    const sb=await ctr(p,'[data-a=story]');await tapAt(p,sb[0],sb[1]);await sleep(700);
     const m=await p.evaluate(()=>({run:GXT.running(),gxc:!!document.querySelector('.gxc:not([hidden])'),rep:[...document.querySelectorAll('.gxc button')].some(b=>/Tutorial/.test(b.textContent))}));
     if(m.run)note(tag,'a finished player was sent through the tutorial again');if(!m.gxc)note(tag,'Story did not open the chapter map after the tutorial');if(!m.rep)note(tag,'no "Tutorial" (replay) button in the chapter list');
   }
@@ -177,11 +180,11 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       if(!e.inside)note(tag,'end card outside the screen');
       for(const b of e.btns)if(b.r[5]<40)note(tag,'end button too small: '+b.t);
       await shot('end');
-      const play=e.btns.find(b=>b.k==='play');await p.touchscreen.tap((play.r[0]+play.r[2])/2,(play.r[1]+play.r[3])/2);await sleep(1200);
-      const after=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length,real:!!G&&!G.tut&&!TUT.on&&BF.on&&G.round>=0&&!UI.info,
-        st:JSON.parse(localStorage.getItem('gxt-nebula-aces')||'{}'),saved:!!localStorage.getItem(SAVE),seed:G&&G.seed}));
+      const play=e.btns.find(b=>b.k==='play');await tapAt(p,(play.r[0]+play.r[2])/2,(play.r[1]+play.r[3])/2);await sleep(1200);
+      const after=await p.evaluate((desk)=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length,real:!!G&&!G.tut&&!TUT.on&&(BF.on||!PHN.on&&desk)&&G.round>=0&&!UI.info,
+        st:JSON.parse(localStorage.getItem('gxt-nebula-aces')||'{}'),saved:!!localStorage.getItem(SAVE),seed:G&&G.seed}),mode==='desk');
       if(after.run||after.dom)note(tag,'tutorial elements left on screen after the end card ('+after.dom+')');
-      if(!after.real)note(tag,'"Play a real game" did not start a normal game');
+      if(!after.real)note(tag,'"Play a real game" did not start a normal game '+JSON.stringify(await p.evaluate(()=>({g:!!G,tut:G&&G.tut,TUT:TUT.on,bf:BF.on,round:G&&G.round,info:UI.info,modal:(document.querySelector('#modal')||{}).className,dlg:!!document.querySelector('#modal .dlg')}))));
       if(!after.st.done)note(tag,'tutorial not remembered as done');
       if(after.saved)note(tag,'the staged tutorial game was saved as a normal game');
       // the title screen and the in-game menu show Tutorial ✓, a normal game plays a move
@@ -201,7 +204,7 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
 
 (async()=>{const b=await PW.chromium.launch({args:ARGS});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
-  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);jobs.push([W0,H0,'offer']);
+  jobs.push([1280,800,'desk']);const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);jobs.push([W0,H0,'offer']);
   const only=process.env.ONLY;
   for(const j of jobs){if(only&&!only.split(',').includes(j[2]))continue;guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();

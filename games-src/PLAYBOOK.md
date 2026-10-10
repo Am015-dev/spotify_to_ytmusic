@@ -42,6 +42,9 @@ A game inlines them in its `build.py` from `../shell/` (never a local copy). Gam
    then deploy it the same way.
 5. Games still on stale shell copies (see Migration) will NOT get the change until migrated: do the migration first.
 
+## After every live deploy
+After every live deploy, run `python3 games-src/scripts/add-update.py <game-id> "headline" "item" ["item"...] --check "what to try"` with 1-5 plain-words items; the shelf's What's new panel shows them to the owner.
+
 ## C. Bug fix
 1. Reproduce with a script first: add a check to `phone-check.js` (if every game could hit it) or the game's `sweep.js`,
    and watch it fail. It stays in the repo so the bug cannot come back.

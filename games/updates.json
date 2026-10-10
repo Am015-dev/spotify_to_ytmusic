@@ -1,0 +1,812 @@
+[
+ {
+  "date": "2026-10-10",
+  "game": "shelf",
+  "title": "Shelf: What's new panel",
+  "items": [
+   "Closing a game gives back its memory straight away",
+   "New icon and share picture",
+   "New What's new button lists every update with a try-this line",
+   "Tick Checked once you have looked; ticked ones fold away"
+  ],
+  "check": "Tap What's new in the top bar."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "crown",
+  "title": "New painted look for Crown City Smash",
+  "items": [
+   "Painted title screen and win/lose screens",
+   "New table looks to pick from",
+   "Clampede monster has a painted portrait and cut-out",
+   "New music for each screen, with a Music picker"
+  ],
+  "check": "Open the game, watch the title, then tap Music to try the songs."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "nebula",
+  "title": "Nebula Aces: tutorial works on desktop, painted art",
+  "items": [
+   "The tutorial now starts on desktop and tablets (it never did before)",
+   "Painted pilot portraits, title and end screens",
+   "New music per screen with a Music picker"
+  ],
+  "check": "Open it on a computer and start the tutorial."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "sunglaze",
+  "title": "Sunglaze gets painted tables and music",
+  "items": [
+   "Painted table skins on the 3D table and the phone board",
+   "New title and end art, plus portraits",
+   "New music per screen with a Music picker"
+  ],
+  "check": "Start a game and open Music to pick a song."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "sands",
+  "title": "Sands of Qamar fully painted",
+  "items": [
+   "Painted tiles and table skins",
+   "New card backs, title and end art, portraits",
+   "Music for each screen with a Music picker"
+  ],
+  "check": "Start a game and look at the tiles and table."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "rampart",
+  "title": "Rampart & Vine painted look",
+  "items": [
+   "Painted fields, towns and roads under the tiles",
+   "Table skins, tile backs, title and end art, portraits",
+   "New music with a Music picker"
+  ],
+  "check": "Place a few tiles and look at the fields and roads."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "tidewake",
+  "title": "Tidewake painted table and music",
+  "items": [
+   "Painted table under the 3D board",
+   "New title and end art, portraits",
+   "Music per screen with a Music picker"
+  ],
+  "check": "Start a game and look at the table."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "doorkick",
+  "title": "Doorkick Dungeon: shorter menu music",
+  "items": [
+   "Menu songs are shorter loops now"
+  ],
+  "check": "Open the menu and listen."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "shortfuse",
+  "title": "Short Fuse: phone workbench",
+  "items": [
+   "Painted workbench table when the phone is upright",
+   "Shorter menu music loops"
+  ],
+  "check": "Hold your phone upright and start a game."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "hollowbough",
+  "title": "Hollowbough: painted places and events",
+  "items": [
+   "Places and events are painted and fill their tiles",
+   "New bench and mat",
+   "Shorter menu music loops"
+  ],
+  "check": "Start a game and look at the places and events."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "thornbound",
+  "title": "Thornbound: painted throne and track",
+  "items": [
+   "Painted throne and score track",
+   "Shorter menu music loops"
+  ],
+  "check": "Start a game and look at the throne."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen: painted counter",
+  "items": [
+   "Painted counter on the reveal stage",
+   "Shorter menu music loops",
+   "New empty belt look"
+  ],
+  "check": "Finish a round and watch the reveal."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "lantern",
+  "title": "Lantern Dive painted",
+  "items": [
+   "Painted emblems on the cards and painted divers",
+   "Unlockable table and card backs",
+   "Portrait title screen, end art and portraits",
+   "Music with a Music picker"
+  ],
+  "check": "Start a dive and look at the cards."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "cauldron",
+  "title": "Cauldron Fair: stage and pass screens",
+  "items": [
+   "New painted stage and pass screens",
+   "Phone table, new Tamsin art",
+   "Shorter menu music loops"
+  ],
+  "check": "Play a day and pass the device."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "approach",
+  "title": "Final Approach: painted table",
+  "items": [
+   "Painted default table, with a portrait file for phones",
+   "Shorter menu music loops"
+  ],
+  "check": "Start a flight on your phone."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "mainhattan",
+  "title": "Nightrun: all art painted",
+  "items": [
+   "Painted cards in the SOON list and the chest",
+   "Painted garage and pause screens",
+   "Painted kit perks, medals, badges, new ships and two mini-bosses"
+  ],
+  "check": "Open the garage and the pause screen."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "overdrive",
+  "title": "Overdrive: fixes and faster Athens",
+  "items": [
+   "Athens loads about 20 seconds faster and uses less memory",
+   "No more pink and white blocks next to cars at night",
+   "Long dusk and night drives no longer slow down",
+   "Garage menus only open when you stop in the ring",
+   "Drift is now hold BRAKE while steering"
+  ],
+  "check": "Drive Athens at night for a few minutes."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "crown",
+  "title": "Crown City Smash: painted cast and tables",
+  "items": [
+   "Painted Clampede portrait and card back",
+   "New harbor-night and spire-gold tables",
+   "Painted title and end screens",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Open the table choices in the menu."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "nebula",
+  "title": "Nebula Aces: painted media",
+  "items": [
+   "11 painted portraits, 2 card backs, tables for desktop and phone",
+   "Painted end screen",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Start a game and look at the portraits."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "doorkick",
+  "title": "Doorkick Dungeon: shorter start, better drawers",
+  "items": [
+   "Shorter start-screen tagline",
+   "Rival seat opens on tap",
+   "Open drawers no longer let taps through to the board",
+   "Hand sits higher when the phone is sideways",
+   "Shuffle-all songs in the music picker"
+  ],
+  "check": "Open a drawer during a game and tap the board behind it."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "shipwreck",
+  "title": "Shipwreck Isle fully painted",
+  "items": [
+   "50 painted cards for beasts, inventions and items",
+   "New card back, painted characters and 17 portraits",
+   "New music with a Music picker and a card list page",
+   "Portrait phone title and table art",
+   "Skipping the story prologue opens the chapter map"
+  ],
+  "check": "Open the Card list and the Music picker."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "sands",
+  "title": "Sands of Qamar painted media",
+  "items": [
+   "Painted tiles, 12 portraits, 3 card backs, 5 tables",
+   "Title and end art",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Look at the tiles in a new game."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "sunglaze",
+  "title": "Sunglaze painted media",
+  "items": [
+   "11 portraits, 3 card backs, 3 unlockable tables and a phone table",
+   "Title and end screens",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Check Story unlocks for new tables."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "rampart",
+  "title": "Rampart & Vine painted media",
+  "items": [
+   "11 portraits, 3 tile backs, 5 tables",
+   "Painted pieces and 10 field textures",
+   "Title and end art",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Start a game and pick a table."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "tidewake",
+  "title": "Tidewake painted media",
+  "items": [
+   "9 portraits, 3 card backs, 4 tables plus phone",
+   "Title and end screens",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Look at the new tables."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "shortfuse",
+  "title": "Short Fuse painted",
+  "items": [
+   "Painted cards, crew and tools",
+   "Card backs, workbench and unlockable tables",
+   "Title and end art, music with a Music picker, card list page",
+   "Skipping the story prologue opens the chapter map"
+  ],
+  "check": "Open the Card list page."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "hollowbough",
+  "title": "Hollowbough: painted cards and readable hand",
+  "items": [
+   "All 48 cards painted",
+   "New music and Music picker",
+   "Hand shows picture, name, cost and points in a scrolling row",
+   "Hand toggle to hide or show the row"
+  ],
+  "check": "Play a card from the hand row."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "thornbound",
+  "title": "Thornbound: painted and easier to read",
+  "items": [
+   "Painted kingdom cards, card backs, court table and title",
+   "Bigger, readable kingdom card row",
+   "Hold a hand card to read it large",
+   "Painted map for desktop and phone",
+   "Crowned-stag card back option"
+  ],
+  "check": "Hold a card in your hand."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen painted",
+  "items": [
+   "New paintings for plates, diners, belt, counter and title",
+   "Chef portraits and unlockable card back and table",
+   "Music with a Music picker",
+   "Skipping the story prologue opens the chapter map",
+   "Portrait phone title and table art"
+  ],
+  "check": "Play a round and watch the belt."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "lantern",
+  "title": "Lantern Dive: tutorial fix",
+  "items": [
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Skip the tutorial, then open Story."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "cauldron",
+  "title": "Cauldron Fair fully painted",
+  "items": [
+   "27 paintings: chips, pieces, makers, table and title",
+   "Campaign portraits, bag skins, 22 fortune cards",
+   "Music with a Music picker, with shuffle-all",
+   "Portrait phone title and table art",
+   "Fortune card list page"
+  ],
+  "check": "Draw from the bag and check the music picker."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "approach",
+  "title": "Final Approach painted",
+  "items": [
+   "Painted sky, terrain, planes and crew",
+   "Portraits, table skins, card backs and end art",
+   "New music with a Music picker",
+   "Portrait phone title and table art"
+  ],
+  "check": "Start a flight and open Music."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "mainhattan",
+  "title": "Nightrun: much tougher and calmer",
+  "items": [
+   "Painted ships, enemies, bosses, effects and backdrops",
+   "30 story stages in five cities, with squad leaders and dodging drones",
+   "Two new difficulties: Very hard and Legend",
+   "Garage loadout, daily shop and 15 starting perks",
+   "Calm minimal HUD by default, with a HUD setting"
+  ],
+  "check": "Pick Legend difficulty and open the garage."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "overdrive",
+  "title": "Overdrive: on foot, garage, open races",
+  "items": [
+   "You can now get out and walk, run and jump",
+   "Take a slowing or parked car",
+   "Garage with a bigger build grid and parts you can save",
+   "Two open races: Riverbank Rally and Coast Rally",
+   "Cities stream in and out so Athens and Frankfurt use far less memory"
+  ],
+  "check": "Press EXIT to get out of your car."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "crown",
+  "title": "Crown City Smash: tutorial and Continue fix",
+  "items": [
+   "Guided tutorial of 22 steps, as Story Chapter 0",
+   "Continue no longer shows an empty dice table"
+  ],
+  "check": "Start the tutorial, or tap Continue on a saved game."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "nebula",
+  "title": "Nebula Aces: tutorial",
+  "items": [
+   "23-step tutorial as Chapter 0"
+  ],
+  "check": "Start the tutorial from the menu."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "doorkick",
+  "title": "Doorkick Dungeon: art, bosses, music",
+  "items": [
+   "Painted art on all 147 cards",
+   "Boss reveal clips: the door opens on the monster",
+   "Painted portraits, card backs, tables, title and end screens",
+   "New music per screen with a Music picker",
+   "Guided tutorial"
+  ],
+  "check": "Kick a door and watch a boss reveal."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "shipwreck",
+  "title": "Shipwreck Isle: tutorial",
+  "items": [
+   "25-step tutorial as Chapter 0"
+  ],
+  "check": "Start the tutorial from the menu."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "sands",
+  "title": "Sands of Qamar: tutorial",
+  "items": [
+   "Guided tutorial you can replay from the menu"
+  ],
+  "check": "Open the tutorial from the menu."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "sunglaze",
+  "title": "Sunglaze: tutorial and help",
+  "items": [
+   "23-step tutorial as Story Chapter 0",
+   "Lightbulb help with a ghost finger and rules cards",
+   "Tips on/off switch"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "rampart",
+  "title": "Rampart & Vine: tutorial",
+  "items": [
+   "Guided tutorial"
+  ],
+  "check": "Start the tutorial."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "shortfuse",
+  "title": "Short Fuse: tutorial",
+  "items": [
+   "Guided tutorial"
+  ],
+  "check": "Start the tutorial."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "tidewake",
+  "title": "Tidewake: tutorial",
+  "items": [
+   "Guided tutorial as Chapter 0"
+  ],
+  "check": "Start the tutorial."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "hollowbough",
+  "title": "Hollowbough: tutorial and painted cards",
+  "items": [
+   "Guided tutorial",
+   "47 of 48 cards painted",
+   "Woodland tables, title and end art",
+   "New music with a Music picker"
+  ],
+  "check": "Start the tutorial."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "thornbound",
+  "title": "Thornbound: painted look and card lists",
+  "items": [
+   "Painted kingdom cards, card backs and court table",
+   "Title and end art",
+   "Music with a Music picker",
+   "Card list page with pictures"
+  ],
+  "check": "Open the Card list page."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen: tutorial",
+  "items": [
+   "Guided tutorial as Chapter 0"
+  ],
+  "check": "Start the tutorial."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "lantern",
+  "title": "Lantern Dive: tutorial",
+  "items": [
+   "Guided tutorial replaces the old Training dive"
+  ],
+  "check": "Start the tutorial from Story."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "cauldron",
+  "title": "Cauldron Fair: help and tutorial",
+  "items": [
+   "Lightbulb help and rules cards",
+   "Two-day guided tutorial as Chapter 0"
+  ],
+  "check": "Start the tutorial."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "approach",
+  "title": "Final Approach: tutorial flight",
+  "items": [
+   "23-step tutorial flight as Chapter 0",
+   "Plainer wording in chapter 1"
+  ],
+  "check": "Start the tutorial flight."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "mainhattan",
+  "title": "Nightrun: pressure for standing still",
+  "items": [
+   "Standing still now costs you: score and fire rate drop",
+   "Fewer enemy bullets",
+   "Dimmer player shots",
+   "Dying slows the song",
+   "Perk stacking is capped"
+  ],
+  "check": "Stand still for a few seconds on Hard."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "overdrive",
+  "title": "Overdrive: life on the road",
+  "items": [
+   "People and stalls along your route, with roadside challenges",
+   "Speed Series cars: Time Coupe, Red Hypercar, Gold Formula",
+   "Pinned checklist folds away in the garage and during the countdown",
+   "Bigger parts palette with groups"
+  ],
+  "check": "Drive a route and look at the roadside."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "shelf",
+  "title": "Shelf: tutorials, filters and Featured",
+  "items": [
+   "All 15 board games now have a tutorial and lightbulb help",
+   "New filters: Has tutorial, Lightbulb help and more",
+   "Featured spotlight rotates between three games",
+   "Nightrun blurb updated"
+  ],
+  "check": "Open Filter and try the new options."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "crown",
+  "title": "Crown City Smash: help, cast and boss clips",
+  "items": [
+   "Lightbulb help with the advisor pick and why",
+   "First-time tips and rules cards per phase",
+   "Nine cast portraits and boss reveal clips",
+   "3D characters on the board",
+   "Boss banner with shake and sound"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "doorkick",
+  "title": "Doorkick Dungeon: help",
+  "items": [
+   "Lightbulb help, first-time tips, rules cards and Tips switch",
+   "Shorter drag/tap status line"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "shipwreck",
+  "title": "Shipwreck Isle: help",
+  "items": [
+   "Lightbulb with the advisor move",
+   "First-time tips and rules cards",
+   "Role icons on pawns"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "sands",
+  "title": "Sands of Qamar: help",
+  "items": [
+   "Lightbulb with the reason",
+   "First-time tips and rules cards"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "rampart",
+  "title": "Rampart & Vine: help",
+  "items": [
+   "Lightbulb, first-time tips and rules cards"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "shortfuse",
+  "title": "Short Fuse: help",
+  "items": [
+   "Lightbulb, first-time bubbles, rules cards and Tips switch"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "tidewake",
+  "title": "Tidewake: help",
+  "items": [
+   "Lightbulb help and rules cards"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "hollowbough",
+  "title": "Hollowbough: help",
+  "items": [
+   "Lightbulb hint with reason, first-time tips, rules cards, Tips switch"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "thornbound",
+  "title": "Thornbound: tutorial",
+  "items": [
+   "Story prologue tutorial as Chapter 0",
+   "Replay the tutorial from the chapter list"
+  ],
+  "check": "Open the chapter list and replay the tutorial."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen: help",
+  "items": [
+   "Lightbulb, coach bubbles and rules cards"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "lantern",
+  "title": "Lantern Dive: help",
+  "items": [
+   "Lightbulb, first-time coach bubbles, rules cards, Tips switch"
+  ],
+  "check": "Tap the lightbulb in a game."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "approach",
+  "title": "Final Approach: flight school",
+  "items": [
+   "Chapters 1-6 each teach one system",
+   "Plane picture and landing checklist",
+   "Co-pilot explains its choices"
+  ],
+  "check": "Play Chapter 1."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "shelf",
+  "title": "Shelf: tidier header",
+  "items": [
+   "Compact Filter popover",
+   "One-row phone header",
+   "Continue chip with a +N list of saved games",
+   "Smaller New! starburst"
+  ],
+  "check": "Open the shelf on your phone."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "crown",
+  "title": "Crown City Smash goes live",
+  "items": [
+   "Story mode: 10 chapters and 3 bosses",
+   "Board-first city with big dice and a tray shop",
+   "Short text during play"
+  ],
+  "check": "Start Story mode."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "nebula",
+  "title": "Nebula Aces goes live",
+  "items": [
+   "Story mode",
+   "3D starts after the first screen, with a flat fallback",
+   "Short text during play"
+  ],
+  "check": "Start Story mode."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "shipwreck",
+  "title": "Shipwreck Isle goes live",
+  "items": [
+   "Island board; the day resolves on the board",
+   "Event cards"
+  ],
+  "check": "Play a day on the island."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "sands",
+  "title": "Sands of Qamar: board-first",
+  "items": [
+   "Play happens on the board",
+   "Rotation fixes"
+  ],
+  "check": "Rotate your phone mid-game."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "rampart",
+  "title": "Rampart & Vine goes live",
+  "items": [
+   "Board-first valley",
+   "Story mode with 3 bosses"
+  ],
+  "check": "Start Story mode."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "shortfuse",
+  "title": "Short Fuse goes live",
+  "items": [
+   "Board-first wire table",
+   "10-chapter story with bosses"
+  ],
+  "check": "Cut a wire in Chapter 1."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "kaiten",
+  "title": "Kaiten Kitchen: round-end count",
+  "items": [
+   "Sets light up on the trays and points fly to the score chips",
+   "Custard dessert count and winner crown",
+   "Belt sized to your hand"
+  ],
+  "check": "Finish a round."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "approach",
+  "title": "Final Approach goes live",
+  "items": [
+   "Board-first cockpit with icons and values",
+   "Results and end banner on the board"
+  ],
+  "check": "Land a plane."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "thornbound",
+  "title": "Thornbound: first help",
+  "items": [
+   "First-time coach bubbles, lightbulb and rules cards (first game to get them)"
+  ],
+  "check": "Tap the lightbulb."
+ },
+ {
+  "date": "2026-10-06",
+  "game": "shelf",
+  "title": "Shelf: 15 board games board-first",
+  "items": [
+   "All 15 board games play on the board with story mode"
+  ],
+  "check": "Open any board game."
+ }
+]

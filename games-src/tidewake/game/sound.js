@@ -8,7 +8,7 @@ const SND_MAP={
   win:{s:'win',vol:1,jitter:0},lose:{s:'lose',vol:1,jitter:0},click:{s:'click',vol:.6},hover:{s:'hover',vol:.3,cooldown:80},open:{s:'open',vol:.6},close:{s:'close',vol:.6},
   confirm:{s:'confirm',vol:.7},error:{s:'error',vol:.7},turn:{s:'turn',vol:.8,jitter:0}};
 const SND_LOOP={sea_loop:{s:'sea_loop',vol:.5}};
-const SND_MUS={calm:'calm',tension:'tension'};
+const SND_MUS={calm:'main-a',tension:'fight-a'};
 const SND={ctx:null,on:true,music:true,vol:.7,last:{},nb:null,fired:{},mood:'calm',loops:{},wantMusic:0,gesture:0};
 try{SND.on=localStorage.getItem('tw_snd')!=='0';SND.music=localStorage.getItem('tw_mus')!=='0'}catch(e){}
 function audioInit(){if(SND.ctx)return true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -38,9 +38,9 @@ function sfx(name,o){o=o||{};if(!SND.on)return;const m=SND_MAP[name];if(!m)retur
    case 'win':[523,659,784,1047].forEach((f,i)=>tone(f,.3,{v:.15,at:at+i*.12}));break;case 'lose':[392,330,262,196].forEach((f,i)=>tone(f,.4,{type:'triangle',v:.15,at:at+i*.18}));break}}catch(e){}}
 function sndLoop(name,on){const L=SND_LOOP[name];if(!L)return;if(on)SND.wantLoop=1;else SND.wantLoop=0;if(on===!!SND.loops[name])return;if(!window.GA)return;
   if(on&&SND.on&&SND.gesture){SND.loops[name]=1;if(GA.has(L.s))GA.loop(L.s,{vol:L.vol,fade:.8});else SND.loops[name]=0}else if(!on){SND.loops[name]=0;GA.stopLoop(L.s,{fade:1})}}
-function musicStart(){SND.wantMusic=1;if(!SND.music||!window.GA)return;GA.music(SND_MUS[SND.mood]||'calm',{fade:1.5})}
-function musicStop(f){SND.wantMusic=0;if(window.GA)GA.music(null,{fade:f!=null?f:1})}
-function musicMood(m){if(m===SND.mood)return;SND.mood=m;if(SND.music&&SND.wantMusic&&window.GA)GA.music(SND_MUS[m],{fade:m==='tension'?1.5:2})}
+function musicStart(){SND.wantMusic=1;if(!SND.music||!window.GA)return;if(typeof GXMUS!=='undefined')GXMUS.sync();else GA.music('main-a',{fade:1.5})}
+function musicStop(f){SND.wantMusic=0;if(typeof GXMUS!=='undefined')return GXMUS.sync();if(window.GA)GA.music(null,{fade:f!=null?f:1})}
+function musicMood(m){if(m===SND.mood)return;SND.mood=m;if(typeof GXMUS!=='undefined')GXMUS.sync()}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('tw_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA)GA.setSfx(SND.on);if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;
   if(!SND.on){for(const k in SND.loops)if(SND.loops[k]){SND.loops[k]=0;if(window.GA)GA.stopLoop(SND_LOOP[k].s,{fade:.2})}}else{if(SND.wantLoop)sndLoop('sea_loop',true);sfx('click')}}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('tw_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.music);if(SND.music){audioInit();if(SND.wantMusic)musicStart()}else{const w=SND.wantMusic;musicStop(.6);SND.wantMusic=w}}

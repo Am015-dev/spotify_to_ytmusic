@@ -5,7 +5,7 @@ var PHN={on:false,land:false,bs:0,pop:null,popSig:'',armed:null,ctx:'',focusOn:f
 const R=document.documentElement;
 const SVG=d=>`<svg class="ico" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const IC={focus:SVG('<circle cx="10" cy="10" r="3.2"/><circle cx="10" cy="10" r="7.2"/><path d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"/>'),plus:SVG('<path d="M10 4v12M4 10h12"/>'),minus:SVG('<path d="M4 10h12"/>'),fit:SVG('<path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/>')};
-const forced=()=>{const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':null};
+const forced=()=>{if(window.TUTPH)return true;const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':null};
 // inside the shelf's full-screen iframe the shelf already pads by the insets (and env() reads 0 there): count them exactly once
 const framed=()=>{try{return window.self!==window.top}catch(e){return true}};
 function insets(){if(framed()&&!/[?&]safe=/.test(location.search||''))return {t:0,r:0,b:0,l:0};const m=/[?&]safe=([\d.]+),([\d.]+),([\d.]+),([\d.]+)/.exec(location.search||'');if(m)return {t:+m[1],r:+m[2],b:+m[3],l:+m[4]};

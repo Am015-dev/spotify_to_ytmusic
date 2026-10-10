@@ -28,8 +28,8 @@ T=os.path.join(SP,'node_modules','three','build','three.min.js')
 SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'campaign-data.js':'','perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'tidewake','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'tutscript.js':os.path.join(D,'src','tutscript.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
-     'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
-ORDER=['shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','tutscript.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js']
+     'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js'),'gx-music.js':os.path.join(SP,'shell','gx-music.js'),'media.js':os.path.join(D,'media.js')}
+ORDER=['shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-music.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','tutscript.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','media.js']
 h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))).replace('</head>','<style>\n'+rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))+'\n</style>\n</head>',1)
 body=rd(os.path.join(D,'body.html')).replace('<!--CREDITS-->',rd(os.path.join(SP,'tidewake','audio','credits.html')))
 for f in ORDER:
