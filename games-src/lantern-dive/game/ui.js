@@ -1709,11 +1709,14 @@ function pxFace(id, w) {
   rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
   if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
   const im = PX.img['emb' + s]; const ew = w * .56;
-  if (im) x.drawImage(im, (w - ew) / 2, H * .5 - ew * .5, ew, ew);
+  // the painting is an opaque square: clip it to a framed rounded square (centre) or a disc (corner pip) so it reads as a picture on the card
+  const framed = (X, Y, S, big) => { x.save(); x.beginPath(); if (big) rr(X, Y, S, S, S * .14); else x.arc(X + S / 2, Y + S / 2, S / 2, 0, 7); x.clip(); x.drawImage(im, X, Y, S, S); x.restore();
+    x.beginPath(); if (big) rr(X, Y, S, S, S * .14); else x.arc(X + S / 2, Y + S / 2, S / 2 - w * .006, 0, 7); x.lineWidth = Math.max(1, S * (big ? .035 : .06)); x.strokeStyle = big ? '#d9b04a' : 'rgba(255,255,255,.9)'; x.stroke(); };
+  if (im) framed((w - ew) / 2, H * .5 - ew * .5, ew, true);
   const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
   const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
     x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = lan ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
-    if (im) x.drawImage(im, w * .1, w * .41, w * .2, w * .2); x.restore(); };
+    if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
   corner(false); corner(true);
   const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
 }

@@ -36,7 +36,14 @@ function emblemInner(s, o) {
 const emblemSVG = (s, size, o) => `${svgOpen(size, size, '0 0 100 100')}${emblemInner(s, o)}</svg>`;
 KIT.emblemSVG = emblemSVG; KIT.emblemInner = emblemInner;
 const artImg = (id, x, y, w, h) => KIT.ART[id] ? `<image href="${KIT.ART[id]}" x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" preserveAspectRatio="xMidYMid meet"/>` : '';
-function emb(s, x, y, w) { return KIT.ART['emb' + s] ? artImg('emb' + s, x, y, w, w) : `<svg x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(w)}" viewBox="0 0 100 100">${emblemInner(s)}</svg>`; }
+// painted emblem: clipped to a framed rounded square (big) or a disc (small corner pip) so the opaque painting reads as a picture on the card
+function embArt(s, x, y, w, big) {
+  const id = uid('e'), r = big ? w * .14 : w / 2, bw = Math.max(1, w * (big ? .035 : .06));
+  const shape = big ? `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(w)}" rx="${f(r)}"/>` : `<circle cx="${f(x + w / 2)}" cy="${f(y + w / 2)}" r="${f(w / 2)}"/>`;
+  return `<defs><clipPath id="${id}">${shape}</clipPath></defs><g clip-path="url(#${id})">${artImg('emb' + s, x, y, w, w).replace('xMidYMid meet', 'xMidYMid slice')}</g>`
+    + (big ? `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(w)}" rx="${f(r)}" fill="none" stroke="#d9b04a" stroke-width="${f(bw)}"/>` : `<circle cx="${f(x + w / 2)}" cy="${f(y + w / 2)}" r="${f(w / 2 - bw / 2)}" fill="none" stroke="#ffffff" stroke-width="${f(bw)}" opacity=".9"/>`);
+}
+function emb(s, x, y, w, big) { return KIT.ART['emb' + s] ? embArt(s, x, y, w, big) : `<svg x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(w)}" viewBox="0 0 100 100">${emblemInner(s)}</svg>`; }
 
 // ---------- playing cards ----------
 const H = w => Math.round(w * 1.4);
@@ -50,7 +57,7 @@ function cardSVG(id, o) {
   mat += `<rect x="${f(w * .05)}" y="${f(w * .05)}" width="${f(w * .9)}" height="${f(h - w * .1)}" rx="${f(r * .7)}" fill="none" stroke="${lan ? '#d9b04a' : c.c}" stroke-width="${f(Math.max(1.2, w * .02))}" opacity=".85"/>`;
   if (lan) { let st = ''; for (let i = 0; i < 9; i++) st += `<circle cx="${f(w * (.12 + ((i * 37) % 76) / 100))}" cy="${f(h * (.1 + ((i * 53) % 80) / 100))}" r="${f(w * (.008 + (i % 3) * .004))}" fill="#9fd0ff" opacity=".5"/>`; mat += st; }
   let mid = ''; const ew = w * .56;
-  mid += emb(s, (w - ew) / 2, h * .5 - ew * .5, ew);
+  mid += emb(s, (w - ew) / 2, h * .5 - ew * .5, ew, true);
   const num = lan ? GOLD : c.dk, nfs = w * .3;
   let top = '';
   const corner = rot => `<g transform="${rot ? `rotate(180 ${f(w / 2)} ${f(h / 2)})` : ''}"><text x="${f(w * .15)}" y="${f(w * .36)}" font-family="${FONT}" font-weight="900" font-size="${f(nfs)}" fill="${num}" stroke="${lan ? INK : '#fff'}" stroke-width="${f(w * .02)}" paint-order="stroke" text-anchor="start">${v}</text>${emb(s, w * .1, w * .41, w * .2)}</g>`;
@@ -69,7 +76,7 @@ function backSVG(o) {
   if (KIT.ART.back) s += `<g clip-path="url(#${gid}c)">${artImg('back', 0, 0, w, h).replace('xMidYMid meet', 'xMidYMid slice')}</g>`;
   else {
     let w2 = ''; for (let i = 0; i < 7; i++) w2 += `<path d="M0 ${f(h * (.1 + i * .14))}Q${f(w * .25)} ${f(h * (.04 + i * .14))} ${f(w * .5)} ${f(h * (.1 + i * .14))}T${f(w)} ${f(h * (.1 + i * .14))}" fill="none" stroke="#5aa3ff" stroke-width="${f(w * .018)}" opacity=".35"/>`;
-    s += `<g clip-path="url(#${gid}c)">${w2}<circle cx="${f(w / 2)}" cy="${f(h / 2)}" r="${f(w * .3)}" fill="#ffe08a" opacity=".2"/></g>` + emb(4, w * .22, h * .5 - w * .28, w * .56);
+    s += `<g clip-path="url(#${gid}c)">${w2}<circle cx="${f(w / 2)}" cy="${f(h / 2)}" r="${f(w * .3)}" fill="#ffe08a" opacity=".2"/></g>` + emb(4, w * .22, h * .5 - w * .28, w * .56, true);
   }
   s += `<rect x="${f(bw / 2)}" y="${f(bw / 2)}" width="${f(w - bw)}" height="${f(h - bw)}" rx="${f(r)}" fill="none" stroke="${INK}" stroke-width="${f(bw)}"/><rect x="${f(w * .05)}" y="${f(w * .05)}" width="${f(w * .9)}" height="${f(h - w * .1)}" rx="${f(r * .7)}" fill="none" stroke="#d9b04a" stroke-width="${f(Math.max(1, w * .016))}" opacity=".8"/>`;
   const out = `${svgOpen(w, h, `0 0 ${w} ${h}`)}${s}</svg>`; if (!o.standalone) cached[k] = out; return out;
