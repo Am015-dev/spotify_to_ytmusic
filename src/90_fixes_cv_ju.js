@@ -454,7 +454,7 @@ roamStep=(f=>function(dt){const busy=JU_busy();if(!busy)JU.clk+=dt;if(!JU.on||!p
     if(c.jpa!=null&&c.jpa>0&&al<=0&&lat>(SC_S&&SC_S.on?2.9:4.8)&&lat<(SC_S&&SC_S.on?5.5:8)&&Math.abs((c.y||0)-RO.y)<3&&!(c.nm>0)){c.nm=3;award(s,'NEAR MISS',6,100,'#4ceaff');AU.sfx('near');comboAdd(2)}c.jpa=al}}
   // air: the base already pays an air bonus over 1 s (roamLanded); here: squash on landing, camera kick on big landings, slight stretch in the air
   if(s.air&&!a0)JU.airT0=JU.clk;else if(!s.air&&a0){const at=JU.clk-JU.airT0;JU.sq=Math.min(.24,.14+at*.1);if(at>=JU_C.airMin)JU.kick=Math.max(JU.kick,Math.min(.45,at*.3)*fxK())}
-  JU.sq=Math.max(0,JU.sq-dt*1.1);{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
+  JU.sq=Math.min(.24,Math.max(0,JU.sq-Math.max(0,dt)*1.1));/* size-1: a negative dt (test clock) grew sq to 3.5 → car 2.6× big and upside down */{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
   // stud trail: nothing rewarding for 5 s while driving → a fountain of studs on the road ahead (pooled stud meshes)
   JU.dropT=Math.max(0,JU.dropT-dt);if(!busy&&sp>3&&JU.dropT<=0&&JU.clk-JU.ev.last>JU_C.deadT){JU.dropT=2.5;const sg=Math.sign(RO.v||1),fx=Math.sin(RO.h)*sg,fz=Math.cos(RO.h)*sg,ahead=Math.min(45,14+sp*.7);JU.v0.set(fx,0,fz);let n=0;
     for(let k=0;k<6;k++){const x=RO.x+fx*(ahead+k*3.5),z=RO.z+fz*(ahead+k*3.5);if(roamHit(x,z,1,RO.y))break;studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0);n++}
