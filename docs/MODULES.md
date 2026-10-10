@@ -70,6 +70,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98gb | `98gb_garage13.js` | 38 | G13 (v89d garage). Alex (2026-10-09, with the 40468 Yellow Taxi instructions): "the garage is missing several items; there is not full control to rotate in diff |
 | 98tx | `98tx_taxi40468.js` | 16 | TX (garage-14/15, 2026-10-10). Alex asked for the LEGO 40468 Yellow Taxi, built from the official instructions (docs/TAXI_40468_STEPS.md). 1) OFFSETS: optional  |
 | 98ld0 | `98ld0_data.js` | 163 | LD data: real LEGO builds converted from LDraw OMR files (CCAL 2.0) by tools/ld/ld2garage.py + tools/ld/ld2src.py. Generated, do not edit. Authors of the LDraw  |
+| 98ld1 | `98ld1_data.js` | 41 | LD data: real LEGO builds converted from LDraw OMR files (CCAL 2.0) by tools/ld/ld2garage.py + tools/ld/ld2src.py. Generated, do not edit. Authors of the LDraw  |
 | 98ld | `98ld_import.js` | 12 | LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds". Real LEGO builds come in as LDra |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 99c | `99c_checklist.js` | 37 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
@@ -330,9 +331,13 @@ uses: 92(40), 93(20), 98gb(15), 20(6), 30(3), 98t(3), 96(3), 10(2), 94(2), 98s(2
 defines: LD_MESH LD_MODELS
 uses: -
 
+## 98ld1_data.js — 41 KB
+defines: (data / markup, no top-level declarations)
+uses: 98ld0(2)
+
 ## 98ld_import.js — 12 KB
 defines: LDI LD_Q LDG LD_b64 LD_geo LD_SD LD_br LD_pts LD_grp __ld LD_boat LD_SW LDP LD_propSpot LD_propBuild
-uses: 92(39), 93(27), 20(13), 53(8), 98ld0(7), 98gb(6), 98(6), 70(3), 85(2), 41(1)
+uses: 92(39), 93(27), 20(13), 53(8), 98ld0(7), 98(7), 98gb(6), 70(3), 85(2), 41(1)
 
 ## 98of_onfoot.js — 45 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody

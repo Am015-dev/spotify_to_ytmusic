@@ -157,6 +157,7 @@ def choose(name, args):
     i = norm_id(name, title); tl = title.lower()
     if m := re.match(r'~moved to\s+(\S+)', tl): tl = ldlib.part_tris(m.group(1) + '.dat')[1].lower()
     if SKIP_T.match(tl + ' ') and not args.keep_figs: return None, 'skip (' + tl.split()[0] + ')', 0
+    if re.match(r'^(\d+ - )?\d{7}[a-z]', name.lower().split('\\')[-1]): return None, 'skip (sticker sheet part)', 0  # embedded stickers (sheet no. 6285381a…)
     sub = ' '.join(l for l in (ldlib.EMB.get(name.lower()) or []) if l.startswith('1 '))
     if re.search(r'1889[0-9]|18977|tyre', sub.lower()) and ('c0' in name.lower()):  # rim + tyre shortcut: same as its tyre
         return 'wL', 'tyre (rim+tyre assembly)', 0

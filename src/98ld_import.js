@@ -60,7 +60,10 @@ function LD_boat(){const A=LD_br('boat').map(b=>Object.assign(b,{y:b.y-5}));A.pu
  GAR_SETS.push({id:'t_rally',n:'Rally S1 (76897)',tier:'r',req:null,car:()=>LD_br('audi'),off:R.off,boat:R.boat,tpl:1,ref:'76897',forms:['car'],
   load:{car:{name:'RALLY S1',k:'Rally',st:{top:1.05,acc:1.06,han:1.05,hull:1},w:'Medium',perk:'drift'},'4x4':L('4x4'),boat:L('boat')}});
  GAR_SETS.push({id:'t_speedboat',n:'Harbour Speedboat (4641)',tier:'c',req:null,car:R.car,off:R.off,boat:LD_boat,tpl:1,ref:'4641',forms:['boat'],
-  load:{car:L('car'),'4x4':L('4x4'),boat:{name:'SPEEDBOAT',k:'Water',st:{top:1.04,acc:1.05,han:1.04,hull:.98},w:'Light',perk:'refill'}}})}
+  load:{car:L('car'),'4x4':L('4x4'),boat:{name:'SPEEDBOAT',k:'Water',st:{top:1.04,acc:1.05,han:1.04,hull:.98},w:'Light',perk:'refill'}}});
+ // v89t: the 1974 911 Turbo 3.0 (75895, Speed Champions 2019): a German classic for Frankfurt (driver + cone of the set not converted)
+ GAR_SETS.push({id:'t_turbo',n:'Turbo 74 (75895)',tier:'r',req:null,car:()=>LD_br('porsche'),off:R.off,boat:R.boat,tpl:1,ref:'75895',forms:['car'],
+  load:{car:{name:'TURBO 74',k:'Speed',st:{top:1.07,acc:1.05,han:1.03,hull:1},w:'Medium',perk:'slip'},'4x4':L('4x4'),boat:L('boat')}})}
 // ---------- the 1490 Town Bank as a Frankfurt world prop ("Mainhattan" is the bank city). Minifig scale = the same stud size as the cars
 // (LD_SW = 0.408 m per garage unit, measured on the player car in roam). One merged world-space mesh per material (3 draws, hub distance culling),
 // box collider = the walls' footprint (bricks above the baseplate), placed on the nearest free lot to the start, front to the street.
