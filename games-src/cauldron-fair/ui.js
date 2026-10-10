@@ -1959,10 +1959,10 @@ function bagApply() {
 // ---- table: the painted market table behind the cauldron; campaign unlocks (market-cloth, judges-tent) replace it. The brown CSS gradient stays underneath while it loads, in the simple view and if a file is missing
 let tblCur = '';
 function tableApply() {
-  const R = document.documentElement, id = unl('table'), f = id && /^(market-cloth|judges-tent)$/.test(id) ? 'table-' + id : '';
+  const R = document.documentElement, id = unl('table'), ph = matchMedia('(max-aspect-ratio:4/5)').matches, f = id && /^(market-cloth|judges-tent)$/.test(id) ? 'table-' + id : ph ? 'table-phone' : '';
   const key = f || 'default'; if (key === tblCur) return;
   if (!f) { const a = KIT.ART.table; if (a) { tblCur = key; R.style.setProperty('--tbl-img', 'url(' + a + ')'); } return; }
-  const im = new Image(); im.onload = () => { tblCur = key; R.style.setProperty('--tbl-img', 'url(' + MEDIA + f + '.webp)'); }; im.src = MEDIA + f + '.webp';
+  const im = new Image(); im.onload = () => { tblCur = key; R.style.setProperty('--tbl-img', 'url(' + MEDIA + f + '.webp)'); }; im.onerror = () => { if (f === 'table-phone' && KIT.ART.table) { tblCur = key; R.style.setProperty('--tbl-img', 'url(' + KIT.ART.table + ')'); } }; im.src = MEDIA + f + '.webp';
 }
 // ---- end art: a painted banner on top of the final scores
 function cfWon() {

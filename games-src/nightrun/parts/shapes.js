@@ -35,12 +35,12 @@ const CHR=[{n:'+1 HULL',t:'Max hull +1 and repaired',c:'#3dffb0',d:'M12 21s-8-5.
   {n:'EMP PACK',t:'+2 EMP',c:'#ffb020',d:'M13 2L4 14h6l-1 8 9-12h-6z',f:()=>{P.emp=Math.min(9,P.emp+2);}},{n:'REVIVE',t:'Come back once',c:'#ff2d95',d:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',f:()=>{TP.revLeft++;}},
   {n:'UPGRADE',t:'A random pit-stop upgrade',c:'#ff2d95',d:'M12 2l3 7 7 .8-5.3 4.7 1.6 7.2L12 18l-6.3 3.7 1.6-7.2L2 9.8 9 9z',f:()=>{const ids=Object.keys(UBY).filter(id=>UBY[id].max>1&&SH.n(id)<UBY[id].max&&!UBY[id].ok);if(ids.length)SH.add(ids[Math.floor(Math.random()*ids.length)]);}}];
 function chestShow(done){G.chestT=true;const pool=CHR.slice().sort(()=>Math.random()-.5).slice(0,3);let picked=-1,fin=false;
-  const art=ART.isReal('chest-closed')?`<img src="media/chest-closed.webp" alt="" class="cz">`:`<span class="cz sh" style="color:#ffe14d">${SVGW('<path d="M3 10a9 7 0 0118 0v3H3z" fill="currentColor" opacity=".85"/><rect x="3" y="12" width="18" height="9" rx="1.5" fill="currentColor" opacity=".55"/><rect x="10.5" y="11" width="3" height="5" fill="#120a1f"/>')}</span>`;
+  const art=ART.isReal('chest-closed')?`<img src="media/chest-closed.webp" alt="" class="cz" id="chImg">`:`<span class="cz sh" style="color:#ffe14d">${SVGW('<path d="M3 10a9 7 0 0118 0v3H3z" fill="currentColor" opacity=".85"/><rect x="3" y="12" width="18" height="9" rx="1.5" fill="currentColor" opacity=".55"/><rect x="10.5" y="11" width="3" height="5" fill="#120a1f"/>')}</span>`;
   const back=ART.isReal('card-back')?'<img src="media/card-back.webp" alt="">':'<span class="cb">?</span>';
   chestEl.innerHTML=`<div class="in" style="align-items:center;text-align:center"><div class="eyebrow">Boss down</div><h1>BOSS <span>CHEST</span></h1>${art}<div class="lede" id="chMsg">Pick one card</div><div class="chc" id="chC"></div><div class="row" style="justify-content:center"><button class="go" id="chGo" type="button" hidden>CONTINUE</button></div></div>`;
   const box=chestEl.querySelector('#chC');
-  pool.forEach((r,i)=>{const b=document.createElement('button');b.type='button';b.className='chk';b.dataset.i=i;b.innerHTML=`<div class="f"><div class="bk">${back}</div><div class="fr" style="--c:${r.c}">${SVGW(`<path d="${r.d}" fill="${r.c}"/>`)}<b>${r.n}</b><small>${r.t}</small></div></div>`;
-    b.addEventListener('click',()=>{if(picked>=0)return;picked=i;r.f();AU.sfx('up');box.querySelectorAll('.chk').forEach((q,k)=>q.classList.add(k===i?'win':'lose','flip'));$('chMsg').textContent=r.n+'!';$('chGo').hidden=false;$('chGo').focus();});box.append(b);});
+  pool.forEach((r,i)=>{const b=document.createElement('button');b.type='button';b.className='chk';b.dataset.i=i;b.innerHTML=`<div class="f"><div class="bk">${back}</div><div class="fr${ART.isReal('card-frame')?' pf':''}" style="--c:${r.c}">${SVGW(`<path d="${r.d}" fill="${r.c}"/>`)}<b>${r.n}</b><small>${r.t}</small></div></div>`;
+    b.addEventListener('click',()=>{if(picked>=0)return;picked=i;r.f();if(ART.isReal('chest-open')){const ci=$('chImg');if(ci)ci.src='media/chest-open.webp';}AU.sfx('up');box.querySelectorAll('.chk').forEach((q,k)=>q.classList.add(k===i?'win':'lose','flip'));$('chMsg').textContent=r.n+'!';$('chGo').hidden=false;$('chGo').focus();});box.append(b);});
   const end=()=>{if(fin)return;fin=true;chestEl.hidden=true;done();};$('chGo').onclick=end;chestEl.hidden=false;
   setTimeout(()=>{if(!fin&&picked<0){const q=box.querySelector('.chk:nth-child(2)');if(q)q.click();}},14000);}
 {const p0=SH.pit;SH.pit=function(cb){if(running&&G&&G.bossDone&&!G.chestT&&CHEST_ON()){chestShow(()=>p0.call(SH,cb));return;}return p0.call(this,cb);};}
@@ -59,5 +59,14 @@ NR.on('runStart',()=>{G.chestT=false;});
 #chest .bk img{width:100%;height:100%;object-fit:contain}#chest .cb{font:700 clamp(30px,10vmin,64px) var(--display);color:#ffe14d}
 #chest .fr{transform:rotateY(180deg);border-color:var(--c)}#chest .fr svg{width:34%}#chest .fr b{font-size:clamp(11px,2.6vmin,17px);color:#fff}#chest .fr small{font-size:clamp(9px,2vmin,13px);color:#cfc9f2;line-height:1.1}
 #chest .chk.lose{opacity:.45}#chest .chk.win .f{filter:drop-shadow(0 0 10px #ffe14d)}
+`;document.head.appendChild(st);}
+/* ----- painted surfaces: garage / pit stop, pause and settings (the dark wash stays on top so the text stays readable); decoded once at start ----- */
+ART.keep=[];for(const n of['garage','garage-phone','pause','chest-open','card-frame']){const im=new Image();im.decoding='async';im.src=ART.base+n+'.webp';ART.keep.push(im);if(im.decode)im.decode().catch(()=>{});}
+{const st=document.createElement('style');st.textContent=`
+#garage.ov.pg{background:linear-gradient(#05030cc4,#05030ce0),url(media/garage.webp) center/cover no-repeat #05030c}
+@media (orientation:portrait){#garage.ov.pg{background:linear-gradient(#05030cc4,#05030ce0),url(media/garage-phone.webp) center/cover no-repeat #05030c}}
+#pausem.ov.solid,#setm.ov.solid{background:linear-gradient(#05030cc8,#05030cdc),url(media/pause.webp) center/cover no-repeat #05030c}
+.pg .card img.pi{opacity:.9}
+#chest .fr.pf{background:#140c26 url(media/card-frame.webp) center/100% 100% no-repeat;border-color:transparent;padding:14% 10%}
 `;document.head.appendChild(st);}
 setTimeout(()=>{if(window.diffDraw)window.diffDraw();},0);
