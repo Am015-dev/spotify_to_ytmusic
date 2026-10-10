@@ -754,6 +754,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90f',date:'10 Oct 2026',items:[{t:'FIXED',s:'Rides keep their real LEGO width (no more squeezed-thin cars and trucks).'},{t:'FIXED',s:'All LEGO City and Town rides are true minifig size with a LEGO driver in the cab; the four 1979 Town cars now drive forwards.'},{t:'NEW',s:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker.'},{t:'CHANGED',s:'Frankfurt: trees, street lamps, park fences and crates are now real LEGO parts, and a LEGO House (4956) stands near the start.'}]},
   {v:'v90e',date:'10 Oct 2026',items:[{t:'NEW',s:'City traffic is now real LEGO sets: the family car, the patrol car, the mail van, the service van, the camper, the LEGO taxi and Speed Champions cars drive the streets.'},{t:'CHANGED',s:'Each traffic car keeps its real set colours, and crashing into one uses its own size.'},{t:'NEW',s:'RIDES: Town Cruiser, another 1979 LEGO Town car. Garage ride pictures now draw the cards on screen first.'}]},
   {v:'v90d',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: four little 1979 LEGO Town vehicles from real model files: Town Roadster, Town Coupe, Ladder Truck and Town Tipper.'}]},
   {v:'v90c',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: 16 more LEGO vehicles from real model files: Race Car 89, Sprint Racer, Racing Pickup, Fire Rescue 4x4, Coast Guard 4WD, Bike Hauler, Mining 4x4, Horse 4WD, Tipper Truck, Dump Truck, Cement Mixer, Mixer Truck, Cargo Truck, Turbine Hauler, Front Loader and Farm Tractor.'},{t:'CHANGED',s:'They load only when you open the garage, so the game still starts as fast.'}]},
@@ -13496,6 +13497,9 @@ const LD_SW=.408,LDP={g:null,at:null,col:null};
 // but the game's people are 1.9 m (pedestrians) to 2.0 m (quest figures, SC_K in 96_scale_qa.js). So world BUILDINGS use LD_SW × LD_FIG (1.6): a minifig of
 // the game fits a 1×4×6 door (2.8 m frame) with headroom. Rides stay at LD_SW (they match the player car); micro sets (P.s) and moored boats too.
 const LD_FIG=1.6;
+// v90f: ONE scale rule for rides and traffic (98sz_ride_scale.js, 98ct_city_lego.js): Speed Champions sets (75xxx/7689x refs, model ids v758../v7689..) are car-sized
+// at LD_SW; every other LDraw City/Town set is minifig scale (× LD_FIG)
+const LD_SCRE=/^v?7(58|689)/;
 function LD_propSpot(x0,z0,hw,hd){for(let r=24;r<300;r+=8)for(let a=0;a<32;a++){const t=a/32*Math.PI*2,x=x0+Math.cos(t)*r,z=z0+Math.sin(t)*r;
   for(const rot of[0,1]){const w=rot?hd:hw,d=rot?hw:hd;if(!rfFree(x,z,3)||roamHit(x,z,Math.max(w,d)+1.5))continue;let ok=1;
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;
@@ -13592,6 +13596,58 @@ window.__ld.w=LDW;window.__ld.wp=LDW_P;window.__ld.wbuild=LDW_build;window.__ld.
 window.__ld.wroad=()=>{const out=[],chk=(id,objs)=>{if(!objs||!objs.length)return;const B=new THREE.Box3();for(const o of objs){o.geometry.computeBoundingBox();B.union(o.geometry.boundingBox)}let n=0,on=0,near=0;
  for(let x=B.min.x;x<=B.max.x;x+=.5)for(let z=B.min.z;z<=B.max.z;z+=.5){n++;if(FL_road(x,z,0))on++;else if(FL_road(x,z,1.5))near++}out.push({id,x0:+B.min.x.toFixed(1),x1:+B.max.x.toFixed(1),z0:+B.min.z.toFixed(1),z1:+B.max.z.toFixed(1),n,on,near})};
  for(const E of LDW.on)if(!E.water)chk(E.id,E.near);if(typeof LDP!=='undefined')chk('bank',LDP.g);if(typeof LD_PROPS!=='undefined')for(const q of LD_PROPS)chk(q.id,q.g);return out};
+// ---- LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets".
+// Frankfurt's trees become the real LEGO tree parts: 3470 Plant Tree Oval (tree), 2435 Plant Tree Pyramidal 3x3x4 (tree2) and 3471 Plant Tree
+// Pyramidal 4x4x6⅔ (tree3), the trees of OMR sets 376-2 / 560 / 6388 (CCAL 2.0). The full LDraw meshes are 1,000-1,600 tris each and Frankfurt
+// has ~8,300 trees (60-84 tris each today), so each part is drawn as a lathe of its own silhouette: the radius profile sampled from the LDraw
+// mesh (tools/ld/lProfile.py; points below in LDU, y up from the trunk foot), 8 sides near, 6 sides + fewer points far (far ≤ the old tris).
+// One scale for all three (3470 = 8.2 m) keeps their real LEGO proportions. Set in ART_trees (props build), so instances/draws/smash/tint are
+// unchanged; far LOD per 800 m prop tile (the tile groups of buildHubProps), switched in hubCullStep.
+const LDS={P:{
+ tree:{n:[[6,0],[6,42],[35,56],[33,62],[42,72],[43,98],[42,112],[32,124],[35,128],[0,144]],f:[[6,0],[6,42],[38,58],[43,95],[34,126],[0,144]],src:'3470'},
+ tree2:{n:[[6,0],[6,18],[32,18],[18,36],[26,38],[14,56],[20,58],[8,76],[12,78],[0,99]],f:[[6,0],[6,18],[32,18],[0,99]],src:'2435'},
+ tree3:{n:[[6,0],[6,42],[44,42],[26,64],[36,66],[20,88],[28,90],[15,112],[20,114],[10,136],[12,138],[0,159]],f:[[6,0],[6,42],[44,42],[0,159]],src:'3471'}},
+ k:8.2/144,trunk:48,near:120,on:[],st:null};
+// lathe of a profile; trunk part (y < trunk LDU, thin) brown, crown white (the per-instance tint colours it, ART_TINT)
+function LDS_lathe(P,seg){const pts=P.map(([r,y])=>new THREE.Vector2(r*LDS.k,y*LDS.k)),g=new THREE.LatheGeometry(pts,seg).toNonIndexed(),p=g.attributes.position,keep=[];
+ for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);
+  if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()<1e-10)continue;keep.push(a,b,d)}// drop the degenerate triangles at the r=0 tip
+ const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],tb=new THREE.Color('#7a4a28'),cw=new THREE.Color('#ffffff'),yt=LDS.trunk*LDS.k;
+ for(let i=0;i<keep.length;i+=3){const ym=(keep[i].y+keep[i+1].y+keep[i+2].y)/3,r=Math.max(...[0,1,2].map(j=>Math.hypot(keep[i+j].x,keep[i+j].z))),C=ym<yt&&r<7*LDS.k+.01?tb:cw;for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
+ q.setAttribute('color',new THREE.Float32BufferAttribute(c,3));q.computeVertexNormals();q.computeBoundingBox();q.computeBoundingSphere();return q}
+const LDS_tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
+// ART_trees (97_art.js) builds the tree types inside kmProps: replace their geometry right after it (Frankfurt; Athens keeps its own trees)
+// street lamp (swap 2): LEGO 2039 Support 2x2x7 Lamppost (as in 10184 Town Plan, CCAL 2.0) + 3062b round brick lamp + 4740 dish shade, one lathe
+// (profile from tools/ld/lProfile.py 2039.dat / 3062b.dat, LDU), 6 sides; replaces the Kenney CC0 'light-curved' (92 tris). Colours by height.
+LDS.L={p:[[25,0],[8,12],[6,150],[10,168],[10,190],[20,192],[20,196],[0,198]],h:6.5,c:[[168,'#3a3f48'],[191,'#ffe9a0'],[999,'#2a2e36']]};
+function LDS_lamp(){const L=LDS.L,k=L.h/198,g=new THREE.LatheGeometry(L.p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),6).toNonIndexed(),p=g.attributes.position,keep=[];
+ for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()>1e-10)keep.push(a,b,d)}
+ const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],C=new THREE.Color();for(let i=0;i<keep.length;i+=3){const ym=(keep[i].y+keep[i+1].y+keep[i+2].y)/3/k;C.set(L.c.find(e=>ym<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
+ q.setAttribute('color',new THREE.Float32BufferAttribute(c,3));q.computeVertexNormals();q.computeBoundingBox();q.computeBoundingSphere();return q}
+// park fence (swap 3): LEGO 3633 Fence Lattice 1x4x1 (LDraw part, CCAL 2.0) instead of the Kenney CC0 'fence-1x3' (204 tris): top rail 80x8x20 LDU,
+// end posts, bottom rail and the diamond lattice (4+4 diagonal bars), boxes in LDU from the part file; stretched to the old fence's length.
+function LDS_fence(old){old.computeBoundingBox();const ob=old.boundingBox,ox=ob.max.x-ob.min.x,oz=ob.max.z-ob.min.z,len=Math.max(ox,oz),s=len/80,G=[],add=(w,h,d,x,y,z,rz)=>{const b=new THREE.BoxGeometry(w,h,d);if(rz)b.rotateZ(rz);b.translate(x,y,z);G.push(colorize(b.toNonIndexed(),new THREE.Color('#ffffff')))};
+ add(80,8,20,0,20,0);add(4,16,6,-38,8,0);add(4,16,6,38,8,0);add(80,4,6,0,2,0);const L=Math.hypot(18,12)+2,a=Math.atan2(12,18);for(let i=0;i<4;i++){const x=-27+i*18;add(L,2,4,x,10,0,a);add(L,2,4,x,10,0,-a)}
+ const g=mergeG(G);
+ g.scale(s,Math.min(s,(ob.max.y-ob.min.y)/24),s);if(oz>ox)g.rotateY(Math.PI/2);g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
+ART_trees=(f=>function(D){f.apply(this,arguments);if(CID!=='fra')return;const st={};try{if(D.lamp&&!D.lamp.lds){const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp();D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}}catch(e){console.warn('LDS lamp',e)}try{for(const t in LDS.P){const d=D[t];if(!d)continue;const P=LDS.P[t],old=LDS_tri(d.g);
+  d.gOld=d.g;d.g=LDS_lathe(P.n,8);d.gFar=LDS_lathe(P.f,6);d.lds=t;st[t]={src:P.src,old,near:LDS_tri(d.g),far:LDS_tri(d.gFar)}}}catch(e){console.warn('LDS trees',e)}LDS.st=st;LDS.on=[]})(ART_trees);
+// crate (swap 4): LEGO 61780 Container 2x2x2 Crate (LDraw part, CCAL 2.0): open box of slats, 40x48x40 LDU: floor + 2 rings of 4 slats with the gaps of
+// the part, instead of the Kenney CC0 'box' (124 tris); fitted to the old crate's footprint, reddish brown like the part's usual colour
+function LDS_crate(old){old.computeBoundingBox();const ob=old.boundingBox,w=Math.min(ob.max.x-ob.min.x,ob.max.z-ob.min.z),s=w/40,G=[],C=new THREE.Color('#8a4a2a'),add=(a,h,d,x,y,z)=>{const b=new THREE.BoxGeometry(a,h,d).toNonIndexed();b.translate(x,y,z);G.push(colorize(b,C))};
+ add(40,8,40,0,4,0);for(const y of[16,36]){add(40,12,4,0,y,18);add(40,12,4,0,y,-18);add(4,12,32,18,y,0);add(4,12,32,-18,y,0)}
+ const g=mergeG(G);g.scale(s,s,s);g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeBoundingBox();g.computeBoundingSphere();return g}
+// fence: D.fence is made after ART_trees, at the end of kmProps (60_city_build.js)
+kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID==='fra'&&D.fence&&!D.fence.lds)try{const old=LDS_tri(D.fence.g);D.fence.gOld=D.fence.g;D.fence.mOld=D.fence.mat;D.fence.g=LDS_fence(D.fence.g);
+ D.fence.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0});D.fence.lds='fence';if(LDS.st)LDS.st.fence={src:'3633',old,near:LDS_tri(D.fence.g),far:LDS_tri(D.fence.g)}}catch(e){console.warn('LDS fence',e)}if(CID==='fra'&&D.crate&&!D.crate.lds)try{const old=LDS_tri(D.crate.g);D.crate.gOld=D.crate.g;D.crate.mOld=D.crate.mat;D.crate.g=LDS_crate(D.crate.g);D.crate.mat=D.fence.mat;D.crate.lds='crate';if(LDS.st)LDS.st.crate={src:'61780',old,near:LDS_tri(D.crate.g),far:LDS_tri(D.crate.g)}}catch(e){console.warn('LDS crate',e)}
+ return r})(kmProps);
+// LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
+function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
+hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
+ for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
+// test hook (before/after shots of the same spot): ab(1) draws the old trees again
+function LDS_ab(off){for(const DL of['lamp','fence','crate'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
+window.__ld.lds=LDS;window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
 // ---- LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module
 // (window.__LDQ, run here at boot) and window.__LDX (chunk urls, mesh key -> chunk, preset -> models). The meshes + brick lists of each model live in
 // models/<id>.js and load on demand: a ride when it is selected/equipped or its thumbnail is drawn, world props when their city builds, and at boot
@@ -13622,6 +13678,7 @@ G9C_render=(f=>function(S,fm){const m=LD_probe(()=>G9C_bricks(S,fm));if(m.length
 GB_enter=(f=>function(){if(!LDL.wait.size)return f.apply(this,arguments);const t=this,a=arguments;Promise.all([...LDL.wait.values()].map(w=>w.p)).then(()=>setTimeout(()=>f.apply(t,a),0))})(GB_enter);
 // garage-17 (98fb_form_build.js): BUILD on an OFF-ROAD / WATER ride copies S.off() / S.boat() into the builder; wait for its model first
 FB_begin=(f=>function(S,fm){const m=S&&typeof S[fm]==='function'?LD_probe(()=>GAR_arr(S[fm]())):[];if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>{f(S,fm);LD_redraw()});return 1})(FB_begin);
+window.__ld.equip=id=>{gbOpen();return LD_need(LD_probe(()=>GAR_arr(GAR_set(id).car()))).then(()=>{GAR_select(id);gbClose(true);return GAR_get().sel})};// test hook: equip a ride and SAVE & DRIVE
 window.__ld.need=LD_need;window.__ld.L=LDL;window.__ld.probe=LD_probe;window.__ld.sel=id=>GAR_select(id);window.__ld.set=id=>GAR_set(id);window.__ld.gar=()=>GAR_get();// test hooks
 // ---- CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars".
 // TRAFFIC: the procedural traffic kinds (CR_cityGeo) are swapped for the real LEGO sets converted from LDraw (LD_MODELS, models.js) and the
@@ -13636,7 +13693,7 @@ const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','tax
  ath:{'taxi':'ld:car:tx','sedan':'ld:car:v6633_1','van':'ld:van:v7639_1',/* su:t_sc_tm kept: swapping it together with the taxi added ~110 MB JS heap in Athens (cause open, docs/HANDOFF_city1.md) */'delivery':'ld:delivery:v60054_1','su:t_sc_hy':'ld:car:v75892_1'}};
 if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];const ex=(location.search.match(/[?&]ctx=([^&]*)/)||[])[1]||'';/* test: ctx=<old kinds kept> */for(let i=0;i<HCAR.length;i++){const v=!ex.split(',').includes(HCAR[i])&&S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
 // target body widths per class (m): Town sets are 4–6 studs wide, Speed Champions 8, so each is scaled uniformly to a road width
-const CT_SC=/^v(758|7689)/;// Speed Champions
+const CT_SC=LD_SCRE;// Speed Champions (shared rule, 98ld_import.js)
 const CT_W={tx:1.72/* 6-wide 40468: keep its height near the others */,car:1.9,police:1.95,van:2.1,delivery:2.2,truck:2.4};
 // lazy models (v89z LD_need): start loading the traffic sets of both cities at boot, so they are in before roam builds (else: CT_FB fallback)
 try{LD_need([...new Set(Object.values(CT_SWAP.fra).concat(Object.values(CT_SWAP.ath)).map(n=>n.split(':')[2]).filter(id=>id!=='tx'))])}catch(e){}
@@ -13720,6 +13777,41 @@ buildRoam=(f=>function(){const r=f.apply(this,arguments);try{CTB_mesh()}catch(e)
 hubCullStep=(f=>function(){f.apply(this,arguments);try{CTB_step()}catch(e){}})(hubCullStep);
 window.__ctb={CTB,pos:()=>({x:RO.x,z:RO.z}),V:CTB_V,stat:()=>({...CTB.st,kinds:Object.values(CTB.K).map(K=>({k:K.v.k,n:K.L.length,W:+K.W.toFixed(1),D:+K.D.toFixed(1),H:+K.H.toFixed(1),tris:K.tris,ftris:K.ftris,near:K.ims[0]?K.ims[0].count:0,far:K.fim?K.fim.count:0}))}),
  near:()=>{let best=null;for(const k in CTB.K)for(const o of CTB.K[k].L){const d=Math.hypot(o.x-RO.x,o.z-RO.z);if(!best||d<best.d)best={k,d,...o,W:CTB.K[k].W,D:CTB.K[k].D,H:CTB.K[k].H}}return best},list:k=>CTB.K[k]?CTB.K[k].L:[]};
+// ---- RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride:
+// 1. SC_ship (96_scale_qa.js) squeezed EVERY roam ride to 75 % width (SC_K.shipX, made for the old winged ships). Brick rides (garage builds, templates,
+//    LDraw sets) now keep their true width; only a ride without bricks (stock ship) is still squeezed.
+// 2. Every ride was built at the Speed Champions stud (LD_SW = 0.408 per garage unit = 0.245 m), but City/Town sets are MINIFIG scale: a 6-wide truck
+//    came out 1.1 m wide, half a traffic car. Those sets now carry a 'drvM' brick: a true-scale minifig driver behind the set's steering wheel, and the
+//    marker that scales the ride by LD_FIG (1.6, the same stud as the world buildings: 0.39 m). Driver = 1.96 m, like the 1.9 m pedestrians.
+//    Speed Champions sets, garage builds and the hand-made big templates (bus, box truck, limo, monster) stay at the car stud (they are car-sized).
+// Traffic / other code can use SZ_k(bricks) (1 or 1.6) and SZ_add(bricks) to get the same scale.
+const RSZ={MS:['30313','30572','3179','3180','3221','4436','4914','60017','60054','60059','60083','7639','7731'],k:LD_FIG,fig:2.36};
+GB_PC.drvM={n:'Minifig driver',w:2,d:2,h:9,ic:'🧑',hide:1};
+function SZ_k(B){return(B||[]).some(b=>b&&(b.t||b[0])==='drvM')?RSZ.k:1}
+// the driver sits behind the steering wheel ('stw', r 2 = facing -z like the LDraw sets, r 0 = +z), 3 plates under it
+function SZ_add(B){if(!Array.isArray(B)||!B.length||SZ_k(B)>1)return B;const w=B.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');const A=B.slice();
+ if(w){const r=w.r&2?2:0;A.push({t:'drvM',x:w.x,z:r?w.z+1:w.z-2,y:w.y-3,r,m:0,c:'#0055bf'})}else A.push({t:'drvM',x:-1,z:-1,y:-99,r:2,m:0,c:'#0055bf',hide:1});return A}
+// figure only (the set has its own seat): true minifig height 5 studs (3.0 units; the 'drv' part is 0.83 of that and has a seat box)
+GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);const tm=[],tl=[];GB_figGeo(GB_figGet(),tm,tl,true);
+ const s=1.5*(typeof SC_S!=='undefined'&&SC_S&&SC_S.drv?SC_K.drv:1),k=RSZ.fig;
+ for(const[A,D]of[[tm,M],[tl,L]])for(const g of A){g.translate(0,-(.74-.42*s),1.55);g.scale(k/s,k/s,k/s);g.translate(0,.1,.25);D.push(g)}})(GB_piece);
+// a driver brick with no wheel to sit behind is only the scale marker
+GB_brickGeo=(f=>function(b){if(b&&b.t==='drvM'&&b.y<=-90)return;return f.apply(this,arguments)})(GB_brickGeo);
+RSZ.mini=S=>!!(S&&S.car&&/^t_v/.test(S.id)&&S.ref&&!LD_SCRE.test(S.ref));// v90f: every LDraw City/Town ride (shared rule LD_SCRE), not a fixed list
+for(const S of GAR_SETS)if(RSZ.mini(S)){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
+// saved copies of these rides (bricks stored before this fix) get the driver too
+G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?SZ_add(B):B})(G9C_bricks);
+gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
+// the ride scale: uniform, no width squeeze for brick rides; driver height checks use the same k
+GB_attach=(f=>function(g,bricks){const r=f.apply(this,arguments);try{if(g&&g.userData){g.userData.szK=SZ_k(bricks);g.userData.szB=!!(bricks&&bricks.length)}}catch(e){}return r})(GB_attach);
+SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(ud.szB||ud.szK>1))return f.apply(this,arguments);SC_fold(ud);
+ const kk=ud.szK||1,k=SHIP_K*SC_K.ship*kk;if(!ud.scOn||ud.m.scale.y!==k||ud.m.scale.x!==k){ud.m.scale.setScalar(k);ud.scOn=1;const r=SC_K.ship*kk;
+  ud.under.scale.set(r,r,1);ud.shadow.scale.set(r,r,1);if(isPl&&ud.shield)ud.shield.scale.set(4.2*r,2.4*r,5.4*r)}})(SC_ship);
+// BC (98bc_bigcars.js) compares a ride with the Hot Rod: its reference width was measured squeezed (1.93 m); unsqueezed it is 2.57 m
+BC.ref.W=2.57;
+// the collider is never wider than a lane vehicle (3.2 m): a snowplow blade or wide mirrors overhang it and glancing hits slide (reviewer: 4.7 m snowplow)
+RSZ.capW=3.2;BC_dims=(f=>function(ud){const d=f.apply(this,arguments);if(d&&d.W>RSZ.capW)d.W=RSZ.capW;return d})(BC_dims);
+window.__sz={S:RSZ,k:SZ_k,add:SZ_add};
 // ===== OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a
 // floating left stick (touch) or WASD/arrows + Shift + Space (PC); camera behind; ENTER near your own car or any parked car (traffic cars with c.pk).
 // State RO.foot: 'car' | 'exit' (0.35 s step-out) | 'walk' | 'enter' (0.45 s tween to the door). BRAKE (#tB) becomes 🚪 EXIT only once the car is
@@ -14034,6 +14126,13 @@ if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)retur
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90f',id:'town-fwd',text:'Equip Town Roadster, then Ladder Truck: the bonnet/cab points forward and the car drives forwards.'},
+ {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker look complete; drive two of them.'},
+ {ver:'v90f',id:'w4956',text:'Frankfurt: a LEGO House (4956) stands by a street near the start; a person fits through its door.'},
+ {ver:'v90f',id:'land',text:'Frankfurt: trees, street lamps, park fences and crates look like LEGO parts (round/pointed LEGO trees, black lamp posts with yellow lamps, white lattice fences, brown slatted crates); the city runs as smoothly as before.'},
+ {ver:'v90f',id:'plow',text:'Drive the Snowplow (the widest ride, ~4.7 m) down a Frankfurt street: it stays in its lane, passes traffic and turns corners without scraping the kerb.'},
+ {ver:'v90f',id:'ride-width',text:'Drive the Hot Rod, the Rally S1 and the Sightseeing Bus: none looks squeezed thin; each still sits on the road and steers like before.'},
+ {ver:'v90f',id:'truck-size',text:'Garage → RIDES → STREET: drive the Big Rig, Logger and Fire Chief: each is minifig size (truck taller and longer than a traffic car), a LEGO driver sits inside the cab, and it fits through normal streets.'},
  {ver:'v90e',id:'cruiser',text:'Garage → RIDES: Town Cruiser looks complete with its windscreen at the front; the ride pictures on screen appear first, the rest follow.'},
  {ver:'v90e',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
  {ver:'v90e',id:'ct-hit',text:'Bump into a traffic car and a van: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
