@@ -75,3 +75,22 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
 - Reviewer + coordinator (2026-10-10), for Part B: Eleni's garage card auto-opens when you drive through the Athens gate (the 5 Athens stuck
   episodes). Open the card only when the car stops inside the gate (< 2-5 km/h for 0.5 s), or show a small "GARAGE ▸" button instead of the
   full card. Ship it with the wall-hits fix (separate REVIEW/DEPLOY).
+
+## Session 3 (2026-10-10, play-3): Part B garage cluster fixed (v89o); Athens target NOT met yet
+- Game (src/71_roam_drive.js, mark loop): garage/flight card opens only after the car stands in the ring (|v| < 1.2 m/s = 4 km/h for 0.4 s;
+  RO.svcT/RO.svcM); TAP TO OPEN prompt unchanged. Note RO.v is m/s: the old "v<7" was 25 km/h, not 7 km/h.
+- Game: garages never count as markDone, so RO.near (the arrow) pointed at Eleni's garage forever. Now a garage/flight ring the car has
+  entered this session (RO.svcV Set) is skipped by the arrow.
+- Game (src/70_roam_world.js athGbSpots0): Athens golden bricks snap to the nearest non-ped road point within 120 m (were in blocks/hillside).
+- tPlay: slows in the last 40 m to an arrow beacon (v > d*.35+3 m/s → off gas, brake above +6); declines a garage card like a flight card.
+- Merged alex/od-mem (live v89n). Version for this release: v89o.
+- tPlay v89m (garage fix only), 3 Athens runs: 0 hits within 60 m of the garage (was 12/12); walls 5.5 / 7.5 / 1.3 per min, stuck 4.9 / 1.0 / 4.3 %.
+  Frankfurt 0.75/min, 2.1 % PASS. Results: qa_p89m/. v89o (+ golden bricks): qa_p89o/.
+- Remaining Athens clusters (qa_dbg_ath.log, DEBUG=1 trace):
+  (a) lawn strip in front of the house row west of the garage (x 1940-2016, z -1625..-1635; road centre z -1644, w 8.5): the bot U-turns at
+      ~60 km/h (wander dest behind it) onto the lawn, then follows the strip 23-32 m off its route (replan only when bd > 30 m), hitting houses.
+  (b) GO! challenge / van chase around (1440-1530, -1220..-1290) and (1750-1850, -1610..-1710): to check whether chNext targets sit off-road.
+  (c) Stuck episodes are behind traffic cars (car ≤ 5 m), "ch":true (during challenges).
+  GPS (qvPath + D24_clean chords) checked on (a): the route there is on the road (routeprobe: 0 off-road samples), so not a GPS bug there.
+  D24_clr only tests colliders (r 1.2) and height steps, not road surface: chords CAN cross lawns elsewhere; worth a check for (b).
+- New in the merged build: tPlay "JS heap ≤ 100 MB while driving" fails (158 MB avg) — came with od-mem; check against v89n before blaming v89o.
