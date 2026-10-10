@@ -35,13 +35,16 @@ const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck
    let goon=0;try{let G=window.__m1&&__m1.goons;if(typeof G==='function')G=G();for(const g of G||[])if(Math.hypot((g.x??1e9)-R.x,(g.z??1e9)-R.z)<9)goon=1}catch(e){}let ped=0;for(const q of M.HUB.peds||[])if(Math.hypot((q._x??1e9)-R.x,(q._z??1e9)-R.z)<6)ped=1;const air=Q.yh.some(y=>y>.6),bst=Q.bh[0]&&!R.boosting;
    const M1o=window.__m1&&(typeof __m1.M1==='function'?__m1.M1():__m1.M1);const ctx=[M1o&&M1o.cs?'cutscene':'',M1o&&M1o.tdc&&M1o.tdc.t>0?'talkcam':'',R.ch&&R.ch.go===undefined?'':'',(document.querySelector('#msg')||{}).textContent||''].filter(Boolean).join('|').slice(0,40);
    Q.hits.push({ctx,f:Q.f,v0:+(vmax*3.6).toFixed(0),v1:+(v*3.6).toFixed(0),drop:+(1-v/vmax).toFixed(2),kind:(M.touch&&M.touch.park)?'parked':wall?'wall':goon?'mission-car':car?'traffic':ped?'ped':air?'landing':bst?'boost-end':'other',x:Math.round(R.x),z:Math.round(R.z),dy:+(R.y-Q.y0).toFixed(1)})}
-  if(v<5/3.6){Q.stEp++}else{if(Q.stEp>120)Q.stuck+=Q.stEp;Q.stEp=0}
+  if(v<5/3.6){Q.stEp++;if(Q.stEp===1){let nc=null,nd=1e9;for(const c of M.HUB.cars||[]){if(c.dead)continue;const d=Math.hypot(c.x-R.x,c.z-R.z);if(d<nd){nd=d;nc=c}}const b=M.roamHitAt(R.x,R.z,3.4,R.y);const T=M.touch||{};
+   Q.stCur={f:Q.f,x:+R.x.toFixed(1),z:+R.z.toFixed(1),y:+R.y.toFixed(2),h:+R.h.toFixed(2),g:+(R.y-M.gnd(R.x,R.z,R.y+.3)).toFixed(2),car:nd<12?+nd.toFixed(1):null,wall:b?{x:+(+b.x).toFixed(1),z:+(+b.z).toFixed(1),hw:+(+b.hw).toFixed(1),hd:+(+b.hd).toFixed(1),rot:b.c!=null,keys:Object.keys(b).slice(0,10).join('/')}:null,ch:!!(R.ch||R.sp),in:[T.gas?'G':'',T.brake?'B':'',T.dir||'',T.park?'P':''].join(''),veh:R.veh||R.vk||M.pl&&M.pl.kind||null}}
+   if(Q.stEp===121&&Q.stCur){Q.stCur.b2=(()=>{const o=[];for(let a=0;a<8;a++){const x=R.x+Math.sin(a*.785)*2.6,z=R.z+Math.cos(a*.785)*2.6;o.push(M.roamHitAt(x,z,.3,R.y)?1:0)}return o.join('')})();Q.stCur.v2=+(v*3.6).toFixed(1)}}
+  else{if(Q.stEp>120){Q.stuck+=Q.stEp;(Q.stL=Q.stL||[]).push({...Q.stCur,len:Q.stEp})}Q.stEp=0}
   const cam=window.__dbg&&__dbg.camera;if(cam&&Q.f%3===0){const b=M.roamHitAt(cam.position.x,cam.position.z,.3,cam.position.y);if(b){Q.camIn++;if(Q.camS.length<8&&Q.f-(Q.camF||-999)>240){Q.camF=Q.f;Q.camS.push({f:Q.f,car:[Math.round(R.x),Math.round(R.z),+R.y.toFixed(1)],cam:[+cam.position.x.toFixed(1),+cam.position.z.toFixed(1),+cam.position.y.toFixed(1)],b:{x:+(+b.x).toFixed(1),z:+(+b.z).toFixed(1),hw:+(+b.hw).toFixed(1),hd:+(+b.hd).toFixed(1),h:b.h&&+b.h.toFixed(1),y0:b.y0&&+b.y0.toFixed(1),rot:b.c!=null}})}}}};};
 const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);const w=Q.hits.filter(h=>h.kind==='wall');const kinds={};for(const h of Q.hits)kinds[h.kind]=(kinds[h.kind]||0)+1;
  return{min:+mins.toFixed(2),hits:Q.hits.length,kinds,wallHits:w.length,wallPerMin:+(w.length/Math.max(.01,mins)).toFixed(2),hitsPerMin:+(Q.hits.length/Math.max(.01,mins)).toFixed(2),
   bigDrop:Q.hits.filter(h=>h.drop>.5).length,stuckPct:+(100*st/Math.max(1,Q.drive)).toFixed(1),avgKmh:+(Q.vSum/Math.max(1,Q.drive)*3.6).toFixed(1),
   loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),camInside:Q.camS,smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
-  traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
+  traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,stuckEp:(Q.stL||[]).concat(Q.stEp>120&&Q.stCur?[{...Q.stCur,len:Q.stEp,open:1}]:[]),worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
 // HUD vs touch-control overlap + tiny text
 const LAYOUT=()=>{  // tiny = visible text under 12 px
 const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
@@ -119,10 +122,10 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   // fra: a brand-new player (STORY → Slot 1 NEW GAME); ath: an existing Athens save (STORY → CONTINUE, the page reloads into Athens)
   await tap('#hcStory');await tick(10);await tap('#slotList .go');
   for(let i=0;i<120;i++){try{if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}catch(e){await p.waitForTimeout(2000)}}await p.evaluate(()=>{window.__auto=false});
-  for(let i=0;i<30;i++){await tick(30);if(!(await tapThrough()))break}
+  let tutTiny=null;for(let i=0;i<30;i++){await tick(30);if(!tutTiny&&await center('#roamTut')){tutTiny=(await p.evaluate(LAYOUT)).tiny;await shot(city+'_tutorial')}if(!(await tapThrough()))break}
   await p.evaluate(MON);ttl(city+' in roam');
   // scale + layout at the start
-  const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
+  const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny.concat(tutTiny||[])),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
   // ---- the drive: human driver
   const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
   const frames=MIN*3600;let f=0,lastLay=0,shotN=0,nextShot=frames/4;let extra={map:null,pause:null,garage:null,otg:null};
@@ -172,7 +175,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
     reloads++;events.push('RELOAD@'+f);if(snap)parts.push(snap);snap=null;for(const k in F)delete F[k];Object.assign(ctl,{steer:0,gas:false,brake:false,drift:false,boost:false});
     for(let i=0;i<90;i++){try{await p.waitForTimeout(2000);const st2=await p.evaluate(()=>window.__mho&&__mho.state);if(st2==='roam')break;if(st2==='menu'){await tap('#hcStory');await tick(10);await tap('#slotList .go')}}catch(_){}}
     await p.evaluate(()=>{window.__auto=false});await shot(`${city}_reload${reloads}`);await p.evaluate(MON);lastSnap=f;f+=60;continue}}
-  ttl(city+' drive done');await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
+  ttl(city+' drive done');await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);st.wallList=(st.allHits||[]).filter(h=>h.kind==="wall");delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
   const perf=await p.evaluate(()=>{const r=__dbg.renderer;window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;r.info.autoReset=false;r.info.reset();__tick(1);r.info.autoReset=true;window.__shooting=0;const i=r.info.render;const o={calls:i.calls,tris:i.triangles,jsMs:+__mho.PERF.js.toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures};window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{};return o});
   ttl(city+' end');cityRes[city]={...st,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,wallSec:Math.round((Date.now()-T0)/1000)};
   console.log(mode,city,JSON.stringify(cityRes[city]));
