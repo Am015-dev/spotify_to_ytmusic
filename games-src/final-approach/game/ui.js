@@ -1640,9 +1640,9 @@ function pxFitBg() {
   s.width = tw * k; s.height = th * k; s.x = (PX.w - s.width) / 2; s.y = (PX.h - s.height) / 2;
 }
 function tableApply() {
-  const R = document.documentElement, id = unl('table'), f = id && /^(night-lake|storm|valley)$/.test(id) ? 'table-' + id : '';
-  const key = f || 'default'; if (key === tblCur) return;
-  if (!f) { tblCur = key; tblTex = null; R.style.removeProperty('--tbl-img'); R.classList.remove('tbl'); try { if (PX.on && PX.bgS) { PX.bgS.texture = PX.tex.plate; pxFitBg(); PX.dirty = true; } } catch (e) { } return; }
+  const R = document.documentElement, id = unl('table'), skin = id && /^(night-lake|storm|valley)$/.test(id);
+  const f = skin ? 'table-' + id : 'table-default' + (innerHeight > innerWidth ? '-phone' : '');   // no unlock yet: the painted default desk (a portrait file on a phone held upright)
+  const key = f; if (key === tblCur) return;
   const im = new Image();
   im.onload = () => {
     tblCur = key; R.style.setProperty('--tbl-img', 'url(' + MEDIA + f + '.webp)'); R.classList.add('tbl');
@@ -1651,7 +1651,7 @@ function tableApply() {
   im.src = MEDIA + f + '.webp';
 }
 // the Pixi plate may start after the skin loaded: re-apply once it exists
-function tableRetry() { try { if (tblCur !== 'default' && tblCur && !tblTex && PX.on && PX.bgS) { const k = tblCur; tblCur = ''; tableApply(); if (tblCur !== k) tblCur = k; } } catch (e) { } }
+function tableRetry() { try { if (tblCur && !tblTex && PX.on && PX.bgS) { const k = tblCur; tblCur = ''; tableApply(); if (tblCur !== k) tblCur = k; } } catch (e) { } }
 // ---- crew-card back: the default back, or the Spires back once unlocked (shown on the pass-the-device screen)
 const cardBackFile = () => unl('cardback') === 'spires' ? 'back-spires' : 'back-default';
 function cardBackImg() { const i = h('img.cback', { src: MEDIA + cardBackFile() + '.webp', alt: '', draggable: 'false' }); i.onerror = () => i.remove(); return i; }
@@ -1663,7 +1663,7 @@ function endBanner() {
 }
 // ---- music: five slots (Menu, Flight, Last round, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / all / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Flight'], ['fight', 'Last round'], ['victory', 'Landed'], ['defeat', 'Crashed']];
-const MTITLE = { 'tavern-a': 'Boarding Pass Daydream', 'tavern-b': 'Wanderlust Departures', 'main-a': 'Holding Pattern', 'main-b': 'Felt Keys and Flight Paths', 'fight-a': 'Runway Lights', 'fight-b': 'Ninety Seconds Out', 'victory-a': 'Applause at Altitude', 'victory-b': 'Homecoming Fanfare', 'defeat-a': 'Deflating Plink', 'defeat-b': 'Oops, Trombone' };
+const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Holding Pattern', 'main-b': 'Felt Keys and Flight Paths', 'fight-a': 'Runway Lights', 'fight-b': 'Ninety Seconds Out', 'victory-a': 'Applause at Altitude', 'victory-b': 'Homecoming Fanfare', 'defeat-a': 'Deflating Plink', 'defeat-b': 'Oops, Trombone' };
 const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, flight and last-round tracks), a new one every ~2.5 min
