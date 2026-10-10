@@ -1,6 +1,20 @@
 [
  {
   "date": "2026-10-10",
+  "game": "thornbound",
+  "title": "Bigger PC layout",
+  "items": [
+   "Painted throne and score track",
+   "Shorter menu music loops",
+   "On a computer the right side is now a table: the Great Road cards on offer sit big in the middle",
+   "Your hand is big along the bottom and lifts when you hover",
+   "Bigger rival strip with larger bid cards",
+   "The hand no longer disappears during the Great Road step"
+  ],
+  "check": "Open Thornbound on a PC and bid a card"
+ },
+ {
+  "date": "2026-10-10",
   "game": "shelf",
   "title": "Shelf: What's new panel",
   "items": [
@@ -107,16 +121,6 @@
    "Shorter menu music loops"
   ],
   "check": "Start a game and look at the places and events."
- },
- {
-  "date": "2026-10-10",
-  "game": "thornbound",
-  "title": "Thornbound: painted throne and track",
-  "items": [
-   "Painted throne and score track",
-   "Shorter menu music loops"
-  ],
-  "check": "Start a game and look at the throne."
  },
  {
   "date": "2026-10-10",
