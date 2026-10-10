@@ -51,6 +51,13 @@ SB_ui=(f=>function(){const r=f.apply(this,arguments);const n=FB_nm(),e=$('#sbG .
 // no bare street chassis plate under a boat / off-road ride
 GB_attach=(f=>function(g,bricks,fig,cache,bp){const r=f.apply(this,arguments);if(FB.s&&bp&&g===GB.mesh&&!(bricks||[]).some(CR_isW)){const U=g.userData,o=U.gbM&&U.gbM[0];
  if(o&&o.userData.gb&&!o.userData.gbc&&o.material===GB_MAT){(U.carG||U.m).remove(o);U.gbM.shift()}}return r})(GB_attach);
+// BUILD camera fits the ride (reviewer: long boats looked small): distance from the ride's own length / width, aimed at its middle height
+// (boat hulls sit below the street car's plate line, so the street camera aimed above them)
+const FB_box=()=>{let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,y0=1e9,y1=-1e9;for(const b of GB_list()){const P=GB_PC[b.t];if(!P)continue;const[fw,fd]=GB_dims(b);
+ x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+fw);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd);y0=Math.min(y0,b.y);y1=Math.max(y1,b.y+P.h)}return x0>1e8?null:{w:x1-x0,l:z1-z0,y0,y1}};
+BC_gk=(f=>function(){if(!FB.s)return f.apply(this,arguments);const B=FB_box();return B?clamp(Math.max(B.l/19,B.w/10),.8,1.6):1})(BC_gk);
+GB_cam=(f=>function(){const r=f.apply(this,arguments);if(!FB.s||!GB_.bk||!GB.mesh||!GB.mesh.userData.m)return r;const B=FB_box();if(!B)return r;const m=GB.mesh.userData.m,
+ dy=m.localToWorld(V3(0,(B.y0+B.y1)/2*GB_PH,0)).y-m.localToWorld(V3(0,6*GB_PH,0)).y;if(Math.abs(dy)>.05){GB.cam.position.y+=dy;GB.cam.updateMatrixWorld()}return r})(GB_cam);
 // RIDES cards: ✎ BUILD + ▶ GUIDE on owned OFF-ROAD / WATER cards too
 GAR_tab=(f=>function(){FB_wrap();f();try{const C=$('#g9Col'),fm=G9C.type;if(!C||fm==='car')return;for(const c of C.querySelectorAll('.g9Card:not(.lock)')){if(c.querySelector('[data-fbb]'))continue;
   c.insertAdjacentHTML('beforeend',`<button class="g9Ed" data-fbb="${c.dataset.gc}">✎ BUILD</button><button class="g9Ed sbGo" data-fbg="${c.dataset.gc}">▶ GUIDE</button>`)}
