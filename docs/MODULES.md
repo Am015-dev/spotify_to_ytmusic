@@ -72,7 +72,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ld | `98ld_stub.js` | 1 | LDM (v89v, 2026-10-10). Coordinator: "move all LDraw model data OUT of overdrive.html into models.js next to km.js" (page ≤ 3.5 MB, flat as models grow). The da |
 | 98ld | `98ld_import.js` | 17 | LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds". Real LEGO builds come in as LDra |
 | 98ld | `98ld_w.js` | 7 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
-| 98ld | `98ld_l_land.js` | 19 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
+| 98ld | `98ld_l_land.js` | 21 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
 | 98ld | `98ld_run.js` | 4 | LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module (window.__LDQ, r |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 99c | `99c_checklist.js` | 41 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
@@ -341,9 +341,9 @@ uses: 92(50), 93(33), 20(15), 53(11), 98(8), 98ld(7), 98gb(6), 41(5), 30(3), 70(
 defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_spot LDW_build
 uses: 20(18), 92(17), 30(16), 53(13), 98ld(12), 93(8), 10(7), 98ld(6), 70(6), 51(4)
 
-## 98ld_l_land.js — 19 KB
+## 98ld_l_land.js — 21 KB
 defines: LDS LDS_lathe LDS_tri LDS_lamp LDS_fence LDS_crate LDS_fit LDS_planter LDS_dumpster LDS_lth LDS_fitH LDS_cone LDS_barrier LDS_clight LDS_sign LDS_rock LDS_palm LDS_scan LDS_ab
-uses: 30(20), 53(20), 20(11), 10(11), 60(10), 97(8), 70(3), 98ld(3)
+uses: 30(23), 53(20), 60(14), 10(12), 20(11), 97(8), 70(3), 98ld(3)
 
 ## 98ld_run.js — 4 KB
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
