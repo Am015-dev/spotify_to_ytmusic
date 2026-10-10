@@ -5,7 +5,7 @@
 const LDW_P=[],LDW={on:[],lod:60};
 // meshes of the w data modules (they load after 98ld_import.js registered LD_MESH): register them as hidden garage parts
 function LDW_reg(){for(const k in LD_MESH)if(!GB_PC[k]){const D=LD_MESH[k];GB_PC[k]={n:D.n.replace(/^~/,''),w:D.w,d:D.d,h:D.h,cat:'LDraw',ic:'◆',hide:1,s:D.s.some(q=>!q[3])};G13_ID[k]=D.id}}
-function LDW_geo(B){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}return[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]).concat((G.w||[]).map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return[g,GB_MAT]}))}// wheels (carts, trailers) as their own meshes
+function LDW_geo(B){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);/* build-6: hidden studs/faces + slivers, like the bank */return[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]).concat((G.w||[]).map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return[g,GB_MAT]}))}// wheels (carts, trailers) as their own meshes
 function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_SW*(P.s||(P.water?1:LD_FIG));/* v89w: buildings at minifig scale (LD_FIG, 98ld_import.js) *//* P.s: scale up micro-scale sets */const B=LD_br(P.model),near=LDW_geo(B),
   far=LDW_geo(B.filter(b=>{const Q=GB_PC[b.t];return Q&&Q.w*Q.d*Q.h>=(P.lodv||9)}));
  const box=new THREE.Box3();for(const[g]of near){g.computeBoundingBox();box.union(g.boundingBox)}const c=box.getCenter(new THREE.Vector3());
@@ -14,7 +14,7 @@ function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_S
  const k=GB_U*SW,hw=Math.max(.3,(x1-x0)*k/2-.2),hd=Math.max(.3,(z1-z0)*k/2-.2),ox=((x0+x1)/2)*GB_U*SW-c.x*SW,oz=((z0+z1)/2)*GB_U*SW-c.z*SW;
  const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:(CID==='fra'?{x:2061,z:0}:{x:0,z:0}),a0=(P.a||0)*Math.PI/180;
  if(P.water)return LDW_boat(P,near,far,box,c,hw,hd,st,a0);
- const S=LDW_spot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),Math.max(hw,hd)+.5,Math.min(hw,hd)+.5,P.road||10);if(!S)return;const best=S.yaw;
+ /* v90a: the road setback uses the WHOLE scaled model (baseplate, low parts) as x/z half-sizes, not the tall-part collider: 6362's base slab sat on the kerb */const fw=(box.max.x-box.min.x)*SW/2,fd=(box.max.z-box.min.z)*SW/2,S=LDW_spot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),fw+.5,fd+.5,P.road||10);if(!S)return;const best=S.yaw;
  const a=best*Math.PI/2,y=groundY(S.x,S.z)-(P.sink||0)*SW*GB_PH;
  const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(SW,SW,SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
  const E={id:P.model,x:S.x,z:S.z,near:[],far:[],tris:0,ftris:0};
@@ -37,9 +37,15 @@ function LDW_spot(x0,z0,hw,hd,road){for(let r=12;r<400;r+=6)for(let a=0;a<36;a++
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;if(!ok)continue;
    for(const q of[0,1,2,3]){if(q%2!==rot)continue;const A=q*Math.PI/2,fx=-Math.sin(A),fz=-Math.cos(A);let hit=0;
     for(let k=1;k<=road;k++){const px=x+fx*(hd+k),pz=z+fz*(hd+k);if(roamHit(px,pz,.5))break;if(FL_road(px,pz,0)){hit=1;break}}if(hit)return{x,z,rot,yaw:q}}}}return null}
-function LDW_build(){if(!HUB.grp||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}}
+// v89z: the city's prop models load first (models/<id>.js, 98ld_run.js), then build; a city switch meanwhile drops the stale build
+function LDW_build(){if(!HUB.grp||LDW.on.length||LDW.busy===HUB.grp)return;const g=HUB.grp,cid=CID;LDW.busy=g;
+ LD_need(LDW_P.filter(P=>P.city===cid).map(P=>P.model)).then(()=>{if(LDW.busy===g)LDW.busy=0;if(HUB.grp!==g||CID!==cid||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}})}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);LDW_build();return r})(buildRoam);
 // LOD: after the hub cull, near mesh within LDW.lod m of the camera, big-parts mesh beyond
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDW.on.length)return;const cx=camera.position.x,cz=camera.position.z;
  for(const E of LDW.on){const d=Math.hypot(E.x-cx,E.z-cz),n=d<LDW.lod;for(const o of E.near)o.visible=n;for(const o of E.far)o.visible=!n&&d<(o.userData.cd||900)}})(hubCullStep);
 window.__ld.w=LDW;window.__ld.wp=LDW_P;window.__ld.wbuild=LDW_build;window.__ld.wreg=LDW_reg;
+// test hook (v90a): every LEGO prop's world box (all parts, baseplate included) vs the road: samples on the road (FL_road, 0 / 1.5 m margin)
+window.__ld.wroad=()=>{const out=[],chk=(id,objs)=>{if(!objs||!objs.length)return;const B=new THREE.Box3();for(const o of objs){o.geometry.computeBoundingBox();B.union(o.geometry.boundingBox)}let n=0,on=0,near=0;
+ for(let x=B.min.x;x<=B.max.x;x+=.5)for(let z=B.min.z;z<=B.max.z;z+=.5){n++;if(FL_road(x,z,0))on++;else if(FL_road(x,z,1.5))near++}out.push({id,x0:+B.min.x.toFixed(1),x1:+B.max.x.toFixed(1),z0:+B.min.z.toFixed(1),z1:+B.max.z.toFixed(1),n,on,near})};
+ for(const E of LDW.on)if(!E.water)chk(E.id,E.near);if(typeof LDP!=='undefined')chk('bank',LDP.g);if(typeof LD_PROPS!=='undefined')for(const q of LD_PROPS)chk(q.id,q.g);return out};

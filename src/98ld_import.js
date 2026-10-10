@@ -114,8 +114,9 @@ function LD_propMake(P,B,nm){const SW=LD_SW*LD_FIG,lo=CR_LO;let G;CR_LO=2;try{G=
  HUB.bld.push(col);hubGridAdd([col]);P.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};P.col=col}
 // v89v: more world props (one entry per converted building; each placed on the next free lot from the start, the bank first)
 const LD_PROPS=[{id:'cgarage',nm:'ld_cgarage',br:()=>LD_br('cga').concat(LD_br('cgb'))}];
-function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;LD_propMake(LDP,LD_br('bank'),'ld_bank');
- for(const q of LD_PROPS){if(q.g)continue;try{LD_propMake(q,q.br(),q.nm)}catch(e){console.warn('LD prop',q.id,e)}}}
+function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp||LDP.busy===HUB.grp)return;const g=HUB.grp;LDP.busy=g;// v89z: models load first (98ld_run.js)
+ LD_need(['bank','cga','cgb']).then(()=>{if(LDP.busy===g)LDP.busy=0;if(CID!=='fra'||LDP.g||HUB.grp!==g)return;try{LD_propMake(LDP,LD_br('bank'),'ld_bank')}catch(e){console.warn('LD prop bank',e)}
+ for(const q of LD_PROPS){if(q.g)continue;try{LD_propMake(q,q.br(),q.nm)}catch(e){console.warn('LD prop',q.id,e)}}})}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{LD_propBuild()}catch(e){console.warn('LD prop',e)}return r})(buildRoam);
 window.__ld.grpLo=(B,lv)=>{const l=CR_LO;CR_LO=lv||2;try{const G=GB_geo(B,null),g=new THREE.Group();G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);if(G.m)g.add(new THREE.Mesh(G.m,GB_MAT));if(G.l)g.add(new THREE.Mesh(G.l,GB_LMAT));if(G.g)g.add(new THREE.Mesh(G.g,CR_GM));return g}finally{CR_LO=l}};// test hook: a prop as the world builds it (CR_LO 2)
 window.__ld.fig=()=>{const M=[],L=[];GB_figGeo(GB_figGet(),M,L,false);const g=new THREE.Group();if(M.length)g.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)g.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));return g};window.__ld.SW=LD_SW;window.__ld.FIG=LD_FIG;// test hooks: a standing game minifig, the scales
