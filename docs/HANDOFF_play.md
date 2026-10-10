@@ -50,3 +50,25 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
   look at the game side: the Athens lawns between road and blocks invite corner-cutting at chase speed.
 - Garage/team panel text at 11 px (`gH`, `.rnd`) showed once after a fresh Frankfurt start (tPlay tiny list).
 - After the PASS: merge the latest live src (alex/od-mem may land first), OD_CHANGELOG v89l entry, `tools/build.sh v89l`, push out/v89l, DEPLOY.
+
+## Session 2 (2026-10-10): Part A done, REVIEW sent (84dcb6d); Part B root cause found, NOT fixed
+- DRIFT stays hidden (coordinator: 5-button rule). Drift = GAS on + steer + hold BRAKE 0.35 s (TUNE.gbHold .6 → .35, also src/assets/tune.json).
+  At .6 the brake bled speed under B2K_DMIN (43 km/h) first, so touch drift only started above ~80 km/h (play/driftprobe.js). Now from ~55 km/h;
+  a ≤0.3 s tap still only brakes (v88g). All DRIFT texts name the gesture; v88g changelog line reworded; checklist item drift-brake (v89l).
+- tPlay accepts DRIFT 'hidden' in the rotation check. Gate shots + tyre gap (0.03 m): play/shots_v89l2/ (qa89i/stdrun.js ATH=1 + qa89i/live.js).
+- tPlay v89l (qa_p89l): stuck Fra 3.0 / Ath 5.6 %, walls Fra 1.49 / Ath 2.98 per min, 0 errors.
+- After PASS: merge live src (check alex/od-mem, alex/od-nits), OD_CHANGELOG v89l entry, tools/build.sh v89l, push out/v89l, DEPLOY to coordinator.
+
+### Part B root cause (Athens wall hits + Athens stuck), from qa_p89l/phone-ath + play/colprobe.js + play/spotprobe.js
+- ALL 12 Athens wall hits and ALL 5 stuck episodes in this run were within 130 m of Eleni's Garage (building centre 2036.6,-1617.7,
+  collider hw 18 hd 11 → south face z -1628.7). The garage mark (ring r 9, card opens only at d<11 AND v<7 km/h) sits at z-20 = 9 m in
+  front of the wall, right at the road edge. The arrow (RO.near = nearest unvisited mark) keeps pointing at the garage until its card is
+  opened, so the bot drives at the ring at 40-50 km/h, overshoots into the wall (3 hits at z -1631), circles the block (hits on the ab:1
+  houses at x 1919-1990, z -1600..-1670, 5-20 m off the road) and comes back; it stops at the gate for 2.5 s (stuck). Wall shots:
+  qa_p89l/phone-ath/phone_ath_wallhit1-2.jpg ("Eleni's Garage → 12 m"). A person would stop on the ring or tap TAP TO OPEN.
+- Glancing hits already slide (roamBounce keeps sp*(1-.6a²)); a tPlay "wall hit" needs drop > 0.4, i.e. > ~55° head-on, so rounded
+  colliders alone will not move the number.
+- Proposed fix (not started): (1) game: deeper forecourt for Eleni's garage (mark ≥ 18 m from the wall) and/or a pit-lane slow-down inside
+  garage/flight rings so the car stops on the pad and the card opens; (2) tPlay: when the arrow target is a mark < 40 m away, brake to stop
+  in its ring like a person (or tap #roamPrompt). Then re-measure Athens over 3 runs (target ≤ 0.8/min); the earlier hillside-grid and
+  ring-challenge hits (HANDOFF above) still need a look after this cluster is gone.
