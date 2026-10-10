@@ -22,7 +22,7 @@ const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck
  const Q=__Q;let sm0=null;
  window.__mon=()=>{if(M.state!=='roam'){const on=!!(M.LD&&M.LD.on);if(on&&!Q.ldOn){Q.ld++;Q.ldT.push(Q.f)}Q.ldOn=on;return}
   Q.f++;const on=!!(M.LD&&M.LD.on)||!!document.querySelector('#loading:not([hidden]),#ldScreen:not([hidden])');if(on&&!Q.ldOn){Q.ld++;Q.ldT.push(Q.f)}Q.ldOn=on;
-  const busy=R.card||R.mapOpen||R.story||R.frozen||R.wk||on||!document.querySelector('#settings').hidden;const v=Math.abs(R.v||0);
+  const busy=window.__rotTrip||R.card||R.mapOpen||R.story||R.frozen||R.wk||on||!document.querySelector('#settings').hidden;const v=Math.abs(R.v||0);
   const ch=R.ch||R.sp;if(!!ch!==!!Q.ch){if(ch)Q.ev.push({f:Q.f,start:(ch.m&&ch.m.ev&&(ch.m.ev.name||ch.m.ev.id))||ch.kind||'event'});else{const r=document.querySelector('#chRes');Q.ev.push({f:Q.f,end:r&&!r.hidden?r.textContent.trim().slice(0,60):'(no result)'})}Q.ch=ch}
   Q.hist.push(v);if(Q.hist.length>8)Q.hist.shift();Q.yh.push(R.y-M.gnd(R.x,R.z,R.y+.3));if(Q.yh.length>12)Q.yh.shift();Q.bh.push(!!R.boosting);if(Q.bh.length>10)Q.bh.shift();if(Q.f%6===0)Q.y0=R.y;
   const sm=M.HUB.smashed||0;if(sm0==null)sm0=sm;if(sm>sm0){Q.smash+=sm-sm0;Q.smashF=Q.f}sm0=sm;
@@ -129,7 +129,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   // scale + layout at the start
   const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny.concat(tutTiny||[])),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
   // ---- the drive: human driver
-  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
+  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let avoid=0,seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
   const frames=MIN*3600;let f=0,lastLay=0,shotN=0,nextShot=frames/4;let extra={map:null,pause:null,garage:null,otg:null};
   const parts=[];let reloads=0,snap=null,lastSnap=0;
   while(f<frames){try{
@@ -168,8 +168,8 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    if(Math.abs(ae)>.45&&Math.abs(ae)<1.1&&o.v>23&&f-driftT>900){driftT=f}if(f-driftT<50&&Math.abs(ae)>.2)c.drift=true;
    // stuck like a person: after 1.5 s at a standstill, reverse with opposite lock for 1.2 s
    if(Math.abs(s.v)<1.4&&!s.cd)stuckT+=6;else stuckT=0;  // waiting for GO is not being stuck
-   if(stuckT>90&&f>revT+150){revT=f;stuckT=0}
-   if(f-revT<72){c.gas=false;c.brake=true;c.boost=false;c.drift=false;c.steer=ae>0?1:-1}
+   if(stuckT>90&&f>revT+150){revT=f;stuckT=0;avoid=await p.evaluate(([x,z,h,y])=>{const fr=a=>{let d=2;for(;d<16;d+=2)if(__mho.roamHitAt(x+Math.sin(h+a)*d,z+Math.cos(h+a)*d,1.6,y+.5))break;return d};return fr(.8)>=fr(-.8)?-1:1},[s.x,s.z,s.h,s.y])}  // a person backs off, then turns towards the open side
+   if(f-revT<72){c.gas=false;c.brake=true;c.boost=false;c.drift=false;c.steer=ae>0?1:-1}else if(f-revT<132&&avoid)c.steer=avoid;
    if(process.env.DEBUG&&f%120===0)console.log('dbg',f,JSON.stringify({x:Math.round(s.x),z:Math.round(s.z),v:Math.round(s.v*3.6),arr:s.arr&&[Math.round(s.arr.x),Math.round(s.arr.z),Math.round(s.arr.d)],dest:dest&&dest.map(Math.round),kind:destKind,los,rl:route&&route.length,bi,bd:Math.round(bd),ae:+ae.toFixed(2),c}));
    await apply(c);await tick(6);f+=6;
    if(f-lastLay>=300){lastLay=f;lay=await p.evaluate(LAYOUT);const nw=lay.ov.filter(x=>!ovAll.has(x));lay.ov.forEach(x=>ovAll.add(x));lay.tiny.forEach(x=>tinyAll.add(x));const nh=lay.hud.filter(x=>!hudAll.has(x));lay.hud.forEach(x=>hudAll.add(x));if(nh.length&&shotN<6){shotN++;await shot(`${city}_hud${shotN}`)}if(nw.length&&shotN<4){shotN++;await shot(`${city}_overlap${shotN}`)}}
@@ -186,7 +186,8 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
  // ---- side trips (all through visible UI)
  // rotation: portrait ↔ landscape 3× mid-drive (iOS order: orientationchange, then the size arrives late), one rotation with GAS held,
  // then iOS's lost touchcancel (a finger id left behind). Afterwards every control must answer a fresh touch and nothing may stay latched.
- async function rotTrip(){const r={steps:[]};const L={width:852,height:393},P={width:393,height:852};
+ async function rotTrip(){const r={steps:[]};await p.evaluate(()=>window.__rotTrip=1);  // the rotation side trip is not drive time (like map / pause / garage)
+ const L={width:852,height:393},P={width:393,height:852};
   const rot=async v=>{const land=v.width>v.height;await p.evaluate(()=>dispatchEvent(new Event('orientationchange')));await tick(6);
    await cdp.send('Emulation.setDeviceMetricsOverride',{width:v.width,height:v.height,deviceScaleFactor:3,mobile:true,screenOrientation:land?{type:'landscapePrimary',angle:90}:{type:'portraitPrimary',angle:0}});
    await p.evaluate(()=>{dispatchEvent(new Event('resize'));window.visualViewport&&visualViewport.dispatchEvent(new Event('resize'))});await tick(60);await p.waitForTimeout(900);await tick(6)};
@@ -198,7 +199,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    await gap(450);return cov||(on?'ok':'NO RESPONSE')};
   r.ctl={'◀':await probe('#tL',()=>__mho.touch.dir===-1),'▶':await probe('#tR',()=>__mho.touch.dir===1),GAS:await probe('#tG',()=>!!__mho.touch.gas),BRAKE:await probe('#tB',()=>!!__mho.touch.brake||!!__mho.touch.park),BOOST:await probe('#tN',()=>!!__mho.touch.boost),DRIFT:await probe('#tD',()=>!!__mho.touch.hb)};
   r.stuck=await p.evaluate(()=>{const T=__mho.touch;return['gas','brake','boost','hb'].filter(k=>T[k]).concat(T.dir?['dir']:[],T.bz!=null&&T.bz!==7?['bz']:[])});
-  r.vp=await p.evaluate(()=>[innerWidth,innerHeight,__dbg.renderer.domElement.width,__dbg.renderer.domElement.height]);await shot('after_rotation');return r}
+  r.vp=await p.evaluate(()=>[innerWidth,innerHeight,__dbg.renderer.domElement.width,__dbg.renderer.domElement.height]);await shot('after_rotation');await p.evaluate(()=>window.__rotTrip=0);return r}
  async function mapTrip(){const r={opened:false,drag:null,pinch:null};if(!(await tap('#roamMapBtn')))return r;await tick(20);r.opened=await p.evaluate(()=>!!__mho.RO.mapOpen);const c=await center('#roamMapC');if(!c)return r;
   const st0=await p.evaluate(()=>({z:__mho.RO.mapZ,c:__mho.RO.mapC&&[Math.round(__mho.RO.mapC.x),Math.round(__mho.RO.mapC.z)]}));
   if(phone){await down('m1',c);for(let i=1;i<=8;i++){await move('m1',[c[0]-i*15,c[1]-i*8]);await tick(2)}await up('m1');await tick(6);
