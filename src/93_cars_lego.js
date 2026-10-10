@@ -401,7 +401,7 @@ function CR_yaw(c,dt,ytg,maxR,air){const v=RO.v||0,sp=Math.abs(v),st=clamp(c.ste
 const CR_roll=()=>clamp(-(RO.yr||0)*(RO.v||0)/26,-1,1)*.055;
 const CR_PS={};
 function CR_bodyPts(ud){const host=ud.m,key=host.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:'');if(CR_PS.k===key)return CR_PS.p;
- const inv=new THREE.Matrix4().copy(host.matrixWorld).invert(),B=new THREE.Box3(),bb=new THREE.Box3(),m4=new THREE.Matrix4();host.updateMatrixWorld(true);
+ host.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(host.matrixWorld).invert(),B=new THREE.Box3(),bb=new THREE.Box3(),m4=new THREE.Matrix4();// size-1: world matrices first, then the inverse (a stale inverse gave Athens rides 10 m long / negative width)
  host.traverse(o=>{if(!o.isMesh||o.userData.r)return;let v=true,q=o;while(q&&q!==host){if(!q.visible)v=false;q=q.parent}if(!v||o.material&&(o.material.transparent||o.material.depthWrite===false))return;
   if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(m4.multiplyMatrices(inv,o.matrixWorld));B.union(bb)});
  const P=[];if(!B.isEmpty())for(const x of[B.min.x,(B.min.x+B.max.x)/2,B.max.x])for(const z of[B.min.z,(B.min.z+B.max.z)/2,B.max.z])if(x!==(B.min.x+B.max.x)/2||z!==(B.min.z+B.max.z)/2)P.push(new THREE.Vector3(x,B.min.y,z));
