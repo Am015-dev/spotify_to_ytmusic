@@ -4,7 +4,7 @@ Brief (coordinator, Alex's own request, freeze-exempt): "now we have a big varie
 ## Shipped in v90b: TRAFFIC (CT)
 - HCAR slots are swapped to kinds `ld:<class>:<model>` (CT_SWAP). The class stays in the name, so QS speeds (/truck|delivery|bus/) and SC caps still work.
   Frankfurt: sedan→6633 Family Car, hypercar→75878, taxi→40468 taxi (TX_CAR), van→7731 mail van, truck→3221 big rig, delivery→60054 service van,
-  police→4436 patrol car, coupe→75893 Charger. Athens: taxi→40468, sedan→6633, van→7639 camper, coupe→75893 Charger, delivery→60054, hypercar→75892.
+  police→4436 patrol car, coupe→75893 Charger. Athens: taxi→40468, sedan→6633, van→7639 camper, delivery→60054, hypercar→75892 (coupe slot kept, see OPEN).
   Bus, trolleybus, scooters and the two 98su street racers are unchanged. Same slot count = same draw calls.
 - CR_cityGeo is wrapped: one merged body (CR_LO 2 + LD_cull), wheels, glass; scaled uniformly to a class width (CT_W; Town sets are 4–6 wide).
   Real set colours (no per-instance paint, CR_cityPost wrapped). Far LOD = the existing 98wb vertex-clustered copy. Collision: OB_cdim (90) asks CT_dim first
