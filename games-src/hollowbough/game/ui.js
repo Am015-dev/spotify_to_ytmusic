@@ -265,7 +265,7 @@ function tileInfo(kind, i) {
 }
 function tileFace(t, big) {
   const px = big ? 28 : (t.ip || 20); let f = h('div.face');
-  const key = t.kind === 'basic' ? D.basic[t.i].key : t.kind === 'forest' ? D.forest[G.forest[t.i]].key : '';
+  const key = t.kind === 'basic' ? D.basic[t.i].key : t.kind === 'forest' ? D.forest[G.forest[t.i]].key : t.kind === 'bev' ? D.basicEvents[G.bev[t.i].k].key : t.kind === 'sev' ? D.specialEvents[G.sev[t.i].k].key : '';
   f.innerHTML = spotArt(t.kind, key, t.i);
   switch (t.kind) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
@@ -1254,6 +1254,8 @@ function pennantArt(special) {
 }
 // the drawing under a place's icons
 function spotArt(kind, key, i) {
+  const ph = key && HBKit.paintedHref ? HBKit.paintedHref(key) : null;
+  if (ph) return '<img class="art pa" src="' + ph + '" alt="" draggable="false">';
   switch (kind) {
     case 'basic': return SVGH('0 0 100 64', (ART_BASIC[key] || ART_BASIC.basic_twig_heap)());
     case 'forest': return SVGH('0 0 64 64', canopyArt(i));
@@ -1298,7 +1300,7 @@ function sceneSVG(R) {
   }
   o.push('</g>');
   // the meadow bench
-  if (R.bench) { const b = R.bench; o.push('<rect x="' + (b.x + 2) + '" y="' + (b.y + 4) + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="rgba(0,0,0,.28)"/><rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="#b98650" stroke="#5a3b1d" stroke-width="3"/>'); for (let y = b.y + 14; y < b.y + b.h - 4; y += 15) o.push('<path d="M' + (b.x + 6) + ' ' + y + 'H' + (b.x + b.w - 6) + '" stroke="#8a5f30" stroke-width="1.500" opacity=".55"/>'); }
+  if (R.bench) { const b = R.bench; o.push('<g class="bnch">'); o.push('<rect x="' + (b.x + 2) + '" y="' + (b.y + 4) + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="rgba(0,0,0,.28)"/><rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="#b98650" stroke="#5a3b1d" stroke-width="3"/>'); for (let y = b.y + 14; y < b.y + b.h - 4; y += 15) o.push('<path d="M' + (b.x + 6) + ' ' + y + 'H' + (b.x + b.w - 6) + '" stroke="#8a5f30" stroke-width="1.500" opacity=".55"/>'); o.push('</g><image class="bnch-img" href="media/bench.webp" x="' + (b.x - 4) + '" y="' + (b.y - 6) + '" width="' + (b.w + 8) + '" height="' + (b.h + 12) + '" preserveAspectRatio="none"/>'); }
   // the rope the event pennants hang from, between two posts
   if (R.rope) {
     const rp = R.rope, y = rp.y; let d = 'M6 ' + y;
@@ -1306,7 +1308,7 @@ function sceneSVG(R) {
     d += 'Q' + ((rp.xs[rp.xs.length - 1] + w - 6) / 2).toFixed(1) + ' ' + (y + 4) + ' ' + (w - 6) + ' ' + y;
     o.push('<rect x="1" y="' + (y - 6) + '" width="7" height="' + (rp.h + 10) + '" rx="3" fill="#7a5632" stroke="' + K_INK + '" stroke-width="2"/><rect x="' + (w - 8) + '" y="' + (y - 6) + '" width="7" height="' + (rp.h + 10) + '" rx="3" fill="#7a5632" stroke="' + K_INK + '" stroke-width="2"/><path d="' + d + '" fill="none" stroke="#5a3b1d" stroke-width="3" stroke-linecap="round"/>');
   }
-  o.push('<rect width="' + w + '" height="' + hh + '" fill="url(#vg)"/>');
+  o.push('<rect class="gvig" width="' + w + '" height="' + hh + '" fill="url(#vg)"/>');
   return '<svg class="scsvg" viewBox="0 0 ' + w + ' ' + hh + '" width="' + w + '" height="' + hh + '" aria-hidden="true" focusable="false">' + o.join('') + '</svg>';
 }
 // the scene (data-board) and the wooden table under it
@@ -1605,6 +1607,8 @@ function backApply() {
   R.style.setProperty('--back-meadow', 'url(' + MEDIA + 'back-meadow.webp)');
 }
 // ---- tables: painted tree stump behind the board; the CSS green stays while it loads and if the file is missing
+// bench + player mat paintings (transparent): the drawn ones hide once the picture has loaded
+['bench','mat'].forEach(n => { const im = new Image(); im.onload = () => { document.documentElement.dataset[n] = '1'; }; im.src = MEDIA + n + '.webp'; });
 const tblSeen = {}; let tblCur = '';
 function tableApply() {
   const R = document.documentElement, id = unl('table') || 'woodland';

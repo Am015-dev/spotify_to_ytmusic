@@ -573,6 +573,7 @@ const HB = {
   table: (w, h, mood) => { mount(); return parse(svgWrap(w, h, `0 0 ${w} ${h}`, tableSVG(w, h, mood))); },
   tableURL: (mood, w, h) => toURL(svgWrap(w || 1200, h || 800, `0 0 ${w || 1200} ${h || 800}`, DEFS2 + tableSVG(w || 1200, h || 800, mood))),
   applyTable: (el, mood) => { el.style.backgroundColor = mood === 'forest' ? '#6f8f5c' : '#efe3c6'; el.style.backgroundImage = `url("${HB.tableURL(mood)}")`; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; },
+  paintedHref: (key) => paintedHref(key),
   stats: () => Object.assign({ templates: tmpl.size }, stats), clearCache: () => { tmpl.clear(); urlCache.clear(); }
 };
 root.HBKit = HB;
