@@ -3,6 +3,11 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89s',id:'rally-garage',text:'Garage → RIDES → Rally S1: the white/yellow rally car shows with its wing, curved hood and 4 wheels; SAVE & DRIVE works.'},
+ {ver:'v89s',id:'rally-drive',text:'Drive the Rally S1 for a minute: it sits on the road (no floating), steers like the other cars, nothing falls off.'},
+ {ver:'v89s',id:'speedboat',text:'RIDES → WATER → Harbour Speedboat, then drive into the river: the red boat with its driver sits in the water.'},
+ {ver:'v89s',id:'bank',text:'Frankfurt start: the red/white LEGO bank stands on the grass by the road; driving into it you bump its walls, not thin air.'},
+ {ver:'v89s',id:'taxi',text:'RIDES → Yellow Taxi (40468): it looks like the LEGO set and drives normally.'},
  {ver:'v89q',id:'night-blocks',text:'Drive at dusk/night: no pink or white blocks float next to your car or traffic.'},
  {ver:'v89p',id:'night-mem',text:'iPhone: drive 15 min in Frankfurt at dusk/night: no slowdown, no reload.'},
  {ver:'v89o',id:'gar-stop',text:'Drive through Eleni\'s garage ring without stopping: no menu pops up; stop in it: the menu opens.'},
