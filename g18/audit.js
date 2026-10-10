@@ -27,7 +27,7 @@ const ONLY=process.argv[4]?process.argv[4].split(','):null;
  let curTy='car';
  const SH=(process.env.SHARD||'0/1').split('/').map(Number);let ix=-1;
  for(const [id,ty,nm] of L){ix++;if(ix%SH[1]!==SH[0])continue;if(ONLY&&!ONLY.includes(id))continue;const e0=T.errs.length;
-  if(ty!==curTy){await tapSel(`#g9Col [data-gty="${ty}"]`);await p.waitForTimeout(1500);curTy=ty}
+  if(ty!==curTy){await tapSel(`#r2C [data-r2px="${({car:0,off:1,boat:2})[ty]}"]`);await p.waitForTimeout(1500);curTy=ty}
   if(!await tapSel(`#g9Col .g9Card[data-gc="${id}"] img`)&&!await tapSel(`#g9Col .g9Card[data-gc="${id}"]`)){res.push({id,ty,nm,miss:1});continue}
   // model chunk + build-up: wait until nothing is loading and the build-up is over
   for(let i=0;i<40;i++){await p.waitForTimeout(500);const s=JSON.parse(await ev(`JSON.stringify({w:LDL.wait.size,ba:BA.on})`));if(!s.w&&!s.ba&&i>3)break}
