@@ -22,9 +22,9 @@ const LDS_tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
 // street lamp (swap 2): LEGO 2039 Support 2x2x7 Lamppost (as in 10184 Town Plan, CCAL 2.0) + 3062b round brick lamp + 4740 dish shade, one lathe
 // (profile from tools/ld/lProfile.py 2039.dat / 3062b.dat, LDU), 6 sides; replaces the Kenney CC0 'light-curved' (92 tris). Colours by height.
 LDS.L={p:[[25,0],[8,12],[6,150],[10,168],[10,190],[20,192],[20,196],[0,198]],h:6.5,c:[[168,'#3a3f48'],[191,'#ffe9a0'],[999,'#2a2e36']]};
-function LDS_lamp(){const L=LDS.L,k=L.h/198,g=new THREE.LatheGeometry(L.p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),6).toNonIndexed(),p=g.attributes.position,keep=[];
+function LDS_lamp(h,cols){const L=LDS.L,k=(h||L.h)/198,g=new THREE.LatheGeometry(L.p.map(([r,y])=>new THREE.Vector2(r*k,y*k)),6).toNonIndexed(),p=g.attributes.position,keep=[];
  for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()>1e-10)keep.push(a,b,d)}
- const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],C=new THREE.Color();for(let i=0;i<keep.length;i+=3){const ym=(keep[i].y+keep[i+1].y+keep[i+2].y)/3/k;C.set(L.c.find(e=>ym<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
+ const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],C=new THREE.Color();for(let i=0;i<keep.length;i+=3){const ym=(keep[i].y+keep[i+1].y+keep[i+2].y)/3/k;C.set((cols||L.c).find(e=>ym<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
  q.setAttribute('color',new THREE.Float32BufferAttribute(c,3));q.computeVertexNormals();q.computeBoundingBox();q.computeBoundingSphere();return q}
 // park fence (swap 3): LEGO 3633 Fence Lattice 1x4x1 (LDraw part, CCAL 2.0) instead of the Kenney CC0 'fence-1x3' (204 tris): top rail 80x8x20 LDU,
 // end posts, bottom rail and the diamond lattice (4+4 diagonal bars), boxes in LDU from the part file; stretched to the old fence's length.
@@ -32,7 +32,7 @@ function LDS_fence(old){old.computeBoundingBox();const ob=old.boundingBox,ox=ob.
  add(80,8,20,0,20,0);add(4,16,6,-38,8,0);add(4,16,6,38,8,0);add(80,4,6,0,2,0);const L=Math.hypot(18,12)+2,a=Math.atan2(12,18);for(let i=0;i<4;i++){const x=-27+i*18;add(L,2,4,x,10,0,a);add(L,2,4,x,10,0,-a)}
  const g=mergeG(G);
  g.scale(s,Math.min(s,(ob.max.y-ob.min.y)/24),s);if(oz>ox)g.rotateY(Math.PI/2);g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
-ART_trees=(f=>function(D){f.apply(this,arguments);if(CID!=='fra')return;const st={};try{if(D.lamp&&!D.lamp.lds){const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp();D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}}catch(e){console.warn('LDS lamp',e)}try{for(const t in LDS.P){const d=D[t];if(!d)continue;const P=LDS.P[t],old=LDS_tri(d.g);
+ART_trees=(f=>function(D){f.apply(this,arguments);if(CID==='ath'&&D.lamp&&!D.lamp.lds)try{const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp(7.43,LDS.LA);D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';LDS.st=LDS.st||{};LDS.st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}catch(e){console.warn('LDS lamp ath',e)}if(CID!=='fra')return;const st={};try{if(D.lamp&&!D.lamp.lds){const old=LDS_tri(D.lamp.g);D.lamp.gOld=D.lamp.g;D.lamp.mOld=D.lamp.mat;D.lamp.g=LDS_lamp();D.lamp.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:.1});D.lamp.lds='lamp';st.lamp={src:'2039',old,near:LDS_tri(D.lamp.g),far:LDS_tri(D.lamp.g)}}}catch(e){console.warn('LDS lamp',e)}try{for(const t in LDS.P){const d=D[t];if(!d)continue;const P=LDS.P[t],old=LDS_tri(d.g);
   d.gOld=d.g;d.g=LDS_lathe(P.n,8);d.gFar=LDS_lathe(P.f,6);d.lds=t;st[t]={src:P.src,old,near:LDS_tri(d.g),far:LDS_tri(d.gFar)}}}catch(e){console.warn('LDS trees',e)}LDS.st=st;LDS.on=[]})(ART_trees);
 // crate (swap 4): LEGO 61780 Container 2x2x2 Crate (LDraw part, CCAL 2.0): open box of slats, 40x48x40 LDU: floor + 2 rings of 4 slats with the gaps of
 // the part, instead of the Kenney CC0 'box' (124 tris); fitted to the old crate's footprint, reddish brown like the part's usual colour
@@ -57,6 +57,9 @@ function LDS_planter(old){const G=[],B=(w,h,d,x,y,z,c)=>G.push(cbox(w,h,d,x,y,z,
 function LDS_dumpster(old){const G=[],B=(w,h,d,x,y,z,c,rx)=>{const g=new THREE.BoxGeometry(w,h,d);if(rx)g.rotateX(rx);g.translate(x,y,z);G.push(colorize(g,new THREE.Color(c)))};
  B(80,48,40,0,32,0,'#2a7a4a');B(84,4,44,0,59,-2,'#2f3640',-.12);B(84,6,4,0,44,22,'#2a7a4a');B(4,4,8,-40,40,0,'#2f3640');B(4,4,8,40,40,0,'#2f3640');
  for(const x of[-30,30])for(const z of[-14,14])B(8,8,8,x,4,z,'#2f3640');return LDS_fit(G,old,80)}
+// Athens street lamp (swap 8): the same LEGO 2039 lamp post in Athens' dark grey; R1 (kmProps) scales it to 5.5 m like the old Kenney lamp
+LDS.LA=[[168,'#4a4a44'],[191,'#ffe9a0'],[999,'#2e302c']];
+kmProps=(f=>function(D){const r=f.apply(this,arguments);const d=D.lamp;if(CID==='ath'&&d&&d.lds==='lamp'&&!d.athFix){d.athFix=1;d.mat.color.set('#ffffff');const k=5.5/7.43;d.gOld=d.gOld.clone().scale(k,k,k);d.mOld=d.mOld.clone();d.mOld.color=new THREE.Color('#5a5a52')}return r})(kmProps);
 LDS.SW={planter:[LDS_planter,'LEGO flower bed 3020+33291+6255'],dumpster:[LDS_dumpster,'LEGO brick dumpster']};
 kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='fra')return r;for(const t in LDS.SW){const d=D[t];if(!d||d.lds)continue;try{const old=LDS_tri(d.g);d.gOld=d.g;d.mOld=d.mat;d.g=LDS.SW[t][0](d.g);
   d.mat=LDS.mat||(LDS.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0}));d.lds=t;if(LDS.st)LDS.st[t]={src:LDS.SW[t][1],old,near:LDS_tri(d.g),far:LDS_tri(d.g)}}catch(e){console.warn('LDS '+t,e)}}return r})(kmProps);
