@@ -71,7 +71,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98tx | `98tx_taxi40468.js` | 16 | TX (garage-14/15, 2026-10-10). Alex asked for the LEGO 40468 Yellow Taxi, built from the official instructions (docs/TAXI_40468_STEPS.md). 1) OFFSETS: optional  |
 | 98ld | `98ld_stub.js` | 1 | LDM (v89v, 2026-10-10). Coordinator: "move all LDraw model data OUT of overdrive.html into models.js next to km.js" (page ≤ 3.5 MB, flat as models grow). The da |
 | 98ld | `98ld_import.js` | 16 | LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds". Real LEGO builds come in as LDra |
-| 98ld | `98ld_w.js` | 6 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
+| 98ld | `98ld_w.js` | 7 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
 | 98ld | `98ld_run.js` | 0 | LDM runner: the model data modules from models.js (see 98ld_stub.js), in src/MODELS order; one bad module never stops the game. |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 99c | `99c_checklist.js` | 39 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
@@ -336,9 +336,9 @@ uses: 72(1), 30(1), 98ld(1)
 defines: LDI LD_Q LDG LD_b64 LD_geo LD_SD LD_br LD_pts LD_grp __ld LD_boat LD_pboat LD_SW LDP LD_propSpot LD_cull LD_propMake LD_PROPS LD_propBuild
 uses: 92(46), 93(33), 20(15), 98(8), 53(8), 98ld(7), 98gb(6), 30(3), 70(3), 41(2)
 
-## 98ld_w.js — 6 KB
-defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_build
-uses: 98ld(24), 20(17), 92(17), 30(16), 93(8), 98ld(6), 53(6), 70(6), 10(5), 51(4)
+## 98ld_w.js — 7 KB
+defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_spot LDW_build
+uses: 20(17), 92(17), 30(16), 53(10), 93(8), 98ld(8), 98ld(6), 70(6), 10(5), 51(4)
 
 ## 98ld_run.js — 0 KB
 defines: (data / markup, no top-level declarations)
@@ -350,7 +350,7 @@ uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 9
 
 ## 99c_checklist.js — 39 KB
 defines: OD_CHECKLIST
-uses: 30(21), 10(19), 20(12), 99t(5), 41(4), 92(4), 40(1), 72(1)
+uses: 30(22), 10(19), 20(12), 99t(5), 41(4), 92(4), 40(1), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
