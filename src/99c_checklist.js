@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90b',id:'ba-open',text:'Open the garage: your car builds itself brick by brick (bottom first) in 2–3 s, then stays complete.'},
+ {ver:'v90b',id:'ba-pick',text:'RIDES: pick another street car, then the WATER tab, then an OFF-ROAD ride: each builds itself up; tapping the view mid-build shows it complete at once.'},
+ {ver:'v90b',id:'ba-noblock',text:'While a ride is building up you can still tap cards, tabs and BUILD; nothing waits for the animation.'},
+ {ver:'v90b',id:'fb-cam',text:'WATER → Power Boat → ✎ BUILD: the whole boat is in view from above and big enough to tap parts on it.'},
  {ver:'v89z',id:'fb-cards',text:'Garage → RIDES → OFF-ROAD and → WATER: every ride card has ✎ BUILD and ▶ GUIDE.'},
  {ver:'v89z',id:'fb-build',text:'WATER → Speedboat → ✎ BUILD: the boat (not the Hot Rod) is in the builder and its name is at the top. Place a part, ROTATE, place another, go back to RIDES: the boat card shows your parts.'},
  {ver:'v89z',id:'fb-guide',text:'OFF-ROAD → Blue Beast → ▶ GUIDE: the guide builds the monster truck step by step (title says Blue Beast). EXIT works.'},

@@ -34,7 +34,7 @@ GAR_frm=(f=>function(){FB_wrap();return f.apply(this,arguments)})(GAR_frm);
 GNB_new=(f=>function(){FB.no=1;try{return f.apply(this,arguments)}finally{FB.no=0}})(GNB_new);
 PA_enter=(f=>function(){FB.no=1;try{return f.apply(this,arguments)}finally{FB.no=0}})(PA_enter);
 // BUILD on the OFF-ROAD / WATER tab edits the equipped off-road / water ride (not the street car)
-GB_enter=(f=>function(){if(!FB.s&&!GB_.bk&&!FB.no){const fm=FB_form();if(fm)FB_begin(GAR_frm(fm),fm)}const r=f.apply(this,arguments);FB_tag();return r})(GB_enter);
+GB_enter=(f=>function(){if(!FB.s&&!GB_.bk&&!FB.no){const fm=FB_form();if(fm)FB_begin(GAR_frm(fm),fm)}const r=f.apply(this,arguments);if(FB.s&&FB.s.f==='boat'&&GB_.bk)GB_.pit=Math.max(GB_.pit||0,.62);FB_tag();return r})(GB_enter);
 GB_exit=(f=>function(){const r=f.apply(this,arguments);if(!FB.keep&&!GB_.bk&&!SB.on)FB_end();return r})(GB_exit);
 SB_open=(f=>function(from){if(!FB.s&&!GB_.bk){const fm=FB_form();if(fm)FB_begin(GAR_frm(fm),fm)}FB.keep=1;try{return f.apply(this,arguments)}finally{FB.keep=0;FB_tag()}})(SB_open);
 SB_close=(f=>function(){const r=f.apply(this,arguments);if(!GB_.bk&&!SB.on)FB_end();return r})(SB_close);
@@ -55,7 +55,7 @@ GB_attach=(f=>function(g,bricks,fig,cache,bp){const r=f.apply(this,arguments);if
 // (boat hulls sit below the street car's plate line, so the street camera aimed above them)
 const FB_box=()=>{let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,y0=1e9,y1=-1e9;for(const b of GB_list()){const P=GB_PC[b.t];if(!P)continue;const[fw,fd]=GB_dims(b);
  x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+fw);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd);y0=Math.min(y0,b.y);y1=Math.max(y1,b.y+P.h)}return x0>1e8?null:{w:x1-x0,l:z1-z0,y0,y1}};
-BC_gk=(f=>function(){if(!FB.s)return f.apply(this,arguments);const B=FB_box();return B?clamp(Math.max(B.l/19,B.w/10),.8,1.6):1})(BC_gk);
+BC_gk=(f=>function(){if(!FB.s)return f.apply(this,arguments);const B=FB_box();return B?clamp(Math.max(B.l/22,B.w/12),.85,1.4):1})(BC_gk);
 GB_cam=(f=>function(){const r=f.apply(this,arguments);if(!FB.s||!GB_.bk||!GB.mesh||!GB.mesh.userData.m)return r;const B=FB_box();if(!B)return r;const m=GB.mesh.userData.m,
  dy=m.localToWorld(V3(0,(B.y0+B.y1)/2*GB_PH,0)).y-m.localToWorld(V3(0,6*GB_PH,0)).y;if(Math.abs(dy)>.05){GB.cam.position.y+=dy;GB.cam.updateMatrixWorld()}return r})(GB_cam);
 // RIDES cards: ✎ BUILD + ▶ GUIDE on owned OFF-ROAD / WATER cards too
