@@ -10,7 +10,7 @@ const SND_MAP={
   turn:{s:'turn',vol:.6},     win:{s:'win',vol:.9},      click:{s:'click',vol:.5},
   engine_loop:{s:'engine_loop',vol:.3}   // quiet hum while ships fly a maneuver (no synth version)
 };
-const MUSIC_MAP={main:'main'};           // null = the synthesized groove
+const MUSIC_MAP={main:'main-a'};           // null = the synthesized groove
 const SND={ctx:null,on:true,music:true,vol:.7,last:{},nb:null,beat:0,mTimer:null};
 try{SND.on=localStorage.getItem('na_snd')!=='0';SND.music=localStorage.getItem('na_mus')!=='0'}catch(e){}
 // GA decodes the samples on the first user gesture; until then (or with no Web Audio, as in jsdom) GA.has() is false and the synth plays
@@ -60,10 +60,10 @@ function sfx(name,k){if(!SND.on)return;
   case 'click':tone(1200,.03,{type:'triangle',v:.05});break;
   }}catch(e){}}
 // music: the recorded track via GA; if it fails to decode, the synth groove below plays instead (slow minor pads over a pulsing bass, through reverb)
-function musicStart(){if(gaMusic()){GA.music(MUSIC_MAP.main,{fade:2});clearTimeout(SND.gaChk);SND.gaChk=setTimeout(()=>{if(SND.music&&!gaMusic())musicStart()},5000);return}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,150)}
+function musicStart(){if(gaMusic()){if(typeof GXMUS!=='undefined')GXMUS.sync();else GA.music(MUSIC_MAP.main,{fade:2});clearTimeout(SND.gaChk);SND.gaChk=setTimeout(()=>{if(SND.music&&!gaMusic())musicStart()},5000);return}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,150)}
 function musicStop(){clearInterval(SND.mTimer);SND.mTimer=null;if(GAOK)GA.music(null)}
 const CHORDS=[[110,164.8,220,261.6],[98,146.8,196,246.9],[87.3,130.8,174.6,220],[98,146.8,196,233.1]];
-function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusic()){clearInterval(SND.mTimer);SND.mTimer=null;GA.music(MUSIC_MAP.main);return}const step=60/84/2;
+function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusic()){clearInterval(SND.mTimer);SND.mTimer=null;if(typeof GXMUS!=='undefined')GXMUS.sync();else GA.music(MUSIC_MAP.main);return}const step=60/84/2;
   while(SND.nextT<c.currentTime+.4){const k=SND.beat%32,at=SND.nextT-c.currentTime,ch=CHORDS[Math.floor(SND.beat/32)%4];
     if(k===0)ch.forEach((f,i)=>tone(f*2,step*31,{type:'sawtooth',v:.035,lp:900,a:1.2,at,bus:SND.rev,det:i*4}));
     if(k%4===0)tone(ch[0]/2,step*1.8,{type:'triangle',v:.28,at,bus:SND.musBus,lp:400});

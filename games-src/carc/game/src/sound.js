@@ -6,13 +6,13 @@ const SND_MAP={
   score:{s:'score',vol:.7},  goods:{s:'goods',vol:.9},  turn:{s:'turn',vol:.35}, story:{s:'story',vol:.7},
   win:{s:'win',vol:.9},      bad:{s:'bad',vol:.6},  myturn:{s:'turn',vol:1}  // myturn: online only, when a decision becomes yours
 };
-const MUSIC_MAP={main:'main'};           // null = the synthesized ambience
+const MUSIC_MAP={main:'main-a'};           // null = the synthesized ambience
 const SND={ctx:null,on:true,music:true,pitch:1,vol:.7,last:{},nb:null,beat:0,mTimer:null};
 try{SND.on=localStorage.getItem('rv_snd')!=='0';SND.music=localStorage.getItem('rv_mus')!=='0'}catch(e){}
 // GA decodes the samples on the first user gesture; until then (or with no Web Audio, as in jsdom) GA.has() is false and the synth plays
 const GAOK=typeof GA!=='undefined'&&typeof GA_DATA!=='undefined';
 if(GAOK){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'rv',musVol:.45});GA.setSfx(SND.on);GA.setMusic(SND.music)}
-function gaMusic(){return GAOK&&MUSIC_MAP.main&&GA.names().indexOf(MUSIC_MAP.main)>=0&&(GA.state().failed||[]).indexOf(MUSIC_MAP.main)<0}
+function gaMusic(){return GAOK&&MUSIC_MAP.main&&GA.names().indexOf(MUSIC_MAP.main)>=0&&(GA.state().failed||[]).indexOf(typeof MUS!=='undefined'&&MUS.want||MUSIC_MAP.main)<0}
 function audioInit(){if(SND.ctx)return true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
   try{const c=SND.ctx=new AC();const comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;comp.connect(c.destination);
     SND.master=c.createGain();SND.master.gain.value=SND.on?SND.vol:0;SND.master.connect(comp);
@@ -49,9 +49,9 @@ function sfx(name){if(!name||!SND.on)return;
   }}catch(e){}}
 // music: the recorded track via GA; if it fails to decode, this synth ambience plays instead (a drone on D and A, a plucked lute line in D dorian, a soft frame drum)
 const LUTE=[293.7,329.6,349.2,392,440,493.9,523.3,587.3];
-function musicStart(){if(gaMusic()){GA.music(MUSIC_MAP.main,{fade:2});clearTimeout(SND.gaChk);SND.gaChk=setTimeout(()=>{if(SND.music&&!gaMusic())musicStart()},5000);return}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,200)}
-function musicStop(){clearInterval(SND.mTimer);SND.mTimer=null;if(GAOK)GA.music(null)}
-function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusic()){clearInterval(SND.mTimer);SND.mTimer=null;GA.music(MUSIC_MAP.main);return}const st=.42;
+function musicStart(){if(gaMusic()){if(typeof musicSync==='function'){MUS.want=null;musicSync()}else GA.music(MUSIC_MAP.main,{fade:2});clearTimeout(SND.gaChk);SND.gaChk=setTimeout(()=>{if(SND.music&&!gaMusic())musicStart()},5000);return}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,200)}
+function musicStop(){clearInterval(SND.mTimer);SND.mTimer=null;if(typeof MUS!=='undefined')MUS.want=null;if(GAOK)GA.music(null)}
+function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusic()){clearInterval(SND.mTimer);SND.mTimer=null;if(typeof musicSync==='function')musicSync();else GA.music(MUSIC_MAP.main);return}const st=.42;
   while(SND.nextT<c.currentTime+.5){const at=SND.nextT-c.currentTime,k=SND.beat%16;
     if(k===0){tone(73.4,st*15,{type:'sine',v:.07,a:.6,at,bus:SND.musBus});tone(110,st*15,{type:'sine',v:.04,a:.8,at,bus:SND.musBus})}
     if([0,6,8,14].includes(k))tone(90,.14,{to:60,v:.22,at,bus:SND.musBus});if([4,12].includes(k))noise(.07,{f:2400,q:1.5,v:.07,at,bus:SND.musBus});
