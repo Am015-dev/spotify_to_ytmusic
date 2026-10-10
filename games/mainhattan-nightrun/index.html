@@ -3128,7 +3128,8 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
     if(n%16===0&&n>=16&&this.dropAt===n)this.dropStart();},
   dropStart(){this.dropAt=-1;this.dw={t:G.t,hit:false,until:G.t+.28};if(this.pdash>0||G.t-this.lastDash<.22)this.drop(true);},
   drop(hit){const w=this.dw;if(!w||w.done)return;w.done=1;this.stat.drops++;const T=tierOf(C.n);
-    if(hit){this.stat.dropsHit++;let k=0;for(const b of G.eb){G.score+=5;k++;}G.eb=[];
+    if(hit){this.stat.dropsHit++;const R2=HARD?300*300:1e12;G.eb=G.eb.filter(b=>{if((b.x-P.x)**2+(b.y-P.y)**2<R2){G.score+=5;return false;}return true;});   // on Hard the blast reaches 300 px round the ship, not the whole screen
+      
       for(const e of G.en)if(e.type!=='boss'&&e.x<W-10){e.hp-=22;e.flash=.2;}
       const pts=800*T*(1+Math.min(3,Math.floor(G.rb/16)));G.score+=pts;tierSet(C.n+3,'drop');
       G.flash=Math.max(G.flash,.55*FX());shake(14);PW.st().wv=.7;banner('DROP!','+'+pts,false,1.5);floater(P.x,P.y-36,'DROP! ×'+T,'#b36bff');
