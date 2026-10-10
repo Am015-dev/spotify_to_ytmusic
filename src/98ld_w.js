@@ -13,6 +13,7 @@ function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const B=LD_br
  if(x0>x1){x0=box.min.x/GB_U;x1=box.max.x/GB_U;z0=box.min.z/GB_U;z1=box.max.z/GB_U}
  const k=GB_U*LD_SW,hw=Math.max(.3,(x1-x0)*k/2-.2),hd=Math.max(.3,(z1-z0)*k/2-.2),ox=((x0+x1)/2)*GB_U*LD_SW-c.x*LD_SW,oz=((z0+z1)/2)*GB_U*LD_SW-c.z*LD_SW;
  const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:(CID==='fra'?{x:2061,z:0}:{x:0,z:0}),a0=(P.a||0)*Math.PI/180;
+ if(P.water)return LDW_boat(P,near,far,box,c,hw,hd,st,a0);
  const S=LD_propSpot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),Math.max(hw,hd)+.5,Math.min(hw,hd)+.5);if(!S)return;
  const yaws=[0,1,2,3].filter(q=>q%2===S.rot);let best=yaws[0],bd=1e9;for(const q of yaws){const a=q*Math.PI/2,fx=-Math.sin(a),fz=-Math.cos(a);for(let r=2;r<40;r+=2)if(FL_road(S.x+fx*(hd+r),S.z+fz*(hd+r),0)){if(r<bd){bd=r;best=q}break}}
  const a=best*Math.PI/2,y=groundY(S.x,S.z)-(P.sink||0)*LD_SW*GB_PH;
@@ -21,6 +22,15 @@ function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const B=LD_br
  for(const[L,set,key]of[[near,E.near,'tris'],[far,E.far,'ftris']])for(const[g,mat]of L){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name='ldw_'+P.model;o.receiveShadow=true;o.userData.cd=P.cd||900;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);set.push(o);E[key]+=(g.index?g.index.count:g.attributes.position.count)/3}
  const cs=Math.cos(a),sn=Math.sin(a),odd=best%2,col={x:S.x+ox*cs+oz*sn,z:S.z-ox*sn+oz*cs,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*LD_SW};
  HUB.bld.push(col);hubGridAdd([col]);E.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};E.col=col;LDW.on.push(E)}
+// boats (P.water): moored in the nearest river/harbour reach to the anchor that is wide enough, near the bank, bow along the flow, hull P.sink plates under the water
+function LDW_boat(P,near,far,box,c,hw,hd,st,a0){const ax=st.x+Math.cos(a0)*(P.r||0),az=st.z+Math.sin(a0)*(P.r||0),bz=box.getSize(new THREE.Vector3()),W=Math.min(bz.x,bz.z)*LD_SW/2;hw=bz.x*LD_SW/2;hd=bz.z*LD_SW/2;// hull size (low parts count for boats)
+ let bp=null,bd=1e18;
+ for(const S of WATERS)for(let i=0;i<S.pts.length;i+=2){const p=S.pts[i];if(p.hw<W*2+6)continue;const d=(p.x-ax)**2+(p.z-az)**2;if(d<bd){bd=d;bp=p}}if(!bp)return;
+ const off=bp.hw-W-2.5,x=bp.x+bp.tz*off,z=bp.z-bp.tx*off;if(!inRiver(x,z,W))return;const a=Math.atan2(-bp.tx,-bp.tz)+(hd>=hw?0:Math.PI/2),y=HWY-.1-(P.sink||3)*GB_PH*LD_SW;
+ const X=new THREE.Matrix4().makeTranslation(x,y,z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(LD_SW,LD_SW,LD_SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
+ const E={id:P.model,x,z,near:[],far:[],tris:0,ftris:0,water:1};
+ for(const[Lq,set,key]of[[near,E.near,'tris'],[far,E.far,'ftris']])for(const[g,mat]of Lq){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name='ldw_'+P.model;o.userData.cd=P.cd||900;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);set.push(o);E[key]+=(g.index?g.index.count:g.attributes.position.count)/3}
+ const col={x,z,hw:W,hd:W,h:HWY+(box.max.y-box.min.y)*LD_SW};HUB.bld.push(col);hubGridAdd([col]);E.at={x:+x.toFixed(1),z:+z.toFixed(1),yaw:+a.toFixed(2),y:+y.toFixed(2)};E.col=col;LDW.on.push(E)}
 function LDW_build(){if(!HUB.grp||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);LDW_build();return r})(buildRoam);
 // LOD: after the hub cull, near mesh within LDW.lod m of the camera, big-parts mesh beyond
