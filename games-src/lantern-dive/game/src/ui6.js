@@ -24,8 +24,9 @@ function snd(name, o) {
 function sndMusic() {
   try {
     if (!window.GA) return;
-    if (UI.prefs.music === false || !G || !UI.started) { GA.music(null); GA.stopLoop && GA.stopLoop('sea'); return; }
-    GA.music('main', { vol: .3 }); if (GA.loop && GA.has && GA.has('sea')) GA.loop('sea', { vol: .14, fade: 1.5 });
+    if (typeof musicSync === 'function') musicSync(); else if (UI.prefs.music === false || !G || !UI.started) GA.music(null); else GA.music('main-a');
+    if (UI.prefs.music === false || !G || !UI.started) { GA.stopLoop && GA.stopLoop('sea'); return; }
+    if (GA.loop && GA.has && GA.has('sea')) GA.loop('sea', { vol: .14, fade: 1.5 });
   } catch (e) { }
 }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.hc,.dc,[data-a=play],[data-a=hcard],[data-a=dcard]')) snd('click'); }, true);
