@@ -4,7 +4,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 (async()=>{const [URL,OUT,TAG]=process.argv.slice(2);fs.mkdirSync(OUT,{recursive:true});const tg=TAG||'trees';const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const p=await (await b.newContext({viewport:{width:1280,height:720}})/* loads at 852×393 stall under swiftshader here; shots are taken after resizing */).newPage();p.setDefaultTimeout(1500000);const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error'||/LDS/.test(m.text()))errs.push(m.text().slice(0,200))});
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:600000});
- await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))});
+ await p.evaluate(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));if(c==='ath'){localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_roam.ath@1',JSON.stringify({tut:1,otg:{}}))}},process.env.CITY||'fra');
  await p.reload({timeout:600000});await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:600000});const t0=Date.now();
  await p.evaluate(()=>{try{__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{timeout:1500000});
  console.log('roam in',(Date.now()-t0)/1000|0,'s');await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose();try{__ju.autoClose(true)}catch(e){}});

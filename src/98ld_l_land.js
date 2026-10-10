@@ -72,7 +72,7 @@ function LDS_palm(){const{p,k}=LDS.PALM,g=new THREE.LatheGeometry(p.map(([r,y])=
  const y0=204*k,tri=(a,b,d)=>{for(const T of[[a,b,d],[a,d,b]]){V.push(...T);for(let j=0;j<3;j++)C.push(lf.r,lf.g,lf.b)}};
  for(let i=0;i<4;i++){const ang=i*Math.PI/2+Math.PI/4,cx=Math.cos(ang),cz=Math.sin(ang),P=(r,w,y)=>new THREE.Vector3((cx*r-cz*w)*k,y0+y*k,(cz*r+cx*w)*k);
   const a=P(4,-10,0),b=P(4,10,0),c=P(80,45,6),d=P(80,-45,6),t=P(176,0,-43);tri(a,b,c);tri(a,c,d);tri(d,c,t)}
- const G=new THREE.BufferGeometry().setFromPoints(V);G.setAttribute('color',new THREE.Float32BufferAttribute(C,3));G.computeVertexNormals();G.computeBoundingBox();G.computeBoundingSphere();return G}
+ const G=new THREE.BufferGeometry().setFromPoints(V);G.setAttribute('color',new THREE.Float32BufferAttribute(C,3));G.computeVertexNormals();G.computeBoundingBox();G.computeBoundingSphere();G.userData.ldsPalm=1;return G}
 ART_athTreeBy=(f=>function(k){if(k==='palm'&&!LDS.palmOff)try{const g=LDS_palm();LDS.palm=g;LDS.st=LDS.st||{};LDS.st.palm={src:'6376 palm',old:108,near:LDS_tri(g),far:LDS_tri(g)};return g}catch(e){console.warn('LDS palm',e)}return f.apply(this,arguments)})(ART_athTreeBy);
 // LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
 function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
