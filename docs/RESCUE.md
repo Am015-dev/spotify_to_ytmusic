@@ -10,7 +10,7 @@ MODEL_CATALOG (alex/od-mdl-land), git logs of alex/od-mdl-veh, alex/od-mdl-world
 | 30023 Lighthouse (build-5) | micro set blown up 3× broke the minifig rule | a LEGO model on display: TRUE size in the minifig world (LD_SW×LD_FIG, like every building: 4.9 m next to a 1.9 m figure) on a 0.8 m stone plinth (new `plinth` option in 98ld_w.js), Athens | docs/shots/rescue/door_w30023.png |
 | 7796 House (build-5) | micro/small Creator set shown 2.5× | same: model on display at true size (3.1 m) on a plinth, Athens | docs/shots/rescue/door_w7796.png |
 | 6613 Phone booth (build-5) | "hood malformed" (old inverted-slope mapping) | reconverted `--only booth --yaw 2`: 3665 inverted slopes and the 4861 hood are real LDraw meshes now; A/B sheet matches the LDraw truth (keypad print and the bike submodel not converted). Frankfurt street prop, 1.1k tris | docs/shots/rescue/ab6613_sheet.png, door_w6613.png |
-| 4956 Creator House (build-6) | 205k tris raw | LD_KEEP .2 / LD_MINT 48 low-poly meshes, ldcull.py (157 hidden parts + 4 plant leaves dropped), in-game LD_cull, merged mesh + far LOD (98ld_w.js) = 25.3k tris culled (budget ~25k), 3 draws; --yaw 2 so the 1×4×5 door (2.35 m) faces the street. Frankfurt | docs/shots/rescue/door_w4956.png, w4956.png |
+| 4956 Creator House (build-6) | 205k tris raw | already rescued by build-6 in v90f (alex/od-models 7e096ac); my parallel conversion dropped in favour of theirs | docs/shots/mdlw/door_w4956.png |
 | 3221 Big Rig in Frankfurt traffic (city-1, pulled in v90e) | 3.84 m wide; traffic drives at 0.36 × road width off the centre line → over the kerb / centre line on narrow roads; no lane-fit proof | CT_wide (98ct_city_lego.js): a kind wider than 2.6 m drives at the offset that keeps it between centre line +0.15 m and kerb −0.3 m, only on segments ≥ 4·hw+1 m (8.7 m), picks its next segment among those (U-turn at a dead end), spawns on one. `__ct.wide()` reports kerb/centre clearances | docs/shots/rescue/rig_lane.png |
 
 ## Also found (attempted conversions that failed or parts dropped): status
@@ -21,6 +21,9 @@ MODEL_CATALOG (alex/od-mdl-land), git logs of alex/od-mdl-veh, alex/od-mdl-world
 | 6522 (veh) | converter IndexError | open: next on this lane |
 | 75870 (veh) | 25 studs wide, extra parts in main | open: retry `--only body,wheel,windscreen` |
 | 1069 boat (world) | downloaded, never tried | open |
+| 1572 Tow Truck, 6668 Recycle Truck, 6526 Red Line Racer, 6669 Diesel Daredevil (build-8) | dark dithered patch on the garage floor (g_34) | queued here; the floor patch itself is garage-18's (session_019vNFjqrqunwBDfw4daimsX) |
+| 7242 Street Sweeper (build-8) | brushes convert to box placeholders | queued: real mesh for the brush part |
+| 4208 (build-8) | broken size | queued |
 | 3718, 6376 (world) | rejected before conversion: no 1×4 door | not converted work; same doorway fix as 6350 applies |
 | Palm tree `l_palm` (land) | converted, not placed | land lane (alex/od-mdl-land): Athens seafront candidate |
 | Bush 2417/2423 (land) | 1,119 tris vs ~500 brick bush | land lane: LD_KEEP low-poly retry |
