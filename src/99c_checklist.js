@@ -5,6 +5,7 @@
 const OD_CHECKLIST=[
  {ver:'v90i',id:'town4',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer: each looks complete, stands on the platform, has a LEGO driver; drive one.'},
  {ver:'v90i',id:'pin-obj',text:'Phone, story mission: the checklist bar sits below the yellow NEXT objective line, never on top of it.'},
+ {ver:'v90i',id:'palms',text:'Athens Syntagma race: the palms stand beside the track on the verge, none on the asphalt.'},
  {ver:'v90i',id:'ath-size',text:'Athens: jump a few times; the car keeps its normal size and stays upright.'},
  {ver:'v90h',id:'gfloor',text:'Garage → RIDES: tap 6 rides in a row (a car, a big truck, a Town set, an OFF-ROAD truck, a WATER boat): after the build-up each one stands on the platform, tyres on the tiles, nothing sunk into the floor, no flat base with tiny wheels.'},
  {ver:'v90h',id:'gpatch',text:'Garage → BUILD on a big ride (Fire Truck, Big Rig): the grey platform has no dark striped patch behind the ride.'},
