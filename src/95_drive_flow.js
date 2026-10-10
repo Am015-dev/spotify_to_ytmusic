@@ -122,6 +122,11 @@ function W10_bump(c,x,z,dx,dz,W){const ph=RO.vh??RO.h,px=Math.sin(ph),pz=Math.co
  if(W>0&&Jn)c.lane=clamp(c.lane+Math.sign(sn)*Math.min(.5,Math.abs(Jn)*.05)/W,-.48,.48);
  c.hitT=Math.max(c.hitT||0,1.6+Math.min(2.5,cl*.12));
  if((c.crB||0)<=0&&cl>1.2){c.crB=.4;AU.sfx('bump');shake=Math.max(shake,Math.min(.45,.12+cl*.02))}}
+// PLAY (v89l): a traffic car the player keeps driving into at a crawl (GAS on, under 15 km/h, touching for 0.6 s) is knocked aside like a smash.
+// It used to be a wall: every bump re-armed its stop-and-wait (hitT) and nothing separated the two footprints, so a player beside or behind
+// a stopped car sat at 0 km/h with GAS held (tPlay v89k: 13-17 % of the drive stuck, always next to a stopped traffic car, no building near).
+function W10_pin(c){if(!(CTL&&CTL.thr>0)||CTL.brk>0||Math.abs(RO.v)>15/3.6){c.w10p=0;return false}
+ c.w10p=T-(c.w10L??-1)<.15?(c.w10p||0)+(T-c.w10L):0;c.w10L=T;return c.w10p>.6}
 // brake to a stop (locked-ish tyres), never past zero
 function W10_brake(v,dt){const d=Math.min(Math.abs(v),(Math.abs(v)>12?8:6)*dt);return v-Math.sign(v)*d}
 window.__drFix={DR,inSolid:(x,z)=>DR_inSolid(x,z),edge:DR_edgeX};

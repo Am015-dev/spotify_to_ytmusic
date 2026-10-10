@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89l',id:'stuck-push',text:'Drive slowly into a stopped car and keep GAS on: within a second it is pushed aside and you can pass.'},
+ {ver:'v89l',id:'drift-brake',text:'Phone: at 60 km/h or more, keep GAS on, steer and hold BRAKE for a moment: the car drifts (pink trail, mini-turbo after). A quick BRAKE tap only brakes.'},
  {ver:'v89k',id:'gold-brick',text:'Golden bricks look like a big gold 2×2 LEGO brick at car-roof height (no pole), and you collect it by driving through.'},
  {ver:'v89j',id:'tip-avatar',text:'Oma Hilde\'s tip text never runs under her picture.'},
  {ver:'v89j',id:'walls-pill',text:'Frankfurt: no plain beige walls; the TAP TO OPEN pill doesn\'t cover the speed bar.'},
@@ -105,7 +107,6 @@ const OD_CHECKLIST=[
  {ver:'v88h',id:'city-far',text:'After coming back to free roam, drive or GO to the far side of town (2+ km): the streets and buildings there are drawn, not a pale empty plane.'},
  {ver:'v88g',id:'turn60',text:'Normal turn at a junction at 50–80 km/h with GAS only: the car turns cleanly where it points, no sliding sideways.'},
  {ver:'v88g',id:'brake-turn',text:'Brake briefly before or in a turn (tap BRAKE, or ↓ while holding ↑ on PC): the car slows down and does NOT start a drift.'},
- {ver:'v88g',id:'drift-btn',text:'DRIFT button (X on PC) while steering at speed: the car still slides on purpose, with the pink trail and a mini-turbo after.'},
  {ver:'v88g',id:'drift-gb',text:'Hold GAS + BRAKE together while steering at 80+ km/h for about a second: it still becomes a drift.'},
  {ver:'v88g',id:'phone-thumb',text:'Phone: rest your thumb near the line between GAS and BRAKE and tap BRAKE in a turn: no accidental drift.'},
  {ver:'v88f',id:'steer-turn',text:'Turn left or right at a junction at 60–80 km/h: the car settles straight within about a second, no wobbling.'},
