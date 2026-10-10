@@ -21,8 +21,16 @@
 - 0 km/h in tRides' 9 s GAS hold = the same story-start popup the taxi worker saw; tPlay is the gate.
 - One-time setup in a new session: parts library into ld/lib (see MODEL_PIPELINE §5), `pip install scipy pyfqmr`, `node tools/ld/ld_dump.js`.
 
-## Still to do (in order)
-1. tPlay result (ld/shots/tplay1.log), REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with the sheets + gap 0.03 m.
-2. After PASS: rebuild on CURRENT live (verify_live.sh), OD_CHANGELOG v89s (NEW Rally S1, NEW Speedboat, NEW bank in Frankfurt — all from real
-   LEGO model files), 99c checklist items, `git add -f out/v89s`, push, DEPLOY to the coordinator (session_017iH3DB4VyxwKSdMwsco4Ut). If the taxi deploys first, merge it in.
-3. Ideas (not started): show the 66 imported parts as an "LDraw" palette category; white hubcaps for our wheels; more OMR sets (the script is ~2 min per model).
+## Status
+- **v89s LIVE** (brave-carson 8797f1b): Rally S1, Harbour Speedboat, Frankfurt Town Bank, Yellow Taxi 40468. Quick review PASS.
+- tPlay with the Rally (ld/shots/tplay1, not committed): phone-fra walls 1.24/min + GPU leak (pre-existing per garage-16 rod baseline),
+  desk-ath walls 5.68/min + heap 160 MB, phone-ath crashed in tPlay's rotTrip (CDP "Must send a TouchStart first"). A/B vs base unfinished.
+
+## Next (coordinator 2026-10-10: one model per deploy, fast flow: look at the shot → checklist items → QUICK review → DEPLOY)
+Candidates from the OMR list (ld/dl/omr_sets.tsv is git-ignored: re-scrape with the loop in this session's notes or browse library.ldraw.org/omr/sets):
+1. **75895 1974 Porsche 911 Turbo 3.0** (Speed Champions 2019; a German classic for Frankfurt) → RIDES. `--yaw` check with ldAB.
+2. **4643 Power Boat Transporter** (City Harbor 2011) → the boat (drop the truck submodel with --only/--drop).
+3. **21011 Brandenburg Gate** (Architecture; Doric columns after the Athens Propylaea) → a Frankfurt/Athens plaza statue at micro scale,
+   or **10264 Corner Garage** (Modular, big: use CR_LO 2 like the bank and check tris < 30k).
+Per model: `python3 tools/ld/ld2garage.py ld/omr/<set>.mpd ld/out/<name> …`, add to tools/ld/convert_all.sh, preset in src/98ld_import.js,
+`tools/build.sh <ver> --local`, ldRT + ldAB + one 852×393 game shot, OD_CHANGELOG + OD_CHECKLIST, out/<ver>, DEPLOY.
