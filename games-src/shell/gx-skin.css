@@ -1,0 +1,56 @@
+/* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
+   html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
+   ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
+   html.sk-stars (ui-star-*), html.sk-banner (ui-act-banner), html.sk-dark (dark panels: light ink). Game colours: --sk-ink, --sk-num, --sk-num-done. ===== */
+html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
+html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
+/* top bar + icon buttons */
+html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
+html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
+html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
+html.sk .gx-ibtn>span{padding:0 4px}
+html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
+html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
+html.sk-icons i[data-ic]{background:center/contain no-repeat}
+/* popups: parchment panel (9-slice) with a wooden title strip */
+html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
+html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
+html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
+html.sk .gx-drawer-body{padding:4px 4px 12px}
+/* campaign kit */
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
+html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
+html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
+html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
+html.sk .gxc-boss{border-color:transparent}
+html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;min-height:52px}
+/* story map nodes: painted medallions, the number (text) sits in the centre */
+html.sk .gxc-node{width:68px;height:68px}
+html.sk .gxc-disc{width:68px;height:68px;border:0;border-radius:0;background:url(media/ui-node-open.webp) center/contain no-repeat;box-shadow:none;color:var(--sk-num);text-shadow:0 1px 0 rgba(255,255,255,.45);font-size:22px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+html.sk .gxc-node.a2 .gxc-disc,html.sk .gxc-node.a3 .gxc-disc{background-color:transparent;background-image:url(media/ui-node-open.webp)}
+html.sk .gxc-node.won .gxc-disc,html.sk .gxc-node.won.a2 .gxc-disc,html.sk .gxc-node.won.a3 .gxc-disc{background-image:url(media/ui-node-done.webp);color:var(--sk-num-done);text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .gxc-node.locked .gxc-disc,html.sk .gxc-node.locked.a2 .gxc-disc,html.sk .gxc-node.locked.a3 .gxc-disc{background-image:url(media/ui-node-locked.webp);filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));opacity:1;color:transparent}
+html.sk .gxc-node.boss .gxc-disc,html.sk .gxc-node.boss.a2 .gxc-disc,html.sk .gxc-node.boss.a3 .gxc-disc{background-image:url(media/ui-node-boss.webp);width:74px;height:74px;margin:-8px 0 0 0;box-shadow:none}
+html.sk .gxc-node.boss .gxc-disc::after,html.sk .gxc-lock{display:none}
+html.sk .gxc-node.boss .gxc-disc .gxc-pt{width:34px!important;height:34px!important;margin-top:8px}
+html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out infinite}
+@keyframes sk-pulse{0%,100%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,214,90,.9))}50%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 9px rgba(255,214,90,.95))}}
+html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10}
+html.sk .gxc-node .gxc-stars{top:56px}
+html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
+html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
+html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
+html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
+html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
+html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
+html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
+/* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+@media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
