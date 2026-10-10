@@ -5,6 +5,7 @@
 const OD_CHECKLIST=[
  {ver:'v90f',id:'town-fwd',text:'Equip Town Roadster, then Ladder Truck: the bonnet/cab points forward and the car drives forwards.'},
  {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker look complete; drive two of them.'},
+ {ver:'v90f',id:'w4956',text:'Frankfurt: a LEGO House (4956) stands by a street near the start; a person fits through its door.'},
  {ver:'v90f',id:'land',text:'Frankfurt: trees, street lamps, park fences and crates look like LEGO parts (round/pointed LEGO trees, black lamp posts with yellow lamps, white lattice fences, brown slatted crates); the city runs as smoothly as before.'},
  {ver:'v90f',id:'plow',text:'Drive the Snowplow (the widest ride, ~4.7 m) down a Frankfurt street: it stays in its lane, passes traffic and turns corners without scraping the kerb.'},
  {ver:'v90f',id:'ride-width',text:'Drive the Hot Rod, the Rally S1 and the Sightseeing Bus: none looks squeezed thin; each still sits on the road and steers like before.'},
