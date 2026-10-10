@@ -90,7 +90,7 @@ function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : [
 function mkey(m) { const o = {}; Object.keys(m).sort().forEach(k => { if (k !== 'label') o[k] = m[k]; }); return JSON.stringify(o); }
 function sameM(a, b) { return !!a && !!b && mkey(a) === mkey(b); }
 function pcolor(i) { return HBKit.PLAYER[i === 'G' ? 4 : i % 4]; }
-function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', HBKit.worker(k, px), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
+function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', h('span.wpg', { style: '--wc:' + HBKit.PLAYER[k].c }, h('img', { src: 'models/worker.webp', alt: '', draggable: 'false' })), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
 function score(seat) { try { return HB.score(G, seat); } catch (e) { return { total: 0 }; } }
 function lastLogs(n) { return G.log.slice(-n).map(x => x.t); }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
