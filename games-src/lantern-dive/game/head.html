@@ -217,7 +217,7 @@ html.ph .cfghead,html.ph .cfgfoot{display:flex}
 @media (prefers-reduced-motion:reduce){.tslot.turn,.hc.pk{animation:none}.emo{animation:none;opacity:1}}
 html.ldpx .hc.dim::before{display:none}
 html.ldpx #bd .hc svg.card,html.ldpx #bd .tc svg.card,html.ldpx #bd .dc svg.card{visibility:hidden}
-html.ldpx #bd{background-image:none}
+html.ldpx.lowtbl #bd{background-image:none}
 html.ldpx .hc{transition:none!important}
 html.ldpx #handz{background:none}
 
@@ -397,4 +397,12 @@ html.ph.ph-l .gx-drawer{top:0;bottom:0;right:0;left:auto;width:min(420px,100vw);
 #bd.side #pile{right:6px}
 html.ph-short .seat .pg{min-height:18px}
 @media (prefers-reduced-motion:reduce){.seat.glow,.jcard.glow,.hc.glow::after,.pspot,.tslot.turn,#finger{animation:none!important}#finger{opacity:1}}
+
+/* ===== painted extras: end art, Music picker ===== */
+.rsbox .endart,.gxc-res .endart{flex:0 0 auto;height:min(26vh,190px);border-radius:12px;background:center/cover no-repeat;margin:0 0 8px}
+#musicbody .mtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.mvol{display:flex;align-items:center;gap:6px;font-weight:800}.mvol input{width:120px}
+.mrow2{margin:0 0 12px}.mrow2 h5{margin:0 0 6px;font-size:15px}.mrow2 small{font-weight:600;color:#7be0a0}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
+.mchip.on{background:var(--gold);color:#1b1200;border-color:var(--gold)}.mchip.prev{border-style:dashed}
 </style></head>
