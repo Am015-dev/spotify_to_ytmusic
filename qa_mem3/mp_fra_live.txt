@@ -1,0 +1,27 @@
+{"totMB":208.5,"glMB":61.3,"cpuMB":36.7,"geoms":309,"tex":160,"progs":66,"heapMB":38.2,"lbl":"menu"}
+enter 30.483
+{"totMB":340.6,"glMB":111.6,"cpuMB":46.4,"geoms":4087,"tex":137,"progs":96,"heapMB":73.2,"lbl":"roam"}
+{"totMB":285.1,"glMB":111.8,"cpuMB":46.6,"geoms":4101,"tex":138,"progs":96,"heapMB":83.2,"lbl":"drive20"}
+{"totMB":283.7,"glMB":112.1,"cpuMB":46.7,"geoms":4111,"tex":138,"progs":96,"heapMB":81.8,"lbl":"drive40"}
+{"totMB":286.4,"glMB":112.4,"cpuMB":46.7,"geoms":4119,"tex":138,"progs":96,"heapMB":77.9,"lbl":"drive60"}
+{"totMB":290.6,"glMB":112.6,"cpuMB":52,"geoms":4127,"tex":138,"progs":96,"heapMB":73,"lbl":"drive80"}
+{"totMB":313.7,"glMB":112.9,"cpuMB":75,"geoms":4135,"tex":138,"progs":96,"heapMB":73.8,"lbl":"drive100"}
+{"totMB":331.3,"glMB":113.1,"cpuMB":92,"geoms":4151,"tex":139,"progs":96,"heapMB":74.4,"lbl":"drive120"}
+{"totMB":359.9,"glMB":114.9,"cpuMB":111.9,"geoms":4178,"tex":151,"progs":113,"heapMB":74.2,"lbl":"garage"}
+{"totMB":341.7,"glMB":134.8,"cpuMB":92.4,"geoms":4221,"tex":150,"progs":113,"heapMB":79.7,"lbl":"after_garage:✕BACK"}
+top owners (last):
+  Group/keep+wbLod 209 45.7 84.6
+  Group/Mesh 1800 22.6 58
+  Group/trG+bwT 88 0 26.2
+  Group/w+g 11 10.2 10.2
+  m+ribbons/Group/scN 74 4.4 4.4
+  Group/a8 22 2.9 2.9
+  Group/keep+wbLo 11 2.4 2.4
+  Group/Group/Group 499 0.4 2.1
+  Group/ks 1559 2 2
+  Group/cv 8 0.1 1.5
+  Group/trG 15 0 1.2
+  a8+art6c 16 1.1 1.1
+  Group/trPl 34 0 0.6
+  Group/dr 2 0 0.5
+errs []

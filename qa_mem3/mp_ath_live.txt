@@ -1,0 +1,8 @@
+{"totMB":235.7,"glMB":71.3,"cpuMB":46.6,"geoms":202,"tex":86,"progs":62,"heapMB":48.7,"lbl":"menu"}
+enter 136.486
+{"totMB":386.5,"glMB":190.2,"cpuMB":38,"geoms":4021,"tex":133,"progs":101,"heapMB":152.6,"lbl":"roam"}
+{"totMB":369.7,"glMB":190.5,"cpuMB":38.1,"geoms":4034,"tex":133,"progs":101,"heapMB":160.7,"lbl":"drive20"}
+{"totMB":392.5,"glMB":190.9,"cpuMB":38.2,"geoms":4057,"tex":134,"progs":101,"heapMB":183,"lbl":"drive40"}
+{"totMB":419.4,"glMB":191.3,"cpuMB":38.2,"geoms":4070,"tex":134,"progs":101,"heapMB":208.3,"lbl":"drive60"}
+{"totMB":443.7,"glMB":191.7,"cpuMB":38.3,"geoms":4083,"tex":134,"progs":101,"heapMB":231.5,"lbl":"drive80"}
+{"totMB":467.3,"glMB":192.1,"cpuMB":38.3,"geoms":4095,"tex":134,"progs":101,"heapMB":254.2,"lbl":"drive100"}

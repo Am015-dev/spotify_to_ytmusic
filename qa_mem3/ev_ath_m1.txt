@@ -1,0 +1,2 @@
+{"on":false,"busy":1,"ms":0,"cells":1054,"items":395017,"packMB":34.9,"tl":946,"tplMB":7.1,"ckMB":1.5,"bld":66614,"grid":58292,"str":{"sup":0,"built":0,"mb":0}}
+errs []

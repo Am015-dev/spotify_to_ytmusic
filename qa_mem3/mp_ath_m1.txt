@@ -1,0 +1,1 @@
+{"wb":0,"totMB":249.2,"glMB":71.3,"cpuMB":46.6,"geoms":202,"tex":86,"progs":62,"heapMB":62.1,"lbl":"menu"}

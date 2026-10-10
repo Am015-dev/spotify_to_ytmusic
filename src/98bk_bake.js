@@ -5,7 +5,7 @@
 // the cell is ≤ the best upper bound (and ≤ the second-best one from another street, so a `skip` argument stays exact). A query then scans
 // ~3–30 samples. Same formula, same order, same ties: the answers are bit-identical (window.__bk.check() compares with the originals).
 // Whole-map lists use two levels (512 m cells → 64 m cells). Each cache is capped (cleared past BK_MAX cells) so memory stays bounded.
-const BK={on:1,st:{q:0,c:0},C:[]},BK_MAX=8000;
+const BK={on:/[?&]bk=0\b/.test(location.search)?0:1,st:{q:0,c:0},C:[]},BK_MAX=8000;
 const BK0={trailDist,fillAt,cityAt,abAt,rivClear,mtnDist};
 const BK_cache=()=>{const M=new Map();BK.C.push(M);return M};
 // point candidates for cell [x0,x1]×[z0,z1]: P = flat [x,z,off,grp,payload…] (stride st), lim = initial best (squared when sq)
