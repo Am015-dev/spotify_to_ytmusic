@@ -104,5 +104,24 @@ button{font:inherit;color:inherit;cursor:pointer}
 </style>
 <style>
 /*GXCCSS*/
+
+/* ===== painted art: table, tile backs, pieces, title and end art, Music picker (html.tbl / .cb / .ti are set once the file has loaded) ===== */
+html.tbl #board{background:var(--tbl,url(media/table-default.webp)) center/cover no-repeat,radial-gradient(ellipse at 50% 40%,#c9b682,#a8935c 80%)}
+@media (max-aspect-ratio:1/1){html.tbl:not(.tbl-u) #board{background:url(media/table-default-phone.webp) center/cover no-repeat,radial-gradient(ellipse at 50% 40%,#c9b682,#a8935c 80%)}}
+.pile{display:none}
+html.cb #left .pile{display:block;width:20px;height:28px;border-radius:4px;background:var(--cb) center/cover;border:1.5px solid #f3dca0;box-shadow:2px 2px 0 rgba(0,0,0,.4)}
+html.cb #left .plain{display:none}
+.pc{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,rgba(255,250,235,.72) 0 56%,transparent 57%);box-shadow:0 0 0 2.5px var(--c);box-sizing:border-box}
+.pc img{display:block;width:100%;height:100%;object-fit:contain}
+.fglow .pc{box-shadow:0 0 0 2.5px var(--c)}
+html.ti .scrim:has(.card[aria-label=Start]){background:linear-gradient(rgba(30,18,8,.06),rgba(30,18,8,.18)),url(media/title.webp) center/cover no-repeat}
+@media (max-aspect-ratio:1/1){html.ti .scrim:has(.card[aria-label=Start]){background:linear-gradient(rgba(30,18,8,.06),rgba(30,18,8,.18)),url(media/title-phone.webp) center/cover no-repeat}}
+.card .endart,.gxc-res .endart{flex:0 0 auto;height:min(26vh,190px);border-radius:12px;background:center/cover no-repeat;margin:0 0 6px}
+#musicm{z-index:45}#musicm[hidden]{display:none}
+#musicbody{text-align:left}#musicbody .mtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.mvol{display:flex;align-items:center;gap:6px;font-weight:800}.mvol input{width:120px}
+.mrow2{margin:0 0 12px}.mrow2 h5{margin:0 0 6px;font-size:15px}.mrow2 small{font-weight:600;color:#2d7a1c}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #6b4429;background:#fff4d8;color:#3a2412;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
+.mchip.on{background:#3a2412;color:#fff4d8}.mchip.prev{border-style:dashed}
 </style>
 </head>

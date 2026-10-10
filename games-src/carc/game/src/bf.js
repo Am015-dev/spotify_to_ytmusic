@@ -59,7 +59,7 @@ function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view
 function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100+sp[0],y*100+sp[1]]}
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
-    const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=ico(FIGICON[f.k]);
+    const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k]);
     addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
   for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
   placeOverlay()}
@@ -67,7 +67,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
-    ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=ico(FIGICON[m.k]);
+    ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k]);
       b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);b.addEventListener('click',()=>onFig(m));
       addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;UI.figs.push(b)})}
   placeOverlay()}
@@ -88,7 +88,7 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
     return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot">${p.human?'':'&#9881;'}</i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${ico('meeple')}${s.f}${s.big?`${ico('champ')}`:''}${s.bld?`${ico('mason')}`:''}${s.pig?`${ico('hog')}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
-  $('#left').innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b>`}
+  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b>`}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
   if(G.over||!G.cur){h.innerHTML=`<div id="hinfo"><span class="big">Valley complete</span></div>`;return}
@@ -167,9 +167,9 @@ function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame
   m.querySelector('[data-a=play]').onclick=()=>{if(tutOffer())showOffer();else beginGame()};m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
   const c=m.querySelector('[data-a=cont]');if(c)c.onclick=loadSaved}
 function openMenu(){if($('#menu'))return closeMenu();const d=document.createElement('div');d.id='menu';d.className='menu';d.setAttribute('role','dialog');
-  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
+  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="musicp">Choose music</button><button data-a="paint">Pictures: ${PAINT_ON?'painted':'simple'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
   document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.gxh||b.hasAttribute('data-gxt-open'))return;const a=b.dataset.a;closeMenu();
-    if(a==='fit')refit(true);else if(a==='rules')showRules();else if(a==='snd')toggleSound();else if(a==='mus')toggleMusic();else if(a==='spd'){UI.speed=UI.speed>1?1:3;try{localStorage.setItem('rv_fast',UI.speed>1?'1':'0')}catch(e){}}
+    if(a==='fit')refit(true);else if(a==='rules')showRules();else if(a==='snd')toggleSound();else if(a==='mus')toggleMusic();else if(a==='musicp')musicOpen();else if(a==='paint')paintToggle();else if(a==='spd'){UI.speed=UI.speed>1?1:3;try{localStorage.setItem('rv_fast',UI.speed>1?'1':'0')}catch(e){}}
     else if(a==='story'&&typeof campOpen==='function')campOpen();else if(a==='new'){UI.camp=null;showStart()}};
   setTimeout(()=>document.addEventListener('pointerdown',menuAway,true),0)}
 function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
