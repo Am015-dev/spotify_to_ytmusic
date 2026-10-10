@@ -1007,7 +1007,17 @@ function fit(){
 let tipT;function tip(h){const t=$('#tip');t.innerHTML=h;t.hidden=false;clearTimeout(tipT);tipT=setTimeout(()=>t.hidden=true,4600)}
 
 /* ---------- player overlay ---------- */
-const table=$('#table'),frame=$('#frame');let retFocus=null;
+const table=$('#table');let frame=$('#frame'),retFocus=null;
+/* a closed game gets a brand-new iframe: blanking the old one kept its images, audio and GPU memory alive (about 60 MB per game played) */
+function frameLoaded(){if(frame.src.startsWith('about:'))return;hideLoader()}
+/* before the old page goes, hand its GPU and media memory back at once instead of waiting for Chrome's garbage collector */
+function releaseFrame(f){try{const w=f.contentWindow,d=w&&w.document;if(!d)return;
+  d.querySelectorAll('canvas').forEach(c=>{for(const k of['webgl2','webgl']){let g=null;try{g=c.getContext(k)}catch(e){}if(g){try{const x=g.getExtension('WEBGL_lose_context');if(x)x.loseContext()}catch(e){}break}}c.width=c.height=0});
+  d.querySelectorAll('audio,video').forEach(m=>{try{m.pause();m.removeAttribute('src');m.load()}catch(e){}});
+  for(const k in w){let v;try{v=w[k]}catch(e){continue}if(v&&typeof v==='object'&&w.AudioContext&&v instanceof w.AudioContext&&v.state!=='closed')try{v.close()}catch(e){}}
+}catch(e){}}
+function freshFrame(){const old=frame,n=old.cloneNode(false);n.removeAttribute('src');n.addEventListener('load',frameLoaded);
+  releaseFrame(old);try{old.src='about:blank'}catch(e){}old.replaceWith(n);frame=n}
 function openGame(g,count){
   const hr=new Date().getHours();
   if(g.id!=='ref'){store.set('shelf_last',g.id);
@@ -1019,7 +1029,7 @@ function openGame(g,count){
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
 function closeGame(){
   if(typeof showFab==='function'){showFab(false);leaveFull()}
-  table.hidden=true;root.classList.remove('playing');frame.src='about:blank';document.body.style.overflow='';
+  table.hidden=true;root.classList.remove('playing');freshFrame();document.body.style.overflow='';
   try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   const id=store.get('shelf_last'),rf=retFocus;retFocus=null;
   render();
@@ -1219,7 +1229,7 @@ var lt0=0,ltick=0;
 function showLoader(name){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader)return;document.getElementById('lname').textContent=name;loader.classList.remove('done');lt0=performance.now();let p=8;lbar.style.width=p+'%';clearInterval(ltick);
   clearInterval(ltick);ltick=setInterval(()=>{p+=(92-p)*0.12;lbar.style.width=p.toFixed(1)+'%'},120)}
 function hideLoader(){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader||loader.classList.contains('done'))return;clearInterval(ltick);lbar.style.width='100%';const wait=Math.max(0,900-(performance.now()-lt0));setTimeout(()=>loader.classList.add('done'),wait+250)}
-document.getElementById('frame').addEventListener('load',()=>{if(document.getElementById('frame').src.startsWith('about:'))return;hideLoader()});
+frame.addEventListener('load',frameLoaded);
 </script>
 </body>
 </html>
