@@ -74,7 +74,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ld | `98ld_w.js` | 8 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
 | 98ld | `98ld_l_land.js` | 14 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
 | 98ld | `98ld_run.js` | 5 | LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module (window.__LDQ, r |
-| 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
+| 98ct | `98ct_city_lego.js` | 26 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98sz | `98sz_ride_scale.js` | 5 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 99c | `99c_checklist.js` | 46 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
@@ -353,9 +353,9 @@ uses: 30(18), 53(18), 10(11), 60(10), 20(9), 97(8), 70(3), 98ld(3)
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
 uses: 98(20), 98ld(12), 98ld(7), 98y(6), 98ld(4), 72(3), 30(3), 10(3), 94(2), 98fb(2)
 
-## 98ct_city_lego.js — 16 KB
-defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim CT_WD CT_segW CT_wideHw CT_wideOk __ct CTB CTB_V CTB_city CTB_kind CTB_h CTB_pick CTB_fill CTB_putK CTB_put CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step __ctb
-uses: 20(35), 93(22), 30(16), 98ld(15), 60(14), 92(13), 53(13), 10(10), 70(9), 98ld(3)
+## 98ct_city_lego.js — 26 KB
+defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim CT_WD CT_segW CT_wideHw CT_wideOk __ct CTB CTB_V CTB_city CTB_ids CTB_free CTB_pack CTB_kind CTB_ST CTB_stack CTB_make CTB_h CTB_pick CTB_row CTB_side CTB_fill CTB_putK CTB_put CTB_mats CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step CTB_step1 CTB_loop __ctb
+uses: 20(34), 93(21), 98ld(17), 10(16), 92(16), 53(15), 60(14), 30(10), 70(8), 72(4)
 
 ## 98sz_ride_scale.js — 5 KB
 defines: RSZ SZ_k SZ_add __sz
