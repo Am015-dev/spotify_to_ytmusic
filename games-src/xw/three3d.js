@@ -143,7 +143,7 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
 // ---- the play mat: a dark glass plate with a holographic range grid, deployment bands, ruler ticks, a glowing frame and corner emitters ----
 function playMat(){const g=new THREE.Group();const M=91.4;
   const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x04050c,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
-  plate.position.set(M/2,-.32,M/2);V3.plate=plate;plate.receiveShadow=true;g.add(plate);
+  plate.position.set(M/2,-.32,M/2);V3.plate=plate;plate.renderOrder=-3;plate.receiveShadow=true;g.add(plate);
   const grid=V3.gridMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},c0:{value:new THREE.Color(0xff8a3a)},c1:{value:new THREE.Color(0xff3050)},cg:{value:new THREE.Color(0x5fb8ff)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:`uniform float t;uniform vec3 c0,c1,cg;varying vec2 vP;
@@ -163,7 +163,7 @@ function playMat(){const g=new THREE.Group();const M=91.4;
   grid.extensions={derivatives:true};
   const gp=new THREE.Mesh(new THREE.PlaneGeometry(M,M),grid);gp.rotation.x=-Math.PI/2;gp.position.set(0,.015,0);
   // PlaneGeometry is centred: shift its positions so vP runs 0..M along x and 0..M from the far edge (board y = MAT - z)
-  gp.geometry.translate(M/2,M/2,0);gp.position.set(0,.015,M);g.add(gp);
+  gp.geometry.translate(M/2,M/2,0);gp.position.set(0,.015,M);gp.renderOrder=-1;g.add(gp);
   // glowing frame bars and corner emitters
   const fm=new THREE.MeshStandardMaterial({color:0x10131f,roughness:.3,metalness:.9,emissive:0x2f7fd0,emissiveIntensity:.9});
   const cm=new THREE.MeshStandardMaterial({color:0x2a2418,roughness:.25,metalness:1,emissive:0xffb35a,emissiveIntensity:.6});
