@@ -23,7 +23,7 @@ async function playGame(browser,W,H,gi){
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
-  p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
+  p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon|Fetch API cannot load/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
   const twoD=process.argv[5]==='3d'?false:process.argv[5]==='2d'?true:gi%4!==0;                       // most games on the 2D chart (fast), every 4th on the real 3D board
   await p.goto('https://gns.test/?phone=1'+(twoD?'&2d':''),{timeout:90000});await sleep(1100);
   const np=2+gi%3,anim=gi%2===0;const exp=gi%3===1||gi%7===3?['rift','cannon','wave','maelstrom']:gi%4===2?['cannon','rift']:[];
