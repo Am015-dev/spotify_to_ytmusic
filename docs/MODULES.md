@@ -157,7 +157,7 @@ uses: 10(182), 30(156), 53(90), 71(45), 51(33), 20(30), 70(20), 72(15), 41(13), 
 
 ## 90_fixes_cv_ju.js — 82 KB
 defines: OB OB_who OB_prop OB_rec __ob OB_LEAVE OB_HOLD OB_DIST OB_MINHOLD OB_raw0 OB_terr0 OB_HW OB_HL OB_touch OB_obb OB_cdim OB_car OB_carP OB_EURO OB_EURO_HW OB_EURO_HD OB_euroBuild __ob OC OC_beamGeo OC_poolGeo OC_lampsBuild OC_poolStep OC_GAME OC_fp OC_roadE OC_segE OC_junc OC_minG OC_props OC_onRoad OC_carScale OC_scaleDefs OC_traffic OC_AK OC_acroBuild OC_unbury OC_altFix OC_REAL OC_RANGE OC_TREES OC_CARS OC_audit OC_lyka OC_zone OC_top OC_fix OC_gy OC_ifl __oc CV CV_MAJ CV_h CV_pal CV_AM CV_AR CV_WK CV_u CV_st CV_walk CV_near CV_sigBuild CV_sigMesh CV_LC CV_lamps CV_tick CV_pre CV_post CV_pedPre CV_pedPost CV_AP CV_put CV_fsty CV_FP CV_fraVar CV_streets __cvCars __cv JU JU_C JU_TC JU_ev JU_roam JU_busy JU_split JU_mis JU_tier JU_ss JU_hit JU_gate JU_popEl JU_step1 __ju W12P W12_paint W12_cars
-uses: 53(201), 30(100), 20(88), 10(45), 71(23), 85(22), 51(22), 60(21), 72(12), 70(8)
+uses: 53(197), 30(100), 20(88), 10(45), 85(23), 71(23), 51(22), 60(21), 72(12), 70(8)
 
 ## 92_garage_builder.js — 17 KB
 defines: GB_U GB_PH GB_MAX GB_CAP GB_BC GB_PC GB_ GB_col GB_box GB_cyl GB_mirX GB_shape GB_dims GB_piece GB_brickGeo GB_FIG GB_FCAT GB_figGet GB_figOk GB_figGeo GB_PT GB_MAT GB_LMAT GB_geo GB_plate GB_attach GB_mods GB_cells GB_top GB_fit GB_twin GB_same GB_list GB_snap GB_add GB_hitBrick GB_del GB_paint GB_undo

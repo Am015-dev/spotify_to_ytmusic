@@ -76,7 +76,9 @@ FL_headlights=function(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.
   // (most of the time), and the old one was never disposed: its geometry + instance buffer stayed on the GPU (+0.7 MB per area, ~1 rebuild/s at dusk/night).
   if(H&&H.parent!==HUB.grp&&H.instanceMatrix.count>=N)HUB.grp.add(H);
   if(!H||H.instanceMatrix.count<N){if(H){H.removeFromParent();H.geometry.dispose();H.material.dispose();H.dispose()}
-    const L=[cbox(.42,.26,.12,-.72,.85,2.25,'#fff6d8'),cbox(.42,.26,.12,.72,.85,2.25,'#fff6d8'),cbox(.36,.2,.1,-.74,.9,-2.25,'#ff2a20'),cbox(.36,.2,.1,.74,.9,-2.25,'#ff2a20')];L.push(OC_beamGeo());
+    // v89q: no lamp boxes. The 4 fixed cboxes (±.74 m, ±2.25 m) fitted no car (traffic rears -2.0..-2.8 m, player x1.2), so at 2.4x additive
+    // they floated beside/behind every car as solid pink/white rectangles. The cars' own lamp parts glow via FL_emis; only the soft beam fan stays.
+    const L=[OC_beamGeo()];
     const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,color:0x000000,fog:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4});
     H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+8);H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1;H.userData.oc=1}
   H.material.color.setScalar(2.4*n);let j=0;
