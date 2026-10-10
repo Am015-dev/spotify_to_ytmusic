@@ -1,1 +1,36 @@
 {"wb":0,"totMB":249.2,"glMB":71.3,"cpuMB":46.6,"geoms":202,"tex":86,"progs":62,"heapMB":62.1,"lbl":"menu"}
+enter 84.551
+{"wb":0.5,"totMB":400.6,"glMB":190.2,"cpuMB":38,"geoms":4022,"tex":133,"progs":101,"heapMB":158.2,"lbl":"roam"}
+{"wb":0.5,"totMB":380.9,"glMB":190.5,"cpuMB":38.1,"geoms":4037,"tex":133,"progs":101,"heapMB":157.1,"lbl":"drive20"}
+{"wb":0.5,"totMB":391.8,"glMB":190.8,"cpuMB":38.2,"geoms":4057,"tex":134,"progs":101,"heapMB":157.5,"lbl":"drive40"}
+{"wb":0.5,"totMB":403.4,"glMB":191.2,"cpuMB":38.2,"geoms":4077,"tex":135,"progs":101,"heapMB":158.3,"lbl":"drive60"}
+{"wb":0.5,"totMB":415.1,"glMB":191.6,"cpuMB":38.2,"geoms":4091,"tex":135,"progs":101,"heapMB":160.6,"lbl":"drive80"}
+{"wb":0.5,"totMB":435.8,"glMB":192,"cpuMB":38.3,"geoms":4101,"tex":135,"progs":101,"heapMB":160.5,"lbl":"drive100"}
+{"wb":0.5,"totMB":427.6,"glMB":192.4,"cpuMB":38.3,"geoms":4113,"tex":135,"progs":101,"heapMB":157.1,"lbl":"drive120"}
+{"wb":0.5,"totMB":423.7,"glMB":192.9,"cpuMB":40.8,"geoms":4129,"tex":135,"progs":101,"heapMB":157.5,"lbl":"drive140"}
+{"wb":0.5,"totMB":465.1,"glMB":193.4,"cpuMB":81.5,"geoms":4145,"tex":135,"progs":101,"heapMB":158.3,"lbl":"drive160"}
+{"wb":1,"totMB":455.6,"glMB":212.9,"cpuMB":66.9,"geoms":4201,"tex":135,"progs":101,"heapMB":163,"lbl":"drive180"}
+{"wb":1,"totMB":455.9,"glMB":218.7,"cpuMB":61.5,"geoms":4219,"tex":135,"progs":101,"heapMB":162.9,"lbl":"drive200"}
+{"wb":1,"totMB":451.3,"glMB":219.9,"cpuMB":61,"geoms":4237,"tex":136,"progs":101,"heapMB":163.2,"lbl":"drive220"}
+{"wb":1,"totMB":450.9,"glMB":220.2,"cpuMB":61,"geoms":4247,"tex":136,"progs":101,"heapMB":163.3,"lbl":"drive240"}
+{"wb":1,"totMB":439.6,"glMB":229.4,"cpuMB":52.4,"geoms":4268,"tex":136,"progs":101,"heapMB":158.6,"lbl":"drive260"}
+{"wb":1,"totMB":438.1,"glMB":230.5,"cpuMB":51.6,"geoms":4279,"tex":136,"progs":101,"heapMB":159.5,"lbl":"drive280"}
+{"wb":1,"totMB":438.5,"glMB":230.9,"cpuMB":51.6,"geoms":4292,"tex":136,"progs":101,"heapMB":159.5,"lbl":"drive300"}
+{"wb":1,"totMB":443.2,"glMB":232.7,"cpuMB":51.6,"geoms":4319,"tex":148,"progs":118,"heapMB":160.9,"lbl":"garage"}
+{"wb":1,"totMB":436.8,"glMB":232.9,"cpuMB":51.6,"geoms":4324,"tex":147,"progs":118,"heapMB":161.2,"lbl":"after_garage:✕BACK"}
+top owners (last):
+  Group/Mesh 1150 22.5 92.2
+  Group/keep+wbLod 176 13.3 81
+  Group/trG+bwT 165 0 50.6
+  Group/dr 2 0 15.3
+  Group/trPl 126 0 12.3
+  Group/w+g 8 5.4 5.4
+  m+ribbons/Group/scN 74 4.4 4.4
+  Group/trG 36 0 3.6
+  Group/a8 16 2 2
+  Group/keep+wbLo 8 1.6 1.6
+  Group/cv 5 0 1.3
+  a8+art6c 16 1.1 1.1
+  Group/trPl+bwT 17 0 1
+  Group/Group/Group 252 0.5 0.7
+errs []

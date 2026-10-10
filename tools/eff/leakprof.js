@@ -18,8 +18,9 @@ const drive=async s=>{await p.keyboard.down('ArrowUp');for(let i=0;i<s;i++){awai
 await drive(WARM);const h0=await heap();
 if(process.env.FROM!=='enter')await cdp.send('HeapProfiler.startSampling',{samplingInterval:16384});await drive(DRIVE);await p.evaluate(()=>gc());await p.evaluate(()=>gc());
 const {profile}=await (process.env.FROM==='enter'?cdp0:cdp).send('HeapProfiler.stopSampling');const h1=await heap();
-const self={},stack={};const walk=(n,path)=>{const f=n.callFrame,k=(f.functionName||'(anon)')+'@'+(f.lineNumber+1);const P=path.concat(k);if(n.selfSize){self[k]=(self[k]||0)+n.selfSize;const s=P.slice(-(+(process.env.DEPTH||4))).join(' < ');stack[s]=(stack[s]||0)+n.selfSize}for(const c of n.children)walk(c,P)};walk(profile.head,[]);
+const self={},stack={};const incl={};const walk=(n,path)=>{const f=n.callFrame,k=(f.functionName||'(anon)')+'@'+(f.lineNumber+1);const P=path.concat(k);if(n.selfSize){for(const q of new Set(P))incl[q]=(incl[q]||0)+n.selfSize;self[k]=(self[k]||0)+n.selfSize;const s=P.slice(-(+(process.env.DEPTH||4))).join(' < ');stack[s]=(stack[s]||0)+n.selfSize}for(const c of n.children)walk(c,P)};walk(profile.head,[]);
 const tot=Object.values(self).reduce((a,b)=>a+b,0);console.log(JSON.stringify({city:CITY,heapBefore:h0,heapAfter:h1,liveSampledMB:+(tot/1048576).toFixed(1),errs}));
 console.log('--self');Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOP||25)).forEach(([k,v])=>console.log((v/1048576).toFixed(2).padStart(7),k));
 console.log('--stacks');Object.entries(stack).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOP||20)).forEach(([k,v])=>console.log((v/1048576).toFixed(2).padStart(7),k));
+console.log('--inclusive');Object.entries(incl).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOP||20)*2).forEach(([k,v])=>console.log((v/1048576).toFixed(2).padStart(7),k));
 await b.close()})().catch(e=>{console.error(e);process.exit(1)});
