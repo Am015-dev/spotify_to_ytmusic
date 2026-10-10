@@ -61,24 +61,24 @@ window.__ct={CT,swap:CT_SWAP,hcar:()=>HCAR.slice(),geo:nm=>CR_cityGeo(nm),r:()=>
 // recoloured to the sentinel #ffffff and tinted per instance (CTB_mat: instanceColor tints only pure-white vertices); positions Int16, colours
 // Uint8, no normals (flat shading); CPU copies dropped after upload. LOD: full bricks < CTB.nearD, clustered copy < CTB.midD, coarse copy < CTB.far.
 // Colliders = each set's footprint of tall parts (oriented hubAddB boxes: glancing hits slide). Landmarks, towers, quest buildings stay. ?ctb=0 = old.
-const CTB={on:!/[?&]ctb=0/.test(location.search),K:{},nearD:34,midD:CID==='fra'?120:80,far:CID==='fra'?560:430,CS:64,st:{slots:0,sets:0,back:0,skip:0,sz:[]},t:0,cg:{},mat:null,gmat:null};
+const CTB={on:!/[?&]ctb=0/.test(location.search),K:{},nearD:34,tinyD:90,midD:CID==='fra'?120:80,far:CID==='fra'?560:430,CS:64,st:{slots:0,sets:0,back:0,skip:0,sz:[]},t:0,cg:{},mat:null,gmat:null};
 // per city: front-row and back-row models (k = model id, ids = data chunks, w = weight, gap = min distance between two of it, rc = fixed recolour,
 // wall = wall colour if the auto pick is wrong) and the wall palette ('o' = the set's own colour)
 const CTB_V={fra:{front:[{k:'bank',w:2},{k:'w6372',w:2},{k:'w6362',w:2,wall:'#b40000'},{k:'w6374',w:1},{k:'w6683',w:1},{k:'cg',ids:['cga','cgb'],w:2,gap:60},
    {k:'m10182',w:2},{k:'m10185',w:2},{k:'m10218',w:2},{k:'m10243',w:2},{k:'m10251',w:2},{k:'m10246',w:2},{k:'m10270',w:2}],
   back:[{k:'cg',ids:['cga','cgb'],w:2},{k:'m10182',w:2},{k:'m10185',w:2},{k:'m10218',w:2},{k:'m10243',w:2},{k:'m10251',w:2},{k:'m10246',w:2},{k:'m10270',w:2},{k:'w6372',w:1},{k:'bank',w:1}],
   pal:['o','o','o','#f4f4f4','#e4cd9e','#958a73','#a0a5a9','#720e0f','#b40404','#a0bcac','#6c6e68','#f2e3bd','#5b7590','#c87a3c']},
- ath:{front:[{k:'w6365',w:3,rc:{'#b40000':'#1e5aa8'},wall:'#fac80a'},{k:'w6360',w:2,wall:'#ffff80'},{k:'w6349',w:2},{k:'w6402',w:1},
-   {k:'m10182',w:1,gap:120},{k:'m10243',w:1,gap:120}],
+ ath:{front:[{k:'w6365',w:3,rc:{'#b40000':'#1e5aa8'},wall:'#fac80a'},{k:'w6360',w:2,wall:'#ffff80'},{k:'w6349',w:2},
+   {k:'m10182',w:1,gap:120},{k:'m10243',w:1,gap:120},{k:'w6376',w:1,gap:90}],fill:{k:'w3718',w:1},
   back:[{k:'w6349',w:1},{k:'w6360',w:1,wall:'#ffff80'},{k:'w6365',w:1,rc:{'#b40000':'#1e5aa8'},wall:'#fac80a'}],
   pal:['#f4f4f4','#f4f4f4','#f4f4f4','#f4f4f4','#f2e3bd','#fbf1d8'],
   // old town (Psyrri, around the start): whitewashed modular cafés and restaurants with the cottages between them
-  old:{front:[{k:'m10182',w:3},{k:'m10243',w:3},{k:'w6365',w:1,rc:{'#b40000':'#1e5aa8'},wall:'#fac80a'},{k:'w6402',w:1}],
-   back:[{k:'w6349',w:1},{k:'w6360',w:1,wall:'#ffff80'},{k:'w6402',w:1}],pal:['#f4f4f4','#f4f4f4','#f4f4f4','#f2e3bd','#fbf1d8','#e4cd9e']}}};
+  old:{front:[{k:'m10182',w:3},{k:'m10243',w:3},{k:'w6376',w:2},{k:'w6365',w:1,rc:{'#b40000':'#1e5aa8'},wall:'#fac80a'}],fill:{k:'w3718',w:1},
+   back:[{k:'w6349',w:1},{k:'w6360',w:1,wall:'#ffff80'}],pal:['#f4f4f4','#f4f4f4','#f4f4f4','#f2e3bd','#fbf1d8','#e4cd9e']}}};
 function CTB_city(){return CID==='fra'?'fra':'ath'}
 const CTB_ids=v=>v.ids||[v.k];
 // lazy models (v89z): this city's sets start loading at boot, so they are in before the city builds (a missing model keeps the old building)
-if(CTB.on)try{const V=CTB_V[CTB_city()];LD_need([...new Set(V.front.concat(V.back,V.old?V.old.front.concat(V.old.back):[]).flatMap(CTB_ids))])}catch(e){}
+if(CTB.on)try{const V=CTB_V[CTB_city()];LD_need([...new Set(V.front.concat(V.back,V.old?V.old.front.concat(V.old.back):[],[V.fill,V.old&&V.old.fill].filter(Boolean)).flatMap(CTB_ids))])}catch(e){}
 function CTB_free(){this.array=null}
 // geometry (world size, centred, base at y 0) → Int16 positions in ±q, Uint8 colours, no normals; CPU copy dropped once on the GPU
 function CTB_pack(g,q){const P=g.attributes.position,C=g.attributes.color,n=P.count,p=new Int16Array(n*3),c=new Uint8Array(n*3),k=32767/q;
@@ -89,7 +89,12 @@ function CTB_pack(g,q){const P=g.attributes.position,C=g.attributes.color,n=P.co
 // one model, built once: near [[geo,mat]], mid + far clustered copies, size, wall colour, collider box in the set's frame
 function CTB_kind(v){const key=v.k;if(CTB.K[key]!==undefined)return CTB.K[key];const ids=CTB_ids(v);if(!ids.every(id=>LD_MODELS[id]))return null;
  try{return CTB.K[key]=CTB_make(v,ids)}catch(e){console.warn('CTB kind',key,e);return CTB.K[key]=null}}
-function CTB_make(v,ids){LDW_reg();let B=ids.flatMap(id=>LD_br(id)).map(b=>{let c=b.c;if(v.rc&&v.rc[c])c=v.rc[c];if(c==='#ffffff')c='#fefefe';return c===b.c?b:{...b,c}});
+// city-3: Frankfurt modulars are ~13–18 m at minifig scale vs the old 25–30 m blocks (the skyline was lost). Each is built taller by repeating its
+// first upper floor n times: bricks in the band [y0,y1) (plates, from floor plate to floor plate) are copied n× upwards and everything above moves up.
+// Frankfurt uses only these tall versions (one geometry per model, as before); Athens keeps the low originals. ~24–27 m.
+const CTB_ST={fra:{m10182:[30,58,2],m10185:[33,60,2],m10218:[34,58,3],m10243:[32,56,3],m10251:[37,61,3]}};
+function CTB_stack(B,st){if(!st)return B;const[y0,y1,n]=st,h=y1-y0,o=[];for(const b of B){if(b.y<y0)o.push(b);else if(b.y<y1)for(let i=0;i<=n;i++)o.push(i?{...b,y:b.y+i*h}:b);else o.push({...b,y:b.y+n*h})}return o}
+function CTB_make(v,ids){LDW_reg();let B=CTB_stack(ids.flatMap(id=>LD_br(id)),(CTB_ST[CTB_city()]||{})[v.k]).map(b=>{let c=b.c;if(v.rc&&v.rc[c])c=v.rc[c];if(c==='#ffffff')c='#fefefe';return c===b.c?b:{...b,c}});
  let wall=v.wall;if(!wall){const n={};for(const b of B){const Q=GB_PC[b.t];if(!Q||Q.h<3||/^[~*]/.test(b.c)||/^#(05131d|1b2a34|000000|6c6e68|595d60)$/i.test(b.c))continue;n[b.c]=(n[b.c]||0)+Q.w*Q.d*Q.h}wall=Object.keys(n).sort((a,b)=>n[b]-n[a])[0]}
  if(wall)B=B.map(b=>b.c===wall?{...b,c:'#ffffff'}:b);
  const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);
@@ -98,14 +103,14 @@ function CTB_make(v,ids){LDW_reg();let B=ids.flatMap(id=>LD_br(id)).map(b=>{let 
  if(x0>x1){x0=box.min.x/GB_U;x1=box.max.x/GB_U;z0=box.min.z/GB_U;z1=box.max.z/GB_U}
  const X=new THREE.Matrix4().makeScale(SW,SW,SW).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));for(const g of gs)g.applyMatrix4(X);
  const W=(box.max.x-box.min.x)*SW,D=(box.max.z-box.min.z)*SW,H=(box.max.y-box.min.y)*SW,q=Math.max(W/2,D/2,H)*1.001;
- const parts=[{g:G.m,col:new THREE.Color(1,1,1)}];if(G.g)parts.push({g:G.g,col:new THREE.Color(.25,.35,.45)});const sm=CID!=='fra'&&G.m.attributes.position.count<75000/* Athens small sets (< 25k tris): one clustered copy, no mid band (draw calls) */,mid=sm?null:WB_cluster(parts,.3),far=WB_cluster(parts,sm?.7:1.1);
+ const parts=[{g:G.m,col:new THREE.Color(1,1,1)}];if(G.g)parts.push({g:G.g,col:new THREE.Color(.25,.35,.45)});const sm=CID!=='fra'&&G.m.attributes.position.count<75000/* Athens small sets (< 25k tris): one clustered copy, no mid band (draw calls) */,tiny=G.m.attributes.position.count<9000/* city-3: props (< 3k tris, the 3718 terrace): near mesh only, 1 draw */,mid=sm||tiny?null:WB_cluster(parts,.3),far=tiny?null:WB_cluster(parts,sm?.7:1.1);
  const tri=g=>(g.index?g.index.count:g.attributes.position.count)/3,K={v,W,D,H,q,wall:wall||'#f4f4f4',L:[],ims:[],
-  tris:gs.reduce((a,g)=>a+tri(g),0),mtris:mid?tri(mid):0,ftris:tri(far),
+  tiny,tris:gs.reduce((a,g)=>a+tri(g),0),mtris:mid?tri(mid):0,ftris:far?tri(far):0,
   col:{ox:((x0+x1)/2*GB_U-c.x)*SW,oz:((z0+z1)/2*GB_U-c.z)*SW,hw:Math.max(.3,(x1-x0)*GB_U*SW/2-.2),hd:Math.max(.3,(z1-z0)*GB_U*SW/2-.2)}};
  // one near mesh per model (draw calls): lamps join the bricks, glass becomes opaque tinted panes (as in the far copies)
  const glass=G.g?(()=>{const g=G.g,n=g.attributes.position.count,c=new Float32Array(n*3);for(let i=0;i<n;i++)c.set([.2,.3,.4],i*3);g.setAttribute('color',new THREE.BufferAttribute(c,3));return g})():null;
  const keep=g=>{for(const k of Object.keys(g.attributes))if(k!=='position'&&k!=='color')g.deleteAttribute(k);return g.index?g.toNonIndexed():g};
- K.near=[[CTB_pack(mergeGeometries([G.m,G.l,glass].filter(Boolean).map(keep)),q),'m']];K.mid=mid&&CTB_pack(mid,q);K.far=CTB_pack(far,q);
+ K.near=[[CTB_pack(mergeGeometries([G.m,G.l,glass].filter(Boolean).map(keep)),q),'m']];K.mid=mid&&CTB_pack(mid,q);K.far=far&&CTB_pack(far,q);
  K.mb=[...K.near.map(p=>p[0]),K.mid,K.far].filter(Boolean).reduce((a,g)=>a+Object.values(g.attributes).reduce((s,x)=>s+x.array.byteLength,0),0)/1048576;return K}
 const CTB_h=(x,z,s)=>{const v=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return v-Math.floor(v)};
 // weighted pick from a pool that fits (maxW along the street, maxD deep); not the same model twice in a row; 'gap' kinds spaced out
@@ -113,9 +118,11 @@ function CTB_pick(pool,x,z,i,maxW,maxD,prev){const tot=pool.reduce((a,v)=>a+v.w,
  let alt=null;for(let t=0;t<pool.length;t++){const v=pool[(i0+t)%pool.length],K=CTB_kind(v);if(!K||K.W>maxW||K.D>maxD)continue;
   if(v.gap&&(CTB.cg[v.k]||[]).some(p=>Math.hypot(p[0]-x,p[1]-z)<v.gap))continue;if(K===prev){alt=alt||K;continue}return K}return alt}
 // one row along the slot's street axis (local x), its front at local z = zf (the back row: the slot turned 180°, facing the street behind); returns the deepest set placed (0 = none)
-function CTB_row(x,z,c,s,ry,w,zf,dmax,pool,seed,extra,pal){const row=[];let p=-w/2,i=0,prev=null;
+function CTB_row(x,z,c,s,ry,w,zf,dmax,pool,seed,extra,pal,fill){const row=[];let p=-w/2,i=0,prev=null;
  while(p<w/2-3&&i<10&&!(row.length&&w/2-p<5)){const K=CTB_pick(pool,x+p*c,z-p*s,seed+i++,w/2-p+1,dmax,prev);if(!K)break;row.push([K,p+K.W/2]);p+=K.W+.3;prev=K}
- if(!row.length)return 0;const sh=(w/2-p+.3)/2;let dd=0;
+ if(!row.length)return 0;
+ // city-3: a café terrace (3718 table + parasol) in the gap at the end of some rows (Athens)
+ const F=fill&&CTB_h(x,z,11)<.5?CTB_kind(fill):null;if(F&&w/2-p>=F.W+.6&&F.D<=dmax){row.push([F,p+F.W/2]);p+=F.W+.3}const sh=(w/2-p+.3)/2;let dd=0;
  for(const[K,lx0]of row){const lx=lx0+sh,lz=zf-K.D/2,px=x+lx*c+lz*s,pz=z-lx*s+lz*c,y=groundY(px,pz),a=ry+Math.PI;// set front (−z) → street (+z local)
   const pc=pal[Math.floor(CTB_h(px,pz,7)*pal.length)];K.L.push({x:px,z:pz,y,a,c:new THREE.Color(pc==='o'?K.wall:pc)});if(K.v.gap)(CTB.cg[K.v.k]=CTB.cg[K.v.k]||[]).push([px,pz]);
   const ca=Math.cos(a),sa=Math.sin(a);hubAddB({x:px+K.col.ox*ca+K.col.oz*sa,z:pz-K.col.ox*sa+K.col.oz*ca,hw:K.col.hw,hd:K.col.hd,h:y+K.H,ry:a,...(extra||{})});CTB.st.sets++;dd=Math.max(dd,K.D)}
@@ -124,7 +131,7 @@ function CTB_row(x,z,c,s,ry,w,zf,dmax,pool,seed,extra,pal){const row=[];let p=-w
 function CTB_side(x,z,ry,d){const c=Math.cos(ry),s=Math.sin(ry);for(let r=1;r<40;r+=2)for(const sg of[1,-1]){const lz=sg*(d/2+r);for(const lx of[0,-3,3])if(FL_road(x+lx*c+lz*s,z-lx*s+lz*c,0))return sg}return 1}
 // fill a slot (centre x,z; yaw ry; width w along the street, depth d; local +z = the street front). false = keep the old building.
 function CTB_fill(x,z,ry,w,d,extra,pk){if(!CTB.on)return false;CTB.st.slots++;if(CTB.st.sz.length<4000)CTB.st.sz.push([+x.toFixed(0),+z.toFixed(0),+w.toFixed(1),+d.toFixed(1),+ry.toFixed(2)]);const V0=CTB_V[CTB_city()],V=pk&&V0[pk]?V0[pk]:V0;if(CTB_side(x,z,ry,d)<0)ry+=Math.PI;const c=Math.cos(ry),s=Math.sin(ry);
- const d1=CTB_row(x,z,c,s,ry,w,d/2,d+1,V.front,0,extra,V.pal);if(!d1){CTB.st.skip++;return false}
+ const d1=CTB_row(x,z,c,s,ry,w,d/2,d+1,V.front,0,extra,V.pal,V.fill);if(!d1){CTB.st.skip++;return false}
  const db=d-d1-.6;if(V.back.length&&db>=3.5){const n0=CTB.st.sets;CTB_row(x,z,-c,-s,ry+Math.PI,w,d/2,db+1,V.back,50,extra,V.pal);CTB.st.back+=CTB.st.sets-n0}return true}
 // Frankfurt hook (putK in buildHubG): only the generic street buildings, never towers
 function CTB_putK(nm,sc,x,z,ry,tint,bx,w,h,d){if(!bx||CID!=='fra'||!/^building-([a-m]|type-[a-z])$/.test(nm))return false;return CTB_fill(x,z,ry,w,d)}
@@ -139,7 +146,7 @@ function CTB_mats(){if(CTB.mat)return;const m=GB_MAT.clone(),ob=GB_MAT.onBeforeC
 function CTB_mesh(){if(!HUB.grp)return;CTB_mats();for(const k in CTB.K){const K=CTB.K[k];if(!K||K.ims.length||!K.L.length)continue;const n=K.L.length;
   const mk=(g,mat,nm,col)=>{const im=new THREE.InstancedMesh(g,mat,n);im.count=0;im.frustumCulled=false;im.receiveShadow=true;im.name=nm+k;im.userData.keep=1;
    if(col)for(let j=0;j<n;j++)im.setColorAt(j,K.L[j].c);if(mat===CTB.gmat)im.renderOrder=2;HUB.grp.add(im);return im};
-  K.nim=K.near.map(([g,t])=>mk(g,t==='m'?CTB.mat:t==='l'?GB_LMAT:CTB.gmat,'ctb_',t==='m'));K.mim=K.mid?mk(K.mid,CTB.mat,'ctbm_',1):null;K.fim=mk(K.far,CTB.mat,'ctbf_',1);K.ims=[...K.nim,K.mim,K.fim].filter(Boolean)}
+  K.nim=K.near.map(([g,t])=>mk(g,t==='m'?CTB.mat:t==='l'?GB_LMAT:CTB.gmat,'ctb_',t==='m'));K.mim=K.mid?mk(K.mid,CTB.mat,'ctbm_',1):null;K.fim=K.far?mk(K.far,CTB.mat,'ctbf_',1):null;K.ims=[...K.nim,K.mim,K.fim].filter(Boolean)}
  // per instance: matrix + linear wall colour once; a 64 m grid of [kind, instance] pairs, so a step visits only the cells in range
  CTB.KS=Object.values(CTB.K).filter(K=>K&&K.ims.length);CTB.G=new Map();const T=new THREE.Matrix4(),S=new THREE.Vector3();
  CTB.KS.forEach((K,ki)=>{const n=K.L.length;K.r=Math.max(K.W,K.D);K.M=new Float32Array(n*16);K.C=new Float32Array(n*3);S.set(K.q,K.q,K.q);
@@ -153,7 +160,7 @@ function CTB_step1(){if(typeof camera==='undefined'||!CTB.G)return;const cx=came
  for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++){const ex=(i0+a+.5)*CS-cx,ez=(j0+b+.5)*CS-cz,ed=Math.hypot(ex,ez);if(ed>far+CS*.71)continue;if(ed>CS*1.5&&ex*fx+ez*fz<-ed*.35-CS*.71)continue;// cell behind the camera
   const P=CTB.G.get((i0+a)*65536+(j0+b));if(!P)continue;
   for(let q=0;q<P.length;q+=2){const K=KS[P[q]],j=P[q+1],o=K.L[j],dx=o.x-cx,dz=o.z-cz,dd=Math.hypot(dx,dz);if(dd>far)continue;const r=K.r,f=dx*fx+dz*fz;if(dd>r+12&&f<-r-6&&f<-dd*.35)continue;
-   if(dd<(K.mim?nd:nd*1.2)){for(const im of K.nim)put(im,K.nn,K,j);K.nn++}else if(K.mim&&dd<md)put(K.mim,K.nm++,K,j);else put(K.fim,K.nf++,K,j)}}
+   if(dd<(K.mim?nd:K.tiny?CTB.tinyD:nd*1.2)){for(const im of K.nim)put(im,K.nn,K,j);K.nn++}else if(K.mim&&dd<md)put(K.mim,K.nm++,K,j);else if(K.fim)put(K.fim,K.nf++,K,j)}}
  for(const K of KS)for(const[im,n]of[...K.nim.map(im=>[im,K.nn]),[K.mim,K.nm],[K.fim,K.nf]]){if(!im)continue;im.count=n;im.visible=n>0;if(n){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true}}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{CTB_mesh()}catch(e){console.warn('CTB mesh',e)}return r})(buildRoam);
 // own frame loop (hubCullStep does not run everywhere, e.g. Athens): LOD + view sort every 6 frames
@@ -161,5 +168,5 @@ function CTB_loop(){try{CTB_step()}catch(e){}requestAnimationFrame(CTB_loop)}
 // the same sets as separate world props would be a second copy of their geometry: CTB's instances replace them (Corner Garage prop, v90a LDW props)
 if(CTB.on){const i=LD_PROPS.findIndex(q=>q.id==='cgarage');if(i>=0)LD_PROPS.splice(i,1);
  LDW_build1=(f=>function(P){if(P&&CTB.K[P.model]&&CTB.K[P.model].L.length)return;return f.apply(this,arguments)})(LDW_build1)}
-window.__ctb={CTB,scene:()=>scene,scam:(x,z)=>{let B=null,bd=1e9;for(const k in CTB.K){const K=CTB.K[k];if(K)for(const o of K.L){const d=Math.hypot(o.x-x,o.z-z);if(d<bd){bd=d;B={...o,D:K.D}}}}if(!B)return null;let fx=-Math.sin(B.a),fz=-Math.cos(B.a),sx=Math.cos(B.a),sz=-Math.sin(B.a),px=B.x,pz=B.z;for(let r=2;r<60;r+=1.5){let hit=0;for(const g of[1,-1]){const qx=B.x+fx*g*r,qz=B.z+fz*g*r;if(FL_road(qx,qz,-2)){px=qx+fx*g*2;pz=qz+fz*g*2;hit=1;break}}if(hit)break}const q=cityAt(px,pz);if(q&&q.p&&q.p.tx!=null){sx=q.p.tx;sz=q.p.tz;px=q.p.x;pz=q.p.z}const y=groundY(px,pz);return[px-sx*8,y+3,pz-sz*8,px+sx*60,y+3,pz+sz*60]},pos:()=>({x:RO.x,z:RO.z}),look:(bk,up,ah,ty)=>{const d=new THREE.Vector3();camera.getWorldDirection(d);const l=Math.hypot(d.x,d.z)||1,x=RO.x,z=RO.z,y=groundY(x,z);return[x-d.x/l*bk,y+up,z-d.z/l*bk,x+d.x/l*ah,y+ty,z+d.z/l*ah]},V:CTB_V,stat:()=>({...CTB.st,sz:undefined,ms:+(CTB.ms||0).toFixed(2),kinds:Object.values(CTB.K).filter(Boolean).map(K=>({k:K.v.k,n:K.L.length,W:+K.W.toFixed(1),D:+K.D.toFixed(1),H:+K.H.toFixed(1),wall:K.wall,tris:K.tris,mtris:K.mtris,ftris:K.ftris,mb:+K.mb.toFixed(2),near:K.nim?K.nim[0].count:0,mid:K.mim?K.mim.count:-1,far:K.fim?K.fim.count:0}))}),
+window.__ctb={CTB,scene:()=>scene,scam:(x,z)=>{let B=null,bd=1e9;for(const k in CTB.K){const K=CTB.K[k];if(K)for(const o of K.L){const d=Math.hypot(o.x-x,o.z-z);if(d<bd){bd=d;B={...o,D:K.D}}}}if(!B)return null;let fx=-Math.sin(B.a),fz=-Math.cos(B.a),sx=Math.cos(B.a),sz=-Math.sin(B.a),px=B.x,pz=B.z;for(let r=2;r<60;r+=1.5){let hit=0;for(const g of[1,-1]){const qx=B.x+fx*g*r,qz=B.z+fz*g*r;if(FL_road(qx,qz,-2)){px=qx+fx*g*2;pz=qz+fz*g*2;hit=1;break}}if(hit)break}const q=cityAt(px,pz);if(q&&q.p&&q.p.tx!=null){sx=q.p.tx;sz=q.p.tz;px=q.p.x;pz=q.p.z}const y=groundY(px,pz);return[px-sx*8,y+3,pz-sz*8,px+sx*60,y+3,pz+sz*60]},pos:()=>({x:RO.x,z:RO.z}),look:(bk,up,ah,ty)=>{const d=new THREE.Vector3();camera.getWorldDirection(d);const l=Math.hypot(d.x,d.z)||1,x=RO.x,z=RO.z,y=groundY(x,z);return[x-d.x/l*bk,y+up,z-d.z/l*bk,x+d.x/l*ah,y+ty,z+d.z/l*ah]},V:CTB_V,stat:()=>({...CTB.st,sz:undefined,ms:+(CTB.ms||0).toFixed(2),kinds:Object.values(CTB.K).filter(Boolean).map(K=>({k:K.v.k,n:K.L.length,W:+K.W.toFixed(1),D:+K.D.toFixed(1),H:+K.H.toFixed(1),wall:K.wall,tris:K.tris,mtris:K.mtris,ftris:K.ftris,mb:+K.mb.toFixed(2),near:K.nim?K.nim[0].count:0,mid:K.mim?K.mim.count:-1,far:K.fim?K.fim.count:-1}))}),
  sz:()=>CTB.st.sz,near:()=>{let best=null;for(const k in CTB.K)if(CTB.K[k])for(const o of CTB.K[k].L){const d=Math.hypot(o.x-RO.x,o.z-RO.z);if(!best||d<best.d)best={k,d,...o,W:CTB.K[k].W,D:CTB.K[k].D,H:CTB.K[k].H}}return best},list:k=>CTB.K[k]?CTB.K[k].L:[]};

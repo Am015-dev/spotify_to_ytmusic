@@ -8,10 +8,10 @@ const GLHOOK=`(()=>{const B=new WeakMap();const G={buf:0};window.__GLM=G;for(con
 const FRAME=p=>p.evaluate(()=>new Promise(res=>{try{gc()}catch(e){}requestAnimationFrame(()=>{const r=__ct.r();r.info.autoReset=false;r.info.reset();requestAnimationFrame(()=>{const i=r.info.render,o={calls:i.calls,tris:i.triangles,heapMB:+(performance.memory.usedJSHeapSize/1048576).toFixed(1),glMB:+(__GLM.buf/1048576).toFixed(1),geos:r.info.memory.geometries};r.info.autoReset=true;res(o)})})}));
 (async()=>{const [URL,OUT,CITY,TAG='']=process.argv.slice(2);fs.mkdirSync(OUT,{recursive:true});const b=await chromium.launch({args:['--js-flags=--expose-gc','--enable-precise-memory-info','--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const p=await (await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true})).newPage();await p.addInitScript(GLHOOK);p.setDefaultTimeout(600000);const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error'||/CTB/.test(m.text()))errs.push(m.text().slice(0,300))});
- await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000});
+ await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:1500000});
  await p.evaluate(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));if(c==='ath')localStorage.setItem('mho_city@1','ath')},CITY);
- await p.reload({timeout:600000});await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000});
- await p.evaluate(()=>{try{__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{timeout:300000});
+ await p.reload({timeout:600000});await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:1500000});
+ await p.evaluate(()=>{try{__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{timeout:1500000});
  await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose();__mho.roamSim(20);try{__ju.autoClose(true)}catch(e){}});await p.waitForTimeout(3000);
  console.log('CTB',CITY,TAG,JSON.stringify(await p.evaluate(()=>window.__ctb&&__ctb.stat())));
  console.log('RENDER start',TAG,JSON.stringify(await FRAME(p)));
