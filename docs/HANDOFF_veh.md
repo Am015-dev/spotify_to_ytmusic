@@ -20,8 +20,8 @@ Minifig-scale only: City, Classic Town, Speed Champions, Creator. NO Racers/Tiny
 ## Next: Classic Town bercik/others from the OMR list (scrape: library.ldraw.org/omr/sets?page=1..59, rows "id name theme year n"):
 6531 6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6355 6354 6361 6352 625 6504 6608; City 4206-2 (truck; file names use 4206-2, scripts assume -1); Creator 7347 6911 (check minifig scale).
 
-## veh-2 session (2026-10-10): 30 more done, sent to build-7
-6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6354 6361 625 6504 6608 4206-2 7347(small car) 7638(rescued) 6600 6602 6603 6501.
+## veh-2 session (2026-10-10): 34 more done, sent to build-7
+6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6354 6361 625 6504 6608 4206-2 7347(small car) 7638(rescued) 6600 6602 6603 6501 6675 6430 6450 6480.
 Skipped: 6531 (helicopter), 6352 (dock crane, no wheels), 6355 (horse cart), 6522 (motorbike), 6911 (OMR file 404 under every name), 7347 big truck (16 wide, not minifig scale).
 
 ## Faster flow (veh-2)
@@ -32,8 +32,8 @@ Skipped: 6531 (helicopter), 6352 (dock crane, no wheels), 6355 (horse cart), 652
 - In g_34 the front points RIGHT (camera sees the right side, slightly from the front).
 - Module ids: vehsrc.py <set-n> -> src/98ld_v_<set-n>.js, preset t_v<set>_<n>.
 - Converter fixes: 4288-style one-piece rubber wheels are tyres (11063ac); scaled inline primitives (cables, hoses) skipped, not a crash (cfdf040).
-## Next (from ld/dl/omr_sets.tsv; downloaded already: 6675 6430 6450 6480 6535 6550 6470 1029)
-6675 Road & Trail 4x4 (Car), 6430 Night Patroller (police car), 6450 Mobile Police Truck (car), 6480 Hook and Ladder (car), 6535 Dumper (dumper), 6550 Outback Racer (car; FILE names have trailing spaces), 6470 Mini Dump Truck, 1029 Milk Delivery Truck (car),
+## Next (from ld/dl/omr_sets.tsv; downloaded already: 6535 6550 6470 1029)
+6535 Dumper (dumper), 6550 Outback Racer (car; FILE names have trailing spaces), 6470 Mini Dump Truck, 1029 Milk Delivery Truck (car),
 then 6553 6571 6581 6594 6431 6473 6481 6484 6545 3056 6406 4016 30283 30284 20011 10220 (Creator: check scale) 6742 6743 6753 31027.
 
 ## Tips (build-8)
