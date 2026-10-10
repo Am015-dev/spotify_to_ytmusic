@@ -99,3 +99,25 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
   CHANGED: Athens golden bricks sit on roads) + a checklist item, tools/build.sh v89o, git add -f out/v89o, DEPLOY to coordinator.
 - Open check: od-mem heap/leak tPlay tests (Athens heap ~157 MB > 100, Frankfurt geo +16 MB/min) — run them on v89n to see whether pre-existing.
 - Next build (Athens ≤ 0.8/min): challenge targets (GO!, van chase, RAMP, DRIFT) — check whether chNext/route targets sit off-road; lawn strip (a).
+
+## Session 4 (2026-10-10, play-4): v89o re-check (leak, ⚙ plate) + Athens step-2 findings
+- Leak: NOT ours. tPlay fra phone FAST 4 min ×2 per build, side by side (v89n = wt_n/out/v89n, byte-identical to live):
+  geometry v89n 5.78 / 12.0 MB/min, v89o 6.87 / 3.69; heap ≤ 0.34 MB/min all. Route-dependent wbLod streaming (PERF3). qa_leak/*.log.
+- ⚙ vs district plate (#roamPlate): plate at 44 px sat under the 44 px test-mode ⚙ #tuG (6-50 px; 54-98 px when body.racing, which is ON during
+  story missions in roam). src/99_api.js: plate top 56 px, body.racing 104 px. 0 overlap (play/plateath.js, shots play/shots_v89o2/ath_plate_*.png).
+  Note: plate shows only 5 s after a district change (v85tick toggles body.v85b); the probe injects a style to force it visible.
+- OD_CHANGELOG v89o = play-3's entry + "district name … no longer under ⚙"; checklist gar-stop, ath-gb-road, plate-gear.
+- REVIEW (QUICK) sent 2026-10-10 for f31e18b7.
+### Step 2 (Athens walls ≤ 0.8/min) findings, NOT fixed yet
+- 101 Athens wall hits from qa_p89o_ath1-3 + qa_p89m_ath1-3: contexts GO!/THE VAN ESCAPED (Koulouri Rush van chase), GOLDEN BRICK, RAMP JUMP
+  (1941-1973,-1628..-1644 = the lawn strip (a) west of Eleni's garage), AKROPOLIS CUP (1609-1654,-1857..-1907, ped roads).
+- play/chaseprobe.js: 40 random Athens qvPath routes 600-2000 m: only 1.67 % of 3 m samples > 1 m outside a CITY_S road (raw node chain 1.38 %),
+  so the van path / GPS line is on roads. BUT the hit points are median 18.7 m outside CITY_S road edges (76/101 > 10 m).
+  Caveat: athRoadD (M.athRoad) only knows CITY_S roads; fill roads (fillAt) and 'ab' lanes (abAt) are NOT in it (CE_onRoad checks all).
+  Next: expose CE_onRoad (or fillAt/abAt) in 99_api and re-score the hit points: are they on fill/ab lanes inside blocks or on lawns/plazas?
+- Mechanism (tPlay line 156-162): during a chase dest = the moving van; with a clear line (LOS = no collider in a 2.4 m sweep, NOT a road check)
+  or dD < 40 / last route leg < 220 m the bot drives straight at the van, across lawns/plazas, then hits house rows behind them.
+  Game-side options (brief: no bot tuning): (1) the van keeps ≥ 60-80 m lead and its path avoids ped/plaza chords so the line-of-sight
+  shortcut runs along the road; (2) widen the setback: Athens 'ab' house rows sit 5-20 m off the road behind open lawns at chase speed;
+  push them back / add kerb-hedge colliders (rounded, glancing) along lawn strips so a cut slides back to the road instead of a head-on hit;
+  (3) the lawn strip (a) at x 1940-2016, z -1625..-1635: hedge/kerb collider or a fill road.
