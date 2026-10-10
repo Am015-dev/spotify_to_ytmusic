@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90e',id:'ride-width',text:'Drive the Hot Rod, the Rally S1 and the Sightseeing Bus: none looks squeezed thin; each still sits on the road and steers like before.'},
+ {ver:'v90e',id:'truck-size',text:'Garage → RIDES → STREET: drive the Big Rig, Logger and Fire Chief: each is minifig size (truck taller and longer than a traffic car), a LEGO driver sits inside the cab, and it fits through normal streets.'},
  {ver:'v90e',id:'cruiser',text:'Garage → RIDES: Town Cruiser looks complete with its windscreen at the front; the ride pictures on screen appear first, the rest follow.'},
  {ver:'v90e',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
  {ver:'v90e',id:'ct-hit',text:'Bump into a traffic car and a van: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
