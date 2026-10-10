@@ -85,7 +85,9 @@ function GS_tip(t){const e=$('#gsTip');if(!e)return;e.textContent=t;e.classList.
 const GS_bb=new THREE.Box3(),GS_v=new THREE.Vector3();
 function GS_br(g){const K=$('#gsBr');if(!K)return;if(!g||!GB_.bk){K.style.display='none';return}g.geometry.computeBoundingBox();GS_bb.copy(g.geometry.boundingBox).applyMatrix4(g.matrixWorld);const c=$('#gbC').getBoundingClientRect(),v=$('#gbx .gbv').getBoundingClientRect();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
  for(let i=0;i<8;i++){GS_v.set(i&1?GS_bb.max.x:GS_bb.min.x,i&2?GS_bb.max.y:GS_bb.min.y,i&4?GS_bb.max.z:GS_bb.min.z).project(GB.cam);const x=(GS_v.x+1)/2*c.width,y=(1-GS_v.y)/2*c.height;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
- const p=10;K.style.display='block';K.style.left=(c.left-v.left+x0-p)+'px';K.style.top=(c.top-v.top+y0-p)+'px';K.style.width=Math.max(24,x1-x0+2*p)+'px';K.style.height=Math.max(24,y1-y0+2*p)+'px';K.classList.toggle('bad',!!(GB_.hov&&GB_.hov.bad))}
+ const p=10;K.style.display='block';K.style.left=(c.left-v.left+x0-p)+'px';K.style.top=(c.top-v.top+y0-p)+'px';K.style.width=Math.max(24,x1-x0+2*p)+'px';K.style.height=Math.max(24,y1-y0+2*p)+'px';K.classList.toggle('bad',!!(GB_.hov&&GB_.hov.bad));
+ // v89k: keep the brackets inside the 3D view: they drew over SELECT/PAINT (bottom toolbar) and the layer buttons (right)
+ {const kb=K.getBoundingClientRect(),tb=document.querySelector('#gbx .r2BkT'),rb=document.querySelector('#b25'),vis=e=>e&&e.getBoundingClientRect().width>0,cb=vis(tb)?Math.max(0,kb.bottom-(tb.getBoundingClientRect().top-4)):0,cr=vis(rb)?Math.max(0,kb.right-(rb.getBoundingClientRect().left-4)):0;K.style.clipPath=cb>0||cr>0?`inset(0 ${cr}px ${cb}px 0)`:'none'}}
 // ---------- pop: white flash shell + stud confetti + a small car bounce
 function GS_pop(b){if(!b||!GB.mesh)return;const U=GB.mesh.userData,host=U.carG||U.m,list=[b];if(GB_.mir){const w=GB_twin(b);if(w.x!==b.x)list.push(w)}
  for(const q of list){const M=[],L=[];try{GB_brickGeo(q,M,L)}catch(e){continue}if(!M.length)continue;const g=mergeGeometries(M.concat(L));g.computeBoundingBox();const c=g.boundingBox.getCenter(new THREE.Vector3());g.translate(-c.x,-c.y,-c.z);

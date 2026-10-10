@@ -1,0 +1,5 @@
+const{chromium,boot}=require('../tools/d24lib');
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const{p,errs,shot}=await boot(b,{city:'ath',url:process.argv[2],phone:true});
+await p.evaluate(()=>{__mho.warp(1049,-553,1.3826,true)});for(let i=0;i<40;i++)await p.evaluate(()=>__tick(10));
+const r=await p.evaluate(()=>__oc.ev(`(()=>{const o=[];scene.traverse(m=>{if(!m.isMesh||!m.material)return;const mats=[].concat(m.material);for(const mt of mats){const c=mt.color;if(!c)continue;if(c.r>.8&&c.g>.35&&c.g<.75&&c.b<.3){const bb=new THREE.Box3().setFromObject(m);const cn=bb.getCenter(new THREE.Vector3());if(Math.hypot(cn.x-1049,cn.z+553)<600)o.push([m.name||m.type,Math.round(cn.x),Math.round(cn.z),+cn.y.toFixed(1),+(bb.max.x-bb.min.x).toFixed(1),+(bb.max.y-bb.min.y).toFixed(1),+(bb.max.z-bb.min.z).toFixed(1),JSON.stringify(m.userData).slice(0,60),'#'+c.getHexString()])}}});return JSON.stringify(o.slice(0,40))})()`));
+console.log(r);console.log(errs);await b.close()})()

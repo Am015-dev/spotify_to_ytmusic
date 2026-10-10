@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89k',id:'gold-brick',text:'Golden bricks look like a big gold 2×2 LEGO brick at car-roof height (no pole), and you collect it by driving through.'},
+ {ver:'v89j',id:'tip-avatar',text:'Oma Hilde\'s tip text never runs under her picture.'},
+ {ver:'v89j',id:'walls-pill',text:'Frankfurt: no plain beige walls; the TAP TO OPEN pill doesn\'t cover the speed bar.'},
  {ver:'v89i',id:'perf-thumbs',text:'Garage: part pictures and car cards all show (no blank tiles), and PAINT recolours them.'},
  {ver:'v89i',id:'perf-ctx',text:'iPhone: open and close the garage 3×, then drive: no black screen, no reload.'},
  {ver:'v89h',id:'ath-take2',text:'Athens: stop near traffic, get out and walk up to a car that stops for you (walk round a scooter if one is in front): 🚗 TAKE appears and you drive off with ★1.'},
@@ -199,11 +202,12 @@ const OD_CHECKLIST=[
 body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:none!important}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
  setInterval(pinR,700);pinR();
  // v89h: the strip never draws over a card (Alex: tip hidden at the start; PAUSE card's RESUME + title covered in roam). While any modal/card
+ // v89j: + the first-drive tutorial card, the main menu's CHOOSE ACTIVITY title and garage dropdown lists (same 8 px rule).
  // is open that covers most of the screen or comes within 8 px of the strip's spot, the strip steps aside (body.odYield); it returns when it closes.
  // Races and results keep their own chip placement (RF5: under LAP, inside the results card's top-right corner).
- const YS='#npcSay,#roamPause,#pause,#results,#settings,#chRes,#spRes,#roamPop,#journal,#roamMap,#story,#roamCard,#cmap,#slots,#profile,#gbx,#odChk,#credBox,[role=dialog],.modal';
+ const YS='#npcSay,#roamPause,#pause,#results,#settings,#chRes,#spRes,#roamPop,#journal,#roamMap,#story,#roamCard,#cmap,#slots,#profile,#gbx,#odChk,#credBox,[role=dialog],.modal,#roamTut,#home .hbar h2,[role=listbox],[role=menu],.r2Pop,.r2Menu,.r2List,.gbDrop';
  let pinBox=null;const yVis=e=>{if(e.hidden||e.closest('[hidden]'))return null;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return null;const r=e.getBoundingClientRect();return r.width>4&&r.height>4?r:null};
- const yieldStep=()=>{try{const P=document.getElementById('odPin');if(!P)return;if(!P.hidden&&!document.body.classList.contains('odYield')){const r=P.getBoundingClientRect();if(r.width>4)pinBox={l:r.left,t:r.top,r:r.right,b:r.bottom}}
+ const yieldStep=()=>{try{const P=document.getElementById('odPin');if(!P)return;if(!P.hidden&&(!document.body.classList.contains('odYield')||!pinBox)){const r=P.getBoundingClientRect();if(r.width>4)pinBox={l:r.left,t:r.top,r:r.right,b:r.bottom}}
    let y=false;if(pinBox&&!P.hidden&&!pinCd()&&!pinRun()){const VA=innerWidth*innerHeight;for(const e of document.querySelectorAll(YS)){if(e===P||P.contains(e))continue;const r=yVis(e);if(!r)continue;
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};

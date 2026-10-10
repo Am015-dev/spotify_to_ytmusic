@@ -19,7 +19,7 @@ html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!impor
 OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
 
 (()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
-html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(46px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
+html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 

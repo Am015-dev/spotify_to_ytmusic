@@ -4,7 +4,7 @@
 {const st=document.createElement('style');st.id='r1Css';st.textContent=`
 html body #roam #npcSay,html body #roam #roamTut{left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;
  top:calc(84px + env(safe-area-inset-top,0px))!important;max-width:min(420px,48vw)!important;box-sizing:border-box}
-html body #roam #npcSay>div{border:0!important;background:none!important;min-width:0!important;padding:0 6px 2px 0!important;box-shadow:none!important}
+html body #roam #npcSay>div{border:0!important;background:none!important;min-width:0!important;padding:0 34px 2px 0!important;box-shadow:none!important}
 html body #roam:has(#npcSay:not([hidden])) #roamTut{visibility:hidden!important}
 @media (orientation:landscape) and (max-height:500px){
  html body #roam #npcSay,html body #roam #roamTut{top:calc(80px + env(safe-area-inset-top,0px))!important;max-width:min(400px,47vw)!important}
