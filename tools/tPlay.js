@@ -112,7 +112,8 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
  const releaseAll=async()=>{await apply({steer:0,gas:false,brake:false,drift:false,boost:false})};
  // ---- overlays a person taps through (only visible ones)
  const CONT=['#storyGo','#m1Cs','#rcGo','#ogRetryB','#setDone','.m1go','#resBtn','#tutSkip'];
- async function tapThrough(){for(const s of CONT){if(s==='#setDone'&&!(await p.evaluate(()=>window.__wantSet===false)))continue;if(await tap(s))return s}return null}
+ async function tapThrough(){if(await p.evaluate(()=>{const c=__mho.RO.card;return!!c&&c.kind==='flight'}))return(await tap('#rcNo'))?'#rcNo':null;  // a person on a mission does not take a flight they drove past
+ for(const s of CONT){if(s==='#setDone'&&!(await p.evaluate(()=>window.__wantSet===false)))continue;if(await tap(s))return s}return null}
  const cityRes={};
  for(const city of CITIES){const T0=Date.now();
   await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
@@ -138,7 +139,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    if(f>=frames*.5&&!extra.pause){await releaseAll();extra.pause=await pauseTrip()||{};}
    if(f>=frames*.7&&!extra.garage){await releaseAll();extra.garage=await garageTrip()||{};}
    if(f>=nextShot){nextShot+=frames/4;await shot(`${city}_drive${Math.round(f/frames*4)}`)}
-   const s=await p.evaluate(()=>{const M=__mho,R=M.RO;const n=document.querySelector('#m1Next');const Hh=window.__Q?__Q.hits:[];return{nh:Hh.length,lh:Hh.length?Hh[Hh.length-1]:null,x:R.x,z:R.z,y:R.y,h:R.h,v:R.v,wp:R.wp&&{x:R.wp.x,z:R.wp.z},busy:!!(R.card||R.mapOpen||R.story||R.frozen),ch:!!(R.ch||R.sp),arr:(()=>{const a=document.querySelector('#roamArrow');if(!a||a.hidden)return null;const m=/rotate\((-?[\d.]+)rad/.exec(a.querySelector('i').style.transform||''),d=/([\d.]+)\s*m\s*$/.exec(a.querySelector('span').textContent||'');if(!m||!d)return null;const ang=-(+m[1])+R.h,D=+d[1];return{x:R.x+Math.sin(ang)*D,z:R.z+Math.cos(ang)*D,d:D}})(),nextVis:!!n&&!n.hidden&&n.getBoundingClientRect().width>20,state:M.state,cid:M.cid(),ld:!!(M.LD&&M.LD.on)}});
+   const s=await p.evaluate(()=>{const M=__mho,R=M.RO;const n=document.querySelector('#m1Next');const Hh=window.__Q?__Q.hits:[];return{nh:Hh.length,lh:Hh.length?Hh[Hh.length-1]:null,x:R.x,z:R.z,y:R.y,h:R.h,v:R.v,wp:R.wp&&{x:R.wp.x,z:R.wp.z},busy:!!(R.card||R.mapOpen||R.story||R.frozen),ch:!!(R.ch||R.sp),arr:(()=>{const a=document.querySelector('#roamArrow');if(!a||a.hidden)return null;const m=/rotate\((-?[\d.]+)rad/.exec(a.querySelector('i').style.transform||''),d=/([\d.]+)\s*m\s*$/.exec(a.querySelector('span').textContent||'');if(!m||!d)return null;const ang=-(+m[1])+R.h,D=+d[1];return{x:R.x+Math.sin(ang)*D,z:R.z+Math.cos(ang)*D,d:D}})(),nextVis:!!n&&!n.hidden&&n.getBoundingClientRect().width>20,state:M.state,cid:M.cid(),ld:!!(M.LD&&M.LD.on),cd:!!((R.ch&&R.ch.cd>0)||(R.sp&&R.sp.cd>0))}});
    if(s.nh>seenHits){seenHits=s.nh;if(s.lh&&s.lh.kind==='wall'&&s.lh.drop>.5&&hitShots<3){hitShots++;await shot(`${city}_wallhit${hitShots}`)}}
    if(s.state!=='roam'){await releaseAll();const t=await tapThrough();if(!t)await tick(30);f+=30;continue}
    if(s.busy){await releaseAll();const t=await tapThrough();await tick(t?6:30);f+=t?6:30;if(!t&&rng()<.2){await tap('#roamMapX')}continue}
@@ -148,7 +149,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    if(!dest||Math.hypot(dest[0]-s.x,dest[1]-s.z)<20){if(!goal){const a=rng()*6.283,L=400+rng()*400;dest=[s.x+Math.sin(a)*L,s.z+Math.cos(a)*L];destKind='wander';route=null}}
    if(!route||f-routeT>360){routeT=f;route=await p.evaluate(([x0,z0,x1,z1])=>{try{const M=__mho,q=M.rsnap(x1,z1,400);const P=M.qv.path(x0,z0,q[0],q[1]).P;return P&&P.length>1?P:null}catch(e){return null}},[s.x,s.z,dest[0],dest[1]]);if(!route){dest=null;await tick(6);f+=6;continue}}
    // a person drives straight at a target they can see: clear line (no building) within 250 m
-   let los=false;if(dest){const dD0=Math.hypot(dest[0]-s.x,dest[1]-s.z);if(dD0<250)los=await p.evaluate(([x0,z0,x1,z1,y])=>{const L=Math.hypot(x1-x0,z1-z0);for(let d=3;d<L;d+=4){const x=x0+(x1-x0)*d/L,z=z0+(z1-z0)*d/L;if(__mho.roamHitAt(x,z,1.4,y+.5))return false}return true},[s.x,s.z,dest[0],dest[1],s.y])}
+   let los=false;if(dest){const dD0=Math.hypot(dest[0]-s.x,dest[1]-s.z);if(dD0<250)los=await p.evaluate(([x0,z0,x1,z1,y])=>{const L=Math.hypot(x1-x0,z1-z0);for(let d=3;d<L;d+=2){const x=x0+(x1-x0)*d/L,z=z0+(z1-z0)*d/L;if(__mho.roamHitAt(x,z,2.4,y+.5))return false}return true},[s.x,s.z,dest[0],dest[1],s.y])}
    // perception lag 0.25 s: decide on the state seen 2 decisions ago
    lagged.push(s);if(lagged.length>3)lagged.shift();const o=lagged[0];
    let bi=0,bd=1e9;for(let k=0;k<route.length;k++){const d=Math.hypot(route[k][0]-o.x,route[k][1]-o.z);if(d<bd){bd=d;bi=k}}const off=bd>30;if(off&&f-routeT>120&&!los)route=null;if(!route){await tick(6);f+=6;continue}
@@ -166,7 +167,8 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    if(Math.abs(ae)<.08&&a2<.2&&o.v>12&&o.v<45&&f-boostT>600){boostT=f}if(f-boostT<90)c.boost=true;
    if(Math.abs(ae)>.45&&Math.abs(ae)<1.1&&o.v>23&&f-driftT>900){driftT=f}if(f-driftT<50&&Math.abs(ae)>.2)c.drift=true;
    // stuck like a person: after 1.5 s at a standstill, reverse with opposite lock for 1.2 s
-   if(Math.abs(s.v)<1.4)stuckT+=6;else stuckT=0;if(stuckT>90&&f>revT+150){revT=f;stuckT=0}
+   if(Math.abs(s.v)<1.4&&!s.cd)stuckT+=6;else stuckT=0;  // waiting for GO is not being stuck
+   if(stuckT>90&&f>revT+150){revT=f;stuckT=0}
    if(f-revT<72){c.gas=false;c.brake=true;c.boost=false;c.drift=false;c.steer=ae>0?1:-1}
    if(process.env.DEBUG&&f%120===0)console.log('dbg',f,JSON.stringify({x:Math.round(s.x),z:Math.round(s.z),v:Math.round(s.v*3.6),arr:s.arr&&[Math.round(s.arr.x),Math.round(s.arr.z),Math.round(s.arr.d)],dest:dest&&dest.map(Math.round),kind:destKind,los,rl:route&&route.length,bi,bd:Math.round(bd),ae:+ae.toFixed(2),c}));
    await apply(c);await tick(6);f+=6;
@@ -188,7 +190,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   const rot=async v=>{const land=v.width>v.height;await p.evaluate(()=>dispatchEvent(new Event('orientationchange')));await tick(6);
    await cdp.send('Emulation.setDeviceMetricsOverride',{width:v.width,height:v.height,deviceScaleFactor:3,mobile:true,screenOrientation:land?{type:'landscapePrimary',angle:90}:{type:'portraitPrimary',angle:0}});
    await p.evaluate(()=>{dispatchEvent(new Event('resize'));window.visualViewport&&visualViewport.dispatchEvent(new Event('resize'))});await tick(60);await p.waitForTimeout(900);await tick(6)};
-  await down('gas',await center('#tG'));for(let i=0;i<3;i++){await rot(P);await rot(L)}for(const k in F)delete F[k];await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await down('gas',await center('#tG'));for(let i=0;i<3;i++){await rot(P);await rot(L);if(i===0){for(const k in F)delete F[k];await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})}}  // spec: ONE rotation with GAS held (was held 7 s unsteered through all 6, which drove the car off the road before the drive began)for(const k in F)delete F[k];await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   // iOS: a finger that was down during the rotation never gets touchend/touchcancel → emulate the stale ids it leaves behind
   await p.evaluate(()=>{const T=__mho.touch;T.bz=7;T.sid=8});await tick(2);
   const probe=async(sel,read)=>{const xy=await center(sel);if(!xy)return'hidden';const cov=await p.evaluate(([x,y,s])=>{const e=document.querySelector(s),t=document.elementFromPoint(x,y);return t===e||e.contains(t)||(t&&t.id==='btnZone'&&/tL|tR/.test(s))?'':'covered by '+(t&&(t.id||t.className||t.tagName))},[xy[0],xy[1],sel]);
