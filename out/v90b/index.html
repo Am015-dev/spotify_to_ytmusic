@@ -755,6 +755,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
   {v:'v90b',date:'10 Oct 2026',items:[{t:'NEW',s:'Garage: when a ride opens or you pick another one in RIDES, it builds itself brick by brick in about 2 seconds. Tap the view to skip.'},{t:'FIXED',s:'BUILD on boats: the camera now looks down at the whole boat, so long boats like the Power Boat are no longer tiny.'},{t:'CHANGED',s:'Off-road rides in BUILD are framed to their own size.'}]},
+  {v:'v90a',date:'10 Oct 2026',items:[{t:'CHANGED',s:'Faster start on phones: LEGO model data now loads only when needed (your equipped ride at start, other rides when you open the garage, buildings when their city loads).'},{t:'NEW',s:'RIDES: two more LEGO City vehicles from real model files: the green Recycler truck and the Family Car.'},{t:'NEW',s:'Frankfurt: a red LEGO shop, a white Holiday Home and a police boat on the river. Athens: a yellow cottage and a white Holiday Villa.'},{t:'CHANGED',s:'LEGO buildings draw about 5x fewer triangles (hidden studs and faces removed), so the cities run smoother.'}]},
   {v:'v89z',date:'10 Oct 2026',items:[{t:'FIXED',s:'Garage: OFF-ROAD and WATER rides now have ✎ BUILD and ▶ GUIDE on their cards, like street cars. Before, BUILD always opened the street car.'},{t:'FIXED',s:'BUILD on the OFF-ROAD or WATER tab now edits that ride. Your changes are saved and used when you drive it.'},{t:'CHANGED',s:'While you build a boat or off-road ride, the top bar and the guide show its name, and the street car stays as it was.'}]},
   {v:'v89y',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: nine LEGO City trucks and vans from real model files: Flatbed, Repair Truck, Logger with crane, Big Rig, Mail Van, Tanker Cab, Service Van, Bin Truck and Snowplow.'},{t:'NEW',s:'Frankfurt: a blue LEGO Speedboat moored on the river.'},{t:'CHANGED',s:'The Athens lighthouse is gone: it was a tiny set blown up, not real minifig size.'}]},
   {v:'v89x',date:'10 Oct 2026',items:[{t:'CHANGED',s:'All LEGO buildings and stalls in the cities are 1.6x bigger, so a person fits through their doors with room to spare.'}]},
@@ -13412,7 +13413,7 @@ window.__tx={car:TX_CAR,nudge:TX_nudge,o:TX_o,S:TX,txt:TX_txt};
 // ---- LDM (v89v, 2026-10-10). Coordinator: "move all LDraw model data OUT of overdrive.html into models.js next to km.js" (page ≤ 3.5 MB, flat as models grow).
 // The data modules (src/MODELS: 98ld<N>_data.js, 98ld_v_*.js, 98ld_w_*.js) are built into out/<ver>/models.js; each is wrapped as a function in window.__LDQ
 // (tools/build.sh) and run by 98ld_run.js after 98ld_w.js, with the bindings they use. models.js loads like km.js (<script src> before this module),
-// so saved rides made of LDraw parts still build at boot. A missing models.js only loses the LDraw rides/props (LD_br gives []).
+// so saved rides made of LDraw parts still build at boot. v89z: models.js is only an index; each model loads from models/<id>.js on demand (98ld_run.js). A missing models.js only loses the LDraw rides/props (LD_br gives []).
 const LD_MESH={},LD_MODELS={};
 // ---- LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds".
 // Real LEGO builds come in as LDraw files (LDraw OMR, CCAL 2.0) and are converted OFFLINE by tools/ld2garage.py into garage brick lists
@@ -13530,8 +13531,9 @@ function LD_propMake(P,B,nm){const SW=LD_SW*LD_FIG,lo=CR_LO;let G;CR_LO=2;try{G=
  HUB.bld.push(col);hubGridAdd([col]);P.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};P.col=col}
 // v89v: more world props (one entry per converted building; each placed on the next free lot from the start, the bank first)
 const LD_PROPS=[{id:'cgarage',nm:'ld_cgarage',br:()=>LD_br('cga').concat(LD_br('cgb'))}];
-function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;LD_propMake(LDP,LD_br('bank'),'ld_bank');
- for(const q of LD_PROPS){if(q.g)continue;try{LD_propMake(q,q.br(),q.nm)}catch(e){console.warn('LD prop',q.id,e)}}}
+function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp||LDP.busy===HUB.grp)return;const g=HUB.grp;LDP.busy=g;// v89z: models load first (98ld_run.js)
+ LD_need(['bank','cga','cgb']).then(()=>{if(LDP.busy===g)LDP.busy=0;if(CID!=='fra'||LDP.g||HUB.grp!==g)return;try{LD_propMake(LDP,LD_br('bank'),'ld_bank')}catch(e){console.warn('LD prop bank',e)}
+ for(const q of LD_PROPS){if(q.g)continue;try{LD_propMake(q,q.br(),q.nm)}catch(e){console.warn('LD prop',q.id,e)}}})}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{LD_propBuild()}catch(e){console.warn('LD prop',e)}return r})(buildRoam);
 window.__ld.grpLo=(B,lv)=>{const l=CR_LO;CR_LO=lv||2;try{const G=GB_geo(B,null),g=new THREE.Group();G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);if(G.m)g.add(new THREE.Mesh(G.m,GB_MAT));if(G.l)g.add(new THREE.Mesh(G.l,GB_LMAT));if(G.g)g.add(new THREE.Mesh(G.g,CR_GM));return g}finally{CR_LO=l}};// test hook: a prop as the world builds it (CR_LO 2)
 window.__ld.fig=()=>{const M=[],L=[];GB_figGeo(GB_figGet(),M,L,false);const g=new THREE.Group();if(M.length)g.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)g.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));return g};window.__ld.SW=LD_SW;window.__ld.FIG=LD_FIG;// test hooks: a standing game minifig, the scales
@@ -13543,7 +13545,7 @@ window.__ld.prop=LDP;window.__ld.props=LD_PROPS;window.__ld.propBuild=LD_propBui
 const LDW_P=[],LDW={on:[],lod:60};
 // meshes of the w data modules (they load after 98ld_import.js registered LD_MESH): register them as hidden garage parts
 function LDW_reg(){for(const k in LD_MESH)if(!GB_PC[k]){const D=LD_MESH[k];GB_PC[k]={n:D.n.replace(/^~/,''),w:D.w,d:D.d,h:D.h,cat:'LDraw',ic:'◆',hide:1,s:D.s.some(q=>!q[3])};G13_ID[k]=D.id}}
-function LDW_geo(B){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}return[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]).concat((G.w||[]).map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return[g,GB_MAT]}))}// wheels (carts, trailers) as their own meshes
+function LDW_geo(B){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);/* build-6: hidden studs/faces + slivers, like the bank */return[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]).concat((G.w||[]).map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return[g,GB_MAT]}))}// wheels (carts, trailers) as their own meshes
 function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_SW*(P.s||(P.water?1:LD_FIG));/* v89w: buildings at minifig scale (LD_FIG, 98ld_import.js) *//* P.s: scale up micro-scale sets */const B=LD_br(P.model),near=LDW_geo(B),
   far=LDW_geo(B.filter(b=>{const Q=GB_PC[b.t];return Q&&Q.w*Q.d*Q.h>=(P.lodv||9)}));
  const box=new THREE.Box3();for(const[g]of near){g.computeBoundingBox();box.union(g.boundingBox)}const c=box.getCenter(new THREE.Vector3());
@@ -13552,7 +13554,7 @@ function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_S
  const k=GB_U*SW,hw=Math.max(.3,(x1-x0)*k/2-.2),hd=Math.max(.3,(z1-z0)*k/2-.2),ox=((x0+x1)/2)*GB_U*SW-c.x*SW,oz=((z0+z1)/2)*GB_U*SW-c.z*SW;
  const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:(CID==='fra'?{x:2061,z:0}:{x:0,z:0}),a0=(P.a||0)*Math.PI/180;
  if(P.water)return LDW_boat(P,near,far,box,c,hw,hd,st,a0);
- const S=LDW_spot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),Math.max(hw,hd)+.5,Math.min(hw,hd)+.5,P.road||10);if(!S)return;const best=S.yaw;
+ /* v90a: the road setback uses the WHOLE scaled model (baseplate, low parts) as x/z half-sizes, not the tall-part collider: 6362's base slab sat on the kerb */const fw=(box.max.x-box.min.x)*SW/2,fd=(box.max.z-box.min.z)*SW/2,S=LDW_spot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),fw+.5,fd+.5,P.road||10);if(!S)return;const best=S.yaw;
  const a=best*Math.PI/2,y=groundY(S.x,S.z)-(P.sink||0)*SW*GB_PH;
  const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(SW,SW,SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
  const E={id:P.model,x:S.x,z:S.z,near:[],far:[],tris:0,ftris:0};
@@ -13575,15 +13577,49 @@ function LDW_spot(x0,z0,hw,hd,road){for(let r=12;r<400;r+=6)for(let a=0;a<36;a++
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;if(!ok)continue;
    for(const q of[0,1,2,3]){if(q%2!==rot)continue;const A=q*Math.PI/2,fx=-Math.sin(A),fz=-Math.cos(A);let hit=0;
     for(let k=1;k<=road;k++){const px=x+fx*(hd+k),pz=z+fz*(hd+k);if(roamHit(px,pz,.5))break;if(FL_road(px,pz,0)){hit=1;break}}if(hit)return{x,z,rot,yaw:q}}}}return null}
-function LDW_build(){if(!HUB.grp||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}}
+// v89z: the city's prop models load first (models/<id>.js, 98ld_run.js), then build; a city switch meanwhile drops the stale build
+function LDW_build(){if(!HUB.grp||LDW.on.length||LDW.busy===HUB.grp)return;const g=HUB.grp,cid=CID;LDW.busy=g;
+ LD_need(LDW_P.filter(P=>P.city===cid).map(P=>P.model)).then(()=>{if(LDW.busy===g)LDW.busy=0;if(HUB.grp!==g||CID!==cid||LDW.on.length)return;LDW_reg();for(const P of LDW_P)try{LDW_build1(P)}catch(e){console.warn('LDW prop',P.model,e)}})}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);LDW_build();return r})(buildRoam);
 // LOD: after the hub cull, near mesh within LDW.lod m of the camera, big-parts mesh beyond
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDW.on.length)return;const cx=camera.position.x,cz=camera.position.z;
  for(const E of LDW.on){const d=Math.hypot(E.x-cx,E.z-cz),n=d<LDW.lod;for(const o of E.near)o.visible=n;for(const o of E.far)o.visible=!n&&d<(o.userData.cd||900)}})(hubCullStep);
 window.__ld.w=LDW;window.__ld.wp=LDW_P;window.__ld.wbuild=LDW_build;window.__ld.wreg=LDW_reg;
-// ---- LDM runner: the model data modules from models.js (see 98ld_stub.js), in src/MODELS order; one bad module never stops the game.
-{const Q=window.__LDQ||[];let n=0;for(const f of Q){try{f(LD_MESH,LD_MODELS,GB_PC,G13_ID,GAR_SETS,GAR_set,LD_br,LDW_P,LDW_reg);n++}catch(e){console.warn('LDM',e)}}
- LDW_reg();window.__ldm={mods:n,models:Object.keys(LD_MODELS).length}}
+// test hook (v90a): every LEGO prop's world box (all parts, baseplate included) vs the road: samples on the road (FL_road, 0 / 1.5 m margin)
+window.__ld.wroad=()=>{const out=[],chk=(id,objs)=>{if(!objs||!objs.length)return;const B=new THREE.Box3();for(const o of objs){o.geometry.computeBoundingBox();B.union(o.geometry.boundingBox)}let n=0,on=0,near=0;
+ for(let x=B.min.x;x<=B.max.x;x+=.5)for(let z=B.min.z;z<=B.max.z;z+=.5){n++;if(FL_road(x,z,0))on++;else if(FL_road(x,z,1.5))near++}out.push({id,x0:+B.min.x.toFixed(1),x1:+B.max.x.toFixed(1),z0:+B.min.z.toFixed(1),z1:+B.max.z.toFixed(1),n,on,near})};
+ for(const E of LDW.on)if(!E.water)chk(E.id,E.near);if(typeof LDP!=='undefined')chk('bank',LDP.g);if(typeof LD_PROPS!=='undefined')for(const q of LD_PROPS)chk(q.id,q.g);return out};
+// ---- LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module
+// (window.__LDQ, run here at boot) and window.__LDX (chunk urls, mesh key -> chunk, preset -> models). The meshes + brick lists of each model live in
+// models/<id>.js and load on demand: a ride when it is selected/equipped or its thumbnail is drawn, world props when their city builds, and at boot
+// (models.js document.write) whatever the saved garage needs, so saved rides still build at boot. A chunk calls __LDC -> __LDD -> LD_ingest.
+const LDL={X:window.__LDX||{c:{},k:{},s:{}},got:new Set(),wait:new Map(),miss:null,rd:0};
+function LD_redraw(){try{if(GB&&GB.d&&!$('#gbx').hidden)gbRender()}catch(e){console.warn('LDM redraw',e)}}
+function LD_done(){if(LDL.rd&&!LDL.wait.size){LDL.rd=0;setTimeout(LD_redraw,0)}}
+function LD_ingest(id){const D=(window.__LDD||{})[id];if(!D||LDL.got.has(id))return;Object.assign(LD_MESH,D[0]);Object.assign(LD_MODELS,D[1]);LDL.got.add(id);LDW_reg();
+ window.__ldm.models=Object.keys(LD_MODELS).length;const w=LDL.wait.get(id);if(w){LDL.wait.delete(id);w.r()}LD_done()}
+function LD_load(id){if(LDL.got.has(id)||!LDL.X.c[id])return Promise.resolve();let w=LDL.wait.get(id);if(w)return w.p;w={};w.p=new Promise(r=>{w.r=r});LDL.wait.set(id,w);
+ const s=document.createElement('script');s.src=LDL.X.c[id].f;s.onerror=()=>{console.warn('LDM load',id);LDL.wait.delete(id);w.r();LD_done()};document.head.appendChild(s);return w.p}
+function LD_need(ids){return Promise.all([...new Set(ids)].map(LD_load))}// ids = model ids (= chunk ids)
+// chunks a brick list needs (saved rides name mesh keys like 'ld3037' or 'ld60614@020')
+function LD_brMiss(B){const m=[];for(const b of B||[]){const t=b&&(b.t||b[0]);if(typeof t!=='string'||t.slice(0,2)!=='ld')continue;const k=t.split('@')[0],c=LDL.X.k[k];if(c&&!LD_MESH[k])m.push(c)}return m}
+// run fn and return the chunks it asked LD_br for that are not loaded yet (fn's brick list is scanned too)
+function LD_probe(fn){const p=LDL.miss;LDL.miss=new Set();let B=null;try{B=fn()}catch(e){}const m=[...LDL.miss].concat(Array.isArray(B)?LD_brMiss(B):[]);LDL.miss=p;return[...new Set(m)]}
+// a model not loaded yet: LD_br starts its load and gives [] (callers below wait for it first; presets and props never see the [])
+LD_br=(f=>function(id){if(!LD_MODELS[id]&&LDL.X.c[id]){if(LDL.miss)LDL.miss.add(id);LD_load(id)}return f(id)})(LD_br);
+{const Q=window.__LDQ||[];let n=0;window.__ldm={mods:0,models:0};for(const f of Q){try{f(LD_MESH,LD_MODELS,GB_PC,G13_ID,GAR_SETS,GAR_set,LD_br,LDW_P,LDW_reg);n++}catch(e){console.warn('LDM',e)}}
+ window.__LDH=LD_ingest;for(const id in window.__LDD||{})LD_ingest(id);LDW_reg();window.__ldm.mods=n}
+// garage: selecting / equipping a ride waits for its model; a thumbnail of an unloaded ride is drawn when it arrives
+GAR_select=(f=>function(id){const S=GAR_set(id),G=GAR_get();if(!GAR_owned(S))return f.apply(this,arguments);
+ const m=LD_probe(()=>[].concat(GAR_arr(S.car()),GAR_arr(S.off()),GAR_arr(S.boat()),G.br[id]||[]));if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>{f(id);LD_redraw()})})(GAR_select);
+G9C_equip=(f=>function(S,fm){if(!GAR_owned(S))return f.apply(this,arguments);const m=LD_probe(()=>G9C_bricks(S,fm));if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>f(S,fm));return 1})(G9C_equip);
+// the first unloaded thumbnail fetches every ride at once (one redraw when all are in, not one per ride)
+G9C_render=(f=>function(S,fm){const m=LD_probe(()=>G9C_bricks(S,fm));if(m.length){LDL.rd=1;LD_need(m.concat(...Object.values(LDL.X.s)));return null}return f.apply(this,arguments)})(G9C_render);
+// BUILD on a ride whose model is still loading: enter once it is in (GAR_select above swaps the bricks first)
+GB_enter=(f=>function(){if(!LDL.wait.size)return f.apply(this,arguments);const t=this,a=arguments;Promise.all([...LDL.wait.values()].map(w=>w.p)).then(()=>setTimeout(()=>f.apply(t,a),0))})(GB_enter);
+// garage-17 (98fb_form_build.js): BUILD on an OFF-ROAD / WATER ride copies S.off() / S.boat() into the builder; wait for its model first
+FB_begin=(f=>function(S,fm){const m=S&&typeof S[fm]==='function'?LD_probe(()=>GAR_arr(S[fm]())):[];if(!m.length)return f.apply(this,arguments);LD_need(m).then(()=>{f(S,fm);LD_redraw()});return 1})(FB_begin);
+window.__ld.need=LD_need;window.__ld.L=LDL;window.__ld.probe=LD_probe;window.__ld.sel=id=>GAR_select(id);window.__ld.set=id=>GAR_set(id);window.__ld.gar=()=>GAR_get();// test hooks
 // ===== OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a
 // floating left stick (touch) or WASD/arrows + Shift + Space (PC); camera behind; ENTER near your own car or any parked car (traffic cars with c.pk).
 // State RO.foot: 'car' | 'exit' (0.35 s step-out) | 'walk' | 'enter' (0.45 s tween to the door). BRAKE (#tB) becomes 🚪 EXIT only once the car is
@@ -13907,6 +13943,16 @@ const OD_CHECKLIST=[
  {ver:'v89z',id:'fb-guide',text:'OFF-ROAD → Blue Beast → ▶ GUIDE: the guide builds the monster truck step by step (title says Blue Beast). EXIT works.'},
  {ver:'v89z',id:'fb-drive',text:'After editing a boat, SAVE & DRIVE: your street car is unchanged; drive into the river and the boat you built appears.'},
  {ver:'v89w',id:'sc-rides',text:'Garage → RIDES → STREET: Senna GTR, Hyper 16, Demon 18 and Charger 70 each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
+ {ver:'v90a',id:'lazy',text:'Start the game: it loads at least as fast as before; your equipped ride looks complete at once (also a LEGO ride you equipped earlier).'},
+ {ver:'v90a',id:'lazyg',text:'Garage → RIDES: every LEGO ride picture appears within a few seconds; equipping one shows it complete.'},
+ {ver:'v90a',id:'recycler',text:'Garage → RIDES → STREET: Recycler (green recycle truck) looks complete; drive it: it sits on the road and steers.'},
+ {ver:'v90a',id:'family',text:'RIDES: Family Car looks complete and drives.'},
+ {ver:'v90a',id:'w6362',text:'Frankfurt: a red LEGO shop with a blue roof stands by a street near the start; a person fits through its door.'},
+ {ver:'v90a',id:'w6360',text:'Athens: a yellow LEGO cottage with a red roof and garden stands by a street near the start; a person fits through its door.'},
+ {ver:'v90a',id:'w6374',text:'Frankfurt: a white LEGO Holiday Home with a red roof stands by a street near the start; a person fits through its door.'},
+ {ver:'v90a',id:'w4010',text:'Frankfurt: a black and white LEGO police boat sits IN the river (not floating above, not on land).'},
+ {ver:'v90a',id:'w6349',text:'Athens: a white LEGO Holiday Villa with a red roof stands by a street near the start; a person fits through its door.'},
+ {ver:'v90a',id:'perf',text:'Drive past the LEGO buildings in both cities: no stutter, buildings look solid (no missing walls or roofs).'},
  {ver:'v89y',id:'trucks',text:'Garage → RIDES → STREET: the 9 new trucks/vans (Flatbed, Repair Truck, Logger, Big Rig, Mail Van, Tanker Cab, Service Van, Bin Truck, Snowplow) each show complete; drive two of them: they sit on the road and steer.'},
  {ver:'v89y',id:'rboat',text:'Frankfurt: the blue Speedboat sits IN the river by the bank (not floating above, not on land).'},
  {ver:'v89x',id:'fig-scale',text:'Walk (on foot) up to the Corner Garage, Town Bank and Town House in Frankfurt: a person fits through the doors with headroom; the buildings still stand on their lots, off the road.'},
