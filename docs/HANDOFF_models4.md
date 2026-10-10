@@ -37,3 +37,13 @@ roam props: copy tools/tPlay.js, after "in roam" log __ld.w.on / __ld.wroad(). H
 - Athens start off the road (one tPlay run, v90f build): spawned in a park, camera inside a tree, target "Flights → Frankfurt", player measured 5.82×8.6 m; Athens walls 11.29/min that run. Not reproduced in 3 later runs. Shot docs/shots/v90f/ath_badrun_park_start.jpg. Cause unknown.
 - 604/606/620/622 Town cars: no steering wheel in the LDraw files -> ×1.6 but empty seat (no driver).
 - Garage floor dark patch on some rides (1572/6668/6526/6669/621): garage render bug, owner garage-18.
+
+## Update 18:50 UTC (build-7 hands off)
+- LIVE: v90f. DEPLOY sent for v90g = fb4fc431 out/v90g (reviewer PASS). Next release: v90h (check live's changelog first; other lanes also take versions).
+- Queued for v90h: veh-2 (session_017JBQniskVjutGH7QYYWjis, alex/od-mdl-veh): 6525 Blaze Commander a88fc89, 6524 Blizzard Blazer 6a869df, 6523 Red Cross Car 212c404, 6509 Red Devil Racer 9804662
+  (add their 98ld_v_*.js lines to src/MODELS if not on the branch). land-2 (session_01Uq1zhXLZyqmHQd2xQRNNUb) is fixing: race palms on the asphalt + floating orange slab.
+- Other open follow-ups: checklist pin covers the mission objective line on phone (HUD lane, coordinator routes); Athens park-start one-off; 604/606/620/622 no driver; garage floor dark patch (garage-18).
+- Sessions: coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuKUcaUT4v, rescue-1 session_01PjYpc3jdr9iB9myHSwGVAs (done, 22 models),
+  build-6 session_01NhPhe9KMC86jAFXKzCXLmg (world), land-1 session_01F1oHeA7LV2cMbPpXRMGsXm, garage-18 session_019vNFjqrqunwBDfw4daimsX. build-8, size-1, city-1 stood down.
+- Test notes: run the http server detached (setsid nohup python3 -m http.server 8766) — it died twice. tPlay copy with LDCHK/RIG2 hooks: tools/tPlayLD.tmp.js (git-ignored;
+  recreate from tools/tPlay.js: log __ld.w.on, __ld.wroad(), __ct.wide()). Equip a ride before story: tools/ld/tRides.js SET=<id> (size-1's tip). Geoms growth ~50/min fra 2-min is pre-existing (v90e 54).
