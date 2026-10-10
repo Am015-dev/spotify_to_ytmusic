@@ -6,7 +6,8 @@
 //    marker that scales the ride by LD_FIG (1.6, the same stud as the world buildings: 0.39 m). Driver = 1.96 m, like the 1.9 m pedestrians.
 //    Speed Champions sets, garage builds and the hand-made big templates (bus, box truck, limo, monster) stay at the car stud (they are car-sized).
 // Traffic / other code can use SZ_k(bricks) (1 or 1.6) and SZ_add(bricks) to get the same scale.
-const RSZ={MS:['30313','30572','3179','3180','3221','4436','4914','60017','60054','60059','60083','7639','7731'],k:LD_FIG,fig:2.36};
+// minifig-scale sets = every LDraw vehicle ride (ids t_v…) except Speed Champions (758xx / 768xx, built bigger than minifig scale)
+const RSZ={ms:S=>/^t_v/.test(S.id)&&!/^7[56]8\d\d$/.test(S.ref||''),k:LD_FIG,fig:2.36,capW:3.2};
 GB_PC.drvM={n:'Minifig driver',w:2,d:2,h:9,ic:'🧑',hide:1};
 function SZ_k(B){return(B||[]).some(b=>b&&(b.t||b[0])==='drvM')?RSZ.k:1}
 // the driver sits behind the steering wheel ('stw', r 2 = facing -z like the LDraw sets, r 0 = +z), 3 plates under it
@@ -18,7 +19,7 @@ GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);cons
  for(const[A,D]of[[tm,M],[tl,L]])for(const g of A){g.translate(0,-(.74-.42*s),1.55);g.scale(k/s,k/s,k/s);g.translate(0,.1,.25);D.push(g)}})(GB_piece);
 // a driver brick with no wheel to sit behind is only the scale marker
 GB_brickGeo=(f=>function(b){if(b&&b.t==='drvM'&&b.y<=-90)return;return f.apply(this,arguments)})(GB_brickGeo);
-for(const S of GAR_SETS)if(RSZ.MS.includes(S.ref)&&S.car){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
+for(const S of GAR_SETS)if(RSZ.ms(S)&&S.car){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
 // saved copies of these rides (bricks stored before this fix) get the driver too
 G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?SZ_add(B):B})(G9C_bricks);
 gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
@@ -29,4 +30,6 @@ SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(u
   ud.under.scale.set(r,r,1);ud.shadow.scale.set(r,r,1);if(isPl&&ud.shield)ud.shield.scale.set(4.2*r,2.4*r,5.4*r)}})(SC_ship);
 // BC (98bc_bigcars.js) compares a ride with the Hot Rod: its reference width was measured squeezed (1.93 m); unsqueezed it is 2.57 m
 BC.ref.W=2.57;
+// the collider is never wider than a lane vehicle (3.2 m): a snowplow blade or wide mirrors overhang it and glancing hits slide (reviewer: 4.7 m snowplow)
+BC_dims=(f=>function(ud){const d=f.apply(this,arguments);if(d&&d.W>RSZ.capW)d.W=RSZ.capW;return d})(BC_dims);
 window.__sz={S:RSZ,k:SZ_k,add:SZ_add};

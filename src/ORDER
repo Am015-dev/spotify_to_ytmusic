@@ -64,6 +64,7 @@
 98ld_w.js
 98ld_run.js
 98sz_ride_scale.js
+98ct_city_lego.js
 98of_onfoot.js
 99c_checklist.js
 98rf_race_fun.js
@@ -71,4 +72,5 @@
 98zp_perf_ctx.js
 98bk_bake.js
 98fb_form_build.js
+98ba_build_anim.js
 99_api.js
