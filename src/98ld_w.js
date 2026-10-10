@@ -45,3 +45,7 @@ buildRoam=(f=>function(){const r=f.apply(this,arguments);LDW_build();return r})(
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDW.on.length)return;const cx=camera.position.x,cz=camera.position.z;
  for(const E of LDW.on){const d=Math.hypot(E.x-cx,E.z-cz),n=d<LDW.lod;for(const o of E.near)o.visible=n;for(const o of E.far)o.visible=!n&&d<(o.userData.cd||900)}})(hubCullStep);
 window.__ld.w=LDW;window.__ld.wp=LDW_P;window.__ld.wbuild=LDW_build;window.__ld.wreg=LDW_reg;
+// test hook (v90a): every LEGO prop's world box (all parts, baseplate included) vs the road: samples on the road (FL_road, 0 / 1.5 m margin)
+window.__ld.wroad=()=>{const out=[],chk=(id,objs)=>{if(!objs||!objs.length)return;const B=new THREE.Box3();for(const o of objs){o.geometry.computeBoundingBox();B.union(o.geometry.boundingBox)}let n=0,on=0,near=0;
+ for(let x=B.min.x;x<=B.max.x;x+=.5)for(let z=B.min.z;z<=B.max.z;z+=.5){n++;if(FL_road(x,z,0))on++;else if(FL_road(x,z,1.5))near++}out.push({id,x0:+B.min.x.toFixed(1),x1:+B.max.x.toFixed(1),z0:+B.min.z.toFixed(1),z1:+B.max.z.toFixed(1),n,on,near})};
+ for(const E of LDW.on)if(!E.water)chk(E.id,E.near);if(typeof LDP!=='undefined')chk('bank',LDP.g);if(typeof LD_PROPS!=='undefined')for(const q of LD_PROPS)chk(q.id,q.g);return out};
