@@ -341,7 +341,7 @@ uses: 10(45), 72(4), 20(3), 92(3), 30(2), 98s(2), 98y(1)
 
 ## 98bk_bake.js — 9 KB
 defines: BK BK_MAX BK0 BK_cache BK_cand BK_two BK_tr BK_rv BK_mt BK_ci BK_abG BK_fiG __bk
-uses: 53(43), 51(22), 40(7), 30(7), 10(2), 72(1)
+uses: 53(43), 51(22), 40(9), 30(9), 72(2), 10(2)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25

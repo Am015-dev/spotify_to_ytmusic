@@ -59,4 +59,7 @@ window.__bk={BK,clear:()=>BK.C.forEach(M=>M.clear()),cells:()=>BK.C.reduce((a,M)
   for(const k of['trailDist','fillAt','cityAt','abAt','rivClear']){let t=performance.now();for(const[x,z]of pts)org[k](x,z);const a=performance.now()-t;t=performance.now();for(const[x,z]of pts)cur[k](x,z);out[k].x=+(a/Math.max(.01,performance.now()-t)).toFixed(1)}
   out.cells=window.__bk.cells();return out}};
 // the caches only help while something is being built: 5 s without a query in roam → drop them (lazy regions rebuild them on demand)
-{let q0=-1;setInterval(()=>{if(BK.st.q===q0&&state==='roam'&&window.__bk.cells())window.__bk.clear();q0=BK.st.q},5000)}
+// PERF-3: the caches baked during the loading screen (~16 MB in Athens) are freed as soon as roam starts; roam then bakes only the cells it
+// queries near the car (cleared again after 5 s without queries)
+{let q0=-1,k=0,ld=1;setInterval(()=>{const busy=state!=='roam'||typeof LD!=='undefined'&&LD.on;if(!busy&&ld&&window.__bk.cells()){window.__bk.clear();BK.st.ldClr=(BK.st.ldClr||0)+1}ld=busy;
+  if(++k%5)return;if(BK.st.q===q0&&state==='roam'&&window.__bk.cells())window.__bk.clear();q0=BK.st.q},1000)}
