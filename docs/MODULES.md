@@ -337,8 +337,8 @@ defines: LD_MESH LD_MODELS
 uses: 72(1), 30(1), 98ld(1)
 
 ## 98ld_import.js — 17 KB
-defines: LDI LD_Q LDG LD_b64 LD_geo LD_SD LD_br LD_pts LD_grp __ld LD_boat LD_pboat LD_SW LDP LD_FIG LD_propSpot LD_cull LD_propMake LD_PROPS LD_propBuild
-uses: 92(50), 93(33), 20(15), 53(11), 98(8), 98ld(7), 98gb(6), 41(5), 30(3), 70(3)
+defines: LDI LD_Q LDG LD_b64 LD_geo LD_SD LD_br LD_pts LD_grp __ld LD_boat LD_pboat LD_SW LDP LD_FIG LD_SCRE LD_propSpot LD_cull LD_propMake LD_PROPS LD_propBuild
+uses: 92(50), 93(33), 20(15), 53(11), 98(8), 98ld(7), 98gb(6), 41(6), 30(3), 70(3)
 
 ## 98ld_w.js — 8 KB
 defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_spot LDW_build
@@ -350,11 +350,11 @@ uses: 98(16), 98ld(11), 98ld(7), 98y(6), 98ld(4), 72(3), 30(3), 94(2), 98fb(2), 
 
 ## 98ct_city_lego.js — 14 KB
 defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim __ct CTB CTB_V CTB_city CTB_kind CTB_h CTB_pick CTB_fill CTB_putK CTB_put CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step __ctb
-uses: 20(35), 93(21), 30(16), 98ld(14), 92(13), 60(11), 10(10), 53(7), 70(7), 98ld(3)
+uses: 20(35), 93(21), 30(16), 98ld(15), 92(13), 60(11), 10(10), 53(7), 70(7), 98ld(3)
 
 ## 98sz_ride_scale.js — 4 KB
 defines: RSZ SZ_k SZ_add __sz
-uses: 96(12), 92(9), 20(4), 98ld(3), 98(3), 41(2), 98y(2), 10(2), 30(1)
+uses: 96(12), 92(9), 98ld(5), 20(4), 98(3), 41(2), 98y(2), 10(2), 30(1)
 
 ## 98of_onfoot.js — 45 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody

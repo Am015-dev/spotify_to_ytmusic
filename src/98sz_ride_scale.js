@@ -18,7 +18,8 @@ GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);cons
  for(const[A,D]of[[tm,M],[tl,L]])for(const g of A){g.translate(0,-(.74-.42*s),1.55);g.scale(k/s,k/s,k/s);g.translate(0,.1,.25);D.push(g)}})(GB_piece);
 // a driver brick with no wheel to sit behind is only the scale marker
 GB_brickGeo=(f=>function(b){if(b&&b.t==='drvM'&&b.y<=-90)return;return f.apply(this,arguments)})(GB_brickGeo);
-for(const S of GAR_SETS)if(RSZ.MS.includes(S.ref)&&S.car){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
+RSZ.mini=S=>!!(S&&S.car&&/^t_v/.test(S.id)&&S.ref&&!LD_SCRE.test(S.ref));// v90f: every LDraw City/Town ride (shared rule LD_SCRE), not a fixed list
+for(const S of GAR_SETS)if(RSZ.mini(S)){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
 // saved copies of these rides (bricks stored before this fix) get the driver too
 G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?SZ_add(B):B})(G9C_bricks);
 gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);

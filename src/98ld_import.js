@@ -76,6 +76,9 @@ const LD_SW=.408,LDP={g:null,at:null,col:null};
 // but the game's people are 1.9 m (pedestrians) to 2.0 m (quest figures, SC_K in 96_scale_qa.js). So world BUILDINGS use LD_SW × LD_FIG (1.6): a minifig of
 // the game fits a 1×4×6 door (2.8 m frame) with headroom. Rides stay at LD_SW (they match the player car); micro sets (P.s) and moored boats too.
 const LD_FIG=1.6;
+// v90f: ONE scale rule for rides and traffic (98sz_ride_scale.js, 98ct_city_lego.js): Speed Champions sets (75xxx/7689x refs, model ids v758../v7689..) are car-sized
+// at LD_SW; every other LDraw City/Town set is minifig scale (× LD_FIG)
+const LD_SCRE=/^v?7(58|689)/;
 function LD_propSpot(x0,z0,hw,hd){for(let r=24;r<300;r+=8)for(let a=0;a<32;a++){const t=a/32*Math.PI*2,x=x0+Math.cos(t)*r,z=z0+Math.sin(t)*r;
   for(const rot of[0,1]){const w=rot?hd:hw,d=rot?hw:hd;if(!rfFree(x,z,3)||roamHit(x,z,Math.max(w,d)+1.5))continue;let ok=1;
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;
