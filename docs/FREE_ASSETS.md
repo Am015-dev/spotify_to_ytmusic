@@ -49,3 +49,4 @@ Then km.js can drop each replaced model (km.js is shared with buildings/cars: on
 
 km.js: `light-curved` cannot be dropped yet: Athens still draws it (R1 Athens lamp), and kmProps builds it before the swap. Dropping it = an Athens lamp swap first.
 | 3 | park fences: Kenney CC0 `fence-1x3` → LEGO 3633 Fence Lattice 1×4×1 (rails, posts, diamond lattice from the part file; old length and height) | 204 → 144 | 448k → 316k (2,197 fences) | 4.56M → 4.52M (−0.9%, all three swaps vs all old) | 32 → 32 | docs/shots/land/fence_before.png, fence_after.png |
+| 4 | crates: Kenney CC0 `box` → LEGO 61780 Container 2×2×2 Crate (floor + 2 slat rings, reddish brown, old footprint) | 124 → 108 | 235k → 205k (1,897 crates) | 4.50M → 4.32M (all four swaps vs all old, courtyard spot) | 38 → 38 | docs/shots/land/crate_before.png, crate_after.png |
