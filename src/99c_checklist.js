@@ -3,7 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
- {ver:'v90i',id:'town4',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer: each looks complete, stands on the platform, has a LEGO driver; drive one.'},
+ {ver:'v90i',id:'town16',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer, Mini Dumper, Rescue Runabout, Landscape Loader, Service Truck, Dump Truck, Fire and Rescue Van, Post Van, Construction Truck, Highway Emergency Van, Bulldozer, TV Studio Van, Pothole Patcher: each looks complete and stands on the platform; drive two.'},
  {ver:'v90i',id:'pin-obj',text:'Phone, story mission: the checklist bar sits below the yellow NEXT objective line, never on top of it.'},
  {ver:'v90i',id:'palms',text:'Athens Syntagma race: the palms stand beside the track on the verge, none on the asphalt.'},
  {ver:'v90i',id:'ath-size',text:'Athens: jump a few times; the car keeps its normal size and stays upright.'},
