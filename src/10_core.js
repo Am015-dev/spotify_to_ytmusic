@@ -16,6 +16,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v89q',date:'10 Oct 2026',items:[{t:'FIXED',s:'No more pink/white floating blocks beside cars at night.'},{t:'CHANGED',s:'Car lights at night are now only the soft beam on the road plus the cars\' own lamps.'}]},
   {v:'v89p',date:'10 Oct 2026',items:[{t:'FIXED',s:'A memory leak from car headlights at dusk and night: long drives no longer slow down or crash on iPhone.'},{t:'CHANGED',s:'After a 15-minute Frankfurt drive the game holds about 110 MB less graphics memory.'}]},
   {v:'v89o',date:'10 Oct 2026',items:[{t:'FIXED',s:'Garage and flight menus open only when you stop in the ring, not while driving through.'},{t:'FIXED',s:'The arrow no longer keeps pointing back to a garage you have visited.'},{t:'FIXED',s:'Athens golden bricks sit on roads.'},{t:'FIXED',s:'The district name in the top right no longer sits under the ⚙ button.'}]},
   {v:'v89n',date:'10 Oct 2026',items:[{t:'CHANGED',s:'Athens loads about 20 seconds faster and uses about 90 MB less memory while the city builds, so the page should reload on iPhone less often.'},{t:'CHANGED',s:'Frankfurt also loads a few seconds faster.'}]},
