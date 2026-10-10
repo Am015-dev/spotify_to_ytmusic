@@ -57,7 +57,7 @@ X = json.dumps({'c': C, 'k': dict(sorted(K.items())), 's': dict(sorted(sets.item
 boot = r"""// boot preload: the chunks the saved garage needs (equipped street/off-road/water ride + its saved bricks, the open build), parser-blocking so the player's ride builds at boot
 (function(){var X=window.__LDX,need={};if(document.readyState!=='loading')return;function add(c){if(c&&X.c[c])need[c]=1}
  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!/^mho_(gar|build)/.test(k))continue;var v=localStorage.getItem(k)||'',t=v;
-  if(/^mho_gar/.test(k)){var o=JSON.parse(v)||{};[o.sel,o.off,o.boat].forEach(function(s){(X.s[s]||[]).forEach(add)});t=JSON.stringify(o.br&&o.br[o.sel]||0)}
+  if(/^mho_gar/.test(k)){var o=JSON.parse(v)||{};[o.sel,o.off,o.boat].forEach(function(s){(X.s[s]||[]).forEach(add)});t=JSON.stringify([o.br&&o.br[o.sel]||0,o.fb||0])}
   (t.match(/"ld[0-9a-z_]+/g)||[]).forEach(function(m){add(X.k[m.slice(1)])})}}catch(e){}
  for(var c in need)document.write('<script src="'+X.c[c].f+'"><\/script>')})();
 """
