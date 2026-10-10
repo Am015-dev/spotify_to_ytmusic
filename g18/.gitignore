@@ -2,3 +2,4 @@ before/
 after/
 *.log
 probe/
+drive_*/

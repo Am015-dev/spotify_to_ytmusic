@@ -84,7 +84,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98bk | `98bk_bake.js` | 9 | BK (PERF-2, EFF #3): baked candidate grids for the road / terrain distance queries. Owner: perf worker (alex/od-mem). ===== Entering roam spent ~28 % of its CPU |
 | 98fb | `98fb_form_build.js` | 9 | FB (garage-17, Alex 2026-10-10: "the build guide and build does not work for the boats and off road"). Root cause: BUILD and the BUILD GUIDE only ever edit GB.d |
 | 98ba | `98ba_build_anim.js` | 4 | BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built"). When a ride first shows in the |
-| 98gf | `98gf_garage_floor.js` | 2 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
+| 98gf | `98gf_garage_floor.js` | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -394,9 +394,9 @@ uses: 98(28), 92(24), 10(10), 94(10), 98y(7), 98sb(7), 30(5), 98u(4), 93(4), 98r
 defines: BA BA_DROP BA_FALL BA_stop BA_now BA_start BA_step __ba
 uses: 10(9), 98(5), 92(5), 98sb(4), 94(2), 20(1), 30(1)
 
-## 98gf_garage_floor.js — 2 KB
+## 98gf_garage_floor.js — 3 KB
 defines: GF __gf
-uses: 98s(3), 72(2), 10(1)
+uses: 92(5), 98s(3), 72(2), 10(1), 93(1), 98ld(1)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25

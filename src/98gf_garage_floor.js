@@ -13,4 +13,10 @@ GS_fitY=(f=>function(){if(!GS.g||!GB.mesh)return f.apply(this,arguments);const s
    const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();b.copy(g.boundingBox).applyMatrix4(o.matrixWorld);B.union(b);k++});
   if(k){const y=B.min.y;GS.g.position.y=clamp(y-GS.y0,-1,1);GS.gy=y}}GF.n++}
  finally{for(const[o,v]of sw)o.visible=v}})(GS_fitY);
-window.__gf={st:()=>({n:GF.n,gy:GS.gy,top:GS.g?GS.y0+GS.g.position.y:null})};
+// 2) "some have a dummy base": GB_attach (92) draws the bare-chassis plate under every build that has no catalogue wheel (CR_isW). A converted LDraw
+// ride with its own LDraw tyres (3180 Tanker Cab) got that dark plate under its chassis, and the platform was fitted to the plate. A ride with
+// imported LDraw parts carries its own chassis: no plate (the base ship stays hidden as before).
+GB_plate=(f=>function(){const g=f.apply(this,arguments);GF.pg=g;return g})(GB_plate);
+GB_attach=(f=>function(g,bricks,fig,cache,bp){GF.pg=null;const r=f.apply(this,arguments);try{if(bp&&GF.pg&&(bricks||[]).some(b=>b&&typeof b.t==='string'&&LD_MESH[b.t.split('@')[0]])){const U=g.userData,host=U.carG||U.m;
+ U.gbM=(U.gbM||[]).filter(o=>{if(o.geometry!==GF.pg)return true;host.remove(o);o.geometry.dispose();GF.np=(GF.np||0)+1;return false})}}catch(e){console.warn('GF',e)}GF.pg=null;return r})(GB_attach);
+window.__gf={st:()=>({n:GF.n,np:GF.np||0,gy:GS.gy,top:GS.g?GS.y0+GS.g.position.y:null})};
