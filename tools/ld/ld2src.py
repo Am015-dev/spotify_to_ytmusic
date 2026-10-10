@@ -7,7 +7,8 @@ import sys, os, json, re
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, '..', '..', 'src', '98ld0_data.js'); BASE = OUT
 ARGS = sys.argv[1:]
 if ARGS[:1] == ['--out']: OUT = ARGS[1]; ARGS = ARGS[2:]
-HAVE = set(re.findall(r'"(ld\w+)":\{"n"', open(BASE).read())) if OUT != BASE else set()
+import glob  # skip meshes any OTHER data module (98ld0, 98ld1, ...) already holds
+HAVE = set() if OUT == BASE else {k for f in glob.glob(os.path.join(os.path.dirname(BASE), '98ld*_data.js')) if os.path.abspath(f) != os.path.abspath(OUT) for k in re.findall(r'"(ld\w+)":\{"n"', open(f).read())}
 CRED = {'75895-1.mpd': 'Magnus Forsberg (MagFors)', '4643-1.mpd': 'Marc Giraudet (Mad_Marc)', '10264-1.mpd': 'Jaco van der Molen', '76897-1.mpd': 'Adrien Pennamen', '1490-1.mpd': 'Robert Paciorek (bercik)', '4641-1.mpd': 'juraj3579 / Steffen'}
 meshes, models = {}, {}
 for a in ARGS:

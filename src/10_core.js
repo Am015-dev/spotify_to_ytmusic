@@ -16,6 +16,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v89u',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES (water): Power Boat, the long white 28-stud racing boat with red deck and yellow trim, built part by part from the real LEGO 4643 model file.'}]},
   {v:'v89t',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: Turbo 74, the white 1974 911 Turbo with its whale-tail wing, built part by part from the real LEGO 75895 Speed Champions model file.'}]},
   {v:'v89s',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: Rally S1, an 8-wide Speed Champions rally car built part by part from the real LEGO 76897 model file.'},{t:'NEW',s:'RIDES (water): Harbour Speedboat from the real LEGO 4641 set, with a driver, sitting in the water.'},{t:'NEW',s:'Frankfurt: a small LEGO Town Bank (set 1490) stands by the road near the start.'},{t:'NEW',s:'RIDES: Yellow Taxi (40468) from the official instructions; parts in the garage show their LEGO id.'}]},
   {v:'v89q',date:'10 Oct 2026',items:[{t:'FIXED',s:'No more pink/white floating blocks beside cars at night.'},{t:'CHANGED',s:'Car lights at night are now only the soft beam on the road plus the cars\' own lamps.'}]},

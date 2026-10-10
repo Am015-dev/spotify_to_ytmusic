@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89u',id:'pboat-garage',text:'Garage → RIDES → WATER → Power Boat: the long white hull with red deck, black cockpit and yellow trim shows, with a driver on the front seat.'},
+ {ver:'v89u',id:'pboat-drive',text:'Drive the Power Boat on the water: the hull sits IN the water (not floating above it, not sunk), it steers like the other boats.'},
  {ver:'v89t',id:'turbo-garage',text:'Garage → RIDES → Turbo 74: the white 911 Turbo shows with its black whale-tail wing, round headlights and 4 wheels; SAVE & DRIVE works.'},
  {ver:'v89t',id:'turbo-drive',text:'Drive the Turbo 74 for a minute: it sits on the road (no floating), steers like the other cars, nothing falls off.'},
  {ver:'v89s',id:'rally-garage',text:'Garage → RIDES → Rally S1: the white/yellow rally car shows with its wing, curved hood and 4 wheels; SAVE & DRIVE works.'},
