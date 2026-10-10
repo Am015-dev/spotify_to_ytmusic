@@ -36,7 +36,7 @@ No third-party glTF/OBJ files are loaded; the only third-party models are the **
 
 ## 3. Plan / status (one swap at a time, each lighter or equal)
 1. **trees** → real LEGO tree parts (done, see docs/MODEL_CATALOG.md and the swap table below).
-2. **lamps** (Kenney, 784k tris, the biggest free-asset cost): a lathe of LEGO 2039 lamp post + round-brick lamp ≤ 92 tris.
+2. **lamps** (Kenney, 784k tris, the biggest free-asset cost): done, LEGO 2039 lamp post lathe, 78 tris.
 3. **fence** (Kenney, 448k tris): LEGO 3185 Fence Lattice 1×4×2 as a flat panel (≤ 204 tris).
 4. **planter / dumpster / crate** (Kenney): LEGO-part equivalents ≤ old tris.
 Then km.js can drop each replaced model (km.js is shared with buildings/cars: only the props' slices go).
@@ -45,3 +45,6 @@ Then km.js can drop each replaced model (km.js is shared with buildings/cars: on
 | # | what | before → after (per instance) | totals (all instances) | frame at the shot spot (renderer.info) | draws | shots |
 |---|---|---|---|---|---|---|
 | 1 | trees: box stacks → LEGO 3470 / 2435 / 3471 silhouettes | tree 60 → 136 near / 54 far; tree2 60 → 136 / 30; tree3 84 → 168 / 30 | 513k → 392k far, 1.15M all-near (near = within 120 m of a tile's trees) | 4.94M → 4.97M (+0.5%) | 138 → 138 | docs/shots/land/trees_before.png, trees_after.png |
+| 2 | street lamps: Kenney CC0 `light-curved` → LEGO 2039 lamp post + 3062b lamp + 4740 shade (lathe, 6 sides, 6.5 m) | 92 → 78 | 784k → 665k (8,524 lamps) | 4.62M → 4.55M (−1.7%, trees + lamps together vs both old) | 52 → 52 | docs/shots/land/lamps_before.png, lamps_after.png |
+
+km.js: `light-curved` cannot be dropped yet: Athens still draws it (R1 Athens lamp), and kmProps builds it before the swap. Dropping it = an Athens lamp swap first.
