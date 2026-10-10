@@ -5,7 +5,7 @@ const CR_bb=(x0,x1,y0,y1,z0,z1,c,e=CR_E)=>{if(CR_LO===1)return GB_box(x0,x1,y0,y
  const g=new THREE.ExtrudeGeometry(sh,{depth:z1-z0-2*e,bevelEnabled:true,bevelThickness:e,bevelSize:e,bevelSegments:1,curveSegments:1});g.translate(0,0,z0+e);return GB_col(g,c)};
 // side profile [z,y] (or ['q',cz,cy,z,y] quadratic) extruded across x0..x1
 function CR_side(P,x0,x1,c,e=CR_E){if(CR_LO===1)e=0;const sh=new THREE.Shape();let f=1;for(const p of P){if(p[0]==='q'){sh.quadraticCurveTo(-p[1],p[2],-p[3],p[4])}else if(f){sh.moveTo(-p[0],p[1]);f=0}else sh.lineTo(-p[0],p[1])}sh.closePath();
- const g=new THREE.ExtrudeGeometry(sh,{depth:x1-x0-2*e,bevelEnabled:e>0,bevelThickness:e,bevelSize:e*.8,bevelSegments:1,curveSegments:CR_LO?4:8});g.rotateY(Math.PI/2);g.translate(x0+e,0,0);return GB_col(g,c)}
+ const g=new THREE.ExtrudeGeometry(sh,{depth:x1-x0-2*e,bevelEnabled:e>0,bevelThickness:e,bevelSize:e*.8,bevelSegments:1,curveSegments:CR_LO&&CR_LO!==3?4:8});g.rotateY(Math.PI/2);g.translate(x0+e,0,0);return GB_col(g,c)}
 // top outline [x,z] extruded y0..y1
 function CR_top(P,y0,y1,c,e=CR_E){if(CR_LO===1)e=0;const sh=new THREE.Shape();P.forEach((p,i)=>i?sh.lineTo(p[0],p[1]):sh.moveTo(p[0],p[1]));sh.closePath();
  const g=new THREE.ExtrudeGeometry(sh,{depth:y1-y0-2*e,bevelEnabled:true,bevelThickness:e,bevelSize:e*.8,bevelSegments:1,curveSegments:1});g.rotateX(Math.PI/2);g.translate(0,y1-e,0);return GB_col(g,c)}
@@ -163,6 +163,27 @@ function CR_car(o){const A=[],B=o.body,K=CR_K,S=o.acc||B,add=(t,x,z,r,c,y)=>A.pu
  sym('tl',-4,7,2,B,1);sym('B1x1',-3,7,0,B,1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);
  if(!o.noWing)add('spoiler',-3,5,0,o.wing||K,6);sym('mir',-4,-3,0,B,6);add('pipes',-1,8,0,K,1);add('lp',-1,-9,0,K,1);add('lp',-1,8,2,K,3);
  for(const e of o.x||[])add(...e);return A}
+// W8 SUV (v87f): 8-wide Speed-Champions-style SUV from real part types: raised hood with curved nose, chrome grille, chunky grey bumpers,
+// mudguard arches, raked 3x6 windscreen, tall greenhouse (side windows split by pillars), flat roof with dark roof rails, tailgate window
+function CR_suv(o){const A=[],B=o.body,K=CR_K,D='#1d2630',G='#3a4048',CH='#d8dde4',add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
+ sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-CR_WH.wL.r)/GB_PH;
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy)}
+ // front: grey bumper, headlights + chrome grille, raised hood with a curved lip
+ add('P8x1',-4,-9,0,G,1);add('T8x1',-4,-9,0,G,2);add('B8x1',-4,-8,0,B,0);add('B8x1',-4,-8,0,B,3);add('B4x4',-2,-7,0,K,1);add('B4x4',-2,-7,0,B,3);
+ sym('hl',-4,-9,0,B,3);for(const y of[3,4,5]){sym('rp',-3,-9,0,B,y);for(const x of[-2,0])add('grl',x,-9,1,CH,y)}
+ add('C8x1',-4,-9,0,B,6);add('P8x5',-4,-8,0,B,6);add('T8x4',-4,-8,0,B,7);add('T8x1',-4,-4,0,B,7);
+ // sides: doors between the arches, grey rocker, belt line
+ sym('P1x6',-4,-3,0,G,1);sym('B1x6',-4,-3,0,B,2);sym('P1x6',-4,-3,0,B,5);sym('P1x6',-4,-3,0,o.acc||B,6);sym('P1x11',-4,-3,0,B,7);add('B4x6',-2,-3,0,K,1);add('P4x6',-2,-3,0,K,4);
+ // rear: deck over the rear arches, taillights, tailgate, grey bumper
+ add('B4x4',-2,3,0,B,3);add('P8x5',-4,3,0,B,6);add('B8x1',-4,7,0,B,0);sym('tl',-4,7,2,B,3);add('B6x1',-3,7,0,B,3);add('P8x1',-4,8,0,G,1);add('T8x1',-4,8,0,G,2);
+ // greenhouse: raked screen, A/B/D pillars, dark side + rear windows, cabin filler
+ add('ws6',-3,-4,0,B,8);sym('C1x2',-4,-4,0,B,8);sym('B1x1',-4,-2,0,B,8);sym('P1x1',-4,-2,0,B,11);
+ for(const y of[8,11]){const P=y===8?'B':'P';sym(P+'1x3',-4,-1,0,D,y);sym(P+'1x1',-4,2,0,B,y);sym(P+'1x3',-4,3,0,D,y);sym(P+'1x1',-4,6,0,B,y);add(P+'6x1',-3,7,0,D,y);sym(P+'1x1',-4,7,0,B,y)}
+ add('B6x8',-3,-1,0,K,8);add('P6x8',-3,-1,0,K,11);
+ // roof: body plate, inset roof tile, dark roof rails, rear lip
+ sym('T1x1',-4,-2,0,B,12);add('P8x9',-4,-1,0,B,12);add('T6x8',-3,-1,0,B,13);sym('T1x7',-4,0,0,K,13);add('C8x1',-4,7,2,B,13);
+ for(const e of o.x||[])add(...e);return A}
 function CR_rod(o={}){const A=[],R=o.body||'#d01712',Y=o.acc||'#fe8a18',K=CR_K,CH='#d8dde4',add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),
  sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(t,ax)=>(ax-GB_PC[t].h*GB_PH/2)/GB_PH;
  add('T4x9',-2,-8,0,K,2);add('T8x7',-4,1,0,K,1);
@@ -267,11 +288,12 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
  try{switch(nm){case'sedan':A=CR_car({body:W,acc:W,noWing:1});break;case'sedan-sports':A=CR_car({body:W,acc:K,wing:K});break;
   case'taxi':A=CR_car({body:ath?'#f5d000':W,acc:ath?'#f5d000':K,noWing:1,x:[['sign',-1,-1,0,ath?'#f4f4f4':'#ffd12c',13]]});break;
   case'police':A=CR_car({body:'#f4f4f4',acc:'#0055bf',noWing:1,x:[['bar',-2,-1,0,K,13]]});break;
-  case'suv':A=CR_car({body:W,acc:K,noWing:1,x:[['T6x4',-3,-2,0,K,13]]});wid=2.15;break;
+  case'suv':A=CR_suv({body:W,acc:W});wid=2.15;break;
   case'van':A=CR_van({body:W});wid=2.2;break;case'delivery':A=CR_truck({body:W});wid=2.4;break;case'truck':A=CR_truck({body:W});wid=2.55;break;
-  case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;default:return CR_CG[nm]=null}
-  if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
-  const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
+  case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;case'bus':A=BC_bus();wid=2.55;break;/* v88z QS: city bus (the big-car template) */
+  default:{const T=nm.startsWith('su:')&&SU_T.find(t=>t.id===nm.slice(3));if(!T)return CR_CG[nm]=null;A=T.car();wid=2.0}} // LV (v88n): street racers from 98su as traffic, own livery colours
+  if(['sedan','sedan-sports','taxi','police'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
+  const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!(TUNE.bwCar?['drv','drvR','stw','flag']:['drv','drvR','stw','mir','lp','pipes','flag']).includes(b.t));CR_LO=TUNE.bwCar?3:2;/* BW (v88w): bwCar = full-detail studs/curves/wheels + mirrors, plates, exhausts on near traffic; the far copy is re-clustered from this */CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
   const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const MD=M.filter(CR_isDark),MB=M.filter(g=>!CR_isDark(g));const body=mergeGeometries(MB.concat(L)),wheels=mergeGeometries(Wg),glass=(CR_G.length||MD.length)?mergeGeometries(CR_G.concat(MD)):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);
   for(const g of[body,wheels,glass].filter(Boolean)){g.translate(0,-y0,0);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.04,0)}return CR_CG[nm]={body,wheels,glass}}
@@ -280,7 +302,14 @@ function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new 
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  im.material=ART9_cabMat();if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
 const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
-function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
+// FX19: seat traffic on all four tyres (as the player car): pitch/roll to the ground under the wheel contacts, height = their mean
+let FX19_R=260;const _fxA=new THREE.Vector3(),_fxR=new THREE.Matrix4(),_fxE=new THREE.Euler();
+function FX19_seat(c,dx,dz,im,M){const w=im.userData.w;if(!w||!w.geometry)return;let B=im.userData.fxWB;if(!B){w.geometry.computeBoundingBox();const b=w.geometry.boundingBox,r=(b.max.y-b.min.y)/2;B=im.userData.fxWB={l:Math.max(.3,(b.max.z-b.min.z)/2-r),w:(b.max.x-b.min.x)/2*.85,cz:(b.max.z+b.min.z)/2,by:b.min.y}}
+ _fxA.setFromMatrixPosition(M);const x=_fxA.x,z=_fxA.z;if(Math.abs(x-camera.position.x)+Math.abs(z-camera.position.z)>FX19_R)return;const y0=c.y+2.5,G=(a,b)=>groundAt(x+dx*(a+B.cz)+dz*b,z+dz*(a+B.cz)-dx*b,y0),
+  fl=G(B.l,B.w),fr=G(B.l,-B.w),bl=G(-B.l,B.w),br=G(-B.l,-B.w);if(Math.max(fl,fr,bl,br)-Math.min(fl,fr,bl,br)>1.2)return;
+ // local +x is (dz,0,-dx): b>0 is the right side
+ const pt=-Math.atan2((fl+fr-bl-br)/2,2*B.l),rl=Math.atan2((fl+bl-fr-br)/2,2*B.w);M.multiply(_fxR.makeRotationFromEuler(_fxE.set(pt,0,rl)));M.elements[13]=(fl+fr+bl+br)/4-B.by+CR_TYRE_Y}
+function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}try{FX19_seat(c,dx,dz,im,M)}catch(e){}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
  const tr=clamp(dh/d*v*.012,-.06,.06),tp=clamp(-ac*.015,-.045,.045),k=Math.min(1,dt*5);c.rl=(c.rl||0)+(tr-(c.rl||0))*k;c.pt=(c.pt||0)+(tp-(c.pt||0))*k;
  _crR.makeRotationFromEuler(_crE.set(c.pt,0,c.rl));_crM.copy(M).multiply(_crT1).multiply(_crR).multiply(_crT2);im.setMatrixAt(c.j,_crM);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_crM)}
 
@@ -341,8 +370,11 @@ function CR_npcTilt(g){const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),f
  yF=(G(dl,dw)+G(dl,-dw))/2,yB=(G(-dl,dw)+G(-dl,-dw))/2,yR=(G(dl,dw)+G(-dl,dw))/2,yL=(G(dl,-dw)+G(-dl,-dw))/2,yC=groundAt(x,z,y0);
  g.rotation.x=clamp(-Math.atan2(yF-yB,2*dl),-.25,.25);g.rotation.z=clamp(Math.atan2(yR-yL,2*dw),-.25,.25);g.userData.crH.position.y=g.userData.crY+clamp((yF+yB)/2-yC,-.5,.5)}
 // keep the player out of mission vehicles: push out of the oriented footprint and bleed speed
-function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;
- if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+1.3-Math.abs(al),ps=H.W+1.05-Math.abs(sd);if(pl<=0||ps<=0)continue;
+// FX19: never draw a story vehicle the chase camera is inside (was a translucent orange wall over the screen); hide its body until the camera is out
+function FX19_camIn(g,H,fx,fz){const b=g.userData.crH;if(!b)return;const c=camera.position,cx=c.x-g.position.x,cz=c.z-g.position.z,al=cx*fx+cz*fz,sd=cx*fz-cz*fx,m=.9;
+ b.visible=!(Math.abs(al)<H.L+m&&Math.abs(sd)<H.W+m&&c.y<g.position.y+4.5)}
+function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;FX19_camIn(g,H,fx,fz);
+ if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+CR_PLH.l-Math.abs(al),ps=H.W+CR_PLH.w-Math.abs(sd);if(pl<=0||ps<=0)continue;
  if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}RO.v*=.6}}
 
 
@@ -360,16 +392,16 @@ function CR_mhud(){const q=document.getElementById('qTrk'),a=document.getElement
 setInterval(CR_mhud,250);
 
 
-const CR_WB=2.7,CR_CAMK=1/.15;
+let CR_WB=2.7,CR_PLH={l:1.3,w:1.05};const CR_CAMK=1/.15; // CR_WB: let, set per car size by 98bc_bigcars.js
 const C26_cityMu=(terr,veh)=>(C26.muCity[terr]||C26.muCity.road)*(veh==='offroad'&&terr!=='road'?C26.muOff:1)*((carStat().han)||1);
-function CR_yaw(c,dt,ytg,maxR,air){const v=RO.v||0,sp=Math.abs(v),st=clamp(c.steer||0,-1,1),base=-st*maxR*Math.sign(v||1),dm=.55/(1+sp/14),tg=st*dm,d0=RO.dl||0;
- RO.dl=d0+(tg-d0)*Math.min(1,dt*(Math.abs(tg)>Math.abs(d0)&&tg*d0>=0?11:16));
+function CR_yaw(c,dt,ytg,maxR,air){const v=RO.v||0,sp=Math.abs(v),st=clamp(c.steer||0,-1,1),base=-st*maxR*Math.sign(v||1),dm=TUNE.stAng/(1+sp/TUNE.stFall),tg=st*dm,d0=RO.dl||0;
+ RO.dl=d0+(tg-d0)*Math.min(1,dt*(Math.abs(tg)>Math.abs(d0)&&tg*d0>=0?TUNE.stIn:TUNE.stOut));
  if(RO.dDir||air)return(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*6.5);
  const cap=Math.max(.35,maxR),pv=Math.max(0,1-sp/9),dS=v>.3?1:v<-.3?-1:(c.brk&&!c.thr?-1:1);return clamp(-(v/CR_WB)*Math.tan(RO.dl)-st*1.15*pv*pv*dS,-Math.max(cap,1.15),Math.max(cap,1.15))+(ytg-base)}
 const CR_roll=()=>clamp(-(RO.yr||0)*(RO.v||0)/26,-1,1)*.055;
 const CR_PS={};
 function CR_bodyPts(ud){const host=ud.m,key=host.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:'');if(CR_PS.k===key)return CR_PS.p;
- const inv=new THREE.Matrix4().copy(host.matrixWorld).invert(),B=new THREE.Box3(),bb=new THREE.Box3(),m4=new THREE.Matrix4();host.updateMatrixWorld(true);
+ host.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(host.matrixWorld).invert(),B=new THREE.Box3(),bb=new THREE.Box3(),m4=new THREE.Matrix4();// size-1: world matrices first, then the inverse (a stale inverse gave Athens rides 10 m long / negative width)
  host.traverse(o=>{if(!o.isMesh||o.userData.r)return;let v=true,q=o;while(q&&q!==host){if(!q.visible)v=false;q=q.parent}if(!v||o.material&&(o.material.transparent||o.material.depthWrite===false))return;
   if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(m4.multiplyMatrices(inv,o.matrixWorld));B.union(bb)});
  const P=[];if(!B.isEmpty())for(const x of[B.min.x,(B.min.x+B.max.x)/2,B.max.x])for(const z of[B.min.z,(B.min.z+B.max.z)/2,B.max.z])if(x!==(B.min.x+B.max.x)/2||z!==(B.min.z+B.max.z)/2)P.push(new THREE.Vector3(x,B.min.y,z));

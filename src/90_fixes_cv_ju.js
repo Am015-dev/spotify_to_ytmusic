@@ -22,12 +22,12 @@ if(!OB.off)FL_terr=function(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=R
   return raw};
 // ---- fix 2 · contact tests: the old checks were circles (props: r+2.1 m, traffic: 5 m) so passing a lamp, bin or a car in the next lane
 // 1–3 m away "smashed" it with a full brick burst. Now: the car's real footprint (oriented box) must touch the prop / the other car's box.
-const OB_HW=1.25,OB_HL=2.45;
+let OB_HW=1.25,OB_HL=2.45; // let: 98bc_bigcars.js sizes them to the player car
 function OB_touch(px,pz,r,ox=RO.x,oz=RO.z,oh=RO.h){const dx=px-ox,dz=pz-oz,s=Math.sin(oh),c=Math.cos(oh),a=dx*s+dz*c,b=dx*c-dz*s;
   const qa=Math.max(0,Math.abs(a)-OB_HL),qb=Math.max(0,Math.abs(b)-OB_HW);const g=Math.hypot(qa,qb),ok=g<r+.25;if(ok)OB.hit={k:'prop',f:OB.fr};else OB.pm.add(px*7919+pz);return ok||OB.off}
 function OB_obb(ax,az,ah,aw,al,bx,bz,bh,bw,bl){const A=[[Math.sin(ah),Math.cos(ah)],[Math.cos(ah),-Math.sin(ah)]],B=[[Math.sin(bh),Math.cos(bh)],[Math.cos(bh),-Math.sin(bh)]],d=[bx-ax,bz-az];
   for(const u of[...A,...B]){const ra=al*Math.abs(A[0][0]*u[0]+A[0][1]*u[1])+aw*Math.abs(A[1][0]*u[0]+A[1][1]*u[1]),rb=bl*Math.abs(B[0][0]*u[0]+B[0][1]*u[1])+bw*Math.abs(B[1][0]*u[0]+B[1][1]*u[1]);if(Math.abs(d[0]*u[0]+d[1]*u[1])>ra+rb+.2)return false}return true}
-const OB_cdim=k=>{const n=HCAR[k]||'';return n==='#troll'?[1.4,6]:n==='#scoot'?[.5,1.1]:/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]};
+const OB_cdim=k=>{const n=HCAR[k]||'',ct=typeof CT_dim==='function'&&CT_dim(k);if(ct)return ct;/* CT (city-1): LEGO-set traffic uses its own box */return n==='#troll'||n==='bus'?[1.4,6]:n==='#scoot'?[.5,1.1]:/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]};
 function OB_car(x,z,dx,dz,c){const k=c.k,[w,l]=OB_cdim(k),r=OB_obb(RO.x,RO.z,RO.h,OB_HW,OB_HL,x,z,Math.atan2(dx,dz),w,l);if(r)OB.hit={k:'car',f:OB.fr};else OB.cm.add(c);return r||OB.off}
 function OB_carP(k,P){const N=HUB.nodes,A=N[k.a],B=N[k.b];const h=A&&B?Math.atan2(B.x-A.x,B.z-A.z):0;const[w,l]=OB_cdim(k.k);return OB_obb(P.x,P.z,P.h??RO.h,OB_HW,OB_HL,k.x,k.z,h,w,l)}
 OB.cm=new Set();OB.pm=new Set();OB.fr=0;
@@ -72,8 +72,13 @@ function OC_beamGeo(){const NL=14,NW=8,L=20,P=[],C=[],I=[];
   for(let i=0;i<NL;i++)for(let j=0;j<NW;j++){const a=i*(NW+1)+j,b=a+1,c=a+NW+1,d=c+1;I.push(a,c,b,b,c,d)}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.setIndex(I);g.setAttribute('uv',new THREE.Float32BufferAttribute(new Array(P.length/3*2).fill(0),2));g.computeVertexNormals();return g}
 FL_headlights=function(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.cars.length+1;
-  if(!H||H.parent!==HUB.grp||H.count<N){if(H&&H.parent)H.parent.remove(H);
-    const L=[cbox(.42,.26,.12,-.72,.85,2.25,'#fff6d8'),cbox(.42,.26,.12,.72,.85,2.25,'#fff6d8'),cbox(.36,.2,.1,-.74,.9,-2.25,'#ff2a20'),cbox(.36,.2,.1,.74,.9,-2.25,'#ff2a20')];L.push(OC_beamGeo());
+  // PERF-4: capacity = instanceMatrix.count. H.count is the drawn count set below, so `H.count<N` rebuilt the mesh every call while any car was hidden
+  // (most of the time), and the old one was never disposed: its geometry + instance buffer stayed on the GPU (+0.7 MB per area, ~1 rebuild/s at dusk/night).
+  if(H&&H.parent!==HUB.grp&&H.instanceMatrix.count>=N)HUB.grp.add(H);
+  if(!H||H.instanceMatrix.count<N){if(H){H.removeFromParent();H.geometry.dispose();H.material.dispose();H.dispose()}
+    // v89q: no lamp boxes. The 4 fixed cboxes (±.74 m, ±2.25 m) fitted no car (traffic rears -2.0..-2.8 m, player x1.2), so at 2.4x additive
+    // they floated beside/behind every car as solid pink/white rectangles. The cars' own lamp parts glow via FL_emis; only the soft beam fan stays.
+    const L=[OC_beamGeo()];
     const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,color:0x000000,fog:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4});
     H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+8);H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1;H.userData.oc=1}
   H.material.color.setScalar(2.4*n);let j=0;
@@ -206,11 +211,11 @@ function OC_altFix(){const R=LM_BY['Römer'],K=LM_BY['Kaiserdom'];if(!R||!K)retu
 {const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r}}
 // ---------- 4 · height audit (both cities): props, traffic, buildings (storeys), named landmarks, floating / buried
 const OC_REAL={Commerzbank:259,'Main Tower':240,Messeturm:257,'Athens Tower':103,Lycabettus:277,Parthenon:13.72+1.53+3.7};
-const OC_RANGE={tree:[6,12],lamp:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
+const OC_RANGE={tree:[6,12],lamp:CID==='ath'?[4.5,6.5]:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
 const OC_TREES=['tree','tree2','tree3','CE_pine','CE_cypress','CE_olive'],OC_CARS=['car','car2','car3','car4','CE_car','CE_car2','CE_taxi'];
 function OC_audit(){const D=HUB.ptypes,T=[],out={rows:T,bad:[],float:0,buried:0,fl:[],bu:[]},hgt=g=>{g.computeBoundingBox();return g.boundingBox.max.y-g.boundingBox.min.y};
   const row=(cls,name,v,lo,hi,real)=>{const ok=v>=lo-1e-6&&v<=hi+1e-6;T.push({cls,name,v:+v.toFixed(2),lo,hi,real,ok});if(!ok)out.bad.push(cls+':'+name+'='+v.toFixed(2))};
-  const used=t=>HUB.props.some(p=>p.t===t);for(const t of OC_TREES)if(D[t]&&used(t))row('tree',t,hgt(D[t].g),...OC_RANGE.tree);if(D.lamp)row('lamp','lamp',hgt(D.lamp.g),...OC_RANGE.lamp,8);
+  const used=t=>HUB.props.some(p=>p.t===t);for(const t of OC_TREES)if(D[t]&&used(t))row('tree',t,hgt(D[t].g),...OC_RANGE.tree);if(D.lamp)row('lamp','lamp',hgt(D.lamp.g),...OC_RANGE.lamp,CID==='ath'?5.5:8);
   for(const t of OC_CARS)if(D[t]&&used(t))row('car',t,hgt(D[t].g),...OC_RANGE.car,1.5);OC_traffic();for(const k in HUB.cim||{}){const g=HUB.cim[k].geometry;g.computeBoundingBox();const l=g.boundingBox.max.z-g.boundingBox.min.z;const w=g.boundingBox.max.x-g.boundingBox.min.x;if(w<1.2)row('two-wheeler','traffic#'+k+' (scooter + rider)',hgt(g),1.3,2,1.7);else if(l<5.2)row('car','traffic#'+k,hgt(g),...OC_RANGE.car,1.5);else row('heavy','traffic#'+k+' (van/truck/bus)',hgt(g),1.9,4.3,3.2)}
   // buildings: Athens instanced bodies (storeys by style), Frankfurt colliders (Altstadt storeys, named towers)
   if(CID!=='fra'){const st={},M=new THREE.Matrix4(),P=V3(),Q=new THREE.Quaternion(),S=V3();HUB.grp.traverse(o=>{const k=o.userData&&o.userData.athB;if(!o.isInstancedMesh||!['poly','neo','plaka'].includes(k))return;const fh=k==='poly'?3.1:3.3;
@@ -317,7 +322,7 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
         if(go)for(const o of res.keys()){if(o===c||same(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
         if(go&&d<6)res.set(c,CV.t);else if(!go)vm=Math.sqrt(10*Math.max(0,d-3.2))}}
       else{vm=Math.min(vm,6+Math.max(0,d)*.6);const o=J.of===CV.fr?J.oc.find(o=>o!==c&&Math.abs(o.CVhx*c.CVhx+o.CVhz*c.CVhz)<.7):null;if(o&&d>2&&(c.CVw=(c.CVw||0)+dt)<4)vm=Math.min(vm,Math.sqrt(10*Math.max(0,d-3.2)));else if(!o)c.CVw=0}}
-    if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng);if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
+    if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
     if(!g){c.CVp=0;if(!J&&!In)c.CVx=null}
     const Jb=In&&In.sig?In:J;if(Jb&&Jb.sig&&(In===Jb||Jb.res&&Jb.res.has(c))){const R=Jb.res,pc=R&&R.has(c)?R.get(c):1e9;let hold=0;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);
       for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,dd=Math.hypot(rx,rz);if(dd>8)continue;const al=rx*c.CVhx+rz*c.CVhz;if(al<-.5)continue;
@@ -449,7 +454,7 @@ roamStep=(f=>function(dt){const busy=JU_busy();if(!busy)JU.clk+=dt;if(!JU.on||!p
     if(c.jpa!=null&&c.jpa>0&&al<=0&&lat>(SC_S&&SC_S.on?2.9:4.8)&&lat<(SC_S&&SC_S.on?5.5:8)&&Math.abs((c.y||0)-RO.y)<3&&!(c.nm>0)){c.nm=3;award(s,'NEAR MISS',6,100,'#4ceaff');AU.sfx('near');comboAdd(2)}c.jpa=al}}
   // air: the base already pays an air bonus over 1 s (roamLanded); here: squash on landing, camera kick on big landings, slight stretch in the air
   if(s.air&&!a0)JU.airT0=JU.clk;else if(!s.air&&a0){const at=JU.clk-JU.airT0;JU.sq=Math.min(.24,.14+at*.1);if(at>=JU_C.airMin)JU.kick=Math.max(JU.kick,Math.min(.45,at*.3)*fxK())}
-  JU.sq=Math.max(0,JU.sq-dt*1.1);{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
+  JU.sq=Math.min(.24,Math.max(0,JU.sq-Math.max(0,dt)*1.1));/* size-1: a negative dt (test clock) grew sq to 3.5 → car 2.6× big and upside down */{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
   // stud trail: nothing rewarding for 5 s while driving → a fountain of studs on the road ahead (pooled stud meshes)
   JU.dropT=Math.max(0,JU.dropT-dt);if(!busy&&sp>3&&JU.dropT<=0&&JU.clk-JU.ev.last>JU_C.deadT){JU.dropT=2.5;const sg=Math.sign(RO.v||1),fx=Math.sin(RO.h)*sg,fz=Math.cos(RO.h)*sg,ahead=Math.min(45,14+sp*.7);JU.v0.set(fx,0,fz);let n=0;
     for(let k=0;k<6;k++){const x=RO.x+fx*(ahead+k*3.5),z=RO.z+fz*(ahead+k*3.5);if(roamHit(x,z,1,RO.y))break;studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0);n++}
@@ -468,8 +473,8 @@ roamCam=(f=>function(dt){const c=camera;c.position.sub(JU.co);c.fov-=JU.cf;JU.co
   if(JU.la)c.rotateOnWorldAxis(JU.Y,JU.la);
   JU.cf=JU.fx+JU.kick*5;c.fov+=JU.cf;c.updateProjectionMatrix();
   // speed blur + speed lines: capped at the mission limits everywhere (uSpeed ≤ .25, uBoost ≤ .15, lines ≤ .3 in missions)
-  const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K-U.uBoost.value)*e;
-  {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
+  const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K*TUNE.fxGlow-U.uBoost.value)*e;
+  {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85*TUNE.fxLines:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
 // ---- wind rises with speed relative to the roam top speed, a low road rumble under it (one extra noise loop, made once)
 AU.engine=(f=>function(s,thr,on){f.call(this,s,thr,on);if(!JU.on||!this.a||state!=='roam'||!this.wind)return;const t=this.a.currentTime,x=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.3);
   if(!this.juR){try{const a=this.a,src=a.createBufferSource();src.buffer=this.nb;src.loop=true;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=110;const g=a.createGain();g.gain.value=0;src.connect(lp);lp.connect(g);g.connect(this.fx);src.start();this.juR=g}catch(e){this.juR={gain:{setTargetAtTime(){}}}}}
@@ -492,3 +497,19 @@ window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.s
   aimTraffic:(v=38)=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>30){bd=d;b=c}}if(!b)return null;const N=HUB.nodes,A=N[b.a],B=N[b.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L;
     RO.x=b.x-dx*26;RO.z=b.z-dz*26;RO.y=groundAt(RO.x,RO.z,b.y+3);RO.vy=0;RO.h=RO.vh=Math.atan2(dx,dz);RO.yr=0;RO.v=v;camSnap=true;return{x:b.x,z:b.z}}};
 
+// ---- W12 · car paint reads as LEGO colours (Bright Red read pink-magenta, blue lavender, yellow pale). Two causes, measured on a side view:
+// 1) the player's glossy paint mirrored the sky environment at envMapIntensity 1.2 (traffic is capped at .6): base specular + clearcoat add
+//    a blue-white veil, which in sRGB lifts the near-zero channels of a saturated paint (red 208,23,18 → 245,51,69). Env off → 224,6,6.
+// 2) the OutputPass Neutral tone map desaturates every pixel whose brightest channel passes ~0.76 toward white; sunlit paint gets there.
+// Fix, car materials only (world look unchanged): player paint env capped at .6 like traffic, and a hue-preserving soft knee before the tone
+// map keeps a saturated paint's brightest channel under 0.76; white/grey highlights (low saturation) are left to the tone map as before.
+const W12P={t:0,K:.55,M:.76,env:.6};
+function W12_paint(m){if(!m||m.userData.w12||!(m.isMeshStandardMaterial))return;m.userData.w12=1;const ob=m.onBeforeCompile,pk=m.customProgramCacheKey;
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.fragmentShader=sh.fragmentShader.replace('#include <opaque_fragment>',
+   `#include <opaque_fragment>\n{vec3 w12c=gl_FragColor.rgb;float w12p=max(w12c.r,max(w12c.g,w12c.b));if(w12p>${W12P.K.toFixed(3)}){float w12d=${(W12P.M-W12P.K).toFixed(3)},w12s=clamp((w12p-min(w12c.r,min(w12c.g,w12c.b)))/w12p*1.4,0.,1.);
+     gl_FragColor.rgb=w12c*mix(1.,(${W12P.K.toFixed(3)}+w12d*(1.-exp(-(w12p-${W12P.K.toFixed(3)})/w12d)))/w12p,w12s);}}`)};
+  m.customProgramCacheKey=function(){const cur=this.onBeforeCompile;this.onBeforeCompile=ob;const k=pk.call(this);this.onBeforeCompile=cur;return k+'|w12'};m.needsUpdate=true}
+function W12_cars(){try{if(typeof ART10!=='undefined')ART10.mats.forEach(W12_paint)}catch(e){}
+  if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material)){W12_paint(m);if(W12P.env&&m&&m.vertexColors&&!m.transparent&&m.roughness>=.1&&m.userData.a10e!==undefined&&m.userData.a10e>W12P.env){m.userData.a10e=W12P.env;m.envMapIntensity=Math.min(m.envMapIntensity,W12P.env)}}});
+  if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(!im)continue;for(const m of[].concat(im.material))W12_paint(m);const u=im.userData||{};for(const q of[u.w,u.g])if(q)for(const m of[].concat(q.material))W12_paint(m)}}
+roamStep=(f=>function(dt){f(dt);const t=performance.now();if(t-W12P.t>500){W12P.t=t;W12_cars()}})(roamStep);

@@ -1,0 +1,4 @@
+B {"url":"live_dbg.html","city":"ath","menuMB":60.8,"roamMB":161.4,"enter_s":85.004,"errs":[]}
+B {"url":"m4_dbg.html","city":"ath","menuMB":60.9,"roamMB":153.9,"enter_s":63.957,"errs":[]}
+C {"url":"live_dbg.html","city":"ath","menuMB":60.9,"roamMB":149.4,"enter_s":86.895,"errs":[]}
+C {"url":"m4_dbg.html","city":"ath","menuMB":60.9,"roamMB":140.7,"enter_s":65.155,"errs":[]}

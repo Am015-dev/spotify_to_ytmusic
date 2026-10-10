@@ -1,0 +1,24 @@
+phone fra {"min":1.63,"hits":17,"kinds":{"other":3,"traffic":13,"wall":1},"wallHits":1,"wallPerMin":0.62,"hitsPerMin":10.46,"bigDrop":11,"stuckPct":18.1,"avgKmh":28.8,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":4.3,"traffic120m":33.6,"missions":[{"f":1,"start":"Hot Drop"}],"worst":[{"ctx":"GO!","f":5224,"v0":32,"v1":10,"drop":0.69,"kind":"traffic","x":1566,"z":-104,"dy":0},{"ctx":"GO!","f":5578,"v0":36,"v1":12,"drop":0.66,"kind":"other","x":1562,"z":-108,"dy":0},{"ctx":"GO!","f":4226,"v0":44,"v1":15,"drop":0.65,"kind":"wall","x":1577,"z":-52,"dy":0},{"ctx":"GO!","f":5830,"v0":35,"v1":12,"drop":0.65,"kind":"traffic","x":1561,"z":-109,"dy":0},{"ctx":"GO!","f":2998,"v0":76,"v1":30,"drop":0.61,"kind":"traffic","x":1667,"z":5,"dy":0}],"monErr":null,"rot":{"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,1704,786]},"scale":{"pedH":1.81,"carL":4.4,"carH":1.63,"player":{"h":2.1,"l":4.48,"w":1.99},"pedRel":1.03,"pedVsPlayer":1.01,"nPed":8,"nCar":8},"road":{"roadPts":898,"blocked":0,"pct":0,"colliders":0,"sample":[]},"roadEnd":{"roadPts":1896,"blocked":0,"pct":0,"colliders":0,"sample":[]},"overlap":[],"hudOverlap":["#roamArrow×#odPin","#npcSay×#odPin"],"tiny":[],"extra":{"map":{"opened":false,"drag":null,"pinch":null},"pause":{"tP_settings":false,"opts":[],"opened":true,"frozen":true,"resumed":false},"garage":{"pause":false,"btn":false,"back":false},"otg":null},"events":[],"perf":{"calls":274,"tris":1801022,"jsMs":0.1,"geoms":406,"tex":131,"str":null},"wallSec":151}
+phone ath {"min":1.5,"hits":9,"kinds":{"traffic":9},"wallHits":0,"wallPerMin":0,"hitsPerMin":6.01,"bigDrop":7,"stuckPct":23.9,"avgKmh":30.1,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":19.4,"traffic120m":13.2,"missions":[{"f":1346,"start":"Koulouri Rush"}],"worst":[{"ctx":"GOLDEN BRICK","f":1933,"v0":52,"v1":4,"drop":0.91,"kind":"traffic","x":1814,"z":-1685,"dy":0},{"ctx":"GOLDEN BRICK","f":2659,"v0":92,"v1":23,"drop":0.75,"kind":"traffic","x":1766,"z":-1538,"dy":0},{"ctx":"GOLDEN BRICK","f":3304,"v0":94,"v1":25,"drop":0.74,"kind":"traffic","x":1733,"z":-1380,"dy":0},{"ctx":"GO!","f":1665,"v0":27,"v1":10,"drop":0.64,"kind":"traffic","x":1833,"z":-1679,"dy":0},{"ctx":"GOLDEN BRICK","f":2875,"v0":39,"v1":18,"drop":0.55,"kind":"traffic","x":1761,"z":-1504,"dy":0}],"monErr":null,"rot":null,"scale":{"pedH":1.77,"carL":4.64,"carH":1.57,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.95,"pedVsPlayer":0.94,"nPed":8,"nCar":8},"road":{"roadPts":450,"blocked":0,"pct":0,"colliders":0,"sample":[]},"roadEnd":{"roadPts":680,"blocked":0,"pct":0,"colliders":0,"sample":[]},"overlap":[],"hudOverlap":[],"tiny":[],"extra":{"map":{"opened":false,"drag":null,"pinch":null},"pause":{"tP_settings":false,"opts":[],"opened":true,"frozen":true,"resumed":false},"garage":{"pause":false,"btn":false,"back":false},"otg":null},"events":["next@0"],"perf":{"calls":228,"tris":1399632,"jsMs":0.2,"geoms":4052,"tex":137,"str":null},"wallSec":197}
+PASS phone fra: wall/building hits ≤ 1/min · {"wallPerMin":0.62,"bigDrop":11,"hits":17}
+FAIL phone fra: stuck ≤ 3 % · {"stuckPct":18.1}
+PASS phone fra: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.81,"carL":4.4,"carH":1.63,"player":{"h":2.1,"l":4.48,"w":1.99},"pedRel":1.03,"pedVsPlayer":1.01,"nPed":8,"nCar":8}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,1704,786]}
+PASS phone fra: no HUD text under 12 px · []
+PASS phone fra: no HUD element over a touch control · []
+PASS phone fra: no collider on the paved road (invisible walls / oversize hulls) · {"pts":2794,"start":0,"end":0,"ex":[]}
+PASS phone fra: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone fra: monitor ran · null
+PASS phone ath: wall/building hits ≤ 1/min · {"wallPerMin":0,"bigDrop":7,"hits":9}
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":23.9}
+PASS phone ath: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone ath: no loading screens while driving · {"loads":0}
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.77,"carL":4.64,"carH":1.57,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.95,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":1130,"start":0,"end":0,"ex":[]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone: zero console / page errors · []
+TPLAY FAIL 3 · 347 s · ath/v89b/tp/base/tPlay.json

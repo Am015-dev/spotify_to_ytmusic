@@ -1,0 +1,7 @@
+route end {"x":385.3419630102667,"z":1693.786919059568,"v":0.017400637524923185,"pi":1,"n":7,"P":[[453,1678],[311,1696]]}
+{"i":6,"x":254,"z":1699,"h":-1.52,"len":24,"hgt":7,"w":16,"y0":29.8,"dk":false,"col":16756768,"appBlk":[],"bodyBlk":[],"landBlk":[],"kerb":-0.17,"roadPct":100,"route":{"launched":false,"hits":1,"stuck":true},"tag":"street","launched":true,"maxAir":16.1,"vLip":97,"hits":0,"minD":1}
+route end {"x":8.990440805288852,"z":1704.4019044172621,"v":-0.04717682361270005,"pi":0,"n":5,"P":[[38,1707],[-193,1686]]}
+{"i":7,"x":-169,"z":1689,"h":-1.66,"len":24,"hgt":7,"w":16,"y0":38.7,"dk":false,"col":16756768,"appBlk":[],"bodyBlk":[],"landBlk":[],"kerb":0.01,"roadPct":100,"route":{"launched":false,"hits":1,"stuck":true},"tag":"street","launched":true,"maxAir":15.8,"vLip":97,"hits":0,"minD":1}
+route end {"x":234.40617454282693,"z":-463.1405105829282,"v":0.06439374718260157,"pi":1,"n":7,"P":[[313,-517],[191,-444]]}
+{"i":19,"x":138,"z":-421,"h":-1.16,"len":24,"hgt":7,"w":16,"y0":0,"dk":false,"col":16756768,"appBlk":[],"bodyBlk":[],"landBlk":[],"kerb":0,"roadPct":100,"route":{"launched":false,"hits":2,"stuck":true},"tag":"street","launched":true,"maxAir":9,"vLip":38,"hits":2,"minD":0}
+RAMPS fra: 3/3 reachable · errs 0 []

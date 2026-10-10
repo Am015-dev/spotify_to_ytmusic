@@ -1,0 +1,44 @@
+dbgD 0 {"v":0,"d":0,"sv":0,"stk":6,"f":"car","k":"{\"K\":[],\"T\":[null,false,null],\"fr\":false,\"on\":true,\"v\":0,\"air\":null}"}
+dbgD 180 {"v":7.5,"d":27,"sv":0,"stk":0,"f":"car","k":"{\"K\":[],\"T\":[true,false,null],\"fr\":false,\"on\":true,\"v\":7.531692537564578,\"air\":null}"}
+dbgD 360 {"v":0.2,"d":45,"sv":-1,"stk":12,"f":"car","k":"{\"K\":[],\"T\":[true,false,null],\"fr\":false,\"on\":true,\"v\":0.1533342670869225,\"air\":null}"}
+dbgD 540 {"v":0.1,"d":48,"sv":1,"stk":18,"f":"car","k":"{\"K\":[],\"T\":[true,false,null],\"fr\":false,\"on\":true,\"v\":0.11495217587271209,\"air\":null}"}
+dbgD 720 {"v":0.1,"d":51,"sv":0,"stk":24,"f":"car","k":"{\"K\":[],\"T\":[true,false,null],\"fr\":false,\"on\":true,\"v\":0.1288518248888374,\"air\":null}"}
+phone_ath drive1 {"m":52,"v":0,"btn":"exit","canExit":true}
+phone_ath exitGap {"n":14,"g":20}
+PASS phone_ath EXIT ≥8 px from BOOST and GAS · {"n":14,"g":20}
+phone_ath layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:🚪 EXIT","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tN:10px"]}
+PASS phone_ath EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":false,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"park\":false,\"v\":0}"}
+PASS phone_ath EXIT → on foot · {"state":"walk"}
+phone_ath scale {"fig":1.8,"peds":[1.76,1.76,1.77,1.75,1.74,1.75],"figH":1.8,"calls":183,"callsCar":178}
+PASS phone_ath minifig 1.75–1.85 m · 1.8
+PASS phone_ath peds near 1.8–2.0 m · [1.76,1.76,1.77,1.75,1.74,1.75]
+phone_ath zone {"z":[0,70.734375,340.796875,322.265625],"ring":[60,233,146],"hit":"ofZone","hh":"<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di","par":"touch<BODY<HTML","t":393}
+phone_ath layout_foot {"ctl":["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"],"n":5,"ov":[],"tiny":[]}
+PASS phone_ath ≤5 controls on foot · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"]
+PASS phone_ath no HUD over controls · []
+PASS phone_ath text ≥12 px · []
+phone_ath phone_ath_j1_target {"x":2131.45830472838,"z":-1628.622450650135,"h":-1.7619806684844923,"fx":-0.981779872995267,"fz":-0.19002179080673162,"cv":2,"d":13.849331058558988,"ah":13.61646366362873,"j":11,"k":0}
+dbg 0 {"p":[2117.6,-1628.7],"t":[2131.5,-1628.6],"cv":2,"ah":13.6,"near":{"k":"cur","x":2117.3,"z":-1627},"dbg":{"e":11.37,"dy":-0.21,"rt":false,"cv":2.0021847837628624,"dead":0,"stk":[],"blk":["cur:@2117.3,-1627.0 dy0.01"],"hit":null,"in":[0,0,0]}}
+dbg 60 {"p":[2121.9,-1629],"t":[2130.5,-1628.8],"cv":0,"ah":8.4,"near":null,"dbg":{"e":6.11,"dy":-0.12,"rt":false,"cv":0,"dead":0,"stk":[[2118,-1629,"car/prop"]],"blk":["traf:#scoot//cv0.0@2123.1,-1630.2 dy-0.06"],"hit":null,"in":[-0.40034702845982145,0.916363525390625,4.999999188130884]}}
+PASS phone_ath_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2130.5,"z":-1628.8},"frames":102}
+PASS phone_ath_j1 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚗 TAKE","tN:JUMP","tP:❚❚"]
+PASS phone_ath_j1 TAKE ≥12 px from JUMP and RUN · {"n":14,"g":20}
+PASS phone_ath_j1 button reads TAKE · "🚗 TAKE"
+phone_ath phone_ath_j1_pull {"state":"jack","jack":{"t":0.8,"ph":"pull"},"flee":{"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.38,"d":0,"dc":1.6,"dp":0.9},"calls":181,"bub":1}
+PASS phone_ath_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.38,"d":0,"dc":1.6,"dp":0.9}
+PASS phone_ath_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@2117,-1627","jack@2130,-1629","★+1:jack","enter:traf@2130,-1629"]}
+PASS phone_ath_j1 +1 ★ · {"stars":1,"before":0}
+phone_ath phone_ath_j1_flee {"flee":{"h":1.8,"hs":1.8,"s":1,"ph":"run","t":1.65,"d":2.6,"dc":4.7,"dp":4.8},"calls":214,"scr":{"w":0.212,"top":0.491},"bub":1}
+PASS phone_ath_j1 driver ran off ≥3 m from the car · {"h":1.8,"hs":1.8,"s":1,"ph":"run","t":1.65,"d":2.6,"dc":4.7,"dp":4.8}
+PASS phone_ath_j1 jack ≤20 s after EXIT · {"walkS":1.7}
+dbgD 0 {"v":3.4,"d":0,"sv":0,"stk":0,"f":"car","k":"{\"K\":[],\"T\":[false,false,false],\"fr\":false,\"on\":true,\"v\":3.4268386267245425,\"air\":null}"}
+dbgD 180 {"v":16.7,"d":41,"sv":0,"stk":0,"f":"car","k":"{\"K\":[],\"T\":[true,false,false],\"fr\":false,\"on\":true,\"v\":16.71109871764591,\"air\":null}"}
+dbgD 360 {"v":15,"d":89,"sv":0,"stk":0,"f":"car","k":"{\"K\":[],\"T\":[true,false,false],\"fr\":false,\"on\":true,\"v\":14.986572442789473,\"air\":null}"}
+PASS phone_ath_j1 drove 100 m in the stolen car · 100
+PASS phone_ath_j1 tyre gap ≤0.05 m · 0.034
+PASS phone_ath_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+phone_ath phone_ath_j1_drive {"m":100,"gap":0.034,"lowN":"inst:2304","scr":{"w":0.202,"top":0.503},"scr0":{"w":0.252,"top":0.491},"bc":{"cam":1.2335447642819248,"big":true,"W":2.1705771294377043,"L":4.3573706140230115,"H":1.8080404258500444,"WB":2.36894134223007,"of":1},"calls":216,"callsCar0":178,"wall":[null,null]}
+phone_ath ath_parked {"b":{"x":1994.8721155214075,"z":-1644.6993885216436,"y":41.510099927601395,"h":1.40127218090937,"d":26.50700287921539,"W":8.5},"n":5,"athPk":11,"nE":12,"ws":[[8.5,8.5,true,30,8],[8.5,8.5,true,30,18],[8.5,8.5,true,30,18],[8.5,8.5,true,30,8],[8.5,8.5,true,30,18],[8.5,8.5,true,30,18],[8.5,8.5,true,30,
+PASS phone_ath Athens has kerb-parked cars · {"b":{"x":1994.8721155214075,"z":-1644.6993885216436,"y":41.510099927601395,"h":1.40127218090937,"d":26.50700287921539,"W":8.5},"n":5,"athPk":11,"nE":12,"ws":[[8.5,8.5,true,30,8],[8.5,8.5,true,30,18],[8.5,8.5,true,30,18],[8.5,8.5,true,30,8],[8.5,8.5,true,30,18],[8.5,8.5,true,30,18],[8.5,8.5,true,30,8],[8.5,8.5,true,30,8]],"cands":12,"want":1,"park":11}
+PASS phone_ath 0 console errors · []
+TJACK_PASS

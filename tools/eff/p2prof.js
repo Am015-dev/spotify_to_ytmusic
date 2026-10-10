@@ -1,0 +1,13 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const URL=process.argv[2];
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+await p.addInitScript("Object.defineProperty(window,'devicePixelRatio',{get:()=>0.35,configurable:true})");
+const cdp=await ctx.newCDPSession(p);await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:500});
+const prof=async(lbl,fn)=>{await cdp.send('Profiler.start');const t=Date.now();await fn();const ms=Date.now()-t;const {profile}=await cdp.send('Profiler.stop');const byId={};for(const n of profile.nodes)byId[n.id]=n;const cnt={};profile.samples.forEach((s,i)=>{cnt[s]=(cnt[s]||0)+(profile.timeDeltas[i]||0)});const self={};for(const id in cnt){const n=byId[id],u=n.callFrame.url.split('/').pop().slice(0,20),k=(n.callFrame.functionName||'(anon)')+'@'+u+':'+n.callFrame.lineNumber;self[k]=(self[k]||0)+cnt[id]}const tot=Object.values(self).reduce((a,b)=>a+b,0);console.log('== '+lbl+' wall '+ms+' ms, sampled '+Math.round(tot/1000)+' ms');Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOP||25)).forEach(([k,v])=>console.log((v/tot*100).toFixed(1).padStart(5)+'% '+Math.round(v/1000)+'ms '+k))};
+const CITY=process.env.CITY||'fra';
+await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:100});
+await p.evaluate(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));if(c==='ath'){localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},CITY);
+await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:100});
+await prof('enter '+CITY+' roam',async()=>{await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{polling:100})});
+await b.close()})().catch(e=>{console.error(e);process.exit(1)});

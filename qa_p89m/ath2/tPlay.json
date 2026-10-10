@@ -1,0 +1,550 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "ath": {
+    "min": 4.02,
+    "hits": 45,
+    "kinds": {
+     "traffic": 13,
+     "wall": 30,
+     "other": 2
+    },
+    "wallHits": 30,
+    "wallPerMin": 7.46,
+    "hitsPerMin": 11.19,
+    "bigDrop": 35,
+    "stuckPct": 1,
+    "avgKmh": 33.7,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 19.4,
+    "traffic120m": 10.2,
+    "missions": [
+     {
+      "f": 3455,
+      "start": "Koulouri Rush"
+     },
+     {
+      "f": 13957,
+      "end": "KOULOURI RUSH★★★THE VAN ESCAPEDNo stars this time · try agai"
+     }
+    ],
+    "stuckEp": [
+     {
+      "f": 3751,
+      "x": 1831.1,
+      "z": -1675.2,
+      "y": 46.7,
+      "h": 14.72,
+      "g": 0,
+      "car": 4.5,
+      "wall": null,
+      "ch": true,
+      "in": "G-1",
+      "veh": "ship",
+      "b2": "00000000",
+      "v2": 0,
+      "at121": {
+       "cd": 0,
+       "spcd": null,
+       "fr": false,
+       "wk": false,
+       "hp": 100,
+       "park": false,
+       "in": "B1",
+       "stkT": 0,
+       "msg": "GO!",
+       "pop": "",
+       "cars": []
+      },
+      "len": 145
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "🦘 RAMP JUMP",
+      "f": 2121,
+      "v0": 49,
+      "v1": 4,
+      "drop": 0.92,
+      "kind": "traffic",
+      "x": 2009,
+      "z": -1642,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 3750,
+      "v0": 33,
+      "v1": 7,
+      "drop": 0.8,
+      "kind": "traffic",
+      "x": 1831,
+      "z": -1675,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4933,
+      "v0": 120,
+      "v1": 31,
+      "drop": 0.74,
+      "kind": "wall",
+      "x": 1765,
+      "z": -1639,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4164,
+      "v0": 29,
+      "v1": 8,
+      "drop": 0.73,
+      "kind": "traffic",
+      "x": 1809,
+      "z": -1681,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 10803,
+      "v0": 85,
+      "v1": 23,
+      "drop": 0.73,
+      "kind": "wall",
+      "x": 1953,
+      "z": -1644,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "wallList": [
+     {
+      "ctx": "🦘 RAMP JUMP",
+      "f": 1346,
+      "v0": 38,
+      "v1": 14,
+      "drop": 0.65,
+      "kind": "wall",
+      "x": 1953,
+      "z": -1644,
+      "dy": 0
+     },
+     {
+      "ctx": "🦘 RAMP JUMP",
+      "f": 1524,
+      "v0": 48,
+      "v1": 31,
+      "drop": 0.34,
+      "kind": "wall",
+      "x": 1942,
+      "z": -1635,
+      "dy": 0
+     },
+     {
+      "ctx": "🦘 RAMP JUMP",
+      "f": 1724,
+      "v0": 50,
+      "v1": 26,
+      "drop": 0.47,
+      "kind": "wall",
+      "x": 1973,
+      "z": -1628,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4696,
+      "v0": 37,
+      "v1": 22,
+      "drop": 0.41,
+      "kind": "wall",
+      "x": 1789,
+      "z": -1704,
+      "dy": 0.1
+     },
+     {
+      "ctx": "GO!",
+      "f": 4933,
+      "v0": 120,
+      "v1": 31,
+      "drop": 0.74,
+      "kind": "wall",
+      "x": 1765,
+      "z": -1639,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 5051,
+      "v0": 27,
+      "v1": 13,
+      "drop": 0.53,
+      "kind": "wall",
+      "x": 1765,
+      "z": -1639,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 5302,
+      "v0": 48,
+      "v1": 17,
+      "drop": 0.65,
+      "kind": "wall",
+      "x": 1752,
+      "z": -1630,
+      "dy": 0.1
+     },
+     {
+      "ctx": "GO!",
+      "f": 5491,
+      "v0": 54,
+      "v1": 17,
+      "drop": 0.68,
+      "kind": "wall",
+      "x": 1749,
+      "z": -1610,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6335,
+      "v0": 82,
+      "v1": 24,
+      "drop": 0.71,
+      "kind": "wall",
+      "x": 1765,
+      "z": -1665,
+      "dy": 0.2
+     },
+     {
+      "ctx": "GO!",
+      "f": 6557,
+      "v0": 48,
+      "v1": 17,
+      "drop": 0.65,
+      "kind": "wall",
+      "x": 1763,
+      "z": -1665,
+      "dy": 0.1
+     },
+     {
+      "ctx": "GO!",
+      "f": 6805,
+      "v0": 53,
+      "v1": 18,
+      "drop": 0.66,
+      "kind": "wall",
+      "x": 1759,
+      "z": -1652,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6992,
+      "v0": 62,
+      "v1": 20,
+      "drop": 0.68,
+      "kind": "wall",
+      "x": 1757,
+      "z": -1629,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 7502,
+      "v0": 50,
+      "v1": 28,
+      "drop": 0.44,
+      "kind": "wall",
+      "x": 1761,
+      "z": -1650,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 7602,
+      "v0": 74,
+      "v1": 22,
+      "drop": 0.7,
+      "kind": "wall",
+      "x": 1757,
+      "z": -1629,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 8950,
+      "v0": 52,
+      "v1": 17,
+      "drop": 0.68,
+      "kind": "wall",
+      "x": 1804,
+      "z": -1712,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 10803,
+      "v0": 85,
+      "v1": 23,
+      "drop": 0.73,
+      "kind": "wall",
+      "x": 1953,
+      "z": -1644,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 11347,
+      "v0": 43,
+      "v1": 16,
+      "drop": 0.64,
+      "kind": "wall",
+      "x": 1855,
+      "z": -1654,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 11638,
+      "v0": 48,
+      "v1": 16,
+      "drop": 0.67,
+      "kind": "wall",
+      "x": 1843,
+      "z": -1653,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 11702,
+      "v0": 43,
+      "v1": 16,
+      "drop": 0.63,
+      "kind": "wall",
+      "x": 1834,
+      "z": -1652,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 12057,
+      "v0": 37,
+      "v1": 16,
+      "drop": 0.56,
+      "kind": "wall",
+      "x": 1842,
+      "z": -1630,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 12212,
+      "v0": 35,
+      "v1": 21,
+      "drop": 0.39,
+      "kind": "wall",
+      "x": 1834,
+      "z": -1606,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 12338,
+      "v0": 55,
+      "v1": 18,
+      "drop": 0.68,
+      "kind": "wall",
+      "x": 1810,
+      "z": -1607,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 12597,
+      "v0": 75,
+      "v1": 22,
+      "drop": 0.7,
+      "kind": "wall",
+      "x": 1793,
+      "z": -1568,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 13134,
+      "v0": 50,
+      "v1": 17,
+      "drop": 0.67,
+      "kind": "wall",
+      "x": 1797,
+      "z": -1533,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 13329,
+      "v0": 50,
+      "v1": 28,
+      "drop": 0.44,
+      "kind": "wall",
+      "x": 1779,
+      "z": -1522,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 13553,
+      "v0": 68,
+      "v1": 49,
+      "drop": 0.29,
+      "kind": "wall",
+      "x": 1769,
+      "z": -1492,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 13616,
+      "v0": 91,
+      "v1": 26,
+      "drop": 0.72,
+      "kind": "wall",
+      "x": 1764,
+      "z": -1473,
+      "dy": 0
+     },
+     {
+      "ctx": "THE VAN ESCAPED",
+      "f": 14130,
+      "v0": 50,
+      "v1": 17,
+      "drop": 0.66,
+      "kind": "wall",
+      "x": 1780,
+      "z": -1415,
+      "dy": 0
+     },
+     {
+      "ctx": "THE VAN ESCAPED",
+      "f": 14373,
+      "v0": 50,
+      "v1": 37,
+      "drop": 0.26,
+      "kind": "wall",
+      "x": 1796,
+      "z": -1403,
+      "dy": 0
+     },
+     {
+      "ctx": "THE VAN ESCAPED",
+      "f": 14557,
+      "v0": 50,
+      "v1": 17,
+      "drop": 0.67,
+      "kind": "wall",
+      "x": 1781,
+      "z": -1367,
+      "dy": 0
+     }
+    ],
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.76,
+     "carL": 4.63,
+     "carH": 1.57,
+     "player": {
+      "h": 1.89,
+      "l": 4.7,
+      "w": 2.42
+     },
+     "pedRel": 0.95,
+     "pedVsPlayer": 0.94,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 450,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 650,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamPlate×#tuG",
+     "#wrongWay×#odPin",
+     "#roamArrow×#r3Up",
+     "#r3Up×#odPin"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@840",
+     "next@1446",
+     "next@2052",
+     "next@13278",
+     "next@13884"
+    ],
+    "perf": {
+     "calls": 166,
+     "tris": 1149681,
+     "jsMs": 0,
+     "geoms": 4115,
+     "tex": 129
+    },
+    "wallSec": 671
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]

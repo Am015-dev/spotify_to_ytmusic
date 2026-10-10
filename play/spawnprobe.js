@@ -1,0 +1,7 @@
+// play/spawnprobe.js <url> fra|ath : where a fresh save spawns (no saved position): road edge distance, heading vs the nearest road (diagnostic)
+const enter=require('../bc/enter.js');const [URL,CITY]=process.argv.slice(2);
+(async()=>{const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`:`localStorage.setItem('mho_slot','1')`;
+ const E=await enter(URL,{seed});const {p}=E;p.setDefaultTimeout(900000);await E.roamApi();
+ const r=await p.evaluate(()=>{const M=__mho,R=M.RO,q=M.rsnap(R.x,R.z,250);const rd=M.cid()==='ath'?M.athRoad(R.x,R.z,48):null;let free=[];for(const [nm,a] of [['fwd',0],['left',Math.PI/2],['right',-Math.PI/2],['back',Math.PI]]){let d=0;for(;d<150;d+=3){if(M.roamHitAt(R.x+Math.sin(R.h+a)*d,R.z+Math.cos(R.h+a)*d,1.4,R.y+.5))break}free.push(nm+':'+d)}
+  return{x:+R.x.toFixed(1),z:+R.z.toFixed(1),h:+(((R.h%6.283)+6.283)%6.283).toFixed(2),v:R.v,roadE:rd&&+rd.e.toFixed(1),roadD:M.roadD?+M.roadD(R.x,R.z).toFixed(1):null,snap:q&&[+q[0].toFixed(1),+q[1].toFixed(1),+(((q[2]%6.283)+6.283)%6.283).toFixed(2)],snapDist:q&&+Math.hypot(q[0]-R.x,q[1]-R.z).toFixed(1),free}});
+ console.log(JSON.stringify(r));await p.screenshot({path:'play/spawn_'+CITY+'.jpg',type:'jpeg',quality:60});await E.b.close()})();

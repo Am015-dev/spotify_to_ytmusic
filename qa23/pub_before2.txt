@@ -1,0 +1,28 @@
+t 30 s {"st":"0:follow","tp":0,"vmax":120,"tv":158,"x":1436,"z":-114} 62s wall
+t 60 s {"st":"0:follow","tp":0,"vmax":132,"tv":158,"x":1176,"z":-295} 111s wall
+t 90 s {"st":"1:thieves","tp":0,"vmax":132,"tv":158,"x":1036,"z":-486} 166s wall
+t 120 s {"st":"1:thieves","tp":0,"vmax":132,"tv":158,"x":818,"z":-478} 214s wall
+t 150 s {"st":"1:thieves","tp":0,"vmax":140,"tv":158,"x":370,"z":-497} 263s wall
+t 180 s {"st":"1:thieves","tp":0,"vmax":140,"tv":158,"x":367,"z":-463} 301s wall
+t 210 s {"st":"1:thieves","tp":0,"vmax":152,"tv":158,"x":204,"z":-751} 344s wall
+t 240 s {"st":"1:thieves","tp":0,"vmax":157,"tv":158,"x":110,"z":-950} 393s wall
+t 270 s {"st":"1:thieves","tp":0,"vmax":157,"tv":158,"x":-126,"z":-961} 442s wall
+t 300 s {"st":"1:thieves","tp":0,"vmax":157,"tv":158,"x":-395,"z":-854} 489s wall
+t 330 s {"st":"1:thieves","tp":0,"vmax":157,"tv":158,"x":-527,"z":-834} 529s wall
+MISSION END 20946 HOT DROP★★★KAISER GOT AWAYNo stars this time · try again2/9 stages · 4.9 km · ★★
+RESULT {"otp":12,"ydrop":[],"camj":3,"beta":false,"end":{"f":20946,"res":"HOT DROP★★★KAISER GOT AWAYNo stars this time · try again2/9 stages · 4.9 km · ★★"},"gameSec":349,"teleports":0,"nan":0,"unstuck":0,"cp":[],"vmax":157,"truckMax":158,"vh":{"0":2987,"10":919,"20":899,"30":2457,"40":3268,"50":3339,"60":1881,"70":1265,"80":909,"90":655,"100":851,"110":1108,"120":272,"130":80,"140":26,"150":25},"stages":[{"f":1,"s":"0:follow","x":2064,"z":0},{"f":4707,"s":"1:thieves","x":1052,"z":-408},{"f":20260,"s":"2:tail","x":-533,"z":-842},{"f":20989,"s":"-","x":-374,"z":-843}],"errs":[]}
+OTP {"f":4739,"who":"thief2","d":24.1,"distToCar":596,"onScreen":false,"stage":"1:thieves"}
+OTP {"f":13436,"who":"thief1","d":10,"distToCar":18,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":13437,"who":"thief1","d":10,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14127,"who":"thief1","d":10.1,"distToCar":19,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14128,"who":"thief1","d":10,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14782,"who":"rammer3","d":7.2,"distToCar":107,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14861,"who":"rammer3","d":7.2,"distToCar":83,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":14959,"who":"rammer3","d":9.4,"distToCar":15,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":19186,"who":"thief2","d":10,"distToCar":18,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":19187,"who":"thief2","d":10.1,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":19620,"who":"thief2","d":10,"distToCar":18,"onScreen":true,"stage":"1:thieves"}
+OTP {"f":19621,"who":"thief2","d":10,"distToCar":8,"onScreen":true,"stage":"1:thieves"}
+CAMJ {"f":16,"d":73.2,"stage":"0:follow","cs":false,"fade":false}
+CAMJ {"f":4707,"d":165,"stage":"1:thieves","cs":true,"fade":false}
+CAMJ {"f":4739,"d":165.2,"stage":"1:thieves","cs":false,"fade":false}
