@@ -121,3 +121,20 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
   shortcut runs along the road; (2) widen the setback: Athens 'ab' house rows sit 5-20 m off the road behind open lawns at chase speed;
   push them back / add kerb-hedge colliders (rounded, glancing) along lawn strips so a cut slides back to the road instead of a head-on hit;
   (3) the lawn strip (a) at x 1940-2016, z -1625..-1635: hedge/kerb collider or a fill road.
+
+## Session 5 (2026-10-10, play-5): v89q shipped (night lamp boxes) + Athens walls step 3 findings, NOT fixed yet (next version v89r)
+- v89q LIVE (brave-carson 03255cc): FL_headlights (src/90) merged 4 fixed cbox lamp blocks (±.74 m, ±2.25 m) that fit no car → solid pink/white
+  slabs at night. Removed; only OC_beamGeo stays. Shots qa_tl/. Tools: tools/eff/tlshots.js (night/day drive + side + traffic rear; freezes render).
+- Baseline v89q Athens tPlay (MODE=phone CITIES=ath FAST=1 DEBUG=1): 2.24 wall/min (9 hits), qa_wb0/ + qa_wb0.log (dbg trace every 120 f).
+- Probes (all bc/enter.js, Athens district A): play/hitprobe.js (collider + OC_roadE at points), play/hitmap.js (+ PIL plot → qa_wall/hitmap.png),
+  play/routechk.js (qv.path vs OC_roadE), play/markchk.js (MARKPOS vs road).
+- Facts: 99/101 old hits + 9/9 new = 'ab' houses (b.ab) in residential block interiors, 8-30 m from any road edge (OC_roadE covers CITY_S, fill, ab
+  lanes, lz, trails, junctions). qv.path routes are ON roads (0-7 % of 3 m samples > 3 m off; just simplified to long straight legs). All MARKPOS
+  spots are on roads. Koulouri Rush beacon (1820,-1681) and its 30 m stage points are on/next to the road.
+- Mechanism (qa_wb0.log): (1) f1440-2040 LOS straight drive 180 m to the beacon at 90-120 km/h across lawns (bd up to 60 m off the route): the
+  2.4 m LOS sweep threads between the sparse lawn houses; (2) chase start: the car sits 13-24 m off the route (bd < 30 so no re-route) and
+  converges diagonally through the block (1794,-1636 → 1793,-1568), hitting houses at roadE 10-18; (3) RAMP JUMP/wander hits on the lawn strip
+  1940-1975,-1628..-1651 (roadE 8-12). Also: tPlay's arrow-derived dest jumps 300-600 m between samples during the chase (test perception only).
+- Proposed game fix (not done): visible hedge rows with rounded colliders, h ≥ 1.2 m (roamHit skips colliders with y ≥ b.h-.6, so a low kerb does
+  nothing), along the lawn edges of Athens 'ab' blocks with driveway gaps, so a cut slides back to the road and the LOS line is blocked; or clear
+  'ab' houses from the 6-20 m lawn band at the start area (1780-1980, -1700..-1560). Then the van lead (≥ 60-80 m after a ram). tPlay ×3, REVIEW.
