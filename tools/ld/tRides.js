@@ -1,4 +1,4 @@
-// tools/ld/tRides.js <url> <out>: phone 852x393, real touch. RIDES → SET (env SET, default t_rally) → garage shots → SAVE → story → drive shots (copied from t4/taxi15.js).
+// tools/ld/tRides.js <url> <out>: phone 852x393, real touch. RIDES → (env TAB car|off|boat) → SET (env SET, default t_rally) → garage shots → SAVE → story → drive shots (copied from t4/taxi15.js).
 // SAVE → story start → hold GAS ~9 s → drive shot, tyre gap, low side shot with a traffic car.
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const OUT=process.argv[3];require('fs').mkdirSync(OUT,{recursive:true});
 (async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true});
@@ -9,7 +9,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const OUT=pr
  const shot=async n=>{await W(+process.env.SW||1500);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n)};
  // drag on the garage view (one finger) to turn the car on the stand
  const drag=async(dx)=>{const x=430,y=200,n=12;await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:3}]});for(let i=1;i<=n;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+dx*i/n,y,id:3}]});await W(30)}await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await W(400)};
- await tap('#gbMenuBtn');await W(1500);await tap('#r2R [data-r2m="rides"]');await W(1200);await tap('[data-gc="'+(process.env.SET||'t_rally')+'"]');await W(2000);
+ await tap('#gbMenuBtn');await W(1500);await tap('#r2R [data-r2m="rides"]');await W(1200);if(process.env.TAB){await ev(t=>document.querySelector('[data-gty="'+t+'"]').click(),process.env.TAB);await W(1200);await ev(s=>document.querySelector('[data-gc="'+s+'"]').click(),process.env.SET)}else await tap('[data-gc="'+(process.env.SET||'t_rally')+'"]');await W(2000);
  console.log('car',await ev(()=>__g9c.eq('car')),'n',await ev(()=>__gb.list().length),'yaw',await ev(()=>__gb.GB_.yaw));
  await drag(1);await ev(()=>{try{__gb.render()}catch(e){}});await shot('g_rides');
  const views=process.env.VIEWS?JSON.parse(process.env.VIEWS):{g_34front:null,g_front:Math.PI*0,g_side:Math.PI/2,g_34rear:2.4};

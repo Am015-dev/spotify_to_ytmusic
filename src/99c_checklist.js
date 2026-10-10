@@ -3,6 +3,16 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89w',id:'sc-rides',text:'Garage → RIDES → STREET: Senna GTR, Hyper 16, Demon 18 and Charger 70 each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
+ {ver:'v89w',id:'ath-light',text:'Athens near the start: the red/white lighthouse stands beside a road; the Summer Cottage and Sidewalk Cafe face the street (not hidden behind houses).'},
+ {ver:'v89v',id:'cgarage-world',text:'Frankfurt, near the start (by the Town Bank): the Corner Garage stands on its own lot, white ground floor with green trim, tan flats above, petrol canopy; it does not block a road and you bump off its walls.'},
+ {ver:'v89v',id:'cgarage-fps',text:'Drive past the Corner Garage and the Town Bank on the phone: no stutter or slowdown compared with the rest of Frankfurt.'},
+ {ver:'v89v',id:'veh-rides',text:'Garage → RIDES → STREET: Race Car (30572), Fire Chief (4914), Patrol Car (4436) and Camper (7639) each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
+ {ver:'v89v',id:'fra-props',text:'Frankfurt near the start: Town House, Burger Stand and Ice Cream Cart stand on lots beside the road, none on the road; you bump off them.'},
+ {ver:'v89v',id:'fra-boat',text:'Frankfurt river: a small Motor Boat is moored by the bank, sitting IN the water.'},
+ {ver:'v89v',id:'ath-props',text:'Athens near the start: the Summer Cottage and the Sidewalk Cafe stand beside the road, none on the road.'},
+ {ver:'v89u',id:'pboat-garage',text:'Garage → RIDES → WATER → Power Boat: the long white hull with red deck, black cockpit and yellow trim shows, with a driver on the front seat.'},
+ {ver:'v89u',id:'pboat-drive',text:'Drive the Power Boat on the water: the hull sits IN the water (not floating above it, not sunk), it steers like the other boats.'},
  {ver:'v89t',id:'turbo-garage',text:'Garage → RIDES → Turbo 74: the white 911 Turbo shows with its black whale-tail wing, round headlights and 4 wheels; SAVE & DRIVE works.'},
  {ver:'v89t',id:'turbo-drive',text:'Drive the Turbo 74 for a minute: it sits on the road (no floating), steers like the other cars, nothing falls off.'},
  {ver:'v89s',id:'rally-garage',text:'Garage → RIDES → Rally S1: the white/yellow rally car shows with its wing, curved hood and 4 wheels; SAVE & DRIVE works.'},
