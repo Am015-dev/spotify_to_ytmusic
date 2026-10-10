@@ -1,0 +1,5 @@
+0 FILE l_bush.ldr
+0 Bush: 2417 Plant Leaves 6x5 crossed + 2423 Plant Leaves 4x3 on top, the leaf parts of set 6376 Breezeway Cafe (OMR, CCAL 2.0) gathered on one stem
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+1 2 0 0 0 1 0 0 0 1 0 0 0 1 2417.dat
+1 2 0 -16 0 0 0 1 0 1 0 -1 0 0 2423.dat

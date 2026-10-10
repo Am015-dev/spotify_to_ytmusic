@@ -63,6 +63,7 @@ def mesh(name, S=0.03, keep=0.45, min_tris=160):
     T, ST = _tris(name)
     if not len(T): return None
     Tall = T; k, D = outer(T); T = T[k]
+    if os.environ.get('LD_ALL') == '1': T = Tall.copy(); D = np.zeros((len(T), 3))  # land-1 organic parts (trees): keep every face, drawn double-sided
     fn = np.cross(T[:, 1] - T[:, 0], T[:, 2] - T[:, 0]); flip = (fn * D).sum(1) < 0; T[flip] = T[flip][:, [0, 2, 1]]  # face the viewer that saw it
     A = np.diag([1.0, -1.0, -1.0]); V = (T.reshape(-1, 3) @ A.T) * S  # det(A) = 1: winding kept
     Va = (Tall.reshape(-1, 3) @ A.T) * S; lo, hi = Va.min(0), Va.max(0); sp = [(p @ A.T) * S for p, _ in ST]  # frame = the whole part, not just what is kept
@@ -74,7 +75,7 @@ def mesh(name, S=0.03, keep=0.45, min_tris=160):
     if len(F) > min_tris:
         import pyfqmr
         ms = pyfqmr.Simplify(); ms.setMesh(uq.astype(np.float64), F.astype(np.int32))
-        ms.simplify_mesh(target_count=max(min_tris, int(len(F) * keep)), aggressiveness=5, preserve_border=True, verbose=False)
+        ms.simplify_mesh(target_count=max(min_tris, int(len(F) * keep)), aggressiveness=int(os.environ.get("LD_AGG", 5)), preserve_border=os.environ.get("LD_BORDER", "1") == "1", verbose=False)
         vv, ff, _ = ms.getMesh(); uq = np.round(vv).astype(np.int32); F = ff.astype(np.int32)
         used = np.unique(F); remap = -np.ones(len(uq), int); remap[used] = np.arange(len(used)); uq = uq[used]; F = remap[F]
     pos = uq.astype(np.int16)
