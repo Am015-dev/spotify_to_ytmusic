@@ -26,6 +26,11 @@ for a in ARGS:
         if any(o) or 'R' in b: e += o
         if 'R' in b: e.append(b['R'])
         B.append(e)
+    if R['model'] not in CRED:  # author from the OMR file header ('0 Author: Name [login]')
+        mp = os.path.join(HERE, '..', '..', 'ld', 'omr', R['model'])
+        if os.path.exists(mp):
+            m = re.search(r'^0 Author:\s*(.+?)\s*$', open(mp, errors='replace').read(), re.M)
+            if m: CRED[R['model']] = m.group(1).replace('[', '(').replace(']', ')')
     models[mid] = {'src': R['model'], 'by': CRED.get(R['model'], ''), 'n': R['n'], 'C': C, 'B': B}
 js = ['// ---- LD data: real LEGO builds converted from LDraw OMR files (CCAL 2.0) by tools/ld/ld2garage.py + tools/ld/ld2src.py. Generated, do not edit.',
       '// Authors of the LDraw files: ' + '; '.join('%s %s' % (m['src'], m['by']) for m in models.values()) + '. Details: docs/MODEL_PIPELINE.md.',
