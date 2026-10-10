@@ -459,7 +459,7 @@ CK.push('mho_og');CITYK.push('mho_og');
 const OG={key:null,S:[],grid:new Map(),ev:null,last:null,cool:0,f:0,area:null,areaT:0,navP:null,navC:new Set(),vis:[],A:{},err:0,ramps:[],log:{start:0,fin:0,tier:[0,0,0,0],gold:0,col:0,retry:0}};
 const OG_N=3,OG_R=190,OG_FADE=[110,190];
 const OG_T={gate:{n:'Gate Crasher',ic:'⛓',col:'#ff5a2d',d:'Smash every gate before time runs out'},ring:{n:'Boost Rings',ic:'💫',col:'#2f9bff',d:'Fly through every ring'},
- drift:{n:'Drift Zone',ic:'🌀',col:'#c46bff',d:'Hold DRIFT and score points in the zone'},stunt:{n:'Stunt Jump',ic:'🎯',col:'#ff2d95',d:'Hit the ramp and land on the target'},
+ drift:{n:'Drift Zone',ic:'🌀',col:'#c46bff',d:'Steer + hold BRAKE to drift and score in the zone'},stunt:{n:'Stunt Jump',ic:'🎯',col:'#ff2d95',d:'Hit the ramp and land on the target'},
  rush:{n:'Stud Rush',ic:'🟡',col:'#ffd12c',d:'Grab as many studs as you can'},smash:{n:'Smash Count',ic:'💥',col:'#ff9a3c',d:'Smash the crates before the timer ends'},
  ghost:{n:'Ghost Race',ic:'👻',col:'#9fe8ff',d:'Beat the ghost to the finish flag'},ljump:{n:'Long Jump',ic:'🚀',col:'#5dffb0',d:'Launch off the ramp and fly far'}};
 const OG_KS=Object.keys(OG_T),OG_PAY=[0,250,500,900];

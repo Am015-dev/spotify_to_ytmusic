@@ -159,7 +159,7 @@ roamHud=(f=>function(){const r=f.apply(this,arguments);if(RO.on&&RO.marks&&((QA8
 (function(){
 const css=`
 body.v85 #roamStuds,body.v85 #roamExit,body.v85 #roamMapBtn,body.v85 #roamVeh,body.v85 #roamHorn,body.v85 #roamCamBtn,body.v85 #roamLogBtn,body.v85 #roamSetBtn,body.v85 #roamEv,body.v85 #roamHint,
-body.v85 #rgBar,body.v85 #rgHull,body.v85 #rgGb,body.v85 #rgTip,body.v85 #roamCombo,body.v85 #tF,body.v85 #steerHint{display:none!important}
+body.v85 #rgBar,body.v85 #rgHull,body.v85 #rgGb,body.v85 #rgTip,body.v85 #roamCombo,body.v85 #tF,body.v85 #tD,body.v85 #steerHint{display:none!important}
 body.v85[data-mode=roam]:not(.v85b) #roamTop,body.v85[data-mode=roam]:not(.v85b) #m1Next,body.v85[data-mode=roam]:not(.v85b) #raceW,body.v85[data-mode=roam]:not(.v85b) #qTrk,body.v85[data-mode=roam]:not(.v85b) #roamPlate,body.v85[data-mode=roam]:not(.v85b) #ogHud,body.v85[data-mode=roam]:not(.v85b) #ogArea{display:none!important}
 body.v85 #roamGauge{background:rgba(10,14,28,.55);border-radius:16px;padding:2px 12px}
 body.v85 #roamArrow{display:flex;align-items:center;gap:6px;font-size:15px!important;font-weight:800;color:#fff;background:rgba(10,14,28,.62);border-radius:14px;padding:4px 14px;max-width:60vw!important;text-shadow:0 1px 2px #000}

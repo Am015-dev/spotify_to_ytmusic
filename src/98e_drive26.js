@@ -6,7 +6,9 @@
 // |steer| ≥ TUNE.gbSteer; before that it is a normal brake. DRIFT (button, X, Ctrl) drifts at once as before. Rear grip loss on braking
 // C26.kR .38 → .12; heading-vs-travel slip outside drift capped at TUNE.slipMax (was .6 rad, inline in 71 roamStep). Free roam only.
 // v88f values: gbHold 0, slipMax .6, C26.kR .38.
-TUNE.gbHold=.6;TUNE.gbSteer=.5;TUNE.slipMax=.12;C26.kR=.12;
+// v89l: gbHold .6 → .35. Phones have no DRIFT button (5-button rule), so GAS+BRAKE+steer is THE drift; at .6 s the brake bled the speed under
+// B2K_DMIN first, so it only drifted above ~80 km/h (play/driftprobe.js). Now from ~55 km/h; a quick tap (≤ 0.3 s) still only brakes (v88g).
+TUNE.gbHold=.35;TUNE.gbSteer=.5;TUNE.slipMax=.12;C26.kR=.12;
 const D26={gbT:0,n:0,blocked:0};
 {const f0=ctlPlayer;ctlPlayer=function(){const c=f0.apply(this,arguments);try{if(state==='roam'){const dt=Math.min(arguments[0]||1/60,.05);
   const ex=!!(K.KeyX||K.ControlLeft||TOUCH.hb);   // the DRIFT control itself: drift at once

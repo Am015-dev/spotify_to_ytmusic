@@ -280,7 +280,7 @@ function sprintFinish(){const sp=RO.sp,e=sp.e;sp.done=true;const place=1+sp.ai.f
 // ---------- first-time tutorial with Hilde
 const TUT=[{t:'Drive! Hold ↑ (on touch it accelerates by itself).',tt:'Drive! Your car accelerates by itself — steer with ◀ ▶.',ok:()=>Math.abs(RO.v)*3.6>150},
  {t:'Hold SHIFT for TURBO. Smashing things refills the bar.',tt:'Hold BOOST for TURBO. Smashing things refills the bar.',ok:()=>(RO.boostT||0)>.8},
- {t:'Hold X and steer to DRIFT. Release for a mini-turbo!',tt:'Hold DRIFT and steer to slide. Release for a mini-turbo!',ok:()=>RO.tutTurbo},
+ {t:'Hold X and steer to DRIFT. Release for a mini-turbo!',tt:'Keep GAS on, steer and hold BRAKE to slide. Let go for a mini-turbo!',ok:()=>RO.tutTurbo},
  {t:'Press SPACE to HOP over traffic.',tt:'Tap HOP to jump over traffic.',ok:()=>RO.tutHop},
  {t:'Smash 10 things in a row to build a CHAIN — studs multiply!',tt:'Smash 10 things in a row to build a CHAIN — studs multiply!',ok:()=>CB.n>=10},
  {t:'Glowing beacons start races and events. 🏁 EVENTS shows them all on the map. Have fun!',tt:'Glowing beacons start races and events. 🏁 EVENTS shows them all on the map. Have fun!',ok:()=>RO.tutT>6}];
