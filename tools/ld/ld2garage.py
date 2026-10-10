@@ -74,6 +74,7 @@ def nearest_ori(O, spin):
         for R, r, x, z, q in ORIL:
             e = np.linalg.norm(R - Q)
             if e < best[0] - 1e-6: best = (e, (r, x, z, q))
+    if best[1] is None: return (0, 0, 0, 0), 180.0  # scaled/sheared matrix (e.g. 7638's string): no stored orientation fits, keep it as a free rotation
     ang = math.degrees(2 * math.asin(min(1, best[0] / math.sqrt(8))))
     return best[1], ang
 def tilt_dims(P, x, z, q=0):
