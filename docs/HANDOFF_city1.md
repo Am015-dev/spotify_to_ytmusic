@@ -6,7 +6,7 @@ Brief (coordinator, Alex's own request, freeze-exempt): "now we have a big varie
   Frankfurt: sedan→6633 Family Car, hypercar→75878, taxi→40468 taxi (TX_CAR), van→7731 mail van, truck→3221 big rig, delivery→60054 service van,
   police→4436 patrol car, coupe→75893 Charger. Athens: taxi→40468, sedan→6633, van→7639 camper, delivery→60054, hypercar→75892 (coupe slot kept, see OPEN).
   Bus, trolleybus, scooters and the two 98su street racers are unchanged. Same slot count = same draw calls.
-- CR_cityGeo is wrapped: one merged body (CR_LO 2 + LD_cull), wheels, glass; scaled uniformly to a class width (CT_W; Town sets are 4–6 wide).
+- CR_cityGeo is wrapped: one merged body (CR_LO 2 + LD_cull), wheels, glass; true scale per size-1 rule: City/Town sets LD_SW×LD_FIG, Speed Champions LD_SW, 40468 taxi fitted to 1.72 m; 96 SC width cap skipped (userData.sc).
   Real set colours (no per-instance paint, CR_cityPost wrapped). Far LOD = the existing 98wb vertex-clustered copy. Collision: OB_cdim (90) asks CT_dim first
   (the model's own half width/length). Missing model (lazy load not done) → the old procedural kind (CT.fb). Boot preloads both cities' sets (LD_need).
 - `?ct=0` = old traffic (A/B). Probe: `NOB=1 node tools/ct/ctProbe.js <url> <outdir> <fra|ath>` (draw calls/tris/heap/glMB per frame + car close-ups).

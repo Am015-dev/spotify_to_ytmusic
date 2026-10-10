@@ -348,8 +348,8 @@ defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
 uses: 98(16), 98ld(11), 98ld(7), 98y(6), 98ld(4), 72(3), 30(3), 94(2), 98fb(2), 10(1)
 
 ## 98ct_city_lego.js — 22 KB
-defines: CT CT_SWAP CT_W CT_bricks CT_build CT_dim __ct CTB CTB_V CTB_city CTB_ids CTB_free CTB_pack CTB_kind CTB_make CTB_h CTB_pick CTB_row CTB_side CTB_fill CTB_putK CTB_put CTB_mats CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step CTB_step1 CTB_loop __ctb
-uses: 20(34), 93(20), 10(16), 92(16), 98ld(13), 60(11), 30(10), 53(9), 70(6), 72(4)
+defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim __ct CTB CTB_V CTB_city CTB_ids CTB_free CTB_pack CTB_kind CTB_make CTB_h CTB_pick CTB_row CTB_side CTB_fill CTB_putK CTB_put CTB_mats CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step CTB_step1 CTB_loop __ctb
+uses: 20(34), 93(20), 98ld(16), 10(16), 92(16), 60(11), 30(10), 53(9), 70(6), 72(4)
 
 ## 98of_onfoot.js — 45 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
