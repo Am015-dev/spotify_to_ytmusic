@@ -7,7 +7,7 @@ import sys, os, json, re
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, '..', '..', 'src', '98ld0_data.js'); BASE = OUT
 ARGS = sys.argv[1:]
 if ARGS[:1] == ['--out']: OUT = ARGS[1]; ARGS = ARGS[2:]
-HAVE = set(re.findall(r'"(ld\w+)":\{"n"', open(BASE).read())) if OUT != BASE else set()
+HAVE = set(re.findall(r'"(ld\w+)":\{"n"', open(BASE).read() + open(os.path.join(os.path.dirname(BASE), '98ld1_data.js')).read())) if OUT != BASE else set()  # 98ld0 + 98ld1 always ship
 CRED = {'75895-1.mpd': 'Magnus Forsberg (MagFors)', '4643-1.mpd': 'Marc Giraudet (Mad_Marc)', '10264-1.mpd': 'Jaco van der Molen', '76897-1.mpd': 'Adrien Pennamen', '1490-1.mpd': 'Robert Paciorek (bercik)', '4641-1.mpd': 'juraj3579 / Steffen'}
 meshes, models = {}, {}
 for a in ARGS:
@@ -25,6 +25,11 @@ for a in ARGS:
         if any(o) or 'R' in b: e += o
         if 'R' in b: e.append(b['R'])
         B.append(e)
+    if R['model'] not in CRED:  # author from the OMR file header ('0 Author: Name [login]')
+        mp = os.path.join(HERE, '..', '..', 'ld', 'omr', R['model'])
+        if os.path.exists(mp):
+            m = re.search(r'^0 Author:\s*(.+?)\s*$', open(mp, errors='replace').read(), re.M)
+            if m: CRED[R['model']] = m.group(1).replace('[', '(').replace(']', ')')
     models[mid] = {'src': R['model'], 'by': CRED.get(R['model'], ''), 'n': R['n'], 'C': C, 'B': B}
 js = ['// ---- LD data: real LEGO builds converted from LDraw OMR files (CCAL 2.0) by tools/ld/ld2garage.py + tools/ld/ld2src.py. Generated, do not edit.',
       '// Authors of the LDraw files: ' + '; '.join('%s %s' % (m['src'], m['by']) for m in models.values()) + '. Details: docs/MODEL_PIPELINE.md.',
