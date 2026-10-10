@@ -4,7 +4,7 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'v89w',id:'sc-rides',text:'Garage → RIDES → STREET: Senna GTR, Hyper 16, Demon 18 and Charger 70 each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
- {ver:'v89w',id:'fig-scale',text:'Walk (on foot) up to the Corner Garage, Town Bank and Town House in Frankfurt: a person fits through the doors with headroom; the buildings still stand on their lots, off the road.'},
+ {ver:'v89x',id:'fig-scale',text:'Walk (on foot) up to the Corner Garage, Town Bank and Town House in Frankfurt: a person fits through the doors with headroom; the buildings still stand on their lots, off the road.'},
  {ver:'v89w',id:'ath-light',text:'Athens near the start: the red/white lighthouse stands beside a road; the Summer Cottage and Sidewalk Cafe face the street (not hidden behind houses).'},
  {ver:'v89v',id:'cgarage-world',text:'Frankfurt, near the start (by the Town Bank): the Corner Garage stands on its own lot, white ground floor with green trim, tan flats above, petrol canopy; it does not block a road and you bump off its walls.'},
  {ver:'v89v',id:'cgarage-fps',text:'Drive past the Corner Garage and the Town Bank on the phone: no stutter or slowdown compared with the rest of Frankfurt.'},
