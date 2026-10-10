@@ -161,7 +161,7 @@ def choose(name, args):
     sub = ' '.join(l for l in (ldlib.EMB.get(name.lower()) or []) if l.startswith('1 '))
     if re.search(r'1889[0-9]|18977|tyre', sub.lower()) and ('c0' in name.lower()):  # rim + tyre shortcut: same as its tyre
         return 'wL', 'tyre (rim+tyre assembly)', 0
-    if tl.startswith('tyre') or tl.startswith('tire'):
+    if tl.startswith('tyre') or tl.startswith('tire') or re.match(r'wheel .*solid rubber', tl):  # one-piece rubber wheels (4288) are tyres too
         dx, dy, dz = ld_dims(name); dia = max(dy * 8, dz * 20) * 0.4  # mm
         k = min(['wS', 'wM', 'wL'], key=lambda w: abs({'wS': 17, 'wM': 20.3, 'wL': 24}[w] - dia)); return k, 'tyre %.0f mm' % dia, 0
     if re.match(r'^(wheel|technic axle|car steering)', tl) and 'rim' in tl or tl.startswith('wheel rim'): return None, 'skip (rim, drawn by our wheel)', 0
