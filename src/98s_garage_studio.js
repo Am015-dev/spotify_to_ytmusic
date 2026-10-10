@@ -21,7 +21,7 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  const PW=14,PL=23,pm=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.42,map:GS_tex(512,512,(g,w,h)=>{g.fillStyle='#767c85';g.fillRect(0,0,w,h);g.strokeStyle='#5b616a';g.lineWidth=4;for(let i=0;i<=2;i++){g.beginPath();g.moveTo(i*w/2,0);g.lineTo(i*w/2,h);g.moveTo(0,i*h/2);g.lineTo(w,i*h/2);g.stroke()}})});
  pm.map.wrapS=pm.map.wrapT=THREE.RepeatWrapping;pm.map.repeat.set(PW/6,PL/6);
  const top=new THREE.Mesh(new THREE.PlaneGeometry(PW,PL),pm);top.rotation.x=-Math.PI/2;top.position.y=y0-.004;top.receiveShadow=true;G.add(top);
- const rim=new THREE.Mesh(new THREE.BoxGeometry(PW+.3,.5,PL+.3),new THREE.MeshStandardMaterial({color:0x22262e,roughness:.6}));rim.position.y=y0-.255;rim.receiveShadow=true;G.add(rim);
+ const rim=new THREE.Mesh(new THREE.BoxGeometry(PW+.3,.5,PL+.3),new THREE.MeshStandardMaterial({color:0x22262e,roughness:.6}));rim.position.y=y0-.285;/* garage-18: rim top 3 cm under the tiles (was 1 mm: z-fighting, a dark dithered patch on the platform with a far camera) */rim.receiveShadow=true;G.add(rim);
  const dots=[];for(let x=-PW/2+.4;x<=PW/2-.3;x+=.75)dots.push([x,-PL/2+.35],[x,PL/2-.35]);for(let z=-PL/2+1.1;z<=PL/2-1;z+=.75)dots.push([-PW/2+.35,z],[PW/2-.35,z]);
  const led=new THREE.InstancedMesh(new THREE.BoxGeometry(.32,.03,.12),new THREE.MeshBasicMaterial({color:0x6f9bff,toneMapped:false}),dots.length),q=new THREE.Object3D();
  dots.forEach(([x,z],i)=>{q.position.set(x,y0+.012,z);q.rotation.y=Math.abs(Math.abs(z)-(PL/2-.35))<.01?0:Math.PI/2;q.updateMatrix();led.setMatrixAt(i,q.matrix)});G.add(led);

@@ -219,7 +219,7 @@ uses: 93(3), 60(3), 53(2), 72(1), 20(1), 98(1)
 
 ## 98s_garage_studio.js — 22 KB
 defines: GS GS_tex GS_build GS_fitY GS_shadows GS_ui GS_reheld GS_drop GS_place GS_tip GS_bb GS_v GS_br GS_pop GS_step GS_t0 GS_thumb GS_thumbs __gs
-uses: 92(43), 94(25), 10(15), 30(7), 20(5), 70(3), 93(2), 98r(2), 97(1), 98zp(1)
+uses: 92(43), 94(25), 10(16), 30(7), 20(5), 70(3), 93(2), 98r(2), 97(1), 98zp(1)
 
 ## 98x_w14_speed.js — 2 KB
 defines: W13L W13_lines

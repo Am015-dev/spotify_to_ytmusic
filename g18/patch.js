@@ -9,8 +9,7 @@ const E=require('../bc/enter.js');const fs=require('fs');const OUT=process.argv[
  console.log('stage casters',await ev(C));
  await tapSel('#r2R [data-r2m="build"]');await p.waitForTimeout(5000);await p.screenshot({path:OUT+'/build.png'});console.log('build casters n',JSON.parse(await ev(C)).length);
  const shot=async n=>{await p.waitForTimeout(1500);await p.screenshot({path:OUT+'/'+n+'.png'})};
- await ev(`(()=>{GB.sc.traverse(o=>{if(o.isDirectionalLight&&o.castShadow){o.castShadow=false;window.__L=o}});GB.r.shadowMap.needsUpdate=true})()`);await shot('b_noshadow');
- await ev(`(()=>{__L.castShadow=true;GB.sc.traverse(m=>{if(m.isMesh&&m.castShadow&&!m.userData.gb){const b=new THREE.Box3().setFromObject(m),s=b.getSize(new THREE.Vector3());if(s.x>40){m.castShadow=false;window.__H=m}}});GB.r.shadowMap.needsUpdate=true})()`);await shot('b_nohall');
- await ev(`(()=>{__H.castShadow=true;GB.mesh.traverse(m=>{if(m.isMesh)m.castShadow=false});GB.r.shadowMap.needsUpdate=true})()`);await shot('b_nocar');
+ console.log('cam',await ev(`JSON.stringify({near:GB.cam.near,far:GB.cam.far,d:GB.cam.position.length().toFixed(1)})`));
+ await ev(`(()=>{GS.g.traverse(o=>{if(o.isMesh&&o.geometry.type==='BoxGeometry'&&o.geometry.parameters.width>14&&o.geometry.parameters.height===.5){o.position.y-=.03;window.__R=o}})})()`);await shot('b_rimdown');
  console.log('shadow',await ev(`JSON.stringify({type:GB.r.shadowMap.type,auto:GB.r.shadowMap.autoUpdate,bias:__L.shadow.bias,nb:__L.shadow.normalBias,ms:__L.shadow.mapSize.x,gy:GS.gy,gpos:GS.g.position.y})`));
  console.log('errs',JSON.stringify(T.errs.slice(0,5)));await T.b.close()})().catch(e=>{console.log('FAIL',e);process.exit(1)});
