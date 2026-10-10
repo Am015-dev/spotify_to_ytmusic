@@ -73,15 +73,15 @@ Style block (paste in front of every art prompt for this game):
 
 **Music (none new yet: one CC0 loop is in the game)**
 
-- [ ] `games-src/audio/crown/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
+- [x] `games-src/audio/crown/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
   - Prompt: Playful big-band monster-movie menu theme, 108 BPM, C major, bouncy upright bass, brass section, vibraphone and handclaps, a little retro-sci-fi theremin wobble, cheeky and heroic. Seamless loop, 90 seconds, no vocals.
-- [ ] `games-src/audio/crown/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
+- [x] `games-src/audio/crown/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
   - Prompt: Mischievous city-stomp instrumental, 100 BPM, A minor, walking bass, muted trumpets, finger snaps, brushed snare, tuba stabs, confident and comic, sits under dice and card sounds without getting in the way. Seamless loop, 2 minutes, no vocals, no big crescendos.
-- [ ] `games-src/audio/crown/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
+- [x] `games-src/audio/crown/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
   - Prompt: Comic giant-monster battle instrumental, 138 BPM, E minor, pounding toms and taiko, gritty baritone sax riffs, brass hits, thundering low strings. Exciting but funny. Seamless loop, 60 seconds, no vocals.
-- [ ] `games-src/audio/crown/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
+- [x] `games-src/audio/crown/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
   - Prompt: Triumphant big-band fanfare with a crowd cheer and a fireworks sparkle, 120 BPM, C major, bright brass and cymbal swells. 20 seconds with a clean ending, no vocals.
-- [ ] `games-src/audio/crown/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
+- [x] `games-src/audio/crown/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
   - Prompt: Comic sad-trombone lament with a deflating tuba, 70 BPM, D minor, a wry two-note shrug at the end. Funny, not depressing. 10 seconds with a clean ending, no vocals.
 
 - Optional: Back default for the power cards: not listed; the cards are drawn in code.
@@ -147,15 +147,15 @@ Style block (paste in front of every art prompt for this game):
 
 **Music (one CC0 loop is in the game, nothing new yet)**
 
-- [ ] `games-src/audio/nebula/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
+- [x] `games-src/audio/nebula/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
   - Prompt: Heroic retro-future space-opera menu theme, 96 BPM, D minor lifting to D major, warm analog synth pads, a French horn melody, a soft arpeggio, hopeful and adventurous. Seamless loop, 90 seconds, no vocals.
-- [ ] `games-src/audio/nebula/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
+- [x] `games-src/audio/nebula/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
   - Prompt: Calm tactical space-duel underscore, 88 BPM, F sharp minor, pulsing analog bass, glassy arpeggios, distant brass swells, tense but never frantic, sits under dice rolls and voice lines. Seamless loop, 2 minutes, no vocals, no big crescendos.
-- [ ] `games-src/audio/nebula/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
+- [x] `games-src/audio/nebula/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
   - Prompt: Driving starfighter dogfight instrumental, 140 BPM, B minor, tight snare, staccato strings, brass stabs and a rough synth lead, urgent and exciting. Seamless loop, 60 seconds, no vocals.
-- [ ] `games-src/audio/nebula/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
+- [x] `games-src/audio/nebula/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
   - Prompt: Triumphant space-opera fanfare, brass and strings with a bright synth shimmer, 120 BPM, D major. 20 seconds with a clean ending, no vocals.
-- [ ] `games-src/audio/nebula/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
+- [x] `games-src/audio/nebula/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
   - Prompt: Sombre falling synth and low strings with a fading radio-static tail, 60 BPM, D minor. 10 seconds with a clean ending, no vocals.
 
 - Optional: Pilot and upgrade card pictures: none painted (the game uses code-drawn card faces). Not on this list unless you want a card set.
@@ -510,15 +510,15 @@ Style block (paste in front of every art prompt for this game):
 
 **Music (one CC0 loop is in the game, nothing new yet)**
 
-- [ ] `games-src/audio/sunglaze/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
+- [x] `games-src/audio/sunglaze/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
   - Prompt: Bright workshop menu theme, 104 BPM, G major, marimba and glockenspiel, plucked strings, soft shaker, a clarinet melody, warm and cheerful, like sunlight on tiles. Seamless loop, 90 seconds, no vocals.
-- [ ] `games-src/audio/sunglaze/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
+- [x] `games-src/audio/sunglaze/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
   - Prompt: Calm focused tile-laying underscore, 90 BPM, D major, gentle marimba ostinato, soft pizzicato strings, a flute motif, relaxed and thoughtful, sits under tile clicks. Seamless loop, 2 minutes, no vocals, no big crescendos.
-- [ ] `games-src/audio/sunglaze/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
+- [x] `games-src/audio/sunglaze/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
   - Prompt: Tense final-round kiln countdown, 124 BPM, A minor, ticking woodblock, driving pizzicato, rising strings, quick marimba runs, playful pressure. Seamless loop, 60 seconds, no vocals.
-- [ ] `games-src/audio/sunglaze/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
+- [x] `games-src/audio/sunglaze/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
   - Prompt: Radiant celebration fanfare, glockenspiel, brass and bells, 120 BPM, G major. 20 seconds with a clean ending, no vocals.
-- [ ] `games-src/audio/sunglaze/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
+- [x] `games-src/audio/sunglaze/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
   - Prompt: Gentle sad descending marimba and a soft low clarinet, 64 BPM, E minor. 10 seconds with a clean ending, no vocals.
 
 ### Rampart and Vine (`games/rampart-and-vine/`)
@@ -686,15 +686,15 @@ Style block (paste in front of every art prompt for this game):
 
 **Music (one CC0 loop is in the game, nothing new yet)**
 
-- [ ] `games-src/audio/tidewake/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
+- [x] `games-src/audio/tidewake/treblo/tavern-a.mp3 and tavern-b.mp3` (90 s seamless loop)
   - Prompt: Warm harbour-inn menu theme, 100 BPM, A minor, accordion and fiddle with a light hand drum and plucked guitar, salty and welcoming, no sea-shanty vocals. Seamless loop, 90 seconds, no vocals.
-- [ ] `games-src/audio/tidewake/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
+- [x] `games-src/audio/tidewake/treblo/main-a.mp3 and main-b.mp3` (2 min seamless loop)
   - Prompt: Calm sailing underscore with a hint of mystery, 84 BPM, D minor, soft pizzicato strings, harp, low clarinet, distant foghorn tone, steady and thoughtful, sits under tile clicks. Seamless loop, 2 minutes, no vocals, no big crescendos.
-- [ ] `games-src/audio/tidewake/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
+- [x] `games-src/audio/tidewake/treblo/fight-a.mp3 and fight-b.mp3` (60 s seamless loop)
   - Prompt: Leviathan chase instrumental, 132 BPM, E minor, pounding taiko and timpani, driving low strings, brass stabs, a rising sea-horn motif. Exciting and ominous. Seamless loop, 60 seconds, no vocals.
-- [ ] `games-src/audio/tidewake/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
+- [x] `games-src/audio/tidewake/treblo/victory-a.mp3 and victory-b.mp3` (20 s, clean ending)
   - Prompt: Triumphant harbour fanfare, brass, accordion and bells with a crowd cheer, 118 BPM, D major. 20 seconds with a clean ending, no vocals.
-- [ ] `games-src/audio/tidewake/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
+- [x] `games-src/audio/tidewake/treblo/defeat-a.mp3 and defeat-b.mp3` (10 s, clean ending)
   - Prompt: Mournful descending low strings and a distant foghorn, slow bell, 60 BPM, D minor. 10 seconds with a clean ending, no vocals.
 
 ### Hollowbough (`games/hollowbough/`)
