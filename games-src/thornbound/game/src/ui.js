@@ -1795,12 +1795,16 @@ const PX=(function(){
   let curM='';
   function mapApply(){const f=matchMedia('(orientation:portrait)').matches?'map-phone':'map';if(f===curM||UI.lowGfx)return;
     const im=new Image();im.onload=()=>{curM=f;TBKit.setMapImg('media/'+f+'.webp');R.dataset.mapimg='1'};im.src='media/'+f+'.webp'}
+  // painted track lane tile and throne centrepiece (media/track.webp, media/throne.webp)
+  let curS=0;
+  function surfApplyUI(){if(curS||UI.lowGfx)return;curS=1;
+    load('track',()=>TBKit.setTrackImg('media/track.webp'));load('throne',()=>TBKit.setThroneImg('media/throne.webp'))}
   // Basic cards: art/basic-<faction>.webp (embedded in TB_ART, already in PA) when it exists, else a crop of the faction's campaign portrait
   const BFB={gilded:'camp-halvard',heath:'camp-ysolde',lantern:'camp-rook',choir:'camp-orlen'};let bdone=false;
   function basicApply(){if(bdone)return;bdone=true;const extra={};let n=0;const fin=()=>{if(--n>0)return;TBKit.setArt(Object.assign({},PA,extra));if(typeof renderAll==='function'&&typeof G!=='undefined'&&G)try{renderAll()}catch(e){}};
     const ks=Object.keys(BFB).filter(f=>!PA['basic-'+f]);n=ks.length;if(!n)return;
     ks.forEach(f=>{const im=new Image();im.onload=()=>{extra['basic-'+f]='media/'+BFB[f]+'.webp';fin()};im.onerror=fin;im.src='media/'+BFB[f]+'.webp'})}
-  function tick(){backApply();tableApply();mapApply();basicApply()}
+  function tick(){backApply();tableApply();mapApply();surfApplyUI();basicApply()}
   ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();

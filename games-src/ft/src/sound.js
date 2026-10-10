@@ -31,7 +31,7 @@ document.addEventListener('keydown',()=>{if(audioInit()&&SND.ctx.state==='suspen
 const HAS_GA=typeof GA!=='undefined'&&typeof GA_DATA!=='undefined';
 if(HAS_GA){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'soq',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.music)}
 // the recorded music takes over unless Web Audio is missing or its track failed to decode
-function gaMusicOk(){if(!HAS_GA)return false;const st=GA.state();return !!GA.playing()||(st.audio&&(st.failed||[]).indexOf('main')<0)}
+function gaMusicOk(){if(!HAS_GA)return false;const st=GA.state();return !!GA.playing()||(st.audio&&(st.failed||[]).indexOf(typeof MUS!=='undefined'&&MUS.want||'main')<0)}
 function env(g,t,a,peak,dur){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+dur)}
 function tone(f,dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const osc=c.createOscillator(),g=c.createGain();osc.type=o.type||'sine';
   osc.frequency.setValueAtTime(f,t);if(o.to)osc.frequency.exponentialRampToValueAtTime(o.to,t+dur);if(o.det)osc.detune.value=o.det;
@@ -62,8 +62,8 @@ function sfx(name){if(!SND.on)return;const m=SND_MAP[name];
   }}catch(e){}}
 // ambience: an oud-like drone and soft hand-drum pattern
 const OUD=[146.8,164.8,174.6,196,220,233.1,261.6];
-function musicStart(){if(HAS_GA)GA.music('main',{fade:2});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,200)}
-function musicStop(){if(HAS_GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
+function musicStart(){if(HAS_GA){if(typeof musicSync==='function'){MUS.want=null;musicSync()}else GA.music('tavern-a',{fade:2})}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,200)}
+function musicStop(){if(HAS_GA){GA.music(null);if(typeof MUS!=='undefined')MUS.want=null}clearInterval(SND.mTimer);SND.mTimer=null}
 function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}const st=.36;
   while(SND.nextT<c.currentTime+.5){const at=SND.nextT-c.currentTime,k=SND.beat%16;
     if(k===0)tone(73.4,st*15,{type:'sine',v:.08,a:.5,at,bus:SND.musBus});

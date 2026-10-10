@@ -685,6 +685,25 @@ TB.setMapImg = function (u) {
     if (MAPIMG && v && vb) v.insertAdjacentHTML('afterend', mapImgEl(vb.width, vb.height));
   });
 };
+/* painted track lane (tile) and throne (transparent centrepiece): optional, applied to every mounted map and to maps built later */
+var TRACKIMG = '', THRONEIMG = '';
+function surfApply(root) {
+  Array.prototype.forEach.call((root || document).querySelectorAll('.tb-m-static'), function (g) {
+    var o = g.querySelector('.tb-trk-def'); if (o) o.remove();
+    var ln = g.querySelector('.tb-lane'); if (!ln) return;
+    if (TRACKIMG) { ln.insertAdjacentHTML('beforebegin', '<defs class="tb-trk-def"><pattern id="tbm-trk" patternUnits="userSpaceOnUse" width="128" height="128"><image href="' + TRACKIMG + '" width="128" height="128"/></pattern></defs>'); ln.setAttribute('stroke', 'url(#tbm-trk)'); }
+    else ln.setAttribute('stroke', '#150d08');
+  });
+  Array.prototype.forEach.call((root || document).querySelectorAll('.tb-m-throne .tb-throne'), function (g) {
+    var o = g.querySelector('.tb-timg'), d = g.querySelector('.tb-tdrawn'); if (o) o.remove();
+    if (d) d.style.display = THRONEIMG ? 'none' : '';
+    var svg = g.ownerSVGElement, vb = svg && svg.viewBox.baseVal; if (!THRONEIMG || !d || !vb) return;
+    var h = 330, w = h * 789 / 984, cx = vb.width / 2, cy = vb.height / 2;
+    d.insertAdjacentHTML('afterend', '<image class="tb-timg" href="' + THRONEIMG + '" x="' + (cx - w / 2) + '" y="' + (cy - h / 2 - 6) + '" width="' + w + '" height="' + h + '" style="pointer-events:none"/>');
+  });
+}
+TB.setTrackImg = function (u) { TRACKIMG = u || ''; surfApply(); };
+TB.setThroneImg = function (u) { THRONEIMG = u || ''; surfApply(); };
 TB.map = function (opts) {
   opts = opts || {}; TB.mount();
   var W = opts.w || 1000, H = opts.h || 1000, cx = W / 2, cy = H / 2, N = opts.trackLen || 40, seed = opts.seed || 7, low = opts.quality === 'low';
@@ -709,7 +728,7 @@ TB.map = function (opts) {
     /* outer frame + track lane */
     s += '<rect class="tb-bg-frame" x="5" y="5" width="' + (W - 10) + '" height="' + (H - 10) + '" rx="40" fill="#1b110b" stroke="url(#tb-gold)" stroke-width="6"/>' + '<rect x="14" y="14" width="' + (W - 28) + '" height="' + (H - 28) + '" rx="34" fill="none" stroke="#6e4c14" stroke-width="1.6"/>' + (low ? '' : '<rect x="6" y="6" width="' + (W - 12) + '" height="' + (H - 12) + '" rx="38" filter="url(#tb-grain)" opacity=".55"/>');
     var lane = 'M' + (46 + 56) + ' 46 H' + (W - 102) + ' A56 56 0 0 1 ' + (W - 46) + ' 102 V' + (H - 102) + ' A56 56 0 0 1 ' + (W - 102) + ' ' + (H - 46) + ' H102 A56 56 0 0 1 46 ' + (H - 102) + ' V102 A56 56 0 0 1 102 46Z';
-    s += '<path d="' + lane + '" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="66"/><path d="' + lane + '" fill="none" stroke="#150d08" stroke-width="62"/><path d="' + lane + '" fill="none" stroke="url(#tb-gold)" stroke-width="64" stroke-opacity=".0"/><path d="' + lane + '" fill="none" stroke="#8a6a24" stroke-width="1.4" transform="translate(0 0)" opacity=".0"/>';
+    s += '<path d="' + lane + '" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="66"/><path class="tb-lane" d="' + lane + '" fill="none" stroke="#150d08" stroke-width="62"/><path d="' + lane + '" fill="none" stroke="url(#tb-gold)" stroke-width="64" stroke-opacity=".0"/><path d="' + lane + '" fill="none" stroke="#8a6a24" stroke-width="1.4" transform="translate(0 0)" opacity=".0"/>';
     /* the land */
     s += '<defs><clipPath id="tbm-landclip"><path d="' + landD + '"/></clipPath></defs>';
     s += '<path d="' + landD + '" fill="#000" opacity=".6" transform="translate(0 5)"' + filt('tb-soft') + '/>';
@@ -759,7 +778,7 @@ TB.map = function (opts) {
     s += '<g transform="translate(' + cx + ' ' + (cy + 28) + ')"><path d="M-34 0 V-70 L-26 -88 L-16 -66 L0 -96 L16 -66 L26 -88 L34 -70 V0Z" fill="#1d0c12" stroke="url(#tb-gold)" stroke-width="3"/><path d="M-24 0 V-52 Q0 -64 24 -52 V0Z" fill="#5b1424"/><rect x="-30" y="-26" width="60" height="14" rx="3" fill="#7c1b2c" stroke="url(#tb-gold)" stroke-width="1.6"/><rect x="-38" y="-12" width="76" height="12" rx="2" fill="#2c1a10" stroke="#8f7330" stroke-width="1.2"/>' + ivy(-34, -4, 70, -92, R, 3.4) + ivy(34, -4, 56, -88, R, 3.4) + rose(-20, -14, 1.2) + '</g>';
     s += '<g transform="translate(' + cx + ' ' + (cy - 76) + ')">' + glowAt(0, 0, 44, 'gold') + crownShape(0, 8, 1.15) + '</g>';
     s += '<g transform="translate(' + cx + ' ' + (cy + 56) + ')"><path d="M-92 -12 H92 L86 0 L92 12 H-92 L-86 0Z" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="2"/><text y="5.4" text-anchor="middle" textLength="150" lengthAdjust="spacingAndGlyphs" font-family="' + DISPLAY + '" font-weight="700" font-size="15" letter-spacing="1" fill="#f1d98a" stroke="rgba(0,0,0,.5)" stroke-width="1" paint-order="stroke">THORNBOUND THRONE</text></g>';
-    L.throne.innerHTML = '<g class="tb-loc tb-throne" data-id="throne" tabindex="0" role="button" aria-label="The Thornbound Throne"><ellipse class="tb-ring" cx="' + cx + '" cy="' + cy + '" rx="132" ry="108" fill="none" stroke="#ffe9a0" stroke-width="5" stroke-dasharray="10 8" opacity="0"/>' + s + '<ellipse cx="' + cx + '" cy="' + cy + '" rx="140" ry="122" fill="transparent"/></g>';
+    L.throne.innerHTML = '<g class="tb-loc tb-throne" data-id="throne" tabindex="0" role="button" aria-label="The Thornbound Throne"><ellipse class="tb-ring" cx="' + cx + '" cy="' + cy + '" rx="132" ry="108" fill="none" stroke="#ffe9a0" stroke-width="5" stroke-dasharray="10 8" opacity="0"/><g class="tb-tdrawn">' + s + '</g><ellipse cx="' + cx + '" cy="' + cy + '" rx="140" ry="122" fill="transparent"/></g>';
   }
   /* ---- roads ---- */
   function buildRoads() {
@@ -848,7 +867,7 @@ TB.map = function (opts) {
   function rebuild() {
     cs = S.locs.length >= 11 ? .84 : 1; sw = Math.round((CP ? 44 : SLOT_W) * cs); sh = Math.round((CP ? 62 : SLOT_H) * cs); pu = (CP ? 1.2 : 1) * cs; hs = (CP ? 1.55 : 1.3) * (cs < 1 ? .9 : 1);
     var r = layoutLocations(S.locs, { w: W, h: H, links: opts.links, rot: opts.rot, below: (CP ? 128 : 118) * cs, above: (CP ? 62 : 54) * cs, half: 98 * cs }); S.pos = r.pos; S.links = r.links;
-    buildStatic(); buildThrone(); buildRoads(); buildLocs(); buildRound(); buildInfl(); buildHeralds();
+    buildStatic(); buildThrone(); buildRoads(); buildLocs(); buildRound(); buildInfl(); buildHeralds(); surfApply(svg);
     L.track.innerHTML = '';
   }
   /* ---- interaction ---- */
