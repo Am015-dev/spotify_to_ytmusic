@@ -69,7 +69,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98pa | `98pa_garage_parts.js` | 24 | PA (v88y garage): BUILD CANVAS + MY PARTS + TILES. Alex (2026-10-09): "since we have now groups we can work in garage in parts and then append them. but we need |
 | 98gb | `98gb_garage13.js` | 38 | G13 (v89d garage). Alex (2026-10-09, with the 40468 Yellow Taxi instructions): "the garage is missing several items; there is not full control to rotate in diff |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
-| 99c | `99c_checklist.js` | 35 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 36 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
@@ -323,7 +323,7 @@ uses: 92(97), 93(46), 98gx(22), 98s(18), 30(13), 94(12), 98t(9), 20(7), 10(3), 9
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
 uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 92(7)
 
-## 99c_checklist.js — 35 KB
+## 99c_checklist.js — 36 KB
 defines: OD_CHECKLIST
 uses: 10(19), 30(14), 20(12), 99t(5), 41(4), 92(4), 40(1), 72(1)
 
