@@ -3,6 +3,12 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90g',id:'rides16',text:'Garage → RIDES: Street Sweeper, Fire Truck (4208), Tow Rig, Recycle Truck, Red Line Racer, Diesel Daredevil, Classic Patrol, Tow Truck (7638), Highway Bike, Z06 Racer, Repair Truck, Tipper Lorry, Sport Coupe, Road Rebel, Trail Ranger, Diesel Dumper: each looks complete; drive two.'},
+ {ver:'v90g',id:'racers',text:'Garage → RIDES: the filter chip cycles ALL → OWNED → ★ FAVS → 🏁 RACERS; RACERS shows the five tiny racers (Tiny Patrol, Tiny Muscle, Track Racer, Rally Sprinter, Track Marshal), car-sized on the road.'},
+ {ver:'v90g',id:'fra-props',text:'Frankfurt: Pizza To Go shop (a person fits through the door), a phone booth, the LEGO fountain on a lawn, and a speedboat IN the river.'},
+ {ver:'v90g',id:'ath-display',text:'Athens: the little lighthouse and the house stand on low display plinths, true LEGO size (not blown up).'},
+ {ver:'v90g',id:'bigrig',text:'Frankfurt: drive 2 minutes: the yellow Big Rig appears in traffic only on wide roads and never cuts a kerb or a corner.'},
+ {ver:'v90g',id:'land2',text:'Frankfurt planters/dumpsters and Athens street lamps look like LEGO parts; both cities run as smoothly as before.'},
  {ver:'v90f',id:'town-fwd',text:'Equip Town Roadster, then Ladder Truck: the bonnet/cab points forward and the car drives forwards.'},
  {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker look complete; drive two of them.'},
  {ver:'v90f',id:'w4956',text:'Frankfurt: a LEGO House (4956) stands by a street near the start; a person fits through its door.'},

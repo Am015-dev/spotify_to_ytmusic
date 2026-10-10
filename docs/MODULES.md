@@ -10,7 +10,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 |---|---|---|---|
 | 00 | `00_page.html` | 113 | <title>, all CSS (HUD, menus, touch controls, phone media queries), all HTML markup (#hud #roam #menu #pause #settings #cmap #gbx…) |
 | 02 | `02_data_json.html` | 108 | DATA: importmap (three r164 CDN), #rf-data (Frankfurt streets/quays/lm/spots JSON), #ath-data (Athens 100 KB line), <script src="km.js">, opening <script type=" |
-| 10 | `10_core.js` | 135 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
+| 10 | `10_core.js` | 136 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
 | 20 | `20_race_world.js` | 104 | race circuits: neon Frankfurt world (buildRoad buildCity buildLandmarks loadTrack disposeWorld applyQuality), Athens race world (athPrep athTex athStands hazard |
 | 30 | `30_race.js` | 116 | race traffic (setupTraffic stepTraffic drawTraffic), props/Baustelle, particles (emit burst puff SPARK pools debris), audio AU, race state + race physics (stepS |
 | 31 | `31_race_r15.js` | 14 | R15 (race worker 15, v87q+): strategic routes. Per circuit, a WATER and an OFF-ROAD corridor run along the inside of a big bend: the inner wall opens at a signe |
@@ -72,12 +72,12 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ld | `98ld_stub.js` | 1 | LDM (v89v, 2026-10-10). Coordinator: "move all LDraw model data OUT of overdrive.html into models.js next to km.js" (page ≤ 3.5 MB, flat as models grow). The da |
 | 98ld | `98ld_import.js` | 17 | LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds". Real LEGO builds come in as LDra |
 | 98ld | `98ld_w.js` | 8 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
-| 98ld | `98ld_l_land.js` | 9 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
+| 98ld | `98ld_l_land.js` | 14 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
 | 98ld | `98ld_run.js` | 5 | LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module (window.__LDQ, r |
-| 98ct | `98ct_city_lego.js` | 14 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
-| 98sz | `98sz_ride_scale.js` | 4 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
+| 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
+| 98sz | `98sz_ride_scale.js` | 5 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
-| 99c | `99c_checklist.js` | 45 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 46 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
@@ -97,7 +97,7 @@ uses: -
 defines: (data / markup, no top-level declarations)
 uses: -
 
-## 10_core.js — 135 KB
+## 10_core.js — 136 KB
 defines: W14_ST W14_PIV TUNE OD_CHANGELOG OD_VER CR_trackW CR_LS CR_SPDCAM CR_smashHit _crTQ _crTE _crTS _crTP _crTM CR_tumbleStart CR_tumble CR_dodge CR_TYRE_Y CR_RG CR_RJM CR_rampLaunch CR_glowFar CR_glowCar CR_boxWall CR_noGlow CR_minBack CR_SMASHV ALL_OPEN TEST_MODE $ V3 clamp lerp mod mul R CK CID CITYK skey _SC _scGet store BOOTF fmt fmt2 ord pad2 S W HALF MARGIN CR_RK BASE_TOP CLASSES TEAMS PERKS PK perkUnlocked perkReq perkSlots perkEq perkSet garOwned teamLocked vehOf pickItem GB_PARTS GB_COLS GB_NEON GB_PATS GB_HORNS gbOwn packs gbReq gbReqTxt gbBuild gbTeam playerTeam hornPlay GB gbOpen gbLoop R1_chip R1_WT R1_weight gbRender gbClose liveryPat kitParts PILOTS PDL BOSS_TEAM PD teamOf SIG RIVAL_EV BOSS_EV flagsR flags BOSS_LINES radioLine worldCfg sigTick STYLE_NAME TAUNT NEM_LINES LEAGUES RND_NAMES SPTS SCRED UPC UPS UPG TRACK_DEFS TDF ATH_TRACKS ATH_TH athW ATH_IDS isAthT athOpen ATH_PD ATH_TRK_EV ATH_BOSS_EV DRAKOS_LINES athNF TRK CP MOODS ATHM MOOD RIVER BRANDS VSIGNS ITEMS ITEM_KEYS ICON itemSpinUntil itemShown EVENTS canvas renderer scene FOGC camera lowGfx adaptR adaptMul diffMul adaptAfter SET_DEF SET fxK rt composer SCRUB bloom FX SPRSCALE pFov DPR2 DRES resize hemi moonL shipKey glowCol neonMat SKY_VS SKY_FS V SKYU skyMat sky ENVSC ENVD lightningT litV applyMood applyMoodMaterials cv TEXV TEXMODE s2l dataTex mkTex texProbe TEXVAR tex refreshTex radial GLOW FLARE SHADOW roadTex wallTex facadeTex WIN_CELLS streetTex billboardTex vSignTex textTex padTex hazardTex liveryTex wingTex buildTrackData reverseTrack TF TD TRACKS frameAt mkF kAt yAt jumpAt WATER_Y isWater isDirt inGapF HCELL hash indexTrack crossAt nearTrack nearestTrackDist
 uses: 30(97), 20(66), 41(12), 72(11), 40(9), 70(5), 71(2), 98d(1), 99(1), 93(1)
 
@@ -343,31 +343,31 @@ uses: 92(50), 93(33), 20(15), 53(11), 98(8), 98ld(7), 98gb(6), 41(6), 30(3), 70(
 
 ## 98ld_w.js — 8 KB
 defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_spot LDW_build
-uses: 20(23), 30(20), 92(17), 98ld(17), 53(13), 93(8), 10(7), 98ld(6), 70(6), 85(5)
+uses: 20(23), 30(21), 92(17), 98ld(17), 53(14), 93(8), 10(7), 70(7), 98ld(6), 85(5)
 
-## 98ld_l_land.js — 9 KB
-defines: LDS LDS_lathe LDS_tri LDS_lamp LDS_fence LDS_crate LDS_scan LDS_ab
-uses: 53(15), 30(14), 97(6), 60(5), 20(5), 10(5), 70(3), 98ld(3)
+## 98ld_l_land.js — 14 KB
+defines: LDS LDS_lathe LDS_tri LDS_lamp LDS_fence LDS_crate LDS_fit LDS_planter LDS_dumpster LDS_palm LDS_scan LDS_ab
+uses: 53(18), 30(17), 60(10), 20(10), 10(10), 97(8), 70(3), 98ld(3), 72(1)
 
 ## 98ld_run.js — 5 KB
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
 uses: 98(20), 98ld(12), 98ld(7), 98y(6), 98ld(4), 72(3), 30(3), 10(3), 94(2), 98fb(2)
 
-## 98ct_city_lego.js — 14 KB
-defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim __ct CTB CTB_V CTB_city CTB_kind CTB_h CTB_pick CTB_fill CTB_putK CTB_put CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step __ctb
-uses: 20(35), 93(21), 30(16), 98ld(15), 92(13), 60(11), 10(10), 53(7), 70(7), 98ld(3)
+## 98ct_city_lego.js — 16 KB
+defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim CT_WD CT_segW CT_wideHw CT_wideOk __ct CTB CTB_V CTB_city CTB_kind CTB_h CTB_pick CTB_fill CTB_putK CTB_put CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step __ctb
+uses: 20(35), 93(22), 30(16), 98ld(15), 60(14), 92(13), 53(13), 10(10), 70(9), 98ld(3)
 
-## 98sz_ride_scale.js — 4 KB
+## 98sz_ride_scale.js — 5 KB
 defines: RSZ SZ_k SZ_add __sz
-uses: 96(12), 92(9), 98ld(5), 20(4), 98(3), 41(2), 98y(2), 10(2), 98bc(2), 30(1)
+uses: 96(12), 92(10), 98ld(5), 20(5), 98(4), 41(2), 98y(2), 10(2), 98bc(2), 30(1)
 
 ## 98of_onfoot.js — 45 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
 uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 92(7)
 
-## 99c_checklist.js — 45 KB
+## 99c_checklist.js — 46 KB
 defines: OD_CHECKLIST
-uses: 30(31), 10(19), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
+uses: 30(32), 10(19), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
