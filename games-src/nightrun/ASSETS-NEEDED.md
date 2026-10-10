@@ -153,3 +153,13 @@ Style block (paste in front of every prompt): Painted neon cyberpunk game icon, 
 | `kit-nmn.webp` | Neon Mining: a pickaxe striking a cluster of neon crystals. |
 
 Also still code-drawn (no painting exists): the garage colour-theme swatches, the HUD hull/shield bars, and the DROP-moment screen effects (all procedural on purpose; paint only if you want them replaced).
+
+## Enemy bullet kinds (added 10 Oct 2026)
+
+The orange shells and gold needles are now the painted lime orb turned orange or stretched; the rocket is still a drawn shape. Paint these three and the game uses them with no code change (light on black, drawn additively). Style block: Painted neon cyberpunk game effect, light on a pure black background (drawn additively), same look as the other Nightrun fx pictures, no text
+
+| file | size | what to paint |
+|---|---|---|
+| `fx-bullet-rocket.webp` | 256x128 | a glowing missile flying RIGHT, pale blue-white body, red nose, orange exhaust flame trailing left, light on black. |
+| `fx-bullet-shell.webp` | 128x128 | a big round orange energy shell, hot white core, molten orange glow, a thin darker ring, light on black. |
+| `fx-bullet-needle.webp` | 256x64 | a thin fast lime-yellow energy needle pointing RIGHT with a short fading tail, light on black. |

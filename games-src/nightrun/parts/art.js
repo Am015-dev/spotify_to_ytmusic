@@ -7,7 +7,7 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   artK:e=>e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
   shipN:['std','tri','hv','ec','swg','syn'],
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
-  fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link'],
+  fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link','bullet-shell','bullet-needle','bullet-rocket'],
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
 ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
   im.onload=()=>{const done=b=>{ART.bm[n]=b;};if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
@@ -28,6 +28,13 @@ ART.sil=(n,w,col)=>{const o=ART.sp(n,w);if(!o)return null;const k='s|'+n+'@'+o.w
   return ART.sc[k]={c,w:o.w,h:o.h};};
 ART.tint=(n,w,col)=>{const o=ART.sp(n,w);if(!o)return null;const k='t|'+n+'@'+o.w+'@'+col+'@'+S;let q=ART.sc[k];if(q)return q;
   const c=document.createElement('canvas');c.width=o.c.width;c.height=o.c.height;const g=c.getContext('2d');g.drawImage(o.c,0,0);g.globalCompositeOperation='multiply';g.fillStyle=col;g.fillRect(0,0,c.width,c.height);
+  return ART.sc[k]={c,w:o.w,h:o.h};};
+/* the same sprite with its hue turned by deg (one small cached copy: a painted orange orb from the painted lime one) */
+ART.hue=(n,w,deg)=>{const o=ART.sp(n,w);if(!o)return null;const k='h|'+n+'@'+o.w+'@'+deg+'@'+S;let q=ART.sc[k];if(q)return q;
+  const c=document.createElement('canvas');c.width=o.c.width;c.height=o.c.height;const g=c.getContext('2d');g.drawImage(o.c,0,0);
+  try{const id=g.getImageData(0,0,c.width,c.height),d=id.data,a=deg*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a),
+    m=[.213+cs*.787-sn*.213,.715-cs*.715-sn*.715,.072-cs*.072+sn*.928,.213-cs*.213+sn*.143,.715+cs*.285+sn*.140,.072-cs*.072-sn*.283,.213-cs*.213-sn*.787,.715-cs*.715+sn*.715,.072+cs*.928+sn*.072];
+    for(let i=0;i<d.length;i+=4){const r=d[i],gg=d[i+1],b=d[i+2];d[i]=Math.max(0,Math.min(255,r*m[0]+gg*m[1]+b*m[2]));d[i+1]=Math.max(0,Math.min(255,r*m[3]+gg*m[4]+b*m[5]));d[i+2]=Math.max(0,Math.min(255,r*m[6]+gg*m[7]+b*m[8]));}g.putImageData(id,0,0);}catch(e){}
   return ART.sc[k]={c,w:o.w,h:o.h};};
 /* draw centred on x,y (rot in radians, optional) */
 ART.put=(o,x,y,rot,al,sx,sy)=>{if(!o)return false;if(al!=null)ctx.globalAlpha=al;

@@ -27,7 +27,7 @@ Generated 9 Oct 2026 from the card data, art manifests, campaign files, hand-off
 | Lantern Dive | 42 | 0 |
 | Cauldron Fair | 3 | 73 |
 | Final Approach | 2 | 42 |
-| Mainhattan Nightrun | 13 | 0 |
+| Mainhattan Nightrun | 16 | 0 |
 | **Total** | **311** | **262** |
 
 ## To make, per game
@@ -939,7 +939,7 @@ Style block (paste in front of every art prompt for this game):
 
 ### Mainhattan Nightrun (`games/mainhattan-nightrun/`)
 
-**13 to make** (garage perk icons, 128x128 transparent). Music is all in and wired. Owned by the Game Night orchestrator.
+**16 to make** (13 garage perk icons 128x128 transparent, 3 bullet effects). Music is all in and wired. Owned by the Game Night orchestrator.
 
 Style block (paste in front of every art prompt for this game):
 
@@ -985,6 +985,17 @@ Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, ma
 
 - [ ] `games/mainhattan-nightrun/media/kit-nmn.webp` (1:1, target 128x128 WebP)
   - Prompt: Neon Mining: a pickaxe striking a cluster of neon crystals
+
+**Enemy bullet effects** (light on black)
+
+- [ ] `games/mainhattan-nightrun/media/fx-bullet-rocket.webp` (target 256x128 WebP)
+  - Prompt: a glowing missile flying RIGHT, pale blue-white body, red nose, orange exhaust flame trailing left, light on black
+
+- [ ] `games/mainhattan-nightrun/media/fx-bullet-shell.webp` (target 128x128 WebP)
+  - Prompt: a big round orange energy shell, hot white core, molten orange glow, a thin darker ring, light on black
+
+- [ ] `games/mainhattan-nightrun/media/fx-bullet-needle.webp` (target 256x64 WebP)
+  - Prompt: a thin fast lime-yellow energy needle pointing RIGHT with a short fading tail, light on black
 
 ## Made but NOT wired (work for us, not the owner)
 

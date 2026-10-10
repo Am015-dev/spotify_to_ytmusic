@@ -50,7 +50,7 @@ const DIR={
     const bb=((i%4)+4)%4;
     if(!ST.on&&G.dbar>=this.bossBar)return;                // the boss is about to come: no new waves
     if(ST.on&&ST.spawned)return;
-    if(G.boss)return;                                      // a mini-boss summons its own
+    if(G.boss){if(bb===0&&(HARD||(G.rb&1)))this.spawnOne();return;}   // a mini-boss summons its own, and a wave still comes every other bar (every bar on Hard)
     if(bb===0)this.barLine(i);
     else if(bb===2&&this.acc>=1.4){this.acc-=1;this.spawnOne();}
     else if(this.emptyB>=4&&nb===0){this.spawnOne(true);this.emptyB=0;}           // dead air: nothing on screen for a whole bar

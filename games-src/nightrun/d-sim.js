@@ -13,7 +13,7 @@ function freePort() { return new Promise(r => { const s = net.createServer(); s.
 const BOT = (o) => {
   const m = window.__mnr; if (o.dk && o.dk[o.diff]) Object.assign(m.DIFFS[o.diff], o.dk[o.diff]); m.setVal('diff', o.diff);
   if (o.stage) m.startStory(o.stage); else document.getElementById('startBtn').click();
-  m.simOn(true);
+  m.simOn(true); if (o.nomini) m.DIR.nextMini = 1e9; if (o.noslow) { const g = m.PW.give.bind(m.PW); m.PW.give = (k, ob) => k === 'slow' ? true : g(k, ob); } if (o.nofun) { m.FUN.setPiece = () => { }; m.FUN.dropStart = () => { }; }
   const rnd = Math.random;
   const dec = () => {
     const G = m.G, P = m.P; let ty = 270, tx = 220, bd = 1e9;
@@ -64,7 +64,7 @@ if (require.main === module) (async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1`); await p.waitForFunction(() => window.__mnr);
-    while (next < jobs.length) { const j = jobs[next++]; const r = await p.evaluate(BOT, { ...j, cap: CAP, stage: STAGE, dk: process.env.DK ? JSON.parse(process.env.DK) : null }); (res[j.diff + '/' + j.type] = res[j.diff + '/' + j.type] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
+    while (next < jobs.length) { const j = jobs[next++]; const r = await p.evaluate(BOT, { ...j, cap: CAP, nomini: !!process.env.NOMINI, nofun: !!process.env.NOFUN, noslow: !!process.env.NOSLOW, stage: STAGE, dk: process.env.DK ? JSON.parse(process.env.DK) : null }); (res[j.diff + '/' + j.type] = res[j.diff + '/' + j.type] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
     await p.close();
   }));
   await browser.close(); srv.kill();
