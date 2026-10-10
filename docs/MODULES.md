@@ -10,7 +10,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 |---|---|---|---|
 | 00 | `00_page.html` | 113 | <title>, all CSS (HUD, menus, touch controls, phone media queries), all HTML markup (#hud #roam #menu #pause #settings #cmap #gbx…) |
 | 02 | `02_data_json.html` | 108 | DATA: importmap (three r164 CDN), #rf-data (Frankfurt streets/quays/lm/spots JSON), #ath-data (Athens 100 KB line), <script src="km.js">, opening <script type=" |
-| 10 | `10_core.js` | 132 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
+| 10 | `10_core.js` | 133 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
 | 20 | `20_race_world.js` | 104 | race circuits: neon Frankfurt world (buildRoad buildCity buildLandmarks loadTrack disposeWorld applyQuality), Athens race world (athPrep athTex athStands hazard |
 | 30 | `30_race.js` | 116 | race traffic (setupTraffic stepTraffic drawTraffic), props/Baustelle, particles (emit burst puff SPARK pools debris), audio AU, race state + race physics (stepS |
 | 31 | `31_race_r15.js` | 14 | R15 (race worker 15, v87q+): strategic routes. Per circuit, a WATER and an OFF-ROAD corridor run along the inside of a big bend: the inner wall opens at a signe |
@@ -92,9 +92,9 @@ uses: -
 defines: (data / markup, no top-level declarations)
 uses: -
 
-## 10_core.js — 132 KB
+## 10_core.js — 133 KB
 defines: W14_ST W14_PIV TUNE OD_CHANGELOG OD_VER CR_trackW CR_LS CR_SPDCAM CR_smashHit _crTQ _crTE _crTS _crTP _crTM CR_tumbleStart CR_tumble CR_dodge CR_TYRE_Y CR_RG CR_RJM CR_rampLaunch CR_glowFar CR_glowCar CR_boxWall CR_noGlow CR_minBack CR_SMASHV ALL_OPEN TEST_MODE $ V3 clamp lerp mod mul R CK CID CITYK skey _SC _scGet store BOOTF fmt fmt2 ord pad2 S W HALF MARGIN CR_RK BASE_TOP CLASSES TEAMS PERKS PK perkUnlocked perkReq perkSlots perkEq perkSet garOwned teamLocked vehOf pickItem GB_PARTS GB_COLS GB_NEON GB_PATS GB_HORNS gbOwn packs gbReq gbReqTxt gbBuild gbTeam playerTeam hornPlay GB gbOpen gbLoop R1_chip R1_WT R1_weight gbRender gbClose liveryPat kitParts PILOTS PDL BOSS_TEAM PD teamOf SIG RIVAL_EV BOSS_EV flagsR flags BOSS_LINES radioLine worldCfg sigTick STYLE_NAME TAUNT NEM_LINES LEAGUES RND_NAMES SPTS SCRED UPC UPS UPG TRACK_DEFS TDF ATH_TRACKS ATH_TH athW ATH_IDS isAthT athOpen ATH_PD ATH_TRK_EV ATH_BOSS_EV DRAKOS_LINES athNF TRK CP MOODS ATHM MOOD RIVER BRANDS VSIGNS ITEMS ITEM_KEYS ICON itemSpinUntil itemShown EVENTS canvas renderer scene FOGC camera lowGfx adaptR adaptMul diffMul adaptAfter SET_DEF SET fxK rt composer SCRUB bloom FX SPRSCALE pFov DPR2 DRES resize hemi moonL shipKey glowCol neonMat SKY_VS SKY_FS V SKYU skyMat sky ENVSC ENVD lightningT litV applyMood applyMoodMaterials cv TEXV TEXMODE s2l dataTex mkTex texProbe TEXVAR tex refreshTex radial GLOW FLARE SHADOW roadTex wallTex facadeTex WIN_CELLS streetTex billboardTex vSignTex textTex padTex hazardTex liveryTex wingTex buildTrackData reverseTrack TF TD TRACKS frameAt mkF kAt yAt jumpAt WATER_Y isWater isDirt inGapF HCELL hash indexTrack crossAt nearTrack nearestTrackDist
-uses: 30(94), 20(65), 41(11), 72(11), 40(9), 70(5), 71(2), 98d(1), 99(1), 93(1)
+uses: 30(94), 20(66), 41(11), 72(11), 40(9), 70(5), 71(2), 98d(1), 99(1), 93(1)
 
 ## 20_race_world.js — 104 KB
 defines: _m _q _s _v geo placeOnTrack basisM TInst TBatch Batch colorize MAT sweep roadShader buildRoad startLights lampList buildGround buildPit trains waterRefl waterPlain LANDMARKS FACADE WINS INTU INT_FS interiorPatch withInterior GLASS glassMat CITY buildCity lmAt beacon edges buildLandmarks rain searchlights billboards traffic3d speedLines buildDressing buildAmbient planes gates inClear WFUN buildWaterFun _m4 dirtTex buildDirt wPos waterStep waterTick buildTrackProps updPlanes KEEP_TEX warmTextures disposeWorld R15_trackW loadTrack applyQuality ATHG ATH_NEON ATH_BRANDS athPrep athH athTD athUV athBox athNoise athRoadTex athWallTex athGroundTex athFacadeTex athWinTex athFlagTex athMerge athTreeGeo athTreeBy athCypGeo athPineGeo athKioskGeo athTaxiGeo athUmbGeo athSeatPts athLathe athStands athLandmarks athMountains athGround athCity athDressing athThemeDress AHZ athHazPlace athHazReset athHazTick athHazStep athFire loft HULL POD SHIP_K RIBBON_VS RIBBON_FS ribbonGeo RIB_GEO LIVERY WHEEL RIM WHEELMAT PONTOON FIN _tipV _tipC WINGMAT WINGGEO WINGTIP GLOWTIP VMAT STUD studs box buildBoat easeBack poseInit poseApply vehMode shipMesh
@@ -338,7 +338,7 @@ uses: 92(50), 93(33), 20(15), 53(11), 98(8), 98ld(7), 98gb(6), 41(5), 30(3), 70(
 
 ## 98ld_w.js — 7 KB
 defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_spot LDW_build
-uses: 20(17), 92(17), 30(16), 53(13), 98ld(10), 93(8), 10(7), 98ld(6), 70(6), 51(4)
+uses: 20(18), 92(17), 30(16), 53(13), 98ld(12), 93(8), 10(7), 98ld(6), 70(6), 51(4)
 
 ## 98ld_run.js — 4 KB
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
@@ -350,7 +350,7 @@ uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 9
 
 ## 99c_checklist.js — 41 KB
 defines: OD_CHECKLIST
-uses: 30(24), 10(19), 20(12), 99t(5), 41(4), 92(4), 40(1), 72(1)
+uses: 30(26), 10(19), 20(12), 99t(5), 41(4), 92(4), 40(1), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
