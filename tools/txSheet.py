@@ -3,7 +3,7 @@ import sys
 from PIL import Image, ImageDraw, ImageFont
 D='docs/shots/taxi40468/';out=sys.argv[1]
 refs=[(D+'pdf/01.jpg','LEGO 40468 box art'),(D+'pdf/41.jpg','PDF final step (p.41)')]
-ours=[(D+'s2/g_front.png','OURS garage · back (LDC-812, tail lights)'),(D+'s2/g_side.png','OURS garage · side'),(D+'s2/g_34rear.png','OURS garage · 3/4 rear'),(D+'s2/d_side_low.png','OURS drive · low side (gap 0.03 m)'),(D+'s2/d_drive.png','OURS drive · chase cam'),(D+'r1/box34.png','OURS model · box-art angle')]
+ours=[(D+'s3/d_34front.png','OURS drive · 3/4 front (in game)'),(D+'s3/d_side.png','OURS drive · side (gap 0.03 m)'),(D+'s3/d_chase.png','OURS drive · chase cam (roof sign)'),(D+'s3/d_34rear.png','OURS drive · 3/4 rear'),(D+'s3/g_side.png','OURS garage · side'),(D+'s3/box34.png','OURS model · box-art angle')]
 f=ImageFont.load_default(size=20);H=30;CW,CH=852,393;RW=round(591*CH/393*1.0)
 im=Image.new('RGB',(RW+6+2*CW+6,3*(CH+H)),(16,18,28));d=ImageDraw.Draw(im)
 for i,(p,c) in enumerate(refs):
