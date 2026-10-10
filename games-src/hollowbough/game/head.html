@@ -313,7 +313,8 @@ html[data-timg] .tbl,html[data-timg] .gvig{display:none}
 .tile .face>img.pa{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;filter:none;box-sizing:border-box}
 .t-basic .face,.t-forest .face{border-radius:50%;overflow:hidden}
 .t-basic .face>img.pa,.t-forest .face>img.pa{border:3px solid var(--ink);border-radius:50%}
-.t-bev .face>img.pa,.t-sev .face>img.pa{clip-path:polygon(6% 6%,94% 6%,94% 69%,85% 81%,50% 96%,15% 81%,6% 69%)}
+.t-bev .face>img.pa,.t-sev .face>img.pa{border-radius:6px}
+.t-bev .face:has(>img.pa),.t-sev .face:has(>img.pa){background:#2a1f19;overflow:hidden}
 .t-basic .face .nm,.t-forest .face .nm,.t-bev .face .nm,.t-sev .face .nm{position:relative;z-index:2;background:rgba(251,244,226,.9);border-radius:8px;padding:1px 6px;text-shadow:none;font-size:12px}
 html[data-mat] .strip,html[data-mat] .strip.city,html[data-mat] .strip.hand{background:url(media/mat.webp) 0 0/100% 100% no-repeat;border:0;box-shadow:none}
 html[data-timg] .gx-board{background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 52%,rgba(12,20,8,.34) 100%),var(--tbl-img) center/cover no-repeat,#4f7040}
