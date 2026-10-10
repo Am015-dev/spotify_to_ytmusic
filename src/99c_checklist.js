@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90h',id:'gfloor',text:'Garage → RIDES: tap 6 rides in a row (a car, a big truck, a Town set, an OFF-ROAD truck, a WATER boat): after the build-up each one stands on the platform, tyres on the tiles, nothing sunk into the floor, no flat base with tiny wheels.'},
+ {ver:'v90h',id:'gpatch',text:'Garage → BUILD on a big ride (Fire Truck, Big Rig): the grey platform has no dark striped patch behind the ride.'},
  {ver:'v90g',id:'rides16',text:'Garage → RIDES: Street Sweeper, Fire Truck (4208), Tow Rig, Recycle Truck, Red Line Racer, Diesel Daredevil, Classic Patrol, Tow Truck (7638), Highway Bike, Z06 Racer, Repair Truck, Tipper Lorry, Sport Coupe, Road Rebel, Trail Ranger, Diesel Dumper: each looks complete; drive two.'},
  {ver:'v90g',id:'racers',text:'Garage → RIDES: the filter chip cycles ALL → OWNED → ★ FAVS → 🏁 RACERS; RACERS shows the five tiny racers (Tiny Patrol, Tiny Muscle, Track Racer, Rally Sprinter, Track Marshal), car-sized on the road.'},
  {ver:'v90g',id:'fra-props',text:'Frankfurt: Pizza To Go shop (a person fits through the door), a phone booth, the LEGO fountain on a lawn, and a speedboat IN the river.'},
