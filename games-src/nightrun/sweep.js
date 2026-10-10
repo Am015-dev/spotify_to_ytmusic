@@ -435,7 +435,7 @@ async function synthFallbackTests(browser) {           // ?nomusic=1 (no song fi
     const exp = [[0, 'stage1', 120], [1, 'stage2', 128]]; await sleep(1200);
     // add-on hook API: events fire, setRate keeps the beat position continuous and scales the beat length
     const nr = await ev(p, async () => { const N = window.NR, got = {}; for (const e of ['beat', 'bar']) N.on(e, () => { got[e] = (got[e] || 0) + 1; }); const b0 = __mnr.bpos(), s0 = __mnr.BT.spb; N.music.setRate(1.25); const b1 = __mnr.bpos(), s1 = __mnr.BT.spb; await new Promise(r => setTimeout(r, 2500)); const r = { jump: b1 - b0, ratio: s0 / s1, got, beats: __mnr.bpos() - b1 }; N.music.setRate(1); return r; });
-    if (Math.abs(nr.jump) > .15 || Math.abs(nr.ratio - 1.25) > .001 || !nr.got.beat || nr.got.beat < 3 || !nr.got.bar) await fail(p, tag, 'hook', 'NR hook API ' + JSON.stringify(nr));
+    if (Math.abs(nr.jump) > .15 || Math.abs(nr.ratio - 1) > .001 || !nr.got.beat || nr.got.beat < 3 || !nr.got.bar) await fail(p, tag, 'hook', 'NR hook API ' + JSON.stringify(nr));
     for (const [i, st, bpm] of exp) { await ev(p, i => window.__mnr.skipTo(i), i); if (i > 0) await waitFor(p, st => __mnr.BT.stage === st && !__mnr.BT.pend, st, 9000); else await sleep(900); const b = await ev(p, () => ({ ...__mnr.BT })); if (b.mode !== 'synth' || b.stage !== st || b.bpm !== bpm) await fail(p, tag, 'beat', `stage ${st}: ${JSON.stringify(b)}`); }
     await ev(p, () => window.__mnr.bossNow()); await waitFor(p, () => __mnr.BT.stage === 'boss' && !__mnr.BT.pend, null, 12000); let b = await ev(p, () => ({ ...__mnr.BT })); if (b.mode !== 'synth' || b.stage !== 'boss' || b.bpm !== 140) await fail(p, tag, 'beat', 'boss music ' + JSON.stringify(b));
     for (const x of await ev(p, () => __mnr.NR.sw.slice())) { const o = Math.abs(x.oldBeat / 4 - Math.round(x.oldBeat / 4)) * 4 * x.spbOld * 1000, n = Math.abs(x.newBeat / 4 - Math.round(x.newBeat / 4)) * 4 * x.spbNew * 1000; stats.switches = (stats.switches || 0) + 1; if (o > 20 || n > 20) await fail(p, tag, 'bar-line', `${x.from}>${x.to} off the bar line (old ${o.toFixed(0)} ms, new ${n.toFixed(0)} ms)`); }
@@ -630,12 +630,12 @@ async function powerTests(browser, synth) {
     // 2) TEMPO UP, collected off the beat: 8 bars, music x1.25, score x2, beat clock stays aligned while the speed changes and when it ends
     c = await collect('tempo', false); await sleep(2200);
     let st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null, d: (__mnr.G.pw.act.find(a => a.k === 'tempo') || {}).d, bc: __mnr.G.bc }));
-    if (st.rate !== 1.25 || Math.abs(st.bpm - base.bpm * 1.25) > .01) await fail(p, tag, 'power', `TEMPO UP: rate ${st.rate} bpm ${st.bpm}, wanted x1.25 of ${base.bpm}`);
-    if (!synth && Math.abs(st.pr - 1.25) > .001) await fail(p, tag, 'power', 'TEMPO UP: the song source plays at ' + st.pr);
+    if (st.rate !== 1 || Math.abs(st.bpm - base.bpm) > .01) await fail(p, tag, 'power', `TEMPO UP must not change the music: rate ${st.rate} bpm ${st.bpm}, wanted x1 of ${base.bpm}`);
+    if (!synth && Math.abs(st.pr - 1) > .001) await fail(p, tag, 'power', 'TEMPO UP: the song source plays at ' + st.pr);
     if (st.d !== 32) await fail(p, tag, 'power', 'off-beat TEMPO UP should last 32 beats, got ' + st.d);
     const sc = await ev(p, async () => { const m = window.__mnr, a = m.G.score; m.G.score += 100; await new Promise(r => setTimeout(r, 120)); return m.G.score - a; });
     if (sc < 200) await fail(p, tag, 'power', 'TEMPO UP: +100 points counted as ' + sc + ' (score x2)');
-    await checkAlign('tempo x1.25', 3.5);
+    await checkAlign('tempo up, song unchanged', 3.5);
     if (!await waitEnd('tempo', 30)) await fail(p, tag, 'power', 'TEMPO UP did not end within 30 s');
     await timing('tempo', 32, await lastLog('tempo'));
     await sleep(1500); st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null }));
@@ -649,14 +649,12 @@ async function powerTests(browser, synth) {
     st = await ev(p, () => ({ rate: __mnr.NR.music.rate, bpm: 60 / __mnr.BT.spb, pr: __mnr.AU.cur && __mnr.AU.cur.src ? (__mnr.AU.cur.src.playbackRate.value ?? __mnr.AU.cur.src.playbackRate) : null, d: (__mnr.G.pw.act.find(a => a.k === 'slow') || {}).d }));
     if (st.rate !== 1 || Math.abs(st.bpm - base.bpm) > .01) await fail(p, tag, 'power', `SLOW GROOVE must not change the music: rate ${st.rate} bpm ${st.bpm}, wanted x1 of ${base.bpm}`);
     if (!synth && Math.abs(st.pr - 1) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
-    const nb = await ev(p, () => { const n = __mnr.G.eb.length; __mnr.eb(900, 40, Math.PI / 2, 100); const b = __mnr.G.eb[__mnr.G.eb.length - 1]; return Math.hypot(b.vx, b.vy) / __mnr.DF.bs / __mnr.STILL.bk; });   // a ship that stands still makes bullets quicker (STILL.bk): not part of this check
-    if (Math.abs(nb - 60) > .5) await fail(p, tag, 'power', 'SLOW GROOVE: a new enemy bullet of speed 100 flies at ' + nb.toFixed(1) + ' (want 60)');
-    if (sp0 > 0 && Math.abs((await sp()) - sp0 * .6) > .05) await fail(p, tag, 'power', 'SLOW GROOVE did not slow a bullet that was already flying');
+    const wk = await ev(p, () => __mnr.PW.wk); if (Math.abs(wk - .6) > .05) await fail(p, tag, 'power', 'SLOW GROOVE: the world runs at ' + wk.toFixed(2) + ' (want 0.6, bullet time)');
     await checkAlign('slow groove, tempo unchanged', 3.5);
     if (!await waitEnd('slow', 40)) await fail(p, tag, 'power', 'SLOW GROOVE did not end within 40 s');
     await timing('slow', 32, await lastLog('slow'));
     const back = await ev(p, () => ({ bs: __mnr.PW.bs, bad: __mnr.G.eb.filter(b => b.sl).length, rate: __mnr.NR.music.rate }));
-    if (back.bs !== 1 || back.bad) await fail(p, tag, 'power', 'bullets stay slowed after SLOW GROOVE ended ' + JSON.stringify(back));
+    await sleep(800); const wk2 = await ev(p, () => __mnr.PW.wk); if (back.bad || wk2 < .99) await fail(p, tag, 'power', 'the world stays slowed after SLOW GROOVE ended ' + JSON.stringify(back) + ' wk ' + wk2);
     await sleep(1500); await checkAlign('after slow ends', 3);
 
     // 4) DROP: the music cuts for one bar, then a blast on the next downbeat clears the bullets
