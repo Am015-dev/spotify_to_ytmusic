@@ -90,3 +90,5 @@ Then the same for the other shared parts a game is missing: `gx-campaign.js` + `
 kot, xw, ft, carc, kaiten, final-approach, short-fuse, tidewake, hollowbough, lantern-dive; needs `campaign.json` + `GXC.init`),
 `gx-kit.js/.css` (only hollowbough has it), `gx-viewport.js` (only lantern-dive has it; roll out after its worker lands it).
 Do the migration as one worker per game (Sonnet), each followed by `build-all.py <slug>`; the games' own css/js stay as they are.
+
+- After a round with new screenshots, run `python3 games-src/scripts/shots-gallery.py`: it rebuilds games/shots.html, the owner's grid of every worker screenshot.
