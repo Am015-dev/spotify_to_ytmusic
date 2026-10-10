@@ -12,7 +12,7 @@ SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-viewport.js': os.p
        'netroom.js': os.path.join(SP, 'net', 'netroom.js')}
 CAMP = 'window.CAMPAIGN=' + rd(os.path.join(D, '..', 'campaign.json')).strip() + ';'
 ORDER = ['shell.js', 'gx-viewport.js', 'gx-help.js', 'gx-tutor.js', 'gx-campaign.js', 'campaign-data.js', 'gameaudio.js', 'audio-data.js', 'trystero.min.js', 'netroom.js',
-         'data.js', 'djinns.js', 'engine.js', 'ai.js', 'tutdata.js', 'rules-html.js', 'story.js', 'sound.js', 'net.js', 'ui.js', 'ui2.js', 'ui3.js', 'hlp.js', 'tutor.js']
+         'data.js', 'djinns.js', 'engine.js', 'ai.js', 'tutdata.js', 'rules-html.js', 'story.js', 'sound.js', 'net.js', 'ui.js', 'ui2.js', 'ui3.js', 'hlp.js', 'tutor.js', 'paint.js']
 for f in ORDER:
     tag = f'<script src="{f}"></script>'; assert tag in b, f
     src = CAMP if f == 'campaign-data.js' else rd(SRC.get(f, os.path.join(D, f)))

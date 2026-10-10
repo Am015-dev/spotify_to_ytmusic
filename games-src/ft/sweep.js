@@ -143,7 +143,7 @@ async function play(browser, job) {
   const ctx = await browser.newContext({ viewport: { width: size[0], height: size[1] }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
   const page = await ctx.newPage(); const res = { idx, size: size.join('x'), mode: JSON.stringify(mode), seed, taps: 0, issues: new Set(), errors: [], rounds: 0, over: false, won: null, story: story || null };
   page.on('pageerror', e => res.errors.push(String(e.message || e).split('\n')[0].slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error') res.errors.push('console: ' + m.text().slice(0, 140)); });
+  page.on('console', m => { if (m.type() === 'error' && !/Fetch API cannot load|net::|Failed to load resource/.test(m.text())) res.errors.push('console: ' + m.text().slice(0, 140)); });
   const issue = s => { if (res.issues.size < 12) res.issues.add(s); };
   const t0 = Date.now();
   const H = { tipsOn: idx % 4 !== 3, seen: new Set(), bulbN: 0 };

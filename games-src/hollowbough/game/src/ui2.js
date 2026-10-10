@@ -169,7 +169,7 @@ function tileInfo(kind, i) {
 }
 function tileFace(t, big) {
   const px = big ? 28 : (t.ip || 20); let f = h('div.face');
-  const key = t.kind === 'basic' ? D.basic[t.i].key : t.kind === 'forest' ? D.forest[G.forest[t.i]].key : '';
+  const key = t.kind === 'basic' ? D.basic[t.i].key : t.kind === 'forest' ? D.forest[G.forest[t.i]].key : t.kind === 'bev' ? D.basicEvents[G.bev[t.i].k].key : t.kind === 'sev' ? D.specialEvents[G.sev[t.i].k].key : '';
   f.innerHTML = spotArt(t.kind, key, t.i);
   switch (t.kind) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
