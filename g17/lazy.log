@@ -1,0 +1,9 @@
+before {"on":1,"t":1.25,"T":2.25,"n":32,"shown":20,"last":"rod|car|45","got":0,"wait":0,"sel":"rod"}
+100 {"on":1,"t":0.34,"T":3,"n":32,"shown":4,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+400 {"on":1,"t":0.8,"T":3,"n":32,"shown":10,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+900 {"on":1,"t":1.36,"T":3,"n":32,"shown":16,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+1500 {"on":1,"t":1.75,"T":3,"n":32,"shown":20,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+2200 {"on":1,"t":2.26,"T":3,"n":32,"shown":26,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+3000 {"on":1,"t":2.42,"T":3,"n":32,"shown":28,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+4000 {"on":1,"t":2.77,"T":3,"n":32,"shown":32,"last":"t_v7991_1|car|186","got":true,"wait":0,"sel":"t_v7991_1"}
+errs 0 []
