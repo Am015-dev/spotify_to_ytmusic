@@ -8,7 +8,7 @@ const OD_CHECKLIST=[
  {ver:'v90g',id:'fra-props',text:'Frankfurt: Pizza To Go shop (a person fits through the door), a phone booth, the LEGO fountain on a lawn, and a speedboat IN the river.'},
  {ver:'v90g',id:'ath-display',text:'Athens: the little lighthouse and the house stand on low display plinths, true LEGO size (not blown up).'},
  {ver:'v90g',id:'bigrig',text:'Frankfurt: drive 2 minutes: the yellow Big Rig appears in traffic only on wide roads and never cuts a kerb or a corner.'},
- {ver:'v90g',id:'land2',text:'Frankfurt planters/dumpsters and Athens street lamps look like LEGO parts; both cities run as smoothly as before.'},
+ {ver:'v90g',id:'land2',text:'Frankfurt planters/dumpsters, Athens street lamps and the Syntagma race palms look like LEGO parts; both cities run as smoothly as before.'},
  {ver:'v90f',id:'town-fwd',text:'Equip Town Roadster, then Ladder Truck: the bonnet/cab points forward and the car drives forwards.'},
  {ver:'v90f',id:'pol-fire',text:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker look complete; drive two of them.'},
  {ver:'v90f',id:'w4956',text:'Frankfurt: a LEGO House (4956) stands by a street near the start; a person fits through its door.'},

@@ -347,7 +347,7 @@ uses: 20(23), 30(21), 92(17), 98ld(17), 53(14), 93(8), 10(7), 70(7), 98ld(6), 85
 
 ## 98ld_l_land.js — 14 KB
 defines: LDS LDS_lathe LDS_tri LDS_lamp LDS_fence LDS_crate LDS_fit LDS_planter LDS_dumpster LDS_palm LDS_scan LDS_ab
-uses: 53(18), 30(17), 60(10), 20(10), 10(10), 97(8), 70(3), 98ld(3), 72(1)
+uses: 30(18), 53(18), 10(11), 60(10), 20(9), 97(8), 70(3), 98ld(3)
 
 ## 98ld_run.js — 5 KB
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
