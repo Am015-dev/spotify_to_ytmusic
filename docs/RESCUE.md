@@ -34,7 +34,7 @@ MODEL_CATALOG (alex/od-mdl-land), git logs of alex/od-mdl-veh, alex/od-mdl-world
 - 3718, 6376: never converted (no 1×4 door); the 6350 doorway method applies if wanted.
 - Palm tree, bush: land lane (alex/od-mdl-land).
 - 75893b coupe in Athens traffic: city-1's open heap issue.
-- Garage floor dark patch under 621/1572/6668/6526/6669: garage-18.
+- Garage floor dark patch under 621/1572/6668/6526/6669: garage-18 found it (tile plane z-fights its rim box with a far camera) and fixed it in src/98s_garage_studio.js, alex/od-garage18 @87df4d3; it ships with their garage release.
 
 ## Tools changed (rescue-1)
 wShot.js, ldAB.js and ldDoor.js call LD_need first (lazy models). ldDoor.js has env DOORFX/DOORIN for an opening without a door part.
