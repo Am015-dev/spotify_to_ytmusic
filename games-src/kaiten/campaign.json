@@ -1,0 +1,290 @@
+{
+  "game": "kaiten",
+  "title": "The Golden Plate",
+  "version": 1,
+  "cast": {
+    "suzu":  { "name": "Auntie Suzu", "portrait": "camp-suzu.webp", "emoji": "🍵", "color": "#b5452a" },
+    "mina":  { "name": "Mina", "portrait": "camp-mina.webp", "emoji": "🍣", "color": "#e5553a" },
+    "pip":   { "name": "Pip", "portrait": "camp-pip.webp", "emoji": "🥟", "color": "#5aa83c" },
+    "kofi":  { "name": "Kofi", "portrait": "camp-kofi.webp", "emoji": "🚌", "color": "#7a5ac8" },
+    "odile": { "name": "Odile", "portrait": "camp-odile.webp", "emoji": "🍮", "color": "#e0a31c" },
+    "taro":  { "name": "Taro", "portrait": "camp-taro.webp", "emoji": "🍜", "color": "#2a97a0" }
+  },
+  "acts": [
+    { "act": 1, "title": "The Lunch Belt", "blurb": "Learn what every plate is worth, one dish at a time." },
+    { "act": 2, "title": "The Dinner Rush", "blurb": "Fuller tables, sharper regulars, and dessert on the line." },
+    { "act": 3, "title": "The Midnight Belt", "blurb": "Only the night-shift regulars remain. Win the Golden Plate." }
+  ],
+  "twists": [
+    { "id": "custard-head-start", "where": "setup", "how": "Right after the deal, move `param` Custard Cups from the deck into the boss seat's kept cups (p.pud), so they count at the end of the game." },
+    { "id": "boss-head-start", "where": "scoring", "how": "At the end of the game, add `param` points to the boss seat's final total before the winner is decided." },
+    { "id": "roll-banner", "where": "scoring", "how": "When each round is scored, the boss seat counts `param` extra roll icons in the roll race (the extra icons alone never score)." },
+    { "id": "roll-fever", "where": "ai", "how": "While the chapter is played, multiply the computer's roll-race weight (AI.params.makiFut) by `param`, so it chases Seaweed Rolls harder." },
+    { "id": "sweet-tooth", "where": "ai", "how": "While the chapter is played, multiply the computer's custard weight (AI.params.pudFut) by `param`, so it hoards Custard Cups." },
+    { "id": "long-think", "where": "ai", "how": "Hard computer seats pass opts.units = `param` (default 250) to KK.AI.choose, so they test more possible hands before each pick." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "First Plates", "boss": false,
+      "intro": [
+        { "who": "suzu", "text": "Welcome to the Turning Plate, Mina. Lunch is quiet, so let's practise." },
+        { "who": "suzu", "text": "Pick one plate, then pass the rest of your hand along the belt. That's all there is to it." },
+        { "who": "pip", "text": "I want one of everything! Hi! Can I sit here?" }
+      ],
+      "outro": [
+        { "who": "suzu", "text": "See? Steam Buns get better the more you stack. Remember that ladder." },
+        { "who": "pip", "text": "You beat me! Next time I'm taking ALL the buns." }
+      ],
+      "opponent": { "name": "Pip", "portrait": "camp-pip.webp", "emoji": "🥟", "cast": "pip",
+        "personality": "Cheerful and hungry, picks whichever plate looks happiest.",
+        "aiLevel": "easy", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": [4], "level": "easy", "lv": ["easy", "easy", "easy", "easy"] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the meal against Pip." },
+      "hints": true,
+      "stars": [
+        { "text": "Win the meal", "test": { "k": "won" } },
+        { "text": "Score 6 or more from Steam Buns", "test": { "k": "bunPts", "op": ">=", "v": 6 } },
+        { "text": "Score 40 points or more", "test": { "k": "score", "op": ">=", "v": 40 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Pip is already as gentle as can be; the hints stay on." },
+      "unlock": [ { "type": "portrait", "id": "pip", "text": "Pip's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Sets of Three", "boss": false,
+      "intro": [
+        { "who": "suzu", "text": "Fish Slices are fussy: one or two score nothing, three make 10 points." },
+        { "who": "suzu", "text": "If you start a set, watch what's coming round. Finish it or don't start it." },
+        { "who": "pip", "text": "I don't get it, but fish are pretty." }
+      ],
+      "outro": [
+        { "who": "suzu", "text": "A finished set is the biggest single plate on the belt. Well timed." }
+      ],
+      "opponent": { "name": "Pip", "portrait": "camp-pip.webp", "emoji": "🥟", "cast": "pip",
+        "personality": "Grabs what looks nice, so half-built sets often survive the trip round.",
+        "aiLevel": "easy", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": [4], "level": "easy", "lv": ["easy", "easy", "easy", "easy"] },
+      "twist": null,
+      "goal": { "type": "custom", "value": 10, "text": "Win, scoring at least 10 points from Fish Slices." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 10+ points from Fish Slices", "test": { "k": "fishPts", "op": ">=", "v": 10 } },
+        { "text": "Score 20 or more from Fish Slices", "test": { "k": "fishPts", "op": ">=", "v": 20 } },
+        { "text": "Win by 10 or more", "test": { "k": "margin", "op": ">=", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Just win the meal; the Fish Slice target becomes a bonus star." },
+      "unlock": [ { "type": "title", "id": "set-builder", "text": "Title: Set Builder" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "The Roll Race", "boss": false,
+      "intro": [
+        { "who": "kofi", "text": "Room for one more? I just finished my bus route and I want rolls!" },
+        { "who": "suzu", "text": "Each round, most roll icons scores 6 and second most scores 3. Count the icons, not the cards." },
+        { "who": "suzu", "text": "Three diners now: hands pass round faster than you think." }
+      ],
+      "outro": [
+        { "who": "kofi", "text": "Ha! You out-rolled me. I'm cheering anyway!" },
+        { "who": "suzu", "text": "Rolls are a race. Sometimes the smart move is second place for 3." }
+      ],
+      "opponent": { "name": "Kofi", "portrait": "camp-kofi.webp", "emoji": "🚌", "cast": "kofi",
+        "personality": "Loud, friendly, and he loves a roll race.",
+        "aiLevel": "easy", "aiStyle": "standard" },
+      "setup": { "np": 3, "seats": [3, 4], "level": "easy", "lv": ["easy", "easy", "easy", "easy"] },
+      "twist": null,
+      "goal": { "type": "custom", "value": 2, "text": "Win, taking the 6-point roll prize in at least 2 of the 3 rounds." },
+      "hints": true,
+      "stars": [
+        { "text": "Take the roll prize in 2 rounds", "test": { "k": "rollWins", "op": ">=", "v": 2 } },
+        { "text": "Score 12 or more from Seaweed Rolls", "test": { "k": "rollPts", "op": ">=", "v": 12 } },
+        { "text": "Score 40 points or more", "test": { "k": "score", "op": ">=", "v": 40 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "np": 2, "seats": [3] }, "maxStars": 2, "text": "Just you and Kofi, so there is only one rival in the roll race." },
+      "unlock": [ { "type": "portrait", "id": "kofi", "text": "Kofi's portrait" } ]
+    },
+    {
+      "id": "c4", "act": 1, "title": "Kofi's Lunch Rush", "boss": true,
+      "intro": [
+        { "who": "kofi", "text": "Lunch rush! Everyone on my route comes here. Let's make it a contest." },
+        { "who": "suzu", "text": "Fire Paste triples the next nigiri you serve on it. A Moon Nigiri becomes 9." },
+        { "who": "suzu", "text": "Kofi will chase rolls. Let him, and feed your paste instead." }
+      ],
+      "outro": [
+        { "who": "suzu", "text": "You've learned every plate on the lunch belt. The dinner crowd is tougher." },
+        { "who": "kofi", "text": "Best lunch of the week, even though I lost. Come for dinner!" }
+      ],
+      "opponent": { "name": "Kofi", "portrait": "camp-kofi.webp", "emoji": "🚌", "cast": "kofi",
+        "personality": "Bus driver, knows every regular, throws everything at the roll race.",
+        "aiLevel": "easy", "aiStyle": "roll-fever",
+        "taunt": "Ding ding! All aboard the roll express. Better luck next stop!",
+        "praise": "Ha! You cleaned me out. That's the best ride I've had all week." },
+      "setup": { "np": 2, "seats": [3], "level": "easy", "lv": ["easy", "easy", "easy", "easy"] },
+      "twist": { "id": "roll-fever", "param": 1.4, "text": "Boss rule: Kofi chases Seaweed Rolls even harder than usual." },
+      "goal": { "type": "win", "value": null, "text": "Win the meal against Kofi." },
+      "hints": true,
+      "stars": [
+        { "text": "Win the meal", "test": { "k": "won" } },
+        { "text": "Earn 4 or more bonus points from Fire Paste", "test": { "k": "pasteBonus", "op": ">=", "v": 4 } },
+        { "text": "Score 45 points or more", "test": { "k": "score", "op": ">=", "v": 45 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Kofi plays his usual game; no extra roll chasing." },
+      "unlock": [ { "type": "act", "id": "2", "text": "Act 2: The Dinner Rush" }, { "type": "cardback", "id": "lunch-belt", "text": "Lunch Belt card back" } ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "Dessert First", "boss": false,
+      "intro": [
+        { "who": "odile", "text": "Young lady, I have never left this belt without dessert. Not once in forty years." },
+        { "who": "suzu", "text": "Custard Cups stay with you to the end. With two diners, most cups scores 6." },
+        { "who": "suzu", "text": "The dinner regulars play properly. No more gentle passes." }
+      ],
+      "outro": [
+        { "who": "odile", "text": "Well! You ate your vegetables and your dessert. I approve." }
+      ],
+      "opponent": { "name": "Odile", "portrait": "camp-odile.webp", "emoji": "🍮", "cast": "odile",
+        "personality": "Retired baker in a tall hat; fair, steady, never skips dessert.",
+        "aiLevel": "normal", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": [2], "level": "normal", "lv": ["normal", "normal", "normal", "normal"] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the meal against Odile." },
+      "hints": false,
+      "stars": [
+        { "text": "Win the meal", "test": { "k": "won" } },
+        { "text": "Score the 6 custard points", "test": { "k": "custardPts", "op": ">=", "v": 6 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Odile is in a generous mood tonight." },
+      "unlock": [ { "type": "portrait", "id": "odile", "text": "Odile's portrait" } ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "Table for Three", "boss": false,
+      "intro": [
+        { "who": "kofi", "text": "Dinner shift's over. Budge up, Odile!" },
+        { "who": "suzu", "text": "Three at the belt again, and now both of them play well." },
+        { "who": "suzu", "text": "With three diners, fewest Custard Cups loses 6. Don't end with none." }
+      ],
+      "outro": [
+        { "who": "suzu", "text": "Forty points at a full dinner table. The midnight crowd has noticed you." }
+      ],
+      "opponent": { "name": "Kofi and Odile", "portrait": "camp-kofi.webp", "emoji": "🚌", "cast": "kofi",
+        "personality": "Kofi races for rolls while Odile quietly collects dessert.",
+        "aiLevel": "normal", "aiStyle": "standard" },
+      "setup": { "np": 3, "seats": [2, 3], "level": "normal", "lv": ["normal", "normal", "normal", "normal"] },
+      "twist": null,
+      "goal": { "type": "score", "value": 40, "text": "Win with at least 40 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with 40 or more", "test": { "k": "score", "op": ">=", "v": 40 } },
+        { "text": "Don't lose points for fewest Custard Cups", "test": { "k": "custardPts", "op": ">=", "v": 0 } },
+        { "text": "Score 20 or more in a single round", "test": { "k": "bestRound", "op": ">=", "v": 20 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Kofi and Odile have had a long day and play more loosely." },
+      "unlock": [ { "type": "table", "id": "dinner-counter", "text": "Dinner counter table skin" } ]
+    },
+    {
+      "id": "c7", "act": 2, "title": "Odile's Sweet Table", "boss": true,
+      "intro": [
+        { "who": "odile", "text": "Tonight I brought my own custard from the bakery. A head start, dear." },
+        { "who": "suzu", "text": "She'll hoard cups. You can fight her for them, or out-score the 6 points she wins." },
+        { "who": "suzu", "text": "Either way, count her cups before you pass her a hand full of dessert." }
+      ],
+      "outro": [
+        { "who": "odile", "text": "Forty years, and you are the first to beat me at my own dessert." },
+        { "who": "suzu", "text": "There's one regular left. He only comes in after midnight." }
+      ],
+      "opponent": { "name": "Odile", "portrait": "camp-odile.webp", "emoji": "🍮", "cast": "odile",
+        "personality": "Polite, patient, and utterly unwilling to give up a Custard Cup.",
+        "aiLevel": "normal", "aiStyle": "sweet-tooth",
+        "taunt": "Dessert always wins, dear. Do come again tomorrow.",
+        "praise": "Bravo. Take the last custard, you've earned it." },
+      "setup": { "np": 2, "seats": [2], "level": "normal", "lv": ["normal", "normal", "normal", "normal"] },
+      "twist": { "id": "custard-head-start", "param": 1, "text": "Boss rule: Odile starts the meal with 1 Custard Cup already kept." },
+      "goal": { "type": "win", "value": null, "text": "Win the meal against Odile." },
+      "hints": false,
+      "stars": [
+        { "text": "Win the meal", "test": { "k": "won" } },
+        { "text": "Score 50 points or more", "test": { "k": "score", "op": ">=", "v": 50 } },
+        { "text": "Win by 8 or more", "test": { "k": "margin", "op": ">=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Odile plays gently and leaves her own custard at home." },
+      "unlock": [ { "type": "act", "id": "3", "text": "Act 3: The Midnight Belt" }, { "type": "cardback", "id": "custard", "text": "Custard card back" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "The Night Shift", "boss": false,
+      "intro": [
+        { "who": "taro", "text": "Suzu says you're good. I count every plate. Let's see." },
+        { "who": "suzu", "text": "Taro remembers every hand he has seen. Don't leave him easy pairs." },
+        { "who": "suzu", "text": "No tricks tonight: just you, him, and a clean belt." }
+      ],
+      "outro": [
+        { "who": "taro", "text": "Hm. You took the last prawn on purpose. I noticed." }
+      ],
+      "opponent": { "name": "Taro", "portrait": "camp-taro.webp", "emoji": "🍜", "cast": "taro",
+        "personality": "Quiet noodle cook who eats at midnight and punishes every loose plate.",
+        "aiLevel": "hard", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": [1], "level": "hard", "lv": ["hard", "hard", "hard", "hard"] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the meal against Taro." },
+      "hints": false,
+      "stars": [
+        { "text": "Win the meal", "test": { "k": "won" } },
+        { "text": "Score 50 points or more", "test": { "k": "score", "op": ">=", "v": 50 } },
+        { "text": "Never leave Fire Paste unused at a round's end", "test": { "k": "wastedPaste", "op": "<=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "level": "normal", "lv": ["normal", "normal", "normal", "normal"] }, "maxStars": 2, "text": "Taro is tired after his shift and plays at normal strength." },
+      "unlock": [ { "type": "portrait", "id": "taro", "text": "Taro's portrait" } ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "Full Belt at Midnight", "boss": false,
+      "intro": [
+        { "who": "kofi", "text": "Night bus is parked! Is this the big one? I brought Odile and Pip." },
+        { "who": "suzu", "text": "Five diners, seven cards each. Plates come back to you far less often." },
+        { "who": "suzu", "text": "Taro plays at full strength; the others are here for fun, mostly." }
+      ],
+      "outro": [
+        { "who": "pip", "text": "That was the loudest dinner ever. You won it!" },
+        { "who": "taro", "text": "Tomorrow, the Golden Plate. Just us." }
+      ],
+      "opponent": { "name": "Taro and friends", "portrait": "camp-taro.webp", "emoji": "🍜", "cast": "taro",
+        "personality": "Taro hunts points while the regulars scramble for rolls and custard.",
+        "aiLevel": "hard", "aiStyle": "standard" },
+      "setup": { "np": 5, "seats": [1, 2, 3, 4], "level": "hard", "lv": ["hard", "normal", "normal", "easy"] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the meal with all five diners at the belt." },
+      "hints": false,
+      "stars": [
+        { "text": "Win the meal", "test": { "k": "won" } },
+        { "text": "Don't lose points for fewest Custard Cups", "test": { "k": "custardPts", "op": ">=", "v": 0 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "level": "normal", "lv": ["normal", "normal", "easy", "easy"] }, "maxStars": 2, "text": "Taro plays at normal strength and Kofi and Pip play gently." },
+      "unlock": [ { "type": "table", "id": "midnight-belt", "text": "Midnight belt table skin" } ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Golden Plate", "boss": true,
+      "intro": [
+        { "who": "suzu", "text": "Once a year, the best diner at my belt eats from the Golden Plate." },
+        { "who": "taro", "text": "I've held it three years. The house gives the champion a little head start." },
+        { "who": "suzu", "text": "He's sharp, Mina, but he can only take one plate a turn. Same as you." }
+      ],
+      "outro": [
+        { "who": "taro", "text": "The plate is yours. I'll be here tomorrow night. And the next." },
+        { "who": "suzu", "text": "The Golden Plate, Mina. The whole belt is clapping." }
+      ],
+      "opponent": { "name": "Taro", "portrait": "camp-taro.webp", "emoji": "🍜", "cast": "taro",
+        "personality": "Three-time champion; silent, exact, never wastes a pick.",
+        "aiLevel": "hard", "aiStyle": "standard",
+        "taunt": "Every plate counted. Every plate mine. Come back next year.",
+        "praise": "You counted better than me tonight. Eat well, champion." },
+      "setup": { "np": 2, "seats": [1], "level": "hard", "lv": ["hard", "hard", "hard", "hard"] },
+      "twist": { "id": "boss-head-start", "param": 3, "text": "Boss rule: the reigning champion Taro adds 3 points to his final total." },
+      "goal": { "type": "win", "value": null, "text": "Win the meal against Taro, champion's bonus and all." },
+      "hints": false,
+      "stars": [
+        { "text": "Win the Golden Plate", "test": { "k": "won" } },
+        { "text": "Score 55 points or more", "test": { "k": "score", "op": ">=", "v": 55 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "level": "normal", "lv": ["normal", "normal", "normal", "normal"] }, "maxStars": 2, "text": "Taro plays at normal strength and gets no champion's bonus." },
+      "unlock": [ { "type": "title", "id": "golden-plate", "text": "Title: Keeper of the Golden Plate" }, { "type": "cardback", "id": "golden", "text": "Golden card back" } ]
+    }
+  ]
+}

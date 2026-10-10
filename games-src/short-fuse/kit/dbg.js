@@ -1,0 +1,14 @@
+const PW = require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright');
+const fs = require('fs'), path = require('path'); const html = fs.readFileSync(path.join(__dirname, 'demo.html'));
+(async () => { const br = await PW.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+ const ctx = await br.newContext({ viewport: { width: 1366, height: 768 } }); await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+ const pg = await ctx.newPage(); pg.setDefaultTimeout(150000); await pg.goto('https://gns.test/?static&noqbar&gfx=low'); await pg.waitForFunction(() => window.DEMO_READY === true);
+ const r = await pg.evaluate(async () => { const n = 3; SFKit.setSpeed(1000);
+   for (const k in SFKit._K.st.stands) SFKit.setStand(+k.split(':')[0], +k.split(':')[1], []);
+   SFKit._K.st.stands = {}; SFKit.setPlayers(n, 0, {});
+   const stands = [[0, 0], [0, 1], [1, 0], [2, 0]]; let id = 0;
+   stands.forEach(([s, st]) => { const t = []; for (let i = 0; i < 13; i++) t.push({ id: 'x' + (id++), known: s === 0, color: 'blue', value: 1 + i % 12, cut: i % 5 === 2 }); SFKit.setStand(s, st, t); });
+   await new Promise(r => setTimeout(r, 4000)); const K = SFKit._K;
+   const recs = Object.values(K.recs).filter(r => r.key !== '__gone'); return [SFKit._dbgPose('x0'), SFKit._dbgPose('x30'), recs.slice(0,2).map(r => [r.id, r.s.x, r.anim && { t0: r.anim.t0, d: r.anim.d, now: performance.now() }])];
+ });
+ console.log(r.map(x => JSON.stringify(x)).join('\n')); await br.close(); })();

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Short Fuse Kit</title>
+<style>
+:root{--ink:#1c1838;--cream:#fff2d4;--bg:#f4c48a}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
+#stage{position:fixed;inset:0}
+#c3{display:block;width:100%;height:100%}
+#fb{position:absolute;inset:0;overflow:auto;display:none}
+#qbar{position:fixed;right:10px;bottom:10px;z-index:20;display:flex;gap:4px;font:14px 'Lilita One','Arial Black',sans-serif}
+#qbar button{font:inherit;color:#fff;background:#2b2f63;border:2px solid var(--ink);border-radius:9px;padding:4px 9px;box-shadow:0 3px 0 var(--ink);cursor:pointer}
+#qbar button.on{background:#ff8a1f}
+#qbar button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="c3"></canvas><div id="fb"></div></div>
+<div id="qbar"><button data-q="high">High</button><button data-q="medium">Med</button><button data-q="low">Low</button></div>
+<script>/*THREE*/</script>
+<script>/*KIT*/</script>
+<script>
+(function(){
+var P=new URLSearchParams(location.search);
+var q=P.get('gfx')||'auto', STATIC=P.has('static');
+var cv=document.getElementById('c3'), fb=document.getElementById('fb');
+var res=SFKit.init(cv,{quality:q==='auto'?undefined:q,fallback:fb,force2D:P.has('2d'),preserveDrawingBuffer:P.has('pdb')});
+if(!res.ok){cv.style.display='none';fb.style.display='block';}
+// ---- a deterministic mid-game deal: mission 9, 4 players, 48 blue + 1 red + 2 yellow ----
+var seed=9;function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
+var pool=[];for(var v=1;v<=12;v++)for(var k=0;k<4;k++)pool.push({color:'blue',value:v});
+pool.push({color:'red',value:7.5});pool.push({color:'yellow',value:3.1});pool.push({color:'yellow',value:9.1});
+for(var i=pool.length-1;i>0;i--){var j=Math.floor(rnd()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t}
+var hands=[[],[],[],[]];pool.forEach(function(t,i){hands[i%4].push(t)});
+var id=0;hands=hands.map(function(h,s){h.sort(function(a,b){return a.value-b.value});return h.map(function(t){return {id:'w'+(id++),color:t.color,value:t.value,known:s===0,cut:false}})});
+// cut pairs of 2, 5, 11 (all four 11s -> validated), some info tokens
+function cutVal(v,n){var c=0;for(var s=0;s<4&&c<n;s++)hands[s].forEach(function(t){if(c<n&&t.color==='blue'&&t.value===v&&!t.cut){t.cut=true;t.known=true;c++}})}
+cutVal(11,4);cutVal(2,2);cutVal(5,2);cutVal(8,2);
+function info(s,idx){var t=hands[s][idx];if(t&&!t.cut)t.infoToken=t.color==='yellow'?'yellow':t.value}
+info(1,3);info(2,6);info(3,1);info(0,9);info(1,10);info(3,8);info(2,2);
+hands[2].forEach(function(t){if(t.color==='yellow')t.infoToken='yellow'});
+var names=['You','Wren','Pike','Moss'];
+SFKit.setPlayers(4,0,{names:names,captain:1});
+function pushStands(){for(var s=0;s<4;s++)SFKit.setStand(s,0,hands[s].map(function(t){var o={};for(var k in t)o[k]=t[k];if(s!==0&&!t.cut)o.known=false;return o}))}
+pushStands();
+SFKit.setDial(2,4);
+SFKit.setTurn(0);
+SFKit.setTokens({validation:[11],markers:[{color:'red',value:7.5},{color:'yellow',value:3.1},{color:'yellow',value:9.1}]});
+SFKit.setEquipment([
+ {id:'eq2',name:'Handsets',timing:'any_time',unlock:{value:2,count:2},state:'ready',effect:'Swap one wire with a teammate, face down.'},
+ {id:'eq6',name:'Rewind',timing:'any_time',unlock:{value:6,count:2},state:'locked',effect:'Move the detonator dial back one step.'},
+ {id:'eq8',name:'Sweep',timing:'any_time',unlock:{value:8,count:2},state:'used',effect:'Call a number: everyone says yes if they hold one.'},
+ {id:'eq11',name:'Coffee Break',timing:'your_turn',unlock:{value:11,count:2},state:'ready',effect:'Skip your turn and choose who goes next.'}
+]);
+SFKit.setMissionCards({mission:{number:9,name:'Pecking Order',text:'Lay out 3 number cards. Their wires must be cut in order: 2 of the first value before moving on to the next. The sequence card marks the active value.'},numbers:[{value:5,done:true},{value:3},{value:10}],sequence:{side:'A',at:1}});
+SFKit.setCharacters([{seat:0,name:'Tally',item:'double_probe'},{seat:1,name:'Squad Lead',item:'double_probe',captain:true},{seat:2,name:'Pike',item:'double_probe',used:true},{seat:3,name:'Moss',item:'double_probe'}]);
+// legal targets: uncut wires on Pike's stand
+var hl=hands[2].filter(function(t){return !t.cut}).slice(0,6).map(function(t){return t.id});
+SFKit.highlight(hl);
+function fit(){SFKit.resize(innerWidth,innerHeight)}
+addEventListener('resize',fit);fit();
+// ---- scripted beats ----
+var mine=hands[0], opp=hands[1];
+function findUncut(h,v){for(var i=0;i<h.length;i++)if(!h[i].cut&&h[i].color==='blue'&&(v==null||h[i].value===v))return h[i];return null}
+var D=window.DEMO={hands:hands,
+ cut:function(){var a=null,b=null;for(var v=1;v<=12&&!b;v++){a=findUncut(mine,v);if(a){for(var s=1;s<4&&!b;s++){b=findUncut(hands[s],v);}}}if(!a||!b)return;a.cut=true;b.cut=true;b.known=true;pushStands();SFKit.highlight([]);setTimeout(function(){SFKit.fx('cut',b.id)},420);setTimeout(function(){SFKit.fx('cut',a.id)},900)},
+ boom:function(){var t=findUncut(hands[3]);SFKit.setDial(1,4);SFKit.fx('boom',t?t.id:null);if(t){t.infoToken=t.value;pushStands()}},
+ phew:function(){SFKit.setDial(2,4);SFKit.fx('phew','dial')},
+ win:function(){SFKit.fx('win')},
+ extras:function(){
+  var me=hands[0];me[me.length-1].marker='X';var u=me.filter(function(t){return !t.cut});u[1].marker='x2';u[3].infoToken='even';hands[1].filter(function(t){return !t.cut})[2].infoToken='odd';
+  pushStands();
+  SFKit.setTokens({validation:[11,2],markers:[{color:'red',value:7.5,unknown:true},{color:'yellow',value:3.1},{color:'yellow',value:9.1,unknown:true}],robot:{pos:6},oxygen:{reserve:7,perSeat:{0:3,1:2,2:4,3:1}},equal:{tiles:[u[0].id,u[1].id]},notEqual:{tiles:[u[4].id,u[5].id]},hero:{cell:[1,2]}});
+  SFKit.setMissionCards({mission:{number:66,name:'Final Stand',text:'The bunker mission: guide the hero through two floors while the crew defuses the last bomb.'},numbers:[{value:4},{value:8}],constraints:[{letter:'L'},{letter:'C',seat:1}],challenges:[{n:4},{n:7,done:true}],bunker:{floor:1}});
+  SFKit.setTokens(SFKit.getState().tokens);
+ },
+ reset:function(){location.reload()}
+};
+if(!STATIC){var beats=['cut','boom','phew','win'],bi=0;setInterval(function(){D[beats[bi%beats.length]]();bi++},3600)}
+// quality bar
+var qb=document.getElementById('qbar');function mark(){var a=SFKit.getQuality().active;[].forEach.call(qb.children,function(b){b.className=b.getAttribute('data-q')===a?'on':''})}
+qb.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;SFKit.setQuality(b.getAttribute('data-q'));mark()});mark();
+if(P.has('noqbar'))qb.style.display='none';
+cv.addEventListener('pointermove',function(e){SFKit.hover(e.clientX,e.clientY)});
+cv.addEventListener('click',function(e){var p=SFKit.pick(e.clientX,e.clientY);window.LASTPICK=p;if(p)console.log('pick',JSON.stringify({kind:p.kind,id:p.id,seat:p.seat,value:p.value}))});
+window.DEMO_READY=false;SFKit.ready.then(function(){setTimeout(function(){window.DEMO_READY=true},300)});
+})();
+</script>
+</body>
+</html>

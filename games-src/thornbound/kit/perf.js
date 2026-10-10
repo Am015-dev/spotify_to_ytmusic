@@ -1,0 +1,12 @@
+const PW = require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright');
+(async () => { const br = await PW.chromium.launch(); const pg = await br.newPage({ viewport: { width: 1000, height: 800 } });
+  await pg.goto('file://' + __dirname + '/demo.html?mode=pp'); await pg.waitForFunction(() => window.DONE);
+  const r = await pg.evaluate(() => { const o = {}; const C = Object.values(window.CARDS || {});
+    let t = performance.now(); const specs = []; for (let i = 0; i < 40; i++) specs.push(Object.assign({}, C[i % C.length], { title: C[i % C.length].title + ' ' + i }));
+    const hold = document.createElement('div'); document.body.appendChild(hold);
+    specs.forEach(s => hold.appendChild(TBKit.card(s, 260))); o.firstRender40_ms = Math.round(performance.now() - t);
+    hold.innerHTML = ''; t = performance.now(); for (let k = 0; k < 5; k++) specs.forEach(s => hold.appendChild(TBKit.card(s, 260))); o.cachedClone200_ms = Math.round(performance.now() - t);
+    hold.innerHTML = ''; t = performance.now(); for (let k = 0; k < 5; k++) specs.forEach(s => hold.appendChild(TBKit.card(s, 60))); o.firstSmall200_ms = Math.round(performance.now() - t);
+    hold.innerHTML = ''; t = performance.now(); specs.forEach(s => hold.appendChild(TBKit.card(s, 60))); o.cachedSmall40_ms = Math.round(performance.now() - t);
+    o.cache = TBKit.cacheStats(); const m = document.createElement('div'); document.body.appendChild(m); t = performance.now(); TBKit.map({ container: m }); o.mapBuild_ms = Math.round(performance.now() - t); return o; });
+  console.log(JSON.stringify(r)); await br.close(); })();

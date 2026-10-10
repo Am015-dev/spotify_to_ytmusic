@@ -1,0 +1,1035 @@
+{
+  "game": "short-fuse",
+  "title": "The Clockmaker's Calling Cards",
+  "version": 1,
+  "cast": {
+    "brix": {
+      "name": "Foreman Brix",
+      "portrait": "camp-brix.webp",
+      "emoji": "👷",
+      "color": "#d98b2b"
+    },
+    "tally": {
+      "name": "Tally",
+      "portrait": "camp-tally.webp",
+      "emoji": "📋",
+      "color": "#3f8f7a"
+    },
+    "wren": {
+      "name": "Wren",
+      "portrait": "camp-wren.webp",
+      "emoji": "🪢",
+      "color": "#6a7fc1"
+    },
+    "rig": {
+      "name": "The Training Rig",
+      "portrait": "camp-rig.webp",
+      "emoji": "🧰",
+      "color": "#7d8a96"
+    },
+    "quill": {
+      "name": "Vesper Quill, the Clockmaker",
+      "portrait": "camp-quill.webp",
+      "emoji": "🕰️",
+      "color": "#8e3b5c"
+    },
+    "mole": {
+      "name": "The Weak Link",
+      "portrait": "camp-mole.webp",
+      "emoji": "🎭",
+      "color": "#5a4a6e"
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "Boot Camp",
+      "blurb": "New hire on Foreman Brix's demolition crew. Learn to cut wires without lighting the fuse."
+    },
+    {
+      "act": 2,
+      "title": "Calling Cards",
+      "blurb": "Devices start turning up around town, each signed with a brass clock key."
+    },
+    {
+      "act": 3,
+      "title": "The Clock Tower",
+      "blurb": "The Clockmaker's last works. One tower, one fuse, no second chances."
+    }
+  ],
+  "twists": [
+    {
+      "id": "short-fuse",
+      "where": "setup",
+      "how": "In engine.js newGame, right after G.dial is set from the mission, apply G.dial = Math.max(1, G.dial - param), so the fuse starts param steps shorter."
+    },
+    {
+      "id": "lean-kit",
+      "where": "setup",
+      "how": "In engine.js newGame, right after setupEquip(M), move the last param cards of G.eq back to the front of G.eqPool (never below 0 cards), so fewer equipment cards are on the board."
+    },
+    {
+      "id": "green-hand",
+      "where": "setup",
+      "how": "When building newGame options, pass o.lv with the last computer seat set to 'easy' and every other computer seat at the chapter's setup.level, so one teammate is a rookie."
+    },
+    {
+      "id": "quiet-start",
+      "where": "setup",
+      "how": "In engine.js infoSetup, skip the later('infoStd', ...) step for computer seats (SP(seat).human false) so only human seats place an opening info token; other info modes are untouched."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c1",
+      "act": 1,
+      "title": "First Day on the Crew",
+      "boss": false,
+      "intro": [
+        {
+          "who": "brix",
+          "text": "Welcome to the crew, rookie. Today we only practise on blue wires, one to six."
+        },
+        {
+          "who": "brix",
+          "text": "Name a number, point at a teammate's wire. If it matches, you both cut. Simple."
+        },
+        {
+          "who": "tally",
+          "text": "Miss, and the fuse burns one step. I'll keep count. Try not to make me count high."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "Not one scorch mark. Same time tomorrow, and bring coffee."
+        }
+      ],
+      "opponent": {
+        "name": "The Training Rig",
+        "portrait": "camp-rig.webp",
+        "emoji": "🧰",
+        "cast": "rig",
+        "personality": "A plywood practice board. Patient, predictable and very forgiving.",
+        "aiLevel": "easy",
+        "aiStyle": "practice"
+      },
+      "setup": {
+        "mission": 1,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 1,
+        "text": "Clear Job 1 (Boot Camp I): cut every wire before the fuse burns down."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Make a solo cut at least once",
+          "test": {
+            "k": "solos",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Miss no more than 1 cut",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 1
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "brix",
+          "text": "Foreman Brix's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "act": 1,
+      "title": "Yellow Means Careful",
+      "boss": false,
+      "intro": [
+        {
+          "who": "brix",
+          "text": "New colour today. Every yellow wire counts as the same value: just 'yellow'."
+        },
+        {
+          "who": "tally",
+          "text": "There are only two of them in the rig. Find their owners before you name yellow."
+        }
+      ],
+      "outro": [
+        {
+          "who": "tally",
+          "text": "Two yellows, two clean cuts. I wrote that down twice for luck."
+        }
+      ],
+      "opponent": {
+        "name": "The Training Rig",
+        "portrait": "camp-rig.webp",
+        "emoji": "🧰",
+        "cast": "rig",
+        "personality": "Now with two yellow wires hidden in the blues.",
+        "aiLevel": "easy",
+        "aiStyle": "practice"
+      },
+      "setup": {
+        "mission": 2,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 2,
+        "text": "Clear Job 2 (Boot Camp II): cut every wire, including both yellows."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 1 cut",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Finish with 2 or more fuse steps left",
+          "test": {
+            "k": "left",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "tally",
+          "text": "Tally's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "act": 1,
+      "title": "The Red One",
+      "boss": false,
+      "intro": [
+        {
+          "who": "brix",
+          "text": "One red wire sits in this rig. Point at it and the whole job goes up. No second try."
+        },
+        {
+          "who": "wren",
+          "text": "Good news: the shelf has equipment now. Each card is a one-time trick for the crew."
+        },
+        {
+          "who": "brix",
+          "text": "If you're unsure, use a tool or ask a teammate's wire you're sure of."
+        }
+      ],
+      "outro": [
+        {
+          "who": "wren",
+          "text": "You walked right past the red. Steady hands, rookie."
+        },
+        {
+          "who": "brix",
+          "text": "Tomorrow is graduation. Sleep well."
+        }
+      ],
+      "opponent": {
+        "name": "The Training Rig",
+        "portrait": "camp-rig.webp",
+        "emoji": "🧰",
+        "cast": "rig",
+        "personality": "Hides a single red wire among forty blues. Still patient, now dangerous.",
+        "aiLevel": "easy",
+        "aiStyle": "practice"
+      },
+      "setup": {
+        "mission": 3,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 3,
+        "text": "Clear Job 3 (Boot Camp III) without ever pointing at the red wire."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Use at least 1 equipment card",
+          "test": {
+            "k": "eqUsed",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Miss no more than 1 cut",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 1
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "wren",
+          "text": "Wren's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "act": 1,
+      "title": "Graduation Day",
+      "boss": true,
+      "intro": [
+        {
+          "who": "brix",
+          "text": "Final exam: the full rig. All twelve blue values, a red and a yellow, maybe more."
+        },
+        {
+          "who": "tally",
+          "text": "The '?' markers show where a red or yellow MIGHT be. Not all of them are real."
+        },
+        {
+          "who": "brix",
+          "text": "Pass this and you get a crew jacket. Fail and you get a broom."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "That's a crew jacket. Wear it with pride."
+        },
+        {
+          "who": "tally",
+          "text": "Odd thing in the post today: a brass clock key and a card. 'See you soon.'"
+        }
+      ],
+      "opponent": {
+        "name": "The Graduation Rig",
+        "portrait": "camp-rig.webp",
+        "emoji": "🎓",
+        "cast": "rig",
+        "personality": "The full practice rig with decoy markers. Stern examiner, fair marker.",
+        "aiLevel": "easy",
+        "aiStyle": "decoys",
+        "taunt": "Rig wins this round. Reset the board and read the markers again.",
+        "praise": "Every wire safe. Welcome to the crew, properly this time."
+      },
+      "setup": {
+        "mission": 8,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": {
+        "id": "quiet-start",
+        "param": 1,
+        "text": "Boss rule: the computer crew keeps its opening tokens to itself."
+      },
+      "goal": {
+        "type": "mission",
+        "value": 8,
+        "text": "Clear Job 8 (Graduation): all 48 blues plus the red and yellow candidates."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 2 cuts",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Finish with 2 or more fuse steps left",
+          "test": {
+            "k": "left",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 4,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Bring a fourth crewmate: the fuse starts one step longer."
+      },
+      "unlock": [
+        {
+          "type": "title",
+          "id": "crew-jacket",
+          "text": "Title: Crew Jacket"
+        },
+        {
+          "type": "act",
+          "id": "act2",
+          "text": "Act 2: Calling Cards"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "act": 2,
+      "title": "The Painted Device",
+      "boss": false,
+      "intro": [
+        {
+          "who": "tally",
+          "text": "Call from the old cinema. A device, and a brass clock key taped to it."
+        },
+        {
+          "who": "quill",
+          "text": "One of the blue numbers is painted red, little crew. Guess which. Or rather, don't."
+        },
+        {
+          "who": "brix",
+          "text": "The card on the job sheet shows the painted number. Treat those four like reds."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "Paint doesn't fool us. Who signs their work 'the Clockmaker' anyway?"
+        }
+      ],
+      "opponent": {
+        "name": "Vesper Quill, the Clockmaker",
+        "portrait": "camp-quill.webp",
+        "emoji": "🕰️",
+        "cast": "quill",
+        "personality": "A showman who builds puzzles, not just bombs. Polite, smug, loves a riddle.",
+        "aiLevel": "normal",
+        "aiStyle": "trickster"
+      },
+      "setup": {
+        "mission": 11,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 11,
+        "text": "Clear Job 11 (Colourblind): never cut one of the four painted wires early."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 2 cuts",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Finish with 2 or more fuse steps left",
+          "test": {
+            "k": "left",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "quill",
+          "text": "The Clockmaker's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "act": 2,
+      "title": "A Fibber on the Crew",
+      "boss": false,
+      "intro": [
+        {
+          "who": "quill",
+          "text": "I've had a quiet word with one of your crew. Their tokens will all be lies."
+        },
+        {
+          "who": "tally",
+          "text": "Whoever was dealt the foreman's card is the fibber. Their tokens mean 'NOT this'."
+        },
+        {
+          "who": "brix",
+          "text": "A lie you can read is as good as the truth. Read it backwards."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "Every lie told us where the truth wasn't. Thanks, Clockmaker."
+        },
+        {
+          "who": "quill",
+          "text": "Charming. Now let's see how you do when you don't know who is lying."
+        }
+      ],
+      "opponent": {
+        "name": "Vesper Quill, the Clockmaker",
+        "portrait": "camp-quill.webp",
+        "emoji": "🕰️",
+        "cast": "quill",
+        "personality": "Turns the crew's trust into a weapon. Enjoys watching you second-guess.",
+        "aiLevel": "normal",
+        "aiStyle": "deceiver"
+      },
+      "setup": {
+        "mission": 17,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 17,
+        "text": "Clear Job 17 (Fibber): read the fibber's false tokens as 'not this value'."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 2 cuts",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Use at least 2 equipment cards",
+          "test": {
+            "k": "eqUsed",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "clock-key",
+          "text": "Brass clock-key card back"
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "act": 2,
+      "title": "The Weak Link",
+      "boss": true,
+      "intro": [
+        {
+          "who": "quill",
+          "text": "Somewhere on your crew is my weak link. Secret rule, secret face. Find them."
+        },
+        {
+          "who": "tally",
+          "text": "Character cards are dealt face down. Whoever got the foreman's card must obey a hidden rule."
+        },
+        {
+          "who": "brix",
+          "text": "Watch who cuts what. Accuse only when you're sure. And someone swiped one of our tools."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "Mask off. Turns out the weak link was just following a note in their lunchbox."
+        },
+        {
+          "who": "tally",
+          "text": "The note had an address: the old clock tower. Of course it did."
+        }
+      ],
+      "opponent": {
+        "name": "The Weak Link",
+        "portrait": "camp-mole.webp",
+        "emoji": "🎭",
+        "cast": "mole",
+        "personality": "A crewmate under the Clockmaker's spell. Quiet, helpful-looking, bound by a secret rule.",
+        "aiLevel": "normal",
+        "aiStyle": "saboteur",
+        "taunt": "You trusted the wrong hands. The Clockmaker sends his regards.",
+        "praise": "Caught. I'm sorry, foreman. He said it was only a game."
+      },
+      "setup": {
+        "mission": 34,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": {
+        "id": "lean-kit",
+        "param": 1,
+        "text": "Boss rule: one fewer equipment card is on the board this job."
+      },
+      "goal": {
+        "type": "mission",
+        "value": 34,
+        "text": "Clear Job 34 (Mole Hunt): defuse the device while the weak link hides among you."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 2 cuts",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Finish with 2 or more fuse steps left",
+          "test": {
+            "k": "left",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 4,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Full equipment shelf and a fourth crewmate: the fuse starts one step longer."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "mole",
+          "text": "The Weak Link's portrait"
+        },
+        {
+          "type": "act",
+          "id": "act3",
+          "text": "Act 3: The Clock Tower"
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "act": 3,
+      "title": "Seven O'Clock Sharp",
+      "boss": false,
+      "intro": [
+        {
+          "who": "quill",
+          "text": "Welcome to my tower. The ground floor is a gift: no red wires at all."
+        },
+        {
+          "who": "tally",
+          "text": "Catch: all four 7s must be cut last, and all at once. Leave them for the end."
+        },
+        {
+          "who": "brix",
+          "text": "Clear everything else first. Then whoever holds only 7s takes the shot."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "Seven o'clock, and the floor is clear. Up the stairs, crew."
+        }
+      ],
+      "opponent": {
+        "name": "Vesper Quill, the Clockmaker",
+        "portrait": "camp-quill.webp",
+        "emoji": "🕰️",
+        "cast": "quill",
+        "personality": "Obsessed with the hour of seven. Generous on the surface, strict about order.",
+        "aiLevel": "hard",
+        "aiStyle": "timekeeper"
+      },
+      "setup": {
+        "mission": 46,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 46,
+        "text": "Clear Job 46 (Lucky Sevens): cut every other wire, then all four 7s together."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 1 cut",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Finish with 2 or more fuse steps left",
+          "test": {
+            "k": "left",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "table",
+          "id": "tower-floor",
+          "text": "Clock-tower workbench table"
+        }
+      ]
+    },
+    {
+      "id": "c9",
+      "act": 3,
+      "title": "Blind Spot",
+      "boss": false,
+      "intro": [
+        {
+          "who": "quill",
+          "text": "On this floor the foreman holds one wire backwards. Everyone sees it but the foreman."
+        },
+        {
+          "who": "tally",
+          "text": "The foreman must cut that wire alone, no tools. A miss on it ends everything."
+        },
+        {
+          "who": "wren",
+          "text": "Tell us what we see. We'll talk you through it with our tokens."
+        }
+      ],
+      "outro": [
+        {
+          "who": "wren",
+          "text": "Blind cut, perfect cut. One floor left."
+        },
+        {
+          "who": "quill",
+          "text": "Impressive. The top floor is where I keep my masterpiece."
+        }
+      ],
+      "opponent": {
+        "name": "Vesper Quill, the Clockmaker",
+        "portrait": "camp-quill.webp",
+        "emoji": "🕰️",
+        "cast": "quill",
+        "personality": "Takes away what you can see and makes you trust what you can't.",
+        "aiLevel": "hard",
+        "aiStyle": "blindfold"
+      },
+      "setup": {
+        "mission": 38,
+        "players": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "mission",
+        "value": 38,
+        "text": "Clear Job 38 (Blind Spot): the foreman cuts the wire they cannot see."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 2 cuts",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Finish in 34 turns or fewer",
+          "test": {
+            "k": "turns",
+            "op": "<=",
+            "v": 34
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "Sharper teammates: the computer crew plays its very best."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "wren-tower",
+          "text": "Wren in tower gear"
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "act": 3,
+      "title": "The Masterpiece",
+      "boss": true,
+      "intro": [
+        {
+          "who": "quill",
+          "text": "My masterpiece: twelve numbers, twelve rules. Each wire you finish wakes a new rule."
+        },
+        {
+          "who": "tally",
+          "text": "If the rule blocks you, say so and pass. If the whole crew is blocked for a round, boom."
+        },
+        {
+          "who": "quill",
+          "text": "And I've trimmed your fuse. Can't have you dawdling in my tower."
+        },
+        {
+          "who": "brix",
+          "text": "Four of us, one tower. Let's send him a calling card of our own."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brix",
+          "text": "The tower is quiet. The Clockmaker's keys go in the evidence bag."
+        },
+        {
+          "who": "tally",
+          "text": "Final count: zero bombs left in town. Best number I've ever written."
+        },
+        {
+          "who": "quill",
+          "text": "...Well cut, crew. Well cut."
+        }
+      ],
+      "opponent": {
+        "name": "Vesper Quill, the Clockmaker",
+        "portrait": "camp-quill.webp",
+        "emoji": "🕰️",
+        "cast": "quill",
+        "personality": "At his most theatrical. Every finished value changes the rules under your feet.",
+        "aiLevel": "hard",
+        "aiStyle": "shifting-rules",
+        "taunt": "Tick, tock, boom. Come back when you can keep time, little crew.",
+        "praise": "My masterpiece, undone by a demolition crew. I suppose that is a kind of art."
+      },
+      "setup": {
+        "mission": 57,
+        "players": 5,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": {
+        "id": "short-fuse",
+        "param": 1,
+        "text": "Boss rule: the Clockmaker trimmed the fuse, it starts 1 step shorter."
+      },
+      "goal": {
+        "type": "mission",
+        "value": 57,
+        "text": "Clear Job 57 (Self-Destruct) with a fuse 1 step shorter than usual."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Clear the job",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Miss no more than 1 cut",
+          "test": {
+            "k": "misses",
+            "op": "<=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Finish with 2 or more fuse steps left",
+          "test": {
+            "k": "left",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "players": 5,
+          "level": "hard"
+        },
+        "maxStars": 2,
+        "text": "The full-length fuse and sharper teammates."
+      },
+      "unlock": [
+        {
+          "type": "title",
+          "id": "tower-breaker",
+          "text": "Title: Tower Breaker"
+        },
+        {
+          "type": "table",
+          "id": "clockface",
+          "text": "Clock-face table"
+        }
+      ]
+    }
+  ]
+}

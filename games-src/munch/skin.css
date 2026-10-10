@@ -1,0 +1,48 @@
+/* ===== Doorkick skin: maps the game's own selectors onto the painted UI kit (see ../shell/gx-skin.css). Opt-in via html.sk. ===== */
+html.sk{--sk-ink:#3a2410}
+/* top bar: shared bar art; our icon buttons keep the SVG icon + label */
+html.sk .gx-bar{background-blend-mode:normal;border-bottom:0;box-shadow:0 3px 8px rgba(0,0,0,.45)}
+html.sk .gx-bar h1{font-size:1.3rem}
+html.sk .gx-ibtn{color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.7);font-weight:700;transition:none}
+html.sk .gx-ibtn .ic{color:#ffd76a}
+html.sk .gx-ibtn:hover{box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)) brightness(1.12)}
+html.sk .gx-ibtn[aria-expanded=true]{background:none;color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .gx-ibtn[aria-expanded=true] .ic{color:#fff3c4}
+html.sk .gx-reopen{background:none}
+html.sk.ph .gx-bar .gx-ibtn{width:48px;min-width:48px;border-radius:0;padding:0}
+html.sk .gx-ibtn.gxh-bulb{min-width:44px}
+/* drawers + dock head */
+html.sk .gx-drawer{color:var(--sk-ink)}
+html.sk .gx-drawer-head h2{color:var(--sk-cream)}
+html.sk .gx-drawer,html.sk .gx-drawer-body{--ink:#3a2410}
+html.sk .gx-dock-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream)}
+/* buttons: cream / go / power pills */
+html.sk .btn,html.sk .btn:hover{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));justify-content:center;transition:none}
+html.sk .btn.primary,html.sk .btn.good{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .btn.danger{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .btn.rec{background:none!important;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec}
+html.sk .btn:active{transform:translateY(2px);box-shadow:none}
+html.sk .btn:disabled{opacity:.5;filter:grayscale(.5)}
+html.sk .seg .btn.on,html.sk .grid2 .btn.on,html.sk .btn.learn.on{background:none;box-shadow:none;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .mrow .btn{min-height:44px;padding:0 2px}
+html.sk .btn .ic{color:currentColor}
+/* menu / option rows */
+html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;min-height:52px;margin:2px 0;text-align:left;justify-content:flex-start;color:#3a2410;text-shadow:none;font-weight:700;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .btn.gxt-menu.gxt-first{box-shadow:none;filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .btn.learn{display:flex;align-items:center}
+html.sk .btn.learn.on{border-image-source:url(media/ui-row-c.webp);color:#1b4332;filter:drop-shadow(0 0 5px #7fe08a) drop-shadow(0 1px 2px rgba(0,0,0,.3));text-shadow:none}
+html.sk .menu .btn:active{transform:translateY(1px)}
+/* dialogs over the table: parchment panel */
+html.sk .dlg{background:none;border:30px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:#3a2410;box-sizing:border-box}
+html.sk .dlg.paper{box-shadow:none;background:none}
+html.sk .dlg h2{color:#8e3a1c}
+html.sk .dlg.start h2 span{color:#b3261a}
+html.sk .dlg .small,html.sk .dlg .muted{color:#5a4128}
+html.sk.ph .dlg{padding:0 2px;font-size:15px;border-width:26px;border-image-width:26px}
+html.sk.ph .dlg .acts{position:sticky;bottom:0;z-index:2;margin:8px 0 0!important;padding:6px 0 2px;background:linear-gradient(rgba(240,222,176,0),#f0deb0 10px)}
+html.sk.ph .dlg .btn{min-height:46px}
+html.sk.ph .modal{align-items:center;padding:6px}
+html.sk.ph .dlg{max-height:calc(100dvh - 12px)}
+@media (orientation:portrait){html.sk.ph .modal.art-title .dlg.start{max-height:64dvh}}
+html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{padding:0 8px}
+html.sk .mrow .btn{min-width:64px;border-width:0 16px;border-image-width:0 16px}

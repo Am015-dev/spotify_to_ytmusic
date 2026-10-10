@@ -1,0 +1,51 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1>Thornbound Throne</h1>
+  <span class="barstat" id="barstat"></span>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn" data-gx="boardd" aria-label="My board and piles" title="My board and piles"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg><span>Board</span></button>
+  <button class="gx-ibtn" data-gx="logd" aria-label="Log" title="Log"><svg class="ico" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-label="How to play" title="How to play"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="setd" aria-label="Menu" title="Menu"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <div id="rivals" aria-label="Scores and bids"></div>
+  <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap" data-board><div id="mapbox"><div id="spots"></div></div></div><div id="news" class="news" hidden role="status" aria-live="polite"></div></main>
+  <aside class="gx-dock" aria-label="Your move">
+    <div id="main" role="group" aria-label="Choices"></div>
+    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="now" aria-live="polite" hidden></div><div id="road" hidden></div><div id="act" role="group" aria-label="Actions"></div><div id="handw" hidden></div></div>
+    <div id="gdef" hidden role="note"></div>
+    <div id="ppop" class="ppop" hidden role="dialog" aria-label="Details"></div>
+    <div id="pc" class="pcard" hidden role="dialog" aria-label="Message"></div>
+  </aside>
+</div>
+</div>
+<div id="fx" aria-hidden="true"></div>
+<div id="tip" hidden role="tooltip"></div>
+<div id="finger" hidden aria-hidden="true"><i></i><b></b></div>
+<div id="start" role="dialog" aria-label="New game" hidden></div>
+<div id="netbox" hidden></div>
+<div id="live" class="sr" aria-live="polite"></div>
+<script src="shell.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="perfhud.js"></script>
+<script src="kit.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="netstrip.js"></script>
+<script src="net.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="art-data.js"></script>
+<script src="gx-campaign.js"></script>
+<script src="campaign.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1><span data-ico="bomb"></span><span class="tt">Short Fuse</span></h1>
+  <button class="jobchip" id="jobchip" data-gx="missiond" aria-expanded="false" hidden></button>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn" data-gx="missiond" aria-expanded="false" data-ico="target" title="The job card" aria-label="Job card"><span>Job</span></button>
+  <button class="gx-ibtn" data-gx="geard" aria-expanded="false" data-ico="gear" title="Equipment cards" aria-label="Equipment"><span>Gear</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" title="How to play" aria-label="How to play"><span>Rules</span></button>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" title="Hint: what should I do?" aria-label="Hint: what should I do?"></button>
+  <button class="gx-ibtn" data-gx="setd" aria-expanded="false" data-ico="menu" title="Menu" aria-label="Menu"><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" aria-label="The table"><div id="tb" data-board>
+    <div id="netst" class="netst" hidden></div>
+    <div id="strip"><div id="fuse" aria-label="Fuse"></div><div id="cutc" aria-label="Wires cut"></div><div id="track" aria-label="Finished numbers"></div><div id="clk"></div></div>
+    <div id="say" role="status" aria-live="polite"></div>
+    <div id="felt"><div id="gear"></div><div id="crew"></div></div>
+    <div id="tray"></div>
+    <div id="mine"></div>
+    <div id="fx" aria-hidden="true"></div>
+    <div id="over" hidden></div>
+    <div id="cover" hidden></div>
+  </div></main>
+</div>
+</div>
+<section class="gx-drawer wide" id="missiond" role="dialog" aria-label="Job card"><div class="gx-drawer-head"><h2 data-ico="target">Job card</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="missionbody"></div></section>
+<section class="gx-drawer wide" id="geard" role="dialog" aria-label="Equipment"><div class="gx-drawer-head"><h2 data-ico="gear">Equipment</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="gearbody"></div></section>
+<section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2 data-ico="scroll">Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div></section>
+<section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="How to play"><div class="gx-drawer-head"><h2 data-ico="book">How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
+<section class="gx-drawer wide" id="refd" role="dialog" aria-label="Wires, tokens and cards"><div class="gx-drawer-head"><h2 data-ico="cards">Wires, tokens and cards</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
+<section class="gx-drawer" id="setd" role="dialog" aria-label="Settings"><div class="gx-drawer-head"><h2 data-ico="menu">Settings</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="setbody"></div></section>
+<section class="gx-drawer wide" id="musicd" role="dialog" aria-label="Music"><div class="gx-drawer-head"><h2 data-ico="music">Music</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="musicbody"></div></section>
+<section class="gx-drawer" id="credd" role="dialog" aria-label="Credits"><div class="gx-drawer-head"><h2 data-ico="info">Credits</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="credbody"><h3>Short Fuse</h3><p>A browser version of a co-operative deduction game about defusing bombs. Game rules and numbers follow the published game. <b>Names, card text and art are original</b>: every text is our own. The wires, tokens and symbols are drawn in code; the card, crew, table, title and ending pictures are painted and the music is made by Am015-dev.</p><p>Fonts: Lilita One and Nunito (Google Fonts, SIL Open Font License). 3D: three.js (MIT).</p><!--CREDITS--></div></section>
+<div id="start" role="dialog" aria-label="Short Fuse" hidden></div>
+<div id="netbox" hidden></div>
+<div id="live" class="sr" aria-live="polite"></div>
+<script src="shell.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
+<script src="gx-tutor.js"></script>
+<script src="gx-campaign.js"></script>
+<script src="campaign-data.js"></script>
+<script src="perfhud.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="art-data.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="netstrip.js"></script>
+<script src="texts.js"></script>
+<script src="hlp.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="sound.js"></script>
+<script src="net.js"></script>
+<script src="ui.js"></script>
+<script src="tbl.js"></script>
+<script src="extras.js"></script>
+<script src="tutor.js"></script>
+<script src="start.js"></script>
+</body>
+</html>

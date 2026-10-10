@@ -1,0 +1,1250 @@
+{
+ "_meta": {
+  "canvas": [
+   1000,
+   650
+  ],
+  "note": "City names are real geography (not protectable); x/y are approximate and for our own redrawn board. Route data verified: 100 segments, 78 city pairs, 22 double pairs, 36 cities. Colour keys: purple/white/blue/yellow/orange/black/red/green + gray (any one colour). Train-card refs: purple=Box, blue=Passenger, orange=Tanker, white=Reefer, green=Freight, yellow=Hopper, black=Coal, red=Caboose (ref only). When playing 2-3 players, only one of each 'pair' may be claimed (other closes).",
+  "source": "An open-source route-analysis repo's CSV (source kept in the private research repo), cross-checked against counts in rulebook"
+ },
+ "cities": [
+  {
+   "id": "vancouver",
+   "name": "Vancouver",
+   "x": 70,
+   "y": 60
+  },
+  {
+   "id": "calgary",
+   "name": "Calgary",
+   "x": 190,
+   "y": 45
+  },
+  {
+   "id": "winnipeg",
+   "name": "Winnipeg",
+   "x": 400,
+   "y": 60
+  },
+  {
+   "id": "seattle",
+   "name": "Seattle",
+   "x": 60,
+   "y": 120
+  },
+  {
+   "id": "portland",
+   "name": "Portland",
+   "x": 40,
+   "y": 175
+  },
+  {
+   "id": "helena",
+   "name": "Helena",
+   "x": 270,
+   "y": 150
+  },
+  {
+   "id": "duluth",
+   "name": "Duluth",
+   "x": 520,
+   "y": 155
+  },
+  {
+   "id": "sault_st_marie",
+   "name": "Sault St. Marie",
+   "x": 640,
+   "y": 110
+  },
+  {
+   "id": "montreal",
+   "name": "Montreal",
+   "x": 835,
+   "y": 75
+  },
+  {
+   "id": "toronto",
+   "name": "Toronto",
+   "x": 740,
+   "y": 170
+  },
+  {
+   "id": "boston",
+   "name": "Boston",
+   "x": 905,
+   "y": 140
+  },
+  {
+   "id": "new_york",
+   "name": "New York",
+   "x": 850,
+   "y": 215
+  },
+  {
+   "id": "pittsburgh",
+   "name": "Pittsburgh",
+   "x": 770,
+   "y": 235
+  },
+  {
+   "id": "washington",
+   "name": "Washington",
+   "x": 840,
+   "y": 295
+  },
+  {
+   "id": "raleigh",
+   "name": "Raleigh",
+   "x": 790,
+   "y": 345
+  },
+  {
+   "id": "chicago",
+   "name": "Chicago",
+   "x": 640,
+   "y": 225
+  },
+  {
+   "id": "omaha",
+   "name": "Omaha",
+   "x": 470,
+   "y": 235
+  },
+  {
+   "id": "denver",
+   "name": "Denver",
+   "x": 330,
+   "y": 310
+  },
+  {
+   "id": "salt_lake_city",
+   "name": "Salt Lake City",
+   "x": 200,
+   "y": 255
+  },
+  {
+   "id": "san_francisco",
+   "name": "San Francisco",
+   "x": 40,
+   "y": 310
+  },
+  {
+   "id": "los_angeles",
+   "name": "Los Angeles",
+   "x": 80,
+   "y": 430
+  },
+  {
+   "id": "las_vegas",
+   "name": "Las Vegas",
+   "x": 130,
+   "y": 375
+  },
+  {
+   "id": "phoenix",
+   "name": "Phoenix",
+   "x": 190,
+   "y": 470
+  },
+  {
+   "id": "santa_fe",
+   "name": "Santa Fe",
+   "x": 300,
+   "y": 425
+  },
+  {
+   "id": "el_paso",
+   "name": "El Paso",
+   "x": 270,
+   "y": 545
+  },
+  {
+   "id": "oklahoma_city",
+   "name": "Oklahoma City",
+   "x": 460,
+   "y": 385
+  },
+  {
+   "id": "kansas_city",
+   "name": "Kansas City",
+   "x": 500,
+   "y": 305
+  },
+  {
+   "id": "saint_louis",
+   "name": "Saint Louis",
+   "x": 610,
+   "y": 315
+  },
+  {
+   "id": "little_rock",
+   "name": "Little Rock",
+   "x": 570,
+   "y": 425
+  },
+  {
+   "id": "dallas",
+   "name": "Dallas",
+   "x": 470,
+   "y": 480
+  },
+  {
+   "id": "houston",
+   "name": "Houston",
+   "x": 510,
+   "y": 550
+  },
+  {
+   "id": "new_orleans",
+   "name": "New Orleans",
+   "x": 620,
+   "y": 575
+  },
+  {
+   "id": "nashville",
+   "name": "Nashville",
+   "x": 690,
+   "y": 365
+  },
+  {
+   "id": "atlanta",
+   "name": "Atlanta",
+   "x": 740,
+   "y": 430
+  },
+  {
+   "id": "charleston",
+   "name": "Charleston",
+   "x": 810,
+   "y": 435
+  },
+  {
+   "id": "miami",
+   "name": "Miami",
+   "x": 830,
+   "y": 565
+  }
+ ],
+ "routes": [
+  {
+   "id": "r001",
+   "a": "vancouver",
+   "b": "calgary",
+   "len": 3,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r002",
+   "a": "vancouver",
+   "b": "seattle",
+   "len": 1,
+   "color": "gray",
+   "pair": "r003"
+  },
+  {
+   "id": "r003",
+   "a": "vancouver",
+   "b": "seattle",
+   "len": 1,
+   "color": "gray",
+   "pair": "r002"
+  },
+  {
+   "id": "r004",
+   "a": "seattle",
+   "b": "calgary",
+   "len": 4,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r005",
+   "a": "seattle",
+   "b": "helena",
+   "len": 6,
+   "color": "yellow",
+   "pair": null
+  },
+  {
+   "id": "r006",
+   "a": "seattle",
+   "b": "portland",
+   "len": 1,
+   "color": "gray",
+   "pair": "r007"
+  },
+  {
+   "id": "r007",
+   "a": "seattle",
+   "b": "portland",
+   "len": 1,
+   "color": "gray",
+   "pair": "r006"
+  },
+  {
+   "id": "r008",
+   "a": "portland",
+   "b": "salt_lake_city",
+   "len": 6,
+   "color": "blue",
+   "pair": null
+  },
+  {
+   "id": "r009",
+   "a": "portland",
+   "b": "san_francisco",
+   "len": 5,
+   "color": "green",
+   "pair": "r010"
+  },
+  {
+   "id": "r010",
+   "a": "portland",
+   "b": "san_francisco",
+   "len": 5,
+   "color": "purple",
+   "pair": "r009"
+  },
+  {
+   "id": "r011",
+   "a": "san_francisco",
+   "b": "salt_lake_city",
+   "len": 5,
+   "color": "orange",
+   "pair": "r012"
+  },
+  {
+   "id": "r012",
+   "a": "san_francisco",
+   "b": "salt_lake_city",
+   "len": 5,
+   "color": "white",
+   "pair": "r011"
+  },
+  {
+   "id": "r013",
+   "a": "san_francisco",
+   "b": "los_angeles",
+   "len": 3,
+   "color": "yellow",
+   "pair": "r014"
+  },
+  {
+   "id": "r014",
+   "a": "san_francisco",
+   "b": "los_angeles",
+   "len": 3,
+   "color": "purple",
+   "pair": "r013"
+  },
+  {
+   "id": "r015",
+   "a": "los_angeles",
+   "b": "las_vegas",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r016",
+   "a": "los_angeles",
+   "b": "phoenix",
+   "len": 3,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r017",
+   "a": "los_angeles",
+   "b": "el_paso",
+   "len": 6,
+   "color": "black",
+   "pair": null
+  },
+  {
+   "id": "r018",
+   "a": "calgary",
+   "b": "winnipeg",
+   "len": 6,
+   "color": "white",
+   "pair": null
+  },
+  {
+   "id": "r019",
+   "a": "calgary",
+   "b": "helena",
+   "len": 4,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r020",
+   "a": "helena",
+   "b": "winnipeg",
+   "len": 4,
+   "color": "blue",
+   "pair": null
+  },
+  {
+   "id": "r021",
+   "a": "helena",
+   "b": "salt_lake_city",
+   "len": 3,
+   "color": "purple",
+   "pair": null
+  },
+  {
+   "id": "r022",
+   "a": "helena",
+   "b": "denver",
+   "len": 4,
+   "color": "green",
+   "pair": null
+  },
+  {
+   "id": "r023",
+   "a": "helena",
+   "b": "duluth",
+   "len": 6,
+   "color": "orange",
+   "pair": null
+  },
+  {
+   "id": "r024",
+   "a": "helena",
+   "b": "omaha",
+   "len": 5,
+   "color": "red",
+   "pair": null
+  },
+  {
+   "id": "r025",
+   "a": "salt_lake_city",
+   "b": "denver",
+   "len": 3,
+   "color": "red",
+   "pair": "r026"
+  },
+  {
+   "id": "r026",
+   "a": "salt_lake_city",
+   "b": "denver",
+   "len": 3,
+   "color": "yellow",
+   "pair": "r025"
+  },
+  {
+   "id": "r027",
+   "a": "las_vegas",
+   "b": "salt_lake_city",
+   "len": 3,
+   "color": "orange",
+   "pair": null
+  },
+  {
+   "id": "r028",
+   "a": "phoenix",
+   "b": "denver",
+   "len": 5,
+   "color": "white",
+   "pair": null
+  },
+  {
+   "id": "r029",
+   "a": "phoenix",
+   "b": "santa_fe",
+   "len": 3,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r030",
+   "a": "phoenix",
+   "b": "el_paso",
+   "len": 3,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r031",
+   "a": "winnipeg",
+   "b": "sault_st_marie",
+   "len": 6,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r032",
+   "a": "winnipeg",
+   "b": "duluth",
+   "len": 4,
+   "color": "black",
+   "pair": null
+  },
+  {
+   "id": "r033",
+   "a": "duluth",
+   "b": "sault_st_marie",
+   "len": 3,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r034",
+   "a": "duluth",
+   "b": "toronto",
+   "len": 6,
+   "color": "purple",
+   "pair": null
+  },
+  {
+   "id": "r035",
+   "a": "duluth",
+   "b": "chicago",
+   "len": 3,
+   "color": "red",
+   "pair": null
+  },
+  {
+   "id": "r036",
+   "a": "duluth",
+   "b": "omaha",
+   "len": 2,
+   "color": "gray",
+   "pair": "r037"
+  },
+  {
+   "id": "r037",
+   "a": "duluth",
+   "b": "omaha",
+   "len": 2,
+   "color": "gray",
+   "pair": "r036"
+  },
+  {
+   "id": "r038",
+   "a": "omaha",
+   "b": "chicago",
+   "len": 4,
+   "color": "blue",
+   "pair": null
+  },
+  {
+   "id": "r039",
+   "a": "omaha",
+   "b": "kansas_city",
+   "len": 1,
+   "color": "gray",
+   "pair": "r040"
+  },
+  {
+   "id": "r040",
+   "a": "omaha",
+   "b": "kansas_city",
+   "len": 1,
+   "color": "gray",
+   "pair": "r039"
+  },
+  {
+   "id": "r041",
+   "a": "kansas_city",
+   "b": "saint_louis",
+   "len": 2,
+   "color": "blue",
+   "pair": "r042"
+  },
+  {
+   "id": "r042",
+   "a": "kansas_city",
+   "b": "saint_louis",
+   "len": 2,
+   "color": "purple",
+   "pair": "r041"
+  },
+  {
+   "id": "r043",
+   "a": "kansas_city",
+   "b": "oklahoma_city",
+   "len": 2,
+   "color": "gray",
+   "pair": "r044"
+  },
+  {
+   "id": "r044",
+   "a": "kansas_city",
+   "b": "oklahoma_city",
+   "len": 2,
+   "color": "gray",
+   "pair": "r043"
+  },
+  {
+   "id": "r045",
+   "a": "oklahoma_city",
+   "b": "little_rock",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r046",
+   "a": "oklahoma_city",
+   "b": "dallas",
+   "len": 2,
+   "color": "gray",
+   "pair": "r047"
+  },
+  {
+   "id": "r047",
+   "a": "oklahoma_city",
+   "b": "dallas",
+   "len": 2,
+   "color": "gray",
+   "pair": "r046"
+  },
+  {
+   "id": "r048",
+   "a": "dallas",
+   "b": "little_rock",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r049",
+   "a": "dallas",
+   "b": "houston",
+   "len": 1,
+   "color": "gray",
+   "pair": "r050"
+  },
+  {
+   "id": "r050",
+   "a": "dallas",
+   "b": "houston",
+   "len": 1,
+   "color": "gray",
+   "pair": "r049"
+  },
+  {
+   "id": "r051",
+   "a": "houston",
+   "b": "new_orleans",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r052",
+   "a": "el_paso",
+   "b": "houston",
+   "len": 6,
+   "color": "green",
+   "pair": null
+  },
+  {
+   "id": "r053",
+   "a": "el_paso",
+   "b": "dallas",
+   "len": 4,
+   "color": "red",
+   "pair": null
+  },
+  {
+   "id": "r054",
+   "a": "el_paso",
+   "b": "oklahoma_city",
+   "len": 5,
+   "color": "yellow",
+   "pair": null
+  },
+  {
+   "id": "r055",
+   "a": "el_paso",
+   "b": "santa_fe",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r056",
+   "a": "santa_fe",
+   "b": "oklahoma_city",
+   "len": 3,
+   "color": "blue",
+   "pair": null
+  },
+  {
+   "id": "r057",
+   "a": "oklahoma_city",
+   "b": "denver",
+   "len": 4,
+   "color": "red",
+   "pair": null
+  },
+  {
+   "id": "r058",
+   "a": "santa_fe",
+   "b": "denver",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r059",
+   "a": "denver",
+   "b": "kansas_city",
+   "len": 4,
+   "color": "black",
+   "pair": "r060"
+  },
+  {
+   "id": "r060",
+   "a": "denver",
+   "b": "kansas_city",
+   "len": 4,
+   "color": "orange",
+   "pair": "r059"
+  },
+  {
+   "id": "r061",
+   "a": "denver",
+   "b": "omaha",
+   "len": 4,
+   "color": "purple",
+   "pair": null
+  },
+  {
+   "id": "r062",
+   "a": "new_orleans",
+   "b": "miami",
+   "len": 6,
+   "color": "red",
+   "pair": null
+  },
+  {
+   "id": "r063",
+   "a": "new_orleans",
+   "b": "atlanta",
+   "len": 4,
+   "color": "orange",
+   "pair": "r064"
+  },
+  {
+   "id": "r064",
+   "a": "new_orleans",
+   "b": "atlanta",
+   "len": 4,
+   "color": "yellow",
+   "pair": "r063"
+  },
+  {
+   "id": "r065",
+   "a": "new_orleans",
+   "b": "little_rock",
+   "len": 3,
+   "color": "green",
+   "pair": null
+  },
+  {
+   "id": "r066",
+   "a": "little_rock",
+   "b": "nashville",
+   "len": 3,
+   "color": "white",
+   "pair": null
+  },
+  {
+   "id": "r067",
+   "a": "little_rock",
+   "b": "saint_louis",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r068",
+   "a": "saint_louis",
+   "b": "nashville",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r069",
+   "a": "saint_louis",
+   "b": "pittsburgh",
+   "len": 5,
+   "color": "green",
+   "pair": null
+  },
+  {
+   "id": "r070",
+   "a": "saint_louis",
+   "b": "chicago",
+   "len": 2,
+   "color": "green",
+   "pair": "r071"
+  },
+  {
+   "id": "r071",
+   "a": "saint_louis",
+   "b": "chicago",
+   "len": 2,
+   "color": "white",
+   "pair": "r070"
+  },
+  {
+   "id": "r072",
+   "a": "chicago",
+   "b": "pittsburgh",
+   "len": 3,
+   "color": "black",
+   "pair": "r073"
+  },
+  {
+   "id": "r073",
+   "a": "chicago",
+   "b": "pittsburgh",
+   "len": 3,
+   "color": "orange",
+   "pair": "r072"
+  },
+  {
+   "id": "r074",
+   "a": "chicago",
+   "b": "toronto",
+   "len": 4,
+   "color": "white",
+   "pair": null
+  },
+  {
+   "id": "r075",
+   "a": "sault_st_marie",
+   "b": "montreal",
+   "len": 5,
+   "color": "black",
+   "pair": null
+  },
+  {
+   "id": "r076",
+   "a": "toronto",
+   "b": "montreal",
+   "len": 3,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r077",
+   "a": "sault_st_marie",
+   "b": "toronto",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r078",
+   "a": "toronto",
+   "b": "pittsburgh",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r079",
+   "a": "pittsburgh",
+   "b": "new_york",
+   "len": 2,
+   "color": "white",
+   "pair": "r080"
+  },
+  {
+   "id": "r080",
+   "a": "pittsburgh",
+   "b": "new_york",
+   "len": 2,
+   "color": "green",
+   "pair": "r079"
+  },
+  {
+   "id": "r081",
+   "a": "pittsburgh",
+   "b": "washington",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r082",
+   "a": "pittsburgh",
+   "b": "raleigh",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r083",
+   "a": "nashville",
+   "b": "raleigh",
+   "len": 3,
+   "color": "black",
+   "pair": null
+  },
+  {
+   "id": "r084",
+   "a": "nashville",
+   "b": "atlanta",
+   "len": 1,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r085",
+   "a": "nashville",
+   "b": "pittsburgh",
+   "len": 4,
+   "color": "yellow",
+   "pair": null
+  },
+  {
+   "id": "r086",
+   "a": "atlanta",
+   "b": "miami",
+   "len": 5,
+   "color": "blue",
+   "pair": null
+  },
+  {
+   "id": "r087",
+   "a": "atlanta",
+   "b": "charleston",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r088",
+   "a": "atlanta",
+   "b": "raleigh",
+   "len": 2,
+   "color": "gray",
+   "pair": "r089"
+  },
+  {
+   "id": "r089",
+   "a": "atlanta",
+   "b": "raleigh",
+   "len": 2,
+   "color": "gray",
+   "pair": "r088"
+  },
+  {
+   "id": "r090",
+   "a": "charleston",
+   "b": "miami",
+   "len": 4,
+   "color": "purple",
+   "pair": null
+  },
+  {
+   "id": "r091",
+   "a": "raleigh",
+   "b": "charleston",
+   "len": 2,
+   "color": "gray",
+   "pair": null
+  },
+  {
+   "id": "r092",
+   "a": "raleigh",
+   "b": "washington",
+   "len": 2,
+   "color": "gray",
+   "pair": "r093"
+  },
+  {
+   "id": "r093",
+   "a": "raleigh",
+   "b": "washington",
+   "len": 2,
+   "color": "gray",
+   "pair": "r092"
+  },
+  {
+   "id": "r094",
+   "a": "washington",
+   "b": "new_york",
+   "len": 2,
+   "color": "orange",
+   "pair": "r095"
+  },
+  {
+   "id": "r095",
+   "a": "washington",
+   "b": "new_york",
+   "len": 2,
+   "color": "black",
+   "pair": "r094"
+  },
+  {
+   "id": "r096",
+   "a": "new_york",
+   "b": "boston",
+   "len": 2,
+   "color": "yellow",
+   "pair": "r097"
+  },
+  {
+   "id": "r097",
+   "a": "new_york",
+   "b": "boston",
+   "len": 2,
+   "color": "red",
+   "pair": "r096"
+  },
+  {
+   "id": "r098",
+   "a": "new_york",
+   "b": "montreal",
+   "len": 3,
+   "color": "blue",
+   "pair": null
+  },
+  {
+   "id": "r099",
+   "a": "boston",
+   "b": "montreal",
+   "len": 2,
+   "color": "gray",
+   "pair": "r100"
+  },
+  {
+   "id": "r100",
+   "a": "boston",
+   "b": "montreal",
+   "len": 2,
+   "color": "gray",
+   "pair": "r099"
+  }
+ ],
+ "tickets": [
+  {
+   "id": "t01",
+   "a": "los_angeles",
+   "b": "new_york",
+   "points": 21,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t02",
+   "a": "duluth",
+   "b": "houston",
+   "points": 8,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t03",
+   "a": "sault_st_marie",
+   "b": "nashville",
+   "points": 8,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t04",
+   "a": "new_york",
+   "b": "atlanta",
+   "points": 6,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t05",
+   "a": "portland",
+   "b": "nashville",
+   "points": 17,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t06",
+   "a": "vancouver",
+   "b": "montreal",
+   "points": 20,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t07",
+   "a": "duluth",
+   "b": "el_paso",
+   "points": 10,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t08",
+   "a": "toronto",
+   "b": "miami",
+   "points": 10,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t09",
+   "a": "portland",
+   "b": "phoenix",
+   "points": 11,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t10",
+   "a": "dallas",
+   "b": "new_york",
+   "points": 11,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t11",
+   "a": "calgary",
+   "b": "salt_lake_city",
+   "points": 7,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t12",
+   "a": "calgary",
+   "b": "phoenix",
+   "points": 13,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t13",
+   "a": "los_angeles",
+   "b": "miami",
+   "points": 20,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t14",
+   "a": "winnipeg",
+   "b": "little_rock",
+   "points": 11,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t15",
+   "a": "san_francisco",
+   "b": "atlanta",
+   "points": 17,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t16",
+   "a": "kansas_city",
+   "b": "houston",
+   "points": 5,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t17",
+   "a": "los_angeles",
+   "b": "chicago",
+   "points": 16,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t18",
+   "a": "denver",
+   "b": "pittsburgh",
+   "points": 11,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t19",
+   "a": "chicago",
+   "b": "santa_fe",
+   "points": 9,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t20",
+   "a": "vancouver",
+   "b": "santa_fe",
+   "points": 13,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t21",
+   "a": "boston",
+   "b": "miami",
+   "points": 12,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t22",
+   "a": "chicago",
+   "b": "new_orleans",
+   "points": 7,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t23",
+   "a": "montreal",
+   "b": "atlanta",
+   "points": 9,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t24",
+   "a": "seattle",
+   "b": "new_york",
+   "points": 22,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t25",
+   "a": "denver",
+   "b": "el_paso",
+   "points": 4,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t26",
+   "a": "helena",
+   "b": "los_angeles",
+   "points": 8,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t27",
+   "a": "winnipeg",
+   "b": "houston",
+   "points": 12,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t28",
+   "a": "montreal",
+   "b": "new_orleans",
+   "points": 13,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t29",
+   "a": "sault_st_marie",
+   "b": "oklahoma_city",
+   "points": 9,
+   "ref": "USA base destination ticket"
+  },
+  {
+   "id": "t30",
+   "a": "seattle",
+   "b": "los_angeles",
+   "points": 9,
+   "ref": "USA base destination ticket"
+  }
+ ],
+ "scoring": {
+  "1": 1,
+  "2": 2,
+  "3": 4,
+  "4": 7,
+  "5": 10,
+  "6": 15
+ }
+}

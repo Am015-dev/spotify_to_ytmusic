@@ -1,0 +1,2255 @@
+// ===================== part 1: globals, helpers, view model =====================
+var ANIM = 1, AIDELAY = 650;
+var G = null;
+var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, seq: 0, over: null, overShown: false,
+  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0, fingerOn: false, holdJobs: null, stampSeen: {}, geo: null };
+const D = LD.DATA, TASKS = D.tasks, KIT = LDKit;
+const suitOf = D.suitOf, valOf = D.valOf;
+// painted art: LD_ART (data URIs made by build.py) -> blob URLs so the card <svg>s carry short links. Without blob URLs (jsdom) the kit keeps its own vector drawings.
+(function () {
+  try {
+    if (typeof LD_ART === 'undefined' || /jsdom/i.test(navigator.userAgent || '') || !window.URL || !URL.createObjectURL || !window.Blob || !window.atob) return;
+    const m = {};
+    for (const k in LD_ART) { const p = LD_ART[k].split(','), mime = (/data:([^;]+)/.exec(p[0]) || [0, 'image/webp'])[1], bin = atob(p[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); m[k] = URL.createObjectURL(new Blob([u], { type: mime })); }
+    KIT.setArt(m);
+  } catch (e) { }
+})();
+const $ = s => /^#[\w-]+$/.test(s) ? document.getElementById(s.slice(1)) : document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const DEF = { np: 4, level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'], seats: [0, 1, 2], mission: 1, kind: 'log', d: 6, cmt: 'normal', deep: 18, job: 1, timer: false };
+const YOU = 4;     // diver portrait index of "you"
+// tiny element builder: h('div.cls#id', {attr:..}, ...kids)
+function h(sel, at) {
+  const m = /^([a-z0-9]*)((?:[.#][\w-]+)*)$/i.exec(sel) || [0, 'div', ''];
+  const e = document.createElement(m[1] || 'div');
+  const cls = []; (m[2] || '').replace(/([.#])([\w-]+)/g, (_, k, v) => { if (k === '#') e.id = v; else cls.push(v); });
+  if (cls.length) e.className = cls.join(' ');
+  let i = 2;
+  if (at && typeof at === 'object' && !(at instanceof Node) && !Array.isArray(at)) { for (const k in at) { const v = at[k]; if (v == null || v === false) continue; if (k === 'text') e.textContent = v; else if (k === 'html') e.innerHTML = v; else e.setAttribute(k, v === true ? '' : v); } } else i = 1;
+  for (; i < arguments.length; i++) add(e, arguments[i]);
+  return e;
+}
+function add(e, k) { if (k == null || k === false) return; if (Array.isArray(k)) k.forEach(x => add(e, x)); else e.appendChild(k instanceof Node ? k : document.createTextNode(String(k))); }
+const _nodes = new Map();
+function svgEl(s) { const t = document.createElement('template'); t.innerHTML = s.trim(); return t.content.firstChild; }
+function artNode(key, strFn) { let t = _nodes.get(key); if (!t) { t = svgEl(strFn()); _nodes.set(key, t); } return t.cloneNode(true); }
+const _art = new Map();
+function cached(key, fn) { let v = _art.get(key); if (v === undefined) { v = fn(); _art.set(key, v); } return v; }
+const cardN = (id, w, dim) => { const n = artNode('c|' + id + '|' + w + '|' + (dim ? 1 : 0), () => KIT.cardSVG(id, { w, dim })); n.classList.add('card'); return n; };
+const backN = w => { const n = artNode('b|' + w, () => KIT.backSVG({ w })); n.classList.add('card'); return n; };
+const cardS = (id, w) => cached('cs|' + id + '|' + w, () => KIT.cardSVG(id, { w }));
+const iconS = (n, s) => cached('i|' + n + '|' + s, () => KIT.iconSVG(n, s));
+const cname = id => D.cardName(id);
+// portraits: a seat shows a diver portrait; the drone has its own
+const chefOf = s => G && G.players[s] && G.players[s].helper ? -1 : (UI.chefs && UI.chefs[s] != null ? UI.chefs[s] : (s === 0 ? YOU : (s - 1) % 4));
+const avatarS = (s, size) => { const c = chefOf(s); return c < 0 ? cached('dr|' + size, () => KIT.droneSVG({ size })) : cached('a|' + c + '|' + size, () => KIT.avatarSVG(c, { size })); };
+const avatarC = (c, size) => cached('a|' + c + '|' + size, () => KIT.avatarSVG(c, { size }));
+const avN = (s, size) => svgEl(avatarS(s, size));
+// ---- game helpers ----
+const humans = () => G ? G.players.map((p, i) => (p.ai || p.helper) ? -1 : i).filter(i => i >= 0) : [];
+const hotSeat = () => !!G && !NET.on && humans().length > 1;
+const watching = () => !!G && humans().length === 0;
+function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) { if (UI.holder < 0 && G.phase === 'distress' && !UI.cards.length) { const p = LD.pending(G).find(s => !G.players[s].ai && !G.players[s].helper); return p != null ? p : -1; } return UI.holder; } const hs = humans(); return hs.length ? hs[0] : -1; }
+const pname = s => G && G.players[s] ? G.players[s].name : '?';
+const nameList = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
+const ntrOf = () => G ? G.ntr : 10;
+const isOver = () => G && G.phase === 'over';
+function jobs(s) { const o = []; G.tasks.forEach((t, i) => { if (t.owner === s) o.push(i); }); return o; }
+const jobDef = i => TASKS[G.tasks[i].id];
+const jobShort = i => TASKS[G.tasks[i].id].s;
+const jobText = i => TASKS[G.tasks[i].id].t;
+const jobDiff = i => TASKS[G.tasks[i].id].d[G.np - 3];
+function jobSt(i) { if (!G) return 0; if (UI.holdJobs && UI.holdJobs.has(i)) return 0; if (G.phase === 'over' && G.result) return G.result.tasks[i]; return LD.jobStatus(G, i); }
+// tricks won per seat (public)
+function tricksWon() { const a = new Array(G.np).fill(0); for (const k of G.tricks) a[k.w]++; if (UI.fz && UI.fz.winner != null && a[UI.fz.winner] > 0) a[UI.fz.winner]--; return a; }
+// the cards a seat has shown with the ping and not yet played
+function shownBy(s) { return G.pings.filter(p => p.seat === s && !G.pl[p.c]); }
+function seatsClockwise(from) { const o = []; for (let k = 1; k < G.np; k++) o.push((from + k) % G.np); return o; }
+function myMoves() { const v = viewSeat(); return v >= 0 && G ? LD.moves(G, v) : []; }
+function mvKey(m) { return m ? m.t + ':' + (m.c != null ? m.c : '') + ':' + (m.i != null ? m.i : '') + ':' + (m.n != null ? m.n : '') + ':' + (m.f != null ? m.f : '') + ':' + (m.on != null ? m.on : '') + ':' + (m.dir || '') + ':' + (m.k || '') : ''; }
+function canAct() { const v = viewSeat(); return !!G && v >= 0 && !UI.busy && !UI.cards.length && !UI.fz && !isOver() && !(NET.on && NET.role === 'client' && !NET.hostPeer); }
+function iMustAct() { const v = viewSeat(); return v >= 0 && G && !isOver() && LD.pending(G).includes(v); }
+// the dive label in the bar
+function diveLabel() {
+  if (UI.mode === 'descent' && G.desc && typeof DESC !== 'undefined') { const Z = DESC[G.desc.zi]; return Z.name + ' · ' + (G.boss ? CHAR[G.boss.id].name : 'dive ' + (G.desc.si + 1) + ' of 3') + (G.desc.tryN > 1 ? ' · try ' + G.desc.tryN : ''); }
+  const m = G.mission; if (m.kind === 'log') return 'Dive ' + m.id; if (m.kind === 'deep') return 'Deep dive ' + m.d; return m.name;
+}
+function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2400); }
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+function loadPrefs() { try { const p = JSON.parse(lsGet('ld_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed != null) AIDELAY = p.speed; } catch (e) { } }
+function savePrefs() { lsSet('ld_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// ---- the logbook: progress saved on this device ----
+const Prog = {
+  d: null,
+  load() { if (this.d) return this.d; let o = null; try { o = JSON.parse(lsGet('ld_prog') || 'null'); } catch (e) { } if (!o || o.v !== 1) o = { v: 1, cur: 1, att: {}, done: {}, flare: {}, deep: { level: D.deep.start, wins: 0, best: 0 }, tries: {} }; this.d = o; return o; },
+  save() { lsSet('ld_prog', JSON.stringify(this.d)); },
+  // an attempt of a logbook dive ended
+  ended(G) {
+    const p = this.load(), m = G.mission; if (G.noProg) return;
+    if (m.kind === 'log') {
+      p.tries[m.id] = (p.tries[m.id] || 0) + 1;
+      if (G.distress) p.flare[m.id] = true;
+      if (G.result.ok) { const n = (p.tries[m.id] || 1) + (p.flare[m.id] ? 1 : 0); if (!p.done[m.id] || n < p.done[m.id]) p.done[m.id] = n; p.att[m.id] = p.done[m.id]; p.cur = Math.max(p.cur, Math.min(33, m.id + 1)); p.tries[m.id] = 0; }
+    } else if (m.kind === 'deep') {
+      if (G.result.ok) { p.deep.wins++; p.deep.level = m.d + 1; p.deep.best = Math.max(p.deep.best, m.d); p.deep.flare = p.deep.flare || {}; p.deep.flare[m.d] = !!G.distress; }
+    }
+    this.save();
+  },
+  reset() { this.d = null; try { localStorage.removeItem('ld_prog'); } catch (e) { } this.load(); }
+};
+// ===================== part 10: the ghost finger (the first move) and dragging a card onto the table =====================
+let _fing = '';
+function fingerDone() {
+  if (UI.fingerOn) { UI.fingerOn = false; try { lsSet('ld_finger', String((+lsGet('ld_finger') || 0) + 1)); } catch (e) { } }
+  const f = $('#finger'); if (f) { f.hidden = true; _fing = ''; }
+}
+function fingerTarget() {
+  if (!G || !UI.started || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || G.phase === 'over' || viewSeat() < 0 || !iMustAct()) return null;
+  if (!UI.fingerOn) return null;
+  const v = viewSeat(), ph = G.phase;
+  if (ph === 'assign') {
+    if (!myMoves().some(m => m.t === 'take')) return null;
+    let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { }
+    const sel = m && m.t === 'take' ? '#pool [data-key="job' + m.i + '"]' : '#pool .jcard.glow';
+    return { sel, kind: 'tap' };
+  }
+  if (ph !== 'play') return null;
+  if (ph === 'play') {
+    const T = G.trick, turn = T.turn; if (ctlSeat(turn) !== v) return null;
+    if (G.players[turn].helper) return { sel: '#opp .dc.can', kind: 'tap' };
+    let c = -1; { let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { } if (m && m.t === 'play') c = m.c; }
+    if (c >= 0) return { sel: '#hand .hc[data-id="' + c + '"]', kind: 'drag' };
+  }
+  return null;
+}
+function placeFinger() {
+  const f = $('#finger'); if (!f) return;
+  const t = fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }
+  const el = document.querySelector(t.sel); if (!el) { f.hidden = true; return; }
+  const r = el.getBoundingClientRect(); if (r.width < 4) { f.hidden = true; return; }
+  const dist = t.kind === 'drag' ? Math.max(60, Math.min(170, r.top - ($('#table').getBoundingClientRect().top + 90))) : 0;
+  f.hidden = false; f.className = t.kind === 'drag' ? 'drag' : 'tap';
+  f.style.left = Math.round(r.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top + r.height * (t.kind === 'drag' ? .45 : .5)) + 'px'; f.style.setProperty('--dist', Math.round(dist) + 'px');
+  const k = t.sel + '|' + Math.round(r.left) + '|' + Math.round(r.top); if (k !== _fing) { _fing = k; f.classList.remove('go'); void f.offsetWidth; }
+  f.classList.add('go');
+}
+// a detail callout (seat, job, last trick) never blocks the table: any touch elsewhere closes it and goes through
+document.addEventListener('pointerdown', e => { if (UI.pop && e.target.closest && !e.target.closest('#ppop')) closePop(); }, true);
+// ---- drag a card from the hand onto the table to play it ----
+(function () {
+  let Dg = null;
+  const overTable = e => { const hz = $('#handz'), t = $('#table'); if (!hz || !t) return false; const tr = t.getBoundingClientRect(); return e.clientY < hz.getBoundingClientRect().top + 6 && e.clientY > tr.top - 10; };
+  document.addEventListener('pointerdown', e => {
+    if (e.button > 0 || !e.target.closest) return;
+    const el = e.target.closest('#hand .hc, #opp .dc.can'); if (!el || e.target.closest('.pspot') || el.classList.contains('dim')) return;
+    if (!G || !canAct() || G.phase !== 'play') return;
+    Dg = { el, id: +el.dataset.id, drone: el.classList.contains('dc'), x0: e.clientX, y0: e.clientY, moved: false };
+  }, true);
+  document.addEventListener('pointermove', e => {
+    if (!Dg) return; const dx = e.clientX - Dg.x0, dy = e.clientY - Dg.y0;
+    if (!Dg.moved && Math.hypot(dx, dy) < 12) return;
+    if (!Dg.moved) { Dg.moved = true; Dg.el.classList.add('drag'); const f = $('#finger'); if (f) f.hidden = true; }
+    Dg.el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.1)'; Dg.el.style.zIndex = '100';
+    const t = $('#table'); if (t) t.classList.toggle('drop', overTable(e));
+    try { pxDirty(); } catch (er) { }
+  }, true);
+  const end = e => {
+    if (!Dg) return; const d = Dg; Dg = null; const t = $('#table'); if (t) t.classList.remove('drop');
+    if (!d.moved) return;
+    UI.noClickUntil = Date.now() + 120;
+    d.el.classList.remove('drag'); d.el.style.transform = ''; d.el.style.zIndex = '';
+    if (e.type === 'pointerup' && overTable(e)) { if (d.drone) tapDrone(d.id); else tapHand(d.id); } else { render(); }
+  };
+  document.addEventListener('pointerup', end, true); document.addEventListener('pointercancel', end, true);
+  window.addEventListener('click', e => { if (UI.noClickUntil && Date.now() < UI.noClickUntil) { e.stopPropagation(); e.preventDefault(); } }, true);
+})();
+// ===================== part 11: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase, short, pointing at the board. The bulb: the computer diver's own choice for you (LD.AI.choose, the same one that plays the
+// computer seats) + a short why + rules cards. Where the advisor has no safe call (signals, votes, passing) the bulb shows only the rules cards.
+// ---------------------------------------------------------------- pictures for the rules cards (the real card art plus small SVGs)
+const HP = {
+  c: (s, v) => { try { return KIT.cardSVG(D.card(s, v), { w: 56 }); } catch (e) { return ''; } },
+  lan: (v) => { try { return KIT.cardSVG(D.card(4, v), { w: 56 }); } catch (e) { return ''; } },
+  ping: (k) => { try { return KIT.pingSVG({ size: 64, k }); } catch (e) { return ''; } },
+  flare: () => { try { return KIT.flareSVG({ size: 64, on: true }); } catch (e) { return ''; } },
+  drone: () => { try { return KIT.droneSVG({ size: 64 }); } catch (e) { return ''; } },
+  job: () => '<svg viewBox="0 0 64 64"><rect x="10" y="6" width="44" height="52" rx="6" fill="#fff6dd" stroke="#0b1f3a" stroke-width="3"/><path d="M18 20h28M18 30h28M18 40h16" stroke="#1d4a93" stroke-width="3.5" stroke-linecap="round"/><circle cx="46" cy="46" r="5" fill="#f1b82e" stroke="#0b1f3a" stroke-width="2"/></svg>',
+  tick: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#3fa86d" stroke="#0b1f3a" stroke-width="3"/><path d="M19 33l9 9 17-20" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  cross: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#c4473d" stroke="#0b1f3a" stroke-width="3"/><path d="M21 21l22 22M43 21L21 43" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg>',
+  crown: () => '<svg viewBox="0 0 64 64"><path d="M8 48h48l-4-28-13 12-7-19-7 19-13-12z" fill="#ffd873" stroke="#0b1f3a" stroke-width="3" stroke-linejoin="round"/><rect x="8" y="48" width="48" height="6" rx="2" fill="#e0a31c" stroke="#0b1f3a" stroke-width="2"/></svg>',
+  hand: () => '<svg viewBox="0 0 64 64"><rect x="8" y="22" width="24" height="34" rx="4" fill="#fff6dd" stroke="#0b1f3a" stroke-width="3" transform="rotate(-14 20 39)"/><rect x="20" y="16" width="24" height="34" rx="4" fill="#fff6dd" stroke="#0b1f3a" stroke-width="3"/><rect x="32" y="22" width="24" height="34" rx="4" fill="#fff6dd" stroke="#0b1f3a" stroke-width="3" transform="rotate(14 44 39)"/></svg>',
+  vote: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="20" r="11" fill="#9fd0ff" stroke="#0b1f3a" stroke-width="3"/><path d="M12 56c2-17 10-22 20-22s18 5 20 22z" fill="#9fd0ff" stroke="#0b1f3a" stroke-width="3" stroke-linejoin="round"/><path d="M26 22l5 5 9-10" fill="none" stroke="#0b1f3a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  num: (n) => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#ffe9a6" stroke="#0b1f3a" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="32" font-weight="800" fill="#0b1f3a" font-family="Georgia,serif">' + n + '</text></svg>'
+};
+function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' : '<figure>' + (HP[it[0]] ? HP[it[0]](it[2], it[3]) : '') + (it[1] ? '<figcaption>' + it[1] + '</figcaption>' : '') + '</figure>').join('') + '</div>'; }
+// ---------------------------------------------------------------- where each bubble points
+const hq = s => () => document.querySelector(s);
+const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+// the box around all the glowing elements that match: the bubble then sits clear of every one of them, not just the first
+const hhull = (sel) => () => {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 3 && r.height > 3); if (!rs.length) return null;
+  const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+  const box = { left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t, x: l, y: t };
+  return { getBoundingClientRect: () => box };
+};
+const HLP_STEPS = {
+  jobs: { target: () => hhull('#pool .jcard.glow')() || hfirst('#acts .btn')(), title: 'Pick a job', text: 'Tap a glowing job card.', pic: () => HP.job() },
+  jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Answer with a button below. Each button says what happens next.', pic: () => HP.job() },
+  vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who should take every job. You may pick yourself.', pic: () => HP.vote() },
+  flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or tap the skip button.', pic: () => HP.flare() },
+  pass: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. Lanterns cannot go.', pic: () => HP.c(1, 5) },
+  predict: { target: hfirst('#acts .btn'), title: 'Predict your tricks', text: 'Tap how many tricks you will win. The job needs exactly that many.', pic: () => HP.num('?') },
+  signal: { target: hfirst('.pspot', '#acts [data-a=nosig]'), title: 'Signal your crew', text: 'Tap a ping spot to show one card, or tap No signal.', pic: () => HP.ping('') },
+  lead: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour.', pic: () => HP.c(0, 7) },
+  follow: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Follow the colour', text: 'Play the colour that was led. Dim cards are blocked. Highest of that colour wins.', pic: () => HP.c(1, 6) },
+  free: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins the trick.', pic: () => HP.lan(2) },
+  drone: { target: hfirst('#opp .dc.can', '#opp .dc'), title: 'Play for the drone', text: 'The drone is on your team. Tap one of its glowing cards.', pic: () => HP.drone() }
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES = [
+  { title: 'The goal', text: 'The whole crew wins or loses together. Finish every job card and the dive is won.', pic: () => hpics([['job', 'Jobs'], '>', ['tick', 'All done'], '>', ['crown', 'Win']]) },
+  { title: 'A trick', text: 'Each diver plays one card. The highest card of the colour led wins, unless a Lantern is played.', pic: () => hpics([['c', 'Led', 0, 4], ['c', '', 0, 8], ['c', 'Wins', 0, 9]]) },
+  { phase: 'jobs', title: 'One job, one diver', text: 'Each job card is a task for one diver. It is done by the tricks that diver wins.', pic: () => hpics([['job', 'Job'], '>', ['vote', 'One diver']]) },
+  { phase: 'jobs', title: 'Done or broken', text: 'A job is done when it is met and can no longer fail. One broken job ends the dive.', pic: () => hpics([['tick', 'Done'], ['cross', 'Dive over']]) },
+  { phase: 'jobs', title: 'The Commander', text: 'The Commander holds Lantern 4 and picks first. Jobs marked with a crossed circle are not for them.', pic: () => hpics([['lan', 'Commander', 4], '>', ['job', 'Picks first']]) },
+  { phase: 'jobsAsk', title: 'Who takes the jobs?', text: 'This dive lets the crew choose. The Commander may keep every job, or offer them to others.', pic: () => hpics([['crown', 'Commander'], '>', ['job', 'Jobs']]) },
+  { phase: 'jobsAsk', title: 'Yes or no', text: 'Yes means you take the jobs on. No leaves them for someone else.', pic: () => hpics([['tick', 'Yes'], ['cross', 'No']]) },
+  { phase: 'jobsAsk', title: 'Done or broken', text: 'A job is done when it is met and can no longer fail. One broken job ends the dive.', pic: () => hpics([['tick', 'Done'], ['cross', 'Dive over']]) },
+  { phase: 'vote', title: 'Vote', text: 'The team agrees on one diver to take every job. Tap your vote. You may vote for yourself.', pic: () => hpics([['vote', 'Your vote'], '>', ['job', 'All jobs']]) },
+  { phase: 'vote', title: 'No card talk', text: 'You may talk about the plan, but never about which cards you hold.', pic: () => hpics([['hand', 'Hidden'], ['cross', 'No talk']]) },
+  { phase: 'flare', title: 'The distress flare', text: 'Optional, before signals: every diver passes one colour card to a neighbour.', pic: () => hpics([['flare', 'Flare'], '>', ['c', 'Pass', 2, 5]]) },
+  { phase: 'flare', title: 'Left or right', text: 'Everyone passes the same way. Lanterns can never be passed.', pic: () => hpics([['c', 'Left', 3, 3], ['lan', 'Never', 3]]) },
+  { phase: 'flare', title: 'It costs a try', text: 'In the logbook, lighting the flare counts as one extra attempt. Skipping it is fine.', pic: () => hpics([['flare', 'Flare'], '>', ['num', 'Extra try', '+1']]) },
+  { phase: 'pass', title: 'Pass a card', text: 'Pick one colour card to pass to your neighbour. Lanterns cannot be passed.', pic: () => hpics([['c', 'Pass', 2, 6], '>', ['vote', 'Neighbour']]) },
+  { phase: 'pass', title: 'Pass to help', text: 'Give a card your neighbour\'s jobs need. Keep the cards your own jobs need.', pic: () => hpics([['job', 'Their job'], '>', ['c', 'Give', 1, 8]]) },
+  { phase: 'predict', title: 'An exact count', text: 'This job needs you to win exactly the number of tricks you predicted.', pic: () => hpics([['num', 'Predict', 2], '>', ['tick', 'Exactly 2']]) },
+  { phase: 'predict', title: 'Count your strength', text: 'High cards and Lanterns win tricks. Few of them? Predict a low number.', pic: () => hpics([['lan', 'Wins', 3], ['c', 'Wins', 0, 9], ['c', 'Loses', 0, 2]]) },
+  { phase: 'signal', title: 'The ping', text: 'Once per dive you may show one colour card to the crew. It stays in your hand.', pic: () => hpics([['c', 'Your card', 1, 9], '>', ['ping', 'Shown', 'top']]) },
+  { phase: 'signal', title: 'Highest, lowest, only', text: 'You may show only your highest, lowest or only card of a colour. The token says which.', pic: () => hpics([['ping', 'Highest', 'top'], ['ping', 'Only', 'mid'], ['ping', 'Lowest', 'bot']]) },
+  { phase: 'signal', title: 'Between tricks only', text: 'Signals come between tricks, never in the middle of one. Lanterns can never be shown.', pic: () => hpics([['lan', 'Never', 2], ['ping', 'Between tricks', 'mid']]) },
+  { phase: 'lead', title: 'Leading a trick', text: 'Lead any card. Its colour is the colour everyone else must follow if they can.', pic: () => hpics([['c', 'You lead', 0, 5], '>', ['c', 'Follow', 0, 8]]) },
+  { phase: 'lead', title: 'Who wins a trick', text: 'The highest card of the led colour wins. Other colours never win. The winner leads next.', pic: () => hpics([['c', 'Led', 2, 4], ['c', 'Higher', 2, 9], ['c', 'Never wins', 1, 9]]) },
+  { phase: 'lead', title: 'Lanterns are trumps', text: 'A Lantern beats every colour. With several Lanterns, the highest Lantern wins.', pic: () => hpics([['c', 'Colour', 3, 9], ['lan', 'Beats it', 2]]) },
+  { phase: 'lead', title: 'Show a card (ping)', text: 'Between tricks, once per dive, you may show your highest, lowest or only card of a colour.', pic: () => hpics([['c', 'Colour card', 1, 9], '>', ['ping', 'Ping', 'top']]) },
+  { phase: 'follow', title: 'Follow the colour', text: 'If you hold the colour that was led, you must play it. Dim cards are not allowed.', pic: () => hpics([['c', 'Led', 1, 4], '>', ['c', 'You play', 1, 7]]) },
+  { phase: 'follow', title: 'You never have to win', text: 'The highest card of the led colour wins. Play low to let a teammate win.', pic: () => hpics([['c', 'Low', 1, 2], ['c', 'High', 1, 9]]) },
+  { phase: 'follow', title: 'Lanterns are trumps', text: 'A Lantern beats every colour. With several Lanterns, the highest Lantern wins.', pic: () => hpics([['c', 'Colour', 1, 9], ['lan', 'Beats it', 1]]) },
+  { phase: 'free', title: 'None of that colour', text: 'You may play any card. A different colour can never win the trick.', pic: () => hpics([['c', 'Led', 0, 6], '>', ['c', 'Never wins', 2, 9]]) },
+  { phase: 'free', title: 'Lanterns are trumps', text: 'Play a Lantern and you win the trick, unless someone plays a higher Lantern.', pic: () => hpics([['lan', 'Wins', 3], ['crown', 'The trick']]) },
+  { phase: 'free', title: 'Save your strength', text: 'Play a card your jobs do not need. Keep what your jobs need for later.', pic: () => hpics([['c', 'Spare', 3, 1], ['job', 'Keep for it']]) },
+  { phase: 'drone', title: 'The drone', text: 'With two divers, a drone joins as an extra player. You play its cards for it.', pic: () => hpics([['drone', 'Drone'], '>', ['hand', 'You play it']]) },
+  { phase: 'drone', title: 'It follows the colour', text: 'The drone follows the colour led like anyone else. Blocked cards are dimmed.', pic: () => hpics([['c', 'Led', 2, 3], '>', ['drone', 'Follows']]) }
+];
+// ---------------------------------------------------------------- phases
+// the phase the player is deciding in (null when there is nothing to decide on the board)
+function hlpPhase() {
+  try {
+    if (tutOn() || !G || !UI.started || G.phase === 'over' || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || UI.tip || (GX && GX.open)) return null;
+    const st = $('#start'), rs = $('#rs'); if ((st && !st.hidden) || (rs && !rs.hidden)) return null;
+    const v = viewSeat(); if (v < 0 || !iMustAct() || !myMoves().length) return null;
+    if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') return null;
+    switch (G.phase) {
+      case 'assign': { const m = G.as.mode; return m === 'vote' ? 'vote' : (m === 'cmd' || m === 'vol') ? 'jobsAsk' : 'jobs'; }
+      case 'distress': return 'flare';
+      case 'pass': return 'pass';
+      case 'predict': return 'predict';
+      case 'signal': return 'signal';
+      case 'play': {
+        const T = G.trick, turn = T.turn; if (ctlSeat(turn) !== v) return null;
+        if (G.players[turn].helper) return 'drone';
+        if (!T.plays.length) return 'lead';
+        return G.players[turn].hand.some(c => suitOf(c) === T.ls) ? 'follow' : 'free';
+      }
+    }
+  } catch (e) { }
+  return null;
+}
+// ---------------------------------------------------------------- the bulb: the computer diver's choice for you
+function capW(t, n) { const w = String(t || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean); return w.length <= n ? w.join(' ') : ''; }
+function hlpPlayWhy(v, c) {
+  let w = ''; try { w = LD.AI.why(G, v, c) || ''; } catch (e) { }
+  w = String(w).replace(/\s*\([^)]*\)/g, '').trim();
+  const parts = w.split(/;\s*/).map(s => s.replace(/[.\s]+$/, '').trim()).filter(Boolean);
+  let best = '';
+  for (let k = parts.length; k >= 1 && !best; k--) { const t = capW(parts.slice(0, k).join('; '), 15); if (t) best = t; }
+  if (!best) best = capW(parts[0], 15);
+  if (!best) return 'This card suits your jobs best right now.';
+  return best.charAt(0).toUpperCase() + best.slice(1) + '.';
+}
+// one planFor() gives the move, the card to pick up and where it goes: the finger, the glow and the bulb all use it
+function hlpPlan() {
+  const v = viewSeat(); if (!canAct() || !iMustAct() || G.phase === 'over') return null;
+  let m = null;
+  try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { m = null; }
+  if (!m) return null;
+  if (!myMoves().some(x => x.t === m.t && x.c === m.c && x.i === m.i && x.on === m.on && x.dir === m.dir)) return null;   // never advise an illegal move
+  if (G.phase === 'play' && m.t === 'play') {
+    const T = G.trick; if (G.players[T.turn].helper || ctlSeat(T.turn) !== v) return null;
+    const card = () => document.querySelector('#hand .hc[data-id="' + m.c + '"]'), slot = () => document.querySelector('.tslot[data-seat="' + v + '"]') || document.querySelector('#felt');
+    return { m, from: card, to: slot, why: () => hlpPlayWhy(v, m.c) };
+  }
+  if (G.phase === 'assign' && m.t === 'take') {
+    const el = () => document.querySelector('#pool [data-key="job' + m.i + '"]');
+    return { m, to: el, why: () => G.as.mode === 'hardfirst' ? 'This dive says: take the hardest job first.' : 'Your hand suits this job better than the others.' };
+  }
+  if (G.phase === 'distress' && m.t === 'dist') {
+    const el = () => document.querySelector('#acts [data-a=dist][data-on="' + (m.on ? 'true' : 'false') + '"]' + (m.on ? '[data-dir="' + m.dir + '"]' : ''));
+    return { m, to: el, why: () => m.on ? 'Earlier tries failed: the flare lets the crew swap cards.' : 'No flare needed on this attempt.' };
+  }
+  return null;
+}
+function hlpSuggest() {
+  const p = hlpPlan(); if (!p || !p.to || !p.to()) return null;
+  const why = p.why(); if (!why || capW(why, 15) === '') return null;
+  return { why, key: p.m.t + ':' + (p.m.c !== undefined ? p.m.c : p.m.i !== undefined ? p.m.i : p.m.on), target: p.to, from: p.from && p.from() ? p.from : null };
+}
+// ---------------------------------------------------------------- wiring
+let _hlpInit = false;
+function hlpInit() {
+  if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
+  GXH.init({ game: 'lantern-dive', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,.pspot,#acts .btn,#opp .dc.can,.tc,#hand .hc,.me,.seat,.jcard,.gx-ibtn' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
+}
+function hlpAfter() { hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }
+// ===================== part 12: the tutorial (shell/gx-tutor.js): a staged, never-saved dive that teaches every rule by doing it once =====================
+// RULES CHECKLIST (from the rules drawer buildRules(), the help-kit rules cards HLP_RULES and rules-test.js). Each line names the step that teaches it by doing:
+//   [x] The goal: the whole crew wins or loses together; every job is done = the dive is won ............ goal, won
+//   [x] A job card is a task for ONE diver; it is met by the tricks that diver wins ...................... goal, take, mates
+//   [x] The Commander holds Lantern 4, picks a job first, then clockwise, one job at a turn .............. cmd, take, mates
+//   [x] A job is done when it is met and can no longer fail (green tick); a job that can no longer be met
+//       is broken (red cross) and loses the dive for everybody; try again .............................. lost, done1, won
+//   [x] The distress flare (optional card pass before signalling, costs an extra attempt) ................ flare
+//   [x] No talking about cards; the ping: once per dive show your highest, lowest or only card of a colour,
+//       between tricks; others read it; the token resets each attempt ................................... ping, readping, ping2
+//   [x] The Commander leads the first trick; the winner leads the next one ............................... lead, win2, done1, win3
+//   [x] The leader plays any card; everybody must follow its colour if they can ......................... lead, follow
+//   [x] The highest card of the led colour wins; other colours never win ................................ win1, win2, win3
+//   [x] You are never forced to win a trick ................................................................ lead2
+//   [x] No card of the led colour: play anything; Lanterns are trumps and beat every colour ............. trump, win4
+//   [x] The dive ends the moment every job is done; cards left in hand do not matter ..................... won
+//   [-] Not taught here (the lightbulb and the Rules drawer cover them): job-sharing dives, murky water, deep narcosis,
+//       the clock, predictions, the drone for two divers, the Last trick button.
+// The staged game: seat 0 = you (Commander, Lantern 4), seat 1 = Dag, seat 2 = Sumi. Jobs: you "Win the Lantern 3", Dag "Win the first trick" (data.js tutorial).
+// Attempt 1 ends on trick 1 on purpose: the player leads the Coral 9, wins, and breaks Dag's job. Attempt 2 (same deal, taken for you) is won in three tricks.
+const TUT_GAME = 'lantern-dive';
+const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial';
+const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls: cls, launch: tutStart });
+const tcard = t => { const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }; return D.card(L[t[0]], +t.slice(1)); };
+// ---------------------------------------------------------------- the scripted divers (Dag = seat 1, Sumi = seat 2)
+// the cards they play, by attempt (1, or 2 = every later one), trick number and seat
+const TUT_PLAY = { 1: [{ 1: 'C5', 2: 'C3' }], 2: [{ 1: 'C7', 2: 'C1' }, { 1: 'K4', 2: 'K9' }, { 2: 'T8', 1: 'T2' }] };
+function tutMove(s) {
+  const mv = LD.moves(G, s); if (!mv.length) return null;
+  if (G.phase === 'assign') return mv.find(m => m.t === 'take') || null;
+  if (G.phase === 'signal') {
+    const k9 = tcard('K9');
+    if (s === 2 && G.att === 1) { const p = mv.find(m => m.t === 'ping' && m.c === k9); if (p) return p; }
+    return mv.find(m => m.t === 'nosig') || null;
+  }
+  if (G.phase === 'play') {
+    const row = (TUT_PLAY[G.att > 1 ? 2 : 1] || [])[G.tricks.length]; const want = row && row[s]; if (!want) return null;
+    return mv.find(m => m.t === 'play' && m.c === tcard(want)) || null;
+  }
+  return null;
+}
+function tutAiStep() {
+  for (const s of LD.pending(G)) {
+    if (!G.players[s].ai) continue;
+    const m = tutMove(s); if (!m) continue;
+    const r = LD.apply(G, s, m); if (r.ok) return true;
+  }
+  return LD.AI.step(G);   // anything unscripted: the normal computer diver
+}
+// attempt 2 starts with the same jobs and no flare, taken for you: those are not the player's taps, so they do not go through the kit
+function tutAuto() {
+  if (!tutOn() || UI.busy || !G || G.att < 2 || !iMustAct()) return false;
+  let mv = null;
+  if (G.phase === 'assign') mv = myMoves().find(m => m.t === 'take' && m.i === 0);
+  else if (G.phase === 'distress') mv = myMoves().find(m => m.t === 'dist' && !m.on);
+  if (!mv) return false;
+  if (!UI._tutAutoT) UI._tutAutoT = setTimeout(() => { UI._tutAutoT = 0; if (tutOn() && G && !UI.busy) commit(0, mv); else schedule(); }, 420);
+  return true;
+}
+// a step that waits for "Next" must not have the computer move on under it
+function tutPaused() { try { const s = GXT.state(); return !!(s.active && s.shown && !s.wait); } catch (e) { return false; } }
+// the kit gate for every move the player makes (doMove in ui3.js)
+function tutGate(mv) { return GXT.act({ type: 'tap', what: 'move', mv }); }
+// the trick stays on the table, with its winner marked, while the current step explains it (playEvs in ui3.js)
+async function tutHoldWait() {
+  for (let g = 0; g < 900 && tutOn(); g++) { const st = GXT.current(); if (!(st && st.hold && st.hold())) return; await wait(80); }
+}
+// ---------------------------------------------------------------- where each step points
+
+// glowing things pulse a few pixels; a spotlight that follows every pulse would redraw its bubble all the time, so a rect only moves when it moved by more than 7 px
+function tutSteady(key, r) {
+  if (!r) { delete tutSteady.last[key]; return null; }
+  const o = tutSteady.last[key];
+  if (o && Math.abs(o.left - r.left) < 7 && Math.abs(o.top - r.top) < 7 && Math.abs(o.width - r.width) < 7 && Math.abs(o.height - r.height) < 7) return o;
+  return (tutSteady.last[key] = r);
+}
+tutSteady.last = {};
+const tq = sel => () => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? tutSteady('q' + sel, { left: r.left, top: r.top, width: r.width, height: r.height }) : null; };
+// a hand card's visible part (later cards overlap it), so the tap lands on that card
+function tutHandRect(id) {
+  return tutSteady('hc' + id, tutHandRect0(id));
+}
+function tutHandRect0(id) {
+  const e = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (!e) return null;
+  const r = e.getBoundingClientRect(); if (!r.width) return null;
+  let right = r.right, bottom = r.bottom, seen = false;
+  for (let q = e.nextElementSibling; q; q = q.nextElementSibling) {
+    if (!q.classList.contains('hc')) continue; const b = q.getBoundingClientRect();
+    if (b.right > r.left && b.left < r.right && b.bottom > r.top + 4 && b.top < r.bottom - 4) {
+      if (b.top < r.top + r.height * .5 && b.left > r.left + 6) right = Math.min(right, b.left);
+      else if (b.top > r.top + 6) bottom = Math.min(bottom, b.top);
+    }
+  }
+  seen = true;
+  return { left: r.left, top: r.top, width: Math.max(24, right - r.left), height: Math.max(24, bottom - r.top) };
+}
+const tutSpot = id => () => { const e = document.querySelector('#hand .hc[data-id="' + id + '"] .pspot'); return e && e.getBoundingClientRect().width ? e : null; };
+const tutSeat = s => () => { const e = document.querySelector('[data-key="seat' + s + '"]'); const b = e && (e.closest('.seat') || e.closest('.me') || e); return b && b.getBoundingClientRect().width ? b : null; };
+// a job's chip: my own sit under my hand (#mine), the others' inside their seat
+const tutJobChip = i => () => {
+  const o = G.tasks[i] && G.tasks[i].owner; if (o == null || o < 0) return null;
+  const chips = o === viewSeat() ? Array.from(document.querySelectorAll('#mine .jc.me')) : (() => { const k = document.querySelector('[data-key="seat' + o + '"]'), root = k && k.closest('.seat'); return root ? Array.from(root.querySelectorAll('.jc')) : []; })();
+  const el = chips.find(c => c.getBoundingClientRect().width); return el || null;
+};
+// the box around all the elements that match (the job cards on the table, the cards of the trick)
+const tutBox = sel => () => {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 4 && r.height > 4); if (!rs.length) return null;
+  const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top)), r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+  return tutSteady('box' + sel, { left: l - 4, top: t - 4, width: r2 - l + 8, height: b - t + 8 });
+};
+const tutFelt = tutBox('#slots .tslot');
+const myTurnLead = () => G && G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !UI.busy && !UI.fz;
+const trickShown = () => !!(UI.fz && UI.fz.win);
+const cn2 = c => D.cardName(c);
+function lastTrickLine() { const k = G.tricks[G.tricks.length - 1]; return k; }
+function tutSteps() {
+  return [
+    { id: 'goal', title: 'One crew', say: 'You, Dag and Sumi win or lose together. Each job card is a task for one diver.', target: tutBox('#pool .jcard'), wait: null,
+      ready: () => G && G.phase === 'assign' && G.att === 1 && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard') },
+    { id: 'cmd', title: 'You are Commander', say: 'You hold Lantern 4, so you are the Commander. The Commander picks a job first.', target: () => tutHandRect(tcard('L4')), wait: null,
+      ready: () => G && G.phase === 'assign' && !UI.busy && !!tutHandRect(tcard('L4')) },
+    { id: 'take', title: 'Take a job', say: 'Tap the "Lantern 3" job: win that card. You hold Lantern 3 and 4, so it is safe.', target: tq('#pool [data-key="job0"]'),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' && a.mv.i === 0 }, ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy },
+    { id: 'mates', title: 'Dag takes one', say: 'Dag took "The first trick": he must win trick 1. Both jobs must be done to win.', target: tutJobChip(1), wait: null,
+      ready: () => G && G.phase === 'distress' && G.tasks[1].owner === 1 && !UI.busy && !!tutJobChip(1)() },
+    { id: 'flare', title: 'Distress flare', say: 'Optional: after a lost try, divers can swap cards. Not now: tap No flare.', target: tq('#acts [data-a=dist][data-on=false]'),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'dist' && !a.mv.on }, ready: () => G && G.phase === 'distress' && iMustAct() && !UI.busy },
+    { id: 'ping', title: 'No talking!', say: 'Cards stay secret. Your only message is a ping: show one colour card. Tap the ping on Coral 9.', target: tutSpot(tcard('C9')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'ping' && a.mv.c === tcard('C9') }, ready: () => G && G.att === 1 && G.phase === 'signal' && iMustAct() && !UI.busy && !!tutSpot(tcard('C9'))() },
+    { id: 'readping', title: 'Read the pings', say: 'Sumi shows her Kelp 9, her highest Kelp. Everyone pings once per dive, between tricks.', target: tutSeat(2), wait: null,
+      ready: () => G && G.att === 1 && G.phase === 'play' && !UI.busy && G.pings.some(p => p.seat === 2) && !!tutSeat(2)() },
+    { id: 'lead', title: 'Lead a card', say: 'You lead the first trick. Everyone must follow its colour. Tap your Coral 9.', target: () => tutHandRect(tcard('C9')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('C9') }, ready: () => G.att === 1 && myTurnLead() },
+    { id: 'win1', title: 'Highest card wins', say: () => 'Coral was led, so all played Coral. The highest Coral wins: your 9 beats ' + otherVals() + '.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 1 && trickShown() },
+    { id: 'lost', title: 'A job broke', say: 'Dag needed to win the first trick, but you did. One broken job loses the dive for all.', target: tutJobChip(1), wait: null,
+      onNext: () => nextAttempt(true), ready: () => G && G.phase === 'over' && !G.result.ok && !UI.busy && !UI.fz && !!tutJobChip(1)() },
+    { id: 'ping2', title: 'Tell Dag', say: 'Same cards. This time let Dag win. Ping your lowest Coral, the 2.', target: tutSpot(tcard('C2')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'ping' && a.mv.c === tcard('C2') }, ready: () => G && G.att === 2 && G.phase === 'signal' && iMustAct() && !UI.busy && !!tutSpot(tcard('C2'))() },
+    { id: 'lead2', title: 'Lead low', say: 'You never have to win. Lead your Coral 2 and let Dag take the trick.', target: () => tutHandRect(tcard('C2')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('C2') }, ready: () => G.att === 2 && G.tricks.length === 0 && myTurnLead() },
+    { id: 'win2', title: 'Dag wins', say: 'Dag\'s Coral 7 is the highest Coral. Whoever wins a trick leads the next one.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 2 && G.tricks.length === 1 && trickShown() },
+    { id: 'done1', title: 'Job done', say: 'A green tick: Dag\'s job is done for good. Only a job that can still fail stays open.', target: tutJobChip(1), wait: null,
+      ready: () => G.att === 2 && G.phase === 'play' && G.tricks.length === 1 && !UI.busy && !UI.fz && jobSt(1) > 0 && !!tutJobChip(1)() },
+    { id: 'follow', title: 'Follow the colour', say: 'Dag led Kelp. If you hold Kelp, you must play it. Tap your Kelp 3.', target: () => tutHandRect(tcard('K3')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('K3') }, ready: () => G.att === 2 && G.tricks.length === 1 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 2 && !UI.busy && !UI.fz },
+    { id: 'win3', title: 'Who leads next', say: 'Sumi\'s Kelp 9 is the highest Kelp, so she wins and leads the next trick.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 2 && G.tricks.length === 2 && trickShown() },
+    { id: 'trump', title: 'Trumps!', say: 'Sumi led Tide. You have none, so play anything. A Lantern beats every colour: tap Lantern 3.', target: () => tutHandRect(tcard('L3')),
+      wait: { type: 'tap', match: a => a.mv && a.mv.t === 'play' && a.mv.c === tcard('L3') }, ready: () => G.att === 2 && G.tricks.length === 2 && G.phase === 'play' && iMustAct() && G.trick.plays.length === 1 && !UI.busy && !UI.fz },
+    { id: 'win4', title: 'Lantern wins', say: 'Your Lantern 3 beats Sumi\'s Tide 8. A higher Lantern would have won instead.', target: tutFelt, wait: null,
+      hold: () => true, ready: () => G.att === 2 && G.tricks.length === 3 && trickShown() },
+    { id: 'won', title: 'Dive won!', say: 'Both jobs are done, so the dive ends now and the crew wins. Cards left over do not matter.', target: tutJobChip(0), also: tutJobChip(1), wait: null,
+      ready: () => G && G.phase === 'over' && G.result && G.result.ok && !UI.busy && !UI.fz }
+  ];
+}
+function otherVals() { const k = UI.fz && UI.fz.plays ? UI.fz.plays.filter(p => p.s !== 0).map(p => valOf(p.c)) : []; return k.length === 2 ? k[0] + ' and ' + k[1] : 'the others'; }
+// ---------------------------------------------------------------- the kit hooks
+function tutStart(o) {
+  if (typeof GXT === 'undefined') return;
+  o = o && o.prologue ? o : null;
+  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  GXT.start({
+    game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+    endTitle: 'You know the rules',
+    endText: o ? 'Jobs, the Commander, pings, tricks, trumps. Now the Story begins.' : 'Jobs, the Commander, pings, tricks, trumps. Murky water, clocks and the drone are in the Rules and the lightbulb.',
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    setup: () => { try { GX.close(); } catch (e) { } try { GXC.close(); } catch (e) { } closePop(true); newGame('tutorial'); },
+    onDone: r => {
+      tutLeave(); const c = r && r.choice;
+      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
+      else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); }
+      else { showStart(); UI.sv = 'setup'; UI.cfgOpen = false; renderStart(); }
+    },
+    onExit: () => { tutLeave(); showStart(); }
+  });
+}
+// leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
+function tutLeave() {
+  clearTimeout(UI.tm); clearTimeout(UI._tutAutoT); UI._tutAutoT = 0; UI.seq++; UI.busy = false; UI.fz = null; UI.rq = []; UI.cards = []; UI.started = false;
+  try { GXH.hide(); } catch (e) { } try { const f = $('#finger'); if (f) f.hidden = true; } catch (e) { }
+}
+// ===================== part 2: the deep-sea table (seats, trick, job pool, hand, action tray) =====================
+// Play happens on the table: divers sit around it with their job tokens, the trick lies in the middle, your hand is along the bottom.
+// There is no text panel: one short status line (8 words or fewer) in the top bar, glows on what can be tapped, badges on the seats.
+const isPh = () => document.documentElement.classList.contains('ph');
+function actorSeat() {
+  if (!G || G.phase === 'over') return -1;
+  switch (G.phase) {
+    case 'assign': return G.as.actor;
+    case 'distress': return G.cap;
+    case 'predict': { const t = G.tasks.find(t => TASKS[t.id].k === 'pred' && t.pn < 0); return t ? t.owner : -1; }
+    case 'signal': return G.sig.actor;
+    case 'play': return G.trick ? G.trick.turn : -1;
+  }
+  return -1;
+}
+// ---- sizes: hand card width (CSS variable); the table's own geometry comes from tableGeo() once the hand has its height ----
+function layoutVars() {
+  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), vw = GXV.now(), land = ph && vw.w > vw.h;
+  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(62, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
+  const short = ph && !land && vw.h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
+  bd.classList.toggle('side', W > H * 1.45);
+  document.documentElement.style.setProperty('--hw', hw + 'px');
+  if (KIT.ART.table && !document.documentElement.style.getPropertyValue('--tableimg')) document.documentElement.style.setProperty('--tableimg', 'url("' + KIT.ART.table + '")');
+}
+// ---- the bar: dive name, flare, clock; the status line sits next to it ----
+function renderBar() {
+  const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
+  if (G && UI.started) {
+    bs.append(h('span', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att)));
+    if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'Distress flare is lit' }));
+    if (G.clock) { const t = h('span.tm' + (UI.clockLeft != null && UI.clockLeft < 20 ? '.low' : ''), clockText()); t.id = 'clk'; bs.append(t); }
+  }
+  placePrompt();
+}
+function clockText() { const s = Math.max(0, Math.round(UI.clockLeft != null ? UI.clockLeft : (G ? G.clock : 0))); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function placePrompt() { const bp = $('#barprompt'), pr = $('#prompt'); if (bp && pr && pr.parentNode !== bp) bp.appendChild(pr); }
+// ---- job tokens ----
+const TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>', CROSS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>';
+function jobChip(i, o) {
+  o = o || {}; const st = jobSt(i), d = jobDef(i);
+  // chips on another diver's seat are plain tokens (the seat is the tap target); only your own chips are buttons
+  const cls = '.jc' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '') + (o.me ? '.me' : '') + (o.opp ? '.opp' : '');
+  const lab = { 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open'), 'data-job': i };
+  const b = o.opp ? h('span' + cls, lab) : h('button' + cls, Object.assign({ type: 'button', 'data-a': 'job', 'data-i': i }, lab));
+  const sm = h('span.sm'); if (st > 0) sm.innerHTML = TICK_SVG; else if (st < 0) sm.innerHTML = CROSS_SVG; else sm.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="none"/></svg>';
+  b.append(sm, h('span.t', d.s));
+  if (o.me) { const df = h('span.df'); for (let k = 0; k < jobDiff(i); k++) df.append(h('i')); b.append(df); }
+  if (st !== 0) {   // a stamp lands on the token the first time it shows
+    UI.stampSeen = UI.stampSeen || {}; const k = G.seed + ':' + G.att + ':' + i + ':' + st, nw = !UI.stampSeen[k]; UI.stampSeen[k] = 1;
+    b.append(h('span.stamp' + (st > 0 ? '.ok' : '.bad') + (nw ? '.new' : ''), { html: st > 0 ? TICK_SVG : CROSS_SVG, 'aria-hidden': 'true' }));
+  }
+  return b;
+}
+// ---- the divers (and the drone) ----
+function pingTok(s, size) {
+  const p = G.players[s]; if (p.helper) return null;
+  if (G.comm === 'none') return h('span.tok', { html: KIT.pingSVG({ size, spent: true }), title: 'No signalling in this dive' });
+  if (G.comm === 'narc') return null;
+  return h('span.tok', { html: KIT.pingSVG({ size, spent: !!p.pingUsed }), title: p.pingUsed ? 'Ping used' : 'Ping ready' });
+}
+function shownEl(s) {
+  const sh = shownBy(s); if (!sh.length) return null;
+  const w = h('span.shownw', { style: 'display:flex;gap:3px' });
+  sh.slice(0, 2).forEach(p => w.append(h('span.spill', { style: 'background:' + D.suits[suitOf(p.c)].c + ';color:' + (suitOf(p.c) === 3 || suitOf(p.c) === 4 ? '#1b1405' : '#fff'), title: cname(p.c) + (p.k === 'high' ? ' (their highest)' : p.k === 'low' ? ' (their lowest)' : p.k === 'only' ? ' (their only one)' : '') }, String(valOf(p.c)) + (p.k === 'high' ? '\u25B2' : p.k === 'low' ? '\u25BD' : p.k === 'only' ? '\u25CF' : ''))));
+  return w;
+}
+const CARD_ICO = '<svg viewBox="0 0 12 16" aria-hidden="true"><rect x="1" y="1" width="10" height="14" rx="2.2"/><path d="M4 5.5h4M4 8.5h4"/></svg>', TRICK_ICO = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.2l2 4.4 4.8.5-3.6 3.2 1 4.7L8 11.6l-4.2 2.4 1-4.7L1.2 6.1 6 5.6z"/></svg>';
+// who may be voted for / is still deciding, shown on the seats instead of a roster
+function seatMarks() {
+  const m = { vote: new Set(), pend: new Set(), ready: new Set() };
+  if (!G || G.phase === 'over') return m;
+  const v = viewSeat();
+  if (G.phase === 'assign' && G.as.mode === 'vote' && iMustAct() && !UI.busy) myMoves().forEach(x => { if (x.t === 'vote') m.vote.add(x.f); });
+  if (G.phase === 'pass') { const pend = new Set(LD.pending(G)); G.players.forEach(p => { if (p.helper) return; (pend.has(p.seat) ? m.pend : m.ready).add(p.seat); }); }
+  return m;
+}
+function seatEl(s, act, mk) {
+  const p = G.players[s]; if (p.helper) return droneEl(s, act, mk);
+  const won = tricksWon()[s], cm = s === G.cap, vote = mk.vote.has(s);
+  const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 17 }), title: 'Commander' }));
+  const t = pingTok(s, 18); if (t) { t.classList.add('pk'); av.append(t); }
+  b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>', title: won + ' tricks won' })));
+  const sh = shownEl(s); if (sh) b.append(h('span.pg', sh));
+  const js = jobs(s), jb = h('span.jobs'); js.slice(0, 2).forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2)));
+  b.append(jb);
+  return b;
+}
+function droneEl(s, act, mk) {
+  const p = G.players[s], v = viewSeat();
+  const b = h('div.seat.drone' + (act === s ? '.act' : ''), { 'data-seat': s });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s });
+  const won = tricksWon()[s];
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>' }))));
+  const js = jobs(s); const jb = h('span.jobs.dj');
+  js.slice(0, 3).forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 3) jb.append(h('span.jc.more', '+' + (js.length - 3)));
+  b.append(h('div.dhead', h('button.dseat', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Drone ' + p.name }, top), jb));
+  const row = h('div.drow');
+  const myTurn = G.phase === 'play' && G.trick.turn === s && G.cap === v && !UI.fz;
+  const legal = myTurn ? LD.playable(G, s) : [];
+  (p.stacks || []).forEach(st => {
+    const top2 = st[0], hasBot = st[1] !== -1;
+    const w = h('div.dstack', h('div.dbk' + (hasBot ? '' : '.none')));
+    if (top2 >= 0) {
+      const can = legal.includes(top2);
+      const c = h('button.dc' + (can ? '.can.glow' : (myTurn ? '.dim' : '')) + (UI.sel === top2 ? '.sel' : ''), { type: 'button', 'data-a': 'dcard', 'data-id': top2, 'data-px': 'card', 'data-pk': 'h:' + top2, 'aria-label': cname(top2) + (can ? ', playable' : '') });
+      c.append(cardN(top2, 46)); w.append(c);
+    }
+    row.append(w);
+  });
+  b.append(row); return b;
+}
+// ---- the table's geometry: where each seat sits and where each diver's card lies in the trick ----
+function tableGeo() {
+  const T = $('#table'), bd = $('#bd'); if (!T) return null;
+  const W = T.clientWidth || 360, H = T.clientHeight || 400, n = G.np, k = n - 1, ph = isPh();
+  const side = !!(bd && bd.classList.contains('side')), small = !side && H < 420, boss = !!(G.boss && G.phase !== 'assign');
+  const drone = G.players.findIndex(p => p.helper);
+  const compact = side || small;
+  const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
+  const seatW = side ? 132 : Math.round(Math.min(90, W * .23)), seatH = side ? 76 : (small ? 100 : 116);
+  const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
+  const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
+  const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
+  geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
+  // trick area
+  let top, zl = 0, zr = W;
+  if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
+  const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
+  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : 112;
+  if (!side && k >= 3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
+  if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
+  cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
+  geo.pl = side ? zl : ((k >= 3 || drone >= 0) ? seatW + 8 : 6); geo.pr = side ? zr : ((k >= 3 || drone >= 0) ? W - seatW - 8 : W - 6);
+  geo.cw = cw; geo.ch = ch; geo.cx = cx; geo.cy = cy; geo.top = top; geo.zoneH = zoneH;
+  const rx = Math.round(cw * (side ? 1.5 : 1.05)), ry = Math.round(ch * (side ? .86 : 1.0));
+  for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry)]); }
+  // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
+  const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
+  geo.L = L; geo.R = R; geo.mid = mid; geo.y0 = y0;
+  return geo;
+}
+// seat anchors for the seat list (clockwise from `from`)
+function seatSpots(geo, list) {
+  const { W, k, side, seatW, seatH, cy, y0, L, R, mid } = geo, out = [], droneIdx = list.findIndex(s => G.players[s].helper);
+  const sp = (x, y, w) => ({ x: Math.round(x), y: Math.round(y), w: w || seatW });
+  if (side) {
+    const dW = geo.droneW; const colL = [], colR = [];
+    if (droneIdx >= 0) { list.forEach((s, i) => { if (i === droneIdx) colR.push(s); else colL.push(s); }); }
+    else { const half = Math.ceil(list.length / 2); list.forEach((s, i) => { if (i < half) colL.push(s); else colR.push(s); }); }
+    const put = (col, x, w, up) => { const m = col.length, order = up ? col.slice().reverse() : col; order.forEach((s, j) => { const h0 = G.players[s].helper ? geo.dh : seatH, gap = 6; const tot = m * h0 + (m - 1) * gap, y = cy - tot / 2 + j * (h0 + gap); out[list.indexOf(s)] = sp(x, Math.max(2, Math.min(geo.H - h0 - 2, y)), w); }); };
+    put(colL, seatW / 2 + 3, seatW, true);   // bottom to top: the seat next to you (clockwise) is the lowest
+    put(colR, geo.W - (droneIdx >= 0 ? dW / 2 + 4 : seatW / 2 + 3), droneIdx >= 0 ? dW : seatW, false);
+    return out;
+  }
+  const kk = list.length;
+  if (droneIdx >= 0) {
+    list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx ? L : R, mid, seatW); });
+    return out;
+  }
+  if (kk === 2) { out[0] = sp(W * .24, y0); out[1] = sp(W * .76, y0); }
+  else if (kk === 3) { out[0] = sp(L, mid); out[1] = sp(W / 2, y0); out[2] = sp(R, mid); }
+  else { out[0] = sp(L, mid + 18); out[1] = sp(W * .31, y0); out[2] = sp(W * .69, y0); out[3] = sp(R, mid + 18); }
+  return out;
+}
+function renderOpp(v) {
+  const box = $('#opp'); box.innerHTML = ''; if (!G) return;
+  const geo = UI.geo; if (!geo) return;
+  const act = G.phase === 'play' && G.trick ? G.trick.turn : actorSeat(), mk = seatMarks();
+  const from = v >= 0 ? v : 0, list = seatsClockwise(from), spots = seatSpots(geo, list);
+  list.forEach((s, i) => {
+    const el = seatEl(s, act, mk), sp = spots[i]; if (!sp) return;
+    el.style.left = (sp.x - sp.w / 2) + 'px'; el.style.top = sp.y + 'px'; el.style.width = sp.w + 'px';
+    box.append(el);
+  });
+}
+// ---- the felt: trick slots in the middle, the job cards while they are handed out ----
+function playsShown() { if (UI.fz && UI.fz.plays) return UI.fz.plays; return G && G.phase === 'play' && G.trick ? G.trick.plays : (G && G.phase === 'over' && G.trick ? G.trick.plays : []); }
+function renderFelt(v) {
+  const felt = $('#felt'), slots = $('#slots'), pool = $('#pool'), lead = $('#lead'), pile = $('#pile'); if (!felt) return;
+  slots.innerHTML = ''; pool.innerHTML = ''; lead.innerHTML = ''; pile.innerHTML = '';
+  const geo = UI.geo; if (!geo) return;
+  const from = v >= 0 ? v : 0;
+  const assign = G.phase === 'assign';
+  pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = !(G.phase === 'play' || G.phase === 'over' || UI.fz);
+  { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
+  if (!pool.hidden) {
+    const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
+    const pw = Math.max(120, geo.pr - geo.pl);
+    pool.style.left = geo.pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
+    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
+    G.tasks.forEach((t, i) => {
+      if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
+      const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
+      const dd = h('span.dd', ...Array.from({ length: jobDiff(i) }, () => h('i')));
+      c.append(h('b', d.s), dd);
+      if (!d.cap) c.append(h('span.nocap', { title: 'Not for the Commander', html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke-width="2.4"/><path d="M6 6L18 18" stroke-width="2.4"/></svg>' }));
+      pool.append(c);
+    });
+    return renderLead(lead, pile, v);
+  }
+  const n = G.np, shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
+  const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
+  felt.style.setProperty('--cw', geo.cw + 'px');
+  for (let rel = 0; rel < n; rel++) {
+    const s = (from + rel) % n, [x, y] = geo.slots[rel];
+    const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.winner' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px;width:' + geo.cw + 'px;height:' + geo.ch + 'px' });
+    const pl = shown.find(p => p.s === s);
+    if (pl) { const tc = h('div.tc', { 'data-px': 'card', 'data-id': pl.c, 'data-pk': 't:' + pl.c, 'data-seat': s, role: 'img', 'aria-label': pname(s) + ' played ' + cname(pl.c) }); tc.append(cardN(pl.c, 80)); slot.append(tc); }
+    if (winS === s) { const lan = UI.fz.plays.some(p => p.s === s && suitOf(p.c) === 4); slot.append(h('span.wtag', pname(s) === 'You' ? 'You win!' : pname(s) + ' wins', lan ? h('i', '★') : null)); }
+    slots.append(slot);
+  }
+  renderLead(lead, pile, v);
+}
+function renderLead(lead, pile, v) {
+  const geo = UI.geo;
+  lead.style.left = (geo ? geo.cx : 0) + 'px'; lead.style.top = (geo ? geo.cy : 0) + 'px';
+  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns' : D.suits[ls].name)); lead.classList.add('on'); }
+  else lead.classList.remove('on');
+  if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last', 'aria-label': 'Last trick' }, h('span', { html: KIT.iconSVG('book', 20) }), h('span', 'Last')));
+}
+// ---- my seat and my jobs ----
+function renderMine(v) {
+  const box = $('#mine'); box.innerHTML = ''; if (!G) return;
+  const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap, mk = seatMarks();
+  const me = h('button.me' + (act === s ? '.act' : '') + (mk.vote.has(s) ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Your seat' });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 18 }) }));
+  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b>', title: tricksWon()[s] + ' tricks won' }))));
+  box.append(me);
+  const t = pingTok(s, 30); if (t) box.append(t);
+  if (G.comm === 'narc') box.append(h('span.pbtn.pool', { html: KIT.pingSVG({ size: 22 }) + '<b>' + G.pool + '</b>' }));
+  const mj = h('div.mjobs'); const js = jobs(s);
+  js.forEach(i => mj.append(jobChip(i, { me: true })));
+  if (G.two && G.cap === s) { const hj = jobs(G.helper); hj.forEach(i => { const c = jobChip(i, { me: true }); c.prepend(h('span.dnl', { html: KIT.droneSVG({ size: 16 }) })); mj.append(c); }); }
+  box.append(mj);
+}
+// ---- my hand ----
+function legalCards(v) {
+  if (v < 0 || !G || UI.busy) return null;
+  const ph = G.phase;
+  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
+  if (UI.pingSel) return new Set(LD.pingMoves(G, v).map(m => m.c));
+  if (ph === 'pass' && LD.moves(G, v).length) return new Set(LD.moves(G, v).map(m => m.c));
+  return null;
+}
+const ctlSeat = s => G.players[s].helper ? G.cap : s;
+// the cards of my hand that carry a ping spot right now (a signal round, or between tricks when it is my turn to lead)
+function pingSpots(v) {
+  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || !iMustAct()) return m;
+  if (G.phase === 'signal' || (G.phase === 'play' && G.trick && G.trick.plays.length === 0)) myMoves().forEach(x => { if (x.t === 'ping') m.set(x.c, x.k); });
+  return m;
+}
+function renderHand(v) {
+  const box = $('#hand'); box.innerHTML = ''; box.style.height = ''; box.style.minHeight = ''; box.classList.remove('two'); if (!G) return;
+  if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? '' : (watching() ? 'Watching the divers.' : 'Take the device.'))); return; }
+  const hand = G.players[v].hand; if (!hand.length) { box.append(h('div.handnote', '')); return; }
+  const legal = legalCards(v), pinged = new Set(G.pings.filter(p => p.seat === v && !G.pl[p.c]).map(p => p.c)); const pk = new Map(G.pings.filter(p => p.seat === v).map(p => [p.c, p.k]));
+  const spots = pingSpots(v);
+  // the card(s) that came to me in the distress pass: the difference between my hand while passing and my hand afterwards
+  if (G.phase === 'pass') UI.passSnap = { key: G.seed + ':' + G.att + ':' + v, hand: hand.slice() };
+  let got = new Set(); if (UI.passSnap && UI.passSnap.key === G.seed + ':' + G.att + ':' + v && G.phase !== 'pass' && G.phase !== 'assign' && G.phase !== 'distress' && !G.tricks.length && !(G.trick && G.trick.plays.some(p => p.s === v))) got = new Set(hand.filter(c => !UI.passSnap.hand.includes(c)));
+  const btns = [];
+  hand.forEach((c, i) => {
+    const dim = legal && !legal.has(c), glow = legal && legal.has(c);
+    const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (glow ? '.glow' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && glow ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '') + (got.has(c) ? '.got' : '');
+    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : '') + (got.has(c) ? ', you got this card in the flare pass' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
+    b.append(cardN(c, 84));
+    if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
+    if (spots.has(c)) b.append(h('span.pspot', { 'data-a': 'pingc', 'data-id': c, role: 'button', 'aria-label': 'Show ' + cname(c) + ' to the team', html: KIT.pingSVG({ size: 30, k: spots.get(c) }) }));
+    if (got.has(c)) b.append(h('span.gotb', 'New'));
+    btns.push(b);
+  });
+  // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
+  const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = Math.max(200, box.clientWidth - 12), n = hand.length, ch = hw * 1.4;
+  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = short ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
+  const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
+  const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
+  const rowStep = Math.round(ch * .64), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
+  box.classList.toggle('two', rows === 2); box.style.setProperty('--rs', rowStep + 'px');
+  box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
+  btns.forEach((b, i) => {
+    const r = rows === 2 && i >= per ? 1 : 0, k = r ? i - per : i, m = r ? n - per : per;
+    const rowW = hw + (m - 1) * pitch, x = Math.round((box.clientWidth - rowW) / 2 + k * pitch), y = padTop + r * rowStep;
+    if (r) b.classList.add('r2'); b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.zIndex = String(1 + i); box.append(b);
+  });
+  box.dataset.rows = rows; box.dataset.pitch = Math.round(pitch);
+  if (UI.sel >= 0) { const sb = box.querySelector('.hc.sel'); if (sb) sb.style.zIndex = '40'; }
+}
+// ---- what to do now: one short line (8 words or fewer) and, for real yes/no decisions only, a few buttons ----
+function actModel(v) {
+  const ph = G.phase, mv = v >= 0 ? LD.moves(G, v) : [], must = iMustAct(), M = { p: '', acts: [], cls: '', warn: 0 };
+  const act = actorSeat(), who = act >= 0 ? pname(act) : '';
+  const btn = (label, a, o) => M.acts.push(Object.assign({ label, a }, o || {}));
+  if (!G) return M;
+  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; if (UI.mode !== 'tutorial') btn('Result', 'result'); return M; }
+  if (hotSeat() && UI.holder < 0 && ph !== 'distress') { M.p = 'Pass the device on.'; return M; }
+  switch (ph) {
+    case 'assign': {
+      const A = G.as;
+      if (A.mode === 'vote') { M.cls = must && mv.length ? 'mine' : ''; M.p = must && mv.length ? 'Tap who takes every job.' : 'Waiting for the votes…'; return M; }
+      if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' decides…' : ' is choosing…') : 'Handing out the jobs…'; return M; }
+      M.cls = 'mine';
+      if (A.mode === 'cmd') {
+        if (A.stage === 'keep') { M.p = 'Keep every job, or offer?'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them', 'offer'); }
+        else { M.p = 'Take every job?'; btn('Yes', 'accept', { cls: 'go' }); btn('No', 'decline', { cls: 'alt' }); }
+        return M;
+      }
+      if (A.mode === 'vol') { M.p = A.need === 1 ? 'Take every job? Yes or no.' : 'Volunteer with a partner?'; btn('Yes', 'yes', { cls: 'go' }); if (mv.some(m => m.t === 'no')) btn('No', 'no', { cls: 'alt' }); return M; }
+      if (A.mode === 'free') M.p = 'Take your jobs, then Done.';
+      else if (A.mode === 'hardfirst') M.p = 'Take the hardest job first.';
+      else if (A.mode === 'split') M.p = 'Share the jobs fairly.';
+      else M.p = G.players[act] && G.players[act].helper ? 'Tap a job for the drone.' : 'Tap a job to take it.';
+      if (mv.some(m => m.t === 'pass')) btn('Pass', 'pass', { cls: 'alt' });
+      if (mv.some(m => m.t === 'done')) btn('Done', 'done', { cls: 'go' });
+      return M;
+    }
+    case 'distress': {
+      if (!must) { M.p = who === 'You' ? 'Decide about the flare…' : who + ' decides on the flare…'; return M; }
+      M.cls = 'mine'; const lit = G.distress;
+      M.p = lit ? 'Pass cards again?' : 'Light the distress flare?';
+      btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });
+      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light it', 'dist', { on: true, dir: 1, cls: 'alt' });
+      else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'alt' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'alt' }); }
+      return M;
+    }
+    case 'pass': {
+      if (!must || !mv.length) { M.p = 'Waiting for the others…'; return M; }
+      M.cls = 'mine'; M.p = 'Tap a card to pass it.'; return M;
+    }
+    case 'predict': {
+      if (!must || !mv.length) { M.p = who + ' is predicting…'; return M; }
+      M.cls = 'mine'; const o = G.tasks[mv[0].i]; M.p = G.players[o.owner].helper ? 'How many tricks for the drone?' : 'How many tricks will you win?';
+      mv.forEach(m => btn(String(m.n), 'predict', { n: m.n, i: m.i, cls: UI.predN === m.n ? 'go' : 'alt' })); return M;
+    }
+    case 'signal': {
+      if (!must) { M.p = who + ' may signal…'; return M; }
+      M.cls = 'mine'; const pm = mv.filter(m => m.t === 'ping');
+      M.p = pm.length ? 'Tap a ping spot, or skip.' : 'Nothing to signal.';
+      btn('No signal', 'nosig', { cls: pm.length ? 'alt' : 'go' });
+      return M;
+    }
+    case 'play': {
+      const T = G.trick, turn = T.turn, helper = G.players[turn].helper, ctl2 = ctlSeat(turn);
+      const myTurn = v >= 0 && ctl2 === v;
+      if (myTurn) {
+        M.cls = 'mine';
+        M.p = helper ? 'Tap a drone card.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play a card.');
+        { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
+          if (UI.ab) { M.p = 'Every card breaks a ' + (UI.ab.job >= 0 ? 'job.' : 'rule.'); M.warn = 1; } }
+      } else M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : '';
+      return M;
+    }
+  }
+  return M;
+}
+function renderActs(v) {
+  const pr = $('#prompt'), ac = $('#acts'); if (!pr || !ac) return;
+  const M = actModel(v); pr.className = (M.cls || '') + (M.warn ? ' warn' : '');
+  pr.textContent = M.p || '';
+  const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
+  { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
+  ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
+  M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
+}
+function renderTip() { }   // no tip cards: play happens on the table
+function render() {
+  if (!G || !UI.started) return;
+  layoutVars();
+  const v = viewSeat();
+  renderBar(); renderMine(v); renderHand(v);
+  UI.geo = tableGeo(); if (UI.geo) { const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--dw', UI.geo.dw + 'px'); r.setProperty('--av', UI.geo.av + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); }
+  renderOpp(v); renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
+  renderActs(v);
+  try { placeFinger(); } catch (e) { console.error(e); }
+  try { hlpAfter(); } catch (e) { console.error(e); }
+  try { netRenderHook(); } catch (e) { }
+  try { pxDirty(); } catch (e) { }
+}
+// ===================== part 3: game flow (new game, AI driver, human actions, event sequences, hot-seat, save) =====================
+function lvAt(opt, k) { const a = opt.lv || DEF.lv; return a[Math.max(0, Math.min(3, k))] || opt.level || 'normal'; }
+// which divers sit at the table: seat 0 is you (portrait YOU), the others are companions 0..3 chosen on the setup screen
+function chefsFor(np, opt) {
+  const pick = Array.isArray(opt.seats) ? opt.seats.filter((c, i, a) => c >= 0 && c <= 3 && a.indexOf(c) === i) : [];
+  const n = Math.max(1, np - 1); if (pick.length >= n) return [YOU].concat(pick.slice(0, n));
+  const out = [YOU].concat(pick); for (let c = 0; c <= 3 && out.length < np; c++) if (out.indexOf(c) < 0) out.push(c);
+  return out;
+}
+function missionFrom(opt) {
+  if (opt.kind === 'free') return { kind: 'free', d: opt.d, cmt: opt.cmt };
+  if (opt.kind === 'job') return { kind: 'free', d: 1, jobs: [Math.max(1, Math.min(96, opt.job | 0 || 1)) - 1] };
+  if (opt.kind === 'deep') return { kind: 'deep', level: opt.deep };
+  return { kind: 'log', id: Math.max(1, Math.min(32, opt.mission | 0 || 1)) };
+}
+function resetUI(mode, cfg) {
+  clearTimeout(UI.tm); UI.seq++; UI.rq = [];
+  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && mode !== 'tutorial' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
+  const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
+  try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
+}
+function newGame(mode, o) {
+  o = o || {};
+  const opt = Object.assign({}, DEF, UI.opt || {}, o);
+  let np = Math.max(2, Math.min(5, opt.np | 0 || 4)), names = [], ai = [];
+  if (mode === 'tutorial') { np = 3; opt.kind = 'log'; opt.mission = 1; opt.seats = [3, 2]; }   // the staged tutorial (ui12.js): you, Dag and Sumi
+  if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
+  const chefs = mode === 'net' ? null : chefsFor(np, opt);
+  if (mode !== 'net') for (let i = 0; i < np; i++) {
+    const c = chefs[i], lv = c !== YOU ? lvAt(opt, c) : (opt.level || 'normal');
+    if (mode === 'hot') { names.push(i === 0 ? 'Diver 1' : 'Diver ' + (i + 1)); ai.push(null); }
+    else if (mode === 'ai') { names.push(D.names[c]); ai.push(lv); }
+    else if (i === 0) { names.push('You'); ai.push(null); }
+    else { names.push(D.names[c]); ai.push(mode === 'tutorial' ? 'normal' : lv); }
+  }
+  UI.chefs = chefs;
+  let mission = mode === 'net' ? (opt.mission && typeof opt.mission === 'object' ? opt.mission : missionFrom(opt)) : missionFrom(opt);
+  const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
+  let tries = 0;
+  // the staged tutorial is a fixed, stacked deal (data.js tutorial); the computer divers are scripted (ui12.js tutMove)
+  const gs = mode === 'tutorial' ? tutorialStack() : null;
+  G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs, boss: mode === 'descent' ? opt.boss || null : null });
+  G.noProg = mode === 'tutorial' || (mission.kind !== 'log' && mission.kind !== 'deep');
+  resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
+  UI.news = [];
+  UI.coach = { level: mode === 'tutorial' ? 'off' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
+  UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
+  placePrompt(); render(); sndMusic(); autosave(); schedule();
+}
+function tutorialStack() {
+  const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
+  return { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true };
+}
+function nextAttempt(same) {
+  if (!G || G.phase !== 'over') return;
+  const fresh = !same;
+  LD.nextAttempt(G, { same: !fresh });
+  const keep = { mode: UI.mode, cfg: UI.cfg };
+  clearTimeout(UI.tm); UI.seq++; UI.rq = [];
+  Object.assign(UI, { holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0 });
+  const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false;
+  closePop(); render(); sndMusic(); autosave(); if (NET.on && isHost()) netPush(true); schedule();
+}
+// ---------- the turn driver ----------
+function aiWants() {
+  if (!G || G.phase === 'over') return false;
+  for (const s of LD.pending(G)) if (G.players[s].ai) return true;
+  if (G.phase === 'play' && G.trick.plays.length === 0 && UI.mode !== 'tutorial') for (const p of G.players) if (p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)) return true;
+  return false;
+}
+function schedule() {
+  clearTimeout(UI.tm);
+  if (!G || !UI.started) return;
+  if (G.phase === 'over') { if (!UI.busy && !UI.overShown) showResult(); return; }
+  if (UI.busy) return;
+  if (isClient()) { try { coachCheck(); } catch (e) { } return; }
+  if (UI.cards.length) return;
+  if (UI.mode === 'tutorial' && tutAuto()) return;
+  if (UI.mode === 'tutorial' && tutPaused()) { UI.tm = setTimeout(schedule, 200); return; }
+  try { if (storyCheck()) return; } catch (e) { console.error(e); }
+  if (G.clock && G.clockRun && UI.timerAt === 0) { UI.timerAt = Date.now(); UI.clockLeft = G.clock; startClock(); }
+  if (aiWants()) {
+    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.25 + .6 * Math.random()));
+    const tok = UI.seq; UI.tm = setTimeout(() => { if (tok === UI.seq) aiTurn(); }, d); return;
+  }
+  if (hotSeat()) hotNext();
+  try { coachCheck(); } catch (e) { console.error(e); }
+}
+function aiTurn() {
+  if (!G || UI.busy || G.phase === 'over') return;
+  let ok = false; try { ok = UI.mode === 'tutorial' ? tutAiStep() : LD.AI.step(G); } catch (e) { console.error(e); }
+  if (!ok) { schedule(); return; }
+  afterApply(G.events.slice());
+}
+function commit(seat, mv) {
+  if (!G || G.phase === 'over') return false;
+  const r = LD.apply(G, seat, mv);
+  if (!r.ok) { snd('error'); toast(r.error || 'That did not work.'); return false; }
+  const evs = G.events.slice(); const v = viewSeat();
+  if (seat === v) { UI.sel = -1; UI.job = -1; UI.pingSel = false; UI.giveSel = -1; UI.hint = null; UI.predN = -1; }
+  if (hotSeat()) { const nx = LD.pending(G).filter(s => !G.players[s].ai); if (!nx.includes(UI.holder)) UI.holder = -1; }
+  afterApply(evs); return true;
+}
+const ANIM_EV = new Set(['play', 'trick', 'swap', 'take', 'ping', 'deal', 'over', 'job']);
+function afterApply(evs) {
+  if (NET.on && isHost()) { try { netRecord(evs); netPush(); } catch (e) { console.error(e); } }
+  autosave();
+  if (evs.some(e => e.t === 'play' || e.t === 'trick' || e.t === 'swap' || e.t === 'take' || e.t === 'ping')) { playEvs(evs); return; }
+  if (evs.some(e => e.t === 'over')) { playEvs(evs); return; }
+  render(); schedule();
+}
+// ---------- human actions ----------
+function doMove(mv) {
+  const v = viewSeat(); if (v < 0) return false;
+  if (tutOn() && !tutGate(mv)) return false;      // the staged tutorial: only the action the step asks for goes through
+  fingerDone();
+  if (isClient()) { netAct(mv); UI.sel = -1; UI.pingSel = false; UI.giveSel = -1; UI.job = -1; render(); return true; }
+  return commit(v, mv);
+}
+function pickMove(pred) { return myMoves().find(pred); }
+function tapHand(id) {
+  if (!canAct()) { if (G && !isOver()) toast(UI.busy ? 'One moment…' : 'Wait for your turn.'); return; }
+  const v = viewSeat(), ph = G.phase;
+  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
+  if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('Lanterns cannot be passed.'); return; } UI.giveSel = id; doMove(m); return; }
+  if (ph === 'play') {
+    const T = G.trick, turn = T.turn;
+    if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards.' : 'Wait for ' + pname(turn) + '.'); return; }
+    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
+    UI.sel = id; UI.hint = null; playSel(); return;
+  }
+  toast('Not your turn yet.');
+}
+function tapDrone(id) {
+  if (!canAct() || G.phase !== 'play') return; const T = G.trick, turn = T.turn, v = viewSeat();
+  if (!G.players[turn].helper || ctlSeat(turn) !== v) { toast('Not the drone\'s turn.'); return; }
+  if (!LD.playable(G, turn).includes(id)) { snd('error'); toast('The drone must follow ' + (T.ls === 4 ? 'the Lantern' : D.suits[T.ls].name) + '.'); return; }
+  UI.sel = id; playSel();
+}
+function playSel() {
+  if (!canAct() || UI.sel < 0 || G.phase !== 'play') return; const v = viewSeat(), turn = G.trick.turn;
+  const m = myMoves().find(x => x.t === 'play' && x.c === UI.sel); if (!m) { snd('error'); return; }
+  doMove(m);
+}
+// tap a job card on the table: it flies to your seat
+function tapJob(i) {
+  if (!canAct() || G.phase !== 'assign') return; const m = myMoves().find(x => x.t === 'take' && x.i === i);
+  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'Not for the Commander.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
+  doMove(m);
+}
+// tap a ping spot on a card of your hand
+function tapPing(id) {
+  if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
+  if (!m) { snd('error'); toast('That card cannot be shown.'); return; }
+  UI.pxPing = viewSeat(); doMove(m);
+}
+// ---------- hot-seat ----------
+function hotNext() {
+  if (!hotSeat() || UI.cards.length || UI.busy) return;
+  const pend = LD.pending(G).filter(s => !G.players[s].ai); if (!pend.length) return;
+  // the flare decision needs no hidden information: nobody has to take the device, and the hand stays hidden meanwhile
+  if (G.phase === 'distress') { if (UI.holder >= 0) { UI.holder = -1; render(); } return; }
+  if (UI.holder >= 0 && pend.includes(UI.holder)) return;
+  const nx = pend[0]; UI.holder = -1; UI.sel = -1; UI.job = -1; UI.pingSel = false; UI.giveSel = -1;
+  pushCard({ kind: 'pass', seat: nx, title: 'Pass the device to ' + pname(nx), body: 'Hand the device to ' + pname(nx) + '. Their cards stay hidden until they press the button.', btn: pname(nx) + ' is ready' });
+  render();
+}
+function pushCard(c) { UI.cards.push(c); drawCard(); }
+function drawCard() {
+  const pa = $('#pass'); if (!pa) return; const c = UI.cards[0];
+  if (!c) { pa.hidden = true; pa.innerHTML = ''; return; }
+  pa.hidden = false; pa.innerHTML = '';
+  pa.append(h('div.pbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': c.title }, h('h2', c.title), h('p', c.body), h('button.btn.go', { type: 'button', 'data-a': 'takedev' }, c.btn || 'Continue')));
+}
+function takeDevice() { const c = UI.cards[0]; if (!c || c.kind !== 'pass') return; UI.cards.shift(); UI.holder = c.seat; drawCard(); render(); schedule(); }
+// ---------- the event sequences: cards fly to the table, the trick is swept to its winner ----------
+// ---------- "what just happened": one plain line per event that touches the team (jobs taken, tricks won, jobs done or failed, signals) ----------
+function trickWhy(e, cu) {
+  const lan = e.plays.filter(p => suitOf(p.c) === 4).length, ws = suitOf(e.wc);
+  if (ws === 4) return lan > 1 ? ', the highest Lantern.' : ': a Lantern beats every colour.';
+  if (cu === 'low') return ', the lowest ' + D.suits[ws].name + ' (Undertow curse).';
+  if (cu === 'any') return ', the highest number of any colour (Riptide curse).';
+  if (cu === 'sleep' && lan) return ', the highest ' + D.suits[ws].name + ': the Lanterns slept (curse).';
+  return ', the highest ' + D.suits[ws].name + '.';
+}
+function newsFrom(evs) {
+  const out = [], q = '“', qq = '”';
+  for (const e of evs) {
+    if (e.t === 'deal') UI.news = [];
+    else if (e.t === 'take') out.push((e.seat === viewSeat() ? 'You took ' : pname(e.seat) + ' took ') + q + jobShort(e.i) + qq + '.');
+    else if (e.t === 'swap') out.push('Every diver passed one card ' + (G.hn === 2 ? 'to the partner.' : e.dir > 0 ? 'to the left.' : 'to the right.'));
+    else if (e.t === 'ping') out.push(pname(e.seat) + ' showed ' + cname(e.c) + (e.k ? ': ' + (e.seat === viewSeat() ? 'your' : 'their') + (e.k === 'high' ? ' highest ' : e.k === 'low' ? ' lowest ' : ' only ') : ' ') + (e.k ? D.suits[suitOf(e.c)].name + '.' : '(highest, lowest or only one?)') + (e.seat === viewSeat() ? '' : ' Their signal is now used (red cross).'));
+    else if (e.t === 'trick') { const ti = G.tricks.findIndex(k => k.plays[0].c === e.plays[0].c); out.push((ti >= 0 ? 'Trick ' + (ti + 1) + ': ' : '')  + pname(e.w) + ' won with ' + cname(e.wc) + trickWhy(e, ti >= 0 ? G.tricks[ti].cu : '')); }
+    else if (e.t === 'job' && e.st > 0 && isBoss()) { UI.hitAt = Date.now(); const B = bossChar(); out.push('\u2714 ' + pname(G.tasks[e.i].owner) + ' finished \u201c' + jobShort(e.i) + '\u201d. ' + B.name + ' takes a hit: \u201c' + B.hit[(G.tasks.filter((t, k) => jobSt(k) > 0).length - 1) % B.hit.length] + '\u201d'); setTimeout(() => { try { bossBar(); } catch (er) { } }, 750); }
+    else if (e.t === 'job' && e.st > 0) out.push('✔ ' + pname(G.tasks[e.i].owner) + ' finished ' + q + jobShort(e.i) + qq + '.');
+    else if (e.t === 'job' && e.st < 0) out.push('✖ ' + (G.tasks[e.i].owner === viewSeat() ? 'Your' : pname(G.tasks[e.i].owner) + '’s') + ' job ' + q + jobShort(e.i) + qq + ' can no longer be done.');
+  }
+  if (out.length) UI.news = (UI.news || []).concat([out.join(' ')]).slice(-3); // one sentence per moment
+}
+function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playEvs(q); } }
+// a +1 (or any short word) that rises from a seat
+function floatAt(seat, text, cls) {
+  try {
+    const bd = $('#bd'), el = document.querySelector('[data-key="seat' + seat + '"]'); if (!bd || !el) return;
+    const B = bd.getBoundingClientRect(), r = el.getBoundingClientRect(), f = h('div.fl' + (cls ? '.' + cls : ''), text);
+    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f); setTimeout(() => f.remove(), 1500);
+  } catch (e) { }
+}
+// a job card taken from the table flies to the seat that took it
+function flyJobs(list) {
+  if (!ANIM || !document.body.animate) return;
+  for (const f of list) {
+    try {
+      const to = document.querySelector('[data-job="' + f.i + '"]'); const tr = to ? to.getBoundingClientRect() : null;
+      const seatEl2 = document.querySelector('[data-key="seat' + f.seat + '"]'); const sr = seatEl2 ? seatEl2.getBoundingClientRect() : null;
+      const dst = tr && tr.width > 4 ? { x: tr.left + tr.width / 2, y: tr.top + tr.height / 2, s: Math.max(.3, tr.width / f.r.width) } : sr ? { x: sr.left + sr.width / 2, y: sr.top + sr.height / 2, s: .3 } : null; if (!dst) continue;
+      const el = f.node; el.className = 'jcard jfly'; el.style.cssText = 'position:fixed;z-index:40;pointer-events:none;margin:0;left:' + f.r.left + 'px;top:' + f.r.top + 'px;width:' + f.r.width + 'px;height:' + f.r.height + 'px'; document.body.appendChild(el);
+      const dx = dst.x - (f.r.left + f.r.width / 2), dy = dst.y - (f.r.top + f.r.height / 2), d = 520 * Math.max(.6, AIDELAY / 650);
+      const an = el.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + dst.s + ')', opacity: .85 }], { duration: d, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
+      an.onfinish = () => el.remove(); setTimeout(() => el.remove(), d + 400);
+    } catch (e) { }
+  }
+}
+async function playEvs(evs) {
+  if (UI.busy) { UI.rq.push(evs); return; }
+  const tok = UI.seq; UI.busy = true; closePop();
+  try {
+    const tr = evs.find(e => e.t === 'trick'), pls = evs.filter(e => e.t === 'play'), sw = evs.find(e => e.t === 'swap'), take = evs.filter(e => e.t === 'take'), pg = evs.filter(e => e.t === 'ping'), jb = evs.filter(e => e.t === 'job');
+    try { newsFrom(evs); } catch (e) { console.error(e); }
+    // job cards still lying on the table: remember where they are, so they can fly to the seat that takes them
+    const flights = []; for (const e of take) { const el = document.querySelector('[data-key="job' + e.i + '"]'); if (el) flights.push({ i: e.i, seat: e.seat, r: el.getBoundingClientRect(), node: el.cloneNode(true) }); }
+    if (pls.length) snd('play');
+    if (pg.length) { snd('ping'); UI.pxPing = pg[0].seat; }
+    if (sw) { snd('pass'); try { animatePass(); } catch (e) { } }
+    if (take.length) snd('take');
+    if (tr) {
+      UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
+      UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
+      render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
+      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      await tutHoldWait(); if (tok !== UI.seq) return;
+      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1', 'plus'); await wait(520); if (tok !== UI.seq) return;
+      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(700); if (tok !== UI.seq) return; }
+    } else {
+      render(); flyJobs(flights); await wait(pls.length ? 420 : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
+    }
+  } catch (e) { console.error(e); UI.fz = null; }
+  UI.busy = false; UI.fz = null; UI.holdJobs = null;
+  try { render(); } catch (e) { console.error(e); }
+  if (G && G.phase === 'over') { schedule(); drainQ(); return; }
+  schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
+}
+function animatePass() {
+  if (!document.body.animate || !ANIM) return;
+  const np = G.np, dir = (G.pass && G.pass.dir) || 1, rect = s => { const e = document.querySelector('[data-key="seat' + s + '"]'); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2 - 15, y: r.top + r.height / 2 - 21 }; };
+  const ds = LD.diverSeats(G);
+  for (let k = 0; k < ds.length; k++) {
+    const a = rect(ds[k]), b = rect(ds[((k + dir) % ds.length + ds.length) % ds.length]); if (!a || !b) continue;
+    const el = h('div.pkt'); el.innerHTML = KIT.backSVG({ w: 30 }); el.style.left = '0'; el.style.top = '0'; document.body.appendChild(el);
+    const an = el.animate([{ transform: 'translate(' + a.x + 'px,' + a.y + 'px)', opacity: 0 }, { transform: 'translate(' + a.x + 'px,' + a.y + 'px)', opacity: 1, offset: .12 }, { transform: 'translate(' + b.x + 'px,' + b.y + 'px)', opacity: 1, offset: .88 }, { transform: 'translate(' + b.x + 'px,' + b.y + 'px)', opacity: 0 }], { duration: 800 * Math.max(.5, AIDELAY / 650), easing: 'ease-in-out' });
+    an.onfinish = () => el.remove(); setTimeout(() => el.remove(), 1500);
+  }
+}
+// ---------- the clock (real-time dives) ----------
+function startClock() {
+  clearInterval(UI.clk); if (!G || !G.clock) return;
+  UI.clk = setInterval(() => {
+    if (!G || G.phase === 'over' || !UI.started) { clearInterval(UI.clk); return; }
+    if (UI.busy && false) return;
+    UI.clockLeft = Math.max(0, G.clock - (Date.now() - UI.timerAt) / 1000);
+    const c = $('#clk'); if (c) { c.textContent = clockText(); c.classList.toggle('low', UI.clockLeft < 20); }
+    if (UI.clockLeft <= 0 && !isClient()) { clearInterval(UI.clk); if (LD.expire(G)) afterApply(G.events.slice()); }
+  }, 250);
+}
+// ---------- save / load (local games only) ----------
+function hasSave() { return !!lsGet('ld_save'); }
+function autosave() { if (NET.on || !G || !UI.started) return false; return save(true); }
+function save(quiet) {
+  if (NET.on || !G || !UI.started || UI.mode === 'tutorial') return false;
+  try { const g = LD.clone(G); delete g.events; lsSet('ld_save', JSON.stringify({ G: g, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, coach: UI.coach })); return true; } catch (e) { return false; }
+}
+function loadSave() {
+  if (NET.on) return false;
+  let o; try { o = JSON.parse(lsGet('ld_save')); } catch (e) { return false; }
+  if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
+  G = o.G; G.events = [];
+  try { if (G.phase !== 'over' && LD.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
+  UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.hn ? o.chefs : null;
+  resetUI(o.mode === 'guided' || o.mode === 'tutorial' ? 'vs' : (o.mode || 'vs'), o.cfg || null); if (o.coach) UI.coach = o.coach;
+  UI.timerAt = 0; placePrompt(); render(); sndMusic();
+  if (G.phase === 'over') showResult(); else schedule();
+  return true;
+}
+// ===================== part 4: guide tips, pop-ups (job, diver, last trick) and the result card =====================
+// ---------- tips: one at a time, never stacked; each tip once per device ----------
+const TIPS = [
+  { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card, so you pick a job first and lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Commander.' },
+  { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card, then "Take this job". Pick one your cards can do.' },
+  { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'Distress flare (optional)', body: 'Light it and everyone passes one card to a neighbour. It costs one extra attempt in the logbook. "No flare" is fine.' },
+  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per dive you may show the team one card: your highest, lowest or only card of a colour. Or skip.' },
+  { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play the colour that was led if you have it (dim cards are not allowed). You never have to win.' },
+  { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'None of that colour', body: 'Play anything. Another colour never wins; a Lantern always does.' },
+  { id: 'trump', when: () => G.phase === 'play' && G.trick.plays.some(p => suitOf(p.c) === 4) || (UI.fz && UI.fz.plays.some(p => suitOf(p.c) === 4)), title: 'Lanterns are trumps', body: 'A Lantern beats every colour. With several Lanterns the highest wins.' },
+  { id: 'jobdone', when: () => G.phase === 'play' && G.tasks.some((t, i) => jobSt(i) > 0) && !UI.busy, title: 'A job is done', body: 'Green tick = done for good. A red cross would end the dive.' }
+];
+function seen(id) { return !!UI.coach.seen[id]; }
+function markSeen(id) { UI.coach.seen[id] = 1; if (UI.coach.level !== 'full') { try { const s = JSON.parse(lsGet('ld_tips') || '{}'); s[id] = 1; lsSet('ld_tips', JSON.stringify(s)); } catch (e) { } } }
+function seenEver(id) { try { return !!JSON.parse(lsGet('ld_tips') || '{}')[id]; } catch (e) { return false; } }
+function coachCheck() {
+  return; // no tip cards: play happens on the board
+  if (!G || !UI.started || UI.coach.level === 'off' || UI.tip || UI.cards.length || UI.dlg) return;
+  if (UI.busy || (G.phase === 'play' && UI.fz)) return;
+  if (viewSeat() < 0) return;
+  const light = UI.coach.level === 'light';
+  for (const t of TIPS) {
+    if (UI.coach.seen[t.id]) continue; if (light && seenEver(t.id)) continue;
+    if (light && !['commander', 'pickjob', 'flare', 'signal', 'follow', 'nofollow', 'trump', 'jobdone'].includes(t.id)) continue;
+    let ok = false; try { ok = t.when(); } catch (e) { }
+    if (!ok) continue;
+    const title = typeof t.title === 'function' ? t.title() : t.title, body = typeof t.body === 'function' ? t.body() : t.body;
+    UI.tip = { id: t.id, title, body, btn: t.btn || 'Got it' }; renderTip(); return;
+  }
+}
+function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }
+// ---------- pop-ups inside the dock ----------
+function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; p.removeAttribute('aria-modal'); } }
+function openPop(title, sub, body) {
+  const p = $('#ppop'); if (!p) return; UI.pop = { title }; document.documentElement.classList.add('popon');
+  p.innerHTML = ''; p.hidden = false;
+  p.append(h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', body));
+  p.setAttribute('aria-modal', 'true'); clearTimeout(UI.popT); UI.popT = setTimeout(closePop, 7000);
+}
+function openJob(i) {
+  if (!G || !G.tasks[i]) return; const t = G.tasks[i], d = TASKS[t.id], st = jobSt(i);
+  const kids = [h('p', d.t)];
+  kids.push(h('div.kv', h('span', 'Taken by'), h('b', t.owner >= 0 ? pname(t.owner) : 'nobody yet')));
+  kids.push(h('div.kv', h('span', 'Difficulty (' + G.np + ' divers)'), h('b', jobDiff(i))));
+  kids.push(h('div.kv', h('span', 'State'), h('b', st > 0 ? 'Done' : st < 0 ? 'Failed' : 'Open')));
+  if (d.k === 'pred' && t.pn >= 0) kids.push(h('div.kv', h('span', 'Prediction'), h('b', d.open || G.phase === 'over' || ctlSeat(t.owner) === viewSeat() ? (t.pn === -2 ? 'secret' : t.pn) : 'secret')));
+  if (!d.cap) kids.push(h('p.sm', 'The Commander may not take this job.'));
+  kids.push(h('p.sm', hintFor(d)));
+  openPop(d.s, 'Job card', kids);
+}
+function hintFor(d) {
+  const k = d.k;
+  if (k === 'cmp') return 'Count the tricks each diver wins. Ties do not count as more or fewer.';
+  if (k === 'cards') return 'You win a card by winning the trick it is in.';
+  if (k === 'with') return 'The card you play to win the trick has to be a colour card of that number.';
+  if (k === 'pos') return 'The first trick is the first one played; the last is the final one of the dive.';
+  if (k === 'pred') return 'Aim for exactly your number of tricks at the end.';
+  if (k === 'subx') return 'Lanterns you win count: every Lantern in a trick you win.';
+  if (k === 'avoidc' || k === 'avoidv' || k === 'avoidsub') return 'Cards in tricks you win count as won, even the ones other divers played.';
+  return 'All cards in the tricks you win count as won by you.';
+}
+function openSeat(s) {
+  if (!G) return; const p = G.players[s], kids = [];
+  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
+  kids.push(h('div.kv', h('span', 'Cards in hand'), h('b', p.hand.length)));
+  kids.push(h('div.kv', h('span', 'Tricks won'), h('b', tricksWon()[s])));
+  if (!p.helper) kids.push(h('div.kv', h('span', 'Ping'), h('b', G.comm === 'none' ? 'No signalling in this dive' : G.comm === 'narc' ? 'Shared pool: ' + G.pool + ' left' : (p.pingUsed ? 'Used' : 'Ready'))));
+  const sh = shownBy(s); sh.forEach(x => kids.push(h('div.kv', h('span', 'Showed'), h('b', cname(x.c) + (x.k === 'high' ? ' (highest)' : x.k === 'low' ? ' (lowest)' : x.k === 'only' ? ' (only one)' : '')))));
+  const js = jobs(s); kids.push(h('h4', { style: 'margin:6px 0 0' }, js.length ? 'Jobs' : 'No jobs'));
+  js.forEach(i => kids.push(h('div.rjob' + (jobSt(i) > 0 ? '.ok' : jobSt(i) < 0 ? '.bad' : ''), h('span.mk', { html: jobSt(i) > 0 ? KIT.iconSVG('tick', 22) : jobSt(i) < 0 ? KIT.iconSVG('cross', 22) : KIT.iconSVG('list', 22) }), h('span', jobText(i)))));
+  openPop(p.name, 'Diver', kids);
+}
+function openLast() {
+  if (!G || !G.tricks.length) return; const k = G.tricks[G.tricks.length - 1];
+  const row = h('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center' });
+  k.plays.forEach(p => row.append(h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;font-weight:800' }, h('div', { style: 'width:62px;height:87px', html: cardS(p.c, 62) }), pname(p.s) + (p.s === k.w ? ' ★' : ''))));
+  openPop('Last trick', 'Trick ' + (k.n + 1), [row, h('p', pname(k.w) + ' won it with ' + cname(k.wc) + '.'), h('p.sm', 'Only the most recent trick can be looked at again.')]);
+}
+// ---------- the result card ----------
+function showResult() {
+  if (!G || G.phase !== 'over' || UI.overShown) return; UI.overShown = true;
+  if (UI.mode === 'tutorial') return;   // the staged tutorial explains the end itself (ui12.js)
+  try { Prog.ended(G); } catch (e) { console.error(e); }
+  clearInterval(UI.clk);
+  const rs = $('#rs'); rs.hidden = false; rs.innerHTML = ''; UI.rsOpen = true;
+  const R = G.result, ok = R.ok, m = G.mission, p = Prog.load();
+  const box = h('div.rsbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': ok ? 'Dive complete' : 'Dive failed' });
+  box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
+  if (!ok && R.why) box.append(h('p', R.why));
+  if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + ', so the dive ended at once. Cards still in hand do not matter.'));
+  box.append(h('p.sm', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att) + (G.distress ? ' · distress flare lit (+1)' : '')));
+  // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
+  G.tasks.forEach((t, i) => {
+    const st = R.tasks[i], det = R.det && R.det[i], nb = ok || st > 0 ? '' : st < 0 ? (det || 'It could not be met by the end of the dive.') : 'Not finished: the dive ended first.';
+    box.append(h('div.rjob' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '.open'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : st < 0 ? KIT.iconSVG('cross', 24) : '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12H18"/></svg>' }), h('span', h('b', pname(t.owner) + ': '), jobText(i), nb ? h('small.why', nb) : null)));
+  });
+  if (!ok) box.append(h('p.sm', 'Tip: the red cross marks the job that broke the dive. Grey jobs were still open.'));
+  if (m.kind === 'log') {
+    if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
+    else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
+  } else if (m.kind === 'deep' && ok) box.append(h('p', 'Deep dive ' + m.d + ' complete. The next one is difficulty ' + (m.d + 1) + '.'));
+  if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) { campResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
+  if (UI.mode === 'descent') { descResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
+  const bt = h('div.cbtns');
+  const host = !NET.on || isHost();
+  if (ok) {
+    if (host && m.kind === 'log' && m.id < 32) bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next dive'));
+    else if (host && m.kind === 'log') bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Deep dive ' + D.deep.start));
+    else if (host && m.kind === 'deep') bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next: deep dive ' + (m.d + 1)));
+    else if (host) bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Play again'));
+  } else if (host) {
+    bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Try again (same jobs)'));
+    bt.append(h('button.btn', { 'data-a': 'retrynew', type: 'button' }, 'Try again (new jobs)'));
+  }
+  bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
+  bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
+  box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
+}
+function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
+function nextDive() {
+  if (!G || G.phase !== 'over' || NET.on && !isHost()) return;
+  const m = G.mission; const o = Object.assign({}, UI.opt || {});
+  if (m.kind === 'log') { if (m.id < 32) { o.kind = 'log'; o.mission = m.id + 1; } else { o.kind = 'deep'; o.deep = Math.max(D.deep.start, Prog.load().deep.level); } }
+  else if (m.kind === 'deep') { o.kind = 'deep'; o.deep = m.d + 1; }
+  closeRS(); const mode = UI.mode;
+  UI.opt = Object.assign(UI.opt || {}, { kind: o.kind, mission: o.mission, deep: o.deep });
+  if (NET.on) { netStart(); return; }
+  newGame(mode, Object.assign({}, UI.cfg || {}, { kind: o.kind, mission: o.mission, deep: o.deep, np: (UI.cfg && UI.cfg.np) || G.hn, seats: UI.cfg && UI.cfg.seats || undefined }));
+}
+// ===================== part 5: drawers (jobs, log, rules, reference, menu), start screens, events, phone mode, boot =====================
+function logHTML() { const e = h('div.logl'); if (!G) return e; for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'A' + G.log[i].att), ' ' + G.log[i].t)); return e; }
+function buildRules() {
+  const root = h('div.rules');
+  const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
+  const ul = a => h('ul', ...a.map(t => h('li', t))), ol = a => h('ol', ...a.map(t => h('li', t)));
+  sec('The goal', h('p', 'You are a team of divers on a deep-sea expedition. Each dive lays out job cards. Every job is a condition on the tricks one diver wins. You win the dive together when every job is done, and you lose it together the moment one job cannot be done. Nobody may talk about their cards: you can only use the ping signal.'));
+  sec('How a dive goes', ol(['Everybody is dealt a hand. The diver with Lantern 4 is the Commander.', 'Job cards are drawn until their numbers add up to the dive\'s difficulty (the number for your team size counts).', 'Jobs are taken: the Commander first, then clockwise, one job at a turn, until none are left.', 'Optionally, light the distress flare to pass cards (see below).', 'Divers may signal once (see below), then the tricks are played. The Commander leads the first trick; each trick is led by the winner of the one before.', 'When every job is done the dive is won. If one job can no longer be done, the attempt is lost: deal again.']));
+  sec('The cards', h('p', '40 cards: four colours (Coral, Tide, Kelp, Sunstar) numbered 1 to 9, and four Lanterns numbered 1 to 4. The Lanterns are the trump suit. With 3 divers one diver has 14 cards and one card is never played; 4 divers play 10 tricks, 5 divers 8 tricks.'));
+  sec('A trick', ul(['The leader plays any card. Everybody must follow the colour that was led if they can (Lanterns count as a colour too). If you cannot follow, play anything.', 'A Lantern beats every colour; the highest Lantern wins. With no Lantern, the highest card of the led colour wins.', 'You are never forced to win.', 'You may look again at the most recent trick only (the "Last trick" button).']));
+  sec('Signals (the ping)', ul(['Once per dive each diver may show one colour card from the hand, face up: it must be their highest, their lowest or their only card of that colour. The token marks which one (top, bottom or middle).', 'Lanterns cannot be shown. Signals only happen between tricks. The mark does not change afterwards, even if it stops being true.', 'Murky water: the card is shown but gets no mark. Deep narcosis: the tokens are in a shared pool (two fewer than divers) and anyone can use one at any time between tricks. Unknown waters: draw a colour card first: 1-3 normal, 4-6 murky, 7-9 narcosis.']));
+  sec('Jobs', ul(['A job is done when it is met and can no longer fail. It fails when it can no longer be met.', 'Three jobs compare with the Commander (more, fewer or equally many tricks); the Commander cannot take those.', 'If both "win the first trick" and "win the first two tricks" lie on the table and nobody could take both, one is swapped for another job of the same value.']));
+  sec('The distress flare', h('p', 'Before any signalling, the team may light the flare. Every diver passes one colour card to the left (or everybody to the right). It stays lit until the dive is won, and the dive counts one extra attempt in your logbook. You may pass again at the start of each later attempt, or not.'));
+  sec('Special dives', ul(['Commander\'s call (dives 10, 13): the Commander takes all jobs or hands them to a willing diver. If handed over, all signalling happens before the first trick.', 'One diver takes all jobs: by team vote (dive 6) or by volunteering in turn, answering only yes or no (dives 14, 15, 16; two volunteers in dive 26).', 'Open briefing (dives 17, 28-31, deep dives): talk freely about the jobs, never about cards.', 'Limits: some dives forbid winning two more 9s (or 1s) than another diver, leading Coral or a Lantern, and more. The rule of each dive is in the panel when you start it.', 'Real-time dives (14, 15, 16, 26): beat a clock, or play without it and use the alternative rule shown with the dive. Turn the clock on in the setup screen.']));
+  sec('Two divers and the drone', h('p', 'With two divers a drone joins as a third team member. Its 14 cards lie in a double row, 7 face up on top of 7 face down. The Commander takes jobs for it, plays its face-up cards and decides without talking. A face-down card turns up only after the card on top of it was played, between tricks.'));
+  sec('On your phone', ul(['Tap a card to lift it, tap it again (or press Play) to play. Dim cards are not allowed now. Tap a diver or a job chip for details; "Last trick" shows the previous trick.', 'The panel at the bottom always says what to do now. The Hint button shows a suggestion with the reason.', 'Hot-seat: a pass-the-device screen hides every hand. Online: you only ever see your own cards. There is no chat, only the pings and a few neutral emotes.']));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game. Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, job text and art are original; the paintings are by Am015-dev.</p></section>' }));
+  return root;
+}
+// ---- reference drawer: every card, job and dive, with counts ----
+function buildRef() {
+  const root = h('div#refbody');
+  const tab = UI.refTab || 'cards';
+  const tabs = h('div.tabs', [['cards', 'Cards (40)'], ['jobs', 'Jobs (96)'], ['dives', 'Dives (32)'], ['tokens', 'Tokens']].map(([k, n]) => h('button.chipb' + (tab === k ? '.on' : ''), { 'data-a': 'reftab', 'data-v': k, type: 'button' }, n)));
+  root.append(tabs);
+  if (tab === 'cards') {
+    D.suits.forEach(su => { root.append(h('h3', { style: 'margin:8px 0 4px' }, su.name + (su.id === 4 ? ' (trump, 4 cards)' : ' (9 cards)'))); const g = h('div.cgrid'); const n = su.id === 4 ? 4 : 9; for (let v = 1; v <= n; v++) g.append(h('div.cdv', { html: cardS(D.card(su.id, v), 44) })); root.append(g); });
+    root.append(h('p.sm', 'Reminder card x5 (put in your hand while your shown card is on the table), card back x1 design.'));
+  } else if (tab === 'jobs') {
+    root.append(h('p.sm', 'Numbers are the job\'s worth for 3 / 4 / 5 divers. 96 jobs.'));
+    const l = h('div.jlist'); TASKS.forEach(t => l.append(h('div.jr', h('span.nn', t.id + 1), h('span', { style: 'flex:1' }, t.t + (t.cap ? '' : ' (not for the Commander)')), h('span.dd', t.d.join(' / '))))); root.append(l);
+  } else if (tab === 'dives') {
+    const p = Prog.load(); const l = h('div.jlist');
+    D.missions.forEach(m => l.append(h('div.jr', h('span.nn', m.id), h('span', { style: 'flex:1' }, h('b', m.name), ' ', m.sel === 'fixed' ? 'Four fixed jobs.' : 'Difficulty ' + (m.timer && m.timer.altD ? m.d + ' (' + m.timer.altD + ' without the clock)' : m.d) + (m.guess ? '*' : '') + '.', m.rule ? h('div.sm', m.rule) : null), h('span.dd', p.done[m.id] ? p.done[m.id] + ' att.' : ''))));
+    root.append(l, h('p.sm', '* the difficulty number of this dive could not be confirmed from the sources; see rules-notes.md.'), h('p.sm', D.deep.note));
+  } else {
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.pingSVG({ size: 56 }) }), h('div.rt', h('b', 'Ping token (one per diver)'), h('div', 'Put on a shown card: top = highest, middle = only, bottom = lowest of that colour in the hand. Green side ready, red side spent.'))));
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.pingSVG({ size: 56, spent: true }) }), h('div.rt', h('b', 'Spent ping'), h('div', 'Flipped to red after use. In murky water it sits beside the card without a mark.'))));
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.flareSVG({ size: 56, on: true }) }), h('div.rt', h('b', 'Distress flare (1)'), h('div', 'Lit before a dive: everybody passes a card, the dive counts one extra attempt.'))));
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.cmdSVG({ size: 56 }) }), h('div.rt', h('b', 'Commander badge (1)'), h('div', 'Goes to the diver holding Lantern 4. Picks jobs first and leads the first trick.'))));
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.reminderSVG({ w: 40 }) }), h('div.rt', h('b', 'Reminder card (5)'), h('div', 'Shown in your hand while your signalled card lies on the table.'))));
+    root.append(h('div.rcard', h('span', { style: 'width:56px;display:block', html: KIT.droneSVG({ size: 56 }) }), h('div.rt', h('b', 'The drone (two divers)'), h('div', D.helper.story))));
+  }
+  return root;
+}
+function renderJobDrawer() {
+  const b = $('#jobbody'); if (!b) return; b.innerHTML = '';
+  if (!G) { b.append(h('p.sm', 'No dive running.')); return; }
+  b.append(h('p.sm', 'All jobs of this attempt. Tap one for details.'));
+  G.tasks.forEach((t, i) => { const st = jobSt(i); b.append(h('div.rjob' + (st > 0 ? '.ok' : st < 0 ? '.bad' : ''), { 'data-a': 'job', 'data-i': i, style: 'cursor:pointer' }, h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : st < 0 ? KIT.iconSVG('cross', 24) : KIT.iconSVG('list', 24) }), h('span', h('b', (t.owner >= 0 ? pname(t.owner) : 'Unclaimed') + ': '), jobText(i) + ' (' + jobDiff(i) + ')'))); });
+  if (G.mission.rule) b.append(h('p.sm', { style: 'margin-top:8px' }, 'Dive rule: ' + G.mission.rule));
+  b.append(h('p.sm', 'Signalling: ' + ({ normal: 'normal', murky: 'murky water (no marks)', narc: 'deep narcosis (shared pool)', none: 'none' }[G.comm]) + (G.unk >= 0 ? '. Drawn colour card: ' + cname(G.unk) + '.' : '.')));
+}
+function renderDrawers() {
+  if (!GX.open) return;
+  if (GX.open === 'logd') { const b = $('#logbody'); b.innerHTML = ''; b.appendChild(logHTML()); }
+  if (GX.open === 'setd') renderMenu();
+  if (GX.open === 'jobd') renderJobDrawer();
+  if (GX.open === 'refd') { const b = $('#refwrap'); b.innerHTML = ''; b.append(buildRef()); }
+}
+function renderMenu() {
+  const b = $('#setbody'); b.innerHTML = '';
+  const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
+  const tog = (name, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': name, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
+  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
+  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New dive'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
+  if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
+  if (!NET.on) { const tr = h('div.mrow', { html: tutBtn('btn') }); b.appendChild(tr); }
+  try { hlpInit(); if (typeof GXH !== 'undefined') b.appendChild(GXH.settingsRow({ rowClass: 'mrow', btnClass: 'btn' })); } catch (e) { }
+  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Choose music'));
+  { const gg = gfxPref(); row('Graphics' + (PX.on ? (gg === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gg === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gg === v ? 'true' : 'false' }, n))); }
+  let sp = ''; try { sp = /[?&]perf=1/.test(location.search) && window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }   // Show speed / Test speed only behind ?perf=1
+  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'ref', type: 'button' }, 'Cards, jobs, dives'), h('span.tinyc', { html: sp }));
+  if (NET.on) row('Emotes (no card talk)', ...['👍', '👋', '👏', '🫧'].map(e => h('button.btn.alt', { 'data-a': 'emote', 'data-v': e, type: 'button', 'aria-label': 'Emote ' + e }, e)));
+  b.appendChild(h('p.sm', 'Lantern Dive is an original deep-sea co-op trick game. Names, job text and art are original; the audio credits are in How to play.'));
+}
+// ---------- start screens: painted title -> setup (dive, crew) / online ----------
+const SEAT_ORDER = [0, 1, 2, 3];
+function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice(), seats: DEF.seats.slice() }); if (!Array.isArray(o.seats)) o.seats = chefsFor(o.np || 4, o).slice(1); if (!o.lv) o.lv = DEF.lv.slice(); o.np = o.seats.length + 1; return o; }
+function setNp(n) { const o = optObj(), want = Math.max(1, Math.min(4, n - 1)); const st = o.seats.slice(); while (st.length > want) st.pop(); for (const c of SEAT_ORDER) { if (st.length >= want) break; if (st.indexOf(c) < 0) st.push(c); } o.seats = st; o.np = st.length + 1; }
+function toggleChef(c) { const o = optObj(), st = o.seats.slice(), i = st.indexOf(c); if (i >= 0) { if (st.length > 1) st.splice(i, 1); else { toast('At least one diver joins you.'); return; } } else if (st.length < 4) st.push(c); o.seats = st; o.np = st.length + 1; }
+function firstTime() { try { return !Object.keys(Prog.load().done || {}).length && !lsGet('ld_save') && !(typeof GXT !== 'undefined' && GXT.status('lantern-dive').seen); } catch (e) { return false; } }
+function logoSVG() { return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#0e2146" stroke="#ffd873" stroke-width="1.4"/><circle cx="13" cy="9" r="4.4" fill="#ffe9a6" stroke="#0b1f3a" stroke-width="1"/><path d="M13 13.4C13 16 10 16 8 19" fill="none" stroke="#ffd873" stroke-width="1.6" stroke-linecap="round"/></svg>'; }
+function missionLine(o) {
+  const kind = o.kind || 'log';
+  if (kind === 'log') { const m = D.missions[(o.mission | 0) - 1] || D.missions[0]; return 'Dive ' + m.id + ': ' + m.name + (m.sel === 'fixed' ? '' : ' · difficulty ' + m.d); }
+  if (kind === 'free') return 'Free dive · difficulty ' + o.d;
+  if (kind === 'job') return 'Job practice · ' + TASKS[Math.max(0, Math.min(95, (o.job | 0) - 1))].s;
+  return 'Deep dive · difficulty ' + o.deep;
+}
+function tableLine(o) { const nm = o.seats.map(c => D.names[c]); return 'You + ' + nameList(nm) + ' · ' + o.np + ' players' + (o.np === 2 ? ' + a drone' : ''); }
+function renderStart() {
+  const s = $('#start'); s.hidden = false; s.innerHTML = '';
+  const rs = $('#rs'); if (rs && !UI.rsOpen) { rs.hidden = true; }
+  if (NET.on) { s.dataset.v = 'net'; netStartScreen(s); return; }
+  if (!UI.sv) UI.sv = UI.onl ? 'online' : 'title';
+  s.dataset.v = UI.sv;
+  if (UI.sv === 'title') { s.appendChild(titleEl()); return; }
+  if (KIT.ART.title) s.appendChild(h('img.ttl-bg.dim', { src: KIT.ART.title, alt: '' }));
+  if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
+  if (UI.sv === 'descent') { s.appendChild(descentEl()); return; }
+  s.appendChild(setupEl());
+}
+function titleEl() {
+  const bg = KIT.ART.title ? h('img.ttl-bg', { src: KIT.ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain');
+  const sv = hasSave();
+  return h('div.ttl', bg, h('div.ttl-in',
+    h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Lantern Dive')),
+    h('p.tag', 'Dive together. Say nothing. Trust the lantern.'),
+    h('div.tbtns',
+      firstTime() ? h('div.tutw', { html: tutBtn('tbtn go') }) : null,
+      window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), ' ', h('span', campLine())) : null,
+      h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
+      h('button.tbtn', { 'data-a': 'play', type: 'button' }, h('b', 'Free play'), ' ', h('span', 'any dive, any crew')),
+      firstTime() ? null : h('div.tutw', { html: tutBtn('tbtn') }),
+      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), ' ', h('span', 'with friends, free')),
+      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), ' ', h('span', 'your saved dive')) : null),
+    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
+}
+function dinerCard(c, o) {
+  const b = D.blurbs[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c] || b.lv || 'normal', pc = KIT.DIVERS[c];
+  const card = h('article.dcard' + (on ? '.on' : ''), { 'aria-label': D.names[c] + (on ? ', in the team' : ', not in the team') });
+  card.style.setProperty('--dc', pc.helm);
+  card.append(h('div.dtop', h('div.dimg', { html: avatarC(c, 120) }), h('h3', D.names[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', b.story), h('p.enjoy', b.enjoy),
+    h('div.drow2', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'In the team ✓' : 'Invite'),
+      on ? h('span.lvs', ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': D.names[c] + ' plays ' + v }, v))) : null)));
+  return card;
+}
+function diveCfg(o) {
+  const ph = isPh(), kind = o.kind || 'log', p = Prog.load();
+  const seg = (l, key, vals, lab) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button', 'aria-pressed': o[key] === v ? 'true' : 'false' }, lab ? lab[v] : v)));
+  const out = [h('div.seg', h('span.lbl', 'Kind of dive'), [['log', 'Logbook'], ['free', 'Free dive'], ['job', 'Job practice'], ['deep', 'Deep dive']].map(([v, n]) => h('button.chipb' + (kind === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'kind', 'data-v': v, type: 'button', 'aria-pressed': kind === v ? 'true' : 'false' }, n)))];
+  if (kind === 'log') {
+    const cur = Math.min(32, o.mission | 0 || p.cur || 1);
+    out.push(h('p.ssub', missionLine(Object.assign({}, o, { mission: cur }))));
+    const g = h('div.lgrid'); D.missions.forEach(m => { const dn = p.done[m.id], lock = m.id > Math.max(p.cur, 1) + 0 && false; g.append(h('button.lcell' + (cur === m.id ? '.cur' : '') + (dn ? '.dn' : ''), { 'data-a': 'pickdive', 'data-v': m.id, type: 'button' }, h('b', m.id + '. ' + m.name), h('span', (m.sel === 'fixed' ? 'Fixed jobs' : 'Difficulty ' + m.d) + (m.cmt !== 'normal' || m.timer ? ' · ' + (m.timer ? 'timed' : ({ murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'no signals' }[m.cmt] || m.cmt)) : '')), dn ? h('span.at', 'Done in ' + dn + ' attempt' + (dn === 1 ? '' : 's')) : (p.tries[m.id] ? h('span.at', p.tries[m.id] + ' failed') : null))); });
+    out.push(g);
+    if (m32done(p)) out.push(h('p.sm', 'All 32 dives logged! The Deep Dive keeps going from difficulty 18.'));
+  } else if (kind === 'free') {
+    out.push(seg('Difficulty', 'd', [3, 5, 7, 9, 12, 15, 18], null), seg('Signalling', 'cmt', ['normal', 'murky', 'narc', 'unknown', 'none'], { normal: 'normal', murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'none' }));
+  } else if (kind === 'job') {
+    const j = Math.max(1, Math.min(96, o.job | 0 || 1)), t = TASKS[j - 1];
+    out.push(h('div.seg', h('span.lbl', 'Job card'), h('button.chipb', { 'data-a': 'jobstep', 'data-v': -10, type: 'button', 'aria-label': 'Back ten' }, '−10'), h('button.chipb', { 'data-a': 'jobstep', 'data-v': -1, type: 'button', 'aria-label': 'Previous job' }, '‹'), h('b', { style: 'min-width:38px;text-align:center' }, j), h('button.chipb', { 'data-a': 'jobstep', 'data-v': 1, type: 'button', 'aria-label': 'Next job' }, '›'), h('button.chipb', { 'data-a': 'jobstep', 'data-v': 10, type: 'button', 'aria-label': 'Forward ten' }, '+10')), h('p.ssub', t.s + ': ' + t.t));
+  } else {
+    out.push(h('p.ssub', 'Deep dive at difficulty ' + o.deep + '. Open briefing, only the use of the flare is noted. Each success raises the number.'), h('div.seg', h('span.lbl', 'Difficulty'), h('button.chipb', { 'data-a': 'deepstep', 'data-v': -1, type: 'button' }, '−'), h('b', { style: 'min-width:38px;text-align:center' }, o.deep), h('button.chipb', { 'data-a': 'deepstep', 'data-v': 1, type: 'button' }, '+')));
+  }
+  out.push(h('div.seg', h('span.lbl', 'Clock'), h('button.chipb' + (o.timer ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'timer', 'data-v': o.timer ? 0 : 1, type: 'button', 'aria-pressed': o.timer ? 'true' : 'false' }, o.timer ? 'On (real-time dives)' : 'Off'), h('span.sm', 'Only dives 14, 15, 16 and 26 have a clock.')));
+  return out;
+}
+const m32done = p => !!p.done[32];
+function setupEl() {
+  const o = optObj(), ph = isPh(), open = !!UI.cfgOpen;
+  const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Plan the dive'));
+  const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', missionLine(o) + ' · ' + tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
+  const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the dive' : null },
+    ph ? h('div.cfghead', h('b', 'Configure the dive'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
+    diveCfg(o),
+    h('div.seg', h('span.lbl', 'Team size'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
+    h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o))),
+    ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
+  // first visit (nothing in the logbook yet): the guided dive is the big button, so a player who taps the big button learns first
+  const fresh = (() => { try { return !Object.keys(Prog.load().done || {}).length; } catch (e) { return false; } })();
+  const bStart = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the dive'), ' ', h('span', missionLine(o)));
+  const bGuided = (big) => h('div.tutw', { html: tutBtn('sbtn' + (big ? ' big' : '')) });
+  const go = h('div.sgo',
+    fresh ? bGuided(true) : bStart(true),
+    h('div.sgrid3',
+      fresh ? bStart(false) : bGuided(false),
+      h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), ' ', h('span', o.np + ' people, one device')),
+      h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), ' ', h('span', 'the divers play'))));
+  return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Choose the dive and who comes along. Each computer diver has a temper; change their level if you like.'), cfg, go);
+}
+function onlineEl() {
+  return h('div.setup.scard.onlv', h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Play online')),
+    h('p.ssub', 'Host a dive and send friends the code or the link. Every browser connects directly; nobody sees another hand. Empty seats go to the computer divers. There is no chat: talk with the pings only.'),
+    h('details.online#onl', { open: true }, h('summary', 'Free, peer to peer'), h('div#netblock', netInner())));
+}
+function showStart() { try { GX.close(); } catch (e) { } UI.dlg = null; try { drawDlg(); } catch (e) { } closePop(); UI.cards = []; UI.sv = 'title'; UI.cfgOpen = false; clearInterval(UI.clk); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; } closeRS(); clearTimeout(UI.tm); renderStart(); }
+// ---------- events ----------
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
+  if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer,#rs')) closePop(); return; }
+  const a = t.dataset.a, d = t.dataset;
+  if (netClick(a, t)) return;
+  if (d.start && !a) { newGame(d.start); return; }
+  const num = x => x === undefined ? undefined : +x;
+  switch (a) {
+    case 'hcard': tapHand(+d.id); break;
+    case 'dcard': tapDrone(+d.id); break;
+    case 'playcard': playSel(); break;
+    case 'signal': if (canAct() && LD.pingMoves(G, viewSeat()).length) { UI.pingSel = true; UI.sel = -1; render(); } break;
+    case 'noping': UI.pingSel = false; UI.sel = -1; render(); break;
+    case 'doping': { const m = myMoves().find(x => x.t === 'ping' && x.c === UI.sel); if (m && canAct()) doMove(m); break; }
+    case 'nosig': { const m = myMoves().find(x => x.t === 'nosig'); if (m && canAct()) doMove(m); break; }
+    case 'pool': tapJob(+d.i); break;
+    case 'pingc': tapPing(+d.id); break;
+    case 'take': { const m = myMoves().find(x => x.t === 'take' && x.i === num(d.i)); if (m && canAct()) doMove(m); else toast('You cannot take that job.'); break; }
+    case 'pass': case 'done': case 'keep': case 'offer': case 'accept': case 'decline': case 'yes': case 'no': { const m = myMoves().find(x => x.t === a); if (m && canAct()) doMove(m); break; }
+    case 'vote': { const m = myMoves().find(x => x.t === 'vote' && x.f === num(d.f)); if (m && canAct()) doMove(m); break; }
+    case 'dist': { const on = d.on === 'true'; const m = myMoves().find(x => x.t === 'dist' && x.on === on && (!on || x.dir === num(d.dir))); if (m && canAct()) doMove(m); break; }
+    case 'give': { const m = myMoves().find(x => x.t === 'give' && x.c === UI.giveSel); if (m && canAct()) doMove(m); break; }
+    case 'predict': { const m = myMoves().find(x => x.t === 'predict' && x.n === num(d.n)); if (m && canAct()) doMove(m); break; }
+    case 'job': openJob(+d.i); break;
+    case 'seat': { const vm = canAct() && G && G.phase === 'assign' && myMoves().find(x => x.t === 'vote' && x.f === +d.seat); if (vm) doMove(vm); else openSeat(+d.seat); break; }
+    case 'last': openLast(); break;
+    case 'popx': closePop(); break;
+    case 'tipok': tipOk(); break;
+    case 'result': UI.overShown = false; showResult(); break;
+    case 'nextdive': nextDive(); break;
+    case 'retrysame': closeRS(); if (NET.on) { if (isHost()) { nextAttempt(true); } } else nextAttempt(true); break;
+    case 'retrynew': closeRS(); if (NET.on) { if (isHost()) { nextAttempt(false); } } else nextAttempt(false); break;
+    case 'rsclose': closeRS(); break;
+    case 'takedev': case 'takeDevice': takeDevice(); break;
+    case 'play': UI.sv = 'setup'; renderStart(); break;
+    case 'story': campOpen(); break;
+    case 'campfin': closeRS(); campFinish(); break;
+    case 'descent': UI.sv = 'descent'; renderStart(); break;
+    case 'descgo': closeRS(); descGo(); break;
+    case 'descmap': closeRS(); showStart(); UI.sv = 'descent'; renderStart(); break;
+    case 'descreset': descReset(); break;
+    case 'dlgok': dlgOk(); break;
+    case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
+    case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
+    case 'cfgopen': UI.cfgOpen = true; renderStart(); try { const c = $('#cfg'); if (c) c.querySelector('button').focus({ preventScroll: true }); } catch (e) { } break;
+    case 'cfgclose': UI.cfgOpen = false; renderStart(); break;
+    case 'seatchef': toggleChef(+d.c); renderStart(); break;
+    case 'gfx': setGfx(d.v); renderMenu(); break;
+    case 'menu': showStart(); break;
+    case 'start': newGame(d.m); break;
+    case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'kind') { o.kind = d.v; if (d.v === 'log' && !o.mission) o.mission = Prog.load().cur > 32 ? 32 : Prog.load().cur; if (d.v === 'deep') o.deep = Math.max(D.deep.start, Prog.load().deep.level); } else if (d.k === 'timer') o.timer = d.v === '1'; else { o[d.k] = isNaN(+d.v) ? d.v : +d.v; } renderStart(); break; }
+    case 'pickdive': { const o = optObj(); o.mission = +d.v; renderStart(); break; }
+    case 'jobstep': { const o = optObj(); o.job = Math.max(1, Math.min(96, ((o.job | 0) || 1) + (+d.v))); renderStart(); break; }
+    case 'deepstep': { const o = optObj(); o.deep = Math.max(1, Math.min(60, (o.deep | 0) + (+d.v))); renderStart(); break; }
+    case 'lv': { const o = optObj(); o.lv = (o.lv || DEF.lv).slice(); o.lv[+d.seat] = d.v; renderStart(); break; }
+    case 'rules': GX.show('rulesd'); break;
+    case 'ref': UI.refTab = UI.refTab || 'cards'; GX.show('refd'); break;
+    case 'reftab': UI.refTab = d.v; { const b = $('#refwrap'); b.innerHTML = ''; b.append(buildRef()); } break;
+    case 'save': toast(save() ? 'Dive saved.' : 'Could not save.'); break;
+    case 'loadsave': if (!loadSave()) toast('No saved dive.'); break;
+    case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
+    case 'guide': UI.coach.level = d.v; UI.prefs.guide = d.v; savePrefs(); renderMenu(); break;
+    case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
+    case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
+    case 'musicopen': try { GX.close(); } catch (x) { } renderMusic(); GX.show('musicd'); break;
+    case 'mpick': musicPick(d.s, d.c); renderMusic(); break;
+    case 'mall': { const on = MLOOPS.every(k => MUS.pick[k] === 'all'); MLOOPS.forEach(k => musicPick(k, on ? MDEF[k] : 'all')); renderMusic(); break; }
+    case 'mprev': musicPreview(d.s); renderMusic(); break;
+    case 'mprevx': musicPreviewStop(); renderMusic(); break;
+    case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
+    case 'emote': netEmote(d.v); break;
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && G && G.phase === 'over' && UI.overShown) closeRS(); } });
+// ---------- phone mode ----------
+function applyPhone() {
+  const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
+  let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
+  if (q) ph = q[1] === '1';
+  const r = document.documentElement.classList, was = r.contains('ph');
+  r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
+}
+function relayout() { applyPhone(); if (G && UI.started) render(); if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } } }
+// ---------- boot ----------
+function boot() {
+  GX.init({ key: 'ld' });
+  GX.drawer('rulesd', 'How to play', buildRules(), true);
+  GX.drawer('refd', 'Cards, jobs, dives', h('div#refwrap'), true);
+  GX.drawer('jobd', 'All jobs', h('div#jobbody'));
+  GX.drawer('logd', 'Log', h('div#logbody'));
+  GX.drawer('setd', 'Menu', h('div#setbody'));
+  GX.onShow = id => { renderDrawers(); };
+  loadPrefs(); applyPhone();
+  GXV.watch(relayout);
+  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'ld' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
+  pxPerfReg();
+  pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
+  if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
+  netInit();
+  renderStart();
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+// ===================== part 6: sound (shared gameaudio samples; silent without Web Audio) =====================
+// SND_MAP: one line per event. s:null means silent (a sample may be re-tuned by ear later: change s / vol here).
+const SND_MAP = { click: { s: 'click', vol: .5 }, play: { s: 'play', vol: .7 }, slide: { s: 'slide', vol: .55 }, pass: { s: 'pass', vol: .6 }, take: { s: 'take', vol: .65 }, ping: { s: 'ping', vol: .7 }, trick: { s: 'trick', vol: .65 },
+  done: { s: 'done', vol: .7 }, fail: { s: 'fail', vol: .7 }, deal: { s: 'deal', vol: .6 }, tick: { s: 'tick', vol: .4 }, win: { s: 'win', vol: .8 }, lose: { s: 'lose', vol: .75 }, error: { s: 'error', vol: .5 } };
+// fallback when the sample bundle is missing (or Web Audio samples did not load): a few quiet oscillator notes
+let SYN = null;
+const SYN_N = { click: [[660, .04, 'square', .03]], play: [[220, .07, 'triangle', .08]], slide: [[300, .1, 'sine', .04]], pass: [[260, .12, 'sine', .04]], take: [[520, .08, 'triangle', .06]], ping: [[880, .3, 'sine', .1], [1320, .25, 'sine', .04]],
+  trick: [[330, .08, 'triangle', .07], [440, .1, 'triangle', .07]], done: [[523, .1, 'sine', .08], [784, .18, 'sine', .08]], fail: [[300, .15, 'sawtooth', .05], [200, .3, 'sawtooth', .05]], deal: [[400, .05, 'square', .02]], tick: [[1200, .02, 'square', .02]],
+  win: [[523, .14, 'triangle', .1], [659, .14, 'triangle', .1], [784, .3, 'triangle', .1]], lose: [[392, .2, 'sine', .09], [294, .4, 'sine', .09]], error: [[140, .12, 'square', .05]] };
+function synth(name, vol) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC || /jsdom/i.test(navigator.userAgent || '')) return; const seq = SYN_N[name]; if (!seq) return;
+    if (!SYN) SYN = new AC(); if (SYN.state === 'suspended') SYN.resume(); let t = SYN.currentTime;
+    seq.forEach(([f, d, w, g]) => { const o = SYN.createOscillator(), a = SYN.createGain(); o.type = w; o.frequency.value = f; a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g * vol, t + .01); a.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(a); a.connect(SYN.destination); o.start(t); o.stop(t + d + .02); t += Math.min(d, .12); });
+  } catch (e) { }
+}
+function snd(name, o) {
+  try {
+    if (UI.prefs && UI.prefs.sound === false) return;
+    const m = SND_MAP[name] || { s: name, vol: 1 }; if (!m.s) return; if (!window.GA || !GA.has(m.s)) { synth(name, (o && o.vol != null ? o.vol : 1) * (m.vol != null ? m.vol : 1)); return; }
+    const oo = Object.assign({}, o || {}); oo.vol = (oo.vol != null ? oo.vol : 1) * (m.vol != null ? m.vol : 1); GA.play(m.s, oo);
+  } catch (e) { }
+}
+function sndMusic() {
+  try {
+    if (!window.GA) return;
+    if (typeof musicSync === 'function') musicSync(); else if (UI.prefs.music === false || !G || !UI.started) GA.music(null); else GA.music('main-a');
+    if (UI.prefs.music === false || !G || !UI.started) { GA.stopLoop && GA.stopLoop('sea'); return; }
+    if (GA.loop && GA.has && GA.has('sea')) GA.loop('sea', { vol: .14, fade: 1.5 });
+  } catch (e) { }
+}
+document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !t.matches('.hc,.dc,[data-a=play],[data-a=hcard],[data-a=dcard]')) snd('click'); }, true);
+// ===================== part 7: the painted table (PixiJS 8: WebGL, else Pixi's canvas renderer, else the plain DOM view) =====================
+// The DOM stays the layout, hit and accessibility layer: every card in your hand, every card on the table and every drone card is still a real
+// <button> / box with data-px="card". When the Pixi table is on (html.ldpx) those boxes keep their place but hide their own SVG pictures, and
+// pxSync() (after every render()) moves painted card sprites to their boxes. Cards ease to new places, a card you play flies from your hand
+// to its slot, other divers' cards fly from their portrait, a finished trick is swept to the winner. Sprites only mirror what the DOM shows,
+// so hidden hands stay hidden: a sprite exists only for a card the DOM shows face up.
+const PX = { on: false, app: null, q: 'high', res: 1, kind: '', B: null, cv: null, L: {}, objs: new Map(), tweens: [], parts: [], tex: {}, img: {}, faceP: {}, dirty: true, t: 0, last: 0, err: '', ready: false, raf: 0, nPlay: 0, nSweep: 0 };
+const PXQ = { high: { pr: 2, fx: 1, blur: true, parts: 1, bub: 1 }, medium: { pr: 1.5, fx: .55, blur: false, parts: .5, bub: .6 }, low: { pr: 1.5, fx: 0, blur: false, parts: 0, bub: 0 } };
+const pxRM = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+function gfxAuto() { const n = navigator.hardwareConcurrency || 4, mem = navigator.deviceMemory || 4, ph = isPh(); if (n <= 2 || mem <= 2) return 'low'; if (PX.soft) return 'low'; return ph ? 'medium' : 'high'; }
+function gfxPref() { return UI.prefs.gfx || 'auto'; }
+function gfxLevel() { const p = gfxPref(); return p === 'auto' ? (PX.autoQ || gfxAuto()) : p; }
+// ---- boot: inject the stored Pixi source, make the renderer, load the textures ----
+async function pxInit() {
+  try {
+    if (/jsdom/i.test(navigator.userAgent || '') || /[?&]px=0/.test(location.search) || typeof LD_ART === 'undefined' || !KIT.ART.emb0) return false;
+    if (!window.PIXI) { const src = document.getElementById('pixi-src'); if (!src) return false; const s = document.createElement('script'); s.textContent = src.textContent; document.head.appendChild(s); }
+    if (!window.PIXI || !PIXI.Application) return false;
+    const bd = $('#bd'); const cv = document.createElement('canvas'); cv.id = 'pxc'; cv.setAttribute('aria-hidden', 'true'); bd.insertBefore(cv, bd.firstChild);
+    PX.q = gfxLevel(); PX.res = pxBasePR();
+    const want = /[?&]px=canvas/.test(location.search) ? ['canvas'] : ['webgl', 'canvas'];
+    let app = null;
+    for (const pref of want) {
+      try { const a = new PIXI.Application(); await a.init({ canvas: cv, backgroundAlpha: 0, antialias: false, resolution: PX.res, autoDensity: true, preference: pref, autoStart: false, sharedTicker: false, width: Math.max(16, bd.clientWidth), height: Math.max(16, bd.clientHeight), powerPreference: 'low-power', failIfMajorPerformanceCaveat: false, hello: false }); app = a; PX.kind = (a.renderer && a.renderer.name) || pref; break; }
+      catch (e) { PX.err += pref + ': ' + (e && e.message || e) + '; '; }
+    }
+    if (!app) { cv.remove(); return false; }
+    PX.app = app; PX.cv = cv;
+    try { const gl = app.renderer.gl; if (gl) { const ext = gl.getExtension('WEBGL_debug_renderer_info'); const r = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ''; if (/swiftshader|llvmpipe|software/i.test(r)) PX.soft = true; PX.gpu = r; } } catch (e) { }
+    if (gfxPref() === 'auto') { PX.q = gfxLevel(); pxSetRes(pxBasePR()); }
+    cv.addEventListener('webglcontextlost', e => { e.preventDefault(); pxOff('context lost'); });
+    await pxTextures();
+    const st = app.stage; const C = () => new PIXI.Container();
+    PX.L = { felt: C(), amb: C(), hand: C(), trick: C(), fly: C(), fx: C() };
+    for (const k of ['felt', 'amb', 'hand', 'trick', 'fly', 'fx']) st.addChild(PX.L[k]);
+    PX.L.hand.sortableChildren = true; PX.L.trick.sortableChildren = true;
+    PX.handMask = new PIXI.Graphics(); st.addChild(PX.handMask); PX.L.hand.mask = PX.handMask;
+    PX.handBg = new PIXI.Sprite(PX.tex.handgrad); PX.L.felt.addChild(PX.handBg);
+    PX.mat = new PIXI.Graphics(); PX.L.felt.addChild(PX.mat);
+    PX.caus = new PIXI.TilingSprite({ texture: PX.tex.caustic, width: 10, height: 10 }); PX.caus.alpha = .5; PX.L.felt.addChild(PX.caus);
+    PX.on = true; PX.ready = true; document.documentElement.classList.add('ldpx');
+    pxApplyQ();
+    const hd = $('#hand'); if (hd) hd.addEventListener('scroll', pxDirty, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(() => { pxResize(); }).observe(bd);
+    pxResize(); pxLoop();
+    return true;
+  } catch (e) { console.warn('painted table off:', e); pxOff(String(e && e.message || e)); return false; }
+}
+function pxOff(why) {
+  PX.on = false; PX.err += (why || '') + ';'; document.documentElement.classList.remove('ldpx');
+  try { if (PX.cv) PX.cv.remove(); } catch (e) { }
+  try { if (G && UI.started) render(); } catch (e) { }
+}
+function pxBasePR() { const d = window.devicePixelRatio || 1; const q = PXQ[PX.q] || PXQ.high; const w = Math.min(q.pr, d); return window.PerfHUD && PerfHUD.pixelRatio ? PerfHUD.pixelRatio(w) : w; }
+function pxSetRes(v) { PX.res = v; if (PX.app && PX.app.renderer) { try { PX.app.renderer.resolution = v; pxResize(true); } catch (e) { } } }
+function pxApplyQ() {
+  PX.q = gfxLevel(); pxSetRes(pxBasePR());
+  const q = PXQ[PX.q];
+  try { PX.L.fx.filters = q.blur ? [new PIXI.BlurFilter({ strength: 1.4, quality: 2 })] : null; } catch (e) { }
+  if (PX.caus) PX.caus.visible = !!q.fx;
+  if (!q.bub) { for (const p of PX.parts) if (p.kind === 'bub') p.life = 0; }
+  PX.dirty = true;
+}
+function setGfx(v) { UI.prefs.gfx = v; savePrefs(); PX.autoQ = null; if (PX.on) { pxApplyQ(); pxPerfReg(); } }
+// ---- textures: painted pictures (blob URLs from LD_ART) + small generated sprites ----
+function pxLoadImg(url) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+async function pxTextures() {
+  const ids = Object.keys(KIT.ART);
+  await Promise.all(ids.map(async k => { try { const im = await pxLoadImg(KIT.ART[k]); PX.img[k] = im; PX.tex[k] = PIXI.Texture.from(im); } catch (e) { } }));
+  const mk = (w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); return PIXI.Texture.from(c); };
+  const radial = stops => (x, w, h) => { const g = x.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); stops.forEach(s => g.addColorStop(s[0], s[1])); x.fillStyle = g; x.fillRect(0, 0, w, h); };
+  PX.tex.shadow = mk(64, 64, radial([[0, 'rgba(0,8,24,.6)'], [.55, 'rgba(0,8,24,.3)'], [1, 'rgba(0,8,24,0)']]));
+  PX.tex.glow = mk(64, 64, radial([[0, 'rgba(255,224,130,.95)'], [.5, 'rgba(255,200,80,.4)'], [1, 'rgba(255,190,60,0)']]));
+  PX.tex.puff = mk(48, 48, radial([[0, 'rgba(220,244,255,.9)'], [.45, 'rgba(200,236,255,.5)'], [1, 'rgba(200,236,255,0)']]));
+  PX.tex.spark = mk(32, 32, (x, w, h) => { x.translate(w / 2, h / 2); x.fillStyle = '#fff3b0'; x.strokeStyle = '#0b2038'; x.lineWidth = 1.5; x.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 4 : 14, a = i / 8 * Math.PI * 2; x.lineTo(Math.cos(a) * r, Math.sin(a) * r); } x.closePath(); x.fill(); x.stroke(); });
+  PX.tex.bub = mk(24, 24, (x, w, h) => { x.strokeStyle = 'rgba(220,244,255,.85)'; x.lineWidth = 2; x.beginPath(); x.arc(w / 2, h / 2, 9, 0, Math.PI * 2); x.stroke(); x.fillStyle = 'rgba(255,255,255,.7)'; x.beginPath(); x.arc(w / 2 - 3, h / 2 - 3, 2.4, 0, Math.PI * 2); x.fill(); });
+  PX.tex.ring = mk(96, 96, (x, w, h) => { x.strokeStyle = 'rgba(255,224,130,.95)'; x.lineWidth = 6; x.beginPath(); x.arc(w / 2, h / 2, 40, 0, Math.PI * 2); x.stroke(); });
+  PX.tex.cardShadow = mk(80, 108, (x, w, h) => { x.filter = 'blur(6px)'; x.fillStyle = 'rgba(0,6,20,.6)'; x.beginPath(); x.roundRect ? x.roundRect(12, 12, w - 24, h - 24, 8) : x.rect(12, 12, w - 24, h - 24); x.fill(); });
+  PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(255,216,115,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
+  PX.tex.handgrad = mk(4, 64, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(2,10,24,0)'); g.addColorStop(.3, 'rgba(2,10,24,.5)'); g.addColorStop(1, 'rgba(2,10,24,.6)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
+  // caustics: soft light pools only (filled radial blobs, no outlines)
+  PX.tex.caustic = mk(256, 256, (x, w, h) => { x.clearRect(0, 0, w, h); let s = 7; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) { const cx = r() * w, cy = r() * h, rr = 22 + r() * 40; for (const [ox, oy] of [[0, 0], [w, 0], [-w, 0], [0, h], [0, -h]]) { const g = x.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, rr); g.addColorStop(0, 'rgba(170,230,255,.16)'); g.addColorStop(1, 'rgba(170,230,255,0)'); x.fillStyle = g; x.beginPath(); x.ellipse(cx + ox, cy + oy, rr, rr * .7, 0, 0, 7); x.fill(); } } });
+}
+function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
+// a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
+function pxFace(id, w) {
+  const r = Math.min(2, Math.max(1, window.devicePixelRatio || 1)), key = id + '|' + w + '|' + r;   // faces are always drawn at the screen's own sharpness (2x phones), whatever the graphics level
+  if (PX.tex['f:' + key]) return PX.tex['f:' + key];
+  const s = suitOf(id), v = valOf(id), lan = s === 4, su = D.suits[s], H = Math.round(w * 1.4);
+  const c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
+  const rad = w * .085, bw = Math.max(1.6, w * .026), INK = '#0b1f3a';
+  const rr = (X, Y, W2, H2, R) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W2, H2, R); else x.rect(X, Y, W2, H2); };
+  const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
+  rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
+  rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
+  if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
+  const im = PX.img['emb' + s]; const ew = w * .56;
+  // the painting is an opaque square: clip it to a framed rounded square (centre) or a disc (corner pip) so it reads as a picture on the card
+  const framed = (X, Y, S, big) => { x.save(); x.beginPath(); if (big) rr(X, Y, S, S, S * .14); else x.arc(X + S / 2, Y + S / 2, S / 2, 0, 7); x.clip(); x.drawImage(im, X, Y, S, S); x.restore();
+    x.beginPath(); if (big) rr(X, Y, S, S, S * .14); else x.arc(X + S / 2, Y + S / 2, S / 2 - w * .006, 0, 7); x.lineWidth = Math.max(1, S * (big ? .035 : .06)); x.strokeStyle = big ? '#d9b04a' : 'rgba(255,255,255,.9)'; x.stroke(); };
+  if (im) framed((w - ew) / 2, H * .5 - ew * .5, ew, true);
+  const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
+  const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
+    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = lan ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
+    if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
+  corner(false); corner(true);
+  const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
+}
+function pxBack(w) {
+  const r = Math.min(2, Math.max(1, PX.res)), key = 'bk|' + w + '|' + r; if (PX.tex[key]) return PX.tex[key];
+  const H = Math.round(w * 1.4), c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
+  const rr = w * .085; x.beginPath(); x.roundRect ? x.roundRect(1, 1, w - 2, H - 2, rr) : x.rect(1, 1, w - 2, H - 2); x.save(); x.clip(); if (PX.img.back) x.drawImage(PX.img.back, 0, 0, w, H); else { x.fillStyle = '#12356c'; x.fillRect(0, 0, w, H); } x.restore();
+  x.lineWidth = Math.max(1.2, w * .026); x.strokeStyle = '#0b1f3a'; x.stroke();
+  const t = PIXI.Texture.from(c); PX.tex[key] = t; return t;
+}
+// make every card face for the sizes in use ahead of time, in small chunks, so a card never flies in without its picture
+function pxPrewarm() {
+  if (!PX.on) return; const hw = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60), cw = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 50), dw = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dw')) || 44);
+  const key = hw + '|' + cw + '|' + dw + '|' + PX.res; if (PX.warm === key) return; PX.warm = key; const ws = [...new Set([hw, cw, dw])]; let i = 0; const all = []; for (const w of ws) for (let id = 0; id < 40; id++) all.push([id, w]);
+  const step = () => { if (!PX.on || PX.warm !== key) return; for (let k = 0; k < 14 && i < all.length; k++, i++) pxFace(all[i][0], all[i][1]); if (i < all.length) setTimeout(step, 16); }; step();
+}
+// ---- the layout read: one pass over the DOM after each render ----
+let pxQueued = false;
+function pxDirty() { if (!PX.on || pxQueued) return; try { if (window.PerfHUD && PerfHUD.wake) PerfHUD.wake(); } catch (e) { } pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
+function pxResize(force) {
+  if (!PX.app) return; const bd = $('#bd'); const w = Math.max(16, bd.clientWidth), h = Math.max(16, bd.clientHeight);
+  if (force || w !== PX.w || h !== PX.h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h, PX.res); } catch (e) { } PX.dirty = true; }
+  pxDirty();
+}
+function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
+function pxDrawFelt(R) {
+  const g = PX.mat; g.clear(); if (!R) return;
+  g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
+  g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
+  g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
+  PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
+  PX.feltR = R;
+}
+function pxSeatRect(s, B) { const e = document.querySelector('[data-key="seat' + s + '"]'); return e ? pxRect(e, B) : null; }
+function pxSync() {
+  if (!PX.on || !G || !UI.started) { if (PX.on) pxClear(); return; }
+  try { if (window.PerfHUD && PerfHUD.wake) PerfHUD.wake(); } catch (e) { }   // a table change must never wait for the idle-frame saver
+  const bd = $('#bd'); const B = bd.getBoundingClientRect(); PX.B = B;
+  const seen = new Set(), now = performance.now();
+  const ent = UI.enter || ''; UI.enter = ''; const exit = UI.pxExit; UI.pxExit = null;
+  pxPrewarm(); const fl = $('#felt'); if (fl) pxDrawFelt(pxRect(fl, B));
+  const hz = $('#handz'); PX.handR = hz ? pxRect(hz, B) : null;
+  const els = [...document.querySelectorAll('#bd [data-px=card]')];
+  let hi = 0;
+  els.forEach(el => {
+    const key = el.dataset.pk, R = pxRect(el, B), id = +el.dataset.id; seen.add(key);
+    const isTrick = key[0] === 't', isHand = key[0] === 'h';
+    let o = PX.objs.get(key), fresh = false;
+    if (!o && isTrick) { const old = PX.objs.get('h:' + id); if (old && !seen.has('h:' + id)) { PX.objs.delete('h:' + id); old.key = key; old.detached = false; old.c.parent && old.c.parent.removeChild(old.c); PX.L.trick.addChild(old.c); old.layer = 'trick'; PX.objs.set(key, old); o = old; PX.nPlay++; if (ANIM) pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 440, 'out'); } }
+    if (!o) { o = pxCardObj(key, isTrick ? 'trick' : 'hand'); fresh = true; }
+    o.id = id; o.sel = el.classList.contains('sel'); o.dim = el.classList.contains('dim'); o.pk = el.classList.contains('pk'); o.pinged = el.classList.contains('pinged'); o.gw = el.classList.contains('glow');
+    o.tx = R.x; o.ty = R.y; o.tw = R.w; o.seatOf = +(el.dataset.seat || -1); o.drone = el.classList.contains('dc');
+    if (isHand) { o.z = ++hi; o.c.zIndex = o.z; } else o.c.zIndex = 50 + (o.idx || 0);
+    if (fresh) {
+      if (isTrick) {
+        const sr = o.seatOf >= 0 ? pxSeatRect(o.seatOf, B) : null;
+        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 500, 'out'); } else { o.x = R.x; o.y = R.y; o.w = R.w; }
+      } else if (ANIM && ent === 'deal' && !o.drone) { o.x = PX.w / 2 - R.w / 2; o.y = -R.w * 1.6; o.w = R.w * .7; o.delay = now + hi * 32; o.rot = -.4 + hi * .06; o.flip = 1; o.flipUntil = now + 1100 + hi * 40; }
+      else { o.x = R.x; o.y = R.y; o.w = R.w; }
+    }
+    pxCardTex(o);
+  });
+  for (const [key, o] of [...PX.objs]) {
+    if (seen.has(key) || o.detached) continue;
+    if (!ANIM || !PX.ready) { pxKill(o); continue; }
+    o.detached = true; o.c.parent && o.c.parent !== PX.L.fly && (o.c.parent.removeChild(o.c), PX.L.fly.addChild(o.c)); o.c.zIndex = 100;
+    if (key[0] === 't' && exit && exit.seat != null) {
+      const sr = pxSeatRect(exit.seat, B); PX.nSweep++;
+      if (sr) { const idx = o.seatOf; pxTween(o, { x: sr.x + sr.w / 2 - o.w * .2, y: sr.y + sr.h / 2 - o.w * .3, w: o.w * .4, a: 0 }, 480, 'in', () => pxKill(o), { delay: 0 }); continue; }
+    }
+    pxTween(o, { a: 0, y: o.y + 18 }, 240, 'in', () => pxKill(o));
+  }
+  if (PX.handR && PX.handBg) { PX.handBg.x = PX.handR.x; PX.handBg.y = PX.handR.y; PX.handBg.width = PX.handR.w; PX.handBg.height = PX.handR.h; }
+  if (PX.handR) { PX.handMask.clear(); PX.handMask.rect(PX.handR.x, PX.handR.y - 40, PX.handR.w, PX.handR.h + 44).fill(0xffffff); }
+  // ripples and sparks requested by the UI
+  if (UI.pxPing != null) { const sr = pxSeatRect(UI.pxPing, B); UI.pxPing = null; if (sr) pxRipple(sr.x + sr.w / 2, sr.y + sr.h / 2); }
+  if (UI.pxSpark != null) { const e = document.querySelector('[data-i="' + UI.pxSpark + '"]'); UI.pxSpark = null; if (e) { const r = pxRect(e, B); pxBurst(r.x + r.w / 2, r.y + r.h / 2); } }
+  PX.dirty = true;
+}
+function pxClear() { for (const [, o] of PX.objs) pxKill(o); if (PX.mat) PX.mat.clear(); PX.dirty = true; }
+// ---- cards ----
+function pxCardObj(key, layer) {
+  const c = new PIXI.Container(); const sh = new PIXI.Sprite(PX.tex.cardShadow), gl = new PIXI.Sprite(PX.tex.cardGlow), lg = new PIXI.Sprite(PX.tex.glow), sp = new PIXI.Sprite(PIXI.Texture.EMPTY);
+  sh.anchor.set(.5); gl.anchor.set(.5); lg.anchor.set(.5); sp.anchor.set(.5); gl.alpha = 0; lg.alpha = 0; c.addChild(sh, gl, lg, sp);
+  const o = { key, kind: 'card', layer, c, sh, gl, lg, sp, x: 0, y: 0, w: 60, tx: 0, ty: 0, tw: 60, a: 1, s: 1, sq: 0, rot: 0, flip: 0, lift: 0, idx: 0 };
+  (layer === 'trick' ? PX.L.trick : PX.L.hand).addChild(c); PX.objs.set(key, o); return o;
+}
+function pxCardTex(o) {
+  const w = Math.round(o.tw || 60); const t = pxFace(o.id, w);
+  if (t) { o.face = t; } o.faceW = w; o.backT = pxBack(w);
+}
+function pxKill(o) { PX.objs.delete(o.key); for (const t of PX.tweens) if (t.o === o) t.dead = true; PX.tweens = PX.tweens.filter(t => !t.dead); try { o.c.destroy({ children: true }); } catch (e) { } PX.dirty = true; }
+// ---- tweens ----
+const EASE = { out: t => 1 - Math.pow(1 - t, 3), in: t => t * t * t, io: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, back: t => { const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); } };
+function pxTween(o, to, ms, ease, done, extra) {
+  const k = ANIM && !pxRM() ? Math.max(.5, AIDELAY > 0 ? Math.min(1.6, AIDELAY / 650) : .5) : 0;
+  const tw = Object.assign({ o, to, from: {}, t0: performance.now() + ((extra && extra.delay) || 0), ms: Math.max(1, ms * (k || 0)), ease: EASE[ease] || EASE.out, done }, extra || {});
+  for (const p in to) tw.from[p] = o[p];
+  PX.tweens.push(tw); o.busy = (o.busy || 0) + 1; PX.dirty = true; return tw;
+}
+function pxStepTweens(now) {
+  const done = [];
+  for (const tw of PX.tweens.slice()) {
+    if (tw.dead || now < tw.t0) continue;
+    const u = Math.min(1, (now - tw.t0) / tw.ms), e = tw.ease(u), o = tw.o;
+    for (const p in tw.to) o[p] = tw.from[p] + (tw.to[p] - tw.from[p]) * e;
+    if (tw.arc) o.y -= Math.sin(u * Math.PI) * tw.arc;
+    if (tw.step) tw.step(u);
+    if (u >= 1) { tw.dead = true; done.push(tw); }
+  }
+  if (done.length) PX.tweens = PX.tweens.filter(t => !t.dead);
+  for (const tw of done) { tw.o.busy = Math.max(0, (tw.o.busy || 0) - 1); if (tw.done) try { tw.done(); } catch (er) { console.error(er); } }
+}
+// ---- effects ----
+function pxPart(kind, x, y, o) {
+  const q = PXQ[PX.q]; if (!q.parts && kind !== 'bub') return; if (kind === 'bub' && !q.bub) return; if (PX.parts.length > 120) return;
+  const sp = new PIXI.Sprite(PX.tex[kind === 'ring' ? 'ring' : kind]); sp.anchor.set(.5); sp.x = x; sp.y = y;
+  (o.noFilter || kind === 'bub' ? PX.L.amb : PX.L.fx).addChild(sp);
+  PX.parts.push(Object.assign({ sp, kind, t: 0, vx: 0, vy: 0, g: 0, life: 1, s0: 1, s1: 1, a0: 1, rot: 0 }, o)); PX.dirty = true;
+}
+function pxStepParts(dt) {
+  const keep = [];
+  for (const p of PX.parts) {
+    p.t += dt; const u = p.t / p.life; if (u >= 1) { p.sp.destroy(); continue; }
+    p.vy += p.g * dt; p.sp.x += p.vx * dt; p.sp.y += p.vy * dt; p.sp.rotation += p.rot * dt;
+    const s = p.s0 + (p.s1 - p.s0) * u; p.sp.scale.set(s); p.sp.alpha = p.a0 * (u < .15 ? u / .15 : 1 - (u - .15) / .85);
+    keep.push(p);
+  }
+  PX.parts = keep;
+}
+function pxBurst(x, y) { const q = PXQ[PX.q]; const n = q.parts ? Math.round(10 * q.parts) + 4 : 0; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + Math.random() * .4, sp = 50 + Math.random() * 60; pxPart('spark', x, y, { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, g: 120, life: .7 + Math.random() * .3, s0: .5 + Math.random() * .4, s1: .2, rot: (Math.random() - .5) * 6, noFilter: true }); } }
+function pxRipple(x, y) { if (!PXQ[PX.q].parts) return; pxPart('ring', x, y, { life: 1, s0: .2, s1: 1.4, a0: .9, noFilter: true }); pxPart('ring', x, y, { life: 1.3, s0: .1, s1: 2.0, a0: .6, noFilter: true }); }
+function pxAmbient(dt) {
+  const q = PXQ[PX.q]; if (!q.bub || pxRM() || !PX.feltR) return;
+  PX.amb = (PX.amb || 0) + dt; if (PX.amb < .55 / q.bub) return; PX.amb = 0;
+  const R = PX.feltR; const x = 6 + Math.random() * (PX.w - 12), y = PX.h - 10;
+  pxPart('bub', x, y, { vx: (Math.random() - .5) * 10, vy: -(24 + Math.random() * 30), life: 6 + Math.random() * 4, s0: .5 + Math.random() * .7, s1: .6 + Math.random() * .8, a0: .5, noFilter: true });
+}
+// ---- the frame ----
+function pxLoop() {
+  const PH = window.PerfHUD && PerfHUD.live ? PerfHUD : null;
+  const tick = ts => { PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick); try { pxFrame(ts); } catch (e) { console.error(e); } };
+  PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick);
+}
+function pxMoving() { return PX.tweens.length > 0 || [...PX.objs.values()].some(o => !o.detached && (Math.abs(o.x - o.tx) > .5 || Math.abs(o.y - o.ty) > .5 || Math.abs(o.w - o.tw) > .5)); }
+const PerfHUDtesting = () => !!(window.PerfHUD && PerfHUD.testing);
+function pxFrame(ts) {
+  if (!PX.on) return;
+  const now = performance.now(), dt = Math.min(.05, Math.max(0, (now - (PX.last || now)) / 1000)); PX.last = now; PX.t += dt;
+  const q = PXQ[PX.q], snap = !ANIM || pxRM();
+  pxStepTweens(now); pxStepParts(dt); pxAmbient(dt);
+  let moving = PX.tweens.length > 0 || PX.parts.length > 0;
+  if (PX.caus && PX.caus.visible && !snap) { PX.caus.tilePosition.x += dt * 9; PX.caus.tilePosition.y += dt * 5; moving = true; }
+  const kf = snap ? 1 : 1 - Math.exp(-dt * 13);
+  for (const [, o] of PX.objs) {
+    if (o.kind !== 'card') continue;
+    if (!o.detached && !o.busy && !(o.delay && now < o.delay)) { o.x += (o.tx - o.x) * kf; o.y += (o.ty - o.y) * kf; o.w += (o.tw - o.w) * kf; if (o.flip && (Math.abs(o.y - o.ty) < 6 || (o.flipUntil && now > o.flipUntil))) o.flip = 0; if (o.rot && !o.busy) o.rot *= (1 - kf); if (o.a < 1 && !o.detached) o.a += (1 - o.a) * kf; }
+    if (o.delay && now >= o.delay) o.delay = 0;
+    if (!o.detached && (Math.abs(o.x - o.tx) > .4 || Math.abs(o.y - o.ty) > .4 || Math.abs(o.w - o.tw) > .4 || o.a < .99)) moving = true;
+    const lift = o.sel && !o.detached ? 1 : 0; o.lift += (lift - o.lift) * (snap ? 1 : 1 - Math.exp(-dt * 16));
+    const w = o.w, h = w * 1.4, c = o.c;
+    c.x = o.x + w / 2; c.y = o.y + h / 2; c.rotation = o.rot || 0; c.alpha = o.a * (o.delay ? 0 : 1);
+    const tex = o.flip ? o.backT : o.face; if (tex && o.sp.texture !== tex) o.sp.texture = tex;
+    const sc = (o.s || 1) * (1 + o.lift * .05);
+    o.sp.width = w * sc; o.sp.height = h * sc; o.sp.alpha = tex ? 1 : 0;
+    o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
+    o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
+    const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
+    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0) + (o.gw && !o.detached && o.layer === 'hand' ? .5 : 0)) * pulse : 0;
+    o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
+    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || o.gw || (lan && q.fx)) moving = true;
+  }
+  PX.moving = moving;
+  if (moving || PX.dirty || PerfHUDtesting()) { PX.dirty = false; try { PX.app.renderer.render(PX.app.stage); PX.frames = (PX.frames || 0) + 1; } catch (e) { pxOff('render: ' + (e && e.message)); } }
+}
+// ---- PerfHUD: levels, pixel ratio cap, "something is moving" for the idle saver
+function pxPerfReg() {
+  try {
+    if (!window.PerfHUD || !PerfHUD.register) return;
+    const shim = PX.on ? { getPixelRatio: () => PX.res, setPixelRatio: v => pxSetRes(v), get domElement() { return PX.cv; }, getContext: () => PX.app && PX.app.renderer && PX.app.renderer.gl || null } : null;
+    PerfHUD.register({ game: 'Lantern Dive', anchor: '.gx-board', corner: 'tl', renderer: shim, levels: ['high', 'medium', 'low'],
+      getLevel: () => PX.q, isAuto: () => gfxPref() === 'auto',
+      setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') renderMenu(); } catch (e) { } },
+      basePR: () => { const d = window.devicePixelRatio || 1; return Math.min((PXQ[PX.q] || PXQ.high).pr, d); }, onPixelRatio: v => pxSetRes(v),
+      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length || !!PX.moving, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
+  } catch (e) { }
+}
+// share of painted (non-transparent) pixels in the canvas: the table is never blank
+function pxPainted() { try { const c = PX.app.renderer.extract.canvas({ target: PX.app.stage, resolution: .25 }); const x = c.getContext('2d'), d = x.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 20) n++; return +(n / (d.length / 4)).toFixed(3); } catch (e) { return -1; } }
+// test hook: where every sprite is and whether anything still moves (px-test.js)
+PX.state = () => ({ nPlay: PX.nPlay || 0, nSweep: PX.nSweep || 0, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err, blur: !!(PX.L.fx && PX.L.fx.filters && PX.L.fx.filters.length), canvasOK: pxPainted(),
+  objs: [...PX.objs.values()].filter(o => !o.detached).map(o => ({ key: o.key, id: o.id, layer: o.layer, x: o.x, y: o.y, w: o.w, tx: o.tx, ty: o.ty, tw: o.tw, face: !!o.face && o.sp.texture === o.face, alpha: o.c.alpha })) });
+// ===================== part 8: the Descent (zones, oxygen, bosses with curses), character dialogs =====================
+// The Descent and the boss curses are our own addition on top of the published rules (see ../rules-notes.md, "Descent mode").
+// ---------- characters (code-drawn portraits; placeholders until painted art replaces them) ----------
+const CHAR = {
+  mara: { name: 'Mara', role: 'your old dive instructor', col: '#e9b44c' },
+  eel: { name: 'Snapjaw the Eel', role: 'boss of the Sunlit Reef', col: '#6fbf73',
+    intro: 'Sssso… fresh divers in MY reef. I bite when you least expect it. Every second trick I twist the rules!',
+    hit: ['Ow! My tail!', 'Grrr… lucky trick.', 'Sssstop that!'], win: 'Hah! Back to the surface with you!', lose: 'Nooo… my reef… take it, then.' },
+  witch: { name: 'The Kelp Witch', role: 'boss of the Kelp Forest', col: '#b27fd6',
+    intro: 'Welcome to my garden, little lights. I put Lanterns to sleep and turn the tides upside down.',
+    hit: ['You cut my kelp!', 'Hmph. A clever trick.', 'My garden… withers!'], win: 'Tangled at last. Swim home, little lights.', lose: 'My spells… unravelled. Pass, then.' },
+  angler: { name: 'The Gloom Angler', role: 'boss of the Twilight Trench', col: '#5fa8d9',
+    intro: 'Follow my little light… In my trench every colour bites, Lanterns doze, and the low ones rise.',
+    hit: ['My lure! You dimmed it!', 'Ghhh… sharper than you look.', 'The dark remembers this!'], win: 'Into the dark you go. Forever.', lose: 'My light… goes out…' },
+  leviathan: { name: 'The Leviathan', role: 'the deep itself', col: '#e05a5a',
+    intro: 'I AM THE ABYSS. EVERY TRICK, MY CURSE. FINISH YOUR JOBS… IF YOU CAN.',
+    hit: ['THE DEEP… TREMBLES.', 'YOU… WOUND ME?', 'IMPOSSIBLE!'], win: 'THE ABYSS KEEPS WHAT IT TAKES.', lose: 'THE LANTERNS… REACH… THE BOTTOM. YOU HAVE WON.' }
+};
+function portraitSVG(id, size) {
+  const s = size || 96, w = (b) => '<svg viewBox="0 0 100 100" width="' + s + '" height="' + s + '" aria-hidden="true">' + b + '</svg>';
+  const bg = c => '<defs><radialGradient id="pg' + id + '" cx="50%" cy="40%" r="65%"><stop offset="0" stop-color="' + c + '" stop-opacity=".55"/><stop offset="1" stop-color="#04122a"/></radialGradient></defs><circle cx="50" cy="50" r="49" fill="url(#pg' + id + ')" stroke="' + c + '" stroke-width="3"/>';
+  if (id === 'mara') return w(bg('#e9b44c') +
+    '<circle cx="50" cy="52" r="34" fill="#c98f35" stroke="#8a5a1c" stroke-width="3"/><circle cx="50" cy="52" r="24" fill="#bfe6f5" stroke="#8a5a1c" stroke-width="3"/>' +
+    '<circle cx="50" cy="55" r="15" fill="#f1c7a0"/><path d="M36 50 Q50 34 64 50 Q60 42 50 41 Q40 42 36 50Z" fill="#e8e8e8"/><circle cx="45" cy="55" r="2.2" fill="#2b2b2b"/><circle cx="55" cy="55" r="2.2" fill="#2b2b2b"/>' +
+    '<path d="M44 62 Q50 66 56 62" stroke="#7a3b2b" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="21" cy="52" r="4" fill="#8a5a1c"/><circle cx="79" cy="52" r="4" fill="#8a5a1c"/><circle cx="50" cy="19" r="4" fill="#8a5a1c"/><path d="M58 47 l6 -4" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>');
+  if (id === 'eel') return w(bg('#6fbf73') +
+    '<path d="M18 78 Q30 40 55 30 Q80 22 86 44 Q88 60 70 64 L40 70 Q30 74 26 84Z" fill="#4f9a55" stroke="#2c5e31" stroke-width="3"/>' +
+    '<path d="M48 62 L86 50 L84 58 Z" fill="#7a1f1f"/><path d="M52 61 l3 -6 l3 5 l3 -6 l3 5 l3 -6 l3 5 l3 -6 l3 5" stroke="#fff" stroke-width="2" fill="none"/>' +
+    '<circle cx="66" cy="38" r="7" fill="#ffe36b"/><circle cx="67" cy="38" r="3" fill="#111"/><path d="M58 30 L74 33" stroke="#2c5e31" stroke-width="3" stroke-linecap="round"/><path d="M30 60 q6 -4 10 0 M34 70 q6 -4 10 0" stroke="#2c5e31" stroke-width="2" fill="none"/>');
+  if (id === 'witch') return w(bg('#b27fd6') +
+    '<path d="M22 90 Q20 50 35 30 Q50 12 65 30 Q80 50 78 90Z" fill="#3f7a46"/><path d="M28 88 Q26 60 34 44 M72 88 Q74 60 66 44 M40 90 Q38 70 42 56 M60 90 Q62 70 58 56" stroke="#2a5530" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+    '<ellipse cx="50" cy="50" rx="15" ry="18" fill="#b9a6d8"/><path d="M38 44 L46 47 M62 44 L54 47" stroke="#2b1b3d" stroke-width="2.5" stroke-linecap="round"/><circle cx="44" cy="51" r="2.8" fill="#e8ff7a"/><circle cx="56" cy="51" r="2.8" fill="#e8ff7a"/>' +
+    '<path d="M43 61 Q50 57 57 61" stroke="#2b1b3d" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 26 L50 6 L70 26 Z" fill="#5b2f7a" stroke="#2b1b3d" stroke-width="2"/><circle cx="50" cy="8" r="3" fill="#e8ff7a"/>');
+  if (id === 'angler') return w(bg('#5fa8d9') +
+    '<path d="M50 30 Q42 8 64 10" stroke="#9fc7e8" stroke-width="2.5" fill="none"/><circle cx="66" cy="11" r="6" fill="#fff6a8"/><circle cx="66" cy="11" r="11" fill="#fff6a8" opacity=".25"/>' +
+    '<path d="M12 56 Q20 26 52 26 Q84 26 90 56 Q84 82 52 84 Q22 84 12 56Z" fill="#26405e" stroke="#0d1c2e" stroke-width="3"/>' +
+    '<path d="M24 62 Q52 80 86 60 L84 66 Q52 92 26 68Z" fill="#0b0f18"/><path d="M28 64 l4 7 l4 -6 l4 8 l4 -7 l4 8 l4 -7 l4 8 l4 -7 l4 7 l4 -7 l4 6 l4 -6" stroke="#f2f2f2" stroke-width="2" fill="none"/>' +
+    '<circle cx="62" cy="44" r="8" fill="#d7f0ff"/><circle cx="64" cy="45" r="4" fill="#0b0f18"/><path d="M52 36 L72 38" stroke="#0d1c2e" stroke-width="3" stroke-linecap="round"/>');
+  return w(bg('#e05a5a') +
+    '<path d="M6 70 Q20 30 50 22 Q82 16 94 44 Q96 70 70 80 Q40 92 6 70Z" fill="#2b1d3f" stroke="#120a1f" stroke-width="3"/>' +
+    '<path d="M20 64 Q30 58 40 64 Q50 70 60 62 Q70 54 82 60" stroke="#4b3470" stroke-width="3" fill="none"/>' +
+    '<ellipse cx="62" cy="42" rx="14" ry="10" fill="#ffcf4a"/><ellipse cx="62" cy="42" rx="3.5" ry="9" fill="#120a1f"/><path d="M44 30 L80 34" stroke="#120a1f" stroke-width="4" stroke-linecap="round"/>' +
+    '<path d="M18 50 q4 -8 8 0 q4 -8 8 0" stroke="#4b3470" stroke-width="2" fill="none"/>');
+}
+const CURSE = {
+  low: { name: 'Undertow', text: 'The LOWEST card of the led colour wins the trick. Lanterns still beat colours (the highest Lantern wins as usual).', short: 'Lowest wins' },
+  sleep: { name: 'Lantern Sleep', text: 'Lanterns sleep this trick: a Lantern played on a colour wins nothing.', short: 'Lanterns sleep' },
+  any: { name: 'Riptide', text: 'Every colour counts: the highest number wins, whatever its colour. Lanterns still beat colours.', short: 'Any colour wins' }
+};
+// ---------- the Descent: 4 zones x (3 dives + a boss), 3 oxygen tanks per zone ----------
+const DESC = [   // difficulty tuned with desc-gauntlet.js (all-computer crew, first-try wins: about 70% / 55% / 35% / 25% per zone)
+  { id: 'reef', name: 'Sunlit Reef', depth: '10 m', dives: [{ d: 2 }, { d: 3 }, { d: 4 }], boss: { id: 'eel', d: 4, pool: ['low'], every: 2 } },
+  { id: 'kelp', name: 'Kelp Forest', depth: '40 m', dives: [{ d: 4 }, { d: 5, cmt: 'murky' }, { d: 5 }], boss: { id: 'witch', d: 6, pool: ['sleep', 'low'], every: 2 } },
+  { id: 'twi', name: 'Twilight Trench', depth: '200 m', dives: [{ d: 6 }, { d: 7 }, { d: 7, cmt: 'murky' }], boss: { id: 'angler', d: 7, pool: ['any', 'sleep', 'low'], every: 2 } },
+  { id: 'abyss', name: 'The Abyss', depth: '4000 m', dives: [{ d: 8 }, { d: 8, cmt: 'murky' }, { d: 9 }], boss: { id: 'leviathan', d: 8, pool: ['low', 'sleep', 'any'], every: 1 } }
+];
+const O2MAX = 3;
+const Desc = {
+  load() { let o = null; try { o = JSON.parse(lsGet('ld_desc') || 'null'); } catch (e) { } if (!o || o.v !== 1) o = { v: 1, z: 0, s: 0, o2: O2MAX, stars: {}, best: 0, met: {} }; return o; },
+  save(o) { try { lsSet('ld_desc', JSON.stringify(o)); } catch (e) { } }
+};
+function descStage(p) { p = p || Desc.load(); const Z = DESC[Math.min(p.z, DESC.length - 1)]; const boss = p.s >= Z.dives.length; const st = boss ? Z.boss : Z.dives[p.s]; return { Z, zi: Math.min(p.z, DESC.length - 1), si: p.s, boss, d: st.d, cmt: st.cmt || 'normal', bossDef: boss ? Z.boss : null, done: p.z >= DESC.length }; }
+function descentEl() {
+  const p = Desc.load(), cur = descStage(p);
+  const box = h('div.setup.scard.desc', h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'The Descent')));
+  box.append(h('div.dmara', h('span.dpt', { html: portraitSVG('mara', 56) }), h('p', p.z >= DESC.length ? 'You reached the bottom of the sea. Legendary! Start again any time.' : cur.boss ? 'Boss ahead: ' + CHAR[cur.bossDef.id].name + '. Every finished job hits it. Watch its curses!' : 'Each zone: 3 dives, then a boss. A failed dive costs one oxygen tank. Out of air = back to the top of the zone.')));
+  const o2 = h('div.o2', h('b', 'Oxygen'), ...Array.from({ length: O2MAX }, (_, i) => h('span.tank' + (i < p.o2 ? '.full' : ''), { 'aria-hidden': 'true' })), h('span.sr', p.o2 + ' of ' + O2MAX + ' tanks'));
+  box.append(o2);
+  const goSlot = h('div.dgo'); box.append(goSlot);
+  const map = h('div.dmap');
+  DESC.forEach((Z, zi) => {
+    const locked = zi > p.z, zc = h('div.dzone' + (zi === p.z ? '.cur' : '') + (locked ? '.lock' : '') + (zi < p.z ? '.won' : ''));
+    zc.append(h('div.dzh', h('b', (zi + 1) + '. ' + Z.name), h('span', Z.depth)));
+    const row = h('div.dsteps');
+    Z.dives.forEach((x, si) => { const done = zi < p.z || (zi === p.z && si < p.s), here = zi === p.z && si === p.s; row.append(h('span.dstep' + (done ? '.ok' : '') + (here ? '.here' : ''), { title: 'Difficulty ' + x.d }, done ? (p.stars[zi + ':' + si] ? '★' : '✓') : String(si + 1))); });
+    const bdone = zi < p.z, bhere = zi === p.z && p.s >= Z.dives.length;
+    row.append(h('span.dstep.boss' + (bdone ? '.ok' : '') + (bhere ? '.here' : ''), { html: portraitSVG(Z.boss.id, 34) + (bdone ? '<b class="bx">\u2714</b>' : ''), title: CHAR[Z.boss.id].name + (bdone ? ' (defeated)' : '') }));
+    zc.append(row); map.append(zc);
+  });
+  box.append(map);
+  const lab = p.z >= DESC.length ? 'Start a new descent' : cur.boss ? 'Fight ' + CHAR[cur.bossDef.id].name : 'Dive ' + (cur.si + 1) + ' of ' + cur.Z.name;
+  goSlot.append(h('div.sgo', h('button.sbtn.big', { 'data-a': p.z >= DESC.length ? 'descreset' : 'descgo', type: 'button' }, h('b', lab), ' ', h('span', p.z >= DESC.length ? 'from the Sunlit Reef' : 'You + Nerea, Bram and Sumi · difficulty ' + cur.d + (cur.cmt === 'murky' ? ' · murky water' : ''))),
+    h('div.tlink2', { html: tutBtn('tlink') })));
+  return box;
+}
+function descGo() {
+  const p = Desc.load(); if (p.z >= DESC.length) { descReset(); return; }
+  const st = descStage(p);
+  newGame('descent', { np: 4, kind: 'free', d: st.d, cmt: st.cmt, boss: st.bossDef ? { id: st.bossDef.id, pool: st.bossDef.pool, every: st.bossDef.every } : null });
+  if (G) {
+    p.tries = p.tries || {}; const key = st.zi + ':' + st.si; p.tries[key] = (p.tries[key] || 0) + 1; Desc.save(p);
+    G.desc = { zi: st.zi, si: st.si, tryN: p.tries[key] }; G.share = 1; G.mission.name = st.Z.name + (st.bossDef ? ' boss' : ' dive ' + (st.si + 1));
+    if (G.log && G.log.length) G.log.forEach(e => { if (e && typeof e.t === 'string') e.t = e.t.replace('Free dive', G.mission.name); });
+    render(); autosave();
+  }
+}
+function descReset() { Desc.save({ v: 1, z: 0, s: 0, o2: O2MAX, stars: {}, best: Desc.load().best || 0, met: Desc.load().met || {} }); UI.sv = 'descent'; renderStart(); }
+function isBoss() { return !!(G && G.boss); }
+function bossChar() { return G && G.boss ? CHAR[G.boss.id] : null; }
+// called by showResult for Descent dives: updates oxygen / progress once and adds the story and the buttons
+function descResult(box, ok) {
+  const p = Desc.load(), B = bossChar(); let st = descStage(p);
+  if (G.desc) { const Z = DESC[G.desc.zi]; st = { Z, zi: G.desc.zi, si: G.desc.si, boss: G.desc.si >= Z.dives.length }; }
+  if (!G.descDone) {
+    G.descDone = 1;
+    p.fail = p.fail || {}; const key = st.zi + ':' + st.si;
+    if (ok) { if (!p.fail[key]) p.stars[key] = 1; if (st.boss) { p.z++; p.s = 0; p.o2 = O2MAX; p.best = Math.max(p.best || 0, p.z); } else p.s++; }
+    else { p.fail[key] = 1; p.o2--; if (p.o2 <= 0) { p.s = 0; p.o2 = O2MAX; G.descOut = 1; } }
+    Desc.save(p);
+  }
+  if (B && ok) box.prepend(h('div.bdef', h('span.dpt', { html: portraitSVG(G.boss.id, 64) }), h('div', h('b', B.name + ' defeated!'), h('span', 'Every job hit home. ' + (DESC[p.z] ? DESC[p.z].name + ' is open, tanks refilled.' : 'The sea is yours.')))));
+  const say = (who, txt) => box.append(h('div.say', h('span.dpt', { html: portraitSVG(who, 52) }), h('p', h('b', CHAR[who].name + ': '), txt)));
+  if (B) say(G.boss.id, ok ? B.lose : B.win);
+  if (ok) say('mara', st.boss ? 'You beat ' + B.name + '! Fresh tanks — on to ' + (DESC[p.z] ? DESC[p.z].name : 'the surface, legends') + '.' : 'Well dived! ' + (p.stars[st.zi + ':' + st.si] ? 'First try — that is a star. ' : '') + 'Next: ' + (descStage(p).boss ? 'the boss of this zone.' : 'dive ' + (descStage(p).si + 1) + '.'));
+  else if (G.descOut) say('mara', 'Out of air! Back up to the start of ' + st.Z.name + ' with full tanks. You know the waters now.');
+  else say('mara', 'That cost one oxygen tank (' + p.o2 + ' left). Read the red cross: that job broke. Try the dive again.');
+  const bt = h('div.cbtns');
+  bt.append(h('button.btn.go', { 'data-a': 'descgo', type: 'button' }, ok ? (p.z >= DESC.length ? 'See the map' : 'Next dive') : 'Dive again'));
+  bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
+  bt.append(h('button.btn.alt', { 'data-a': 'descmap', type: 'button' }, 'Map'));
+  box.append(bt);
+}
+// ---------- dialogs: a character pops up, play waits until the player answers ----------
+function showDlg(d) { UI.dlg = d; drawDlg(); }
+function drawDlg() {
+  const el = $('#dlg'); if (!el) return; const d = UI.dlg;
+  if (!d) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false; el.innerHTML = '';
+  const who = CHAR[d.who] || CHAR.mara;
+  el.append(h('div.dbox' + (d.curse ? '.curse' : '') + (d.who !== 'mara' ? '.bossd' : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': d.title || who.name },
+    h('div.dtop2', h('span.dpt', { html: portraitSVG(d.who || 'mara', 76) }), h('div', h('b', who.name), h('small', who.role))),
+    d.title ? h('h3', d.title) : null, h('p', d.body),
+    h('div.cbtns', h('button.btn.go', { 'data-a': 'dlgok', type: 'button' }, d.btn || 'OK'))));
+}
+function dlgOk() { const d = UI.dlg; UI.dlg = null; drawDlg(); if (d && d.then) try { d.then(); } catch (e) { console.error(e); } render(); schedule(); }
+// one check per schedule(): opens the next dialog that is due. Returns true while a dialog is open (play waits).
+function storyCheck() {
+  if (UI.dlg) return true;
+  if (!G || !UI.started || UI.busy || UI.cards.length || G.phase === 'over' || isClient()) return false;
+  UI.said = UI.said || {};
+  const once = (k, d) => { if (UI.said[k]) return false; UI.said[k] = 1; showDlg(d); return true; };
+  if (UI.mode === 'descent') {
+    const st = descStage(), p = Desc.load(), B = bossChar();
+    if (G.tricks.length === 0 && G.phase === 'assign') {
+      if (!p.met.intro && once('intro', { who: 'mara', title: 'The Descent', body: 'Four zones, deeper and harder. Each zone: three dives, then a boss. A failed dive costs one oxygen tank (you have ' + O2MAX + '). Do every job to clear a dive. Ready?', btn: 'Let\'s dive', then: () => { const q = Desc.load(); q.met.intro = 1; Desc.save(q); } })) return true;
+      if (B && once('boss' + G.att, { who: G.boss.id, title: G.att === 1 ? B.name + ' appears!' : B.name + ' is waiting', body: B.intro + ' Curses: ' + G.boss.pool.map(c => CURSE[c].name + ' (' + CURSE[c].short.toLowerCase() + ')').join(', ') + '. Each job you finish hits me.', btn: 'Bring it on' })) return true;
+      if (!B && st.si === 0 && G.att === 1 && once('zone', { who: 'mara', title: st.Z.name + ' · ' + st.Z.depth, body: st.zi === 0 ? 'Shallow and bright. Pick jobs your cards can do, and help the others with theirs.' : st.zi === 1 ? 'Murky water ahead: in some dives a shown card does not tell if it is the highest or lowest.' : st.zi === 2 ? 'The trench is dark and the jobs are many. Use your signal early.' : 'The Abyss. The Leviathan curses EVERY trick. Good luck, diver.', btn: 'Dive' })) return true;
+    }
+    if (B && G.phase === 'play' && G.trick && G.trick.plays.length === 0 && G.trick.cu) {
+      const C = CURSE[G.trick.cu], n = G.tricks.length, nx = G.boss.sched.findIndex((c, i) => i > n && c);
+      const tail = ' This trick only' + (nx >= 0 ? '; the next curse comes on trick ' + (nx + 1) + '.' : '.');
+      // the full pop-up only the first time a curse appears in a fight; later it is a line in the dock and the red tag on the boss bar
+      if (!UI.said['cut' + G.att + G.trick.cu]) { UI.said['cut' + G.att + G.trick.cu] = 1; UI.said['cu' + G.att + ':' + n] = 1; showDlg({ who: G.boss.id, curse: 1, title: B.name + ' casts ' + C.name + '!', body: C.text + tail, btn: 'Brace!' }); return true; }
+      if (!UI.said['cu' + G.att + ':' + n]) { UI.said['cu' + G.att + ':' + n] = 1; UI.hitAt = Date.now(); UI.news = (UI.news || []).concat(['\u2620 Trick ' + (n + 1) + ': ' + B.name + ' casts ' + C.name + ' \u2014 ' + C.short.toLowerCase() + '.']).slice(-3); render(); }
+    }
+  }
+  return false;
+}
+// ---------- the boss bar on the table ----------
+function bossBar() {
+  const fe = $('#table'); if (!fe) return; let bb = $('#bossbar');
+  if (!isBoss() || G.phase === 'assign') { if (bb) bb.remove(); fe.classList.remove('bosson'); return; }
+  if (!bb) { bb = h('div#bossbar'); fe.prepend(bb); }
+  fe.classList.add('bosson');
+  const B = bossChar(), n = G.tasks.length, done = G.tasks.filter((t, i) => jobSt(i) > 0).length, cu = G.phase === 'play' && G.trick ? G.trick.cu : '';
+  bb.className = (UI.hitAt && Date.now() - UI.hitAt < 700 ? 'hit' : '');
+  bb.innerHTML = '';
+  const nx = G.boss.sched.findIndex((c, i) => i > G.tricks.length && c);
+  bb.append(h('span.bpt', { html: portraitSVG(G.boss.id, 34) }), h('div.bmid', h('b', B.name), h('div.hp', { 'aria-label': 'Boss health ' + (n - done) + ' of ' + n }, ...Array.from({ length: n }, (_, i) => h('i' + (i < n - done ? '.on' : ''))))),
+    cu ? h('span.bcu', { title: CURSE[cu].text }, '☠ ' + CURSE[cu].short) : h('span.bcu.calm', nx >= 0 ? 'Curse on trick ' + (nx + 1) : 'No curse'));
+}
+// ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
+// A chapter is a real logbook dive with its own crew and (at most) one twist. The twists exist only here; the normal rules never change.
+UI.camp = null;
+function campTw(def) { return (def && def.twist && def.twist.id) || ''; }
+function campOk(g) { return !!(g && g.phase === 'over' && g.result && g.result.ok); }
+function campMetrics(g) {
+  const mine = g.tasks.filter(t => t.owner === 0).length, pings = g.pings.filter(p => p.seat === 0).length;
+  return { won: campOk(g), attempts: g.att, flare: g.distress ? 1 : 0, pings, myJobs: mine };
+}
+function campIsWon(g, def) {
+  if (!campOk(g)) return false; const t = def.twist;
+  if (t && t.id === 'no-flare' && g.distress) return false;
+  if (t && t.id === 'air-limit' && g.att > (t.param || 4)) return false;
+  return true;
+}
+// twist limit already broken: no point retrying this dive
+function campDead(g, def) {
+  const t = def && def.twist; if (!t) return false;
+  if (t.id === 'no-flare') return !!g.distress; if (t.id === 'air-limit') return g.att >= (t.param || 4); return false;
+}
+function campStart(def) {
+  const s = def.setup || {}, t = def.twist || null, mates = (t && t.id === 'rookie-mates' ? t.param : s.mates) || 'normal';
+  let np = s.np || 4; if (t && t.id === 'big-team') np = t.param || 5;
+  const o = { camp: def, np, kind: 'log', mission: s.mission || 1, seats: [0, 1, 2, 3], lv: [mates, mates, mates, mates], level: 'normal', timer: !!((t && t.id === 'clock-on') || s.timer) };
+  UI.seed = s.seed != null ? s.seed : null;
+  newGame('vs', o);
+  UI.camp = def;
+  UI.coach.level = def.hints ? 'full' : 'off'; render();
+  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+}
+function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
+// Story starts with the staged tutorial (Chapter 0) until it has been finished once; then it goes straight to the chapter map
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); if (typeof GXT !== 'undefined' && typeof tutStart === 'function' && !GXT.isDone('lantern-dive')) tutStart({ prologue: true }); else GXC.open(); }
+function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
+// result footer inside a story chapter (called from showResult)
+function campResult(box, ok) {
+  const def = UI.camp, won = campIsWon(G, def), dead = campDead(G, def), bt = h('div.cbtns');
+  if (def.twist && def.twist.text) box.append(h('p.sm', def.twist.text));
+  if (ok && !won) box.append(h('p', 'The boss rule was broken, so the chapter is not won.'));
+  if (!won && !dead) bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Try again (same jobs)'));
+  bt.append(h('button.btn' + (won || dead ? '.go' : '.alt'), { 'data-a': 'campfin', type: 'button' }, won ? 'Continue the story' : 'Leave the dive'));
+  bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
+  box.append(bt);
+}
+{ const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
+function campLine() {
+  try {
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
+    const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
+    return n ? n + ' of ' + ch.length + ' chapters done' : 'Ten chapters, three bosses';
+  } catch (e) { return ''; }
+}
+function campInit() {
+  if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'lantern-dive', headButtons: () => { const b = document.createElement('button'); b.type = 'button'; b.className = 'gxc-ib'; b.textContent = 'Tutorial'; b.setAttribute('aria-label', 'Replay the tutorial'); b.addEventListener('click', () => { GXC.close(); tutStart(); }); return [b]; }, data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    onExit: () => { UI.camp = null; showStart(); },
+    scores: g => g.players.map(() => 0), seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
+  });
+}
+campInit();
+// ===================== part 99: painted extras (portrait title, unlocked table and card backs, end art) and music (per screen + the Music picker) =====================
+const MEDIA = 'media/';
+const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
+const IMG_OK = {};
+const preImg = (f, cb) => { if (IMG_OK[f] !== undefined) { if (cb && IMG_OK[f] === 1) cb(); return; } IMG_OK[f] = 0; const i = new Image(); i.onload = () => { IMG_OK[f] = 1; if (cb) cb(); }; i.src = MEDIA + f + '.webp'; };
+const lowGfx = () => { try { return gfxPref() === 'low'; } catch (e) { return false; } };
+// Low graphics keeps the flat dark-blue table (the painting is switched off); every other setting shows it under the Pixi table
+function lowTblApply() { document.documentElement.classList.toggle('lowtbl', lowGfx()); }
+// ---- title: the portrait painting on phones held upright (the embedded landscape one stays underneath until it has loaded)
+function titleApply() {
+  const bg = document.querySelector('.ttl .ttl-bg'); if (!bg || bg.tagName !== 'IMG') return;
+  const port = window.matchMedia && matchMedia('(max-aspect-ratio: 1/1)').matches; if (!port) return;
+  preImg('title-phone', () => { if (bg.isConnected) bg.src = MEDIA + 'title-phone.webp'; });
+}
+// ---- table: the campaign unlock (tunnel-glow) replaces the default painting; the embedded default and the dark blue stay underneath
+let tblCur = '';
+function tableApply() {
+  const R = document.documentElement, id = unl('table'), f = id === 'tunnel-glow' && !lowGfx() ? 'table-' + id : '', key = f || 'default'; if (key === tblCur) return;
+  if (!f) { if (tblCur) R.style.removeProperty('--tableimg'); tblCur = key; return; }
+  preImg(f, () => { tblCur = key; R.style.setProperty('--tableimg', 'url("' + MEDIA + f + '.webp")'); });
+}
+// ---- card back: the campaign unlocks (wreck-brass, last-light) replace the painted back (loaded as a blob so the Pixi table can use it too)
+let backCur = '', back0 = null, backBusy = '';
+function backApply() {
+  const id = unl('cardback'), f = /^(wreck-brass|last-light)$/.test(id || '') && !lowGfx() ? 'back-' + id : '', key = f || 'default'; if (key === backCur || backBusy === key) return;
+  if (back0 === null) back0 = KIT.ART.back || '';
+  const set = u => { backCur = key; backBusy = ''; const m = Object.assign({}, KIT.ART); if (u) m.back = u; else if (back0) m.back = back0; else delete m.back; KIT.setArt(m);
+    try { if (PX && PX.on && typeof PIXI !== 'undefined' && u) { const i = new Image(); i.onload = () => { PX.img.back = i; PX.tex.back = PIXI.Texture.from(i); PX.dirty = true; }; i.src = u; } } catch (e) { }
+    try { if (G && UI.started) render(); } catch (e) { } };
+  if (!f) { set(null); return; }
+  backBusy = key; if (!window.fetch) { backBusy = ''; return; }
+  fetch(MEDIA + f + '.webp').then(r => r.ok ? r.blob() : Promise.reject()).then(b => set(URL.createObjectURL(b))).catch(() => { backBusy = ''; });
+}
+// ---- end art: a painted banner on top of the result card (dive result and story result)
+function endBanner(box, won) {
+  if (!box || box.querySelector('.endart')) return; const f = won ? 'end-win' : 'end-lose'; if (!IMG_OK[f]) return;
+  const d = h('div.endart.' + (won ? 'win' : 'lose'), { 'aria-hidden': 'true' }); d.style.backgroundImage = 'url(' + MEDIA + f + '.webp)'; box.insertBefore(d, box.firstChild);
+}
+(function () { const sr = showResult; showResult = function () { const r = sr.apply(this, arguments); try { if (G && G.result) endBanner(document.querySelector('#rs .rsbox'), !!G.result.ok); } catch (e) { } return r; }; })();
+new MutationObserver(() => { const r = document.querySelector('.gxc-res-on .gxc-res'); if (r && !r.querySelector('.endart')) endBanner(r, /\bwon\b/.test(r.closest('.gxc-res-on').className)); }).observe(document.body, { childList: true, subtree: true });
+// ---- music: five slots (Menu, Dive, Boss, Victory, Defeat), two tracks each, saved choice a / b / shuffle / all / off
+const MSLOTS = [['tavern', 'Menu'], ['main', 'Dive'], ['fight', 'Boss'], ['victory', 'Victory'], ['defeat', 'Defeat']];
+const MTITLE = { 'tavern-a': 'Menu tune A', 'tavern-b': 'Menu tune B', 'main-a': 'Dive tune A', 'main-b': 'Dive tune B', 'fight-a': 'Boss tune A', 'fight-b': 'Boss tune B', 'victory-a': 'Victory A', 'victory-b': 'Victory B', 'defeat-a': 'Defeat A', 'defeat-b': 'Defeat B' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
+const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
+const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;
+try { Object.assign(MUS.pick, JSON.parse(localStorage.getItem('ld_mpick') || '{}')); } catch (e) { }
+function musicSlot() {
+  const st = $('#start');
+  if (!G || !UI.started || (st && !st.hidden)) return ['tavern', 0];
+  if (G.phase === 'over' && UI.overShown && UI.mode !== 'tutorial' && G.result) return [G.result.ok ? 'victory' : 'defeat', 1];
+  if (UI.mode !== 'tutorial' && ((UI.camp && UI.camp.boss) || G.boss)) return ['fight', 0];
+  return ['main', 0];
+}
+function musicName(slot) {
+  const c = MUS.pick[slot] || MDEF[slot]; if (c === 'off') return '-';
+  if (c === 'all') { if (!MUS.res[slot]) { const pool = MALL.filter(k => k !== MUS.last); MUS.res[slot] = pool[Math.floor(Math.random() * pool.length)]; } return MUS.res[slot]; }
+  if (c === 'shuffle') { if (!MUS.res[slot]) { MUS.sh[slot] = MUS.sh[slot] === undefined ? (Math.random() < .5 ? 0 : 1) : 1 - MUS.sh[slot]; MUS.res[slot] = slot + '-' + 'ab'[MUS.sh[slot]]; } return MUS.res[slot]; }
+  return slot + '-' + (c === 'b' ? 'b' : 'a');
+}
+function musicPick(slot, c) {
+  MUS.pick[slot] = c; MUS.res[slot] = null; try { localStorage.setItem('ld_mpick', JSON.stringify(MUS.pick)); } catch (e) { }
+  if (window.GA && c !== 'off' && c !== 'shuffle' && c !== 'all') try { GA.preload(musicName(slot)); } catch (e) { }
+  if (MUS.wslot === slot && !MUS.prev) { MUS.want = null; musicSync(); }
+}
+function musicSync() {
+  if (!window.GA || MUS.prev) return;
+  if (UI.prefs.music === false) { MUS.want = null; GA.music(null, { fade: .6 }); return; }
+  const w = musicSlot(); if (MUS.wslot !== w[0]) { MUS.wslot = w[0]; MUS.res[w[0]] = null; }
+  else if (MUS.pick[w[0]] === 'all' && !w[1] && MUS.since && Date.now() - MUS.since > MALL_MS) MUS.res[w[0]] = null;
+  const n = musicName(w[0]); if (MUS.want === n) return; MUS.want = n; MUS.since = Date.now(); if (n !== '-') MUS.last = n;
+  if (n === '-') { GA.music(null, { fade: 1 }); return; }
+  GA.music(n, { fade: w[1] ? .6 : 1, once: !!w[1] });
+  if (w[0] === 'tavern' || w[0] === 'main') setTimeout(() => { try { const nx = w[0] === 'tavern' ? 'main' : 'fight', c = MUS.pick[nx]; if (c !== 'off' && c !== 'shuffle' && c !== 'all') GA.preload(musicName(nx)); } catch (e) { } }, 4000);
+}
+function musicPreview(slot) {
+  if (!window.GA || UI.prefs.music === false || MUS.wslot === slot) return; try { GA.unlock(); } catch (e) { }
+  const n = musicName(slot); if (n === '-') return;
+  clearTimeout(MUS.prevT); MUS.prev = slot; MUS.want = null; GA.music(n, { fade: .5, once: true });
+  MUS.prevT = setTimeout(() => { MUS.prev = null; MUS.want = null; musicSync(); renderMusic(); }, 8000);
+}
+function musicPreviewStop() { if (!MUS.prev) return; clearTimeout(MUS.prevT); MUS.prev = null; MUS.want = null; musicSync(); }
+function renderMusic() {
+  const b = $('#musicbody'); if (!b) return; const on = UI.prefs.music !== false; let vol = .5; try { vol = GA.state().musVol; } catch (e) { }
+  const chip = (cls, at, t) => h('button.mchip' + cls, Object.assign({ type: 'button' }, at), t);
+  const top = h('div.mtop', chip(on ? '.on' : '', { 'data-a': 'mmus' }, 'Music: ' + (on ? 'on' : 'off')), h('label.mvol', 'Volume ', h('input#mvol', { type: 'range', min: '0', max: '1', step: '0.05', value: String(vol), 'aria-label': 'Music volume' })));
+  const sig = JSON.stringify([on, MUS.pick, MUS.prev, MUS.wslot]); if (b._sig === sig) return; b._sig = sig;
+  b.innerHTML = ''; b.appendChild(top);
+  const allOn = MLOOPS.every(k => MUS.pick[k] === 'all');
+  b.appendChild(h('div.mtop', chip(allOn ? '.on' : '', { 'data-a': 'mall' }, '⇄ Shuffle all songs')));
+  MSLOTS.forEach(([k, nm]) => {
+    const cur = MUS.pick[k], act = MUS.wslot === k && on && cur !== 'off', row = h('div.mchips');
+    ['a', 'b'].forEach(v => row.appendChild(chip(cur === v ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': v }, MTITLE[k + '-' + v])));
+    row.appendChild(chip(cur === 'shuffle' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'shuffle' }, '⇄ Shuffle'));
+    if (MLOOPS.includes(k)) row.appendChild(chip(cur === 'all' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'all' }, '⇄ All songs'));
+    row.appendChild(chip(cur === 'off' ? '.on' : '', { 'data-a': 'mpick', 'data-s': k, 'data-c': 'off' }, 'Off'));
+    if (MUS.prev === k) row.appendChild(chip('.prev', { 'data-a': 'mprevx', 'data-s': k }, '■ Stop preview'));
+    else if (!act && cur !== 'off' && on) row.appendChild(chip('.prev', { 'data-a': 'mprev', 'data-s': k }, '▶ Preview'));
+    b.appendChild(h('div.mrow2', h('h5', nm, act ? h('small', ' playing now') : null), row));
+  });
+}
+document.addEventListener('input', e => { if (e.target && e.target.id === 'mvol' && window.GA) GA.setVolume('music', +e.target.value); });
+function extrasBoot() {
+  GX.drawer('musicd', 'Music', h('div#musicbody'));
+  const os = GX.onShow; GX.onShow = id => { os(id); if (id === 'musicd') { const mb = $('#musicbody'); if (mb) mb._sig = null; renderMusic(); } };
+  ['end-win', 'end-lose', 'back-wreck-brass', 'back-last-light', 'table-tunnel-glow'].forEach(f => preImg(f));
+  titleApply(); tableApply(); backApply();
+  lowTblApply();
+  setInterval(() => { try { lowTblApply(); musicSync(); tableApply(); backApply(); if (!document.querySelector('.ttl .ttl-bg[data-p]')) titleApply(); } catch (e) { } }, 800);
+  document.addEventListener('pointerdown', () => setTimeout(() => { try { musicSync(); } catch (e) { } }, 60), { capture: true });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', extrasBoot); else setTimeout(extrasBoot, 0);

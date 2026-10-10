@@ -1,0 +1,397 @@
+{
+ "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
+ "items": {
+  "beast-alligator": "beast-alligator",
+  "beast-bear": "beast-bear",
+  "beast-birds": "beast-birds",
+  "beast-boa": "beast-boa",
+  "beast-chamois": "beast-chamois",
+  "beast-cheetah": "beast-cheetah",
+  "beast-fox": "beast-fox",
+  "beast-goats": "beast-goats",
+  "beast-gorilla": "beast-gorilla",
+  "beast-iguana": "beast-iguana",
+  "beast-jaguar": "beast-jaguar",
+  "beast-puma": "beast-puma",
+  "beast-tapir": "beast-tapir",
+  "beast-tiger": "beast-tiger",
+  "beast-wild-dog": "beast-wild-dog",
+  "beast-wild-pig": "beast-wild-pig",
+  "char-carpenter": "char-carpenter",
+  "char-cook": "char-cook",
+  "char-explorer": "char-explorer",
+  "char-friday": "char-friday",
+  "disc-candles": "disc-candles",
+  "disc-fallentree": "disc-fallentree",
+  "disc-goat": "disc-goat",
+  "disc-healherbs": "disc-healherbs",
+  "disc-herbs": "disc-herbs",
+  "disc-larvae": "disc-larvae",
+  "disc-leaves": "disc-leaves",
+  "disc-machete": "disc-machete",
+  "disc-poison": "disc-poison",
+  "disc-sc1": "disc-sc1",
+  "disc-sc2": "disc-sc2",
+  "disc-sc3": "disc-sc3",
+  "disc-sc4": "disc-sc4",
+  "disc-thorns": "disc-thorns",
+  "disc-tobacco": "disc-tobacco",
+  "disc-treasure": "disc-treasure",
+  "disc-veggies": "disc-veggies",
+  "inv-basket": "inv-basket",
+  "inv-bed": "inv-bed",
+  "inv-belts": "inv-belts",
+  "inv-bow": "inv-bow",
+  "inv-bricks": "inv-bricks",
+  "inv-cellar": "inv-cellar",
+  "inv-corral": "inv-corral",
+  "inv-dam": "inv-dam",
+  "inv-diary": "inv-diary",
+  "inv-drums": "inv-drums",
+  "inv-fire": "inv-fire",
+  "inv-fireplace": "inv-fireplace",
+  "inv-furnace": "inv-furnace",
+  "inv-knife": "inv-knife",
+  "inv-lantern": "inv-lantern",
+  "inv-map": "inv-map",
+  "inv-medicine": "inv-medicine",
+  "inv-moat": "inv-moat",
+  "inv-pit": "inv-pit",
+  "inv-pot": "inv-pot",
+  "inv-raft": "inv-raft",
+  "inv-rope": "inv-rope",
+  "inv-sack": "inv-sack",
+  "inv-shield": "inv-shield",
+  "inv-shortcut": "inv-shortcut",
+  "inv-shovel": "inv-shovel",
+  "inv-sling": "inv-sling",
+  "inv-snare": "inv-snare",
+  "inv-spear": "inv-spear",
+  "inv-wall": "inv-wall",
+  "item-bible": "item-bible",
+  "item-biscuits": "item-biscuits",
+  "item-bottle": "item-bottle",
+  "item-hammer": "item-hammer",
+  "item-pipe": "item-pipe",
+  "item-pistol": "item-pistol",
+  "item-rum": "item-rum",
+  "item-stormglass": "item-stormglass",
+  "wreck-crates": "wreck-crates",
+  "wreck-dinghy": "wreck-dinghy",
+  "wreck-seachest": "wreck-seachest"
+ },
+ "size": {
+  "beast-alligator": [
+   256,
+   256
+  ],
+  "beast-bear": [
+   256,
+   256
+  ],
+  "beast-birds": [
+   256,
+   256
+  ],
+  "beast-boa": [
+   256,
+   256
+  ],
+  "beast-chamois": [
+   256,
+   256
+  ],
+  "beast-cheetah": [
+   256,
+   256
+  ],
+  "beast-fox": [
+   256,
+   256
+  ],
+  "beast-goats": [
+   256,
+   256
+  ],
+  "beast-gorilla": [
+   256,
+   256
+  ],
+  "beast-iguana": [
+   256,
+   256
+  ],
+  "beast-jaguar": [
+   256,
+   256
+  ],
+  "beast-puma": [
+   256,
+   256
+  ],
+  "beast-tapir": [
+   256,
+   256
+  ],
+  "beast-tiger": [
+   256,
+   256
+  ],
+  "beast-wild-dog": [
+   256,
+   256
+  ],
+  "beast-wild-pig": [
+   256,
+   256
+  ],
+  "char-carpenter": [
+   256,
+   256
+  ],
+  "char-cook": [
+   256,
+   256
+  ],
+  "char-explorer": [
+   256,
+   256
+  ],
+  "char-friday": [
+   256,
+   256
+  ],
+  "disc-candles": [
+   256,
+   256
+  ],
+  "disc-fallentree": [
+   256,
+   256
+  ],
+  "disc-goat": [
+   256,
+   256
+  ],
+  "disc-healherbs": [
+   256,
+   256
+  ],
+  "disc-herbs": [
+   256,
+   256
+  ],
+  "disc-larvae": [
+   256,
+   256
+  ],
+  "disc-leaves": [
+   256,
+   256
+  ],
+  "disc-machete": [
+   256,
+   256
+  ],
+  "disc-poison": [
+   256,
+   256
+  ],
+  "disc-sc1": [
+   256,
+   256
+  ],
+  "disc-sc2": [
+   256,
+   256
+  ],
+  "disc-sc3": [
+   256,
+   256
+  ],
+  "disc-sc4": [
+   256,
+   256
+  ],
+  "disc-thorns": [
+   256,
+   256
+  ],
+  "disc-tobacco": [
+   256,
+   256
+  ],
+  "disc-treasure": [
+   256,
+   256
+  ],
+  "disc-veggies": [
+   256,
+   256
+  ],
+  "inv-basket": [
+   256,
+   256
+  ],
+  "inv-bed": [
+   256,
+   256
+  ],
+  "inv-belts": [
+   256,
+   256
+  ],
+  "inv-bow": [
+   256,
+   256
+  ],
+  "inv-bricks": [
+   256,
+   256
+  ],
+  "inv-cellar": [
+   256,
+   256
+  ],
+  "inv-corral": [
+   256,
+   256
+  ],
+  "inv-dam": [
+   256,
+   256
+  ],
+  "inv-diary": [
+   256,
+   256
+  ],
+  "inv-drums": [
+   256,
+   256
+  ],
+  "inv-fire": [
+   256,
+   256
+  ],
+  "inv-fireplace": [
+   256,
+   256
+  ],
+  "inv-furnace": [
+   256,
+   256
+  ],
+  "inv-knife": [
+   256,
+   256
+  ],
+  "inv-lantern": [
+   256,
+   256
+  ],
+  "inv-map": [
+   256,
+   256
+  ],
+  "inv-medicine": [
+   256,
+   256
+  ],
+  "inv-moat": [
+   256,
+   256
+  ],
+  "inv-pit": [
+   256,
+   256
+  ],
+  "inv-pot": [
+   256,
+   256
+  ],
+  "inv-raft": [
+   256,
+   256
+  ],
+  "inv-rope": [
+   256,
+   256
+  ],
+  "inv-sack": [
+   256,
+   256
+  ],
+  "inv-shield": [
+   256,
+   256
+  ],
+  "inv-shortcut": [
+   256,
+   256
+  ],
+  "inv-shovel": [
+   256,
+   256
+  ],
+  "inv-sling": [
+   256,
+   256
+  ],
+  "inv-snare": [
+   256,
+   256
+  ],
+  "inv-spear": [
+   256,
+   256
+  ],
+  "inv-wall": [
+   256,
+   256
+  ],
+  "item-bible": [
+   256,
+   256
+  ],
+  "item-biscuits": [
+   256,
+   256
+  ],
+  "item-bottle": [
+   256,
+   256
+  ],
+  "item-hammer": [
+   256,
+   256
+  ],
+  "item-pipe": [
+   256,
+   256
+  ],
+  "item-pistol": [
+   256,
+   256
+  ],
+  "item-rum": [
+   256,
+   256
+  ],
+  "item-stormglass": [
+   256,
+   256
+  ],
+  "wreck-crates": [
+   256,
+   256
+  ],
+  "wreck-dinghy": [
+   256,
+   256
+  ],
+  "wreck-seachest": [
+   256,
+   256
+  ]
+ }
+}

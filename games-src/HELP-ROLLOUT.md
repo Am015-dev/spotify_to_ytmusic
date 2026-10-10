@@ -1,0 +1,44 @@
+# Help kit rollout (6 Oct 2026)
+
+Pilot: Thornbound (live). Round 1 started 6 Oct 23:13 UTC as cloud sessions: doorkick-dungeon, hollowbough, final-approach, shipwreck-isle.
+Round 1 DONE. Round 2 DONE (checked 7 Oct 13:40). Round 3 STARTED 7 Oct 13:42 UTC as cloud sessions. Round 2 was: sands-of-qamar, rampart-and-vine, kaiten-kitchen, crown-city-smash. Round 3: nebula-aces, short-fuse, lantern-dive, tidewake. Round 4: sunglaze, cauldron-fair.
+One Sonnet cloud session per game, max 4 at a time. Prompt template (replace __NAME__/__SLUG__):
+
+```
+Owner authorisation: commit, merge and push to `alex/brave-carson-rbpmlk` and deploy this game live once its checks pass. Work on branch alex/brave-carson-rbpmlk (never main, never force-push, no PRs).
+
+Read CLAUDE.md first (hard rules: no original game/publisher/designer names, no model names, no AI attribution lines in commits). Then games-src/shell/GX-KIT.md section 9 (the help kit: gx-help.js/css) and the pilot that uses it: Thornbound (games-src/thornbound/game, file ui11.js, plus the "help kit checks" block in its sweep.js).
+
+Game: __NAME__ (slug __SLUG__; source dir from the GAMES table in games-src/scripts/build-all.py). Only touch this game's files. Other sessions are adding the kit to other games at the same time: never edit games-src/shell/, games-src/scripts/, games/index.html.
+
+Owner's request: "Some games are confusing; tutorial pop-ups; the light bulb can be more helpful, especially if people don't know the rules." Help must be on demand (bulb) or first-time only (coach bubbles), never advice cards on their own during play.
+
+Do, following GX-KIT.md section 9 exactly:
+1. build.py: inline gx-viewport.js, gx-help.js and gx-help.css after shell.js (if not already).
+2. A bulb button in the top bar (SVG bulb, same as Thornbound). Remove any old hint button so there is one bulb.
+3. Write the game's help file: a phaseId() for every distinct moment of play; one coach step per phase (title ≤4 words, text ≤20 words, target = the board element to tap); 2–4 rules cards per phase (picture/icons + ≤20 words; explain the real rules plainly for someone who has never played); suggest() from the game's real AI/advice function (so the finger and the "why" line are right; return null rather than guess). Call GXH.init and GXH.bulb once, GXH.phase() after each render.
+4. Menu: GXH.settingsHTML() (Tips on/off, Reset tips). Replace any old guided-game tip/coach pop-ups with the kit's steps (guided game = all bubbles on).
+5. Sweep: copy Thornbound's help kit checks (fresh profile: each bubble once, never covers a glowing target, dismisses on tap, game still completes; bulb finger == suggestion).
+
+Checks before deploy: `python3 games-src/scripts/build-all.py __SLUG__` PASS; the game's sweep.js (and rotate-test.js if present) pass incl. the help checks. Save help-coach-bubble, help-bulb-suggestion and help-rules-card screenshots at 390x763 to the game's playtest/ folder, look at them (short, clear, pointing at the board) and commit them (git add -f if ignored).
+
+Deploy: `python3 games-src/scripts/build-all.py --deploy __SLUG__`; commit only this game's files; `git fetch origin alex/brave-carson-rbpmlk && git merge origin/alex/brave-carson-rbpmlk`; `git push origin alex/brave-carson-rbpmlk`. Commit work in progress as you go. If a command is blocked, stop and say so. Delete temporary staging folders.
+
+Finish with a report under 120 words: phases/steps/rules counts, what suggest() uses, checks, deployed yes/no, commit hash, screenshot paths.
+```
+
+## Story tutorial (Chapter 0) rollout
+Pilot: Thornbound live 7 Oct (gx-tutor.js, GX-KIT.md section 10; 19 steps, ~5 min; first Story tap runs it, then "Start chapter 1").
+Owner evaluates Thornbound first. Then one Sonnet cloud session per game (max 4): follow GX-KIT.md section 10 and Thornbound's tutor.js/tutor-test.js:
+staged never-saved mode (fixed seed, scripted computer), steps in rule order teaching EVERY rule once, GXT.act in input handlers,
+Story routes through it on first tap, menu "Tutorial" replay, tutor-test.js (390x763, 375x553, rotation, leave/return, skip, fresh Story run).
+Final Approach: its learn-by-chapters ladder is in progress; its Chapter 0 should teach the full cockpit staged.
+- Shelf filter: when a game gets its staged tutorial or lightbulb help, add its shelf id to TUTOR / HELP in games/index.html (orchestrator does this after reviewing).
+
+## Tutorial sessions running (8 Oct 2026, owner asked for all at once)
+final-approach session_015NDv9ESdPrEJTnfJKUDLtw · shipwreck-isle session_01VUNYo8922FwbNpyjiQhmv1 · hollowbough session_01NHtss5aHd9P92NSQAUmhf8 ·
+doorkick-dungeon session_016aP8q2iPCJLmH9jc27qUYR · sands-of-qamar session_018TBPe79x2EBEQueToqiwVX · rampart-and-vine session_01SWdevsDjN31VGnnVmswCyQ ·
+kaiten-kitchen session_01RtUPEgsfBFVT1S3WytVrkb · crown-city-smash session_01WwNGprwPu21nGLqgUVJ5Lr · short-fuse session_016Auy9sxZudGktJP9a1gjhq ·
+lantern-dive session_01JNYcvB65KFqwqBugP7sUYb · tidewake session_01JSeGDLjZpiUbouwyyZjYub · nebula-aces (+help kit) session_01R72ukY9Q1iKMGFnDSF2qsE ·
+sunglaze (+help kit) session_01WKGyjovMLeQZkFosF8UXSi · cauldron-fair (+help kit) session_01UDfNVi8Lw1ni5sYyBTZRp1.
+Orchestrator: check each with get_session on every owner message; review tutor-*.png; add the shelf id to TUTOR/HELP in games/index.html.

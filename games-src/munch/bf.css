@@ -1,0 +1,156 @@
+/* ===== board-first: drag/tap targets, the big door kick, the reveal, flying cards, floating numbers ===== */
+.bfline{display:none}
+.mine .hand .card,.mine .gear .gchip{touch-action:pan-x}
+.bfhero{display:inline-flex;align-items:center;gap:4px;flex:none;position:relative}
+.bfhero .bfav{width:40px;height:40px;border-radius:50%;border:2px solid var(--c,#ffd76a);background:#2a1208;box-shadow:0 2px 0 #000;object-fit:cover}
+.bfhero .bfstr{font:800 1.15rem/1 var(--title);color:#ffd76a;text-shadow:0 2px 0 #000}
+/* glowing targets while a card is held */
+.bf-tgt{outline:3px dashed #7dffb2!important;outline-offset:2px;border-radius:10px;animation:bfGlow 1s ease-in-out infinite alternate;position:relative}
+.bf-over{outline:4px solid #b6ffd4!important;box-shadow:0 0 0 6px rgba(125,255,178,.35),0 0 28px rgba(125,255,178,.9)!important}
+@keyframes bfGlow{from{box-shadow:0 0 0 0 rgba(125,255,178,0)}to{box-shadow:0 0 18px 4px rgba(125,255,178,.65)}}
+[data-bfl]::after{content:attr(data-bfl);position:absolute;left:50%;top:-4px;translate:-50% -100%;z-index:6;white-space:nowrap;font:700 13px/1.2 var(--ui,system-ui);color:#06230f;background:#7dffb2;border-radius:8px;padding:2px 8px;box-shadow:0 2px 6px rgba(0,0,0,.5);pointer-events:none}
+.mine .top[data-bfl]::after,.mine .gear[data-bfl]::after{top:auto;bottom:-2px;translate:-50% 0}
+.pile[data-bfl]::after{top:auto;bottom:0;translate:-50% 0}
+.phc[data-bfl]::after,.opp[data-bfl]::after{top:auto;bottom:1px;translate:-50% 0;font-size:12px;padding:1px 6px}
+.phopps:has(.bf-tgt){padding-top:6px;padding-bottom:6px}
+.mine .card.bf-picked,.mine .gchip.bf-picked{translate:0 -20px!important;box-shadow:0 0 0 3px #ffd76a,0 0 22px #ffd76a!important;z-index:5}
+.mine .bf-lift{opacity:.35}
+html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
+.bfghost{position:fixed!important;left:0;top:0;z-index:120;pointer-events:none;margin:0!important;rotate:none!important;translate:none!important;filter:drop-shadow(0 14px 18px rgba(0,0,0,.6));transition:none}
+/* the big door */
+.bfdoor{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:grid;place-items:center;margin:auto;height:min(92%,calc(100cqh - 10px));aspect-ratio:100/142;max-width:62%;border-radius:12px;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,.7)) drop-shadow(0 0 22px rgba(255,190,90,.45))}
+.bfdoor .bfdi,.bfdoor .bfkick{animation:bfBreathe 1.6s ease-in-out infinite}
+.bfdoor .bfdi{position:absolute;inset:0;border-radius:12px;overflow:hidden}
+.bfdoor .bfdi img,.bfdoor .bfdi svg{width:100%;height:100%;display:block}
+.bfdoor .bfkick{position:relative;font:900 clamp(26px,9vw,46px)/1 var(--title);color:#ffe9a8;letter-spacing:.04em;text-shadow:0 3px 0 #3a1004,0 0 18px #ff7a1a,0 0 2px #000;rotate:-6deg}
+.bfdoor .bfboot{position:absolute;right:-6%;bottom:8%;font-size:clamp(28px,9vw,46px);animation:bfBoot 1.6s ease-in-out infinite}
+.bfdoor:focus-visible{outline:3px solid #7fd0ff}
+@keyframes bfBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes bfBoot{0%,60%,100%{transform:translateX(0) rotate(0)}75%{transform:translateX(-22%) rotate(-18deg)}}
+.bf-kicking{animation:bfKickDoor .52s cubic-bezier(.3,.1,.4,1) forwards!important}
+@keyframes bfKickDoor{0%{transform:scale(1)}15%{transform:scale(.94) rotate(-3deg)}30%{transform:scale(1.04) rotate(4deg)}45%{transform:scale(.97) rotate(-5deg)}60%{transform:scale(1.08) rotate(3deg);filter:brightness(1.4)}100%{transform:scale(1.25);opacity:0;filter:brightness(2.2)}}
+.bf-shake{animation:bfShake .5s linear}
+@keyframes bfShake{0%,100%{translate:0 0}20%{translate:-5px 2px}40%{translate:6px -3px}60%{translate:-4px 3px}80%{translate:3px -1px}}
+/* the reveal */
+.bfrev{position:fixed;inset:0;z-index:110;pointer-events:none;display:grid;place-items:center;align-content:center;gap:6px;background:radial-gradient(circle at 50% 45%,rgba(40,14,4,.55),rgba(0,0,0,.86));animation:bfIn .18s ease-out;cursor:pointer;overflow:hidden}
+.bfrev.out{opacity:0;transition:opacity .25s}
+.bfrev .bfburst{position:absolute;left:50%;top:45%;width:10px;height:10px;border-radius:50%;translate:-50% -50%;background:radial-gradient(circle,#fff6c8,#ffb03a 40%,rgba(255,80,20,0) 70%);animation:bfBurst .7s .25s ease-out both}
+.bfrev.k-mon .bfburst{background:radial-gradient(circle,#ffe2c8,#ff4a1a 40%,rgba(120,0,0,0) 70%)}
+.bfrev.k-curse .bfburst{background:radial-gradient(circle,#f0d8ff,#9a3aff 40%,rgba(40,0,80,0) 70%)}
+@keyframes bfBurst{from{width:10px;height:10px;opacity:1}to{width:180vmax;height:180vmax;opacity:0}}
+.bfrev .bfdh{position:absolute;top:50%;width:min(30vw,130px);aspect-ratio:50/142;overflow:hidden;translate:0 -55%}
+.bfrev .bfdh img,.bfrev .bfdh svg{height:100%;width:200%;display:block}
+.bfrev .bfdh.l{right:50%;animation:bfDoorL .55s .2s cubic-bezier(.5,0,.8,.4) both}
+.bfrev .bfdh.r{left:50%}.bfrev .bfdh.r img,.bfrev .bfdh.r svg{margin-left:-100%}
+.bfrev .bfdh.r{animation:bfDoorR .55s .2s cubic-bezier(.5,0,.8,.4) both}
+@keyframes bfDoorL{to{transform:translateX(-120%) rotate(-30deg);opacity:0}}
+@keyframes bfDoorR{to{transform:translateX(120%) rotate(30deg);opacity:0}}
+.bfrev .bfwho{position:relative;font:700 16px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;animation:bfIn .2s both}
+.bfrev .bfrc{position:relative;perspective:800px}
+.bfrev .bfrc .card{--w:min(46vw,210px);animation:bfFlip .6s .45s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 18px 40px rgba(0,0,0,.7)}
+.bfrev:not(.mine) .bfrc .card{--w:min(36vw,160px)}
+@keyframes bfFlip{from{transform:rotateY(90deg) scale(.3)}to{transform:none}}
+.bfrev .bfban{position:relative;font:900 clamp(30px,11vw,56px)/1 var(--title);color:#fff2c0;letter-spacing:.03em;text-shadow:0 4px 0 #4a0c02,0 0 24px #ff5a1a;animation:bfSlam .45s .75s cubic-bezier(.2,1.6,.4,1) both}
+.bfrev.k-curse .bfban{text-shadow:0 4px 0 #2a0450,0 0 24px #b04aff}
+.bfrev.k-other .bfban{font-size:clamp(22px,7vw,34px);text-shadow:0 3px 0 #2a1208}
+.bfrev .bfsub{position:relative;font:600 15px var(--ui,system-ui);color:#f3e2c0;text-shadow:0 1px 0 #000;max-width:86vw;text-align:center;animation:bfIn .3s .9s both}
+@keyframes bfSlam{from{transform:scale(2.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes bfIn{from{opacity:0}to{opacity:1}}
+/* flying cards, floating numbers, rival bubbles, the ghost finger */
+.bffly{position:fixed;left:0;top:0;z-index:105;pointer-events:none}
+.bffly .card{--w:64px;margin:0}
+.bffloat{position:fixed;z-index:106;pointer-events:none;translate:-50% -50%;font:900 26px/1 var(--title);color:#7dffb2;text-shadow:0 2px 0 #000,0 0 10px rgba(0,0,0,.8);animation:bfRise 1.4s ease-out forwards}
+.bffloat.down,.bffloat.bad{color:#ff8a7a}
+@keyframes bfRise{0%{transform:scale(.4);opacity:0}15%{transform:scale(1.3);opacity:1}30%{transform:scale(1)}100%{transform:translateY(-56px);opacity:0}}
+.bfbub{position:fixed;z-index:104;pointer-events:none;max-width:200px;font:700 14px/1.2 var(--ui,system-ui);color:#1a0d06;background:#fff6dc;border:2px solid var(--c);border-radius:12px;padding:5px 10px;box-shadow:0 4px 12px rgba(0,0,0,.5);animation:bfPop .3s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bfPop{from{transform:scale(.3);opacity:0}}
+#bffing{position:fixed;left:0;top:0;z-index:107;pointer-events:none;opacity:0}
+#bffing span{display:block;font-size:44px;margin:-6px 0 0 -18px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+/* phone portrait: the board is the screen; one line + one row of buttons at the bottom, always the same height */
+html.ph-p{--ph-dock:calc(104px + env(safe-area-inset-bottom,0px))}
+html.ph-p:has(#prompt.bfq),html.ph-p:has(#prompt .sellbar){--ph-dock:auto}
+html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:52dvh!important;overflow:auto}
+html.ph .bfline{display:block;margin:0 0 6px!important;font:700 16px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
+html.ph #prompt{display:flex;flex-direction:column}
+html.ph #prompt>.bfline{order:1}html.ph #prompt>.acts.main{order:2}html.ph #prompt>*{order:3}
+html.ph #prompt:not(.bfq) p.say,html.ph #prompt>p:not(.bfline):not(.say),html.ph #prompt .hint,html.ph #prompt .lesson,html.ph #prompt>.tip,html.ph #prompt .since{display:none!important}
+html.ph #prompt.bfq p.say{order:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:15px}
+html.ph #prompt.bfq .bfline{display:none}
+html.ph #prompt .acts.main{flex-wrap:nowrap;margin:0;gap:6px}
+html.ph #prompt.bfq .acts.main{flex-wrap:wrap}
+html.ph #prompt .acts.main .btn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #prompt .acts.main .btn.pulse{flex:2 1 auto}
+html.ph #prompt .toast,html.ph #prompt .winwarn,html.ph #prompt>.since,html.ph #prompt>.autonote{position:fixed;left:8px;right:8px;top:calc(var(--ph-bar) + 62px + env(safe-area-inset-top,0px));z-index:30;margin:0;font-size:14px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+html.ph-p:has(#prompt.bfq) #prompt .toast,html.ph-p:has(#prompt.bfq) #prompt .winwarn{position:static}
+html.ph .mine{--hw:clamp(63px,11dvh,80px)}
+html.ph .gear>.small{display:none}
+html.ph .gear:not(:has(.gchip)){min-height:0;padding:0}
+html.ph .mine .top{gap:6px}
+html.ph .mine .top .str{display:none}
+html.ph .hand{padding-top:22px}
+html.ph-p .hand .card+.card{margin-left:-18px}
+html.ph-l .mine .top{display:flex}
+html.ph-l .mine{--hw:60px}
+html.ph-l .hand{padding-top:14px}
+@media (prefers-reduced-motion:reduce){.bf-tgt,.bfdoor .bfdi,.bfdoor .bfkick,.bfdoor .bfboot{animation:none}}
+.bfstage{display:grid;place-items:center;gap:8px;height:100%;align-content:center}
+.bfbig{position:relative;display:grid;place-items:center;width:clamp(60px,min(52vw,calc(100cqh - 84px)),220px);aspect-ratio:1;border-radius:50%;border:4px solid var(--c);background:radial-gradient(#4a2412,#1a0904);box-shadow:0 0 0 3px #1a0904,0 10px 24px rgba(0,0,0,.6)}
+.bfbig .bfbav{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.bfbig .bfbstr{position:absolute;bottom:-12px;left:50%;translate:-50% 0;font:900 26px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:20px;padding:4px 12px;text-shadow:0 2px 0 #000;white-space:nowrap}
+.bfbig .bfblv{position:absolute;top:-6px;right:-6px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
+.bfbig[data-bfl]::after{top:auto;bottom:22%;translate:-50% 0}
+.bfcap{position:relative;z-index:3;white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 15px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
+.bfdoor.small{cursor:default;height:clamp(60px,calc(100cqh - 90px),240px);max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
+.bfdoor.small .bfdi{animation:none}
+.bfcap.sm{font-size:15px;margin-top:4px}
+.bfstage .row .card{--w:var(--cw)}
+.bfstage:has(.row) .bfcap{margin-top:0}
+/* short portrait phones: the hero strip folds into the gear row (avatar on the left), the hand sits lower */
+@media (max-height:640px){
+  html.ph-p .mine{position:relative}
+  html.ph-p .mine .top{position:absolute;left:6px;top:4px;z-index:2;gap:0}
+  html.ph-p .mine .top>:not(.bfhero){display:none}
+  html.ph-p .mine .top .bfstr{font-size:1rem}
+  html.ph-p .mine .gear{padding-left:76px;min-height:44px!important}
+  html.ph-p .hand{padding-top:12px}
+  html.ph-p{--ph-dock:calc(96px + env(safe-area-inset-bottom,0px))}
+  html.ph .bfline{font-size:15px!important;margin-bottom:4px!important}
+}
+.bfbub.note{max-width:220px;background:#fff6dc}
+.mine .gear .gchip.eqoff{position:relative;opacity:.8}
+.bfx{font:700 11px/1 var(--ui,system-ui);color:#fff;background:#a23a2a;border-radius:6px;padding:2px 4px;margin-left:4px;white-space:nowrap}
+/* a glow means "good for you, now"; red glow = a card against a rival; dim = not now */
+.mine .hand .card.bf-no{filter:saturate(.55) brightness(.72)}
+html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
+.mine .hand .card.play.bf-mean{box-shadow:0 0 0 2px #ff6a5a,0 0 14px rgba(255,90,70,.75)!important}
+
+.story-btn{display:block;width:100%;min-height:56px;font-size:1.2rem!important;margin:8px 0 4px}
+
+/* boss reveal clip: a 16:9 strip at the top, invisible until the video plays, tap to skip, the board stays usable below it */
+#bfclip{position:fixed;z-index:120;overflow:hidden;pointer-events:none;touch-action:none;background:transparent}
+#bfclip .bfc-dim{position:absolute;inset:0;background:radial-gradient(ellipse 85% 80% at 50% 48%,rgba(8,4,14,.55),rgba(8,4,14,.92));-webkit-mask-image:radial-gradient(ellipse 54% 54% at 50% 50%,#000 66%,transparent 100%);mask-image:radial-gradient(ellipse 54% 54% at 50% 50%,#000 66%,transparent 100%)}
+#bfclip video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%;display:block;-webkit-mask-image:radial-gradient(ellipse 53% 52% at 50% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 53% 52% at 50% 50%,#000 58%,transparent 100%)}
+#bfclip.fly video,#bfclip.fly .bfc-dim{-webkit-mask-image:none;mask-image:none}
+#bfclip .bfc-name{position:absolute;left:50%;bottom:24%;translate:-50% 0;width:92%;text-align:center;font:900 clamp(20px,6.4vw,42px)/1.1 var(--title);letter-spacing:.04em;color:#fff2c0;text-shadow:0 3px 0 #4a0c02,0 0 22px #ff5a1a,0 0 3px #000;opacity:0;transition:opacity .35s}
+#bfclip .bfc-name.on{opacity:1}
+@media (prefers-reduced-motion: reduce){#bfclip{display:none}}
+
+/* boss clip first, then the card: the monster card stays hidden until the clip lands in its spot */
+html.bf-clipping .arena .row.mons .mon{visibility:hidden}
+/* key art behind the title and end screens: cover, dark gradient so the paper card and buttons stay readable */
+.modal.art-title,.modal.art-win,.modal.art-lose{background-size:cover;background-position:50% 30%;background-repeat:no-repeat}
+.modal.art-title{background-image:linear-gradient(180deg,rgba(10,4,1,.15) 0%,rgba(10,4,1,.35) 45%,rgba(10,4,1,.82) 100%),url(media/title.webp)}
+.modal.art-win{background-image:linear-gradient(180deg,rgba(10,4,1,.1) 0%,rgba(10,4,1,.4) 50%,rgba(10,4,1,.85) 100%),url(media/end-win.webp)}
+.modal.art-lose{background-image:linear-gradient(180deg,rgba(10,4,1,.1) 0%,rgba(10,4,1,.4) 50%,rgba(10,4,1,.85) 100%),url(media/end-lose.webp)}
+@media (max-aspect-ratio:4/5){.modal.art-title{background-image:linear-gradient(180deg,rgba(10,4,1,.1) 0%,rgba(10,4,1,.3) 40%,rgba(10,4,1,.85) 100%),url(media/title-phone.webp)}}
+/* phone: leave the top half of the key art showing, the menu scrolls inside its sheet (Start stays pinned) */
+@media (orientation:portrait){html.ph .modal.art-title .dlg.start{max-height:50dvh}html.ph .modal.art-title{background-position:50% 0}}
+/* music picker drawer */
+.music{display:flex;flex-direction:column;gap:14px;padding-bottom:12px}
+.music h3{margin:0 0 6px;font-size:1.05rem;color:var(--gold,#e8c36a)}.music h3 small{font-weight:400;opacity:.75;font-size:.8rem;margin-left:6px}
+.mtop{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.mvol{display:flex;align-items:center;gap:8px;flex:1 1 160px}.mvol input{flex:1;min-height:44px}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid rgba(232,195,106,.45);background:rgba(60,38,20,.85);color:#f6e7c4;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
+.mchip.on{background:#c9962f;color:#2a1a0a;border-color:#ffe08a;font-weight:700}.mchip.prev{border-style:dashed}
+.mchip .ic{width:1em;height:1em}

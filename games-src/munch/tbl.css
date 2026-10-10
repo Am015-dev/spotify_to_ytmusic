@@ -1,0 +1,211 @@
+/* ===== the dungeon table: one surface holds the rival seats, the door / fight, your hero + gear and your fanned hand ===== */
+.tbl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;position:relative}
+/* rival seats on the rim of the table: avatar, level badge, strength + gear count only */
+.opps{justify-content:center;align-items:flex-start;gap:8px;padding:2px 2px 0;overflow:visible}
+.opp.seat{flex:0 1 150px;min-width:0;min-height:0;max-width:200px;padding:3px 10px 3px 4px;border-radius:30px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;row-gap:0;align-content:center;align-items:center;position:relative;
+  translate:0 calc((1 - var(--q,0)*var(--q,0))*8px)}
+.opp.seat .sav{grid-row:1/3;grid-column:1;position:relative;width:42px;height:42px;border-radius:50%;border:2.5px solid var(--c,#ffd76a);background:#2a1208;box-shadow:0 2px 0 #000;display:block}
+.opp.seat .savi{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.opp.seat .slv{position:absolute;right:-7px;bottom:-5px;min-width:21px;height:21px;padding:0 4px;border-radius:11px;display:grid;place-items:center;font:800 14px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 1px 0 rgba(0,0,0,.5)}
+.opp.seat .sdead{position:absolute;left:-4px;top:-6px;font-style:normal;font-size:16px}
+.opp.seat .snm{grid-column:2;grid-row:1;font:700 13px/1.15 var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000;min-width:0}
+.opp.seat .sbd{grid-column:2;grid-row:2;display:flex;gap:7px;font:700 13px/1.15 var(--hand);color:var(--cream2);white-space:nowrap;min-width:0}
+.opp.seat .sw{color:#ffd76a}
+.opp.seat .sc{color:#c9b4ff}
+.opp.seat .sbd .ic{width:1em;height:1em;vertical-align:-.12em}
+.opp.seat.active{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
+.opp.seat.dead{filter:grayscale(.6)}
+.opp.seat[data-bfl]::after{top:auto;bottom:-14px;translate:-50% 0}
+.opps.n5 .snm,.opps.n4 .snm{display:none}
+.opps.n5 .opp.seat{padding-right:6px}.opps.n5 .sbd{gap:4px}
+.opps.n5 .opp.seat,.opps.n4 .opp.seat{grid-template-rows:auto auto}
+/* hero strip: your avatar with the big strength number, level medal, gear laid out beside it */
+.mine .slots{display:flex;gap:10px;align-items:center;opacity:.4}
+.mine .slots i{font-style:normal;width:36px;height:36px;border-radius:9px;border:2px dashed rgba(245,231,200,.55);display:grid;place-items:center;color:var(--cream)}
+.mine .slots .ic{width:22px;height:22px}
+.mine .nogear{display:none}
+.fbtns{display:flex;gap:8px;width:100%;justify-content:center;align-items:stretch}
+.fbtns .btn{min-height:50px;font-size:18px;flex:1 1 0;justify-content:center;padding:6px 8px;white-space:nowrap}
+.fbtns .fightb{flex:1.35 1 0;font-size:21px}
+.fbtns .helpb{flex:0 0 auto;min-width:60px}
+.fbtns .btn.rec{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 0 #3a2213,0 0 0 3px #7fd0ff}
+.fbtns .btn.pulse{animation:tblPulse 1.1s ease-in-out infinite}
+@keyframes tblPulse{50%{transform:scale(1.04);filter:brightness(1.12)}}
+.hsav{display:block;position:relative;width:var(--hav,84px);height:var(--hav,84px)}
+.hsav .hsavi{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #ffd76a;background:radial-gradient(#4a2412,#1a0904);box-shadow:0 6px 14px rgba(0,0,0,.6);display:block}
+.hsav .hsavi.h2{position:absolute;right:-18%;bottom:-6%;width:46%;height:46%;border-width:2px}
+.bffloat.big{font-size:44px}
+.tbfly{position:fixed;left:0;top:0;z-index:105;pointer-events:none}
+.tbfly .card{--w:54px;margin:0}
+.tbfly .tbbadge{display:grid;place-items:center;min-width:46px;height:46px;border-radius:50%;padding:0 6px;font:900 22px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 2px #2a170b,0 0 22px rgba(255,215,106,.9)}
+@media (prefers-reduced-motion:reduce){.fbtns .btn.pulse{animation:none}}
+
+/* ---- phone: the table is the screen ---- */
+html.ph .phopps{display:none!important}
+html.ph-p .gx-main{grid-row:3}
+html.ph .gx-board{padding:4px 4px 0;gap:0}
+html.ph .tbl{padding:4px 5px 0;border-radius:14px 14px 0 0;gap:4px;
+  background:radial-gradient(70% 55% at 50% 50%,rgba(255,190,110,.12),transparent 70%),var(--tex-wood),repeating-linear-gradient(0deg,#6a3f22 0 3px,#5a3520 3px 9px,#71452a 9px 14px);background-size:auto,340px 170px,auto;
+  border:1px solid #0d0603;border-bottom:0;box-shadow:inset 0 0 0 4px #2a160b,inset 0 0 0 5px rgba(226,180,87,.55),inset 0 0 40px rgba(10,4,0,.6)}
+html.baked.ph .tbl{background:var(--img-table) center/100% 100% #5a3520}
+html.ph .table{flex:1 1 auto}
+html.ph .felt{background:none;border:0;box-shadow:none;padding:12px 2px 8px;border-radius:10px}
+html.ph .felt::before,html.ph .felt::after{display:none}
+html.ph #app .tbl .opps{display:flex;flex:none}
+html.ph .opp.seat{flex:1 1 0;max-width:150px;min-height:44px;padding:3px 6px 3px 4px;column-gap:5px}
+html.ph .opp.seat .sav{width:37px;height:37px}
+html.ph .opp.seat.paper{background:radial-gradient(120% 120% at 20% 0%,rgba(255,200,140,.18),transparent 55%),linear-gradient(#4a2415,#2a1209);box-shadow:inset 0 0 0 1px rgba(226,180,87,.45),0 3px 0 rgba(0,0,0,.4)}
+html.ph .opp.seat.active{box-shadow:inset 0 0 0 2px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
+html.ph .pile .lbl{display:none}
+html.ph .pile .card.xs{--w:calc(var(--sw)*.8)}
+/* your strip: hero + gear, then the fan */
+html.ph .mine{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"top gear" "hand hand";align-items:center;gap:0 6px;padding:2px 2px 0;--hero:clamp(46px,7.2dvh,58px);background:none;border:0;box-shadow:none;border-radius:0;
+  --hw:clamp(60px,min(10.5dvh,19vw),82px)}
+html.ph .mine.paper::before{display:none}
+html.ph .mine .top{grid-area:top;position:relative;display:block;width:calc(var(--hero) + 14px);height:calc(var(--hero) + 10px);gap:0;padding:0}
+html.ph .mine .top>:not(.bfhero):not(.lv){display:none}
+html.ph .mine .bfhero{position:absolute;left:0;top:0;display:block;width:var(--hero);height:var(--hero)}
+html.ph .mine .bfhero .bfav{width:var(--hero);height:var(--hero);border-width:3px;display:block}
+html.ph .mine .bfhero .bfstr{position:absolute;left:50%;bottom:-9px;translate:-50% 0;font:900 18px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:14px;padding:3px 8px;text-shadow:0 1px 0 #000;white-space:nowrap}
+html.ph .mine .lv{position:absolute;right:0;top:-3px;margin:0;min-width:26px;height:26px;padding:0 5px;border-radius:13px;display:grid;place-items:center;grid-auto-flow:column;gap:2px;font:800 15px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 2px 0 rgba(0,0,0,.5);text-shadow:none}
+html.ph .mine .lv small{display:none}
+html.ph .mine .gear{grid-area:gear;min-height:calc(var(--hero) + 4px)!important;padding:0 2px 0 6px!important;gap:6px;align-items:center;mask-image:none}
+html.ph .mine .gear:not(:has(.gchip)){min-height:calc(var(--hero) + 4px)!important}
+html.ph .mine .hand{grid-area:hand;display:flex;justify-content:center;align-items:flex-end;overflow:visible;gap:0;padding:calc(var(--hw)*.12 + 12px) 0 4px;height:calc(var(--hw)*1.42 + var(--hw)*.12 + 16px);box-sizing:border-box;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none;position:relative}
+html.ph .mine .hand .card{--w:var(--hw);rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px);transform-origin:50% 130%;flex:none;touch-action:none}
+html.ph .mine .hand .card+.card{margin-left:var(--ov,-18px)}
+html.ph .mine .hand .card.play,html.ph .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 14px)}
+html.ph .mine .hand .card:hover{rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px)}
+html.ph .mine .hand .card.bf-picked{translate:0 -24px!important;rotate:0deg!important;z-index:8}
+html.ph .mine .hand.scrolls{justify-content:flex-start;overflow-x:auto;overflow-y:hidden}
+html.ph .mine .hand.scrolls .card{touch-action:pan-x}
+html.ph .mine .gear .gchip{touch-action:pan-x}
+html.ph .mine .hand:not(.scrolls)>.small{margin:auto}
+/* the action strip under the table: dark, one line + one row of buttons */
+html.ph .gx-dock{background:linear-gradient(#2a160b,#150a04);color:var(--cream);border-top:2px solid #6a4a22}
+html.ph .gx-dock-body{background:none}
+html.ph #prompt .bfline{color:var(--cream);text-shadow:0 1px 0 #000}
+html.ph-p{--ph-dock:calc(98px + env(safe-area-inset-bottom,0px))}
+html.ph-p #prompt{min-height:78px;justify-content:center}
+html.ph-p .gx-dock{padding-bottom:env(safe-area-inset-bottom,0px)}
+html.ph .gx-dock-body{padding:6px 10px 6px}
+/* the fight on the table: your hero on the left, the monster on the right, strengths as big numbers, buttons under them */
+html.ph .arena:has(>.vs){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr);grid-template-rows:minmax(0,1fr) auto;column-gap:4px;row-gap:4px;align-content:center;justify-content:stretch;justify-items:center;align-items:center;overflow:visible;--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.42),150px)}
+html.ph .arena:has(>.vs) .vs{display:contents}
+html.ph .arena:has(>.vs) .vs .score.hero{grid-column:1;grid-row:1/3;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;background:none;border:0;box-shadow:none;align-self:center;position:relative}
+html.ph .arena:has(>.vs) .vs .vsx{position:static;grid-column:2;grid-row:1/3;width:30px;height:30px;align-self:center;opacity:.95}
+html.ph .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:2;display:flex;justify-content:center;padding:0;background:none;border:0;box-shadow:none;align-self:start}
+html.ph .arena:has(>.vs) .row.mons{grid-column:3;grid-row:1;align-self:end;flex-wrap:nowrap;justify-content:center;gap:4px}
+html.ph .arena:has(>.vs)>:not(.vs):not(.row.mons){grid-column:1/-1}
+html.ph .arena:has(>.vs) .card{--w:min(var(--cw),calc(((100cqw - 2*var(--sw) - 40px)*.52)/var(--n,1) - 6px))}
+html.ph .arena:has(>.vs) .score .sl{display:none}
+html.ph .arena:has(>.vs) .score.hero .sl{display:block;font:700 13px/1.1 var(--title);max-width:var(--hav);text-align:center;text-shadow:0 1px 0 #000}
+html.ph .arena:has(>.vs) .score .num{order:0;min-width:2.1em;height:2.1em;font-size:clamp(1.6rem,6.5vw,2.1rem);box-shadow:0 0 0 3px #2a170b,0 3px 0 rgba(0,0,0,.45),inset 0 -3px 0 rgba(90,50,10,.35)}
+html.ph .arena:has(>.vs) .score.win .num{box-shadow:0 0 0 3px #ffd76a,0 0 24px 6px rgba(255,215,106,.75)}
+html.ph .arena:has(>.vs) .score.lose .num{filter:saturate(.7) brightness(.9)}
+html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:13px;line-height:1.1;text-align:center}
+html.ph .arena:has(>.vs) .mon:only-child>.small.mstr{display:none}
+html.ph .arena:has(>.vs) .fbtns{grid-row:3}
+html.ph .arena:has(>.vs)>.row.small{grid-row:3;justify-content:center}
+html.ph .arena:has(>.vs):has(>.fbtns)>.row.small{grid-row:4}
+html.ph .arena:has(>.vs)>.rollbox{grid-row:4}
+html.ph .arena:has(>.vs) .wchip{font-size:13px}
+html.ph-l .arena:has(>.vs) .vs .vsx{position:static}
+html.ph-l .fbtns .btn{min-height:44px;font-size:16px}
+html.ph-l .fbtns .fightb{font-size:18px}
+/* landscape: table + hand on the left, action strip in the right rail */
+html.ph-l .tbl{padding:3px 5px 0;gap:3px}
+html.ph-l .mine{--hero:38px;--hw:clamp(44px,14dvh,58px)}
+html.ph-l{--ph-rail:clamp(230px,28vw,250px)}
+html.ph-l .opp.seat{min-height:40px;max-width:150px}
+html.ph-l .opp.seat .sav{width:34px;height:34px}
+html.ph-l .opp.seat{translate:0 calc((1 - var(--q,0)*var(--q,0))*4px)}
+html.ph-l .mine .top{display:block}
+html.ph-l .gx-dock{background:linear-gradient(#2a160b,#150a04)}
+/* short portrait phones */
+@media (max-height:640px){
+  html.ph-p .tbl{gap:2px}
+  html.ph-p{--ph-dock:calc(88px + env(safe-area-inset-bottom,0px))}html.ph-p #prompt{min-height:70px}
+  html.ph-p .mine{--hero:40px;--hw:clamp(52px,9.6dvh,60px)}
+  html.ph-p .mine .top{position:relative!important;left:auto!important;top:auto!important}
+  html.ph-p .mine .top .bfstr{font-size:15px}
+  html.ph-p .mine .gear{padding-left:6px!important}
+  html.ph-p .opp.seat{min-height:40px}
+  html.ph-p .opp.seat .sav{width:34px;height:34px}
+  html.ph-p .opp.seat .slv{min-width:19px;height:19px;font-size:13px}
+  html.ph-p .fbtns .btn{min-height:46px}
+}
+
+html.ph .arena:has(>.vs){--res:calc(44px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
+html.ph .arena:has(>.fbtns){--rb:54px}
+html.ph .arena:has(.mon .row){--re:46px}
+html.ph .arena:has(>.row.small){--rc:34px}
+html.ph .arena:has(>.rollbox){--rr:54px}
+.fbtns .btn.rec::after,.fbtns .btn.rec::before{content:none!important}
+html.ph-p .gx-dock-body{padding-bottom:max(6px,env(safe-area-inset-bottom,0px))}
+
+html.ph .outcome .story,html.ph #prompt .acts .small,html.ph #prompt .acts.main>.muted{display:none!important}
+html.ph .outcome{padding:6px 14px}
+
+html.ph #prompt>.tip.sellbar{display:block!important;margin:2px 0;font-size:15px}
+html.ph #prompt .winwarn{display:block;padding:5px 10px;font:700 14px/1.2 var(--title);background:linear-gradient(#ffe8a8,#f0bf4c);color:#2b1405;border-radius:9px;border:1px solid #4a2a06}
+html.ph #prompt .winwarn b{font-weight:800}
+@media (max-height:640px){
+  html.ph .arena:has(>.vs){align-content:start}
+  html.ph .arena:has(>.vs) .score .num{font-size:1.3rem;height:1.9em;min-width:1.9em}
+  html.ph .arena:has(>.vs) .hsav{display:none}
+  html.ph .arena:has(>.vs) .score.hero .num{margin-top:0}
+  html.ph .arena:has(>.vs) .score .num{font-size:1.5rem}
+  html.ph .felt{padding-top:8px}
+  html.ph .arena:has(>.vs){--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.34),84px)}
+}
+
+/* strength numbers sit on the bottom edge of the hero and of the monster card */
+html.ph .arena:has(>.vs) .score.hero .num{margin-top:-24px;position:relative;z-index:3}
+html.ph .arena:has(>.vs) .score.hero{gap:2px}
+html.ph .arena:has(>.vs) .score.hero .sl{margin-top:0}
+html.ph .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:1;align-self:end;justify-self:center;margin:0;position:relative;z-index:3}
+html.ph .arena:has(>.vs) .row.mons{margin-bottom:20px}
+html.ph .arena:has(>.vs) .vs .score.mons .num{margin:0}
+html.ph .arena:has(>.vs) .mon{gap:0}
+.fbtns{flex-wrap:wrap}
+.fbtns .btn{min-width:0;overflow:hidden;text-overflow:ellipsis}
+html.ph #prompt .acts.main .btn.pickchip{min-height:38px;font-size:13px;flex:1 1 30%;padding:2px 5px}
+html.ph #prompt.bfq .acts.main{gap:4px}
+html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:min(196px,35dvh)!important}
+
+/* while a question is open the hand can't be played: fold it down so the table keeps its room */
+html.ph:has(#prompt.bfq) .mine{--hw:44px;--hero:40px}
+html.ph:has(#prompt.bfq) .mine .gear{padding-left:6px}
+html.ph-l #prompt .bfline{white-space:normal;line-height:1.2}
+html.ph .mine .hand>.small{display:none}
+html.ph .opp.seat,html.ph-l .opp.seat,html.ph-p .opp.seat{min-height:44px}
+
+/* a crowded fight on a short phone: drop the extras, keep the numbers, the cards and the buttons */
+html.ph .arena.tight .hsav,html.ph .arena.tight .mon .row,html.ph .arena.tight>.row.small,html.ph .arena.tight>.rollbox .small{display:none}
+html.ph .arena.tight .score .num{margin-top:0}
+html.ph .arena.tight .row.mons{margin-bottom:6px}
+/* the tutorial's progress dots: 23+ steps must fit beside "Skip tutorial" on a 375px phone */
+.gxt-top .gxt-dots{gap:2px}.gxt-top .gxt-dots i{width:4px;height:4px}.gxt-top .gxt-dots i.on{transform:scale(1.5)}.gxt-top .gxt-n{font-size:11px}
+/* the tutorial entry in the start dialog and the menu */
+.btn.gxt-menu{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
+.btn.gxt-menu span{font-weight:600;font-size:.82em;opacity:.8}
+.btn.gxt-menu.gxt-first{border-color:#c99a35;box-shadow:0 0 0 2px rgba(201,154,53,.45)}
+/* painted extras */
+.ptokp{width:1.9em;height:1.9em;object-fit:cover;border-radius:50%;vertical-align:middle;background:#2a170b;margin-right:.3em}
+.ptoklog{width:1.7em;height:1.7em}
+.cast{list-style:none;padding-left:0}.cast li{display:flex;align-items:center;gap:.5em;margin:.2rem 0}
+.castp{flex:none;width:2.1em;height:2.1em;object-fit:cover;border-radius:50%;box-shadow:0 0 0 1.5px #f0c860,0 0 0 2.5px #2a170b}
+.pbk{position:relative;display:block;width:100%;height:100%}
+.pbk>i{position:absolute;inset:0;border-radius:inherit;background:center/100% 100% no-repeat}
+html[data-timg]:not([data-gfx="low"]) .felt.paper{background:radial-gradient(52% 48% at 50% 50%,rgba(8,3,0,.4),transparent 80%),var(--tbl-img) center/cover #5a3520}
+html[data-timg]:not([data-gfx="low"]) .felt.paper::after{display:block;background:radial-gradient(120% 105% at 50% 42%,transparent 62%,rgba(10,4,0,.5) 100%)}
+.winp{display:block;margin:0 auto 6px;width:84px;height:84px;object-fit:cover;border-radius:50%;box-shadow:0 0 0 3px #f0c860,0 0 0 5px #2a170b,0 6px 14px rgba(0,0,0,.5)}
+.pbk>i{border-radius:6%/4.2%}
+.mine .who .ptokp{width:1.25em;height:1.25em;font-size:.78em;vertical-align:.05em;margin-right:.15em}
+/* landscape: the outer cards of the fan dipped 3 px below the screen edge; lift the whole fan */
+html.ph-l .mine .hand .card,html.ph-l .mine .hand .card:hover{translate:0 calc(var(--arc,0px) - 14px)}
+html.ph-l .mine .hand .card.play,html.ph-l .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 22px)}
+html.ph-l .mine .hand .card.bf-picked{translate:0 -30px!important}
+/* an open drawer (diary, cards, menu) sits over the board: the board under it takes no taps and shows no glowing targets */
+html:has(.gx-drawer.on) .gx-main{pointer-events:none}

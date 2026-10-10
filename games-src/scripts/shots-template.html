@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Screenshot Grid</title>
+<style>
+:root{--bg:#17120e;--card:#241c16;--fg:#f3e9da;--mut:#b9a88f;--acc:#f0b04a;--line:#3a2f25}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(23,18,14,.96);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:grid;gap:8px}
+h1{font-size:1.2rem;margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}h1 small{color:var(--mut);font-weight:400;font-size:.85rem}
+h1 a{color:var(--acc);font-size:.85rem;font-weight:600;margin-left:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);min-height:40px}
+input{flex:1;min-width:150px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:99px;padding:6px 12px;font:600 13px system-ui;cursor:pointer;min-height:36px}
+.chip[aria-pressed=true]{background:var(--acc);color:#2a1808;border-color:var(--acc)}
+main{padding:12px 16px 40px}
+h2{font-size:1.05rem;margin:22px 0 8px;color:var(--acc)}h2 small{color:var(--mut);font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+@media(min-width:900px){.grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}}
+figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:zoom-in}
+figure img{display:block;width:100%;height:150px;object-fit:cover;object-position:top;background:#0d0a08}
+figcaption{padding:5px 8px 7px;font-size:12px;color:var(--mut);display:grid;gap:1px}figcaption b{color:var(--fg);font-weight:600;word-break:break-word}
+.more{display:block;margin:10px auto 0;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 16px;font:600 14px system-ui;cursor:pointer}
+#lb{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.92);display:grid;grid-template-rows:1fr auto;padding:12px}#lb[hidden]{display:none}
+#lb img{max-width:100%;max-height:100%;margin:auto;object-fit:contain;align-self:center;justify-self:center}
+#lb .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;padding-top:8px}
+#lb .bar span{color:var(--fg);font-size:13px;text-align:center;flex:1 1 100%}
+#lb button,#lb a{border:1px solid #555;background:#222;color:#fff;border-radius:10px;padding:8px 14px;font:600 14px system-ui;min-height:44px;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer}
+.empty{color:var(--mut);padding:30px 0;text-align:center}
+</style></head><body>
+<header>
+  <h1>Screenshot grid <small id="count"></small><a href="index.html">← Shelf</a></h1>
+  <div class="row"><input id="q" type="search" placeholder="Search screenshots (e.g. boss, hand, 390x763)" aria-label="Search screenshots">
+    <select id="kind" aria-label="Screen size"><option value="">All sizes</option><option value="phone">Phone</option><option value="desktop">PC</option></select>
+    <select id="when" aria-label="Taken"><option value="0">Any time</option><option value="1">Last 24 h</option><option value="3">Last 3 days</option><option value="7">Last 7 days</option></select></div>
+  <div class="chips" id="chips" role="group" aria-label="Game"></div>
+</header>
+<main id="main"></main>
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Screenshot"><img id="lbimg" alt=""><div class="bar"><span id="lbcap"></span><button id="prev" type="button">◀ Prev</button><a id="orig" target="_blank" rel="noopener">Full size</a><button id="next" type="button">Next ▶</button><button id="close" type="button">✕ Close</button></div></div>
+<script>
+const D=/*DATA*/[];
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const games=[...new Set(D.map(d=>d.g))].sort();let game='',list=[],cur=-1;const shown={};
+const fmt=t=>new Date(t*1000).toLocaleString([], {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+$('#chips').innerHTML=['All',...games].map(g=>`<button type="button" class="chip" data-g="${esc(g==='All'?'':g)}" aria-pressed="${g==='All'}">${esc(g)} <small>${g==='All'?D.length:D.filter(d=>d.g===g).length}</small></button>`).join('');
+$('#chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;game=b.dataset.g;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()};
+function filtered(){const q=$('#q').value.trim().toLowerCase(),k=$('#kind').value,days=+$('#when').value,now=Date.now()/1000;
+  return D.filter(d=>(!game||d.g===game)&&(!k||d.k===k)&&(!days||now-d.t<days*86400)&&(!q||(d.n+' '+d.g+' '+d.d).toLowerCase().includes(q)))}
+function draw(){list=filtered();$('#count').textContent=list.length+' of '+D.length;
+  const by={};list.forEach((d,i)=>{(by[d.g]=by[d.g]||[]).push(i)});const order=Object.keys(by).sort((a,b)=>list[by[b][0]].t-list[by[a][0]].t);
+  $('#main').innerHTML=order.length?order.map(g=>{const ix=by[g],n=shown[g]||60;return `<h2>${esc(g)} <small>${ix.length} · newest ${fmt(list[ix[0]].t)}</small></h2><div class="grid">${ix.slice(0,n).map(i=>{const d=list[i];return `<figure data-i="${i}"><img loading="lazy" decoding="async" src="shots/${d.f}" alt="${esc(d.n)}" width="${d.w}" height="${d.h}"><figcaption><b>${esc(d.n)}</b>${esc(fmt(d.t))}${d.k?' · '+d.k:''}</figcaption></figure>`}).join('')}</div>${ix.length>n?`<button type="button" class="more" data-more="${esc(g)}">Show ${Math.min(120,ix.length-n)} more of ${ix.length-n}</button>`:''}`}).join(''):'<p class="empty">No screenshots match.</p>'}
+$('#main').onclick=e=>{const m=e.target.closest('[data-more]');if(m){shown[m.dataset.more]=(shown[m.dataset.more]||60)+120;draw();return}const f=e.target.closest('figure');if(f)open(+f.dataset.i)};
+function open(i){cur=(i+list.length)%list.length;const d=list[cur];$('#lbimg').src='shots/'+d.f;$('#lbimg').alt=d.n;$('#lbcap').textContent=`${d.g} · ${d.n} · ${fmt(d.t)} · ${d.w}×${d.h} · ${d.d}`;$('#orig').href=d.o;$('#lb').hidden=false;document.body.style.overflow='hidden'}
+function close(){$('#lb').hidden=true;document.body.style.overflow=''}
+$('#prev').onclick=()=>open(cur-1);$('#next').onclick=()=>open(cur+1);$('#close').onclick=close;$('#lb').onclick=e=>{if(e.target.id==='lb')close()};
+addEventListener('keydown',e=>{if($('#lb').hidden)return;if(e.key==='Escape')close();if(e.key==='ArrowLeft')open(cur-1);if(e.key==='ArrowRight')open(cur+1)});
+let sx=0;$('#lb').addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});$('#lb').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)open(cur+(dx<0?1:-1))});
+['#q','#kind','#when'].forEach(s=>$(s).addEventListener('input',draw));draw();
+</script></body></html>

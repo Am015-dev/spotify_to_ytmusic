@@ -1,0 +1,1476 @@
+{
+ "game": "approach",
+ "title": "The Ninth Name",
+ "version": 2,
+ "cast": {
+  "chief": {
+   "name": "Chief Pilot Hedda Voss",
+   "portrait": "camp-voss.webp",
+   "emoji": "👩‍✈️",
+   "color": "#2f4f7a"
+  },
+  "ravi": {
+   "name": "First Officer Ravi Okoro",
+   "portrait": "camp-ravi.webp",
+   "emoji": "🧑‍✈️",
+   "color": "#e07a1f"
+  },
+  "alder": {
+   "name": "Port Alder Tower (Molly Brack)",
+   "portrait": "camp-alder.webp",
+   "emoji": "🌅",
+   "color": "#d98aa6"
+  },
+  "foxmere": {
+   "name": "Foxmere Approach (Nell Ashby)",
+   "portrait": "camp-foxmere.webp",
+   "emoji": "🌉",
+   "color": "#4a5a8c"
+  },
+  "seabright": {
+   "name": "Controller Teo Vance",
+   "portrait": "camp-seabright.webp",
+   "emoji": "🌋",
+   "color": "#c4572e"
+  },
+  "bowlrock": {
+   "name": "Controller Gunnar Sted",
+   "portrait": "camp-bowlrock.webp",
+   "emoji": "⛰️",
+   "color": "#7a6a4a"
+  },
+  "cloudspire": {
+   "name": "Controller Aurel Kade",
+   "portrait": "camp-cloudspire.webp",
+   "emoji": "🏔️",
+   "color": "#5b7fa6"
+  }
+ },
+ "acts": [
+  {
+   "act": 1,
+   "title": "Flight school",
+   "blurb": "Six lessons, one control at a time: axis, engines, radio, gear and flaps, brakes, coffee."
+  },
+  {
+   "act": 2,
+   "title": "Green Wings",
+   "blurb": "Routine landings with the whole panel: traffic, fuel and the corridor tabs."
+  },
+  {
+   "act": 3,
+   "title": "The List",
+   "blurb": "Crew cards, fog, a trainee, the mountain bowl, storms and the valley where only eight crews may land."
+  }
+ ],
+ "twists": [
+  {
+   "id": "extra-plane",
+   "where": "setup",
+   "how": "After FA.newGame, add param plane tokens to G.planes[2] (space 3, or the last space before the airport on shorter strips), never letting FA.planesOnTrack(G) exceed D.planeSupply."
+  },
+  {
+   "id": "short-fuel",
+   "where": "setup",
+   "how": "After FA.newGame on a scenario with kero or leak, set G.pl.kero = D.keroStart - param (fuel starts lower)."
+  },
+  {
+   "id": "red-altitude",
+   "where": "setup",
+   "how": "After FA.newGame, set G.alt = \"rb\" so the altitude track uses the red/black side and the 2000 ft reroll token never comes aboard."
+  },
+  {
+   "id": "held-reroll",
+   "where": "setup",
+   "how": "After FA.newGame, set G.rrHand = Math.max(0, G.rrHand - param) so the 6000 ft reroll token stays in the box."
+  },
+  {
+   "id": "tilted-start",
+   "where": "setup",
+   "how": "After FA.newGame, set G.pl.axis = param (-1 or +1; negative = toward the Pilot), so the flight starts one notch off level."
+  },
+  {
+   "id": "spare-coffee",
+   "where": "setup",
+   "how": "Helper used only by easier offers: after FA.newGame, set G.coffee = Math.min(D.coffeeMax, param)."
+  }
+ ],
+ "chapters": [
+  {
+   "id": "c1",
+   "act": 1,
+   "title": "Keep it level",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Welcome aboard, Captain. Today you learn one control: the axis."
+    },
+    {
+     "who": "ravi",
+     "text": "Drop a die on the axis. I will answer with mine. Keep her level."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "Level wings at the end. That is a good landing."
+    }
+   ],
+   "opponent": {
+    "cast": "alder",
+    "portrait": "camp-alder.webp",
+    "emoji": "🌅",
+    "name": "Port Alder Tower",
+    "personality": "Calm dawn approach, a few parked planes on the river path.",
+    "aiLevel": "hard",
+    "aiStyle": "calm"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "pad",
+    "scenario": "g1",
+    "lad": 1,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "lad1",
+    "text": "Land with the plane level."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land level",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Never tilt more than 1",
+     "test": {
+      "k": "maxTilt",
+      "op": "<=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Level after 5 rounds or more",
+     "test": {
+      "k": "levelRounds",
+      "op": ">=",
+      "v": 5
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi plays at his sharpest."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c2",
+   "act": 1,
+   "title": "Speed and the runway",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Now the engines. Two dice make your speed, and speed moves you along the approach."
+    },
+    {
+     "who": "ravi",
+     "text": "Stop on the airport, never past it. Slow and steady."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "You stopped right on the runway. Well flown."
+    }
+   ],
+   "opponent": {
+    "cast": "alder",
+    "portrait": "camp-alder.webp",
+    "emoji": "🌅",
+    "name": "Port Alder Tower",
+    "personality": "Calm dawn approach, a few parked planes on the river path.",
+    "aiLevel": "hard",
+    "aiStyle": "calm"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "pad",
+    "scenario": "g1",
+    "lad": 2,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "lad2",
+    "text": "Reach the airport and land level."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Never tilt more than 1",
+     "test": {
+      "k": "maxTilt",
+      "op": "<=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Land with speed to spare",
+     "test": {
+      "k": "brakeMargin",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi plays at his sharpest."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c3",
+   "act": 1,
+   "title": "Clear the way",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Planes wait on the approach. Leaving a space with a plane in it is a collision."
+    },
+    {
+     "who": "ravi",
+     "text": "The radio sends them away. A 1 clears your own space, a 2 the next."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "A clear sky and a clean approach."
+    }
+   ],
+   "opponent": {
+    "cast": "alder",
+    "portrait": "camp-alder.webp",
+    "emoji": "🌅",
+    "name": "Port Alder Tower",
+    "personality": "Calm dawn approach, a few parked planes on the river path.",
+    "aiLevel": "hard",
+    "aiStyle": "calm"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "pad",
+    "scenario": "g1",
+    "lad": 3,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "lad3",
+    "text": "Clear the planes, reach the airport, land level."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Clear at least 2 planes by radio",
+     "test": {
+      "k": "radio",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Never tilt more than 1",
+     "test": {
+      "k": "maxTilt",
+      "op": "<=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi plays at his sharpest."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c4",
+   "act": 1,
+   "title": "Wheels and flaps",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Gear and flaps must all be down to land. Pilot has the gear, co-pilot the flaps."
+    },
+    {
+     "who": "ravi",
+     "text": "Flaps go in order. I will take the first ones."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "Wheels down, flaps out. Textbook."
+    }
+   ],
+   "opponent": {
+    "cast": "alder",
+    "portrait": "camp-alder.webp",
+    "emoji": "🌅",
+    "name": "Port Alder Tower",
+    "personality": "Calm dawn approach, a few parked planes on the river path.",
+    "aiLevel": "hard",
+    "aiStyle": "calm"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "pad",
+    "scenario": "g1",
+    "lad": 4,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "lad4",
+    "text": "Lower all gear and flaps, then land."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Clear at least 2 planes by radio",
+     "test": {
+      "k": "radio",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Never tilt more than 1",
+     "test": {
+      "k": "maxTilt",
+      "op": "<=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi plays at his sharpest."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c5",
+   "act": 1,
+   "title": "Brakes",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Brakes decide how fast you may touch down. They start at 2."
+    },
+    {
+     "who": "ravi",
+     "text": "Raise them to 4 and 6 with those exact dice, in order."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "You stopped well inside the runway."
+    }
+   ],
+   "opponent": {
+    "cast": "alder",
+    "portrait": "camp-alder.webp",
+    "emoji": "🌅",
+    "name": "Port Alder Tower",
+    "personality": "Calm dawn approach, a few parked planes on the river path.",
+    "aiLevel": "hard",
+    "aiStyle": "calm"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "pad",
+    "scenario": "g1",
+    "lad": 5,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "lad5",
+    "text": "Raise the brakes and land within them."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Touch down 1 under the brakes",
+     "test": {
+      "k": "brakeMargin",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Never tilt more than 1",
+     "test": {
+      "k": "maxTilt",
+      "op": "<=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi plays at his sharpest."
+   },
+   "unlock": []
+  },
+  {
+   "id": "c6",
+   "act": 1,
+   "title": "The check ride",
+   "boss": true,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Last lesson: coffee and rerolls. Spare dice earn coffee to nudge a later die."
+    },
+    {
+     "who": "ravi",
+     "text": "A reroll token lets us both roll again. Then it is the full game."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "Every control, one landing. You are a captain now."
+    }
+   ],
+   "opponent": {
+    "cast": "chief",
+    "portrait": "camp-voss.webp",
+    "emoji": "👩‍✈️",
+    "name": "Chief Pilot Hedda Voss",
+    "personality": "Fair but exact. Grades the full landing.",
+    "aiLevel": "hard",
+    "aiStyle": "calm",
+    "taunt": "Not yet, Captain. Fly the check again.",
+    "praise": "Passed. Welcome to the line."
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "pad",
+    "scenario": "g1",
+    "lad": 6,
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "lad6",
+    "text": "Land at Port Alder with every control."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with a coffee left",
+     "test": {
+      "k": "coffee",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Touch down 1 under the brakes",
+     "test": {
+      "k": "brakeMargin",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 1,
+     "text": "Help: you start with 1 coffee token."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest and you start with a coffee in hand."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "flight-school",
+     "text": "Title: Flight School Graduate"
+    }
+   ]
+  },
+  {
+   "id": "c7",
+   "act": 2,
+   "title": "Lights on the River",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Foxmere at night. Planes queue on the approach and you cannot fly through them."
+    },
+    {
+     "who": "ravi",
+     "text": "Radio clears one plane: yours counts 1 space ahead, mine counts 2. Any die value works."
+    },
+    {
+     "who": "foxmere",
+     "text": "Kestrel four-one, Foxmere Approach. Busy evening. Expect traffic."
+    }
+   ],
+   "outro": [
+    {
+     "who": "foxmere",
+     "text": "Runway is yours, Kestrel. Thanks for sorting the queue."
+    },
+    {
+     "who": "chief",
+     "text": "Every plane left on the strip is a crash. You kept the path clear."
+    }
+   ],
+   "opponent": {
+    "cast": "foxmere",
+    "portrait": "camp-foxmere.webp",
+    "emoji": "🌉",
+    "name": "Foxmere Approach",
+    "personality": "Polite but busy: the traffic die keeps adding planes.",
+    "aiLevel": "hard",
+    "aiStyle": "traffic"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "fox",
+    "scenario": "g2",
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "g2",
+    "text": "Land at Foxmere with every plane cleared from the approach."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Clear at least 3 planes by radio",
+     "test": {
+      "k": "radio",
+      "op": ">=",
+      "v": 3
+     }
+    },
+    {
+     "text": "Land with at least 1 coffee left",
+     "test": {
+      "k": "coffee",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 1,
+     "text": "Help: you start with 1 coffee token."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest and you start with a coffee in hand."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "foxmere",
+     "text": "Foxmere Approach portrait"
+    }
+   ]
+  },
+  {
+   "id": "c8",
+   "act": 2,
+   "title": "Eyes on the Gauge",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Lake Orrin is a long flight. You start with 20 fuel."
+    },
+    {
+     "who": "ravi",
+     "text": "Put any die on the fuel space to burn that much. Skip it and we burn 6 at the end of the round."
+    },
+    {
+     "who": "chief",
+     "text": "Low dice on the fuel space keep the tank healthy."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "Fuel left in the tank and the wheels on the ground. Good housekeeping."
+    }
+   ],
+   "opponent": {
+    "cast": null,
+    "portrait": "camp-orrin.webp",
+    "emoji": "⛽",
+    "name": "Lake Orrin Tower",
+    "personality": "A quiet night tower over a long lake. The fuel gauge is the real danger.",
+    "aiLevel": "hard",
+    "aiStyle": "fuel"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "orr",
+    "scenario": "g4",
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "g4",
+    "text": "Land at Lake Orrin without the fuel dropping below 0."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with at least 4 fuel left",
+     "test": {
+      "k": "fuel",
+      "op": ">=",
+      "v": 4
+     }
+    },
+    {
+     "text": "Land with a reroll token unused",
+     "test": {
+      "k": "rerolls",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 1,
+     "text": "Help: you start with 1 coffee token."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest and you start with a coffee in hand."
+   },
+   "unlock": [
+    {
+     "type": "table",
+     "id": "night-lake",
+     "text": "Night-lake panel skin"
+    }
+   ]
+  },
+  {
+   "id": "c9",
+   "act": 2,
+   "title": "The Long Left Turn",
+   "boss": true,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Seabright Bay is your first real test. The approach bends left over the water."
+    },
+    {
+     "who": "chief",
+     "text": "Marked spaces only let you fly on if the axis is tilted the way the tab shows."
+    },
+    {
+     "who": "seabright",
+     "text": "Seabright Approach. I do not do second chances, Captain. Fly the line I give you."
+    }
+   ],
+   "outro": [
+    {
+     "who": "seabright",
+     "text": "On the line, on the speed. Very well. Seabright clears you."
+    },
+    {
+     "who": "chief",
+     "text": "Act one done. Next season the weather gets a vote."
+    }
+   ],
+   "opponent": {
+    "cast": "seabright",
+    "portrait": "camp-seabright.webp",
+    "emoji": "🌋",
+    "name": "Controller Teo Vance",
+    "personality": "Seabright Approach: precise and dry. Wants the left turn flown exactly to the tabs.",
+    "aiLevel": "hard",
+    "aiStyle": "corridor",
+    "taunt": "Off the line again. Go around and read the tabs, Captain.",
+    "praise": "Textbook turn. You may tell them Vance said so."
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "sea",
+    "scenario": "g3",
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "g3",
+    "text": "Land at Seabright Bay, matching the axis to every corridor tab you fly past."
+   },
+   "hints": true,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Spend at most 2 coffee tokens",
+     "test": {
+      "k": "coffeeSpent",
+      "op": "<=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Land with a reroll token unused",
+     "test": {
+      "k": "rerolls",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 1,
+     "text": "Help: you start with 1 coffee token."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest and you start with a coffee in hand."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "seabright",
+     "text": "Controller Teo Vance portrait"
+    },
+    {
+     "type": "act",
+     "id": "act2",
+     "text": "Act 2: Weather Gets a Vote"
+    }
+   ]
+  },
+  {
+   "id": "c10",
+   "act": 3,
+   "title": "Hours in the Logbook",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Act two. No more coaching on the panel: you plan, Ravi follows."
+    },
+    {
+     "who": "ravi",
+     "text": "Castlemoor gives us two crew cards. Pick ones that save dice, not ones that look exciting."
+    },
+    {
+     "who": "chief",
+     "text": "Watch the fuel and the two corridor tabs over the old town."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "The cards are tools, not tricks. You used them like a captain."
+    }
+   ],
+   "opponent": {
+    "cast": null,
+    "portrait": "camp-castlemoor.webp",
+    "emoji": "🏰",
+    "name": "Castlemoor Tower",
+    "personality": "A gentle dusk tower among spires, with a fuel gauge and two tabs.",
+    "aiLevel": "normal",
+    "aiStyle": "abilities"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "cas",
+    "scenario": "g6",
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "g6",
+    "text": "Land at Castlemoor with your two crew cards and the fuel above 0."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with at least 3 fuel left",
+     "test": {
+      "k": "fuel",
+      "op": ">=",
+      "v": 3
+     }
+    },
+    {
+     "text": "Land with at least 2 coffees left",
+     "test": {
+      "k": "coffee",
+      "op": ">=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 2,
+     "text": "Help: you start with 2 coffee tokens."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest, the boss rule is off and you start with 2 coffees."
+   },
+   "unlock": [
+    {
+     "type": "cardback",
+     "id": "spires",
+     "text": "Spires crew-card back"
+    }
+   ]
+  },
+  {
+   "id": "c11",
+   "act": 3,
+   "title": "Fog and Holding Patterns",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Swap seats tonight: you fly as First Officer. Ravi takes the left seat."
+    },
+    {
+     "who": "ravi",
+     "text": "Your radio reaches 2 spaces. Foxmere is full of jets circling in the fog."
+    },
+    {
+     "who": "foxmere",
+     "text": "Foxmere Approach. Fog, holding stacks, and you have a trainee aboard. Good luck."
+    },
+    {
+     "who": "chief",
+     "text": "Use the trainee space early: all six tokens must be placed before you land."
+    }
+   ],
+   "outro": [
+    {
+     "who": "foxmere",
+     "text": "Out of the fog and down. The trainee is grinning in the jump seat."
+    },
+    {
+     "who": "ravi",
+     "text": "Nice radio work from the right seat."
+    }
+   ],
+   "opponent": {
+    "cast": "foxmere",
+    "portrait": "camp-foxmere.webp",
+    "emoji": "🌫️",
+    "name": "Foxmere Approach",
+    "personality": "Fog, stacked traffic and a nervous trainee on the flight deck.",
+    "aiLevel": "normal",
+    "aiStyle": "fog-trainee"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 1,
+    "airport": "fox",
+    "scenario": "y1",
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "y1",
+    "text": "Land at Foxmere in fog from the Co-pilot seat, with all 6 trainee tokens placed."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Clear at least 4 planes by radio",
+     "test": {
+      "k": "radio",
+      "op": ">=",
+      "v": 4
+     }
+    },
+    {
+     "text": "Land with a reroll token unused",
+     "test": {
+      "k": "rerolls",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 2,
+     "text": "Help: you start with 2 coffee tokens."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest, the boss rule is off and you start with 2 coffees."
+   },
+   "unlock": [
+    {
+     "type": "title",
+     "id": "right-seat",
+     "text": "Title: Right-Seat Ace"
+    }
+   ]
+  },
+  {
+   "id": "c12",
+   "act": 3,
+   "title": "Down Into the Bowl",
+   "boss": true,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Bowlrock sits at the bottom of a ring of mountains. Only five spaces to come down."
+    },
+    {
+     "who": "ravi",
+     "text": "Three corridor tabs, all leaning toward your side. And fuel to watch."
+    },
+    {
+     "who": "bowlrock",
+     "text": "Bowlrock Tower. Most crews leave here with white knuckles. Show me yours."
+    }
+   ],
+   "outro": [
+    {
+     "who": "bowlrock",
+     "text": "Down in the bowl and still smiling. I owe you a coffee."
+    },
+    {
+     "who": "chief",
+     "text": "Act two done. The last season is the one that makes captains."
+    }
+   ],
+   "opponent": {
+    "cast": "bowlrock",
+    "portrait": "camp-bowlrock.webp",
+    "emoji": "⛰️",
+    "name": "Controller Gunnar Sted",
+    "personality": "Bowlrock Tower: gruff mountain veteran who enjoys watching crews sweat the tight turn.",
+    "aiLevel": "normal",
+    "aiStyle": "mountain-bowl",
+    "taunt": "Too fast for the bowl. The mountains always win the first round.",
+    "praise": "Hah! Dropped in like a stone and stopped like a feather."
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "bwr",
+    "scenario": "y2",
+    "seed": null
+   },
+   "twist": {
+    "id": "tilted-start",
+    "param": 1,
+    "text": "Boss rule: the plane starts tilted one step toward the pilot."
+   },
+   "goal": {
+    "type": "mission",
+    "value": "y2",
+    "text": "Land at Bowlrock: a 5-space dive, three tilt tabs and fuel above 0."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with at least 2 fuel left",
+     "test": {
+      "k": "fuel",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Spend at most 3 coffee tokens",
+     "test": {
+      "k": "coffeeSpent",
+      "op": "<=",
+      "v": 3
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": null,
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest, the boss rule is off and you start with 2 coffees."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "bowlrock",
+     "text": "Controller Gunnar Sted portrait"
+    },
+    {
+     "type": "act",
+     "id": "act3",
+     "text": "Act 3: The List"
+    }
+   ]
+  },
+  {
+   "id": "c13",
+   "act": 3,
+   "title": "Between the Storms",
+   "boss": false,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Final season. Your name is up for Cloudspire, where only eight crews are cleared."
+    },
+    {
+     "who": "chief",
+     "text": "First, Twin Spires: storm cells both sides, tabs that flip left and right."
+    },
+    {
+     "who": "ravi",
+     "text": "Level the axis between tabs. Keep tilt small and we can lean either way."
+    }
+   ],
+   "outro": [
+    {
+     "who": "chief",
+     "text": "A bumpy one, but the passengers will only remember the lightning."
+    }
+   ],
+   "opponent": {
+    "cast": null,
+    "portrait": "camp-spires.webp",
+    "emoji": "⛈️",
+    "name": "Twin Spires Tower",
+    "personality": "Night storms between two glass towers; tabs swing from side to side.",
+    "aiLevel": "normal",
+    "aiStyle": "storm-corridor"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "tws",
+    "scenario": "y6",
+    "seed": null
+   },
+   "twist": null,
+   "goal": {
+    "type": "mission",
+    "value": "y6",
+    "text": "Land at Twin Spires, meeting every corridor tab, with fuel above 0."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with at least 3 fuel left",
+     "test": {
+      "k": "fuel",
+      "op": ">=",
+      "v": 3
+     }
+    },
+    {
+     "text": "Land with a reroll token unused",
+     "test": {
+      "k": "rerolls",
+      "op": ">=",
+      "v": 1
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 2,
+     "text": "Help: you start with 2 coffee tokens."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest, the boss rule is off and you start with 2 coffees."
+   },
+   "unlock": [
+    {
+     "type": "table",
+     "id": "storm",
+     "text": "Storm-night panel skin"
+    }
+   ]
+  },
+  {
+   "id": "c14",
+   "act": 3,
+   "title": "The Silent Tower",
+   "boss": false,
+   "intro": [
+    {
+     "who": "ravi",
+     "text": "Palmreach is not answering the radio. Tail wind pushing us in fast."
+    },
+    {
+     "who": "chief",
+     "text": "The wind dial adds to your engine total every round. Tilt turns the dial."
+    },
+    {
+     "who": "chief",
+     "text": "And the spare reroll at 2000 feet is not on board today. Plan for it."
+    }
+   ],
+   "outro": [
+    {
+     "who": "ravi",
+     "text": "No tower, no problem. That was all you, Captain."
+    }
+   ],
+   "opponent": {
+    "cast": null,
+    "portrait": "camp-palmreach.webp",
+    "emoji": "🌴",
+    "name": "Palmreach (no reply)",
+    "personality": "A silent tower, warm rain and a tail wind that keeps adding speed.",
+    "aiLevel": "normal",
+    "aiStyle": "tailwind"
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "plm",
+    "scenario": "y3",
+    "seed": null
+   },
+   "twist": {
+    "id": "red-altitude",
+    "param": 1,
+    "text": "Flight rule: the 2000 ft reroll token is missing; only the 6000 ft one comes aboard."
+   },
+   "goal": {
+    "type": "mission",
+    "value": "y3",
+    "text": "Land at Palmreach with the tail wind, with only one reroll token on the whole track."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with at least 1 coffee left",
+     "test": {
+      "k": "coffee",
+      "op": ">=",
+      "v": 1
+     }
+    },
+    {
+     "text": "Touch down at least 2 under the brake value",
+     "test": {
+      "k": "brakeMargin",
+      "op": ">=",
+      "v": 2
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 2,
+     "text": "Help: you start with 2 coffee tokens."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest, the reroll is back on the track and you start with 2 coffees."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "ravi",
+     "text": "First Officer Okoro, storm gear portrait"
+    }
+   ]
+  },
+  {
+   "id": "c15",
+   "act": 3,
+   "title": "The Ninth Name",
+   "boss": true,
+   "intro": [
+    {
+     "who": "chief",
+     "text": "Cloudspire. A narrow valley, thin air, and a 60-second clock every round."
+    },
+    {
+     "who": "cloudspire",
+     "text": "Cloudspire Tower. Eight names on my list. Every one of them earned it."
+    },
+    {
+     "who": "cloudspire",
+     "text": "A supply plane is on the approach. I will not move it for you. Land, and you're ninth."
+    },
+    {
+     "who": "ravi",
+     "text": "Quick hands, Captain. Fuel, tabs, traffic. Together."
+    }
+   ],
+   "outro": [
+    {
+     "who": "cloudspire",
+     "text": "Kestrel four-one, down and stopped. I am writing a ninth name."
+    },
+    {
+     "who": "chief",
+     "text": "Captain Marlow, line check passed. Every airport on the map is yours now."
+    }
+   ],
+   "opponent": {
+    "cast": "cloudspire",
+    "portrait": "camp-cloudspire.webp",
+    "emoji": "🏔️",
+    "name": "Controller Aurel Kade",
+    "personality": "Cloudspire Tower: keeper of the list. Cool, exacting, quietly proud of his valley.",
+    "aiLevel": "hard",
+    "aiStyle": "valley-clock",
+    "taunt": "Not today. The list stays at eight.",
+    "praise": "Welcome to the list, Captain. Number nine."
+   },
+   "setup": {
+    "players": 2,
+    "seats": 1,
+    "role": 0,
+    "airport": "cls",
+    "scenario": "r1",
+    "seed": null
+   },
+   "twist": {
+    "id": "extra-plane",
+    "param": 1,
+    "text": "Boss rule: one extra plane waits on space 3 of the approach at the start."
+   },
+   "goal": {
+    "type": "mission",
+    "value": "r1",
+    "text": "Land at Cloudspire against the clock, with fuel above 0 and every plane cleared."
+   },
+   "hints": false,
+   "stars": [
+    {
+     "text": "Land safely",
+     "test": {
+      "k": "won"
+     }
+    },
+    {
+     "text": "Land with at least 2 fuel left",
+     "test": {
+      "k": "fuel",
+      "op": ">=",
+      "v": 2
+     }
+    },
+    {
+     "text": "Spend at most 3 coffee tokens",
+     "test": {
+      "k": "coffeeSpent",
+      "op": "<=",
+      "v": 3
+     }
+    }
+   ],
+   "easier": {
+    "aiLevel": "hard",
+    "twist": {
+     "id": "spare-coffee",
+     "param": 2,
+     "text": "Help: you start with 2 coffee tokens."
+    },
+    "setup": {},
+    "maxStars": 2,
+    "text": "Ravi flies at his sharpest, the boss rule is off and you start with 2 coffees."
+   },
+   "unlock": [
+    {
+     "type": "portrait",
+     "id": "cloudspire",
+     "text": "Controller Aurel Kade portrait"
+    },
+    {
+     "type": "title",
+     "id": "ninth-name",
+     "text": "Title: The Ninth Name"
+    },
+    {
+     "type": "table",
+     "id": "valley",
+     "text": "Cloudspire valley panel skin"
+    }
+   ]
+  }
+ ]
+}

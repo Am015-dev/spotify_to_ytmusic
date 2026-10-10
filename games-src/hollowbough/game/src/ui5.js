@@ -1,0 +1,158 @@
+// ===================== part 5: game flow (new game, turn driver, AI, one-card-at-a-time queue, save/load) =====================
+const SAVEKEY = 'hb_save1';
+function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 2600); }
+function setSeed(n) { UI.seed = n >>> 0; }
+function setAiSeed(n) { UI.aiSeed = n; }
+const DEF = { np: 2, level: 'normal', solo: 1 };
+function newGame(mode, o) {
+  mode = mode || 'vs'; o = Object.assign({}, UI.opt || DEF, o || {});
+  const cfg = { mode, np: o.np || 2, level: o.level || 'normal', solo: o.solo || 1, names: o.names };
+  if (mode === 'tutorial') cfg.tutorial = true; else { try { localStorage.setItem('hb_played', '1'); } catch (e) { } }
+  let players, solo = null;
+  if (mode === 'solo') { players = [{ name: 'You', ai: null }]; solo = { difficulty: cfg.solo }; }
+  else if (mode === 'tutorial') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
+  else if (mode === 'guided') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
+  else if (mode === 'hot') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: (cfg.names && cfg.names[i]) || 'Player ' + (i + 1), ai: null }); }
+  else if (mode === 'net') { players = o.players; }
+  else if (mode === 'ai') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: PNAMES[i], ai: cfg.level }); if (cfg.np < 2) players.push({ name: PNAMES[1], ai: cfg.level }); }
+  else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
+  if (o.camp && mode === 'vs') { const cn = o.camp.names || []; players.forEach((p, i) => { if (i > 0 && cn[i - 1]) p.name = cn[i - 1]; }); }
+  G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
+  if (o.camp) campTwist(o.camp);
+  if (mode === 'tutorial') tutStage(G);
+  UI.seed = null;
+  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.sel = null; UI.fingerSeen = false; UI.passArm = 0; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
+  UI.holder = hotSeat() ? -1 : -1;
+  UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
+  UI.coachOn = false;
+  if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.reset(); GXH.setEnabled(true); } }   // the guided game: every first-time bubble on
+  const st = $('#start'); if (st) st.hidden = true;
+  closePop(); fxClear(); try { GX.close(); } catch (e) { }
+  kitNewGame();
+  render(); schedule();
+  return G;
+}
+function kitNewGame() { GX.undo.clear(); recapSeats(); UI.t0 = Date.now(); UI.resultDone = false; UI.earned = null; }
+function render() {
+  if (!G || !UI.started) return;
+  { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
+  try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
+  UI.mmc = null; renderBoard(); renderCard(); renderDrawers();
+  if (NET.on) netRenderHook();
+  if (typeof hlpAfter === 'function') hlpAfter();
+}
+// ---- one-card-at-a-time queue
+function pushCard(c) { UI.cards.push(c); closePop(); render(); }
+function renderCard() {
+  const pc = $('#pc'); if (!pc) return;
+  if (!UI.cards.length) { pc.hidden = true; pc.innerHTML = ''; pc.removeAttribute('data-card'); return; }
+  const c = UI.cards[0]; pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', c.kind);
+  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', c.title), c.sub ? h('span', c.sub) : null)));
+  const body = h('div.ph-body'); const b = typeof c.body === 'function' ? c.body() : c.body; add(body, b);
+  const btns = h('div.cbtns');
+  (c.buttons || [{ label: 'Continue', a: 'cont' }]).forEach(x => btns.appendChild(h('button.btn.go' + (x.cls ? '.' + x.cls : ''), Object.assign({ 'data-a': x.a, type: 'button' }, x.at || {}), x.label)));
+  body.appendChild(btns); pc.appendChild(body);
+}
+function nextCard() { const c = UI.cards.shift(); if (c && c.onDone) c.onDone(); render(); schedule(); }
+function takeDevice() { const c = UI.cards.shift(); UI.holder = c && c.seat != null ? c.seat : HB.actor(G); render(); schedule(); }
+// ---- driver
+function schedule() {
+  clearTimeout(UI.tm); clearTimeout(UI.tr); UI.tm = 0;
+  if (!G || !UI.started || (UI.cards.length && !NET.on)) return;
+  if (G.phase === 'over') { if (!UI.overShown) { UI.overShown = true; queueOver(); const w = G.over; snd(G.grim ? (w.win ? 'fanfare' : 'lose') : 'fanfare', { duck: true }); sndMusic(); } return; }
+  const a = HB.actor(G), p = G.players[a], hs = humans();
+  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? Math.round(AIDELAY * .4) : 0); return; }
+  if (hotSeat() && UI.holder !== a) {
+    UI.holder = -1; closePop(); render();
+    pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
+    return;
+  }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
+  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
+}
+function aiStep() {
+  UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
+  const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
+  let m;
+  try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
+  const tok = UI.animTok = (UI.animTok || 0) + 1;
+  const go = src => { if (tok !== UI.animTok) return; UI.animBusy = false; aiApply(m, a, src); };
+  if (!ANIM) { go(null); return; }
+  UI.animBusy = true; aiFly(m, a, go);
+}
+// the computer's move: a worker flies to its place, a card flies to its city (about 0.6 s), then the move happens
+function aiFly(m, a, done) {
+  const chip = seatRect(a); if (!chip || !UI.lay) { done(null); return; }
+  let from = chip, to = null, node = null, src = chip;
+  if (m.type === 'worker' && m.k !== 'dest') {
+    const kind = m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k;
+    to = UI.tiles[kind + ':' + (m.k === 'haven' || m.k === 'journey' ? 0 : m.i)]; node = pawn(a, 28); src = to;
+  } else if (m.type === 'play') {
+    const mr = m.from === 'meadow' ? UI.cr['m' + m.card] : null;
+    from = mr || { x: UI.lay.W / 2 - 24, y: UI.lay.H * .55, w: 48, h: 64 }; to = chip; node = cardEl(m.card, 48); src = mr || chip;
+  }
+  if (!to || !node || !from) { done(src); return; }
+  fxFly(node, from, to, Math.max(140, Math.min(600, Math.round(AIDELAY * .9))), () => done(src));
+}
+function aiApply(m, a, src) {
+  const n0 = G.logN, pre = sndPre(), fpre = fxPre(a);
+  let r = HB.apply(G, m);
+  if (r.ok) sndPost(pre, m, a);
+  if (!r.ok) { const ms = HB.moves(G, a); m = ms[0]; r = HB.apply(G, m); }
+  const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
+  GX.recap.push(ls, a);
+  afterMove();
+  try { fxPost(fpre, m, src); fxLand(m, a, src, seatRect(a)); } catch (e) { console.error(e); }
+}
+function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
+function act(m) {
+  if (!G || !m) return; const a = HB.actor(G);
+  if (isClient()) { netAct(m); return; }
+  if (NET.on && a !== NET.mySeat) return;
+  const n0 = G.logN, src = UI.fxSrc; UI.fxSrc = null;
+  const pre = sndPre(), fpre = fxPre(a), chip0 = seatRect(a);
+  if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
+  const r = HB.apply(G, m);
+  closePop(); UI.rec = null;
+  if (r.ok) sndPost(pre, m, a);
+  if (!r.ok) { snd('error'); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
+  UI.lastAi = ''; afterMove();
+  try { fxPost(fpre, m, src); fxLand(m, a, src, chip0); } catch (e) { console.error(e); }
+}
+// ---- end of game: one card per player, then the result
+function queueOver() {
+  const ov = G.over; if (!ov) return;
+  GX.undo.clear(); GX.recap.clear(); kitResult();
+  const rows = (sc, name, s) => {
+    const l = [['Printed card points', sc.cards], ['Point tokens', sc.tokens], ['Prosperity bonuses', sc.bonus], ['Events', sc.events], ['The Long Road', sc.journey]];
+    const t = h('div.score');
+    l.forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v))));
+    if (sc.detail && sc.detail.length) t.appendChild(h('p.sm', 'Bonuses: ' + sc.detail.map(d => cname(d.card) + ' +' + d.bonus).join(', ')));
+    t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', sc.total)));
+    return t;
+  };
+  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40), h('img.hero-tree', { src: 'models/ever-tree.webp', alt: '', draggable: 'false' })), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
+  if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
+  const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
+  UI.cards.push({
+    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: 'The game is over',
+    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
+    buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
+  });
+  if (!(UI.cfg && UI.cfg.tutorial)) clearSave(); render();
+}
+// ---- save / load
+function save() { try { if (!G || G.phase === 'over' || NET.on || (UI.cfg && UI.cfg.tutorial)) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); if (!UI.savedFlag) { UI.savedFlag = 1; GNS.saved(GAME_ID, true); } } catch (e) { } }
+function clearSave() { try { localStorage.removeItem(SAVEKEY); UI.savedFlag = 0; GNS.saved(GAME_ID, false); } catch (e) { } }
+function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
+function loadSave() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVEKEY)); if (!s || !s.G) return false;
+    G = s.G; UI.mode = s.mode; UI.cfg = s.cfg; UI.coach = s.coach || { level: 'full', seen: {} }; UI.coachOn = !!s.coachOn;
+    UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0;
+    const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { }
+    kitNewGame();
+    render(); schedule(); return true;
+  } catch (e) { return false; }
+}

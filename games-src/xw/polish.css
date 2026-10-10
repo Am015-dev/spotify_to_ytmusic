@@ -1,0 +1,94 @@
+/* ===== Nebula Aces visual polish: cockpit-glass panels, enamel buttons, SVG icons, d8 dice, pilot cards ===== */
+:root{--glass:linear-gradient(180deg,rgba(40,36,92,.55),rgba(14,12,40,.7));--edge:rgba(160,170,255,.22);--edge2:rgba(255,255,255,.07);
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.ico{width:18px;height:18px;flex:0 0 auto;vertical-align:-3px;display:inline-block}
+.icw{display:inline-flex;align-items:center;gap:.35em}
+.btn .ico,.gx-ibtn .ico{filter:drop-shadow(0 0 4px rgba(127,180,255,.25))}
+/* top bar: deep hull plating with a thin gold running light */
+.gx-bar{background:var(--noise),radial-gradient(1px 1px at 12% 30%,rgba(255,255,255,.5),transparent 60%),radial-gradient(1px 1px at 63% 70%,rgba(255,255,255,.4),transparent 60%),radial-gradient(1px 1px at 84% 20%,rgba(255,255,255,.35),transparent 60%),linear-gradient(180deg,#221a52 0%,#150f38 60%,#0f0b2a 100%);
+  border-bottom:1px solid rgba(255,200,107,.65);box-shadow:0 1px 0 rgba(255,200,107,.15),0 6px 24px rgba(0,0,0,.45)}
+.gx-bar h1{font-family:Orbitron,"Exo 2",sans-serif;font-weight:800;letter-spacing:.07em;background:linear-gradient(180deg,#fff2cf 0%,#ffc86b 55%,#d98a2a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px rgba(255,190,90,.35))}
+/* enamel buttons with hover lift and press */
+.btn{background:linear-gradient(180deg,rgba(64,58,130,.95),rgba(30,27,72,.95));border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.35);
+  transition:transform .12s ease,box-shadow .15s ease,border-color .15s ease,background .15s ease}
+.btn:hover:not([disabled]){border-color:rgba(255,200,107,.8);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 0 1px rgba(255,200,107,.25),0 4px 14px rgba(0,0,0,.4)}/* no hover lift: a moving hit box can flicker hover on and off under a still pointer */
+.btn:active:not([disabled]){transform:translateY(1px);box-shadow:inset 0 2px 5px rgba(0,0,0,.5)}
+.btn.primary{background:linear-gradient(180deg,#ffe2a6 0%,#ffc569 45%,#e9962f 100%);border-color:#ffe6b0;color:#231205;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(140,70,10,.45),0 3px 12px rgba(255,170,60,.3)}
+.btn.primary:hover:not([disabled]){box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 0 18px rgba(255,190,90,.45),0 4px 14px rgba(0,0,0,.35)}
+.btn.ghost{background:transparent;box-shadow:none}
+.btn.on{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(255,200,107,.45),0 0 12px rgba(255,200,107,.2)}
+.gx-ibtn{background:linear-gradient(180deg,rgba(60,55,120,.7),rgba(26,24,62,.8));border:1px solid var(--edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);transition:border-color .15s,transform .12s}
+.gx-ibtn:hover{border-color:rgba(255,200,107,.7)}.gx-ibtn:active{transform:translateY(1px)}
+#gfxbtn span{font-size:.85rem}
+/* dock and drawers: cockpit glass */
+.gx-dock{background:var(--noise),radial-gradient(120% 60% at 50% 0%,rgba(90,70,190,.22),transparent 60%),linear-gradient(180deg,#171440 0%,#100e2e 100%);border-left:1px solid rgba(160,170,255,.25);box-shadow:inset 1px 0 0 rgba(255,255,255,.05),-10px 0 30px rgba(0,0,0,.35)}
+.gx-dock-head{background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);border-bottom:1px solid rgba(160,170,255,.18)}
+.gx-dock-top{background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.05));border-bottom:1px solid rgba(160,170,255,.15)}
+.gx-drawer{background:var(--noise),linear-gradient(180deg,#1a1746,#0f0d2c);border:1px solid rgba(255,200,107,.55);box-shadow:0 0 0 1px rgba(0,0,0,.4),0 24px 70px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08)}
+.gx-drawer-head{background:linear-gradient(180deg,rgba(255,200,107,.12),transparent);border-bottom:1px solid rgba(255,200,107,.25)}
+.gx-drawer-head h2{font-family:Orbitron,"Exo 2",sans-serif;letter-spacing:.06em;text-shadow:0 0 12px rgba(255,190,90,.35)}
+.dlg{background:var(--noise),radial-gradient(90% 50% at 50% 0%,rgba(110,80,210,.28),transparent 70%),linear-gradient(180deg,#1b1848,#0e0c2a);border:1px solid rgba(255,200,107,.65);box-shadow:0 0 0 1px rgba(0,0,0,.5),0 30px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.1)}
+.dlg h1{font-family:Orbitron,"Exo 2",sans-serif;background:linear-gradient(180deg,#fff2cf,#ffc86b 60%,#d98a2a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(255,190,90,.35));text-shadow:none}
+#modal:not(.hidden) .dlg{animation:dlgIn .28s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes dlgIn{from{transform:translateY(14px) scale(.97)}to{transform:none}}
+.nowbox{background:linear-gradient(180deg,rgba(255,200,107,.11),rgba(255,200,107,.02) 45%,rgba(0,0,0,.08));border:1px solid rgba(255,200,107,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(0,0,0,.35),0 6px 20px rgba(0,0,0,.3)}
+.box,.recap,.note,.coach,.result,.brief,.preview,.roadinfo{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 3px 10px rgba(0,0,0,.25)}
+.road .ph,.qc,.road .rn{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s,background .2s}
+.road .ph.on{background:linear-gradient(180deg,rgba(255,200,107,.3),rgba(255,200,107,.1))}
+/* dial buttons: bevelled keycaps */
+.mv{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(0,0,0,.25),0 2px 5px rgba(0,0,0,.45);transition:transform .1s,box-shadow .15s}
+.mv.w{background:linear-gradient(180deg,#ffffff,#d8dcf0)}.mv.g{background:linear-gradient(180deg,#7df5b0,#2fc873)}.mv.r{background:linear-gradient(180deg,#ff8a86,#e23c3c)}
+.mv:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 0 0 2px rgba(127,212,255,.5),0 4px 10px rgba(0,0,0,.4)}.mv:active{transform:translateY(1px)}
+/* name tags on the board: small glass plaques with a faction edge */
+.tag{background:linear-gradient(180deg,rgba(30,28,70,.88),rgba(8,8,24,.9));border:1px solid rgba(255,255,255,.14);border-bottom:2px solid var(--c0);box-shadow:0 3px 10px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(2px)}
+.tag.s1{border-bottom-color:var(--c1)}.tag b{font-family:"Exo 2",sans-serif;letter-spacing:.02em}
+.tag.on{box-shadow:0 0 0 2px var(--gold),0 0 16px rgba(255,200,107,.45)}.tag.coach{border:1px solid var(--gold)}
+.viewbar .btn,.legend{background:linear-gradient(180deg,rgba(40,36,92,.78),rgba(12,10,34,.82));backdrop-filter:blur(3px)}
+/* eight-sided dice */
+.dice{gap:8px}
+.die,.die.atk,.die.def{width:48px;height:54px;border:0;border-radius:0;background:none no-repeat center 42%/112% auto;flex-direction:column;justify-content:flex-start;animation:dieIn .45s cubic-bezier(.2,.8,.3,1.25) backwards;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55))}
+.die .d8{width:44px;height:46px;display:block}
+.die i{font:700 .55rem "Exo 2",sans-serif;letter-spacing:.06em;color:#fff;opacity:.9;margin-top:-2px;text-shadow:0 1px 2px #000}
+.dice3d .die .d8{visibility:hidden}
+.die.blank{opacity:.62}.die:nth-child(2){animation-delay:.06s}.die:nth-child(3){animation-delay:.12s}.die:nth-child(4){animation-delay:.18s}.die:nth-child(5){animation-delay:.24s}
+@keyframes dieIn{from{transform:translateY(-8px) rotate(-100deg) scale(.7)}to{transform:none}}
+@media (max-width:999px){.dice{gap:5px;margin:.15rem 0}.dice .die{width:36px;height:38px;font-size:1rem}.die .d8{width:32px;height:30px}.dice .die i{font-size:.5rem;margin-top:-3px}.dice3d .dice .die{background-position:center 30%;background-size:100% auto}}
+/* pilot cards: frame, title bar with the skill gem, art window, type line, stat bar and text box */
+.card.pcard{padding:0;overflow:hidden;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:linear-gradient(180deg,#1f1c4c,#131132);box-shadow:0 0 0 1px rgba(0,0,0,.5),0 6px 16px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);--fc:var(--c0)}
+.card.pcard.fc1{--fc:var(--c1)}.card.pcard.fc2{--fc:var(--c2)}.card.pcard.on{box-shadow:0 0 0 2px var(--gold),0 6px 18px rgba(0,0,0,.45)}
+.pc-title{display:flex;align-items:center;gap:.45rem;padding:.3rem .5rem;background:linear-gradient(90deg,color-mix(in srgb,var(--fc) 55%,#000) 0%,rgba(20,18,50,.9) 100%);border-bottom:1px solid rgba(0,0,0,.5)}
+.pc-title b{font-family:Orbitron,"Exo 2",sans-serif;font-size:.86rem;letter-spacing:.03em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-ps{display:inline-flex;align-items:center;justify-content:center;width:1.75rem;height:1.75rem;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe7b0,#f09a2a 60%,#8a4a0a);color:#241002;font:800 .85rem Orbitron,sans-serif;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 10px rgba(255,170,60,.4)}
+.pc-uq{color:var(--gold);font-size:.75rem}
+.pc-art{height:84px;margin:.35rem .45rem 0;border-radius:8px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:var(--fc);overflow:hidden;
+  background:radial-gradient(1px 1px at 20% 30%,#fff,transparent 70%),radial-gradient(1px 1px at 70% 60%,#fff,transparent 70%),radial-gradient(80% 90% at 30% 20%,color-mix(in srgb,var(--fc) 35%,transparent),transparent 70%),radial-gradient(100% 100% at 80% 100%,rgba(80,120,255,.3),transparent 60%),#070618;box-shadow:inset 0 0 20px rgba(0,0,0,.7)}
+.pc-art img{height:124%;width:auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.6))}.pc-art svg{width:70%;height:auto}
+.pc-type{margin:.3rem .5rem .15rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#e8e4ff;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:.2rem}.pc-type span{color:var(--muted);text-transform:none;letter-spacing:0}
+.pcard>.stats{display:block;margin:0 .45rem .15rem}.pc-text{margin:.2rem .45rem .45rem;padding:.3rem .45rem;border-radius:8px;background:rgba(0,0,0,.25);box-shadow:inset 0 1px 3px rgba(0,0,0,.4)}.pc-text p{margin:.15rem 0}.pc-text:empty{display:none}
+.stats span{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 1px 2px rgba(0,0,0,.4)}
+.shipc,.shipc.two>div{background:linear-gradient(180deg,rgba(40,36,92,.6),rgba(18,16,46,.7));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.pop{font-family:Orbitron,"Exo 2",sans-serif;text-shadow:0 0 10px currentColor,0 2px 0 #000,0 0 2px #000}
+@media (prefers-reduced-motion:reduce){.die,.die.atk,.die.def,#modal:not(.hidden) .dlg{animation:none}.btn,.mv{transition:none}}
+.launchbar{background:linear-gradient(180deg,#1f1b50 70%,rgba(31,27,80,0));padding-bottom:.4rem}
+/* ---- online play ---- */
+.online{border:1px solid var(--line);border-radius:10px;padding:.45rem .6rem;background:rgba(255,255,255,.03)}
+.online>p{margin:.1rem 0 .4rem}
+.online.hl{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.25)}
+.online .row{align-items:center}.online input,.invrow input{font:inherit;background:var(--panel2);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:.35rem .5rem;min-width:0}
+.online #netname{flex:1 1 8rem;max-width:12rem}.online #joincode{flex:1 1 6rem;max-width:9rem;text-transform:lowercase}
+.lobby .launchbar h2{margin:0;font-size:1.3rem}.lobby .x{margin-left:auto;font-size:1rem;padding:.3rem .6rem}
+.lobby .code,.online .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.15em;letter-spacing:.12em;color:var(--gold)}
+.invrow{align-items:center;flex-wrap:nowrap}.invrow .btn{white-space:nowrap;flex:none}.invrow input{flex:1 1 auto;width:100%}
+.plist{margin:.2rem 0 .4rem;padding-left:1.2rem}.plist li{margin:.1rem 0}
+.nb-dot{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#4fe08a;box-shadow:0 0 6px #4fe08a;margin-right:.3rem;vertical-align:middle}.nb-dot.off{background:#ffb347;box-shadow:0 0 6px #ffb347}
+.netbar{flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.2rem .4rem;margin:0 0 .3rem;border-radius:8px;background:rgba(80,200,255,.07);border:1px solid rgba(120,200,255,.2);line-height:1.5}.netbar.hidden{display:none}.netbar .btn.sm{padding:.1rem .45rem;font-size:.78rem;margin-left:.3rem}
+.netwait{display:flex;flex-wrap:wrap;gap:.3rem;margin:.1rem 0 .35rem;color:var(--muted)}.netwait .nw{border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem}.netwait .nw.ok{border-color:rgba(79,224,138,.55);color:#9ff0c0}
+
+.road .ph .sh{display:none}
+/* ---- painted title / end banners (media.js sets the --na-* variables; the panel keeps its colour if a file is missing) ---- */
+.dlg.start{background-image:linear-gradient(180deg,rgba(14,12,42,.62) 0,rgba(14,12,42,.4) 60px,rgba(14,12,42,.74) 150px,#0e0c2a 235px),var(--na-title,none);background-size:100% 260px,100% 260px;background-repeat:no-repeat;background-position:top,center top;background-color:#0e0c2a}
+
+.dlg.debrief{background-image:linear-gradient(180deg,rgba(14,12,42,.05) 0,rgba(14,12,42,.4) 110px,#0e0c2a 220px),var(--na-end-win,none);background-size:100% 230px,100% 230px;background-repeat:no-repeat;background-position:top,center top;background-color:#0e0c2a;padding-top:150px}
+.dlg.debrief[data-end=lose]{background-image:linear-gradient(180deg,rgba(14,12,42,.05) 0,rgba(14,12,42,.4) 110px,#0e0c2a 220px),var(--na-end-lose,none)}
+/* flat (simple) board shows the painted table under the map */
+body.flat .gx-board{background:#05040f var(--tbl-flat,none) center/cover no-repeat}

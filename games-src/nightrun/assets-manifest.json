@@ -1,0 +1,532 @@
+[
+ {
+  "file": "kit-sc.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Wing Cannons: twin side cannons. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-rg.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Rear Guard: a gun pointing backwards. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-pc.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Piercer: a shot passing through two targets. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-cl.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Arc Chain: lightning jumping between targets. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-bt.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Chrono Dash: a clock or hourglass with a dash trail. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-rc.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Ricochet: a shot bouncing off a wall. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-as.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Aegis: a shield bubble. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-bd.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Orbit Guns: small guns circling a ship. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-hm.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Seeker Shots: a curving homing missile. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-sm.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Score Magnet: a magnet pulling score numbers. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-ni.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Neon Interest: a neon crystal with a plus or coin stack. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-lk.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Fortune: a four-leaf clover or dice, lucky drops. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-wn.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Second Wind: a heart with wings or a lung. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-og.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "Overdrive Core: a glowing reactor core. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "kit-ec.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage kit perks",
+  "status": "WIRED",
+  "where": "Garage TUNE and LOAD cards (the line icon until this exists)",
+  "notes": "EMP Cell: a battery with a lightning bolt. Square, transparent, same painted style as pk-*.webp.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-weapon-forge.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Weapon Forge: an anvil with a weapon module. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-contracts.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Contracts: a clipboard or mission card. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-pilot-ranks.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Pilot Ranks: rank chevrons. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-boss-trophies.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Boss Trophies: a trophy with a boss head. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-ship-skins.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Ship Skins: a spray can or paint swatch. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-squad-roster.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Squad Roster: three small wingmen. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "soon-leaderboards.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Garage SOON cards",
+  "status": "WIRED",
+  "where": "Garage SOON tab (a vector icon until this exists)",
+  "notes": "Leaderboards: a podium. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "medal-bronze.webp",
+  "w": 160,
+  "h": 160,
+  "group": "Stage medals",
+  "status": "WIRED",
+  "where": "Stage clear screen (a vector medal until this exists)",
+  "notes": "A round medal with ribbon, transparent. Bronze/silver/gold.",
+  "kind": "icon"
+ },
+ {
+  "file": "medal-silver.webp",
+  "w": 160,
+  "h": 160,
+  "group": "Stage medals",
+  "status": "WIRED",
+  "where": "Stage clear screen (a vector medal until this exists)",
+  "notes": "A round medal with ribbon, transparent. Bronze/silver/gold.",
+  "kind": "icon"
+ },
+ {
+  "file": "medal-gold.webp",
+  "w": 160,
+  "h": 160,
+  "group": "Stage medals",
+  "status": "WIRED",
+  "where": "Stage clear screen (a vector medal until this exists)",
+  "notes": "A round medal with ribbon, transparent. Bronze/silver/gold.",
+  "kind": "icon"
+ },
+ {
+  "file": "diff-easy.webp",
+  "w": 96,
+  "h": 96,
+  "group": "Difficulty badges",
+  "status": "WIRED",
+  "where": "Title difficulty button and LAB (a vector badge until this exists)",
+  "notes": "Easy badge, escalating from plain to flaming/legendary. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "diff-normal.webp",
+  "w": 96,
+  "h": 96,
+  "group": "Difficulty badges",
+  "status": "WIRED",
+  "where": "Title difficulty button and LAB (a vector badge until this exists)",
+  "notes": "Normal badge, escalating from plain to flaming/legendary. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "diff-hard.webp",
+  "w": 96,
+  "h": 96,
+  "group": "Difficulty badges",
+  "status": "WIRED",
+  "where": "Title difficulty button and LAB (a vector badge until this exists)",
+  "notes": "Hard badge, escalating from plain to flaming/legendary. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "diff-vhard.webp",
+  "w": 96,
+  "h": 96,
+  "group": "Difficulty badges",
+  "status": "WIRED",
+  "where": "Title difficulty button and LAB (a vector badge until this exists)",
+  "notes": "Very hard badge, escalating from plain to flaming/legendary. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "diff-legend.webp",
+  "w": 96,
+  "h": 96,
+  "group": "Difficulty badges",
+  "status": "WIRED",
+  "where": "Title difficulty button and LAB (a vector badge until this exists)",
+  "notes": "Legend badge, escalating from plain to flaming/legendary. Square, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "chest-closed.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Boss chest reveal",
+  "status": "WIRED",
+  "where": "Boss chest after every district boss (vector chest and cards until this exists)",
+  "notes": "A glowing sealed chest, transparent.",
+  "kind": "icon"
+ },
+ {
+  "file": "chest-open.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Boss chest reveal",
+  "status": "WIRED",
+  "where": "Boss chest after every district boss (vector chest and cards until this exists)",
+  "notes": "The same chest opened with light pouring out.",
+  "kind": "icon"
+ },
+ {
+  "file": "card-back.webp",
+  "w": 192,
+  "h": 256,
+  "group": "Boss chest reveal",
+  "status": "WIRED",
+  "where": "Boss chest after every district boss (vector chest and cards until this exists)",
+  "notes": "Card back with the Nightrun mark.",
+  "kind": "icon"
+ },
+ {
+  "file": "card-frame.webp",
+  "w": 192,
+  "h": 256,
+  "group": "Boss chest reveal",
+  "status": "WIRED",
+  "where": "Boss chest after every district boss (vector chest and cards until this exists)",
+  "notes": "Empty card frame with a rarity glow area.",
+  "kind": "icon"
+ },
+ {
+  "file": "spr-en-leader.webp",
+  "w": 256,
+  "h": 163,
+  "group": "Enemies",
+  "status": "WIRED",
+  "where": "Squad leaders (a gold-tinted drone until this exists)",
+  "notes": "Same drone silhouette, bigger, gold trim, command antenna. Faces LEFT, transparent, 256 px wide.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fx-crown.webp",
+  "w": 96,
+  "h": 64,
+  "group": "Effects",
+  "status": "WIRED",
+  "where": "Crown above squad leaders (a vector crown until this exists)",
+  "notes": "Gold crown on black (drawn additively).",
+  "kind": "fx"
+ },
+ {
+  "file": "fx-orb-homing.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects",
+  "status": "WIRED",
+  "where": "Homing gunship shots (a white ring until this exists)",
+  "notes": "Lime orb with a white swirl ring, light on black (additive).",
+  "kind": "fx"
+ },
+ {
+  "file": "fx-shield-link.webp",
+  "w": 256,
+  "h": 32,
+  "group": "Effects",
+  "status": "WIRED",
+  "where": "Planned: shield link between leader and squad (code-drawn dashes now)",
+  "notes": "Tileable cyan energy beam, light on black.",
+  "kind": "fx"
+ },
+ {
+  "file": "ship-drift.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Planned ships",
+  "status": "WIRED",
+  "where": "Garage ship card (a vector icon until this exists); the ship is playable now",
+  "notes": "Drift: a new ship with its own firing rhythm. Square portrait.",
+  "kind": "icon"
+ },
+ {
+  "file": "spr-ship-drift.webp",
+  "w": 256,
+  "h": 90,
+  "group": "Planned ships",
+  "status": "WIRED",
+  "where": "In-run sprite (the stretched coloured hull until this exists); the ship is playable now",
+  "notes": "Drift: nose pointing RIGHT, 256 px wide, transparent.",
+  "kind": "sprite"
+ },
+ {
+  "file": "ship-lancer.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Planned ships",
+  "status": "WIRED",
+  "where": "Garage ship card (a vector icon until this exists); the ship is playable now",
+  "notes": "Lancer: a new ship with its own firing rhythm. Square portrait.",
+  "kind": "icon"
+ },
+ {
+  "file": "spr-ship-lancer.webp",
+  "w": 256,
+  "h": 90,
+  "group": "Planned ships",
+  "status": "WIRED",
+  "where": "In-run sprite (the stretched coloured hull until this exists); the ship is playable now",
+  "notes": "Lancer: nose pointing RIGHT, 256 px wide, transparent.",
+  "kind": "sprite"
+ },
+ {
+  "file": "ship-nova.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Planned ships",
+  "status": "WIRED",
+  "where": "Garage ship card (a vector icon until this exists); the ship is playable now",
+  "notes": "Nova: a new ship with its own firing rhythm. Square portrait.",
+  "kind": "icon"
+ },
+ {
+  "file": "spr-ship-nova.webp",
+  "w": 256,
+  "h": 90,
+  "group": "Planned ships",
+  "status": "WIRED",
+  "where": "In-run sprite (the stretched coloured hull until this exists); the ship is playable now",
+  "notes": "Nova: nose pointing RIGHT, 256 px wide, transparent.",
+  "kind": "sprite"
+ },
+ {
+  "file": "spr-boss-tresor-wart.webp",
+  "w": 512,
+  "h": 330,
+  "group": "Mini-bosses",
+  "status": "WIRED",
+  "where": "Planned: own sprite (re-uses another boss sprite now)",
+  "notes": "Tresor-Wart (Bankenviertel mini-boss). Faces LEFT, 512 px wide, transparent.",
+  "kind": "sprite"
+ },
+ {
+  "file": "boss-tresor-wart.webp",
+  "w": 384,
+  "h": 384,
+  "group": "Mini-bosses",
+  "status": "WIRED",
+  "where": "Planned: boss intro portrait",
+  "notes": "Tresor-Wart (Bankenviertel mini-boss). Square portrait.",
+  "kind": "icon"
+ },
+ {
+  "file": "spr-boss-messe-waechter.webp",
+  "w": 512,
+  "h": 330,
+  "group": "Mini-bosses",
+  "status": "WIRED",
+  "where": "Planned: own sprite (re-uses another boss sprite now)",
+  "notes": "Messe-Waechter (Messe mini-boss). Faces LEFT, 512 px wide, transparent.",
+  "kind": "sprite"
+ },
+ {
+  "file": "boss-messe-waechter.webp",
+  "w": 384,
+  "h": 384,
+  "group": "Mini-bosses",
+  "status": "WIRED",
+  "where": "Planned: boss intro portrait",
+  "notes": "Messe-Waechter (Messe mini-boss). Square portrait.",
+  "kind": "icon"
+ },
+ {
+  "file": "ly-phone-bankenviertel.webp",
+  "w": 768,
+  "h": 600,
+  "group": "Portrait parallax",
+  "status": "WIRED",
+  "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
+  "notes": "bankenviertel: a keyed strip seen from above, tileable vertically, transparent sky.",
+  "kind": "layer"
+ },
+ {
+  "file": "ly-phone-mainufer.webp",
+  "w": 768,
+  "h": 600,
+  "group": "Portrait parallax",
+  "status": "WIRED",
+  "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
+  "notes": "mainufer: a keyed strip seen from above, tileable vertically, transparent sky.",
+  "kind": "layer"
+ },
+ {
+  "file": "ly-phone-ostend.webp",
+  "w": 768,
+  "h": 600,
+  "group": "Portrait parallax",
+  "status": "WIRED",
+  "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
+  "notes": "ostend: a keyed strip seen from above, tileable vertically, transparent sky.",
+  "kind": "layer"
+ },
+ {
+  "file": "ly-phone-messe.webp",
+  "w": 768,
+  "h": 600,
+  "group": "Portrait parallax",
+  "status": "WIRED",
+  "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
+  "notes": "messe: a keyed strip seen from above, tileable vertically, transparent sky.",
+  "kind": "layer"
+ },
+ {
+  "file": "ly-phone-athina.webp",
+  "w": 768,
+  "h": 600,
+  "group": "Portrait parallax",
+  "status": "WIRED",
+  "where": "Planned: painted scrolling layer for the phone-upright view (only the backdrop scrolls there now)",
+  "notes": "athina: a keyed strip seen from above, tileable vertically, transparent sky.",
+  "kind": "layer"
+ }
+]
