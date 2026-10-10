@@ -557,6 +557,34 @@ html.ph #feat .ft{max-width:none}
 .kofi:hover{filter:brightness(1.08)}
 .support{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
 .support p{margin:0;max-width:52ch}
+/* What's new */
+.upd{position:absolute;left:3%;top:3%;padding:.28em .55em;border-radius:.4em;background:var(--brass);color:#2a1a0c;font:800 .62em/1 var(--body);letter-spacing:.02em;box-shadow:0 .1em .3em rgba(0,0,0,.5);transform:rotate(-6deg);z-index:2;pointer-events:none}
+.pl-t .upd-d{display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:var(--brass);vertical-align:middle}
+.wnbadge{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e23b2e;color:#fff6c8;font:800 .7rem/18px var(--body);text-align:center;box-shadow:0 0 0 2px var(--hdr)}
+#wnback{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55)}
+#wnpanel{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 24px));max-height:min(720px,calc(100dvh - 24px));display:flex;flex-direction:column;border-radius:14px;background:#241810;color:#f4ead8;border:1.5px solid var(--brass);box-shadow:0 14px 40px rgba(0,0,0,.6);overflow:hidden}
+#wnpanel[hidden],#wnback[hidden]{display:none}
+#wnpanel .wnh{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 8px 14px;border-bottom:1px solid #4a3326}
+#wnpanel h2{font:400 1rem var(--display);margin:0;color:#f0c05a}
+#wnpanel .wnx{font:700 1.1rem var(--body);width:44px;height:44px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer}
+#wnbody{overflow:auto;overscroll-behavior:contain;padding:6px 12px 14px;-webkit-overflow-scrolling:touch}
+#wnbody .wnd{font:500 .78rem var(--mono);color:#bca78c;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+#wnbody .wne{border:1.5px solid #4a3326;border-radius:12px;padding:10px;margin-bottom:8px;background:rgba(255,255,255,.03)}
+#wnbody .wne.done{opacity:.7}
+#wnbody .wnt{display:flex;align-items:center;gap:10px}
+#wnbody .wnt img,#wnbody .wnt .wns{width:44px;height:44px;border-radius:8px;object-fit:cover;flex:none;background:#3a2a1c;display:grid;place-items:center;font-size:1.4rem}
+#wnbody .wnt b{display:block;font:800 .95rem/1.2 var(--body)}
+#wnbody .wnt small{font:500 .78rem var(--mono);color:#bca78c}
+#wnbody ul{margin:8px 0 6px;padding-left:20px;font:500 .9rem/1.35 var(--body)}
+#wnbody li{margin:2px 0}
+#wnbody .wnc{font:600 .86rem/1.3 var(--body);color:#e0c690;margin:0 0 8px}
+#wnbody .wnr{display:flex;gap:8px;flex-wrap:wrap}
+#wnbody .wnr button{font:800 .88rem var(--body);min-height:44px;padding:0 16px;border-radius:10px;cursor:pointer}
+#wnbody .wnp{background:var(--brass);border:0;color:#1d1208}
+#wnbody .wnk{background:transparent;border:1.5px solid #4a3326;color:#f4ead8}
+#wnbody .wnk[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
+#wnbody .wnf{width:100%;text-align:left;font:700 .9rem var(--body);min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;margin-top:12px}
+#wnbody .wnempty{font:500 .9rem var(--body);color:#bca78c;padding:14px 2px}
 </style>
 </head>
 <body>
@@ -564,8 +592,9 @@ html.ph #feat .ft{max-width:none}
 <header class="top">
   <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div></div>
   <div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div>
-  <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="fltbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpop" aria-label="Filter games"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4-2v-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">Filter</span><i class="fdot" hidden></i></button><button type="button" class="tbtn" id="viewbtn" aria-label="Plain list"><span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span></button></div>
+  <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="fltbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpop" aria-label="Filter games"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4-2v-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">Filter</span><i class="fdot" hidden></i></button><button type="button" class="tbtn" id="wnbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="wnpanel" aria-label="What's new"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l2.4 5.6 6.1.5-4.6 4 1.4 6-5.3-3.2-5.3 3.2 1.4-6-4.6-4 6.1-.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">What's new</span><i class="wnbadge" id="wnbadge" hidden></i></button><button type="button" class="tbtn" id="viewbtn" aria-label="Plain list"><span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span></button></div>
   <div class="fpop" id="fpop" role="dialog" aria-label="Filter games" hidden></div>
+  <div id="wnback" hidden></div><div id="wnpanel" role="dialog" aria-modal="true" aria-label="What's new" hidden><div class="wnh"><h2>What's new</h2><button type="button" class="wnx" aria-label="Close what's new">✕</button></div><div id="wnbody"></div></div>
   <div class="fpop cpop" id="cpop" role="dialog" aria-label="More saved games" hidden></div>
 </header>
 <main>
@@ -730,6 +759,50 @@ function renderFilters(){
     else if(e.key==='Tab'){const f=[...p.querySelectorAll('button:not([disabled]),a[href]')];if(!f.length)return;const i=f.indexOf(document.activeElement);
       if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}},true);
   addEventListener('resize',()=>{if(!p.hidden)placeFpop()})}
+/* ---------- What's new (games/updates.json) ---------- */
+let UPDS=[];
+const WNK='shelf_wn_checked';
+const wnKey=e=>e.date+'|'+e.game;
+const wnDone=()=>{try{return JSON.parse(store.get(WNK)||'{}')||{}}catch(e){return{}}};
+const unchk=id=>{const d=wnDone();return UPDS.some(e=>e.game===id&&!d[wnKey(e)])};
+function refreshUpd(){
+  const d=wnDone(),n=UPDS.filter(e=>!d[wnKey(e)]).length,b=document.getElementById('wnbadge');
+  if(b){b.hidden=!n;b.textContent=n>99?'99+':n;document.getElementById('wnbtn').setAttribute('aria-label',n?"What's new ("+n+" to check)":"What's new")}
+  document.querySelectorAll('.boxbtn[data-id]').forEach(el=>{const fr=el.querySelector('.f.front');if(!fr)return;const has=fr.querySelector('.upd'),on=unchk(el.dataset.id);
+    if(on&&!has){const s=document.createElement('span');s.className='upd';s.textContent='Updated';fr.appendChild(s)}else if(!on&&has)has.remove()});
+  document.querySelectorAll('#listview li[data-id]').forEach(li=>{const t=li.querySelector('.pl-t b'),has=li.querySelector('.upd-d'),on=unchk(li.dataset.id);
+    if(on&&!has&&t){const s=document.createElement('i');s.className='upd-d';s.title='Updated';t.appendChild(s)}else if(!on&&has)has.remove()})}
+const wnDate=s=>{const m=String(s).match(/^(\d{4})-(\d\d)-(\d\d)$/);if(!m)return esc(s);return new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})};
+function wnEntry(e,done){
+  const g=byId(e.game),nm=g?g.name:e.game==='shelf'?'The shelf':e.game;
+  return `<article class="wne${done?' done':''}"><div class="wnt">${g?`<img src="${g.cover}" alt="" loading="lazy" decoding="async">`:'<span class="wns" aria-hidden="true">🏠</span>'}<div><b>${esc(e.title)}</b><small>${esc(nm)}</small></div></div><ul>${(e.items||[]).map(i=>`<li>${esc(i)}</li>`).join('')}</ul>${e.check?`<p class="wnc">Try this: ${esc(e.check)}</p>`:''}<div class="wnr">${g?`<button type="button" class="wnp" data-wnplay="${g.id}">▶ PLAY</button>`:''}<button type="button" class="wnk" data-wnk="${esc(wnKey(e))}" aria-pressed="${done}">✓ Checked</button></div></article>`}
+let wnOpenF=false;
+function renderWn(keep){
+  const d=wnDone(),body=document.getElementById('wnbody'),st=body.scrollTop,open=body.querySelector('.wnf[aria-expanded=true]')!==null||wnOpenF;
+  const todo=UPDS.filter(e=>!d[wnKey(e)]),done=UPDS.filter(e=>d[wnKey(e)]);
+  let h='',last='';
+  todo.forEach(e=>{if(e.date!==last){last=e.date;h+=`<div class="wnd">${wnDate(e.date)}</div>`}h+=wnEntry(e,false)});
+  if(!todo.length)h+=`<div class="wnempty">${UPDS.length?'All checked. Nothing new to look at.':'Nothing to show yet.'}</div>`;
+  if(done.length){h+=`<button type="button" class="wnf" aria-expanded="${open}">Checked (${done.length}) ${open?'▴':'▾'}</button>`;
+    if(open){last='';done.forEach(e=>{if(e.date!==last){last=e.date;h+=`<div class="wnd">${wnDate(e.date)}</div>`}h+=wnEntry(e,true)})}}
+  body.innerHTML=h;body.scrollTop=keep?st:0}
+function openWn(){closeFpop(false);closeCpop&&closeCpop(false);renderWn(false);document.getElementById('wnback').hidden=false;document.getElementById('wnpanel').hidden=false;document.getElementById('wnbtn').setAttribute('aria-expanded','true');document.querySelector('#wnpanel .wnx').focus()}
+function closeWn(back){const p=document.getElementById('wnpanel');if(p.hidden)return;p.hidden=true;document.getElementById('wnback').hidden=true;const b=document.getElementById('wnbtn');b.setAttribute('aria-expanded','false');if(back)b.focus()}
+function initWn(){
+  const p=document.getElementById('wnpanel'),b=document.getElementById('wnbtn');
+  b.onclick=e=>{e.stopPropagation();p.hidden?openWn():closeWn(true)};
+  document.getElementById('wnback').addEventListener('click',()=>closeWn(true));
+  p.addEventListener('click',e=>{e.stopPropagation();
+    if(e.target.closest('.wnx')){closeWn(true);return}
+    const f=e.target.closest('.wnf');if(f){wnOpenF=f.getAttribute('aria-expanded')!=='true';renderWn(true);const nf=p.querySelector('.wnf');if(nf)nf.focus();return}
+    const k=e.target.closest('[data-wnk]');if(k){const d=wnDone(),key=k.dataset.wnk;if(d[key])delete d[key];else d[key]=1;store.set(WNK,JSON.stringify(d));renderWn(true);refreshUpd();
+      const nk=p.querySelector('[data-wnk]');if(nk&&!p.contains(document.activeElement))nk.focus();return}
+    const pl=e.target.closest('[data-wnplay]');if(pl){const g=byId(pl.dataset.wnplay);closeWn(false);if(g){retFocus=b;if(ins)hideInspect(true);openGame(g,true)}}});
+  document.addEventListener('keydown',e=>{if(p.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeWn(true)}
+    else if(e.key==='Tab'){const f=[...p.querySelectorAll('button:not([disabled])')];if(!f.length)return;const i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}},true);
+  fetch('updates.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(j=>{if(Array.isArray(j)){UPDS=j.filter(e=>e&&e.game&&e.date&&e.title);refreshUpd();if(!p.hidden)renderWn(true)}}).catch(()=>{})}
 const byId=id=>GAMES.find(g=>g.id===id);
 const VIDEO=()=>GAMES.filter(g=>g.kind==='video'),BOARD=()=>GAMES.filter(g=>g.kind!=='video');
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -794,7 +867,7 @@ function buildBox(g,dims){
   const w=wearOf(getPlays()[g.id]|0);
   const b=document.createElement('span');b.className='b3';b.dataset.wear=w;
   b.style.cssText=`--W:${W};--H:${H};--D:${D};--c:${L.c}`;
-  b.innerHTML=`<span class="f front"><img src="${g.cover}" alt="" loading="lazy" decoding="async" draggable="false"><i class="wearov"></i><span class="band">${esc(t)}</span>${isPrev(g)?`<span class="note">${ST_LABEL[stOf(g).k]}</span>`:''}${g.isNew?'<span class="new">New!</span>':''}</span><span class="f left"><b style="font-size:${fs}em">${esc(t)}</b></span><span class="f right"></span><span class="f top"></span><span class="f bot"><b>${esc(t)}</b></span>`;
+  b.innerHTML=`<span class="f front"><img src="${g.cover}" alt="" loading="lazy" decoding="async" draggable="false"><i class="wearov"></i><span class="band">${esc(t)}</span>${isPrev(g)?`<span class="note">${ST_LABEL[stOf(g).k]}</span>`:''}${g.isNew?'<span class="new">New!</span>':''}${unchk(g.id)?'<span class="upd">Updated</span>':''}</span><span class="f left"><b style="font-size:${fs}em">${esc(t)}</b></span><span class="f right"></span><span class="f top"></span><span class="f bot"><b>${esc(t)}</b></span>`;
   return b}
 function boxBtn(g,pose,dims,tw){
   const L=LOOK[g.id],[W,H,D]=dims||[L.W,L.H,L.D];
@@ -979,7 +1052,7 @@ function render(){
   $('#viewbtn').innerHTML=list?'<span class="ic" aria-hidden="true">🏠</span><span class="tl">Room view</span>':'<span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span>';$('#viewbtn').setAttribute('aria-label',list?'Room view':'Plain list');
   $('#viewbtn').setAttribute('aria-pressed',list?'true':'false');
   if(list){renderList();renderCont()}else renderRoom(ph);renderFeat();
-  $('#tally').textContent=GAMES.length+' games on the shelf';applyFilter()}
+  $('#tally').textContent=GAMES.length+' games on the shelf';applyFilter();refreshUpd()}
 /* ---------- featured spotlight (switch games by changing FEATURED) ---------- */
 const FEATURED=['doorkick','thornbound','hollowbough'];let featI=0,featT=0;
 const FEAT={doorkick:{img:'doorkick-dungeon/media/title.webp',imgPh:'doorkick-dungeon/media/title-phone.webp',tag:'Kick doors. Fight monsters. Stab friends.',more:['See all 147 cards','doorkick-dungeon/cards.html']},
@@ -1218,7 +1291,7 @@ document.addEventListener('pointerdown',e=>{if(!fabmenu.hidden&&!fabmenu.contain
 addEventListener('resize',()=>{if(!fab.hidden)placeFab(corner)});
 if(isPh()&&/iPhone|iPod/.test(navigator.userAgent)&&!standalone&&!store.get('shelf_iostip')){const t=document.getElementById('iostip');t.hidden=false;document.getElementById('iosok').onclick=()=>{t.hidden=true;store.set('shelf_iostip','1')}}
 addEventListener('resize',fit);
-renderFilters();fit();render();
+renderFilters();initWn();fit();render();
 {const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start)}
 
 /* Ko-fi support: set the page name to switch the support links on */
