@@ -53,11 +53,37 @@ function LD_grp(B){const G=GB_geo(B,null),g=new THREE.Group(),mk=(geo,mat)=>{con
  for(const w of G.w||[]){const o=mk(CR_wheel(w.t),GB_MAT);o.position.copy(w.o)}return g}
 window.__ld={pts:LD_pts,br:LD_br,grp:LD_grp,fix:B=>B.map(b=>{CR_reg(b.t.split('@')[0]);return b}),M:LD_MODELS,THREE,PC:GB_PC,ID:G13_ID,AL:G13_AL,BC:GB_BC,U:GB_U,PH:GB_PH,
  parts:()=>Object.keys(GB_PC).map(k=>{const P=GB_PC[k];return{k,n:P.n,w:P.w,d:P.d,h:P.h,cat:P.cat||'',id:G13_ID[k]||null,wh:!!(typeof CR_WH!=='undefined'&&CR_WH[k])}})};
-// the speedboat: hull bottom 3 plates under the deck line like CR_boat (sits IN the water), driver behind the wheel (the set's minifig is not converted)
-function LD_boat(){const A=LD_br('boat').map(b=>Object.assign(b,{y:b.y-3}));A.push({t:'drv',x:-1,z:2,y:-1,r:0,m:0,c:'#0055bf'});return A}
+// the speedboat: hull bottom 5 plates down (w8boat: sits IN the water like the other boats), driver behind the wheel (the set's minifig is not converted)
+function LD_boat(){const A=LD_br('boat').map(b=>Object.assign(b,{y:b.y-5}));A.push({t:'drv',x:-1,z:2,y:-3,r:0,m:0,c:'#0055bf'});return A}
 // ---------- presets (names are generic like the other RIDES; the LEGO set number is the ref)
 {const R=GAR_set('rod'),L=n=>JSON.parse(JSON.stringify(R.load[n]));
  GAR_SETS.push({id:'t_rally',n:'Rally S1 (76897)',tier:'r',req:null,car:()=>LD_br('audi'),off:R.off,boat:R.boat,tpl:1,ref:'76897',forms:['car'],
   load:{car:{name:'RALLY S1',k:'Rally',st:{top:1.05,acc:1.06,han:1.05,hull:1},w:'Medium',perk:'drift'},'4x4':L('4x4'),boat:L('boat')}});
  GAR_SETS.push({id:'t_speedboat',n:'Harbour Speedboat (4641)',tier:'c',req:null,car:R.car,off:R.off,boat:LD_boat,tpl:1,ref:'4641',forms:['boat'],
   load:{car:L('car'),'4x4':L('4x4'),boat:{name:'SPEEDBOAT',k:'Water',st:{top:1.04,acc:1.05,han:1.04,hull:.98},w:'Light',perk:'refill'}}})}
+// ---------- the 1490 Town Bank as a Frankfurt world prop ("Mainhattan" is the bank city). Minifig scale = the same stud size as the cars
+// (LD_SW = 0.408 m per garage unit, measured on the player car in roam). One merged world-space mesh per material (3 draws, hub distance culling),
+// box collider = the walls' footprint (bricks above the baseplate), placed on the nearest free lot to the start, front to the street.
+const LD_SW=.408,LDP={g:null,at:null,col:null};
+function LD_propSpot(x0,z0,hw,hd){for(let r=24;r<300;r+=8)for(let a=0;a<32;a++){const t=a/32*Math.PI*2,x=x0+Math.cos(t)*r,z=z0+Math.sin(t)*r;
+  for(const rot of[0,1]){const w=rot?hd:hw,d=rot?hw:hd;if(!rfFree(x,z,3)||roamHit(x,z,Math.max(w,d)+1.5))continue;let ok=1;
+   for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;
+   if(ok)return{x,z,rot}}}return null}
+function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;const B=LD_br('bank'),lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}// CR_LO 2: 6-sided studs, imported parts without studs
+ const parts=[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]),box=new THREE.Box3();for(const[g]of parts){g.computeBoundingBox();box.union(g.boundingBox)}
+ const c=box.getCenter(new THREE.Vector3());let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;
+ // walls: footprint of the bricks standing on the baseplate
+ for(const b of B){if(b.y<1||!GB_PC[b.t]||GB_PC[b.t].h<3)continue;const P=GB_PC[b.t],w=b.r%2?P.d:P.w,d=b.r%2?P.w:P.d;x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+w);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+d)}
+ const k=GB_U*LD_SW,hw=(x1-x0)*k/2-.2,hd=(z1-z0)*k/2-.2,ox=((x0+x1)/2)*GB_U*LD_SW-c.x*LD_SW,oz=((z0+z1)/2)*GB_U*LD_SW-c.z*LD_SW;
+ const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:{x:2061,z:0};// the story start (measured) when the car is not placed yet
+ const S=LD_propSpot(st.x,st.z,Math.max(hw,hd)+.5,Math.min(hw,hd)+.5);if(!S)return;
+ // front (−z of the model) to the nearest road
+ const yaws=[0,1,2,3].filter(q=>q%2===S.rot);let best=yaws[0],bd=1e9;for(const q of yaws){const a=q*Math.PI/2,fx=-Math.sin(a),fz=-Math.cos(a);for(let r=2;r<40;r+=2)if(FL_road(S.x+fx*(hd+r),S.z+fz*(hd+r),0)){if(r<bd){bd=r;best=q}break}}
+ const a=best*Math.PI/2,y=groundY(S.x,S.z);
+ // world-space geometry straight under HUB.grp, so the hub distance culling (hubCull*) handles it like every other building
+ const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(LD_SW,LD_SW,LD_SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
+ LDP.g=[];LDP.tris=0;for(const[g,mat]of parts){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name='ld_bank';o.receiveShadow=true;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);LDP.g.push(o);LDP.tris+=(g.index?g.index.count:g.attributes.position.count)/3}
+ const cs=Math.cos(a),sn=Math.sin(a),cx=S.x+ox*cs+oz*sn,cz=S.z-ox*sn+oz*cs,odd=best%2,col={x:cx,z:cz,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*LD_SW};
+ HUB.bld.push(col);hubGridAdd([col]);LDP.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};LDP.col=col}
+buildRoam=(f=>function(){const r=f.apply(this,arguments);try{LD_propBuild()}catch(e){console.warn('LD prop',e)}return r})(buildRoam);
+window.__ld.prop=LDP;window.__ld.propBuild=LD_propBuild;

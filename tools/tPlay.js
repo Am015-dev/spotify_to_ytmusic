@@ -11,6 +11,8 @@ const URL0=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',URL=process.e
 const FASTM=process.env.FAST==='1';  // FAST=1: game URL gets ?fast=1 (src/test/fast.js) and no CPU throttle (results are frame-stepped, so throttle only changes wall time)
 const RENDER=+(process.env.RENDER||20);  // RENDER=N: draw every Nth game frame (default 20: real GPU uploads, so glMB is what a player's GPU holds and the no-leak gate can see GPU leaks); 0 = no drawing except shots
 const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.env.CITIES||'fra,ath').split(','),THR=+(process.env.THROTTLE||(FASTM?1:4)),SHOTS=process.env.SHOTS!=='0';
+// env LS=<file.json>: localStorage entries set after the clear (e.g. mho_gar@1 + mho_build@1 saved from the garage = drive a given car)
+const LSP=process.env.LS?(()=>{const o=JSON.parse(fs.readFileSync(process.env.LS));const r={};for(const k in o)if(/^mho_(gar|build)@/.test(k))r[k]=o[k];return r})():{};
 const results=[];let fails=0;const ok=(c,m,i)=>{console.log((c?'PASS ':'FAIL ')+m+(i!==undefined?' · '+JSON.stringify(i):''));if(!c)fails++};
 // ---- in-page: test-driven rAF clock + per-frame monitor
 const INIT=`(()=>{const q=[];let t=0;window.__auto=true;let rc=0;window.__rStub=function(){if(${RENDER}&&++rc%${RENDER}===0&&window.__fastR)return window.__fastR.apply(this,arguments)};window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
@@ -128,7 +130,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
  const cityRes={};
  for(const city of CITIES){const T0=Date.now();
   await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
-  await p.evaluate(([c])=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city]);
+  await p.evaluate(([c,ls])=>{localStorage.clear();localStorage.setItem('mho_slot','1');for(const k in ls)localStorage.setItem(k,ls[k]);if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city,LSP]);
   await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
   if(mode==='phone'&&city===CITIES[0])await shot('menu');
   // a person taps STORY; the loading screen plays; then intro cards are tapped away
