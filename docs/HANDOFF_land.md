@@ -1,3 +1,27 @@
+# land-2 handoff (2026-10-10, continues land-1 below)
+
+## land-2 done (each sent to build-7 as MODEL)
+| sha | swap | tris each | draws |
+|---|---|---|---|
+| 74f7c85 | Frankfurt planter → LEGO flower bed (bed brick + 3020, 33291 flowers, 6255 leaves) | 204 → 168 | 48 → 48 |
+| 74f7c85 | Frankfurt dumpster → LEGO brick dumpster | 234 → 108 | 48 → 48 |
+| ed78371 | 10184 Town Plan fountain placed in Frankfurt (src/98ld_w_10184f.js + src/MODELS) | new: 6,310 near / 4,414 far | +1/material |
+| d9bf579 | Athens street lamps → same LEGO 2039 lamp (Athens grey, 5.5 m via R1 scale) | 92 → 78 | same |
+| 075047a | Athens race palms (Syntagma) → LEGO 6376 palm (lathe trunk + 4 two-sided 2518 leaves) | 108 → 99 | 9 → 9 |
+
+## land-2 notes
+- LDraw library is downloaded to ld/lib (git-ignored): `curl -o c.zip https://library.ldraw.org/library/updates/complete.zip`.
+- New swaps go in `LDS.SW` (src/98ld_l_land.js): `{type:[fn(oldGeo)->geo, label]}`, swapped after kmProps (Frankfurt only), A/B via `LDS_ab` list.
+- Athens: `CITY=ath node tools/ld/lWorld.js ...` (sets mho_city@1). Race tracks: `node tools/ld/lRace.js <url> <out> synt` (attract race via `__ld.lds.race`, hides the menu DOM, palm A/B).
+- km.js `light-curved` not dropped: kmProps still loads it before the swap and it is ~4 KB; removing it needs KM_IDX re-offsetting (tools/split_km.py) + a 60_city_build change. Low value.
+- Frame `calls` differ by a few between A/B (bounding spheres), per-type draw counts are unchanged.
+
+## Next (land-3)
+1. Construction props (Kenney cone 66 / barrier 60 / clight 144, 615 total): LEGO 4589 cone (traffic cone), 3633-style barrier, light.
+2. sign (road-sign-stop 104, 311): LEGO 3742-free sign = 4589/3957 pole + 2×2 round tile sign (892? check part).
+3. rock_largeA (80, 262): LEGO rock 6082/6083 (Rock Panel) as boxes.
+4. Athens procedural props (CE_* types) and parked Kenney cars (needs LEGO cars from the art lane, ask build-7 before touching).
+
 # land-1 handoff (landscape lane, 2026-10-10). Branch alex/od-mdl-land (from alex/od-models 8eb6eaa), draft PR #91 → alex/od-models.
 
 ## Done (each one sent to build-7 as MODEL <sha> …)
