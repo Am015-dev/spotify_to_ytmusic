@@ -9,3 +9,10 @@
 .acts .gxt-menu{flex:1 1 100%;order:-1}
 .bf-bw{flex:none;display:inline-flex;width:44px;height:44px}
 @media (max-width:440px){.gxc-head{gap:4px;padding:8px 6px}.gxc-head .gxc-ib{padding:4px 7px;font-size:13px}.gxc-head .gxc-htitle{font-size:15px}}
+/* ---- painted title / end banners (media.js sets the --sg-* variables; panels keep their colour if a file is missing) ---- */
+.sg-hero{flex:none;height:130px;margin:-18px -20px 0;border-radius:15px 15px 0 0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,#fdf7ea),var(--sg-title,none) center/cover}
+@media (max-width:640px){.sg-hero{margin:-14px -14px 0}}html.ph .sg-hero{margin:-12px -14px 0}
+.sg-endart{height:130px;margin:-12px -12px 6px;border-radius:15px 15px 0 0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(255,248,230,.95)),var(--sg-end-win,none) center/cover}
+.sg-endart.lose{background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(255,248,230,.95)),var(--sg-end-lose,none) center/cover}
+/* phone board-first view: the painted table sits behind the kilns */
+#bf .bf-table::before{content:'';position:absolute;inset:-2px -4px;border-radius:16px;background:linear-gradient(rgba(255,248,230,.12),rgba(255,248,230,.12)),var(--sg-table,none) center/cover;box-shadow:0 0 0 2px rgba(224,169,72,.7),0 8px 24px rgba(0,0,0,.45);z-index:0;pointer-events:none}

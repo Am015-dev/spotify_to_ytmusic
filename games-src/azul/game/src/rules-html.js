@@ -19,7 +19,7 @@ const RULES_HTML=`<div class="rules">
 <h4>Audio</h4>
 <p>Used under Creative Commons Attribution:</p>
 <ul>
-<li>Music: &ldquo;Morning&rdquo; by <a href="https://incompetech.com" target="_blank" rel="noopener">Kevin MacLeod</a> (incompetech.com), source <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2300003" target="_blank" rel="noopener">incompetech.com</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons: By Attribution 4.0</a>. Modified: cut to a 114 s seamless loop, loudness-normalised, re-encoded to MP3.<br><small>&quot;Morning&quot; Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/</small></li>
+<li>Music: original songs made for this game with Treblo (treblo.com)</li>
 </ul>
 <p>With thanks to these public-domain (CC0) creators:</p>
 <ul>
