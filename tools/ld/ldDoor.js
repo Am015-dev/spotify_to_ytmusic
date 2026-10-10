@@ -8,7 +8,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
   const r=await p.evaluate(([ids,sc])=>{const T=__ld.THREE,B=[].concat(...ids.split('+').map(i=>__ld.br(i))),K=__ld.SW*(+sc||__ld.FIG),g=__ld.grpLo(B);g.scale.setScalar(K);g.updateMatrixWorld(true);
    const box=new T.Box3().setFromObject(g),c=box.getCenter(new T.Vector3());
    // lowest door: catalogue/LDraw part named door (not roller/garage), else the lowest roller door
-   const P=__ld.PC,isD=b=>{const n=(P[b.t.split('@')[0]]||{}).n||'';return/^(door|~?door frame)\b/i.test(n.replace(/^~/,''))&&!/container|roller/i.test(n)},isR=b=>/roller door/i.test((P[b.t.split('@')[0]]||{}).n||'');
+   const P=__ld.PC,isD=b=>{const n=(P[b.t.split('@')[0]]||{}).n||'';return/^[=~]?(door|door frame)\b/i.test(n.replace(/^~/,''))&&!/container|roller/i.test(n)},isR=b=>/roller door/i.test((P[b.t.split('@')[0]]||{}).n||'');
    const isF=b=>{const n=((P[b.t.split('@')[0]]||{}).n||'').replace(/^~/,'');return/^(window|door)/i.test(n)&&/x 4 x [56]\b/.test(n)};let D=B.filter(isD);if(!D.length)D=B.filter(isR);if(!D.length){const y0=Math.min(...B.filter(isF).map(b=>b.y));D=B.filter(b=>isF(b)&&b.y<=y0+1)}D.sort((x,y)=>x.y-y.y);const d=D[0];let fx=c.x,fz=box.min.z-.4,fy=box.min.y,doorH=null,dir=[0,-1],nm='front (no door: stall/cart)';
    if(d){const di=B.indexOf(d),db=new T.Box3();g.traverse(o=>{if(!o.isMesh||!o.geometry.userData.bid)return;const id=o.geometry.userData.bid,ps=o.geometry.attributes.position,v=new T.Vector3();
      for(let t=0;t<id.length;t++)if(id[t]===di)for(let k=0;k<3;k++){v.fromBufferAttribute(ps,t*3+k).multiplyScalar(K);db.expandByPoint(v)}});
