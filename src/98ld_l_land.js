@@ -43,10 +43,27 @@ function LDS_crate(old){old.computeBoundingBox();const ob=old.boundingBox,w=Math
 kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID==='fra'&&D.fence&&!D.fence.lds)try{const old=LDS_tri(D.fence.g);D.fence.gOld=D.fence.g;D.fence.mOld=D.fence.mat;D.fence.g=LDS_fence(D.fence.g);
  D.fence.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0});D.fence.lds='fence';if(LDS.st)LDS.st.fence={src:'3633',old,near:LDS_tri(D.fence.g),far:LDS_tri(D.fence.g)}}catch(e){console.warn('LDS fence',e)}if(CID==='fra'&&D.crate&&!D.crate.lds)try{const old=LDS_tri(D.crate.g);D.crate.gOld=D.crate.g;D.crate.mOld=D.crate.mat;D.crate.g=LDS_crate(D.crate.g);D.crate.mat=D.fence.mat;D.crate.lds='crate';if(LDS.st)LDS.st.crate={src:'61780',old,near:LDS_tri(D.crate.g),far:LDS_tri(D.crate.g)}}catch(e){console.warn('LDS crate',e)}
  return r})(kmProps);
+// planter (swap 5): LEGO flower bed instead of the Kenney CC0 'planter' (204 tris): a 2x4 bed brick (80x24x40 LDU, reddish brown) + 3020 Plate 2x4 (green),
+// on its 8 studs 4 flowers (3062b Round Brick 1x1 stem + 33291 Plate 1x1 Round with Tabs, red/yellow) and 4 leaf clumps (6255 Plant 1x1 with 3 Leaves),
+// low-poly in LDU (LDraw parts, CCAL 2.0); fitted to the old planter's footprint, long side kept
+function LDS_fit(G,old,L){const g=mergeG(G);old.computeBoundingBox();const ob=old.boundingBox,ox=ob.max.x-ob.min.x,oz=ob.max.z-ob.min.z,s=Math.max(ox,oz)/L;g.scale(s,s,s);if(oz>ox)g.rotateY(Math.PI/2);
+ g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
+function LDS_planter(old){const G=[],B=(w,h,d,x,y,z,c)=>G.push(cbox(w,h,d,x,y,z,c)),Y=(r1,r2,h,x,y,z,c,n)=>G.push(ccyl(r1,r2,h,x,y,z,c,n));
+ B(80,24,40,0,12,0,'#7a4a28');B(80,8,40,0,28,0,'#3f8a2e');
+ for(let i=0;i<4;i++)for(let j=0;j<2;j++){const x=-30+i*20,z=j?10:-10;if((i+j)%2){Y(8,8,24,x,44,z,'#4f9a36',4);Y(11,11,8,x,60,z,i<2?'#d8302a':'#ffd12c',5)}else{const c=new THREE.ConeGeometry(15,20,5,1,true);c.translate(x,42,z);G.push(colorize(c,new THREE.Color('#2f7a2a')))}}
+ return LDS_fit(G,old,80)}
+// dumpster (swap 6): LEGO brick-built dumpster (as in LEGO City garbage sets): dark green 2x4 body two bricks high (80x48x40 LDU), black 2x4 tile lid
+// tilted open a little, 2 black handle bars (bar holders) and 4 black 1x1 round wheels; replaces the Kenney CC0 'dumpster' (234 tris)
+function LDS_dumpster(old){const G=[],B=(w,h,d,x,y,z,c,rx)=>{const g=new THREE.BoxGeometry(w,h,d);if(rx)g.rotateX(rx);g.translate(x,y,z);G.push(colorize(g,new THREE.Color(c)))};
+ B(80,48,40,0,32,0,'#2a7a4a');B(84,4,44,0,59,-2,'#2f3640',-.12);B(84,6,4,0,44,22,'#2a7a4a');B(4,4,8,-40,40,0,'#2f3640');B(4,4,8,40,40,0,'#2f3640');
+ for(const x of[-30,30])for(const z of[-14,14])B(8,8,8,x,4,z,'#2f3640');return LDS_fit(G,old,80)}
+LDS.SW={planter:[LDS_planter,'LEGO flower bed 3020+3062b+33291+6255'],dumpster:[LDS_dumpster,'LEGO brick dumpster']};
+kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='fra')return r;for(const t in LDS.SW){const d=D[t];if(!d||d.lds)continue;try{const old=LDS_tri(d.g);d.gOld=d.g;d.mOld=d.mat;d.g=LDS.SW[t][0](d.g);
+  d.mat=LDS.mat||(LDS.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0}));d.lds=t;if(LDS.st)LDS.st[t]={src:LDS.SW[t][1],old,near:LDS_tri(d.g),far:LDS_tri(d.g)}}catch(e){console.warn('LDS '+t,e)}}return r})(kmProps);
 // LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
 function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
  for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
 // test hook (before/after shots of the same spot): ab(1) draws the old trees again
-function LDS_ab(off){for(const DL of['lamp','fence','crate'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
+function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
 window.__ld.lds=LDS;window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
