@@ -11,7 +11,7 @@ GB_PC.drvM={n:'Minifig driver',w:2,d:2,h:9,ic:'🧑',hide:1};
 function SZ_k(B){return(B||[]).some(b=>b&&(b.t||b[0])==='drvM')?RSZ.k:1}
 // the driver sits behind the steering wheel ('stw', r 2 = facing -z like the LDraw sets, r 0 = +z), 3 plates under it
 function SZ_add(B){if(!Array.isArray(B)||!B.length||SZ_k(B)>1)return B;const w=B.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');const A=B.slice();
- if(w){const r=w.r&2?2:0;A.push({t:'drvM',x:w.x,z:r?w.z-2:w.z+1,y:w.y-3,r,m:0,c:'#0055bf'})}else A.push({t:'drvM',x:-1,z:-1,y:-99,r:2,m:0,c:'#0055bf',hide:1});return A}
+ if(w){const r=w.r&2?2:0;A.push({t:'drvM',x:w.x,z:r?w.z+1:w.z-2,y:w.y-3,r,m:0,c:'#0055bf'})}else A.push({t:'drvM',x:-1,z:-1,y:-99,r:2,m:0,c:'#0055bf',hide:1});return A}
 // figure only (the set has its own seat): true minifig height 5 studs (3.0 units; the 'drv' part is 0.83 of that and has a seat box)
 GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);const tm=[],tl=[];GB_figGeo(GB_figGet(),tm,tl,true);
  const s=1.5*(typeof SC_S!=='undefined'&&SC_S&&SC_S.drv?SC_K.drv:1),k=RSZ.fig;
