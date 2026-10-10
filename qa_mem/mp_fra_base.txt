@@ -1,0 +1,23 @@
+{"totMB":207.7,"glMB":61.3,"cpuMB":36.7,"geoms":309,"tex":159,"progs":66,"heapMB":37.7,"lbl":"menu"}
+enter 34.129
+{"totMB":398.8,"glMB":111.5,"cpuMB":46.5,"geoms":4107,"tex":136,"progs":96,"heapMB":85.7,"lbl":"roam"}
+{"totMB":275.6,"glMB":111.7,"cpuMB":46.6,"geoms":4112,"tex":136,"progs":96,"heapMB":83.2,"lbl":"drive20"}
+{"totMB":288.1,"glMB":112.2,"cpuMB":46.7,"geoms":4128,"tex":136,"progs":96,"heapMB":84.3,"lbl":"drive40"}
+{"totMB":305.4,"glMB":114,"cpuMB":50,"geoms":4155,"tex":148,"progs":113,"heapMB":77.2,"lbl":"garage"}
+{"totMB":308.4,"glMB":114.2,"cpuMB":63.2,"geoms":4160,"tex":147,"progs":113,"heapMB":77.3,"lbl":"after_garage:✕BACK"}
+top owners (last):
+  Group/Mesh 1800 22.6 58
+  Group/trG+bwT 88 0 26.2
+  Group/keep+wbLod 40 16.5 16.5
+  Group/w+g 11 10.2 10.2
+  m+ribbons/Group/scN 74 4.4 4.4
+  Group/a8 22 2.9 2.9
+  Group/keep+wbLo 11 2.4 2.4
+  Group/Group/Group 477 0.4 2
+  Group/ks 1559 2 2
+  Group/cv 8 0.1 1.5
+  Group/trG 15 0 1.2
+  a8+art6c 16 1.1 1.1
+  Group/trPl 34 0 0.6
+  Group/dr 1 0 0.5
+errs []

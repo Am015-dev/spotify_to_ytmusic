@@ -1,0 +1,11 @@
+mine before {"n":20,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 wL T6x6 drvL T4x4 diff b22","L":1,"plate":5}
+shot mine_1_before 128s
+mine after {"n":15,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 wL T6x6 drvL T4x4 diff","L":1,"plate":5}
+shot mine_2_cleared 174s
+PASS mine: CLEAR leaves only chassis + wheels {"n":15,"w":4,"bp":1,"base":124,"hi":0,"ty":"T6x16 T1x6 T1x1 wL T6x6 drvL T4x4 diff","L":1,"plate":5}
+PASS mine: base rescanned, layer on the chassis deck (no floating grid) cells 124 highest 0 (before 0)
+PASS mine: UNDO restores the build 
+mine set mine
+ERRS 0 []
+PASS 0 console errors 
+RESULT PASS 4/4

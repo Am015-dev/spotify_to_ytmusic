@@ -1,0 +1,12 @@
+equipped car t_su off t_su
+wait 0 menu|false
+hull {"rad":1.15,"off":1.35,"cam":0.72,"wb":2.7,"hw":1.25,"hl":2.45,"acc":1,"top":1,"big":false,"m":1}
+shot 01_start
+fra top kmh 1 pos [ 2062, 0 ]
+shot 02_frankfurt_drive
+traffic car {"x":2138.404727242903,"z":247.92,"h":1.5707963267948966}
+shot 03_side_traffic
+shot 04_side_tyres
+tyre_rest [0.03,0.03,0.03,0.03] traffic_rest [[0.028,0.032,0.032,0.028],[0.034,0.027,0.026,0.034],[0.029,0.031,0.031,0.029],[0.029,0.031,0.031,0.029],[0.03,0.03,0.03,0.03],[0.03,0.03,0.03,0.03]]
+GAP player {"n":1,"max":0.03,"over05":0} traffic {"n":6,"max":0.034,"over05":0} veh ship
+ERR []

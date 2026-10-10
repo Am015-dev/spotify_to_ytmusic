@@ -1,0 +1,178 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "fra": {
+    "min": 2.13,
+    "hits": 17,
+    "kinds": {
+     "other": 2,
+     "traffic": 13,
+     "ped": 1,
+     "wall": 1
+    },
+    "wallHits": 1,
+    "wallPerMin": 0.47,
+    "hitsPerMin": 8,
+    "bigDrop": 13,
+    "stuckPct": 19.7,
+    "avgKmh": 34.2,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 4.2,
+    "traffic120m": 18.8,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 2632,
+      "v0": 23,
+      "v1": 6,
+      "drop": 0.75,
+      "kind": "traffic",
+      "x": 1717,
+      "z": 17,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4509,
+      "v0": 22,
+      "v1": 6,
+      "drop": 0.73,
+      "kind": "traffic",
+      "x": 1703,
+      "z": 1,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 1628,
+      "v0": 114,
+      "v1": 37,
+      "drop": 0.68,
+      "kind": "other",
+      "x": 1872,
+      "z": 13,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4326,
+      "v0": 38,
+      "v1": 15,
+      "drop": 0.62,
+      "kind": "traffic",
+      "x": 1701,
+      "z": 1,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6779,
+      "v0": 35,
+      "v1": 14,
+      "drop": 0.61,
+      "kind": "wall",
+      "x": 1366,
+      "z": -60,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.82,
+     "carL": 4.35,
+     "carH": 1.4,
+     "player": {
+      "h": 2.1,
+      "l": 4.48,
+      "w": 1.98
+     },
+     "pedRel": 1.05,
+     "pedVsPlayer": 1.02,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1369,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#npcSay×#odPin",
+     "#odPin×#juPop"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": false
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": false
+     },
+     "otg": null
+    },
+    "events": [],
+    "perf": {
+     "calls": 156,
+     "tris": 880014,
+     "jsMs": 0,
+     "geoms": 4130,
+     "tex": 122
+    },
+    "wallSec": 181
+   }
+  },
+  "errs": [],
+  "warns": [
+   "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported."
+  ]
+ }
+]

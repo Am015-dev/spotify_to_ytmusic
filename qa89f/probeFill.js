@@ -1,0 +1,5 @@
+const{chromium,boot}=require('../tools/d24lib');const URL=process.argv[2];
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const{p}=await boot(b,{city:'ath',url:URL,phone:true});
+ console.log(await p.evaluate(()=>__oc.ev(`(()=>{const R=DR.solid;let per=0,area=0,lw=[],fin=0,fex=0,fst=0,L=0;for(const r of R){const w=r.x1-r.x0,d=r.z1-r.z0;per+=2*(w+d);area+=w*d;lw.push(Math.max(w,d));
+  for(const[mx,mz,nx,nz,len]of[[(r.x0+r.x1)/2,r.z0,0,-1,w],[r.x1,(r.z0+r.z1)/2,1,0,d],[(r.x0+r.x1)/2,r.z1,0,1,w],[r.x0,(r.z0+r.z1)/2,-1,0,d]]){const ox=mx+nx*4,oz=mz+nz*4;L+=len;if(DR_inSolid(ox,oz))fin+=len;else if(DR_edgeX(mx+nx*25,mz+nz*25)<6)fst+=len;else fex+=len}}
+  lw.sort((a,b)=>a-b);return JSON.stringify({n:R.length,per:Math.round(per),area:Math.round(area),medLong:lw[lw.length>>1],p90:lw[Math.floor(lw.length*.9)],max:lw[lw.length-1],faceLen:Math.round(L),internal:Math.round(fin),street:Math.round(fst),exposed:Math.round(fex)})})()`)));await b.close()})();

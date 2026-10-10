@@ -1,0 +1,25 @@
+FAIL phone ath: JS heap ≤ 100 MB while driving · {"lastAvgMB":202.9,"peakMB":203}
+FAIL phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":1525,"start":0,"end":3,"ex":[{"x":4553,"z":-3541,"bx":4577.5,"bz":-3492.7,"hw":55,"hd":7,"h":35.397438366848704,"keys":"ry","t":null},{"x":4589,"z":-3533,"bx":4599.3,"bz":-3531.7,"hw":20,"hd":4.5,"h":29.89705253329597,"keys":"ry","t":null},{"x":4593,"z":-3541,"bx":4599.3,"bz":-3531.7,"hw":2.5,"hd":23,"h":32.49705253329597,"keys":"ry","t":null}]}
+FAIL phone ath: no loading screens while driving · {"loads":1}
+FAIL phone ath: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry, ≤ 6 MB/min incl. buffers) · {"heapMBperMin":31.08,"totMBperMin":143.05,"geoMBperMin":-98.13,"geomsPerMin":-70.4,"first":{"f":0,"totMB":390.5,"geoms":4018,"tex":121,"sceneGeo":4571,"geoMB":284.6,"cpuGeoMB":40.4,"heap":143},"last":{"f":17400,"totMB":642.7,"geoms":3947,"tex":115,"sceneGeo":4406,"geoMB":116.9,"cpuGeoMB":47,"heap":203}}
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":12.9}
+FAIL phone ath: the page never reloads while playing · {"reloads":1,"events":["RELOAD@14268"]}
+FAIL phone ath: wall/building hits ≤ 1/min · {"wallPerMin":2.4,"bigDrop":36,"hits":47}
+FAIL phone fra: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry, ≤ 6 MB/min incl. buffers) · {"heapMBperMin":0.31,"totMBperMin":0.14,"geoMBperMin":5.84,"geomsPerMin":29.3,"first":{"f":0,"totMB":286.6,"geoms":4048,"tex":112,"sceneGeo":4488,"geoMB":188.6,"cpuGeoMB":49.9,"heap":72.8},"last":{"f":17400,"totMB":300,"geoms":4163,"tex":117,"sceneGeo":4626,"geoMB":257.2,"cpuGeoMB":54.9,"heap":78.1}}
+FAIL phone fra: stuck ≤ 3 % · {"stuckPct":10.2}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.76,"carL":4.63,"carH":1.56,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.95,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+PASS phone fra: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone fra: monitor ran · null
+PASS phone fra: no HUD element over a touch control · []
+PASS phone fra: no HUD text under 12 px · []
+PASS phone fra: no collider on the paved road (invisible walls / oversize hulls) · {"pts":1922,"start":0,"end":0,"ex":[]}
+PASS phone fra: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.83,"carL":4.38,"carH":1.64,"player":{"h":2.1,"l":4.48,"w":1.98},"pedRel":1.04,"pedVsPlayer":1.02,"nPed":8,"nCar":8}
+PASS phone fra: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: wall/building hits ≤ 1/min · {"wallPerMin":0.78,"bigDrop":23,"hits":32}
+PASS phone: zero console / page errors · []
+TPLAY_FAST FAIL 10 · 509 s · qa_mem3/tp_m4/*.log
