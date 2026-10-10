@@ -24,3 +24,11 @@ OD_CHANGELOG entry (2-4 lines) + 1 checklist item per model in src/99c_checklist
 Shots: coordinator wants each new ride EQUIPPED on the garage stage (tap card [data-gc=id], wait for build-up), not just the card thumbnail.
 Test scripts (scratch, recreate): garage open + __g9c.render(id) for each id on out/<ver>/index.html (deploy page; ?fast=1 local_dbg does not pump thumbnails);
 roam props: copy tools/tPlay.js, after "in roam" log __ld.w.on / __ld.wroad(). Headless roam needs tPlay's fake-rAF INIT. Athens 0.5-min tPlay wall/stuck fails on live too.
+
+## Update 17:50 UTC
+- LIVE: v90e (city-1 traffic, built from 32c4ea53; Big Rig out of fra traffic). v90f on branch head: size-1 (deduped: LD_SCRE in 98ld_import.js = one SC-vs-minifig rule for rides + traffic; RSZ.mini covers every t_v City/Town ride),
+  land-1 (98ld_l_land.js after 98ld_w.js: trees/lamps/fences/crates), 9 Town rides, facing fix 604/606/620/622, 4956 House. tPlay fra PASS. WAITING: size-1 (session_01NeJvmdn2aCpPX3zP2ofgLc) Snowplow lane shot + dark-object answer.
+- Queued v90g: build-8 6521, 6527, 6530 (alex/od-mdl-veh). garage-18 (session_019vNFjqrqunwBDfw4daimsX, alex/od-garage18) garage bugs: merge when it reports. rescue-1 session_01PjYpc3jdr9iB9myHSwGVAs (alex/od-rescue).
+- ALEX RULE: never drop/skip finished work -> fix or hand to rescue-1.
+- Test tricks: tools/tPlayLD.tmp.js (git-ignored copy of tPlay) logs LDCHK (props, __ld.wroad). A ride equipped in roam cannot be forced from tPlay (story keeps Hot Rod).
+  Garage card shots: tap the card IMG (touchscreen) = equip, wait 12 s; thumbnails pump serially (~1.5 s each in swiftshader).
