@@ -14,3 +14,10 @@
 - bc/sizes.js <url>: stud extents of every ride. bc/szshot.js <url> <out> [ids]: roam via the API, each ride as a roam ship plus a traffic car and a 1.9 m minifig, side shot + _cab 3/4 shot + W/L/H. bc/fig2.js: driver figure boxes.
 - tools/ld/tRides.js with SET=<id>: real garage taps + drive + tyre gap (Big Rig 0.03 m).
 - Don't `pkill -f`/`pgrep -f` with a pattern that is in your own command line: it kills the shell.
+
+## Update 18:05 UTC
+- The reviewer gave a CONDITIONAL (stale base, snowplow width). build-7 merged c7aefc07 into v90f on alex/od-models; the rule is now RSZ.mini (LD_SCRE = Speed Champions, shared with 98ct).
+- alex/od-size bc35e81f = od-models d6b0c858 + the collider cap RSZ.capW 3.2 (BC_dims wrap). Sent to build-7, the reviewer and the coordinator, with plow_lane.png and new_rides_driver.png.
+- Dark object in the contact shots = live traffic at shot time, not a leftover (one ride mesh after a real switch + drive).
+- Open: 604/606/620/622 have no 'stw', so no driver; big trucks get the BC mass factor (acc about 0.53–0.65).
+- 18:00: the coordinator is not deploying alex/od-size (its out/v90f predates the merge). build-7 folds the cap into v90f. size-1 stood down.

@@ -36,5 +36,6 @@ SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(u
 // BC (98bc_bigcars.js) compares a ride with the Hot Rod: its reference width was measured squeezed (1.93 m); unsqueezed it is 2.57 m
 BC.ref.W=2.57;
 // the collider is never wider than a lane vehicle (3.2 m): a snowplow blade or wide mirrors overhang it and glancing hits slide (reviewer: 4.7 m snowplow)
-RSZ.capW=3.2;BC_dims=(f=>function(ud){const d=f.apply(this,arguments);if(d&&d.W>RSZ.capW)d.W=RSZ.capW;return d})(BC_dims);
+RSZ.capW=3.2;// and a measure that is not a car (negative or zero width, a body longer than 30 m) is dropped: BC keeps the last good hull
+BC_dims=(f=>function(ud){const d=f.apply(this,arguments);if(!d||!(d.W>.3&&d.L>.5&&d.H>.3&&d.L<30&&d.W<12))return null;if(d.W>RSZ.capW)d.W=RSZ.capW;return d})(BC_dims);
 window.__sz={S:RSZ,k:SZ_k,add:SZ_add};
