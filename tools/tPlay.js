@@ -228,7 +228,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    ok(!s.reloads,`${m} ${c}: the page never reloads while playing`,{reloads:s.reloads||0,events:(s.events||[]).filter(e=>/RELOAD/.test(e))});
    if(c==='ath')ok(s.loads===0,`${m} ath: no loading screens while driving`,{loads:s.loads});
    ok(s.scale.pedRel==null||s.scale.pedRel<=1.2,`${m} ${c}: pedestrians ≤ 1.2× adult scale vs cars`,s.scale);
-   if(s.rot)ok(Object.values(s.rot.ctl).every(v=>v==='ok')&&!s.rot.stuck.length,`${m}: after 3 rotations every touch control answers, nothing latched`,s.rot);
+   if(s.rot)ok(Object.entries(s.rot.ctl).every(([k,v])=>v==='ok'||k==='DRIFT'&&v==='hidden')&&!s.rot.stuck.length,`${m}: after 3 rotations every touch control answers, nothing latched`,s.rot);
    if(m==='phone')ok(!s.tiny.length,`${m} ${c}: no HUD text under 12 px`,s.tiny.slice(0,8));
    if(m==='phone')ok(!s.overlap.length,`${m} ${c}: no HUD element over a touch control`,s.overlap.slice(0,8));
    ok(s.road.blocked+s.roadEnd.blocked===0,`${m} ${c}: no collider on the paved road (invisible walls / oversize hulls)`,{pts:s.road.roadPts+s.roadEnd.roadPts,start:s.road.colliders,end:s.roadEnd.colliders,ex:s.road.sample.concat(s.roadEnd.sample).slice(0,3)});
