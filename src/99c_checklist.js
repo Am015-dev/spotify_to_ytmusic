@@ -5,6 +5,10 @@
 const OD_CHECKLIST=[
  {ver:'v89v',id:'cgarage-world',text:'Frankfurt, near the start (by the Town Bank): the Corner Garage stands on its own lot, white ground floor with green trim, tan flats above, petrol canopy; it does not block a road and you bump off its walls.'},
  {ver:'v89v',id:'cgarage-fps',text:'Drive past the Corner Garage and the Town Bank on the phone: no stutter or slowdown compared with the rest of Frankfurt.'},
+ {ver:'v89v',id:'veh-rides',text:'Garage → RIDES → STREET: Race Car (30572), Fire Chief (4914), Patrol Car (4436) and Camper (7639) each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
+ {ver:'v89v',id:'fra-props',text:'Frankfurt near the start: Town House, Burger Stand and Ice Cream Cart stand on lots beside the road, none on the road; you bump off them.'},
+ {ver:'v89v',id:'fra-boat',text:'Frankfurt river: a small Motor Boat is moored by the bank, sitting IN the water.'},
+ {ver:'v89v',id:'ath-props',text:'Athens near the start: the Summer Cottage and the Sidewalk Cafe stand beside the road, none on the road.'},
  {ver:'v89u',id:'pboat-garage',text:'Garage → RIDES → WATER → Power Boat: the long white hull with red deck, black cockpit and yellow trim shows, with a driver on the front seat.'},
  {ver:'v89u',id:'pboat-drive',text:'Drive the Power Boat on the water: the hull sits IN the water (not floating above it, not sunk), it steers like the other boats.'},
  {ver:'v89t',id:'turbo-garage',text:'Garage → RIDES → Turbo 74: the white 911 Turbo shows with its black whale-tail wing, round headlights and 4 wheels; SAVE & DRIVE works.'},
