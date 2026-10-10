@@ -6,12 +6,14 @@
 // (CT_dim, read by OB_cdim). A model missing from models.js (lazy load not finished) falls back to the old procedural kind (CT_FB).
 const CT={geo:{},dim:{},fb:{},stat:[]};
 // slot swaps (after QS/SU swaps): name → new kind. Frankfurt: 0 sedan,1 hypercar,2 taxi,3 van,4 truck,5 delivery,6 police,7 coupe,8 bus,9 tuner,10 roadster
-const CT_SWAP={fra:{'sedan':'ld:car:v75893_1b','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1','truck':'ld:truck:v3221_1',
-  'delivery':'ld:delivery:v60054_1','police':'ld:police:v4436_1','su:t_sc_tm':'ld:car:v75893_1a'},
- ath:{'taxi':'ld:car:tx','sedan':'ld:car:v75893_1b','van':'ld:van:v7639_1','su:t_sc_tm':'ld:car:v75893_1a','delivery':'ld:delivery:v60054_1','su:t_sc_hy':'ld:car:v75892_1'}};
-if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];for(let i=0;i<HCAR.length;i++){const v=S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
+const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1','truck':'ld:truck:v3221_1',
+  'delivery':'ld:delivery:v60054_1','police':'ld:police:v4436_1','su:t_sc_tm':'ld:car:v75893_1b'},
+ ath:{'taxi':'ld:car:tx','sedan':'ld:car:v6633_1','van':'ld:van:v7639_1','su:t_sc_tm':'ld:car:v75893_1b','delivery':'ld:delivery:v60054_1','su:t_sc_hy':'ld:car:v75892_1'}};
+if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];const ex=(location.search.match(/[?&]ctx=([^&]*)/)||[])[1]||'';/* test: ctx=<old kinds kept> */for(let i=0;i<HCAR.length;i++){const v=!ex.split(',').includes(HCAR[i])&&S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
 // target body widths per class (m): Town sets are 4–6 studs wide, Speed Champions 8, so each is scaled uniformly to a road width
 const CT_W={tx:1.72/* 6-wide 40468: keep its height near the others */,car:1.9,police:1.95,van:2.1,delivery:2.2,truck:2.4};
+// lazy models (v89z LD_need): start loading the traffic sets of both cities at boot, so they are in before roam builds (else: CT_FB fallback)
+try{LD_need([...new Set(Object.values(CT_SWAP.fra).concat(Object.values(CT_SWAP.ath)).map(n=>n.split(':')[2]).filter(id=>id!=='tx'))])}catch(e){}
 function CT_bricks(src){if(src==='tx')return typeof TX_CAR==='function'?GAR_arr(TX_CAR()):[];return LD_MODELS[src]?LD_br(src):[]}
 function CT_build(nm){const src=nm.split(':')[2],B=CT_bricks(src).filter(b=>!['drv','drvR','stw','fig','flag'].includes(b.t));if(!B.length)return null;
  const lo=CR_LO;let G=null;for(const lv of[2,3,0]){CR_LO=lv;try{G=GB_geo(B,null)}catch(e){G=null}finally{CR_LO=lo}if(G&&G.m)break}if(!G||!G.m)return null;/* the 40468 taxi's printed parts have no LO-2 builder: next level */G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);
@@ -39,7 +41,7 @@ window.__ct={CT,swap:CT_SWAP,hcar:()=>HCAR.slice(),geo:nm=>CR_cityGeo(nm),r:()=>
 // Colliders = each set's footprint of tall parts (oriented, like the Kenney boxes, so glancing hits slide the same way). Landmarks, towers, quest
 // buildings and the existing LDraw props are untouched. Render: one InstancedMesh per model variant and material (near, full bricks) plus one
 // far mesh per variant (vertex-clustered, ~5 % tris); every few frames the instances are re-sorted by distance and view direction.
-const CTB={on:!/[?&]ctb=0/.test(location.search),K:{},near:70,far:520,st:{slots:0,sets:0,skip:0,by:{}},t:0,cg:[]};
+const CTB={on:/[?&]ctb=1/.test(location.search)/* v90b: traffic ships first; buildings are test-only (?ctb=1) until their memory pass */,K:{},near:70,far:520,st:{slots:0,sets:0,skip:0,by:{}},t:0,cg:[]};
 // model variants: id(s), recolour map (old hex → new hex), where. fra = Frankfurt rows; ath = Athens plaka/villa houses (whitewashed)
 const CTB_V={fra:[
   {k:'bank',ids:['bank'],w:3},{k:'bank_t',ids:['bank'],w:2,rc:{'#b40000':'#e4cd9e','#f4f4f4':'#b40000'}},

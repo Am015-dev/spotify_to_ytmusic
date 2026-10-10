@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90b',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow big rig, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
+ {ver:'v90b',id:'ct-hit',text:'Bump into a traffic car and a big rig: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
  {ver:'v89z',id:'fb-cards',text:'Garage → RIDES → OFF-ROAD and → WATER: every ride card has ✎ BUILD and ▶ GUIDE.'},
  {ver:'v89z',id:'fb-build',text:'WATER → Speedboat → ✎ BUILD: the boat (not the Hot Rod) is in the builder and its name is at the top. Place a part, ROTATE, place another, go back to RIDES: the boat card shows your parts.'},
  {ver:'v89z',id:'fb-guide',text:'OFF-ROAD → Blue Beast → ▶ GUIDE: the guide builds the monster truck step by step (title says Blue Beast). EXIT works.'},
