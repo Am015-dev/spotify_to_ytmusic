@@ -1,0 +1,3 @@
+grand W 38.0 raceSec 123.65 avgKmh 201.5 top 295.35 wall/min 0.73 transf 6.0 items 4.0 ms 283.22 calls 213.5 place ['3/8', '4/8'] routes [['water', 'dirt'], ['water', 'dirt']] err 0
+hafen W 38.0 raceSec 76.9 avgKmh 175.15 top 270.75 wall/min 0.78 transf 6.0 items 2.0 ms 300.06 calls 210.5 place ['3/8', '1/8'] routes [['water', 'dirt'], ['water', 'dirt']] err 0
+akro W 38.0 raceSec 112.4 avgKmh 186.15 top 286.05 wall/min 0.27 transf 4.0 items 4.5 ms 289.45 calls 172.5 place ['3/8', '4/8'] routes [['dirt', 'water'], ['dirt', 'water']] err 0

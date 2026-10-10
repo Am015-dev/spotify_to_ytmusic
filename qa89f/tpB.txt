@@ -1,0 +1,13 @@
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":10.6}
+FAIL phone ath: wall/building hits ≤ 1/min · {"wallPerMin":5.54,"bigDrop":10,"hits":15}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":983,"start":0,"end":0,"ex":[]}
+PASS phone ath: no loading screens while driving · {"loads":0}
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.76,"carL":4.63,"carH":1.44,"player":{"h":9.17,"l":16.65,"w":13.35},"pedRel":0.95,"pedVsPlayer":0.26,"nPed":8,"nCar":8}
+PASS phone ath: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone: zero console / page errors · []
+TPLAY_FAST FAIL 3 · 407 s · qa89f/tpB/*.log

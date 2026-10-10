@@ -1,0 +1,65 @@
+dbgD 0 {"v":0.2,"d":0,"sv":0,"stk":6,"f":"car","k":"{\"K\":[],\"T\":[null,false,null],\"fr\":false,\"on\":true,\"v\":0.22201357225881121,\"air\":null}"}
+dbgD 180 {"v":4.1,"d":5,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[null,false,null],\"fr\":false,\"on\":true,\"v\":4.129202884799159,\"air\":null}"}
+dbgD 360 {"v":24.6,"d":50,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[null,false,null],\"fr\":false,\"on\":true,\"v\":24.56889765885525,\"air\":null}"}
+desk_fra drive1 {"m":61,"v":0,"btn":"exit","canExit":true}
+desk_fra layout_car {"ctl":[],"n":0,"ov":[],"tiny":["SMALL:11px:KM/H"]}
+PASS desk_fra EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":true,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS desk_fra EXIT → on foot · {"state":"walk"}
+desk_fra scale {"fig":1.8,"peds":[1.76,1.77,1.76,1.74,1.77,1.73],"figH":1.8,"calls":171,"callsCar":169}
+PASS desk_fra minifig 1.75–1.85 m · 1.8
+PASS desk_fra peds near 1.8–2.0 m · [1.76,1.77,1.76,1.74,1.77,1.73]
+desk_fra zone {"z":[0,0,0,0],"ring":[0,0,0],"hit":"c","hh":"<canvas id=\"c\" data-engine=\"three.js r164\" width=\"313\" height=\"196\"></canvas>","par":"BODY<HTML","t":0}
+desk_fra layout_foot {"ctl":[],"n":0,"ov":[],"tiny":[]}
+PASS desk_fra ≤5 controls on foot · []
+PASS desk_fra no HUD over controls · []
+PASS desk_fra text ≥12 px · []
+desk_fra desk_fra_j1_target {"x":1993.4868443861171,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":1.2,"d":7.972430993027704,"ah":5.415817968913643,"j":9,"k":0}
+dbg 0 {"p":[1998.9,2.1],"t":[1993.5,7.9],"cv":1.2,"ah":5.4,"near":{"k":"cur","x":1998.9,"z":0.3},"dbg":{"e":5.72,"dy":0.19,"rt":false,"cv":1.205940854933684,"dead":0}}
+PASS desk_fra_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2003.2,"z":7.9},"frames":36}
+PASS desk_fra_j1 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_fra_j1 button reads TAKE · "🚗 TAKE"
+desk_fra desk_fra_j1_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":167}
+PASS desk_fra_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_fra_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@1999,0","jack@1995,8","★+1:jack","enter:traf@1995,8"]}
+PASS desk_fra_j1 +1 ★ · {"stars":1,"before":0}
+desk_fra desk_fra_j1_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4.7,"dp":5.1},"calls":170}
+PASS desk_fra_j1 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4.7,"dp":5.1}
+PASS desk_fra_j1 jack ≤20 s after EXIT · {"walkS":0.6}
+dbgD 0 {"v":3.5,"d":0,"sv":0,"stk":0,"f":"car","k":"{\"K\":[],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":3.4999493821315317,\"air\":null}"}
+dbgD 180 {"v":9.4,"d":33,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":9.38556021880405,\"air\":null}"}
+dbgD 360 {"v":7.8,"d":61,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":7.812917659907544,\"air\":null}"}
+dbgD 540 {"v":0,"d":72,"sv":0,"stk":60,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":0.02646970799106077,\"air\":null}"}
+dbgD 720 {"v":0.1,"d":72,"sv":1,"stk":84,"f":"car","k":"{\"K\":[\"ArrowUp\",\"ArrowRight\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":0.09357780255807605,\"air\":null}"}
+dbgD 900 {"v":0.1,"d":73,"sv":0,"stk":264,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":0.08552794393129423,\"air\":null}"}
+dbgD 1080 {"v":0.1,"d":75,"sv":0,"stk":444,"f":"car","k":"{\"K\":[\"ArrowUp\",\"ArrowRight\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":0.09523469978872484,\"air\":null}"}
+dbgD 1260 {"v":17,"d":99,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":17.04939791947521,\"air\":null}"}
+PASS desk_fra_j1 drove 100 m in the stolen car · 101
+PASS desk_fra_j1 tyre gap ≤0.05 m · 0.029
+PASS desk_fra_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+desk_fra desk_fra_j1_drive {"m":101,"gap":0.029,"lowN":"inst:2304","calls":194,"callsCar0":169,"wall":[null,null]}
+dbgD 0 {"v":0,"d":0,"sv":0,"stk":6,"f":"car","k":"{\"K\":[],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":0,\"air\":null}"}
+dbgD 180 {"v":17.4,"d":26,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":17.402165969798595,\"air\":null}"}
+PASS desk_fra_j2 EXIT again · {"state":"walk","btn":"enter"}
+desk_fra desk_fra_j2_target {"x":2148.793828679602,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":6,"d":26.203950673895232,"ah":25.691010634168833,"j":2,"k":8}
+dbg 0 {"p":[2174.5,2.8],"t":[2148.8,7.9],"cv":6,"ah":25.7,"near":{"k":"cur","x":2174.5,"z":4.7},"dbg":{"e":23.71,"dy":0.27,"rt":false,"cv":6,"dead":0}}
+dbg 60 {"p":[2170.2,3.2],"t":[2155.8,7.9],"cv":7.1,"ah":14.4,"near":null,"dbg":{"e":12.65,"dy":0.25,"rt":false,"cv":7.1069541874999,"dead":0}}
+dbg 120 {"p":[2166.7,4.3],"t":[2159.3,7.9],"cv":2.2,"ah":7.4,"near":null,"dbg":{"e":5.65,"dy":0.19,"rt":false,"cv":2.2352763528538016,"dead":0}}
+dbg 180 {"p":[2164.2,7],"t":[2152.1,2.4],"cv":4.8,"ah":4.6,"near":null,"dbg":{"e":11.37,"dy":-0.24,"rt":false,"cv":4.822115712673699,"dead":0}}
+PASS desk_fra_j2 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2155,"z":7.9},"frames":234}
+PASS desk_fra_j2 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_fra_j2 button reads TAKE · "🚗 TAKE"
+desk_fra desk_fra_j2_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":181}
+PASS desk_fra_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_fra_j2 jacked → driving the traffic car · {"state":"car","own":false,"taken":2,"log":["exit@1999,0","jack@1995,8","★+1:jack","enter:traf@1995,8","exit@2174,5","jack@2155,8","★+1:jack","enter:traf@2155,8"]}
+PASS desk_fra_j2 +1 ★ · {"stars":2,"before":1}
+desk_fra desk_fra_j2_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.8,"dc":4.7,"dp":5},"calls":189}
+PASS desk_fra_j2 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.8,"dc":4.7,"dp":5}
+PASS desk_fra_j2 jack ≤20 s after EXIT · {"walkS":3.9}
+dbgD 0 {"v":2.8,"d":0,"sv":0,"stk":0,"f":"car","k":"{\"K\":[],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":2.845570507023056,\"air\":null}"}
+dbgD 180 {"v":20.4,"d":36,"sv":0,"stk":0,"f":"car","k":"{\"K\":[\"ArrowUp\"],\"T\":[false,false,null],\"fr\":false,\"on\":true,\"v\":20.370861877927194,\"air\":null}"}
+PASS desk_fra_j2 drove 100 m in the stolen car · 101
+PASS desk_fra_j2 tyre gap ≤0.05 m · 0.028
+PASS desk_fra_j2 ★ chip visible · {"t":"★2","vis":true,"fs":"14px"}
+desk_fra desk_fra_j2_drive {"m":101,"gap":0.028,"lowN":"inst:2304","calls":147,"callsCar0":169,"wall":[null,null]}
+PASS desk_fra 0 console errors · []
+TJACK_PASS

@@ -1,0 +1,8 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const URL=process.argv[2],OUT=process.argv[3];fs.mkdirSync(OUT,{recursive:true});
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true});
+const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+await p.goto(URL);await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});await p.waitForTimeout(2500);
+await p.click('#gbMenuBtn');await p.waitForTimeout(2000);await p.getByText('BUILD',{exact:true}).first().click();await p.waitForTimeout(2000);
+await p.mouse.click(120,230);await p.keyboard.type('slope');await p.waitForTimeout(3000);await p.mouse.click(720,300);await p.mouse.move(690,200);await p.mouse.click(690,200);await p.waitForTimeout(1500);await p.screenshot({path:OUT+'/search.png'});
+console.log(JSON.stringify(await p.evaluate(()=>{const o=[];for(const e of document.querySelectorAll('body *')){const r=e.getBoundingClientRect();if(r.width<3||r.height<3)continue;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')continue;if(r.left<780&&r.right>560&&r.top<250&&r.bottom>150&&r.width<420&&r.height<200)o.push([e.tagName,e.id,String(e.className).slice(0,24),Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height),cs.position,cs.zIndex])}return o.slice(0,40)})));await p.screenshot({path:OUT+'/search2.png'});
+console.log(errs);await b.close()})()

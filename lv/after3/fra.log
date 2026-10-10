@@ -1,0 +1,9 @@
+city fra
+shot 0 -240 600 {"peds":4,"cars":4,"birds":0,"boats":0}
+shot 1 1920 1200 {"peds":0,"cars":0,"birds":0,"boats":0}
+shot 2 -240 1200 {"peds":1,"cars":1,"birds":0,"boats":0}
+shot 3 -2880 1680 {"peds":12,"cars":0,"birds":0,"boats":0}
+shot 4 840 -1200 {"peds":23,"cars":0,"birds":0,"boats":0}
+frame_ms {"withRender":687.78,"cpuOnly":8.47}
+lv {"peds":70,"flags":33,"roofs":1545,"boats":5,"birds":6,"blimp":true,"ms":0.09531294079520025}
+errors 0 

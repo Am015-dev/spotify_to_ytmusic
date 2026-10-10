@@ -1,0 +1,26 @@
+== enter ath roam wall 189458 ms, sampled 189966 ms
+ 12.8% 24352ms athShelfY@base_dbg.html:3867
+ 12.3% 23382ms cityAt@base_dbg.html:3795
+  8.0% 15236ms ART7_rd@base_dbg.html:9396
+  6.9% 13085ms (garbage collector)@:-1
+  6.5% 12403ms trailDist@base_dbg.html:3940
+  5.7% 10841ms (idle)@:-1
+  5.2% 9949ms toDataURL@:-1
+  4.8% 9077ms TR_Y@base_dbg.html:3843
+  3.9% 7338ms SM_shC@base_dbg.html:3862
+  3.2% 6062ms gndBuild@base_dbg.html:4122
+  3.0% 5744ms TR_G@base_dbg.html:3838
+  2.6% 4880ms getProgramParameter@:-1
+  2.2% 4106ms bufferData@:-1
+  1.5% 2815ms DR_inSolid@base_dbg.html:8871
+  1.2% 2363ms abAt@base_dbg.html:3982
+  1.2% 2323ms fillAt@base_dbg.html:4020
+  1.2% 2291ms (program)@:-1
+  1.1% 2112ms lzRoadD@base_dbg.html:4694
+  1.0% 1808ms Float32BufferAttribute@three.module.js:10408
+  0.8% 1584ms athRoadD@base_dbg.html:4517
+  0.8% 1513ms TR_bldFix@base_dbg.html:7378
+  0.6% 1158ms find@base_dbg.html:7382
+  0.5% 994ms athBuildG@base_dbg.html:4465
+  0.4% 848ms ci@base_dbg.html:4466
+  0.4% 768ms WB_split@base_dbg.html:12488

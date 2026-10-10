@@ -1,0 +1,977 @@
+{
+ "city": "fra",
+ "s": [
+  {
+   "wb": 0,
+   "totMB": 208.4,
+   "glMB": 61.3,
+   "cpuMB": 36.7,
+   "geoms": 309,
+   "tex": 160,
+   "progs": 66,
+   "top": [
+    [
+     "Group/Mesh",
+     197,
+     21.9,
+     21.9
+    ],
+    [
+     "m+ribbons/Group/Group",
+     798,
+     12.7,
+     12.7
+    ],
+    [
+     "a8",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/Group/Mesh",
+     205,
+     0.2,
+     0.2
+    ],
+    [
+     "Group/tunTube",
+     1,
+     0.2,
+     0.2
+    ],
+    [
+     "Mesh",
+     12,
+     0.1,
+     0.1
+    ],
+    [
+     "LineSegments",
+     2,
+     0.1,
+     0.1
+    ],
+    [
+     "Points",
+     6,
+     0.1,
+     0.1
+    ],
+    [
+     "Group/Group/Group",
+     122,
+     0.1,
+     0.1
+    ],
+    [
+     "m+ribbons/Group/boat",
+     128,
+     0.1,
+     0.1
+    ],
+    [
+     "m+ribbons/art6c+r17m",
+     8,
+     0.1,
+     0.1
+    ],
+    [
+     "PerspectiveCamera/LineSegments",
+     1,
+     0,
+     0
+    ],
+    [
+     "a8/a8s+keep",
+     16,
+     0,
+     0
+    ],
+    [
+     "Group/Group/Sprite",
+     5,
+     0,
+     0
+    ]
+   ],
+   "heapMB": 38.2,
+   "lbl": "menu"
+  },
+  {
+   "wb": 0.5,
+   "totMB": 287.1,
+   "glMB": 111.6,
+   "cpuMB": 46.4,
+   "geoms": 4078,
+   "tex": 136,
+   "progs": 96,
+   "top": [
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/Group/Group",
+     389,
+     0.2,
+     1.8
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ],
+    [
+     "Group/trPl+bwT",
+     9,
+     0,
+     0.3
+    ]
+   ],
+   "heapMB": 77.9,
+   "lbl": "roam"
+  },
+  {
+   "wb": 0.5,
+   "totMB": 295.9,
+   "glMB": 111.6,
+   "cpuMB": 46.5,
+   "geoms": 4080,
+   "tex": 136,
+   "progs": 96,
+   "top": [
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/Group/Group",
+     411,
+     0.2,
+     1.8
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ],
+    [
+     "Group/trPl+bwT",
+     9,
+     0,
+     0.3
+    ]
+   ],
+   "heapMB": 78.3,
+   "lbl": "drive20"
+  },
+  {
+   "wb": 0.5,
+   "totMB": 302.1,
+   "glMB": 112,
+   "cpuMB": 46.7,
+   "geoms": 4093,
+   "tex": 136,
+   "progs": 96,
+   "top": [
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     466,
+     0.4,
+     2
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ],
+    [
+     "Group/trPl+bwT",
+     9,
+     0,
+     0.3
+    ]
+   ],
+   "heapMB": 76.6,
+   "lbl": "drive40"
+  },
+  {
+   "wb": 0.5,
+   "totMB": 310.8,
+   "glMB": 112.3,
+   "cpuMB": 46.7,
+   "geoms": 4102,
+   "tex": 136,
+   "progs": 96,
+   "top": [
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     477,
+     0.4,
+     2
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ],
+    [
+     "Group/trPl+bwT",
+     9,
+     0,
+     0.3
+    ]
+   ],
+   "heapMB": 76.9,
+   "lbl": "drive60"
+  },
+  {
+   "wb": 0.5,
+   "totMB": 311.1,
+   "glMB": 134.7,
+   "cpuMB": 46.7,
+   "geoms": 4122,
+   "tex": 138,
+   "progs": 97,
+   "top": [
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/keep+wbLod",
+     55,
+     0,
+     44
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     488,
+     0.4,
+     2
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ]
+   ],
+   "heapMB": 79,
+   "lbl": "drive80"
+  },
+  {
+   "wb": 0.5,
+   "totMB": 309.9,
+   "glMB": 168.4,
+   "cpuMB": 46.7,
+   "geoms": 4131,
+   "tex": 138,
+   "progs": 97,
+   "top": [
+    [
+     "Group/keep+wbLod",
+     165,
+     0,
+     110.9
+    ],
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     488,
+     0.4,
+     2
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ]
+   ],
+   "heapMB": 77.7,
+   "lbl": "drive100"
+  },
+  {
+   "wb": 1,
+   "totMB": 315.4,
+   "glMB": 178.8,
+   "cpuMB": 46.7,
+   "geoms": 4181,
+   "tex": 138,
+   "progs": 97,
+   "top": [
+    [
+     "Group/keep+wbLod",
+     209,
+     0,
+     130.3
+    ],
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     499,
+     0.4,
+     2.1
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ]
+   ],
+   "heapMB": 82.6,
+   "lbl": "drive120"
+  },
+  {
+   "wb": 1,
+   "totMB": 329.4,
+   "glMB": 180.6,
+   "cpuMB": 46.7,
+   "geoms": 4208,
+   "tex": 150,
+   "progs": 114,
+   "top": [
+    [
+     "Group/keep+wbLod",
+     209,
+     0,
+     130.3
+    ],
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     499,
+     0.4,
+     2.1
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ]
+   ],
+   "heapMB": 83.3,
+   "lbl": "garage"
+  },
+  {
+   "wb": 1,
+   "totMB": 316.4,
+   "glMB": 180.7,
+   "cpuMB": 46.7,
+   "geoms": 4213,
+   "tex": 149,
+   "progs": 114,
+   "top": [
+    [
+     "Group/keep+wbLod",
+     209,
+     0,
+     130.3
+    ],
+    [
+     "Group/Mesh",
+     1800,
+     22.6,
+     58
+    ],
+    [
+     "Group/trG+bwT",
+     88,
+     0,
+     26.2
+    ],
+    [
+     "Group/w+g",
+     11,
+     10.2,
+     10.2
+    ],
+    [
+     "m+ribbons/Group/scN",
+     74,
+     4.4,
+     4.4
+    ],
+    [
+     "Group/a8",
+     22,
+     2.9,
+     2.9
+    ],
+    [
+     "Group/keep+wbLo",
+     11,
+     2.4,
+     2.4
+    ],
+    [
+     "Group/Group/Group",
+     499,
+     0.4,
+     2.1
+    ],
+    [
+     "Group/ks",
+     1559,
+     2,
+     2
+    ],
+    [
+     "Group/cv",
+     8,
+     0.1,
+     1.5
+    ],
+    [
+     "Group/trG",
+     15,
+     0,
+     1.2
+    ],
+    [
+     "a8+art6c",
+     16,
+     1.1,
+     1.1
+    ],
+    [
+     "Group/trPl",
+     34,
+     0,
+     0.6
+    ],
+    [
+     "Group/dr",
+     2,
+     0,
+     0.5
+    ]
+   ],
+   "heapMB": 78.9,
+   "lbl": "after_garage:✕BACK"
+  }
+ ],
+ "enter_s": 28.55,
+ "errs": []
+}

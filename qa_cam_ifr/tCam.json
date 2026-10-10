@@ -1,0 +1,269 @@
+[
+ {
+  "mode": "iframe",
+  "city": "fra",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 61,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.77,
+      1.75,
+      1.75,
+      1.77,
+      1.71,
+      1.72
+     ],
+     "figH": 1.8,
+     "calls": 469,
+     "callsCar": 466
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚪 ENTER",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "A",
+    {
+     "name": "straight",
+     "n": 252,
+     "camTurn": 0,
+     "camAbs": 0,
+     "heroTurn": 1.57,
+     "jitter": 0,
+     "maxRate": 0,
+     "lastRate": 0,
+     "onScreen": 100
+    }
+   ],
+   [
+    "B",
+    {
+     "name": "hold45",
+     "n": 492,
+     "camTurn": -0.78,
+     "camAbs": 0.78,
+     "heroTurn": -0.79,
+     "jitter": 0.236,
+     "maxRate": 1.2,
+     "lastRate": 0,
+     "onScreen": 100
+    }
+   ],
+   [
+    "C",
+    {
+     "name": "circle",
+     "n": 492,
+     "camTurn": 0,
+     "camAbs": 0,
+     "heroTurn": -6.28,
+     "jitter": 0,
+     "maxRate": 0,
+     "lastRate": 0,
+     "onScreen": 100
+    }
+   ],
+   [
+    "D",
+    {
+     "name": "fig8",
+     "n": 732,
+     "camTurn": 0,
+     "camAbs": 0,
+     "heroTurn": 0.13,
+     "jitter": 0,
+     "maxRate": 0,
+     "lastRate": 0,
+     "onScreen": 100
+    }
+   ],
+   [
+    "Eshot",
+    {
+     "calls": 235
+    }
+   ],
+   [
+    "E",
+    {
+     "name": "street",
+     "n": 3650,
+     "camTurn": -0.76,
+     "camAbs": 0.88,
+     "heroTurn": -0.88,
+     "jitter": 0.127,
+     "maxRate": 1.2,
+     "lastRate": 0,
+     "onScreen": 100,
+     "stuck": 0.2,
+     "camIn": 0
+    }
+   ],
+   [
+    "Fdbg",
+    "{\"cy\":-4.085660585616953,\"cam\":{\"id\":\"t0\",\"x\":661.2000122070312,\"y\":226.5,\"t0\":0,\"tap\":0,\"mv\":180},\"camT\":0.05000000000001455,\"foot\":\"walk\",\"ev\":22,\"tg\":\"ofCam@511,197\"}"
+   ],
+   [
+    "F",
+    {
+     "cy0": -3.110660585616952,
+     "cy1": -4.085660585616953,
+     "d": -0.975000000000001
+    }
+   ],
+   [
+    "G",
+    {
+     "name": "after_orbit",
+     "n": 128,
+     "camTurn": 0,
+     "camAbs": 0,
+     "heroTurn": -0.98,
+     "jitter": 0,
+     "maxRate": 0,
+     "lastRate": 0,
+     "onScreen": 100
+    }
+   ]
+  ],
+  "metrics": {
+   "A": {
+    "name": "straight",
+    "n": 252,
+    "camTurn": 0,
+    "camAbs": 0,
+    "heroTurn": 1.57,
+    "jitter": 0,
+    "maxRate": 0,
+    "lastRate": 0,
+    "onScreen": 100
+   },
+   "B": {
+    "name": "hold45",
+    "n": 492,
+    "camTurn": -0.78,
+    "camAbs": 0.78,
+    "heroTurn": -0.79,
+    "jitter": 0.236,
+    "maxRate": 1.2,
+    "lastRate": 0,
+    "onScreen": 100
+   },
+   "C": {
+    "name": "circle",
+    "n": 492,
+    "camTurn": 0,
+    "camAbs": 0,
+    "heroTurn": -6.28,
+    "jitter": 0,
+    "maxRate": 0,
+    "lastRate": 0,
+    "onScreen": 100
+   },
+   "D": {
+    "name": "fig8",
+    "n": 732,
+    "camTurn": 0,
+    "camAbs": 0,
+    "heroTurn": 0.13,
+    "jitter": 0,
+    "maxRate": 0,
+    "lastRate": 0,
+    "onScreen": 100
+   },
+   "E": {
+    "name": "street",
+    "n": 3650,
+    "camTurn": -0.76,
+    "camAbs": 0.88,
+    "heroTurn": -0.88,
+    "jitter": 0.127,
+    "maxRate": 1.2,
+    "lastRate": 0,
+    "onScreen": 100,
+    "stuck": 0.2,
+    "camIn": 0
+   },
+   "G": {
+    "name": "after_orbit",
+    "n": 128,
+    "camTurn": 0,
+    "camAbs": 0,
+    "heroTurn": -0.98,
+    "jitter": 0,
+    "maxRate": 0,
+    "lastRate": 0,
+    "onScreen": 100
+   }
+  }
+ }
+]

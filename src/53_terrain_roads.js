@@ -135,6 +135,9 @@ const AB_R=350,ABW=L=>L.map(p=>WP(p[0],p[1])),AB=CID!=='fra'?[]:[{id:'A5',name:'
 // interchanges: [name, road a, road b, real point along a (towards the ring inside), real point along b]; the connector is a curve between
 // the two carriageways ~420 m from the crossing (filled in by abSamples, so the curve follows the real road shapes)
 const AB_K=CID!=='fra'?[]:[['Frankfurter Kreuz','A5','A3',[-6146,265],[5422,-3493]],['Offenbacher Kreuz','A661','A3',[4134,-508],[-6082,-6257]],['Nordwestkreuz','A5','A66w',[-6146,265],[-9800,3000]],['Bad Homburger Kreuz','A5','A661',[-6212,5019],[3774,3803]]];
+// W12: asphalt height above groundY (the physics ground). Was r.y*2.5 = 0.25-0.6 m, so tyres sank into the ribbon; now 4-5.5 cm like city
+// streets (grass under roads dips 10 cm, ART8_dip). The small per-road step plus polygonOffset keeps overlapping ribbons apart.
+const AB_RY=r=>.03+r.y*.1;
 const AB_C=[],AB_X=[];
 // feeders from the outer end of a real radial to the nearest Autobahn
 const AB_FEED=CID!=='fra'?[]:[['mainzer','A5','Feeder road A5 · Mainzer Landstraße'],['heuss','A5','Feeder road A648 · Westkreuz'],['esch','A661','Feeder road A661 · Eschersheimer Landstraße'],['friedberger','A661','Feeder road A661 · Friedberger Landstraße'],['hanauer','A661','Feeder road A661 · Hanauer Landstraße'],['darm','A3','Feeder road A3 · Darmstädter Landstraße']];
@@ -169,7 +172,7 @@ function abAt(x,z){const S0=abSamples();if(!AB_G){AB_G=new Map();S0.forEach((S,s
 function abBridgesAuto(){const out=[];for(const S of abSamples()){const r=S.r;if(!r.ab||r.c)continue;const P=S.pts,step=S.L/(P.length-1);let i=0;while(i<P.length){if(!inRiver(P[i].x,P[i].z)){i++;continue}let j=i;while(j+1<P.length&&inRiver(P[j+1].x,P[j+1].z))j++;const m=P[(i+j)>>1],wl=(j-i+1)*step,L=160,half=wl/2+40+L;
     out.push({id:'ab_'+r.id,name:r.id==='A5'?'Schwanheimer Brücke (A5)':r.id==='A661'?'Kaiserleibrücke (A661)':r.id+' Mainbrücke',kind:'ab',cx:m.x,cz:m.z,ux:m.tx,uz:m.tz,w:r.w+2,H:12,prof:'ramp',L,half,road:r,r:half+r.w});i=j+1}}
   {const S=abSamples().find(q=>q.r.id==='A5'),X=AB_X.find(q=>q.name==='Frankfurter Kreuz');if(S&&X){const p=S.pts[abNearI(S,X.x,X.z)[0]];out.push({id:'ab_fk',name:'Frankfurter Kreuz (A5 über A3)',kind:'ab',cx:p.x,cz:p.z,ux:p.tx,uz:p.tz,w:40,H:9,prof:'ramp',L:120,half:180,road:AB[0],r:220})}}return out}
-AB_BRIDGES=abBridgesAuto();ALL_DECKS=[...BRIDGES,...AB_BRIDGES];
+AB_BRIDGES=abBridgesAuto();for(const b of AB_BRIDGES){b.yA=TR_Y(b.cx-b.ux*b.half,b.cz-b.uz*b.half);b.yB=TR_Y(b.cx+b.ux*b.half,b.cz+b.uz*b.half)}ALL_DECKS=[...BRIDGES,...AB_BRIDGES];
 const abSkip=(x,z,m=0)=>(abSamples(),AB_X).some(q=>Math.hypot(x-q.x,z-q.z)<520)||AB_BRIDGES.some(b=>{if(Math.abs(x-b.cx)>b.r+40+m||Math.abs(z-b.cz)>b.r+40+m)return false;const[a,c]=deckLocal(b,x,z);return Math.abs(a)<b.half+20+m&&Math.abs(c)<b.w+m});
 function abClear(x,z){const a=abAt(x,z);if(a&&a.d<a.road.w/2+10)return false;return !GARAGES.some(g=>g.x!=null&&Math.hypot(x-g.x,z-g.z)<70)&&mtnDist(x,z)>20}
 let MTN_S=null;function mtnSamples(){if(MTN_S)return MTN_S;MTN_S=MTN.map(r=>{const c=new THREE.CatmullRomCurve3(r.pts.map(p=>V3(p[0],0,p[1])));const L=c.getLength(),n=Math.ceil(L/6);return{r,pts:c.getSpacedPoints(n).map(v=>({x:v.x,z:v.z})),L}});return MTN_S}

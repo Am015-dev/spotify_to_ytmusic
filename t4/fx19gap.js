@@ -1,0 +1,21 @@
+// t4/fx19gap.js: story start (real taps), then measure every visible city-traffic car's 4 tyre-bottom gaps to groundAt (debug build hook __g9ev).
+// Also a low side shot of the nearest traffic car. usage: node t4/fx19gap.js <url> <png>
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const URL=process.argv[2],PNG=process.argv[3];
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true});
+ const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+ await p.goto(URL);await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});const cdp=await ctx.newCDPSession(p);
+ const tapXY=async(x,y)=>{const tp=[{x,y,id:1,radiusX:4,radiusY:4,force:1}];await Promise.all([cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:tp}),cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})]);await p.waitForTimeout(700)};
+ const tapEl=async e=>{const bb=await e.boundingBox();if(bb)await tapXY(bb.x+bb.width/2,bb.y+bb.height/2)};
+ await tapEl(await p.$('#hcStory'));for(let i=0;i<240;i++){await p.waitForTimeout(3000);if(await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on))==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}}
+ for(let i=0;i<14;i++){let hit=0;for(const l of[p.getByText('SKIP',{exact:false}),p.getByText('TAP TO CONTINUE'),p.locator('#m1Next')]){const e=l.first();if(await e.count()&&await e.isVisible()){await tapEl(await e.elementHandle());hit=1;break}}if(!hit&&i>3)break;await p.waitForTimeout(1500)}
+ const probe=`(()=>{const M=new THREE.Matrix4(),v=new THREE.Vector3(),out=[];for(const c of HUB.cars){if(c.dead>0)continue;const im=HUB.cim[c.k],w=im&&im.userData.w;if(!w)continue;
+  if(Math.hypot(c.x-RO.x,c.z-RO.z)>${+(process.env.RAD||200)})continue;w.getMatrixAt(c.j,M);if(M.elements[0]===0&&M.elements[5]===0)continue;const P=w.geometry.attributes.position,bb=w.geometry.boundingBox||(w.geometry.computeBoundingBox(),w.geometry.boundingBox),cx=(bb.min.x+bb.max.x)/2,cz=(bb.min.z+bb.max.z)/2;
+  const q=[1e9,1e9,1e9,1e9],qi=[0,0,0,0];for(let i=0;i<P.count;i++){const k=(P.getX(i)>cx?1:0)+(P.getZ(i)>cz?2:0);if(P.getY(i)<q[k]){q[k]=P.getY(i);qi[k]=i}}
+  const g=qi.map(i=>{v.fromBufferAttribute(P,i).applyMatrix4(M);return v.y-groundAt(v.x,v.z,v.y+1)});out.push({d:Math.round(Math.abs(c.x-camera.position.x)+Math.abs(c.z-camera.position.z)),nm:HCAR[c.k],max:+Math.max(...g).toFixed(3),min:+Math.min(...g).toFixed(3)})}
+  out.sort((a,b)=>b.max-a.max);return JSON.stringify({n:out.length,worst:out.slice(0,6),lowest:Math.min(...out.map(o=>o.min)).toFixed(3),over05:out.filter(o=>o.max>.05).length,near:(()=>{const n=out.filter(o=>o.d<=250);return{n:n.length,over05:n.filter(o=>o.max>.05||o.min<-.05).length,max:Math.max(...n.map(o=>o.max)),min:Math.min(...n.map(o=>o.min))}})(),farOver05:out.filter(o=>o.d>250&&o.max>.05).length})})()`;
+ if(process.env.ALL)await p.evaluate(()=>__g9ev('FX19_R=1e9'));
+ for(let k=0;k<3;k++){await p.waitForTimeout(2500);console.log('GAP',await p.evaluate(s=>__g9ev(s),probe))}
+ // low side view of the nearest traffic car: put the camera low beside it for one frame
+ console.log('side',await p.evaluate(()=>__g9ev(`(()=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>6){bd=d;b=c}}if(!b)return 'none';window.__fxc=b;return HCAR[b.k]+' '+bd.toFixed(1)})()`)));
+ await p.evaluate(()=>__g9ev(`(()=>{const f=frame;window.__fxOn=1;const R=window.__fxc;const o=renderer.render.bind(renderer);composer.render=((cr)=>function(){if(window.__fxOn&&R){const dx=Math.sin(R.hh||0),dz=Math.cos(R.hh||0);camera.position.set(R.x+dz*6,R.y+.35,R.z-dx*6);camera.lookAt(R.x,R.y+.4,R.z);camera.updateMatrixWorld()}return cr.apply(this,arguments)})(composer.render)})()`));
+ await p.waitForTimeout(800);await p.screenshot({path:PNG});console.log('ERR',JSON.stringify(errs.filter(e=>!/GPU stall|GL Driver/.test(e)).slice(0,5)));await b.close()})();

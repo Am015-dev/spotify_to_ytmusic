@@ -1,0 +1,2 @@
+(()=>{let im=0,im1=0,im4=0,ms=0,o3=0,inst=0;HUB.grp.traverse(o=>{o3++;if(o.isInstancedMesh){im++;inst+=o.count;if(o.count<=1)im1++;if(o.count<=4)im4++}else if(o.isMesh)ms++});let o3s=0;__dbg.scene.traverse(()=>o3s++);
+const L=HUB.CE_L||[];const pk=HUB.props?HUB.props.length:-1;return{o3,o3scene:o3s,im,im1,im4,inst,ms,props:pk,CE_L:L.length,bld:HUB.bld.length,grid:HUB.grid.size,gridRefs:[...HUB.grid.values()].reduce((a,l)=>a+l.length,0),pgrid:HUB.pgrid?HUB.pgrid.size:0,traf:(HUB.traffic||[]).length,trB:HUB.trB}})()

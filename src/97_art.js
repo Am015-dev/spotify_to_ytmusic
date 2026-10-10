@@ -10,9 +10,20 @@ function ART4_base(s,ud,boat){const host=ud.m;const key=host.uuid+'|'+(ud.gbM?ud
   o=boat?-(B.min.y-y0)-Math.min(.7,h*.3):-(B.min.y-y0);ART4.off.set(key,o);if(ART4.off.size>40)ART4.off.delete(ART4.off.keys().next().value);return o}
 function ART4_tyres(){if(ART4.ty)return ART4.ty;const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:ART_blobTex(),color:0,transparent:true,opacity:.7,depthWrite:false,fog:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),8);im.count=0;im.frustumCulled=false;im.renderOrder=1;im.userData.keep=1;scene.add(im);return ART4.ty=im}
 function ART4_foam(){if(ART4.fm)return ART4.fm;const im=new THREE.InstancedMesh(new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false,fog:false}),90);im.count=90;im.frustumCulled=false;im.userData.keep=1;ART4.fp=[];for(let i=0;i<90;i++){ART4.fp.push({x:0,y:-999,z:0,a:0,s:0});im.setMatrixAt(i,new THREE.Matrix4().makeScale(0,0,0))}ART4.fi=0;ART4.ft=0;scene.add(im);return ART4.fm=im}
+// W8 (v87f): boats sit IN the water. Boat mode kept the street car's ride-height offset (0 to 0.58 m depending on the garage set), so set
+// boats rode high. Now the hull bottom sits W8B.sink below the local wave surface every frame (world metres, through the live transform chain).
+const W8B={bb:new Map(),sink:.22,v:new THREE.Vector3(),q:new THREE.Quaternion(),sc:new THREE.Vector3(),M:new THREE.Matrix4(),T:new THREE.Matrix4()};
+function W8_boatY(s,ud){const g=ud.gbV&&ud.gbV.boat,host=ud.m,P=host.parent;if(!g||!P)return host.position.y;let n=0;g.traverse(m=>{if(m.isMesh&&m.geometry.attributes.position)n+=m.geometry.attributes.position.count});
+  const key=g.uuid+'|'+n;let B=W8B.bb.get(key);P.updateWorldMatrix(true,false);const y0=host.position.y;host.position.y=0;host.updateMatrixWorld(true);
+  if(!B){B=new THREE.Box3();W8B.M.copy(g.matrixWorld).invert();g.traverse(m=>{if(!m.isMesh||m.userData.a8s||m.material&&m.material.transparent&&m.material.opacity<.6)return;const pa=m.geometry.attributes.position;if(!pa)return;
+    W8B.T.multiplyMatrices(W8B.M,m.matrixWorld);for(let i=0;i<pa.count;i++)B.expandByPoint(W8B.v.fromBufferAttribute(pa,i).applyMatrix4(W8B.T))});
+   if(B.isEmpty()){host.position.y=y0;return y0}W8B.bb.set(key,B);if(W8B.bb.size>20)W8B.bb.delete(W8B.bb.keys().next().value)}
+  let lo=1e9;for(let i=0;i<8;i++){W8B.v.set(i&1?B.max.x:B.min.x,i&2?B.max.y:B.min.y,i&4?B.max.z:B.min.z).applyMatrix4(g.matrixWorld);if(W8B.v.y<lo)lo=W8B.v.y}
+  P.matrixWorld.decompose(W8B.v,W8B.q,W8B.sc);const sy=W8B.sc.y||1,water=RO.y+waveH(RO.x,RO.z,T)*Math.min(1,s.boatK||0)+Math.sin((s.bob||0)*.55)*.05;
+  host.position.y=y0;return(water-W8B.sink-lo)/sy}
 roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||s!==pl)return;const boat=(s.boatK||0)>.5;
   if(s.air){if(ART4.ty)ART4.ty.count=0;return}
-  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}
+  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}else ud.m.position.y=W8_boatY(s,ud);
   // front wheels steer (front = -z), spin order keeps the steer axis vertical
   const st=-(CTL.steer||0)*.42;let n=0;const T=ART4_tyres();
   for(const w of ud.gbM||[]){if(!w.userData.r||!ART4_vis(w))continue;if(w.position.z<-.2){w.rotation.order='YXZ';w.rotation.y=st}
@@ -47,13 +58,13 @@ function ART_hub(){if(!HUB||!HUB.M||HUB.M.artDone===CID)return;const M=HUB.M;M.a
   if(CID==='ath'&&M.cobble){M.cobble.map=ART_tex(256,256,(g,W)=>{g.fillStyle='#5a5d64';g.fillRect(0,0,W,W);let r=7;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;for(let i=0;i<2500;i++){const v=72+rnd()*40|0;g.fillStyle=`rgba(${v},${v+2},${v+6},.45)`;g.fillRect(rnd()*W,rnd()*W,2,2)}});M.cobble.color.set(0xffffff);M.cobble.roughness=.75;M.cobble.needsUpdate=true}
   if(M.road){const t=ART_road();t.wrapS=THREE.ClampToEdgeWrapping;M.road.map=t;M.road.color.set(0xffffff);M.road.roughness=.7;M.road.needsUpdate=true}}
 
-// brick clouds: ~22 stacked-plate clouds with studs on a far ring that follows the camera (never overhead, so the sky stays deep blue); 2 draw calls
-cloudsOn=function(v){if(v&&!CLOUDS){const L=13,BR=[],ST=[];let r=5;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
-  for(let c=0;c<22;c++){const a=c/22*Math.PI*2+rnd()*.2,R=1350+rnd()*500,cx=Math.cos(a)*R,cz=Math.sin(a)*R,cy=170+rnd()*260,yaw=a+Math.PI/2;const ca=Math.cos(yaw),sa=Math.sin(yaw);
+// brick clouds (ART10: 14 big ones, 1.85× the brick size, 12-20° above the horizon so they clear the rooftops; whiter): stacked-plate clouds with studs on a far ring that follows the camera (never overhead, so the sky stays deep blue); 2 draw calls
+cloudsOn=function(v){if(v&&!CLOUDS){const L=24,BR=[],ST=[];let r=5;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
+  for(let c=0;c<14;c++){const a=c/14*Math.PI*2+rnd()*.3,R=1200+rnd()*400,cx=Math.cos(a)*R,cz=Math.sin(a)*R,cy=240+rnd()*260,yaw=a+Math.PI/2;const ca=Math.cos(yaw),sa=Math.sin(yaw);
    const lay=[[4+(rnd()*3|0),2],[2+(rnd()*3|0),2],[1+(rnd()*2|0),1]];let y=0;
    for(let li=0;li<3;li++){const[n,dep]=lay[li];if(li===2&&rnd()<.35)break;const h=li===0?1.2:.4+.8*(rnd()<.5);for(let i=0;i<n;i++){const w=2*(1+(rnd()*2|0)),d=dep*2,ox=(i-(n-1)/2)*w*.78*L+(rnd()-.5)*L,oz=(rnd()-.5)*L;
      BR.push([cx+ox*ca-oz*sa,cy+y+h*L/2,cz+ox*sa+oz*ca,w*L,h*L,d*L,yaw]);for(let sx=0;sx<w;sx++)for(let sz=0;sz<d;sz++){const px=ox+(sx-(w-1)/2)*L,pz=oz+(sz-(d-1)/2)*L;ST.push([cx+px*ca-pz*sa,cy+y+h*L,cz+px*sa+pz*ca])}}y+=(li===0?1.2:.8)*L}}
-  const mat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xb8cdf0,emissiveIntensity:.42,fog:false});
+  const mat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xdce6fa,emissiveIntensity:.6,fog:false});
   const bg=new THREE.BoxGeometry(1,1,1),sg=new THREE.CylinderGeometry(.3*L,.3*L,.36*L,10);sg.translate(0,.18*L,0);
   const bi=new THREE.InstancedMesh(bg,mat,BR.length),si=new THREE.InstancedMesh(sg,mat,ST.length),M=new THREE.Matrix4(),q=new THREE.Quaternion(),S=new THREE.Vector3(),P=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0);
   BR.forEach((b,i)=>{q.setFromAxisAngle(Y,-b[6]);M.compose(P.set(b[0],b[1],b[2]),q,S.set(b[3]*.98,b[4]*.98,b[5]*.98));bi.setMatrixAt(i,M)});
@@ -107,7 +118,7 @@ const ART_m=new THREE.Matrix4(),ART_q=new THREE.Quaternion(),ART_s=new THREE.Vec
 function ART_blobTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,4,32,32,31);r.addColorStop(0,'rgba(0,0,0,1)');r.addColorStop(.55,'rgba(0,0,0,.75)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);if(typeof KEEP_TEX!=='undefined')KEEP_TEX.add(t);return t}
 function ART_step(dt){if(!RO.on)return;
   // boost: blue speed lines + FOV kick
-  const b=!!(pl&&pl.nitro);document.body.classList.toggle('artBoost',b);if(b)fovKick=Math.max(fovKick,7);
+  const b=!!(pl&&pl.nitro);document.body.classList.toggle('artBoost',b);if(b)fovKick=Math.max(fovKick,7*TUNE.fxFov);if(ART3.fxL!==TUNE.fxLines){ART3.fxL=TUNE.fxLines;document.body.style.setProperty('--fxL',TUNE.fxLines)}
   const bar=ART3.bar||(ART3.bar=document.getElementById('artBoost'));if(bar&&pl){const v=Math.max(0,Math.min(100,pl.bm||0));if(ART3.bv!==(v|0)){ART3.bv=v|0;bar.firstChild.style.width=v+'%'}bar.classList.toggle('full',v>=99)}}
 
 // sky light columns: 140 m mission/garage beacons become 1.5 m glowing ground rings; 1600 m searchlight beams are hidden
@@ -129,7 +140,7 @@ body.touch #npcSay{left:calc(112px + env(safe-area-inset-left,0px))!important;to
 #artBoost i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3aa8ff,#7ae0ff);transition:width .15s}
 #artBoost.full i{background:linear-gradient(90deg,#3aa8ff,#bdf3ff);box-shadow:0 0 8px #7ae0ff}
 body[data-mode=roam] #artBoost{display:block}
-body.artBoost #speedFx{opacity:.55!important;filter:hue-rotate(10deg) saturate(2.2) drop-shadow(0 0 2px #3aa8ff)}
+body.artBoost #speedFx{opacity:calc(.55*var(--fxL,1))!important;filter:hue-rotate(10deg) saturate(2.2) drop-shadow(0 0 2px #3aa8ff)}
 .hcard h3,.hcard b,#home h2,#home h1{font-style:italic;font-weight:900;letter-spacing:.01em}`;document.head.appendChild(st);
  const b=document.createElement('div');b.id='artBoost';b.innerHTML='<i></i>';(document.getElementById('hud')||document.body).appendChild(b)}
 /*ART</art3.js>*/
@@ -203,3 +214,25 @@ function ART7_res(a,b,c,d){const L=b-a,W=d-c,nMax=Math.max(1,Math.ceil(L/3));let
 function ART8_riv(ax,az,dx,dz,n0){const out=[],bs=dx/n0;for(let i=0;i<n0;i++)for(let j=0;j<n0;j++){const x=ax+i*bs,z=az+j*bs;
   if(rivClear(x+bs/2,z+bs/2)<bs*.71+6)out.push([x,z,bs,bs,ART7_res(x,x+bs,z,z+bs),1]);else ART7_quad(x,z,bs,bs,out)}return out}
 /*ART</art7.js>*/
+
+/*ART<art10.js>*/// ==== ART10 (v87g) · LEGO 2K Drive look, pass 2: root causes of the pale, cold, flat picture (no new objects on screen)
+// 1) Pale lime grass and cyan-washed facades: the grass (roughness .55) and the Kenney facade kits (.55, metal .05) mirrored the bright sky
+//    environment at the chase camera's grazing angle (Fresnel), lifting them toward white-blue. Matte baseplate grass and satin bricks keep their colour.
+// 2) The environment's lower half was sky blue (ART.gnd), so every side face and car flank reflected/received blue from below. Now a neutral asphalt-grey ground.
+// 3) Cars never got their gloss: with scene.environment set, three.js uses scene.environmentIntensity (.55) for every material WITHOUT its own envMap,
+//    so the authored car envMapIntensity (1.3-2.2) was ignored. Car paint now carries the env map itself; the world's env drops to .35 (less blue cast).
+// 4) Traffic windows used the matte wheel material (rough .8): glossy dark glass now.
+ART.gnd=[.24,.25,.27];
+const ART10={t:0,mats:new Set()};
+function ART10_world(){const M=HUB&&HUB.M;if(!M)return;for(const k of['walk','yard','grass'])if(M[k]){M[k].roughness=.95;M[k].metalness=0}
+  if(typeof KMM!=='undefined')for(const k in KMM){const m=KMM[k];if(m&&m.map){m.roughness=.8;m.metalness=0}}}
+// cap: env reflections above ~.6-1.2 wash a blue or white paint into pale sky colour (A/B side shots: traffic .35 flat, .6 glossy, 1.3 pale)
+function ART10_env(m,cap){const e=scene.environment;if(!m||!m.isMeshStandardMaterial||!e)return;if(m.envMap!==e){const nu=!m.envMap;m.envMap=e;if(nu)m.needsUpdate=true}
+  if(m.userData.a10e===undefined)m.userData.a10e=m.envMapIntensity;m.envMapIntensity=Math.min(m.userData.a10e,cap||1.2);ART10.mats.add(m)}
+function ART10_glass(){if(ART10.gl)return ART10.gl;return ART10.gl=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.06,metalness:0,clearcoat:1,clearcoatRoughness:.04,envMapIntensity:1.4})}
+function ART10_cars(){ART10_env(CR_CM,1);ART10_env(ART9_cabMat(),.6);ART10_env(ART10_glass(),1.4);
+  if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k],g=im&&im.userData.g;if(g&&g.material!==ART10.gl)g.material=ART10.gl;if(im)for(const m of[].concat(im.material))ART10_env(m,.6)}
+  if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(m&&(m.isMeshPhysicalMaterial||m.envMapIntensity>1))ART10_env(m)})}
+ART.hook=w=>{scene.environmentIntensity=.55+(.35-.55)*w;moonL.color.set('#fff0dc');hemi.intensity=1-.15*w};
+{const _ah=ART_hub;ART_hub=function(){const r=_ah.apply(this,arguments);try{ART10_world()}catch(e){}return r}}
+roamStep=(f=>function(dt){f(dt);const t=performance.now();if(t-ART10.t>500){ART10.t=t;try{ART10_cars()}catch(e){}}})(roamStep);

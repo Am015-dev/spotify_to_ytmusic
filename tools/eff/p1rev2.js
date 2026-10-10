@@ -1,0 +1,22 @@
+// re-review shots on the merged split build: menu, Hilde start tip, garage BUILD + thumbs, BACK -> drive Fra, Athens drive. node p1rev2.js <url> <outdir>
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [URL,OUT]=process.argv.slice(2);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const errs=[],R={};
+ const mk=async()=>{const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});const p=await ctx.newPage();p.setDefaultTimeout(900000);
+  p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200))});return p};
+ const shot=(p,n)=>p.screenshot({path:`${OUT}/${n}.png`});
+ let p=await mk();await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});await p.waitForTimeout(2500);await shot(p,'1_menu');
+ await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))});await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});
+ await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{polling:200});await p.waitForTimeout(3000);await shot(p,'2_hilde_tip');
+ R.pin=await p.evaluate(()=>{const s=[...document.querySelectorAll('[id*=odPin],[id*=odChk],.odPin')].filter(e=>e.offsetParent).map(e=>e.id||e.className);return s});
+ await p.evaluate(()=>document.querySelector('#roamPause [data-p=garage]').click());await p.waitForFunction(()=>{const g=document.querySelector('#gbx');return g&&!g.hidden&&g.getBoundingClientRect().width>10},null,{polling:50});await p.waitForTimeout(2000);
+ await p.evaluate(()=>{const b=[...document.querySelectorAll('#gbx button')].find(b=>b.offsetParent&&/^\W*BUILD$/.test(b.textContent.trim()));if(b)b.click()});await p.waitForTimeout(15000);
+ R.thumbs=await p.evaluate(()=>{const T=[...document.querySelectorAll('#gbBkPc .gbPc')].filter(b=>b.style.display!=='none'&&b.offsetParent);return T.filter(b=>b.querySelector('img')).length+'/'+T.length});await shot(p,'3_garage_build');
+ await p.evaluate(()=>{const b=[...document.querySelectorAll('#gbx button')].find(b=>b.offsetParent&&/BACK/.test(b.textContent));if(b)b.click()});await p.waitForTimeout(3000);
+ R.canvas=await p.evaluate(()=>{const c=document.querySelector('#c');return c.parentElement.tagName+' '+c.width+'x'+c.height+' style="'+(c.getAttribute('style')||'')+'"'});
+ await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.offsetParent&&/CONTINUE|RESUME/.test(b.textContent));if(b)b.click()});await p.waitForTimeout(1000);
+ await p.keyboard.down('ArrowUp');await p.waitForTimeout(5000);await shot(p,'4_drive_fra_after_garage');await p.keyboard.up('ArrowUp');await p.context().close();
+ p=await mk();await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});
+ await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')});
+ await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:200});await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{polling:200});
+ await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.offsetParent&&/LATER|CONTINUE/.test(b.textContent));if(b)b.click()});await p.keyboard.down('ArrowUp');await p.waitForTimeout(5000);await shot(p,'5_drive_ath');
+ R.errs=errs.slice(0,8);console.log(JSON.stringify(R));await b.close()})().catch(e=>{console.error(e);process.exit(1)});
