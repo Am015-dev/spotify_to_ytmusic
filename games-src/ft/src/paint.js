@@ -17,7 +17,7 @@ function paintApply(){
   if(PAINT_ON)pimg(cf,()=>HR.style.setProperty('--cb','url('+MEDIA+cf+'.webp)'));
   HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1);
 }
-function paintBoot(){['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
+function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players','djinn','log','cards','rules','settings','menu','newgame','speed','sound','music','hint'],sets:{'sk-meeple':['vizier','elder','merchant','builder','assassin','artisan'].map(k=>'meeple-'+k)}});['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
   ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply()}
 // painted pictures on/off (Settings)
 document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');if(!b)return;PAINT_ON=b.dataset.paint==='1';try{localStorage.setItem('soq_paint',PAINT_ON?'1':'0')}catch(x){}paintApply();if(G)render();renderSettings()});

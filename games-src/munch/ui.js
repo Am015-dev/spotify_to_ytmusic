@@ -282,6 +282,7 @@ function humanTurn(){if(!G||G.winner)return false;const s=sideToAct();return s>=
 try{const ex=JSON.parse(localStorage.getItem('dkd_ex')||'null');if(ex)Object.assign(DEFEX,ex)}catch(e){}
 // ---- board-first shell: popups for the diary, rivals, card details and rules ----
 GX.init({key:'dkd'});
+if(typeof GXSK!=='undefined')GXSK.init({});
 GX.drawer('dkLog','Dungeon diary',$('#dkLogBody'));
 GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));

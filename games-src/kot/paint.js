@@ -35,6 +35,7 @@ function slot(){
   if(!UI.tut&&((UI.camp&&UI.camp.boss&&campOn())||G.pl.some(p=>p.vp>=15)))return['fight',0];
   return['main',0]}
 function boot(){
+  try{GXSK.init({dark:true})}catch(e){}
   try{GXMUS.init({key:'ccs',slots:SLOTS,slot,on:()=>SND.on&&SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}
