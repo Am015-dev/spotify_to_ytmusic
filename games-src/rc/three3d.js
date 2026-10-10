@@ -12,7 +12,7 @@ V3.pref=gfxPref();
 function gfxLabel(){return V3.pref==='auto'?'Auto'+(V3.on?' · '+GFX[V3.q].nm:''):GFX[V3.pref].nm}
 const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
 function setGfx(v){V3.pref=GFX[v]?v:'auto';try{localStorage.setItem('swi_gfx',V3.pref)}catch(e){}if(PH)PH.hitch();applyQ(V3.pref==='auto'?gfxAuto():V3.pref)}
-function applyQ(q){V3.q=GFX[q]?q:'high';const lite=V3.q==='low';if(V3.lite!==lite){V3.lite=lite;if(V3.layout&&V3.r)rebuildLite()}if(typeof onGfxChange==='function')try{onGfxChange()}catch(e){}if(!V3.r)return;const c=GFX[V3.q],r=V3.r;
+function applyQ(q){V3.q=GFX[q]?q:'high';const lite=V3.q==='low';if(!lite)glbLoad();if(V3.lite!==lite){V3.lite=lite;if(V3.layout&&V3.r)rebuildLite()}if(typeof onGfxChange==='function')try{onGfxChange()}catch(e){}if(!V3.r)return;const c=GFX[V3.q],r=V3.r;
   {const want=Math.min(c.pr,window.devicePixelRatio||1);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=c.sh>0;if(r.shadowMap.enabled!==sh){r.shadowMap.enabled=sh;V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
   V3.sun.castShadow=sh;if(sh&&V3.sun.shadow.mapSize.x!==c.sh){V3.sun.shadow.mapSize.set(c.sh,c.sh);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}}
@@ -277,10 +277,11 @@ const G_={cyl:()=>gq('cyl',()=>{const g=new THREE.CylinderGeometry(.8,1,1,LO(7,5
       for(const s of [-1,1]){pos.push(x0,y0,0, x1,y1,0, x1,y1-.05,s*w1, x0,y0,0, x1,y1-.05,s*w1, x0,y0-.05,s*w0)}}
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.computeVertexNormals();g.computeBoundingBox();return g}),
   fern:()=>gq('fern',()=>{const g=G_.frond().clone();g.scale(1,1.4,1.3);g.computeBoundingBox();return g})};
-function palm(P,x,y,z,R,s){s=s||1;const h=(1.15+R()*.55)*s,la=R()*6.28,lean=(.25+R()*.35)*h;let prev=new THREE.Vector3(x,y,z);const n=6;
+function palm(P,x,y,z,R,s){s=s||1;if(glbOn()&&V3.glbR.palmA){const a=R()*6.28,sm=(.9+R()*.3)*s;(P.inst||(P.inst=[])).push([x,y-.04,z,sm,a]);return}const h=(1.15+R()*.55)*s,la=R()*6.28,lean=(.25+R()*.35)*h;let prev=new THREE.Vector3(x,y,z);const n=6;
   for(let k=1;k<=n;k++){const f=k/n;const p=new THREE.Vector3(x+Math.cos(la)*lean*f*f,y+h*f,z+Math.sin(la)*lean*f*f);P.add(G_.cyl(),k%2?0x8a6a45:0x6f5236,segM(prev,p,(.075-.03*f)*s),.0,.15);prev=p}
   const top=prev;for(let k=0;k<3;k++)P.add(G_.sph(),0x5a3e22,M(top.x+Math.cos(k*2.1)*.07*s,top.y-.07*s,top.z+Math.sin(k*2.1)*.07*s,0,0,0,.065*s),0,.2);
   const fc=[0x3f8a3a,0x4f9a42,0x2f7033,0x5aa347];const nf=7+Math.floor(R()*2);for(let k=0;k<nf;k++){const a=k/nf*6.28+R()*.3;const L=(.85+R()*.3)*s;P.add(G_.frond(),fc[k%4],M(top.x,top.y,top.z,0,-a,(R()-.3)*.35,L,L,L),1,.25)}}
+function flushPalms(grp,P){if(!P.inst)return;const a=[],c=[];P.inst.forEach((e,i)=>(i%2?c:a).push(e));glbInstanced(grp,'palmA',a);glbInstanced(grp,'palmC',c);P.inst=null}
 function jtree(P,x,y,z,R,s,dark){s=s||1;const h=(.75+R()*.5)*s;const tc=dark?0x1f2622:0x5b4630;P.add(G_.cyl(),tc,M(x,y,z,0,0,0,.09*s,h,.09*s),0,.3);
   const cols=dark?[0x34463e,0x3c5048,0x2f4038,0x46584e]:[0x245c2a,0x2f6f30,0x3d8237,0x4f9440,0x1d4d24];const L=3+Math.floor(R()*3);
   for(let i=0;i<L;i++){const f=i/L;const a=R()*6.28,o=(.05+R()*.22)*s*(1-f*.5);const r=(.5-f*.22+R()*.12)*s;P.add(G_.leaf(i%3),cols[Math.min(cols.length-1,i+(R()<.4?1:0))],M(x+Math.cos(a)*o,y+h+(f*.55-.05)*s,z+Math.sin(a)*o,R()*3,R()*3,0,r,r*.78,r),.35+f*.4,.45)}}
@@ -367,6 +368,7 @@ function tileMesh(t){const grp=new THREE.Group();const terr=t.down?'down':t.terr
   if(t.totem){const x=1.2,z=-.9,y=gy(x,z);P.add(G_.cylS(),0x4a3526,M(x,y,z,0,0,0,.1,.95,.1),0,.3);for(let k=0;k<3;k++)P.add(G_.box(),0x3a2a20,M(x,y+.25+k*.25,z,0,k*.4,0,.24,.14,.24),0,.2);P.add(G_.box(),0x6a4a2a,M(x,y+.9,z,0,0,0,.5,.07,.1),0,.2);grp.userData.totem=[x,y+.62,z]}
   if(t.shelter){const x=1.1,z=1,y=gy(x,z);P.add(G_.rock(1),0x6d675d,M(x,y,z,0,.4,0,.62,.5,.55),0,.5);P.add(G_.rock(2),0x5d5850,M(x+.3,y,z-.2,0,1,0,.35,.3,.35),0,.5);P.add(G_.dome(),0x0c0b0a,M(x,y,z+.42,-.25,0,0,.26,.3,.1),0,0)}
   if(P.p.length){const pm=P.mesh();grp.add(pm);grp.userData.props=pm}
+  flushPalms(grp,P);
   if(t.totem){const eye=new THREE.Mesh(gq('eyeG',()=>new THREE.SphereGeometry(.035,LO(8,5),LO(6,4))),gq('eyeM',()=>new THREE.MeshBasicMaterial({color:new THREE.Color(3,1.2,5)})));const [x,y,z]=grp.userData.totem;for(const s of [-1,1]){const e2=eye.clone();e2.position.set(x+s*.05,y,z+.13);grp.add(e2)}}
   // glowing rim for tiles you can pick
   const ring=new THREE.Mesh(gq('ringG',()=>{const s=hexShape(HR0+.07);s.holes.push(hexShape(HR0-.06));const g=new THREE.ShapeGeometry(s);g.rotateX(-Math.PI/2);return g}),new THREE.MeshBasicMaterial({color:new THREE.Color(2.4,1.5,.45),transparent:true,opacity:0,depthWrite:false,fog:false}));ring.position.y=TOPY+.03;ring.visible=false;ring.renderOrder=3;grp.add(ring);grp.userData.ring=ring;
@@ -398,7 +400,7 @@ function buildIsland(cx,cz,rad){const L=(rad+14)*2;V3.box={x0:cx-L/2,z0:cz-L/2,L
   // the sandy skirt: leaning palms, dune grass, driftwood and shells between the tiles and the surf
   const B=new Parts();for(let i=0,n=0;i<900&&n<70;i++){const x=cx+(R()-.5)*L*.9,z=cz+(R()-.5)*L*.9;const d=samp(x,z);if(d<.35||d>V3.shoreW-.35)continue;const y=-.2-.35*sst(0,V3.shoreW,d);n++;
     if(n%5===0)palm(B,x,y,z,R,.85);else if(n%5===1)B.add(G_.cylS(),0xb3a58c,M(x,y+.03,z,Math.PI/2,R()*3,0,.04,.5+R()*.4,.04),0,.1);else if(n%5===2)rock(B,x,y-.03,z,R,.08+R()*.1,0x8a8274);else{const tc=R()<.5?0xa7a55a:0x8f9a4a;if(!V3.lite)tuft(B,x,y,z,R,tc)}}
-  const bm=B.mesh();deco.add(bm);
+  const bm=B.mesh();deco.add(bm);flushPalms(deco,B);
   const wp=hexPos(MAP[START_POS].q,MAP[START_POS].r);const wa=Math.atan2(wp.z-cz,wp.x-cx);let wr=Math.hypot(wp.x-cx,wp.z-cz)+2;for(let k=0;k<40&&islandSDF(cx+Math.cos(wa)*wr,cz+Math.sin(wa)*wr)<V3.shoreW+1.4;k++)wr+=.3;
   const wreck=wreckMesh();wreck.position.set(cx+Math.cos(wa)*(wr+1.2),-.55,cz+Math.sin(wa)*(wr+1.2));wreck.rotation.y=-wa+.9;deco.add(wreck);V3.scene.add(deco)}
 function sandTex(){return gq('sandT',()=>{const S=256,c=cvs(S),x=c.getContext('2d'),id=x.createImageData(S,S),D=id.data;for(let j=0;j<S;j++)for(let i=0;i<S;i++){const v=fbm(i/S*16,j/S*16)*.7+vnoise(i*.9,j*.9)*.3;const o=(j*S+i)*4;D[o]=D[o+1]=D[o+2]=v*255;D[o+3]=255}x.putImageData(id,0,0);const t=tex(c,false,true);t.repeat.set(10,10);return t})}
@@ -448,20 +450,38 @@ function campMesh(){const g=new THREE.Group();const P=new Parts();const R=seeded
   tent.add(G_.cylS(),0x5a4230,M(-.95+Math.sin(.5)*.62,0,-.35+Math.cos(.5)*.62,0,0,0,.025,.8,.025),0,.2);tent.add(G_.cylS(),0x5a4230,M(-.95-Math.sin(.5)*.62,0,-.35-Math.cos(.5)*.62,0,0,0,.025,.8,.025),0,.2);
   const tm=tent.mesh();g.add(tm);g.userData.tent=tm;
   for(const k of ['shel','pal','roof','pile']){const q=new THREE.Group();g.add(q);g.userData[k]=q}return g}
-function syncCamp(g,G){const u=g.userData;const sh=G.camp.shelter;const key=[!!sh,Math.min(4,G.camp.roof),Math.min(4,G.camp.pal),Math.min(15,G.pileWood||0)].join();if(u.key===key)return;u.key=key;
-  u.tent.visible=!sh;for(const k of ['shel','roof','pal','pile'])u[k].clear();const R=seeded(9);
-  if(sh){const P=new Parts();for(let i=0;i<6;i++){P.add(G_.cylS(),i%2?0x7a5a36:0x6b4b2a,M(-1.55,.05+i*.13,-.4,Math.PI/2,0,0,.065,1.1,.065),0,.25);P.add(G_.cylS(),i%2?0x6b4b2a:0x7a5a36,M(-.05,.05+i*.13,-.4,Math.PI/2,0,0,.065,1.1,.065),0,.25)}
+function syncCamp(g,G){const u=g.userData;const sh=G.camp.shelter;const key=[glbOn()?1:0,!!sh,Math.min(4,G.camp.roof),Math.min(4,G.camp.pal),Math.min(15,G.pileWood||0)].join();if(u.key===key)return;u.key=key;
+  const GB=glbOn()&&V3.glbR.shelter&&V3.glbR.palisade;u.tent.visible=!sh;for(const k of ['shel','roof','pal','pile'])u[k].clear();const R=seeded(9);
+  if(sh&&GB){const o=glbInst('shelter');o.position.set(-.8,0,-.62);o.rotation.y=.35;u.shel.add(o)}
+  else if(sh){const P=new Parts();for(let i=0;i<6;i++){P.add(G_.cylS(),i%2?0x7a5a36:0x6b4b2a,M(-1.55,.05+i*.13,-.4,Math.PI/2,0,0,.065,1.1,.065),0,.25);P.add(G_.cylS(),i%2?0x6b4b2a:0x7a5a36,M(-.05,.05+i*.13,-.4,Math.PI/2,0,0,.065,1.1,.065),0,.25)}
     for(let i=0;i<5;i++)P.add(G_.cylS(),i%2?0x6f5030:0x7f5f3a,M(-1.55+i*.37,.05+.02*i,-.95,0,0,Math.PI/2*0,.06,.85,.06),0,.25);
     P.add(G_.cylS(),0x5a4028,M(-1.6,.8,-.95,0,0,-Math.PI/2,.05,1.6,.05),0,.2);u.shel.add(P.mesh())}
-  const rl=Math.min(4,G.camp.roof);if(rl){const P=new Parts();const th=[0x9a8a4a,0xa89a58,0x8a7a40,0xb0a060];for(let i=0;i<rl;i++){for(let k=0;k<7;k++)P.add(G_.box(),th[(i+k)%4],M(-1.55+k*.25,(sh?.86:.78)+i*.09,-.62+i*.06,-.38,R()*.1-.05,0,.34,.05,1.15),.3,.3)}u.roof.add(P.mesh())}
-  const n=Math.min(4,G.camp.pal)*7;if(n){const P=new Parts();for(let i=0;i<n;i++){const a=i/28*Math.PI*2-1;const x=Math.cos(a)*1.6,z=Math.sin(a)*1.6;const h=.55+R()*.15;P.add(G_.cylS(),i%2?0x7a5a33:0x6b4b2a,M(x,0,z,0,0,0,.055,h,.055),0,.3);P.add(G_.cone(),0x9a7a50,M(x,h,z,0,0,0,.055,.14,.055),0,.1)}
+  const rl=GB?0:Math.min(4,G.camp.roof);if(rl){const P=new Parts();const th=[0x9a8a4a,0xa89a58,0x8a7a40,0xb0a060];for(let i=0;i<rl;i++){for(let k=0;k<7;k++)P.add(G_.box(),th[(i+k)%4],M(-1.55+k*.25,(sh?.86:.78)+i*.09,-.62+i*.06,-.38,R()*.1-.05,0,.34,.05,1.15),.3,.3)}u.roof.add(P.mesh())}
+  if(GB&&G.camp.pal>0){const L=Math.min(4,G.camp.pal)*2,list=[];for(let i=0;i<L;i++){const a=(i+.5)/8*Math.PI*2-1;list.push([Math.cos(a)*1.6,0,Math.sin(a)*1.6,1,-a+Math.PI/2])}glbInstanced(u.pal,'palisade',list)}
+  const n=GB?0:Math.min(4,G.camp.pal)*7;if(n){const P=new Parts();for(let i=0;i<n;i++){const a=i/28*Math.PI*2-1;const x=Math.cos(a)*1.6,z=Math.sin(a)*1.6;const h=.55+R()*.15;P.add(G_.cylS(),i%2?0x7a5a33:0x6b4b2a,M(x,0,z,0,0,0,.055,h,.055),0,.3);P.add(G_.cone(),0x9a7a50,M(x,h,z,0,0,0,.055,.14,.055),0,.1)}
     for(let i=0;i<n-1;i++){const a=(i+.5)/28*Math.PI*2-1;P.add(G_.cylS(),0x5a4028,M(Math.cos(a)*1.6,.28,Math.sin(a)*1.6,Math.PI/2,-a,0,.02,.36,.02),0,.2)}u.pal.add(P.mesh())}
   const pw=Math.min(15,G.pileWood||0);if(pw){const P=new Parts();for(let i=0;i<pw;i++){const row=Math.floor(i/4),k=i%4;P.add(G_.cylS(),i%2?0x8a5a2b:0x7a4d24,M(1.05,.06+row*.11,.25+k*.13-row*.05,Math.PI/2,0,0,.055,.62,.055),0,.25)}u.pile.add(P.mesh())}}
+// ---------- GLB models (High/Medium: real 3D, loaded once and cloned; Low: thumbnail sprites for pawns, procedural props) ----------
+const GLBD={carpenter:['sw-carpenter',1.5],cook:['sw-cook',1.5],explorer:['sw-explorer',1.5],fri:['sw-friday',1.5],palmA:['sw-palm-a',1.9],palmC:['sw-palm-c',1.6],shelter:['sw-shelter',1.45],palisade:['sw-palisade',.95]};
+function glbLoad(){if(V3.glbP||typeof GXGLB==='undefined')return;V3.glbR={};
+  V3.glbP=Promise.all(Object.keys(GLBD).map(k=>GXGLB.load('models/'+GLBD[k][0]+'.glb').then(src=>{src.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;const m=o.material;if(m){m.envMapIntensity=.6;m.side=THREE.FrontSide}}});
+    const bb=new THREE.Box3().setFromObject(src),sc=GLBD[k][1]/Math.max(1e-3,bb.max.y-bb.min.y);V3.glbR[k]={src,sc,r:Math.max(bb.max.x-bb.min.x,bb.max.z-bb.min.z)/2*sc}}))).then(()=>{V3.glbOK=true;if(V3.layout&&V3.r&&!V3.lite)rebuildLite()}).catch(()=>{V3.glbR=null});}
+const glbOn=()=>!V3.lite&&V3.glbOK;
+function glbInst(k){const d=V3.glbR&&V3.glbR[k];if(!d)return null;const o=d.src.clone(true);o.scale.setScalar(d.sc);return o}
+// instanced copies of a model: list = [[x,y,z,scaleMul,yaw]...] -> one InstancedMesh per mesh part, added to grp
+function glbInstanced(grp,k,list){const d=V3.glbR&&V3.glbR[k];if(!d||!list.length)return;d.src.updateMatrixWorld(true);const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),ax=new THREE.Vector3(0,1,0),sv=new THREE.Vector3(),pv=new THREE.Vector3();
+  d.src.traverse(me=>{if(!me.isMesh)return;const im=new THREE.InstancedMesh(me.geometry,me.material,list.length);list.forEach((e,i)=>{q.setFromAxisAngle(ax,e[4]||0);m4.compose(pv.set(e[0],e[1],e[2]),q,sv.setScalar(d.sc*(e[3]||1))).multiply(me.matrixWorld);im.setMatrixAt(i,m4)});im.castShadow=im.receiveShadow=true;im.frustumCulled=false;grp.add(im)})}
+function glbSprite(f,h){const t=gq('spT'+f,()=>{const x=new THREE.TextureLoader().load('models/'+f+'.webp');x.colorSpace=THREE.SRGBColorSpace;return x});const s=new THREE.Sprite(gq('spM'+f,()=>new THREE.SpriteMaterial({map:t,transparent:true,fog:true,depthWrite:false})));s.center.set(.5,.06);s.scale.set(h*1.2,h*1.2,1);s.renderOrder=3;return s}
 // ---------- pawns: painted resin miniatures on round bases ----------
 const PCOL3=[0xd9534f,0x3c7dd9,0x49a35a,0xe0a13a,0x9a6cd6,0x7a7a7a];
 function miniMat(){if(V3.lite)return gq('miniL',()=>new THREE.MeshPhongMaterial({vertexColors:true,shininess:45,specular:0x3a3a3a}));return gq('miniM',()=>new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.5,metalness:0,clearcoat:.8,clearcoatRoughness:.3,envMapIntensity:.9}))}
 function lathe(pts,seg){return ni(new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),Math.round((seg||14)*LO(1,.5))))}
-function pawnMesh(col,kind,ck){const g=new THREE.Group();const P=new Parts();const skin=kind==='fri'?0x7a4a2c:0xe2b08a;
+function pawnMesh(col,kind,ck){const gk=kind==='fri'?'fri':kind==='dog'?null:(ck==='carpenter'||ck==='cook'||ck==='explorer')?ck:null;
+  if(gk&&(glbOn()||V3.lite)){const g=new THREE.Group();let r=.45;
+    if(glbOn()&&V3.glbR[gk]){g.add(glbInst(gk));r=V3.glbR[gk].r}else g.add(glbSprite(GLBD[gk][0],GLBD[gk][1]));
+    const ring=new THREE.Mesh(gq('pawnRing',()=>ni(new THREE.TorusGeometry(1,.06,LO(6,3),LO(28,14)))),new THREE.MeshBasicMaterial({color:col}));ring.rotation.x=Math.PI/2;ring.scale.setScalar(r*1.04);ring.position.y=.04;g.add(ring);
+    const bl=new THREE.Mesh(gq('blobG',()=>{const q=new THREE.PlaneGeometry(.95,.95);q.rotateX(-Math.PI/2);return q}),gq('blobM',()=>new THREE.MeshBasicMaterial({map:blobTex(),transparent:true,depthWrite:false,opacity:.7})));bl.scale.setScalar(r*2.2);bl.position.y=.012;bl.renderOrder=2;g.add(bl);return g}
+  const g=new THREE.Group();const P=new Parts();const skin=kind==='fri'?0x7a4a2c:0xe2b08a;
   P.add(gq('baseL',()=>lathe([[0,0],[.3,0],[.32,.025],[.31,.075],[.27,.09],[0,.09]],20)),0x2a2018,M(0,0,0),0,.2);P.add(gq('ringL',()=>ni(new THREE.TorusGeometry(.305,.022,LO(6,3),LO(24,12)))),col,M(0,.055,0,Math.PI/2,0,0),0,0);
   if(kind==='dog'){const fur=0xb07a48,dark=0x6a4526;P.add(G_.sph(),fur,M(0,.33,0,0,0,0,.13,.12,.24),0,.3);for(const [x,z] of [[-.07,.14],[.07,.14],[-.07,-.14],[.07,-.14]])P.add(G_.cylS(),dark,M(x,.09,z,0,0,0,.035,.2,.035),0,.2);
     P.add(G_.sph(),fur,M(0,.47,.22,0,0,0,.1,.095,.11),0,.2);P.add(G_.sph(),dark,M(0,.44,.33,0,0,0,.05,.045,.06),0,.1);P.add(G_.cone(),dark,M(-.06,.53,.2,0,0,-.3,.035,.1,.03),0,.1);P.add(G_.cone(),dark,M(.06,.53,.2,0,0,.3,.035,.1,.03),0,.1);

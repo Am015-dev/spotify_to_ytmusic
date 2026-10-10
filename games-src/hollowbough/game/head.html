@@ -281,6 +281,12 @@ html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:cent
 html.ph.ph-l.net #barstat{display:none}
 /* shared kit (part 8): pawn symbols for colour-blind help, undo, achievement line, left-handed dock */
 .pawnw{position:relative;display:inline-flex;flex:none;line-height:0}
+.wpg{display:block;position:relative;width:calc(var(--pw,16px)*.9);height:var(--pw,16px)}
+.wpg::before{content:'';position:absolute;left:6%;right:6%;bottom:0;height:42%;border-radius:50%;background:var(--wc);box-shadow:0 1px 1px rgba(0,0,0,.4)}
+.wpg img{position:relative;display:block;width:100%;height:100%;object-fit:contain}
+.hero-tree{height:88px;width:auto;margin-left:14px;vertical-align:middle;animation:treesway 5s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes treesway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){.hero-tree{animation:none}}
 .pawnw .gx-cbm{position:absolute;right:-2px;bottom:-2px;min-width:calc(var(--pw,16px)*.62);height:calc(var(--pw,16px)*.62);border-radius:50%;background:#fffaf0;color:#2a1e14;font:700 calc(var(--pw,16px)*.46)/calc(var(--pw,16px)*.62) system-ui,sans-serif;text-align:center;box-shadow:0 0 0 1px #3b2f2a;opacity:1}
 html.cb .pawnw .gx-cbm{display:block}
 .pacts2{display:flex;gap:6px}.pacts2 .btn{flex:1}
