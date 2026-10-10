@@ -15,10 +15,12 @@ function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_S
  const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:(CID==='fra'?{x:2061,z:0}:{x:0,z:0}),a0=(P.a||0)*Math.PI/180;
  if(P.water)return LDW_boat(P,near,far,box,c,hw,hd,st,a0);
  /* v90a: the road setback uses the WHOLE scaled model (baseplate, low parts) as x/z half-sizes, not the tall-part collider: 6362's base slab sat on the kerb */const fw=(box.max.x-box.min.x)*SW/2,fd=(box.max.z-box.min.z)*SW/2,S=LDW_spot(st.x+Math.cos(a0)*(P.r||0),st.z+Math.sin(a0)*(P.r||0),fw+.5,fd+.5,P.road||10);if(!S)return;const best=S.yaw;
- const a=best*Math.PI/2,y=groundY(S.x,S.z)-(P.sink||0)*SW*GB_PH;
+ const a=best*Math.PI/2,g0=groundY(S.x,S.z),pl=P.plinth||0,y=g0+pl-(P.sink||0)*SW*GB_PH;
  const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(SW,SW,SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
  const E={id:P.model,x:S.x,z:S.z,near:[],far:[],tris:0,ftris:0};
  for(const[L,set,key]of[[near,E.near,'tris'],[far,E.far,'ftris']])for(const[g,mat]of L){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name='ldw_'+P.model;o.receiveShadow=true;o.userData.cd=P.cd||900;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);set.push(o);E[key]+=(g.index?g.index.count:g.attributes.position.count)/3}
+ if(pl){/* rescue-1: a micro set shown as a LEGO model on display (true size at minifig scale) stands on a stone plinth */const g=new THREE.BoxGeometry(fw*2+.8,pl,fd*2+.8);g.rotateY(a);g.translate(S.x,g0+pl/2,S.z);g.computeBoundingSphere();
+  const o=new THREE.Mesh(g,LDW.pm||(LDW.pm=new THREE.MeshStandardMaterial({color:0xb9b2a3,roughness:.85})));o.name='ldw_plinth';o.receiveShadow=true;o.userData.cd=P.cd||900;HUB.grp.add(o);hubCullAdd(o);E.near.push(o);E.tris+=12}
  const cs=Math.cos(a),sn=Math.sin(a),odd=best%2,col={x:S.x+ox*cs+oz*sn,z:S.z-ox*sn+oz*cs,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*SW};
  HUB.bld.push(col);hubGridAdd([col]);E.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};E.col=col;LDW.on.push(E)}
 // boats (P.water): moored in the nearest river/harbour reach to the anchor that is wide enough, near the bank, bow along the flow, hull P.sink plates under the water
