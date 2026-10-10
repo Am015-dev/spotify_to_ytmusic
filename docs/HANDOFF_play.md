@@ -29,7 +29,20 @@ Brief: stuck % (Frankfurt 17 / Athens 14 → < 3), Athens wall hits (1.75 → �
 - Logs stuck episodes and the wall-hit list.
 
 ## Numbers (phone, FAST, 4 game-min per city, same tPlay for both builds)
-See the bottom of this file (filled in after qa_play5k / qa_play5l).
+| metric | v89k (live) | v89l |
+|---|---|---|
+| stuck Frankfurt | 14.8 % (qa_play5k), 6.4 % (4k) | **2.1 %** (5l), 3.6 % (4l, rotation still counted) |
+| stuck Athens | 13.5 / 2.0 / 9.0 / 15.4 % | **2.3 / 2.0 %** (6l1, 6l2) |
+| wall hits Frankfurt /min | 0.5 / 0.97 | 0.75 / 1.45 |
+| wall hits Athens /min | 1.99 / 2.48 / 2.99 / 1.21 | 6.72 / 1.0 / 2.17 |
+| DRIFT after 3 rotations | hidden | ok |
+| tutorial text | 9 / 10 px | ≥ 12 px |
+| console errors | 0 | 0 |
+Wall hits are NOT fixed. Athens 6.72 (6l1): 18 hits 20-80 m off-road in a hillside grid of 6 m houses (x 1130-1410, z -1820..-1960,
+y 68-91), no mission running, bot wandering. The other runs: Koulouri van chase / DRIFT ZONE / RAMP JUMP rings, 5-15 m off-road.
+v89k Athens is ~2/min on the same test too, so the brief's 1.75 matches; 0.62 (pre-v88z) was an older tPlay.
+Shots (852x393): qa_play4l/phone-{fra,ath}/ (start, drive1-3, after_rotation, tutorial, wallhit*), qa_play5l/ (fra).
+tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check every log has a "phone <city> {" result line.
 
 ## Open
 - Wall hits per minute vary 0–6/min run to run on the SAME build (mission-dependent: Koulouri Rush van chase in Athens, brick packs
