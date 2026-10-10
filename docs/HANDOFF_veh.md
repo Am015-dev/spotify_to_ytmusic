@@ -20,7 +20,7 @@ Minifig-scale only: City, Classic Town, Speed Champions, Creator. NO Racers/Tiny
 ## Next: Classic Town bercik/others from the OMR list (scrape: library.ldraw.org/omr/sets?page=1..59, rows "id name theme year n"):
 6531 6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6355 6354 6361 6352 625 6504 6608; City 4206-2 (truck; file names use 4206-2, scripts assume -1); Creator 7347 6911 (check minifig scale).
 
-## veh-2 session (2026-10-10): 31 more done, sent to build-7
+## veh-2 session (2026-10-10): 30 more done, sent to build-7
 6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6354 6361 625 6504 6608 4206-2 7347(small car) 7638(rescued) 6600 6602 6603 6501.
 Skipped: 6531 (helicopter), 6352 (dock crane, no wheels), 6355 (horse cart), 6522 (motorbike), 6911 (OMR file 404 under every name), 7347 big truck (16 wide, not minifig scale).
 
