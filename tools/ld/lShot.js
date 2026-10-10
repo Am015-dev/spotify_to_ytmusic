@@ -17,7 +17,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
    D.g.computeBoundingBox();const h=D.g.boundingBox.max.y-D.g.boundingBox.min.y,sz=Math.max(D.g.boundingBox.max.x-D.g.boundingBox.min.x,D.g.boundingBox.max.z-D.g.boundingBox.min.z);
    const x0=__mho.RO?__mho.RO.x:2061,z0=__mho.RO?__mho.RO.z:0,M=new THREE.Matrix4(),S=new THREE.Vector3(),Q=new THREE.Quaternion(),c=[];
    for(const o of ms)for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);const P=new THREE.Vector3();M.decompose(P,Q,S);if(S.x<.05)continue;c.push({o,i,P,s:S.y,d:Math.hypot(P.x-x0,P.z-z0)})}
-   c.sort((a,b)=>a.d-b.d);const R=new THREE.Raycaster(),objs=__art.scene.children;let tried=0;
+   c.sort((a,b)=>a.d-b.d);const R=new THREE.Raycaster(),objs=__art.scene.children;R.camera=__ld.lds.cam();let tried=0;
    for(const q of c.slice(0,80)){const H=h*q.s,Dd=Math.max(7,H*1.3,sz*q.s*2),ty=q.P.y+Math.min(H*.45,1.2+H*.3),tgt=new THREE.Vector3(q.P.x,ty,q.P.z);
     for(let k=0;k<12;k++){tried++;const a=k*Math.PI/6,cam=new THREE.Vector3(q.P.x+Math.cos(a)*Dd,q.P.y+1.5,q.P.z+Math.sin(a)*Dd),dir=tgt.clone().sub(cam),L=dir.length();dir.normalize();
      R.set(cam,dir);R.far=L+sz*q.s;const h1=R.intersectObjects(objs,true).find(x=>x.object.visible);if(!h1||h1.object!==q.o||h1.instanceId!==q.i)continue;
