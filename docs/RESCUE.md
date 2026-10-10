@@ -11,15 +11,15 @@ MODEL_CATALOG (alex/od-mdl-land), git logs of alex/od-mdl-veh, alex/od-mdl-world
 | 7796 House (build-5) | micro/small Creator set shown 2.5× | same: model on display at true size (3.1 m) on a plinth, Athens | docs/shots/rescue/door_w7796.png |
 | 6613 Phone booth (build-5) | "hood malformed" (old inverted-slope mapping) | reconverted `--only booth --yaw 2`: 3665 inverted slopes and the 4861 hood are real LDraw meshes now; A/B sheet matches the LDraw truth (keypad print and the bike submodel not converted). Frankfurt street prop, 1.1k tris | docs/shots/rescue/ab6613_sheet.png, door_w6613.png |
 | 4956 Creator House (build-6) | 205k tris raw | already rescued by build-6 in v90f (alex/od-models 7e096ac); my parallel conversion dropped in favour of theirs | docs/shots/mdlw/door_w4956.png |
-| 3221 Big Rig in Frankfurt traffic (city-1, pulled in v90e) | 3.84 m wide; traffic drives at 0.36 × road width off the centre line → over the kerb / centre line on narrow roads; no lane-fit proof | CT_wide (98ct_city_lego.js): a kind wider than 2.6 m drives at the offset that keeps it between centre line +0.15 m and kerb −0.3 m, only on segments ≥ 4·hw+1 m (8.7 m), picks its next segment among those (U-turn at a dead end), spawns on one. `__ct.wide()` reports kerb/centre clearances | docs/shots/rescue/rig_lane.png |
+| 3221 Big Rig in Frankfurt traffic (city-1, pulled in v90e) | 3.84 m wide; traffic drives at 0.36 × road width off the centre line → over the kerb / centre line on narrow roads; no lane-fit proof | CT_wide (98ct_city_lego.js): a kind wider than 2.6 m drives at the offset that keeps it between centre line +0.15 m and kerb −0.3 m, only on segments ≥ 4·hw+1 m (8.7 m), picks its next segment among those (U-turn at a dead end), spawns on one. `__ct.wide()` reports kerb/centre clearances | docs/shots/rescue/rig_lane.png, rig_top.png. Probe (30 s, 3 rigs): all on 22 m roads, kerb clearance ≥ 1.16 m, centre line 6 m, 0 narrow segments. Turns not exercised in 30 s |
 
-## Also found (attempted conversions that failed or parts dropped): status
+## Also found (attempted conversions that failed or parts dropped): status (rows with shots = fixed here)
 | Item | Why | Status |
 |---|---|---|
-| 621 (veh) | beacon floats | open: next on this lane |
-| 7638 (veh) | converter TypeError | open: next on this lane |
-| 6522 (veh) | converter IndexError | open: next on this lane |
-| 75870 (veh) | 25 studs wide, extra parts in main | open: retry `--only body,wheel,windscreen` |
+| 621 Police Car (veh) | "beacon floats" | reconverted --yaw 1: beacon sits on the roof (A/B matches), driver behind its wheel. RIDES 'Classic Patrol'. Garage floor shows the dark patch (garage-18's bug) | docs/shots/rescue/ab_v621_1.png, r621_g.png |
+| 7638 Tow Truck (veh) | converter TypeError (scaled string matrix) | ld2garage.py guard (no stored orientation → free rotation), --drop string --yaw 2; A/B matches. RIDES 'Tow Truck' | docs/shots/rescue/ab_v7638_1.png, r7638_g.png |
+| 6522 Highway Patrol bike (veh) | converter IndexError (dropping both sub-files left nothing) | one bike only (ld/omr/6522-1b.mpd), --only biker; rider placed on the seat by hand (no steering-wheel part). RIDES 'Highway Bike' | docs/shots/rescue/ab_v6522_1.png, r6522_g.png |
+| 75870 Corvette Z06 (veh) | 25 wide: the file holds the car twice + a camera stand | one car (ld/omr/75870-1b.mpd), --only body,wheel,windscreen: 6.6 wide Speed Champions scale. RIDES 'Z06 Racer' | docs/shots/rescue/ab_v75870_1.png, r75870_g.png |
 | 1069 boat (world) | downloaded, never tried | open |
 | 1572 Tow Truck, 6668 Recycle Truck, 6526 Red Line Racer, 6669 Diesel Daredevil (build-8) | dark dithered patch on the garage floor (g_34) | queued here; the floor patch itself is garage-18's (session_019vNFjqrqunwBDfw4daimsX) |
 | 7242 Street Sweeper (build-8) | brushes convert to box placeholders | queued: real mesh for the brush part |
