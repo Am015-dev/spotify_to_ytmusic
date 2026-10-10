@@ -10,11 +10,10 @@
 | 98ld_w_1632.js | 1632 Motor Boat | fra river | 36 | water:1 sink:3 |
 | 98ld_w_6365.js | 6365 Summer Cottage | ath | 54 | |
 | 98ld_w_6372.js | 6372 Town House | fra | 31 | --yaw 2 (open back away from street) |
-| 98ld_w_30023.js | 30023 Lighthouse | ath | 13 | s:3 (micro set) |
+| 98ld_w_30023.js | 30023 Lighthouse | ath | 13 | s:3 micro set: BREAKS the minifig-scale rule, build-3 asked to drop it from src/MODELS; then delete the file |
 | 98ld_w_2882.js | 2882 Speedboat | fra river | 19 | sink:1 (Athens has no river reach in WATERS) |
 | 98ld_w_6350.js | 6350 Pizza To Go | fra | 51 | --only pizzeria |
-| 98ld_w_7796.js | 7796 House | ath | 3 | s:2.5 |
-Skipped: 10264 Corner Garage (543 KB, over budget), 6613 phone booth (hood malformed).
+Removed: 7796 House (micro set at 2.5x, breaks the minifig-scale rule). Skipped: 10264 Corner Garage (543 KB, over budget), 6613 phone booth (hood malformed).
 src/ORDER is NOT committed (shared): integrator adds 98ld_w.js then each 98ld_w_<set>.js right after 98ld_import.js.
 
 ## Loop (≈5 min per model)
@@ -26,3 +25,7 @@ OMR catalogue: /omr/sets?page=1..59 (1,469 sets); download https://library.ldraw
 
 ## Budget
 Local page with all of the above = 3.33 MB (base 3.03). Keep new models ≤ 30 KB; ask build-3 before bigger ones.
+
+## Since 2026-10-10 15:50 (merged alex/od-models at 517c03f)
+- **Data modules are no longer in the page:** build-3 lists them in `src/MODELS` → `out/<ver>/models.js`, run by `98ld_run.js` (each file only sees LD_MESH, LD_MODELS, GB_PC, G13_ID, GAR_SETS, GAR_set, LD_br, LDW_P, LDW_reg). The page budget is gone; the limit is the phone's triangle count (the Corner Garage is 77k tris: too many). wOne.sh still appends to src/ORDER: change it to src/MODELS (build-3 owns that file; local only).
+- **NEW RULE (Alex):** buildings at TRUE minifig scale, the same as the game's humanoids. A game minifig must fit through the door and inside with headroom. **Every building needs a shot of a game minifig standing in its doorway.** No `s:` scaling for buildings. NOT yet checked: is LD_SW = 0.408 (car stud scale) the same as the humanoid scale? First job for the next session: doorway shots for 6683, 6402, 6365, 6372, 6350 with a game humanoid. If they don't match, fix LD_SW (or a per-prop factor) for every building.
