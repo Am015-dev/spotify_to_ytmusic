@@ -197,7 +197,7 @@ html.ph .bk .pr{margin:0;flex:0 0 auto}
 .conf i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:conf 2.6s linear infinite}
 @keyframes conf{to{transform:translateY(110vh) rotate(540deg)}}
 .fin-tab{width:100%;border-collapse:collapse;font-size:14px}.fin-tab th,.fin-tab td{padding:3px 4px;text-align:center;border-bottom:1px dotted rgba(58,36,56,.3)}.fin-tab td:first-child,.fin-tab th:first-child{text-align:left;font-weight:800}.fin-tab tr.w td{background:#fff3c8;font-weight:900}
-.passc{position:absolute;inset:0;z-index:20;background:linear-gradient(180deg,#3d2a4d,#241730);color:#f8eed8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:16px}
+.passc{position:absolute;inset:0;z-index:20;background:linear-gradient(180deg,rgba(24,14,34,.42),rgba(24,14,34,.62)),url(media/pass.webp) center/cover no-repeat,linear-gradient(180deg,#3d2a4d,#241730);color:#f8eed8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:16px}
 .passc .av{width:96px;height:96px}
 .passc h2{margin:0;font-size:1.5rem}
 .tipc{border:2px solid var(--ink);background:#fff3c8;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.35}
@@ -345,6 +345,7 @@ html.ph.ph-l .th{padding:2px 4px}
 html.ph.ph-l #cz{flex:1 1 0}
 html.ph .rsbox{width:100%;max-height:100%;padding:8px}
 html.ph .passc{padding:10px}
+@media (max-aspect-ratio:4/5){.passc{background-image:linear-gradient(180deg,rgba(24,14,34,.42),rgba(24,14,34,.62)),url(media/pass-phone.webp),linear-gradient(180deg,#3d2a4d,#241730)}}
 html.ph .gx-x{min-width:44px;min-height:44px}
 html.ph #netst{min-height:44px;min-width:44px}
 html.ph.ph-p .fin-tab{font-size:13px}html.ph.ph-p .fin-tab th,html.ph.ph-p .fin-tab td{padding:3px 1px}html.ph.ph-p .fin-tab td:first-child,html.ph.ph-p .fin-tab th:first-child{padding-right:3px}
@@ -517,7 +518,7 @@ html.ph.ph-p .gx-dock{min-height:var(--dockh)}
 .shopfoot .btn.go.confirm{flex:1 1 0;min-width:0;min-height:56px;font-size:18px;padding-left:8px;padding-right:8px}
 
 /* ===== part 9: the day end on the table (tally, market stall, ruby board), fortune chip, long-press bubble ===== */
-#rs.stg{background:radial-gradient(ellipse at 50% 30%,#6a4630,#3d281c 75%);padding:0;align-items:stretch;justify-content:stretch;z-index:55;color:#f8eed8}
+#rs.stg{background:linear-gradient(180deg,rgba(30,18,10,.18),rgba(30,18,10,.34)),url(media/stage.webp) center/cover no-repeat,radial-gradient(ellipse at 50% 30%,#6a4630,#3d281c 75%);padding:0;align-items:stretch;justify-content:stretch;z-index:55;color:#f8eed8}
 .rsbox.stg{width:100%;height:100%!important;max-height:none;border:0;border-radius:0;background:transparent;box-shadow:none;padding:4px 8px 6px;gap:4px;color:#f8eed8;position:relative}
 html.ph .rsbox.stg{padding:3px 6px 5px}
 .stg .rsbody{gap:6px;padding:0;overflow-x:hidden}

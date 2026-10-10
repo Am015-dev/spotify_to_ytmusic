@@ -10,6 +10,8 @@ function backApply() {
   R.style.setProperty('--back-meadow', 'url(' + MEDIA + 'back-meadow.webp)');
 }
 // ---- tables: painted tree stump behind the board; the CSS green stays while it loads and if the file is missing
+// bench + player mat paintings (transparent): the drawn ones hide once the picture has loaded
+['bench','mat'].forEach(n => { const im = new Image(); im.onload = () => { document.documentElement.dataset[n] = '1'; }; im.src = MEDIA + n + '.webp'; });
 const tblSeen = {}; let tblCur = '';
 function tableApply() {
   const R = document.documentElement, id = unl('table') || 'woodland';
