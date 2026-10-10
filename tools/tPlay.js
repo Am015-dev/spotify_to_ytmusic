@@ -130,6 +130,9 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
   await p.evaluate(([c])=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city]);
   await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
+  if(process.env.CAR){const C=process.env.CAR,gc=`[data-gc="${C}"]`;await tap('#gbMenuBtn');await tick(90);await tap('#r2R [data-r2m="rides"]');await tick(60);  // CAR=<preset id>: a person equips that ride in the garage first (RIDES → scroll → card → SAVE)
+   await p.evaluate(s=>{const e=document.querySelector(s);if(e)e.scrollIntoView({block:'center'})},gc);await tick(20);await tap(gc);await tick(90);await tap('#gbSave');await tick(120);
+   const eq=await p.evaluate(()=>__g9c.eq('car'));ok(eq===C,'equipped '+C+' in the garage',eq);for(let i=0;i<30&&!(await p.evaluate(()=>__mho.state==='menu'));i++)await tick(30)}
   if(mode==='phone'&&city===CITIES[0])await shot('menu');
   // a person taps STORY; the loading screen plays; then intro cards are tapped away
   // fra: a brand-new player (STORY → Slot 1 NEW GAME); ath: an existing Athens save (STORY → CONTINUE, the page reloads into Athens)
