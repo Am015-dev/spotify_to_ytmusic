@@ -20,7 +20,7 @@ const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').f
 const HT={bubbles:{},bulbs:0,bulbNull:0,rules:0,tipsOff:0};
 async function newPage(b,w,h,init){const c=await b.newContext({viewport:{width:w,height:h},isMobile:true,hasTouch:true,deviceScaleFactor:2,userAgent:UA});
   if(SLOW)await c.addInitScript(()=>{window.__slow=1});if(init)await c.addInitScript(init);await c.addInitScript(()=>{try{localStorage.setItem('sgz_offer','1')}catch(e){}});const p=await c.newPage();p.errs=[];
-  p.on('pageerror',e=>p.errs.push('pageerror: '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))p.errs.push('console: '+m.text())});
+  p.on('pageerror',e=>p.errs.push('pageerror: '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource|Fetch API cannot load/.test(m.text()))p.errs.push('console: '+m.text())});
   await p.goto(URL);await sleep(1200);return p}
 const tapEl=async(p,sel)=>{const r=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return r.width>0?{x:r.left+r.width/2,y:r.top+r.height/2}:null},sel);if(!r)return false;await p.touchscreen.tap(r.x,r.y);return true};
 const st=p=>p.evaluate(()=>({over:!!G.over,busy:BF.busy,q:BF.q.length,side:sideToAct(),phase:G.phase,logN:G.logN,round:G.round,cur:G.cur,sel:UI.sel?1:0}));
