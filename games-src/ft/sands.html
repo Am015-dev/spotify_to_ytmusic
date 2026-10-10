@@ -381,6 +381,110 @@ html.ti .mbox.start canvas{display:none}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #7a4524;background:#fff4d8;color:#3a2412;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .mchip.on{background:#3a2412;color:#fff4d8}.mchip.prev{border-style:dashed}
 html.tp .tile .tn{font-size:11px;letter-spacing:-.03em;padding:0 3px;max-width:calc(100% - 15px)}
+/* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
+   html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
+   ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
+   html.sk-stars (ui-star-*), html.sk-banner (ui-act-banner), html.sk-dark (dark panels: light ink). Game colours: --sk-ink, --sk-num, --sk-num-done. ===== */
+html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
+html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
+/* top bar + icon buttons */
+html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
+html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
+html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
+html.sk .gx-ibtn>span{padding:0 4px}
+html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
+html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
+html.sk-icons i[data-ic]{background:center/contain no-repeat}
+/* popups: parchment panel (9-slice) with a wooden title strip */
+html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
+html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
+html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
+html.sk .gx-drawer-body{padding:4px 4px 12px}
+/* campaign kit */
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
+html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
+html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
+html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
+html.sk .gxc-boss{border-color:transparent}
+html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;min-height:52px}
+/* story map nodes: painted medallions, the number (text) sits in the centre */
+html.sk .gxc-node{width:68px;height:68px}
+html.sk .gxc-disc{width:68px;height:68px;border:0;border-radius:0;background:url(media/ui-node-open.webp) center/contain no-repeat;box-shadow:none;color:var(--sk-num);text-shadow:0 1px 0 rgba(255,255,255,.45);font-size:22px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+html.sk .gxc-node.a2 .gxc-disc,html.sk .gxc-node.a3 .gxc-disc{background-color:transparent;background-image:url(media/ui-node-open.webp)}
+html.sk .gxc-node.won .gxc-disc,html.sk .gxc-node.won.a2 .gxc-disc,html.sk .gxc-node.won.a3 .gxc-disc{background-image:url(media/ui-node-done.webp);color:var(--sk-num-done);text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .gxc-node.locked .gxc-disc,html.sk .gxc-node.locked.a2 .gxc-disc,html.sk .gxc-node.locked.a3 .gxc-disc{background-image:url(media/ui-node-locked.webp);filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));opacity:1;color:transparent}
+html.sk .gxc-node.boss .gxc-disc,html.sk .gxc-node.boss.a2 .gxc-disc,html.sk .gxc-node.boss.a3 .gxc-disc{background-image:url(media/ui-node-boss.webp);width:74px;height:74px;margin:-8px 0 0 0;box-shadow:none}
+html.sk .gxc-node.boss .gxc-disc::after,html.sk .gxc-lock{display:none}
+html.sk .gxc-node.boss .gxc-disc .gxc-pt{width:34px!important;height:34px!important;margin-top:8px}
+html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out infinite}
+@keyframes sk-pulse{0%,100%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,214,90,.9))}50%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 9px rgba(255,214,90,.95))}}
+html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10}
+html.sk .gxc-node .gxc-stars{top:56px}
+html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
+html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
+html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
+html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
+html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
+html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
+html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
+/* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+@media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
+/* Sands skin (facelift): painted kit wired by gx-skin.css/js; this file holds the Sands-specific selectors. */
+html.sk{--sk-ink:#3a2410}
+/* tribe meeples */
+html.sk-meeple .mp::before{display:none}
+html.sk-meeple .mp::after{left:0;top:0;transform:none;width:100%;height:100%;border:0;border-radius:0;background:var(--mi) center/contain no-repeat}
+html.sk-meeple .mp[data-c=vizier]{--mi:url(media/meeple-vizier.webp)}html.sk-meeple .mp[data-c=elder]{--mi:url(media/meeple-elder.webp)}
+html.sk-meeple .mp[data-c=merchant]{--mi:url(media/meeple-merchant.webp)}html.sk-meeple .mp[data-c=builder]{--mi:url(media/meeple-builder.webp)}
+html.sk-meeple .mp[data-c=assassin]{--mi:url(media/meeple-assassin.webp)}html.sk-meeple .mp[data-c=artisan]{--mi:url(media/meeple-artisan.webp)}
+html.sk-meeple .mp{filter:drop-shadow(0 1px 1px rgba(30,15,5,.65))}
+html.sk-meeple .mp.h{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+/* icon set (bar, menu rows, drawer titles) */
+html.sk-icons i[data-ic=camel],html.sk-icons i[data-ic=lamp],html.sk-icons i[data-ic=scroll],html.sk-icons i[data-ic=cards],html.sk-icons i[data-ic=book],html.sk-icons i[data-ic=gear],html.sk-icons i[data-ic=menu],html.sk-icons i[data-ic=plus],html.sk-icons i[data-ic=fast]{background:center/contain no-repeat;width:24px;height:24px;display:inline-block;vertical-align:middle}
+html.sk-icons i[data-ic=camel]{background-image:url(media/icon-players.webp)}html.sk-icons i[data-ic=lamp]{background-image:url(media/icon-djinn.webp)}
+html.sk-icons i[data-ic=scroll]{background-image:url(media/icon-log.webp)}html.sk-icons i[data-ic=cards]{background-image:url(media/icon-cards.webp)}
+html.sk-icons i[data-ic=book]{background-image:url(media/icon-rules.webp)}html.sk-icons i[data-ic=gear]{background-image:url(media/icon-settings.webp)}
+html.sk-icons i[data-ic=menu]{background-image:url(media/icon-menu.webp)}html.sk-icons i[data-ic=plus]{background-image:url(media/icon-newgame.webp)}
+html.sk-icons i[data-ic=fast]{background-image:url(media/icon-speed.webp)}
+html.sk-icons i[data-ic=camel] svg,html.sk-icons i[data-ic=lamp] svg,html.sk-icons i[data-ic=scroll] svg,html.sk-icons i[data-ic=cards] svg,html.sk-icons i[data-ic=book] svg,html.sk-icons i[data-ic=gear] svg,html.sk-icons i[data-ic=menu] svg,html.sk-icons i[data-ic=plus] svg,html.sk-icons i[data-ic=fast] svg,html.sk-icons #sndbtn svg,html.sk-icons #musbtn svg{display:none}
+html.sk-icons #sndbtn,html.sk-icons #musbtn,html.sk-icons #bulbbtn{background-repeat:no-repeat;background-position:center;background-size:24px;background-origin:content-box;background-clip:content-box}
+html.sk-icons #sndbtn{background-image:url(media/icon-sound.webp)}html.sk-icons #musbtn{background-image:url(media/icon-music.webp)}html.sk-icons #bulbbtn{background-image:url(media/icon-hint.webp)}
+html.sk-icons #sndbtn[aria-pressed=false],html.sk-icons #musbtn[aria-pressed=false]{opacity:.55}
+html.sk-icons #bulbbtn svg,html.sk-icons #bulbbtn>*{opacity:0}
+html.sk-icons .ri{font-size:0;display:inline-block;width:26px;height:26px;vertical-align:middle;margin-right:8px;background:center/contain no-repeat;font-style:normal}
+html.sk-icons .ri[data-r=players]{background-image:url(media/icon-players.webp)}html.sk-icons .ri[data-r=djinn]{background-image:url(media/icon-djinn.webp)}
+html.sk-icons .ri[data-r=cards]{background-image:url(media/icon-cards.webp)}html.sk-icons .ri[data-r=rules]{background-image:url(media/icon-rules.webp)}
+html.sk-icons .ri[data-r=sound]{background-image:url(media/icon-sound.webp)}html.sk-icons .ri[data-r=music]{background-image:url(media/icon-music.webp)}
+html.sk-icons .ri[data-r=speed]{background-image:url(media/icon-speed.webp)}html.sk-icons .ri[data-r=settings]{background-image:url(media/icon-settings.webp)}
+html.sk-icons .ri[data-r=log]{background-image:url(media/icon-log.webp)}html.sk-icons .ri[data-r=newgame]{background-image:url(media/icon-newgame.webp)}
+/* buttons: cream / go / power pills */
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;justify-content:center}
+html.sk .ab.go,html.sk .mbox .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;min-height:44px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
+html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
+html.sk.short:not(.land) .ab{min-height:44px;padding:0 2px}html.sk.short:not(.land) .ab.pw{min-height:44px}
+html.sk .mbox .btn.sm{min-height:44px;border-width:0 18px;border-image-width:0 18px}
+html.sk .mbox .btn.xs{min-height:44px}
+/* menu rows */
+html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;min-height:52px;margin:2px 0;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;font-weight:700;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
+/* dialogs over the table */
+html.sk .mbox{background:none;border:30px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:#3a2410}
+html.ti.sk #modal[data-k=start] .mbox.start{background:none}
+html.sk .mbox h2{color:#8e3a1c}
+html.sk .gx-bar{gap:2px;padding-left:6px;padding-right:6px}
+html.sk .gx-bar h1{font-size:.9rem;margin:0 2px 0 0}
+html.sk .gx-bar .pchip{font-size:11px;padding:2px 6px}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -499,6 +603,7 @@ html.tp .tile .tn{font-size:11px;letter-spacing:-.03em;padding:0 3px;max-width:c
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
 .gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
@@ -654,8 +759,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 <section class="gx-drawer wide" id="refd" role="dialog" aria-label="Card list"><div class="gx-drawer-head"><h2><i data-ic="cards"></i> Cards, tiles and tokens</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
 <section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2><i data-ic="book"></i> How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
 <section class="gx-drawer" id="menud" role="dialog" aria-label="Menu"><div class="gx-drawer-head"><h2><i data-ic="menu"></i> Menu</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body menu">
-  <button class="btn" data-gx="plrd">🐪 Players and scores</button><button class="btn" data-gx="djd">🧞 Djinns</button><button class="btn" data-gx="refd">🃏 Card list</button><button class="btn" data-gx="rulesd">📖 How to play</button>
-  <button class="btn" data-a="snd">🔊 Sound on/off</button><button class="btn" data-a="mus">🎶 Music on/off</button><button class="btn" data-gx="musicd">🎼 Choose music</button><button class="btn" data-a="speed">⏩ Computer speed</button><button class="btn" data-gx="setd">⚙ Settings</button><button class="btn" data-ui="story">📜 Story mode</button><button class="btn" data-a="new">✚ New game</button><div id="gxtmenu"></div><div id="gxhmenu"></div></div></section>
+  <button class="btn" data-gx="plrd"><i class="ri" data-r="players">🐪</i> Players and scores</button><button class="btn" data-gx="djd"><i class="ri" data-r="djinn">🧞</i> Djinns</button><button class="btn" data-gx="refd"><i class="ri" data-r="cards">🃏</i> Card list</button><button class="btn" data-gx="rulesd"><i class="ri" data-r="rules">📖</i> How to play</button>
+  <button class="btn" data-a="snd"><i class="ri" data-r="sound">🔊</i> Sound on/off</button><button class="btn" data-a="mus"><i class="ri" data-r="music">🎶</i> Music on/off</button><button class="btn" data-gx="musicd"><i class="ri" data-r="music">🎼</i> Choose music</button><button class="btn" data-a="speed"><i class="ri" data-r="speed">⏩</i> Computer speed</button><button class="btn" data-gx="setd"><i class="ri" data-r="settings">⚙</i> Settings</button><button class="btn" data-ui="story"><i class="ri" data-r="log">📜</i> Story mode</button><button class="btn" data-a="new"><i class="ri" data-r="newgame">✚</i> New game</button><div id="gxtmenu"></div><div id="gxhmenu"></div></div></section>
 <section class="gx-drawer" id="setd" role="dialog" aria-label="Settings"><div class="gx-drawer-head"><h2><i data-ic="gear"></i> Settings</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="setbody"></div></section>
 <section class="gx-drawer" id="musicd" role="dialog" aria-label="Music"><div class="gx-drawer-head"><h2><i data-ic="gear"></i> Music</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="musicbody"></div></section>
 <div id="modal" hidden></div>
@@ -1298,9 +1403,32 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+/* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+(function () {
+  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  window.GXSK = {
+    init: function (o) {
+      o = o || {}; var extra = [];
+      if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
+      load(core, function (ok) {
+        if (!ok) return;
+        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
+        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        if (o.cb) o.cb();
+      });
+    }
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
-//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
 //   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
@@ -1692,6 +1820,7 @@ const GX={key:'gx',open:null,
     return new Promise(function (done) {
       if (!doc) return done('map');
       var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      if (O && O.endArt) { var ea = r.won ? O.endArt.win : O.endArt.lose; if (ea) { s.parentNode.classList.add('has-art'); s.parentNode.style.setProperty('--gxc-art', 'url(' + ea + ')'); } }
       box.appendChild(el('div', 'gxc-res-k', def.title));
       box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
@@ -4715,7 +4844,7 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='offe
 UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox start"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>Sands of Qamar</h2><p class="lede">Lead the tribes. Rule the bazaar.</p>
-   <div class="acts big">${online()||typeof tutBtn!=='function'?'':tutBtn('btn big'+(firstTime()?' go':''))}${online()?'':'<button class="btn'+(firstTime()?'':' go')+' big" data-ui="quick">▶ Play vs computer</button>'}${window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="btn big" data-ui="story">📜 Story mode</button>':''}${saved&&!online()?'<button class="btn big" data-ui="continue">Continue saved game</button>':''}</div>
+   <div class="acts big">${online()||typeof tutBtn!=='function'?'':tutBtn('btn big'+(firstTime()?' go':''))}${online()?'':'<button class="btn'+(firstTime()?'':' go')+' big" data-ui="quick">▶ Play vs computer</button>'}${window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="btn big" data-ui="story"><i class="ri" data-r="log">📜</i> Story mode</button>':''}${saved&&!online()?'<button class="btn big" data-ui="continue">Continue saved game</button>':''}</div>
    <details class="exd"><summary><b>More ways to play</b></summary><div class="more"><div class="seg">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n} players</button>`).join('')}</div>
    <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seatrow" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><button class="btn sm" data-seatset="${i}">${o.seats[i]==='human'?'🙂 person':'🤖 computer'}</button>${o.seats[i]==='ai'?`<button class="btn sm ghost" data-lv="${i}">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
    <div class="exs">${[['artisans','The Crafters'],['sultan','Wonder Cities'],['thieves','Cutpurses'],['promos','Promo djinns']].map(([k,n])=>`<label class="chk"><input type="checkbox" data-ex="${k}" ${o.ex[k]||(k==='sultan'&&o.np===5)?'checked':''} ${k==='sultan'&&o.np===5?'disabled':''}> <b>${n}</b></label>`).join('')}</div>
@@ -5063,7 +5192,7 @@ function paintApply(){
   if(PAINT_ON)pimg(cf,()=>HR.style.setProperty('--cb','url('+MEDIA+cf+'.webp)'));
   HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1);
 }
-function paintBoot(){['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
+function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players','djinn','log','cards','rules','settings','menu','newgame','speed','sound','music','hint'],sets:{'sk-meeple':['vizier','elder','merchant','builder','assassin','artisan'].map(k=>'meeple-'+k)}});['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
   ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply()}
 // painted pictures on/off (Settings)
 document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');if(!b)return;PAINT_ON=b.dataset.paint==='1';try{localStorage.setItem('soq_paint',PAINT_ON?'1':'0')}catch(x){}paintApply();if(G)render();renderSettings()});
@@ -5073,7 +5202,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');i
 // ---------- music: five slots (Menu, Game, Last round, Victory, Defeat), two tracks each; choice a / b / shuffle / all / off ----------
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last round'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'Warm Welcome','tavern-b':'Oud Lanterns','main-a':'Desert Evening','main-b':'Ninety Steps','fight-a':'Last Stand','fight-b':'Frame Drum Rising','victory-a':'Golden Gates','victory-b':'Oud and Ney','defeat-a':'Ten Seconds of Dusk','defeat-b':'Softly, Then Still'};
-const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MUS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('soq_mpick')||'{}'))}catch(e){}

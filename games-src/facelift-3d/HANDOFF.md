@@ -78,3 +78,6 @@ leaned 10-40 deg); those already stand on y=0, centred on x/z. Small see-through
 | thornbound | throne | `games-src/facelift-3d/thornbound/throne.glb` | 4103 KB | yes | owner keep |
 | tidewake | junk | `games-src/facelift-3d/tidewake/junk.glb` | 2952 KB | yes | owner keep |
 | tidewake | leviathan | `games-src/facelift-3d/tidewake/leviathan.glb` | 3214 KB | yes | owner keep |
+
+## Rule (owner, 10 Oct 2026)
+Never decimate the owner's models below 40k triangles or 1024 px textures without the owner's OK.

@@ -90,7 +90,7 @@ function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : [
 function mkey(m) { const o = {}; Object.keys(m).sort().forEach(k => { if (k !== 'label') o[k] = m[k]; }); return JSON.stringify(o); }
 function sameM(a, b) { return !!a && !!b && mkey(a) === mkey(b); }
 function pcolor(i) { return HBKit.PLAYER[i === 'G' ? 4 : i % 4]; }
-function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', HBKit.worker(k, px), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
+function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', h('span.wpg', { style: '--wc:' + HBKit.PLAYER[k].c }, h('img', { src: 'models/worker.webp', alt: '', draggable: 'false' })), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
 function score(seat) { try { return HB.score(G, seat); } catch (e) { return { total: 0 }; } }
 function lastLogs(n) { return G.log.slice(-n).map(x => x.t); }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
@@ -870,7 +870,7 @@ function queueOver() {
     t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', sc.total)));
     return t;
   };
-  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40)), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
+  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40), h('img.hero-tree', { src: 'models/ever-tree.webp', alt: '', draggable: 'false' })), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({

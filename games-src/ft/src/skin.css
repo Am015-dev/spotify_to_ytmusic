@@ -1,0 +1,48 @@
+/* Sands skin (facelift): painted kit wired by gx-skin.css/js; this file holds the Sands-specific selectors. */
+html.sk{--sk-ink:#3a2410}
+/* tribe meeples */
+html.sk-meeple .mp::before{display:none}
+html.sk-meeple .mp::after{left:0;top:0;transform:none;width:100%;height:100%;border:0;border-radius:0;background:var(--mi) center/contain no-repeat}
+html.sk-meeple .mp[data-c=vizier]{--mi:url(media/meeple-vizier.webp)}html.sk-meeple .mp[data-c=elder]{--mi:url(media/meeple-elder.webp)}
+html.sk-meeple .mp[data-c=merchant]{--mi:url(media/meeple-merchant.webp)}html.sk-meeple .mp[data-c=builder]{--mi:url(media/meeple-builder.webp)}
+html.sk-meeple .mp[data-c=assassin]{--mi:url(media/meeple-assassin.webp)}html.sk-meeple .mp[data-c=artisan]{--mi:url(media/meeple-artisan.webp)}
+html.sk-meeple .mp{filter:drop-shadow(0 1px 1px rgba(30,15,5,.65))}
+html.sk-meeple .mp.h{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+/* icon set (bar, menu rows, drawer titles) */
+html.sk-icons i[data-ic=camel],html.sk-icons i[data-ic=lamp],html.sk-icons i[data-ic=scroll],html.sk-icons i[data-ic=cards],html.sk-icons i[data-ic=book],html.sk-icons i[data-ic=gear],html.sk-icons i[data-ic=menu],html.sk-icons i[data-ic=plus],html.sk-icons i[data-ic=fast]{background:center/contain no-repeat;width:24px;height:24px;display:inline-block;vertical-align:middle}
+html.sk-icons i[data-ic=camel]{background-image:url(media/icon-players.webp)}html.sk-icons i[data-ic=lamp]{background-image:url(media/icon-djinn.webp)}
+html.sk-icons i[data-ic=scroll]{background-image:url(media/icon-log.webp)}html.sk-icons i[data-ic=cards]{background-image:url(media/icon-cards.webp)}
+html.sk-icons i[data-ic=book]{background-image:url(media/icon-rules.webp)}html.sk-icons i[data-ic=gear]{background-image:url(media/icon-settings.webp)}
+html.sk-icons i[data-ic=menu]{background-image:url(media/icon-menu.webp)}html.sk-icons i[data-ic=plus]{background-image:url(media/icon-newgame.webp)}
+html.sk-icons i[data-ic=fast]{background-image:url(media/icon-speed.webp)}
+html.sk-icons i[data-ic=camel] svg,html.sk-icons i[data-ic=lamp] svg,html.sk-icons i[data-ic=scroll] svg,html.sk-icons i[data-ic=cards] svg,html.sk-icons i[data-ic=book] svg,html.sk-icons i[data-ic=gear] svg,html.sk-icons i[data-ic=menu] svg,html.sk-icons i[data-ic=plus] svg,html.sk-icons i[data-ic=fast] svg,html.sk-icons #sndbtn svg,html.sk-icons #musbtn svg{display:none}
+html.sk-icons #sndbtn,html.sk-icons #musbtn,html.sk-icons #bulbbtn{background-repeat:no-repeat;background-position:center;background-size:24px;background-origin:content-box;background-clip:content-box}
+html.sk-icons #sndbtn{background-image:url(media/icon-sound.webp)}html.sk-icons #musbtn{background-image:url(media/icon-music.webp)}html.sk-icons #bulbbtn{background-image:url(media/icon-hint.webp)}
+html.sk-icons #sndbtn[aria-pressed=false],html.sk-icons #musbtn[aria-pressed=false]{opacity:.55}
+html.sk-icons #bulbbtn svg,html.sk-icons #bulbbtn>*{opacity:0}
+html.sk-icons .ri{font-size:0;display:inline-block;width:26px;height:26px;vertical-align:middle;margin-right:8px;background:center/contain no-repeat;font-style:normal}
+html.sk-icons .ri[data-r=players]{background-image:url(media/icon-players.webp)}html.sk-icons .ri[data-r=djinn]{background-image:url(media/icon-djinn.webp)}
+html.sk-icons .ri[data-r=cards]{background-image:url(media/icon-cards.webp)}html.sk-icons .ri[data-r=rules]{background-image:url(media/icon-rules.webp)}
+html.sk-icons .ri[data-r=sound]{background-image:url(media/icon-sound.webp)}html.sk-icons .ri[data-r=music]{background-image:url(media/icon-music.webp)}
+html.sk-icons .ri[data-r=speed]{background-image:url(media/icon-speed.webp)}html.sk-icons .ri[data-r=settings]{background-image:url(media/icon-settings.webp)}
+html.sk-icons .ri[data-r=log]{background-image:url(media/icon-log.webp)}html.sk-icons .ri[data-r=newgame]{background-image:url(media/icon-newgame.webp)}
+/* buttons: cream / go / power pills */
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;justify-content:center}
+html.sk .ab.go,html.sk .mbox .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;min-height:44px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
+html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
+html.sk.short:not(.land) .ab{min-height:44px;padding:0 2px}html.sk.short:not(.land) .ab.pw{min-height:44px}
+html.sk .mbox .btn.sm{min-height:44px;border-width:0 18px;border-image-width:0 18px}
+html.sk .mbox .btn.xs{min-height:44px}
+/* menu rows */
+html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;min-height:52px;margin:2px 0;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;font-weight:700;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
+/* dialogs over the table */
+html.sk .mbox{background:none;border:30px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:#3a2410}
+html.ti.sk #modal[data-k=start] .mbox.start{background:none}
+html.sk .mbox h2{color:#8e3a1c}
+html.sk .gx-bar{gap:2px;padding-left:6px;padding-right:6px}
+html.sk .gx-bar h1{font-size:.9rem;margin:0 2px 0 0}
+html.sk .gx-bar .pchip{font-size:11px;padding:2px 6px}

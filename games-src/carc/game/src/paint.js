@@ -4,7 +4,7 @@
 const MEDIA='media/',HR=document.documentElement;
 let PAINT_ON=true;try{PAINT_ON=localStorage.getItem('rv_paint')!=='0'}catch(e){}
 const PIMG={};
-function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[f]=0;const i=new Image();i.onload=()=>{PIMG[f]=1;if(cb)cb()};i.src=MEDIA+f+'.webp'}
+function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[f]=0;const i=new Image();i.onload=()=>{PIMG[f]=1;if(cb)cb()};i.src=(f.includes('/')?f:MEDIA+f)+'.webp'}
 function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
 // texture name -> [file, size of one repeat in tile units]
 const TEXD={field:60,road:30,river:40,lake:34,garden:20,hedge:20,hub:20,wall:25,mon:40,'town-basilica':50,town:50,roof:24};
@@ -15,8 +15,8 @@ function texApply(){TEXSET={};let any=false;
   el.innerHTML=any?`<svg width="0" height="0" style="position:absolute"><defs>${texDefs()}</defs></svg>`:'';
   if(typeof G!=='undefined'&&G&&typeof UI!=='undefined'){try{for(const k in UI.tl){const T=G.tiles[k];if(T)UI.tl[k].innerHTML=tileSvg(T.t,T.r)}UI.handKey=null;if(G.cur&&!G.over){renderHand();renderGlows()}}catch(e){}}}
 // pieces: painted figure on a player-coloured disc (seat chips keep the drawn icons: they are tiny and need the colour)
-const PCF={meeple:'piece-meeple',champ:'piece-champ',mason:'piece-mason',hog:'piece-hog'};
-function pcHtml(n){return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${MEDIA}${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
+const PCF={meeple:'models/piece-meeple',champ:'models/piece-champ',mason:'models/piece-mason',hog:'models/piece-hog'};   // 3D renders of the follower models (transparent, 3/4 view); the player colour is the disc behind them
+function pcHtml(n){return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
 const TABLES=['harvest','riverbank','sable-hall'],BACKS=['tavern','raven'];
 function paintApply(){
   HR.classList.toggle('ti',PAINT_ON&&PIMG['title']===1);
@@ -28,7 +28,7 @@ function paintApply(){
   HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1)}
 function paintBoot(){const all=Object.keys(TEXD).map(k=>'tex-'+k);let left=all.length;
   all.forEach(f=>pimg(f,()=>{if(--left===0)texApply()}));
-  ['title','title-phone','table-default','table-default-phone','back-default','end-win','end-lose','piece-meeple','piece-champ','piece-mason','piece-hog'].forEach(f=>pimg(f,paintApply));
+  ['title','title-phone','table-default','table-default-phone','back-default','end-win','end-lose',...Object.values(PCF)].forEach(f=>pimg(f,paintApply));
   ['table-harvest','table-riverbank','table-sable-hall','back-tavern','back-raven'].forEach(f=>pimg(f));paintApply()}
 function paintToggle(){PAINT_ON=!PAINT_ON;try{localStorage.setItem('rv_paint',PAINT_ON?'1':'0')}catch(x){}texApply();paintApply()}
 // end banner on the result card and on the story result screen

@@ -13,7 +13,7 @@ function gfxLoadPref(){let v=null;try{v=localStorage.getItem(GFX_KEY)}catch(e){}
 function gfxSetPref(v){V3.qPref=v;try{localStorage.setItem(GFX_KEY,v)}catch(e){}applyQuality(v==='auto'?gfxAuto():v)}
 function gfxCycle(){const o=['auto','high','medium','low'];gfxSetPref(o[(o.indexOf(V3.qPref)+1)%o.length])}
 function gfxLabel(){const n={high:'High',medium:'Medium',low:'Low'};return V3.qPref==='auto'?'Auto · '+n[V3.q]:n[V3.q]}
-function applyQuality(q){V3.q=q;if(typeof gfxBtn==='function')try{gfxBtn()}catch(e){}if(!V3.r)return;const r=V3.r;const dpr=window.devicePixelRatio||1;
+function applyQuality(q){const lo0=V3.q==='low';V3.q=q;if(q!=='low')glbLoad();if(V3.glbOK&&lo0!==(q==='low')){dressSun();V3.lkey=null;if(typeof relayout==='function'&&V3.L)relayout()}if(typeof gfxBtn==='function')try{gfxBtn()}catch(e){}if(!V3.r)return;const r=V3.r;const dpr=window.devicePixelRatio||1;
   const want=Math.min(q==='high'?2:q==='medium'?1.5:1,dpr);r.setPixelRatio(PH?PH.pixelRatio(want):want);
   const sh=q!=='low';const ms=q==='high'?2048:1024;
   if(V3.sun.shadow.mapSize.x!==ms){V3.sun.shadow.mapSize.set(ms,ms);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}}
@@ -233,6 +233,16 @@ function potMesh(i){const g=new THREE.Group();const R=rng(60+i);const pot=new TH
   for(let k=0;k<N;k++){const a=R()*6.28,b=Math.acos(2*R()-1),rad=.55+R()*.35;v.set(Math.sin(b)*Math.cos(a)*rad,2.15+Math.cos(b)*rad*.8,Math.sin(b)*Math.sin(a)*rad);e.set(R()*3,R()*6.3,R()*3);q.setFromEuler(e);s.setScalar(.8+R()*.6);m4.compose(v,q,s);leaves.setMatrixAt(k,m4);c.setHSL(.26+R()*.06,.45+R()*.2,.2+R()*.14);leaves.setColorAt(k,c)}
   leaves.castShadow=true;g.add(leaves);const fr=new THREE.InstancedMesh(new THREE.SphereGeometry(.12,10,8),emat(new THREE.MeshPhysicalMaterial({color:0xf2c418,roughness:.4,clearcoat:.5})),9);
   for(let k=0;k<9;k++){const a=R()*6.28,b=.5+R()*1.6;v.set(Math.sin(b)*Math.cos(a)*.86,2.15+Math.cos(b)*.7,Math.sin(b)*Math.sin(a)*.86);m4.compose(v,q.identity(),s.set(1,1.15,1));fr.setMatrixAt(k,m4)}g.add(fr);g.scale.setScalar(.92);return g}
+// ---------- GLB models (High/Medium; Low keeps the brass token and the clay kilns): sun first-player token + dished kiln plates ----------
+function glbLoad(){if(V3.glbP||typeof GXGLB==='undefined')return;
+  V3.glbP=Promise.all([GXGLB.load('models/sun.glb'),GXGLB.load('models/plate.glb')]).then(r=>{
+    const sun=GXGLB.prep(r[0],{len:.95,env:.7}),w=new THREE.Group();sun.rotation.x=-Math.PI/2;w.add(sun);w.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(w);sun.position.y-=bb.min.y;V3.glbSun=w;
+    const pl=GXGLB.prep(r[1],{len:3.22,ground:true,env:.6}),sz=pl.userData.size;pl.scale.y=.3/Math.max(.01,sz.y);V3.glbPlate=pl;V3.glbOK=true;dressSun();V3.lkey=null;V3.dirty=3;if(typeof relayout==='function')relayout()}).catch(()=>{V3.glbP=null})}
+const glbOn=()=>V3.q!=='low'&&V3.glbOK;
+function dressSun(){const g=V3.sunTok;if(!g)return;const on=glbOn();if(g.userData.glb===on)return;g.userData.glb=on;
+  if(on){g.children.forEach(c=>{if(!c.userData.keep)c.visible=false});if(!g.userData.gm){g.userData.gm=V3.glbSun.clone(true)}g.userData.gm.visible=true;g.add(g.userData.gm);
+    const sh=g.children.find(c=>c.material&&c.material.map===V3.T.blob);if(sh){sh.visible=true;sh.userData.keep=1}}
+  else{g.children.forEach(c=>c.visible=true);if(g.userData.gm)g.remove(g.userData.gm)}V3.dirty=3}
 function makeSunToken(){const g=new THREE.Group();const brass=emat(new THREE.MeshPhysicalMaterial({color:0xd4a24a,metalness:1,roughness:.28,clearcoat:.4,clearcoatRoughness:.2}));
   const rim=new THREE.Mesh(lathe([[0,0],[.42,0],[.46,.02],[.48,.07],[.48,.14],[.46,.19],[.43,.21],[.4,.2],[.39,.18],[0,.18]],40),brass);rim.castShadow=true;rim.receiveShadow=true;g.add(rim);
   const S=256,c=mkCanvas(S,S),x=c.getContext('2d');x.fillStyle='#f3b92e';x.beginPath();x.arc(128,128,128,0,7);x.fill();const gr=x.createRadialGradient(128,110,10,128,128,128);gr.addColorStop(0,'#ffe08a');gr.addColorStop(1,'#e08a18');x.fillStyle=gr;x.fill();
@@ -240,7 +250,7 @@ function makeSunToken(){const g=new THREE.Group();const brass=emat(new THREE.Mes
   x.fillStyle='#7a3a0c';x.font='700 70px "Cormorant Garamond",Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('1',128,134);
   const H=heightOf(c);const top=new THREE.Mesh(new THREE.CircleGeometry(.395,40),emat(new THREE.MeshPhysicalMaterial({map:texOf(c,true),normalMap:texOf(normalCanvas(H,S,S,2,false)),roughness:.3,clearcoat:1,clearcoatRoughness:.05})));top.rotation.x=-Math.PI/2;top.position.y=.181;g.add(top);
   const sh=new THREE.Mesh(V3.blobGeo||new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:V3.T.blob,transparent:true,depthWrite:false,opacity:.7}));sh.scale.setScalar(.95);sh.position.y=.004;g.add(sh);
-  V3.sunTok=g;V3.scene.add(g);g.userData={pos:new THREE.Vector3()}}
+  V3.sunTok=g;V3.scene.add(g);g.userData={pos:new THREE.Vector3()};if(V3.glbOK)dressSun()}
 // ---------- layout: kiln ring and player boards, chosen to fill the current board area ----------
 function focusSeat(){if(!G)return 0;if(NET.on&&NET.mySeat>=0&&P(NET.mySeat))return NET.mySeat;const s=sideToAct();if(s>=0&&P(s).human)return s;if(UI.lastHuman!=null&&P(UI.lastHuman)&&P(UI.lastHuman).human)return UI.lastHuman;const h=G.pl.find(p=>p.human);return h?h.i:(s>=0?s:0)}
 function ringGeom(n){const RR=Math.max(4.6,n*(2*KR+.5)/(2*Math.PI));return {RR,cr:RR-KR-.25,out:RR+KR}}
@@ -304,7 +314,7 @@ function buildStatic(){const sc=V3.scene;if(V3.stat)for(const m of V3.stat)sc.re
   const mh=add(new THREE.Mesh(new THREE.CircleGeometry(cr,32),V3.hitMat));mh.rotation.x=-Math.PI/2;mh.position.y=.08;mh.userData.hit={k:'ctr'};V3.hits.push(mh);
   // kilns: thick terracotta discs, a rolled lip with a slip-painted band, a painted floor with the kiln's number
   if(!V3.kilnGeo)V3.kilnGeo=lathe([[1.5,0],[1.56,.02],[1.6,.1],[1.61,.2],[1.58,.265],[1.53,.29],[1.48,.285],[1.44,.24],[1.4,.175],[1.34,.155]],56);
-  L.kilns.forEach((K,i)=>{const g=new THREE.Group();const body=new THREE.Mesh(V3.kilnGeo,clayMat());body.castShadow=body.receiveShadow=true;g.add(body);
+  L.kilns.forEach((K,i)=>{const g=new THREE.Group();const body=new THREE.Mesh(V3.kilnGeo,clayMat());body.castShadow=body.receiveShadow=true;g.add(body);if(glbOn()&&V3.glbPlate){body.visible=false;g.add(V3.glbPlate.clone(true))}
     const fl=new THREE.Mesh(new THREE.CircleGeometry(1.36,48),kilnFloorMat(i));fl.rotation.x=-Math.PI/2;fl.position.y=.155;fl.receiveShadow=true;g.add(fl);
     {const c=mkCanvas(128,128),x=c.getContext('2d');x.fillStyle='#f4ead2';x.beginPath();x.arc(64,64,58,0,7);x.fill();x.strokeStyle='#23407a';x.lineWidth=8;x.stroke();x.fillStyle='#23407a';x.font='800 80px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText(String(i+1),64,70);
       const nm=new THREE.Mesh(new THREE.CircleGeometry(.36,32),mat(new THREE.MeshBasicMaterial({map:texOf(c,true),transparent:true,depthWrite:false})));nm.rotation.x=-Math.PI/2;nm.position.set(0,.3,1.62);nm.renderOrder=3;g.add(nm)}// the kiln's number, as the log and recap name it

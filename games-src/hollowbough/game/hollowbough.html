@@ -652,6 +652,12 @@ html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:cent
 html.ph.ph-l.net #barstat{display:none}
 /* shared kit (part 8): pawn symbols for colour-blind help, undo, achievement line, left-handed dock */
 .pawnw{position:relative;display:inline-flex;flex:none;line-height:0}
+.wpg{display:block;position:relative;width:calc(var(--pw,16px)*.9);height:var(--pw,16px)}
+.wpg::before{content:'';position:absolute;left:6%;right:6%;bottom:0;height:42%;border-radius:50%;background:var(--wc);box-shadow:0 1px 1px rgba(0,0,0,.4)}
+.wpg img{position:relative;display:block;width:100%;height:100%;object-fit:contain}
+.hero-tree{height:88px;width:auto;margin-left:14px;vertical-align:middle;animation:treesway 5s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes treesway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@media (prefers-reduced-motion:reduce){.hero-tree{animation:none}}
 .pawnw .gx-cbm{position:absolute;right:-2px;bottom:-2px;min-width:calc(var(--pw,16px)*.62);height:calc(var(--pw,16px)*.62);border-radius:50%;background:#fffaf0;color:#2a1e14;font:700 calc(var(--pw,16px)*.46)/calc(var(--pw,16px)*.62) system-ui,sans-serif;text-align:center;box-shadow:0 0 0 1px #3b2f2a;opacity:1}
 html.cb .pawnw .gx-cbm{display:block}
 .pacts2{display:flex;gap:6px}.pacts2 .btn{flex:1}
@@ -5377,7 +5383,7 @@ function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : [
 function mkey(m) { const o = {}; Object.keys(m).sort().forEach(k => { if (k !== 'label') o[k] = m[k]; }); return JSON.stringify(o); }
 function sameM(a, b) { return !!a && !!b && mkey(a) === mkey(b); }
 function pcolor(i) { return HBKit.PLAYER[i === 'G' ? 4 : i % 4]; }
-function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', HBKit.worker(k, px), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
+function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', h('span.wpg', { style: '--wc:' + HBKit.PLAYER[k].c }, h('img', { src: 'models/worker.webp', alt: '', draggable: 'false' })), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
 function score(seat) { try { return HB.score(G, seat); } catch (e) { return { total: 0 }; } }
 function lastLogs(n) { return G.log.slice(-n).map(x => x.t); }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
@@ -6157,7 +6163,7 @@ function queueOver() {
     t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', sc.total)));
     return t;
   };
-  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40)), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
+  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40), h('img.hero-tree', { src: 'models/ever-tree.webp', alt: '', draggable: 'false' })), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
@@ -6935,7 +6941,7 @@ function rivalPortrait() {
 // ---- music: five slots (Menu, Game, Fight, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Fight'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'The Village Wakes', 'tavern-b': 'Sunlight Through the Canopy', 'main-a': 'Quiet Cartographer', 'main-b': 'Meadowlight Turn', 'fight-a': 'Last Harvest Before Winter', 'fight-b': "Fiddle at the Wood's Edge", 'victory-a': 'Grove of Golden Light', 'victory-b': 'Tambourine at the Woodland Gate', 'defeat-a': 'Late October', 'defeat-b': 'Last Chord, Golden Light' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and fight tracks), a new one every ~2.5 min
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;

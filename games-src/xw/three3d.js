@@ -50,7 +50,7 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   /* shader warm-up only where there is no GPU (it stalls start-up for seconds on iPhone); real GPUs compile on first use */if(V3.soft)try{warm3D()}catch(e){console.warn('warm off',e)}
   perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
-function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;
+function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;const lo0=V3.q==='low';V3.q=q;if(q!=='low')glbLoad();if(V3.glbOK&&lo0!==(q==='low'))V3.gid=null;const dpr=window.devicePixelRatio||1;
   {let want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;/* software rendering (no GPU): fewer pixels keeps taps responsive */if(V3.soft)want=Math.min(want,.5);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=q!=='low',ms=q==='high'?2048:1024,st=q==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;
   if(r.shadowMap.enabled!==sh||V3.key.shadow.mapSize.x!==ms||r.shadowMap.type!==st){r.shadowMap.enabled=sh;r.shadowMap.type=st;V3.key.castShadow=sh;V3.key.shadow.mapSize.set(ms,ms);if(V3.key.shadow.map){V3.key.shadow.map.dispose();V3.key.shadow.map=null}
@@ -233,6 +233,13 @@ function plumeMat(col){V3.plm=V3.plm||{};if(V3.plm[col])return V3.plm[col];const
 function engineFx(grp,f){const c=grp.userData.engCol||0xffa24f;const g=new THREE.Group();g.position.set(...f.p);
   const pl=new THREE.Mesh(new THREE.ConeGeometry(f.r*.8,f.r*4.2,16,1,true).rotateZ(PI/2).translate(-f.r*2.1,0,0),plumeMat(c));g.add(pl);
   const s=glow(c,f.r*3.4,.6);s.position.x=-f.r*.3;g.add(s);const s2=glow(0xffffff,f.r*1.3,.6);s2.position.x=-f.r*.1;g.add(s2);grp.add(g);grp.userData.eng.push({g,pl,s,s2,r:f.r,ph:Math.random()*6})}
+// ---- GLB models (High/Medium only; Low keeps the procedural ships and rocks): Lancer + Talon hulls and three asteroids, loaded once, cloned per use ----
+const GLBS={lance:['na-lancer',4.6,Math.PI/2],shard:['na-talon',4.4,-Math.PI/2]},GLBR3=['na-rock-a','na-rock-b','na-rock-c'];
+function glbLoad(){if(V3.glbP||typeof GXGLB==='undefined')return;const R=V3.glbR={};const jobs=[];
+  for(const k in GLBS){const [f,len,yaw]=GLBS[k];jobs.push(GXGLB.load('models/'+f+'.glb').then(src=>{R[k]=GXGLB.prep(src,{len,yaw,env:.8})}))}
+  GLBR3.forEach((f,i)=>jobs.push(GXGLB.load('models/'+f+'.glb').then(src=>{R['rock'+i]=GXGLB.prep(src,{len:2,env:.5})})));
+  V3.glbP=Promise.all(jobs).then(()=>{V3.glbOK=true;V3.gid=null}).catch(()=>{V3.glbR=null})}
+const glbOn=()=>V3.q!=='low'&&V3.glbOK&&V3.glbR;
 // ---- original ship models (+x forward, y up). Every model: hull panels, greebles, glass canopy, bell nozzles with glow, faction trim ----
 const DESIGN={
   // Compact "Lancer" heavy fighter: a pointed central lance, two gun booms on swept wing plates, forward canards, three engines
@@ -350,7 +357,7 @@ function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[
   const acr=new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false});
   const sock=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.3,16),plastic);sock.position.y=.66;g.add(sock);
   const peg=new THREE.Mesh(new THREE.CylinderGeometry(.13,.16,3.2,12),acr);peg.position.y=2.2;g.add(peg);
-  const T=SHIPS[s.type];const mdl=(MODELS[T.model]||MODELS.lance)(fc);mdl.position.y=3.6;const k=(s.base==='L'?2.1:2.3)*(T.scale||1);/* big, readable miniatures that overhang their bases, like the real ones */mdl.scale.multiplyScalar(k);g.add(mdl);
+  const T=SHIPS[s.type];const gk=glbOn()&&GLBS[T.model]&&V3.glbR[T.model];const mdl=gk?gk.clone(true):(MODELS[T.model]||MODELS.lance)(fc);mdl.position.y=3.6;const k=(s.base==='L'?2.1:2.3)*(T.scale||1);/* big, readable miniatures that overhang their bases, like the real ones */mdl.scale.multiplyScalar(k);g.add(mdl);
   const pick=new THREE.Mesh(new THREE.BoxGeometry(Math.max(b,5),5,Math.max(b,5)),new THREE.MeshBasicMaterial({visible:false}));pick.position.y=2;pick.userData.ship=s.id;g.add(pick);
   const bs=new THREE.Box3().setFromObject(mdl);const sz=bs.getSize(new THREE.Vector3());
   const shield=new THREE.Mesh(new THREE.SphereGeometry(1,40,24),shieldMat());shield.scale.set(sz.x*.62+.6,Math.max(1.6,sz.y*.9+.8),sz.z*.62+.6);shield.position.y=3.6;shield.renderOrder=5;g.add(shield);
@@ -371,8 +378,8 @@ function rockGeo(R,seed,det,prof){const g=mergeVerts(new THREE.IcosahedronGeomet
   // spherical UVs for the detail maps
   const U=new Float32Array(P.count*2);for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i).normalize();U[i*2]=Math.atan2(v.z,v.x)/(2*PI)+.5;U[i*2+1]=v.y*.5+.5}g.setAttribute('uv',new THREE.BufferAttribute(U,2));return g}
 function rockMat(){if(V3.rockM)return V3.rockM;const R=rockMaps();V3.rockM=new THREE.MeshStandardMaterial({color:0x9a8c80,vertexColors:true,roughness:.93,metalness:.04,envMapIntensity:.4});return V3.rockM}
-function rockMesh(o,idx){const seed=Math.round(o.x*7+o.y*13)+idx*101;const geo=rockGeo(S3(o.r)*1.05,seed,V3.q==='low'?3:5,o);
-  const m=new THREE.Mesh(geo,rockMat());m.castShadow=true;m.receiveShadow=true;m.position.copy(W(o.x,o.y,1.6));m.userData={spin:(Math.random()-.5)*.1,ph:Math.random()*6,y0:1.6};
+function rockMesh(o,idx){const seed=Math.round(o.x*7+o.y*13)+idx*101;const gr=glbOn()&&V3.glbR['rock'+(idx%3)];let m;if(gr){m=gr.clone(true);m.scale.setScalar(S3(o.r)*1.05)}else{const geo=rockGeo(S3(o.r)*1.05,seed,V3.q==='low'?3:5,o);m=new THREE.Mesh(geo,rockMat());m.castShadow=true;m.receiveShadow=true}
+  m.position.copy(W(o.x,o.y,1.6));m.userData={spin:(Math.random()-.5)*.1,ph:Math.random()*6,y0:1.6};
   // a ring of pebbles orbiting each rock (one instanced mesh)
   const pg=rockGeo(1,seed+7,1,null);const n=12;const pb=new THREE.InstancedMesh(pg,rockMat(),n);pb.castShadow=true;const rr=rng(seed+3);pb.userData.p=[];
   for(let i=0;i<n;i++){pb.userData.p.push({a:rr()*6.28,d:S3(o.r)*(1.25+rr()*.6),y:(rr()-.5)*1.8,s:.12+rr()*.32,sp:(.05+rr()*.12)*(rr()<.5?-1:1),rx:rr()*6,ry:rr()*6})}m.userData.pebbles=pb;return m}

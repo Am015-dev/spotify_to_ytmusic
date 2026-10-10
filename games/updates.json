@@ -14,6 +14,18 @@
  },
  {
   "date": "2026-10-10",
+  "game": "sands-of-qamar",
+  "title": "Painted look for Sands of Qamar",
+  "items": [
+   "New carved top bar and painted icon buttons",
+   "Parchment menus and dialogs with gilt corners",
+   "Painted story map with medallion chapters and act banners",
+   "The six tribes are now painted meeples on the board"
+  ],
+  "check": "Open Story mode and scroll the map; tap a chapter"
+ },
+ {
+  "date": "2026-10-10",
   "game": "thornbound",
   "title": "Bigger PC layout",
   "items": [
