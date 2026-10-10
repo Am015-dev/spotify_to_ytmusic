@@ -11,6 +11,12 @@ Brief (coordinator, Alex's own request, freeze-exempt): "now we have a big varie
   (the model's own half width/length). Missing model (lazy load not done) → the old procedural kind (CT.fb). Boot preloads both cities' sets (LD_need).
 - `?ct=0` = old traffic (A/B). Probe: `NOB=1 node tools/ct/ctProbe.js <url> <outdir> <fra|ath>` (draw calls/tris/heap/glMB per frame + car close-ups).
 
+- OPEN: in Athens, swapping BOTH the taxi and the 'su:t_sc_tm' coupe slot adds ~110 MB JS heap (after GC) at the start view (bisected with
+  `?ctx=<old kinds kept>`: any config that keeps taxi or tm is flat; Frankfurt swaps both and is flat). v90b keeps Athens tm procedural. Root-cause it
+  (heap snapshot diff, ctProbe + `?ctx=`) before swapping tm in Athens.
+- Measured v90b vs `?ct=0` (start view, 852×393, headless, GC'd): Frankfurt draws 489→488, tris 2.02M→2.11M, heap +2.5 MB, glMB +2.5;
+  Athens draws 249→251, tris 1.22M→1.27M, heap flat (380 vs 377–390), glMB +2.6.
+
 ## NOT shipped: BUILDINGS (CTB) — code is in, OFF unless `?ctb=1`
 - Hooks (edited 60_city_build.js): putK (Frankfurt Kenney rows/frontage, names building-a..m / building-type-*; towers untouched) → CTB_putK;
   Athens put → CTB_put (only 'plaka'/'villa' units in the plaka + villa districts; the 13k suburban 'town' houses stay procedural).
