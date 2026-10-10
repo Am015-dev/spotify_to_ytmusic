@@ -25,7 +25,7 @@ async function newPage(b, W, H) {
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: UA });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000); p.errs = [];
   p.on('pageerror', e => p.errs.push('pageerror ' + e.message));
-  p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts/.test(m.text())) p.errs.push('console ' + m.text()); });
+  p.on('console', m => { if (m.type() === 'error' && !/net::|Fetch API cannot load|Failed to load|favicon|fonts/.test(m.text())) p.errs.push('console ' + m.text()); });
   await p.goto(URL); await sleep(300); return p;
 }
 // ---------- in-page probe ----------

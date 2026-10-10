@@ -3,6 +3,7 @@ const MEDIA = 'media/';
 const unlAll = t => { try { return GXC.unlocked().filter(x => x.type === t).map(x => x.id).reverse(); } catch (e) { return []; } };
 const IMG_OK = {};
 const preImg = f => { const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };
+preImg('stage');   // the painted reveal-stage backdrop, decoded before the first reveal
 // ---- card backs: the campaign unlocks (lunch-belt, custard, golden) replace the default back; the file is fetched once and
 // handed to the kit as a data URL (the kit also draws backs into canvases); a missing file keeps the default back
 let backCur = '';
@@ -35,7 +36,7 @@ function endBanner() {
 }
 // ---- music: five slots (Menu, Game, Last round, Victory, Defeat), two Treblo tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last round'], ['victory', 'Victory'], ['defeat', 'Defeat']];
-const MTITLE = { 'tavern-a': 'Warm Counter Seat', 'tavern-b': 'Noren at Noon', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
+const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
 const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and last-round tracks), a new one every ~2.5 min

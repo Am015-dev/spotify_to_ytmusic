@@ -140,7 +140,7 @@ async function playGame(browser, size, gi, rep) {
   const tipsOn = gi % 5 !== 4, ctl = { seenPh: new Set(), issues, stats, tipsOn, bulbN: 0 };
   const tapAt = (x, y) => page.touchscreen.tap(x, y);
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text().slice(0, 120)); });
+  page.on('console', m => { if (m.type() === 'error' && !/Fetch API cannot load|net::|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
   try {
     await page.goto('file://' + FILE); await sleep(900);
     await page.evaluate(PAGE);

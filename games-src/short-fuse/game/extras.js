@@ -19,7 +19,7 @@ function backApply(){const R=document.documentElement,id=unl('cardback')||'defau
 const tblSeen={};let tblCur='';
 function tableApply(){const R=document.documentElement,id=unl('table')||'workbench';
   if(LOWGFX){R.removeAttribute('data-timg');tblCur='';return}
-  const f='table-'+id;if(f===tblCur)return;
+  const f='table-'+id+(id==='workbench'&&innerHeight>innerWidth?'-phone':'');if(f===tblCur)return;   // the phone workbench when held upright
   const go=()=>{tblCur=f;R.style.setProperty('--tbl-img','url('+MEDIA+f+'.webp)');R.dataset.timg='1'};
   if(tblSeen[f])return go();const im=new Image();im.onload=()=>{tblSeen[f]=1;go()};im.src=MEDIA+f+'.webp'}
 // ---- title key art behind the start screen

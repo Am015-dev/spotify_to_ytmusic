@@ -100,23 +100,24 @@ function buildGeo(t){if(GEO[t])return GEO[t];const d=TT[t],segs=tileSegs(t),fix=
 function r2len(R){return lineLen(R.pts)}
 // ---------- SVG painter (catalogue, 2D board, dock preview) ----------
 const PAL={field:'#a9b86a',field2:'#c2c077',town:'#e3c89a',townEdge:'#8a5a33',roof:'#c0613a',road:'#efe2bf',roadEdge:'#9c8458',river:'#4d93c2',riverEdge:'#2f6f99',mon:'#f1e6cf',hedge:'#5d7a35'};
+let TEXSET={};const TX=(k,fb)=>TEXSET[k]?`url(#tx-${k}) ${fb}`:fb;// painted textures (paint.js) under the flat colours
 function polyD(p){return 'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')+'Z'}
 function lineD(p){return 'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}
 function tileSVG(t,opt){opt=opt||{};const g=buildGeo(t),d=TT[t];let s='';
-  s+=`<rect width="100" height="100" fill="${PAL.field}"/>`;
-  s+=`<path d="M0 22H100M0 46H100M0 70H100M0 94H100" stroke="${PAL.field2}" stroke-width="6" opacity=".45"/>`;
-  for(const V of g.rivers)s+=`<path d="${lineD(V)}" stroke="${PAL.riverEdge}" stroke-width="19" fill="none" stroke-linecap="butt"/><path d="${lineD(V)}" stroke="${PAL.river}" stroke-width="14" fill="none"/>`;
-  for(const p of g.ponds)s+=`<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${PAL.river}" stroke="${PAL.riverEdge}" stroke-width="2.5"/>`;
-  for(const T of g.towns){s+=`<path d="${polyD(T.poly)}" fill="${d.C[T.seg].cat?'#ead7b5':PAL.town}"/>`;for(const w of T.walls)s+=`<path d="${lineD(w)}" stroke="${PAL.townEdge}" stroke-width="3.2" fill="none"/>`}
-  for(const h of g.hedges)s+=`<path d="${lineD(h)}" stroke="${PAL.hedge}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-  for(const R of g.roads)s+=`<path d="${lineD(R.pts)}" stroke="${PAL.roadEdge}" stroke-width="10" fill="none"/><path d="${lineD(R.pts)}" stroke="${PAL.road}" stroke-width="7" fill="none"/>`;
-  for(const h of g.hubs)s+=`<circle cx="${h.x}" cy="${h.y}" r="${h.r}" fill="#e8d5ad" stroke="${PAL.roadEdge}" stroke-width="1.5"/><rect x="${h.x-4}" y="${h.y-4}" width="8" height="8" fill="${PAL.roof}"/>`;
-  if(g.mon)s+=`<circle cx="${g.mon.x}" cy="${g.mon.y}" r="${g.mon.r}" fill="#d8e3a8" stroke="#7a8f3f" stroke-width="1.2"/><rect x="${g.mon.x-7}" y="${g.mon.y-8}" width="14" height="13" fill="${PAL.mon}" stroke="#7d6a4c" stroke-width="1"/><path d="M${g.mon.x-9} ${g.mon.y-7}L${g.mon.x} ${g.mon.y-15}L${g.mon.x+9} ${g.mon.y-7}Z" fill="${PAL.roof}"/>`;
+  s+=`<rect width="100" height="100" fill="${TX('field',PAL.field)}"/>`;
+  if(!TEXSET.field)s+=`<path d="M0 22H100M0 46H100M0 70H100M0 94H100" stroke="${PAL.field2}" stroke-width="6" opacity=".45"/>`;
+  for(const V of g.rivers)s+=`<path d="${lineD(V)}" stroke="${PAL.riverEdge}" stroke-width="19" fill="none" stroke-linecap="butt"/><path d="${lineD(V)}" stroke="${TX('river',PAL.river)}" stroke-width="14" fill="none"/>`;
+  for(const p of g.ponds)s+=`<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${TX('lake',PAL.river)}" stroke="${PAL.riverEdge}" stroke-width="2.5"/>`;
+  for(const T of g.towns){s+=`<path d="${polyD(T.poly)}" fill="${d.C[T.seg].cat?TX('town-basilica','#ead7b5'):TX('town',PAL.town)}"/>`;for(const w of T.walls)s+=`<path d="${lineD(w)}" stroke="${TX('wall',PAL.townEdge)}" stroke-width="3.2" fill="none"/>`}
+  for(const h of g.hedges)s+=`<path d="${lineD(h)}" stroke="${TX('hedge',PAL.hedge)}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  for(const R of g.roads)s+=`<path d="${lineD(R.pts)}" stroke="${PAL.roadEdge}" stroke-width="10" fill="none"/><path d="${lineD(R.pts)}" stroke="${TX('road',PAL.road)}" stroke-width="7" fill="none"/>`;
+  for(const h of g.hubs)s+=`<circle cx="${h.x}" cy="${h.y}" r="${h.r}" fill="${TX('hub','#e8d5ad')}" stroke="${PAL.roadEdge}" stroke-width="1.5"/><rect x="${h.x-4}" y="${h.y-4}" width="8" height="8" fill="${TX('roof',PAL.roof)}"/>`;
+  if(g.mon)s+=`<circle cx="${g.mon.x}" cy="${g.mon.y}" r="${g.mon.r}" fill="${TX('mon','#d8e3a8')}" stroke="#7a8f3f" stroke-width="1.2"/><rect x="${g.mon.x-7}" y="${g.mon.y-8}" width="14" height="13" fill="${PAL.mon}" stroke="#7d6a4c" stroke-width="1"/><path d="M${g.mon.x-9} ${g.mon.y-7}L${g.mon.x} ${g.mon.y-15}L${g.mon.x+9} ${g.mon.y-7}Z" fill="${TX('roof',PAL.roof)}"/>`;
   for(const I of g.inns)s+=`<ellipse cx="${I.x}" cy="${I.y}" rx="7" ry="5" fill="${PAL.river}"/><rect x="${I.x+3}" y="${I.y-9}" width="8" height="7" fill="#f3e2c2" stroke="#6b4b2a" stroke-width=".8"/>`;
   d.C.forEach((c,i)=>{const sp=g.spots[i];if(c.cat)s+=`<path d="M${sp[0]-6} ${sp[1]+6}V${sp[1]-3}L${sp[0]} ${sp[1]-11}L${sp[0]+6} ${sp[1]-3}V${sp[1]+6}Z" fill="#f4ecdc" stroke="#6b4b2a"/>`;
     if(c.p)s+=`<path d="M${sp[0]+7} ${sp[1]-12}h9v7l-4.5 3l-4.5-3z" fill="#2c5fb8" stroke="#f0c44c" stroke-width="1.2"/>`;
     if(c.g)s+=`<circle cx="${sp[0]-9}" cy="${sp[1]+6}" r="5" fill="${GOODS_COL[c.g]}" stroke="#3a2a18" stroke-width=".8"/>`});
-  if(d.gar){const fs=g.spots[d.C.length+d.R.length];if(fs)s+=`<rect x="${fs[0]-5}" y="${fs[1]+5}" width="10" height="7" rx="2" fill="#6e9a3c" stroke="#3f5f22" stroke-width="1"/>`}
+  if(d.gar){const fs=g.spots[d.C.length+d.R.length];if(fs)s+=`<rect x="${fs[0]-5}" y="${fs[1]+5}" width="10" height="7" rx="2" fill="${TX('garden','#6e9a3c')}" stroke="#3f5f22" stroke-width="1"/>`}
   if(opt.spots)g.spots.forEach((p,i)=>{s+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff" stroke="#000" stroke-width="1"/><text x="${p[0]}" y="${p[1]+2}" font-size="5" text-anchor="middle">${i}</text>`});
   return s}
 const GOODS_COL={wine:'#7a1f3d',grain:'#e3b23c',cloth:'#3f6fb5'};
