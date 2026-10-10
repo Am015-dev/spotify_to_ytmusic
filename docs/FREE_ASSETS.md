@@ -37,7 +37,7 @@ No third-party glTF/OBJ files are loaded; the only third-party models are the **
 ## 3. Plan / status (one swap at a time, each lighter or equal)
 1. **trees** → real LEGO tree parts (done, see docs/MODEL_CATALOG.md and the swap table below).
 2. **lamps** (Kenney, 784k tris, the biggest free-asset cost): done, LEGO 2039 lamp post lathe, 78 tris.
-3. **fence** (Kenney, 448k tris): LEGO 3185 Fence Lattice 1×4×2 as a flat panel (≤ 204 tris).
+3. **fence** (Kenney, 448k tris): done, LEGO 3633 Fence Lattice 1×4×1, 144 tris.
 4. **planter / dumpster / crate** (Kenney): LEGO-part equivalents ≤ old tris.
 Then km.js can drop each replaced model (km.js is shared with buildings/cars: only the props' slices go).
 
@@ -48,3 +48,4 @@ Then km.js can drop each replaced model (km.js is shared with buildings/cars: on
 | 2 | street lamps: Kenney CC0 `light-curved` → LEGO 2039 lamp post + 3062b lamp + 4740 shade (lathe, 6 sides, 6.5 m) | 92 → 78 | 784k → 665k (8,524 lamps) | 4.62M → 4.55M (−1.7%, trees + lamps together vs both old) | 52 → 52 | docs/shots/land/lamps_before.png, lamps_after.png |
 
 km.js: `light-curved` cannot be dropped yet: Athens still draws it (R1 Athens lamp), and kmProps builds it before the swap. Dropping it = an Athens lamp swap first.
+| 3 | park fences: Kenney CC0 `fence-1x3` → LEGO 3633 Fence Lattice 1×4×1 (rails, posts, diamond lattice from the part file; old length and height) | 204 → 144 | 448k → 316k (2,197 fences) | 4.56M → 4.52M (−0.9%, all three swaps vs all old) | 32 → 32 | docs/shots/land/fence_before.png, fence_after.png |

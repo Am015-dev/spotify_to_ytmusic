@@ -11,7 +11,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  await p.waitForFunction(()=>__ld.lds&&__ld.lds.st,null,{timeout:300000});
  const r=await p.evaluate(tg=>{const H=__mho.HUB,D=H.ptypes,S=__ld.lds.st,c={};for(const q of H.props)c[q.t]=(c[q.t]||0)+1;const tr=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;
   const out={};for(const t in S){const d=D[t];out[t]=Object.assign({},S[t],{props:c[t],totOld:c[t]*S[t].old,totNear:c[t]*S[t].near,totFar:c[t]*S[t].far})}
-  const T=H.props.filter(q=>(tg==='lamps'?/^lamp$/:/^tree/).test(q.t)),x0=window.__mho.RO?__mho.RO.x:2061,z0=window.__mho.RO?__mho.RO.z:0,G=new Map();
+  const T=H.props.filter(q=>(tg==='lamps'?/^lamp$/:tg==='fence'?/^fence$/:/^tree/).test(q.t)),x0=window.__mho.RO?__mho.RO.x:2061,z0=window.__mho.RO?__mho.RO.z:0,G=new Map();
   for(const q of T){if(Math.hypot(q.x-x0,q.z-z0)>400)continue;const k=Math.floor(q.x/30)+','+Math.floor(q.z/30);G.set(k,(G.get(k)||0)+1)}let best=null,bn=0;for(const[k,n]of G)if(n>bn){bn=n;best=k}
   const all={};for(const t in c){const g=D[t]&&(D[t].gOld||D[t].g);let dr=0;H.grp.traverse(o=>{if(o.isInstancedMesh&&D[t]&&(o.geometry===D[t].g||o.geometry===D[t].gFar||o.geometry===D[t].gOld))dr++});all[t]={n:c[t],tri:tr(g),draws:dr}}
   const[a,bq]=best.split(',').map(Number);return{out,all,spot:{x:a*30+15,z:bq*30+15,n:bn}}},tg);
