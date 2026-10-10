@@ -74,7 +74,7 @@ function sfx(name){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const 
   }}catch(e){}}
 function sndLog(n,how){SND_LOG.push(n+':'+how);if(SND_LOG.length>80)SND_LOG.shift()}
 // background music: "Funked Up" by Joth (GA_DATA.music.main); the synthesized groove below plays only until it is decoded, or if it fails
-function musicStart(){if(GAOK&&SND.on)GA.music('main',{vol:.6});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
+function musicStart(){if(GAOK&&typeof GXMUS!=='undefined'){GXMUS.sync();return}if(GAOK&&SND.on)GA.music('main-a',{vol:.6});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
 function musicStop(){if(GAOK)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
 const BASS=[55,55,65.4,55,73.4,73.4,65.4,49,55,55,65.4,55,82.4,73.4,65.4,61.7];
 function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(GAOK&&GA.playing()){SND.nextT=c.currentTime+.1;return}const step=60/112/2;

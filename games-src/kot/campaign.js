@@ -34,7 +34,7 @@ function campIsWon(g,def){const m=campMetrics(g);if(!m.won)return false;const gl
   if(def.id==='c2')return m.city>=2;if(def.id==='c3')return m.cards>=2;
   if(gl.type==='score')return m.score>=gl.value;return true}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'crown',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Play the tutorial (Chapter 0)');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,portrait:(w,sz,c)=>window.CCMedia?CCMedia.portrait(c):null,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'crown',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Play the tutorial (Chapter 0)');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,portrait:(w,sz,c)=>window.CCMedia?CCMedia.portrait(c):null,endArt:{win:'media/end-win.webp',lose:'media/end-lose.webp'},startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
     onExit:()=>{UI.camp=null;if(CAMPSAVE){UI.hints=CAMPSAVE.hints;CAMPSAVE=null}UI.info=true;UI.choice=null;UI.intro=false;render()},
     scores:g=>g.pl.map(p=>p.vp),seats:g=>g.pl.map(p=>({name:mname(p),me:!!p.human,ai:p.human?undefined:p.lvl}))})}
 campInit();
