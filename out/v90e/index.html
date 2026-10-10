@@ -754,7 +754,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
-  {v:'v90e',date:'10 Oct 2026',items:[{t:'NEW',s:'City traffic is now real LEGO sets: the family car, the patrol car, the mail van, the service van, the big rig, the camper, the LEGO taxi and Speed Champions cars drive the streets.'},{t:'CHANGED',s:'Each traffic car keeps its real set colours, and crashing into one uses its own size.'},{t:'NEW',s:'RIDES: Town Cruiser, another 1979 LEGO Town car. Garage ride pictures now draw the cards on screen first.'}]},
+  {v:'v90e',date:'10 Oct 2026',items:[{t:'NEW',s:'City traffic is now real LEGO sets: the family car, the patrol car, the mail van, the service van, the camper, the LEGO taxi and Speed Champions cars drive the streets.'},{t:'CHANGED',s:'Each traffic car keeps its real set colours, and crashing into one uses its own size.'},{t:'NEW',s:'RIDES: Town Cruiser, another 1979 LEGO Town car. Garage ride pictures now draw the cards on screen first.'}]},
   {v:'v90d',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: four little 1979 LEGO Town vehicles from real model files: Town Roadster, Town Coupe, Ladder Truck and Town Tipper.'}]},
   {v:'v90c',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: 16 more LEGO vehicles from real model files: Race Car 89, Sprint Racer, Racing Pickup, Fire Rescue 4x4, Coast Guard 4WD, Bike Hauler, Mining 4x4, Horse 4WD, Tipper Truck, Dump Truck, Cement Mixer, Mixer Truck, Cargo Truck, Turbine Hauler, Front Loader and Farm Tractor.'},{t:'CHANGED',s:'They load only when you open the garage, so the game still starts as fast.'}]},
   {v:'v90b',date:'10 Oct 2026',items:[{t:'NEW',s:'Garage: when a ride opens or you pick another one in RIDES, it builds itself brick by brick in about 2 seconds. Tap the view to skip.'},{t:'FIXED',s:'BUILD on boats: the camera now looks down at the whole boat, so long boats like the Power Boat are no longer tiny.'},{t:'CHANGED',s:'Off-road rides in BUILD are framed to their own size.'}]},
@@ -13631,7 +13631,7 @@ window.__ld.need=LD_need;window.__ld.L=LDL;window.__ld.probe=LD_probe;window.__l
 // (CT_dim, read by OB_cdim). A model missing from models.js (lazy load not finished) falls back to the old procedural kind (CT_FB).
 const CT={geo:{},dim:{},fb:{},stat:[]};
 // slot swaps (after QS/SU swaps): name → new kind. Frankfurt: 0 sedan,1 hypercar,2 taxi,3 van,4 truck,5 delivery,6 police,7 coupe,8 bus,9 tuner,10 roadster
-const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1','truck':'ld:truck:v3221_1',
+const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','taxi':'ld:car:tx','van':'ld:van:v7731_1',/* v90e: Big Rig (3.84 m wide) dropped from traffic until a lane-fit shot proves it (integrator) */
   'delivery':'ld:delivery:v60054_1','police':'ld:police:v4436_1','su:t_sc_tm':'ld:car:v75893_1b'},
  ath:{'taxi':'ld:car:tx','sedan':'ld:car:v6633_1','van':'ld:van:v7639_1',/* su:t_sc_tm kept: swapping it together with the taxi added ~110 MB JS heap in Athens (cause open, docs/HANDOFF_city1.md) */'delivery':'ld:delivery:v60054_1','su:t_sc_hy':'ld:car:v75892_1'}};
 if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];const ex=(location.search.match(/[?&]ctx=([^&]*)/)||[])[1]||'';/* test: ctx=<old kinds kept> */for(let i=0;i<HCAR.length;i++){const v=!ex.split(',').includes(HCAR[i])&&S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
@@ -14035,8 +14035,8 @@ if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)retur
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'v90e',id:'cruiser',text:'Garage → RIDES: Town Cruiser looks complete with its windscreen at the front; the ride pictures on screen appear first, the rest follow.'},
- {ver:'v90e',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow big rig, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
- {ver:'v90e',id:'ct-hit',text:'Bump into a traffic car and a big rig: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
+ {ver:'v90e',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
+ {ver:'v90e',id:'ct-hit',text:'Bump into a traffic car and a van: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
  {ver:'v90b',id:'ba-open',text:'Open the garage: your car builds itself brick by brick (bottom first) in 2–3 s, then stays complete.'},
  {ver:'v90b',id:'ba-pick',text:'RIDES: pick another street car, then the WATER tab, then an OFF-ROAD ride: each builds itself up; tapping the view mid-build shows it complete at once.'},
  {ver:'v90b',id:'ba-noblock',text:'While a ride is building up you can still tap cards, tabs and BUILD; nothing waits for the animation.'},

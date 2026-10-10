@@ -4,8 +4,8 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'v90e',id:'cruiser',text:'Garage → RIDES: Town Cruiser looks complete with its windscreen at the front; the ride pictures on screen appear first, the rest follow.'},
- {ver:'v90e',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow big rig, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
- {ver:'v90e',id:'ct-hit',text:'Bump into a traffic car and a big rig: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
+ {ver:'v90e',id:'ct-traffic',text:'Frankfurt and Athens: drive 1 minute. The traffic is LEGO sets (family car, blue-white patrol car, mail van, service van, yellow LEGO taxi, sports cars), all on their wheels on the road.'},
+ {ver:'v90e',id:'ct-hit',text:'Bump into a traffic car and a van: the hit happens where the car looks to be (no invisible wall, no driving through it).'},
  {ver:'v90b',id:'ba-open',text:'Open the garage: your car builds itself brick by brick (bottom first) in 2–3 s, then stays complete.'},
  {ver:'v90b',id:'ba-pick',text:'RIDES: pick another street car, then the WATER tab, then an OFF-ROAD ride: each builds itself up; tapping the view mid-build shows it complete at once.'},
  {ver:'v90b',id:'ba-noblock',text:'While a ride is building up you can still tap cards, tabs and BUILD; nothing waits for the animation.'},

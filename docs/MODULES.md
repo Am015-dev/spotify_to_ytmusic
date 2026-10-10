@@ -73,7 +73,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ld | `98ld_import.js` | 17 | LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds". Real LEGO builds come in as LDra |
 | 98ld | `98ld_w.js` | 8 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
 | 98ld | `98ld_run.js` | 4 | LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module (window.__LDQ, r |
-| 98ct | `98ct_city_lego.js` | 13 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
+| 98ct | `98ct_city_lego.js` | 14 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 99c | `99c_checklist.js` | 44 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
@@ -347,7 +347,7 @@ uses: 20(23), 30(20), 92(17), 98ld(17), 53(13), 93(8), 10(7), 98ld(6), 70(6), 85
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
 uses: 98(16), 98ld(11), 98ld(7), 98y(6), 98ld(4), 72(3), 30(3), 94(2), 98fb(2), 10(1)
 
-## 98ct_city_lego.js — 13 KB
+## 98ct_city_lego.js — 14 KB
 defines: CT CT_SWAP CT_SC CT_W CT_bricks CT_build CT_dim __ct CTB CTB_V CTB_city CTB_kind CTB_h CTB_pick CTB_fill CTB_putK CTB_put CTB_mesh _ctbM _ctbQ _ctbP _ctbS _ctbU _ctbD CTB_step __ctb
 uses: 20(35), 93(21), 30(16), 98ld(14), 92(13), 60(11), 10(10), 53(7), 70(7), 98ld(3)
 
