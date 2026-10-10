@@ -77,14 +77,14 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98sz | `98sz_ride_scale.js` | 5 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
-| 99c | `99c_checklist.js` | 46 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 47 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
 | 98bk | `98bk_bake.js` | 9 | BK (PERF-2, EFF #3): baked candidate grids for the road / terrain distance queries. Owner: perf worker (alex/od-mem). ===== Entering roam spent ~28 % of its CPU |
 | 98fb | `98fb_form_build.js` | 9 | FB (garage-17, Alex 2026-10-10: "the build guide and build does not work for the boats and off road"). Root cause: BUILD and the BUILD GUIDE only ever edit GB.d |
 | 98ba | `98ba_build_anim.js` | 4 | BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built"). When a ride first shows in the |
-| 98gf | `98gf_garage_floor.js` | 2 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
+| 98gf | `98gf_garage_floor.js` | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -366,9 +366,9 @@ uses: 96(12), 92(10), 98ld(5), 20(5), 98(4), 41(2), 98y(2), 10(2), 98bc(2), 30(1
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
 uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 92(7)
 
-## 99c_checklist.js — 46 KB
+## 99c_checklist.js — 47 KB
 defines: OD_CHECKLIST
-uses: 30(32), 10(19), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
+uses: 30(33), 10(19), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
@@ -394,9 +394,9 @@ uses: 98(28), 92(24), 10(10), 94(10), 98y(7), 98sb(7), 30(5), 98u(4), 93(4), 98r
 defines: BA BA_DROP BA_FALL BA_stop BA_now BA_start BA_step __ba
 uses: 10(9), 98(5), 92(5), 98sb(4), 94(2), 20(1), 30(1)
 
-## 98gf_garage_floor.js — 2 KB
+## 98gf_garage_floor.js — 3 KB
 defines: GF __gf
-uses: 98s(3), 72(2), 10(1)
+uses: 92(5), 98s(3), 72(2), 10(1), 93(1), 98ld(1)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25
