@@ -30,4 +30,6 @@ SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(u
   ud.under.scale.set(r,r,1);ud.shadow.scale.set(r,r,1);if(isPl&&ud.shield)ud.shield.scale.set(4.2*r,2.4*r,5.4*r)}})(SC_ship);
 // BC (98bc_bigcars.js) compares a ride with the Hot Rod: its reference width was measured squeezed (1.93 m); unsqueezed it is 2.57 m
 BC.ref.W=2.57;
+// the collider is never wider than a lane vehicle (3.2 m): a snowplow blade or wide mirrors overhang it and glancing hits slide (reviewer: 4.7 m snowplow)
+RSZ.capW=3.2;BC_dims=(f=>function(ud){const d=f.apply(this,arguments);if(d&&d.W>RSZ.capW)d.W=RSZ.capW;return d})(BC_dims);
 window.__sz={S:RSZ,k:SZ_k,add:SZ_add};

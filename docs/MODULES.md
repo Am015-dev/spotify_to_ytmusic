@@ -359,7 +359,7 @@ uses: 20(35), 93(21), 30(16), 98ld(15), 92(13), 60(11), 10(10), 53(7), 70(7), 98
 
 ## 98sz_ride_scale.js — 4 KB
 defines: RSZ SZ_k SZ_add __sz
-uses: 96(12), 92(9), 98ld(5), 20(4), 98(3), 41(2), 98y(2), 10(2), 30(1)
+uses: 96(12), 92(9), 98ld(5), 20(4), 98(3), 41(2), 98y(2), 10(2), 98bc(2), 30(1)
 
 ## 98of_onfoot.js — 45 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
