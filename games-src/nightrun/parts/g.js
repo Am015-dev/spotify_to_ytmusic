@@ -3,8 +3,11 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='I8';
+const NR_VER='I9';
 const NR_CHECKLIST=[
+ {ver:'I9',id:'painted-icons',text:'All the grey placeholder boxes are gone: painted kit perk icons (Garage TUNE and LOAD), painted SOON cards (no PLACEHOLDER tag), difficulty badges, stage medals, squad leader with painted crown, glowing homing orbs and the Drift, Lancer and Nova ships. Anything still a plain shape?'},
+ {ver:'I9',id:'painted-chest',text:'Boss chest: painted closed chest and card backs, painted card faces, and the chest opens when you pick a card.'},
+ {ver:'I9',id:'painted-surfaces',text:'Garage / pit stop screens and the pause + settings screens now sit on painted backgrounds (dark wash on top). Is every card and button still easy to read, on the phone upright and sideways?'},
  {ver:'I8',id:'calm-hud',text:'Less clutter: the ship ring (beat cue) and the shield circle are small and faint, the stat chips and upgrade icons round the ship and under the score are gone, no BEST line, no big faint word in the backdrop. Only a small shield and revive count remain. Settings > Gameplay > HUD switches back to Full. Is it calm enough, and can you still hit the beat?'},
  {ver:'I7',id:'idle',text:'Stand still with your best build: after about 9 s a red dashed ring tightens round the ship and every 2 s you lose 1 hull (STATIC DISCHARGE) that shields cannot stop. Moving resets it. You cannot win by standing still any more.'},
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
