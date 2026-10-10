@@ -248,7 +248,7 @@ uses: 10(47), 30(7), 40(5), 41(3), 71(1), 20(1), 93(1)
 
 ## 98e_drive26.js — 2 KB
 defines: D26 __d26
-uses: 10(12), 30(8), 71(2), 98k(1), 40(1)
+uses: 10(12), 30(8), 98k(2), 71(2), 40(1)
 
 ## 98qs_speed.js — 12 KB
 defines: QS_CLS QS_cls QS_kmh QS_tt QS_MIX QS_K QS_KC QS_v0 QS_segD QS_pts QS_shutSet QS_shut QS_rampNear QS_hourK QS_ct QS_rampOk QS_RD QS_rampFit QS_rampSkip __qs
