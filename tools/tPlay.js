@@ -123,7 +123,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
  const releaseAll=async()=>{await apply({steer:0,gas:false,brake:false,drift:false,boost:false})};
  // ---- overlays a person taps through (only visible ones)
  const CONT=['#storyGo','#m1Cs','#rcGo','#ogRetryB','#setDone','.m1go','#resBtn','#tutSkip'];
- async function tapThrough(){if(await p.evaluate(()=>{const c=__mho.RO.card;return!!c&&c.kind==='flight'}))return(await tap('#rcNo'))?'#rcNo':null;  // a person on a mission does not take a flight they drove past
+ async function tapThrough(){if(await p.evaluate(()=>{const c=__mho.RO.card;return!!c&&(c.kind==='flight'||c.kind==='garage')}))return(await tap('#rcNo'))?'#rcNo':null;  // a person on a mission does not take a flight (or garage) they drove past
  for(const s of CONT){if(s==='#setDone'&&!(await p.evaluate(()=>window.__wantSet===false)))continue;if(await tap(s))return s}return null}
  const cityRes={};
  for(const city of CITIES){const T0=Date.now();
@@ -174,6 +174,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    const c={steer:ae>.13?-1:ae<-.13?1:0,gas:true,brake:false,drift:false,boost:false};
    if(o.v<0)c.steer=-c.steer; // reversing: wheel works backwards
    let wantB=false;if(Math.abs(ae)>.7&&o.v>14){c.gas=false;wantB=true}else if(a2>.9&&o.v>20){c.gas=false;if(o.v>32)wantB=true}
+   if(destKind==='arrow'&&dD<40&&o.v>dD*.35+3){c.gas=false;if(o.v>dD*.35+6)wantB=true}  // a person slows for the beacon they are driving into (pit-lane speed in the last 40 m)
    // one held press per corner (a quick second tap would be the double-tap PARK gesture)
    if(wantB&&(ctl.brake||f-lastBrake>60))brakeUntil=Math.max(brakeUntil,f+18);if(f<brakeUntil){c.brake=true;lastBrake=f}
    if(Math.abs(ae)<.08&&a2<.2&&o.v>12&&o.v<45&&f-boostT>600){boostT=f}if(f-boostT<90)c.boost=true;

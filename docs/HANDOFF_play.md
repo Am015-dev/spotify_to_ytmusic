@@ -75,3 +75,49 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
 - Reviewer + coordinator (2026-10-10), for Part B: Eleni's garage card auto-opens when you drive through the Athens gate (the 5 Athens stuck
   episodes). Open the card only when the car stops inside the gate (< 2-5 km/h for 0.5 s), or show a small "GARAGE ▸" button instead of the
   full card. Ship it with the wall-hits fix (separate REVIEW/DEPLOY).
+
+## Session 3 (2026-10-10, play-3): Part B garage cluster fixed (v89o); Athens target NOT met yet
+- Game (src/71_roam_drive.js, mark loop): garage/flight card opens only after the car stands in the ring (|v| < 1.2 m/s = 4 km/h for 0.4 s;
+  RO.svcT/RO.svcM); TAP TO OPEN prompt unchanged. Note RO.v is m/s: the old "v<7" was 25 km/h, not 7 km/h.
+- Game: garages never count as markDone, so RO.near (the arrow) pointed at Eleni's garage forever. Now a garage/flight ring the car has
+  entered this session (RO.svcV Set) is skipped by the arrow.
+- Game (src/70_roam_world.js athGbSpots0): Athens golden bricks snap to the nearest non-ped road point within 120 m (were in blocks/hillside).
+- tPlay: slows in the last 40 m to an arrow beacon (v > d*.35+3 m/s → off gas, brake above +6); declines a garage card like a flight card.
+- Merged alex/od-mem (live v89n). Version for this release: v89o.
+- tPlay v89m (garage fix only), 3 Athens runs: 0 hits within 60 m of the garage (was 12/12); walls 5.5 / 7.5 / 1.3 per min, stuck 4.9 / 1.0 / 4.3 %.
+  Frankfurt 0.75/min, 2.1 % PASS. Results: qa_p89m/. v89o (+ golden bricks): qa_p89o/.
+- Remaining Athens clusters (qa_dbg_ath.log, DEBUG=1 trace):
+  (a) lawn strip in front of the house row west of the garage (x 1940-2016, z -1625..-1635; road centre z -1644, w 8.5): the bot U-turns at
+      ~60 km/h (wander dest behind it) onto the lawn, then follows the strip 23-32 m off its route (replan only when bd > 30 m), hitting houses.
+  (b) GO! challenge / van chase around (1440-1530, -1220..-1290) and (1750-1850, -1610..-1710): to check whether chNext targets sit off-road.
+  (c) Stuck episodes are behind traffic cars (car ≤ 5 m), "ch":true (during challenges).
+  GPS (qvPath + D24_clean chords) checked on (a): the route there is on the road (routeprobe: 0 off-road samples), so not a GPS bug there.
+  D24_clr only tests colliders (r 1.2) and height steps, not road surface: chords CAN cross lawns elsewhere; worth a check for (b).
+- New in the merged build: tPlay "JS heap ≤ 100 MB while driving" fails (158 MB avg) — came with od-mem; check against v89n before blaming v89o.
+- REVIEW v89o sent 2026-10-10 ~04:10 (alex/od-play 262c2248). After PASS: rebuild on CURRENT live (merge latest live src), OD_CHANGELOG v89o entry
+  (FIXED: Eleni's garage card opens only when you stop on the pad; FIXED: arrow no longer pulls you back to a garage you visited;
+  CHANGED: Athens golden bricks sit on roads) + a checklist item, tools/build.sh v89o, git add -f out/v89o, DEPLOY to coordinator.
+- Open check: od-mem heap/leak tPlay tests (Athens heap ~157 MB > 100, Frankfurt geo +16 MB/min) — run them on v89n to see whether pre-existing.
+- Next build (Athens ≤ 0.8/min): challenge targets (GO!, van chase, RAMP, DRIFT) — check whether chNext/route targets sit off-road; lawn strip (a).
+
+## Session 4 (2026-10-10, play-4): v89o re-check (leak, ⚙ plate) + Athens step-2 findings
+- Leak: NOT ours. tPlay fra phone FAST 4 min ×2 per build, side by side (v89n = wt_n/out/v89n, byte-identical to live):
+  geometry v89n 5.78 / 12.0 MB/min, v89o 6.87 / 3.69; heap ≤ 0.34 MB/min all. Route-dependent wbLod streaming (PERF3). qa_leak/*.log.
+- ⚙ vs district plate (#roamPlate): plate at 44 px sat under the 44 px test-mode ⚙ #tuG (6-50 px; 54-98 px when body.racing, which is ON during
+  story missions in roam). src/99_api.js: plate top 56 px, body.racing 104 px. 0 overlap (play/plateath.js, shots play/shots_v89o2/ath_plate_*.png).
+  Note: plate shows only 5 s after a district change (v85tick toggles body.v85b); the probe injects a style to force it visible.
+- OD_CHANGELOG v89o = play-3's entry + "district name … no longer under ⚙"; checklist gar-stop, ath-gb-road, plate-gear.
+- REVIEW (QUICK) sent 2026-10-10 for f31e18b7.
+### Step 2 (Athens walls ≤ 0.8/min) findings, NOT fixed yet
+- 101 Athens wall hits from qa_p89o_ath1-3 + qa_p89m_ath1-3: contexts GO!/THE VAN ESCAPED (Koulouri Rush van chase), GOLDEN BRICK, RAMP JUMP
+  (1941-1973,-1628..-1644 = the lawn strip (a) west of Eleni's garage), AKROPOLIS CUP (1609-1654,-1857..-1907, ped roads).
+- play/chaseprobe.js: 40 random Athens qvPath routes 600-2000 m: only 1.67 % of 3 m samples > 1 m outside a CITY_S road (raw node chain 1.38 %),
+  so the van path / GPS line is on roads. BUT the hit points are median 18.7 m outside CITY_S road edges (76/101 > 10 m).
+  Caveat: athRoadD (M.athRoad) only knows CITY_S roads; fill roads (fillAt) and 'ab' lanes (abAt) are NOT in it (CE_onRoad checks all).
+  Next: expose CE_onRoad (or fillAt/abAt) in 99_api and re-score the hit points: are they on fill/ab lanes inside blocks or on lawns/plazas?
+- Mechanism (tPlay line 156-162): during a chase dest = the moving van; with a clear line (LOS = no collider in a 2.4 m sweep, NOT a road check)
+  or dD < 40 / last route leg < 220 m the bot drives straight at the van, across lawns/plazas, then hits house rows behind them.
+  Game-side options (brief: no bot tuning): (1) the van keeps ≥ 60-80 m lead and its path avoids ped/plaza chords so the line-of-sight
+  shortcut runs along the road; (2) widen the setback: Athens 'ab' house rows sit 5-20 m off the road behind open lawns at chase speed;
+  push them back / add kerb-hedge colliders (rounded, glancing) along lawn strips so a cut slides back to the road instead of a head-on hit;
+  (3) the lawn strip (a) at x 1940-2016, z -1625..-1635: hedge/kerb collider or a fill road.
