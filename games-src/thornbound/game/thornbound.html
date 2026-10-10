@@ -532,6 +532,30 @@ html[data-timg]:not([data-gfx="low"]) .gx-board{background:radial-gradient(ellip
 .mchips{display:flex;flex-wrap:wrap;gap:8px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid rgba(124,27,44,.55);background:#e9d9ae;color:#231a10;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .mchip.on{background:#7c1b2c;color:#f6e6b4;border-color:#e8c867;font-weight:700}.mchip.prev{border-style:dashed}
+/* ===== desktop (wide, not a phone): the right column is the table. Great Road on top, big hand at the bottom ===== */
+html.desk .gx-dock{justify-content:flex-end}
+html.desk .gx-dock-body{flex:1 1 auto;min-height:0}
+html.desk #road{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 16px;overflow:hidden}
+html.desk #road[hidden]{display:none}
+html.desk #road .roadrow{height:auto;gap:14px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+html.desk #road .dk-h{margin:0;font:700 1.15rem var(--fd);letter-spacing:.08em;text-transform:uppercase;color:#e8c867}
+html.desk #road .kcb .kn{font-size:.95rem;white-space:normal;text-align:center}
+html.desk #road .dk-ins{margin:0;font:700 1.35rem/1.2 var(--fb);color:#fff3c4;text-align:center}
+html.desk .roadrow .kcb{flex:0 0 auto;min-width:0}html.desk #road .roadrow{overflow:visible}
+html.desk #road .kcb>svg{width:100%;height:auto}
+html.desk #act{min-height:56px;padding:6px 12px}
+html.desk #act .btn{min-height:50px;font-size:1.05rem}
+html.desk #handw{border-top:1px solid var(--line);padding:6px 8px 0;height:calc(var(--ch,72px) + 44px)}
+html.desk #handw .hand{height:calc(var(--ch,72px) + 34px)!important}
+html.desk .hc{top:26px}
+html.desk .hc:hover:not(.on){transform:translateY(-18px) scale(1.06) rotate(0deg);z-index:40!important}
+html.desk #rivals{padding:8px 10px}
+html.desk .rv{min-height:76px;gap:10px;padding:6px 12px;border-radius:14px}
+html.desk .rv-t b{font-size:1.1rem}html.desk .rv-t small{font-size:1rem}
+html.desk .rv-n{font-size:2.1rem}
+html.desk .bidc{width:44px;height:62px;border-radius:6px;margin:0 6px}
+html.desk .bidc.up b{font-size:1.5rem}
+html.desk .race-c.four .rv-t b{display:block}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -650,6 +674,7 @@ html[data-timg]:not([data-gfx="low"]) .gx-board{background:radial-gradient(ellip
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
 .gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
@@ -4538,7 +4563,7 @@ var TB_ART = {"kc01":"data:image/webp;base64,UklGRgw7AABXRUJQVlA4IAA7AADwwgCdASo
 <script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
-//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
 //   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
@@ -4930,6 +4955,7 @@ var TB_ART = {"kc01":"data:image/webp;base64,UklGRgw7AABXRUJQVlA4IAA7AADwwgCdASo
     return new Promise(function (done) {
       if (!doc) return done('map');
       var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      if (O && O.endArt) { var ea = r.won ? O.endArt.win : O.endArt.lose; if (ea) { s.parentNode.classList.add('has-art'); s.parentNode.style.setProperty('--gxc-art', 'url(' + ea + ')'); } }
       box.appendChild(el('div', 'gxc-res-k', def.title));
       box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
@@ -5535,14 +5561,14 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   if(!G||s<0||isPassing()||G.over){el.innerHTML='';el._h='';el.hidden=true;return}
   if(UI.dragging)return;
   el.hidden=false;const V=UI.V,P=V.pl[s];const M=UI.bf;
-  if(M&&M.kind==='bidRes'){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
+  if(M&&M.kind==='bidRes'&&!UI.desk){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
   el.classList.remove('road');
   const ids0=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
   // cards keep their slot while the hand only shrinks (no reflow under the next tap); a new card or a new round lays the hand out again
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
-  const PAD=16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
+  const PAD=UI.desk?32:16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
   ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
@@ -5555,10 +5581,18 @@ function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),st
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
   for(const m of steal)items.push({kc:m.kc,m,steal:1});
   if(!items.length)return '<div class="hand roadrow"></div>';
-  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());const w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));const rk=recK();
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
     const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
     return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+// desktop: the Great Road stays on the table above the hand (taking a card, when it is your turn, happens here)
+function renderDeskRoad(){const el=$('#road');if(!el)return;
+  if(!UI.desk||!G||!UI.V||isPassing()||G.over){if(UI.desk){el.hidden=true;el.innerHTML='';el._h=''}return}
+  el.hidden=false;const s=vs(),M=UI.bf;const st=$('#barstat .st-t');const ins=st?st.textContent:'';
+  let row;if(M&&M.kind==='bidRes')row=roadRowHTML(s,M);
+  else{const V=UI.V;const w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||600)/4)-30));
+    row='<div class="hand roadrow" role="list" aria-label="The Great Road">'+V.road.map(n=>n?'<button class="kcb" role="listitem" data-a="kc" data-n="'+n+'" style="width:'+(w+4)+'px" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(n).name)+'</span></button>':'').join('')+'</div>'}
+  const h='<h4 class="dk-h">The Great Road</h4>'+row+(ins?'<p class="dk-ins">'+esc(ins)+'</p>':'');if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
 function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;
@@ -5685,7 +5719,7 @@ function eventHTML(ev){const note=typeof coachEvent==='function'?coachEvent(ev):
     const night=(ev.logs||[]).filter(t=>!/^(.* reveals |Strength in |Clash [IV]+: |.* wins the Clash|Tie in |Added cards are revealed)/.test(t)).slice(0,10).map(t=>'<li class="'+(/[Ee]liminat/.test(t)&&!/Invulnerable/.test(t)?'warn':'')+'">'+gloss(plain(t))+'</li>').join('');
     return cdWrap('cd-clash','<h3>Clash '+(ev.idx>=0?['I','II','III'][ev.idx]:'')+': '+esc(REG[ev.r])+(ev.n>1?' (replay)':'')+'</h3><div class="cl-panel" id="clp"></div><p class="cl-res" id="clres" hidden>'+res+'</p>'+
       '<div class="bkg'+(parts.length>2?' stack':'')+'" id="clbk" hidden>'+parts.map(s=>'<div class="bks'+(w===s?' win':'')+'" style="--fc:'+fcol(s)+'"><b>'+esc(s===me?'You':sideName(s))+'</b>'+brkHTML(ev,s)+'</div>').join('')+'</div>'+
-      (night?'<ul class="cl-log" id="cllog" hidden><li class="cl-h">In this Clash</li>'+night+'</ul>':'')+cn+'<div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
+      (night?'<ul class="cl-log" id="cllog" hidden><li class="cl-h">In this Clash</li>'+night+'</ul>':'<ul id="cllog" hidden></ul>')+cn+'<div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
   if(ev.t==='summary'){const why=ev.why||[];const order=youFirst(ev.inf1.map((_,s)=>s));
     return cdWrap('cd-sum','<h3>End of round '+ev.round+' of '+ev.rounds+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Total</th></tr></thead><tbody>'+order.map(s=>{const v=ev.inf1[s];const L=why[s]||[];return '<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(s===me?'You':sideName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>'+(L.length?'<tr class="sw"><td colspan="3">'+L.map(x=>gloss(x[0])+' '+(x[1]>0?'+':'−')+Math.abs(x[1])).join(', ')+'</td></tr>':'')}).join('')+'</tbody></table>'+cn+
       ((ev.winter&&ev.winter.length)||ev.warns.length?'<ul class="cl-log warn">'+ev.warns.concat(ev.winter||[]).filter(t=>!/Winter: .* played cards/.test(t)||true).map(t=>'<li>'+gloss(plain(t))+'</li>').join('')+'</ul>':'')+
@@ -5716,7 +5750,7 @@ function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderMain();renderBar();renderHand();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
+  renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof bfAfter==='function')bfAfter();
   netAfter();
@@ -5871,12 +5905,14 @@ function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('p
 function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const root=document.documentElement;
   const W=innerWidth,H=innerHeight;UI.phone=on;UI.land=W>=H*1.15;UI.short=on?(UI.land?H<370:H<600):H<560;
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
-  root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);
+  root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);UI.desk=UI.land&&!on;root.classList.toggle('desk',UI.desk);
   const barH=on?44:48;
   let cw=UI.land?Math.max(44,Math.min(66,Math.floor((H-barH-52-46-24-16)/1.4308))):(H<600?44:H<820?50:H<1000?56:66);
   if(!UI.land){ // portrait: the map is as wide as the screen; whatever height is left over goes to a bigger hand
     const mn=$('.gx-main'),rv=$('#rivals');const Hm=(mn&&mn.clientHeight)||(H-barH),rh=(rv&&rv.offsetHeight)||52;
     const hh=Hm-rh-46-W-10;cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}
+  if(UI.desk){ // desktop: the right column is the table; the hand gets big, readable cards
+    const R=W-Math.max(150,Math.min(H-barH,Math.round(W*.62)));cw=Math.max(66,Math.min(116,Math.floor((H-barH)*.125),Math.floor((R-48)/3.9)))}
   root.style.setProperty('--cw',cw+'px');root.style.setProperty('--ch',Math.round(cw*1.4308)+'px');root.style.setProperty('--barh',barH+'px');
   if(UI.land)root.style.setProperty('--bs',Math.max(150,Math.min(H-barH,Math.round(W*.62)))+'px');
   sizeMap();
@@ -6793,7 +6829,7 @@ const PX=(function(){
 // Slots: tavern = title/menu, main = the game, fight = the last round, victory / defeat = the end card. Each has a saved choice: a, b, shuffle or off.
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Final round'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'The Gilded Hall at Midnight','tavern-b':'Whispers Beneath the Throne','main-a':'The Quiet Ledger','main-b':'Velvet Daggers','fight-a':'Siege of the Glass Kingdom','fight-b':'Thornfield Advance','victory-a':'All Hail the Victor','victory-b':'Fanfare for a New King','defeat-a':'Lanterns in the Frostwood','defeat-b':'A Lullaby for Empty Halls'};
-const MDEF={tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'};
 const MS={pick:Object.assign({},MDEF),res:{},sh:{},want:null,wslot:null,prev:null,prevT:0,last:null,since:0};
 // 'all' = shuffle through every looping song (menu, game and final-round tracks), a new one every ~2.5 min
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;

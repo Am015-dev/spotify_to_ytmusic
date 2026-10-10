@@ -3,7 +3,7 @@ function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderMain();renderBar();renderHand();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
+  renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof bfAfter==='function')bfAfter();
   netAfter();

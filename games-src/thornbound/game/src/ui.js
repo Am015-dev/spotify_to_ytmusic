@@ -554,14 +554,14 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   if(!G||s<0||isPassing()||G.over){el.innerHTML='';el._h='';el.hidden=true;return}
   if(UI.dragging)return;
   el.hidden=false;const V=UI.V,P=V.pl[s];const M=UI.bf;
-  if(M&&M.kind==='bidRes'){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
+  if(M&&M.kind==='bidRes'&&!UI.desk){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
   el.classList.remove('road');
   const ids0=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
   // cards keep their slot while the hand only shrinks (no reflow under the next tap); a new card or a new round lays the hand out again
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
-  const PAD=16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
+  const PAD=UI.desk?32:16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
   ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
@@ -574,10 +574,18 @@ function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),st
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
   for(const m of steal)items.push({kc:m.kc,m,steal:1});
   if(!items.length)return '<div class="hand roadrow"></div>';
-  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());const w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));const rk=recK();
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
     const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
     return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+// desktop: the Great Road stays on the table above the hand (taking a card, when it is your turn, happens here)
+function renderDeskRoad(){const el=$('#road');if(!el)return;
+  if(!UI.desk||!G||!UI.V||isPassing()||G.over){if(UI.desk){el.hidden=true;el.innerHTML='';el._h=''}return}
+  el.hidden=false;const s=vs(),M=UI.bf;const st=$('#barstat .st-t');const ins=st?st.textContent:'';
+  let row;if(M&&M.kind==='bidRes')row=roadRowHTML(s,M);
+  else{const V=UI.V;const w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||600)/4)-30));
+    row='<div class="hand roadrow" role="list" aria-label="The Great Road">'+V.road.map(n=>n?'<button class="kcb" role="listitem" data-a="kc" data-n="'+n+'" style="width:'+(w+4)+'px" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(n).name)+'</span></button>':'').join('')+'</div>'}
+  const h='<h4 class="dk-h">The Great Road</h4>'+row+(ins?'<p class="dk-ins">'+esc(ins)+'</p>':'');if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
 function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;
@@ -704,7 +712,7 @@ function eventHTML(ev){const note=typeof coachEvent==='function'?coachEvent(ev):
     const night=(ev.logs||[]).filter(t=>!/^(.* reveals |Strength in |Clash [IV]+: |.* wins the Clash|Tie in |Added cards are revealed)/.test(t)).slice(0,10).map(t=>'<li class="'+(/[Ee]liminat/.test(t)&&!/Invulnerable/.test(t)?'warn':'')+'">'+gloss(plain(t))+'</li>').join('');
     return cdWrap('cd-clash','<h3>Clash '+(ev.idx>=0?['I','II','III'][ev.idx]:'')+': '+esc(REG[ev.r])+(ev.n>1?' (replay)':'')+'</h3><div class="cl-panel" id="clp"></div><p class="cl-res" id="clres" hidden>'+res+'</p>'+
       '<div class="bkg'+(parts.length>2?' stack':'')+'" id="clbk" hidden>'+parts.map(s=>'<div class="bks'+(w===s?' win':'')+'" style="--fc:'+fcol(s)+'"><b>'+esc(s===me?'You':sideName(s))+'</b>'+brkHTML(ev,s)+'</div>').join('')+'</div>'+
-      (night?'<ul class="cl-log" id="cllog" hidden><li class="cl-h">In this Clash</li>'+night+'</ul>':'')+cn+'<div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
+      (night?'<ul class="cl-log" id="cllog" hidden><li class="cl-h">In this Clash</li>'+night+'</ul>':'<ul id="cllog" hidden></ul>')+cn+'<div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
   if(ev.t==='summary'){const why=ev.why||[];const order=youFirst(ev.inf1.map((_,s)=>s));
     return cdWrap('cd-sum','<h3>End of round '+ev.round+' of '+ev.rounds+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Total</th></tr></thead><tbody>'+order.map(s=>{const v=ev.inf1[s];const L=why[s]||[];return '<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(s===me?'You':sideName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>'+(L.length?'<tr class="sw"><td colspan="3">'+L.map(x=>gloss(x[0])+' '+(x[1]>0?'+':'−')+Math.abs(x[1])).join(', ')+'</td></tr>':'')}).join('')+'</tbody></table>'+cn+
       ((ev.winter&&ev.winter.length)||ev.warns.length?'<ul class="cl-log warn">'+ev.warns.concat(ev.winter||[]).filter(t=>!/Winter: .* played cards/.test(t)||true).map(t=>'<li>'+gloss(plain(t))+'</li>').join('')+'</ul>':'')+
@@ -735,7 +743,7 @@ function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderMain();renderBar();renderHand();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
+  renderMain();renderBar();renderHand();renderDeskRoad();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof bfAfter==='function')bfAfter();
   netAfter();
@@ -890,12 +898,14 @@ function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('p
 function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const root=document.documentElement;
   const W=innerWidth,H=innerHeight;UI.phone=on;UI.land=W>=H*1.15;UI.short=on?(UI.land?H<370:H<600):H<560;
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
-  root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);
+  root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);UI.desk=UI.land&&!on;root.classList.toggle('desk',UI.desk);
   const barH=on?44:48;
   let cw=UI.land?Math.max(44,Math.min(66,Math.floor((H-barH-52-46-24-16)/1.4308))):(H<600?44:H<820?50:H<1000?56:66);
   if(!UI.land){ // portrait: the map is as wide as the screen; whatever height is left over goes to a bigger hand
     const mn=$('.gx-main'),rv=$('#rivals');const Hm=(mn&&mn.clientHeight)||(H-barH),rh=(rv&&rv.offsetHeight)||52;
     const hh=Hm-rh-46-W-10;cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}
+  if(UI.desk){ // desktop: the right column is the table; the hand gets big, readable cards
+    const R=W-Math.max(150,Math.min(H-barH,Math.round(W*.62)));cw=Math.max(66,Math.min(116,Math.floor((H-barH)*.125),Math.floor((R-48)/3.9)))}
   root.style.setProperty('--cw',cw+'px');root.style.setProperty('--ch',Math.round(cw*1.4308)+'px');root.style.setProperty('--barh',barH+'px');
   if(UI.land)root.style.setProperty('--bs',Math.max(150,Math.min(H-barH,Math.round(W*.62)))+'px');
   sizeMap();

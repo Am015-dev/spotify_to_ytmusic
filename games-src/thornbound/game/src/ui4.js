@@ -7,14 +7,14 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   if(!G||s<0||isPassing()||G.over){el.innerHTML='';el._h='';el.hidden=true;return}
   if(UI.dragging)return;
   el.hidden=false;const V=UI.V,P=V.pl[s];const M=UI.bf;
-  if(M&&M.kind==='bidRes'){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
+  if(M&&M.kind==='bidRes'&&!UI.desk){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
   el.classList.remove('road');
   const ids0=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
   // cards keep their slot while the hand only shrinks (no reflow under the next tap); a new card or a new round lays the hand out again
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
-  const PAD=16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
+  const PAD=UI.desk?32:16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
   ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
@@ -27,10 +27,18 @@ function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),st
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
   for(const m of steal)items.push({kc:m.kc,m,steal:1});
   if(!items.length)return '<div class="hand roadrow"></div>';
-  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());const w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));const rk=recK();
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
     const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
     return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+// desktop: the Great Road stays on the table above the hand (taking a card, when it is your turn, happens here)
+function renderDeskRoad(){const el=$('#road');if(!el)return;
+  if(!UI.desk||!G||!UI.V||isPassing()||G.over){if(UI.desk){el.hidden=true;el.innerHTML='';el._h=''}return}
+  el.hidden=false;const s=vs(),M=UI.bf;const st=$('#barstat .st-t');const ins=st?st.textContent:'';
+  let row;if(M&&M.kind==='bidRes')row=roadRowHTML(s,M);
+  else{const V=UI.V;const w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||600)/4)-30));
+    row='<div class="hand roadrow" role="list" aria-label="The Great Road">'+V.road.map(n=>n?'<button class="kcb" role="listitem" data-a="kc" data-n="'+n+'" style="width:'+(w+4)+'px" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(n).name)+'</span></button>':'').join('')+'</div>'}
+  const h='<h4 class="dk-h">The Great Road</h4>'+row+(ins?'<p class="dk-ins">'+esc(ins)+'</p>':'');if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
 function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;

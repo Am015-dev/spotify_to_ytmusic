@@ -483,4 +483,28 @@ html[data-timg]:not([data-gfx="low"]) .gx-board{background:radial-gradient(ellip
 .mchips{display:flex;flex-wrap:wrap;gap:8px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid rgba(124,27,44,.55);background:#e9d9ae;color:#231a10;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .mchip.on{background:#7c1b2c;color:#f6e6b4;border-color:#e8c867;font-weight:700}.mchip.prev{border-style:dashed}
+/* ===== desktop (wide, not a phone): the right column is the table. Great Road on top, big hand at the bottom ===== */
+html.desk .gx-dock{justify-content:flex-end}
+html.desk .gx-dock-body{flex:1 1 auto;min-height:0}
+html.desk #road{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 16px;overflow:hidden}
+html.desk #road[hidden]{display:none}
+html.desk #road .roadrow{height:auto;gap:14px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+html.desk #road .dk-h{margin:0;font:700 1.15rem var(--fd);letter-spacing:.08em;text-transform:uppercase;color:#e8c867}
+html.desk #road .kcb .kn{font-size:.95rem;white-space:normal;text-align:center}
+html.desk #road .dk-ins{margin:0;font:700 1.35rem/1.2 var(--fb);color:#fff3c4;text-align:center}
+html.desk .roadrow .kcb{flex:0 0 auto;min-width:0}html.desk #road .roadrow{overflow:visible}
+html.desk #road .kcb>svg{width:100%;height:auto}
+html.desk #act{min-height:56px;padding:6px 12px}
+html.desk #act .btn{min-height:50px;font-size:1.05rem}
+html.desk #handw{border-top:1px solid var(--line);padding:6px 8px 0;height:calc(var(--ch,72px) + 44px)}
+html.desk #handw .hand{height:calc(var(--ch,72px) + 34px)!important}
+html.desk .hc{top:26px}
+html.desk .hc:hover:not(.on){transform:translateY(-18px) scale(1.06) rotate(0deg);z-index:40!important}
+html.desk #rivals{padding:8px 10px}
+html.desk .rv{min-height:76px;gap:10px;padding:6px 12px;border-radius:14px}
+html.desk .rv-t b{font-size:1.1rem}html.desk .rv-t small{font-size:1rem}
+html.desk .rv-n{font-size:2.1rem}
+html.desk .bidc{width:44px;height:62px;border-radius:6px;margin:0 6px}
+html.desk .bidc.up b{font-size:1.5rem}
+html.desk .race-c.four .rv-t b{display:block}
 </style></head>
