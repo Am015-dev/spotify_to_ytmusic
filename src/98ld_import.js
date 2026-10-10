@@ -37,7 +37,7 @@ GB_brickGeo=(f=>function(b,M,L){if(!b.R)return f.apply(this,arguments);const m0=
 GB_brickGeo=(f=>function(b,M,L){if(typeof b.c!=='string'||b.c.indexOf('/')<0)return f.apply(this,arguments);const q=b.c.split('/'),o=Object.assign({},b,{c:q[0]});
  if(+q[1])o.ox=+q[1];if(+q[2])o.oy=+q[2];if(+q[3])o.oz=+q[3];if(q[4])o.R=q[4].split(',').map(Number);return f.call(this,o,M,L)})(GB_brickGeo);
 // ---------- converted models → brick lists
-function LD_br(id){const Mo=LD_MODELS[id];return Mo.B.map(([t,x,z,y,r,m,ci,ox,oy,oz,R])=>{CR_reg(t.split('@')[0]);const b={t,x,z,y,r,m,c:Mo.C[ci]};if(ox)b.ox=ox;if(oy)b.oy=oy;if(oz)b.oz=oz;if(R)b.R=R;return b})}
+function LD_br(id){const Mo=LD_MODELS[id];if(!Mo)return[];return Mo.B.map(([t,x,z,y,r,m,ci,ox,oy,oz,R])=>{CR_reg(t.split('@')[0]);const b={t,x,z,y,r,m,c:Mo.C[ci]};if(ox)b.ox=ox;if(oy)b.oy=oy;if(oz)b.oz=oz;if(R)b.R=R;return b})}
 // test hook: surface points of one part as the garage builds it (upright, r 0), used by tools/ld_dump.js to calibrate LDraw parts
 function LD_pts(t,n){const M=[],L=[],g0=CR_G,w0=CR_W;CR_G=[];CR_W=[];let G=[];
  try{GB_piece(t,'#888888',M,L);G=M.concat(L,CR_G);for(const w of CR_W){const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);G.push(g)}}finally{CR_G=g0;CR_W=w0}

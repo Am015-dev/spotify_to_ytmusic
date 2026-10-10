@@ -34,7 +34,7 @@ for a in ARGS:
     models[mid] = {'src': R['model'], 'by': CRED.get(R['model'], ''), 'n': R['n'], 'C': C, 'B': B}
 js = ['// ---- LD data: real LEGO builds converted from LDraw OMR files (CCAL 2.0) by tools/ld/ld2garage.py + tools/ld/ld2src.py. Generated, do not edit.',
       '// Authors of the LDraw files: ' + '; '.join('%s %s' % (m['src'], m['by']) for m in models.values()) + '. Details: docs/MODEL_PIPELINE.md.',
-      ('const LD_MESH=' if OUT == BASE else 'Object.assign(LD_MESH,') + json.dumps({k: {kk: v[kk] for kk in ('n', 'id', 'w', 'd', 'h', 'v', 'i', 's')} for k, v in sorted(meshes.items()) if k not in HAVE}, separators=(',', ':')) + (';' if OUT == BASE else ');'),
-      ('const LD_MODELS=' if OUT == BASE else 'Object.assign(LD_MODELS,') + json.dumps(models, separators=(',', ':')) + (';' if OUT == BASE else ');')]
+      'Object.assign(LD_MESH,' + json.dumps({k: {kk: v[kk] for kk in ('n', 'id', 'w', 'd', 'h', 'v', 'i', 's')} for k, v in sorted(meshes.items()) if k not in HAVE}, separators=(',', ':')) + ');',
+      'Object.assign(LD_MODELS,' + json.dumps(models, separators=(',', ':')) + ');']
 open(OUT, 'w').write('\n'.join(js) + '\n')
 print('LD2SRC_OK', OUT, os.path.getsize(OUT), 'B', len([k for k in meshes if k not in HAVE]), 'meshes', {k: m['n'] for k, m in models.items()})
