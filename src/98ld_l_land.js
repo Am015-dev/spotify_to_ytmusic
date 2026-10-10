@@ -80,4 +80,4 @@ hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.pty
  for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
 // test hook (before/after shots of the same spot): ab(1) draws the old trees again
 function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
-window.__ld.lds=LDS;window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
+window.__ld.lds=LDS;LDS.race=t=>{loadTrack(t);startRace()};LDS.cam=()=>camera;LDS.palm0=()=>athTreeBy0('palm');window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
