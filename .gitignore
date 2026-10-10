@@ -20,3 +20,8 @@ ath_before_dbg.html
 v88l_dbg.html
 v88s_dbg.html
 v88t_dbg.html
+ld/lib/
+ld/ours.json
+ld/shots/
+ld/dl/
+ld/ref/
