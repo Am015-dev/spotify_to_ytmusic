@@ -17,12 +17,12 @@ function FB_drop(){for(const k in CR_VC)if(k.indexOf('gar|')===0)delete CR_VC[k]
 // start editing a form (S = the set, f = 'off' | 'boat')
 function FB_begin(S,f){if(!GB.d||!S||!S[f])return 0;if(FB.s)FB_end(1);const d=GB.d;
  FB.s={id:S.id,f,car:d.bricks||[],bp:d.bp,pv:GAR_.pv,dist:GB_.dist};d.bricks=FB_cur(S,f);d.bp=1;GAR_.pv='car';
- if(!$('#gbx').hidden)gbRender();FB_tag();return 1}
+ if(!$('#gbx').hidden)gbRender();FB_tag();try{R2_hdr()}catch(e){}return 1}
 // save the form's bricks (only when they differ from the preset; an empty form falls back to the preset)
 function FB_save(){const s=FB.s;if(!s||!GB.d)return;const S=GAR_set(s.id),B=JSON.parse(JSON.stringify(GB.d.bricks||[])),G=GAR_get(),F=G.fb=G.fb||{},k=FB_K(s.id,s.f),
  same=B.length===0||JSON.stringify(B)===JSON.stringify(FB_pre(S,s.f));if(same){if(!F[k])return;delete F[k]}else{if(JSON.stringify(F[k]||0)===JSON.stringify(B))return;F[k]=B}GAR_put(G);FB_drop()}
 function FB_end(noR){const s=FB.s;if(!s)return;FB_save();FB.s=null;const d=GB.d;if(d){d.bricks=s.car;d.bp=s.bp;store.set('mho_build',d)}GAR_.pv=s.pv;GB_.dist=s.dist;
- try{if(pl&&pl.mesh&&pl.mesh.userData.gbV){CR_attachV(pl.mesh,null);CR_vis(pl,pl.mesh.userData)}}catch(e){}FB_tag();if(!noR&&!$('#gbx').hidden&&!GB_.bk)gbRender()}
+ try{if(pl&&pl.mesh&&pl.mesh.userData.gbV){CR_attachV(pl.mesh,null);CR_vis(pl,pl.mesh.userData)}}catch(e){}FB_tag();try{R2_hdr()}catch(e){}if(!noR&&!$('#gbx').hidden&&!GB_.bk)gbRender()}
 // a small label in BUILD / the guide: which ride is being edited
 function FB_tag(){let t=$('#fbTag');const s=FB.s;if(!s){if(t)t.hidden=true;return}if(!t){t=document.createElement('div');t.id='fbTag';$('#gbx').appendChild(t)}
  const S=GAR_set(s.id);t.textContent=(s.f==='boat'?'🚤 WATER · ':'🛻 OFF-ROAD · ')+G9C_name(S,s.f);t.hidden=false}
@@ -39,10 +39,15 @@ GB_exit=(f=>function(){const r=f.apply(this,arguments);if(!FB.keep&&!GB_.bk&&!SB
 SB_open=(f=>function(from){if(!FB.s&&!GB_.bk){const fm=FB_form();if(fm)FB_begin(GAR_frm(fm),fm)}FB.keep=1;try{return f.apply(this,arguments)}finally{FB.keep=0;FB_tag()}})(SB_open);
 SB_close=(f=>function(){const r=f.apply(this,arguments);if(!GB_.bk&&!SB.on)FB_end();return r})(SB_close);
 gbClose=(f=>function(){if(FB.s){if(GB_.bk){FB.keep=1;try{GB_exit()}finally{FB.keep=0}}FB_end(1)}return f.apply(this,arguments)})(gbClose);
-// build grid for a form: the whole footprint of the ride at its lowest brick (boat hulls sit below the street car's plate line)
-GB_scanBase=(f=>function(){const r=f.apply(this,arguments);if(!FB.s||!GB.d)return r;const L=GB_list();if(!L.length)return r;let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,y0=1e9;
- for(const b of L){const[fw,fd]=GB_dims(b);x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+fw-1);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+fd-1);y0=Math.min(y0,b.y)}
- const B={};for(let i=Math.max(GB_N0,x0);i<=Math.min(GB_N1,x1);i++)for(let j=Math.max(GB_Z0,z0);j<=Math.min(GB_Z1,z1);j++)B[i+','+j]=Math.floor(y0);GB_.base=B;return r})(GB_scanBase);
+// build grid for a form: every cell the ride covers (wheels excluded), at its lowest brick (boat hulls sit below the street car's plate line),
+// so LAYER mode starts on the ride's own deck instead of the floor between the wheels
+GB_scanBase=(f=>function(){const r=f.apply(this,arguments);if(!FB.s||!GB.d)return r;const L=GB_list().filter(b=>!CR_WH[b.t]);if(!L.length)return r;let y0=1e9;for(const b of L)y0=Math.min(y0,b.y);
+ const B={};for(const b of L){const[fw,fd]=GB_dims(b);for(let i=Math.max(GB_N0,b.x);i<=Math.min(GB_N1,b.x+fw-1);i++)for(let j=Math.max(GB_Z0,b.z);j<=Math.min(GB_Z1,b.z+fd-1);j++)B[i+','+j]=Math.floor(y0)}
+ if(Object.keys(B).length)GB_.base=B;return r})(GB_scanBase);
+// names: the garage header and the guide title show the ride being edited (not the street car)
+const FB_nm=()=>FB.s&&G9C_name(GAR_set(FB.s.id),FB.s.f);
+R2_hdr=(f=>function(){const r=f.apply(this,arguments);const n=FB_nm(),e=$('#r2Name');if(n&&e)e.textContent=n;return r})(R2_hdr);
+SB_ui=(f=>function(){const r=f.apply(this,arguments);const n=FB_nm(),e=$('#sbG .sbNm');if(n&&e)e.textContent=n;return r})(SB_ui);
 // no bare street chassis plate under a boat / off-road ride
 GB_attach=(f=>function(g,bricks,fig,cache,bp){const r=f.apply(this,arguments);if(FB.s&&bp&&g===GB.mesh&&!(bricks||[]).some(CR_isW)){const U=g.userData,o=U.gbM&&U.gbM[0];
  if(o&&o.userData.gb&&!o.userData.gbc&&o.material===GB_MAT){(U.carG||U.m).remove(o);U.gbM.shift()}}return r})(GB_attach);

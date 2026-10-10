@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89z',id:'fb-cards',text:'Garage → RIDES → OFF-ROAD and → WATER: every ride card has ✎ BUILD and ▶ GUIDE.'},
+ {ver:'v89z',id:'fb-build',text:'WATER → Speedboat → ✎ BUILD: the boat (not the Hot Rod) is in the builder and its name is at the top. Place a part, ROTATE, place another, go back to RIDES: the boat card shows your parts.'},
+ {ver:'v89z',id:'fb-guide',text:'OFF-ROAD → Blue Beast → ▶ GUIDE: the guide builds the monster truck step by step (title says Blue Beast). EXIT works.'},
+ {ver:'v89z',id:'fb-drive',text:'After editing a boat, SAVE & DRIVE: your street car is unchanged; drive into the river and the boat you built appears.'},
  {ver:'v89w',id:'sc-rides',text:'Garage → RIDES → STREET: Senna GTR, Hyper 16, Demon 18 and Charger 70 each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
  {ver:'v89y',id:'trucks',text:'Garage → RIDES → STREET: the 9 new trucks/vans (Flatbed, Repair Truck, Logger, Big Rig, Mail Van, Tanker Cab, Service Van, Bin Truck, Snowplow) each show complete; drive two of them: they sit on the road and steer.'},
  {ver:'v89y',id:'rboat',text:'Frankfurt: the blue Speedboat sits IN the river by the bank (not floating above, not on land).'},
