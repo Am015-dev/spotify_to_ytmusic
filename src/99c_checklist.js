@@ -12,6 +12,7 @@ const OD_CHECKLIST=[
  {ver:'v89z',id:'fb-guide',text:'OFF-ROAD → Blue Beast → ▶ GUIDE: the guide builds the monster truck step by step (title says Blue Beast). EXIT works.'},
  {ver:'v89z',id:'fb-drive',text:'After editing a boat, SAVE & DRIVE: your street car is unchanged; drive into the river and the boat you built appears.'},
  {ver:'v89w',id:'sc-rides',text:'Garage → RIDES → STREET: Senna GTR, Hyper 16, Demon 18 and Charger 70 each show complete with 4 wheels; SAVE & DRIVE works and they sit on the road.'},
+ {ver:'v90d',id:'town79',text:'Garage → RIDES → STREET: Town Roadster, Town Coupe, Ladder Truck and Town Tipper each look complete; equip one and drive: it sits on the road and steers.'},
  {ver:'v90c',id:'cars3',text:'Garage → RIDES → STREET: Race Car 89, Sprint Racer and Racing Pickup each look complete; drive one: it sits on the road and steers.'},
  {ver:'v90c',id:'4x4s',text:'RIDES: Fire Rescue 4x4, Coast Guard 4WD, Bike Hauler, Mining 4x4 and Horse 4WD each look complete; drive one.'},
  {ver:'v90c',id:'work',text:'RIDES: Tipper Truck, Dump Truck, Cement Mixer, Mixer Truck, Cargo Truck, Turbine Hauler, Front Loader and Farm Tractor each look complete; drive one of the 3-axle trucks: wheels on the road, it steers.'},
