@@ -76,7 +76,23 @@ function LD_propSpot(x0,z0,hw,hd){for(let r=24;r<300;r+=8)for(let a=0;a<32;a++){
   for(const rot of[0,1]){const w=rot?hd:hw,d=rot?hw:hd;if(!rfFree(x,z,3)||roamHit(x,z,Math.max(w,d)+1.5))continue;let ok=1;
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;
    if(ok)return{x,z,rot}}}return null}
-function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;const B=LD_br('bank'),lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}// CR_LO 2: 6-sided studs, imported parts without studs
+// v89v: hidden-surface cull for big props (10264: 131k → 60k triangles at CR_LO 2): a triangle is dropped when all 3 corners lie inside the body box of ANOTHER
+// plain brick/plate/tile (studs under the brick above, faces between stacked bricks). Uses the per-triangle brick ids GB_geo keeps (userData.bid).
+function LD_cull(g,B){if(!g||!g.userData.bid)return g;const bid=g.userData.bid,A=g.attributes,pos=A.position.array,nt=bid.length,bb=new Map(),e=.004,K=1.2,H=new Map();
+ for(let t=0;t<nt;t++){const i=bid[t];if(i<0)continue;let q=bb.get(i);if(!q)bb.set(i,q=[1e9,1e9,1e9,-1e9,-1e9,-1e9]);for(let v=0;v<3;v++){const o=(t*3+v)*3;for(let k=0;k<3;k++){if(pos[o+k]<q[k])q[k]=pos[o+k];if(pos[o+k]>q[k+3])q[k+3]=pos[o+k]}}}
+ for(const[i,q]of bb){const b=B[i];if(!b||!/^[bpt]\d+$/.test(b.t)||b.R||typeof b.c!=='string'||b.c[0]==='~'||b.c[0]==='*'||!GB_PC[b.t])continue;
+  const o=[q[0]-e,q[1]-e,q[2]-e,q[3]+e,q[1]+GB_PC[b.t].h*GB_PH+e,q[5]+e,i];
+  for(let x=Math.floor(o[0]/K);x<=Math.floor(o[3]/K);x++)for(let y=Math.floor(o[1]/K);y<=Math.floor(o[4]/K);y++)for(let z=Math.floor(o[2]/K);z<=Math.floor(o[5]/K);z++){const h=x+','+y+','+z;let L=H.get(h);if(!L)H.set(h,L=[]);L.push(o)}}
+ const keep=new Uint8Array(nt);let n=0;
+ for(let t=0;t<nt;t++){const b=t*9;const cx=(pos[b]+pos[b+3]+pos[b+6])/3,cy=(pos[b+1]+pos[b+4]+pos[b+7])/3,cz=(pos[b+2]+pos[b+5]+pos[b+8])/3,L=H.get(Math.floor(cx/K)+','+Math.floor(cy/K)+','+Math.floor(cz/K));let hid=0;
+  // slivers (the 0.022 bevel strips and corners, ≤ 9 mm in the world) go too: a far prop needs no bevels
+  {const ax=pos[b+3]-pos[b],ay=pos[b+4]-pos[b+1],az=pos[b+5]-pos[b+2],bx=pos[b+6]-pos[b],by=pos[b+7]-pos[b+1],bz=pos[b+8]-pos[b+2],cx2=pos[b+6]-pos[b+3],cy2=pos[b+7]-pos[b+4],cz2=pos[b+8]-pos[b+5];
+   const ar=Math.hypot(ay*bz-az*by,az*bx-ax*bz,ax*by-ay*bx),le=Math.max(ax*ax+ay*ay+az*az,bx*bx+by*by+bz*bz,cx2*cx2+cy2*cy2+cz2*cz2);if(ar<.03*Math.sqrt(le))hid=1}
+  if(L&&!hid)for(const o of L){if(o[6]===bid[t])continue;let ins=1;for(let v=0;v<3&&ins;v++){const p=b+v*3;if(pos[p]<o[0]||pos[p]>o[3]||pos[p+1]<o[1]||pos[p+1]>o[4]||pos[p+2]<o[2]||pos[p+2]>o[5])ins=0}if(ins){hid=1;break}}
+  if(!hid){keep[t]=1;n++}}
+ if(n===nt)return g;const out=new THREE.BufferGeometry();for(const k in A){const s=A[k].itemSize,src=A[k].array,d=new src.constructor(n*3*s);let w=0;for(let t=0;t<nt;t++)if(keep[t]){d.set(src.subarray(t*3*s,(t+1)*3*s),w);w+=3*s}out.setAttribute(k,new THREE.BufferAttribute(d,s,A[k].normalized))}
+ const nb=new Int16Array(n);let w=0;for(let t=0;t<nt;t++)if(keep[t])nb[w++]=bid[t];out.userData.bid=nb;return out}
+function LD_propMake(P,B,nm){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);// CR_LO 2: 6-sided studs, imported parts without studs
  const parts=[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]),box=new THREE.Box3();for(const[g]of parts){g.computeBoundingBox();box.union(g.boundingBox)}
  const c=box.getCenter(new THREE.Vector3());let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;
  // walls: footprint of the bricks standing on the baseplate
@@ -89,8 +105,13 @@ function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;const B=LD_br('ba
  const a=best*Math.PI/2,y=groundY(S.x,S.z);
  // world-space geometry straight under HUB.grp, so the hub distance culling (hubCull*) handles it like every other building
  const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(LD_SW,LD_SW,LD_SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
- LDP.g=[];LDP.tris=0;for(const[g,mat]of parts){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name='ld_bank';o.receiveShadow=true;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);LDP.g.push(o);LDP.tris+=(g.index?g.index.count:g.attributes.position.count)/3}
+ P.g=[];P.tris=0;for(const[g,mat]of parts){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name=nm;o.receiveShadow=true;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);P.g.push(o);P.tris+=(g.index?g.index.count:g.attributes.position.count)/3}
  const cs=Math.cos(a),sn=Math.sin(a),cx=S.x+ox*cs+oz*sn,cz=S.z-ox*sn+oz*cs,odd=best%2,col={x:cx,z:cz,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*LD_SW};
- HUB.bld.push(col);hubGridAdd([col]);LDP.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};LDP.col=col}
+ HUB.bld.push(col);hubGridAdd([col]);P.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};P.col=col}
+// v89v: more world props (one entry per converted building; each placed on the next free lot from the start, the bank first)
+const LD_PROPS=[{id:'cgarage',nm:'ld_cgarage',br:()=>LD_br('cga').concat(LD_br('cgb'))}];
+function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;LD_propMake(LDP,LD_br('bank'),'ld_bank');
+ for(const q of LD_PROPS){if(q.g)continue;try{LD_propMake(q,q.br(),q.nm)}catch(e){console.warn('LD prop',q.id,e)}}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{LD_propBuild()}catch(e){console.warn('LD prop',e)}return r})(buildRoam);
-window.__ld.prop=LDP;window.__ld.propBuild=LD_propBuild;
+window.__ld.grpLo=(B,lv)=>{const l=CR_LO;CR_LO=lv||2;try{const G=GB_geo(B,null),g=new THREE.Group();G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);if(G.m)g.add(new THREE.Mesh(G.m,GB_MAT));if(G.l)g.add(new THREE.Mesh(G.l,GB_LMAT));if(G.g)g.add(new THREE.Mesh(G.g,CR_GM));return g}finally{CR_LO=l}};// test hook: a prop as the world builds it (CR_LO 2)
+window.__ld.prop=LDP;window.__ld.props=LD_PROPS;window.__ld.propBuild=LD_propBuild;

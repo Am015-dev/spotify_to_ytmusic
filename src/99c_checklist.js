@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89v',id:'cgarage-world',text:'Frankfurt, near the start (by the Town Bank): the Corner Garage stands on its own lot, white ground floor with green trim, tan flats above, petrol canopy; it does not block a road and you bump off its walls.'},
+ {ver:'v89v',id:'cgarage-fps',text:'Drive past the Corner Garage and the Town Bank on the phone: no stutter or slowdown compared with the rest of Frankfurt.'},
  {ver:'v89u',id:'pboat-garage',text:'Garage → RIDES → WATER → Power Boat: the long white hull with red deck, black cockpit and yellow trim shows, with a driver on the front seat.'},
  {ver:'v89u',id:'pboat-drive',text:'Drive the Power Boat on the water: the hull sits IN the water (not floating above it, not sunk), it steers like the other boats.'},
  {ver:'v89t',id:'turbo-garage',text:'Garage → RIDES → Turbo 74: the white 911 Turbo shows with its black whale-tail wing, round headlights and 4 wheels; SAVE & DRIVE works.'},
