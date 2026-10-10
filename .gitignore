@@ -26,3 +26,5 @@ ld/shots/
 ld/dl/
 ld/ref/
 /models.js
+/models/
+tools/tPlayLD.tmp.js
