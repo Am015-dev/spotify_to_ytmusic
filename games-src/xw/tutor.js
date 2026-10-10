@@ -52,6 +52,7 @@ const tutRound=()=>Math.max(1,Math.min(2,G?G.round:1));
 {const o=guided;guided=function(){return tutOn()?false:o()}}
 {const o=coachKey;coachKey=function(){return tutOn()?null:o()}}
 function tutStage(){
+  window.TUTPH=true;try{PHN.apply()}catch(e){}   // every step points at the board-first layer: desktop and tablets get it for the lesson
   try{boot3D()}catch(e){}
   if(typeof NET!=='undefined'&&NET.on)netLeave(true);
   TUT.on=true;TUT.dice=TUT_DICE();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
@@ -123,7 +124,7 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
       else startGame('solo')},
     onExit:()=>{tutLeave();UI.info=true;render()}})}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
-function tutLeave(){TUT.on=false;TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
+function tutLeave(){TUT.on=false;if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
   UI.hold=null;UI.holdK=[];UI.stats=false;UI.draft={};try{GXH.hide()}catch(e){}if(G&&G.tut){G.tut=0}}
 function lsPlayed(){try{localStorage.setItem('na_played','1')}catch(e){}}
 // first-time players who tap Launch are offered the lesson first
