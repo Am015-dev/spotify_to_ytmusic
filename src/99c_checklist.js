@@ -3,6 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v89l',id:'stuck-push',text:'Drive slowly into a stopped car and keep GAS on: within a second it is pushed aside and you can pass.'},
  {ver:'v89l',id:'drift-brake',text:'Phone: at 60 km/h or more, keep GAS on, steer and hold BRAKE for a moment: the car drifts (pink trail, mini-turbo after). A quick BRAKE tap only brakes.'},
  {ver:'v89k',id:'gold-brick',text:'Golden bricks look like a big gold 2×2 LEGO brick at car-roof height (no pole), and you collect it by driving through.'},
  {ver:'v89j',id:'tip-avatar',text:'Oma Hilde\'s tip text never runs under her picture.'},

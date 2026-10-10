@@ -72,3 +72,6 @@ tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check ever
   garage/flight rings so the car stops on the pad and the card opens; (2) tPlay: when the arrow target is a mark < 40 m away, brake to stop
   in its ring like a person (or tap #roamPrompt). Then re-measure Athens over 3 runs (target ≤ 0.8/min); the earlier hillside-grid and
   ring-challenge hits (HANDOFF above) still need a look after this cluster is gone.
+- Reviewer + coordinator (2026-10-10), for Part B: Eleni's garage card auto-opens when you drive through the Athens gate (the 5 Athens stuck
+  episodes). Open the card only when the car stops inside the gate (< 2-5 km/h for 0.5 s), or show a small "GARAGE ▸" button instead of the
+  full card. Ship it with the wall-hits fix (separate REVIEW/DEPLOY).
