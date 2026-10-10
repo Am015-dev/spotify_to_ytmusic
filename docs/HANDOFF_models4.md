@@ -47,3 +47,5 @@ roam props: copy tools/tPlay.js, after "in roam" log __ld.w.on / __ld.wroad(). H
   build-6 session_01NhPhe9KMC86jAFXKzCXLmg (world), land-1 session_01F1oHeA7LV2cMbPpXRMGsXm, garage-18 session_019vNFjqrqunwBDfw4daimsX. build-8, size-1, city-1 stood down.
 - Test notes: run the http server detached (setsid nohup python3 -m http.server 8766) — it died twice. tPlay copy with LDCHK/RIG2 hooks: tools/tPlayLD.tmp.js (git-ignored;
   recreate from tools/tPlay.js: log __ld.w.on, __ld.wroad(), __ct.wide()). Equip a ride before story: tools/ld/tRides.js SET=<id> (size-1's tip). Geoms growth ~50/min fra 2-min is pre-existing (v90e 54).
+- NEW STANDING RULE (Alex, 18:47): one labelled shot GRID per READY, never loose shots: `git show origin/alex/overdrive-devkit:tools/grid.py > tools/grid.py` (pillow),
+  `python3 tools/grid.py docs/shots/<ver>/GRID.jpg "<ver>: <what>" "label=path" ...` covering drives (fra/ath), new rides on stage, new props. Pass the rule to every MODEL sender.
