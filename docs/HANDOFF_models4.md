@@ -51,3 +51,5 @@ roam props: copy tools/tPlay.js, after "in roam" log __ld.w.on / __ld.wroad(). H
   `python3 tools/grid.py docs/shots/<ver>/GRID.jpg "<ver>: <what>" "label=path" ...` covering drives (fra/ath), new rides on stage, new props. Pass the rule to every MODEL sender.
 - 18:51 coordinator: v90g LIVE (brave-carson 05ac434). v90h = garage-18 floor fix (rides sunk in garage floor, Alex's top complaint) + veh-2's 4 rides
   + reviewer follow-ups: palms/orange slab -> land-3 (session_01F9UVq3exKAQQy4xHV7BH6G); checklist pin covering the mission objective line -> the integrator fixes it (99c_checklist.js pin position in missions/races).
+- 18:55 size-1: Athens "park start / 5.82 m ride" ROOT-CAUSED (pre-existing in v90e): JU landing squash (90_fixes_cv_ju.js:457) grows with negative test dt -> player root
+  scale (2.59,-2.54,2.59). Fix on alex/od-size b989e882 (3 small changes in 90/93/98sz). Merge into v90h.
