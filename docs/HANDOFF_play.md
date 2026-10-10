@@ -41,12 +41,12 @@ Brief: stuck % (Frankfurt 17 / Athens 14 → < 3), Athens wall hits (1.75 → �
 Wall hits are NOT fixed. Athens 6.72 (6l1): 18 hits 20-80 m off-road in a hillside grid of 6 m houses (x 1130-1410, z -1820..-1960,
 y 68-91), no mission running, bot wandering. The other runs: Koulouri van chase / DRIFT ZONE / RAMP JUMP rings, 5-15 m off-road.
 v89k Athens is ~2/min on the same test too, so the brief's 1.75 matches; 0.62 (pre-v88z) was an older tPlay.
-Shots (852x393): qa_play4l/phone-{fra,ath}/ (start, drive1-3, after_rotation, tutorial, wallhit*), qa_play5l/ (fra).
+Shots (852x393): play/shots_v89l/ (Athens start + tutorial + wall hit, Frankfurt after rotation + drive).
 tplay_fast.sh prints PASS when a city process crashes (no FAIL line): check every log has a "phone <city> {" result line.
 
 ## Open
 - Wall hits per minute vary 0–6/min run to run on the SAME build (mission-dependent: Koulouri Rush van chase in Athens, brick packs
-  in Frankfurt). Judge on ≥ 2 runs. If still > 0.8 after (c): make the bot steer away after reversing (it is a bot artefact), then
+  in Frankfurt). Judge on ≥ 2 runs. (c) is in tPlay now (turns to the open side after backing off; used in the 6l runs). Next
   look at the game side: the Athens lawns between road and blocks invite corner-cutting at chase speed.
 - Garage/team panel text at 11 px (`gH`, `.rnd`) showed once after a fresh Frankfurt start (tPlay tiny list).
 - After the PASS: merge the latest live src (alex/od-mem may land first), OD_CHANGELOG v89l entry, `tools/build.sh v89l`, push out/v89l, DEPLOY.
