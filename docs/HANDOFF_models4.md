@@ -32,3 +32,8 @@ roam props: copy tools/tPlay.js, after "in roam" log __ld.w.on / __ld.wroad(). H
 - ALEX RULE: never drop/skip finished work -> fix or hand to rescue-1.
 - Test tricks: tools/tPlayLD.tmp.js (git-ignored copy of tPlay) logs LDCHK (props, __ld.wroad). A ride equipped in roam cannot be forced from tPlay (story keeps Hot Rod).
   Garage card shots: tap the card IMG (touchscreen) = equip, wait 12 s; thumbnails pump serially (~1.5 s each in swiftshader).
+
+## Follow-up bugs (queue)
+- Athens start off the road (one tPlay run, v90f build): spawned in a park, camera inside a tree, target "Flights → Frankfurt", player measured 5.82×8.6 m; Athens walls 11.29/min that run. Not reproduced in 3 later runs. Shot docs/shots/v90f/ath_badrun_park_start.jpg. Cause unknown.
+- 604/606/620/622 Town cars: no steering wheel in the LDraw files -> ×1.6 but empty seat (no driver).
+- Garage floor dark patch on some rides (1572/6668/6526/6669/621): garage render bug, owner garage-18.
