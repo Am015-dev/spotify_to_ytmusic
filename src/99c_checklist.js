@@ -3,6 +3,9 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90i',id:'town4',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer: each looks complete, stands on the platform, has a LEGO driver; drive one.'},
+ {ver:'v90i',id:'pin-obj',text:'Phone, story mission: the checklist bar sits below the yellow NEXT objective line, never on top of it.'},
+ {ver:'v90i',id:'ath-size',text:'Athens: jump a few times; the car keeps its normal size and stays upright.'},
  {ver:'v90h',id:'gfloor',text:'Garage → RIDES: tap 6 rides in a row (a car, a big truck, a Town set, an OFF-ROAD truck, a WATER boat): after the build-up each one stands on the platform, tyres on the tiles, nothing sunk into the floor, no flat base with tiny wheels.'},
  {ver:'v90h',id:'gpatch',text:'Garage → BUILD on a big ride (Fire Truck, Big Rig): the grey platform has no dark striped patch behind the ride.'},
  {ver:'v90g',id:'rides16',text:'Garage → RIDES: Street Sweeper, Fire Truck (4208), Tow Rig, Recycle Truck, Red Line Racer, Diesel Daredevil, Classic Patrol, Tow Truck (7638), Highway Bike, Z06 Racer, Repair Truck, Tipper Lorry, Sport Coupe, Road Rebel, Trail Ranger, Diesel Dumper: each looks complete; drive two.'},
@@ -246,7 +249,7 @@ const OD_CHECKLIST=[
    // roam / race / missions: below the objective line (quest tracker, objective pill) when it sits at the top centre
    if(innerWidth>900&&innerHeight>500){const g=document.querySelector('#tuG,#tuB,[id^="tu"][id$="G"]');let t=108;if(vis(g)){const r=g.getBoundingClientRect();if(r.top<160&&r.right>innerWidth-120)t=Math.round(r.bottom)+10}
     pin.style.transform='none';pin.style.left=Math.round(innerWidth-16-pin.offsetWidth)+'px';pin.style.top=t+'px';return}
-   const a=pin.getBoundingClientRect();let t=54;for(const e of document.querySelectorAll('#roamArrow,#qTrk,#obj,[id*="Obj"],[class*="Pill"],[class*="pill"]')){if(pin.contains(e)||!vis(e))continue;const r=e.getBoundingClientRect();
+   const a=pin.getBoundingClientRect();let t=54;for(const e of document.querySelectorAll('#roamArrow,#qTrk,#obj,#m1Next,[id*="Obj"],[class*="Pill"],[class*="pill"]')){if(pin.contains(e)||!vis(e))continue;const r=e.getBoundingClientRect();
     if(r.top<110&&r.bottom<150&&r.right>a.left&&r.left<a.right&&r.height<70)t=Math.max(t,Math.round(r.bottom)+6)}
    pin.style.top=t===54?'':`calc(env(safe-area-inset-top,0px) + ${t}px)`;return}pin.style.top='';let L=0,R=innerWidth;
   for(const q of['#r2R','#gxG','#slBar','#gsBar']){const e=document.querySelector(q);if(vis(e)){const r=e.getBoundingClientRect();if(r.top<120)L=Math.max(L,r.right+6)}}
