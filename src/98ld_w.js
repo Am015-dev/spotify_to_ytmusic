@@ -6,7 +6,7 @@ const LDW_P=[],LDW={on:[],lod:60};
 // meshes of the w data modules (they load after 98ld_import.js registered LD_MESH): register them as hidden garage parts
 function LDW_reg(){for(const k in LD_MESH)if(!GB_PC[k]){const D=LD_MESH[k];GB_PC[k]={n:D.n.replace(/^~/,''),w:D.w,d:D.d,h:D.h,cat:'LDraw',ic:'◆',hide:1,s:D.s.some(q=>!q[3])};G13_ID[k]=D.id}}
 function LDW_geo(B){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}return[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]).concat((G.w||[]).map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return[g,GB_MAT]}))}// wheels (carts, trailers) as their own meshes
-function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_SW*(P.s||1);/* P.s: scale up micro-scale sets */const B=LD_br(P.model),near=LDW_geo(B),
+function LDW_build1(P){if(P.city!==CID||!LD_MODELS[P.model])return;const SW=LD_SW*(P.s||(P.water?1:LD_FIG));/* v89w: buildings at minifig scale (LD_FIG, 98ld_import.js) *//* P.s: scale up micro-scale sets */const B=LD_br(P.model),near=LDW_geo(B),
   far=LDW_geo(B.filter(b=>{const Q=GB_PC[b.t];return Q&&Q.w*Q.d*Q.h>=(P.lodv||9)}));
  const box=new THREE.Box3();for(const[g]of near){g.computeBoundingBox();box.union(g.boundingBox)}const c=box.getCenter(new THREE.Vector3());
  let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;for(const b of B){const Q=GB_PC[b.t];if(!Q||Q.h<(P.colh||3))continue;const w=b.r%2?Q.d:Q.w,d=b.r%2?Q.w:Q.d;x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+w);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+d)}

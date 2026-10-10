@@ -72,6 +72,10 @@ function LD_pboat(){const A=LD_br('pboat').map(b=>Object.assign(b,{y:b.y-6}));A.
 // (LD_SW = 0.408 m per garage unit, measured on the player car in roam). One merged world-space mesh per material (3 draws, hub distance culling),
 // box collider = the walls' footprint (bricks above the baseplate), placed on the nearest free lot to the start, front to the street.
 const LD_SW=.408,LDP={g:null,at:null,col:null};
+// v89w, Alex: "buildings should be comparable to buildings where a lego human can fit". An LDraw minifig (hips to head stud) is 100 LDU = 1.22 m at LD_SW,
+// but the game's people are 1.9 m (pedestrians) to 2.0 m (quest figures, SC_K in 96_scale_qa.js). So world BUILDINGS use LD_SW × LD_FIG (1.6): a minifig of
+// the game fits a 1×4×6 door (2.8 m frame) with headroom. Rides stay at LD_SW (they match the player car); micro sets (P.s) and moored boats too.
+const LD_FIG=1.6;
 function LD_propSpot(x0,z0,hw,hd){for(let r=24;r<300;r+=8)for(let a=0;a<32;a++){const t=a/32*Math.PI*2,x=x0+Math.cos(t)*r,z=z0+Math.sin(t)*r;
   for(const rot of[0,1]){const w=rot?hd:hw,d=rot?hw:hd;if(!rfFree(x,z,3)||roamHit(x,z,Math.max(w,d)+1.5))continue;let ok=1;
    for(const sx of[-1,-.5,0,.5,1])for(const sz of[-1,-.5,0,.5,1])if(ok&&(FL_road(x+sx*w,z+sz*d,2.5)||roamHit(x+sx*w,z+sz*d,.8)))ok=0;
@@ -92,21 +96,21 @@ function LD_cull(g,B){if(!g||!g.userData.bid)return g;const bid=g.userData.bid,A
   if(!hid){keep[t]=1;n++}}
  if(n===nt)return g;const out=new THREE.BufferGeometry();for(const k in A){const s=A[k].itemSize,src=A[k].array,d=new src.constructor(n*3*s);let w=0;for(let t=0;t<nt;t++)if(keep[t]){d.set(src.subarray(t*3*s,(t+1)*3*s),w);w+=3*s}out.setAttribute(k,new THREE.BufferAttribute(d,s,A[k].normalized))}
  const nb=new Int16Array(n);let w=0;for(let t=0;t<nt;t++)if(keep[t])nb[w++]=bid[t];out.userData.bid=nb;return out}
-function LD_propMake(P,B,nm){const lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);// CR_LO 2: 6-sided studs, imported parts without studs
+function LD_propMake(P,B,nm){const SW=LD_SW*LD_FIG,lo=CR_LO;let G;CR_LO=2;try{G=GB_geo(B,null)}finally{CR_LO=lo}G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);// CR_LO 2: 6-sided studs, imported parts without studs
  const parts=[[G.m,GB_MAT],[G.l,GB_LMAT],[G.g,CR_GM]].filter(q=>q[0]),box=new THREE.Box3();for(const[g]of parts){g.computeBoundingBox();box.union(g.boundingBox)}
  const c=box.getCenter(new THREE.Vector3());let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;
  // walls: footprint of the bricks standing on the baseplate
  for(const b of B){if(b.y<1||!GB_PC[b.t]||GB_PC[b.t].h<3)continue;const P=GB_PC[b.t],w=b.r%2?P.d:P.w,d=b.r%2?P.w:P.d;x0=Math.min(x0,b.x);x1=Math.max(x1,b.x+w);z0=Math.min(z0,b.z);z1=Math.max(z1,b.z+d)}
- const k=GB_U*LD_SW,hw=(x1-x0)*k/2-.2,hd=(z1-z0)*k/2-.2,ox=((x0+x1)/2)*GB_U*LD_SW-c.x*LD_SW,oz=((z0+z1)/2)*GB_U*LD_SW-c.z*LD_SW;
+ const k=GB_U*SW,hw=(x1-x0)*k/2-.2,hd=(z1-z0)*k/2-.2,ox=((x0+x1)/2)*GB_U*SW-c.x*SW,oz=((z0+z1)/2)*GB_U*SW-c.z*SW;
  const st=(typeof RO!=='undefined'&&RO&&RO.x!=null&&isFinite(RO.x)&&(RO.x||RO.z))?{x:RO.x,z:RO.z}:{x:2061,z:0};// the story start (measured) when the car is not placed yet
  const S=LD_propSpot(st.x,st.z,Math.max(hw,hd)+.5,Math.min(hw,hd)+.5);if(!S)return;
  // front (−z of the model) to the nearest road
  const yaws=[0,1,2,3].filter(q=>q%2===S.rot);let best=yaws[0],bd=1e9;for(const q of yaws){const a=q*Math.PI/2,fx=-Math.sin(a),fz=-Math.cos(a);for(let r=2;r<40;r+=2)if(FL_road(S.x+fx*(hd+r),S.z+fz*(hd+r),0)){if(r<bd){bd=r;best=q}break}}
  const a=best*Math.PI/2,y=groundY(S.x,S.z);
  // world-space geometry straight under HUB.grp, so the hub distance culling (hubCull*) handles it like every other building
- const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(LD_SW,LD_SW,LD_SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
+ const X=new THREE.Matrix4().makeTranslation(S.x,y,S.z).multiply(new THREE.Matrix4().makeRotationY(a)).multiply(new THREE.Matrix4().makeScale(SW,SW,SW)).multiply(new THREE.Matrix4().makeTranslation(-c.x,-box.min.y,-c.z));
  P.g=[];P.tris=0;for(const[g,mat]of parts){g.applyMatrix4(X);g.computeBoundingSphere();const o=new THREE.Mesh(g,mat);o.name=nm;o.receiveShadow=true;if(mat===CR_GM)o.renderOrder=2;HUB.grp.add(o);hubCullAdd(o);P.g.push(o);P.tris+=(g.index?g.index.count:g.attributes.position.count)/3}
- const cs=Math.cos(a),sn=Math.sin(a),cx=S.x+ox*cs+oz*sn,cz=S.z-ox*sn+oz*cs,odd=best%2,col={x:cx,z:cz,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*LD_SW};
+ const cs=Math.cos(a),sn=Math.sin(a),cx=S.x+ox*cs+oz*sn,cz=S.z-ox*sn+oz*cs,odd=best%2,col={x:cx,z:cz,hw:odd?hd:hw,hd:odd?hw:hd,h:y+(box.max.y-box.min.y)*SW};
  HUB.bld.push(col);hubGridAdd([col]);P.at={x:+S.x.toFixed(1),z:+S.z.toFixed(1),yaw:best,y:+y.toFixed(2)};P.col=col}
 // v89v: more world props (one entry per converted building; each placed on the next free lot from the start, the bank first)
 const LD_PROPS=[{id:'cgarage',nm:'ld_cgarage',br:()=>LD_br('cga').concat(LD_br('cgb'))}];
@@ -114,4 +118,5 @@ function LD_propBuild(){if(CID!=='fra'||LDP.g||!HUB.grp)return;LD_propMake(LDP,L
  for(const q of LD_PROPS){if(q.g)continue;try{LD_propMake(q,q.br(),q.nm)}catch(e){console.warn('LD prop',q.id,e)}}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{LD_propBuild()}catch(e){console.warn('LD prop',e)}return r})(buildRoam);
 window.__ld.grpLo=(B,lv)=>{const l=CR_LO;CR_LO=lv||2;try{const G=GB_geo(B,null),g=new THREE.Group();G.m=LD_cull(G.m,B);G.l=LD_cull(G.l,B);if(G.m)g.add(new THREE.Mesh(G.m,GB_MAT));if(G.l)g.add(new THREE.Mesh(G.l,GB_LMAT));if(G.g)g.add(new THREE.Mesh(G.g,CR_GM));return g}finally{CR_LO=l}};// test hook: a prop as the world builds it (CR_LO 2)
+window.__ld.fig=()=>{const M=[],L=[];GB_figGeo(GB_figGet(),M,L,false);const g=new THREE.Group();if(M.length)g.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)g.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));return g};window.__ld.SW=LD_SW;window.__ld.FIG=LD_FIG;// test hooks: a standing game minifig, the scales
 window.__ld.prop=LDP;window.__ld.props=LD_PROPS;window.__ld.propBuild=LD_propBuild;
