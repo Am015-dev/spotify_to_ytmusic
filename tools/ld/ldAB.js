@@ -4,6 +4,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 (async()=>{const [url,mpd,id,out,yaw='0',hide='']=process.argv.slice(2);const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const p=await (await b.newContext({viewport:{width:900,height:500}})).newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));
  await p.goto(url);await p.waitForFunction(()=>window.__ld&&window.__mho,null,{timeout:240000});
+ await p.evaluate(i=>__ld.need?__ld.need([i]):0,id);
  const r=await p.evaluate(async([mpd,id,yaw,hide])=>{const T=__ld.THREE,{LDrawLoader}=await import('/ld/vendor/LDrawLoader.js');const L=new LDrawLoader();L.setPartsLibraryPath('/ld/lib/ldraw/');
   await L.preloadMaterials('/ld/lib/ldraw/LDConfig.ldr');const g0=await L.loadAsync(mpd);const H=hide?hide.split(','):[];
   g0.traverse(o=>{if(o.isLineSegments)o.visible=false;if(H.some(h=>(o.userData.fileName||o.name||'').toLowerCase().includes(h)))o.visible=false});
