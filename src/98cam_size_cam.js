@@ -8,9 +8,9 @@
 const CAM={on:1,k:'',due:0,f:0,P:null,T:{},cur:null,asp:0,sP:.62,fill:.24,m:.3,ahead:10,n:{fit:0,keep:0},go:null,log:[]};
 const _cmV=new THREE.Vector3(),_cmB=new THREE.Box3();
 // side profile in the car frame: z forward from RO, y up from RO.y; bins of 0.5 m → top height; g = lowest point (tyre bottoms)
-function CAM_prof(){const ud=pl&&pl.mesh&&pl.mesh.userData,host=ud&&ud.m;if(!host)return null;host.updateMatrixWorld(true);
- const sh=Math.sin(RO.h),ch=Math.cos(RO.h),bins=new Map();let z0=1e9,z1=-1e9,g=1e9,top=-1e9,n=0;
- const add=(x,y,z)=>{const dz=(x-RO.x)*sh+(z-RO.z)*ch,dy=y-RO.y;if(!isFinite(dz)||!isFinite(dy))return;const k=Math.round(dz*2);bins.set(k,Math.max(bins.get(k)??-1e9,dy));z0=Math.min(z0,dz);z1=Math.max(z1,dz);g=Math.min(g,dy);top=Math.max(top,dy);n++};
+function CAM_prof(host,F){if(!host){const ud=pl&&pl.mesh&&pl.mesh.userData;host=ud&&ud.m}if(!host)return null;host.updateMatrixWorld(true);F=F||{x:RO.x,y:RO.y,z:RO.z,h:RO.h};
+ const sh=Math.sin(F.h),ch=Math.cos(F.h),bins=new Map();let z0=1e9,z1=-1e9,g=1e9,top=-1e9,n=0;
+ const add=(x,y,z)=>{const dz=(x-F.x)*sh+(z-F.z)*ch,dy=y-F.y;if(!isFinite(dz)||!isFinite(dy))return;const k=Math.round(dz*2);bins.set(k,Math.max(bins.get(k)??-1e9,dy));z0=Math.min(z0,dz);z1=Math.max(z1,dz);g=Math.min(g,dy);top=Math.max(top,dy);n++};
  host.traverse(o=>{if(!o.isMesh)return;for(let q=o;q&&q!==host;q=q.parent)if(!q.visible)return;if(o.material&&o.material.visible===false)return;const P=o.geometry&&o.geometry.attributes.position;if(!P)return;
   if(o.isInstancedMesh){if(!o.boundingBox)o.computeBoundingBox();_cmB.copy(o.boundingBox).applyMatrix4(o.matrixWorld);for(let i=0;i<8;i++){_cmV.set(i&1?_cmB.max.x:_cmB.min.x,i&2?_cmB.max.y:_cmB.min.y,i&4?_cmB.max.z:_cmB.min.z);add(_cmV.x,_cmV.y,_cmV.z)}return}
   const st=Math.max(1,Math.floor(P.count/6000));for(let i=0;i<P.count;i+=st){_cmV.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);add(_cmV.x,_cmV.y,_cmV.z)}});
@@ -20,10 +20,10 @@ const CAM_s=(b,h,th,T,z,y)=>.5+Math.tan(Math.atan2(h-y,z+b)-th)/(2*T);
 function CAM_eval(P,b,h,th,T){const pz=P.z1+CAM.ahead,py=P.g;let clr=1e9,smin=1e9,smax=-1e9;
  for(const[z,y]of P.B){const ry=h+(py-h)*(z+b)/(pz+b);clr=Math.min(clr,ry-y);for(const yy of[y,P.g]){const s=CAM_s(b,h,th,T,z,yy);smin=Math.min(smin,s);smax=Math.max(smax,s)}}
  return{clr,sP:CAM_s(b,h,th,T,pz,py),fill:Math.min(1,smax)-Math.max(0,smin),smax}}
-const CAM_ok=e=>e.clr>=CAM.m&&e.sP>=.42&&e.sP<=.82&&e.fill>=.16&&e.fill<=.34&&e.smax<=.98;
-function CAM_vfov(){const a=camera.aspect||1.5,f=TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0);return(a<.9?Math.min(100,f*(1+.5*Math.min(1,(.9-a)/.45))):f)*Math.PI/180}
+const CAM_ok=e=>e.clr>=CAM.m&&e.sP>=.42&&e.sP<=.82&&e.fill>=.17&&e.fill<=.33&&e.smax<=.95;
+function CAM_vfov(asp){const a=asp||camera.aspect||1.5,f=TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0);return(a<.9?Math.min(100,f*(1+.5*Math.min(1,(.9-a)/.45))):f)*Math.PI/180}
 function CAM_base(n){const k=SC_S&&SC_S.on?BC.D0.cam:1,C=SC_RC0[n];return{b:C.b*k,h:C.h*k,l:C.l*k,ly:C.ly*k,bk:C.bk*k,hk:C.hk*k,lk:C.lk*k}}
-function CAM_solve(P,n){const C0=CAM_base(n),T=Math.tan(CAM_vfov()/2);
+function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
  const th0=Math.atan2(C0.h-C0.ly,C0.l+C0.b),e0=CAM_eval(P,C0.b,C0.h,th0,T);if(CAM_ok(e0))return Object.assign({keep:1,e:e0},C0);
  let best=null,bc=1e9;const bMin=Math.max(C0.b*.8,-P.z0+1.5),aim=Math.atan(2*(CAM.sP-.5)*T);
  for(let b=bMin;b<=60;b+=.25)for(let h=Math.max(1.2,C0.h*.8);h<=30;h+=.1){const aP=Math.atan2(h-P.g,P.z1+CAM.ahead+b),th=aP-aim,e=CAM_eval(P,b,h,th,T);if(!CAM_ok(e))continue;
@@ -78,4 +78,20 @@ function CAM_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
  try{gbOpen();GAR_select(R[0])}catch(e){G.done=-1;return'📍 Can\'t switch the ride here'}
  let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>150){try{gbClose(true)}catch(e){}setTimeout(place,400)}else setTimeout(w,200)};setTimeout(w,300);
  return'📍 '+R[1]+' · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height'}
-window.__cam={S:CAM,meas:CAM_meas,pass:m=>CAM_pass(m||CAM_meas()),go:CAM_go,fit:()=>{CAM.k='';CAM.due=0;CAM_fit();return CAM.T},prof:()=>CAM.P&&{L:CAM.P.L,H:CAM.P.H,z0:CAM.P.z0,z1:CAM.P.z1,g:CAM.P.g},rc:()=>RCAM[SET.rcam||'chase'],cp:()=>CAM.cp||null,settled:()=>{const n=SET.rcam||'chase',T=CAM.T[n],c=CAM.cur;if(RO.foot&&RO.foot!=='car')return true;if(!T||!c||CAM.pend||Math.abs((camera.aspect||1)-CAM.asp)>.05)return false;return['b','h','l','ly'].every(q=>Math.abs((c[q]??0)-(T[q]??0))<.05)},sel:()=>{try{return GAR_get().sel}catch(e){return null}}};
+// ---- audit (cam-1 queue: "every ride, state only, < 60 s"): each ride is built off-screen at the origin facing +z (as RSZ.meas does), its chase
+// camera solved for 852×393 and 393×852, then a virtual camera at that pose: raycast to the road 10 m past the nose (blocked by the ride?), project the
+// ride's vertices (share of the screen height) and the road point (lower middle?). Returns [{id,n,L,H,land:{…},port:{…},ok}] and the failures.
+function CAM_view(g,P,s,asp){const vc=new THREE.PerspectiveCamera(CAM_vfov(asp)*180/Math.PI,asp,.1,2000);vc.position.set(0,s.h,-s.b);vc.lookAt(0,s.ly,s.l);vc.updateMatrixWorld(true);vc.updateProjectionMatrix();
+ const objs=[g.userData.m],v=new THREE.Vector3();let y0=1e9,y1=-1e9;g.userData.m.traverse(m=>{if(!m.isMesh)return;for(let q=m;q&&q!==g;q=q.parent)if(!q.visible)return;const A=m.geometry&&m.geometry.attributes.position;if(!A)return;
+  const st=Math.max(1,Math.floor(A.count/3000));for(let i=0;i<A.count;i+=st){v.fromBufferAttribute(A,i).applyMatrix4(m.matrixWorld).project(vc);if(v.z>1)continue;y0=Math.min(y0,v.y);y1=Math.max(y1,v.y)}});
+ const Pt=new THREE.Vector3(0,P.g+.05,P.z1+CAM.ahead),dir=Pt.clone().sub(vc.position),d=dir.length();dir.normalize();const rc=new THREE.Raycaster(vc.position.clone(),dir,0,d-.05);rc.camera=vc;
+ const hit=rc.intersectObjects(objs,true).filter(i=>{const m=i.object;for(let q=m;q&&q!==g;q=q.parent)if(!q.visible)return false;return!(m.material&&(m.material.transparent&&m.material.opacity<.6||m.material.visible===false))}).length,sp=Pt.clone().project(vc);
+ const r={bot:+((1-y0)/2).toFixed(3),fill:+((Math.min(1,y1)-Math.max(-1,y0))/2).toFixed(3),rx:+((sp.x+1)/2).toFixed(3),ry:+((1-sp.y)/2).toFixed(3),hit,b:+s.b.toFixed(2),h:+s.h.toFixed(2),keep:!!s.keep};r.ok=!hit&&r.bot<=.98&&r.rx>=1/3&&r.rx<=2/3&&r.ry>=.4&&r.ry<=.85&&r.fill>=.15&&r.fill<=.35;return r}
+async function CAM_audit(ids,stock){const t0=performance.now(),b0=gbBuild()||GB.d,L=(ids?ids.map(GAR_set):RSZ.sets()).filter(Boolean),need=[];for(const S of L){try{need.push(...LD_probe(()=>[].concat(GAR_arr(S.car()))))}catch(e){}}
+ if(need.length)await LD_need(need);const out=[];
+ for(const S of L){let g=null;try{const B=G9C_bricks(S,'car');RSZ.S=S;g=shipMesh(gbTeam(TEAMS[teamIdx],Object.assign({},b0,{on:true,bricks:B})));scene.add(g);SC_ship(g,true);CR_fx({boatK:0},g.userData);g.position.set(0,0,0);g.rotation.set(0,0,0);g.updateMatrixWorld(true);
+   const P=CAM_prof(g.userData.m,{x:0,y:0,z:0,h:0});if(!P){out.push({id:S.id,n:S.n,err:'no profile'});continue}const o={id:S.id,n:S.n,L:+P.L.toFixed(2),H:+P.H.toFixed(2)};
+   for(const[k,a]of[['land',852/393],['port',393/852]]){const s=stock?Object.assign({keep:1},CAM_base('chase')):CAM_solve(P,'chase',a);o[k]=CAM_view(g,P,s,a);if(s.fail)o[k].fail=1}o.ok=o.land.ok&&o.port.ok;out.push(o)}
+  catch(e){out.push({id:S.id,n:S.n,err:String(e).slice(0,80)})}finally{RSZ.S=null;if(g){scene.remove(g)}}}
+ const bad=out.filter(o=>!o.ok);return{n:out.length,ok:out.length-bad.length,ms:Math.round(performance.now()-t0),bad,all:out}}
+window.__cam={S:CAM,audit:CAM_audit,meas:CAM_meas,pass:m=>CAM_pass(m||CAM_meas()),go:CAM_go,fit:()=>{CAM.k='';CAM.due=0;CAM_fit();return CAM.T},prof:()=>CAM.P&&{L:CAM.P.L,H:CAM.P.H,z0:CAM.P.z0,z1:CAM.P.z1,g:CAM.P.g},rc:()=>RCAM[SET.rcam||'chase'],cp:()=>CAM.cp||null,settled:()=>{const n=SET.rcam||'chase',T=CAM.T[n],c=CAM.cur;if(RO.foot&&RO.foot!=='car')return true;if(!T||!c||CAM.pend||Math.abs((camera.aspect||1)-CAM.asp)>.05)return false;return['b','h','l','ly'].every(q=>Math.abs((c[q]??0)-(T[q]??0))<.05)},sel:()=>{try{return GAR_get().sel}catch(e){return null}}};

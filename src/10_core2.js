@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.15',date:'13 Oct 2026',items:[{t:'FIXED',s:'Floating glow blobs at mission markers are gone (glows follow their ground ring).'},{t:'CHANGED',s:'The chase camera now fits every one of the 157 rides.'}]},
   {v:'v90m-beta.13',date:'13 Oct 2026',items:[{t:'CHANGED',s:'Road-gap check now draws its own top-down picture, so it fails when the gap is back.'}]},
   {v:'v90m-beta.12',date:'13 Oct 2026',items:[{t:'CHANGED',s:'On-foot camera sits higher so you see the road ahead past your minifig; the camera also fits big vehicles (bus, trucks).'},{t:'FIXED',s:'Glowing blobs around mission markers are gone.'}]},
   {v:'v90m-beta.11',date:'13 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the road gap by the Festhalle (south grid seam) is closed.'}]},

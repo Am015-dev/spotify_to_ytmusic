@@ -83,7 +83,7 @@ file | KB | purpose | first defines
 98ct_city_lego.js | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big va | CT CT_SWAP CT_SC
 98sz_ride_scale.js | 8 | RSZ (size-1, 2026-10-10). Alex: "many of the big veh | RSZ SZ_f SZ_fac
 98sz2_ride_audit.js | 8 | RSZ audit (size-2, 2026-10-13): measures EVERY garag | RSZ_go RSZ_human
-98of_onfoot.js | 64 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
+98of_onfoot.js | 65 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
 98sh_shadow.js | 4 | SHB (v90k): soft blob shadows on the ground under th | SHB SHB_pool SHB_M
 98lf_lively_fill.js | 19 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
 99c_checklist.js | 82 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | OD_CHECKLIST
@@ -100,7 +100,7 @@ file | KB | purpose | first defines
 98tq_test_quick.js | 5 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z] | TQ_url
 98rs_road_seams.js | 5 | RS: ROAD SEAMS (art-1, 2026-10-13). Alex (v90m-beta. | RS_OFF RS_seams RS
 98lm_liveliness.js | 5 | LVM: LIVELINESS METER (art-1, 2026-10-13). Alex: "Al | LVM_SPOTS LVM_T LVM_HR
-98cam_size_cam.js | 13 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
+98cam_size_cam.js | 16 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
 99_api.js | 49 | test API window.__mho={…} (state, roamSim, warp, gnd | __mho CR_RBX CR_raceHide
 test/fast.js | 5 | FAST · test-only fast mode, active only with ?fast=1 | FAST
 test/g9iter.js | 0 | test-only (local builds): eval in module scope for t | __g9ev
