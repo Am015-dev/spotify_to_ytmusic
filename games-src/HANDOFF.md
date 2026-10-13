@@ -24,8 +24,20 @@ Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BR
   - `session_0173P8APho8S4jxLQSJj26oe` Nightrun K2: stages + map, difficulty curve, strategic shop/garage/market.
   - In this session's checkout a look fixer was deploying Crown, Sands, Tidewake, Thornbound, Cauldron (label sizes, tap targets, Got it button); check `git log` for "Look fixes" and finish any not live.
 - **Open items:** Nightrun quick sweep failed on rhythm/difficulty/story-lock/tune items after the boss deploy (likely K2's in-progress work; K2's deploy must clear them). Nightrun needs LAB/scenarios adopted after K2 (note above). Owner may want the Overdrive car-damage request handled by the Overdrive session (session_017iH3DB4VyxwKSdMwsco4Ut).
-- **Watchdog:** routine `trig_01SnC3sNN1s8bCYNsQCoo8u1` runs hourly at :38 in a fresh **Haiku** session (not in any orchestrator): sends wrap-ups (commit, push, HANDOFF, deploy what passed), archives 20 min later, starts one replacement; log under "## Watchdog log" at the end of this file.
+- **Fast tests, game-industry style** (owner: "lab tests are extremely stupid" / "fast tests like game industry"): `session_01FAqai6WD8dZNr6tGwzjBBW` builds the test pyramid on Crown + Doorkick: (1) engine unit + invariant tests and 1,000 seeded headless AI games in < 10 s (node, no browser); (2) thin UI smoke < 30 s (errors, 404s, glowing targets respond, text, numbers = engine); (3) owner QA via ✔ Test / LAB GO. Deploy gate = 1 + 2, < 60 s per game. If it works, roll out (Sonnet, 2-3 games per worker).
+- **Watchdog:** 4 Haiku routines, every 15 min (:08 trig_01A9jTmTB2EvmdBmHtwKsW5X, :23 trig_01Tbt3WcM5AgSMDhNdgPVbhK, :38 trig_01SnC3sNN1s8bCYNsQCoo8u1, :53 trig_016JC8qhbc7XGpWJgNebEAyB), each a fresh session: UNBLOCKS any worker waiting for an answer (fix the real cause, never bypass checks), sends wrap-ups (commit, push, HANDOFF, deploy what passed), archives finished workers, starts one replacement; log under "## Watchdog log".
 - **Owner is frustrated by slowness:** target ≤ 15 min per game from start to live; report real times. Hand off this orchestrator at ~150k context.
+
+## Worker groups (13 Oct 2026, 23:10 UTC) — one worker per game, max 15, titles start with the group tag
+| Group | Worker (session) | Model | Games | Status |
+|---|---|---|---|---|
+| [ART] | session_011jRzpiYd1pxZRj3N2mtQGt | Sonnet | Sands of Qamar (31 paintings wired in source) | fix gold-badge digit contrast, deploy (old worker archived, over context) |
+| [ART] | session_01VZTUufsMh4x1FxGCz95a9S | Sonnet | Final Approach, Short Fuse (2 + 2) | fixing phone-check cause, then deploy |
+| [TESTS] | session_01FAqai6WD8dZNr6tGwzjBBW | Sonnet | pilot: Crown, Doorkick | fast test pyramid (engine tests + UI smoke < 60 s) |
+| [LAB] | session_01VxGyhTM7mpMZhPEraRLygh | Sonnet | all games | LAB menu + pinned checklist GO: 9 live, 6 to go |
+| [OPS] | routine trig_01SnC3sNN1s8bCYNsQCoo8u1 | Haiku | all workers | hourly watchdog at :38 |
+Done today (archived): art wiring for Hollowbough, Rampart, Nebula, Lantern, Shipwreck, Crown, Tidewake, Cauldron, Sunglaze, Thornbound, Kaiten, Doorkick; Nightrun phone HUD.
+Next after the [TESTS] pilot passes: one [TESTS] worker per remaining game (13), Sonnet, all in parallel (≤ 15 total).
 
 ## Checks: two speeds + scenarios (13 Oct 2026) — read `PLAYBOOK.md` "Iterate fast, check once"
 - `build-all.py --quick <slug>` (phone-check + scenarios + QUICK sweep) to iterate; `--deploy <slug>` = full sweep once, then live. Numbers: `CHECK-SPEED.md`.
@@ -109,3 +121,15 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
 - **Shelf:** the 3 new games are not on it yet. To add them, run `games-src/room/add-new-games.py` (covers are
   ready).
 - **Art:** the owner will make art with Google Flow later; each game has a prompt list in `ART-PROMPTS.md`.
+
+## Final Approach + Short Fuse: art wired, deploy blocked by phone-check (13 Oct 2026)
+Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist items); Thornbound and Kaiten Kitchen are live.
+`build-all.py --deploy <slug>` stops at phone-check. **The currently live games fail the same checks** (run `GAMES_DIR=$PWD/games PC_OUT_DIR=/tmp/pc node games-src/scripts/phone-check.js <slug>`), so the new art is not the cause.
+- **final-approach:** "slow" = one tap in every run takes 400-950 ms (limit 800). It is always the same tap: placing a die on "Axis, any die" (the 4th move). Median tap is ~120 ms. A GPU upload warm-up of all PIXI textures after `pxTextures()` (ui7.js) did not change it, so it is not first-use texture upload; next step is a CDP profile of that tap (suspects: the computer's reply / `render()` after a placement, PIXI scene rebuild).
+- **short-fuse:** "2 dead taps" in the rotation scenarios (P>L, stale; sometimes L>P): after rotating, taps on the candidates "2" and "Wire C" change nothing within 1 s. Not investigated yet; start with the rotation relayout (`gx-viewport.js` + the game's resize handler) and whether the board is re-laid out before the candidates are tapped.
+- `phone-check.js` now prints each tap's latency (slow taps labelled) and which taps were dead, to make this faster to chase.
+## Sands of Qamar painted art wiring (13 Oct, worker)
+- Wired (sources, committed, not live yet): tile glyph medallions, tile frames, badges, star icon, goods-card, nameplate, djinn bar, ribbon, finger, bubble tail, item and trophy pictures (`html.sk-pl`, scenario `sq-art`). Not used: `ui-seat-chip` (its frame is too thick for 4-5 seat chips).
+- Deploy blocked by the look gate: `contrast|b.tv` (digits on the gold badge, 1.5-2.7:1 depending on the tile behind). The look check measures what is behind the digits; the badge picture now sits on `.tv::before` over a solid `#f4c04a`. `btn.sm` plate fixed; goods row has 44 px boxes. Next: lift `.tv` text contrast (e.g. a cream plate behind the digits), run `NODE_PATH=/opt/node-tools/node_modules python3 games-src/scripts/build-all.py --deploy sands-of-qamar`, then `look-check.js --baseline --game sands-of-qamar`, `add-update.py sands-of-qamar "Painted art wired" "item" --check "..." --scn sq-art`.
+- Note: export `NODE_PATH=/opt/node-tools/node_modules` before build-all (the look gate crashes otherwise).
+- Doorkick Dungeon: live (hand/level icons, bubble tail, 3D winner heroes; scenarios dk-art, dk-tips, dk-status-line).

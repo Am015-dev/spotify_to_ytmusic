@@ -2,17 +2,15 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 663 paintings, 59 3D models. Still to wire: 52 paintings, 0 models.
+Wired: 674 paintings, 59 3D models. Still to wire: 41 paintings, 0 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | sands-of-qamar | 31 | 0 |
-| crown-city-smash | 7 | 0 |
-| cauldron-fair | 4 | 0 |
 | lantern-dive | 3 | 0 |
+| shipwreck-isle | 2 | 0 |
 | short-fuse | 2 | 0 |
 | final-approach | 2 | 0 |
-| shipwreck-isle | 2 | 0 |
 | nebula-aces | 1 | 0 |
 
 ## sands-of-qamar
@@ -53,31 +51,6 @@ Wired: 663 paintings, 59 3D models. Still to wire: 52 paintings, 0 models.
 | Wave 1 Wave 1 (16:9) | `ui-djinn-bar` | a long narrow banner plaque in deep violet lacquer with a thin hammered-gold border and small gold stars at bo |
 | Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank curling ribbon banner in terracotta with gold edges, centre empty, single object, centred, plain flat  |
 
-## crown-city-smash
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 2 Wave 2 | `icon-crown` | a small gold crown, chunky, thick ink outline, single object, centred, plain flat white background, no shadow, |
-| Wave 2 Wave 2 | `ui-button-ghost` | a blank wide horizontal pill-shaped button outline about three times wider than tall, thick dark ink rim, see- |
-| Wave 2 Wave 2 | `ui-button-pink` | a blank wide horizontal pill-shaped button plate about three times wider than tall, neon pink enamel with a th |
-| Wave 2 Wave 2 | `ui-button-yellow` | a blank wide horizontal pill-shaped button plate about three times wider than tall, bright yellow enamel with  |
-| Wave 2 Wave 2 | `ui-hud-chip` | a blank rounded comic-book chip plate in cream with a thick dark ink border and a halftone corner, wider than  |
-| Wave 2 Wave 2 (16:9) | `ui-dice-tray` | a long rounded dice tray lined with green felt and a dark wood rim, seen from above, empty, single object, cen |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of glossy dark-purple enamel with a chrome outline, single object, cen |
-
-## cauldron-fair
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `btn-draw` | a big friendly clay button with a drawstring bag on it, single object, centred, plain flat white background, n |
-| Wave 3 Wave 3 (16:9) | `ui-chipbar` | a long narrow carved wooden track with seven shallow round pockets in a row, empty, single object, centred, pl |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of fairground parchment with a copper outline, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of fairground parchment with a thin copper edge and a small potion green diamond at the lef |
-
 ## lantern-dive
 
 3D: none
@@ -87,6 +60,15 @@ Wired: 663 paintings, 59 3D models. Still to wire: 52 paintings, 0 models.
 | Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
+
+## shipwreck-isle
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
 ## short-fuse
 
@@ -105,15 +87,6 @@ Wired: 663 paintings, 59 3D models. Still to wire: 52 paintings, 0 models.
 |---|---|---|
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
-
-## shipwreck-isle
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
 ## nebula-aces
 
