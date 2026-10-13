@@ -81,7 +81,7 @@ Alex: "make tracks, but make sure they are fun as the ones in youtube meaning hi
 | STUNT SC | a split: an asphalt lane behind the island with a lane kicker (wedge 22 m wide) | lane top speed auto-balanced (see L17) |
 | LANDMARK | Messeturm, Kaiserdom, Römer, Eiserner Steg (an arch you drive under), Mainhattan skyline · Akropolis, Syntagma, Lykavittos, Plaka, Piraeus | sight range 600–2400 m |
 | FLYOVER | automatic where the course crosses itself ≥ 12 m apart | abutment skirts, deck underside, no hills |
-Juice: the chase cam lifts ≤ 2.2 m and backs off ≤ 2.4 m in the air; a 0.22 s slow-mo at the apex; dust ring + shake + "STUNT 2.6 s" award and a short boost on landing.
+Juice: in big air the chase cam backs off ≤ 10 m and rises ≤ 5.5 m (eases out in the last 4 m before the landing) so the height and the landing read; a 0.35 s slow-mo at the apex; dust ring + shake + "STUNT 2.6 s" award and a short boost on landing.
 
 ### New lint rules
 | ID | rule | pass when | why |
@@ -90,3 +90,8 @@ Juice: the chase cam lifts ≤ 2.2 m and backs off ≤ 2.4 m in the air; a 0.22 
 | L17 | **Route splits** | ≥ 2 splits per lap of ≥ 2 kinds (boat / dirt / stunt), each on a bend, 200–800 m; the alt lane's top speed = base × length ratio ρ × measured factor, so every route is within ±5 % (checked in tRace, road vs alt) | "alternative roads" (Alex); MK / Trackmania: a risky line next to a safe one |
 | L18 | **Landmark on screen** | a landmark inside ±38° of the heading (±63° when < 200 m) and within its sight range ≥ 50 % of the lap time | 2K: a landmark is always on screen; you name the place you race in |
 | L19 | **Elevation range** | highest − lowest point ≥ 15 m | climbs and drops (the reference jump is off a crest onto a lower road) |
+
+### Look (coordinator review of the first grid: "jumps don't read big, landmarks invisible, generic green fields")
+- Every big jump launches straight at a landmark 560–750 m ahead (`tools/tbDemo.mjs` lm offset `"ahead:D:A"`, kept ≥ 25 m clear of the course).
+- LEGO city blocks (Frankfurt facades / Athens white-ochre cubes, flat roofs) on the hill slopes 64–118 m beside every builder course (TS_city), not on flyover, water, sea or gap rows.
+- Split lanes: dirt / water splits need R ≥ 150 m (low grip pushed cars onto the island on R 96–121 m bends: 0.5–1.1 wall hits/min), stunt (asphalt) R ≥ 90 m.
