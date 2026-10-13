@@ -78,14 +78,14 @@ function OF_doorPlace(B,on){const P=['left','top','right','bottom','transform'];
   const r=B.getBoundingClientRect(),gap=e=>{if(!e||!e.offsetWidth)return 999;const q=e.getBoundingClientRect();return Math.round(Math.max(q.left-r.right,r.left-q.right,q.top-r.bottom,r.top-q.bottom))};OF.doorGap={n:gap(N),g:gap(G)}}
 function OF_btns(){const B=$('#tB'),G=$('#tG'),N=$('#tN');if(!B)return;if(!OF_lbl0)OF_lbl0={g:G&&G.innerHTML,n:N&&N.innerHTML};
   const foot=RO.foot!=='car';document.body.classList.toggle('onfoot',foot);let want;
-  if(foot)want=RO.foot==='walk'&&OF.near?(OF.near.k==='traf'?'take':'enter'):'hide';else want=OF_canExit()?'exit':'brake';
-  if(want!==OF.btn){OF.btn=want;B.classList.toggle('ofDoor',want==='exit'||want==='enter'||want==='take');B.classList.toggle('ofHide',want==='hide');
-    if(want==='exit')B.textContent='🚪 EXIT';else if(want==='enter')B.textContent='🚪 ENTER';else if(want==='take')B.textContent='🚗 TAKE';else B.textContent=TOUCH.park?'GO ▶':'BRAKE';OF_doorPlace(B,want==='exit'||want==='enter'||want==='take')}
+  if(foot){const a=RO.foot==='walk'&&OF.act;want=!a?'hide':a.k==='traf'?'take':a.k==='car'?'enter':a.k}else want=OF_canExit()?'exit':'brake';
+  if(want!==OF.btn){OF.btn=want;const door=want!=='hide'&&want!=='brake';B.classList.toggle('ofDoor',door);B.classList.toggle('ofHide',want==='hide');
+    if(want==='exit')B.textContent='🚪 EXIT';else if(want==='enter')B.textContent='🚪 ENTER';else if(want==='take')B.textContent='🚗 TAKE';else if(want==='npc')B.textContent='👋 HI';else if(want==='bench')B.textContent='🪑 SIT';else if(want==='mission')B.textContent='📋 TALK';else B.textContent=TOUCH.park?'GO ▶':'BRAKE';OF_doorPlace(B,door)}
   if(foot!==!!OF.lblFoot){OF.lblFoot=foot;if(G)G.innerHTML=foot?'RUN':OF_lbl0.g;if(N)N.innerHTML=foot?'JUMP':OF_lbl0.n;const u=document.querySelector('#roamGauge small');if(u)u.textContent=foot?'ON FOOT':'KM/H';if(foot&&OF.dom)requestAnimationFrame(()=>OF.dom.home())}}
 // EXIT is offered only when the car is stopped and idle (no gas/brake held for 0.5 s), on the ground, not in a cutscene/menu/event, not a boat
 function OF_canExit(){if(state!=='roam'||!RO.on||RO.frozen||RO.wk||!pl||pl.air||RO.sp||RO.card||RO.mapOpen||RO.story)return false;if(typeof M1!=='undefined'&&M1.cs)return false;
   if(pl.boatMode||(pl.vmode&&pl.vmode!=='car'&&pl.vmode!=='4x4'))return false;if(TOUCH.park)return Math.abs(RO.v)<2.2;return Math.abs(RO.v)<2.2&&OF.idle>.5}
-function OF_door(){if(RO.foot==='car'){if(OF_canExit())OF_exit()}else if(RO.foot==='walk'&&OF.near)OF_enter(OF.near)}
+function OF_door(){if(RO.foot==='car'){if(OF_canExit())OF_exit()}else if(RO.foot==='walk')OF_use(OF.act)}
 // --- EXIT: car stops, driver hidden, minifig at the driver's door (left), else right, else behind
 // half extents of the driven body in its own frame (metres), clamped to car-like sizes
 function OF_ext(){try{const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(ud.m.matrixWorld).invert(),B=new THREE.Box3(),b=new THREE.Box3(),m=new THREE.Matrix4(),sc=new THREE.Vector3();ud.m.getWorldScale(sc);
@@ -220,7 +220,7 @@ enterRoam=(f=>function(){OF_jackEnd();OF_fleeEnd();OF.star.n=0;OF.star.t=0;RO.fo
 if(typeof M1_fire==='function')M1_fire=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(M1_fire);
 const OF_m1=()=>typeof M1!=='undefined'&&(M1.cs||M1.inv||(typeof M1_wpn==='function'&&M1_wpn()));
 addEventListener('keydown',e=>{if(state!=='roam'||e.repeat||!(e.code==='KeyF'||e.code==='KeyE'))return;if(!$('#settings').hidden||RO.jOpen)return;
-  if(RO.foot==='walk'){e.preventDefault();if(OF.near)OF_enter(OF.near)}else if(RO.foot==='car'&&!OF_m1()&&OF_canExit()){e.preventDefault();OF_exit()}},true);
+  if(RO.foot==='walk'){e.preventDefault();OF_use(OF.act)}else if(RO.foot==='car'&&!OF_m1()&&OF_canExit()){e.preventDefault();OF_exit()}},true);
 addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat&&RO.foot==='walk')OF.jQ=.2},true);
 function OF_api(){return{state:RO.foot,x:+OF.x.toFixed(2),z:+OF.z.toFixed(2),y:+OF.y.toFixed(2),h:+OF.h.toFixed(3),spd:+OF.spd.toFixed(2),air:OF.air,near:OF.near&&{k:OF.near.k,x:+OF.near.x.toFixed(1),z:+OF.near.z.toFixed(1)},
   car:OF.car&&{x:+OF.car.x.toFixed(1),z:+OF.car.z.toFixed(1),h:+OF.car.h.toFixed(3)},parked:OF.vs.length,taken:OF.taken.length,own:OF.cur.own,btn:OF.btn,figH:OF.figH,n:Object.assign({},OF.n),log:OF.log.slice(-8),stk:OF.stk||[],canExit:OF_canExit(),doorGap:OF.doorGap,idle:+OF.idle.toFixed(2),
@@ -358,7 +358,7 @@ function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first
   const P=OF_pave();if(!P)return'📍 No clear pavement nearby · drive on and try again';
   if(kind==='car'){if(!OF_spawn(P))return'📍 Can\'t jump right now';const c=OF.car,fx=Math.sin(c.h),fz=Math.cos(c.h);OF.x=c.x+fz*1.9-fx*.3;OF.z=c.z-fx*1.9-fz*.3;OF.y=groundAt(OF.x,OF.z,c.y+1);OF.h=Math.atan2(c.x-OF.x,c.z-OF.z);OF.cy=OF.cyIn=OF.h;return'📍 YOUR CAR · 🚪 ENTER appears, tap it (PC: E)'}
   if(!OF_spawn(P))return'📍 Can\'t jump right now';
-  if(kind==='npc'){const p=OF_npcPick();if(!p)return'📍 No pedestrian free · try again';const x=P.x+Math.sin(P.h)*2.2,z=P.z+Math.cos(P.h)*2.2;p.ofS={x,z,h:P.h+Math.PI/2,go:1};OF.npc=p;return'📍 PEDESTRIAN AHEAD · walk up, tap 👋 HI (PC: E)'}
+  if(kind==='npc'){const p=OF_npcPick();if(!p)return'📍 No pedestrian free · try again';const x=P.x+Math.sin(P.h)*2-P.rx*.9,z=P.z+Math.cos(P.h)*2-P.rz*.9;  // ahead, a step towards the shops: in view beside the minifigp.ofS={x,z,h:P.h+Math.PI/2,go:1};p._x=x;p._z=z;p.y=groundAt(x,z,P.y+2);p.yc=1;OF.npc=p;return'📍 PEDESTRIAN AHEAD · walk up, tap 👋 HI (PC: E)'}
   return kind==='phone'?'📍 ON FOOT · half stick = walk, full stick = run':kind==='jump'?'📍 ON FOOT · JUMP (PC: Space)':'📍 ON FOOT · walk ahead, then turn (PC: WASD, Shift runs)'}
 function OF_npcPick(){const P=HUB.peds;if(!P)return null;const n=typeof LV_pn==='function'?LV_pn(P.length):P.length;let b=null,bd=-1;for(let i=0;i<n;i++){const p=P[i];if(p.cw||p.jy>0||p.ofS)continue;const d=p._x==null?1e9:Math.hypot(p._x-RO.x,p._z-RO.z);if(d>bd){bd=d;b=p}}return b}
 function OF_actEnd(){for(const p of HUB.peds||[])if(p.ofS)delete p.ofS}
@@ -366,3 +366,40 @@ OF_api=(f=>function(){const o=f(),P=OF.npc,v=P&&P.ofS;let face=null;if(v){face=+
   return Object.assign(o,{cy:+OF.cy.toFixed(3),cyIn:+OF.cyIn.toFixed(3),vx:+OF.vx.toFixed(2),vz:+OF.vz.toFixed(2),ph:+OF.ph.toFixed(3),footV:+(OF.footV||0).toFixed(2),gnd:+(OF.y-groundAt(OF.x,OF.z,OF.y+1)).toFixed(3),
     act:OF.act?OF.act.k:null,sit:!!OF.sit,npc:P?{d:+Math.hypot((P._x??0)-OF.x,(P._z??0)-OF.z).toFixed(2),w:v?+(v.w||0).toFixed(2):0,face,jy:+(P.jy||0).toFixed(2),bub:!!(OF.bub&&OF.bub.s.visible)}:null,
     flying:(HUB.peds||[]).filter(p=>p.jy>0&&p._x!=null&&Math.hypot(p._x-OF.x,p._z-OF.z)<6).length,card:!!RO.card,btnTxt:($('#tB')||{}).textContent||''})})(OF_api);
+// ===== OF ACT (foot-1): one context button on foot, nearest/most-faced target wins: 🚪 ENTER / 🚗 TAKE (cars), 👋 HI (a pedestrian: turns to you,
+// waves, says a line), 🪑 SIT (a bench; the stick or JUMP stands up), 📋 TALK (a mission giver: opens its card; starting it puts you back in your car).
+const OF_HI=['HI THERE!','HELLO!','NICE DAY!','HIGH FIVE!','LOVE YOUR CAR!','WATCH THE TRAFFIC!','GREAT HAT!','SEEN THE RIVER?'];
+function OF_say(txt,col){const cv=document.createElement('canvas');cv.width=256;cv.height=64;const g=cv.getContext('2d');g.font='900 italic 26px system-ui';const w=Math.min(248,g.measureText(txt).width+34),x0=128-w/2;
+  g.fillStyle='#ffffff';g.beginPath();g.roundRect(x0,4,w,44,16);g.fill();g.beginPath();g.moveTo(116,46);g.lineTo(128,62);g.lineTo(138,46);g.fill();g.lineWidth=4;g.strokeStyle=col||'#2a7de1';g.beginPath();g.roundRect(x0,4,w,44,16);g.stroke();
+  g.fillStyle='#1b1d22';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,128,27);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false,depthTest:false}));s.scale.set(2.4,.6,1);s.renderOrder=5;return s}
+function OF_bubOff(){const B=OF.bub;if(!B)return;if(B.s.parent)B.s.parent.remove(B.s);B.s.material.map.dispose();B.s.material.dispose();OF.bub=null}
+const OF_pedS=()=>typeof SC_S!=='undefined'&&SC_S&&SC_S.on?SC_K.ped:.66;
+function OF_acts(){const L=[],fx=Math.sin(OF.h),fz=Math.cos(OF.h),add=(k,o,d,x,z,bon)=>{const dx=x-OF.x,dz=z-OF.z,l=Math.hypot(dx,dz)||1,c=(dx*fx+dz*fz)/l;L.push({k,o,d,s:d+(1-c)*(k==='traf'?1.5:.6)-bon})};  // a passing car only wins when you face it
+  if(OF.near)add(OF.near.k==='traf'?'traf':'car',OF.near,OF_edge(OF.near)-(OF.near.k==='traf'?OF_JREACH-OF_NEAR:0),OF.near.x,OF.near.z,OF.near.k==='traf'?0:.4);
+  const P=HUB.peds||[],n=typeof LV_pn==='function'?LV_pn(P.length):P.length;for(let i=0;i<n;i++){const p=P[i];if(p._x==null||p.jy>0||Math.abs((p.y||0)-OF.y)>1.5)continue;const d=Math.hypot(p._x-OF.x,p._z-OF.z);if(d<2.8)add('npc',p,d,p._x,p._z,1)}
+  const PG=HUB.pgrid;if(PG){const kx=Math.floor(OF.x/16),kz=Math.floor(OF.z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){for(const q of PG.get((kx+a)*10000+kz+c)||[]){if(q.t!=='bench'||!q.alive||Math.abs((q.y||0)-OF.y)>1.2)continue;const d=Math.hypot(q.x-OF.x,q.z-OF.z);if(d<2.2)add('bench',q,d,q.x,q.z,.3)}}}
+  for(const m of RO.marks||[]){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(_ofBv),d=Math.hypot(v.x-OF.x,v.z-OF.z);if(d<3.5&&Math.abs(v.y-OF.y)<2)add('mission',m,d,v.x,v.z,1.2)}
+  let b=null;for(const q of L)if(!b||q.s<b.s)b=q;return b}
+function OF_use(a){if(!a||RO.foot!=='walk')return;OF.n.use=(OF.n.use||0)+1;
+  if(a.k==='car'||a.k==='traf')return OF_enter(a.o);
+  if(a.k==='npc'){const p=a.o,S=p.ofS||(p.ofS={x:p._x,z:p._z,h:0,rel:1});S.h=Math.atan2(OF.x-S.x,OF.z-S.z);S.w=1.6;S.t=Math.max(S.t||0,4);OF.npc=p;OF.h=Math.atan2(S.x-OF.x,S.z-OF.z);OF.vx=OF.vz=0;OF.wave=.9;
+    OF_bubOff();const s=OF_say(OF_HI[(OF.n.use*5+Math.floor(performance.now()/1000))%OF_HI.length]);HUB.grp.add(s);OF.bub={s,p,t:2.4};AU.sfx&&AU.sfx('pick');OF.log.push('hi');return}
+  if(a.k==='bench'){const q=a.o;OF.sit={x:q.x,z:q.z,y:q.y??groundAt(q.x,q.z,OF.y+1),h:(q.ry||0)+Math.PI,x0:OF.x,z0:OF.z,t:0};OF.vx=OF.vz=0;OF.spd=0;AU.sfx&&AU.sfx('brick');OF.log.push('sit');return}
+  if(a.k==='mission'){OF.vx=OF.vz=0;roamOpen(a.o);RO.cardPin=1;OF.log.push('talk');if(!$('#roamCard').hidden)OF.n.card=(OF.n.card||0)+1;return}}
+// per frame (walk): pick the target, run the greeting / bubble timers, sit
+function OF_actStep(dt){for(const p of HUB.peds||[]){const S=p.ofS;if(!S)continue;if(S.w>0)S.w-=dt;if(S.rel){S.t-=dt;if(S.t<=0)delete p.ofS}else if(Math.hypot(S.x-OF.x,S.z-OF.z)>30)delete p.ofS}
+  if(OF.wave>0)OF.wave-=dt;const B=OF.bub;if(B){B.t-=dt;const p=B.p;B.s.position.set(p._x??0,(p.y||0)+3.95*OF_pedS()+.45,p._z??0);if(B.t<=0)OF_bubOff()}
+  OF.act=RO.foot==='walk'&&!OF.sit?OF_acts():null}
+// sitting: the minifig slides onto the seat, legs forward; any stick push / JUMP stands up
+function OF_sitStep(dt){const S=OF.sit,I=OF_input();if(Math.hypot(I.fx,I.fy)>.25||I.jump){OF.sit=null;OF.jQ=0;OF.jHeld=true;OF.x+=Math.sin(OF.h)*.45;OF.z+=Math.cos(OF.h)*.45;OF.y=groundAt(OF.x,OF.z,OF.y+1);return false}
+  S.t=Math.min(1,S.t+dt*4);const e=S.t*S.t*(3-2*S.t);OF.x=S.x0+(S.x-S.x0)*e;OF.z=S.z0+(S.z-S.z0)*e;OF.h+=angDiff(S.h,OF.h)*Math.min(1,dt*10);OF.y=S.y;OF.vx=OF.vz=0;OF.spd=0;return true}
+OF_walk=(f=>function(dt){if(OF.sit&&OF_sitStep(dt))return;return f.apply(this,arguments)})(OF_walk);
+OF_figPose=(f=>function(dt){f.apply(this,arguments);const F=OF.fig;if(!F)return;const M=F.M,S=OF.sit;
+  if(S){const k=S.t;for(const l of[M.lL,M.lR])if(l)l.rotation.x=-1.5*k;if(M.aL)M.aL.rotation.x=-.3*k;if(M.aR)M.aR.rotation.x=-.3*k;F.g.position.y=S.y+(.42-.36*F.s)*k}
+  else if(OF.wave>0&&M.aR)M.aR.rotation.x=-2.7+Math.sin(performance.now()/90)*.35})(OF_figPose);
+OF_step=(f=>function(dt){f.apply(this,arguments);try{OF_actStep(Math.min(dt||0,.05))}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF act',e)}}})(OF_step);
+OF_actEnd=(f=>function(){f();OF_bubOff();OF.sit=null;OF.act=null;OF.wave=0})(OF_actEnd);
+OF_reset=(f=>function(){OF_actEnd();return f.apply(this,arguments)})(OF_reset);
+// starting a mission from its card while on foot: back into your car first (the event then places the car as usual)
+document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#rcGo')&&RO.foot&&RO.foot!=='car')OF_reset()},true);

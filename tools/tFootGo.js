@@ -40,7 +40,7 @@ const ang=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*M
   await W(300);let f=await F();ok(T,f.act==='npc'&&/HI/.test(f.btnTxt),'👋 HI button shows next to a person',{act:f.act,btn:f.btnTxt,d:f.npc&&f.npc.d});
   await shot('foot_npc_prompt.jpg');
   const tp=await tapEl('#tB');const tT=Date.now();const L=await samp(700,40);const r=L.find(q=>q.npc&&q.npc.w>0&&q.npc.face!=null&&q.npc.face<.35&&q.npc.bub);
-  ok(T,tp&&!!r&&r.t-tT<=500,'tap HI: person faces you, waves, bubble within 0.5 s',{tap:tp,ms:r?r.t-tT:null,last:L[L.length-1].npc});
+  await shot('foot_npc_hi.jpg');ok(T,tp&&!!r&&r.t-tT<=500,'tap HI: person faces you, waves, bubble within 0.5 s',{tap:tp,ms:r?r.t-tT:null,last:L[L.length-1].npc});
   await p.keyboard.press('KeyE');await W(200);f=await F();ok(T,f.npc&&f.npc.w>0,'E key greets too',f.npc);
   await p.keyboard.down('KeyW');const M=await samp(1500);await p.keyboard.up('KeyW');ok(T,M.every(q=>!q.flying),'walking into people never sends them flying',{flying:Math.max(...M.map(q=>q.flying))})}
  if(ONLY.includes('obj')){const T='obj';let g=await go('v90n/foot-go-obj',T+':car');await W(300);let f=await F();ok(T,f.btn==='enter'||/ENTER/.test(f.btnTxt),'next to your car: 🚪 ENTER',{btn:f.btn,said:g.said});
@@ -49,7 +49,9 @@ const ang=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*M
   await tapEl('#tB');await W(900);f=await F();ok(T,f.sit,'SIT sits the minifig on the bench',{sit:f.sit,y:f.y});await shot('foot_bench.jpg');
   await p.keyboard.down('KeyW');await W(700);await p.keyboard.up('KeyW');f=await F();ok(T,!f.sit&&f.state==='walk','the stick stands it up again',{sit:f.sit});
   g=await go('v90n/foot-go-obj',T+':mission');await W(300);f=await F();ok(T,f.act==='mission'&&/TALK/.test(f.btnTxt),'next to a mission giver: 📋 TALK',{act:f.act,btn:f.btnTxt,said:g.said});
-  await tapEl('#tB');await W(600);f=await F();const vis=await p.evaluate(()=>!document.getElementById('roamCard').hidden);ok(T,f.card&&vis,'TALK opens the mission card',{card:f.card,vis});
+  const c0=f.n.card||0;await tapEl('#tB');await W(600);f=await F();const vis=await p.evaluate(()=>!document.getElementById('roamCard').hidden);
+  // test mode (98tq) auto-clicks the card's GO button, so the card may already be accepted: count the open, and starting it puts you back in your car
+  ok(T,(f.n.card||0)>c0,'TALK opens the mission card',{opened:(f.n.card||0)-c0,vis,state:f.state});
   await p.evaluate(()=>{const b=document.getElementById('rcNo');if(b)b.click()})}
  if(ONLY.includes('jump')){const T='jump';const g=await go('v90n/foot-go-jump',T);ok(T,g.f.state==='walk','GO puts you on foot',g.said);
   await p.keyboard.down('Space');const L=await samp(1300,25);await p.keyboard.up('Space');const top=Math.max(...L.map(q=>q.gnd)),sink=Math.min(...L.map(q=>q.gnd)),end=L[L.length-1];
