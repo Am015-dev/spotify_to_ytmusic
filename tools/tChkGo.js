@@ -4,7 +4,7 @@
 //   node tools/tChkGo.js <base url of the build, e.g. http://localhost:8811/index.html> <outdir> [filter substring]
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const BASE=process.argv[2],OUT=process.argv[3]||'.',FIL=process.argv[4]||'';fs.mkdirSync(OUT,{recursive:true});
-const BAD=/can't|no .* nearby|loading a test drive|first|get back|works while/i;
+const BAD=/can't|no .* nearby|loading a test drive|first|get back|works while|❌/i;
 (async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errs=[],boots={},res=[];let nav=0,p=null;
  const newPage=async()=>{p=await ctx.newPage();p.setDefaultTimeout(120000);p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});p.on('framenavigated',f=>{if(f===p.mainFrame())nav++})};await newPage();
