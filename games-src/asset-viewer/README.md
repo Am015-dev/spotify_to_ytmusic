@@ -34,23 +34,34 @@ Needs Pillow (`flow_status.py` makes thumbnails).
 
 `/run` (start a Flow lane) is Windows-only: it opens PowerShell and talks to Chrome on CDP 9222.
 
-## Pipeline status (2026-10-13)
+## Pipeline status (2026-10-13, afternoon)
 
-All Flow image waves are generated. Delivery into `games/<game>/media/` is the open work.
+Every Flow image is generated, voted and pushed. The open work is wiring.
 
-| Wave | Generated | Voted ok | Not voted | Prepped (WebP) | Pushed |
-|---|---:|---:|---:|---:|---:|
-| 0 Sands kit pilot | 41 | - | - | 41 | 41 |
-| 1 High, unique pieces | 140 | 8 | 132 | 0 | 0 |
-| 2 Crown City Smash | 191 | 64 | 127 | 0 | 0 |
-| 3 Medium, unique pieces | 120 | 48 | 72 | 0 | 0 |
-| 4 Kit re-runs | 210 | 84 | 88 | 38 | 38 (CCS, Doorkick, Nebula Aces) |
-| 5 Low (Hollowbough, Nightrun) | 13 | 5 | 8 | 0 | 0 |
-| 3D sources / Covers | 66 / 17 | | | | 3D: 59 approved GLBs in `games-src/facelift-3d/` |
+| Asset | Made | In repo | Wired into a game |
+|---|---:|---:|---:|
+| 2D facelift paintings (Waves 0-5, `games/<game>/media/`) | 715 | 715 | 37 (Sands 30, Crown 7) |
+| 3D models (`games/<game>/models/`) | 59 approved | 59 | 67 GLBs placed in 15 games (cloud workers, 13 Oct) |
+| Animation clips (`games-src/anims/`) | 3 (Voltusk idle/attack, Adler take 1) | 3 | 0 |
+| Nightrun boss pose stills (`games-src/anims/mainhattan-nightrun/poses/`) | 68 of 76 | 68 | n/a (video references) |
+| Treblo cover art (`games-src/audio/covers/`) | 17 | 17 | n/a (track artwork) |
+| Music (Treblo) | all games | all | per handoff |
 
-Next, in order:
-1. Windows: finish 2D votes (427 not voted) in `assets.html`.
-2. Windows: prep approved images to WebP (`prep_kit.py` covers Wave 4; Waves 1-3 and 5 have no prep script yet) and push per game.
-3. Linux: wire pushed `media/*.webp` into each game (same as the Doorkick handoff, `games-src/munch/PAINTED-ART-HANDOFF.md`).
-4. Windows: 8 Nightrun boss pose images missing (Kronos atk1-4, Messe-Waechter atk1-4); the Flow run stopped on 2026-10-11 when the browser closed.
-5. Adler boss video loop (MiniMax H3 on the A100): take 2 did not close the loop; ping-pong loop in ffmpeg is the cheap fallback. VM is stopped.
+Not pushed on purpose: rejected/candidate GLBs (`viewer/glb`, 576 MB), TRELLIS inputs, superseded v2/v3 sources,
+ComfyUI test outputs, contact sheets, the old Suno originals (replaced by Treblo).
+
+### Pending: Linux (wiring)
+1. Wire the 678 pushed-but-unused paintings, biggest first: Crown City Smash 198 (182 power cards), Sands 102,
+   Rampart 38, Shipwreck 37, Doorkick 33, Nebula 32, Final Approach 29, Lantern Dive 28, Thornbound 28, the rest 19-23.
+2. Wire the clips in `games-src/anims/` once the owner approves them in `anims.html`.
+
+### Pending: Windows (generation)
+1. Nightrun: 8 pose stills (Kronos atk1-4, Messe-Waechter atk1-4) and 13 base perk icons (`games/missing.html`).
+2. Adler boss loop: ffmpeg ping-pong (free) or one more H3 bridge take (~9 min A100, owner OK needed). The other
+   9 Nightrun bosses and the Crown monsters wait until one loop is accepted.
+3. Optional 3D gap fix, 4 items (sw-shelter, tower-c, sw-palm-b, sun): owner ruled the holes acceptable.
+4. Refresh the online snapshot after changes: `export_static.py`, push `games/asset-viewer`.
+
+### Owner decisions open
+1. Adler loop: free ping-pong, or a paid loop take.
+2. From `games-src/HANDOFF.md`: replace the few CC BY tracks; open games as separate pages instead of the shelf iframe.

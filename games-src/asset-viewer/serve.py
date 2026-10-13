@@ -39,6 +39,11 @@ class H(SimpleHTTPRequestHandler):
             body = json.dumps(pipeline_api.lanes()).encode()
             self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
             return self.wfile.write(body)
+        if self.path.split("?")[0] == "/music.json":  # every game's music folder, for music.html
+            import pipeline_api
+            body = json.dumps(pipeline_api.music(REPO, "game/", lambda c: f"full/{c.relative_to(GA).as_posix()}")).encode()
+            self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
+            return self.wfile.write(body)
         if self.path.split("?")[0] == "/anims.json":  # Flow animation clips: flow-video/<game>/<name>.webm (alpha) + .mp4 source
             out = []
             for w in sorted((GA / "flow-video").glob("*/*.webm")):
