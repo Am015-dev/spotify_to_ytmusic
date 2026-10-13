@@ -22,7 +22,7 @@
   /* ---- the little bar (top corner): LAB, checklist chip, run controls, quick rating ---- */
   function bar() {
     var b = el.bar; if (!b) { b = el.bar = mk('div', 'gxlab-bar'); document.body.appendChild(b); }
-    b.className = L.get('gx_lab_pos') === 'r' ? 'r' : '';
+    b.className = (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'r' : '';
     var r = run(), done = 0, tot = 0, h = '<button type="button" id="gxlab-btn" aria-label="LAB menu">🧪 LAB</button>';
     if (!inShelf && UP.length) { var c = ckCount(); h += '<button type="button" id="gxlab-ck" aria-label="Test checklist">📍 ' + c.done + '/' + c.tot + '</button>'; }
     if (r) h += '<button type="button" id="gxlab-next" class="on">Next ▶ ' + (r.i + 1) + '/' + r.ids.length + '</button>';
@@ -40,7 +40,7 @@
         if (t.dataset.go) { go(t.dataset.go); return; }
         if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
         if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
-        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', L.get('gx_lab_pos') === 'r' ? 'l' : 'r'); bar(); return; }
+        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'l' : 'r'); bar(); return; }
         if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
         if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
     fillMenu(); p.hidden = false;
