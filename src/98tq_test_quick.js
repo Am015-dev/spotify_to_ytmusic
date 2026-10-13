@@ -21,9 +21,17 @@ if(TQ){
  const spot=()=>{if(!TQ.at)return;const[x,z]=TQ.at,q=rfSnap(x,z,120);if(!roamWarp(q?q[0]:x,q?q[1]:z,q&&q[2]!=null?q[2]:RO.h))TQS.log.push('at: warp refused')};
  const iv=setInterval(()=>{skip();if(TQS.busy||TQS.ready)return;let st='';try{st=state}catch(e){}if(st!=='roam'||!RO.on||!RO.built||LD.busy)return;TQS.busy=1;
   ride().then(()=>{const w2=()=>{let s2='';try{s2=state}catch(e){}if(s2!=='roam'||!RO.on||LD.busy)return setTimeout(w2,200);spot();skip();RO.v=0;
-   TQS.ready=true;TQS.tReady=Math.round(performance.now()-TQS.t0);if(TQ.go)setTimeout(()=>{try{TQS.goSaid=window.__chk&&__chk.go(TQ.go)}catch(e){TQS.log.push('go: '+e)}},300)};w2()})},250);
+   TQS.ready=true;TQS.tReady=Math.round(performance.now()-TQS.t0);TQS.home=[RO.x,RO.z,RO.h];if(TQ.go)setTimeout(()=>{try{TQS.goSaid=window.__chk&&__chk.go(TQ.go)}catch(e){TQS.log.push('go: '+e)}},300)};w2()})},250);
  setTimeout(()=>clearInterval(iv),120000);
- window.__tq=Object.assign(TQS,{o:TQ,skip,draw:()=>{TQ.draw=1;try{composer.render()}finally{TQ.draw=0}}});
+ // warm page (dev-5): back to a clean roam at the boot spot WITHOUT a reload (~0.2 s instead of a 20-40 s city boot); the GO runner calls it between items
+ const reset=()=>{const t=performance.now(),log=[];const T=(n,f)=>{try{f()}catch(e){log.push(n+': '+String(e).slice(0,60))}};
+  T('og',()=>{if(typeof OG!=='undefined'&&OG.ev)OG_end(null,1)});T('foot',()=>OF_reset());T('gar',()=>{const g=document.getElementById('gbx');if(g&&!g.hidden)gbClose(false)});
+  T('card',()=>{RO.card=null;RO.cardPin=0;RO.wwTest=0;const c=document.getElementById('roamCard');if(c)c.hidden=true});T('map',()=>{if(RO.mapOpen&&typeof roamMap==='function')roamMap(false);RO.mapOpen=false});
+  T('ch',()=>{if(RO.ch)chAbort()});T('sp',()=>{if(RO.sp)sprintEnd()});T('wk',()=>{RO.wk=null});skip();
+  let st='';try{st=state}catch(e){}if(st!=='roam')T('roam',()=>enterRoam());
+  T('home',()=>{const H=TQS.home;if(H){roamWarp(H[0],H[1],H[2])}RO.v=0;RO.vy=0;RO.frozen=false});
+  return{ms:Math.round(performance.now()-t),state:(()=>{try{return state}catch(e){return'?'}})(),log}};
+ window.__tq=Object.assign(TQS,{o:TQ,skip,reset,draw:()=>{TQ.draw=1;try{composer.render()}finally{TQ.draw=0}}});
 }
 // test URL for a city (+ ride / spot / checklist GO): the checklist GO uses this to reach the other city without the story flight
 function TQ_url(c,o={}){const q=new URLSearchParams({test:c});for(const k of['car','at','go'])if(o[k])q.set(k,o[k]);return location.pathname+'?'+q}
