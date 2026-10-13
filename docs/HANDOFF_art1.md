@@ -27,3 +27,9 @@ Plan (sent to the coordinator): tests first (tag `terrain:` in 99c): Lycabettus 
 Then: exaggerate relief inside the TR_init raster (Frankfurt ~2.2× above the valley floor, Athens ~1.4× outside the Acropolis plateau), smooth road corridors to ≤12 %, add off-road mounds masked away from roads, raise the horizon ridges, check building bases (min ground under the footprint + plinth), colour the ground by slope/height (grass → dry → dirt → rock), regenerate the qt cache, then perf + one shot per city.
 Beware: TR_init runs early (lazily, on the first TR_G call), possibly before FILL_R exists, so a road mask needs CITY_S/GRIDS rects, not fillAt.
 Baseline shot: `docs/shots/terrain/baseline.jpg` (the Frankfurt one also shows a big light-blue swoosh ribbon artefact; reported to the coordinator).
+
+## Update 23:30
+- road-gap GO also fixed for `&draw=0` (dde707c): the GO forces its one top-down draw (TQ.draw), and a black picture counts as FAIL. `art/tGap2.js <index url> 0|1` = int-3's exact path.
+- Coordinator rules for terrain tests: assert state only (sample groundY along Lycabettus/Mühlberg, grades, edge drops and ramp joints from the road data; read the tyre gap at the spawn). No driving as a test; input checks ≤ 3 s; run only the lane's GOs (TAG=terrain:, road-gap), < 60 s, FAIL lines only.
+- art-2's grass mounds (`src/98lf_lively_fill.js`, `LF.mounds`) must be switched off when the terrain raster lands in od-int2 (tell art-2, session_01EznFFLjG5grA4WgCSSYSXP).
+- dev-4: the Messeturm is grounded (guard GO v90k/sky-tower on od-dev4); the green vase marker belongs to dev-5; the blue swoosh belongs to dev-4.
