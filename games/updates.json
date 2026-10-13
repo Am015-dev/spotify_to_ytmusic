@@ -1,5 +1,15 @@
 [
  {
+  "date": "2026-10-13",
+  "game": "shipwreck",
+  "title": "Real 3D castaways and palms",
+  "items": [
+   "Pawns, palms, shelter and palisade are now detailed 3D models",
+   "Phones and Low graphics load lighter versions of the same models"
+  ],
+  "check": "Start a game and look at the castaways and the camp on the island."
+ },
+ {
   "date": "2026-10-10",
   "game": "cauldron",
   "title": "3D bag and tumbling chips",

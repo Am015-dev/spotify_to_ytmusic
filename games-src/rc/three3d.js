@@ -12,7 +12,7 @@ V3.pref=gfxPref();
 function gfxLabel(){return V3.pref==='auto'?'Auto'+(V3.on?' · '+GFX[V3.q].nm:''):GFX[V3.pref].nm}
 const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
 function setGfx(v){V3.pref=GFX[v]?v:'auto';try{localStorage.setItem('swi_gfx',V3.pref)}catch(e){}if(PH)PH.hitch();applyQ(V3.pref==='auto'?gfxAuto():V3.pref)}
-function applyQ(q){V3.q=GFX[q]?q:'high';const lite=V3.q==='low';if(!lite)glbLoad();if(V3.lite!==lite){V3.lite=lite;if(V3.layout&&V3.r)rebuildLite()}if(typeof onGfxChange==='function')try{onGfxChange()}catch(e){}if(!V3.r)return;const c=GFX[V3.q],r=V3.r;
+function applyQ(q){V3.q=GFX[q]?q:'high';const lite=V3.q==='low';glbLoad();if(V3.lite!==lite){V3.lite=lite;if(V3.layout&&V3.r)rebuildLite()}if(typeof onGfxChange==='function')try{onGfxChange()}catch(e){}if(!V3.r)return;const c=GFX[V3.q],r=V3.r;
   {const want=Math.min(c.pr,window.devicePixelRatio||1);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=c.sh>0;if(r.shadowMap.enabled!==sh){r.shadowMap.enabled=sh;V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
   V3.sun.castShadow=sh;if(sh&&V3.sun.shadow.mapSize.x!==c.sh){V3.sun.shadow.mapSize.set(c.sh,c.sh);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}}
@@ -463,10 +463,11 @@ function syncCamp(g,G){const u=g.userData;const sh=G.camp.shelter;const key=[glb
   const pw=Math.min(15,G.pileWood||0);if(pw){const P=new Parts();for(let i=0;i<pw;i++){const row=Math.floor(i/4),k=i%4;P.add(G_.cylS(),i%2?0x8a5a2b:0x7a4d24,M(1.05,.06+row*.11,.25+k*.13-row*.05,Math.PI/2,0,0,.055,.62,.055),0,.25)}u.pile.add(P.mesh())}}
 // ---------- GLB models (High/Medium: real 3D, loaded once and cloned; Low: thumbnail sprites for pawns, procedural props) ----------
 const GLBD={carpenter:['sw-carpenter',1.5],cook:['sw-cook',1.5],explorer:['sw-explorer',1.5],fri:['sw-friday',1.5],palmA:['sw-palm-a',1.9],palmC:['sw-palm-c',1.6],shelter:['sw-shelter',1.45],palisade:['sw-palisade',.95]};
-function glbLoad(){if(V3.glbP||typeof GXGLB==='undefined')return;V3.glbR={};
-  V3.glbP=Promise.all(Object.keys(GLBD).map(k=>GXGLB.load('models/'+GLBD[k][0]+'.glb').then(src=>{src.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;const m=o.material;if(m){m.envMapIntensity=.6;m.side=THREE.FrontSide}}});
-    const bb=new THREE.Box3().setFromObject(src),sc=GLBD[k][1]/Math.max(1e-3,bb.max.y-bb.min.y);V3.glbR[k]={src,sc,r:Math.max(bb.max.x-bb.min.x,bb.max.z-bb.min.z)/2*sc}}))).then(()=>{V3.glbOK=true;if(V3.layout&&V3.r&&!V3.lite)rebuildLite()}).catch(()=>{V3.glbR=null});}
-const glbOn=()=>!V3.lite&&V3.glbOK;
+function glbVar(){let ph=false;try{ph=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return V3.q==='low'||ph?'-lite':''}
+function glbLoad(){if(typeof GXGLB==='undefined')return;const v=glbVar();if(V3.glbV===v&&V3.glbP)return;const first=!V3.glbP;V3.glbV=v;V3.glbOK=false;if(!first)try{GXGLB.dispose()}catch(e){}V3.glbR={};
+  const me=V3.glbP=Promise.all(Object.keys(GLBD).map(k=>GXGLB.load('models/'+GLBD[k][0]+v+'.glb').then(src=>{src.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;const m=o.material;if(m){m.envMapIntensity=.6;m.side=THREE.FrontSide}}});
+    const bb=new THREE.Box3().setFromObject(src),sc=GLBD[k][1]/Math.max(1e-3,bb.max.y-bb.min.y);V3.glbR[k]={src,sc,r:Math.max(bb.max.x-bb.min.x,bb.max.z-bb.min.z)/2*sc}}))).then(()=>{if(V3.glbP!==me)return;V3.glbOK=true;if(V3.layout&&V3.r)rebuildLite()}).catch(()=>{if(V3.glbP===me)V3.glbR=null});}
+const glbOn=()=>V3.glbOK&&!!V3.glbR;
 function glbInst(k){const d=V3.glbR&&V3.glbR[k];if(!d)return null;const o=d.src.clone(true);o.scale.setScalar(d.sc);return o}
 // instanced copies of a model: list = [[x,y,z,scaleMul,yaw]...] -> one InstancedMesh per mesh part, added to grp
 function glbInstanced(grp,k,list){const d=V3.glbR&&V3.glbR[k];if(!d||!list.length)return;d.src.updateMatrixWorld(true);const m4=new THREE.Matrix4(),q=new THREE.Quaternion(),ax=new THREE.Vector3(0,1,0),sv=new THREE.Vector3(),pv=new THREE.Vector3();
