@@ -11,7 +11,7 @@ import pipeline_api
 V = Path(__file__).parent
 REPO = Path(os.environ.get("CROWN_REPO", r"C:\Users\kourisa\crown-media\repo"))
 OUT = REPO / "games" / "asset-viewer"
-PAGES = ["flow.html", "board.html", "assets.html", "screens.html", "anims.html", "music.html"]
+PAGES = ["flow.html", "board.html", "assets.html", "screens.html", "anims.html", "music.html", "games.html"]
 # local server routes -> GitHub Pages paths (asset-viewer/ sits next to the game folders)
 ROUTES = [("src=\"game/${G}/", "src=\"../${G}/"), ("`/repo/${g}/media/", "`../${g}/media/")]
 

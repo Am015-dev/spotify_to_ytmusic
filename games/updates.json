@@ -14,6 +14,17 @@
  },
  {
   "date": "2026-10-13",
+  "game": "shelf",
+  "title": "Game versions and status page",
+  "items": [
+   "Every game card and the player bar show a version chip, like v47 and the date",
+   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
+   "Asset viewer has a new Games tab with the same numbers"
+  ],
+  "check": "Open the shelf, then Status (status.html) and the Games tab in the asset viewer."
+ },
+ {
+  "date": "2026-10-13",
   "game": "sunglaze",
   "title": "Painted kilns and rack for Sunglaze",
   "items": [

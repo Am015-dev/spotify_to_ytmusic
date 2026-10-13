@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Games</title>
+<style>
+  :root { --bg: #111215; --rail: #16181c; --card: #1d2025; --card2: #24272d; --line: #2d3138; --ink: #ecebe7; --mute: #9599a1; --dim: #6c7078; --accent: #f2b33d;
+          --wired: #b98cff; --pushed: #8d97ff; --redo: #e0574a; --approved: #4cb36b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; overflow-x: hidden; }
+  header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 10px 18px; flex-wrap: wrap;
+           background: rgba(17,18,21,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 17px; margin: 0; white-space: nowrap; } header h1 span { color: var(--accent); }
+  nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; } nav.tabs a { text-decoration: none; padding: 6px 10px; border-radius: 7px; color: var(--mute); }
+  nav.tabs a.on { background: var(--card2); color: var(--ink); } nav.tabs a:hover { color: var(--ink); }
+  #upd { margin-left: auto; color: var(--dim); font-size: 12px; }
+  main { padding: 18px 22px 60px; max-width: 1300px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 6px 14px; cursor: pointer; font-weight: 600; }
+  .chip[aria-pressed=true] { background: var(--accent); color: #1b1404; border-color: var(--accent); }
+  button { font: inherit; color: inherit; }
+  .list { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+  .g { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0; align-content: start; }
+  .top { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; } .top h2 { margin: 0; font-size: 15px; }
+  .ver { font: 700 12px ui-monospace, Menlo, monospace; background: var(--card2); color: var(--accent); border: 1px solid var(--line); border-radius: 99px; padding: 2px 9px; white-space: nowrap; }
+  .news { color: var(--mute); font-size: 13px; overflow-wrap: anywhere; } .news b { color: var(--ink); font-weight: 600; }
+  .bar { display: grid; gap: 3px; font-size: 13px; color: var(--mute); } .bar b { color: var(--ink); }
+  .track { height: 8px; border-radius: 5px; background: #0c0d10; border: 1px solid var(--line); overflow: hidden; } .track i { display: block; height: 100%; background: var(--wired); }
+  details { border-top: 1px solid var(--line); padding-top: 6px; }
+  summary { cursor: pointer; font-weight: 600; min-height: 28px; display: flex; align-items: center; }
+  summary.m { color: var(--redo); } summary.u { color: var(--pushed); } summary.z { color: var(--mute); cursor: default; }
+  ul { margin: 6px 0 2px; padding-left: 18px; font-size: 13px; color: var(--mute); } li { margin: 3px 0; overflow-wrap: anywhere; } li b { color: var(--ink); }
+  .k { font: 600 10px system-ui; text-transform: uppercase; letter-spacing: .06em; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 4px; }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px; } .links a { color: var(--accent); text-decoration: none; }
+  .empty { color: var(--mute); padding: 30px 0; text-align: center; }
+</style>
+</head>
+<body><div style="position:sticky;top:0;z-index:99;background:#3a2f12;color:#ffe9a8;font:13px system-ui;padding:6px 12px">Read-only snapshot of 13 Oct 2026 13:39. Voting and Flow runs work only in the local viewer.</div>
+<header>
+  <h1>Asset <span>viewer</span></h1>
+  <nav class="tabs"><a href="board.html">Production</a><a href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a class="on" href="games.html">Games</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
+  <span id="upd"></span>
+</header>
+<main>
+  <div class="chips" role="group" aria-label="Filter"><button class="chip" data-f="all" aria-pressed="true">All</button><button class="chip" data-f="miss" aria-pressed="false">Has missing</button><button class="chip" data-f="unw" aria-pressed="false">Not wired</button></div>
+  <div class="list" id="m"><div class="empty">Loading&hellip;</div></div>
+</main>
+<script>
+const $ = s => document.querySelector(s), esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let D = null, F = 'all';
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dshort = s => { const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(s || ''); return m ? (+m[3]) + ' ' + MON[m[2] - 1] : ''; };
+const bar = (l, w, p) => { const t = w + p; return `<div class="bar"><span>${l} <b>${w}/${t}</b></span><div class="track"><i style="width:${t ? Math.round(w / t * 100) : 0}%"></i></div></div>`; };
+function draw() {
+  let L = D.games.slice().sort((a, b) => b.missing.length - a.missing.length || b.unwired.length - a.unwired.length || a.title.localeCompare(b.title));
+  if (F === 'miss') L = L.filter(g => g.missing.length); if (F === 'unw') L = L.filter(g => g.unwired.length);
+  $('#m').innerHTML = L.length ? L.map(g => {
+    const n = g.news ? `<div class="news">${esc(dshort(g.news.date))} &middot; <b>${esc(g.news.title)}</b></div>` : '';
+    const mk = g.missing.length ? `<details><summary class="m">Still to make: ${g.missing.length}</summary><ul>${g.missing.map(x => `<li><b>${esc(x.name)}</b><span class="k">${esc(x.kind)}</span><br>${esc(x.desc)}</li>`).join('')}</ul></details>` : `<details><summary class="z">Still to make: 0</summary></details>`;
+    const uw = g.unwired.length ? `<details><summary class="u">Made, not in game: ${g.unwired.length}</summary><ul>${g.unwired.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : `<details><summary class="z">Made, not in game: 0</summary></details>`;
+    return `<section class="g" data-slug="${g.slug}"><div class="top"><h2>${esc(g.title)}</h2><span class="ver">${esc(g.version)} &middot; ${esc(dshort(g.updated))}</span></div>${n}
+      ${bar('Paintings wired', g.paintings.wired, g.paintings.pushed)}${bar('3D models wired', g.models.wired, g.models.pushed)}${mk}${uw}
+      <div class="links"><a href="board.html#${g.slug}">Production</a><a href="flow.html#${g.slug}">Flow batches</a><a href="screens.html#${g.slug}">In the game</a></div></section>`; }).join('') : '<div class="empty">Nothing matches.</div>';
+}
+document.querySelector('.chips').onclick = e => { const b = e.target.closest('.chip'); if (!b || !D) return; F = b.dataset.f; document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b)); draw(); };
+fetch('../status.json?v=' + Date.now(), { cache: 'no-cache' }).then(r => r.json()).then(j => { D = j; $('#upd').textContent = 'as of ' + String(j.generated).slice(0, 10); draw(); })
+  .catch(() => { $('#m').innerHTML = '<div class="empty">Could not load ../status.json (it is published with the site, not in the local viewer).</div>'; });
+</script>
+</body>
+</html>
