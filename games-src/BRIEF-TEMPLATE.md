@@ -35,6 +35,6 @@ Report (under 150 words, once): per game before -> after numbers, scenario ids, 
 ```
 
 Orchestrator notes
-- One session per game batch, at most 4 cloud sessions at a time, model sonnet on every one.
+- One session per game batch, at most 10 cloud sessions at a time, model sonnet on every one.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
 - If a worker reports it is out of context, start a new session with this template plus its HANDOFF note.
