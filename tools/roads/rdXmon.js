@@ -11,7 +11,7 @@
    const J=inJ(c.x,c.z);const jn=J&&J.sig?J:null;
    if(jn&&s.inJ!==jn){X.sigEnter++;let k=-1,bd=-2;jn.ap.forEach((a,i)=>{const v=a.dx*hx+a.dz*hz;if(v>bd){bd=v;k=i}});if(k>=0&&CV_st(jn,k)==='r'&&Math.hypot(c.x-jn.x,c.z-jn.z)>jn.R0-3){X.redRun++;ex('red',[Math.round(c.x),Math.round(c.z)])}}
    s.inJ=jn;
-   if(!J){const r=roadOf(c.x,c.z);if(!r||r.d>r.hw+.6){X.offRoad++;ex('off',[Math.round(c.x),Math.round(c.z),r?+(r.d-r.hw).toFixed(1):null])}
+   if(!J&&!c.pk){/* parked cars stand half on the kerb by design (98l) */const r=roadOf(c.x,c.z);if(!r||r.d>r.hw+.6){X.offRoad++;ex('off',[Math.round(c.x),Math.round(c.z),r?+(r.d-r.hw).toFixed(1):null])}
     else{const dir=Math.sign(hx*r.tx+hz*r.tz)||1,latR=(c.x-r.cx)*(-hz)+(c.z-r.cz)*hx;if(r.one){if(dir<0){X.wrongOneWay++;ex('wrong',[Math.round(c.x),Math.round(c.z),'1way'])}}else if(r.hw>=3&&latR<-0.8){X.wrongSide++;ex('wrong',[Math.round(c.x),Math.round(c.z),+latR.toFixed(1)])}}}
    const v=c.cv??c.v;if(v<.3){const w=c.RDfz?'ped':c.hitT>0?'hit':c.RDy||(c.dead>0?'dead':'none');X.why[w]=(X.why[w]||0)+1;s.st+=DT;X.stuckCarS+=DT;if(s.st>=20&&s.st<20+DT*1.5)X.stuck20++;if(s.st>=60&&s.st<60+DT*1.5){X.stuck60++;ex('stuck',[Math.round(c.x),Math.round(c.z),c.RDy])}}else s.st=0;
    if(v>2&&s.hx*hx+s.hz*hz<-.7&&!J){X.uturnMid++}s.hx=hx;s.hz=hz}

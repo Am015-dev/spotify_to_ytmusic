@@ -226,14 +226,15 @@ function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?h
   // a few problem spots for screenshots / inspection
   const sp=N.dead.filter(d=>d.st<40).map(d=>[Math.round(d.x),Math.round(d.z),Math.round(d.st),'city']);FR.forEach((r,k)=>{const I=ext.info[k];for(const e of[0,1])if(!I.endJ[e]){const[x,z]=OB_fpt(r,e?r.L:0);sp.push([Math.round(x),Math.round(z),0,'fill'])}});s.spots=sp.slice(0,12);s.noPlateAt=npAt.slice(0,6);return s}
 // ===== RD (roads-1, Alex 2026-10-13 "simplify the maps … many areas do not connect … wider roads"): load-time network simplification.
-// Athens: short dead-end side streets (res/sec/link stubs < RD_STUB m to their junction) are cut back to the junction; the main/arterial net is widened;
+// Athens: short dead-end side streets (res/sec/link stubs < RD_STUB m to their junction, 2 rounds) are cut back to the junction; the main/arterial net is widened;
 // every street is two-way for traffic (one-way chains split the traffic graph into ~5000 trapped pieces, main SCC 23 %). Frankfurt: grid stubs that
 // overhang the last cross street (up to RD_GSTUB m) are trimmed. Stubs near a mission spot / landmark stay. ?rd=0 = old network (A/B).
-const RD_ON=!/[?&]rd=0/.test(location.search),RD={ops:{cut:0,del:0,gtrim:0,gdel:0,wide:0,two:0},before:null,after:null},RD_STUB={res:420,sec:320,link:200,main:70,arterial:70},RD_GSTUB=230;
+const RD_ON=!/[?&]rd=0/.test(location.search),RD={ops:{cut:0,del:0,gtrim:0,gdel:0,wide:0,two:0},before:null,after:null},RD_STUB={res:420,sec:220,link:200}/* main/arterial never cut: peeling them round by round removed whole arterials (Athens 1718,-1325) */,RD_GSTUB=230;
 const RD_keep=(()=>{const P=[];for(const k in RF.spots){const v=RF.spots[k];P.push(WP(v[0],v[1]))}for(const L of RF.lm)P.push(WP(L[2],L[3]));for(const G of (RF.garages||[]))if(G&&G.length>2)P.push(WP(G[1],G[2]));return(x,z,r=45)=>P.some(([a,b])=>(a-x)**2+(b-z)**2<r*r)})();
-function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<6;round++){const N=OB_net(),S=N.segs;let did=0;const kill=new Set(),cut=[];
+function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<2;round++){const N=OB_net(),S=N.segs;let did=0;const kill=new Set(),cut=[];
   for(const d of N.dead){const A=S[d.a];if(!(d.st<(RD_STUB[A.r.cls]||0))||kill.has(A)||cut.some(c=>c.a===d.a))continue;const P=A.pts;let prot=false;
     if(d.e){for(let i=P.length-1;i>=0&&P[d.i].s-P[i].s<=d.st+1;i-=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}}else for(let i=0;i<P.length&&P[i].s<=d.st+1;i+=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}
+    if(!prot){/* a stub that another drivable street crosses or touches is not a leaf (crossings without a shared junction key) */const lo=d.e?P[d.i].s-d.st:0,hi=d.e?P[d.i].s:d.st;const sJ=d.e?lo:hi;for(let i=0;i<P.length&&!prot;i++){if(P[i].s<lo-1||P[i].s>hi+1||Math.abs(P[i].s-sJ)<15)continue;const q=N.proj(P[i].x,P[i].z,A.r.w/2+12,(b)=>b!==d.a);if(q&&q.d<A.r.w/2+N.segs[q.a].r.w/2+1)prot=true}}
     if(prot)continue;cut.push(d)}
   for(const d of cut){const A=S[d.a],P=A.pts,jf=N.jf[d.a];if(kill.has(A))continue;let k=-1;if(!d.e){for(let i=0;i<P.length;i++)if(jf[i]){k=i;break}}else for(let i=P.length-1;i>=0;i--)if(jf[i]){k=i;break}
     if(k<0||(!d.e&&k>=P.length-2)||(d.e&&k<=1)){kill.add(A);O.del++;did++;continue}if(d.e)P.length=k+1;else{P.splice(0,k);const s0=P[0].s;for(const q of P)q.s-=s0}A.L=P[P.length-1].s;O.cut++;did++}

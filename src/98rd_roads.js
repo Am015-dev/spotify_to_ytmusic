@@ -27,7 +27,7 @@ function RD_memGet(p,ref){if(p.rdM)for(const m of p.rdM)if(m[0]===ref)return m[1
 // may the walker cross road q at (x,z) now? true / false (wait) / null (inside a junction box: never, turn back)
 function RD_may(x,z){let J=null,jd=1e9;CV_near(x,z,Q=>{const d=Math.hypot(Q.x-x,Q.z-z);if(d<Q.R0+14&&d<jd){jd=d;J=Q}return false});
   if(J&&jd<J.r-.5)return null;if(J&&J.sig){const w=CV_walk(J);return w>=0&&w<4}
-  for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-x,dz=c.z-z;if(dx*dx+dz*dz<400&&(c.cv??c.v)>.8)return false}return true}
+  const N=HUB.nodes;for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=x-c.x,dz=z-c.z,d2=dx*dx+dz*dz;if(d2<64)return false;if(d2>900||(c.cv??c.v)<.8)continue;const A=N[c.a],B=N[c.b];if(!A||!B)continue;if((B.x-A.x)*dx+(B.z-A.z)*dz>0)return false}return true}/* gap: no car within 8 m, none within 30 m moving towards the crossing */
 function RD_kerb(p,bx,bz,dt){const key=RD_key(p);if(p.rdK!==key){p.rdK=key;p.sd=1;p.rdM=null;p.rdX=null;p.rdH=0;p.rdW=0;p.rdcx=0;p.rdcz=0}
   let x=bx,z=bz,hold=0;const sk=[];
   for(let it=0;it<2;it++){const q=RD_road(x,z,sk[0]);if(!q)break;const al=Math.abs(q.lat);if(al>=q.hw+.3){if(al<q.hw+7){const sg=q.lat<0?-1:1;if(p.rdTB===q.ref&&sg===RD_memGet(p,q.ref))p.rdTB=null;if(p.rdTB!==q.ref)RD_mem(p,q.ref,sg)}break}
@@ -45,7 +45,7 @@ function RD_maySig(x,z){return !!CV_near(x,z,Q=>Q.sig&&Math.hypot(Q.x-x,Q.z-z)<Q
 // cars stop for a walker on a crossing ahead of them (frozen like a CV red: speed 0, position kept)
 function RD_carPre(){const P=HUB.peds;if(!P)return;const X=[];for(const p of P)if(p.rdX&&p._x!=null&&Math.abs(p._x-RO.x)<330&&Math.abs(p._z-RO.z)<330)X.push(p);if(!X.length)return;const N=HUB.nodes;
   for(const c of HUB.cars){if(c.dead>0||c.x==null||c.route&&!c.CVr)continue;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;
-    for(const p of X){const rx=p._x-c.x,rz=p._z-c.z,al=rx*hx+rz*hz;if(al<1||al>16)continue;if(Math.abs(rx*hz-rz*hx)<3){c.RDfz=[c.a,c.b,c.t,c.v];c.RDy2='ped';c.v=0;c.cv=0;RD_PS.carHold++;break}}}}
+    for(const p of X){const rx=p._x-c.x,rz=p._z-c.z,al=rx*hx+rz*hz;if(al<-.5||al>18)continue;if(Math.abs(rx*hz-rz*hx)<3.6){c.RDfz=[c.a,c.b,c.t,c.v];c.RDy2='ped';c.v=0;c.cv=0;RD_PS.carHold++;break}}}}
 function RD_carPost(){for(const c of HUB.cars)if(c.RDfz){if(!(c.dead>0)){c.a=c.RDfz[0];c.b=c.RDfz[1];c.t=c.RDfz[2];c.cv=0}c.v=c.RDfz[3];c.RDfz=null}}
 if(RD_ON){const _ht=hubTrafficStep;hubTrafficStep=function(dt){try{RD_carPre()}catch(e){}const r=_ht.apply(this,arguments);try{RD_carPost()}catch(e){}return r}}
 // zebra crossings on every arm of a Frankfurt junction (Athens has its own, CE_kerbs): band J.r+1.4 … +4.6 from the centre = where walkers cross
