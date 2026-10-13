@@ -8,3 +8,8 @@
 # sink-2 (WIP, NOT READY — do not ship as is)
 - Added OF_settle/OF_gap/OF_corners in src/98of_onfoot.js (runs on exit + every 0.25 s on foot) and checklist item v90k/park-sit with a 📍 GO (T.fn support in goJump).
 - Probe (default car, tSink.js now prints OF_gap): wheel gaps on foot [0.079,0.011,0.059,-0.028] (worse than 0.03 before), OF_gap box-corner min -0.156 even after the lift → the mesh box bottom isn't the tyre bottom (something hangs below, or CR_carPose re-lifts after). Next: use real wheels (userData.r) when present, box corners only as fallback; drop the extra premultiplied pitch when CR_carPose has wheels; then test the blue racer (garage id unknown yet; 't_beast' Blue Beast is a candidate).
+
+# sink-3
+- OF_settle now uses the real wheels (userData.r): wheels reset to rest height, pitch/roll from the ground under each tyre, lowest tyre CR_TYRE_Y above the road, then each wheel ±4 cm onto the road. Box corners only if <3 wheels. Dropped the CR_carPose call inside settle.
+- Blue racer id NOT found: Alex's shot shows a brick-built blue/white body with a big red brick wing (looks like a custom "My Build"/GB brick car, not an LDraw ride). No GAR_SETS entry matches blue+red wing. Next: ask the coordinator for Alex's mho_gar save, or test the GB 'RACER' preset; then point GO v90k/park-sit at it.
+- Probe result: see the coordinator message (tSink default car).

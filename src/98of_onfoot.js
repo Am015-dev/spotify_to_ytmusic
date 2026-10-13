@@ -190,11 +190,19 @@ function OF_corners(){const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);
   if(B.isEmpty())return null;const ix=(B.max.x-B.min.x)*.12,iz=(B.max.z-B.min.z)*.12,P=[];for(let i=0;i<4;i++)P.push(new THREE.Vector3(i&1?B.max.x-ix:B.min.x+ix,B.min.y,i&2?B.max.z-iz:B.min.z+iz).applyMatrix4(pl.mesh.matrixWorld));return P}
 function OF_gap(){if(!pl)return null;const P=OF_corners();if(!P)return null;let mx=-9,mn=9;for(const v of P){const d=v.y-groundAt(v.x,v.z,v.y+1);mx=Math.max(mx,d);mn=Math.min(mn,d)}const f=new THREE.Vector3(0,0,1).applyQuaternion(pl.mesh.quaternion);return{max:+mx.toFixed(3),min:+mn.toFixed(3),pitch:+(Math.asin(clamp(f.y,-1,1))*180/Math.PI).toFixed(2)}}
 function OF_settle(){const C=OF.car;if(!C||!C.own||!pl||!pl.mesh||(pl.boatK||0)>.5)return;try{
-  pl.pitch=0;pl.roll=0;pl.pv=0;RO.v=0;RO.vy=0;RO.landK=0;pl.air=false;const sx=RO.x,sz=RO.z,sh=RO.h;RO.x=C.x;RO.z=C.z;RO.h=RO.vh=C.h;try{roamPose(pl,1/60)}catch(e){}try{CR_carPose(pl,0)}catch(e){}RO.x=sx;RO.z=sz;RO.h=RO.vh=sh;
-  const fx=Math.sin(C.h),fz=Math.cos(C.h),hd=(C.hd||2)*.8,hw=(C.hw||1)*.8,g=(a,b)=>groundAt(C.x+fx*a+fz*b,C.z+fz*a-fx*b,(C.y||0)+1.5);
+  pl.pitch=0;pl.roll=0;pl.pv=0;RO.v=0;RO.vy=0;RO.landK=0;pl.air=false;const sx=RO.x,sz=RO.z,sh=RO.h;RO.x=C.x;RO.z=C.z;RO.h=RO.vh=C.h;try{roamPose(pl,1/60)}catch(e){}RO.x=sx;RO.z=sz;RO.h=RO.vh=sh;
+  // real wheels (userData.r) when the ride has them: wheels back to rest height, pitch/roll from the ground under each tyre, lowest tyre bottom CR_TYRE_Y above the road, then each wheel drops/rises ≤ 4 cm onto the road (box corners only as a fallback)
+  const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
+  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{w.getWorldPosition(OF_v3);const sc=w.getWorldScale(new THREE.Vector3()).y,r=w.userData.r*sc,p=OF_v3.clone();return{w,p,sc,d:p.y-r-groundAt(p.x,p.z,p.y+1)}})};
+  if(W.length>=3){for(const w of W){if(w.userData.by!=null)w.position.y=w.userData.by}let T=tyre();const fx=Math.sin(C.h),fz=Math.cos(C.h);
+   const lf=t=>(t.p.x-C.x)*fx+(t.p.z-C.z)*fz,ls=t=>(t.p.x-C.x)*fz-(t.p.z-C.z)*fx,F=T.filter(t=>lf(t)>0),Bk=T.filter(t=>lf(t)<=0),L=T.filter(t=>ls(t)>0),R=T.filter(t=>ls(t)<=0),av=(A,f)=>A.reduce((a,t)=>a+f(t),0)/A.length,gy=t=>t.p.y-t.d;
+   if(F.length&&Bk.length&&L.length&&R.length){const pit=Math.atan2(av(F,gy)-av(Bk,gy),av(F,lf)-av(Bk,lf)),rol=Math.atan2(av(L,gy)-av(R,gy),av(L,ls)-av(R,ls));
+    OF_ax.set(fz,0,-fx);OF_q.setFromAxisAngle(OF_ax,-clamp(pit,-.35,.35));pl.mesh.quaternion.premultiply(OF_q);OF_ax.set(fx,0,fz);OF_q.setFromAxisAngle(OF_ax,clamp(rol,-.35,.35));pl.mesh.quaternion.premultiply(OF_q);T=tyre()}
+   const mn=Math.min(...T.map(t=>t.d));if(mn<5)pl.mesh.position.y+=CR_TYRE_Y-mn;T=tyre();for(const t of T){const k=t.w.parent?t.w.parent.getWorldScale(new THREE.Vector3()).y:1;t.w.position.y-=clamp(t.d-CR_TYRE_Y,-.04,.04)/(k||1)}}
+  else{const fx=Math.sin(C.h),fz=Math.cos(C.h),hd=(C.hd||2)*.8,hw=(C.hw||1)*.8,g=(a,b)=>groundAt(C.x+fx*a+fz*b,C.z+fz*a-fx*b,(C.y||0)+1.5);
   const pit=Math.atan2(((g(hd,hw)+g(hd,-hw))-(g(-hd,hw)+g(-hd,-hw)))/2,2*hd),rol=Math.atan2(((g(hd,hw)+g(-hd,hw))-(g(hd,-hw)+g(-hd,-hw)))/2,2*hw);
   OF_ax.set(fz,0,-fx);OF_q.setFromAxisAngle(OF_ax,-clamp(pit,-.35,.35));pl.mesh.quaternion.premultiply(OF_q);OF_ax.set(fx,0,fz);OF_q.setFromAxisAngle(OF_ax,clamp(rol,-.35,.35));pl.mesh.quaternion.premultiply(OF_q);
-  const P=OF_corners();if(P){let mn=9;for(const v of P)mn=Math.min(mn,v.y-groundAt(v.x,v.z,v.y+1));if(mn<5)pl.mesh.position.y+=CR_TYRE_Y-.01-mn}pl.mesh.updateMatrixWorld(true);OF.n.settle=(OF.n.settle||0)+1}catch(e){if(!OF.e3){OF.e3=1;console.warn('OF settle',e)}}}
+  const P=OF_corners();if(P){let mn=9;for(const v of P)mn=Math.min(mn,v.y-groundAt(v.x,v.z,v.y+1));if(mn<5)pl.mesh.position.y+=CR_TYRE_Y-.01-mn}}pl.mesh.updateMatrixWorld(true);OF.n.settle=(OF.n.settle||0)+1}catch(e){if(!OF.e3){OF.e3=1;console.warn('OF settle',e)}}}
 OF_exit=(f=>function(){const r=f.apply(this,arguments);OF.stT=0;OF_settle();return r})(OF_exit);
 // --- per-frame hooks (outermost wrappers: none of the car-only wrappers run on foot)
 roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen){OF_step(dt);OF.stT=(OF.stT||0)+(dt||0);if(OF.stT>.25){OF.stT=0;OF_settle()}}return}
