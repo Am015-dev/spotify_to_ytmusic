@@ -17,7 +17,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 40 | `40_hud_input_menu.js` | 33 | race HUD (updHud buildMap drawMap flashHud), input (keys K, tilt, touch steer pad steerDraw, parkSet), menu/pause/settings (togglePause openSettings buildSettin |
 | 41 | `41_career_quests.js` | 105 | career = free roam: XP/level (carStat addXP), RO (roam state object), side quests (QUESTS qStart qStep), quests v2 road graph + GPS (qvGraph qvPath qvLayout), m |
 | 50 | `50_kenney_data.js` | 78 | DATA: KM_IDX (model index), KM_TEX (atlas PNGs), KM_BIN=window.__KM_BIN (blob lives in assets/km.js) |
-| 51 | `51_city_net.js` | 44 | Kenney loader (kmGeo kmKit kmMat), real Frankfurt layout CITYCFG RF WP, Athens street net decode, the Main (riverAt inRiver rivSide), decks/bridges BRIDGES deck |
+| 51 | `51_city_net.js` | 45 | Kenney loader (kmGeo kmKit kmMat), real Frankfurt layout CITYCFG RF WP, Athens street net decode, the Main (riverAt inRiver rivSide), decks/bridges BRIDGES deck |
 | 52 | `52_terrain_data.js` | 115 | DATA: TR_DATA (DEM rasters, one line) |
 | 53 | `53_terrain_roads.js` | 52 | terrain TR_ (TR_real TR_G), hills/Taunus/Acropolis, road shelves athRoadProfile shelfY, Autobahn AB_, garage lots, HUB, colliders (groundAt roofAt roamHit bHit  |
 | 60 | `60_city_build.js` | 201 | build the free-roam map: ground gndBuild gndVert, water/quays/slipways/decks, streets, biomes BIOMES, landmarks lmBuildAll, skyline/outer towns, Athens building |
@@ -130,9 +130,9 @@ uses: 10(103), 30(79), 53(66), 70(52), 71(51), 20(32), 51(27), 72(10), 60(7), 96
 defines: KM_IDX KM_TEX KM_BIN
 uses: 30(2), 20(1)
 
-## 51_city_net.js — 44 KB
-defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_prune RD_net RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
-uses: 53(53), 30(30), 10(19), 40(7), 20(6), 41(6), 50(5)
+## 51_city_net.js — 45 KB
+defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_OLD RD_kriezi RD_prune RD_net RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
+uses: 53(54), 30(33), 10(20), 20(7), 40(7), 41(6), 50(5)
 
 ## 52_terrain_data.js — 115 KB
 defines: TR_DATA
@@ -376,7 +376,7 @@ uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
 ## 99c_checklist.js — 63 KB
 defines: OD_CHECKLIST
-uses: 30(52), 10(24), 20(16), 41(6), 70(6), 71(6), 99t(5), 72(4), 92(4), 98ld(3)
+uses: 30(52), 10(24), 20(16), 70(7), 71(7), 41(6), 99t(5), 72(4), 92(4), 98ld(3)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp

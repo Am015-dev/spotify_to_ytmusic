@@ -80,3 +80,8 @@ Last tPlay ATH (381ec86, rd/tp_final3): wall 5.63/min FAIL, stuck 1.4 %, heap 20
 - Branch fac6530 FRA graph (rd/r3_before, local page = ./overdrive.html from `build.sh <v> --local`, copied next to km.js): 1 comp, 35 dead ends, 2 stubs < 40 m, 468 junctions. Grid: docs/shots/roads/r3_grid.jpg (live map | branch).
 - On the branch the district grids are already one network; the live map's islands come from v90j not having roads-1's work.
 - Gap found: motorways (AB in 53_terrain_roads.js, 6 AB_FEED feeders) are NOT in rdGraph/OB_net, so "every motorway connected" cannot be checked yet. Next: add AB + feeders to rdGraph, then add ramps for motorway sides with no feeder (A66 west/east, A3 south), cut the 2 stubs < 40 m, hide Höchst/Offenbach loose roads from the map, checklist item + check.
+
+## roads-4 (slice): Athens old town never loses secondary streets
+- RD_prune (src/51_city_net.js, RD_OLD): `sec` streets in the old-town box (x 1450–2300, z -1760..-1300: Psyrri/Monastiraki/Plaka) or within 150 m of Garaz Psyrri are never cut. Kriezi restored (off-asphalt at the stub 19/32 m → 3.8/2.0 m = base).
+- Check: `node tools/roads/rdEvalW.js <url> ath tools/roads/kriezi.code.js` → KRIEZI OK (asphalt + no building collider on the street within 150 m). Checklist item ath-kriezi (v90k) with a 📍 GO button (sets a GPS pin; `go:[city,x,z]` field, full checklist only).
+- NOT measured: the Athens tPlay ×2 (CITIES=ath MODE=phone MIN=2 FAST=1) did not finish inside the slice (one browser crash, then stopped at the time limit). Next worker: run it twice on 409406d+ and compare with 5.63/min (tp_final3).
