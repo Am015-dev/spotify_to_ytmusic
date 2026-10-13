@@ -4,6 +4,20 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## START HERE — orchestrator hand-off (13 Oct 2026, 21:00 UTC)
+Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BRIEF-TEMPLATE.md` into every new worker brief.
+- **Deploy gate (owner, 13 Oct):** `build-all.py --deploy <slug>` = phone-check + scenarios + look check + QUICK sweep. Full sweep only `--full` (engine/rules changes).
+- **Code:** start from `games-src/<dir>/MODULES.md` + `games-src/scripts/find.sh`; build outputs are untracked; `guard.py` (build + GitHub workflow) blocks regressions.
+- **Owner pages:** `status.html` (versions, missing, not wired), `look/index.html` (look check), `next-wave.html` (to-make list, Waves 7-9, 3D A-E; laptop prompt files in `games-src/next-wave/`), asset viewer Games tab, `lab.html` (coming).
+- **Cloud workers still running (check with get_session, model sonnet):**
+  - `session_01VxGyhTM7mpMZhPEraRLygh` LAB menu + pinned in-game checklist with GO, all games (Doorkick first), `games/lab.html`.
+  - `session_01TKczxYncDcsdcj22o9Zg3W` shared skin: story bubble 9-slice + no sideways scrollbars, deploying game by game.
+  - `session_01Xv41avdLg3J35CCnreRR8M` faster checks + scenarios (was fixing 4/24 Doorkick sweep failures).
+  - `session_0173P8APho8S4jxLQSJj26oe` Nightrun K2: stages + map, difficulty curve, strategic shop/garage/market.
+  - In this session's checkout a look fixer was deploying Crown, Sands, Tidewake, Thornbound, Cauldron (label sizes, tap targets, Got it button); check `git log` for "Look fixes" and finish any not live.
+- **Open items:** Nightrun quick sweep failed on rhythm/difficulty/story-lock/tune items after the boss deploy (likely K2's in-progress work; K2's deploy must clear them). Nightrun needs LAB/scenarios adopted after K2 (note above). Owner may want the Overdrive car-damage request handled by the Overdrive session (session_017iH3DB4VyxwKSdMwsco4Ut).
+- **Owner is frustrated by slowness:** target ≤ 15 min per game from start to live; report real times. Hand off this orchestrator at ~150k context.
+
 ## Checks: two speeds + scenarios (13 Oct 2026) — read `PLAYBOOK.md` "Iterate fast, check once"
 - `build-all.py --quick <slug>` (phone-check + scenarios + QUICK sweep) to iterate; `--deploy <slug>` = full sweep once, then live. Numbers: `CHECK-SPEED.md`.
 - One shared http server (`scripts/gx-serve.js`, `GX_URL`) for every check; no file://. Skin never changes a box (`GXSK.audit()` in phone-check).
