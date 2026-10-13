@@ -1,0 +1,1 @@
+(()=>{const o=__qaHumans(5000);const h=__sc.humans();let of=null;try{const F=OF_figBuild();const b=new THREE.Box3().setFromObject(F.g);of=+(b.max.y-b.min.y).toFixed(2)}catch(e){}return {heights:o.heights,humans:h,onfoot:of,fixed:o.fixed}})()

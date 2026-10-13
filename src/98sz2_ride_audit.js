@@ -41,3 +41,15 @@ function RSZ_go(){(async()=>{const bad=[];for(const id of RSZ.WORST){const S=GAR
   if(m.L<lo||m.L>hi||m.stick!=null&&m.stick>(RSZ.open(S)?.75:.1)||!RSZ.sunkOK(S)&&m.sink!=null&&m.sink<.3)bad.push(S.n+' '+m.L+' m')}
  RSZ.res={bad};try{say('',bad.length?'❌ out of class: '+bad.join(' · '):'✅ the 6 worst rides are in class · look at the driver in the garage',4)}catch(e){}
  try{if(!RO.ch&&!RO.sp){gbOpen();setTimeout(()=>GAR_select(RSZ.WORST[0]),700)}}catch(e){}})();return'📍 Measuring 6 rides…'}
+// rv-human (rv:2026-10-13, Alex: figure vs sports car): EVERY humanoid type is one height, 1.80 m (±3 %): on-foot figure, pavement pedestrians, quest/mission givers
+// and hosts (minifig()), the moped goon, and the minifig driver of the City/Town rides (drvM). The stock Speed-Champions garage driver (1.55 m seated figure, sized to the
+// open cockpit of the 8-wide cars) is listed but exempt: a 1.80 m one would stick out of the roof (RSZ.audit 'head' check).
+RSZ.HUM=1.8;
+RSZ.humans=()=>{const o={},B=new THREE.Box3();try{o['pedestrian']=4.18*SC_K.ped}catch(e){}
+ try{const f=minifig('#f00');f.userData.ex&&(f.userData.ex.visible=false);f.updateMatrixWorld(true);B.makeEmpty();f.traverse(c=>{if(c.isMesh)B.expandByObject(c)});o['quest giver / host']=B.max.y-B.min.y}catch(e){}
+ try{const F=OF_figBuild();B.setFromObject(F.g);o['on-foot figure']=B.max.y-B.min.y}catch(e){}
+ try{o['moped goon rider']=4.01*.75*SC_K.moped}catch(e){}
+ try{const M=[],L=[];GB_figGeo(GB_figGet(),M,L,false);B.makeEmpty();for(const g of M){g.computeBoundingBox();B.union(g.boundingBox)}o['City-set driver (drvM)']=(B.max.y-B.min.y)*RSZ.fig*SHIP_K*SC_K.ship*RSZ.k}catch(e){}
+ return o};
+function RSZ_human(){const h=RSZ.humans(),bad=[],t=[];for(const k in h){const v=h[k],r=v/RSZ.HUM-1;t.push(k+' '+v.toFixed(2));if(Math.abs(r)>.03)bad.push(k+' '+v.toFixed(2)+' m')}
+ const n=Object.keys(h).length,m=n<5?'❌ only '+n+' of 5 humanoid types measured · ':'';window.__chk&&(__chk.human=h);return m+(bad.length?'❌ not 1.80 m ±3 %: '+bad.join(' · '):'✅ all humanoids 1.80 m ±3 % · '+t.join(' · '))}
