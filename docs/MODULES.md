@@ -87,7 +87,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ba | `98ba_build_anim.js` | 5 | BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built"). When a ride first shows in the |
 | 98gf | `98gf_garage_floor.js` | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
 | 98gz | `98gz_garage_zoom.js` | 7 | GZ (garage zoom + pick, Alex 2026-10-13: "include a zoom in/out and more builder functionalities for garage"). 1) ZOOM in every garage mode (RIDES / BUILD / PAI |
-| 98b2 | `98b2_builder2.js` | 57 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: the STUNT CUP ribbon builder was "boring, flat, no levels". This is a PIECE builder on FULL terrain, in its ow |
+| 98b2 | `98b2_builder2.js` | 60 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: the STUNT CUP ribbon builder was "boring, flat, no levels". This is a PIECE builder on FULL terrain, in its ow |
 | 98rd | `98rd_roads.js` | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow traffic rules and also humans"): pedestrian kerb + crossing rules, cars yield, zebras in Frankfurt. |
 | 98tq | `98tq_test_quick.js` | 4 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z][&go=<ver/id>][&draw=0]: slot 9 (wiped each load), skips intro/menu/story/tutorial, low quality, no warm-up  |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
@@ -377,7 +377,7 @@ uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
 ## 99c_checklist.js — 65 KB
 defines: OD_CHECKLIST
-uses: 30(52), 10(24), 20(16), 71(8), 70(7), 41(6), 53(6), 98tq(6), 99t(5), 72(4)
+uses: 30(52), 10(24), 20(17), 71(8), 70(7), 41(6), 53(6), 98tq(6), 99t(5), 72(4)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
@@ -411,9 +411,9 @@ uses: 92(5), 98s(3), 72(2), 10(1), 93(1), 98ld(1)
 defines: GZ GZ_md GZ_MIN GZ_MAX GZ_set GZ_step GZ_fit GZ_lab GZ_mk GZ_place GZ_spin GZ_pickOn GZ_ui __gz
 uses: 92(28), 94(12), 10(7), 98u(4), 98s(4), 98ld(3), 30(2), 98(2), 98y(2), 98gb(1)
 
-## 98b2_builder2.js — 57 KB
-defines: BX BXC BXH BXN BXW BXR BXTN BXO BXG BXRW BXF bxV bxSS bxCl BX_hv BX_h BX_tn bxBowl BX_WORLDS BX_CITY BX_world BX_brush BX_carve bxCurve BX_P BX_PAL BX_fr BX_exit BX_samp BX_tex BX_mats bxCol BX_PROF BX_geo BX_mk BX_apply BX_replay BX_do BX_undo BX_hashAll BX_near BX_pcMesh BX_pcDrop BX_gate BX_buildAll BX_pillars BX_ends BX_after BX_marks BX_ghost BX_terrMesh BX_trees BX_bld BX_scene BX_fxInit BX_burst BX_fxStep BX_car BX_vmode BX_spawn BX_driveStart BX_driveStop BX_hud BX_say BX_respawn _r1 _r2 _r3 BX_cast BX_objs BX_step BX_farCheck BX_course BX_camBuild BX_camDrive BX_sunAt BX_tick BX_input BX_css BX_icon BX_TOOLS BX_ui BX_place BX_del BX_stats BX_tapInit BX_tap BX_hlShow BX_saved BX_save BX_load BX_loadUI BX_DEMOS BX_open BX_close bxCh bxRep bxCross BX_TESTS BX_test __bx
-uses: 10(31), 30(12), 20(10), 72(5), 40(1), 93(1)
+## 98b2_builder2.js — 60 KB
+defines: BX BXC BXH BXN BXW BXR BXTN BXO BXG BXRW BXF bxV bxSS bxCl BX_hv BX_h BX_tn bxBowl BX_WORLDS BX_CITY BX_world BX_brush BX_carve bxCurve BX_P BX_PAL BX_fr BX_exit BX_samp BX_tex BX_mats bxCol BX_PROF BX_geo BX_mk BX_apply BX_replay BX_do BX_undo BX_hashAll BX_near BX_pcMesh BX_pcDrop BX_gate BX_buildAll BX_pillars BX_ends BX_after BX_marks BX_ghost BX_terrMesh BX_trees BX_bld BX_scene BX_fxInit BX_burst BX_fxStep BX_car BX_vmode BX_spawn BX_driveStart BX_driveStop BX_hud BX_say BX_respawn _r1 _r2 _r3 BX_cast BX_objs BX_step BX_farCheck BX_course BX_camBuild BX_camDrive BX_sunAt BX_tick BX_input BX_css BX_icon BX_TOOLS BX_ui BX_place BX_del BX_stats BX_tapInit BX_tap BX_hlShow BX_saved BX_save BX_load BX_loadUI BX_DEMOS BX_open BX_close BX_raceMenu bxCh bxRep bxCross BX_TESTS BX_test __bx
+uses: 10(31), 20(13), 30(12), 72(7), 40(1), 93(1)
 
 ## 98rd_roads.js — 14 KB
 defines: RD_PS RD_key RD_sd RD_pv RD_pred RD_predOf RD_inBox RD_boxPath RD_pedNext RD_turnBack RD_CG RD_RB RD_road RD_mem RD_memGet RD_may RD_KR RD_kerb RD_maySig RD_carPre RD_carPost RD_zebra __rd RD_entry RD_compat RD_LEFT RD_US RD_unstack RD_POLE RD_poleOn RD_poleOut RD_exitFree
