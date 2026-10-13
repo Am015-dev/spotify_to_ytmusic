@@ -59,6 +59,6 @@ The 2 FAILs are test order: the kit was already installed when the second tap ca
    NITRO KIT with BOOST; (d) the Hot Rod parked at Home after the swap; (e) the Home pin on the minimap (zoom/circle).
 5. Athens: a Home shot + the boost gate. Phone tPlay fra+ath no worse than v90i (fra walls 0.5/min, stuck 4.5 %; ath walls 1.49/min).
 6. OD_CHANGELOG v90k entry + OD_CHECKLIST (99c) items for Home and the nitro gate.
-7. Scope note: the reviewer saw ~19 new 98ld_v_* models + src/MODELS on this branch. They come from the base alex/od-models (b40e79b v90j WIP), NOT from
+7. DROPPED by the reviewer (correction 13:58): the 98ld_v_* models are reviewed with od-models. Was: the reviewer saw ~19 new 98ld_v_* models + src/MODELS on this branch. They come from the base alex/od-models (b40e79b v90j WIP), NOT from
    home-1: `git diff origin/alex/od-models...HEAD -- src` = only 98hm_home.js, 70_roam_world.js (1 line), ORDER, MAP.md. Ship them with od-models' own review.
 8. Check that the 99c pin coverage isn't hidden by the HOME card.
