@@ -18,3 +18,11 @@ Brief: Alex "make tracks fun like YouTube: high stunts, alternative roads". STEP
   Lesson: a moved line carried a closing `}` → the TB module died at load but build.sh said BUILD_OK. Always run a load smoke (`/tmp/claude-0/sp/err.js URL`: waits for __tb + menu, prints page errors).
 - alex/od-track merged od-builder (7562fe7). 6 STUNT CUP tracks, 19/19 lint; tRace 2 laps each in qa_t2_*.log (0 errors, all jumps landed, air 2.3–3.6 s).
 - Open: wall hits 0.51–0.57/min on 4 tracks, Taunus 1.08 (DBGW run qa_t2_td2); route balance needs ROUTE=road runs (TB_V.rk); Lab artifact update; stunt GRID; full REVIEW.
+
+## Update (REVIEW sent)
+- od-builder 0146a18 PASSed (QUICK-plus) → handed to build-10 for v90k (conditions: changelog/checklist, ≤3.6 MB, models ship).
+- STUNT CUP REVIEW sent: alex/od-track 7f79e65, GRID docs/shots/track2/GRID.jpg (build tr2i), Lab v4. Final tRace qa_t7_*.log.
+- Coordinator notes fixed: big-air camera (10 m back / 5.5 m up, eases out) + 0.35 s apex slow-mo, landmarks ahead of every jump, LEGO city blocks (TS_city).
+- Tyre gap: tRace now measures plane distance (old world-Y box was wrong on banks); median +0.002 m.
+- Split radius lint (dirt/water R≥150, stunt R≥90) removed the island scrapes; tRace driver now holds the split lane centre.
+- Next after PASS: build-10 handoff (OD_CHANGELOG entry + checklist: STUNT CUP row, a big jump, a split, the builder new pieces).
