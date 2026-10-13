@@ -378,7 +378,7 @@ uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
 ## 98lf_lively_fill.js — 21 KB
 defines: LF LF_count LF_hrange LF_find LF_go LF_metrics __lvf LF_h LF_n LF_mound LF_open LF_box LF_FC LF_geos LF_free LF_scatter LF_verge LF_build LF_green LF_goSpot LF_goMound LF_mottle
-uses: 53(45), 51(28), 30(23), 40(19), 60(11), 10(10), 20(8), 72(4), 71(4), 70(3)
+uses: 53(46), 51(28), 30(25), 40(19), 60(11), 10(10), 20(8), 72(4), 71(4), 70(3)
 
 ## 99c_checklist.js — 67 KB
 defines: OD_CHECKLIST

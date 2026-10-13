@@ -14,7 +14,7 @@ function LF_find(n){const N=HUB.nodes,C=[],inB=(x,z)=>!(typeof biomeAt==='functi
 // put the car at a spot, looking along h, camera snapped behind
 function LF_go(s){roamWarp(s.x,s.z,s.h);RO.v=0;camSnap=true;return true}
 function LF_metrics(s){const x=RO.x,z=RO.z,h=RO.h,fx=x+Math.sin(h)*45,fz=z+Math.cos(h)*45;return{x:+x.toFixed(1),z:+z.toFixed(1),h:+h.toFixed(2),props50:LF_count(fx,fz,50),hRange:LF_hrange(x,z,h),fill:LF.st.n||0}}
-window.__lvf={HM:()=>HUB.M,THREE,scene:()=>scene,cam:()=>camera,find:LF_find,go:LF_go,metrics:LF_metrics,count:LF_count,LF,dbg:()=>({st:LF.st,props:HUB.props.length,hx:[HX0,HX1,HZS,HZN]})};
+window.__lvf={ro:()=>({v:+RO.v.toFixed(1),y:+RO.y.toFixed(2),x:+RO.x.toFixed(1),z:+RO.z.toFixed(1)}),props:t=>HUB.props.filter(q=>q.t===t).length,HM:()=>HUB.M,THREE,scene:()=>scene,cam:()=>camera,find:LF_find,go:LF_go,metrics:LF_metrics,count:LF_count,LF,dbg:()=>({st:LF.st,props:HUB.props.length,hx:[HX0,HX1,HZS,HZN]})};
 // ---------- the fill. Open grass = 40 m cells of the city box that are ≥ 12 m from roads, buildings, water, decks, trails, ramps and existing props.
 // Each open cell gets ONE theme from a 160 m noise patch (so areas read as parks / meadows / ponds / wild ground, not confetti):
 //   grove (LEGO tree cluster + bushes) · garden (flower beds in a bush hedge + bench + lamp) · pond (water + sand rim + reeds + rocks) · wild (mound + rocks + dirt)
@@ -22,15 +22,16 @@ window.__lvf={HM:()=>HUB.M,THREE,scene:()=>scene,cam:()=>camera,find:LF_find,go:
 // Trees, bushes, rocks, benches, lamps, stalls, fences go through buildHubProps' add() (smashable, instanced per 800 m tile, LDS LOD). The low decor
 // (flower beds, tufts, patches, ponds, reeds) is our own instanced layer, no collision (≤ 0.5 m high), per 1 km tile, hidden past LF.R[type] m.
 // Mounds ("rolling terrain"): smooth domes h·(1-q)² (2-4.5 m, r 14-26 m, max slope ~14°) on wild/grove cells; roamTerr adds them, so the car drives over them.
-LF.near=150;LF.cap=6000;// only cells within 150 m of a street (what the player sees), at most 6000 cells per city
+LF.vs=CID==='fra'?12:18;LF.near=150;LF.cap=CID==='fra'?6000:3500;// only cells within 150 m of a street (what the player sees), at most 6000 cells per city
 LF.R={tuft:260,bed:380,patch:700,pond:900,reed:300,mound:1400};LF.M=[];LF.MG=new Map();
 const LF_h=(x,z,s)=>{let h=Math.sin(x*12.9898+z*78.233+(s||0)*37.719)*43758.5453;return h-Math.floor(h)};
 const LF_n=(x,z)=>{const a=x/160,b=z/160,i=Math.floor(a),j=Math.floor(b),u=a-i,v=b-j,s=t=>t*t*(3-2*t),q=(p,r)=>LF_h(p,r,7);return q(i,j)*(1-s(u))*(1-s(v))+q(i+1,j)*s(u)*(1-s(v))+q(i,j+1)*(1-s(u))*s(v)+q(i+1,j+1)*s(u)*s(v)};
 function LF_mound(x,z){const L=LF.MG.get(Math.floor(x/64)*10000+Math.floor(z/64));if(!L)return 0;let h=0;for(const m of L){const q=((x-m.x)**2+(z-m.z)**2)/(m.r*m.r);if(q<1){const k=1-q;h=Math.max(h,m.h*k*k)}}return h}
 roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.MG.size){const m=LF_mound(x,z);if(m>0)r.g+=m}return r})(roamTerr);
-function LF_open(x,z){if(roamHit(x,z,12)||inRiver(x,z,-12)||onAnyDeck(x,z))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+12)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+12)return false;
- const a=abAt(x,z);if(a&&a.d<a.road.w/2+14)return false;if(trailDist(x,z)<12)return false;if(RO.ramps&&RO.ramps.some(r=>Math.hypot(r.x-x,r.z-z)<30))return false;
- if(typeof biomeAt==='function'&&(biomeAt(x,z)||{}).g==='air')return false;return LF_count(x,z,16)<2}
+// cheapest checks first (grid lookups), trail distance (a loop over every trail point) last; returns the road-edge distance or -1
+function LF_open(x,z){if(roamHit(x,z,12))return -1;const q=cityAt(x,z),f=fillAt(x,z),d=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(d<12||d>LF.near)return -1;
+ if(inRiver(x,z,-12)||onAnyDeck(x,z))return -1;const a=abAt(x,z);if(a&&a.d<a.road.w/2+14)return -1;if(RO.ramps&&RO.ramps.some(r=>Math.abs(r.x-x)<30&&Math.abs(r.z-z)<30))return -1;
+ if(CID==='fra'&&typeof biomeAt==='function'&&(biomeAt(x,z)||{}).g==='air')return -1;if(LF_count(x,z,16)>=2||trailDist(x,z)<12)return -1;return d}
 // low decor pieces, metres, vertex colours (white parts take the instance colour)
 function LF_box(G,w,h,d,x,y,z,c,ry){const b=new THREE.BoxGeometry(w,h,d).toNonIndexed();if(ry)b.rotateY(ry);b.translate(x,y,z);G.push(colorize(b,new THREE.Color(c)))}
 const LF_FC=['#d8302a','#ffd12c','#ffffff','#f28ac0','#3f7fe0','#ff8a1c'];
@@ -54,7 +55,7 @@ function LF_scatter(add,rnd,D){if(!LF.on)return;const T0=performance.now(),I=LF.
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),P=(t,x,z,ry,y)=>{if(!t||!has(t))return;const n0=HUB.CE_L?HUB.CE_L.length:0;add(t,x,z,ry==null?rnd()*6.28:ry,y==null?gy(x,z):y);st.props++};
  const di=(t,x,z,ry,sx,sy,sz,c,y)=>{I[t].push({x,y:y==null?gy(x,z):y,z,ry,sx,sy,sz,c});st.n++;const k=Math.floor(x/16)*10000+Math.floor(z/16);let L=LF.G.get(k);if(!L)LF.G.set(k,L=[]);if(t!=='tuft'&&t!=='patch'&&t!=='mound')L.push([x,z])};
  const GRN=fra?['#4fa83a','#3f8f30','#62b848','#2f7a2a']:['#7a9a48','#8aa858','#6b8a3e','#9aae6a'],DIRT=fra?['#a8865a','#d8c08a','#8a6a44']:['#c8a46a','#d8bc84','#b08a5a'];
- const cs=40,cells=[];for(let x=HX0+cs;x<HX1-cs;x+=cs)for(let z=HZS+cs;z<HZN-cs;z+=cs){const jx=x+(LF_h(x,z,1)-.5)*10,jz=z+(LF_h(x,z,2)-.5)*10;if(!LF_open(jx,jz))continue;const q=cityAt(jx,jz),f=fillAt(jx,jz),d=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(d<LF.near)cells.push([jx,jz])}
+ const cs=40,cells=[];for(let x=HX0+cs;x<HX1-cs;x+=cs)for(let z=HZS+cs;z<HZN-cs;z+=cs){const jx=x+(LF_h(x,z,1)-.5)*10,jz=z+(LF_h(x,z,2)-.5)*10;if(LF_open(jx,jz)>=0)cells.push([jx,jz])}
  st.open=cells.length;if(cells.length>LF.cap){const k=LF.cap/cells.length;for(let i=cells.length-1;i>=0;i--)if(LF_h(cells[i][0],cells[i][1],77)>k)cells.splice(i,1)}st.cells=cells.length;
  // mounds first (props and decor then stand on them)
  for(const[x,z]of cells){const n=LF_n(x,z),wild=n>=.62&&n<.8,grove=n>=.22&&n<.42;const th0=n<.22?'pond':n>=.55&&n<.62?'market':'';if(th0||!(wild&&LF_h(x,z,3)<.85||LF_h(x,z,3)<.4))continue;
@@ -88,8 +89,8 @@ function LF_verge(P,di,pk,TREES,ROCK,GRN,DIRT,st){let n=0;const one=(x,z,ux,uz,w
    else if(zn<.62){if(u<.3)P('bench',px,pz,ry+(sd>0?Math.PI/2:-Math.PI/2))}
    else if(zn<.8){if(u<.4)P(ROCK,px,pz);else di('patch',px,pz,u*6.28,3+u*4,1,2+u*3,DIRT[k%DIRT.length])}
    else for(let j=0;j<3;j++)di('tuft',px+(LF_h(px,j,4)-.5)*6,pz+(LF_h(pz,j,5)-.5)*6,j,.8,.8,.8,LF_FC[(k+j)%LF_FC.length])}};
- let k=0;for(const S of CITY_S){const Pp=S.pts;if(!Pp||S.r.cls==='hill')continue;let acc=0;for(let i=1;i<Pp.length-1;i++){const p=Pp[i],q=Pp[i-1];acc+=Math.hypot(p.x-q.x,p.z-q.z);if(acc<12)continue;acc=0;if(p.x<HX0||p.x>HX1||p.z<HZS||p.z>HZN)continue;one(p.x,p.z,p.tx,p.tz,S.r.w,k++)}}
- for(const r of hubRoads())for(let d=8;d<r.L-8;d+=12)one(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w,k++);st.verge=n}
+ let k=0;for(const S of CITY_S){const Pp=S.pts;if(!Pp||S.r.cls==='hill')continue;let acc=0;for(let i=1;i<Pp.length-1;i++){const p=Pp[i],q=Pp[i-1];acc+=Math.hypot(p.x-q.x,p.z-q.z);if(acc<LF.vs)continue;acc=0;if(p.x<HX0||p.x>HX1||p.z<HZS||p.z>HZN)continue;one(p.x,p.z,p.tx,p.tz,S.r.w,k++)}}
+ for(const r of hubRoads())for(let d=8;d<r.L-8;d+=LF.vs)one(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w,k++);st.verge=n}
 // instanced decor, one mesh per type per 1 km tile
 function LF_build(){if(!LF.I||!HUB.grp)return;const G=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
  LF.ms=[];const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),C=new THREE.Color();
