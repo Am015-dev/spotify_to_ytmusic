@@ -183,8 +183,21 @@ function OF_lift(){const C=OF.cur;if(C.own||C.lowL==null||!pl||pl.air||(pl.boatK
   // lowest tyre point under each wheel's contact patch (box corner moved in by the tyre radius) (pitch/roll included) vs the ground there: the lowest corner gap is held at CR_TYRE_Y − 1 cm, tyres just touching (no float on a crowned road or by a kerb)
   let lift=-1e9;const W=C.wb;if(W){for(let i=0;i<4;i++){const r=Math.min((W.max.y-W.min.y)/2,(W.max.z-W.min.z)/4);OF_v3.set(i&1?W.max.x:W.min.x,C.lowL,i&2?W.max.z-r:W.min.z+r).applyMatrix4(ud.m.matrixWorld);lift=Math.max(lift,groundAt(OF_v3.x,OF_v3.z,OF_v3.y+1)+CR_TYRE_Y-.01-OF_v3.y)}}
   else lift=groundAt(RO.x,RO.z,RO.y+1)+CR_TYRE_Y-OF_v3.y;lift=clamp(lift,-.4,.4);ud.m.position.y+=lift/(pl.mesh.scale.y||1);ud.m.updateMatrixWorld(true)}
+// own car parked while you walk: nothing re-poses it on foot, so the exit-frame squat/pitch froze (rear sunk into the road). Settle it: level pose, then pitch/roll to the ground under the 4 corners, lowest tyre point CR_TYRE_Y above the road.
+const OF_q=new THREE.Quaternion(),OF_ax=new THREE.Vector3(),OF_bx=new THREE.Box3();
+function OF_corners(){const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const B=OF_bx.makeEmpty(),inv=new THREE.Matrix4().copy(pl.mesh.matrixWorld).invert(),m=new THREE.Matrix4(),b=new THREE.Box3();
+  ud.m.traverseVisible(o=>{if(!o.isMesh||!o.geometry||(o.material&&o.material.transparent)||o.userData.ofSeat)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();m.multiplyMatrices(inv,o.matrixWorld);if(o.isInstancedMesh){const k=new THREE.Matrix4();o.getMatrixAt(0,k);m.multiply(k)}b.copy(o.geometry.boundingBox).applyMatrix4(m);B.union(b)});
+  if(B.isEmpty())return null;const ix=(B.max.x-B.min.x)*.12,iz=(B.max.z-B.min.z)*.12,P=[];for(let i=0;i<4;i++)P.push(new THREE.Vector3(i&1?B.max.x-ix:B.min.x+ix,B.min.y,i&2?B.max.z-iz:B.min.z+iz).applyMatrix4(pl.mesh.matrixWorld));return P}
+function OF_gap(){if(!pl)return null;const P=OF_corners();if(!P)return null;let mx=-9,mn=9;for(const v of P){const d=v.y-groundAt(v.x,v.z,v.y+1);mx=Math.max(mx,d);mn=Math.min(mn,d)}const f=new THREE.Vector3(0,0,1).applyQuaternion(pl.mesh.quaternion);return{max:+mx.toFixed(3),min:+mn.toFixed(3),pitch:+(Math.asin(clamp(f.y,-1,1))*180/Math.PI).toFixed(2)}}
+function OF_settle(){const C=OF.car;if(!C||!C.own||!pl||!pl.mesh||(pl.boatK||0)>.5)return;try{
+  pl.pitch=0;pl.roll=0;pl.pv=0;RO.v=0;RO.vy=0;RO.landK=0;pl.air=false;const sx=RO.x,sz=RO.z,sh=RO.h;RO.x=C.x;RO.z=C.z;RO.h=RO.vh=C.h;try{roamPose(pl,1/60)}catch(e){}try{CR_carPose(pl,0)}catch(e){}RO.x=sx;RO.z=sz;RO.h=RO.vh=sh;
+  const fx=Math.sin(C.h),fz=Math.cos(C.h),hd=(C.hd||2)*.8,hw=(C.hw||1)*.8,g=(a,b)=>groundAt(C.x+fx*a+fz*b,C.z+fz*a-fx*b,(C.y||0)+1.5);
+  const pit=Math.atan2(((g(hd,hw)+g(hd,-hw))-(g(-hd,hw)+g(-hd,-hw)))/2,2*hd),rol=Math.atan2(((g(hd,hw)+g(-hd,hw))-(g(hd,-hw)+g(-hd,-hw)))/2,2*hw);
+  OF_ax.set(fz,0,-fx);OF_q.setFromAxisAngle(OF_ax,-clamp(pit,-.35,.35));pl.mesh.quaternion.premultiply(OF_q);OF_ax.set(fx,0,fz);OF_q.setFromAxisAngle(OF_ax,clamp(rol,-.35,.35));pl.mesh.quaternion.premultiply(OF_q);
+  const P=OF_corners();if(P){let mn=9;for(const v of P)mn=Math.min(mn,v.y-groundAt(v.x,v.z,v.y+1));if(mn<5)pl.mesh.position.y+=CR_TYRE_Y-.01-mn}pl.mesh.updateMatrixWorld(true);OF.n.settle=(OF.n.settle||0)+1}catch(e){if(!OF.e3){OF.e3=1;console.warn('OF settle',e)}}}
+OF_exit=(f=>function(){const r=f.apply(this,arguments);OF.stT=0;OF_settle();return r})(OF_exit);
 // --- per-frame hooks (outermost wrappers: none of the car-only wrappers run on foot)
-roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen)OF_step(dt);return}
+roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen){OF_step(dt);OF.stT=(OF.stT||0)+(dt||0);if(OF.stT>.25){OF.stT=0;OF_settle()}}return}
   const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}try{OF_fleeStep(dt||0);OF_starStep(dt||0)}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF flee',e)}}OF_dom();OF_btns();return r})(roamStep);
 roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);return f(dt)})(roamCam);
 // leaving roam (menu, district change, wreck reset) puts you back in the car

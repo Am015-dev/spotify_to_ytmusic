@@ -59,7 +59,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
  if(process.env.GO){const r=await G.evaluate(id=>__chk.go(id),process.env.GO);console.log('GO',r);await tick(120)}
  else{await kb('ArrowUp',360);await p.keyboard.down('ArrowDown');for(let i=0;i<40;i++){await tick(6);if(Math.abs(await G.evaluate(()=>__mho.RO.v))<.4)break}await p.keyboard.up('ArrowDown');await tick(60)}
  console.log('car',JSON.stringify(await GAP()));
- await kb('KeyF',2);await tick(90);console.log('foot',JSON.stringify(await GAP()));
+ await kb('KeyF',2);await tick(90);console.log('foot',JSON.stringify(await GAP()),'settle',JSON.stringify(await G.evaluate(()=>__oc.ev('OF_gap()'))));await tick(120);console.log('foot2s',JSON.stringify(await G.evaluate(()=>__oc.ev('OF_gap()'))));
  await G.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}});await G.evaluate(()=>__tick(2));await p.screenshot({path:OUT+'/foot.jpg'});
  console.log('errs',errs.length,errs.slice(0,3));await b.close();process.exit(0)}
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});await run(b,'desk','fra')})();
