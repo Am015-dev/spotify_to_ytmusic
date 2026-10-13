@@ -9,6 +9,6 @@ git merge --no-edit FETCH_HEAD >/dev/null 2>&1 || { echo "CI: merge conflict"; g
 echo "CI: $N new commit(s): $(git log --no-merges --format='%h %an %s' HEAD~$N..HEAD | cut -c1-80 | head -5 | tr '\n' '|')"
 B0=$(date +%s); tools/build.sh $V 2>&1 | grep -E "BUILD_OK|rror" | cut -c1-90; echo "build $(( $(date +%s)-B0 ))s"
 rm -rf out/int2dev; mkdir -p out/int2dev; cp -r out/$V/* out/int2dev/
-pkill -f "http.server 8812" 2>/dev/null; (cd out/int2dev && nohup python3 -m http.server 8812 >/dev/null 2>&1 &); sleep 1
+(fuser -k 8812/tcp >/dev/null 2>&1); (cd out/int2dev && nohup python3 -m http.server 8812 >/dev/null 2>&1 &); sleep 1
 SMOKE=1 tools/tGo.sh http://localhost:8812/index.html $SCR/smoke
 [ -n "$TG" ] && TAG=$TG tools/tGo.sh http://localhost:8812/index.html $SCR/tag
