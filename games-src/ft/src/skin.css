@@ -67,3 +67,36 @@ html.sp3 .own.cam{font-size:0;width:22px;height:22px;background:var(--pc) url(mo
 @keyframes smPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes smIn{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){#summon .sm-lamp{animation:none}#summon .sm-smoke{animation:none;opacity:.5}}
+/* ===== painted pieces (djinns, goods, tokens, icons, tile frames, bid slots); each class is set by artProbe() once its file loaded ===== */
+/* goods market cards */
+html.sk-gd .mcard:not(.empty){background:linear-gradient(#fffdf6,#f1e0bc)}
+html.sk-gd .mcard:not(.empty) .mi{font-size:0;width:100%;height:100%;background:var(--gi) center/auto 92% no-repeat}
+html.sk-gd .fl .mi{font-size:0;display:block;width:30px;height:30px}
+/* djinn row: the painting behind the name */
+html.sk-dj .dcard:not(.th){background:linear-gradient(90deg,rgba(28,12,54,.86) 0,rgba(28,12,54,.5) 70%,rgba(28,12,54,.2)),var(--dj) center 20%/cover,#3f2766;text-shadow:0 1px 2px #000}
+html.sk-dj .dcard .dv{box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.dcard .thi{font-style:normal;width:22px;height:22px;flex:0 0 22px;margin-left:-4px;background:var(--ti) center/contain no-repeat;font-size:0}
+html.sk-dj .dcard.th{padding-left:6px}
+html.sk-dj .dcard.th .thi{font-size:0}
+/* summoning: the painted djinn rises out of the smoke */
+#summon .sm-art{position:relative;width:min(70vw,300px);aspect-ratio:4/3;object-fit:cover;border-radius:16px;border:3px solid #e0b24a;box-shadow:0 10px 30px rgba(0,0,0,.65),0 0 28px rgba(190,140,255,.7);animation:smPop .55s cubic-bezier(.2,1.5,.4,1) both}
+/* reference cards */
+.card img.ca{object-fit:cover;object-position:center 22%;background:#3f2766}
+.card img.ca.ct{object-fit:contain;object-position:center;background:linear-gradient(#f6e7c6,#e0c48e);padding:3px;box-sizing:border-box}
+/* camel / tent tokens on the tiles (the player-coloured rim says who owns the tile) */
+html.sk-tk .own{width:24px;height:24px;border:0;border-radius:0;background:none center/contain no-repeat;box-shadow:none;font-size:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+html.sk-tk:not(.sp3) .own.cam{background-image:var(--tk)}html.sk-tk .own:not(.cam){background-image:var(--tk)}
+html.sk-tk .own[data-p="0"]{--tk:url(media/token-camel-0.webp)}html.sk-tk .own[data-p="1"]{--tk:url(media/token-camel-1.webp)}html.sk-tk .own[data-p="2"]{--tk:url(media/token-camel-2.webp)}html.sk-tk .own[data-p="3"]{--tk:url(media/token-camel-3.webp)}html.sk-tk .own[data-p="4"]{--tk:url(media/token-camel-4.webp)}
+html.sk-tk .own:not(.cam)[data-p="0"]{--tk:url(media/token-tent-0.webp)}html.sk-tk .own:not(.cam)[data-p="1"]{--tk:url(media/token-tent-1.webp)}html.sk-tk .own:not(.cam)[data-p="2"]{--tk:url(media/token-tent-2.webp)}html.sk-tk .own:not(.cam)[data-p="3"]{--tk:url(media/token-tent-3.webp)}html.sk-tk .own:not(.cam)[data-p="4"]{--tk:url(media/token-tent-4.webp)}
+html.sk-tk:not(.sp3) .tok{font-size:0;display:inline-block;width:24px;height:24px;background:var(--tp) center/contain no-repeat;text-shadow:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}
+html.sk-tk:not(.sp3) .tok small{display:none}html.sk-tk:not(.sp3) .tok.palm{--tp:url(media/token-palm.webp)}html.sk-tk:not(.sp3) .tok.pal{--tp:url(media/token-palace.webp)}
+/* seat chips: coin, camel, goods and djinn icons instead of emoji */
+html.sk-ic2 .e2{font-size:0;display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:1px;background:center/contain no-repeat}
+html.sk-ic2 .e2[data-i=coin]{background-image:url(media/icon-coin.webp)}html.sk-ic2 .e2[data-i=camel]{background-image:url(media/icon-camel.webp)}
+html.sk-ic2 .e2[data-i=basket]{background-image:url(media/icon-basket.webp)}html.sk-ic2 .e2[data-i=djinn]{background-image:url(media/icon-djinn.webp)}
+/* turn-order slots: greyscale peg slot tinted with the bidder's colour */
+html.sk-spot .spot{background:url(media/ui-spot.webp) center/100% 100% no-repeat,rgba(255,248,230,.75);border-color:transparent;border-radius:6px}
+html.sk-spot .spot.taken{background:url(media/ui-spot.webp) center/100% 100% no-repeat var(--pc);background-blend-mode:multiply}
+/* winner sparkle */
+html.sk-fx .ft.up{text-shadow:0 0 6px #ffd35a,0 1px 2px rgba(0,0,0,.6)}
+.card img.ca.cv{height:116px;object-position:center 10%;border-radius:8px}

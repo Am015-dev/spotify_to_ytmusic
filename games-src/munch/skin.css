@@ -46,3 +46,40 @@ html.sk.ph .dlg{max-height:calc(100dvh - 12px)}
 @media (orientation:portrait){html.sk.ph .modal.art-title .dlg.start{max-height:64dvh}}
 html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{padding:0 8px}
 html.sk .mrow .btn{min-width:64px;border-width:0 16px;border-image-width:0 16px}
+/* ===== painted HUD pieces (classes set in tbl.js once the file loaded) ===== */
+/* gear slots, curse and gear icons */
+html.dk-slot .mine .slots{opacity:.75}
+html.dk-slot .mine .slots i{width:40px;height:40px;border:0;border-radius:0;font-size:0;background:center/contain no-repeat}
+html.dk-slot .mine .slots i[data-s=head]{background-image:url(media/ui-slot-head.webp)}html.dk-slot .mine .slots i[data-s=body]{background-image:url(media/ui-slot-body.webp)}
+html.dk-slot .mine .slots i[data-s=hands]{background-image:url(media/ui-slot-hands.webp)}html.dk-slot .mine .slots i[data-s=feet]{background-image:url(media/ui-slot-feet.webp)}
+html.dk-slot .gchip .gi{font-size:0;display:inline-block;width:22px;height:22px;vertical-align:middle;margin-right:4px;background:center/contain no-repeat}
+html.dk-slot .gchip .gi[data-s=head]{background-image:url(media/ui-slot-head.webp)}html.dk-slot .gchip .gi[data-s=body]{background-image:url(media/ui-slot-body.webp)}
+html.dk-slot .gchip .gi[data-s=hands]{background-image:url(media/ui-slot-hands.webp)}html.dk-slot .gchip .gi[data-s=feet]{background-image:url(media/ui-slot-feet.webp)}
+html.dk-slot .gchip .gi[data-s=class]{background-image:url(media/ui-slot-class.webp)}html.dk-slot .gchip .gi[data-s=race]{background-image:url(media/ui-slot-race.webp)}
+html.dk-curse .gi[data-s=curse]{font-size:0;display:inline-block;width:18px;height:18px;vertical-align:middle;background:url(media/token-curse.webp) center/contain no-repeat}
+html.dk-gi .opp.seat .gi[data-s=gear]{font-size:0;display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:2px;background:url(media/icon-gear.webp) center/contain no-repeat}
+/* rival chips: carved-wood plaque */
+html.dk-chip .opp.seat{background:url(media/ui-rival-chip.webp) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;padding:4px 14px 4px 7px;min-height:44px;flex-basis:170px;max-width:200px;min-width:112px}
+html.dk-chip .opp.seat.active,html.ph.dk-chip .opp.seat.active{box-shadow:none;filter:drop-shadow(0 0 4px #ffd76a) drop-shadow(0 0 2px #ffd76a)}
+/* clash: medallions behind the strength numbers, painted swords between them */
+html.dk-clash.dk-clash .arena .vs .score.hero .num,html.dk-clash.dk-clash .arena .vs .score.mons .num{background-color:transparent;background-position:center;background-size:contain;background-repeat:no-repeat;border:0;border-radius:0;box-shadow:none;min-width:2.5em;height:2.5em;display:grid;place-items:center;font-weight:800}
+html.dk-clash.dk-clash .arena .vs .score.hero .num{background-image:url(media/ui-clash-hero.webp);color:#fff;text-shadow:0 2px 0 #0a1a3a,0 0 4px #0a1a3a}
+html.dk-clash.dk-clash .arena .vs .score.mons .num{background-image:url(media/ui-clash-monster.webp);color:#3a0d05;text-shadow:none}
+html.dk-clash.dk-clash .arena .vs .score.win .num{filter:drop-shadow(0 0 8px #ffd76a) drop-shadow(0 0 16px rgba(255,215,106,.8))}
+html.dk-clash.dk-clash .arena .vs .score.lose .num{filter:saturate(.7) brightness(.9)}
+html.dk-clash.dk-clash .arena .vs .vsx{background:url(media/ui-swords.webp) center/contain no-repeat}html.dk-clash.dk-clash .arena .vs .vsx svg{display:none}
+/* hero ring around the portrait on the table */
+html.dk-med .hsav::after{content:'';position:absolute;inset:-14%;background:url(media/ui-medallion.webp) center/contain no-repeat;pointer-events:none}
+html.dk-med .hsav .hsavi{border:0}
+/* the draw piles: painted stacks instead of a single card back */
+html.dk-pile .stack .back{opacity:0}
+html.dk-pile .stack{box-shadow:none!important;background:none!important;border:0!important}
+html.dk-pile .stack::before{content:'';position:absolute;inset:-14% -24% -4%;z-index:0;background:center/contain no-repeat;pointer-events:none}
+html.dk-pile .stack.door::before{background-image:url(media/pile-door.webp)}html.dk-pile .stack.treas::before{background-image:url(media/pile-treasure.webp)}
+html.dk-pile .stack>*{position:relative;z-index:1}
+html.dk-pile .stack .dn{text-shadow:0 1px 2px #000,0 0 4px #000}
+/* ledger: parchment sheet behind the side panel, painted strip behind "Just happened" */
+html.dk-par .gx-dock-body{background:#e9d7a8;border:20px solid transparent;border-image:url(media/ui-parchment.webp) 50 fill/20px stretch}
+html.dk-par .recent .rl{background:url(media/ui-ledger-head.webp) center/auto 100% repeat-x;padding:2px 10px;border-radius:6px;min-height:46px;align-items:center}
+html.dk-par .gx-dock-body{position:relative;isolation:isolate}
+html.dk-par .gx-dock-body::before{content:'';position:absolute;inset:0;z-index:-1;background:rgba(248,240,216,.62);pointer-events:none}

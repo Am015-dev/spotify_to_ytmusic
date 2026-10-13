@@ -94,4 +94,6 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   addEventListener('resize',tableApply);addEventListener('orientationchange',tableApply);
   ['door','treasure','cellar-oak','corridor-brass','crypt-bone'].forEach(n=>{new Image().src='media/back-'+n+'.webp'});
   tableApply();
+  // painted HUD pieces: each class goes on <html> once its file has loaded (the CSS fallback stays until then)
+  [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
 })();
