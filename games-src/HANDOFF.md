@@ -5,6 +5,13 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
 
+## Lantern Dive last paintings (13 Oct 2026, 23:xx UTC): NOT deployed, one check failing
+
+- Wiring result: `table-tunnel-glow-phone` is already live (`ui99.js:18` builds the name by concatenation, so the scan still lists it). Nothing new wired.
+- `ui-bubble-tail`: no tail element exists in the shared help kit (`shell/gx-help.css`/`gx-help.js`). Adding one changes every game, so not used here. Needs an owner decision.
+- `ui-row`: its description names no place. Not used until a target is named.
+- Deploy gate FAILED on merged branch: `ld-help@375x553` text clipped ("First two tricks", span.t). Not caused by this change (no Lantern source edited). Fix in help layout (`lantern-dive/game/src/ui11.js` / shared `gx-help.css`), then rerun `build-all.py --deploy lantern-dive`.
+
 ## Story bubble + painted plate fix (13 Oct 2026): source done, only 1 of 15 deployed
 - Shell: `gx-skin.css` speech bubble is a 9-slice (`22 62 34 30 fill`), `gx-campaign.css` scene/boss/result/sheet never scroll sideways, `?scn=story-scene` registered in `gx-campaign.js`. All painted buttons use `30 42 fill/14px Npx` (vertical caps, were `0 42` = stretched on tall buttons). Short Fuse nameplate/rack, Thornbound sheet head, Doorkick dock frame, Crown `#choice` fixed in their skin/layout css.
 - `look-check.js` has two new checks (`panels`: scrollbar for decoration-only overflow, severe on x; `plates`: 9-slice/100% 100% distortion, >25% warn, >40% severe) and a `story-scene` screen. Calibrated: old final-approach build = 2 severe, fixed = 0.

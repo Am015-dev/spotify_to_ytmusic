@@ -7,9 +7,9 @@ Wired: 704 paintings, 59 3D models. Still to wire: 11 paintings, 0 models.
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | lantern-dive | 3 | 0 |
+| shipwreck-isle | 2 | 0 |
 | final-approach | 2 | 0 |
 | short-fuse | 2 | 0 |
-| shipwreck-isle | 2 | 0 |
 | sands-of-qamar | 1 | 0 |
 | nebula-aces | 1 | 0 |
 
@@ -22,6 +22,15 @@ Wired: 704 paintings, 59 3D models. Still to wire: 11 paintings, 0 models.
 | Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
+
+## shipwreck-isle
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
 ## final-approach
 
@@ -40,15 +49,6 @@ Wired: 704 paintings, 59 3D models. Still to wire: 11 paintings, 0 models.
 |---|---|---|
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
-
-## shipwreck-isle
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
 ## sands-of-qamar
 
