@@ -164,22 +164,22 @@ function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)
 // one landmark per track (a giant LEGO minifig statue near the start). All instanced; no collision (they stand outside the rails).
 const BX_DC=['#c91a09','#0055bf','#f2cd37','#237841','#fe8a18','#ffffff','#a0a5a9'].map(bxCol);
 function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isInstancedMesh)o.dispose()})}const g=BX.drM=new THREE.Group();BX.sc.add(g);
- const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],pole=[],flag=[],ban=[],chev=[],near=(x,z,me)=>BX.samp.some(q=>q.pc!==me&&Math.abs(q.s.p.x-x)<10&&Math.abs(q.s.p.z-z)<10),
+ const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],pole=[],flag=[],ban=[],chev=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<8.5)/* another road within its rail */,
   inB=(x,z)=>(BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+2&&Math.abs(b.z-z)<b.d/2+2);let n=0,side=1,run=0,len=0,props=0;
  for(const pc of L){const S=pc.S[0];for(let k=1;k<S.length;k++){const s=S[k],d=s.d-S[k-1].d;len+=d;run+=d;if(pc.def.boost&&k%Math.max(1,S.length>>1)===0)chev.push(s);if(run<7)continue;run=0;side=-side;n++;
   const raised=s.p.y-BX_h(s.p.x,s.p.z)>2.5||pc.def.p.length>1;if(pc.def.p.length>1||pc.def.stick)continue;
-  if(raised){const x=s.p.x+s.S.x*side*6.8,z=s.p.z+s.S.z*side*6.8,y=s.p.y+s.S.y*side*6.8+1.4;pole.push([x,y,z,4]);flag.push([x,y+3.3,z,n,s]);props++;continue}
-  const x=s.p.x+s.S.x*side*11,z=s.p.z+s.S.z*side*11,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
-  if(n%3===0){for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*1.3,fz=z+s.F.z*f*1.3;body.push([fx,y+.75,fz,n+f]);head.push([fx,y+1.75,fz])}}
-  else if(n%3===1){ban.push([x,y,z,n,s])}else{pole.push([x,y,z,5]);flag.push([x,y+3.8,z,n,s])}}}
+  if(raised){const x=s.p.x+s.S.x*side*6.8,z=s.p.z+s.S.z*side*6.8,y=s.p.y+s.S.y*side*6.8+1.4;pole.push([x,y,z,7]);flag.push([x,y+6.4,z,n,s]);props++;continue}
+  const x=s.p.x+s.S.x*side*9.6,z=s.p.z+s.S.z*side*9.6,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
+  if(n%3===0){for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*2.6,fz=z+s.F.z*f*2.6;body.push([fx,y+1.5,fz,n+f]);head.push([fx,y+3.5,fz])}}
+  else if(n%3===1){ban.push([x,y,z,n,s])}else{pole.push([x,y,z,10]);flag.push([x,y+8.6,z,n,s])}}}
  const mt=new THREE.Matrix4(),q=new THREE.Quaternion(),sc=bxV(),pos=bxV(),UP=bxV(0,1,0),M=(geo,mat,arr,fn)=>{if(!arr.length)return;const im=new THREE.InstancedMesh(geo,mat,arr.length);im.castShadow=true;
   arr.forEach((a,i)=>{fn(a,i);im.setMatrixAt(i,mt)});g.add(im);return im},std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45});
- const bi=M(new THREE.BoxGeometry(.9,1.5,.7),std(0xffffff),body,a=>{mt.makeTranslation(a[0],a[1],a[2])});if(bi){body.forEach((a,i)=>bi.setColorAt(i,BX_DC[Math.abs(a[3])%5]))}
- M(new THREE.CylinderGeometry(.42,.42,.6,10),std(0xf2cd37),head,a=>{mt.makeTranslation(a[0],a[1],a[2])});
- M(new THREE.CylinderGeometry(.12,.12,1,6),std(0xd9d9d9),pole,a=>{mt.makeScale(1,a[3],1);mt.setPosition(a[0],a[1]+a[3]/2,a[2])});
- const fl=M(new THREE.BoxGeometry(.08,1.1,1.8),std(0xffffff),flag,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1],a[2]).addScaledVector(a[4].F,-.9),q,sc.set(1,1,1))});
+ const bi=M(new THREE.BoxGeometry(1.8,3,1.4),std(0xffffff),body,a=>{mt.makeTranslation(a[0],a[1],a[2])});if(bi){body.forEach((a,i)=>bi.setColorAt(i,BX_DC[Math.abs(a[3])%5]))}
+ M(new THREE.CylinderGeometry(.84,.84,1.2,10),std(0xf2cd37),head,a=>{mt.makeTranslation(a[0],a[1],a[2])});
+ M(new THREE.CylinderGeometry(.24,.24,1,6),std(0xd9d9d9),pole,a=>{mt.makeScale(1,a[3],1);mt.setPosition(a[0],a[1]+a[3]/2,a[2])});
+ const fl=M(new THREE.BoxGeometry(.12,2.2,3.6),std(0xffffff),flag,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1],a[2]).addScaledVector(a[4].F,-1.8),q,sc.set(1,1,1))});
  if(fl)flag.forEach((a,i)=>fl.setColorAt(i,BX_DC[a[3]%4]));
- const bn=M(new THREE.BoxGeometry(.3,2.2,7),std(0xffffff),ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+1.9,a[2]),q,sc.set(1,1,1))});
+ const bn=M(new THREE.BoxGeometry(.5,4.4,12),std(0xffffff),ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+3,a[2]),q,sc.set(1,1,1))});
  if(bn)ban.forEach((a,i)=>bn.setColorAt(i,BX_DC[(a[3]>>1)%4]));
  // glowing chevrons on BOOST pads (pulse in BX_tick)
  const cm=BX.chevMat=BX.chevMat||new THREE.MeshStandardMaterial({color:0xffb000,emissive:0xff8a00,emissiveIntensity:1.4,roughness:.3}),cg=new THREE.BoxGeometry(.5,.08,4.6);
@@ -187,10 +187,10 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
  M(cg,cm,C,([s,sd])=>{const a=Math.atan2(s.F.x,s.F.z)+sd*.75;q.setFromAxisAngle(UP,a);mt.compose(pos.copy(s.p).addScaledVector(s.U,.08).addScaledVector(s.S,sd*1.6),q,sc.set(1,1,1))});
  BX.dressN={props,len,landmark:BX_landmark(g,L)}}
 // landmark: a giant LEGO minifig (~16 m) on open ground 30-50 m from the course, as close to START as possible
-function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp.length)return 0;const o=st.S[0][0].p;let best=null,bd=1e9;
- for(let a=0;a<64;a++)for(const r of[34,44,56]){const x=o.x+Math.cos(a/64*6.283)*r,z=o.z+Math.sin(a/64*6.283)*r;if(Math.abs(x)>150||Math.abs(z)>150)continue;const h=BX_h(x,z);if(h<.3||BX_tn(x,z).y<.9)continue;
+function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp.length)return 0;const o=st.S[0][0].p,sF=st.S[0][0].F;let best=null,bd=1e9;
+ for(let a=0;a<64;a++)for(const r of[70,85,100,120]){const ca=Math.cos(a/64*6.283),sa=Math.sin(a/64*6.283),x=o.x+ca*r,z=o.z+sa*r;if(ca*sF.x+sa*sF.z<.94)continue;/* ahead of the start grid */if(Math.abs(x)>150||Math.abs(z)>150)continue;const h=BX_h(x,z);if(h<.3||BX_tn(x,z).y<.9)continue;
   let dmin=1e9;for(const{s}of BX.samp){const d=Math.hypot(s.p.x-x,s.p.z-z);if(d<dmin)dmin=d}if(dmin<26)continue;if((BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+8&&Math.abs(b.z-z)<b.d/2+8))continue;
-  const sc=Math.abs(r-40)+a*.01;if(sc<bd){bd=sc;best=[x,h,z]}}
+  const sc=r-(ca*sF.x+sa*sF.z)*30;if(sc<bd){bd=sc;best=[x,h,z]}}
  if(!best)return 0;const f=new THREE.Group(),std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.35}),B=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),std(c));m.position.set(x,y,z);m.castShadow=true;f.add(m);return m};
  B(1.7,4.2,2.2,0x0055bf,-.95,2.1,0);B(1.7,4.2,2.2,0x0055bf,.95,2.1,0);B(3.9,1.1,2.2,0x0055bf,0,4.7,0);B(4.2,4.6,2.2,0xc91a09,0,7.5,0);
  const arm=(sx)=>{const m=B(1.2,4,1.4,0xc91a09,sx*2.7,7.4,0);m.rotation.z=sx*.18};arm(-1);arm(1);
@@ -198,7 +198,7 @@ function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp
  const hd=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,3,16),std(0xf2cd37));hd.position.y=11.6;hd.castShadow=true;f.add(hd);
  const stud=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,.7,12),std(0xf2cd37));stud.position.y=13.45;f.add(stud);
  for(const sx of[-.6,.6]){const e=B(.3,.5,.1,0x111111,sx,12,1.7)}const mo=B(1.4,.25,.1,0x111111,0,11.1,1.7);
- f.position.set(best[0],best[1]-.2,best[2]);f.rotation.y=Math.atan2(o.x-best[0],o.z-best[2]);g.add(f);return 1}
+ f.scale.setScalar(1.5);f.position.set(best[0],best[1]-.2,best[2]);f.rotation.y=Math.atan2(o.x-best[0],o.z-best[2]);g.add(f);return 1}
 // open ends (exits with no piece starting there) + the cursor
 // every cell a piece can be entered from (a MERGE has two)
 const BX_ents=p=>[p.c,...(p.def.in||[]).map(e=>BX_exit(p.c,[e[0],e[1],0,0]))];
@@ -274,7 +274,7 @@ function BX_driveStart(){BX.mode='drive';BX_after();const car=BX_car();BX.sc.add
  BX.camD={p:sp.p.clone().addScaledVector(sp.F,-9).add(bxV(0,4,0)),up:bxV(0,1,0)}}
 function BX_driveStop(){BX.mode='build';if(BX.car)BX.sc.remove(BX.car,BX.shM);BX_after();BX_ui()}
 function BX_hud(){const V=BX.v,m=BX.m,H=$('#bxHud'),M=$('#bxMsg');if(!H)return;const cps=BX.pcs.filter(p=>!p.dead&&p.def.cp).length;
- H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${m.laps+1}`;M.textContent=V.msgT>0?V.msg:''}
+ H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${Math.min(m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS}`;M.textContent=V.msgT>0?V.msg:''}
 function BX_say(t,s=1.4){const V=BX.v;if(V){V.msg=t;V.msgT=s}}
 function BX_respawn(why){const V=BX.v,m=BX.m,s=V.lastCp||V.safe,sp=6;if(why==='far'&&V.fallPk-V.p.y>16)why='cliff';V.fallPk=-1e9;
  V.hist=[];V.p.copy(s.p).add(bxV(0,.8,0));V.F.copy(s.F);V.U.set(0,1,0);V.v.copy(s.F).multiplyScalar(sp);V.g=false;V.air=0;V.pk=V.p.y;V.far=0;V.stuck=0;
@@ -343,7 +343,7 @@ function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9;for
  if(best>40){V.far+=dt;if(V.far>3)BX_respawn('far')}else V.far=0}
 // checkpoints and laps: START then every CHECKPOINT (any order), back over START = lap
 function BX_course(pc){const V=BX.v,m=BX.m,cps=BX.pcs.filter(p=>!p.dead&&p.def.cp);if((pc.def.cp||pc.def.start)&&V.lastPc!==pc.id)V.lastCp={p:V.p.clone(),F:V.F.clone()};if(pc.def.cp&&!V.cps.has(pc.id)){V.cps.add(pc.id);BX_say('CHECKPOINT '+V.cps.size+'/'+cps.length,1)}
- if(pc.def.start&&V.lastPc!==pc.id){if(V.cps.size>=cps.length&&m.t-m.lap0>8){m.laps++;m.lapT.push(+(m.t-m.lap0).toFixed(2));m.lap0=m.t;V.cps=new Set();BX_say('LAP '+m.laps+' · '+m.lapT[m.lapT.length-1].toFixed(1)+' s',2)}}
+ if(pc.def.start&&V.lastPc!==pc.id){if(V.cps.size>=cps.length&&m.t-m.lap0>8){m.laps++;m.lapT.push(+(m.t-m.lap0).toFixed(2));m.lap0=m.t;V.cps=new Set();BX_say(m.laps>=BX_RACE_LAPS?'FINISH! '+m.lapT.reduce((a,b)=>a+b,0).toFixed(1)+' s':'LAP '+m.laps+' · '+m.lapT[m.lapT.length-1].toFixed(1)+' s',m.laps>=BX_RACE_LAPS?4:2)}}
  V.lastPc=pc.id;if(pc.def.stick&&pc.type==='lp'&&V.U.y<-.8&&!V.loopTop){V.loopTop=1;m.loops++;BX_say('LOOP!',1)}if(V.U.y>.5)V.loopTop=0}
 // ---------------------------------------------------------------- cameras
 function BX_camBuild(){const c=BX.camB;if(BX.camGo){const fr=BX_fr(BX.cur),k=.12;c.x+=(fr.o.x-c.x)*k;c.z+=(fr.o.z-c.z)*k;if(Math.hypot(fr.o.x-c.x,fr.o.z-c.z)<1)BX.camGo=0}const cam=BX.cam,t=bxV(c.x,BX_h(c.x,c.z)*.5,c.z);cam.position.set(t.x+Math.sin(c.yaw)*Math.cos(c.pit)*c.d,t.y+Math.sin(c.pit)*c.d,t.z+Math.cos(c.yaw)*Math.cos(c.pit)*c.d);cam.up.set(0,1,0);cam.lookAt(t);BX_sunAt(t)}
@@ -437,7 +437,7 @@ function BX_saved(){try{return JSON.parse(localStorage.getItem('bx_tracks')||'{}
 function BX_save(){const S=BX_saved();if(BX.name==='MY TRACK'||BX_DEMOS[BX.name])BX.name='TRACK '+(Object.keys(S).length+1);S[BX.name]={v:2,log:BX.log};try{localStorage.setItem('bx_tracks',JSON.stringify(S))}catch(e){}BX_stats()}
 function BX_load(o,name){BX.log=JSON.parse(JSON.stringify(o.log));BX.name=name||'TRACK';BX_replay();const L=BX.pcs.filter(p=>!p.dead);if(L.length){BX.cur={...L[L.length-1].ex[0]};const s=L[0].S[0][0].p;BX.camB.x=s.x;BX.camB.z=s.z}BX_after()}
 function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=document.createElement('div');D.id='bxLoad';const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{D.remove();f()};D.appendChild(b)};
- D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');if(BX_DEMOS_SHOW)for(const k in BX_DEMOS)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
+ D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');if(BX_DEMOS_SHOW)for(const k in BX_DEMOS)if(!BX_DEMOS[k].hide)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
  const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(BX_mig(S[k]),k));
  add('✚ NEW EMPTY TRACK',()=>BX_load({log:[['w','valley']]},'MY TRACK'));add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
@@ -449,9 +449,9 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
-const BX_DEMOS_SHOW=false; // dev-2: hidden until the drivable/fun GO lines pass (Alex: "horrible"); the data stays (builder ★ list + GO tests)
-function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){const b=document.createElement('button');b.className='trk bxTrk';
- b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 1 lap</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
+const BX_DEMOS_SHOW=true,BX_RACE_LAPS=2; // trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (TWO-LEVEL CITY until its redo). Races are 2 laps (coordinator)
+function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
+ b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 2 laps</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
  b.onclick=e=>{e.stopPropagation();BX_open();BX_load(BX_DEMOS[k],k);BX.camGo=1;BX.seenAll=new Set();BX_driveStart()};tw.appendChild(b)}}
 buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);
 
@@ -471,7 +471,7 @@ Object.assign(BX_DEMOS,{
  // city figure-8: boat ramp across the lake -> up onto the 14 m bridge -> down -> between the blocks (kicker) -> under the bridge -> back to the lake
  'TWO-LEVEL CITY':{log:bxCh('city',[29,6,1,0],['fk',1,'dn',[28,13,-1,0],'up',0,...bxRep('st',8),'mg','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
   'bo',...bxRep('st',5),'kj',...bxRep('st',8),'kj',...bxRep('st',8),'wbr',...bxRep('st',9),'wbr',...bxRep('st',7),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
-  'bo',...bxRep('st',8),'kj',...bxRep('st',10),'wbl','wbl'])},
+  'bo',...bxRep('st',8),'kj',...bxRep('st',10),'wbl','wbl']),hide:1},
  // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
  'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','st','wbl','st','st','st','wbl','st','wbr',0,...bxRep('st',21),'mg',
   'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',6),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',7),'wbr','su',...bxRep('st',13),'wbr'])}});
