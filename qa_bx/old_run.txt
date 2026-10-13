@@ -1,0 +1,8 @@
+bx-t-cliff run 0 t 70.1 laps 0 resp 0 
+bx-t-cliff {"ok":false,"msg":"laps 0, elevation 36.9 m, air max 2.68 s, banked turn yes | ✔ backward 0.0 s, ✘ respawns 0/0 laps, ✘ hits 450.4/min, ✘ avg 21 km/h (17 %), ✔ jumps 2.68/0.71/0.68, ✘ lap 0.0 s, ✘ max grade 74 % (sd)","fails":["<=1 respawn/lap","<=2 hits/min","avg >=60 % top","lap 45-90 s","grade <=25 %"],"wall":"93s"}
+bx-t-city run 0 t 70.0 laps 0 resp 4 far,far,far,far
+bx-t-city {"ok":false,"msg":"laps 0, elevation 2.6 m, over+under no, boat 0.0 s | ✔ backward 0.0 s, ✘ respawns 4/0 laps, ✘ hits 2.6/min, ✘ avg 34 km/h (28 %), ✔ jumps 0.77/0.61/0.72/0.6/0.6, ✘ lap 0.0 s, ✘ max grade 74 % (su)","fails":["<=1 respawn/lap","<=2 hits/min","avg >=60 % top","lap 45-90 s","grade <=25 %"],"wall":"94s"}
+bx-t-canyon run 0 t 70.0 laps 0 resp 3 far,far,far
+bx-t-canyon run 1 t 70.0 laps 0 resp 1 far
+bx-t-canyon {"ok":false,"msg":"laps 0, elevation 21.8 m, routes driven 1/2, off-road 40.1 s | ✘ backward 0.7 s, ✘ respawns 1/0 laps, ✘ hits 18.8/min, ✘ avg 38 km/h (31 %), ✔ jumps 0.96/1.44/0.51/0.82/0.58/1.05/0.94/0.64, ✘ lap 0.0 s, ✘ max grade 74 % (su)","fails":["0 backward start","<=1 respawn/lap","<=2 hits/min","avg >=60 % top","lap 45-90 s","grade <=25 %"],"wall":"202s"}
+errors {"ok":true,"msg":"0 console/page errors","err":[]}
