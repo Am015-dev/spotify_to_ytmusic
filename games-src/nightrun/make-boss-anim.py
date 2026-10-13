@@ -14,7 +14,7 @@ LONG = 300   # px of the long side of one cell
 MOVE = {'sek-adler': 'air', 'flusskrake': 'water', 'zentral-ice': 'air', 'kronos': 'air', 'tresor-wart': 'ground', 'bruecken-waechter': 'ground',
         'schranken-wart': 'air', 'messe-waechter': 'air', 'hoplite': 'ground', 'talos': 'ground'}
 FLIP = {'talos'}
-HOLES = {'flusskrake': 40, 'schranken-wart': 40, 'bruecken-waechter': 30, 'hoplite': 30, 'talos': 30, 'tresor-wart': 60}
+HOLES = {'sek-adler': 30, 'flusskrake': 40, 'schranken-wart': 40, 'bruecken-waechter': 30, 'hoplite': 30, 'talos': 30, 'tresor-wart': 60}
 ONLY = set(a for a in os.sys.argv[1:] if not a.startswith('-'))
 sys.path.insert(0, R + 'games-src/scripts')
 import cutout
@@ -51,6 +51,6 @@ for nm in names:
         box = (u[0], bb[i][3] - uh, u[2], bb[i][3]) if gr else u
         c = f.crop(box).resize((cw, ch), Image.LANCZOS); sheet.paste(c, ((i % 4) * cw, (i // 4) * ch))
     sheet.save(M + f'anim-boss-{nm}.webp', quality=82, method=6)
-    meta[nm] = {'cw': cw, 'ch': ch, 'idle': 4, 'atk': len(atk) if len(atk) == 4 else 0, 'kw': round(uw / aw, 3), 'kh': round(uh / ah, 3), 'move': MOVE[nm], 'gb': 1 if gr else 0}
+    meta[nm] = {'cw': cw, 'ch': ch, 'idle': 4, 'atk': len(atk) if len(atk) == 4 else 0, 'kw': round(uw / aw, 3), 'kh': round(uh / ah, 3), 'move': MOVE[nm], 'face': 'left', 'gb': 1 if gr else 0}
     print(nm, cw, ch, 'rows', rows, 'kw', meta[nm]['kw'], os.path.getsize(M + f'anim-boss-{nm}.webp') // 1024, 'KB')
 json.dump(meta, open(M + 'anim-boss.json', 'w'), indent=1)

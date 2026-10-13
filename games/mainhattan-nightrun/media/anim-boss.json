@@ -4,24 +4,33 @@
   "ch": 229,
   "idle": 4,
   "atk": 4,
-  "kw": 1.121,
-  "kh": 1.0
+  "kw": 1.12,
+  "kh": 1.0,
+  "move": "ground",
+  "face": "left",
+  "gb": 1
  },
  "flusskrake": {
   "cw": 300,
-  "ch": 266,
+  "ch": 265,
   "idle": 4,
   "atk": 4,
-  "kw": 1.116,
-  "kh": 1.084
+  "kw": 1.118,
+  "kh": 1.083,
+  "move": "water",
+  "face": "left",
+  "gb": 0
  },
  "hoplite": {
   "cw": 300,
   "ch": 246,
   "idle": 4,
   "atk": 4,
-  "kw": 1.006,
-  "kh": 1.009
+  "kw": 1.003,
+  "kh": 1.009,
+  "move": "ground",
+  "face": "left",
+  "gb": 1
  },
  "kronos": {
   "cw": 300,
@@ -29,7 +38,10 @@
   "idle": 4,
   "atk": 0,
   "kw": 1.0,
-  "kh": 1.0
+  "kh": 1.0,
+  "move": "air",
+  "face": "left",
+  "gb": 0
  },
  "messe-waechter": {
   "cw": 300,
@@ -37,31 +49,43 @@
   "idle": 4,
   "atk": 0,
   "kw": 1.052,
-  "kh": 1.002
+  "kh": 1.0,
+  "move": "air",
+  "face": "left",
+  "gb": 0
  },
  "schranken-wart": {
   "cw": 300,
-  "ch": 165,
+  "ch": 164,
   "idle": 4,
   "atk": 4,
   "kw": 1.015,
-  "kh": 1.026
+  "kh": 1.026,
+  "move": "air",
+  "face": "left",
+  "gb": 0
  },
  "sek-adler": {
   "cw": 300,
   "ch": 284,
   "idle": 4,
   "atk": 4,
-  "kw": 1.013,
-  "kh": 1.513
+  "kw": 1.012,
+  "kh": 1.517,
+  "move": "air",
+  "face": "left",
+  "gb": 0
  },
  "talos": {
   "cw": 292,
   "ch": 300,
   "idle": 4,
   "atk": 4,
-  "kw": 1.429,
-  "kh": 1.0
+  "kw": 1.428,
+  "kh": 1.0,
+  "move": "ground",
+  "face": "left",
+  "gb": 1
  },
  "tresor-wart": {
   "cw": 300,
@@ -69,14 +93,20 @@
   "idle": 4,
   "atk": 4,
   "kw": 1.189,
-  "kh": 1.0
+  "kh": 1.002,
+  "move": "ground",
+  "face": "left",
+  "gb": 1
  },
  "zentral-ice": {
   "cw": 300,
   "ch": 258,
   "idle": 4,
   "atk": 4,
-  "kw": 1.093,
-  "kh": 1.065
+  "kw": 1.094,
+  "kh": 1.067,
+  "move": "air",
+  "face": "left",
+  "gb": 0
  }
 }

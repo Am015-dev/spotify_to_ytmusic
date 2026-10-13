@@ -137,7 +137,7 @@ const fanN=n=>{const m=Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.
 const ringN=n=>Math.max(6,Math.round((n+(ST.on?Math.floor(ST.lvl/2):0)+DF.fan+(ST.on?0:Math.floor(2*TUNE2.loopFan*Math.min(3,G.loop))))*.62));
 const FANSTEP=.19;                                         // adjacent bullets of a fan are never closer than this angle: about 60 px apart at the ship, a gap you can see and fly through
 const fanAngle=(n,sp,i)=>{if(n<2)return 0;const st=Math.max(sp/(n-1),FANSTEP);return-st*(n-1)/2+st*i;};
-function fan(e,n,sp,s,c){n=fanN(n);const room=ebCap()-G.eb.length;if(room<n)n=room>=3?odd(room):room>=1?1:0;if(n<1)return;const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a+fanAngle(n,sp,i),s,c);}
+function fan(e,n,sp,s,c){n=fanN(n);const room=ebCap()-G.eb.length;if(room<n)n=room>=3?odd(room):room>=1?1:0;if(n<1)return;const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y+(e.my||0),a+fanAngle(n,sp,i),s,c);}
 function ring(e,n,s,off,c){n=ringN(n);n=Math.min(n,Math.max(0,ebCap()-G.eb.length));if(n<4)return;for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
 function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,mini=!!o.mini;
   const tab=[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']];
@@ -374,8 +374,9 @@ function update(dt){
 }
 
 function bossUpdate(e,dt,d){
-  if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
-  e.y=H/2-20+Math.sin(e.t*.7)*150;
+  const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
+  else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
+  else e.y=H/2-20+Math.sin(e.t*.7)*150;
   for(const l of e.lasers){l.t+=dt;if(l.t>2*BT.spb&&l.t<3.1*BT.spb&&!G.dead){const vx=Math.cos(l.a),vy=Math.sin(l.a),px=P.x-l.x,py=P.y-l.y,pr=px*vx+py*vy;
       if(pr>0&&Math.abs(px*vy-py*vx)<9)hurt();}}
   e.lasers=e.lasers.filter(l=>l.t<3.1*BT.spb);}
