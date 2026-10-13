@@ -1,7 +1,8 @@
 // Rotation / orientation responsiveness test. Usage: (python3 -m http.server 8096 in this dir) NODE_PATH=/opt/node-tools/node_modules node rotate-test.js
 // For each tap it records: did the click reach the intended element, latency touchstart->click, and what elementFromPoint says at the centre.
 const PW = require(process.env.PW || 'playwright');
-const URL = process.env.URL || 'http://localhost:8096/cauldron-fair.html';
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
 const LIMIT = +process.env.LIMIT || 150;
 let bad = 0; const rows = [];
@@ -97,6 +98,7 @@ async function startGame(p) {
 const centre = (p, s) => p.evaluate(s => { const r = document.querySelector(s).getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, s);
 async function lat(p) { return p.evaluate(() => { const o = []; return new Promise(res => { let n = 0, last = performance.now(), mx = 0; const t = setInterval(() => { const now = performance.now(); mx = Math.max(mx, now - last - 50); last = now; if (++n > 20) { clearInterval(t); res(Math.round(mx)); } }, 50); }); }); }
 (async () => {
+  URL = process.env.URL || await gx.url('cauldron-fair', { file: require('path').resolve(__dirname, 'cauldron-fair.html') });
   const b = await PW.chromium.launch({ executablePath: process.env.CHROMIUM || '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const sizes = (process.env.SIZES || '390x763,844x390,667x375').split(',').map(s => s.split('x').map(Number));
   // 1. portrait -> landscape -> portrait, per landscape size

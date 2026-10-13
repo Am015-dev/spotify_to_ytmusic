@@ -50,6 +50,13 @@ async function runOne(browser, base, slug, sc, sz) {
     for (let i = 0; i < n; i++) {
       const r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw ' + e.message.slice(0, 60) }));
       if (!r.ok) { fails.push(r.msg); continue; }
+      if (r.hold) {   // press and hold (touch: CDP touch events, pc: mouse hover), then read the state while held
+        if (sz.phone) { const cd = await page.context().newCDPSession(page); await cd.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: r.hold.x, y: r.hold.y }] }); await sleep(r.hold.ms);
+          const a = await page.evaluate(i => GXS.after(i), i).catch(e => ({ ok: false, msg: 'after threw ' + e.message.slice(0, 60) })); if (!a.ok) fails.push(a.msg);
+          await cd.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await sleep(300); await cd.detach().catch(() => { }); }
+        else { await page.mouse.move(r.hold.x, r.hold.y); await sleep(r.hold.ms); const a = await page.evaluate(i => GXS.after(i), i).catch(e => ({ ok: false, msg: 'after threw ' + e.message.slice(0, 60) })); if (!a.ok) fails.push(a.msg); await page.mouse.move(3, 3); await sleep(300); }
+        continue;
+      }
       if (r.tap) {
         if (sz.phone) await page.touchscreen.tap(r.tap.x, r.tap.y); else await page.mouse.click(r.tap.x, r.tap.y);
         await sleep(450);

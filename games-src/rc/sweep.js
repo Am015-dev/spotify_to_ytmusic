@@ -6,15 +6,14 @@
 // 1 game in 5 plays with tips off and must show no bubble at all.
 // usage: NODE_PATH=/opt/node-tools/node_modules node sweep.js [gamesPerSize=12]
 const PW=require(process.env.PW||'playwright');const fs=require('fs'),path=require('path');
-const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const N=+(process.argv[2]||12),SEED0=+(process.argv[3]||101);let bad=0,games=0;const HELP={bubbles:{},bulbs:0,bulbNull:0,rules:0,beatBulbs:0,off:0};
+const gx=require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK=!!process.env.QUICK;   // QUICK=1: 2 games per size = 4 games
+let URL;const N=+(process.argv[2]||(QUICK?2:12)),SEED0=+(process.argv[3]||101);let bad=0,games=0;const HELP={bubbles:{},bulbs:0,bulbNull:0,rules:0,beatBulbs:0,off:0};
 const SC=['marooned','hexed','stranded','settlers'];
 async function tapSel(p,sel){const pt=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}},sel);if(!pt)return false;await p.touchscreen.tap(pt.x,pt.y);return true}
 async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true});
- await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='swi.test')return r.abort();
-  if(/^\/media\/[\w.-]+\.webp$/.test(u.pathname)){const f=path.join(__dirname,'../../games/shipwreck-isle',u.pathname);if(fs.existsSync(f))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(f)})}   // painted kit, so the sweep runs with the skin on
-  r.fulfill({status:200,contentType:'text/html',body:html})});
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));const tag=`${W}x${H} seed ${seed}`;const tipsOn=seed%5!==4;const prob=m=>{bad++;console.log(tag,'PROBLEM',m)};
- await p.goto('https://swi.test/');await p.waitForTimeout(900);
+ await p.goto(URL);await p.waitForTimeout(900);
  await p.evaluate(([s,sc,tips])=>{try{localStorage.clear();localStorage.setItem('swi_tutoffer','1')}catch(e){}GXH.reset();GXH.setEnabled(tips);setSeed(s);AIDELAY=0;UI.speed=8;try{setGfx('low')}catch(e){}UI.setup.scen=sc;render()},[seed,SC[seed%4],tipsOn]);
  await p.tap('[data-a=start]');await p.waitForTimeout(1200);
  const innerWidthOf=w=>w;
@@ -121,6 +120,6 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
 const LAUNCH={args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']};
 // one fresh browser per game; a browser killed from outside (shared machine) is retried, not counted as a game bug
 async function game(W,H,seed){for(let a=0;a<3;a++){let b;try{b=await PW.chromium.launch(LAUNCH);await one(b,W,H,seed);return}catch(e){console.log(`${W}x${H} seed ${seed} retry (${String(e.message).split('\n')[0].slice(0,70)})`)}finally{if(b)await b.close().catch(()=>{})}}bad++;console.log(`${W}x${H} seed ${seed} PROBLEM could not finish after 3 tries`)}
-(async()=>{await Promise.all([[390,763],[375,553]].map(async([W,H])=>{for(let i=0;i<N;i++)await game(W,H,SEED0+i)}));
+(async()=>{URL=await gx.url('shipwreck-isle',{file:path.join(__dirname,'shipwreck.html')});await Promise.all([[390,763],[375,553]].map(async([W,H])=>{for(let i=0;i<N;i++)await game(W,H,SEED0+i)}));
  console.log('help kit:',JSON.stringify(HELP));if(N>=8)for(const k of['job','ready','choice','intro','daysum'])if(!HELP.bubbles[k]){bad++;console.log('PROBLEM no coach bubble was ever checked for phase',k)}
  console.log(bad?`FAIL ${bad} problems`:`PASS ${games} games`);process.exit(bad?1:0)})()

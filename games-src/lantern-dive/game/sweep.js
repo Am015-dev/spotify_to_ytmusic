@@ -5,7 +5,10 @@
 // move, why <= 15 words, rules 2-4 cards <= 20 words with a picture; a tips-off game never shows a bubble; anything stuck > 8 s, a hand card off screen, horizontal scroll, a seat or a button covering a trick card, the table under 55 % of a portrait screen.
 const { chromium } = require('playwright');
 const path = require('path');
-const N = +process.argv[2] || 40, FILE = path.resolve(__dirname, process.argv[3] || 'lantern-dive.html');
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 4 games
+let URL;
+const N = +process.argv[2] || (QUICK ? 4 : 40), FILE = path.resolve(__dirname, process.argv[3] || 'lantern-dive.html');
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
 const MISSIONS = [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 17, 19, 21, 25, 26, 28, 4, 8, 12, 15, 16, 18, 20, 22, 23, 24, 27, 29, 30];
@@ -140,9 +143,9 @@ async function playGame(browser, size, gi, rep) {
   const tipsOn = gi % 5 !== 4, ctl = { seenPh: new Set(), issues, stats, tipsOn, bulbN: 0 };
   const tapAt = (x, y) => page.touchscreen.tap(x, y);
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error' && !/Fetch API cannot load|net::|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
+  page.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
   try {
-    await page.goto('file://' + FILE); await sleep(900);
+    await page.goto(URL); await sleep(900);
     await page.evaluate(PAGE);
     const mission = MISSIONS[gi % MISSIONS.length], np = NPS[gi % NPS.length], mode = 'vs';
     await page.evaluate(`AIDELAY=${160};UI.seed=${gi * 977 + 11};UI.fingerOn=${gi % 3 === 0};newGame('${mode}',{np:${np},mission:${mission},kind:'log',level:'${['easy', 'normal', 'hard'][gi % 3]}'})`);
@@ -188,6 +191,7 @@ async function playGame(browser, size, gi, rep) {
 }
 
 (async () => {
+  URL = await gx.url('lantern-dive', { file: FILE });
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const jobs = []; for (let g = 0; g < N; g++) if (!process.env.ONLY || +process.env.ONLY === g) jobs.push([SIZES[g % SIZES.length], g]);
   const results = []; let next = 0;

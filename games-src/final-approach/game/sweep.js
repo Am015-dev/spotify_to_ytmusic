@@ -11,7 +11,10 @@
 // (hlpPlan), be legal, why <= 15 words, a tap must not change the game; the rules cards (2-4, <= 20 words, a picture each) open from "How does this work?".
 const { chromium } = require('playwright');
 const path = require('path');
-const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'final-approach.html');
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 4 games
+let URL;
+const N = +process.argv[2] || (QUICK ? 4 : 24), FILE = path.resolve(__dirname, process.argv[3] || 'final-approach.html');
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -124,10 +127,10 @@ async function playGame(browser, size, gi) {
   await ctx.addInitScript(() => { try { localStorage.setItem('fa_prefs', JSON.stringify({ prefs: { gfx: 'low' } })); } catch (e) { } });
   const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, drags: 0, rr: 0, hints: 0, audits: 0, end: '?', bulbs: 0, bulbNull: 0, rules: 0, bubbles: {} };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|Fetch API cannot load file:/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
+  page.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
   const shot = async why => { if (process.env.SHOTS) await page.screenshot({ path: path.join(process.env.SHOTS, tag.replace(/\W+/g, '_') + '_' + why.replace(/\W+/g, '_').slice(0, 30) + '.png') }).catch(() => { }); };
   try {
-    await page.goto('file://' + FILE); await sleep(900);
+    await page.goto(URL); await sleep(900);
     await page.evaluate(PAGE);
     const scs = await page.evaluate('D.scenarios.map(s=>s.id)'); const sc = scs[(gi - 12 + scs.length) % scs.length];
     const lad = gi < 12 ? gi % 6 + 1 : 0, camp = false, mode = 'vs', role = lad ? 0 : gi % 2, level = lad ? 'hard' : ['easy', 'normal', 'hard'][gi % 3];
@@ -258,6 +261,7 @@ async function playGame(browser, size, gi) {
 }
 
 (async () => {
+  URL = await gx.url('final-approach', { file: FILE });
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const jobs = []; for (let g = 0; g < N; g++) if (!process.env.ONLY || +process.env.ONLY === g) jobs.push([g < 12 ? SIZES[Math.floor(g / 6) % 2] : SIZES[g % SIZES.length], g]);
   const results = []; let next = 0;

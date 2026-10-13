@@ -22,6 +22,7 @@
      {kind:'eq', name:'YOU total', a:() => dom number, b:() => engine number}   on-screen number equals the engine's
      {kind:'tap', sel:'.fbtns .smash', name:'SMASH', state:() => any, expect:(before, after) => true|false|'why'}
                                                                   the runner touch-taps the element; the engine state must then change as expected
+     {kind:'hold', sel:'#pshop .obc', ms:700, name:'hold a card', state:..., expect:...}   like tap, but the runner presses and holds ms (touch: CDP touchStart..touchEnd; pc: mouse hover); state is read WHILE held
      {kind:'fn', name:'sound played', fn:() => true|false|'why'}   anything else
    Universal asserts the runner adds to every scenario: no page error, no horizontal scroll, the Test tag shows, the board/game fills the screen. */
 (function () {
@@ -86,8 +87,8 @@
         return why ? { ok: false, msg: nm + ': ' + why } : { ok: true }; }
       if (c.kind === 'eq') { var A = c.a(), B = c.b(); return A === B ? { ok: true } : { ok: false, msg: nm + ': screen ' + A + ' != engine ' + B }; }
       if (c.kind === 'fn') { var r = c.fn(); return r === true ? { ok: true } : { ok: false, msg: nm + (typeof r === 'string' ? ': ' + r : ' failed') }; }
-      if (c.kind === 'tap') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var w3 = onScreen(f.e); if (w3) return { ok: false, msg: nm + ' ' + w3 };
-        saved[i] = c.state ? c.state() : null; var b = box(f.e); return { ok: true, tap: { x: b.x, y: b.y } }; }
+      if (c.kind === 'tap' || c.kind === 'hold') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var w3 = onScreen(f.e); if (w3) return { ok: false, msg: nm + ' ' + w3 };
+        saved[i] = c.state ? c.state() : null; var b = box(f.e); return c.kind === 'hold' ? { ok: true, hold: { x: b.x, y: b.y, ms: c.ms || 700 } } : { ok: true, tap: { x: b.x, y: b.y } }; }
       return { ok: false, msg: 'unknown check kind ' + c.kind };
     } catch (x) { return { ok: false, msg: nm + ' threw ' + String(x.message).slice(0, 100) }; }
   };

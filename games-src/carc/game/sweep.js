@@ -5,9 +5,11 @@
 // ghost finger sits on the control it points at and that move is legal; scores, followers and tiles-left on screen = engine;
 // no horizontal scroll; no glow covered or cut off; nothing stuck for 8 s; the result card appears at the end.
 const PW = require(process.env.PW || 'playwright'), fs = require('fs'), path = require('path');
-const URL = process.env.URL || 'file://' + path.join(__dirname, 'rampart.html');
-const GAMES = process.env.GAMES != null ? +process.env.GAMES : 24, ROT = process.env.ROT != null ? +process.env.ROT : 4, PAR = +process.env.PAR || 3;
-const STORY = process.env.STORY != null ? +process.env.STORY : 1, C1N = process.env.C1 != null ? +process.env.C1 : 300;
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 4 games, 1 rotation, no story, no headless sims
+let URL;
+const GAMES = process.env.GAMES != null ? +process.env.GAMES : (QUICK ? 4 : 24), ROT = process.env.ROT != null ? +process.env.ROT : (QUICK ? 1 : 4), PAR = +process.env.PAR || 3;
+const STORY = process.env.STORY != null ? +process.env.STORY : (QUICK ? 0 : 1), C1N = process.env.C1 != null ? +process.env.C1 : (QUICK ? 0 : 300);
 const SHOTS = path.join(__dirname, 'sweep-shots'); fs.mkdirSync(SHOTS, { recursive: true });
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]], VARIANTS = [{}, { river: 1 }, { river: 1, ic: 1 }, { river: 1, ic: 1, tb: 1 }, { tb: 1 }, { ic: 1 }];
@@ -25,7 +27,7 @@ async function newPage(b, W, H) {
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: UA });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000); p.errs = [];
   p.on('pageerror', e => p.errs.push('pageerror ' + e.message));
-  p.on('console', m => { if (m.type() === 'error' && !/net::|Fetch API cannot load|Failed to load|favicon|fonts/.test(m.text())) p.errs.push('console ' + m.text()); });
+  p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts/.test(m.text())) p.errs.push('console ' + m.text()); });
   await p.goto(URL); await sleep(300); return p;
 }
 // ---------- in-page probe ----------
@@ -221,6 +223,7 @@ async function winRates(b) {
   await p.context().close(); return r;
 }
 (async () => {
+  URL = process.env.URL || await gx.url('rampart-and-vine', { file: path.join(__dirname, 'rampart.html') });
   const b = await PW.chromium.launch({ args: ['--no-sandbox'] });
   const jobs = [];
   for (let i = 0; i < GAMES; i++) { const [W, H] = SIZES[i % 2], v = VARIANTS[i % VARIANTS.length]; jobs.push(() => playGame(b, W, H, { ...v, rivals: i % 5 === 4 ? 2 : 1, lv: i % 3 === 2 ? 'hard' : i % 3 === 1 ? 'easy' : 'normal' }, `g${i}-${W}x${H}`, { rotate: i < ROT, first: i % 4 === 0, tipsOff: i % 6 === 5, shot: i === 1 ? 'game-end.png' : null })); }
