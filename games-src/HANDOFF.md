@@ -5,6 +5,14 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
 
+## Lantern Dive last paintings (13 Oct 2026, 23:xx UTC): NOT deployed, one check failing
+
+- Wiring result: `table-tunnel-glow-phone` is already live (`ui99.js:18` builds the name by concatenation, so the scan still lists it). Nothing new wired.
+- `ui-bubble-tail`: no tail element exists in the shared help kit (`shell/gx-help.css`/`gx-help.js`). Adding one changes every game, so not used here. Needs an owner decision.
+- `ui-row`: its description names no place. Not used until a target is named.
+- 23:4x re-run on merged branch (50583c8): gate still FAILS only on ld-help@375x553 clipping. A report of a clipped player name ("Nerea", span.nm, seat plate, ld-art scenario) was NOT reproduced by this gate run. Verify it before any CSS change.
+- Deploy gate FAILED on merged branch: `ld-help@375x553` text clipped ("First two tricks", span.t). Not caused by this change (no Lantern source edited). Fix in help layout (`lantern-dive/game/src/ui11.js` / shared `gx-help.css`), then rerun `build-all.py --deploy lantern-dive`.
+
 ## Story bubble + painted plate fix (13 Oct 2026): source done, only 1 of 15 deployed
 - Shell: `gx-skin.css` speech bubble is a 9-slice (`22 62 34 30 fill`), `gx-campaign.css` scene/boss/result/sheet never scroll sideways, `?scn=story-scene` registered in `gx-campaign.js`. All painted buttons use `30 42 fill/14px Npx` (vertical caps, were `0 42` = stretched on tall buttons). Short Fuse nameplate/rack, Thornbound sheet head, Doorkick dock frame, Crown `#choice` fixed in their skin/layout css.
 - `look-check.js` has two new checks (`panels`: scrollbar for decoration-only overflow, severe on x; `plates`: 9-slice/100% 100% distortion, >25% warn, >40% severe) and a `story-scene` screen. Calibrated: old final-approach build = 2 severe, fixed = 0.
@@ -140,3 +148,13 @@ Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist
 - Real bugs found by the new invariants: FIXED Crown 375/390 px player chip cut off the energy number ("⚡20", `kot/skin.css`). LISTED (in `GXS.known`, `munch/scn.js`, `kot/scn.js`): Doorkick miniature card text 7-8 px (`.card .cn/.dn/.tag/.kind`), Doorkick fight side label "Pip (you) + Morwen" clipped, Crown PC tag "PERMANENT" 9.9 px. Delete the known line once fixed.
 - Other games: add `data-engine` to key numbers, `mut:` to each scenario, run scenario-mutate.js, fix survivors.
 - A routine message ("Redirect: fast tests like the game industry": engine unit tests + 1000 AI games, drop the mutation runner) reached this session without the owner; not acted on, owner to confirm.
+## Shipwreck Isle: last paintings wired (blocked deploy gate)
+
+- Wired `ui-bubble-tail` (island label tail, `html.sk .tl:not(.far)::after` in games-src/rc/skin.css) and `ui-row` (`html.sk .row`, `.row.has`, `.row:hover`).
+- Deploy NOT done: `build-all.py --deploy shipwreck-isle` fails scenario si-art: "text under 11px" on the phase strip label "Event" (9.6px, ui.js PHASES). The same failure reproduces on the commit before this change, so it is pre-existing.
+- Next: raise the phase strip label to 11px or more (shared phase-bar style), then re-run the deploy.
+
+## Update 13 Oct (late): Final Approach is live; Short Fuse blocked only by look-check
+Final Approach deployed (GO `fa-art`, LAB 24/24, look ok). Shelf checklist entries must use the shelf ids (`approach`, `shortfuse`), not the slugs, or the LAB shelf check says "missing".
+Short Fuse: GO scenarios 6/6 and LAB 24/24 pass; `--deploy` stops at look-check with NEW severe findings that are not from the art wiring: `plates|div.tile.crew` (the crew tile frame `wire-tile-frame-c.webp` is drawn stretched, box 56x73 vs picture 100x240) and `contrast|div.gxc-sc-name` (story-scene speaker name). Fix the tile frame slice/size in `games-src/short-fuse/game/skin.css` and the speaker-name colour, then `build-all.py --deploy short-fuse` (its art is already wired and committed).
+Short Fuse, after merging the build-all fix: every scenario (all 6, not only `sf-art`) now fails the universal "text under 11px" check: `"1"` at 7px in `<i.cn12>` (the small wire-number labels on the board). Together with the look-check findings above, Short Fuse needs a readability pass (wire number labels >= 11px, crew tile frame slice, speaker-name contrast) before it can deploy; its art wiring and `sf-art` are already committed.
