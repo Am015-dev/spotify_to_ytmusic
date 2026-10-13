@@ -1,6 +1,39 @@
 [
  {
   "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Painted art wired",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit",
+   "Menu tutorial row and speech tail are painted"
+  ],
+  "check": "Open Settings: Tutorial is a painted strip",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-buttons",
+   "sf-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "kaiten-kitchen",
   "title": "Painted art wired",
   "items": [
@@ -184,48 +217,6 @@
    "LAB opens straight on a boss with ?boss=talos"
   ],
   "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
- },
- {
-  "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: painted workshop kit",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big",
-   "Wire racks, name plates and equipment cards are painted",
-   "A rope fuse with a spark and a painted bomb",
-   "Top bar, menus and buttons use the workshop kit"
-  ],
-  "check": "Look at the table and the fuse strip",
-  "scn": [
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-13",
