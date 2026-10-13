@@ -216,7 +216,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
     return;}
   if(e.x>bossX()||G.dead){e.arm=false;return;}
   const list=e.lists[e.ph-1];e.pc++;if(e.pc<0){e.arm=bossNext(e);return;}if(e.pc>=8){e.pc=0;e.pi=(e.pi+1)%list.length;e.cnt=0;}
-  const c=e.pc,cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c2='#ffa02d',wasArm=e.arm;eb.src=wasArm?e:{arm:false};
+  const c=e.pc,cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c2='#ffa02d',wasArm=e.arm;if(wasArm)e.fireT=.42;eb.src=wasArm?e:{arm:false};
   switch(list[e.pi%list.length]){
     case'fan5':if(c%cad===0)fan(e,5,.9,(190+15*d)*sp,c2);break;
     case'fan7':if(c%cad===0)fan(e,7,1.2,(180+15*d)*sp,c2);break;

@@ -119,11 +119,21 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
 #pausem::before{content:"";position:absolute;left:0;right:0;top:0;height:40px;background:linear-gradient(#05030c88,#05030c88),url(media/ui-topbar.webp) center/100% 100% no-repeat}
 .pg .card svg,.pg .card img.ki{padding:.22em;box-sizing:border-box;background:url(media/ui-iconbtn.webp) center/100% 100% no-repeat}
 #stsel .card .no{position:relative;z-index:0;padding:0 .3em;color:#fff;text-shadow:0 0 3px #000,0 0 6px #000}
-#stsel .card .no::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:1.4em;height:1.4em;transform:translate(-50%,-50%);background:url(media/ui-node-open.webp) center/contain no-repeat}
+#stsel .card .no::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:1.3em;height:1.3em;transform:translate(-50%,-50%);background:url(media/ui-node-open.webp) center/contain no-repeat}
 #stsel .card[data-nd=done] .no::before{background-image:url(media/ui-node-done.webp)}
 #stsel .card[data-nd=boss] .no::before{background-image:url(media/ui-node-boss.webp)}
 #stsel .card[data-nd=locked] .no::before{background-image:url(media/ui-node-locked.webp)}
 #stsel .card[data-nd=locked] .no{color:var(--dim)}
+#stsel .card .hd{margin-bottom:.2em}
+@container (max-height:640px) and (max-aspect-ratio:1/1){
+ #stsel .card{flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;padding:0 8px!important}
+ #stsel .card .hd{display:contents!important}
+ #stsel .card .no{order:0;flex:0 0 auto;font-size:13px!important;min-width:28px;text-align:center}
+ #stsel .card .no::before{width:28px;height:28px}
+ #stsel .card .nm{order:1;flex:1 1 40px!important;min-width:0!important;display:block!important;width:auto!important;font-size:11px!important}
+ #stsel .card .stars,#stsel .card svg.lk{order:2;font-size:11px!important}
+ #stsel .card .gl{display:none!important}
+}
 #setm .card{border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;border-radius:0}
 #setm .card h2{background:linear-gradient(#05030c88,#05030c88),url(media/ui-drawer-head.webp) center/100% 100% no-repeat;text-shadow:0 0 6px #000}
 #setm .seg,#setm .sl{background:url(media/ui-row.webp) center/148% 100% no-repeat;padding:3px 10px 3px 24px;min-height:40px}
@@ -935,7 +945,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
     return;}
   if(e.x>bossX()||G.dead){e.arm=false;return;}
   const list=e.lists[e.ph-1];e.pc++;if(e.pc<0){e.arm=bossNext(e);return;}if(e.pc>=8){e.pc=0;e.pi=(e.pi+1)%list.length;e.cnt=0;}
-  const c=e.pc,cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c2='#ffa02d',wasArm=e.arm;eb.src=wasArm?e:{arm:false};
+  const c=e.pc,cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c2='#ffa02d',wasArm=e.arm;if(wasArm)e.fireT=.42;eb.src=wasArm?e:{arm:false};
   switch(list[e.pi%list.length]){
     case'fan5':if(c%cad===0)fan(e,5,.9,(190+15*d)*sp,c2);break;
     case'fan7':if(c%cad===0)fan(e,7,1.2,(180+15*d)*sp,c2);break;
@@ -1169,6 +1179,7 @@ function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm[
   const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],by=Math.sin(t*1.6)*3,tl=Math.sin(t*.9)*.035;
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
+  if(UIK.bossDraw(e,nm,wd,by,tl,fl))return true;
   return ART.dflash('spr-boss-'+nm,wd,0,by,tl,fl,'#ff4058',.32);}   // damage: a red tint
 function drawBoss(e,t,fl){const c=e.col;
   for(const l of e.lasers){ctx.save();ctx.translate(-e.x,-e.y);const tele=l.t<2*BT.spb;ctx.translate(l.x,l.y);ctx.rotate(l.a);
@@ -2618,11 +2629,19 @@ const qsave=()=>save('mnr_q',GA.queue);
 .pg .slots{font-family:var(--mono);color:var(--cyan);text-align:center;font-size:clamp(11px,calc(var(--u)*3.3),16px);flex:0 0 auto}
 .pg .tabs button{font-size:clamp(10px,calc(var(--u)*3.2),15px)}
 #lab{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;gap:8px;padding:10px 4%;overflow-y:auto;background:#05030c}
+#lab .lbar{order:-3;position:sticky;top:-10px;z-index:2;display:flex;align-items:center;gap:10px;margin:-10px -4% 0;padding:8px 4%;background:#05030cf2;border-bottom:1px solid #2a1840}
+#lab .lbar .nt{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lab .lbar .go{min-height:44px}
+#lab .first{order:-2}
+#lab .db{width:1.7em;height:1.7em}
+#lab .rw button{background-image:none!important;clip-path:none;border:1px solid #3a2b5c;border-radius:6px;background-color:#140c26;color:var(--ink);text-shadow:none;padding:.3em .8em;display:inline-flex;align-items:center;gap:.3em}
+#lab .rw button.on{background-color:var(--cyan)!important;color:var(--void)}
+#labChip{position:absolute;z-index:4;right:6px;top:64px;min-width:44px;min-height:44px;opacity:.55;font:700 12px var(--mono);letter-spacing:.08em;color:var(--ink);background:#05030c99;border:1px solid #3a2b5c;border-radius:8px}
+#labChip:active{opacity:1}
 #lab h2{margin:0;font:700 clamp(15px,4vw,22px) var(--display);letter-spacing:.14em;color:var(--cyan)}
 #lab .sec{font-family:var(--mono);color:var(--dim);font-size:12px;letter-spacing:.12em;margin-top:6px}
 #lab .rw{display:flex;flex-wrap:wrap;gap:6px}
-#lab .rw button{min-height:40px;padding:.3em .8em;font-size:13px}
-#lab .rw button.on{background:var(--cyan);color:var(--void)}
+#lab .rw button{min-height:44px;font-size:13px}
 #lab .rw button:disabled{opacity:.35}
 #lab .nt{font-family:var(--mono);color:var(--amber);font-size:12px;min-height:1.2em}
 `;document.head.appendChild(st);}
@@ -2661,15 +2680,18 @@ function soonDraw(box){for(const [n,t,im] of SOON){const c=document.createElemen
 NR.on('runStart',()=>setTimeout(()=>{if(!GA.queue.length)return;for(const id of GA.queue)SH.add(id);G.note={t:4,txt:'Cargo: '+GA.queue.map(id=>UBY[id].n).join(', ')};GA.queue=[];qsave();},60));
 /* ----- LAB: the test menu ----- */
 const labEl=document.createElement('div');labEl.id='lab';labEl.hidden=true;stage.appendChild(labEl);
-let labFrom=null;
+let labFrom=null,labChip=null;
+labChip=document.createElement('button');labChip.id='labChip';labChip.type='button';labChip.textContent='LAB';labChip.hidden=true;labChip.setAttribute('aria-label','Open the test lab');stage.appendChild(labChip);
+labChip.addEventListener('click',()=>{setPause(true);pauseEl.hidden=true;labOpen('pause');});
+const _syncUI=syncUI;syncUI=function(){_syncUI();let on=false;try{on=localStorage.getItem('mnr_labchip')==='1';}catch(e){}labChip.hidden=!(on&&running&&!paused&&!SH.active&&labEl.hidden);};   // once the LAB has been opened, a small LAB chip stays in the run (it pauses and opens the LAB)
 /* the LAB page is built once; a click only flips the state of the buttons (rebuilding the whole page every click was a visible hitch) */
 const LABS=[];
-function labRow(l,items){const r=document.createElement('div');r.className='rw';for(const it of items){const b=document.createElement('button');b.type='button';b.className='go dim';if(it[5])b.innerHTML=it[5]+' '+it[0];else b.textContent=it[0];b.addEventListener('click',()=>{it[1]();labNote(b.textContent);labSync();});r.append(b);LABS.push({b,it});}
-  const s=document.createElement('div');s.className='sec';s.textContent=l;labEl.append(s,r);}
+function labRow(l,items,cls){const r=document.createElement('div');r.className='rw'+(cls?' '+cls:'');for(const it of items){const b=document.createElement('button');b.type='button';b.className='go dim';if(it[5])b.innerHTML=it[5]+' '+it[0];else b.textContent=it[0];b.addEventListener('click',()=>{it[1]();labNote(b.textContent);labSync();if(cls==='first'&&running)labGo();});r.append(b);LABS.push({b,it});}   // an in-run action closes the LAB and carries on playing: one tap, no pause > lab > resume dance
+  const s=document.createElement('div');s.className='sec'+(cls?' '+cls:'');s.textContent=l;labEl.append(s,r);}
 const labNote=t=>{const n=$('labNt');if(n)n.textContent=t+' done';};
 function labSync(){const live=running&&G&&!G.dead;for(const {b,it} of LABS){const on=typeof it[2]==='function'?it[2]():false,dis=typeof it[3]==='function'?it[3](live):false;
     b.classList.toggle('on',!!on);b.disabled=!!dis;if(it[4]){const t=it[4](on);if(b.textContent!==t)b.textContent=t;}}}
-function labBuild(){labEl.innerHTML='<h2>TEST LAB</h2><div class="nt" id="labNt"></div>';LABS.length=0;const live=g=>!g;
+function labBuild(){labEl.innerHTML='<div class="lbar"><h2>TEST LAB</h2><div class="nt" id="labNt"></div><button class="go" id="labX" type="button">CLOSE</button></div>';LABS.length=0;const live=g=>!g;
   labRow('STORY',[['OPEN ALL STAGES',()=>{sSave.all=!sSave.all;sPersist();},()=>sSave.all,null,on=>on?'ALL STAGES OPEN: ON':'OPEN ALL STAGES'],['RESET STORY',()=>{sSave.stars={};sSave.snap={};sSave.all=false;sPersist();}]]);
   labRow('DIFFICULTY',[['easy','Easy'],['normal','Normal'],['hard','Hard'],['vhard','Very hard'],['legend','Legend']].map(([k,n])=>[n,()=>{SET.diff=k;saveSet();DF=DIFFS[k];HARD=HARDS.includes(k);diffDraw();},()=>SET.diff===k,null,null,diffBadge(k)]));   // no applySet here: it resizes the canvases
   labRow('PLAYER',[['GOD MODE',()=>{godMode=!godMode;},()=>godMode,null,on=>on?'GOD MODE: ON':'GOD MODE'],['FPS COUNTER',()=>{SET.fpsc=!SET.fpsc;saveSet();$('fpsEl').hidden=!SET.fpsc;},()=>!!SET.fpsc,null,on=>on?'FPS COUNTER: ON':'FPS COUNTER'],['BOSS CHEST',()=>{save('mnr_chest',CHEST_ON()?0:1);},()=>CHEST_ON(),null,on=>on?'BOSS CHEST: ON':'BOSS CHEST: OFF']]);
@@ -2677,13 +2699,16 @@ function labBuild(){labEl.innerHTML='<h2>TEST LAB</h2><div class="nt" id="labNt"
   labRow('GARAGE',[['UNLOCK + MAX EVERYTHING',()=>{for(const s of SHIPS)if(s.p)GA.own['ship_'+s.id]=true;for(const c of CREW)GA.own[c.id]=true;for(const h of THEMES)if(h.p)GA.own['th_'+h.id]=true;for(const d of TP_DEF){GA.tune[d.id]=d.max;}tsave();gsave();SH.recalc();garageDirty=true;}],
     ['EQUIP BEST',()=>{GA.eq={};for(const d of TP_DEF.slice().sort((a,b)=>b.pri-a.pri).slice(0,eqSlots()))if(TP.raw(d.id))GA.eq[d.id]=true;eqsave();SH.recalc();}],['EQUIP ALL (TEST)',()=>{for(const d of TP_DEF)if(TP.raw(d.id))GA.eq[d.id]=true;eqsave();SH.recalc();}],
     ['RESET GARAGE',()=>{GA.own={};GA.tune={};GA.eq={};GA.bank=0;GA.ship='std';GA.queue=[];qsave();tsave();eqsave();gsave();SH.recalc();garageDirty=true;}]]);
-  const dis=l=>!l,lv='IN A RUN (start a run first)';
+  const dis=l=>!l,lv='IN A RUN: one tap and you are back in the game';
   labRow(lv,[['BOSS NOW',()=>{G.force=true;G.en=[];},null,dis],['NEXT DISTRICT',()=>{G.en=[];G.eb=[];enterDistrict(nextDi(G.di).di);},null,dis],['FULL HULL',()=>{P.hp=P.max;},null,dis],['+3 EMP',()=>{P.emp=Math.min(9,P.emp+3);},null,dis],
-    ['KILL ALL',()=>{for(const e of G.en)if(e.type!=='boss')e.hp=0;G.eb=[];},null,dis],['SPAWN LEADER',()=>{const e=en('drone',{x:W-90,y:H/2,amp:0});if(!e.ldr){e.ldr=1;e.lc=0;e.r=Math.round(e.r*1.35);e.hp=Math.round(e.hp*3.5);e.max=e.hp;}},null,dis],['SPAWN GUNSHIP',()=>{en('gunship',{x:W-90,y:H/2});},null,dis]]);
-  const b=document.createElement('button');b.className='go';b.type='button';b.textContent='CLOSE';b.addEventListener('click',labClose);labEl.append(document.createElement('div'),b);}
+    ['KILL ALL',()=>{for(const e of G.en)if(e.type!=='boss')e.hp=0;G.eb=[];},null,dis],['SPAWN LEADER',()=>{const e=en('drone',{x:W-90,y:H/2,amp:0});if(!e.ldr){e.ldr=1;e.lc=0;e.r=Math.round(e.r*1.35);e.hp=Math.round(e.hp*3.5);e.max=e.hp;}},null,dis],['SPAWN GUNSHIP',()=>{en('gunship',{x:W-90,y:H/2});},null,dis]],'first');
+  labRow('BOSS PICKER (spawns it now)',LAB_BOSSES.map(([n,o])=>[n,()=>{if(G.boss)return;G.en=[];G.eb=[];G.force=false;const D2=o.mini?null:DISTRICTS.find(d=>d.boss===o.k);spawnBoss(D2?{...o,sub:D2.bossSub}:o);},null,l=>!l||!!G.boss]),'first');
+  $('labX').addEventListener('click',()=>{if(running&&paused&&labFrom==='pause')labGo();else labClose();});}
 let garageDirty=false;
-function labOpen(from){labFrom=from;if(!LABS.length)labBuild();labSync();labEl.hidden=false;}
-function labClose(){labEl.hidden=true;if(garageDirty){garageDirty=false;gaDraw();}if(labFrom==='pause'&&running)pauseEl.hidden=false;showBest();}
+const LAB_BOSSES=[['ADLER',{k:0,nm:'SEK-ADLER'}],['KRAKE',{k:1,nm:'FLUSSKRAKE'}],['ICE',{k:2,nm:'ZENTRAL-ICE'}],['KRONOS',{k:3,nm:'KRONOS'}],['TRESOR',{k:5,nm:'TRESOR-WART',r:38,pats:['laser','fan5','ring','laser'],lbl:'T',mini:true}],['BRÜCKE',{mini:true,...MINIS[0]}],['SCHRANKE',{mini:true,...MINIS[1]}],['MESSE',{k:4,nm:'MESSE-WÄCHTER',r:42,pats:['fan7','ring','spiral','fan9'],lbl:'M',mini:true}],['HOPLITE',{mini:true,...MINIS[2]}],['TALOS',{k:6,nm:'TALOS'}]];
+function labGo(){labClose();if(running&&paused)setPause(false);}
+function labOpen(from){labFrom=from;if(!LABS.length)labBuild();labSync();$('labX').textContent=running&&from==='pause'?'RESUME RUN':'CLOSE';labEl.hidden=false;labEl.scrollTop=0;try{localStorage.setItem('mnr_labchip','1');}catch(e){}if(labChip)labChip.hidden=true;}
+function labClose(){labEl.hidden=true;syncUI();if(garageDirty){garageDirty=false;gaDraw();}if(labFrom==='pause'&&running)pauseEl.hidden=false;showBest();}
 {const tb=document.createElement('button');tb.className='go dim';tb.id='labBtn';tb.type='button';tb.textContent='LAB';$('setBtn').after(tb);tb.addEventListener('click',()=>labOpen('title'));
   const pr=$('pausem').querySelector('.row'),pb=document.createElement('button');pb.className='go dim';pb.id='labBtn2';pb.type='button';pb.textContent='LAB';(pr||$('pausem').querySelector('.in')).append(pb);pb.addEventListener('click',()=>{pauseEl.hidden=true;labOpen('pause');});}
 
@@ -2736,7 +2761,7 @@ function chestShow(done){G.chestT=true;const pool=CHR.slice().sort(()=>Math.rand
 {const ed=enterDistrict;enterDistrict=function(i){G.chestT=false;return ed.apply(this,arguments);};}
 NR.on('runStart',()=>{G.chestT=false;});
 {const st=document.createElement('style');st.textContent=`
-.db{display:inline-flex;vertical-align:-.2em;width:1.2em;height:1.2em;margin-right:.35em}.db svg,img.db{width:100%;height:100%;object-fit:contain}
+.db{display:inline-flex;vertical-align:-.2em;width:1.2em;height:1.2em;margin-right:.35em}.db svg{width:100%;height:100%}img.db{width:1.2em;height:1.2em;object-fit:contain}
 .md{display:block;height:72px;width:72px;margin-top:8px}.md svg{height:100%;width:100%}
 .pg .card .pi{height:clamp(34px,calc(var(--u)*10),52px);width:clamp(34px,calc(var(--u)*10),52px);flex:0 0 auto}.pg .card .pi.sh svg,.pg .card .shp.sh svg{width:100%;height:100%;color:var(--c)}
 .pg .card .shp.sh{display:inline-block;height:clamp(40px,calc(var(--u)*13),84px);width:clamp(40px,calc(var(--u)*13),84px);flex:0 0 auto}
@@ -2833,6 +2858,21 @@ const UIK={names:['ui-hud-bars','ui-hud-mult','ui-bubble','ui-bubble-tail'],
 UIK.keep=['ui-btn-pink','ui-btn-cyan','ui-btn-violet','ui-button-go','ui-button-cream','ui-button-power','ui-topbar','ui-drawer-head','ui-panel','ui-row','ui-iconbtn','ui-node-open','ui-node-done','ui-node-boss','ui-node-locked','ui-touch-dash','ui-touch-emp','ui-touch-pause'].map(n=>{const im=new Image();im.decoding='async';im.src=ART.base+n+'.webp';if(im.decode)im.decode().catch(()=>{});return im;});
 UIK.init();
 
+/* ---------- animated bosses: one frame sheet per boss (media/anim-boss-<name>.webp, made by games-src/nightrun/make-boss-anim.py from the pose stills):
+   row 1 = four idle frames, row 2 (when the boss has them) = wind-up, charge, fire, recover. cw/ch = frame size, kw/kh = frame size / body size of the idle frame. */
+UIK.boss={"bruecken-waechter":{"cw":300,"ch":229,"idle":4,"atk":4,"kw":1.121,"kh":1.0},"flusskrake":{"cw":300,"ch":266,"idle":4,"atk":4,"kw":1.116,"kh":1.084},"hoplite":{"cw":300,"ch":246,"idle":4,"atk":4,"kw":1.006,"kh":1.009},"kronos":{"cw":300,"ch":212,"idle":4,"atk":0,"kw":1.0,"kh":1.0},"messe-waechter":{"cw":300,"ch":243,"idle":4,"atk":0,"kw":1.052,"kh":1.002},"schranken-wart":{"cw":300,"ch":165,"idle":4,"atk":4,"kw":1.015,"kh":1.026},"sek-adler":{"cw":300,"ch":284,"idle":4,"atk":4,"kw":1.013,"kh":1.513},"talos":{"cw":292,"ch":300,"idle":4,"atk":4,"kw":1.429,"kh":1.0},"tresor-wart":{"cw":300,"ch":157,"idle":4,"atk":4,"kw":1.189,"kh":1.0},"zentral-ice":{"cw":300,"ch":258,"idle":4,"atk":4,"kw":1.093,"kh":1.065}};
+UIK.bossDraw=(e,nm,wd,by,tl,fl)=>{const A=UIK.boss[nm],sh=A&&ART.bm['anim-boss-'+nm];if(!sh){if(A)ART.load('anim-boss-'+nm);return false;}
+  e._at=(e._at||0)+FD;if(e.fireT>0)e.fireT=Math.max(0,e.fireT-FD);
+  let col,row=0;const T=e._at;
+  if(A.atk&&e.ph!==undefined&&(e.arm||e.fireT>0)){row=1;col=e.fireT>0?(e.fireT>.22?2:3):(PHF<.5?0:1);}      // wind-up on the beat before it fires, then the shot, then the recovery
+  else col=[0,1,2,3,2,1][Math.floor(T*(A.atk?5:3.2))%6];
+  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}
+  const ctx_=ctx;ctx_.save();ctx_.translate(0,by);if(tl)ctx_.rotate(tl);ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);
+  if(fl){ctx_.globalCompositeOperation='lighter';ctx_.globalAlpha=.4;ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);}
+  ctx_.restore();return true;};
+// the sheet of a district's boss is fetched a few seconds after the district starts (never at the moment the boss arrives, never all ten at once)
+NR.on('tick',()=>{if(!G.live||G.di===UIK._di)return;UIK._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>ART.load('anim-boss-'+nm),3000);});
+
 /* ---------- lag fix, part 2: songs are streamed (see parts/a.js "tracks"), nothing is decoded any more, so there is no stall to hide.
    What is left of the old pump: keep the songs a district will need (its own, its boss's, the next one) buffered in their audio slots, ahead of time and one after
    the other. A song that is needed before it is buffered is still asked for at once (urgent), and that is counted in NR.lag.urgent. ---------- */
@@ -2864,8 +2904,11 @@ setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='J2';
+const NR_VER='J3';
 const NR_CHECKLIST=[
+ {ver:'J3',id:'boss-anim',text:'Every boss now animates: it moves through its idle frames, and when it is about to fire (the beat before) it winds up, then shows the shot and recovers. Check Adler, Krake, Ice, Kronos, Tresor, Bruecke, Schranke, Messe, Hoplite and Talos (LAB > BOSS PICKER). No white boxes or fringes round any of them, size looks like before.'},
+ {ver:'J3',id:'lab-oneTap',text:'LAB: pause > LAB > any IN A RUN button (BOSS NOW, a boss from the BOSS PICKER, KILL ALL ...) closes the LAB and you are back in the game at once. RESUME RUN sits at the top. After you open the LAB once, a small LAB chip stays in the run (it pauses and opens the LAB).'},
+ {ver:'J3',id:'no-overlap',text:'Nothing overlaps: difficulty badges in the LAB are small icons, the story map shows number medallion, stage name and stars on one line on a small phone (375x553), the boss sub-title matches the boss.'},
  {ver:'J2',id:'ui-menus',text:'Menu, pause, garage, shop and story buttons are painted plates (angular on title and pause, round pills in garage, shop, story and settings); the settings card has a painted frame, header and rows. Every label is readable and every button still reacts to a tap.'},
  {ver:'J2',id:'ui-hud',text:'In a run the score and the hull/heat/dash/EMP bars sit in painted housings and the hint line in a speech bubble; all numbers stay easy to read. On a phone the pause, DASH and EMP buttons are the painted round buttons and still work.'},
  {ver:'J2',id:'ui-story-map',text:'On the story map every stage number sits on a medallion: open, done (laurel), boss (crown) or locked (padlock); garage and shop item icons sit in round chrome buttons.'},
