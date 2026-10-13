@@ -13,6 +13,7 @@ const RENDER=+(process.env.RENDER||20);  // RENDER=N: draw every Nth game frame 
 const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.env.CITIES||'fra,ath').split(','),THR=+(process.env.THROTTLE||(FASTM?1:4)),SHOTS=process.env.SHOTS!=='0';
 // env LS=<file.json>: localStorage entries set after the clear (e.g. mho_gar@1 + mho_build@1 saved from the garage = drive a given car)
 const LSP=process.env.LS?(()=>{const o=JSON.parse(fs.readFileSync(process.env.LS));const r={};for(const k in o)if(/^mho_(gar|build)@/.test(k))r[k]=o[k];return r})():{};
+const XMON=process.env.XMON?fs.readFileSync(process.env.XMON,'utf8'):null;  // env XMON=<in-page monitor file> (tools/roads/rdXmon.js): traffic/ped rule counts in cityRes[city].xmon
 const results=[];let fails=0;const ok=(c,m,i)=>{console.log((c?'PASS ':'FAIL ')+m+(i!==undefined?' · '+JSON.stringify(i):''));if(!c)fails++};
 // ---- in-page: test-driven rAF clock + per-frame monitor
 const INIT=`(()=>{const q=[];let t=0;window.__auto=true;let rc=0;window.__rStub=function(){if(${RENDER}&&++rc%${RENDER}===0&&window.__fastR)return window.__fastR.apply(this,arguments)};window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
@@ -145,7 +146,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await tap('#hcStory');await tick(10);await tap('#slotList .go');
   for(let i=0;i<120;i++){try{if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}catch(e){await p.waitForTimeout(2000)}}await p.evaluate(()=>{window.__auto=false});
   let tutTiny=null;for(let i=0;i<30;i++){await tick(30);if(!tutTiny&&await center('#roamTut')){tutTiny=(await p.evaluate(LAYOUT)).tiny;await shot(city+'_tutorial')}if(!(await tapThrough()))break}
-  await p.evaluate(MON);ttl(city+' in roam');
+  await p.evaluate(MON);if(XMON)await p.evaluate(c=>{const r=__g9ev(c);const m=window.__mon;window.__mon=()=>{m();try{window.__xmon()}catch(e){window.__xmErr=String(e)}};return r},XMON);ttl(city+' in roam');
   // scale + layout at the start
   const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny.concat(tutTiny||[])),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
   // ---- the drive: human driver
@@ -202,7 +203,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
     await p.evaluate(()=>{window.__auto=false});await shot(`${city}_reload${reloads}`);await p.evaluate(MON);lastSnap=f;f+=60;continue}}
   ttl(city+' drive done');await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);st.wallList=(st.allHits||[]).filter(h=>h.kind==="wall");delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
   const perf=await p.evaluate(()=>{const r=__dbg.renderer;window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;r.info.autoReset=false;r.info.reset();__tick(1);r.info.autoReset=true;window.__shooting=0;const i=r.info.render;const o={calls:i.calls,tris:i.triangles,jsMs:+__mho.PERF.js.toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures};window.__fastR=__dbg.composer.render;__dbg.composer.render=window.__rStub;return o});
-  ttl(city+' end');cityRes[city]={...st,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,mem,wallSec:Math.round((Date.now()-T0)/1000)};
+  ttl(city+' end');const xmon=XMON?await p.evaluate(()=>window.__xmonOut?Object.assign(__xmonOut(),{err:window.__xmErr||null}):null):null;cityRes[city]={...st,xmon,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,mem,wallSec:Math.round((Date.now()-T0)/1000)};
   console.log(mode,city,JSON.stringify(cityRes[city]));
  }
  // ---- side trips (all through visible UI)
