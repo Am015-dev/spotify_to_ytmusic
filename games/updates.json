@@ -1,6 +1,81 @@
 [
  {
   "date": "2026-10-13",
+  "game": "sunglaze",
+  "title": "Painted art wired",
+  "items": [
+   "Painted terracotta kiln plates and a wooden centre tray",
+   "Carved rack dishes, clay floor dishes and plaster wall recesses",
+   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels",
+   "Rack tray, bubble tail, rows"
+  ],
+  "check": "Five-dish rack is a wooden tray",
+  "scn": [
+   "sg-board",
+   "sg-board",
+   "sg-buttons",
+   "sg-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   "Does the rack look like a tray?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "cauldron-fair",
+  "title": "Painted art wired",
+  "items": [
+   "Draw dish, chip track, bubble tail, rows"
+  ],
+  "check": "Draw bag and chip track look painted",
+  "scn": [
+   "cf-art"
+  ],
+  "ask": [
+   "Do the bag and chip track look painted?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "tidewake",
+  "title": "Painted art wired",
+  "items": [
+   "The board sea is painted water tiles with a painted brass compass rose",
+   "Brass-and-teal buttons and bar",
+   "Board frame, brass rings, luggage tag, bubble tail, rows"
+  ],
+  "check": "Board is framed, labels readable",
+  "scn": [
+   "tw-board",
+   "tw-buttons",
+   "tw-art"
+  ],
+  "ask": [
+   null,
+   null,
+   "Is the board framed?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "crown-city-smash",
+  "title": "Painted art wired",
+  "items": [
+   "Crown icon, chips, dice tray, pink/yellow/ghost buttons, bubble tail"
+  ],
+  "check": "Top chips, dice tray and crown look painted",
+  "scn": [
+   "cc-art"
+  ],
+  "ask": [
+   "Do the chips and dice tray look painted?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "final-approach",
   "title": "Painted menu row and tail",
   "items": [
@@ -345,33 +420,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "sunglaze",
-  "title": "Painted kilns and rack for Sunglaze",
-  "items": [
-   "Painted terracotta kiln plates and a wooden centre tray",
-   "Carved rack dishes, clay floor dishes and plaster wall recesses",
-   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
-  ],
-  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack.",
-  "scn": [
-   "sg-board",
-   "sg-board",
-   "sg-buttons",
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "rampart",
   "title": "Painted look for Rampart & Vine",
   "items": [
@@ -468,28 +516,6 @@
    null,
    null,
    null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "tidewake",
-  "title": "Painted sea for Tidewake",
-  "items": [
-   "The board sea is painted water tiles with a painted brass compass rose",
-   "Brass-and-teal buttons and bar"
-  ],
-  "check": "Start a game: look at the water under the tiles and the compass in the middle.",
-  "scn": [
-   "tw-board",
-   "tw-buttons",
-   null,
-   null
-  ],
-  "ask": [
    null,
    null,
    null,
