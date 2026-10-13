@@ -77,12 +77,13 @@ const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility
 const SCALE=()=>{const T=__dbg.THREE,M=__mho,R=M.RO,H=M.HUB,B=new T.Box3(),m4=new T.Matrix4(),sz=new T.Vector3();const med=a=>{a=a.filter(v=>v!=null).sort((x,y)=>x-y);return a.length?+a[a.length>>1].toFixed(2):null};
  const inst=(im,j)=>{if(!im||!im.geometry)return null;if(!im.geometry.boundingBox)im.geometry.computeBoundingBox();im.getMatrixAt(j,m4);B.copy(im.geometry.boundingBox).applyMatrix4(m4);return B.clone()};
  // pedestrians: union of their instanced body parts, height above their feet
- const peds=(H.peds||[]).map((p,i)=>({p,i,d:Math.hypot((p._x??1e9)-R.x,(p._z??1e9)-R.z)})).sort((a,b)=>a.d-b.d).slice(0,8).map(({p,i})=>{const U=new T.Box3();for(const k in (H.pP||{})){const b=inst(H.pP[k],i);if(b&&!b.isEmpty())U.union(b)}return U.isEmpty()?null:U.max.y-(p.y||0)-(p.jy||0)});
+ const pN=[];  // reviewer v90i: every close-up figure's own height (nearest first), not just the median
+ const peds=(H.peds||[]).map((p,i)=>({p,i,d:Math.hypot((p._x??1e9)-R.x,(p._z??1e9)-R.z)})).sort((a,b)=>a.d-b.d).slice(0,8).map(({p,i,d})=>{const U=new T.Box3();for(const k in (H.pP||{})){const b=inst(H.pP[k],i);if(b&&!b.isEmpty())U.union(b)}const h=U.isEmpty()?null:U.max.y-(p.y||0)-(p.jy||0);pN.push({d:+d.toFixed(1),h:h==null?null:+h.toFixed(2)});return h});
  const cars=(H.cars||[]).filter(c=>!c.dead&&H.cim&&H.cim[c.k]).map(c=>({c,d:Math.hypot(c.x-R.x,c.z-R.z)})).sort((a,b)=>a.d-b.d).slice(0,8).map(({c})=>{const b=inst(H.cim[c.k],c.j);if(!b)return null;b.getSize(sz);return{l:Math.max(sz.x,sz.z),h:sz.y}});
  let pc=null;if(M.pl&&M.pl.mesh){M.pl.mesh.updateMatrixWorld(true);B.makeEmpty();M.pl.mesh.traverseVisible(o=>{if(o.isMesh&&o.geometry&&!(o.material&&(o.material.transparent||o.material.blending===T.AdditiveBlending))){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();B.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld))}});B.getSize(sz);pc={h:+sz.y.toFixed(2),l:+Math.max(sz.x,sz.z).toFixed(2),w:+Math.min(sz.x,sz.z).toFixed(2)}}
  const pedH=med(peds),carL=med(cars.map(c=>c&&c.l)),carH=med(cars.map(c=>c&&c.h));
  const rel=h=>h&&carL?+((h/carL)/(1.8/4.5)).toFixed(2):null;   // adult 1.8 m vs car 4.5 m: >1 = people too big for the cars
- return{pedH,carL,carH,player:pc,pedRel:rel(pedH),pedVsPlayer:pedH&&pc?+((pedH/pc.l)/(1.8/4.5)).toFixed(2):null,nPed:peds.filter(Boolean).length,nCar:cars.filter(Boolean).length}};
+ return{pedH,carL,carH,player:pc,pedRel:rel(pedH),pedVsPlayer:pedH&&pc?+((pedH/pc.l)/(1.8/4.5)).toFixed(2):null,nPed:peds.filter(Boolean).length,nCar:cars.filter(Boolean).length,pedNear:pN,pedMax:pN.reduce((m,q)=>q.h!=null&&q.h>m?q.h:m,0)}};
 // invisible walls / hulls on the road: colliders covering paved road ≥ 1.5 m inside its edge, 300 m around the car
 const ROADPROBE=()=>{const M=__mho,R=M.RO,out=[];let n=0,hit=0;const seen=new Set();const ath=M.cid()==='ath';
  const inside=(x,z)=>{if(ath){const r=M.athRoad(x,z,48);return!!r&&r.e<=-1.5}return!(M.roadD(x,z)>0||M.roadD(x+1.5,z)>0||M.roadD(x-1.5,z)>0||M.roadD(x,z+1.5)>0||M.roadD(x,z-1.5)>0)};
