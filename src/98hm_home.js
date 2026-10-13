@@ -28,7 +28,11 @@ const HM_mark=()=>(RO.marks||[]).find(HM_isHome)||null;
 mapIcon=(f=>function(m){return HM_isHome(m)?'🏠':f.apply(this,arguments)})(mapIcon);
 markTitle=(f=>function(m){return HM_isHome(m)?'Home · '+f.apply(this,arguments):f.apply(this,arguments)})(markTitle);
 function HM_toast(t){let e=document.getElementById('hmToast');if(!e){e=document.createElement('div');e.id='hmToast';(document.getElementById('roam')||document.body).appendChild(e)}
- e.textContent=t;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(HM.toastT);HM.toastT=setTimeout(()=>e.classList.remove('on'),2200)}
+ e.textContent=t;e.classList.remove('on','side');e.style.left=e.style.top=e.style.maxWidth='';void e.offsetWidth;HM_toastPlace(e);e.classList.add('on');clearTimeout(HM.toastT);HM.toastT=setTimeout(()=>e.classList.remove('on'),2200)}
+// reviewer (39d31f2): the toast sat on the Home card's title. When it would touch the card, it moves into the free column left of the card, under the minimap.
+function HM_toastPlace(e){const c=document.getElementById('roamCard'),R=x=>x&&x.getBoundingClientRect(),cr=R(c);if(!cr||cr.width<4||getComputedStyle(c).display==='none')return;
+ const tr=R(e),hit=!(tr.right<cr.left||tr.left>cr.right||tr.bottom<cr.top||tr.top>cr.bottom);if(!hit)return;const mm=R(document.getElementById('roamMini')||document.getElementById('mini')),top=mm&&mm.height>4?mm.bottom+10:120;
+ e.classList.add('side');e.style.left='10px';e.style.top=top+'px';e.style.maxWidth=Math.max(90,cr.left-20)+'px'}
 function HM_save(){try{pstatFlush()}catch(e){}roamSavePos();const H=store.get('mho_home',{});H[CID]={t:Date.now(),car:GAR_get().sel};H.last=CID;store.set('mho_home',H);HM.saves=(HM.saves||0)+1;HM_toast('💾 SAVED · HOME');try{AU.sfx('pick')}catch(e){}}
 roamOpen=(f=>function(m){const r=f.apply(this,arguments);try{if(HM_isHome(m)&&state==='roam'){HM.at=true;HM_save()}}catch(e){console.warn('HM',e)}return r})(roamOpen);
 // ---- stored cars: the old ride is parked at Home when you swap there
@@ -69,6 +73,7 @@ exitRoam=(f=>function(){document.body.classList.remove('hmNoB');HM.nb=false;HM.a
 body.hmNoB:not(.onfoot) #tN,body.hmNoB #artBoost{display:none!important}
 #hmToast{position:absolute;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translate(-50%,-8px);background:#141413;color:#ffd400;border:3px solid #ffd400;border-radius:12px;padding:6px 14px;font:italic 900 15px var(--hud,system-ui);letter-spacing:.04em;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:7;white-space:nowrap}
 #hmToast.on{opacity:1;transform:translate(-50%,0)}
+#hmToast.side{transform:translate(0,-8px);white-space:normal;text-align:center;font-size:14px;line-height:1.15}#hmToast.side.on{transform:none}
 .garSt .hmNit em{color:#ffd400}
 #gbBody .hmKit{display:block;width:100%;margin:6px 0;text-align:left;background:#ffd400;color:#141413}#gbBody .hmKit[disabled]{opacity:.6;background:#fff}
 #gbBody .hmKit b{font-size:14px}#gbBody .hmKit small{display:block;font-size:12px}`;document.head.appendChild(s)}

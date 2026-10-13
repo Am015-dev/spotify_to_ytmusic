@@ -31,7 +31,10 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  const st=()=>G.evaluate(()=>{const R=__mho.RO,m=__hm.mark();return{x:R.x,z:R.z,v:R.v,h:R.h,card:!!R.card,dHome:m?Math.hypot(m.x-R.x,m.z-R.z):-1,at:__hm.HM.at,saves:__hm.HM.saves||0,ok:__hm.ok(),cur:__hm.cur().id,nb:document.body.classList.contains('hmNoB'),foot:__oc.ev('RO.foot')}});
  const toRoam=async()=>{for(let i=0;i<150;i++){if(await G.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}await G.evaluate(()=>{window.__auto=false});for(let i=0;i<30;i++){await tick(30);if(!(await through()))break}await tick(60)};
  await tap('#hcStory');await tick(10);await tap('#slotList .go');await toRoam();
- const S=[];const add=async(lab,name)=>S.push(lab+'='+await shot(name));
+ const calm=async()=>{for(let i=0;i<120;i++){const b=await G.evaluate(()=>!!document.getElementById('g8Sh')||!!(window.__ba&&__ba.st().on));if(!b)return true;await tick(6);await p.waitForTimeout(30)}return false};
+ const S=[];const add=async(lab,name)=>{await calm();S.push(lab+'='+await shot(name))};
+ const tapTxt=async(scope,re)=>{const xy=await G.evaluate(([sc,r])=>{const b=[...document.querySelectorAll(sc+' button')].find(b=>b.offsetWidth&&new RegExp(r).test(b.textContent));if(!b)return null;const q=b.getBoundingClientRect();return[q.left+q.width/2,q.top+q.height/2]},[scope,re]);if(!xy)return false;await down('tap',xy);await tick(4);await up('tap');await tick(4);return true};
+ const closeCard=async()=>{if(await vis('#roamCard')){await tapTxt('#roamCard','LATER|DONE');await tick(20)}return !(await vis('#roamCard'))};
  let s=await st();ok(s.cur==='rod'&&s.ok&&!s.nb&&await vis('#tN'),tag+' start: Hot Rod (sports) has BOOST, button shown',s);
  // drive a few seconds so the start shot is mid-road with the HUD settled
  await down('gas',await center('#tG'));await tick(150);await up('gas');await tick(30);await add('Sports car HUD with BOOST','1_sports_boost');
@@ -45,7 +48,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(10);await p.waitForTimeout(120);const q=await st();if(q.dHome>0&&q.dHome<40&&!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(60);await through();
  console.log(tag,'after FT',JSON.stringify(await st()));
  s=await st();ok(s.dHome>15&&s.dHome<40,tag+' fast travel lands at Home',{d:+s.dHome.toFixed(1)});
- await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');
+ await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');fs.writeFileSync(path.join(OUT,tag+'_mini.json'),JSON.stringify(await G.evaluate(()=>{const r=document.getElementById('roamMini').getBoundingClientRect();return[r.left,r.top,r.width,r.height]})));
  // drive into the beacon: fast travel home leaves the car 26 m out facing it. GAS, then BRAKE to a stop on it (the card needs a stop)
  const goIn=async()=>{let f=0,mv=0;await down('gas',await center('#tG'));while(f<900){await tick(6);f+=6;s=await st();if(s.card||s.dHome<9)break;if(Math.abs(s.v)>1)mv=1;else if(!mv&&f%120===0){await up('gas');await tick(4);await down('gas',await center('#tG'))}}await up('gas');console.log(tag,'goIn',f,JSON.stringify(s));
   if(Math.abs(s.v)>.6)await down('brk',await center('#tB'));for(let i=0;i<40;i++){await tick(4);s=await st();if(s.card||Math.abs(s.v)<.5)break}await up('brk');for(let i=0;i<60&&!(s=await st()).card;i++)await tick(6);return s};
@@ -53,13 +56,15 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  for(let i=0;i<60&&!(s=await st()).card;i++){await tick(6)}
  s=await st();ok(s.card&&s.saves>=1,tag+' driving into Home = save point (card + save)',s);
  const tst=await G.evaluate(()=>{const e=document.getElementById('hmToast');return e&&e.classList.contains('on')?e.textContent:null});ok(!!tst&&/SAVED/.test(tst),tag+' "Saved" toast',tst);
+ const ov=await G.evaluate(()=>{const a=document.getElementById('hmToast').getBoundingClientRect(),c=document.getElementById('roamCard'),b=c&&c.getBoundingClientRect();if(!b||!b.width)return{ov:false};return{ov:!(a.right<b.left||a.left>b.right||a.bottom<b.top||a.top>b.bottom),t:[a.left,a.top,a.right,a.bottom].map(Math.round),c:[b.left,b.top,b.right,b.bottom].map(Math.round)}});ok(!ov.ov,tag+' toast does not overlap the card',ov);
  await add('Drive into Home: SAVED toast','4_home_saved');
  const H1=await G.evaluate(()=>JSON.parse(localStorage.getItem('mho_home@1')||'null'));ok(H1&&H1[city]&&H1.last===city,tag+' mho_home stored',H1);
  // stored cars, a low side view along the façade (camera set for the shot only)
  const camShot=async(lab,name)=>{await G.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1);__oc.ev(`(()=>{const Q=__hm.slots(),m=__hm.mark();if(!Q.length)return;const cx=(Q[0][0]+Q[1][0])/2,cz=Q[0][1];const gy=groundY(cx,cz);camera.position.set(cx-6,gy+4.5,cz-26);camera.lookAt(cx,gy+1.5,cz);__dbg.composer.render()})()`)});
-  const f2=path.join(OUT,`${tag}_${name}.jpg`);await p.screenshot({path:f2,type:'jpeg',quality:72});S.push(lab+'='+f2);await G.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})};
+  const f2=path.join(OUT,`${tag}_${name}.jpg`);await G.evaluate(()=>{const c=document.getElementById('roamCard');if(c)c.style.visibility='hidden'});await p.screenshot({path:f2,type:'jpeg',quality:72});await G.evaluate(()=>{const c=document.getElementById('roamCard');if(c)c.style.visibility=''});S.push(lab+'='+f2);await G.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})};
  const pk=await ev('JSON.stringify({n:HM.P.length,ids:HM.P.map(g=>g.userData.hmId),pl:(()=>{const b=HM_box(pl.mesh);return [+(b.max.x-b.min.x).toFixed(2),+(b.max.y-b.min.y).toFixed(2),+(b.max.z-b.min.z).toFixed(2)]})(),y:HM.P.map(g=>{const b=HM_box(g);return [+(b.min.y-groundY(g.position.x,g.position.z)).toFixed(3),+(b.max.x-b.min.x).toFixed(2),+(b.max.y-b.min.y).toFixed(2),+(b.max.z-b.min.z).toFixed(2)]})})');
- ok(JSON.parse(pk).n>=2,tag+' stored cars parked at Home',JSON.parse(pk));await camShot('Home garage with stored cars','5_home_cars');
+ const PK=JSON.parse(pk);ok(PK.n>=2,tag+' stored cars parked at Home',PK);ok(PK.y.every(a=>Math.abs(a[0])<=0.05),tag+' parked cars: tyre-to-ground gap ≤ 0.05 m',PK.y.map(a=>a[0]));
+ await camShot('Stored cars parked at Home · gap '+Math.max(...PK.y.map(a=>Math.abs(a[0]))).toFixed(3)+' m','5_home_cars');
  // card → garage
  const cardBtns=await G.evaluate(()=>[...document.querySelectorAll('#roamCard button')].filter(b=>b.offsetWidth).map(b=>(b.id||'')+':'+b.textContent.trim().slice(0,30)));console.log(tag,'card buttons',cardBtns);
  const openGar=async()=>{for(const sel of['#roamCard .go','#roamCard button']){if(await tap(sel)){await tick(30);if(await vis('#gbx'))return true}}return vis('#gbx')};
@@ -68,19 +73,20 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  await add('Home garage: RIDES (Hot Rod: Nitro built in)','6_garage_rides');
  // pick the Post Van: scroll its card into view, then tap it
  await G.evaluate(()=>{const e=document.querySelector('[data-gc="t_v6651_1"]');e&&e.scrollIntoView({block:'center'})});await tick(10);
- ok(await tap('[data-gc="t_v6651_1"]'),tag+' tap the Post Van card');await tick(40);await rides();
+ ok(await tap('[data-gc="t_v6651_1"] img'),tag+' tap the Post Van card');await tick(40);ok(!(await G.evaluate(()=>__oc.ev('GB_.bk'))),tag+' card tap stays in RIDES (no BUILD)');
  s=await st();ok(s.cur==='t_v6651_1'&&!s.ok,tag+' Post Van selected, no nitro',s);
  await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmKit');e&&e.scrollIntoView({block:'center'})});await tick(6);
  const kitTxt=await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmKit');return e&&e.textContent});ok(!!kitTxt,tag+' NITRO KIT offered for the van',kitTxt);
  await add('Van stats: Nitro none + NITRO KIT','7_van_kit_offer');
- const closeGar=async()=>{for(const sel of['#gbDone','#gbx .gbX','#gbClose','#gbx [data-x]']){if(await vis(sel)){await tap(sel);break}}for(let i=0;i<40;i++){await tick(10);if(!(await vis('#gbx'))&&await G.evaluate(()=>__mho.state==='roam'))break}await tick(30);await through()};
+ const closeGar=async()=>{for(const sel of['#gbSave','#gbDone','#gbx .gbX','#gbClose']){if(await vis(sel)){await tap(sel);break}}for(let i=0;i<40;i++){await tick(10);if(!(await vis('#gbx'))&&await G.evaluate(()=>__mho.state==='roam'))break}await tick(30);await through()};
  const gbBtns=await G.evaluate(()=>[...document.querySelectorAll('#gbx button')].filter(b=>b.offsetWidth&&/✕|DONE|DRIVE|CLOSE|BACK/i.test(b.textContent)).map(b=>(b.id||b.className)+':'+b.textContent.trim().slice(0,20)));console.log(tag,'garage close buttons',gbBtns);
- await closeGar();s=await st();ok(!s.ok&&s.nb&&!(await vis('#tN')),tag+' van HUD: BOOST button hidden',s);
+ const gty=await ev('JSON.stringify({type:G9C.type,pv:GAR_.pv})');ok(/"car"/.test(gty),tag+' garage stays on STREET for the Post Van',gty);
+ await closeGar();ok(!(await vis('#gbx')),tag+' garage closed (SAVE & DRIVE)');await closeCard();s=await st();ok(!s.ok&&s.nb&&!(await vis('#tN')),tag+' van HUD: BOOST button hidden',s);
  const pk2=await ev('JSON.stringify(HM.P.map(g=>g.userData.hmId))');ok(JSON.parse(pk2).includes('rod'),tag+' Hot Rod now parked at Home',pk2);
  // try the boost key on the van: no boost
  await down('gas',await center('#tG'));await p.keyboard.down('Shift');await tick(90);const nb=await ev('JSON.stringify({b:!!RO.boosting,n:!!pl.nitro})');await p.keyboard.up('Shift');await up('gas');ok(!JSON.parse(nb).b,tag+' van: Shift does not boost',nb);
- await add('Van HUD without BOOST','8_van_no_boost');
- await camShot('Hot Rod parked at Home after the swap','9_home_cars_after');
+ await down('gas',await center('#tG'));await tick(60);await add('Post Van driving: no BOOST button','8_van_no_boost');await up('gas');await tick(30);
+ await G.evaluate(()=>__oc.ev('HM_build()'));await tick(40);await camShot('Hot Rod parked at Home after the swap','9_home_cars_after');
  // back into the beacon → garage → install the kit (studs granted for the test)
  await G.evaluate(()=>__oc.ev('(()=>{const S=season();S.cr=Math.max(S.cr,5000);saveSeason(S)})()'));
  // pause → HOME again (the garage left the car on the beacon's exit), then drive in
@@ -91,9 +97,9 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  const kit=await G.evaluate(()=>JSON.parse(localStorage.getItem('mho_gar@1')||'{}').nk||[]);ok(kit.includes('t_v6651_1'),tag+' kit stored',kit);
  await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmNit');e&&e.scrollIntoView({block:'center'})});await tick(6);
  await add('NITRO KIT installed (ride stats)','10_kit_installed');
- await closeGar();s=await st();ok(s.ok&&!s.nb&&await vis('#tN'),tag+' van with kit: BOOST button back',s);
- await down('gas',await center('#tG'));await tick(120);await down('bst',await center('#tN'));await tick(40);const yb=await ev('JSON.stringify({b:!!RO.boosting})');await up('bst');await up('gas');ok(JSON.parse(yb).b,tag+' van with kit boosts (BOOST tap)',yb);
- await add('Van with Nitro Kit: BOOST','11_van_kit_boost');
+ await closeGar();await closeCard();s=await st();ok(s.ok&&!s.nb&&await vis('#tN'),tag+' van with kit: BOOST button back',s);
+ await down('gas',await center('#tG'));await tick(120);await down('bst',await center('#tN'));await tick(40);const yb=await ev('JSON.stringify({b:!!RO.boosting})');ok(JSON.parse(yb).b,tag+' van with kit boosts (BOOST held)',yb);
+ await add('Post Van with Nitro Kit: BOOST','11_van_kit_boost');await up('bst');await up('gas');
  // reload → continue → restored
  console.log(tag,'saved pos before reload',await G.evaluate(()=>JSON.stringify((JSON.parse(localStorage.getItem('mho_roam@1')||'{}')).pos)));
  const before=await G.evaluate(()=>({gar:JSON.parse(localStorage.getItem('mho_gar@1')||'{}'),home:JSON.parse(localStorage.getItem('mho_home@1')||'null')}));

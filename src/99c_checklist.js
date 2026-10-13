@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90k',id:'home-save',area:'city',text:'Pause → 🏠 HOME takes you to your Home garage (orange 🏠 on the minimap). Drive in and stop: "💾 SAVED · HOME" shows beside the card (not on it). Works in Frankfurt and Athens.'},
+ {ver:'v90k',id:'home-cars',area:'city',text:'Your stored cars stand parked by the Home door, wheels on the ground. Swap your ride in the garage while at Home: the old ride is now parked outside.'},
+ {ver:'v90k',id:'nitro-gate',area:'hud',text:'Free roam: sports cars (Hot Rod, Speed Champions, racers) have BOOST. Other rides (e.g. Post Van) have no BOOST button. Races still give everyone boost.'},
+ {ver:'v90k',id:'nitro-kit',area:'garage',text:'At Home → garage → RIDES: a ride without nitro shows 🧰 INSTALL NITRO KIT (1,500 studs). After installing, that ride has BOOST everywhere. Reload: ride, kit and Home stay.'},
  {ver:'v90j',id:'ride-fast',area:'garage',text:'Garage → RIDES: tap any ride card: the whole ride stands there within about 1 second (never just wheels or a bare chassis); a LOADING sign shows if it needs longer.'},
  {ver:'v90j',id:'ck-go',area:'hud',text:'Checklist: items you can\'t reach in a short drive (pizza shop, phone booth, fountain, speedboat, Big Rig, planters, cones, Athens display models, Syntagma palms) have 📍 GO: it drops your car next to the thing (tap again for the next one).'},
  {ver:'v90j',id:'gz-zoom',area:'garage',text:'Garage: the − ⤢ + buttons zoom the car in and out on every tab (RIDES, BUILD, PAINT…); ⤢ goes back to the normal view. Two-finger pinch zooms too.'},
