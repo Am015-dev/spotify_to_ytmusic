@@ -1,6 +1,7 @@
 // tChkGo: tap 📍 GO on EVERY checklist item, in ONE warm page per city (__tq.reset() between items, no reload), via the fast test start (?test=fra|ath&draw=0, src/98tq_test_quick.js).
 // Frankfurt items, then the builder (bx) items, then Athens items. Prints one line per item (PASS/FAIL + what GO said) and a JSON summary
 // with boot times and console errors. Target: whole run < 3 min.
+//   SHOTS=1 saves jpgs of the first 3 items + shadow (each first frame costs ~10 s of software-GL shaders; off by default).
 //   QUIET=1 prints only FAIL lines + the summary (token saver).
 //   TAG=foot,v90k/park-sit  only items whose id starts with / contains one of these (the merged lanes' GO tags).
 //   SMOKE=1  only a ~20-item smoke set (both city boots, drive, on foot, errors). Frankfurt and Athens run IN PARALLEL (two pages); fixed sleeps are short.
@@ -29,7 +30,7 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
    if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const secs=(Date.now()-t1)/1000,slow=secs>10&&c!=='bx';if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:(spawnOnly||slow)?false:ok,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!ok||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
-   if(res.length<=3||id.endsWith('/shadow'))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
+   if(process.env.SHOTS&&(res.length<=3||id.endsWith('/shadow')))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
    if(st.gar)await p.evaluate(()=>{try{gbClose(false)}catch(e){}});
    // warm page: reset to a clean roam in the same page (no reload); reload only when the reset can't (navigation, no __tq.reset, still not roam)
