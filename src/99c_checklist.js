@@ -3,6 +3,15 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'bxA',id:'bx-snap',area:'race',text:'TRACK BUILDER: tap START, RAMP UP, STRAIGHT and ✔ PLACE (or tap the green ghost): 3 pieces snap end to end and the road climbs one height level.'},
+ {ver:'bxA',id:'bx-jump',area:'race',text:'Builder test CLIFF JUMP (📍 GO): drive off the JUMP at the mountain top: at least 1.5 s in the air, you land upright on the road below.'},
+ {ver:'bxA',id:'bx-offroad',area:'race',text:'Builder test OFF-ROAD (📍 GO): leave the road and drive across the grass and hills for 10 s: no invisible wall stops you.'},
+ {ver:'bxA',id:'bx-cliff',area:'race',text:'Builder test CLIFF FALL (📍 GO): drive off the end of the mountain road: "OFF THE CLIFF!" and you are back on the road within 2 s.'},
+ {ver:'bxA',id:'bx-water',area:'race',text:'Builder test WATER (📍 GO): drive off the road into the lake: the car becomes a boat and keeps going; back on land it is a car again.'},
+ {ver:'bxA',id:'bx-bridge',area:'race',text:'Builder test BRIDGE (📍 GO): drive the low road under the bridge, then the bridge road over it (LEGO pillars hold it up, none stand on the low road).'},
+ {ver:'bxA',id:'bx-split',area:'race',text:'Builder test SPLIT (📍 GO): at the SPLIT take the left road, then RESPAWN and take the right one: both are drivable.'},
+ {ver:'bxA',id:'bx-elev',area:'race',text:'Builder demo MOUNTAIN JUMP (📍 GO): the track climbs and drops at least 15 m (mountain top to valley).'},
+ {ver:'bxA',id:'bx-errors',area:'race',text:'Track builder: build, drive and switch tracks for a few minutes: nothing freezes, no error messages.'},
  {ver:'v90j',id:'ride-fast',area:'garage',text:'Garage → RIDES: tap any ride card: the whole ride stands there within about 1 second (never just wheels or a bare chassis); a LOADING sign shows if it needs longer.'},
  {ver:'v90j',id:'ck-go',area:'hud',text:'Checklist: items you can\'t reach in a short drive (pizza shop, phone booth, fountain, speedboat, Big Rig, planters, cones, Athens display models, Syntagma palms) have 📍 GO: it drops your car next to the thing (tap again for the next one).'},
  {ver:'v90j',id:'gz-zoom',area:'garage',text:'Garage: the − ⤢ + buttons zoom the car in and out on every tab (RIDES, BUILD, PAINT…); ⤢ goes back to the normal view. Two-finger pinch zooms too.'},
@@ -225,7 +234,7 @@ const OD_CHECKLIST=[
  // 📍 GO (coordinator v90j: items a 2-min drive never reaches): drops the car on the nearest street facing the thing to check; items with
  // several things step through them on each tap. Another city → the flight there (tap 📍 again after landing). Palms → the Syntagma race.
  // Targets: w = a LEGO world model (LDW.on), p = a street prop type (HUB.props), car = a traffic car kind, race = a track id.
- const GO={'v90g/fra-props':[{w:'w6350',n:'Pizza To Go'},{w:'w6613',n:'phone booth'},{w:'w10184f',n:'fountain'},{w:'w1069',n:'speedboat'}],
+ const GO={'bxA/bx-snap':[{bx:'bx-snap',n:'snap test'}],'bxA/bx-jump':[{bx:'bx-jump',n:'cliff jump'}],'bxA/bx-offroad':[{bx:'bx-offroad',n:'off-road'}],'bxA/bx-cliff':[{bx:'bx-cliff',n:'cliff fall'}],'bxA/bx-water':[{bx:'bx-water',n:'water'}],'bxA/bx-bridge':[{bx:'bx-bridge',n:'bridge'}],'bxA/bx-split':[{bx:'bx-split',n:'split'}],'bxA/bx-elev':[{bx:'bx-elev',n:'elevation'}],'v90g/fra-props':[{w:'w6350',n:'Pizza To Go'},{w:'w6613',n:'phone booth'},{w:'w10184f',n:'fountain'},{w:'w1069',n:'speedboat'}],
   'v90g/ath-display':[{w:'w30023',n:'lighthouse'},{w:'w7796',n:'house'}],'v90g/bigrig':[{car:'v3221_1',c:'fra',n:'Big Rig'}],
   'v90g/land2':[{p:'planter',c:'fra',n:'planter'},{p:'dumpster',c:'fra',n:'dumpster'}],'v90i/palms':[{race:'synt',c:'ath',n:'Syntagma race'}],
   'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
@@ -235,7 +244,7 @@ const OD_CHECKLIST=[
  const goAt=T=>{if(T.w){const E=LDW.on.find(e=>e.id===T.w);return E&&{x:E.x,z:E.z}}
   if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}
   if(T.car){const c=(HUB.cars||[]).find(c=>!c.dead&&String(HCAR[c.k]).includes(T.car));return c&&{x:c.x,z:c.z}}return null};
- const goJump=it=>{const L=GO[k(it)];if(!L)return;const i=goI[k(it)]=((goI[k(it)]??-1)+1)%L.length,T=L[i],c=goCity(T);let st='';try{st=state}catch(e){}
+ const goJump=it=>{const L=GO[k(it)];if(!L)return;if(L[0].bx){goI._t=L[0].n;BX_test(L[0].bx);return}const i=goI[k(it)]=((goI[k(it)]??-1)+1)%L.length,T=L[i],c=goCity(T);let st='';try{st=state}catch(e){}
   if(c!==CID){if(st==='roam'&&cityTravel(c)){goSay('✈ Flying to '+(c==='ath'?'Athens':'Frankfurt')+' · tap 📍 again after landing');goI[k(it)]=i-1}else goSay('📍 Drive in '+(c==='ath'?'Athens':'Frankfurt')+' first (story → fly there)');return}
   if(T.race){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;
    menuTab='quick';menuTrack=T.race;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;return}  // like a roam race marker: back to the city after the race
