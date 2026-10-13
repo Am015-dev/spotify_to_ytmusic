@@ -19,13 +19,13 @@ async function openGame(ctx, base, slug, qs, errs) {
   await page.goto(`${base}/${slug}/${qs}`, { waitUntil: 'load', timeout: 45000 }).catch(e => errs.push('load: ' + e.message.slice(0, 80)));
   return page;
 }
-const tapSel = async (page, sel) => { const b = await page.evaluate(s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }, sel); if (!b) throw new Error('not found ' + sel); await page.touchscreen.tap(b.x, b.y); await sleep(250); };
+const tapSel = async (page, sel) => { const b = await page.evaluate(s => { const e = document.querySelector(s); if (!e) return null; e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }, sel); if (!b) throw new Error('not found ' + sel); await page.touchscreen.tap(b.x, b.y); await sleep(250); };
 
 async function runChecks(page, fails, id) {   // same step/tap protocol as scenario-test.js, touch only
   await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => fails.push(id + ': scenario never ready'));
   const info = await page.evaluate(() => window.GXSCN).catch(() => null);
   if (!info) return; if (info.error) { fails.push(id + ': ' + info.error); return; }
-  if (info.id !== id) { fails.push(`${id}: GO opened ${info.id}`); return; }
+  if (info.id !== id) { fails.push(`${id}: GO opened ${info.id} (page ${page.url().slice(-40)})`); return; }
   await sleep(600);
   for (let i = 0; i < (info.checks || []).length; i++) {
     const r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw' }));
@@ -64,15 +64,15 @@ async function testGame(browser, base, slug) {
       ok(rows.length === list.length && list.every(s => rows.includes(s.id)), `(b) LAB rows [${rows.join(',')}] != scenarios [${list.map(s => s.id).join(',')}]`);
       for (const s of list) {
         const open = await page.evaluate(() => { const m = document.getElementById('gxlab-menu'); return !!m && !m.hidden; });
-        if (!open) await tapSel(page, '#gxlab-btn');
+        if (process.env.LABDBG) console.log('menu open?', open, page.url().slice(-45)); if (!open) await tapSel(page, '#gxlab-btn');
         await page.evaluate(id => { const b = document.querySelector('#gxlab-menu [data-go="' + id + '"]'); if (b) b.scrollIntoView({ block: 'center' }); }, s.id);
         await sleep(150);
-        const nav = page.waitForNavigation({ waitUntil: 'load', timeout: 30000 }).catch(() => null);
-        await tapSel(page, `#gxlab-menu [data-go="${s.id}"]`); await nav;
+        const nav = page.waitForURL(u => u.search.includes('scn=' + s.id + '&'), { waitUntil: 'load', timeout: 30000 }).catch(() => null);
+        await tapSel(page, `#gxlab-menu [data-go="${s.id}"]`); await nav; if (process.env.LABDBG) console.log('after GO', s.id, page.url().slice(-45));
         const f0 = fails.length; await runChecks(page, fails, s.id);
-        const lab = await page.evaluate(() => { const e = document.getElementById('gxlab-btn'); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 10 && r.bottom <= innerHeight; }).catch(() => false);
+        const lab = await page.evaluate(() => { const e = document.getElementById('gxlab-btn'); if (!e) return false; const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.width > 10 && r.bottom <= innerHeight && (t === e || e.contains(t)); }).catch(() => false);
         ok(lab, `${s.id}: LAB not one tap away after GO`); ok(fails.length === f0, `${s.id} checks`); }
-    } catch (e) { fails.push('(b) ' + String(e.message).slice(0, 100)); }
+    } catch (e) { fails.push('(b) ' + String(e.message).slice(0, 100) + ' @' + (await page.evaluate(() => { const m = document.getElementById('gxlab-menu'); return location.search + ' menu=' + (m ? (m.hidden ? 'hidden' : 'open') + ' rows=' + m.querySelectorAll('.gxl-row').length : 'none'); }).catch(() => '?'))); }
     await ctx.close(); }
   // ---- (b2) 375x553: LAB menu fits, no sideways scroll ----
   { const ctx = await phoneCtx(browser, 375, 553), page = await openGame(ctx, base, slug, '?test=1#lab', errs);

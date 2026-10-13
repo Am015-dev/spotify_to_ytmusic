@@ -1,6 +1,42 @@
 [
  {
   "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Fight numbers you can read, and a test LAB",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
+   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario"
+  ],
+  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario",
+  "scn": [
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-fight-bonus",
+   "dk-tut-help",
+   "dk-board",
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-zoom"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "cauldron",
   "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
   "items": [
@@ -86,21 +122,6 @@
    "The side panel is smaller: just status and advice"
   ],
   "check": "Roll, keep a die, tap SMASH!, then hold a card and tap it to buy"
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Fight numbers you can read",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut",
-   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals."
-  ],
-  "check": "Kick open a door and fight a monster"
  },
  {
   "date": "2026-10-13",

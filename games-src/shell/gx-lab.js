@@ -35,14 +35,14 @@
   /* ---- LAB menu ---- */
   function menu() {
     var p = el.menu; if (!p) { p = el.menu = mk('div', 'gxlab-menu', 'gxl-panel'); p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'LAB'); p.hidden = true; document.body.appendChild(p);
-      p.addEventListener('click', function (e) { var t = e.target.closest('button'); if (!t) return;
+      p.act = function (t) {
         if (t.id === 'gxl-close') { p.hidden = true; return; }
         if (t.dataset.go) { go(t.dataset.go); return; }
         if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
         if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
         if (t.id === 'gxl-pos') { L.set('gx_lab_pos', L.get('gx_lab_pos') === 'r' ? 'l' : 'r'); bar(); return; }
         if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
-        if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }); }
+        if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
     fillMenu(); p.hidden = false;
   }
   function fillMenu() {
@@ -64,11 +64,11 @@
   /* ---- pinned ✔ Test checklist (this game's What's new items, shared with the shelf) ---- */
   function card() {
     var p = el.card; if (!p) { p = el.card = mk('div', 'gxlab-card', 'gxl-panel'); p.setAttribute('role', 'region'); p.setAttribute('aria-label', 'Test checklist'); p.hidden = true; document.body.appendChild(p);
-      p.addEventListener('click', function (e) { var t = e.target.closest('button'); if (!t) return;
+      p.act = function (t) {
         if (t.id === 'gxl-cclose') { setCk(false); p.hidden = true; return; }
         if (t.id === 'gxl-ccopy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
         if (t.dataset.go) { setCk(false); go(t.dataset.go); return; }
-        if (t.dataset.s) { var e2 = ckEntries()[+t.dataset.e], i = +t.dataset.i, cur = L.itemRes(e2, i).s; L.setItem(UP, e2, i, cur === t.dataset.s ? null : t.dataset.s, ''); fillCard(); bar(); if (el.menu && !el.menu.hidden) fillMenu(); } });
+        if (t.dataset.s) { var e2 = ckEntries()[+t.dataset.e], i = +t.dataset.i, cur = L.itemRes(e2, i).s; L.setItem(UP, e2, i, cur === t.dataset.s ? null : t.dataset.s, ''); fillCard(); bar(); if (el.menu && !el.menu.hidden) fillMenu(); } };
       p.addEventListener('input', function (e) { var t = e.target; if (t.dataset && t.dataset.note) { var e3 = ckEntries()[+t.dataset.e], i = +t.dataset.i; L.setItem(UP, e3, i, 'bad', t.value); } }); }
     fillCard(); p.hidden = false;
   }
@@ -87,13 +87,20 @@
   /* ---- wiring ---- */
   function init() {
     css(); bar();
-    document.addEventListener('click', function (e) {
-      var b = e.target.closest && e.target.closest('#gxlab-bar button'); if (!b) return;
+    /* one window-capture handler on pointerup (a game's blocking handlers, e.g. the tutorial's, never see it) and on click (mouse / keyboard / when no pointerup came) */
+    var last = 0;
+    function hit(e) {
+      var b = e.target && e.target.closest && e.target.closest('#gxlab-bar button, .gxl-panel button'); if (!b) return;
+      e.stopPropagation(); if (e.type === 'click') e.preventDefault();
+      if (e.type === 'click' && Date.now() - last < 600) return;   // pointerup already did it
+      if (e.type === 'pointerup') last = Date.now();
+      var p = b.closest('.gxl-panel'); if (p) { if (p.act) p.act(b); return; }
       if (b.id === 'gxlab-btn') { if (el.menu && !el.menu.hidden) el.menu.hidden = true; else { if (el.card) el.card.hidden = true; menu(); } return; }
       if (b.id === 'gxlab-ck') { if (el.card && !el.card.hidden) { setCk(false); el.card.hidden = true; } else { if (el.menu) el.menu.hidden = true; setCk(true); card(); } return; }
       if (b.id === 'gxlab-next') { var r = run(); if (!r) return; if (r.i + 1 < r.ids.length) { r.i++; saveRun(r); go(r.ids[r.i]); } else { saveRun(null); location.href = location.pathname + '?test=1#lab'; } return; }
       if (b.dataset.s && scn) { var cur = L.scnRes(slug, scn).s; L.setScn(UP, slug, scn, cur === b.dataset.s ? null : b.dataset.s); bar(); if (el.menu && !el.menu.hidden) fillMenu(); if (el.card && !el.card.hidden) fillCard(); }
-    });
+    }
+    W.addEventListener('pointerup', hit, true); W.addEventListener('click', hit, true);
     if (location.hash === '#lab') menu();
     else if (ckOpen() && !inShelf && UP.length) card();
   }

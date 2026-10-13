@@ -85,4 +85,27 @@
       { kind: 'eq', name: 'MONSTERS total', a: function () { return GXS.num('.sline .sm .n'); }, b: function () { return monStr(G.cb); } }
     ]
   });
+
+  GXS.add({
+    id: 'dk-board', name: 'Start of game board', ask: 'Is the table clear, with Help and Run?', ls: { dkd_offer: '1' }, seed: 31, when: booted, group: 'Board',
+    setup: function () { table(31); return new Promise(function (r) { setTimeout(r, 500); }); },
+    checks: [
+      { kind: 'visible', sel: '[data-board]', name: 'table' },
+      { kind: 'fn', name: 'table fills the screen', fn: function () { var r = document.querySelector('[data-board]').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > (innerWidth < 600 ? .55 : .4) || 'table only ' + Math.round(f * 100) + '%'; } },
+      { kind: 'visible', sel: '.arena .bfdoor', name: 'the door' },
+      { kind: 'visible', sel: '.mine .hand', name: 'your hand' },
+      { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } }
+    ]
+  });
+
+  GXS.add({
+    id: 'dk-zoom', name: 'Big card zoom', ask: 'Is the big card readable?', ls: { dkd_offer: '1' }, seed: 32, when: booted, group: 'Cards',
+    setup: function () { table(32); UI.zoom = P(0).hand[0]; render(); return GXS.wait(function () { return document.querySelector('#dkCard .zoom .card'); }, 5000).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '#dkCard .zoom .card', name: 'big card' },
+      { kind: 'text', sel: '#dkCard h2', re: /\S/, name: 'card name' },
+      { kind: 'visible', sel: '#dkCard .gx-x', name: 'Close button' },
+      { kind: 'tap', sel: '#dkCard .gx-x', name: 'tap Close', state: function () { return UI.zoom != null; }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
 })();
