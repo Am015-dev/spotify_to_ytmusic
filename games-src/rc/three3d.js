@@ -532,7 +532,7 @@ function sync3D(){if(!V3.on||!G)return;hexArtLoad();if(HEXART.done<7&&performanc
     o.g.userData.id=m.id;const ok=overlayKey(m);if(o.ok!==ok){if(o.ov)o.g.remove(o.ov);o.ov=overlayMesh(m);o.g.add(o.ov);o.ok=ok}
     const mv=V3.mist[m.id]||(V3.mist[m.id]={v:0,c:0,to:0});mv.to=v.terr==='unknown'&&!v.down?1:m.fog?.62:0;mv.fog=!!m.fog;if(mv.init==null){mv.init=1;mv.v=mv.to}}
   // camp on the camp tile
-  if(!V3.camp){V3.camp=campMesh();sc.add(V3.camp);if(V3.q==='low')lowNoise(true)}const cp=hexPos(MAP[G.camp.pos].q,MAP[G.camp.pos].r);V3.camp.position.set(cp.x+.3,groundY(cp.x+.3,cp.z+.2),cp.z+.2);syncCamp(V3.camp,{camp:G.camp,pileWood:G.sc&&G.sc.pile||0});
+  if(!V3.camp){V3.camp=campMesh();sc.add(V3.camp);if(V3.q==='low')lowNoise(true)}const cp=hexPos(MAP[G.camp.pos].q,MAP[G.camp.pos].r);V3.camp.position.set(cp.x+.3,groundY(cp.x+.3,cp.z+.2),cp.z+.2);syncCamp(V3.camp,{camp:G.camp,pileWood:G.sc&&G.sc.pile||0,inv:G.inv});
   // pawns: one figure per character pawn, Friday and the dog; they walk to where the plan sends them
   const want=[];for(const c of G.chars){const n=c.dead?0:(c.npc?1:2);for(let k=0;k<n;k++)want.push({id:'c'+c.i+'_'+k,col:PCOL3[c.i%6],out:!!c.out,ck:c.k})}if(G.fri&&!G.fri.dead)want.push({id:'fri',col:0xf4f4f4,kind:'fri'});if(G.dog)want.push({id:'dog',col:0x9b6bd6,kind:'dog'});
   const acts={};for(const a of (G.plan&&G.plan.acts)||[])for(const p of a.pw)acts[p]=a;

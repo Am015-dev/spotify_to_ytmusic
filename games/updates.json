@@ -1,6 +1,117 @@
 [
  {
   "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Painted art wired",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane",
+   "Top bar, menus and buttons are now painted cockpit panels",
+   "Briefing is a real clipboard with painted check boxes",
+   "Weather and time-of-day badges on the briefing",
+   "Radio phrase buttons and the Roll plate are painted",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   "fa-board",
+   "fa-board",
+   "fa-buttons",
+   "fa-zoom",
+   "fa-zoom",
+   "fa-buttons",
+   "fa-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Painted art wired",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit",
+   "Menu tutorial row and speech tail are painted"
+  ],
+  "check": "Open Settings: Tutorial is a painted strip",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-buttons",
+   "sf-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Painted art wired",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "kk-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shipwreck-isle",
+  "title": "Painted art wired",
+  "items": [
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm"
+  ],
+  "check": "Do the camp icons and 3D camp look painted?",
+  "scn": [
+   "si-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "nebula-aces",
   "title": "Painted art wired",
   "items": [
@@ -223,61 +334,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: painted workshop kit",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big",
-   "Wire racks, name plates and equipment cards are painted",
-   "A rope fuse with a spark and a painted bomb",
-   "Top bar, menus and buttons use the workshop kit"
-  ],
-  "check": "Look at the table and the fuse strip",
-  "scn": [
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: painted chef tags and icons",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals",
-   "Each chef has a painted chopstick-sleeve name tag",
-   "Stars, plates, custard cups and Fire Paste are painted icons",
-   "Top bar, menus and buttons use the lacquer kit"
-  ],
-  "check": "Look under each chef on the table"
- },
- {
-  "date": "2026-10-13",
   "game": "shelf",
   "title": "Game versions and status page",
   "items": [
@@ -306,48 +362,6 @@
    null
   ],
   "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "final-approach",
-  "title": "Painted cockpit kit",
-  "items": [
-   "The landing and the crash now show a detailed 3D airliner",
-   "Low graphics keeps the old painted plane",
-   "Top bar, menus and buttons are now painted cockpit panels",
-   "Briefing is a real clipboard with painted check boxes",
-   "Weather and time-of-day badges on the briefing",
-   "Radio phrase buttons and the Roll plate are painted"
-  ],
-  "check": "Open Flight and read the briefing; tap Roll",
-  "scn": [
-   "fa-board",
-   "fa-board",
-   "fa-buttons",
-   "fa-zoom",
-   "fa-zoom",
-   "fa-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
    null,
    null,
    null,
