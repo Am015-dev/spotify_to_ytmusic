@@ -73,7 +73,7 @@ exitRoam=(f=>function(){document.body.classList.remove('hmNoB');HM.nb=false;HM.a
 body.hmNoB:not(.onfoot) #tN,body.hmNoB #artBoost{display:none!important}
 #hmToast{position:absolute;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translate(-50%,-8px);background:#141413;color:#ffd400;border:3px solid #ffd400;border-radius:12px;padding:6px 14px;font:italic 900 15px var(--hud,system-ui);letter-spacing:.04em;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:7;white-space:nowrap}
 #hmToast.on{opacity:1;transform:translate(-50%,0)}
-#hmToast.side{transform:translate(0,-8px);white-space:normal;text-align:center;font-size:14px;line-height:1.15}#hmToast.side.on{transform:none}
+#hmToast.side{transform:none;transition:opacity .2s;white-space:normal;text-align:center;font-size:14px;line-height:1.15}#hmToast.side.on{transform:none}
 .garSt .hmNit em{color:#ffd400}
 #gbBody .hmKit{display:block;width:100%;margin:6px 0;text-align:left;background:#ffd400;color:#141413}#gbBody .hmKit[disabled]{opacity:.6;background:#fff}
 #gbBody .hmKit b{font-size:14px}#gbBody .hmKit small{display:block;font-size:12px}`;document.head.appendChild(s)}
