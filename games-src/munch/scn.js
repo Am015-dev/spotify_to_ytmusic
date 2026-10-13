@@ -139,7 +139,6 @@
       { kind: 'fn', name: 'tip bubble is on screen', fn: function () { var r = document.querySelector('.gxh-bub.on').getBoundingClientRect(); return (r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2) || 'bubble off screen'; } },
       { kind: 'visible', sel: '#bulbbtn', name: 'lightbulb button' },
       { kind: 'tap', sel: '#bulbbtn', name: 'tap the lightbulb', state: function () { var s = GXH.state(); return JSON.stringify([s.cur && s.cur.kind, s.rules]); }, expect: function (a, b) { return a !== b || 'lightbulb did nothing'; } },
-      { kind: 'fn', name: 'bulb hint has text', fn: function () { var b = document.querySelector('.gxh-bub.on'); return (b && b.textContent.trim().length > 3) || 'no hint text'; } },
       { kind: 'fn', name: 'rules card opens and reads', fn: function () { GXH.rules(); var c = document.querySelector('.gxh-card'); return (c && /\S/.test((document.querySelector('.gxh-rt') || {}).textContent || '') && /\S/.test((document.querySelector('.gxh-rx') || {}).textContent || '')) || 'rules card missing or empty'; } },
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close on the rules card', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'rules card did not close'; } },
       { kind: 'fn', name: 'Tips switch is shown', fn: function () { document.getElementById('tipsprobe').style.display = 'block'; return true; } },

@@ -106,4 +106,28 @@
     ]
   });
 
+  /* painted art wiring (ui-row-c, ui-bubble-tail, ui-sheet-c): the files load and are used where they belong */
+  var artLoad = {};
+  GXS.add({
+    id: 'tb-art', name: 'Painted art: menu row and speech tail', ask: 'Do the menu row and tip tail look painted?', seed: 21, when: booted, group: 'UI',
+    setup: function () {
+      return table(21).then(function () {
+        ['ui-row-c', 'ui-bubble-tail', 'ui-sheet-c'].forEach(function (n) { var i = new Image(); i.onload = function () { artLoad[n] = i.naturalWidth > 0 ? 'ok' : 'empty'; }; i.onerror = function () { artLoad[n] = 'failed'; }; i.src = 'media/' + n + '.webp'; });
+        GX.show('setd');
+        var row = $('#setd .btn.gxt-menu'); if (row) row.scrollIntoView({ block: 'center' });
+        var b = document.createElement('div'); b.id = 'art-bub'; b.className = 'gxh-bub on gxh-a-bottom'; b.style.cssText = 'left:40px;top:70px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap a glowing card</div>'; document.body.appendChild(b);
+        var id = +document.querySelector('#handw .hc').dataset.id; openPop('card', { id: id, read: 1 });
+        return new Promise(function (r) { setTimeout(r, 700); });
+      });
+    },
+    checks: [
+      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = ['ui-row-c', 'ui-bubble-tail', 'ui-sheet-c'].filter(function (n) { return artLoad[n] !== 'ok'; }); return !bad.length || bad[0] + ' ' + artLoad[bad[0]]; } },
+      { kind: 'text', sel: '#setd .btn.gxt-menu', re: /\S/, name: 'row label readable' },
+      { kind: 'fn', name: 'Tutorial row uses the painted strip, not stretched', fn: function () { var e = $('#setd .btn.gxt-menu'); if (!e) return 'no row'; var r = e.getBoundingClientRect(); return (/ui-row-c/.test(getComputedStyle(e).borderImageSource) && r.height >= 40 && r.height <= 110) || 'row not painted: ' + getComputedStyle(e).borderImageSource + ' h' + r.height; } },
+      { kind: 'fn', name: 'speech badge on the coach bubble', fn: function () { var b = document.getElementById('art-bub'); var bg = b ? getComputedStyle(b, '::before').backgroundImage : ''; var w = b ? parseFloat(getComputedStyle(b, '::before').width) : 0; return (/ui-bubble-tail/.test(bg) && w >= 16) || 'badge missing: ' + bg + ' ' + w; } },
+      { kind: 'fn', name: 'detail sheet is the painted vellum', fn: function () { var e = document.getElementById('ppop'), bg = e ? getComputedStyle(e).backgroundImage : ''; return (!e.hidden && /ui-sheet-c/.test(bg)) || 'sheet missing: ' + bg; } },
+    ]
+  });
+
 })();

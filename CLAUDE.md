@@ -32,8 +32,8 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
     rotations) and `rotate-test.js`. They fail on page errors, a glowing target that doesn't respond, a wrong hint
     or hint text ≠ finger, on-screen scores ≠ engine, anything stuck >8 s, covered buttons, horizontal scroll.
     Deploy gate (owner, 13 Oct 2026: "fast tests, not hours of sweeps", Overdrive-style): `build-all.py --deploy`
-    = phone-check + the change's `?scn=` scenario tests + look check + a QUICK sweep (4 games); any failure blocks.
-    The full 40-game sweep runs only with `--deploy --full` for engine/rules changes. The owner checks via the
+    = phone-check + the change's `?scn=` GO scenario tests + look check; any failure blocks. NO game playing
+    (owner: "don't play the game"): sweeps run only with `--full`, for engine/rules changes. The owner checks via the
     ✔ Test checklist scenarios (one tap each), not by playing whole games.
   - The owner's bug reports go first into the fixer's brief, then into the sweep.
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
