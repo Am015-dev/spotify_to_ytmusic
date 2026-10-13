@@ -230,13 +230,19 @@ const OD_CHECKLIST=[
   'v90g/land2':[{p:'planter',c:'fra',n:'planter'},{p:'dumpster',c:'fra',n:'dumpster'}],'v90i/palms':[{race:'synt',c:'ath',n:'Syntagma race'}],
   'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
   'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
+ // chk-1 (Alex v90j-beta: "checklist has no GO scenarios"): every item without its own target gets one from its area/text:
+ // garage items open the garage (RIDES); Athens items fly to Athens; the rest drive in Frankfurt free roam.
+ for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
+  GO[k(it)]=[(it.area==='garage'||/^garage|garage →|rides →/.test(t))?{gar:1,n:'garage'}:/athens|syntagma|acropolis/.test(t)?{here:1,c:'ath',n:'Athens free roam'}:{here:1,c:'fra',n:'Frankfurt free roam'}]}
  const goI={},goSay=t=>{goI._t=t;try{say('',t,2.2)}catch(e){}};
- const goCity=T=>T.c||(T.w&&((LDW_P.find(q=>q.model===T.w)||{}).city))||'fra';
+ const goCity=T=>T.gar?CID:T.c||(T.w&&((LDW_P.find(q=>q.model===T.w)||{}).city))||'fra';
  const goAt=T=>{if(T.w){const E=LDW.on.find(e=>e.id===T.w);return E&&{x:E.x,z:E.z}}
   if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}
   if(T.car){const c=(HUB.cars||[]).find(c=>!c.dead&&String(HCAR[c.k]).includes(T.car));return c&&{x:c.x,z:c.z}}return null};
  const goJump=it=>{const L=GO[k(it)];if(!L)return;const i=goI[k(it)]=((goI[k(it)]??-1)+1)%L.length,T=L[i],c=goCity(T);let st='';try{st=state}catch(e){}
   if(c!==CID){if(st==='roam'&&cityTravel(c)){goSay('✈ Flying to '+(c==='ath'?'Athens':'Frankfurt')+' · tap 📍 again after landing');goI[k(it)]=i-1}else goSay('📍 Drive in '+(c==='ath'?'Athens':'Frankfurt')+' first (story → fly there)');return}
+  if(T.gar){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}gbOpen();goSay('📍 GARAGE');return}
+  if(T.here){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}goSay('📍 '+T.n.toUpperCase()+' · drive');return}
   if(T.race){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;
    menuTab='quick';menuTrack=T.race;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;return}  // like a roam race marker: back to the city after the race
   if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}
