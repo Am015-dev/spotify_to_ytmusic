@@ -887,7 +887,7 @@ html.ph #prompt .bfline{color:var(--cream);text-shadow:0 1px 0 #000}
 html.ph-p{--ph-dock:calc(98px + env(safe-area-inset-bottom,0px))}
 html.ph-p #prompt{min-height:78px;justify-content:center}
 html.ph-p .gx-dock{padding-bottom:env(safe-area-inset-bottom,0px)}
-html.ph .gx-dock-body{padding:6px 10px 6px}
+html.ph .gx-dock-body{padding:4px 10px 4px}
 /* the fight on the table: your hero on the left, the monster on the right, strengths as big numbers, buttons under them */
 html.ph .arena:has(>.vs){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr);grid-template-rows:minmax(0,1fr) auto;column-gap:4px;row-gap:4px;align-content:center;justify-content:stretch;justify-items:center;align-items:center;overflow:visible;--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.42),150px)}
 html.ph .arena:has(>.vs) .vs{display:contents}
@@ -1032,13 +1032,13 @@ html:has(.gx-drawer.on) .gx-main{pointer-events:none}
 .arena .mon .gchip{min-height:40px;font-size:.95rem;font-weight:800}.arena .mon .gchip b{font-size:1.15rem}
 html.ph .arena:has(>.sline){padding-top:60px}
 html.ph .sline .n{font-size:clamp(32px,9vw,40px);-webkit-text-stroke:1.5px #0d0603}
-html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.7rem}
+html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.75rem}
 html.ph .sline .sd{font-size:.82rem;line-height:1.25}
 html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:15px}
 html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
 @media (max-height:600px){html.ph .arena:has(>.sline){padding-top:56px}html.ph .sline .n{font-size:32px}}
 html .arena .vs .score .num{display:none!important}
-html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.58rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
+html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.75rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
 html.ph .sline .n{min-width:.9em}
 
 </style>
@@ -1122,7 +1122,7 @@ html.ph .sline .n{min-width:.9em}
 .gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
 @keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
 /* sheets and toasts sit over the map */
-.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
   background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
 @keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
 .gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
@@ -1142,7 +1142,7 @@ html.ph .sline .n{min-width:.9em}
 .gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
 /* ---- story scene ---- */
 .gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
-  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;max-width:100%}
 .gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
 .gxc-sc-who{margin-bottom:8px}
 .gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
@@ -1197,6 +1197,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
 .gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+/* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
+.gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px;margin-right:-6px}
 .gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
@@ -1243,7 +1245,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
-.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
@@ -1285,33 +1287,30 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
    html.sk-stars (ui-star-*), html.sk-banner (ui-act-banner), html.sk-dark (dark panels: light ink). Game colours: --sk-ink, --sk-num, --sk-num-done. ===== */
-html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
+html.sk{--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
 html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
 /* top bar + icon buttons */
 html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
-html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
-html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 30 42 fill/14px 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
 html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
-html.sk .gx-ibtn>span{padding:0 4px}
 html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
 html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
 html.sk-icons i[data-ic]{background:center/contain no-repeat}
 /* popups: parchment panel (9-slice) with a wooden title strip */
-html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
-html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-drawer{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
+html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
 html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
-html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
-html.sk .gx-drawer-body{padding:4px 4px 12px}
+html.sk .gx-drawer .gx-x{color:var(--sk-cream)}
 /* campaign kit */
-html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
 html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
-html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
-html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
 html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
 html.sk .gxc-boss{border-color:transparent}
-html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;min-height:52px}
+html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208}
 /* story map nodes: painted medallions, the number (text) sits in the centre */
 html.sk .gxc-node{width:68px;height:68px}
 html.sk .gxc-disc{width:68px;height:68px;border:0;border-radius:0;background:url(media/ui-node-open.webp) center/contain no-repeat;box-shadow:none;color:var(--sk-num);text-shadow:0 1px 0 rgba(255,255,255,.45);font-size:22px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
@@ -1327,15 +1326,17 @@ html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
 html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
 html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
 /* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
-html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
-html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+/* speech bubble: 9-slice (corners + the whole tail keep their shape, only the plain frame stretches); flipped so the tail points up at the speaker.
+   slice px are of the ~170x160 art (tail = bottom-right 60x34); widths are the same slices at ~0.7 scale. Never wider than the text box. */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;box-sizing:border-box;max-width:100%;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-6px 0;z-index:-1;pointer-events:none;border-style:solid;border-color:transparent;border-width:15px 42px 24px 21px;border-image:url(media/ui-bubble-c.webp) 22 62 34 30 fill/15px 42px 24px 21px stretch;transform:scaleY(-1)}
 @media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
 
 /* ===== Doorkick skin: maps the game's own selectors onto the painted UI kit (see ../shell/gx-skin.css). Opt-in via html.sk. ===== */
@@ -1349,43 +1350,35 @@ html.sk .gx-ibtn:hover{box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.
 html.sk .gx-ibtn[aria-expanded=true]{background:none;color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .gx-ibtn[aria-expanded=true] .ic{color:#fff3c4}
 html.sk .gx-reopen{background:none}
-html.sk.ph .gx-bar .gx-ibtn{width:48px;min-width:48px;border-radius:0;padding:0}
-html.sk .gx-ibtn.gxh-bulb{min-width:44px}
 /* drawers + dock head */
 html.sk .gx-drawer{color:var(--sk-ink)}
 html.sk .gx-drawer-head h2{color:var(--sk-cream)}
 html.sk .gx-drawer,html.sk .gx-drawer-body{--ink:#3a2410}
 html.sk .gx-dock-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream)}
 /* buttons: cream / go / power pills */
-html.sk .btn,html.sk .btn:hover{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));justify-content:center;transition:none}
+html.sk .btn,html.sk .btn:hover{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));transition:none}
 html.sk .btn.primary,html.sk .btn.good{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.danger{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn.rec{background:none!important;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec}
 html.sk .btn:active{transform:translateY(2px);box-shadow:none}
 html.sk .btn:disabled{opacity:.5;filter:grayscale(.5)}
 html.sk .seg .btn.on,html.sk .grid2 .btn.on,html.sk .btn.learn.on{background:none;box-shadow:none;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
-html.sk .mrow .btn{min-height:44px;padding:0 2px}
 html.sk .btn .ic{color:currentColor}
 /* menu / option rows */
-html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;min-height:52px;margin:2px 0;text-align:left;justify-content:flex-start;color:#3a2410;text-shadow:none;font-weight:700;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;text-align:left;color:#3a2410;text-shadow:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .btn.gxt-menu.gxt-first{box-shadow:none;filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .btn.learn{display:flex;align-items:center}
 html.sk .btn.learn.on{border-image-source:url(media/ui-row-c.webp);color:#1b4332;filter:drop-shadow(0 0 5px #7fe08a) drop-shadow(0 1px 2px rgba(0,0,0,.3));text-shadow:none}
 html.sk .menu .btn:active{transform:translateY(1px)}
 /* dialogs over the table: parchment panel */
-html.sk .dlg{background:none;border:30px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:#3a2410;box-sizing:border-box}
+html.sk .dlg{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
 html.sk .dlg.paper{box-shadow:none;background:none}
 html.sk .dlg h2{color:#8e3a1c}
 html.sk .dlg.start h2 span{color:#b3261a}
 html.sk .dlg .small,html.sk .dlg .muted{color:#5a4128}
-html.sk.ph .dlg{padding:0 2px;font-size:15px;border-width:26px;border-image-width:26px}
-html.sk.ph .dlg .acts{position:sticky;bottom:0;z-index:2;margin:8px 0 0!important;padding:6px 0 2px;background:linear-gradient(rgba(240,222,176,0),#f0deb0 10px)}
-html.sk.ph .dlg .btn{min-height:46px}
-html.sk.ph .modal{align-items:center;padding:6px}
-html.sk.ph .dlg{max-height:calc(100dvh - 12px)}
-@media (orientation:portrait){html.sk.ph .modal.art-title .dlg.start{max-height:64dvh}}
-html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{padding:0 8px}
-html.sk .mrow .btn{min-width:64px;border-width:0 16px;border-image-width:0 16px}
+html.sk.ph .dlg{border-image-width:26px}
+html.sk.ph .dlg .acts{position:sticky;bottom:0;z-index:2;background:linear-gradient(rgba(240,222,176,0),#f0deb0 10px)}
+html.sk .mrow .btn{border-image-width:0 16px}
 /* ===== painted HUD pieces (classes set in tbl.js once the file loaded) ===== */
 /* gear slots, curse and gear icons */
 html.dk-slot .mine .slots{opacity:.75}
@@ -1419,32 +1412,29 @@ html.dk-pile .stack.door::before{background-image:url(media/pile-door.webp)}html
 html.dk-pile .stack>*{position:relative;z-index:1}
 html.dk-pile .stack .dn{text-shadow:0 1px 2px #000,0 0 4px #000}
 /* ledger: parchment sheet behind the side panel, painted strip behind "Just happened" */
-html.dk-par .gx-dock-body{background:#e9d7a8;border:20px solid transparent;border-image:url(media/ui-parchment.webp) 50 fill/20px stretch}
+html.dk-par .gx-dock-body{background:#e9d7a8;border-style:solid;border-color:transparent;border-image:url(media/ui-parchment.webp) 50 fill/20px stretch}
 html.dk-par .recent .rl{background:url(media/ui-ledger-head.webp) center/auto 100% repeat-x;padding:2px 10px;border-radius:6px;min-height:46px;align-items:center}
 html.dk-par .gx-dock-body{position:relative;isolation:isolate}
 html.dk-par .gx-dock-body::before{content:'';position:absolute;inset:0;z-index:-1;background:rgba(248,240,216,.62);pointer-events:none}
 /* fight bar: the painted plate's side caps (2 x 22px) must not eat the label; Help keeps room for icon + word, Run never squeezes it */
-html.sk .fbtns .btn{border-width:0 14px;border-image-width:0 14px;padding:0 2px;overflow:visible;text-overflow:clip;min-width:96px;white-space:nowrap;font-weight:700}
+html.sk .fbtns .btn{border-image-width:0 14px;overflow:visible;text-overflow:clip}
 html.sk .fbtns .btn:not(.helpb){flex:1 1 0;max-width:340px}
-html.sk .fbtns .helpb{flex:0 0 auto;min-width:112px}
-html.sk.ph .fbtns .helpb{min-width:104px}
 /* the painted dock panel is light parchment: dark status line, not cream */
 html.sk.ph #prompt .bfline{color:#3a2410;text-shadow:none}
 /* top-bar labels >=13px; small buttons reach 44px tap height */
 html.sk .gx-ibtn,html.sk .gx-ibtn>span{font-size:13px}
-html.sk .gx-drawer .btn{min-height:44px}
-html.sk .gxh-bub .gxh-ok{min-height:44px;min-width:64px;font-size:14px}
+html.sk .gxh-bub .gxh-ok{font-size:14px}
 /* contrast: dark ink on the orange "go" plates (cream on orange measured 3.3-3.8:1) */
 html.sk .btn.primary,html.sk .btn.good,html.sk .btn.rec,html.sk .seg .btn.on,html.sk .grid2 .btn.on{color:#1c0e03;text-shadow:0 1px 0 rgba(255,235,190,.5)}
 /* phone dock has a fixed height: the 20px painted frame left no room for the buttons (cut off at the screen bottom) */
-html.ph.dk-par .gx-dock-body{border-width:4px 14px;border-image-width:4px 14px;padding-top:0;padding-bottom:0}
+html.ph.dk-par .gx-dock-body{border-image-width:7px}
 /* dock + dialog buttons: slimmer plate caps and labels that wrap instead of being cut off */
-html.sk #prompt .acts .btn,html.sk .dlg .acts .btn{border-width:0 16px;border-image-width:0 16px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;text-align:center;padding:2px 0}
+html.sk #prompt .acts .btn,html.sk .dlg .acts .btn{border-image-width:0 16px;overflow:visible;text-overflow:clip;text-align:center}
 html.sk.ph #prompt .acts .btn{font-size:15px}
 html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;font-size:15px}
 /* a hovered card on the table must not stretch its tap zone over the buttons below it (it covered Help) */
 .arena .card>.hit,.arena .card:hover>.hit{pointer-events:none!important;bottom:0}
-html.sk.ph .fbtns .btn{min-height:44px}
+
 
 </style>
 </head>
@@ -1482,6 +1472,249 @@ html.sk.ph .fbtns .btn{min-height:44px}
 <div id="dkNetBody"></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" class="modal" hidden></div>
+<script>
+/* GX scenarios: "spawn the requirement only". Open any game with  ?scn=<id>  and it skips menus / tutorial offers, seeds the RNG,
+   builds the exact engine state of ONE scenario directly (no playing through), shows a tiny "Test: <name>" tag and exposes
+   window.GXSCN = {id, name, ask, ready, checks}. `ask` is the one line the owner should try ("Tap SMASH over Downtown");
+   `checks` are the machine asserts the runner (scripts/scenario-test.js) runs at 390x763, 375x553 and 1366x768.
+   ?scn=list  ->  window.GXSLIST = [{id, name, ask, sizes}]  (no setup, used by the runner and the shelf).
+
+   A game registers its scenarios in ONE small file (scn.js) inlined right after this one and BEFORE the game scripts:
+     GXS.add({
+       id: 'dk-help-label',                         // unique, kebab-case, prefix = game
+       name: 'Tutorial: Help button',               // shown in the "Test:" tag
+       ask: 'Is the Help button label readable?',   // ONE line for the owner (8 words or fewer is best)
+       ls: { dkd_offer: '1' },                      // optional: localStorage seeded for this scenario (a private in-memory store: the player's saves are never touched)
+       seed: 7,                                     // optional RNG seed (default: hash of id)
+       sizes: 'all' | 'phone' | 'pc',               // optional, default all
+       when: () => window.G && window.UI,           // optional: wait until the game has booted (default: page loaded + 300 ms)
+       setup() { ...build the state directly... },  // may return a promise
+       checks: [ ... ]                              // see below
+     });
+   Checks (plain data + small functions; they run IN the page):
+     {kind:'visible', sel:'.fbtns .helpb', name:'Help button'}     exists, shown, inside the viewport, not covered by another element
+     {kind:'text', sel:'.fbtns .helpb', re:/help/i, name:'label'}   visible text matches re, font >= 12 px, not clipped, not transparent
+     {kind:'eq', name:'YOU total', a:() => dom number, b:() => engine number}   on-screen number equals the engine's
+     {kind:'tap', sel:'.fbtns .smash', name:'SMASH', state:() => any, expect:(before, after) => true|false|'why'}
+                                                                  the runner touch-taps the element; the engine state must then change as expected
+     {kind:'hold', sel:'#pshop .obc', ms:700, name:'hold a card', state:..., expect:...}   like tap, but the runner presses and holds ms (touch: CDP touchStart..touchEnd; pc: mouse hover); state is read WHILE held
+     {kind:'fn', name:'sound played', fn:() => true|false|'why'}   anything else
+   Universal asserts the runner adds to every scenario: no page error, no horizontal scroll, the Test tag shows, the board/game fills the screen. */
+(function () {
+  var q = new URLSearchParams(location.search), id = q.get('scn');
+  var S = window.GXS = { defs: [], on: !!id, id: id };
+  try { S.realLS = window.localStorage; } catch (e) { }   // the player's real storage (a scenario swaps window.localStorage for a private one): the LAB (gx-lab.js) keeps its results here
+  S.add = function (d) { S.defs.push(d); };
+  /* group of a scenario for the LAB menu: d.group, else guessed from id / name (Board, Cards, Story, Bosses, UI) */
+  S.group = function (d) { if (d.group) return d.group; var t = (d.id + ' ' + d.name).toLowerCase();
+    return /boss/.test(t) ? 'Bosses' : /story|chapter|campaign|scene|cutscene/.test(t) ? 'Story' : /zoom|card|hand|market|deck|piece|token/.test(t) ? 'Cards' : /board|start|map|table|tile|grid|island|city|dungeon/.test(t) ? 'Board' : 'UI'; };
+  S.pub = function (d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', group: S.group(d) }; };
+  if (!id) return;   // normal play: the module is inert (one small object)
+
+  /* ---- seeded RNG (mulberry32) ---- */
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function seedRng(n) { var a = n >>> 0; Math.random = function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  S.seed = function (n) { seedRng(n); };
+  seedRng(hash(id));   // until the scenario's own seed is known, the run is already deterministic
+
+  /* ---- private storage: a scenario never reads or writes the player's saves ---- */
+  var mem = {}, store = { getItem: function (k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; }, setItem: function (k, v) { mem[k] = String(v); }, removeItem: function (k) { delete mem[k]; }, clear: function () { mem = {}; }, key: function (i) { return Object.keys(mem)[i] || null; } };
+  Object.defineProperty(store, 'length', { get: function () { return Object.keys(mem).length; } });
+  try { Object.defineProperty(window, 'localStorage', { configurable: true, get: function () { return store; } }); } catch (e) { }
+  S.store = store;
+  /* registration happens before the game scripts run, so the scenario's storage + seed are in place for the game's own boot */
+  S.add = function (d) { S.defs.push(d); if (d.id === id) { var ls = d.ls || {}; for (var k in ls) mem[k] = String(ls[k]); if (d.seed != null) seedRng(d.seed >>> 0); } };
+
+  /* ---- helpers for scenario files ---- */
+  S.vis = function (e) { if (!e) return false; var r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 3 && r.height > 3 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > .05 && !e.closest('[hidden]'); };
+  S.num = function (sel) { var e = document.querySelector(sel); return e ? +String(e.textContent).replace(/[^0-9.\-]/g, '') : NaN; };
+  S.wait = function (fn, ms) { return new Promise(function (res, rej) { var t0 = Date.now(); (function p() { var v; try { v = fn(); } catch (e) { } if (v) return res(v); if (Date.now() - t0 > (ms || 15000)) return rej(new Error('GXS.wait timed out: ' + String(fn).slice(0, 80))); setTimeout(p, 50); })(); }); };
+  S.click = function (sel) { var e = typeof sel === 'string' ? document.querySelector(sel) : sel; if (e) e.click(); return !!e; };
+  S.spy = function (obj, name) { var c = { n: 0, args: [] }, f = obj[name]; obj[name] = function () { c.n++; c.args.push([].slice.call(arguments).slice(0, 3)); return f && f.apply(this, arguments); }; return c; };
+
+  /* ---- list mode (no setup) ---- */
+  function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
+  var pub = S.pub;
+  function onload(fn) { if (document.readyState === 'complete') setTimeout(fn, 0); else addEventListener('load', function () { setTimeout(fn, 0); }); }
+  if (id === 'list') { onload(function () { window.GXSLIST = S.defs.map(pub); window.GXSCN = { id: 'list', ready: true }; }); return; }
+
+  /* ---- the "Test:" tag ---- */
+  function tag(d) {
+    var e = document.createElement('div'); e.id = 'gxscn-tag'; e.textContent = 'Test: ' + d.name;
+    e.style.cssText = 'position:fixed;left:4px;bottom:2px;z-index:2147483000;font:600 10px/1.2 system-ui,sans-serif;color:#fff;background:rgba(20,20,30,.62);padding:1px 6px;border-radius:8px;pointer-events:none;max-width:70vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+    document.body.appendChild(e);
+  }
+
+  /* ---- check engine (runs in the page; the runner drives the taps) ---- */
+  var saved = {};
+  function box(e) { var r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r }; }
+  function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
+    if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
+    var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    return ''; }
+  function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
+  S.step = function (i) {
+    var d = def(), c = d.checks[i], nm = c.name || c.sel || c.kind, f;
+    try {
+      if (c.kind === 'visible') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var w = onScreen(f.e); return w ? { ok: false, msg: nm + ' ' + w } : { ok: true }; }
+      if (c.kind === 'text') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var e = f.e, t = (e.innerText || e.textContent || '').trim(), cs = getComputedStyle(e), why = '';
+        if (c.re && !c.re.test(t)) why = 'text "' + t.slice(0, 30) + '" does not match ' + c.re; else if (!t && !e.querySelector('svg,img')) why = 'blank (no text, no icon)';
+        else if (parseFloat(cs.fontSize) < (c.minPx || 12)) why = 'font ' + cs.fontSize + ' under ' + (c.minPx || 12) + 'px';
+        else if (/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(cs.color) || +cs.opacity < .3) why = 'text transparent';
+        else if (e.scrollWidth > e.clientWidth + 2 && cs.overflow !== 'visible') why = 'label clipped (' + e.scrollWidth + '>' + e.clientWidth + ')';
+        else { var w2 = onScreen(e); if (w2) why = w2; }
+        return why ? { ok: false, msg: nm + ': ' + why } : { ok: true }; }
+      if (c.kind === 'eq') { var A = c.a(), B = c.b(); return A === B ? { ok: true } : { ok: false, msg: nm + ': screen ' + A + ' != engine ' + B }; }
+      if (c.kind === 'fn') { var r = c.fn(); return r === true ? { ok: true } : { ok: false, msg: nm + (typeof r === 'string' ? ': ' + r : ' failed') }; }
+      if (c.kind === 'tap' || c.kind === 'hold') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var w3 = onScreen(f.e); if (w3) return { ok: false, msg: nm + ' ' + w3 };
+        saved[i] = c.state ? c.state() : null; var b = box(f.e); return c.kind === 'hold' ? { ok: true, hold: { x: b.x, y: b.y, ms: c.ms || 700 } } : { ok: true, tap: { x: b.x, y: b.y } }; }
+      return { ok: false, msg: 'unknown check kind ' + c.kind };
+    } catch (x) { return { ok: false, msg: nm + ' threw ' + String(x.message).slice(0, 100) }; }
+  };
+  S.after = function (i) {
+    var c = def().checks[i], nm = c.name || c.sel;
+    try { var now = c.state ? c.state() : null, r = c.expect ? c.expect(saved[i], now) : (JSON.stringify(saved[i]) !== JSON.stringify(now));
+      return r === true ? { ok: true } : { ok: false, msg: nm + ': tap did not ' + (typeof r === 'string' ? r : 'change the game as expected') + ' (' + JSON.stringify(saved[i]).slice(0, 60) + ' -> ' + JSON.stringify(now).slice(0, 60) + ')' };
+    } catch (x) { return { ok: false, msg: nm + ' threw ' + String(x.message).slice(0, 100) }; }
+  };
+  S.universal = function () {
+    var out = [], de = document.documentElement;
+    if (Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1) out.push('horizontal scroll ' + de.scrollWidth + '>' + innerWidth);
+    var t = document.getElementById('gxscn-tag'); if (!t || !t.textContent) out.push('Test tag missing');
+    return out;
+  };
+
+  /* ---- boot: wait for the game, seed, run setup, publish ---- */
+  onload(function () {
+    var d = def();
+    if (!d) { window.GXSCN = { id: id, ready: true, error: 'unknown scenario ' + id + ' (have: ' + S.defs.map(function (x) { return x.id; }).join(', ') + ')' }; return; }
+    tag(d);
+    S.wait(d.when || function () { return true; }, 20000).then(function () {
+      if (d.seed != null) seedRng(d.seed >>> 0);
+      return new Promise(function (r) { setTimeout(r, 300); });
+    }).then(function () { return d.setup && d.setup(); }).then(function () {
+      var pubD = pub(d); pubD.checks = d.checks.map(function (c) { return { kind: c.kind, name: c.name || c.sel || c.kind, sel: c.sel }; });
+      window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', checks: pubD.checks, ready: true };
+      try { if (parent !== window) parent.postMessage({ type: 'gxscn', id: d.id, name: d.name, ask: d.ask || '' }, '*'); } catch (e) { }
+    }).catch(function (e) { window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', ready: true, error: 'setup failed: ' + String(e && e.message || e).slice(0, 160), checks: [] }; });
+  });
+})();
+
+</script>
+<script>
+// Doorkick scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
+(function () {
+  if (!window.GXS) return;
+  var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof render === 'function' && typeof startCombat === 'function' && typeof UI !== 'undefined'; };
+  // a plain solo game, no menus: you (Pip) vs two computer heroes, animations on, seeded
+  function table(seed) {
+    var m = document.getElementById('modal'); if (m) { m.hidden = true; m.innerHTML = ''; }
+    try { GX.close(); } catch (e) { }
+    try { GXH.setEnabled(false); } catch (e) { }   // no coach bubbles over the scene
+    setSeed(seed); newGame('solo', 3); UI.hints = false; UI.speed = 1; G.learn = false; G.active = 0; G.phase = 'main'; UI.info = false;
+    clearTimeout(window.aiTimer); window.aiTimer = null; UI.pause = true;   // the computer waits: the scenario is about YOUR screen
+    render();
+  }
+  var idOf = function (key) { return Object.keys(G.C).map(Number).find(function (i) { return G.C[i] === key; }); };
+  var pull = function (id) { ['door', 'tr', 'dd', 'td'].forEach(function (z) { var i = G[z].indexOf(id); if (i >= 0) G[z].splice(i, 1); }); P(0).hand = P(0).hand.filter(function (x) { return x !== id; }); return id; };
+
+  GXS.add({
+    id: 'dk-tut-help', name: 'Tutorial: ask for help', ask: 'Can you read the Help button?', ls: { dkd_offer: '1' },
+    when: function () { return booted() && typeof tutStart === 'function' && typeof GXT !== 'undefined'; },
+    setup: function () {
+      var m = document.getElementById('modal'); if (m) { m.hidden = true; m.innerHTML = ''; }
+      tutStart();
+      return GXS.wait(function () { return GXT.active() && G && G.tut; }, 8000).then(function () {
+        // the staged deal: Pip plays Lizards from his hand against the door ("look for trouble"), then the Help step asks for the Help button
+        var id = pull(idOf('lizards')); G.active = 0; G.phase = 'after'; G.fought = false; apply({ act: 'trouble', card: id }, 0); G.cb.stage = 'act'; render();
+        GXT.goto('help');
+        return GXS.wait(function () { var s = GXT.state(); return s.id === 'help' && s.shown; }, 8000);
+      });
+    },
+    checks: [
+      { kind: 'fn', name: 'tutorial is on the Help step', fn: function () { return GXT.state().id === 'help' || 'step is ' + GXT.state().id; } },
+      { kind: 'visible', sel: '.fbtns .helpb', name: 'Help button' },
+      { kind: 'text', sel: '.fbtns .helpb', re: /help/i, name: 'Help label' },
+      { kind: 'fn', name: 'Help label is not covered by the painted plate cap', fn: function () { var e = document.querySelector('.fbtns .helpb'); if (!e) return 'no button'; var r = document.createRange(); r.selectNodeContents(e); var t = r.getBoundingClientRect(), b = e.getBoundingClientRect(); return (t.left >= b.left - 1 && t.right <= b.right + 1 && t.width > 8) || 'label box ' + Math.round(t.left) + '..' + Math.round(t.right) + ' outside button ' + Math.round(b.left) + '..' + Math.round(b.right); } },
+      { kind: 'tap', sel: '.fbtns .helpb', name: 'tap Help', state: function () { return GXT.state().id; }, expect: function (a, b) { return b === 'who' || 'move on to "Pick a helper" (still ' + b + ')'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'dk-fight-bonus', name: 'Fight with bonuses', ask: 'Is YOU vs MONSTERS big and clear?', ls: { dkd_offer: '1' }, seed: 7, when: booted,
+    setup: function () {
+      table(7); P(0).lvl = 4;
+      var mon = idOf('hatmuncher'); pull(mon); startCombat(0, mon, 'kick'); render();
+      return GXS.wait(function () { return document.querySelector('.sline .n'); }, 5000).then(function () {
+        window.__fly = GXS.spy(window, 'bfFly');
+        var os = Object.keys(G.C).map(Number).filter(function (i) { return cd(i).t === 'oneshot' && G.tr.indexOf(i) >= 0; })[0];
+        pull(os); P(0).hand.push(os); render(); apply({ act: 'play', card: os, tgt: 'p' }, 0); G.cb.help = 1; G.cb.pb += 3; render();
+        return new Promise(function (r) { setTimeout(r, 900); });
+      });
+    },
+    checks: [
+      { kind: 'visible', sel: '.sline', name: 'scoreline' },
+      { kind: 'text', sel: '.sline .sy i', re: /^YOU/, name: 'YOU label' },
+      { kind: 'text', sel: '.sline .sm i', re: /MONSTERS/, name: 'MONSTERS label' },
+      { kind: 'fn', name: 'numbers are big (>= 24 px)', fn: function () { var e = document.querySelector('.sline .n'); return parseFloat(getComputedStyle(e).fontSize) >= 24 || 'font ' + getComputedStyle(e).fontSize; } },
+      { kind: 'eq', name: 'YOU total', a: function () { return GXS.num('.sline .sy .n'); }, b: function () { return sideStr(G.cb); } },
+      { kind: 'eq', name: 'MONSTERS total', a: function () { return GXS.num('.sline .sm .n'); }, b: function () { return monStr(G.cb); } },
+      { kind: 'eq', name: 'win/lose colour matches the engine', a: function () { return document.querySelector('.sline').classList.contains('win'); }, b: function () { return winning(G.cb); } },
+      { kind: 'fn', name: 'a flying +N bonus was launched', fn: function () { return window.__fly.n > 0 || 'no bfFly call'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'dk-boss-reveal', name: 'Boss clip, then the card', ask: 'Boss clip, roar, then the monster card?', ls: { dkd_offer: '1' }, seed: 11, when: booted,
+    setup: function () {
+      table(11); P(0).lvl = 3; UI.pause = false; try { GXH.setEnabled(false); } catch (e) { }
+      var obs = window.__obs = { clip: false, played: false, rev: false, card: false, sfx: 0, clipUrl: '' };
+      var sf = window.sfx; window.sfx = function () { obs.sfx++; return sf && sf.apply(this, arguments); };
+      var boss = idOf('wyrm'); pull(boss); G.door.push(boss);   // top of the door pile
+      var iv = setInterval(function () {
+        var c = document.getElementById('bfclip'); if (c) { obs.clip = true; var v = c.querySelector('video'); if (v) { obs.clipUrl = v.currentSrc || v.src; if (v.readyState >= 2 && !v.paused) obs.played = true; } }
+        if (document.getElementById('bfrev')) obs.rev = true;
+        if (!c && document.querySelector('.arena .row.mons .card')) obs.card = true; }, 60);
+      window.__obsIv = iv;
+      G.phase = 'main'; G.active = 0; UI.pause = true; render();
+      bfKick();
+      return GXS.wait(function () { return obs.card && !document.getElementById('bfclip') && !document.getElementById('bfrev'); }, 16000).then(function () { clearInterval(iv); UI.pause = true; });
+    },
+    checks: [
+      { kind: 'fn', name: 'a boss clip or the card reveal showed', fn: function () { return window.__obs.clip || window.__obs.rev || 'neither #bfclip nor #bfrev appeared'; } },
+      { kind: 'fn', name: 'the boss clip file loads over http', fn: function () { return window.__obs.clip ? (window.__obs.clipUrl.indexOf('http') === 0 || 'clip src ' + window.__obs.clipUrl) : true; } },
+      { kind: 'fn', name: 'sound played (sfx calls)', fn: function () { return window.__obs.sfx > 0 || 'no sfx() call during the reveal'; } },
+      { kind: 'fn', name: 'the monster is in the fight', fn: function () { return !!G.cb && G.cb.mons.length > 0 && G.C[G.cb.mons[0].id] === 'wyrm' || 'no wyrm in G.cb'; } },
+      { kind: 'visible', sel: '.arena .row.mons .card', name: 'monster card landed' },
+      { kind: 'eq', name: 'MONSTERS total', a: function () { return GXS.num('.sline .sm .n'); }, b: function () { return monStr(G.cb); } }
+    ]
+  });
+
+  GXS.add({
+    id: 'dk-board', name: 'Start of game board', ask: 'Is the table clear, with Help and Run?', ls: { dkd_offer: '1' }, seed: 31, when: booted, group: 'Board',
+    setup: function () { table(31); return new Promise(function (r) { setTimeout(r, 500); }); },
+    checks: [
+      { kind: 'visible', sel: '[data-board]', name: 'table' },
+      { kind: 'fn', name: 'table fills the screen', fn: function () { var r = document.querySelector('[data-board]').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > (innerWidth < 600 ? .55 : .4) || 'table only ' + Math.round(f * 100) + '%'; } },
+      { kind: 'visible', sel: '.arena .bfdoor', name: 'the door' },
+      { kind: 'visible', sel: '.mine .hand', name: 'your hand' }
+    ]
+  });
+
+  GXS.add({
+    id: 'dk-zoom', name: 'Big card zoom', ask: 'Is the big card readable?', ls: { dkd_offer: '1' }, seed: 32, when: booted, group: 'Cards',
+    setup: function () { table(32); UI.zoom = P(0).hand[0]; render(); return GXS.wait(function () { return document.querySelector('#dkCard .zoom .card'); }, 5000).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '#dkCard .zoom .card', name: 'big card' },
+      { kind: 'text', sel: '#dkCard h2', re: /\S/, name: 'card name' },
+      { kind: 'visible', sel: '#dkCard .gx-x', name: 'Close button' },
+      { kind: 'tap', sel: '#dkCard .gx-x', name: 'tap Close', state: function () { return UI.zoom != null; }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
+})();
+
+</script>
 <script>
 /* Trystero 0.25.4 (MIT, github.com/dmotz/trystero), bundled with esbuild. Loaded only where WebRTC exists. */
 var Trystero;if(typeof RTCPeerConnection!=="undefined"&&typeof TextEncoder!=="undefined"&&typeof crypto!=="undefined"&&crypto.subtle)try{Trystero=(()=>{var nn=Object.defineProperty;var qr=Object.getOwnPropertyDescriptor;var Kr=Object.getOwnPropertyNames;var Wr=Object.prototype.hasOwnProperty;var Fr=(e,n,t)=>n in e?nn(e,n,{enumerable:!0,configurable:!0,writable:!0,value:t}):e[n]=t;var Jr=(e,n)=>{for(var t in n)nn(e,t,{get:n[t],enumerable:!0})},zr=(e,n,t,o)=>{if(n&&typeof n=="object"||typeof n=="function")for(let a of Kr(n))!Wr.call(e,a)&&a!==t&&nn(e,a,{get:()=>n[a],enumerable:!(o=qr(n,a))||o.enumerable});return e};var Vr=e=>zr(nn({},"__esModule",{value:!0}),e);var Q=(e,n,t)=>Fr(e,typeof n!="symbol"?n+"":n,t);var Hs={};Jr(Hs,{joinRoom:()=>Lr,selfId:()=>Z});var An=Object.freeze,Se=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn,We=0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,Pt=0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n,kt=0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n,Gr=An({p:Se,n:We,h:1n,a:0n,b:7n,Gx:Pt,Gy:kt}),de=32,ut=e=>e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"&&e.BYTES_PER_ELEMENT===1,ce=(e,n,t="")=>{if(ut(e)&&(n===void 0||e.length===n))return e;let o=ut(e),a=n!==void 0?` of length ${n}`:"",s=o?`length=${e.length}`:`type=${typeof e}`,r=(t?`"${t}" `:"")+"expected Uint8Array"+a+", got "+s;throw o?new RangeError(r):new TypeError(r)},Zr=e=>Uint8Array.from(e),Xr=(e,n,t)=>Zr(ce(e,t,n)),vt=(e,n)=>e.toString(16).padStart(n,"0"),St=e=>{let n="";for(let t of ce(e))n+=vt(t,2);return n},bt=e=>{let n="hex invalid";if(typeof e!="string")throw new TypeError(n);if(e.length%2||!/^[\da-f]*$/i.test(e))throw new RangeError(n);let t=new Uint8Array(e.length/2);for(let o=0,a=0;o<t.length;o++,a+=2){let s=e.charCodeAt(a),r=e.charCodeAt(a+1);t[o]=((s&15)+(s>>6)*9)*16+(r&15)+(r>>6)*9}return t},dt=()=>{let e=globalThis?.crypto?.subtle;if(e)return e;throw new Error("crypto.subtle must be defined, consider polyfill")},_e=(...e)=>{let n=0;for(let a of e)n+=ce(a).length;let t=new Uint8Array(n),o=0;for(let a of e)t.set(a,o),o+=a.length;return t},Rn=(e=de)=>{let n=globalThis?.crypto;if(typeof n?.getRandomValues!="function")throw new Error("crypto.getRandomValues must be defined, consider polyfill");return n.getRandomValues(new Uint8Array(e))},Yr=BigInt,Fe=(e,n,t,o="bad number: out of range")=>{if(typeof e!="bigint")throw new TypeError(o);if(n<=e&&e<t)return e;throw new RangeError(o)},M=(e,n=Se)=>(e%=n)>=0n?e:n+e,rn=e=>M(e,We),Qr=(e,n)=>{if(e===0n)throw new Error("invert: expected non-zero number");if(n<=1n)throw new Error("invert: expected modulus > 1, got "+n);let t=M(e,n),o=n,a=0n,s=1n;for(;t!==0n;){let i=o/t,c=o-t*i,m=a-s*i;o=t,t=c,a=s,s=m}if(o!==1n)throw new Error("invert: does not exist");return M(a,n)},Tt=e=>{let n=ro[e];if(typeof n!="function")throw new Error("hashes."+e+" not set");return n},mt=(e,n,t)=>ce(Tt(e)(n,t),de,"digest"),gt=async(e,n,t)=>ce(await Tt(e)(n,t),de,"digest");var vn=e=>{if(e instanceof be)return e;throw new TypeError("Point expected")},Sn="bad point: not on curve",At=e=>M(M(e*e)*e+7n),ht=e=>Fe(e,0n,Se),qe=e=>Fe(e,1n,Se),Rt=e=>Fe(e,1n,We),on=e=>!(e&1n),eo=e=>Uint8Array.of(on(e)?2:3),Et=e=>{let n=At(qe(e)),t=1n;for(let o=n,a=(Se+1n)/4n;a>0n;a>>=1n)a&1n&&(t=t*o%Se),o=o*o%Se;if(M(t*t)!==n)throw new Error("sqrt invalid");return new be(e,on(t)?t:M(-t),1n)},ye=class ye{constructor(n,t,o){Q(this,"X");Q(this,"Y");Q(this,"Z");this.X=ht(n),this.Y=qe(t),this.Z=ht(o),An(this)}static CURVE(){return Gr}static fromAffine(n){let{x:t,y:o}=n;return t===0n&&o===0n?Ke:new ye(t,o,1n)}static fromBytes(n){ce(n);let t=n.length,o=n[0],a=tn(n,1,33);try{if(t===33&&(o===2||o===3)){let s=Et(a);return o===3?s.negate():s}if(t===65&&o===4)return new ye(a,tn(n,33,65),1n).assertValidity()}catch{throw new Error(Sn)}throw new Error(Sn)}static fromHex(n){return ye.fromBytes(bt(n))}get x(){return this.toAffine().x}get y(){return this.toAffine().y}equals(n){let{X:t,Y:o,Z:a}=this,{X:s,Y:r,Z:i}=vn(n);return M(t*i)===M(s*a)&&M(o*i)===M(r*a)}is0(){return this.Z===0n}negate(){return new ye(this.X,M(-this.Y),this.Z)}double(){return this.add(this)}add(n){let{X:t,Y:o,Z:a}=this,{X:s,Y:r,Z:i}=vn(n),c=0n,m=7n,u=0n,f=0n,d=0n,h=M(m*3n),y=M(t*s),A=M(o*r),T=M(a*i),B=M(t+o),w=M(s+r);B=M(B*w),w=M(y+A),B=M(B-w),w=M(t+a);let O=M(s+i);return w=M(w*O),O=M(y+T),w=M(w-O),O=M(o+a),u=M(r+i),O=M(O*u),u=M(A+T),O=M(O-u),d=M(c*w),u=M(h*T),d=M(u+d),u=M(A-d),d=M(A+d),f=M(u*d),A=M(y+y),A=M(A+y),T=M(c*T),w=M(h*w),A=M(A+T),T=M(y-T),T=M(c*T),w=M(w+T),y=M(A*w),f=M(f+y),y=M(O*w),u=M(B*u),u=M(u-y),y=M(B*A),d=M(O*d),d=M(d+y),new ye(u,f,d)}subtract(n){return this.add(vn(n).negate())}multiply(n,t=!0){if(!t&&n===0n)return Ke;if(Rt(n),n===1n)return this;if(this.equals(Be))return uo(n).p;let o=Ke,a=Be,s=this;for(let r=0;t?r<256:n>0n;r++)n&1n?o=o.add(s):t&&(a=a.add(s)),s=s.double(),n>>=1n;return o}multiplyUnsafe(n){return this.multiply(n,!1)}toAffine(){let{X:n,Y:t,Z:o}=this;if(o===0n)return{x:0n,y:0n};if(o===1n)return{x:n,y:t};let a=Qr(o,Se);if(M(o*a)!==1n)throw new Error("inverse invalid");return{x:M(n*a),y:M(t*a)}}assertValidity(){let{x:n,y:t}=this.toAffine();if(qe(n),qe(t),M(t*t)!==At(n))throw new Error(Sn);return this}toBytes(n=!0){let{x:t,y:o}=this.assertValidity().toAffine(),a=pe(t);return n?_e(eo(o),a):_e(Uint8Array.of(4),a,pe(o))}toHex(n){return St(this.toBytes(n))}};Q(ye,"BASE"),Q(ye,"ZERO");var be=ye,Be=new be(Pt,kt,1n),Ke=new be(0n,1n,0n);be.BASE=Be;be.ZERO=Ke;var no=(e,n,t)=>Be.multiply(n,!1).add(e.multiply(t,!1)).assertValidity(),Oe=e=>Yr("0x"+(St(e)||"0")),tn=(e,n,t)=>Oe(e.subarray(n,t)),pe=e=>bt(vt(Fe(e,0n,2n**256n),de*2)),to=e=>{let n=Oe(ce(e,de,"secret key"));return Fe(n,1n,We,"invalid secret key: outside of range")};var yt="SHA-256",ro={hmacSha256Async:async(e,n)=>{let t=dt(),o=await t.importKey("raw",e,{name:"HMAC",hash:yt},!1,["sign"]);return new Uint8Array(await t.sign("HMAC",o,n))},hmacSha256:void 0,sha256Async:async e=>new Uint8Array(await dt().digest(yt,e)),sha256:void 0};var oo=e=>{if(e=e===void 0?Rn(48):e,ce(e),e.length<48||e.length>1024)throw new RangeError("expected 48-1024b");let n=M(Oe(e),We-1n);return pe(n+1n)},so=e=>n=>{let t=oo(n);return{secretKey:t,publicKey:e(t)}};var Mt=e=>Uint8Array.from("BIP0340/"+e,n=>n.charCodeAt(0)),bn=(e,...n)=>{let t=mt("sha256",Mt(e));return mt("sha256",_e(t,t,...n))},Tn=(e,...n)=>gt("sha256Async",Mt(e)).then(t=>gt("sha256Async",_e(t,t,...n))),En=e=>{let n=to(e),t=Be.multiply(n),{x:o,y:a}=t.assertValidity().toAffine(),s=on(a)?n:rn(-n),r=pe(o);return{d:s,px:r}},Mn=e=>rn(Oe(e)),Bt=(...e)=>Mn(bn("challenge",...e)),Ot=async(...e)=>Mn(await Tn("challenge",...e)),Ct=e=>En(e).px,ao=so(Ct),Dt=(e,n,t)=>{let o=Xr(e,"message"),{px:a,d:s}=En(n);return{m:o,px:a,d:s,a:ce(t,de)}},Lt=e=>{let n=Mn(e);if(n===0n)throw new Error("sign failed: k is zero");let{px:t,d:o}=En(pe(n));return{rx:t,k:o}},Ht=(e,n,t,o)=>_e(n,pe(rn(e+t*o))),xt="invalid signature produced",io=(e,n,t=Rn(de))=>{let{m:o,px:a,d:s,a:r}=Dt(e,n,t),i=pe(s^Oe(bn("aux",r))),{rx:c,k:m}=Lt(bn("nonce",i,a,o)),u=Ht(m,c,Bt(c,a,o),s);if(!It(u,o,a))throw new Error(xt);return u},co=async(e,n,t=Rn(de))=>{let{m:o,px:a,d:s,a:r}=Dt(e,n,t),i=pe(s^Oe(await Tn("aux",r))),{rx:c,k:m}=Lt(await Tn("nonce",i,a,o)),u=Ht(m,c,await Ot(c,a,o),s);if(!await Ut(u,o,a))throw new Error(xt);return u},fo=(e,n)=>e instanceof Promise?e.then(n):n(e),_t=(e,n,t,o)=>{let a=ce(e,64,"signature"),s=ce(n,void 0,"message"),r=ce(t,de,"publicKey"),i,c,m,u;try{let f=Oe(r);i=Et(f),c=qe(tn(a,0,de)),m=Rt(tn(a,de,64)),u=_e(pe(c),r,s)}catch{return!1}return fo(o(u),f=>{try{let{x:d,y:h}=no(i,m,rn(-f)).toAffine();return!(!on(h)||d!==c)}catch{return!1}})},It=(e,n,t)=>_t(e,n,t,Bt),Ut=async(e,n,t)=>_t(e,n,t,Ot),Bn=An({keygen:ao,getPublicKey:Ct,sign:io,verify:It,signAsync:co,verifyAsync:Ut}),lo=()=>{let e=[],n=Be,t=n;for(let o=0;o<33;o++){t=n,e.push(t);for(let a=1;a<128;a++)t=t.add(n),e.push(t);n=t.double()}return e},pt,wt=(e,n)=>{let t=n.negate();return e?t:n},uo=e=>{let n=pt||(pt=lo()),t=Ke,o=Be;for(let a=0;a<33;a++){let s=Number(e&255n);e>>=8n,s>128&&(s-=256,e+=1n);let r=a*128,i=r+Math.abs(s)-1,c=a%2!==0,m=s<0;s===0?o=o.add(wt(c,n[r])):t=t.add(wt(m,n[i]))}if(e!==0n)throw new Error("invalid wnaf");return{p:t,f:o}};var{floor:On,min:mo,sin:go}=Math,G="Trystero",Te=(e,n)=>Array(e).fill(void 0).map(n),ho="0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz",fe=e=>Te(e,()=>ho[On(Math.random()*62)]??"").join(""),Z=fe(20),se=Promise.all.bind(Promise),Dn=typeof window<"u",{entries:me,fromEntries:Ln,keys:ne,values:we}=Object,V=()=>{},sn="candidate",_=e=>(e!==null&&clearTimeout(e),null),I=e=>new Error(`${G}: ${e}`),Pe=(e,n)=>e instanceof Error&&e.message?e.message:typeof e=="string"&&e?e:X(e??n),le=(e,n)=>e instanceof Error?e:I(Pe(e,n)),yo=new TextEncoder,po=new TextDecoder,ue=e=>yo.encode(e),ge=e=>po.decode(e),ke=e=>e.reduce((n,t)=>n+t.toString(16).padStart(2,"0"),""),Ce=(...e)=>e.join("@"),wo=(e,n)=>{let t=[...e],o=()=>{let s=go(n++)*1e4;return s-On(s)},a=t.length;for(;a;){let s=On(o()*a--),r=t[a];t[a]=t[s],t[s]=r}return t},Hn=(e,n,t,o=!1)=>e.relayConfig?.urls||(o?wo(n,an(e.appId)):n).slice(0,e.relayConfig?.redundancy??t),X=JSON.stringify,he=e=>{try{return JSON.parse(e)}catch{throw I(`failed to parse JSON: ${e}`)}},an=(e,n=Number.MAX_SAFE_INTEGER)=>e.split("").reduce((t,o)=>t+o.charCodeAt(0),0)%n,Nt=3333,$t=6e4,Je={},ze=null,Cn=null,xn=()=>{ze||(ze=new Promise(e=>{Cn=e}).finally(()=>{Cn=null,ze=null}))},_n=()=>{Cn?.()},In=(e,n,t)=>{let o={},a=!1,s=!1,r,i=V;o.isClosed=!1,o.ready=new Promise(m=>i=m);let c=()=>{if(o.isClosed)return;r=void 0,s=!1;let m=new WebSocket(e);m.onclose=()=>{if(o.isClosed||s)return;if(s=!0,ze){ze.then(c);return}let u=Je[e]??(Je[e]=Nt);if(u>=$t){o.isClosed=!0;return}r=setTimeout(c,Math.random()*u),Je[e]=mo(u*2,$t)},m.onmessage=u=>n(String(u.data)),o.socket=m,o.url=m.url,m.onopen=()=>{let u=a;a=!0,i(o),Je[e]=Nt,u&&t?.()},o.send=u=>{m.readyState===1&&m.send(u)}};return o.close=()=>{o.isClosed=!0,r!==void 0&&(clearTimeout(r),r=void 0),o.socket.close()},c(),o};var Un=e=>{let n={},t=new WeakMap,o=r=>{let i=t.get(r);if(!i)throw I("relay bookkeeping missing registration for relay client");return i},a=()=>{let r={},i=c=>r[c]??(r[c]={});return{forKey:i,forRelay:c=>i(o(c))}},s=(r,i)=>(n[r]=i,t.set(i,r),i);return{register:(r,i)=>{let c=n[r];return c||s(r,i())},keyOf:o,scoped:a,getSockets:()=>Ln(me(n).flatMap(([r,i])=>{let c=e(i);return c?[[r,c]]:[]}))}},jt=()=>{if(Dn){let e=new AbortController;return addEventListener("online",_n,{signal:e.signal}),addEventListener("offline",xn,{signal:e.signal}),()=>e.abort()}return V};var $n="AES-GCM",Nn={},Po=e=>btoa(String.fromCharCode.apply(null,Array.from(new Uint8Array(e)))),ko=e=>{let n=atob(e);return new Uint8Array(n.length).map((t,o)=>n.charCodeAt(o)).buffer},De=async(e,n)=>new Uint8Array(await crypto.subtle.digest(e,ue(n))),Ae=async e=>Nn[e]??(Nn[e]=Array.from(await De("SHA-1",e)).map(n=>n.toString(36)).join("")),qt=async(e,n,t)=>crypto.subtle.importKey("raw",await crypto.subtle.digest({name:"SHA-256"},ue(`${e}:${n}:${t}`)),{name:$n},!1,["encrypt","decrypt"]),Kt=async(e,n)=>ke(await De("SHA-256",`${G}:${e}:${n}`)),Wt="$",Ft=",",Jt=async(e,n)=>{let t=crypto.getRandomValues(new Uint8Array(16));return t.join(Ft)+Wt+Po(await crypto.subtle.encrypt({name:$n,iv:t},await e,ue(n)))},zt=async(e,n)=>{let[t,o]=n.split(Wt);return ge(await crypto.subtle.decrypt({name:$n,iv:new Uint8Array(t?.split(Ft).map(Number)??[])},await e,ko(o??"")))};var Ve=57333,vo=18e4,So=20,Vt=class{constructor(e){Q(this,"makeOffer");Q(this,"pool",[]);Q(this,"pooled",new Set);Q(this,"leased",new Map);Q(this,"recycling",new Set);Q(this,"cleanupTimer",null);Q(this,"active",!1);this.makeOffer=e}get isActive(){return this.active}warmup(){this.pool=[],this.pooled.clear(),Te(So,this.makeOffer).forEach(e=>this.push(e)),this.active=!0,this.cleanupTimer=setInterval(()=>{this.pool=this.pool.filter(e=>e.isDead?(this.pooled.delete(e),!1):!0)},Ve)}push(e){e.isDead||this.pooled.has(e)||this.leased.has(e)||(this.pool.push(e),this.pooled.add(e))}shift(e){let n=[];for(;n.length<e&&this.pool.length>0;){let t=this.pool.shift();if(!t)break;this.pooled.delete(t),n.push(t)}return n}claimLeased(e){let n=this.leased.get(e);n&&(_(n),this.leased.delete(e))}recycle(e){if(!(e.isDead||this.recycling.has(e))){if(e.connection.remoteDescription){e.destroy();return}if(!this.active){e.destroy();return}this.recycling.add(e),e.setHandlers({connect:V,close:V,error:V}),e.getOffer(!0).then(n=>{if(!n||n.type!=="offer"||e.isDead||!this.active){e.destroy();return}this.push(e)}).catch(()=>e.destroy()).finally(()=>this.recycling.delete(e))}}reclaimLeased(e){let n=this.leased.get(e);n&&(_(n),this.leased.delete(e),this.recycle(e))}lease(e){this.claimLeased(e),this.leased.set(e,setTimeout(()=>{this.leased.delete(e),this.recycle(e)},vo))}checkout(e,n,t){let o=this.shift(e),a=Math.max(0,e-o.length);a>0&&o.push(...Te(a,this.makeOffer));let s=async(r,i=!1)=>{try{let c=await t(r);return n?(this.lease(r),{peer:r,offer:c,claim:()=>this.claimLeased(r),reclaim:()=>this.reclaimLeased(r)}):{peer:r,offer:c}}catch(c){if(this.claimLeased(r),this.pooled.delete(r),r.destroy(),!i)return s(this.makeOffer(),!0);throw c}};return se(o.map(r=>s(r)))}getOffers(e,n){return this.checkout(e,!0,n)}destroy(){this.active=!1,this.cleanupTimer&&(clearInterval(this.cleanupTimer),this.cleanupTimer=null),this.pool.forEach(e=>e.destroy()),this.pool=[],this.pooled.clear(),this.leased.forEach((e,n)=>{_(e),n.destroy()}),this.leased.clear(),this.recycling.forEach(e=>e.destroy()),this.recycling.clear()}};var jn=I("incorrect password for overlapping room"),Gt=(e,n,t)=>{let o=r=>De("SHA-256",`${r}:${e}:${n}:${t}`).then(ke),a=async(r,i,c)=>{if(!e)return;if(c){let u=fe(36);await r({__trystero_pw:"challenge",c:u});let{data:f}=await i();if(!f||typeof f!="object"||f.__trystero_pw!=="response"||typeof f.h!="string")throw jn;let d=await o(u);if(f.h!==d)throw jn;return}let{data:m}=await i();if(!m||typeof m!="object"||m.__trystero_pw!=="challenge"||typeof m.c!="string")throw jn;await r({__trystero_pw:"response",h:await o(m.c)})};return{run:a,compose:r=>e||r?async(i,c,m,u)=>{await a(c,m,u),await r?.(i,c,m,u)}:void 0}},bo=e=>{let n=Pe(e,"unknown error");return n.startsWith("handshake ")?n:`handshake failed: ${n}`},Zt=({onPeerHandshake:e,onHandshakeError:n,handshakeTimeoutMs:t,sendHandshakeData:o,sendHandshakeReady:a,onActivate:s,onFailure:r})=>{let i={},c=(f,d)=>{let h=i[f];!h||d&&h.peer!==d||h.isActive||!h.didLocalHandshakePass||!h.didReceiveRemoteReady||(h.isActive=!0,h.handshakeTimer=_(h.handshakeTimer),s(f,h.peer))},m=(f,d,h)=>{let y=i[f];if(!y||y.peer!==d)return;let A=bo(h);n?.(f,A),r(f,d,I(A))},u=(f,d)=>{let h=i[f];!h||h.peer!==d||h.isActive||(h.didLocalHandshakePass=!0,a("",f).catch(y=>m(f,d,I(`failed sending handshake readiness: ${Pe(y,"unknown send failure")}`))),c(f,d))};return{addPeer:(f,d)=>{i[f]={peer:d,isActive:!1,didLocalHandshakePass:!1,didReceiveRemoteReady:!1,handshakeTimer:null,pendingHandshakePayloads:[],handshakeWaiters:[]}},clearPeer:(f,d)=>{let h=i[f];h&&(h.handshakeTimer=_(h.handshakeTimer),h.pendingHandshakePayloads.length=0,h.handshakeWaiters.splice(0).forEach(y=>y.reject(d)),delete i[f])},canReceiveFromPeer:(f,d)=>{let h=i[f];return!!(h&&(h.isActive||d))},start:(f,d)=>{let h=i[f];if(!h||h.peer!==d)return;h.handshakeTimer=setTimeout(()=>m(f,d,I(`handshake timed out after ${t}ms`)),t);let y=async(B,w)=>{await o(B,f,w)},A=()=>new Promise((B,w)=>{let O=i[f];if(!O||O.peer!==d){w(I("peer disconnected during handshake"));return}let x=O.pendingHandshakePayloads.shift();if(x){B(x);return}O.handshakeWaiters.push({resolve:B,reject:P=>w(P)})}),T=Z<f;Promise.resolve(e?.(f,y,A,T)).then(()=>u(f,d)).catch(B=>m(f,d,le(B,"handshake failed")))},receiveHandshakeData:(f,d,h)=>{let y=i[d];if(!y||y.isActive)return;let A=h===void 0?{data:f}:{data:f,metadata:h},T=y.handshakeWaiters.shift();if(T){T.resolve(A);return}y.pendingHandshakePayloads.push(A)},receiveHandshakeReady:f=>{let d=i[f];!d||d.isActive||(d.didReceiveRemoteReady=!0,c(f))}}};var To=15e3,Ao=5e3,Xt="icegatheringstatechange",Ro="iceconnectionstatechange",Ge="offer",Eo="answer",Mo=/out of range/i,Yt=e=>e.replace(/ (\S+\.local) (\d+) typ host/g," 127.0.0.1 $2 typ host"),qn=(e,{trickleIce:n,rtcConfig:t,rtcPolyfill:o,turnConfig:a,_test_only_mdnsHostFallbackToLoopback:s})=>{let r=new(o??RTCPeerConnection)({iceServers:Bo.concat(a??[]),...t}),i={},c=[],m=[],u=n!==!1,f=[],d=[],h=!1,y=!1,A=null,T=null,B=!1,w=()=>T=_(T),O=()=>{B||(B=!0,w(),i.close?.())},x=g=>{i.signal?i.signal(g):c.push(g)},P=g=>{let v=i.signal;i.signal=H=>{v?.(H),g(H)},c.length>0&&c.splice(0).forEach(H=>i.signal?.(H))},R=g=>s?Yt(g):g,$=g=>{if(!s||typeof g.candidate!="string")return g;let v=Yt(g.candidate);return v===g.candidate?g:{...g,candidate:v}},S=g=>({type:g.localDescription?.type??Ge,sdp:R(g.localDescription?.sdp??"")}),K=()=>{let g=r.remoteDescription?.sdp;return g?g.match(/a=ice-ufrag:([^\s]+)/)?.[1]??null:null},W=()=>(r.remoteDescription?.sdp?.match(/^m=/gm)??[]).length,q=g=>{if(!r.remoteDescription)return!1;let v=W();if(typeof g.sdpMLineIndex=="number"&&v>0&&g.sdpMLineIndex>=v)return!1;let H=K();return!(H&&g.usernameFragment&&g.usernameFragment!==H)},F=async g=>{try{return await r.addIceCandidate(g),!0}catch(v){if(v instanceof Error&&Mo.test(v.message)&&typeof g.sdpMLineIndex=="number")return!1;throw v}},J=async()=>{if(!r.remoteDescription||f.length===0)return;let g=f.splice(0),v=[];for(let H of g){if(!q(H)){v.push(H);continue}await F(H)||v.push(H)}v.length>0&&f.push(...v)},l=async g=>{if(q(g)){await F(g)||f.push(g);return}f.push(g)},p=g=>{g.binaryType="arraybuffer",g.bufferedAmountLowThreshold=65535,g.onmessage=v=>{let H=v.data;i.data?i.data(H):m.push(H)},g.onopen=()=>i.connect?.(),g.onclose=O,g.onerror=({error:v})=>i.error?.(le(v,"data channel error"))},b=async g=>{let v=null;try{await Promise.race([new Promise(H=>{let ee=()=>{g.iceGatheringState==="complete"&&(g.removeEventListener(Xt,ee),H())};g.addEventListener(Xt,ee),ee()}),new Promise(H=>{v=setTimeout(H,To)})])}finally{_(v)}return S(g)},k=async()=>{let g=u?S(r):await b(r);return x(g),g};e?(A=r.createDataChannel("data"),p(A)):r.ondatachannel=({channel:g})=>{A=g,p(g)};let E=async(g=!1)=>{if(r.connectionState!=="closed")try{return h=!0,g&&(r.signalingState!=="stable"&&r.signalingState!=="closed"&&r.localDescription?.type===Ge&&await r.setLocalDescription({type:"rollback"}),typeof r.restartIce=="function"&&r.restartIce()),await r.setLocalDescription(g?await r.createOffer({iceRestart:!0}):void 0),await k()}catch(v){i.error?.(le(v,"failed to create local offer"))}finally{h=!1}};r.onnegotiationneeded=async()=>E(!1),r.onicecandidate=({candidate:g})=>{if(!u||!g)return;let v=$(typeof g.toJSON=="function"?g.toJSON():{candidate:g.candidate,sdpMid:g.sdpMid,sdpMLineIndex:g.sdpMLineIndex,usernameFragment:g.usernameFragment});x({type:sn,sdp:JSON.stringify(v)})};let U=()=>{if(r.connectionState==="failed"||r.connectionState==="closed"||r.iceConnectionState==="failed"||r.iceConnectionState==="closed"){O();return}if(r.connectionState==="connected"||r.connectionState==="connecting"||r.iceConnectionState==="connected"||r.iceConnectionState==="completed"||r.iceConnectionState==="checking"){w();return}if(r.connectionState==="disconnected"||r.iceConnectionState==="disconnected"){T||(T=setTimeout(()=>{T=null,(r.connectionState==="disconnected"||r.iceConnectionState==="disconnected")&&O()},Ao));return}};r.onconnectionstatechange=U,r.addEventListener(Ro,U),r.ontrack=g=>{let v=g.streams[0];if(v){if(!i.track&&!i.stream){d.push({track:g.track,stream:v});return}i.track?.(g.track,v),i.stream?.(v)}},r.onremovestream=g=>i.stream?.(g.stream);let j=e?new Promise(g=>P(v=>{v.type===Ge&&g(v)})):Promise.resolve();return e&&queueMicrotask(()=>{!h&&r.signalingState==="stable"&&!r.localDescription&&r.connectionState!=="closed"&&r.onnegotiationneeded?.(new Event("negotiationneeded"))}),{created:Date.now(),connection:r,get channel(){return A},get isDead(){return r.connectionState==="closed"},getOffer:async(g=!1)=>{if(e)return g?E(!0):r.localDescription?.type===Ge?u?S(r):b(r):j},async signal(g){if(g.type==="candidate"){try{let v=JSON.parse(g.sdp);v&&typeof v=="object"&&await l($(v))}catch(v){i.error?.(le(v,"failed to parse remote candidate"))}return}if(!(A?.readyState==="open"&&!g.sdp?.includes("a=rtpmap")))try{let v={...g,sdp:R(g.sdp)};if(g.type===Ge){if(h||r.signalingState!=="stable"&&!y){if(e)return;await se([r.setLocalDescription({type:"rollback"}),r.setRemoteDescription(v)])}else await r.setRemoteDescription(v);return await J(),await r.setLocalDescription(),await k()}if(g.type===Eo){y=!0;try{await r.setRemoteDescription(v),await J()}finally{y=!1}}}catch(v){i.error?.(le(v,"failed to apply remote signal"))}},sendData:g=>A?.send(g),destroy:()=>{w(),A?.close(),r.close(),h=!1,y=!1,O()},setHandlers:g=>{let{signal:v,...H}=g;Object.assign(i,H),i.data&&m.length>0&&m.splice(0).forEach(ee=>i.data?.(ee)),v&&P(v),(i.track||i.stream)&&d.length>0&&d.splice(0).forEach(({track:ee,stream:te})=>{i.track?.(ee,te),i.stream?.(te)})},offerPromise:j,addStream:g=>g.getTracks().forEach(v=>r.addTrack(v,g)),removeStream:g=>r.getSenders().filter(v=>v.track&&g.getTracks().includes(v.track)).forEach(v=>r.removeTrack(v)),addTrack:(g,v)=>r.addTrack(g,v),removeTrack:g=>{let v=r.getSenders().find(H=>H.track===g);v&&r.removeTrack(v)},replaceTrack:(g,v)=>{let H=r.getSenders().find(ee=>ee.track===g);if(H)return H.replaceTrack(v)}}},Bo=[...Te(3,(e,n)=>`stun:stun${n||""}.l.google.com:19302`),"stun:stun.cloudflare.com:3478"].map(e=>({urls:e}));var Oo=Object.getPrototypeOf(Uint8Array),Kn=32,Co=0,Wn=32,Qt=34,Fn=35,cn=36,Le=16*2**10-cn,Ze=255,Do=65535,er="bufferedamountlow",nr="close",tr="error",Lo=1e4,Ho=e=>e instanceof ArrayBuffer?new Uint8Array(e):new Uint8Array(e.buffer,e.byteOffset,e.byteLength),xo=(e,n=Lo)=>e.readyState!=="open"||e.bufferedAmount<=e.bufferedAmountLowThreshold?Promise.resolve(e.readyState==="open"):new Promise(t=>{let o=!1,a=null,s=c=>{o||(o=!0,e.removeEventListener(er,r),e.removeEventListener(nr,i),e.removeEventListener(tr,i),_(a),t(c))},r=()=>s(!0),i=()=>s(!1);if(e.addEventListener(er,r),e.addEventListener(nr,i),e.addEventListener(tr,i),a=setTimeout(()=>s(!1),n),e.readyState!=="open"){s(!1);return}e.bufferedAmount<=e.bufferedAmountLowThreshold&&s(!0)}),rr=({getPeer:e,getPeerIds:n,canReceiveFromPeer:t,throwIfAborted:o})=>{let a={},s={},r={},i={},c=(f,d,{includePending:h=!1}={})=>(f?Array.isArray(f)?f:[f]:n(h)).flatMap(y=>{let A=e(y,h);return A?[Promise.resolve(d(y,A))]:(console.warn(`${G}: no peer with id ${y} found`),[])});return{makeInternalAction:(f,d={})=>{let h=s[f];if(a[f]&&h){let w=a[f].options;if(w.sendToPending!==!!d.sendToPending||w.receiveWhilePending!==!!d.receiveWhilePending)throw I(`action type "${f}" cannot be redefined`);return h}if(!f)throw I("action type argument is required");let y=ue(f);if(y.byteLength>Kn)throw I(`action type string "${f}" (${y.byteLength}b) exceeds byte limit (${Kn}). Hint: choose a shorter name.`);let A={sendToPending:!!d.sendToPending,receiveWhilePending:!!d.receiveWhilePending},T=new Uint8Array(Kn);T.set(y);let B=0;return a[f]={onComplete:V,onProgress:V,setOnComplete:w=>{a[f].onComplete=w;let O=i[f];O?.length&&(delete i[f],O.forEach(({payload:x,peerId:P,metadata:R})=>w(x,P,R)))},setOnProgress:w=>{a[f].onProgress=w},send:async(w,O,x,P,R)=>{o(R);let $=typeof w;if($==="undefined")throw I("action data cannot be undefined");let S=$!=="string",K=w instanceof Blob,W=K||w instanceof ArrayBuffer||w instanceof Oo,q=x!==void 0,F=W?Ho(K?await w.arrayBuffer():w):ue(S?X(w):w),J=q?ue(X(x)):null,l=Math.ceil(F.byteLength/Le)+(q?1:0)||1,p=Te(l,(b,k)=>{let E=k===l-1,U=!!(q&&k===0),j=new Uint8Array(cn+(U?J?.byteLength??0:E?F.byteLength-Le*(l-(q?2:1)):Le));return j.set(T),j.set([B>>8,B&Ze],Wn),j.set([Number(E)|Number(U)<<1|Number(W)<<2|Number(S)<<3],Qt),j.set([Math.round((k+1)/l*Ze)],Fn),j.set(q?U?J??new Uint8Array:F.subarray((k-1)*Le,k*Le):F.subarray(k*Le,(k+1)*Le),cn),j});return B=B+1&Do,await se(c(O,async(b,k)=>{let{channel:E}=k,U=0;for(;U<l;){o(R);let j=p[U];if(!j)break;if(E&&E.bufferedAmount>E.bufferedAmountLowThreshold){let H=await xo(E);if(o(R),!H)break}let g=e(b,A.sendToPending);if(!g||g!==k)break;k.sendData(j),U++;let v=j[Fn]??Ze;P?.(v/Ze,b,x)}},{includePending:A.sendToPending})),[]},options:A},s[f]={send:a[f].send,onMessage:a[f].setOnComplete,onProgress:a[f].setOnProgress}},handleData:(f,d)=>{var q,F;let h=new Uint8Array(d),y=ge(h.subarray(Co,Wn)).replaceAll("\0",""),A=a[y];if(!t(f,!!A?.options.receiveWhilePending))return;let T=(h[Wn]??0)<<8|(h[33]??0),B=h[Qt]??0,w=h[Fn]??0,O=h.subarray(cn),x=!!(B&1),P=!!(B&2),R=!!(B&4),$=!!(B&8);r[f]??(r[f]={}),(q=r[f])[y]??(q[y]={});let S=(F=r[f][y])[T]??(F[T]={chunks:[]});if(P?S.meta=he(ge(O)):S.chunks.push(O),A?.onProgress(w/Ze,f,S.meta),!x)return;let K=new Uint8Array(S.chunks.reduce((J,l)=>J+l.byteLength,0));S.chunks.reduce((J,l)=>(K.set(l,J),J+l.byteLength),0),delete r[f][y][T];let W=R?K:$?he(ge(K)):ge(K);if(A){A.onComplete(W,f,S.meta);return}(i[y]??(i[y]=[])).push({payload:W,peerId:f,...S.meta===void 0?{}:{metadata:S.meta}})},clearPeer:f=>{delete r[f]}}};var _o=500,Ie=(e,n)=>{let t=I(n);return t.kind=e,t.name=e==="aborted"?"AbortError":t.name,t},Jn=e=>{if(e?.aborted)throw Ie("aborted","operation aborted")},or=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.r=="string"?{r:e.r,...Object.hasOwn(e,"m")?{m:e.m}:{}}:null,Io=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.r=="string"?{r:e.r,...typeof e.e=="string"?{e:e.e}:{}}:null,fn=(e,n)=>n===void 0?e:{...e,metadata:n},sr=({getPeer:e,getPeerIds:n,canReceiveFromPeer:t})=>{let o={},a={},s=rr({getPeer:e,getPeerIds:n,canReceiveFromPeer:t,throwIfAborted:Jn}),r=s.makeInternalAction,i=s.handleData,c=h=>{let y=a[h];y&&(_(y.timer),y.signal&&y.abortHandler&&y.signal.removeEventListener("abort",y.abortHandler),delete a[h])},m=(h,y)=>{me(a).forEach(([A,T])=>{T.peerId===h&&(c(A),T.reject(y))})},u=(h,y)=>{s.clearPeer(h),m(h,Ie("disconnected",Pe(y,"peer disconnected")))},f=r("@_response");return f.onMessage((h,y,A)=>{let T=Io(A);if(!T)return;let B=a[T.r];if(!(!B||B.peerId!==y)){if(c(T.r),T.e!==void 0){B.reject(Ie("rejected",T.e));return}B.resolve(h)}}),{makeAction:(h,y)=>{if(y&&"onRequest"in y&&y.kind!=="request")throw I('request actions must use kind: "request"');let A=y?.kind??"message",T=r(h),B=o[h];if(B){if(B.kind!==A)throw I(`action type "${h}" cannot be redefined`);return B.action}let w={kind:A,action:null,pendingMessages:[],pendingRequests:[],onReceiveProgress:y?.onReceiveProgress??null},O=(l,p)=>l?(b,k)=>l(b,fn({peerId:k},p)):void 0,x=l=>{w.onReceiveProgress=l},P=(l,p,b)=>{let k=w.kind==="request"?or(b):null;w.onReceiveProgress?.(l,fn({peerId:p},k?k.m:b))};if(T.onProgress(P),A==="message"){let l=y?.onMessage??null,p=()=>{if(!l)return;let k=l;w.pendingMessages.splice(0).forEach(({payload:E,peerId:U,metadata:j})=>{Promise.resolve().then(()=>k(E,fn({peerId:U},j))).catch(g=>console.error(`${G} action handler error:`,g))})},b={send:async(k,E={})=>{await T.send(k,E.target,E.metadata,O(E.onProgress,E.metadata),E.signal)},get onMessage(){return l},set onMessage(k){l=k,p()},get onReceiveProgress(){return w.onReceiveProgress},set onReceiveProgress(k){x(k)}};return T.onMessage((k,E,U)=>{if(!l){w.pendingMessages.push(U===void 0?{payload:k,peerId:E}:{payload:k,peerId:E,metadata:U});return}let j=l;Promise.resolve().then(()=>j(k,fn({peerId:E},U))).catch(g=>console.error(`${G} action handler error:`,g))}),w.action=b,o[h]=w,p(),b}let R=y?.onRequest??null,$=l=>{_(l.timer);let p=w.pendingRequests.indexOf(l);p>-1&&w.pendingRequests.splice(p,1)},S=(l,p,b)=>{f.send(null,l,{r:p,e:Pe(b,"request failed")})},K=(l,p)=>{$(l),Promise.resolve().then(()=>p(l.payload,{peerId:l.peerId,...l.metadata===void 0?{}:{metadata:l.metadata},signal:l.controller.signal})).then(async b=>{if(b===void 0)throw I("request handler returned undefined");await f.send(b,l.peerId,{r:l.requestId})}).catch(b=>S(l.peerId,l.requestId,b)).finally(()=>l.controller.abort())},W=()=>{R&&w.pendingRequests.slice().forEach(l=>K(l,R))},q=(l,p,b,k)=>{if(R){let U={payload:l,peerId:p,...b===void 0?{}:{metadata:b},requestId:k,controller:new AbortController,timer:null};K(U,R);return}let E={payload:l,peerId:p,...b===void 0?{}:{metadata:b},requestId:k,controller:new AbortController,timer:setTimeout(()=>{$(E),E.controller.abort(),S(p,k,"request handler unavailable")},_o)};w.pendingRequests.push(E)},F=async(l,p)=>{let{target:b,metadata:k,onProgress:E,signal:U,timeoutMs:j}=p;if(Jn(U),!e(b,!1))throw Ie("disconnected",`no active peer with id ${b}`);let g=fe(20),v=new Promise((H,ee)=>{let te={peerId:b,resolve:H,reject:ee,timer:null,...U===void 0?{}:{signal:U}},$e=()=>{c(g),ee(Ie("aborted","operation aborted"))};U&&(te.abortHandler=$e,U.addEventListener("abort",$e,{once:!0})),a[g]=te}).catch(H=>{throw H});try{await T.send(l,b,k===void 0?{r:g}:{r:g,m:k},O(E,k),U);let H=a[g];return H&&j!==void 0&&(H.timer=setTimeout(()=>{c(g),H.reject(Ie("timeout","request timed out"))},j)),await v}catch(H){throw c(g),H}},J={request:F,requestMany:async(l,p)=>(Jn(p.signal),await se(p.targets.map(async b=>{try{let k={peerId:b,status:"fulfilled",value:await F(l,{target:b,...p.metadata===void 0?{}:{metadata:p.metadata},...p.timeoutMs===void 0?{}:{timeoutMs:p.timeoutMs},...p.onProgress===void 0?{}:{onProgress:p.onProgress},...p.signal===void 0?{}:{signal:p.signal}})};return p.onResult?.(k),k}catch(k){let E=le(k,"request failed");if(E.kind==="aborted"||!E.kind)throw E;let U=E.kind==="timeout"?{peerId:b,status:"timeout"}:E.kind==="disconnected"?{peerId:b,status:"disconnected"}:{peerId:b,status:"rejected",error:E};return p.onResult?.(U),U}}))),get onRequest(){return R},set onRequest(l){R=l,W()},get onReceiveProgress(){return w.onReceiveProgress},set onReceiveProgress(l){x(l)}};return T.onMessage((l,p,b)=>{let k=or(b);k&&q(l,p,k.m,k.r)}),w.action=J,o[h]=w,W(),J},makeInternalAction:r,handleData:i,clearPeer:u}};var ar=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.k=="string"?{key:e.k,...typeof e.s=="string"?{streamId:e.s}:{},...typeof e.t=="string"?{trackId:e.t}:{},...Object.hasOwn(e,"m")?{metadata:e.m}:{}}:null,ir=e=>n=>{let t=e.get(n);return t||(t=fe(20),e.set(n,t)),t},zn=()=>{let e=new WeakMap,n=new WeakMap,t=new Map,o=new Map,a=new Map,s=new Map;return{getStreamKey:ir(e),getTrackKey:ir(n),rememberRemoteStream:(r,i,c)=>{t.set(r,i),c&&o.set(c,i)},getRemoteStream:(r,i)=>t.get(r)??(i?o.get(i):void 0),rememberRemoteTrack:(r,i,c,m,u)=>{let f={track:i,stream:c};a.set(r,f),m&&s.set(m,f),u&&o.set(u,c)},getRemoteTrack:(r,i)=>a.get(r)??(i?s.get(i):void 0),clearRemote:()=>{t.clear(),o.clear(),a.clear(),s.clear()}}},cr=({iterate:e,isActive:n,getSharedMediaPeer:t})=>{let o={},a={},s=zn(),r={onPeerStream:null,onPeerTrack:null},i=(u,f,d,h)=>{n(u)&&(t(u)?.__trysteroMedia?.rememberRemoteStream(f,d,typeof d.id=="string"?d.id:void 0),r.onPeerStream?.(d,u,h))},c=(u,f,d,h,y)=>{n(u)&&(t(u)?.__trysteroMedia?.rememberRemoteTrack(f,d,h,typeof d.id=="string"?d.id:void 0,typeof h.id=="string"?h.id:void 0),r.onPeerTrack?.(d,h,u,y))},m=(u,f,d,h,y,A={})=>{let T={k:f,...A,...d===void 0?{}:{m:d}};return e(u,async(B,w)=>{await h(T,B),y(w)})};return{addStream:(u,f,d)=>m(f.target,s.getStreamKey(u),f.metadata,d,h=>h.addStream(u),{s:u.id}),removeStream:(u,f)=>{e(f,(d,h)=>h.removeStream(u))},addTrack:(u,f,d,h)=>m(d.target,s.getTrackKey(u),d.metadata,h,y=>y.addTrack(u,f),{s:f.id,t:u.id}),removeTrack:(u,f)=>{e(f,(d,h)=>h.removeTrack(u))},replaceTrack:(u,f,d,h)=>m(d.target,s.getTrackKey(f),d.metadata,h,y=>y.replaceTrack(u,f),{t:u.id}),receiveStreamMeta:(u,f)=>{if(!n(f))return;let d=ar(u);if(!d)return;let h=t(f)?.__trysteroMedia?.getRemoteStream(d.key,d.streamId);if(h){i(f,d.key,h,d.metadata);return}(o[f]??(o[f]=[])).push(d)},receiveTrackMeta:(u,f)=>{if(!n(f))return;let d=ar(u);if(!d)return;let h=t(f)?.__trysteroMedia?.getRemoteTrack(d.key,d.trackId);if(h){c(f,d.key,h.track,h.stream,d.metadata);return}(a[f]??(a[f]=[])).push(d)},receiveRemoteStream:(u,f)=>{if(!n(u))return;let d=o[u]?.shift();d&&i(u,d.key,f,d.metadata)},receiveRemoteTrack:(u,f,d)=>{if(!n(u))return;let h=a[u]?.shift();h&&c(u,h.key,f,d,h.metadata)},clearPeer:u=>{delete o[u],delete a[u]},get onPeerStream(){return r.onPeerStream},set onPeerStream(u){r.onPeerStream=u},get onPeerTrack(){return r.onPeerTrack},set onPeerTrack(u){r.onPeerTrack=u}}};var fr="beforeunload",Uo=1e4,Re=e=>"@_"+e,Xe=new Set,lr=()=>Xe.forEach(e=>e()),No=e=>(Xe.add(e),Xe.size===1&&addEventListener(fr,lr),()=>{Xe.delete(e),Xe.size||removeEventListener(fr,lr)}),ur=(e,n,t,{onPeerHandshake:o,onHandshakeError:a,handshakeTimeoutMs:s=Uo,isPassive:r=!1}={})=>{let i={},c={},m={},u={onPeerJoin:null,onPeerLeave:null},f=V,d=null,h=(l,p,{includePending:b=!1}={})=>(l?Array.isArray(l)?l:[l]:ne(b?i:c)).flatMap(k=>{let E=b?i[k]:c[k];return E?[Promise.resolve(p(k,E))]:(console.warn(`${G}: no peer with id ${k} found`),[])}),y=cr({iterate:(l,p)=>h(l,(b,k)=>p(b,k)),isActive:l=>!!c[l],getSharedMediaPeer:l=>i[l]??null}),A=sr({getPeer:(l,p)=>(p?i:c)[l],getPeerIds:l=>ne(l?i:c),canReceiveFromPeer:(l,p)=>!!d?.canReceiveFromPeer(l,p)}),T=A.makeInternalAction,B=A.handleData,w=A.makeAction,O=(l,p=I("peer disconnected"))=>{let b=le(p,"peer disconnected");d?.clearPeer(l,b),delete i[l],delete c[l],A.clearPeer(l,b),m[l]?.splice(0).forEach(k=>k.reject(b)),delete m[l],y.clearPeer(l)},x=(l,p,b)=>{let k=i[l];if(!k||p&&k!==p)return;let E=!!c[l];O(l,b),k.destroy(),E&&u.onPeerLeave?.(l),n(l)},P=async()=>{await q.send(""),await new Promise(l=>setTimeout(l,99)),me(i).forEach(([l,p])=>{p.destroy(),O(l,I("room left"))}),f(),t()},R=T(Re("ping")),$=T(Re("pong")),S=T(Re("signal")),K=T(Re("stream")),W=T(Re("track")),q=T(Re("leave"),{sendToPending:!0,receiveWhilePending:!0}),F=T(Re("hsdata"),{sendToPending:!0,receiveWhilePending:!0}),J=T(Re("hsready"),{sendToPending:!0,receiveWhilePending:!0});return d=Zt({...o===void 0?{}:{onPeerHandshake:o},...a===void 0?{}:{onHandshakeError:a},handshakeTimeoutMs:s,sendHandshakeData:F.send,sendHandshakeReady:J.send,onActivate:(l,p)=>{c[l]=p,u.onPeerJoin?.(l)},onFailure:(l,p,b)=>x(l,p,b)}),R.onMessage((l,p)=>$.send("",p)),$.onMessage((l,p)=>{let b=m[p];b?.shift()?.resolve(),b&&!b.length&&delete m[p]}),S.onMessage((l,p)=>{c[p]&&i[p]?.signal(l)}),K.onMessage((l,p)=>y.receiveStreamMeta(l,p)),W.onMessage((l,p)=>y.receiveTrackMeta(l,p)),q.onMessage((l,p)=>x(p,void 0,I("peer left room"))),F.onMessage((l,p,b)=>d?.receiveHandshakeData(l,p,b)),J.onMessage((l,p)=>d?.receiveHandshakeReady(p)),e((l,p)=>{let b=i[p];if(b){if(b===l)return;b.destroy(),O(p,I("peer replaced"))}i[p]=l,d?.addPeer(p,l),l.setHandlers({data:k=>B(p,k),stream:k=>y.receiveRemoteStream(p,k),track:(k,E)=>y.receiveRemoteTrack(p,k,E),signal:k=>{c[p]&&S.send(k,p)},close:()=>x(p,l,I("peer disconnected")),error:k=>{console.error(`${G} peer error:`,k),x(p,l,k)}}),d?.start(p,l)}),Dn&&(f=No(()=>P().catch(V))),{makeAction:w,leave:P,ping:async l=>{if(!c[l])throw I(`no active peer with id ${l}`);let p=Date.now();return await new Promise((b,k)=>{let E=m[l]??(m[l]=[]),U=()=>{let g=m[l];if(!g)return;let v=g.indexOf(j);v>-1&&g.splice(v,1),g.length||delete m[l]},j={resolve:()=>{U(),b()},reject:g=>{U(),k(g)}};E.push(j),R.send("",l).catch(g=>j.reject(le(g,"peer disconnected")))}),Date.now()-p},isPassive:()=>r,getPeers:()=>Ln(me(c).map(([l,p])=>[l,p.connection])),addStream:(l,p={})=>y.addStream(l,p,K.send),removeStream:(l,p={})=>{y.removeStream(l,p.target)},addTrack:(l,p,b={})=>y.addTrack(l,p,b,W.send),removeTrack:(l,p={})=>{y.removeTrack(l,p.target)},replaceTrack:(l,p,b={})=>y.replaceTrack(l,p,b,W.send),get onPeerJoin(){return u.onPeerJoin},set onPeerJoin(l){u.onPeerJoin=l,l&&ne(c).forEach(p=>l(p))},get onPeerLeave(){return u.onPeerLeave},set onPeerLeave(l){u.onPeerLeave=l},get onPeerStream(){return y.onPeerStream},set onPeerStream(l){y.onPeerStream=l},get onPeerTrack(){return y.onPeerTrack},set onPeerTrack(l){y.onPeerTrack=l}}};var mr=1,gr=2,dr=(e,n)=>{let t=ue(e),o=new Uint8Array(3+t.byteLength+n.byteLength);return o[0]=mr,o[1]=t.byteLength>>>8&255,o[2]=t.byteLength&255,o.set(t,3),o.set(n,3+t.byteLength),o},$o=(e,n)=>{let t=ue(e),o=new Uint8Array(4+t.byteLength);return o[0]=gr,o[1]=Number(n),o[2]=t.byteLength>>>8&255,o[3]=t.byteLength&255,o.set(t,4),o},jo=e=>{let n=new Uint8Array(e);if(n.byteLength<3)return null;if(n[0]===mr){let a=(n[1]??0)<<8|(n[2]??0),s=3+a;return a<=0||n.byteLength<s?null:{type:"room",roomToken:ge(n.subarray(3,s)),payload:n.subarray(s).slice().buffer}}if(n[0]!==gr||n.byteLength<4)return null;let t=(n[2]??0)<<8|(n[3]??0),o=4+t;return t<=0||n.byteLength<o?null:{type:"presence",roomToken:ge(n.subarray(4,o)),isPresent:n[1]===1}},hr=e=>{let{connection:n,channel:t}=e;return e.isDead||n.connectionState==="closed"||n.connectionState==="failed"||n.iceConnectionState==="closed"||n.iceConnectionState==="failed"||t?.readyState==="closing"||t?.readyState==="closed"},yr=e=>{if(hr(e))return"stale";let{channel:n}=e;return!n||n.readyState!=="open"?"transient":"live"},pr=class{constructor(){Q(this,"byApp",{});Q(this,"roomPresenceHandlers",{})}getMap(e){var n;return(n=this.byApp)[e]??(n[e]={})}get(e,n){return this.byApp[e]?.[n]}isPeerStale(e){return hr(e)}getHealth(e){return this.isPeerStale(e)?"stale":"live"}setRoomPresenceHandler(e,n){return this.roomPresenceHandlers[e]=n,()=>{this.roomPresenceHandlers[e]===n&&delete this.roomPresenceHandlers[e]}}sendRoomPresence(e,n,t){e.isClosing||e.peer.isDead||e.peer.sendData($o(n,t))}clear(e,n,{destroyPeer:t}){let o=this.byApp[e],a=o?.[n];if(!a||a.isClosing)return;a.idleTimer=_(a.idleTimer),a.isClosing=!0,t&&!a.peer.isDead&&a.peer.destroy();let s=we(a.bindings);a.bindings={},a.bindingsByToken={},a.controlRoomId=null,delete o[n],s.forEach(r=>{r.handlers.close?.(),r.pendingData.length=0,r.pendingSendData.length=0,r.pendingTracks.length=0}),a.media.clearRemote(),a.pendingDataByToken.clear(),a.remoteRoomTokens.clear(),ne(o).length===0&&delete this.byApp[e]}register(e,n,t,o){let a=this.getMap(e),s=a[n];if(s){if(s.idleTimer=_(s.idleTimer),s.peer===t)return s;this.clear(e,n,{destroyPeer:!0})}let r={appId:e,peerId:n,peer:t,bindings:{},bindingsByToken:{},pendingDataByToken:new Map,remoteRoomTokens:new Set,idleTimer:null,controlRoomId:null,streamOwners:new Map,trackOwners:new Map,media:zn(),idleMs:o,isClosing:!1};return t.setHandlers({data:i=>this.dispatchData(r,i),signal:i=>this.dispatchSignal(r,i),close:()=>this.clear(e,n,{destroyPeer:!1}),error:i=>{console.error(`${G} peer error:`,i),this.clear(e,n,{destroyPeer:!1})},track:(i,c)=>this.dispatchTrack(r,i,c)}),a[n]=r,r}bind(e,n,t,{onDetach:o}){let a=t.bindings[e];if(a)return t.idleTimer=_(t.idleTimer),{proxy:a.proxy,isNew:!1};let s={roomId:e,roomToken:null,roomTokenPromise:n,handlers:{},pendingData:[],pendingSendData:[],pendingTracks:[],detach:V,proxy:{}},r=()=>{t.bindings[e]&&(this.pruneRoomOwnership(t,e),delete t.bindings[e],s.roomToken&&t.bindingsByToken[s.roomToken]===s&&delete t.bindingsByToken[s.roomToken],t.controlRoomId===e&&(t.controlRoomId=ne(t.bindings)[0]??null),o(),this.scheduleIdleTimer(t))},i={created:t.peer.created,get connection(){return t.peer.connection},get channel(){return t.peer.channel},get isDead(){return t.peer.isDead},getOffer:c=>t.peer.getOffer(c),signal:c=>t.peer.signal(c),sendData:c=>{if(!s.roomToken){s.pendingSendData.push(c);return}t.peer.sendData(dr(s.roomToken,c))},destroy:()=>r(),setHandlers:c=>{let{signal:m,...u}=c;Object.assign(s.handlers,u),m&&(s.handlers.signal=m),this.flushBindingQueues(s)},offerPromise:t.peer.offerPromise,addStream:c=>{let m=t.streamOwners.get(c)??new Set,u=m.size===0;m.add(e),t.streamOwners.set(c,m),u&&t.peer.addStream(c)},removeStream:c=>{let m=t.streamOwners.get(c);m&&(m.delete(e),m.size===0&&(t.streamOwners.delete(c),t.peer.removeStream(c)))},addTrack:(c,m)=>{let u=t.trackOwners.get(c)??{stream:m,rooms:new Set},f=u.rooms.size===0;return u.stream=m,u.rooms.add(e),t.trackOwners.set(c,u),f?t.peer.addTrack(c,m):t.peer.connection.getSenders().find(d=>d.track===c)??t.peer.addTrack(c,m)},removeTrack:c=>{let m=t.trackOwners.get(c);m&&(m.rooms.delete(e),m.rooms.size===0&&(t.trackOwners.delete(c),t.peer.removeTrack(c)))},replaceTrack:(c,m)=>{let u=t.trackOwners.get(c);if(u){t.trackOwners.delete(c);let f=t.trackOwners.get(m)??{stream:u.stream,rooms:new Set};u.rooms.forEach(d=>f.rooms.add(d)),t.trackOwners.set(m,f)}return t.peer.replaceTrack(c,m)},__trysteroMedia:t.media};return s.proxy=i,s.detach=r,t.bindings[e]=s,t.controlRoomId??(t.controlRoomId=e),t.idleTimer=_(t.idleTimer),n.then(c=>{if(t.isClosing||t.bindings[e]!==s)return;s.roomToken=c,t.bindingsByToken[c]=s;let m=t.pendingDataByToken.get(c);m?.length&&(s.pendingData.push(...m),t.pendingDataByToken.delete(c)),s.pendingSendData.splice(0).forEach(u=>t.peer.sendData(dr(c,u))),this.flushBindingQueues(s)}),{proxy:i,isNew:!0}}pruneRoomOwnership(e,n){e.streamOwners.forEach((t,o)=>{t.delete(n),t.size===0&&(e.streamOwners.delete(o),e.peer.removeStream(o))}),e.trackOwners.forEach((t,o)=>{t.rooms.delete(n),t.rooms.size===0&&(e.trackOwners.delete(o),e.peer.removeTrack(o))})}scheduleIdleTimer(e){e.isClosing||ne(e.bindings).length>0||(e.idleTimer=_(e.idleTimer),e.idleTimer=setTimeout(()=>{let n=this.byApp[e.appId]?.[e.peerId];!n||ne(n.bindings).length>0||this.clear(e.appId,e.peerId,{destroyPeer:!0})},e.idleMs))}getSignalBinding(e){if(e.controlRoomId){let t=e.bindings[e.controlRoomId];if(t?.handlers.signal)return t}let n=we(e.bindings).find(t=>!!t.handlers.signal);return n?(e.controlRoomId=n.roomId,n):null}flushBindingQueues(e){let{handlers:n}=e;n.data&&e.pendingData.length>0&&e.pendingData.splice(0).forEach(t=>n.data?.(t)),(n.track||n.stream)&&e.pendingTracks.length&&e.pendingTracks.splice(0).forEach(({track:t,stream:o})=>{n.track?.(t,o),n.stream?.(o)})}dispatchData(e,n){let t=jo(n);if(!t)return;if(t.type==="presence"){t.isPresent?e.remoteRoomTokens.add(t.roomToken):e.remoteRoomTokens.delete(t.roomToken),this.roomPresenceHandlers[e.appId]?.(e.peerId,t.roomToken,t.isPresent);return}let o=e.bindingsByToken[t.roomToken];if(!o){let a=e.pendingDataByToken.get(t.roomToken)??[];a.push(t.payload),e.pendingDataByToken.set(t.roomToken,a);return}o.handlers.data?o.handlers.data(t.payload):o.pendingData.push(t.payload)}dispatchSignal(e,n){this.getSignalBinding(e)?.handlers.signal?.(n)}dispatchTrack(e,n,t){we(e.bindings).forEach(o=>{if(o.handlers.track||o.handlers.stream){o.handlers.track?.(n,t),o.handlers.stream?.(t);return}o.pendingTracks.push({track:n,stream:t})})}};var qo=23333,Ko=12,Wo=7533,Fo=23333,Vn="__legacy__",un="offer-placeholder",Jo=["offer","answer","candidate"],zo=e=>{if(typeof e=="string")try{let n=he(e);return n&&typeof n=="object"?n:null}catch{return null}return e&&typeof e=="object"?e:null},Ye=(e,n)=>typeof e[n]=="string"&&e[n]?e[n]:void 0,Vo=e=>Jo.some(n=>n in e&&(typeof e[n]!="string"||e[n]==="")),Pr=(e,n,t,o,a,s)=>{e.toCipher(n).then(r=>{e.isLeaving()||!s()||o(t,X(a(r.sdp)))})},Go=()=>({status:"idle",offerPeer:null,offerId:null,offerSdp:null,offerInitPromise:null,offerAnswered:!1,offerRelays:[],offerSignalRelays:[],offerSignalBacklog:[],offerRelayTimers:[],offerExpiryTimer:null,connectedPeer:null,connectedPeerUnhealthySinceMs:null,answeringExpiryTimer:null,answeringPeer:null,answerSent:!1,connectionErrorReported:!1,pendingCandidates:{}}),Zo=e=>[...e.turnConfig??[],...e.rtcConfig?.iceServers??[]].some(({urls:n})=>(Array.isArray(n)?n:[n]).some(t=>/^turns?:/i.test(t))),Xo=(e,n)=>`could not connect to peer ${e} after exchanging SDP; ${Zo(n)?"check that your TURN server URLs and credentials are reachable by both peers":"configure TURN servers with turnConfig or rtcConfig.iceServers"}`,mn=(e,n,t)=>{e.isLeaving()||n.connectedPeer||n.connectionErrorReported||(n.connectionErrorReported=!0,e.onJoinError?.({error:Xo(t,e.config),appId:e.appId,peerId:t,roomId:e.roomId}))},Ue=(e,n)=>e[n]??(e[n]=Go()),ie=e=>{e.connectedPeer?e.status="connected":e.answeringPeer?e.status="answering":e.offerPeer||e.offerRelays.some(Boolean)?e.status="offering":e.status="idle"},ln=(e,n)=>{e.answeringPeer===n&&(e.answeringExpiryTimer=_(e.answeringExpiryTimer),e.answeringPeer=null,e.answerSent=!1,ie(e))},dn=(e,n,t)=>{e.connectedPeer&&(e.connectedPeer.isDead||e.connectedPeer.destroy(),e.connectedPeer=null,e.connectedPeerUnhealthySinceMs=null,ie(e))},Gn=(e,n)=>{e.offerRelayTimers[n]=_(e.offerRelayTimers[n]),e.offerRelays[n]&&(e.offerRelays[n]=void 0,ie(e))},wr=(e,n)=>{e?.offerRelays[n]===un&&Gn(e,n)},Yo=e=>{if(e.isDead||e.connection.connectionState==="closed")return!0;try{return!!e.connection.remoteDescription}catch{return!0}},Ne=(e,n)=>{let t=e.offerAnswered;e.offerExpiryTimer=_(e.offerExpiryTimer),e.offerInitPromise=null,e.offerRelays.forEach((o,a)=>Gn(e,a)),e.offerRelays=[],e.offerSignalRelays=[],e.offerRelayTimers=[],e.offerSignalBacklog=[],e.offerPeer&&e.offerPeer!==e.connectedPeer&&(t||Yo(e.offerPeer)?e.offerPeer.isDead||e.offerPeer.destroy():n.recycle(e.offerPeer)),e.offerPeer=null,e.offerId=null,e.offerSdp=null,e.offerAnswered=!1,e.connectionErrorReported=!1,ie(e)},Qo=(e,n,t,o)=>{_(n.answeringExpiryTimer),n.answeringExpiryTimer=setTimeout(()=>{let a=e.peerStates[t];!a||a.connectedPeer||a.answeringPeer!==o||(a.answerSent&&mn(e,a,t),o.destroy(),ln(a,o),e.checkDeactivate())},Fo)},es=async(e,n,t)=>{let o=t?[t,Vn]:[Vn];for(let a of o){let s=e.pendingCandidates[a];if(s?.length){delete e.pendingCandidates[a];for(let r of s)await n.signal(r)}}},kr=(e,n,t,o=Ve)=>{_(n.offerExpiryTimer);let a=n.offerId;n.offerExpiryTimer=setTimeout(()=>{let s=e.peerStates[t];!s||s.connectedPeer||s.offerId!==a||(s.offerAnswered&&mn(e,s,t),Ne(s,e.offerPool),e.checkDeactivate())},o)},ns=(e,n,t,o)=>n.offerPeer&&n.offerId&&n.offerSdp?Promise.resolve({peer:n.offerPeer,offer:n.offerSdp,offerId:n.offerId}):(n.offerInitPromise||(n.offerInitPromise=(async()=>{let a=(await e.offerPool.checkout(1,!1,e.encryptOffer))[0];if(!a)throw I("failed to allocate offer peer");let{peer:s,offer:r}=a;n.offerPeer=s,n.offerId=fe(Ko),n.offerSdp=r,n.offerAnswered=!1,n.connectionErrorReported=!1,n.offerSignalBacklog=[],ie(n);let i=()=>{n.offerPeer===s&&!n.connectedPeer&&(n.offerAnswered&&mn(e,n,t),Ne(n,e.offerPool)),e.disconnectPeer(s,t),e.checkDeactivate()};return s.setHandlers({connect:()=>e.connectPeer(s,t,o),signal:c=>{n.offerPeer===s&&(n.offerSignalBacklog.push(c),n.offerSignalRelays.forEach(m=>m?.(c)))},close:i,error:i}),kr(e,n,t),{peer:s,offer:r,offerId:n.offerId}})().finally(()=>n.offerInitPromise=null)),n.offerInitPromise),ts=async(e,n,t,o,a)=>{if(o){e.attachSharedPeerToRoom(t,o);return}let s=e.peerStates[t];if(!s||s.connectedPeer||s.answeringPeer||s.offerAnswered){wr(s,n);return}if(s.offerRelays[n]!==un)return;let[r,i]=await se([Ae(Ce(e.rootTopicPlaintext,t)),ns(e,s,t,n)]);if(e.isLeaving())return;if(s.connectedPeer||s.answeringPeer||s.offerAnswered||s.offerRelays[n]!==un){wr(s,n);return}s.offerRelayTimers[n]=_(s.offerRelayTimers[n]),s.offerRelays[n]=!0,ie(s),s.offerRelayTimers[n]=setTimeout(()=>as(e,t,n),(e.announceIntervals[n]??e.announceIntervalMs)*.9);let c=!1;s.offerSignalRelays[n]=m=>{c&&(e.isLeaving()||s.connectedPeer||s.offerPeer!==i.peer||s.offerId!==i.offerId||m.type!=="candidate"||Pr(e,m,r,a,u=>({peerId:Z,offerId:i.offerId,candidate:u,...e.isPassive?{passive:!0}:{}}),()=>!s.connectedPeer&&s.offerPeer===i.peer&&s.offerId===i.offerId))},a(r,X({peerId:Z,offerId:i.offerId,offer:i.offer,...e.isPassive?{passive:!0}:{}})),c=!0,s.offerSignalBacklog.forEach(m=>s.offerSignalRelays[n]?.(m))},rs=async(e,n,t,o,a,s,r)=>{let i=Ue(e.peerStates,t);if(i.answeringPeer||i.offerAnswered)return;let c=!!(i.offerPeer||i.offerRelays.some(Boolean));if((c||s)&&Z<t)return;c&&Ne(i,e.offerPool);let m=e.initPeer(!1,e.config);i.answeringPeer=m,i.answerSent=!1,i.connectionErrorReported=!1,Qo(e,i,t,m),ie(i);let u=()=>{i.answeringPeer===m&&!i.connectedPeer&&i.answerSent&&mn(e,i,t),ln(i,m),e.disconnectPeer(m,t),e.checkDeactivate()};m.setHandlers({connect:()=>e.connectPeer(m,t,n),close:u,error:u});let f;try{f=await e.toPlain({type:"offer",sdp:o})}catch{ln(i,m),e.onJoinError?.({error:"incorrect room password when decrypting offer",appId:e.appId,peerId:t,roomId:e.roomId});return}if(m.isDead){ln(i,m);return}let d=await Ae(Ce(e.rootTopicPlaintext,t));e.isLeaving()||(m.setHandlers({signal:h=>{e.isLeaving()||i.answeringPeer!==m||m.isDead||h.type!=="answer"&&h.type!=="candidate"||Pr(e,h,d,r,y=>{let A={peerId:Z};return h.type==="answer"?(i.answerSent=!0,A.answer=y):A.candidate=y,a&&(A.offerId=a),e.isPassive&&(A.passive=!0),A},()=>i.answeringPeer===m&&!m.isDead)}}),await m.signal(f),await es(i,m,a))},os=async(e,n,t,o,a)=>{var f;let s;try{s=await e.toPlain({type:sn,sdp:t})}catch{return}let r=Ue(e.peerStates,n),i=o&&r?.offerPeer&&r.offerId===o?r.offerPeer:null,c=r?.answeringPeer??null,m=!o&&r?.offerPeer?r.offerPeer:null,u=a&&!a.isDead?a:i??c??m;if(!u||u.isDead){let d=o??Vn;((f=r.pendingCandidates)[d]??(f[d]=[])).push(s);return}u.signal(s)},ss=async(e,n,t,o,a,s)=>{let r;try{r=await e.toPlain({type:"answer",sdp:o})}catch{e.onJoinError?.({error:"incorrect room password when decrypting answer",appId:e.appId,peerId:t,roomId:e.roomId});return}if(s)e.offerPool.claimLeased(s),s.setHandlers({connect:()=>e.connectPeer(s,t,n),close:()=>e.disconnectPeer(s,t)}),s.signal(r);else{let i=e.peerStates[t];if(!i||!i.offerPeer||i.offerAnswered||a&&i.offerId&&a!==i.offerId||i.offerPeer.isDead)return;i.offerAnswered=!0,kr(e,i,t,qo),i.offerPeer.signal(r)}},as=(e,n,t)=>{let o=e.peerStates[n];!o||o.connectedPeer||o.offerRelays[t]&&(Gn(o,t),e.checkDeactivate())},vr=e=>n=>async(t,o,a)=>{if(e.isLeaving())return;let s=zo(o);if(!s||Vo(s))return;let r=Ye(s,"peerId")??"",i=Ye(s,"offer"),c=Ye(s,"answer"),m=Ye(s,"candidate"),u=Ye(s,"offerId"),f=s.peer,d=s.hasOutgoingOffer===!0,h=s.passive===!0;if(!r||r===Z)return;let[y,A]=await se([e.rootTopicP,e.selfTopicP]);if(e.isLeaving()||t!==y&&t!==A||e.isPassive&&h||(e.isPassive&&!e.isActive&&!c&&!m&&(e.isActive=!0,e.requeueAnnounce?.()),e.isPassive&&!e.isActive))return;let T=e.peerStates[r],B=T?.connectedPeer;if(B&&T){let x=yr(B);if(x==="live"){T.connectedPeerUnhealthySinceMs=null;return}if(x==="stale")dn(T,r,"message-from-stale-peer");else{let P=Date.now(),R=T.connectedPeerUnhealthySinceMs??P;if(T.connectedPeerUnhealthySinceMs=R,P-R<Wo)return;dn(T,r,"message-from-prolonged-disconnect")}}let w=e.sharedPeers.get(e.appId,r);w&&e.sharedPeers.getHealth(w.peer)==="stale"&&(e.sharedPeers.clear(e.appId,r,{destroyPeer:!0}),w=void 0);let O=!!(r&&!i&&!c&&!m);if(O&&!w){let x=Ue(e.peerStates,r),P=Z<r;if(x.answeringPeer||x.connectedPeer||x.offerAnswered)return;if(!P&&!x.offerPeer){let R=await Ae(Ce(e.rootTopicPlaintext,r));!e.isLeaving()&&!x.connectedPeer&&a(R,X({peerId:Z}));return}if(x.offerRelays[n])return;x.offerRelays[n]=un,ie(x)}if(w&&(i||c||m)){if(w.bindings[e.roomId])return;e.attachSharedPeerToRoom(r,w);return}if(O)return ts(e,n,r,w,a);if(i)return rs(e,n,r,i,u,d,a);if(m)return os(e,r,m,u,f);if(c)return ss(e,n,r,c,u,f)};var gn=5333,is=[233,533,1333],cs=7533,fs=123333,Zn=({init:e,subscribe:n,announce:t,deactivate:o})=>{let a={},s={},r={},i={},c=new pr,m=()=>we(a).some(P=>ne(P).length>0),u=P=>s[P]??(s[P]={}),f=P=>r[P]??(r[P]={}),d=(P,R,$)=>{c.getHealth(P.peer)==="live"&&c.sendRoomPresence(P,R,$)},h=(P,R)=>{me(s[P]??{}).forEach(([$,S])=>{if(!S.shouldAdvertise())return;let{roomToken:K,roomTokenPromise:W}=S;if(K){d(R,K,!0);return}W.then(q=>{s[P]?.[$]===S&&S.roomToken===q&&(c.get(P,R.peerId)!==R||R.isClosing||S.shouldAdvertise()&&d(R,q,!0))})})},y=(P,R,$)=>we(c.getMap(P)).forEach(S=>d(S,R,$)),A=P=>{i[P]||(i[P]=c.setRoomPresenceHandler(P,(R,$,S)=>{if(!S)return;let K=c.get(P,R),W=r[P]?.[$];!K||!W||s[P]?.[W]?.attachSharedPeerToRoom(R,K)}))},T=P=>{a[P]&&ne(a[P]).length>0||(i[P]?.(),delete i[P],delete s[P],delete r[P])},B=!1,w=[],O=null,x=V;return(P,R,$)=>{if(!P)throw I("requires a config map as the first argument");if($&&typeof $!="object")throw I("third argument must be a callbacks object");let{appId:S}=P,K=$?.onJoinError,W=$?.onPeerHandshake,q=$?.handshakeTimeoutMs;if(!S)throw I("config map is missing appId field");if(!R)throw I("roomId argument required");if(q!==void 0&&(!Number.isFinite(q)||q<=0))throw I("handshakeTimeoutMs must be a positive number");if(a[S]?.[R])return a[S][R];A(S);let F=Ce(G,S,R),J=Ae(F),l=Ae(Ce(F,Z)),p=qt(P.password??"",S,R),b=Kt(S,R),k=P._test_only_sharedPeerIdleMs??fs,E=!1,U=C=>async D=>({type:D.type,sdp:await C(p,D.sdp)}),j=U(zt),g=U(Jt),v=c.getMap(S),H=()=>qn(!0,P),ee=!1;O||(O=new Vt(H));let te=O,$e=async C=>{let D=await C.getOffer(Date.now()-C.created>Ve);if(!D||D.type!=="offer")throw I("failed to get offer for peer");return(await g(D)).sdp},je=(C,D)=>{let L=Ue(z.peerStates,C);L.answeringExpiryTimer=_(L.answeringExpiryTimer),L.answeringPeer=null;let{proxy:Y,isNew:N}=c.bind(R,b,D,{onDetach:()=>{let re=z.peerStates[C];re?.connectedPeer===D.peer&&(re.connectedPeer=null,re.connectedPeerUnhealthySinceMs=null,ie(re))}});L.connectedPeer=D.peer,L.connectedPeerUnhealthySinceMs=null,ie(L),N&&kn(Y,C),Ne(L,te)},Hr=(C,D,L)=>{if(E){C.destroy();return}let Y=Ue(z.peerStates,D);if(Y.connectedPeer){let oe=v[D];if(oe&&Y.connectedPeer===oe.peer&&oe.bindings[R])return;Y.connectedPeer!==C&&!C.isDead&&C.destroy();return}let N=v[D];if(N&&c.getHealth(N.peer)==="stale"&&(c.clear(S,D,{destroyPeer:!0}),N=void 0),N&&N.peer!==C){C.isDead||C.destroy(),je(D,N);return}let re=!N;N||(N=c.register(S,D,C,k)),je(D,N),re&&h(S,N)},xr=(C,D)=>{if(E)return;let L=z.peerStates[D];L?.connectedPeer===C&&(dn(L,D,"close-event"),en(),!ae&&ee&&z.requeueAnnounce?.())},ae=!!P.passive,Ee=null,Me,ot=V,en=()=>{if(!ae||!z.isActive)return;let C=!1;me(z.peerStates).forEach(([D,L])=>{L.connectedPeer||L.answeringPeer||L.offerInitPromise||L.offerPeer||L.offerRelays.some(Boolean)?C=!0:L.status==="idle"&&delete z.peerStates[D]}),C||(z.isActive=!1,Me=_(Me),xe.forEach(_),xe.length=0,ot(),Ee?.roomToken&&y(S,Ee.roomToken,!1))},z={appId:S,roomId:R,config:P,peerStates:{},rootTopicPlaintext:F,rootTopicP:J,selfTopicP:l,toPlain:j,toCipher:g,isLeaving:()=>E,isPassive:ae,isActive:!ae,onJoinError:K,sharedPeers:c,offerPool:te,encryptOffer:$e,initPeer:qn,connectPeer:Hr,disconnectPeer:xr,attachSharedPeerToRoom:je,checkDeactivate:en,announceIntervals:[],announceIntervalMs:gn},yn={config:P,appId:S,roomId:R,isPassive:ae},_r=vr(z);if(!B){let C=e(P);w=(Array.isArray(C)?C:[C]).map(D=>Promise.resolve(D)),B=!0,x=P.relayConfig?.manualReconnection?V:jt()}!ae&&!te.isActive&&te.warmup(),z.announceIntervals=w.map(()=>gn);let pn=w.map(()=>gn),wn=w.map(()=>0),Pn=w.map(()=>0),xe=[],st=w.map(async(C,D)=>n(await C,await J,await l,_r(D),L=>te.getOffers(L,$e),yn));se([J,l]).then(([C,D])=>{if(E)return;let L=async(Y,N)=>{if(E||ae&&!z.isActive)return;let re=ae?{passive:!0}:void 0,oe;try{oe=await t(Y,C,D,re,yn),Pn[N]=0}catch(jr){let lt=Pn[N]??0;lt===0&&P.relayConfig?.warnOnRelayFailure!==!1&&console.warn(`${G}: announce failed - ${Pe(jr,"")}`),Pn[N]=lt+1}if(E||ae&&!z.isActive||oe&&typeof oe!="number"&&"stopAnnouncing"in oe)return;typeof oe=="number"?(z.announceIntervals[N]=oe,pn[N]=oe):oe&&(pn[N]=oe.nextAnnounceMs,ee||(ee=oe.reannounceOnDisconnect===!0));let it=wn[N]??0;wn[N]=it+1;let ct=pn[N]??gn,ft=is[it];xe[N]=setTimeout(()=>{L(Y,N)},typeof ft=="number"?Math.min(ct,ft):ct)};ot=()=>{o&&w.forEach(async Y=>{let N=await Y;E||o(N,C,D,yn)})},z.requeueAnnounce=()=>{xe.forEach(_),xe.length=0,Me=_(Me),te.isActive||te.warmup(),Ee?.roomToken&&y(S,Ee.roomToken,!0),Me=setTimeout(en,cs),w.forEach(async(Y,N)=>{let re=await Y;re&&!E&&(wn[N]=0,L(re,N))})},st.forEach(async(Y,N)=>{if(await Y,E)return;let re=await w[N];re&&!E&&(!ae||z.isActive)&&L(re,N)})});let kn=V,{compose:Ir}=Gt(P.password??"",S,R),at=Ir(W),Ur={...at?{onPeerHandshake:at}:{},...q===void 0?{}:{handshakeTimeoutMs:q},isPassive:ae,onHandshakeError:(C,D)=>K?.({error:D.replace(/^handshake failed: /,""),appId:S,peerId:C,roomId:R})};a[S]??(a[S]={});let Nr=u(S),$r=ur(C=>kn=C,C=>{if(E)return;let D=z.peerStates[C];D?.connectedPeer&&(D.connectedPeer=null,ie(D),en())},()=>{E=!0,kn=V;let C=s[S]?.[R];C?.roomToken&&(y(S,C.roomToken,!1),delete r[S]?.[C.roomToken],r[S]&&!ne(r[S]).length&&delete r[S]),s[S]&&(delete s[S][R],ne(s[S]).length||delete s[S]),me(z.peerStates).forEach(([D,L])=>{if(L.answeringExpiryTimer=_(L.answeringExpiryTimer),L.connectedPeer&&!L.connectedPeer.isDead){let Y=v[D];(!Y||Y.peer!==L.connectedPeer)&&L.connectedPeer.destroy()}L.answeringPeer&&!L.answeringPeer.isDead&&L.answeringPeer.destroy(),Ne(L,te),L.connectedPeer=null,L.answeringPeer=null,ie(L)}),a[S]&&(delete a[S][R],ne(a[S]).length===0&&delete a[S]),xe.forEach(_),Me=_(Me),st.forEach(async D=>{(await D)()}),!m()&&(B=!1,te.destroy(),O=null,x(),T(S))},Ur);return Ee={roomToken:null,roomTokenPromise:b,attachSharedPeerToRoom:je,shouldAdvertise:()=>!ae||z.isActive},Nr[R]=Ee,b.then(C=>{let D=Ee;!D||E||s[S]?.[R]!==D||(D.roomToken=C,f(S)[C]=R,we(v).forEach(L=>{L.remoteRoomTokens.has(C)&&je(L.peerId,L)}),(!ae||z.isActive)&&y(S,C,!0))}),a[S][R]=$r}};var ls=["offer","answer","candidate"],us=6e4,ds=e=>{if(typeof e=="string")try{let n=he(e);return n&&typeof n=="object"?n:null}catch{return null}return e},Xn=(e,n)=>typeof e[n]=="string"&&e[n]?e[n]:void 0,ms=e=>ls.some(n=>n in e&&(typeof e[n]!="string"||e[n]==="")),gs=e=>{let n=ds(e);if(!n||ms(n))return!1;let t=Xn(n,"peerId");return!!(t&&t!==Z&&n.passive!==!0&&!Xn(n,"answer")&&!Xn(n,"candidate"))},Yn=e=>{if(!e)throw I("topic strategy missing room context");return e},Sr=(e,n,t,o)=>({kind:n,appId:e.appId,roomId:e.roomId,rootTopic:t,selfTopic:o}),Qn=(e,n,t,o)=>({kind:n,appId:e.appId,roomId:e.roomId,rootTopic:t,selfTopic:o}),et=({steadyAnnounceIntervalMs:e=us,reannounceOnDisconnect:n=!0,init:t,subscribeTopic:o,publishTopic:a,unpublishTopic:s})=>Zn({init:t,subscribe:async(r,i,c,m,u,f)=>{let d=Yn(f),h=(P,R)=>{a(r,P,R,Qn(d,"signal",i,c))},y=null,A=!1,T=null,B=!1,w=P=>{A||(A=!0,P())},O=()=>(T||(T=Promise.resolve(o(r,c,(P,R)=>{B||m(P,R,h)},Sr(d,"self",i,c))).then(P=>{y=P,B&&w(P)})),T);d.isPassive||await O();let x=await o(r,i,async(P,R)=>{B||(d.isPassive&&gs(R)&&await O(),B||await m(P,R,h))},Sr(d,"root",i,c));return()=>{B=!0,y&&w(y),x()}},announce:async(r,i,c,m,u)=>{let f=Yn(u),d=await a(r,i,X({peerId:Z,...m}),Qn(f,"announce",i,c));return typeof d=="number"||d!==void 0&&"stopAnnouncing"in d?d:{nextAnnounceMs:d?.nextAnnounceMs??e,reannounceOnDisconnect:d?.reannounceOnDisconnect??n}},...s?{deactivate:(r,i,c,m)=>{let u=Yn(m);return s(r,i,Qn(u,"announce",i,c))}}:{}});var Ar=Un(e=>e.socket),hs=5,Rr="x",Er="EVENT",{secretKey:ys,publicKey:ps}=Bn.keygen(),ws=ke(ps),Ps={},ks={},nt={},br=250,hn=6e4,vs=15*6e4,Ss=5333,Qe=new WeakMap,rt=new WeakSet,He=new WeakMap,Tr=e=>{let n=Qe.get(e),t=Math.min(n?.delayMs?Math.max(hn,n.delayMs*2):hn,vs);return Qe.set(e,{delayMs:t,untilMs:Date.now()+t}),t},bs=e=>{let n=Qe.get(e);if(!n)return 0;let t=n.untilMs-Date.now();return t>0?t:0},tt=e=>({nextAnnounceMs:e}),Ts={stopAnnouncing:!0},As=e=>{if(rt.has(e))return!1;let n=He.get(e);return n&&(clearTimeout(n.timer),He.delete(e)),rt.add(e),Qe.delete(e),e.close?.(),!0},Rs=(e,n)=>{let t=He.get(e);t&&(clearTimeout(t.timer),t.eventIds.add(n));let o=t?.eventIds??new Set([n]),a=setTimeout(()=>{He.delete(e)},Ss);He.set(e,{eventIds:o,timer:a})},Es=(e,n)=>{let t=He.get(e);return t?.eventIds.has(n)?(clearTimeout(t.timer),He.delete(e),!0):!1},Mr=()=>Math.floor(Date.now()/1e3),Br=e=>nt[e]??(nt[e]=an(e,1e4)+2e4),Ms=async(e,n)=>{let t={kind:Br(e),tags:[[Rr,e]],created_at:Mr(),content:n,pubkey:ws},o=await De("SHA-256",X([0,t.pubkey,t.created_at,t.kind,t.tags,t.content]));return X([Er,{...t,id:ke(o),sig:ke(await Bn.signAsync(o,ys))}])};var ve={},Or=e=>{e.flushWaiters.forEach(n=>n()),e.flushWaiters.clear()},Bs=(e,n,t)=>{var a;let o=ve[a=e.url]??(ve[a]={subIds:[],topics:new Map,updateTimer:null,flushWaiters:new Set});o.topics.set(n,t),Cr(e,o)},Os=(e,n)=>{let t=ve[e.url];t&&(t.topics.delete(n),t.topics.size===0?(t.updateTimer!==null&&(clearTimeout(t.updateTimer),t.updateTimer=null),Or(t),t.subIds.forEach(o=>e.send(X(["CLOSE",o]))),delete ve[e.url]):Cr(e,t))},Cr=(e,n)=>{n.updateTimer===null&&(n.updateTimer=setTimeout(()=>{n.updateTimer=null;try{Dr(e)}finally{Or(n)}},0))},Cs=e=>{let n=ve[e.url];return!n||n.updateTimer===null?Promise.resolve():new Promise(t=>n.flushWaiters.add(t))},Dr=e=>{let n=ve[e.url];if(!n||n.topics.size===0)return;let t=[...n.topics.keys()],o=[],a=Mr();for(let s=0;s<t.length;s+=br)o.push(t.slice(s,s+br));for(;n.subIds.length>o.length;){let s=n.subIds.pop();s&&e.send(X(["CLOSE",s]))}o.forEach((s,r)=>{var c;let i=(c=n.subIds)[r]??(c[r]=fe(64));e.send(X(["REQ",i,{kinds:[...new Set(s.map(Br))],since:a,"#x":s}]))})},Ds=e=>{let n=ve[e.url];n&&n.topics.size>0&&Dr(e)},Lr=et({init:e=>Hn(e,Ls,hs,!0).map(n=>{let t=Ar.register(n,()=>In(n,o=>{let[a,s,r,i]=he(o);if(a!==Er){let c=`${G}: relay failure from ${t.url} - `,m=a==="CLOSED"&&typeof r=="string"?r:i,u=a==="OK"&&r===!1,f=u&&m?.startsWith("rate-limited:"),d=u&&m?.startsWith("duplicate:"),h=a==="CLOSED"||u&&!f&&!d,y=a==="OK"&&Es(t,s);if(h&&!As(t))return;f?Tr(t):y&&Qe.delete(t),!d&&e.relayConfig?.warnOnRelayFailure!==!1&&(a==="NOTICE"?console.warn(c+s):(u||a==="CLOSED")&&console.warn(c+m));return}if(r&&typeof r=="object"&&"content"in r){let{content:c}=r,m=ks[s];if(m){m(Ps[s]??"",c);return}let u=ve[t.url];if(u?.subIds.includes(s)&&r.tags){let f=r.tags.find(d=>d[0]===Rr);f?.[1]&&u.topics.get(f[1])?.(f[1],c)}}},()=>Ds(t)));return t.ready}),subscribeTopic:(e,n,t,o)=>{Bs(e,n,(r,i)=>{t(r,i)});let s=()=>{Os(e,n)};return o.kind==="root"?Cs(e).then(()=>s):s},publishTopic:async(e,n,t,o)=>{if(rt.has(e)||e.isClosed)return o.kind==="announce"?Ts:void 0;if(o.kind==="announce"){let i=bs(e);if(i>0)return tt(Math.max(hn,i))}let a=await Ms(n,typeof t=="string"?t:X(t)),s=e.socket.readyState===1;if(e.send(a),o.kind!=="announce")return;if(!s)return tt(Tr(e));let r=he(a)[1].id;return Rs(e,r),tt(hn)}}),Ua=Ar.getSockets,Ls=["basspistol.org","bucket.coracle.social","chorus.pjv.me","koru.bitcointxoko.org","nos.lol","nostr-01.uid.ovh","nostr-01.yakihonne.com","nostr-relay.corb.net","nostr.data.haus","nostr.islandarea.net","nostr.sathoarder.com","nostr.tegila.com.br","nostr.vulpem.com","purplerelay.com","relay-can.zombi.cloudrodion.com","relay-rpi.edufeed.org","relay.agorist.space","relay.artio.inf.unibe.ch","relay.mostr.pub","relay.mostro.network","relay.sigit.io","relay02.lnfi.network","schnorr.me","social.amanah.eblessing.co","staging.yabu.me","strfry.shock.network","top.testrelay.top","yabu.me/v2"].map(e=>"wss://"+e);return Vr(Hs);})();
@@ -2195,7 +2428,7 @@ const GX={key:'gx',open:null,
   }
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
-    index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
+    index: function () { return S ? S.i : -1; }, goto: function (id) { if (!S) return false; for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) { clearVisuals(); enter(i); return true; } return false; },   /* test scenarios jump straight to a step (gx-scenario.js) */ state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
     status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
@@ -2204,20 +2437,42 @@ const GX={key:'gx',open:null,
 </script>
 <script>
 /* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
-   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays.
+   RULE: the skin never changes an element's layout box. Painted plates go on as background / border-image (border-width 0, the plate drawn
+   by border-image-width inside the element's own width, height and padding). GXSK.audit() proves it: it measures the visible buttons, bars and
+   panels with the skin on, takes every skin class off, measures again, puts them back, and lists each element whose box moved by more than 2 px.
+   phone-check.js runs it and fails the game on any entry. */
 (function () {
-  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  var H = document.documentElement, on = [], base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
   function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  function add(c) { if (on.indexOf(c) < 0) on.push(c); H.classList.add(c); }
+  var SEL = 'button,.gx-ibtn,.gxc-btn,.gxc-ib,.gxc-act,[role=button],.gx-bar,.gx-drawer,.gxc-sheet,.gxc-scene,.gxc-boss,.gxc-res,.gxc-head,.dlg,.gxc-sheet';
   window.GXSK = {
+    classes: function () { return on.slice(); },
+    audit: function (sel, tol) {
+      tol = tol == null ? 2 : tol; var els = [].filter.call(document.querySelectorAll(sel || SEL), function (e) { return e.offsetWidth > 0 && e.offsetHeight > 0; });
+      if (!on.length) return { skinned: false, n: els.length, moved: [] };
+      var st = document.createElement('style'); st.textContent = '*,*::before,*::after{transition:none!important;animation:none!important}'; document.head.appendChild(st);
+      var P = ['width','height','minWidth','minHeight','paddingTop','paddingRight','paddingBottom','paddingLeft','marginTop','marginRight','marginBottom','marginLeft','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','display','flex','fontSize','whiteSpace','boxSizing','fontWeight','letterSpacing','textAlign','justifyContent','alignSelf','maxWidth','overflow','textShadow','fontFamily'];
+      var cs = function (e) { var c = getComputedStyle(e), p = e.parentElement; return P.map(function (k) { return c[k]; }).concat([p ? p.offsetWidth + '/' + getComputedStyle(p).paddingLeft + '/' + getComputedStyle(p).borderLeftWidth : '']); };
+      var a = els.map(function (e) { return [e.offsetWidth, e.offsetHeight]; }), ca = els.map(cs), cl = on.slice();
+      cl.forEach(function (c) { H.classList.remove(c); }); void H.offsetWidth;
+      var b = els.map(function (e) { return [e.offsetWidth, e.offsetHeight]; }), cb = els.map(cs);
+      cl.forEach(function (c) { H.classList.add(c); }); void H.offsetWidth; st.remove();
+      var moved = [];
+      els.forEach(function (e, i) { if (!b[i][0] && !b[i][1]) return; var dw = a[i][0] - b[i][0], dh = a[i][1] - b[i][1];
+        if (Math.abs(dw) > tol || Math.abs(dh) > tol) moved.push((e.id ? '#' + e.id : e.tagName.toLowerCase()) + '.' + String(e.className && e.className.baseVal === undefined ? e.className : '').trim().split(/\s+/).slice(0, 2).join('.') + ' ' + (e.textContent || '').trim().slice(0, 14) + ' ' + b[i].join('x') + '->' + a[i].join('x') + ' [' + P.concat(['parent']).filter(function (k, j) { return ca[i][j] !== cb[i][j]; }).map(function (k) { var j = P.concat(['parent']).indexOf(k); return k + ':' + cb[i][j] + '>' + ca[i][j]; }).join(' ') + ']'); });
+      return { skinned: true, n: els.length, moved: moved };
+    },
     init: function (o) {
       o = o || {}; var extra = [];
       if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
       load(core, function (ok) {
         if (!ok) return;
-        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
-        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
-        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
-        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        add('sk'); if (o.dark) add('sk-dark');
+        load(extra, function () { if (o.map) add('sk-map'); if (o.stars) add('sk-stars'); if (o.banner) add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) add(cls); }); });
         if (o.cb) o.cb();
       });
     }
@@ -2662,6 +2917,23 @@ const GX={key:'gx',open:null,
   GXC.data = function () { return D; };
 
   if (root && root.document) root.GXC = GXC;
+
+  /* ---- shared scenario: the story scene itself (?scn=story-scene), the longest line a game's own story has so the bubble is at its tallest ---- */
+  if (root && root.GXS && root.GXS.add) root.GXS.add({
+    id: 'story-scene', name: 'Story scene: speech bubble', ask: 'Is the speech bubble clean, with no sideways bar?',
+    when: function () { return !!(root.GXC && GXC.data && GXC.data()); },
+    setup: function () {
+      var cast = Object.keys((D && D.cast) || {}), who = cast[0] || 'narrator', long = '', ch = (D && D.chapters) || [];
+      ch.forEach(function (c) { [].concat(c.intro || [], c.outro || [], c.story || []).forEach(function (l) { var t = lineText(l); if (t && t.length > long.length) long = t; }); });
+      GXC.scene([{ who: who, text: long || 'The harbour is quiet tonight. Something stirs in the fog and the lamps start to flicker.' }, { who: cast[1] || who, text: 'Ready when you are.' }], { title: 'Chapter 1' });
+    },
+    checks: [
+      { kind: 'visible', sel: '.gxc-scene .gxc-sc-text', name: 'story text' },
+      { kind: 'visible', sel: '.gxc-scene .gxc-btn.go', name: 'Next button' },
+      { kind: 'fn', name: 'no sideways scrollbar in the scene', fn: function () { var e = document.querySelector('.gxc-scene'); return e.scrollWidth <= e.clientWidth + 1 || 'scrollWidth ' + e.scrollWidth + ' > ' + e.clientWidth; } },
+      { kind: 'fn', name: 'bubble is a 9-slice, not a stretched picture', fn: function () { var c = getComputedStyle(document.querySelector('.gxc-scene .gxc-sc-text'), '::before'); return !document.documentElement.classList.contains('sk') || (c.borderImageSource !== 'none' && c.backgroundImage === 'none') || 'bubble is a stretched background'; } }
+    ]
+  });
   if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
 })(typeof window !== 'undefined' ? window : this);
 
@@ -7292,7 +7564,7 @@ function hlpPlan0(m,me){if(!m||me<0)return null;
   const b=hlpBtn(m);if(b)return {toE:b};
   if(m.card!=null){const f=hlpCardEl(m.card);if(!hvis(f))return null;const mv=bfMoves(me,m.card).find(x=>mvKey(x.m)===mvKey(m));if(!mv)return null;
     const to=bfEls(mv.z).find(hvis);if(!to)return null;
-    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{f.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}}
+    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{f.scrollIntoView({inline:'center',block:'nearest',behavior:'instant'})}catch(e){}}
     return {toE:to,fromE:f}}
   return null}
 // a short reason (<= 15 words) from the advisor's own text; '' when there is no honest short reason
@@ -7594,6 +7866,190 @@ function campLine(){try{const p=GXC.progress();const ch=window.CAMPAIGN.chapters
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a="story"]');if(t){e.preventDefault();campOpen()}});
 campInit();
 if(!G)render();
+
+</script>
+<script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>
+<script>
+/* GX LAB core: storage + result rules shared by the in-game LAB (gx-lab.js) and the owner page (games/lab.html).
+   Results live in the player's REAL localStorage (the same origin as the shelf), in the shelf's own format:
+     shelf_ck_res      {"<date>|<game>|<item index>": {s:'ok'|'bad'|'skip', n:'note'}}   (the shelf's ✔ Test checklist)
+     shelf_wn_checked / shelf_ck_auto                                                       (What's new "Checked" ticks, same rule as the shelf)
+     gx_lab_res        {"<slug>/<scenario id>": {s, n}}                                      (scenario results: LAB menu + lab.html)
+   Rating a scenario also rates every checklist item that points at it, and rating an item rates its scenario, so a tick shows everywhere.
+   Test mode: ?test=1 in the URL or localStorage gx_test = '1'. Off = nothing in the page changes. */
+(function (W) {
+  if (W.GXLAB && W.GXLAB.core) return;
+  var IDS = { 'crown-city-smash': 'crown', 'nebula-aces': 'nebula', 'doorkick-dungeon': 'doorkick', 'shipwreck-isle': 'shipwreck', 'sands-of-qamar': 'sands', 'sunglaze': 'sunglaze', 'rampart-and-vine': 'rampart', 'short-fuse': 'shortfuse', 'tidewake': 'tidewake', 'hollowbough': 'hollowbough', 'thornbound': 'thornbound', 'kaiten-kitchen': 'kaiten', 'lantern-dive': 'lantern', 'cauldron-fair': 'cauldron', 'final-approach': 'approach', 'mainhattan-nightrun': 'mainhattan', 'mainhattan-overdrive': 'overdrive' };
+  var L = W.GXLAB = W.GXLAB || {}; L.core = true; L.IDS = IDS;
+  L.idOf = function (slug) { return IDS[slug] || slug; };
+  L.slugOfId = function (id) { for (var k in IDS) if (IDS[k] === id) return k; return id; };
+  L.slug = function () { var p = location.pathname.split('/').filter(Boolean); if (p.length && /\.html?$/.test(p[p.length - 1])) p.pop(); return p[p.length - 1] || ''; };
+  L.ls = function () { try { return (W.GXS && W.GXS.realLS) || W.localStorage; } catch (e) { return null; } };
+  L.get = function (k) { try { return L.ls().getItem(k); } catch (e) { return null; } };
+  L.set = function (k, v) { try { L.ls().setItem(k, v); } catch (e) { } };
+  L.j = function (k) { try { return JSON.parse(L.get(k) || '{}') || {}; } catch (e) { return {}; } };
+  L.testOn = function () { return /[?&]test=1\b/.test(location.search) || L.get('gx_test') === '1'; };
+  L.setTest = function (on) { L.set('gx_test', on ? '1' : '0'); };
+  var RES = 'gx_lab_res', CKR = 'shelf_ck_res', WNK = 'shelf_wn_checked', CKA = 'shelf_ck_auto';
+  L.key = function (e, i) { return e.date + '|' + e.game + '|' + i; };
+  L.wnKey = function (e) { return e.date + '|' + e.game; };
+  L.entries = function (upds, slug) { var id = L.idOf(slug); return (upds || []).filter(function (e) { return e.game === id || e.game === slug; }); };
+  L.scnRes = function (slug, id) { return L.j(RES)[slug + '/' + id] || {}; };
+  L.itemRes = function (e, i) { return L.j(CKR)[L.key(e, i)] || {}; };
+  /* mark a What's new entry Checked when every item works; undo only what we marked (same rule as the shelf) */
+  L.sync = function (upds) {
+    var r = L.j(CKR), a = L.j(CKA), d = L.j(WNK), ch = false;
+    (upds || []).forEach(function (e) { var its = e.items || []; if (!its.length) return; var wk = L.wnKey(e), all = its.every(function (_, i) { return (r[L.key(e, i)] || {}).s === 'ok'; });
+      if (all && !d[wk]) { d[wk] = 1; a[wk] = 1; ch = true; } else if (!all && d[wk] && a[wk]) { delete d[wk]; delete a[wk]; ch = true; } });
+    if (ch) { L.set(WNK, JSON.stringify(d)); L.set(CKA, JSON.stringify(a)); }
+  };
+  function put(store, k, s, n) { var o = L.j(store); if (s == null) delete o[k]; else o[k] = { s: s, n: n || '' }; L.set(store, JSON.stringify(o)); }
+  L.setItem = function (upds, e, i, s, n) {
+    put(CKR, L.key(e, i), s, n); var sid = e.scn && e.scn[i]; if (sid) put(RES, L.slugOfId(e.game) + '/' + sid, s, n);
+    L.sync(upds);
+  };
+  L.setScn = function (upds, slug, id, s, n) {
+    put(RES, slug + '/' + id, s, n);
+    L.entries(upds, slug).forEach(function (e) { (e.scn || []).forEach(function (x, i) { if (x === id) put(CKR, L.key(e, i), s, n); }); });
+    L.sync(upds);
+  };
+  /* text for "Copy results": the shelf's own format per entry, then the scenarios that no checklist item covers */
+  L.text = function (upds, slug, list, name) {
+    var out = [], used = {};
+    L.entries(upds, slug).forEach(function (e) { var l = ['Game Night test · ' + name + ' · ' + e.date];
+      (e.items || []).forEach(function (t, i) { var v = L.itemRes(e, i), sid = e.scn && e.scn[i], tg = sid ? ' [scn:' + sid + ']' : ''; if (sid) used[sid] = 1;
+        l.push(v.s === 'ok' ? '✅ ' + t + tg : v.s === 'bad' ? '❌ ' + t + tg + (v.n ? ' — ' + v.n : '') : v.s === 'skip' ? '⏭ ' + t + tg : '⬜ ' + t + tg + ' (not tested)'); });
+      out.push(l.join('\n')); });
+    var rest = (list || []).filter(function (d) { return !used[d.id]; });
+    if (rest.length) out.push(['Game Night LAB · ' + name].concat(rest.map(function (d) { var v = L.scnRes(slug, d.id); return (v.s === 'ok' ? '✅ ' : v.s === 'bad' ? '❌ ' : v.s === 'skip' ? '⏭ ' : '⬜ ') + d.name + ' [scn:' + d.id + ']' + (v.s === 'bad' && v.n ? ' — ' + v.n : ''); })).join('\n'));
+    return out.join('\n\n');
+  };
+  L.copy = function (text, done) {
+    var fb = function () { var ok = false, box = document.createElement('div'); box.className = 'gxl-fb'; box.innerHTML = '<textarea readonly aria-label="Results"></textarea><button type="button">Close</button>';
+      var ta = box.firstChild; ta.value = text; document.body.appendChild(box); ta.focus(); ta.select(); try { ok = document.execCommand('copy'); } catch (_) { }
+      box.lastChild.onclick = function () { box.remove(); }; if (ok) { box.remove(); done(true); } else done(false); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, fb); else fb();
+  };
+  L.esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  L.chip = function (s) { return s === 'ok' ? '✅' : s === 'bad' ? '❌' : s === 'skip' ? '⏭' : '⬜'; };
+})(window);
+
+</script>
+<script>
+/* GX LAB (test mode only): 🧪 LAB menu of this game's scenarios, a pinned ✔ Test checklist, quick ✅/❌ for the scenario on screen.
+   Needs gx-scenario.js (GXS.defs) and gx-lab-core.js. Off (no ?test=1, no localStorage gx_test) = returns at once: no element, no listener.
+   build-all.py inlines gx-lab-core.js + this + gx-lab.css into every staged game. Read the use in games-src/shell/LAB.md. */
+(function (W) {
+  var L = W.GXLAB; if (!L || !L.core || !L.testOn()) return;
+  var slug = L.slug(), gid = L.idOf(slug), q = new URLSearchParams(location.search), scn = q.get('scn') && q.get('scn') !== 'list' ? q.get('scn') : '';
+  var inShelf = false; try { inShelf = parent !== window; } catch (e) { inShelf = true; }
+  var UP = [], el = {}, esc = L.esc, name = slug;
+  var list = function () { var S = W.GXS; return S && S.defs ? S.defs.map(S.pub) : []; };
+  var run = function () { try { return JSON.parse(sessionStorage.getItem('gx_lab_run') || 'null'); } catch (e) { return null; } };
+  var saveRun = function (r) { try { if (r) sessionStorage.setItem('gx_lab_run', JSON.stringify(r)); else sessionStorage.removeItem('gx_lab_run'); } catch (e) { } };
+  var ckOpen = function () { try { return sessionStorage.getItem('gx_lab_ck') === '1'; } catch (e) { return false; } };
+  var setCk = function (v) { try { sessionStorage.setItem('gx_lab_ck', v ? '1' : '0'); } catch (e) { } };
+  var go = function (id) { L.go = id; location.href = location.pathname + '?scn=' + encodeURIComponent(id) + '&test=1'; };
+  function toast(m) { var t = document.createElement('div'); t.className = 'gxl-toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 1600); }
+  function mk(tag, id, cls) { var e = document.createElement(tag); if (id) e.id = id; if (cls) e.className = cls; return e; }
+
+  function css() {   // the stylesheet is inlined next to this script by build-all.py (window.GXLAB_CSS); else load nothing
+    if (W.GXLAB_CSS && !document.getElementById('gxlab-css')) { var s = mk('style', 'gxlab-css'); s.textContent = W.GXLAB_CSS; document.head.appendChild(s); }
+  }
+
+  /* ---- the little bar (top corner): LAB, checklist chip, run controls, quick rating ---- */
+  function bar() {
+    var b = el.bar; if (!b) { b = el.bar = mk('div', 'gxlab-bar'); document.body.appendChild(b); }
+    b.className = L.get('gx_lab_pos') === 'r' ? 'r' : '';
+    var r = run(), done = 0, tot = 0, h = '<button type="button" id="gxlab-btn" aria-label="LAB menu">🧪 LAB</button>';
+    if (!inShelf && UP.length) { var c = ckCount(); h += '<button type="button" id="gxlab-ck" aria-label="Test checklist">📍 ' + c.done + '/' + c.tot + '</button>'; }
+    if (r) h += '<button type="button" id="gxlab-next" class="on">Next ▶ ' + (r.i + 1) + '/' + r.ids.length + '</button>';
+    if (scn) { var v = L.scnRes(slug, scn).s; h += '<span class="gxl-r">' + [['ok', '✅'], ['bad', '❌'], ['skip', '⏭']].map(function (a) { return '<button type="button" data-s="' + a[0] + '" aria-pressed="' + (v === a[0]) + '" aria-label="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</span>'; }
+    b.innerHTML = h;
+  }
+  function ckEntries() { return L.entries(UP, slug).slice(0, 4); }
+  function ckCount() { var done = 0, tot = 0; ckEntries().forEach(function (e) { (e.items || []).forEach(function (_, i) { tot++; if (L.itemRes(e, i).s) done++; }); }); return { done: done, tot: tot }; }
+
+  /* ---- LAB menu ---- */
+  function menu() {
+    var p = el.menu; if (!p) { p = el.menu = mk('div', 'gxlab-menu', 'gxl-panel'); p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'LAB'); p.hidden = true; document.body.appendChild(p);
+      p.act = function (t) {
+        if (t.id === 'gxl-close') { p.hidden = true; return; }
+        if (t.dataset.go) { go(t.dataset.go); return; }
+        if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
+        if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
+        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', L.get('gx_lab_pos') === 'r' ? 'l' : 'r'); bar(); return; }
+        if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
+        if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
+    fillMenu(); p.hidden = false;
+  }
+  function fillMenu() {
+    var p = el.menu, ds = list(), g = {}, order = ['Board', 'Cards', 'Story', 'Bosses', 'UI'], h;
+    ds.forEach(function (d) { (g[d.group] = g[d.group] || []).push(d); });
+    Object.keys(g).forEach(function (k) { if (order.indexOf(k) < 0) order.push(k); });
+    var n = 0; ds.forEach(function (d) { if (L.scnRes(slug, d.id).s === 'ok') n++; });
+    h = '<div class="gxl-h"><h2>🧪 LAB · ' + esc(name) + ' · ' + n + '/' + ds.length + ' ✅</h2><button type="button" id="gxl-close" aria-label="Close LAB">✕</button></div>' +
+      '<div class="gxl-tools"><button type="button" id="gxl-all">All scenarios ▶</button><button type="button" id="gxl-copy">Copy results</button><button type="button" id="gxl-pos">⇄ Move 🧪</button><button type="button" id="gxl-off">Test mode off</button></div><div class="gxl-body" id="gxl-mbody">';
+    order.forEach(function (k) { if (!g[k]) return; h += '<div class="gxl-g">' + esc(k) + '</div>';
+      g[k].forEach(function (d) { var v = L.scnRes(slug, d.id).s;
+        h += '<div class="gxl-row" data-id="' + esc(d.id) + '"><div class="gxl-t"><b>' + esc(d.name) + '</b>' + (d.ask ? '<small>' + esc(d.ask) + '</small>' : '') + '</div>' +
+          '<button type="button" class="gxl-go' + (d.id === scn ? ' here' : '') + '" data-go="' + esc(d.id) + '" aria-label="Go: ' + esc(d.name) + '">▶ GO</button>' +
+          '<button type="button" class="gxl-chip" data-chip="' + esc(d.id) + '" aria-label="Result">' + L.chip(v) + '</button></div>'; }); });
+    if (!ds.length) h += '<div class="gxl-g">No scenarios registered for this game yet.</div>';
+    var bd = p.querySelector('.gxl-body'), st = bd ? bd.scrollTop : 0; p.innerHTML = h + '</div>'; p.querySelector('.gxl-body').scrollTop = st;
+  }
+
+  /* ---- pinned ✔ Test checklist (this game's What's new items, shared with the shelf) ---- */
+  function card() {
+    var p = el.card; if (!p) { p = el.card = mk('div', 'gxlab-card', 'gxl-panel'); p.setAttribute('role', 'region'); p.setAttribute('aria-label', 'Test checklist'); p.hidden = true; document.body.appendChild(p);
+      p.act = function (t) {
+        if (t.id === 'gxl-cclose') { setCk(false); p.hidden = true; return; }
+        if (t.id === 'gxl-ccopy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
+        if (t.dataset.go) { setCk(false); go(t.dataset.go); return; }
+        if (t.dataset.s) { var e2 = ckEntries()[+t.dataset.e], i = +t.dataset.i, cur = L.itemRes(e2, i).s; L.setItem(UP, e2, i, cur === t.dataset.s ? null : t.dataset.s, ''); fillCard(); bar(); if (el.menu && !el.menu.hidden) fillMenu(); } };
+      p.addEventListener('input', function (e) { var t = e.target; if (t.dataset && t.dataset.note) { var e3 = ckEntries()[+t.dataset.e], i = +t.dataset.i; L.setItem(UP, e3, i, 'bad', t.value); } }); }
+    fillCard(); p.hidden = false;
+  }
+  function fillCard() {
+    var p = el.card, c = ckCount(), h = '<div class="gxl-h"><h2>📍 ' + esc(name) + ' · ' + c.done + '/' + c.tot + ' checked</h2><button type="button" id="gxl-ccopy">Copy</button><button type="button" id="gxl-cclose" aria-label="Fold checklist">▾</button></div><div class="gxl-body">';
+    ckEntries().forEach(function (e, ei) { h += '<div class="gxl-ed">' + esc(e.date) + ' · <b>' + esc(e.title) + '</b></div>';
+      (e.items || []).forEach(function (t, i) { var v = L.itemRes(e, i), sid = e.scn && e.scn[i], d = list().filter(function (x) { return x.id === sid; })[0], ask = (d && d.ask) || (e.ask && e.ask[i]) || '';
+        h += '<div class="gxl-item" data-e="' + ei + '" data-i="' + i + '"><span class="gxl-p">' + esc(t) + '</span>' +
+          (sid ? '<div class="gxl-top"><button type="button" class="gxl-go' + (sid === scn ? ' here' : '') + '" data-go="' + esc(sid) + '">📍 GO</button>' + (ask ? '<span class="gxl-ask">' + esc(ask) + '</span>' : '') + '</div>' : '') +
+          '<div class="gxl-rate">' + [['ok', '✅ Works'], ['bad', '❌ Problem'], ['skip', '⏭ Skip']].map(function (a) { return '<button type="button" data-s="' + a[0] + '" data-e="' + ei + '" data-i="' + i + '" aria-pressed="' + (v.s === a[0]) + '">' + a[1] + '</button>'; }).join('') + '</div>' +
+          (v.s === 'bad' ? '<input class="gxl-note" type="text" maxlength="200" placeholder="What went wrong? (optional)" aria-label="Note" data-note="1" data-e="' + ei + '" data-i="' + i + '" value="' + esc(v.n || '') + '">' : '') + '</div>'; }); });
+    if (!ckEntries().length) h += '<div class="gxl-g">Nothing to test for this game yet.</div>';
+    var bd = p.querySelector('.gxl-body'), st = bd ? bd.scrollTop : 0; p.innerHTML = h + '</div>'; p.querySelector('.gxl-body').scrollTop = st;
+  }
+
+  /* ---- wiring ---- */
+  function init() {
+    css(); bar();
+    /* one window-capture handler on pointerup (a game's blocking handlers, e.g. the tutorial's, never see it) and on click (mouse / keyboard / when no pointerup came) */
+    var last = 0;
+    function hit(e) {
+      var b = e.target && e.target.closest && e.target.closest('#gxlab-bar button, .gxl-panel button'); if (!b) return;
+      e.stopPropagation(); if (e.type === 'click') e.preventDefault();
+      if (e.type === 'click' && Date.now() - last < 600) return;   // pointerup already did it
+      if (e.type === 'pointerup') last = Date.now();
+      var p = b.closest('.gxl-panel'); if (p) { if (p.act) p.act(b); return; }
+      if (b.id === 'gxlab-btn') { if (el.menu && !el.menu.hidden) el.menu.hidden = true; else { if (el.card) el.card.hidden = true; menu(); } return; }
+      if (b.id === 'gxlab-ck') { if (el.card && !el.card.hidden) { setCk(false); el.card.hidden = true; } else { if (el.menu) el.menu.hidden = true; setCk(true); card(); } return; }
+      if (b.id === 'gxlab-next') { var r = run(); if (!r) return; if (r.i + 1 < r.ids.length) { r.i++; saveRun(r); go(r.ids[r.i]); } else { saveRun(null); location.href = location.pathname + '?test=1#lab'; } return; }
+      if (b.dataset.s && scn) { var cur = L.scnRes(slug, scn).s; L.setScn(UP, slug, scn, cur === b.dataset.s ? null : b.dataset.s); bar(); if (el.menu && !el.menu.hidden) fillMenu(); if (el.card && !el.card.hidden) fillCard(); }
+    }
+    W.addEventListener('pointerup', hit, true); W.addEventListener('click', hit, true);
+    if (location.hash === '#lab') menu();
+    else if (ckOpen() && !inShelf && UP.length) card();
+  }
+  var ready = function () { init(); };
+  fetch('../updates.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }).then(function (u) {
+    UP = Array.isArray(u) ? u : []; if (W.GXS && W.GXS.defs) { /* scenarios are registered before this runs */ }
+    var go2 = function () { try { name = (document.title || slug).replace(/\s*[|–-].*$/, '').trim() || slug; } catch (e) { } ready(); };
+    if (document.body) go2(); else addEventListener('DOMContentLoaded', go2);
+  });
+  L.ui = { list: list, bar: bar, menu: menu, card: card };
+})(window);
 
 </script>
 </body>

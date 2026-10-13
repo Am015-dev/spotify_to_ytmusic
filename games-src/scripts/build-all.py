@@ -6,6 +6,7 @@
   python3 games-src/scripts/build-all.py --out /tmp/stage sunglaze
   python3 games-src/scripts/build-all.py --deploy sunglaze  # also copy PASSING games into games/<slug>/index.html
   python3 games-src/scripts/build-all.py --deploy --suffix -next sunglaze   # preview: games/<slug>-next/
+Every run first executes guard.py (stops on a failure) and modmap.py (refreshes the MODULES.md code maps).
 Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
@@ -54,7 +55,18 @@ SWEEPS = {
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
 }
+PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)
+
+def inject_lab(html_path):
+    """Inline the LAB (shell/gx-lab-core.js + gx-lab.js + gx-lab.css) at the end of the staged page. Inert unless test mode is on (?test=1 or localStorage gx_test=1)."""
+    sh = SRC / "shell"
+    t = pathlib.Path(html_path).read_text(encoding="utf-8")
+    if "gxlab-" in t and "GXLAB_CSS" in t: return
+    blk = "<script>window.GXLAB_CSS=" + json.dumps((sh / "gx-lab.css").read_text(encoding="utf-8")).replace("</", "<\\/") + ";</script>\n<script>\n" + (sh / "gx-lab-core.js").read_text(encoding="utf-8") + "\n</script>\n<script>\n" + (sh / "gx-lab.js").read_text(encoding="utf-8") + "\n</script>\n"
+    i = t.rfind("</body>")
+    t = t[:i] + blk + t[i:] if i >= 0 else t + blk
+    pathlib.Path(html_path).write_text(t, encoding="utf-8")
 
 def timed(slug, name, fn):
     t = time.time(); r = fn(); dt = time.time() - t
@@ -98,6 +110,12 @@ def main():
     slugs = a.slugs or list(GAMES)
     bad = [s for s in slugs if s not in GAMES]
     if bad: sys.exit("unknown slug(s): %s\nknown: %s" % (" ".join(bad), " ".join(GAMES)))
+    # cost guard (fails the build) and fresh code maps (games-src/<dir>/MODULES.md: read these, not the built files)
+    g = subprocess.run([sys.executable, str(SCRIPTS / "guard.py")], capture_output=True, text=True)
+    print(g.stdout.rstrip())
+    if g.returncode: sys.exit("build stopped by guard.py (see the Fix: hints above)")
+    m = subprocess.run([sys.executable, str(SCRIPTS / "modmap.py")], capture_output=True, text=True)
+    print(m.stdout.strip() or ("modmap failed: " + m.stderr.strip()[-200:]), flush=True)
     out = pathlib.Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     status, why = {}, {}
@@ -114,6 +132,7 @@ def main():
         else:
             (out / s).mkdir(parents=True, exist_ok=True)
             shutil.copyfile(built, out / s / "index.html")
+            inject_lab(out / s / "index.html")
             status[s], why[s] = "BUILT", ""
         print(f"[build] {s:18} {status[s]} {why[s]}", flush=True)
 
@@ -130,7 +149,7 @@ def main():
         env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
     if ok and not a.no_check:  # 3. phone-check against the staging folder
         chk = out / ".check"
-        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk))
+        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
         r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
         rows = {}
         md = chk / "phone-check-results.md"
@@ -155,6 +174,16 @@ def main():
                     if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
                     elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
+        if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+            passing = [s for s in ok if status[s] == "PASS"]
+            if passing:
+                code, tail = timed("all" if len(passing) > 1 else passing[0], "lab-test", lambda: run_check(["node", str(SCRIPTS / "lab-test.js")] + passing, str(SCRIPTS), env3, out / ".check" / "lab-test.log", 1800))
+                txt = (out / ".check" / "lab-test.log").read_text()
+                for s in passing:
+                    m = re.search(r"^LAB %s (\S+) (.*)$" % re.escape(s), txt, re.M)
+                    if not m: status[s], why[s] = "FAIL", "lab-test did not report"
+                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "lab-test: " + m.group(2)[:140]
+                    else: print(f"[lab] {s:18} ok {m.group(2)[:40]}")
         # 3c. the game's own sweeps: QUICK=1 (4 games) for --quick and --deploy; the full default only with --deploy --full.
         # Owner, 13 Oct 2026: fast tests + checklist scenarios, no hour-long sweeps per deploy (Overdrive-style).
         if (a.quick or a.deploy) and not (a.deploy and a.no_sweep):
@@ -192,6 +221,11 @@ def main():
                 shutil.copyfile(out / s / "index.html", dest / "index.html")
                 deployed.append(s)
 
+    if deployed and srv and not a.suffix:  # the LAB owner page: every deployed game's scenario list -> games/scenarios.json, then games/lab.html
+        try:
+            r = subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + deployed, env=env, capture_output=True, text=True, timeout=300); print(r.stdout.strip())
+            subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+        except Exception as e: print("lab-index skipped:", e)
     if srv: srv.kill()
     if TIMES:
         tj = out / ".check" / "timings.json"; tj.parent.mkdir(parents=True, exist_ok=True)

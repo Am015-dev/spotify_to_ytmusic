@@ -23,9 +23,13 @@
   }
  },
  "doorkick-dungeon": {
-  "severe": 0,
+  "severe": 3,
   "warn": 5,
-  "severeKeys": [],
+  "severeKeys": [
+   "plates|button.btn.primary",
+   "plates|button.btn",
+   "plates|div#side"
+  ],
   "counts": {
    "images": 5,
    "art": 0
@@ -87,17 +91,12 @@
   }
  },
  "tidewake": {
-  "severe": 2,
-  "warn": 7,
-  "severeKeys": [
-   "size|button#bulbbtn > span",
-   "size|button.gx-ibtn > span"
-  ],
+  "severe": 0,
+  "warn": 5,
+  "severeKeys": [],
   "counts": {
-   "size": 2,
-   "contrast": 2,
+   "contrast": 1,
    "images": 3,
-   "button": 1,
    "boards": 1,
    "art": 0
   }
@@ -113,16 +112,15 @@
   }
  },
  "thornbound": {
-  "severe": 3,
-  "warn": 8,
+  "severe": 2,
+  "warn": 7,
   "severeKeys": [
    "size|g.tb-m-round > g > text",
-   "size|g.tb-m-static > g > text",
    "size|g.tbx-pan > g > text"
   ],
   "counts": {
-   "size": 5,
-   "images": 5,
+   "size": 4,
+   "images": 4,
    "button": 1,
    "art": 0
   }

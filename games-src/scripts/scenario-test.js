@@ -74,7 +74,7 @@ async function runOne(browser, base, slug, sc, sz) {
 (async () => {
   if (!slugs.length) { console.error('usage: scenario-test.js <slug...> [--only id] [--sizes phone|pc|all]'); process.exit(2); }
   let own = null, base = process.env.GX_URL;
-  if (!base) { own = await gx.startServer({}); base = own.base; }
+  if (!base) { own = await gx.startServer({ stage: process.env.GX_STAGE }); base = own.base; }
   base = base.replace(/\/+$/, '');
   const browser = await chromium.launch({ args: ['--no-sandbox', '--force-color-profile=srgb'] });
   const all = {}; let badGames = 0;

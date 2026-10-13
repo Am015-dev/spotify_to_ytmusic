@@ -49,4 +49,27 @@
       { kind: 'tap', sel: '#djd .gx-x', name: 'tap closes the drawer', state: function () { return GX.open === 'djd'; }, expect: function (a, b) { return (a && !b) || 'drawer did not close'; } }
     ]
   });
+
+  GXS.add({
+    id: 'sq-chips', name: 'Bid chips and score chips', ask: 'Are the bid numbers big enough?', seed: 7, when: booted, group: 'Board',
+    setup: function () { return table(7); },
+    checks: [
+      { kind: 'text', sel: '#acts .sp-b.glow', re: /\d/, name: 'bid chip number', minPx: 13 },
+      { kind: 'fn', name: 'every bid chip number >= 13 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#acts .sp-b'), function (e) { if (bad || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < 13) bad = 'bid chip font ' + px + ' px'; }); return !bad || bad; } },
+      { kind: 'visible', sel: '.sch[data-seat="0"] .ss', name: 'your score chip' },
+      { kind: 'eq', name: 'your score', a: function () { return GXS.num('.sch[data-seat="0"] .ss'); }, b: function () { return shownTotal(G.pl[0]); } },
+      skin
+    ]
+  });
+
+  GXS.add({
+    id: 'sq-help', name: 'Rules cards', ask: 'Can you read the rules card?', seed: 8, when: booted, group: 'UI',
+    setup: function () { return table(8).then(function () { GXH.rules(); return GXS.wait(function () { return $('.gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
 })();
