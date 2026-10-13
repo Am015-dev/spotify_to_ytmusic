@@ -35,3 +35,17 @@ Open items at the time of handoff (see the latest qa_home_fra.log / shots):
 5. **tPlay in both cities not run** (gate: no worse than live). The boost gating only removes boost for non-sports rides; the default Hot Rod keeps it.
 6. Parked-car shot (`*_5_home_cars.jpg`) needs a look: the camera is set for the shot only.
 Then: OD_CHANGELOG entry (v90k: NEW Home save point + stored cars; CHANGED boost only on sports rides, Nitro Kit at Home), grid, reviewer, build-10, coordinator READY.
+
+## Final Frankfurt run (home-1, last) · grid `qa_home/GRID_home_fra.jpg`
+tHome fra: 25/27 PASS, 0 console errors. PASS: Hot Rod BOOST, pause 🏠 HOME, fast travel, drive in = save + "SAVED · HOME" toast, mho_home@1 stored,
+garage from the Home card, Post Van picked → no nitro, NITRO KIT offered (1,500 studs), van: Shift doesn't boost, Hot Rod parked after the swap (list),
+kit stored, reload → van + kit + Home position (3.4 m) + stored cars restored.
+The 2 FAILs are test order: the kit was already installed when the second tap came, and the BOOST tap ran with the garage card open (busy blocks boost).
+**What I SAW in the grid. A fresh worker must fix these before the reviewer can pass:**
+1. Shots 5 and 9 ("stored cars") show the garage card or garage UI, not the parked cars. The parked cars are NOT visually verified (sizes in the log look plausible:
+   van 3.7×2.7×4.2 m, fire truck 3.9×5.2×7.4, Z06 1.7×1.4×4.4). Close the card first (or step 60 m away) and shoot the façade.
+2. Shots 8 and 11 were taken with the garage still open: `closeGar` didn't close it (tap `#gbSave` "SAVE & DRIVE"). The van HUD without BOOST is only proven by the
+   class check (`body.hmNoB`), not by a shot.
+3. The SAVED toast (shot 4) sits over the garage card title: move it above the card or hide it when the card opens.
+4. Shot 12: after the reload, the Frankfurt intro "STORY · Hot Drop" objective shows again (seeded fresh:0, step 0): existing story state, not the Home save.
+5. Not run: Athens (`CITIES=ath`), tPlay in both cities, tyre-gap measure on the parked cars, OD_CHANGELOG entry.
