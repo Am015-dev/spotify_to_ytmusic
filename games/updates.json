@@ -16,6 +16,27 @@
  },
  {
   "date": "2026-10-13",
+  "game": "doorkick-dungeon",
+  "title": "Short status line",
+  "items": [
+   "Hand and level icons, speech-bubble tail, 3D winner hero",
+   "Lightbulb, first-time tips, rules cards, Tips switch",
+   "Drag/tap status line is 8 words or fewer"
+  ],
+  "check": "Is the line short and does it match?",
+  "scn": [
+   "dk-art",
+   "dk-tips",
+   "dk-status-line"
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Painted art wired",
   "items": [

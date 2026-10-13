@@ -2,7 +2,7 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 649 paintings, 52 3D models. Still to wire: 66 paintings, 7 models.
+Wired: 652 paintings, 56 3D models. Still to wire: 63 paintings, 3 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
@@ -12,10 +12,9 @@ Wired: 649 paintings, 52 3D models. Still to wire: 66 paintings, 7 models.
 | tidewake | 5 | 0 |
 | cauldron-fair | 4 | 0 |
 | lantern-dive | 3 | 0 |
-| doorkick-dungeon | 3 | 4 |
+| kaiten-kitchen | 2 | 0 |
 | short-fuse | 2 | 0 |
 | final-approach | 2 | 0 |
-| kaiten-kitchen | 2 | 0 |
 | nebula-aces | 1 | 0 |
 
 ## sands-of-qamar
@@ -116,15 +115,14 @@ Wired: 649 paintings, 52 3D models. Still to wire: 66 paintings, 7 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
 
-## doorkick-dungeon
+## kaiten-kitchen
 
-3D: hero-grub, hero-morwen, hero-pip, hero-tansy
+3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 3 Wave 3 | `icon-hand` | a small hand-painted icon of a fan of three blank playing cards, bold, readable at 24 px, single object, centr |
-| Wave 3 Wave 3 | `icon-level` | a small hand-painted icon of a gold level gem, bold, readable at 24 px, single object, centred, plain flat whi |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged parchment with a dark iron outline, single object, centred, pl |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of washi paper with a lacquered red wood outline, single object, centr |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
 
 ## short-fuse
 
@@ -143,15 +141,6 @@ Wired: 649 paintings, 52 3D models. Still to wire: 66 paintings, 7 models.
 |---|---|---|
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
-
-## kaiten-kitchen
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of washi paper with a lacquered red wood outline, single object, centr |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
 
 ## nebula-aces
 
