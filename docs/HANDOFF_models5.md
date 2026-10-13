@@ -27,3 +27,8 @@ Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuK
 - Baseline for any tPlay fail: `git worktree add ../wt<ver> <live src commit>`, build --local there, serve on :8767, run the same tPlay.
 - One full phone tPlay (2 min/city) takes ~50-55 min here.
 - qa/ is in .git/info/exclude (test output); commit only docs/shots/<ver>/.
+
+## Status at stand-down (2026-10-13)
+- Reviewer PASS for v90i ce5cbb2b; READY sent to the coordinator: alex/od-models 50326558 out/v90i (changelog dates 13 Oct).
+- Reviewer follow-ups: (A) tPlay must exclude race-countdown frames from stuck% (v90i Athens 7.7 % = 3.5 pts countdown + 2 traffic stops);
+  (B) next REVIEW must report the measured height of the close-up purple minifig in Athens (GRID tile 23).
