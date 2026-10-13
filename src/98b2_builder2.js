@@ -427,13 +427,13 @@ Object.assign(BX_DEMOS,{
  // mountain: low start -> climb in two hairpins -> across the mesa top (kicker) -> elevated 30 m hairpin -> long descent -> home
  'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf','st','st','kj',...bxRep('st',3),'cp',...bxRep('st',6),'kj',...bxRep('st',10),'wbr','st','wbr',
   'su','st','su','st','cp',...bxRep('st',8),'wbl','st','wbl','lu','su','bo',...bxRep('st',5),'kj',...bxRep('st',6),'wbr',...bxRep('st',5),'wbr',
-  'st','st','sd','sd','cp','sd','ld','wbr','bo',...bxRep('st',7),'kj',...bxRep('st',16),'wbr'])},
+  'st','st','sd','sd','cp','sd','ld','wbr','bo','fk',1,'wbr','st','wbl','st','wbl','st','wbr',0,...bxRep('st',7),'kj',...bxRep('st',11),'mg','st','wbr'])},
  // city figure-8: boat ramp across the lake -> up onto the 14 m bridge -> down -> between the blocks (kicker) -> under the bridge -> back to the lake
- 'TWO-LEVEL CITY':{log:bxCh('city',[29,15,-1,0],['up','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
+ 'TWO-LEVEL CITY':{log:bxCh('city',[29,6,1,0],['fk',1,'dn',[28,13,-1,0],'up',0,...bxRep('st',8),'mg','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
   'bo',...bxRep('st',5),'kj',...bxRep('st',8),'kj',...bxRep('st',8),'wbr',...bxRep('st',9),'wbr',...bxRep('st',7),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
-  'bo',...bxRep('st',8),'kj',...bxRep('st',10),'wbl','wbl','dn'])},
+  'bo',...bxRep('st',8),'kj',...bxRep('st',10),'wbl','wbl'])},
  // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
- 'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf',...bxRep('st',12),'wbr','fk',1,'sd','dn','st','st','st','up','su',0,...bxRep('st',21),'mg',
+ 'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','st','wbl','st','st','st','wbl','st','wbr',0,...bxRep('st',21),'mg',
   'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',6),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',7),'wbr','su',...bxRep('st',13),'wbr'])}});
 // "drivable and fun" pass lines (coordinator 2026-10-13, after Alex: "horrible! not fun, not easy to drive, the car moves backward"):
 // 0 backward start, <=1 respawn per lap, <=2 wall hits/min, average speed >=60 % of top, a 0.6-1.5 s jump with a clean landing, lap 45-90 s, no grade >25 %
@@ -475,7 +475,21 @@ const BX_TESTS={
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
-for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon']){const T=BX_TESTS[k];T.chk=()=>{const a=T.chk0(),b=BX_fun();return{ok:a.ok&&b.ok,msg:a.msg+' | '+b.msg,fails:b.fails}}}
+// trk-1 data checks (coordinator 2026-10-13: "no laps as tests, assert the track data"): read from the built pieces, no driving
+function BX_routeLen(ch){const W=window.__bx.route(ch);let d=0;for(let i=1;i<W.length;i++)d+=Math.hypot(W[i][0]-W[i-1][0],W[i][1]-W[i-1][1],W[i][2]-W[i-1][2]);
+ const T=[...new Set(W.map(w=>w[3]+'#'+w[4]))].map(x=>x.split('#')[0]);return{d,kick:T.filter(t=>t==='kj'||t==='kk').length,boost:T.filter(t=>t==='bo').length}}
+function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,NS=new Set(L.flatMap(p=>BX_ents(p).map(key)));
+ const gaps=L.flatMap(p=>p.ex.filter(e=>{if(NS.has(key(e)))return false;const o=BX_fr(e).o;return BX_h(o.x,o.z)>-.7}).map(()=>p.type));
+ const noRail=L.filter(p=>!(p.def.in||p.def.p.length>1)&&!BX_RAIL.length).length,width=2*BXRW+1,G=BX_grade(),fk=L.some(p=>p.type==='fk')&&L.some(p=>p.type==='mg');
+ const R=[BX_routeLen([0]),BX_routeLen([1])],short=fk?Math.abs(R[0].d-R[1].d):0,lo=Math.min(R[0].d,R[1].d),hi=Math.max(R[0].d,R[1].d);
+ const C=[['rails on every piece',noRail===0,`${noRail} pieces without rails`],['width >=14 m',width>=14,`width ${width} m`],['0 gaps',gaps.length===0,`open ends ${gaps.length}${gaps.length?' ('+gaps.join(',')+')':''}`],
+  ['>=3 jumps',Math.min(R[0].kick,R[1].kick)>=3,`jumps ${R[0].kick}/${R[1].kick}`],['>=2 boosts',Math.min(R[0].boost,R[1].boost)>=2,`boosts ${R[0].boost}/${R[1].boost}`],
+  ['shortcut',fk&&short>=50,`shortcut ${fk?'saves '+short.toFixed(0)+' m':'none'}`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} %`],
+  ['lap 1.5-2.7 km',lo>=1500&&hi<=2700,`lap ${(lo/1000).toFixed(2)}-${(hi/1000).toFixed(2)} km`]];
+ return{ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')}}
+// the bxT check: track data + the 3 s input check (GO -> GAS 3 s -> >=15 m forward, never backward)
+for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon']){const T=BX_TESTS[k];T.chk=()=>{const m=BX.m,D=BX_data(),i=[['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 backward',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`]];
+ const ok=D.ok&&i.every(x=>x[1]);return{ok,fails:[...D.fails,...i.filter(x=>!x[1]).map(x=>x[0])],msg:D.msg+' | '+i.map(x=>(x[1]?'✔ ':'✘ ')+x[2]).join(', ')}}}
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
  BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();return T.n}
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
@@ -486,6 +500,6 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  st:()=>{const V=BX.v;return{mode:BX.mode,cur:BX.cur,n:BX.pcs.filter(p=>!p.dead).length,log:BX.log.length,v:V&&{p:V.p.toArray().map(x=>+x.toFixed(2)),F:V.F.toArray().map(x=>+x.toFixed(3)),sp:+V.v.length().toFixed(2),g:V.g,boat:V.boat,air:+V.air.toFixed(2),Uy:+V.U.y.toFixed(2),on:V.on&&V.on.type,dC:V.dCourse},m:BX.m&&{...BX.m,pcs:BX.m.pcs.size}}},
  // the course as waypoints (for the test driver): follow exits from START, choosing branch ch[k] at the k-th SPLIT
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
-  while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type]);
+  while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
    const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
  h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:2,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
