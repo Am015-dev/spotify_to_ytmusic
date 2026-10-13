@@ -29,6 +29,8 @@ const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck
   const ch=R.ch||R.sp;if(!!ch!==!!Q.ch){if(ch)Q.ev.push({f:Q.f,start:(ch.m&&ch.m.ev&&(ch.m.ev.name||ch.m.ev.id))||ch.kind||'event'});else{const r=document.querySelector('#chRes');Q.ev.push({f:Q.f,end:r&&!r.hidden?r.textContent.trim().slice(0,60):'(no result)'})}Q.ch=ch}
   Q.hist.push(v);if(Q.hist.length>8)Q.hist.shift();Q.yh.push(R.y-M.gnd(R.x,R.z,R.y+.3));if(Q.yh.length>12)Q.yh.shift();Q.bh.push(!!R.boosting);if(Q.bh.length>10)Q.bh.shift();if(Q.f%6===0)Q.y0=R.y;
   const sm=M.HUB.smashed||0;if(sm0==null)sm0=sm;if(sm>sm0){Q.smash+=sm-sm0;Q.smashF=Q.f}sm0=sm;
+  // upside-down check (v90j Athens start): the camera's up vector must point up on EVERY roam frame, busy or not
+  try{const C=__dbg.camera;C.updateMatrixWorld();const e=C.matrixWorld.elements;if(!(e[5]>0)){Q.upBad=(Q.upBad||0)+1;if(!Q.upEx){const m=window.__dbg&&__dbg.scene;Q.upEx={f:Q.f,upY:+e[5].toFixed(2),x:Math.round(R.x),z:Math.round(R.z),v:Math.round(v*3.6)}}}}catch(e){Q.upErr=String(e)}
   if(busy)return;Q.drive++;Q.vSum+=v;
   if(Q.f%30===0){let n=0;for(const c of M.HUB.cars||[]){if(!c.dead&&Math.hypot(c.x-R.x,c.z-R.z)<120)n++}Q.traf+=n;Q.trafN++;Q.pos.push([Math.round(R.x),Math.round(R.z)])}
   // hit: lost >25 % of speed within 6 frames from > 6 m/s without braking
@@ -49,7 +51,7 @@ const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);c
  return{min:+mins.toFixed(2),hits:Q.hits.length,kinds,wallHits:w.length,wallPerMin:+(w.length/Math.max(.01,mins)).toFixed(2),hitsPerMin:+(Q.hits.length/Math.max(.01,mins)).toFixed(2),
   bigDrop:Q.hits.filter(h=>h.drop>.5).length,stuckPct:+(100*st/Math.max(1,Q.drive)).toFixed(1),avgKmh:+(Q.vSum/Math.max(1,Q.drive)*3.6).toFixed(1),
   loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),camInside:Q.camS,smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
-  traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,stuckEp:(Q.stL||[]).concat(Q.stEp>120&&Q.stCur?[{...Q.stCur,len:Q.stEp,open:1}]:[]),worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
+  traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,stuckEp:(Q.stL||[]).concat(Q.stEp>120&&Q.stCur?[{...Q.stCur,len:Q.stEp,open:1}]:[]),worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null,upBad:Q.upBad||0,upEx:Q.upEx||null,upErr:Q.upErr||null}};
 // memory (EFF #5/PERF-2): heap = V8 JS heap after a full GC (CDP JSHeapUsedSize), totMB = performance.memory (heap + typed-array backing stores) + renderer.info.memory + bytes of live GPU geometry buffers (CPU copies still held too)
 const MEMS=()=>{try{window.gc&&gc()}catch(e){}const r=__dbg.renderer,T=__dbg.THREE,seen=new Set();let gpuB=0,cpuB=0,geo=0;
  __dbg.scene.traverse(o=>{const g=o.geometry;if(!g||seen.has(g))return;seen.add(g);geo++;const at=Object.values(g.attributes);if(g.index)at.push(g.index);for(const a of at){const d=a.isInterleavedBufferAttribute?a.data:a,arr=d.array,id=arr?arr.buffer:d;if(seen.has(id))continue;seen.add(id);const by=arr?arr.byteLength:0;cpuB+=by;gpuB+=by||d.count*(a.itemSize||1)*4}});
@@ -93,7 +95,7 @@ const ROADPROBE=()=>{const M=__mho,R=M.RO,out=[];let n=0,hit=0;const seen=new Se
 // a page reload in the middle of play (e.g. a district change that falls back to a reload) restarts the in-page monitor: merge the parts
 function merge(parts,reloads){if(parts.length===1&&!reloads)return parts[0];const R={drive:0,f:0,stuck:0,vSum:0,camIn:0,smash:0,ld:0,traf:0,trafN:0};let H=[],ev=[],cs=[];for(const p of parts){for(const k in R)R[k]+=p.raw[k];H=H.concat(p.allHits);ev=ev.concat(p.missions);cs=cs.concat(p.camInside||[])}
  const mins=R.drive/3600,w=H.filter(h=>h.kind==='wall'),kinds={};for(const h of H)kinds[h.kind]=(kinds[h.kind]||0)+1;
- return{...parts[parts.length-1],min:+mins.toFixed(2),hits:H.length,kinds,wallHits:w.length,wallPerMin:+(w.length/Math.max(.01,mins)).toFixed(2),hitsPerMin:+(H.length/Math.max(.01,mins)).toFixed(2),bigDrop:H.filter(h=>h.drop>.5).length,
+ return{...parts[parts.length-1],upBad:parts.reduce((a,q)=>a+(q.upBad||0),0),upEx:(parts.find(q=>q.upEx)||{}).upEx||null,min:+mins.toFixed(2),hits:H.length,kinds,wallHits:w.length,wallPerMin:+(w.length/Math.max(.01,mins)).toFixed(2),hitsPerMin:+(H.length/Math.max(.01,mins)).toFixed(2),bigDrop:H.filter(h=>h.drop>.5).length,
   stuckPct:+(100*R.stuck/Math.max(1,R.drive)).toFixed(1),avgKmh:+(R.vSum/Math.max(1,R.drive)*3.6).toFixed(1),loads:R.ld+reloads,reloads,loadsPerMin:+((R.ld+reloads)/Math.max(.01,R.f/3600)).toFixed(2),camInsidePct:+(100*R.camIn/Math.max(1,R.drive/3)).toFixed(1),camInside:cs.slice(0,8),
   smashPerMin:+(R.smash/Math.max(.01,mins)).toFixed(1),traffic120m:+(R.traf/Math.max(1,R.trafN)).toFixed(1),missions:ev.slice(0,30),worst:H.slice().sort((a,b)=>b.drop-a.drop).slice(0,5)}}
 // ---------------------------------------------------------------------------------------------------------------------------------
@@ -252,7 +254,8 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    if(m==='phone')ok(!s.tiny.length,`${m} ${c}: no HUD text under 12 px`,s.tiny.slice(0,8));
    if(m==='phone')ok(!s.overlap.length,`${m} ${c}: no HUD element over a touch control`,s.overlap.slice(0,8));
    ok(s.road.blocked+s.roadEnd.blocked===0,`${m} ${c}: no collider on the paved road (invisible walls / oversize hulls)`,{pts:s.road.roadPts+s.roadEnd.roadPts,start:s.road.colliders,end:s.roadEnd.colliders,ex:s.road.sample.concat(s.roadEnd.sample).slice(0,3)});
-   ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});
+   {const ub=(s.upBad!=null?s.upBad:0);ok(!ub&&!s.upErr,`${m} ${c}: no upside-down frames (camera up-vector y > 0 every roam frame)`,{upBad:ub,ex:s.upEx,err:s.upErr})}
+  ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});
    if(s.mem&&s.mem.length>=6){const M=s.mem,n=M.length,h=M.slice(Math.floor(n/2)),fit=k=>{const xs=h.map(m=>m.f/3600),ys=h.map(m=>m[k]),mx=xs.reduce((a,b)=>a+b)/xs.length,my=ys.reduce((a,b)=>a+b)/ys.length;let nu=0,de=0;xs.forEach((x,i)=>{nu+=(x-mx)*(ys[i]-my);de+=(x-mx)**2});return de?nu/de:0};
     const hs=fit('heap'),gs=fit('geoMB'),pk=Math.max(...M.map(m=>m.heap)),last=M.slice(-3).reduce((a,m)=>a+m.heap,0)/3;
     // PERF-4: GPU = glMB (exact live WebGL buffer bytes) minus the streamed far cells on the GPU (str.upMB: they grow while exploring and are freed past
