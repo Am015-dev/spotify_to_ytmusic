@@ -127,7 +127,14 @@ ART3.bl=new Set();const ART_isBeam=o=>{const m=o&&o.material,g=o&&o.geometry;if(
 {const _add=THREE.Object3D.prototype.add;THREE.Object3D.prototype.add=function(...a){for(const o of a)if(ART_isBeam(o))ART3.bl.add(o);return _add.apply(this,a)}}
 scene.traverse(o=>{if(ART_isBeam(o))ART3.bl.add(o)});
 function ART_beacons(dt){
-  for(const o of ART3.bl){if(!o.parent){ART3.bl.delete(o);continue}const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox,h=b.max.y-b.min.y;if(h>1000){o.visible=false;continue}const u=o.userData;if(o.position.y!==u.artY)u.artB=o.position.y;const k=1.5/h;o.scale.y=k;const wd=b.max.x-b.min.x;if(wd>0){const kx=Math.min(1,3/wd);o.scale.x=o.scale.z=kx}o.position.y=u.artB+b.min.y*(1-k);u.artY=o.position.y}}
+  for(const o of ART3.bl){if(!o.parent){ART3.bl.delete(o);continue}const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox,h=b.max.y-b.min.y;if(h>1000){o.visible=false;continue}const u=o.userData;if(o.position.y!==u.artY)u.artB=o.position.y;const k=1.5/h;o.scale.y=k;const wd=b.max.x-b.min.x;if(wd>0){const kx=Math.min(1,3/wd);o.scale.x=o.scale.z=kx}o.position.y=u.artB+b.min.y*(1-k);u.artY=o.position.y;
+    // the squashed glow follows its marker's ground ring: rings hide beyond 160 m (96_scale_qa), the glow stayed = a lone floating green blob on the road (Alex b4)
+    o.name='beaconGlow'}ART_glowSync()}
+function ART_glowSync(){for(const o of ART3.bl){if(!o.parent)continue;const u=o.userData,rg=o.parent.children.find(c=>c!==o&&c.geometry&&c.geometry.type==='TorusGeometry');if(!rg)continue;if(!rg.visible){if(o.visible){o.visible=false;u.artH=1}}else if(u.artH){o.visible=true;u.artH=0}}}
+// roamStep is skipped on foot (98of), roamHud is not: keep the glows in step with their rings there too
+roamHud=(f=>function(){const r=f.apply(this,arguments);if(RO.on&&((ART3.gs=(ART3.gs||0)+1)%15===0))try{ART_glowSync()}catch(e){}return r})(roamHud);
+// GO v90m/green-blob: visible beacon glows whose ring is hidden (0 = pass)
+function ART_blobChk(){let lone=0,glow=0;for(const o of ART3.bl){if(!o.parent)continue;let v=true,q=o;while(q){if(!q.visible)v=false;q=q.parent}if(!v)continue;glow++;const rg=o.parent.children.find(c=>c!==o&&c.geometry&&c.geometry.type==='TorusGeometry');if(rg&&!rg.visible)lone++}return{lone,glow,ok:lone===0}}
 roamStep=(f=>function(dt){f(dt);try{ART_step(dt)}catch(e){}try{ART_beacons(dt)}catch(e){}})(roamStep);
 // HUD skin: minimap N marker, purple NPC card with yellow header + round portrait, thin boost bar bottom-centre, bold italic headings
 {const st=document.createElement('style');st.id='artHud';st.textContent=`

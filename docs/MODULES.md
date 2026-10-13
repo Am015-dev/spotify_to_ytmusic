@@ -39,7 +39,7 @@ file | KB | purpose | first defines
 94_garage_ui.js | 19 | garage builder scene + pointer picking + UI (#gbx),  | GB_hullMeshes GB_scanBase GB_gridMesh
 95_drive_flow.js | 19 | DR probe window.__dr + driving flow: fewer breakable | DR_edge __dr DR
 96_scale_qa.js | 33 | SC/SC2 real scale (SC_: 1.8 m humans, road setback), | SC_K SC_S SC_cam
-97_art.js | 35 | ART steps (ART_ ART4_ ART6_ ART7_): LEGO-2K sky/look | ART4 ART4_vis ART4_base
+97_art.js | 36 | ART steps (ART_ ART4_ ART6_ ART7_): LEGO-2K sky/look | ART4 ART4_vis ART4_base
 98_garage_driver.js | 50 | GAR1 driver minifig at real proportions (GAR_), 8 re | GAR_PRE GAR_HC GAR_tc
 98g_garage_paint.js | 3 | GP: garage PAINT tab recolours the real LEGO bricks  | GP_K GP_rank GP_pa
 98p_garage_perks.js | 4 | GPK: 2K-style vehicle groups + perks in the garage R | GPK_GRP GPK_ GPK_cls
