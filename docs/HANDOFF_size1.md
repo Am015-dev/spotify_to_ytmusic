@@ -21,3 +21,4 @@
 - Dark object in the contact shots = live traffic at shot time, not a leftover (one ride mesh after a real switch + drive).
 - Open: 604/606/620/622 have no 'stw', so no driver; big trucks get the BC mass factor (acc about 0.53–0.65).
 - 18:00: the coordinator is not deploying alex/od-size (its out/v90f predates the merge). build-7 folds the cap into v90f. size-1 stood down.
+- 18:50: Athens blocker (player 5.8×8.6 m, wall hits). Root cause: JU landing squash (90:457) with a negative dt grew to q 3.5, so the root scale was (2.59,-2.54,2.59). It was already in the v90e baseline. Fix b989e882: clamp sq/dt; CR_bodyPts updates matrices before the inverse; BC_dims drops invalid measures. 4/4 runs normal size. Sent to build-7. Stood down.
