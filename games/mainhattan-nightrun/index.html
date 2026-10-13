@@ -1395,7 +1395,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     const g=this.ship==='tri'?1/3:this.ship==='hv'?2:0;
     if(g){const cur=Math.floor(G.bp/g);this.tk=cur!==this.prevCur&&this.prevCur!==-1;this.prevCur=cur;}else this.tk=true;
     const dn=P.dashT>0;if(dn&&!this.wasDash)this.dashId++;this.wasDash=dn;
-    if(dn&&this.db){const dm=5*this.db;for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
+    if(dn&&this.db){const dm=5*this.db*(1+(typeof SYN==='object'?SYN.v.db||0:0));for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
   absorb(){if(this.sh>0){this.sh--;P.inv=1.3;shake(8);G.flash=Math.max(G.flash,.12*FX());burst(P.x,P.y,'#19e3ff',26,320,.5);floater(P.x,P.y-24,'SHIELD','#19e3ff');AU.sfx('hurt');
       return true;}return false;},
   steer(b,dt,k){k=k||this.hm;let best=null,bd=1e9;for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.x<b.x-10||e.x>W+10)continue;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd&&d<420){bd=d;best=e;}}
@@ -1842,7 +1842,7 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
     b.type='button';b.className='nd'+(boss?' boss':mini?' mini':s.ch?' chl':'')+(s.n===cur?' cur':'')+(s.n===MAPD.sel?' sel':'');
     b.dataset.n=s.n;b.dataset.id='s'+s.n;b.dataset.nd=!ok?'locked':k>0?'done':boss||mini?'boss':'open';b.style.cssText=`left:${nd.x}px;top:${nd.y}px;--c:${D.a}`;
     b.setAttribute('aria-label',`Stage ${s.n} ${s.name}${ok?'':' locked'}`);
-    const side=L.land?'':(nd.x<L.W/2?'r':'l');
+    const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'':(nd.x<L.W/2?'r':'l');
     b.innerHTML=`<i class="ring"></i><span class="no">${s.ch?'◆':s.n}</span>${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm ${side}">${s.name}</span>`;
     b.addEventListener('click',()=>mapPick(s.n));root.append(b);}
   box.append(root);
@@ -1912,7 +1912,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 #stsel .nd svg.lk{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:-1px;height:12px;width:12px;color:var(--dim)}
 #stsel .nd .nm{position:absolute;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;letter-spacing:.02em;white-space:nowrap;max-width:112px;overflow:hidden;text-overflow:ellipsis;padding:2px 7px;border-radius:6px;background:#05030cd0;color:var(--ink);text-shadow:none;pointer-events:none}
 #stsel .nd .nm.r{left:100%;margin-left:6px}#stsel .nd .nm.l{right:100%;margin-right:6px}
-#stsel .mapbox.land .nd .nm,#stsel .nd.chl .nm{top:100%;left:50%;right:auto;margin:14px 0 0;transform:translateX(-50%)}
+#stsel .mapbox.land .nd .nm,#stsel .nd .nm:not(.r):not(.l){top:100%;left:50%;right:auto;margin:14px 0 0;transform:translateX(-50%)}
 #stsel .nd[data-nd=locked] .nm{color:var(--dim)}
 #stsel .nd.shake{animation:pgsh .3s}
 #stDet{position:absolute;z-index:6;left:50%;bottom:calc(var(--u)*2);transform:translateX(-50%);width:min(94%,520px);box-sizing:border-box;display:flex;flex-direction:column;gap:5px;padding:2px 4px;
@@ -2189,6 +2189,46 @@ pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;
  const dp=drawPickups;drawPickups=function(t){dp(t);DIR.drawWarn(t);};}
 NR.on('runStart',()=>{upsCalc();});
 
+/* ---------- build paths, synergies, set bonuses, heat load and boss counters: the data tables and pure helpers (the runtime is in strategy.js) ---------- */
+const PATHS={gc:{n:'Glass Cannon',s:'Hit hard, break fast',c:'#ff5a3d',ic:'M13 2L4 14h6l-1 8 9-12h-6z'},
+  tk:{n:'Tank',s:'Outlast every shot',c:'#19e3ff',ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z'},
+  bc:{n:'Beat Combo',s:'Live on the beat',c:'#ffe14d',ic:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z'}};
+const PATHOF={fr:'gc',dm:'gc',cr:'gc',sb:'gc',pc:'gc',cl:'gc',sc:'gc',rg:'gc',rc:'gc',og:'gc',dr:'gc',hm:'gc',
+  sh:'tk',hl:'tk',mh:'tk',rv:'tk',as:'tk',wn:'tk',lk:'tk',cool:'tk',rgn:'tk',hsk:'tk',
+  wd:'bc',ck:'bc',bt:'bc',db:'bc',dc:'bc',bd:'bc',sm:'bc',bea:'bc',lp:'bc'};
+const ALIAS={dmg:'dm',rof:'fr',crt:'cr',prc:'pc',sdc:'sc',drn:'dr',shd:'sh',hul:'mh',rev:'rv',ckp:'ck',dsh:'dc',tdl:'bt',mag:'mg',pwd:'lp',nmn:'nx',nint:'ni'};
+const canon=id=>{const d=typeof TP_BY!=='undefined'&&TP_BY[id];return d&&d.uid?d.uid:ALIAS[id]||id;};
+const pathOf=id=>PATHOF[canon(id)]||null;
+const pathChip=p=>p?`<i class="pc" style="--c:${PATHS[p].c}" title="${PATHS[p].n}">${svgI(PATHS[p].ic)}</i>`:'';
+const SYNS=[{id:'oc',n:'Overclock',a:'dm',b:'fr',t:'+8% shot damage',fx:{dmg:.08}},
+  {id:'bw',n:'Bulwark',a:'sh',b:'mh',t:'Shield pop: 0.8 s extra safe',fx:{inv:.8}},
+  {id:'mt',n:'Metronome',a:'wd',b:'ck',t:'Tier lasts 2 beats more',fx:{ck:2}},
+  {id:'sl',n:'Slingshot',a:'dc',b:'db',t:'Dash Blast hits 50% harder',fx:{db:.5}},
+  {id:'gr',n:'Gold Rush',a:'sb',b:'wd',t:'Gold pulses +15% harder',fx:{sharp:.15}},
+  {id:'cc',n:'Cash Cow',a:'nx',b:'mg',t:'+15% Neon from kills',fx:{nx:.15}},
+  {id:'cs',n:'Crit Storm',a:'cr',b:'pc',t:'+5% crit chance',fx:{crit:.05}},
+  {id:'cb',n:'Cold Barrel',a:'cool',b:'fr',t:'Rapid Fire adds no heat',fx:{fr0:1}}];
+const SETS={gc:[{n:2,t:'+8% damage',fx:{dmg:.08}},{n:4,t:'+7% damage, +15% heat',fx:{dmg:.07,heat:.15}}],
+  tk:[{n:2,t:'Shield pop: 0.4 s extra safe',fx:{inv:.4}},{n:4,t:'+1 hull, -5% damage',fx:{hull:1,dmg:-.05}}],
+  bc:[{n:2,t:'On-beat window +8 ms',fx:{win:8}},{n:4,t:'Tier +3 beats, off-beat -15%',fx:{ck:3,off:.15}}]};
+const HEATL={fr:.05,dm:.04,sc:.08,rg:.05,pc:.03,cl:.03,rc:.04,og:.1,dr:.03,sb:.03};          // extra heat per shot, per level
+const NOSELL=new Set(['sh','dc','hl','mh','rv','wn','ec','as']);                              // instant or one-shot upgrades cannot be sold back
+const PIT_SLOTS=6;                                                                              // different pit-stop upgrades in one run (more in the later story stages)
+/* what an upgrade is good against (the same four words are used for the bosses below) */
+const UT={bt:'dodge',db:'dodge',dc:'dodge',sc:'spread',rg:'spread',cl:'spread',rc:'spread',bd:'spread',dr:'spread',sh:'guard',hl:'guard',mh:'guard',rv:'guard',as:'guard',wn:'guard',
+  fr:'dps',dm:'dps',cr:'dps',sb:'dps',pc:'dps',og:'dps',cool:'dps'};
+const CT={dodge:{n:'Dash',w:'lasers'},spread:{n:'Spread',w:'minions'},guard:{n:'Guard',w:'bullet walls'},dps:{n:'Damage',w:'a long fight'}};
+const BPATS=k=>[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']][k]||(typeof ATAB!=='undefined'&&ATAB[k])||[];
+/* a foe's counters, read from its pattern list: lasers -> dash, summons -> spread, rings / spirals / wide fans -> guard, always some damage */
+function foeOf(s){if(!s)return null;const g=s.goal.k;if(g!=='boss'&&g!=='mini')return null;const pats=g==='mini'?s.mini.pats:BPATS(DISTRICTS[s.di].boss),nm=g==='mini'?s.mini.nm:DISTRICTS[s.di].bossName,tags=[];
+  if(pats.includes('laser'))tags.push('dodge');if(pats.includes('summon'))tags.push('spread');if(pats.some(p=>/^(ring|spiral|fan9|fan7)$/.test(p)))tags.push('guard');tags.push('dps');
+  return{nm,tags,pats,mini:g==='mini'};}
+function nextFoeFrom(n){for(let i=Math.max(1,n);i<=MAIN;i++){const f=foeOf(STAGES[i-1]);if(f)return f;}return null;}
+const foeTip=f=>{if(!f)return '';const t=f.tags.filter(x=>x!=='dps').slice(0,2).map(x=>CT[x].n);const w=f.tags.filter(x=>x!=='dps').slice(0,2).map(x=>CT[x].w);
+  return w.length?'Fires '+w.join(' and ')+'. Bring '+t.join(' + ')+'.':'A long fight. Bring Damage.';};
+const stageTip=s=>{const f=foeOf(s);return f?foeTip(f):'';};
+
+
 /* ---------- much more to buy: permanent TUNE perks in the garage (levels, scaling prices, a recommended pick), more pit-stop upgrades, five new power-ups
    that can be bought into the drop pool, and "you can afford N upgrades" prompts. Everything hooks in from here (wrappers), the shop/garage files stay as they were. ---------- */
 const RGN=[50,44,38,33,28,24];                                   // seconds per shield for Shield Regen levels 1 to 6
@@ -2213,11 +2253,11 @@ const TP={revLeft:0,rgnT:0,boost:{},
   l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
 GA.tune={};{const o=load('mnr_tune',{});if(o&&typeof o==='object'&&!Array.isArray(o))for(const d of TP_DEF)if(isFinite(o[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(o[d.id])));}
 const tsave=()=>save('mnr_tune',GA.tune);
-/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 15 story stars (up to 8). Existing players start with their best perks equipped. */
+/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 20 story stars (up to 8). Existing players start with their best perks equipped. */
 GA.eq={};{const o=load('mnr_eq',null);if(o&&typeof o==='object'){for(const d of TP_DEF)GA.eq[d.id]=!!o[d.id];}
   else{const own=TP_DEF.filter(d=>(GA.tune[d.id]|0)>0).sort((a,b)=>b.pri-a.pri);for(const d of own.slice(0,4))GA.eq[d.id]=true;}}
 const eqsave=()=>save('mnr_eq',GA.eq);
-const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/15));
+const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/20));
 const eqCount=()=>TP_DEF.filter(d=>GA.eq[d.id]&&(GA.tune[d.id]|0)>0).length;
 GA.tab='tune';
 
@@ -2232,9 +2272,9 @@ const NEWU=[
   {id:'rv',n:'Revive Token',t:'Come back once',          p:90,max:3,c:'#ff2d95',ic:TP_BY.rev.ic}];
 for(const u of NEWU){SH.UPG.push(u);UBY[u.id]=u;}
 /* ----- effects (all through wrappers) ----- */
-const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'));   // stacking cap: damage perks together never more than x2.1
+const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'))*SYN.dmg();   // stacking cap: the damage upgrades and perks together never more than x2.1; synergies, set bonuses and the trade-off perks (strategy.js) come on top
 const DRONE_CAP=3,DOUBLE_CAP=.3,CRIT_CAP=.3;
-const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr'));
+const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr')+SYN.v.crit);
 const tpDouble=()=>Math.min(DOUBLE_CAP,.025*TP.l('rof'));
 const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
 {const rc=SH.recalc;SH.recalc=function(){rc.call(this);
@@ -2245,7 +2285,7 @@ const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
     if(id==='mh'&&P){P.max++;P.hp=Math.min(P.max,P.hp+1);}
     if(id==='rv')TP.revLeft++;};
   const vol=SH.volley;                                        // damage, crits and double shots on every volley the ship fires
-  const boost=n0=>{const dm=tpDmg(),pc=tpCrit();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=dm;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
+  const boost=n0=>{const dm=tpDmg(),pc=tpCrit();const off=SYN.off();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=b.pf?dm:dm*off;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
   SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);boost(n0);
     const dd=tpDouble();if(dd&&Math.random()<dd)G.delayed.push({t:.07,f:()=>{if(G.dead||!running||P.over)return;const m=G.pb.length;vol.call(SH,P.x+22,P.y+2,0);boost(m);}});};
   const hurt0=hurt;hurt=function(){if(PW.on('bub')){if(P.inv<=0){P.inv=.0;}if(!TP.bt||performance.now()-TP.bt>400){TP.bt=performance.now();burst(P.x,P.y,'#3dffb0',10,220,.3);AU.sfx('graze');}return;}hurt0();};
@@ -2305,8 +2345,6 @@ function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr
   for(const s of SHIPS)if(s.p&&!GA.own['ship_'+s.id]&&s.p<=GA.bank)n++;
   for(const c of CREW)if(!GA.own[c.id]&&c.p<=GA.bank)n++;
   for(const h of THEMES)if(h.p&&!GA.own['th_'+h.id]&&h.p<=GA.bank)n++;return n;}
-function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P.max?45:0,sh:()=>SH.sh===0?90:55,rv:()=>TP.revLeft===0?85:30,mh:()=>60,dm:()=>70,dc:()=>55,dr:()=>65,fr:()=>50,cr:()=>45,hm:()=>40,ck:()=>35,mg:()=>30,wd:()=>25,lp:()=>30};
-  SH.cards.forEach((c,i)=>{if(c.sold||SH.neon<SH.price(c.u))return;const s=(pri[c.u.id]?pri[c.u.id]():30)-4*SH.n(c.u.id);if(s>bs){bs=s;best=i;}});return best;}
 
 /* ----- styles ----- */
 {const st=document.createElement('style');st.textContent=`
@@ -2328,9 +2366,10 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 const gaItems0=gaItems;
 function perkIcon(d){let real=false;try{real=ART.isReal('kit-'+(d.uid||d.id));}catch(e){}return real?`<img class="ki" src="media/kit-${d.uid||d.id}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
-  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
+  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button'),p=pathOf(d.id);b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
-    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
+    const bad=d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(Math.min(d.max,l+1))}</b></div>`:'';
+    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${pathChip(p)}${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div>${l>0&&l<d.max?`<div class="pv">${d.t(l)}</div>`:''}${bad}<div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':i===l?'nx':''}"></i>`).join('')}</div></div>`
       +`<div class="pr">${pr?neonI+' '+pr:'MAX'}</div>`+(d.id===rec?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>tuneBuy(d,b));box.appendChild(b);}}
 function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
@@ -2346,27 +2385,18 @@ gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
       b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
       const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:it.kind==='ship'?shipPortrait(it):svgI(it.ic);
       const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
-      b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
+      b.innerHTML=`${ic}<div class="tx"><div class="n">${it.kind==='crew'?pathChip(pathOf(it.id.replace(/^up_|^pu_/,''))):''}${it.n}</div><div class="t">${it.t}</div>${it.kind==='ship'?rhythmHTML(it.id):''}</div><div class="pr">${pr}</div>`;
       b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}
-    if(GA.tab==='crew')box.classList.add('tune');}
+    if(GA.tab==='crew'||GA.tab==='ships')box.classList.add('tune');}
   affUpd();};
 function affUpd(){const n=affordCount();afford.all=n;const g=$('gaBtn');
   if(g){g.innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank+(n?'<small>'+n+' UPGRADE'+(n>1?'S':'')+' READY</small>':'');g.classList.toggle('rdy',n>0);}
   const g2=$('gaBtn2');if(g2){g2.innerHTML='GARAGE'+(n?'<small>'+n+' READY</small>':'');g2.classList.toggle('rdy',n>0);}}
 gaDraw();
 
-/* ----- the pit stop: levels on the cards, a recommended pick, and "you can afford N" ----- */
+/* ----- the pit stop: the "you can afford N" row (the cards, picks, slots and selling are in strategy.js) ----- */
 {const row=document.createElement('div');row.className='aff';row.id='shAff';$('shMsg').before(row);}
-SH.draw=function(){const box=$('shCards');box.innerHTML='';const rec=recPit();let aff=0;
-  this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),n=this.n(u.id),b=document.createElement('button');b.type='button';if(!c.sold&&this.neon>=pr)aff++;
-    b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
-    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}</div><div class="t">${lvText(u,n+1)}</div>${u.max>1?`<div class="pp">${Array.from({length:u.max},(_,k)=>`<i class="${k<n?'on':''}"></i>`).join('')}</div>`:''}</div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`+(i===rec&&!c.sold?'<span class="rec">RECOMMENDED</span>':'');
-    b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
-  $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
-  $('shGo').textContent=this.picks?'GO':'SKIP';
-  $('shOwn').innerHTML=this.order.length?this.order.map(id=>{const u=UBY[id];return `<span style="--c:${u.c}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</span>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>';
-  const ga=affordCount();$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(ga?` · Garage: <b>${ga}</b> ready`:'');
-  SH.aff=aff;SH.rec=rec;};
+
 NR.on('banked',()=>affUpd());NR.on('runEnd',()=>setTimeout(affUpd,0));
 affUpd();
 
@@ -2468,10 +2498,7 @@ const this_ship=()=>SH.ship;
   if(AX.arcs.length){ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';for(const a of AX.arcs){ctx.globalAlpha=clamp(a.l*4,0,1);ctx.strokeStyle='#8fe9ff';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(a.x1,a.y1);
       const n=5;for(let i=1;i<n;i++){const u=i/n;ctx.lineTo(a.x1+(a.x2-a.x1)*u+(((i*37+(a.x1|0))%11)-5),a.y1+(a.y2-a.y1)*u+(((i*53+(a.y1|0))%11)-5));}ctx.lineTo(a.x2,a.y2);ctx.stroke();}ctx.restore();}
   if(G.bt>0&&G.live){ctx.save();ctx.globalAlpha=clamp(G.bt*.5,0,.14);ctx.fillStyle='#19e3ff';ctx.fillRect(0,0,W,H);ctx.restore();}};}
-/* ----- recommended picks in the pit stop for the new upgrades ----- */
-{const rp=recPit;recPit=function(){let best=-1,bs=-1e9;const pri={sc:62,rg:38,pc:60,cl:58,bt:48,rc:36,og:64,as:66,bd:63,sm:28,ni:34,wn:80,ec:32,lk:35};
-  const base=rp.call(this);SH.cards.forEach((c,i)=>{if(c.sold||SH.neon<SH.price(c.u))return;const b=pri[c.u.id];if(b==null)return;const s=b-4*SH.n(c.u.id);if(s>bs){bs=s;best=i;}});
-  if(best<0)return base;if(base<0)return best;return bs>=60?best:base;};}
+
 
 /* ---------- fifteen more garage perks: STARTING KITS. An equipped kit gives you that pit-stop upgrade at the start of every run (up to the level you own),
    so what you equip decides your build, and slots are limited (see LOADOUT in meta.js). ---------- */
@@ -2482,6 +2509,157 @@ const this_ship=()=>SH.ship;
   for(const [id,n,max,p,t] of KITS){const u=UBY[id];if(!u)continue;const d={id:'kit_'+id,n:n+' kit',p,max:Math.min(max,u.max||max),c:u.c,pri:55,ic:u.ic,uid:id,t:l=>t+(l>1?' (level '+l+')':'')};
     TP_DEF.push(d);TP_BY[d.id]=d;if(raw&&isFinite(raw[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(raw[d.id])));GA.eq[d.id]=!!(eq&&eq[d.id]);}
   NR.on('runStart',()=>setTimeout(()=>{if(!G||!G.live)return;for(const d of TP_DEF){if(!d.uid||!TP.l(d.id))continue;const u=UBY[d.uid];for(let i=SH.n(d.uid);i<TP.l(d.id)&&i<u.max;i++)SH.add(d.uid);}},40));}
+
+/* ---------- STRATEGY: build paths, synergies, a heat budget, slot limits, stock that rotates per run, selling at a loss and boss-weakness picks ----------
+   Everything here is a layer on top of the pit stop (shop.js), the garage perks (upgrades.js) and the market (meta.js). The data tables come first.
+   PATHS     three builds: Glass Cannon (damage), Tank (survive), Beat Combo (live on the beat). Every upgrade and perk belongs to one or none.
+   SYNS      pairs of items that do more together; SETS: bonuses for owning 2 and 4 pieces of one path (the 4-piece bonus has a price).
+   HEAT      damage upgrades make every shot hotter (overheat locks the gun); Coolant and Heat Sink pay it back. One budget to balance.
+   SLOTS     a run holds at most 6 different pit-stop upgrades (7 from story stage 14, 8 from stage 28).
+   BOSSW     what a boss or mini-boss fires decides which upgrades are recommended against it (read from its real pattern list). */
+function nextFoe(){if(typeof ST!=='undefined'&&ST.on)return nextFoeFrom(ST.n+(ST.over?1:0));
+  const D=DISTRICTS[G&&G.di||0];if(!D)return null;const pats=BPATS(D.boss),tags=[];if(pats.includes('laser'))tags.push('dodge');if(pats.includes('summon'))tags.push('spread');if(pats.some(p=>/^(ring|spiral|fan9|fan7)$/.test(p)))tags.push('guard');tags.push('dps');
+  return{nm:D.bossName,tags,pats};}
+/* ----- what you own, the active synergies and set bonuses, and the numbers they add ----- */
+const SYN={v:{},act:[],sets:{},cnt:{gc:0,tk:0,bc:0},owned:new Set(),hg:0,
+  lvl(id){let l=SH.n(id);for(const d of TP_DEF)if(canon(d.id)===id)l=Math.max(l,TP.l(d.id));return l;},
+  scan(){const o=new Set();for(const id in SH.got)if(SH.got[id]>0)o.add(canon(id));for(const d of TP_DEF)if(TP.l(d.id)>0)o.add(canon(d.id));this.owned=o;return o;},
+  calc(){const o=this.scan(),v={dmg:0,crit:0,inv:0,ck:0,win:0,sharp:0,nx:0,db:0,hull:0,off:0,heat:0,fr0:0},add=fx=>{for(const k in fx)v[k]=(v[k]||0)+fx[k];};
+    this.act=SYNS.filter(s=>o.has(s.a)&&o.has(s.b));for(const s of this.act)add(s.fx);
+    for(const p in PATHS){let n=0;for(const id of o)if(PATHOF[id]===p)n++;this.cnt[p]=n;this.sets[p]=SETS[p].filter(t=>n>=t.n);for(const t of this.sets[p])add(t.fx);}
+    this.v=v;return v;},
+  heat(){let h=1+this.v.heat;for(const id in HEATL){if(id==='fr'&&this.v.fr0)continue;h+=HEATL[id]*this.lvl(id);}h-=.1*this.lvl('cool')+.1*TP.l('hsk');return Math.max(.55,Math.min(2.4,h));},
+  /* the heat line of an upgrade card: what one more level of it costs */
+  heatOf(id){return HEATL[id]?Math.round(HEATL[id]*100):0;},
+  // would buying this complete a synergy? (the chip on the card)
+  completes(id){const c=canon(id),o=this.owned;return SYNS.find(s=>!(o.has(s.a)&&o.has(s.b))&&((s.a===c&&o.has(s.b))||(s.b===c&&o.has(s.a))));},
+  /* the 4-piece bonus is a trade: say so before the pieces are bought */
+  hullDelta(){return (this.v.hull||0)-TP.l('glc');},
+  applyHull(){if(!P||!G||!G.live)return;const t=this.hullDelta(),d=t-this.hg;if(!d)return;this.hg=t;P.max=Math.max(3,P.max+d);P.hp=Math.max(1,Math.min(P.max,P.hp+(d>0?d:0)));}};
+{const rc=SH.recalc;SH.recalc=function(){rc.call(this);const v=SYN.calc(),n=id=>TP.l(id);
+    this.ck+=v.ck;NR.mod.win+=v.win+10*n('bea');this.sharp+=v.sharp;this.nx*=(1+v.nx)*(1+.1*n('grd'));
+    NR.mod.mag*=1-.15*n('grd');TP.nx0=this.nx;TP.mag0=NR.mod.mag;SYN.applyHull();};
+  const ab=SH.absorb;SH.absorb=function(){const r=ab.call(this);if(r&&SYN.v.inv)P.inv=Math.max(P.inv,1.3+SYN.v.inv);return r;};
+  const sh0=SH.shot;SH.shot=function(){const r=sh0.call(this);r.heat*=SYN.heat();return r;};}
+NR.on('runStart',()=>{SYN.hg=0;SH.stock=[];SH.seen=new Set();SH.sold=0;setTimeout(()=>{if(!G||!G.live)return;
+  const l=TP.l('ldp');if(l)SH.sh+=l;const g=TP.l('glc');if(g){P.max=Math.max(3,P.max-g);P.hp=Math.min(P.hp,P.max);SYN.hg=-g;}SH.recalc();},90);});
+
+/* ----- new garage perks. Three have a downside: that is the deal ----- */
+{const IC2={glc:'M12 2l3 7 7 .8-5.3 4.7 1.6 7.2L12 18l-6.3 3.7 1.6-7.2L2 9.8 9 9z',grd:'M12 2l8.5 5v10L12 22l-8.5-5V7z',ldp:'M5 8h14v8H5zM3 10h2v4H3zM19 10h2v4h-2z',bea:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z',hsk:'M12 2a6 6 0 016 6c0 4-6 8-6 14C12 16 6 12 6 8a6 6 0 016-6z'};
+  const NP=[{id:'hsk',n:'Heat Sink',p:80,max:5,c:'#7dffd8',pri:66,ic:IC2.hsk,t:l=>'Shots build '+10*l+'% less heat'},
+    {id:'glc',n:'Glass Core',p:90,max:3,c:'#ff5a3d',pri:64,ic:IC2.glc,t:l=>'+'+14*l+'% shot damage',bad:l=>'Max hull -'+l},
+    {id:'grd',n:'Greedy Pilot',p:60,max:4,c:'#19e3ff',pri:34,ic:IC2.grd,t:l=>'+'+10*l+'% Neon from kills',bad:l=>'Pickup range -'+15*l+'%'},
+    {id:'ldp',n:'Lead Plating',p:110,max:3,c:'#3dffb0',pri:62,ic:IC2.ldp,t:l=>'Start with +'+l+' shield'+(l>1?'s':''),bad:l=>'Shot damage -'+6*l+'%'},
+    {id:'bea',n:'Beat Addict',p:100,max:3,c:'#ffe14d',pri:61,ic:IC2.bea,t:l=>'On-beat window +'+10*l+' ms',bad:l=>'Off-beat shots -'+15*l+'%'}];
+  const raw=load('mnr_tune',{}),eq=load('mnr_eq',null);
+  for(const d of NP){TP_DEF.push(d);TP_BY[d.id]=d;if(raw&&isFinite(raw[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(raw[d.id])));GA.eq[d.id]=!!(eq&&eq[d.id]);}}
+/* the pit-stop upgrade that pays the heat back */
+{const u={id:'cool',n:'Coolant',t:'Shots build less heat',p:36,max:4,c:'#7dffd8',ic:'M12 2a6 6 0 016 6c0 4-6 8-6 14C12 16 6 12 6 8a6 6 0 016-6z'};SH.UPG.push(u);UBY.cool=u;LVT.cool=l=>'Heat per shot -'+10*l+'%';}
+// what the upgrades.js damage formula multiplies in: synergies, set bonuses, the downside perks
+SYN.dmg=()=>(1+SYN.v.dmg)*(1+.14*TP.l('glc'))*(1-.06*TP.l('ldp'));
+SYN.off=()=>Math.max(.4,1-(SYN.v.off||0)-.15*TP.l('bea'));
+
+/* ----- the pit stop: slots, rotating stock, sell, boss picks, previews ----- */
+Object.defineProperty(SH,'slots',{get(){return PIT_SLOTS+(ST.on?(ST.n>=14)+(ST.n>=28):0);}});   // 6 different upgrades, 7 from stage 14, 8 from stage 28
+SH.stock=[];SH.seen=new Set();SH.sold=0;SH.armed=null;
+SH.pool=function(){const full=this.order.length>=this.slots;return UPG.filter(u=>this.n(u.id)<u.max&&(!u.x||GA.own[u.x])&&(!u.ok||u.ok())&&(!full||this.n(u.id)>0));};
+SH.rerollPrice=function(){return 8+4*this.rerolls+3*this.pits;};
+SH.restock=function(pool){const by={gc:[],tk:[],bc:[],n:[]},sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  for(const u of pool)by[pathOf(u.id)||'n'].push(u.id);for(const k in by)sh(by[k]);
+  const out=[];for(let i=0;i<3;i++)for(const k of['gc','tk','bc'])if(by[k].length&&out.length<9)out.push(by[k].shift());
+  const rest=sh([].concat(by.gc,by.tk,by.bc,by.n));while(out.length<11&&rest.length)out.push(rest.shift());this.stock=out;this.seen=new Set();};
+SH.buildScore=function(u){const c=canon(u.id),p=pathOf(u.id);let s=0;if(p){const top=Object.keys(SYN.cnt).sort((a,b)=>SYN.cnt[b]-SYN.cnt[a])[0];if(SYN.cnt[p]>0&&p===top)s+=30;s+=8*SYN.cnt[p];if(SYN.cnt[p]===1||SYN.cnt[p]===3)s+=14;}  // one piece short of a set bonus
+  if(SYN.completes(u.id))s+=35;if(this.n(u.id)>0)s+=6;if(u.id==='hl'&&P&&P.hp<=P.max-2)s+=70;if(HEATL[c]&&SYN.heat()>1.5)s-=25;return s;};
+SH.bossScore=function(u,foe){if(!foe)return 0;const t=UT[canon(u.id)];if(!t)return 0;const i=foe.tags.indexOf(t);return i<0?0:(i===0?60:i===1?45:t==='dps'?15:30)-4*this.n(u.id);};
+SH.deal=function(){let pool=this.pool();if(!this.stock.length||!pool.some(u=>this.stock.includes(u.id)))this.restock(pool);
+  const cand=pool.filter(u=>this.stock.includes(u.id)),out=[],take=u=>{if(u&&!out.includes(u)){out.push(u);return true;}return false;},foe=nextFoe();
+  const best=(f,only)=>cand.filter(u=>!out.includes(u)&&(!only||only(u))).sort((a,b)=>f(b)-f(a)+(this.seen.has(a.id)?.5:0)-(this.seen.has(b.id)?.5:0))[0];
+  take(best(u=>this.bossScore(u,foe),u=>this.bossScore(u,foe)>0));            // one card answers the next boss
+  take(best(u=>this.buildScore(u)));                                           // one card follows your build
+  const rest=cand.filter(u=>!out.includes(u)),unseen=rest.filter(u=>!this.seen.has(u.id));const wild=(unseen.length?unseen:rest);take(wild[Math.floor(Math.random()*wild.length)]);
+  while(out.length<3){const more=pool.filter(u=>!out.includes(u));if(!more.length)break;take(more[Math.floor(Math.random()*more.length)]);}
+  for(const u of out)this.seen.add(u.id);
+  this.cards=out.map(u=>({u,sold:false,why:this.bossScore(u,foe)>0&&u===out[0]?'boss':null}));
+  // the badge on the card: boss pick (first card) or build pick
+  const bp=this.cards.find(c=>c.why==='boss');if(!bp){const b=this.cards.map((c,i)=>[this.buildScore(c.u),i]).sort((a,b)=>b[0]-a[0])[0];if(b&&b[0]>=20)this.cards[b[1]].why='build';}
+  else{const b=this.cards.filter(c=>c!==bp).map(c=>[this.buildScore(c.u),c]).sort((a,b)=>b[0]-a[0])[0];if(b&&b[0]>=20)b[1].why='build';}
+  this.foe=foe;this.armed=null;};
+SH.sellPrice=function(id){const u=UBY[id],n=this.n(id);if(!u||n<1||NOSELL.has(id))return 0;return Math.max(1,Math.floor(.5*Math.round(1.25*u.p*(1+.5*(n-1)))));};
+SH.sell=function(id){if(!this.active||this.lock>0)return false;const pr=this.sellPrice(id);if(!pr)return false;
+  if(this.armed!==id){this.armed=id;this.msg('Sell '+UBY[id].n+' for '+pr+'? Tap again');this.draw();return false;}
+  this.got[id]--;if(this.got[id]<=0){delete this.got[id];this.order=this.order.filter(x=>x!==id);}this.neon+=pr;this.sold++;this.armed=null;this.recalc();AU.sfx('hit');this.msg(UBY[id].n+' sold +'+pr);this.draw();return true;};
+SH.buy0=SH.buy;SH.buy=function(i){this.armed=null;return this.buy0(i);};
+/* ----- the pit-stop screen ----- */
+{const st=document.createElement('style');st.textContent=`
+.pg .card .pc{display:inline-flex;width:1.25em;height:1.25em;border-radius:50%;background:#05030c;border:1.5px solid var(--c);vertical-align:-.25em;margin-right:4px;flex:0 0 auto}
+.pg .card .pc svg{width:100%;height:100%;padding:2px;box-sizing:border-box;background:none!important;color:var(--c);height:100%}
+.pg .card .pv{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.8),13px);color:var(--dim);line-height:1.2}
+.pg .card .chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.7),12px)}
+.pg .card .chips b{font-weight:700;padding:0 6px;border-radius:8px;background:#05030c;border:1px solid var(--c,#8c86b8);color:var(--c,#ccc);white-space:nowrap}
+.pg .card .chips b.heat{--c:#ff9a3d}.pg .card .chips b.syn{--c:#3dffb0}.pg .card .chips b.bad{--c:#ff5a6a}
+.pg .card .rec.boss{background:#ff5a6a;color:#fff}
+.pg .card .pp i.nx{background:var(--c);animation:pnx 1s ease-in-out infinite}
+@keyframes pnx{0%,100%{opacity:.25}50%{opacity:1}}
+.pg .bld{display:flex;gap:calc(var(--u)*2);align-items:center;flex:0 0 auto;font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:var(--dim);flex-wrap:wrap}
+.pg .bld .bp{display:inline-flex;align-items:center;gap:3px;color:var(--c)}
+.pg .bld .bp svg{height:1.5em;width:1.5em}
+.pg .bld .bp i{display:inline-block;width:7px;height:7px;border-radius:2px;background:#ffffff22}.pg .bld .bp i.on{background:var(--c)}.pg .bld .bp i.set{box-shadow:0 0 5px var(--c)}
+.pg .bld .hs{margin-left:auto;white-space:nowrap}.pg .bld .hs.hot{color:#ff9a3d}
+.pg .foe{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:#7dffd8;flex:0 0 auto;text-align:center;min-height:1.2em}
+.pg .own button.oi{display:inline-flex;align-items:center;gap:2px;min-height:34px;min-width:34px;padding:0 6px;border:1px solid transparent;border-radius:8px;background:#ffffff0a;color:var(--c);font-family:var(--mono);cursor:pointer}
+.pg .own button.oi.arm{border-color:#ff5a6a;background:#ff5a6a33;animation:pnx .5s infinite}
+.pg .own button.oi.ns{cursor:default;opacity:.85}
+.pg .own .sl{margin-left:auto;color:var(--dim);white-space:nowrap}
+`;document.head.appendChild(st);}
+{const bl=document.createElement('div');bl.className='bld';bl.id='shBld';const fo=document.createElement('div');fo.className='foe';fo.id='shFoe';$('shOwn').before(bl,fo);
+  $('shOwn').addEventListener('click',e=>{const b=e.target.closest('button.oi');if(b&&!b.classList.contains('ns'))SH.sell(b.dataset.id);});}
+const heatTxt=()=>{const h=Math.round((SYN.heat()-1)*100);return 'HEAT '+(h>=0?'+':'')+h+'%';};
+function buildBar(){let h='';for(const p in PATHS){const P_=PATHS[p],n=SYN.cnt[p],tier=n>=4?2:n>=2?1:0;h+=`<span class="bp" style="--c:${P_.c}" title="${P_.n}">${svgI(P_.ic)}${[0,1,2,3].map(i=>`<i class="${i<n?'on':''}${(i===1&&n>=2)||(i===3&&n>=4)?' set':''}"></i>`).join('')}</span>`;}
+  const hot=SYN.heat()>1.45;return h+`<span class="hs${hot?' hot':''}">${heatTxt()}</span>`;}
+SH.draw=function(){const box=$('shCards');box.innerHTML='';SYN.calc();let aff=0;const full=this.order.length>=this.slots;
+  this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),n=this.n(u.id),b=document.createElement('button'),p=pathOf(u.id),sy=SYN.completes(u.id),hl=SYN.heatOf(canon(u.id)),nw=n?lvText(u,n):'';b.type='button';if(!c.sold&&this.neon>=pr)aff++;
+    b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
+    const chips=(sy?`<b class="syn" title="${sy.t}">+ ${sy.n}</b>`:'')+(hl?`<b class="heat">HEAT +${hl}%</b>`:'')+(u.id==='cool'?'<b class="heat">COOLS</b>':'');
+    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${pathChip(p)}${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}</div><div class="t">${lvText(u,n+1)}</div>${nw?`<div class="pv">${nw}</div>`:''}${chips?`<div class="chips">${chips}</div>`:''}${u.max>1?`<div class="pp">${Array.from({length:u.max},(_,k)=>`<i class="${k<n?'on':k===n?'nx':''}"></i>`).join('')}</div>`:''}</div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`
+      +(c.why&&!c.sold?`<span class="rec${c.why==='boss'?' boss':''}">${c.why==='boss'?'BOSS PICK':'BUILD PICK'}</span>`:'');
+    b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
+  $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
+  $('shGo').textContent=this.picks?'GO':'SKIP';
+  $('shBld').innerHTML=buildBar();$('shFoe').textContent=this.foe?this.foe.nm+': '+foeTip(this.foe):'';
+  $('shOwn').innerHTML=(this.order.length?this.order.map(id=>{const u=UBY[id],sp=this.sellPrice(id);return `<button type="button" class="oi${NOSELL.has(id)?' ns':''}${this.armed===id?' arm':''}" data-id="${id}" style="--c:${u.c}" aria-label="${u.n}${sp?', sell for '+sp:''}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</button>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>')+`<span class="sl">SLOTS ${this.order.length}/${this.slots}${full?' · FULL':''}</span>`;
+  const ga=typeof affordCount==='function'?affordCount():0;$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(this.order.some(id=>!NOSELL.has(id))?' · tap owned to sell':'')+(ga?` · Garage: <b>${ga}</b> ready`:'');
+  SH.aff=aff;SH.rec=this.cards.findIndex(c=>c.why);};
+
+/* ----- ship preview: one bar of the ship's fire pattern with a moving playhead, and what it does to damage and heat ----- */
+const SHIPACC={drift:{every:1,off:0,n:'FAN'},lancer:{every:2,off:1,n:'LANCE'},nova:{every:3,off:2,n:'RING'}};   // what the extra ships add on top of the steady 16th grid (shapes.js)
+function shipRhythm(id){const x=typeof SHIPX==='object'?SHIPX[id]:null,ac=SHIPACC[id],gs=x?x.gs:id==='tri'?1/3:id==='hv'?2:id==='ec'?.5:.25,mk=x?x.mk:()=>true,out=[];
+  for(let c=0;c*gs<4-1e-6;c++)if(mk(c)){const a=ac&&c%ac.every===ac.off;out.push({t:c*gs/4,cls:id==='hv'||a?'big':'',echo:id==='ec'});}return out;}
+function rhythmHTML(id){const shots=shipRhythm(id),x=typeof SHIPX==='object'?SHIPX[id]:null,ac=SHIPACC[id],nb=ac?shots.filter(s=>s.cls).length:0;
+  return `<div class="rh" aria-hidden="true">${shots.map(s=>`<i${s.cls?' class="big"':''} style="left:${(s.t*100).toFixed(1)}%"></i>${s.echo&&s.t+.25<1?`<i class="ech" style="left:${((s.t+.25)*100).toFixed(1)}%"></i>`:''}`).join('')}<u></u></div>`
+   +`<div class="chips">${id==='ec'?`<b>${shots.length} SHOTS + ${shots.length} ECHOES</b>`:ac?`<b>${nb} ${ac.n}${nb>1?'S':''} A BAR</b>`:`<b>${shots.length} ${id==='hv'?'BLASTS':'SHOTS'} A BAR</b>`}${x?`<b class="heat">HEAT x${x.hk}</b>`:''}</div>`;}
+{const st=document.createElement('style');st.textContent=`
+.pg .card .rh{position:relative;height:12px;margin-top:3px;background:#ffffff10;border-radius:3px;overflow:hidden}
+.pg .card .rh i{position:absolute;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2px;border-radius:50%;background:var(--c,#ccc)}
+.pg .card .rh i.big{width:10px;height:10px;margin:-5px 0 0 -4px}
+.pg .card .rh i.ech{opacity:.35}
+.pg .card .rh u{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 6px #fff;animation:rhp 2s linear infinite}
+@keyframes rhp{from{left:0}to{left:100%}}
+.pg .presets{display:flex;gap:calc(var(--u)*1.6)}.pg .presets .pst{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:.3em .2em;font-size:clamp(9px,calc(var(--u)*2.8),13px);white-space:nowrap}
+.pg .presets .pst svg{height:1.3em;width:1.3em;color:var(--c)}
+.pg .paths{display:flex;flex-direction:column;gap:3px;text-align:left}
+.pg .pth{display:grid;grid-template-columns:minmax(0,9.5em) auto 1fr;gap:8px;align-items:center;color:var(--c);font-size:clamp(10px,calc(var(--u)*2.9),13px)}
+.pg .pth .pn{display:flex;align-items:center;gap:4px;white-space:nowrap}.pg .pth svg{height:1.4em;width:1.4em}
+.pg .pth .pb i{display:inline-block;width:8px;height:8px;margin-right:2px;border-radius:2px;background:#ffffff22}.pg .pth .pb i.on{background:var(--c)}
+.pg .pth .pt{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg .syns{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.pg .syns b,.pg .cargo button.oi{font-weight:700;padding:2px 8px;border-radius:9px;background:#05030c;border:1px solid #3dffb0;color:#3dffb0;font-size:clamp(10px,calc(var(--u)*2.8),12px);display:inline-flex;align-items:center;gap:3px}
+.pg .syns b svg{height:1.2em;width:1.2em}.pg .syns b:not(.on){border-style:dashed;opacity:.6}.pg .syns b.heat{border-color:#ff9a3d;color:#ff9a3d}
+.pg .cargo button.oi{border-color:var(--c);color:var(--c);min-height:32px;margin:2px 3px;cursor:pointer}.pg .cargo button.oi svg{height:1.3em;width:1.3em}
+.pg .mkbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.pg .mkbar .go{flex:0 0 auto;min-height:40px}
+.pg .mkbar .foe2{color:#7dffd8;font-size:clamp(10px,calc(var(--u)*2.8),12px);flex:1 1 12em;text-align:left}
+.pg .card s{color:var(--dim);margin-right:3px}
+.pg .card .pv::before{content:"NOW ";letter-spacing:.08em;color:#ffffff55}
+`;document.head.appendChild(st);}
 
 /* ---------- ATHINA must be Athens in every orientation ----------
    Landscape: moon and glint on the water, olive groves on the shore, on top of the lit Acropolis, Plaka and Lycabettus that were already there.
@@ -2799,30 +2977,58 @@ const qsave=()=>save('mnr_q',GA.queue);
 {const tabs=garageEl.querySelector('.tabs');for(const [t,l] of [['load','LOAD'],['mkt','SHOP'],['soon','SOON']]){const b=document.createElement('button');b.className='go dim';b.dataset.t=t;b.type='button';b.textContent=l;tabs.append(b);b.addEventListener('click',()=>{GA.tab=t;gaDraw();});}}
 const day=()=>new Date().toISOString().slice(0,10);
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
-const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc','sc','pc','cl','bt','as','bd','sm','lk','ni','rc'].filter(id=>UBY[id]);
-const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?o:{day:day(),b:[]};})(),
-  offers(){const r=mul(hash(day()));const pool=MKP.slice(),o=[];while(o.length<3&&pool.length)o.push(pool.splice(Math.floor(r()*pool.length),1)[0]);return o;},
-  price(id){return Math.round(UBY[id].p*3.2/5)*5;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
+const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc','sc','pc','cl','bt','as','bd','sm','lk','ni','rc','cool','db','sb','nx'].filter(id=>UBY[id]);
+/* the daily MARKET: four offers (one per build path where possible, one of them on sale), two purchases a day, a hold for 3 items, a reroll that costs more every time.
+   Cargo can be sold back at 60%. Offers show the effect, the build path, a synergy with what you own and whether they answer the next boss. */
+const CARGO_MAX=3;
+const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?Object.assign({rr:0},o):{day:day(),b:[],rr:0};})(),
+  offers(){const r=mul(hash(day()+'/'+this.s.rr));const by={gc:[],tk:[],bc:[],n:[]};for(const id of MKP)by[pathOf(id)||'n'].push(id);
+    const pick=a=>a.length?a.splice(Math.floor(r()*a.length),1)[0]:null,o=[];for(const k of['gc','tk','bc'])o.push(pick(by[k]));
+    const rest=[].concat(by.gc,by.tk,by.bc,by.n);while(o.length<4&&rest.length)o.push(pick(rest));return o.filter(Boolean);},
+  sale(){const o=this.offers();return o[Math.floor(mul(hash(day()+'/sale/'+this.s.rr))()*o.length)];},
+  price(id){const p=Math.round(UBY[id].p*3.2/5)*5;return id===this.sale()?Math.round(p*.7/5)*5:p;},
+  full(id){return Math.round(UBY[id].p*3.2/5)*5;},
+  rerollPrice(){return 40+40*this.s.rr;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
 const gd0=gaDraw;
 gaDraw=function(){if(garageEl.hidden&&!labEl.hidden){garageDirty=true;return;}if(!['load','mkt','soon'].includes(GA.tab)){gd0();return;}
   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.innerHTML='';box.classList.add('tune');
   if(GA.tab==='load')loadDraw(box);else if(GA.tab==='mkt')mktDraw(box);else soonDraw(box);affUpd();};
-function loadDraw(box){const sl=eqSlots(),n=eqCount(),own=TP_DEF.filter(d=>TP.raw(d.id)>0);
-  const h=document.createElement('div');h.className='slots';h.style.gridColumn='1/-1';h.innerHTML=`SLOTS <b style="color:#ffb020">${n}/${sl}</b> · only equipped perks work · +1 slot per 15 story stars (${ST.totalStars()} now) · selling returns 60%`;box.append(h);
-  if(!own.length){const e=document.createElement('div');e.className='slots';e.style.gridColumn='1/-1';e.textContent='Buy perks in TUNE first.';box.append(e);}
+const fullRow=(box,html,cls)=>{const e=document.createElement('div');e.className='slots '+(cls||'');e.style.gridColumn='1/-1';e.innerHTML=html;box.append(e);return e;};
+/* build preset: equip the best owned perks of one path */
+function loadPreset(p){const sl=eqSlots(),mine=TP_DEF.filter(d=>TP.raw(d.id)>0).sort((a,b)=>((pathOf(b.id)===p)-(pathOf(a.id)===p))||(b.pri-a.pri));GA.eq={};for(const d of mine.slice(0,sl))if(pathOf(d.id)===p||d.pri>=90)GA.eq[d.id]=true;eqsave();SH.recalc();AU.sfx('up');gaMsg(PATHS[p].n+' loadout set');gaDraw();}
+function loadDraw(box){const sl=eqSlots(),n=eqCount(),own=TP_DEF.filter(d=>TP.raw(d.id)>0);SYN.calc();
+  fullRow(box,`SLOTS <b style="color:#ffb020">${n}/${sl}</b> · only equipped perks work · +1 slot per 20 story stars (${ST.totalStars()} now) · selling returns 60%`);
+  const pr=fullRow(box,'','presets');pr.innerHTML=Object.keys(PATHS).map(p=>`<button type="button" class="go dim pst" data-p="${p}" style="--c:${PATHS[p].c}">${svgI(PATHS[p].ic)}${PATHS[p].n.toUpperCase()}</button>`).join('');
+  pr.addEventListener('click',e=>{const b=e.target.closest('.pst');if(b)loadPreset(b.dataset.p);});
+  // build paths: pieces owned, the next set bonus (the 4-piece bonus has a price)
+  fullRow(box,Object.keys(PATHS).map(p=>{const c=SYN.cnt[p],nx=SETS[p].find(t=>c<t.n),have=SETS[p].filter(t=>c>=t.n).pop();
+    return `<div class="pth" style="--c:${PATHS[p].c}"><span class="pn">${svgI(PATHS[p].ic)}${PATHS[p].n}</span><span class="pb">${[0,1,2,3].map(i=>`<i class="${i<c?'on':''}"></i>`).join('')}</span><span class="pt">${nx?`${c}/${nx.n}: ${nx.t}`:`Full: ${have.t}`}</span></div>`;}).join(''),'paths');
+  const act=SYN.act,near=SYNS.filter(s=>!act.includes(s)&&(SYN.owned.has(s.a)!==SYN.owned.has(s.b)));
+  fullRow(box,(act.length?act.map(s=>`<b class="syn on" title="${s.t}">${UBY[s.a]?svgI(UBY[s.a].ic):''}+${UBY[s.b]?svgI(UBY[s.b].ic):''} ${s.n}: ${s.t}</b>`).join(''):'<span style="color:var(--dim)">No synergy yet: pair two perks</span>')
+    +near.slice(0,3).map(s=>`<b class="syn" title="${s.t}">${UBY[s.a]?svgI(UBY[s.a].ic):''}+${UBY[s.b]?svgI(UBY[s.b].ic):''} ${s.n}?</b>`).join('')+`<b class="heat">${heatTxt()}</b>`,'syns');
+  if(!own.length){fullRow(box,'Buy perks in TUNE first.');}
   for(const d of own){const l=TP.raw(d.id),on=!!GA.eq[d.id],c=document.createElement('div');c.className='card d'+(on?' sel':'');c.style.setProperty('--c',on?d.c:'#8c86b8');c.dataset.id='lo_'+d.id;c.dataset.kind='load';
     const refund=Math.round(tpPrice(d,l-1)*.6);
-    c.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${d.t(l)}</div></div><div class="bt"><button class="go ${on?'':'alt'}" data-a="eq" type="button">${on?'UNEQUIP':'EQUIP'}</button><button class="go dim" data-a="sell" type="button">SELL +${refund}</button></div>`;
+    c.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${pathChip(pathOf(d.id))}${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${d.t(l)}</div>${d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(l)}</b></div>`:''}</div><div class="bt"><button class="go ${on?'':'alt'}" data-a="eq" type="button">${on?'UNEQUIP':'EQUIP'}</button><button class="go dim" data-a="sell" type="button">SELL +${refund}</button></div>`;
     c.querySelector('[data-a=eq]').addEventListener('click',()=>{if(!on&&eqCount()>=eqSlots()){gaMsg('All '+eqSlots()+' slots are full: unequip one first');return;}GA.eq[d.id]=!on;eqsave();SH.recalc();AU.sfx('up');gaDraw();});
     c.querySelector('[data-a=sell]').addEventListener('click',()=>{GA.bank+=refund;GA.tune[d.id]=l-1;if(l-1<=0)GA.eq[d.id]=false;tsave();eqsave();gsave();SH.recalc();gaMsg(d.n+' sold for '+refund);gaDraw();});
     box.append(c);}}
-function mktDraw(box){const h=document.createElement('div');h.className='slots';h.style.gridColumn='1/-1';h.innerHTML=`TODAY'S MARKET · <b style="color:#ffb020">${MK.left()}</b> of ${MK.max} purchases left · applies to your next run only · new offers every day`;box.append(h);
-  const q=document.createElement('div');q.className='slots';q.style.gridColumn='1/-1';q.innerHTML=GA.queue.length?'In your cargo: '+GA.queue.map(id=>UBY[id].n).join(', '):'Cargo empty';box.append(q);
-  for(const id of MK.offers()){const u=UBY[id],pr=MK.price(id),got=MK.s.b.includes(id),c=document.createElement('button');c.type='button';c.className='card'+(got?' sold':GA.bank<pr||!MK.left()?' no':'');c.style.setProperty('--c',u.c);c.dataset.id='mk_'+id;c.dataset.kind='market';
-    c.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${lvText(u,1)}</div></div><div class="pr">${got?'BOUGHT':neonI+' '+pr}</div>`;
-    c.addEventListener('click',()=>{if(got)return;if(!MK.left()){gaMsg('No purchases left today');return;}if(GA.bank<pr){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return;}
-      GA.bank-=pr;MK.s.b.push(id);MK.save();GA.queue.push(id);qsave();gsave();AU.sfx('up');gaMsg(u.n+' is in your cargo');gaDraw();});box.append(c);}}
+function mktBuy(id,c){const pr=MK.price(id),u=UBY[id];if(!MK.left()){gaMsg('No purchases left today');return;}if(GA.queue.length>=CARGO_MAX){gaMsg('Cargo hold is full: sell one');return;}
+  if(GA.bank<pr){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return;}
+  GA.bank-=pr;MK.s.b.push(id);MK.save();GA.queue.push(id);qsave();gsave();AU.sfx('up');gaMsg(u.n+' is in your cargo');gaDraw();}
+function mktDraw(box){const foe=nextFoeFrom(mapCurrent()),offers=MK.offers(),sale=MK.sale();SYN.calc();
+  fullRow(box,`TODAY'S MARKET · <b style="color:#ffb020">${MK.left()}</b> of ${MK.max} buys left · cargo ${GA.queue.length}/${CARGO_MAX} · next run only`);
+  const q=fullRow(box,'','cargo');q.innerHTML=GA.queue.length?'Cargo (tap to sell at 60%): '+GA.queue.map((id,i)=>`<button type="button" class="oi" data-i="${i}" style="--c:${UBY[id].c}" aria-label="Sell ${UBY[id].n}">${svgI(UBY[id].ic)} ${UBY[id].n} +${Math.round(MK.full(id)*.6)}</button>`).join(''):'Cargo empty';
+  q.addEventListener('click',e=>{const b=e.target.closest('button.oi');if(!b)return;const i=+b.dataset.i,id=GA.queue[i];if(id==null)return;GA.queue.splice(i,1);GA.bank+=Math.round(MK.full(id)*.6);qsave();gsave();AU.sfx('hit');gaMsg(UBY[id].n+' sold for '+Math.round(MK.full(id)*.6));gaDraw();});
+  const best=foe?offers.map(id=>[SH.bossScore(UBY[id],foe),id]).sort((a,b)=>b[0]-a[0])[0]:null;
+  for(const id of offers){const u=UBY[id],pr=MK.price(id),got=MK.s.b.includes(id),c=document.createElement('button'),sy=SYN.completes(id)||SYNS.find(s=>(s.a===id&&GA.queue.includes(s.b))||(s.b===id&&GA.queue.includes(s.a))),hl=SYN.heatOf(id);c.type='button';
+    c.className='card'+(got?' sold':GA.bank<pr||!MK.left()?' no':'');c.style.setProperty('--c',u.c);c.dataset.id='mk_'+id;c.dataset.kind='market';
+    const chips=(id===sale?'<b class="syn">SALE -30%</b>':'')+(sy?`<b class="syn">+ ${sy.n}</b>`:'')+(hl?`<b class="heat">HEAT +${hl}%</b>`:'');
+    c.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${pathChip(pathOf(id))}${u.n}</div><div class="t">${lvText(u,1)}</div>${chips?`<div class="chips">${chips}</div>`:''}</div><div class="pr">${got?'BOUGHT':(id===sale?'<s>'+MK.full(id)+'</s> ':'')+neonI+' '+pr}</div>`+(best&&best[0]>0&&best[1]===id?'<span class="rec boss">BOSS PICK</span>':'');
+    c.addEventListener('click',()=>{if(!got)mktBuy(id,c);});box.append(c);}
+  fullRow(box,`<button type="button" class="go dim" id="mkRe">NEW OFFERS ${neonI} ${MK.rerollPrice()}</button>`+(foe?`<span class="foe2">${foe.nm}: ${foeTip(foe)}</span>`:''),'mkbar');
+  $('mkRe').addEventListener('click',()=>{const p=MK.rerollPrice();if(GA.bank<p){gaMsg('Need '+(p-GA.bank)+' more Neon');return;}GA.bank-=p;MK.s.rr++;MK.save();gsave();AU.sfx('up');gaDraw();});}
 const SOON=[['Weapon Forge','Craft and swap weapon mods between runs.','weapon-forge'],['Contracts','Three daily missions that pay Neon and slots.','contracts'],['Pilot Ranks','Level up your pilot for passive bonuses.','pilot-ranks'],
   ['Boss Trophies','A gallery of the bosses you beat, with their stats.','boss-trophies'],['Ship Skins','Paint jobs for every ship.','ship-skins'],['Squad Roster','Hire and level wingmen with their own skills.','squad-roster'],['Leaderboards','Daily and weekly scores, friends first.','leaderboards']];
 function soonDraw(box){for(const [n,t,im] of SOON){const c=document.createElement('div');c.className='card d no';c.style.setProperty('--c','#8c86b8');c.dataset.kind='soon';c.innerHTML=`${ART.isReal('soon-'+im)?'':'<span class="ph">PLACEHOLDER</span>'}${soonIcon(im)}<div class="tx"><div class="n">${n}</div><div class="t">${t}</div></div><div class="pr">SOON</div>`;box.append(c);}}
