@@ -108,8 +108,8 @@ html.sk-pl .tile>*{z-index:2}
 html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.webp)}
 html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
 html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
-html.sk-pl .tile .tv{background:url(media/ui-badge-gold.webp) center/contain no-repeat;border-color:transparent;z-index:3}
-html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/contain no-repeat;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
+html.sk-pl .tile .tv{background:url(media/ui-badge-gold.webp) center/142% no-repeat;border-color:transparent;z-index:3}
+html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/142% no-repeat;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
 html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
 html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
 html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}
