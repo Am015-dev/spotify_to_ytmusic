@@ -33,7 +33,8 @@ function TB_route(t,g,p){const n=t.pts.length,N=g.N,sl=q=>(g.cpI[(q+1)%n]-g.cpI[
   for(let k=0;len<320&&k<2*n;k++){if(k%2){q=(q-1+n)%n;len+=sl(q)}else{len+=sl(qb);qb=(qb+1)%n}}
   const a=g.cpI[q],b=g.cpI[qb],m=(b-a+N)%N;let km=0,rho=0;
   for(let d=0;d<m;d++){const kk=g.K[(a+d)%N];km+=kk}km/=Math.max(1,m);const sd=Math.sign(km)||1;for(let d=0;d<m;d++)rho+=1-sd*g.K[(a+d)%N]*TB_ST.lane;rho/=Math.max(1,m);
-  return{q,qb,a,b,m,len:m*g.ds,km,sd,rho}}
+  let rmin=1e9;for(let d=0;d<m;d++)rmin=Math.min(rmin,1/Math.max(1e-6,Math.abs(g.K[(a+d)%N])));
+  return{q,qb,a,b,m,len:m*g.ds,km,sd,rho,rmin}}
 const TB={on:false,trk:null,undo:[],tool:'pt',sel:-1,view:{s:.25,x:0,z:0},snap:false,lint:null,el:null,cv:null,defs:{},list:{},db:null,uid:null,dbErr:'',ptr:new Map(),drag:null,toast:0};
 const TB_clone=o=>JSON.parse(JSON.stringify(o));
 function TB_new(city){return{v:1,id:'tb_'+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36),name:'My Track',city:city||'fra',laps:3,road:14,pts:[],pc:[],st:null}}
@@ -100,8 +101,8 @@ function TB_lint(t){const g=TB_geo(t),R=[],marks=[];const rule=(id,name,ok,val,n
     for(const p of J){const ic=TB_near(g,p.x,p.z).i,i=p.k==='ramp'?ic:(ic-Math.round(TB_ST.gHalf/ds)+N)%N,a=TB_air(g,i,v[(i-2+N)%N],p.k);air.push(+a.t.toFixed(1));if(a.t>=TB_ST.air&&a.clear)big++;else marks.push({x:p.x,z:p.z,r:45,c:'#ff3b3b',t:a.clear?'AIR '+a.t.toFixed(1)+' s':'GAP TOO LONG'})}
     g.air=air;rule('L16','Big stunts',big>=2,big+' · air '+(air.join(' / ')||'–')+' s','≥ 2 with ≥ 1.5 s air')}
   {const S=t.pc.filter(p=>TB_SK.includes(p.k));let ok=0;const kinds=new Set(),seen=new Set();
-    for(const p of S){const r=TB_route(t,g,p);if(seen.has(r.q))continue;seen.add(r.q);const good=r.len>=200&&r.len<=800&&r.rho<.985;if(good){ok++;kinds.add(p.k)}}
-    rule('L17','Route splits',ok>=2&&kinds.size>=2,ok+' splits · '+[...kinds].map(k=>({scw:'boat',scd:'dirt',scs:'stunt'})[k]).join(' '),'≥ 2, 2 kinds (time ±5 %)')}
+    for(const p of S){const r=TB_route(t,g,p);if(seen.has(r.q))continue;seen.add(r.q);const rN=p.k==='scs'?90:150,good=r.len>=200&&r.len<=800&&r.rho<.985&&r.rmin>=rN;if(good){ok++;kinds.add(p.k)}else if(r.rmin<rN)marks.push({x:p.x,z:p.z,r:50,c:'#ff3b3b',t:'SPLIT TOO TIGHT R'+Math.round(r.rmin)})}
+    rule('L17','Route splits',ok>=2&&kinds.size>=2,ok+' splits · '+[...kinds].map(k=>({scw:'boat',scd:'dirt',scs:'stunt'})[k]).join(' '),'≥ 2, 2 kinds, R ≥ 150 (stunt 90), time ±5 %')}
   {const M=t.pc.filter(p=>p.k==='lm');let vis=0;
     for(let i=0;i<N;i++){let see=false;for(const m of M){const dx=m.x-g.X[i],dz=m.z-g.Z[i],d=Math.hypot(dx,dz),r=TB_ST.LMV[m.n]||800;if(d>r)continue;const c=(dx*g.TX[i]+dz*g.TZ[i])/(d||1);if(c>Math.cos(d<200?1.1:.66)){see=true;break}}if(see)vis+=T[i+1]-T[i]}
     const f=T[N]?vis/T[N]:0;rule('L18','Landmark on screen',f>=.5,Math.round(f*100)+' % · '+M.length+' landmarks','≥ 50 % of the lap')}
