@@ -14,24 +14,20 @@
   }
  },
  "nebula-aces": {
-  "severe": 1,
+  "severe": 0,
   "warn": 2,
-  "severeKeys": [
-   "button|button.btn"
-  ],
+  "severeKeys": [],
   "counts": {
-   "button": 1,
    "size": 1,
    "images": 1
   }
  },
  "doorkick-dungeon": {
   "severe": 0,
-  "warn": 6,
+  "warn": 5,
   "severeKeys": [],
   "counts": {
    "images": 5,
-   "contrast": 1,
    "art": 0
   }
  },
@@ -47,73 +43,52 @@
   }
  },
  "sands-of-qamar": {
-  "severe": 6,
-  "warn": 32,
+  "severe": 3,
+  "warn": 36,
   "severeKeys": [
-   "button|b.tv",
    "button|details.exd > summary",
    "contrast|small.ord",
-   "contrast|span.dv",
-   "contrast|span.tn",
    "size|small.ord"
   ],
   "counts": {
    "size": 2,
-   "contrast": 6,
+   "contrast": 5,
    "button": 5,
    "overflow": 1,
    "overlap": 3,
-   "images": 21
+   "images": 23
   }
  },
  "sunglaze": {
-  "severe": 1,
+  "severe": 0,
   "warn": 0,
-  "severeKeys": [
-   "button|button.btn.sm"
-  ],
+  "severeKeys": [],
   "counts": {
-   "button": 1,
    "art": 0
   }
  },
  "rampart-and-vine": {
-  "severe": 1,
+  "severe": 0,
   "warn": 2,
-  "severeKeys": [
-   "contrast|button.opt"
-  ],
+  "severeKeys": [],
   "counts": {
-   "contrast": 1,
    "images": 2,
    "art": 0
   }
  },
  "short-fuse": {
-  "severe": 8,
-  "warn": 18,
-  "severeKeys": [
-   "button|button.btn.small",
-   "button|button.jt > b",
-   "contrast|button.btn.small",
-   "contrast|button.jt > b",
-   "contrast|button.jt > span",
-   "contrast|details.more > h2",
-   "contrast|div.box",
-   "contrast|p.small.muted"
-  ],
+  "severe": 0,
+  "warn": 13,
+  "severeKeys": [],
   "counts": {
-   "contrast": 6,
-   "button": 3,
    "images": 11,
-   "size": 1,
-   "overflow": 4,
-   "overlap": 1
+   "overlap": 1,
+   "button": 1
   }
  },
  "tidewake": {
   "severe": 2,
-  "warn": 8,
+  "warn": 7,
   "severeKeys": [
    "size|button#bulbbtn > span",
    "size|button.gx-ibtn > span"
@@ -121,7 +96,6 @@
   "counts": {
    "size": 2,
    "contrast": 2,
-   "overflow": 1,
    "images": 3,
    "button": 1,
    "boards": 1,
@@ -139,20 +113,17 @@
   }
  },
  "thornbound": {
-  "severe": 5,
+  "severe": 3,
   "warn": 8,
   "severeKeys": [
-   "button|svg.tb-card > text",
-   "contrast|g.tb-m-static > g > text",
-   "contrast|svg.tb-card > text",
    "size|g.tb-m-round > g > text",
+   "size|g.tb-m-static > g > text",
    "size|g.tbx-pan > g > text"
   ],
   "counts": {
-   "size": 4,
-   "contrast": 2,
-   "button": 2,
+   "size": 5,
    "images": 5,
+   "button": 1,
    "art": 0
   }
  },
