@@ -46,3 +46,19 @@ def run(jobs):
     subprocess.Popen(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-NoExit", "-File", str(GA / "flow_lane.ps1"),
                       "-Tab", tab, "-Log", str(log), "-Jobs", ",".join(jobs)], creationflags=subprocess.CREATE_NEW_CONSOLE)
     return {"tab": tab, "jobs": jobs, "log": log.name}
+
+
+COVER_ALIAS = {"thornbound": "thornbound-throne"}  # flow-covers file names that differ from the game folder
+
+
+def music(games_dir, base, cover):
+    """{game: {cover, tracks: [{name, url, kb}]}} for every games/<game>/music/*.mp3|ogg (preview folders skipped).
+    base: URL prefix for the games folder ('game/' via serve.py, '../' on GitHub Pages); cover(path) -> URL or None."""
+    out = {}
+    for d in sorted(p for p in Path(games_dir).iterdir() if p.is_dir() and not p.name.endswith(("-next", "-new"))):
+        files = sorted([*(d / "music").glob("*.mp3"), *(d / "music").glob("*.ogg")])
+        if not files: continue
+        c = GA / "flow-covers" / f"{COVER_ALIAS.get(d.name, d.name)}.jpg"
+        out[d.name] = {"cover": cover(c) if c.is_file() else None,
+                       "tracks": [{"name": f.stem, "url": f"{base}{d.name}/music/{f.name}", "kb": f.stat().st_size // 1024} for f in files]}
+    return out

@@ -154,11 +154,11 @@
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
-<body><div style="position:sticky;top:0;z-index:99;background:#3a2f12;color:#ffe9a8;font:13px system-ui;padding:6px 12px">Read-only snapshot of 13 Oct 2026 13:00. Voting and Flow runs work only in the local viewer.</div>
+<body><div style="position:sticky;top:0;z-index:99;background:#3a2f12;color:#ffe9a8;font:13px system-ui;padding:6px 12px">Read-only snapshot of 13 Oct 2026 13:39. Voting and Flow runs work only in the local viewer.</div>
 <header>
   <button class="btn" id="menu" aria-label="Filters">☰</button>
   <h1>Asset <span>Board</span></h1>
-  <nav class="tabs"><a href="board.html">Production</a><a class="on" href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
+  <nav class="tabs"><a href="board.html">Production</a><a class="on" href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
   <label class="search"><input id="q" type="search" placeholder="Search names and prompts" aria-label="Search"><kbd>/</kbd></label>
   <button class="btn" id="reload" title="Reload data (R)">↻ Refresh</button>
   <span id="upd"></span>
@@ -169,6 +169,7 @@
     <div class="games" id="fGame"></div>
     <h3>Type</h3><div class="row2" id="fType"></div>
     <h3>Status <button data-clear="status">clear</button></h3><div class="chips" id="fStatus"></div>
+    <h3>Wiring <button data-clear="wire">clear</button></h3><div class="chips" id="fWire"></div>
     <h3>Wave <button data-clear="wave">clear</button></h3><div class="chips" id="fWave"></div>
     <h3>Shape <button data-clear="ratio">clear</button></h3><div class="chips" id="fRatio"></div>
     <h3>Sort</h3>
@@ -206,18 +207,22 @@ const STATUS = {
   redo:    { label: '3D redo',         col: 'var(--redo)', tag: 'redo' },
   drop:    { label: '3D dropped',      col: 'var(--drop)', tag: 'drop' },
 };
+// delivery of a game picture (flow-2d only): wired = a game uses it, needs = pushed to games/<game>/media but unused
+const WIRE = { needs: { label: 'Needs wiring', col: 'var(--accent)' }, wired: { label: 'Wired in game', col: 'var(--done)' },
+  none: { label: 'Not delivered yet', col: 'var(--pend)' } };
+const wireOf = (root, stage) => root !== 'flow-2d' ? undefined : stage === 'wired' ? 'wired' : stage === 'pushed' ? 'needs' : 'none';
 const WAVEORDER = ['Wave 0', 'Wave 1', 'Wave 2', 'Wave 3', 'Wave 4', 'Wave 5', 'Boss poses', '3D sources', '3D models', 'Covers'];
-const F = { game: new Set(), type: '', status: new Set(), wave: new Set(), ratio: new Set(), sort: 'wave', view: 'game', q: '', size: 150 };
+const F = { game: new Set(), type: '', status: new Set(), wire: new Set(), wave: new Set(), ratio: new Set(), sort: 'wave', view: 'game', q: '', size: 150 };
 let ALL = [], VIEW = [], COVERS = {}, cur = -1;
 
 function readHash() {
   const p = new URLSearchParams(location.hash.slice(1));
-  for (const k of ['game', 'status', 'wave', 'ratio']) F[k] = new Set((p.get(k) || '').split(',').filter(Boolean));
+  for (const k of ['game', 'status', 'wire', 'wave', 'ratio']) F[k] = new Set((p.get(k) || '').split(',').filter(Boolean));
   F.type = p.get('type') || ''; F.sort = p.get('sort') || 'wave'; F.view = p.get('view') || 'game'; F.q = p.get('q') || ''; F.size = +(p.get('size') || 150);
 }
 function writeHash() {
   const p = new URLSearchParams();
-  for (const k of ['game', 'status', 'wave', 'ratio']) if (F[k].size) p.set(k, [...F[k]].join(','));
+  for (const k of ['game', 'status', 'wire', 'wave', 'ratio']) if (F[k].size) p.set(k, [...F[k]].join(','));
   for (const k of ['type', 'q']) if (F[k]) p.set(k, F[k]);
   if (F.sort !== 'wave') p.set('sort', F.sort); if (F.view !== 'game') p.set('view', F.view); if (F.size !== 150) p.set('size', F.size);
   history.replaceState(null, '', '#' + p.toString());
@@ -237,7 +242,7 @@ async function load() {
     if (b.root === 'flow-covers') continue;
     const game = GAMEFIX[b.game] || b.game;
     for (const i of b.items) items.push({ kind: '2d', root: b.root, game, name: i.name, wave: b.wave, ratio: b.ratio, batch: b.kind, file: b.file,
-      status: i.done ? 'done' : 'pending', thumb: i.thumb, full: i.full, prompt: i.prompt, t: i.t, twin: i.twin, vote: i.vote, note: i.note, stage: i.stage });
+      status: i.done ? 'done' : 'pending', thumb: i.thumb, full: i.full, prompt: i.prompt, t: i.t, twin: i.twin, vote: i.vote, note: i.note, stage: i.stage, wire: wireOf(b.root, i.stage) });
   }
   for (const c of flow.crossed || []) items.push({ kind: '2d', game: c.game, name: c.name, wave: c.wave, ratio: '1:1', status: 'crossed', twin: c.twin,
     prompt: `Not painted: the approved 3D model “${c.twin}” (games-src/facelift-3d) replaces it.` });
@@ -259,6 +264,7 @@ function passes(i, skip) {
   if (skip !== 'game' && F.game.size && !F.game.has(i.game)) return false;
   if (skip !== 'type' && F.type && i.kind !== F.type) return false;
   if (skip !== 'status' && F.status.size && !F.status.has(i.status)) return false;
+  if (skip !== 'wire' && F.wire.size && !F.wire.has(i.wire)) return false;
   if (skip !== 'wave' && F.wave.size && !F.wave.has(i.wave)) return false;
   if (skip !== 'ratio' && F.ratio.size && !F.ratio.has(i.ratio)) return false;
   if (F.q) { const q = F.q.toLowerCase(); if (!(i.name.toLowerCase().includes(q) || (i.prompt || '').toLowerCase().includes(q) || i.game.includes(q))) return false; }
@@ -284,6 +290,7 @@ function buildRail() {
   $('fType').innerHTML = [['', 'All'], ['2d', '2D'], ['3d', '3D']].map(([v, l]) =>
     `<button class="chip ${F.type === v ? 'on' : ''}" data-k="type" data-v="${v}" aria-pressed="${F.type === v}">${l}</button>`).join('');
   chipSet($('fStatus'), 'status', Object.keys(STATUS), v => STATUS[v].label, v => STATUS[v].col);
+  chipSet($('fWire'), 'wire', Object.keys(WIRE), v => WIRE[v].label, v => WIRE[v].col);
   const waves = WAVEORDER.filter(w => ALL.some(i => i.wave === w));
   chipSet($('fWave'), 'wave', waves, v => v);
   chipSet($('fRatio'), 'ratio', ['1:1', '16:9', '4:3', '3:4', '9:16'].filter(r => ALL.some(i => i.ratio === r)), v => v);
@@ -308,6 +315,8 @@ function tile(i, idx) {
   if (i.kind === '2d' && i.ratio !== '1:1') tags.push(`<span class="tag">${i.ratio}</span>`);
   if (i.twin && i.status !== 'crossed') tags.push(`<span class="tag twin" title="approved 3D model ${esc(i.twin)} covers this">3D twin</span>`);
   if (i.shipped) tags.push('<span class="tag ship">on GitHub</span>');
+  if (i.wire === 'needs') tags.push('<span class="tag" style="background:var(--accent);color:#1b1404">Needs wiring</span>');
+  if (i.wire === 'wired') tags.push('<span class="tag">Wired</span>');
   if (i.kind === '2d' && i.vote) tags.push(`<span class="tag" style="background:${i.vote === 'ok' ? 'var(--done)' : 'var(--redo)'};color:${i.vote === 'ok' ? '#0b1a10' : '#fff'}">${i.vote === 'ok' ? 'Kept' : 'Redo'}</span>`);
   return `<button class="tile ${i.status} k${i.kind}" data-i="${idx}" title="${esc(i.name)}">${img}
     <div class="meta"><div class="nm">${esc(i.name)}</div><div class="tags">${tags.join('')}</div></div></button>`;
@@ -327,9 +336,10 @@ function render() {
   const s = k => VIEW.filter(i => i.status === k).length;
   $('sum').innerHTML = `<span><b class="num">${VIEW.length}</b>assets</span><span><b class="num">${s('done')}</b>2D done</span>
     <span><b class="num">${s('pending')}</b>pending</span><span><b class="num">${s('crossed')}</b>crossed out</span>
-    <span><b class="num">${s('ok3d')}</b>3D approved</span><span><b class="num">${VIEW.filter(i => i.shipped).length}</b>on GitHub</span>`;
+    <span><b class="num">${s('ok3d')}</b>3D approved</span><span><b class="num">${VIEW.filter(i => i.shipped).length}</b>3D on GitHub</span>
+    <span><b class="num">${VIEW.filter(i => i.wire === 'needs').length}</b>need wiring</span><span><b class="num">${VIEW.filter(i => i.wire === 'wired').length}</b>wired</span>`;
   const act = [];
-  F.game.forEach(g => act.push(['game', g, nice(g)])); F.status.forEach(v => act.push(['status', v, STATUS[v].label]));
+  F.game.forEach(g => act.push(['game', g, nice(g)])); F.status.forEach(v => act.push(['status', v, STATUS[v].label])); F.wire.forEach(v => act.push(['wire', v, WIRE[v].label]));
   F.wave.forEach(v => act.push(['wave', v, v])); F.ratio.forEach(v => act.push(['ratio', v, v]));
   if (F.type) act.push(['type', F.type, F.type.toUpperCase()]); if (F.q) act.push(['q', F.q, `“${F.q}”`]);
   $('act').innerHTML = act.map(([k, v, l]) => `<button class="chip" data-rm="${k}" data-v="${esc(v)}">${esc(l)}</button>`).join('');

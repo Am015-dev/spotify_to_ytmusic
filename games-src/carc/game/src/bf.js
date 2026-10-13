@@ -59,7 +59,7 @@ function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view
 function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100+sp[0],y*100+sp[1]]}
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
-    const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k]);
+    const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k],f.p);
     addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
   for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
   placeOverlay()}
@@ -67,7 +67,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
-    ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k]);
+    ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k],p);
       b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);b.addEventListener('click',()=>onFig(m));
       addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;UI.figs.push(b)})}
   placeOverlay()}
@@ -87,7 +87,7 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
-    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot">${p.human?'':'&#9881;'}</i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${ico('meeple')}${s.f}${s.big?`${ico('champ')}`:''}${s.bld?`${ico('mason')}`:''}${s.pig?`${ico('hog')}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
+    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot">${p.human?'':'&#9881;'}</i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
   $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b>`}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
