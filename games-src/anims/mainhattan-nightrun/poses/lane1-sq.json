@@ -1,0 +1,101 @@
+{
+ "style": "",
+ "cards": {
+  "02-boss-flusskrake-a": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: bell contracted, tentacles drawn up. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "02-boss-flusskrake-b": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: bell wide open, tentacles drooping straight down. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "02-boss-flusskrake-c": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: tentacles swept to the left, cyan eyes bright. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "02-boss-flusskrake-d": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: tentacles swept to the right, cyan eyes dim. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "03-boss-zentral-ice-a": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: core glowing bright, shell turrets turned left. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "03-boss-zentral-ice-b": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: core dim, shell turrets turned right. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "03-boss-zentral-ice-c": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: crystal blocks shimmering white, turrets facing front. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "03-boss-zentral-ice-d": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: core medium glow, turrets turned back. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "04-boss-kronos-a": {
+   "prompt": "The exact same the warship boss as the reference. Pose: star blades rotated 45 degrees, core bright. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "04-boss-kronos-b": {
+   "prompt": "The exact same the warship boss as the reference. Pose: star blades rotated 90 degrees, core dim. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "04-boss-kronos-c": {
+   "prompt": "The exact same the warship boss as the reference. Pose: star blades rotated 135 degrees, core bright. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "04-boss-kronos-d": {
+   "prompt": "The exact same the warship boss as the reference. Pose: star blades at the reference angle, core medium. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-a": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: twin cannons raised high, orange lights on. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-b": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: twin cannons lowered, orange lights off. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-c": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: twin cannons half raised, left orange light on. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-d": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: twin cannons half raised, right orange light on. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  }
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "style": "",
+ "cards": {
+  "08-boss-messe-waechter-a": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: arms swung out to the sides, foot thrusters bright cyan. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  },
+  "08-boss-messe-waechter-b": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: arms hanging down, foot thrusters dim. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  },
+  "08-boss-messe-waechter-c": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: arms forward, foot thrusters medium, dome glowing. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  },
+  "08-boss-messe-waechter-d": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: arms back, foot thrusters bright, dome dim. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  }
+ }
+}

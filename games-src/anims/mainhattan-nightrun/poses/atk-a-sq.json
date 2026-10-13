@@ -1,0 +1,101 @@
+{
+ "style": "",
+ "cards": {
+  "01-boss-sek-adler-atk1": {
+   "prompt": "The exact same the mechanical eagle boss as the reference. Pose: wind-up: reared back, wings raised high, police lights red. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "01-boss-sek-adler.png"
+   ]
+  },
+  "01-boss-sek-adler-atk2": {
+   "prompt": "The exact same the mechanical eagle boss as the reference. Pose: charge: wings spread fully wide, police lights blazing red and blue. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "01-boss-sek-adler.png"
+   ]
+  },
+  "01-boss-sek-adler-atk3": {
+   "prompt": "The exact same the mechanical eagle boss as the reference. Pose: attack: lunging forward, talons stretched out toward the viewer, wings swept back. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "01-boss-sek-adler.png"
+   ]
+  },
+  "01-boss-sek-adler-atk4": {
+   "prompt": "The exact same the mechanical eagle boss as the reference. Pose: recoil: pulling back, wings half folded, talons drawn in. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "01-boss-sek-adler.png"
+   ]
+  },
+  "02-boss-flusskrake-atk1": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: wind-up: bell squeezed tight, tentacles gathered close under it. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "02-boss-flusskrake-atk2": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: charge: cyan eyes flaring bright, tentacles coiled. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "02-boss-flusskrake-atk3": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: attack: tentacles whipped outward in a wide fan. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "02-boss-flusskrake-atk4": {
+   "prompt": "The exact same the armoured jellyfish boss as the reference. Pose: recoil: tentacles curling back inward, eyes dimming. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "02-boss-flusskrake.png"
+   ]
+  },
+  "03-boss-zentral-ice-atk1": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: wind-up: crystal blocks starting to split away from the core. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "03-boss-zentral-ice-atk2": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: charge: blocks split wide apart, core glowing bright cyan. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "03-boss-zentral-ice-atk3": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: attack: turrets snapped toward the viewer, small cyan muzzle flashes at each turret. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "03-boss-zentral-ice-atk4": {
+   "prompt": "The exact same the ice crystal boss as the reference. Pose: recoil: blocks closing back together around the core. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "03-boss-zentral-ice.png"
+   ]
+  },
+  "04-boss-kronos-atk1": {
+   "prompt": "The exact same the warship boss as the reference. Pose: wind-up: star blades turned slightly, core dim. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "04-boss-kronos-atk2": {
+   "prompt": "The exact same the warship boss as the reference. Pose: charge: core glowing bright magenta, blade tips lit. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "04-boss-kronos-atk3": {
+   "prompt": "The exact same the warship boss as the reference. Pose: attack: all blade tips flashing small magenta bursts. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  },
+  "04-boss-kronos-atk4": {
+   "prompt": "The exact same the warship boss as the reference. Pose: recoil: core dimming, blades back at the reference angle. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "04-boss-kronos.png"
+   ]
+  }
+ }
+}
