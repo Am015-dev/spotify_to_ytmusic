@@ -2616,7 +2616,7 @@ function setup3D(canvas, opts) {
   canvas.addEventListener('webglcontextrestored', function () { K.lost = false; }, false);
 }
 function applyQ(q, first) {
-  var lo0 = K.q === 'low'; K.q = q; if (q !== 'low') glbLoadK(); if (!first && GLBK.ok && lo0 !== (q === 'low')) glbRefresh(); var c = GFX[q], r = K.r; if (!r) return;
+  K.q = q; glbLoadK(); var c = GFX[q], r = K.r; if (!r) return;
   r.setPixelRatio(global.PerfHUD ? PerfHUD.pixelRatio(Math.min(global.devicePixelRatio || 1, c.dpr)) : Math.min(global.devicePixelRatio || 1, c.dpr));
   r.shadowMap.enabled = c.shadows; K.key.castShadow = c.shadows;
   if (c.shadows) { K.key.shadow.mapSize.set(c.map, c.map); if (K.key.shadow.map) { K.key.shadow.map.dispose(); K.key.shadow.map = null; } }
@@ -2934,7 +2934,7 @@ function buildLevCreature(L) {
   g.add(head); L.head = head; L.fins = [];
   var fm = new THREE.MeshStandardMaterial({ color: pal.fin, roughness: .4, metalness: .45, emissive: new THREE.Color(pal.fin), emissiveIntensity: .12 });
   for (var i = 0; i < 11; i++) { var f = new THREE.Mesh(new THREE.ConeGeometry(.026, .09, 4), fm); g.add(f); L.fins.push(f); }
-  if (GLBK.ok && K.q !== 'low') glbDressLev(L, g); else L.glb = null;
+  if (GLBK.ok) glbDressLev(L, g); else L.glb = null;
   g.traverse(function (o) { if (o.isMesh) o.castShadow = true; });
   return g;
 }
@@ -2980,13 +2980,19 @@ TWKit.leviathanRoar = function (c, r) { var L = S.levs[c + ',' + r]; if (!L) ret
 
 /* ------------------------------------------------------------------ junks (ships) */
 
-/* ---- GLB junk + leviathan (High / Medium 3D only; Low and the 2D board keep their drawings, the 2D leviathan gets the thumbnail). Preloaded once from models/*.glb, cloned per use. ---- */
+/* ---- GLB junk + leviathan (full-detail files on desktop, -lite files on phones and Low; the 2D board keeps its drawings, the 2D leviathan gets the thumbnail). Preloaded from models/*.glb, cloned per use. ---- */
 var GLBK = { ok: false, p: null, junk: null, lev: null };
+function glbVarK() {
+  var ph = false; try { ph = Math.min(innerWidth, innerHeight) < 600 || (matchMedia('(pointer:coarse)').matches && Math.max(innerWidth, innerHeight) < 1200); } catch (e) {}
+  return K.q === 'low' || ph ? '-lite' : '';
+}
 function glbLoadK() {
-  if (GLBK.p || !global.GXGLB) return;
-  GLBK.p = Promise.all([GXGLB.load('models/junk.glb'), GXGLB.load('models/leviathan.glb')]).then(function (r) {
+  if (!global.GXGLB) return; var v = glbVarK(); if (GLBK.v === v && GLBK.p) return;
+  var first = !GLBK.p; GLBK.v = v; GLBK.ok = false; if (!first) try { GXGLB.dispose(); } catch (e) {}
+  var me = GLBK.p = Promise.all([GXGLB.load('models/junk' + v + '.glb'), GXGLB.load('models/leviathan' + v + '.glb')]).then(function (r) {
+    if (GLBK.p !== me) return;
     GLBK.junk = GXGLB.prep(r[0], { len: .76, ground: true, env: .8 }); GLBK.lev = GXGLB.prep(r[1], { h: .58, ground: true, env: .8 }); GLBK.ok = true; glbRefresh();
-  }).catch(function () { GLBK.p = null; });
+  }).catch(function () { if (GLBK.p === me) GLBK.p = null; });
 }
 function glbRefresh() {
   if (!K.on || !GLBK.ok) return;
@@ -3059,7 +3065,7 @@ function buildShip3D(s) {
     var yard = new THREE.Mesh(new THREE.CylinderGeometry(.006, .006, m[2] + .03, 5), mastM); yard.rotation.x = Math.PI / 2; yard.rotation.z = 0; yard.rotation.set(0, 0, Math.PI / 2); yard.position.set(-m[2] / 2 + .012, .14 + m[3] + (i ? 0 : .02) + .0, 0); pv.add(yard);
   });
   var flag = new THREE.Mesh(new THREE.PlaneGeometry(.1, .05, 4, 1), new THREE.MeshStandardMaterial({ color: col.sail, side: THREE.DoubleSide, roughness: .8, emissive: col.sail, emissiveIntensity: .3 })); flag.position.set(-.03 - .055, .1 + .46 - .02, 0); g.add(flag); s.flag = flag;
-  if (GLBK.ok && K.q !== 'low') glbDressShip(s, g, col);
+  if (GLBK.ok) glbDressShip(s, g, col);
   g.traverse(function (o) { if (o.isMesh) { o.castShadow = q.shadows; } });
   s.g = g; s.cann = new THREE.Group(); g.add(s.cann); K.gShips.add(g); setCannons3D(s);
   // wake ribbon
@@ -3441,7 +3447,7 @@ var R2 = {
     var pal = LEV_PAL[L.kind]; s += '<g class="lv"><path d="M' + (cx - .12) + ' ' + (cy + .14) + 'c-.2-.2 .02-.34 .15-.26s.06 .22-.1 .18c-.16-.05-.1-.2 .02-.2" fill="none" stroke="' + pal.b + '" stroke-width=".11" stroke-linecap="round"/><path d="M' + (cx - .12) + ' ' + (cy + .14) + 'c-.2-.2 .02-.34 .15-.26s.06 .22-.1 .18c-.16-.05-.1-.2 .02-.2" fill="none" stroke="' + pal.a + '" stroke-width=".08" stroke-linecap="round" stroke-dasharray=".05 .02"/><ellipse cx="' + (cx + .06) + '" cy="' + (cy - .14) + '" rx=".08" ry=".055" fill="' + pal.a + '" stroke="' + pal.b + '" stroke-width=".02"/><circle cx="' + (cx + .08) + '" cy="' + (cy - .16) + '" r=".016" fill="' + pal.eye + '"/></g>';
     L.arrows.forEach(function (a) { var an = (a.dir * 45 - 90) * Math.PI / 180, ax = cx + Math.cos(an) * .38, ay = cy + Math.sin(an) * .38, nx = cx + Math.cos(an) * .27, ny = cy + Math.sin(an) * .27; s += '<g transform="translate(' + ax + ' ' + ay + ') rotate(' + a.dir * 45 + ') scale(.011)"><path d="M0-10L7-1H2.6V8H-2.6V-1H-7Z" fill="' + C.gold + '" stroke="' + C.ink + '" stroke-width="1"/></g><circle cx="' + nx + '" cy="' + ny + '" r=".055" fill="' + C.ink + '" stroke="' + C.gold + '" stroke-width=".01"/><text x="' + nx + '" y="' + (ny + .03) + '" text-anchor="middle" font-size=".08" font-weight="700" fill="#fff2c4" font-family="' + FD.replace(/"/g, "'") + '">' + a.n + '</text>'; });
     L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);
-    var lvg = L.node.querySelector('.lv'); if (lvg) lvg.innerHTML = '<image href="models/leviathan.webp" x="' + (cx - .47) + '" y="' + (cy - .56) + '" width=".94" height=".94"/>';
+    var lvg = L.node.querySelector('.lv'); if (lvg) lvg.innerHTML = '<image href="models/leviathan@512.webp" x="' + (cx - .47) + '" y="' + (cy - .56) + '" width=".94" height=".94"/>';
   },
   unlev: function (L) { if (L.node) L.node.remove(); },
   pulse: function (c, r) { R2.fx('splash', c - 2.5, r - 2.5, 1.2); },
