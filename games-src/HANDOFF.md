@@ -12,6 +12,11 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Owner rules this week: credits = "Art and music by Am015-dev", never name the music/art tools; "Shuffle all songs" is the default music; music never changes playback rate; check a live link (curl 200) before sending it; look at PC layouts as well as phone.
 - Open owner decisions: replace the few CC BY tracks (credits must stay while used); open games as separate pages instead of the shelf iframe (frees memory fully).
 
+## Mainhattan Nightrun L1 (13 Oct 2026): stages, map, difficulty, strategy
+- Story is 40 stages (8 per district) plus 5 optional challenge stages (no-hit, speed, perfect-beat) on a painted scrollable route map (`parts/map.js`); tap a node, read the plate, PLAY. Old saves move by stage name (`v40`). How it works: `games-src/nightrun/STORY.md`.
+- One tuning table (`LV`, `HULL`, `TUNE.dm`, `TUNE.lenK` at the top of `parts/story.js`); check it with `RUNS=16 STAGES=$(seq -s, 1 45) node games-src/nightrun/story-sim.js` (bot clears stages 1-16 every time, about 80% of 33-40; the bot keeps moving, the anti-idle beam hit it before).
+- Strategy layer: `parts/paths.js` (tables), `parts/strategy.js` (pit stop, heat, slots, selling, boss picks), market and loadout in `parts/meta.js`; `strategy-test.js` checks the numbers. Open: balance numbers of synergies and set bonuses are first guesses; the HUD contrast findings of `ui-align-test.js` (K1's) are still open.
+
 ## Mainhattan Nightrun J1 (10 Oct 2026)
 - Music is locked at playbackRate 1 with natural pitch (`NR.music.setRate` ignores everything but 1); TEMPO UP = double-time fire + score x2, SLOW GROOVE = world at 0.6x (`PW.wk`) + soft low-pass, master limiter. `audio-test.js` asserts rate 1 and no clipping through TEMPO, SLOW, DROP, low hull.
 - `parts/fun.js`: set pieces every 6 bars (WEAVE, LASER FENCE, district formation), DROP every 16 bars (dash on the downbeat), shard showers; mini-boss every ~26 bars. `fun-test.js` covers it; bots call `FUN.cost(y)`.
