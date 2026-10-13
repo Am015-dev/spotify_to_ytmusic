@@ -152,7 +152,7 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
       const fw=fr.t.clone().multiplyScalar(.87).addScaledVector(fr.r,r.sd*.5).normalize();a.up.copy(fw);a.lookAt(c2.clone().add(fr.u));WORLD.add(a)})}}
   // hills / beach beyond the edge (not on cliff sides, not on water lanes)
   {const m=MB(),gc=COL[0],sc=COL[2];
-    for(const sg of[-1,1])strip(m,i=>{const j=i%N;if(OPN.CL[j]===sg||(OPN.RT[j]>=0&&OPN.SD[j]===sg&&OPN.routes[OPN.RT[j]].kind==='water'))return null;
+    for(const sg of[-1,1])strip(m,i=>{const j=i%N;if(OPN.CL[j]===sg||(OPN.NEAR&&OPN.NEAR[j])||(OPN.RT[j]>=0&&OPN.SD[j]===sg&&OPN.routes[OPN.RT[j]].kind==='water'))return null;
       if(ath&&OPN.SEA[j]&&sg===OPN.out)return[[sg*48,0,...sc.toArray()],[sg*58,-.4,...sc.toArray()],[sg*72,-3,...sc.toArray()],[sg*240,-10,...sc.toArray()]];
       const s=i*td.ds,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg),sh=k=>[gc.r*k,gc.g*k,gc.b*k];
       return[[sg*48,0,...sh(.9)],[sg*52,1.2,...sh(.82)],[sg*62,H*.18,...sh(.95)],[sg*90,H*.55,...sh(1)],[sg*140,H,...sh(.9)],[sg*230,H*1.4,...sh(.8)]]},null,(i,q)=>[q[0]/12,i*td.ds/12]);
@@ -168,14 +168,14 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
     for(let i=0;i<N;i+=3){if(gap(i))continue;frameAt(td,i*td.ds,fr);for(const sg of[-1,1]){const water=OPN.RT[i]>=0&&OPN.SD[i]===sg&&OPN.routes[OPN.RT[i]].kind==='water';if(OPN.CL[i]===sg)continue;
         if(ath&&OPN.SEA[i]&&sg===OPN.out&&i%9)continue;v.copy(fr.p).addScaledVector(fr.r,sg*(48.4+OPN_noise(i,sg)*1.2));(water?buoys:rocks).push([v.x,v.y,v.z,OPN_noise(i,sg*3)])}
       if(OPN.IH[i]>2&&i%12===0){v.copy(fr.p).addScaledVector(fr.r,OPN.SD[i]*(OPN_I0+OPN_I1)/2).addScaledVector(fr.u,.8);trees.push([v.x,v.y,v.z,ath?.4:.55])}
-      if(i%5===0)for(const sg of[-1,1]){if(OPN.CL[i]===sg||(ath&&OPN.SEA[i]&&sg===OPN.out)||OPN.RT[i]>=0&&OPN.SD[i]===sg&&OPN.routes[OPN.RT[i]].kind==='water')continue;const t=60+OPN_noise(i,sg*7)*150;if(OPN_noise(i,sg*11)<.45)continue;
+      if(i%5===0)for(const sg of[-1,1]){if(OPN.CL[i]===sg||(OPN.NEAR&&OPN.NEAR[i])||(ath&&OPN.SEA[i]&&sg===OPN.out)||OPN.RT[i]>=0&&OPN.SD[i]===sg&&OPN.routes[OPN.RT[i]].kind==='water')continue;const t=60+OPN_noise(i,sg*7)*150;if(OPN_noise(i,sg*11)<.45)continue;
         const s=i*td.ds,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg),yy=t<90?H*(.18+.37*(t-62)/28):t<140?H*(.55+.45*(t-90)/50):H*(1+.4*(t-140)/90);v.copy(fr.p).addScaledVector(fr.r,sg*t);trees.push([v.x,v.y+yy-.5,v.z,1+OPN_noise(i,sg)*.6])}}
     const inst=(geo,mat,L,sc)=>{if(!L.length)return;const im=new THREE.InstancedMesh(geo,mat,L.length),M=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler();L.forEach((a,k)=>{e.set(0,a[3]*6.28,0);q.setFromEuler(e);const s=sc(a);M.compose(V3(a[0],a[1]+(s.dy||0),a[2]),q,V3(s.x,s.y,s.z));im.setMatrixAt(k,M)});im.castShadow=false;im.receiveShadow=true;WORLD.add(im)};
     // RO5 dressing (shots read bare): a tree line on the hill foot, bushes at the edge, drive-through LEGO tufts + flowers on the open terrain (low, no collider needed)
     const bush=[],tuft=[],flo=[],cyp=[],stn=[],hy=(t,H)=>t<52?1.2*(t-48)/4:t<62?1.2+(H*.18-1.2)*(t-52)/10:H*(.18+.37*(t-62)/28);
     for(let i=1;i<N;i+=2){if(gap(i))continue;frameAt(td,i*td.ds,fr);const s=i*td.ds,wl=OPN.RT[i]>=0&&OPN.routes[OPN.RT[i]].kind==='water';
       for(const sg of[-1,1]){const sea=ath&&OPN.SEA[i]&&sg===OPN.out,wat=wl&&OPN.SD[i]===sg,H=7+9*(.5+.5*Math.sin(s/170+sg*2.1))+5*Math.sin(s/61+sg);
-        if(OPN.CL[i]!==sg&&!sea&&!wat){if(i%3===0&&OPN_noise(i,sg*5)>.3){const t=51+OPN_noise(i,sg*13)*9;v.copy(fr.p).addScaledVector(fr.r,sg*t);(ath&&OPN_noise(i,sg*17)<.45?cyp:trees).push([v.x,v.y+hy(t,H)-.4,v.z,.8+OPN_noise(i,sg*19)*.5])}
+        if(OPN.CL[i]!==sg&&!sea&&!wat&&!(OPN.NEAR&&OPN.NEAR[i])){if(i%3===0&&OPN_noise(i,sg*5)>.3){const t=51+OPN_noise(i,sg*13)*9;v.copy(fr.p).addScaledVector(fr.r,sg*t);(ath&&OPN_noise(i,sg*17)<.45?cyp:trees).push([v.x,v.y+hy(t,H)-.4,v.z,.8+OPN_noise(i,sg*19)*.5])}
           if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(49.6+OPN_noise(i,sg*29)*2.4));bush.push([v.x,v.y+hy(49.6,H)*.5,v.z,.7+OPN_noise(i,sg*31)*.6])}}
         const lim=OPN.CL[i]===sg?OPN.LIP[i]-3:wat?OPN_I1-1:44;for(let k=0;k<3;k++){const n=OPN_noise(i*3+k,sg*37);if(n<.3)continue;const x=16+OPN_noise(i*3+k,sg*41)*(lim-16);if(x>lim)continue;
           if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:ath&&n<.45?stn:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
@@ -191,7 +191,7 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
     inst(crown,tm,trees,a=>({x:a[3],y:a[3],z:a[3],dy:(ath?3.6:5)*a[3]}));inst(new THREE.CylinderGeometry(.45,.6,3,6),new THREE.MeshStandardMaterial({color:0x6b4423,roughness:.9}),trees,a=>({x:a[3],y:a[3],z:a[3],dy:1.5*a[3]}))}
   // far scenery: ground plane, Frankfurt skyline or the Acropolis + the sea
   {let cx=0,cz=0,y0=1e9;for(let i=0;i<N;i++){cx+=td.P[i*3]/N;cz+=td.P[i*3+2]/N;y0=Math.min(y0,td.P[i*3+1])}
-    const gp=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),new THREE.MeshStandardMaterial({color:ath?0x2a7fc0:0x4f9a3a,roughness:ath?.2:.95,metalness:ath?.1:0}));gp.rotation.x=-Math.PI/2;gp.position.set(cx,ath?y0-2.4:y0-30,cz);WORLD.add(gp);
+    const gp=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),new THREE.MeshStandardMaterial({color:ath?0x2a7fc0:0x4f9a3a,roughness:ath?.2:.95,metalness:ath?.1:0}));gp.rotation.x=-Math.PI/2;gp.position.set(cx,ath?y0-2.4:TRK.tb?y0-10:y0-30,cz);WORLD.add(gp);
     if(o.sky){const bm=new THREE.MeshStandardMaterial({color:0x7d8fae,roughness:.6,metalness:.2}),g=[];for(let k=0;k<16;k++){const a=-1.9+k*.09+OPN_noise(k,1)*.05,d=1300+OPN_noise(k,2)*350,h=70+OPN_noise(k,3)*190,w=34+OPN_noise(k,4)*30;
         const b=new THREE.BoxGeometry(w,h,w);b.translate(cx+Math.cos(a)*d,y0+h/2-10,cz+Math.sin(a)*d);g.push(b)}const mg=THREE.BufferGeometryUtils?THREE.BufferGeometryUtils.mergeGeometries(g):null;if(mg)WORLD.add(new THREE.Mesh(mg,bm));else for(const b of g)WORLD.add(new THREE.Mesh(b,bm))}
     if(o.acro){const ax=cx+700,az=cz-1100,hill=new THREE.Mesh(new THREE.CylinderGeometry(150,260,70,12),new THREE.MeshStandardMaterial({color:0xcbb68e,roughness:.9,flatShading:true}));hill.position.set(ax,y0+30,az);WORLD.add(hill);

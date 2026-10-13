@@ -7,9 +7,33 @@
 // (98ro_open.js: 96 m ribbon, asphalt in the middle, terrain beside it, routes behind an island, pit jumps).
 // Track JSON v1: {v,id,name,city,laps,road,pts:[[x,z,h,ter]…] (world m; ter = surface of the segment pt→next), pc:[{k,x,z,n?}…], st:[x,z]}
 const TB_TERS=['grass','dirt','sand','cobble'],TB_TCOL={grass:'#58b43a',dirt:'#9b6a3c',sand:'#e2c98a',cobble:'#9a948a'};
-const TB_V={top:62,lat:13,acc:7,brk:16,cal:1};// lap estimate (docs/TRACK_FUN.md); cal = measured / estimated (test drive)
+const TB_V={top:62,lat:13,acc:7,brk:16,cal:1,rk:{}};// rk: per-route-kind balance factor (measured, tRace alt vs road)// lap estimate (docs/TRACK_FUN.md); cal = measured / estimated (test drive)
 const TB_PCS={jump:{ic:'⤴',c:'#ff7a1c',l:'JUMP'},boost:{ic:'⚡',c:'#ffd12c',l:'BOOST'},item:{ic:'?',c:'#4ceaff',l:'ITEMS'},gate:{ic:'⛩',c:'#ff2d95',l:'GATE'},
-  scw:{ic:'≈',c:'#29b6ff',l:'WATER SC'},scd:{ic:'⛰',c:'#ff9a1f',l:'DIRT SC'}};
+  scw:{ic:'≈',c:'#29b6ff',l:'WATER SC'},scd:{ic:'⛰',c:'#ff9a1f',l:'DIRT SC'},
+  // track-2 stunt pieces (98ts_track_stunts.js builds them): big kicker ramp, gap jumps over water / a road, banked curve, stunt split, landmark
+  ramp:{ic:'⤒',c:'#ff5a1c',l:'BIG RAMP'},gapw:{ic:'⛵',c:'#1f8bff',l:'WATER GAP'},gapr:{ic:'⛟',c:'#c46bff',l:'ROAD GAP'},bank:{ic:'◢',c:'#9bff5a',l:'BANK'},
+  scs:{ic:'★',c:'#ff3fa4',l:'STUNT SC'},lm:{ic:'🏛',c:'#ffffff',l:'LANDMARK'}};
+// track-2: stunt / route numbers shared by the lint (estimate) and the race (98ts). Kicker: y=h·u² over L metres before the lip (slope 2h/L at the lip).
+const TB_ST={rH:3.6,rL:36,gH:3.2,gL:30,gHalf:32,gR:14,gG:15,lH:3.2,lL:24,bank:.34,bankGrip:.45,air:1.5,lane:27,fly:12,
+  LM:{fra:['messe','dom','roemer','steg','skyline'],ath:['akro','synt','lyka','plaka','pireas']},
+  // landmark sight range (m): tall towers read from far away
+  LMV:{messe:1800,dom:1300,roemer:700,steg:600,skyline:2200,akro:2400,synt:1000,lyka:2000,plaka:800,pireas:1000},
+  LMN:{messe:'MESSETURM',dom:'KAISERDOM',roemer:'RÖMER',steg:'EISERNER STEG',skyline:'MAINHATTAN',akro:'AKROPOLIS',synt:'SYNTAGMA',lyka:'LYKAVITTOS',plaka:'PLAKA',pireas:'PIRAEUS'}};
+const TB_JK=['jump','ramp','gapw','gapr'],TB_SK=['scw','scd','scs'];
+// kicker height / length per jump kind (0 = no kicker: the old pit jump)
+const TB_kick=k=>k==='ramp'?[TB_ST.rH,TB_ST.rL]:k==='gapw'||k==='gapr'?[TB_ST.gH,TB_ST.gL]:[0,0];
+// estimated air time of a launch at speed v from the lip at sample i (kicker of height h, slope 2h/L), landing on the track profile Y
+function TB_air(g,i,v,k){const[h,L]=TB_kick(k);const gap=k==='gapw'||k==='gapr',G=gap?TB_ST.gG:TB_ST.gR,vy=v*(L?2*h/L:.2)+(gap?2:1),y0=g.Y[i]+h;
+  let t=0;for(;t<6;t+=.02){const u=v*t,j=Math.floor((i*g.ds+u)/g.ds)%g.N,y=y0+vy*t-G*t*t/2;
+    if(gap&&u<2*TB_ST.gHalf){if(y<g.Y[j]-9)return{t,land:u,clear:false};continue}if(t>.1&&y<=g.Y[j]+(k==='ramp'&&u<4?h:0))break}
+  return{t,land:v*t,clear:true}}
+// route geometry: inside lane at x=±27; length ratio alt/main = mean(1-|k|·27)
+function TB_route(t,g,p){const n=t.pts.length,N=g.N,sl=q=>(g.cpI[(q+1)%n]-g.cpI[q]+N)%N*g.ds;let q=g.SEG[TB_near(g,p.x,p.z).i],qb=(q+1)%n,len=sl(q);
+  // dense point tracks: grow the split over the neighbouring segments (alternately) until it is ≥ 320 m long
+  for(let k=0;len<320&&k<2*n;k++){if(k%2){q=(q-1+n)%n;len+=sl(q)}else{len+=sl(qb);qb=(qb+1)%n}}
+  const a=g.cpI[q],b=g.cpI[qb],m=(b-a+N)%N;let km=0,rho=0;
+  for(let d=0;d<m;d++){const kk=g.K[(a+d)%N];km+=kk}km/=Math.max(1,m);const sd=Math.sign(km)||1;for(let d=0;d<m;d++)rho+=1-sd*g.K[(a+d)%N]*TB_ST.lane;rho/=Math.max(1,m);
+  return{q,qb,a,b,m,len:m*g.ds,km,sd,rho}}
 const TB={on:false,trk:null,undo:[],tool:'pt',sel:-1,view:{s:.25,x:0,z:0},snap:false,lint:null,el:null,cv:null,defs:{},list:{},db:null,uid:null,dbErr:'',ptr:new Map(),drag:null,toast:0};
 const TB_clone=o=>JSON.parse(JSON.stringify(o));
 function TB_new(city){return{v:1,id:'tb_'+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36),name:'My Track',city:city||'fra',laps:3,road:14,pts:[],pc:[],st:null}}
@@ -49,14 +73,17 @@ function TB_lint(t){const g=TB_geo(t),R=[],marks=[];const rule=(id,name,ok,val,n
   rule('L5','Corner mix',nF>=2&&nM>=2&&nT>=1,`${nF} fast · ${nM} med · ${nT} tight`,'2 · 2 · 1');
   {const nr=cor.filter(c=>c.sg>0).length,nl=cor.length-nr,f=cor.length?Math.min(nl,nr)/cor.length:0;rule('L6','Left and right',cor.length>=2&&f>=.3,`${nl} L · ${nr} R`,'each ≥ 30 %')}
   {const mn=cor.reduce((a,c)=>Math.min(a,c.r),1e9);rule('L7','Drivable corners',mn>=55,(mn>1e8?'–':Math.round(mn)+' m'),'R ≥ 55 m');for(const c of cor)if(c.r<55)marks.push({x:g.X[c.i],z:g.Z[c.i],r:40,c:'#ff3b3b',t:'R '+Math.round(c.r)})}
-  // L8 overlap: ≥ 110 m from any part more than 300 m away along the track
-  {let bad=0,bx=0,bz=0,st=Math.max(1,Math.round(10/ds));for(let i=0;i<N&&bad<1;i+=st)for(let j=i+st;j<N;j+=st){const da=Math.min(j-i,N-(j-i))*ds;if(da<300)continue;if((g.X[i]-g.X[j])**2+(g.Z[i]-g.Z[j])**2<110*110){bad++;bx=(g.X[i]+g.X[j])/2;bz=(g.Z[i]+g.Z[j])/2;break}}
-    rule('L8','No overlap',!bad,bad?'crosses':'clear','gap ≥ 110 m');if(bad)marks.push({x:bx,z:bz,r:70,c:'#ff3b3b',t:'OVERLAP'})}
+  // L8 overlap: ≥ 110 m from any part more than 300 m away along the track, EXCEPT a crossing (flyover): ≥ 12 m above/below and short (≤ 260 m close)
+  {let bad=0,bx=0,bz=0,fly=0;const st=Math.max(1,Math.round(10/ds)),cl=new Uint8Array(N);
+    for(let i=0;i<N;i+=st)for(let j=0;j<N;j+=st){const da=Math.min(Math.abs(j-i),N-Math.abs(j-i))*ds;if(da<300)continue;if((g.X[i]-g.X[j])**2+(g.Z[i]-g.Z[j])**2<110*110){cl[i]=1;if(Math.abs(Y[i]-Y[j])<TB_ST.fly&&!bad){bad++;bx=(g.X[i]+g.X[j])/2;bz=(g.Z[i]+g.Z[j])/2}}}
+    let run=0,mx=0;for(let q=0;q<2*N;q+=st){if(cl[q%N])run+=st*ds;else{if(run>0)fly++;run=0}mx=Math.max(mx,run)}fly=Math.round(fly/2);
+    if(mx>260&&!bad){bad=1;bx=g.X[0];bz=g.Z[0]}
+    rule('L8','No overlap (flyover ok)',!bad,bad?'crosses':fly?fly+' flyover':'clear','gap ≥ 110 m or ≥ 12 m above');if(bad)marks.push({x:bx,z:bz,r:70,c:'#ff3b3b',t:'OVERLAP'});g.fly=fly}
   const pos=k=>t.pc.filter(p=>p.k===k).map(p=>({...p,i:TB_near(g,p.x,p.z).i})).sort((a,b)=>a.i-b.i),gap=(a,b)=>{const d=Math.abs(a-b)*ds;return Math.min(d,L-d)};
-  {const J=pos('jump');let ok=J.length>=1&&J.length<=3;for(const j of J){let st=true;for(let d=-30;d<=30;d++)if(Rr((j.i+d+N)%N)<250)st=false;if(!st){ok=false;marks.push({x:g.X[j.i],z:g.Z[j.i],r:40,c:'#ff3b3b',t:'JUMP IN BEND'})}}
-    for(let a=0;a<J.length;a++)for(let b=a+1;b<J.length;b++)if(gap(J[a].i,J[b].i)<300)ok=false;rule('L9','Jumps',ok,J.length+' per lap','1–3, straight')}
-  {const S=t.pc.filter(p=>p.k==='scw'||p.k==='scd');let good=0;for(const p of S){const q=TB_segOf(t,g,p),a=g.cpI[q],b=g.cpI[(q+1)%t.pts.length],n=(b-a+N)%N,len=n*ds;let km=0;for(let d=0;d<n;d++)km+=K[(a+d)%N];km/=Math.max(1,n);
-      const ok=len>=200&&len<=800&&Math.abs(km)>1/700;if(ok)good++;else marks.push({x:p.x,z:p.z,r:50,c:'#ff3b3b',t:len<200?'SC TOO SHORT':len>800?'SC TOO LONG':'SC NOT ON A BEND'})}
+  {const J=t.pc.filter(p=>TB_JK.includes(p.k)).map(p=>({...p,i:TB_near(g,p.x,p.z).i})).sort((a,b)=>a.i-b.i);let ok=J.length>=1&&J.length<=4;for(const j of J){let st=true;for(let d=-30;d<=30;d++)if(Rr((j.i+d+N)%N)<250)st=false;if(!st){ok=false;marks.push({x:g.X[j.i],z:g.Z[j.i],r:40,c:'#ff3b3b',t:'JUMP IN BEND'})}}
+    for(let a=0;a<J.length;a++)for(let b=a+1;b<J.length;b++)if(gap(J[a].i,J[b].i)<300)ok=false;rule('L9','Jumps',ok,J.length+' per lap','1–4, straight, 300 m apart')}
+  {const S=t.pc.filter(p=>TB_SK.includes(p.k));let good=0;for(const p of S){const r=TB_route(t,g,p),len=r.len;
+      const ok=len>=200&&len<=800&&Math.abs(r.km)>1/700;if(ok)good++;else marks.push({x:p.x,z:p.z,r:50,c:'#ff3b3b',t:len<200?'SC TOO SHORT':len>800?'SC TOO LONG':'SC NOT ON A BEND'})}
     rule('L10','Shortcut with a trade-off',good>=1,good+' ok of '+S.length,'≥ 1 on a bend')}
   {const n=pos('boost').length;rule('L11','Boost pads',n>=2&&n<=6,n+'','2–6')}
   {const I=pos('item');let ok=I.length>=2&&I.length<=5;for(let a=0;a<I.length;a++){const b=(a+1)%I.length;if(I.length>1&&gap(I[a].i,I[b].i)<400)ok=false}rule('L12','Item rows',ok,I.length+' rows','2–5, ≥ 400 m apart')}
@@ -64,6 +91,17 @@ function TB_lint(t){const g=TB_geo(t),R=[],marks=[];const rule=(id,name,ok,val,n
   {const G=pos('gate');let mx=0;for(let a=0;a<G.length;a++){const b=(a+1)%G.length,i0=G[a].i,i1=G[b].i;let dt=i1>i0?T[i1]-T[i0]:T[N]-T[i0]+T[i1];if(G.length===1)dt=T[N];mx=Math.max(mx,dt*TB_V.cal)}
     rule('L14','Checkpoints',G.length>=3&&mx<=25,G.length+' gates · '+(G.length?Math.round(mx)+' s':'–'),'≥ 3 · ≤ 25 s')}
   {const k=new Set(t.pts.map(p=>p[3]||'grass'));if(t.pc.some(p=>p.k==='scw'))k.add('water');if(t.pc.some(p=>p.k==='scd'))k.add('dirt');rule('L15','Surface mix',k.size>=2,[...k].join(' '),'≥ 2 kinds')}
+  // ---- track-2 stunt / route / landmark rules (docs/TRACK_FUN.md L16–L19)
+  {const J=t.pc.filter(p=>TB_JK.includes(p.k)&&p.k!=='jump');let big=0;const air=[];
+    for(const p of J){const ic=TB_near(g,p.x,p.z).i,i=p.k==='ramp'?ic:(ic-Math.round(TB_ST.gHalf/ds)+N)%N,a=TB_air(g,i,v[(i-2+N)%N],p.k);air.push(+a.t.toFixed(1));if(a.t>=TB_ST.air&&a.clear)big++;else marks.push({x:p.x,z:p.z,r:45,c:'#ff3b3b',t:a.clear?'AIR '+a.t.toFixed(1)+' s':'GAP TOO LONG'})}
+    g.air=air;rule('L16','Big stunts',big>=2,big+' · air '+(air.join(' / ')||'–')+' s','≥ 2 with ≥ 1.5 s air')}
+  {const S=t.pc.filter(p=>TB_SK.includes(p.k));let ok=0;const kinds=new Set(),seen=new Set();
+    for(const p of S){const r=TB_route(t,g,p);if(seen.has(r.q))continue;seen.add(r.q);const good=r.len>=200&&r.len<=800&&r.rho<.985;if(good){ok++;kinds.add(p.k)}}
+    rule('L17','Route splits',ok>=2&&kinds.size>=2,ok+' splits · '+[...kinds].map(k=>({scw:'boat',scd:'dirt',scs:'stunt'})[k]).join(' '),'≥ 2, 2 kinds (time ±5 %)')}
+  {const M=t.pc.filter(p=>p.k==='lm');let vis=0;
+    for(let i=0;i<N;i++){let see=false;for(const m of M){const dx=m.x-g.X[i],dz=m.z-g.Z[i],d=Math.hypot(dx,dz),r=TB_ST.LMV[m.n]||800;if(d>r)continue;const c=(dx*g.TX[i]+dz*g.TZ[i])/(d||1);if(c>Math.cos(d<200?1.1:.66)){see=true;break}}if(see)vis+=T[i+1]-T[i]}
+    const f=T[N]?vis/T[N]:0;rule('L18','Landmark on screen',f>=.5,Math.round(f*100)+' % · '+M.length+' landmarks','≥ 50 % of the lap')}
+  {let y0=1e9,y1=-1e9;for(let i=0;i<N;i++){y0=Math.min(y0,Y[i]);y1=Math.max(y1,Y[i])}rule('L19','Elevation range',y1-y0>=15,Math.round(y1-y0)+' m','≥ 15 m')}
   return{g,rules:R,lap,race,marks,cor}}
 // segment a piece sits on (nearest sample → SEG)
 function TB_segOf(t,g,p){return g.SEG[TB_near(g,p.x,p.z).i]}
@@ -77,10 +115,16 @@ function TB_def(t){const key=JSON.stringify(t);if(TB.defs[t.id]&&TB.defs[t.id].k
   const secOf=q=>{let best=null,bd=1e9;for(const p of G){const d=(q-p.q+n)%n;if(d<bd){bd=d;best=p}}return(best&&best.n)||(t.name||'COURSE').toUpperCase()};
   const cp=[],ter={},tseg=[];for(let k=0;k<n;k++){const i=(st+k)%n,p=t.pts[i],nm=secOf(i);cp.push([p[0]/S,p[2]||0,p[1]/S,nm]);tseg.push(p[3]||'grass')}
   const jumps=t.pc.filter(p=>p.k==='jump').map((p,k)=>({id:'tbj'+k,name:'JUMP',kind:'pit',at:[p.x/S,p.z/S],half:22,floor:-8,style:ath?'rock':'creek',msg:'BIG AIR'}));
-  const routes=t.pc.filter(p=>p.k==='scw'||p.k==='scd').map(p=>{const q=rot(TB_segOf(t,g,p));return{a:q,b:(q+1)%n,kind:p.k==='scw'?'water':'dirt',kf:p.k==='scw'?1.45:undefined}}).filter((r,i,a)=>a.findIndex(o=>o.a===r.a)===i);
+  // track-2: gap jumps (kicker + a 64 m gap over water / a road), big ramps (kicker, no gap), banks, landmarks (98ts builds and flies them)
+  t.pc.forEach((p,k)=>{if(p.k==='gapw'||p.k==='gapr')jumps.push({id:'tbg'+k,name:p.k==='gapw'?'WATER JUMP':'ROAD JUMP',kind:'pit',at:[p.x/S,p.z/S],half:TB_ST.gHalf,floor:-8,style:p.k==='gapw'?'creek':'rail',tbk:p.k,msg:p.k==='gapw'?'INTO THE WATER':'ONTO THE ROAD'})});
+  const kick=t.pc.filter(p=>TB_JK.includes(p.k)&&p.k!=='jump').map(p=>({k:p.k,x:p.x,z:p.z}));
+  // routes: the alt lane's top speed is scaled by the lane/road length ratio (rho) × a per-kind factor, so every split is within ±5 % (tRace)
+  const RK={scw:1.45,scd:1.2,scs:1.12},routes=t.pc.filter(p=>TB_SK.includes(p.k)).map(p=>{const r=TB_route(t,g,p),q=rot(r.q);
+    return{a:q,b:rot(r.qb),kind:p.k==='scw'?'water':p.k==='scs'?'stunt':'dirt',kf:+(RK[p.k]*r.rho*(TB_V.rk[p.k]||1)).toFixed(3),rho:+r.rho.toFixed(3)}}).filter((r,i,a)=>a.findIndex(o=>o.a===r.a)===i);
   // laps: 99_api.js scales every race's laps by CR_RK (round(laps·CR_RK)); pre-divided so the author's 1–3 laps survive
   const def={id:t.id,tb:t,name:t.name||'My Track',short:(t.name||'My Track').slice(0,18),open:1,w:96,w15:96,laps:t.laps/CR_RK,bank:.25,road:clamp(t.road/2,5,8.5),mood:ath?'athnoon':'brick',tunnel:'',clear:[],city:ath?'ath':undefined,
-    desc:'Built in the track builder.',cp,jumps,ro:{ter,tseg,routes,cliffs:[],sky:ath?0:1,acro:ath?1:0,col:ath?[0xa7a94a,0xa8763e,0xecd9a0,0xd8cdb8]:[0x58b43a,0x9b6a3c,0xe2c98a,0x9a948a]}};
+    desc:t.desc||'Built in the track builder.',cp,jumps,kick,banks:t.pc.filter(p=>p.k==='bank').map(p=>({x:p.x,z:p.z})),lms:t.pc.filter(p=>p.k==='lm').map(p=>({x:p.x,z:p.z,n:p.n})),
+    ro:{ter,tseg,routes,cliffs:[],sky:ath?0:1,acro:ath&&!t.pc.some(p=>p.n==='akro')?1:0,col:ath?[0xa7a94a,0xa8763e,0xecd9a0,0xd8cdb8]:[0x58b43a,0x9b6a3c,0xe2c98a,0x9a948a]}};
   if(!ath)delete def.city;TB.defs[t.id]={key,def};return def}
 function TB_reg(def){const i=TRACK_DEFS.findIndex(d=>d.id===def.id);if(i>=0)TRACK_DEFS[i]=def;else TRACK_DEFS.push(def);return def}
 // race hooks: asphalt width, per-segment surface, authored pads, checkpoint gates
@@ -117,14 +161,14 @@ const TB_css=`body.tbOn #tuG,body.tbOn #odNew,body.tbOn #odPin{display:none!impo
 #tbx canvas{position:absolute;left:0;top:0}#tbx .tbar{position:absolute;left:0;right:0;top:0;height:48px;display:flex;gap:4px;align-items:center;padding:2px 6px calc(2px) max(6px,env(safe-area-inset-left));background:rgba(8,14,28,.92);overflow-x:auto}
 #tbx button{min-width:44px;min-height:44px;border:0;border-radius:10px;background:#24324f;color:#fff;font:800 13px system-ui,sans-serif;padding:0 8px;flex:0 0 auto}#tbx button[aria-pressed=true]{background:#ffd12c;color:#111}
 #tbx button.go{background:#2bd46b;color:#06210f}#tbx .nm{max-width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-#tbx .pal{position:absolute;left:max(4px,env(safe-area-inset-left));top:54px;display:grid;grid-template-columns:48px 48px;gap:4px}#tbx .pal button{width:48px;height:44px;padding:0;font-size:12px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#tbx .pal{position:absolute;left:max(4px,env(safe-area-inset-left));top:54px;display:grid;grid-template-columns:46px 46px 46px;gap:3px}#tbx .pal button{width:46px;height:44px;min-width:0;padding:0;font-size:12px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
 #tbx .pal button i{font-style:normal;font-size:18px}#tbx .pal button small{font-size:9px;font-weight:800;margin-top:2px}
 #tbx .lint{position:absolute;right:max(4px,env(safe-area-inset-right));top:54px;bottom:4px;width:228px;background:rgba(8,14,28,.88);border-radius:12px;padding:6px 8px;overflow:auto}
 #tbx .lint.min{bottom:auto;height:auto}#tbx .lint h4{margin:0 0 4px;font:900 15px system-ui;display:flex;justify-content:space-between;align-items:center;gap:6px}#tbx .lint h4 button{min-height:32px;min-width:44px}
 #tbx .lr{display:flex;gap:6px;align-items:baseline;font-size:12px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.06)}#tbx .lr b{width:14px;flex:0 0 14px}#tbx .lr span{flex:1}#tbx .lr em{font-style:normal;opacity:.8;font-size:12px;text-align:right}
-#tbx .ok b{color:#3ee07a}#tbx .no b{color:#ff4d4d}#tbx .sel{position:absolute;left:110px;bottom:max(6px,env(safe-area-inset-bottom));display:flex;gap:4px;background:rgba(8,14,28,.9);padding:4px;border-radius:12px}
+#tbx .ok b{color:#3ee07a}#tbx .no b{color:#ff4d4d}#tbx .sel{position:absolute;left:156px;bottom:max(6px,env(safe-area-inset-bottom));display:flex;gap:4px;background:rgba(8,14,28,.9);padding:4px;border-radius:12px}
 #tbx .sel span{min-width:56px;text-align:center;align-self:center}#tbx .toast{position:absolute;left:50%;top:56px;transform:translateX(-50%);background:#ffd12c;color:#111;padding:8px 14px;border-radius:10px;font-weight:900;pointer-events:none}
-#tbx .hint{position:absolute;left:112px;top:56px;right:240px;font-size:12px;opacity:.85;pointer-events:none;text-shadow:0 1px 2px #000}
+#tbx .hint{position:absolute;left:158px;top:56px;right:240px;font-size:12px;opacity:.85;pointer-events:none;text-shadow:0 1px 2px #000}
 #tbx .ov{position:absolute;inset:0;background:rgba(4,8,18,.94);display:flex;flex-direction:column;padding:10px max(14px,env(safe-area-inset-left));overflow:auto;gap:8px}#tbx .ov h3{margin:4px 0;font:900 18px system-ui}
 #tbx .ov .rowb{display:flex;flex-wrap:wrap;gap:6px}#tbx .ov .trk{display:flex;gap:6px;align-items:center;background:#16223a;border-radius:12px;padding:6px 8px}#tbx .ov .trk b{flex:1;min-width:120px}
 #tbx textarea{width:100%;min-height:70px;background:#0a1122;color:#cfe;border:1px solid #345;border-radius:8px;font:12px monospace}`;
@@ -148,7 +192,7 @@ function TB_ui(){const t=TB.trk,e=TB.el;if(!t||!e)return;if(!TB.lint)TB.lint=TB_
   const pal=e.querySelector('#tbPal');pal.innerHTML='';const tools=[['pt','●','POINT'],['ter','🎨','SURFACE'],['start','🏁','START'],...Object.entries(TB_PCS).map(([k,v])=>[k,v.ic,v.l]),['del','✕','ERASE']];
   for(const[k,ic,l]of tools)pal.append(TB_btn(`<i>${ic}</i><small>${l}</small>`,()=>{TB.tool=k;TB.sel=-1;TB_ui()},{p:TB.tool===k}));
   e.querySelector('#tbHint').textContent=t.pts.length<3?'Tap the map to drop points (a loop closes itself). Drag a point to move it. Drag the map to pan, pinch or wheel to zoom.':
-    {pt:'Tap the map: add a point (on the track: insert). Drag points. Tap a point for height / delete.',ter:'Tap a segment to change its surface: grass → dirt → sand → cobbles.',start:'Tap a point: the grid starts there.',del:'Tap a piece or a point to erase it.'}[TB.tool]||('Tap the track to place: '+TB_PCS[TB.tool].l);
+    {pt:'Tap the map: add a point (on the track: insert). Drag points. Tap a point for height / delete.',ter:'Tap a segment to change its surface: grass → dirt → sand → cobbles.',start:'Tap a point: the grid starts there.',del:'Tap a piece or a point to erase it.',lm:'Tap beside the track to place a landmark; tap it again for another one.',bank:'Tap a corner: it gets banked (take it flat out).'}[TB.tool]||('Tap the track to place: '+TB_PCS[TB.tool].l);
   TB_lintUi();TB_selUi();TB_draw()}
 function TB_lintUi(){const e=TB.el.querySelector('#tbLint'),L=TB.lint,ok=L.rules.filter(r=>r.ok).length,fm=x=>Math.floor(x/60)+':'+String(Math.round(x%60)).padStart(2,'0');
   const min=TB.lintMin;e.className='lint'+(min?' min':'');e.innerHTML=`<h4><span>${ok}/${L.rules.length} ✓ · lap ${L.lap?Math.round(L.lap)+' s':'–'} · race ${L.race?fm(L.race):'–'}</span></h4>`;
@@ -163,8 +207,8 @@ function TB_bg(city){const ath=city==='ath',L=(ath?ATH_TRACKS:TDF).filter(d=>!d.
   return{roads,labels:Object.entries(lab).map(([n,a])=>[n,a.reduce((s,p)=>s+p[0],0)/a.length,a.reduce((s,p)=>s+p[1],0)/a.length]),river:ath?null:[450*S,750*S]}}
 function TB_fit(){const t=TB.trk,cv=TB.cv;let P=t&&t.pts.length?t.pts.map(p=>[p[0],p[1]]):TB_bg(t?t.city:'fra').roads.flat();if(!P.length)P=[[0,0]];
   let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;for(const[x,z]of P){x0=Math.min(x0,x);x1=Math.max(x1,x);z0=Math.min(z0,z);z1=Math.max(z1,z)}
-  const W=innerWidth-110-240,H=innerHeight-60;TB.view.s=clamp(Math.min(W/Math.max(200,x1-x0+260),H/Math.max(200,z1-z0+260)),.02,3);TB.view.x=(x0+x1)/2;TB.view.z=(z0+z1)/2}
-const TB_cx=()=>110+(innerWidth-110-(TB.lintMin?0:236))/2,TB_cy=()=>48+(innerHeight-48)/2;
+  const W=innerWidth-156-240,H=innerHeight-60;TB.view.s=clamp(Math.min(W/Math.max(200,x1-x0+260),H/Math.max(200,z1-z0+260)),.02,3);TB.view.x=(x0+x1)/2;TB.view.z=(z0+z1)/2}
+const TB_cx=()=>156+(innerWidth-156-(TB.lintMin?0:236))/2,TB_cy=()=>48+(innerHeight-48)/2;
 const TB_w2s=(x,z)=>[TB_cx()+(x-TB.view.x)*TB.view.s,TB_cy()+(z-TB.view.z)*TB.view.s],TB_s2w=(px,py)=>[TB.view.x+(px-TB_cx())/TB.view.s,TB.view.z+(py-TB_cy())/TB.view.s];
 function TB_draw(){const cv=TB.cv,t=TB.trk;if(!cv||!t)return;const dpr=Math.min(2,devicePixelRatio||1),W=innerWidth,H=innerHeight;if(cv.width!==W*dpr||cv.height!==H*dpr){cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px'}
   const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle=t.city==='ath'?'#2b2a24':'#14261c';g.fillRect(0,0,W,H);const s=TB.view.s,bg=TB_bg(t.city);
@@ -174,7 +218,7 @@ function TB_draw(){const cv=TB.cv,t=TB.trk;if(!cv||!t)return;const dpr=Math.min(
   if(bg.river){const[,y0]=TB_w2s(0,bg.river[0]),[,y1]=TB_w2s(0,bg.river[1]);g.fillStyle='#1f5f9e';g.fillRect(0,y0,W,y1-y0);g.fillStyle='rgba(255,255,255,.5)';g.font='800 12px system-ui';g.fillText('MAIN',TB_cx()-14,(y0+y1)/2+4)}
   g.lineJoin=g.lineCap='round';for(const r of bg.roads){g.strokeStyle='rgba(190,200,215,.28)';g.lineWidth=Math.max(3,18*s);g.beginPath();r.forEach(([x,z],i)=>{const[p,q]=TB_w2s(x,z);i?g.lineTo(p,q):g.moveTo(p,q)});g.closePath();g.stroke()}
   g.font='700 12px system-ui';g.fillStyle='rgba(230,236,255,.5)';{const put=[];for(const[n,x,z]of bg.labels){const[p,q]=TB_w2s(x,z),w=g.measureText(n).width;if(put.some(b=>p<b[0]+b[2]+8&&p+w+8>b[0]&&Math.abs(q-b[1])<18))continue;put.push([p,q,w]);g.fillText(n,p+6,q-6)}}
-  {const m=100*s>=40?100:500*s>=40?500:1000,[p0]=TB_w2s(0,0),y=H-14,x=118;g.fillStyle='#fff';g.fillRect(x,y,m*s,3);g.fillText(m+' m',x,y-4)}
+  {const m=100*s>=40?100:500*s>=40?500:1000,[p0]=TB_w2s(0,0),y=H-14,x=164;g.fillStyle='#fff';g.fillRect(x,y,m*s,3);g.fillText(m+' m',x,y-4)}
   const L=TB.lint,G=L&&L.g;
   if(G){// ribbon (96 m) coloured by segment surface, asphalt core, centre line
     const rib=(w,col)=>{g.lineWidth=Math.max(2,w*s);for(let q=0;q<t.pts.length;q++){g.strokeStyle=typeof col==='function'?col(q):col;g.beginPath();let f=true;for(let i=0;i<G.N;i++){if(G.SEG[i]!==q)continue;const[p,r]=TB_w2s(G.X[i],G.Z[i]);f?g.moveTo(p,r):g.lineTo(p,r);f=false}const j=G.cpI[(q+1)%t.pts.length],[p,r]=TB_w2s(G.X[j],G.Z[j]);g.lineTo(p,r);g.stroke()}};
@@ -189,7 +233,8 @@ function TB_draw(){const cv=TB.cv,t=TB.trk;if(!cv||!t)return;const dpr=Math.min(
     if(si>=0){const[p,r]=TB_w2s(t.pts[si][0],t.pts[si][1]);for(let a=0;a<4;a++)for(let b=0;b<2;b++){g.fillStyle=(a+b)%2?'#111':'#fff';g.fillRect(p-16+a*8,r-22+b*8,8,8)}g.fillStyle='#fff';g.font='900 12px system-ui';g.fillText('START',p-16,r-26)}}
   // pieces
   for(const pc of t.pc){const d=TB_PCS[pc.k];if(!d)continue;const[p,r]=TB_w2s(pc.x,pc.z);g.fillStyle=d.c;g.beginPath();g.arc(p,r,13,0,7);g.fill();g.fillStyle='#111';g.font='900 15px system-ui';g.textAlign='center';g.fillText(d.ic,p,r+5);g.textAlign='left';
-    if(pc.k==='gate'&&pc.n){g.fillStyle='#ff9ccc';g.font='800 12px system-ui';g.fillText(pc.n,p+15,r-8)}}
+    if(pc.k==='gate'&&pc.n){g.fillStyle='#ff9ccc';g.font='800 12px system-ui';g.fillText(pc.n,p+15,r-8)}
+    if(pc.k==='lm'){g.fillStyle='#fff';g.font='800 12px system-ui';g.fillText(TB_ST.LMN[pc.n]||pc.n,p+15,r+4)}}
   // control points (drawn 12 px, hit radius 26 px)
   t.pts.forEach((p,i)=>{const[a,b]=TB_w2s(p[0],p[1]);g.fillStyle=i===TB.sel?'#ffd12c':'#fff';g.strokeStyle='#111';g.lineWidth=2;g.beginPath();g.arc(a,b,i===TB.sel?13:10,0,7);g.fill();g.stroke();
     if(p[2]){g.fillStyle='#bfe3ff';g.font='800 12px system-ui';g.fillText('↑'+Math.round(p[2]),a+12,b+14)}})}
@@ -203,6 +248,8 @@ function TB_tap(px,py){const t=TB.trk,[x,z]=TB_s2w(px,py),G=TB.lint&&TB.lint.g,t
     const q=TB.sel>=0?TB.sel+1:t.pts.length,prev=t.pts[q-1];t.pts.splice(q,0,[sx,sz,prev?prev[2]||0:4,prev?prev[3]||'grass':'grass']);TB.sel=q;TB_changed();return}
   if(tool==='del'){const c=TB_hitPc(px,py);if(c>=0){TB_push();t.pc.splice(c,1);TB_changed();return}const h=TB_hitPt(px,py);if(h>=0){TB_push();t.pts.splice(h,1);TB_changed()}return}
   if(tool==='start'){const h=TB_hitPt(px,py);if(h>=0){TB_push();t.st=[t.pts[h][0],t.pts[h][1]];TB_changed()}return}
+  if(tool==='lm'){const c=TB_hitPc(px,py),LL=TB_ST.LM[t.city==='ath'?'ath':'fra'];TB_push();if(c>=0&&t.pc[c].k==='lm'){const p=t.pc[c];p.n=LL[(LL.indexOf(p.n)+1)%LL.length];TB_toast(TB_ST.LMN[p.n])}
+    else{t.pc.push({k:'lm',x:Math.round(x),z:Math.round(z),n:LL[0]});TB_toast(TB_ST.LMN[LL[0]]+' · tap it again for another')}TB_changed();return}
   if(!G)return TB_toast('Draw a loop first (3+ points)');const n=TB_near(G,x,z);if(n.d*TB.view.s>40)return;
   if(tool==='ter'){TB_push();const q=G.SEG[n.i],p=t.pts[q];p[3]=TB_TERS[(TB_TERS.indexOf(p[3]||'grass')+1)%TB_TERS.length];TB_changed();return}
   const c=TB_hitPc(px,py);if(c>=0&&t.pc[c].k===tool){TB_push();t.pc.splice(c,1);TB_changed();return}

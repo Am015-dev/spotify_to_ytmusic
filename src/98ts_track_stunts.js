@@ -1,0 +1,157 @@
+
+// ===== TS (track-2, 2026-10-13): STUNT PIECES for builder tracks. Alex: "make tracks, but make sure they are fun as the ones in youtube
+// meaning high stunts, alternative roads, fun is important". Pieces (placed in the builder, numbers in TB_ST, rules L16–L19 in TRACK_FUN.md):
+//  BIG RAMP (ramp)  a full-width kicker (the course itself rises h·u² over L m, steep back) → a floaty 1.5–2.5 s jump, no fail
+//  WATER / ROAD GAP (gapw/gapr)  a kicker + a 64 m gap over water / a road with traffic; too slow (< ~160 km/h) = into the gap → respawn
+//  BANK  the corner around it banks to 19° and grips +45 % (take it flat out)
+//  STUNT SC (scs)  a split: an asphalt lane behind the island with a lane kicker; route speed auto-balanced (±5 %)
+//  LANDMARK (lm)  Messeturm, Kaiserdom, Römer, Eiserner Steg arch, Mainhattan skyline · Akropolis, Syntagma, Lykavittos, Plaka, Piraeus
+//  FLYOVER  automatic where the course crosses itself ≥ 12 m apart: abutments + a deck underside, no hills there
+// Air: our own launch at the lip (vy = v·slope), the stock airStep flies / lands / crashes it. Juice: camera lifts back, a short slow-mo at
+// the apex of a big jump, a dust ring + STUNT award on landing. Test probe: window.__ts().
+const TS={on:false,kick:[],BK:null,stats:null};
+const TS_on=()=>!!(TS.on&&TRK&&TRK.tb&&OPN_on());
+// nearest TF sample to a world point (2D)
+function TS_near(td,x,z){let bi=0,bd=1e18;for(let i=0;i<td.N;i++){const d=(td.P[i*3]-x)**2+(td.P[i*3+2]-z)**2;if(d<bd){bd=d;bi=i}}return bi}
+// ---- 1) shape the course: kickers raise the centre line, banks tilt the frame; then rebuild T / R / U
+buildTrackData=(f=>function(){const td=f();if(!(TRK&&TRK.tb))return td;try{TS_shape(td)}catch(e){console.warn('TS shape',e)}return td})(buildTrackData);
+function TS_shape(td){const N=td.N,ds=td.ds,P=td.P,kk=[];TS.BK=new Float32Array(N);
+  for(const k of TRK.kick||[]){const[h,L]=TB_kick(k.k);if(!h)continue;let i=TS_near(td,k.x,k.z);if(k.k!=='ramp')i=(i-Math.round(TB_ST.gHalf/ds)+N)%N;
+    const n=Math.round(L/ds);for(let d=-n;d<=0;d++){const u=(d+n)/n,j=(i+d+N)%N;P[j*3+1]+=h*u*u}
+    if(k.k==='ramp')P[((i+1)%N)*3+1]+=h*.35;// a steep back face (one 2 m step) under the lip
+    kk.push({k:k.k,i,s:i*ds,h,L})}
+  for(const b of TRK.banks||[]){const i0=TS_near(td,b.x,b.z),sg=Math.sign(td.K[i0])||1;let a=i0,c=i0;const lim=Math.round(420/ds);
+    for(let q=0;q<lim&&Math.abs(td.K[(a-1+N)%N])>1/600&&Math.sign(td.K[(a-1+N)%N])===sg;q++)a=(a-1+N)%N;for(let q=0;q<lim&&Math.abs(td.K[(c+1)%N])>1/600&&Math.sign(td.K[(c+1)%N])===sg;q++)c=(c+1)%N;
+    const m=(c-a+N)%N,tp=Math.max(4,Math.round(30/ds));for(let d=-tp;d<=m+tp;d++){const j=(a+d+N)%N,w=d<0?1+d/tp:d>m?1-(d-m)/tp:1,ws=w*w*(3-2*w);TS.BK[j]=Math.max(TS.BK[j],ws);
+      const bb=sg*TB_ST.bank*ws;if(Math.abs(bb)>Math.abs(td.B[j]))td.B[j]=bb}}
+  const t=V3(),fr=V3(),rt=V3(),up=V3(),Y=V3(0,1,0);
+  for(let i=0;i<N;i++){const a=((i-1+N)%N)*3,b=((i+1)%N)*3;t.set(P[b]-P[a],P[b+1]-P[a+1],P[b+2]-P[a+2]).normalize();fr.crossVectors(t,Y).normalize();
+    rt.copy(fr).multiplyScalar(Math.cos(td.B[i])).addScaledVector(Y,-Math.sin(td.B[i]));up.crossVectors(rt,t).normalize();td.T.set([t.x,t.y,t.z],i*3);td.R.set([rt.x,rt.y,rt.z],i*3);td.U.set([up.x,up.y,up.z],i*3)}
+  td.tsKick=kk;return td}
+// ---- 2) near-crossing rows (no hills there) + flyover data, before OPN_build
+{const _p=OPN_prep;OPN_prep=function(){_p();if(!(TRK&&TRK.tb&&OPN))return;const td=TF,N=td.N,ds=td.ds,P=td.P,st=3,NEAR=new Uint8Array(N),far=Math.round(300/ds);
+  for(let i=0;i<N;i+=st)for(let j=0;j<N;j+=st){const da=Math.min(Math.abs(j-i),N-Math.abs(j-i));if(da<far)continue;if((P[i*3]-P[j*3])**2+(P[i*3+2]-P[j*3+2])**2<260*260){for(let q=-st;q<=st;q++)NEAR[(i+q+N)%N]=1;break}}
+  OPN.NEAR=NEAR;
+  // stunt routes: the lane counts as road (no transform); the AI picks by skill (see TS_aiXt)
+  for(const r of OPN.routes)if(r.kind==='stunt'){const L=r.s1-r.s0;r.kick=r.s0+L*.55}}}
+// ---- 3) race setup: our kickers in TD (forward), gap gravity / floor, stats
+setupRace=(f=>function(cfg){const r=f.apply(this,arguments);TS.on=!!(TRK&&TRK.tb&&OPN_on());if(!TS.on)return r;
+  try{const td=TD,kk=[];for(const k of td.tsKick||TF.tsKick||[]){const gap=k.k!=='ramp';const j=gap?td.jumps.find(o=>o.tbk&&Math.abs(tdd(o.s0,k.s))<8):null;
+      if(gap&&j){j.g=TB_ST.gG;j.floor=yAt(td,(j.s0+j.s1)/2)-9;j.tsK=k}kk.push({...k,s:gap&&j?j.s0:k.s,j:j||{id:'tbr'+kk.length,name:'BIG RAMP',kind:'pit',s0:-9,s1:-9,g:TB_ST.gR,floor:-1e9,msg:'BIG AIR'},lane:null})}
+    for(const ro of OPN.routes)if(ro.kind==='stunt')kk.push({k:'lane',s:ro.kick,h:TB_ST.lH,L:TB_ST.lL,lane:OPN_lane(ro),j:{id:'tbl'+ro.id,name:'STUNT',kind:'pit',s0:-9,s1:-9,g:TB_ST.gR,floor:-1e9,msg:'STUNT'}});
+    TS.kick=kk;TS.stats={air:[],landed:0,crashed:0,launch:0,airLap:{},ai:{launch:0,landed:0,crashed:0},route:{}};for(const s of ships)s.tsP=s.dist}catch(e){console.warn('TS setup',e)}return r})(setupRace);
+// ---- 4) air: launch at the lip, then the stock airStep flies it; landing / crash bookkeeping + juice
+function TS_launch(s){const L=TD.L,p0=s.tsP==null?s.dist:s.tsP;s.tsP=s.dist;if(s.air||s.dead>0||s.dist<=p0)return;
+  for(const k of TS.kick){const lane=k.k==='lane',s0=lane?k.s-k.L:k.s;let a=s.dist-mod(s.dist,L)+mod(s0,L);if(a>s.dist)a-=L;if(!(a>p0&&a<=s.dist))continue;
+    if(lane&&Math.abs(s.x-k.lane)>6.5)continue;const key=k.j.id+'_'+Math.floor(s.dist/L);if(s.lastJump===key)continue;s.lastJump=key;
+    const gap=k.k==='gapw'||k.k==='gapr',slope=2*k.h/k.L;if(gap&&!s.isPlayer)s.v=Math.max(s.v,47);
+    frameAt(TD,s.dist,F2);const y=yAt(TD,s.dist)+1.4,A={y,vy:lane?s.v*slope:s.v*slope+(gap?2:1),j:k.j,t:0,fall:false,cleared:false,tb:k.k,climb:lane?k.s:null,slope,v0:s.v};A.off=F2.p.y+F2.r.y*s.x-y;s.air=A;s.tsAir=A;
+    if(s.isPlayer){TS.stats.launch++;AU.sfx('launch');fovKick=Math.max(fovKick,11);say('',gap&&s.v<44?'TOO SLOW!':k.k==='lane'?'STUNT LINE!':'BIG AIR!',.8)}else TS.stats.ai.launch++;return}}
+airStep=(f=>function(s){if(TS_on()){try{TS_launch(s)}catch(e){}const A=s.air;if(A&&A.climb!=null){if(mod(s.dist-A.climb+TD.L/2,TD.L)-TD.L/2<0)A.vy=s.v*A.slope+A.j.g*H;else if(A.climb!=null){A.climb=null;A.vy+=1}}}
+  f(s);if(TS_on()&&s.tsAir){const A=s.tsAir;if(s.air===A){if(s.isPlayer&&!A.apex&&A.vy<=0&&A.t>.35){A.apex=1;if(A.t>.55)slowmo=Math.max(slowmo,.22)}return}
+    s.tsAir=null;const ok=!(s.dead>0),st=TS.stats;if(s.isPlayer){if(ok){st.landed++;st.air.push(+A.t.toFixed(2));const lp=Math.max(0,s.lap);st.airLap[lp]=(st.airLap[lp]||0)+A.t;
+        const at=s.mesh.position.clone();burst(SMOKE||SPARK,at,26,14,.7,new THREE.Color(1.2,1.1,.9));burst(SPARK,at,18,20,.4,new THREE.Color(2,1.7,1));shake=Math.max(shake,.55);
+        if(A.t>=1.2){award(s,A.tb==='lane'?'STUNT LINE':'STUNT '+A.t.toFixed(1)+' s',10,Math.round(A.t*500),'#ffd12c');s.boost=Math.max(s.boost,.6)}}else st.crashed++}
+    else{if(ok)st.ai.landed++;else st.ai.crashed++}}})(airStep);
+// a gap crash: water splash instead of fire over the water gap
+crashJump=(f=>function(s){const j=s.air&&s.air.j;if(j&&j.tbk==='gapw'){const k=j.kind;j.kind='river';try{f(s)}finally{j.kind=k}return}return f(s)})(crashJump);
+// camera: in a big jump the chase cam lifts and backs off a little (phone-safe: ≤ 2.4 m)
+updateCam=(f=>function(dt,snap){f(dt,snap);if(!TS_on()||!pl||!pl.air||!pl.air.tb||snap||(typeof CC!=='undefined'&&CC))return;const A=pl.air,k=Math.min(1,A.t/.45)*(1-Math.max(0,(A.t-2.6)/.6));if(k<=0)return;
+  frameAt(TD,pl.dist,F2);camera.position.y+=2.2*k;camera.position.addScaledVector(F2.t,-2.4*k);camera.lookAt(camLook)})(updateCam);
+// ---- 5) banks grip more (lateral mu × 1.45 at full bank) for the player and the AI
+const TS_bk=s=>{if(!TS_on()||!TS.BK)return 0;return TS.BK[Math.floor(mod(s.dist,TF.L)/TF.ds)%TF.N]||0};
+physPlayer=(f=>function(s,c){const b=TS_bk(s);if(!b)return f(s,c);const m=C26.muRace;C26.muRace=m*(1+TB_ST.bankGrip*b);try{return f(s,c)}finally{C26.muRace=m}})(physPlayer);
+physAI=(f=>function(s){const b=TS_bk(s);if(!b)return f(s);const m=C26.muRace;C26.muRace=m*(1+TB_ST.bankGrip*b);try{return f(s)}finally{C26.muRace=m}})(physAI);
+// ---- 6) routes: the stunt lane is road (no transform); AI route choice by skill (stunt line = the best drivers, boat / dirt ≈ half the field)
+{const t=R15_ter;R15_ter=function(s){const r=t(s);if(!TS_on())return r;const i=OPN_i(s.dist),ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const ro=OPN.routes[ri];if(ro.kind==='stunt'){s.r15k=ro.kf||1;s.r15w=false;return null}}return r}}
+{const a=R15_aiXt;R15_aiXt=function(s,xt){if(TS_on()&&!s.isPlayer){s.rod=s.rod||{};const m=mod(s.dist,OPN.L);
+    for(const r of OPN.routes){const key=r.id+'@'+s.lap;if(s.rod[key]!=null)continue;const dd=mod(r.s0-m,OPN.L);if(dd>170)continue;const sk=clamp((s.skill-.82)/.3,0,1);
+      const p=r.kind==='stunt'?.2+.6*sk:r.kind==='water'?.55-.2*sk:.35+.3*sk;s.rod[key]=R()<p;const rs=TS.stats&&TS.stats.route;if(rs){const q=rs['r'+r.id]=rs['r'+r.id]||{kind:r.kind,alt:0,road:0};q[s.rod[key]?'alt':'road']++}}}
+  return a(s,xt)}}
+R15_signTex=(f=>function(kind,sd){if(kind!=='stunt')return f(kind,sd);const[c,g]=cv(1024,352);g.fillStyle='#ffd12c';g.fillRect(0,0,1024,352);g.fillStyle='#0d0d10';g.fillRect(14,14,996,324);
+  g.fillStyle='#ffd12c';g.font='900 150px system-ui,sans-serif';g.fillText('STUNT LINE',40,180);g.fillStyle='#ff3fa4';g.font='900 104px system-ui,sans-serif';g.fillText('★ JUMP',44,312);
+  g.fillStyle='#ffd12c';g.beginPath();const ax=x=>sd<0?1590-x:x;g.moveTo(ax(600),236);g.lineTo(ax(830),236);g.lineTo(ax(830),206);g.lineTo(ax(990),272);g.lineTo(ax(830),338);g.lineTo(ax(830),308);g.lineTo(ax(600),308);g.closePath();g.fill();return tex(c,false)})(R15_signTex);
+{const p=OPN_pads;OPN_pads=function(){if(!TS_on()&&!(TRK&&TRK.tb))return p();for(const r of OPN.routes){const fr=r.kind==='water'?[.3,.55,.8]:r.kind==='stunt'?[.42,.85]:[.4,.7];for(const q of fr)pads.push({s:r.s0+(r.s1-r.s0)*q,x:OPN_lane(r),type:'boost'})}
+  for(const k of(TF.tsKick||[]))if(k.k==='ramp')pads.push({s:k.s-150,x:0,type:'boost'})}}
+// ---- 7) the world: ramp boards, gap water / road, stunt lanes + lane kickers, bank kerbs, flyover abutments + deck, landmarks
+{const _lt=loadTrack;loadTrack=function(id){const r=_lt(id);if(r&&TRK&&TRK.tb&&OPN)try{TS_build()}catch(e){console.warn('TS build',e)}return r}}
+const TS_M={};const TS_mat=(c,o={})=>{const k=c+JSON.stringify(o);return TS_M[k]||(TS_M[k]=new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:0},o)))};
+function TS_box(g,w,h,d,x,y,z,c,o){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),TS_mat(c,o));m.position.set(x,y,z);m.castShadow=false;m.receiveShadow=true;g.add(m);return m}
+function TS_cyl(g,r0,r1,h,n,x,y,z,c,o){const m=new THREE.Mesh(new THREE.CylinderGeometry(r0,r1,h,n),TS_mat(c,o));m.position.set(x,y,z);g.add(m);return m}
+function TS_winTex(base,win,cols,rows){const[c,g]=cv(128,256);g.fillStyle=base;g.fillRect(0,0,128,256);g.fillStyle=win;const cw=128/cols,rh=256/rows;for(let x=0;x<cols;x++)for(let y=0;y<rows;y++)g.fillRect(x*cw+cw*.22,y*rh+rh*.25,cw*.56,rh*.5);return tex(c)}
+function TS_build(){const td=TF,N=td.N,ds=td.ds,fr=mkF(),ath=TRK.city==='ath';
+  const strip=(rows,mat)=>{const p=[],ix=[];let n=0,prevK=-1;for(const row of rows){if(!row){prevK=-1;continue}const K=row.length;for(const v of row)p.push(v.x,v.y,v.z);if(prevK===K)for(let k=0;k<K-1;k++){const a=n-K+k,b=n+k;ix.push(a,a+1,b,a+1,b+1,b)}n+=K;prevK=K}
+    if(!ix.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setIndex(ix);g.computeVertexNormals();const m=new THREE.Mesh(g,mat);m.receiveShadow=true;WORLD.add(m);return m};
+  const at=(s,x,y)=>{frameAt(td,s,fr);return fr.p.clone().addScaledVector(fr.r,x).addScaledVector(fr.u,y)};
+  // ramps: hazard decal on the kicker face + chevron boards both sides
+  {const hz=hazardTex();hz.wrapS=hz.wrapT=THREE.RepeatWrapping;const hm=new THREE.MeshStandardMaterial({map:hz,roughness:.6,polygonOffset:true,polygonOffsetFactor:-2});
+    for(const k of td.tsKick||[]){const n=Math.round(k.L/ds),rows=[];for(let d=-n;d<=0;d++){const s=(k.i+d)*ds;rows.push([at(s,-OPN_ROAD-1,.05),at(s,OPN_ROAD+1,.05)])}const m=strip(rows,hm);
+      if(m){const uv=[];for(let d=0;d<=n;d++)uv.push(0,d/2,4,d/2);m.geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2))}
+      for(const sg of[-1,1]){const b=new THREE.Mesh(new THREE.PlaneGeometry(9,4.2),new THREE.MeshBasicMaterial({map:textTex(k.k==='ramp'?'BIG AIR ▲':'JUMP ▲','#ffd12c',512,128),side:THREE.DoubleSide}));
+        const c=at(k.s-k.L-30,sg*(OPN_ROAD+9),5.5);b.position.copy(c);b.lookAt(c.clone().addScaledVector(fr.t,-10));WORLD.add(b);TS_cyl(WORLD,.25,.25,5.5,6,c.x,c.y-3.2,c.z,0x333333)}}}
+  // gaps: water (with a far bank) or a road with traffic, 9 m down
+  for(const j of td.jumps){if(!j.tbk)continue;const s0=j.s0,s1=j.s1,mid=(s0+s1)/2;frameAt(td,mid,fr);const c=fr.p.clone(),t=fr.t.clone(),r=fr.r.clone(),g=new THREE.Group();g.position.copy(c);g.lookAt(c.clone().add(t));WORLD.add(g);
+    if(j.tbk==='gapw'){const w=new THREE.Mesh(new THREE.PlaneGeometry(130,s1-s0+30),new THREE.MeshStandardMaterial({map:R15_tex('water'),roughness:.12,metalness:.1,emissive:0x0a3a70,emissiveIntensity:.25}));w.rotation.x=-Math.PI/2;w.position.y=-6.5;g.add(w);
+      for(const sx of[-1,1])for(let q=0;q<5;q++)TS_cyl(g,.7,.7,1.2,10,sx*rr(10,40),-6.2,rr(-20,20),0xff6a1a,{emissive:0x401000})}
+    else{TS_box(g,140,.4,26,0,-8.6,0,0x55595f);for(let x=-66;x<66;x+=10)TS_box(g,5,.05,.5,x,-8.35,0,0xffc81e);TS_box(g,140,.6,1,0,-8.2,13.5,0xdddddd);TS_box(g,140,.6,1,0,-8.2,-13.5,0xdddddd);
+      const cars=[];for(let q=0;q<4;q++){const cg=new THREE.Group(),col=[0xe8231c,0x1f6fe0,0xffd21c,0x2bd46b][q];TS_box(cg,4.4,1.3,2,0,.9,0,col);TS_box(cg,2.4,1,1.8,-.3,2,0,0x222831,{metalness:.3});
+        for(const wx of[-1.4,1.4])for(const wz of[-1,1])TS_cyl(cg,.45,.45,.4,10,wx,.45,wz,0x111111).rotation.x=Math.PI/2;cg.position.set(-60+q*36,-8.4,q%2?-6:6);if(q%2)cg.rotation.y=Math.PI;g.add(cg);cars.push(cg)}
+      g.userData.tsCars=cars;TS.cars=(TS.cars||[]);TS.cars.push(...cars)}}
+  // stunt lanes: asphalt with kerbs + the lane kicker (a wedge you drive up)
+  {const am=new THREE.MeshStandardMaterial({map:OPN_roadTex(),roughness:.55});
+    for(const ro of OPN.routes){if(ro.kind!=='stunt')continue;const xc=OPN_lane(ro),rows=[];for(let s=ro.s0+20;s<=ro.s1-20;s+=ds)rows.push([at(s,xc-7,.03),at(s,xc+7,.03)]);const m=strip(rows,am);
+      if(m){const uv=[];rows.forEach((r,q)=>uv.push(0,q*ds/32,1,q*ds/32));m.geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2))}
+      const n=Math.round(TB_ST.lL/2),hm=new THREE.MeshStandardMaterial({map:hazardTex(),roughness:.6,side:THREE.DoubleSide}),wr=[],sides=[];
+      for(let q=0;q<=n;q++){const s=ro.kick-TB_ST.lL+q*2,y=TB_ST.lH*(q/n)**2+.06;wr.push([at(s,xc-6,y),at(s,xc+6,y)])}strip(wr,hm);
+      for(const sx of[-6,6]){const sr=[];for(let q=0;q<=n;q++){const s=ro.kick-TB_ST.lL+q*2,y=TB_ST.lH*(q/n)**2+.06;sr.push([at(s,xc+sx,0),at(s,xc+sx,y)])}strip(sr,TS_mat(0x2a2a30,{side:THREE.DoubleSide}))}
+      {const back=[[at(ro.kick,xc-6,TB_ST.lH+.06),at(ro.kick,xc+6,TB_ST.lH+.06)],[at(ro.kick+.5,xc-6,0),at(ro.kick+.5,xc+6,0)]];strip(back,TS_mat(0x2a2a30,{side:THREE.DoubleSide}))}}}
+  // banks: red / white kerbs on both road edges through the banked corner
+  {const kc=document.createElement('canvas');kc.width=16;kc.height=64;const kg=kc.getContext('2d');kg.fillStyle='#e8231c';kg.fillRect(0,0,16,32);kg.fillStyle='#fff';kg.fillRect(0,32,16,32);const kt=new THREE.CanvasTexture(kc);kt.wrapS=kt.wrapT=THREE.RepeatWrapping;kt.colorSpace=THREE.SRGBColorSpace;
+    const km=new THREE.MeshStandardMaterial({map:kt,roughness:.5,polygonOffset:true,polygonOffsetFactor:-2});
+    for(const sg of[-1,1]){let rows=[],uv=[];const flush=()=>{if(rows.length>2){const m=strip(rows,km);if(m)m.geometry.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2))}rows=[];uv=[]};
+      for(let i=0;i<=N;i++){const b=TS.BK&&TS.BK[i%N];if(b>.5){const s=i*ds;rows.push([at(s,sg*OPN_ROAD,.05),at(s,sg*(OPN_ROAD+2.2),.05)]);uv.push(0,i*ds/4,1,i*ds/4)}else flush()}flush()}}
+  // flyovers: abutment skirts down to the ground where a row is near another part, a deck underside where it passes over it
+  if(OPN.NEAR){const P=td.P,far=Math.round(300/ds),GY=(()=>{let y0=1e9;for(let i=0;i<N;i++)y0=Math.min(y0,P[i*3+1]);return ath?y0-2.4:y0-10})();
+    const lowerAt=(x,z,i,rad)=>{let best=null;for(let j=0;j<N;j+=2){const da=Math.min(Math.abs(j-i),N-Math.abs(j-i));if(da<far)continue;const d=(P[j*3]-x)**2+(P[j*3+2]-z)**2;if(d<rad*rad&&(!best||P[j*3+1]<best))best=P[j*3+1]}return best};
+    const sk=TS_mat(ath?0xc9b48c:0x8a8076,{roughness:.95,flatShading:true,side:THREE.DoubleSide}),dk=TS_mat(0x4b5260,{roughness:.7,side:THREE.DoubleSide}),gm=TS_mat(0x2f6fb0,{roughness:.5,metalness:.3,side:THREE.DoubleSide});
+    for(const sg of[-1,1]){let rows=[];const flush=()=>{if(rows.length>1)strip(rows,sk);rows=[]};
+      for(let i=0;i<=N;i+=2){const j=i%N;if(!OPN.NEAR[j]){flush();continue}const e=at(j*ds,sg*48.6,0),lo=lowerAt(e.x,e.z,j,52);if(lo!=null&&lo<e.y-6){flush();continue}rows.push([e,V3(e.x,GY,e.z)])}flush()}
+    let rows=[],fa=[[],[]];const flush=()=>{if(rows.length>1){strip(rows,dk);for(const f of fa)strip(f,gm)}rows=[];fa=[[],[]]};
+    for(let i=0;i<=N;i+=2){const j=i%N;if(!OPN.NEAR[j]){flush();continue}const c=at(j*ds,0,0),lo=lowerAt(c.x,c.z,j,62);if(lo==null||lo>c.y-6){flush();continue}
+      rows.push([at(j*ds,-48.6,-1.8),at(j*ds,48.6,-1.8)]);fa[0].push([at(j*ds,-48.6,.2),at(j*ds,-48.6,-1.8)]);fa[1].push([at(j*ds,48.6,.2),at(j*ds,48.6,-1.8)])}flush()}
+  // landmarks
+  let y0=1e9;for(let i=0;i<N;i++)y0=Math.min(y0,td.P[i*3+1]);
+  for(const m of TRK.lms||[]){const i=TS_near(td,m.x,m.z),g=TS_lm(m.n,td,i);if(!g)continue;const gy=Math.min(td.P[i*3+1]-2,y0+6);g.position.set(m.x,gy,m.z);
+    if(m.n==='steg'){frameAt(td,i*ds,fr);g.position.copy(fr.p);g.lookAt(fr.p.clone().add(fr.t))}else g.rotation.y=Math.atan2(td.P[i*3]-m.x,td.P[i*3+2]-m.z);WORLD.add(g)}}
+// ---- landmark models (LEGO-ish blocks; heights in game metres, the course is ~2× real scale)
+function TS_lm(n,td,i){const g=new THREE.Group(),B=(...a)=>TS_box(g,...a),C=(...a)=>TS_cyl(g,...a);
+  if(n==='messe'){B(34,10,34,0,5,0,0x8e8a84);const w=TS_winTex('#9c4d3c','#c9dbe8',6,24);const sh=new THREE.Mesh(new THREE.BoxGeometry(24,150,24),new THREE.MeshStandardMaterial({map:w,roughness:.5}));sh.position.y=85;g.add(sh);
+    C(10,12,16,16,0,168,0,0x9c4d3c);const p=C(.1,11,26,4,0,189,0,0x5b6670,{metalness:.4});p.rotation.y=Math.PI/4;B(.6,12,.6,0,208,0,0xdddddd)}
+  else if(n==='dom'){B(64,26,26,-34,13,0,0xb5574a);B(64,3,28,-34,27,0,0x5b6a72);B(28,48,28,0,24,0,0xb5574a);C(13,14,34,8,0,65,0,0xb5574a);C(9,12,10,8,0,87,0,0xa84a3e);C(.2,9,30,8,0,107,0,0x6a7a72,{metalness:.3});C(1.2,1.2,6,6,0,124,0,0xffd21c)}
+  else if(n==='roemer'){const cols=[0xd8b07a,0xc9785a,0xe0c8a0,0xb85f4f,0xd9c08f];for(let q=0;q<5;q++){const x=(q-2)*14;const w=TS_winTex('#'+cols[q].toString(16).padStart(6,'0'),'#3a4a5a',3,4);
+      const b=new THREE.Mesh(new THREE.BoxGeometry(13,22,14),new THREE.MeshStandardMaterial({map:w,roughness:.7}));b.position.set(x,11,0);g.add(b);for(let k=0;k<5;k++)B(13-k*2.4,3.4,14.4,x,23.7+k*3.4,0,cols[q])}
+    B(80,2,30,0,1,8,0x9a948a);C(.4,.4,16,6,0,8,22,0x333333);B(6,4,.3,3,14,22,0xe8231c)}
+  else if(n==='steg'){// Eiserner Steg: blue-grey riveted truss arches spanning the course (you drive under it)
+    const m=0x4f6b86,span=118;for(const sx of[-1,1]){for(let q=0;q<=24;q++){const u=q/24,x=(u-.5)*span,y=14+16*Math.sin(Math.PI*u);B(span/24+.4,1.2,1.2,x,y,sx*6,m,{metalness:.4});if(q%2===0)B(.8,y-12,.8,x,(y+12)/2,sx*6,m,{metalness:.4})}
+      B(span,1.4,1.4,0,13,sx*6,m,{metalness:.4})}B(span,.6,13,0,12.4,0,0x6b5a48);for(const x of[-span/2,span/2])for(const sx of[-1,1])B(3,14,3,x,7,sx*6,0x9a7a5a);
+    const sg=new THREE.Mesh(new THREE.PlaneGeometry(26,4.4),new THREE.MeshBasicMaterial({map:textTex('EISERNER STEG','#ffd12c',1024,128),side:THREE.DoubleSide}));sg.position.set(0,33,0);sg.rotation.y=Math.PI/2;g.add(sg);g.rotateY(Math.PI/2)}
+  else if(n==='skyline'){const T=[[0,0,210,0xb9d4ea,26],[46,-30,170,0x7fa3c4,22],[-44,-20,150,0x9fb8cf,20],[90,10,120,0x5f86ad,18],[-90,24,135,0xc2cdd8,24],[20,50,100,0x86a9c9,18]];
+    for(const[x,z,h,c,w]of T){const wt=TS_winTex('#'+c.toString(16).padStart(6,'0'),'#eaf6ff',5,30);const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,w),new THREE.MeshStandardMaterial({map:wt,roughness:.25,metalness:.35}));m.position.set(x,h/2,z);g.add(m)}
+    C(.6,.6,40,6,0,230,0,0xffd21c);B(140,6,100,0,3,10,0x8e8a84)}
+  else if(n==='akro'){C(120,190,60,12,0,30,0,0xcbb68e,{flatShading:true,roughness:.9});B(70,4,32,0,62,0,0xf3ecdc);B(72,4,34,0,80,0,0xf3ecdc);const r=C(.1,26,10,4,0,87,0,0xf3ecdc);r.scale.set(1.4,1,.62);r.rotation.y=Math.PI/4;
+    for(let k=0;k<8;k++)for(const zz of[-14,14])C(1.5,1.7,14,8,-31+k*8.9,71,zz,0xf3ecdc)}
+  else if(n==='synt'){B(110,8,40,0,4,0,0xcfc6b0);const w=TS_winTex('#e9d6a4','#6a5a40',10,3);const b=new THREE.Mesh(new THREE.BoxGeometry(100,26,30),new THREE.MeshStandardMaterial({map:w,roughness:.7}));b.position.y=21;g.add(b);
+    B(40,4,10,0,36,17,0xf1e4c0);const r=C(.1,22,8,3,0,42,17,0xf1e4c0);r.rotation.z=0;for(let k=0;k<8;k++)C(1.2,1.3,24,8,-17+k*4.9,22,19,0xfaf3e0);C(.3,.3,16,6,0,46,0,0xdddddd);B(8,5,.2,4,51,0,0x1f6fe0)}
+  else if(n==='lyka'){C(10,150,190,12,0,95,0,0x7c8a4a,{flatShading:true,roughness:.95});B(12,8,8,0,194,0,0xffffff);C(.1,4,5,4,0,200,0,0xffffff);C(.4,.4,6,6,0,204,0,0x1f6fe0)}
+  else if(n==='plaka'){for(let q=0;q<16;q++){const x=(q%4-1.5)*16,z=(Math.floor(q/4)-1.5)*16,y=Math.floor(q/4)*6;B(12,10,12,x,y+5,z,0xf4f1ea);B(13,2,13,x,y+11,z,q%3?0xc8643c:0xf4f1ea);B(3,5,.3,x,y+3,z+6.1,0x1f6fe0)}
+    C(8,24,30,8,0,-6,0,0xcbb68e)}
+  else if(n==='pireas'){const w=new THREE.Mesh(new THREE.CircleGeometry(160,24),new THREE.MeshStandardMaterial({color:0x2a7fc0,roughness:.2,metalness:.1}));w.rotation.x=-Math.PI/2;w.position.y=.5;g.add(w);
+    B(90,10,22,0,6,30,0xffffff);B(90,2,22.4,0,4,30,0x1f6fe0);B(50,10,18,-6,16,30,0xffffff);C(3,3,10,10,10,26,30,0xffd21c);for(const x of[-60,40]){B(4,60,4,x,30,-30,0xe8231c);B(4,4,50,x,62,-14,0xe8231c);B(6,6,6,x,58,-36,0xffffff)}B(200,4,30,0,2,-30,0x9a948a)}
+  else return null;
+  // stud tops on the roofs read as LEGO from the chase cam
+  return g}
+// ---- probe for tools (read-only): air per launch, landings, crashes, AI route split, bank / flyover counts
+window.__ts=()=>TS_on()&&{kick:TS.kick.map(k=>({k:k.k,s:Math.round(k.s)})),st:TS.stats,near:OPN.NEAR?OPN.NEAR.reduce((a,b)=>a+b,0):0,banks:TS.BK?TS.BK.reduce((a,b)=>a+(b>.5),0):0,routes:OPN.routes.map(r=>({kind:r.kind,kf:r.kf,s0:Math.round(r.s0),s1:Math.round(r.s1)}))};
+// ---- the STUNT CUP: 6 authored tracks (docs/tracks2/*.json, tools/tsEmbed.py), listed under MY TRACKS and in the builder list
+const TS_TRACKS=/*TS_TRACKS*/[{"v":1,"id":"tb_main_river_jump","name":"Main River Jump","city":"fra","laps":3,"road":14,"pts":[[0,0,4,"cobble"],[70,0,4,"cobble"],[139,0,4,"cobble"],[209,0,4,"cobble"],[261,6,5,"grass"],[311,25,6,"grass"],[354,55,7,"grass"],[389,94,8,"grass"],[431,153,11,"grass"],[472,212,13,"grass"],[514,272,16,"grass"],[535,333,18,"grass"],[521,397,20,"grass"],[475,444,22,"grass"],[417,478,23,"dirt"],[359,511,24,"dirt"],[301,545,24,"dirt"],[243,578,25,"dirt"],[185,612,26,"dirt"],[117,651,22,"grass"],[50,690,18,"grass"],[-18,729,14,"grass"],[-61,765,13,"grass"],[-89,813,13,"grass"],[-98,868,12,"grass"],[-125,925,12,"sand"],[-186,942,12,"sand"],[-238,905,12,"sand"],[-270,850,11,"grass"],[-302,795,10,"grass"],[-327,741,10,"grass"],[-341,683,10,"grass"],[-344,623,10,"grass"],[-337,564,10,"grass"],[-318,507,10,"grass"],[-289,455,10,"grass"],[-251,409,10,"grass"],[-220,350,10,"cobble"],[-229,285,10,"cobble"],[-245,230,9,"cobble"],[-246,173,8,"cobble"],[-230,118,7,"cobble"],[-199,70,7,"cobble"],[-156,32,6,"cobble"],[-104,8,5,"cobble"],[-48,0,4,"cobble"]],"pc":[{"k":"ramp","x":197,"z":605},{"k":"gapw","x":-316,"z":768},{"k":"bank","x":-177,"z":943},{"k":"scd","x":528,"z":382},{"k":"scw","x":-344,"z":628},{"k":"scs","x":-198,"z":69},{"k":"boost","x":172,"z":0},{"k":"boost","x":-92,"z":828},{"k":"boost","x":-220,"z":327},{"k":"item","x":337,"z":41},{"k":"item","x":71,"z":678},{"k":"item","x":-250,"z":407},{"k":"gate","x":56,"z":0,"n":"MAINKAI"},{"k":"gate","x":515,"z":406,"n":"SACHSENHAUSEN"},{"k":"gate","x":-51,"z":754,"n":"MÜHLBERG"},{"k":"gate","x":-342,"z":672,"n":"MAIN JUMP"},{"k":"gate","x":-247,"z":186,"n":"RÖMERBERG"},{"k":"lm","x":60,"z":470,"n":"skyline"},{"k":"lm","x":950,"z":250,"n":"messe"},{"k":"lm","x":-750,"z":650,"n":"dom"},{"k":"lm","x":86,"z":-130,"n":"roemer"},{"k":"lm","x":-338,"z":700,"n":"steg"}],"st":[0,0],"desc":"Kick off the Sachsenhausen hill, fly the Main on the big water jump, under the Eiserner Steg; dirt park cut or the stunt line."}]/*/TS_TRACKS*/;
+for(const t of TS_TRACKS)TB.list[t.id]={t,src:'cup'};TB_regAll();
