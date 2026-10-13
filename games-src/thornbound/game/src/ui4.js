@@ -1,5 +1,5 @@
 // ===================== part 4: hand, rivals, pop-ups, one-at-a-time cards =====================
-const emb=(s,w)=>TBKit.token('influence',{faction:fk(s)},w||26).outerHTML;
+const emb=(s,w)=>{const t=TBKit.token('influence',{faction:fk(s)},w||26).outerHTML;return '<span class="embw e-'+fk(s)+'" style="--ew:'+(w||26)+'px">'+t+'</span>'};
 function isPassing(){return !!(UI.card&&UI.card.kind==='pass')}
 // ---------------------------------------------------------------- hand: a fanned strip along the bottom (tap = lift, tap again or drag onto the glowing spot = play; hold = read)
 function cssPx(n,d){try{const v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n));return v>0?v:d}catch(e){return d}}
@@ -110,10 +110,10 @@ function popRegion(r){const s=vs(),V=UI.V,q=G.q;let h='';
   return popShell(esc(REG[r]),h,'reg-b')}
 function popRival(s){const V=UI.V,P=V.pl[s],f=TBKit.FACTIONS[FK[P.fac]];let h='';
   h+='<div class="rv-top" style="--fc:'+f.main+'"><span>'+emb(s,40)+'</span><div><b>'+esc(f.name)+'</b><br><small>'+esc(DD.FBLURB[P.fac])+'</small></div></div>';
-  h+='<ul class="kv"><li><b>Influence</b> '+P.inf+'</li><li><b>Cards in hand</b> '+P.hand.length+' (limit '+P.hs+')</li><li><b>Deck / Discard / Lost</b> '+P.deck.length+' / '+P.disc.length+' / '+V.lost.filter(id=>ownerOf(id)===s).length+'</li><li><b>Lore</b> '+P.lore+'</li><li><b>Supporters</b> '+P.supp.b+' at home, '+(P.supp.r.reduce((a,b)=>a+b,0)+P.supp.x.reduce((a,b)=>a+b,0))+' on the map, '+P.supp.l+' lost</li>'+(V.fav.h===s?'<li><b>Kingdom\'s Favour</b> '+V.fav.u+' uses left</li>':'')+'</ul>';
+  h+='<ul class="kv"><li class="ki ki-influence"><b>Influence</b> '+P.inf+'</li><li><b>Cards in hand</b> '+P.hand.length+' (limit '+P.hs+')</li><li><b>Deck / Discard / Lost</b> '+P.deck.length+' / '+P.disc.length+' / '+V.lost.filter(id=>ownerOf(id)===s).length+'</li><li class="ki ki-lore"><b>Lore</b> '+P.lore+'</li><li class="ki ki-supporter"><b>Supporters</b> '+P.supp.b+' at home, '+(P.supp.r.reduce((a,b)=>a+b,0)+P.supp.x.reduce((a,b)=>a+b,0))+' on the map, '+P.supp.l+' lost</li>'+(V.fav.h===s?'<li><b>Kingdom\'s Favour</b> '+V.fav.u+' uses left</li>':'')+'</ul>';
   const ks=P.ks.map((T,j)=>T?'<button class="lk" data-a="kc" data-n="'+T.kc+'">'+esc(TB.kingdomInfo(T.kc).name)+'</button>':'').filter(Boolean).concat(P.sup.map(n=>'<button class="lk" data-a="kc" data-n="'+n+'">'+esc(TB.kingdomInfo(n).name)+' (Supply)</button>'));
   h+='<p class="lc-h"><b>Kingdom Cards:</b> '+(ks.join(', ')||'<em>none</em>')+'</p>';
-  h+='<p class="lc-h"><b>Councils (votes):</b> '+DD.COUNCILS.map(c=>SUIT_N[c]+' '+TB.votes(G,s,c)).join(' · ')+'</p>';
+  h+='<p class="lc-h ki ki-pledge"><b>Councils (votes):</b> '+DD.COUNCILS.map(c=>SUIT_N[c]+' '+TB.votes(G,s,c)).join(' · ')+'</p>';
   h+='<p class="lc-h"><b>'+gloss('Tactics')+':</b></p><ul class="tacl">'+DD.TACTICS[P.fac].map((t,i)=>'<li class="tac'+(P.tac[i].burn?' burn':P.tac[i].ex?' ex':'')+'"><b>'+esc(t.nm)+'</b> <small>'+(P.tac[i].burn?'burned':P.tac[i].ex?'used up':t.mk>0?P.tac[i].mk+' use'+(P.tac[i].mk===1?'':'s')+' left, once a round':'once per game')+'</small><br>'+gloss(t.txt.replace(/^SETUP[^.]*\.\s*/,''))+'</li>').join('')+'</ul>';
   h+='<p class="lc-h"><b>Site of Power:</b> '+(P.site.length?P.site.map(id=>esc(TB.cardName(G,id))+' ('+cinfo(id).cost+')').join(', '):'<em>empty</em>')+(P.hq.length?'. HQ: '+P.hq.map(id=>esc(TB.cardName(G,id))).join(', '):'')+'</p>';
   h+='<p class="lc-h"><b>'+gloss('Favour')+' power:</b> '+esc(DD.FAVOUR[P.fac].nm)+': '+gloss(DD.FAVOUR[P.fac].txt)+'</p>';

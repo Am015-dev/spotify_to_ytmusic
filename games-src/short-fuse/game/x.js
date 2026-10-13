@@ -637,6 +637,29 @@ const GX={key:'gx',open:null,
 
 
 
+/* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+(function () {
+  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  window.GXSK = {
+    init: function (o) {
+      o = o || {}; var extra = [];
+      if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
+      load(core, function (ok) {
+        if (!ok) return;
+        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
+        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        if (o.cb) o.cb();
+      });
+    }
+  };
+})();
+
+
+
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
@@ -4706,7 +4729,10 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   else if(a==='mprevx'){musicPreviewStop();renderMusic()}
   else if(a==='mmus'){toggleMusic();renderMusic();try{renderSettings()}catch(x){}}
   else if(a==='gfx'){LOWGFX=!LOWGFX;try{localStorage.setItem('sf_gfx',LOWGFX?'low':'hi')}catch(x){}artApply();backApply();tableApply();titleArt();renderSettings()}});
-function extrasBoot(){artBoot();artApply();endArt();backApply();tableApply();titleArt();
+// ---- painted UI kit (gx-skin.css + skin.css): every switch turns on only after its files loaded; Low graphics keeps the plain CSS
+function skinBoot(){if(LOWGFX||typeof GXSK==='undefined')return;
+  try{GXSK.init({sets:{'sk-fuse':['ui-fuse-track'],'sk-spark':['fx-fuse-spark'],'sk-bomb':['icon-bomb'],'sk-plate':['ui-nameplate-c'],'sk-eq':['ui-eq-frame-c'],'sk-job':['ui-job-sheet-c'],'sk-rack':['ui-rack-c'],'sk-wire':['wire-tile-frame-c'],'sk-key':['ui-iconbtn-k','ui-node-open-k','ui-node-done-k','ui-node-locked-k','ui-node-boss-k']}})}catch(e){}}
+function extrasBoot(){skinBoot();artBoot();artApply();endArt();backApply();tableApply();titleArt();
   ['back-default','back-clock-key','camp-brix','camp-tally','camp-wren','end-win','end-lose'].forEach(preImg);
   setInterval(()=>{try{backApply();tableApply();if(SND.wantMusic&&SND.music&&MUS.pick[SND.slot]==='all')musSync()}catch(e){}},800)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',extrasBoot);else extrasBoot();

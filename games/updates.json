@@ -1,6 +1,81 @@
 [
  {
   "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Painted court kit",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit"
+  ],
+  "check": "Open a rival's chip, then play a clash"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shipwreck",
+  "title": "Painted island and kit for Shipwreck Isle",
+  "items": [
+   "Pawns, palms, shelter and palisade are now detailed 3D models",
+   "Phones and Low graphics load lighter versions of the same models",
+   "Unexplored tiles are painted storm-fog; the island is drawn on painted tiles",
+   "Driftwood buttons, bar and panels",
+   "Painted action and resource icons (food, wood, fur, build, hunt...)"
+  ],
+  "check": "Start a game: look at the island, then open Camp and the plan list."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Painted gear slots, rivals and clash medallions",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip"
+  ],
+  "check": "Start a game and kick a door."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sands",
+  "title": "Painted djinns, goods and tokens",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots"
+  ],
+  "check": "Start a game: look at the djinn row and goods; summon a djinn at a Shrine."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Painted cockpit kit",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane",
+   "Top bar, menus and buttons are now painted cockpit panels",
+   "Briefing is a real clipboard with painted check boxes",
+   "Weather and time-of-day badges on the briefing",
+   "Radio phrase buttons and the Roll plate are painted"
+  ],
+  "check": "Open Flight and read the briefing; tap Roll"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "crown",
+  "title": "Every power card now has its own painting",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons."
+  ],
+  "check": "Open the Cards shop: each card has a picture, a dark name plate and readable text."
+ },
+ {
+  "date": "2026-10-13",
   "game": "mainhattan",
   "title": "Animated bosses and a one-tap Lab",
   "items": [
@@ -28,15 +103,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Thornbound Throne: the real crown",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways"
-  ],
-  "check": "Finish a game and look at the winner screen"
- },
- {
-  "date": "2026-10-13",
   "game": "kaiten-kitchen",
   "title": "Kaiten Kitchen: real brass cloches",
   "items": [
@@ -57,18 +123,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "crown",
-  "title": "Painted kit and 3D city",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out"
-  ],
-  "check": "Start a game as Clampede (Brainjack set) and look at the city"
- },
- {
-  "date": "2026-10-13",
   "game": "nebula",
   "title": "Real 3D ships and asteroids",
   "items": [
@@ -76,16 +130,6 @@
    "Phones and Low graphics load lighter versions"
   ],
   "check": "Start a battle and look at the ships and asteroids on the mat."
- },
- {
-  "date": "2026-10-13",
-  "game": "final-approach",
-  "title": "Final Approach: a real 3D airliner",
-  "items": [
-   "The landing and the crash now show a detailed 3D airliner",
-   "Low graphics keeps the old painted plane"
-  ],
-  "check": "Finish a flight and watch the plane land or crash"
  },
  {
   "date": "2026-10-13",
@@ -97,16 +141,6 @@
    "When the fuse runs out the bomb blows up big"
   ],
   "check": "Make a wrong cut, then let the fuse run out"
- },
- {
-  "date": "2026-10-13",
-  "game": "shipwreck",
-  "title": "Real 3D castaways and palms",
-  "items": [
-   "Pawns, palms, shelter and palisade are now detailed 3D models",
-   "Phones and Low graphics load lighter versions of the same models"
-  ],
-  "check": "Start a game and look at the castaways and the camp on the island."
  },
  {
   "date": "2026-10-10",

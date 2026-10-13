@@ -637,6 +637,29 @@ const GX={key:'gx',open:null,
 
 
 
+/* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+(function () {
+  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  window.GXSK = {
+    init: function (o) {
+      o = o || {}; var extra = [];
+      if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
+      load(core, function (ok) {
+        if (!ok) return;
+        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
+        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        if (o.cb) o.cb();
+      });
+    }
+  };
+})();
+
+
+
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
@@ -3597,7 +3620,7 @@ function showStory() {
   const mods = sc.mods.map(m => D.mods[m]).concat(G.mods.traffic ? [D.mods.traffic] : []).concat(G.mods.tabs ? [D.mods.turns] : []);
   const box = h('div.rsbox.stbox', { role: 'dialog', 'aria-label': 'Flight story' },
     ART['end-land'] ? h('img.stimg', { src: ART['end-land'], alt: '' }) : null,
-    h('h2', ap.name + ': ' + sc.title), h('p.sm.muted', (band.name || sc.col) + ' · ' + ap.wx + ', ' + ap.tod + ' · ' + name(0) + ' (Pilot, blue) and ' + name(1) + ' (Co-pilot, orange)'),
+    h('h2', ap.name + ': ' + sc.title), h('p.sm.muted', (band.name || sc.col) + ' · ', wxImg('wx-' + ap.wx), wxImg('time-' + ap.tod), ap.wx + ', ' + ap.tod + ' · ' + name(0) + ' (Pilot, blue) and ' + name(1) + ' (Co-pilot, orange)'),
     h('p', sc.text), h('p.sm', ap.blurb),
     mods.length ? h('div', h('b', 'Today'), ...mods.map(m => h('div.why', h('b', m.name + ': '), m.text))) : h('p.sm', 'No extra rules today: just the panel, the track and each other.'),
     ...G.abil.map(a => h('div.why', h('b', D.abilities[a].name + ': '), D.abilities[a].text)),
@@ -3680,7 +3703,7 @@ function renderCrew() {
     b.appendChild(h('h3.drh', 'The airport'));
   }
   b.appendChild(h('div.kv', h('span', 'Airport'), h('b', ap.name))); b.appendChild(h('p', ap.blurb)); b.appendChild(h('div.kv', h('span', 'Scenario'), h('b', sc.title + ' (' + D.diffs[sc.col].name + ')'))); b.appendChild(h('p.sm', sc.text));
-  b.appendChild(h('div.kv', h('span', 'Weather'), h('b', ap.wx + ', ' + ap.tod))); if (G.mods) for (const m of sc.mods) b.appendChild(h('div.why', h('b', D.mods[m].name + ': '), D.mods[m].text));
+  b.appendChild(h('div.kv', h('span', 'Weather'), h('b.wxb', wxImg('wx-' + ap.wx), wxImg('time-' + ap.tod), ap.wx + ', ' + ap.tod))); if (G.mods) for (const m of sc.mods) b.appendChild(h('div.why', h('b', D.mods[m].name + ': '), D.mods[m].text));
   if (G.mods.tabs) b.appendChild(h('div.why', h('b', D.mods.turns.name + ': '), D.mods.turns.text)); if (G.mods.traffic) b.appendChild(h('div.why', h('b', D.mods.traffic.name + ': '), D.mods.traffic.text));
   for (const a of G.abil) b.appendChild(h('div.why', h('b', D.abilities[a].name + ': '), D.abilities[a].text));
   for (const s of [0, 1]) b.appendChild(h('div.rcard', ART['crew-' + s] ? h('img.ri', { src: ART['crew-' + s], alt: '' }) : null, h('div.rt', h('b', D.crew[s].name + (G.ai[s] ? ' (computer ' + G.ai[s] + ')' : '')), h('div.sm', D.crew[s].story))));
@@ -4815,8 +4838,11 @@ function extrasBoot() {
   GX.drawer('musicd', 'Music', h('div#musicbody'));
   ['back-default', 'back-spires'].forEach(preImg);
   tableApply();
+  try { GXSK.init({ sets: { 'sk-phrase': ['ui-phrase-c'], 'sk-roll': ['ui-button-roll-c'], 'sk-sheet': ['ui-sheet-c'], 'sk-alt': ['ui-altbar-c'], 'sk-check': ['ui-check'] } }); } catch (e) { }
   setInterval(() => { try { musicSync(); tableApply(); tableRetry(); } catch (e) { } }, 800);
 }
+// weather / time-of-day badge (painted); vanishes if the file is missing
+const wxImg = (k, a) => { const i = h('img.wxi', { src: MEDIA + 'icon-' + k + '.webp', alt: a || '', draggable: 'false' }); i.onerror = () => i.remove(); return i; };
 // the debrief picks up the end art after each draw
 (function () {
   const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { endBanner(); } catch (e) { } return r; };

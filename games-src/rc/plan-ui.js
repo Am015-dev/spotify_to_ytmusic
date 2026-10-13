@@ -70,7 +70,7 @@ function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=cur
   if(UI.ps.pick){const quick=priorities().filter(p=>!p.done&&p.act&&!placeWhy(cur.id,p.act.type,p.act.tgt,p.act.alt));
     if(quick.length)h+=`<h4>Today’s needs ${esc(pawnLabel(cur).split(' ')[0])} can help with</h4><div class="qpick">${quick.map(p=>`<button class="btn sm" data-pq="${priorities().indexOf(p)}" ${posAttr(p.act)}>${esc(p.title)}</button>`).join('')}</div>`;
     if(UI.tileSel!=null)h+=tileFocusHtml(UI.tileSel);
-    h+=`<h4>All jobs</h4><div class="cats">${CATS.filter(([kk])=>kk!=='special'||Object.keys(SC().specials||{}).length||G.kept.m_tmap).map(([kk,ic,n])=>{const c=catCount(kk);return `<button class="cat ${UI.cat===kk?'on':''}" data-cat="${kk}" ${c?'':'aria-disabled="true"'}><span>${ic}</span>${n}<small>${c?c+' possible':'none now'}</small></button>`}).join('')}</div>`;
+    h+=`<h4>All jobs</h4><div class="cats">${CATS.filter(([kk])=>kk!=='special'||Object.keys(SC().specials||{}).length||G.kept.m_tmap).map(([kk,ic,n])=>{const c=catCount(kk);return `<button class="cat ${UI.cat===kk?'on':''}" data-cat="${kk}" ${c?'':'aria-disabled="true"'}><span class="ai" data-a="${kk}">${ic}</span>${n}<small>${c?c+' possible':'none now'}</small></button>`}).join('')}</div>`;
     if(UI.cat)h+=`<div class="catbody">${catHtml(UI.cat)}</div>`}
   h+=`<p class="hint">One pawn on a job rolls the dice: it can fail or hurt. A second pawn on the same job makes it certain. Places two steps from camp need one more pawn.</p>`;
   return h+planSoFar()}
@@ -109,9 +109,9 @@ function diceOdds(dt){const n=f=>DICE[dt+'-'+f].filter(x=>x===(f==='wound'?'woun
 function pawnsText(n,far){return n.roll?`${n.need} pawn${n.need>1?'s':''}: dice · ${n.max}: sure${far?' · far from camp (+1 pawn)':''}`:`${n.need} pawn${n.need>1?'s':''}, no dice`}
 function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);let chance;
   if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max){const o=dt?diceOdds(dt):{s:80,w:1,q:3};chance=`<b class="roll" title="One pawn fewer than sure: the dice decide. Add 1 more pawn for a sure success. A failure gives the leader 2 determination.">🎲 ${o.s}% success · ${o.w}-in-6 wound risk</b>`}else chance='<b class="sure">✔ sure</b>';
-  const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RICON[r]}`).join(' ');
+  const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RX(r)}`).join(' ');
   const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
-  return `<div class="pl" ${posAttr(a)}><span class="pli">${ACT_ICON[a.type]||'•'}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
+  return `<div class="pl" ${posAttr(a)}><span class="pli">${AI(a.type)}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
 function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
 // every job in a category: {type,tgt,alt,title,sub,why}
 function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);const pl=why==='already planned'&&findAct(type,tgt);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&(MULTI.includes(type)||pl&&pl.pw.length<actNeed(pl).max)?null:why})};

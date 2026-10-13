@@ -584,6 +584,51 @@ html.ph #feat .ft{max-width:none}
 #wnbody .wnk{background:transparent;border:1.5px solid #4a3326;color:#f4ead8}
 #wnbody .wnk[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
 #wnbody .wnf{width:100%;text-align:left;font:700 .9rem var(--body);min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;margin-top:12px}
+/* in-game test checklist */
+#table .bar #cktest{position:relative}
+.ckbadge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;margin-left:8px;border-radius:10px;background:#e23b2e;color:#fff6c8;font:800 .75rem/20px var(--body)}
+.ckbadge[hidden]{display:none}
+#ck{position:absolute;z-index:74;display:flex;flex-direction:column;background:#241810;color:#f4ead8;border:1.5px solid var(--brass);box-shadow:0 10px 30px rgba(0,0,0,.55);overflow:hidden;box-sizing:border-box}
+#ck[hidden],#ckpill[hidden]{display:none}
+#ck.r{right:0;bottom:0;top:var(--ckt,0px);width:var(--ckw,320px);border-width:0 0 0 1.5px}
+#ck.b{left:0;right:0;bottom:0;height:var(--ckh,40%);border-width:1.5px 0 0;border-radius:14px 14px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+#table.ckr iframe{width:calc(100% - var(--ckw,320px))}
+#table.ckb iframe{height:calc(100% - var(--ckh,40%))}
+#ck .ckg{display:none;height:20px;flex:none;cursor:ns-resize;touch-action:none;place-items:center}
+#ck.b .ckg{display:grid}
+#ck .ckg i{width:44px;height:5px;border-radius:3px;background:#6b5340}
+#ck .ckh{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border-bottom:1px solid #4a3326;flex:none}
+#ck.b .ckh{padding-top:0}
+#ck h2{font:400 1rem var(--display);margin:0;color:#f0c05a;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ck .ckh button,#ckcopy{font:700 .9rem var(--body);min-height:44px;min-width:44px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;touch-action:manipulation}
+#ck .ckh button:hover,#ckcopy:hover{border-color:var(--brass)}
+#ckbody{overflow:auto;overscroll-behavior:contain;padding:8px 10px 14px;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
+#ckcopy{width:100%;background:rgba(255,255,255,.04);margin-bottom:8px}
+#ckbody .cke{border:1.5px solid #4a3326;border-radius:12px;padding:10px;margin-bottom:8px;background:rgba(255,255,255,.03)}
+#ckbody .cke.done{border-color:#2f7d4f}
+#ckbody .ckd{font:500 .8rem var(--mono);color:#bca78c;text-transform:uppercase;letter-spacing:.03em}
+#ckbody .ckd b{display:block;font:800 .95rem/1.25 var(--body);color:#f4ead8;text-transform:none;letter-spacing:0;margin-top:2px}
+#ckbody .ckc{font:800 .9rem/1.3 var(--body);color:#f0c05a;margin:8px 0 4px}
+#ckbody .cki{padding:8px 0;border-top:1px solid #3a2a1c}
+#ckbody .ckt{font:500 .9rem/1.35 var(--body);margin-bottom:6px}
+#ckbody .ckb{display:flex;gap:6px}
+#ckbody .ckb button{flex:1;min-height:44px;padding:0 4px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;font:700 .85rem var(--body);cursor:pointer;touch-action:manipulation;white-space:nowrap}
+#ckbody .ckb button[aria-pressed=true][data-ck=ok]{background:#2f7d4f;border-color:#2f7d4f;color:#fff}
+#ckbody .ckb button[aria-pressed=true][data-ck=bad]{background:#b3382c;border-color:#b3382c;color:#fff}
+#ckbody .ckb button[aria-pressed=true][data-ck=skip]{background:#6b5a48;border-color:#6b5a48;color:#fff}
+#ckbody .ckn{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:44px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px var(--body)}
+#ckbody .ckempty{font:500 .9rem var(--body);color:#bca78c;padding:14px 2px}
+#ckpill{position:absolute;z-index:74;bottom:calc(10px + env(safe-area-inset-bottom,0px));left:10px;min-height:44px;padding:0 14px;border-radius:22px;border:1.5px solid var(--brass);background:#241810;color:#f4ead8;font:800 .9rem var(--body);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);display:flex;align-items:center;touch-action:manipulation}
+#ckpill.r{left:auto;right:10px}
+#cktoast{position:absolute;z-index:77;left:50%;bottom:70px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 .9rem var(--body);padding:10px 16px;border-radius:10px;pointer-events:none}
+#cktoast[hidden]{display:none}
+#ckfb{position:fixed;z-index:90;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid var(--brass);border-radius:12px;padding:10px;display:grid;gap:8px}
+#ckfb textarea{width:100%;box-sizing:border-box;height:140px;font:500 16px var(--mono);background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px}
+#ckfb button{min-height:44px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;font:700 .9rem var(--body)}
+#wnpanel .wnh .wncopy{font:700 .85rem var(--body);min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;margin-left:auto}
+#wnpanel .wnh{justify-content:flex-start}
+#wnpanel .wnh .wnx{margin-left:0}
+@media (prefers-reduced-motion:no-preference){#ck{animation:ckin .18s ease-out}@keyframes ckin{from{opacity:0}to{opacity:1}}}
 #wnbody .wnempty{font:500 .9rem var(--body);color:#bca78c;padding:14px 2px}
 </style>
 </head>
@@ -594,7 +639,7 @@ html.ph #feat .ft{max-width:none}
   <div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div>
   <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="fltbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpop" aria-label="Filter games"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4-2v-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">Filter</span><i class="fdot" hidden></i></button><button type="button" class="tbtn" id="wnbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="wnpanel" aria-label="What's new"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l2.4 5.6 6.1.5-4.6 4 1.4 6-5.3-3.2-5.3 3.2 1.4-6-4.6-4 6.1-.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">What's new</span><i class="wnbadge" id="wnbadge" hidden></i></button><button type="button" class="tbtn" id="viewbtn" aria-label="Plain list"><span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span></button></div>
   <div class="fpop" id="fpop" role="dialog" aria-label="Filter games" hidden></div>
-  <div id="wnback" hidden></div><div id="wnpanel" role="dialog" aria-modal="true" aria-label="What's new" hidden><div class="wnh"><h2>What's new</h2><button type="button" class="wnx" aria-label="Close what's new">✕</button></div><div id="wnbody"></div></div>
+  <div id="wnback" hidden></div><div id="wnpanel" role="dialog" aria-modal="true" aria-label="What's new" hidden><div class="wnh"><h2>What's new</h2><button type="button" class="wncopy" id="wncopy">Copy all games</button><button type="button" class="wnx" aria-label="Close what's new">✕</button></div><div id="wnbody"></div></div>
   <div class="fpop cpop" id="cpop" role="dialog" aria-label="More saved games" hidden></div>
 </header>
 <main>
@@ -622,15 +667,18 @@ html.ph #feat .ft{max-width:none}
 <dialog id="invite" aria-labelledby="invh"><div class="in"><h2 id="invh">Play online with friends</h2><p>Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server.</p><p>Each game keeps its own save, sound and difficulty settings.</p><button type="button" class="btn" id="invok">Got it</button></div></dialog>
 <dialog id="mine" aria-labelledby="mineh"><div class="in"><h2 id="mineh">Your games</h2><div id="minebody"></div><button type="button" class="btn" id="mineok">Close</button></div></dialog>
 <button type="button" id="fab" aria-label="Game menu: back to the shelf" hidden>←</button>
-<div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
+<div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><button type="button" id="fabtest" role="menuitem" hidden>✔ Test<i class="ckbadge" hidden></i></button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
 <div id="iostip" hidden><p>For a full-screen shelf on iPhone: tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>, and open it from there.</p><button type="button" id="iosok">Got it</button></div>
 <div id="table" hidden>
   <div class="bar">
     <button type="button" id="back" aria-label="Back to the shelf">← Shelf</button>
     <strong id="tname">Game</strong>
+    <button type="button" id="cktest" hidden aria-expanded="false" aria-controls="ck">✔ Test<i class="ckbadge" hidden></i></button>
     <a id="solo" href="#" target="_blank" rel="noopener">Open on its own</a>
   </div>
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
+  <div id="ck" role="region" aria-label="Test checklist" hidden><div class="ckg" id="ckgrip" aria-hidden="true"><i></i></div><div class="ckh"><h2 id="ckttl">Test</h2><button type="button" id="ckmin" aria-label="Collapse checklist">&#9662;</button><button type="button" id="ckx" aria-label="Close checklist">&#10005;</button></div><div id="ckbody"></div></div>
+  <button type="button" id="ckpill" hidden>&#10004; Test<i class="ckbadge" hidden></i></button><div id="cktoast" role="status" hidden></div>
   <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div><div class="lk" id="lkofi" hidden>Enjoying the shelf? <a class="kofi-link" target="_blank" rel="noopener" href="#">Buy Alex a coffee ☕</a></div></div></div>
 </div>
 
@@ -771,7 +819,8 @@ function refreshUpd(){
   document.querySelectorAll('.boxbtn[data-id]').forEach(el=>{const fr=el.querySelector('.f.front');if(!fr)return;const has=fr.querySelector('.upd'),on=unchk(el.dataset.id);
     if(on&&!has){const s=document.createElement('span');s.className='upd';s.textContent='Updated';fr.appendChild(s)}else if(!on&&has)has.remove()});
   document.querySelectorAll('#listview li[data-id]').forEach(li=>{const t=li.querySelector('.pl-t b'),has=li.querySelector('.upd-d'),on=unchk(li.dataset.id);
-    if(on&&!has&&t){const s=document.createElement('i');s.className='upd-d';s.title='Updated';t.appendChild(s)}else if(!on&&has)has.remove()})}
+    if(on&&!has&&t){const s=document.createElement('i');s.className='upd-d';s.title='Updated';t.appendChild(s)}else if(!on&&has)has.remove()});
+  if(typeof ckBadges==='function'){ckBadges();if(ckGame)ckLayout()}}
 const wnDate=s=>{const m=String(s).match(/^(\d{4})-(\d\d)-(\d\d)$/);if(!m)return esc(s);return new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})};
 function wnEntry(e,done){
   const g=byId(e.game),nm=g?g.name:e.game==='shelf'?'The shelf':e.game;
@@ -803,6 +852,104 @@ function initWn(){
     else if(e.key==='Tab'){const f=[...p.querySelectorAll('button:not([disabled])')];if(!f.length)return;const i=f.indexOf(document.activeElement);
       if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}},true);
   fetch('updates.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(j=>{if(Array.isArray(j)){UPDS=j.filter(e=>e&&e.game&&e.date&&e.title);refreshUpd();if(!p.hidden)renderWn(true)}}).catch(()=>{})}
+
+/* ---------- in-game test checklist (reuses the What's new notes) ---------- */
+const CKR='shelf_ck_res',CKA='shelf_ck_auto',CKS='shelf_ck_state',CKH='shelf_ck_h';
+let ckGame=null,ckState='closed',ckTimer=0;
+const ckEl=()=>document.getElementById('ck');
+const ckEnts=id=>UPDS.filter(e=>e.game===id);
+const ckK=(e,i)=>wnKey(e)+'|'+i;
+const ckLeftIn=(id)=>{const d=wnDone(),r=jget(CKR);let n=0;ckEnts(id).forEach(e=>{if(d[wnKey(e)])return;(e.items||[]).forEach((t,i)=>{if(!(r[ckK(e,i)]&&r[ckK(e,i)].s))n++})});return n};
+const ckMode=()=>(innerWidth<=700&&innerHeight>innerWidth)?'b':'r';
+function ckBadges(){
+  const n=ckGame?ckLeftIn(ckGame):0;
+  document.querySelectorAll('.ckbadge').forEach(b=>{b.hidden=!n;b.textContent=n>99?'99+':n});
+  const t=document.getElementById('cktest');if(t)t.setAttribute('aria-label',n?'Test checklist ('+n+' to check)':'Test checklist')}
+function ckLayout(){
+  const t=document.getElementById('table'),c=ckEl(),pill=document.getElementById('ckpill');
+  const has=!!ckGame&&ckEnts(ckGame).length>0;
+  document.getElementById('cktest').hidden=!has;document.getElementById('fabtest').hidden=!has;
+  const m=ckMode(),bar=t.querySelector('.bar'),barH=bar&&bar.offsetParent?bar.offsetHeight:0;
+  let fr=0.4;try{fr=parseFloat(store.get(CKH))||0.4}catch(_){}
+  fr=Math.max(.25,Math.min(.7,fr));
+  const open=has&&ckState==='open'&&!table.hidden,min=has&&ckState==='min'&&!table.hidden;
+  c.hidden=!open;pill.hidden=!min;
+  t.classList.toggle('ckr',open&&m==='r');t.classList.toggle('ckb',open&&m==='b');
+  c.classList.toggle('r',m==='r');c.classList.toggle('b',m==='b');pill.classList.toggle('r',m==='r');
+  t.style.setProperty('--ckt',barH+'px');
+  t.style.setProperty('--ckw',(innerWidth<=900?300:320)+'px');
+  t.style.setProperty('--ckh',Math.round(innerHeight*fr)+'px');
+  document.getElementById('cktest').setAttribute('aria-expanded',open?'true':'false');
+  ckBadges();if(open)ckRender(true)}
+function ckSet(st){ckState=st;store.set(CKS,st);ckLayout();clearTimeout(ckTimer);ckTimer=setTimeout(ckLayout,400)}
+function ckRender(keep){
+  const c=ckEl();if(c.hidden||!ckGame)return;const g=byId(ckGame),body=document.getElementById('ckbody'),st=body.scrollTop,r=jget(CKR),d=wnDone();
+  document.getElementById('ckttl').textContent='Test: '+(g?g.name:ckGame);
+  const ents=ckEnts(ckGame);let h='<button type="button" id="ckcopy">&#128203; Copy results</button>';
+  ents.forEach(e=>{
+    h+=`<section class="cke${d[wnKey(e)]?' done':''}"><div class="ckd">${wnDate(e.date)}<b>${esc(e.title)}</b></div>${e.check?`<p class="ckc">Try this: ${esc(e.check)}</p>`:''}`;
+    (e.items||[]).forEach((t,i)=>{const k=ckK(e,i),v=r[k]||{},s=v.s;
+      h+=`<div class="cki"><div class="ckt">${esc(t)}</div><div class="ckb">${[['ok','&#9989; Works'],['bad','&#10060; Problem'],['skip','&#9197; Skip']].map(([a,l])=>`<button type="button" data-ck="${a}" data-k="${esc(k)}" aria-pressed="${s===a}">${l}</button>`).join('')}</div>${s==='bad'?`<input class="ckn" type="text" maxlength="200" placeholder="What went wrong? (optional)" aria-label="Note" data-note="${esc(k)}" value="${esc(v.n||'')}">`:''}</div>`});
+    h+='</section>'});
+  if(!ents.length)h+='<div class="ckempty">Nothing to test for this game yet.</div>';
+  body.innerHTML=h;body.scrollTop=keep?st:0}
+function ckText(id){
+  const r=jget(CKR),g=byId(id),nm=g?g.name:id,out=[];
+  ckEnts(id).forEach(e=>{const l=['Game Night test · '+nm+' · '+e.date];
+    (e.items||[]).forEach((t,i)=>{const v=r[ckK(e,i)]||{};
+      l.push(v.s==='ok'?'✅ '+t:v.s==='bad'?'❌ '+t+(v.n?' — '+v.n:''):v.s==='skip'?'⏭ '+t:'⬜ '+t+' (not tested)')});
+    out.push(l.join('\n'))});
+  return out.join('\n\n')}
+function ckToast(m){const t=document.getElementById('cktoast');t.textContent=m;t.hidden=false;clearTimeout(ckToast.t);ckToast.t=setTimeout(()=>{t.hidden=true},1800)}
+function ckCopy(text,done){
+  const fb=()=>{let ok=false;const box=document.createElement('div');box.id='ckfb';box.innerHTML='<textarea readonly aria-label="Results"></textarea><button type="button">Close</button>';
+    const ta=box.firstChild;ta.value=text;document.body.appendChild(box);ta.focus();ta.select();
+    try{ok=document.execCommand('copy')}catch(_){}
+    box.lastChild.onclick=()=>box.remove();if(ok){box.remove();done(true)}else done(false)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>done(true),fb);else fb()}
+function ckAllText(){const ids=[...new Set(UPDS.map(e=>e.game))].filter(id=>byId(id));return ids.map(ckText).filter(Boolean).join('\n\n')}
+function ckSetRes(k,s,n){
+  const r=jget(CKR);if(s==null)delete r[k];else r[k]={s,n:n||''};store.set(CKR,JSON.stringify(r));ckSync(k)}
+/* mark an entry Checked in What's new when every item works; undo only what we marked */
+function ckSync(){
+  const r=jget(CKR),a=jget(CKA),d=wnDone();let ch=false;
+  UPDS.forEach(e=>{const its=e.items||[];if(!its.length)return;const wk=wnKey(e),all=its.every((_,i)=>(r[ckK(e,i)]||{}).s==='ok');
+    if(all&&!d[wk]){d[wk]=1;a[wk]=1;ch=true}else if(!all&&d[wk]&&a[wk]){delete d[wk];delete a[wk];ch=true}});
+  if(ch){store.set(WNK,JSON.stringify(d));store.set(CKA,JSON.stringify(a));refreshUpd();const wp=document.getElementById('wnpanel');if(wp&&!wp.hidden)renderWn(true)}
+  ckBadges()}
+function ckOpenGame(g){
+  ckGame=g&&g.id!=='ref'?g.id:null;let st='closed';try{st=store.get(CKS)||'closed'}catch(_){}
+  ckState=['open','min','closed'].includes(st)?st:'closed';ckLayout()}
+function ckCloseGame(){ckGame=null;ckLayout()}
+function initCk(){
+  const c=ckEl(),body=document.getElementById('ckbody');
+  document.getElementById('cktest').onclick=()=>ckSet(ckState==='open'?'closed':'open');
+  document.getElementById('fabtest').onclick=()=>{fabmenu.hidden=true;ckSet('open')};
+  document.getElementById('ckpill').onclick=()=>ckSet('open');
+  document.getElementById('ckmin').onclick=()=>ckSet('min');
+  document.getElementById('ckx').onclick=()=>ckSet('closed');
+  body.addEventListener('click',e=>{
+    if(e.target.closest('#ckcopy')){ckCopy(ckText(ckGame),ok=>ckToast(ok?'Copied':'Select and copy the text'));return}
+    const b=e.target.closest('[data-ck]');if(!b)return;
+    const k=b.dataset.k,cur=(jget(CKR)[k]||{}).s,nx=b.dataset.ck;
+    ckSetRes(k,cur===nx?null:nx,(jget(CKR)[k]||{}).n);ckRender(true);
+    if(nx==='bad'&&cur!=='bad'){const i=body.querySelector('.ckn[data-note="'+CSS.escape(k)+'"]');if(i)i.focus({preventScroll:false})}});
+  body.addEventListener('input',e=>{const i=e.target.closest('[data-note]');if(!i)return;
+    const r=jget(CKR),k=i.dataset.note;if(r[k]){r[k].n=i.value;store.set(CKR,JSON.stringify(r))}});
+  /* drag the grip (portrait sheet): drag to resize, tap to collapse */
+  const grip=document.getElementById('ckgrip');let dr=null;
+  grip.addEventListener('pointerdown',e=>{dr={y:e.clientY,moved:false};try{grip.setPointerCapture(e.pointerId)}catch(_){}});
+  grip.addEventListener('pointermove',e=>{if(!dr)return;if(Math.abs(e.clientY-dr.y)>6)dr.moved=true;
+    if(dr.moved){const f=Math.max(.2,Math.min(.7,(innerHeight-e.clientY)/innerHeight));document.getElementById('table').style.setProperty('--ckh',Math.round(innerHeight*f)+'px');dr.f=f}});
+  const gend=()=>{if(!dr)return;const d0=dr;dr=null;
+    if(!d0.moved){ckSet('min');return}
+    if(d0.f<.25){ckSet('min');return}
+    store.set(CKH,String(Math.min(.7,d0.f)));ckLayout()};
+  grip.addEventListener('pointerup',gend);grip.addEventListener('pointercancel',()=>{dr=null});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!c.hidden&&ckState==='open'){e.preventDefault();e.stopPropagation();ckSet('closed')}},true);
+  const rl=()=>{ckLayout();clearTimeout(ckTimer);ckTimer=setTimeout(ckLayout,400)};
+  addEventListener('resize',rl);addEventListener('orientationchange',rl);if(window.visualViewport)visualViewport.addEventListener('resize',rl);
+  document.getElementById('wncopy').onclick=()=>{const t=ckAllText();if(!t){return}ckCopy(t,ok=>{const b=document.getElementById('wncopy');const o='Copy all games';b.textContent=ok?'Copied':o;setTimeout(()=>{b.textContent=o},1600)})}}
 const byId=id=>GAMES.find(g=>g.id===id);
 const VIDEO=()=>GAMES.filter(g=>g.kind==='video'),BOARD=()=>GAMES.filter(g=>g.kind!=='video');
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1098,11 +1245,11 @@ function openGame(g,count){
   if(ins)hideInspect(true);
   $('#tname').textContent=g.name;$('#solo').href=g.src;frame.title=g.name;if(g.id!=='ref')showLoader(g.name.replace(/ \(preview\)$/,''));frame.src=g.src;
   table.hidden=false;if(isPh()){$('#fabname').textContent=g.name;$('#fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;if(!reduced())table.classList.add('opening');
-  document.body.style.overflow='hidden';root.classList.add('playing');
+  document.body.style.overflow='hidden';root.classList.add('playing');ckOpenGame(g);
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
 function closeGame(){
   if(typeof showFab==='function'){showFab(false);leaveFull()}
-  table.hidden=true;root.classList.remove('playing');freshFrame();document.body.style.overflow='';
+  table.hidden=true;ckCloseGame();root.classList.remove('playing');freshFrame();document.body.style.overflow='';
   try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   const id=store.get('shelf_last'),rf=retFocus;retFocus=null;
   render();
@@ -1291,7 +1438,7 @@ document.addEventListener('pointerdown',e=>{if(!fabmenu.hidden&&!fabmenu.contain
 addEventListener('resize',()=>{if(!fab.hidden)placeFab(corner)});
 if(isPh()&&/iPhone|iPod/.test(navigator.userAgent)&&!standalone&&!store.get('shelf_iostip')){const t=document.getElementById('iostip');t.hidden=false;document.getElementById('iosok').onclick=()=>{t.hidden=true;store.set('shelf_iostip','1')}}
 addEventListener('resize',fit);
-renderFilters();initWn();fit();render();
+renderFilters();initWn();initCk();fit();render();
 {const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start)}
 
 /* Ko-fi support: set the page name to switch the support links on */

@@ -104,6 +104,7 @@ function extrasBoot() {
   ['bag-moss', 'bag-ember', 'end-win', 'end-lose'].forEach(preImg);
   ['bag', 'chip'].forEach(n => { const i = new Image(); i.src = MODELS + n + '.webp'; });   // 3D sprites, loaded once
   tableApply();
+  try { GXSK.init({ sets: { 'sk-awn': ['awning-c'], 'sk-stall': ['ui-stall-c', 'ui-stall-locked-c'], 'sk-slot': ['ui-slot'], 'sk-stop': ['btn-stop'], 'sk-boom': ['icon-boom'] } }); } catch (e) { }
   setInterval(() => { try { sndMusic(); bagApply(); tableApply(); } catch (e) { } }, 800);
 }
 // the final scores pick up the end art after each draw
