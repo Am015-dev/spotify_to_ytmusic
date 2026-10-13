@@ -1,0 +1,15 @@
+PASS walk · GO puts you on foot · "📍 ON FOOT · walk ahead, then turn (PC: WASD, Shift runs)"
+PASS walk · 3 s forward moves ≥ 4 m · {"d":5.93}
+PASS walk · steady speed, no jitter (sd/mean < 0.12) · {"mean":2,"sd":0}
+PASS walk · heading steady while walking straight · {"maxStep":0}
+PASS walk · feet step in time with the ground (foot speed / ground speed 0.75-1.35) · {"ratio":1}
+PASS walk · faces the new direction within 0.2 s (+1 frame) · {"ms":148}
+PASS walk · camera back behind within 1.5 s of the turn · {"ms":897,"end":0.01}
+PASS walk · camera never inside a wall · {"camIn":0}
+PASS walk · no snagging (stuck frames < 10) · {"stuck":1}
+PASS phone · GO puts you on foot · "📍 ON FOOT · half stick = walk, full stick = run"
+PASS phone · half stick = steady walk 1.4-2.6 m/s · {"v50":1.88}
+PASS phone · full stick = run ≥ 4 m/s · {"v100":5}
+PASS phone · ¾ stick is in between (smooth, no crawl→sprint jump) · {"v75":3.05}
+PASS all · no console errors · []
+GO 14/14
