@@ -13,3 +13,9 @@
   BC_upd re-measures per ride. Start by writing the cam: tests (GO bus / longest truck / small sports car / on foot; ray from camera to a road point
   10 m ahead of the nose not blocked by the ride; ride 15-35 % of screen height at 852×393 and portrait), then check why BC_apply is not enough for
   the long flatbed (likely look-at point / height not derived from length).
+
+## cam-1 (2026-10-13), alex/od-foot @ 84773e2 — READY sent, GO 35/35
+- src/98cam_size_cam.js (CAM_): CAM_prof = ride side profile (vertices → 0.5 m bins, car frame); CAM_solve per RCAM mode: keep stock if it passes,
+  else grid-search b/h (pitch puts the road 10 m past the nose at 62 % screen height) with clearance ≥ 0.3 m over the profile and fill 16-34 %.
+  roamCam wrapper eases RCAM fields (≤ 4 m/s on the real clock); SC_rcam wrapper restores the eased values. Refit 30 frames after a ride change / on rotation.
+- On-foot camera height OF_CAMH = 2.9 (98of). Tests: v90n/cam-go-* in 99c, `node tools/tCamGo.js <url>/index.html <out>` (FAIL lines only, ALL=1 all, SHOTS=1, BEFORE=1 old camera).
