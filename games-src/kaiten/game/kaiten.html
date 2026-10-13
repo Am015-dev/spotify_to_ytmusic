@@ -214,7 +214,7 @@ html.ph #cheat{display:none}
 .scard h1{margin:0;font-size:2rem;display:flex;align-items:center;gap:10px;font-weight:900}.scard h1>span{width:44px;height:44px;display:inline-block}.scard h1 svg{width:100%;height:100%}
 .scard .tag{margin:0;font-size:15px}
 .chefs{display:flex;gap:6px;justify-content:center}.chefs svg{width:46px;height:46px}
-.sbtn{appearance:none;border:2px solid var(--ink);background:linear-gradient(180deg,#fff8e6,#f0dcb2);border-radius:12px;padding:8px 12px;min-height:56px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-size:15px}
+.sbtn{appearance:none;border:2px solid var(--ink);background:linear-gradient(180deg,#fff8e6,#f0dcb2);border-radius:12px;padding:6px 12px;min-height:64px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-size:15px}
 .sbtn b{font-size:16px}.sbtn span{font-size:13px;opacity:.85}
 .sbtn.big{background:linear-gradient(180deg,#f0725a,#d9452c);color:#fff}.sbtn.big span{opacity:.95}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -356,8 +356,8 @@ html.kkpx .grp .pl{animation:none!important}
 .logo .ic{width:1.15em;height:1.15em;flex:0 0 auto;filter:drop-shadow(0 3px 0 #5b3221)}.logo svg{width:100%;height:100%}
 .ttl .tag{margin:6px 0 0;color:#ffe9c2;font-weight:800;font-size:17px;text-shadow:0 2px 6px rgba(0,0,0,.85)}
 .tbtns{margin-top:auto;display:flex;flex-direction:column;gap:12px;width:min(360px,100%)}
-.tbtn{appearance:none;border:3px solid #4a2a22;border-radius:18px;min-height:64px;padding:6px 14px;background:linear-gradient(180deg,#fff8e6,#efd9ad);color:#4a2a22;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;box-shadow:0 5px 0 #5b3221,0 10px 22px rgba(0,0,0,.5);font-family:inherit}
-.tbtn b{font-size:23px;font-weight:900;line-height:1.1}.tbtn span{font-size:13.5px;font-weight:700;opacity:.88}
+.tbtn{appearance:none;border:3px solid #4a2a22;border-radius:18px;min-height:76px;padding:8px 14px;background:linear-gradient(180deg,#fff8e6,#efd9ad);color:#4a2a22;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;box-shadow:0 5px 0 #5b3221,0 10px 22px rgba(0,0,0,.5);font-family:inherit}
+.tbtn b{font-size:22px;font-weight:900;line-height:1.1}.tbtn span{font-size:13.5px;font-weight:700;opacity:.88}
 .tbtn.go{background:linear-gradient(180deg,#f47a5f,#d9452c);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .tbtn:active{transform:translateY(3px);box-shadow:0 2px 0 #5b3221,0 6px 14px rgba(0,0,0,.5)}
 .tbtn:focus-visible,.tlink:focus-visible,.dcard button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
@@ -607,9 +607,6 @@ html.sk-kki .sh .sc{background:url(media/icon-star.webp) center/contain no-repea
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{background:rgba(36,18,8,.78);border-radius:8px;padding:2px 8px;color:var(--sk-cream);text-shadow:none}
 html.sk .gx-drawer-head h2{background:rgba(36,18,8,.8);border-radius:8px;padding:3px 10px;flex:0 1 auto;margin-right:auto;color:var(--sk-cream)}
 html.sk .gx-drawer-head .gx-x{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/8px stretch;border-radius:0;background:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
-html.sk .tbtn{min-height:76px;padding-top:8px;padding-bottom:8px}
-html.sk .tbtn b{font-size:22px}
-html.sk .sbtn{min-height:64px;padding-top:6px;padding-bottom:6px}
 html.sk .gxh-set button.btn{background:none;border-radius:0;min-height:48px}
 html.sk .gxh-set button.btn[aria-pressed=true]{background:none;border-image-source:url(media/ui-button-power-c.webp);color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-bar #barstat{font-size:12px;padding:1px 4px}
@@ -768,6 +765,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
 .gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+/* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
+.gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px}
 .gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
@@ -814,7 +813,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
-.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin-top:-8px;margin-bottom:-8px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.

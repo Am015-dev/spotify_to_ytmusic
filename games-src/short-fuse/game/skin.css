@@ -4,8 +4,6 @@ html.sk{--sk-ink:#2a1a08;--sk-cream:#fff1d2;--gxc-ink:#f6efdc;--gxc-dim:rgba(246
 /* ---- buttons: cream plate (default), orange (go / selected), blue (power / chosen) ---- */
 html.sk .big,html.sk .btn,html.sk .chip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .big{min-height:56px}
-html.sk .btn{min-height:48px;min-width:60px;font-size:.92rem}
-html.sk .btn.small{min-height:44px}
 html.sk .chip{border-image-width:0 20px}
 html.sk .chip.sm{border-image-width:0 16px}
 html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on,html.sk .chip.on{border-image-source:url(media/ui-button-go-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
@@ -16,8 +14,6 @@ html.sk .big:active,html.sk .btn:active,html.sk .chip:active{transform:translate
 html.sk .btn:hover{background:none}
 html.sk .btn[disabled],html.sk .btn.dis{opacity:.5}
 html.sk .chip.glow{box-shadow:none;filter:drop-shadow(0 0 4px #ffe066) drop-shadow(0 0 8px #ffe066)}
-html.sk .jobrow .btn{min-width:64px}
-html.sk .st-main .seg .btn{min-width:60px}
 html.sk .big.gxt-menu,html.sk .btn.gxt-menu{flex-direction:column}
 /* ---- popups: painted frame, parchment inside (the cream body keeps every text dark on light) ---- */
 html.sk .gx-drawer-body{background:#fff6e2;border-radius:5px;padding:6px 8px 12px;color:var(--ink)}

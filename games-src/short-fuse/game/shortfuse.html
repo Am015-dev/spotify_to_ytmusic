@@ -72,6 +72,8 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
 .gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+/* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
+.gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px}
 .gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
@@ -118,7 +120,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
-.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin-top:-8px;margin-bottom:-8px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
@@ -220,7 +222,7 @@ button{font-family:inherit}
 .brief .bt h3{margin:0;font:1.35rem var(--fd)}
 .flav{font-style:italic;color:#4b3a20;background:#fff3d6;border-radius:10px;padding:6px 9px;border:2px dashed #c08a3d;margin:0}
 .tags{display:flex;flex-wrap:wrap;gap:4px}
-.tag{font:800 .72rem var(--fb);border:2px solid var(--ink);border-radius:999px;padding:1px 8px;background:#fff;display:inline-flex;align-items:center;gap:4px}
+.tag{font:800 .8rem var(--fb);border:2px solid var(--ink);border-radius:999px;padding:1px 8px;background:#fff;display:inline-flex;align-items:center;gap:4px}
 .tag.r{background:#ffd9d4}.tag.y{background:#fff1b3}.tag.b{background:#d9ecff}.tag.t{background:#e8e3ff}.tag.e{background:#dff7e8}
 .mix{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
 .mw{width:20px;height:28px;border-radius:5px;border:2px solid var(--ink);display:inline-grid;place-items:center;font:.78rem var(--fd);color:#fff;text-shadow:0 1px 0 var(--ink)}
@@ -731,6 +733,12 @@ html.short #over .card2.end .endart{height:16dvh}
 @keyframes s3bb{0%{transform:scale(.3);opacity:0}12%{transform:scale(.9);opacity:1}28%{transform:scale(1.25) rotate(-4deg)}40%{transform:scale(1.05) rotate(4deg)}55%{transform:scale(1.5);opacity:1}100%{transform:scale(2);opacity:0}}
 @media (prefers-reduced-motion:reduce){.s3{animation-duration:.01s!important}}
 
+/* the painted skin never changes a box: these sizes used to live in skin.css */
+html .btn{min-height:48px;min-width:60px}
+html .btn.small{min-height:44px}
+html .jobrow .btn{min-width:64px;min-height:48px}
+html .st-main .seg .btn{min-width:60px;min-height:46px}
+
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -791,8 +799,6 @@ html.sk{--sk-ink:#2a1a08;--sk-cream:#fff1d2;--gxc-ink:#f6efdc;--gxc-dim:rgba(246
 /* ---- buttons: cream plate (default), orange (go / selected), blue (power / chosen) ---- */
 html.sk .big,html.sk .btn,html.sk .chip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .big{min-height:56px}
-html.sk .btn{min-height:48px;min-width:60px;font-size:.92rem}
-html.sk .btn.small{min-height:44px}
 html.sk .chip{border-image-width:0 20px}
 html.sk .chip.sm{border-image-width:0 16px}
 html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on,html.sk .chip.on{border-image-source:url(media/ui-button-go-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
@@ -803,8 +809,6 @@ html.sk .big:active,html.sk .btn:active,html.sk .chip:active{transform:translate
 html.sk .btn:hover{background:none}
 html.sk .btn[disabled],html.sk .btn.dis{opacity:.5}
 html.sk .chip.glow{box-shadow:none;filter:drop-shadow(0 0 4px #ffe066) drop-shadow(0 0 8px #ffe066)}
-html.sk .jobrow .btn{min-width:64px}
-html.sk .st-main .seg .btn{min-width:60px}
 html.sk .big.gxt-menu,html.sk .btn.gxt-menu{flex-direction:column}
 /* ---- popups: painted frame, parchment inside (the cream body keeps every text dark on light) ---- */
 html.sk .gx-drawer-body{background:#fff6e2;border-radius:5px;padding:6px 8px 12px;color:var(--ink)}
