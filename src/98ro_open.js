@@ -6,7 +6,7 @@
 // island on the inside of a bend (dirt shortcut / water lane where the boat wins: the inside line is shorter, ds=v/(1−k·x)),
 // full-width jumps and a CLIFF side: past the lip you fall → crashJump → RESPAWN at the same progress (place kept).
 // Built procedurally on race entry (loadTrack), so it adds no download. Hooks: loadTrack, setupRace, R15_b/_ter/_aiXt/_pads.
-const OPN_TER={grass:0,dirt:1,sand:2,cobble:3},OPN_K=[.9,.93,.86,.97],OPN_I0=9,OPN_I1=14,OPN_MOUTH=45,OPN_NOSE=30,OPN_ROAD=7.2;
+const OPN_TER={grass:0,dirt:1,sand:2,cobble:3},OPN_K=[.9,.93,.86,.97],OPN_I0=9,OPN_I1=14,OPN_MOUTH=45,OPN_NOSE=30;let OPN_ROAD=7.2;// track-1: let (builder courses set their asphalt half-width; loadTrack wrap in 98tb)
 let OPN=null;const OPN_on=()=>!!(OPN&&TRK&&TRK.open);
 const OPN_cp=(a,dx,dz)=>a.map(([x,z,y,n])=>[(x+dx)/S,y,(z+dz)/S,n]);
 const OPN_DEFS=[
