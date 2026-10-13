@@ -69,3 +69,8 @@ html.sk .gx-dock,html.sk .gx-dock-body{background:linear-gradient(#2b1655,#190a3
 html.sk .gx-dock #prompt .head,html.sk .gx-dock .head{color:#ff9db1}
 html.sk header.gx-bar h1{background:rgba(22,8,50,.62);padding:2px 12px 0;border-radius:10px}
 html.sk .gx-dock #news,html.sk #news .newsbtn{color:#2a1650}
+/* painted buttons never shrink below their text inside flex dialogs (menu rows were clipped on phones) */
+html.sk .btn,html.sk .btn.mrow{flex-shrink:0}
+html.sk .menu .mrow{display:flex}
+/* tall two-line buttons stretch the painted rim: keep the text clear of it */
+html.sk .btn.big,html.sk .btn.gxt-menu{padding:18px 8px}

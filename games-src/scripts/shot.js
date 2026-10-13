@@ -4,8 +4,8 @@ const [slug,tag]=process.argv.slice(2);
 const DIR={ 'sands-of-qamar':'ft','crown-city-smash':'kot','doorkick-dungeon':'munch'}[slug];
 const R='/home/user/spotify_to_ytmusic';
 const stage=R+'/games-src/.staging/'+slug; 
-const file=stage+'/index.html';
-if(!fs.existsSync(stage+'/media')) fs.symlinkSync(R+'/games/'+slug+'/media',stage+'/media');
+const file=process.env.SHOT_FILE||stage+'/index.html';
+
 const out=R+'/games-src/'+DIR+'/playtest/'; fs.mkdirSync(out,{recursive:true});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{const b=await chromium.launch();

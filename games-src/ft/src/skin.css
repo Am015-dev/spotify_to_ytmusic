@@ -46,3 +46,24 @@ html.sk .mbox h2{color:#8e3a1c}
 html.sk .gx-bar{gap:2px;padding-left:6px;padding-right:6px}
 html.sk .gx-bar h1{font-size:.9rem;margin:0 2px 0 0}
 html.sk .gx-bar .pchip{font-size:11px;padding:2px 6px}
+
+/* 3D-model sprites on tiles (palm and palace stacks x1-x3, camel on the owner chip) and the summoning lamp; html.sp3 is set once the files loaded */
+html.sp3 .tok{position:relative;display:inline-block;width:24px;height:24px;font-size:0;text-shadow:none;background:var(--sp) center bottom/38px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}
+html.sp3 .tok small{display:none}
+html.sp3 .tok.palm{--sp:url(models/palm@512.webp)}html.sp3 .tok.pal{--sp:url(models/palace@512.webp)}
+html.sp3 .tok::before,html.sp3 .tok::after{content:'';position:absolute;inset:0;background:inherit;translate:0 -7px}
+html.sp3 .tok::after{translate:0 -14px}
+html.sp3 .tok[data-n="1"]::before,html.sp3 .tok[data-n="1"]::after,html.sp3 .tok[data-n="2"]::after{display:none}
+html.sp3 .own.cam{font-size:0;width:22px;height:22px;background:var(--pc) url(models/camel@512.webp) center 55%/40px no-repeat}
+#summon{position:fixed;inset:0;z-index:120;pointer-events:none;display:grid;place-items:center;align-content:center;gap:2px;background:radial-gradient(circle at 50% 46%,rgba(60,24,8,.1),rgba(10,4,20,.72));animation:smIn .25s ease-out both}
+#summon.out{opacity:0;transition:opacity .3s}
+#summon{--sz:min(46vw,190px)}
+#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
+@keyframes smTurn{to{background-position:calc(-24*var(--sz)) 0}}
+#summon .sm-smoke{position:absolute;left:50%;top:30%;width:min(60vw,260px);aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(190,140,255,.8),rgba(130,80,220,.4) 45%,rgba(90,40,180,0) 70%);filter:blur(8px);animation:smSmoke 1.7s ease-out both}
+@keyframes smSmoke{from{transform:translateY(60px) scale(.3);opacity:0}30%{opacity:.95}to{transform:translateY(-70px) scale(1.5);opacity:0}}
+#summon b{position:relative;font:900 clamp(26px,9vw,44px)/1 var(--title,Georgia,serif);color:#ffe9a8;text-shadow:0 3px 0 #3a1004,0 0 18px #ff9a2a;animation:smPop .5s .25s cubic-bezier(.2,1.6,.4,1) both}
+#summon span{position:relative;margin-top:6px;font:800 16px var(--title,Georgia,serif);color:#fff3d0;text-shadow:0 2px 0 #000;animation:smPop .4s .45s both}
+@keyframes smPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes smIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#summon .sm-lamp{animation:none}#summon .sm-smoke{animation:none;opacity:.5}}

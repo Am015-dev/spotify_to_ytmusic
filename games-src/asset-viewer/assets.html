@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asset Board</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  :root {
+    --bg: #111215; --rail: #16181c; --card: #1d2025; --card2: #24272d; --line: #2d3138; --ink: #ecebe7; --mute: #9599a1; --dim: #6c7078;
+    --accent: #f2b33d; --done: #4cb36b; --pend: #8a8f99; --cross: #4fb3ad; --ok3d: #8d97ff; --drop: #6b6e76; --redo: #e0574a;
+    --r: 10px; --thumb: 150px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, input, select { font: inherit; color: inherit; }
+  a { color: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* top bar */
+  header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 10px 18px;
+           background: rgba(17,18,21,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 17px; margin: 0; letter-spacing: .2px; white-space: nowrap; }
+  header h1 span { color: var(--accent); }
+  nav.tabs { display: flex; gap: 4px; }
+  nav.tabs a { text-decoration: none; padding: 6px 10px; border-radius: 7px; color: var(--mute); }
+  nav.tabs a.on { background: var(--card2); color: var(--ink); }
+  nav.tabs a:hover { color: var(--ink); }
+  .search { flex: 1; max-width: 460px; position: relative; }
+  .search input { width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px 8px 32px; }
+  .search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .search::before { content: "⌕"; position: absolute; left: 11px; top: 6px; color: var(--dim); font-size: 16px; }
+  .search kbd { position: absolute; right: 9px; top: 8px; font-size: 11px; color: var(--dim); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+  #upd { color: var(--dim); font-size: 12px; white-space: nowrap; margin-left: auto; }
+  .btn { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; cursor: pointer; }
+  .btn:hover { border-color: #444a53; }
+  #menu { display: none; }
+
+  .layout { display: grid; grid-template-columns: 270px 1fr; min-height: calc(100vh - 53px); }
+
+  /* filter rail */
+  aside { background: var(--rail); border-right: 1px solid var(--line); padding: 14px 14px 40px; position: sticky; top: 53px;
+          height: calc(100vh - 53px); overflow: auto; }
+  aside h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--dim); margin: 18px 0 8px; display: flex; justify-content: space-between; }
+  aside h3 button { background: none; border: 0; color: var(--dim); cursor: pointer; font-size: 11px; text-transform: none; letter-spacing: 0; }
+  aside h3 button:hover { color: var(--accent); }
+  aside h3:first-child { margin-top: 2px; }
+  .games button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; text-align: left; background: none; border: 0;
+                  border-radius: 8px; padding: 6px 8px; cursor: pointer; }
+  .games button:hover { background: var(--card); }
+  .games button.on { background: var(--card2); box-shadow: inset 3px 0 0 var(--accent); }
+  .games .gname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .games .gc { color: var(--dim); font-size: 12px; }
+  .games .mini { grid-column: 1 / -1; height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .games .mini i { display: block; height: 100%; background: var(--done); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-size: 12.5px;
+          display: inline-flex; gap: 6px; align-items: center; }
+  .chip:hover { border-color: #49505a; }
+  .chip.on { background: var(--ink); color: #15171a; border-color: var(--ink); }
+  .chip .c { color: var(--dim); font-size: 11px; } .chip.on .c { color: #4a4d52; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  aside select { width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; }
+  aside input[type=range] { width: 100%; accent-color: var(--accent); }
+  .row2 { display: flex; gap: 6px; }
+  .row2 .chip { flex: 1; justify-content: center; }
+  #reset { width: 100%; margin-top: 18px; }
+
+  /* main */
+  main { padding: 18px 22px 60px; min-width: 0; }
+  .summary { display: flex; gap: 22px; flex-wrap: wrap; align-items: baseline; margin-bottom: 14px; color: var(--mute); }
+  .summary b { color: var(--ink); font-size: 20px; margin-right: 4px; }
+  .active { display: flex; gap: 6px; flex-wrap: wrap; margin: -4px 0 14px; }
+  .active .chip { background: var(--card2); }
+  .active .chip::after { content: "×"; color: var(--dim); }
+
+  .overview { display: grid; grid-auto-flow: column; grid-auto-columns: 196px; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 22px;
+              scroll-snap-type: x proximity; scrollbar-width: thin; }
+  .overview .gcard { scroll-snap-align: start; }
+  .gcard { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; cursor: pointer; text-align: left; padding: 0;
+           display: flex; flex-direction: column; transition: transform .15s ease, border-color .15s ease; }
+  .gcard:hover { transform: translateY(-2px); border-color: #48505a; }
+  .gcard.on { border-color: var(--accent); }
+  .gcard .cov { aspect-ratio: 16 / 8; background: #0c0d0f center / cover no-repeat; position: relative; }
+  .gcard .cov::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(17,18,21,.85)); }
+  .gcard .t { position: absolute; left: 12px; bottom: 8px; z-index: 1; font-weight: 650; font-size: 15px; text-shadow: 0 1px 3px #000; }
+  .gcard .body { padding: 10px 12px 12px; display: grid; gap: 7px; }
+  .stack { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line); }
+  .stack i { display: block; height: 100%; }
+  .gstats { display: flex; gap: 10px; font-size: 12px; color: var(--mute); flex-wrap: wrap; }
+  .gstats span { display: inline-flex; align-items: center; gap: 5px; }
+
+  section.game { margin-bottom: 30px; content-visibility: auto; contain-intrinsic-size: 600px; }
+  section.game > h2 { font-size: 18px; margin: 0 0 4px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  section.game > h2 small { color: var(--mute); font-weight: 400; font-size: 13px; }
+  .wave { margin: 14px 0 0; }
+  .wave h4 { margin: 0 0 8px; font-size: 12px; color: var(--mute); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--thumb), 1fr)); gap: 10px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; cursor: pointer; position: relative;
+          display: flex; flex-direction: column; text-align: left; padding: 0; }
+  .tile:hover, .tile:focus-visible { border-color: var(--accent); outline: none; }
+  .tile .img { aspect-ratio: 1; background: #f4f2ee; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .tile .img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .tile .img img.broken { display: none; }
+  .tile .img:has(img.broken)::before { content: "no preview"; color: #8a8d93; font-size: 11px; }
+  .tile.k3d .img { background: #d9d9d9; }
+  .tile.pending .img { background: repeating-linear-gradient(45deg, #1f2227 0 9px, #1a1c20 9px 18px); color: var(--dim);
+                       font-size: 11px; padding: 10px; text-align: center; line-height: 1.35; }
+  .tile.crossed .img { opacity: .35; filter: grayscale(1); }
+  .tile.crossed .img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent calc(50% - 1px), var(--cross) 50%, transparent calc(50% + 1px)); opacity: .6; }
+  .tile.dropped { opacity: .5; }
+  .tile .meta { padding: 6px 8px 7px; display: grid; gap: 3px; }
+  .tile .nm { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tile .tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tag { font-size: 10.5px; padding: 1px 6px; border-radius: 999px; background: var(--card2); color: var(--mute); white-space: nowrap; }
+  .tag.done { color: #9fdcb2; background: #1d3325; } .tag.pend { color: #c6cad1; } .tag.cross { color: #9fe0dc; background: #173533; }
+  .tag.ok3d { color: #c4c9ff; background: #262a4d; } .tag.drop { color: #a7a9ae; } .tag.redo { color: #f4a69d; background: #43201c; }
+  .tag.ship { color: #f6d58e; background: #3d321a; } .tag.twin { color: #9fe0dc; background: #173533; }
+  .empty { text-align: center; color: var(--mute); padding: 60px 20px; border: 1px dashed var(--line); border-radius: 12px; }
+
+  /* lightbox */
+  #lb { position: fixed; inset: 0; z-index: 20; background: rgba(8,9,11,.94); display: grid; grid-template-columns: 1fr 360px; }
+  #lb[hidden] { display: none; }
+  #lb .stage { position: relative; display: flex; align-items: center; justify-content: center; padding: 30px; min-width: 0; }
+  #lb .stage img { max-width: 100%; max-height: calc(100vh - 60px); background: #f4f2ee; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  #lb model-viewer { width: 100%; height: calc(100vh - 60px); background: #2a2d33; border-radius: 8px; }
+  #lb .pendbig { width: min(560px, 90%); aspect-ratio: 1; border-radius: 10px; display: flex; align-items: center; justify-content: center; text-align: center;
+                 color: var(--mute); background: repeating-linear-gradient(45deg, #1f2227 0 12px, #1a1c20 12px 24px); padding: 40px; }
+  #lb .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; border-radius: 10px; border: 1px solid var(--line);
+             background: rgba(29,32,37,.8); cursor: pointer; font-size: 22px; }
+  #lb .prev { left: 12px; } #lb .next { right: 12px; }
+  #lb .side { background: var(--rail); border-left: 1px solid var(--line); padding: 18px; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+  #lb .side h2 { margin: 0; font-size: 18px; word-break: break-word; }
+  #lb dl { display: grid; grid-template-columns: 88px 1fr; gap: 6px 10px; margin: 0; font-size: 13px; }
+  #lb dt { color: var(--dim); } #lb dd { margin: 0; word-break: break-word; }
+  #lb .prompt { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-size: 12.5px; color: #d4d3cf; line-height: 1.5; white-space: pre-wrap; }
+  #lb .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  #lb .close { position: absolute; top: 12px; right: 12px; z-index: 2; }
+  #lb .pos { color: var(--dim); font-size: 12px; }
+  #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #15171a; padding: 8px 14px;
+           border-radius: 8px; font-size: 13px; z-index: 30; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  #toast.on { opacity: 1; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: fixed; inset: 53px 0 0 0; z-index: 6; height: auto; transform: translateX(-100%); transition: transform .2s; width: 300px; }
+    aside.open { transform: none; box-shadow: 10px 0 30px rgba(0,0,0,.5); }
+    #menu { display: inline-block; }
+    nav.tabs, #upd { display: none; }
+    #lb { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+    #lb .side { max-height: 45vh; border-left: 0; border-top: 1px solid var(--line); }
+    :root { --thumb: 120px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <button class="btn" id="menu" aria-label="Filters">☰</button>
+  <h1>Asset <span>Board</span></h1>
+  <nav class="tabs"><a href="board.html">Production</a><a class="on" href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
+  <label class="search"><input id="q" type="search" placeholder="Search names and prompts" aria-label="Search"><kbd>/</kbd></label>
+  <button class="btn" id="reload" title="Reload data (R)">↻ Refresh</button>
+  <span id="upd"></span>
+</header>
+<div class="layout">
+  <aside id="rail">
+    <h3>Games <button data-clear="game">all</button></h3>
+    <div class="games" id="fGame"></div>
+    <h3>Type</h3><div class="row2" id="fType"></div>
+    <h3>Status <button data-clear="status">clear</button></h3><div class="chips" id="fStatus"></div>
+    <h3>Wave <button data-clear="wave">clear</button></h3><div class="chips" id="fWave"></div>
+    <h3>Shape <button data-clear="ratio">clear</button></h3><div class="chips" id="fRatio"></div>
+    <h3>Sort</h3>
+    <select id="sort"><option value="wave">Game, then wave</option><option value="new">Newest first</option><option value="name">Name A–Z</option></select>
+    <h3>View</h3>
+    <div class="row2" id="fView"></div>
+    <h3>Thumbnail size</h3><input type="range" id="size" min="100" max="280" step="10" value="150" aria-label="Thumbnail size">
+    <button class="btn" id="reset">Reset all filters</button>
+  </aside>
+  <main>
+    <div class="summary" id="sum"></div>
+    <div class="active" id="act"></div>
+    <div class="overview" id="ov"></div>
+    <div id="out"></div>
+  </main>
+</div>
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Asset details">
+  <div class="stage" id="stage"></div>
+  <div class="side" id="side"></div>
+</div>
+<div id="toast"></div>
+<script>
+// One board for every asset: 2D Flow images (/flow.json, built live by flow_status.py) and 3D models
+// (manifest.json + votes.json from the TRELLIS/Pixal3D viewer). Filters live in the URL hash so a view can be bookmarked.
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const GAMEFIX = { 'thornbound-throne': 'thornbound' };
+const nice = g => g.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+const STATUS = {
+  done:    { label: 'Done',            col: 'var(--done)', tag: 'done' },
+  pending: { label: 'Pending',         col: 'var(--pend)', tag: 'pend' },
+  crossed: { label: 'Crossed out (3D)', col: 'var(--cross)', tag: 'cross' },
+  ok3d:    { label: '3D approved',     col: 'var(--ok3d)', tag: 'ok3d' },
+  open3d:  { label: '3D needs vote',   col: 'var(--accent)', tag: 'pend' },
+  redo:    { label: '3D redo',         col: 'var(--redo)', tag: 'redo' },
+  drop:    { label: '3D dropped',      col: 'var(--drop)', tag: 'drop' },
+};
+const WAVEORDER = ['Wave 0', 'Wave 1', 'Wave 2', 'Wave 3', 'Wave 4', 'Wave 5', 'Boss poses', '3D sources', '3D models', 'Covers'];
+const F = { game: new Set(), type: '', status: new Set(), wave: new Set(), ratio: new Set(), sort: 'wave', view: 'game', q: '', size: 150 };
+let ALL = [], VIEW = [], COVERS = {}, cur = -1;
+
+function readHash() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  for (const k of ['game', 'status', 'wave', 'ratio']) F[k] = new Set((p.get(k) || '').split(',').filter(Boolean));
+  F.type = p.get('type') || ''; F.sort = p.get('sort') || 'wave'; F.view = p.get('view') || 'game'; F.q = p.get('q') || ''; F.size = +(p.get('size') || 150);
+}
+function writeHash() {
+  const p = new URLSearchParams();
+  for (const k of ['game', 'status', 'wave', 'ratio']) if (F[k].size) p.set(k, [...F[k]].join(','));
+  for (const k of ['type', 'q']) if (F[k]) p.set(k, F[k]);
+  if (F.sort !== 'wave') p.set('sort', F.sort); if (F.view !== 'game') p.set('view', F.view); if (F.size !== 150) p.set('size', F.size);
+  history.replaceState(null, '', '#' + p.toString());
+}
+
+async function load() {
+  $('upd').textContent = 'loading…';
+  const [flow, manifest, votes] = await Promise.all([
+    fetch('flow.json', { cache: 'no-store' }).then(r => r.json()),
+    fetch('manifest.json', { cache: 'no-store' }).then(r => r.json()).catch(() => []),
+    fetch('votes.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+  ]);
+  COVERS = {};
+  for (const [g, c] of Object.entries(flow.covers || {})) COVERS[GAMEFIX[g] || g] ||= c;
+  const items = [];
+  for (const b of flow.batches) {
+    if (b.root === 'flow-covers') continue;
+    const game = GAMEFIX[b.game] || b.game;
+    for (const i of b.items) items.push({ kind: '2d', root: b.root, game, name: i.name, wave: b.wave, ratio: b.ratio, batch: b.kind, file: b.file,
+      status: i.done ? 'done' : 'pending', thumb: i.thumb, full: i.full, prompt: i.prompt, t: i.t, twin: i.twin, vote: i.vote, note: i.note, stage: i.stage });
+  }
+  for (const c of flow.crossed || []) items.push({ kind: '2d', game: c.game, name: c.name, wave: c.wave, ratio: '1:1', status: 'crossed', twin: c.twin,
+    prompt: `Not painted: the approved 3D model “${c.twin}” (games-src/facelift-3d) replaces it.` });
+  const base = n => n.replace(/-pixal(-game)?$/, '').replace(/-v\d+$/, '');
+  for (const m of manifest) {
+    if (m.missing) continue;
+    const game = GAMEFIX[m.game] || m.game, v = votes[`${m.game}/${m.name}`], grp = votes[`${m.game}/${base(m.name)}`];
+    const status = v === 'ok' ? 'ok3d' : v === 'drop' ? 'drop' : grp === 'redo' ? 'redo' : 'open3d';
+    items.push({ kind: '3d', game, name: m.name, wave: '3D models', ratio: '1:1', status, thumb: m.src, glb: m.glb, kb: m.kb, t: m.t,
+      shipped: m.shipped, see: m.see, prompt: '' });
+  }
+  ALL = items;
+  $('upd').textContent = 'updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  buildRail(); render();
+}
+
+function count(pred) { return ALL.filter(pred).length; }
+function passes(i, skip) {
+  if (skip !== 'game' && F.game.size && !F.game.has(i.game)) return false;
+  if (skip !== 'type' && F.type && i.kind !== F.type) return false;
+  if (skip !== 'status' && F.status.size && !F.status.has(i.status)) return false;
+  if (skip !== 'wave' && F.wave.size && !F.wave.has(i.wave)) return false;
+  if (skip !== 'ratio' && F.ratio.size && !F.ratio.has(i.ratio)) return false;
+  if (F.q) { const q = F.q.toLowerCase(); if (!(i.name.toLowerCase().includes(q) || (i.prompt || '').toLowerCase().includes(q) || i.game.includes(q))) return false; }
+  return true;
+}
+
+function chipSet(el, key, values, labelOf, dotOf) {
+  // counts reflect every other active filter, so a chip shows what you would get by adding it
+  el.innerHTML = values.map(v => {
+    const n = count(i => passes(i, key) && i[key === 'type' ? 'kind' : key] === v);
+    const on = key === 'type' ? F.type === v : F[key].has(v);
+    return `<button class="chip ${on ? 'on' : ''}" data-k="${key}" data-v="${esc(v)}" aria-pressed="${on}">${dotOf ? `<span class="dot" style="background:${dotOf(v)}"></span>` : ''}${esc(labelOf(v))}<span class="c num">${n}</span></button>`;
+  }).join('');
+}
+function buildRail() {
+  const games = [...new Set(ALL.map(i => i.game))].sort();
+  $('fGame').innerHTML = games.map(g => {
+    const two = ALL.filter(i => i.game === g && i.kind === '2d' && i.status !== 'crossed'), d = two.filter(i => i.status === 'done').length;
+    const n = count(i => i.game === g && passes(i, 'game'));
+    return `<button class="${F.game.has(g) ? 'on' : ''}" data-g="${g}" aria-pressed="${F.game.has(g)}"><span class="gname">${esc(nice(g))}</span>
+      <span class="gc num">${n}</span><span class="mini"><i style="width:${two.length ? d / two.length * 100 : 100}%"></i></span></button>`;
+  }).join('');
+  $('fType').innerHTML = [['', 'All'], ['2d', '2D'], ['3d', '3D']].map(([v, l]) =>
+    `<button class="chip ${F.type === v ? 'on' : ''}" data-k="type" data-v="${v}" aria-pressed="${F.type === v}">${l}</button>`).join('');
+  chipSet($('fStatus'), 'status', Object.keys(STATUS), v => STATUS[v].label, v => STATUS[v].col);
+  const waves = WAVEORDER.filter(w => ALL.some(i => i.wave === w));
+  chipSet($('fWave'), 'wave', waves, v => v);
+  chipSet($('fRatio'), 'ratio', ['1:1', '16:9', '4:3', '3:4', '9:16'].filter(r => ALL.some(i => i.ratio === r)), v => v);
+  $('fView').innerHTML = [['game', 'By game'], ['flat', 'One grid']].map(([v, l]) =>
+    `<button class="chip ${F.view === v ? 'on' : ''}" data-view="${v}" aria-pressed="${F.view === v}">${l}</button>`).join('');
+  $('sort').value = F.sort; $('size').value = F.size; $('q').value = F.q;
+  document.documentElement.style.setProperty('--thumb', F.size + 'px');
+}
+
+function sorted(list) {
+  const w = i => WAVEORDER.indexOf(i.wave);
+  if (F.sort === 'new') return list.sort((a, b) => (b.t || 0) - (a.t || 0));
+  if (F.sort === 'name') return list.sort((a, b) => a.name.localeCompare(b.name));
+  return list.sort((a, b) => a.game.localeCompare(b.game) || w(a) - w(b) || (a.status === 'pending') - (b.status === 'pending') || a.name.localeCompare(b.name));
+}
+
+function tile(i, idx) {
+  const st = STATUS[i.status];
+  const img = i.status === 'pending' ? `<div class="img">${esc((i.prompt || '').slice(0, 90))}…</div>`
+    : `<div class="img"><img src="${esc(i.thumb || '')}" loading="lazy" alt="" onerror="this.classList.add('broken')"></div>`;
+  const tags = [`<span class="tag ${st.tag}">${st.label}</span>`];
+  if (i.kind === '2d' && i.ratio !== '1:1') tags.push(`<span class="tag">${i.ratio}</span>`);
+  if (i.twin && i.status !== 'crossed') tags.push(`<span class="tag twin" title="approved 3D model ${esc(i.twin)} covers this">3D twin</span>`);
+  if (i.shipped) tags.push('<span class="tag ship">on GitHub</span>');
+  if (i.kind === '2d' && i.vote) tags.push(`<span class="tag" style="background:${i.vote === 'ok' ? 'var(--done)' : 'var(--redo)'};color:${i.vote === 'ok' ? '#0b1a10' : '#fff'}">${i.vote === 'ok' ? 'Kept' : 'Redo'}</span>`);
+  return `<button class="tile ${i.status} k${i.kind}" data-i="${idx}" title="${esc(i.name)}">${img}
+    <div class="meta"><div class="nm">${esc(i.name)}</div><div class="tags">${tags.join('')}</div></div></button>`;
+}
+
+function stackBar(list) {
+  const n = list.length || 1;
+  return `<div class="stack">${['done', 'ok3d', 'crossed', 'open3d', 'pending', 'redo'].map(s => {
+    const c = list.filter(i => i.status === s).length; return c ? `<i style="width:${c / n * 100}%;background:${STATUS[s].col}" title="${STATUS[s].label}: ${c}"></i>` : '';
+  }).join('')}</div>`;
+}
+
+function render() {
+  buildRail(); writeHash();
+  VIEW = sorted(ALL.filter(i => passes(i)));
+  const two = VIEW.filter(i => i.kind === '2d');
+  const s = k => VIEW.filter(i => i.status === k).length;
+  $('sum').innerHTML = `<span><b class="num">${VIEW.length}</b>assets</span><span><b class="num">${s('done')}</b>2D done</span>
+    <span><b class="num">${s('pending')}</b>pending</span><span><b class="num">${s('crossed')}</b>crossed out</span>
+    <span><b class="num">${s('ok3d')}</b>3D approved</span><span><b class="num">${VIEW.filter(i => i.shipped).length}</b>on GitHub</span>`;
+  const act = [];
+  F.game.forEach(g => act.push(['game', g, nice(g)])); F.status.forEach(v => act.push(['status', v, STATUS[v].label]));
+  F.wave.forEach(v => act.push(['wave', v, v])); F.ratio.forEach(v => act.push(['ratio', v, v]));
+  if (F.type) act.push(['type', F.type, F.type.toUpperCase()]); if (F.q) act.push(['q', F.q, `“${F.q}”`]);
+  $('act').innerHTML = act.map(([k, v, l]) => `<button class="chip" data-rm="${k}" data-v="${esc(v)}">${esc(l)}</button>`).join('');
+
+  // game overview cards (always all games, so you can jump between them)
+  const games = [...new Set(ALL.map(i => i.game))].sort();
+  $('ov').innerHTML = games.map(g => {
+    const all = ALL.filter(i => i.game === g && passes(i, 'game'));
+    const cov = COVERS[g] || (ALL.find(i => i.game === g && i.status === 'done') || {}).thumb || '';
+    const c = k => all.filter(i => i.status === k).length;
+    return `<button class="gcard ${F.game.has(g) ? 'on' : ''}" data-g="${g}"><div class="cov" style="background-image:url('${esc(cov)}')"><span class="t">${esc(nice(g))}</span></div>
+      <div class="body">${stackBar(all)}<div class="gstats num"><span><i class="dot" style="background:var(--done)"></i>${c('done')}</span>
+      <span><i class="dot" style="background:var(--pend)"></i>${c('pending')}</span><span><i class="dot" style="background:var(--ok3d)"></i>${c('ok3d')} 3D</span>
+      ${c('crossed') ? `<span><i class="dot" style="background:var(--cross)"></i>${c('crossed')} crossed</span>` : ''}</div></div></button>`;
+  }).join('');
+
+  if (!VIEW.length) { $('out').innerHTML = '<div class="empty">Nothing matches these filters.<br><br><button class="btn" id="reset2">Reset filters</button></div>'; return; }
+  if (F.view === 'flat') { $('out').innerHTML = `<div class="grid">${VIEW.map((i, k) => tile(i, k)).join('')}</div>`; return; }
+  const byGame = {};
+  VIEW.forEach((i, k) => ((byGame[i.game] ||= {})[i.wave] ||= []).push([i, k]));
+  // "Keep all" only touches generated 2D images without a vote, so an earlier Keep/Redo is never overwritten
+  const keepBtn = (g, w, list) => { const n = list.filter(unvoted).length;
+    return n ? `<button class="btn" data-keep="${esc(g)}" data-w="${esc(w)}" style="font-size:12px;padding:3px 10px">Keep all ${n}</button>` : ''; };
+  $('out').innerHTML = Object.keys(byGame).sort().map(g => {
+    const list = Object.values(byGame[g]).flat().map(x => x[0]);
+    return `<section class="game"><h2>${esc(nice(g))}<small class="num">${list.length} assets · ${list.filter(i => i.status === 'done').length} done ·
+      ${list.filter(i => i.status === 'pending').length} pending · ${list.filter(i => i.status === 'ok3d').length} 3D approved</small>${keepBtn(g, '', list)}</h2>${stackBar(list)}
+      ${Object.keys(byGame[g]).sort((a, b) => WAVEORDER.indexOf(a) - WAVEORDER.indexOf(b)).map(w => `<div class="wave"><h4>${esc(w)} · ${byGame[g][w].length} ${keepBtn(g, w, byGame[g][w].map(x => x[0]))}</h4>
+      <div class="grid">${byGame[g][w].map(([i, k]) => tile(i, k)).join('')}</div></div>`).join('')}</section>`;
+  }).join('');
+}
+
+// lightbox
+function open(k) {
+  cur = k; const i = VIEW[k]; if (!i) return;
+  const st = STATUS[i.status];
+  $('stage').innerHTML = `<button class="btn close" id="lbx">Close (Esc)</button><button class="nav prev" id="lbp" aria-label="Previous">‹</button>
+    ${i.kind === '3d' ? `<model-viewer src="${esc(i.glb)}" camera-controls auto-rotate shadow-intensity="1" exposure="1.1"></model-viewer>`
+      : i.status === 'pending' || i.status === 'crossed' ? `<div class="pendbig">${i.status === 'crossed' ? 'Crossed out: covered by an approved 3D model' : 'Not generated yet'}</div>`
+      : `<img src="${esc(i.full)}" alt="${esc(i.name)}" onerror="this.src='${esc(i.thumb)}'">`}
+    <button class="nav next" id="lbn" aria-label="Next">›</button>`;
+  const when = i.t ? new Date(i.t * 1000).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '–';
+  const path = i.kind === '3d' ? `viewer/${i.glb}` : i.full ? i.full.replace(/^full\//, '') : '';
+  $('side').innerHTML = `<div class="pos num">${k + 1} / ${VIEW.length} · ← → to browse</div><h2>${esc(i.name)}</h2>
+    <div class="tags"><span class="tag ${st.tag}">${st.label}</span>${i.shipped ? ' <span class="tag ship">on GitHub</span>' : ''}${i.twin ? ` <span class="tag twin">3D: ${esc(i.twin)}</span>` : ''}</div>
+    <dl><dt>Game</dt><dd>${esc(nice(i.game))}</dd><dt>Wave</dt><dd>${esc(i.wave)}</dd><dt>Type</dt><dd>${i.kind.toUpperCase()}${i.kind === '2d' ? ' · ' + i.ratio : ''}</dd>
+      ${i.batch ? `<dt>Batch</dt><dd>${esc(i.batch)}</dd>` : ''}${i.kb ? `<dt>Size</dt><dd>${i.kb} KB</dd>` : ''}
+      ${i.see != null ? `<dt>Gaps</dt><dd>${(i.see * 100).toFixed(1)}%</dd>` : ''}<dt>Updated</dt><dd>${when}</dd>${path ? `<dt>File</dt><dd>${esc(path)}</dd>` : ''}</dl>
+    ${i.prompt ? `<div><div class="pos" style="margin-bottom:6px">Prompt</div><div class="prompt">${esc(i.prompt)}</div></div>` : ''}
+    <div class="actions">${i.prompt ? '<button class="btn" id="cpP">Copy prompt</button>' : ''}${path ? '<button class="btn" id="cpF">Copy file path</button>' : ''}
+      ${i.kind === '3d' ? '<a class="btn" href="index.html" style="text-decoration:none">Vote in 3D page</a>' : ''}</div>
+    ${i.kind === '2d' && i.status === 'done' ? `<div><div class="pos" style="margin-bottom:6px">Review${i.stage ? ' · stage: ' + esc(i.stage) : ''}</div>
+      <textarea id="vnote" maxlength="300" placeholder="Note for a redo (added to the prompt)" style="width:100%;min-height:54px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--ink)">${esc(i.note || '')}</textarea>
+      <div class="actions" style="margin-top:8px"><button class="btn" id="vk" style="${i.vote === 'ok' ? 'background:var(--done);color:#0b1a10' : ''}">Keep</button>
+      <button class="btn" id="vr" style="${i.vote === 'redo' ? 'background:var(--redo);color:#fff' : ''}">Redo</button>${i.vote ? '<button class="btn" id="vc">Clear vote</button>' : ''}
+      <a class="btn" href="screens.html#${esc(i.game)}" style="text-decoration:none">See in game</a></div></div>` : ''}`;
+  $('lb').hidden = false;
+  $('lbx').onclick = close; $('lbp').onclick = () => step(-1); $('lbn').onclick = () => step(1);
+  if ($('cpP')) $('cpP').onclick = () => copy(i.prompt, 'Prompt copied');
+  if ($('cpF')) $('cpF').onclick = () => copy('C:\\Users\\kourisa\\Desktop\\game-assets\\' + path.replace(/\//g, '\\'), 'Path copied');
+  const vote = async v => {
+    const r = await fetch('votes2d', { method: 'POST', body: JSON.stringify({ key: `${i.game}/${i.name}`, v, note: $('vnote') ? $('vnote').value : '' }) });
+    if (!r.ok) return toast('Save failed');
+    i.vote = v; i.note = $('vnote') ? $('vnote').value : ''; toast(v === 'ok' ? 'Kept' : v ? 'Sent to redo' : 'Vote cleared'); open(k);
+  };
+  if ($('vk')) $('vk').onclick = () => vote('ok'); if ($('vr')) $('vr').onclick = () => vote('redo'); if ($('vc')) $('vc').onclick = () => vote(null);
+}
+const unvoted = i => i.root === 'flow-2d' && i.status === 'done' && !i.vote;
+async function keepAll(g, w) {
+  // only what the current filters show, so a filtered section approves exactly what is on screen
+  const list = VIEW.filter(i => i.game === g && (!w || i.wave === w) && unvoted(i));
+  if (!list.length || !confirm(`Keep all ${list.length} unvoted images in ${nice(g)}${w ? ' · ' + w : ''}?`)) return;
+  const r = await fetch('votes2d/bulk', { method: 'POST', body: JSON.stringify(list.map(i => ({ key: `${i.game}/${i.name}`, v: 'ok', note: '' }))) });
+  if (!r.ok) return toast('Save failed');
+  list.forEach(i => i.vote = 'ok'); toast(`Kept ${list.length}`); render();
+}
+function close() { $('lb').hidden = true; $('stage').innerHTML = ''; cur = -1; }
+function step(d) { if (VIEW.length) open((cur + d + VIEW.length) % VIEW.length); }
+function copy(t, msg) { navigator.clipboard.writeText(t).then(() => toast(msg), () => prompt('Copy', t)); }
+function toast(m) { $('toast').textContent = m; $('toast').classList.add('on'); setTimeout(() => $('toast').classList.remove('on'), 1400); }
+
+// events
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.g && (t.closest('#fGame') || t.closest('#ov'))) { const g = t.dataset.g; F.game.has(g) ? F.game.delete(g) : (e.shiftKey || e.ctrlKey ? 0 : F.game.clear(), F.game.add(g)); return render(); }
+  if (t.dataset.k) { const { k, v } = t.dataset; if (k === 'type') F.type = F.type === v ? '' : v; else F[k].has(v) ? F[k].delete(v) : F[k].add(v); return render(); }
+  if (t.dataset.view) { F.view = t.dataset.view; return render(); }
+  if (t.dataset.clear) { F[t.dataset.clear].clear(); return render(); }
+  if (t.dataset.rm) { const { rm, v } = t.dataset; if (rm === 'type') F.type = ''; else if (rm === 'q') F.q = ''; else F[rm].delete(v); return render(); }
+  if (t.dataset.i) return open(+t.dataset.i);
+  if (t.dataset.keep) return keepAll(t.dataset.keep, t.dataset.w);
+  if (t.id === 'reset' || t.id === 'reset2') { location.hash = ''; readHash(); return render(); }
+});
+$('q').oninput = () => { F.q = $('q').value.trim(); clearTimeout(window._qt); window._qt = setTimeout(render, 150); };
+$('sort').onchange = () => { F.sort = $('sort').value; render(); };
+$('size').oninput = () => { F.size = +$('size').value; document.documentElement.style.setProperty('--thumb', F.size + 'px'); writeHash(); };
+$('reload').onclick = load;
+$('menu').onclick = () => $('rail').classList.toggle('open');
+$('lb').addEventListener('click', e => { if (e.target.id === 'lb' || e.target.id === 'stage') close(); });
+document.addEventListener('keydown', e => {
+  if (!$('lb').hidden) { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); return; }
+  if (e.target.matches('input')) { if (e.key === 'Escape') e.target.blur(); return; }
+  if (e.key === '/') { e.preventDefault(); $('q').focus(); }
+  if (e.key === 'r') load();
+});
+readHash(); load();
+setInterval(() => { if ($('lb').hidden) load(); }, 180000);
+</script>
+</body>
+</html>
