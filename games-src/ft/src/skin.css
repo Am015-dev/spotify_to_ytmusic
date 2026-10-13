@@ -109,7 +109,7 @@ html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.we
 html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
 html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
 html.sk-pl .tile .tv{background:url(media/ui-badge-gold.webp) center/contain no-repeat;border-color:transparent;z-index:3}
-html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/contain no-repeat;color:#2a1650;font-weight:800;box-shadow:none}
+html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/contain no-repeat;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
 html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
 html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
 html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}
@@ -122,5 +122,5 @@ html.sk-pl .gxh-a-bottom .gxh-arr{bottom:-19px}html.sk-pl .gxh-a-top .gxh-arr{to
 
 /* look fixes: readable tile names, 44 px tap boxes for the goods row (footprint unchanged: margin takes back the extra 10 px) */
 html.sk-pl .tile .tn{background:rgba(255,247,226,.93);box-shadow:0 0 0 2px rgba(255,247,226,.93);border-radius:3px;color:#2e1a0a}
-html.sk-pl .tile .tv{color:#2a1500;font-weight:800}
+html.sk-pl .tile .tv{color:#2a1500;font-weight:800;line-height:11px;padding-top:2px}
 html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-sizing:border-box;border:0;border-radius:7px;outline:1px solid #8a5a18;outline-offset:-5px;box-shadow:none;background-clip:content-box!important;background-origin:content-box!important}
