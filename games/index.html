@@ -559,6 +559,7 @@ html.ph #feat .ft{max-width:none}
 .support p{margin:0;max-width:52ch}
 /* What's new */
 .upd{position:absolute;left:3%;top:3%;padding:.28em .55em;border-radius:.4em;background:var(--brass);color:#2a1a0c;font:800 .62em/1 var(--body);letter-spacing:.02em;box-shadow:0 .1em .3em rgba(0,0,0,.5);transform:rotate(-6deg);z-index:2;pointer-events:none}
+.vchip{display:inline-block;font:700 .7rem var(--mono);letter-spacing:.04em;color:var(--brass);border:1px solid #6b5238;border-radius:99px;padding:1px 8px;margin-left:8px;vertical-align:middle;white-space:nowrap;text-transform:none}.vchip:empty{display:none}.pl-t .vchip{margin:4px 0 0;display:inline-block}#tver{margin-left:4px;font-size:.68rem;flex:none}
 .pl-t .upd-d{display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:var(--brass);vertical-align:middle}
 .wnbadge{position:absolute;top:2px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e23b2e;color:#fff6c8;font:800 .7rem/18px var(--body);text-align:center;box-shadow:0 0 0 2px var(--hdr)}
 #wnback{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55)}
@@ -660,7 +661,7 @@ html.ph #feat .ft{max-width:none}
 </div>
 <div id="listview" hidden></div>
 </main>
-<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
 
 <div id="inspect" hidden></div>
 <div id="tip" role="status" hidden></div>
@@ -672,7 +673,7 @@ html.ph #feat .ft{max-width:none}
 <div id="table" hidden>
   <div class="bar">
     <button type="button" id="back" aria-label="Back to the shelf">← Shelf</button>
-    <strong id="tname">Game</strong>
+    <strong id="tname">Game</strong><span id="tver" class="vchip" hidden></span>
     <button type="button" id="cktest" hidden aria-expanded="false" aria-controls="ck">✔ Test<i class="ckbadge" hidden></i></button>
     <a id="solo" href="#" target="_blank" rel="noopener">Open on its own</a>
   </div>
@@ -807,6 +808,13 @@ function renderFilters(){
     else if(e.key==='Tab'){const f=[...p.querySelectorAll('button:not([disabled]),a[href]')];if(!f.length)return;const i=f.indexOf(document.activeElement);
       if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}},true);
   addEventListener('resize',()=>{if(!p.hidden)placeFpop()})}
+/* ---------- version chips (games/status.json, written by games-src/scripts/game-status.py) ---------- */
+const VER={};
+const vtxt=id=>{const v=VER[id];if(!v)return'';const m=/^\d{4}-(\d\d)-(\d\d)/.exec(v.updated||'');return v.version+(m?' · '+(+m[2])+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m[1]-1]:'')};
+const vchip=id=>`<span class="vchip" data-v="${id}">${esc(vtxt(id))}</span>`;
+function paintVer(){document.querySelectorAll('.vchip[data-v]').forEach(e=>{e.textContent=vtxt(e.dataset.v)});if(window.curGame)setTver(window.curGame)}
+function setTver(g){const e=document.getElementById('tver');if(!e)return;const s=g&&g.id!=='ref'?vtxt(g.id):'';e.textContent=s;e.hidden=!s;const f=document.getElementById('fabname');if(f&&g)f.textContent=g.name+(s?' · '+s:'')}
+try{fetch('status.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&Array.isArray(j.games)){j.games.forEach(x=>{VER[x.id]=x});paintVer()}}).catch(()=>{})}catch(_){}
 /* ---------- What's new (games/updates.json) ---------- */
 let UPDS=[];
 const WNK='shelf_wn_checked';
@@ -1188,7 +1196,7 @@ function tvStatic(){
 setInterval(()=>{if(document.hidden||!table.hidden||ins||view!=='room'||!$('#tvscreen')||VIDEO().length<2)return;if($('#tv:hover,#tv:focus-within'))return;tvCh++;tvShow(true)},6000);
 function renderList(){
   const lv=$('#listview'),id=store.get('shelf_last');
-  const row=g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${stOf(g)?ST_LABEL[stOf(g).k]+(stOf(g).st?' · Story':'')+' · ':''}${esc(g.ribbon)}${id===g.id?' · Played last':''}</span></div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`;
+  const row=g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${stOf(g)?ST_LABEL[stOf(g).k]+(stOf(g).st?' · Story':'')+' · ':''}${esc(g.ribbon)}${id===g.id?' · Played last':''}</span>${vchip(g.id)}</div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`;
   const sec=(t,k,a)=>a.length?`<h2 class="lh" id="lh-${k}">${t}</h2><ul class="plist" aria-labelledby="lh-${k}">${a.map(row).join('')}</ul>`:'';
   lv.innerHTML=`<div class="lobj"><button type="button" class="tbtn" data-ref="">📖 Card &amp; token reference</button><a class="tbtn" href="suggest.html">💬 Suggestion box</a><button type="button" class="tbtn" data-inv="1" aria-haspopup="dialog">✉ Play online with friends</button><button type="button" class="tbtn" data-mine="1" aria-haspopup="dialog">★ Stats &amp; achievements</button></div>${sec('Board games','board',BOARD())}${sec('Video games','video',VIDEO())}`}
 function render(){
@@ -1243,8 +1251,8 @@ function openGame(g,count){
   if(g.id!=='ref'){store.set('shelf_last',g.id);
     if(count){const P=getPlays();P[g.id]=(P[g.id]|0)+1;store.set('room_plays',JSON.stringify(P));evalTrophies(hr<5)}}
   if(ins)hideInspect(true);
-  $('#tname').textContent=g.name;$('#solo').href=g.src;frame.title=g.name;if(g.id!=='ref')showLoader(g.name.replace(/ \(preview\)$/,''));frame.src=g.src;
-  table.hidden=false;if(isPh()){$('#fabname').textContent=g.name;$('#fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;if(!reduced())table.classList.add('opening');
+  $('#tname').textContent=g.name;window.curGame=g;setTver(g);$('#solo').href=g.src;frame.title=g.name;if(g.id!=='ref')showLoader(g.name.replace(/ \(preview\)$/,''));frame.src=g.src;
+  table.hidden=false;if(isPh()){$('#fabname').textContent=g.name;setTver(g);$('#fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;if(!reduced())table.classList.add('opening');
   document.body.style.overflow='hidden';root.classList.add('playing');ckOpenGame(g);
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
 function closeGame(){
@@ -1279,7 +1287,7 @@ async function openInspect(g,btn){
   riffle();
   if(ph){
     const sh=document.createElement('div');sh.className='sheet';sh.setAttribute('role','dialog');sh.setAttribute('aria-modal','true');sh.setAttribute('aria-label',g.name);
-    sh.innerHTML=`<div class="sh-head"><i class="grab"></i><div class="sh-top"><div class="mini"></div><div class="sh-ttl"><h2>${esc(g.name)}</h2><span class="bk-r">${esc(g.ribbon)}</span></div><button type="button" class="sh-x" aria-label="Close and put the box back">✕</button></div></div><div class="sh-body">${parts.body}</div><div class="sh-foot">${parts.acts}</div>`;
+    sh.innerHTML=`<div class="sh-head"><i class="grab"></i><div class="sh-top"><div class="mini"></div><div class="sh-ttl"><h2>${esc(g.name)}</h2><span class="bk-r">${esc(g.ribbon)}</span>${vchip(g.id)}</div><button type="button" class="sh-x" aria-label="Close and put the box back">✕</button></div></div><div class="sh-body">${parts.body}</div><div class="sh-foot">${parts.acts}</div>`;
     const mb=buildBox(g,[10,8,2]);mb.style.fontSize='8.8px';sh.querySelector('.mini').append(mb);
     o.append(sh);ins.sheet=sh;ins.fly=sh;
     sh.querySelector('.sh-x').onclick=()=>closeInspect();
@@ -1319,7 +1327,7 @@ async function openTvInspect(g,btn){
   const pic=`<div class="crt tvpic"><img src="${g.cover}" alt="" draggable="false"><span class="tv-ch">CH ${ch}</span><i class="tv-flick"></i></div>`;
   if(ph){
     const sh=document.createElement('div');sh.className='sheet tvg';sh.setAttribute('role','dialog');sh.setAttribute('aria-modal','true');sh.setAttribute('aria-label',`Now playing: ${g.name}`);
-    sh.innerHTML=`<div class="sh-head"><i class="grab"></i><div class="sh-top"><div class="mini mtv"><div class="crt"><img src="${g.cover}" alt="" draggable="false"><span class="tv-ch">CH ${ch}</span></div></div><div class="sh-ttl"><span class="bk-r">Now playing · CH ${ch}</span><h2>${esc(g.name)}</h2><span class="bk-r">${esc(g.ribbon)}</span></div><button type="button" class="sh-x" aria-label="Close the TV guide card">✕</button></div></div><div class="sh-body">${parts.body}</div><div class="sh-foot">${parts.acts}</div>`;
+    sh.innerHTML=`<div class="sh-head"><i class="grab"></i><div class="sh-top"><div class="mini mtv"><div class="crt"><img src="${g.cover}" alt="" draggable="false"><span class="tv-ch">CH ${ch}</span></div></div><div class="sh-ttl"><span class="bk-r">Now playing · CH ${ch}</span><h2>${esc(g.name)}</h2><span class="bk-r">${esc(g.ribbon)}</span>${vchip(g.id)}</div><button type="button" class="sh-x" aria-label="Close the TV guide card">✕</button></div></div><div class="sh-body">${parts.body}</div><div class="sh-foot">${parts.acts}</div>`;
     o.append(sh);ins.sheet=sh;ins.fly=sh;
     sh.querySelector('.sh-x').onclick=()=>closeInspect();
     swipe(sh.querySelector('.sh-head'),sh);

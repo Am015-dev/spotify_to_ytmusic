@@ -106,6 +106,10 @@ def main():
                 shutil.copyfile(out / s / "index.html", dest / "index.html")
                 deployed.append(s)
 
+    if deployed and not a.suffix:  # refresh games/status.json (versions, wiring); never blocks the deploy
+        try: subprocess.run([sys.executable, str(SCRIPTS / "game-status.py")], check=False, timeout=120)
+        except Exception as e: print("game-status skipped:", e)
+
     print("\n== result ==")
     for s in slugs:
         print(f"{status[s]:5} {s:18} {why[s]}" + ("   -> deployed" if s in deployed else ""))

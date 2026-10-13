@@ -47,3 +47,5 @@ for g in games:
     L += [f'| {w} {k} | `{n}` | {p.replace("|", "/")} |' for w, k, n, p in sorted(todo[g])]
 open('games-src/WIRING-TODO.md', 'w').write('\n'.join(L) + '\n')
 print(dict(cnt)); [print(f'  {g:22} paintings {len(todo[g]):4}  3D {len(m3[g])}') for g in games]
+import subprocess, sys
+subprocess.run([sys.executable, os.path.join(ROOT, 'games-src/scripts/game-status.py')], check=False)  # refresh games/status.json
