@@ -38,6 +38,17 @@ GB_brickGeo=(f=>function(b,M,L){if(typeof b.c!=='string'||b.c.indexOf('/')<0)ret
  if(+q[1])o.ox=+q[1];if(+q[2])o.oy=+q[2];if(+q[3])o.oz=+q[3];if(q[4])o.R=q[4].split(',').map(Number);return f.call(this,o,M,L)})(GB_brickGeo);
 // ---------- converted models → brick lists
 function LD_br(id){const Mo=LD_MODELS[id];if(!Mo)return[];return Mo.B.map(([t,x,z,y,r,m,ci,ox,oy,oz,R])=>{CR_reg(t.split('@')[0]);const b={t,x,z,y,r,m,c:Mo.C[ci]};if(ox)b.ox=ox;if(oy)b.oy=oy;if(oz)b.oz=oz;if(R)b.R=R;return b})}
+// facing-1 (Alex 2026-10-13: "cars drive backwards"): a ride's front must be -z (the game drives along -z). The converter picked the yaw from the size
+// (w > d -> --yaw 1 or 3), so sets whose LDraw front is -x came out turned 180 deg (grille at the back). tools/ld/ldfront.py now reads the front from the parts
+// (steering wheel ahead of the seat, clear/yellow lights at one end and red at the other, grille, windscreen) and tools/ld/vehcv.sh picks the yaw from it.
+// Models already converted with the wrong yaw are turned here, at load (audit: tools/ld/facing.py, docs/FACING.md). LD_turn: 180 deg about the origin,
+// cell = -cell - footprint, r + 2, offsets negated, free rotations R = Ry(pi)*R. 'fcT' = hidden marker of a turned list (saved garage copies, 98sz_ride_scale.js).
+const LD_FACE=new Set(['v1991_1','v3180_1','v4208_1','v621_1','v6633_1']);GB_PC.fcT={n:'Facing fix',w:1,d:1,h:1,ic:'↻',hide:1};
+function LD_turn(B){const A=B.map(b=>{if(!b||typeof b.t!=='string'||b.y<=-90)return b;try{if(b.t.indexOf('@')>0)G13_def(b.t)}catch(e){}const P=GB_PC[b.t]||GB_PC[b.t.split('@')[0]];if(!P)return b;
+ const[fw,fd]=b.R||!(b.r%2)?[P.w,P.d]:[P.d,P.w],o=Object.assign({},b,{x:-b.x-fw,z:-b.z-fd,r:((b.r||0)+2)%4});if(b.ox)o.ox=-b.ox;if(b.oz)o.oz=-b.oz;
+ if(b.R){const R=b.R;o.R=[-R[0],-R[1],-R[2],R[3],R[4],R[5],-R[6],-R[7],-R[8]]}return o});A.push({t:'fcT',x:0,z:0,y:-99,r:0,m:0,c:'#000000',hide:1});return A}
+LD_br=(f=>function(id){const B=f(id);return LD_FACE.has(id)&&B.length?LD_turn(B):B})(LD_br);
+GB_brickGeo=(f=>function(b){if(b&&b.t==='fcT')return;return f.apply(this,arguments)})(GB_brickGeo);
 // test hook: surface points of one part as the garage builds it (upright, r 0), used by tools/ld_dump.js to calibrate LDraw parts
 function LD_pts(t,n){const M=[],L=[],g0=CR_G,w0=CR_W;CR_G=[];CR_W=[];let G=[];
  try{GB_piece(t,'#888888',M,L);G=M.concat(L,CR_G);for(const w of CR_W){const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);G.push(g)}}finally{CR_G=g0;CR_W=w0}

@@ -1,10 +1,10 @@
-# Vehicle converter lane handoff (veh-2, 2026-10-10; was build-8, build-4). Branch alex/od-mdl-veh. Integrator: build-9 (session_01GMDcFfTGnwQmyHKU8PFQfp; build-7 stood down, never send there). Every MODEL batch and status carries ONE labelled grid: python3 tools/grid.py docs/shots/veh/GRID_<n>.jpg "<title>" "label=path" ...
+# Vehicle converter lane handoff (veh-3, 2026-10-13). Branch alex/od-mdl-veh. Integrator: build-10 (session_01NEKmBJhbYZuQ3ir54EPH89); build-7 and build-9 have stood down.
 
 ## Loop (≈ 3 min per model)
 Setup in a fresh container: parts lib (`curl -o ld/c.zip https://library.ldraw.org/library/updates/complete.zip; unzip -q -d ld/lib ld/c.zip`),
 `pip install scipy pyfqmr`, `python3 -m http.server 8766 &`, `tools/build.sh vveh --local`, `node tools/ld/ld_dump.js http://127.0.0.1:8766/local_dbg.html?fast=1 ld/ours.json`.
 OMR file: `curl -o ld/omr/<set>-1.mpd https://library.ldraw.org/library/omr/<set>-1.mpd`. The full OMR list is ld/dl/omr_sets.tsv (git-ignored; scrape library.ldraw.org/omr/sets?page=1..62).
-1. `python3 tools/ld/ld2garage.py ld/omr/<s>.mpd ld/out/v<s> --only "<set> - truck" --yaw 2`. If size [w,d] has w > d, use --yaw 1 (or 3 if the shot shows it backwards).
+1. `python3 tools/ld/ld2garage.py ld/omr/<s>.mpd ld/out/v<s> --only "<set> - truck" --yaw 2`. Pick the yaw with `python3 tools/ld/ldfront.py <mpd>` (front from the parts; facing-1: the old "w > d -> --yaw 1" rule turned 1991/3180/4208/621/6633 backwards). vehcv.sh does this in auto mode.
 2. `python3 tools/ld/vehsrc.py <s> ld/out/v<s>.json "<Name>" <Kind> <perk> top acc han` writes src/98ld_v_<s>.js (data + GB_PC registration + GAR_SETS preset t_v<s with _>).
    Valid perks: armor drift heal luck refill shield slip start.
 3. Add it to src/MODELS locally (do NOT commit MODELS, ORDER or MODULES.md: build-7 owns them), `tools/build.sh vveh --local`.
@@ -42,3 +42,17 @@ then 6553 6571 6581 6594 6431 6473 6481 6484 6545 3056 6406 4016 30283 30284 200
 - Run at most 4 ld2garage.py in parallel; 13 in parallel corrupted a cache (JSONDecodeError), rerun fixes it.
 - Trucks with trailers: --only "<set> - Truck" --drop trailer. When the cab is a sibling submodel (60018), use --drop worker,wheelbarrow,driver instead of --only.
 - tools/ld/calib.json changes on every run; not committed.
+
+## veh-3 session (2026-10-13): 21 more done, GRID docs/shots/veh/GRID_3.jpg, sent to build-9 and build-10
+6535 6550(yaw 0) 6470 1029 6553 6571 6571-1b(FD car 2) 6581 6594(cab only) 6431 6473(ground vehicle) 6481 6484(hauler) 6484-1b(F1 car) 6545 3056 30283 30284 20011 31027 6753-1b(red car).
+- Second vehicle from one set: cp ld/omr/<s>-1.mpd ld/omr/<s>-1b.mpd, then vehcv.sh <s>-1b "<sub>".
+- Skipped: 6743 (10 wide), 6753 truck (16 wide), 10220 (Creator Expert van, not minifig scale), 6406 (same go-kart as 3056), 6742 (no file found).
+- Other OMR source: GitHub mirror https://raw.githubusercontent.com/anteloc/ldraw-lib/606be1421f6c353d9f23f6c467e0be1812280455/models/<file>.mpd (has 4016-1.mpd, no FILE header).
+- Setup gotcha: in a fresh container, add all src/98ld_v_*.js missing from src/MODELS locally (`git update-index --assume-unchanged src/MODELS`), build, run ld_dump.js before vehcv.sh (ld2garage needs ld/ours.json).
+- tRides "car rod" in the log = the ride didn't load (shot shows the default car); rerun until it is gone.
+## Next: 4016 (GitHub mirror), more Classic Town/City cars from the OMR list.
+
+## facing-1 (2026-10-13): driver + ride facing fixed at the root (docs/FACING.md)
+- Driver: src/98sz_ride_scale.js SZ_add always seats the drvM figure facing -z (the front), one stud behind the 'stw' brick. Never derive it from stw r.
+- Ride: front must be -z. tools/ld/ldfront.py = the part-based front; vehcv.sh auto uses it and WARNs when a manual yaw disagrees. Wrongly converted modules are
+  turned at load via LD_FACE in src/98ld_import.js (add the model id there instead of reconverting). Audit: tools/ld/tFacing.js -> tools/ld/facing.py.
