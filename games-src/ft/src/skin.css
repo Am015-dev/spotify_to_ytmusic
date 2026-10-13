@@ -27,25 +27,20 @@ html.sk-icons .ri[data-r=sound]{background-image:url(media/icon-sound.webp)}html
 html.sk-icons .ri[data-r=speed]{background-image:url(media/icon-speed.webp)}html.sk-icons .ri[data-r=settings]{background-image:url(media/icon-settings.webp)}
 html.sk-icons .ri[data-r=log]{background-image:url(media/icon-log.webp)}html.sk-icons .ri[data-r=newgame]{background-image:url(media/icon-newgame.webp)}
 /* buttons: cream / go / power pills */
-html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;justify-content:center}
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center}
 html.sk .ab.go,html.sk .mbox .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
-html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;min-height:44px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
 html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
-html.sk.short:not(.land) .ab{min-height:44px;padding:0 2px}html.sk.short:not(.land) .ab.pw{min-height:44px}
-html.sk .mbox .btn.sm{min-height:44px;border-width:0 18px;border-image-width:0 18px}
-html.sk .mbox .btn.xs{min-height:44px}
+html.sk .mbox .btn.sm{border-image-width:0 18px}
 /* menu rows */
-html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;min-height:52px;margin:2px 0;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;font-weight:700;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
 /* dialogs over the table */
-html.sk .mbox{background:none;border:30px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:#3a2410}
+html.sk .mbox{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
 html.ti.sk #modal[data-k=start] .mbox.start{background:none}
 html.sk .mbox h2{color:#8e3a1c}
-html.sk .gx-bar{gap:2px;padding-left:6px;padding-right:6px}
-html.sk .gx-bar h1{font-size:.9rem;margin:0 2px 0 0}
-html.sk .gx-bar .pchip{font-size:11px;padding:2px 6px}
 
 /* 3D-model sprites on tiles (palm and palace stacks x1-x3, camel on the owner chip) and the summoning lamp; html.sp3 is set once the files loaded */
 html.sp3 .tok{position:relative;display:inline-block;width:24px;height:24px;font-size:0;text-shadow:none;background:var(--sp) center bottom/38px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}

@@ -2,12 +2,12 @@
    its files loaded, so a missing file keeps the plain CSS. Palette: blueprint blue, brass, copper, warning orange. */
 html.sk{--sk-ink:#2a1a08;--sk-cream:#fff1d2;--gxc-ink:#f6efdc;--gxc-dim:rgba(246,239,220,.78)}
 /* ---- buttons: cream plate (default), orange (go / selected), blue (power / chosen) ---- */
-html.sk .big,html.sk .btn,html.sk .chip{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));padding-top:0;padding-bottom:0;padding-left:0;padding-right:0}
+html.sk .big,html.sk .btn,html.sk .chip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .big{min-height:56px}
 html.sk .btn{min-height:48px;min-width:60px;font-size:.92rem}
 html.sk .btn.small{min-height:44px}
-html.sk .chip{min-height:44px;border-width:0 20px;border-image-width:0 20px}
-html.sk .chip.sm{min-height:36px;border-width:0 16px;border-image-width:0 16px}
+html.sk .chip{border-image-width:0 20px}
+html.sk .chip.sm{border-image-width:0 16px}
 html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on,html.sk .chip.on{border-image-source:url(media/ui-button-go-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .big.blue,html.sk .btn.blue{border-image-source:url(media/ui-button-power-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .chip.on{border-image-source:url(media/ui-button-power-c.webp)}
@@ -24,7 +24,7 @@ html.sk .gx-drawer-body{background:#fff6e2;border-radius:5px;padding:6px 8px 12p
 html.sk .gx-drawer-head{border-bottom:0}
 /* ---- fuse: painted rope behind the burning segments, painted spark, painted bomb ---- */
 html.sk-fuse .rp{background:url(media/ui-fuse-track.webp) left center/auto 100% repeat-x;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.6);align-self:center}
-html.sk-fuse .rp i.rope{background:transparent;border-color:rgba(40,20,4,.5);border-width:0 1px}
+html.sk-fuse .rp i.rope{background:transparent;border-color:rgba(40,20,4,.5)}
 html.sk-fuse .rp i.ash{background:#2b2630;border-color:#15121a;opacity:.92}
 html.sk-fuse .rp i.next{box-shadow:inset 0 0 6px 1px rgba(255,200,80,.9)}
 html.sk-spark .spark{width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:0;background:url(media/fx-fuse-spark.webp) 0 0/800% 100% no-repeat;animation:sk-spark .5s steps(8,jump-none) infinite}
@@ -57,11 +57,11 @@ html.sk-wire .tile.known.b{background-image:url(media/wire-tile-frame-c.webp),li
 html.sk-wire .tile.known.r{background-image:url(media/wire-tile-frame-c.webp),linear-gradient(#ff6048,#c11d1d)}
 html.sk-wire .tile.known.y{background-image:url(media/wire-tile-frame-c.webp),linear-gradient(#ffe455,#ffb300)}
 /* ---- equipment cards (drawer) and the job card sheet ---- */
-html.sk-eq .eqc{border:16px solid transparent;border-image:url(media/ui-eq-frame-c.webp) 62 fill/16px stretch;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+html.sk-eq .eqc{border-style:solid;border-color:transparent;border-image:url(media/ui-eq-frame-c.webp) 62 fill/16px stretch;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
 html.sk-eq .eqc.used{background:none;opacity:.7;filter:grayscale(.6) drop-shadow(0 3px 3px rgba(0,0,0,.4))}
 html.sk-eq .eqc .et{margin:-4px -4px 0;border-radius:4px}
 html.sk-eq .eqc .ex,html.sk-eq .eqc .es{padding-left:4px;padding-right:4px}
-html.sk-job .mcard{border:22px solid transparent;border-image:url(media/ui-job-sheet-c.webp) 110 fill/22px stretch;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.4))}
+html.sk-job .mcard{border-style:solid;border-color:transparent;border-image:url(media/ui-job-sheet-c.webp) 110 fill/22px stretch;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.4))}
 html.sk-job .mcard .mh{margin:-4px -4px 0;border-radius:4px;border-bottom-width:3px}
 html.sk-job .mcard .mb{background:#fff;margin:0 -4px -4px;border-radius:0 0 4px 4px}
 /* ---- medallions and icon buttons without the white hole in the hanging loop (-k files, see crop-kit.py) ---- */

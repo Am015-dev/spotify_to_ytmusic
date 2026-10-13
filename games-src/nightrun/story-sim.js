@@ -14,7 +14,7 @@ const BOT = (opts) => {
   if (endless) m.startStory(1); else m.startStory(n);
   m.simOn(true);
   const dec = () => {
-    const G = m.G, P = m.P; let ty = 270, tx = 220, bd = 1e9;
+    const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;   // a real player never parks: the anti-idle beam would hit the bot
     for (const e of G.en) { if (e.type === 'boss') { if (e.x < 960) ty = e.y; continue; } const dx = e.x - P.x; if (dx > 0 && dx < bd && e.x < 940) { bd = dx; ty = e.type === 'gate' ? e.gy : e.y; } }
     let bc = 1e18, bx = P.x, by = P.y;
     for (let ix = -5; ix <= 5; ix++) for (let iy = -5; iy <= 5; iy++) {
@@ -60,7 +60,7 @@ const BOT = (opts) => {
   await browser.close(); srv.kill();
   const avg = (a, k) => a.length ? (a.reduce((x, y) => x + (y[k] || 0), 0) / a.length) : 0;
   console.log('stage  clear%  time(s)  hits  perf  score   (runs ' + RUNS + ', perfect-chance ' + PC + ')');
-  for (const n of STAGES) { const a = res[n], c = a.filter(x => x.clear); console.log(String(n).padStart(4), String(Math.round(100 * c.length / a.length)).padStart(6) + '%', avg(c.length ? c : a, 't').toFixed(0).padStart(7), avg(a, 'hits').toFixed(1).padStart(5), avg(a, 'perf').toFixed(0).padStart(5), avg(a, 'score').toFixed(0).padStart(8), ' hitsBoss ' + avg(a, 'hb').toFixed(1) + ' hitsWaves ' + avg(a, 'hw').toFixed(1) + ' fight ' + avg(a.filter(x => x.fight), 'fight').toFixed(0).padStart(3) + 's', '  3-star: ' + c.filter(x => x.stars[2]).length + ' perfStar: ' + c.filter(x => x.stars[1]).length); }
+  for (const n of STAGES) { const a = res[n], c = a.filter(x => x.clear); console.log(String(n).padStart(4), String(Math.round(100 * c.length / a.length)).padStart(6) + '%', avg(c.length ? c : a, 't').toFixed(0).padStart(7), avg(a, 'hits').toFixed(1).padStart(5), avg(a, 'perf').toFixed(0).padStart(5), avg(a, 'score').toFixed(0).padStart(8), ' kills ' + avg(a, 'kills').toFixed(0).padStart(4) + ' ', ' hitsBoss ' + avg(a, 'hb').toFixed(1) + ' hitsWaves ' + avg(a, 'hw').toFixed(1) + ' fight ' + avg(a.filter(x => x.fight), 'fight').toFixed(0).padStart(3) + 's', '  3-star: ' + c.filter(x => x.stars[2]).length + ' perfStar: ' + c.filter(x => x.stars[1]).length); }
   for (const n of STAGES) { const cs = {}; for (const x of res[n]) for (const c in x.causes) cs[c] = (cs[c] || 0) + x.causes[c]; console.log('  hit causes stage ' + n + ': ' + JSON.stringify(cs)); }
   fs.writeFileSync(path.join(__dirname, 'playtest', 'story-sim.json'), JSON.stringify(res));
 })().catch(e => { console.error(e); process.exit(2); });

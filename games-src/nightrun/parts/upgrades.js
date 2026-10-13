@@ -22,11 +22,11 @@ const TP={revLeft:0,rgnT:0,boost:{},
   l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
 GA.tune={};{const o=load('mnr_tune',{});if(o&&typeof o==='object'&&!Array.isArray(o))for(const d of TP_DEF)if(isFinite(o[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(o[d.id])));}
 const tsave=()=>save('mnr_tune',GA.tune);
-/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 15 story stars (up to 8). Existing players start with their best perks equipped. */
+/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 20 story stars (up to 8). Existing players start with their best perks equipped. */
 GA.eq={};{const o=load('mnr_eq',null);if(o&&typeof o==='object'){for(const d of TP_DEF)GA.eq[d.id]=!!o[d.id];}
   else{const own=TP_DEF.filter(d=>(GA.tune[d.id]|0)>0).sort((a,b)=>b.pri-a.pri);for(const d of own.slice(0,4))GA.eq[d.id]=true;}}
 const eqsave=()=>save('mnr_eq',GA.eq);
-const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/15));
+const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/20));
 const eqCount=()=>TP_DEF.filter(d=>GA.eq[d.id]&&(GA.tune[d.id]|0)>0).length;
 GA.tab='tune';
 
@@ -41,9 +41,9 @@ const NEWU=[
   {id:'rv',n:'Revive Token',t:'Come back once',          p:90,max:3,c:'#ff2d95',ic:TP_BY.rev.ic}];
 for(const u of NEWU){SH.UPG.push(u);UBY[u.id]=u;}
 /* ----- effects (all through wrappers) ----- */
-const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'));   // stacking cap: damage perks together never more than x2.1
+const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'))*SYN.dmg();   // stacking cap: the damage upgrades and perks together never more than x2.1; synergies, set bonuses and the trade-off perks (strategy.js) come on top
 const DRONE_CAP=3,DOUBLE_CAP=.3,CRIT_CAP=.3;
-const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr'));
+const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr')+SYN.v.crit);
 const tpDouble=()=>Math.min(DOUBLE_CAP,.025*TP.l('rof'));
 const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
 {const rc=SH.recalc;SH.recalc=function(){rc.call(this);
@@ -54,7 +54,7 @@ const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
     if(id==='mh'&&P){P.max++;P.hp=Math.min(P.max,P.hp+1);}
     if(id==='rv')TP.revLeft++;};
   const vol=SH.volley;                                        // damage, crits and double shots on every volley the ship fires
-  const boost=n0=>{const dm=tpDmg(),pc=tpCrit();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=dm;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
+  const boost=n0=>{const dm=tpDmg(),pc=tpCrit();const off=SYN.off();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=b.pf?dm:dm*off;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
   SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);boost(n0);
     const dd=tpDouble();if(dd&&Math.random()<dd)G.delayed.push({t:.07,f:()=>{if(G.dead||!running||P.over)return;const m=G.pb.length;vol.call(SH,P.x+22,P.y+2,0);boost(m);}});};
   const hurt0=hurt;hurt=function(){if(PW.on('bub')){if(P.inv<=0){P.inv=.0;}if(!TP.bt||performance.now()-TP.bt>400){TP.bt=performance.now();burst(P.x,P.y,'#3dffb0',10,220,.3);AU.sfx('graze');}return;}hurt0();};
@@ -114,15 +114,13 @@ function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr
   for(const s of SHIPS)if(s.p&&!GA.own['ship_'+s.id]&&s.p<=GA.bank)n++;
   for(const c of CREW)if(!GA.own[c.id]&&c.p<=GA.bank)n++;
   for(const h of THEMES)if(h.p&&!GA.own['th_'+h.id]&&h.p<=GA.bank)n++;return n;}
-function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P.max?45:0,sh:()=>SH.sh===0?90:55,rv:()=>TP.revLeft===0?85:30,mh:()=>60,dm:()=>70,dc:()=>55,dr:()=>65,fr:()=>50,cr:()=>45,hm:()=>40,ck:()=>35,mg:()=>30,wd:()=>25,lp:()=>30};
-  SH.cards.forEach((c,i)=>{if(c.sold||SH.neon<SH.price(c.u))return;const s=(pri[c.u.id]?pri[c.u.id]():30)-4*SH.n(c.u.id);if(s>bs){bs=s;best=i;}});return best;}
 
 /* ----- styles ----- */
 {const st=document.createElement('style');st.textContent=`
 .pg .card .rec{position:absolute;top:-9px;right:10px;background:var(--amber,#ffb020);color:#120a1f;font-family:var(--mono);font-weight:700;font-size:clamp(11px,calc(var(--u)*2.6),12px);letter-spacing:.08em;padding:1px 7px;border-radius:9px;white-space:nowrap}
 .pg .card .lv{font-family:var(--mono);font-weight:400;color:var(--dim);font-size:.82em;margin-left:4px;white-space:nowrap}
 .pg .card .pp{display:flex;gap:2px;margin-top:2px}.pg .card .pp i{display:block;width:clamp(5px,calc(var(--u)*2),9px);height:4px;border-radius:1px;background:#ffffff22}.pg .card .pp i.on{background:var(--c)}
-#gaCards.tune{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,235px),1fr));grid-auto-rows:min-content;align-content:start;gap:calc(var(--u)*2) calc(var(--u)*2);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 2px 6px;flex:1 1 0;min-height:0}
+#gaCards.tune{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));grid-auto-rows:min-content;align-content:start;gap:calc(var(--u)*2) calc(var(--u)*2);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 2px 6px;flex:1 1 0;min-height:0}
 #gaCards.tune .card{flex-direction:row;text-align:left;justify-content:flex-start;gap:10px;padding:8px 10px;min-height:58px}
 #gaCards.tune .card .tx{flex:1 1 0;min-width:0;overflow-wrap:anywhere}#gaCards.tune .card .pr{flex:0 0 auto;margin-left:6px}#gaCards.tune .card>svg{height:30px;width:30px}
 #gaCards.tune .card.max{opacity:.55;border-style:dashed}
@@ -137,9 +135,10 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 const gaItems0=gaItems;
 function perkIcon(d){let real=false;try{real=ART.isReal('kit-'+(d.uid||d.id));}catch(e){}return real?`<img class="ki" src="media/kit-${d.uid||d.id}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
-  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
+  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button'),p=pathOf(d.id);b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
-    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
+    const bad=d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(Math.min(d.max,l+1))}</b></div>`:'';
+    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${pathChip(p)}${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div>${l>0&&l<d.max?`<div class="pv">${d.t(l)}</div>`:''}${bad}<div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':i===l?'nx':''}"></i>`).join('')}</div></div>`
       +`<div class="pr">${pr?neonI+' '+pr:'MAX'}</div>`+(d.id===rec?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>tuneBuy(d,b));box.appendChild(b);}}
 function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
@@ -155,26 +154,17 @@ gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
       b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
       const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:it.kind==='ship'?shipPortrait(it):svgI(it.ic);
       const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
-      b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
+      b.innerHTML=`${ic}<div class="tx"><div class="n">${it.kind==='crew'?pathChip(pathOf(it.id.replace(/^up_|^pu_/,''))):''}${it.n}</div><div class="t">${it.t}</div>${it.kind==='ship'?rhythmHTML(it.id):''}</div><div class="pr">${pr}</div>`;
       b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}
-    if(GA.tab==='crew')box.classList.add('tune');}
+    if(GA.tab==='crew'||GA.tab==='ships')box.classList.add('tune');}
   affUpd();};
 function affUpd(){const n=affordCount();afford.all=n;const g=$('gaBtn');
   if(g){g.innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank+(n?'<small>'+n+' UPGRADE'+(n>1?'S':'')+' READY</small>':'');g.classList.toggle('rdy',n>0);}
   const g2=$('gaBtn2');if(g2){g2.innerHTML='GARAGE'+(n?'<small>'+n+' READY</small>':'');g2.classList.toggle('rdy',n>0);}}
 gaDraw();
 
-/* ----- the pit stop: levels on the cards, a recommended pick, and "you can afford N" ----- */
+/* ----- the pit stop: the "you can afford N" row (the cards, picks, slots and selling are in strategy.js) ----- */
 {const row=document.createElement('div');row.className='aff';row.id='shAff';$('shMsg').before(row);}
-SH.draw=function(){const box=$('shCards');box.innerHTML='';const rec=recPit();let aff=0;
-  this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),n=this.n(u.id),b=document.createElement('button');b.type='button';if(!c.sold&&this.neon>=pr)aff++;
-    b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
-    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}</div><div class="t">${lvText(u,n+1)}</div>${u.max>1?`<div class="pp">${Array.from({length:u.max},(_,k)=>`<i class="${k<n?'on':''}"></i>`).join('')}</div>`:''}</div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`+(i===rec&&!c.sold?'<span class="rec">RECOMMENDED</span>':'');
-    b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
-  $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
-  $('shGo').textContent=this.picks?'GO':'SKIP';
-  $('shOwn').innerHTML=this.order.length?this.order.map(id=>{const u=UBY[id];return `<span style="--c:${u.c}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</span>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>';
-  const ga=affordCount();$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(ga?` · Garage: <b>${ga}</b> ready`:'');
-  SH.aff=aff;SH.rec=rec;};
+
 NR.on('banked',()=>affUpd());NR.on('runEnd',()=>setTimeout(affUpd,0));
 affUpd();
