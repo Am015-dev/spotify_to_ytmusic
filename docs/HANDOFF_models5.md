@@ -1,0 +1,36 @@
+# models-5 handoff (build-9, LEGO-model INTEGRATOR, 2026-10-13). Branch alex/od-models.
+Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuKUcaUT4v. Read docs/HANDOFF_models4.md for the pipeline (lazy models, src/MODELS, loop).
+
+## State
+- LIVE: v90i (brave-carson 27ec0df, src od-models 50326558), 2026-10-13. Beta refreshed. v90j is next.
+- v90h (garage-18 floor fix) was never shipped on its own; it is folded into v90i (changelog keeps both entries v90i + v90h).
+- v90i = out/v90i on alex/od-models (built at 5e8c7e38, grid ce5cbb2b): v90h floor fix (alex/od-garage18 78d49cf0) + veh-2's 16 Town rides
+  + size-1 b989e882 (JU squash clamp, BC_dims width cap) + land-2 35406f1 (palms on the verge) + checklist pin clears #m1Next (src/99c_checklist.js pinPlace selector).
+  GRID docs/shots/v90i/GRID.jpg. REVIEW sent; see the end of this file for PASS/READY status.
+- tPlay phone v90i vs v90g baseline (docs/shots/v90i/tPlay_*.json): shared fails, v90i no worse: fra stuck 4.5 vs 4.9 %, ath walls 1.49 vs 1.98/min, ath heap 167 vs 162 MB (peak 198 vs 227).
+  NOT shared: ath stuck 7.7 % on v90i vs 0 % on v90g (one 2-min run each; cause unknown, could be route noise or size-1's collider cap). Reproduce before blaming v90i.
+
+## Next: v90j (fresh integrator)
+- veh-2 (stood down) left 20 rides on alex/od-mdl-veh head 3cac11f, NOT in src/MODELS yet (veh-2 does not commit MODELS):
+  98ld_v_6605-1 6609-1 6354-1 6361-1 625-1 6504-1 6608-1 4206-2 7347-1 7638-1 6600-1 6602-1 6603-1 6501-1 6675-1 6430-1 6450-1 6480-1
+  6911-1_Ladder-Truck 6911-1_Rescue-SUV (.js). Grids: docs/shots/veh/GRID_veh2.jpg, GRID_veh2b.jpg.
+- CONFLICT: 7638 Tow Truck already shipped in v90g (rescue-1, same file src/98ld_v_7638-1.js). Keep one version (compare both on the stage).
+- veh-3 (session_01CyEic6W3fiivff8jZngR9M) REPORTED 21 more rides: alex/od-mdl-veh head ab4de71 (after 3cac11f), grid docs/shots/veh/GRID_3.jpg, 0 errors.
+  Add to src/MODELS: 98ld_v_ 6535-1 6550-1 6470-1 1029-1 6553-1 6571-1 6571-1b 6581-1 6594-1 6431-1 6473-1 6481-1 6484-1 6484-1b 6545-1 3056-1 30283-1 30284-1 20011-1 31027-1 6753-1b (.js).
+  Largest module 6484-1 = 130 KB. Ship veh-2's 20 and veh-3's 21 as separate small releases (v90j, v90k) rather than one batch of 41.
+- land-3 (session_01F9UVq3exKAQQy4xHV7BH6G) REPORTED 2026-10-13: alex/od-mdl-land db39943, all in src/98ld_l_land.js. Grid docs/shots/land/GRID_l3.jpg.
+  fra: cone 4589, barrier 4083 (side view still owed), construction light, STOP sign, rock; ath: CE_pine 3471, CE_olive 3470 (-2.8M tris), CE_cypress 3778 (+57k), CE_rock.
+  Frankfurt 4.21M->4.03M tris, same draws, 0 errors. The branch also holds 35406f1 (palms), already in v90i: merge db39943 (git handles the duplicate).
+
+## Test notes (things that cost time)
+- tPlay and g18/audit.js need the --local build (local_dbg.html has __dbg/__g9ev); out/<ver>/index.html fails with "__dbg is not defined".
+  `tools/build.sh <ver>dbg --local` then serve the repo root on :8766 (setsid nohup python3 -m http.server 8766).
+- Ride audit: `node g18/audit.js http://127.0.0.1:8766/local_dbg.html <out> t_v6525_1,...` prints gap/dummy/errs per ride + stage png per ride.
+- Baseline for any tPlay fail: `git worktree add ../wt<ver> <live src commit>`, build --local there, serve on :8767, run the same tPlay.
+- One full phone tPlay (2 min/city) takes ~50-55 min here.
+- qa/ is in .git/info/exclude (test output); commit only docs/shots/<ver>/.
+
+## Status at stand-down (2026-10-13)
+- Reviewer PASS for v90i ce5cbb2b; READY sent to the coordinator: alex/od-models 50326558 out/v90i (changelog dates 13 Oct).
+- Reviewer follow-ups: (A) tPlay must exclude race-countdown frames from stuck% (v90i Athens 7.7 % = 3.5 pts countdown + 2 traffic stops);
+  (B) next REVIEW must report the measured height of the close-up purple minifig in Athens (GRID tile 23).

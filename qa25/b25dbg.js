@@ -1,0 +1,2 @@
+const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.argv[3]);const{ev,tap}=T;await tap('#gbMenuBtn',2500);await tap('#r2R [data-r2m="build"]',3000);
+ console.log(await ev(()=>__g9ev(`JSON.stringify({gbM:(GB.mesh.userData.gbM||[]).map(o=>[o.material===GB_MAT,o.material.type,!!(o.geometry.userData.bid),o.geometry.attributes.position.count]),gh:!!B25.gh,L:B25.L,cls:GB_list().map(b=>b.y+(GB_PC[b.t]?GB_PC[b.t].h:0)<=B25.L?1:b.y>B25.L?2:0).join('')})`)));await T.close()})();

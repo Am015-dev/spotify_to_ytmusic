@@ -1,0 +1,2 @@
+[["ath/v89b/final/spots/base/ath_0.1.png",174,1018212],["ath/v89b/final/spots/base/ath_0.3.png",142,813946],["ath/v89b/final/spots/base/ath_0.5.png",237,1440760],["ath/v89b/final/spots/base/ath_0.7.png",195,1030600],["ath/v89b/final/spots/base/ath_0.9.png",196,806182]]
+errors 0 

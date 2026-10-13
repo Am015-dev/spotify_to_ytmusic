@@ -1,0 +1,21 @@
+a_open 350 {"on":1,"t":0.7,"T":2.25,"n":32,"shown":11,"last":"rod|car|45"}
+a_open 800 {"on":1,"t":1.3,"T":2.25,"n":32,"shown":21,"last":"rod|car|45"}
+a_open 1400 {"on":1,"t":1.75,"T":2.25,"n":32,"shown":28,"last":"rod|car|45"}
+a_open 2100 {"on":1,"t":2.11,"T":2.25,"n":32,"shown":32,"last":"rod|car|45"}
+end {"on":0,"t":2.32,"T":2.25,"n":0,"shown":0,"last":"rod|car|45"}
+rides (same ride, no replay) {"on":0,"t":2.32,"T":2.25,"n":0,"shown":0,"last":"rod|car|45"}
+b_taxi 350 {"on":1,"t":0.75,"T":3,"n":32,"shown":9,"last":"t_taxi|car|123"}
+b_taxi 800 {"on":1,"t":1.36,"T":3,"n":32,"shown":16,"last":"t_taxi|car|123"}
+b_taxi 1400 {"on":1,"t":1.91,"T":3,"n":32,"shown":22,"last":"t_taxi|car|123"}
+b_taxi 2100 {"on":1,"t":2.39,"T":3,"n":32,"shown":27,"last":"t_taxi|car|123"}
+c_water 350 {"on":1,"t":0.57,"T":1.5,"n":12,"shown":6,"last":"t_taxi|boat|12"}
+c_water 800 {"on":1,"t":1.29,"T":1.5,"n":12,"shown":12,"last":"t_taxi|boat|12"}
+c_water 1400 {"on":0,"t":1.61,"T":1.5,"n":0,"shown":0,"last":"t_taxi|boat|12"}
+c_water 2100 {"on":0,"t":1.61,"T":1.5,"n":0,"shown":0,"last":"t_taxi|boat|12"}
+d_beast 350 {"on":1,"t":0.81,"T":2.0500000000000003,"n":32,"shown":15,"last":"t_beast|off|41"}
+d_beast 800 {"on":0,"t":2.12,"T":2.0500000000000003,"n":0,"shown":0,"last":"t_beast|off|41"}
+d_beast 1400 {"on":0,"t":2.12,"T":2.0500000000000003,"n":0,"shown":0,"last":"t_beast|off|41"}
+d_beast 2100 {"on":0,"t":2.12,"T":2.0500000000000003,"n":0,"shown":0,"last":"t_beast|off|41"}
+before skip {"on":1,"t":0.2,"T":3,"n":32,"shown":3,"last":"t_v7639_1|car|142"}
+after tap skip {"on":0,"t":0.22,"T":3,"n":0,"shown":0,"last":"t_v7639_1|car|142"}
+errs 0 []

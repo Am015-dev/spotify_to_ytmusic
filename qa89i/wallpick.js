@@ -1,0 +1,14 @@
+// Athens outskirts drive at speed (real keys: hold ArrowUp + light steering to stay on the road), shots every ~2 s; checks errors
+const fs=require('fs');const{chromium,boot}=require('../tools/d24lib');const URL=process.argv[2],OUT=process.argv[3]||'qa89h/drive';fs.mkdirSync(OUT,{recursive:true});
+
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const{p,errs,shot}=await boot(b,{city:'fra',url:URL,phone:true});
+ const ev=s=>p.evaluate(s=>__oc.ev(s),s);
+ await p.evaluate(()=>{__mho.warp(-1250,880,3.14,true)});for(let i=0;i<60;i++)await p.evaluate(()=>__tick(10));const at=await p.evaluate(()=>{const M=__mho,N=M.HUB.nodes;let best=-1,bd=1e9;for(let i=0;i<N.length;i++){const n=N[i];if(n.ab||!n.nb||!n.nb.length)continue;const d=Math.hypot(n.x+1250,n.z-880);if(d<bd){bd=d;best=i}}const n=N[best],m=N[n.nb[0]],h=Math.atan2(m.x-n.x,m.z-n.z);M.warp(n.x,n.z,h,true);return {x:n.x,z:n.z,h,bd}});console.log('at',JSON.stringify(at));for(let i=0;i<40;i++)await p.evaluate(()=>__tick(10));await shot(`${OUT}/wall0.jpg`);const r=await ev(`(()=>{camera.updateMatrixWorld(true);scene.updateMatrixWorld(true);
+  const W=426,H=196,rt=new THREE.WebGLRenderTarget(W,H),buf=new Uint8Array(4);const R=__dbg.renderer||renderer;
+  const px=(sx,sy)=>{R.setRenderTarget(rt);R.render(scene,camera);R.readRenderTargetPixels(rt,Math.round((sx+1)/2*W),Math.round((sy+1)/2*H),1,1,buf);R.setRenderTarget(null);return[buf[0],buf[1],buf[2]]};
+  const out=[];const rc=new THREE.Raycaster();
+  for(const[sx,sy]of [[-0.41,0.24],[-0.55,0.22],[-0.3,0.2]]){const c0=px(sx,sy);rc.setFromCamera(new THREE.Vector2(sx,sy),camera);const C=[];
+   scene.traverseVisible(o=>{if(!o.isMesh||!o.geometry)return;const g=o.geometry;if(!g.boundingSphere)return;const S=g.boundingSphere.clone().applyMatrix4(o.matrixWorld);if(rc.ray.intersectsSphere(S)&&S.center.distanceTo(camera.position)<S.radius+400)C.push(o)});
+   const hits=[];for(const o of C){o.visible=false;const c1=px(sx,sy);o.visible=true;const dd=Math.abs(c1[0]-c0[0])+Math.abs(c1[1]-c0[1])+Math.abs(c1[2]-c0[2]);if(dd>12){let path=[];for(let q=o;q&&path.length<4;q=q.parent)path.push((q.name||q.type)+'{'+Object.keys(q.userData||{}).slice(0,5).join(',')+'}');
+     const m=o.material;hits.push({dd,path:path.join('<'),vc:o.geometry.attributes.position?o.geometry.attributes.position.count:-1,arr:!!(o.geometry.attributes.position&&o.geometry.attributes.position.array),inst:o.isInstancedMesh?o.count:0,mat:m&&(m.type+':'+(m.map?'map':'nomap')+':'+(m.color?m.color.getHexString():'')+':'+(m.vertexColors?'vc':'')+':'+(m.name||'')),attrs:Object.keys(o.geometry.attributes).join(','),bs:+o.geometry.boundingSphere.radius.toFixed(0),ud:JSON.stringify(o.userData).slice(0,120)})}}
+   out.push({sx,sy,c0,nC:C.length,hits})}rt.dispose();return JSON.stringify(out)})()`);console.log(r);console.log('errs',JSON.stringify(errs));await b.close()})();

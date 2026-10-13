@@ -1,0 +1,14 @@
+equipped car t_rosso off t_rosso
+wait 0 menu|false
+shot 01_start
+fra top kmh 5 pos [ 2057, 0 ]
+shot 02_frankfurt_drive
+shot 03_side_traffic {"traffic":8.4}
+shot 04_side_tyres {"traffic":8.4}
+tyre_rest [0.03,0.03,0.03,0.03] traffic_rest [[0.03,0.03,0.03,0.03],[0.031,0.029,0.029,0.031],[0.03,0.03,0.03,0.03],[0.038,0.034,0.034,0.038],[0.03,0.03,0.03,0.03],[0.031,0.03,0.03,0.031]]
+athens at {"w":false,"x":-1200,"z":960,"h":3.14}
+shot 05_athens_start
+ath top kmh 76 pos [ -1200, 919 ]
+shot 06_athens_drive
+GAP player {"n":19,"max":0.03,"over05":0} traffic {"n":41,"max":0.038,"over05":0} veh ship
+ERR []

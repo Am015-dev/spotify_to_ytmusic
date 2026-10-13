@@ -1,0 +1,56 @@
+street car bricks 45
+boat t_speedboat BUILD btn 0 GUIDE btn 0
+in build {"id":"t_speedboat","f":"boat","n":31} bk 1
+shot boat_t_speedboat_1build
+target [433.7919072943593,154.7007299211704,[-1,4],2]
+held true 
+place 31 -> 32
+rotate+place 32 -> 32 held false
+shot boat_t_speedboat_3placed
+after exit {"st":null,"saved":["t_speedboat|boat"],"car":45,"cur":null} cur 32 pre 31
+gvis []
+guide {"on":1,"n":15,"B":32,"st":{"id":"t_speedboat","f":"boat","n":32}}
+shot boat_t_speedboat_4guide1
+shot boat_t_speedboat_5guide5
+shot boat_t_speedboat_6guideDone
+guide exit {"on":0,"st":null,"car":45}
+off t_beast BUILD btn 0 GUIDE btn 0
+in build {"id":"t_beast","f":"off","n":41} bk 1
+shot off_t_beast_1build
+target [443.3381996545967,134.46372482811853,[-2,4],6]
+held true 
+place 41 -> 43
+shot off_t_beast_2rotate
+rotate+place 43 -> 43 held true
+shot off_t_beast_3placed
+after exit {"st":null,"saved":["t_speedboat|boat","t_beast|off"],"car":45,"cur":null} cur 43 pre 41
+gvis []
+guide {"on":1,"n":16,"B":43,"st":{"id":"t_beast","f":"off","n":43}}
+shot off_t_beast_4guide1
+shot off_t_beast_5guide5
+shot off_t_beast_6guideDone
+guide exit {"on":0,"st":null,"car":45}
+boat t_pboat BUILD btn 1 GUIDE btn 1
+in build {"id":"t_pboat","f":"boat","n":58} bk 1
+shot boat_t_pboat_1build
+target [449.8263529904695,147.30184092561063,[-1,5],4]
+held true Something is already there
+place 58 -> 58
+shot boat_t_pboat_2rotate
+rotate+place 58 -> 60 held true
+shot boat_t_pboat_3placed
+after exit {"st":null,"saved":["t_speedboat|boat","t_beast|off","t_pboat|boat"],"car":45,"cur":null} cur 60 pre 58
+gvis []
+guide {"on":1,"n":22,"B":60,"st":{"id":"t_pboat","f":"boat","n":60}}
+shot boat_t_pboat_4guide1
+shot boat_t_pboat_5guide5
+shot boat_t_pboat_6guideDone
+guide exit {"on":0,"st":null,"car":45}
+BUILD tab on WATER {"id":"t_pboat","f":"boat","n":60}
+shot 7_buildtab_water
+more guide {"on":1,"n":22,"st":{"id":"t_pboat","f":"boat","n":60}}
+back {"bk":1,"st":{"id":"t_pboat","f":"boat","n":60}}
+street tab BUILD {"st":null,"n":45}
+after SAVE {"build":45,"saved":["t_speedboat|boat","t_beast|off","t_pboat|boat"],"boatEq":"t_pboat","offEq":"t_beast"} carN 45
+drive forms no pl
+errs 0 []

@@ -1,0 +1,74 @@
+{"calls":239,"tris":1470106} {"calls":223,"tris":1470090,"sh":16} casters 0
+--- by calls
+29 0 7276 Mesh<Group<Group |MeshStandardMaterial
+22 0 104980 Mesh{nr,athB}<Group<Scene |MeshStandardMaterial+map
+22 0 306802 Mesh{keep,wbLod}<Group<Scene |MeshStandardMaterial
+17 0 43196 Mesh<Group<Scene |MeshStandardMaterial
+15 0 364030 Mesh{trG,bwT}<Group<Scene |MeshStandardMaterial+map
+13 0 4552 Mesh{keep,wbM}<Group<Scene |MeshStandardMaterial+map
+10 0 9972 Mesh{nr,athB}<Group<Scene |MeshStandardMaterial
+10 0 20 Mesh<Group<Scene |MeshStandardMaterial+map
+10 0 34504 Mesh{trPl}<Group<Scene |MeshStandardMaterial
+9 0 50616 Mesh{keep,wbP}<Group<Scene |MeshStandardMaterial
+9 0 3683 Mesh{keep,wbM}<Group<Scene |MeshStandardMaterial
+6 0 3724 Mesh<Group<Group |MeshBasicMaterial
+4 0 4320 Mesh{gb,gbc,r}<Group{scN}<Group |MeshPhysicalMaterial
+4 0 4320 Mesh{a8s,art6c}<Mesh{gb,gbc,r}<Group{scN} |ShaderMaterial
+3 0 17860 Mesh{cv}<Group<Scene |MeshStandardMaterial
+3 0 20700 Mesh<Group<Scene |MeshBasicMaterial
+3 0 0 Points<Scene |PointsMaterial+map
+2 0 56960 Mesh<Scene |MeshStandardMaterial
+2 0 6720 Mesh<Scene |MeshBasicMaterial
+2 0 2 Mesh{pw}<Group<Scene |MeshStandardMaterial
+2 0 1660 Mesh{w13,a8,art6c}<Group<Scene |MeshStandardMaterial
+2 0 55052 Mesh<Group{keep,art}<Scene |MeshLambertMaterial
+2 0 3520 Mesh{a8s,keep}<Mesh{a8}<Group |ShaderMaterial
+2 0 18688 Mesh{a8s,art6c}<Mesh{gb,gbc,art6c}<Group{scN} |ShaderMaterial
+2 0 0 Points<Scene |ShaderMaterial
+1 0 2208 Mesh<Scene |ShaderMaterial
+1 0 288 Mesh{ridge}<Group<Group |MeshBasicMaterial
+1 0 72 Mesh{gb,gbc,art6c}<Group{scN}<Group |MeshBasicMaterial
+1 0 1 Mesh{pw}<Group<Scene |MeshStandardMaterial+map
+1 0 544 Mesh{trG}<Group<Scene |MeshStandardMaterial+map
+1 0 18616 Mesh{gb,gbc,art6c}<Group{scN}<Group |MeshPhysicalMaterial
+1 0 4324 Mesh{keep,wbP}<Group<Scene |MeshStandardMaterial+map
+1 0 10182 Mesh{cv}<Group<Scene |MeshStandardMaterial+map
+1 0 223056 Mesh{dr}<Group<Scene |MeshStandardMaterial
+1 0 20776 Mesh{keep,wbLo}<Group<Scene |MeshPhysicalMaterial
+1 0 48960 Mesh{cv}<Group<Scene |MeshBasicMaterial
+1 0 448 Mesh<OG<Group |MeshBasicMaterial
+1 0 26 WB_icons{keep}<Scene |MeshBasicMaterial+map
+1 0 0 LineSegments<Scene |LineBasicMaterial
+1 0 0 LineSegments<PerspectiveCamera<Scene |LineBasicMaterial
+--- by tris
+364030 15 Mesh{trG,bwT}<Group<Scene |MeshStandardMaterial+map
+306802 22 Mesh{keep,wbLod}<Group<Scene |MeshStandardMaterial
+223056 1 Mesh{dr}<Group<Scene |MeshStandardMaterial
+104980 22 Mesh{nr,athB}<Group<Scene |MeshStandardMaterial+map
+56960 2 Mesh<Scene |MeshStandardMaterial
+55052 2 Mesh<Group{keep,art}<Scene |MeshLambertMaterial
+50616 9 Mesh{keep,wbP}<Group<Scene |MeshStandardMaterial
+48960 1 Mesh{cv}<Group<Scene |MeshBasicMaterial
+43196 17 Mesh<Group<Scene |MeshStandardMaterial
+34504 10 Mesh{trPl}<Group<Scene |MeshStandardMaterial
+20776 1 Mesh{keep,wbLo}<Group<Scene |MeshPhysicalMaterial
+20700 3 Mesh<Group<Scene |MeshBasicMaterial
+18688 2 Mesh{a8s,art6c}<Mesh{gb,gbc,art6c}<Group{scN} |ShaderMaterial
+18616 1 Mesh{gb,gbc,art6c}<Group{scN}<Group |MeshPhysicalMaterial
+17860 3 Mesh{cv}<Group<Scene |MeshStandardMaterial
+10182 1 Mesh{cv}<Group<Scene |MeshStandardMaterial+map
+9972 10 Mesh{nr,athB}<Group<Scene |MeshStandardMaterial
+8976 1 Mesh{keep,oc}<Group<Scene |MeshBasicMaterial
+8392 1 Mesh{a8s,keep,art6c}<Mesh{w,g,sc}<Group |ShaderMaterial
+7276 29 Mesh<Group<Group |MeshStandardMaterial
+6720 2 Mesh<Scene |MeshBasicMaterial
+4552 13 Mesh{keep,wbM}<Group<Scene |MeshStandardMaterial+map
+4324 1 Mesh{keep,wbP}<Group<Scene |MeshStandardMaterial+map
+4320 4 Mesh{gb,gbc,r}<Group{scN}<Group |MeshPhysicalMaterial
+4320 4 Mesh{a8s,art6c}<Mesh{gb,gbc,r}<Group{scN} |ShaderMaterial
+3724 6 Mesh<Group<Group |MeshBasicMaterial
+3683 9 Mesh{keep,wbM}<Group<Scene |MeshStandardMaterial
+3520 2 Mesh{a8s,keep}<Mesh{a8}<Group |ShaderMaterial
+2208 1 Mesh<Scene |ShaderMaterial
+1660 2 Mesh{w13,a8,art6c}<Group<Scene |MeshStandardMaterial
+errors 0

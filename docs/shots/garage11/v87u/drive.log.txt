@@ -1,0 +1,20 @@
+equipped car t_rosso off t_beast
+wait 0 menu|false
+shot 01_start
+fra meter {"m":0,"bt":0}
+shot fra_boost
+fra top kmh 4 pos [ 1961, 2 ]
+shot 02_frankfurt_drive
+traffic car {"x":1927.92,"z":221.10000000000002,"h":3.141592653589793}
+shot 03_side_traffic
+shot 04_side_tyres
+tyre_rest [0.03,0.03,0.03,0.03] traffic_rest [[0.002,0.087,-0.014,0.072],[0.1,0.039,0.042,-0.02],[-0.017,0.05,0.029,0.098]]
+vsel offroad
+off meter {"m":0,"bt":0}
+shot off_boost
+off top kmh 20 pos [ 1926, 211 ]
+shot 07_offroad_drive
+shot 08_offroad_side {"traffic":4.5}
+off_rest [0.03,0.03,0.03,0.03]
+GAP player {"n":15,"max":0.031,"over05":0} traffic {"n":15,"max":0.1,"over05":15} veh ship
+ERR []

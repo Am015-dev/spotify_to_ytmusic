@@ -1,0 +1,5 @@
+fra route m 9066 pts 152 kmh 200
+fra POPIN {"frames":9720,"holeFrames":0,"holeMax":0,"hole1k":0,"lzHoleFrames":0,"lzHoleMax":0,"frMax":0,"fr16":0,"fr50":0,"shotsAt":[],"pc":[3273.4661651453926,-3367.267563403676],"onAt":721,"str":{"fr":{"n":2599,"max":16.4,"o8":2,"o16":1,"o50":0},"max":4.4,"b":73,"f":43,"sup":{"sup":284,"built":30,"mb":4.7,"lodT":91320}},"lz":{"max":11.2,"over":1,"big":[[10.1,"stadtwald",4,""]]}}
+shot ath/v89b/final/pop/new/fra_long900.png {"calls":232,"tris":1382857,"holes":0}
+shot ath/v89b/final/pop/new/fra_long1500.png {"calls":251,"tris":1343765,"holes":0}
+errors 0 

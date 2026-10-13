@@ -1,0 +1,243 @@
+[
+ {
+  "mode": "phone",
+  "city": "ath",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 62,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.76,
+      1.71,
+      1.71,
+      1.75,
+      1.77,
+      1.76
+     ],
+     "figH": 1.8,
+     "calls": 201,
+     "callsCar": 198
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚪 ENTER",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "walkshot",
+    {
+     "spd": 2.95,
+     "calls": 200
+    }
+   ],
+   [
+    "walk1",
+    {
+     "trav": 65,
+     "n": {
+      "exit": 1,
+      "enter": 0,
+      "swap": 0,
+      "stuckF": 75,
+      "walkF": 1104,
+      "camIn": 31
+     }
+    }
+   ],
+   [
+    "target",
+    {
+     "x": 2162.2864007281837,
+     "z": -1621.3847186586595,
+     "k": "cur",
+     "d": 40.120296915561084
+    }
+   ],
+   [
+    "doorGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "near",
+    {
+     "stkWhat": [
+      "",
+      "",
+      "",
+      ""
+     ],
+     "stk": [
+      [
+       2163,
+       -1623,
+       "car/prop"
+      ],
+      [
+       2164,
+       -1622,
+       "car/prop"
+      ],
+      [
+       2164,
+       -1622,
+       "car/prop"
+      ],
+      [
+       2164,
+       -1622,
+       "car/prop"
+      ],
+      [
+       2190,
+       -1602,
+       "bld"
+      ],
+      [
+       2190,
+       -1602,
+       "bld"
+      ],
+      [
+       2190,
+       -1602,
+       "bld"
+      ],
+      [
+       2189,
+       -1602,
+       "bld"
+      ]
+     ],
+     "near": {
+      "k": "cur",
+      "x": 2162.3,
+      "z": -1621.4
+     },
+     "btn": "enter",
+     "trav": 39.8,
+     "n": {
+      "exit": 1,
+      "enter": 0,
+      "swap": 0,
+      "stuckF": 77,
+      "walkF": 1692,
+      "camIn": 223
+     }
+    }
+   ],
+   [
+    "reenter",
+    {
+     "gap": 0.023,
+     "calls": 182,
+     "callsCar": 198,
+     "callsFoot": 201,
+     "own": true,
+     "parked": 0
+    }
+   ],
+   [
+    "drive2",
+    {
+     "m": 100,
+     "gap": 0.023,
+     "calls": 159
+    }
+   ]
+  ],
+  "metrics": {
+   "walked": 104.83828252857943,
+   "stuckPct": 4.6,
+   "camPct": 13.2,
+   "fig": 1.8,
+   "peds": [
+    1.76,
+    1.71,
+    1.71,
+    1.75,
+    1.77,
+    1.76
+   ],
+   "gap": 0.023,
+   "calls": {
+    "car": 198,
+    "foot": 201,
+    "walk": 200,
+    "reent": 182,
+    "drive2": 159
+   },
+   "target": "cur",
+   "errs": []
+  }
+ }
+]

@@ -1,0 +1,11 @@
+parts tile,grl,t11,t13,t14,t16,t22,t24,t44
+tile sel tile held true placed +2
+grl sel grl held true placed +2
+t11 sel t11 held true placed +2
+t13 sel t13 held true placed +2
+t14 sel t14 held true placed +2
+t16 sel t16 held true placed +2
+t22 sel t22 held true placed +2
+t24 sel t24 held true placed +2
+t44 sel t44 held true placed +2
+FAIL [] ERR []

@@ -1,0 +1,6 @@
+0 {"tip":{"l":226,"t":80,"r":626,"b":165,"txt":"Oma HildeHold GAS and follow my orange truck. Hold","fs":"14px"},"pin":null,"ov":0,"cards":[["#npcSay",{"l":226,"t":80,"r":626,"b":165,"txt":"Oma HildeHold GAS and follow my orange truck. Hold","fs":"14px"}]]}
+300 {"tip":{"l":226,"t":80,"r":626,"b":160,"txt":"Oma HildeHold BOOST (SHIFT) on the straight. Smash","fs":"14px"},"pin":null,"ov":0,"cards":[["#npcSay",{"l":226,"t":80,"r":626,"b":160,"txt":"Oma HildeHold BOOST (SHIFT) on the straight. Smash","fs":"14px"}]]}
+after {"tip":null,"pin":{"l":256,"t":81,"r":596,"b":137,"txt":"1/13▴ 0✓RACE → Riverbank Rally (or Coast Rally in ","fs":"12px"},"ov":0,"cards":[["#odPin",{"l":256,"t":81,"r":596,"b":137,"txt":"1/13▴ 0✓RACE → Riverbank Rally (or Coast Rally in ","fs":"12px"}]]}
+drive {"pin":[256,81,596,137],"yieldCls":false,"pause":null,"cards":["PAUSED:null","▶ RESUME:null","↺ Restart:null","✕ Abandon:null","🗺️ MAP:null","📖 LOGBOOK:null"]}
+pause {"pin":null,"yieldCls":true,"pause":[0,0,852,393],"cards":["PAUSED:[234,83,307,104]","▶ RESUME:[226,118,625,153]","↺ Restart:[226,159,355,195]","✕ Abandon:[361,159,490,195]","🗺️ MAP:[496,159,625,195]","📖 LOGBOOK:[226,201,355,233]"]}
+errs []

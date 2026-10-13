@@ -1,0 +1,518 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "ath": {
+    "min": 5,
+    "hits": 47,
+    "kinds": {
+     "traffic": 28,
+     "wall": 12,
+     "ped": 3,
+     "other": 4
+    },
+    "wallHits": 12,
+    "wallPerMin": 2.4,
+    "hitsPerMin": 9.4,
+    "bigDrop": 36,
+    "stuckPct": 12.9,
+    "avgKmh": 28.5,
+    "loads": 1,
+    "loadsPerMin": 0.2,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 6.6,
+    "traffic120m": 7.1,
+    "missions": [],
+    "worst": [
+     {
+      "ctx": "💥 SMASH STREAK",
+      "f": 9809,
+      "v0": 52,
+      "v1": 5,
+      "drop": 0.91,
+      "kind": "traffic",
+      "x": 2051,
+      "z": -1639,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 2173,
+      "v0": 35,
+      "v1": 4,
+      "drop": 0.9,
+      "kind": "traffic",
+      "x": 2020,
+      "z": -1647,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 3678,
+      "v0": 46,
+      "v1": 5,
+      "drop": 0.89,
+      "kind": "traffic",
+      "x": 2051,
+      "z": -1640,
+      "dy": 0
+     },
+     {
+      "ctx": "🏺 RED-FIGURE AMPHORA",
+      "f": 4951,
+      "v0": 34,
+      "v1": 4,
+      "drop": 0.89,
+      "kind": "traffic",
+      "x": 1918,
+      "z": -1664,
+      "dy": 0
+     },
+     {
+      "ctx": "💥 SMASH STREAK",
+      "f": 8766,
+      "v0": 56,
+      "v1": 6,
+      "drop": 0.89,
+      "kind": "traffic",
+      "x": 2045,
+      "z": -1640,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "reloads": 1,
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.76,
+     "carL": 4.63,
+     "carH": 1.56,
+     "player": {
+      "h": 1.89,
+      "l": 4.7,
+      "w": 2.42
+     },
+     "pedRel": 0.95,
+     "pedVsPlayer": 0.94,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 450,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1075,
+     "blocked": 17,
+     "pct": 1.58,
+     "colliders": 3,
+     "sample": [
+      {
+       "x": 4553,
+       "z": -3541,
+       "bx": 4577.5,
+       "bz": -3492.7,
+       "hw": 55,
+       "hd": 7,
+       "h": 35.397438366848704,
+       "keys": "ry",
+       "t": null
+      },
+      {
+       "x": 4589,
+       "z": -3533,
+       "bx": 4599.3,
+       "bz": -3531.7,
+       "hw": 20,
+       "hd": 4.5,
+       "h": 29.89705253329597,
+       "keys": "ry",
+       "t": null
+      },
+      {
+       "x": 4593,
+       "z": -3541,
+       "bx": 4599.3,
+       "bz": -3531.7,
+       "hw": 2.5,
+       "hd": 23,
+       "h": 32.49705253329597,
+       "keys": "ry",
+       "t": null
+      }
+     ]
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamPlate×#tuG"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@3696",
+     "next@6276",
+     "next@9444",
+     "next@10164",
+     "next@10770",
+     "next@13500",
+     "next@14184",
+     "RELOAD@14268"
+    ],
+    "perf": {
+     "calls": 60,
+     "tris": 294265,
+     "jsMs": 0,
+     "geoms": 3972,
+     "tex": 117
+    },
+    "mem": [
+     {
+      "f": 0,
+      "totMB": 390.5,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4571,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 143
+     },
+     {
+      "f": 600,
+      "totMB": 393.8,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 145
+     },
+     {
+      "f": 1200,
+      "totMB": 393.5,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 145.8
+     },
+     {
+      "f": 1800,
+      "totMB": 394.8,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 147.2
+     },
+     {
+      "f": 2400,
+      "totMB": 394.9,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 147.3
+     },
+     {
+      "f": 3000,
+      "totMB": 395.1,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 147.5
+     },
+     {
+      "f": 3600,
+      "totMB": 395.4,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 147.5
+     },
+     {
+      "f": 4200,
+      "totMB": 395.6,
+      "geoms": 4018,
+      "tex": 121,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 147.7
+     },
+     {
+      "f": 4800,
+      "totMB": 395.8,
+      "geoms": 4030,
+      "tex": 123,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 148.1
+     },
+     {
+      "f": 5400,
+      "totMB": 396.1,
+      "geoms": 4030,
+      "tex": 123,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 148.2
+     },
+     {
+      "f": 6000,
+      "totMB": 395.9,
+      "geoms": 4030,
+      "tex": 123,
+      "sceneGeo": 4572,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 148.3
+     },
+     {
+      "f": 6600,
+      "totMB": 395.7,
+      "geoms": 4030,
+      "tex": 123,
+      "sceneGeo": 4573,
+      "geoMB": 284.6,
+      "cpuGeoMB": 40.4,
+      "heap": 148
+     },
+     {
+      "f": 7200,
+      "totMB": 396.3,
+      "geoms": 4064,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 148.4
+     },
+     {
+      "f": 7800,
+      "totMB": 394.7,
+      "geoms": 4064,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 148.6
+     },
+     {
+      "f": 8400,
+      "totMB": 394.7,
+      "geoms": 4064,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 148.7
+     },
+     {
+      "f": 9000,
+      "totMB": 394.9,
+      "geoms": 4064,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 148.8
+     },
+     {
+      "f": 9600,
+      "totMB": 395,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 148.9
+     },
+     {
+      "f": 10200,
+      "totMB": 395.3,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.1
+     },
+     {
+      "f": 10800,
+      "totMB": 395.4,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.1
+     },
+     {
+      "f": 11400,
+      "totMB": 395.7,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.2
+     },
+     {
+      "f": 12000,
+      "totMB": 395.5,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.2
+     },
+     {
+      "f": 12600,
+      "totMB": 395.5,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.3
+     },
+     {
+      "f": 13200,
+      "totMB": 395.5,
+      "geoms": 4071,
+      "tex": 127,
+      "sceneGeo": 4573,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.4
+     },
+     {
+      "f": 13800,
+      "totMB": 395.8,
+      "geoms": 4086,
+      "tex": 129,
+      "sceneGeo": 4576,
+      "geoMB": 286.5,
+      "cpuGeoMB": 38.5,
+      "heap": 149.4
+     },
+     {
+      "f": 14400,
+      "totMB": 640.6,
+      "geoms": 3947,
+      "tex": 115,
+      "sceneGeo": 4403,
+      "geoMB": 116.8,
+      "cpuGeoMB": 47,
+      "heap": 201.3
+     },
+     {
+      "f": 15000,
+      "totMB": 642.2,
+      "geoms": 3947,
+      "tex": 115,
+      "sceneGeo": 4406,
+      "geoMB": 116.9,
+      "cpuGeoMB": 47,
+      "heap": 202.2
+     },
+     {
+      "f": 15600,
+      "totMB": 643.2,
+      "geoms": 3947,
+      "tex": 115,
+      "sceneGeo": 4406,
+      "geoMB": 116.9,
+      "cpuGeoMB": 47,
+      "heap": 202.8
+     },
+     {
+      "f": 16200,
+      "totMB": 642.5,
+      "geoms": 3947,
+      "tex": 115,
+      "sceneGeo": 4406,
+      "geoMB": 116.9,
+      "cpuGeoMB": 47,
+      "heap": 202.9
+     },
+     {
+      "f": 16800,
+      "totMB": 642.3,
+      "geoms": 3947,
+      "tex": 115,
+      "sceneGeo": 4406,
+      "geoMB": 116.9,
+      "cpuGeoMB": 47,
+      "heap": 202.9
+     },
+     {
+      "f": 17400,
+      "totMB": 642.7,
+      "geoms": 3947,
+      "tex": 115,
+      "sceneGeo": 4406,
+      "geoMB": 116.9,
+      "cpuGeoMB": 47,
+      "heap": 203
+     }
+    ],
+    "wallSec": 507
+   }
+  },
+  "errs": [],
+  "warns": [
+   "WB_up TypeError: Cannot read properties of null (reading '0')\n    at BufferAttribute.getX (http://127.0.0.1:8766/node_modules/three/build/three.module.js:10012:21)\n    at Vector3.fromBufferAttribute ("
+  ]
+ }
+]

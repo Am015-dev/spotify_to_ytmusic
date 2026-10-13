@@ -1,0 +1,157 @@
+{
+ "LOG": [
+  {
+   "name": "roam_noboost",
+   "fx": {
+    "state": "roam",
+    "v": 17.3,
+    "bm": 92.8,
+    "nitro": false,
+    "bash": false,
+    "sparks": 0,
+    "sparkFar": 0,
+    "sparkBig": 0,
+    "turb": null,
+    "fov": 72.6,
+    "uBoost": 0,
+    "sl": 0,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "roam_boost_015",
+   "fx": {
+    "state": "roam",
+    "v": 18.9,
+    "bm": 89.1,
+    "nitro": true,
+    "bash": false,
+    "sparks": 38,
+    "sparkFar": 3.5,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 1.99,
+      "sc": 0.51,
+      "len": 0.71
+     },
+     {
+      "d": 1.99,
+      "sc": 0.51,
+      "len": 0.73
+     }
+    ],
+    "fov": 79.4,
+    "uBoost": 0.07,
+    "sl": 0,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "roam_boost_05",
+   "fx": {
+    "state": "roam",
+    "v": 23.7,
+    "bm": 81.1,
+    "nitro": true,
+    "bash": false,
+    "sparks": 2,
+    "sparkFar": 2.7,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2,
+      "sc": 0.56,
+      "len": 0.69
+     },
+     {
+      "d": 2,
+      "sc": 0.56,
+      "len": 0.73
+     }
+    ],
+    "fov": 86.8,
+    "uBoost": 0.13,
+    "sl": 0,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "roam_boost_12",
+   "fx": {
+    "state": "roam",
+    "v": 31.9,
+    "bm": 64.9,
+    "nitro": true,
+    "bash": false,
+    "sparks": 6,
+    "sparkFar": 4.6,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2,
+      "sc": 0.56,
+      "len": 0.68
+     },
+     {
+      "d": 2,
+      "sc": 0.56,
+      "len": 0.73
+     }
+    ],
+    "fov": 94.4,
+    "uBoost": 0.15,
+    "sl": 0,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "roam_boost_26",
+   "fx": {
+    "state": "roam",
+    "v": 44.5,
+    "bm": 39.2,
+    "nitro": true,
+    "bash": true,
+    "sparks": 6,
+    "sparkFar": 5.4,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2,
+      "sc": 0.56,
+      "len": 0.92
+     },
+     {
+      "d": 2,
+      "sc": 0.56,
+      "len": 1
+     }
+    ],
+    "fov": 102.3,
+    "uBoost": 0.15,
+    "sl": 0,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "roam_after",
+   "fx": {
+    "state": "roam",
+    "v": 33.4,
+    "bm": 41.3,
+    "nitro": false,
+    "bash": false,
+    "sparks": 0,
+    "sparkFar": 0,
+    "sparkBig": 0,
+    "turb": null,
+    "fov": 85.5,
+    "uBoost": 0,
+    "sl": 0,
+    "b2kErr": null
+   }
+  }
+ ],
+ "errs": []
+}

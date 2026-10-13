@@ -1,0 +1,1 @@
+{"city":"ath","seen":30,"seenByType":{"taxi":14,"#scoot":3,"sedan":5,"su:t_su_sky":1,"su:t_su":1,"van":3,"su:t_sc_hy":1,"su:t_sc_tm":1,"delivery":1},"cityMix":{"taxi":30,"#scoot":8,"van":6,"sedan":12,"#troll":5,"su:t_su_sky":3,"su:t_sc_tm":5,"delivery":3,"su:t_sc_hy":3,"su:t_su":2},"trafKmh":{"avg":67,"min":43,"max":83},"avgKmh":36,"errs":[]}

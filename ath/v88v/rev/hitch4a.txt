@@ -1,0 +1,2 @@
+ath HITCH {"build":{"ms":187667,"slices":205,"slMax":28,"sl50":0,"sl100":0,"big":[[9618,"inst 4648x30"],[9127,"inst 2648x30"],[8867,"inst 765x30"],[8826,"inst 4276x30"],[8700,"inst 1340x30"],[107,"inst 4060x30"]],"pixN":12,"pixMs":237,"pixMax":204,"tPix":240,"tPrep":565,"cells":1088,"err":null},"framesDuringBuild":{"n":207,"worst":12767,"p50":24,"over50":25,"over100":23},"framesAfter":{"n":39,"worst":7527,"p50":16,"over50":3,"over100":3},"first10After":[46,18,16,16,12,13,18,18,12,7527]}
+errors 0 

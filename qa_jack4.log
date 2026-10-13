@@ -1,0 +1,286 @@
+phone_fra drive1 {"m":61,"v":0,"btn":"exit","canExit":true}
+phone_fra exitGap {"n":14,"g":20}
+PASS phone_fra EXIT ≥8 px from BOOST and GAS · {"n":14,"g":20}
+phone_fra layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:🚪 EXIT","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tN:10px"]}
+PASS phone_fra EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":true,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS phone_fra EXIT → on foot · {"state":"walk"}
+phone_fra scale {"fig":1.8,"peds":[1.74,1.74,1.72,1.75,1.77,1.77],"figH":1.8,"calls":187,"callsCar":184}
+PASS phone_fra minifig 1.75–1.85 m · 1.8
+PASS phone_fra peds near 1.8–2.0 m · [1.74,1.74,1.72,1.75,1.77,1.77]
+phone_fra zone {"z":[0,70.734375,340.796875,322.265625],"ring":[60,233,146],"hit":"ofZone","hh":"<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di","par":"touch<BODY<HTML","t":393}
+phone_fra layout_foot {"ctl":["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"],"n":5,"ov":[],"tiny":[]}
+PASS phone_fra ≤5 controls on foot · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"]
+PASS phone_fra no HUD over controls · []
+PASS phone_fra text ≥12 px · []
+phone_fra phone_fra_j1_target {"x":1994.4300198652513,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":2,"d":7.669017967627786,"ah":4.864675131620288,"j":3,"k":3}
+PASS phone_fra_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":1995.7,"z":7.9},"frames":36}
+PASS phone_fra_j1 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚗 TAKE","tN:JUMP","tP:❚❚"]
+PASS phone_fra_j1 TAKE ≥12 px from JUMP and RUN · {"n":14,"g":20}
+PASS phone_fra_j1 button reads TAKE · "🚗 TAKE"
+phone_fra phone_fra_j1_pull {"state":"jack","jack":{"t":0.8,"ph":"pull"},"flee":{"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.37,"d":0,"dc":1.5,"dp":0.9},"calls":189}
+PASS phone_fra_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.37,"d":0,"dc":1.5,"dp":0.9}
+PASS phone_fra_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@1999,0","jack@1996,8","★+1:jack","enter:traf@1996,8"]}
+PASS phone_fra_j1 +1 ★ · {"stars":1,"before":0}
+phone_fra phone_fra_j1_flee {"flee":{"h":1.837,"hs":1.8,"s":1,"ph":"run","t":1.63,"d":2.4,"dc":4.6,"dp":4.7},"calls":189}
+PASS phone_fra_j1 driver ran off ≥3 m from the car · {"h":1.837,"hs":1.8,"s":1,"ph":"run","t":1.63,"d":2.4,"dc":4.6,"dp":4.7}
+PASS phone_fra_j1 jack ≤20 s after EXIT · {"walkS":0.6}
+PASS phone_fra_j1 drove 100 m in the stolen car · 100
+PASS phone_fra_j1 tyre gap ≤0.05 m · 0.024
+PASS phone_fra_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+phone_fra phone_fra_j1_drive {"m":100,"gap":0.024,"lowN":"inst:2304","calls":186,"callsCar0":184,"wall":[null,null]}
+PASS phone_fra_j2 EXIT again · {"state":"walk","btn":"enter"}
+phone_fra phone_fra_j2_target {"x":2141.239826518981,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":2,"d":6.0529007020386745,"ah":3.6961580158863394,"j":7,"k":7}
+PASS phone_fra_j2 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2147.2,"z":7.9},"frames":192}
+PASS phone_fra_j2 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚗 TAKE","tN:JUMP","tP:❚❚"]
+PASS phone_fra_j2 TAKE ≥12 px from JUMP and RUN · {"n":14,"g":20}
+PASS phone_fra_j2 button reads TAKE · "🚗 TAKE"
+phone_fra phone_fra_j2_pull {"state":"jack","jack":{"t":0.8,"ph":"pull"},"flee":{"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.37,"d":0,"dc":1.5,"dp":0.9},"calls":195}
+PASS phone_fra_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.37,"d":0,"dc":1.5,"dp":0.9}
+PASS phone_fra_j2 jacked → driving the traffic car · {"state":"car","own":false,"taken":2,"log":["exit@1999,0","jack@1996,8","★+1:jack","enter:traf@1996,8","exit@2145,5","jack@2147,8","★+1:jack","enter:traf@2147,8"]}
+PASS phone_fra_j2 +1 ★ · {"stars":2,"before":1}
+phone_fra phone_fra_j2_flee {"flee":{"h":1.837,"hs":1.8,"s":1,"ph":"run","t":1.63,"d":2.4,"dc":4.6,"dp":4.7},"calls":203}
+PASS phone_fra_j2 driver ran off ≥3 m from the car · {"h":1.837,"hs":1.8,"s":1,"ph":"run","t":1.63,"d":2.4,"dc":4.6,"dp":4.7}
+PASS phone_fra_j2 jack ≤20 s after EXIT · {"walkS":3.2}
+PASS phone_fra_j2 drove 100 m in the stolen car · 100
+PASS phone_fra_j2 tyre gap ≤0.05 m · 0.028
+PASS phone_fra_j2 ★ chip visible · {"t":"★2","vis":true,"fs":"14px"}
+phone_fra phone_fra_j2_drive {"m":100,"gap":0.028,"lowN":"inst:2304","calls":149,"callsCar0":184,"wall":[null,null]}
+PASS phone_fra 0 console errors · []
+phone_ath drive1 {"m":63,"v":-16.403643542094215,"btn":"brake","canExit":false}
+phone_ath exitGap null
+FAIL phone_ath EXIT ≥8 px from BOOST and GAS · null
+phone_ath layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:BRAKE","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tB:10px","tN:10px"]}
+FAIL phone_ath EXIT offered when stopped · {"btn":"brake","idle":0,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":false,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":-16.335551851652756}"}
+FAIL phone_ath EXIT → on foot · {"state":"car"}
+phone_ath scale {"fig":null,"peds":[],"figH":0,"calls":192,"callsCar":190}
+FAIL phone_ath minifig 1.75–1.85 m · null
+PASS phone_ath peds near 1.8–2.0 m · []
+phone_ath zone {"z":[0,0,0,0],"ring":[0,0,0],"hit":"c","hh":"<canvas id=\"c\" data-engine=\"three.js r164\" width=\"424\" height=\"196\"></canvas>","par":"BODY<HTML","t":393}
+phone_ath layout_foot {"ctl":["tL:◀","tR:▶","tG:GAS","tB:BRAKE","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tB:10px","tN:10px"]}
+FAIL phone_ath ≤5 controls on foot · ["tL:◀","tR:▶","tG:GAS","tB:BRAKE","tN:BOOST","tP:❚❚"]
+PASS phone_ath no HUD over controls · []
+FAIL phone_ath text ≥12 px · ["tB:10px","tN:10px"]
+phone_ath phone_ath_j1_target null
+FAIL phone_ath_j1 🚗 TAKE offered at a traffic car · {"btn":"brake","near":null,"frames":360}
+FAIL phone_ath_j1 ≤5 controls, no HUD over them (TAKE) · ["tL:◀","tR:▶","tG:GAS","tB:BRAKE","tN:BOOST","tP:❚❚"]
+FAIL phone_ath_j1 TAKE ≥12 px from JUMP and RUN · null
+FAIL phone_ath_j1 button reads TAKE · "BRAKE"
+phone_ath phone_ath_j1_pull {"state":"car","jack":null,"flee":null,"calls":185}
+FAIL phone_ath_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · null
+FAIL phone_ath_j1 jacked → driving the traffic car · {"state":"car","own":true,"taken":0,"log":[]}
+FAIL phone_ath_j1 +1 ★ · {"stars":0,"before":0}
+phone_ath phone_ath_j1_flee {"flee":null,"calls":176}
+FAIL phone_ath_j1 driver ran off ≥3 m from the car · null
+PASS phone_ath_j1 jack ≤20 s after EXIT · {"walkS":6}
+PASS phone_ath_j1 drove 100 m in the stolen car · 101
+PASS phone_ath_j1 tyre gap ≤0.05 m · 0.023
+FAIL phone_ath_j1 ★ chip visible · null
+phone_ath phone_ath_j1_drive {"m":101,"gap":0.023,"lowN":"mesh:3240","calls":185,"callsCar0":190,"wall":[null,null]}
+FAIL phone_ath_j2 EXIT again · {"state":"car","btn":"brake"}
+phone_ath phone_ath_j2_target null
+FAIL phone_ath_j2 🚗 TAKE offered at a traffic car · {"btn":"brake","near":null,"frames":360}
+FAIL phone_ath_j2 ≤5 controls, no HUD over them (TAKE) · ["tL:◀","tR:▶","tG:GAS","tB:BRAKE","tN:BOOST","tP:❚❚"]
+FAIL phone_ath_j2 TAKE ≥12 px from JUMP and RUN · null
+FAIL phone_ath_j2 button reads TAKE · "BRAKE"
+phone_ath phone_ath_j2_pull {"state":"car","jack":null,"flee":null,"calls":195}
+FAIL phone_ath_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · null
+FAIL phone_ath_j2 jacked → driving the traffic car · {"state":"car","own":true,"taken":0,"log":[]}
+FAIL phone_ath_j2 +1 ★ · {"stars":0,"before":0}
+phone_ath phone_ath_j2_flee {"flee":null,"calls":188}
+FAIL phone_ath_j2 driver ran off ≥3 m from the car · null
+PASS phone_ath_j2 jack ≤20 s after EXIT · {"walkS":6}
+PASS phone_ath_j2 drove 100 m in the stolen car · 102
+PASS phone_ath_j2 tyre gap ≤0.05 m · 0.023
+FAIL phone_ath_j2 ★ chip visible · null
+phone_ath phone_ath_j2_drive {"m":102,"gap":0.023,"lowN":"mesh:3240","calls":189,"callsCar0":190,"wall":[null,null]}
+phone_ath ath_parked {"b":{"x":1865.9319313749297,"z":-1676.130092794584,"y":45.96558768586394,"h":-1.744045554128802,"d":77.97964007752856,"W":8.5},"n":5,"athPk":21,"nE":7,"ws":[[8.5,8.5,true,27,18],[8.5,8.5,true,27,18],[8.5,8.5,true,27,8],[8.5,8.5,true,27,8],[8.5,8.5,true,27,8],[8.5,8.5,true,27,8],[8.5,8.5,true,27,18]
+PASS phone_ath Athens has kerb-parked cars · {"b":{"x":1865.9319313749297,"z":-1676.130092794584,"y":45.96558768586394,"h":-1.744045554128802,"d":77.97964007752856,"W":8.5},"n":5,"athPk":21,"nE":7,"ws":[[8.5,8.5,true,27,18],[8.5,8.5,true,27,18],[8.5,8.5,true,27,8],[8.5,8.5,true,27,8],[8.5,8.5,true,27,8],[8.5,8.5,true,27,8],[8.5,8.5,true,27,18]],"cands":17,"want":1,"park":21}
+PASS phone_ath 0 console errors · []
+desk_fra drive1 {"m":61,"v":0,"btn":"exit","canExit":true}
+desk_fra layout_car {"ctl":[],"n":0,"ov":[],"tiny":["SMALL:11px:KM/H"]}
+PASS desk_fra EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":true,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS desk_fra EXIT → on foot · {"state":"walk"}
+desk_fra scale {"fig":1.8,"peds":[1.76,1.77,1.76,1.74,1.77,1.73],"figH":1.8,"calls":171,"callsCar":168}
+PASS desk_fra minifig 1.75–1.85 m · 1.8
+PASS desk_fra peds near 1.8–2.0 m · [1.76,1.77,1.76,1.74,1.77,1.73]
+desk_fra zone {"z":[0,0,0,0],"ring":[0,0,0],"hit":"c","hh":"<canvas id=\"c\" data-engine=\"three.js r164\" width=\"313\" height=\"196\"></canvas>","par":"BODY<HTML","t":0}
+desk_fra layout_foot {"ctl":[],"n":0,"ov":[],"tiny":[]}
+PASS desk_fra ≤5 controls on foot · []
+PASS desk_fra no HUD over controls · []
+PASS desk_fra text ≥12 px · []
+desk_fra desk_fra_j1_target {"x":1993.4868443861171,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":1.2,"d":7.972430993027704,"ah":5.415817968913643,"j":9,"k":0}
+PASS desk_fra_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2003.2,"z":7.9},"frames":36}
+PASS desk_fra_j1 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_fra_j1 button reads TAKE · "🚗 TAKE"
+desk_fra desk_fra_j1_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":167}
+PASS desk_fra_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_fra_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@1999,0","jack@1995,8","★+1:jack","enter:traf@1995,8"]}
+PASS desk_fra_j1 +1 ★ · {"stars":1,"before":0}
+desk_fra desk_fra_j1_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4,"dp":4.2},"calls":174}
+PASS desk_fra_j1 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4,"dp":4.2}
+PASS desk_fra_j1 jack ≤20 s after EXIT · {"walkS":0.6}
+PASS desk_fra_j1 drove 100 m in the stolen car · 100
+PASS desk_fra_j1 tyre gap ≤0.05 m · 0.024
+PASS desk_fra_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+desk_fra desk_fra_j1_drive {"m":100,"gap":0.024,"lowN":"inst:2304","calls":190,"callsCar0":168,"wall":[null,null]}
+PASS desk_fra_j2 EXIT again · {"state":"walk","btn":"enter"}
+desk_fra desk_fra_j2_target {"x":2144.9688109007675,"z":-7.92,"h":-1.5707963267948966,"fx":-1,"fz":6.123233995736766e-17,"cv":10.1,"d":11.88497391917602,"ah":4.908746513029656,"j":0,"k":8}
+desk_fra desk_fra_j2_retarget {"x":2078.9925299715865,"z":-7.92,"h":-1.5707963267948966,"fx":-1,"fz":6.123233995736766e-17,"cv":5.5,"d":14.26812101625258,"ah":11.696789737022755,"j":20,"k":0}
+PASS desk_fra_j2 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2073.5,"z":-7.9},"frames":1062}
+PASS desk_fra_j2 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_fra_j2 button reads TAKE · "🚗 TAKE"
+desk_fra desk_fra_j2_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":166}
+PASS desk_fra_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_fra_j2 jacked → driving the traffic car · {"state":"car","own":false,"taken":2,"log":["exit@1999,0","jack@1995,8","★+1:jack","enter:traf@1995,8","exit@2140,5","jack@2073,-8","★+1:jack","enter:traf@2073,-8"]}
+PASS desk_fra_j2 +1 ★ · {"stars":2,"before":1}
+desk_fra desk_fra_j2_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4,"dp":4.2},"calls":183}
+PASS desk_fra_j2 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4,"dp":4.2}
+PASS desk_fra_j2 jack ≤20 s after EXIT · {"walkS":17.7}
+PASS desk_fra_j2 drove 100 m in the stolen car · 102
+PASS desk_fra_j2 tyre gap ≤0.05 m · 0.041
+PASS desk_fra_j2 ★ chip visible · {"t":"★2","vis":true,"fs":"14px"}
+desk_fra desk_fra_j2_drive {"m":102,"gap":0.041,"lowN":"inst:2304","calls":166,"callsCar0":168,"wall":[null,null]}
+PASS desk_fra 0 console errors · []
+desk_ath drive1 {"m":62,"v":0,"btn":"exit","canExit":true}
+desk_ath layout_car {"ctl":[],"n":0,"ov":[],"tiny":["SMALL:11px:KM/H"]}
+PASS desk_ath EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":false,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS desk_ath EXIT → on foot · {"state":"walk"}
+desk_ath scale {"fig":1.8,"peds":[1.77,1.77,1.77,1.77,1.75,1.76],"figH":1.8,"calls":189,"callsCar":185}
+PASS desk_ath minifig 1.75–1.85 m · 1.8
+PASS desk_ath peds near 1.8–2.0 m · [1.77,1.77,1.77,1.77,1.75,1.76]
+desk_ath zone {"z":[0,0,0,0],"ring":[0,0,0],"hit":"c","hh":"<canvas id=\"c\" data-engine=\"three.js r164\" width=\"313\" height=\"196\"></canvas>","par":"BODY<HTML","t":0}
+desk_ath layout_foot {"ctl":[],"n":0,"ov":[],"tiny":[]}
+PASS desk_ath ≤5 controls on foot · []
+PASS desk_ath no HUD over controls · []
+PASS desk_ath text ≥12 px · []
+desk_ath desk_ath_j1_target {"x":2174.9392599366083,"z":-1620.2067827132496,"h":-1.7619807863919112,"fx":-0.9817798505902814,"fz":-0.1900219065658611,"cv":0.1,"d":12.657182069817008,"ah":12.647217096601427,"j":1,"k":8}
+PASS desk_ath_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2172.9,"z":-1620.6},"frames":78}
+PASS desk_ath_j1 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_ath_j1 button reads TAKE · "🚗 TAKE"
+desk_ath desk_ath_j1_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":182}
+PASS desk_ath_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_ath_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@2162,-1621","jack@2173,-1621","★+1:jack","enter:traf@2173,-1621"]}
+PASS desk_ath_j1 +1 ★ · {"stars":1,"before":0}
+desk_ath desk_ath_j1_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.8,"dc":4,"dp":4.2},"calls":199}
+PASS desk_ath_j1 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.8,"dc":4,"dp":4.2}
+PASS desk_ath_j1 jack ≤20 s after EXIT · {"walkS":1.3}
+PASS desk_ath_j1 drove 100 m in the stolen car · 101
+PASS desk_ath_j1 tyre gap ≤0.05 m · 0.047
+PASS desk_ath_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+desk_ath desk_ath_j1_drive {"m":101,"gap":0.047,"lowN":"inst:2304","calls":190,"callsCar0":185,"wall":[null,null]}
+FAIL desk_ath_j2 EXIT again · {"state":"car","btn":"brake"}
+desk_ath desk_ath_j2_target {"x":2189.0057509357744,"z":-1613.6748280856439,"h":1.379611867197882,"fx":0.9817798505902814,"fz":0.190021906565861,"cv":11.8,"d":17.942488142580515,"ah":-17.795751761210898,"j":6,"k":0}
+desk_ath desk_ath_j2_retarget {"x":2105.9692075096195,"z":-1629.6959375438,"h":1.3815973428119857,"fx":0.9821551990609071,"fz":0.18807223335099202,"cv":13.4,"d":66.81318929095595,"ah":66.77672872598332,"j":10,"k":0}
+desk_ath desk_ath_j2_retarget {"x":2154.1833357033647,"z":-1620.414650388691,"h":1.379611867197882,"fx":0.9817798505902814,"fz":0.190021906565861,"cv":12.7,"d":17.820655662090605,"ah":17.67290774679709,"j":1,"k":0}
+FAIL desk_ath_j2 🚗 TAKE offered at a traffic car · {"btn":"brake","near":null,"frames":1488}
+PASS desk_ath_j2 ≤5 controls, no HUD over them (TAKE) · []
+FAIL desk_ath_j2 button reads TAKE · "BRAKE"
+desk_ath desk_ath_j2_pull {"state":"car","jack":null,"flee":null,"calls":148}
+FAIL desk_ath_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · null
+PASS desk_ath_j2 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@2162,-1621","jack@2173,-1621","★+1:jack","enter:traf@2173,-1621"]}
+FAIL desk_ath_j2 +1 ★ · {"stars":1,"before":1}
+desk_ath desk_ath_j2_flee {"flee":null,"calls":147}
+FAIL desk_ath_j2 driver ran off ≥3 m from the car · null
+FAIL desk_ath_j2 jack ≤20 s after EXIT · {"walkS":24.8}
+FAIL desk_ath crashed · "page.evaluate: Execution context was destroyed, most likely because of a navigation"
+iframe_fra drive1 {"m":61,"v":0,"btn":"exit","canExit":true}
+iframe_fra exitGap {"n":14,"g":20}
+PASS iframe_fra EXIT ≥8 px from BOOST and GAS · {"n":14,"g":20}
+iframe_fra layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:🚪 EXIT","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tN:10px"]}
+PASS iframe_fra EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":true,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS iframe_fra EXIT → on foot · {"state":"walk"}
+iframe_fra scale {"fig":1.8,"peds":[1.72,1.77,1.74,1.74,1.76,1.77],"figH":1.8,"calls":451,"callsCar":448}
+PASS iframe_fra minifig 1.75–1.85 m · 1.8
+PASS iframe_fra peds near 1.8–2.0 m · [1.72,1.77,1.74,1.74,1.76,1.77]
+iframe_fra zone {"z":[0,70.734375,340.796875,322.265625],"ring":[60,233,146],"hit":"ofZone","hh":"<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di","par":"touch<BODY<HTML","t":393}
+iframe_fra layout_foot {"ctl":["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"],"n":5,"ov":[],"tiny":[]}
+PASS iframe_fra ≤5 controls on foot · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"]
+PASS iframe_fra no HUD over controls · []
+PASS iframe_fra text ≥12 px · []
+iframe_fra iframe_fra_j1_target {"x":1994.0112967717916,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":2,"d":7.841847140394141,"ah":5.285022848929884,"j":14,"k":0}
+PASS iframe_fra_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":1995.4,"z":7.9},"frames":36}
+PASS iframe_fra_j1 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚗 TAKE","tN:JUMP","tP:❚❚"]
+PASS iframe_fra_j1 TAKE ≥12 px from JUMP and RUN · {"n":14,"g":20}
+PASS iframe_fra_j1 button reads TAKE · "🚗 TAKE"
+iframe_fra iframe_fra_j1_pull {"state":"jack","jack":{"t":0.8,"ph":"pull"},"flee":{"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.37,"d":0,"dc":1.5,"dp":0.9},"calls":251}
+PASS iframe_fra_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.37,"d":0,"dc":1.5,"dp":0.9}
+PASS iframe_fra_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@1999,0","jack@1995,8","★+1:jack","enter:traf@1995,8"]}
+PASS iframe_fra_j1 +1 ★ · {"stars":1,"before":0}
+iframe_fra iframe_fra_j1_flee {"flee":{"h":1.837,"hs":1.8,"s":1,"ph":"run","t":1.63,"d":2.4,"dc":4.6,"dp":4.7},"calls":210}
+PASS iframe_fra_j1 driver ran off ≥3 m from the car · {"h":1.837,"hs":1.8,"s":1,"ph":"run","t":1.63,"d":2.4,"dc":4.6,"dp":4.7}
+PASS iframe_fra_j1 jack ≤20 s after EXIT · {"walkS":0.6}
+PASS iframe_fra_j1 drove 100 m in the stolen car · 100
+PASS iframe_fra_j1 tyre gap ≤0.05 m · 0.029
+PASS iframe_fra_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+iframe_fra iframe_fra_j1_drive {"m":100,"gap":0.029,"lowN":"inst:2304","calls":212,"callsCar0":448,"wall":[null,null]}
+PASS iframe_fra_j2 EXIT again · {"state":"walk","btn":"enter"}
+iframe_fra iframe_fra_j2_target {"x":2154.303190360782,"z":7.92,"h":1.5707963267948966,"fx":1,"fz":6.123233995736766e-17,"cv":2,"d":9.161483022471023,"ah":6.685790028508109,"j":3,"k":5}
+iframe_fra iframe_fra_j2_retarget {"x":2254.521529026172,"z":-7.92,"h":-1.5707963267948966,"fx":-1,"fz":6.123233995736766e-17,"cv":11.6,"d":16.681667754119598,"ah":6.707708959122102,"j":6,"k":9}
+FAIL iframe_fra_j2 🚗 TAKE offered at a traffic car · {"btn":"hide","near":null,"frames":1494}
+PASS iframe_fra_j2 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tN:JUMP","tP:❚❚"]
+FAIL iframe_fra_j2 TAKE ≥12 px from JUMP and RUN · null
+FAIL iframe_fra_j2 button reads TAKE · "BRAKE"
+iframe_fra iframe_fra_j2_pull {"state":"walk","jack":null,"flee":null,"calls":193}
+FAIL iframe_fra_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · null
+FAIL iframe_fra_j2 jacked → driving the traffic car · {"state":"walk","own":false,"taken":1,"log":["exit@1999,0","jack@1995,8","★+1:jack","enter:traf@1995,8","exit@2161,3"]}
+FAIL iframe_fra_j2 +1 ★ · {"stars":1,"before":1}
+iframe_fra iframe_fra_j2_flee {"flee":null,"calls":194}
+FAIL iframe_fra_j2 driver ran off ≥3 m from the car · null
+FAIL iframe_fra_j2 jack ≤20 s after EXIT · {"walkS":24.9}
+FAIL iframe_fra_j2 drove 100 m in the stolen car · 0
+FAIL iframe_fra_j2 tyre gap ≤0.05 m · null
+FAIL iframe_fra_j2 ★ chip visible · {"t":"","vis":false,"fs":"14px"}
+iframe_fra iframe_fra_j2_drive {"m":0,"gap":null,"lowN":"","calls":181,"callsCar0":448,"wall":[null,null]}
+PASS iframe_fra 0 console errors · []
+iframe_ath drive1 {"m":59,"v":0,"btn":"exit","canExit":true}
+iframe_ath exitGap {"n":9,"g":18}
+PASS iframe_ath EXIT ≥8 px from BOOST and GAS · {"n":9,"g":18}
+iframe_ath layout_car {"ctl":["tL:◀","tR:▶","tG:GAS","tB:🚪 EXIT","tN:BOOST","tP:❚❚"],"n":6,"ov":[],"tiny":["tN:10px"]}
+PASS iframe_ath EXIT offered when stopped · {"btn":"exit","idle":0.65,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":false,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"park\":true,\"v\":0}"}
+PASS iframe_ath EXIT → on foot · {"state":"walk"}
+iframe_ath scale {"fig":1.8,"peds":[1.77,1.74,1.72,1.76,1.77,1.72],"figH":1.8,"calls":262,"callsCar":257}
+PASS iframe_ath minifig 1.75–1.85 m · 1.8
+PASS iframe_ath peds near 1.8–2.0 m · [1.77,1.74,1.72,1.76,1.77,1.72]
+iframe_ath zone {"z":[0,70.734375,340.796875,322.265625],"ring":[60,233,146],"hit":"ofZone","hh":"<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di","par":"touch<BODY<HTML","t":393}
+iframe_ath layout_foot {"ctl":["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"],"n":5,"ov":[],"tiny":[]}
+PASS iframe_ath ≤5 controls on foot · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚪 ENTER","tN:JUMP","tP:❚❚"]
+PASS iframe_ath no HUD over controls · []
+PASS iframe_ath text ≥12 px · []
+iframe_ath iframe_ath_j1_target {"x":2113.4006421837294,"z":-1628.274624631546,"h":1.3815973428119857,"fx":0.9821551990609071,"fz":0.18807223335099202,"cv":2.1,"d":9.624326665053605,"ah":9.201654744934016,"j":1,"k":9}
+PASS iframe_ath_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2117.2,"z":-1627.5},"frames":228}
+PASS iframe_ath_j1 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tB:🚗 TAKE","tN:JUMP","tP:❚❚"]
+PASS iframe_ath_j1 TAKE ≥12 px from JUMP and RUN · {"n":14,"g":20}
+PASS iframe_ath_j1 button reads TAKE · "🚗 TAKE"
+iframe_ath iframe_ath_j1_pull {"state":"jack","jack":{"t":0.8,"ph":"pull"},"flee":{"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.38,"d":0,"dc":1.6,"dp":0.9},"calls":242}
+PASS iframe_ath_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.885,"hs":1.8,"s":1,"ph":"out","t":0.38,"d":0,"dc":1.6,"dp":0.9}
+PASS iframe_ath_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@2123,-1628","jack@2117,-1628","★+1:jack","enter:traf@2117,-1628"]}
+PASS iframe_ath_j1 +1 ★ · {"stars":1,"before":0}
+iframe_ath iframe_ath_j1_flee {"flee":{"h":1.8,"hs":1.8,"s":1,"ph":"run","t":1.65,"d":2.6,"dc":4.7,"dp":4.8},"calls":242}
+PASS iframe_ath_j1 driver ran off ≥3 m from the car · {"h":1.8,"hs":1.8,"s":1,"ph":"run","t":1.65,"d":2.6,"dc":4.7,"dp":4.8}
+PASS iframe_ath_j1 jack ≤20 s after EXIT · {"walkS":3.8}
+PASS iframe_ath_j1 drove 100 m in the stolen car · 102
+PASS iframe_ath_j1 tyre gap ≤0.05 m · 0.042
+PASS iframe_ath_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+iframe_ath iframe_ath_j1_drive {"m":102,"gap":0.042,"lowN":"inst:2304","calls":244,"callsCar0":257,"wall":[null,null]}
+PASS iframe_ath_j2 EXIT again · {"state":"walk","btn":"enter"}
+iframe_ath iframe_ath_j2_target {"x":2237.8358088761697,"z":-1604.8091845149427,"h":1.4170887977364173,"fx":0.9882102372837738,"fz":0.15310299450875403,"cv":12.2,"d":60.10193096225548,"ah":15.194105500819997,"j":2,"k":0}
+iframe_ath iframe_ath_j2_retarget {"x":2236.828310784044,"z":-1604.9652757686524,"h":1.4170887977364173,"fx":0.9882102372837738,"fz":0.15310299450875403,"cv":14.4,"d":38.298910206190705,"ah":18.127820284455826,"j":0,"k":1}
+FAIL iframe_ath_j2 🚗 TAKE offered at a traffic car · {"btn":"hide","near":null,"frames":1494}
+PASS iframe_ath_j2 ≤5 controls, no HUD over them (TAKE) · ["ofZone:DRAG TO WALK","tG:RUN","tN:JUMP","tP:❚❚"]
+FAIL iframe_ath_j2 TAKE ≥12 px from JUMP and RUN · null
+FAIL iframe_ath_j2 button reads TAKE · "BRAKE"
+iframe_ath iframe_ath_j2_pull {"state":"walk","jack":null,"flee":null,"calls":151}
+FAIL iframe_ath_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · null
+FAIL iframe_ath_j2 jacked → driving the traffic car · {"state":"walk","own":false,"taken":1,"log":["exit@2123,-1628","jack@2117,-1628","★+1:jack","enter:traf@2117,-1628","exit@2243,-1544"]}
+FAIL iframe_ath_j2 +1 ★ · {"stars":1,"before":1}
+iframe_ath iframe_ath_j2_flee {"flee":null,"calls":151}
+FAIL iframe_ath_j2 driver ran off ≥3 m from the car · null
+FAIL iframe_ath_j2 jack ≤20 s after EXIT · {"walkS":24.9}
+FAIL iframe_ath_j2 drove 100 m in the stolen car · 0
+FAIL iframe_ath_j2 tyre gap ≤0.05 m · null
+FAIL iframe_ath_j2 ★ chip visible · {"t":"","vis":false,"fs":"14px"}
+iframe_ath iframe_ath_j2_drive {"m":0,"gap":null,"lowN":"","calls":149,"callsCar0":257,"wall":[null,null]}
+iframe_ath ath_parked {"b":{"x":2240.582727642315,"z":-1555.195672652229,"y":32.847355356068505,"h":-2.2655346029916,"d":16.472120228812727,"W":8},"n":5,"athPk":13,"nE":9,"ws":[[8.5,8.5,true,24,8],[8.5,8.5,true,32,18],[8.5,8.5,true,32,8],[8.5,8.5,true,32,8],[8.5,8.5,true,32,18],[8.5,8.5,true,32,18],[8.5,8.5,true,32,8],[8
+PASS iframe_ath Athens has kerb-parked cars · {"b":{"x":2240.582727642315,"z":-1555.195672652229,"y":32.847355356068505,"h":-2.2655346029916,"d":16.472120228812727,"W":8},"n":5,"athPk":13,"nE":9,"ws":[[8.5,8.5,true,24,8],[8.5,8.5,true,32,18],[8.5,8.5,true,32,8],[8.5,8.5,true,32,8],[8.5,8.5,true,32,18],[8.5,8.5,true,32,18],[8.5,8.5,true,32,8],[8.5,8.5,true,32,18]],"cands":15,"want":1,"park":13}
+PASS iframe_ath 0 console errors · []
+TJACK_FAIL 55

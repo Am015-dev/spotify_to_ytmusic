@@ -1,0 +1,14 @@
+t 30 s {"st":"0:follow","tp":0,"vmax":127,"tv":94,"x":1649,"z":-8} 36s wall
+t 60 s {"st":"0:follow","tp":0,"vmax":127,"tv":94,"x":1196,"z":-215} 69s wall
+t 90 s {"st":"0:follow","tp":0,"vmax":127,"tv":94,"x":1006,"z":-488} 103s wall
+t 120 s {"st":"1:thieves","tp":0,"vmax":133,"tv":94,"x":394,"z":-360} 134s wall
+t 150 s {"st":"1:thieves","tp":0,"vmax":133,"tv":94,"x":282,"z":-680} 157s wall
+t 180 s {"st":"1:thieves","tp":0,"vmax":133,"tv":94,"x":131,"z":-884} 185s wall
+t 210 s {"st":"1:thieves","tp":0,"vmax":133,"tv":94,"x":77,"z":-949} 214s wall
+t 240 s {"st":"1:thieves","tp":0,"vmax":133,"tv":94,"x":-340,"z":-823} 242s wall
+t 270 s {"st":"1:thieves","tp":0,"vmax":133,"tv":94,"x":-541,"z":-846} 275s wall
+MISSION END 17820 HOT DROP★★★KAISER GOT AWAYNo stars this time · try again2/9 stages · 4.9 km · ★★
+RESULT {"otp":0,"ydrop":[],"camj":3,"beta":false,"end":{"f":17820,"res":"HOT DROP★★★KAISER GOT AWAYNo stars this time · try again2/9 stages · 4.9 km · ★★"},"gameSec":297,"teleports":0,"nan":0,"unstuck":0,"cp":[],"vmax":133,"truckMax":94,"vh":{"0":867,"10":358,"20":355,"30":1742,"40":3582,"50":3225,"60":2459,"70":1328,"80":1124,"90":793,"100":728,"110":625,"120":610,"130":27},"stages":[{"f":1,"s":"0:follow","x":2064,"z":0},{"f":6871,"s":"1:thieves","x":447,"z":-381},{"f":16931,"s":"2:tail","x":-533,"z":-844},{"f":17855,"s":"-","x":-534,"z":-728}],"errs":[]}
+CAMJ {"f":16,"d":73.2,"stage":"0:follow","cs":false,"fade":true}
+CAMJ {"f":6871,"d":62,"stage":"1:thieves","cs":true,"fade":true}
+CAMJ {"f":6887,"d":61.8,"stage":"1:thieves","cs":false,"fade":true}

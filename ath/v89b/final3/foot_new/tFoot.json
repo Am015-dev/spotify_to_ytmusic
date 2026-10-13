@@ -1,0 +1,207 @@
+[
+ {
+  "mode": "phone",
+  "city": "ath",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 61,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.77,
+      1.77,
+      1.76,
+      1.73,
+      1.77,
+      1.77
+     ],
+     "figH": 1.8,
+     "calls": 189,
+     "callsCar": 185
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚗 TAKE",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "walkshot",
+    {
+     "spd": 5,
+     "calls": 180
+    }
+   ],
+   [
+    "walk1",
+    {
+     "trav": 32,
+     "n": {
+      "exit": 1,
+      "enter": 0,
+      "swap": 0,
+      "jack": 0,
+      "stuckF": 3,
+      "walkF": 462,
+      "camIn": 0
+     }
+    }
+   ],
+   [
+    "target",
+    {
+     "x": 2161.8116667849254,
+     "z": -1625.7523541323721,
+     "k": "park",
+     "d": 16.298319804317135
+    }
+   ],
+   [
+    "doorGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "near",
+    {
+     "stkWhat": [
+      ""
+     ],
+     "stk": [
+      [
+       2133,
+       -1627,
+       "car/prop"
+      ]
+     ],
+     "near": {
+      "k": "park",
+      "x": 2161.8,
+      "z": -1625.8
+     },
+     "btn": "enter",
+     "trav": 13.2,
+     "n": {
+      "exit": 1,
+      "enter": 0,
+      "swap": 0,
+      "jack": 0,
+      "stuckF": 9,
+      "walkF": 636,
+      "camIn": 0
+     }
+    }
+   ],
+   [
+    "reenter",
+    {
+     "gap": 0.024,
+     "calls": 198,
+     "callsCar": 185,
+     "callsFoot": 189,
+     "own": false,
+     "parked": 1
+    }
+   ],
+   [
+    "drive2",
+    {
+     "m": 100,
+     "gap": 0.025,
+     "calls": 217
+    }
+   ]
+  ],
+  "metrics": {
+   "walked": 45.22880407357986,
+   "stuckPct": 1.4,
+   "camPct": 0,
+   "fig": 1.8,
+   "peds": [
+    1.77,
+    1.77,
+    1.76,
+    1.73,
+    1.77,
+    1.77
+   ],
+   "gap": 0.025,
+   "calls": {
+    "car": 185,
+    "foot": 189,
+    "walk": 180,
+    "reent": 198,
+    "drive2": 217
+   },
+   "target": "park",
+   "errs": []
+  }
+ }
+]

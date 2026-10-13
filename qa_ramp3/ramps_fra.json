@@ -1,0 +1,33 @@
+[
+ {
+  "i": 18,
+  "x": 1314,
+  "z": -1674,
+  "h": 2.28,
+  "len": 24,
+  "hgt": 7,
+  "w": 16,
+  "y0": 11.4,
+  "dk": false,
+  "col": 16756768,
+  "appBlk": [],
+  "bodyBlk": [],
+  "landBlk": [],
+  "kerb": -0.29,
+  "roadPct": 100,
+  "route": {
+   "mode": "gps",
+   "launched": false,
+   "hits": 2,
+   "stuck": true,
+   "unstick": 4,
+   "note": "overtakes traffic ahead (4 m lane offset); stuck 3 s → reverse 1 s + swing round; gives up at 12 s"
+  },
+  "tag": "street",
+  "launched": true,
+  "maxAir": 16,
+  "vLip": 97,
+  "hits": 0,
+  "minD": 0
+ }
+]

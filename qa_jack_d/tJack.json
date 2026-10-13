@@ -1,0 +1,258 @@
+[
+ {
+  "mode": "desk",
+  "city": "fra",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 61,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [],
+     "n": 0,
+     "ov": [],
+     "tiny": [
+      "SMALL:11px:KM/H"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.76,
+      1.77,
+      1.76,
+      1.74,
+      1.77,
+      1.73
+     ],
+     "figH": 1.8,
+     "calls": 171,
+     "callsCar": 169
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "ring": [
+      0,
+      0,
+      0
+     ],
+     "hit": "c",
+     "hh": "<canvas id=\"c\" data-engine=\"three.js r164\" width=\"313\" height=\"196\"></canvas>",
+     "par": "BODY<HTML",
+     "t": 0
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [],
+     "n": 0,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "desk_fra_j1_target",
+    {
+     "x": 1994.1088135659406,
+     "z": 7.92,
+     "h": 1.5707963267948966,
+     "fx": 1,
+     "fz": 6.123233995736766e-17,
+     "cv": 1.8,
+     "d": 6.530554173538749,
+     "ah": 5.415817968913643,
+     "j": 9,
+     "k": 0
+    }
+   ],
+   [
+    "desk_fra_j1_pull",
+    {
+     "state": "jack",
+     "jack": {
+      "t": 0.67,
+      "ph": "pull"
+     },
+     "flee": {
+      "h": 1.872,
+      "hs": 1.8,
+      "s": 1,
+      "ph": "out",
+      "t": 0.23,
+      "d": 0,
+      "dc": 1,
+      "dp": 0.9
+     },
+     "calls": 167
+    }
+   ],
+   [
+    "desk_fra_j1_flee",
+    {
+     "flee": {
+      "h": 1.828,
+      "hs": 1.8,
+      "s": 1,
+      "ph": "run",
+      "t": 1.5,
+      "d": 1.7,
+      "dc": 4.7,
+      "dp": 5.1
+     },
+     "calls": 170
+    }
+   ],
+   [
+    "desk_fra_j1_drive",
+    {
+     "m": 101,
+     "gap": 0.029,
+     "lowN": "inst:2304",
+     "calls": 194,
+     "callsCar0": 169,
+     "wall": [
+      null,
+      null
+     ]
+    }
+   ],
+   [
+    "desk_fra_j2_target",
+    {
+     "x": 2152.08,
+     "z": 7.548360529353715,
+     "h": 0,
+     "fx": 0,
+     "fz": 1,
+     "cv": 8,
+     "d": 8.17466191612109,
+     "ah": 25.691010634168833,
+     "j": 2,
+     "k": 8
+    }
+   ],
+   [
+    "desk_fra_j2_pull",
+    {
+     "state": "jack",
+     "jack": {
+      "t": 0.67,
+      "ph": "pull"
+     },
+     "flee": {
+      "h": 1.872,
+      "hs": 1.8,
+      "s": 1,
+      "ph": "out",
+      "t": 0.23,
+      "d": 0,
+      "dc": 1,
+      "dp": 0.9
+     },
+     "calls": 181
+    }
+   ],
+   [
+    "desk_fra_j2_flee",
+    {
+     "flee": {
+      "h": 1.828,
+      "hs": 1.8,
+      "s": 1,
+      "ph": "run",
+      "t": 1.5,
+      "d": 1.8,
+      "dc": 4.7,
+      "dp": 5
+     },
+     "calls": 189
+    }
+   ],
+   [
+    "desk_fra_j2_drive",
+    {
+     "m": 101,
+     "gap": 0.028,
+     "lowN": "inst:2304",
+     "calls": 147,
+     "callsCar0": 169,
+     "wall": [
+      null,
+      null
+     ]
+    }
+   ]
+  ],
+  "metrics": {
+   "jacks": [
+    {
+     "walkS": 0.6,
+     "gap": 0.029,
+     "calls": {
+      "car0": 169,
+      "take": 174,
+      "pull": 167,
+      "flee": 170,
+      "drive": 194
+     },
+     "flee": {
+      "h": 1.828,
+      "hs": 1.8,
+      "s": 1,
+      "ph": "run",
+      "t": 1.5,
+      "d": 1.7,
+      "dc": 4.7,
+      "dp": 5.1
+     },
+     "wall": null,
+     "stars": 1
+    },
+    {
+     "walkS": 3.9,
+     "gap": 0.028,
+     "calls": {
+      "car0": 169,
+      "take": 178,
+      "pull": 181,
+      "flee": 189,
+      "drive": 147
+     },
+     "flee": {
+      "h": 1.828,
+      "hs": 1.8,
+      "s": 1,
+      "ph": "run",
+      "t": 1.5,
+      "d": 1.8,
+      "dc": 4.7,
+      "dp": 5
+     },
+     "wall": null,
+     "stars": 2
+    }
+   ],
+   "errs": []
+  }
+ }
+]

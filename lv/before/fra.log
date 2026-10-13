@@ -1,0 +1,8 @@
+city fra
+shot 0 -240 600
+shot 1 1920 1200
+shot 2 -240 1200
+shot 3 -2880 1680
+shot 4 840 -1200
+frame_ms {"withRender":640.75,"cpuOnly":6.51}
+errors 0 

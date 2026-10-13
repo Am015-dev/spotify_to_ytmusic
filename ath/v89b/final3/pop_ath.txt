@@ -1,0 +1,5 @@
+ath route m 4614 pts 207 kmh 110
+ath POPIN {"frames":9060,"holeFrames":0,"holeMax":0,"hole1k":0,"lzHoleFrames":0,"lzHoleMax":0,"frMax":0,"fr16":0,"fr50":0,"shotsAt":[],"pc":[-1104.4054105936093,-874.4977803114623],"onAt":2481,"str":{"fr":{"n":2356,"max":15.7,"o8":2,"o16":0,"o50":0},"max":4.4,"b":58,"f":6,"sup":{"sup":306,"built":52,"mb":49.1,"lodT":952946}},"lz":{"max":15.5,"over":1,"big":[[14.8,"tourk",3,""]]}}
+shot ath/v89b/final3/pop/ath_long900.png {"calls":235,"tris":1304472,"holes":0}
+shot ath/v89b/final3/pop/ath_long1500.png {"calls":218,"tris":1307028,"holes":0}
+errors 0 

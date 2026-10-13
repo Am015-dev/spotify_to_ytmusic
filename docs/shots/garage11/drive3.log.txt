@@ -1,0 +1,15 @@
+equipped car t_racer off t_beast
+wait 0 menu|false
+shot 01_start
+fra top kmh 4 pos [ 2031, 2 ]
+shot 02_frankfurt_drive
+shot 03_side_traffic {"traffic":null}
+shot 04_side_tyres {"traffic":null}
+tyre_rest [0.03,0.03,0.03,0.03] traffic_rest []
+vsel offroad
+off top kmh 57 pos [ 2004, 3 ]
+shot 07_offroad_drive
+shot 08_offroad_side {"traffic":null}
+off_rest [0.03,0.03,0.03,0.03]
+GAP player {"n":13,"max":0.03,"over05":0} traffic null veh ship
+ERR []

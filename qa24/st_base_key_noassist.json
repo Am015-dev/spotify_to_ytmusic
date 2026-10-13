@@ -1,0 +1,643 @@
+{
+ "city": "fra",
+ "input": "key",
+ "fps": 60,
+ "runs": [
+  {
+   "V": 60,
+   "route": 0,
+   "sec": 62.9,
+   "done": true,
+   "turns": [
+    {
+     "ang": 90,
+     "v": 48,
+     "flips": 5,
+     "over": 37,
+     "settle": 4
+    },
+    {
+     "ang": -124,
+     "v": 56,
+     "flips": 4,
+     "over": 43.1,
+     "settle": 4
+    },
+    {
+     "ang": 121,
+     "v": 52,
+     "flips": 1,
+     "over": 0,
+     "settle": 4
+    },
+    {
+     "ang": -87,
+     "v": 51,
+     "flips": 2,
+     "over": 46.3,
+     "settle": 4
+    },
+    {
+     "ang": 90,
+     "v": 49,
+     "flips": 3,
+     "over": 39.1,
+     "settle": 2.43
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 1,
+   "offPct": 0.1,
+   "yawFlipsPerKmStraight": 113.4
+  },
+  {
+   "V": 60,
+   "route": 1,
+   "sec": 50.7,
+   "done": true,
+   "turns": [
+    {
+     "ang": 131,
+     "v": 49,
+     "flips": 1,
+     "over": 0,
+     "settle": 4
+    },
+    {
+     "ang": -41,
+     "v": 60,
+     "flips": 0,
+     "over": 45,
+     "settle": 4
+    },
+    {
+     "ang": -51,
+     "v": 58,
+     "flips": 8,
+     "over": 43.3,
+     "settle": 4
+    },
+    {
+     "ang": 141,
+     "v": 41,
+     "flips": 1,
+     "over": 0,
+     "settle": 4
+    }
+   ],
+   "hits": 1,
+   "hitsPerMin": 1.18,
+   "dep": 2,
+   "offPct": 3.4,
+   "yawFlipsPerKmStraight": 172.3
+  },
+  {
+   "V": 60,
+   "route": 2,
+   "sec": 45.7,
+   "done": true,
+   "turns": [
+    {
+     "ang": 90,
+     "v": 47,
+     "flips": 1,
+     "over": 39,
+     "settle": 4
+    },
+    {
+     "ang": -77,
+     "v": 53,
+     "flips": 3,
+     "over": 46,
+     "settle": 4
+    }
+   ],
+   "hits": 1,
+   "hitsPerMin": 1.31,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 94.4
+  },
+  {
+   "V": 60,
+   "route": 3,
+   "sec": 42.5,
+   "done": true,
+   "turns": [
+    {
+     "ang": 75,
+     "v": 59,
+     "flips": 7,
+     "over": 46.2,
+     "settle": 4
+    },
+    {
+     "ang": -90,
+     "v": 47,
+     "flips": 2,
+     "over": 38.1,
+     "settle": 4
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 119.7
+  },
+  {
+   "V": 60,
+   "route": 4,
+   "sec": 64.7,
+   "done": true,
+   "turns": [
+    {
+     "ang": 61,
+     "v": 61,
+     "flips": 8,
+     "over": 44,
+     "settle": 4
+    },
+    {
+     "ang": -37,
+     "v": 53,
+     "flips": 1,
+     "over": 40.9,
+     "settle": 4
+    },
+    {
+     "ang": -90,
+     "v": 48,
+     "flips": 3,
+     "over": 37.8,
+     "settle": 4
+    },
+    {
+     "ang": 58,
+     "v": 61,
+     "flips": 5,
+     "over": 43.5,
+     "settle": 3.83
+    },
+    {
+     "ang": -84,
+     "v": 50,
+     "flips": 4,
+     "over": 43.9,
+     "settle": 4
+    }
+   ],
+   "hits": 1,
+   "hitsPerMin": 0.93,
+   "dep": 3,
+   "offPct": 18.4,
+   "yawFlipsPerKmStraight": 164.4
+  },
+  {
+   "V": 60,
+   "route": 5,
+   "sec": 69.8,
+   "done": true,
+   "turns": [
+    {
+     "ang": -96,
+     "v": 49,
+     "flips": 6,
+     "over": 43,
+     "settle": 1.73
+    },
+    {
+     "ang": 31,
+     "v": 61,
+     "flips": 0,
+     "over": 44.4,
+     "settle": 1.53
+    },
+    {
+     "ang": 76,
+     "v": 53,
+     "flips": 3,
+     "over": 38.9,
+     "settle": 4
+    },
+    {
+     "ang": -39,
+     "v": 59,
+     "flips": 3,
+     "over": 46.2,
+     "settle": 4
+    },
+    {
+     "ang": -90,
+     "v": 50,
+     "flips": 1,
+     "over": 39.8,
+     "settle": 4
+    },
+    {
+     "ang": 121,
+     "v": 48,
+     "flips": 1,
+     "over": 39,
+     "settle": 4
+    }
+   ],
+   "hits": 3,
+   "hitsPerMin": 2.58,
+   "dep": 2,
+   "offPct": 21.1,
+   "yawFlipsPerKmStraight": 97.1
+  },
+  {
+   "V": 60,
+   "route": 6,
+   "sec": 46.5,
+   "done": true,
+   "turns": [
+    {
+     "ang": 90,
+     "v": 49,
+     "flips": 1,
+     "over": 37.5,
+     "settle": 4
+    },
+    {
+     "ang": -76,
+     "v": 62,
+     "flips": 4,
+     "over": 42.6,
+     "settle": 4
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 171.7
+  },
+  {
+   "V": 60,
+   "route": 7,
+   "sec": 53.3,
+   "done": true,
+   "turns": [
+    {
+     "ang": 87,
+     "v": 51,
+     "flips": 5,
+     "over": 44.1,
+     "settle": 1.45
+    },
+    {
+     "ang": -74,
+     "v": 54,
+     "flips": 1,
+     "over": 36.5,
+     "settle": 4
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 1,
+   "offPct": 0.1,
+   "yawFlipsPerKmStraight": 109.6
+  },
+  {
+   "V": 100,
+   "route": 0,
+   "sec": 50.1,
+   "done": true,
+   "turns": [
+    {
+     "ang": 90,
+     "v": 49,
+     "flips": 3,
+     "over": 36.8,
+     "settle": 4
+    },
+    {
+     "ang": -124,
+     "v": 51,
+     "flips": 6,
+     "over": 35.8,
+     "settle": 0.53
+    },
+    {
+     "ang": 121,
+     "v": 52,
+     "flips": 1,
+     "over": 0,
+     "settle": 4
+    },
+    {
+     "ang": -87,
+     "v": 48,
+     "flips": 1,
+     "over": 39.7,
+     "settle": 1.87
+    },
+    {
+     "ang": 90,
+     "v": 50,
+     "flips": 1,
+     "over": 37.5,
+     "settle": 1.3
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 63.3
+  },
+  {
+   "V": 100,
+   "route": 1,
+   "sec": 37.5,
+   "done": true,
+   "turns": [
+    {
+     "ang": 131,
+     "v": 49,
+     "flips": 1,
+     "over": 0,
+     "settle": 3.18
+    },
+    {
+     "ang": -41,
+     "v": 58,
+     "flips": 1,
+     "over": 35.7,
+     "settle": 0.92
+    },
+    {
+     "ang": -51,
+     "v": 66,
+     "flips": 2,
+     "over": 40.4,
+     "settle": 1.25
+    },
+    {
+     "ang": 141,
+     "v": 48,
+     "flips": 0,
+     "over": 0,
+     "settle": 1.28
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 1,
+   "offPct": 3.5,
+   "yawFlipsPerKmStraight": 83.2
+  },
+  {
+   "V": 100,
+   "route": 2,
+   "sec": 28.9,
+   "done": true,
+   "turns": [
+    {
+     "ang": 90,
+     "v": 47,
+     "flips": 1,
+     "over": 37.1,
+     "settle": 1.32
+    },
+    {
+     "ang": -77,
+     "v": 53,
+     "flips": 1,
+     "over": 38.9,
+     "settle": 1.72
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 51.2
+  },
+  {
+   "V": 100,
+   "route": 3,
+   "sec": 31,
+   "done": true,
+   "turns": [
+    {
+     "ang": 75,
+     "v": 54,
+     "flips": 3,
+     "over": 36.8,
+     "settle": 0.75
+    },
+    {
+     "ang": -90,
+     "v": 47,
+     "flips": 1,
+     "over": 37.1,
+     "settle": 2.9
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 1,
+   "offPct": 1.1,
+   "yawFlipsPerKmStraight": 68.3
+  },
+  {
+   "V": 100,
+   "route": 4,
+   "sec": 48.7,
+   "done": true,
+   "turns": [
+    {
+     "ang": 61,
+     "v": 69,
+     "flips": 1,
+     "over": 29.4,
+     "settle": 0.15
+    },
+    {
+     "ang": -37,
+     "v": 54,
+     "flips": 1,
+     "over": 22.3,
+     "settle": 4
+    },
+    {
+     "ang": -90,
+     "v": 48,
+     "flips": 2,
+     "over": 38.9,
+     "settle": 4
+    },
+    {
+     "ang": 58,
+     "v": 62,
+     "flips": 4,
+     "over": 39.6,
+     "settle": 1.47
+    },
+    {
+     "ang": -84,
+     "v": 49,
+     "flips": 3,
+     "over": 37.4,
+     "settle": 0.75
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 3,
+   "offPct": 18.9,
+   "yawFlipsPerKmStraight": 87.7
+  },
+  {
+   "V": 100,
+   "route": 5,
+   "sec": 59.9,
+   "done": true,
+   "turns": [
+    {
+     "ang": -96,
+     "v": 49,
+     "flips": 3,
+     "over": 39,
+     "settle": 1.08
+    },
+    {
+     "ang": 31,
+     "v": 80,
+     "flips": 0,
+     "over": 26.8,
+     "settle": 2.07
+    },
+    {
+     "ang": 76,
+     "v": 53,
+     "flips": 3,
+     "over": 39.1,
+     "settle": 4
+    },
+    {
+     "ang": -39,
+     "v": 54,
+     "flips": 3,
+     "over": 40.6,
+     "settle": 3.57
+    },
+    {
+     "ang": -90,
+     "v": 49,
+     "flips": 1,
+     "over": 38.7,
+     "settle": 4
+    },
+    {
+     "ang": 121,
+     "v": 50,
+     "flips": 1,
+     "over": 35,
+     "settle": 2.97
+    }
+   ],
+   "hits": 3,
+   "hitsPerMin": 3,
+   "dep": 4,
+   "offPct": 27.7,
+   "yawFlipsPerKmStraight": 56.7
+  },
+  {
+   "V": 100,
+   "route": 6,
+   "sec": 31.7,
+   "done": true,
+   "turns": [
+    {
+     "ang": 90,
+     "v": 49,
+     "flips": 1,
+     "over": 37.2,
+     "settle": 4
+    },
+    {
+     "ang": -76,
+     "v": 53,
+     "flips": 3,
+     "over": 36.6,
+     "settle": 1.58
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 89.6
+  },
+  {
+   "V": 100,
+   "route": 7,
+   "sec": 37.5,
+   "done": true,
+   "turns": [
+    {
+     "ang": 87,
+     "v": 54,
+     "flips": 1,
+     "over": 44.2,
+     "settle": 1.48
+    },
+    {
+     "ang": -74,
+     "v": 54,
+     "flips": 2,
+     "over": 38.9,
+     "settle": 4
+    }
+   ],
+   "hits": 0,
+   "hitsPerMin": 0,
+   "dep": 0,
+   "offPct": 0,
+   "yawFlipsPerKmStraight": 53.1
+  }
+ ],
+ "pulse": [
+  {
+   "V": 60,
+   "vAt": 75,
+   "peakYaw": 34.6,
+   "flips": 0,
+   "overshoot": 0,
+   "settle": 0.43
+  },
+  {
+   "V": 100,
+   "vAt": 106,
+   "peakYaw": 22.1,
+   "flips": 0,
+   "overshoot": 0,
+   "settle": 0.43
+  }
+ ],
+ "sum": {
+  "turns": 56,
+  "flipsAvg": 2.41,
+  "flipsP90": 5,
+  "turnsWith2plusFlips": 29,
+  "overAvgDeg": 35.08,
+  "settleAvg": 2.98,
+  "settleP90": 4,
+  "hitsPerMin": 0.71,
+  "depPerMin": 1.42,
+  "offPct": 5.89,
+  "yawFlipsPerKmStraight": 99.73,
+  "done": "16/16",
+  "pulseFlips": 0,
+  "pulseSettle": 0.43,
+  "pulseOver": 0,
+  "errors": 0
+ }
+}

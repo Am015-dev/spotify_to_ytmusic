@@ -1,0 +1,9 @@
+v88d music timing (t4/r3mus.js, Chromium --autoplay-policy=user-gesture-required, tap = real CDP touch)
+NOTE: this box delivers a tap to JS 1-6 s late (swiftshader renders the menu at ~1 fps), so absolute numbers are box-bound.
+852x393                live (v88c)                         v88d
+standalone             audio start ~7.8 s after tap         ~3.7 s after tap, 1 mp3 request (prefetch at load)
+iframe (no allow=)     NOT audible within 15 s              audible after ONE tap (pointerdown play refused, touchend retry plays)
+320x148 (less render load)
+standalone             handler→audio ~2.6 s                 handler→audio ~0.6 s
+Knobs (⚙ AUDIO + SETTINGS slider): musOn 0 → gain fades to 0; musOn 1 vol .25 → plays; SET.mus 0 → level 0; restored → 0.5, track menu.
+Console errors: 0 in every run. Not verifiable here: iPhone Safari.

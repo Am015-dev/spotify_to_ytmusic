@@ -1,0 +1,5 @@
+// play/markchk.js <url> : Athens: every MARKPOS spot (mission givers, garages, events) with road-edge distance (OC_roadE) and the nearest collider gap.
+const enter=require('../bc/enter.js');const [URL]=process.argv.slice(2);
+(async()=>{const seed=`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`;
+ const E=await enter(URL,{seed});const {p}=E;p.setDefaultTimeout(900000);await E.roamApi();
+ console.log(await p.evaluate(()=>__oc.ev(`(()=>{const o=[];const gap=(x,z)=>{for(let r=0;r<=20;r+=.5)if(roamHit(x,z,r))return r;return 99};for(const k in MARKPOS){const[x,z]=MARKPOS[k];o.push([k,Math.round(x),Math.round(z),+OC_roadE(x,z).toFixed(1),gap(x,z)])}return JSON.stringify({RO:[Math.round(RO.x),Math.round(RO.z)],m:o})})()`)));await E.b.close()})().catch(e=>{console.error(e);process.exit(1)});

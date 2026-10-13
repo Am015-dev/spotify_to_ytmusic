@@ -1,0 +1,7 @@
+const L=require('./lib.js');(async()=>{const T=await L(process.argv[2],process.argv[3]);const{ev,tap,tapXY}=T;
+ await tap('#gbMenuBtn',2500);await tap('#r2R [data-r2m="build"]',3000);await tap('#gbBkP [data-r2b="more"]');await tap('#r2More [data-r2a="gnb"]',1200);await tap('#gnbP [data-ch="sc8"]',2500);
+ await ev(()=>{window.__lg=[];for(const t of['pointerdown','pointerup','pointercancel','touchstart','touchend','click'])addEventListener(t,e=>__lg.push(Math.round(performance.now())+':'+t+':'+(e.target.id||e.target.className||e.target.tagName)+':'+(e.pointerType||'')),true)});
+ await tap('#b25 [data-b25="top"]',1500);await T.swipeTo('#gbBkPc','#gbBkPc [data-p="b22"]');await tap('#gbBkPc [data-p="b22"]');console.log('pc',await ev(()=>__gb.GB_.pc),'tool',await ev(()=>__gb.GB_.tool),'L',await ev(()=>__b25.S.L));
+ const q=await ev(()=>__b25.scr(-3,-1));console.log('q',JSON.stringify(q),await ev(q=>{const e=document.elementFromPoint(q.x,q.y);return e&&(e.id||e.className)},q));await ev(()=>__lg.length=0);
+ await tapXY(q.x,q.y,1500);console.log('events',JSON.stringify(await ev(()=>__lg)),'held',JSON.stringify(await ev(()=>__g8.held())),'ptr',await ev(()=>__gb.GB_.ptr.size),'multi',await ev(()=>__gb.GB_.multi),'drag',await ev(()=>__gb.GB_.drag),'pick',await ev(q=>__g9ev(`JSON.stringify(GB_pick(${q.x},${q.y}))`),q));
+ console.log('direct act',await ev(q=>__g9ev(`(()=>{GS.pt='touch';const n=GB_act(${q.x},${q.y});return JSON.stringify({n,held:GS.held,why:B25.why})})()`),q));await T.close()})();

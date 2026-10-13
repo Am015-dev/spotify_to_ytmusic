@@ -1,0 +1,15 @@
+early 0 Deliver → 37 m {"camTruck":42.8,"carTruck":37.1,"kmh":10}
+early 1 Deliver → 36 m {"camTruck":41,"carTruck":35.3,"kmh":12}
+early 2 Deliver → 34 m {"camTruck":39.1,"carTruck":33.4,"kmh":12}
+early 3 Deliver → 5 m {"camTruck":2.2,"carTruck":4.7,"kmh":10}
+early 4 Deliver → 5 m {"camTruck":2.3,"carTruck":4.7,"kmh":8}
+early 5 Deliver → 5 m {"camTruck":2.4,"carTruck":4.7,"kmh":12}
+early 6 Deliver → 5 m {"camTruck":2.4,"carTruck":4.7,"kmh":12}
+early 7 Deliver → 5 m {"camTruck":2.4,"carTruck":4.7,"kmh":12}
+early 8 Deliver → 5 m {"camTruck":2.5,"carTruck":4.7,"kmh":12}
+early 9 Deliver → 5 m {"camTruck":2.5,"carTruck":4.7,"kmh":3}
+early 10 Deliver → 5 m {"camTruck":2.5,"carTruck":4.7,"kmh":2}
+early 11 Deliver → 5 m {"camTruck":2.5,"carTruck":4.7,"kmh":2}
+early 12 Deliver → 5 m {"camTruck":2.4,"carTruck":4.7,"kmh":2}
+early 13 Deliver → 5 m {"camTruck":2.4,"carTruck":4.7,"kmh":2}
+ERR []

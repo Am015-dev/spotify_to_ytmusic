@@ -1,0 +1,9 @@
+// wb/inv.js <url> fra|ath : inventory of HUB.grp meshes: by material (meshes, total tris incl. instances, mean bounding radius)
+const enter=require('../../bc/enter.js');const URL=process.argv[2],CITY=process.argv[3]||'fra';
+(async()=>{const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`:`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))`;
+ const E=await enter(URL,{gfx:'normal',seed});const {p}=E;p.setDefaultTimeout(900000);await E.roamApi();await p.waitForTimeout(5000);
+ const o=await p.evaluate(()=>{const H=__g9ev('HUB'),g={};let N=0;const walk=(o,d,path)=>{if(o.isMesh){const geo=o.geometry;const t=((geo.index?geo.index.count:geo.attributes.position.count)/3)*(o.isInstancedMesh?o.count:1);const m=[].concat(o.material)[0];
+   const k=(o.isInstancedMesh?'I ':'M ')+path+' '+(m.type)+(m.map?'+map':'')+(m.vertexColors?'+vc':'')+' '+Object.keys(o.userData).join(',')+' mat'+m.id;const e=g[k]||(g[k]={k,n:0,t:0,r:0,vis:0,inst:0});e.n++;e.t+=t;e.inst+=o.isInstancedMesh?o.count:0;if(o.visible)e.vis++;if(!geo.boundingSphere)geo.computeBoundingSphere();e.r+=geo.boundingSphere.radius;N++}
+   for(const c of o.children)walk(c,d+1,d<1?(c.name||c.type)+(Object.keys(c.userData).length?'{'+Object.keys(c.userData).join(',')+'}':''):path)};walk(H.grp,0,'');
+  return {N,L:Object.values(g).sort((a,b)=>b.n-a.n).slice(0,45).map(e=>[e.n,e.vis,Math.round(e.t),Math.round(e.r/e.n),e.inst,e.k])}});
+ console.log('meshes',o.N);for(const r of o.L)console.log(r.join('  '));await E.b.close()})();

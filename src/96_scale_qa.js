@@ -186,7 +186,7 @@ function v85Off(dt){let target=1;try{const q=RO.ch&&RO.ch.v2,sp=RO.sp;if((q||sp)
   return RO.v85o}
 window.v85Off=v85Off;
 // verbs for the one objective line
-window.v85Verb=function(ch){if(!ch)return'';const k=ch.kind;return({speed:'Radar',chase:'Catch',drift:'Drift',longjump:'Jump',smash:'Smash',m1:'Deliver'}[k])||'Go'};
+window.v85Verb=function(ch){if(!ch)return'';const k=ch.kind;{const V=ch.v2,S=V&&V.L&&V.L.st&&V.L.st[V.si];/* BG23: story stages say what to do (was 'Deliver' for every M1 stage) */if(k==='m1'&&S){const w={follow:'Follow',tail:'Tail',thieves:'Ram',goons:'Ram',survive:'Fight',chase:'Catch',booths:'Smash',tower:'Smash',chain:'Smash',push:'Push',jumpR:'Jump',driftzone:'Drift'}[S.t];if(w)return w}}return({speed:'Radar',chase:'Catch',drift:'Drift',longjump:'Jump',smash:'Smash',m1:'Go'}[k])||'Go'};
 // brief overlays: the mission / district / result cards show for 5 s at start and end, then get out of the way
 let brief=0,lastCh=null,lastRes=false,lastPlate='';const bc=document.body.classList;
 function v85tick(dt){try{if(RO.ch)v85Road(RO.ch);

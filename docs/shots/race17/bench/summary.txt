@@ -1,0 +1,8 @@
+== docs/shots/race17/bench/live_v87r.txt
+grand wall/min 2.13 pack {'t15': 128, 't30': 336, 't60': 644} overtakes 52.0 plChg 13.5 place ['4/8', '8/8'] clrMin [[-2.47], [-1.95]] clrP10 -0.19 clrMed 3.33 tyreRoad p50/min [(0.006, -0.109), (0.007, -0.158)] avgKmh 161.45 top 245.7 raceSec 154.9 err 0
+hafen wall/min 1.21 pack {'t15': 165, 't30': 296, 't60': 260} overtakes 49.5 plChg 20.5 place ['7/8', '6/8'] clrMin [[-3.29], [-2.15]] clrP10 -0.29 clrMed 1.89 tyreRoad p50/min [(0.004, -0.231), (0.006, -0.172)] avgKmh 137.35 top 234.5 raceSec 100.35 err 0
+akro wall/min 2.66 pack {'t15': 172, 't30': 190, 't60': 430} overtakes 57.5 plChg 17.5 place ['8/8', '7/8'] clrMin [[-2.3], [-2.27]] clrP10 -1.66 clrMed 1.12 tyreRoad p50/min [(0.007, -0.1), (0.006, -0.124)] avgKmh 154.95 top 255.95 raceSec 135.5 err 0
+== docs/shots/race17/bench/stack.txt
+grand wall/min 0.0 pack {'t15': 208, 't30': 336, 't60': 618} overtakes 33.5 plChg 5.0 place ['3/8', '3/8'] clrMin [[-1.18], [-0.88]] clrP10 2.98 clrMed 12.2 tyreRoad p50/min [(0.003, -0.1), (0.005, -0.098)] avgKmh 201.4 top 297.2 raceSec 124.25 err 0
+hafen wall/min 0.78 pack {'t15': 172, 't30': 194, 't60': 204} overtakes 48.5 plChg 19.0 place ['4/8', '4/8'] clrMin [[-2.33], [-2.06]] clrP10 1.17 clrMed 11.82 tyreRoad p50/min [(0, -0.1), (0.001, -0.101)] avgKmh 171.95 top 264.1 raceSec 79.55 err 0
+akro wall/min 0.0 pack {'t15': 250, 't30': 298, 't60': 408} overtakes 43.0 plChg 7.0 place ['2/8', '1/8'] clrMin [[-2.19], [-2.01]] clrP10 0.52 clrMed 9.23 tyreRoad p50/min [(0.003, -0.127), (0.004, -0.1)] avgKmh 192.9 top 306.25 raceSec 110.8 err 0

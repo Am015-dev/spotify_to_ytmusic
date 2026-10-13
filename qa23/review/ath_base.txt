@@ -1,0 +1,14 @@
+phone ath {"min":1.14,"hits":1,"kinds":{"other":1},"wallHits":0,"wallPerMin":0,"hitsPerMin":0.88,"bigDrop":0,"stuckPct":12.1,"avgKmh":37.7,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":2.6,"traffic120m":1.4,"missions":[],"worst":[{"ctx":"AKROPOLIS CUP","f":535,"v0":28,"v1":19,"drop":0.32,"kind":"other","x":2063,"z":-1635,"dy":0}],"monErr":null,"rot":{"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,1704,786]},"scale":{"pedH":1.77,"carL":4.44,"carH":1.37,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":1,"pedVsPlayer":0.94,"nPed":8,"nCar":8},"road":{"roadPts":450,"blocked":0,"pct":0,"colliders":0,"sample":[]},"roadEnd":{"roadPts":462,"blocked":0,"pct":0,"colliders":0,"sample":[]},"overlap":[],"hudOverlap":[],"tiny":[],"extra":{"map":{"opened":false,"drag":null,"pinch":null},"pause":{"tP_settings":false,"opts":[],"opened":true,"frozen":true,"resumed":true},"garage":{"pause":false,"btn":false,"back":true},"otg":null},"events":[],"perf":{"calls":419,"tris":2006719,"jsMs":14.8,"geoms":1443,"tex":151},"wallSec":571}
+PASS phone ath: wall/building hits ≤ 1/min · {"wallPerMin":0,"bigDrop":0,"hits":1}
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":12.1}
+PASS phone ath: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone ath: no loading screens while driving · {"loads":0}
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.77,"carL":4.44,"carH":1.37,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":1,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,1704,786]}
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":912,"start":0,"end":0,"ex":[]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone: zero console / page errors · []
+TPLAY FAIL 2 · 571 s · qa23/review/ath_base/tPlay.json

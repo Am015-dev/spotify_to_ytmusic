@@ -1,0 +1,6 @@
+built {"sel":"mine","saved":33,"live":33}
+traffic {"x":2152.08,"z":-22.32765036025097,"h":0}
+shot 09_side_traffic
+shot 10_side_tyres
+tyre [0.03,0.03,0.03,0.03] dist 7.5
+ERR []

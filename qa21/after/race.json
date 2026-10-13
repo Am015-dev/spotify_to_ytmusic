@@ -1,0 +1,157 @@
+{
+ "LOG": [
+  {
+   "name": "race_noboost",
+   "fx": {
+    "state": "race",
+    "v": 10.7,
+    "bm": 48.7,
+    "nitro": false,
+    "bash": false,
+    "sparks": 0,
+    "sparkFar": 0,
+    "sparkBig": 0,
+    "turb": null,
+    "fov": 65.3,
+    "uBoost": 0,
+    "sl": 0,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "race_boost_015",
+   "fx": {
+    "state": "race",
+    "v": 12.2,
+    "bm": 58.7,
+    "nitro": true,
+    "bash": false,
+    "sparks": 7,
+    "sparkFar": 4.9,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2.95,
+      "sc": 0.99,
+      "len": 0.94
+     },
+     {
+      "d": 2.95,
+      "sc": 0.99,
+      "len": 0.94
+     }
+    ],
+    "fov": 70.1,
+    "uBoost": 0.35,
+    "sl": 0.12,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "race_boost_05",
+   "fx": {
+    "state": "race",
+    "v": 18.4,
+    "bm": 49.9,
+    "nitro": true,
+    "bash": false,
+    "sparks": 8,
+    "sparkFar": 5,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2.97,
+      "sc": 1.09,
+      "len": 1.08
+     },
+     {
+      "d": 2.97,
+      "sc": 1.09,
+      "len": 1.02
+     }
+    ],
+    "fov": 73.4,
+    "uBoost": 0.31,
+    "sl": 0.12,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "race_boost_12",
+   "fx": {
+    "state": "race",
+    "v": 31.1,
+    "bm": 32.3,
+    "nitro": true,
+    "bash": false,
+    "sparks": 6,
+    "sparkFar": 6,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2.97,
+      "sc": 1.09,
+      "len": 1.15
+     },
+     {
+      "d": 2.97,
+      "sc": 1.09,
+      "len": 1.19
+     }
+    ],
+    "fov": 78.8,
+    "uBoost": 0.3,
+    "sl": 0.18,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "race_boost_26",
+   "fx": {
+    "state": "race",
+    "v": 57.5,
+    "bm": 3.8,
+    "nitro": true,
+    "bash": true,
+    "sparks": 8,
+    "sparkFar": 9.1,
+    "sparkBig": 0,
+    "turb": [
+     {
+      "d": 2.97,
+      "sc": 1.09,
+      "len": 1.41
+     },
+     {
+      "d": 2.97,
+      "sc": 1.09,
+      "len": 1.35
+     }
+    ],
+    "fov": 91.7,
+    "uBoost": 0.3,
+    "sl": 0.44,
+    "b2kErr": null
+   }
+  },
+  {
+   "name": "race_after",
+   "fx": {
+    "state": "race",
+    "v": 59,
+    "bm": 10.9,
+    "nitro": false,
+    "bash": false,
+    "sparks": 1,
+    "sparkFar": 114.8,
+    "sparkBig": 0,
+    "turb": null,
+    "fov": 88.5,
+    "uBoost": 0,
+    "sl": 0.32,
+    "b2kErr": null
+   }
+  }
+ ],
+ "errs": []
+}

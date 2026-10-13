@@ -1,0 +1,99 @@
+{
+ "LOG": [
+  {
+   "label": "menu",
+   "mus": {
+    "mode": "menu",
+    "track": "menu",
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": false,
+      "t": 3,
+      "g": 0.3,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": true,
+      "t": 0,
+      "g": 0,
+      "rs": 4
+     }
+    ],
+    "dead": [],
+    "err": null
+   },
+   "state": "menu",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0
+  },
+  {
+   "label": "race_missing_file",
+   "mus": {
+    "mode": "race",
+    "track": null,
+    "unlocked": true,
+    "ctx": "running",
+    "muted": false,
+    "level": 0.3,
+    "duck": 1,
+    "synth": 0.156,
+    "playing": [
+     {
+      "name": "menu",
+      "paused": true,
+      "t": 6.6,
+      "g": 0,
+      "rs": 4
+     },
+     {
+      "name": null,
+      "paused": false,
+      "t": 0,
+      "g": 0.3,
+      "rs": 0
+     }
+    ],
+    "dead": [
+     "race"
+    ],
+    "err": null
+   },
+   "state": "race",
+   "master": 0.48,
+   "fx": 0.495,
+   "synth": 0.156
+  }
+ ],
+ "mlog": [
+  {
+   "t": 4.3,
+   "mode": "menu",
+   "track": "menu"
+  },
+  {
+   "t": 8.3,
+   "mode": "race",
+   "track": "race"
+  },
+  {
+   "t": 8.4,
+   "err": "race"
+  }
+ ],
+ "net": [
+  "menu.mp3",
+  "race.mp3"
+ ],
+ "errs": [
+  "console: Failed to load resource: the server responded with a status of 404 (File not found)"
+ ]
+}

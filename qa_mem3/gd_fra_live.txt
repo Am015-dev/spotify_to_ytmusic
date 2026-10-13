@@ -1,0 +1,31 @@
+t=0s tot 114.9 MB cpu 47.6 geoms 4061 pos -418,453
+t=30s tot 115.0 MB cpu 47.7 geoms 4066 pos -418,453
+t=60s tot 115.2 MB cpu 47.8 geoms 4087 pos -418,453
+t=90s tot 115.2 MB cpu 47.9 geoms 4106 pos -418,453
+t=120s tot 135.7 MB cpu 68.4 geoms 4127 pos -418,453
+t=150s tot 165.9 MB cpu 98.6 geoms 4139 pos -418,453
+t=180s tot 204.2 MB cpu 90.4 geoms 4190 pos -418,453
+t=210s tot 204.2 MB cpu 90.5 geoms 4205 pos -418,453
+t=240s tot 204.2 MB cpu 90.5 geoms 4221 pos -418,453
+owner | n 30s→240s | gpuMB | Δgpu | Δcpu
+  Group/keep+wbLod|Mesh(h) | 0 | 158 | 0.0 | 66.5 | 66.51 | 37.08
+  Group/keep+wbLod|Mesh | 0 | 51 | 0.0 | 21.9 | 21.87 | 4.86
+  Group/keep+P|Mesh(h) | 0 | 1 | 0.0 | 0.6 | 0.58 | 0.58
+  Group/Group/Group|Mesh(h) | 72 | 81 | 1.5 | 1.7 | 0.16 | 0.16
+  Group/Group/Group|Mesh | 259 | 322 | 0.3 | 0.4 | 0.06 | 0.06
+  Mesh|Mesh | 6 | 5 | 0.1 | 0.1 | -0.01 | -0.01
+  Mesh|Mesh(h) | 4 | 5 | 0.0 | 0.0 | 0.01 | 0.01
+  Group/Points|Points(h) | 1 | 0 | 0.0 | 0.0 | -0.01 | -0.01
+  Group/Points|Points | 0 | 1 | 0.0 | 0.0 | 0.01 | 0.01
+  PerspectiveCamera/LineSegments|LineSegments | 1 | 1 | 0.0 | 0.0 | 0.00 | 0.00
+  LineSegments|LineSegments(h) | 1 | 1 | 0.1 | 0.1 | 0.00 | 0.00
+  a8+art6c|Mesh(h) | 16 | 16 | 1.1 | 1.1 | 0.00 | 0.00
+  a8+art6c/a8s+keep|Mesh | 16 | 16 | 0.0 | 0.0 | 0.00 | 0.00
+  art6|Mesh(h) | 2 | 2 | 0.0 | 0.0 | 0.00 | 0.00
+  Points|Points(h) | 1 | 1 | 0.0 | 0.0 | 0.00 | 0.00
+  LineSegments|LineSegments | 1 | 1 | 0.0 | 0.0 | 0.00 | 0.00
+  Points|Points | 5 | 5 | 0.1 | 0.1 | 0.00 | 0.00
+  keep|Mesh | 1 | 1 | 0.0 | 0.0 | 0.00 | 0.00
+  Group/Group/Mesh|Mesh | 184 | 184 | 0.2 | 0.2 | 0.00 | 0.00
+  Group/Group/Sprite|Sprite | 8 | 8 | 0.0 | 0.0 | 0.00 | 0.00
+errs []

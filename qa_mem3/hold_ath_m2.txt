@@ -1,0 +1,48 @@
+{"city":"ath","heapBefore":164.7,"heapAfter":165.7,"liveSampledMB":107.3,"errs":[]}
+--self
+  11.27 Object3D@7118
+  10.29 TR_bldFix@7381
+   9.86 add@4993
+   8.50 push@0
+   8.25 (anon)@5043
+   6.54 put@4491
+   4.85 hubGrid@4015
+   4.28 set@0
+   3.63 Color@8456
+   3.58 CV_put@8031
+   3.13 add@11123
+   3.06 buildHubProps@4993
+   2.19 BK_cand@14157
+   1.90 cloneUniforms@12072
+   1.82 OG_build@7491
+   1.76 hubAddB@4007
+   1.72 chain@5073
+   1.16 createBindingState@15109
+   1.13 WB_split@12495
+   1.13 BufferGeometry@10428
+   1.00 InstancedMesh@32452
+   0.88 setup@15017
+   0.75 computeBoundingSphere@32506
+   0.67 join@0
+   0.63 SM_shC@3865
+--stacks
+  10.29 buildHubG@4592 < hubGrid@7879 < hubGrid@7403 < TR_bldFix@7381
+   8.25 buildHubProps@7890 < buildHubProps@4993 < forEach@0 < (anon)@5043
+   6.54 buildHubG@4592 < next@0 < athBuildG@4468 < put@4491
+   5.79 buildHubProps@7890 < buildHubProps@4993 < InstancedMesh@32452 < Object3D@7118
+   5.48 buildHubProps@7890 < buildHubProps@4993 < CE_lots@4987 < add@4993
+   4.85 buildHubG@4592 < hubGrid@7879 < hubGrid@7403 < hubGrid@4015
+   3.63 buildHubProps@4993 < forEach@0 < (anon)@5043 < Color@8456
+   3.58 next@0 < athBuildG@4468 < put@4491 < CV_put@8031
+   3.30 buildHubG@4592 < buildHubProps@7890 < buildHubProps@4993 < push@0
+   3.13 (anon)@11137 < QS_rampFit@11127 < QS_roads@11123 < add@11123
+   3.06 next@0 < buildHubG@4592 < buildHubProps@7890 < buildHubProps@4993
+   2.57 buildHubG@4592 < buildHubProps@7890 < buildHubProps@4993 < add@4993
+   2.29 LV_corner@12035 < LV_onRoad@12034 < LV_eGrid@12032 < push@0
+   2.13 WB_cityPrep@12506 < WB_split@12495 < Mesh@11502 < Object3D@7118
+   1.82 (anon)@7719 < (anon)@7674 < OG_tick@7648 < OG_build@7491
+   1.76 next@0 < athBuildG@4468 < put@4491 < hubAddB@4007
+   1.72 buildHubTraffic@5065 < map@0 < (anon)@5074 < chain@5073
+   1.71 prepareMaterial@29100 < getProgram@29800 < getUniforms@20950 < cloneUniforms@12072
+   1.16 renderObject@29769 < WebGLRenderer.renderBufferDirect@28948 < setup@15017 < createBindingState@15109
+   1.13 ldPrewarm@12612 < (anon)@12787 < WB_cityPrep@12506 < WB_split@12495

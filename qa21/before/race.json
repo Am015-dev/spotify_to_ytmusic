@@ -1,0 +1,29 @@
+{
+ "LOG": [
+  {
+   "name": "race_noboost",
+   "fx": "Error: page.evaluate: SyntaxError: Invalid or unexpected token\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "name": "race_boost_015",
+   "fx": "Error: page.evaluate: SyntaxError: Invalid or unexpected token\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "name": "race_boost_05",
+   "fx": "Error: page.evaluate: SyntaxError: Invalid or unexpected token\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "name": "race_boost_12",
+   "fx": "Error: page.evaluate: SyntaxError: Invalid or unexpected token\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "name": "race_boost_26",
+   "fx": "Error: page.evaluate: SyntaxError: Invalid or unexpected token\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "name": "race_after",
+   "fx": "Error: page.evaluate: SyntaxError: Invalid or unexpected token\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:290:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  }
+ ],
+ "errs": []
+}

@@ -1,0 +1,2 @@
+fra HITCH {"build":{"ms":98178,"slices":118,"slMax":8202,"sl50":13,"sl100":13,"big":[[8201,"piece 96 tex"],[6350,"piece 117 tex"],[3181,"piece 39 tex"],[3095,"piece 723 tex"],[2482,"piece 324 tex"],[1672,"piece 156 tex"]],"pixN":18,"pixMs":31393,"pixMax":8201,"tPrep":279,"cells":740,"err":null},"framesDuringBuild":{"n":159,"worst":9570,"p50":23,"over50":38,"over100":34},"framesAfter":{"n":38,"worst":6866,"p50":16,"over50":4,"over100":3}}
+errors 0 

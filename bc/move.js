@@ -1,0 +1,5 @@
+// bc/move.js <url> <tpl...>: real taps equip each template, enter roam, hold the real GAS key (ArrowUp) and step the sim 3 s (__mho.roamSim): km/h at 1 s / 2 s / 3 s
+const E=require('./enter.js');(async()=>{for(const TPL of process.argv.slice(3)){const T=await E(process.argv[2]);const{p,tap,ev}=T;
+ await tap('#gbMenuBtn');await p.waitForTimeout(1500);await tap('#gbx .gbTabs [data-t="veh"]');await p.waitForTimeout(1500);await tap(`#g9Col .g9Card[data-gc="${TPL}"] img`);await p.waitForTimeout(1000);await tap('#gbSave');await p.waitForTimeout(1500);
+ await T.roamApi();await p.evaluate(()=>__bc.measure());await p.keyboard.down('ArrowUp');const v=[];for(let i=0;i<3;i++){await p.evaluate(()=>__mho.roamSim(60));v.push(await p.evaluate(()=>Math.round(Math.abs(__mho.RO.v)*3.6)))}await p.keyboard.up('ArrowUp');
+ console.log(TPL,await ev('GAR_get().sel'),'kmh@1/2/3s',v.join('/'),'big',await ev('BC.big'),'errs',T.errs.length,T.errs.slice(0,2));await T.b.close()}})().catch(e=>{console.log('FAIL',e);process.exit(1)});

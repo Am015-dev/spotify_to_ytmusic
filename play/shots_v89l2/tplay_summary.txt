@@ -1,0 +1,24 @@
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":5.6}
+FAIL phone ath: wall/building hits ≤ 1/min · {"wallPerMin":2.98,"bigDrop":39,"hits":50}
+FAIL phone fra: wall/building hits ≤ 1/min · {"wallPerMin":1.49,"bigDrop":18,"hits":23}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":926,"start":0,"end":0,"ex":[]}
+PASS phone ath: no loading screens while driving · {"loads":0}
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.76,"carL":4.63,"carH":1.57,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.95,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+PASS phone ath: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone fra: monitor ran · null
+PASS phone fra: no HUD element over a touch control · []
+PASS phone fra: no HUD text under 12 px · []
+PASS phone fra: no collider on the paved road (invisible walls / oversize hulls) · {"pts":2368,"start":0,"end":0,"ex":[]}
+PASS phone fra: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.81,"carL":4.34,"carH":1.42,"player":{"h":2.1,"l":4.48,"w":1.98},"pedRel":1.04,"pedVsPlayer":1.01,"nPed":8,"nCar":8}
+PASS phone fra: stuck ≤ 3 % · {"stuckPct":3}
+PASS phone fra: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone: zero console / page errors · []
+TPLAY_FAST FAIL 4 · 620 s · qa_p89l/*.log
+phone ath {"min":4.02,"hits":50,"kinds":{"traffic":34,"wall":12,"ped":3,"other":1},"wallHits":12,"wallPerMin":2.98,"hitsPerMin":12.43,"bigDrop":39,"stuckPct":5.6,"avgKmh":29.3,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":12.9,"traffic120m":12.6,"missions":[],"stuckEp":[{"f":2596,"x":2045.9,"z":-1641.1,"y":39.66,"h":20.84,"g":0,"car":3.1,"wall":null,"ch":false,"in":"GB-1"
+phone fra {"min":4.02,"hits":23,"kinds":{"other":8,"traffic":8,"ped":1,"wall":6},"wallHits":6,"wallPerMin":1.49,"hitsPerMin":5.72,"bigDrop":18,"stuckPct":3,"avgKmh":50.8,"loads":0,"loadsPerMin":0,"camInsidePct":0,"camInside":[],"smashPerMin":3.5,"traffic120m":13.6,"missions":[{"f":1,"start":"Hot Drop"}],"stuckEp":[{"f":7955,"x":1506.1,"z":-95.9,"y":14.87,"h":-10.48,"g":0,"car":2.9,"wall":null,"ch"

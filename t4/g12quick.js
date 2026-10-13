@@ -1,0 +1,19 @@
+// t4/g12quick.js (v88y review fixes): 852x393 touch. Builder → SELECT 2 parts (real taps) → shot q1 (selection bar vs palette);
+// a saved part → MY PARTS → tap it (real tap) → shot q2 (held pad vs palette); tap the checklist chip in BUILD → shot q3 (stays a chip). IFRAME=1 = in an iframe.
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const U=process.argv[2],O=process.argv[3];require('fs').mkdirSync(O,{recursive:true});
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true});
+ const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(String(e)));pg.on('console',m=>{if(m.type()==='error')errs.push(m.text())});let p=pg;
+ if(process.env.IFRAME){await pg.setContent(`<html><body style="margin:0;background:#000"><iframe src="${U}" style="border:0;width:852px;height:393px"></iframe></body></html>`);await pg.waitForTimeout(3000);p=pg.frames().find(f=>f.url().startsWith(U.split('?')[0]))}else await pg.goto(U);
+ await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});const cdp=await ctx.newCDPSession(pg),ev=(f,a)=>p.evaluate(f,a);
+ const tapXY=async(x,y)=>{const tp=[{x,y,id:1,radiusX:4,radiusY:4,force:1}];await Promise.all([cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:tp}),cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})]);await pg.waitForTimeout(700)};
+ const tap=async s=>{const e=await p.$(s);if(!e)return console.log('NO',s);const bb=await e.boundingBox();if(!bb)return console.log('NOBOX',s);await tapXY(bb.x+bb.width/2,bb.y+bb.height/2)};
+ const ovl=()=>ev(()=>{const R=e=>e&&!e.hidden&&e.offsetParent?e.getBoundingClientRect():null,P=document.querySelector('#gbBkP'),pr=R(P);const out={};for(const id of['gsBar','slBar']){const r=R(document.getElementById(id));if(r&&pr)out[id]={barRight:Math.round(r.right),paletteLeft:Math.round(pr.left),overlap:r.right>pr.left&&r.bottom>pr.top}}
+  const pin=document.getElementById('odPin');out.pin=pin&&!pin.hidden?(pin.classList.contains('col')?'chip':'EXPANDED'):'hidden';return out});
+ const shot=async n=>{await pg.waitForTimeout(900);await pg.screenshot({path:`${O}/${n}.png`});console.log('shot',n,JSON.stringify(await ovl()))};
+ await ev(()=>localStorage.setItem('mho_parts',JSON.stringify([{id:'pq1',n:'Side pod',b:[{t:'b22',x:0,z:0,y:0,r:0,m:0,c:0},{t:'b22',x:0,z:2,y:0,r:0,m:0,c:0},{t:'rt22',x:0,z:0,y:3,r:0,m:0,c:9}]}])));
+ await tap('#gbMenuBtn');await pg.waitForTimeout(1500);await tap('#r2R [data-r2m="build"]');await pg.waitForTimeout(2500);
+ await tap('#gbBkP [data-r2b="sel"]');await ev(()=>__g9ev('B25_set(60)'));await pg.waitForTimeout(600);const C=await ev(()=>__gx.cand());console.log('cand',JSON.stringify(C.slice(0,3)));for(const c of C.slice(0,1))await tapXY(c.x,c.y);console.log('sel',await ev(()=>__sl.sel().length),await ev(()=>__gb.GB_.tool));await shot('q1_select_bar');
+ await ev(()=>__g9ev('SL_set([]);GB_.tool="add";GB_ui()'));await ev(()=>__g9ev('B25_set(6)'));await tap('#gxCh [data-gxc="My parts"]');await tap('#gbBkPc .paC[data-pa="pq1"]');console.log('carry',JSON.stringify(await ev(()=>__pa.carry())));
+ const s=await ev(()=>__gb.scr(3,0));if(s)await tapXY(s.x,s.y);console.log('carry2',JSON.stringify(await ev(()=>__pa.carry())),'layer',await ev(()=>__g9ev('B25.L')));await shot('q2_held_pad');await tap('#gsBar [data-g="cancel"]');
+ await tap('#odPin [data-p="exp"]');await pg.waitForTimeout(800);if(await p.$('#odChk:not([hidden]), .odChk'))console.log('full checklist opened');await ev(()=>{const c=document.querySelector('#odChk [data-x="close"],#odChk .x');if(c)c.click()});
+ await shot('q3_pin_build');console.log('ERR',JSON.stringify(errs.filter(e=>!/GPU stall|GL Driver/.test(e)).slice(0,6)));await b.close()})();

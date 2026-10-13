@@ -1,0 +1,9 @@
+city ath
+shot 0 -1928 566 {"peds":13,"cars":0,"birds":4,"boats":0}
+shot 1 232 -1543 {"peds":32,"cars":1,"birds":14,"boats":0}
+shot 2 -3036 1339 {"peds":16,"cars":0,"birds":7,"boats":0}
+shot 3 -1950 -1975 {"peds":8,"cars":0,"birds":0,"boats":0}
+shot 4 -5385 2810 {"peds":19,"cars":0,"birds":7,"boats":0}
+frame_ms {"withRender":1047.91,"cpuOnly":7.1}
+lv {"peds":70,"flags":0,"roofs":2084,"boats":0,"birds":9,"blimp":true,"ms":0.07149572772252427}
+errors 0 

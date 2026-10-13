@@ -1,0 +1,481 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "fra": {
+    "min": 5.14,
+    "hits": 32,
+    "kinds": {
+     "other": 17,
+     "traffic": 7,
+     "wall": 4,
+     "ped": 2,
+     "landing": 2
+    },
+    "wallHits": 4,
+    "wallPerMin": 0.78,
+    "hitsPerMin": 6.22,
+    "bigDrop": 23,
+    "stuckPct": 10.2,
+    "avgKmh": 42.6,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 4.1,
+    "traffic120m": 12.1,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "BRICK PACK 1/12",
+      "f": 9084,
+      "v0": 112,
+      "v1": 12,
+      "drop": 0.9,
+      "kind": "ped",
+      "x": 974,
+      "z": -18,
+      "dy": 0
+     },
+     {
+      "ctx": "BRICK PACK 1/12",
+      "f": 11854,
+      "v0": 65,
+      "v1": 6,
+      "drop": 0.9,
+      "kind": "other",
+      "x": 629,
+      "z": -78,
+      "dy": -0.1
+     },
+     {
+      "ctx": "BRICK PACK 1/12",
+      "f": 16422,
+      "v0": 47,
+      "v1": 5,
+      "drop": 0.89,
+      "kind": "other",
+      "x": 427,
+      "z": -369,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4217,
+      "v0": 74,
+      "v1": 10,
+      "drop": 0.86,
+      "kind": "traffic",
+      "x": 1555,
+      "z": -135,
+      "dy": 0
+     },
+     {
+      "ctx": "BRICK PACK 1/12",
+      "f": 16099,
+      "v0": 88,
+      "v1": 17,
+      "drop": 0.8,
+      "kind": "ped",
+      "x": 425,
+      "z": -363,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.83,
+     "carL": 4.38,
+     "carH": 1.64,
+     "player": {
+      "h": 2.1,
+      "l": 4.48,
+      "w": 1.98
+     },
+     "pedRel": 1.04,
+     "pedVsPlayer": 1.02,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1024,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#wrongWay×#odPin",
+     "#roamPlate×#tuG"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [],
+    "perf": {
+     "calls": 201,
+     "tris": 1267502,
+     "jsMs": 0,
+     "geoms": 4183,
+     "tex": 117
+    },
+    "mem": [
+     {
+      "f": 0,
+      "totMB": 286.6,
+      "geoms": 4048,
+      "tex": 112,
+      "sceneGeo": 4488,
+      "geoMB": 188.6,
+      "cpuGeoMB": 49.9,
+      "heap": 72.8
+     },
+     {
+      "f": 600,
+      "totMB": 288.4,
+      "geoms": 4048,
+      "tex": 112,
+      "sceneGeo": 4504,
+      "geoMB": 195.4,
+      "cpuGeoMB": 49.9,
+      "heap": 73.3
+     },
+     {
+      "f": 1200,
+      "totMB": 288.4,
+      "geoms": 4048,
+      "tex": 112,
+      "sceneGeo": 4518,
+      "geoMB": 205.3,
+      "cpuGeoMB": 49.9,
+      "heap": 74.6
+     },
+     {
+      "f": 1800,
+      "totMB": 295.7,
+      "geoms": 4048,
+      "tex": 112,
+      "sceneGeo": 4537,
+      "geoMB": 214.2,
+      "cpuGeoMB": 49.9,
+      "heap": 76.1
+     },
+     {
+      "f": 2400,
+      "totMB": 291.7,
+      "geoms": 4065,
+      "tex": 115,
+      "sceneGeo": 4540,
+      "geoMB": 215.7,
+      "cpuGeoMB": 48.4,
+      "heap": 76.3
+     },
+     {
+      "f": 3000,
+      "totMB": 290.3,
+      "geoms": 4065,
+      "tex": 115,
+      "sceneGeo": 4543,
+      "geoMB": 215.7,
+      "cpuGeoMB": 48.4,
+      "heap": 76.4
+     },
+     {
+      "f": 3600,
+      "totMB": 290.3,
+      "geoms": 4072,
+      "tex": 116,
+      "sceneGeo": 4543,
+      "geoMB": 215.7,
+      "cpuGeoMB": 48.4,
+      "heap": 76.5
+     },
+     {
+      "f": 4200,
+      "totMB": 290.5,
+      "geoms": 4072,
+      "tex": 116,
+      "sceneGeo": 4543,
+      "geoMB": 215.7,
+      "cpuGeoMB": 48.4,
+      "heap": 76.7
+     },
+     {
+      "f": 4800,
+      "totMB": 290.6,
+      "geoms": 4089,
+      "tex": 117,
+      "sceneGeo": 4558,
+      "geoMB": 216.8,
+      "cpuGeoMB": 48.4,
+      "heap": 76.7
+     },
+     {
+      "f": 5400,
+      "totMB": 290.6,
+      "geoms": 4089,
+      "tex": 117,
+      "sceneGeo": 4558,
+      "geoMB": 216.8,
+      "cpuGeoMB": 48.4,
+      "heap": 76.4
+     },
+     {
+      "f": 6000,
+      "totMB": 290.8,
+      "geoms": 4089,
+      "tex": 117,
+      "sceneGeo": 4558,
+      "geoMB": 216.8,
+      "cpuGeoMB": 48.4,
+      "heap": 76.8
+     },
+     {
+      "f": 6600,
+      "totMB": 290.9,
+      "geoms": 4089,
+      "tex": 117,
+      "sceneGeo": 4558,
+      "geoMB": 216.8,
+      "cpuGeoMB": 48.4,
+      "heap": 76.9
+     },
+     {
+      "f": 7200,
+      "totMB": 290.9,
+      "geoms": 4103,
+      "tex": 117,
+      "sceneGeo": 4553,
+      "geoMB": 220.2,
+      "cpuGeoMB": 48.4,
+      "heap": 76.9
+     },
+     {
+      "f": 7800,
+      "totMB": 291.3,
+      "geoms": 4103,
+      "tex": 117,
+      "sceneGeo": 4568,
+      "geoMB": 231.6,
+      "cpuGeoMB": 48.4,
+      "heap": 77.1
+     },
+     {
+      "f": 8400,
+      "totMB": 297.8,
+      "geoms": 4103,
+      "tex": 117,
+      "sceneGeo": 4583,
+      "geoMB": 241.1,
+      "cpuGeoMB": 54.9,
+      "heap": 77.1
+     },
+     {
+      "f": 9000,
+      "totMB": 298.2,
+      "geoms": 4103,
+      "tex": 117,
+      "sceneGeo": 4578,
+      "geoMB": 241,
+      "cpuGeoMB": 54.9,
+      "heap": 77.3
+     },
+     {
+      "f": 9600,
+      "totMB": 300.7,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4593,
+      "geoMB": 245.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.5
+     },
+     {
+      "f": 10200,
+      "totMB": 298.3,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4590,
+      "geoMB": 245.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.5
+     },
+     {
+      "f": 10800,
+      "totMB": 301,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4597,
+      "geoMB": 249.3,
+      "cpuGeoMB": 54.9,
+      "heap": 77.6
+     },
+     {
+      "f": 11400,
+      "totMB": 298.8,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4597,
+      "geoMB": 249.3,
+      "cpuGeoMB": 54.9,
+      "heap": 77.7
+     },
+     {
+      "f": 12000,
+      "totMB": 300,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4613,
+      "geoMB": 257.6,
+      "cpuGeoMB": 54.9,
+      "heap": 77.5
+     },
+     {
+      "f": 12600,
+      "totMB": 299,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4604,
+      "geoMB": 254.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.4
+     },
+     {
+      "f": 13200,
+      "totMB": 299,
+      "geoms": 4119,
+      "tex": 117,
+      "sceneGeo": 4604,
+      "geoMB": 254.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.7
+     },
+     {
+      "f": 13800,
+      "totMB": 299,
+      "geoms": 4164,
+      "tex": 117,
+      "sceneGeo": 4619,
+      "geoMB": 254.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.9
+     },
+     {
+      "f": 14400,
+      "totMB": 299.1,
+      "geoms": 4164,
+      "tex": 117,
+      "sceneGeo": 4619,
+      "geoMB": 254.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.9
+     },
+     {
+      "f": 15000,
+      "totMB": 299.7,
+      "geoms": 4164,
+      "tex": 117,
+      "sceneGeo": 4619,
+      "geoMB": 254.2,
+      "cpuGeoMB": 54.9,
+      "heap": 78
+     },
+     {
+      "f": 15600,
+      "totMB": 299.3,
+      "geoms": 4164,
+      "tex": 117,
+      "sceneGeo": 4623,
+      "geoMB": 254.5,
+      "cpuGeoMB": 54.9,
+      "heap": 78.1
+     },
+     {
+      "f": 16200,
+      "totMB": 299.9,
+      "geoms": 4164,
+      "tex": 117,
+      "sceneGeo": 4623,
+      "geoMB": 254.5,
+      "cpuGeoMB": 54.9,
+      "heap": 78.1
+     },
+     {
+      "f": 16800,
+      "totMB": 299.3,
+      "geoms": 4164,
+      "tex": 117,
+      "sceneGeo": 4631,
+      "geoMB": 259.2,
+      "cpuGeoMB": 54.9,
+      "heap": 77.8
+     },
+     {
+      "f": 17400,
+      "totMB": 300,
+      "geoms": 4163,
+      "tex": 117,
+      "sceneGeo": 4626,
+      "geoMB": 257.2,
+      "cpuGeoMB": 54.9,
+      "heap": 78.1
+     }
+    ],
+    "wallSec": 427
+   }
+  },
+  "errs": [],
+  "warns": [
+   "WB_up TypeError: Cannot read properties of null (reading '0')\n    at BufferAttribute.getX (http://127.0.0.1:8766/node_modules/three/build/three.module.js:10012:21)\n    at Vector3.fromBufferAttribute ("
+  ]
+ }
+]

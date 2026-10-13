@@ -1,0 +1,10 @@
+PASS RIDES: folded chip 
+shot g1_rides_chip
+PASS chip tap opens it in the garage 
+PASS countdown: folded countdown
+shot x1_countdown_chip
+PASS opens again after the start 
+shot x2_race_open
+ERRS 0 []
+PASS 0 console errors 
+RESULT PASS

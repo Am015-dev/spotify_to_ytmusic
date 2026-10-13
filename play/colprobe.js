@@ -1,0 +1,7 @@
+// play/colprobe.js <url> <city fra|ath> '<json [[x,z],...]>' : colliders within 9 m of each point + road info (diagnostic only)
+const enter=require('../bc/enter.js');const [URL,CITY,PTS]=process.argv.slice(2);
+(async()=>{const seed=CITY==='ath'?`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}');localStorage.setItem('mho_story.ath@1','{"seen":1}')`:`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))`;
+ const E=await enter(URL,{seed});const {p}=E;p.setDefaultTimeout(900000);await E.roamApi();
+ const r=await p.evaluate(pts=>__g9ev(`(()=>{const P=${pts};const out=[];for(const [x,z] of P){const seen=new Set(),L=[];for(let dx=-9;dx<=9;dx+=1.5)for(let dz=-9;dz<=9;dz+=1.5){const b=roamHit(x+dx,z+dz,.05,groundAt?groundAt(x,z)+.5:1);if(b&&!seen.has(b)){seen.add(b);const o={};for(const k in b){const v=b[k];if(typeof v==='number')o[k]=+v.toFixed(2);else if(typeof v==='string'||typeof v==='boolean')o[k]=v;else if(v&&typeof v==='object')o[k]='{'+(v.constructor&&v.constructor.name)+'}'}L.push(o)}}
+  let rd=null;try{rd=CID==='ath'?__mho.athRoad(x,z,48):null}catch(e){rd=String(e)}out.push({x,z,rd:rd&&{e:rd.e!=null?+rd.e.toFixed(2):null,w:rd.w,keys:Object.keys(rd).join('/')},n:L.length,L})}return JSON.stringify(out)})()`),PTS);
+ for(const o of JSON.parse(r))console.log(JSON.stringify(o));await E.b.close()})();

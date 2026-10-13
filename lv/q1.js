@@ -1,0 +1,1 @@
+(()=>{const F=LV.flags;const b=HUB.bld.slice(0,3).map(b=>JSON.stringify(b).slice(0,200));return JSON.stringify({n:F&&F.L.length,L:F&&F.L.slice(0,5),b,roof:HUB.bld.slice(0,3).map(b=>roofAt(b.x,b.z)),cnt:F&&F.c.map(m=>m.count),car:[RO.x,RO.y,RO.z]})})()

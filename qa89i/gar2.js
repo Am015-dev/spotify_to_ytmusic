@@ -1,0 +1,9 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const URL=process.argv[2],OUT=process.argv[3];fs.mkdirSync(OUT,{recursive:true});
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true});
+const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto(URL);await p.waitForFunction(()=>window.__mho&&!document.querySelector('#topBtns').hidden,null,{timeout:240000});await p.waitForTimeout(2500);
+const R=()=>p.evaluate(()=>{const f=s=>{const e=document.querySelector(s);if(!e||e.hidden||e.closest('[hidden]'))return null;const cs=getComputedStyle(e);if(cs.display==='none')return null;const q=e.getBoundingClientRect();return q.width?[q.left|0,q.top|0,q.right|0,q.bottom|0]:null};return{pin:f('#odPin'),yield:document.body.classList.contains('odYield'),title:f('#home .hbar h2'),gbx:f('#gbx'),drop:f('#gbx .r2Menu, #gbx .r2Drop, #gbx [class*=Cat][class*=List]')}});
+console.log('menu',JSON.stringify(await R()));await p.screenshot({path:OUT+'/menu.png'});
+await p.click('#gbMenuBtn');await p.waitForTimeout(2000);await p.getByText('BUILD',{exact:true}).first().click();await p.waitForTimeout(2500);console.log('byo',JSON.stringify(await R()));await p.screenshot({path:OUT+'/byo.png'});
+const ids=await p.evaluate(()=>[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&/(Cat|Drop|Menu|Pop)/i.test(e.id+' '+e.className)&&getComputedStyle(e).display!=='none'}).slice(0,15).map(e=>e.tagName+'#'+e.id+'.'+String(e.className).slice(0,30)));console.log(ids);
+console.log(errs);await b.close()})()

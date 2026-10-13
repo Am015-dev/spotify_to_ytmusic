@@ -1,0 +1,1 @@
+{"city":"fra","seen":72,"seenByType":{"delivery":5,"sedan":23,"bus":3,"su:t_su":7,"van":6,"su:t_su_pink":6,"taxi":6,"truck":3,"su:t_sc_hy":3,"police":2,"su:t_sc_tm":8},"cityMix":{"sedan":25,"su:t_su_pink":6,"su:t_sc_tm":9,"su:t_su":7,"taxi":6,"delivery":5,"bus":3,"police":2,"van":6,"truck":3,"su:t_sc_hy":3},"trafKmh":{"avg":49,"min":0,"max":58},"avgKmh":36,"errs":[]}

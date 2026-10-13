@@ -1,0 +1,351 @@
+{
+ "city": "ath",
+ "load_event": 8.98,
+ "menu_ready": 14.59,
+ "trace_ms": {
+  "FunctionCall": 10322,
+  "V8.GC_MC_BACKGROUND_MARKING": 311,
+  "V8.CompileCode": 242,
+  "ParseHTML": 197,
+  "V8.ParseProgram": 167,
+  "V8.GC_BACKGROUND_YOUNG_ARRAY_BUFFER_SWEEP": 163,
+  "MinorGC": 156,
+  "V8.GCScavenger": 152,
+  "V8.GC_SCAVENGER": 138,
+  "V8.GC_SCAVENGER_SCAVENGE": 136,
+  "V8.GC_BACKGROUND_FULL_ARRAY_BUFFER_SWEEP": 128,
+  "V8.PreParse": 127
+ },
+ "paint": [
+  [
+   "first-paint",
+   728
+  ],
+  [
+   "first-contentful-paint",
+   728
+  ]
+ ],
+ "nav": {
+  "ttfb": 633,
+  "dcl": 4134,
+  "load": 8954
+ },
+ "res": [
+  {
+   "n": "km.js",
+   "kb": 577,
+   "dec": 1916,
+   "ms": 674,
+   "st": 684
+  },
+  {
+   "n": "three.module.js",
+   "kb": 250,
+   "dec": 1245,
+   "ms": 220,
+   "st": 1544
+  },
+  {
+   "n": "EffectComposer.js",
+   "kb": 1,
+   "dec": 5,
+   "ms": 212,
+   "st": 1544
+  },
+  {
+   "n": "RenderPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 336,
+   "st": 1544
+  },
+  {
+   "n": "UnrealBloomPass.js",
+   "kb": 3,
+   "dec": 12,
+   "ms": 362,
+   "st": 1544
+  },
+  {
+   "n": "ShaderPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 405,
+   "st": 1544
+  },
+  {
+   "n": "OutputPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 406,
+   "st": 1544
+  },
+  {
+   "n": "Reflector.js",
+   "kb": 2,
+   "dec": 7,
+   "ms": 420,
+   "st": 1544
+  },
+  {
+   "n": "BufferGeometryUtils.js",
+   "kb": 7,
+   "dec": 31,
+   "ms": 456,
+   "st": 1545
+  },
+  {
+   "n": "CopyShader.js",
+   "kb": 1,
+   "dec": 1,
+   "ms": 275,
+   "st": 1758
+  },
+  {
+   "n": "MaskPass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 304,
+   "st": 1758
+  },
+  {
+   "n": "Pass.js",
+   "kb": 1,
+   "dec": 2,
+   "ms": 184,
+   "st": 1883
+  },
+  {
+   "n": "LuminosityHighPassShader.js",
+   "kb": 1,
+   "dec": 1,
+   "ms": 166,
+   "st": 1910
+  },
+  {
+   "n": "OutputShader.js",
+   "kb": 1,
+   "dec": 1,
+   "ms": 1081,
+   "st": 1955
+  },
+  {
+   "n": "tune.json",
+   "kb": 1,
+   "dec": 2,
+   "ms": 227,
+   "st": 4118
+  }
+ ],
+ "menu_heapMB": 24,
+ "menu_nodes": 2752,
+ "menu_gl": {
+  "calls": 0,
+  "tris": 0,
+  "cbMs": 0,
+  "frames": 0,
+  "progs": 107
+ },
+ "menu_fps": {
+  "fps": 0.3,
+  "worstMs": 4121
+ },
+ "roam_enter_s": 143.5,
+ "roam_heapMB": 133,
+ "roam_nodes": 2841,
+ "roam_idle_gl": {
+  "calls": 223,
+  "tris": 1190135,
+  "cbMs": 103.5,
+  "frames": 1,
+  "progs": 162
+ },
+ "roam_idle_fps": {
+  "fps": 0.1,
+  "worstMs": 7427
+ },
+ "drive": [
+  {
+   "fps": 0.4,
+   "worstMs": 2587,
+   "calls": 223,
+   "tris": 1186105,
+   "cbMs": 71.6,
+   "frames": 1
+  },
+  {
+   "fps": 0.1,
+   "worstMs": 11731,
+   "calls": 225,
+   "tris": 1189365,
+   "cbMs": 98.4,
+   "frames": 1
+  },
+  {
+   "fps": 0.2,
+   "worstMs": 4718,
+   "calls": 225,
+   "tris": 1190849,
+   "cbMs": 98.3,
+   "frames": 1
+  },
+  {
+   "fps": 0.2,
+   "worstMs": 4969,
+   "calls": 226,
+   "tris": 1195333,
+   "cbMs": 91.4,
+   "frames": 1
+  }
+ ],
+ "roam_after_drive_heapMB": 137,
+ "roam_after_drive_nodes": 2842,
+ "cpu": {
+  "LayoutDuration": 0.3,
+  "RecalcStyleDuration": 1.4,
+  "DevToolsCommandDuration": 0.9,
+  "ScriptDuration": 39.2,
+  "V8CompileDuration": 0,
+  "TaskDuration": 184.2,
+  "TaskOtherDuration": 142.4
+ },
+ "garage_open_s": 73.56,
+ "garage_heapMB": 143,
+ "garage_nodes": 3552,
+ "garage_gl": {
+  "calls": 133,
+  "tris": 637056,
+  "cbMs": 26.9,
+  "frames": 4,
+  "progs": 162
+ },
+ "garage_fps": {
+  "fps": 0.1,
+  "worstMs": 8405
+ },
+ "errs": [],
+ "net": [
+  {
+   "f": "garage.mp3",
+   "kB": 2920,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "city_ath.mp3",
+   "kB": 2449,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "https://am015-dev.github.io/spotify_to_ytmusic/mainhattan-ov",
+   "kB": 1061,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "km.js",
+   "kB": 578,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "three.module.js",
+   "kB": 251,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "BufferGeometryUtils.js",
+   "kB": 8,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "UnrealBloomPass.js",
+   "kB": 4,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "Reflector.js",
+   "kB": 3,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "EffectComposer.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "RenderPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "ShaderPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "OutputPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "MaskPass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "Pass.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "OutputShader.js",
+   "kB": 2,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "CopyShader.js",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "LuminosityHighPassShader.js",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "tune.json",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "tune.json",
+   "kB": 1,
+   "enc": "",
+   "cc": ""
+  },
+  {
+   "f": "https://am015-dev.github.io/spotify_to_ytmusic/mainhattan-ov",
+   "kB": 0,
+   "enc": "",
+   "cc": ""
+  }
+ ],
+ "net_total_kB": 7292
+}

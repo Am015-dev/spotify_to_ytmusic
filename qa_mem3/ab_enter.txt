@@ -1,0 +1,6 @@
+{"url":"live_dbg.html","city":"ath","menuMB":61.3,"roamMB":161.4,"enter_s":87.753,"errs":[]}
+{"url":"m3_dbg.html","city":"ath","menuMB":61,"roamMB":157.1,"enter_s":65.559,"errs":[]}
+{"url":"m3_dbg.html?bk=0","city":"ath","menuMB":47.6,"roamMB":141.3,"enter_s":86.702,"errs":[]}
+{"url":"live_dbg.html","city":"fra","menuMB":22.9,"roamMB":69,"enter_s":24.599,"errs":[]}
+{"url":"m3_dbg.html","city":"fra","menuMB":36.4,"roamMB":84.8,"enter_s":19.34,"errs":[]}
+{"url":"m3_dbg.html?bk=0","city":"fra","menuMB":36.4,"roamMB":79.4,"enter_s":24.625,"errs":[]}

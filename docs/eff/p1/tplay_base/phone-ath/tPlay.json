@@ -1,0 +1,162 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "ath": {
+    "min": 3.38,
+    "hits": 4,
+    "kinds": {
+     "other": 2,
+     "wall": 2
+    },
+    "wallHits": 2,
+    "wallPerMin": 0.59,
+    "hitsPerMin": 1.18,
+    "bigDrop": 3,
+    "stuckPct": 1.1,
+    "avgKmh": 8.1,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 1.2,
+    "traffic120m": 16.7,
+    "missions": [],
+    "worst": [
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 414,
+      "v0": 170,
+      "v1": 39,
+      "drop": 0.77,
+      "kind": "other",
+      "x": 2207,
+      "z": -1644,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 110,
+      "v0": 58,
+      "v1": 19,
+      "drop": 0.68,
+      "kind": "other",
+      "x": 2158,
+      "z": -1720,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 603,
+      "v0": 38,
+      "v1": 14,
+      "drop": 0.62,
+      "kind": "wall",
+      "x": 2205,
+      "z": -1647,
+      "dy": 0.1
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 783,
+      "v0": 32,
+      "v1": 20,
+      "drop": 0.39,
+      "kind": "wall",
+      "x": 2203,
+      "z": -1654,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.75,
+     "carL": 4.63,
+     "carH": 1.51,
+     "player": {
+      "h": 15.49,
+      "l": 23.34,
+      "w": 16.24
+     },
+     "pedRel": 0.94,
+     "pedVsPlayer": 0.19,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 428,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 455,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": false
+     },
+     "garage": {
+      "pause": false,
+      "btn": true,
+      "open": [
+       "gbx"
+      ],
+      "refused": false,
+      "closeBtn": "✕BACK",
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@0"
+    ],
+    "perf": {
+     "calls": 172,
+     "tris": 1124895,
+     "jsMs": 0,
+     "geoms": 4042,
+     "tex": 128
+    },
+    "wallSec": 473
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]

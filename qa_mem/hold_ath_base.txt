@@ -1,0 +1,83 @@
+{"city":"ath","heapBefore":161.5,"heapAfter":156.2,"liveSampledMB":109.5,"errs":[]}
+--self
+  13.61 Object3D@7118
+  10.07 TR_bldFix@7379
+   8.29 add@4991
+   6.53 (anon)@5041
+   5.73 put@4489
+   5.47 hubGrid@4013
+   5.28 push@0
+   5.02 CV_put@8029
+   4.13 buildHubProps@4991
+   3.68 set@0
+   3.47 Color@8456
+   3.19 add@11117
+   2.82 chain@5071
+   2.23 OG_build@7489
+   1.86 cloneUniforms@12072
+   1.69 LV_eGrid@12026
+   1.65 WB_cpack@12539
+   1.64 hubAddB@4005
+   1.41 InstancedMesh@32452
+   1.03 createBindingState@15109
+   0.94 setup@15017
+   0.84 addEventListener@226
+   0.84 WB_split@12489
+   0.82 SM_shC@3863
+   0.81 BufferGeometry@10428
+   0.72 CV_sigBuild@7937
+   0.63 one@5064
+   0.61 join@0
+   0.56 Float32BufferAttribute@10409
+   0.56 generateUUID@314
+   0.52 qvGraphGen@3192
+   0.50 SMM_grids@5925
+   0.50 put@4960
+   0.50 slice@0
+   0.44 Float64Array@0
+   0.41 buildCity@1607
+   0.41 add@0
+   0.41 computeBoundingSphere@32506
+   0.41 cullPush@5140
+   0.38 InstancedBufferAttribute@32406
+--stacks
+  10.07 hubGrid@7877 < hubGrid@7401 < TR_bldFix@7379
+   6.53 buildHubProps@4991 < forEach@0 < (anon)@5041
+   6.26 buildHubProps@4991 < InstancedMesh@32452 < Object3D@7118
+   5.73 next@0 < athBuildG@4466 < put@4489
+   5.47 hubGrid@7877 < hubGrid@7401 < hubGrid@4013
+   5.02 athBuildG@4466 < put@4489 < CV_put@8029
+   4.76 buildHubProps@4991 < CE_lots@4985 < add@4991
+   4.13 buildHubG@4590 < buildHubProps@7888 < buildHubProps@4991
+   3.44 forEach@0 < (anon)@5041 < Color@8456
+   3.19 QS_rampFit@11121 < QS_roads@11117 < add@11117
+   2.82 map@0 < (anon)@5072 < chain@5071
+   2.46 buildHubProps@7888 < buildHubProps@4991 < push@0
+   2.23 (anon)@7672 < OG_tick@7646 < OG_build@7489
+   2.00 buildHubProps@7888 < buildHubProps@4991 < add@4991
+   1.88 WB_split@12489 < Mesh@11502 < Object3D@7118
+   1.88 WB_cityPrep@12500 < WB_split@12489 < Object3D@7118
+   1.86 getProgram@29800 < getUniforms@20950 < cloneUniforms@12072
+   1.69 LV_corner@12029 < LV_onRoad@12028 < LV_eGrid@12026
+   1.65 (anon)@0 < WB_cityBuild2@12511 < WB_cpack@12539
+   1.64 athBuildG@4466 < put@4489 < hubAddB@4005
+   1.31 buildHubProps@7888 < buildHubProps@4991 < InstancedMesh@32452
+   1.03 athBuildG@4466 < InstancedMesh@32452 < Object3D@7118
+   1.03 WebGLRenderer.renderBufferDirect@28948 < setup@15017 < createBindingState@15109
+   0.94 renderObject@29769 < WebGLRenderer.renderBufferDirect@28948 < setup@15017
+   0.88 hubGrid@7401 < hubGrid@4013 < set@0
+   0.88 buildHubProps@7888 < buildHubProps@4991 < set@0
+   0.88 athBuildG@4466 < athStyleAt@4450 < set@0
+   0.85 LV_onRoad@12028 < LV_eGrid@12026 < push@0
+   0.84 (anon)@12771 < WB_cityPrep@12500 < WB_split@12489
+   0.75 CE_streets@4958 < put@4960 < add@4991
+   0.72 buildHubTraffic@8926 < buildHubTraffic@8022 < CV_sigBuild@7937
+   0.69 projectObject@29487 < update@17890 < addEventListener@226
+   0.59 (anon)@4999 < side@4994 < add@4991
+   0.56 (anon)@5072 < chain@5071 < one@5064
+   0.53 InstancedMesh@32452 < Mesh@11502 < Object3D@7118
+   0.52 SM_qvLoad@5949 < next@0 < qvGraphGen@3192
+   0.52 CE_lots@4985 < add@4991 < push@0
+   0.51 getProgram@29800 < getProgramCacheKey@20760 < join@0
+   0.50 (anon)@0 < SM_qvLoad@5949 < SMM_grids@5925
+   0.50 CE_streets@8025 < CE_streets@4958 < put@4960

@@ -1,0 +1,13 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const URL='https://am015-dev.github.io/spotify_to_ytmusic/mainhattan-overdrive/';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+await p.addInitScript("Object.defineProperty(window,'devicePixelRatio',{get:()=>0.35,configurable:true})");
+const cdp=await ctx.newCDPSession(p);await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:500});
+const prof=async(lbl,fn)=>{await cdp.send('Profiler.start');const t=Date.now();await fn();const ms=Date.now()-t;const {profile}=await cdp.send('Profiler.stop');const byId={};for(const n of profile.nodes)byId[n.id]=n;const cnt={};profile.samples.forEach((s,i)=>{cnt[s]=(cnt[s]||0)+(profile.timeDeltas[i]||0)});const self={};for(const id in cnt){const n=byId[id],u=n.callFrame.url.split('/').pop().slice(0,20),k=(n.callFrame.functionName||'(anon)')+'@'+u+':'+n.callFrame.lineNumber;self[k]=(self[k]||0)+cnt[id]}const tot=Object.values(self).reduce((a,b)=>a+b,0);console.log('== '+lbl+' wall '+ms+' ms, sampled '+Math.round(tot/1000)+' ms');Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,15).forEach(([k,v])=>console.log((v/tot*100).toFixed(1).padStart(5)+'% '+Math.round(v/1000)+'ms '+k))};
+await prof('boot to menu',async()=>{await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:100})});
+await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))});await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:100});
+await prof('enter Frankfurt roam',async()=>{await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on),null,{polling:100})});
+await p.waitForTimeout(1500);
+await prof('open garage',async()=>{await p.evaluate(()=>document.querySelector('#roamPause [data-p=garage]').click());await p.waitForFunction(()=>{const g=document.querySelector('#gbx');return g&&!g.hidden&&g.getBoundingClientRect().width>10},null,{polling:50});await p.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))))});
+await b.close()})().catch(e=>{console.error(e);process.exit(1)});

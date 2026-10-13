@@ -1,0 +1,875 @@
+top 0 0 false true false false [
+  6366,  -2942, 161,
+  1616,  0,     false,
+  false, false, 0
+]
+top 1 23 false true false false [
+  6363,  -2943, 161,
+  1616,  0,     false,
+  false, false, 0
+]
+top 2 50 false true false false [
+  6353,  -2944, 162,
+  1616,  0,     false,
+  false, false, 0
+]
+top 3 75 false true false false [
+  6336,  -2946, 164,
+  1616,  0,     false,
+  false, false, 0
+]
+top 4 98 false true false false [
+  6312,  -2950, 166,
+  1616,  0,     false,
+  false, false, 0
+]
+top 5 119 false true false false [
+  6282,  -2954, 169,
+  1616,  0,     false,
+  false, false, 0
+]
+top 6 138 false true false false [
+  6246,  -2959, 173,
+  1616,  0,     false,
+  false, false, 0
+]
+top 7 154 false true false false [
+  6206,  -2964, 177,
+  1616,  0,     false,
+  false, false, 0
+]
+top 8 167 false true false false [
+  6162,  -2971, 182,
+  1616,  0,     false,
+  false, false, 0
+]
+top 9 179 false true false false [
+  6114,  -2978, 186,
+  1616,  0,     false,
+  false, false, 0
+]
+top 10 189 false true false false [
+  6064,  -2985, 192,
+  1616,  0,     false,
+  false, false, 0
+]
+top 11 197 false true false false [
+  6011,  -2993, 197,
+  1616,  0,     false,
+  false, false, 0
+]
+top 12 203 false true false false [
+  5956,  -3001, 202,
+  1616,  0,     false,
+  false, false, 0
+]
+top 13 208 false true false false [
+  5899,  -3010, 208,
+  1616,  0,     false,
+  false, false, 0
+]
+top 14 211 false true false false [
+  5841,  -3018, 214,
+  1616,  0,     false,
+  false, false, 0
+]
+top 15 213 false true false false [
+  5783,  -3027, 220,
+  1616,  0,     false,
+  false, false, 0
+]
+top 16 215 false true false false [
+  5724,  -3036, 226,
+  1616,  0,     false,
+  false, false, 0
+]
+top 17 218 false true false false [
+  5665,  -3045, 232,
+  1616,  0,     false,
+  false, false, 0
+]
+top 18 220 false true false false [
+  5605,  -3055, 238,
+  1616,  0,     false,
+  false, false, 0
+]
+top 19 222 false true false false [
+  5544,  -3064, 244,
+  1616,  0,     false,
+  false, false, 0
+]
+top 20 224 false true false false [
+  5483,  -3074, 250,
+  1616,  0,     false,
+  false, false, 0
+]
+top 21 225 false true false false [
+  5421,  -3084, 257,
+  1616,  0,     false,
+  false, false, 0
+]
+top 22 226 false true false false [
+  5359,  -3094, 263,
+  1616,  0,     false,
+  false, false, 0
+]
+top 23 227 false true false false [
+  5297,  -3104, 269,
+  1616,  0,     false,
+  false, false, 0
+]
+top 24 226 false true false false [
+  5235,  -3114, 275,
+  1616,  0,     false,
+  false, false, 0
+]
+top 25 226 false true false false [
+  5173,  -3125, 282,
+  1616,  0,     false,
+  false, false, 0
+]
+top 26 226 false true false false [
+  5112,  -3135, 288,
+  1616,  0,     false,
+  false, false, 0
+]
+top 27 227 false true false false [
+  5050,  -3146, 294,
+  1616,  0,     false,
+  false, false, 0
+]
+top 28 227 false true false false [
+  4988,  -3157, 301,
+  1616,  0,     false,
+  false, false, 0
+]
+top 29 227 false true false false [
+  4925,  -3168, 307,
+  1616,  0,     false,
+  false, false, 0
+]
+top 30 228 false true false false [
+  4863,  -3180, 313,
+  1616,  0,     false,
+  false, false, 0
+]
+top 31 228 false true false false [
+  4801,  -3192, 319,
+  1616,  0,     false,
+  false, false, 0
+]
+top 32 228 false true false false [
+  4739,  -3204, 326,
+  1616,  0,     false,
+  false, false, 0
+]
+top 33 229 false true false false [
+  4677,  -3221, 332,
+  1616,  0,     false,
+  false, false, 0
+]
+top 34 229 false true false false [
+  4615,  -3234, 339,
+  1616,  0,     false,
+  false, false, 0
+]
+top 35 229 false true false false [
+  4553,  -3249, 345,
+  1616,  0,     false,
+  false, false, 0
+]
+top 36 229 false true false false [
+  4492,  -3265, 351,
+  1616,  0,     false,
+  false, false, 0
+]
+top 37 230 false true false false [
+  4430,  -3281, 358,
+  1616,  0,     false,
+  false, false, 0
+]
+top 38 230 false true false false [
+  4369,  -3298, 364,
+  1616,  0,     false,
+  false, false, 0
+]
+top 39 230 false true false false [
+  4307,  -3315, 370,
+  1616,  0,     false,
+  false, false, 0
+]
+top 40 229 false true false false [
+  4244,  -3327, 377,
+  1616,  0,     false,
+  false, false, -0
+]
+top 41 229 false true false false [
+  4182,  -3341, 383,
+  1616,  0,     false,
+  false, false, 0
+]
+top 42 230 false true false false [
+  4120,  -3354, 390,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 43 230 false true false false [
+  4059,  -3363, 396,
+  1616,  -1,    false,
+  false, false, 15
+]
+top 44 27 false true false false [
+  4064,  -3362, 395,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 0 6 false true false false [
+  4065,  -3359, 395,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 1 55 false true false false [
+  4060,  -3365, 396,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 2 102 false true false false [
+  4060,  -3386, 396,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 3 143 false true false false [
+  4059,  -3421, 396,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 4 178 false true false false [
+  4059,  -3466, 397,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 5 196 false true false false [
+  4058,  -3519, 398,
+  1616,  -1,    false,
+  false, false, 0
+]
+{"wrecks":0,"form":"ship","road":"autobahn","cls":"spSport","veh":"car","onAB":true,"inCity":false,"top":{"max":230,"plateau":12,"t100":4.1,"hud":6},"boost":{"max":198,"plateau":70,"t100":2,"hud":24}}
+top 0 4 false false true false [
+  1543,  1449,  60,
+  604,   -1,    false,
+  false, false, 0
+]
+top 1 28 false false true false [
+  1539,  1450,  61,
+  604,   -1,    false,
+  false, false, 0
+]
+top 2 54 false false true false [
+  1528,  1453,  62,
+  604,   -5,    false,
+  false, false, 0
+]
+top 3 77 false false true false [
+  1511,  1458,  64,
+  604,   -1,    false,
+  false, false, 0
+]
+top 4 99 false false true false [
+  1488,  1466,  67,
+  604,   -1,    false,
+  false, false, 0
+]
+top 5 123 false false true false [
+  1458,  1476,  71,
+  604,   -1,    false,
+  false, false, 12
+]
+top 6 123 false false true false [
+  1425,  1486,  76,
+  604,   -1,    false,
+  false, false, 14
+]
+top 7 123 false false true false [
+  1393,  1497,  80,
+  604,   -1,    false,
+  false, false, 1
+]
+top 8 137 false false true false [
+  1359,  1508,  84,
+  604,   -1,    false,
+  false, false, 0
+]
+top 9 149 false false true false [
+  1321,  1519,  89,
+  604,   -1,    false,
+  false, false, 0
+]
+top 10 158 false false true false [
+  1280,  1531,  95,
+  604,   -1,    false,
+  false, false, 0
+]
+top 11 166 false false true false [
+  1236,  1543,  100,
+  604,   -1,    false,
+  false, false, 0
+]
+top 12 172 false false true false [
+  1191,  1556,  106,
+  604,   -1,    false,
+  false, false, 0
+]
+top 13 176 false false true false [
+  1144,  1568,  112,
+  604,   -1,    false,
+  false, false, 0
+]
+top 14 180 false false true false [
+  1096,  1579,  118,
+  604,   -1,    false,
+  false, false, 0
+]
+top 15 203 false false true false [
+  1044,  1591,  125,
+  604,   -1,    false,
+  false, false, 11
+]
+top 16 203 false false true false [
+  989,   1603,  132,
+  604,   -1,    false,
+  false, false, 8
+]
+top 17 195 false false true false [
+  934,   1614,  139,
+  604,   -1,    false,
+  false, false, 0
+]
+top 18 191 false false true false [
+  882,   1623,  146,
+  604,   -1,    false,
+  false, false, 0
+]
+top 19 191 false false true false [
+  830,   1632,  152,
+  604,   -1,    false,
+  false, false, 0
+]
+top 20 191 false false true false [
+  777,   1641,  159,
+  604,   -1,    false,
+  false, false, 0
+]
+top 21 191 false false true false [
+  725,   1649,  166,
+  604,   -1,    false,
+  false, false, 0
+]
+top 22 213 false false true false [
+  667,   1658,  173,
+  604,   -1,    false,
+  false, false, 10
+]
+top 23 213 false false true false [
+  609,   1667,  180,
+  604,   -1,    false,
+  false, false, 1
+]
+top 24 192 false false true false [
+  553,   1670,  187,
+  604,   -1,    false,
+  false, false, 0
+]
+top 25 191 false false true false [
+  501,   1676,  194,
+  604,   -1,    false,
+  false, false, 0
+]
+top 26 191 false false true false [
+  448,   1682,  201,
+  604,   -1,    false,
+  false, false, 0
+]
+top 27 191 false false true false [
+  395,   1687,  207,
+  604,   -1,    false,
+  false, false, 0
+]
+top 28 191 false false true false [
+  343,   1692,  214,
+  604,   -1,    false,
+  false, false, 0
+]
+top 29 191 false false true false [
+  290,   1696,  221,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 0 214 false false true false [
+  235,   1699,  227,
+  604,   -1,    false,
+  false, false, 9
+]
+boost 1 214 false false true false [
+  176,   1702,  235,
+  604,   -1,    false,
+  false, false, 11
+]
+boost 2 214 false false true false [
+  116,   1705,  242,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 3 223 false false true false [
+  56,    1699,  250,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 4 229 false false true false [
+  -7,    1698,  258,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 5 233 false false true false [
+  -71,   1695,  266,
+  604,   -1,    false,
+  false, false, 0
+]
+{"wrecks":0,"form":"ship","road":"city","cls":"spSport","veh":"car","onAB":false,"inCity":true,"top":{"max":214,"plateau":193,"t100":4.1,"hud":214},"boost":{"max":235,"plateau":234,"t100":0,"hud":236}}
+top 0 4 false true false false [
+  6365,  -2942, 161,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 1 28 false true false false [
+  6361,  -2943, 161,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 2 53 false true false false [
+  6350,  -2944, 163,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 3 75 false true false false [
+  6332,  -2947, 164,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 4 94 false true false false [
+  6309,  -2950, 167,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 5 110 false true false false [
+  6281,  -2954, 170,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 6 122 false true false false [
+  6249,  -2958, 173,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 7 131 false true false false [
+  6214,  -2963, 176,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 8 138 false true false false [
+  6176,  -2969, 180,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 9 144 false true false false [
+  6138,  -2974, 184,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 10 147 false true false false [
+  6098,  -2980, 188,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 11 150 false true false false [
+  6057,  -2986, 192,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 12 152 false true false false [
+  6015,  -2992, 196,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 13 154 false true false false [
+  5973,  -2998, 201,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 14 154 false true false false [
+  5931,  -3005, 205,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 15 153 false true false false [
+  5888,  -3011, 209,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 16 152 false true false false [
+  5846,  -3018, 214,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 17 152 false true false false [
+  5805,  -3024, 218,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 18 152 false true false false [
+  5763,  -3030, 222,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 19 152 false true false false [
+  5721,  -3037, 226,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 20 153 false true false false [
+  5679,  -3043, 230,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 21 154 false true false false [
+  5637,  -3050, 235,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 22 155 false true false false [
+  5595,  -3056, 239,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 23 155 false true false false [
+  5553,  -3063, 243,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 24 156 false true false false [
+  5510,  -3070, 248,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 25 156 false true false false [
+  5467,  -3077, 252,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 26 156 false true false false [
+  5424,  -3084, 256,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 27 156 false true false false [
+  5381,  -3091, 261,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 28 156 false true false false [
+  5338,  -3098, 265,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 29 156 false true false false [
+  5296,  -3105, 269,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 30 156 false true false false [
+  5253,  -3112, 274,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 31 155 false true false false [
+  5210,  -3119, 278,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 32 155 false true false false [
+  5168,  -3126, 282,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 33 155 false true false false [
+  5126,  -3134, 287,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 34 155 false true false false [
+  5083,  -3141, 291,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 35 155 false true false false [
+  5041,  -3149, 295,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 36 155 false true false false [
+  4998,  -3156, 299,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 37 156 false true false false [
+  4956,  -3164, 304,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 38 156 false true false false [
+  4913,  -3172, 308,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 39 156 false true false false [
+  4871,  -3180, 312,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 40 156 false true false false [
+  4828,  -3188, 317,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 41 156 false true false false [
+  4786,  -3196, 321,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 42 157 false true false false [
+  4743,  -3204, 325,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 43 157 false true false false [
+  4700,  -3213, 330,
+  1616,  -1,    false,
+  false, false, 0
+]
+top 44 157 false true false false [
+  4658,  -3223, 334,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 0 157 false true false false [
+  4615,  -3233, 339,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 1 168 false true false false [
+  4571,  -3244, 343,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 2 175 false true false false [
+  4524,  -3256, 348,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 3 180 false true false false [
+  4477,  -3269, 353,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 4 182 false true false false [
+  4428,  -3282, 358,
+  1616,  -1,    false,
+  false, false, 0
+]
+boost 5 184 false true false false [
+  4379,  -3295, 363,
+  1616,  -1,    false,
+  false, false, 0
+]
+{"wrecks":0,"form":"offroad","road":"autobahn","cls":"spSuv","veh":"4x4","onAB":true,"inCity":false,"top":{"max":157,"plateau":157,"t100":4.4,"hud":157},"boost":{"max":184,"plateau":184,"t100":0,"hud":185}}
+top 0 4 false false true false [
+  1543,  1449,  60,
+  604,   -1,    false,
+  false, false, 0
+]
+top 1 27 false false true false [
+  1540,  1450,  61,
+  604,   -1,    false,
+  false, false, 0
+]
+top 2 52 false false true false [
+  1529,  1453,  62,
+  604,   -1,    false,
+  false, false, 0
+]
+top 3 72 false false true false [
+  1512,  1458,  64,
+  604,   -1,    false,
+  false, false, 0
+]
+top 4 89 false false true false [
+  1491,  1465,  67,
+  604,   -1,    false,
+  false, false, 0
+]
+top 5 110 false false true false [
+  1465,  1473,  70,
+  604,   -1,    false,
+  false, false, 10
+]
+top 6 110 false false true false [
+  1436,  1483,  74,
+  604,   -1,    false,
+  false, false, 14
+]
+top 7 110 false false true false [
+  1407,  1492,  78,
+  604,   -1,    false,
+  false, false, 5
+]
+top 8 115 false false true false [
+  1377,  1502,  82,
+  604,   -1,    false,
+  false, false, 0
+]
+top 9 120 false false true false [
+  1346,  1511,  86,
+  604,   -1,    false,
+  false, false, 0
+]
+top 10 122 false false true false [
+  1313,  1521,  90,
+  604,   -1,    false,
+  false, false, 0
+]
+top 11 124 false false true false [
+  1281,  1531,  95,
+  604,   -1,    false,
+  false, false, 0
+]
+top 12 126 false false true false [
+  1247,  1540,  99,
+  604,   -1,    false,
+  false, false, 0
+]
+top 13 126 false false true false [
+  1213,  1550,  103,
+  604,   -1,    false,
+  false, false, 0
+]
+top 14 127 false false true false [
+  1179,  1559,  108,
+  604,   -1,    false,
+  false, false, 0
+]
+top 15 127 false false true false [
+  1145,  1567,  112,
+  604,   -1,    false,
+  false, false, 0
+]
+top 16 128 false false true false [
+  1111,  1576,  117,
+  604,   -1,    false,
+  false, false, 0
+]
+top 17 128 false false true false [
+  1076,  1584,  121,
+  604,   -1,    false,
+  false, false, 0
+]
+top 18 143 false false true false [
+  1038,  1592,  126,
+  604,   -1,    false,
+  false, false, 15
+]
+top 19 143 false false true false [
+  999,   1601,  131,
+  604,   -1,    false,
+  false, false, 10
+]
+top 20 134 false false true false [
+  960,   1609,  136,
+  604,   -1,    false,
+  false, false, 0
+]
+top 21 129 false false true false [
+  925,   1615,  140,
+  604,   -1,    false,
+  false, false, 0
+]
+top 22 129 false false true false [
+  889,   1621,  145,
+  604,   -1,    false,
+  false, false, 0
+]
+top 23 129 false false true false [
+  854,   1628,  149,
+  604,   -1,    false,
+  false, false, 0
+]
+top 24 129 false false true false [
+  819,   1634,  154,
+  604,   -1,    false,
+  false, false, 0
+]
+top 25 129 false false true false [
+  784,   1640,  158,
+  604,   -1,    false,
+  false, false, 0
+]
+top 26 129 false false true false [
+  748,   1645,  163,
+  604,   -1,    false,
+  false, false, 0
+]
+top 27 144 false false true false [
+  712,   1651,  167,
+  604,   -1,    false,
+  false, false, 9
+]
+top 28 144 false false true false [
+  673,   1657,  172,
+  604,   -1,    false,
+  false, false, 14
+]
+top 29 144 false false true false [
+  633,   1663,  177,
+  604,   -1,    false,
+  false, false, 5
+]
+boost 0 130 false false true false [
+  595,   1667,  182,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 1 140 false false true false [
+  558,   1672,  187,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 2 146 false false true false [
+  518,   1677,  192,
+  604,   -1,    false,
+  false, false, 0
+]
+boost 3 149 false false true false [
+  477,   1682,  197,
+  604,   3,     false,
+  false, false, 0
+]
+boost 4 150 false false true false [
+  444,   1685,  201,
+  604,   -9,    false,
+  false, false, 0
+]
+boost 5 144 false false true false [
+  408,   1685,  206,
+  604,   -9,    false,
+  false, false, 0
+]
+{"wrecks":0,"form":"offroad","road":"city","cls":"spSuv","veh":"4x4","onAB":false,"inCity":true,"top":{"max":144,"plateau":138,"t100":4.8,"hud":130},"boost":{"max":151,"plateau":33,"t100":0,"hud":2}}
+SPEED done · errs 0 []

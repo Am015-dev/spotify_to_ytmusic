@@ -1,0 +1,17 @@
+shot s0_start 9s
+shot s1_palette 100s
+shot s1b_palette_slopes 119s
+sel 42/107 y>=13
+shot s2_group_made 158s
+shot s3_group_hidden 173s
+shot s5a_layer_ghosts 219s
+shot s5_hide_above 235s
+pod 3
+groups [{"g":1,"n":3,"name":"Side pod"},{"g":2,"n":3,"name":"Side pod ⇋"}]
+shot s4_mirrored 298s
+carry {"x":-5,"z":-6,"y":7,"bad":false}
+shot s4b_copy_held 319s
+groups [{"g":1,"n":3,"name":"Side pod"},{"g":2,"n":3,"name":"Side pod ⇋"},{"g":3,"n":3,"name":"Side pod copy"}]
+shot s4c_copied 334s
+shot s6_checklist 357s
+ERRS 0 []

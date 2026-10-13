@@ -1,0 +1,41 @@
+desk_ath drive1 {"m":62,"v":0,"btn":"exit","canExit":true}
+desk_ath layout_car {"ctl":[],"n":0,"ov":[],"tiny":["SMALL:11px:KM/H"]}
+PASS desk_ath EXIT offered when stopped · {"btn":"exit","idle":0.75,"why":"{\"st\":\"roam\",\"on\":true,\"fr\":false,\"air\":null,\"ch\":false,\"sp\":false,\"card\":false,\"map\":false,\"story\":false,\"cs\":null,\"boat\":false,\"v\":0}"}
+PASS desk_ath EXIT → on foot · {"state":"walk"}
+desk_ath scale {"fig":1.8,"peds":[1.77,1.77,1.77,1.77,1.75,1.76],"figH":1.8,"calls":187,"callsCar":183}
+PASS desk_ath minifig 1.75–1.85 m · 1.8
+PASS desk_ath peds near 1.8–2.0 m · [1.77,1.77,1.77,1.77,1.75,1.76]
+desk_ath zone {"z":[0,0,0,0],"ring":[0,0,0],"hit":"c","hh":"<canvas id=\"c\" data-engine=\"three.js r164\" width=\"313\" height=\"196\"></canvas>","par":"BODY<HTML","t":0}
+desk_ath layout_foot {"ctl":[],"n":0,"ov":[],"tiny":[]}
+PASS desk_ath ≤5 controls on foot · []
+PASS desk_ath no HUD over controls · []
+PASS desk_ath text ≥12 px · []
+desk_ath desk_ath_j1_target {"x":2173.1595206348156,"z":-1620.5512483845644,"h":-1.7619807863919112,"fx":-0.9817798505902814,"fz":-0.1900219065658611,"cv":0,"d":10.846079492103106,"ah":10.834448887188028,"j":1,"k":8}
+PASS desk_ath_j1 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":2171.5,"z":-1620.9},"frames":72}
+PASS desk_ath_j1 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_ath_j1 button reads TAKE · "🚗 TAKE"
+desk_ath desk_ath_j1_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":183}
+PASS desk_ath_j1 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_ath_j1 jacked → driving the traffic car · {"state":"car","own":false,"taken":1,"log":["exit@2162,-1621","jack@2171,-1621","★+1:jack","enter:traf@2171,-1621"]}
+PASS desk_ath_j1 +1 ★ · {"stars":1,"before":0}
+desk_ath desk_ath_j1_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.8,"dc":4,"dp":4.2},"calls":194,"scr":{"w":0.312,"top":0.496},"bub":0}
+PASS desk_ath_j1 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.8,"dc":4,"dp":4.2}
+PASS desk_ath_j1 jack ≤20 s after EXIT · {"walkS":1.2}
+PASS desk_ath_j1 drove 100 m in the stolen car · 101
+PASS desk_ath_j1 tyre gap ≤0.05 m · 0.027
+PASS desk_ath_j1 ★ chip visible · {"t":"★1","vis":true,"fs":"14px"}
+desk_ath desk_ath_j1_drive {"m":101,"gap":0.027,"lowN":"inst:2304","scr":{"w":0.294,"top":0.497},"scr0":{"w":0.357,"top":0.49},"bc":{"cam":1.1955617412967645,"big":true,"W":2.1668526277527937,"L":4.353342848104158,"H":1.7231034782318992,"WB":2.4667824227996786,"of":1},"calls":196,"callsCar0":183,"wall":[null,null]}
+PASS desk_ath_j2 EXIT again · {"state":"walk","btn":"enter"}
+desk_ath desk_ath_j2_target {"x":1992.7970822611608,"z":-1648.0474684898102,"h":1.40127218090937,"fx":0.9856651614369273,"fz":0.16871333536361632,"cv":12.1,"d":38.134137841269904,"ah":-38.04846169540862,"j":0,"k":1}
+PASS desk_ath_j2 🚗 TAKE offered at a traffic car · {"btn":"take","near":{"k":"traf","x":1985.4,"z":-1653.1},"frames":306}
+PASS desk_ath_j2 ≤5 controls, no HUD over them (TAKE) · []
+PASS desk_ath_j2 button reads TAKE · "🚗 TAKE"
+desk_ath desk_ath_j2_pull {"state":"jack","jack":{"t":0.67,"ph":"pull"},"flee":{"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9},"calls":203}
+PASS desk_ath_j2 driver minifig 1.75–1.85 m standing, same scale as the walker (arms up ≤2.4 m) · {"h":1.872,"hs":1.8,"s":1,"ph":"out","t":0.23,"d":0,"dc":1,"dp":0.9}
+PASS desk_ath_j2 jacked → driving the traffic car · {"state":"car","own":false,"taken":2,"log":["exit@2162,-1621","jack@2171,-1621","★+1:jack","enter:traf@2171,-1621","exit@1956,-1659","jack@1985,-1653","★+1:jack","enter:traf@1985,-1653"]}
+PASS desk_ath_j2 +1 ★ · {"stars":2,"before":1}
+desk_ath desk_ath_j2_flee {"flee":{"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4,"dp":4},"calls":203,"scr":{"w":0.328,"top":0.521},"bub":2}
+PASS desk_ath_j2 driver ran off ≥3 m from the car · {"h":1.828,"hs":1.8,"s":1,"ph":"run","t":1.5,"d":1.7,"dc":4,"dp":4}
+PASS desk_ath_j2 jack ≤20 s after EXIT · {"walkS":5.1}
+FAIL desk_ath crashed · "page.evaluate: Execution context was destroyed, most likely because of a navigation"
+TJACK_FAIL 1

@@ -1,0 +1,43 @@
+bricks 107
+PAL {"vis":11,"tile":[72,58],"rows":2,"chips":["▾","★ FAVS","🕘 RECENT","BRICKS","PLATES","TILES","SLOPES","ROUND","VEHICLE","POWER","LIGHTS","DECO"],"minFont":12}
+PASS palette: 2 rows of bigger tiles [72,58] rows 2
+PASS palette shows ≥ 10 parts at once (was 5) visible 11
+PASS chips: ★ FAVS + RECENT + categories 
+shot p1_palette 110s
+PASS PLATES chip filters the tiles wl,wr,jmp,p11,p12,p13
+lp dbg [["wr"],null,null]
+PASS long-press stars a part wr
+PASS long-press does not pick the part b22
+PASS ★ FAVS shows the starred part wr
+shot p2_favs 219s
+PASS RECENT shows the part just picked first wl
+PASS ▾ folds the palette to one row 
+cand [{"i":99,"x":391.55212495745457,"y":104.45778465467981,"t":"B1x1"},{"i":91,"x":451.99610668697545,"y":106.50743052373039,"t":"seat"},{"i":93,"x":436.1981312442832,"y":104.56820982180871,"t":"seat"},{"i":95,"x":421.4511460784319,"y":102.75799945477218,"t":"seat"},{"i":97,"x":407.65364882601267,"y":101.06433988404683,"t":"seat"},{"i":101,"x":382.5625079213958,"y":97.9843718176593,"t":"seat"}]
+PASS SELECT: tap parts adds them sel 6
+shot g0_selected 330s
+PASS MAKE GROUP → named group in the list [{"g":1,"n":6,"name":"Group 1"}]
+shot g1_group_made 392s
+PASS ✎ rename Roof
+PASS 👁 hides the group (fewer triangles drawn) 70576→70240
+PASS hidden part cannot be picked pick -1
+PASS hidden group is not editable (no select) 
+shot g2_group_hidden 471s
+PASS 👁 shows it again 
+PASS row tap selects the whole group sel 6
+PASS MIRROR (copy on the other side, or flip if it is in the middle) 107→107 groups Roof
+shot g3_mirrored 549s
+PASS COPY lifts a copy (PLACE bar) 
+PASS COPY placed as its own named group 107→113 Roof|Roof copy
+shot g4_copied 654s
+PASS DELETE removes the whole group 
+PASS UNDO brings it back 
+PASS HIDE UP removes the parts above the layer ghost before true
+shot h1_hide_above 757s
+PASS …and stays hidden on another layer 
+shot h2_hide_above_lower 810s
+PASS SHOW UP brings the ghosts back 
+PASS hidden group still saves (all parts) 113/113
+PASS builder closed: car whole again 
+ERRS 0 []
+PASS 0 console errors 
+RESULT PASS 28/28

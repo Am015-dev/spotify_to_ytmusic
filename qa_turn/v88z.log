@@ -1,0 +1,7 @@
+{"form":"ship","kmh":50,"reached":51,"yawDegS":29.5,"peakDegS":65.2,"lostKmh":52}
+{"form":"ship","kmh":100,"reached":98,"yawDegS":24,"peakDegS":29.4,"lostKmh":3}
+{"form":"ship","kmh":150,"reached":147,"yawDegS":15.7,"peakDegS":19.2,"lostKmh":-2}
+{"form":"offroad","kmh":50,"reached":50,"yawDegS":35.1,"peakDegS":62,"lostKmh":55}
+{"form":"offroad","kmh":100,"reached":98,"yawDegS":23.6,"peakDegS":29.1,"lostKmh":3}
+{"form":"offroad","kmh":150,"reached":147,"yawDegS":15.3,"peakDegS":18.3,"lostKmh":-1}
+TURN done errs 0

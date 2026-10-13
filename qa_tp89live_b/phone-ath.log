@@ -1,0 +1,13 @@
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.evaluate: Execution context was destroyed, most likely because of a navigation
+    at tick (/home/user/spotify_to_ytmusic/tools/tPlay.js:100:45)
+    at tap (/home/user/spotify_to_ytmusic/tools/tPlay.js:97:177)
+    at async play (/home/user/spotify_to_ytmusic/tools/tPlay.js:120:40)
+    at async /home/user/spotify_to_ytmusic/tools/tPlay.js:219:64 {
+  name: 'Error'
+}
+
+Node.js v22.22.0

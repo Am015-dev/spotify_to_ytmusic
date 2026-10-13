@@ -1,0 +1,180 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "ath": {
+    "min": 2.12,
+    "hits": 19,
+    "kinds": {
+     "traffic": 15,
+     "wall": 4
+    },
+    "wallHits": 4,
+    "wallPerMin": 1.88,
+    "hitsPerMin": 8.94,
+    "bigDrop": 15,
+    "stuckPct": 9.4,
+    "avgKmh": 40,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 21.2,
+    "traffic120m": 16.1,
+    "missions": [
+     {
+      "f": 3260,
+      "start": "Koulouri Rush"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 3957,
+      "v0": 47,
+      "v1": 5,
+      "drop": 0.9,
+      "kind": "traffic",
+      "x": 1838,
+      "z": -1674,
+      "dy": 0
+     },
+     {
+      "ctx": "GOLDEN BRICK",
+      "f": 3249,
+      "v0": 53,
+      "v1": 6,
+      "drop": 0.88,
+      "kind": "traffic",
+      "x": 1824,
+      "z": -1679,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 3574,
+      "v0": 38,
+      "v1": 8,
+      "drop": 0.79,
+      "kind": "traffic",
+      "x": 1831,
+      "z": -1675,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6806,
+      "v0": 111,
+      "v1": 29,
+      "drop": 0.74,
+      "kind": "wall",
+      "x": 1711,
+      "z": -1365,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 3737,
+      "v0": 49,
+      "v1": 13,
+      "drop": 0.72,
+      "kind": "traffic",
+      "x": 1820,
+      "z": -1679,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.77,
+     "carL": 4.6,
+     "carH": 1.57,
+     "player": {
+      "h": 4.01,
+      "l": 10.81,
+      "w": 8.48
+     },
+     "pedRel": 0.96,
+     "pedVsPlayer": 0.41,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 428,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 666,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamPlate×#tuG",
+     "#odPin×#juPop"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": false
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": false
+     },
+     "otg": null
+    },
+    "events": [
+     "next@0"
+    ],
+    "perf": {
+     "calls": 163,
+     "tris": 1161452,
+     "jsMs": 0,
+     "geoms": 4122,
+     "tex": 124
+    },
+    "wallSec": 245
+   }
+  },
+  "errs": [
+   "Cannot read properties of undefined (reading 'isReady')"
+  ],
+  "warns": [
+   "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported."
+  ]
+ }
+]

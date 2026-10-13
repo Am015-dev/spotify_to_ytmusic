@@ -1,0 +1,25 @@
+FAIL phone ath: JS heap ≤ 100 MB while driving · {"lastAvgMB":154.1,"peakMB":154.2}
+FAIL phone ath: no HUD text under 12 px · ["gH:11px:VEHICLE · Kronos Finanz ","B:11px:Kronos Finanz","rnd cur:11px:Kronos Finanz","rnd:11px:Äppler Motorsport","rnd:11px:Helix Aerodyn","rnd:11px:Nordend Kinetik","rnd:11px:Zeil Syndikat","rnd:11px:Ostend Voltaic"]
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":23.1}
+FAIL phone ath: wall/building hits ≤ 1/min · {"wallPerMin":1.36,"bigDrop":43,"hits":49}
+FAIL phone fra: stuck ≤ 3 % · {"stuckPct":6}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":911,"start":0,"end":0,"ex":[]}
+PASS phone ath: no loading screens while driving · {"loads":0}
+PASS phone ath: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry, ≤ 6 MB/min incl. buffers) · {"heapMBperMin":0.19,"totMBperMin":0.17,"geoMBperMin":0,"geomsPerMin":0,"first":{"f":0,"totMB":438.6,"geoms":3899,"tex":99,"sceneGeo":4546,"geoMB":238,"cpuGeoMB":83.8,"heap":149.6},"last":{"f":17400,"totMB":444.5,"geoms":3899,"tex":99,"sceneGeo":4548,"geoMB":238,"cpuGeoMB":83.8,"heap":154.2}}
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.76,"carL":4.63,"carH":1.56,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.95,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+PASS phone ath: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone fra: monitor ran · null
+PASS phone fra: no HUD element over a touch control · []
+PASS phone fra: no HUD text under 12 px · []
+PASS phone fra: no collider on the paved road (invisible walls / oversize hulls) · {"pts":2455,"start":0,"end":0,"ex":[]}
+PASS phone fra: no memory leak while driving (2nd-half trend ≤ 4 MB/min heap and GPU geometry, ≤ 6 MB/min incl. buffers) · {"heapMBperMin":0.29,"totMBperMin":2.86,"geoMBperMin":2.04,"geomsPerMin":0,"first":{"f":0,"totMB":306.5,"geoms":3889,"tex":98,"sceneGeo":4461,"geoMB":150.3,"cpuGeoMB":83,"heap":68.1},"last":{"f":17400,"totMB":346.1,"geoms":3889,"tex":98,"sceneGeo":4548,"geoMB":183.9,"cpuGeoMB":116.5,"heap":72.5}}
+PASS phone fra: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.85,"carL":4.36,"carH":1.47,"player":{"h":2.1,"l":4.48,"w":1.99},"pedRel":1.06,"pedVsPlayer":1.03,"nPed":8,"nCar":8}
+PASS phone fra: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: wall/building hits ≤ 1/min · {"wallPerMin":0.97,"bigDrop":18,"hits":30}
+PASS phone: zero console / page errors · []
+TPLAY_FAST FAIL 6 · 866 s · qa_mem3/tp_live/*.log

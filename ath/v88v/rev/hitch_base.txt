@@ -1,0 +1,2 @@
+fra HITCH {"build":{"sl50":0,"sl100":0,"err":null},"framesDuringBuild":{"n":116,"worst":8748,"p50":18,"over50":31,"over100":29},"framesAfter":{"n":20,"worst":8338,"p50":15,"over50":4,"over100":4},"first10After":[8281,14,13,16,18,10,19,11,15,896]}
+errors 1 Failed to load resource: the server responded with a status of 404 (File not found)

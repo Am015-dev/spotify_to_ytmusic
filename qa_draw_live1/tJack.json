@@ -1,0 +1,244 @@
+[
+ {
+  "mode": "phone",
+  "city": "fra",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 61,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.77,
+      1.72,
+      1.72,
+      1.73,
+      1.76,
+      1.73
+     ],
+     "figH": 1.8,
+     "calls": 183,
+     "callsCar": 180
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚪 ENTER",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ]
+  ],
+  "metrics": {
+   "jacks": [],
+   "errs": []
+  }
+ },
+ {
+  "mode": "phone",
+  "city": "ath",
+  "ok": true,
+  "steps": [
+   [
+    "drive1",
+    {
+     "m": 62,
+     "v": 0,
+     "btn": "exit",
+     "canExit": true
+    }
+   ],
+   [
+    "exitGap",
+    {
+     "n": 14,
+     "g": 20
+    }
+   ],
+   [
+    "layout_car",
+    {
+     "ctl": [
+      "tL:◀",
+      "tR:▶",
+      "tG:GAS",
+      "tB:🚪 EXIT",
+      "tN:BOOST",
+      "tP:❚❚"
+     ],
+     "n": 6,
+     "ov": [],
+     "tiny": [
+      "tN:10px"
+     ]
+    }
+   ],
+   [
+    "scale",
+    {
+     "fig": 1.8,
+     "peds": [
+      1.76,
+      1.71,
+      1.71,
+      1.75,
+      1.77,
+      1.76
+     ],
+     "figH": 1.8,
+     "calls": 194,
+     "callsCar": 190
+    }
+   ],
+   [
+    "zone",
+    {
+     "z": [
+      0,
+      70.734375,
+      340.796875,
+      322.265625
+     ],
+     "ring": [
+      60,
+      233,
+      146
+     ],
+     "hit": "ofZone",
+     "hh": "<div id=\"ofZone\"><div id=\"ofRing\" style=\"left: 130px; top: 232.266px;\"><i></i></div><div id=\"ofHint\" style=\"left: 130px; top: 308.266px;\">DRAG TO WALK</div></di",
+     "par": "touch<BODY<HTML",
+     "t": 393
+    }
+   ],
+   [
+    "layout_foot",
+    {
+     "ctl": [
+      "ofZone:DRAG TO WALK",
+      "tG:RUN",
+      "tB:🚪 ENTER",
+      "tN:JUMP",
+      "tP:❚❚"
+     ],
+     "n": 5,
+     "ov": [],
+     "tiny": []
+    }
+   ],
+   [
+    "ath_parked",
+    {
+     "b": null,
+     "n": 0,
+     "athPk": 0,
+     "nE": 5,
+     "ws": [
+      [
+       8.5,
+       8.5,
+       true,
+       32,
+       8
+      ],
+      [
+       8.5,
+       8.5,
+       true,
+       31,
+       8
+      ],
+      [
+       8.5,
+       8.5,
+       true,
+       32,
+       18
+      ],
+      [
+       8.5,
+       8.5,
+       true,
+       30,
+       8
+      ],
+      [
+       8.5,
+       8.5,
+       true,
+       31,
+       18
+      ]
+     ],
+     "cands": 20,
+     "want": 1
+    }
+   ]
+  ],
+  "metrics": {
+   "jacks": [],
+   "errs": []
+  }
+ }
+]

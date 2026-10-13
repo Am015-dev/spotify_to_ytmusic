@@ -1,0 +1,5 @@
+GAP {"n":2,"worst":[{"d":107,"nm":"truck","max":0.034,"min":0.034},{"d":190,"nm":"sedan-sports","max":0.031,"min":0.029}],"lowest":"0.029","over05":0,"near":{"n":2,"over05":0,"max":0.034,"min":0.029},"farOver05":0}
+GAP {"n":2,"worst":[{"d":106,"nm":"truck","max":0.034,"min":0.034},{"d":188,"nm":"sedan-sports","max":0.032,"min":0.029}],"lowest":"0.029","over05":0,"near":{"n":2,"over05":0,"max":0.034,"min":0.029},"farOver05":0}
+GAP {"n":2,"worst":[{"d":105,"nm":"truck","max":0.034,"min":0.034},{"d":186,"nm":"sedan-sports","max":0.032,"min":0.028}],"lowest":"0.028","over05":0,"near":{"n":2,"over05":0,"max":0.034,"min":0.028},"farOver05":0}
+side truck 92.4
+ERR []

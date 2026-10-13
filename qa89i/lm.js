@@ -1,0 +1,3 @@
+const{chromium,boot}=require('../tools/d24lib');
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const{p,errs,shot}=await boot(b,{city:'ath',url:process.argv[2],phone:true});
+const r=await p.evaluate(()=>__oc.ev(`(()=>{const o=[];for(const L of HUB.lmk||[])o.push([L.id||L.name,Math.round(L.x),Math.round(L.z),Math.round(Math.hypot(L.x-1049,L.z+553))]);o.sort((a,b)=>a[3]-b[3]);return JSON.stringify({city:CID,at:[RO.x,RO.z],n:o.length,near:o.slice(0,12),mk:(RO.marks||[]).filter(m=>/kolon/i.test(JSON.stringify(m.ev||m.name||''))).map(m=>[m.x,m.z,m.name||m.ev&&m.ev.name])})})()`));console.log(r);console.log(errs);await b.close()})()

@@ -1,0 +1,9 @@
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.evaluate: Target page, context or browser has been closed
+    at Object.roamApi (/home/user/spotify_to_ytmusic/bc/enter.js:14:34)
+    at /home/user/spotify_to_ytmusic/ath/v89b/heap.js:4:162
+
+Node.js v22.22.0

@@ -1,0 +1,28 @@
+shot m0_menu 25s
+menu {"rect":[256,54,340,56],"over":[]}
+shot g0_garage 95s
+garage {"rect":[139,54,340,56],"over":[]}
+PASS garage: strip visible, covers nothing {"rect":[139,54,340,56],"over":[]}
+shot r1_roam_expanded 225s
+roam {"rect":[256,81,340,56],"over":[]}
+PASS roam: strip visible, covers no control/minimap/speed/objective {"rect":[256,81,340,56],"over":[]}
+PASS text ≥12 px, PASS/FAIL ≥44 px, ≤ ~340×70 {"fs":12,"pa":44,"w":340,"h":56}
+PASS ✅ answers the item and moves to the next i 0→1 answered 1
+PASS answering does not pause or leave roam roam
+shot r2_roam_answered 260s
+PASS › moves on 
+PASS ‹ moves back 
+PASS header folds to a chip 
+shot r3_roam_collapsed 342s
+chip {"rect":[390,81,70,52],"over":[]}
+PASS no ✕ on the chip while items are open 
+PASS state kept after reload (answers, item, folded) {"v":"v88o","i":1,"col":1,"done":0}
+PASS chip expands again 
+PASS tap on the text opens the full panel 
+shot c1_full_panel 426s
+shot x1_race 778s
+race {"rect":[256,54,340,56],"over":[]}
+PASS race: strip visible, covers nothing {"rect":[256,54,340,56],"over":[]}
+ERRS 0 []
+PASS 0 console errors 
+RESULT PASS 14/14

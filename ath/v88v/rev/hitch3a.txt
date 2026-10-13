@@ -1,0 +1,2 @@
+ath HITCH {"build":{"ms":166389,"slices":192,"slMax":103,"sl50":1,"sl100":1,"big":[[103,"inst 2750x30"]],"pixN":12,"pixMs":311,"pixMax":281,"tPix":317,"tPrep":474,"cells":1088,"err":null},"framesDuringBuild":{"n":194,"worst":10680,"p50":25,"over50":23,"over100":21},"framesAfter":{"n":22,"worst":8948,"p50":20,"over50":2,"over100":2},"first10After":[8637,20,20,13,16,13,13,12,20,11]}
+errors 0 

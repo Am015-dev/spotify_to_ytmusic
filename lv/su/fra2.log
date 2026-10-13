@@ -1,0 +1,3 @@
+kinds [["sedan",7,true],["sedan-sports",7,true],["taxi",7,true],["van",7,true],["truck",7,true],["delivery",7,true],["police",7,true],["suv",6,true],["garbage-truck",7,true],["su:t_su",6,true],["su:t_su_pink",7,true]]
+racer su:t_su_pink 123
+errors 0 

@@ -1,0 +1,6 @@
+const{chromium,boot}=require('../tools/d24lib');
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const{p,errs,shot}=await boot(b,{city:'ath',url:process.argv[2],phone:true});
+await p.evaluate(()=>{__mho.warp(1049,-553,1.3826,true)});for(let i=0;i<40;i++)await p.evaluate(()=>__tick(10));
+const r=await p.evaluate(()=>__oc.ev(`(()=>{const cl={};let nm=0,nf=0;scene.traverse(o=>{if(!o.isMesh||!o.geometry)return;nm++;const g=o.geometry,c=g.attributes.color,P=g.attributes.position;if(!c||!P||!c.array||c.array.length<3){nf++;return}o.updateMatrixWorld(true);const v=new THREE.Vector3();
+ for(let i=0;i<c.count;i++){const r=c.getX(i),gg=c.getY(i),bb=c.getZ(i);if(r>.8&&gg>.35&&gg<.72&&bb<.25){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);if(Math.hypot(v.x-1049,v.z+553)>250)continue;const k=Math.round(v.x/12)+','+Math.round(v.z/12);const q=cl[k]||(cl[k]={n:0,x:0,z:0,y0:1e9,y1:-1e9});q.n++;q.x+=v.x;q.z+=v.z;q.y0=Math.min(q.y0,v.y);q.y1=Math.max(q.y1,v.y)}}});
+ return JSON.stringify({nm,nf,top:Object.values(cl).filter(q=>q.n>=8).map(q=>[Math.round(q.x/q.n),Math.round(q.z/q.n),q.n,+q.y0.toFixed(1),+q.y1.toFixed(1)]).sort((a,c)=>c[2]-a[2]).slice(0,40)})})()`));console.log(r);console.log(errs);await b.close()})()

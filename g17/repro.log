@@ -1,0 +1,7 @@
+tabs []
+street ["t_su/:BG","t_su_mid/:BG","t_su_gt/:BG","t_su_wide/:BG","t_su_sky/:BG","t_su_pink/:BG","t_su_v8/:BG","t_sc_tm/:BG","t_sc_hy/:BG","t_sc_f1/:BG","gold/:BG","t_bianco/:BG","t_papaya/:BG","t_limo/:BG","posei/:BG","t_rosso/:BG","t_bus/:BG","t_mt/:BG","ebbel/:BG","t_silver/:BG","t_viola/:BG","t_flame/:BG","t_truck/:BG","t_rally/:BG","t_turbo/:BG","rod/:BG","mine/:BG","t_patrol/:BG","t_racer/:BG","t_taxi/:BG","t_v30572_1/:BG","t_v4436_1/:BG","t_v4914_1/:BG","t_v7639_1/:BG"]
+shot 02_off
+off ["gold/:--","posei/:--","ebbel/:--","t_beast/:--","rod/:--"]
+shot 02_boat
+boat ["gold/:--","posei/:--","ebbel/:--","t_pboat/:--","rod/:--","t_speedboat/:--"]
+errs 0 []

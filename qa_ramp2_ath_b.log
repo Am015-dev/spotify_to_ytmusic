@@ -1,0 +1,5 @@
+route end {"x":-5548.051815818515,"z":4757.1980244439665,"v":-1.2138062912599956,"pi":11,"n":12,"P":[[-5749,4933],[-5171,4057],[-5672,4782]]}
+{"i":11,"x":-5645,"z":4734,"h":2.63,"len":24,"hgt":7,"w":6.5,"y0":186.9,"dk":false,"col":16756768,"appBlk":[],"bodyBlk":[],"landBlk":[],"kerb":-0.21,"roadPct":100,"route":{"launched":false,"hits":5,"stuck":false,"unstick":2,"note":"overtakes traffic ahead (4 m lane offset); stuck 3 s → reverse 1 s + swing round; gives up at 12 s"},"tag":"street","launched":true,"maxAir":15.8,"vLip":97,"hits":0,"minD":0}
+route end {"x":-5401.798895201065,"z":3206.2717715014796,"v":1.0626670973973982,"pi":13,"n":14,"P":[[-5299,2990],[-5431,3037],[-5408,3258],[-5372,3186]]}
+{"i":17,"x":-5372,"z":3186,"h":-0.37,"len":24,"hgt":7,"w":7,"y0":175.4,"dk":false,"col":16756768,"appBlk":[],"bodyBlk":[],"landBlk":[],"kerb":0.01,"roadPct":100,"route":{"launched":false,"hits":6,"stuck":false,"unstick":0,"note":"overtakes traffic ahead (4 m lane offset); stuck 3 s → reverse 1 s + swing round; gives up at 12 s"},"tag":"street","launched":false,"maxAir":0,"vLip":0,"hits":3,"minD":64}
+RAMPS ath: 1/2 reachable · errs 0 []

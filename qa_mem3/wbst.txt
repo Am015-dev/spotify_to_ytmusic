@@ -1,0 +1,3 @@
+(()=>{let n=0,by=0,cells=0;for(const c of WBC.cells.values()){cells++;n+=c.n||0;if(c.T)by+=c.T.byteLength+c.M.byteLength+c.C.byteLength}let tb=0;for(const t of WBC.tl)tb+=t.p.byteLength+t.c.byteLength;
+let ckb=0;for(const e of WBC.objs)ckb+=e.ck?e.ck.byteLength:0;
+return{on:WBC.on,busy:WBC.busy,ms:WBC.st.ms,cells,items:n,packMB:+(by/1048576).toFixed(1),tl:WBC.tl.length,tplMB:+(tb/1048576).toFixed(1),ckMB:+(ckb/1048576).toFixed(1),bld:HUB.bld.length,grid:HUB.grid.size,str:window.__str.sup()}})()
