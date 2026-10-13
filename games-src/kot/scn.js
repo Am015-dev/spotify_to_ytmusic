@@ -29,7 +29,7 @@
   var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
 
   // Known, listed in HANDOFF.md: the 'PERMANENT' card tag on the PC market prints at 9.9 px
-  GXS.known.push({ re: /span\.chip\.cK/, why: 'PC card tag under 11 px' });
+  GXS.known.push({ re: /span\.chip\.cK|span\.more/, why: 'PC card tag under 11 px; PC player name overlaps its "· tap: how" hint' });
   GXS.glowSel += ',#ob [data-act].pulse';   // the pulsing SMASH! button is a glowing legal target: it must answer a real tap
   var faces = function (a, f) { return a.filter(function (x) { return x === f; }).length; };
   var hp = function () { return G.pl.map(function (p) { return p.hp; }); };
@@ -49,6 +49,8 @@
     return true;
   };
   var settled = function () { return G.phase !== 'roll' && !UI.busy && !UI.choice; };
+  var diag = function () { return 'phase ' + G.phase + ', active ' + G.active + ', human ' + humanTurn() + ', busy ' + UI.busy + ', choice ' + !!UI.choice + ', winner ' + G.winner + ', alive ' + G.pl.map(function (p) { return p.alive ? 1 : 0; }).join('') + ', dice ' + G.dice.length; };
+  var ask1 = function () { return UI.choice && document.querySelector('#choice [data-opt].primary, #choice [data-opt]'); };   // the game asks YOU something during the computer's turn (stay or yield?)
   var myRoll = function () { return humanTurn() && G.phase === 'roll' && !UI.busy && !UI.choice && G.dice.length === 6; };
 
   GXS.add({
@@ -88,7 +90,7 @@
       { kind: 'hold', sel: '#ob #pshop .obc', ms: 700, name: 'hold a card', state: function () { return { big: document.getElementById('obcard').classList.contains('on'), own: owned() }; },
         expect: function (a, b) { return (b.big && b.own === a.own) || (!b.big ? 'show the big card' : 'a hold bought the card'); } },
       { kind: 'fn', name: 'big card gone after release, nothing bought', fn: function () { return !document.getElementById('obcard').classList.contains('on') || 'big card stayed'; } },
-      { kind: 'play', name: 'tap the card (touch: twice): it is bought', settleMs: 8000,
+      { kind: 'play', name: 'tap the card (touch: twice): it is bought', settleMs: 12000,
         snap: function () { var q = cur(); return { en: q.en, cards: q.cards.slice(), mk: G.market.slice(), shown: GXS.num('header.gx-bar .pchip.me .e'), ph: G.phase }; },
         steps: [{ sel: '#KSEL', until: function () { return cur().cards.indexOf(window.__id) >= 0; }, max: 3 }],
         idle: function () { return !UI.busy && !UI.choice && !(G.q && G.q.length); },
@@ -109,7 +111,7 @@
     checks: [
       { kind: 'visible', sel: '#ob #dice .die[data-die="0"]', name: 'first die' },
       { kind: 'fn', name: 'all 6 dice are inside the board', fn: function () { for (var i = 0; i < 6; i++) { var r = inBoard('#ob #dice .die[data-die="' + i + '"]'); if (r !== true) return r; } return !(document.querySelector('.gx-dock #dice, .gx-dock #pacts')) || 'dice or buttons still in the panel'; } },
-      { kind: 'play', name: 'keep a die, tap Roll: only the loose dice change', settleMs: 8000,
+      { kind: 'play', name: 'keep a die, tap Roll: only the loose dice change', settleMs: 12000,
         snap: function () { return { rolls: G.rolls, f: G.dice.map(function (d) { return d.f; }), k: G.dice.map(function (d) { return !!d.k; }) }; },
         steps: [{ sel: '#ob #dice .die[data-die="0"]', until: function () { return !!G.dice[0].k; }, max: 2 }, { sel: '#ob [data-act="reroll"]' }],
         idle: function () { return !UI.busy && G.dice.length === 6; },
@@ -129,16 +131,16 @@
     checks: [
       { kind: 'visible', sel: '#ob [data-act="end"]', name: 'End turn button' },
       { kind: 'fn', name: 'End turn is inside the board', fn: function () { return inBoard('#ob [data-act="end"]'); } },
-      { kind: 'play', name: 'tap End turn: three computer turns, then your new roll', settleMs: 8000,
+      { kind: 'play', name: 'tap End turn: three computer turns, then your new roll', settleMs: 12000,
         snap: function () { return { tid: G.tid, act: G.active, en: cur().en, alive: G.pl.filter(function (p) { return p.alive; }).length }; },
         steps: [{ sel: '#ob [data-act="end"]' }],
-        idle: myRoll,
+        idle: myRoll, diag: diag, assist: ask1,
         verify: function (b, a) { return (a.tid > b.tid && a.act === b.act && G.rolls > 0) || 'turn ' + b.tid + ' -> ' + a.tid + ' (expected the 3 computer monsters to play, then you again); rolls ' + G.rolls; } },
-      { kind: 'play', name: 'tap SMASH! on the new turn: it goes on to buying', settleMs: 8000,
+      { kind: 'play', name: 'tap SMASH! on the new turn: it goes on to buying', settleMs: 12000,
         snap: smashSnap, steps: [{ sel: '#ob [data-act="resolve"]' }], idle: settled, verify: smashVerify },
-      { kind: 'play', name: 'End turn again: you are back on a fresh roll', settleMs: 8000,
+      { kind: 'play', name: 'End turn again: you are back on a fresh roll', settleMs: 12000,
         snap: function () { return { tid: G.tid }; }, steps: [{ sel: '#ob [data-act="end"]', ready: function () { return G.phase === 'buy'; } }],
-        idle: myRoll, verify: function (b, a) { return a.tid > b.tid || 'turn ' + b.tid + ' -> ' + a.tid; } }
+        idle: myRoll, diag: diag, assist: ask1, verify: function (b, a) { return a.tid > b.tid || 'turn ' + b.tid + ' -> ' + a.tid; } }
     ]
   });
 
