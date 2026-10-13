@@ -89,7 +89,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98gz | `98gz_garage_zoom.js` | 7 | GZ (garage zoom + pick, Alex 2026-10-13: "include a zoom in/out and more builder functionalities for garage"). 1) ZOOM in every garage mode (RIDES / BUILD / PAI |
 | 98b2 | `98b2_builder2.js` | 57 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: the STUNT CUP ribbon builder was "boring, flat, no levels". This is a PIECE builder on FULL terrain, in its ow |
 | 98rd | `98rd_roads.js` | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow traffic rules and also humans"): pedestrian kerb + crossing rules, cars yield, zebras in Frankfurt. |
-| 98tq | `98tq_test_quick.js` | 3 | TQ: FAST TEST START (int-2, 2026-10-13). Active only with ?test=fra/ath (the prelude in 10_core.js sets slot 9 + the boot-to-roam flag). Minimal graphics (low q |
+| 98tq | `98tq_test_quick.js` | 4 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z][&go=<ver/id>][&draw=0]: slot 9 (wiped each load), skips intro/menu/story/tutorial, low quality, no warm-up  |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -419,9 +419,9 @@ uses: 10(31), 30(12), 20(10), 72(5), 40(1), 93(1)
 defines: RD_PS RD_key RD_sd RD_pv RD_pred RD_predOf RD_inBox RD_boxPath RD_pedNext RD_turnBack RD_CG RD_RB RD_road RD_mem RD_memGet RD_may RD_KR RD_kerb RD_maySig RD_carPre RD_carPost RD_zebra __rd RD_entry RD_compat RD_LEFT RD_US RD_unstack RD_POLE RD_poleOn RD_poleOut RD_exitFree
 uses: 53(20), 51(16), 60(6), 20(5), 70(5), 90(4), 10(4), 98l(4), 72(1)
 
-## 98tq_test_quick.js — 3 KB
+## 98tq_test_quick.js — 4 KB
 defines: TQ_url
-uses: 10(9), 72(7), 80(7), 30(4), 20(2), 70(2), 98(2), 98ld(2), t/fast.js(1), 98zp(1)
+uses: 10(12), 72(7), 80(7), 30(4), 20(2), 70(2), 98(2), 98ld(2), t/fast.js(1), 98zp(1)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25
