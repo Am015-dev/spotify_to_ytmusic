@@ -160,18 +160,19 @@ const _pB=new THREE.Matrix4(),_pL=new THREE.Matrix4(),_pR=new THREE.Matrix4(),_p
 function pedPart(im,i,ox,oy,oz,rx,rz){_pe.set(rx||0,0,rz||0);_pq.setFromEuler(_pe);_pL.compose(_pv.set(ox,oy,oz),_pq,_ps.set(1,1,1));_pR.multiplyMatrices(_pB,_pL);im.setMatrixAt(i,_pR)}
 function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=Math.abs(RO.v),Q=HUB.pP;
   const PN=LV_pn(P.length);for(const k in Q)if(Q[k].count!==PN)Q[k].count=PN;for(let i=0;i<PN;i++){const p=P[i],A=N[p.a],B=N[p.b];if(!A||!B){pedPlace(p,40,380);continue}const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gN=A.g&&B.g,W=Math.min(A.w||20,B.w||20);
-    if(p.jy<=0&&!p.cw){const pv=RD_ON?RD_pv(p):p.v;p.t+=pv*dt/L;p.ph+=pv*dt*3.2;if(p.t>=1){if(RD_ON)RD_pedNext(p,B);else{const nx=B.nb.filter(n=>n!==p.a);p.a=p.b;p.b=nx.length?nx[Math.floor(R()*nx.length)]:p.a;p.t=0}}}
-    const off=(gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)))*(RD_ON?RD_sd(p):1);let bx=p.cw?p.cx:A.x+(B.x-A.x)*p.t-dz*off,bz=p.cw?p.cz:A.z+(B.z-A.z)*p.t+dx*off;/* v88p: crowd peds (LV clusters) stand at p.cx/p.cz */
+    const S=p.ofS;/* foot-1: p.ofS = stand here (x,z,h), wave while S.w>0 (98of_onfoot.js) */
+    if(p.jy<=0&&!p.cw&&!S){const pv=RD_ON?RD_pv(p):p.v;p.t+=pv*dt/L;p.ph+=pv*dt*3.2;if(p.t>=1){if(RD_ON)RD_pedNext(p,B);else{const nx=B.nb.filter(n=>n!==p.a);p.a=p.b;p.b=nx.length?nx[Math.floor(R()*nx.length)]:p.a;p.t=0}}}
+    const off=(gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)))*(RD_ON?RD_sd(p):1);let bx=S?S.x:p.cw?p.cx:A.x+(B.x-A.x)*p.t-dz*off,bz=S?S.z:p.cw?p.cz:A.z+(B.z-A.z)*p.t+dx*off;/* v88p: crowd peds (LV clusters) stand at p.cx/p.cz */
     let d=Math.hypot(bx+p.jx-RO.x,bz+p.jz-RO.z);
-    if(!p.cw&&d>LV_pedFar()){LV_pedPut(p);continue}
+    if(!p.cw&&!S&&d>LV_pedFar()){LV_pedPut(p);continue}
     if(TUNE.lvLod&&d>90&&p.jy<=0&&p._x!=null&&(i+HUB.fr)%3)continue;/* v88u perf: people > 90 m away re-pose every 3rd frame (9-13 px tall there) */
-    if(RD_ON&&!p.cw&&p.jy<=0){const k=RD_kerb(p,bx,bz,dt);bx=k[0];bz=k[1]}
-    if(p.jy<=0&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
+    if(RD_ON&&!p.cw&&!S&&p.jy<=0){const k=RD_kerb(p,bx,bz,dt);bx=k[0];bz=k[1]}
+    if(p.jy<=0&&(!RO.foot||RO.foot==='car')&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}
     const x=bx+p.jx,z=bz+p.jz;p._x=x;p._z=z;if(!p.yc||(i+HUB.fr)%8===0){p.y=groundAt(x,z,(p.y||0)+3);if(p.y<-1){pedPlace(p,120,380);continue}p.y=Math.max(0,p.y)}p.yc=1;
-    const air=p.jy>0,sw=air||p.cw?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1);
+    const air=p.jy>0,sw=air||p.cw||S?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(S?S.h:p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1);
     _pq.setFromAxisAngle(up,h);_pB.compose(_pv.set(x,p.y+p.jy+bob,z),_pq,_ps.set(S2,S2,S2));
     pedPart(Q.legL,i,-.3,1.25,0,air?-.5:sw);pedPart(Q.legR,i,.3,1.25,0,air?.4:-sw);pedPart(Q.hip,i,0,1.36,0);pedPart(Q.tor,i,0,2.22,0);
-    const wv=!air&&(p.cw?LV_cwave(i,d):LV_wave(i,d,sp)),wa=wv?Math.sin(performance.now()/95+i)*.4:0,ct=p.cw&&!wv&&!air?Math.max(0,Math.sin(performance.now()/420+i*1.7)):0,aL=air?-2.7:wv&&i%2?-2.8+wa:p.cw?-.15-ct*1.1:-sw*.9,aR=air?-2.7:wv?-2.8-wa:sw*.9;pedPart(Q.armL,i,-.86,2.78,0,aL,-.12);pedPart(Q.armR,i,.86,2.78,0,aR,.12);pedPart(Q.handL,i,-.86,2.78,0,aL,-.12);pedPart(Q.handR,i,.86,2.78,0,aR,.12);
+    const wv=!air&&(S?S.w>0:p.cw?LV_cwave(i,d):LV_wave(i,d,sp)),wa=wv?Math.sin(performance.now()/95+i)*.4:0,ct=p.cw&&!wv&&!air?Math.max(0,Math.sin(performance.now()/420+i*1.7)):0,aL=air?-2.7:wv&&i%2?-2.8+wa:p.cw?-.15-ct*1.1:-sw*.9,aR=air?-2.7:wv?-2.8-wa:sw*.9;pedPart(Q.armL,i,-.86,2.78,0,aL,-.12);pedPart(Q.armR,i,.86,2.78,0,aR,.12);pedPart(Q.handL,i,-.86,2.78,0,aL,-.12);pedPart(Q.handR,i,.86,2.78,0,aR,.12);
     pedPart(Q.head,i,0,3.32,0);pedPart(Q.hair,i,0,3.62,0)}
   HUB.fr=(HUB.fr||0)+1;for(const k in Q)Q[k].instanceMatrix.needsUpdate=true}

@@ -18,7 +18,7 @@ CR_wheel=(f=>function(t){if(t!=='wMT')return f(t);const k='bcMT'+(CR_LO?'lo':'')
 function BC_kit(){const A=[],add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},
  wy=w=>(CR_WH[w].r-.72-GB_PC[w].h*GB_PH/2)/GB_PH;return{A,add,sym,wy}}
 const BC_C={K:CR_K,W:'#f4f4f4',R:'#d01712',Y:'#fac80a',G:'#a0a5a9',B:'#0055bf',O:'#fe8a18',CH:'#d8dde4',DK:'#1b2a34'};
-// Sightseeing bus after 60407: open-top double-decker, red with a black window band and a yellow/black stripe, 2 axles. 10 wide × 36 long, ~46 plates tall.
+// Sightseeing bus after 60407: double-decker with a closed roof (v90m; was open-top), red with a black window band and a yellow/black stripe, 2 axles. 10 wide × 36 long, ~46 plates tall.
 function BC_bus(){const{A,add,sym,wy}=BC_kit(),{K,R,Y,W,G,DK}=BC_C;
  add('T10x36',-5,-18,0,K,0);for(const z of[-15,6]){sym('arch',-5,z,0,R,0);sym('wL',-5,z,0,K,wy('wL'));sym('P1x4',-5,z,0,R,6)}
  // lower deck: skirt (2 bricks) between the arches, yellow stripe, glass band, black belt
@@ -36,6 +36,8 @@ function BC_bus(){const{A,add,sym,wy}=BC_kit(),{K,R,Y,W,G,DK}=BC_C;
  add('G10x1h5',-5,-18,0,0,19);for(const[z,n]of[[-17,17],[1,16]])sym('G1x'+n,-5,z,0,0,19);sym('B1x1',-5,0,0,R,19);sym('B1x1',-5,0,0,R,22);sym('B1x1',-5,17,0,R,19);sym('B1x1',-5,17,0,R,22);
  add('B8x1',-4,17,0,R,19);add('B8x1',-4,17,0,R,22);sym('P1x35',-5,-17,0,R,25);add('P10x1',-5,-18,0,R,24);add('P8x1',-4,17,0,R,25);
  for(const z of[-12,-7,-2,3,8,13])sym('seat',-4,z,0,DK,18);add('B6x1',-3,-17,0,K,18);add('T6x1',-3,-17,0,Y,21);sym('mir',-6,-17,0,K,10);
+ // dev4 (Alex: "hollow red open frame, not a car"): closed roof over the upper deck (a red roof tile on the top rail + a white centre stripe), so no open flatbed look from above or behind
+ add('T10x36',-5,-18,0,R,26);add('T6x34',-3,-17,0,W,27);
  return A}
 // Box truck after 60440's tractor: bonneted US cab (tilting bonnet, grey grille, one grey stack, sleeper) + a white box body on one chassis, 3 axles.
 function BC_truck(){const{A,add,sym,wy}=BC_kit(),{K,R,Y,W,G,CH,B}=BC_C;

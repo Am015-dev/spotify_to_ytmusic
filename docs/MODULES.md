@@ -4,7 +4,7 @@ file | KB | purpose | first defines
 00_page.html | 113 | <title>, all CSS (HUD, menus, touch controls, phone  | 
 02_data_json.html | 108 | DATA: importmap (three r164 CDN), #rf-data (Frankfur | 
 10_core.js | 3 | OD_CHANGELOG (top; every deploy prepends an entry),  | W14_ST W14_PIV TUNE
-10_core2.js | 40 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | OD_CHANGELOG
+10_core2.js | 42 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | OD_CHANGELOG
 10_core3.js | 38 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | OD_VER CR_trackW CR_LS
 10_core4.js | 38 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | PD teamOf SIG
 10_core5.js | 21 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | ENVD lightningT litV
@@ -26,20 +26,20 @@ file | KB | purpose | first defines
 60_city_build3.js | 27 | part of 60_city_build.js: build the free-roam map: g | athBuildG athRoadD athConn
 60_city_build4.js | 38 | part of 60_city_build.js: build the free-roam map: g | buildHubG LAZY LZ
 60_city_build5.js | 35 | part of 60_city_build.js: build the free-roam map: g | lzTractor lzTurbine lzFarm
-60_city_build6.js | 37 | part of 60_city_build.js: build the free-roam map: g | CE_streets CE_plazas CE_lots
+60_city_build6.js | 38 | part of 60_city_build.js: build the free-roam map: g | CE_streets CE_plazas CE_lots
 70_roam_world.js | 81 | culling hubCull, minimap (miniPaint miniDraw), distr | waterFx hubCullAdd hubCullInit
 71_roam_drive.js | 67 | free-roam driving: roamStep (player physics), wall s | VSEL VNAME cycleVehicle
 72_roam_map_loop_boot.js | 51 | big map, main loop frame(now) (dt, sim, composer.ren | picks pickAdd pickDrop
 80_story_m1.js | 90 | M1 Frankfurt chapter 1 (M1_: scenes, goons, items, d | M1 M1_WHO M1_av
 81_story_ath_m2_m3.js | 98 | ATC Athens campaign (ATC_), M2 Hafenbande (M2_), M3  | ATC ATC_W ATC_P
 85_audio_feel_sp_otg.js | 105 | AU adaptive music/SFX (AU_), FL feel: vehicle auto-s | AU_M AU_BPM AU_KEYS
-90_fixes_cv_ju.js | 84 | OB burst-cause log (OB_), OC night lights/Acropolis  | OB OB_who OB_prop
+90_fixes_cv_ju.js | 85 | OB burst-cause log (OB_), OC night lights/Acropolis  | OB OB_who OB_prop
 92_garage_builder.js | 17 | GB brick builder core: pieces GB_PC GB_piece GB_bric | GB_U GB_PH GB_MAX
 93_cars_lego.js | 66 | LEGO cars (CR_): part geometry (CR_bb CR_side CR_whe | CR_G CR_W CR_LO
 94_garage_ui.js | 19 | garage builder scene + pointer picking + UI (#gbx),  | GB_hullMeshes GB_scanBase GB_gridMesh
 95_drive_flow.js | 19 | DR probe window.__dr + driving flow: fewer breakable | DR_edge __dr DR
 96_scale_qa.js | 33 | SC/SC2 real scale (SC_: 1.8 m humans, road setback), | SC_K SC_S SC_cam
-97_art.js | 35 | ART steps (ART_ ART4_ ART6_ ART7_): LEGO-2K sky/look | ART4 ART4_vis ART4_base
+97_art.js | 36 | ART steps (ART_ ART4_ ART6_ ART7_): LEGO-2K sky/look | ART4 ART4_vis ART4_base
 98_garage_driver.js | 50 | GAR1 driver minifig at real proportions (GAR_), 8 re | GAR_PRE GAR_HC GAR_tc
 98g_garage_paint.js | 3 | GP: garage PAINT tab recolours the real LEGO bricks  | GP_K GP_rank GP_pa
 98p_garage_perks.js | 4 | GPK: 2K-style vehicle groups + perks in the garage R | GPK_GRP GPK_ GPK_cls
@@ -82,11 +82,11 @@ file | KB | purpose | first defines
 98ld_run.js | 5 | LDM runner (v89z: lazy per-model loading). models.js | LDL LD_redraw LD_done
 98ct_city_lego.js | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big va | CT CT_SWAP CT_SC
 98sz_ride_scale.js | 8 | RSZ (size-1, 2026-10-10). Alex: "many of the big veh | RSZ SZ_f SZ_fac
-98sz2_ride_audit.js | 6 | RSZ audit (size-2, 2026-10-13): measures EVERY garag | RSZ_go
-98of_onfoot.js | 50 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
+98sz2_ride_audit.js | 8 | RSZ audit (size-2, 2026-10-13): measures EVERY garag | RSZ_go RSZ_human
+98of_onfoot.js | 65 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
 98sh_shadow.js | 4 | SHB (v90k): soft blob shadows on the ground under th | SHB SHB_pool SHB_M
-98lf_lively_fill.js | 25 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
-99c_checklist.js | 70 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | OD_CHECKLIST
+98lf_lively_fill.js | 19 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
+99c_checklist.js | 82 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | OD_CHECKLIST
 98rf_race_fun.js | 10 | (no header comment) | RF_GRID RF_rub RF_lat
 98ro_open.js | 30 | OPN (race worker, 2026-10-09): OPEN race courses in  | OPN_TER OPN_K OPN_I0
 98zp_perf_ctx.js | 13 | PERF1 (v89i): one WebGL context The menu car cards ( | P1 P1_rt P1_free
@@ -95,11 +95,12 @@ file | KB | purpose | first defines
 98ba_build_anim.js | 5 | BA (garage-17 task B, Alex 2026-10-10: "when opening | BA BA_DROP BA_FALL
 98gf_garage_floor.js | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the  | GF __gf
 98gz_garage_zoom.js | 7 | GZ (garage zoom + pick, Alex 2026-10-13: "include a  | GZ GZ_md GZ_MIN
-98b2_builder2.js | 66 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: th | BX BXC BXH
+98b2_builder2.js | 75 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: th | BX BXC BXH
 98rd_roads.js | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow t | RD_PS RD_key RD_sd
-98tq_test_quick.js | 4 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z] | TQ_url
-98rs_road_seams.js | 4 | RS: ROAD SEAMS (art-1, 2026-10-13). Alex (v90m-beta. | RS_seams RS RS_SPOT
+98tq_test_quick.js | 5 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z] | TQ_url
+98rs_road_seams.js | 5 | RS: ROAD SEAMS (art-1, 2026-10-13). Alex (v90m-beta. | RS_OFF RS_seams RS
 98lm_liveliness.js | 5 | LVM: LIVELINESS METER (art-1, 2026-10-13). Alex: "Al | LVM_SPOTS LVM_T LVM_HR
+98cam_size_cam.js | 16 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
 99_api.js | 49 | test API window.__mho={…} (state, roamSim, warp, gnd | __mho CR_RBX CR_raceHide
 test/fast.js | 5 | FAST · test-only fast mode, active only with ?fast=1 | FAST
 test/g9iter.js | 0 | test-only (local builds): eval in module scope for t | __g9ev

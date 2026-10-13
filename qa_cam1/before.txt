@@ -1,0 +1,38 @@
+BOOT fra 16.6 s
+GO bus: "📍 SIGHTSEEING BUS · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height" {"sel":"t_bus","road":92,"foot":"car"}
+FAIL bus · landscape 852×393: road 10 m past the nose not hidden by the ride · {"by":"Mesh","cam":{"b":10.25,"h":6.49,"fov":66},"P":{"L":4.43,"H":1.81}}
+PASS bus · landscape 852×393: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.499,"y":0.577,"blocked":3,"by":"Mesh","d":26.9}
+FAIL bus · landscape 852×393: ride fills 15-35 % of the screen height · {"fill":0.47,"top":0.53,"bot":1}
+FAIL bus · portrait 393×852: road 10 m past the nose not hidden by the ride · {"by":"Mesh","cam":{"b":10.26,"h":6.49,"fov":98.2},"P":{"L":4.43,"H":1.81}}
+PASS bus · portrait 393×852: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.498,"y":0.543,"blocked":3,"by":"Mesh","d":26.9}
+FAIL bus · portrait 393×852: ride fills 15-35 % of the screen height · {"fill":0.362,"top":0.517,"bot":0.879}
+GO bus: "📍 SIGHTSEEING BUS · on a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height" {"sel":"t_bus","road":92,"foot":"car"}
+PASS bus · drive 5 s (gas, then steer): the ride moves ≥ 10 m · {"d":44.1}
+PASS bus · camera follows smoothly (no step > 0.8 m back / 0.6 m up per 50 ms) · {"jb":0.02,"jh":0.21}
+GO flatbed: "📍 FLATBED (60017) · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height" {"sel":"t_v60017_1","road":92,"foot":"car"}
+PASS flatbed · landscape 852×393: road 10 m past the nose not hidden by the ride · {"by":null,"cam":{"b":10.1,"h":6.27,"fov":66},"P":{"L":4.43,"H":1.81}}
+PASS flatbed · landscape 852×393: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.501,"y":0.572,"blocked":0,"by":null,"d":24.7}
+FAIL flatbed · landscape 852×393: ride fills 15-35 % of the screen height · {"fill":0.426,"top":0.574,"bot":1}
+PASS flatbed · portrait 393×852: road 10 m past the nose not hidden by the ride · {"by":null,"cam":{"b":10.1,"h":6.27,"fov":98.2},"P":{"L":4.43,"H":1.81}}
+PASS flatbed · portrait 393×852: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.502,"y":0.541,"blocked":0,"by":null,"d":24.7}
+PASS flatbed · portrait 393×852: ride fills 15-35 % of the screen height · {"fill":0.256,"top":0.542,"bot":0.798}
+GO truck: "📍 LOGGER (60059), the longest/tallest truck · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height" {"sel":"t_v60059_1","road":92,"foot":"car"}
+FAIL truck · landscape 852×393: road 10 m past the nose not hidden by the ride · {"by":"Mesh","cam":{"b":13.69,"h":8.93,"fov":66},"P":{"L":4.43,"H":1.81}}
+PASS truck · landscape 852×393: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.501,"y":0.602,"blocked":2,"by":"Mesh","d":29.8}
+FAIL truck · landscape 852×393: ride fills 15-35 % of the screen height · {"fill":0.4,"top":0.6,"bot":1}
+FAIL truck · portrait 393×852: road 10 m past the nose not hidden by the ride · {"by":"Mesh","cam":{"b":13.69,"h":8.93,"fov":98.2},"P":{"L":4.43,"H":1.81}}
+PASS truck · portrait 393×852: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.502,"y":0.557,"blocked":2,"by":"Mesh","d":29.8}
+PASS truck · portrait 393×852: ride fills 15-35 % of the screen height · {"fill":0.242,"top":0.556,"bot":0.798}
+GO foot: "📍 ON FOOT · check: road 10 m ahead in view (PC: WASD, Shift runs)" {"sel":"t_v60059_1","foot":"walk"}
+FAIL foot · landscape 852×393: road 10 m past the nose not hidden by the ride · {"by":"Mesh","cam":{"b":4.5,"h":2.2,"fov":66},"P":{"L":4.43,"H":1.81}}
+PASS foot · landscape 852×393: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.5,"y":0.508,"blocked":3,"by":"Mesh","d":14.9}
+PASS foot · landscape 852×393: ride fills 15-35 % of the screen height · {"fill":0.306,"top":0.462,"bot":0.768}
+FAIL foot · portrait 393×852: road 10 m past the nose not hidden by the ride · {"by":"Mesh","cam":{"b":4.5,"h":2.2,"fov":98.2},"P":{"L":4.43,"H":1.81}}
+PASS foot · portrait 393×852: that road point is in the lower middle (x 33-67 %, y 40-85 %) · {"x":0.5,"y":0.504,"blocked":3,"by":"Mesh","d":14.9}
+PASS foot · portrait 393×852: ride fills 15-35 % of the screen height · {"fill":0.172,"top":0.479,"bot":0.651}
+GO sport: "📍 Z06 RACER (75870), small sports car · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height" {"sel":"t_v75870_1","road":92,"foot":"car"}
+GO bus: "📍 SIGHTSEEING BUS · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height" {"sel":"t_bus","road":92,"foot":"car"}
+PASS switch · the camera re-frames for the bus (moves back > 1 m) · {"b0":5.62,"start":5.63,"end":10.26}
+FAIL switch · it eases in: no step > 0.5 m per 50 ms · {"jb":0.9,"jh":5.68}
+PASS all · no console errors · []
+GO 18/29
