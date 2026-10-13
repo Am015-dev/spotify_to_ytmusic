@@ -44,6 +44,7 @@ A game inlines them in its `build.py` from `../shell/` (never a local copy). Gam
 
 ## After every live deploy
 After every live deploy, run `python3 games-src/scripts/add-update.py <game-id> "headline" "item" ["item"...] --check "what to try"` with 1-5 plain-words items; the shelf's What's new panel shows them to the owner.
+To-make list for the laptop (missing + facelift + look-check, with prompts): rerun `python3 games-src/scripts/next-wave.py` after look-check and after wiring-status; it writes `games/next-wave.html`, `games-src/NEXT-WAVE.md` and the `games-src/next-wave/` prompt files, and refreshes `games/status.json`.
 Versions and what is missing: `python3 games-src/scripts/game-status.py` writes `games/status.json` (version = commits touching `games/<slug>/`, wired/unwired art, still-to-make list). `build-all.py --deploy` and `wiring-status.py` run it; commit the file with the deploy. It feeds the shelf version chips, `games/status.html` and `games/asset-viewer/games.html`.
 
 ## C. Bug fix

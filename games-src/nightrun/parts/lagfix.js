@@ -23,3 +23,23 @@ loadTrack=function(stage,urgent){const info=TR.by[stage];if(!info||TR.bufs[info.
    building one is 20-80 ms of canvas work, which showed as a hitch at the first visit of a district. */
 setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
   for(let k=0;k<2*n;k++){const i=k%n,port=k>=n;if(port?BGPC[i]:BGC[i])continue;if(running&&!calmNow())return;(port?bgpFor:bgFor)(i);return;}},350);
+
+/* ---------- lag fix, part 3: do not draw what nobody can see, and let a machine that is fill-rate bound draw fewer pixels ----------
+   1. Covered: while an opaque full-screen page (pause, settings, garage, pit stop, story map, results, chest, weapons) is up, the canvas behind it is drawn at about 8 a second instead of 60
+      (the page is 90% opaque, so the world is still faintly alive). The old LAB was such a page: the whole game kept rendering at full cost under it.
+   2. Render scale (RSC, used by fit() in b.js): when the average frame of a live run stays above 22 ms for ~3 s, the canvas backing store is made 25% smaller in each direction (browser scales it up),
+      down to 55% (under a third of the pixels). Each step is judged: if the frames did not get at least 7% faster the screen is not fill-bound (throttled at 30 Hz, slow CPU), the step is undone and the scaler stops.
+      Never active in an automated browser (navigator.webdriver) unless the URL has ?scale=1, so the tests see a fixed canvas. */
+const COVERS=()=>[pauseEl,setEl,garageEl,shopEl,selEl,resEl,chestEl,typeof wpEl!=='undefined'?wpEl:null];
+let covT=0;
+function lagCovered(now){let on=false;for(const e of COVERS())if(e&&!e.hidden){on=true;break;}
+  if(!on)return false;if(now-covT<120)return true;covT=now;return false;}
+RSC.on=()=>!RSC.off&&SET.fps!==30&&!(navigator.webdriver&&!/[?&]scale=1/.test(location.search));
+RSC.feed=function(raw){if(!RSC.on()||SH.active||G.dead||raw>250||document.hidden)return;
+  if(RSC.cool>0){RSC.cool--;return;}
+  RSC.buf.push(raw);if(RSC.buf.length<75)return;
+  const s=RSC.buf.slice().sort((a,b)=>a-b),n=Math.floor(s.length*.9),m=s.slice(0,n).reduce((a,b)=>a+b,0)/n;RSC.buf=[];RSC.log.push(Math.round(m*10)/10);if(RSC.log.length>12)RSC.log.shift();
+  if(RSC.hist){const was=RSC.hist;RSC.hist=0;if(m>was*.93){RSC.k=RSC.prev;RSC.off=true;fit();return;}}   // not faster: it was never the pixels
+  const nk=Math.max(RSC.min,+(RSC.k*.75).toFixed(3));
+  if(m>22&&RSC.k-nk>.05&&performance.now()-RSC.t0>4000){RSC.prev=RSC.k;RSC.hist=m;RSC.k=nk;RSC.steps++;RSC.cool=45;fit();}};
+NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});

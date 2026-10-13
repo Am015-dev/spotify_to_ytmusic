@@ -1,6 +1,8 @@
 
 /* ---------- input ---------- */
 const K={};let pressed={};
+let HK=1,HKL=1;                                         // HUD type scale on small screens: portrait (drawHUDP) / landscape (drawHUD); set by fit()
+const RSC={k:1,min:.55,buf:[],cool:0,hist:0,off:false,t0:0,steps:0,log:[]};   // render scale: the adaptive part of the backing-store budget (lagfix.js lowers it when frames are slow because of fill rate)
 let touch=null,touchFire=false;
 const stampOf=e=>(e&&e.timeStamp>0?e.timeStamp:performance.now());
 const QD={L:1,M:1.5,H:2};
@@ -15,11 +17,12 @@ function fit(){
   if(rotMode){const sA=Math.min(aw/H,(ah-84)/W),sB=Math.min((aw-80)/H,ah/W);   // buttons in a strip below, or in a column beside the play area, whichever leaves the bigger screen
     if(sB>sA*1.04){side=80;w=H*sB;h=W*sB;}else{strip=84;w=H*sA;h=W*sA;}}
   else{w=aw;h=w*9/16;if(h>ah){h=ah;w=h*16/9;}}
+  {const cpu=rotMode?w/PW_:w/W;HK=rotMode?Math.min(2,Math.max(1,11.6/(11*cpu))):1;HKL=rotMode?1:Math.min(2,Math.max(1,11.6/(11*cpu)));}   // CSS px per world unit: below 11 px of type the HUD is scaled up
   const left=SET.layout==='left';
   stage.classList.toggle('p',rotMode);stage.classList.toggle('sd',side>0);stage.classList.toggle('tl',left);
   stage.style.setProperty('--strip',strip+'px');stage.style.setProperty('--shift',side?(left?40:-40)+'px':'0px');
   frame.style.width=w+'px';frame.style.height=h+'px';
-  const dpr=Math.max(.5,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
+  const dpr=Math.max(.4,Math.min(QD[SET.q]||1.5,window.devicePixelRatio||1,Math.sqrt((PXB[SET.q]||PXB.M)/(w*h)))*RSC.k),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
   if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch;}
   if(rotMode){                                           // the world keeps its landscape coordinates on its own canvas; render() turns it upright
     if(wcv===cv){wcv=document.createElement('canvas');wctx=wcv.getContext('2d');}
@@ -49,7 +52,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running
 addEventListener('pageshow',()=>{if(!paused&&!document.hidden)AU.resume();});
 for(const ev of['pointerdown','touchstart','touchend','mouseup','click'])addEventListener(ev,()=>AU.unlock(),true);
 addEventListener('touchstart',()=>{if(!touchUI){touchUI=true;relayout();syncUI();}},{capture:true,passive:true});
-stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch'))return;e.preventDefault();
+stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch,#labP'))return;e.preventDefault();
   if(!running||paused||touch)return;const t=e.changedTouches[0],[x,y]=toGame(t);
   touch={id:t.identifier,sx:x,sy:y,px:P.x,py:P.y,x,y};touchFire=true;pressed.Fire=stampOf(e);},{passive:false});
 stage.addEventListener('touchmove',e=>{if(!touch)return;e.preventDefault();for(const t of e.changedTouches)if(t.identifier===touch.id){const[x,y]=toGame(t);touch.x=x;touch.y=y;}},{passive:false});
@@ -154,7 +157,7 @@ const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));}
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers
 const tierOf=n=>Math.min(TIERS,1+Math.floor(n/TS));
 const comboK=()=>tierOf(C.n);                            // score multiplier = tier (x1..x4)
-const TIERC=['#8c86b8','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
+const TIERC=['#b9b3e6','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
 function tierSet(n,why,x,y){const t0=tierOf(C.n);C.n=clamp(n,0,TIERS*TS-1);const t1=tierOf(C.n);AU.tier=t1;
   if(t1!==t0){G.tpop=.7;G.tdir=t1>t0?1:-1;
     if(t1>t0){floater(x==null?P.x:x,(y==null?P.y:y)-52,'TIER ×'+t1,TIERC[t1-1]);AU.sfx('tier');G.rings.push({x:P.x,y:P.y,l:.6,m:.6,c:TIERC[t1-1]});G.flash=Math.max(G.flash,.1*FX());
@@ -255,7 +258,7 @@ function update(dt){
   for(const x of G.delayed){x.t-=dt;if(x.t<=0){x.dead=1;x.f();}}G.delayed=G.delayed.filter(x=>!x.dead);
   if(G.dead){G.deadT+=dt;if(G.deadT>2.2)gameOver();}
   if(!G.dead){beatPump();
-    if(G.t>1.5&&!G.hint.txt&&!TIP.done){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
+    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
   else G.bp=bpos();
 
   /* player */
@@ -300,6 +303,7 @@ function update(dt){
 
   /* waves & boss trigger */
   if(ST.on){ST.tick(dt);}
+  else if(G.lab){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
   else if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;DIR.tick(dt);                 // the director schedules the waves on bar lines; it also decides when the boss comes
     if(!G.preload&&G.dt>10){G.preload=true;const n=nextDi(G.di).di;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
   else if(!G.dead&&G.boss&&G.boss.mini&&!ST.on){G.dt+=dt;DIR.tick(dt);}

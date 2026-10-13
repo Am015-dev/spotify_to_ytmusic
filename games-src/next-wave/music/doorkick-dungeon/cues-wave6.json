@@ -1,0 +1,76 @@
+{
+ "cues": {
+  "amb-tavern": {
+   "prompt": "Medieval tavern ambience loop: distant crowd chatter with no clear words, mugs clinking, a crackling fireplace, creaking floorboards. 60 seconds, seamless loop. No vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "amb-tavern.mp3",
+   "length": "60 s seamless loop"
+  },
+  "stinger-bad": {
+   "prompt": "Short medieval game sound effect, two quick low plucks slightly off-key, a playful \"nope\", under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-bad.mp3",
+   "length": "under 2 s"
+  },
+  "stinger-boss": {
+   "prompt": "Short medieval game sound effect, deep war-drum hit with a low horn blast and a door-slam crack, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-boss.mp3",
+   "length": "under 2 s"
+  },
+  "stinger-curse": {
+   "prompt": "Short medieval game sound effect, spooky rising glass-harmonica shimmer with a goblin giggle and no words, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-curse.mp3",
+   "length": "under 2 s"
+  },
+  "stinger-level": {
+   "prompt": "Short medieval game sound effect, bright lute strum rising into a small bell chime, a happy level-up, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-level.mp3",
+   "length": "under 2 s"
+  },
+  "stinger-lose": {
+   "prompt": "Short medieval game sound effect, descending bassoon wah-wah with a soft drum thud, comic, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-lose.mp3",
+   "length": "under 2 s"
+  },
+  "stinger-turn": {
+   "prompt": "Short medieval game sound effect, a single warm hand-drum tap plus a lute pluck, a gentle \"your turn\", under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-turn.mp3",
+   "length": "under 2 s"
+  },
+  "stinger-win": {
+   "prompt": "Short medieval game sound effect, short brass fanfare three notes up with a cymbal sparkle, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "stinger-win.mp3",
+   "length": "under 2 s"
+  }
+ }
+}
