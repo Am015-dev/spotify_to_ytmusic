@@ -2,21 +2,17 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 606 paintings, 47 3D models. Still to wire: 109 paintings, 12 models.
+Wired: 649 paintings, 52 3D models. Still to wire: 66 paintings, 7 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | sands-of-qamar | 31 | 0 |
-| hollowbough | 19 | 1 |
-| rampart-and-vine | 18 | 4 |
 | crown-city-smash | 7 | 0 |
 | shipwreck-isle | 6 | 3 |
 | tidewake | 5 | 0 |
 | cauldron-fair | 4 | 0 |
-| sunglaze | 3 | 0 |
 | lantern-dive | 3 | 0 |
 | doorkick-dungeon | 3 | 4 |
-| thornbound | 3 | 0 |
 | short-fuse | 2 | 0 |
 | final-approach | 2 | 0 |
 | kaiten-kitchen | 2 | 0 |
@@ -59,57 +55,6 @@ Wired: 606 paintings, 47 3D models. Still to wire: 109 paintings, 12 models.
 | Wave 1 Wave 1 | `ui-trophy` | a small copper trophy cup with a lapis band and two handles, single object, centred, plain flat white backgrou |
 | Wave 1 Wave 1 (16:9) | `ui-djinn-bar` | a long narrow banner plaque in deep violet lacquer with a thin hammered-gold border and small gold stars at bo |
 | Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank curling ribbon banner in terracotta with gold edges, centre empty, single object, centred, plain flat  |
-
-## hollowbough
-
-3D: ever-tree
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of birch-bark paper with a carved bark outline and a tiny curl at one corner, |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of birch-bark paper with a carved bark outline, single object, centred |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream with a carved bark r |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, autumn-orange with a carve |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, moss-green with a carved b |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of a carved branch with leaves with a carved bark edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round carved bark button with a autumn orange ring, centre empty, single object, centred, plain flat w |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round carved bark medallion with a autumn orange ring, centre blank, larger with a small crown on top, singl |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round carved bark medallion with a autumn orange ring, centre blank, with a small laurel at the bottom, sing |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round carved bark medallion with a autumn orange ring, centre blank, dull and darkened with a small padlock  |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round carved bark medallion with a autumn orange ring, centre blank, bright and polished, single object, cen |
-| Wave 4 Wave 4 kit | `ui-panel` | a birch-bark paper panel with ornate carved bark corners and a thin carved bark border, the whole centre plain |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of birch-bark paper with a thin carved bark edge and a small autumn orange diamond at the l |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of a carved branch with leaves, seamless left to right, empty, no text |
-| Wave 5 Wave 5 | `icon-berry` | a cluster of red berries, bold, readable at 24 px, single object, centred, plain flat white background, no sha |
-| Wave 5 Wave 5 | `icon-pebble` | a smooth grey pebble, bold, readable at 24 px, single object, centred, plain flat white background, no shadow, |
-| Wave 5 Wave 5 | `icon-resin` | a golden resin drop, bold, readable at 24 px, single object, centred, plain flat white background, no shadow,  |
-| Wave 5 Wave 5 | `icon-twig` | a small bundle of twigs tied with grass, bold, readable at 24 px, single object, centred, plain flat white bac |
-| Wave 5 Wave 5 | `ui-season-wheel` | a round wooden dial divided into four seasons with a leaf, flower, sun and snowflake motif carved in each quar |
-
-## rampart-and-vine
-
-3D: piece-champ, piece-hog, piece-mason, piece-meeple
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `piece-champ-blue` | a chunky painted wooden knight champion game piece in solid blue, front view, single object, centred, plain fl |
-| Wave 1 Wave 1 | `piece-champ-green` | a chunky painted wooden knight champion game piece in solid green, front view, single object, centred, plain f |
-| Wave 1 Wave 1 | `piece-champ-red` | a chunky painted wooden knight champion game piece in solid red, front view, single object, centred, plain fla |
-| Wave 1 Wave 1 | `piece-champ-yellow` | a chunky painted wooden knight champion game piece in solid yellow, front view, single object, centred, plain  |
-| Wave 1 Wave 1 | `piece-hog-blue` | a chunky painted wooden little pig game piece in solid blue, front view, single object, centred, plain flat wh |
-| Wave 1 Wave 1 | `piece-hog-green` | a chunky painted wooden little pig game piece in solid green, front view, single object, centred, plain flat w |
-| Wave 1 Wave 1 | `piece-hog-red` | a chunky painted wooden little pig game piece in solid red, front view, single object, centred, plain flat whi |
-| Wave 1 Wave 1 | `piece-hog-yellow` | a chunky painted wooden little pig game piece in solid yellow, front view, single object, centred, plain flat  |
-| Wave 1 Wave 1 | `piece-mason-blue` | a chunky painted wooden mason with a trowel game piece in solid blue, front view, single object, centred, plai |
-| Wave 1 Wave 1 | `piece-mason-green` | a chunky painted wooden mason with a trowel game piece in solid green, front view, single object, centred, pla |
-| Wave 1 Wave 1 | `piece-mason-red` | a chunky painted wooden mason with a trowel game piece in solid red, front view, single object, centred, plain |
-| Wave 1 Wave 1 | `piece-mason-yellow` | a chunky painted wooden mason with a trowel game piece in solid yellow, front view, single object, centred, pl |
-| Wave 1 Wave 1 | `piece-meeple-blue` | a chunky painted wooden meeple follower game piece in solid blue, front view, single object, centred, plain fl |
-| Wave 1 Wave 1 | `piece-meeple-green` | a chunky painted wooden meeple follower game piece in solid green, front view, single object, centred, plain f |
-| Wave 1 Wave 1 | `piece-meeple-red` | a chunky painted wooden meeple follower game piece in solid red, front view, single object, centred, plain fla |
-| Wave 1 Wave 1 | `piece-meeple-yellow` | a chunky painted wooden meeple follower game piece in solid yellow, front view, single object, centred, plain  |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of parchment with a grey stone outline, single object, centred, plain  |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of parchment with a thin grey stone edge and a small vine green diamond at the left end, ce |
 
 ## crown-city-smash
 
@@ -161,16 +106,6 @@ Wired: 606 paintings, 47 3D models. Still to wire: 109 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of fairground parchment with a copper outline, single object, centred, |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of fairground parchment with a thin copper edge and a small potion green diamond at the lef |
 
-## sunglaze
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `ui-rack-frame` | a blank carved wooden tile rack with shallow square dishes, warm oak, seen from above, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
-
 ## lantern-dive
 
 3D: none
@@ -190,16 +125,6 @@ Wired: 606 paintings, 47 3D models. Still to wire: 109 paintings, 12 models.
 | Wave 3 Wave 3 | `icon-hand` | a small hand-painted icon of a fan of three blank playing cards, bold, readable at 24 px, single object, centr |
 | Wave 3 Wave 3 | `icon-level` | a small hand-painted icon of a gold level gem, bold, readable at 24 px, single object, centred, plain flat whi |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged parchment with a dark iron outline, single object, centred, pl |
-
-## thornbound
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
 
 ## short-fuse
 
