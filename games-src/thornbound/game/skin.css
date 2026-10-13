@@ -31,3 +31,4 @@ html.sk .gx-bar h1,html.sk .gx-bar #barstat,html.sk .gx-bar .gx-sp{text-shadow:0
 html.sk .gx-drawer .gl,html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{text-decoration-color:#7c1b2c}
 html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{color:#7c1b2c}
 html.sk .btn:has(>small),html.sk .btn:has(>b){flex-direction:column;gap:0}
+html.sk .gx-drawer{border-width:0}

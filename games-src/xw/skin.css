@@ -1,11 +1,10 @@
 
 /* ===== Nebula Aces skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons; html.sk-dark = light ink on dark glass) ===== */
-html.sk .btn:not(.sm):not(.ghost){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#161a2a;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));display:inline-flex;flex-direction:column;align-items:center;gap:0;text-align:center;height:auto}
+html.sk .btn:not(.sm):not(.ghost){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#161a2a;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
 html.sk .btn.primary:not(.sm){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.armed:not(.sm){border-image-source:url(media/ui-button-power-c.webp);color:#eaf0ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn:not(.sm):active{transform:translateY(2px)}
 html.sk .btn:disabled{opacity:.5}
-html.sk .gx-bar .btn{min-height:40px}
 /* dialogs: smoked glass panel with steel corners */
 html.sk .dlg{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.6))}
 /* manoeuvre cards (the arrow stays drawn on top) */
@@ -21,3 +20,4 @@ html.sk-ico .tk[data-t=focus]::before{background-image:url(media/icon-focus.webp
 html.sk .btn:disabled{opacity:.8;filter:saturate(.45) brightness(.8) drop-shadow(0 2px 2px rgba(0,0,0,.5))}
 html.sk .btn.primary small,html.sk .btn.primary em,html.sk .btn.primary i{color:#fff8ec}
 @media (max-width:420px){html.sk .gx-bar{gap:2px;padding-left:4px;padding-right:4px}html.sk .gx-bar .gx-ibtn{border-image-width:8px}}
+html.sk .gx-ibtn>span{padding:0}
