@@ -1,6 +1,16 @@
 [
  {
   "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Kaiten Kitchen: real brass cloches",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals"
+  ],
+  "check": "Pick a plate and watch the cloches lift"
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Lantern Dive: the Commander's real lantern",
   "items": [
