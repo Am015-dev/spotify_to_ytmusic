@@ -150,9 +150,9 @@ def main():
     # Owner, 13 Oct 2026: "don't play the game, run tests". phone-check PLAYS each game (6 scenarios, up to 3 min each), so it
     # runs only with --full. The gate is the ?scn= scenario tests + LAB test + look check (open a state, check it, no playing).
     if ok and not a.no_check:  # 3. phone-check (plays the game): --full only; otherwise straight to the scenario tests
+        chk = out / ".check"
+        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
         if a.full:
-            chk = out / ".check"
-            env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
             r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
             rows = {}
             md = chk / "phone-check-results.md"
