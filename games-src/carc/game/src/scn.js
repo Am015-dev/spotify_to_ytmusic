@@ -87,7 +87,7 @@
       { kind: 'fn', name: 'all 18 painted files load', fn: function () { return !window.__artBad.length || 'did not load: ' + window.__artBad.join(', '); } },
       { kind: 'fn', name: 'menu rows are painted', fn: function () { return /ui-row/.test(getComputedStyle(document.querySelector('#rvprobe .menu button')).backgroundImage) || 'menu row not painted'; } },
       { kind: 'fn', name: 'coach bubble tail is painted', fn: function () { return /ui-bubble-tail/.test(getComputedStyle(document.querySelector('#rvprobe .gxh-arr')).backgroundImage) || 'tail not painted'; } },
-      { kind: 'fn', name: 'painted followers loaded, not stretched', fn: function () { var bad = '', n = 0; [].forEach.call(document.querySelectorAll('img[src*="piece-"]'), function (e) { if (!GXS.vis(e)) return; n++; if (!e.naturalWidth) bad = bad || e.src; var r = e.getBoundingClientRect(); if (e.naturalWidth && r.width > 4 && Math.abs(r.width / r.height - e.naturalWidth / e.naturalHeight) > 0.2) bad = bad || 'stretched ' + e.src; }); return (!bad && n) || bad || 'no painted follower on the board'; } },
+      { kind: 'fn', name: 'painted followers loaded, not stretched', fn: function () { var bad = '', n = 0; [].forEach.call(document.querySelectorAll('img[src*="piece-"]'), function (e) { if (!GXS.vis(e)) return; n++; if (!e.naturalWidth) bad = bad || e.src; var r = e.getBoundingClientRect(); if (e.naturalWidth && r.width > 4 && getComputedStyle(e).objectFit === 'fill' && Math.abs(r.width / r.height - e.naturalWidth / e.naturalHeight) > 0.2) bad = bad || 'stretched ' + e.src; }); return (!bad && n) || bad || 'no painted follower on the board'; } },
       skin
     ]
   });
