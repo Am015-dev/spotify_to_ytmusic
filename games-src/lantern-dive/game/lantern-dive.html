@@ -509,8 +509,10 @@ html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow
 html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
 html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
 /* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
-html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
-html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+/* speech bubble: 9-slice (corners + the whole tail keep their shape, only the plain frame stretches); flipped so the tail points up at the speaker.
+   slice px are of the ~170x160 art (tail = bottom-right 60x34); widths are the same slices at ~0.7 scale. Never wider than the text box. */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;box-sizing:border-box;max-width:100%;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-6px 0;z-index:-1;pointer-events:none;border-style:solid;border-color:transparent;border-width:15px 42px 24px 21px;border-image:url(media/ui-bubble-c.webp) 22 62 34 30 fill/15px 42px 24px 21px stretch;transform:scaleY(-1)}
 @media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
 
 /* painted UI over the shared skin (gx-skin.css): html.sk and the sk-* switches are added by GXSK.init in ui99.js after the files loaded */
@@ -607,7 +609,7 @@ html.sk .gx-bar{box-shadow:inset 0 0 0 100px rgba(5,18,40,.45),0 3px 8px rgba(0,
 .gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
 @keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
 /* sheets and toasts sit over the map */
-.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
   background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
 @keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
 .gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
@@ -627,7 +629,7 @@ html.sk .gx-bar{box-shadow:inset 0 0 0 100px rgba(5,18,40,.45),0 3px 8px rgba(0,
 .gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
 /* ---- story scene ---- */
 .gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
-  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;max-width:100%}
 .gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
 .gxc-sc-who{margin-bottom:8px}
 .gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
@@ -4484,6 +4486,23 @@ const GX={key:'gx',open:null,
   GXC.data = function () { return D; };
 
   if (root && root.document) root.GXC = GXC;
+
+  /* ---- shared scenario: the story scene itself (?scn=story-scene), the longest line a game's own story has so the bubble is at its tallest ---- */
+  if (root && root.GXS && root.GXS.add) root.GXS.add({
+    id: 'story-scene', name: 'Story scene: speech bubble', ask: 'Is the speech bubble clean, with no sideways bar?',
+    when: function () { return !!(root.GXC && GXC.data && GXC.data()); },
+    setup: function () {
+      var cast = Object.keys((D && D.cast) || {}), who = cast[0] || 'narrator', long = '', ch = (D && D.chapters) || [];
+      ch.forEach(function (c) { [].concat(c.intro || [], c.outro || [], c.story || []).forEach(function (l) { var t = lineText(l); if (t && t.length > long.length) long = t; }); });
+      GXC.scene([{ who: who, text: long || 'The harbour is quiet tonight. Something stirs in the fog and the lamps start to flicker.' }, { who: cast[1] || who, text: 'Ready when you are.' }], { title: 'Chapter 1' });
+    },
+    checks: [
+      { kind: 'visible', sel: '.gxc-scene .gxc-sc-text', name: 'story text' },
+      { kind: 'visible', sel: '.gxc-scene .gxc-btn.go', name: 'Next button' },
+      { kind: 'fn', name: 'no sideways scrollbar in the scene', fn: function () { var e = document.querySelector('.gxc-scene'); return e.scrollWidth <= e.clientWidth + 1 || 'scrollWidth ' + e.scrollWidth + ' > ' + e.clientWidth; } },
+      { kind: 'fn', name: 'bubble is a 9-slice, not a stretched picture', fn: function () { var c = getComputedStyle(document.querySelector('.gxc-scene .gxc-sc-text'), '::before'); return !document.documentElement.classList.contains('sk') || (c.borderImageSource !== 'none' && c.backgroundImage === 'none') || 'bubble is a stretched background'; } }
+    ]
+  });
   if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
 })(typeof window !== 'undefined' ? window : this);
 
