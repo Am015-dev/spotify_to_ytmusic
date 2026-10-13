@@ -152,4 +152,5 @@ setTimeout(()=>{
   const sb=document.createElement('button');sb.className='go dim';sb.id='labBtnS';sb.type='button';sb.textContent='OPEN LAB';sb.addEventListener('click',()=>{if(running)return;closeSettings();startLab();});
   const body=$('setBody');if(body)body.append(sb);
   const _os=openSettings;openSettings=function(from){_os(from);sb.hidden=from==='pause'||running;};
-  if(/[?&]lab=1/.test(location.search))setTimeout(()=>startLab(),300);},0);
+  {const bq=(location.search.match(/[?&]boss=([a-z-]+)/)||[])[1],bi=bq?LAB_B.findIndex(B=>B.art===bq):-1;   // ?boss=<id> (e.g. ?boss=talos): the LAB opens on that boss
+    if(bi>=0)setTimeout(()=>startLab(bi),300);else if(/[?&]lab=1/.test(location.search))setTimeout(()=>startLab(),300);}},0);
