@@ -1,0 +1,53 @@
+{
+ "cards": {
+  "table-fog": "a wide painted cockpit-window view tabletop: a runway approach in thick fog with soft glowing approach lights, calm empty space in the middle, no text, letters or numbers",
+  "table-snow": "a wide painted cockpit-window view tabletop: a snowy mountain airfield approach with blowing snow and runway lights, calm empty space in the middle, no text, letters or numbers",
+  "table-sunset": "a wide painted cockpit-window view tabletop: a sunset coastal approach with orange clouds and a glowing runway, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a cosy cockpit game, chunky soft shapes with a slightly wobbly dark navy outline, matte paper grain, rich but warm colours (teal panel, warm cream highlights, blue and orange crew colours), gentle rim light, soft drop shadow, crisp and readable at very small sizes, simple silhouettes, no text, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-fog": {
+   "element": "Painting: table-fog",
+   "why": "four tables for fifteen chapters",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-fog.png",
+   "target": "games/final-approach/media/table-fog.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  },
+  "table-snow": {
+   "element": "Painting: table-snow",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-snow.png",
+   "target": "games/final-approach/media/table-snow.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  },
+  "table-sunset": {
+   "element": "Painting: table-sunset",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-sunset.png",
+   "target": "games/final-approach/media/table-sunset.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  }
+ }
+}

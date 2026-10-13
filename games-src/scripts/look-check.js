@@ -35,15 +35,16 @@ function listSlugs() {
   let s = [];
   try { s = JSON.parse(fs.readFileSync(path.join(ROOT, 'games', 'status.json'), 'utf8')).games.map(g => g.slug); } catch {}
   if (!s.length) s = fs.readdirSync(GAMES_DIR).filter(d => fs.existsSync(path.join(GAMES_DIR, d, 'index.html')) && !/asset-viewer|^room$/.test(d));
-  return s.filter(d => fs.existsSync(path.join(GAMES_DIR, d, 'index.html')));
+  return s.filter(d => fs.existsSync(path.join(GAMES_DIR, d, 'index.html')) || fs.existsSync(path.join(ROOT, 'games', d, 'index.html')));
 }
 
 function serve() {
   const types = { html: 'text/html', js: 'text/javascript', css: 'text/css', json: 'application/json', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', glb: 'model/gltf-binary', mp3: 'audio/mpeg', ogg: 'audio/ogg', wav: 'audio/wav', woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf', webmanifest: 'application/manifest+json' };
   const srv = http.createServer((q, r) => {
     let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html';
-    const f = path.join(GAMES_DIR, p);
-    if (!f.startsWith(GAMES_DIR) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end('nope'); }
+    let f = path.join(GAMES_DIR, p);
+    if (!fs.existsSync(f) || (fs.existsSync(f) && fs.statSync(f).isDirectory())) f = path.join(ROOT, 'games', p);  // staged copy first, shelf folder for media/models
+    if (!f.startsWith(GAMES_DIR) && !f.startsWith(path.join(ROOT, 'games')) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end('nope'); }
     r.writeHead(200, { 'content-type': types[path.extname(f).slice(1)] || 'application/octet-stream' });
     fs.createReadStream(f).pipe(r);
   });
@@ -179,9 +180,9 @@ async function pageCollect(o) {
       if (direct && el.clientWidth > 0 && el.clientHeight > 0) {
         const lc = s.webkitLineClamp && s.webkitLineClamp !== 'none';
         if (hid.test(s.overflowX) && el.scrollWidth > el.clientWidth + 1.5 && (t.ell || s.whiteSpace === 'nowrap' || s.display !== 'inline')) overflow = (t.ell ? 'ellipsis cuts' : 'clips') + ' the text sideways';
-        else if (hid.test(s.overflowY) && el.scrollHeight > el.clientHeight + 1.5) overflow = lc ? 'line clamp cuts' : 'clips the text vertically';
+        else if (hid.test(s.overflowY) && el.scrollHeight > el.clientHeight + Math.max(3, el.clientHeight * 0.14)) overflow = lc ? 'line clamp cuts' : 'clips the text vertically';
       }
-      if (!overflow && t.hardFrac > 0.05 && t.hardFrac < 0.85 && !t.rot) overflow = 'is partly hidden by its container';
+      if (!overflow && t.hardFrac > 0.05 && t.hardFrac < 0.7 && !t.rot) overflow = 'is partly hidden by its container';
       if (!overflow && !t.scrollAnc && t.vpf > 0.1 && t.vpf < 0.85 && !t.rot) overflow = 'runs off the screen edge';
     }
     t.overflow = overflow;
@@ -212,7 +213,8 @@ async function pageCollect(o) {
   for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
     const a = L[i], b = L[j]; if (related(a.el, b.el)) continue;
     let best = null;
-    for (const ra of a.rects) for (const rb of b.rects) { const ir = interRect(ra, rb); if (!ir) continue; const sm = Math.min(ra[2] * ra[3], rb[2] * rb[3]); if (ir[2] * ir[3] / sm > 0.15 && (!best || ir[2] * ir[3] > best[2] * best[3])) best = ir; }
+    const core = q => [q[0], q[1] + q[3] * 0.18, q[2], q[3] * 0.64];
+    for (const ra0 of a.rects) for (const rb0 of b.rects) { const ra = core(ra0), rb = core(rb0); const ir = interRect(ra, rb); if (!ir) continue; const sm = Math.min(ra[2] * ra[3], rb[2] * rb[3]); if (ir[2] * ir[3] / sm > 0.15 && (!best || ir[2] * ir[3] > best[2] * best[3])) best = ir; }
     if (best && best[2] > 3 && best[3] > 3 && topAt(best, a.el, b.el)) overlaps.push({ a: a.sel, ta: a.text, b: b.sel, tb: b.text, box: best, boxA: a.box, boxB: b.box, kind: 'text' });
     if (overlaps.length > 60) break;
   }
@@ -402,7 +404,7 @@ async function findClick(p, step, size) {
     const vis = e => e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[hidden],[aria-hidden=true]');
     let el = null;
     if (spec.sel) el = [...document.querySelectorAll(spec.sel)].find(vis);
-    else { const re = new RegExp(spec.text, 'i'); el = [...document.querySelectorAll('button, a, [role=button], [data-act]')].find(e => vis(e) && re.test((e.textContent || e.getAttribute('aria-label') || '').trim())); }
+    else { const re = new RegExp(spec.text, 'i'); el = [...document.querySelectorAll('button, a, [role=button], [data-act]')].find(e => vis(e) && re.test((e.textContent || e.getAttribute('aria-label') || '').trim().replace(/^[^\p{L}\p{N}]+/u, '').replace(/\s+/g, ' '))); }
     if (!el) return null; el.scrollIntoView({ block: 'nearest' }); const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }, { spec });
   return pos;

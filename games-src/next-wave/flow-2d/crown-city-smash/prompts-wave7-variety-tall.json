@@ -1,0 +1,53 @@
+{
+ "cards": {
+  "table-harbor-dawn-phone": "a tall painted city tabletop seen from above: a harbour at dawn with wooden piers, small boats and coloured containers, soft pink-gold light, calm empty space in the middle for a game board, no text, letters or numbers",
+  "table-spire-night-phone": "a tall painted rooftop terrace at night seen from above with the glittering city far below, gold crown-shaped inlay, deep blue and gold, calm empty space in the middle, no text, letters or numbers",
+  "table-portal-suburbs-phone": "a tall painted quiet suburban street at night seen from above with a swirling purple portal glow on the road, lamp posts and parked cars, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-harbor-dawn-phone": {
+   "element": "Painting: table-harbor-dawn-phone",
+   "why": "phone version",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-harbor-dawn-phone.png",
+   "target": "games/crown-city-smash/media/table-harbor-dawn-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  },
+  "table-spire-night-phone": {
+   "element": "Painting: table-spire-night-phone",
+   "why": "phone version",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-spire-night-phone.png",
+   "target": "games/crown-city-smash/media/table-spire-night-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  },
+  "table-portal-suburbs-phone": {
+   "element": "Painting: table-portal-suburbs-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-portal-suburbs-phone.png",
+   "target": "games/crown-city-smash/media/table-portal-suburbs-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  }
+ }
+}

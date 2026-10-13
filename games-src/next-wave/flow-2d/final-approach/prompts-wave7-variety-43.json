@@ -1,0 +1,113 @@
+{
+ "cards": {
+  "event-go-around": "a cartoon airliner pulling up steeply just above a runway with gear still down, dramatic sky, no text, letters or numbers",
+  "event-touchdown": "a cartoon airliner touching down with puffs of tyre smoke on a wet runway, bright and cheerful, no text, letters or numbers",
+  "event-wind-shear": "a cartoon small aeroplane tossed by swirling wind streaks near a runway, tense, no text, letters or numbers",
+  "end-win-b": "a crew walking out of a plane at golden hour with a smiling tower controller waving, no text, letters or numbers",
+  "end-win-c": "a logbook with a gold stamp on a cockpit panel, warm light, no text, letters or numbers",
+  "end-lose-b": "a plane sitting alone on a dark runway in rain with a single blinking light, no text, letters or numbers",
+  "end-lose-c": "a crumpled paper checklist on a cockpit seat, dim light, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a cosy cockpit game, chunky soft shapes with a slightly wobbly dark navy outline, matte paper grain, rich but warm colours (teal panel, warm cream highlights, blue and orange crew colours), gentle rim light, soft drop shadow, crisp and readable at very small sizes, simple silhouettes, no text, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "event-go-around": {
+   "element": "Painting: event-go-around",
+   "why": "go-around splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-go-around.png",
+   "target": "games/final-approach/media/event-go-around.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "event-touchdown": {
+   "element": "Painting: event-touchdown",
+   "why": "touchdown splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-touchdown.png",
+   "target": "games/final-approach/media/event-touchdown.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "event-wind-shear": {
+   "element": "Painting: event-wind-shear",
+   "why": "weather splash",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-wind-shear.png",
+   "target": "games/final-approach/media/event-wind-shear.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-win-b": {
+   "element": "Painting: end-win-b",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-b.png",
+   "target": "games/final-approach/media/end-win-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-win-c": {
+   "element": "Painting: end-win-c",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-c.png",
+   "target": "games/final-approach/media/end-win-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-lose-b": {
+   "element": "Painting: end-lose-b",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-b.png",
+   "target": "games/final-approach/media/end-lose-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-lose-c": {
+   "element": "Painting: end-lose-c",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-c.png",
+   "target": "games/final-approach/media/end-lose-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  }
+ }
+}

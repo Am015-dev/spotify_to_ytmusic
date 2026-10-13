@@ -12,7 +12,8 @@ All four layers must pass with 0 errors before delivery. Templates are in `asset
 5. **Rules tests** for tricky rules, as named scenarios. Also run forced-card runs (`force.js`) that put every card into play at least once.
 6. **Online** (see `online-p2p.md`): the p2p template over a local relay.
 7. **Human-like blind playtest** (`scripts/drive-serve.js`, see `board-first-play.md`): the real gate for clarity and fun.
-8. `node --check x.js` after every build. The build writes the joined scripts to `x.js`.
+8. **Look check** (`games-src/scripts/look-check.js`, no AI): tiny or low-contrast text, cut-off text, unlabeled or covered buttons, broken/stretched/blurry art, blank boards, sideways scroll, on phone and PC. A game with NEW severe findings does not deploy (`build-all.py --deploy` gate). AI eyes miss these.
+9. `node --check x.js` after every build. The build writes the joined scripts to `x.js`.
 
 ## Sandbox tips
 - **Use the installed Playwright:** `PW=$(npm root -g)/playwright` and `require(process.env.PW)`. Never run `playwright install`.

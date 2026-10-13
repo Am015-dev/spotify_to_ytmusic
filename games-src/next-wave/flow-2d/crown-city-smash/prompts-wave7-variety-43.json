@@ -1,0 +1,113 @@
+{
+ "cards": {
+  "event-portal-opens": "a huge purple portal ripping open in the night sky above a city skyline with the silhouettes of monsters climbing out, dramatic, no text, letters or numbers",
+  "event-brass-beetle": "a giant shiny brass clockwork beetle stampeding down a city street with scattered gears and cheering crowds, no text, letters or numbers",
+  "event-evolution": "a cartoon monster silhouette glowing bright white mid-evolution with swirling star cards and sparks around it, no text, letters or numbers",
+  "end-win-b": "a giant cheerful monster silhouette raising a golden crown over a city at sunrise, confetti in the air, no text, letters or numbers",
+  "end-win-c": "a victory parade of tiny confetti-throwing citizens in a city street, golden light, no text, letters or numbers",
+  "end-lose-b": "a lone monster sitting on a city rooftop at dusk with its head in its hands, rain starting, no text, letters or numbers",
+  "end-lose-c": "a toppled giant crown on a street with a few monster footprints, grey evening light, no text, letters or numbers"
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "event-portal-opens": {
+   "element": "Painting: event-portal-opens",
+   "why": "chapter intro splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-portal-opens.png",
+   "target": "games/crown-city-smash/media/event-portal-opens.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "event-brass-beetle": {
+   "element": "Painting: event-brass-beetle",
+   "why": "Brass Beetle splash",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-brass-beetle.png",
+   "target": "games/crown-city-smash/media/event-brass-beetle.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "event-evolution": {
+   "element": "Painting: event-evolution",
+   "why": "evolution splash",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-evolution.png",
+   "target": "games/crown-city-smash/media/event-evolution.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-win-b": {
+   "element": "Painting: end-win-b",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-b.png",
+   "target": "games/crown-city-smash/media/end-win-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-win-c": {
+   "element": "Painting: end-win-c",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-c.png",
+   "target": "games/crown-city-smash/media/end-win-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-lose-b": {
+   "element": "Painting: end-lose-b",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-b.png",
+   "target": "games/crown-city-smash/media/end-lose-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-lose-c": {
+   "element": "Painting: end-lose-c",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-c.png",
+   "target": "games/crown-city-smash/media/end-lose-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  }
+ }
+}
