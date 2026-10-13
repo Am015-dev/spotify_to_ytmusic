@@ -11,3 +11,10 @@ Brief: Alex "make tracks fun like YouTube: high stunts, alternative roads". STEP
 - `src/98ro_open.js`: NEAR rows skip hills/trees; TB ground plane y0-10.
 - Tools: `tools/tbDemo.mjs in out spec` (turtle layouts, pieces by fraction, lm offset or [x,z]); `/tmp/claude-0/sp/close.py` closes a turtle (copy into tools if kept); tRace shots air1..3 + `stunts` in RACE_RESULT.
 - Tracks: docs/tracks2/<id>.spec.json → .json. Done: main_river_jump (19/19 lint).
+
+## Update 2026-10-13 (later)
+- PRIORITY slice done: **alex/od-builder** (from 4b1dd8b; worktree /home/user/odb), draft PR #96: EXPORT dialog, IMPORT at top of MY TRACKS, tools/tbImport.mjs,
+  docs/TRACK_IMPORT.md, tools/tTBx.js gate. GRID docs/shots/builder/GRID.jpg. REVIEW sent to the reviewer (0146a18); after PASS → hand to build-10 for v90k.
+  Lesson: a moved line carried a closing `}` → the TB module died at load but build.sh said BUILD_OK. Always run a load smoke (`/tmp/claude-0/sp/err.js URL`: waits for __tb + menu, prints page errors).
+- alex/od-track merged od-builder (7562fe7). 6 STUNT CUP tracks, 19/19 lint; tRace 2 laps each in qa_t2_*.log (0 errors, all jumps landed, air 2.3–3.6 s).
+- Open: wall hits 0.51–0.57/min on 4 tracks, Taunus 1.08 (DBGW run qa_t2_td2); route balance needs ROUTE=road runs (TB_V.rk); Lab artifact update; stunt GRID; full REVIEW.
