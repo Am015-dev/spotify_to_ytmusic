@@ -26,6 +26,7 @@ Read less (this is the main cost lever)
   and report. Do not run on to 450k.
 
 Fast loop
+- NO screenshots, contact sheets or before/after images (owner's order). Deliver: change + ?scn= scenario + ✔ Test item with GO.
 - Scenario first: for each ask, register a ?scn=<id> scenario (games-src/shell/gx-scenario.js) and watch it fail, then fix.
 - Iterate with `python3 games-src/scripts/build-all.py --quick <slug>` (under 3 min). Go live with `--deploy <slug>` as soon as it
   passes (quick sweep; `--full` only for engine/rules changes). Then `add-update.py <game> "headline" "item" --check "..." --scn <id>`.
