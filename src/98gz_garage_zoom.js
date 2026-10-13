@@ -21,7 +21,13 @@ function GZ_mk(){if(GZ.el||!$('#gbx'))return;const d=document.createElement('div
  $('#gbx').appendChild(d);GZ.el=d;GZ_lab()}
 function GZ_place(){const d=GZ.el;if(!d)return;const c=$('#gbC'),A=(typeof R2!=='undefined'&&R2.area)||null;if(!c||!A||$('#gbx').hidden||(typeof SB!=='undefined'&&SB.on)){d.style.display='none';return}
  const r=c.getBoundingClientRect();d.style.display='flex';d.style.left=Math.round(r.left+A.l+8)+'px';d.style.top=Math.round(r.top+(GB_.bk?A.t+8:A.b-44-30))+'px';GZ_lab()}
-gbLoop=(f=>function(){if(!$('#gbx').hidden){GZ_mk();if(++GZ.f%10===1)GZ_place()}else if(GZ.el)GZ.el.style.display='none';return f.apply(this,arguments)})(gbLoop);
+// 3) LOADING: while a ride's LEGO model is still on its way (LDL.wait), a spinner sits in the middle of the stage (reviewer v90j: never a bare chassis
+//    with no sign that something is coming). Only the ride you tapped counts, not the thumbnails loading in the background.
+function GZ_spin(){let e=$('#gzSpin');let on=0;if(GZ.want){try{if(GAR_get().sel===GZ.want||performance.now()-GZ.wt>20000)GZ.want=null;else on=!$('#gbx').hidden&&typeof LDL!=='undefined'&&LDL.wait.size>0}catch(er){GZ.want=null}}if(!e){if(!on)return;e=document.createElement('div');e.id='gzSpin';
+ e.innerHTML='<i></i>LOADING';e.style.cssText='position:fixed;z-index:31;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:12px;background:rgba(11,22,38,.85);border:2px solid #ffd12c;color:#fff;font:italic 900 14px system-ui;pointer-events:none';
+ const st=document.createElement('style');st.textContent='#gzSpin i{width:18px;height:18px;border:3px solid #ffd12c;border-top-color:transparent;border-radius:50%;animation:gzR .8s linear infinite}@keyframes gzR{to{transform:rotate(360deg)}}';document.head.appendChild(st);$('#gbx').appendChild(e)}
+ e.style.display=on?'flex':'none';if(!on)return;const c=$('#gbC').getBoundingClientRect(),A=(typeof R2!=='undefined'&&R2.area)||{l:0,r:c.width,t:0,b:c.height};e.style.left=Math.round(c.left+(A.l+A.r)/2)+'px';e.style.top=Math.round(c.top+(A.t+A.b)/2)+'px'}
+gbLoop=(f=>function(){if(!$('#gbx').hidden){GZ_mk();if(++GZ.f%10===1)GZ_place();if(GZ.f%6===1)GZ_spin()}else if(GZ.el)GZ.el.style.display='none';return f.apply(this,arguments)})(gbLoop);
 // pinch + wheel on the stage outside BUILD (BUILD already pinches / wheels the camera distance)
 {const v=document;const cv=e=>e.target&&e.target.id==='gbC'&&!GB_.bk;
  v.addEventListener('pointerdown',e=>{if(!cv(e))return;GZ.ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});GZ.d0=0},true);
@@ -43,6 +49,7 @@ GB_act=(f=>function(cx,cy,del){if(!GB_.bk||del||GB_.tool!=='pick')return f.apply
 GB_exit=(f=>function(){if(GB_.tool==='pick')GB_.tool='add';return f.apply(this,arguments)})(GB_exit);
 GB_ui=(f=>function(){const r=f.apply(this,arguments);const mo=$('#r2More');if(mo&&!mo.querySelector('[data-gzm]')){mo.insertAdjacentHTML('afterbegin','<button class="r2T" data-gzm="pick"><i>💧</i>PICK</button>');
  mo.addEventListener('click',e=>{if(!e.target.closest('[data-gzm]'))return;e.stopPropagation();try{R2_pop(null)}catch(_){}GZ_pickOn()},true)}GZ_ui();return r})(GB_ui);
+G9C_equip=(f=>function(S,fm){try{if(S&&S.id&&GAR_get().sel!==S.id){GZ.want=S.id;GZ.wt=performance.now()}}catch(e){}return f.apply(this,arguments)})(G9C_equip);
 window.__gz={S:GZ,set:GZ_set,step:GZ_step,fit:GZ_fit,pick:GZ_pickOn,st:()=>({bk:GB_.bk,tool:GB_.tool,pc:GB_.pc,col:GB_.col,rot:GB_.rot,zoom:GB.cam&&GB.cam.zoom}),
  // screen point of the build's centre (tests tap it)
  mid:()=>{if(!GB.mesh)return null;GB_cam();const c=new THREE.Box3().setFromObject(GB.mesh).getCenter(new THREE.Vector3()).project(GB.cam),r=$('#gbC').getBoundingClientRect();return[r.left+(c.x+1)/2*r.width,r.top+(1-c.y)/2*r.height]}};

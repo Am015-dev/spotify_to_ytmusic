@@ -3,6 +3,8 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90j',id:'ride-fast',area:'garage',text:'Garage → RIDES: tap any ride card: the whole ride stands there within about 1 second (never just wheels or a bare chassis); a LOADING sign shows if it needs longer.'},
+ {ver:'v90j',id:'ck-go',area:'hud',text:'Checklist: items you can\'t reach in a short drive (pizza shop, phone booth, fountain, speedboat, Big Rig, planters, cones, Athens display models, Syntagma palms) have 📍 GO: it drops your car next to the thing (tap again for the next one).'},
  {ver:'v90j',id:'gz-zoom',area:'garage',text:'Garage: the − ⤢ + buttons zoom the car in and out on every tab (RIDES, BUILD, PAINT…); ⤢ goes back to the normal view. Two-finger pinch zooms too.'},
  {ver:'v90j',id:'gz-keys',area:'garage',dev:'pc',text:'PC, garage: the mouse wheel and the + / − / 0 keys zoom; the I key picks a part (like 💧 PICK).'},
  {ver:'v90j',id:'gz-pick',area:'garage',text:'Garage → BUILD → ⋯ MORE → 💧 PICK, then tap a part of the car: the next part you place is the same part, turn and colour.'},
@@ -217,6 +219,31 @@ const OD_CHECKLIST=[
  const res=(s,it,d=flt().d)=>s[k(it)+'|'+d]||s[k(it)]||{};  // answers from before v90j (no device) count on both devices
  const rset=(s,it,o)=>{const kk=k(it)+'|'+flt().d;s[kk]=Object.assign({},res(s,it),s[kk]||{},o)};
  const cur=()=>OD_CHECKLIST.filter(it=>it.ver===OD_CHECKLIST[0].ver&&show(it));
+ // 📍 GO (coordinator v90j: items a 2-min drive never reaches): drops the car on the nearest street facing the thing to check; items with
+ // several things step through them on each tap. Another city → the flight there (tap 📍 again after landing). Palms → the Syntagma race.
+ // Targets: w = a LEGO world model (LDW.on), p = a street prop type (HUB.props), car = a traffic car kind, race = a track id.
+ const GO={'v90g/fra-props':[{w:'w6350',n:'Pizza To Go'},{w:'w6613',n:'phone booth'},{w:'w10184f',n:'fountain'},{w:'w1069',n:'speedboat'}],
+  'v90g/ath-display':[{w:'w30023',n:'lighthouse'},{w:'w7796',n:'house'}],'v90g/bigrig':[{car:'v3221_1',c:'fra',n:'Big Rig'}],
+  'v90g/land2':[{p:'planter',c:'fra',n:'planter'},{p:'dumpster',c:'fra',n:'dumpster'}],'v90i/palms':[{race:'synt',c:'ath',n:'Syntagma race'}],
+  'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
+  'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
+ const goI={},goSay=t=>{goI._t=t;try{say('',t,2.2)}catch(e){}};
+ const goCity=T=>T.c||(T.w&&((LDW_P.find(q=>q.model===T.w)||{}).city))||'fra';
+ const goAt=T=>{if(T.w){const E=LDW.on.find(e=>e.id===T.w);return E&&{x:E.x,z:E.z}}
+  if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}
+  if(T.car){const c=(HUB.cars||[]).find(c=>!c.dead&&String(HCAR[c.k]).includes(T.car));return c&&{x:c.x,z:c.z}}return null};
+ const goJump=it=>{const L=GO[k(it)];if(!L)return;const i=goI[k(it)]=((goI[k(it)]??-1)+1)%L.length,T=L[i],c=goCity(T);let st='';try{st=state}catch(e){}
+  if(c!==CID){if(st==='roam'&&cityTravel(c)){goSay('✈ Flying to '+(c==='ath'?'Athens':'Frankfurt')+' · tap 📍 again after landing');goI[k(it)]=i-1}else goSay('📍 Drive in '+(c==='ath'?'Athens':'Frankfurt')+' first (story → fly there)');return}
+  if(T.race){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;
+   menuTab='quick';menuTrack=T.race;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;return}  // like a roam race marker: back to the city after the race
+  if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}
+  if(RO.ch||RO.sp){const nm=((RO.ch&&RO.ch.m&&RO.ch.m.ev&&RO.ch.m.ev.name)||(RO.sp&&RO.sp.e&&RO.sp.e.name)||'the event').toUpperCase();
+   if(!(goI._ok>performance.now())){goI._ok=performance.now()+6000;goI[k(it)]=i-1;goSay('📍 This leaves '+nm+' (you can restart it) · tap 📍 again to go');return}
+   goI._ok=0;try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}
+  if(RO.wk){goSay('📍 Get back in the car first');return}
+  const t=goAt(T);if(!t){goSay('📍 No '+T.n+' nearby right now · try again');return}
+  let q=rfSnap(t.x,t.z,220)||[t.x+12,t.z+12];if(T.car&&q[2]!=null)q=[q[0]-Math.sin(q[2])*20,q[1]-Math.cos(q[2])*20];const h=Math.atan2(t.x-q[0],t.z-q[1])+(T.car?0:.35);  // .35 rad: the thing sits beside the car, not hidden behind it · a traffic car: 20 m back along its road, not on top of it
+  if(roamWarp(q[0],q[1],h))goSay('📍 '+T.n.toUpperCase()+(L.length>1?` · ${i+1}/${L.length}, tap 📍 for the next`:''));else goSay('📍 Can\'t jump right now')};
  const open=()=>{const s=load();return cur().filter(it=>!res(s,it).st).length};
  const st=document.createElement('style');st.textContent=`#odChk{position:fixed;inset:0;z-index:9100;display:flex;align-items:center;justify-content:center;background:rgba(10,14,30,.6);padding:8px;box-sizing:border-box;user-select:none;-webkit-user-select:none}#odChk[hidden]{display:none}
 #odChk .cc{width:min(720px,100%);max-height:100%;display:flex;flex-direction:column;background:#0b1626;border:3px solid #3ddc84;border-radius:16px;color:#e8f2fa;font:600 13px system-ui}
@@ -235,13 +262,14 @@ const OD_CHECKLIST=[
  const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div>`;const F=flt();
   h+=`<div class="cf">${['ph','pc'].map(d=>`<button data-c="d:${d}" class="${F.d===d?'on':''}">${DEVN[d]}</button>`).join('')}<i></i>${AREAS.map(([a,n])=>`<button data-c="a:${a}" class="${F.a===a?'on':''}">${n}</button>`).join('')}</div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
   const L=OD_CHECKLIST.filter(it=>show(it,F));if(!L.length)h+=`<div class="msg">Nothing to check for ${DEVN[F.d]} in ${F.a.toUpperCase()}.</div>`;
-  for(const it of L){const r=res(s,it,F.d);h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
+  for(const it of L){const r=res(s,it,F.d);h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button>${GO[k(it)]?'<button class="go" data-c="GO" title="Jump there">📍 GO</button>':''}<input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
   ov.innerHTML=h+'</div></div>';badge()};
  const copy=()=>{const t=text();const done=()=>render('Copied: paste it to the coordinator.');
   const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;left:0;top:0;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();ok?done():render('Copy blocked here; long-press to select:\n'+t)};
   try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}};
  ov.addEventListener('click',e=>{if(e.target===ov){ov.hidden=true;document.body.classList.remove('ckOn');return}const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;try{AU.sfx('pick')}catch(er){}
   if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='PASS'||c==='FAIL'){const it=OD_CHECKLIST.find(q=>k(q)===b.closest('.ci').dataset.k),s=load();if(it){rset(s,it,{st:res(s,it).st===c?'':c});save(s)}render()}
+  else if(c==='GO'){const it=OD_CHECKLIST.find(q=>k(q)===b.closest('.ci').dataset.k);ov.hidden=true;document.body.classList.remove('ckOn');if(it)setTimeout(()=>goJump(it),50)}
   else if(/^[da]:/.test(c)){const s=load();s._f=Object.assign(flt(),c[0]==='d'?{d:c.slice(2)}:{a:c.slice(2)});s._pin=Object.assign(pst(),{i:0});save(s);render();try{pinR()}catch(er){}}});
  ov.addEventListener('change',e=>{const i=e.target;if(i.tagName!=='INPUT')return;const it=OD_CHECKLIST.find(q=>k(q)===i.closest('.ci').dataset.k),s=load();if(it){rset(s,it,{n:i.value.slice(0,200)});save(s)}});
  window.odChkOpen=()=>{render();ov.hidden=false;document.body.classList.add('ckOn')};
@@ -269,7 +297,7 @@ const OD_CHECKLIST=[
    `<p class="pt" data-p="exp" title="${esc(it.text)}">${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button><button class="pk" data-p="next" title="Skip">›</button>`);
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
    `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
-   `<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
+   `${GO[k(it)]?'<button class="pg" data-p="GO" title="Jump there">📍</button>':''}<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
   pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
  // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
  const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
@@ -289,7 +317,7 @@ const OD_CHECKLIST=[
   pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
  const P_col=()=>pin.classList.contains('col');
  pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=pinItems(),n=C.length;try{AU.sfx('pick')}catch(er){}
-  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'&&pinBk()&&typeof GB_!=='undefined'&&GB_.bk){psave(P);odChkOpen();pinR();return}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
+  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'&&pinBk()&&typeof GB_!=='undefined'&&GB_.bk){psave(P);odChkOpen();pinR();return}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}else if(a==='GO'){goJump(C[P.i]);return}
   else if(a==='PASS'||a==='FAIL'){const s=load(),it=C[P.i],was=res(s,it).st===a;rset(s,it,{st:was?'':a});s._pin=P;save(s);
    if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n];if(!res(s,q).st){P.i=(P.i+j)%n;break}}}}
   psave(P);pinR();badge()});
@@ -298,7 +326,7 @@ const OD_CHECKLIST=[
 #odPin button{min-height:44px;border-radius:9px;border:2px solid #4ceaff;background:#12304a;color:#fff;font:900 12px system-ui;padding:0;cursor:pointer;flex:none}
 #odPin .pn{width:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-color:#3ddc84}#odPin .pn b{font-size:13px}#odPin .pn small{font-size:12px;color:#9fe8bf;font-weight:800}
 #odPin p{flex:1;min-width:0;margin:0;line-height:15px;max-height:30px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;font-size:12px}
-#odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
+#odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pg{width:36px;font-size:16px;border-color:#ffd12c}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
 #odPin .pv{display:flex;flex-direction:column;gap:2px}#odPin .pv button{width:28px;min-height:21px;height:21px;font-size:15px;line-height:1}
 #odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}#odPin.col .pt{flex:0 1 auto;max-width:min(170px,32vw);-webkit-line-clamp:2;font-size:12px}#odPin.col .pa,#odPin.col .fa{width:40px}#odPin.col .pk{width:26px;font-size:15px}
 body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:none!important}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
@@ -314,4 +342,4 @@ body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:non
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};
  {const st3=document.createElement('style');st3.textContent='body.odYield #odPin{display:none!important}';document.head.appendChild(st3)}setInterval(yieldStep,120);
- window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
+ window.__chk={go:id=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it)goJump(it);return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
