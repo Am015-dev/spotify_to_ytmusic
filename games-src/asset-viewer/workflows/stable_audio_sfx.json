@@ -1,0 +1,394 @@
+{
+ "last_node_id": 8,
+ "last_link_id": 9,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "CheckpointLoaderSimple",
+   "pos": [
+    40,
+    40
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [],
+     "slot_index": 1
+    },
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      8
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    "stable-audio-open-1.0.safetensors"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "CLIPLoader",
+   "pos": [
+    40,
+    370
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      1,
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    "t5_base.safetensors",
+    "stable_audio",
+    "default"
+   ]
+  },
+  {
+   "id": 3,
+   "type": "CLIPTextEncode",
+   "pos": [
+    420,
+    40
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    "heavy wooden door slam with a deep war drum hit, dry, clean, no music"
+   ]
+  },
+  {
+   "id": 4,
+   "type": "CLIPTextEncode",
+   "pos": [
+    420,
+    370
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    "low quality, noise, hiss, distortion, music, speech"
+   ]
+  },
+  {
+   "id": 5,
+   "type": "EmptyLatentAudio",
+   "pos": [
+    40,
+    700
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    4.0,
+    1
+   ]
+  },
+  {
+   "id": 6,
+   "type": "KSampler",
+   "pos": [
+    800,
+    40
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 4
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 5
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    7,
+    "fixed",
+    50,
+    5.0,
+    "dpmpp_3m_sde_gpu",
+    "exponential",
+    1.0
+   ]
+  },
+  {
+   "id": 7,
+   "type": "VAEDecodeAudio",
+   "pos": [
+    1180,
+    40
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 7
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "AUDIO",
+     "type": "AUDIO",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": []
+  },
+  {
+   "id": 8,
+   "type": "SaveAudio",
+   "pos": [
+    1560,
+    40
+   ],
+   "size": [
+    340,
+    200
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {},
+   "widgets_values": [
+    "audio/sfx"
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   2,
+   0,
+   3,
+   0,
+   "CLIP"
+  ],
+  [
+   2,
+   2,
+   0,
+   4,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   1,
+   0,
+   6,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   3,
+   0,
+   6,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   5,
+   4,
+   0,
+   6,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   5,
+   0,
+   6,
+   3,
+   "LATENT"
+  ],
+  [
+   7,
+   6,
+   0,
+   7,
+   0,
+   "LATENT"
+  ],
+  [
+   8,
+   1,
+   2,
+   7,
+   1,
+   "VAE"
+  ],
+  [
+   9,
+   7,
+   0,
+   8,
+   0,
+   "AUDIO"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {},
+ "version": 0.4
+}
