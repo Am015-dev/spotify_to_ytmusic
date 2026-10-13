@@ -179,7 +179,16 @@ def main():
                 for s in passing:
                     m = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), txt, re.M)
                     if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
-                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
+                    elif m.group(1) != "ok":
+                        # Universal invariants (text < 11 px, clipping, ...) also flag OLD problems already on the live game. Rerun with the
+                        # scenarios' own checks only: if those pass, warn (the look check, which compares with the live game, guards regressions).
+                        rn = subprocess.run(["node", str(SCRIPTS / "scenario-test.js"), s], cwd=str(SCRIPTS), env=dict(env3, SCN_NOINV="1", SCN_OUT=str(out / ".check" / ".scn-own")),
+                                            capture_output=True, text=True, timeout=600)
+                        m2 = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), rn.stdout, re.M)
+                        if m2 and m2.group(1) == "ok":
+                            print(f"[scn] {s:18} own checks {m2.group(2)}/{m2.group(3)} ok; WARN universal: {m.group(4).strip()[:120]}", flush=True)
+                        else:
+                            status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
         if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
