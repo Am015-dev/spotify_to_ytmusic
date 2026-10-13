@@ -1,6 +1,20 @@
 [
  {
   "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Short Fuse: painted workshop kit",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit"
+  ],
+  "check": "Look at the table and the fuse strip"
+ },
+ {
+  "date": "2026-10-13",
   "game": "crown",
   "title": "Play it on the board",
   "items": [
@@ -172,17 +186,6 @@
    "Stone-framed menus and buttons, ribbon and goblet on the result"
   ],
   "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
- },
- {
-  "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: a real 3D bomb",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big"
-  ],
-  "check": "Make a wrong cut, then let the fuse run out"
  },
  {
   "date": "2026-10-10",
