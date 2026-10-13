@@ -10,7 +10,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 |---|---|---|---|
 | 00 | `00_page.html` | 113 | <title>, all CSS (HUD, menus, touch controls, phone media queries), all HTML markup (#hud #roam #menu #pause #settings #cmap #gbx…) |
 | 02 | `02_data_json.html` | 108 | DATA: importmap (three r164 CDN), #rf-data (Frankfurt streets/quays/lm/spots JSON), #ath-data (Athens 100 KB line), <script src="km.js">, opening <script type=" |
-| 10 | `10_core.js` | 136 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
+| 10 | `10_core.js` | 137 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
 | 20 | `20_race_world.js` | 104 | race circuits: neon Frankfurt world (buildRoad buildCity buildLandmarks loadTrack disposeWorld applyQuality), Athens race world (athPrep athTex athStands hazard |
 | 30 | `30_race.js` | 116 | race traffic (setupTraffic stepTraffic drawTraffic), props/Baustelle, particles (emit burst puff SPARK pools debris), audio AU, race state + race physics (stepS |
 | 31 | `31_race_r15.js` | 14 | R15 (race worker 15, v87q+): strategic routes. Per circuit, a WATER and an OFF-ROAD corridor run along the inside of a big bend: the inner wall opens at a signe |
@@ -77,7 +77,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98sz | `98sz_ride_scale.js` | 5 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
-| 99c | `99c_checklist.js` | 48 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 49 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
@@ -85,7 +85,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98fb | `98fb_form_build.js` | 9 | FB (garage-17, Alex 2026-10-10: "the build guide and build does not work for the boats and off road"). Root cause: BUILD and the BUILD GUIDE only ever edit GB.d |
 | 98ba | `98ba_build_anim.js` | 4 | BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built"). When a ride first shows in the |
 | 98gf | `98gf_garage_floor.js` | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
-| 98rd | `98rd_roads.js` | 11 | RD · roads-1 (Alex 2026-10-13: "cars should follow traffic rules and also humans"): pedestrian kerb + crossing rules, cars yield, zebras in Frankfurt. |
+| 98rd | `98rd_roads.js` | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow traffic rules and also humans"): pedestrian kerb + crossing rules, cars yield, zebras in Frankfurt. |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -99,7 +99,7 @@ uses: -
 defines: (data / markup, no top-level declarations)
 uses: -
 
-## 10_core.js — 136 KB
+## 10_core.js — 137 KB
 defines: W14_ST W14_PIV TUNE OD_CHANGELOG OD_VER CR_trackW CR_LS CR_SPDCAM CR_smashHit _crTQ _crTE _crTS _crTP _crTM CR_tumbleStart CR_tumble CR_dodge CR_TYRE_Y CR_RG CR_RJM CR_rampLaunch CR_glowFar CR_glowCar CR_boxWall CR_noGlow CR_minBack CR_SMASHV ALL_OPEN TEST_MODE $ V3 clamp lerp mod mul R CK CID CITYK skey _SC _scGet store BOOTF fmt fmt2 ord pad2 S W HALF MARGIN CR_RK BASE_TOP CLASSES TEAMS PERKS PK perkUnlocked perkReq perkSlots perkEq perkSet garOwned teamLocked vehOf pickItem GB_PARTS GB_COLS GB_NEON GB_PATS GB_HORNS gbOwn packs gbReq gbReqTxt gbBuild gbTeam playerTeam hornPlay GB gbOpen gbLoop R1_chip R1_WT R1_weight gbRender gbClose liveryPat kitParts PILOTS PDL BOSS_TEAM PD teamOf SIG RIVAL_EV BOSS_EV flagsR flags BOSS_LINES radioLine worldCfg sigTick STYLE_NAME TAUNT NEM_LINES LEAGUES RND_NAMES SPTS SCRED UPC UPS UPG TRACK_DEFS TDF ATH_TRACKS ATH_TH athW ATH_IDS isAthT athOpen ATH_PD ATH_TRK_EV ATH_BOSS_EV DRAKOS_LINES athNF TRK CP MOODS ATHM MOOD RIVER BRANDS VSIGNS ITEMS ITEM_KEYS ICON itemSpinUntil itemShown EVENTS canvas renderer scene FOGC camera lowGfx adaptR adaptMul diffMul adaptAfter SET_DEF SET fxK rt composer SCRUB bloom FX SPRSCALE pFov DPR2 DRES resize hemi moonL shipKey glowCol neonMat SKY_VS SKY_FS V SKYU skyMat sky ENVSC ENVD lightningT litV applyMood applyMoodMaterials cv TEXV TEXMODE s2l dataTex mkTex texProbe TEXVAR tex refreshTex radial GLOW FLARE SHADOW roadTex wallTex facadeTex WIN_CELLS streetTex billboardTex vSignTex textTex padTex hazardTex liveryTex wingTex buildTrackData reverseTrack TF TD TRACKS frameAt mkF kAt yAt jumpAt WATER_Y isWater isDirt inGapF HCELL hash indexTrack crossAt nearTrack nearestTrackDist
 uses: 30(97), 20(66), 41(12), 72(11), 40(9), 70(5), 71(2), 98d(1), 99(1), 93(1)
 
@@ -145,7 +145,7 @@ uses: 53(628), 51(240), 20(237), 10(138), 30(105), 72(14), 70(10), 90(9), 98l(8)
 
 ## 70_roam_world.js — 81 KB
 defines: waterFx hubCullAdd hubCullInit cullPush hubCullStep DIST_R DISTRICTS districtAt rfWaterPaint bldPaint MINI URB urbDraw miniPaint miniDraw athDistGo athDistPick SM_step athDistStep districtStep _hfw _hrt _hup hubTrafficStep CLOUDS hubLayerFix hubShadow hubLeave hubFrame rfSnap rfWp rfPath SPRINTS SCH MARKPOS MARKH rfMarks rfRamps rfCheckpoints markKey RAMPT athGbSpots athGbSpots0 buildRoam _sq _se rr2s abPads abRoam CH_SCAT CH_LBL cpTargets raceHud cpBeam hitPop chNext chStart mapIcon mapRedraw athMapBase drawRoamMap spSave spGates spPos sprintStart sprintStep spHud sprintEnd sprintFinish TUT tutStep tutDone roamCatalog markTitle markDone disc ftGar markKnown discover ftShow fastTravel markStars markLocked iconTex enterRoam ROAMCFG roamPre roamPost ATH_NEED fraFlags athPre flyOpen flightMark flyFT cityTravel flyRoute slotInfo showSlots exitRoam
-uses: 10(159), 53(135), 51(129), 30(67), 71(58), 41(35), 20(26), 60(23), 72(21), 40(12)
+uses: 10(159), 53(135), 51(130), 30(67), 71(58), 41(35), 20(26), 60(23), 72(21), 40(12)
 
 ## 71_roam_drive.js — 67 KB
 defines: VSEL VNAME cycleVehicle roamFaceOpen edgeStep roamWarp roamSavePos W13S W13_corner W13_lift BG23_cap roamStep qCrate roamDamage roamHeal RBRK roamWreckStep roamGlance roamBounce angDiff studCombo studComboT streetMul studGain PD_HILDE ATH_RIVAL_EV ATH_CHAPTERS ATH_EPILOGUE ATH_INVITE CHS athInvited athInvitePending CHAPTERS EPILOGUE nFlags chapter RCH MCH OCH ECH markCh drvClass storyCheck storyShow homeShow homeArt roamPauseOpen roamPauseClose pstatFlush profileOpen storyClose roamBossOpen roamPrompt roamPromptOpen BRIEF briefHTML CARD_PAY cardStars roamOpen garageUI roamGo chStep roamLanded chAbort chResult chEnd roamPose camSnap RCAM roamCamCycle roamCam CB comboAdd POPS popStep packInit packStep gbStep comboStep huQ huT roamGauge markBadges roamHud
@@ -169,7 +169,7 @@ uses: 10(182), 30(156), 53(90), 71(45), 51(33), 20(30), 70(20), 72(15), 41(13), 
 
 ## 90_fixes_cv_ju.js — 84 KB
 defines: OB OB_who OB_prop OB_rec __ob OB_LEAVE OB_HOLD OB_DIST OB_MINHOLD OB_raw0 OB_terr0 OB_HW OB_HL OB_touch OB_obb OB_cdim OB_car OB_carP OB_EURO OB_EURO_HW OB_EURO_HD OB_euroBuild __ob OC OC_beamGeo OC_poolGeo OC_lampsBuild OC_poolStep OC_GAME OC_fp OC_roadE OC_segE OC_junc OC_minG OC_props OC_onRoad OC_carScale OC_scaleDefs OC_traffic OC_AK OC_acroBuild OC_unbury OC_altFix OC_REAL OC_RANGE OC_TREES OC_CARS OC_audit OC_lyka OC_zone OC_top OC_fix OC_gy OC_ifl __oc CV CV_MAJ CV_h CV_pal CV_AM CV_AR CV_WK CV_u CV_st CV_walk CV_near CV_sigBuild CV_sigMesh CV_LC CV_lamps CV_tick CV_pre CV_post CV_pedPre CV_pedPost CV_AP CV_put CV_fsty CV_FP CV_fraVar CV_streets __cvCars __cv JU JU_C JU_TC JU_ev JU_roam JU_busy JU_split JU_mis JU_tier JU_ss JU_hit JU_gate JU_popEl JU_step1 __ju W12P W12_paint W12_cars
-uses: 53(197), 30(100), 20(92), 10(45), 51(31), 85(23), 71(23), 60(21), 72(12), 70(8)
+uses: 53(197), 30(100), 20(94), 10(45), 51(34), 85(23), 71(23), 60(21), 72(12), 70(8)
 
 ## 92_garage_builder.js — 17 KB
 defines: GB_U GB_PH GB_MAX GB_CAP GB_BC GB_PC GB_ GB_col GB_box GB_cyl GB_mirX GB_shape GB_dims GB_piece GB_brickGeo GB_FIG GB_FCAT GB_figGet GB_figOk GB_figGeo GB_PT GB_MAT GB_LMAT GB_geo GB_plate GB_attach GB_mods GB_cells GB_top GB_fit GB_twin GB_same GB_list GB_snap GB_add GB_hitBrick GB_del GB_paint GB_undo
@@ -367,7 +367,7 @@ uses: 96(12), 92(10), 98ld(5), 20(5), 98(4), 41(2), 98y(2), 10(2), 98bc(2), 30(1
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
 uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 92(7)
 
-## 99c_checklist.js — 48 KB
+## 99c_checklist.js — 49 KB
 defines: OD_CHECKLIST
 uses: 30(34), 10(19), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
 
@@ -399,9 +399,9 @@ uses: 10(9), 98(5), 92(5), 98sb(4), 94(2), 20(1), 30(1)
 defines: GF __gf
 uses: 92(5), 98s(3), 72(2), 10(1), 93(1), 98ld(1)
 
-## 98rd_roads.js — 11 KB
-defines: RD_PS RD_key RD_sd RD_pv RD_pred RD_predOf RD_inBox RD_boxPath RD_pedNext RD_turnBack RD_CG RD_road RD_mem RD_memGet RD_may RD_kerb RD_maySig RD_carPre RD_carPost RD_zebra __rd RD_entry RD_compat RD_LEFT RD_US RD_unstack
-uses: 53(15), 51(13), 70(5), 90(4), 10(4), 60(4), 20(3), 98l(3), 72(1)
+## 98rd_roads.js — 14 KB
+defines: RD_PS RD_key RD_sd RD_pv RD_pred RD_predOf RD_inBox RD_boxPath RD_pedNext RD_turnBack RD_CG RD_RB RD_road RD_mem RD_memGet RD_may RD_KR RD_kerb RD_maySig RD_carPre RD_carPost RD_zebra __rd RD_entry RD_compat RD_LEFT RD_US RD_unstack RD_POLE RD_poleOn RD_poleOut RD_exitFree
+uses: 53(20), 51(16), 60(6), 20(5), 70(5), 90(4), 10(4), 98l(4), 72(1)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25
