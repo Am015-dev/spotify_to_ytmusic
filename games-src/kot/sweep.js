@@ -6,17 +6,15 @@
 // moving; a tap on a glowing control that changes nothing; a text block over 8 words (the long-press / drawers excepted);
 // the score chips (hearts, stars, energy) differing from the engine for 3 probes in a row; the one board line over 8 words;
 // the ghost finger pointing at nothing; a control (SMASH!, Roll, End turn, dice, cards for sale) off the board or left in the panel; horizontal scroll; the board (data-board) under 55% of a portrait screen.
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
 const PW = require('/opt/node22/lib/node_modules/playwright'), path = require('path'), fs = require('fs');
 const E = process.env, FILE = path.resolve(E.FILE || 'kot2.html');
-const GAMES = +(E.GAMES || 10), PAR = +(E.PAR || 2), ROT = +(E.ROT || 3), STORY = E.STORY == null ? 2 : +E.STORY, MAXMS = +(E.MAXMS || 300000);
+const QUICK = !!E.QUICK;   // QUICK=1: 4 games (2 per size), 1 rotation, no story
+const GAMES = +(E.GAMES || (QUICK ? 2 : 10)), PAR = +(E.PAR || 2), ROT = +(E.ROT || (QUICK ? 1 : 3)), STORY = E.STORY == null ? (QUICK ? 0 : 2) : +E.STORY, MAXMS = +(E.MAXMS || 300000);
 let seed = +(E.SEED || 1); const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
 const SIZES = [[390, 763], [375, 553]].filter(s => !E.ONLY || String(s[0]) === E.ONLY), SHOTS = path.join(__dirname, 'sweep-shots'); fs.mkdirSync(SHOTS, { recursive: true });
 for (const f of fs.readdirSync(SHOTS)) if (/\.png$/.test(f)) fs.unlinkSync(path.join(SHOTS, f));
-// serve the page over http (like the real site) so the cut-out figures load; files next to the live page (media, pictures) are served too
-const http = require('http'), LIVE = path.resolve(__dirname, '../../games/crown-city-smash'); let BASE = '';
-const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split('?')[0]); const f = u === '/' ? FILE : path.join(LIVE, u);
-  if (!f.startsWith(LIVE) && f !== FILE || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.statusCode = 404; return r.end() }
-  r.writeHead(200, { 'Content-Type': f.endsWith('.html') ? 'text/html' : f.endsWith('.webp') ? 'image/webp' : f.endsWith('.mp4') ? 'video/mp4' : 'application/octet-stream' }); r.end(fs.readFileSync(f)) });
+let BASE = '';
 const fails = []; let shotN = 0, battles = 0, wins = 0, losses = 0, steps = 0, boardMin = 100, taps = 0, fingers = 0, buys = 0, keeps = 0;
 async function fail(p, tag, kind, detail) {
   const key = tag + kind + String(detail).slice(0, 40); if (fails.some(f => f.key === key)) return;
@@ -62,7 +60,7 @@ const PROBE = () => {
 async function newPage(b, W, H) {
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   const p = await ctx.newPage(); p.setDefaultTimeout(90000); p.errs = [];
-  p.on('pageerror', e => p.errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g|Fetch API cannot load/.test(m.text())) p.errs.push('console ' + m.text()); });
+  p.on('pageerror', e => p.errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g/.test(m.text())) p.errs.push('console ' + m.text()); });
   await p.goto(BASE + '/?phone=1'); await p.waitForSelector('[data-start]', { timeout: 60000 }); await p.waitForTimeout(1500);
   await p.evaluate(() => { AIDELAY = 120; try { localStorage.clear(); localStorage.setItem('gxt-crown-city-smash', '{"done":1}') } catch (e) { }   /* the tutorial is covered by tutor-test.js: no offer button for the random taps to hit */ window.__log = []; const ua = uiAct; uiAct = function (d) { __log.push('act ' + JSON.stringify(d) + ' ev=' + (window.event ? window.event.type + ':' + (window.event.target.className || window.event.target.tagName) + ':' + window.event.isTrusted : 'none') + ' stack=' + new Error().stack.split('\n').slice(2, 5).map(x => x.trim().replace(/\(.*[\\/]/, '(')).join('<') + ' help=' + JSON.stringify(GXH.state().cur) + ' rules=' + GXH.state().rules); return ua.apply(this, arguments) }; document.addEventListener('click', e => { const t = e.target; __log.push('click ' + t.tagName + '#' + t.id + '.' + String(t.className).slice(0, 25) + (t.closest && t.closest('[data-shop]') ? ' shop' + t.closest('[data-shop]').dataset.shop : '')); if (__log.length > 12) __log.shift() }, true); }); return p;
 }
@@ -250,7 +248,7 @@ async function story(b, W, H, ch) {
   await p.context().close();
 }
 (async () => {
-  await new Promise(r => srv.listen(0, '127.0.0.1', r)); BASE = 'http://127.0.0.1:' + srv.address().port;
+  BASE = (await gx.url('crown-city-smash', { file: FILE })).replace(/\/$/, '');
   const b = await PW.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }); const jobs = [];
   for (const [W, H] of SIZES) { for (let i = 0; i < GAMES; i++) jobs.push(() => game(b, W, H, i)); for (let c = 1; c <= STORY; c++) jobs.push(() => story(b, W, H, c)); }
   let next = 0; await Promise.all([...Array(PAR)].map(async () => { while (next < jobs.length) { const j = jobs[next++]; await j() } }));

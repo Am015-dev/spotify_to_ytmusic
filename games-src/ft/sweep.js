@@ -6,7 +6,10 @@
 // a ghost finger that is not on something that glows or is a button, engine invariants broken, no result screen at the end.
 const { chromium } = require('playwright');
 const path = require('path');
-const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'sands.html'), STORY = process.argv[4] != null ? +process.argv[4] : 2;
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 4 games, no story
+let URL;
+const N = +process.argv[2] || (QUICK ? 4 : 24), FILE = path.resolve(__dirname, process.argv[3] || 'sands.html'), STORY = process.argv[4] != null ? +process.argv[4] : (QUICK ? 0 : 2);
 const JOBS = +process.env.JOBS || 4, STEP_CAP = +process.env.STEP_CAP || 3500;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
@@ -145,10 +148,9 @@ async function helpRules(page, ph, issue) { HT.rules++;
 async function play(browser, job) {
   const { idx, size, mode, seed, story } = job; const rnd = rng(seed * 7919 + idx);
   const ctx = await browser.newContext({ viewport: { width: size[0], height: size[1] }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
-  await require('../munch/local-route.js')(ctx, require('fs').readFileSync(FILE), [__dirname, path.join(__dirname, '../../games/sands-of-qamar')]);
   const page = await ctx.newPage(); const res = { idx, size: size.join('x'), mode: JSON.stringify(mode), seed, taps: 0, issues: new Set(), errors: [], rounds: 0, over: false, won: null, story: story || null };
   page.on('pageerror', e => res.errors.push(String(e.message || e).split('\n')[0].slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error' && !/Fetch API cannot load|net::|Failed to load resource/.test(m.text())) res.errors.push('console: ' + m.text().slice(0, 140)); });
+  page.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load resource/.test(m.text())) res.errors.push('console: ' + m.text().slice(0, 140)); });
   const issue = s => { if (res.issues.size < 12) res.issues.add(s); };
   const t0 = Date.now();
   const H = { tipsOn: idx % 4 !== 3, seen: new Set(), bulbN: 0 };
@@ -156,7 +158,7 @@ async function play(browser, job) {
   if (!H.tipsOn) await ctx.addInitScript(() => { try { localStorage.setItem('gxh-sands-of-qamar', JSON.stringify({ on: false, seen: {} })); } catch (e) { } });
   try {
     if (story) { const n = +story.slice(1); const ch = {}; for (let k = 1; k < n; k++) ch['c' + k] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; await ctx.addInitScript(p => { try { localStorage.setItem('gns-campaign-sands', JSON.stringify({ v: 1, ch: p, unlocked: [], last: null })); } catch (e) { } }, ch); }
-    await page.goto('https://gns.test/', { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (idx === 0) await helpStatic(page, issue);
+    await page.goto(URL, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (idx === 0) await helpStatic(page, issue);
     if (story) {
       await page.evaluate(id => { setSeed(1000 + (+id.slice(1))); GXC.play(id); }, story); await sleep(400);
       for (let k = 0; k < 14; k++) { // intro, boss card, goal: tap the kit's own buttons until the game starts
@@ -206,6 +208,7 @@ async function play(browser, job) {
 }
 
 (async () => {
+  URL = await gx.url('sands-of-qamar', { file: FILE });
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const jobs = []; for (let i = 0; i < N; i++) jobs.push({ idx: i, size: SIZES[i % 2], mode: MODES[i % MODES.length], seed: 100 + i });
   for (let k = 0; k < STORY; k++) jobs.push({ idx: N + k, size: SIZES[k % 2], mode: { np: 2 }, seed: 500 + k, story: ['c1', 'c4', 'c10', 'c5'][k % 4] });

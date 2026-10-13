@@ -1,0 +1,14 @@
+{
+ "cards": {
+  "dcard-plate": "a single dcard plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gx-bar-plate": "a single gx bar plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gx-drawer-head-plate": "a single gx drawer head plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "mi-plate": "a single mi plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "modal-plate": "a single modal plate, game art for a board game, no text",
+  "spot-plate": "a single spot plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "spot-taken-plate": "a single spot taken plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "tile-blue-plate": "a single tile blue plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "tile-red-plate": "a single tile red plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text"
+ },
+ "style": "Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text"
+}

@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "table-clock-tower": "a wide painted tabletop seen from above: a clock tower workshop floor with big brass gears and blueprints, calm empty space in the middle for a game board, no text, letters or numbers"
+ },
+ "style": "Workshop gouache illustration for a cheerful bomb-defusal crew card game, warm lamplight against cool blueprint blues, brass and copper wire, slightly wobbly dark ink outline, matte paper texture, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-clock-tower": {
+   "element": "Painting: table-clock-tower",
+   "why": "job tables",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-clock-tower.png",
+   "target": "games/short-fuse/media/table-clock-tower.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

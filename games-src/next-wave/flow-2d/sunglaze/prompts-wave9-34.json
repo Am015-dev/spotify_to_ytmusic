@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "back-black-kiln": "a card back design: a black kiln door emblem with violet glow on charcoal, ornate border, symmetrical, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a glazed-tile mosaic workshop game, jewel-bright glaze colours, warm kiln glow, matte paper texture, slightly wobbly dark ink outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 9",
+ "meta": {
+  "back-black-kiln": {
+   "element": "Painting: back-black-kiln",
+   "why": "boss chapter card back",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "back-black-kiln.png",
+   "target": "games/sunglaze/media/back-black-kiln.webp",
+   "size": "768x1024",
+   "ratio": "3:4",
+   "tag": "art",
+   "wave": "Wave 9"
+  }
+ }
+}

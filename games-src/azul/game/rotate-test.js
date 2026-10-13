@@ -2,7 +2,8 @@
 // For each orientation step it taps every visible button / tile / row with a real touch and reports: hit (elementFromPoint at centre is the target),
 // responded (click reached target), latency (tap -> next painted frame), plus long tasks, offscreen controls and horizontal scroll.
 const {chromium}=require('playwright');
-const URL=process.env.URL||'http://localhost:8095/sunglaze.html';
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mozilla/5.0 Mobile/15E148 Safari/604.1)';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const SEL='button,[data-k],[data-bfrow],[data-ui],[data-bf],[data-gx],[data-ph]';
@@ -48,7 +49,7 @@ async function rotateStale(p,w,h,ow,oh){await p.setViewportSize({width:w,height:
     Object.defineProperty(window,'innerWidth',{configurable:true,get:()=>ow});Object.defineProperty(window,'innerHeight',{configurable:true,get:()=>oh});
     dispatchEvent(new Event('orientationchange'));dispatchEvent(new Event('resize'));
     setTimeout(()=>{if(dw)Object.defineProperty(window,'innerWidth',dw);else delete window.innerWidth;if(dh)Object.defineProperty(window,'innerHeight',dh);else delete window.innerHeight},50)},[ow,oh]);await sleep(1400)}
-(async()=>{const b=await chromium.launch();let fail=0;const chk=r=>{if(r.blocked||r.noresp||r.slow||r.off||r.hscroll)fail++};
+(async()=>{URL=process.env.URL||await gx.url('sunglaze',{file:require('path').join(__dirname,'sunglaze.html')});const b=await chromium.launch();let fail=0;const chk=r=>{if(r.blocked||r.noresp||r.slow||r.off||r.hscroll)fail++};
   const skip=id=>/menu|new|reset|rulesd|story|start/i.test(id)&&false;
   for(const [pw,ph,lw,lh] of [[390,763,763,390],[390,844,844,390],[375,667,667,375]]){
     console.log(`=== rotate ${pw}x${ph} <-> ${lw}x${lh}`);const p=await fresh(b,pw,ph);await start(p);

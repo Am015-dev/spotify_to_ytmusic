@@ -233,11 +233,11 @@ html:has(.gx-drawer.on) .gx-main{pointer-events:none}
 .arena .mon .gchip{min-height:40px;font-size:.95rem;font-weight:800}.arena .mon .gchip b{font-size:1.15rem}
 html.ph .arena:has(>.sline){padding-top:60px}
 html.ph .sline .n{font-size:clamp(32px,9vw,40px);-webkit-text-stroke:1.5px #0d0603}
-html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.7rem}
+html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.75rem}
 html.ph .sline .sd{font-size:.82rem;line-height:1.25}
 html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:15px}
 html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
 @media (max-height:600px){html.ph .arena:has(>.sline){padding-top:56px}html.ph .sline .n{font-size:32px}}
 html .arena .vs .score .num{display:none!important}
-html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.58rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
+html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.75rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
 html.ph .sline .n{min-width:.9em}

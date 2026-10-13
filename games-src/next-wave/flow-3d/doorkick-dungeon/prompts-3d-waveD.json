@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "bone-pile": "a pile of bones and a skull with a cracked helmet, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "coin-pile": "a heap of gold coins, a goblet and a few gems, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "torch": "a wall torch in an iron sconce with a lively flame, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave D",
+ "meta": {
+  "bone-pile": {
+   "element": "3D model: bone-pile",
+   "why": "crypt table prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "bone-pile.png",
+   "target": "games/doorkick-dungeon/models/bone-pile.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "coin-pile": {
+   "element": "3D model: coin-pile",
+   "why": "vault table prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "coin-pile.png",
+   "target": "games/doorkick-dungeon/models/coin-pile.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "torch": {
+   "element": "3D model: torch",
+   "why": "dungeon edge prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "torch.png",
+   "target": "games/doorkick-dungeon/models/torch.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  }
+ },
+ "targets": {
+  "bone-pile": "games/doorkick-dungeon/models/bone-pile.glb",
+  "coin-pile": "games/doorkick-dungeon/models/coin-pile.glb",
+  "torch": "games/doorkick-dungeon/models/torch.glb"
+ }
+}
