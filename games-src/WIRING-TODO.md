@@ -24,9 +24,9 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 
 ## crown-city-smash
 
-Wired 13 Oct: all 182 `pc-*` card paintings (shop pop-up, board shop tiles, flying card, owned-card rows; lazy-loaded, listed in media.json "cards"), `icon-heart/energy/star` (flying pick-ups), `table-harbor-night/spire-gold` (loaded by name in paint.js, campaign unlock). 3D tower/fountain/Dot/Clampede models are live.
+Wired 13 Oct: all 182 `pc-*` card paintings (88 cards + 12 costumes + 72 evolutions: shop pop-up, board shop tiles, flying card, owned/evolution rows; lazy-loaded, listed in media.json "cards"), `icon-heart/energy/star` (flying pick-ups), `table-harbor-night/spire-gold` (loaded by name in paint.js, campaign unlock). 3D tower/fountain/Dot/Clampede models are live.
 
-Still not loaded by the page (13 files; each needs a design decision, not just a hook):
+Still not loaded by the page (11 files; each needs a design decision, not just a hook):
 
 | File | Why left |
 |---|---|
@@ -37,7 +37,6 @@ Still not loaded by the page (13 files; each needs a design decision, not just a
 | `ui-bubble-tail` | coach bubble uses ui-bubble without a tail |
 | `back-brass-beetle`, `back-bulletin` | no face-down card is shown anywhere |
 | `token-{energy,heart,star}.glb` (+ `*-lite.glb`, `@512`) | 3D pick-ups not hooked into the fx fly |
-| 3 evolution paintings (`evo*`) | evolutions render as text rows |
 
 ## sands-of-qamar
 
