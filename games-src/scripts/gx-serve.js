@@ -38,6 +38,11 @@ function startServer(o) {
     const parts = decodeURIComponent(u.pathname).split('/').filter(Boolean);
     const slug = parts.shift();
     if (!slug) { res.writeHead(404); return res.end('no slug'); }
+    if (!parts.length && /\.(json|html)$/.test(slug)) {   // site-root files the pages fetch with ../ (updates.json, scenarios.json) and the owner pages (lab.html, index.html)
+      const rf = [path.join(stage, slug), path.join(games, slug)].find(x => { try { return fs.statSync(x).isFile(); } catch (e) { return false; } });
+      if (!rf) { res.writeHead(404); return res.end('not found'); }
+      res.writeHead(200, { 'Content-Type': TYPES[path.extname(rf)] || 'text/plain', 'Cache-Control': 'no-store' }); return res.end(fs.readFileSync(rf));
+    }
     if (u.pathname === '/' + slug) { res.writeHead(301, { Location: '/' + slug + '/' + u.search }); return res.end(); }
     const f = find(slug, parts.join('/'));
     if (!f) { res.writeHead(404, { 'Content-Type': 'text/plain' }); return res.end('not found: ' + u.pathname); }
