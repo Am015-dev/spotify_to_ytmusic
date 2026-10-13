@@ -107,4 +107,44 @@
       { kind: 'tap', sel: '#dkCard .gx-x', name: 'tap Close', state: function () { return UI.zoom != null; }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+  var idle = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var wordsIn = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
+  var line = function () { var e = document.querySelector('#prompt .bfline'); return e ? e.textContent : ''; };
+
+  // the short status line: one line of 8 words or fewer, on the glow it says what to drag or tap
+  GXS.add({
+    id: 'dk-status-line', name: 'Short drag/tap status line', ask: 'Is the line short and does it match?', ls: { dkd_offer: '1' }, seed: 41, when: booted, group: 'Board',
+    setup: function () { table(41); return GXS.wait(function () { return document.querySelector('#prompt .bfline') && document.querySelector('.mine .hand .card'); }, 6000).then(function () { return idle(500); }); },
+    checks: [
+      { kind: 'visible', sel: '#prompt .bfline', name: 'status line' },
+      { kind: 'text', sel: '#prompt .bfline', re: /\S/, name: 'status text', minPx: 12 },
+      { kind: 'fn', name: 'line is 8 words or fewer', fn: function () { return wordsIn(line()) <= 8 || '"' + line() + '" is ' + wordsIn(line()) + ' words'; } },
+      { kind: 'fn', name: 'line is a single line (no wrap past 2 rows)', fn: function () { var e = document.querySelector('#prompt .bfline'), px = parseFloat(getComputedStyle(e).lineHeight) || 16; return e.getBoundingClientRect().height <= px * 2.2 || 'line wraps to ' + Math.round(e.getBoundingClientRect().height / px) + ' rows'; } },
+      { kind: 'tap', sel: '.mine .hand .card.play', name: 'tap a glowing card', state: function () { return line(); }, expect: function (a, b) { return (a !== b && wordsIn(b) <= 8 && /tap|drop|drag|glow/i.test(b)) || 'line after tap: "' + b + '"'; } }
+    ]
+  });
+
+  // lightbulb help, first-time tips, rules cards and the Tips switch
+  GXS.add({
+    id: 'dk-tips', name: 'Lightbulb, tips, rules cards, Tips switch', ask: 'Do tips, bulb and rules cards work?', ls: { dkd_offer: '1' }, seed: 42, when: function () { return booted() && typeof GXH !== 'undefined' && typeof hlpPhase === 'function'; }, group: 'UI',
+    setup: function () {
+      table(42); try { GXH.reset(); GXH.setEnabled(true); } catch (e) { }
+      var d = document.createElement('div'); d.id = 'tipsprobe'; d.style.cssText = 'position:fixed;left:8px;bottom:60px;z-index:9999;background:#fff;padding:4px'; d.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); document.body.appendChild(d);
+      try { GXH.phase(hlpPhase()); } catch (e) { }
+      return GXS.wait(function () { var b = document.querySelector('.gxh-bub.on'); return b && b.textContent.trim(); }, 8000).then(function () { return idle(400); });
+    },
+    checks: [
+      { kind: 'visible', sel: '.gxh-bub.on', name: 'first-time tip bubble' },
+      { kind: 'text', sel: '.gxh-bub.on', re: /\S/, name: 'tip text', minPx: 12 },
+      { kind: 'fn', name: 'tip bubble is on screen', fn: function () { var r = document.querySelector('.gxh-bub.on').getBoundingClientRect(); return (r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2) || 'bubble off screen'; } },
+      { kind: 'visible', sel: '#bulbbtn', name: 'lightbulb button' },
+      { kind: 'tap', sel: '[data-gxh=tips][data-v="0"]', name: 'tap Tips Off', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === true && b === false) || 'Tips switch did not turn off'; } },
+      { kind: 'fn', name: 'no tip bubble while Tips are off', fn: function () { return !document.querySelector('.gxh-bub.on') || 'bubble still shown'; } },
+      { kind: 'tap', sel: '[data-gxh=tips][data-v="1"]', name: 'tap Tips On', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === false && b === true) || 'Tips switch did not turn on'; } },
+      { kind: 'tap', sel: '#bulbbtn', name: 'tap the lightbulb', state: function () { var s = GXH.state(); return JSON.stringify([s.cur && s.cur.kind, s.rules]); }, expect: function (a, b) { return a !== b || 'lightbulb did nothing'; } },
+      { kind: 'fn', name: 'bulb hint has text', fn: function () { var b = document.querySelector('.gxh-bub.on'); return (b && b.textContent.trim().length > 3) || 'no hint text'; } },
+      { kind: 'fn', name: 'rules card opens and reads', fn: function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000).then(function () { var c = document.querySelector('.gxh-card'); return (c && /\S/.test((document.querySelector('.gxh-rt') || {}).textContent || '') && /\S/.test((document.querySelector('.gxh-rx') || {}).textContent || '')) || 'rules card empty'; }); } },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close on the rules card', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'rules card did not close'; } }
+    ]
+  });
 })();

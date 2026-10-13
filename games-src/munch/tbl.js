@@ -96,7 +96,8 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   const _r=render;render=function(){const r=_r.apply(this,arguments);tableApply();return r};
   addEventListener('resize',tableApply);addEventListener('orientationchange',tableApply);
   ['door','treasure','cellar-oak','corridor-brass','crypt-bone'].forEach(n=>{new Image().src='media/back-'+n+'.webp'});
+  window.handIc=()=>document.documentElement.classList.contains('dk-hand')?'<img class="pic" src="media/icon-hand.webp" alt="">':'✋';
   tableApply();
   // painted HUD pieces: each class goes on <html> once its file has loaded (the CSS fallback stays until then)
-  [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
+  [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse'],['dk-hand','icon-hand'],['dk-lv','icon-level'],['dk-bt','ui-bubble-tail']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
 })();
