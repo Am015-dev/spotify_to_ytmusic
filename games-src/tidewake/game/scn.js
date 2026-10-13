@@ -77,4 +77,30 @@
       skin
     ]
   });
+  // painted art wired: each plate is painted on the element, its skin switch is on, the element visible
+  function art(name, sel, file, pseudo, cls) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
+  GXS.add({
+    id: 'tw-art', name: 'Painted art: frame, rings, tag, tail, rows', ask: 'Is the board framed, with brass rings?', seed: 5, when: booted, group: 'UI',
+    setup: function () {
+      return table(5).then(function () {
+        var ov = document.getElementById('ov') || document.getElementById('board'), bd = document.getElementById('board').getBoundingClientRect(), c = ov.getBoundingClientRect();
+        function put(cls, txt, x, y) { var e = document.createElement('div'); e.className = cls; if (txt) e.textContent = txt; e.style.cssText = 'position:absolute;left:' + (bd.left - c.left + x) + 'px;top:' + (bd.top - c.top + y) + 'px'; ov.appendChild(e); return e; }
+        put('oring', '', 120, 150); put('otag ship me', 'You', 200, 150);
+        var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Pick, turn, then Place</div>'; document.body.appendChild(b);
+        var d = document.createElement('section'); d.className = 'gx-drawer'; d.id = 'artdrawer'; d.style.cssText = 'position:fixed;left:-300px;top:0;width:280px;visibility:hidden';
+        d.innerHTML = '<div class="gx-row"><div class="gx-row-l">Sound</div><div class="gx-row-k"><button>On</button></div></div>'; document.body.appendChild(d);
+        return idle(500);
+      });
+    },
+    checks: [
+      art('sea-chart frame painted', '#board', 'board-frame', '::after', 'sk-frame'),
+      art('brass ring painted', '.oring', 'ring-slot', null, 'sk-ringslot'),
+      art('luggage tag painted', '.otag.ship.me', 'ui-nametag-c', '::after', 'sk-nametag'),
+      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
+      { kind: 'text', sel: '#arttail .gxh-tx', re: /place/i, name: 'bubble text readable' },
+      { kind: 'text', sel: '.otag.ship.me', re: /you/i, name: 'name tag readable' },
+      { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
+    ]
+  });
 })();

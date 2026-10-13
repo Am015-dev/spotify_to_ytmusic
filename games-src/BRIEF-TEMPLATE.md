@@ -4,7 +4,7 @@ Fill the three <...> parts, delete nothing else. Keep the whole brief under ~60 
 
 ```
 Owner authorisation: Alex (repo owner) has approved this task: <one line, quote the owner's words if there are any>.
-Repo /home/user/spotify_to_ytmusic, branch alex/brave-carson-rbpmlk. Model: sonnet (set it on this session).
+Repo /home/user/spotify_to_ytmusic, branch alex/brave-carson-rbpmlk. Model: <haiku for chores/status/copying/repeating a known fix; sonnet for code, fixes, tests> (set it on this session; see CLAUDE.md model tiers).
 
 Task: <games: at most 2-3, each deployed as soon as it passes>
 Known bugs / asks (every one, in the owner's words): <list>
@@ -26,6 +26,7 @@ Read less (this is the main cost lever)
   and report. Do not run on to 450k.
 
 Fast loop
+- NO screenshots, contact sheets or before/after images (owner's order). Deliver: change + ?scn= scenario + ✔ Test item with GO.
 - Scenario first: for each ask, register a ?scn=<id> scenario (games-src/shell/gx-scenario.js) and watch it fail, then fix.
 - Iterate with `python3 games-src/scripts/build-all.py --quick <slug>` (under 3 min). Go live with `--deploy <slug>` as soon as it
   passes (quick sweep; `--full` only for engine/rules changes). Then `add-update.py <game> "headline" "item" --check "..." --scn <id>`.
@@ -35,6 +36,7 @@ Report (under 150 words, once): per game before -> after numbers, scenario ids, 
 ```
 
 Orchestrator notes
-- One session per game batch, at most 10 cloud sessions at a time, model sonnet on every one.
+- One session per game batch, at most 10 cloud sessions at a time. Model: Haiku for chores (status refresh, copying, converting, repeating
+  an already-written fix, checks that only report), Sonnet for code/fixes/tests. Never the main model for workers.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
 - If a worker reports it is out of context, start a new session with this template plus its HANDOFF note.

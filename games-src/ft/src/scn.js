@@ -72,4 +72,47 @@
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+  // painted plates/glyphs/badges: every wired file loaded, applied to its element, and not stretched out of shape
+  var ART = [ // [selector, pseudo, file, max stretch]
+    ['.tile.blue', '::after', 'ui-tile-frame-blue', 0], ['.tile:not(.blue)', '::after', 'ui-tile-frame-red', 0],
+    ['.tile .tv', '::before', 'ui-badge-gold', 1.6], ['.dcard:not(.th) .dv', '::before', 'ui-badge-cream', 1.6],
+    ['.sch .sti', '', 'icon-star', 0], ['.mcard:not(.empty)', '', 'ui-goods-card', 0]
+  ];
+  var PROBE = [ // transient pieces: built as a probe so their CSS is tested without waiting for the moment
+    ['<div class="card dj"><h4>Djinn</h4></div>', '.card.dj h4', '', 'ui-djinn-bar', 0], ['<div id="summon"><b>Name</b></div>', '#summon b', '', 'ui-ribbon', 0],
+    ['<div class="stat"><b class="nm">Ann</b></div>', '.stat .nm', '', 'ui-nameplate', 0], ['<div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div>', '.gxh-arr', '', 'ui-bubble-tail', 0],
+    ['<div id="finger"><svg></svg></div>', '#finger', '', 'ui-finger', 0]
+  ];
+  var GLYPH = ['village', 'sacred', 'oasis', 'small', 'large', 'workshop', 'exchange', 'city', 'lake'];
+  function bg(sel, ps) { var e = $(sel); if (!e) return null; var cs = getComputedStyle(e, ps || null); return { e: e, s: cs.backgroundImage + ' ' + cs.borderImageSource + ' ' + cs.getPropertyValue('--gl'), cs: cs }; }
+  function loaded(f) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 && i); }; i.onerror = function () { r(false); }; i.src = 'media/' + f + '.webp'; }); }
+  var artOut = null;
+  GXS.add({
+    id: 'sq-art', name: 'Painted plates and glyphs', ask: 'Are the painted pieces sharp and in place?', seed: 9, when: booted, group: 'Art',
+    setup: function () {
+      return table(9).then(function () {
+        var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = PROBE.map(function (p) { return p[0]; }).join(''); document.body.appendChild(h);
+        var files = ART.map(function (a) { return a[2]; }).concat(PROBE.map(function (p) { return p[3]; }), GLYPH.map(function (k) { return 'glyph-' + k; }), Object.keys(ITEMS).map(function (k) { return 'item-' + k; }), ['ui-trophy']);
+        return Promise.all(files.map(loaded)).then(function (r) { artOut = {}; files.forEach(function (f, i) { artOut[f] = r[i]; }); return idle(300); });
+      });
+    },
+    checks: [
+      { kind: 'fn', name: 'painted layer is on', fn: function () { return document.documentElement.classList.contains('sk-pl') || 'html.sk-pl missing'; } },
+      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = Object.keys(artOut).filter(function (f) { return !artOut[f]; }); return !bad.length || 'not loaded: ' + bad.join(', '); } },
+      { kind: 'fn', name: 'plates, badges, frames use their painting', fn: function () {
+        var bad = ''; ART.forEach(function (a) { var b = bg(a[0], a[1]); if (!b) { bad = bad || 'no element ' + a[0]; return; } if (b.s.indexOf(a[2] + '.webp') < 0) bad = bad || a[0] + a[1] + ' lacks ' + a[2]; });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'every tile kind has its glyph medallion', fn: function () {
+        var bad = ''; [].forEach.call(document.querySelectorAll('.tile'), function (t) { var k = (t.className.match(/k-(\w+)/) || [])[1]; var s = getComputedStyle(t, '::before').backgroundImage; if (k && GLYPH.indexOf(k) >= 0 && s.indexOf('glyph-' + k + '.webp') < 0) bad = bad || 'tile ' + k + ' has no glyph'; });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'transient pieces (djinn bar, ribbon, name plate, bubble tail, finger) are painted', fn: function () {
+        var bad = ''; PROBE.forEach(function (p) { var b = bg(p[1], p[2]); if (!b || b.s.indexOf(p[3] + '.webp') < 0) bad = bad || p[1] + ' lacks ' + p[3]; }); return !bad || bad; } },
+      { kind: 'fn', name: 'item and trophy pictures replace the emoji', fn: function () { return (itemIc('lamp').indexOf('item-lamp.webp') > 0 && pIc('ui-trophy.webp', 'x').indexOf('ui-trophy.webp') > 0) || 'emoji still shown'; } },
+      { kind: 'fn', name: 'plates are not stretched out of shape', fn: function () {
+        var bad = ''; ART.forEach(function (a) { if (!a[3]) return; var e = $(a[0]); if (!e) return; var r = e.getBoundingClientRect(), i = artOut[a[2]]; if (!i || !r.width || !r.height) return; var q = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (q > a[3] || q < 1 / a[3]) bad = bad || a[0] + ' stretched x' + q.toFixed(2); });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'labels on the art stay readable (>= 11 px)', fn: function () { var bad = ''; ['.sch .sn', '.tile .tn', '.tile .tv', '.dcard b'].forEach(function (s) { var e = $(s); if (e && parseFloat(getComputedStyle(e).fontSize) < 11 && !bad) bad = s + ' ' + getComputedStyle(e).fontSize; }); return !bad || bad; } },
+      skin
+    ]
+  });
 })();

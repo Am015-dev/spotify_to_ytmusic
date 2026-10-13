@@ -732,6 +732,26 @@ html.sk .btn.warn:not(.small){border-image-source:url(media/ui-button-go-c.webp)
 html.sk .btn:not(.small):active{transform:translateY(2px)}
 html.sk .btn:disabled{opacity:.55}
 
+/* sea-chart frame round the board: a thin overlay, corner fittings kept, edge bands tiled (never stretched); taps pass through */
+html.sk-frame #board{position:relative}
+html.sk-frame #board::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;border:solid transparent;border-width:18px;border-image:url(media/board-frame.webp) 190/18px round}
+/* target rings: the painted brass buoy ring instead of the flat gold circle */
+html.sk-ringslot .oring{border-color:transparent;background:url(media/ring-slot.webp) center/contain no-repeat;box-shadow:none;filter:drop-shadow(0 0 6px rgba(255,210,74,.95))}
+/* your junk's label gets a painted luggage tag hanging under it */
+html.sk-nametag .otag.ship.me{position:relative}
+html.sk-nametag .otag.ship.me::after{content:'';position:absolute;left:50%;top:100%;width:14px;height:26px;margin:1px 0 0 -7px;background:url(media/ui-nametag-c.webp) center/contain no-repeat;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* settings rows: the painted parchment strip behind each row (overlay, no size change) */
+html.sk-row .gx-row{position:relative;isolation:isolate}
+html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
+html.sk-nametag .otag.ship.me{font-size:12px}
+html.sk-frame #ov{z-index:6}
+
 </style>
 <script>/* painted sea + compass for the board paint (kit patch 9): TW_ART.water is set only when all four tiles loaded */
 window.TW_ART={};(function(){function ld(f,cb){var i=new Image();i.onload=function(){cb(i)};i.src='media/'+f+'.webp'}
@@ -856,7 +876,7 @@ var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function
   function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
     if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
     var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
-    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag' && !(t.closest && t.closest('#gxlab-bar'))) return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
     return ''; }
   function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
   S.step = function (i) {
@@ -985,6 +1005,32 @@ var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function
       { kind: 'text', get sel() { return pick('.ps-main [data-a=place]', 'button[data-a=place]'); }, re: /place/i, name: 'Place label' },
       { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
       skin
+    ]
+  });
+  // painted art wired: each plate is painted on the element, its skin switch is on, the element visible
+  function art(name, sel, file, pseudo, cls) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
+  GXS.add({
+    id: 'tw-art', name: 'Painted art: frame, rings, tag, tail, rows', ask: 'Is the board framed, with brass rings?', seed: 5, when: booted, group: 'UI',
+    setup: function () {
+      return table(5).then(function () {
+        var ov = document.getElementById('ov') || document.getElementById('board'), bd = document.getElementById('board').getBoundingClientRect(), c = ov.getBoundingClientRect();
+        function put(cls, txt, x, y) { var e = document.createElement('div'); e.className = cls; if (txt) e.textContent = txt; e.style.cssText = 'position:absolute;left:' + (bd.left - c.left + x) + 'px;top:' + (bd.top - c.top + y) + 'px'; ov.appendChild(e); return e; }
+        put('oring', '', 120, 150); put('otag ship me', 'You', 200, 150);
+        var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Pick, turn, then Place</div>'; document.body.appendChild(b);
+        var d = document.createElement('section'); d.className = 'gx-drawer'; d.id = 'artdrawer'; d.style.cssText = 'position:fixed;left:-300px;top:0;width:280px;visibility:hidden';
+        d.innerHTML = '<div class="gx-row"><div class="gx-row-l">Sound</div><div class="gx-row-k"><button>On</button></div></div>'; document.body.appendChild(d);
+        return idle(500);
+      });
+    },
+    checks: [
+      art('sea-chart frame painted', '#board', 'board-frame', '::after', 'sk-frame'),
+      art('brass ring painted', '.oring', 'ring-slot', null, 'sk-ringslot'),
+      art('luggage tag painted', '.otag.ship.me', 'ui-nametag-c', '::after', 'sk-nametag'),
+      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
+      { kind: 'text', sel: '#arttail .gxh-tx', re: /place/i, name: 'bubble text readable' },
+      { kind: 'text', sel: '.otag.ship.me', re: /you/i, name: 'name tag readable' },
+      { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
     ]
   });
 })();
@@ -6258,7 +6304,7 @@ function slot(){const s=document.getElementById('start');
   if(!UI.tut&&(SND.mood==='tension'||(UI.camp&&UI.camp.boss&&campOn())))return['fight',0];
   return['main',0]}
 function boot(){
-  try{GXSK.init({})}catch(e){}
+  try{GXSK.init({sets:{'sk-frame':['board-frame'],'sk-ringslot':['ring-slot'],'sk-nametag':['ui-nametag-c'],'sk-tail':['ui-bubble-tail'],'sk-row':['ui-row-c']}})}catch(e){}
   try{GXMUS.init({key:'tw',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}

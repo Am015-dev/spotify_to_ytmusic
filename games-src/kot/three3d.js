@@ -594,7 +594,7 @@ function sync3D(){if(!V3.on)return;if(PH)PH.wake();
   // tags
   [...tags.children].forEach((el,k)=>{const p=G.pl[k];el.className=`tag ${k===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${inCity(p.i)?'city':''}`;
     el.style.setProperty('--mc',MONS[p.m].c);
-    el.innerHTML=`<b>${inCity(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
+    el.innerHTML=`<b>${inCity(p.i)?'<i class="crn">👑</i> ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
   V3.tower.visible=exOn('tower');if(exOn('tower'))G.tower.forEach((o,l)=>{const m=V3.tsegs[l].material;m.color.set(o>=0?MONS[P(o).m].c:'#d8442e');m.emissive.set(o>=0?0x331100:0x000000)});
   V3.csign.visible=exOn('curse');if(exOn('curse')&&V3.curseShown!==G.curse){V3.curseShown=G.curse;V3.csign.material.map=signTex(CURSES[G.curse].n.toUpperCase(),'#b57bff','#ffffff');V3.csign.material.needsUpdate=true}
   G.pl.forEach((p,k)=>{const o=V3.mons[k];o.berserk=!!(p.tok&&p.tok.berserk&&p.alive);const n=p.alive?(p.cult||0):0;o.cults=o.cults||[];

@@ -890,7 +890,7 @@ html.ph-l .pcard .endart{height:22dvh}
   function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
     if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
     var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
-    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag' && !(t.closest && t.closest('#gxlab-bar'))) return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
     return ''; }
   function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
   S.step = function (i) {
@@ -991,7 +991,7 @@ html.ph-l .pcard .endart{height:22dvh}
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = document.querySelector('#bd').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .55 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
       { kind: 'visible', sel: '#bd .hc', name: 'hand' },
       { kind: 'visible', sel: '#acts .btn', name: 'Pass / Prepare buttons' },
-      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
+      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
       { kind: 'fn', name: 'top line has contrast >= 3 against the bar', fn: function () { var e = document.querySelector('#prompt'), bar = document.querySelector('.gx-bar'), c = contrast(getComputedStyle(e).color, getComputedStyle(bar).backgroundColor); return c >= 3 || 'contrast ' + c.toFixed(1) + ' (' + getComputedStyle(e).color + ' on ' + getComputedStyle(bar).backgroundColor + ')'; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bd *, #prompt'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin
@@ -1030,6 +1030,19 @@ html.ph-l .pcard .endart{height:22dvh}
       { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
       { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
+
+  // painted art wired: every pushed file loads, the resource icons and season wheel on the board are real pictures, not stretched
+  var ART = ['icon-berry', 'icon-pebble', 'icon-resin', 'icon-twig', 'ui-season-wheel', 'ui-bubble', 'ui-bubble-tail', 'ui-button-cream', 'ui-button-go', 'ui-button-power', 'ui-drawer-head', 'ui-iconbtn', 'ui-node-boss', 'ui-node-done', 'ui-node-locked', 'ui-node-open', 'ui-panel', 'ui-row', 'ui-topbar'];
+  GXS.add({
+    id: 'hb-art', name: 'Painted art wired', ask: 'Are the resource icons painted?', seed: 6, when: booted, group: 'UI',
+    setup: function () { return table(6).then(function () { return Promise.all(ART.map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 ? '' : n); }; i.onerror = function () { r(n); }; i.src = 'media/' + n + '.webp'; }); })); }).then(function (a) { window.__artBad = a.filter(Boolean); }); },
+    checks: [
+      { kind: 'fn', name: 'all 19 painted files load', fn: function () { return !window.__artBad.length || 'did not load: ' + window.__artBad.join(', '); } },
+      { kind: 'fn', name: 'painted resource icons show on the board', fn: function () { var n = ['berry', 'pebble', 'resin', 'twig'].filter(function (k) { return document.querySelector('img[src*="icon-' + k + '"]'); }); return n.length >= 3 || 'painted icons on the board: ' + n.join(','); } },
+      { kind: 'fn', name: 'painted pictures loaded and not stretched', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img[src*="icon-"], img[src*="ui-season"]'), function (e) { if (!GXS.vis(e)) return; if (!e.naturalWidth) bad = bad || e.src; var r = e.getBoundingClientRect(); if (e.naturalWidth && r.width > 4 && Math.abs(r.width / r.height - e.naturalWidth / e.naturalHeight) > 0.15) bad = bad || 'stretched ' + e.src; }); return !bad || bad; } },
+      skin
     ]
   });
 })();

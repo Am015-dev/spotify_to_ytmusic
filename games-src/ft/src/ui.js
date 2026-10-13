@@ -52,7 +52,7 @@ function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
 function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="mp sm" data-c="${c}"></i>${n}</span>`:''}
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
-   <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss">★${shownTotal(p)}</b>
+   <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
    <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}</span><span class="st">${E2('🐪','camel')}${p.camels}</span>${p.tent?'<span class="st">⛺</span>':''}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
@@ -85,7 +85,7 @@ function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filt
   for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay=(m.pay.el?m.pay.el+'●':'')+(m.pay.fk?m.pay.fk+'🔮':'');
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
-      if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">🪄 ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`🪄 ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
+      if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
   return `<div class="arow pws">${h}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';

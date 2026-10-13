@@ -88,4 +88,17 @@
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+
+  // painted art wired: every pushed file loads, the resource icons and season wheel on the board are real pictures, not stretched
+  var ART = ['icon-berry', 'icon-pebble', 'icon-resin', 'icon-twig', 'ui-season-wheel', 'ui-bubble', 'ui-bubble-tail', 'ui-button-cream', 'ui-button-go', 'ui-button-power', 'ui-drawer-head', 'ui-iconbtn', 'ui-node-boss', 'ui-node-done', 'ui-node-locked', 'ui-node-open', 'ui-panel', 'ui-row', 'ui-topbar'];
+  GXS.add({
+    id: 'hb-art', name: 'Painted art wired', ask: 'Are the resource icons painted?', seed: 6, when: booted, group: 'UI',
+    setup: function () { return table(6).then(function () { return Promise.all(ART.map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 ? '' : n); }; i.onerror = function () { r(n); }; i.src = 'media/' + n + '.webp'; }); })); }).then(function (a) { window.__artBad = a.filter(Boolean); }); },
+    checks: [
+      { kind: 'fn', name: 'all 19 painted files load', fn: function () { return !window.__artBad.length || 'did not load: ' + window.__artBad.join(', '); } },
+      { kind: 'fn', name: 'painted resource icons show on the board', fn: function () { var n = ['berry', 'pebble', 'resin', 'twig'].filter(function (k) { return document.querySelector('img[src*="icon-' + k + '"]'); }); return n.length >= 3 || 'painted icons on the board: ' + n.join(','); } },
+      { kind: 'fn', name: 'painted pictures loaded and not stretched', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img[src*="icon-"], img[src*="ui-season"]'), function (e) { if (!GXS.vis(e)) return; if (!e.naturalWidth) bad = bad || e.src; var r = e.getBoundingClientRect(); if (e.naturalWidth && r.width > 4 && Math.abs(r.width / r.height - e.naturalWidth / e.naturalHeight) > 0.15) bad = bad || 'stretched ' + e.src; }); return !bad || bad; } },
+      skin
+    ]
+  });
 })();

@@ -396,6 +396,19 @@ html.sk-cells .bf-floor .bf-c{background:url(media/ui-floor-cell.webp) center/11
 html.sk .gxc-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1a0a}
 html.sk .gxc-htitle{color:#3a1a0a;text-shadow:none;line-height:1.3;padding:2px 0}
 html.sk .gxc-ib{color:#fff}
+
+/* carved wooden tray around the full five-dish rack (the shorter racks are a staircase, so they keep plain dishes) (overlay behind the dishes, no size change) */
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no)){isolation:isolate}
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no))::before{content:'';position:absolute;inset:-9px -5px -8px;z-index:-1;pointer-events:none;border:solid transparent;border-width:11px 5px 9px;border-image:url(media/ui-rack-frame-c.webp) 36 16 30 16 fill/11px 5px 9px stretch;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* settings rows: the painted glazed strip behind each row (overlay, no size change) */
+html.sk-row .gx-row{position:relative;isolation:isolate}
+html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -921,6 +934,26 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
     ]
   });
 
+  // painted art wired: each plate is painted on the element, its skin switch is on, the element visible
+  function art(name, sel, file, pseudo, cls) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
+  GXS.add({
+    id: 'sg-art', name: 'Painted art: rack trays, tail, rows', ask: 'Do the racks look like wooden trays?', seed: 5, sizes: 'phone', when: booted,
+    setup: function () {
+      return table(5).then(function () {
+        var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap a colour</div>'; document.body.appendChild(b);
+        var d = document.createElement('section'); d.className = 'gx-drawer'; d.id = 'artdrawer'; d.style.cssText = 'position:fixed;left:-300px;top:0;width:280px;visibility:hidden';
+        d.innerHTML = '<div class="gx-row"><div class="gx-row-l">Sound</div><div class="gx-row-k"><button>On</button></div></div>'; document.body.appendChild(d);
+        return idle(500);
+      });
+    },
+    checks: [
+      art('rack tray painted', '.bf-me .bf-rack:not(:has(>.bf-c.no))', 'ui-rack-frame-c', '::before', 'sk-rackf'),
+      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
+      { kind: 'text', sel: '#arttail .gxh-tx', re: /colour/i, name: 'bubble text readable' },
+      { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
+    ]
+  });
 })();
 
 </script>
@@ -5163,7 +5196,7 @@ function slot(){
 function sgPaint(){const want={kiln:['kiln-disc'],kilne:['kiln-disc-empty'],pool:['pool-oval'],rack:['ui-rack-cell'],floor:['ui-floor-cell'],wall:['ui-wall-cell'],sun:['token-sun'],gloss:['tile-gloss']};
   Object.keys(want).forEach(k=>pre(want[k][0],()=>{if(typeof SGK==='undefined'||SGK[k])return;SGK[k]=1;clearTimeout(sgPaint.t);sgPaint.t=setTimeout(()=>{try{if(typeof G!=='undefined'&&G)render()}catch(e){}},60)}))}
 function boot(){
-  try{GXSK.init({sets:{'sk-cells':['ui-rack-cell','ui-floor-cell','ui-wall-cell']}})}catch(e){}
+  try{GXSK.init({sets:{'sk-cells':['ui-rack-cell','ui-floor-cell','ui-wall-cell'],'sk-rackf':['ui-rack-frame-c'],'sk-tail':['ui-bubble-tail'],'sk-row':['ui-row-c']}})}catch(e){}
   sgPaint();
   try{GXMUS.init({key:'sgz',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);

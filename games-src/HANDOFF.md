@@ -4,6 +4,13 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+
+## Story bubble + painted plate fix (13 Oct 2026): source done, only 1 of 15 deployed
+- Shell: `gx-skin.css` speech bubble is a 9-slice (`22 62 34 30 fill`), `gx-campaign.css` scene/boss/result/sheet never scroll sideways, `?scn=story-scene` registered in `gx-campaign.js`. All painted buttons use `30 42 fill/14px Npx` (vertical caps, were `0 42` = stretched on tall buttons). Short Fuse nameplate/rack, Thornbound sheet head, Doorkick dock frame, Crown `#choice` fixed in their skin/layout css.
+- `look-check.js` has two new checks (`panels`: scrollbar for decoration-only overflow, severe on x; `plates`: 9-slice/100% 100% distortion, >25% warn, >40% severe) and a `story-scene` screen. Calibrated: old final-approach build = 2 severe, fixed = 0.
+- LIVE: cauldron-fair only. The other 14 are built from fixed sources but NOT deployed: full sweeps here take 20-60 min and failed under CPU load (final-approach phone-check slow 926ms; thornbound 375x553 bulb finger 4px off mid-spring; short-fuse help bubble covers target; crown phone-check browser crash; doorkick 1/24 sweep game; kaiten sweep ran >1 h). Not yet checked whether they also fail on the old build. Next: `python3 games-src/scripts/build-all.py --deploy <slug>` one game at a time on an idle machine (Crown needs `GAME_MS=420000`), then `look-check.js --baseline --game <slug>`, add-update (`--scn story-scene`).
+- Known art issue (needs new art): Short Fuse `wire-tile-frame-c.webp` (100x240) is stretched onto 52x69 tiles. Sunglaze top bar content overflows 69 px at 1366 wide (hidden scrollbar, buttons cut).
+
 ## START HERE — orchestrator hand-off (13 Oct 2026, 21:00 UTC)
 Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BRIEF-TEMPLATE.md` into every new worker brief.
 - **Deploy gate (owner, 13 Oct):** `build-all.py --deploy <slug>` = phone-check + scenarios + look check + QUICK sweep. Full sweep only `--full` (engine/rules changes).
@@ -11,12 +18,13 @@ Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BR
 - **Owner pages:** `status.html` (versions, missing, not wired), `look/index.html` (look check), `next-wave.html` (to-make list, Waves 7-9, 3D A-E; laptop prompt files in `games-src/next-wave/`), asset viewer Games tab, `lab.html` (coming).
 - **Cloud workers still running (check with get_session, model sonnet):**
   - `session_01VxGyhTM7mpMZhPEraRLygh` LAB menu + pinned in-game checklist with GO, all games (Doorkick first), `games/lab.html`.
-  - `session_01TKczxYncDcsdcj22o9Zg3W` shared skin: story bubble 9-slice + no sideways scrollbars, deploying game by game.
-  - `session_01Xv41avdLg3J35CCnreRR8M` faster checks + scenarios (was fixing 4/24 Doorkick sweep failures).
+  - ARCHIVED 21:29 (over time/context, owner rule): shared-skin bubble worker (shell fix pushed, only Cauldron live — the other games get it when the wiring workers redeploy them), faster-checks worker, old wiring batch A (overlapped the new wiring workers).
   - `session_01XvM88e6mByticHEdTcS4tq` Nightrun phone HUD: playfield ≥80% visible, power-ups as chips not banners (owner: "impossible to see on phone").
+  - Wiring finish (13 Oct 21:28, 588/715 paintings + 47/59 models wired at start): `session_01USGHUaR7VayPywWkrGfMYc` Hollowbough+Rampart, `session_011XN3XWkxaDaz6hzkMhEdyv` Sands+Doorkick (+dk-tips, dk-status-line), `session_01FScDuF5uCNZdJFfDeUqTNh` Nebula+Lantern+Shipwreck, `session_018PZdut3kYbVEVaUDTUwQxr` Crown+Tidewake+Cauldron+Sunglaze, `session_01VZTUufsMh4x1FxGCz95a9S` Thornbound+Kaiten+Final Approach+Short Fuse. When all report: run wiring-status.py, check the asset viewer, report before→after.
   - `session_0173P8APho8S4jxLQSJj26oe` Nightrun K2: stages + map, difficulty curve, strategic shop/garage/market.
   - In this session's checkout a look fixer was deploying Crown, Sands, Tidewake, Thornbound, Cauldron (label sizes, tap targets, Got it button); check `git log` for "Look fixes" and finish any not live.
 - **Open items:** Nightrun quick sweep failed on rhythm/difficulty/story-lock/tune items after the boss deploy (likely K2's in-progress work; K2's deploy must clear them). Nightrun needs LAB/scenarios adopted after K2 (note above). Owner may want the Overdrive car-damage request handled by the Overdrive session (session_017iH3DB4VyxwKSdMwsco4Ut).
+- **Watchdog:** routine `trig_01SnC3sNN1s8bCYNsQCoo8u1` runs hourly at :38 in a fresh **Haiku** session (not in any orchestrator): sends wrap-ups (commit, push, HANDOFF, deploy what passed), archives 20 min later, starts one replacement; log under "## Watchdog log" at the end of this file.
 - **Owner is frustrated by slowness:** target ≤ 15 min per game from start to live; report real times. Hand off this orchestrator at ~150k context.
 
 ## Checks: two speeds + scenarios (13 Oct 2026) — read `PLAYBOOK.md` "Iterate fast, check once"

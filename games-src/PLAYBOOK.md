@@ -30,7 +30,7 @@ Every change, however small, ships as: **code + scenario + checklist item**, in 
    `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
 2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
    sweep while iterating.
-3. **`--deploy` as soon as the scenarios pass** (quick sweep; `--full` only for engine/rules changes). Small batches: 1-3 games per worker, deploy each
+3. **`--deploy` as soon as the scenarios pass** (no sweep; `--full` only for engine/rules changes). Small batches: 1-3 games per worker, deploy each
    game as soon as it passes; never hold finished games back for the rest of a batch.
 4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
    gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
@@ -99,7 +99,7 @@ Versions and what is missing: `python3 games-src/scripts/game-status.py` writes 
    No AI testers for bugs.
 
 ## Efficiency rules (from CLAUDE.md)
-- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` (quick sweep; `--full` only for engine/rules changes). After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
+- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` (no sweep; `--full` only for engine/rules changes). After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
 - One worker per game, a tiny brief that names the files; reports under 150 words; at most 2 subagents at once.
 - Always set the model: orchestrator on main, workers on Sonnet, plain copying/downloads on Haiku. No new cloud sessions.
 - Scripts do the checking (build-all, phone-check, sweep); AI testers only for new-game blind tests, never for bugs.

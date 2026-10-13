@@ -20,3 +20,23 @@ html.sk-stop #acts .btn.stopb{position:relative}
 html.sk-stop #acts .btn.stopb::before{content:'';position:absolute;left:-12px;top:50%;width:54px;height:54px;transform:translateY(-50%);background:url(media/btn-stop-c.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk-boom .mcells .mboom svg{display:none}
 html.sk-boom .mcells .mboom::after{content:'';display:block;width:30px;height:30px;background:url(media/icon-boom-c.webp) center/contain no-repeat}
+
+/* Draw button: the painted clay bag dish replaces the flat bag picture (the 3D bag still shakes on a pull) */
+html.sk-draw .bagwrap{background:url(media/btn-draw-c.webp) center/contain no-repeat}
+html.sk-draw .bagwrap .bagimg{opacity:0}
+/* white-chip meter with 7 spaces: the carved seven-pocket track behind the cells (cells become round chips in the pockets) */
+html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2)){aspect-ratio:8/1;background:url(media/ui-chipbar.webp) center/100% 100% no-repeat;padding:0 3.4%;gap:0}
+html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2))>i{height:auto;align-self:center;aspect-ratio:1;margin:0 1.5%;border-radius:50%;background:transparent;box-shadow:none;max-height:100%}
+html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on{background:#7fd65a;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
+html.sk-chipbar .meter.mid .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on{background:#f2b81e}
+html.sk-chipbar .meter.hi .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on,html.sk-chipbar .meter.over .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on{background:#ff5a3c}
+html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2))>.mboom{position:absolute;right:-6px;top:-12px}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* settings rows: the painted parchment strip behind each row (overlay, no size change) */
+html.sk-row .mrow{position:relative;isolation:isolate}
+html.sk-row .mrow::before{content:'';position:absolute;inset:-4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}

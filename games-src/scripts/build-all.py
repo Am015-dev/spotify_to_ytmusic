@@ -100,7 +100,7 @@ def main():
     ap.add_argument("--no-check", action="store_true", help="skip every check (build + stamp only)")
     ap.add_argument("--quick", action="store_true", help="iterate: phone-check + scenario tests + QUICK sweep (4 games, 1 rotation)")
     ap.add_argument("--no-sweep", action="store_true", help="with --deploy: skip the sweep (say why in the commit)")
-    ap.add_argument("--full", action="store_true", help="with --deploy: run the full sweep (only for engine/rules changes or the nightly run; owner, 13 Oct 2026)")
+    ap.add_argument("--full", action="store_true", help="run the game sweeps (they play whole games): only for engine/rules changes. Without it no sweep runs (owner, 13 Oct 2026)")
     ap.add_argument("--no-look", action="store_true", help="skip the look check gate (new severe visual findings block --deploy)")
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args()
@@ -176,7 +176,11 @@ def main():
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
         if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
-            if passing:
+            if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
+                try:
+                    subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + passing, env=env, capture_output=True, text=True, timeout=300)
+                    subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+                except Exception as e: print("lab-index (pre-test) skipped:", e)
                 code, tail = timed("all" if len(passing) > 1 else passing[0], "lab-test", lambda: run_check(["node", str(SCRIPTS / "lab-test.js")] + passing, str(SCRIPTS), env3, out / ".check" / "lab-test.log", 1800))
                 txt = (out / ".check" / "lab-test.log").read_text()
                 for s in passing:
@@ -184,9 +188,10 @@ def main():
                     if not m: status[s], why[s] = "FAIL", "lab-test did not report"
                     elif m.group(1) != "ok": status[s], why[s] = "FAIL", "lab-test: " + m.group(2)[:140]
                     else: print(f"[lab] {s:18} ok {m.group(2)[:40]}")
-        # 3c. the game's own sweeps: QUICK=1 (4 games) for --quick and --deploy; the full default only with --deploy --full.
-        # Owner, 13 Oct 2026: fast tests + checklist scenarios, no hour-long sweeps per deploy (Overdrive-style).
-        if (a.quick or a.deploy) and not (a.deploy and a.no_sweep):
+        # 3c. the game's own sweeps (they play whole games).
+        # Owner, 13 Oct 2026: "don't play the game". Sweeps play whole games, so they run ONLY with --full (engine/rules changes).
+        # --quick and --deploy = phone-check + ?scn= GO scenarios + look check, no game playing.
+        if a.full:
             for s in [x for x in ok if status[x] == "PASS"]:
                 d, scripts = SWEEPS[s]
                 full = a.deploy and a.full

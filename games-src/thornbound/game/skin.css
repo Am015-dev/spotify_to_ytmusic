@@ -32,3 +32,9 @@ html.sk .gx-drawer .gl,html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{text-de
 html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{color:#7c1b2c}
 html.sk .btn:has(>small),html.sk .btn:has(>b){flex-direction:column;gap:0}
 html.sk .gx-drawer{border-width:0}
+/* wide tap-rows (Tutorial) sit on the painted strip; border widths unchanged, only the paint changes */
+html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 5px stretch;text-align:center;color:var(--sk-ink);text-shadow:none}
+html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
+/* speech badge on the coach bubble, vellum sheet behind the detail popup */
+html.sk .gxh-bub::before{content:'';position:absolute;left:-9px;top:-11px;width:26px;height:20px;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;pointer-events:none}
+html.sk .ppop:not([hidden]){background:#e9d7a8 url(media/ui-sheet-c.webp) center/100% 100% no-repeat;border-top:0}

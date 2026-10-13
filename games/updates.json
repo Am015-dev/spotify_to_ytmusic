@@ -1,18 +1,246 @@
 [
  {
   "date": "2026-10-13",
-  "game": "shelf",
-  "title": "Test mode and LAB in every game",
+  "game": "final-approach",
+  "title": "Painted art wired",
   "items": [
-   "Every game card and the player bar show a version chip, like v47 and the date",
-   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
-   "Asset viewer has a new Games tab with the same numbers",
-   "Shelf: turn on 🧪 Test mode next to ✔ Test",
-   "In a game: 🧪 LAB lists its scenarios, ▶ GO opens one",
-   "📍 pinned checklist: GO, ✅ Works / ❌ Problem",
-   "lab.html: every game, every scenario, one page"
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane",
+   "Top bar, menus and buttons are now painted cockpit panels",
+   "Briefing is a real clipboard with painted check boxes",
+   "Weather and time-of-day badges on the briefing",
+   "Radio phrase buttons and the Roll plate are painted",
+   "Menu learn row and speech tail are painted"
   ],
-  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario"
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   "fa-board",
+   "fa-board",
+   "fa-buttons",
+   "fa-zoom",
+   "fa-zoom",
+   "fa-buttons",
+   "fa-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Painted art wired",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit",
+   "Menu tutorial row and speech tail are painted"
+  ],
+  "check": "Open Settings: Tutorial is a painted strip",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-buttons",
+   "sf-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Painted art wired",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "kk-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shipwreck-isle",
+  "title": "Painted art wired",
+  "items": [
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm"
+  ],
+  "check": "Do the camp icons and 3D camp look painted?",
+  "scn": [
+   "si-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "nebula-aces",
+  "title": "Painted art wired",
+  "items": [
+   "Every hull shows its own painted ship; radio strip on a painted plate"
+  ],
+  "check": "Does each ship card show its picture?",
+  "scn": [
+   "nb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick-dungeon",
+  "title": "Short status line",
+  "items": [
+   "Hand and level icons, speech-bubble tail, 3D winner hero",
+   "Lightbulb, first-time tips, rules cards, Tips switch",
+   "Drag/tap status line is 8 words or fewer"
+  ],
+  "check": "Is the line short and does it match?",
+  "scn": [
+   "dk-art",
+   "dk-tips",
+   "dk-status-line"
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "lantern-dive",
+  "title": "Painted art wired",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit",
+   "Painted card frames, tick/cross, seat plates, portrait Descent table"
+  ],
+  "check": "Do cards, seats and job marks look painted?",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "ld-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Painted art wired",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger",
+   "Menu tutorial row, speech badge and detail sheet are painted"
+  ],
+  "check": "Open Menu: Tutorial sits on the painted strip",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
+   null,
+   "tb-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "hollowbough",
+  "title": "Painted art wired",
+  "items": [
+   "Painted resource icons, season wheel and kit"
+  ],
+  "check": "Are the resource icons painted?",
+  "scn": [
+   "hb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "cauldron",
+  "title": "Readable chip numbers",
+  "items": [
+   "Story speech bubble keeps its frame and tail instead of being stretched",
+   "Painted buttons and panels keep their proportions",
+   "The numbers on the small chips under each cauldron are bigger"
+  ],
+  "check": "Draw a few chips and read the small numbers",
+  "scn": [
+   "story-scene",
+   "cf-board",
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -64,33 +292,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Readable map labels",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit",
-   "ROUND, region names and influence numbers on the map are bigger"
-  ],
-  "check": "Open a game: read ROUND and the region names on the map",
-  "scn": [
-   "tb-board",
-   "tb-rivals",
-   "tb-board",
-   "tb-buttons",
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "mainhattan-nightrun",
   "title": "Clear phone screen in runs",
   "items": [
@@ -133,61 +334,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: painted workshop kit",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big",
-   "Wire racks, name plates and equipment cards are painted",
-   "A rope fuse with a spark and a painted bomb",
-   "Top bar, menus and buttons use the workshop kit"
-  ],
-  "check": "Look at the table and the fuse strip",
-  "scn": [
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: painted chef tags and icons",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals",
-   "Each chef has a painted chopstick-sleeve name tag",
-   "Stars, plates, custard cups and Fire Paste are painted icons",
-   "Top bar, menus and buttons use the lacquer kit"
-  ],
-  "check": "Look under each chef on the table"
- },
- {
-  "date": "2026-10-13",
   "game": "sunglaze",
   "title": "Painted kilns and rack for Sunglaze",
   "items": [
@@ -205,61 +351,6 @@
    null
   ],
   "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "lantern-dive",
-  "title": "Lantern Dive: painted deep-sea table",
-  "items": [
-   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
-   "The Commander badge is now the lantern too",
-   "The trick table is a brass-rimmed painted pad",
-   "Oxygen tanks and boss hearts are painted",
-   "Buttons, top bar and menus use the brass kit"
-  ],
-  "check": "Start a dive and look at the table"
- },
- {
-  "date": "2026-10-13",
-  "game": "final-approach",
-  "title": "Painted cockpit kit",
-  "items": [
-   "The landing and the crash now show a detailed 3D airliner",
-   "Low graphics keeps the old painted plane",
-   "Top bar, menus and buttons are now painted cockpit panels",
-   "Briefing is a real clipboard with painted check boxes",
-   "Weather and time-of-day badges on the briefing",
-   "Radio phrase buttons and the Roll plate are painted"
-  ],
-  "check": "Open Flight and read the briefing; tap Roll",
-  "scn": [
-   "fa-board",
-   "fa-board",
-   "fa-buttons",
-   "fa-zoom",
-   "fa-zoom",
-   "fa-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
    null,
    null,
    null,
@@ -475,24 +566,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "cauldron",
-  "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
-  "items": [
-   "Story speech bubble keeps its frame and tail instead of being stretched",
-   "Painted buttons and panels keep their proportions"
-  ],
-  "check": "Open Story: speech bubble undistorted, no sideways scrollbar",
-  "scn": [
-   "story-scene",
-   "cf-board"
-  ],
-  "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "sands",
   "title": "Button text size",
   "items": [
@@ -524,24 +597,37 @@
   ]
  },
  {
-  "date": "2026-10-10",
-  "game": "sands-of-qamar",
-  "title": "Painted look for Sands of Qamar",
+  "date": "2026-10-13",
+  "game": "rampart-and-vine",
+  "title": "Painted art wired",
   "items": [
-   "New carved top bar and painted icon buttons",
-   "Parchment menus and dialogs with gilt corners",
-   "Painted story map with medallion chapters and act banners",
-   "The six tribes are now painted meeples on the board"
+   "Painted pieces, menu rows, bubble tail"
   ],
-  "check": "Open Story mode and scroll the map; tap a chapter",
+  "check": "Are the pieces painted and coloured?",
   "scn": [
-   "sq-board",
-   "sq-help",
-   "story-scene",
-   "sq-board",
-   null,
-   null,
-   null,
+   "rv-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Readable map labels",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger"
+  ],
+  "check": "Open a game: read ROUND and the region names on the map",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
    null
   ],
   "ask": [
@@ -549,11 +635,23 @@
    null,
    null,
    null,
-   null,
-   null,
-   null,
    null
   ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shelf",
+  "title": "Test mode and LAB in every game",
+  "items": [
+   "Every game card and the player bar show a version chip, like v47 and the date",
+   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
+   "Asset viewer has a new Games tab with the same numbers",
+   "Shelf: turn on 🧪 Test mode next to ✔ Test",
+   "In a game: 🧪 LAB lists its scenarios, ▶ GO opens one",
+   "📍 pinned checklist: GO, ✅ Works / ❌ Problem",
+   "lab.html: every game, every scenario, one page"
+  ],
+  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario"
  },
  {
   "date": "2026-10-10",
@@ -932,6 +1030,38 @@
    null
   ],
   "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-10",
+  "game": "sands-of-qamar",
+  "title": "Painted look for Sands of Qamar",
+  "items": [
+   "New carved top bar and painted icon buttons",
+   "Parchment menus and dialogs with gilt corners",
+   "Painted story map with medallion chapters and act banners",
+   "The six tribes are now painted meeples on the board"
+  ],
+  "check": "Open Story mode and scroll the map; tap a chapter",
+  "scn": [
+   "sq-board",
+   "sq-help",
+   "story-scene",
+   "sq-board",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
    null,
    null,
    null,

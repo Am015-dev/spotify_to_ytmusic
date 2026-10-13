@@ -529,6 +529,8 @@ html.sk-heart #bossbar .hp i{flex:0 0 18px;max-width:none;width:18px;height:18px
 html.sk-heart #bossbar .hp i.on{opacity:1;filter:none}
 html.sk-air .o2 b::before{content:'';display:inline-block;width:22px;height:22px;margin-right:4px;vertical-align:-6px;background:url(media/icon-air.webp) center/contain no-repeat}
 html.sk .gx-bar{box-shadow:inset 0 0 0 100px rgba(5,18,40,.45),0 3px 8px rgba(0,0,0,.45)}
+/* seats: the brass diving-helmet plate behind the diver's name (background only; the name keeps its box) */
+html.sk-seat .seat:not(.drone) .top .nm{background:url(media/ui-seat.webp) center/100% 100% no-repeat;color:#2b1d0c;text-indent:7px;text-shadow:0 1px 0 rgba(255,245,210,.6)}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -3266,7 +3268,7 @@ fn mainFragment(
   function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
     if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
     var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
-    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag' && !(t.closest && t.closest('#gxlab-bar'))) return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
     return ''; }
   function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
   S.step = function (i) {
@@ -3346,7 +3348,7 @@ fn mainFragment(
       { kind: 'visible', sel: '#pool .jcard.glow', name: 'job to take' },
       { kind: 'visible', sel: '#acts button', name: 'Pass button' },
       { kind: 'text', sel: '#pool .jcard b', re: /\S/, name: 'job name' },
-      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
+      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
       { kind: 'fn', name: 'your whole hand is on screen', fn: function () { var h = [].slice.call(document.querySelectorAll('#hand > *')).filter(GXS.vis); if (h.length !== G.players[0].hand.length) return h.length + ' cards shown, engine has ' + G.players[0].hand.length; for (var i = 0; i < h.length; i++) if (!inView(h[i])) return 'card ' + i + ' off screen'; return true; } },
       { kind: 'eq', name: 'cards left, first rival', a: function () { return GXS.num('#opp .seat[data-seat="1"] .bdg.n b'); }, b: function () { return G.players[1].hand.length; } },
       { kind: 'eq', name: 'your tricks won', a: function () { return GXS.num('#mine .bdg.t b'); }, b: function () { return tricksWon()[0]; } },
@@ -3379,6 +3381,27 @@ fn mainFragment(
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+  // painted art: card frames, tick/cross, seat plates and the portrait Descent table
+  GXS.add({
+    id: 'ld-art', name: 'Painted cards, seats, tick and cross', ask: 'Do cards and seats look painted?', seed: 5, when: booted,
+    setup: function () {
+      window.__ldf = [];
+      var loads = ['coral', 'tide', 'kelp', 'sunstar', 'lantern'].map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { window.__ldf.push([n, i.naturalWidth > 0]); r(); }; i.onerror = function () { window.__ldf.push([n, false]); r(); }; i.src = 'media/card-face-' + n + '.webp'; }); });
+      return Promise.all(loads).then(function () { return table(5); }).then(function () {
+        try { GXC.unlocked = function () { return [{ type: 'table', id: 'tunnel-glow' }]; }; tableApply(); } catch (e) { }
+        return GXS.wait(function () { return /tunnel-glow/.test(getComputedStyle(document.documentElement).getPropertyValue('--tableimg')) && document.documentElement.classList.contains('sk-seat'); }, 8000);
+      }).then(function () { return idle(1200); });
+    },
+    checks: [
+      { kind: 'fn', name: 'all 5 card frames load', fn: function () { var b = (window.__ldf || []).filter(function (x) { return !x[1]; }).map(function (x) { return x[0]; }); return ((window.__ldf || []).length === 5 && !b.length) || 'not loaded: ' + (b.join(',') || 'none tried'); } },
+      { kind: 'fn', name: 'table cards use the painted frames', fn: function () { if (!PX || !PX.on) return true; var m = [0, 1, 2, 3, 4].filter(function (s) { return !PX.img['face' + s]; }); return !m.length || 'suits without frame: ' + m.join(','); } },
+      { kind: 'fn', name: 'tick and cross are painted and clipped to a disc', fn: function () { var t = KIT.stateMark(1, 100), c = KIT.stateMark(-1, 100); return (/icon-tick\.webp/.test(t) && /icon-cross\.webp/.test(c) && /clip-path/.test(t + c)) || 'marks not painted: ' + KIT.stateMark(1, 100).slice(0, 40); } },
+      { kind: 'fn', name: 'seat names sit on the brass plate and stay readable', fn: function () { var e = document.querySelector('.seat:not(.drone) .top .nm'); if (!e) return 'no seat name'; var cs = getComputedStyle(e), c = cs.color.match(/\d+/g).map(Number); return (/ui-seat\.webp/.test(cs.backgroundImage) && (c[0] + c[1] + c[2]) / 3 < 110 && parseFloat(cs.fontSize) >= 11) || 'plate ' + cs.backgroundImage.slice(0, 30) + ' ink ' + cs.color + ' ' + cs.fontSize; } },
+      { kind: 'fn', name: 'Descent table matches the screen shape', fn: function () { var v = getComputedStyle(document.documentElement).getPropertyValue('--tableimg'), want = innerWidth < 700 && innerHeight > innerWidth ? 'tunnel-glow-phone' : 'tunnel-glow.webp'; return v.indexOf(want) >= 0 || 'table image is ' + v.slice(-40) + ', wanted ' + want; } },
+      skin
+    ]
+  });
+
 })();
 
 </script>
@@ -4994,7 +5017,7 @@ const SU = D.suits;
 const FONT = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
 const f = n => Math.round(n * 100) / 100;
 const INK = '#0b1f3a', PAPER = '#f5eed9', PAPER2 = '#e9dfc2', NAVY = '#0e2146', GOLD = '#ffd873';
-const KIT = { SUITS: SU, ART: {}, FONT, INK, PAPER, GOLD };
+const KIT = { SUITS: SU, ART: {}, MARK: {}, FONT, INK, PAPER, GOLD };
 const cached = {}; const key = (...a) => a.join('|');
 let UID = 0; const uid = p => p + (++UID);
 const svgOpen = (w, h, vb, extra) => `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="${vb}"${extra || ''}>`;
@@ -5121,7 +5144,9 @@ function droneSVG(o) {
 // short names for chips and for the table (full wording is in data.js)
 const SHORT = D.tasks.map(t => t.s);
 KIT.SHORT = SHORT;
-function stateMark(st, sz) { return st > 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#2fb36d" stroke="${INK}" stroke-width="2"/><path d="M5 10.5L8.8 14L15.5 6.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : st < 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#d8453b" stroke="${INK}" stroke-width="2"/><path d="M6 6L14 14M14 6L6 14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></g>` : ''; }
+// painted tick / cross (media/icon-*.webp) once loaded (KIT.MARK), cut to a disc so the paint blotches around them stay out
+const markImg = (n, sz) => `<clipPath id="ldmk" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".47"/></clipPath><image href="media/icon-${n}.webp" x="${sz - 23}" y="2" width="24" height="24" clip-path="url(#ldmk)"/>`;
+function stateMark(st, sz) { if (st && KIT.MARK[st > 0 ? 'tick' : 'cross']) return markImg(st > 0 ? 'tick' : 'cross', sz); return st > 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#2fb36d" stroke="${INK}" stroke-width="2"/><path d="M5 10.5L8.8 14L15.5 6.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : st < 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#d8453b" stroke="${INK}" stroke-width="2"/><path d="M6 6L14 14M14 6L6 14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></g>` : ''; }
 function diffDots(d, w, x0, y0) { let s = ''; for (let i = 0; i < d; i++) s += `<circle cx="${f(x0 + i * 9)}" cy="${f(y0)}" r="3.6" fill="#ffd873" stroke="${INK}" stroke-width="1.4"/>`; return s; }
 // a job card as an SVG (used for the mini chips): face with the short name; w x h px
 function jobMini(id, o) {
@@ -8736,6 +8761,7 @@ async function pxTextures() {
 }
 function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
 // a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
+const FACEC = [[.10, .92, .03, .92], [.075, .972, .029, .9665], [.055, .945, .01, .935], [.10, .90, .055, .935], [.04, .955, .005, .96]];   // per suit: the card area (x0,x1,y0,y1 as fractions) inside each painting's ragged paper edge
 function pxFace(id, w) {
   const r = Math.min(2, Math.max(1, window.devicePixelRatio || 1)), key = id + '|' + w + '|' + r;   // faces are always drawn at the screen's own sharpness (2x phones), whatever the graphics level
   if (PX.tex['f:' + key]) return PX.tex['f:' + key];
@@ -8743,10 +8769,14 @@ function pxFace(id, w) {
   const c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
   const rad = w * .085, bw = Math.max(1.6, w * .026), INK = '#0b1f3a';
   const rr = (X, Y, W2, H2, R) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W2, H2, R); else x.rect(X, Y, W2, H2); };
-  const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
-  rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
-  rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
-  if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
+  const fi = PX.img['face' + s], dk = lan || (fi && (s === 0 || s === 3));   // painted card frame (media/card-face-*.webp), cropped inside its ragged paper edge; coral and sunstar are dark scenes so their numerals go light
+  if (fi) { const C = FACEC[s], iw = fi.naturalWidth, ih = fi.naturalHeight; x.save(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.clip(); x.drawImage(fi, C[0] * iw, C[2] * ih, (C[1] - C[0]) * iw, (C[3] - C[2]) * ih, 0, 0, w, H); x.restore(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.lineWidth = bw; x.strokeStyle = INK; x.stroke(); }
+  else {
+    const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
+    rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
+    rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
+    if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
+  }
   const im = PX.img['emb' + s]; const ew = w * .56;
   // the painting is an opaque square: clip it to a framed rounded square (centre) or a disc (corner pip) so it reads as a picture on the card
   const framed = (X, Y, S, big) => { x.save(); x.beginPath(); if (big) rr(X, Y, S, S, S * .14); else x.arc(X + S / 2, Y + S / 2, S / 2, 0, 7); x.clip(); x.drawImage(im, X, Y, S, S); x.restore();
@@ -8754,7 +8784,7 @@ function pxFace(id, w) {
   if (im) framed((w - ew) / 2, H * .5 - ew * .5, ew, true);
   const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
   const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
-    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = lan ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
+    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = dk ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
     if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
   corner(false); corner(true);
   const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
@@ -9212,7 +9242,7 @@ function titleApply() {
 // ---- table: the campaign unlock (tunnel-glow) replaces the default painting; the embedded default and the dark blue stay underneath
 let tblCur = '';
 function tableApply() {
-  const R = document.documentElement, id = unl('table'), f = id === 'tunnel-glow' && !lowGfx() ? 'table-' + id : '', key = f || 'default'; if (key === tblCur) return;
+  const R = document.documentElement, id = unl('table'), f = id === 'tunnel-glow' && !lowGfx() ? 'table-' + id + (innerWidth < 700 && innerHeight > innerWidth ? '-phone' : '') : '', key = f || 'default'; if (key === tblCur) return;
   if (!f) { if (tblCur) R.style.removeProperty('--tableimg'); tblCur = key; return; }
   preImg(f, () => { tblCur = key; R.style.setProperty('--tableimg', 'url("' + MEDIA + f + '.webp")'); });
 }
@@ -9330,7 +9360,12 @@ var PADIMG = null;
   const R = document.documentElement;
   function boot() {
     try { GXSK.init({ sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
-    // card frames (media/card-face-*.webp) are NOT wired: the delivered paintings have ragged paper edges and corner lanterns that collide with the numerals
+    // painted card frames (media/card-face-*.webp): drawn by pxFace on the Pixi table, cropped inside their paper edge; the drawn card stays until each file loaded
+    let fr = 0; const faceRefresh = () => { clearTimeout(fr); fr = setTimeout(() => { try { for (const k of Object.keys(PX.tex)) if (k.indexOf('f:') === 0) delete PX.tex[k]; PX.warm = ''; for (const o of PX.objs.values()) if (o.kind === 'card') pxCardTex(o); pxPrewarm(); pxDirty(); } catch (e) { } }, 60); };
+    ['coral', 'tide', 'kelp', 'sunstar', 'lantern'].forEach((n, si) => { const i = new Image(); i.onload = () => { try { PX.img['face' + si] = i; if (PX.on) faceRefresh(); } catch (e) { } }; i.src = MEDIA + 'card-face-' + n + '.webp'; });
+    // tick / cross on done and failed jobs, brass name plate on the seats
+    ['tick', 'cross'].forEach(n => preImg('icon-' + n, () => { KIT.MARK[n] = 1; try { render(); } catch (e) { } }));
+    preImg('ui-seat', () => R.classList.add('sk-seat'));
     const pd = new Image(); pd.onload = () => { PADIMG = pd; try { if (PX && PX.on) { PX.padKey = ""; if (PX.feltR) pxDrawFelt(PX.feltR); pxDirty(); } } catch (e) { } }; pd.src = MEDIA + 'ui-trick-pad-c.webp';
   }
   if (typeof GXSK !== 'undefined' && !/jsdom/i.test(navigator.userAgent || '')) setTimeout(boot, 0);

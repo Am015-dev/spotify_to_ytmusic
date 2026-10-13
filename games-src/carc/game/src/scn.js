@@ -77,4 +77,18 @@
     ]
   });
 
+
+  // painted art wired: every piece colour + the row and bubble-tail plates load; followers show in their seat colour, not stretched
+  var ART = ['piece-meeple', 'piece-champ', 'piece-mason', 'piece-hog'].reduce(function (a, n) { return a.concat(['red', 'blue', 'yellow', 'green'].map(function (c) { return n + '-' + c; })); }, ['ui-row', 'ui-bubble-tail']);
+  GXS.add({
+    id: 'rv-art', name: 'Painted pieces, rows and bubble tail', ask: 'Are the pieces painted and coloured?', seed: 11, when: booted, group: 'UI',
+    setup: function () { return table(11).then(function () { var d = document.createElement('div'); d.id = 'rvprobe'; d.style.cssText = 'position:fixed;left:-300px;top:0'; d.innerHTML = '<div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div><div class="menu"><button>x</button></div>'; document.body.appendChild(d); return Promise.all(ART.map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 ? '' : n); }; i.onerror = function () { r(n); }; i.src = 'media/' + n + '.webp'; }); })); }).then(function (a) { window.__artBad = a.filter(Boolean); }); },
+    checks: [
+      { kind: 'fn', name: 'all 18 painted files load', fn: function () { return !window.__artBad.length || 'did not load: ' + window.__artBad.join(', '); } },
+      { kind: 'fn', name: 'menu rows are painted', fn: function () { return /ui-row/.test(getComputedStyle(document.querySelector('#rvprobe .menu button')).backgroundImage) || 'menu row not painted'; } },
+      { kind: 'fn', name: 'coach bubble tail is painted', fn: function () { return /ui-bubble-tail/.test(getComputedStyle(document.querySelector('#rvprobe .gxh-arr')).backgroundImage) || 'tail not painted'; } },
+      { kind: 'fn', name: 'painted followers loaded, not stretched', fn: function () { var bad = '', n = 0; [].forEach.call(document.querySelectorAll('img[src*="piece-"]'), function (e) { if (!GXS.vis(e)) return; n++; if (!e.naturalWidth) bad = bad || e.src; var r = e.getBoundingClientRect(); if (e.naturalWidth && r.width > 4 && getComputedStyle(e).objectFit === 'fill' && Math.abs(r.width / r.height - e.naturalWidth / e.naturalHeight) > 0.2) bad = bad || 'stretched ' + e.src; }); return (!bad && n > 0) || bad || 'no painted follower on the board'; } }
+    ]
+  });
+
 })();
