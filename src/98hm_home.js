@@ -1,4 +1,4 @@
-// ===== HM (home-1, v90k). Alex 2026-10-13: "the nitro/boost should be on sports cars only and not all cars unless you modify the car in home.
+// ===== HM (home-1, version set at integration). Alex 2026-10-13: "the nitro/boost should be on sports cars only and not all cars unless you modify the car in home.
 // I think we should have a save point Home with a garage to store cars".
 // HOME = the city garage of each city (Werkstatt Konstablerwache / Garaz Psyrri), its 🔧 beacon becomes 🏠 HOME (pinned on the minimap edge).
 //  - driving in (the beacon stop) = SAVE POINT: position + stats saved at once, "💾 SAVED" toast. The card then opens the usual garage (RIDES).

@@ -1,4 +1,4 @@
-# HANDOFF: home-1 → next worker (v90k Home + nitro gating), 2026-10-13
+# HANDOFF: home-1 → next worker (Home + nitro gating; version set by build-11), 2026-10-13
 
 Branch `alex/od-home` (from alex/od-models, live v90i). Draft PR #93. Alex's ask: "the nitro/boost should be on sports cars only and not all cars
 unless you modify the car in home. I think we should have a save point Home with a garage to store cars".
@@ -77,3 +77,5 @@ Branch rebased on alex/od-models v90j (2ca7c8f); `git diff origin/alex/od-models
    The same 3 FAILs on v90j without Home: fra GPU-buffer trend 3.87 (3.83), ath heap 165 MB (161), ath walls > 1/min. Pre-existing, not from Home.
 7. OD_CHANGELOG v90k entry + 4 OD_CHECKLIST items (home-save, home-cars, nitro-gate, nitro-kit).
 Integrator: build-11 (session_01FYerWDe4eDfpw7Jfrm9mtb).
+Version label: NOT v90k (that is build-11's builder + STUNT CUP). The changelog entry and the 4 checklist items carry the placeholder 'vHOME'; build-11 sets the real
+number at integration (after v90l). Status 2026-10-13 ~15:50: REVIEW sent for 861a5ce9 (label fix on top). Coordinator OK'd the grid. Next: on PASS, hand to build-11, then stop.

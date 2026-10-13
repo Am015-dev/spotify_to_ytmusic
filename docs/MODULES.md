@@ -86,7 +86,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ba | `98ba_build_anim.js` | 5 | BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built"). When a ride first shows in the |
 | 98gf | `98gf_garage_floor.js` | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
 | 98gz | `98gz_garage_zoom.js` | 7 | GZ (garage zoom + pick, Alex 2026-10-13: "include a zoom in/out and more builder functionalities for garage"). 1) ZOOM in every garage mode (RIDES / BUILD / PAI |
-| 98hm | `98hm_home.js` | 11 | HM (v90k): 🏠 HOME = the city garage of each city (save point + "Saved" toast, up to 4 stored cars parked by the door, pause-menu fast travel, minimap pin); BOOS |
+| 98hm | `98hm_home.js` | 11 | HM (Home): 🏠 HOME = the city garage of each city (save point + "Saved" toast, up to 4 stored cars parked by the door, pause-menu fast travel, minimap pin); BOOS |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
