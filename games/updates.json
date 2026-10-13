@@ -1,6 +1,25 @@
 [
  {
   "date": "2026-10-13",
+  "game": "crown",
+  "title": "Play it on the board",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons.",
+   "Tap SMASH! over the city to use your dice",
+   "Cards for sale are painted cards on the board: hold to read, tap to buy",
+   "Your power cards sit along the top of the board",
+   "Stay or yield opens in the middle of the board",
+   "The side panel is smaller: just status and advice"
+  ],
+  "check": "Roll, keep a die, tap SMASH!, then hold a card and tap it to buy"
+ },
+ {
+  "date": "2026-10-13",
   "game": "shipwreck",
   "title": "Painted island and kit for Shipwreck Isle",
   "items": [
@@ -47,20 +66,6 @@
    "Radio phrase buttons and the Roll plate are painted"
   ],
   "check": "Open Flight and read the briefing; tap Roll"
- },
- {
-  "date": "2026-10-13",
-  "game": "crown",
-  "title": "Every power card now has its own painting",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out",
-   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
-   "Hearts, energy and stars fly to the chips as painted icons."
-  ],
-  "check": "Open the Cards shop: each card has a picture, a dark name plate and readable text."
  },
  {
   "date": "2026-10-13",

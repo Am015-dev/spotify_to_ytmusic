@@ -129,6 +129,7 @@ async function full(b, tag, w, h, { touch = true, qs = '?phone=1', shots = null,
   if (ONLY.includes('b')) await full(b, 'b:375x553', 375, 553);
   if (ONLY.includes('c')) { // rotate: portrait -> landscape at the shop, back to portrait at the sweep, landscape again at the yield
     const rot = async (p, s, w, h, tag) => { await p.setViewportSize({ width: w, height: h }); await sleep(900);
+      if (E.DBG) { await p.screenshot({ path: path.join(SHOTS, 'rot-' + s.id + '-' + w + '.png') }); console.log(JSON.stringify(await p.evaluate(() => { const r = e => { const b = document.querySelector(e); if (!b) return null; const x = b.getBoundingClientRect(); return [x.left, x.top, x.width, x.height].map(Math.round).join(',') }; return { ob: r('#ob'), bd: r('[data-board]'), shop: r('#pshop'), c0: r('#pshop .obc'), ch: r('#obmid #choice'), app: r('.gx-app'), vh: innerHeight, sy: [document.scrollingElement.scrollTop, document.querySelector('.gx-board').scrollTop, document.getElementById('ob').scrollTop] } }))) }
       const s2 = await shown(p, s.id); if (!s2) { fail('c:rotate', s.id + ': step not showing after rotating to ' + w + 'x' + h); return null }
       await checkShown(p, 'c:rotate ' + w + 'x' + h, s2); return s2 };
     await full(b, 'c:rotate', 390, 763, { mid: async (p, s) => { if (s.id === 'buy') return rot(p, s, 844, 390); if (s.id === 'sweep') return rot(p, s, 390, 763); if (s.id === 'yield') return rot(p, s, 844, 390); } });

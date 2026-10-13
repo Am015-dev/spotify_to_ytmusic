@@ -1,0 +1,116 @@
+/* ===== Play on the board (see onboard.js): dice, Roll, SMASH!, End turn, painted cards for sale, your cards, questions ===== */
+#ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:min(60px,calc((var(--obw,360px) - 44px)/6.3))}
+#ob button,#ob .die,#ob #choice{pointer-events:auto}
+#ob #obown,#ob #obmid,#ob #obtoast,#ob #obcard{position:absolute}
+#ob #obact,#ob #pacts{position:static!important}
+#ob #obact{width:100%;display:flex;justify-content:center}
+#ob #pacts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:0;padding:0;border:0;background:none;box-shadow:none;width:100%}
+#ob #pacts>.btn{min-height:54px;margin:0;max-width:300px}
+#ob #pacts [data-act="reroll"]{min-width:150px;font-size:22px}
+#ob #pacts [data-act="hint"]{min-width:54px;width:54px;padding:0}
+#ob #pacts [data-act="end"]{min-width:210px;font-size:22px}
+#ob #pacts [data-act="sweep"]{min-width:64px}
+#ob #pacts .emotes{display:none}
+/* SMASH!: the real resolve button, hanging over Downtown */
+#ob #pacts [data-act="resolve"]{position:fixed;left:var(--cx,50%);top:var(--cy,40%);transform:translate(-50%,-50%);z-index:4;width:112px;height:112px;min-width:0;min-height:0;padding:0;border-radius:50%;border:4px solid #1a1320;
+  background:radial-gradient(circle at 36% 28%,#ffb35a 0%,#ff5a2c 55%,#c81d25 100%);color:#fff;display:grid;place-items:center;text-align:center;cursor:pointer;
+  box-shadow:0 0 0 4px #ffd23f,0 0 26px 8px rgba(255,120,40,.8),4px 6px 0 rgba(0,0,0,.5);animation:obGlow 1.5s ease-in-out infinite}
+#ob #pacts [data-act="resolve"] .bl{font:400 25px/.95 Bangers,Impact,sans-serif;letter-spacing:.05em;text-shadow:2px 2px 0 #1a1320;display:block;max-width:90px}
+#ob #pacts [data-act="resolve"] small{display:none}
+#ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out infinite;width:124px;height:124px}
+#ob #pacts [data-act="resolve"]:active{transform:translate(-50%,-50%) scale(.93)}
+@keyframes obGlow{0%,100%{box-shadow:0 0 0 4px #ffd23f,0 0 20px 5px rgba(255,120,40,.7),4px 6px 0 rgba(0,0,0,.5)}50%{box-shadow:0 0 0 6px #fff1a0,0 0 38px 14px rgba(255,150,40,.95),4px 6px 0 rgba(0,0,0,.5)}}
+/* dice */
+#ob #dicewrap{margin:0;width:100%;padding:0;border:0;background:none;box-shadow:none;border-radius:0}
+#ob #dicewrap.off{display:none}
+#ob #dice{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 7px;padding:12px 0 0;min-height:0;background:none;border:0}
+#ob #dice>span{display:none}
+#ob .die{width:var(--dw);height:var(--dw);min-width:0;min-height:0;border-radius:12px;transition:transform .14s ease-out}
+#ob .die svg{width:calc(var(--dw)*.66);height:calc(var(--dw)*.66)}
+#ob .die.kept{transform:translateY(-12px);box-shadow:0 0 0 3px #ffd23f,0 0 16px rgba(255,210,63,.9),3px 9px 0 var(--shadow,rgba(0,0,0,.4))}
+#ob #dice:has(.die.kept) .die:not(.kept):not([disabled]){opacity:.85;transform:scale(.95)}
+#ob .die:active:not([disabled]){transform:scale(.92)}
+#ob .die[disabled]{opacity:1;filter:saturate(.92)}
+#ob .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
+#ob .die.bfroll svg{animation:bfFace var(--land,.6s) steps(1,end) both;animation-delay:inherit}
+html.ph #ob .die.sugg{outline:none}
+#ob #rolls{display:none}
+#ob #preview{display:block;text-align:center;font-size:13px;line-height:1.25;max-width:560px;margin:6px auto 0;padding:4px 10px;border-radius:10px;background:rgba(26,19,32,.78);color:#fff;border:0}
+#ob #preview:empty{display:none}
+html.ph #ob #preview{display:none}
+#ob[data-bf="resolving"] #pshop,#ob[data-bf="resolving"] #pacts>*,#ob[data-bf="resolving"] #dicewrap{visibility:hidden}
+/* cards for sale: painted cards on the board */
+#ob #obmkt{width:100%;display:flex;justify-content:center}
+#ob #pshop{display:flex;gap:10px;justify-content:center;width:100%;margin:0;padding:0}
+#ob #pshop:empty{display:none}
+#ob .obc{--cw:min(158px,calc((var(--obw,360px) - 44px)/3));appearance:none;position:relative;width:var(--cw);min-height:0;flex:0 0 var(--cw);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding:5px 5px 8px;border:3px solid #1a1320;border-radius:12px;background:#fff6dc;color:#1a1320;cursor:pointer;
+  box-shadow:3px 4px 0 rgba(0,0,0,.45);transition:transform .15s,box-shadow .15s;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation;text-align:center;font:inherit}
+#ob .obc.K{background:#efe2ff}#ob .obc.D{background:#ffe6d6}#ob .obc.C{background:#dcefff}
+#ob .obc .oart{display:block;width:100%;aspect-ratio:360/220;border-radius:7px;overflow:hidden;background:#2a1f33}
+#ob .obc .oart img,#ob .obc .oart svg{display:block;width:100%;height:100%;object-fit:cover}
+#ob .obc .oart svg{padding:12%;box-sizing:border-box;object-fit:contain}
+#ob .obc b{font:400 15px/1.05 Bangers,Impact,sans-serif;letter-spacing:.03em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.1em;overflow-wrap:anywhere}
+#ob .obc .cost{position:absolute;left:-8px;top:-10px;z-index:2;width:34px;height:34px;display:block;flex:none;border-radius:50%;background:#1f9d5c;border:3px solid #1a1320;color:#fff;font:400 20px/28px Bangers,Impact,sans-serif;text-align:center}
+#ob .obc .star{position:absolute;right:4px;top:0;z-index:2;font-style:normal;font-size:16px;color:#ffd23f;text-shadow:1px 1px 0 #1a1320}
+#ob .obc.ok{box-shadow:0 0 0 3px #2fd47a,0 0 18px 5px rgba(47,212,122,.75),3px 4px 0 rgba(0,0,0,.45)}
+#ob .obc.no{opacity:.62;filter:saturate(.6)}
+#ob .obc.sel{transform:translateY(-12px) scale(1.04);box-shadow:0 0 0 4px #ffd23f,0 8px 16px rgba(0,0,0,.55)}
+#ob .obc.sugg:not(.sel){outline:3px solid #ffd23f;outline-offset:1px}
+#ob .obc .go{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);z-index:3;background:#1a1320;color:#ffd23f;font:400 17px/1 Bangers,Impact,sans-serif;letter-spacing:.06em;font-style:normal;padding:4px 10px;border-radius:7px;white-space:nowrap;animation:bmPulse2 .9s ease-in-out infinite}
+#ob .obc.shake{animation:bShake .4s}
+@media (hover:hover){#ob .obc.ok:hover{transform:translateY(-8px)}}
+/* your cards, along the top */
+#ob #obown{left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none;z-index:2}
+#ob #obown:empty{display:none}
+html.ph #ob #obown{top:48px}
+#ob .obo{appearance:none;position:relative;width:62px;aspect-ratio:360/220;padding:0;border:3px solid #1a1320;border-radius:8px;overflow:hidden;background:#2a1f33;cursor:pointer;box-shadow:2px 3px 0 rgba(0,0,0,.45);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#ob .obo.K{border-color:#8e5be0}#ob .obo.D{border-color:#e8702a}#ob .obo.C{border-color:#2f8fe0}
+#ob .obo img,#ob .obo svg{display:block;width:100%;height:100%;object-fit:cover}
+#ob .obo svg{padding:14%;box-sizing:border-box;object-fit:contain}
+#ob .obo i{display:none}
+/* hold to read */
+#ob #obcard{inset:0;display:none;place-items:center;background:rgba(15,8,25,.6);z-index:9;pointer-events:none}
+#ob #obcard.on{display:grid}
+#ob .obbig{position:relative;width:min(330px,88%);box-sizing:border-box;padding:10px 12px 14px;border:4px solid #1a1320;border-radius:16px;background:#fff6dc;color:#1a1320;box-shadow:0 10px 30px rgba(0,0,0,.6);text-align:center}
+#ob .obbig.K{background:#efe2ff}#ob .obbig.D{background:#ffe6d6}#ob .obbig.C{background:#dcefff}
+#ob .obbig .bart{border-radius:10px;overflow:hidden;aspect-ratio:360/220;background:#2a1f33}
+#ob .obbig .bart img,#ob .obbig .bart svg{display:block;width:100%;height:100%;object-fit:cover}
+#ob .obbig .bart svg{padding:12%;box-sizing:border-box;object-fit:contain}
+#ob .obbig h3{margin:8px 0 2px;font:400 26px/1 Bangers,Impact,sans-serif;letter-spacing:.04em}
+#ob .obbig p{margin:4px 0 0;font-size:15px;line-height:1.3}
+#ob .obbig .ty{margin:2px 0 0}
+#ob .obbig .ex{font-weight:800;color:#a3281d}
+#ob .obbig .cost{position:absolute;left:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#1f9d5c;border:3px solid #1a1320;color:#fff;font:400 27px/38px Bangers,Impact,sans-serif;text-align:center;display:block}
+/* a question (Stay or yield, ...) opens in the middle of the board */
+#ob #obmid{left:8px;right:8px;top:50%;transform:translateY(-50%);display:flex;justify-content:center;pointer-events:none;z-index:8}
+#ob #obmid #choice{position:relative;display:block;width:min(430px,100%);max-height:min(78%,560px);overflow:auto;margin:0;box-sizing:border-box;border:4px solid #1a1320;border-top-color:var(--red,#e0453a);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6);background:var(--card,#fff6dc);color:#1a1320;overscroll-behavior:contain;padding:10px 12px 12px}
+#ob #obmid #choice.hidden{display:none}
+#ob #obmid #choice .acts{display:grid;gap:8px}
+#ob #obmid #choice .btn{min-height:50px}
+/* feedback line (desktop; the phone has its own line) */
+#ob #obtoast{left:50%;top:10px;transform:translateX(-50%);max-width:calc(100% - 20px);padding:6px 14px;border-radius:999px;background:#ffd23f;color:#1a1320;border:2px solid #1a1320;font:900 15px/1.2 Nunito,sans-serif;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;z-index:7}
+#ob #obtoast.on{opacity:1}
+html.ph #bline{bottom:auto;top:8px}
+html.ph #ob #btip{position:static;left:auto;right:auto;bottom:auto;width:calc(100% - 8px);max-width:420px;box-sizing:border-box;padding:4px 10px}
+html.ph #ob #btip p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* landscape phone: the buttons stand in a column at the right edge */
+html.ph-l #ob{padding-right:166px;--dw:56px}
+html.ph-l #ob #dice{max-width:calc(3*var(--dw) + 16px);margin:0 auto;gap:8px}
+html.ph-l #ob #obact{position:absolute!important;right:8px;bottom:calc(10px + var(--sab,0px));width:auto}
+html.ph-l #ob #pacts{flex-direction:column;flex-wrap:nowrap;width:auto;align-items:stretch}
+html.ph-l #ob #pacts [data-act="end"],html.ph-l #ob #pacts [data-act="reroll"]{min-width:140px}
+html.ph-l #ob .obc{--cw:min(112px,calc((var(--obw,500px) - 186px)/3))}
+html.ph-l #ob #obown{right:166px}
+html.ph-l #ob #obmid{right:166px}
+/* the panel keeps only the essentials: the result line, the advice and the status */
+html.ob #prompt #pmsg:empty{display:none}
+html.ph-p .gx-dock[data-card="coach"] #coach,html.ph-p .gx-dock[data-card="advice"] #advice,html.ph-p .gx-dock[data-card="pop"] #pcx{top:calc(var(--pz-t,50vh) - 230px)}
+html.ob #buymini{display:none!important}
+html.ob:not(.ph) #hud{left:auto;right:10px;bottom:auto;top:10px;max-width:46%}
+html.ob #pmsg .how{display:none}
+#ob #pacts [data-act="sweep"]{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:76px;min-height:54px;padding:0 6px}
+#ob #pacts [data-act="sweep"] .bl{font-size:20px}#ob #pacts [data-act="sweep"] small{font-size:12px}
+html.ph-p #ob #pacts [data-act="end"]{min-width:0;flex:1 1 150px}
+html.ob .gx-board{overflow:clip}
+html.ph-l #ob #pacts>.btn{flex:none}
+html.ph-l #ob #pacts [data-act="end"]{min-height:60px}
