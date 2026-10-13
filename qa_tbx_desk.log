@@ -1,0 +1,10 @@
+SHOT 1_menu
+SHOT 2_list
+SHOT 3_builder
+SHOT 4_export
+SHOT 5_copied
+SHOT 6_paste
+SHOT 7_imported
+SHOT 8_test_drive
+RESULT {"menuBtn":true,"edit":true,"exp":true,"codeLen":1269,"selectable":"text","toast":"","clip":"ODT1:eyJ2Ijo","imp":true,"name":"Alex Import","saved":true,"test":true,"testState0":"countdown","state":"countdown","track":"Alex Import"}
+ERRORS []

@@ -80,8 +80,8 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 99c | `99c_checklist.js` | 47 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 31 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
-| 98tb | `98tb_track_builder.js` | 47 | (no header comment) |
-| 98ts | `98ts_track_stunts.js` | 34 | (no header comment) |
+| 98tb | `98tb_track_builder.js` | 49 | TB track builder (track-1): editor UI #tbx, lint TB_lint (L1–L19, docs/TRACK_FUN.md), TB_ST stunt numbers, TB_def → open-course race def, db/local save, window. |
+| 98ts | `98ts_track_stunts.js` | 35 | TS stunt pieces (track-2): kickers / gap jumps / banks / stunt splits / landmarks / flyovers on builder courses, air launch + juice, AI route pick, STUNT CUP tr |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
 | 98bk | `98bk_bake.js` | 9 | BK (PERF-2, EFF #3): baked candidate grids for the road / terrain distance queries. Owner: perf worker (alex/od-mem). ===== Entering roam spent ~28 % of its CPU |
 | 98fb | `98fb_form_build.js` | 9 | FB (garage-17, Alex 2026-10-10: "the build guide and build does not work for the boats and off road"). Root cause: BUILD and the BUILD GUIDE only ever edit GB.d |
@@ -380,13 +380,13 @@ uses: 30(38), 10(19), 40(6), 20(1)
 defines: OPN_TER OPN_K OPN_I0 OPN_I1 OPN_MOUTH OPN_NOSE OPN OPN_cp OPN_DEFS OPN_prep OPN_i OPN_b OPN_lane OPN_ter OPN_fall OPN_land OPN_falling OPN_aiXt OPN_pads OPN_rt OPN_noise OPN_vn OPN_roadTex OPN_grainTex OPN_AP OPN_build __ro OPN_segStep __ro2
 uses: 10(92), 20(28), 30(25), 31(17), 98rf(10), 53(6), 51(6), 72(2), 40(1)
 
-## 98tb_track_builder.js — 47 KB
-defines: TB_TERS TB_TCOL TB_V TB_PCS TB_ST TB_JK TB_SK TB_kick TB_air TB_route TB TB_clone TB_new TB_geo TB_near TB_lint TB_segOf TB_def TB_reg TB_gates TB_LS TB_loadLocal TB_saveLocal TB_code TB_decode TB_dbInit TB_save TB_regAll TB_css TB_mk TB_toast TB_open TB_close TB_push TB_changed TB_btn TB_ui TB_lintUi TB_selUi TB_bg TB_fit TB_cx TB_cy TB_w2s TB_s2w TB_draw TB_hitPt TB_hitPc TB_snapW TB_tap TB_hAt TB_nameIn TB_lab TB_input TB_drawList TB_codeBox TB_fromDef TB_test TB_editBtns TB_menu TB_BUILTIN __tbS
-uses: 10(44), 30(26), 98ro(12), 20(6), 72(6), 31(2), 40(1)
+## 98tb_track_builder.js — 49 KB
+defines: TB_TERS TB_TCOL TB_V TB_PCS TB_ST TB_JK TB_SK TB_kick TB_air TB_route TB TB_clone TB_new TB_geo TB_near TB_lint TB_segOf TB_def TB_reg TB_gates TB_LS TB_loadLocal TB_saveLocal TB_code TB_decode TB_dbInit TB_save TB_regAll TB_css TB_mk TB_toast TB_open TB_close TB_push TB_changed TB_btn TB_ui TB_lintUi TB_selUi TB_bg TB_fit TB_cx TB_cy TB_w2s TB_s2w TB_draw TB_hitPt TB_hitPc TB_snapW TB_tap TB_hAt TB_nameIn TB_lab TB_input TB_drawList TB_export TB_codeBox TB_fromDef TB_test TB_editBtns TB_menu TB_BUILTIN __tbS
+uses: 10(45), 30(26), 20(13), 98ro(12), 72(6), 31(2), 40(1)
 
-## 98ts_track_stunts.js — 34 KB
+## 98ts_track_stunts.js — 35 KB
 defines: TS TS_on TS_near TS_shape TS_launch TS_bk TS_M TS_box TS_cyl TS_winTex TS_build TS_lm __ts TS_TRACKS
-uses: 10(46), 30(42), 98ro(30), 98tb(27), 31(7), 20(3), 72(2), 53(1)
+uses: 10(47), 30(42), 98ro(30), 98tb(29), 31(7), 20(3), 72(2), 53(1)
 
 ## 98zp_perf_ctx.js — 13 KB
 defines: P1 P1_rt P1_free P1_draw P1_off P1_img P1_readAsync P1_CRC P1_png P1_view P1_attach P1_detach P1_gbDraw P1_thSet P1_tq __P1 P2_after P2_compile P2_warm
