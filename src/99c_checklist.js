@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90j',id:'rd-red',text:'Frankfurt: drive through 3 signal crossings. Cars wait at red in their lane behind the stop line; the middle of the crossing stays clear.'},
+ {ver:'v90j',id:'rd-ped',text:'People walk on the pavement and cross only at the zebras (on green, or when no car is coming); cars stop for them.'},
+ {ver:'v90j',id:'rd-ath',text:'Athens: drive around the centre for 2 minutes. Streets connect (few dead ends), main roads are wide, and you never have to cut across grass to follow the GPS line.'},
+ {ver:'v90j',id:'rd-lanes',text:'Frankfurt wide streets: traffic uses both lanes in each direction; no cars sitting inside each other.'},
  {ver:'v90j',id:'town20',text:'Garage → RIDES: Recycling Truck, Classic Tractor, Pursuit Squad Car, Mobile Crane, Night Patroller, Mobile Police Truck, Hook and Ladder Truck, Sport Convertible, Farm Tractor (6504), Police Patrol, Fire Chief Car (6602), Shovel Tractor, Road Racer, Little Tractor, Race Car (6609), Road and Trail 4x4, Mini Ladder Truck, Rescue SUV, Highway Pickup: each stands on the floor, wheels down, driver in the seat.'},
  {ver:'v90j',id:'tow7638',text:'Garage → RIDES → Tow Truck (7638): now with doors, windscreen and mudguards; drives forwards.'},
  {ver:'v90j',id:'fra-props',text:'Frankfurt: road works have LEGO cones, barriers, a warning light and a STOP sign; rocks are LEGO rocks; none sit on the road.'},

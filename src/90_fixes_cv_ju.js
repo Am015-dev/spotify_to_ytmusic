@@ -277,7 +277,7 @@ function CV_sigBuild(){const N=HUB.nodes,NG=N.ng,K=CV.K;CV.sig=[];CV.yl=[];CV.se
     G.sort((a,b)=>b.w-a.w);C.ap=G;const hw=q=>Math.min(14,q.w/2);
     G.forEach((g,k)=>{for(const[i,j]of g.e){CV.seg.set(i*K+j,{J:C,k});need.set(i,[C,k])}});
     if(!C.sig){CV.yl.push(C);continue}
-    C.s=[];C.g=[];let t=0;if(RD_ON){/* RD: two-phase signals — opposite approaches share one green (was one approach per phase: 75 s cycles, spill-back gridlock) */const ph=G.map(()=>-1);let np=0;G.forEach((g,k)=>{if(ph[k]>=0)return;ph[k]=np;G.forEach((h,m)=>{if(ph[m]<0&&g.dx*h.dx+g.dz*h.dz<-.8)ph[m]=np});np++});const PS=[],PG=[];for(let q=0;q<np;q++){const w=Math.max(...G.filter((g,k)=>ph[k]===q).map(g=>g.w));PS.push(t);PG.push(w>=16?14:10);t+=PG[q]+CV_AM+CV_AR}G.forEach((g,k)=>{C.s.push(PS[ph[k]]);C.g.push(PG[ph[k]])});C.ph=ph}else G.forEach((g,k)=>{C.s.push(t);C.g.push(g.w>=16?12:8);t+=C.g[k]+CV_AM+CV_AR});C.Cw=t;C.C=t+(RD_ON?7:CV_WK);
+    C.s=[];C.g=[];let t=0;if(RD_ON){/* RD: two-phase signals — opposite approaches share one green (was one approach per phase: 75 s cycles, spill-back gridlock) */const ph=G.map(()=>-1);let np=0;G.forEach((g,k)=>{if(ph[k]>=0)return;ph[k]=np;G.forEach((h,m)=>{if(ph[m]<0&&g.dx*h.dx+g.dz*h.dz<-.8)ph[m]=np});np++});const PS=[],PG=[];for(let q=0;q<np;q++){const w=Math.max(...G.filter((g,k)=>ph[k]===q).map(g=>g.w));PS.push(t);PG.push(w>=16?14:10);t+=PG[q]+CV_AM+4/* all-red 4 s: slow turners clear the box */}G.forEach((g,k)=>{C.s.push(PS[ph[k]]);C.g.push(PG[ph[k]])});C.ph=ph}else G.forEach((g,k)=>{C.s.push(t);C.g.push(g.w>=16?12:8);t+=C.g[k]+CV_AM+CV_AR});C.Cw=t;C.C=t+(RD_ON?7:CV_WK);
     const a0=G[0];C.off=((C.x*a0.dx+C.z*a0.dz)/13)%C.C;CV.sig.push(C)}
   // the edge before each incoming edge is part of the approach too (braking room)
   for(let i=0;i<NG;i++){for(const j of N[i].nb){const q=need.get(j);if(!q||CV.seg.has(i*K+j))continue;const[C,k]=q;if(Math.hypot(N[i].x-C.x,N[i].z-C.z)>C.R0)CV.seg.set(i*K+j,{J:C,k,pre:1})}}
@@ -291,7 +291,7 @@ function CV_sigMesh(){const S=CV.sig,grp=HUB.grp;let nh=0;for(const J of S)nh+=J
   for(const J of S){J.li=h*4;J.lc=[];J.ap.forEach((g,k)=>{const hw=Math.min(14,g.w/2),sd=Math.abs(g.lat)<1?1:Math.sign(g.lat),lx=g.dz,lz=-g.dx,ry=Math.atan2(g.dx,g.dz),
       bx=J.x-g.dx*J.R0,bz=J.z-g.dz*J.R0,one=Math.abs(g.lat)<1,sx=bx+lx*(one?0:sd*hw/2),sz=bz+lz*(one?0:sd*hw/2);
       m.compose(v.set(sx,groundY(sx,sz)+.07,sz),q.setFromAxisAngle(up,ry),sc.set(one?hw*2-1:hw-.6,1,1));sm.setMatrixAt(h,m);
-      const px=bx-g.dx*1.2+lx*sd*(hw+1.3),pz=bz-g.dz*1.2+lz*sd*(hw+1.3),gy=groundY(px,pz),ar=sd>0?ry+Math.PI:ry,ax=-lx*sd,az=-lz*sd;
+      let px=bx-g.dx*1.2+lx*sd*(hw+1.3),pz=bz-g.dz*1.2+lz*sd*(hw+1.3);if(RD_ON){const P=RD_poleOut(px,pz,lx*sd,lz*sd);px=P[0];pz=P[1]}const gy=groundY(px,pz),ar=sd>0?ry+Math.PI:ry,ax=-lx*sd,az=-lz*sd;
       m.compose(v.set(px,gy,pz),q.setFromAxisAngle(up,ar),sc.set(1,1,1));pm.setMatrixAt(h,m);
       const hx=px+ax*5.4-g.dx*.48,hz=pz+az*5.4-g.dz*.48;for(let n=0;n<3;n++){m.makeTranslation(hx,gy+8.62-n*.82,hz);lm.setMatrixAt(h*4+n,m)}
       m.makeTranslation(px+ax*.36-g.dx*.15,gy+4.12,pz+az*.36-g.dz*.15);lm.setMatrixAt(h*4+3,m);for(let n=0;n<4;n++)lm.setColorAt(h*4+n,c.setRGB(.1,.1,.1));h++})}
@@ -319,7 +319,7 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
     if(J){CV.act.add(J);let d=Math.hypot(J.x-c.x,J.z-c.z)-J.R0,k=-1,bd=-2;J.ap.forEach((a,i)=>{const v=a.dx*c.CVhx+a.dz*c.CVhz;if(v>bd){bd=v;k=i}});if(k>=0)d=(J.x-c.x)*J.ap[k].dx+(J.z-c.z)*J.ap[k].dz-J.R0;c.CVf=J.id*8+k;const res=J.res||(J.res=new Map());
       if(J.sig&&J.ap.length>1){if(!res.has(c)){const s=k<0?'r':CV_st(J,k);let go=s==='g'||s==='y'&&d<(c.cv||0)**2/12+2;const l=c.CVl;
         if(go&&l&&!(l.dead>0)&&(l.cv||0)<3&&Math.hypot(l.x-J.x,l.z-J.z)<J.R0+8)go=false;
-        if(go&&RD_ON)RD_entry(c,J,k);if(go)for(const o of res.keys()){if(o===c||same(o,c)||RD_ON&&RD_compat(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
+        if(go&&RD_ON&&!RD_exitFree(c,J))go=false;if(go&&RD_ON)RD_entry(c,J,k);if(go)for(const o of res.keys()){if(o===c||same(o,c)||RD_ON&&RD_compat(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
         if(go&&d<6)res.set(c,CV.t);else if(!go){vm=Math.sqrt(10*Math.max(0,d-3.2));c.RDy='sig'}}}
       else{vm=Math.min(vm,6+Math.max(0,d)*.6);c.RDy='slow';const o=J.of===CV.fr?J.oc.find(o=>o!==c&&Math.abs(o.CVhx*c.CVhx+o.CVhz*c.CVhz)<.7):null;if(o&&d>2&&(c.CVw=(c.CVw||0)+dt)<4){vm=Math.min(vm,Math.sqrt(10*Math.max(0,d-3.2)));c.RDy='yield'}else if(!o)c.CVw=0}}
     if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
@@ -327,7 +327,7 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
     const Jb=In&&In.sig?In:J;if(Jb&&Jb.sig&&(In===Jb||Jb.res&&Jb.res.has(c))){const R=Jb.res,pc=R&&R.has(c)?R.get(c):1e9;let hold=0;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);
       for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,dd=Math.hypot(rx,rz);if(dd>8)continue;const al=rx*c.CVhx+rz*c.CVhz;if(al<-.5)continue;
         const po=R&&R.has(o)?R.get(o):1e9;if(RD_ON&&!(dd<6&&al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<3)&&RD_compat(o,c))continue;if(po<pc||po===pc&&o.j+o.k*997<c.j+c.k*997||dd<6&&al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<3)hold=1}
-      if(RD_ON&&hold&&(c.CVst||0)>6)hold=0;/* RD: a car held 6 s inside a box goes on (no permanent deadlock next to the player) */if(hold){vm=0;c.RDy='box';c.CVst=(c.CVst||0)+dt;if(c.CVst>5&&In&&(Math.hypot(c.x-RO.x,c.z-RO.z)>50||RD_ON&&typeof LV_seen==='function'&&!LV_seen(c.x,c.y||0,c.z))){c.dead=.05;c.CVst=0;c.route=null;c.CVr=0;CV.rc=(CV.rc||0)+1;for(const Q of[In,J])if(Q&&Q.res)Q.res.delete(c)}}else c.CVst=0}
+      if(RD_ON&&hold&&(c.CVst||0)>15)hold=0;/* RD: a car held 6 s inside a box goes on (no permanent deadlock next to the player) */if(hold){vm=0;c.RDy='box';c.CVst=(c.CVst||0)+dt;if(c.CVst>5&&In&&(Math.hypot(c.x-RO.x,c.z-RO.z)>50||RD_ON&&typeof LV_seen==='function'&&!LV_seen(c.x,c.y||0,c.z))){c.dead=.05;c.CVst=0;c.route=null;c.CVr=0;CV.rc=(CV.rc||0)+1;for(const Q of[In,J])if(Q&&Q.res)Q.res.delete(c)}}else c.CVst=0}
     const o=c.CVl;if(o&&!(o.dead>0)){const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<2.6){const lv=al<7.5?0:(o.cv||0)+Math.sqrt(8*(al-7.5));if(lv<vm){vm=lv;c.RDy='lead'}}}
     if(vm<1e9){c.CVv=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(c.cv??c.v,vm);if(vm<.5)c.CVfz=[c.a,c.b,c.t]}}}
 function CV_post(dt){for(const c of HUB.cars){if(c.CVv!=null){c.v=c.CVv;c.CVv=null}if(c.CVfz){if(!(c.dead>0)){[c.a,c.b,c.t]=c.CVfz;c.cv=0}c.CVfz=null}}

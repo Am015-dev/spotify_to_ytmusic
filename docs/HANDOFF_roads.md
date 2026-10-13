@@ -43,3 +43,13 @@ Brief (coordinator, Alex 2026-10-13): simplify + connect the maps, wider roads, 
 - ATH: wall 4.31→2.98/min (both FAIL), stuck 2.7→4.0 % (FAIL; same challenge-start spot ~1815,-1680 in both runs, +1 episode blocked by a queued car), offRoad 0.07→3.2 %, wrongOneWay 0.84→0, overlap 239→117, pedHitByCar 41→64, heap avg 163→160 MB (both FAIL), peak 166→224.
 - Draw calls same views: ATH 249/249/288→232/228/292, FRA 380/421/477→378/431/455 (FRA over 250 already on base). Tyre gap 0.03 m both cities. 0 console errors.
 - Grid: rd/step1_grid.jpg. Next slice queued by the coordinator: scooter riders + rideable scooters, LEGO bikes/motorbikes (6522 Highway Bike) in traffic.
+
+## Reviewer FAIL on 5c43425 (items) + status
+1 ATH off-road 3.2 % → 540cb2c: flagged cars were kerb-parked (98l parks half on the kerb, base too); monitor skips c.pk → 0.01 % (base 0). DONE.
+2 ATH ped contacts 64 (base 41) → gap rule (no car < 8 m, none < 30 m heading in) + wider car stop zone → 21 (base re-run 83). DONE.
+3 ATH heap peak +58 → tPlay rd/tp_after2: flat +30–37 MB offset from the 1st sample, no growth. rdHeap.js (GC'd, phone ctx) shows new LOWER (475 vs 484). Probing ?fast=1 (tPlay uses it). RD_cityNear now reuses its Map (churn). OPEN.
+4 ATH stuck +1 episode → root cause was MY prune peeling a crossed sec street (1718,-1325); fixed (main/arterial never cut, 2 rounds, crossed stubs kept). tp_after2 ATH stuck 2.7 % (pass), base re-run 1.3 %. wall ATH 4.31→0.66.
+5 junction pile-up / overlaps → don't-block-the-box (RD_exitFree), all-red 4 s, breaker 15 s; observer FRA overlap 76/min. tPlay FRA overlap 167 (rd20, before these). Needs tPlay re-run + a low red-phase shot. OPEN.
+6 pole on asphalt → RD_poleOut pushes poles off carriageway/junction plates (__rd.POLE() = moved/left). Verify count + shot. OPEN.
+7 OD_CHANGELOG v90k (provisional) + 4 OD_CHECKLIST items (ver v90j, the current top) added. DONE.
+Final GRID must be ONE labelled grid at docs/shots/roads/GRID.jpg (reviewer rule).
