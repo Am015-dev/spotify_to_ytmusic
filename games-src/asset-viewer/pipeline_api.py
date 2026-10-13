@@ -22,6 +22,7 @@ def lanes():
 
 def bulk(changes):
     if not isinstance(changes, list) or len(changes) > 2000: raise ValueError("bad bulk")
+    if not all(isinstance(c, dict) and votes2d.KEY.match(c.get("key", "")) for c in changes): raise ValueError("bad key in bulk")  # all or nothing
     votes = {}
     for c in changes: votes = votes2d.apply(c.get("key", ""), c.get("v"), c.get("note", ""))
     return votes

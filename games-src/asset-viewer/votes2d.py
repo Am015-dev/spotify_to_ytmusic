@@ -7,7 +7,7 @@ from pathlib import Path
 V = Path(__file__).parent
 GA = Path(os.environ.get("GAME_ASSETS", V.parent))
 FILE = V / "votes2d.json"
-KEY = re.compile(r"^[a-z0-9-]+/[a-z0-9-]+$")
+KEY = re.compile(r"^[a-z0-9-]+/[a-z0-9_-]+$")
 SUF = {"1:1": "", "16:9": "-wide", "4:3": "-43", "3:4": "-34", "9:16": "-tall"}
 
 

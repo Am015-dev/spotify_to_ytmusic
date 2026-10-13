@@ -236,7 +236,7 @@ async function load() {
   for (const b of flow.batches) {
     if (b.root === 'flow-covers') continue;
     const game = GAMEFIX[b.game] || b.game;
-    for (const i of b.items) items.push({ kind: '2d', game, name: i.name, wave: b.wave, ratio: b.ratio, batch: b.kind, file: b.file,
+    for (const i of b.items) items.push({ kind: '2d', root: b.root, game, name: i.name, wave: b.wave, ratio: b.ratio, batch: b.kind, file: b.file,
       status: i.done ? 'done' : 'pending', thumb: i.thumb, full: i.full, prompt: i.prompt, t: i.t, twin: i.twin, vote: i.vote, note: i.note, stage: i.stage });
   }
   for (const c of flow.crossed || []) items.push({ kind: '2d', game: c.game, name: c.name, wave: c.wave, ratio: '1:1', status: 'crossed', twin: c.twin,
@@ -308,6 +308,7 @@ function tile(i, idx) {
   if (i.kind === '2d' && i.ratio !== '1:1') tags.push(`<span class="tag">${i.ratio}</span>`);
   if (i.twin && i.status !== 'crossed') tags.push(`<span class="tag twin" title="approved 3D model ${esc(i.twin)} covers this">3D twin</span>`);
   if (i.shipped) tags.push('<span class="tag ship">on GitHub</span>');
+  if (i.kind === '2d' && i.vote) tags.push(`<span class="tag" style="background:${i.vote === 'ok' ? 'var(--done)' : 'var(--redo)'};color:${i.vote === 'ok' ? '#0b1a10' : '#fff'}">${i.vote === 'ok' ? 'Kept' : 'Redo'}</span>`);
   return `<button class="tile ${i.status} k${i.kind}" data-i="${idx}" title="${esc(i.name)}">${img}
     <div class="meta"><div class="nm">${esc(i.name)}</div><div class="tags">${tags.join('')}</div></div></button>`;
 }
@@ -349,11 +350,14 @@ function render() {
   if (F.view === 'flat') { $('out').innerHTML = `<div class="grid">${VIEW.map((i, k) => tile(i, k)).join('')}</div>`; return; }
   const byGame = {};
   VIEW.forEach((i, k) => ((byGame[i.game] ||= {})[i.wave] ||= []).push([i, k]));
+  // "Keep all" only touches generated 2D images without a vote, so an earlier Keep/Redo is never overwritten
+  const keepBtn = (g, w, list) => { const n = list.filter(unvoted).length;
+    return n ? `<button class="btn" data-keep="${esc(g)}" data-w="${esc(w)}" style="font-size:12px;padding:3px 10px">Keep all ${n}</button>` : ''; };
   $('out').innerHTML = Object.keys(byGame).sort().map(g => {
     const list = Object.values(byGame[g]).flat().map(x => x[0]);
     return `<section class="game"><h2>${esc(nice(g))}<small class="num">${list.length} assets · ${list.filter(i => i.status === 'done').length} done ·
-      ${list.filter(i => i.status === 'pending').length} pending · ${list.filter(i => i.status === 'ok3d').length} 3D approved</small></h2>${stackBar(list)}
-      ${Object.keys(byGame[g]).sort((a, b) => WAVEORDER.indexOf(a) - WAVEORDER.indexOf(b)).map(w => `<div class="wave"><h4>${esc(w)} · ${byGame[g][w].length}</h4>
+      ${list.filter(i => i.status === 'pending').length} pending · ${list.filter(i => i.status === 'ok3d').length} 3D approved</small>${keepBtn(g, '', list)}</h2>${stackBar(list)}
+      ${Object.keys(byGame[g]).sort((a, b) => WAVEORDER.indexOf(a) - WAVEORDER.indexOf(b)).map(w => `<div class="wave"><h4>${esc(w)} · ${byGame[g][w].length} ${keepBtn(g, w, byGame[g][w].map(x => x[0]))}</h4>
       <div class="grid">${byGame[g][w].map(([i, k]) => tile(i, k)).join('')}</div></div>`).join('')}</section>`;
   }).join('');
 }
@@ -393,6 +397,15 @@ function open(k) {
   };
   if ($('vk')) $('vk').onclick = () => vote('ok'); if ($('vr')) $('vr').onclick = () => vote('redo'); if ($('vc')) $('vc').onclick = () => vote(null);
 }
+const unvoted = i => i.root === 'flow-2d' && i.status === 'done' && !i.vote;
+async function keepAll(g, w) {
+  // only what the current filters show, so a filtered section approves exactly what is on screen
+  const list = VIEW.filter(i => i.game === g && (!w || i.wave === w) && unvoted(i));
+  if (!list.length || !confirm(`Keep all ${list.length} unvoted images in ${nice(g)}${w ? ' · ' + w : ''}?`)) return;
+  const r = await fetch('votes2d/bulk', { method: 'POST', body: JSON.stringify(list.map(i => ({ key: `${i.game}/${i.name}`, v: 'ok', note: '' }))) });
+  if (!r.ok) return toast('Save failed');
+  list.forEach(i => i.vote = 'ok'); toast(`Kept ${list.length}`); render();
+}
 function close() { $('lb').hidden = true; $('stage').innerHTML = ''; cur = -1; }
 function step(d) { if (VIEW.length) open((cur + d + VIEW.length) % VIEW.length); }
 function copy(t, msg) { navigator.clipboard.writeText(t).then(() => toast(msg), () => prompt('Copy', t)); }
@@ -407,6 +420,7 @@ document.addEventListener('click', e => {
   if (t.dataset.clear) { F[t.dataset.clear].clear(); return render(); }
   if (t.dataset.rm) { const { rm, v } = t.dataset; if (rm === 'type') F.type = ''; else if (rm === 'q') F.q = ''; else F[rm].delete(v); return render(); }
   if (t.dataset.i) return open(+t.dataset.i);
+  if (t.dataset.keep) return keepAll(t.dataset.keep, t.dataset.w);
   if (t.id === 'reset' || t.id === 'reset2') { location.hash = ''; readHash(); return render(); }
 });
 $('q').oninput = () => { F.q = $('q').value.trim(); clearTimeout(window._qt); window._qt = setTimeout(render, 150); };
