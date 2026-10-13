@@ -127,7 +127,7 @@ const stMsg=t=>{$('stMsg').textContent=t;clearTimeout(stMsg.h);stMsg.h=setTimeou
 function stDraw(){$('stStars').textContent='★ '+ST.totalStars()+' / '+STAGES.length*3;const box=$('stRows');box.innerHTML='';box.classList.toggle('many',ACTN.length>3);
   for(let a=0;a<ACTN.length;a++){const row=document.createElement('div');row.className='arow';row.innerHTML='<div class="alab">'+ACTN[a]+'</div>';
     for(const s of STAGES.filter(x=>x.act===a)){const ok=unlocked(s.n),k=sSave.stars[s.n]|0,D=DISTRICTS[s.di],b=document.createElement('button');b.type='button';
-      b.className='card'+(ok?'':' lock');b.dataset.id='s'+s.n;b.dataset.n=s.n;b.style.setProperty('--c',D.a);
+      b.className='card'+(ok?'':' lock');b.dataset.nd=!ok?'locked':k>0?'done':s.goal&&s.goal.k==='boss'?'boss':'open';b.dataset.id='s'+s.n;b.dataset.n=s.n;b.style.setProperty('--c',D.a);
       b.innerHTML=`<div class="hd"><span class="no">${s.n}</span>${ok?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:lockI}</div><div class="nm">${s.name}</div><div class="gl"><span class="ac">${ACTN[s.act]} · </span>${goalTxt(s)}</div>`;
       b.addEventListener('click',()=>{if(!unlocked(s.n)){stMsg('Clear stage '+(s.n-1)+' first');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}startStory(s.n);});
       row.appendChild(b);}
