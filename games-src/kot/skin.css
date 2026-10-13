@@ -89,7 +89,7 @@ html.sk .gx-ibtn>span{padding:0}
 html.ph .pchip .v{color:#6b4200}html.ph .pchip .e{color:#0f6b3a}
 html.ph .pchip span em{background:rgba(255,253,245,.9);border-radius:4px;padding:0 1px}
 html.ph-p header.gx-bar .pchip span{font-size:12px;gap:1px;letter-spacing:-.7px}
-@media (max-width:380px){html.ph-p header.gx-bar .pchip{padding:0 2px 1px}html.ph-p header.gx-bar .pchip span{gap:0;letter-spacing:-.9px;font-size:11px}html.ph-p header.gx-bar .pchip span em{padding:0}}   /* 375 px phones: the energy number was cut off by the chip edge (scenario invariant) */
+@media (max-width:430px){html.ph-p header.gx-bar .pchip{padding:0 2px 1px}html.ph-p header.gx-bar .pchip span{gap:0;letter-spacing:-1px}html.ph-p header.gx-bar .pchip span em{padding:0}}@media (max-width:380px){html.ph-p header.gx-bar .pchip span{font-size:11px}}   /* 375 px phones: the energy number was cut off by the chip edge (scenario invariant) */
 html.ph-p header.gx-bar .pchip{padding-left:2px;padding-right:2px}
 
 /* the painted crown marks the monster in Downtown (the emoji stays if the picture is missing) */

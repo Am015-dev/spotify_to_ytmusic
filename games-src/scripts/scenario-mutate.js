@@ -25,6 +25,8 @@ function mutantsOf(info) {
   act.slice(0, 4).forEach(sel => m.push({ t: 'dead', sel }));
   if (act[0]) m.push({ t: 'throw', sel: act[0] });
   eqs.slice(0, 2).forEach(sel => m.push({ t: 'num', sel }));
+  if (info.engine) m.push({ t: 'num', sel: '[data-engine]' });   // an on-screen engine number that is off by one must be caught by the data-engine invariant
+  if (info.glowN) m.push({ t: 'dead', sel: info.glowSel });   // a glowing legal target whose handler is dead
   act.slice(0, 1).concat(vis.slice(0, 2)).forEach(sel => m.push({ t: 'hide', sel }));
   txt.slice(0, 1).forEach(sel => m.push({ t: 'font', sel }));
   vis.slice(0, 1).forEach(sel => m.push({ t: 'cover', sel }));

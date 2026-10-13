@@ -28,36 +28,74 @@
   var inBoard = function (sel) { var b = $('[data-board]'), e = $(sel); if (!b || !e) return 'missing ' + sel; var B = b.getBoundingClientRect(), r = e.getBoundingClientRect(); return (r.width > 3 && r.left >= B.left - 1 && r.right <= B.right + 1 && r.top >= B.top - 1 && r.bottom <= B.bottom + 1) || sel + ' is outside the board'; };
   var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
 
+  GXS.glowSel += ',#ob [data-act].pulse';   // the pulsing SMASH! button is a glowing legal target: it must answer a real tap
+  var faces = function (a, f) { return a.filter(function (x) { return x === f; }).length; };
+  var hp = function () { return G.pl.map(function (p) { return p.hp; }); };
+  // the rolled dice, resolved by the real SMASH! tap, must give exactly what the rules say (no cards owned at the start of a game)
+  var smashSnap = function () { var q = cur(); return { ph: G.phase, step: G.step, f: G.dice.map(function (d) { return d.f; }), en: q.en, vp: q.vp, hp: q.hp, hps: hp(), act: G.active, inCity: G.pl.map(function (p) { return inCity(p.i); }), max: maxhp(q) }; };
+  var smashVerify = function (b, a) {
+    var E = faces(b.f, 'E'), C = faces(b.f, 'C'), H = faces(b.f, 'H'), vp = 0;
+    ['1', '2', '3'].forEach(function (n) { var k = faces(b.f, n); if (k >= 3) vp += +n + (k - 3); });
+    if (a.act !== b.act || a.ph === 'roll') return 'the dice were not resolved (phase ' + a.ph + ')';
+    if (a.en - b.en !== E) return 'energy +' + (a.en - b.en) + ' but ' + E + ' energy dice were rolled';
+    if (a.vp - b.vp < vp) return 'victory points +' + (a.vp - b.vp) + ' but number dice are worth ' + vp;
+    if (!b.inCity[b.act]) { var heal = Math.min(b.max, b.hp + H); if (a.hp !== heal) return 'hearts: hp ' + b.hp + ' -> ' + a.hp + ' but ' + H + ' heart dice should give ' + heal; }
+    for (var i = 0; i < b.hps.length; i++) {   // claws hit everyone else when you are in the city, else whoever is in it
+      var victim = i !== b.act && (b.inCity[b.act] || b.inCity[i]) && b.hps[i] > 0, want = Math.max(0, b.hps[i] - C);
+      if (victim && a.hps[i] !== want) return 'player ' + i + ' hp ' + b.hps[i] + ' -> ' + a.hps[i] + ' but ' + C + ' claws should leave ' + want;
+    }
+    return true;
+  };
+  var settled = function () { return G.phase !== 'roll' && !UI.busy && !UI.choice; };
+  var myRoll = function () { return humanTurn() && G.phase === 'roll' && !UI.busy && !UI.choice && G.dice.length === 6; };
+
   GXS.add({
     id: 'cc-smash', name: 'SMASH! over the city', ask: 'Tap SMASH! over the city', ls: LS, seed: 21, when: booted,
     setup: function () { return table(21); },
+    mut: [
+      { name: 'energy dice give nothing', js: 'gainE = function () { }' },
+      { name: 'claws never hurt', js: 'applyLoss = function () { return 0 }' }
+    ],
     checks: [
       { kind: 'visible', sel: '#ob [data-act="resolve"]', name: 'SMASH! button' },
       { kind: 'fn', name: 'SMASH! hangs inside the central board', fn: function () { return inBoard('#ob [data-act="resolve"]'); } },
       { kind: 'text', sel: '#ob [data-act="resolve"]', re: /smash/i, name: 'SMASH! label' },
       { kind: 'fn', name: 'it is YOUR roll', fn: function () { return (humanTurn() && G.phase === 'roll') || 'phase ' + G.phase; } },
-      { kind: 'tap', sel: '#ob [data-act="resolve"]', name: 'tap SMASH!', state: function () { return G.phase + '/' + G.step; }, expect: function (a, b) { return (a.split('/')[0] === 'roll' && b.split('/')[0] !== 'roll') || 'resolve the dice (phase still ' + b + ')'; } }
+      { kind: 'play', name: 'tap SMASH!: the dice do what the rules say', snap: smashSnap, steps: [{ sel: '#ob [data-act="resolve"]' }], idle: settled, verify: smashVerify }
     ]
   });
 
   var MKT = {
-    id: 'cc-market', name: 'Cards for sale on the board', ask: 'Hold a card, then tap it', ls: LS, seed: 22, when: booted,
+    id: 'cc-market', name: 'Buy a card from the board', ask: 'Tap a card twice to buy it', ls: LS, seed: 22, when: booted,
     setup: function () {
       return marketTable(22).then(function () {
-        var q = cur(), sg = suggestCard(q), a = G.market.map(function (_, j) { return j; }).filter(function (j) { return canBuy(q, j); });
-        window.__k = a.filter(function (j) { return j !== sg; })[0]; if (window.__k == null) window.__k = a[0];
-        MKT.checks.forEach(function (c) { if (c.sel === '#KSEL') c.sel = '#ob #pshop [data-shop="' + window.__k + '"]'; });
+        var q = cur(), sg = suggestCard(q), a = G.market.map(function (_, j) { return j; }).filter(function (j) { return canBuy(q, j) && CARDS[base(G.market[j])].t === 'K'; });
+        var k = a.filter(function (j) { return j !== sg; })[0]; if (k == null) k = a[0];
+        window.__k = k; window.__id = G.market[k]; window.__cost = costOf(q, G.market[k]);
+        MKT.checks.forEach(function (c) { if (c.sel === '#KSEL') c.sel = '#ob #pshop [data-shop="' + k + '"]'; (c.steps || []).forEach(function (st) { if (st.sel === '#KSEL') st.sel = '#ob #pshop [data-shop="' + k + '"]'; }); });
       });
     },
+    mut: [
+      { name: 'cards cost 1 more', js: 'costOf = (function (f) { return function (p, id) { return f(p, id) + 1 } })(costOf)' },
+      { name: 'bought card never arrives', js: 'acquire = function (p, id, a, done) { done() }' },
+      { name: 'market is not refilled', js: 'refill = function () { }' }
+    ],
     checks: [
       { kind: 'visible', sel: '#ob #pshop .obc', name: 'card for sale' },
       { kind: 'fn', name: 'at least 2 painted cards inside the board', fn: function () { var n = document.querySelectorAll('#ob #pshop .obc'); if (n.length < 2) return 'only ' + n.length + ' cards'; for (var i = 0; i < n.length; i++) { if (!n[i].querySelector('img.cpic')) return 'card ' + i + ' has no painting'; } return inBoard('#ob #pshop .obc'); } },
       { kind: 'hold', sel: '#ob #pshop .obc', ms: 700, name: 'hold a card', state: function () { return { big: document.getElementById('obcard').classList.contains('on'), own: owned() }; },
         expect: function (a, b) { return (b.big && b.own === a.own) || (!b.big ? 'show the big card' : 'a hold bought the card'); } },
       { kind: 'fn', name: 'big card gone after release, nothing bought', fn: function () { return !document.getElementById('obcard').classList.contains('on') || 'big card stayed'; } },
-      { kind: 'tap', sel: '#KSEL', name: 'tap a card (touch: picks it)', state: function () { return { sel: BF.sel, own: owned() }; },
-        expect: function (a, b) { return navigator.maxTouchPoints > 0 ? (b.sel === window.__k && b.own === a.own) || 'first tap picks the card (sel ' + b.sel + ')' : (b.own !== a.own) || 'a click should buy'; } },
-      { kind: 'tap', sel: '#KSEL', name: 'tap again (touch: buys it)', state: function () { return owned(); }, expect: function (a, b) { return navigator.maxTouchPoints > 0 ? (b !== a) || 'second tap should buy the card' : true; } }
+      { kind: 'play', name: 'tap the card (touch: twice): it is bought', settleMs: 8000,
+        snap: function () { var q = cur(); return { en: q.en, cards: q.cards.slice(), mk: G.market.slice(), shown: GXS.num('header.gx-bar .pchip.me .e'), ph: G.phase }; },
+        steps: [{ sel: '#KSEL', until: function () { return cur().cards.indexOf(window.__id) >= 0; }, max: 3 }],
+        idle: function () { return !UI.busy && !UI.choice && !(G.q && G.q.length); },
+        verify: function (b, a) {
+          var q = cur(); if (b.en - a.en !== window.__cost) return 'energy ' + b.en + ' -> ' + a.en + ' but the card costs ' + window.__cost;
+          if (a.cards.indexOf(window.__id) < 0) return 'the card is not in your hand of cards';
+          if (a.mk.length !== 3 || a.mk.indexOf(window.__id) >= 0) return 'the market was not refilled with a new card (' + a.mk.join(',') + ')';
+          if (GXS.num('header.gx-bar .pchip.me .e') !== q.en) return 'screen energy ' + GXS.num('header.gx-bar .pchip.me .e') + ' != engine ' + q.en;
+          return true; } }
     ]
   };
   GXS.add(MKT);
@@ -65,23 +103,40 @@
   GXS.add({
     id: 'cc-dice-end', name: 'Dice and rolling on the board', ask: 'Keep a die, roll, then smash', ls: LS, seed: 23, when: booted,
     setup: function () { return table(23); },
+    mut: [{ name: 'a rolled die ignores its keep', js: 'doReroll = (function (f) { return function () { var k = G.dice.map(function (d) { return d.k }); var r = f.apply(this, arguments); G.dice.forEach(function (d, i) { if (k[i]) d.f = d.f === "1" ? "2" : "1" }); return r } })(doReroll)' }],
     checks: [
       { kind: 'visible', sel: '#ob #dice .die[data-die="0"]', name: 'first die' },
       { kind: 'fn', name: 'all 6 dice are inside the board', fn: function () { for (var i = 0; i < 6; i++) { var r = inBoard('#ob #dice .die[data-die="' + i + '"]'); if (r !== true) return r; } return !(document.querySelector('.gx-dock #dice, .gx-dock #pacts')) || 'dice or buttons still in the panel'; } },
-      { kind: 'tap', sel: '#ob #dice .die[data-die="0"]', name: 'tap a die to keep it', state: function () { return !!G.dice[0].k; }, expect: function (a, b) { return (!a && b) || 'die 0 should be kept'; } },
-      { kind: 'visible', sel: '#ob [data-act="reroll"]', name: 'Roll button' },
-      { kind: 'tap', sel: '#ob [data-act="reroll"]', name: 'tap Roll', state: function () { return G.rolls; }, expect: function (a, b) { return b === a - 1 || 'rolls left ' + a + ' -> ' + b; } },
-      { kind: 'fn', name: 'the kept die did not change', fn: function () { return !!G.dice[0].k || 'die 0 lost its keep'; } }
+      { kind: 'play', name: 'keep a die, tap Roll: only the loose dice change', settleMs: 8000,
+        snap: function () { return { rolls: G.rolls, f: G.dice.map(function (d) { return d.f; }), k: G.dice.map(function (d) { return !!d.k; }) }; },
+        steps: [{ sel: '#ob #dice .die[data-die="0"]', until: function () { return !!G.dice[0].k; }, max: 2 }, { sel: '#ob [data-act="reroll"]' }],
+        idle: function () { return !UI.busy && G.dice.length === 6; },
+        verify: function (b, a) {
+          if (!a.k[0]) return 'die 0 lost its keep'; if (a.rolls !== b.rolls - 1) return 'rolls left ' + b.rolls + ' -> ' + a.rolls;
+          var kf = b.f[0]; if (a.f[0] !== kf) return 'the kept die changed from ' + kf + ' to ' + a.f[0];
+          var moved = 0; for (var i = 1; i < 6; i++) if (a.f[i] !== b.f[i]) moved++; if (!moved) return 'no loose die was rolled again';
+          return true; } },
+      { kind: 'visible', sel: '#ob [data-act="resolve"]', name: 'SMASH! is still there to finish the turn' }
     ]
   });
 
   GXS.add({
     id: 'cc-end-turn', name: 'End turn from the board', ask: 'Tap End turn on the board', ls: LS, seed: 24, when: booted,
     setup: function () { return marketTable(24); },
+    mut: [{ name: 'the computer never ends its turn', js: 'nextAlive = function (i) { return G.active }' }],
     checks: [
       { kind: 'visible', sel: '#ob [data-act="end"]', name: 'End turn button' },
       { kind: 'fn', name: 'End turn is inside the board', fn: function () { return inBoard('#ob [data-act="end"]'); } },
-      { kind: 'tap', sel: '#ob [data-act="end"]', name: 'tap End turn', state: function () { return G.tid + '/' + G.phase + '/' + G.active; }, expect: function (a, b) { return a !== b || 'the turn did not end'; } }
+      { kind: 'play', name: 'tap End turn: three computer turns, then your new roll', settleMs: 8000,
+        snap: function () { return { tid: G.tid, act: G.active, en: cur().en, alive: G.pl.filter(function (p) { return p.alive; }).length }; },
+        steps: [{ sel: '#ob [data-act="end"]' }],
+        idle: myRoll,
+        verify: function (b, a) { return (a.tid >= b.tid + 4 && a.act === b.act && G.rolls > 0) || 'turn ' + b.tid + ' -> ' + a.tid + ' (expected the 3 computer monsters to play, then you again); rolls ' + G.rolls; } },
+      { kind: 'play', name: 'tap SMASH! on the new turn: it goes on to buying', settleMs: 8000,
+        snap: smashSnap, steps: [{ sel: '#ob [data-act="resolve"]' }], idle: settled, verify: smashVerify },
+      { kind: 'play', name: 'End turn again: you are back on a fresh roll', settleMs: 8000,
+        snap: function () { return { tid: G.tid }; }, steps: [{ sel: '#ob [data-act="end"]', ready: function () { return G.phase === 'buy'; } }],
+        idle: myRoll, verify: function (b, a) { return a.tid >= b.tid + 4 || 'turn ' + b.tid + ' -> ' + a.tid; } }
     ]
   });
 

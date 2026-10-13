@@ -123,9 +123,14 @@
       .then(function () { var b = box(stepEl(st)); return { x: b.x, y: b.y, until: !!st.until, max: st.max || 1, after: st.after || 450 }; }, function () { return { err: nm + ': ' + why + ' (cannot tap it)' }; });
   };
   S.puntil = function (i, j) { try { return !!def().checks[i].steps[j].until(); } catch (x) { return true; } };
-  S.pidle = function (i) {   // the turn must complete: no stuck state longer than 8 s
+  S.pidle = function (i) {   // the turn must complete: "stuck" = no engine/screen change for 8 s (a long computer turn that keeps moving is fine, hard cap 60 s)
     var c = def().checks[i]; if (!c.idle) return Promise.resolve({ ok: true });
-    return S.wait(c.idle, c.settleMs || 8000).then(function () { return { ok: true }; }, function () { return { ok: false, msg: (c.name || 'play') + ': stuck for more than ' + (c.settleMs || 8000) / 1000 + ' s (' + String(c.idle).replace(/\s+/g, ' ').slice(0, 70) + ' never true)' }; });
+    var quiet = c.settleMs || 8000;
+    return new Promise(function (res) { var t0 = Date.now(), last = Date.now(), fp = S.fp();
+      (function p() { var v = false; try { v = c.idle(); } catch (e) { } if (v) return res({ ok: true });
+        var f = S.fp(); if (f !== fp) { fp = f; last = Date.now(); }
+        if (Date.now() - last > quiet || Date.now() - t0 > 60000) return res({ ok: false, msg: (c.name || 'play') + ': stuck, nothing changed for ' + Math.round((Date.now() - last) / 1000) + ' s and  ' + String(c.idle).replace(/\s+/g, ' ').slice(0, 80) + '  never became true' });
+        setTimeout(p, 100); })(); });
   };
   S.pend = function (i) {
     var c = def().checks[i], nm = c.name || 'play';
@@ -148,6 +153,11 @@
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   S.known = [];   // known findings a game lists on purpose: {re: /message/, why: 'owner-listed in HANDOFF.md'}; they are not hidden, scenario-test prints how many were skipped
   S.glowSel = '.bf-tgt,.glow,[data-legal]';
+  function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
+    var out = [];
+    [].slice.call(document.querySelectorAll('[data-engine]')).forEach(function (e) { if (!S.vis(e)) return; var v; try { v = (0, eval)(e.getAttribute('data-engine')); } catch (x) { out.push('data-engine "' + e.getAttribute('data-engine') + '" threw ' + x.message); return; }
+      var shown = +String(e.textContent).replace(/[^0-9.\-]/g, ''); if (typeof v === 'number' && shown !== v) out.push('on screen ' + shown + ' != engine ' + v + ' (' + e.getAttribute('data-engine') + ')'); });
+    return out; }
   S.audit = function () {
     var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 8) { seen[m] = 1; out.push(m); } }
     var els = [].slice.call(document.querySelectorAll('body *')).filter(function (e) { return !/^(SCRIPT|STYLE|NOSCRIPT|OPTION)$/.test(e.tagName) && !e.closest(SKIPSEL) && ownText(e) && S.vis(e); }), rects = [];
@@ -164,8 +174,7 @@
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
     [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
-    [].slice.call(document.querySelectorAll('[data-engine]')).forEach(function (e) { if (!S.vis(e)) return; var v; try { v = (0, eval)(e.getAttribute('data-engine')); } catch (x) { add('data-engine "' + e.getAttribute('data-engine') + '" threw ' + x.message); return; }
-      var shown = +String(e.textContent).replace(/[^0-9.\-]/g, ''); if (typeof v === 'number' && shown !== v) add('on screen ' + shown + ' != engine ' + v + ' (' + e.getAttribute('data-engine') + ')'); });
+    engineBad().forEach(add);
     return out;
   };
   S.fp = function () { var d = def(); try { if (d && d.fp) return JSON.stringify(d.fp()); } catch (e) { } var g = ''; try { g = JSON.stringify(window.G || (0, eval)('G')); } catch (e) { } return g.length + ':' + g.slice(0, 4000) + '|' + document.body.innerHTML.length; };
@@ -182,13 +191,16 @@
     else if (m.t === 'js') (0, eval)(m.js);
   };
 
-  S.universal = function (inv) {
+  S.universal = function (inv) {   // async: numbers that animate (a tally counting up) get 5 s to land before they are compared with the engine
+    return (inv === false ? Promise.resolve() : S.wait(function () { return !engineBad().length; }, 5000).catch(function () { })).then(function () { return universalNow(inv); });
+  };
+  function universalNow(inv) {
     var out = [], de = document.documentElement;
     if (Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1) out.push('horizontal scroll ' + de.scrollWidth + '>' + innerWidth);
     var t = document.getElementById('gxscn-tag'); if (!t || !t.textContent) out.push('Test tag missing');
     if (inv !== false) try { S.audit().forEach(function (m) { if (S.known.some(function (k) { return k.re.test(m); })) S.skipped = (S.skipped || 0) + 1; else out.push(m); }); } catch (x) { out.push('audit threw ' + x.message); }
     return out;
-  };
+  }
 
   /* ---- boot: wait for the game, seed, run setup, publish ---- */
   onload(function () {
@@ -200,7 +212,7 @@
       return new Promise(function (r) { setTimeout(r, 300); });
     }).then(function () { return d.setup && d.setup(); }).then(function () {
       var pubD = pub(d); pubD.checks = d.checks.map(function (c) { return { kind: c.kind, name: c.name || c.sel || c.kind, sel: c.sel, sels: (c.steps || []).map(function (x) { return typeof x.sel === 'string' ? x.sel : null; }).filter(Boolean), eqsel: c.sel || c.dom || null }; });
-      window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', checks: pubD.checks, mut: (d.mut || []).map(function (m) { return m.name; }), ready: true };
+      window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', checks: pubD.checks, mut: (d.mut || []).map(function (m) { return m.name; }), engine: document.querySelectorAll('[data-engine]').length, glowN: S.glow().length, glowSel: S.glowSel, ready: true };
       try { if (parent !== window) parent.postMessage({ type: 'gxscn', id: d.id, name: d.name, ask: d.ask || '' }, '*'); } catch (e) { }
     }).catch(function (e) { window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', ready: true, error: 'setup failed: ' + String(e && e.message || e).slice(0, 160), checks: [] }; });
   });
