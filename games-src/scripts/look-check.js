@@ -314,8 +314,8 @@ async function pageCollect(o) {
       }
     }
     for (const ps of [null, '::before', '::after']) {
-      const c = ps ? cs(e, ps) : s; if (ps && (c.content === 'none' || c.content === 'normal' || c.display === 'none')) continue;
-      const r = R(e); if (r[2] < 10 || r[3] < 10 || chainOk(e) < 0.3) continue;
+      const c = ps ? getComputedStyle(e, ps) : s; if (ps && (c.content === 'none' || c.content === 'normal' || c.display === 'none')) continue;
+      const r = R(e); if (r[2] < 10 || r[3] < 10 || e.closest('[hidden],[aria-hidden=true]')) continue;   // opacity ignored: entrance animations are frozen at 0
       const bw = ps ? num(c.width) + num(c.paddingLeft) + num(c.paddingRight) + (c.boxSizing === 'border-box' ? 0 : num(c.borderLeftWidth) + num(c.borderRightWidth)) : r[2], bh = ps ? num(c.height) + num(c.paddingTop) + num(c.paddingBottom) + (c.boxSizing === 'border-box' ? 0 : num(c.borderTopWidth) + num(c.borderBottomWidth)) : r[3];
       if (!(bw >= 10 && bh >= 10)) continue;
       const base = { sel: sel(e) + (ps || ''), box: r };
