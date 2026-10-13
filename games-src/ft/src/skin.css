@@ -103,14 +103,13 @@ html.sk-fx .ft.up{text-shadow:0 0 6px #ffd35a,0 1px 2px rgba(0,0,0,.6)}
 .sch .sn small{font-size:11px;opacity:.85}
 
 /* painted plates, glyphs and badges (html.sk-pl): backgrounds and overlays only, no box moves */
-html.sk-pl .tile::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;box-sizing:border-box;border:7px solid transparent;border-image:url(media/ui-tile-frame-red.webp) 28/7px stretch}
+html.sk-pl .tile::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;box-sizing:border-box;border:5px solid transparent;border-image:url(media/ui-tile-frame-red.webp) 28/5px stretch}
+html.sk-pl .tile>*{z-index:2}
 html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.webp)}
-html.sk-pl .tile::before{content:'';position:absolute;left:4px;top:4px;z-index:1;width:calc(var(--cw)*.3);aspect-ratio:1;max-width:30px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
+html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
 html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
 html.sk-pl .tile .tv{background:url(media/ui-badge-gold.webp) center/100% 100% no-repeat;border-color:transparent;z-index:3}
 html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/100% 100% no-repeat;box-shadow:none}
-html.sk-pl .sch{background:url(media/ui-seat-chip.webp) center/100% 100% no-repeat,#fff9ea;border-color:transparent;box-shadow:none}
-html.sk-pl .sch.actnow{box-shadow:0 0 0 3px #ffcf5a,0 0 12px rgba(255,190,60,.8)}
 html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
 html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
 html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}

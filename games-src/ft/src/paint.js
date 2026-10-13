@@ -20,11 +20,11 @@ function paintApply(){
 }
 function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players','djinn','log','cards','rules','settings','menu','newgame','speed','sound','music','hint'],sets:{'sk-meeple':['vizier','elder','merchant','builder','assassin','artisan'].map(k=>'meeple-'+k)}});['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
   ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d();artProbe()}
-// painted plates, glyphs, items: html.sk-pl once ui-seat-chip has loaded; an <img> in place of an emoji only when painted
+// painted plates, glyphs, items: html.sk-pl once ui-nameplate has loaded; an <img> in place of an emoji only when painted
 const ITEM_IMG={gem5:'item-gem5.webp',gem7:'item-gem7.webp',gem9:'item-gem9.webp',carpet:'item-carpet.webp',lamp:'item-lamp.webp',flute:'item-flute.webp',scimitar:'item-scimitar.webp',talisman:'item-talisman.webp',horn:'item-horn.webp'};
 function pIc(f,emo){return HR.classList.contains('sk-pl')&&f?`<img class="pic" src="media/${f}" alt="">`:emo}
 function itemIc(k){return pIc(ITEM_IMG[k],'🪄')}
-function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle'],['sk-pl','ui-seat-chip']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
+function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle'],['sk-pl','ui-nameplate']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
 // 3D-model sprites (palm, palace, camel, lamp turntable): html.sp3 once the files are there; without them the emoji stay
 function sprites3d(){let n=0;['palm@512','palace@512','camel@512','lamp-turn'].forEach(f=>{const i=new Image();i.onload=()=>{if(++n===4)document.documentElement.classList.add('sp3')};i.src='models/'+f+'.webp'})}
 // painted pictures on/off (Settings)

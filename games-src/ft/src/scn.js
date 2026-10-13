@@ -76,7 +76,7 @@
   var ART = [ // [selector, pseudo, file, max stretch]
     ['.tile.blue', '::after', 'ui-tile-frame-blue', 0], ['.tile:not(.blue)', '::after', 'ui-tile-frame-red', 0],
     ['.tile .tv', '', 'ui-badge-gold', 1.6], ['.dcard:not(.th) .dv', '', 'ui-badge-cream', 1.6],
-    ['.sch', '', 'ui-seat-chip', 1.9], ['.sch .sti', '', 'icon-star', 0], ['.mcard:not(.empty)', '', 'ui-goods-card', 0]
+    ['.sch .sti', '', 'icon-star', 0], ['.mcard:not(.empty)', '', 'ui-goods-card', 0]
   ];
   var PROBE = [ // transient pieces: built as a probe so their CSS is tested without waiting for the moment
     ['<div class="card dj"><h4>Djinn</h4></div>', '.card.dj h4', '', 'ui-djinn-bar', 0], ['<div id="summon"><b>Name</b></div>', '#summon b', '', 'ui-ribbon', 0],
