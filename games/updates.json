@@ -27,6 +27,33 @@
  },
  {
   "date": "2026-10-13",
+  "game": "nebula",
+  "title": "Painted look for Nebula Aces",
+  "items": [
+   "Lancer and Talon hulls and the asteroids are detailed 3D models",
+   "Phones and Low graphics load lighter versions",
+   "Metal-and-glass buttons, panels and bar",
+   "Painted flight-plan cards for manoeuvres",
+   "Brass badges for hull, shields, focus, evade and lock",
+   "Painted ship art on pilot cards; painted star-chart arena floor"
+  ],
+  "check": "Start a battle: look at the buttons, the dial cards and the floor under the grid."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "lantern-dive",
+  "title": "Lantern Dive: painted deep-sea table",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit"
+  ],
+  "check": "Start a dive and look at the table"
+ },
+ {
+  "date": "2026-10-13",
   "game": "thornbound",
   "title": "Painted court kit",
   "items": [
@@ -81,15 +108,18 @@
  {
   "date": "2026-10-13",
   "game": "mainhattan",
-  "title": "Painted menus, HUD and touch buttons",
+  "title": "Animated bosses and a one-tap Lab",
   "items": [
    "Title, pause, garage, shop and story buttons are now painted plates",
    "Settings card has a painted frame, header and rows",
    "Run HUD sits in painted housings; hints in a speech bubble",
    "Phone pause, DASH and EMP are painted round buttons",
-   "Story map stages sit on medallions: open, done, boss, locked"
+   "Story map stages sit on medallions: open, done, boss, locked",
+   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
+   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
+   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones"
   ],
-  "check": "Open the title, a story run on a phone, pause and settings: everything readable and tappable"
+  "check": "LAB > BOSS PICKER, then watch each boss before it fires"
  },
  {
   "date": "2026-10-13",
@@ -111,26 +141,6 @@
    "They still lift with steam when the round reveals"
   ],
   "check": "Pick a plate and watch the cloches lift"
- },
- {
-  "date": "2026-10-13",
-  "game": "lantern-dive",
-  "title": "Lantern Dive: the Commander's real lantern",
-  "items": [
-   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
-   "The Commander badge is now the lantern too"
-  ],
-  "check": "Start a dive and watch the lantern appear by the Commander"
- },
- {
-  "date": "2026-10-13",
-  "game": "nebula",
-  "title": "Real 3D ships and asteroids",
-  "items": [
-   "Lancer and Talon hulls and the asteroids are detailed 3D models",
-   "Phones and Low graphics load lighter versions"
-  ],
-  "check": "Start a battle and look at the ships and asteroids on the mat."
  },
  {
   "date": "2026-10-13",

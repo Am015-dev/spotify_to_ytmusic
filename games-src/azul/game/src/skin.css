@@ -17,3 +17,6 @@ html.sk .gx-drawer-head h2{text-shadow:none}
 html.sk-cells .bf-rack .bf-c:not(.no){background:url(media/ui-rack-cell.webp) center/118% 118% no-repeat;box-shadow:none}
 html.sk-cells .bf-wall .bf-c{background:url(media/ui-wall-cell.webp) center/118% 118% no-repeat;box-shadow:none}
 html.sk-cells .bf-floor .bf-c{background:url(media/ui-floor-cell.webp) center/118% 118% no-repeat;box-shadow:none}
+html.sk .gxc-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1a0a}
+html.sk .gxc-htitle{color:#3a1a0a;text-shadow:none;line-height:1.3;padding:2px 0}
+html.sk .gxc-ib{color:#fff}

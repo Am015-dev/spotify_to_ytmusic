@@ -8,7 +8,7 @@
 // its finger target must equal planned advice (startAdvice / recMove / aiMove), tapping the finger must perform exactly that move, the why <= 15 words, a tap
 // dismisses it, and the rules cards (2-4, <= 20 words, a picture each) open from "How does this work?".
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
-const fs=require('fs');
+const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(__dirname+'/tidewake.html');
 const GAMES=+(process.argv[2]||20);const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||3);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -20,7 +20,7 @@ const GLOW='.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .b
 async function playGame(browser,W,H,gi){
   const tag=W+'x'+H+' g'+gi;
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const m=/^\/media\/[\w.-]+\.webp$/.test(u.pathname)&&path.join(__dirname,'../../../games/tidewake',u.pathname);if(m&&fs.existsSync(m))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(m)});r.fulfill({status:200,contentType:'text/html',body:html})});   // painted kit served too, so the sweep runs with the skin on
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon|Fetch API cannot load/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
@@ -197,7 +197,7 @@ async function playGame(browser,W,H,gi){
 
 // every phase has a step (title <= 4 words, text <= 20) and 2-4 rules cards (<= 20 words, a picture), plus 2+ general cards
 async function staticCheck(b){const ctx=await b.newContext({viewport:{width:390,height:763},isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const m=/^\/media\/[\w.-]+\.webp$/.test(u.pathname)&&path.join(__dirname,'../../../games/tidewake',u.pathname);if(m&&fs.existsSync(m))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(m)});r.fulfill({status:200,contentType:'text/html',body:html})});   // painted kit served too, so the sweep runs with the skin on
   const p=await ctx.newPage();await p.goto('https://gns.test/?phone=1&2d',{timeout:90000});await sleep(900);
   const R=await p.evaluate(()=>({steps:Object.entries(HLP_STEPS).map(([k,v])=>({k,t:v.title,x:v.text,pic:!!(v.pic&&v.pic())})),rules:HLP_RULES.map(r=>({ph:r.phase||null,t:r.title,x:r.text,pic:!!(r.pic&&r.pic())}))}));
   const phases=R.steps.map(s=>s.k);const sc={phases:phases.length,steps:R.steps.length,rules:R.rules.length};
