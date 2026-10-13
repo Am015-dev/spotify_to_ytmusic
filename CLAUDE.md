@@ -16,8 +16,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - **Shot Wall (Alex, 2026-10-10: "save all the screenshots inside the new html based on worker").** All worker shots live in the Shot Wall artifact https://claude.ai/artifact/J9fD3HLnbjnhhjxJ83Czbs, grouped by worker. Workers keep shots under docs/shots/<lane>/ on their branch. The coordinator refreshes the wall with every deploy (tools/shotwall/collect.py → index.html, then republish).
 - **Quick review for tiny fixes (Alex, 2026-10-06):** text, popup positions, colours and opacity get a QUICK review: one 852×393 shot of the change plus a no-console-errors check. The full shot set and tPlay are only for driving, physics, world or performance changes.
 - **Model choice (Alex, 2026-10-06):** small, well-specified fixes (UI nits, text, colours) run on `claude-sonnet-5-5`. Driving feel, graphics, and anything that failed once run on `claude-opus-5-5`.
-- **The gate = screenshots you LOOK at (852×393 phone: start, mid-drive, Athens) + tPlay (`tools/tPlay.js`, alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
-  force-clicks. smoke and tOut are sanity checks only. Never deploy an unsplit build (3.6 MB cap).
+- **The gate = checklist tests + screenshots you LOOK at (Alex, 2026-10-13: "fast implementations ... better checklists and tests and less playing the game and waiting for hours").** Every change ships with checklist tests (src/99c_checklist.js): 📍 GO spawns ONLY the requirement (place, car, state), then the test acts with REAL touch/keyboard input (no warps or force-clicks during the tested action) and checks a measurable pass line. Each test runs in seconds; the whole set for a change in under 3 min. Plus ONE grid of 852×393 shots you LOOK at. Long tPlay is OUT of the per-change loop: release candidates get ONE short tPlay (≤ 3 min per city, real input, SPLIT build) as a final sanity check. Never deploy an unsplit build (3.6 MB cap).
 - **Feature freeze:** only fixes until Alex scores the game 6/10 or higher, EXCEPT what Alex asks for himself (art direction, LEGO cars). Never self-score fun.
 - Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex" and "3D models by Alex" (Alex, 2026-10-06), English UI, gas default on touch, and no model names in files or commits.
 - Read the `fun-game-design` skill (real-input testing; terse reporting).
@@ -51,7 +50,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - Write a handoff at ~120k context (not later). Small fixes go to an already-running worker, not a new session.
 - Use a fresh session per task and write a handoff before ~150k context. Never keep going in a 400k+ context.
 - Run a test once in the background and wait for its notification. No `sleep`/`grep` polling loops and no scheduled check-ins.
-- Release candidates: build with `reapply.sh` in the RELEASE.md order, split, run tPlay once, deploy. No 22-run matrices.
+- Release candidates: build with `reapply.sh` in the RELEASE.md order, split, run the checklist tests + ONE short tPlay (≤ 3 min/city), deploy. No long runs, no matrices.
 - Workers never deploy; they hand the coordinator a DEPLOY message (see standing orders).
 - Every new session pays ~15 min and ~150k tokens just reading the 3.7 MB file. Prefer ONE long-lived owner session (now: art session) with a queue, over new sessions per request.
 - The coordinator itself must stay under ~200k context (Alex runs /compact). It cost $20 at 312k.
