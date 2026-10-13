@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-13",
+  "game": "shipwreck-isle",
+  "title": "Painted art wired",
+  "items": [
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm"
+  ],
+  "check": "Do the camp icons and 3D camp look painted?",
+  "scn": [
+   "si-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "nebula-aces",
   "title": "Painted art wired",
   "items": [
