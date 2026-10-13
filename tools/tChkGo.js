@@ -16,27 +16,27 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
  const open=async c=>{const t=Date.now();await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+c+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:90000});
   const s=(Date.now()-t)/1000;(boots[c]=boots[c]||[]).push(s);if(!process.env.QUIET)console.log(`BOOT ${c} ${s.toFixed(1)} s`);nav=0};
  const shot=async f=>{await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.screenshot({path:OUT+'/'+f,type:'jpeg',quality:70})};
- await open('fra');
+ await open(process.env.CITY||'fra');
  const all=await p.evaluate(()=>window.__chk.items.map(it=>it.ver+'/'+it.id).filter(id=>window.__chk.GO[id]).map(id=>[id,window.__chk.city(id)]));
  // items whose GO only opens the garage (or says "drive here") all do the same thing: run the first, report the rest as the same
  const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>{const T=window.__chk.GO[id][0];return[id,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));const seen={},same={};
- const SM=['v90k/rv-human','v90k/rv-scale','v90k/park-sit','v90k/shadow','v90k/fra-net','v90k/lag','v90k/ath-kriezi','v90m/ath-boot','art1/road-gap','v90k/ramp-seam','v90k/ww-card','v90n/foot-go-walk','v90n/foot-go-npc','v90n/foot-go-jump','v90k/kerb-park','v90k/ath-flip','v90i/palms','v90g/fra-props','v90g/ath-display','v90k/no-hollow'],TG=(process.env.TAG||'').split(',').filter(Boolean);
+ const SM=['v90n/foot-go-walk','v90n/foot-go-npc','v90n/foot-go-jump','v90k/rv-human','v90k/no-hollow','v90k/shadow','v90k/lag','v90k/ramp-seam','v90k/fra-net','v90g/fra-props','v90m/ath-boot','v90k/ath-kriezi','v90g/ath-display','v90k/rv-scale','v90k/ww-card'],TG=(process.env.TAG||'').split(',').filter(Boolean);
  const want=id=>id.includes(FIL)&&(!process.env.SMOKE||SM.includes(id))&&(!TG.length||TG.some(t=>id.startsWith(t)||id.includes('/'+t)||id.split('/')[0]===t));
- const pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
+ const LAST=['v90k/rv-scale','v90k/ww-card','v90k/park-sit'],pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).sort((a,b)=>(process.env.SMOKE?LAST.includes(a)-LAST.includes(b):0)).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
  const run=async(c,ids)=>{for(const id of ids){const e0=errs.length;let said='';
-   const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:60000,polling:500}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
-   await p.waitForTimeout(c==='bx'?1500:500);
+   const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:20000,polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
+   await p.waitForTimeout(c==='bx'?1500:process.env.SMOKE?150:500);
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
    if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:spawnOnly?false:ok,spawnOnly,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!ok||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(res.length<=3||id.endsWith('/shadow'))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
    if(st.gar)await p.evaluate(()=>{try{gbClose(false)}catch(e){}});
-   if(nav||(st.state!=='roam'))await open(c==='ath'?'ath':'fra')}};
+   if((nav||(st.state!=='roam'&&!process.env.SMOKE))&&!(process.env.SMOKE&&id===ids[ids.length-1]))await open(c==='ath'?'ath':'fra')}};
  const runSafe=async(c,ids)=>{let i=0;while(i<ids.length){const n0=res.length;try{await run(c,ids.slice(i));return}catch(e){const d=res.length-n0,bad=ids[i+d];if(bad)res.push({id:bad,c,ok:false,said:'PAGE LOST',errs:[]});i+=d+1;console.log('PAGE LOST at '+bad+' '+String(e).slice(0,100)+' → reopen');try{if(p.isClosed())await newPage();await open(c==='bx'?'fra':c)}catch(e2){}}}};
  const ath=pick('ath'),CY=process.env.CITY||'';
  if(CY!=='ath'){await runSafe('fra',pick('fra'));await runSafe('bx',pick('bx'))}
- if(CY!=='fra'&&ath.length){await open('ath');await runSafe('ath',ath)}
+ if(CY!=='fra'&&ath.length){if(CY!=='ath')await open('ath');await runSafe('ath',ath)}
  for(const id in same){const r=res.find(q=>q.id===same[id]);if(r)res.push({...r,id,said:'same as '+same[id]+': '+r.said})}
  const pass=res.filter(r=>r.ok).length;
  console.log(JSON.stringify({pass,total:res.length,fail:res.filter(r=>!r.ok).map(r=>r.id),boots,errors:errs.length,firstErrors:errs.slice(0,5),secs:Math.round((Date.now()-T0)/1000)}));
