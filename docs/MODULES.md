@@ -86,7 +86,7 @@ file | KB | purpose | first defines
 98of_onfoot.js | 65 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
 98sh_shadow.js | 4 | SHB (v90k): soft blob shadows on the ground under th | SHB SHB_pool SHB_M
 98lf_lively_fill.js | 25 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
-99c_checklist.js | 87 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | CK_pit OD_CHECKLIST
+99c_checklist.js | 92 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | CK_pit OD_CHECKLIST
 98rf_race_fun.js | 10 | (no header comment) | RF_GRID RF_rub RF_lat
 98ro_open.js | 30 | OPN (race worker, 2026-10-09): OPEN race courses in  | OPN_TER OPN_K OPN_I0
 98zp_perf_ctx.js | 13 | PERF1 (v89i): one WebGL context The menu car cards ( | P1 P1_rt P1_free
@@ -101,6 +101,7 @@ file | KB | purpose | first defines
 98rs_road_seams.js | 5 | RS: ROAD SEAMS (art-1, 2026-10-13). Alex (v90m-beta. | RS_OFF RS_seams RS
 98lm_liveliness.js | 5 | LVM: LIVELINESS METER (art-1, 2026-10-13). Alex: "Al | LVM_SPOTS LVM_T LVM_HR
 98cam_size_cam.js | 16 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
+98gx_gfx.js | 6 | GFX (gfx-1, 2026-10-13): daytime lighting/rendering  | GFX GFX_SUN GFX_tier
 99_api.js | 49 | test API window.__mho={…} (state, roamSim, warp, gnd | __mho CR_RBX CR_raceHide
 test/fast.js | 5 | FAST · test-only fast mode, active only with ?fast=1 | FAST
 test/g9iter.js | 0 | test-only (local builds): eval in module scope for t | __g9ev
