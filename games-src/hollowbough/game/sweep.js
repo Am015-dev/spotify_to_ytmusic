@@ -8,7 +8,7 @@
 // Prints "FAIL ..." lines and "SWEEP PASS" or "SWEEP FAIL n".
 const PW = (() => { try { return require('playwright'); } catch (e) { return require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright'); } })();
 const fs = require('fs'), path = require('path');
-const html = fs.readFileSync(path.join(__dirname, 'hollowbough.html'));
+const html = fs.readFileSync(process.env.HTML || path.join(__dirname, 'hollowbough.html'));
 const NG = +process.argv[2] || 5, SIZES = (process.argv[3] || '390x763,375x553').split(',').map(s => s.split('x').map(Number)), MODE = process.argv[4] || 'vs';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let bad = 0; const fails = []; const helpTotals = [];
