@@ -22,6 +22,36 @@
  },
  {
   "date": "2026-10-13",
+  "game": "lantern-dive",
+  "title": "Painted art wired",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit",
+   "Painted card frames, tick/cross, seat plates, portrait Descent table"
+  ],
+  "check": "Do cards, seats and job marks look painted?",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "ld-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "thornbound",
   "title": "Painted art wired",
   "items": [
@@ -268,19 +298,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-13",
-  "game": "lantern-dive",
-  "title": "Lantern Dive: painted deep-sea table",
-  "items": [
-   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
-   "The Commander badge is now the lantern too",
-   "The trick table is a brass-rimmed painted pad",
-   "Oxygen tanks and boss hearts are painted",
-   "Buttons, top bar and menus use the brass kit"
-  ],
-  "check": "Start a dive and look at the table"
  },
  {
   "date": "2026-10-13",
