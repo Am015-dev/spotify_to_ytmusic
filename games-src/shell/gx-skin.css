@@ -48,6 +48,8 @@ html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow
 html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
 html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
 /* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
-html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
-html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+/* speech bubble: 9-slice (corners + the whole tail keep their shape, only the plain frame stretches); flipped so the tail points up at the speaker.
+   slice px are of the ~170x160 art (tail = bottom-right 60x34); widths are the same slices at ~0.7 scale. Never wider than the text box. */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;box-sizing:border-box;max-width:100%;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-6px 0;z-index:-1;pointer-events:none;border-style:solid;border-color:transparent;border-width:15px 42px 24px 21px;border-image:url(media/ui-bubble-c.webp) 22 62 34 30 fill/15px 42px 24px 21px stretch;transform:scaleY(-1)}
 @media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
