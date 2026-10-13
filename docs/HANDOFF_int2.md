@@ -6,7 +6,7 @@ Never touch live, never run deploy.sh, never ask Alex. Push + one line to the co
 
 ## State
 - Branch `alex/od-int2`, head `ff50683` = **v90m-beta.1** (`out/v90m-beta.1`): v90l + dev-2 ded0603/28b5681 (3 built-in builder tracks, WIP).
-  tChkGo **220/223, 0 errors** (fails: v90k/shadow, v90g/bigrig, v90i/palms; see open items). Grid NOT yet made/sent for beta.1.
+  tChkGo **220/223, 0 errors** (fails: v90k/shadow, v90g/bigrig, v90i/palms; see open items). Grid `qa_v90m-beta.1/grid.jpg` (looked: OK except the parked-car shot, player still in the car); BUILD line for beta.1 not sent by int-2.
 - `out/v90l` (9351831) = last full BUILD sent to the coordinator (217/220, 0 errors, grid `qa_v90l/grid_v90l.jpg`).
 - `out/v90k` (8ee95ab) = the coordinator's live candidate (dev1 2ced33a + lag fix).
 - `alex/od-int2-tq` = the ?test= work (now fully merged into od-int2; no need to use it).
