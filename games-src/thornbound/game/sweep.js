@@ -56,7 +56,7 @@ async function playGame(browser,W,H,gi){
         for(const c of cores)if(r.left<c.right&&r.right>c.left&&r.top<c.bottom&&r.bottom>c.top){o.bad.push('help bubble covers a glowing target');break}}}
       const f=document.querySelector('#finger');o.finger=!!(f&&!f.hidden);
       return o});
-    for(const b of r.bad){note(tag+' '+phase,b);if(/help bubble/.test(b)&&!checks._shot){checks._shot=1;await p.screenshot({path:'/tmp/claude-0/helpbad_'+W+'_'+gi+'.png'}).catch(()=>{})}}
+    for(const b of r.bad){note(tag+' '+phase,b);if(/board only/.test(b)&&!checks._s2){checks._s2=1;await p.screenshot({path:'/tmp/tb-boardbad_'+W+'_'+gi+'.png'}).catch(()=>{})}if(/help bubble/.test(b)&&!checks._shot){checks._shot=1;await p.screenshot({path:'/tmp/claude-0/helpbad_'+W+'_'+gi+'.png'}).catch(()=>{})}}
     if(r.finger)totals.hint++;
     return r};
   let lastTap=null,lastDiag='';
@@ -98,6 +98,7 @@ async function playGame(browser,W,H,gi){
       else if(pre.sug&&pre.plan){
         if(pre.sug!==pre.adv)note(tag,'bulb suggestion '+pre.sug+' differs from advise() '+pre.adv+' ('+hs.ph+')');
         if(!pre.legal)note(tag,'bulb suggestion not legal ('+pre.sug+')');
+        if(!r.f&&!checks._s3){checks._s3=1;await p.screenshot({path:'/tmp/tb-nofinger_'+W+'_'+gi+'.png'}).catch(()=>{})}
         if(!r.f)note(tag,'bulb tapped, no finger ('+hs.ph+') plan now '+await p.evaluate(()=>{try{return JSON.stringify(planFor(UI.bf,UI.bf.sug,{full:1}).toR)+' main='+document.querySelector('#main').className+' '+document.querySelector('#main').innerHTML.length+' pop='+UI.pop+' card='+(UI.card&&UI.card.kind)+' st='+JSON.stringify(GXH.state())+' phase='+hlpPhase()+' qk='+(G.q&&G.q.kind)+' sugnow='+(()=>{const x=hlpSuggest();return x?JSON.stringify([x.why,!!x.target(),x.from&&!!x.from()]):'null'})()}catch(e){return 'none '+e.message}}));
         else{if(Math.abs(+r.f.tx-pre.plan.to.x)>2||Math.abs(+r.f.ty-pre.plan.to.y)>2)note(tag,'bulb finger target '+r.f.tx+','+r.f.ty+' != suggestion '+Math.round(pre.plan.to.x)+','+Math.round(pre.plan.to.y)+' ('+hs.ph+')');
           if(pre.plan.from&&(!r.f.fx||Math.abs(+r.f.fx-pre.plan.from.x)>2||Math.abs(+r.f.fy-pre.plan.from.y)>2))note(tag,'bulb finger start != the suggested card ('+hs.ph+')');}
