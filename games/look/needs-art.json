@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-13T17:35:24.512Z",
+ "generated": "2026-10-13T17:42:30.884Z",
  "items": [
   {
    "game": "crown-city-smash",
@@ -405,25 +405,6 @@
   {
    "game": "sands-of-qamar",
    "check": "images",
-   "element": "tile red plate",
-   "sel": "div.tile.red",
-   "issue": "Tile red art tile-small.webp is cropped hard (36% cut off)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 0.65,
-   "transparent": true,
-   "needs_art": true,
-   "img": "img/sands-of-qamar/f9.webp",
-   "sites": [
-    "phone:board",
-    "phone:mid-game"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
    "element": "spot plate",
    "sel": "div.spot",
    "issue": "Spot art ui-spot.webp is stretched (box 40x56, picture 128x160)",
@@ -434,10 +415,29 @@
    "ratio": 0.71,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f10.webp",
+   "img": "img/sands-of-qamar/f6.webp",
    "sites": [
     "phone:board",
     "small:board"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "tile red plate",
+   "sel": "div.tile.red",
+   "issue": "Tile red art tile-small.webp is cropped hard (36% cut off)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.65,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f7.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
    ]
   },
   {
@@ -453,7 +453,7 @@
    "ratio": 0.65,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f12.webp",
+   "img": "img/sands-of-qamar/f10.webp",
    "sites": [
     "phone:board",
     "phone:mid-game"
@@ -472,7 +472,7 @@
    "ratio": 0.65,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f15.webp",
+   "img": "img/sands-of-qamar/f12.webp",
    "sites": [
     "phone:board",
     "phone:mid-game"
@@ -491,7 +491,7 @@
    "ratio": 1.2,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f16.webp",
+   "img": "img/sands-of-qamar/f13.webp",
    "sites": [
     "phone:board",
     "phone:mid-game",
@@ -512,7 +512,7 @@
    "ratio": 0.65,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f17.webp",
+   "img": "img/sands-of-qamar/f14.webp",
    "sites": [
     "phone:board",
     "phone:mid-game"
@@ -531,7 +531,7 @@
    "ratio": 0.65,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f18.webp",
+   "img": "img/sands-of-qamar/f16.webp",
    "sites": [
     "phone:board",
     "phone:mid-game"
@@ -550,7 +550,7 @@
    "ratio": 7.5,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f21.webp",
+   "img": "img/sands-of-qamar/f18.webp",
    "sites": [
     "phone:start",
     "phone:board",
@@ -565,7 +565,28 @@
    "check": "images",
    "element": "mi plate",
    "sel": "span.mi",
-   "issue": "Mi art good-wheat.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "issue": "Mi art good-fish.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f19.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-ivory.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
    "target_px": [
     512,
     512
@@ -586,7 +607,7 @@
    "check": "images",
    "element": "mi plate",
    "sel": "span.mi",
-   "issue": "Mi art good-fish.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "issue": "Mi art good-silk.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
    "target_px": [
     512,
     512
@@ -607,7 +628,7 @@
    "check": "images",
    "element": "mi plate",
    "sel": "span.mi",
-   "issue": "Mi art good-pottery.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "issue": "Mi art good-spice.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
    "target_px": [
     512,
     512
@@ -636,7 +657,7 @@
    "ratio": 0.51,
    "transparent": false,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f27.webp",
+   "img": "img/sands-of-qamar/f25.webp",
    "sites": [
     "phone:start",
     "small:start"
@@ -647,7 +668,7 @@
    "check": "images",
    "element": "mi plate",
    "sel": "span.mi",
-   "issue": "Mi art good-jewels.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "issue": "Mi art good-pottery.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
    "target_px": [
     512,
     512
@@ -655,7 +676,7 @@
    "ratio": 1.2,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f28.webp",
+   "img": "img/sands-of-qamar/f26.webp",
    "sites": [
     "phone:board",
     "phone:mid-game"
@@ -674,45 +695,45 @@
    "ratio": 4.16,
    "transparent": true,
    "needs_art": true,
+   "img": "img/sands-of-qamar/f27.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-nakhla.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.16,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f28.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-zarifa.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.16,
+   "transparent": true,
+   "needs_art": true,
    "img": "img/sands-of-qamar/f29.webp",
-   "sites": [
-    "phone:board",
-    "phone:mid-game"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
-   "element": "dcard plate",
-   "sel": "button.dcard",
-   "issue": "Dcard art djinn-rawda.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 4.16,
-   "transparent": true,
-   "needs_art": true,
-   "img": "img/sands-of-qamar/f30.webp",
-   "sites": [
-    "phone:board",
-    "phone:mid-game"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
-   "element": "dcard plate",
-   "sel": "button.dcard",
-   "issue": "Dcard art djinn-fath.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 4.16,
-   "transparent": true,
-   "needs_art": true,
-   "img": "img/sands-of-qamar/f31.webp",
    "sites": [
     "phone:board",
     "phone:mid-game"
@@ -731,29 +752,10 @@
    "ratio": 5.96,
    "transparent": true,
    "needs_art": true,
-   "img": "img/sands-of-qamar/f32.webp",
+   "img": "img/sands-of-qamar/f30.webp",
    "sites": [
     "phone:help",
     "small:help"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
-   "element": "mi plate",
-   "sel": "span.mi",
-   "issue": "Mi art good-spice.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 1.41,
-   "transparent": true,
-   "needs_art": true,
-   "img": "img/sands-of-qamar/f33.webp",
-   "sites": [
-    "small:board",
-    "small:mid-game"
    ]
   },
   {
@@ -769,6 +771,63 @@
    "ratio": 1.41,
    "transparent": true,
    "needs_art": true,
+   "img": "img/sands-of-qamar/f31.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-wheat.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.41,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f32.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-khanjar.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.6,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f33.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-sirra.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.6,
+   "transparent": true,
+   "needs_art": true,
    "img": "img/sands-of-qamar/f34.webp",
    "sites": [
     "small:board",
@@ -780,7 +839,7 @@
    "check": "images",
    "element": "dcard plate",
    "sel": "button.dcard",
-   "issue": "Dcard art djinn-zarifa.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "issue": "Dcard art djinn-wahha.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
    "target_px": [
     512,
     512
@@ -792,62 +851,6 @@
    "sites": [
     "small:board",
     "small:mid-game"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
-   "element": "dcard plate",
-   "sel": "button.dcard",
-   "issue": "Dcard art djinn-burhan.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 4.6,
-   "transparent": true,
-   "needs_art": true,
-   "img": null,
-   "sites": [
-    "small:board",
-    "small:mid-game"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
-   "element": "dcard plate",
-   "sel": "button.dcard",
-   "issue": "Dcard art djinn-sadim.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 4.6,
-   "transparent": true,
-   "needs_art": true,
-   "img": null,
-   "sites": [
-    "small:board",
-    "small:mid-game"
-   ]
-  },
-  {
-   "game": "sands-of-qamar",
-   "check": "images",
-   "element": "spot taken plate",
-   "sel": "div.spot.taken",
-   "issue": "Spot taken art ui-spot.webp is stretched (box 38x56, picture 128x160)",
-   "target_px": [
-    512,
-    512
-   ],
-   "ratio": 0.68,
-   "transparent": true,
-   "needs_art": true,
-   "img": null,
-   "sites": [
-    "small:board"
    ]
   },
   {
@@ -1362,7 +1365,7 @@
    "ratio": 8.86,
    "transparent": true,
    "needs_art": true,
-   "img": "img/thornbound/f5.webp",
+   "img": "img/thornbound/f4.webp",
    "sites": [
     "phone:start",
     "phone:board",
@@ -1385,7 +1388,7 @@
    "ratio": 0.71,
    "transparent": false,
    "needs_art": true,
-   "img": "img/thornbound/f6.webp",
+   "img": "img/thornbound/f5.webp",
    "sites": [
     "phone:start",
     "phone:board",
@@ -1408,7 +1411,7 @@
    "ratio": 6.42,
    "transparent": true,
    "needs_art": true,
-   "img": "img/thornbound/f8.webp",
+   "img": "img/thornbound/f7.webp",
    "sites": [
     "phone:help",
     "small:help"
@@ -1427,7 +1430,7 @@
    "ratio": 6.42,
    "transparent": true,
    "needs_art": true,
-   "img": "img/thornbound/f9.webp",
+   "img": "img/thornbound/f8.webp",
    "sites": [
     "phone:help",
     "small:help"
@@ -1446,7 +1449,7 @@
    "ratio": 0.51,
    "transparent": false,
    "needs_art": true,
-   "img": "img/thornbound/f11.webp",
+   "img": "img/thornbound/f10.webp",
    "sites": [
     "phone:start"
    ]
@@ -1464,11 +1467,12 @@
    "ratio": 2.04,
    "transparent": true,
    "needs_art": true,
-   "img": "img/thornbound/f13.webp",
+   "img": "img/thornbound/f11.webp",
    "sites": [
     "phone:board",
     "phone:mid-game",
     "small:board",
+    "small:mid-game",
     "pc:board",
     "pc:mid-game"
    ]
@@ -1486,7 +1490,7 @@
    "ratio": 5.4,
    "transparent": true,
    "needs_art": true,
-   "img": "img/thornbound/f14.webp",
+   "img": "img/thornbound/f12.webp",
    "sites": [
     "phone:start",
     "small:start",
@@ -1506,7 +1510,7 @@
    "ratio": 5.4,
    "transparent": true,
    "needs_art": true,
-   "img": "img/thornbound/f15.webp",
+   "img": "img/thornbound/f13.webp",
    "sites": [
     "phone:start",
     "small:start",
