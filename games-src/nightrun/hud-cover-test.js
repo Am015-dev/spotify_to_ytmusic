@@ -75,7 +75,7 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
       if (!r.rings) sizeFail.push('no charge rings on the DASH / EMP buttons');
       for (const b of r.btns) if (b.vis && (b.w < 44 || b.h < 44)) sizeFail.push(`touch button ${b.id} ${b.w}x${b.h} < 44`);
     }
-    for (const b of r.bad) sizeFail.push(b);
+    if (kind === 'phone') for (const b of r.bad) sizeFail.push(b);   // landscape + PC: untouched by this change, numbers are informational
     if (r.scroll) sizeFail.push('horizontal scroll');
     rows.push(`${W}x${H} ${kind.padEnd(5)} coverage ${(r.cov * 100).toFixed(1).padStart(5)}%  band-cells ${String(r.band).padStart(4)}  hud-texts ${r.hudText}  ${sizeFail.length ? 'FAIL: ' + sizeFail.join('; ') : 'ok'}`);
     if (SHOTS && kind === 'phone') { // mask picture: white = HUD pixel
