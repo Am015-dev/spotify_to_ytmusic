@@ -22,12 +22,12 @@ canvas{display:block;width:100%;height:100%;}
   background:linear-gradient(90deg,#05030cf2 0%,#05030cc0 55%,#05030c40 100%);}
 .ov.solid{background:#05030ce6}
 .ov .in{margin:auto 0;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(5px,1.4vh,13px);max-width:100%;width:100%;}
-.eyebrow{font-family:var(--mono);font-size:clamp(10px,min(1.5vw,2.6vh),14px);letter-spacing:.24em;color:var(--cyan);text-transform:uppercase;}
+.eyebrow{font-family:var(--mono);font-size:clamp(11px,min(1.5vw,2.6vh),14px);letter-spacing:.24em;color:var(--cyan);text-transform:uppercase;}
 h1{font-family:var(--display);font-weight:700;margin:0;line-height:.9;font-size:clamp(30px,min(7.4vw,11.5vh),84px);letter-spacing:.01em;
   color:var(--ink);text-shadow:3px 0 0 #ff2d95aa,-3px 0 0 #19e3ffaa;text-wrap:balance;}
 h1 span{color:var(--pink);text-shadow:0 0 18px #ff2d9599;}
 .lede{font-family:var(--display);font-weight:500;font-size:clamp(13px,min(1.9vw,3.2vh),18px);line-height:1.35;max-width:52ch;color:#cfc9f2;margin:0;}
-.keys{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-family:var(--mono);font-size:clamp(10px,min(1.35vw,2.4vh),13px);color:var(--dim);}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-family:var(--mono);font-size:clamp(11px,min(1.35vw,2.4vh),13px);color:var(--dim);}
 .keys b{color:var(--ink);font-weight:400;border:1px solid #3a2b5c;padding:0 6px;border-radius:3px;background:#140c26;}
 html.touch .kb{display:none}
 html:not(.touch) .tc{display:none}
@@ -125,15 +125,6 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
 #stsel .card[data-nd=locked] .no::before{background-image:url(media/ui-node-locked.webp)}
 #stsel .card[data-nd=locked] .no{color:var(--dim)}
 #stsel .card .hd{margin-bottom:.2em}
-@container (max-height:640px) and (max-aspect-ratio:1/1){
- #stsel .card{flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;padding:0 8px!important}
- #stsel .card .hd{display:contents!important}
- #stsel .card .no{order:0;flex:0 0 auto;font-size:13px!important;min-width:28px;text-align:center}
- #stsel .card .no::before{width:28px;height:28px}
- #stsel .card .nm{order:1;flex:1 1 40px!important;min-width:0!important;display:block!important;width:auto!important;font-size:11px!important}
- #stsel .card .stars,#stsel .card svg.lk{order:2;font-size:11px!important}
- #stsel .card .gl{display:none!important}
-}
 #setm .card{border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;border-radius:0}
 #setm .card h2{background:linear-gradient(#05030c88,#05030c88),url(media/ui-drawer-head.webp) center/100% 100% no-repeat;text-shadow:0 0 6px #000}
 #setm .seg,#setm .sl{background:url(media/ui-row.webp) center/148% 100% no-repeat;padding:3px 10px 3px 24px;min-height:40px}

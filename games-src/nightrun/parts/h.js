@@ -15,7 +15,7 @@ NR.on('tick',dt=>{if(!G.live)return;
   if(G.dead){STILL.beam=null;return;}
   /* --- stillness --- */
   if(Math.hypot(P.x-STILL.ax,P.y-STILL.ay)>50||P.dashT>0){STILL.ax=P.x;STILL.ay=P.y;STILL.t=Math.max(0,STILL.t-STILL.t*.5);if(STILL.t<.5)STILL.t=0;}
-  else if(G.t>6&&G.transT<0)STILL.t+=dt;
+  else if(G.t>6&&G.transT<0&&!G.lab)STILL.t+=dt;
   const s=Math.max(0,STILL.t-STILLF()),k=Math.min(1,s/STILL_RAMP);STILL.k=k;
   STILL.fk=1+1.4*k;STILL.bk=1+.22*k;STILL.sk=Math.max(.12,1-.88*k);
   if(s>0&&G.mult>1)G.mult=Math.max(1,G.mult-.4*dt);

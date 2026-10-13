@@ -59,7 +59,14 @@ ART.bgOf=(di,port,u,w,h,dim)=>{const n='bg-'+ART.dn[di]+(port?'-phone':'');const
   const fb=port?null:ART.bm['ly-far-'+ART.dn[di]];       // the painted far skyline is baked into the backdrop tile: one layer, no extra blit per frame
   return ART.bigGet(n+'|'+Math.round(u*100)+(fb?'f':''),()=>{const c=document.createElement('canvas');c.width=Math.round(w*u);c.height=Math.round(h*u);const g=c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(b,0,0,c.width,c.height);
     if(fb){const fh=w*fb.height/fb.width;g.globalAlpha=.75;g.drawImage(fb,0,(h-60-fh)*u,c.width,fh*u);g.globalAlpha=1;}
-    g.fillStyle='rgba(6,3,16,'+dim+')';g.fillRect(0,0,c.width,c.height);return{c,w,h};});};
+    g.fillStyle='rgba(6,3,16,'+dim+')';g.fillRect(0,0,c.width,c.height);
+    if(!port){const q=g.createLinearGradient(0,(h-220)*u,0,h*u),a=DISTRICTS[di].a;q.addColorStop(0,a+'00');q.addColorStop(1,a+'38');g.fillStyle=q;g.fillRect(0,(h-220)*u,c.width,220*u);}   // the ground haze is part of the backdrop (it used to be a gradient fill over the whole picture every frame)
+    return{c,w,h};});};
+/* the mid skyline strip with the same haze painted onto its own pixels (source-atop): haze over (mid over sky) = (haze over mid) over (haze over sky), so the picture is unchanged */
+ART.midHaze=(di,n,h)=>{const o=ART.strip('ly-mid-'+n,h);if(!o)return null;const k='mh|'+n+'@'+o.w+'@'+S;let q=ART.sc[k];if(q)return q;
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(o.w*S));c.height=Math.max(1,Math.round(o.h*S));const g=c.getContext('2d');g.drawImage(o.c,0,0,c.width,c.height);
+  const y0=H-30-o.h,a=DISTRICTS[di].a,gr=g.createLinearGradient(0,(H-220-y0)*S,0,(H-y0)*S);gr.addColorStop(0,a+'00');gr.addColorStop(1,a+'38');g.globalCompositeOperation='source-atop';g.fillStyle=gr;g.fillRect(0,0,c.width,c.height);
+  return ART.sc[k]={c,w:o.w,h:o.h};};
 /* tile a scaled strip horizontally; every other tile is mirrored, so there is never a seam */
 ART.tiles=(o,y,scroll,par,al)=>{const tw=o.w,off=(scroll*par)%(2*tw),j0=Math.floor(off/tw);ctx.globalAlpha=al;
   for(let j=j0;j*tw-off<W;j++){const x=j*tw-off;if(x+tw<=0)continue;
@@ -69,11 +76,10 @@ ART.strip=(n,h)=>{const b=ART.bm[n];return b?ART.sp(n,h*b.width/b.height):null;}
 ART.paintReady=di=>{const n=ART.dn[di];if(n&&!ART.bm['ly-mid-'+n])ART.warm(di);return !!(n&&ART.bm['bg-'+n]&&ART.bm['ly-far-'+n]&&ART.bm['ly-mid-'+n]);};
 ART.paintBG=(bg,t,scroll)=>{const D=bg.D,di=DISTRICTS.indexOf(D);bg._p=false;if(!ART.paintReady(di)||!ART.bm['ly-near-'+D.near])return false;
   const sky=ART.bgOf(di,false,S,W,H,.52);if(!sky)return false;const n=ART.dn[di];
-  const far=ART.bm['ly-far-'+n],mid=ART.strip('ly-mid-'+n,310),nr=ART.strip('ly-near-'+D.near,130);if(!far||!mid||!nr)return false;
+  const far=ART.bm['ly-far-'+n],mid=ART.midHaze(di,n,310),nr=ART.strip('ly-near-'+D.near,130);if(!far||!mid||!nr)return false;
   const so=(scroll*.03)%(2*W);ctx.globalAlpha=1;
   for(let j=Math.floor(so/W);j*W-so<W;j++){const x=j*W-so;if(j&1){ctx.save();ctx.translate(x+W,0);ctx.scale(-1,1);ctx.drawImage(sky.c,0,0,W,H);ctx.restore();}else ctx.drawImage(sky.c,x,0,W,H);}
   ART.tiles(mid,H-30-mid.h,scroll,.3,.88);
-  const hz=bg.hzG||(bg.hzG=(()=>{const q=ctx.createLinearGradient(0,H-220,0,H);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'38');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
   ART.tiles(nr,H-nr.h,scroll,1.1,.92);bg._p=true;return true;};
 ART.paintP=(bg,scroll)=>{const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.dn[di]+'-phone'])ART.warm(di);const o=ART.bgOf(di,true,VS,PW_,PH_,.5);if(!o)return false;
   const off=(scroll*.1)%(2*PH_),j0=Math.floor(off/PH_);
@@ -104,4 +110,4 @@ NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,
 /* the scaled copies of the next backdrop are built in calm moments, never in the middle of a fight */
 setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame();const port=wcv!==cv;
   for(const di of[G.di,nextDi(G.di).di]){if(!ART.paintReady(di))continue;const n=ART.dn[di];
-    if(port)ART.bgOf(di,true,VS,PW_,PH_,.5);else{ART.bgOf(di,false,S,W,H,.52);ART.strip('ly-mid-'+n,310);ART.strip('ly-near-'+DISTRICTS[di].near,130);}}},700);
+    if(port)ART.bgOf(di,true,VS,PW_,PH_,.5);else{ART.bgOf(di,false,S,W,H,.52);ART.midHaze(di,n,310);ART.strip('ly-near-'+DISTRICTS[di].near,130);}}},700);

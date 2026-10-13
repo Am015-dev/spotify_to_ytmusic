@@ -131,7 +131,8 @@ function stDraw(){$('stStars').textContent='★ '+ST.totalStars()+' / '+STAGES.l
       b.innerHTML=`<div class="hd"><span class="no">${s.n}</span>${ok?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:lockI}</div><div class="nm">${s.name}</div><div class="gl"><span class="ac">${ACTN[s.act]} · </span>${goalTxt(s)}</div>`;
       b.addEventListener('click',()=>{if(!unlocked(s.n)){stMsg('Clear stage '+(s.n-1)+' first');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}startStory(s.n);});
       row.appendChild(b);}
-    box.appendChild(row);}}
+    box.appendChild(row);}
+  try{const cur=box.querySelector('.card[data-nd=open],.card[data-nd=boss]');if(cur&&box.scrollHeight>box.clientHeight+2)box.scrollTop+=cur.getBoundingClientRect().top-box.getBoundingClientRect().top-box.clientHeight/2+cur.offsetHeight/2;}catch(e){}}   // on a phone the map scrolls: start at the next stage to play
 function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;stDraw();}
 function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 
@@ -140,31 +141,38 @@ function storyUI(){
 {const st=document.createElement('style');st.textContent=`
 #stsel .rows{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*1.4)}
 #stsel .arow{flex:1 1 0;min-height:0;display:flex;gap:calc(var(--u)*1.4);align-items:stretch}
-#stsel .alab{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;font-family:var(--mono);letter-spacing:.2em;color:var(--dim);font-size:clamp(9px,calc(var(--u)*3),13px);white-space:nowrap}
+#stsel .alab{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;font-family:var(--mono);letter-spacing:.2em;color:var(--dim);font-size:clamp(11px,calc(var(--u)*3),13px);white-space:nowrap}
 #stsel .card{gap:calc(var(--u)*.6);padding:calc(var(--u)*.8);justify-content:space-between}
 #stsel .card .hd{display:flex;align-items:baseline;justify-content:space-between;width:100%;gap:4px}
 #stsel .card .no{font-weight:700;font-size:clamp(16px,calc(var(--u)*8),34px);line-height:1;color:var(--c)}
-#stsel .card .stars{font-size:clamp(9px,calc(var(--u)*3.4),15px);letter-spacing:0;color:#ffe14d;white-space:nowrap}
-#stsel .card .nm{font-weight:700;font-size:clamp(9px,calc(var(--u)*3.2),14px);line-height:1.05;color:var(--ink);text-align:left;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-#stsel .card .gl{font-family:var(--mono);font-size:clamp(8px,calc(var(--u)*2.8),12px);color:var(--dim);text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stsel .card .stars{font-size:clamp(11px,calc(var(--u)*3.4),15px);letter-spacing:0;color:#ffe14d;white-space:nowrap}
+#stsel .card .nm{font-weight:700;font-size:clamp(11px,calc(var(--u)*3.2),14px);line-height:1.05;color:var(--ink);text-align:left;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#stsel .card .gl{font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.8),12px);color:var(--dim);text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #stsel .card.lock{opacity:.5;border-style:dashed}
 #stsel .card.lock .no{color:var(--dim)}
 #stsel .card svg.lk{height:clamp(10px,calc(var(--u)*4),18px);width:auto;aspect-ratio:1;color:var(--dim)}
 @container (max-height:300px){#stsel .card .nm{display:none}}
 #stsel .card .gl .ac{display:none}
 @container (max-aspect-ratio:1/1){
- #stsel .rows{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr)}
+ /* upright phone: a scrolling list of stages, medallion + name + goal + stars on every card, all type 11 px or more, nothing squeezed */
+ #stsel .rows{display:grid;grid-template-columns:1fr;grid-auto-rows:min-content;align-content:start;gap:6px;overflow-y:auto;overflow-x:hidden;padding:2px 2px 8px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
  #stsel .arow{display:contents}
  #stsel .alab{display:none}
- #stsel .card{flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;gap:calc(var(--u)*.6);padding:calc(var(--u)*1.4)}
+ #stsel .card{display:grid!important;grid-template-columns:34px minmax(0,1fr) auto;grid-template-areas:"no nm st" "no gl st";align-items:center;column-gap:10px;row-gap:1px;padding:6px 12px!important;min-height:54px;text-align:left;justify-content:stretch;flex:none}
+ #stsel .card .hd{display:contents!important}
+ #stsel .card .no{grid-area:no;font-size:16px!important;line-height:1;text-align:center;width:34px;padding:0!important}
+ #stsel .card .no::before{width:32px!important;height:32px!important}
+ #stsel .card .stars,#stsel .card svg.lk{grid-area:st;font-size:12px!important;align-self:center}
+ #stsel .card svg.lk{height:20px;width:20px}
+ #stsel .card .nm{grid-area:nm;display:block!important;font-size:14px!important;line-height:1.15!important;width:auto!important;overflow:visible;white-space:normal;text-overflow:clip}
+ #stsel .card .gl{grid-area:gl;display:block!important;font-size:11px!important;line-height:1.2!important;width:auto!important;overflow:visible;white-space:normal;text-overflow:clip}
  #stsel .card .gl .ac{display:inline;color:var(--c)}
- #stsel .card .nm{display:block}
- #stsel .card .no{font-size:clamp(18px,calc(var(--u)*7),34px)}
 }
+@container (max-aspect-ratio:1/1) and (min-width:560px){#stsel .rows{grid-template-columns:1fr 1fr}}
 #stsel .rows.many .card{padding:calc(var(--u)*.7) calc(var(--u)*1.2);gap:0;justify-content:center}
 #stsel .rows.many .card .no{font-size:clamp(13px,calc(var(--u)*4.4),22px)}
-#stsel .rows.many .card .nm{font-size:clamp(9px,calc(var(--u)*2.7),13px)}
-#stsel .rows.many .card .gl{font-size:clamp(8px,calc(var(--u)*2.3),11px)}
+#stsel .rows.many .card .nm{font-size:clamp(11px,calc(var(--u)*2.7),13px)}
+#stsel .rows.many .card .gl{font-size:clamp(11px,calc(var(--u)*2.3),11px)}
 #stres .sr{font-family:var(--mono);font-size:clamp(13px,min(2vw,3.4vh),19px);color:var(--dim)}
 #stres .sr.ok{color:var(--ink)}#stres .sr .sg{color:#ffe14d;font-size:1.25em}
 #hardBtn.on{background:#ff3040;color:#fff}
