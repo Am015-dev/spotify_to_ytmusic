@@ -1,0 +1,1 @@
+(()=>{const C=HUB.cars||[];const al=C.filter(c=>!c.dead);return [C.length,al.length,al.slice(0,3).map(c=>[Math.round(c.x),Math.round(c.z),c.k,c.dead]),Math.round(RO.x),Math.round(RO.z),C.slice(0,2).map(c=>Object.keys(c).join(','))]})()
