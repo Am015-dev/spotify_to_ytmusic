@@ -621,7 +621,7 @@ html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-ind
 /* painted UI over the shared skin (gx-skin.css); switches (html.sk, sk-*) are added by skinInit in ui13.js after each file loaded */
 html.sk{--sk-ink:#2a160c;--sk-cream:#f5e6c0;--sk-num:#2a1405;--sk-num-done:#fff0c4}
 /* the game's own buttons: ivory plate (normal), crimson velvet (primary) */
-html.sk .btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;padding:0 4px;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .btn{display:inline-flex;flex-direction:row;gap:6px;align-items:center;justify-content:center;border:0 solid transparent;border-width:2px 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/2px 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:44px;padding:6px 4px;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .btn.pri,html.sk .btn.go,html.sk .btn.on{border-image-source:url(media/ui-button-go-c.webp);color:#fff4e0;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .btn:disabled{opacity:.5}
 /* drawer heads in the vellum strip once its file loaded */
@@ -650,6 +650,7 @@ html.sk .gx-bar{color:var(--sk-cream)}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat,html.sk .gx-bar .gx-sp{text-shadow:0 1px 3px #000,0 0 8px #000,0 0 3px #000}
 html.sk .gx-drawer .gl,html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{text-decoration-color:#7c1b2c}
 html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{color:#7c1b2c}
+html.sk .btn:has(>small),html.sk .btn:has(>b){flex-direction:column;gap:0}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
