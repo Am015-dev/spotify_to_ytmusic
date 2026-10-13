@@ -15,7 +15,9 @@ Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuK
   6911-1_Ladder-Truck 6911-1_Rescue-SUV (.js). Grids: docs/shots/veh/GRID_veh2.jpg, GRID_veh2b.jpg.
 - CONFLICT: 7638 Tow Truck already shipped in v90g (rescue-1, same file src/98ld_v_7638-1.js). Keep one version (compare both on the stage).
 - veh-3 (new) sends MODEL lines + grids to the integrator directly.
-- land-3 WIP on alex/od-mdl-land (3e29a64..ad2e05d: LEGO cone/barrier/stop sign/rock, Athens tree swaps) is UNTESTED; take it only when land-3 reports.
+- land-3 (session_01F9UVq3exKAQQy4xHV7BH6G) REPORTED 2026-10-13: alex/od-mdl-land db39943, all in src/98ld_l_land.js. Grid docs/shots/land/GRID_l3.jpg.
+  fra: cone 4589, barrier 4083 (side view still owed), construction light, STOP sign, rock; ath: CE_pine 3471, CE_olive 3470 (-2.8M tris), CE_cypress 3778 (+57k), CE_rock.
+  Frankfurt 4.21M->4.03M tris, same draws, 0 errors. The branch also holds 35406f1 (palms), already in v90i: merge db39943 (git handles the duplicate).
 
 ## Test notes (things that cost time)
 - tPlay and g18/audit.js need the --local build (local_dbg.html has __dbg/__g9ev); out/<ver>/index.html fails with "__dbg is not defined".
