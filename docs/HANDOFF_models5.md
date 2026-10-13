@@ -2,7 +2,7 @@
 Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuKUcaUT4v. Read docs/HANDOFF_models4.md for the pipeline (lazy models, src/MODELS, loop).
 
 ## State
-- LIVE: v90g (brave-carson 05ac434; later brave-carson commits do not touch games/mainhattan-overdrive).
+- LIVE: v90i (brave-carson 27ec0df, src od-models 50326558), 2026-10-13. Beta refreshed. v90j is next.
 - v90h (garage-18 floor fix) was never shipped on its own; it is folded into v90i (changelog keeps both entries v90i + v90h).
 - v90i = out/v90i on alex/od-models (built at 5e8c7e38, grid ce5cbb2b): v90h floor fix (alex/od-garage18 78d49cf0) + veh-2's 16 Town rides
   + size-1 b989e882 (JU squash clamp, BC_dims width cap) + land-2 35406f1 (palms on the verge) + checklist pin clears #m1Next (src/99c_checklist.js pinPlace selector).
