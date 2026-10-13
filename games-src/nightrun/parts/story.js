@@ -8,10 +8,11 @@ const sPersist=()=>save('mnr_story',sSave);
    Stages 1-40 climb +0.2 per stage at the start and +0.3 at the end; a mini-boss or boss sits +0.2 above its neighbours and
    the next stage never drops below it (the biggest step is 0.5, into a boss). 41-45 are the optional challenge stages: the level of their district's mini-boss + 0.2.
    HULL: starting hull (7 for the first eight stages, 6 to stage 26, 5 after; challenges 6).
+   lenK: level change per bar of stage length against 89 bars (66 bars +0.46, 125 bars -0.72), so a stage's length does not decide its difficulty.
    DM: per-difficulty multipliers: lv = added to the stage level, hp = enemy and boss HP. (Bullet speed, density and fire rate per difficulty live in DIFFS, b.js.) */
 const LV=[1.6, 1.8, 2.0, 2.2, 2.61, 2.62, 2.83, 3.24, 3.26, 3.47, 3.7, 3.92, 4.34, 4.37, 4.6, 5.04, 5.07, 5.31, 5.55, 5.8, 6.24, 6.29, 6.54, 7.0, 7.05, 7.31, 7.57, 7.84, 8.3, 8.37, 8.64, 9.12, 9.19, 9.47, 9.75, 10.04, 10.53, 10.61, 10.91, 11.4, 2.81, 4.54, 6.44, 8.5, 10.73];
 const HULL=[7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6];
-const TUNE={d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:HULL,lv:LV,bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12,
+const TUNE={lenK:.02,d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:HULL,lv:LV,bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12,
   dm:{easy:{lv:-.5,hp:.9},normal:{lv:0,hp:1},hard:{lv:.3,hp:1.1},vhard:{lv:.5,hp:1.2},legend:{lv:.8,hp:1.3}}};
 const dmOf=()=>TUNE.dm[SET.diff]||TUNE.dm.normal;
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
@@ -52,17 +53,17 @@ const CITYS=[
   ['HAMMERING MAN','The hammer keeps the beat.',{k:'survive',v:46},26,['droneV','turret','gunship','gate','chargers']],
   ['EXPO HALL','Stalls, lights and snipers.',{k:'survive',v:46},26,['droneV','turret','gate','chargers','droneSine']],
   ['MESSE-WÄCHTER','The fair has a guardian.',{k:'mini'},22,['droneV','turret','chargers','gunship'],{k:4,nm:'MESSE-WÄCHTER',r:42,pats:['fan7','ring','spiral','fan9'],lbl:'M'}],
-  ['BOARDROOM','Everything shoots. Leaders everywhere.',{k:'kill',v:260},30,['gate','gunship','turret','chargers','droneSine','droneV']],
+  ['BOARDROOM','Everything shoots. Leaders everywhere.',{k:'kill',v:205},30,['gate','gunship','turret','chargers','droneSine','droneV']],
   ['SKYLINE','Top floor. Do not get hit.',{k:'score',v:650000},22,['droneV','gunship','turret','gate','chargers']],
   ['KRONOS','End the corporation. Last delivery.',{k:'boss'},20,['gate','gunship','turret','chargers','droneSine']]]},
  {di:4,st:[
   ['PLAKA NIGHTS','Rooftops and kiosks. Hold the block.',{k:'survive',v:46},30,['phalanx','droneSine','chargers','turret']],
   ['HARBOUR WATCH','Piraeus is closed. Dash the pillars.',{k:'score',v:900000},26,['pillars','wedge','turret','phalanx','gunship']],
-  ['LYCABETTUS','Climb the hill under fire.',{k:'kill',v:250},28,['phalanx','wedge','turret','droneSine','gunship']],
+  ['LYCABETTUS','Climb the hill under fire.',{k:'kill',v:215},28,['phalanx','wedge','turret','droneSine','gunship']],
   ['ACROPOLIS','March up the sacred rock.',{k:'survive',v:46},26,['phalanx','wedge','turret','droneSine']],
   ['HOPLITE','The shield wall walks.',{k:'mini'},24,['phalanx','wedge','turret'],{k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H'}],
   ['AGORA','Phalanx and leaders. No gaps.',{k:'survive',v:46},26,['phalanx','wedge','pillars','gunship','turret']],
-  ['OLIVE ROAD','The last road to the sea.',{k:'kill',v:260},26,['phalanx','wedge','pillars','gunship','turret']],
+  ['OLIVE ROAD','The last road to the sea.',{k:'kill',v:190},26,['phalanx','wedge','pillars','gunship','turret']],
   ['TALOS','Bronze guardian of the harbour.',{k:'boss'},20,['phalanx','wedge','pillars','gunship','turret']]]}];
 /* optional challenge stages: ch = nohit (the first hull hit ends it) | speed (reach the kills before the clock: tb = share of the stage) | perfect (finish with the PERFECT target);
    req = the stage that opens it (the city's mini-boss); s3 = the score for its third star */
@@ -94,7 +95,7 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv;
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLen(this.def));   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
     this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;

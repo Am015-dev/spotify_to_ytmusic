@@ -1026,6 +1026,7 @@ async function storyTests(browser, cfg, full) {
       const d = defs[n - 1], t = tag + '#' + n;
       if (n > 1 && await ev(p, () => document.getElementById('stsel').hidden)) await ev(p, () => { window.__mnr.abort(); });
       await ev(p, () => { if (document.getElementById('stsel').hidden && !__mnr.running) { document.getElementById('title').hidden = true; document.getElementById('stres').hidden = true; document.getElementById('stsel').hidden = false; } });
+      await ev(p, () => { __mnr.MSGS.length = 0; });                                  // the page keeps only the first 500 messages: a long run through every stage would fill it
       await pickStage(p, cfg, T, n);
       if (!await waitFor(p, n => __mnr.running && __mnr.ST.on && __mnr.ST.n === n, n, 4000)) { await fail(p, t, 'story', 'stage ' + n + ' did not start from the stage select'); continue; }
       await ev(p, () => { window.__mnr.god = true; }); stats.storyStages = (stats.storyStages || 0) + 1;
