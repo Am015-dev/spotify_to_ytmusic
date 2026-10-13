@@ -1,6 +1,17 @@
 [
  {
   "date": "2026-10-13",
+  "game": "sunglaze",
+  "title": "Painted kilns and rack for Sunglaze",
+  "items": [
+   "Painted terracotta kiln plates and a wooden centre tray",
+   "Carved rack dishes, clay floor dishes and plaster wall recesses",
+   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
+  ],
+  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack."
+ },
+ {
+  "date": "2026-10-13",
   "game": "sands",
   "title": "Button text size",
   "items": [
