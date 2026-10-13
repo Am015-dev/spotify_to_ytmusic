@@ -1,6 +1,24 @@
 [
  {
   "date": "2026-10-13",
+  "game": "cauldron",
+  "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
+  "items": [
+   "Story speech bubble keeps its frame and tail instead of being stretched",
+   "Painted buttons and panels keep their proportions"
+  ],
+  "check": "Open Story: speech bubble undistorted, no sideways scrollbar",
+  "scn": [
+   "story-scene",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "mainhattan",
   "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
   "items": [

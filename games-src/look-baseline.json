@@ -146,16 +146,14 @@
   }
  },
  "cauldron-fair": {
-  "severe": 1,
-  "warn": 7,
-  "severeKeys": [
-   "size|svg.chip > text"
-  ],
+  "severe": 0,
+  "warn": 8,
+  "severeKeys": [],
   "counts": {
-   "size": 2,
-   "overflow": 1,
-   "button": 3,
-   "images": 2,
+   "contrast": 2,
+   "images": 4,
+   "button": 1,
+   "size": 1,
    "art": 0
   }
  },
