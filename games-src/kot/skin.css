@@ -75,3 +75,22 @@ html.sk .menu .mrow{display:flex}
 /* tall two-line buttons stretch the painted rim: keep the text clear of it */
 html.sk .btn.big,html.sk .btn.gxt-menu{padding:18px 8px}
 html.sk .cc-endart,html.sk .cc-hero{pointer-events:none}
+
+/* ---- painted power-card pictures (media/pc-*.webp): fill the art window; name/cost/text stay on the dark plate and paper below ---- */
+.cpic{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit;background:#e6d4ff}
+.pc .art:has(.cpic){height:auto;aspect-ratio:360/220;position:relative}
+.pc .art:has(.cpic)::after{display:none}
+.pc .art .cpic{position:absolute;inset:0;z-index:1}
+html.ph .pcard .pcc:has(.cpic){width:92px;height:56px}
+html.ph .pcard .art:has(.cpic){width:100%;height:100%}
+html.ph .pcard .art .cpic{border-radius:6px}
+html.ph .pcard .pcc .cost{text-shadow:0 1px 2px #000}
+html.ph .ptile.bcard .art:has(.cpic){width:100%;height:50px;border-radius:6px;overflow:hidden;border:2px solid #1a1320;box-sizing:border-box}
+.bfly .bcard-fly:has(.cpic){padding:0;overflow:hidden}
+.bfly .bcard-fly .cpic{width:100%;height:100%}
+.mc .cthumb{float:left;width:52px;height:32px;margin:0 7px 2px 0;border-radius:5px;border:2px solid #1a1320;box-sizing:border-box;box-shadow:1px 1px 0 var(--shadow)}
+.mc:has(.cthumb)::after{content:"";display:block;clear:both}
+/* stat pick-ups that fly to the chips wear the painted icons (the glyph stays in the DOM, just hidden) */
+.bfly .btok.star{background:url(media/icon-star.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
+.bfly .btok.en{background:url(media/icon-energy.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
+.bfly .btok.hp{background:url(media/icon-heart.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
