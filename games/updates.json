@@ -1,6 +1,16 @@
 [
  {
   "date": "2026-10-13",
+  "game": "nebula",
+  "title": "Real 3D ships and asteroids",
+  "items": [
+   "Lancer and Talon hulls and the asteroids are detailed 3D models",
+   "Phones and Low graphics load lighter versions"
+  ],
+  "check": "Start a battle and look at the ships and asteroids on the mat."
+ },
+ {
+  "date": "2026-10-13",
   "game": "shipwreck",
   "title": "Real 3D castaways and palms",
   "items": [
