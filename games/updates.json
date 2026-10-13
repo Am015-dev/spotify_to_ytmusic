@@ -1,6 +1,36 @@
 [
  {
   "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Painted art wired",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "kk-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "thornbound",
   "title": "Painted art wired",
   "items": [
@@ -196,19 +226,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: painted chef tags and icons",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals",
-   "Each chef has a painted chopstick-sleeve name tag",
-   "Stars, plates, custard cups and Fire Paste are painted icons",
-   "Top bar, menus and buttons use the lacquer kit"
-  ],
-  "check": "Look under each chef on the table"
  },
  {
   "date": "2026-10-13",
