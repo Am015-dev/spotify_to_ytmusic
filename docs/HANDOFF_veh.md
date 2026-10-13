@@ -1,4 +1,4 @@
-# Vehicle converter lane handoff (veh-2, 2026-10-10; was build-8, build-4). Branch alex/od-mdl-veh. Integrator: build-9 (session_01GMDcFfTGnwQmyHKU8PFQfp; build-7 stood down, never send there). Every MODEL batch and status carries ONE labelled grid: python3 tools/grid.py docs/shots/veh/GRID_<n>.jpg "<title>" "label=path" ...
+# Vehicle converter lane handoff (veh-3, 2026-10-13). Branch alex/od-mdl-veh. Integrator: build-10 (session_01NEKmBJhbYZuQ3ir54EPH89); build-7 and build-9 have stood down.
 
 ## Loop (≈ 3 min per model)
 Setup in a fresh container: parts lib (`curl -o ld/c.zip https://library.ldraw.org/library/updates/complete.zip; unzip -q -d ld/lib ld/c.zip`),
@@ -43,7 +43,7 @@ then 6553 6571 6581 6594 6431 6473 6481 6484 6545 3056 6406 4016 30283 30284 200
 - Trucks with trailers: --only "<set> - Truck" --drop trailer. When the cab is a sibling submodel (60018), use --drop worker,wheelbarrow,driver instead of --only.
 - tools/ld/calib.json changes on every run; not committed.
 
-## veh-3 session (2026-10-13): 21 more done, GRID docs/shots/veh/GRID_3.jpg, sent to build-9 (session_01GMDcFfTGnwQmyHKU8PFQfp; build-7 is dead)
+## veh-3 session (2026-10-13): 21 more done, GRID docs/shots/veh/GRID_3.jpg, sent to build-9 and build-10
 6535 6550(yaw 0) 6470 1029 6553 6571 6571-1b(FD car 2) 6581 6594(cab only) 6431 6473(ground vehicle) 6481 6484(hauler) 6484-1b(F1 car) 6545 3056 30283 30284 20011 31027 6753-1b(red car).
 - Second vehicle from one set: cp ld/omr/<s>-1.mpd ld/omr/<s>-1b.mpd, then vehcv.sh <s>-1b "<sub>".
 - Skipped: 6743 (10 wide), 6753 truck (16 wide), 10220 (Creator Expert van, not minifig scale), 6406 (same go-kart as 3056), 6742 (no file found).
