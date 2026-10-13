@@ -4581,6 +4581,23 @@ const GX={key:'gx',open:null,
   GXC.data = function () { return D; };
 
   if (root && root.document) root.GXC = GXC;
+
+  /* ---- shared scenario: the story scene itself (?scn=story-scene), the longest line a game's own story has so the bubble is at its tallest ---- */
+  if (root && root.GXS && root.GXS.add) root.GXS.add({
+    id: 'story-scene', name: 'Story scene: speech bubble', ask: 'Is the speech bubble clean, with no sideways bar?',
+    when: function () { return !!(root.GXC && GXC.data && GXC.data()); },
+    setup: function () {
+      var cast = Object.keys((D && D.cast) || {}), who = cast[0] || 'narrator', long = '', ch = (D && D.chapters) || [];
+      ch.forEach(function (c) { [].concat(c.intro || [], c.outro || [], c.story || []).forEach(function (l) { var t = lineText(l); if (t && t.length > long.length) long = t; }); });
+      GXC.scene([{ who: who, text: long || 'The harbour is quiet tonight. Something stirs in the fog and the lamps start to flicker.' }, { who: cast[1] || who, text: 'Ready when you are.' }], { title: 'Chapter 1' });
+    },
+    checks: [
+      { kind: 'visible', sel: '.gxc-scene .gxc-sc-text', name: 'story text' },
+      { kind: 'visible', sel: '.gxc-scene .gxc-btn.go', name: 'Next button' },
+      { kind: 'fn', name: 'no sideways scrollbar in the scene', fn: function () { var e = document.querySelector('.gxc-scene'); return e.scrollWidth <= e.clientWidth + 1 || 'scrollWidth ' + e.scrollWidth + ' > ' + e.clientWidth; } },
+      { kind: 'fn', name: 'bubble is a 9-slice, not a stretched picture', fn: function () { var c = getComputedStyle(document.querySelector('.gxc-scene .gxc-sc-text'), '::before'); return !document.documentElement.classList.contains('sk') || (c.borderImageSource !== 'none' && c.backgroundImage === 'none') || 'bubble is a stretched background'; } }
+    ]
+  });
   if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
 })(typeof window !== 'undefined' ? window : this);
 
