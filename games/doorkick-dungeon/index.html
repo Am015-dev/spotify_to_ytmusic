@@ -790,6 +790,13 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 .mchip.on{background:#c9962f;color:#2a1a0a;border-color:#ffe08a;font-weight:700}.mchip.prev{border-style:dashed}
 .mchip .ic{width:1em;height:1em}
 
+/* facelift: the real door (3D model sprite) takes the kick, then swings open on its hinge with a puff of dust */
+.bfrev .bfd3{position:absolute;left:50%;top:44%;width:min(78vw,52vh,460px);aspect-ratio:1;translate:-50% -50%;perspective:900px;pointer-events:none}
+.bfrev .bfd3 img{position:absolute;inset:0;width:100%;height:100%;display:block;filter:drop-shadow(0 14px 18px rgba(0,0,0,.65));transform-origin:30% 62%;animation:bfD3 .66s .06s cubic-bezier(.4,0,.9,.5) both}
+@keyframes bfD3{0%{transform:scale(.9);opacity:0}10%{transform:scale(1);opacity:1}24%{transform:scale(1.04) rotate(-1.6deg)}34%{transform:scale(.98) rotate(1.3deg)}46%{transform:scale(1.01) rotate(-.5deg)}100%{transform:rotateY(-82deg) scale(1.08);opacity:0}}
+.bfrev .bfdust{position:absolute;left:50%;bottom:8%;width:34%;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(230,205,165,.8),rgba(190,160,120,.35) 55%,rgba(190,160,120,0) 72%);opacity:0;animation:bfDust .7s .3s ease-out both}
+@keyframes bfDust{0%{opacity:.9;transform:translate(0,0) scale(.3)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}
+
 /* ===== the dungeon table: one surface holds the rival seats, the door / fight, your hero + gear and your fanned hand ===== */
 .tbl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;position:relative}
 /* rival seats on the rim of the table: avatar, level badge, strength + gear count only */
@@ -1122,6 +1129,7 @@ html:has(.gx-drawer.on) .gx-main{pointer-events:none}
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
 .gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
@@ -1240,6 +1248,149 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
 @media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+
+/* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
+   html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
+   ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
+   html.sk-stars (ui-star-*), html.sk-banner (ui-act-banner), html.sk-dark (dark panels: light ink). Game colours: --sk-ink, --sk-num, --sk-num-done. ===== */
+html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
+html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
+/* top bar + icon buttons */
+html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
+html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
+html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
+html.sk .gx-ibtn>span{padding:0 4px}
+html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
+html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
+html.sk-icons i[data-ic]{background:center/contain no-repeat}
+/* popups: parchment panel (9-slice) with a wooden title strip */
+html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
+html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
+html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
+html.sk .gx-drawer-body{padding:4px 4px 12px}
+/* campaign kit */
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
+html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
+html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
+html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
+html.sk .gxc-boss{border-color:transparent}
+html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;min-height:52px}
+/* story map nodes: painted medallions, the number (text) sits in the centre */
+html.sk .gxc-node{width:68px;height:68px}
+html.sk .gxc-disc{width:68px;height:68px;border:0;border-radius:0;background:url(media/ui-node-open.webp) center/contain no-repeat;box-shadow:none;color:var(--sk-num);text-shadow:0 1px 0 rgba(255,255,255,.45);font-size:22px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+html.sk .gxc-node.a2 .gxc-disc,html.sk .gxc-node.a3 .gxc-disc{background-color:transparent;background-image:url(media/ui-node-open.webp)}
+html.sk .gxc-node.won .gxc-disc,html.sk .gxc-node.won.a2 .gxc-disc,html.sk .gxc-node.won.a3 .gxc-disc{background-image:url(media/ui-node-done.webp);color:var(--sk-num-done);text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .gxc-node.locked .gxc-disc,html.sk .gxc-node.locked.a2 .gxc-disc,html.sk .gxc-node.locked.a3 .gxc-disc{background-image:url(media/ui-node-locked.webp);filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));opacity:1;color:transparent}
+html.sk .gxc-node.boss .gxc-disc,html.sk .gxc-node.boss.a2 .gxc-disc,html.sk .gxc-node.boss.a3 .gxc-disc{background-image:url(media/ui-node-boss.webp);width:74px;height:74px;margin:-8px 0 0 0;box-shadow:none}
+html.sk .gxc-node.boss .gxc-disc::after,html.sk .gxc-lock{display:none}
+html.sk .gxc-node.boss .gxc-disc .gxc-pt{width:34px!important;height:34px!important;margin-top:8px}
+html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out infinite}
+@keyframes sk-pulse{0%,100%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,214,90,.9))}50%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 9px rgba(255,214,90,.95))}}
+html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10}
+html.sk .gxc-node .gxc-stars{top:56px}
+html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
+html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
+html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
+html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
+html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
+html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
+html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
+/* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+@media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
+
+/* ===== Doorkick skin: maps the game's own selectors onto the painted UI kit (see ../shell/gx-skin.css). Opt-in via html.sk. ===== */
+html.sk{--sk-ink:#3a2410}
+/* top bar: shared bar art; our icon buttons keep the SVG icon + label */
+html.sk .gx-bar{background-blend-mode:normal;border-bottom:0;box-shadow:0 3px 8px rgba(0,0,0,.45)}
+html.sk .gx-bar h1{font-size:1.3rem}
+html.sk .gx-ibtn{color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.7);font-weight:700;transition:none}
+html.sk .gx-ibtn .ic{color:#ffd76a}
+html.sk .gx-ibtn:hover{box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)) brightness(1.12)}
+html.sk .gx-ibtn[aria-expanded=true]{background:none;color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .gx-ibtn[aria-expanded=true] .ic{color:#fff3c4}
+html.sk .gx-reopen{background:none}
+html.sk.ph .gx-bar .gx-ibtn{width:48px;min-width:48px;border-radius:0;padding:0}
+html.sk .gx-ibtn.gxh-bulb{min-width:44px}
+/* drawers + dock head */
+html.sk .gx-drawer{color:var(--sk-ink)}
+html.sk .gx-drawer-head h2{color:var(--sk-cream)}
+html.sk .gx-drawer,html.sk .gx-drawer-body{--ink:#3a2410}
+html.sk .gx-dock-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream)}
+/* buttons: cream / go / power pills */
+html.sk .btn,html.sk .btn:hover{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));justify-content:center;transition:none}
+html.sk .btn.primary,html.sk .btn.good{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .btn.danger{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .btn.rec{background:none!important;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec}
+html.sk .btn:active{transform:translateY(2px);box-shadow:none}
+html.sk .btn:disabled{opacity:.5;filter:grayscale(.5)}
+html.sk .seg .btn.on,html.sk .grid2 .btn.on,html.sk .btn.learn.on{background:none;box-shadow:none;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .mrow .btn{min-height:44px;padding:0 2px}
+html.sk .btn .ic{color:currentColor}
+/* menu / option rows */
+html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{border:12px solid transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;min-height:52px;margin:2px 0;text-align:left;justify-content:flex-start;color:#3a2410;text-shadow:none;font-weight:700;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .btn.gxt-menu.gxt-first{box-shadow:none;filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .btn.learn{display:flex;align-items:center}
+html.sk .btn.learn.on{border-image-source:url(media/ui-row-c.webp);color:#1b4332;filter:drop-shadow(0 0 5px #7fe08a) drop-shadow(0 1px 2px rgba(0,0,0,.3));text-shadow:none}
+html.sk .menu .btn:active{transform:translateY(1px)}
+/* dialogs over the table: parchment panel */
+html.sk .dlg{background:none;border:30px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:#3a2410;box-sizing:border-box}
+html.sk .dlg.paper{box-shadow:none;background:none}
+html.sk .dlg h2{color:#8e3a1c}
+html.sk .dlg.start h2 span{color:#b3261a}
+html.sk .dlg .small,html.sk .dlg .muted{color:#5a4128}
+html.sk.ph .dlg{padding:0 2px;font-size:15px;border-width:26px;border-image-width:26px}
+html.sk.ph .dlg .acts{position:sticky;bottom:0;z-index:2;margin:8px 0 0!important;padding:6px 0 2px;background:linear-gradient(rgba(240,222,176,0),#f0deb0 10px)}
+html.sk.ph .dlg .btn{min-height:46px}
+html.sk.ph .modal{align-items:center;padding:6px}
+html.sk.ph .dlg{max-height:calc(100dvh - 12px)}
+@media (orientation:portrait){html.sk.ph .modal.art-title .dlg.start{max-height:64dvh}}
+html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{padding:0 8px}
+html.sk .mrow .btn{min-width:64px;border-width:0 16px;border-image-width:0 16px}
+/* ===== painted HUD pieces (classes set in tbl.js once the file loaded) ===== */
+/* gear slots, curse and gear icons */
+html.dk-slot .mine .slots{opacity:.75}
+html.dk-slot .mine .slots i{width:40px;height:40px;border:0;border-radius:0;font-size:0;background:center/contain no-repeat}
+html.dk-slot .mine .slots i[data-s=head]{background-image:url(media/ui-slot-head.webp)}html.dk-slot .mine .slots i[data-s=body]{background-image:url(media/ui-slot-body.webp)}
+html.dk-slot .mine .slots i[data-s=hands]{background-image:url(media/ui-slot-hands.webp)}html.dk-slot .mine .slots i[data-s=feet]{background-image:url(media/ui-slot-feet.webp)}
+html.dk-slot .gchip .gi{font-size:0;display:inline-block;width:22px;height:22px;vertical-align:middle;margin-right:4px;background:center/contain no-repeat}
+html.dk-slot .gchip .gi[data-s=head]{background-image:url(media/ui-slot-head.webp)}html.dk-slot .gchip .gi[data-s=body]{background-image:url(media/ui-slot-body.webp)}
+html.dk-slot .gchip .gi[data-s=hands]{background-image:url(media/ui-slot-hands.webp)}html.dk-slot .gchip .gi[data-s=feet]{background-image:url(media/ui-slot-feet.webp)}
+html.dk-slot .gchip .gi[data-s=class]{background-image:url(media/ui-slot-class.webp)}html.dk-slot .gchip .gi[data-s=race]{background-image:url(media/ui-slot-race.webp)}
+html.dk-curse .gi[data-s=curse]{font-size:0;display:inline-block;width:18px;height:18px;vertical-align:middle;background:url(media/token-curse.webp) center/contain no-repeat}
+html.dk-gi .opp.seat .gi[data-s=gear]{font-size:0;display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:2px;background:url(media/icon-gear.webp) center/contain no-repeat}
+/* rival chips: carved-wood plaque */
+html.dk-chip .opp.seat{background:url(media/ui-rival-chip.webp) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;padding:4px 14px 4px 7px;min-height:44px;flex-basis:170px;max-width:200px;min-width:112px}
+html.dk-chip .opp.seat.active,html.ph.dk-chip .opp.seat.active{box-shadow:none;filter:drop-shadow(0 0 4px #ffd76a) drop-shadow(0 0 2px #ffd76a)}
+/* clash: medallions behind the strength numbers, painted swords between them */
+html.dk-clash.dk-clash .arena .vs .score.hero .num,html.dk-clash.dk-clash .arena .vs .score.mons .num{background-color:transparent;background-position:center;background-size:contain;background-repeat:no-repeat;border:0;border-radius:0;box-shadow:none;min-width:2.5em;height:2.5em;display:grid;place-items:center;font-weight:800}
+html.dk-clash.dk-clash .arena .vs .score.hero .num{background-image:url(media/ui-clash-hero.webp);color:#fff;text-shadow:0 2px 0 #0a1a3a,0 0 4px #0a1a3a}
+html.dk-clash.dk-clash .arena .vs .score.mons .num{background-image:url(media/ui-clash-monster.webp);color:#3a0d05;text-shadow:none}
+html.dk-clash.dk-clash .arena .vs .score.win .num{filter:drop-shadow(0 0 8px #ffd76a) drop-shadow(0 0 16px rgba(255,215,106,.8))}
+html.dk-clash.dk-clash .arena .vs .score.lose .num{filter:saturate(.7) brightness(.9)}
+html.dk-clash.dk-clash .arena .vs .vsx{background:url(media/ui-swords.webp) center/contain no-repeat}html.dk-clash.dk-clash .arena .vs .vsx svg{display:none}
+/* hero ring around the portrait on the table */
+html.dk-med .hsav::after{content:'';position:absolute;inset:-14%;background:url(media/ui-medallion.webp) center/contain no-repeat;pointer-events:none}
+html.dk-med .hsav .hsavi{border:0}
+/* the draw piles: painted stacks instead of a single card back */
+html.dk-pile .stack .back{opacity:0}
+html.dk-pile .stack{box-shadow:none!important;background:none!important;border:0!important}
+html.dk-pile .stack::before{content:'';position:absolute;inset:-14% -24% -4%;z-index:0;background:center/contain no-repeat;pointer-events:none}
+html.dk-pile .stack.door::before{background-image:url(media/pile-door.webp)}html.dk-pile .stack.treas::before{background-image:url(media/pile-treasure.webp)}
+html.dk-pile .stack>*{position:relative;z-index:1}
+html.dk-pile .stack .dn{text-shadow:0 1px 2px #000,0 0 4px #000}
+/* ledger: parchment sheet behind the side panel, painted strip behind "Just happened" */
+html.dk-par .gx-dock-body{background:#e9d7a8;border:20px solid transparent;border-image:url(media/ui-parchment.webp) 50 fill/20px stretch}
+html.dk-par .recent .rl{background:url(media/ui-ledger-head.webp) center/auto 100% repeat-x;padding:2px 10px;border-radius:6px;min-height:46px;align-items:center}
+html.dk-par .gx-dock-body{position:relative;isolation:isolate}
+html.dk-par .gx-dock-body::before{content:'';position:absolute;inset:0;z-index:-1;background:rgba(248,240,216,.62);pointer-events:none}
 
 </style>
 </head>
@@ -1998,9 +2149,32 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+/* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+(function () {
+  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  window.GXSK = {
+    init: function (o) {
+      o = o || {}; var extra = [];
+      if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
+      load(core, function (ok) {
+        if (!ok) return;
+        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
+        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        if (o.cb) o.cb();
+      });
+    }
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
-//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
 //   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
@@ -2392,6 +2566,7 @@ const GX={key:'gx',open:null,
     return new Promise(function (done) {
       if (!doc) return done('map');
       var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      if (O && O.endArt) { var ea = r.won ? O.endArt.win : O.endArt.lose; if (ea) { s.parentNode.classList.add('has-art'); s.parentNode.style.setProperty('--gxc-art', 'url(' + ea + ')'); } }
       box.appendChild(el('div', 'gxc-res-k', def.title));
       box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
@@ -5786,7 +5961,7 @@ function musicWant(){if(typeof G==='undefined'||!G)return ['tavern',0];
 // ---- music picker: each slot (tavern=Menu, main=Dungeon, fight, victory, defeat) has a saved choice: a, b, shuffle, off or classic
 const MSLOTS=[['tavern','Menu'],['main','Dungeon'],['fight','Fight'],['victory','Victory'],['defeat','Defeat']];
 const MTITLE={'tavern-a':'Menu loop A','tavern-b':'Menu loop B','main-a':'Tiptoe Through the Trapdoor','main-b':'The Curious Little Dungeon','fight-a':'Taiko and Tumble','fight-b':'Fiddle Fists and Bassoon Blows','victory-a':'Tavern of the Golden Stag','victory-b':'Fanfare for the Merry Company','defeat-a':"O Woe, My Broken Lute",'defeat-b':'Two Notes and a Shrug',classic:'Classic'};
-const MDEF={tavern:'a',main:'b',fight:'a',victory:'b',defeat:'a'};
+const MDEF={tavern:'all',main:'all',fight:'all',victory:'b',defeat:'a'};
 SND.pick=Object.assign({},MDEF);try{Object.assign(SND.pick,JSON.parse(localStorage.getItem('dkd_mpick')||'{}'))}catch(e){}
 SND.res={};SND.wslot=null;SND.prev=null;SND.last=null;SND.since=0;
 // 'all' = shuffle through every looping song (menu, dungeon and fight tracks), a new one every ~2.5 min
@@ -6327,7 +6502,7 @@ function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0
 function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
   return `<div class="recent"><div class="rl"><h3>Just happened</h3><button class="btn" data-gx="dkLog" style="min-height:40px;padding:2px 10px;font-size:.85rem">📜 Diary</button></div><ol>${o?`<li class="story">📖 ${narrate(o)}</li>`:''}${bk.map(b=>`<li class="quote" style="border-left-color:${PCOL[b.s]}"><b>${esc(P(b.s).nm)}:</b> “${esc(b.t)}”</li>`).join('')}${G.log.slice(0,2).map(l=>`<li${l.s>=0?` style="border-left-color:${PCOL[l.s]}"`:''}>${esc(l.t)}</li>`).join('')}</ol></div>`}
 function oppsHTML(me){const n=G.pl.length-(me>=0?1:0);return `<div class="opps n${n}" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map((p,k,a)=>{const act=p.i===G.active;const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;const q=a.length>1?(k/(a.length-1))*2-1:0;
-  return `<button class="opp seat paper ${act?'active':''}${p.dead?' dead':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]};--q:${q.toFixed(2)}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Hold for details."><span class="sav">${typeof bfAv==='function'?bfAv(p,'savi'):''}<b class="slv" aria-hidden="true">${p.lvl}</b>${p.dead?'<i class="sdead" aria-hidden="true">💀</i>':''}</span><span class="snm">${esc(p.nm.split(/[ ,]/)[0])}</span><span class="sbd" aria-hidden="true"><span class="sw">⚔${pStr(p)}</span><span class="sg">🪖${p.eq.length}</span>${p.curse.length?`<span class="sc">☁${p.curse.length}</span>`:''}</span></button>`}).join('')}</div>`}
+  return `<button class="opp seat paper ${act?'active':''}${p.dead?' dead':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]};--q:${q.toFixed(2)}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Hold for details."><span class="sav">${typeof bfAv==='function'?bfAv(p,'savi'):''}<b class="slv" aria-hidden="true">${p.lvl}</b>${p.dead?'<i class="sdead" aria-hidden="true">💀</i>':''}</span><span class="snm">${esc(p.nm.split(/[ ,]/)[0])}</span><span class="sbd" aria-hidden="true"><span class="sw">⚔${pStr(p)}</span><span class="sg"><i class="gi" data-s="gear">🪖</i>${p.eq.length}</span>${p.curse.length?`<span class="sc"><i class="gi" data-s="curse">☁</i>${p.curse.length}</span>`:''}</span></button>`}).join('')}</div>`}
 // phone only (CSS shows it instead of the mini cards): one readable row per card, tap = the big card
 function phList(p){const ids=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>({id,on:true})).concat(p.eq.map(e=>({id:e.id,on:e.on})));
   return `<ul class="phlist">${ids.map(x=>{const c=cd(x.id);const t=tagOf(c).replace(/<[^>]+>/g,'');return `<li><button class="gchip ${c.d==='door'?'door':'tr'} ${x.on?'':'eqoff'}" data-card="${x.id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${x.on?'':' (carried, not worn)'}"><b>${esc(c.n)}</b>${t?' '+esc(t):''}${x.on?'':' (not worn)'}</button></li>`}).join('')||'<li class="small muted">No items yet.</li>'}</ul>`}
@@ -6370,8 +6545,8 @@ function rollHTML(){const r=G.lastRoll;if(!r)return '';UI.rollAt=UI.rollAt||{};c
   // only this turn's roll, and inside a fight only a roll made in this fight (no stale dice)
   if(UI.rollAt[rk]!==G.turn||(G.cb&&!G.cb.runs))return '';const faces=[r.v,1,6,3,4,2];const PIP={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};const face=v=>[0,1,2,3,4,5,6,7,8].map(k=>PIP[v]&&PIP[v].includes(k)?'<b></b>':'<span></span>').join('');const tot=r.v+(r.mod||0);
   const anim=UI.rolled!==r.id;UI.rolled=r.id;UI.arRes+=46;return `<div class="rollbox" aria-label="Last roll"><div class="dwrap"><div class="die3 ${anim?'roll':''}">${faces.map(v=>`<i>${face(v)}</i>`).join('')}</div></div><span class="small">${nmY(r.who)} rolled ${r.v}${r.mod?` ${r.mod>0?'+':'−'} ${Math.abs(r.mod)} = ${tot}`:''}${r.what==='slugs'?'':`: ${r.ok?'✓ made it':'✗ failed'} (needed ${r.need}+)`}</span></div>`}
-function gchipHTML(id,cls){const c=cd(id);const ic=c.t==='race'?'🧬':c.t==='class'?'🎓':c.t==='curse'?'☁':c.slot==='head'?'🪖':c.slot==='foot'?'👢':c.slot==='armor'?'🛡':c.hands?'🗡':c.t==='item'?'🎒':'✦';
-  return `<button class="gchip ${c.d==='door'?'door':'tr'} ${c.t==='curse'?'curse ':''}${cls||''}" data-card="${id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${/eqoff/.test(cls||'')?' (carried, not worn)':''}"><span aria-hidden="true">${ic}</span>${esc(c.n)}${c.t==='item'&&c.b?` <b>+${c.b}</b>`:''}</button>`}
+function gchipHTML(id,cls){const c=cd(id);const ic=c.t==='race'?'🧬':c.t==='class'?'🎓':c.t==='curse'?'☁':c.slot==='head'?'🪖':c.slot==='foot'?'👢':c.slot==='armor'?'🛡':c.hands?'🗡':c.t==='item'?'🎒':'✦';const gs=c.t==='race'?'race':c.t==='class'?'class':c.t==='curse'?'curse':c.slot==='head'?'head':c.slot==='foot'?'feet':c.slot==='armor'?'body':c.hands?'hands':'';
+  return `<button class="gchip ${c.d==='door'?'door':'tr'} ${c.t==='curse'?'curse ':''}${cls||''}" data-card="${id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${/eqoff/.test(cls||'')?' (carried, not worn)':''}"><span class="gi" data-s="${gs}" aria-hidden="true">${ic}</span>${esc(c.n)}${c.t==='item'&&c.b?` <b>+${c.b}</b>`:''}</button>`}
 function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><div class="empty">Watching the computer play. Press ⏸ to pause at any moment; tap a rival for their cards.</div></div>`;
   const p=P(me);const vm=myMoves(me);const playable=new Set(vm.filter(m=>m.card!==undefined).map(m=>m.card));const sellSet=UI.sell?new Set(UI.sell):null;const selc=id=>sellSet?(sellSet.has(id)?'sel ':sellable(p).includes(id)?'play ':'dim '):'';
   const co=p.human?coach(me):{};const sug=UI.hints&&co.card!=null?co.card:null;const badge=co.disc?(G.phase==='charity'&&charityTargets(p).length?'Suggested give-away':'Suggested discard'):'Suggested play';
@@ -6379,7 +6554,7 @@ function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><di
   const lim=handLimit(p),over=p.hand.length-lim;
   return `<section class="mine paper" aria-label="You"><div class="top"><span class="who">${ptok(p.i)} ${esc(p.nm)}${G.mode!=='ai'?' <span class="you">(you)</span>':''} <span class="small muted">${p.sex==='m'?'♂':'♀'}${races(p).concat(classes(p)).map(r=>' · '+(TRAITNAME[r]||r)).join('')}</span></span>
     <span class="str">⚔ <b>${pStr(p)}</b> strength <span class="muted">(level ${p.lvl} + items ${itemBonus(p)}${p.sexPen?' − 5 next fight':''})</span> · ✋ ${p.hand.length} card${plural(p.hand.length)} <span class="${over>0?'warn':'muted'}">(limit ${lim}${over>0?`: give away ${over} at end of turn`:''})</span>${p.hire!=null?' · Porter':''}${p.dead?' · 💀 dead until next turn':''}</span><span class="swipe" aria-hidden="true">${p.hand.length>3?'⇆ swipe':''}</span><span class="lv"><small>Lv</small> ${p.lvl}</span></div>
-    <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="slots" aria-hidden="true"><i>🪖</i><i>🛡</i><i>🗡</i><i>👢</i></span><span class="small muted nogear">nothing yet: items you play from your hand appear here.</span>'}</div>
+    <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="slots" aria-hidden="true"><i data-s="head">🪖</i><i data-s="body">🛡</i><i data-s="hands">🗡</i><i data-s="feet">👢</i></span><span class="small muted nogear">nothing yet: items you play from your hand appear here.</span>'}</div>
     <div class="hand${p.hand.length>3?' many':''}" aria-label="Your hand, ${p.hand.length} cards${p.hand.length>3?', scroll sideways for more':''}">${p.hand.map((id,i)=>{const n=p.hand.length,q=i-(n-1)/2;const fan=`style="--rot:${Math.max(-6,Math.min(6,q*1.7)).toFixed(1)}deg;--arc:${Math.min(10,q*q*.9).toFixed(1)}px"`;if(sellSet)return cardHTML(id,{cls:selc(id),attr:fan});const pl=playable.has(id);const rk=pl&&UI.hints?riskyCard(me,id):'';
       return cardHTML(id,{cls:(pl?(rk?'play risky ':'play '):''),badge:sug===id?badge:'',risk:rk,attr:fan})}).join('')||'<span class="small muted">No cards.</span>'}</div></section>`}
 function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip sellbar"><b>Sell:</b> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling x2)':''}. ${v>=R.SELL?`Buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
@@ -6527,6 +6702,7 @@ function humanTurn(){if(!G||G.winner)return false;const s=sideToAct();return s>=
 try{const ex=JSON.parse(localStorage.getItem('dkd_ex')||'null');if(ex)Object.assign(DEFEX,ex)}catch(e){}
 // ---- board-first shell: popups for the diary, rivals, card details and rules ----
 GX.init({key:'dkd'});
+if(typeof GXSK!=='undefined')GXSK.init({});
 GX.drawer('dkLog','Dungeon diary',$('#dkLogBody'));
 GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));
@@ -6650,7 +6826,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   const ban=kind==='mon'?'A MONSTER!':kind==='curse'?'CURSED!':mine?'Into your hand':'Into '+P(who).nm+'’s hand';
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
-  o.innerHTML=`<div class="bfburst"></div><div class="bfdh l">${cardBack('door')}</div><div class="bfdh r">${cardBack('door')}</div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
+  o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
   document.body.appendChild(o);const dur=mine?1900:1050;
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
   const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
@@ -6924,6 +7100,8 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   addEventListener('resize',tableApply);addEventListener('orientationchange',tableApply);
   ['door','treasure','cellar-oak','corridor-brass','crypt-bone'].forEach(n=>{new Image().src='media/back-'+n+'.webp'});
   tableApply();
+  // painted HUD pieces: each class goes on <html> once its file has loaded (the CSS fallback stays until then)
+  [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
 })();
 
 </script>

@@ -56,97 +56,20 @@ Still not loaded by the page (13 files; each needs a design decision, not just a
 | Wave 0 redo | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream enamel with a copper |
 | Wave 0 redo | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, terracotta-orange enamel w |
 | Wave 0 redo | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, violet enamel with a gold  |
-| Wave 1 Wave 1 | `glyph-city` | a round brass medallion with an embossed tall minaret in the middle, lapis-blue enamel background, one bold sh |
-| Wave 1 Wave 1 | `glyph-exchange` | a round brass medallion with an embossed balance scale with a spice bowl in the middle, lapis-blue enamel back |
 | Wave 1 Wave 1 | `glyph-lake` | a round brass medallion with an embossed single rolling wave in the middle, lapis-blue enamel background, one  |
-| Wave 1 Wave 1 | `glyph-large` | a round brass medallion with an embossed pair of market-stall awnings in the middle, lapis-blue enamel backgro |
-| Wave 1 Wave 1 | `glyph-oasis` | a round brass medallion with an embossed palm tree beside a small pool in the middle, lapis-blue enamel backgr |
-| Wave 1 Wave 1 | `glyph-sacred` | a round brass medallion with an embossed domed shrine in the middle, lapis-blue enamel background, one bold sh |
-| Wave 1 Wave 1 | `glyph-small` | a round brass medallion with an embossed market-stall awning in the middle, lapis-blue enamel background, one  |
-| Wave 1 Wave 1 | `glyph-village` | a round brass medallion with an embossed small flat-roofed house in the middle, lapis-blue enamel background,  |
-| Wave 1 Wave 1 | `glyph-workshop` | a round brass medallion with an embossed blacksmith anvil in the middle, lapis-blue enamel background, one bol |
-| Wave 1 Wave 1 | `good-fakir` | a glowing violet crystal ball on a small brass stand, a tiny star inside, three-quarter view, single object, c |
-| Wave 1 Wave 1 | `good-fish` | one plump silver fish with a blue back, simple friendly shape, three-quarter view, single object, centred, pla |
-| Wave 1 Wave 1 | `good-gold` | a stack of two gold ingots with a stamped crescent, warm shine, three-quarter view, single object, centred, pl |
-| Wave 1 Wave 1 | `good-ivory` | a single curved elephant tusk, polished cream ivory with a brass cap, three-quarter view, single object, centr |
-| Wave 1 Wave 1 | `good-jewels` | a small heap of three faceted gemstones, ruby, sapphire and emerald, glinting, three-quarter view, single obje |
-| Wave 1 Wave 1 | `good-papyrus` | a rolled papyrus scroll tied with a red cord, one end unrolled, three-quarter view, single object, centred, pl |
-| Wave 1 Wave 1 | `good-pottery` | a round-bellied terracotta jug with a lapis-blue painted band and two handles, three-quarter view, single obje |
-| Wave 1 Wave 1 | `good-silk` | a folded bolt of red silk cloth with a ruffled corner, gold thread edge, three-quarter view, single object, ce |
-| Wave 1 Wave 1 | `good-spice` | a small copper bowl heaped with orange-red spice powder and two dried chillies, three-quarter view, single obj |
-| Wave 1 Wave 1 | `good-wheat` | a tied sheaf of golden wheat ears, three-quarter view, single object, centred, plain flat white background, no |
-| Wave 1 Wave 1 | `icon-basket` | a small hand-painted icon of a woven basket with a lid, bold, readable at 24 px, single object, centred, plain |
-| Wave 1 Wave 1 | `icon-camel` | a small hand-painted icon of a standing camel silhouette, bold, readable at 24 px, single object, centred, pla |
-| Wave 1 Wave 1 | `icon-coin` | a small hand-painted icon of a gold coin with a crescent, bold, readable at 24 px, single object, centred, pla |
 | Wave 1 Wave 1 | `icon-star` | a small hand-painted icon of a gold five-point star, bold, readable at 24 px, single object, centred, plain fl |
-| Wave 1 Wave 1 | `item-carpet` | a small rolled flying carpet with tassels and a swirl of wind, single object, centred, plain flat white backgr |
-| Wave 1 Wave 1 | `item-flute` | a reed pipe with a tassel, single object, centred, plain flat white background, no shadow, no text |
-| Wave 1 Wave 1 | `item-gem5` | a chunky silver bangle set with small turquoise stones, single object, centred, plain flat white background, n |
-| Wave 1 Wave 1 | `item-gem7` | a small carved jade casket with a gold clasp, single object, centred, plain flat white background, no shadow,  |
-| Wave 1 Wave 1 | `item-gem9` | a gold diadem shaped like sun rays with a red jewel, single object, centred, plain flat white background, no s |
-| Wave 1 Wave 1 | `item-horn` | a curved ram horn overflowing with fruit and coins, single object, centred, plain flat white background, no sh |
-| Wave 1 Wave 1 | `item-lamp` | a polished brass oil lamp, single object, centred, plain flat white background, no shadow, no text |
-| Wave 1 Wave 1 | `item-scimitar` | a curved scimitar with glowing orange ember patterns, single object, centred, plain flat white background, no  |
-| Wave 1 Wave 1 | `item-talisman` | a round copper charm with a storm cloud and a lightning bolt, single object, centred, plain flat white backgro |
-| Wave 1 Wave 1 | `thief-artisan` | a hooded cutpurse bust in a violet purple scarf with a tiny curved knife, single object, centred, plain flat w |
-| Wave 1 Wave 1 | `thief-assassin` | a hooded cutpurse bust in a brick red scarf with a tiny curved knife, single object, centred, plain flat white |
-| Wave 1 Wave 1 | `thief-builder` | a hooded cutpurse bust in a cobalt blue scarf with a tiny curved knife, single object, centred, plain flat whi |
-| Wave 1 Wave 1 | `thief-elder` | a hooded cutpurse bust in a cream white scarf with a tiny curved knife, single object, centred, plain flat whi |
-| Wave 1 Wave 1 | `thief-merchant` | a hooded cutpurse bust in a leaf green scarf with a tiny curved knife, single object, centred, plain flat whit |
-| Wave 1 Wave 1 | `thief-vizier` | a hooded cutpurse bust in a golden yellow scarf with a tiny curved knife, single object, centred, plain flat w |
-| Wave 1 Wave 1 | `token-camel-0` | a round clay game token seen from above with a thick charcoal black rim and a cream centre stamped with a stan |
-| Wave 1 Wave 1 | `token-camel-1` | a round clay game token seen from above with a thick teal rim and a cream centre stamped with a standing camel |
-| Wave 1 Wave 1 | `token-camel-2` | a round clay game token seen from above with a thick rose pink rim and a cream centre stamped with a standing  |
-| Wave 1 Wave 1 | `token-camel-3` | a round clay game token seen from above with a thick cedar brown rim and a cream centre stamped with a standin |
-| Wave 1 Wave 1 | `token-camel-4` | a round clay game token seen from above with a thick slate grey rim and a cream centre stamped with a standing |
-| Wave 1 Wave 1 | `token-palace` | a small sandstone palace with one gold onion dome and two slim towers, slightly top-down view, single object,  |
-| Wave 1 Wave 1 | `token-palm` | a small round-topped date palm with five curved fronds and two dates, slightly top-down view, single object, c |
-| Wave 1 Wave 1 | `token-tent-0` | a round clay game token seen from above with a thick charcoal black rim and a cream centre stamped with a smal |
-| Wave 1 Wave 1 | `token-tent-1` | a round clay game token seen from above with a thick teal rim and a cream centre stamped with a small striped  |
-| Wave 1 Wave 1 | `token-tent-2` | a round clay game token seen from above with a thick rose pink rim and a cream centre stamped with a small str |
-| Wave 1 Wave 1 | `token-tent-3` | a round clay game token seen from above with a thick cedar brown rim and a cream centre stamped with a small s |
-| Wave 1 Wave 1 | `token-tent-4` | a round clay game token seen from above with a thick slate grey rim and a cream centre stamped with a small st |
 | Wave 1 Wave 1 | `ui-badge-cream` | a blank round cream enamel seal coin with a raised copper rim and a tiny sunburst, no marking, single object,  |
 | Wave 1 Wave 1 | `ui-badge-gold` | a blank round gold seal coin with a raised rim and a tiny sunburst, no marking, single object, centred, plain  |
 | Wave 1 Wave 1 | `ui-finger` | a painted pointing hand, index finger out, cuff with a copper bracelet, single object, centred, plain flat whi |
 | Wave 1 Wave 1 | `ui-goods-card` | a blank small playing-card shape in cream paper with a thin gilded edge and tiny corner flourishes, centre emp |
 | Wave 1 Wave 1 | `ui-nameplate` | a blank cream paper label with torn edges and a thin brown outline, flat, single object, centred, plain flat w |
 | Wave 1 Wave 1 | `ui-seat-chip` | a blank cream scoreboard plaque with a thin brown wooden border and a small rope loop on each side, centre emp |
-| Wave 1 Wave 1 | `ui-spot` | a blank tall wooden peg-board slot with a small coin dish at the bottom, greyscale, soft carved edges, single  |
 | Wave 1 Wave 1 | `ui-tile-frame-blue` | a square ornamental picture-frame border, glazed lapis-blue ceramic with tiny gold studs in the corners, thin, |
 | Wave 1 Wave 1 | `ui-tile-frame-red` | a square ornamental picture-frame border, glazed terracotta-red ceramic with tiny gold studs in the corners, t |
 | Wave 1 Wave 1 | `ui-trophy` | a small copper trophy cup with a lapis band and two handles, single object, centred, plain flat white backgrou |
 | Wave 1 Wave 1 (16:9) | `fx-sparkle` | a small burst of gold sparkles with four-point stars shown in 8 stages in one row from a tiny glint to fading, |
 | Wave 1 Wave 1 (16:9) | `ui-djinn-bar` | a long narrow banner plaque in deep violet lacquer with a thin hammered-gold border and small gold stars at bo |
 | Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank curling ribbon banner in terracotta with gold edges, centre empty, single object, centred, plain flat  |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-amir` | a splendid djinn emir with a feathered turban and a heavy gold chain, waist-up, body ending in a curl of colou |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-burhan` | a regal djinn taking a giant stride across a tiled floor, carrying a small palace on one palm, waist-up, body  |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-dalil` | a friendly djinn guide holding up a lantern and a little glowing compass orb, a blank tag dangling from his be |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-dukkan` | a sly djinn shopkeeper behind a stall counter hung with goods, waist-up, body ending in a curl of coloured smo |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-fath` | a stern djinn herder with a rope, a camel standing behind him on a crowd of tiny figures, waist-up, body endin |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-ghulam` | a sneaky dark-smoke djinn boy with two curved daggers and a wide grin, waist-up, body ending in a curl of colo |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-hafiz` | a calm protector djinn standing behind a shield shaped like a big lock, waist-up, body ending in a curl of col |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-harith` | a jolly round djinn with a fat purse, coins clinking out of it every time he laughs, waist-up, body ending in  |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-hikma` | an elderly bearded djinn sage reading an open ancient book, glowing eyes, waist-up, body ending in a curl of c |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-jamal` | a handsome djinn riding a camel made of smoke, waist-up, body ending in a curl of coloured smoke, expressive f |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-jawhar` | a djinn jeweller with a loupe, holding a glowing jewel up to the light, waist-up, body ending in a curl of col |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-khanjar` | a djinn with a curved dagger, a gold coin balanced on the flat of the blade, waist-up, body ending in a curl o |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-majlis` | three little smoke djinns sitting around a low table with a glowing lamp, waist-up, body ending in a curl of c |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-nakhla` | a tall djinn with palm fronds for hair and clusters of dates in both hands, waist-up, body ending in a curl of |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-nuraya` | a graceful djinn lifting a small glowing domed palace out of a swirl of sand, waist-up, body ending in a curl  |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-qasra` | a proud djinn architect holding a rolled plan and a tiny glowing palace, waist-up, body ending in a curl of co |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-qirsh` | a burly djinn mason with a trowel and a hammer, two tall stacks of gold coins beside him, waist-up, body endin |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-rawda` | a playful djinn gardener with a watering can, a palm sprouting beside her, waist-up, body ending in a curl of  |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-ruya` | a dreamy djinn gazing into a crystal ball that shows three tiny lamps, waist-up, body ending in a curl of colo |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-sadim` | a stoic guardian djinn with a shield of woven smoke standing in front of two small figures, waist-up, body end |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-sana` | a djinn craftsman with a chisel and a half-carved brass lamp, waist-up, body ending in a curl of coloured smok |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-sirra` | a veiled djinn in a star-patterned robe whispering a secret, one bright eye visible, waist-up, body ending in  |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-suqra` | a cheerful djinn dealer fanning out a handful of blank goods cards like a magician, waist-up, body ending in a |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-tamuz` | a grinning djinn pulling three small wooden figures out of a bottomless velvet bag, waist-up, body ending in a |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-tariq` | a swift djinn runner with a coin pouch, a trail of tiny gold coins behind his footsteps, waist-up, body ending |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-wahha` | a gentle green-smoke djinn planting a palm sapling that sprouts as she waves her hand, waist-up, body ending i |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-wazira` | a dignified djinn vizier in a tall turban with a golden quill and three small scrolls, waist-up, body ending i |
-| Wave 1 Wave 1 djinns (4:3) | `djinn-zarifa` | a serene pale-blue smoke djinn woman holding two glowing orbs that melt into one, waist-up, body ending in a c |
 
 ## rampart-and-vine
 
@@ -202,39 +125,15 @@ WIRED and live 13 Oct 2026 (all 2D files: per-colour pieces, icons, score pill, 
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 3 Wave 3 | `icon-gear` | a small hand-painted icon of a crossed sword and shield, bold, readable at 24 px, single object, centred, plai |
 | Wave 3 Wave 3 | `icon-hand` | a small hand-painted icon of a fan of three blank playing cards, bold, readable at 24 px, single object, centr |
 | Wave 3 Wave 3 | `icon-level` | a small hand-painted icon of a gold level gem, bold, readable at 24 px, single object, centred, plain flat whi |
-| Wave 3 Wave 3 | `pile-door` | a short stack of dungeon cards with a heavy wooden door painted on the top card, single object, centred, plain |
-| Wave 3 Wave 3 | `pile-treasure` | a short stack of dungeon cards with a treasure chest painted on the top card, single object, centred, plain fl |
-| Wave 3 Wave 3 | `token-curse` | a small cracked violet curse token with a swirling smoky hex mark, no letters, single object, centred, plain f |
-| Wave 3 Wave 3 | `ui-clash-hero` | a round blue shield medallion, bold, thick ink outline, centre empty, single object, centred, plain flat white |
-| Wave 3 Wave 3 | `ui-clash-monster` | a round red skull-crest medallion, bold, thick ink outline, centre empty, single object, centred, plain flat w |
-| Wave 3 Wave 3 | `ui-medallion` | an ornate round brass-and-oak medallion frame with a small gem at the bottom for a level badge, centre empty,  |
-| Wave 3 Wave 3 | `ui-parchment` | a stained parchment sheet with a burnt edge and a thin gilt line, centre plain, single object, centred, plain  |
-| Wave 3 Wave 3 | `ui-rival-chip` | a blank carved-wood name plaque with a brass edge, wider than tall, centre empty, single object, centred, plai |
-| Wave 3 Wave 3 | `ui-slot-body` | a small brass-edged oak plaque with a breastplate silhouette stamped in it, single object, centred, plain flat |
-| Wave 3 Wave 3 | `ui-slot-class` | a small brass-edged oak plaque with a sword silhouette stamped in it, single object, centred, plain flat white |
-| Wave 3 Wave 3 | `ui-slot-feet` | a small brass-edged oak plaque with a boot silhouette stamped in it, single object, centred, plain flat white  |
-| Wave 3 Wave 3 | `ui-slot-hands` | a small brass-edged oak plaque with a glove silhouette stamped in it, single object, centred, plain flat white |
-| Wave 3 Wave 3 | `ui-slot-head` | a small brass-edged oak plaque with a helmet silhouette stamped in it, single object, centred, plain flat whit |
-| Wave 3 Wave 3 | `ui-slot-race` | a small brass-edged oak plaque with a pointed ear silhouette stamped in it, single object, centred, plain flat |
-| Wave 3 Wave 3 | `ui-swords` | two crossed swords, bold, thick ink outline, single object, centred, plain flat white background, no shadow, n |
-| Wave 3 Wave 3 (16:9) | `ui-ledger-head` | a strip of stained parchment with a burnt edge and a thin gilt line, seamless left to right, empty, no text |
 | Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of aged parchment with a dark iron outline and a tiny curl at one corner, sin |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged parchment with a dark iron outline, single object, centred, pl |
 | Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, bone-cream with a dark iro |
 | Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, torch-orange with a dark i |
 | Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, dungeon-purple with a dark |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of dark oak with iron bands with a dark iron edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round dark iron button with a torch-orange ring, centre empty, single object, centred, plain flat whit |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round dark iron medallion with a torch-orange ring, centre blank, larger with a small crown on top, single o |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round dark iron medallion with a torch-orange ring, centre blank, with a small laurel at the bottom, single  |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round dark iron medallion with a torch-orange ring, centre blank, dull and darkened with a small padlock at  |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round dark iron medallion with a torch-orange ring, centre blank, bright and polished, single object, centre |
 | Wave 4 Wave 4 kit | `ui-panel` | a aged parchment panel with ornate dark iron corners and a thin dark iron border, the whole centre plain and e |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged parchment with a thin dark iron edge and a small torch-orange diamond at the left e |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of dark oak with iron bands, seamless left to right, empty, no text |
 
 ## nebula-aces
 
