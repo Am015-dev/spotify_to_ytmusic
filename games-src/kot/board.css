@@ -60,6 +60,7 @@ html.ph-p header.gx-bar .pchip{min-height:0;height:100%;padding:0 3px 1px;border
 html.ph-p header.gx-bar .pchip b{font-size:13px;line-height:1.05}
 html.ph-p header.gx-bar .pchip.hasn b{padding-right:0}
 html.ph-p header.gx-bar .pchip span{font-size:13px;gap:2px;letter-spacing:-.6px}
+@media (max-width:380px){html.ph-p header.gx-bar .pchip{padding:0 2px 1px}html.ph-p header.gx-bar .pchip span{gap:0;letter-spacing:-.9px;font-size:11px}html.ph-p header.gx-bar .pchip span em{padding:0}}   /* 375 px phones: the energy number was cut off by the chip edge (scenario invariant) */
 html.ph-p header.gx-bar .pchip .pn{display:none}
 html.ph-p header.gx-bar .pchip u{top:0;bottom:auto;right:0;font:400 13px/1 Bangers,Impact,sans-serif;padding:1px 3px 0;border-radius:5px 0 4px 0}
 html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip u,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip u{display:none}

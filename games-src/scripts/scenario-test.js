@@ -26,6 +26,9 @@ async function openScn(browser, base, slug, id, sz) {
   const page = await ctx.newPage(), errs = [];
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR|favicon|status of 40[34]|Blocked call to navigator.vibrate/.test(m.text())) errs.push('console: ' + m.text().slice(0, 120)); });
+  const origin = new URL(base).origin;   // a same-origin 404 / failed image, music file or model is a bug
+  page.on('response', r => { const u = r.url(); if (u.startsWith(origin) && r.status() >= 400 && !/favicon/.test(u)) errs.push(`request ${r.status()} ${u.slice(origin.length).slice(0, 70)}`); });
+  page.on('requestfailed', r => { const u = r.url(); if (u.startsWith(origin) && !/favicon|ERR_ABORTED/.test(u + (r.failure() && r.failure().errorText))) errs.push(`request failed ${u.slice(origin.length).slice(0, 70)}`); });
   await page.goto(`${base}/${slug}/?scn=${encodeURIComponent(id)}`, { waitUntil: 'load', timeout: 45000 }).catch(e => errs.push('load: ' + e.message.slice(0, 80)));
   return { ctx, page, errs };
 }
@@ -37,15 +40,21 @@ async function listScn(browser, base, slug) {
   finally { await ctx.close(); }
 }
 
-async function runOne(browser, base, slug, sc, sz) {
+const tapAt = (page, sz, x, y) => sz.phone ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
+
+async function runOne(browser, base, slug, sc, sz, mut) {
   const t0 = Date.now(), fails = [], { ctx, page, errs } = await openScn(browser, base, slug, sc.id, sz);
   try {
     await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => fails.push('scenario never became ready'));
     const info = await page.evaluate(() => window.GXSCN).catch(() => null);
     if (info && info.error) fails.push(info.error);
+    if (mut && info && !info.error) {   // scripts/scenario-mutate.js: break the feature on purpose before any check runs
+      const ok = await page.evaluate(m => { try { if (m.t === 'named') return GXS.mutateNamed(m.name); GXS.mutate(m); return true; } catch (e) { return String(e.message); } }, mut);
+      if (ok !== true) fails.push('mutation did not apply: ' + ok);
+    }
     await sleep(600);   // let animations land; checks are about the settled state
     const dir = path.join(OUT, slug); fs.mkdirSync(dir, { recursive: true });   // the shot shows the state the owner is asked about (before the runner taps anything)
-    await page.screenshot({ path: path.join(dir, `${sc.id}-${sz.id}.png`), scale: 'css' }).catch(() => { });
+    if (process.env.SCN_SHOTS) await page.screenshot({ path: path.join(dir, `${sc.id}-${sz.id}.png`), scale: 'css' }).catch(() => { });
     const n = info && info.checks ? info.checks.length : 0;
     for (let i = 0; i < n; i++) {
       const r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw ' + e.message.slice(0, 60) }));
@@ -57,21 +66,46 @@ async function runOne(browser, base, slug, sc, sz) {
         else { await page.mouse.move(r.hold.x, r.hold.y); await sleep(r.hold.ms); const a = await page.evaluate(i => GXS.after(i), i).catch(e => ({ ok: false, msg: 'after threw ' + e.message.slice(0, 60) })); if (!a.ok) fails.push(a.msg); await page.mouse.move(3, 3); await sleep(300); }
         continue;
       }
+      if (r.play) {   // real taps, one step at a time; then the engine must have moved on to a valid state and the outcome must be right
+        let bad = '';
+        for (let j = 0; j < r.play.n && !bad; j++) {
+          let tries = 0, p;
+          do {
+            p = await page.evaluate(([i, j]) => GXS.pstep(i, j), [i, j]);
+            if (p.err) { bad = p.err; break; } if (p.skip) break;
+            await tapAt(page, sz, p.x, p.y); await sleep(p.after); tries++;
+          } while (p.until && tries < p.max && !(await page.evaluate(([i, j]) => GXS.puntil(i, j), [i, j])));
+        }
+        if (bad) { fails.push(bad); continue; }
+        const idle = await page.evaluate(i => GXS.pidle(i), i); if (!idle.ok) { fails.push(idle.msg); continue; }
+        await sleep(200);
+        const a = await page.evaluate(i => GXS.pend(i), i); if (!a.ok) fails.push(a.msg);
+        continue;
+      }
       if (r.tap) {
-        if (sz.phone) await page.touchscreen.tap(r.tap.x, r.tap.y); else await page.mouse.click(r.tap.x, r.tap.y);
+        await tapAt(page, sz, r.tap.x, r.tap.y);
         await sleep(450);
         const a = await page.evaluate(i => GXS.after(i), i).catch(e => ({ ok: false, msg: 'after threw ' + e.message.slice(0, 60) }));
         if (!a.ok) fails.push(a.msg);
       }
     }
-    if (info && !info.error) (await page.evaluate(() => GXS.universal()).catch(() => [])).forEach(m => fails.push(m));
+    if (info && !info.error) {
+      (await page.evaluate(() => GXS.universal()).catch(() => [])).forEach(m => fails.push(m));
+      for (let k = 0; k < 3; k++) {   // every glowing legal target must answer a real tap (the game state must change)
+        const g = await page.evaluate(() => ({ t: GXS.glow(), fp: GXS.fp() })).catch(() => ({ t: [] }));
+        if (!g.t.length) break;
+        await tapAt(page, sz, g.t[0].x, g.t[0].y); await sleep(500);
+        if (g.fp === await page.evaluate(() => GXS.fp()).catch(() => g.fp)) { fails.push(`glowing target "${g.t[0].n}" did not respond to a tap`); break; }
+      }
+    }
     errs.forEach(e => fails.push('page error: ' + e));
   } catch (e) { fails.push('harness: ' + String(e.message).slice(0, 100)); }
   finally { await ctx.close(); }
-  return { id: sc.id, size: sz.id, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) };
+  return { id: sc.id, size: sz.id, mut: mut ? (mut.name || mut.t) : undefined, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) };
 }
 
-(async () => {
+module.exports = { SIZES, openScn, listScn, runOne };
+if (require.main === module) (async () => {
   if (!slugs.length) { console.error('usage: scenario-test.js <slug...> [--only id] [--sizes phone|pc|all]'); process.exit(2); }
   let own = null, base = process.env.GX_URL;
   if (!base) { own = await gx.startServer({ stage: process.env.GX_STAGE }); base = own.base; }
