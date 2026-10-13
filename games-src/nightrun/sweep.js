@@ -90,11 +90,7 @@ const INIT = () => {
       for (const e of document.querySelectorAll(sels.join(','))) {
         if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
         const sb = e.closest('.sbody'); if (sb) { const sr = sb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // settings rows scroll: only the ones in view are checked
-<<<<<<< HEAD
         const mb = e.closest('.mapbox'); if (mb) { const sr = mb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1 || r.left < sr.left - 1 || r.right > sr.right + 1) continue; const h0 = document.elementFromPoint(x, y); if (h0 && h0.closest('#stDet')) continue; }   // the story map scrolls (and the plate may sit over a node)
-=======
-        const sr2 = e.closest('#stRows'); if (sr2 && sr2.scrollHeight > sr2.clientHeight + 2) { const sr = sr2.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // the upright story map scrolls (K1): only the cards in view are checked
->>>>>>> origin/alex/brave-carson-rbpmlk
         const gb = e.closest('#gaCards.tune'); if (gb) { const sr = gb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) { if (r.left < -1 || r.right > innerWidth + 1) out.bad.push('scroll list sticks out sideways ' + e.dataset.id); continue; } }   // the perk list scrolls: only the cards in view are checked
         if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) { out.bad.push('control off screen ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); continue; }
         const h = document.elementFromPoint(x, y); if (!(h && (e === h || e.contains(h) || (h.closest && h.closest('label') && h.closest('label') === e.closest('label'))))) out.bad.push('control covered ' + (e.id || e.textContent.trim().slice(0, 12)) + ' by ' + (h && (h.id || h.className || h.tagName)));
@@ -144,15 +140,10 @@ class Touch {                                           // real touch events thr
 const ev = (p, f, a) => p.evaluate(f, a);
 async function gridOk(p) { let g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) { await sleep(800); const g2 = await ev(p, () => window.__bot.gridErr()); if (g2 !== null && (g === null || Math.abs(g2) < Math.abs(g))) g = g2; } return g; }   // one more look: clock readings jitter when the machine is busy
 async function waitFor(p, f, a, ms = 5000) { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(f, a)) return true; await sleep(50); } return false; }
-<<<<<<< HEAD
 async function pickStage(p, cfg, T, n, play = true) {   // the story map: scroll the node into view, tap it, then PLAY on the plate
   await ev(p, n => { document.querySelector(`#stsel .nd[data-n="${n}"]`).scrollIntoView({ block: 'center', inline: 'center' }); }, n); await sleep(250);
   await press(p, cfg, T, `#stsel .nd[data-n="${n}"]`); await sleep(350); if (play) await press(p, cfg, T, '#stPlay'); }
 async function press(p, cfg, T, sel) { if (cfg.touch) await T.tap(p, sel); else await p.click(sel); }
-=======
-async function press(p, cfg, T, sel) { if (/#stsel \.card/.test(sel)) { await p.evaluate(q => { const c = document.querySelector(q); if (c) c.scrollIntoView({ block: 'center' }); }, sel).catch(() => { }); await sleep(100); }   // the upright story map scrolls
-  if (cfg.touch) await T.tap(p, sel); else await p.click(sel); }
->>>>>>> origin/alex/brave-carson-rbpmlk
 async function startGame(p, cfg, T, how) {
   if (how === 'daily') { await press(p, cfg, T, '#dailyBtn'); }
   else if (cfg.touch) await T.tap(p, '#startBtn'); else await p.keyboard.press('Enter');
@@ -1036,13 +1027,8 @@ async function storyTests(browser, cfg, full) {
       const d = defs[n - 1], t = tag + '#' + n;
       if (n > 1 && await ev(p, () => document.getElementById('stsel').hidden)) await ev(p, () => { window.__mnr.abort(); });
       await ev(p, () => { if (document.getElementById('stsel').hidden && !__mnr.running) { document.getElementById('title').hidden = true; document.getElementById('stres').hidden = true; document.getElementById('stsel').hidden = false; } });
-<<<<<<< HEAD
       await ev(p, () => { __mnr.MSGS.length = 0; });                                  // the page keeps only the first 500 messages: a long run through every stage would fill it
       await pickStage(p, cfg, T, n);
-=======
-      await ev(p, n => { const c = document.querySelector(`#stsel .card[data-n="${n}"]`); if (c) c.scrollIntoView({ block: 'center' }); }, n); await sleep(120);   // the upright story map scrolls
-      await press(p, cfg, T, `#stsel .card[data-n="${n}"]`);
->>>>>>> origin/alex/brave-carson-rbpmlk
       if (!await waitFor(p, n => __mnr.running && __mnr.ST.on && __mnr.ST.n === n, n, 4000)) { await fail(p, t, 'story', 'stage ' + n + ' did not start from the stage select'); continue; }
       await ev(p, () => { window.__mnr.god = true; }); stats.storyStages = (stats.storyStages || 0) + 1;
       const s0 = await ev(p, () => ({ di: __mnr.G.di, hp: __mnr.P.hp, msgs: __mnr.MSGS.slice(-4), st: __mnr.ST.def.song }));

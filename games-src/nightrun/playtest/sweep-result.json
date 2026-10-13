@@ -10,7 +10,8 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 20
+  "shopChecks": 0,
+  "storyStages": 45
  },
  "avg": 0
 }
