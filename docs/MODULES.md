@@ -72,7 +72,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ld | `98ld_stub.js` | 1 | LDM (v89v, 2026-10-10). Coordinator: "move all LDraw model data OUT of overdrive.html into models.js next to km.js" (page ≤ 3.5 MB, flat as models grow). The da |
 | 98ld | `98ld_import.js` | 19 | LD (models-1, 2026-10-10). Alex: "use the taxi as an example to build more complicated items; look on the web for LEGO builds". Real LEGO builds come in as LDra |
 | 98ld | `98ld_w.js` | 8 | LDW (build-5 world props, 2026-10-10). Alex: "one model every ~5 minutes". Real LEGO sets (LDraw OMR, CCAL 2.0) as WORLD props: city buildings, shops, Athens ho |
-| 98ld | `98ld_l_land.js` | 22 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
+| 98ld | `98ld_l_land.js` | 24 | LDS land trees (land-1, 2026-10-10). Alex: "landscape builds for Frankfurt ... drop the free assets and use our own faster assets". Frankfurt's trees become the |
 | 98ld | `98ld_run.js` | 5 | LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module (window.__LDQ, r |
 | 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98sz | `98sz_ride_scale.js` | 6 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
@@ -350,9 +350,9 @@ uses: 92(55), 93(33), 20(15), 53(11), 98(8), 98ld(7), 98gb(7), 41(6), 30(3), 70(
 defines: LDW_P LDW LDW_reg LDW_geo LDW_build1 LDW_boat LDW_spot LDW_build
 uses: 20(23), 30(21), 92(17), 98ld(17), 53(14), 93(8), 10(7), 70(7), 98ld(6), 85(5)
 
-## 98ld_l_land.js — 22 KB
+## 98ld_l_land.js — 24 KB
 defines: LDS LDS_lathe LDS_tri LDS_lamp LDS_fence LDS_crate LDS_fit LDS_planter LDS_dumpster LDS_lth LDS_fitH LDS_cone LDS_barrier LDS_clight LDS_sign LDS_rock LDS_palm LDS_scan LDS_ab
-uses: 30(23), 20(21), 53(20), 10(17), 60(14), 97(8), 70(3), 98ld(3)
+uses: 30(31), 53(24), 20(21), 10(19), 60(18), 97(8), 70(4), 98ld(3)
 
 ## 98ld_run.js — 5 KB
 defines: LDL LD_redraw LD_done LD_ingest LD_load LD_need LD_brMiss LD_probe
@@ -376,7 +376,7 @@ uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
 ## 99c_checklist.js — 63 KB
 defines: OD_CHECKLIST
-uses: 30(45), 10(23), 20(16), 41(6), 70(6), 71(6), 99t(5), 72(4), 92(4), 98ld(3)
+uses: 30(52), 10(24), 20(16), 41(6), 70(6), 71(6), 99t(5), 72(4), 92(4), 98ld(3)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
