@@ -1,9 +1,12 @@
 {
  "crown-city-smash": {
-  "severe": 1,
+  "severe": 4,
   "warn": 6,
   "severeKeys": [
-   "contrast|em.v"
+   "contrast|em.v",
+   "plates|button.btn.mini",
+   "panels|div#choice",
+   "plates|button.btn"
   ],
   "counts": {
    "contrast": 2,
@@ -50,13 +53,14 @@
   }
  },
  "sands-of-qamar": {
-  "severe": 4,
+  "severe": 5,
   "warn": 36,
   "severeKeys": [
    "button|details.exd > summary",
    "contrast|small.ord",
    "size|small.ord",
-   "plates|button.btn.sm"
+   "plates|button.btn.sm",
+   "contrast|b.tv"
   ],
   "counts": {
    "size": 2,
