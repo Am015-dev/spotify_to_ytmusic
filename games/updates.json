@@ -46,7 +46,7 @@
   "check": "Open Story: speech bubble undistorted, no sideways scrollbar",
   "scn": [
    "story-scene",
-   null
+   "cf-board"
   ],
   "ask": [
    null,
@@ -168,7 +168,27 @@
    "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
    "Bid chips 13 px"
   ],
-  "check": "sweep 4/4 clean, no empty or clipped button labels"
+  "check": "sweep 4/4 clean, no empty or clipped button labels",
+  "scn": [
+   "sq-zoom",
+   "sq-board",
+   "sq-chips",
+   "sq-chips",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -258,7 +278,31 @@
    "The bag swings and shakes as you reach in",
    "Each chip tumbles out of the bag in its own colour"
   ],
-  "check": "Tap the bag and watch it shake, then the chip flip out"
+  "check": "Tap the bag and watch it shake, then the chip flip out",
+  "scn": [
+   "cf-board",
+   "cf-board",
+   "cf-help",
+   "cf-draw",
+   "cf-draw",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -341,7 +385,23 @@
    "New card backs, title and end art, portraits",
    "Music for each screen with a Music picker"
   ],
-  "check": "Start a game and look at the tiles and table."
+  "check": "Start a game and look at the tiles and table.",
+  "scn": [
+   "sq-board",
+   "sq-zoom",
+   "sq-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -510,7 +570,23 @@
    "Title and end art",
    "Skipping the tutorial now counts as seen"
   ],
-  "check": "Look at the tiles in a new game."
+  "check": "Look at the tiles in a new game.",
+  "scn": [
+   "sq-board",
+   "sq-board",
+   "sq-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -616,7 +692,31 @@
    "Portrait phone title and table art",
    "Fortune card list page"
   ],
-  "check": "Draw from the bag and check the music picker."
+  "check": "Draw from the bag and check the music picker.",
+  "scn": [
+   "cf-zoom",
+   "cf-board",
+   "cf-help",
+   "cf-board",
+   "cf-help",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -704,7 +804,15 @@
   "items": [
    "Guided tutorial you can replay from the menu"
   ],
-  "check": "Open the tutorial from the menu."
+  "check": "Open the tutorial from the menu.",
+  "scn": [
+   "sq-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -794,7 +902,19 @@
    "Lightbulb help and rules cards",
    "Two-day guided tutorial as Chapter 0"
   ],
-  "check": "Start the tutorial."
+  "check": "Start the tutorial.",
+  "scn": [
+   "cf-help",
+   "cf-board",
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",

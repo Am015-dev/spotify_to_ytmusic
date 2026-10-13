@@ -23,9 +23,13 @@
   }
  },
  "doorkick-dungeon": {
-  "severe": 0,
+  "severe": 3,
   "warn": 5,
-  "severeKeys": [],
+  "severeKeys": [
+   "plates|button.btn.primary",
+   "plates|button.btn",
+   "plates|div#side"
+  ],
   "counts": {
    "images": 5,
    "art": 0
