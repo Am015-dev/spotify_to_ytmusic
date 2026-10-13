@@ -96,5 +96,6 @@
 98rd_roads.js
 98tq_test_quick.js
 98rs_road_seams.js
+98tr_terrain.js
 98lm_liveliness.js
 99_api.js
