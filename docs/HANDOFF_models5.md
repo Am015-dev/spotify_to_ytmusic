@@ -7,7 +7,8 @@ Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuK
 - v90i = out/v90i on alex/od-models (built at 5e8c7e38, grid ce5cbb2b): v90h floor fix (alex/od-garage18 78d49cf0) + veh-2's 16 Town rides
   + size-1 b989e882 (JU squash clamp, BC_dims width cap) + land-2 35406f1 (palms on the verge) + checklist pin clears #m1Next (src/99c_checklist.js pinPlace selector).
   GRID docs/shots/v90i/GRID.jpg. REVIEW sent; see the end of this file for PASS/READY status.
-- tPlay phone v90i vs v90g baseline (docs/shots/v90i/tPlay_*.json): the same fails on both (fra stuck ~4.5-4.9 %, ath walls 1.5-2/min, ath heap ~165 MB); v90i is no worse.
+- tPlay phone v90i vs v90g baseline (docs/shots/v90i/tPlay_*.json): shared fails, v90i no worse: fra stuck 4.5 vs 4.9 %, ath walls 1.49 vs 1.98/min, ath heap 167 vs 162 MB (peak 198 vs 227).
+  NOT shared: ath stuck 7.7 % on v90i vs 0 % on v90g (one 2-min run each; cause unknown, could be route noise or size-1's collider cap). Reproduce before blaming v90i.
 
 ## Next: v90j (fresh integrator)
 - veh-2 (stood down) left 20 rides on alex/od-mdl-veh head 3cac11f, NOT in src/MODELS yet (veh-2 does not commit MODELS):
