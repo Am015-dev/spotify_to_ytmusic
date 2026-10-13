@@ -528,6 +528,95 @@ html.ph.ph-l #rs .endart{height:30dvh;width:min(300px,40vw)}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #7d4a27;background:#fbf0da;color:#4a2a22;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
 .mchip.on{background:#e0a31c;border-color:#7d4a27;font-weight:800}.mchip.prev{border-style:dashed}
 </style><style>
+/* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
+   html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
+   ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
+   html.sk-stars (ui-star-*), html.sk-banner (ui-act-banner), html.sk-dark (dark panels: light ink). Game colours: --sk-ink, --sk-num, --sk-num-done. ===== */
+html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
+html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
+/* top bar + icon buttons */
+html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
+html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
+html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
+html.sk .gx-ibtn>span{padding:0 4px}
+html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
+html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
+html.sk-icons i[data-ic]{background:center/contain no-repeat}
+/* popups: parchment panel (9-slice) with a wooden title strip */
+html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
+html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
+html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
+html.sk .gx-drawer-body{padding:4px 4px 12px}
+/* campaign kit */
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
+html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
+html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
+html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
+html.sk .gxc-boss{border-color:transparent}
+html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;min-height:52px}
+/* story map nodes: painted medallions, the number (text) sits in the centre */
+html.sk .gxc-node{width:68px;height:68px}
+html.sk .gxc-disc{width:68px;height:68px;border:0;border-radius:0;background:url(media/ui-node-open.webp) center/contain no-repeat;box-shadow:none;color:var(--sk-num);text-shadow:0 1px 0 rgba(255,255,255,.45);font-size:22px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+html.sk .gxc-node.a2 .gxc-disc,html.sk .gxc-node.a3 .gxc-disc{background-color:transparent;background-image:url(media/ui-node-open.webp)}
+html.sk .gxc-node.won .gxc-disc,html.sk .gxc-node.won.a2 .gxc-disc,html.sk .gxc-node.won.a3 .gxc-disc{background-image:url(media/ui-node-done.webp);color:var(--sk-num-done);text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .gxc-node.locked .gxc-disc,html.sk .gxc-node.locked.a2 .gxc-disc,html.sk .gxc-node.locked.a3 .gxc-disc{background-image:url(media/ui-node-locked.webp);filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));opacity:1;color:transparent}
+html.sk .gxc-node.boss .gxc-disc,html.sk .gxc-node.boss.a2 .gxc-disc,html.sk .gxc-node.boss.a3 .gxc-disc{background-image:url(media/ui-node-boss.webp);width:74px;height:74px;margin:-8px 0 0 0;box-shadow:none}
+html.sk .gxc-node.boss .gxc-disc::after,html.sk .gxc-lock{display:none}
+html.sk .gxc-node.boss .gxc-disc .gxc-pt{width:34px!important;height:34px!important;margin-top:8px}
+html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out infinite}
+@keyframes sk-pulse{0%,100%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,214,90,.9))}50%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 9px rgba(255,214,90,.95))}}
+html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10}
+html.sk .gxc-node .gxc-stars{top:56px}
+html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
+html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
+html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
+html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
+html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
+html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
+html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
+/* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+@media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
+/* painted UI over the shared skin (gx-skin.css): switches are added by GXSK.init in ui5.js once the files loaded; missing files keep the old CSS */
+html.sk{--sk-ink:#3a1a10;--sk-cream:#fbefd6}
+.kki{width:20px;height:20px;vertical-align:-5px;margin:0 4px 0 0;object-fit:contain}
+.kv>span{display:inline-flex;align-items:center}
+.rcard .rt>b>.kki{width:24px;height:24px;vertical-align:-7px}
+/* buttons: salmon plate (default and Serve), cream plate (alt), indigo plate (selected) */
+html.sk .btn{display:inline-flex;align-items:center;justify-content:center;border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-go-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:96px;padding:0 2px;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .btn.alt{border-image-source:url(media/ui-button-cream-c.webp)}
+html.sk .btn.on{border-image-source:url(media/ui-button-power-c.webp);color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .btn.dis,html.sk .btn:disabled{opacity:.5}
+html.sk .btn.small{min-height:48px}
+html.sk #rs .rsbox.bar .btn{box-shadow:none;min-height:62px;min-width:170px;border-width:0 26px;border-image-width:0 26px}
+html.sk .tbtn,html.sk .sbtn{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 24px stretch;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));color:var(--sk-ink);text-shadow:none}
+html.sk .tbtn.go,html.sk .sbtn.big{border-image-source:url(media/ui-button-go-c.webp);color:var(--sk-ink);text-shadow:none}
+html.sk .tbtn:active{box-shadow:none}
+html.sk .sbtn span{opacity:1}
+html.sk .px{border:8px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/8px stretch;border-radius:0;background:none;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:24px;padding:0}
+html.sk .gx-bar .gx-ibtn{color:var(--sk-cream)}
+/* painted paper chopstick-sleeve name tags under each diner (colour per chef; red and teal darkened for white ink) */
+html.sk-tags .sh .nm{background:var(--nto,none),var(--nt,none) center/100% 100% no-repeat;color:var(--nti,var(--ink));padding:1px 7px;line-height:16px;min-width:46px;text-align:center;border-radius:0;text-shadow:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+/* the score badge becomes a gold star (number stays real text) */
+html.sk-kki .sh .sc{background:url(media/icon-star.webp) center/contain no-repeat;border:0;border-radius:0;min-width:30px;height:30px;line-height:30px;right:-12px;top:-9px;color:#3a1a10;font-size:13px;padding:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+/* ink over the busy bamboo strips: dark plaques behind bar text and drawer titles */
+html.sk .gx-bar h1,html.sk .gx-bar #barstat{background:rgba(36,18,8,.78);border-radius:8px;padding:2px 8px;color:var(--sk-cream);text-shadow:none}
+html.sk .gx-drawer-head h2{background:rgba(36,18,8,.8);border-radius:8px;padding:3px 10px;flex:0 1 auto;margin-right:auto;color:var(--sk-cream)}
+html.sk .gx-drawer-head .gx-x{border:8px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/8px stretch;border-radius:0;background:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:1.5rem;padding:0}
+html.sk .tbtn{min-height:76px;padding-top:8px;padding-bottom:8px}
+html.sk .tbtn b{font-size:22px}
+html.sk .sbtn{min-height:64px;padding-top:6px;padding-bottom:6px}
+html.sk .gxh-set button.btn{background:none;border-radius:0;min-height:48px}
+html.sk .gxh-set button.btn[aria-pressed=true]{background:none;border-image-source:url(media/ui-button-power-c.webp);color:var(--sk-cream);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-bar #barstat{font-size:12px;padding:1px 4px}
+html.sk .gx-bar{gap:4px}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -646,6 +735,7 @@ html.ph.ph-l #rs .endart{height:30dvh;width:min(300px,40vw)}
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
 .gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
@@ -3823,9 +3913,32 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+/* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+(function () {
+  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  window.GXSK = {
+    init: function (o) {
+      o = o || {}; var extra = [];
+      if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
+      load(core, function (ok) {
+        if (!ok) return;
+        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
+        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        if (o.cb) o.cb();
+      });
+    }
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
-//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
 //   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
@@ -4217,6 +4330,7 @@ const GX={key:'gx',open:null,
     return new Promise(function (done) {
       if (!doc) return done('map');
       var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      if (O && O.endArt) { var ea = r.won ? O.endArt.win : O.endArt.lose; if (ea) { s.parentNode.classList.add('has-art'); s.parentNode.style.setProperty('--gxc-art', 'url(' + ea + ')'); } }
       box.appendChild(el('div', 'gxc-res-k', def.title));
       box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
@@ -6953,7 +7067,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
   const gs = groupsOf(s, tab, info), total = totalOf(s, info);
   const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : '') + (dm.wrap ? '.wrap' : '') + (dm.tight ? '.tight' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
-  el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
+  el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s)); { const c = pcol(s).name, t = { Mina: ['red', 1], Taro: ['teal', 1], Odile: ['gold', 0], Kofi: ['purple', 0], Pip: ['green', 0] }[c]; if (t) { el.style.setProperty('--nt', 'url(media/ui-nametag-' + t[0] + '.webp)'); el.style.setProperty('--nti', t[1] ? '#fff' : '#3a1a10'); el.style.setProperty('--nto', t[1] ? 'linear-gradient(rgba(30,10,0,.28),rgba(30,10,0,.28))' : 'none'); } }
   const crowned = G.phase === 'over' && (G.winners || []).indexOf(s) >= 0 && (UI.overShown || (UI.fz && UI.fz.crown));
   const av = h('div.av' + (picking ? '.act' : '') + (crowned ? '.win' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));
@@ -7611,6 +7725,7 @@ function buildRules() {
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
+const kkIc = n => { const i = new Image(); i.className = 'kki'; i.alt = ''; i.setAttribute('aria-hidden', 'true'); i.onerror = () => i.remove(); i.src = 'media/icon-' + n + '.webp'; return i; };   // painted counter icon; removes itself when the file is missing
 function renderRival(seat) {
   const b = $('#rivalbody'); if (!b || !G) return; b.innerHTML = '';
   seat = seat == null ? (UI.rseat != null ? UI.rseat : focusSeat()) : seat; UI.rseat = seat;
@@ -7621,13 +7736,13 @@ function renderRival(seat) {
   b.appendChild(h('div.rhead', h('span', { html: avatarS(seat, 96) }), h('div', h('b', p.name), h('div.sm', (p.ai ? 'Computer (' + p.ai + ')' : (NET.on && seat === NET.mySeat ? 'You' : 'Diner')) + (G.phase === 'pick' ? (p.picked ? ' · has chosen' : ' · is choosing') : '')))));
   b.querySelector('.rhead svg').style.cssText = 'width:52px;height:52px';
   const bank = G.rs.map(r => r[seat].total);
-  b.appendChild(h('div.kv', h('span', 'Rounds banked'), h('b', bank.length ? bank.join(' + ') + ' = ' + bank.reduce((a, c) => a + c, 0) : 'none yet')));
-  if (G.phase !== 'over' && tab[seat].length) b.appendChild(h('div.kv', h('span', 'This round so far'), h('b', '+' + info.rs[seat].total)));
-  b.appendChild(h('div.kv', h('span', 'Custard cups'), h('b', pcs[seat])));
-  b.appendChild(h('div.kv', h('span', 'Plates in hand'), h('b', G.phase === 'over' ? 0 : G.players[seat].hand.length)));
+  b.appendChild(h('div.kv', h('span', kkIc('star'), 'Rounds banked'), h('b', bank.length ? bank.join(' + ') + ' = ' + bank.reduce((a, c) => a + c, 0) : 'none yet')));
+  if (G.phase !== 'over' && tab[seat].length) b.appendChild(h('div.kv', h('span', kkIc('star'), 'This round so far'), h('b', '+' + info.rs[seat].total)));
+  b.appendChild(h('div.kv', h('span', kkIc('cup'), 'Custard cups'), h('b', pcs[seat])));
+  b.appendChild(h('div.kv', h('span', kkIc('plate'), 'Plates in hand'), h('b', G.phase === 'over' ? 0 : G.players[seat].hand.length)));
   b.appendChild(h('h4', 'On the counter'));
   if (!gs.length) b.appendChild(h('p.sm', 'Nothing served yet this round.'));
-  gs.forEach(g => b.appendChild(h('div.rcard', cardDiv(g.k === 'roll' ? 'roll2' : g.type, 54, g.on), h('div.rt', h('b', g.hint), h('div.sm', g.tip)))));
+  gs.forEach(g => b.appendChild(h('div.rcard', cardDiv(g.k === 'roll' ? 'roll2' : g.type, 54, g.on), h('div.rt', h('b', g.type === 'wasabi' ? kkIc('paste') : null, g.hint), h('div.sm', g.tip)))));
 }
 function renderDrawers() {
   if (!GX.open || !G) return;
@@ -7794,6 +7909,7 @@ function applyPhone() {
 let rzT = 0;
 // ---------- boot ----------
 function boot() {
+  try { GXSK.init({ sets: { 'sk-kki': ['icon-cup', 'icon-paste', 'icon-plate', 'icon-star'], 'sk-tags': ['ui-nametag-red', 'ui-nametag-teal', 'ui-nametag-gold', 'ui-nametag-purple', 'ui-nametag-green'] } }); } catch (e) { }
   GX.init({ key: 'kk' });
   GX.drawer('rulesd', 'How to play', buildRules(), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
@@ -8796,7 +8912,7 @@ function endBanner() {
 // ---- music: five slots (Menu, Game, Last round, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last round'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and last-round tracks), a new one every ~2.5 min
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;

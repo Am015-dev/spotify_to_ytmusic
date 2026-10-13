@@ -41,6 +41,7 @@ function buildRules() {
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Art and music by Am015-dev. Sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
+const kkIc = n => { const i = new Image(); i.className = 'kki'; i.alt = ''; i.setAttribute('aria-hidden', 'true'); i.onerror = () => i.remove(); i.src = 'media/icon-' + n + '.webp'; return i; };   // painted counter icon; removes itself when the file is missing
 function renderRival(seat) {
   const b = $('#rivalbody'); if (!b || !G) return; b.innerHTML = '';
   seat = seat == null ? (UI.rseat != null ? UI.rseat : focusSeat()) : seat; UI.rseat = seat;
@@ -51,13 +52,13 @@ function renderRival(seat) {
   b.appendChild(h('div.rhead', h('span', { html: avatarS(seat, 96) }), h('div', h('b', p.name), h('div.sm', (p.ai ? 'Computer (' + p.ai + ')' : (NET.on && seat === NET.mySeat ? 'You' : 'Diner')) + (G.phase === 'pick' ? (p.picked ? ' · has chosen' : ' · is choosing') : '')))));
   b.querySelector('.rhead svg').style.cssText = 'width:52px;height:52px';
   const bank = G.rs.map(r => r[seat].total);
-  b.appendChild(h('div.kv', h('span', 'Rounds banked'), h('b', bank.length ? bank.join(' + ') + ' = ' + bank.reduce((a, c) => a + c, 0) : 'none yet')));
-  if (G.phase !== 'over' && tab[seat].length) b.appendChild(h('div.kv', h('span', 'This round so far'), h('b', '+' + info.rs[seat].total)));
-  b.appendChild(h('div.kv', h('span', 'Custard cups'), h('b', pcs[seat])));
-  b.appendChild(h('div.kv', h('span', 'Plates in hand'), h('b', G.phase === 'over' ? 0 : G.players[seat].hand.length)));
+  b.appendChild(h('div.kv', h('span', kkIc('star'), 'Rounds banked'), h('b', bank.length ? bank.join(' + ') + ' = ' + bank.reduce((a, c) => a + c, 0) : 'none yet')));
+  if (G.phase !== 'over' && tab[seat].length) b.appendChild(h('div.kv', h('span', kkIc('star'), 'This round so far'), h('b', '+' + info.rs[seat].total)));
+  b.appendChild(h('div.kv', h('span', kkIc('cup'), 'Custard cups'), h('b', pcs[seat])));
+  b.appendChild(h('div.kv', h('span', kkIc('plate'), 'Plates in hand'), h('b', G.phase === 'over' ? 0 : G.players[seat].hand.length)));
   b.appendChild(h('h4', 'On the counter'));
   if (!gs.length) b.appendChild(h('p.sm', 'Nothing served yet this round.'));
-  gs.forEach(g => b.appendChild(h('div.rcard', cardDiv(g.k === 'roll' ? 'roll2' : g.type, 54, g.on), h('div.rt', h('b', g.hint), h('div.sm', g.tip)))));
+  gs.forEach(g => b.appendChild(h('div.rcard', cardDiv(g.k === 'roll' ? 'roll2' : g.type, 54, g.on), h('div.rt', h('b', g.type === 'wasabi' ? kkIc('paste') : null, g.hint), h('div.sm', g.tip)))));
 }
 function renderDrawers() {
   if (!GX.open || !G) return;
@@ -224,6 +225,7 @@ function applyPhone() {
 let rzT = 0;
 // ---------- boot ----------
 function boot() {
+  try { GXSK.init({ sets: { 'sk-kki': ['icon-cup', 'icon-paste', 'icon-plate', 'icon-star'], 'sk-tags': ['ui-nametag-red', 'ui-nametag-teal', 'ui-nametag-gold', 'ui-nametag-purple', 'ui-nametag-green'] } }); } catch (e) { }
   GX.init({ key: 'kk' });
   GX.drawer('rulesd', 'How to play', buildRules(), true);
   GX.drawer('logd', 'Log', h('div#logbody'));

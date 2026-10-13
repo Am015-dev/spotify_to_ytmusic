@@ -53,7 +53,10 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   else if(a==='mprevx'){musicPreviewStop();renderMusic()}
   else if(a==='mmus'){toggleMusic();renderMusic();try{renderSettings()}catch(x){}}
   else if(a==='gfx'){LOWGFX=!LOWGFX;try{localStorage.setItem('sf_gfx',LOWGFX?'low':'hi')}catch(x){}artApply();backApply();tableApply();titleArt();renderSettings()}});
-function extrasBoot(){artBoot();artApply();endArt();backApply();tableApply();titleArt();
+// ---- painted UI kit (gx-skin.css + skin.css): every switch turns on only after its files loaded; Low graphics keeps the plain CSS
+function skinBoot(){if(LOWGFX||typeof GXSK==='undefined')return;
+  try{GXSK.init({sets:{'sk-fuse':['ui-fuse-track'],'sk-spark':['fx-fuse-spark'],'sk-bomb':['icon-bomb'],'sk-plate':['ui-nameplate-c'],'sk-eq':['ui-eq-frame-c'],'sk-job':['ui-job-sheet-c'],'sk-rack':['ui-rack-c'],'sk-wire':['wire-tile-frame-c'],'sk-key':['ui-iconbtn-k','ui-node-open-k','ui-node-done-k','ui-node-locked-k','ui-node-boss-k']}})}catch(e){}}
+function extrasBoot(){skinBoot();artBoot();artApply();endArt();backApply();tableApply();titleArt();
   ['back-default','back-clock-key','camp-brix','camp-tally','camp-wren','end-win','end-lose'].forEach(preImg);
   setInterval(()=>{try{backApply();tableApply();if(SND.wantMusic&&SND.music&&MUS.pick[SND.slot]==='all')musSync()}catch(e){}},800)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',extrasBoot);else extrasBoot();

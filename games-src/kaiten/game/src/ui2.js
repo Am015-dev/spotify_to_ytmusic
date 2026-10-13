@@ -89,7 +89,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
   const gs = groupsOf(s, tab, info), total = totalOf(s, info);
   const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : '') + (dm.wrap ? '.wrap' : '') + (dm.tight ? '.tight' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
-  el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
+  el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s)); { const c = pcol(s).name, t = { Mina: ['red', 1], Taro: ['teal', 1], Odile: ['gold', 0], Kofi: ['purple', 0], Pip: ['green', 0] }[c]; if (t) { el.style.setProperty('--nt', 'url(media/ui-nametag-' + t[0] + '.webp)'); el.style.setProperty('--nti', t[1] ? '#fff' : '#3a1a10'); el.style.setProperty('--nto', t[1] ? 'linear-gradient(rgba(30,10,0,.28),rgba(30,10,0,.28))' : 'none'); } }
   const crowned = G.phase === 'over' && (G.winners || []).indexOf(s) >= 0 && (UI.overShown || (UI.fz && UI.fz.crown));
   const av = h('div.av' + (picking ? '.act' : '') + (crowned ? '.win' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));

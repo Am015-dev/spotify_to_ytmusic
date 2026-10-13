@@ -269,6 +269,10 @@ function renderMap(){if(!G||!UI.started)return;const wrap=$('#mapwrap');if(!wrap
     const first=!MAP.slotPrev;MAP.slotPrev=MAP.slotPrev||{};
     for(const [r,s,st] of ss){const a=LOCID[2*r];const key=r+'|'+s,js=JSON.stringify(st);if(!first&&MAP.slotPrev[key]!==js&&typeof bfSlot==='function'){try{bfSlot(r,s,MAP.slotPrev[key]?JSON.parse(MAP.slotPrev[key]):null,st)}catch(e){}}MAP.slotPrev[key]=js;m.setSlot(a,s,st);const el=m.slotEl(a,s);if(el){if(st&&st.mineId!=null){el.setAttribute('data-owner',s);el.setAttribute('data-up','1')}else{el.removeAttribute('data-owner');el.removeAttribute('data-up')}}}}
   drawOverlay();applyHl()}
+// painted strength seal for a seat's colour (green / orange / red) once its file loaded, else null (the flat pill stays)
+function sealOf(seat){const c=fcol(seat)||'';const m=/^#([0-9a-f]{6})$/i.exec(c);if(!m)return null;const n=parseInt(m[1],16),r=n>>16&255,g=n>>8&255,b=n&255,mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(mx-mn<30)return null;
+  let h=mx===r?60*(((g-b)/(mx-mn))%6):mx===g?60*((b-r)/(mx-mn)+2):60*((r-g)/(mx-mn)+4);if(h<0)h+=360;
+  const k=(h<22||h>=330)?'red':h<58?'orange':(h>=70&&h<=180)?'green':null;return k&&typeof TBP!=='undefined'&&TBP.tok[k]?k:null}
 function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=[];
   // location reward coins (+1 / +2) and a favour disc marker
   for(let l=0;l<6;l++){const p=m.locPos(LOCID[l]),inf=DD.LOCS[l][2],k=UI.phone?1.2:1;
@@ -319,7 +323,7 @@ function regionChips(f){if(!G||!UI.V||G.phase==='setup')return;const V=UI.V,me=v
       pills.push({s,txt,win})}
     if(!pills.length)continue;const fs=pills.length<=2?76:pills.length===3?62:52,pw=p=>Math.max(fs*1.3,p.txt.length*fs*.62+fs*.55),ph=Math.round(fs*1.28),gap=8;const tot=pills.reduce((a,p)=>a+pw(p),0)+gap*(pills.length-1);
     let x=CHIPPOS[r][0]-tot/2;const y=CHIPPOS[r][1];
-    f.push('<g class="rchip" data-reg="'+r+'">'+pills.map(p=>{const w=pw(p);const g='<g transform="translate('+Math.round(x)+' '+(y-ph/2)+')"><rect width="'+Math.round(w)+'" height="'+ph+'" rx="'+ph/2+'" fill="'+fcol(p.s)+'" stroke="'+(p.win?'#ffd24a':'#fff3c4')+'" stroke-width="'+(p.win?8:3)+'"/>'+
+    f.push('<g class="rchip" data-reg="'+r+'">'+pills.map(p=>{const w=pw(p);const tc=sealOf(p.s),seal=tc&&p.txt.length<=3;const g='<g transform="translate('+Math.round(x)+' '+(y-ph/2)+')">'+(seal?'<image href="media/token-strength-'+tc+'.webp" x="'+Math.round((w-ph)/2)+'" y="0" width="'+ph+'" height="'+ph+'"/>'+(p.win?'<circle cx="'+Math.round(w/2)+'" cy="'+ph/2+'" r="'+(ph/2-2)+'" fill="none" stroke="#ffd24a" stroke-width="7"/>':''):'<rect width="'+Math.round(w)+'" height="'+ph+'" rx="'+ph/2+'" fill="'+fcol(p.s)+'" stroke="'+(p.win?'#ffd24a':'#fff3c4')+'" stroke-width="'+(p.win?8:3)+'"/>')+
       '<text x="'+Math.round(w/2)+'" y="'+(ph/2+fs*.36)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#fff" stroke="#000" stroke-opacity=".45" stroke-width="3" paint-order="stroke">'+esc(p.txt)+(p.s===me?'':'')+'</text></g>';x+=w+gap;return g}).join('')+'</g>')}}
 // ===================== part 3: the dock (round roadmap, the one decision to make now) =====================
 const ROAD=['Bids','Heralds','Cards','Spring','Clashes','Autumn','Winter'];
@@ -546,7 +550,7 @@ function selHTML(s,mv,rm,q,pulse){const items=mv.filter(m=>m.t==='sel'),dn=mv.fi
 function cardOwnerOK(id){const o=ownerOf(id);return o===vs()||G.pl[o]&&(G.reg.some(R=>R.up.includes(id)))}
 function chipFor(v){try{if(typeof v==='number'&&v<10000)return '<span class="chp">'+esc(TB.cardName(G,v))+'</span>'}catch(e){}return '<span class="chp">'+esc(v)+'</span>'}
 // ===================== part 4: hand, rivals, pop-ups, one-at-a-time cards =====================
-const emb=(s,w)=>TBKit.token('influence',{faction:fk(s)},w||26).outerHTML;
+const emb=(s,w)=>{const t=TBKit.token('influence',{faction:fk(s)},w||26).outerHTML;return '<span class="embw e-'+fk(s)+'" style="--ew:'+(w||26)+'px">'+t+'</span>'};
 function isPassing(){return !!(UI.card&&UI.card.kind==='pass')}
 // ---------------------------------------------------------------- hand: a fanned strip along the bottom (tap = lift, tap again or drag onto the glowing spot = play; hold = read)
 function cssPx(n,d){try{const v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n));return v>0?v:d}catch(e){return d}}
@@ -657,10 +661,10 @@ function popRegion(r){const s=vs(),V=UI.V,q=G.q;let h='';
   return popShell(esc(REG[r]),h,'reg-b')}
 function popRival(s){const V=UI.V,P=V.pl[s],f=TBKit.FACTIONS[FK[P.fac]];let h='';
   h+='<div class="rv-top" style="--fc:'+f.main+'"><span>'+emb(s,40)+'</span><div><b>'+esc(f.name)+'</b><br><small>'+esc(DD.FBLURB[P.fac])+'</small></div></div>';
-  h+='<ul class="kv"><li><b>Influence</b> '+P.inf+'</li><li><b>Cards in hand</b> '+P.hand.length+' (limit '+P.hs+')</li><li><b>Deck / Discard / Lost</b> '+P.deck.length+' / '+P.disc.length+' / '+V.lost.filter(id=>ownerOf(id)===s).length+'</li><li><b>Lore</b> '+P.lore+'</li><li><b>Supporters</b> '+P.supp.b+' at home, '+(P.supp.r.reduce((a,b)=>a+b,0)+P.supp.x.reduce((a,b)=>a+b,0))+' on the map, '+P.supp.l+' lost</li>'+(V.fav.h===s?'<li><b>Kingdom\'s Favour</b> '+V.fav.u+' uses left</li>':'')+'</ul>';
+  h+='<ul class="kv"><li class="ki ki-influence"><b>Influence</b> '+P.inf+'</li><li><b>Cards in hand</b> '+P.hand.length+' (limit '+P.hs+')</li><li><b>Deck / Discard / Lost</b> '+P.deck.length+' / '+P.disc.length+' / '+V.lost.filter(id=>ownerOf(id)===s).length+'</li><li class="ki ki-lore"><b>Lore</b> '+P.lore+'</li><li class="ki ki-supporter"><b>Supporters</b> '+P.supp.b+' at home, '+(P.supp.r.reduce((a,b)=>a+b,0)+P.supp.x.reduce((a,b)=>a+b,0))+' on the map, '+P.supp.l+' lost</li>'+(V.fav.h===s?'<li><b>Kingdom\'s Favour</b> '+V.fav.u+' uses left</li>':'')+'</ul>';
   const ks=P.ks.map((T,j)=>T?'<button class="lk" data-a="kc" data-n="'+T.kc+'">'+esc(TB.kingdomInfo(T.kc).name)+'</button>':'').filter(Boolean).concat(P.sup.map(n=>'<button class="lk" data-a="kc" data-n="'+n+'">'+esc(TB.kingdomInfo(n).name)+' (Supply)</button>'));
   h+='<p class="lc-h"><b>Kingdom Cards:</b> '+(ks.join(', ')||'<em>none</em>')+'</p>';
-  h+='<p class="lc-h"><b>Councils (votes):</b> '+DD.COUNCILS.map(c=>SUIT_N[c]+' '+TB.votes(G,s,c)).join(' · ')+'</p>';
+  h+='<p class="lc-h ki ki-pledge"><b>Councils (votes):</b> '+DD.COUNCILS.map(c=>SUIT_N[c]+' '+TB.votes(G,s,c)).join(' · ')+'</p>';
   h+='<p class="lc-h"><b>'+gloss('Tactics')+':</b></p><ul class="tacl">'+DD.TACTICS[P.fac].map((t,i)=>'<li class="tac'+(P.tac[i].burn?' burn':P.tac[i].ex?' ex':'')+'"><b>'+esc(t.nm)+'</b> <small>'+(P.tac[i].burn?'burned':P.tac[i].ex?'used up':t.mk>0?P.tac[i].mk+' use'+(P.tac[i].mk===1?'':'s')+' left, once a round':'once per game')+'</small><br>'+gloss(t.txt.replace(/^SETUP[^.]*\.\s*/,''))+'</li>').join('')+'</ul>';
   h+='<p class="lc-h"><b>Site of Power:</b> '+(P.site.length?P.site.map(id=>esc(TB.cardName(G,id))+' ('+cinfo(id).cost+')').join(', '):'<em>empty</em>')+(P.hq.length?'. HQ: '+P.hq.map(id=>esc(TB.cardName(G,id))).join(', '):'')+'</p>';
   h+='<p class="lc-h"><b>'+gloss('Favour')+' power:</b> '+esc(DD.FAVOUR[P.fac].nm)+': '+gloss(DD.FAVOUR[P.fac].txt)+'</p>';
@@ -1788,6 +1792,7 @@ function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._
   return o(r)}})();
 // ===================== part 13: painted extras (media/*.webp beside the page): card back and table =====================
 // The drawn card back and the CSS table stay while a picture loads, in jsdom, and (table only) on Low graphics.
+var TBP={tok:{}};
 const PX=(function(){
   if(/jsdom/i.test(navigator.userAgent||''))return {tick(){}};
   const R=document.documentElement,seen={};let curT='',curB='';
@@ -1814,7 +1819,15 @@ const PX=(function(){
   function basicApply(){if(bdone)return;bdone=true;const extra={};let n=0;const fin=()=>{if(--n>0)return;TBKit.setArt(Object.assign({},PA,extra));if(typeof renderAll==='function'&&typeof G!=='undefined'&&G)try{renderAll()}catch(e){}};
     const ks=Object.keys(BFB).filter(f=>!PA['basic-'+f]);n=ks.length;if(!n)return;
     ks.forEach(f=>{const im=new Image();im.onload=()=>{extra['basic-'+f]='media/'+BFB[f]+'.webp';fin()};im.onerror=fin;im.src='media/'+BFB[f]+'.webp'})}
-  function tick(){backApply();tableApply();mapApply();surfApplyUI();basicApply()}
+  // painted UI kit (gx-skin) and extras: strength seals, round shield, faction emblems, resource icons; each switches on only after its file loaded
+  let skd=0;
+  function skinInit(){if(skd||UI.lowGfx||typeof GXSK==='undefined')return;skd=1;GXSK.init({});
+    ['token-strength-green','token-strength-orange','token-strength-red'].forEach(f=>{const im=new Image();im.onload=()=>{TBP.tok[f.slice(15)]=1;if(typeof drawOverlay==='function'&&MAP&&MAP.m)try{drawOverlay()}catch(e){}};im.src='media/'+f+'.webp'});
+    const sh=new Image();sh.onload=()=>{window.TBP_SHIELD=1;try{if(MAP.m&&G)MAP.m.setRound(Math.max(1,G.round),G.rounds)}catch(e){}};sh.src='media/ui-round-shield-c.webp';
+    [['clans','heath'],['gathering','choir'],['nobility','gilded'],['uprising','lantern']].forEach(([f,k])=>{const im=new Image();im.onload=()=>{R.classList.add('sk-e-'+k);try{if(typeof renderAll==='function'&&G)renderAll()}catch(e){}};im.src='media/emblem-'+f+'.webp'});
+    ['influence','lore','pledge','supporter'].forEach(f=>{const im=new Image();im.onload=()=>R.classList.add('sk-i-'+f);im.src='media/icon-'+f+'.webp'});
+    ['ui-sheet-head','ui-bubble-c'].forEach(f=>{const im=new Image();im.onload=()=>R.classList.add('sk-'+f.replace('ui-','').replace('-c',''));im.src='media/'+f+'.webp'})}
+  function tick(){skinInit();backApply();tableApply();mapApply();surfApplyUI();basicApply()}
   ['back-default','back-court','table-court','table-court-phone'].forEach(n=>{new Image().src='media/'+n+'.webp'});
   return {tick};
 })();
