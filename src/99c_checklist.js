@@ -11,7 +11,7 @@ const OD_CHECKLIST=[
  {ver:'terr1',id:'terrain-lyka',area:'city',text:'terrain: Athens Lycabettus (📍 GO looks at it from a street): a real tall hill, ground rises ≥150 m from the streets around it to the summit.'},
  {ver:'terr1',id:'terrain-muehl',area:'city',text:'terrain: Frankfurt Mühlberg / Sachsenhausen hills (📍 GO looks at them): visible hills south of the Main, ≥100 m above the valley floor (10th percentile of the ground 0.4-1 km around).'},
  {ver:'terr1',id:'terrain-grade-fra',area:'city',text:'terrain: Frankfurt roads: no street steeper than 12 % (every 8 m of every street, filler road and Autobahn).'},
- {ver:'terr1',id:'terrain-grade-ath',area:'city',text:'terrain: Athens roads: no street steeper than 12 % (every 8 m of every street).'},
+ {ver:'terr1',id:'terrain-grade-ath',area:'city',text:'terrain: Athens roads: no street steeper than 12 % (every 8 m of every street; the hill footpaths up Lycabettus and Filopappou excluded).'},
  {ver:'terr1',id:'terrain-edge-fra',area:'city',text:'terrain: Frankfurt roads are flat across their width: at 50 road points the edge is within 0.3 m of the centre.'},
  {ver:'terr1',id:'terrain-edge-ath',area:'city',text:'terrain: Athens roads are flat across their width: at 50 road points the edge is within 0.3 m of the centre.'},
  {ver:'terr1',id:'terrain-tyre-fra',area:'city',text:'terrain: Frankfurt: the car sits ON the road on slopes: tyre gap ≤0.05 m at 5 road spawns.'},

@@ -9,7 +9,8 @@ function TRN_roads(){const R=[];for(const S of CITY_S)R.push({P:S.pts.map(p=>[p.
 // points to skip: water (bridges carry their own decks), decks, and the world rim
 function TRN_skip(x,z){if(x<WX0+60||x>WX1-60||z<WZS+60||z>WZN-60)return true;if(CID==='fra'&&inRiver(x,z,-25))return true;for(const b of ALL_DECKS)if(deckAt(b,x,z)!=null)return true;return false}
 // steepest 8 m step along every road
-function TRN_grade(){const G=[];let worst=null;for(const r of TRN_roads()){const P=r.P;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<4||TRN_skip(a[0],a[1])||TRN_skip(b[0],b[1]))continue;
+function TRN_grade(){const G=[];let worst=null;for(const r of TRN_roads()){if(r.cls==='hill')continue;  // hill trails (Lycabettus, Filopappou) climb by design
+   const P=r.P;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<4||TRN_skip(a[0],a[1])||TRN_skip(b[0],b[1]))continue;
     const g=Math.abs(groundY(b[0],b[1])-groundY(a[0],a[1]))/d;G.push(g);if(!worst||g>worst.g)worst={g,x:Math.round(a[0]),z:Math.round(a[1]),id:r.id}}}
   G.sort((a,b)=>a-b);const q=p=>+(G[Math.min(G.length-1,Math.floor(G.length*p))]*100).toFixed(1);const o={n:G.length,p50:q(.5),p99:q(.99),max:+(worst.g*100).toFixed(1),over:G.filter(g=>g>.12).length,worst};TRN.grade=o;return o}
 // 50 road points: height across the full width (centre vs both edges)
@@ -47,7 +48,7 @@ const TRN_VIEWS={fra:[[200,354,0],[-1100,-1200,3.6],[2121,150,1.6]],ath:[[0,0,0]
 const TRN_LOAD0={fra:null,ath:null};
 function TRN_fps(say){if(TRN.fpRun)return'📍 FPS VIEWS running…';TRN.fpRun=1;const V=TRN_VIEWS[CID==='fra'?'fra':'ath'],out=[];
   const step=k=>{if(k>=V.length){TRN.fpRun=0;TRN.fps=out;const L0=TRN_LOAD0[CID==='fra'?'fra':'ath'];let ok=true;if(L0)for(let i=0;i<out.length;i++)if(out[i].tris>L0[i].tris*1.05||out[i].calls>L0[i].calls*1.05)ok=false;
-      say('📍 FPS VIEWS · '+out.map(o=>o.fps+' fps / '+Math.round(o.tris/1000)+'k tris / '+o.calls+' calls').join(' · ')+(L0?ok?' · load ≤ +5% ✅':' · load > +5% ❌':' · (no baseline) ✅'));return}
+      say('📍 FPS VIEWS · '+(out.every(o=>!o.calls)?'(page not drawing: draw=0 test mode) · ':'')+out.map(o=>o.fps+' fps / '+Math.round(o.tris/1000)+'k tris / '+o.calls+' calls').join(' · ')+(L0?ok?' · load ≤ +5% ✅':' · load > +5% ❌':' · (no baseline) ✅'));return}
     const q=rfSnap(V[k][0],V[k][1],200)||V[k];roamWarp(q[0],q[1],V[k][2]);RO.v=0;setTimeout(()=>{let n=0,t0=performance.now(),tr=0,ca=0;const I=renderer.info,ar=I.autoReset;I.autoReset=false;I.reset();const f=()=>{n++;tr=Math.max(tr,I.render.triangles);ca=Math.max(ca,I.render.calls);I.reset();if(performance.now()-t0>=2000)I.autoReset=ar;
       if(performance.now()-t0<2000)requestAnimationFrame(f);else{out.push({fps:Math.round(n*1000/(performance.now()-t0)),tris:tr,calls:ca});step(k+1)}};requestAnimationFrame(f)},2500)};step(0);return'📍 FPS VIEWS · measuring 3 views…'}
 function TRN_go(kind,say){try{
@@ -63,4 +64,4 @@ window.__trn={TRN,go:TRN_go,grade:TRN_grade,edge:TRN_edge,ramp:TRN_ramp,base:TRN
 const TRN_C={dry:new THREE.Color(CID==='fra'?'#b3a85e':'#c2ae72'),dirt:new THREE.Color('#9a7a52'),rock:new THREE.Color('#8e8a82')};
 function TRN_slopeCol(c,x,z){if(!c||!c.isColor)return c;let s=0,h=0;try{h=groundY(x,z);const a=groundY(x+5,z)-groundY(x-5,z),b=groundY(x,z+5)-groundY(x,z-5);s=Math.hypot(a,b)/10}catch(e){return c}
   const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};let d=ss(.12,.3,s)*.55;if(CID!=='fra')d=Math.max(d,ss(110,220,h)*.45);if(d>0)c.lerp(TRN_C.dry,d);const r=ss(.3,.55,s);if(r>0)c.lerp(TRN_C.dirt,r*.7);const k=ss(.55,.9,s);if(k>0)c.lerp(TRN_C.rock,k*.8);return c}
-if(new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{if(o&&o.col&&!o.trc){const c0=o.col;o={...o,trc:1,col:(x,z)=>TRN_slopeCol(c0(x,z),x,z)}}return _g(grp,x0,x1,z0,z1,o)}}
+if(TERR.on&&new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{if(o&&o.col&&!o.trc){const c0=o.col;o={...o,trc:1,col:(x,z)=>TRN_slopeCol(c0(x,z),x,z)}}return _g(grp,x0,x1,z0,z1,o)}}
