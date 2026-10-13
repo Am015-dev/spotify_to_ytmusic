@@ -754,7 +754,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
-  {v:'v90m-beta.5',date:'13 Oct 2026',items:[{t:'CHANGED',s:'Athens loads about 15 s faster (the ground mesh layout is pre-computed).'},{t:'NEW',s:'Empty green fields get trees, flowers and small hills (west meadow, Athens slopes).'},{t:'FIXED',s:'Road seams: dead-end filler roads now continue across grid seams (Messe road gap).'},{t:'FIXED',s:'Builder ramps are capped at a gentler slope; new pieces: long ramp, wide bank, kicker, merge (built-in tracks stay hidden).'}]},
+  {v:'v90m-beta.6',date:'13 Oct 2026',items:[{t:'CHANGED',s:'Athens loads about 15 s faster (the ground mesh layout is pre-computed).'},{t:'FIXED',s:'Frankfurt roads no longer end in a strip of grass where two street grids meet (e.g. by the Messe).'},{t:'FIXED',s:'Builder ramps are capped at a gentler slope; new pieces: long ramp, wide bank, kicker, merge (built-in tracks stay hidden).'}]},
   {v:'v90m-beta.4',date:'13 Oct 2026',items:[{t:'FIXED',s:'Vehicle sizes: every ride now has one size table, so buses and trucks are real bus and truck size and the driver is scaled to fit (Frankfurt bus was 4.9 m, now 10.3 m).'}]},
   {v:'v90m-beta.3',date:'13 Oct 2026',items:[{t:'NEW',s:'Liveliness meter: 8 spots per city are measured for life (people, cars, props) to guide the world art pass.'},{t:'CHANGED',s:'Builder track tests now check drivable/fun pass lines (tracks stay hidden).'}]},
   {v:'v90m-beta.2',date:'13 Oct 2026',items:[{t:'CHANGED',s:'The three ready-made builder tracks are hidden from the Race menu until they are fixed.'},{t:'FIXED',s:'Track builder: cut-through hills now have a flat shoulder and sloped walls instead of vertical cliffs.'}]},
@@ -14463,7 +14463,7 @@ window.__sh=()=>({n:SHB.n,trees:SHB.trees.length,pl:SHB.pl,plUnder:!!(SHB.pl&&SH
 // ===== LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex: "All the game looks extremely poor compared to lively 2K Drive ... way too many empty spaces,
 // boring green flat spaces." Reference grid + difference list: docs/research/LIVELY_2K_FILL.md. GO checks look at ONE exact empty spot each
 // (spot list LF.SP): % flat uniform green in the frame (tools/tLiveGreen.py), props within 50 m, height range in view.
-const LF={on:!/[?&]lf=0\b/.test(location.search),st:{},G:new Map()};
+const LF={on:/[?&]lf=1\b/.test(location.search),st:{},G:new Map()};
 // props + fill pieces within r m of (x,z): HUB.pgrid (16 m cells) + LF.G (the fill's own 16 m grid of [x,z])
 function LF_count(x,z,r){let n=0;const c=Math.ceil(r/16),kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-c;a<=c;a++)for(let b=-c;b<=c;b++){const k=(kx+a)*10000+kz+b;
   for(const L of[HUB.pgrid&&HUB.pgrid.get(k),LF.G.get(k)]){if(!L)continue;for(const p of L){const px=p.x!=null?p.x:p[0],pz=p.z!=null?p.z:p[1];if((px-x)**2+(pz-z)**2<r*r&&p.alive!==false)n++}}}return n}
@@ -14853,7 +14853,7 @@ const OD_CHECKLIST=[
   'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
   'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
  // art-2 (lf1): empty-green spots, each GO parks the car at its spot and measures it (src/98lf_lively_fill.js)
- for(const id in LF.SP)GO['lf1/'+id]=[{c:LF.SP[id].c,fn:()=>LF_goSpot(id),n:LF.SP[id].n}];GO['lf1/mound']=[{c:'fra',fn:()=>LF_goMound(),n:'grass hill'}];
+ for(const id in LF.SP)GO['lf1/'+id]=[{c:LF.SP[id].c,fn:()=>LF.on?LF_goSpot(id):'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:LF.SP[id].n}];GO['lf1/mound']=[{c:'fra',fn:()=>LF.on?LF_goMound():'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:'grass hill'}];
  // chk-1 (Alex v90j-beta: "checklist has no GO scenarios"): every item without its own target gets one from its area/text:
  // garage items open the garage (RIDES); Athens items fly to Athens; the rest drive in Frankfurt free roam.
  for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
@@ -16222,7 +16222,7 @@ const RS={n:0};
 {const _f=RD_fillLoop;RD_fillLoop=function(trimOnly){const r=_f.apply(this,arguments);try{RS_seams()}catch(e){console.warn('RS',e)}return r}}
 // GO check (checklist "roads: no gap at the Messe"): a top-down picture of the road (the GPU's downward ray: asphalt meshes free their CPU copy,
 // so a raycast can't see them), sampled every 2 m along the road from the spawn to the next street: every sample must be asphalt, not grass.
-const RS_SPOT={x:2160,z0:520,z1:420,n:'Messe grid seam (Hot Drop)'};
+const RS_SPOT={x:2160,z0:485,z1:405,n:'Messe grid seam (Hot Drop)'};
 function RS_strip(x0,z0,x1,z1){const cx=(x0+x1)/2,cz=(z0+z1)/2,L=Math.hypot(x1-x0,z1-z0),S=Math.max(40,L+20),P=256;
  const cam=new THREE.OrthographicCamera(-S/2,S/2,S/2,-S/2,1,3000);cam.position.set(cx,800,cz);cam.up.set(0,0,-1);cam.lookAt(cx,0,cz);cam.updateMatrixWorld();
  const hid=[];scene.traverse(o=>{if(o.visible&&(o.isInstancedMesh||o.isSprite||o.isPoints||(o.isMesh&&o.material&&o.material.transparent)))hid.push(o)});for(const o of hid)o.visible=false;
