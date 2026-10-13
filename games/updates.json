@@ -1,6 +1,20 @@
 [
  {
   "date": "2026-10-13",
+  "game": "crown",
+  "title": "Every power card now has its own painting",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons."
+  ],
+  "check": "Open the Cards shop: each card has a picture, a dark name plate and readable text."
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Lantern Dive: the Commander's real lantern",
   "items": [
@@ -8,18 +22,6 @@
    "The Commander badge is now the lantern too"
   ],
   "check": "Start a dive and watch the lantern appear by the Commander"
- },
- {
-  "date": "2026-10-13",
-  "game": "crown",
-  "title": "Painted kit and 3D city",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out"
-  ],
-  "check": "Start a game as Clampede (Brainjack set) and look at the city"
  },
  {
   "date": "2026-10-13",

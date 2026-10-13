@@ -51,8 +51,8 @@ function renderPanel(){
   renderBuyMini(p,buyPh,sg);
   const who2=me||p;
   const tk=who2.tok||{};const list=[...who2.cards.map(id=>{const C=CARDS[base(id)];const b=base(id);return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}${b==='smoke'?` (${tk.smoke} puffs)`:''}${b==='cell'?` (${tk.cell} energy on it)`:''}${b==='mimic'&&tk.mim?` (copying ${esc(CN(tk.mim.id))})`:''}${(tk.ufo||[]).includes(id)?' 🐚':''}<br>${esc(C.x)}</div>`}),
-    ...who2.evo.map(e=>`<div class="mc E"><b>🧬 ${esc(evoName(e))}</b> <i>${EVO[e].t==='P'?'permanent':'temporary'} evolution in play</i>${e===18&&tk.icy?` (copying ${esc(evoName(tk.icy.e))})`:''}${e===24?` (${tk.adapt} tokens)`:''}<br>${esc(evoText(e))}</div>`),
-    ...(who2===me||!me||G.mode==='hot'||G.mode==='ai'?who2.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand (${EVO[e].t==='P'?'permanent':'temporary'}${EVO[e].kw?', '+EVO[e].kw:''})</i><br>${esc(evoText(e))}</div>`):[])];
+    ...who2.evo.map(e=>`<div class="mc E">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>${EVO[e].t==='P'?'permanent':'temporary'} evolution in play</i>${e===18&&tk.icy?` (copying ${esc(evoName(tk.icy.e))})`:''}${e===24?` (${tk.adapt} tokens)`:''}<br>${esc(evoText(e))}</div>`),
+    ...(who2===me||!me||G.mode==='hot'||G.mode==='ai'?who2.hand.map(e=>`<div class="mc E hand">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>in hand (${EVO[e].t==='P'?'permanent':'temporary'}${EVO[e].kw?', '+EVO[e].kw:''})</i><br>${esc(evoText(e))}</div>`):[])];
   if(tk.poison||tk.shrink)list.unshift(`<div class="mc B"><b>${tk.poison?'☠ Poison tokens: '+tk.poison+' ':''}${tk.shrink?'🔻 Shrink tokens: '+tk.shrink:''}</b><br>Poison: lose 1 heart per token at the end of your turn. Shrink: roll 1 die fewer per token. A heart die outside the city can remove one token.</div>`);
   if(G.frz&&G.frz.t===who2.i)list.unshift(`<div class="mc E"><b>❄ ${esc(evoName(11))}</b> from ${esc(mname(P(G.frz.o)))}${G.tf&&G.tf.void&&G.active===who2.i?`: your ${esc(fname(G.tf.void))} faces do nothing this turn`:''}</div>`);
   if(exOn('curse'))list.unshift(`<div class="mc K"><b>𓂀 Curse: ${esc(CURSES[G.curse].n)}</b><br>${esc(CURSES[G.curse].x)}<br><i>Ankh: ${esc(CURSES[G.curse].a)} Snake: ${esc(CURSES[G.curse].s)}</i><br>🪲 Brass Beetle: <b>${scarab()>=0?esc(mname(P(scarab()))):'nobody'}</b></div>`);
@@ -74,8 +74,8 @@ function renderBuyMini(p,buyPh,sg){const el=document.getElementById('buymini');
 // every monster's details (popup); the plates on the board show the short version
 function monDetail(p){const k=p.i;const hidden=(G.mode==='solo'||G.mode==='net')&&!(NET.on?k===NET.mySeat:p.human);
   const cards=p.cards.map(id=>{const C=CARDS[base(id)];return `<div class="mc ${C.t}">${cardPic(id,'cthumb')}<b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}<br>${esc(C.x)}</div>`});
-  const evo=p.evo.map(e=>`<div class="mc E"><b>🧬 ${esc(evoName(e))}</b> <i>evolution in play</i><br>${esc(evoText(e))}</div>`);
-  const hand=p.hand.length?(hidden?[`<div class="mc E hand"><b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i></div>`]:p.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand</i><br>${esc(evoText(e))}</div>`)):[];
+  const evo=p.evo.map(e=>`<div class="mc E">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>evolution in play</i><br>${esc(evoText(e))}</div>`);
+  const hand=p.hand.length?(hidden?[`<div class="mc E hand"><b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i></div>`]:p.hand.map(e=>`<div class="mc E hand">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>in hand</i><br>${esc(evoText(e))}</div>`)):[];
   const all=[...cards,...evo,...hand];
   return `<div class="mon ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}" id="mon-${k}"><b style="background:${MONS[p.m].c}">${inCity(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>
     <div class="st2">${p.alive?`♥${p.hp}/${maxhp(p)} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${exIcons(p)} · ${esc(where(p.i))}`:'Knocked out'}</div>

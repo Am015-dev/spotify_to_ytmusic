@@ -86,7 +86,7 @@ function brainIcon(x,y,s,fill){return `<g transform="translate(${x},${y}) scale(
 function burst(x,y,r,fill){let d='';for(let k=0;k<24;k++){const a=k*Math.PI/12,rr=k%2?r*.72:r;d+=(k?'L':'M')+(x+Math.cos(a)*rr).toFixed(1)+' '+(y+Math.sin(a)*rr).toFixed(1)}return `<path d="${d}Z" fill="${fill}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`}
 // painted picture of a power card (games/crown-city-smash/media/pc-<id>.webp, listed in media.json "cards"); cards without a file keep the drawn icon
 const CPIC=new Set((window.CC_MEDIA&&window.CC_MEDIA.cards)||[]);
-function cardPic(id,cls){const b=base(id);return CPIC.has(String(b))?`<img class="cpic ${cls||''}" src="media/pc-${b}.webp" width="360" height="220" loading="lazy" decoding="async" alt="" draggable="false">`:''}
+function cardPic(id,cls){const b=typeof id==='number'?'evo'+id:base(id);return CPIC.has(String(b))?`<img class="cpic ${cls||''}" src="media/pc-${b}.webp" width="360" height="220" loading="lazy" decoding="async" alt="" draggable="false">`:''}
 // small icon for a power card
 function cardIcon(id){const b=base(id),C=CARDS[b];const pic=cardPic(id);if(pic)return pic;const x=C.x;let k='dice';
   if(/Brainjack/.test(x))k='brain';else if(C.kws)k=C.kws[0];else if(/loses? \d+ hearts?|smash|damage/.test(x))k='claw';else if(/[Hh]eal/.test(x))k='heart';else if(/energy/.test(x)&&!/star/.test(x))k='bolt';else if(/star/.test(x))k='star';
