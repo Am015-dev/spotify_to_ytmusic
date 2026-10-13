@@ -51,3 +51,14 @@ SH.hud=function(c,t,L){L=L||{nx:24,ny:57,dx:214,dy:H-30,sx:18,sy:H-34,ring:true}
   HUDX.strip(c,L.nx+(10+String(this.neon).length*8+14)*k,L.ny+5*k,k);
   if(L.ring)this.ring(c,t);
   HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;};
+
+/* ?scn=nr-hud-busy (owner test link, ✔ Test checklist) and hud-cover-test.js: the worst-case moment of a phone run in one spawn - Legend, Bankenviertel,
+   boss incoming, two power-ups, shield x7, one revive, heat high, combo at x4 - kept topped up so the HUD can be judged while it is on screen. */
+function hudBusy(){
+  if(running)return;DF=DIFFS.legend;SET.hud='full';SET.fpsc=true;start();godMode=true;
+  const bi=Math.max(0,DISTRICTS.findIndex(d=>d.name==='BANKENVIERTEL'));enterDistrict(bi);G.banner.t=0;G.hint.t=0;
+  P.hp=P.max;SH.sh=7;TP.revLeft=1;SH.neon=16;GA.eqAll=true;G.force=true;G.en=[];
+  const top=()=>{if(!running)return;P.heat=Math.max(P.heat,86);P.over=false;C.n=Math.max(C.n,TS*3+3);C.lb=G.bc;SH.sh=Math.max(SH.sh,7);
+    for(const k of['tempo','drum'])if(!PW.on(k))PW.give(k,true);};
+  top();setInterval(top,150);}
+if(/[?&]scn=nr-hud-busy/.test(location.search))addEventListener('load',()=>setTimeout(hudBusy,600));
