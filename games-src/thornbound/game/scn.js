@@ -1,0 +1,76 @@
+// Thornbound scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
+(function () {
+  if (!window.GXS) return;
+  var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && typeof renderAll === 'function' && typeof GXT !== 'undefined'; };
+  var $ = function (s) { return document.querySelector(s); };
+  // a 3-player game (you vs 2 computer houses), no menus, tips off, waiting at YOUR first decision
+  function table(seed) {
+    try { GXH.setEnabled(false); } catch (e) { }
+    try { GX.close(); } catch (e) { }
+    GXS.seed(seed); newGame('me', { np: 3, seed: seed, length: 'short', levels: ['normal', 'normal', 'easy'] }); UI.guide = 'off'; UI.speed = 8; try { GXH.setEnabled(false); } catch (e) { }
+    return GXS.wait(function () { return UI.started && !UI.card && !UI.busy && G && G.q && whoActs().hum.length && document.querySelectorAll('#handw .hc').length; }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
+  }
+  var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
+  var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
+  var ext = function (sel) { var l = 1e9, r = -1e9; [].forEach.call(document.querySelectorAll(sel), function (e) { var b = e.getBoundingClientRect(); if (b.width) { l = Math.min(l, b.left); r = Math.max(r, b.right); } }); return [l, r]; };
+  var leafFonts = function (root) { var out = []; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (e.children.length || !(e.textContent || '').trim() || !GXS.vis(e)) return; out.push({ px: parseFloat(getComputedStyle(e).fontSize), t: e.textContent.trim().slice(0, 18) }); }); return out; };
+  var skin = { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } };
+
+  GXS.add({
+    id: 'tb-pc-hand', name: 'PC: hand and Great Road', ask: 'Do hand and road fill the panel?', sizes: 'pc', seed: 5, when: booted,
+    setup: function () { return table(5); },
+    checks: [
+      { kind: 'visible', sel: '#handw .hc', name: 'a hand card' },
+      { kind: 'visible', sel: '#road .kcb', name: 'a Great Road card' },
+      { kind: 'fn', name: 'hand + road span >= 80% of the panel, no empty right side', fn: function () { var d = document.querySelector('.gx-dock').getBoundingClientRect(), h = ext('#handw .hc'), k = ext('#road .kcb'), l = Math.min(h[0], k[0]), r = Math.max(h[1], k[1]), f = (r - l) / d.width; if (f < .8) return 'span only ' + Math.round(f * 100) + '% of the panel'; if (d.right - r > d.width * .1) return 'empty right side: ' + Math.round(d.right - r) + ' px'; if (l - d.left > d.width * .1) return 'empty left side: ' + Math.round(l - d.left) + ' px'; return true; } },
+      { kind: 'fn', name: 'hand spans >= 80% of the panel', fn: function () { var d = document.querySelector('.gx-dock').getBoundingClientRect(), h = ext('#handw .hc'); return (h[1] - h[0]) / d.width >= .8 || 'hand is ' + Math.round((h[1] - h[0]) / d.width * 100) + '% of the panel'; } },
+      { kind: 'fn', name: 'hand + road span >= 40% of the screen width', fn: function () { var h = ext('#handw .hc'), k = ext('#road .kcb'); return (Math.max(h[1], k[1]) - Math.min(h[0], k[0])) / innerWidth >= .4 || 'narrow'; } },
+      { kind: 'fn', name: 'all card text >= 13 px', fn: function () { var bad = leafFonts('#handw').concat(leafFonts('#road')).filter(function (x) { return x.px < 13; }); return !bad.length || bad.length + ' texts under 13px, e.g. ' + bad[0].t + ' ' + bad[0].px + 'px'; } },
+      { kind: 'fn', name: 'nothing clipped or off screen', fn: function () { var bad = [].filter.call(document.querySelectorAll('#handw .hc, #road .kcb'), function (e) { return !inView(e); }); if (bad.length) return bad.length + ' cards partly off screen'; var cl = [].filter.call(document.querySelectorAll('#road .kn'), function (e) { return e.scrollWidth > e.clientWidth + 2; }); return !cl.length || 'card name clipped: ' + cl[0].textContent; } },
+      { kind: 'tap', sel: '#handw .hc', name: 'tap a hand card', state: function () { return UI.hand; }, expect: function (a, b) { return a !== b || 'the card was not picked'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'tb-story-start', name: 'Story after Skip tutorial', ask: 'Skip tutorial: is the chapter map next?', seed: 6, when: function () { return booted() && typeof storyOpen === 'function' && typeof GXC !== 'undefined' && !!window.CAMPAIGN; },
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      showStart(); storyOpen();   // what the Story button does: first time, the tutorial comes first
+      return GXS.wait(function () { return GXT.active() && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
+    },
+    checks: [
+      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return GXT.active() || 'no tutorial'; } },
+      { kind: 'text', sel: '[data-gxt-skip]', re: /skip tutorial/i, name: 'Skip tutorial label' },
+      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: GXT.active(), map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
+        expect: function (a, b) { return (!b.tut && b.map) || (b.tut ? 'tutorial still running' : b.start ? 'went back to the title screen, not the chapter map' : 'blank: no chapter map'); } },
+      { kind: 'visible', sel: '.gxc-map-on .gxc-map', name: 'chapter map' },
+      { kind: 'fn', name: 'map has chapter 1 to play, and no tutorial strip is left', fn: function () { var n = document.querySelectorAll('.gxc-map-on button, .gxc-map-on [data-ch]').length; return (n >= 2 && !document.querySelector('.gxt-top')) || (n < 2 ? 'chapter map is empty' : 'tutorial strip left over'); } },
+      { kind: 'fn', name: 'Story does not force the tutorial again', fn: function () { return GXT.isDone('thornbound') || GXT.isDone(TUT_GAME) || 'tutorial not counted as seen'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'tb-board', name: 'Start of game board', ask: 'Is the board clear and filled?', seed: 7, when: booted,
+    setup: function () { return table(7); },
+    checks: [
+      { kind: 'visible', sel: '#board', name: 'board' },
+      { kind: 'fn', name: 'board fills its half or the screen', fn: function () { var r = document.querySelector('#board').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > (innerWidth < 600 ? .3 : .3) || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
+      { kind: 'visible', sel: '#handw .hc', name: 'hand' },
+      { kind: 'visible', sel: '#rivals', name: 'rivals bar' },
+      { kind: 'fn', name: 'no line of text over 8 words in the play area', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#main *, #now, #act, #barstat'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
+      skin
+    ]
+  });
+
+  GXS.add({
+    id: 'tb-zoom', name: 'Card zoom', ask: 'Is the big card readable?', seed: 8, when: booted,
+    setup: function () { return table(8).then(function () { var id = +document.querySelector('#handw .hc').dataset.id; openPop('card', { id: id, read: 1 }); return new Promise(function (r) { setTimeout(r, 500); }); }); },
+    checks: [
+      { kind: 'visible', sel: '#ppop .pp-card', name: 'zoomed card' },
+      { kind: 'fn', name: 'zoom text is readable (>= 13 px)', fn: function () { var bad = leafFonts('#ppop .pp-info').filter(function (x) { return x.px < 13; }); return (leafFonts('#ppop .pp-info').length > 0 && !bad.length) || (bad.length ? 'text ' + bad[0].px + 'px: ' + bad[0].t : 'no explanation text'); } },
+      { kind: 'fn', name: 'zoom is on screen and not clipped', fn: function () { var e = document.querySelector('#ppop .pp-card'); return inView(e) || 'card off screen'; } },
+      { kind: 'visible', sel: '#ppop .pp-x', name: 'close button' },
+      { kind: 'tap', sel: '#ppop .pp-x', name: 'tap close', state: function () { return !!UI.pop; }, expect: function (a, b) { return (a && !b) || 'zoom did not close'; } }
+    ]
+  });
+})();
