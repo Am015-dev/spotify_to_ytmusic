@@ -27,7 +27,7 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
    const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:20000,polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
    await p.waitForTimeout(c==='bx'?1500:process.env.SMOKE?150:500);
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
-   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:spawnOnly?false:ok,spawnOnly,said,state:st.state,errs:errs.slice(e0)});
+   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const secs=(Date.now()-t1)/1000,slow=secs>10&&c!=='bx';if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:(spawnOnly||slow)?false:ok,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!ok||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(res.length<=3||id.endsWith('/shadow'))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
@@ -39,5 +39,5 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
  if(CY!=='fra'&&ath.length){if(CY!=='ath')await open('ath');await runSafe('ath',ath)}
  for(const id in same){const r=res.find(q=>q.id===same[id]);if(r)res.push({...r,id,said:'same as '+same[id]+': '+r.said})}
  const pass=res.filter(r=>r.ok).length;
- console.log(JSON.stringify({pass,total:res.length,fail:res.filter(r=>!r.ok).map(r=>r.id),boots,errors:errs.length,firstErrors:errs.slice(0,5),secs:Math.round((Date.now()-T0)/1000)}));
+ console.log(JSON.stringify({pass,total:res.length,slowest:res.slice().sort((x,y)=>y.secs-x.secs).slice(0,5).map(r=>r.id+' '+(r.secs||0).toFixed(1)+'s'),fail:res.filter(r=>!r.ok).map(r=>r.id),boots,errors:errs.length,firstErrors:errs.slice(0,5),secs:Math.round((Date.now()-T0)/1000)}));
  fs.writeFileSync(OUT+'/tChkGo.json',JSON.stringify({res,boots,errs},null,1));await b.close()})();
