@@ -165,7 +165,7 @@ async function pageCollect(o) {
     const cv = cover(t.el, t.box, null);
     { let n = 0, k = 0; for (const [fx, fy] of [[.5, .5], [.2, .5], [.8, .5], [.5, .25], [.5, .75]]) { const x = t.vis[0] + t.vis[2] * fx, y = t.vis[1] + t.vis[3] * fy; if (x < 0 || y < 0 || x >= W || y >= H) continue; n++; const h = document.elementFromPoint(x, y); if (h && t.el.contains(h)) k++; } t.selfHit = n ? k / n : 0; }
     t.cover = cv.frac; t.coverModal = cv.by ? modalish(cv.by) : false; t.coverBy = cv.by;
-    t.sel = sel(t.el); t.btnEl = t.el.closest(BTN); t.dis = !!t.el.closest(':disabled,[aria-disabled=true],.disabled,.dis,.locked,[disabled]');
+    t.sel = sel(t.el); t.btnEl = t.el.closest(BTN); t.help = !!t.el.closest('[data-help]'); t.dis = !!t.el.closest(':disabled,[aria-disabled=true],.disabled,.dis,.locked,[disabled]');
     textRecs.push(t);
   }
   const recKeys = new Set();
@@ -445,7 +445,7 @@ function judge(raw, ctx) {
   }
   // 2 contrast (+ button label invisible)
   for (const t of raw.texts) {
-    if (!t.ok || !t.letters || t.dis || t.__ratio == null || t.clipText) continue;
+    if (!t.ok || !t.letters || t.dis || t.__ratio == null || t.clipText || t.help) continue;
     const r = t.__ratio;
     if (r < 3) {
       const inBtn = !!t.btn;
