@@ -1,5 +1,5 @@
 // node tools/roads/rdEval.js <url> <fra|ath> <codefile> [ticks]: enter roam, (optionally run N game frames), print __g9ev(code)
 const enter=require('../../bc/enter.js');const fs=require('fs');const URL=process.argv[2],CITY=process.argv[3]||'fra',code=fs.readFileSync(process.argv[4],'utf8'),TK=+(process.argv[5]||0);
 (async()=>{const seed=`localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_city@1','${CITY}');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{},"tut":1}')`;
- const E=await enter(URL,{gfx:'min',seed});const {p,errs}=E;p.setDefaultTimeout(900000);await E.roamApi();await p.waitForTimeout(2000);if(TK)await p.evaluate(n=>window.__tick(n),TK);
+ const E=await enter(URL,{gfx:'min',seed});const {p,errs}=E;p.setDefaultTimeout(900000);await E.roamApi();await p.waitForTimeout(2000);if(TK)await p.evaluate(n=>{const r=window.__dbg.composer.render;window.__dbg.composer.render=()=>{};for(let i=0;i<n;i+=60)window.__tick(60);window.__dbg.composer.render=r},TK);
  console.log(await p.evaluate(c=>{try{return String(__g9ev(c))}catch(e){return 'ERR '+e+' '+e.stack}},code));console.log('errors',errs.length,errs.slice(0,3).join(' | '));await E.b.close()})();

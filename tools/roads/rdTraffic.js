@@ -8,4 +8,4 @@ const enter=require('../../bc/enter.js');const fs=require('fs');const path=requi
  await p.evaluate(()=>{window.__dbg.composer.render=()=>{}});const t0=Date.now();
  for(const [x,z] of JSON.parse(spots)){await p.evaluate(([x,z])=>__g9ev(`RO.x=${x};RO.z=${z};RO.v=0;if(pl){pl.x=${x};pl.z=${z}}`),[x,z]);
   for(let s=0;s<SEC;s+=5){await p.evaluate(()=>{for(let i=0;i<300;i++){window.__tick(1);__g9ev('RO.v=0');window.__xmon()}})}}
- const o=await p.evaluate(()=>__xmonOut());o.rd=await p.evaluate(()=>window.__rd?JSON.stringify(__rd.PS):null);o.wall=Math.round((Date.now()-t0)/1000);console.log(JSON.stringify(o));console.log('errors',errs.length,errs.slice(0,3).join(' | '));await E.b.close()})();
+ const o=await p.evaluate(()=>__xmonOut());o.rd=await p.evaluate(()=>window.__rd?JSON.stringify([__rd.PS,__rd.US&&__rd.US()]):null);o.wall=Math.round((Date.now()-t0)/1000);console.log(JSON.stringify(o));console.log('errors',errs.length,errs.slice(0,3).join(' | '));await E.b.close()})();
