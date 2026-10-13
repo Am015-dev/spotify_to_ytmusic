@@ -3,6 +3,11 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90j',id:'gz-zoom',area:'garage',text:'Garage: the − ⤢ + buttons zoom the car in and out on every tab (RIDES, BUILD, PAINT…); ⤢ goes back to the normal view. Two-finger pinch zooms too.'},
+ {ver:'v90j',id:'gz-keys',area:'garage',dev:'pc',text:'PC, garage: the mouse wheel and the + / − / 0 keys zoom; the I key picks a part (like 💧 PICK).'},
+ {ver:'v90j',id:'gz-pick',area:'garage',text:'Garage → BUILD → ⋯ MORE → 💧 PICK, then tap a part of the car: the next part you place is the same part, turn and colour.'},
+ {ver:'v90j',id:'ck-filter',area:'hud',text:'Checklist: 📱 PHONE / 💻 PC and the GARAGE · RACE · CITY · PEOPLE · HUD chips filter the list; phone and PC answers are kept apart.'},
+ {ver:'v90j',id:'ck-fold',area:'hud',text:'While driving, fold the checklist strip (tap the counter): ✅ / ❌ still answer the item shown, with nothing to open or close.'},
  {ver:'v90j',id:'town20',text:'Garage → RIDES: Recycling Truck, Classic Tractor, Pursuit Squad Car, Mobile Crane, Night Patroller, Mobile Police Truck, Hook and Ladder Truck, Sport Convertible, Farm Tractor (6504), Police Patrol, Fire Chief Car (6602), Shovel Tractor, Road Racer, Little Tractor, Race Car (6609), Road and Trail 4x4, Mini Ladder Truck, Rescue SUV, Highway Pickup: each stands on the floor, wheels down, driver in the seat.'},
  {ver:'v90j',id:'tow7638',text:'Garage → RIDES → Tow Truck (7638): now with doors, windscreen and mudguards; drives forwards.'},
  {ver:'v90j',id:'fra-props',text:'Frankfurt: road works have LEGO cones, barriers, a warning light and a STOP sign; rocks are LEGO rocks; none sit on the road.'},
@@ -195,8 +200,24 @@ const OD_CHECKLIST=[
  {ver:'v88f',id:'music',text:'Music plays after your first tap (iPhone and the Claude app).'}];
 {const KEY='mho_chk',esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
  const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}},save=s=>{try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}};
- const k=it=>it.ver+'/'+it.id,cur=()=>OD_CHECKLIST.filter(it=>it.ver===OD_CHECKLIST[0].ver);
- const open=()=>{const s=load();return cur().filter(it=>!(s[k(it)]&&s[k(it)].st)).length};
+ const k=it=>it.ver+'/'+it.id;
+ // CK2 (Alex 2026-10-13: "separate the checklist pc/phone and also make it easy to approve while playing not open close", "allow some filtering eg
+ // garage, race, city, person"): answers are kept per device (📱 PHONE = touch screen, 💻 PC = mouse); an item with dev:'phone'|'pc' (or whose text
+ // starts "Phone"/"PC") only shows on that device. AREA chips (GARAGE · RACE · CITY · PEOPLE · HUD) use it.area or words in the text. The filter
+ // (mho_chk._f) also drives the pinned strip, whose folded chip keeps ✅ / ❌ so an item is answered with one tap while playing.
+ const DEV=(()=>{try{return matchMedia('(pointer:coarse)').matches?'ph':'pc'}catch(e){return'pc'}})(),DEVN={ph:'📱 PHONE',pc:'💻 PC'};
+ const devOf=it=>it.dev?(it.dev==='pc'?'pc':'ph'):/^(phone|iphone|touch)\b/i.test(it.text)?'ph':/^(pc|desktop|keyboard|mouse)\b/i.test(it.text)?'pc':'';
+ const AREAS=[['all','ALL'],['garage','GARAGE'],['race','RACE'],['city','CITY'],['people','PEOPLE'],['hud','HUD']];
+ const AREA_RX={garage:/garage|\brides?\b|\bbuild|paint|showroom|\bkits?\b/i,race:/\brac(e|es|ing)\b|\bcup\b|\blaps?\b|countdown|finish|rival/i,
+  city:/frankfurt|athens|\bcity\b|street|road|traffic|\bdriv(e|ing)\b|roam|tree|props?\b|river|boat|jump/i,people:/minifig|pedestrian|people|person|driver|\bnpc|human|giant|statue|\bhost/i,
+  hud:/\bhud\b|button|checklist|menu|popup|\bpin\b|objective|screen|minimap|updates|\btext\b/i};
+ const areaOf=it=>it.area?[].concat(it.area):Object.keys(AREA_RX).filter(a=>AREA_RX[a].test(it.text));
+ const flt=()=>{const f=load()._f||{};return{d:f.d==='pc'||f.d==='ph'?f.d:DEV,a:f.a||'all'}};
+ const show=(it,F=flt())=>{const d=devOf(it);return(!d||d===F.d)&&(F.a==='all'||areaOf(it).includes(F.a))};
+ const res=(s,it,d=flt().d)=>s[k(it)+'|'+d]||s[k(it)]||{};  // answers from before v90j (no device) count on both devices
+ const rset=(s,it,o)=>{const kk=k(it)+'|'+flt().d;s[kk]=Object.assign({},res(s,it),s[kk]||{},o)};
+ const cur=()=>OD_CHECKLIST.filter(it=>it.ver===OD_CHECKLIST[0].ver&&show(it));
+ const open=()=>{const s=load();return cur().filter(it=>!res(s,it).st).length};
  const st=document.createElement('style');st.textContent=`#odChk{position:fixed;inset:0;z-index:9100;display:flex;align-items:center;justify-content:center;background:rgba(10,14,30,.6);padding:8px;box-sizing:border-box;user-select:none;-webkit-user-select:none}#odChk[hidden]{display:none}
 #odChk .cc{width:min(720px,100%);max-height:100%;display:flex;flex-direction:column;background:#0b1626;border:3px solid #3ddc84;border-radius:16px;color:#e8f2fa;font:600 13px system-ui}
 #odChk .ch{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:2px solid #1d3550}#odChk .ch b{font:italic 900 20px var(--hud,system-ui)}#odChk .ch small{color:#9fb3c8;font-size:12px}
@@ -204,21 +225,25 @@ const OD_CHECKLIST=[
 #odChk .cb{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 10px 10px}#odChk .ci{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #ffffff14;flex-wrap:wrap}
 #odChk .ci p{flex:1 1 300px;margin:0;line-height:1.35;font-size:13px}#odChk .ci .pa.on{background:#3ddc84;border-color:#3ddc84;color:#0b1626}#odChk .ci .fa.on{background:#ff4d6d;border-color:#ff4d6d}
 #odChk .ci input{flex:1 1 100%;min-height:36px;font:13px system-ui;background:#0d1a2c;color:#fff;border:1px solid #4ceaff55;border-radius:8px;padding:4px 8px;user-select:text;-webkit-user-select:text}
-#odChk .msg{color:#ffd12c;font-size:12px}.ckB{font:800 13px system-ui;min-height:44px;border-radius:10px;border:2px solid #3ddc84;background:#10301f;color:#fff;padding:0 10px}`;document.head.appendChild(st);
+#odChk .msg{color:#ffd12c;font-size:12px}#odChk .cf{display:flex;gap:4px;padding:4px 10px;overflow-x:auto;border-bottom:2px solid #1d3550;flex:none}#odChk .cf i{flex:none;width:8px}
+#odChk .cf button{flex:none;min-height:36px;min-width:44px;border-radius:9px;border:2px solid #4ceaff;background:#12304a;color:#fff;font:900 12px system-ui;padding:0 8px}#odChk .cf button.on{background:#ffd12c;border-color:#ffd12c;color:#0b1626}.ckB{font:800 13px system-ui;min-height:44px;border-radius:10px;border:2px solid #3ddc84;background:#10301f;color:#fff;padding:0 10px}`;document.head.appendChild(st);
  const ov=document.createElement('div');ov.id='odChk';ov.hidden=true;document.body.appendChild(ov);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown','wheel'])ov.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  for(const ev of['keydown','keyup'])ov.addEventListener(ev,e=>{if(e.target.tagName==='INPUT')e.stopPropagation()});
- const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>{const r=s[k(it)]||{};return `${it.ver} ${it.id}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')};
+ const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>['ph','pc'].filter(d=>!devOf(it)||devOf(it)===d).map(d=>{const r=res(s,it,d);return `${it.ver} ${it.id} ${d==='ph'?'phone':'pc'}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')).join('\n')};
  const badge=()=>{try{pinR()}catch(e){}const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
- const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
-  for(const it of OD_CHECKLIST){const r=s[k(it)]||{};h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
+ const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div>`;const F=flt();
+  h+=`<div class="cf">${['ph','pc'].map(d=>`<button data-c="d:${d}" class="${F.d===d?'on':''}">${DEVN[d]}</button>`).join('')}<i></i>${AREAS.map(([a,n])=>`<button data-c="a:${a}" class="${F.a===a?'on':''}">${n}</button>`).join('')}</div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
+  const L=OD_CHECKLIST.filter(it=>show(it,F));if(!L.length)h+=`<div class="msg">Nothing to check for ${DEVN[F.d]} in ${F.a.toUpperCase()}.</div>`;
+  for(const it of L){const r=res(s,it,F.d);h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
   ov.innerHTML=h+'</div></div>';badge()};
  const copy=()=>{const t=text();const done=()=>render('Copied: paste it to the coordinator.');
   const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;left:0;top:0;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();ok?done():render('Copy blocked here; long-press to select:\n'+t)};
   try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}};
  ov.addEventListener('click',e=>{if(e.target===ov){ov.hidden=true;document.body.classList.remove('ckOn');return}const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;try{AU.sfx('pick')}catch(er){}
-  if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='PASS'||c==='FAIL'){const key=b.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{st:s[key]&&s[key].st===c?'':c});save(s);render()}});
- ov.addEventListener('change',e=>{const i=e.target;if(i.tagName!=='INPUT')return;const key=i.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{n:i.value.slice(0,200)});save(s)});
+  if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='PASS'||c==='FAIL'){const it=OD_CHECKLIST.find(q=>k(q)===b.closest('.ci').dataset.k),s=load();if(it){rset(s,it,{st:res(s,it).st===c?'':c});save(s)}render()}
+  else if(/^[da]:/.test(c)){const s=load();s._f=Object.assign(flt(),c[0]==='d'?{d:c.slice(2)}:{a:c.slice(2)});s._pin=Object.assign(pst(),{i:0});save(s);render();try{pinR()}catch(er){}}});
+ ov.addEventListener('change',e=>{const i=e.target;if(i.tagName!=='INPUT')return;const it=OD_CHECKLIST.find(q=>k(q)===i.closest('.ci').dataset.k),s=load();if(it){rset(s,it,{n:i.value.slice(0,200)});save(s)}});
  window.odChkOpen=()=>{render();ov.hidden=false;document.body.classList.add('ckOn')};
  const mk=()=>{const b=document.createElement('button');b.className='ckB';b.addEventListener('click',e=>{e.stopPropagation();try{if(typeof TU_toggle==='function')TU_toggle(false)}catch(er){}document.getElementById('odUpd')&&(document.getElementById('odUpd').hidden=true);odChkOpen()});return b};
  // ⚙ drawer header (re-rendered on every change) and the UPDATES screen header
@@ -230,17 +255,18 @@ const OD_CHECKLIST=[
  // Touches on it never reach the controls under it and it never pauses the game.
  const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
  // the strip walks the items of the newest 3 versions (a small hotfix release must not hide the open items of the release before it)
- const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver))};
+ const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver)&&show(it))};
  let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
  // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
  // RF5 (reviewer): folded chip in races, parked under LAP; hidden only while the big FINISH place text shows; on results at the card's top-right corner
  const pinCd=()=>{try{return state==='countdown'||state==='race'||state==='results'}catch(e){return false}},pinRun=()=>{try{return state==='finished'}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
- const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
+ const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>res(s,it).st).length;
   const busy=!ov.hidden||!n||pinRun()||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
-  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const pinBld=pinBk()&&typeof GB_!=='undefined'&&GB_.bk,fold=P.col||(pinBk()&&(!pinBkOpen||pinBld))||pinCd();
-  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
+  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=res(s,it);let h;const pinBld=pinBk()&&typeof GB_!=='undefined'&&GB_.bk,fold=P.col||(pinBk()&&(!pinBkOpen||pinBld))||pinCd();
+  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:
+   `<p class="pt" data-p="exp" title="${esc(it.text)}">${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button><button class="pk" data-p="next" title="Skip">›</button>`);
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
    `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
    `<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
@@ -264,8 +290,8 @@ const OD_CHECKLIST=[
  const P_col=()=>pin.classList.contains('col');
  pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=pinItems(),n=C.length;try{AU.sfx('pick')}catch(er){}
   if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'&&pinBk()&&typeof GB_!=='undefined'&&GB_.bk){psave(P);odChkOpen();pinR();return}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
-  else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
-   if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
+  else if(a==='PASS'||a==='FAIL'){const s=load(),it=C[P.i],was=res(s,it).st===a;rset(s,it,{st:was?'':a});s._pin=P;save(s);
+   if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n];if(!res(s,q).st){P.i=(P.i+j)%n;break}}}}
   psave(P);pinR();badge()});
  {const st2=document.createElement('style');st2.textContent=`#odPin{position:fixed;z-index:8990;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 54px);width:min(340px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:4px;
  background:rgba(11,22,38,.88);border:2px solid #3ddc84;border-radius:12px;color:#e8f2fa;font:600 12px system-ui;user-select:none;-webkit-user-select:none;touch-action:manipulation;box-shadow:0 2px 0 rgba(0,0,0,.35)}#odPin[hidden]{display:none}
@@ -274,7 +300,7 @@ const OD_CHECKLIST=[
 #odPin p{flex:1;min-width:0;margin:0;line-height:15px;max-height:30px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;font-size:12px}
 #odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
 #odPin .pv{display:flex;flex-direction:column;gap:2px}#odPin .pv button{width:28px;min-height:21px;height:21px;font-size:15px;line-height:1}
-#odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}
+#odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}#odPin.col .pt{flex:0 1 auto;max-width:min(170px,32vw);-webkit-line-clamp:2;font-size:12px}#odPin.col .pa,#odPin.col .fa{width:40px}#odPin.col .pk{width:26px;font-size:15px}
 body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:none!important}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
  setInterval(pinR,700);pinR();
  // v89h: the strip never draws over a card (Alex: tip hidden at the start; PAUSE card's RESUME + title covered in roam). While any modal/card
