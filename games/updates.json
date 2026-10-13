@@ -1,6 +1,41 @@
 [
  {
   "date": "2026-10-13",
+  "game": "shipwreck",
+  "title": "Painted island and kit for Shipwreck Isle",
+  "items": [
+   "Pawns, palms, shelter and palisade are now detailed 3D models",
+   "Phones and Low graphics load lighter versions of the same models",
+   "Unexplored tiles are painted storm-fog; the island is drawn on painted tiles",
+   "Driftwood buttons, bar and panels",
+   "Painted action and resource icons (food, wood, fur, build, hunt...)"
+  ],
+  "check": "Start a game: look at the island, then open Camp and the plan list."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Painted gear slots, rivals and clash medallions",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip"
+  ],
+  "check": "Start a game and kick a door."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sands",
+  "title": "Painted djinns, goods and tokens",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots"
+  ],
+  "check": "Start a game: look at the djinn row and goods; summon a djinn at a Shrine."
+ },
+ {
+  "date": "2026-10-13",
   "game": "final-approach",
   "title": "Painted cockpit kit",
   "items": [
@@ -100,16 +135,6 @@
    "When the fuse runs out the bomb blows up big"
   ],
   "check": "Make a wrong cut, then let the fuse run out"
- },
- {
-  "date": "2026-10-13",
-  "game": "shipwreck",
-  "title": "Real 3D castaways and palms",
-  "items": [
-   "Pawns, palms, shelter and palisade are now detailed 3D models",
-   "Phones and Low graphics load lighter versions of the same models"
-  ],
-  "check": "Start a game and look at the castaways and the camp on the island."
  },
  {
   "date": "2026-10-10",

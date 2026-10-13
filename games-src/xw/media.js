@@ -8,11 +8,11 @@ const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 // ---- title / end art as CSS variables (the start and debrief panels paint a banner from them)
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
   set('--na-title',phone()?'title-phone':'title');set('--na-end-win','end-win');set('--na-end-lose','end-lose');
-  const t=unl('table')==='nebula7'?'table-nebula7':'table-default';pre(t,()=>{R.style.setProperty('--tbl-img','url('+MEDIA+t+'.webp)');if(tblWant!==t){tblWant=t;skin()}});
+  const t=unl('table')==='nebula7'?'table-nebula7':'arena-floor';pre(t,()=>{R.style.setProperty('--tbl-img','url('+MEDIA+t+'.webp)');if(tblWant!==t){tblWant=t;skin()}});
   pre(phone()?'table-default-phone':'table-default',()=>R.style.setProperty('--tbl-flat','url('+MEDIA+(phone()?'table-default-phone':'table-default')+'.webp)'))}
 // ---- 3D mat: a painted plane just under the holographic grid (the unlock Nebula-7 dust swaps it); plain dark plate while loading and on Low
 let tblWant='',skinPl=null,skinFile='';
-function skin(){if(typeof V3==='undefined'||!V3.mat||typeof THREE==='undefined')return;const f=tblWant||'table-default';
+function skin(){if(typeof V3==='undefined'||!V3.mat||typeof THREE==='undefined')return;const f=tblWant||'arena-floor';
   if(skinFile!==f&&IMG_OK[f]){skinFile=f;new THREE.TextureLoader().load(MEDIA+f+'.webp',tx=>{try{tx.colorSpace=THREE.SRGBColorSpace;tx.anisotropy=4;
       if(!skinPl){const M=91.4,g=new THREE.PlaneGeometry(M,M).translate(M/2,M/2,0);skinPl=new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tx,transparent:true,opacity:.92,depthWrite:false,toneMapped:false}));
         skinPl.rotation.x=-Math.PI/2;skinPl.position.set(0,.01,M);skinPl.renderOrder=-2;V3.mat.add(skinPl)}else{if(skinPl.material.map)skinPl.material.map.dispose();skinPl.material.map=tx;skinPl.material.needsUpdate=true}}catch(e){}})}
@@ -26,7 +26,11 @@ function slot(){
   if(G.winner&&G.winner!=='draw'){const me=soloSide();return[(me<0||G.winner==='P'+(me+1))?'victory':'defeat',1]}
   if(!UI.tut&&UI.camp&&UI.camp.boss)return['fight',0];
   return['main',0]}
+const SHIPF={'lancer:0':'anvil','talon:0':'needle','lancer:1':'warden','talon:1':'razor','lancer:2':'maul','talon:2':'herald'};   // painted side view per hull and faction colour (keel, kestrel and hauler have no hull in the game yet)
+window.paintedShip=s=>{try{const f=SHIPF[s.type+':'+FACTIONS[G.fac[s.side]].col];return f&&IMG_OK['ship-'+f]===1?MEDIA+'ship-'+f+'.webp':null}catch(e){return null}};
 function boot(){
+  try{GXSK.init({dark:true,sets:{'sk-ico':['focus','evade','lock','shield','hull'].map(k=>'icon-'+k),'sk-cards':['white','green','red'].map(k=>'ui-move-card-'+k)}})}catch(e){}
+  Object.values(SHIPF).forEach(f=>pre('ship-'+f));
   try{GXMUS.init({key:'na',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin();endMark()}catch(e){}},800);
