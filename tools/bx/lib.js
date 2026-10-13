@@ -5,7 +5,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function launch(q=''){const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const c=await b.newContext({viewport:{width:852,height:393},hasTouch:true,isMobile:true,deviceScaleFactor:1});const p=await c.newPage();const E=[];
  p.on('pageerror',e=>E.push('PAGEERR '+e.message));p.on('console',m=>{if(m.type()==='error')E.push('CONSOLE '+m.text())});
- await p.goto('http://127.0.0.1:8766/local_dbg.html?bxfast=1'+q);await p.waitForSelector('#bxMenuBtn',{state:'visible',timeout:180000});await sleep(1500);
+ await p.goto('http://127.0.0.1:8766/local_dbg.html?bxfast=1'+q,{timeout:180000});await p.waitForSelector('#bxMenuBtn',{state:'visible',timeout:180000});await sleep(1500);
  const cdp=await c.newCDPSession(p);return{b,p,E,cdp}}
 const T=async(cdp,type,pts)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:pts.map((q,i)=>({x:q[0],y:q[1],id:q[2]??i}))});
 async function tap(cdp,x,y){await T(cdp,'touchStart',[[x,y]]);await sleep(60);await T(cdp,'touchEnd',[]);await sleep(160)}
