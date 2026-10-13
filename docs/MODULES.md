@@ -78,6 +78,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98sz | `98sz_ride_scale.js` | 6 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 50 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 98sh | `98sh_shadow.js` | 4 | SHB (v90k): soft blob shadows on the ground under the player car, city traffic, people and trees. One InstancedMesh, depth-write off, ~1 draw call. Cause of "no |
+| 98lf | `98lf_lively_fill.js` | 19 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex: "All the game looks extremely poor compared to lively 2K Drive ... way too many empty spaces, boring green f |
 | 99c | `99c_checklist.js` | 67 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
@@ -90,7 +91,6 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98b2 | `98b2_builder2.js` | 61 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: the STUNT CUP ribbon builder was "boring, flat, no levels". This is a PIECE builder on FULL terrain, in its ow |
 | 98rd | `98rd_roads.js` | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow traffic rules and also humans"): pedestrian kerb + crossing rules, cars yield, zebras in Frankfurt. |
 | 98tq | `98tq_test_quick.js` | 4 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z][&go=<ver/id>][&draw=0]: slot 9 (wiped each load), skips intro/menu/story/tutorial, low quality, no warm-up  |
-| 98lf | `98lf_lively_fill.js` | 19 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex: "All the game looks extremely poor compared to lively 2K Drive ... way too many empty spaces, boring green f |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
 | t/fast.js | `test/fast.js` | 5 | FAST · test-only fast mode, active only with ?fast=1 in the URL. Never in deploy builds: tools/build.sh adds src/test/*.js (before 99_api.js) only with --local. |
 | t/g9iter.js | `test/g9iter.js` | 0 | test-only (local builds): eval in module scope for template iteration (t4/g9iter.js) |
@@ -376,6 +376,10 @@ uses: 53(52), 10(49), 30(28), 71(23), 40(17), 51(11), 72(10), 98l(10), 98bc(8), 
 defines: SHB SHB_pool SHB_M SHB_V SHB_Q SHB_S SHB_E SHB_B SHB_scanTrees SHB_put SHB_gy SHB_step __sh
 uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
+## 98lf_lively_fill.js — 19 KB
+defines: LF LF_count LF_hrange LF_find LF_go LF_metrics __lvf LF_h LF_n LF_mound LF_open LF_box LF_FC LF_geos LF_free LF_scatter LF_verge LF_build LF_green LF_goSpot LF_goMound
+uses: 53(41), 51(28), 30(23), 40(19), 60(11), 20(8), 10(7), 72(4), 71(4), 70(3)
+
 ## 99c_checklist.js — 67 KB
 defines: OD_CHECKLIST
 uses: 30(58), 10(24), 20(17), 71(8), 70(7), 41(6), 53(6), 98tq(6), 99t(5), 72(4)
@@ -423,10 +427,6 @@ uses: 53(20), 51(16), 60(6), 20(5), 70(5), 90(4), 10(4), 98l(4), 72(1)
 ## 98tq_test_quick.js — 4 KB
 defines: TQ_url
 uses: 10(12), 72(7), 80(7), 30(4), 20(2), 70(2), 98(2), 98ld(2), t/fast.js(1), 98zp(1)
-
-## 98lf_lively_fill.js — 19 KB
-defines: LF LF_count LF_hrange LF_find LF_go LF_metrics __lvf LF_h LF_n LF_mound LF_open LF_box LF_FC LF_geos LF_free LF_scatter LF_verge LF_build LF_green LF_goSpot LF_goMound
-uses: 53(41), 51(28), 30(23), 40(19), 60(11), 20(8), 10(7), 72(4), 71(4), 70(3)
 
 ## 99_api.js — 49 KB
 defines: __mho CR_RBX CR_raceHide CR_raceBox CR_VMAX CR_VBOOST CR_acc _crD _crF _crQ _crEu _crW _crWS CR_camHide _crCF _crCD CR_BD CR_needTip CR_lgFx CR_lgHit CR_LG CR_lgTap CR_lgGo CR_HB CR_hbStep _cr25F CR_CAMX CR_WL CRSM CRSM_ts CRSM_tap CRSM_modal CRSM_go CRSM_try CRSM_fired CRSM_car CRSM_rects CRSM_pos CRSM_show CRSM_fx CRSM_tutHide R3B_PANELS R3B_panelOpen CRSM_hint __crsm __cr25
