@@ -1,4 +1,7 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.18',date:'13 Oct 2026',items:[{t:'NEW',s:'Race menu: CLIFF RUN and CANYON SPLIT builder tracks (2 laps each) are back.'}]},
+  {v:'v90m-beta.17',date:'13 Oct 2026',items:[{t:'NEW',s:'Empty green fields now have grass clumps, flowers, rocks and trees (streamed in near you).'}]},
+  {v:'v90m-beta.16',date:'13 Oct 2026',items:[{t:'FIXED',s:'The Sightseeing Bus has a roof now (it was an empty open frame), in the garage and in traffic.'},{t:'FIXED',s:'Portrait mode: the STORY button text no longer sticks out of its box.'},{t:'FIXED',s:'The camera no longer costs frame time (re-solving every 4 s removed).'}]},
   {v:'v90m-beta.15',date:'13 Oct 2026',items:[{t:'FIXED',s:'Floating glow blobs at mission markers are gone (glows follow their ground ring).'},{t:'CHANGED',s:'The chase camera now fits every one of the 157 rides.'}]},
   {v:'v90m-beta.13',date:'13 Oct 2026',items:[{t:'CHANGED',s:'Road-gap check now draws its own top-down picture, so it fails when the gap is back.'}]},
   {v:'v90m-beta.12',date:'13 Oct 2026',items:[{t:'CHANGED',s:'On-foot camera sits higher so you see the road ahead past your minifig; the camera also fits big vehicles (bus, trucks).'},{t:'FIXED',s:'Glowing blobs around mission markers are gone.'}]},
