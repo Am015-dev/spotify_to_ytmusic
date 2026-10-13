@@ -165,3 +165,11 @@ Rationale in brackets. "P" = our proposal, not a sourced fact.
 
 - Terrain: fixed flat base map plus height via pieces (no free sculpting) (P; simpler on a phone and keeps collision matching the visuals).
 - The validator rejects a track that has no closed loop, a jump with no landing, a height step > 2 m between adjacent cells, or a water piece above level 0.
+
+## Look-and-play traits from real 2K race worlds (docs/shots/builderA/RESEARCH_GRID.jpg)
+Sources: Steam store screenshots of app 1451810 (store.steampowered.com/app/1451810) and YouTube thumbnails (youtube.com/watch?v=Ql1fzBffBgA).
+- Track runs OVER full terrain: hills, cliffs, a river; free off-road between road pieces (tile 1, 4).
+- Height: a loop and a wall/half-pipe ribbon high above the hills, plus bridges over water (tiles 2, 3).
+- Water is part of the course: boats race on it; road bridges cross it (tiles 3, 6).
+- On-track: banked turns, boost chevrons, brick clouds in a deep blue sky (tile 5).
+Builder-A copies these as pieces: LOOP, WALL L/R, BANK L/R, RAMP/STEEP, JUMP, SPLIT, BOOST, auto LEGO pillars (bridges), terrain sculpt + WATER brush, world presets (MEADOW, MOUNTAIN, CANYON, CITY, ISLANDS).
