@@ -132,7 +132,7 @@ uses: 30(2), 20(1)
 
 ## 51_city_net.js — 47 KB
 defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_OLD RD_kriezi RD_prune RD_net RD_fillJoin RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
-uses: 53(61), 30(33), 10(21), 20(7), 40(7), 41(6), 50(5)
+uses: 53(63), 30(33), 10(21), 20(7), 40(7), 41(6), 50(5)
 
 ## 52_terrain_data.js — 115 KB
 defines: TR_DATA
@@ -140,7 +140,7 @@ uses: -
 
 ## 53_terrain_roads.js — 57 KB
 defines: TR_EX TR_GR TR_GJ TR_dec SM_TG TR_bil SM_trReal TR_real TR_DATUM TR_W TR_init TR_G TR_tauH0 TR_Y TR_grad TR_sst SM_SC SM_shC TR_dev HILL athHills athHill1 athHillH HILLS HILL_BY athHillFit athBlurH athShelfMark athVirtJ athRoadProfiles athRoadProfile shelfY _sst athHilly athHilly0 hillH TAU_R TAU_O tauFade tauRaw TAU_SUM TAU_CAS TAU_SH TAU_CH tauH ZONES MTN TRAILS trailDist AB_R ABW AB AB_K AB_RY AB_C AB_X AB_FEED AB_Z AB_BRIDGES ALL_DECKS GARAGES athRectClr AB_S AB_G abNearI abSamples AB_AUTO AB_netChk abAt abBridgesAuto abSkip abClear MTN_S mtnDist HUB zoneAt inLot slipY roamTerr groundAt groundY roofAt hubAddB bHit bExt roamHit bldPush hubGrid hubTile FILL_R FILL_G BLOCK_C FILL_X gridAt lmNear rfFree fillAt rfGrid hubRoads fpOK onAnyDeck hubFacadeTex hubWinEm signTex adTex groundTex bxUV roofGeo mergeG cbox ccyl csph propDefs
-uses: 51(76), 10(44), 30(24), 20(12), 96(6), 41(4), 60(4), 40(3), 52(2), 90(2)
+uses: 51(76), 10(44), 30(26), 20(12), 96(6), 41(4), 60(4), 40(3), 52(2), 90(2)
 
 ## 60_city_build.js — 201 KB
 defines: qGeo tH gndVert gndBuild waterBuild quayBuild slipBuild deckBuild cityStreetsBuild taunusBuildG BIOMES biomeAt WGC worldGroundBuild athResTex CE_kerbs abStrip_v86 abTex AB_SGN W12_TOL W12_ST W12_abStrip abBuild waveH waterMat flipG LMI lmBuildAll stegBuild stegTower skylineBuild outerTownsBuild lmPhoto athTerrainBuild athRidge ATHGT athMarbleTex ATH_STY ATH_DS ATH_TA athInA ATH_SC athStyle0 athSpecK ATH_COL athUnitGeos athIM athBuildG athRoadD athConn athOverlap ATH_LMK athLmkList athLmNear athLandmarksBuild buildHub buildHubG LAZY LZ lzReg lzD gridAddTo hubGridAdd gridHit lzHit lzRoadD lzPlanAll lzFree lzFreeBox lzY0 lzBox lzCyl lzCone lzSph lzGab lzKm lzMapLine lzRoad LBatch lzPartGeo lzBuildG lzPropsG lzStart lzFinish lzRun lazyStep lzLoad LZT lzNeed ldTravel outerFree2 lzWoodM lzWoodG LZH LZC LZLD LZT2 lzFront lzJet lzCrane lzTractor lzTurbine lzFarm lzStudLine athBiomes athOuter kmProps _abC athBal athProps CE_RX CE_roadE CE_onRoad CE_defs CE_streets CE_plazas CE_lots buildHubProps s0m smashCheck propRespawn propRevive STUDG STUDM studFXStep HCAR HCOL ATH_K TRL athVeh buildHubTraffic navPath hubNear hubRecycle PED_N PED_COL PED_PANTS PED_HAIR pedInit pedPlace _pB _pL _pR _pq _pe _pv _ps pedPart pedStep

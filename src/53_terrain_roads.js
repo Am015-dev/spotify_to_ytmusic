@@ -173,25 +173,26 @@ function abSamples(){if(AB_S)return AB_S;const M=AB.map(abSamp),by=k=>M.find(S=>
 // at the motorway's edge at an angle (no T into the carriageway). A66 w/e get one each this way. ?abf=0 = old feeders only (A/B).
 const AB_AUTO=[];function AB_auto(M){if(/[?&]abf=0/.test(location.search))return;const G=new Map(),gk=(x,z)=>Math.floor(x/40)*100000+Math.floor(z/40);
  CITY_S.forEach((S,si)=>{for(let i=0;i<S.pts.length;i+=2){const p=S.pts[i],k=gk(p.x,p.z);if(!G.has(k))G.set(k,[]);G.get(k).push(si,p.x,p.z)}});
- const near=(x,z,si,r)=>{const cx=Math.floor(x/40),cz=Math.floor(z/40);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=G.get((cx+a)*100000+cz+b);if(!L)continue;for(let i=0;i<L.length;i+=3)if(L[i]!==si&&(L[i+1]-x)**2+(L[i+2]-z)**2<r*r)return true}return false};
+ const near=(x,z,si,r)=>{const n=Math.ceil(r/40),cx=Math.floor(x/40),cz=Math.floor(z/40);for(let a=-n;a<=n;a++)for(let b=-n;b<=n;b++){const L=G.get((cx+a)*100000+cz+b);if(!L)continue;for(let i=0;i<L.length;i+=3)if(L[i]!==si&&(L[i+1]-x)**2+(L[i+2]-z)**2<r*r)return true}return false};
  const used=AB_Z.map(Z=>Z.pts[0]);
+ // ramp from street end E (heading tx,tz) to motorway B near sample bi: leaves along the street, merges at B's near edge 120 m on, at an angle
+ const mk=(E,tx,tz,B,bi)=>{const q=B.pts[bi],dl=Math.hypot(q.x-E.x,q.z-E.z),sg=Math.sign(tx*q.tx+tz*q.tz)||1,j=Math.max(0,Math.min(B.pts.length-1,bi+sg*12)),m=B.pts[j];let nx=-m.tz,nz=m.tx;if(nx*(E.x-m.x)+nz*(E.z-m.z)<0){nx=-nx;nz=-nz}
+  const o=B.r.w/2-4,T=[m.x+nx*o,m.z+nz*o],k=Math.min(dl*.45,260);return[[E.x,E.z],[E.x+tx*k,E.z+tz*k],[T[0]+nx*Math.min(dl*.3,160)-m.tx*sg*120,T[1]+nz*Math.min(dl*.3,160)-m.tz*sg*120],T]};
+ // a ramp runs over open land: not across the Main, not into another motorway, and (past its first 40 m) never within 60 m of another city street or inside a filler-grid district (= their buildings)
+ const GR=(RF.grids||[]).map(g=>rfRect(g[1])),inG=(x,z)=>GR.some(R=>x>R.x0-20&&x<R.x1+20&&z>R.z0-20&&z<R.z1+20);
+ const ok=(pts,B,si)=>{for(let a=0;a<3;a++)for(let t=0;t<=1;t+=.04){const x=pts[a][0]+(pts[a+1][0]-pts[a][0])*t,z=pts[a][1]+(pts[a+1][1]-pts[a][1])*t;if(inRiver(x,z,-14))return false;
+   if(a<2)for(const U of M)if(U!==B&&abNearI(U,x,z)[1]<U.r.w/2+14)return false;if(Math.hypot(x-pts[0][0],z-pts[0][1])>40&&(near(x,z,si,60)||inG(x,z)))return false}return true};
+ const add=(pts,B,S,si,auto)=>{used.push(pts[0]);const K=B.r.k||B.r.id,Z={id:B.r.id,k:K,name:'Ramp '+K.replace(/[we]$/,'')+' · '+(S.r.name||'street'),w:20,y:.24,pts,auto,sid:si};AB_Z.push(Z);AB_AUTO.push(Z)};
  CITY_S.forEach((S,si)=>{if(!/^(main|arterial|sec)$/.test(S.r.cls)||S.L<120)return;for(const e of[0,1]){const P=S.pts,E=e?P[P.length-1]:P[0],F=e?P[Math.max(0,P.length-4)]:P[Math.min(P.length-1,3)];
   if(near(E.x,E.z,si,22))continue;let tx=E.x-F.x,tz=E.z-F.z;const tl=Math.hypot(tx,tz)||1;tx/=tl;tz/=tl;if(tx*E.x+tz*E.z<.3*Math.hypot(E.x,E.z))continue;// must point out of town
   if(used.some(u=>Math.hypot(u[0]-E.x,u[1]-E.z)<200))continue;
   let B=null,bd=1e18,bi=0;for(const T of M){const[i,d]=abNearI(T,E.x,E.z);if(d<bd){bd=d;B=T;bi=i}}if(!B||bd>3200||bd<40)continue;
-  const q=B.pts[bi],dx=q.x-E.x,dz=q.z-E.z,dl=Math.hypot(dx,dz);if((dx*tx+dz*tz)/dl<.2)continue;// motorway must lie ahead of the street
-  // merge point: 120 m along the motorway in the direction the ramp is already heading, on the near edge
-  const sg=Math.sign(tx*q.tx+tz*q.tz)||1,j=Math.max(0,Math.min(B.pts.length-1,bi+sg*12)),m=B.pts[j];let nx=-m.tz,nz=m.tx;if(nx*(E.x-m.x)+nz*(E.z-m.z)<0){nx=-nx;nz=-nz}
-  const o=B.r.w/2-4,T=[m.x+nx*o,m.z+nz*o],k=Math.min(dl*.45,260),C1=[E.x+tx*k,E.z+tz*k],C2=[T[0]+nx*Math.min(dl*.3,160)-m.tx*sg*120,T[1]+nz*Math.min(dl*.3,160)-m.tz*sg*120];
-  const pts=[[E.x,E.z],C1,C2,T];let bad=false;for(let a=0;a<3&&!bad;a++)for(let t=0;t<=1;t+=.05){const x=pts[a][0]+(pts[a+1][0]-pts[a][0])*t,z=pts[a][1]+(pts[a+1][1]-pts[a][1])*t;
-   if(inRiver(x,z,-14)){bad=true;break}if(a<2)for(const U of M){if(U===B)continue;if(abNearI(U,x,z)[1]<U.r.w/2+14){bad=true;break}}if(bad)break}
-  if(bad)continue;used.push(pts[0]);const Z={id:B.r.id,k:B.r.k||B.r.id,name:'Ramp '+(B.r.k||B.r.id).replace(/[we]$/,'')+' · '+(S.r.name||S.r.id||'street'),w:20,y:.24,pts,auto:1,sid:si};AB_Z.push(Z);AB_AUTO.push(Z)}});
- // a motorway still without a ramp (A66 w/e: the A5/A661 are nearer to every town edge) gets one from the closest main/arterial street point
- for(const B of M){const K=B.r.k||B.r.id;if(!B.r.ab||AB_Z.some(Z=>Z.k===K))continue;let best=null;
-  CITY_S.forEach((S,si)=>{if(!/^(main|arterial)$/.test(S.r.cls))return;for(let i=0;i<S.pts.length;i+=3){const p=S.pts[i];if(used.some(u=>Math.hypot(u[0]-p.x,u[1]-p.z)<200))continue;const[bi,d]=abNearI(B,p.x,p.z);if(d<6000&&(!best||d<best.d))best={d,p,bi,S}}});
-  if(!best)continue;const{p:E,bi,S}=best,q=B.pts[bi],dl=best.d,tx=(q.x-E.x)/dl,tz=(q.z-E.z)/dl,sg=1,j=Math.min(B.pts.length-1,bi+12),m=B.pts[j];let nx=-m.tz,nz=m.tx;if(nx*(E.x-m.x)+nz*(E.z-m.z)<0){nx=-nx;nz=-nz}
-  const o=B.r.w/2-4,T=[m.x+nx*o,m.z+nz*o],k=Math.min(dl*.45,260),pts=[[E.x,E.z],[E.x+tx*k,E.z+tz*k],[T[0]+nx*Math.min(dl*.3,160)-m.tx*120,T[1]+nz*Math.min(dl*.3,160)-m.tz*120],T];
-  const Z={id:B.r.id,k:K,name:'Ramp '+K.replace(/[we]$/,'')+' · '+(S.r.name||'street'),w:20,y:.24,pts,auto:2};used.push(pts[0]);AB_Z.push(Z);AB_AUTO.push(Z)}}
+  const q=B.pts[bi];if(((q.x-E.x)*tx+(q.z-E.z)*tz)/bd<.2)continue;// motorway must lie ahead of the street
+  const pts=mk(E,tx,tz,B,bi);if(ok(pts,B,si))add(pts,B,S,si,1)}});
+ // a motorway still without a ramp (A66 w/e: the A5/A661 are nearer to every town edge) gets one from the closest main/arterial street point that passes ok()
+ for(const B of M){const K=B.r.k||B.r.id;if(!B.r.ab||AB_Z.some(Z=>Z.k===K))continue;const C=[];
+  CITY_S.forEach((S,si)=>{if(!/^(main|arterial)$/.test(S.r.cls))return;for(let i=0;i<S.pts.length;i+=3){const p=S.pts[i];if(used.some(u=>Math.hypot(u[0]-p.x,u[1]-p.z)<200))continue;const[bi,d]=abNearI(B,p.x,p.z);if(d<6000)C.push({d,p,bi,S,si})}});
+  C.sort((a,b)=>a.d-b.d);for(const c of C.slice(0,400)){const q=B.pts[c.bi],pts=mk(c.p,(q.x-c.p.x)/c.d,(q.z-c.p.z)/c.d,B,c.bi);if(ok(pts,B,c.si)){add(pts,B,c.S,c.si,2);break}}}}
 // check (GO v90k/fra-net): one road network; every motorway has its own ramp to a city street; dead ends (a street end with a ramp is not one)
 function AB_netChk(){const FR=hubRoads(),nB=BRIDGES.length,ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs,R=new Map();
  segs.forEach((S,a)=>{const r=N.find(a);R.set(r,(R.get(r)||0)+S.L)});FR.forEach((r,k)=>{const q=N.find(segs.length+nB+k);R.set(q,(R.get(q)||0)+r.L)});

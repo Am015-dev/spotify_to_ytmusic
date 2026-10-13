@@ -254,11 +254,11 @@ function RD_net(){if(!RD_ON)return;RD.before=OB_sum(OB_net());RD_prune();
 // (street, other grid road), stopping at that road's centre line; if none (or the Main is in the way) it is trimmed back to its last crossing
 function RD_fillJoin(){if(!RD_ON||CID!=='fra'||!FILL_R||!FILL_R.length)return;const O=RD.ops;O.gjoin=O.gjoin||0;O.gcut=O.gcut||0;OB_fillIdx();const N=OB_net();
  const other=(r,x,z)=>{let b=null;for(const q of FILL_R){if(q===r)continue;const t=Math.max(0,Math.min(q.L,(x-q.x0)*q.ux+(z-q.z0)*q.uz)),d=Math.hypot(q.x0+q.ux*t-x,q.z0+q.uz*t-z);if(d<q.w/2&&(!b||d<b))b=d}
-  const c=cityAt(x,z);if(c&&c.d<c.road.w/2){const d=c.d;if(b==null||d<b)b=d}return b};
+  const c=N.proj(x,z,40);if(c&&c.d<N.segs[c.a].r.w/2){const d=c.d;if(b==null||d<b)b=d}return b};
  for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,sg=e?1:-1;let hit=null;
   for(let u=4;u<=150;u+=4){const[x,z]=OB_fpt(r,t+sg*u);if(inRiver(x,z,-4))break;const d=other(r,x,z);if(d!=null){let best=u,bd=d;for(let v=u+2;v<=u+40;v+=2){const[x2,z2]=OB_fpt(r,t+sg*v),d2=other(r,x2,z2);if(d2==null||d2>bd)break;bd=d2;best=v}hit=best;break}}
   if(hit!=null){if(e){r.x1=r.x0+r.ux*(r.L+hit);r.z1=r.z0+r.uz*(r.L+hit)}else{r.x0-=r.ux*hit;r.z0-=r.uz*hit;I.J=I.J.map(c=>c+hit)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gjoin++;continue}
-  const js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
+  const js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot){O.gprot=(O.gprot||0)+1;continue}
   if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gcut++}}
  for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
 function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;OB_fillIdx();const N=OB_net();
@@ -266,7 +266,7 @@ function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;
     let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
     if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
   for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
-OB_fix();RD_net();
+OB_fix();RD_net();if(FILL_R)try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}// dev1: again on the final street net (the rfGrid pass runs before OB_fix/RD_net)
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
