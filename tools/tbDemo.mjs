@@ -13,7 +13,7 @@ if(spec.turtle){// turtle: [["S",len,dh,ter],["L"|"R",radius,degrees,dh,ter]…]
   const last=P.pop();console.log('turtle close gap',Math.round(last[0]),Math.round(last[1]),'dh',(last[2]-P[0][2]).toFixed(1),'heading',Math.round((a*180/Math.PI)%360));
   t.pts=P.map(p=>[Math.round(p[0]),Math.round(p[1]),Math.max(0,Math.round(p[2])),p[3]])}
 else if(spec.pts)t.pts=spec.pts;Object.assign(t,spec.meta||{});const g=T.TB_geo(t);t.pc=[];
-for(const[k,f,n,off]of spec.pc){const i=Math.floor(((f%1)+1)%1*g.N);const o=off||0,ab=Array.isArray(o);const p=ab?{k,x:o[0],z:o[1]}:{k,x:Math.round(g.X[i]-g.TZ[i]*o),z:Math.round(g.Z[i]+g.TX[i]*o)};if(n)p.n=n;t.pc.push(p)}
+for(const[k,f,n,off]of spec.pc){const i=Math.floor(((f%1)+1)%1*g.N);const o=off||0,ab=Array.isArray(o),ah=typeof o==='string'&&o.startsWith('ahead');let p;if(ah){const[,D,A]=o.split(':').map(Number),an=Math.atan2(g.TZ[i],g.TX[i])+A*Math.PI/180;p={k,x:Math.round(g.X[i]+Math.cos(an)*D),z:Math.round(g.Z[i]+Math.sin(an)*D)}}else p=ab?{k,x:o[0],z:o[1]}:{k,x:Math.round(g.X[i]-g.TZ[i]*o),z:Math.round(g.Z[i]+g.TX[i]*o)};if(n)p.n=n;t.pc.push(p)}
 if(spec.st!=null){const p=t.pts[spec.st];t.st=[p[0],p[1]]}
 fs.writeFileSync(process.argv[3],JSON.stringify(t));
 const L=T.TB_lint(t);if(process.env.TABLE)for(let q=0;q<40;q++){const i=Math.floor(q/40*g.N);console.log((q/40).toFixed(3),Math.round(g.X[i]),Math.round(g.Z[i]),'R',Math.round(1/Math.max(1e-5,Math.abs(g.K[i])))*Math.sign(g.K[i]),'y',g.Y[i].toFixed(0),'seg',g.SEG[i],'t',(L.g.T[i]*T.TB_V.cal).toFixed(1))}
