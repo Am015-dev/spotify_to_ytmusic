@@ -16,7 +16,7 @@ async function panTo(p,cdp,x,z){for(let k=0;k<6;k++){const s=await p.evaluate(([
    // inverse of the pan in BX_tapInit: c.x -= (mx*cs+my*sn)*k ; c.z -= (-mx*sn+my*cs)*k
    const a=-dx/kk,b=-dz/kk;return{mx:a*cs-b*sn,my:a*sn+b*cs,d:Math.hypot(dx,dz)}},[x,z]);if(s.d<6)return;
   const cx=426,cy=210,L=Math.hypot(s.mx,s.my),f=Math.min(1,300/L);await drag(cdp,cx,cy,cx+s.mx*f,cy+s.my*f)}}
-async function shot(p,path){await sleep(250);await p.screenshot({path})}
+async function shot(p,path){await p.evaluate(()=>{if(window.__bx)__bx.BX.shotNow=1});await sleep(300);await p.screenshot({path})}
 // --- driving: hold touch buttons like a thumb (GAS is automatic on touch)
 function holder(p,cdp){const H={};const pts=async()=>{const out=[];for(const k in H)out.push([H[k].x,H[k].y,H[k].id]);return out};
  const box=async id=>{const b=await p.locator('#'+id).boundingBox();return b&&[b.x+b.width/2,b.y+b.height/2]};
@@ -33,7 +33,7 @@ async function drive(p,cdp,{ch=[],secs=90,out,tag,shots={},wpExtra=null,stopLaps
   const look=Math.min(W.length-1,idx+Math.max(3,Math.round(V.sp/3.2))),tw=W[look%W.length],dx=tw[0]-V.p[0],dz=tw[2]-V.p[2],fh=Math.hypot(V.F[0],V.F[2])||1;
   const cross=(V.F[2]*dx-V.F[0]*dz)/fh,dot=(V.F[0]*dx+V.F[2]*dz)/fh,ang=Math.atan2(cross,dot); // >0: target is to the LEFT (x-left convention: right = F x up)
   const steer=Math.abs(ang)<.06?0:ang>0?-1:1;await h.set('bxL',steer<0);await h.set('bxR',steer>0);await h.set('bxB',Math.abs(ang)>.9&&V.sp>16);
-  for(const k in shots)if(!taken[k]&&shots[k](s)){taken[k]=1;await p.screenshot({path:`${out}/${tag}_${k}.png`})}
+  for(const k in shots)if(!taken[k]&&shots[k](s)){taken[k]=1;await shot(p,`${out}/${tag}_${k}.png`)}
   info.push([+s.m.t.toFixed(2),...V.p,V.sp,V.g?1:0,V.boat?1:0,idx]);await sleep(70)}
  await h.clear();return{s,info,taken}}
 module.exports={launch,tap,tapEl,drag,panTo,shot,drive,sleep,holder};

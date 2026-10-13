@@ -10,6 +10,7 @@ const OD_CHECKLIST=[
  {ver:'bxA',id:'bx-water',area:'race',text:'Builder test WATER (📍 GO): drive off the road into the lake: the car becomes a boat and keeps going; back on land it is a car again.'},
  {ver:'bxA',id:'bx-bridge',area:'race',text:'Builder test BRIDGE (📍 GO): drive the low road under the bridge, then the bridge road over it (LEGO pillars hold it up, none stand on the low road).'},
  {ver:'bxA',id:'bx-split',area:'race',text:'Builder test SPLIT (📍 GO): at the SPLIT take the left road, then RESPAWN and take the right one: both are drivable.'},
+ {ver:'bxA',id:'bx-world',area:'race',text:'Builder test NEW TRACK (📍 GO): the empty builder world is a valley with mountains, a cliff mesa, a river, a lake, rocks and trees: hills fill the view.'},
  {ver:'bxA',id:'bx-elev',area:'race',text:'Builder demo MOUNTAIN JUMP (📍 GO): the track climbs and drops at least 15 m (mountain top to valley).'},
  {ver:'bxA',id:'bx-errors',area:'race',text:'Track builder: build, drive and switch tracks for a few minutes: nothing freezes, no error messages.'},
  {ver:'v90j',id:'ride-fast',area:'garage',text:'Garage → RIDES: tap any ride card: the whole ride stands there within about 1 second (never just wheels or a bare chassis); a LOADING sign shows if it needs longer.'},
@@ -234,7 +235,7 @@ const OD_CHECKLIST=[
  // 📍 GO (coordinator v90j: items a 2-min drive never reaches): drops the car on the nearest street facing the thing to check; items with
  // several things step through them on each tap. Another city → the flight there (tap 📍 again after landing). Palms → the Syntagma race.
  // Targets: w = a LEGO world model (LDW.on), p = a street prop type (HUB.props), car = a traffic car kind, race = a track id.
- const GO={'bxA/bx-snap':[{bx:'bx-snap',n:'snap test'}],'bxA/bx-jump':[{bx:'bx-jump',n:'cliff jump'}],'bxA/bx-offroad':[{bx:'bx-offroad',n:'off-road'}],'bxA/bx-cliff':[{bx:'bx-cliff',n:'cliff fall'}],'bxA/bx-water':[{bx:'bx-water',n:'water'}],'bxA/bx-bridge':[{bx:'bx-bridge',n:'bridge'}],'bxA/bx-split':[{bx:'bx-split',n:'split'}],'bxA/bx-elev':[{bx:'bx-elev',n:'elevation'}],'v90g/fra-props':[{w:'w6350',n:'Pizza To Go'},{w:'w6613',n:'phone booth'},{w:'w10184f',n:'fountain'},{w:'w1069',n:'speedboat'}],
+ const GO={'bxA/bx-snap':[{bx:'bx-snap',n:'snap test'}],'bxA/bx-jump':[{bx:'bx-jump',n:'cliff jump'}],'bxA/bx-offroad':[{bx:'bx-offroad',n:'off-road'}],'bxA/bx-cliff':[{bx:'bx-cliff',n:'cliff fall'}],'bxA/bx-water':[{bx:'bx-water',n:'water'}],'bxA/bx-bridge':[{bx:'bx-bridge',n:'bridge'}],'bxA/bx-split':[{bx:'bx-split',n:'split'}],'bxA/bx-elev':[{bx:'bx-elev',n:'elevation'}],'bxA/bx-world':[{bx:'bx-world',n:'new track'}],'v90g/fra-props':[{w:'w6350',n:'Pizza To Go'},{w:'w6613',n:'phone booth'},{w:'w10184f',n:'fountain'},{w:'w1069',n:'speedboat'}],
   'v90g/ath-display':[{w:'w30023',n:'lighthouse'},{w:'w7796',n:'house'}],'v90g/bigrig':[{car:'v3221_1',c:'fra',n:'Big Rig'}],
   'v90g/land2':[{p:'planter',c:'fra',n:'planter'},{p:'dumpster',c:'fra',n:'dumpster'}],'v90i/palms':[{race:'synt',c:'ath',n:'Syntagma race'}],
   'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],

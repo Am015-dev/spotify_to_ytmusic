@@ -7,8 +7,8 @@
 //    the course, or stuck upside down.
 //  - the build is an action log (world, pieces, brushes, deletes): undo = pop + replay, save = the log as JSON.
 // Drawn with the main renderer while BX.on (frame() is wrapped; the game loop is idle meanwhile). Probe: window.__bx.
-const BX={on:false,ui:0,tab:'track',sel:'st',tool:'raise',world:'meadow',log:[],pcs:[],cur:{i:20,j:12,l:1,r:0},hl:-1,mode:'build',
- cam:null,sc:null,v:null,m:null,keys:{},t:0,acc:0,camB:{x:0,z:0,d:58,yaw:0.6,pit:0.88},name:'MY TRACK',fast:/[?&](bx)?fast=1/.test(location.search),tfast:/[?&]bxfast=1/.test(location.search)};
+const BX={on:false,ui:0,tab:'track',sel:'st',tool:'raise',world:'valley',log:[],pcs:[],cur:{i:20,j:22,l:2,r:0},hl:-1,mode:'build',
+ cam:null,sc:null,v:null,m:null,keys:{},t:0,acc:0,camB:{x:0,z:0,d:72,yaw:3.5,pit:0.52},name:'MY TRACK',fast:/[?&](bx)?fast=1/.test(location.search),tfast:/[?&]bxfast=1/.test(location.search)};
 const BXC=8,BXH=2,BXN=40,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=3.5;
 const BXF=[[0,1],[-1,0],[0,-1],[1,0]];
 const bxV=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z),bxSS=t=>t*t*(3-2*t),bxCl=(v,a,b)=>v<a?a:v>b?b:v;
@@ -20,6 +20,9 @@ function BX_h(x,z){const fx=(x-BXO)/BXR,fz=(z-BXO)/BXR,a=Math.floor(fx),b=Math.f
 function BX_tn(x,z,o){return (o||bxV()).set(BX_h(x-1,z)-BX_h(x+1,z),2,BX_h(x,z-1)-BX_h(x,z+1)).normalize()}
 const bxBowl=(x,z,cx,cz,r,deep)=>{const d=Math.hypot(x-cx,z-cz);return d<r?deep+(2-deep+1)*(d/r)**2:99};
 const BX_WORLDS={
+ valley:{n:'VALLEY',f:(x,z)=>{let h=3+1.4*Math.sin(x/29)*Math.cos(z/23)+.9*Math.sin((x-z)/41);
+  h=Math.max(h,3+44*bxSS(bxCl((z-55)/85,0,1))*(.72+.28*Math.sin(x/37)));const dm=Math.hypot(x-50,z+95);h=Math.max(h,dm<30?26-dm/15:dm<38?26-21*bxSS((dm-30)/8):h);
+  const rz=-12+26*Math.sin(x/55),dr=Math.abs(z-rz);if(dr<16)h=Math.min(h,dr<6?-2.6:-2.6+(h+2.6)*bxSS((dr-6)/10));return Math.min(h,bxBowl(x,z,-100,-100,34,-4))}},
  meadow:{n:'MEADOW',f:(x,z)=>Math.min(2+1.3*Math.sin(x/31)*Math.cos(z/27)+.9*Math.sin((x+z)/53)+1.5*bxSS(bxCl((Math.hypot(x-90,z+80)-20)/-60+1,0,1))*3,bxBowl(x,z,-80,70,42,-4))},
  mountain:{n:'MOUNTAIN',f:(x,z)=>{const d=Math.hypot(x-30,z-25);let m=d<38?30+4*(1-d/38):d<46?30-20*bxSS((d-38)/8):10*Math.pow(bxCl(1-(d-46)/70,0,1),1.2);
   return Math.min(Math.max(2+.8*Math.sin(x/23)*Math.cos(z/19),m),bxBowl(x,z,-95,-85,45,-4))}},
@@ -30,7 +33,7 @@ const BX_WORLDS={
 };
 const BX_CITY=[[-56,-40,18,18,22,'#c91a09'],[-24,-40,14,18,14,'#f2cd37'],[24,-40,18,14,30,'#0055bf'],[56,-40,14,14,18,'#a0a5a9'],[-56,40,16,16,26,'#237841'],
  [-20,40,18,16,12,'#fe8a18'],[20,40,16,18,34,'#e4cd9e'],[56,40,14,16,16,'#c91a09'],[-110,0,20,20,20,'#0055bf'],[110,10,16,24,24,'#f2cd37']];
-function BX_world(w){BX.world=BX_WORLDS[w]?w:'meadow';const f=BX_WORLDS[BX.world].f;for(let b=0;b<BXTN;b++)for(let a=0;a<BXTN;a++)BX.th[b*BXTN+a]=f(BXO+a*BXR,BXO+b*BXR);
+function BX_world(w){BX.world=BX_WORLDS[w]?w:'valley';const f=BX_WORLDS[BX.world].f;for(let b=0;b<BXTN;b++)for(let a=0;a<BXTN;a++)BX.th[b*BXTN+a]=f(BXO+a*BXR,BXO+b*BXR);
  BX.bld=BX.world==='city'?BX_CITY.map(([x,z,w,d,h,c])=>({x,z,w,d,h,c,y:BX_h(x,z)})):[]}
 function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.floor((x-R-BXO)/BXR)),a1=Math.min(BXTN-1,Math.ceil((x+R-BXO)/BXR)),b0=Math.max(0,Math.floor((z-R-BXO)/BXR)),b1=Math.min(BXTN-1,Math.ceil((z+R-BXO)/BXR)),T=BX.th,o=T.slice();
  for(let b=b0;b<=b1;b++)for(let a=a0;a<=a1;a++){const d=Math.hypot(BXO+a*BXR-x,BXO+b*BXR-z);if(d>R)continue;const w=bxSS(1-d/R),k=b*BXTN+a;
@@ -111,7 +114,7 @@ function BX_mk(type,c,id){const def=BX_P[type];if(!def)return null;const S=def.p
 function BX_apply(a){if(a[0]==='w')BX_world(a[1]);else if(a[0]==='b')BX_brush(a[1],a[2],a[3],a[4]);
  else if(a[0]==='p'){const pc=BX_mk(a[1],{i:a[2],j:a[3],l:a[4],r:a[5]},BX.pcs.length);if(pc){BX.pcs.push(pc);BX_carve(pc)}}
  else if(a[0]==='d'){const pc=BX.pcs[a[1]];if(pc)pc.dead=true}}
-function BX_replay(){BX.pcs=[];BX_world('meadow');for(const a of BX.log)BX_apply(a);BX_buildAll()}
+function BX_replay(){BX.pcs=[];BX_world('valley');for(const a of BX.log)BX_apply(a);BX_buildAll()}
 function BX_do(a){BX.log.push(a);if(a[0]==='p'){BX_apply(a);const pc=BX.pcs[BX.pcs.length-1];if(pc){BX_pcMesh(pc);BX.cur={...pc.ex[0]};BX.camGo=1}BX_terrMesh();BX_after()}
  else if(a[0]==='w'){BX_replay()}else{BX_apply(a);if(a[0]==='d')BX_pcDrop(BX.pcs[a[1]]);BX_terrMesh();BX_after()}}
 function BX_undo(){if(!BX.log.length)return;const a=BX.log.pop();if(a[0]==='w'&&!BX.log.some(x=>x[0]==='w'))BX.log.unshift(['w','meadow']);BX_replay();
@@ -157,12 +160,15 @@ function BX_terrMesh(){const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeo
  const nm=g.attributes.normal.array,G1=bxCol('#4fb33a'),G2=bxCol('#3f9a2e'),RK=bxCol('#8d7b68'),RK2=bxCol('#a89a86'),SA=bxCol('#e0cf93'),tc=new THREE.Color();
  for(let k=0;k<n*n;k++){const h=BX.th[k],ny=nm[k*3+1];if(h<.4)tc.copy(SA);else if(ny<.72)tc.copy(h>20?RK2:RK);else tc.copy(G1).lerp(G2,bxCl((h-2)/30,0,1)*.7+((k*7919)%13)/60);c[k*3]=tc.r;c[k*3+1]=tc.g;c[k*3+2]=tc.b}
  g.attributes.color.needsUpdate=true;g.computeBoundingSphere();BX_trees()}
-function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[];let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
- for(let i=0;i<70;i++){const x=BXO+20+rnd()*(BXW-40),z=BXO+20+rnd()*(BXW-40),h=BX_h(x,z),n=BX_tn(x,z);if(h<.6||n.y<.85)continue;
+function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[],RK=[];let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+ for(let i=0;i<60;i++){const x=BXO+16+rnd()*(BXW-32),z=BXO+16+rnd()*(BXW-32),h=BX_h(x,z);if(h<.3)continue;if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<10&&Math.abs(s.p.z-z)<10))continue;RK.push([x,z,h,1+rnd()*2.2])}
+ BX.rk=RK;for(let i=0;i<150;i++){const x=BXO+20+rnd()*(BXW-40),z=BXO+20+rnd()*(BXW-40),h=BX_h(x,z),n=BX_tn(x,z);if(h<.6||n.y<.85)continue;
   if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<9&&Math.abs(s.p.z-z)<9))continue;if(BX.bld&&BX.bld.some(b=>Math.abs(b.x-x)<b.w/2+4&&Math.abs(b.z-z)<b.d/2+4))continue;T.push([x,z,h])}
- BX.tr=T;if(!T.length)return;const g=new THREE.Group(),tr=new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.6,3,6),new THREE.MeshStandardMaterial({color:0x7c4a1e}),T.length),
+ BX.tr=T;const gg=new THREE.Group();BX.sc.add(gg);BX.trM=gg;if(RK.length){const rm=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x8f8a82,flatShading:true,roughness:.9}),RK.length),q=new THREE.Matrix4();
+ RK.forEach(([x,z,h,r],i)=>{q.compose(bxV(x,h+r*.35,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(i,i*2,0)),bxV(r*1.3,r,r*1.1));rm.setMatrixAt(i,q)});rm.castShadow=rm.receiveShadow=true;gg.add(rm)}if(!T.length)return;const g=new THREE.Group(),tr=new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.6,3,6),new THREE.MeshStandardMaterial({color:0x7c4a1e}),T.length),
   lf=new THREE.InstancedMesh(new THREE.ConeGeometry(2.6,5,6),new THREE.MeshStandardMaterial({color:0x237841,flatShading:true}),T.length),mt=new THREE.Matrix4();
- T.forEach(([x,z,h],i)=>{mt.makeTranslation(x,h+1.5,z);tr.setMatrixAt(i,mt);mt.makeTranslation(x,h+5,z);lf.setMatrixAt(i,mt)});tr.castShadow=lf.castShadow=true;g.add(tr,lf);BX.sc.add(g);BX.trM=g}
+ const AC=[0x237841,0x2f8f3c,0xe07b16,0xf2b632,0xc4401b].map(c=>new THREE.Color(c));T.forEach(([x,z,h],i)=>{mt.makeTranslation(x,h+1.5,z);tr.setMatrixAt(i,mt);mt.makeTranslation(x,h+5,z);lf.setMatrixAt(i,mt);lf.setColorAt(i,AC[i%7<4?i%2:2+i%3])});
+ tr.castShadow=lf.castShadow=true;lf.material.color.set(0xffffff);g.add(tr,lf);BX.trM.add(g)}
 function BX_bld(){if(BX.bM){BX.sc.remove(BX.bM);BX.bM=null}if(!BX.bld||!BX.bld.length)return;const g=BX.bM=new THREE.Group();
  for(const b of BX.bld){const geo=new THREE.BoxGeometry(b.w,b.h,b.d),c=bxCol(b.c),col=[];for(let i=0;i<geo.attributes.position.count;i++)col.push(c.r,c.g,c.b);geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
   const uv=geo.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*b.w/6,uv.getY(i)*b.h/6);const m=new THREE.Mesh(geo,BX_mats().bld);m.position.set(b.x,b.y+b.h/2,b.z);m.castShadow=m.receiveShadow=true;g.add(m)}BX.sc.add(g)}
@@ -202,14 +208,15 @@ function BX_spawn(){const L=BX.pcs.filter(p=>!p.dead),st=L.find(p=>p.def.start)|
  if(st){const s=st.S[0][1]||st.S[0][0];p=s.p.clone().addScaledVector(s.U,.6);F=s.F.clone()}else{const fr=BX_fr(BX.cur);p=fr.o.clone();p.y=BX_h(p.x,p.z)+.6;F=fr.F.clone()}
  return{p,F}}
 function BX_driveStart(){BX.mode='drive';BX_after();const car=BX_car();BX.sc.add(car,BX.shM);const sp=BX_spawn();
- BX.v={p:sp.p.clone(),v:sp.F.clone().multiplyScalar(2),F:sp.F.clone(),U:bxV(0,1,0),g:false,air:0,pk:sp.p.y,on:null,boat:false,steer:0,boost:0,safe:{p:sp.p.clone(),F:sp.F.clone()},far:0,stuck:0,cpN:0,lap:0,cps:new Set(),msg:'',msgT:0,lastPc:null};
- BX.m={t:0,dist:0,air:0,airMax:0,jumps:0,yMin:1e9,yMax:-1e9,off:0,resp:0,wall:0,boat:0,boatSp:0,terrT:0,swaps:0,bump:0,pcs:new Set(),seen:BX.seenAll=BX.seenAll||new Set(),loops:0,laps:0,lapT:[],lap0:0,respWhy:[],lastLand:null,backT:null,respAt:null};BX_vmode('car');BX_ui();
+ BX.v={p:sp.p.clone(),v:sp.F.clone().multiplyScalar(2),F:sp.F.clone(),U:bxV(0,1,0),g:false,air:0,pk:sp.p.y,on:null,boat:false,steer:0,boost:0,safe:{p:sp.p.clone(),F:sp.F.clone()},hist:[],sT:0,far:0,stuck:0,cpN:0,lap:0,cps:new Set(),msg:'',msgT:0,lastPc:null};
+ BX.m={t:0,dist:0,air:0,airMax:0,jumps:0,yMin:1e9,yMax:-1e9,off:0,resp:0,wall:0,boat:0,boatSp:0,terrT:0,swaps:0,bump:0,pcs:new Set(),seen:BX.seenAll=BX.seenAll||new Set(),loops:0,laps:0,lapT:[],lap0:0,respWhy:[],lastLand:null,backT:null,respAt:null,backs:[]};BX_vmode('car');BX_ui();
  BX.camD={p:sp.p.clone().addScaledVector(sp.F,-9).add(bxV(0,4,0)),up:bxV(0,1,0)}}
 function BX_driveStop(){BX.mode='build';if(BX.car)BX.sc.remove(BX.car,BX.shM);BX_after();BX_ui()}
 function BX_hud(){const V=BX.v,m=BX.m,H=$('#bxHud'),M=$('#bxMsg');if(!H)return;const cps=BX.pcs.filter(p=>!p.dead&&p.def.cp).length;
  H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${m.laps+1}`;M.textContent=V.msgT>0?V.msg:''}
 function BX_say(t,s=1.4){const V=BX.v;if(V){V.msg=t;V.msgT=s}}
-function BX_respawn(why){const V=BX.v,s=V.safe;V.p.copy(s.p).add(bxV(0,.8,0));V.F.copy(s.F);V.U.set(0,1,0);V.v.copy(s.F).multiplyScalar(6);V.g=false;V.air=0;V.pk=V.p.y;V.far=0;V.stuck=0;
+function BX_respawn(why){const V=BX.v,m=BX.m,H=V.hist,t1=(H.length?H[H.length-1].t:m.t)-1.5;let s=V.safe,sp=6;for(let i=H.length-1;i>=0;i--){if(H[i].t<=t1||i===0){s=H[i];sp=Math.max(6,H[i].sp*.7);break}}
+ V.hist=H.filter(h=>h.t<=s.t);V.p.copy(s.p).add(bxV(0,.8,0));V.F.copy(s.F);V.U.set(0,1,0);V.v.copy(s.F).multiplyScalar(sp);V.g=false;V.air=0;V.pk=V.p.y;V.far=0;V.stuck=0;
  if(V.boat){V.boat=false;BX_vmode('car')}BX.m.resp++;BX.m.respWhy.push(why);BX.m.respAt=BX.m.t;BX.m.backT=null;BX_say(why==='cliff'?'OFF THE CLIFF!':why==='far'?'TOO FAR FROM THE COURSE':'RESPAWN')}
 const _r1=bxV(),_r2=bxV(),_r3=bxV();
 // one wheel ray along -U: nearest hit on pieces (real meshes) or analytic terrain
@@ -230,11 +237,12 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // water: boat when the ground under the car is deep enough and the car is at the surface
  const gy=BX_h(V.p.x,V.p.z),wantBoat=gy<-.7&&V.p.y<.9&&!(grounded&&pc);
  if(wantBoat!==V.boat&&(wantBoat||grounded)){V.boat=wantBoat;BX_vmode(V.boat?'boat':'car');m.swaps++;BX_burst(V.p.clone().add(bxV(0,.3,0)),18,V.boat?0xbfe4ff:0x8d7b68,7);BX_say(V.boat?'SPLASH! BOAT':'BACK ON WHEELS',1)}
- const top=(V.boat?24:pc?34:27)+(V.boost>0?14:0),grip=V.boat?2.4:pc?11:6.5,acc=(V.boat?11:15)+(V.boost>0?18:0);
+ const top=(V.boat?24:pc?34:27)+(V.boost>0?14:0),grip=V.boat?2.4:pc?11:6.5,acc=(V.boat?13:22)+(V.boost>0?18:0);
  V.steer+=(inp.s-V.steer)*Math.min(1,dt*7);
  if(V.boat){grounded=false;const wave=.12*Math.sin(BX.t*2.1+V.p.x*.2);V.p.y+=(.05+wave-V.p.y)*Math.min(1,dt*6);V.v.y*=.8;
   U.lerp(bxV(.06*Math.sin(BX.t*1.7),1,.06*Math.sin(BX.t*1.3)),Math.min(1,dt*4)).normalize();m.boat+=dt;
   if(Math.random()<dt*20*Math.min(1,V.v.length()/10))BX_burst(V.p.clone().addScaledVector(F,-2.4),1,0xffffff,2)}
+ if(grounded){let dsum=0,c=0;for(const h of H)if(h){dsum+=h.d;c++}const err=(dsum/c)-(1+.5);if(wasG&&V.v.dot(n)>2.5&&err>.05&&!(pc&&pc.def.stick))grounded=false}
  if(grounded){U.lerp(n,Math.min(1,dt*(V.air>.2?12:20))).normalize();
   let dsum=0,c=0;for(const h of H)if(h){dsum+=h.d;c++}const err=(dsum/c)-(1+.5);V.p.addScaledVector(U,-err*Math.min(1,dt*25));
   const vn=V.v.dot(U);if(vn<0||!V.g||vn<3)V.v.addScaledVector(U,-vn);
@@ -248,13 +256,15 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
   let a=inp.g*acc*Math.max(0,1-sp/top);if(inp.b){a=sp>.5?-24:sp>-9?-9:0}if(!inp.g&&!inp.b)a=-Math.sign(sp)*Math.min(Math.abs(sp)/dt,2.5);
   V.v.addScaledVector(F,a*dt);const vs=V.v.dot(S2);V.v.addScaledVector(S2,-vs*Math.min(1,grip*dt));if(V.v.dot(F)>top+2)V.v.addScaledVector(F,-(V.v.dot(F)-top)*Math.min(1,dt*2));
   if(m.lastLand&&m.t-m.lastLand.t<.4)m.lastLand.Uy=U.y;if(!pc&&!V.boat)m.terrT+=dt;if(V.boat)m.boatSp=Math.max(m.boatSp,V.v.length());
-  if(pc){V.on=pc;m.pcs.add(pc.id);m.seen.add(pc.id);if(m.respAt!=null&&m.backT==null)m.backT=m.t-m.respAt;if(pc.def.boost&&V.boost<=0){V.boost=1.6;BX_say('BOOST!',.8)}
-   if(U.y>.85&&V.v.length()>2){V.safe.p.copy(V.p);V.safe.F.copy(F)}BX_course(pc)}else V.on=null}
- else{V.air+=dt;V.v.y-=BXG*dt;V.pk=Math.max(V.pk,V.p.y);U.lerp(bxV(0,1,0),Math.min(1,dt*1.6)).normalize();F.addScaledVector(U,-F.dot(U)).normalize();F.applyAxisAngle(U,-inp.s*1.2*dt);if(V.air>.1)V.on=null}
+  if(pc){V.on=pc;m.pcs.add(pc.id);m.seen.add(pc.id);if(m.respAt!=null&&m.backT==null){m.backT=m.t-m.respAt;m.backs.push(+m.backT.toFixed(2))}if(pc.def.boost&&V.boost<=0){V.boost=1.6;BX_say('BOOST!',.8)}
+   if(U.y>.94&&!pc.def.jump&&V.v.length()>2&&m.t-(V.sT||0)>.25){V.sT=m.t;V.hist.push({p:V.p.clone(),F:F.clone(),sp:V.v.length(),t:m.t});if(V.hist.length>40)V.hist.shift()}BX_course(pc)}else V.on=null}
+ else{V.air+=dt;V.v.y-=BXG*dt;V.pk=Math.max(V.pk,V.p.y);U.lerp(bxV(0,1,0),Math.min(1,dt*1.6)).normalize();F.addScaledVector(U,-F.dot(U)).normalize();const ya=-inp.s*1.1*dt;F.applyAxisAngle(U,ya);
+  {const vy=V.v.y;V.v.y=0;V.v.applyAxisAngle(bxV(0,1,0),ya*.8);V.v.y=vy}if(V.air>.1)V.on=null}
  V.g=grounded;if(V.boost>0)V.boost-=dt;
  // obstacles you can SEE: pillars, trees, buildings (circle/box push-out, glancing hits slide)
  const push=(nx,nz,d)=>{V.p.x+=nx*d;V.p.z+=nz*d;const vn=V.v.x*nx+V.v.z*nz;if(vn<0){V.v.x-=nx*vn*1.25;V.v.z-=nz*vn*1.25;if(vn<-6)m.bump++}};
  for(const[x,z,g,t]of BX.pil||[]){if(V.p.y>t-.4||V.p.y<g-1)continue;const dx=V.p.x-x,dz=V.p.z-z,d=Math.hypot(dx,dz);if(d<2&&d>.01)push(dx/d,dz/d,2-d)}
+ for(const[x,z,h,r]of BX.rk||[]){if(V.p.y>h+r*1.2)continue;const dx=V.p.x-x,dz=V.p.z-z,d=Math.hypot(dx,dz),R=r*1.2+1;if(d<R&&d>.01)push(dx/d,dz/d,R-d)}
  for(const[x,z,h]of BX.tr||[]){if(V.p.y>h+8)continue;const dx=V.p.x-x,dz=V.p.z-z,d=Math.hypot(dx,dz);if(d<1.8&&d>.01)push(dx/d,dz/d,1.8-d)}
  for(const b of BX.bld||[]){if(V.p.y>b.y+b.h)continue;const dx=V.p.x-b.x,dz=V.p.z-b.z,ox=b.w/2+1.2-Math.abs(dx),oz=b.d/2+1.2-Math.abs(dz);if(ox>0&&oz>0){if(ox<oz)push(Math.sign(dx),0,ox);else push(0,Math.sign(dz),oz)}}
  // deck sides: a forward ray at bumper height against the piece meshes (walls = faces whose normal is far from our up)
@@ -266,8 +276,8 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  if(grounded&&U.y<.2&&!(pc&&pc.def.stick)&&V.v.length()<4){V.stuck+=dt;if(V.stuck>1.5)return BX_respawn('stuck')}else V.stuck=0;
  if(V.air>7)return BX_respawn('fall');
  m.t+=dt;m.dist+=V.v.length()*dt;m.yMin=Math.min(m.yMin,V.p.y);m.yMax=Math.max(m.yMax,V.p.y);if(!grounded&&!V.boat||U.y<Math.cos(.07))m.off+=dt}
-function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9;for(const{s}of BX.samp){const d=s.p.distanceToSquared(V.p);if(d<best)best=d}best=Math.sqrt(best);V.dCourse=best;
- if(best>60){V.far+=dt;if(V.far>1.5)BX_respawn('far')}else V.far=0}
+function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9;for(const{s}of BX.samp){const dx=s.p.x-V.p.x,dz=s.p.z-V.p.z,d=dx*dx+dz*dz;if(d<best)best=d}best=Math.sqrt(best);V.dCourse=+best.toFixed(1);
+ if(best>60){V.far+=dt;if(V.far>3)BX_respawn('far')}else V.far=0}
 // checkpoints and laps: START then every CHECKPOINT (any order), back over START = lap
 function BX_course(pc){const V=BX.v,m=BX.m,cps=BX.pcs.filter(p=>!p.dead&&p.def.cp);if(pc.def.cp&&!V.cps.has(pc.id)){V.cps.add(pc.id);BX_say('CHECKPOINT '+V.cps.size+'/'+cps.length,1)}
  if(pc.def.start&&V.lastPc!==pc.id){if(V.cps.size>=cps.length&&m.t-m.lap0>8){m.laps++;m.lapT.push(+(m.t-m.lap0).toFixed(2));m.lap0=m.t;V.cps=new Set();BX_say('LAP '+m.laps+' · '+m.lapT[m.lapT.length-1].toFixed(1)+' s',2)}}
@@ -286,7 +296,7 @@ function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/10
   const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,Math.max(gy,V.boat?0:gy)+.08,V.p.z);
   if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
  BX_fxStep(dt);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
- const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
+ BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
 addEventListener('keyup',e=>{if(!BX.on)return;BX.keys[e.code]=0;e.stopImmediatePropagation()},true);
@@ -364,11 +374,11 @@ function BX_load(o,name){BX.log=JSON.parse(JSON.stringify(o.log));BX.name=name||
 function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=document.createElement('div');D.id='bxLoad';const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{D.remove();f()};D.appendChild(b)};
  D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');for(const k in BX_DEMOS)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
  const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(S[k],k));
- add('✚ NEW EMPTY TRACK',()=>BX_load({log:[['w','meadow']]},'MY TRACK'));add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
+ add('✚ NEW EMPTY TRACK',()=>BX_load({log:[['w','valley']]},'MY TRACK'));add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
 // ---------------------------------------------------------------- open / close
 function BX_open(){BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
- if(!BX.log.length){BX.log=[['w','meadow']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui()}
+ if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui()}
 function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
@@ -382,24 +392,27 @@ const BX_TESTS={
  'bx-snap':{n:'SNAP TEST',log:()=>[['w','meadow']],drive:0,chk:()=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,ex=new Set();let con=0;
   for(const p of L){if(ex.has(key(p.c)))con++;for(const e of p.ex)ex.add(key(e))}const step=new Set(L.map(p=>p.c.l)).size>1||L.some(p=>p.ex[0].l!==p.c.l);
   return{ok:L.length>=3&&con>=2&&step,msg:`${L.length} pieces, ${con} snapped, height step ${step?'yes':'no'}`}}},
- 'bx-jump':{n:'CLIFF JUMP',log:()=>bxCh('mountain',[21,23,16,3],['sf',...bxRep('st',5),'kk',[31,23,15,3],...bxRep('st',6),'sd','sd','sd','dn','st']),drive:1,
+ 'bx-jump':{n:'CLIFF JUMP',log:()=>bxCh('mountain',[20,23,16,3],['sf',...bxRep('st',6),'kk',[30,23,14,3],...bxRep('st',4),'sd','sd','sd']),drive:1,
   chk:()=>{const m=BX.m,L=m.lastLand||{};return{ok:(L.air||0)>=1.5&&L.Uy>.7&&!m.respWhy.includes('cliff'),msg:`air ${(L.air||0).toFixed(2)} s, landed up ${(L.Uy||0).toFixed(2)}, respawns ${m.resp}`}}},
- 'bx-offroad':{n:'OFF-ROAD',log:()=>bxCh('meadow',[22,14,1,0],['sf','st']),drive:1,off:[[30,-10],[60,-30],[45,-75],[5,-85],[-20,-50],[0,-15],[40,-5]],
+ 'bx-offroad':{n:'OFF-ROAD',log:()=>bxCh('valley',[20,24,2,3],['sf','st']),drive:1,off:[[35,45],[45,65],[20,78],[-5,65],[-10,45],[5,38],[30,40]],
   chk:()=>{const m=BX.m;return{ok:m.terrT>=10&&m.resp===0&&m.wall===0,msg:`terrain ${m.terrT.toFixed(1)} s, respawns ${m.resp}, invisible-wall hits ${m.wall}, tree/pillar bumps ${m.bump}`}}},
  'bx-cliff':{n:'CLIFF FALL',log:()=>bxCh('mountain',[23,23,16,2],['sf',...bxRep('st',5)]),drive:1,off:[[28,-40]],
-  chk:()=>{const m=BX.m,i=m.respWhy.indexOf('cliff');return{ok:i>=0&&m.backT!=null&&m.backT<=2,msg:`respawn ${m.respWhy.join(',')||'none'}, back on course after ${m.backT==null?'-':m.backT.toFixed(2)} s`}}},
- 'bx-water':{n:'WATER',log:()=>bxCh('meadow',[17,28,1,1],['sf','st','st']),drive:1,off:[[-70,70],[-100,64]],
+  chk:()=>{const m=BX.m,i=m.respWhy.indexOf('cliff'),b=m.backs[i];return{ok:i>=0&&b!=null&&b<=2,msg:`respawn ${m.respWhy.join(',')||'none'}, back on course after ${b==null?'-':b} s`}}},
+ 'bx-water':{n:'WATER',log:()=>bxCh('valley',[20,13,1,0],['sf','st','st']),drive:1,off:[[4,-12],[25,-3],[45,6],[30,2]],
   chk:()=>{const m=BX.m;return{ok:m.boat>=3&&m.boatSp>8,msg:`boat ${m.boat.toFixed(1)} s, boat speed ${m.boatSp.toFixed(1)} m/s`}}},
  'bx-bridge':{n:'BRIDGE',log:()=>[...bxCh('city',[13,20,1,3],['sf',...bxRep('st',12)]),...bxCh(null,[20,6,1,0],['st','up','up',...bxRep('st',8),'dn','dn','st'])],drive:1,
   chk:()=>{const ok=bxCross(BX.m.seen||new Set());return{ok,msg:ok?'drove under and over the bridge':'not both levels yet'}}},
- 'bx-split':{n:'SPLIT',log:()=>bxCh('meadow',[20,8,1,0],['sf','st','fk','st','st','cl',1,'st','st','cr']),drive:1,
+ 'bx-split':{n:'SPLIT',log:()=>bxCh('valley',[14,24,2,3],['sf','st','fk','st','st','cl',1,'st','st','cr']),drive:1,
   chk:()=>{const S=BX.m.seen||new Set(),fk=BX.pcs.find(p=>p.type==='fk'),key=c=>c.i+','+c.j+','+c.l+','+c.r,br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[];
    const n=br.filter(p=>p&&S.has(p.id)).length;return{ok:n===2,msg:`split branches driven: ${n}/2`}}},
+ 'bx-world':{n:'NEW TRACK',log:()=>[['w','valley']],drive:0,chk:()=>{let lo=1e9,hi=-1e9;for(const h of BX.th){lo=Math.min(lo,h);hi=Math.max(hi,h)}let vis=0;const v=bxV();BX.cam.updateMatrixWorld();
+  for(let k=0;k<BX.th.length;k+=3){if(BX.th[k]<20)continue;v.set(BXO+(k%BXTN)*BXR,BX.th[k],BXO+Math.floor(k/BXTN)*BXR).project(BX.cam);if(Math.abs(v.x)<1&&Math.abs(v.y)<1&&v.z<1)vis++}
+  return{ok:hi-lo>=30&&vis>20,msg:`terrain range ${(hi-lo).toFixed(1)} m, ${vis} hill points (>20 m) on screen`}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['MOUNTAIN JUMP']?BX_DEMOS['MOUNTAIN JUMP'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
- BX_load({log:T.log()},T.n);BX.testId=id;BX.seenAll=new Set();if(T.drive)BX_driveStart();return T.n}
+ BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();return T.n}
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
  proj:(x,y,z)=>{const v=bxV(x,y,z).project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z<1?1:0]},
  cell:(i,j,l)=>{const p=bxV(BXO+(i+.5)*BXC,l==null?BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC):l*BXH,BXO+(j+.5)*BXC).project(BX.cam);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]},
