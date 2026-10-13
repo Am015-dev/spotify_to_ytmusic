@@ -157,7 +157,7 @@ const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));}
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers
 const tierOf=n=>Math.min(TIERS,1+Math.floor(n/TS));
 const comboK=()=>tierOf(C.n);                            // score multiplier = tier (x1..x4)
-const TIERC=['#8c86b8','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
+const TIERC=['#b9b3e6','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
 function tierSet(n,why,x,y){const t0=tierOf(C.n);C.n=clamp(n,0,TIERS*TS-1);const t1=tierOf(C.n);AU.tier=t1;
   if(t1!==t0){G.tpop=.7;G.tdir=t1>t0?1:-1;
     if(t1>t0){floater(x==null?P.x:x,(y==null?P.y:y)-52,'TIER ×'+t1,TIERC[t1-1]);AU.sfx('tier');G.rings.push({x:P.x,y:P.y,l:.6,m:.6,c:TIERC[t1-1]});G.flash=Math.max(G.flash,.1*FX());
