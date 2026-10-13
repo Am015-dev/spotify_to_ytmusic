@@ -36,6 +36,7 @@ Big single-line data files (50, 52, 02) are never read whole: `grep -o` a key in
 | `98w_w13_traffic.js` | 2 | W13 (v87o): traffic glass/wheels scaled to match the body (`W13_trafFit`) | driving / traffic |
 | `98s_garage_studio.js` | 17 | GS (v87p): 2K-style garage hall + platform + shadows, held part with brackets and PLACE/ROTATE/CANCEL, pop, 3D part thumbnails (`GS_*`, `window.__gs`) | garage |
 | `98m_music.js` | 6 | MUS (fix21): streamed Suno tracks `music/<name>.mp3` per mode (`MUS_FILES MUS_MAP MUS_mode`), crossfade, ducking, AUDIO knobs (TUNE.musOn/musVol/sfxVol/duckOn/duckAmt), `window.__mus` | audio |
+| `98hm_home.js` | 6 | HM (v90k): 🏠 HOME = the city garage of each city (save point + "Saved" toast, up to 4 stored cars parked by the door, pause-menu fast travel, minimap pin); BOOST only on sports rides (`HM_sport`) or with a NITRO KIT (`mho_gar.nk`, installed at Home); races keep boost; `window.__hm` | garage / driving |
 | `99_api.js` | 41 | test API **`window.__mho={…}`** (state, roamSim, warp, gnd, …), late CR_ hooks (`_crD _cr25F`), closing `</script>` | QA (+ cars hooks) |
 | `assets/km.js` | 1916 | `window.__KM_BIN='…'` Kenney model blob (deployed next to the page) | — |
 | `assets/shell_head.html` | 0.5 | live `index.html` head up to `<body>` (only for `out/<ver>/index.html` = exactly what deploy.sh writes) | — |
