@@ -16,7 +16,8 @@ async function panTo(p,cdp,x,z){for(let k=0;k<6;k++){const s=await p.evaluate(([
    // inverse of the pan in BX_tapInit: c.x -= (mx*cs+my*sn)*k ; c.z -= (-mx*sn+my*cs)*k
    const a=-dx/kk,b=-dz/kk;return{mx:a*cs-b*sn,my:a*sn+b*cs,d:Math.hypot(dx,dz)}},[x,z]);if(s.d<6)return;
   const cx=426,cy=210,L=Math.hypot(s.mx,s.my),f=Math.min(1,300/L);await drag(cdp,cx,cy,cx+s.mx*f,cy+s.my*f)}}
-async function shot(p,path){await p.evaluate(()=>{if(window.__bx)__bx.BX.shotNow=1});await sleep(300);await p.screenshot({path})}
+// the sim is frozen while the shot is taken (test-only BX.hold), so the driver never steers on stale input
+async function shot(p,path){await p.evaluate(()=>{if(window.__bx){__bx.BX.hold=1;__bx.BX.shotNow=1}});await sleep(300);await p.screenshot({path});await p.evaluate(()=>{if(window.__bx){__bx.BX.hold=0;__bx.BX.last=0}})}
 // --- driving: hold touch buttons like a thumb (GAS is automatic on touch)
 function holder(p,cdp){const H={};const pts=async()=>{const out=[];for(const k in H)out.push([H[k].x,H[k].y,H[k].id]);return out};
  const box=async id=>{const b=await p.locator('#'+id).boundingBox();return b&&[b.x+b.width/2,b.y+b.height/2]};
@@ -33,9 +34,10 @@ async function drive(p,cdp,{ch=[],secs=90,out,tag,shots={},wpExtra=null,stopLaps
   const look=Math.min(W.length-1,idx+Math.max(3,Math.round(V.sp/3.2))),tw=W[look%W.length],dx=tw[0]-V.p[0],dz=tw[2]-V.p[2],fh=Math.hypot(V.F[0],V.F[2])||1;
   const cross=(V.F[2]*dx-V.F[0]*dz)/fh,dot=(V.F[0]*dx+V.F[2]*dz)/fh,ang=Math.atan2(cross,dot); // >0: target is to the LEFT (x-left convention: right = F x up)
   const steer=Math.abs(ang)<.06?0:ang>0?-1:1;await h.set('bxL',steer<0);await h.set('bxR',steer>0);
-  // brake like a player before a corner: heading change over the next ~30 m of course vs speed
-  let turn=0;{const a=W[Math.min(W.length-1,idx+2)],c=W[Math.min(W.length-1,idx+10)],d=W[Math.min(W.length-1,idx+18)];if(a&&c&&d){const h1=Math.atan2(c[0]-a[0],c[2]-a[2]),h2=Math.atan2(d[0]-c[0],d[2]-c[2]);turn=Math.abs(Math.atan2(Math.sin(h2-h1),Math.cos(h2-h1)))}}
-  await h.set('bxB',(Math.abs(ang)>.9&&V.sp>16)||(turn>.45&&V.sp>24)||(turn>.9&&V.sp>16));
+  // brake like a player before a corner: the tightest radius in the next ~45 m of course (heading change per metre) vs speed (yaw limit ~1.25 rad/s)
+  let need=99;{let acc=0,i=idx,a0=null;const P=[];while(acc<45&&i<W.length-1){const a=W[i],b=W[i+1],d=Math.hypot(b[0]-a[0],b[2]-a[2]);if(d>.3)P.push([Math.atan2(b[0]-a[0],b[2]-a[2]),d,acc]);acc+=d;i++}
+   for(let k=0;k<P.length;k++){let dd=0,m=k;while(m<P.length-1&&dd<14){dd+=P[m][1];m++}if(dd<8)break;const t=Math.abs(Math.atan2(Math.sin(P[m][0]-P[k][0]),Math.cos(P[m][0]-P[k][0])));if(t>.05){const R=dd/t,v=1.25*R+Math.max(0,P[k][2]-10)*.5;if(v<need)need=v}}}
+  await h.set('bxB',(Math.abs(ang)>.9&&V.sp>16)||V.sp>need+2);
   for(const k in shots)if(!taken[k]&&shots[k](s)){taken[k]=1;await shot(p,`${out}/${tag}_${k}.png`)}
   info.push([+s.m.t.toFixed(2),...V.p,V.sp,V.g?1:0,V.boat?1:0,idx]);await sleep(70)}
  await h.clear();return{s,info,taken}}

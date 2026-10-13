@@ -309,7 +309,7 @@ function BX_camDrive(dt){const V=BX.v,cam=BX.cam,D=BX.camD,air=!V.g&&!V.boat&&V.
 function BX_sunAt(t){const s=BX.sun;s.position.set(t.x+60,t.y+120,t.z+40);s.target.position.copy(t);s.target.updateMatrixWorld()}
 // ---------------------------------------------------------------- frame
 function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/1000);BX.last=now;BX.t+=dt;const cam=BX.cam;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
- if(BX.mode==='drive'){const inp=BX_input(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
+ if(BX.mode==='drive'&&BX.hold){BX_camDrive(0)}else if(BX.mode==='drive'){const inp=BX_input(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
   const V=BX.v;BX.car.position.copy(V.p);const S=bxV().crossVectors(V.F,V.U).normalize();BX.car.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(S.negate(),V.U,V.F));
   const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,Math.max(gy,V.boat?0:gy)+.08,V.p.z);
   if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
@@ -420,12 +420,12 @@ const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for
 // 36 m WIDE BANKs (full speed), one KICKER each (0.6-1.5 s air, flat landing), closed loops (the SPLIT joins again at a MERGE), laps ~1.4-1.7 km
 Object.assign(BX_DEMOS,{
  // mountain: low start -> climb in two hairpins -> across the mesa top (kicker) -> elevated 30 m hairpin -> long descent -> home
- 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf',...bxRep('st',6),'cp',...bxRep('st',8),'bo',...bxRep('st',3),'wbr','st','wbr',
+ 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf','st','st','bo',...bxRep('st',3),'cp',...bxRep('st',12),'wbr','st','wbr',
   'su','st','su','st','cp',...bxRep('st',3),'wbl','st','wbl','lu','su',...bxRep('st',6),'kj',...bxRep('st',6),'wbr','st','wbr',
   'st','st','sd','sd','cp','sd','ld','wbr',...bxRep('st',21),'wbr'])},
  // city figure-8: boat ramp across the lake -> up onto the 14 m bridge -> down -> between the blocks (kicker) -> under the bridge -> back to the lake
  'TWO-LEVEL CITY':{log:bxCh('city',[29,15,-1,0],['up','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
-  ...bxRep('st',24),'wbr',...bxRep('st',9),'wbr','st','st','bo',...bxRep('st',4),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
+  ...bxRep('st',24),'wbr',...bxRep('st',9),'wbr',...bxRep('st',7),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
   ...bxRep('st',20),'wbl','wbl','dn'])},
  // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
  'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf',...bxRep('st',12),'wbr','fk',1,'sd','dn','st','st','st','up','su',0,...bxRep('st',21),'mg',
