@@ -43,7 +43,7 @@ async function listScn(browser, base, slug) {
 const tapAt = (page, sz, x, y) => sz.phone ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
 
 async function runOne(browser, base, slug, sc, sz, mut) {
-  const t0 = Date.now(), fails = [], { ctx, page, errs } = await openScn(browser, base, slug, sc.id, sz); let info = null;
+  const t0 = Date.now(), fails = [], { ctx, page, errs } = await openScn(browser, base, slug, sc.id, sz); let info = null, skipped = 0;
   try {
     await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => fails.push('scenario never became ready'));
     info = await page.evaluate(() => window.GXSCN).catch(() => null);
@@ -57,7 +57,8 @@ async function runOne(browser, base, slug, sc, sz, mut) {
     if (process.env.SCN_SHOTS) await page.screenshot({ path: path.join(dir, `${sc.id}-${sz.id}.png`), scale: 'css' }).catch(() => { });
     const n = info && info.checks ? info.checks.length : 0;
     for (let i = 0; i < n; i++) {
-      const r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw ' + e.message.slice(0, 60) }));
+      let r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw ' + e.message.slice(0, 60) }));
+      for (let k = 0; !r.ok && info.checks[i].kind === 'eq' && k < 8; k++) { await sleep(400); r = await page.evaluate(i => GXS.step(i), i).catch(() => r); }   // an animated tally gets ~3 s to land
       if (!r.ok) { fails.push(r.msg); continue; }
       if (r.hold) {   // press and hold (touch: CDP touch events, pc: mouse hover), then read the state while held
         if (sz.phone) { const cd = await page.context().newCDPSession(page); await cd.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: r.hold.x, y: r.hold.y }] }); await sleep(r.hold.ms);
@@ -91,6 +92,7 @@ async function runOne(browser, base, slug, sc, sz, mut) {
     }
     if (info && !info.error) {
       (await page.evaluate(inv => GXS.universal(inv), !process.env.SCN_NOINV).catch(() => [])).forEach(m => fails.push(m));
+      skipped = await page.evaluate(() => GXS.skipped || 0).catch(() => 0);
       if (!process.env.SCN_NOINV) for (let k = 0; k < 3; k++) {   // every glowing legal target must answer a real tap (the game state must change)
         const g = await page.evaluate(() => ({ t: GXS.glow(), fp: GXS.fp() })).catch(() => ({ t: [] }));
         if (!g.t.length) break;
@@ -101,7 +103,7 @@ async function runOne(browser, base, slug, sc, sz, mut) {
     errs.forEach(e => fails.push('page error: ' + e));
   } catch (e) { fails.push('harness: ' + String(e.message).slice(0, 100)); }
   finally { await ctx.close(); }
-  return { info, id: sc.id, size: sz.id, mut: mut ? (mut.name || mut.t) : undefined, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) };
+  return { info, skipped, id: sc.id, size: sz.id, mut: mut ? (mut.name || mut.t) : undefined, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) };
 }
 
 module.exports = { SIZES, openScn, listScn, runOne };
@@ -129,6 +131,7 @@ if (require.main === module) (async () => {
     for (const r of res) console.log(`  ${r.ok ? 'ok  ' : 'FAIL'} ${slug} ${r.id} @${r.size} ${r.sec}s${r.ok ? '' : ' :: ' + r.fails.slice(0, 3).join(' | ')}`);
     const nOk = new Set(sel.filter(sc => !res.some(r => r.id === sc.id && !r.ok)).map(s => s.id)).size;
     const why = noScn ? ' no scenarios registered (' + (errs[0] || 'empty list') + ')' : bad.slice(0, 2).map(r => `${r.id}@${r.size}: ${r.fails[0]}`).join(' ; ');
+    const skip = res.reduce((a, r) => Math.max(a, r.skipped || 0), 0); if (skip) console.log(`  note: ${slug} lists known findings that are skipped (up to ${skip} per scenario): see GXS.known in its scn.js and HANDOFF.md`);
     console.log(`SCN ${slug} ${noScn || bad.length ? 'FAIL' : 'ok'} ${nOk}/${sel.length} scenarios ${why}   (${((Date.now() - tg) / 1000).toFixed(0)}s, ${jobs.length} runs)`);
   }
   fs.mkdirSync(OUT, { recursive: true }); fs.writeFileSync(path.join(OUT, 'results.json'), JSON.stringify(all, null, 1));

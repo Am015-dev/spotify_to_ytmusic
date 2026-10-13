@@ -123,7 +123,7 @@
   GXS.add({
     id: 'cc-end-turn', name: 'End turn from the board', ask: 'Tap End turn on the board', ls: LS, seed: 24, when: booted,
     setup: function () { return marketTable(24); },
-    mut: [{ name: 'the computer never ends its turn', js: 'nextAlive = function (i) { return G.active }' }],
+    mut: [{ name: 'the next monster never starts its turn', js: 'startTurn = function () { }' }],
     checks: [
       { kind: 'visible', sel: '#ob [data-act="end"]', name: 'End turn button' },
       { kind: 'fn', name: 'End turn is inside the board', fn: function () { return inBoard('#ob [data-act="end"]'); } },

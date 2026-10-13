@@ -1,14 +1,18 @@
 // Doorkick scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
 (function () {
   if (!window.GXS) return;
+  // Known, owner-listed findings (games-src/HANDOFF.md "Scenario invariants"): the miniature cards in the fan and on the piles print their names at 7-8 px
+  // (the big card is one tap away) and the fight side label "Pip (you) + Morwen" is cut by its box. They are skipped here so the invariants can gate everything else; fix them, then delete these lines.
+  GXS.known.push({ re: /<(span\.(cn|dn|tag|kind|gold|cx)|small)>|span\.cn in span\.cn|span\.tag in span\.aw/, why: 'miniature card text under 11 px' }, { re: /span\.sl in span\.sl/, why: 'fight side label clipped' });
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof render === 'function' && typeof startCombat === 'function' && typeof UI !== 'undefined'; };
   // a plain solo game, no menus: you (Pip) vs two computer heroes, animations on, seeded
-  function table(seed) {
+  function table(seed, live) {
     var m = document.getElementById('modal'); if (m) { m.hidden = true; m.innerHTML = ''; }
     try { GX.close(); } catch (e) { }
     try { GXH.setEnabled(false); } catch (e) { }   // no coach bubbles over the scene
     setSeed(seed); newGame('solo', 3); UI.hints = false; UI.speed = 1; G.learn = false; G.active = 0; G.phase = 'main'; UI.info = false;
     clearTimeout(window.aiTimer); window.aiTimer = null; UI.pause = true;   // the computer waits: the scenario is about YOUR screen
+    if (live) { UI.pause = false; UI.speed = 4; }   // ... unless the scenario plays on through the computer's turns
     render();
   }
   var idOf = function (key) { return Object.keys(G.C).map(Number).find(function (i) { return G.C[i] === key; }); };
@@ -36,27 +40,60 @@
     ]
   });
 
+  // the real buttons, found by their label
+  var btnText = function (re) { return function () { return [].slice.call(document.querySelectorAll('button')).filter(function (b) { return re.test(b.textContent.trim()) && GXS.vis(b); })[0]; }; };
+  var hearth = function () { return { you: G.cb ? sideStr(G.cb) : null, mon: G.cb ? monStr(G.cb) : null, hand: P(0).hand.length, lvl: P(0).lvl, turn: G.turn, td: G.td.length }; };
   GXS.add({
     id: 'dk-fight-bonus', name: 'Fight with bonuses', ask: 'Is YOU vs MONSTERS big and clear?', ls: { dkd_offer: '1' }, seed: 7, when: booted,
     setup: function () {
-      table(7); P(0).lvl = 4;
-      var mon = idOf('hatmuncher'); pull(mon); startCombat(0, mon, 'kick'); render();
-      return GXS.wait(function () { return document.querySelector('.sline .n'); }, 5000).then(function () {
-        window.__fly = GXS.spy(window, 'bfFly');
-        var os = Object.keys(G.C).map(Number).filter(function (i) { return cd(i).t === 'oneshot' && G.tr.indexOf(i) >= 0; })[0];
-        pull(os); P(0).hand.push(os); render(); apply({ act: 'play', card: os, tgt: 'p' }, 0); G.cb.help = 1; G.cb.pb += 3; render();
-        return new Promise(function (r) { setTimeout(r, 900); });
-      });
+      table(7, true);
+      // the staged deal: a plain level-2 monster on top of the door, one bonus card in hand, no more than 3 other cards (no charity round after the fight)
+      var mon = Object.keys(G.C).map(Number).filter(function (i) { return G.door.indexOf(i) >= 0 && cd(i).t === 'monster' && cd(i).lvl === 2 && !cd(i).sp && !cd(i).vs; })[0];
+      var os = Object.keys(G.C).map(Number).filter(function (i) { return cd(i).t === 'oneshot' && cd(i).b === 2 && !cd(i).sp && (G.tr.indexOf(i) >= 0 || P(0).hand.indexOf(i) >= 0); })[0];
+      G.door.splice(G.door.indexOf(mon), 1); G.door.push(mon); pull(os); P(0).hand = P(0).hand.slice(0, 3); P(0).hand.push(os); P(0).lvl = 1;
+      window.__mon = mon; window.__os = os; window.__val = cd(os).b;
+      GXS.defs.forEach(function (d) { if (d.id === 'dk-fight-bonus') d.checks.forEach(function (c) { (c.steps || []).forEach(function (st) { if (st.sel === '#OS') st.sel = '.mine .hand [data-card="' + os + '"]'; }); }); });
+      render(); return new Promise(function (r) { setTimeout(r, 500); });
     },
+    mut: [
+      { name: 'bonus card adds one too many', js: 'sideStr = (function (f) { return function (cb) { return f(cb) + (cb.pb ? 1 : 0) } })(sideStr)' },
+      { name: 'the fight is judged wrong', js: 'winning = function () { return false }' },
+      { name: 'a win gives no loot', js: 'monTr = function () { return 0 }' },
+      { name: 'a win gives no level', js: 'gainLv = function () { }' }
+    ],
     checks: [
+      { kind: 'play', name: 'kick the door: the monster appears', snap: function () { return { door: G.door.length, ph: G.phase }; },
+        steps: [{ sel: '.bfdoor' }], idle: function () { return G.cb && G.cb.stage === 'act' && !BF.kicking && !UI.busy; },
+        verify: function (b, a) { return (G.cb.mons.length === 1 && G.cb.mons[0].id === window.__mon && a.door === b.door - 1 && document.querySelector('.arena .row.mons').textContent.indexOf(cd(window.__mon).n) >= 0) || 'expected ' + cd(window.__mon).n + ' on the table, got ' + G.cb.mons.map(function (m) { return cd(m.id).n; }) + ' (door ' + b.door + ' -> ' + a.door + ')'; } },
+      { kind: 'play', name: 'play the bonus card: YOU grows by exactly its value', snap: hearth,
+        steps: [{ sel: '#OS', until: function () { return BF.pick === window.__os; }, max: 2 }, { sel: '.bf-tgt[data-bfz="fh"]' }],
+        idle: function () { return !UI.busy && P(0).hand.indexOf(window.__os) < 0; },
+        verify: function (b, a) {
+          if (a.you !== b.you + window.__val) return 'YOU ' + b.you + ' -> ' + a.you + ' but the card is worth +' + window.__val;
+          if (a.mon !== b.mon) return 'MONSTERS changed ' + b.mon + ' -> ' + a.mon;
+          if (a.hand !== b.hand - 1 || !G.cb.os.some(function (o) { return o.id === window.__os; })) return 'the card should leave your hand and sit on the table in the fight';
+          return true; } },
       { kind: 'visible', sel: '.sline', name: 'scoreline' },
       { kind: 'text', sel: '.sline .sy i', re: /^YOU/, name: 'YOU label' },
       { kind: 'text', sel: '.sline .sm i', re: /MONSTERS/, name: 'MONSTERS label' },
       { kind: 'fn', name: 'numbers are big (>= 24 px)', fn: function () { var e = document.querySelector('.sline .n'); return parseFloat(getComputedStyle(e).fontSize) >= 24 || 'font ' + getComputedStyle(e).fontSize; } },
-      { kind: 'eq', name: 'YOU total', a: function () { return GXS.num('.sline .sy .n'); }, b: function () { return sideStr(G.cb); } },
-      { kind: 'eq', name: 'MONSTERS total', a: function () { return GXS.num('.sline .sm .n'); }, b: function () { return monStr(G.cb); } },
+      { kind: 'eq', name: 'YOU total', sel: '.sline .sy .n', a: function () { return GXS.num('.sline .sy .n'); }, b: function () { return sideStr(G.cb); } },
+      { kind: 'eq', name: 'MONSTERS total', sel: '.sline .sm .n', a: function () { return GXS.num('.sline .sm .n'); }, b: function () { return monStr(G.cb); } },
       { kind: 'eq', name: 'win/lose colour matches the engine', a: function () { return document.querySelector('.sline').classList.contains('win'); }, b: function () { return winning(G.cb); } },
-      { kind: 'fn', name: 'a flying +N bonus was launched', fn: function () { return window.__fly.n > 0 || 'no bfFly call'; } }
+      { kind: 'play', name: 'tap Fight!: the winner is decided right and the loot is given', snap: function () { var h = hearth(); h.win = h.you > h.mon; return h; },
+        steps: [{ sel: '.fightb' }], idle: function () { return !G.cb && G.phase !== 'combat' && !UI.busy; },
+        verify: function (b, a) {
+          if (!G.out) return 'no fight result'; if (!!G.out.won !== b.win) return 'YOU ' + b.you + ' vs MONSTERS ' + b.mon + ' but the engine says won=' + G.out.won;
+          if (!b.win) return true;
+          if (P(0).lvl !== b.lvl + G.out.lv || G.out.lv < 1) return 'level ' + b.lvl + ' -> ' + P(0).lvl + ' but the fight gave ' + G.out.lv;
+          if (a.hand !== b.hand + G.out.tr || G.out.tr < 1) return 'hand ' + b.hand + ' -> ' + a.hand + ' but the loot is ' + G.out.tr + ' treasure(s)';
+          return true; } },
+      { kind: 'play', name: 'End turn: the rivals play, then it is your turn again', snap: hearth,
+        steps: [{ sel: btnText(/^End turn/) }], idle: function () { return G.turn > 1 && G.active === 0 && sideToAct() === 0 && !G.cb && !UI.busy && !G.winner; },
+        verify: function (b, a) { return (a.lvl === b.lvl && validMoves(0).length > 0) || 'level ' + b.lvl + ' -> ' + a.lvl + ', ' + validMoves(0).length + ' valid moves'; } },
+      { kind: 'play', name: 'Kick the next door: a valid next state', snap: function () { return { door: G.door.length + G.dd.length }; },
+        steps: [{ sel: '.bfdoor' }], idle: function () { return !BF.kicking && !UI.busy && (G.cb || G.phase !== 'main'); },
+        verify: function (b, a) { return (sideToAct() !== 0 || validMoves(0).length > 0) || 'dead end: no valid move after the kick'; } }
     ]
   });
 

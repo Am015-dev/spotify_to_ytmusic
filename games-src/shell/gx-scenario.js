@@ -39,6 +39,8 @@
   var S = window.GXS = { defs: [], on: !!id, id: id };
   try { S.realLS = window.localStorage; } catch (e) { }   // the player's real storage (a scenario swaps window.localStorage for a private one): the LAB (gx-lab.js) keeps its results here
   S.add = function (d) { S.defs.push(d); };
+  S.known = [];   // known findings a game lists on purpose: {re: /message/, why: 'owner-listed in HANDOFF.md'}; they are not hidden, scenario-test prints how many were skipped
+  S.glowSel = '.bf-tgt,.glow,[data-legal]';
   /* group of a scenario for the LAB menu: d.group, else guessed from id / name (Board, Cards, Story, Bosses, UI) */
   S.group = function (d) { if (d.group) return d.group; var t = (d.id + ' ' + d.name).toLowerCase();
     return /boss/.test(t) ? 'Bosses' : /story|chapter|campaign|scene|cutscene/.test(t) ? 'Story' : /zoom|card|hand|market|deck|piece|token/.test(t) ? 'Cards' : /board|start|map|table|tile|grid|island|city|dungeon/.test(t) ? 'Board' : 'UI'; };
@@ -151,8 +153,6 @@
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
-  S.known = [];   // known findings a game lists on purpose: {re: /message/, why: 'owner-listed in HANDOFF.md'}; they are not hidden, scenario-test prints how many were skipped
-  S.glowSel = '.bf-tgt,.glow,[data-legal]';
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
     var out = [];
     [].slice.call(document.querySelectorAll('[data-engine]')).forEach(function (e) { if (!S.vis(e)) return; var v; try { v = (0, eval)(e.getAttribute('data-engine')); } catch (x) { out.push('data-engine "' + e.getAttribute('data-engine') + '" threw ' + x.message); return; }
@@ -186,8 +186,9 @@
     var ev = ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend'];
     function hit(e) { try { return m.sel && e.target && e.target.closest && e.target.closest(m.sel); } catch (x) { return false; } }
     if (m.t === 'dead' || m.t === 'throw') ev.forEach(function (n) { addEventListener(n, function (e) { if (!hit(e)) return; e.stopImmediatePropagation(); e.preventDefault(); if (m.t === 'throw' && n === 'click') throw new Error('mutant: handler throws'); }, true); });
-    else if (m.t === 'hide' || m.t === 'font' || m.t === 'cover') { var st = document.createElement('style'); st.textContent = m.t === 'hide' ? m.sel + '{display:none!important}' : m.t === 'font' ? m.sel + ',' + m.sel + ' *{font-size:8px!important}' : m.sel + '{position:relative!important}' + m.sel + '::after{content:"";position:absolute;left:-6px;top:-6px;right:-6px;bottom:-6px;background:rgba(255,0,0,.9);z-index:2147483000}'; document.head.appendChild(st); }
-    else if (m.t === 'num') setInterval(function () { [].slice.call(document.querySelectorAll(m.sel)).forEach(function (e) { var s = e.textContent; if (/\d/.test(s) && !e.__mut) { e.__mut = 1; e.textContent = s.replace(/\d+/, function (d) { return +d + 1; }); e.__mut = 0; } }); }, 40);
+    else if (m.t === 'cover') { var tg = document.querySelector(m.sel); if (tg) { var q = tg.getBoundingClientRect(), o = document.createElement('div'); o.setAttribute('data-mutant', 'cover'); o.style.cssText = 'position:fixed;z-index:2147482000;background:rgba(255,0,0,.9);left:' + (q.left + q.width * .15) + 'px;top:' + (q.top + q.height * .15) + 'px;width:' + q.width * .7 + 'px;height:' + q.height * .7 + 'px'; document.body.appendChild(o); } }
+    else if (m.t === 'hide' || m.t === 'font') { var st = document.createElement('style'); st.textContent = m.t === 'hide' ? m.sel + '{display:none!important}' : m.sel + ',' + m.sel + ' *{font-size:8px!important}'; document.head.appendChild(st); }
+    else if (m.t === 'num') setInterval(function () { [].slice.call(document.querySelectorAll(m.sel)).forEach(function (e) { var t = e.textContent; if (/\d/.test(t) && e.__fake !== t) { e.textContent = t.replace(/\d+/, function (d) { return +d + 1; }); e.__fake = e.textContent; } }); }, 40);   // shows every number one too high (once per update)
     else if (m.t === 'js') (0, eval)(m.js);
   };
 
@@ -212,7 +213,7 @@
       return new Promise(function (r) { setTimeout(r, 300); });
     }).then(function () { return d.setup && d.setup(); }).then(function () {
       var pubD = pub(d); pubD.checks = d.checks.map(function (c) { return { kind: c.kind, name: c.name || c.sel || c.kind, sel: c.sel, sels: (c.steps || []).map(function (x) { return typeof x.sel === 'string' ? x.sel : null; }).filter(Boolean), eqsel: c.sel || c.dom || null }; });
-      window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', checks: pubD.checks, mut: (d.mut || []).map(function (m) { return m.name; }), engine: document.querySelectorAll('[data-engine]').length, glowN: S.glow().length, glowSel: S.glowSel, ready: true };
+      window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', checks: pubD.checks, mut: (d.mut || []).map(function (m) { return m.name; }), engine: [].filter.call(document.querySelectorAll('[data-engine]'), S.vis).length, glowN: S.glow().length, glowSel: S.glowSel, ready: true };
       try { if (parent !== window) parent.postMessage({ type: 'gxscn', id: d.id, name: d.name, ask: d.ask || '' }, '*'); } catch (e) { }
     }).catch(function (e) { window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', ready: true, error: 'setup failed: ' + String(e && e.message || e).slice(0, 160), checks: [] }; });
   });
