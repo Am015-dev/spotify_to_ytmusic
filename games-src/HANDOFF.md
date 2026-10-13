@@ -133,3 +133,9 @@ Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist
 - Deploy blocked by the look gate: `contrast|b.tv` (digits on the gold badge, 1.5-2.7:1 depending on the tile behind). The look check measures what is behind the digits; the badge picture now sits on `.tv::before` over a solid `#f4c04a`. `btn.sm` plate fixed; goods row has 44 px boxes. Next: lift `.tv` text contrast (e.g. a cream plate behind the digits), run `NODE_PATH=/opt/node-tools/node_modules python3 games-src/scripts/build-all.py --deploy sands-of-qamar`, then `look-check.js --baseline --game sands-of-qamar`, `add-update.py sands-of-qamar "Painted art wired" "item" --check "..." --scn sq-art`.
 - Note: export `NODE_PATH=/opt/node-tools/node_modules` before build-all (the look gate crashes otherwise).
 - Doorkick Dungeon: live (hand/level icons, bubble tail, 3D winner heroes; scenarios dk-art, dk-tips, dk-status-line).
+
+## Shipwreck Isle: last paintings wired (blocked deploy gate)
+
+- Wired `ui-bubble-tail` (island label tail, `html.sk .tl:not(.far)::after` in games-src/rc/skin.css) and `ui-row` (`html.sk .row`, `.row.has`, `.row:hover`).
+- Deploy NOT done: `build-all.py --deploy shipwreck-isle` fails scenario si-art: "text under 11px" on the phase strip label "Event" (9.6px, ui.js PHASES). The same failure reproduces on the commit before this change, so it is pre-existing.
+- Next: raise the phase strip label to 11px or more (shared phase-bar style), then re-run the deploy.

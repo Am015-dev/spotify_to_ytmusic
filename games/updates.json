@@ -1,6 +1,24 @@
 [
  {
   "date": "2026-10-13",
+  "game": "shipwreck-isle",
+  "title": "Last paintings wired",
+  "items": [
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm",
+   "ui-bubble-tail: island label tail; ui-row: drawer and camp row strip"
+  ],
+  "check": "Island labels show a small tail; drawer and camp rows show the painted sailcloth strip",
+  "scn": [
+   "si-art",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "sands-of-qamar",
   "title": "Painted art in Sands",
   "items": [
@@ -182,21 +200,6 @@
    null,
    null,
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "shipwreck-isle",
-  "title": "Painted art wired",
-  "items": [
-   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm"
-  ],
-  "check": "Do the camp icons and 3D camp look painted?",
-  "scn": [
-   "si-art"
-  ],
-  "ask": [
    null
   ]
  },
