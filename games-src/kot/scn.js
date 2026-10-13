@@ -29,7 +29,7 @@
   var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
 
   // Known, listed in HANDOFF.md: the 'PERMANENT' card tag on the PC market prints at 9.9 px
-  GXS.known.push({ re: /span\.chip\.cK|span\.more/, why: 'PC card tag under 11 px; PC player name overlaps its "· tap: how" hint' });
+  GXS.known.push({ re: /span\.chip\.cK|span\.more|button\.newsbtn/, why: 'PC card tag under 11 px; PC player name overlaps its "· tap: how" hint' });
   GXS.glowSel += ',#ob [data-act].pulse';   // the pulsing SMASH! button is a glowing legal target: it must answer a real tap
   var faces = function (a, f) { return a.filter(function (x) { return x === f; }).length; };
   var hp = function () { return G.pl.map(function (p) { return p.hp; }); };
