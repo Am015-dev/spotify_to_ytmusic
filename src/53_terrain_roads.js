@@ -28,13 +28,7 @@ function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=
 const TR_tauH0=tauH;
 // the Taunus keeps its sculpted ridges on top of the real ground; Frankfurt has no road shelves (gentle, smoothed DEM)
 tauH=(x,z)=>{let h=TR_G(x,z)+TR_tauH0(x,z);if(x<TAU_R.x0||z<TAU_R.z0)return h;for(const P of[TAU_SUM,TAU_CAS]){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){const H=P.trH??(P.trH=TR_G(P.x,P.z)+TR_tauH0(P.x,P.z)),k=clamp((P.r-d)/(P.r*.55),0,1);h+=(H-h)*k*k*(3-2*k)}}return h};
-let TR_RAS=false;const TR_RC=new Map();
-// boot speed: while the ground MESH is built, Athens samples the shelf blend from a 2 m raster per 32 m cell (groundY / collision stay exact)
-function TR_Yr(x,z){const kx=Math.floor(x/32),kz=Math.floor(z/32),k=kx*100000+kz;let C=TR_RC.get(k);
-  if(C===undefined){if(!SHELF.get(k))C=null;else{C=new Float32Array(289);const ox=kx*32,oz=kz*32;for(let i=0;i<17;i++)for(let j=0;j<17;j++){const X=ox+i*2,Z=oz+j*2;C[i*17+j]=athShelfY(X,Z,TR_G(X,Z))}}TR_RC.set(k,C)}
-  if(!C)return TR_G(x,z);const fx=(x-kx*32)*.5,fz=(z-kz*32)*.5,i=Math.min(15,fx|0),j=Math.min(15,fz|0),tx=fx-i,tz=fz-j,q=i*17+j;
-  return(C[q]*(1-tz)+C[q+1]*tz)*(1-tx)+(C[q+17]*(1-tz)+C[q+18]*tz)*tx}
-function TR_Y(x,z){return CID==='fra'?tauH(x,z):TR_RAS?TR_Yr(x,z):athShelfY(x,z,TR_G(x,z))}
+function TR_Y(x,z){return CID==='fra'?tauH(x,z):athShelfY(x,z,TR_G(x,z))}
 function TR_grad(x,z,e=1.5){return[(groundY(x+e,z)-groundY(x-e,z))/(2*e),(groundY(x,z+e)-groundY(x,z-e))/(2*e)]}
 // Athens road shelves follow the real ground: every street (pedestrian lanes too) gets a graded profile (TR_GR cap, TR_GJ between junctions);
 // the hill trails follow the smoothed ground without the old "monotone to the top" rule

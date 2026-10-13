@@ -16,6 +16,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.2',date:'13 Oct 2026',items:[{t:'CHANGED',s:'The three ready-made builder tracks are hidden from the Race menu until they are fixed.'},{t:'FIXED',s:'Track builder: cut-through hills now have a flat shoulder and sloped walls instead of vertical cliffs.'}]},
   {v:'v90m-beta.1',date:'13 Oct 2026',items:[{t:'NEW',s:'Race menu: three ready-made builder tracks to race: Cliff Run, Two-Level City and Canyon Split (work in progress).'}]},
   {v:'v90l',date:'13 Oct 2026',items:[{t:'FIXED',s:'Athens: wall hits back to normal (Kriezi street restored).'},{t:'CHANGED',s:'Frankfurt: the motorways are joined to the city with ramps; the streets form one road network.'},{t:'NEW',s:'Checklist 📍 GO is faster: it can drop you straight into either city.'}]},
   {v:'v90k',date:'13 Oct 2026',items:[{t:'FIXED',s:'Less lag: LEGO trees, rocks, cones and signs are simpler at a distance.'},{t:'NEW',s:'Track builder.'},{t:'NEW',s:'📍 GO on every checklist item.'},{t:'FIXED',s:'Shadows under cars, people and trees; the broken Big Rig is gone from traffic.'},{t:'CHANGED',s:'Frankfurt roads are joined into one network.'}]},

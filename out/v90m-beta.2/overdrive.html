@@ -754,6 +754,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.2',date:'13 Oct 2026',items:[{t:'CHANGED',s:'The three ready-made builder tracks are hidden from the Race menu until they are fixed.'},{t:'FIXED',s:'Track builder: cut-through hills now have a flat shoulder and sloped walls instead of vertical cliffs.'}]},
   {v:'v90m-beta.1',date:'13 Oct 2026',items:[{t:'NEW',s:'Race menu: three ready-made builder tracks to race: Cliff Run, Two-Level City and Canyon Split (work in progress).'}]},
   {v:'v90l',date:'13 Oct 2026',items:[{t:'FIXED',s:'Athens: wall hits back to normal (Kriezi street restored).'},{t:'CHANGED',s:'Frankfurt: the motorways are joined to the city with ramps; the streets form one road network.'},{t:'NEW',s:'Checklist 📍 GO is faster: it can drop you straight into either city.'}]},
   {v:'v90k',date:'13 Oct 2026',items:[{t:'FIXED',s:'Less lag: LEGO trees, rocks, cones and signs are simpler at a distance.'},{t:'NEW',s:'Track builder.'},{t:'NEW',s:'📍 GO on every checklist item.'},{t:'FIXED',s:'Shadows under cars, people and trees; the broken Big Rig is gone from traffic.'},{t:'CHANGED',s:'Frankfurt roads are joined into one network.'}]},
@@ -3920,13 +3921,7 @@ function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=
 const TR_tauH0=tauH;
 // the Taunus keeps its sculpted ridges on top of the real ground; Frankfurt has no road shelves (gentle, smoothed DEM)
 tauH=(x,z)=>{let h=TR_G(x,z)+TR_tauH0(x,z);if(x<TAU_R.x0||z<TAU_R.z0)return h;for(const P of[TAU_SUM,TAU_CAS]){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){const H=P.trH??(P.trH=TR_G(P.x,P.z)+TR_tauH0(P.x,P.z)),k=clamp((P.r-d)/(P.r*.55),0,1);h+=(H-h)*k*k*(3-2*k)}}return h};
-let TR_RAS=false;const TR_RC=new Map();
-// boot speed: while the ground MESH is built, Athens samples the shelf blend from a 2 m raster per 32 m cell (groundY / collision stay exact)
-function TR_Yr(x,z){const kx=Math.floor(x/32),kz=Math.floor(z/32),k=kx*100000+kz;let C=TR_RC.get(k);
-  if(C===undefined){if(!SHELF.get(k))C=null;else{C=new Float32Array(289);const ox=kx*32,oz=kz*32;for(let i=0;i<17;i++)for(let j=0;j<17;j++){const X=ox+i*2,Z=oz+j*2;C[i*17+j]=athShelfY(X,Z,TR_G(X,Z))}}TR_RC.set(k,C)}
-  if(!C)return TR_G(x,z);const fx=(x-kx*32)*.5,fz=(z-kz*32)*.5,i=Math.min(15,fx|0),j=Math.min(15,fz|0),tx=fx-i,tz=fz-j,q=i*17+j;
-  return(C[q]*(1-tz)+C[q+1]*tz)*(1-tx)+(C[q+17]*(1-tz)+C[q+18]*tz)*tx}
-function TR_Y(x,z){return CID==='fra'?tauH(x,z):TR_RAS?TR_Yr(x,z):athShelfY(x,z,TR_G(x,z))}
+function TR_Y(x,z){return CID==='fra'?tauH(x,z):athShelfY(x,z,TR_G(x,z))}
 function TR_grad(x,z,e=1.5){return[(groundY(x+e,z)-groundY(x-e,z))/(2*e),(groundY(x,z+e)-groundY(x,z-e))/(2*e)]}
 // Athens road shelves follow the real ground: every street (pedestrian lanes too) gets a graded profile (TR_GR cap, TR_GJ between junctions);
 // the hill trails follow the smoothed ground without the old "monotone to the top" rule
@@ -7496,7 +7491,7 @@ window.__SP={S:SP_S,open:SP_open,go:SP_go,start:(o={})=>{Object.assign(SP_S,{m:o
 function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,d);let e=0;
   for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=(h00*(1-u)+h10*u)*(1-v)+(h01*(1-u)+h11*u)*v;e=Math.max(e,Math.abs(tH(a+(b-a)*u,c+(d-c)*v)-l))}
   if(e<.05)return false;const n=Math.min(Math.ceil((b-a)/8),Math.ceil(Math.sqrt(e/.05)));return n<=1?false:(b-a)/n}
-{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{TR_RC.clear();TR_RAS=true;let out;try{out=_g(grp,x0,x1,z0,z1,{...o,hilly:TR_res,y0:(o.y0||0)-.005})}finally{TR_RAS=false}for(const m of out)m.userData.trG=1;return out}}
+{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:TR_res,y0:(o.y0||0)-.005});for(const m of out)m.userData.trG=1;return out}}
 // buildings: most city builders place bodies at y=0. Right after the city merge (first hubGrid) every collider footprint gets its ground
 // (min/max over corners, edges, centre). Bodies that start below their ground are lifted to max(lowest corner, highest corner - 0.8 m)
 // (vertices of merged meshes and instance origins inside the footprint, + 1.6 m for balconies/eaves); a stone plinth fills down to the
@@ -15437,10 +15432,11 @@ function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.fl
   else if(tool==='smooth'){const m=(BX_hv(a-1,b)+BX_hv(a+1,b)+BX_hv(a,b-1)+BX_hv(a,b+1))/4;T[k]=o[k]+(m-o[k])*w}
   T[k]=bxCl(T[k],-8,60)}}
 // pieces sit IN the ground: terrain under a piece is cut to just below the deck, and lifted to it where the gap is small (embankment)
-function BX_carve(pc){const T=BX.th;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18,R=10.5;
+// a road below the ground cuts a flat 9 m shoulder, then ~39° walls (dev-2: the old near-vertical 16 m cut walls let the car drive INTO the rock)
+function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18;
  const a0=Math.floor((s.p.x-R-BXO)/BXR),a1=Math.ceil((s.p.x+R-BXO)/BXR),b0=Math.floor((s.p.z-R-BXO)/BXR),b1=Math.ceil((s.p.z+R-BXO)/BXR);
  for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;
-  const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a;if(T[k]>y||(dd<7&&y-T[k]<2.2))T[k]=y}}}
+  const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a;if(dd<R0){if(T[k]>y||(dd<7&&y-T[k]<2.2))T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap}}}}
 // ---------------------------------------------------------------- pieces (local: x = right, y = up, z = forward; origin = entry edge middle)
 const bxCurve=(R,s)=>t=>{const a=t*Math.PI/2;return[s*(R-R*Math.cos(a)),0,R*Math.sin(a)]};
 const BX_P={
@@ -15766,7 +15762,7 @@ function BX_saved(){try{return JSON.parse(localStorage.getItem('bx_tracks')||'{}
 function BX_save(){const S=BX_saved();if(BX.name==='MY TRACK'||BX_DEMOS[BX.name])BX.name='TRACK '+(Object.keys(S).length+1);S[BX.name]={v:1,log:BX.log};try{localStorage.setItem('bx_tracks',JSON.stringify(S))}catch(e){}BX_stats()}
 function BX_load(o,name){BX.log=JSON.parse(JSON.stringify(o.log));BX.name=name||'TRACK';BX_replay();const L=BX.pcs.filter(p=>!p.dead);if(L.length){BX.cur={...L[L.length-1].ex[0]};const s=L[0].S[0][0].p;BX.camB.x=s.x;BX.camB.z=s.z}BX_after()}
 function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=document.createElement('div');D.id='bxLoad';const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{D.remove();f()};D.appendChild(b)};
- D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');for(const k in BX_DEMOS)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
+ D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');if(BX_DEMOS_SHOW)for(const k in BX_DEMOS)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
  const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(S[k],k));
  add('✚ NEW EMPTY TRACK',()=>BX_load({log:[['w','valley']]},'MY TRACK'));add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
@@ -15778,7 +15774,8 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
-function BX_raceMenu(){const tw=$('#tracks');if(!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){const b=document.createElement('button');b.className='trk bxTrk';
+const BX_DEMOS_SHOW=false; // dev-2: hidden until the drivable/fun GO lines pass (Alex: "horrible"); the data stays (builder ★ list + GO tests)
+function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){const b=document.createElement('button');b.className='trk bxTrk';
  b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 1 lap</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
  b.onclick=e=>{e.stopPropagation();BX_open();BX_load(BX_DEMOS[k],k);BX.camGo=1;BX.seenAll=new Set();BX_driveStart()};tw.appendChild(b)}}
 buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);
@@ -15789,8 +15786,8 @@ function bxCh(w,c,L){const log=w?[['w',w]]:[];let cur={i:c[0],j:c[1],l:c[2],r:c[
 const bxRep=(t,n)=>Array(n).fill(t);
 const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for(const B of L){if(A===B)continue;for(const a of A.S[0])for(const b of B.S[0])if(Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<4&&a.p.y-b.p.y>5)return true}return false};
 // built-in tracks (dev-2, Alex: "I see no tracks made with the builder yet!!!"): plain builder logs, so ★ load + edit + save works like any track
-Object.assign(BX_DEMOS,{'CLIFF RUN':{log:bxCh('mountain',[18,21,16,3],['sf','st','st','cp','st','st','st','kk',[29,21,8,3],'st','st','st','sd','st','st','br','dn','st','st','st','st','st','st','br',
-  ...bxRep('st',3),'bo',...bxRep('st',5),'cp',...bxRep('st',8),'br','su','su','su','up','br'])},
+Object.assign(BX_DEMOS,{'CLIFF RUN':{log:bxCh('mountain',[18,21,16,3],['sf','st','st','cp','st','st','st','kk',[29,21,8,3],'st','st','st','sd','st','st','br','dn','st','st','st','st','st','st','st','st','br',
+  ...bxRep('st',3),'bo',...bxRep('st',5),'cp',...bxRep('st',8),'br','su','su','su','up','st','st','br'])},
  'TWO-LEVEL CITY':{log:bxCh('city',[8,26,1,2],['sf',...bxRep('st',6),'cp',...bxRep('st',6),'br',...bxRep('st',4),'bo',...bxRep('st',8),
   [31,10,-1,3],'up','su','su','br','st','st','br',...bxRep('st',8),'cp',...bxRep('st',10),'bo',...bxRep('st',10),'sd','sd','bl',...bxRep('st',7),'bl',...bxRep('st',3),'bl'])},
  'CANYON SPLIT':{log:[...bxCh('canyon',[19,27,1,3],['sf','st','fk','bl','br','br','up','bl',1,'up','up','up','dn','dn','bl',[35,21,3,2],'su','su',...bxRep('st',3),'cp','st','bl',
