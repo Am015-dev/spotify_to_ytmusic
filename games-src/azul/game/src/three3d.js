@@ -13,7 +13,7 @@ function gfxLoadPref(){let v=null;try{v=localStorage.getItem(GFX_KEY)}catch(e){}
 function gfxSetPref(v){V3.qPref=v;try{localStorage.setItem(GFX_KEY,v)}catch(e){}applyQuality(v==='auto'?gfxAuto():v)}
 function gfxCycle(){const o=['auto','high','medium','low'];gfxSetPref(o[(o.indexOf(V3.qPref)+1)%o.length])}
 function gfxLabel(){const n={high:'High',medium:'Medium',low:'Low'};return V3.qPref==='auto'?'Auto · '+n[V3.q]:n[V3.q]}
-function applyQuality(q){const lo0=V3.q==='low';V3.q=q;if(q!=='low')glbLoad();if(V3.glbOK&&lo0!==(q==='low')){dressSun();V3.lkey=null;if(typeof relayout==='function'&&V3.L)relayout()}if(typeof gfxBtn==='function')try{gfxBtn()}catch(e){}if(!V3.r)return;const r=V3.r;const dpr=window.devicePixelRatio||1;
+function applyQuality(q){const lo0=V3.q==='low';V3.q=q;glbLoad();if(V3.glbOK&&lo0!==(q==='low')){dressSun();V3.lkey=null;if(typeof relayout==='function'&&V3.L)relayout()}if(typeof gfxBtn==='function')try{gfxBtn()}catch(e){}if(!V3.r)return;const r=V3.r;const dpr=window.devicePixelRatio||1;
   const want=Math.min(q==='high'?2:q==='medium'?1.5:1,dpr);r.setPixelRatio(PH?PH.pixelRatio(want):want);
   const sh=q!=='low';const ms=q==='high'?2048:1024;
   if(V3.sun.shadow.mapSize.x!==ms){V3.sun.shadow.mapSize.set(ms,ms);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}}
@@ -233,12 +233,13 @@ function potMesh(i){const g=new THREE.Group();const R=rng(60+i);const pot=new TH
   for(let k=0;k<N;k++){const a=R()*6.28,b=Math.acos(2*R()-1),rad=.55+R()*.35;v.set(Math.sin(b)*Math.cos(a)*rad,2.15+Math.cos(b)*rad*.8,Math.sin(b)*Math.sin(a)*rad);e.set(R()*3,R()*6.3,R()*3);q.setFromEuler(e);s.setScalar(.8+R()*.6);m4.compose(v,q,s);leaves.setMatrixAt(k,m4);c.setHSL(.26+R()*.06,.45+R()*.2,.2+R()*.14);leaves.setColorAt(k,c)}
   leaves.castShadow=true;g.add(leaves);const fr=new THREE.InstancedMesh(new THREE.SphereGeometry(.12,10,8),emat(new THREE.MeshPhysicalMaterial({color:0xf2c418,roughness:.4,clearcoat:.5})),9);
   for(let k=0;k<9;k++){const a=R()*6.28,b=.5+R()*1.6;v.set(Math.sin(b)*Math.cos(a)*.86,2.15+Math.cos(b)*.7,Math.sin(b)*Math.sin(a)*.86);m4.compose(v,q.identity(),s.set(1,1.15,1));fr.setMatrixAt(k,m4)}g.add(fr);g.scale.setScalar(.92);return g}
-// ---------- GLB models (High/Medium; Low keeps the brass token and the clay kilns): sun first-player token + dished kiln plates ----------
-function glbLoad(){if(V3.glbP||typeof GXGLB==='undefined')return;
-  V3.glbP=Promise.all([GXGLB.load('models/sun.glb'),GXGLB.load('models/plate.glb')]).then(r=>{
+// ---------- GLB models (full-detail files on desktop, -lite files on phones and Low; the brass token and clay kilns show until they load): sun first-player token + dished kiln plates ----------
+function glbVar(){let ph=false;try{ph=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return V3.q==='low'||ph?'-lite':''}
+function glbLoad(){if(typeof GXGLB==='undefined')return;const v=glbVar();if(V3.glbV===v&&V3.glbP)return;const first=!V3.glbP;V3.glbV=v;if(!first)try{GXGLB.dispose()}catch(e){}
+  const me=V3.glbP=Promise.all([GXGLB.load('models/sun'+v+'.glb'),GXGLB.load('models/plate'+v+'.glb')]).then(r=>{if(V3.glbP!==me)return;
     const sun=GXGLB.prep(r[0],{len:.95,env:.7}),w=new THREE.Group();sun.rotation.x=-Math.PI/2;w.add(sun);w.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(w);sun.position.y-=bb.min.y;V3.glbSun=w;
-    const pl=GXGLB.prep(r[1],{len:3.22,ground:true,env:.6}),sz=pl.userData.size;pl.scale.y=.3/Math.max(.01,sz.y);V3.glbPlate=pl;V3.glbOK=true;dressSun();V3.lkey=null;V3.dirty=3;if(typeof relayout==='function')relayout()}).catch(()=>{V3.glbP=null})}
-const glbOn=()=>V3.q!=='low'&&V3.glbOK;
+    const pl=GXGLB.prep(r[1],{len:3.22,ground:true,env:.6}),sz=pl.userData.size;pl.scale.y=.3/Math.max(.01,sz.y);V3.glbPlate=pl;const g=V3.sunTok;if(g&&g.userData.gm){g.remove(g.userData.gm);g.userData.gm=null;g.userData.glb=undefined}V3.glbOK=true;dressSun();V3.lkey=null;V3.dirty=3;if(typeof relayout==='function')relayout()}).catch(()=>{if(V3.glbP===me)V3.glbP=null})}
+const glbOn=()=>!!V3.glbOK;
 function dressSun(){const g=V3.sunTok;if(!g)return;const on=glbOn();if(g.userData.glb===on)return;g.userData.glb=on;
   if(on){g.children.forEach(c=>{if(!c.userData.keep)c.visible=false});if(!g.userData.gm){g.userData.gm=V3.glbSun.clone(true)}g.userData.gm.visible=true;g.add(g.userData.gm);
     const sh=g.children.find(c=>c.material&&c.material.map===V3.T.blob);if(sh){sh.visible=true;sh.userData.keep=1}}
