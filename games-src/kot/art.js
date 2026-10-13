@@ -84,8 +84,11 @@ function statBadge(x,y,kind,val){const col={hp:'#e63946',vp:'#f4a300',en:'#2ec27
   return `<g transform="translate(${x},${y})"><rect x="-22" y="-13" width="44" height="26" rx="13" fill="${col}" stroke="${INK}" stroke-width="3"/><g transform="translate(-10,0)">${icon}</g><text x="9" y="7" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="19" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">${val}</text></g>`}
 function brainIcon(x,y,s,fill){return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-14 6 C-20 0 -16 -12 -8 -12 C-6 -18 6 -18 8 -12 C16 -12 20 0 14 6 C12 14 -12 14 -14 6 Z" fill="${fill||'#ff8fc7'}" stroke="${INK}" stroke-width="3"/><path d="M0 -12 V10 M-8 -4 C-4 -2 -4 4 -8 6 M8 -4 C4 -2 4 4 8 6" fill="none" stroke="${INK}" stroke-width="2"/></g>`}
 function burst(x,y,r,fill){let d='';for(let k=0;k<24;k++){const a=k*Math.PI/12,rr=k%2?r*.72:r;d+=(k?'L':'M')+(x+Math.cos(a)*rr).toFixed(1)+' '+(y+Math.sin(a)*rr).toFixed(1)}return `<path d="${d}Z" fill="${fill}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`}
+// painted picture of a power card (games/crown-city-smash/media/pc-<id>.webp, listed in media.json "cards"); cards without a file keep the drawn icon
+const CPIC=new Set((window.CC_MEDIA&&window.CC_MEDIA.cards)||[]);
+function cardPic(id,cls){const b=typeof id==='number'?'evo'+id:base(id);return CPIC.has(String(b))?`<img class="cpic ${cls||''}" src="media/pc-${b}.webp" width="360" height="220" loading="lazy" decoding="async" alt="" draggable="false">`:''}
 // small icon for a power card
-function cardIcon(id){const b=base(id),C=CARDS[b];const x=C.x;let k='dice';
+function cardIcon(id){const b=base(id),C=CARDS[b];const pic=cardPic(id);if(pic)return pic;const x=C.x;let k='dice';
   if(/Brainjack/.test(x))k='brain';else if(C.kws)k=C.kws[0];else if(/loses? \d+ hearts?|smash|damage/.test(x))k='claw';else if(/[Hh]eal/.test(x))k='heart';else if(/energy/.test(x)&&!/star/.test(x))k='bolt';else if(/star/.test(x))k='star';
   const S=`stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
   const g={brain:brainIcon(0,0,1),star:`<path d="M0 -16 L4.6 -5.4 L16 -4.6 L7 3 L10 14 L0 8 L-10 14 L-7 3 L-16 -4.6 L-4.6 -5.4 Z" fill="#f4a300" ${S}/>`,

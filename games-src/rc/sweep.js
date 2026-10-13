@@ -10,7 +10,9 @@ const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const N=+(proc
 const SC=['marooned','hexed','stranded','settlers'];
 async function tapSel(p,sel){const pt=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}},sel);if(!pt)return false;await p.touchscreen.tap(pt.x,pt.y);return true}
 async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true});
- await ctx.route('**/*',r=>new URL(r.request().url()).host==='swi.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+ await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='swi.test')return r.abort();
+  if(/^\/media\/[\w.-]+\.webp$/.test(u.pathname)){const f=path.join(__dirname,'../../games/shipwreck-isle',u.pathname);if(fs.existsSync(f))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(f)})}   // painted kit, so the sweep runs with the skin on
+  r.fulfill({status:200,contentType:'text/html',body:html})});
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));const tag=`${W}x${H} seed ${seed}`;const tipsOn=seed%5!==4;const prob=m=>{bad++;console.log(tag,'PROBLEM',m)};
  await p.goto('https://swi.test/');await p.waitForTimeout(900);
  await p.evaluate(([s,sc,tips])=>{try{localStorage.clear();localStorage.setItem('swi_tutoffer','1')}catch(e){}GXH.reset();GXH.setEnabled(tips);setSeed(s);AIDELAY=0;UI.speed=8;try{setGfx('low')}catch(e){}UI.setup.scen=sc;render()},[seed,SC[seed%4],tipsOn]);

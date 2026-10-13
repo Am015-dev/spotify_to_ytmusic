@@ -646,6 +646,7 @@ html.ph.ph-l #rs .endart{height:30dvh;width:min(300px,40vw)}
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
 .gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
@@ -3825,7 +3826,7 @@ const GX={key:'gx',open:null,
 <script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
-//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
 //   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
@@ -4217,6 +4218,7 @@ const GX={key:'gx',open:null,
     return new Promise(function (done) {
       if (!doc) return done('map');
       var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      if (O && O.endArt) { var ea = r.won ? O.endArt.win : O.endArt.lose; if (ea) { s.parentNode.classList.add('has-art'); s.parentNode.style.setProperty('--gxc-art', 'url(' + ea + ')'); } }
       box.appendChild(el('div', 'gxc-res-k', def.title));
       box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
@@ -5275,6 +5277,9 @@ function tableCSS(mood) {
 function applyTable(el, mood) { if (!el || !el.style) return; el.style.background = tableCSS(mood) + ' 0 0/auto,120px 120px'; el.style.backgroundColor = mood === 'night' ? '#3a231d' : '#efdcb8'; }
 
 // ---------------------------------------------------------------- cloche (dome lid), same aspect as a card (1 : 1.4)
+// the 3D brass cloche (sprite rendered from the full-detail model); the drawn SVG stays on Low graphics and if the file is missing
+function clocheLow() { try { return typeof gfxPref === 'function' && gfxPref() === 'low'; } catch (e) { return false; } }
+function clocheImg(o) { o = o || {}; const w = o.w || 100; if (clocheLow()) return K.clocheSVG(o); return `<img class="kk-c3" src="models/cloche${w <= 300 ? '@512' : ''}.webp" alt="" draggable="false" decoding="async" style="width:100%;height:100%;object-fit:contain;display:block" onerror="this.outerHTML=window.KIT&&KIT.clocheSVG?KIT.clocheSVG({w:${w}}):''">`; }
 function clocheSVG(o) {
   o = o || {}; const w = o.w || 100, H = Math.round(w * 1.4);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-cloche-svg" width="${w}" height="${H}" viewBox="0 0 100 140" role="img" aria-label="Covered plate">`;
@@ -5288,7 +5293,7 @@ function clocheSVG(o) {
   return s + '</svg>';
 }
 
-K.beltSegmentSVG = beltSegmentSVG; K.beltCSS = beltCSS; K.beltEl = beltEl; K.counterSVG = counterSVG; K.tableTile = tableTile; K.tableCSS = tableCSS; K.applyTable = applyTable; K.clocheSVG = clocheSVG; K.dataURL = dataURL;
+K.beltSegmentSVG = beltSegmentSVG; K.beltCSS = beltCSS; K.beltEl = beltEl; K.counterSVG = counterSVG; K.tableTile = tableTile; K.tableCSS = tableCSS; K.applyTable = applyTable; K.clocheSVG = clocheSVG; K.clocheImg = clocheImg; K.clocheLow = clocheLow; K.dataURL = dataURL;
 })(typeof window !== 'undefined' ? window : globalThis);
 /* p6: chef avatars + seats, public API (KKKit), CSS, DOM helpers, cloche reveal */
 (function (root) {
@@ -5424,7 +5429,7 @@ function clocheOn(host, o) {
   if (!doc || !host) return { el: null, lift: () => Promise.resolve(), remove() {} };
   if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
   const c = doc.createElement('div'); c.className = 'kk-cloche';
-  c.innerHTML = `<div class="kk-lidwrap" style="position:absolute;inset:0;transform-origin:50% 100%">${K.clocheSVG({ w: 100 }).replace(/width="100" height="140"/, 'width="100%" height="100%"').replace('viewBox', 'preserveAspectRatio="none" viewBox')}</div>`;
+  c.innerHTML = `<div class="kk-lidwrap" style="position:absolute;inset:0;transform-origin:50% 100%">${K.clocheLow() ? K.clocheSVG({ w: 100 }).replace(/width="100" height="140"/, 'width="100%" height="100%"').replace('viewBox', 'preserveAspectRatio="none" viewBox') : K.clocheImg({ w: 100 })}</div>`;
   host.appendChild(c);
   const lift = (lo) => {
     lo = lo || {}; const delay = lo.delay || 0;
@@ -5448,7 +5453,7 @@ const API = {
   beltSegmentSVG: K.beltSegmentSVG, beltCSS: K.beltCSS, beltEl: K.beltEl, counterSVG: K.counterSVG,
   avatarSVG, seatSVG, iconSVG: K.iconSVG, iconNames: K.ICON_NAMES, iconLabel: K.ICON_LABEL, ruleIcon: t => (TYPES[t] || {}).rule,
   roundMarkerSVG: K.roundMarkerSVG, roundTrackSVG: K.roundTrackSVG, scorePadSVG: K.scorePadSVG,
-  clocheSVG: K.clocheSVG, clocheOn, revealAll,
+  clocheSVG: K.clocheSVG, clocheImg: K.clocheImg, clocheOn, revealAll,
   tableCSS: K.tableCSS, applyTable: K.applyTable,
   mount, css: () => CSS, defs: K.defs, el, cardEl, cardURL, cardImg, backURL, drawCard, dataURL: K.dataURL,
   name: t => (TYPES[t] || {}).name, ruleText: t => (TYPES[t] || {}).ruleText, color: t => (TYPES[t] || {}).c
@@ -7001,7 +7006,7 @@ function pudStand(s) {
 function slotEl(s, sl, cmp) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots;
   const box = h('div.sbox'), wrap = h('div.slot', box);
-  const cover = () => { box.innerHTML = KIT.clocheSVG({ w: sl }); };
+  const cover = () => { box.innerHTML = KIT.clocheImg({ w: sl }); box.firstChild && box.firstChild.style && (box.firstChild.style.width = sl + 'px', box.firstChild.style.height = Math.round(sl * 1.2) + 'px'); };
   if (fz) {
     const m = fz[s];
     if (m && m.mode === 'cover') { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
@@ -8796,7 +8801,7 @@ function endBanner() {
 // ---- music: five slots (Menu, Game, Last round, Victory, Defeat), two tracks each, saved choice a / b / shuffle / off
 const MSLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last round'], ['victory', 'Victory'], ['defeat', 'Defeat']];
 const MTITLE = { 'tavern-a': 'Menu loop A', 'tavern-b': 'Menu loop B', 'main-a': 'Nine Cards, One Cup of Tea', 'main-b': 'Quiet Table, Warm Light', 'fight-a': 'Shamisen Sprint', 'fight-b': 'Last Bell, Light Heart', 'victory-a': 'Golden Koto Rise', 'victory-b': 'Bright Final Chord', 'defeat-a': 'A Gentle Plonk of Defeat', 'defeat-b': 'Trombone Bows Out' };
-const MDEF = { tavern: 'a', main: 'a', fight: 'a', victory: 'a', defeat: 'a' };
+const MDEF = { tavern:'all',main:'all',fight:'all', victory: 'a', defeat: 'a' };
 const MUS = { pick: Object.assign({}, MDEF), res: {}, sh: {}, want: null, wslot: null, prev: null, prevT: 0, last: null, since: 0 };
 // 'all' = shuffle through every looping song (menu, game and last-round tracks), a new one every ~2.5 min
 const MLOOPS = ['tavern', 'main', 'fight'], MALL = Object.keys(MTITLE).filter(k => MLOOPS.includes(k.split('-')[0])), MALL_MS = 150000;

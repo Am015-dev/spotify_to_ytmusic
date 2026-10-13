@@ -1,0 +1,30 @@
+
+/* ===== Shipwreck Isle skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons); this file holds the game's own buttons and icons ===== */
+html.sk{--sk-ink:#3a2410}
+html.sk .btn:not(.xs):not(.add):not(.opt):not(.sk),html.sk #modal .btn{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));justify-content:center;text-shadow:none}
+html.sk .btn.go:not(.xs){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .btn:not(.xs):not(.add):active{transform:translateY(2px)}
+html.sk .btn:disabled{opacity:.5}
+html.sk .btn.go:disabled{filter:grayscale(.5) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+/* painted action chips (plan rows, job categories, plan dots) and resource icons (camp stock, costs) */
+html.sk-acts .ai{display:inline-block;font-size:0;width:28px;height:28px;background:center/contain no-repeat;vertical-align:middle;font-style:normal}
+html.sk-acts .ai[data-a=build]{background-image:url(media/icon-act-build.webp)}html.sk-acts .ai[data-a=camp]{background-image:url(media/icon-act-camp.webp)}
+html.sk-acts .ai[data-a=explore]{background-image:url(media/icon-act-explore.webp)}html.sk-acts .ai[data-a=gather]{background-image:url(media/icon-act-gather.webp)}
+html.sk-acts .ai[data-a=hunt]{background-image:url(media/icon-act-hunt.webp)}html.sk-acts .ai[data-a=rest]{background-image:url(media/icon-act-rest.webp)}
+html.sk-acts .ai[data-a=threat]{background-image:url(media/icon-act-threat.webp)}
+html.sk-acts .ai:not([data-a=build]):not([data-a=camp]):not([data-a=explore]):not([data-a=gather]):not([data-a=hunt]):not([data-a=rest]):not([data-a=threat]){font-size:inherit;width:auto;height:auto}
+html.sk-acts .cat .ai{width:34px;height:34px}
+html.sk-res .rx{display:inline-block;font-size:0;width:22px;height:22px;background:center/contain no-repeat;vertical-align:middle;font-style:normal}
+html.sk-res .rx[data-r=food]{background-image:url(media/icon-res-food.webp)}html.sk-res .rx[data-r=pfood]{background-image:url(media/icon-res-pfood.webp)}
+html.sk-res .rx[data-r=wood]{background-image:url(media/icon-res-wood.webp)}html.sk-res .rx[data-r=fur]{background-image:url(media/icon-res-fur.webp)}
+/* the driftwood bar and the drawer strips are light: dark ink instead of the cream text of the dark kits */
+html.sk{--sk-cream:#2a1a0a}
+html.sk .gx-bar h1{color:#2a1a0a;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+html.sk .gx-drawer-head h2{text-shadow:0 1px 0 rgba(255,255,255,.6)}
+html.sk .gx-ibtn{text-shadow:0 1px 0 rgba(255,255,255,.5);color:#2a1a0a}
+html.sk #hud .hk{align-items:center}
+html.sk-res #hud .rx{width:20px;height:20px}
+html.sk .gx-bar{background:linear-gradient(rgba(255,246,226,.82),rgba(255,246,226,.82)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #e8d9b4}
+html.sk .gx-bar .gx-ibtn,html.sk .gx-bar .gx-ibtn span,html.sk #phchip{color:#2a1a0a;text-shadow:none}
+html.sk .gx-drawer-head{background:linear-gradient(rgba(255,246,226,.8),rgba(255,246,226,.8)),url(media/ui-drawer-head.webp) center/auto 100% repeat-x #e8d9b4}
+html.sk .gx-ibtn svg,html.sk .gx-ibtn svg *{stroke:#2a1a0a;color:#2a1a0a}

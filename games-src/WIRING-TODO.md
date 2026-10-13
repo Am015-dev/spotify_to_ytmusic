@@ -16,216 +16,28 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 | kaiten-kitchen | 23 | 2 |
 | sunglaze | 23 | 2 |
 | short-fuse | 22 | 2 |
-| mainhattan-nightrun | 22 | 0 |
+| mainhattan-nightrun | 0 | 0 |
 | cauldron-fair | 22 | 2 |
 | tidewake | 22 | 2 |
 | hollowbough | 19 | 2 |
-| **Total** | **678** | **56** |
+| **Total** | **656** | **56** |
 
 ## crown-city-smash
 
-3D: dot, fountain, token-energy, token-heart, token-star, tower-a, tower-b, tower-c, tower-c-t120000, tower-c-t60000, tower-d
+Wired 13 Oct: all 182 `pc-*` card paintings (shop pop-up, board shop tiles, flying card, owned-card rows; lazy-loaded, listed in media.json "cards"), `icon-heart/energy/star` (flying pick-ups), `table-harbor-night/spire-gold` (loaded by name in paint.js, campaign unlock). 3D tower/fountain/Dot/Clampede models are live.
 
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 2 Wave 2 | `icon-crown` | a small gold crown, chunky, thick ink outline, single object, centred, plain flat white background, no shadow, |
-| Wave 2 Wave 2 | `icon-energy` | a yellow lightning-bolt battery cell, chunky, thick ink outline, single object, centred, plain flat white back |
-| Wave 2 Wave 2 | `icon-heart` | a glossy red heart, chunky, thick ink outline, single object, centred, plain flat white background, no shadow, |
-| Wave 2 Wave 2 | `icon-star` | a gold star, chunky, thick ink outline, single object, centred, plain flat white background, no shadow, no tex |
-| Wave 2 Wave 2 | `ui-button-ghost` | a blank wide horizontal pill-shaped button outline about three times wider than tall, thick dark ink rim, see- |
-| Wave 2 Wave 2 | `ui-button-pink` | a blank wide horizontal pill-shaped button plate about three times wider than tall, neon pink enamel with a th |
-| Wave 2 Wave 2 | `ui-button-yellow` | a blank wide horizontal pill-shaped button plate about three times wider than tall, bright yellow enamel with  |
-| Wave 2 Wave 2 | `ui-hud-chip` | a blank rounded comic-book chip plate in cream with a thick dark ink border and a halftone corner, wider than  |
-| Wave 2 Wave 2 (16:9) | `ui-dice-tray` | a long rounded dice tray lined with green felt and a dark wood rim, seen from above, empty, single object, cen |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-acid` | a chunky cartoon giant monster drooling bright green acid that melts a parked car, one clear subject, no frame |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-alpha` | a chunky cartoon giant monster roaring on top of a crushed skyscraper, a gold star above its head, one clear s |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-barbed` | a chunky cartoon giant monster with a spiked barbed tail smashing a water tower, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-battery` | a chunky cartoon giant monster with a giant glowing battery inside its belly, lightning crackling, one clear s |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-brain` | a chunky cartoon giant monster with a huge glowing exposed brain, thinking hard, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_astro` | a cheerful chunky cartoon giant monster wearing a round space helmet, stars around it, one clear subject, no f |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_cheer` | a chunky cartoon giant monster cheering with pom-poms, one clear subject, no frame, no text, no letters, no nu |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_clown` | a chunky cartoon giant monster with a red clown nose and a ruffled collar, one clear subject, no frame, no tex |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_devil` | a chunky cartoon giant monster wearing red devil horns and holding a toy pitchfork, one clear subject, no fram |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_ghost` | a chunky cartoon giant monster wearing a bedsheet ghost costume with eye holes, one clear subject, no frame, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_pirate` | a chunky cartoon giant monster in a pirate hat with an eye patch, one clear subject, no frame, no text, no let |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_prin` | a chunky cartoon giant monster wearing a sparkling royal tiara, one clear subject, no frame, no text, no lette |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_robot` | a chunky cartoon giant monster dressed in a tin-can robot suit, one clear subject, no frame, no text, no lette |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_statue` | a chunky cartoon giant monster wearing a spiked torch crown and holding up a torch like a famous statue, one c |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_vamp` | a chunky cartoon giant monster wearing a vampire cape with a high collar, one clear subject, no frame, no text |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_witch` | a chunky cartoon giant monster in a pointy witch hat holding a broom, one clear subject, no frame, no text, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-c_zombie` | a chunky cartoon giant monster in zombie makeup with painted stitches, groaning goofily, one clear subject, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-carpet` | bombers dropping a carpet of explosions on several cartoon monsters at once, one clear subject, no frame, no t |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-carrion` | a chunky cartoon giant monster happily munching a giant drumstick on a pile of rubble, gold stars around it, o |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-cell` | a chunky cartoon giant monster carrying a big glowing green power cell on its back, energy sparks, one clear s |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-chameleon` | a chunky cartoon giant monster whose skin changes colour to blend into a neon billboard, half camouflaged, one |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-cosmic` | a chunky cartoon giant monster with a swirling galaxy glowing inside its belly, patting it happily, one clear  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-cyclone` | a cyclone twisting through the city, sucking green energy bolts away from monsters, one clear subject, no fram |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-egg` | a cracked giant monster egg in a nest of rubble, a baby monster hatching out, one clear subject, no frame, no  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-flame` | a wall of fire sweeping down a street toward three cartoon monsters, one clear subject, no frame, no text, no  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-gourmand` | a chunky cartoon giant monster wearing a bib, eating a building like a slice of cake with a knife and fork, on |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-grazer` | a gentle chunky cartoon giant monster calmly munching trees in a city park, one clear subject, no frame, no te |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-growth` | a chunky cartoon giant monster suddenly growing taller, bursting up out of a city block, one clear subject, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-healray` | a chunky cartoon giant monster shooting a soft green healing beam at a bruised monster friend, one clear subje |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-hiccup` | a chunky cartoon giant monster hiccuping a swirling clock face out of its mouth, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-jetsq` | a squadron of fighter jets swooping at a chunky cartoon giant monster that swats at them, one clear subject, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-kidfan` | a crowd of excited kids waving monster flags and glow sticks behind a barrier, one clear subject, no frame, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-kiosk` | a chunky cartoon giant monster stomping a tiny corner newspaper kiosk, one clear subject, no frame, no text, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-lab` | a chunky cartoon giant monster tinkering in a cluttered garage lab with bubbling flasks, one clear subject, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-lurker` | a chunky cartoon giant monster peeking out of a dark alley between neon buildings, glowing eyes, one clear sub |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-m_bug` | a small squishy brain spawn creature hatching from a pod, one clear subject, no frame, no text, no letters, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-m_dysf` | a sparking faulty brain-control helmet zapping several cartoon monsters, one clear subject, no frame, no text, |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-m_evade` | a slippery brain-shaped gadget squirting out of a chunky cartoon giant monster's grip, one clear subject, no f |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-m_free` | a chunky cartoon giant monster in a steel helmet shrugging off wavy brain-control rays, one clear subject, no  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-m_nobrain` | an empty-headed chunky cartoon giant monster with a hollow skull, grinning dimly, claws up, one clear subject, |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-mend` | a chunky cartoon giant monster sticking a giant sticking plaster on its own arm, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-meta` | a chunky cartoon giant monster stepping out of its old shed skin, fresh and shiny, one clear subject, no frame |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-militia` | a small militia of soldiers with toy-like cannons drilling in front of a chunky cartoon giant monster, one cle |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-mimic` | a chunky cartoon giant monster copying another monster's pose like a mirror image, a glowing gland on its neck |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-mind` | two cartoon monsters linked by a glowing purple thought beam between their heads, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-needle` | a chunky cartoon giant monster climbing a tall sky-needle tower, one clear subject, no frame, no text, no lett |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-news` | a news helicopter filming a chunky cartoon giant monster that poses proudly for the camera, one clear subject, |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-nova` | a chunky cartoon giant monster roaring a ring-shaped shockwave that knocks everything around it flat, one clea |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-omni` | a chunky cartoon giant monster with a huge mouth gobbling cars, buses and street signs all at once, one clear  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-opp` | a chunky cartoon giant monster snatching a glowing card off a shop counter before anyone else, sly grin, one c |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-pack` | three small cartoon monsters hunting together across the rooftops, one clear subject, no frame, no text, no le |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-para` | a chunky cartoon giant monster with leech tendrils reaching out to steal glowing cards from another monster, o |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-patch` | a chunky cartoon giant monster sitting down with bandages, being patched up, one clear subject, no frame, no t |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-plated` | a chunky cartoon giant monster covered in thick armour plates shrugging off a small missile, one clear subject |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-probe` | a chunky cartoon giant monster with a third eye beaming into another monster's head, one clear subject, no fra |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-pspit` | a chunky cartoon giant monster spitting a glob of bubbling toxic green spit at another monster, one clear subj |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-quills` | a chunky cartoon giant monster bristling with glowing purple venom quills that fire outwards, one clear subjec |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-reactor` | a chunky cartoon giant monster snacking on a glowing reactor core like a lollipop, one clear subject, no frame |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-refinery` | an oil refinery exploding in a fireball behind a chunky cartoon giant monster, one clear subject, no frame, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-regrow` | a chunky cartoon giant monster regrowing a broken horn in a burst of green sparkles, one clear subject, no fra |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-rubber` | a chunky cartoon giant monster with stretchy rubber arms reaching right round a skyscraper, one clear subject, |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-rush` | a chunky cartoon giant monster sprinting flat out through the streets, motion lines and dust, one clear subjec |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-scorch` | a chunky cartoon giant monster breathing a wide arc of fire that scorches the monsters on both sides of it, on |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-shrink` | a chunky cartoon giant monster firing a shrink ray that shrinks another monster to toy size, one clear subject |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-sirens` | police cars with flashing sirens screaming down the street, monsters covering their ears, one clear subject, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-skull` | a chunky cartoon giant monster with two heads, both grinning, one clear subject, no frame, no text, no letters |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-skydive` | a chunky cartoon giant monster skydiving onto the downtown plaza, a shockwave as it lands, one clear subject,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-smoke` | a chunky cartoon giant monster hiding in three big puffs of grey smoke, eyes peeking out, one clear subject, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-spree` | a chunky cartoon giant monster smashing a whole row of shops in one swing, gold stars flying out, one clear su |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-street` | a chunky cartoon giant monster munching a neon street sign like a snack in the middle of downtown, one clear s |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-sun` | a chunky cartoon giant monster sunbathing on a rooftop deck chair, soaking up sunlight, one clear subject, no  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-surge` | a chunky cartoon giant monster crackling with a huge surge of electricity from a power station, one clear subj |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-tanks` | a column of tanks rolling toward a chunky cartoon giant monster, one clear subject, no frame, no text, no lett |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-thick` | a chunky cartoon giant monster with thick leathery hide, tank shells bouncing off it with sparks, one clear su |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-tower` | a chunky cartoon giant monster toppling a tall tower block, one clear subject, no frame, no text, no letters,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-train` | a chunky cartoon giant monster lifting a rush-hour commuter train like a toy, one clear subject, no frame, no  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-tunnel` | a chunky cartoon giant monster bursting up through the street from a tunnel, asphalt chunks flying, one clear  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-twist` | a chunky cartoon giant monster flipping a giant die in mid-air with a wink, one clear subject, no frame, no te |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-underdog` | a small scrappy monster squaring up bravely to a huge one, one clear subject, no frame, no text, no letters, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-vjets` | a chunky cartoon giant monster escaping straight up on jets of steam from its feet, one clear subject, no fram |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_anti` | a chunky cartoon giant monster firing a beam of dark null energy from both claws, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_cyb` | a chunky cartoon giant monster with a glowing circuit-board brain and dangling wires, one clear subject, no fr |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_dev` | a sly grinning chunky cartoon giant monster with narrowed eyes, rubbing its claws, one clear subject, no frame |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_eter` | an undying chunky cartoon giant monster glowing with a green halo, rising again, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_lair` | a dark monster den in a sewer with glowing eyes and heaps of loot, one clear subject, no frame, no text, no le |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_panic` | crowds fleeing in mass hysteria through the streets past a confused monster, one clear subject, no frame, no t |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_regen` | a chunky cartoon giant monster fully renewed inside a pillar of green light, one clear subject, no frame, no t |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_skul` | a lurking chunky cartoon giant monster half-hidden in fog, casting a skull-shaped shadow, one clear subject, n |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_sky` | a lance of light falling from the sky onto a chunky cartoon giant monster, one clear subject, no frame, no tex |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-w_tire` | a restless chunky cartoon giant monster pacing, crackling with nervous energy, one clear subject, no frame, no |
-| Wave 2 Wave 2 power cards A (16:9) | `pc-wings` | a chunky cartoon giant monster gliding between towers on bat-like membrane wings, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo11` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, firing a frost beam that |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo12` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, scooping a glowing card  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo13` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, plunging into an icy poo |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo14` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, blowing a freezing wind  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo15` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, holding a die locked ins |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo16` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, stomping through a blizz |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo17` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, holding a glowing black  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo18` | Glacyx, a walking glacier monster of pale icy-blue crystal with a cold glowing heart, facing its reflection in |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo21` | Squidrik, a one-eyed purple squid monster from the storm drains, rising out of a storm drain as crowds gasp, o |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo22` | Squidrik, a one-eyed purple squid monster from the storm drains, fishing treasure out of a gutter, one clear s |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo23` | Squidrik, a one-eyed purple squid monster from the storm drains, squirting a furious cloud of black ink, one c |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo24` | Squidrik, a one-eyed purple squid monster from the storm drains, swirling a hand of cards down a drain, one cl |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo25` | Squidrik, a one-eyed purple squid monster from the storm drains, wobbling but slapping hard with its tentacles |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo26` | Squidrik, a one-eyed purple squid monster from the storm drains, sprouting a bunch of extra tentacles, one cle |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo27` | Squidrik, a one-eyed purple squid monster from the storm drains, sipping from a glowing puddle, one clear subj |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo28` | Squidrik, a one-eyed purple squid monster from the storm drains, covered in barnacles, hugging a pile of cards |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo31` | Voltusk, a thunder-tusked yellow boar monster of the power grid, rebooting in a city blackout with one big spa |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo32` | Voltusk, a thunder-tusked yellow boar monster of the power grid, collecting energy bolts from other monsters l |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo33` | Voltusk, a thunder-tusked yellow boar monster of the power grid, releasing a burst of static electricity, one  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo34` | Voltusk, a thunder-tusked yellow boar monster of the power grid, glowing overcharged and bulging with power, o |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo35` | Voltusk, a thunder-tusked yellow boar monster of the power grid, holding another monster on a crackling static |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo36` | Voltusk, a thunder-tusked yellow boar monster of the power grid, surfing a power line into downtown, one clear |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo37` | Voltusk, a thunder-tusked yellow boar monster of the power grid, chasing sparks like fireflies, one clear subj |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo38` | Voltusk, a thunder-tusked yellow boar monster of the power grid, charging tusks first, one clear subject, no f |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo41` | Shroomhulk, a green mushroom-capped spore brute, rushing in on a cloud of spores, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo42` | Shroomhulk, a green mushroom-capped spore brute, scurrying away fast, one clear subject, no frame, no text, no |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo43` | Shroomhulk, a green mushroom-capped spore brute, with mushrooms growing rampantly over a building around it, o |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo44` | Shroomhulk, a green mushroom-capped spore brute, hugging a giant truffle, one clear subject, no frame, no text |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo45` | Shroomhulk, a green mushroom-capped spore brute, bellowing a blast of spores that pushes monsters back, one cl |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo46` | Shroomhulk, a green mushroom-capped spore brute, standing triumphant on a rooftop, one clear subject, no frame |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo47` | Shroomhulk, a green mushroom-capped spore brute, sitting on a throne of rotten logs, one clear subject, no fra |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo48` | Shroomhulk, a green mushroom-capped spore brute, wearing a fuzzy crown of mould in the city centre, one clear  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo51` | Magmaw, an orange-red lava crab monster with molten pincers, shedding a molten claw, one clear subject, no fra |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo52` | Magmaw, an orange-red lava crab monster with molten pincers, relaxing in a bubbling magma bath, one clear subj |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo53` | Magmaw, an orange-red lava crab monster with molten pincers, roaring a spray of lava, one clear subject, no fr |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo54` | Magmaw, an orange-red lava crab monster with molten pincers, melting and reshaping dice in its pincers, one cl |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo55` | Magmaw, an orange-red lava crab monster with molten pincers, sitting on a molten throne, one clear subject, no |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo56` | Magmaw, an orange-red lava crab monster with molten pincers, glaring with glowing lava eyes, one clear subject |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo57` | Magmaw, an orange-red lava crab monster with molten pincers, spitting fire, one clear subject, no frame, no te |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo58` | Magmaw, an orange-red lava crab monster with molten pincers, sweeping its pincers in a wide arc, one clear sub |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo61` | Boltbox, a blue runaway demolition robot monster, firing an overdrive blast, one clear subject, no frame, no t |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo611` | Bramblebat, a lime-green thorny bat-bush monster, regrowing from a tangle of bramble roots, one clear subject, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo612` | Bramblebat, a lime-green thorny bat-bush monster, sprouting fresh thorny wings after a fall, one clear subject |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo613` | Bramblebat, a lime-green thorny bat-bush monster, oozing glowing sap, one clear subject, no frame, no text, no |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo614` | Bramblebat, a lime-green thorny bat-bush monster, wrapped in three layers of bark armour, one clear subject, n |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo615` | Bramblebat, a lime-green thorny bat-bush monster, screeching under the full moon, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo616` | Bramblebat, a lime-green thorny bat-bush monster, shooting three thorns, one clear subject, no frame, no text, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo617` | Bramblebat, a lime-green thorny bat-bush monster, brooding on a branch in moonlight, one clear subject, no fra |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo618` | Bramblebat, a lime-green thorny bat-bush monster, hungrily eyeing a neon sign, one clear subject, no frame, no |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo62` | Boltbox, a blue runaway demolition robot monster, scanning another monster with a red scanning grid, one clear |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo621` | Cortexa, a pink brain-headed alien schemer monster, buying a brain spawn from a portal shop, one clear subject |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo622` | Cortexa, a pink brain-headed alien schemer monster, with a glowing cosmic brain full of stars, one clear subje |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo623` | Cortexa, a pink brain-headed alien schemer monster, radiating waves of big brain energy, one clear subject, no |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo624` | Cortexa, a pink brain-headed alien schemer monster, stepping through a rift portal, one clear subject, no fram |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo625` | Cortexa, a pink brain-headed alien schemer monster, with a cute parasite riding on its shoulder, one clear sub |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo626` | Cortexa, a pink brain-headed alien schemer monster, as hive queen with little minions bowing to it, one clear  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo627` | Cortexa, a pink brain-headed alien schemer monster, working puppet strings tied to other monsters, one clear s |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo628` | Cortexa, a pink brain-headed alien schemer monster, freezing another monster with a numbing stare, one clear s |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo63` | Boltbox, a blue runaway demolition robot monster, standing over wreckage with flashing warning lights, one cle |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo631` | Clampede, a teal clam-headed centipede monster, snapping its clam head out of an ambush, one clear subject, no |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo632` | Clampede, a teal clam-headed centipede monster, munching energy batteries, one clear subject, no frame, no tex |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo633` | Clampede, a teal clam-headed centipede monster, mutating inside a swirling portal, one clear subject, no frame |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo634` | Clampede, a teal clam-headed centipede monster, grabbing cards with its clam shell, one clear subject, no fram |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo635` | Clampede, a teal clam-headed centipede monster, curled up tight inside its hard shell, one clear subject, no f |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo636` | Clampede, a teal clam-headed centipede monster, chasing sparks, one clear subject, no frame, no text, no lette |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo637` | Clampede, a teal clam-headed centipede monster, jabbing with stinging legs, one clear subject, no frame, no te |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo638` | Clampede, a teal clam-headed centipede monster, running in a hundred-leg frenzy, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo64` | Boltbox, a blue runaway demolition robot monster, resting in a repair bay with giant wrenches, one clear subje |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo65` | Boltbox, a blue runaway demolition robot monster, blowing huge clouds of exhaust, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo66` | Boltbox, a blue runaway demolition robot monster, surrounded by an arcing electric shield, one clear subject,  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo67` | Boltbox, a blue runaway demolition robot monster, flexing sharp steel talons, one clear subject, no frame, no  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-evo68` | Boltbox, a blue runaway demolition robot monster, locking a target reticle onto another monster, one clear sub |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_alloy` | a chunky cartoon giant monster made of shifting liquid metal changing shape, one clear subject, no frame, no t |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_ances` | a ghostly elder monster spirit shielding a chunky cartoon giant monster, one clear subject, no frame, no text, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_bold` | a chunky cartoon giant monster charging recklessly headfirst at a tower, one clear subject, no frame, no text, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_cryst` | a geode cracking open with an explosive burst of crystal light, one clear subject, no frame, no text, no lette |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_earm` | a chunky cartoon giant monster in crackling electric plating absorbing a hit, one clear subject, no frame, no  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_gift` | a chunky cartoon giant monster opening a suspicious present that pops a spring boxing glove, one clear subject |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_legend` | a famous monster tracker in a hat with binoculars following giant footprints, one clear subject, no frame, no  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_maxe` | a chunky cartoon giant monster pushing with all its might against a skyscraper, sweating, one clear subject, n |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_mirac` | a battered chunky cartoon giant monster grabbing a glowing brain gadget as a last hope, one clear subject, no  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_offp` | a sneaky chunky cartoon giant monster launching a swarm of small attack drones, one clear subject, no frame, n |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_petal` | a venomous neon flower blossom spraying poison petals, one clear subject, no frame, no text, no letters, no nu |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_scept` | a chunky cartoon giant monster holding an occult rod glowing with purple runes, one clear subject, no frame, n |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_shell` | a chunky cartoon giant monster with a spiked shell carapace on its back, one clear subject, no frame, no text, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_spat` | a shadowy void stalker monster creeping forward with glowing eyes, one clear subject, no frame, no text, no le |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_strange` | a chunky cartoon giant monster scratching its head over a glowing blueprint of a weird contraption, one clear  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_trap` | a trapper monster loaded with nets, hooks and gear, taking aim, one clear subject, no frame, no text, no lette |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_treas` | a chunky cartoon giant monster digging a buried treasure chest out of the rubble, one clear subject, no frame, |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_unrel` | a chunky cartoon giant monster peering through a wobbly crooked targeting scope, one clear subject, no frame,  |
-| Wave 2 Wave 2 power cards B (16:9) | `pc-m_whip` | a chunky cartoon giant monster cracking a crackling electric whip, one clear subject, no frame, no text, no le |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of glossy dark-purple enamel with a chrome outline and a tiny curl at one cor |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of glossy dark-purple enamel with a chrome outline, single object, cen |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream enamel with a chrome |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, hot-orange enamel with a c |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, electric-violet enamel wit |
-| Wave 4 Wave 4 kit | `ui-panel` | a glossy dark-purple enamel panel with ornate chrome corners and a thin chrome border, the whole centre plain  |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of glossy dark-purple enamel with a thin chrome edge and a small neon magenta diamond at th |
+Still not loaded by the page (13 files; each needs a design decision, not just a hook):
+
+| File | Why left |
+|---|---|
+| `icon-crown` | no crown glyph slot yet (Downtown 👑 is text in the chip name) |
+| `ui-hud-chip` | chip text is read by the sweep; needs a 9-slice behind the existing chip |
+| `ui-dice-tray` | dock tray is the shared kit panel; needs a 9-slice rule |
+| `ui-button-ghost/pink/yellow` | no button variant uses them (cream/go/power cover all current buttons) |
+| `ui-bubble-tail` | coach bubble uses ui-bubble without a tail |
+| `back-brass-beetle`, `back-bulletin` | no face-down card is shown anywhere |
+| `token-{energy,heart,star}.glb` (+ `*-lite.glb`, `@512`) | 3D pick-ups not hooked into the fx fly |
+| 3 evolution paintings (`evo*`) | evolutions render as text rows |
 
 ## sands-of-qamar
 
@@ -338,48 +150,7 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 
 ## rampart-and-vine
 
-3D: piece-champ, piece-hog, piece-mason, piece-meeple
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `icon-follower` | a small hand-painted icon of a chunky wooden meeple, bold, readable at 24 px, single object, centred, plain fl |
-| Wave 1 Wave 1 | `icon-score` | a small hand-painted icon of a stone shield wrapped in a vine laurel, bold, readable at 24 px, single object,  |
-| Wave 1 Wave 1 | `icon-tile` | a small hand-painted icon of a square land tile with a green field and a road, seen from above, bold, readable |
-| Wave 1 Wave 1 | `piece-champ-blue` | a chunky painted wooden knight champion game piece in solid blue, front view, single object, centred, plain fl |
-| Wave 1 Wave 1 | `piece-champ-green` | a chunky painted wooden knight champion game piece in solid green, front view, single object, centred, plain f |
-| Wave 1 Wave 1 | `piece-champ-red` | a chunky painted wooden knight champion game piece in solid red, front view, single object, centred, plain fla |
-| Wave 1 Wave 1 | `piece-champ-yellow` | a chunky painted wooden knight champion game piece in solid yellow, front view, single object, centred, plain  |
-| Wave 1 Wave 1 | `piece-hog-blue` | a chunky painted wooden little pig game piece in solid blue, front view, single object, centred, plain flat wh |
-| Wave 1 Wave 1 | `piece-hog-green` | a chunky painted wooden little pig game piece in solid green, front view, single object, centred, plain flat w |
-| Wave 1 Wave 1 | `piece-hog-red` | a chunky painted wooden little pig game piece in solid red, front view, single object, centred, plain flat whi |
-| Wave 1 Wave 1 | `piece-hog-yellow` | a chunky painted wooden little pig game piece in solid yellow, front view, single object, centred, plain flat  |
-| Wave 1 Wave 1 | `piece-mason-blue` | a chunky painted wooden mason with a trowel game piece in solid blue, front view, single object, centred, plai |
-| Wave 1 Wave 1 | `piece-mason-green` | a chunky painted wooden mason with a trowel game piece in solid green, front view, single object, centred, pla |
-| Wave 1 Wave 1 | `piece-mason-red` | a chunky painted wooden mason with a trowel game piece in solid red, front view, single object, centred, plain |
-| Wave 1 Wave 1 | `piece-mason-yellow` | a chunky painted wooden mason with a trowel game piece in solid yellow, front view, single object, centred, pl |
-| Wave 1 Wave 1 | `piece-meeple-blue` | a chunky painted wooden meeple follower game piece in solid blue, front view, single object, centred, plain fl |
-| Wave 1 Wave 1 | `piece-meeple-green` | a chunky painted wooden meeple follower game piece in solid green, front view, single object, centred, plain f |
-| Wave 1 Wave 1 | `piece-meeple-red` | a chunky painted wooden meeple follower game piece in solid red, front view, single object, centred, plain fla |
-| Wave 1 Wave 1 | `piece-meeple-yellow` | a chunky painted wooden meeple follower game piece in solid yellow, front view, single object, centred, plain  |
-| Wave 1 Wave 1 | `ui-rotate-btn` | a round oak button with a carved curved arrow going round, iron rim, single object, centred, plain flat white  |
-| Wave 1 Wave 1 | `ui-trophy` | a small silver goblet with a vine wrapped around it, single object, centred, plain flat white background, no s |
-| Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank green-and-gold ribbon banner, centre empty, single object, centred, plain flat white background, no sh |
-| Wave 1 Wave 1 (16:9) | `ui-score-pill` | a blank wooden name-peg plaque with a small shield on the left, single object, centred, plain flat white backg |
-| Wave 1 Wave 1 (16:9) | `ui-tray` | a shallow oak tray with a leather lining and rope handles at the sides, seen from above, empty, single object, |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of parchment with a grey stone outline and a tiny curl at one corner, single  |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of parchment with a grey stone outline, single object, centred, plain  |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream with a grey stone ri |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, terracotta with a grey sto |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, meadow-green with a grey s |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of carved oak with a vine inlay with a grey stone edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round grey stone button with a vine green ring, centre empty, single object, centred, plain flat white |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round grey stone medallion with a vine green ring, centre blank, larger with a small crown on top, single ob |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round grey stone medallion with a vine green ring, centre blank, with a small laurel at the bottom, single o |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round grey stone medallion with a vine green ring, centre blank, dull and darkened with a small padlock at t |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round grey stone medallion with a vine green ring, centre blank, bright and polished, single object, centred |
-| Wave 4 Wave 4 kit | `ui-panel` | a parchment panel with ornate grey stone corners and a thin grey stone border, the whole centre plain and empt |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of parchment with a thin grey stone edge and a small vine green diamond at the left end, ce |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of carved oak with a vine inlay, seamless left to right, empty, no text |
+WIRED and live 13 Oct 2026 (all 2D files: per-colour pieces, icons, score pill, tray, rotate button, ribbon, trophy, Wave 4 kit). 3D models: other worker.
 
 ## shipwreck-isle
 
@@ -701,32 +472,7 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 
 ## mainhattan-nightrun
 
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of smoked glass with a dark chrome outline and a tiny curl at one corner, sin |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of smoked glass with a dark chrome outline, single object, centred, pl |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale cyan with a dark chro |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, magenta with a dark chrome |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep indigo with a dark ch |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of a dark chrome strip with a thin cyan light line with a dark chrome edge line, seamless left to righ |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round dark chrome button with a magenta ring, centre empty, single object, centred, plain flat white b |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round dark chrome medallion with a magenta ring, centre blank, larger with a small crown on top, single obje |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round dark chrome medallion with a magenta ring, centre blank, with a small laurel at the bottom, single obj |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round dark chrome medallion with a magenta ring, centre blank, dull and darkened with a small padlock at the |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round dark chrome medallion with a magenta ring, centre blank, bright and polished, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-panel` | a smoked glass panel with ornate dark chrome corners and a thin dark chrome border, the whole centre plain and |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of smoked glass with a thin dark chrome edge and a small magenta diamond at the left end, c |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of a dark chrome strip with a thin cyan light line, seamless left to right, empty, no text |
-| Wave 5 Wave 5 | `ui-touch-dash` | a round glowing neon push-button with a double-chevron dash symbol, single object, centred, plain flat white b |
-| Wave 5 Wave 5 | `ui-touch-emp` | a round glowing neon push-button with a pulse-ring symbol, single object, centred, plain flat white background |
-| Wave 5 Wave 5 | `ui-touch-pause` | a round glowing neon push-button with a pause symbol, single object, centred, plain flat white background, no  |
-| Wave 5 Wave 5 (16:9) | `ui-btn-cyan` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-btn-pink` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-btn-violet` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-hud-bars` | a slim dark sci-fi gauge housing with a neon cyan trim and four empty horizontal channels stacked, wide and sh |
-| Wave 5 Wave 5 (16:9) | `ui-hud-mult` | a small dark sci-fi plate with a glowing magenta trim, wider than tall, centre empty, single object, centred,  |
+All painted files in media/ are now loaded by the live page (J2 wired the 22 UI kit files).
 
 ## short-fuse
 

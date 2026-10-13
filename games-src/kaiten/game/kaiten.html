@@ -5389,6 +5389,9 @@ function tableCSS(mood) {
 function applyTable(el, mood) { if (!el || !el.style) return; el.style.background = tableCSS(mood) + ' 0 0/auto,120px 120px'; el.style.backgroundColor = mood === 'night' ? '#3a231d' : '#efdcb8'; }
 
 // ---------------------------------------------------------------- cloche (dome lid), same aspect as a card (1 : 1.4)
+// the 3D brass cloche (sprite rendered from the full-detail model); the drawn SVG stays on Low graphics and if the file is missing
+function clocheLow() { try { return typeof gfxPref === 'function' && gfxPref() === 'low'; } catch (e) { return false; } }
+function clocheImg(o) { o = o || {}; const w = o.w || 100; if (clocheLow()) return K.clocheSVG(o); return `<img class="kk-c3" src="models/cloche${w <= 300 ? '@512' : ''}.webp" alt="" draggable="false" decoding="async" style="width:100%;height:100%;object-fit:contain;display:block" onerror="this.outerHTML=window.KIT&&KIT.clocheSVG?KIT.clocheSVG({w:${w}}):''">`; }
 function clocheSVG(o) {
   o = o || {}; const w = o.w || 100, H = Math.round(w * 1.4);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-cloche-svg" width="${w}" height="${H}" viewBox="0 0 100 140" role="img" aria-label="Covered plate">`;
@@ -5402,7 +5405,7 @@ function clocheSVG(o) {
   return s + '</svg>';
 }
 
-K.beltSegmentSVG = beltSegmentSVG; K.beltCSS = beltCSS; K.beltEl = beltEl; K.counterSVG = counterSVG; K.tableTile = tableTile; K.tableCSS = tableCSS; K.applyTable = applyTable; K.clocheSVG = clocheSVG; K.dataURL = dataURL;
+K.beltSegmentSVG = beltSegmentSVG; K.beltCSS = beltCSS; K.beltEl = beltEl; K.counterSVG = counterSVG; K.tableTile = tableTile; K.tableCSS = tableCSS; K.applyTable = applyTable; K.clocheSVG = clocheSVG; K.clocheImg = clocheImg; K.clocheLow = clocheLow; K.dataURL = dataURL;
 })(typeof window !== 'undefined' ? window : globalThis);
 /* p6: chef avatars + seats, public API (KKKit), CSS, DOM helpers, cloche reveal */
 (function (root) {
@@ -5538,7 +5541,7 @@ function clocheOn(host, o) {
   if (!doc || !host) return { el: null, lift: () => Promise.resolve(), remove() {} };
   if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
   const c = doc.createElement('div'); c.className = 'kk-cloche';
-  c.innerHTML = `<div class="kk-lidwrap" style="position:absolute;inset:0;transform-origin:50% 100%">${K.clocheSVG({ w: 100 }).replace(/width="100" height="140"/, 'width="100%" height="100%"').replace('viewBox', 'preserveAspectRatio="none" viewBox')}</div>`;
+  c.innerHTML = `<div class="kk-lidwrap" style="position:absolute;inset:0;transform-origin:50% 100%">${K.clocheLow() ? K.clocheSVG({ w: 100 }).replace(/width="100" height="140"/, 'width="100%" height="100%"').replace('viewBox', 'preserveAspectRatio="none" viewBox') : K.clocheImg({ w: 100 })}</div>`;
   host.appendChild(c);
   const lift = (lo) => {
     lo = lo || {}; const delay = lo.delay || 0;
@@ -5562,7 +5565,7 @@ const API = {
   beltSegmentSVG: K.beltSegmentSVG, beltCSS: K.beltCSS, beltEl: K.beltEl, counterSVG: K.counterSVG,
   avatarSVG, seatSVG, iconSVG: K.iconSVG, iconNames: K.ICON_NAMES, iconLabel: K.ICON_LABEL, ruleIcon: t => (TYPES[t] || {}).rule,
   roundMarkerSVG: K.roundMarkerSVG, roundTrackSVG: K.roundTrackSVG, scorePadSVG: K.scorePadSVG,
-  clocheSVG: K.clocheSVG, clocheOn, revealAll,
+  clocheSVG: K.clocheSVG, clocheImg: K.clocheImg, clocheOn, revealAll,
   tableCSS: K.tableCSS, applyTable: K.applyTable,
   mount, css: () => CSS, defs: K.defs, el, cardEl, cardURL, cardImg, backURL, drawCard, dataURL: K.dataURL,
   name: t => (TYPES[t] || {}).name, ruleText: t => (TYPES[t] || {}).ruleText, color: t => (TYPES[t] || {}).c
@@ -7115,7 +7118,7 @@ function pudStand(s) {
 function slotEl(s, sl, cmp) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots;
   const box = h('div.sbox'), wrap = h('div.slot', box);
-  const cover = () => { box.innerHTML = KIT.clocheSVG({ w: sl }); };
+  const cover = () => { box.innerHTML = KIT.clocheImg({ w: sl }); box.firstChild && box.firstChild.style && (box.firstChild.style.width = sl + 'px', box.firstChild.style.height = Math.round(sl * 1.2) + 'px'); };
   if (fz) {
     const m = fz[s];
     if (m && m.mode === 'cover') { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
