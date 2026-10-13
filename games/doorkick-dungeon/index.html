@@ -1009,6 +1009,38 @@ html.ph-l .mine .hand .card.bf-picked{translate:0 -30px!important}
 /* an open drawer (diary, cards, menu) sits over the board: the board under it takes no taps and shows no glowing targets */
 html:has(.gx-drawer.on) .gx-main{pointer-events:none}
 
+/* ---- fight numbers: one big scoreline across the top of the fight (YOU 9 vs 13 MONSTERS) ---- */
+.arena:has(>.sline){padding-top:78px}
+.arena .sline{position:absolute;top:2px;left:0;right:0;z-index:6;display:grid;justify-items:center;gap:0;pointer-events:none}
+.sline .sl1{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,22px);padding:2px 22px 3px;border-radius:18px;background:rgba(18,8,3,.86);box-shadow:0 0 0 2px #0d0603,0 3px 0 rgba(0,0,0,.5)}
+.sline .sy,.sline .sm{position:relative;display:flex;align-items:baseline;gap:8px}
+.sline .sl1 i{font:700 .9rem/1 var(--title);font-style:normal;letter-spacing:.08em;color:#f3e3c0}
+.sline .n{font:900 clamp(40px,4.6vw,56px)/1 var(--title);font-variant-numeric:tabular-nums;color:#fff;-webkit-text-stroke:2px #0d0603;paint-order:stroke fill;text-shadow:0 3px 0 #0d0603;min-width:1.1em;text-align:center}
+.sline .sy .n{color:#8fd7ff}.sline .sm .n{color:#ff9d88}
+.sline.win .sy .n{color:#9dff8a;text-shadow:0 0 14px rgba(120,255,110,.7),0 3px 0 #0d0603}
+.sline.lose .sm .n{color:#ff6a55;text-shadow:0 0 14px rgba(255,80,60,.7),0 3px 0 #0d0603}
+.sline.lose .sy .n{color:#ff8a7a}
+.sline .sv{font:800 1.1rem var(--title);color:#e6c677}
+.sline .sd{margin-top:2px;padding:0 12px;border-radius:99px;font:800 1rem/1.35 var(--title);background:rgba(18,8,3,.86);color:#f3e3c0;box-shadow:0 0 0 1.5px #0d0603}
+.sline.win .sd{color:#9dff8a}.sline.lose .sd{color:#ff9d88}
+.fxfly{position:absolute;left:50%;top:0;font:900 1.9rem/1 var(--title);-webkit-text-stroke:2px #0d0603;paint-order:stroke fill;pointer-events:none;white-space:nowrap;z-index:7}
+.fxfly.up{color:#9dff8a}.fxfly.dn{color:#ff8a7a}
+.arena .vs .score .num{display:none}
+.arena .vs .score{padding:3px 8px}
+.arena .mon>.small.mstr{font:800 1.15rem/1.1 var(--title);color:#fff;-webkit-text-stroke:1.5px #0d0603;paint-order:stroke fill;text-shadow:0 2px 0 #0d0603}
+.arena .mon .card .tag{transform:scale(1.4);transform-origin:top left}
+.arena .mon .gchip{min-height:40px;font-size:.95rem;font-weight:800}.arena .mon .gchip b{font-size:1.15rem}
+html.ph .arena:has(>.sline){padding-top:60px}
+html.ph .sline .n{font-size:clamp(32px,9vw,40px);-webkit-text-stroke:1.5px #0d0603}
+html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.7rem}
+html.ph .sline .sd{font-size:.82rem;line-height:1.25}
+html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:15px}
+html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
+@media (max-height:600px){html.ph .arena:has(>.sline){padding-top:56px}html.ph .sline .n{font-size:32px}}
+html .arena .vs .score .num{display:none!important}
+html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.58rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
+html.ph .sline .n{min-width:.9em}
+
 </style>
 <style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
@@ -4895,7 +4927,12 @@ const GFX=(function(){
     if(!prev||prev.k!==k||!motion())return;
     const pop=(sel,d)=>{if(!d)return;const s=v.querySelector(sel);if(!s)return;const n=s.querySelector('.num');if(n)n.animate([{transform:'scale(1)'},{transform:'scale(1.5)',offset:.4},{transform:'scale(1)'}],{duration:520,easing:'cubic-bezier(.2,1.8,.4,1)'});
       const f=document.createElement('span');f.className='fxdelta '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);setTimeout(()=>f.remove(),1150)};
-    pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b)}
+    pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b);
+    // the big scoreline: a +N flies into the total and the number counts up to it
+    [['.sy',a,prev.a],['.sm',b,prev.b]].forEach(([sel,to,from])=>{const d=to-from;if(!d)return;const s=v.parentNode.querySelector('.sline '+sel);if(!s)return;const n=s.querySelector('.n');if(!n)return;
+      n.textContent=from;const f=document.createElement('span');f.className='fxfly '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);
+      f.animate([{transform:'translate(-50%,70px) scale(1.7)',opacity:0},{transform:'translate(-50%,30px) scale(1.7)',opacity:1,offset:.25},{transform:'translate(-50%,-4px) scale(.9)',opacity:1,offset:.85},{transform:'translate(-50%,-4px) scale(.6)',opacity:0}],{duration:760,easing:'ease-in'}).onfinish=()=>f.remove();
+      const t0=performance.now(),T=420,D=520;const step=t=>{const q=Math.min(1,Math.max(0,(t-t0-D)/T));n.textContent=Math.round(from+(to-from)*q);if(q<1)requestAnimationFrame(step);else n.animate([{transform:'scale(1)'},{transform:'scale(1.35)',offset:.4},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.2,1.8,.4,1)'})};requestAnimationFrame(step)})}
   function init(){if(!HAS_DOM)return;textures();apply(load());
     perf();
     try{addEventListener('resize',()=>{sizeEmbers();if(auto){const v=autoPick();if(v!==level&&!(v==='high'&&level!=='high'))apply(v)}})}catch(e){}
@@ -6551,7 +6588,10 @@ function arenaHTML(){const cb=G.cb;
   cb.os.forEach(o=>chips.push(`<span class="chip">${esc(cname(o.id))} (${o.side==='p'?'heroes':'monsters'})</span>`));
   const wt=winThreat(cb);if(wt)chips.unshift(`<span class="chip wchip">${isMe(wt.who)?'🏆 This fight wins you the game!':'⚠ This fight wins '+esc(f.nm)+' the game!'}</span>`);
   const hn=`${nmY(f.i)}${h?' + '+nmY(h.i):''}`;const en=animOnce(cb.who+'-'+(cb.mons[0]?cb.mons[0].id:'x'),'enter');
-  return `<div class="vs clash" data-k="${G.turn}:${cb.who}" data-a="${a}" data-b="${b}" role="group" aria-label="${hn}: ${a} versus the monsters: ${b}"><span class="score hero ${win?'win':'lose'} ${en}"><span class="hsav">${typeof bfAv==='function'?bfAv(f,'hsavi')+(h?bfAv(h,'hsavi h2'):''):''}</span><b class="num">${a}</b><span class="sl">${hn}</span></span><span class="vsx ${en}" aria-hidden="true">${ic('swords')}</span><span class="score mons ${win?'lose':'win'} ${en}"><span class="sl">Monsters</span><b class="num">${b}</b></span></div>
+  const dlt=a-b,ymine=isMe(f.i)&&f.human,yn=ymine?'YOU':esc(f.nm.split(/[ ,]/)[0].toUpperCase());
+  const dtxt=win?(dlt>0?'+'+dlt+': you win':'Tied: a Warrior wins ties'):'−'+Math.abs(dlt)+(ymine?': need help or run':': monsters win');UI.arRes+=document.documentElement.classList.contains('ph')?0:56;
+  const sline=`<div class="sline ${win?'win':'lose'}" aria-hidden="true"><div class="sl1"><span class="sy"><i>${yn}${h?' +1':''}</i><b class="n" data-v="${a}">${a}</b></span><span class="sv">vs</span><span class="sm"><b class="n" data-v="${b}">${b}</b><i>MONSTERS</i></span></div><div class="sd">${dtxt}</div></div>`;
+  return `${sline}<div class="vs clash" data-k="${G.turn}:${cb.who}" data-a="${a}" data-b="${b}" role="group" aria-label="${hn}: ${a} versus the monsters: ${b}"><span class="score hero ${win?'win':'lose'} ${en}"><span class="hsav">${typeof bfAv==='function'?bfAv(f,'hsavi')+(h?bfAv(h,'hsavi h2'):''):''}</span><b class="num">${a}</b><span class="sl">${hn}</span></span><span class="vsx ${en}" aria-hidden="true">${ic('swords')}</span><span class="score mons ${win?'lose':'win'} ${en}"><span class="sl">Monsters</span><b class="num">${b}</b></span></div>
    <div class="row mons" style="--n:${cb.mons.length}">${cb.mons.map((m,j)=>`<div class="mon">${cardHTML(m.like!=null?m.like:m.id,{cls:animOnce(m.like!=null?m.like:m.id,'fly')})}<span class="small mstr">${m.like!=null?'the date · ':''}strength ${mStr(m,cb)}</span>${m.enh.length?`<div class="row" style="gap:4px">${m.enh.map(e=>{const c=cd(e);return `<button class="gchip door" data-card="${e}" aria-label="${esc(c.n)}: ${esc(c.x||'')}">${esc(c.n)} <b>${c.b>0?'+':''}${c.b}</b></button>`}).join('')}</div>`:''}</div>`).join('')}</div>
    ${chips.length?(UI.arRes+=30,`<div class="row small" style="gap:4px">${chips.join('')}</div>`):''}${rollHTML()}${fightBtns(cb)}`}
 function runShort(cb,me){try{const o=runOdds(P(me),cb);return o.all===0?' (no chance)':o.all===1?' (sure)':' '+pct(o.all)}catch(e){return ''}}

@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Fight numbers you can read",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals."
+  ],
+  "check": "Kick open a door and fight a monster"
+ },
+ {
+  "date": "2026-10-13",
   "game": "kaiten-kitchen",
   "title": "Kaiten Kitchen: painted chef tags and icons",
   "items": [
@@ -45,20 +60,6 @@
    "Bid chips 13 px"
   ],
   "check": "sweep 4/4 clean, no empty or clipped button labels"
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Buttons readable again",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut"
-  ],
-  "check": "tutor-test 390x763 + 1280x800 and button label/contrast check pass"
  },
  {
   "date": "2026-10-13",
