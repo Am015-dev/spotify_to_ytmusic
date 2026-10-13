@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-13",
+  "game": "hollowbough",
+  "title": "Painted art wired",
+  "items": [
+   "Painted resource icons, season wheel and kit"
+  ],
+  "check": "Are the resource icons painted?",
+  "scn": [
+   "hb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "cauldron",
   "title": "Readable chip numbers",
   "items": [
