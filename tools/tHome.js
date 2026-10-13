@@ -35,6 +35,10 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  let s=await st();ok(s.cur==='rod'&&s.ok&&!s.nb&&await vis('#tN'),tag+' start: Hot Rod (sports) has BOOST, button shown',s);
  // drive a few seconds so the start shot is mid-road with the HUD settled
  await down('gas',await center('#tG'));await tick(150);await up('gas');await tick(30);await add('Sports car HUD with BOOST','1_sports_boost');
+ // a new save starts in the intro event (Home is hidden during events): abandon it from the pause menu, like a player
+ await tap('#tP');await tick(10);if(await vis('#roamPause [data-p="eva"]')){await tap('#roamPause [data-p="eva"]');await tick(20);for(const sel of['#qAbn','.qvYes','#roamCard .go']){if(await vis(sel)){await tap(sel);await tick(20)}}await through();await tick(60)}
+ if(await vis('#roamPause'))await tap('#roamPause [data-p="resume"]');await tick(20);
+ console.log(tag,'event after abandon',await ev('JSON.stringify({ch:!!RO.ch,sp:!!RO.sp,card:!!RO.card})'));
  // pause → HOME
  await tap('#tP');await tick(10);ok(await vis('#roamPause [data-p="home"]'),tag+' pause menu has 🏠 HOME');await add('Pause menu: 🏠 HOME','2_pause_home');
  await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(20);if(!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(40);await through();
@@ -50,7 +54,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  // stored cars, a low side view along the façade (camera set for the shot only)
  const camShot=async(lab,name)=>{await G.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1);__oc.ev(`(()=>{const Q=__hm.slots(),m=__hm.mark();if(!Q.length)return;const cx=(Q[0][0]+Q[1][0])/2,cz=Q[0][1];const gy=groundY(cx,cz);camera.position.set(cx-6,gy+4.5,cz-26);camera.lookAt(cx,gy+1.5,cz);__dbg.composer.render()})()`)});
   const f2=path.join(OUT,`${tag}_${name}.jpg`);await p.screenshot({path:f2,type:'jpeg',quality:72});S.push(lab+'='+f2);await G.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})};
- const pk=await ev('JSON.stringify({n:HM.P.length,ids:HM.P.map(g=>g.userData.hmId),y:HM.P.map(g=>{const b=new THREE.Box3().setFromObject(g);return [+(b.min.y-groundY(g.position.x,g.position.z)).toFixed(3),+(b.max.x-b.min.x).toFixed(2),+(b.max.y-b.min.y).toFixed(2),+(b.max.z-b.min.z).toFixed(2)]})})');
+ const pk=await ev('JSON.stringify({n:HM.P.length,ids:HM.P.map(g=>g.userData.hmId),pl:(()=>{const b=HM_box(pl.mesh);return [+(b.max.x-b.min.x).toFixed(2),+(b.max.y-b.min.y).toFixed(2),+(b.max.z-b.min.z).toFixed(2)]})(),y:HM.P.map(g=>{const b=HM_box(g);return [+(b.min.y-groundY(g.position.x,g.position.z)).toFixed(3),+(b.max.x-b.min.x).toFixed(2),+(b.max.y-b.min.y).toFixed(2),+(b.max.z-b.min.z).toFixed(2)]})})');
  ok(JSON.parse(pk).n>=2,tag+' stored cars parked at Home',JSON.parse(pk));await camShot('Home garage with stored cars','5_home_cars');
  // card → garage
  const cardBtns=await G.evaluate(()=>[...document.querySelectorAll('#roamCard button')].filter(b=>b.offsetWidth).map(b=>(b.id||'')+':'+b.textContent.trim().slice(0,30)));console.log(tag,'card buttons',cardBtns);

@@ -40,10 +40,12 @@ function HM_slots(){const L=typeof LM_BY!=='undefined'&&LM_BY[CID==='ath'?'Garaz
  return[[L.x-X[0],z],[L.x+X[0],z],[L.x-X[1],z],[L.x+X[1],z]]}
 function HM_carMesh(S){const B=G9C_bricks(S,'car'),t=Object.assign({},gbTeam(TEAMS[teamIdx]||TEAMS[0],GB.d||null),{gbB:B,gbF:null,gbP:1}),g=shipMesh(t),U=g.userData;
  for(const k of['boat','shield','flares','under'])if(U[k])U[k].visible=false;for(const rb of U.ribbons||[])rb.visible=false;try{SC_ship(g,false)}catch(e){}return g}
+// box of the visible meshes only (the hidden shield / boat would put the car in the air)
+function HM_box(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
 function HM_clear(){for(const o of HM.P){o.parent&&o.parent.remove(o);o.traverse(m=>{if(m.isMesh&&m.geometry&&!m.userData.gbc&&!m.userData.keep)m.geometry.dispose()})}HM.P=[]}
 function HM_build(){if(!RO.on||!RO.grp)return;const L=HM_parkList(),sig=CID+'|'+L.join(',');if(sig===HM.sig&&HM.P.length)return;HM.sig=sig;HM_clear();const Q=HM_slots();
  L.forEach((id,i)=>{const q=Q[i];if(!q)return;try{const g=HM_carMesh(GAR_set(id));const y=groundY(q[0],q[1]);g.position.set(q[0],y,q[1]);g.rotation.y=Math.PI;g.updateMatrixWorld(true);
-  const bb=new THREE.Box3().setFromObject(g);if(Number.isFinite(bb.min.y))g.position.y+=y-bb.min.y;g.userData.hmId=id;RO.grp.add(g);HM.P.push(g)}catch(e){console.warn('HM car',id,e)}})}
+  const bb=HM_box(g);if(Number.isFinite(bb.min.y))g.position.y+=y-bb.min.y;g.userData.hmId=id;RO.grp.add(g);HM.P.push(g)}catch(e){console.warn('HM car',id,e)}})}
 // ---- pause menu: 🏠 HOME fast travel
 {const g=document.querySelector('#roamPause .pg'),q=g&&g.querySelector('[data-p="garage"]');if(g){const b=document.createElement('button');b.dataset.p='home';b.textContent='🏠 HOME';
   b.addEventListener('click',()=>{try{AU.sfx('pick')}catch(e){}const m=HM_mark();roamPauseClose();if(m)fastTravel(m)});g.insertBefore(b,q||null)}}
@@ -66,4 +68,4 @@ body.hmNoB:not(.onfoot) #tN,body.hmNoB #artBoost{display:none!important}
 .garSt .hmNit em{color:#ffd400}
 #gbBody .hmKit{display:block;width:100%;margin:6px 0;text-align:left;background:#ffd400;color:#141413}#gbBody .hmKit[disabled]{opacity:.6;background:#fff}
 #gbBody .hmKit b{font-size:14px}#gbBody .hmKit small{display:block;font-size:12px}`;document.head.appendChild(s)}
-window.__hm={HM,ok:HM_ok,sport:HM_sport,cur:HM_curSet,mark:HM_mark,save:HM_save,park:HM_parkList,slots:HM_slots,build:HM_build,kits:HM_kits};
+window.__hm={HM,box:HM_box,ok:HM_ok,sport:HM_sport,cur:HM_curSet,mark:HM_mark,save:HM_save,park:HM_parkList,slots:HM_slots,build:HM_build,kits:HM_kits};
