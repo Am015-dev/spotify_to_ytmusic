@@ -31,7 +31,12 @@ function slot(){
   if(G.over)return[humanWon()?'victory':'defeat',1];
   if(!UI.tut&&((UI.cmp&&UI.cmp.boss)||G.round>=5))return['fight',0];
   return['main',0]}
+// painted board pieces: each flag turns its drawing on once the file loaded, then the board is drawn again
+function sgPaint(){const want={kiln:['kiln-disc'],kilne:['kiln-disc-empty'],pool:['pool-oval'],rack:['ui-rack-cell'],floor:['ui-floor-cell'],wall:['ui-wall-cell'],sun:['token-sun'],gloss:['tile-gloss']};
+  Object.keys(want).forEach(k=>pre(want[k][0],()=>{if(typeof SGK==='undefined'||SGK[k])return;SGK[k]=1;clearTimeout(sgPaint.t);sgPaint.t=setTimeout(()=>{try{if(typeof G!=='undefined'&&G)render()}catch(e){}},60)}))}
 function boot(){
+  try{GXSK.init({sets:{'sk-cells':['ui-rack-cell','ui-floor-cell','ui-wall-cell']}})}catch(e){}
+  sgPaint();
   try{GXMUS.init({key:'sgz',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}

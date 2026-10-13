@@ -29,7 +29,12 @@ const MOTIF=[
 // SVG <symbol>s for every glaze, and a tile at (x,y) of size s
 function glazeDefs(){return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${MOTIF.map((m,k)=>`<symbol id="gz${k}" viewBox="0 0 100 100"><rect width="100" height="100" rx="12" fill="${TBASE[k]}"/>${m.map(p=>`<path d="${p.d}" fill="${p.f}"${p.a?` opacity="${p.a}"`:''}/>`).join('')}<rect x="3" y="3" width="94" height="94" rx="10" fill="none" stroke="${TRIM[k]}" stroke-width="5"/><path d="M8 14Q12 8 22 8H60" stroke="#fff" stroke-opacity=".45" stroke-width="4" fill="none" stroke-linecap="round"/></symbol>`).join('')}
   <symbol id="gzsun" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#f6c84c" stroke="#a8661a" stroke-width="5"/><path d="${rays(50,50,12,22,42,5)}" fill="#e07a1f"/><circle cx="50" cy="50" r="20" fill="#ffe7a0" stroke="#a8661a" stroke-width="3"/><text x="50" y="58" text-anchor="middle" font-size="24" font-weight="700" fill="#8a4a10">1</text></symbol></defs></svg>`}
-function tileSVG(k,x,y,s,extra){return `<use href="#${k===SUN?'gzsun':'gz'+k}" x="${x}" y="${y}" width="${s}" height="${s}"${extra||''}/>`}
+// painted pieces (media/*.webp) switch themselves on once loaded: SGK.rack / floor / wall (cells), kiln / kilne (plates), pool, sun, gloss; the drawn shapes stay as the fallback
+const SGK={};
+const SGI=(f,x,y,w,h,ex)=>`<image href="media/${f}.webp" x="${x}" y="${y}" width="${w}" height="${h||w}" preserveAspectRatio="${ex||'xMidYMid meet'}" pointer-events="none"/>`;
+const SGC=(kind,x,y,fb)=>SGK[kind]?SGI('ui-'+kind+'-cell',x,y,100,100,'none'):fb;
+function tileSVG(k,x,y,s,extra){if(k===SUN&&SGK.sun)return SGI('token-sun',x,y,s,s);
+  return `<use href="#${k===SUN?'gzsun':'gz'+k}" x="${x}" y="${y}" width="${s}" height="${s}"${extra||''}/>`+(SGK.gloss&&!extra&&k!==SUN?`<image href="media/tile-gloss.webp" x="${x}" y="${y}" width="${s}" height="${s}" style="mix-blend-mode:screen;opacity:.5" pointer-events="none"/>`:'')}
 function tileChip(k,n){return `<span class="tchip"><svg viewBox="0 0 100 100" width="22" height="22" aria-hidden="true"><use href="#${k===SUN?'gzsun':'gz'+k}"/></svg>${n!=null?`<b>×${n}</b>`:''}</span>`}
 // paint a glaze onto a 2D canvas (3D textures); alpha for ghost prints on the mosaic
 function paintGlaze(x,k,px,py,s,alpha){x.save();x.translate(px,py);x.scale(s/100,s/100);x.globalAlpha=alpha==null?1:alpha;

@@ -46,11 +46,11 @@ const phHold=()=>(PHN.on&&!NET.on&&!!PHN.sum)||(typeof bfHold==='function'&&bfHo
 // racks + mosaic + breakage in one picture (viewBox 1076 x 624); used by the strip and the board pop-up
 function phBoardSVG(p,o){o=o||{};const U=100,X0=44,XW=X0+5*U+36;let s='';
   for(let r=0;r<5;r++){const y=r*U;s+=`<text x="20" y="${y+66}" font-size="46" font-weight="800" fill="#7a3d14" text-anchor="middle">${r+1}</text>`;
-    for(let k=0;k<cap(r);k++){const x=X0+(4-k)*U;const t=p.lines[r][k];s+=`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`;if(t!=null)s+=tileSVG(t,x+5,y+5,90)}
+    for(let k=0;k<cap(r);k++){const x=X0+(4-k)*U;const t=p.lines[r][k];s+=`${SGC('rack',x,y,`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`)}`;if(t!=null)s+=tileSVG(t,x+5,y+5,90)}
     s+=`<path d="M${X0+5*U+8} ${y+30}L${X0+5*U+30} ${y+50}L${X0+5*U+8} ${y+70}Z" fill="#8a5a2b" opacity=".6"/>`;
-    for(let c=0;c<5;c++){const x=XW+c*U,v=p.wall[r][c];s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>${tileSVG(WALLC(r,c),x+14,y+14,72,' opacity=".13"')}`;
+    for(let c=0;c<5;c++){const x=XW+c*U,v=p.wall[r][c];s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`${SGC('wall',x,y,`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>`)}${tileSVG(WALLC(r,c),x+14,y+14,72,' opacity=".13"')}`;
       if(v>=0)s+=tileSVG(v<5?v:PRISM,x+5,y+5,90)}}
-  const fy=5*U+26;for(let k=0;k<7;k++){const x=X0+k*U,t=p.floor[k];s+=`<rect x="${x+3}" y="${fy+3}" width="94" height="94" rx="12" fill="#e3cfc4" stroke="#a0493a" stroke-width="4"/>`;
+  const fy=5*U+26;for(let k=0;k<7;k++){const x=X0+k*U,t=p.floor[k];s+=`${SGC('floor',x,fy,`<rect x="${x+3}" y="${fy+3}" width="94" height="94" rx="12" fill="#e3cfc4" stroke="#a0493a" stroke-width="4"/>`)}`;
     if(t!=null)s+=tileSVG(t,x+5,fy+5,90);else s+=`<text x="${x+50}" y="${fy+66}" font-size="48" font-weight="800" fill="#a0302a" text-anchor="middle">${FLOOR[k]}</text>`}
   s+=`<text x="${X0+7*U+34}" y="${fy+66}" font-size="44" font-style="italic" fill="#6b4a2a">breakage</text>`;
   return `<svg viewBox="0 0 ${XW+5*U+4} ${fy+U+4}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(p.nm)}'s racks, mosaic and breakage">${s}</svg>`}
@@ -59,7 +59,7 @@ function phWallSVG(p,o){o=o||{};const U=100;let s='';const cand={};for(const c o
   for(let r=0;r<5;r++){if(o.row===r)s+=`<rect x="-8" y="${r*U-6}" width="${5*U+16}" height="${U+12}" rx="14" fill="#ffd24a" opacity=".28"/>`;
     for(let c=0;c<5;c++){const x=c*U,y=r*U,v=p.wall[r][c],k=r+','+c;const cd=cand[k],m=mk[k];
       s+=`<g ${cd?`data-cell="${k}" class="hit" role="button" aria-label="Row ${r+1}, column ${c+1}${cd.pts!=null?', plus '+cd.pts:''}"`:''}>`;
-      s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>${tileSVG(WALLC(r,c),x+14,y+14,72,' opacity=".15"')}`;
+      s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`${SGC('wall',x,y,`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>`)}${tileSVG(WALLC(r,c),x+14,y+14,72,' opacity=".15"')}`;
       if(v>=0)s+=tileSVG(v<5?v:PRISM,x+5,y+5,90);
       if(m)s+=`<rect x="${x+1}" y="${y+1}" width="98" height="98" rx="13" fill="none" stroke="#2f7d46" stroke-width="7"/><circle cx="${x+78}" cy="${y+22}" r="24" fill="#2f7d46"/><text x="${x+78}" y="${y+33}" font-size="32" font-weight="800" fill="#fff" text-anchor="middle">+${m.pts}</text>`;
       if(cd){const adv=o.adv===cd.c;s+=`<rect x="${x+2}" y="${y+2}" width="96" height="96" rx="13" fill="${adv?'#fff':'#ffd24a'}" fill-opacity="${adv?.35:.22}" stroke="${adv?'#fff':'#ffb400'}" stroke-width="8"><animate attributeName="stroke-opacity" values="1;.4;1" dur="1.2s" repeatCount="indefinite"/></rect>`;
