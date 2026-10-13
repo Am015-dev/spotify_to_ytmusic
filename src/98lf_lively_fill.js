@@ -118,11 +118,16 @@ function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(cons
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}return r})(buildHubProps);
 // distance cull: each decor type hides past LF.R[type] m (checked every 15 frames)
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LF.ms||(LF.fr=(LF.fr|0)+1)%15)return;const cp=camera.position;for(const m of LF.ms){const s=m.boundingSphere;if(!s)continue;m.visible=Math.hypot(s.center.x-cp.x,s.center.z-cp.z)-s.radius<LF.R[m.userData.lf]}})(hubCullStep);
-// flat uniform green % of the frame (same rule as tools/tLiveGreen.py, on a 1/2-res copy: 4×4 blocks, green hue, luma stdev < 9; bottom 22% = car/HUD left out)
-function LF_green(){try{composer.render()}catch(e){}const c=renderer.domElement,W=Math.floor(c.width/2),H=Math.floor(c.height/2),cv=LF.cv||(LF.cv=document.createElement('canvas'));cv.width=W;cv.height=H;
- const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(c,0,0,W,H);const D=x.getImageData(0,0,W,H).data,H2=Math.floor(H*.78);let n=0,g=0;
- for(let by=0;by+4<=H2;by+=4)for(let bx=0;bx+4<=W;bx+=4){let r=0,gg=0,b=0,l=0,l2=0;for(let j=0;j<4;j++)for(let i=0;i<4;i++){const o=((by+j)*W+bx+i)*4,R=D[o],G=D[o+1],B=D[o+2],L=.299*R+.587*G+.114*B;r+=R;gg+=G;b+=B;l+=L;l2+=L*L}
-  r/=16;gg/=16;b/=16;l/=16;const sd=Math.sqrt(Math.max(0,l2/16-l*l));n++;if(gg>r+12&&gg>b+12&&sd<9)g++}return+(100*g/Math.max(1,n)).toFixed(1)}
+// flat uniform green % of the frame = visible GROUND that is one flat green: 4×4 blocks (1/2-res) that are green (G > R+12, G > B+12), flat (luma
+// stdev < 9) AND unoccluded ground: a second render with only the ground meshes (userData.trG) must match the normal frame there (mean |Δ| < 6),
+// so tree crowns, cars, HUD-free canvas only. Bottom 22% (the car) left out.
+function LF_px(){try{composer.render()}catch(e){}const c=renderer.domElement,W=Math.floor(c.width/2),H=Math.floor(c.height/2),cv=LF.cv||(LF.cv=document.createElement('canvas'));cv.width=W;cv.height=H;
+ const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(c,0,0,W,H);return{W,H,D:x.getImageData(0,0,W,H).data}}
+function LF_green(){const A=LF_px(),hid=[];scene.traverse(o=>{if((o.isMesh||o.isPoints||o.isSprite||o.isLine)&&o.visible&&!o.userData.trG){o.visible=false;hid.push(o)}});const bg=scene.background;scene.background=null;
+ let B;try{B=LF_px()}finally{for(const o of hid)o.visible=true;scene.background=bg}try{composer.render()}catch(e){}
+ const{W,H,D}=A,E=B.D,H2=Math.floor(H*.78);let n=0,g=0;
+ for(let by=0;by+4<=H2;by+=4)for(let bx=0;bx+4<=W;bx+=4){let r=0,gg=0,b=0,l=0,l2=0,dd=0;for(let j=0;j<4;j++)for(let i=0;i<4;i++){const o=((by+j)*W+bx+i)*4,R=D[o],G=D[o+1],Bb=D[o+2],L=.299*R+.587*G+.114*Bb;r+=R;gg+=G;b+=Bb;l+=L;l2+=L*L;dd+=Math.abs(R-E[o])+Math.abs(G-E[o+1])+Math.abs(Bb-E[o+2])}
+  r/=16;gg/=16;b/=16;l/=16;const sd=Math.sqrt(Math.max(0,l2/16-l*l));n++;if(gg>r+12&&gg>b+12&&sd<9&&dd/48<6)g++}return+(100*g/Math.max(1,n)).toFixed(1)}
 // GO spots: the exact empty spots of the reference grid (docs/research/ref/fill/side_by_side.jpg), car parked looking at the empty ground
 LF.SP={'fra-1':{c:'fra',x:-2093.3,z:-547.9,h:2.356,n:'Frankfurt west meadow'},'fra-2':{c:'fra',x:-1753,z:-240.3,h:2.356,n:'Frankfurt west field'},'fra-3':{c:'fra',x:960,z:-308,h:4.712,n:'Frankfurt east lawn'},
  'fra-4':{c:'fra',x:-1680,z:-1680,h:1.571,n:'Frankfurt south-west field'},'ath-1':{c:'ath',x:-1917.3,z:2338.4,h:2.356,n:'Athens north slope'},'ath-2':{c:'ath',x:1221.4,z:-1029.8,h:3.142,n:'Athens south lawn'}};
