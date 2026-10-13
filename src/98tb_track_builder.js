@@ -127,7 +127,8 @@ const TB_css=`body.tbOn #tuG,body.tbOn #odNew,body.tbOn #odPin{display:none!impo
 #tbx .hint{position:absolute;left:112px;top:56px;right:240px;font-size:12px;opacity:.85;pointer-events:none;text-shadow:0 1px 2px #000}
 #tbx .ov{position:absolute;inset:0;background:rgba(4,8,18,.94);display:flex;flex-direction:column;padding:10px max(14px,env(safe-area-inset-left));overflow:auto;gap:8px}#tbx .ov h3{margin:4px 0;font:900 18px system-ui}
 #tbx .ov .rowb{display:flex;flex-wrap:wrap;gap:6px}#tbx .ov .trk{display:flex;gap:6px;align-items:center;background:#16223a;border-radius:12px;padding:6px 8px}#tbx .ov .trk b{flex:1;min-width:120px}
-#tbx textarea{width:100%;min-height:70px;background:#0a1122;color:#cfe;border:1px solid #345;border-radius:8px;font:12px monospace}`;
+#tbx textarea{width:100%;min-height:70px;background:#0a1122;color:#cfe;border:1px solid #345;border-radius:8px;font:12px monospace;user-select:text;-webkit-user-select:text;touch-action:auto;box-sizing:border-box}
+#tbx .ov{touch-action:pan-y}#tbx .exp{background:#16223a;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px}#tbx .exp small{opacity:.8;font-size:12px}`;
 function TB_mk(){if(TB.el)return TB.el;const st=document.createElement('style');st.textContent=TB_css;document.head.appendChild(st);
   const e=document.createElement('div');e.id='tbx';e.hidden=true;e.innerHTML=`<canvas id="tbC"></canvas><div class="tbar" id="tbBar"></div><div class="pal" id="tbPal"></div><div class="hint" id="tbHint"></div><div class="lint" id="tbLint"></div><div class="sel" id="tbSel" hidden></div><div class="toast" id="tbToast" hidden></div><div class="ov" id="tbOv" hidden></div>`;
   document.body.appendChild(e);TB.el=e;TB.cv=e.querySelector('#tbC');TB_input();addEventListener('resize',()=>{if(TB.on)TB_draw()});return e}
@@ -144,7 +145,7 @@ function TB_ui(){const t=TB.trk,e=TB.el;if(!t||!e)return;if(!TB.lint)TB.lint=TB_
   const rw=document.createElement('label');rw.style.cssText='display:flex;align-items:center;gap:4px;font-size:12px;flex:0 0 auto';rw.innerHTML=`ROAD <input type=range min=10 max=17 step=1 value=${t.road} style="width:84px;height:40px"> <b>${t.road} m</b>`;
   const ri=rw.querySelector('input');ri.oninput=()=>{t.road=+ri.value;rw.querySelector('b').textContent=t.road+' m';TB.lint=TB_lint(t);TB_lintUi();TB_draw()};ri.onchange=()=>TB_push();bar.append(rw);
   bar.append(TB_btn('SNAP',()=>{TB.snap=!TB.snap;TB_ui()},{p:TB.snap,t:'Snap points to the city roads'}),TB_btn('↶',()=>{const s=TB.undo.pop();if(s){TB.trk=JSON.parse(s);TB.sel=-1;TB_changed();TB_draw()}},{t:'Undo'}),
-    TB_btn('💾',()=>TB_save(),{t:'Save'}),TB_btn('▶ TEST',()=>TB_test(),{c:'go',t:'Test drive with AI rivals'}));
+    TB_btn('💾',()=>TB_save(),{t:'Save'}),TB_btn('⧉ EXPORT',()=>TB_export(TB.trk),{t:'Export a track code'}),TB_btn('▶ TEST',()=>TB_test(),{c:'go',t:'Test drive with AI rivals'}));
   const pal=e.querySelector('#tbPal');pal.innerHTML='';const tools=[['pt','●','POINT'],['ter','🎨','SURFACE'],['start','🏁','START'],...Object.entries(TB_PCS).map(([k,v])=>[k,v.ic,v.l]),['del','✕','ERASE']];
   for(const[k,ic,l]of tools)pal.append(TB_btn(`<i>${ic}</i><small>${l}</small>`,()=>{TB.tool=k;TB.sel=-1;TB_ui()},{p:TB.tool===k}));
   e.querySelector('#tbHint').textContent=t.pts.length<3?'Tap the map to drop points (a loop closes itself). Drag a point to move it. Drag the map to pan, pinch or wheel to zoom.':
@@ -230,18 +231,29 @@ function TB_input(){const cv=TB.cv,P=TB.ptr;
 function TB_drawList(){TB_mk();TB.on=true;TB.el.hidden=false;document.body.classList.add('tbOn');const o=TB.el.querySelector('#tbOv');o.hidden=false;o.innerHTML='';
   const head=document.createElement('div');head.className='rowb';head.append(TB_btn('◀ MENU',()=>{o.hidden=true;TB_close()}),TB_btn('＋ NEW FRANKFURT',()=>{o.hidden=true;TB_open(TB_new('fra'))}),TB_btn('＋ NEW ATHENS',()=>{o.hidden=true;TB_open(TB_new('ath'))}));
   if(TB.trk)head.append(TB_btn('✎ BACK TO EDITOR',()=>{o.hidden=true;TB_ui()},{c:'go'}));o.append(head);
+  const h3=document.createElement('h3');h3.textContent='IMPORT · PASTE A TRACK CODE';o.append(h3);const ir=document.createElement('div');ir.className='rowb';ir.style.flexWrap='nowrap';const ta=document.createElement('textarea');ta.placeholder='ODT1:…';ta.rows=2;ta.style.minHeight='44px';ir.append(ta);o.append(ir);
+  ir.append(TB_btn('IMPORT',()=>{let t;try{t=TB_decode(ta.value)}catch(e){TB_toast('That is not a track code');return}if(TB.list[t.id]&&TB.list[t.id].src==='demo')t.id=TB_new(t.city).id;TB_saveLocal(t);TB.list[t.id]={t:TB_clone(t),src:'local'};TB_regAll();o.hidden=true;TB_open(t);TB_toast('Imported · saved on this device')},{c:'go'}))
   const h=document.createElement('h3');h.textContent='MY TRACKS'+(TB.db?' · shared':' · on this device');o.append(h);
   const ids=Object.keys(TB.list).sort((a,b)=>(TB.list[b].time||0)-(TB.list[a].time||0));if(!ids.length){const p=document.createElement('div');p.textContent='No tracks yet. Start a NEW one or copy a circuit below.';o.append(p)}
   for(const id of ids){const it=TB.list[id],t=it.t,r=document.createElement('div');r.className='trk';const L=TB_lint(t),ok=L.rules.filter(x=>x.ok).length;
     r.innerHTML=`<b>${t.name.replace(/</g,'')}<br><small style="opacity:.75">${t.city==='ath'?'Athens':'Frankfurt'} · ${t.laps} laps · ~${Math.round(L.race)} s · lint ${ok}/${L.rules.length}${it.src==='demo'?' · demo':''}</small></b>`;
-    r.append(TB_btn('▶ RACE',()=>{o.hidden=true;TB.trk=TB_clone(t);TB_test()},{c:'go'}),TB_btn('✎ EDIT',()=>{o.hidden=true;TB_open(t)}),TB_btn('⧉ CODE',()=>TB_codeBox(t)));o.append(r)}
+    r.append(TB_btn('▶ RACE',()=>{o.hidden=true;TB.trk=TB_clone(t);TB_test()},{c:'go'}),TB_btn('✎ EDIT',()=>{o.hidden=true;TB_open(t)}),TB_btn('⧉ EXPORT',()=>TB_export(t)));o.append(r)}
   const h2=document.createElement('h3');h2.textContent='COPY A CIRCUIT INTO THE BUILDER';o.append(h2);const cr=document.createElement('div');cr.className='rowb';
-  for(const d of TRACK_DEFS.filter(d=>!d.tb&&!d.open))cr.append(TB_btn(d.short,()=>{o.hidden=true;TB_open(TB_fromDef(d))}));o.append(cr);
-  const h3=document.createElement('h3');h3.textContent='PASTE A TRACK CODE';o.append(h3);const ta=document.createElement('textarea');ta.placeholder='ODT1:…';o.append(ta);
-  o.append(TB_btn('IMPORT',()=>{try{const t=TB_decode(ta.value);o.hidden=true;TB_open(t)}catch(e){TB_toast('That is not a track code')}}))}
-function TB_codeBox(t){const o=TB.el.querySelector('#tbOv'),ta=document.createElement('textarea');ta.value=TB_code(t);ta.readOnly=true;const r=document.createElement('div');r.className='rowb';
-  r.append(TB_btn('COPY',()=>{ta.select();try{navigator.clipboard.writeText(ta.value).then(()=>TB_toast('Copied'),()=>{document.execCommand('copy');TB_toast('Copied')})}catch(e){document.execCommand('copy');TB_toast('Copied')}}));
-  o.prepend(r);o.prepend(ta);o.scrollTop=0}
+  for(const d of TRACK_DEFS.filter(d=>!d.tb&&!d.open))cr.append(TB_btn(d.short,()=>{o.hidden=true;TB_open(TB_fromDef(d))}));o.append(cr);}
+
+// EXPORT (track-1/2, Alex: "allowing to export the track so we can include in the game"): the ODT1 code in a selectable box + COPY
+// (clipboard API, then execCommand, then "long-press to copy": the Claude app iframe may block the clipboard) + 💾 save (db in the Lab artifact)
+function TB_export(t){if(!t)return;TB_mk();TB.on=true;TB.el.hidden=false;document.body.classList.add('tbOn');const o=TB.el.querySelector('#tbOv');o.hidden=false;o.innerHTML='';
+  const box=document.createElement('div');box.className='exp';const h=document.createElement('h3');h.textContent='EXPORT · '+t.name;const ta=document.createElement('textarea');ta.id='tbExp';ta.value=TB_code(t);ta.readOnly=true;ta.rows=5;
+  const L=TB_lint(t),ok=L.rules.filter(r=>r.ok).length,inf=document.createElement('small');inf.textContent=`${t.city==='ath'?'Athens':'Frankfurt'} · ${t.laps} laps · lint ${ok}/${L.rules.length} · ${ta.value.length} characters. Send this code to the team; IMPORT (MY TRACKS) loads it back.`;
+  const sel=()=>{try{ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length)}catch(e){}};ta.onclick=sel;ta.onfocus=sel;
+  const r=document.createElement('div');r.className='rowb';
+  r.append(TB_btn('⧉ COPY',async()=>{sel();let done=false;try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(ta.value);done=true}}catch(e){}
+      if(!done)try{done=document.execCommand('copy')}catch(e){}TB_toast(done?'Copied':'Copy blocked here: long-press the code → Copy')},{c:'go'}),
+    TB_btn('💾 SAVE',()=>{TB.trk=TB_clone(t);TB_save().then(()=>TB_export(t))},{t:TB.db?'Save to the team db':'Save on this device'}),
+    TB_btn('◀ BACK',()=>{o.hidden=true;if(TB.trk)TB_ui();else TB_drawList()}));
+  box.append(h,ta,inf,r);o.append(box);o.scrollTop=0;sel()}
+const TB_codeBox=TB_export;
 function TB_fromDef(d){const t=TB_new(d.city==='ath'?'ath':'fra');t.name=d.short+' (copy)';t.laps=Math.min(3,d.laps||3);t.pts=d.cp.map(c=>[Math.round(c[0]*S),Math.round(c[2]*S),Math.max(0,Math.round(c[1])),'grass']);return t}
 // ---- TEST DRIVE: register the def and start a quick race on it (RETRY reuses the built world: no rebuild)
 function TB_test(){const t=TB.trk;if(!t)return;const def=TB_def(t);if(!def){TB_toast('Draw a loop first (3+ points)');return}TB_reg(def);TB.list[t.id]=Object.assign({src:'draft'},TB.list[t.id],{t:TB_clone(t)});
@@ -264,4 +276,4 @@ const TB_BUILTIN=[{"v":1,"id":"tb_demo_twister","name":"Twister GP","city":"fra"
 TB_loadLocal();TB_regAll();
 if(String(menuTrack).startsWith('tb_')&&!TRACK_DEFS.some(d=>d.id===menuTrack)){menuTrack='grand'}
 TB_dbInit();
-window.__tbS=(x,z)=>TB_w2s(x,z);window.__tb={open:TB_open,list:TB_drawList,lint:t=>TB_lint(t||TB.trk),def:t=>TB_def(t||TB.trk),get:()=>TB.trk,set:t=>{TB.trk=t;TB.undo=[];TB.lint=null;TB_changed()},fit:()=>{TB_fit();TB_draw()},test:TB_test,state:()=>({on:TB.on,tool:TB.tool,n:TB.trk&&TB.trk.pts.length,db:!!TB.db,dbErr:TB.dbErr,list:Object.keys(TB.list)}),V:TB_V,code:TB_code,decode:TB_decode};
+window.__tbS=(x,z)=>TB_w2s(x,z);window.__tb={open:TB_open,list:TB_drawList,lint:t=>TB_lint(t||TB.trk),def:t=>TB_def(t||TB.trk),get:()=>TB.trk,set:t=>{TB.trk=t;TB.undo=[];TB.lint=null;TB_changed()},fit:()=>{TB_fit();TB_draw()},test:TB_test,state:()=>({on:TB.on,tool:TB.tool,n:TB.trk&&TB.trk.pts.length,db:!!TB.db,dbErr:TB.dbErr,list:Object.keys(TB.list)}),V:TB_V,code:TB_code,decode:TB_decode,export:t=>TB_export(t||TB.trk)};
