@@ -30,3 +30,14 @@ Expose `window.__perf=()=>({i:renderer.info, n:...})` (one line) and re-run `per
 - Caveat: `RO.on` was false and `LDS.on.length` was 0 in all runs, so the page was in the menu/attract scene, not hub free roam. Clicking `#careerBtn`/`#roamBtn` did not enter the hub.
 - Attract/race scene: no difference between v90i and v90j, so the lag is not in that scene. The LDS props live only in the hub and are still unmeasured.
 - No fix applied (the >20 % rule was not met). Next: enter the hub via `hubEnter()` (script scope; expose it in the hook), then rerun `docs/perf_v90j/tris.js <port> ath|fra 0|1`.
+
+## perf-3 (13 Oct): free-roam driver `docs/perf_v90j/roam.js` (tPlay start: STORY → slot `.go` → wait `__mho.state==='roam'` → tap cards away)
+- Hook in the test copies: `renderer.info.autoReset=false` plus a rAF reader → `window.__perf()` = {calls, triangles, geo} for the previous frame.
+- Result: no numbers. One run (v90j Frankfurt) hit the 170 s cap before free roam started. Five parallel runs timed out on `page.goto` (30 s) because software GL plus one static server can't serve them.
+- No fix applied: the LDS suspect is still unconfirmed.
+- Next: run sequentially, one at a time, with `timeout 400` and `goto` timeout 120 s (≈4 min per run, 6 runs). Or run on a GPU box: `node roam.js <port> ath|fra 0|1 10`.
+
+| city | v90j | v90j LDS off | v90i |
+|---|---|---|---|
+| Athens | n/a | n/a | n/a |
+| Frankfurt | timeout | n/a | n/a |
