@@ -1,4 +1,7 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.11',date:'13 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the road gap by the Festhalle (south grid seam) is closed.'}]},
+  {v:'v90m-beta.10',date:'13 Oct 2026',items:[{t:'FIXED',s:'Parked cars sit on the road after you get out (final sink fix).'}]},
+  {v:'v90m-beta.9',date:'13 Oct 2026',items:[{t:'NEW',s:'On foot: walk and run with the stick, jump, and one button: 👋 HI to a person, 🪑 SIT on a bench, 📋 TALK to a mission giver.'},{t:'FIXED',s:'A parked car on a slope no longer sinks into the road at the back.'}]},
   {v:'v90m-beta.8',date:'13 Oct 2026',items:[{t:'FIXED',s:'Frankfurt motorway ramps no longer start on a green median plate.'},{t:'FIXED',s:'The WRONG WAY banner hides while a mission card or speech is open.'}]},
   {v:'v90m-beta.7',date:'13 Oct 2026',items:[{t:'FIXED',s:'Every person is now the same height, 1.80 m (pedestrians, quest givers, drivers, you on foot).'}]},
   {v:'v90m-beta.6',date:'13 Oct 2026',items:[{t:'CHANGED',s:'Athens loads about 15 s faster (the ground mesh layout is pre-computed).'},{t:'FIXED',s:'Frankfurt roads no longer end in a strip of grass where two street grids meet (e.g. by the Messe).'},{t:'FIXED',s:'Builder ramps are capped at a gentler slope; new pieces: long ramp, wide bank, kicker, merge (built-in tracks stay hidden).'}]},
