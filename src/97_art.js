@@ -134,7 +134,7 @@ function ART_glowSync(){for(const o of ART3.bl){if(!o.parent)continue;const u=o.
 // roamStep is skipped on foot (98of), roamHud is not: keep the glows in step with their rings there too
 roamHud=(f=>function(){const r=f.apply(this,arguments);if(RO.on&&((ART3.gs=(ART3.gs||0)+1)%15===0))try{ART_glowSync()}catch(e){}return r})(roamHud);
 // GO v90m/green-blob: visible beacon glows whose ring is hidden (0 = pass)
-function ART_blobChk(){let lone=0,glow=0;for(const o of ART3.bl){if(!o.parent)continue;let v=true,q=o;while(q){if(!q.visible)v=false;q=q.parent}if(!v)continue;glow++;const rg=o.parent.children.find(c=>c!==o&&c.geometry&&c.geometry.type==='TorusGeometry');if(rg&&!rg.visible)lone++}return{lone,glow,ok:lone===0}}
+function ART_blobChk(){let lone=0,glow=0;for(const o of ART3.bl){if(!o.parent)continue;let v=true,q=o;while(q){if(!q.visible)v=false;q=q.parent}if(!v)continue;glow++;const rg=o.parent.children.find(c=>c!==o&&c.geometry&&c.geometry.type==='TorusGeometry');if(rg&&!rg.visible)lone++}let og=0;try{if(RO.foot&&RO.foot!=='car'&&OG.grp&&OG.grp.visible)og=(OG.imC?OG.imC.count:0)+(OG.imG?OG.imG.count:0)+(OG.imE?OG.imE.count:0)}catch(e){}return{lone,glow,og,ok:lone===0&&og===0}}
 roamStep=(f=>function(dt){f(dt);try{ART_step(dt)}catch(e){}try{ART_beacons(dt)}catch(e){}})(roamStep);
 // HUD skin: minimap N marker, purple NPC card with yellow header + round portrait, thin boost bar bottom-centre, bold italic headings
 {const st=document.createElement('style');st.id='artHud';st.textContent=`
