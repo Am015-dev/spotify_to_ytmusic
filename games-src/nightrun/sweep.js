@@ -785,6 +785,7 @@ async function shopTests(browser, cfg, full) {
         await chk(await ev(p, ids => ids.every(id => __mnr.SH.n(id) === 1), batch), 'shop-buy', 'batch not bought ' + batch);
         await press(p, cfg, T, '#shGo'); await sleep(300);
       }
+      await ev(p, () => { __nrs.SYN.muted = true; __mnr.SH.recalc(); });   // one upgrade at a time: the synergy layer has its own test (strategy-test.js)
       const E = await ev(p, () => { const h = __mnr.SH; return { fr: h.n('fr'), hm: h.hm, ck: h.ck, sharp: h.sharp, nx: h.nx, sh: h.sh, spare: h.spare, mag: __mnr.NR.mod.mag, win: __mnr.NR.mod.win, pw: __mnr.NR.mod.pw, spb: __mnr.BT.spb }; });
       await chk(E.fr >= 1 && E.hm === 1 && E.ck === 4 && Math.abs(E.sharp - 1.3) < 1e-9 && Math.abs(E.nx - 1.3) < 1e-9 && E.mag > 140 && E.win === 14 && Math.abs(E.pw - 1.3) < 1e-9, 'upgrade-effect', 'state ' + JSON.stringify(E));
       await chk(E.sh === 1 && E.spare >= 1, 'upgrade-effect', 'shield/dash charge not given ' + JSON.stringify(E));
@@ -839,7 +840,7 @@ async function tuneTests(browser, cfg, full) {
     await ev(p, () => { __mnr.GA.eqAll = true; });   // the effect tests set levels directly: count them all as equipped
     if (!full) { await p.context().close(); return; }
     // every perk at once: the run starts with them, and they do what the card says
-    await ev(p, () => { const G_ = __mnr.GA; for (const d of __mnr.TP_DEF) G_.tune[d.id] = d.max; G_.bank = 99999; });
+    await ev(p, () => { __nrs.SYN.muted = true; const G_ = __mnr.GA; for (const d of __mnr.TP_DEF) G_.tune[d.id] = ['hsk', 'glc', 'grd', 'ldp', 'bea'].includes(d.id) ? 0 : d.max; G_.bank = 99999; });   // the trade-off perks have their own test
     if (!await startGame(p, cfg, T)) { await fail(p, tag, 'start', 'no start'); await p.context().close(); return; }
     await sleep(500); await ev(p, () => { __mnr.god = true; });
     let r = await ev(p, () => { const m = __mnr; return { max: m.P.max, hp: m.P.hp, sh: m.SH.sh, dmax: m.SH.dmax, spare: m.SH.spare, rev: m.TP.revLeft, mag: m.NR.mod.mag, pw: m.NR.mod.pw, ck: m.SH.ck, nx: m.SH.nx, drones: m.TP.drones.length }; });
@@ -850,7 +851,7 @@ async function tuneTests(browser, cfg, full) {
     await ev(p, () => { __mnr.GA.tune.crt = 8; __mnr.GA.tune.rof = 0; let c = 0, n = 0; for (let i = 0; i < 400; i++) { __mnr.G.pb = []; __mnr.SH.volley(100, 100, 0); for (const b of __mnr.G.pb) { n++; if (b.crit) c++; } } window.__crit = c / n; });
     const cr = await ev(p, () => window.__crit); await chk(p, cr > .12 && cr < .3, 'tune-effect', 'crit rate ' + cr.toFixed(2) + ' (want about .2: the perk is capped)');
     // the HUD shows the ship stats (hull, shield, dash, drones, revive) correctly
-    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp, np: __mnr.TP_DEF.length })); await chk(p, h.x && h.x.max === 10 && h.x.hp === h.hp && h.x.sh === 5 && h.x.dashMax === 6 && h.x.drones === 3 && h.x.rev === 5 && h.x.perks === h.np - 1, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
+    await sleep(300); const h = await ev(p, () => ({ x: __mnr.HUD.x, hp: __mnr.P.hp, np: __mnr.TP_DEF.length })); await chk(p, h.x && h.x.max === 10 && h.x.hp === h.hp && h.x.sh === 5 && h.x.dashMax === 6 && h.x.drones === 3 && h.x.rev === 5 && h.x.perks === h.np - 6, 'HUD-mismatch', 'ship stats ' + JSON.stringify(h));
     await p.screenshot({ path: path.join(OUT, 'hud-' + cfg.name + '.png') });
     // revive: a lethal hit brings the ship back with 4 hull and a short shield of invulnerability
     await ev(p, () => { const m = __mnr; m.god = false; m.SH.sh = 0; m.G.en = []; m.G.eb = []; m.P.hp = 1; m.P.inv = 0; m.P.dashT = 0; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: 1 }); });

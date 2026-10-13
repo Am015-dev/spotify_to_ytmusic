@@ -12,7 +12,9 @@ function nextFoe(){if(typeof ST!=='undefined'&&ST.on)return nextFoeFrom(ST.n+(ST
 const SYN={v:{},act:[],sets:{},cnt:{gc:0,tk:0,bc:0},owned:new Set(),hg:0,
   lvl(id){let l=SH.n(id);for(const d of TP_DEF)if(canon(d.id)===id)l=Math.max(l,TP.l(d.id));return l;},
   scan(){const o=new Set();for(const id in SH.got)if(SH.got[id]>0)o.add(canon(id));for(const d of TP_DEF)if(TP.l(d.id)>0)o.add(canon(d.id));this.owned=o;return o;},
+  muted:false,   // tests of a single upgrade switch the synergy layer off
   calc(){const o=this.scan(),v={dmg:0,crit:0,inv:0,ck:0,win:0,sharp:0,nx:0,db:0,hull:0,off:0,heat:0,fr0:0},add=fx=>{for(const k in fx)v[k]=(v[k]||0)+fx[k];};
+    if(this.muted){this.act=[];for(const p in PATHS){this.cnt[p]=0;this.sets[p]=[];}this.v=v;return v;}
     this.act=SYNS.filter(s=>o.has(s.a)&&o.has(s.b));for(const s of this.act)add(s.fx);
     for(const p in PATHS){let n=0;for(const id of o)if(PATHOF[id]===p)n++;this.cnt[p]=n;this.sets[p]=SETS[p].filter(t=>n>=t.n);for(const t of this.sets[p])add(t.fx);}
     this.v=v;return v;},
@@ -100,6 +102,8 @@ SH.buy0=SH.buy;SH.buy=function(i){this.armed=null;return this.buy0(i);};
 .pg .own button.oi.ns{cursor:default;opacity:.85}
 .pg .own .sl{margin-left:auto;color:var(--dim);white-space:nowrap}
 @container (max-height:640px){.pg .aff{display:none}}
+@container (max-height:640px){.pg .card .pv{display:none}}
+@container (max-height:600px){.pg .card .chips{display:none}}
 @container (max-height:430px){.pg .card .pv,.pg .card .chips,.pg .foe{display:none}.pg .bld{font-size:11px}}
 `;document.head.appendChild(st);}
 {const bl=document.createElement('div');bl.className='bld';bl.id='shBld';const fo=document.createElement('div');fo.className='foe';fo.id='shFoe';$('shOwn').before(bl,fo);

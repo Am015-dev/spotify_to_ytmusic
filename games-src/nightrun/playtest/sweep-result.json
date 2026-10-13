@@ -1,12 +1,5 @@
 {
- "fails": [
-  {
-   "tag": "375x553/story#36",
-   "kind": "story",
-   "detail": "intro line not shown: [\"+200\",\"Dash on the pulse to power up\",\"BANKENVIERTEL\",\"Taunusanlage · 23:47\"]",
-   "shot": "fail1-story.png"
-  }
- ],
+ "fails": [],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -17,8 +10,7 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 0,
-  "storyStages": 55
+  "shopChecks": 20
  },
  "avg": 0
 }
