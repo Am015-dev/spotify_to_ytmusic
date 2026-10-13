@@ -7,14 +7,14 @@
 // (98ro_open.js: 96 m ribbon, asphalt in the middle, terrain beside it, routes behind an island, pit jumps).
 // Track JSON v1: {v,id,name,city,laps,road,pts:[[x,z,h,ter]…] (world m; ter = surface of the segment pt→next), pc:[{k,x,z,n?}…], st:[x,z]}
 const TB_TERS=['grass','dirt','sand','cobble'],TB_TCOL={grass:'#58b43a',dirt:'#9b6a3c',sand:'#e2c98a',cobble:'#9a948a'};
-const TB_V={top:62,lat:13,acc:7,brk:16,cal:1,rk:{}};// rk: per-route-kind balance factor (measured, tRace alt vs road)// lap estimate (docs/TRACK_FUN.md); cal = measured / estimated (test drive)
+const TB_V={top:62,lat:13,acc:7,brk:16,cal:1,rk:{scd:1.15}};// rk: per-route-kind balance factor (measured, tRace alt vs road)// lap estimate (docs/TRACK_FUN.md); cal = measured / estimated (test drive)
 const TB_PCS={jump:{ic:'⤴',c:'#ff7a1c',l:'JUMP'},boost:{ic:'⚡',c:'#ffd12c',l:'BOOST'},item:{ic:'?',c:'#4ceaff',l:'ITEMS'},gate:{ic:'⛩',c:'#ff2d95',l:'GATE'},
   scw:{ic:'≈',c:'#29b6ff',l:'WATER SC'},scd:{ic:'⛰',c:'#ff9a1f',l:'DIRT SC'},
   // track-2 stunt pieces (98ts_track_stunts.js builds them): big kicker ramp, gap jumps over water / a road, banked curve, stunt split, landmark
   ramp:{ic:'⤒',c:'#ff5a1c',l:'BIG RAMP'},gapw:{ic:'⛵',c:'#1f8bff',l:'WATER GAP'},gapr:{ic:'⛟',c:'#c46bff',l:'ROAD GAP'},bank:{ic:'◢',c:'#9bff5a',l:'BANK'},
   scs:{ic:'★',c:'#ff3fa4',l:'STUNT SC'},lm:{ic:'🏛',c:'#ffffff',l:'LANDMARK'}};
 // track-2: stunt / route numbers shared by the lint (estimate) and the race (98ts). Kicker: y=h·u² over L metres before the lip (slope 2h/L at the lip).
-const TB_ST={rH:3.6,rL:36,gH:3.2,gL:30,gHalf:32,gR:14,gG:15,lH:3.2,lL:24,bank:.34,bankGrip:.45,air:1.5,lane:27,fly:12,
+const TB_ST={rH:5.2,rL:38,gH:4.2,gL:32,gHalf:32,gR:14,gG:15,lH:3.8,lL:26,lW:11,bank:.34,bankGrip:.45,air:1.5,lane:27,fly:12,
   LM:{fra:['messe','dom','roemer','steg','skyline'],ath:['akro','synt','lyka','plaka','pireas']},
   // landmark sight range (m): tall towers read from far away
   LMV:{messe:1800,dom:1300,roemer:700,steg:600,skyline:2200,akro:2400,synt:1000,lyka:2000,plaka:800,pireas:1000},
@@ -81,7 +81,11 @@ function TB_lint(t){const g=TB_geo(t),R=[],marks=[];const rule=(id,name,ok,val,n
     rule('L8','No overlap (flyover ok)',!bad,bad?'crosses':fly?fly+' flyover':'clear','gap ≥ 110 m or ≥ 12 m above');if(bad)marks.push({x:bx,z:bz,r:70,c:'#ff3b3b',t:'OVERLAP'});g.fly=fly}
   const pos=k=>t.pc.filter(p=>p.k===k).map(p=>({...p,i:TB_near(g,p.x,p.z).i})).sort((a,b)=>a.i-b.i),gap=(a,b)=>{const d=Math.abs(a-b)*ds;return Math.min(d,L-d)};
   {const J=t.pc.filter(p=>TB_JK.includes(p.k)).map(p=>({...p,i:TB_near(g,p.x,p.z).i})).sort((a,b)=>a.i-b.i);let ok=J.length>=1&&J.length<=4;for(const j of J){let st=true;for(let d=-30;d<=30;d++)if(Rr((j.i+d+N)%N)<250)st=false;if(!st){ok=false;marks.push({x:g.X[j.i],z:g.Z[j.i],r:40,c:'#ff3b3b',t:'JUMP IN BEND'})}}
-    for(let a=0;a<J.length;a++)for(let b=a+1;b<J.length;b++)if(gap(J[a].i,J[b].i)<300)ok=false;rule('L9','Jumps',ok,J.length+' per lap','1–4, straight, 300 m apart')}
+    for(let a=0;a<J.length;a++)for(let b=a+1;b<J.length;b++)if(gap(J[a].i,J[b].i)<300)ok=false;
+    // no jump under / over a flyover: the flight path (0…+160 m) stays ≥ 120 m from other parts of the course
+    for(const j of J){let hit=false;for(let d=0;d<=80&&!hit;d+=5){const i=(j.i+d+N)%N;for(let q=0;q<N;q+=3){if(Math.min(Math.abs(q-i),N-Math.abs(q-i))*ds<300)continue;if((g.X[i]-g.X[q])**2+(g.Z[i]-g.Z[q])**2<120*120){hit=true;break}}}
+      if(hit){ok=false;marks.push({x:g.X[j.i],z:g.Z[j.i],r:40,c:'#ff3b3b',t:'JUMP AT FLYOVER'})}}
+    rule('L9','Jumps',ok,J.length+' per lap','1–4, straight, 300 m apart, not at a flyover')}
   {const S=t.pc.filter(p=>TB_SK.includes(p.k));let good=0;for(const p of S){const r=TB_route(t,g,p),len=r.len;
       const ok=len>=200&&len<=800&&Math.abs(r.km)>1/700;if(ok)good++;else marks.push({x:p.x,z:p.z,r:50,c:'#ff3b3b',t:len<200?'SC TOO SHORT':len>800?'SC TOO LONG':'SC NOT ON A BEND'})}
     rule('L10','Shortcut with a trade-off',good>=1,good+' ok of '+S.length,'≥ 1 on a bend')}
