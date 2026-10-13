@@ -53,4 +53,17 @@
       { kind: 'tap', sel: '#missiond .gx-x', name: 'tap closes the card', state: function () { return GX.open === 'missiond'; }, expect: function (a, b) { return (a && !b) || 'card did not close'; } }
     ]
   });
+
+  GXS.add({
+    id: 'sf-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 13, when: booted, group: 'UI',
+    setup: function () { return table(13).then(function () { GXH.rules(null); return GXS.wait(function () { return document.querySelector('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-rules .gxh-card', name: 'help card' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'visible', sel: '.gxh-rules .gxh-x', name: 'Close button' },
+      { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
+    ]
+  });
+
 })();
