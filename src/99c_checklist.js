@@ -4,12 +4,12 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'art1',id:'road-gap',area:'city',text:'Frankfurt Messe (Hot Drop start): tap 📍 GO: you stand on the street where the road used to end in a 10 m grass strip. Drive ahead: asphalt all the way to the next street, no grass across the road. Auto: a downward look every 2 m along the road, 0 on grass.'},
- {ver:'lf1',id:'fra-1',area:'world',text:'Frankfurt west meadow (📍 GO parks you looking at it): no big flat green: trees, flower beds, rocks or a pond within 50 m, hills you can see. Pass line: flat green ≤ 8% of the screen, ≥ 6 props within 50 m, ≥ 4 m height range.'},
- {ver:'lf1',id:'fra-2',area:'world',text:'Frankfurt west field (📍 GO): same as the west meadow: ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
- {ver:'lf1',id:'fra-3',area:'world',text:'Frankfurt east lawn (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
- {ver:'lf1',id:'fra-4',area:'world',text:'Frankfurt south-west field (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
- {ver:'lf1',id:'ath-1',area:'world',text:'Athens north slope (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
- {ver:'lf1',id:'ath-2',area:'world',text:'Athens south lawn (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
+ {ver:'lf1',id:'fra-1',area:'world',text:'Frankfurt west meadow (📍 GO parks you looking at it): no big flat green: trees, flower beds, rocks or a pond within 50 m, hills you can see. Pass line: flat green ground ≤ 8% of the screen, ≥ 6 props within 50 m (the hills in view are shown too).'},
+ {ver:'lf1',id:'fra-2',area:'world',text:'Frankfurt west field (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
+ {ver:'lf1',id:'fra-3',area:'world',text:'Frankfurt east lawn (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
+ {ver:'lf1',id:'fra-4',area:'world',text:'Frankfurt south-west field (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
+ {ver:'lf1',id:'ath-1',area:'world',text:'Athens north slope (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
+ {ver:'lf1',id:'ath-2',area:'world',text:'Athens south lawn (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
  {ver:'lf1',id:'mound',area:'world',text:'Drive over a grass hill (📍 GO puts you 40 m before one): the car rolls up and over it without a bump or a stop, and lands back on the grass.'},
  {ver:'v90k',id:'no-hollow',area:'city',text:'Frankfurt: drive 1 minute along the main road: every traffic vehicle is a whole car or truck (roof, cab, all 4+ wheels on the road); no hollow red/blue open box. Auto: HCAR has no ld:truck:v3221_1.'},
  {ver:'v90k',id:'shadow',text:'Cars, trees and people have shadows on the ground: a soft dark patch under your car, every traffic car, each person and each tree (📍 GO drops you behind a Frankfurt traffic car).'},
