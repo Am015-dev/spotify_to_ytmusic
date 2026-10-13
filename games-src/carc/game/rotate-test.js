@@ -2,7 +2,8 @@
 // and after each rotation check: no page error, the board fills the screen, glowing squares / follower spots are inside the board and not covered, and a tap on one still works.
 //   cd games-src/carc/game/src && python3 build.py   then   NODE_PATH=/opt/node-tools/node_modules node ../rotate-test.js
 const PW = require(process.env.PW || 'playwright'), path = require('path');
-const URL = process.env.URL || 'file://' + path.join(__dirname, 'rampart.html');
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
 const sleep = ms => new Promise(r => setTimeout(r, ms)); let bad = 0; const fail = (...a) => { bad++; console.log('FAIL', ...a); };
 const STATE = () => { const bd = document.querySelector('#board').getBoundingClientRect(), vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 2 && r.height > 2 && s.visibility !== 'hidden'; };
@@ -10,6 +11,7 @@ const STATE = () => { const bd = document.querySelector('#board').getBoundingCli
   const spots = [...document.querySelectorAll('.glow,.fglow')].filter(vis).map(e => ({ ...c(e), cover: (() => { const t = document.elementFromPoint(c(e).x, c(e).y); return !t || !t.closest('.glow,.fglow'); })() }));
   const sk = document.querySelector('#hskip'); return { W: innerWidth, H: innerHeight, board: Math.round(100 * bd.width * bd.height / (innerWidth * innerHeight)), bw: bd.width, bh: bd.height, hscroll: document.documentElement.scrollWidth > innerWidth + 1, spots, skip: sk && vis(sk) ? c(sk) : null, mine: myTurn(), step: G.step, sig: G.turn + G.step, tw: !!UI.tw }; };
 (async () => {
+  URL = process.env.URL || await gx.url('rampart-and-vine', { file: path.join(__dirname, 'rampart.html') });
   const b = await PW.chromium.launch({ args: ['--no-sandbox'] });
   for (const [W, H] of [[390, 763], [375, 553]]) {
     const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA }), p = await ctx.newPage(), errs = [];

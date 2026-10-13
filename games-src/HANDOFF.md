@@ -4,6 +4,12 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Checks: two speeds + scenarios (13 Oct 2026) — read `PLAYBOOK.md` "Iterate fast, check once"
+- `build-all.py --quick <slug>` (phone-check + scenarios + QUICK sweep) to iterate; `--deploy <slug>` = full sweep once, then live. Numbers: `CHECK-SPEED.md`.
+- One shared http server (`scripts/gx-serve.js`, `GX_URL`) for every check; no file://. Skin never changes a box (`GXSK.audit()` in phone-check).
+- Scenarios: `?scn=<id>` (`shell/gx-scenario.js`, per-game `scn.js`), runner `scripts/scenario-test.js <slug>`, shelf checklist "▶ Try this" + "Scenarios only" filter (`add-update.py --scn`).
+- **Mainhattan Nightrun (K2's code, not touched here):** the runner already works for it (`node games-src/scripts/scenario-test.js mainhattan-nightrun` serves `games/mainhattan-nightrun/`). K2 only has to inline `shell/gx-scenario.js` + a new `scn.js` (before the game scripts) and register, with `GXS.add({id,name,ask,setup,checks})`, these scenarios (ids `nr-*`): `nr-lab-boss-<boss>` one per boss in the LAB boss gallery (boss card/portrait visible, name readable, tap opens its detail, on-screen numbers = engine), `nr-stage-map` (stage map: nodes visible, next stage glows, tap enters it), `nr-shop` / `nr-garage` / `nr-market` (items readable at 390x763, 375x553, 1366x768, buying changes credits as the engine says), plus the generic `nr-board` and `nr-zoom`. Add `nightrun` to `GAMES`/`SWEEPS` in `build-all.py` when its build is wired.
+
 ## Orchestrator state (13 Oct 2026)
 - Owner pages: shelf What's new panel (`games/updates.json`, add with `games-src/scripts/add-update.py`), missing assets `games/missing.html`, facelift list `games/facelift.html` (`games-src/FACELIFT.md`), screenshot grid `games/shots.html` (rebuild: `games-src/scripts/shots-gallery.py`).
 - 3D: owner's Pixal3D models at FULL detail in `games/<game>/models/<item>.glb` + `-lite.glb` (phones/Low) + sprites; `games-src/facelift-3d/MODELS.md`. Never decimate the owner's models below 40k tris / 1024 px textures without asking.

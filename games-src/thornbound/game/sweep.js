@@ -9,8 +9,10 @@
 // rules cards (2-4, <= 20 words, a picture each) open from the "How does this work?" link.
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs');
-const html=fs.readFileSync(__dirname+'/thornbound.html');
-const MODE=process.argv[5]||'me';const GAMES=+(process.argv[2]||20);const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||4);
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 2 games per size = 4 games
+let URL;
+const MODE=process.argv[5]||'me';const GAMES=+(process.argv[2]||(QUICK?2:20));const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||4);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
 let totals={games:0,taps:0,hint:0,kinds:{},bubbles:{},bulbs:0,bulbNull:0,rulesOpened:0,tipsOffGames:0};
@@ -18,11 +20,10 @@ let totals={games:0,taps:0,hint:0,kinds:{},bubbles:{},bulbs:0,bulbNull:0,rulesOp
 async function playGame(browser,W,H,gi){
   const tag=W+'x'+H+' g'+gi;
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const mf=require('path').join(__dirname,'..','..','..','games','thornbound',u.pathname);if(/^\/media\//.test(u.pathname)&&fs.existsSync(mf))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(mf)});r.fulfill({status:200,contentType:'text/html',body:html})});
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{if(m.type()==='warning'&&/rejected/.test(m.text()))note(tag,'ENGINE '+m.text().slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
-  await p.goto('https://gns.test/?phone=1');await sleep(900);
+  await p.goto(URL+'?phone=1');await sleep(900);
   const np=2+gi%3;const seed=900+gi*7;
   await p.evaluate(([np,seed,gi,mode])=>{try{localStorage.clear()}catch(e){}newGame(mode==='hot'?'hot':mode==='watch'?'ai':'me',{np:mode==='hot'?2:np,seed,length:'short',levels:['normal','normal','easy','hard'].slice(0,np)});UI.speed=8;UI.guide=gi%4===0?'off':'full';if(gi%5===4)GXH.setEnabled(false)},[np,seed,gi,MODE]);
   const tipsOn=gi%5!==4;
@@ -203,7 +204,7 @@ async function playGame(browser,W,H,gi){
   await ctx.close();
   return {taps,dead,secs:Math.round((Date.now()-t0)/1000)}}
 
-(async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});const T=Date.now();
+(async()=>{URL=await gx.url('thornbound',{file:__dirname+'/thornbound.html'});const b=await PW.chromium.launch({args:['--no-sandbox']});const T=Date.now();
   const jobs=[];for(const [W,H] of SIZES)for(let g=0;g<GAMES;g++)jobs.push([W,H,g]);
   let ji=0;const res=[];
   await Promise.all(Array.from({length:WORKERS},async()=>{while(ji<jobs.length){const j=jobs[ji++];try{const r=await playGame(b,...j,j[2]);res.push(r);process.stdout.write('.')}catch(e){note(j[0]+'x'+j[1]+' g'+j[2],'CRASH '+String(e.message).split('\n')[0]);process.stdout.write('x')}}}));

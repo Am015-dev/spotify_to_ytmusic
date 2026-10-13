@@ -8,8 +8,10 @@
 // Prints "FAIL ..." lines and "SWEEP PASS" or "SWEEP FAIL n".
 const PW = (() => { try { return require('playwright'); } catch (e) { return require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright'); } })();
 const fs = require('fs'), path = require('path');
-const html = fs.readFileSync(process.env.HTML || path.join(__dirname, 'hollowbough.html'));
-const NG = +process.argv[2] || 5, SIZES = (process.argv[3] || '390x763,375x553').split(',').map(s => s.split('x').map(Number)), MODE = process.argv[4] || 'vs';
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 2 games per size = 4 games
+let URL;
+const NG = +process.argv[2] || (QUICK ? 2 : 5), SIZES = (process.argv[3] || '390x763,375x553').split(',').map(s => s.split('x').map(Number)), MODE = process.argv[4] || 'vs';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let bad = 0; const fails = []; const helpTotals = [];
 function fail(tag, msg) { bad++; if (fails.length < 40) { fails.push(tag + ' ' + msg); console.log('FAIL', tag, msg); } }
@@ -18,14 +20,9 @@ async function playGame(browser, W, H, gi, mode) {
   const tag = `${W}x${H} g${gi}`, R = rng(1000 + gi * 7 + W);
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
   // the page is served from memory; its painted media (title, tables, backs, portraits, end art) come from games/hollowbough/media so the real layout is swept; music files stay blocked
-  const MEDIA = path.join(__dirname, '..', '..', '..', 'games', 'hollowbough', 'media');
-  await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort();
-    if (u.pathname.startsWith('/media/')) { const f = path.join(MEDIA, path.basename(u.pathname)); return fs.existsSync(f) ? r.fulfill({ status: 200, contentType: 'image/webp', body: fs.readFileSync(f) }) : r.abort(); }
-    if (u.pathname.startsWith('/music/')) return r.abort();
-    return r.fulfill({ status: 200, contentType: 'text/html', body: html }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(8000);
   p.on('pageerror', e => fail(tag, 'pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) fail(tag, 'console ' + m.text().slice(0, 100)); });
-  await p.goto('https://gns.test/'); await sleep(500);
+  await p.goto(URL); await sleep(500);
   await p.evaluate(([m, s]) => { try { localStorage.clear(); } catch (e) { } UI.seed = s; AIDELAY = 50; UI.opt = { np: 2 + (s % 3), level: 'normal', solo: 1 }; newGame(m); }, [mode, 11 + gi * 3]);
   const tipsOn = gi % 5 !== 4; if (!tipsOn) await p.evaluate(() => GXH.setEnabled(false));
   await sleep(400);
@@ -164,6 +161,7 @@ async function playGame(browser, W, H, gi, mode) {
   await ctx.close();
 }
 (async () => {
+  URL = await gx.url('hollowbough', { file: path.join(__dirname, 'hollowbough.html') });
   fs.mkdirSync(path.join(__dirname, 'shots'), { recursive: true });
   const b = await PW.chromium.launch();
   for (const [W, H] of SIZES) { const jobs = []; for (let g = 0; g < NG; g++) jobs.push(() => playGame(b, W, H, g, MODE).catch(e => fail(`${W}x${H} g${g}`, 'crash ' + String(e.message).slice(0, 160)))); for (let i = 0; i < jobs.length; i += 3) await Promise.all(jobs.slice(i, i + 3).map(f => f())); }

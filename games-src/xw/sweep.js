@@ -5,12 +5,15 @@
 // with nothing moving; a control covered / off screen / under 30 px; the ghost finger pointing at nothing; a text block
 // over 8 words (long-press popups excepted); the top strip (ships, hull+shields) differing from the engine;
 // horizontal scroll; the board (data-board) under 55% of a portrait screen; after a rotation controls off screen.
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
 const PW = require('/opt/node22/lib/node_modules/playwright'), path = require('path'), fs = require('fs');
 const E = process.env, FILE = path.resolve(E.FILE || 'nebula.html');
-const GAMES = +(E.GAMES || 10), PAR = +(E.PAR || 3), ROT = +(E.ROT || 3), STORY = E.STORY == null ? 2 : +E.STORY, MAXMS = +(E.MAXMS || 420000);
+const QUICK = !!E.QUICK;   // QUICK=1: 4 games (2 per size), 1 rotation, no story
+const GAMES = +(E.GAMES || (QUICK ? 2 : 10)), PAR = +(E.PAR || 3), ROT = +(E.ROT || (QUICK ? 1 : 3)), STORY = E.STORY == null ? (QUICK ? 0 : 2) : +E.STORY, MAXMS = +(E.MAXMS || 420000);
 let seed = +(E.SEED || 1); const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
 const SIZES = [[390, 763], [375, 553]].filter(s => !E.ONLY || String(s[0]) === E.ONLY), SHOTS = path.join(__dirname, 'sweep-shots'); fs.mkdirSync(SHOTS, { recursive: true });
 for (const f of fs.readdirSync(SHOTS)) if (/\.png$/.test(f)) fs.unlinkSync(path.join(SHOTS, f));
+let BASE = '';
 const fails = []; let shotN = 0, battles = 0, wins = 0, losses = 0, steps = 0, boardMin = 100, taps = 0, fingers = 0;
 async function fail(p, tag, kind, detail) {
   const key = tag + kind + String(detail).slice(0, 40); if (fails.some(f => f.key === key)) return;
@@ -61,8 +64,8 @@ const PROBE = () => {
 async function newPage(b, W, H) {
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   const p = await ctx.newPage(); p.setDefaultTimeout(90000); p.errs = [];
-  p.on('pageerror', e => p.errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g|Fetch API cannot load/.test(m.text())) p.errs.push('console ' + m.text()); });
-  await p.goto((E.URL ? E.URL : 'file://' + FILE) + '?phone=1'); await p.waitForSelector('[data-start]', { timeout: 30000 }); await p.waitForTimeout(1200);
+  p.on('pageerror', e => p.errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g/.test(m.text())) p.errs.push('console ' + m.text()); });
+  await p.goto(BASE.replace(/\/$/, '') + '/?phone=1'); await p.waitForSelector('[data-start]', { timeout: 30000 }); await p.waitForTimeout(1200);
   await p.evaluate(() => { AIDELAY = 70; try { localStorage.clear(); localStorage.setItem('na_played', '1'); localStorage.setItem('gxt-nebula-aces', JSON.stringify({ done: 1, open: 0, step: 0 })) } catch (e) { } }); return p;   // the first-time lesson offer and the story prologue are covered by tutor-test.js
 }
 // choose the next tap like a player would: the glowing / recommended control, sometimes another one
@@ -265,6 +268,7 @@ async function story(b, W, H, ch) {
   await p.context().close();
 }
 (async () => {
+  BASE = E.URL || await gx.url('nebula-aces', { file: FILE });
   const b = await PW.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }); const jobs = [];
   for (const [W, H] of SIZES) { for (let i = 0; i < GAMES; i++) jobs.push(() => battle(b, W, H, i)); for (let c = 1; c <= STORY; c++) jobs.push(() => story(b, W, H, c)); }
   let next = 0; await Promise.all([...Array(PAR)].map(async () => { while (next < jobs.length) { const j = jobs[next++]; await j() } }));

@@ -43,7 +43,8 @@
   <a href="games.html">Games</a>
   <a href="index.html">3D models</a>
   <select id="game"><option value="">All games</option></select>
-  <select id="state" autocomplete="off"><option value="" selected>All batches</option><option value="open">With pending images</option><option value="done">Complete</option></select>
+  <select id="wave"><option value="">All waves</option></select>
+  <select id="state" autocomplete="off"><option value="" selected>All batches</option><option value="open">With pending images</option><option value="done">Complete</option><option value="planned">Planned waves (not made yet)</option></select>
   <button id="reload">Refresh</button>
   <span id="upd" class="mute"></span>
 </header>
@@ -82,21 +83,23 @@ async function load() {
   $('chart').innerHTML = data.forecast.map(f => `<div style="height:${f.room / max * 100}%" title="+${f.h} h (${hhmm(f.at)}): room for ${f.room}"><span>${f.h % 3 ? '' : '+' + f.h + 'h'}</span></div>`).join('');
   const games = [...new Set(data.batches.map(b => b.game))].sort();
   const sel = $('game'), cur = sel.value; sel.length = 1; games.forEach(g => sel.add(new Option(g, g))); sel.value = cur;
+  const wsel = $('wave'), wcur = wsel.value, waves = [...new Set(data.batches.map(b => b.wave))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  wsel.length = 1; waves.forEach(w => wsel.add(new Option(w, w))); wsel.value = wcur;
   $('plan').innerHTML = (data.planned || []).map(p => `<tr><td>${p.name}</td><td class="num">${p.images}</td><td>${hhmm(p.eta)}</td></tr>`).join('');
   $('upd').textContent = 'updated ' + new Date().toLocaleTimeString();
   draw();
 }
 function draw() {
-  const g = $('game').value, st = $('state').value;
-  const bs = data.batches.filter(b => (!g || b.game === g) && (!st || (st === 'open' ? b.done < b.total : b.done === b.total)))
+  const g = $('game').value, st = $('state').value, w = $('wave').value;
+  const bs = data.batches.filter(b => (!g || b.game === g) && (!w || b.wave === w) && (!st || (st === 'planned' ? b.source === 'next-wave' : st === 'open' ? b.done < b.total : b.done === b.total)))
     .sort((a, b) => (b.total - b.done) - (a.total - a.done) || a.game.localeCompare(b.game));
-  $('rows').innerHTML = bs.map(b => `<tr><td>${b.game}</td><td>${b.kind} <span class="mute">${b.root}</span></td><td class="num">${b.done}</td>
+  $('rows').innerHTML = bs.map(b => `<tr><td>${b.game}</td><td>${b.kind} <span class="mute">${b.root}${b.source === 'next-wave' ? ' &middot; planned' : ''}</span></td><td class="num">${b.done}</td>
     <td class="num">${b.total - b.done}</td><td><div class="bar"><div style="width:${b.done / b.total * 100}%"></div></div></td></tr>`).join('');
   $('galleries').innerHTML = bs.map(b => `<div class="panel" style="margin-bottom:12px"><b>${b.game}</b> <span class="mute">· ${b.kind} · ${b.done}/${b.total}</span>
     <div class="grid">${b.items.map(i => `<div class="cell">${i.done ? `<img src="${i.thumb}" loading="lazy" alt="${i.name}" data-full="${i.thumb}">`
       : '<div class="pend">pending</div>'}<div class="n" title="${i.name}">${i.name}</div></div>`).join('')}</div></div>`).join('');
 }
-$('game').onchange = $('state').onchange = draw;
+$('game').onchange = $('state').onchange = $('wave').onchange = draw;
 $('reload').onclick = load;
 $('galleries').onclick = e => { const im = e.target.closest('img'); if (!im) return; $('zimg').src = im.src; $('zoom').hidden = false; };
 $('zoom').onclick = () => { $('zoom').hidden = true; };

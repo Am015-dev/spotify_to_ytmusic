@@ -1,8 +1,41 @@
 # Playbook: change one place, land in every game
 
 Roles: **Orchestrator** = main model (plans, decides, deploys). **Worker** = Sonnet (builds, fixes). **Script** = no AI.
-Read root `CLAUDE.md` first (hard rules, cost rules). The live `games/<slug>/index.html` changes only after the owner OKs it;
-use `--suffix -next` for previews. Never touch Mainhattan / Overdrive; Ticket to Ride is on hold.
+Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes straight to `games/<slug>/index.html` once its checks pass (owner, 5 Oct; `-next` previews are retired). Never touch Mainhattan / Overdrive; Ticket to Ride is on hold.
+
+## Iterate fast, check once (two speeds; numbers in `CHECK-SPEED.md`)
+- **Iterate with `--quick`:** `python3 games-src/scripts/build-all.py --quick <slug>` = build + stamp + phone-check + the game's scenario tests
+  (`?scn=` states, seconds each) + a QUICK sweep (4 games, one rotation). Run it after every small fix. Never run the full sweep to iterate.
+- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks + the FULL sweep (the CLAUDE.md gate, unchanged) + rotate-test,
+  once, then copies the passing game into `games/`. Run it once, right before going live (not after each fix, not again after a merge unless
+  the merge touched your game's logic). `--no-sweep` skips the sweep: only for a change that cannot touch play, and say why in the commit.
+- **One shared http server:** build-all.py starts `scripts/gx-serve.js` once and passes `GX_URL` to every check. Sweeps, rotate-tests,
+  phone-check and the scenario runner open `GX_URL/<slug>/` with the real media, music and models: never file://, never a per-game route hack
+  (fetch errors from file:// were fixed four times by four workers). In a sweep use `const gx = require('../scripts/gx-serve.js'); URL = await gx.url('<slug>', {file: <built html>})`
+  and honour `QUICK=1` (4 games).
+- **Skin keeps size:** the painted UI skin (`shell/gx-skin.css`, each game's `skin.css`) draws plates with `border-image` / background only
+  and never changes an element's width, height, padding, margin, font or border width (`scripts/skin-size-fix.py <skin.css>` does the
+  mechanical part). `phone-check.js` fails a game when `GXSK.audit()` finds a button, bar or panel whose box moves by more than 2 px with
+  the skin on versus off, and prints which computed property moved.
+- **Scenarios ("spawn the requirement only"):** every game registers scenarios in its own `scn.js` (see `shell/gx-scenario.js`,
+  worked example `munch/scn.js`): `?scn=<id>` skips menus and tutorial, seeds the RNG, builds the exact state and shows a "Test:" tag;
+  `scripts/scenario-test.js <slug>` runs every scenario at 390x763, 375x553 and 1366x768 over http. Write a scenario for every owner request
+  (it is the repro that stays), put its `ask` line in the What's new entry with `add-update.py ... --scn <id>` so the owner gets "▶ Try this".
+  Every game needs at least `<prefix>-board` and `<prefix>-zoom`.
+
+## Fast delivery (owner, 13 Oct 2026: "better checklists and tests, less playing the game and waiting for hours")
+Every change, however small, ships as: **code + scenario + checklist item**, in that order, in one deploy.
+1. **Scenario first.** For each requirement in the brief, register a `?scn=<id>` scenario (`games-src/shell/gx-scenario.js`)
+   that builds that exact moment directly (no menus, no playing there) with an `ask` line (8 words or fewer) and machine
+   `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
+2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
+   sweep while iterating.
+3. **One full `--deploy` at the end** (the full sweep gate is unchanged). Small batches: 1-3 games per worker, deploy each
+   game as soon as it passes; never hold finished games back for the rest of a batch.
+4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
+   gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
+5. **Report** = before/after numbers + the scenario ids. No "play a few games to check" steps for the owner, ever.
+6. Hand off at ~250k context tokens; long sessions get slow and expensive.
 
 ## The tools (all scripts, no AI)
 - `python3 games-src/scripts/build-all.py [slugs] [--out DIR] [--no-check] [--deploy [--suffix -next]]`
@@ -45,6 +78,7 @@ A game inlines them in its `build.py` from `../shell/` (never a local copy). Gam
 ## After every live deploy
 After every live deploy, run `python3 games-src/scripts/add-update.py <game-id> "headline" "item" ["item"...] --check "what to try"` with 1-5 plain-words items; the shelf's What's new panel shows them to the owner.
 To-make list for the laptop (missing + facelift + look-check, with prompts): rerun `python3 games-src/scripts/next-wave.py` after look-check and after wiring-status; it writes `games/next-wave.html`, `games-src/NEXT-WAVE.md` and the `games-src/next-wave/` prompt files, and refreshes `games/status.json`.
+Production waves (poses, 3D and art variety, split into days of at most 380 images; Wave 7, 8, 9 and 3D wave A to E): edit `games-src/scripts/wave7_data.py`, then rerun `python3 games-src/scripts/make-wave7.py` -> `next-wave.py` -> `viewer-plan.py` (prompt files in `games-src/next-wave/`, see its README.md; `viewer-plan.py` puts them in `games/asset-viewer/flow.json` as planned batches; commit the three outputs together).
 Versions and what is missing: `python3 games-src/scripts/game-status.py` writes `games/status.json` (version = commits touching `games/<slug>/`, wired/unwired art, still-to-make list). `build-all.py --deploy` and `wiring-status.py` run it; commit the file with the deploy. It feeds the shelf version chips, `games/status.html` and `games/asset-viewer/games.html`.
 
 ## C. Bug fix
@@ -56,7 +90,7 @@ Versions and what is missing: `python3 games-src/scripts/game-status.py` writes 
    No AI testers for bugs.
 
 ## Efficiency rules (from CLAUDE.md)
-- Test once, at the end: one full sweep right before deploy. After merging origin, run only a quick sweep (RUNS=8) unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
+- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` runs the one full sweep. After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
 - One worker per game, a tiny brief that names the files; reports under 150 words; at most 2 subagents at once.
 - Always set the model: orchestrator on main, workers on Sonnet, plain copying/downloads on Haiku. No new cloud sessions.
 - Scripts do the checking (build-all, phone-check, sweep); AI testers only for new-game blind tests, never for bugs.
@@ -94,3 +128,18 @@ kot, xw, ft, carc, kaiten, final-approach, short-fuse, tidewake, hollowbough, la
 Do the migration as one worker per game (Sonnet), each followed by `build-all.py <slug>`; the games' own css/js stay as they are.
 
 - After a round with new screenshots, run `python3 games-src/scripts/shots-gallery.py`: it rebuilds games/shots.html, the owner's grid of every worker screenshot.
+
+## Look check (does it LOOK right? no AI)
+`games-src/scripts/look-check.js` opens every shelf game at 390x763, 375x553 (phone, 3x, touch) and 1366x768 (PC), on the start
+screen, the board, mid-game (a few taps on glowing targets), the Help panel and a card hold. It never plays a game. It reports
+text under 11 px (phone) / 12 px (PC), contrast under 3:1 measured against the real pixels behind the text, cut-off or overlapping
+text, failed fonts, buttons with no visible label / under 40 px / covered, broken, stretched, blurry or hard-cropped pictures,
+blank canvases, small boards, overlapping or spilling cards, sideways scroll and console errors. Every finding has a red-boxed crop.
+- Run: `NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/look-check.js [--game <slug>] [--sizes phone,small,pc]`
+  (one game takes about 100 s; run games one at a time). Output: `games/look/index.html`, `report.json`, `needs-art.json`
+  (findings only new art can fix: flat CSS plates, blurry or stretched pictures).
+- Gate: `build-all.py --deploy` runs `look-check.js --gate` on each passing game. Only NEW severe findings against
+  `games-src/look-baseline.json` block the deploy; everything else is report-only. Skip with `--no-look`.
+- After a real fix, re-save the baseline: `look-check.js --baseline --game <slug>`. Scene drivers live in
+  `games-src/scripts/look-scenes.json` (a copy of the ones in asset-viewer/screens.html).
+- An owner bug report about looks ("can't read it", "button has no label") goes into the fixer's brief first, then run the look check on that game.

@@ -32,7 +32,7 @@ def wired(g, n, ext):
     return ext == 'webp' and 'media/' in t and bool(re.search(r"['\"`/]" + re.escape(n) + r"['\"`]", t))
 todo = collections.defaultdict(list); m3 = collections.defaultdict(list); cnt = collections.Counter()
 for b in d['batches']:
-    if b['root'] != 'flow-2d': continue
+    if b['root'] != 'flow-2d' or b.get('source') == 'next-wave': continue   # planned next-wave batches have nothing to wire yet
     for i in b['items']:
         if i.get('stage') in ('pushed', 'wired'):
             i['stage'] = 'wired' if wired(b['game'], i['name'], 'webp') else 'pushed'; cnt['2d-' + i['stage']] += 1

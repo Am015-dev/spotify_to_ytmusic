@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "back-harbor": "a card back design: a navy blue anchor and crown emblem on a wave pattern, ornate border, symmetrical, no text, letters or numbers",
+  "back-spire": "a card back design: a gold crown and spire emblem on a deep violet starry pattern, ornate border, symmetrical, no text, letters or numbers"
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 8",
+ "meta": {
+  "back-harbor": {
+   "element": "Painting: back-harbor",
+   "why": "chapter card backs",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "back-harbor.png",
+   "target": "games/crown-city-smash/media/back-harbor.webp",
+   "size": "768x1024",
+   "ratio": "3:4",
+   "tag": "art",
+   "wave": "Wave 8"
+  },
+  "back-spire": {
+   "element": "Painting: back-spire",
+   "why": "chapter card backs",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "back-spire.png",
+   "target": "games/crown-city-smash/media/back-spire.webp",
+   "size": "768x1024",
+   "ratio": "3:4",
+   "tag": "art",
+   "wave": "Wave 8"
+  }
+ }
+}

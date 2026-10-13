@@ -85,7 +85,9 @@ def nextwave_counts():
     try: d = json.load(open('games/next-wave.json', encoding='utf-8'))
     except (OSError, ValueError): return {}
     c = {}
-    for it in d.get('items', []): c[it['slug']] = c.get(it['slug'], 0) + 1
+    for it in d.get('items', []):
+        if it.get('tag'): continue          # wave 7 variety items (poses, 3D variety, art variety) are optional extras, not must-make
+        c[it['slug']] = c.get(it['slug'], 0) + 1
     return c
 
 def main():
@@ -94,7 +96,12 @@ def main():
     flow = json.load(open('games/asset-viewer/flow.json', encoding='utf-8'))
     pa, mo, unw = {}, {}, {}
     def slot(d, s): return d.setdefault(s, dict(wired=0, pushed=0))
+    planned = {}   # next-wave batches written by viewer-plan.py: optional extras by wave, never counted as must-make or as wired/pushed
     for b in flow['batches']:
+        if b.get('source') == 'next-wave':
+            p = planned.setdefault(ALIAS.get(b['game'], b['game']), dict(total=0, waves={}))
+            p['total'] += b['total']; p['waves'][b['wave']] = p['waves'].get(b['wave'], 0) + b['total']
+            continue
         if b.get('root') != 'flow-2d': continue
         s = ALIAS.get(b['game'], b['game'])
         for i in b['items']:
@@ -113,7 +120,8 @@ def main():
         s = g['slug']; have = stems(s)
         e = dict(id=g['id'], slug=s, title=g['title'], **version(s), news=news(g, upd),
                  paintings=pa.get(s, dict(wired=0, pushed=0)), models=mo.get(s, dict(wired=0, pushed=0)),
-                 unwired=sorted(unw.get(s, [])), missing=missing(s, have), facelift=None, nextwave=nw.get(s, 0))
+                 unwired=sorted(unw.get(s, [])), missing=missing(s, have), facelift=None, nextwave=nw.get(s, 0),
+                 planned=dict(total=planned.get(s, {}).get('total', 0), waves=dict(sorted(planned.get(s, {}).get('waves', {}).items(), key=lambda x: (x[0].startswith('3D'), x[0])))))
         out.append(e)
     data = dict(generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), games=out)
     with open('games/status.json', 'w', encoding='utf-8') as f:

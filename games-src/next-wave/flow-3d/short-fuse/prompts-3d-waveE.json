@@ -1,0 +1,113 @@
+{
+ "cards": {
+  "clock-key": "a large ornate brass clock-winding key, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tool-magnifier": "a brass magnifying glass on a short handle, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tool-multimeter": "a small brass and black handheld meter with a dial and two probes, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tool-screwdriver": "a flat screwdriver with a red wooden handle, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tool-wrench": "a heavy steel adjustable wrench, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "wire-spool": "a wooden spool wound with coloured wires, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Workshop gouache illustration for a cheerful bomb-defusal crew card game, warm lamplight against cool blueprint blues, brass and copper wire, slightly wobbly dark ink outline, matte paper texture, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave E",
+ "meta": {
+  "clock-key": {
+   "element": "3D model: clock-key",
+   "why": "unlock reward prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "clock-key.png",
+   "target": "games/short-fuse/models/clock-key.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "tool-magnifier": {
+   "element": "3D model: tool-magnifier",
+   "why": "job tool card prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tool-magnifier.png",
+   "target": "games/short-fuse/models/tool-magnifier.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "tool-multimeter": {
+   "element": "3D model: tool-multimeter",
+   "why": "job tool card prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tool-multimeter.png",
+   "target": "games/short-fuse/models/tool-multimeter.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "tool-screwdriver": {
+   "element": "3D model: tool-screwdriver",
+   "why": "job tool card prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tool-screwdriver.png",
+   "target": "games/short-fuse/models/tool-screwdriver.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "tool-wrench": {
+   "element": "3D model: tool-wrench",
+   "why": "job tool card prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tool-wrench.png",
+   "target": "games/short-fuse/models/tool-wrench.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "wire-spool": {
+   "element": "3D model: wire-spool",
+   "why": "bench prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "wire-spool.png",
+   "target": "games/short-fuse/models/wire-spool.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  }
+ },
+ "targets": {
+  "clock-key": "games/short-fuse/models/clock-key.glb",
+  "tool-magnifier": "games/short-fuse/models/tool-magnifier.glb",
+  "tool-multimeter": "games/short-fuse/models/tool-multimeter.glb",
+  "tool-screwdriver": "games/short-fuse/models/tool-screwdriver.glb",
+  "tool-wrench": "games/short-fuse/models/tool-wrench.glb",
+  "wire-spool": "games/short-fuse/models/wire-spool.glb"
+ }
+}

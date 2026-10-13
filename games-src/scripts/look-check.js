@@ -35,15 +35,16 @@ function listSlugs() {
   let s = [];
   try { s = JSON.parse(fs.readFileSync(path.join(ROOT, 'games', 'status.json'), 'utf8')).games.map(g => g.slug); } catch {}
   if (!s.length) s = fs.readdirSync(GAMES_DIR).filter(d => fs.existsSync(path.join(GAMES_DIR, d, 'index.html')) && !/asset-viewer|^room$/.test(d));
-  return s.filter(d => fs.existsSync(path.join(GAMES_DIR, d, 'index.html')));
+  return s.filter(d => fs.existsSync(path.join(GAMES_DIR, d, 'index.html')) || fs.existsSync(path.join(ROOT, 'games', d, 'index.html')));
 }
 
 function serve() {
   const types = { html: 'text/html', js: 'text/javascript', css: 'text/css', json: 'application/json', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', glb: 'model/gltf-binary', mp3: 'audio/mpeg', ogg: 'audio/ogg', wav: 'audio/wav', woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf', webmanifest: 'application/manifest+json' };
   const srv = http.createServer((q, r) => {
     let p = decodeURIComponent(q.url.split('?')[0]); if (p.endsWith('/')) p += 'index.html';
-    const f = path.join(GAMES_DIR, p);
-    if (!f.startsWith(GAMES_DIR) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end('nope'); }
+    let f = path.join(GAMES_DIR, p);
+    if (!fs.existsSync(f) || (fs.existsSync(f) && fs.statSync(f).isDirectory())) f = path.join(ROOT, 'games', p);  // staged copy first, shelf folder for media/models
+    if (!f.startsWith(GAMES_DIR) && !f.startsWith(path.join(ROOT, 'games')) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end('nope'); }
     r.writeHead(200, { 'content-type': types[path.extname(f).slice(1)] || 'application/octet-stream' });
     fs.createReadStream(f).pipe(r);
   });
@@ -162,6 +163,7 @@ async function pageCollect(o) {
     if (!t.shown || t.fs <= 0) { t.skip = 'hidden'; continue; }
     if (!inRoot(t.el)) { t.skip = 'behind'; continue; }
     const cv = cover(t.el, t.box, null);
+    { let n = 0, k = 0; for (const [fx, fy] of [[.5, .5], [.2, .5], [.8, .5], [.5, .25], [.5, .75]]) { const x = t.vis[0] + t.vis[2] * fx, y = t.vis[1] + t.vis[3] * fy; if (x < 0 || y < 0 || x >= W || y >= H) continue; n++; const h = document.elementFromPoint(x, y); if (h && t.el.contains(h)) k++; } t.selfHit = n ? k / n : 0; }
     t.cover = cv.frac; t.coverModal = cv.by ? modalish(cv.by) : false; t.coverBy = cv.by;
     t.sel = sel(t.el); t.btnEl = t.el.closest(BTN); t.dis = !!t.el.closest(':disabled,[aria-disabled=true],.disabled,.dis,.locked,[disabled]');
     textRecs.push(t);
@@ -179,9 +181,9 @@ async function pageCollect(o) {
       if (direct && el.clientWidth > 0 && el.clientHeight > 0) {
         const lc = s.webkitLineClamp && s.webkitLineClamp !== 'none';
         if (hid.test(s.overflowX) && el.scrollWidth > el.clientWidth + 1.5 && (t.ell || s.whiteSpace === 'nowrap' || s.display !== 'inline')) overflow = (t.ell ? 'ellipsis cuts' : 'clips') + ' the text sideways';
-        else if (hid.test(s.overflowY) && el.scrollHeight > el.clientHeight + 1.5) overflow = lc ? 'line clamp cuts' : 'clips the text vertically';
+        else if (hid.test(s.overflowY) && el.scrollHeight > el.clientHeight + Math.max(3, el.clientHeight * 0.14)) overflow = lc ? 'line clamp cuts' : 'clips the text vertically';
       }
-      if (!overflow && t.hardFrac > 0.05 && t.hardFrac < 0.85 && !t.rot) overflow = 'is partly hidden by its container';
+      if (!overflow && t.hardFrac > 0.05 && t.hardFrac < 0.7 && !t.rot) overflow = 'is partly hidden by its container';
       if (!overflow && !t.scrollAnc && t.vpf > 0.1 && t.vpf < 0.85 && !t.rot) overflow = 'runs off the screen edge';
     }
     t.overflow = overflow;
@@ -212,7 +214,8 @@ async function pageCollect(o) {
   for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
     const a = L[i], b = L[j]; if (related(a.el, b.el)) continue;
     let best = null;
-    for (const ra of a.rects) for (const rb of b.rects) { const ir = interRect(ra, rb); if (!ir) continue; const sm = Math.min(ra[2] * ra[3], rb[2] * rb[3]); if (ir[2] * ir[3] / sm > 0.15 && (!best || ir[2] * ir[3] > best[2] * best[3])) best = ir; }
+    const core = q => [q[0], q[1] + q[3] * 0.18, q[2], q[3] * 0.64];
+    for (const ra0 of a.rects) for (const rb0 of b.rects) { const ra = core(ra0), rb = core(rb0); const ir = interRect(ra, rb); if (!ir) continue; const sm = Math.min(ra[2] * ra[3], rb[2] * rb[3]); if (ir[2] * ir[3] / sm > 0.15 && (!best || ir[2] * ir[3] > best[2] * best[3])) best = ir; }
     if (best && best[2] > 3 && best[3] > 3 && topAt(best, a.el, b.el)) overlaps.push({ a: a.sel, ta: a.text, b: b.sel, tb: b.text, box: best, boxA: a.box, boxB: b.box, kind: 'text' });
     if (overlaps.length > 60) break;
   }
@@ -358,11 +361,11 @@ window.__px = {
           if (it.out) { const o = it.out, L3 = this.lum(o[0], o[1], o[2]), hi2 = Math.max(L1, L3), lo2 = Math.min(L1, L3); ratiosO.push((hi2 + 0.05) / (lo2 + 0.05)); }
         }
       }
-      if (!ratios.length) { out.push(null); continue; }
-      if (diffs.length) { diffs.sort((p, q) => p - q); if (diffs[Math.floor(diffs.length * 0.95)] >= 110) { out.push(null); diffs.length = 0; continue; } diffs.length = 0; }
+      if (!ratios.length) { out.push({ r: null, g: 0 }); continue; }
+      let gl = 0; if (diffs.length) { diffs.sort((p, q) => p - q); gl = diffs[Math.floor(diffs.length * 0.95)]; if (gl >= 110) { out.push({ r: null, g: gl }); diffs.length = 0; continue; } diffs.length = 0; }
       ratios.sort((p, q) => p - q); let r = ratios[ratios.length >> 1];
       if (ratiosO.length) { ratiosO.sort((p, q) => p - q); r = Math.max(r, ratiosO[ratiosO.length >> 1]); }
-      out.push(Math.round(r * 100) / 100);
+      out.push({ r: Math.round(r * 100) / 100, g: gl });
     }
     return out;
   },
@@ -402,7 +405,7 @@ async function findClick(p, step, size) {
     const vis = e => e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[hidden],[aria-hidden=true]');
     let el = null;
     if (spec.sel) el = [...document.querySelectorAll(spec.sel)].find(vis);
-    else { const re = new RegExp(spec.text, 'i'); el = [...document.querySelectorAll('button, a, [role=button], [data-act]')].find(e => vis(e) && re.test((e.textContent || e.getAttribute('aria-label') || '').trim())); }
+    else { const re = new RegExp(spec.text, 'i'); el = [...document.querySelectorAll('button, a, [role=button], [data-act]')].find(e => vis(e) && re.test((e.textContent || e.getAttribute('aria-label') || '').trim().replace(/^[^\p{L}\p{N}]+/u, '').replace(/\s+/g, ' '))); }
     if (!el) return null; el.scrollIntoView({ block: 'nearest' }); const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }, { spec });
   return pos;
@@ -430,9 +433,10 @@ const gridPx = (w, h, dpr) => { const up = v => v <= 512 ? 512 : 1024; return [u
 function judge(raw, ctx) {
   const { size, screen, contrastOf } = ctx; const phone = size.mobile; const F = [];
   const add = (f) => F.push({ size: size.id, screen, ...f });
+  for (const t of raw.texts) t.ok = !t.skip && (t.selfHit >= 0.4 || (t.__glyph || 0) >= 20);
   // 1 text size
   for (const t of raw.texts) {
-    if (t.skip || !t.letters || t.dis) continue;
+    if (!t.ok || !t.letters || t.dis) continue;
     const px = t.fs * t.scale; const th = t.rects[0][3]; const min = phone ? PHONE_MIN : PC_MIN;
     if (px < min - 0.01 && th < min * 1.9) {
       add({ check: 'size', sev: px < 9 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `size|${t.sel}|${px < 9 ? 'xs' : 's'}`, num: Math.round(px * 10) / 10,
@@ -441,7 +445,7 @@ function judge(raw, ctx) {
   }
   // 2 contrast (+ button label invisible)
   for (const t of raw.texts) {
-    if (t.skip || !t.letters || t.dis || t.__ratio == null || t.clipText) continue;
+    if (!t.ok || !t.letters || t.dis || t.__ratio == null || t.clipText) continue;
     const r = t.__ratio;
     if (r < 3) {
       const inBtn = !!t.btn;
@@ -451,7 +455,7 @@ function judge(raw, ctx) {
   }
   // 3 cut off
   for (const t of raw.texts) {
-    if (t.skip || !t.letters) continue;
+    if (!t.ok || !t.letters) continue;
     if (t.overflow) add({ check: 'overflow', sev: /hidden by|clips|cuts/.test(t.overflow) ? 'warn' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `ovf|${t.sel}|${t.overflow}`, desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" ${t.overflow}` });
     else if (t.plate && !t.scrollAnc) {
       const p = t.plate.rect, b = t.box; const out = Math.max(0, p[0] - b[0], p[1] - b[1], b[0] + b[2] - (p[0] + p[2]), b[1] + b[3] - (p[1] + p[3]));
@@ -577,7 +581,7 @@ async function checkGame(browser, helper, port, slug, deadline) {
         if (t.stroke > 0 && t.strokeCol[3] > 0.3) it.out = t.strokeCol; else { const m = (t.shadow || '').match(/rgba?\([^)]+\)/); if (m && !/none/.test(t.shadow)) { const c = m[0].match(/[\d.]+/g).map(Number); if ((c.length < 4 || c[3] > 0.3) && !/\b0px 0px 0px\b/.test(t.shadow)) it.out = c.slice(0, 3); } }
         items.push(it); idx.push(i); });
       const rs = items.length ? await helper.evaluate(([id, items]) => __px.contrast(id + '|bg', items), [id, items]) : [];
-      idx.forEach((i, k) => { raw.texts[i].__ratio = rs[k]; });
+      idx.forEach((i, k) => { raw.texts[i].__ratio = rs[k] ? rs[k].r : null; raw.texts[i].__glyph = rs[k] ? rs[k].g : 0; });
       for (const o of raw.objs) if ((o.tag === 'canvas') && o.box[2] >= 60 && o.box[3] >= 60 && o.op >= 0.5 && o.cover < 0.6 && o.vpf > 0.5) {
         const s = await helper.evaluate(([id, b]) => __px.std(id, b), [id, o.box]); if (s && s.std < 1.2 && s.colours <= 2) o.__blank = true; }
       const f = judge(raw, { size, screen: name, errors, net, isBoardScreen: !!isBoard });

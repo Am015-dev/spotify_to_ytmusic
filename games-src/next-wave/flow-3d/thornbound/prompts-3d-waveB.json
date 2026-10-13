@@ -1,0 +1,45 @@
+{
+ "cards": {
+  "pawn-agent": "a court pawn figure of a hooded agent in a dark green cloak holding a small dagger, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "pawn-knight": "a court pawn figure of a knight in crimson tabard with a sword and shield, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave B",
+ "meta": {
+  "pawn-agent": {
+   "element": "3D model: pawn-agent",
+   "why": "court pawn look",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "pawn-agent.png",
+   "target": "games/thornbound/models/pawn-agent.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "pawn-knight": {
+   "element": "3D model: pawn-knight",
+   "why": "court pawn look",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "pawn-knight.png",
+   "target": "games/thornbound/models/pawn-knight.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  }
+ },
+ "targets": {
+  "pawn-agent": "games/thornbound/models/pawn-agent.glb",
+  "pawn-knight": "games/thornbound/models/pawn-knight.glb"
+ }
+}

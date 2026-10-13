@@ -1,0 +1,45 @@
+{
+ "cards": {
+  "acorn": "a big glossy acorn with a textured cap, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "hollow-log": "a hollow mossy log with a round door and a tiny window, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted woodland gouache illustration for a cosy forest-critter game, warm autumn earth colours, soft rim light, matte paper texture, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "acorn": {
+   "element": "3D model: acorn",
+   "why": "resource prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "acorn.png",
+   "target": "games/hollowbough/models/acorn.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "hollow-log": {
+   "element": "3D model: hollow-log",
+   "why": "home prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "hollow-log.png",
+   "target": "games/hollowbough/models/hollow-log.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "acorn": "games/hollowbough/models/acorn.glb",
+  "hollow-log": "games/hollowbough/models/hollow-log.glb"
+ }
+}

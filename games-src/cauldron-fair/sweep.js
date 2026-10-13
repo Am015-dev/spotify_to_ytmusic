@@ -4,8 +4,10 @@
 // Per step it asserts: no console/page errors, a tapped control responds, hint text and ghost finger agree, scores and bag on screen = engine,
 // something changes within 8 s, no horizontal scroll, no tappable control covered. Then story chapters 1, 3 and 10 are played and their boss twists checked.
 const PW = require(process.env.PW || 'playwright'), fs = require('fs'), path = require('path');
-const URL = process.env.URL || 'http://localhost:8098/cauldron-fair.html';
-const GAMES = process.env.GAMES != null ? +process.env.GAMES : 40, ROT = process.env.ROT == null ? 5 : +process.env.ROT, ANIMN = process.env.ANIM == null ? 6 : +process.env.ANIM, PAR = +process.env.PAR || 3, C1N = +process.env.C1 || 400;
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 4 games, 1 rotation, story chapter 1 only
+let URL;
+const GAMES = process.env.GAMES != null ? +process.env.GAMES : (QUICK ? 4 : 40), ROT = process.env.ROT == null ? (QUICK ? 1 : 5) : +process.env.ROT, ANIMN = process.env.ANIM == null ? 6 : +process.env.ANIM, PAR = +process.env.PAR || 3, C1N = +process.env.C1 || 400;
 const SHOTS = path.join(__dirname, 'sweep-shots'); fs.mkdirSync(SHOTS, { recursive: true });
 for (const f of fs.readdirSync(SHOTS)) if (/\.png$/.test(f)) fs.unlinkSync(path.join(SHOTS, f));
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
@@ -283,6 +285,7 @@ async function playStory(b, id, W, H) {
 }
 // ---------------- main ----------------
 (async () => {
+  URL = process.env.URL || await gx.url('cauldron-fair', { file: path.resolve(__dirname, 'cauldron-fair.html') });
   const t0 = Date.now(); const b = await PW.chromium.launch({ executablePath: process.env.CHROMIUM || '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const jobs = []; for (let i = 0; i < GAMES; i++) jobs.push({ i, size: SIZES[i % 2], rot: false, anim: i < ANIMN });
   for (let i = 0; i < ROT; i++) jobs.push({ i: GAMES + i, size: SIZES[i % 2], rot: true, anim: false });
@@ -300,7 +303,7 @@ async function playStory(b, id, W, H) {
   };
   await Promise.all(Array.from({ length: PAR }, worker));
   const story = [];
-  if (process.env.STORY !== '0') for (const id of ['c1', 'c3', 'c10']) for (const [W, H] of SIZES) { const r = await playStory(b, id, W, H); story.push(r); console.log('STORY', JSON.stringify(r)); if (r.ended && r.twist.startsWith('WRONG') === false) counts.pass++; }
+  if (process.env.STORY !== '0') for (const id of QUICK ? ['c1'] : ['c1', 'c3', 'c10']) for (const [W, H] of SIZES) { const r = await playStory(b, id, W, H); story.push(r); console.log('STORY', JSON.stringify(r)); if (r.ended && r.twist.startsWith('WRONG') === false) counts.pass++; }
   await b.close();
   const c1 = c1WinRate(C1N); console.log('observed states (polls): ' + JSON.stringify(STAT)); console.log('help kit: bubbles per phase ' + JSON.stringify(HELP.bubbles) + ', bulb taps ' + HELP.bulbs + ' (' + HELP.bulbNull + ' with no suggestion), rules cards opened ' + HELP.rules + ', bulbs per phase ' + JSON.stringify(HELP.ph));
   console.log('\n===== SWEEP SUMMARY =====');

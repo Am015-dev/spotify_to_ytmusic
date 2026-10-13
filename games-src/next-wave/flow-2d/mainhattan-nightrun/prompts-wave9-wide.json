@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "event-new-record": "a neon cyberpunk trophy splash: a glowing gold trophy with magenta light rays over a night skyline, no text"
+ },
+ "style": "Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 9",
+ "meta": {
+  "event-new-record": {
+   "element": "Painting: event-new-record",
+   "why": "record splash",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-new-record.png",
+   "target": "games/mainhattan-nightrun/media/event-new-record.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 9"
+  }
+ }
+}
