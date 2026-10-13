@@ -49,6 +49,7 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
     (no forced state during the tested action). Done = every test passes and its GO item is in the ✔ Test checklist.
   - The whole test set for a change runs in under 3 min. Prove a test with a 1-min dry run before any longer run; a run that
     fails on a script error is fixed, never repeated.
+  - Workers never wait for an answer: fix the cause (max 20 min) or note it in HANDOFF.md and move on to the next game.
   - Workers commit at least every 10 min. Features over ~1 h or ~$5: spec + 3 acceptance tests + one mock-up first; the
     orchestrator asks the owner one yes/no.
 - **"No story mode":** chapters with bosses and a difficulty curve (`games-src/shell/CAMPAIGN.md`).
