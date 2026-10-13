@@ -407,6 +407,14 @@ const BX_TESTS={
  'bx-world':{n:'NEW TRACK',log:()=>[['w','valley']],drive:0,chk:()=>{let lo=1e9,hi=-1e9;for(const h of BX.th){lo=Math.min(lo,h);hi=Math.max(hi,h)}let vis=0;const v=bxV();BX.cam.updateMatrixWorld();
   for(let k=0;k<BX.th.length;k+=3){if(BX.th[k]<20)continue;v.set(BXO+(k%BXTN)*BXR,BX.th[k],BXO+Math.floor(k/BXTN)*BXR).project(BX.cam);if(Math.abs(v.x)<1&&Math.abs(v.y)<1&&v.z<1)vis++}
   return{ok:hi-lo>=30&&vis>20,msg:`terrain range ${(hi-lo).toFixed(1)} m, ${vis} hill points (>20 m) on screen`}}},
+ // dev-2 built-in tracks (Alex: "I see no tracks made with the builder yet!!!"): lap completes, >=15 m elevation, + each track's feature
+ 'bx-t-cliff':{n:'CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,
+  chk:()=>{const m=BX.m,r=m.yMax-m.yMin;return{ok:m.laps>=1&&r>=15&&m.airMax>=1.5&&BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id)),msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, air max ${m.airMax.toFixed(2)} s, banked turn ${BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id))?'yes':'no'}`}}},
+ 'bx-t-city':{n:'TWO-LEVEL CITY',log:()=>(BX_DEMOS['TWO-LEVEL CITY']||{log:[['w','city']]}).log,drive:1,
+  chk:()=>{const m=BX.m,r=m.yMax-m.yMin,cr=bxCross(m.seen||new Set());return{ok:m.laps>=1&&r>=15&&cr&&m.boat>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, over+under ${cr?'yes':'no'}, boat ${m.boat.toFixed(1)} s`}}},
+ 'bx-t-canyon':{n:'CANYON SPLIT',log:()=>(BX_DEMOS['CANYON SPLIT']||{log:[['w','canyon']]}).log,drive:1,
+  chk:()=>{const m=BX.m,r=m.yMax-m.yMin,S=m.seen||new Set(),key=c=>c.i+','+c.j+','+c.l+','+c.r,fk=BX.pcs.find(p=>p.type==='fk'),br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[],n=br.filter(p=>p&&S.has(p.id)).length;
+   return{ok:m.laps>=1&&r>=15&&n===2&&m.terrT>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, routes driven ${n}/2, off-road ${m.terrT.toFixed(1)} s`}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['MOUNTAIN JUMP']?BX_DEMOS['MOUNTAIN JUMP'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
