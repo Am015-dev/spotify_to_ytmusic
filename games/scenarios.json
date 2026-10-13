@@ -258,6 +258,36 @@
    "group": "Story"
   }
  ],
+ "shipwreck-isle": [
+  {
+   "id": "si-board",
+   "name": "Start of game board",
+   "ask": "Is the island clear with glowing places?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "si-zoom",
+   "name": "Card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "phone",
+   "group": "Cards"
+  },
+  {
+   "id": "si-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
  "sunglaze": [
   {
    "id": "sg-board",
@@ -284,6 +314,64 @@
    "id": "sg-buttons",
    "name": "Painted buttons keep their labels",
    "ask": "Are the buttons readable?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
+ "thornbound": [
+  {
+   "id": "tb-pc-hand",
+   "name": "PC: hand and Great Road",
+   "ask": "Do hand and road fill the panel?",
+   "sizes": "pc",
+   "group": "Cards"
+  },
+  {
+   "id": "tb-story-start",
+   "name": "Story after Skip tutorial",
+   "ask": "Skip tutorial: is the chapter map next?",
+   "sizes": "all",
+   "group": "Story"
+  },
+  {
+   "id": "tb-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "tb-zoom",
+   "name": "Card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "tb-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "tb-rivals",
+   "name": "Rival strip with faction emblems",
+   "ask": "Are the rival chips readable?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "tb-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the action buttons readable?",
    "sizes": "all",
    "group": "Board"
   },
