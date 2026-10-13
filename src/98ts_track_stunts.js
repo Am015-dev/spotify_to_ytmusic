@@ -47,7 +47,7 @@ function TS_launch(s){const L=TD.L,p0=s.tsP==null?s.dist:s.tsP;s.tsP=s.dist;if(s
     const gap=k.k==='gapw'||k.k==='gapr',slope=2*k.h/k.L;if(gap&&!s.isPlayer)s.v=Math.max(s.v,47);
     frameAt(TD,s.dist,F2);const y=yAt(TD,s.dist)+1.4,A={y,vy:lane?s.v*slope:s.v*slope+(gap?2:1),j:k.j,t:0,fall:false,cleared:false,tb:k.k,climb:lane?k.s:null,slope,v0:s.v};A.off=F2.p.y+F2.r.y*s.x-y;s.air=A;s.tsAir=A;
     if(s.isPlayer){TS.stats.launch++;AU.sfx('launch');fovKick=Math.max(fovKick,11);say('',gap&&s.v<44?'TOO SLOW!':k.k==='lane'?'STUNT LINE!':'BIG AIR!',.8)}else TS.stats.ai.launch++;return}}
-airStep=(f=>function(s){if(TS_on()){try{TS_launch(s)}catch(e){}const A=s.air;if(A&&A.climb!=null){const dl=mod(s.dist-A.climb+TD.L/2,TD.L)-TD.L/2;if(dl<0)A.vy=s.v*A.slope*clamp(1+dl/TB_ST.lL,0,1)+A.j.g*H;/* follow the wedge y=h·u² (slope 2h·u/L) */else if(A.climb!=null){A.climb=null;A.vy+=1}}}
+airStep=(f=>function(s){if(TS_on()){try{TS_launch(s)}catch(e){}const A=s.air;if(A&&A.climb!=null){const dl=mod(s.dist-A.climb+TD.L/2,TD.L)-TD.L/2;if(dl<0){const u=clamp(1+dl/TB_ST.lL,0,1);A.vy=s.v*A.slope*u+A.j.g*H;A.y=yAt(TD,s.dist)+1.4+TB_ST.lH*u*u+.06}/* ride the wedge y=h·u² (slope 2h·u/L); never 'lands' on it */else if(A.climb!=null){A.climb=null;A.vy+=1}}}
   f(s);if(TS_on()&&s.tsAir){const A=s.tsAir;if(s.air===A){if(s.isPlayer&&!A.apex&&A.vy<=0&&A.t>.35){A.apex=1;if(A.t>.55)slowmo=Math.max(slowmo,.35)}return}
     s.tsAir=null;const ok=!(s.dead>0),st=TS.stats;if(s.isPlayer){if(ok){st.landed++;st.air.push(+A.t.toFixed(2));const lp=Math.max(0,s.lap);st.airLap[lp]=(st.airLap[lp]||0)+A.t;
         const at=s.mesh.position.clone();burst(SMOKE||SPARK,at,26,14,.7,new THREE.Color(1.2,1.1,.9));burst(SPARK,at,18,20,.4,new THREE.Color(2,1.7,1));shake=Math.max(shake,.55);

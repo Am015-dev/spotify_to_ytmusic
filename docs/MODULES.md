@@ -386,7 +386,7 @@ uses: 10(45), 30(26), 20(13), 98ro(12), 72(6), 31(2), 40(1)
 
 ## 98ts_track_stunts.js — 38 KB
 defines: TS TS_on TS_near TS_shape TS_launch TS_bk TS_M TS_box TS_cyl TS_winTex TS_build TS_city TS_lm __ts TS_TRACKS
-uses: 10(55), 30(42), 98ro(39), 98tb(30), 31(7), 20(7), 72(3), 53(1)
+uses: 10(56), 30(42), 98ro(39), 98tb(31), 31(7), 20(7), 72(3), 53(1)
 
 ## 98zp_perf_ctx.js — 13 KB
 defines: P1 P1_rt P1_free P1_draw P1_off P1_img P1_readAsync P1_CRC P1_png P1_view P1_attach P1_detach P1_gbDraw P1_thSet P1_tq __P1 P2_after P2_compile P2_warm
