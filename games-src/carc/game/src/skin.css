@@ -1,0 +1,47 @@
+
+/* ===== Rampart & Vine skin (facelift): painted kit over the drawn UI. html.sk is set by gx-skin.js once the kit files loaded; every rule falls back to the old CSS without it. ===== */
+html.sk{--sk-ink:#3a2410}
+/* painted followers in the player's own colour (no disc behind them) */
+.pc.pp{background:none;box-shadow:none}
+.fglow .pc.pp{box-shadow:none}
+.seat .fi{width:1.2em;height:1.2em;object-fit:contain;display:block}
+/* top strip: carved oak bar, name-peg pills for the seats */
+html.sk #top{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #2b1a0d;border-bottom:0;box-shadow:0 3px 8px rgba(0,0,0,.45);min-height:52px;gap:4px}
+html.sk .seat{border:0 solid transparent;border-width:0 14px 0 40px;border-image:url(media/ui-score-pill.webp) 0 26 0 64 fill/0 14px 0 40px stretch;border-radius:0;background:none;color:#3a2410;min-height:40px;padding:0 2px 0 0;gap:5px;position:relative;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .seat.cur{background:none;filter:drop-shadow(0 0 5px var(--c)) drop-shadow(0 0 2px #fff6d8) drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .seat .dot{position:absolute;left:-30px;top:50%;translate:0 -50%;width:20px;height:20px;border-width:1.5px;font-size:11px}
+html.sk .seat .nm{opacity:1;color:#3a2410;font-weight:800;max-width:6ch}
+html.sk .seat b{color:#2a1608}
+html.sk .seat .fl{opacity:1;color:#3a2410}
+html.sk .seat.bump b{animation:bump .6s}
+html.sk #left{color:#fbecd2;font-weight:800;gap:4px}
+html.sk #left .plain{display:none}
+html.sk #left::before{content:'';width:24px;height:24px;background:url(media/icon-tile.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+html.sk #menubtn,html.sk #bulbbtn{width:44px;height:44px;border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));box-sizing:border-box}
+html.sk #menubtn svg{width:16px;height:16px}
+html.sk #bulbbtn{color:#3a2410}
+/* the tile tray */
+html.sk #app{background:#2b1a0d}
+html.sk #hand{background:none;border-top:0;border-style:solid;border-color:transparent;border-width:0 38px;border-image:url(media/ui-tray-c.webp) 0 70 fill/0 38px stretch;padding:8px 0 calc(9px + env(safe-area-inset-bottom));color:#f6ead2;filter:drop-shadow(0 -3px 5px rgba(0,0,0,.35));min-height:100px}
+html.sk #hinfo{color:#f6ead2}
+html.sk #hinfo .big{color:#2a3a14;font-size:1.35rem;padding:20px 54px;background:url(media/ui-ribbon.webp) center/100% 100% no-repeat;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+html.sk #htile{border-radius:6px}
+html.sk #htile .rot{right:-1px;bottom:-1px;width:34px;height:34px;border-radius:0;background:url(media/ui-rotate-btn.webp) center/contain no-repeat;font-size:0;color:transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+/* buttons: terracotta / cream pills */
+html.sk .btn,html.sk #hskip{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-go-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;padding:0 2px;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));display:inline-flex;align-items:center;justify-content:center}
+html.sk .btn.alt{border-image-source:url(media/ui-button-cream-c.webp);color:#3a2410;text-shadow:none}
+html.sk .btn:active,html.sk #hskip:active{transform:translateY(2px)}
+html.sk #hskip.hintspot{filter:drop-shadow(0 0 6px #ffd24a) drop-shadow(0 0 3px #ffd24a)}
+html.sk .opt{border:0 solid transparent;border-width:0 20px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 20px stretch;border-radius:0;background:none;min-height:44px;color:#3a2410;padding:0 2px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+html.sk .opt[aria-pressed=true]{border-image-source:url(media/ui-button-power-c.webp);color:#f6ffe6;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+/* panels: stone-cornered frame around a plain parchment centre (the painted centre of the panel is a map, so no 'fill') */
+html.sk .card,html.sk .menu,html.sk .gx-drawer,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100/34px stretch;border-radius:0;background:var(--paper) padding-box;background-clip:padding-box;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410;padding:0 2px;box-sizing:border-box}
+html.sk .card{max-width:392px}
+html.sk .menu{padding:0;min-width:230px}
+html.sk .menu button{min-height:46px}
+html.sk .card h1,html.sk .card h2{color:#8e3a1c}
+/* result: trophy on the painted end art, ribbon title */
+.endart{position:relative}
+html.sk .endart.win::after{content:'';position:absolute;right:6px;bottom:4px;width:64px;height:64px;background:url(media/ui-trophy.webp) center/contain no-repeat;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
+html.sk .card[aria-label=Result] h2,html.sk .gxc-res h2{background:url(media/ui-ribbon.webp) center/100% 100% no-repeat;padding:20px 44px;color:#2a3a14;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+@media (max-width:420px){html.sk .seat .nm{max-width:5ch}}
