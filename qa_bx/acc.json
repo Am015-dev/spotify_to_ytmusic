@@ -1,0 +1,25 @@
+{
+ "bx-cliff": {
+  "ok": true,
+  "msg": "respawn cliff, back on course after 0.28 s",
+  "why": "cliff",
+  "wall": "23s"
+ },
+ "bx-offroad": {
+  "ok": false,
+  "msg": "terrain 16.9 s, respawns 1, invisible-wall hits 0, tree/pillar bumps 1",
+  "why": "far",
+  "wall": "26s"
+ },
+ "bx-water": {
+  "ok": false,
+  "msg": "boat 2.5 s, boat speed 22.9 m/s",
+  "why": "far",
+  "wall": "19s"
+ },
+ "bx-errors": {
+  "ok": true,
+  "msg": "0 console/page errors",
+  "err": []
+ }
+}
