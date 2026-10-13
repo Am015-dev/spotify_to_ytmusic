@@ -145,6 +145,19 @@ def main():
         items.append((nm, f'{short[o[0][0]]}' + ('+' if len(o) > 1 else '')))
     L.append(' '.join(f'{a}={b}' for a, b in sorted(items)))
     s = '\n'.join(L) + '\n'
+    if '--full' not in sys.argv:   # token saver (dev3): ONE line per module, < 10 KB; symbol lookup = tools/find.sh, full tables = --full -> docs/MODULES_FULL.md
+        C = ['# MODULES.md: one line per module (tools/modmap.py; `--full` = the long version in docs/MODULES_FULL.md). Find a symbol: `tools/find.sh <symbol>`. Never open built html.', '',
+             'file | KB | purpose | first defines']
+        for f in flist:
+            if f not in texts: continue
+            kb = len(texts[f].encode('utf8')) / 1024
+            mb = re.sub(r'\d+\.js$', '.js', f)
+            pur = (mp.get(f) or (mb != f and mp.get(mb) and 'part of ' + mb + ': ' + mp.get(mb)) or purpose(f, texts[f].split('\n')[:6])).replace('|', '/')
+            pur = re.sub(r'\s+', ' ', re.sub(r'`|\*\*', '', pur))[:52]
+            C.append(f'{f} | {kb:.0f} | {pur} | ' + ' '.join(nm for nm, ln in defs[f][:3]))
+        full, s = s, '\n'.join(C) + '\n'
+    else:
+        OUT2 = os.path.join(ROOT, 'docs', 'MODULES_FULL.md'); open(OUT2, 'w', encoding='utf8').write(s); print('full ->', OUT2); return
     if '--check' in sys.argv:
         print(len(s)); return
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
