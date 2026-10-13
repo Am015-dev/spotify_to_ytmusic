@@ -163,8 +163,9 @@ async function pageCollect(o) {
     if (!t.shown || t.fs <= 0) { t.skip = 'hidden'; continue; }
     if (!inRoot(t.el)) { t.skip = 'behind'; continue; }
     const cv = cover(t.el, t.box, null);
+    { let n = 0, k = 0; for (const [fx, fy] of [[.5, .5], [.2, .5], [.8, .5], [.5, .25], [.5, .75]]) { const x = t.vis[0] + t.vis[2] * fx, y = t.vis[1] + t.vis[3] * fy; if (x < 0 || y < 0 || x >= W || y >= H) continue; n++; const h = document.elementFromPoint(x, y); if (h && t.el.contains(h)) k++; } t.selfHit = n ? k / n : 0; }
     t.cover = cv.frac; t.coverModal = cv.by ? modalish(cv.by) : false; t.coverBy = cv.by;
-    t.sel = sel(t.el); t.btnEl = t.el.closest(BTN); t.dis = !!t.el.closest(':disabled,[aria-disabled=true],.disabled,.dis,.locked,[disabled]');
+    t.sel = sel(t.el); t.btnEl = t.el.closest(BTN); t.help = !!t.el.closest('[data-help]'); t.dis = !!t.el.closest(':disabled,[aria-disabled=true],.disabled,.dis,.locked,[disabled]');
     textRecs.push(t);
   }
   const recKeys = new Set();
@@ -360,11 +361,11 @@ window.__px = {
           if (it.out) { const o = it.out, L3 = this.lum(o[0], o[1], o[2]), hi2 = Math.max(L1, L3), lo2 = Math.min(L1, L3); ratiosO.push((hi2 + 0.05) / (lo2 + 0.05)); }
         }
       }
-      if (!ratios.length) { out.push(null); continue; }
-      if (diffs.length) { diffs.sort((p, q) => p - q); if (diffs[Math.floor(diffs.length * 0.95)] >= 110) { out.push(null); diffs.length = 0; continue; } diffs.length = 0; }
+      if (!ratios.length) { out.push({ r: null, g: 0 }); continue; }
+      let gl = 0; if (diffs.length) { diffs.sort((p, q) => p - q); gl = diffs[Math.floor(diffs.length * 0.95)]; if (gl >= 110) { out.push({ r: null, g: gl }); diffs.length = 0; continue; } diffs.length = 0; }
       ratios.sort((p, q) => p - q); let r = ratios[ratios.length >> 1];
       if (ratiosO.length) { ratiosO.sort((p, q) => p - q); r = Math.max(r, ratiosO[ratiosO.length >> 1]); }
-      out.push(Math.round(r * 100) / 100);
+      out.push({ r: Math.round(r * 100) / 100, g: gl });
     }
     return out;
   },
@@ -432,9 +433,10 @@ const gridPx = (w, h, dpr) => { const up = v => v <= 512 ? 512 : 1024; return [u
 function judge(raw, ctx) {
   const { size, screen, contrastOf } = ctx; const phone = size.mobile; const F = [];
   const add = (f) => F.push({ size: size.id, screen, ...f });
+  for (const t of raw.texts) t.ok = !t.skip && (t.selfHit >= 0.4 || (t.__glyph || 0) >= 20);
   // 1 text size
   for (const t of raw.texts) {
-    if (t.skip || !t.letters || t.dis) continue;
+    if (!t.ok || !t.letters || t.dis) continue;
     const px = t.fs * t.scale; const th = t.rects[0][3]; const min = phone ? PHONE_MIN : PC_MIN;
     if (px < min - 0.01 && th < min * 1.9) {
       add({ check: 'size', sev: px < 9 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `size|${t.sel}|${px < 9 ? 'xs' : 's'}`, num: Math.round(px * 10) / 10,
@@ -443,7 +445,7 @@ function judge(raw, ctx) {
   }
   // 2 contrast (+ button label invisible)
   for (const t of raw.texts) {
-    if (t.skip || !t.letters || t.dis || t.__ratio == null || t.clipText) continue;
+    if (!t.ok || !t.letters || t.dis || t.__ratio == null || t.clipText || t.help) continue;
     const r = t.__ratio;
     if (r < 3) {
       const inBtn = !!t.btn;
@@ -453,7 +455,7 @@ function judge(raw, ctx) {
   }
   // 3 cut off
   for (const t of raw.texts) {
-    if (t.skip || !t.letters) continue;
+    if (!t.ok || !t.letters) continue;
     if (t.overflow) add({ check: 'overflow', sev: /hidden by|clips|cuts/.test(t.overflow) ? 'warn' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `ovf|${t.sel}|${t.overflow}`, desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" ${t.overflow}` });
     else if (t.plate && !t.scrollAnc) {
       const p = t.plate.rect, b = t.box; const out = Math.max(0, p[0] - b[0], p[1] - b[1], b[0] + b[2] - (p[0] + p[2]), b[1] + b[3] - (p[1] + p[3]));
@@ -579,7 +581,7 @@ async function checkGame(browser, helper, port, slug, deadline) {
         if (t.stroke > 0 && t.strokeCol[3] > 0.3) it.out = t.strokeCol; else { const m = (t.shadow || '').match(/rgba?\([^)]+\)/); if (m && !/none/.test(t.shadow)) { const c = m[0].match(/[\d.]+/g).map(Number); if ((c.length < 4 || c[3] > 0.3) && !/\b0px 0px 0px\b/.test(t.shadow)) it.out = c.slice(0, 3); } }
         items.push(it); idx.push(i); });
       const rs = items.length ? await helper.evaluate(([id, items]) => __px.contrast(id + '|bg', items), [id, items]) : [];
-      idx.forEach((i, k) => { raw.texts[i].__ratio = rs[k]; });
+      idx.forEach((i, k) => { raw.texts[i].__ratio = rs[k] ? rs[k].r : null; raw.texts[i].__glyph = rs[k] ? rs[k].g : 0; });
       for (const o of raw.objs) if ((o.tag === 'canvas') && o.box[2] >= 60 && o.box[3] >= 60 && o.op >= 0.5 && o.cover < 0.6 && o.vpf > 0.5) {
         const s = await helper.evaluate(([id, b]) => __px.std(id, b), [id, o.box]); if (s && s.std < 1.2 && s.colours <= 2) o.__blank = true; }
       const f = judge(raw, { size, screen: name, errors, net, isBoardScreen: !!isBoard });

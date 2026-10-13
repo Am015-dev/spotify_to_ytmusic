@@ -1,0 +1,192 @@
+{
+ "crown-city-smash": {
+  "severe": 1,
+  "warn": 6,
+  "severeKeys": [
+   "contrast|em.v"
+  ],
+  "counts": {
+   "contrast": 2,
+   "overflow": 2,
+   "images": 2,
+   "button": 1,
+   "art": 0
+  }
+ },
+ "nebula-aces": {
+  "severe": 0,
+  "warn": 2,
+  "severeKeys": [],
+  "counts": {
+   "size": 1,
+   "images": 1
+  }
+ },
+ "doorkick-dungeon": {
+  "severe": 0,
+  "warn": 5,
+  "severeKeys": [],
+  "counts": {
+   "images": 5,
+   "art": 0
+  }
+ },
+ "shipwreck-isle": {
+  "severe": 0,
+  "warn": 4,
+  "severeKeys": [],
+  "counts": {
+   "images": 1,
+   "boards": 1,
+   "overlap": 2,
+   "art": 0
+  }
+ },
+ "sands-of-qamar": {
+  "severe": 6,
+  "warn": 33,
+  "severeKeys": [
+   "button|b.tv",
+   "button|details.exd > summary",
+   "contrast|small.ord",
+   "contrast|span.dv",
+   "contrast|span.tn",
+   "size|small.ord"
+  ],
+  "counts": {
+   "size": 2,
+   "contrast": 5,
+   "button": 5,
+   "overflow": 1,
+   "overlap": 3,
+   "images": 23
+  }
+ },
+ "sunglaze": {
+  "severe": 0,
+  "warn": 0,
+  "severeKeys": [],
+  "counts": {
+   "art": 0
+  }
+ },
+ "rampart-and-vine": {
+  "severe": 0,
+  "warn": 2,
+  "severeKeys": [],
+  "counts": {
+   "images": 2,
+   "art": 0
+  }
+ },
+ "short-fuse": {
+  "severe": 0,
+  "warn": 13,
+  "severeKeys": [],
+  "counts": {
+   "images": 11,
+   "overlap": 1,
+   "button": 1
+  }
+ },
+ "tidewake": {
+  "severe": 2,
+  "warn": 7,
+  "severeKeys": [
+   "size|button#bulbbtn > span",
+   "size|button.gx-ibtn > span"
+  ],
+  "counts": {
+   "size": 2,
+   "contrast": 2,
+   "images": 3,
+   "button": 1,
+   "boards": 1,
+   "art": 0
+  }
+ },
+ "hollowbough": {
+  "severe": 0,
+  "warn": 4,
+  "severeKeys": [],
+  "counts": {
+   "contrast": 2,
+   "images": 2,
+   "art": 0
+  }
+ },
+ "thornbound": {
+  "severe": 4,
+  "warn": 9,
+  "severeKeys": [
+   "button|span.bidc.up > b",
+   "contrast|svg.tb-card > text",
+   "size|g.tb-m-round > g > text",
+   "size|g.tbx-pan > g > text"
+  ],
+  "counts": {
+   "size": 4,
+   "contrast": 2,
+   "button": 2,
+   "images": 5,
+   "art": 0
+  }
+ },
+ "kaiten-kitchen": {
+  "severe": 0,
+  "warn": 5,
+  "severeKeys": [],
+  "counts": {
+   "images": 5,
+   "art": 0
+  }
+ },
+ "lantern-dive": {
+  "severe": 0,
+  "warn": 2,
+  "severeKeys": [],
+  "counts": {
+   "images": 2,
+   "art": 0
+  }
+ },
+ "cauldron-fair": {
+  "severe": 1,
+  "warn": 7,
+  "severeKeys": [
+   "size|svg.chip > text"
+  ],
+  "counts": {
+   "size": 2,
+   "overflow": 1,
+   "button": 3,
+   "images": 2,
+   "art": 0
+  }
+ },
+ "final-approach": {
+  "severe": 0,
+  "warn": 3,
+  "severeKeys": [],
+  "counts": {
+   "images": 3,
+   "art": 0
+  }
+ },
+ "mainhattan-nightrun": {
+  "severe": 3,
+  "warn": 17,
+  "severeKeys": [
+   "images|network"
+  ],
+  "counts": {
+   "images": 20
+  }
+ },
+ "mainhattan-overdrive": {
+  "severe": 0,
+  "warn": 0,
+  "severeKeys": [],
+  "counts": {}
+ }
+}

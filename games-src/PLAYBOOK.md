@@ -78,6 +78,7 @@ A game inlines them in its `build.py` from `../shell/` (never a local copy). Gam
 ## After every live deploy
 After every live deploy, run `python3 games-src/scripts/add-update.py <game-id> "headline" "item" ["item"...] --check "what to try"` with 1-5 plain-words items; the shelf's What's new panel shows them to the owner.
 To-make list for the laptop (missing + facelift + look-check, with prompts): rerun `python3 games-src/scripts/next-wave.py` after look-check and after wiring-status; it writes `games/next-wave.html`, `games-src/NEXT-WAVE.md` and the `games-src/next-wave/` prompt files, and refreshes `games/status.json`.
+Production waves (poses, 3D and art variety, split into days of at most 380 images; Wave 7, 8, 9 and 3D wave A to E): edit `games-src/scripts/wave7_data.py`, then rerun `python3 games-src/scripts/make-wave7.py` -> `next-wave.py` -> `viewer-plan.py` (prompt files in `games-src/next-wave/`, see its README.md; `viewer-plan.py` puts them in `games/asset-viewer/flow.json` as planned batches; commit the three outputs together).
 Versions and what is missing: `python3 games-src/scripts/game-status.py` writes `games/status.json` (version = commits touching `games/<slug>/`, wired/unwired art, still-to-make list). `build-all.py --deploy` and `wiring-status.py` run it; commit the file with the deploy. It feeds the shelf version chips, `games/status.html` and `games/asset-viewer/games.html`.
 
 ## C. Bug fix

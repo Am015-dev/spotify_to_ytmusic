@@ -1,0 +1,45 @@
+{
+ "cards": {
+  "sw-pine": "a tall tropical jungle tree with a dense canopy and hanging vines, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sw-reeds": "a clump of tall river reeds with cattail heads, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Tropical castaway gouache illustration for a co-operative island survival card game, turquoise, sand, jungle green and driftwood colours, soft rim light, matte paper texture, slightly wobbly dark ink outline, simple readable silhouette that works small, centred, plenty of margin, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave D",
+ "meta": {
+  "sw-pine": {
+   "element": "3D model: sw-pine",
+   "why": "plains and hills hexes",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-pine.png",
+   "target": "games/shipwreck-isle/models/sw-pine.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "sw-reeds": {
+   "element": "3D model: sw-reeds",
+   "why": "river hex",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-reeds.png",
+   "target": "games/shipwreck-isle/models/sw-reeds.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  }
+ },
+ "targets": {
+  "sw-pine": "games/shipwreck-isle/models/sw-pine.glb",
+  "sw-reeds": "games/shipwreck-isle/models/sw-reeds.glb"
+ }
+}

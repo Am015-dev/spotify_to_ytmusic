@@ -1,0 +1,96 @@
+{
+ "cards": {
+  "brainjack-token": "a glowing pink brain-shaped token on a thin round base, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "crown-spire": "the Crown Spire: a glittering spire skyscraper topped by a giant golden crown, the landmark of the final chapter, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tower-e": "a slim art-deco skyscraper with a stepped crown, a gold spire and warm lit windows, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tower-f": "a wide glass-slab office block with a rooftop helipad and a blank billboard frame, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tower-g": "a squat brick apartment block with a rooftop water tank and fire escapes, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave B",
+ "meta": {
+  "brainjack-token": {
+   "element": "3D model: brainjack-token",
+   "why": "Cortexa's Brainjack token is a flat icon today",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "brainjack-token.png",
+   "target": "games/crown-city-smash/models/brainjack-token.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "crown-spire": {
+   "element": "3D model: crown-spire",
+   "why": "hero landmark for the last chapter and the win screen",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "crown-spire.png",
+   "target": "games/crown-city-smash/models/crown-spire.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "tower-e": {
+   "element": "3D model: tower-e",
+   "why": "a fifth skyline silhouette next to the four towers",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tower-e.png",
+   "target": "games/crown-city-smash/models/tower-e.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "tower-f": {
+   "element": "3D model: tower-f",
+   "why": "a low wide building to break the vertical rhythm",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tower-f.png",
+   "target": "games/crown-city-smash/models/tower-f.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "tower-g": {
+   "element": "3D model: tower-g",
+   "why": "a human-scale building for the suburbs and the edges",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tower-g.png",
+   "target": "games/crown-city-smash/models/tower-g.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  }
+ },
+ "targets": {
+  "brainjack-token": "games/crown-city-smash/models/brainjack-token.glb",
+  "crown-spire": "games/crown-city-smash/models/crown-spire.glb",
+  "tower-e": "games/crown-city-smash/models/tower-e.glb",
+  "tower-f": "games/crown-city-smash/models/tower-f.glb",
+  "tower-g": "games/crown-city-smash/models/tower-g.glb"
+ }
+}

@@ -322,12 +322,13 @@ W7_NOTE = {'poses': 'Pose set: reuse the reference painting and the same seed; f
 def from_wave7(titles):
     import glob
     items = []
-    for f in sorted(glob.glob('games-src/next-wave/flow-2d/*/prompts-wave7-*.json') + glob.glob('games-src/next-wave/flow-3d/*/prompts-wave7-*.json')):
+    for f in sorted(glob.glob('games-src/next-wave/flow-2d/*/prompts-wave[0-9]*.json') + glob.glob('games-src/next-wave/flow-3d/*/prompts-3d-wave*.json')):
         slug = f.split('/')[-2]
         if slug not in titles: continue
         try: d = json.load(open(f, encoding='utf-8'))
         except ValueError: continue
         meta = d.get('meta', {})
+        if os.path.basename(f).startswith('prompts-wave6'): continue   # wave 6 is written by this script itself
         for name, prompt in d.get('cards', {}).items():
             m = meta.get(name)
             if not m: continue
@@ -340,7 +341,7 @@ def from_wave7(titles):
             items.append(dict(slug=slug, game=titles[slug], kind='model3d' if tag == '3d' else 'art', stem=name, element=m.get('element', name), files=[m.get('save_as', name + '.png')],
                               save_as=m.get('save_as', name + '.png'), repo_target=m.get('target', ''), size=m.get('size', ''), ratio=m.get('ratio', '1:1'), transparent=False,
                               prompt=prompt, style=d.get('style', ''), why=m.get('why', ''), source='wave7', priority=3 + int(m.get('pri', 3)), note=note.strip(),
-                              crop=m.get('thumb', ''), tag=tag, bg=m.get('bg', ''), align=m.get('align', '')))
+                              crop=m.get('thumb', ''), tag=tag, bg=m.get('bg', ''), align=m.get('align', ''), wave=m.get('wave', '')))
     return items
 
 # ---------------------------------------------------------------- build
@@ -393,7 +394,7 @@ def main():
     write_md([it for it in items if not it.get('tag')], titles, have_lc, drops, len(w7))
     write_html(items, titles, have_lc)
     json.dump(dict(generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), lookcheck=have_lc,
-                   items=[{k: v for k, v in it.items() if k in ('id', 'slug', 'kind', 'priority', 'stem', 'tag')} for it in items]),
+                   items=[{k: v for k, v in it.items() if k in ('id', 'slug', 'kind', 'priority', 'stem', 'tag', 'wave')} for it in items]),
               open('games/next-wave.json', 'w', encoding='utf-8'), separators=(',', ':'))
     subprocess.run([sys.executable, 'games-src/scripts/game-status.py'], stdout=subprocess.DEVNULL)
     core = [it for it in items if not it.get('tag')]
@@ -465,7 +466,7 @@ def write_html(items, titles, have_lc):
         pub.append({k: hide(v) if isinstance(v, str) else v for k, v in dict(
             id=it['id'], slug=it['slug'], game=it['game'], kind=it['kind'], stem=it['stem'], element=it['element'], save_as=it['save_as'],
             size=it['size'], ratio=it['ratio'], transparent=it['transparent'], prompt=it['full_prompt'], why=it['why'], src=it['sources'][0],
-            pri=it['priority'], note=it['note'], crop=it.get('crop', ''), tag=it.get('tag', ''), bg=it.get('bg', '')).items()})
+            pri=it['priority'], note=it['note'], crop=it.get('crop', ''), tag=it.get('tag', ''), bg=it.get('bg', ''), wave=it.get('wave', '')).items()})
     gen = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
     data = json.dumps(dict(generated=gen, lookcheck=have_lc, titles=titles, items=pub), ensure_ascii=False).replace('</', '<\\/')
     html = HTML.replace('__DATA__', data)
@@ -486,6 +487,7 @@ h1 a{color:var(--acc);font-size:.85rem;font-weight:600;text-decoration:none}h1 a
 .chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:99px;padding:6px 14px;font:600 13px system-ui;cursor:pointer;min-height:36px}
 .chip[aria-pressed=true]{background:var(--acc);color:#2a1808;border-color:var(--acc)}
 main{padding:12px 16px 40px;display:grid;gap:10px;max-width:1100px;margin:0 auto}
+.wbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--mut)}.wbar b{color:var(--acc)}.wbar .btn{margin-left:auto}
 .intro{color:var(--mut);font-size:13px;margin:0}.intro a{color:var(--acc)}
 .g{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px;min-width:0}
 .g>summary{list-style:none;cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:34px}
@@ -518,13 +520,14 @@ main{padding:12px 16px 40px;display:grid;gap:10px;max-width:1100px;margin:0 auto
 <header><h1>Next wave <small id="gen"></small><a class="r" href="status.html">Status</a><a href="index.html">&larr; Shelf</a></h1>
 <div class="counts" id="counts"></div>
 <div class="chips" role="group" aria-label="Filter"><button class="chip" data-f="todo" aria-pressed="true">To make</button><button class="chip" data-f="all" aria-pressed="false">All</button><button class="chip" data-f="done" aria-pressed="false">Made</button></div>
-<div class="chips" role="group" aria-label="Type"><button class="chip" data-t="" aria-pressed="true">All types</button><button class="chip" data-t="core" aria-pressed="false">Missing &amp; facelift</button><button class="chip" data-t="poses" aria-pressed="false">Poses</button><button class="chip" data-t="3d" aria-pressed="false">3D variety</button><button class="chip" data-t="art" aria-pressed="false">Art variety</button></div></header>
+<div class="chips" role="group" aria-label="Type"><button class="chip" data-t="" aria-pressed="true">All types</button><button class="chip" data-t="core" aria-pressed="false">Missing &amp; facelift</button><button class="chip" data-t="poses" aria-pressed="false">Poses</button><button class="chip" data-t="3d" aria-pressed="false">3D variety</button><button class="chip" data-t="art" aria-pressed="false">Art variety</button></div>
+<div class="chips" id="wv" role="group" aria-label="Wave"></div><div class="wbar" id="wbar" hidden></div></header>
 <main><p class="intro" id="intro"></p><div id="m"></div></main>
 <script id="data" type="application/json">__DATA__</script>
 <script>
 const D=JSON.parse(document.getElementById('data').textContent);
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const KEY='nextwave-made-v1';let made={},F='todo',T='',cur={},opened={};
+const KEY='nextwave-made-v1';let made={},F='todo',T='',WV='',cur={},opened={};
 try{const h=location.hash.match(/^#g-([\w-]+)/);if(h)opened[h[1]]=true}catch(e){}
 try{made=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){made={}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(made))}catch(e){}}
@@ -539,10 +542,19 @@ function counts(){
   const L=D.items,todo=L.filter(i=>!made[i.id]),core=todo.filter(i=>!i.tag),c=k=>core.filter(i=>i.kind===k).length,t=k=>todo.filter(i=>i.tag===k).length;
   $('#counts').innerHTML=`<span>To make <b>${core.length}</b></span><span>Paintings <b>${c('art')}</b></span><span>Music <b>${c('music')}</b></span><span>3D <b>${c('model3d')}</b></span>`+(c('video')?`<span>Video <b>${c('video')}</b></span>`:'')+(t('poses')+t('3d')+t('art')?`<span>Poses <b>${t('poses')}</b></span><span>3D variety <b>${t('3d')}</b></span><span>Art variety <b>${t('art')}</b></span>`:'')+`<span>Made <b>${L.length-todo.length}</b></span>`;
 }
-const vis=i=>T===''||(T==='core'?!i.tag:i.tag===T);
+const vis=i=>(WV===''||i.wave===WV)&&(T===''||(T==='core'?!i.tag:i.tag===T));
+const WAVES=[...new Set(D.items.map(i=>i.wave).filter(Boolean))].sort((a,b)=>(a.startsWith('3D')-b.startsWith('3D'))||a.localeCompare(b,undefined,{numeric:true}));
+function waveBar(){
+  const n=w=>D.items.filter(i=>i.wave===w&&!made[i.id]).length;
+  $('#wv').innerHTML=WAVES.length?`<button class="chip" data-w="" aria-pressed="${WV===''}">All waves</button>`+WAVES.map(w=>`<button class="chip" data-w="${esc(w)}" aria-pressed="${WV===w}">${esc(w)} &middot; ${n(w)}</button>`).join(''):'';
+  const b=$('#wbar');
+  if(!WV){b.hidden=true;return}
+  const L=D.items.filter(i=>i.wave===WV&&!made[i.id]),mix=['poses','3d','art'].map(k=>[k,L.filter(i=>i.tag===k).length]).filter(x=>x[1]).map(x=>x[1]+' '+TL[x[0]].toLowerCase()).join(', '),games=new Set(L.map(i=>i.slug)).size;
+  b.hidden=false;b.innerHTML=`<span><b>${esc(WV)}</b>: ${L.length} images to make (${esc(mix)}) in ${games} games`+(WV.startsWith('3D')?' &middot; 3D track':' &middot; one day of the 380 limit')+`</span><button class="btn" data-wavecopy="1">Copy all prompts in this wave</button>`;
+}
 const BG={green:'flat chroma green #00FF00 background',magenta:'flat chroma magenta #FF00FF background',grey:'light-grey background (3D source)'};
 function itemHTML(i){
-  return `<div class="it${made[i.id]?' done':''}" data-id="${esc(i.id)}"><div class="hd"><span class="tag p${i.pri}">${i.src==='lookcheck'?'look-check':PL[i.pri]}</span><span class="tag ${i.tag?'t':'k'}">${i.tag?TL[i.tag]:KL[i.kind]}</span><b>${esc(i.stem)}</b></div>
+  return `<div class="it${made[i.id]?' done':''}" data-id="${esc(i.id)}"><div class="hd"><span class="tag p${i.pri}">${i.src==='lookcheck'?'look-check':PL[i.pri]}</span><span class="tag ${i.tag?'t':'k'}">${i.tag?TL[i.tag]:KL[i.kind]}</span>${i.wave?`<span class="tag p5">${esc(i.wave)}</span>`:''}<b>${esc(i.stem)}</b></div>
         <div class="why">${esc(i.element)} &middot; ${esc(i.why)}</div>
         ${i.crop?`<img class="crop" loading="lazy" src="${esc(i.crop)}" alt="Reference picture" onerror="this.remove()">`:''}
         <div class="meta">Save as <code>${esc(i.save_as)}</code>${i.size?' &middot; '+esc(i.size)+(i.kind==='music'?'':' px'):''}${i.ratio?' &middot; ratio '+esc(i.ratio):''}${i.transparent?' &middot; flat white background':''}${i.bg?' &middot; '+esc(BG[i.bg]||i.bg):''}</div>
@@ -551,7 +563,7 @@ function itemHTML(i){
         <div class="row"><button class="btn" data-copy="${esc(i.id)}">Copy prompt</button><label><input type="checkbox" data-made="${esc(i.id)}"${made[i.id]?' checked':''}> &#10003; Made</label></div></div>`;
 }
 function draw(){
-  counts();
+  counts();waveBar();
   const by={};D.items.filter(vis).forEach(i=>{(by[i.slug]=by[i.slug]||[]).push(i)});
   let slugs=Object.keys(by).sort((a,b)=>{const pa=Math.min(...by[a].filter(i=>!made[i.id]).map(i=>i.pri),9),pb=Math.min(...by[b].filter(i=>!made[i.id]).map(i=>i.pri),9);return pa-pb||by[b].length-by[a].length||D.titles[a].localeCompare(D.titles[b])});
   let html='';
@@ -568,6 +580,8 @@ function draw(){
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.wavecopy){const L=D.items.filter(i=>i.wave===WV&&!made[i.id]).sort((a,b)=>D.titles[a.slug].localeCompare(D.titles[b.slug])||a.pri-b.pri);copy(L.map(i=>'# '+D.titles[i.slug]+'\n'+lineOf(i)).join('\n\n'),b)}
+  if(b.dataset.w!==undefined&&b.classList.contains('chip')){WV=b.dataset.w;draw()}
   if(b.dataset.copy){const it=D.items.find(i=>i.id===b.dataset.copy);if(it)copy(it.prompt,b)}
   if(b.dataset.all){const L=D.items.filter(i=>i.slug===b.dataset.all&&!made[i.id]&&vis(i));copy(L.map(lineOf).join('\n\n'),b)}
   if(b.dataset.f!==undefined&&b.classList.contains('chip')){F=b.dataset.f;document.querySelectorAll('.chip[data-f]').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()}
@@ -576,7 +590,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.s){if(d.open!==(d.dataset.def==='1'))opened[d.dataset.s]=d.open;else delete opened[d.dataset.s];const l=d.querySelector('.list');if(d.open&&l&&l.dataset.lz==='1'){l.dataset.lz='0';l.innerHTML=(cur[d.dataset.s]||[]).map(itemHTML).join('')}}},true);
 document.addEventListener('change',e=>{const c=e.target.closest('input[data-made]');if(!c)return;if(c.checked)made[c.dataset.made]=1;else delete made[c.dataset.made];save();draw()});
 $('#gen').textContent='as of '+D.generated;
-$('#intro').innerHTML='One list of everything still to make, deduped. Paste a prompt into the picture or music tool, save the file under the name shown, tick Made. Replaces <a href="missing.html">Missing assets</a>.'+(D.items.some(i=>i.tag)?' <b>Poses</b>, <b>3D variety</b> and <b>Art variety</b> are optional extras that make the games richer: pose sets are painted on a flat chroma colour so they can be cut out cleanly and keep one feet line; 3D items are source paintings for the 3D step. Top picks first.':'')+(D.lookcheck?'':' Look-check findings are not in yet.');
+$('#intro').innerHTML='One list of everything still to make, deduped. Paste a prompt into the picture or music tool, save the file under the name shown, tick Made. Replaces <a href="missing.html">Missing assets</a>.'+(D.items.some(i=>i.wave)?' Pick a <b>wave</b> to see one day of work (at most 380 images); 3D waves are their own track. ':'')+(D.items.some(i=>i.tag)?' <b>Poses</b>, <b>3D variety</b> and <b>Art variety</b> are optional extras that make the games richer: pose sets are painted on a flat chroma colour so they can be cut out cleanly and keep one feet line; 3D items are source paintings for the 3D step. Top picks first.':'')+(D.lookcheck?'':' Look-check findings are not in yet.');
 draw();
 </script></body></html>
 '''

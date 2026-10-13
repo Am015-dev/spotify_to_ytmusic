@@ -1,0 +1,60 @@
+{
+ "cards": {
+  "pip-idle": "Pip: an excited kid with ginger hair at a table with a stack of pancakes. Pose: listening with a calm neutral expression. Bust portrait, head and shoulders, face centred, the same framing, head size and lighting as the reference painting in every expression of this character, shoulders cut by the bottom edge of the frame. Same character exactly as the reference painting (same face, proportions, colours and costume); reuse this exact description and the same seed for every pose of this character. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+  "pip-win": "Pip: an excited kid with ginger hair at a table with a stack of pancakes. Pose: triumphant, a big smile with the chin raised. Bust portrait, head and shoulders, face centred, the same framing, head size and lighting as the reference painting in every expression of this character, shoulders cut by the bottom edge of the frame. Same character exactly as the reference painting (same face, proportions, colours and costume); reuse this exact description and the same seed for every pose of this character. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+  "pip-lose": "Pip: an excited kid with ginger hair at a table with a stack of pancakes. Pose: defeated: downcast eyes and a deflated slumped expression. Bust portrait, head and shoulders, face centred, the same framing, head size and lighting as the reference painting in every expression of this character, shoulders cut by the bottom edge of the frame. Same character exactly as the reference painting (same face, proportions, colours and costume); reuse this exact description and the same seed for every pose of this character. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a cosy card game, top-down view of a single round ceramic plate, the food on the plate is a cute character with an expressive face (little eyebrows, eyelids, a clear emotion), warm-brown ink outline with a slightly wobbly brush edge, soft rim light, gentle shadow under the plate, rich but warm colours, matte paper texture, crisp at small sizes, simple readable silhouette, centred, plenty of margin, plain transparent background, no text. Do NOT put the plate on a placemat.",
+ "notes": "Pose / expression set. One character = one reused description + the reference painting (meta.ref) + the same seed, same camera, same scale, centred, feet on one baseline. Background is flat chroma colour (meta.bg) so games-src/scripts/cutout.py can key it: save each as <name>.png in one folder per character, then python3 games-src/scripts/cutout.py <folder>/<char>-*.png --out <target folder> --size 512 --align <meta.align>  (writes transparent webp + contact-sheet.png). Check the contact sheet: all poses the same height, same feet line. Style block: use the one in \"style\" but ignore any background wording in it.",
+ "wave": "Wave 9",
+ "meta": {
+  "pip-idle": {
+   "element": "Pip: idle expression",
+   "why": "Set of 3 for pip: same description, camera, scale and framing as its other poses",
+   "pri": 3,
+   "ref": "games/kaiten-kitchen/media/camp-pip.webp",
+   "thumb": "kaiten-kitchen/media/camp-pip.webp",
+   "bg": "green",
+   "align": "source --one-set",
+   "save_as": "pip-idle.png",
+   "target": "games/kaiten-kitchen/media/poses/pip-idle.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "pip",
+   "tag": "poses",
+   "wave": "Wave 9"
+  },
+  "pip-win": {
+   "element": "Pip: win expression",
+   "why": "Set of 3 for pip: same description, camera, scale and framing as its other poses",
+   "pri": 3,
+   "ref": "games/kaiten-kitchen/media/camp-pip.webp",
+   "thumb": "kaiten-kitchen/media/camp-pip.webp",
+   "bg": "green",
+   "align": "source --one-set",
+   "save_as": "pip-win.png",
+   "target": "games/kaiten-kitchen/media/poses/pip-win.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "pip",
+   "tag": "poses",
+   "wave": "Wave 9"
+  },
+  "pip-lose": {
+   "element": "Pip: lose expression",
+   "why": "Set of 3 for pip: same description, camera, scale and framing as its other poses",
+   "pri": 3,
+   "ref": "games/kaiten-kitchen/media/camp-pip.webp",
+   "thumb": "kaiten-kitchen/media/camp-pip.webp",
+   "bg": "green",
+   "align": "source --one-set",
+   "save_as": "pip-lose.png",
+   "target": "games/kaiten-kitchen/media/poses/pip-lose.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "pip",
+   "tag": "poses",
+   "wave": "Wave 9"
+  }
+ }
+}
