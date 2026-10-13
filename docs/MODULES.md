@@ -17,9 +17,9 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 40 | `40_hud_input_menu.js` | 33 | race HUD (updHud buildMap drawMap flashHud), input (keys K, tilt, touch steer pad steerDraw, parkSet), menu/pause/settings (togglePause openSettings buildSettin |
 | 41 | `41_career_quests.js` | 105 | career = free roam: XP/level (carStat addXP), RO (roam state object), side quests (QUESTS qStart qStep), quests v2 road graph + GPS (qvGraph qvPath qvLayout), m |
 | 50 | `50_kenney_data.js` | 78 | DATA: KM_IDX (model index), KM_TEX (atlas PNGs), KM_BIN=window.__KM_BIN (blob lives in assets/km.js) |
-| 51 | `51_city_net.js` | 44 | Kenney loader (kmGeo kmKit kmMat), real Frankfurt layout CITYCFG RF WP, Athens street net decode, the Main (riverAt inRiver rivSide), decks/bridges BRIDGES deck |
+| 51 | `51_city_net.js` | 47 | Kenney loader (kmGeo kmKit kmMat), real Frankfurt layout CITYCFG RF WP, Athens street net decode, the Main (riverAt inRiver rivSide), decks/bridges BRIDGES deck |
 | 52 | `52_terrain_data.js` | 115 | DATA: TR_DATA (DEM rasters, one line) |
-| 53 | `53_terrain_roads.js` | 52 | terrain TR_ (TR_real TR_G), hills/Taunus/Acropolis, road shelves athRoadProfile shelfY, Autobahn AB_, garage lots, HUB, colliders (groundAt roofAt roamHit bHit  |
+| 53 | `53_terrain_roads.js` | 58 | terrain TR_ (TR_real TR_G), hills/Taunus/Acropolis, road shelves athRoadProfile shelfY, Autobahn AB_, garage lots, HUB, colliders (groundAt roofAt roamHit bHit  |
 | 60 | `60_city_build.js` | 201 | build the free-roam map: ground gndBuild gndVert, water/quays/slipways/decks, streets, biomes BIOMES, landmarks lmBuildAll, skyline/outer towns, Athens building |
 | 70 | `70_roam_world.js` | 81 | culling hubCull, minimap (miniPaint miniDraw), districts, hub traffic (hubTrafficStep), hubFrame, street snap/ramps/checkpoints (rfSnap rfRamps), golden bricks, |
 | 71 | `71_roam_drive.js` | 67 | free-roam driving: roamStep (player physics), wall slide roamGlance roamBounce, damage/wreck, exitRoam cycleVehicle roamWarp, chapters CHAPTERS chapter storyChe |
@@ -78,7 +78,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98sz | `98sz_ride_scale.js` | 6 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 50 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 98sh | `98sh_shadow.js` | 4 | SHB (v90k): soft blob shadows on the ground under the player car, city traffic, people and trees. One InstancedMesh, depth-write off, ~1 draw call. Cause of "no |
-| 99c | `99c_checklist.js` | 63 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 65 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
@@ -131,17 +131,17 @@ uses: 10(103), 30(79), 53(66), 70(52), 71(51), 20(32), 51(27), 72(10), 60(7), 96
 defines: KM_IDX KM_TEX KM_BIN
 uses: 30(2), 20(1)
 
-## 51_city_net.js — 44 KB
-defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_prune RD_net RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
-uses: 53(53), 30(30), 10(19), 40(7), 20(6), 41(6), 50(5)
+## 51_city_net.js — 47 KB
+defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_OLD RD_kriezi RD_prune RD_net RD_fillJoin RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
+uses: 53(63), 30(33), 10(21), 20(7), 40(7), 41(6), 50(5)
 
 ## 52_terrain_data.js — 115 KB
 defines: TR_DATA
 uses: -
 
-## 53_terrain_roads.js — 52 KB
-defines: TR_EX TR_GR TR_GJ TR_dec SM_TG TR_bil SM_trReal TR_real TR_DATUM TR_W TR_init TR_G TR_tauH0 TR_Y TR_grad TR_sst SM_SC SM_shC TR_dev HILL athHills athHill1 athHillH HILLS HILL_BY athHillFit athBlurH athShelfMark athVirtJ athRoadProfiles athRoadProfile shelfY _sst athHilly athHilly0 hillH TAU_R TAU_O tauFade tauRaw TAU_SUM TAU_CAS TAU_SH TAU_CH tauH ZONES MTN TRAILS trailDist AB_R ABW AB AB_K AB_RY AB_C AB_X AB_FEED AB_Z AB_BRIDGES ALL_DECKS GARAGES athRectClr AB_S AB_G abNearI abSamples abAt abBridgesAuto abSkip abClear MTN_S mtnDist HUB zoneAt inLot slipY roamTerr groundAt groundY roofAt hubAddB bHit bExt roamHit bldPush hubGrid hubTile FILL_R FILL_G BLOCK_C FILL_X gridAt lmNear rfFree fillAt rfGrid hubRoads fpOK onAnyDeck hubFacadeTex hubWinEm signTex adTex groundTex bxUV roofGeo mergeG cbox ccyl csph propDefs
-uses: 51(68), 10(44), 30(19), 20(12), 96(6), 41(4), 60(4), 40(3), 52(2), 90(2)
+## 53_terrain_roads.js — 58 KB
+defines: TR_EX TR_GR TR_GJ TR_dec SM_TG TR_bil SM_trReal TR_real TR_DATUM TR_W TR_init TR_G TR_tauH0 TR_Y TR_grad TR_sst SM_SC SM_shC TR_dev HILL athHills athHill1 athHillH HILLS HILL_BY athHillFit athBlurH athShelfMark athVirtJ athRoadProfiles athRoadProfile shelfY _sst athHilly athHilly0 hillH TAU_R TAU_O tauFade tauRaw TAU_SUM TAU_CAS TAU_SH TAU_CH tauH ZONES MTN TRAILS trailDist AB_R ABW AB AB_K AB_RY AB_C AB_X AB_FEED AB_Z AB_BRIDGES ALL_DECKS GARAGES athRectClr AB_S AB_G abNearI abSamples AB_AUTO AB_netChk abAt abBridgesAuto abSkip abClear MTN_S mtnDist HUB zoneAt inLot slipY roamTerr groundAt groundY roofAt hubAddB bHit bExt roamHit bldPush hubGrid hubTile FILL_R FILL_G BLOCK_C FILL_X gridAt lmNear rfFree fillAt rfGrid hubRoads fpOK onAnyDeck hubFacadeTex hubWinEm signTex adTex groundTex bxUV roofGeo mergeG cbox ccyl csph propDefs
+uses: 51(77), 10(44), 30(26), 20(12), 96(6), 41(4), 60(4), 40(3), 52(2), 90(2)
 
 ## 60_city_build.js — 201 KB
 defines: qGeo tH gndVert gndBuild waterBuild quayBuild slipBuild deckBuild cityStreetsBuild taunusBuildG BIOMES biomeAt WGC worldGroundBuild athResTex CE_kerbs abStrip_v86 abTex AB_SGN W12_TOL W12_ST W12_abStrip abBuild waveH waterMat flipG LMI lmBuildAll stegBuild stegTower skylineBuild outerTownsBuild lmPhoto athTerrainBuild athRidge ATHGT athMarbleTex ATH_STY ATH_DS ATH_TA athInA ATH_SC athStyle0 athSpecK ATH_COL athUnitGeos athIM athBuildG athRoadD athConn athOverlap ATH_LMK athLmkList athLmNear athLandmarksBuild buildHub buildHubG LAZY LZ lzReg lzD gridAddTo hubGridAdd gridHit lzHit lzRoadD lzPlanAll lzFree lzFreeBox lzY0 lzBox lzCyl lzCone lzSph lzGab lzKm lzMapLine lzRoad LBatch lzPartGeo lzBuildG lzPropsG lzStart lzFinish lzRun lazyStep lzLoad LZT lzNeed ldTravel outerFree2 lzWoodM lzWoodG LZH LZC LZLD LZT2 lzFront lzJet lzCrane lzTractor lzTurbine lzFarm lzStudLine athBiomes athOuter kmProps _abC athBal athProps CE_RX CE_roadE CE_onRoad CE_defs CE_streets CE_plazas CE_lots buildHubProps s0m smashCheck propRespawn propRevive STUDG STUDM studFXStep HCAR HCOL ATH_K TRL athVeh buildHubTraffic navPath hubNear hubRecycle PED_N PED_COL PED_PANTS PED_HAIR pedInit pedPlace _pB _pL _pR _pq _pe _pv _ps pedPart pedStep
@@ -375,9 +375,9 @@ uses: 53(52), 10(49), 30(28), 71(23), 40(17), 51(11), 72(10), 98l(10), 98bc(8), 
 defines: SHB SHB_pool SHB_M SHB_V SHB_Q SHB_S SHB_E SHB_B SHB_scanTrees SHB_put SHB_gy SHB_step __sh
 uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
-## 99c_checklist.js — 63 KB
+## 99c_checklist.js — 65 KB
 defines: OD_CHECKLIST
-uses: 30(52), 10(24), 20(16), 41(6), 70(6), 71(6), 98tq(6), 99t(5), 72(4), 92(4)
+uses: 30(52), 10(24), 20(16), 71(8), 70(7), 41(6), 53(6), 98tq(6), 99t(5), 72(4)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp

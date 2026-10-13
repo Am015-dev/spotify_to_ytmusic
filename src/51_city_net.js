@@ -199,7 +199,7 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   {const nB=BRIDGES.length,ext=OB_ext(FILL_R,nB),M=OB_net(null,ext),cl=new Map(M.comps);FILL_R.forEach((r,k)=>{const R=M.find(M.segs.length+nB+k);cl.set(R,(cl.get(R)||0)+r.L)});let main=-1,mL=-1;for(const[r,l]of cl)if(l>mL){mL=l;main=r}
     const keep=FILL_R.filter((r,k)=>M.find(M.segs.length+nB+k)===main);for(const r of FILL_R)if(!keep.includes(r))OB_log('fdel',(r.x0+r.x1)/2,(r.z0+r.z1)/2,r.L);O.fDel+=FILL_R.length-keep.length;FILL_R.length=0;FILL_R.push(...keep);OB_fillIdx()}
   O.fillMs=Math.round(performance.now()-t0)}
-{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim()}}
+{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}}}
 // runtime audit of the CURRENT drawn network: CITY_S drivable streets + filler grid + bridges + Autobahn links, junction plates, GPS coverage
 function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?hubRoads():[],nF=FR.length,nB=BRIDGES.length;
   const ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs;
@@ -231,8 +231,14 @@ function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?h
 // overhang the last cross street (up to RD_GSTUB m) are trimmed. Stubs near a mission spot / landmark stay. ?rd=0 = old network (A/B).
 const RD_ON=!/[?&]rd=0/.test(location.search),RD={ops:{cut:0,del:0,gtrim:0,gdel:0,wide:0,two:0},before:null,after:null},RD_STUB={res:420,sec:220,link:200}/* main/arterial never cut: peeling them round by round removed whole arterials (Athens 1718,-1325) */,RD_GSTUB=230;
 const RD_keep=(()=>{const P=[];for(const k in RF.spots){const v=RF.spots[k];P.push(WP(v[0],v[1]))}for(const L of RF.lm)P.push(WP(L[2],L[3]));for(const G of (RF.garages||[]))if(G&&G.length>2)P.push(WP(G[1],G[2]));return(x,z,r=45)=>P.some(([a,b])=>(a-x)**2+(b-z)**2<r*r)})();
+/* Athens old town (Psyrri / Monastiraki / Plaka box) and 150 m round Garaz Psyrri: secondary streets never pruned (cut Kriezi stub = car drove into the blocks that filled it) */
+const RD_OLD=CID!=='ath'?()=>false:(()=>{const g=RF.lm.find(L=>L[1]==='Garaz Psyrri'),G=g?WP(g[2],g[3]):null;return(x,z)=>(x>1450&&x<2300&&z>-1760&&z<-1300)||(G&&(G[0]-x)**2+(G[1]-z)**2<150*150)})();
+/* GO check v90k/ath-kriezi (= tools/roads/kriezi.code.js): Kriezi at the old stub is asphalt (off ≤ 6 m) and no building collider on it within 150 m */
+function RD_kriezi(){const out=[];let bad=0;for(const[x,z]of[[2142,-1419],[2152,-1410]]){const q=cityAt(x,z),off=q?q.d-q.road.w/2:999;let n=0,h=0;if(off>6)bad++;
+ if(q&&q.road.pts){const P=q.road.pts;for(let i=1;i<P.length;i++)for(let t=0;t<1;t+=.1){const px=P[i-1].x+(P[i].x-P[i-1].x)*t,pz=P[i-1].z+(P[i].z-P[i-1].z)*t;if(Math.hypot(px-x,pz-z)>150)continue;n++;if(roamHit(px,pz,1.6,1))h++}if(h)bad++}
+ out.push({x,z,off:+off.toFixed(1),cls:q&&q.road.cls,n,h})}return{ok:!bad,out}}
 function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<2;round++){const N=OB_net(),S=N.segs;let did=0;const kill=new Set(),cut=[];
-  for(const d of N.dead){const A=S[d.a];if(!(d.st<(RD_STUB[A.r.cls]||0))||kill.has(A)||cut.some(c=>c.a===d.a))continue;const P=A.pts;let prot=false;
+  for(const d of N.dead){const A=S[d.a];if(!(d.st<(RD_STUB[A.r.cls]||0))||kill.has(A)||cut.some(c=>c.a===d.a))continue;const P=A.pts;let prot=A.r.cls==='sec'&&P.some(q=>RD_OLD(q.x,q.z));
     if(d.e){for(let i=P.length-1;i>=0&&P[d.i].s-P[i].s<=d.st+1;i-=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}}else for(let i=0;i<P.length&&P[i].s<=d.st+1;i+=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}
     if(!prot){/* a stub that another drivable street crosses or touches is not a leaf (crossings without a shared junction key) */const lo=d.e?P[d.i].s-d.st:0,hi=d.e?P[d.i].s:d.st;const sJ=d.e?lo:hi;for(let i=0;i<P.length&&!prot;i++){if(P[i].s<lo-1||P[i].s>hi+1||Math.abs(P[i].s-sJ)<15)continue;const q=N.proj(P[i].x,P[i].z,A.r.w/2+12,(b)=>b!==d.a);if(q&&q.d<A.r.w/2+N.segs[q.a].r.w/2+1)prot=true}}
     if(prot)continue;cut.push(d)}
@@ -244,12 +250,23 @@ function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<2
 function RD_net(){if(!RD_ON)return;RD.before=OB_sum(OB_net());RD_prune();
   if(CID!=='fra'){const O=RD.ops,WM={arterial:[13,1.25,22],main:[11,1.2,18],sec:[8,1,12],res:[7,1,10],link:[7,1,10]};const seen=new Set();for(const S of CITY_S){const r=S.r;if(seen.has(r))continue;seen.add(r);if(r.one){r.one0=1;r.one=0;O.two++}const m=WM[r.cls];if(m){const w=Math.min(Math.max(r.w,m[2]),Math.max(m[0],r.w*m[1]));if(w>r.w+.05){r.w0=r.w;r.w=+w.toFixed(1);O.wide++}}}}
   RD.after=OB_sum(OB_net())}
+// dev1 (v90k/fra-net, Frankfurt): a filler-grid road whose end is still not a junction runs on along its own line to the next road within 150 m
+// (street, other grid road), stopping at that road's centre line; if none (or the Main is in the way) it is trimmed back to its last crossing
+function RD_fillJoin(){if(!RD_ON||CID!=='fra'||!FILL_R||!FILL_R.length)return;const O=RD.ops;O.gjoin=O.gjoin||0;O.gcut=O.gcut||0;OB_fillIdx();const N=OB_net();
+ const other=(r,x,z)=>{let b=null;for(const q of FILL_R){if(q===r)continue;const t=Math.max(0,Math.min(q.L,(x-q.x0)*q.ux+(z-q.z0)*q.uz)),d=Math.hypot(q.x0+q.ux*t-x,q.z0+q.uz*t-z);if(d<q.w/2&&(!b||d<b))b=d}
+  const c=N.proj(x,z,40);if(c&&c.d<N.segs[c.a].r.w/2){const d=c.d;if(b==null||d<b)b=d}return b};
+ for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,sg=e?1:-1;let hit=null;
+  for(let u=4;u<=150;u+=4){const[x,z]=OB_fpt(r,t+sg*u);if(inRiver(x,z,-4))break;const d=other(r,x,z);if(d!=null){let best=u,bd=d;for(let v=u+2;v<=u+40;v+=2){const[x2,z2]=OB_fpt(r,t+sg*v),d2=other(r,x2,z2);if(d2==null||d2>bd)break;bd=d2;best=v}hit=best;break}}
+  if(hit!=null){if(e){r.x1=r.x0+r.ux*(r.L+hit);r.z1=r.z0+r.uz*(r.L+hit)}else{r.x0-=r.ux*hit;r.z0-=r.uz*hit;I.J=I.J.map(c=>c+hit)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gjoin++;continue}
+  const js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot){O.gprot=(O.gprot||0)+1;continue}
+  if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gcut++}}
+ for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
 function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;OB_fillIdx();const N=OB_net();
   for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length&&I.endJ[1-e])js.push(e?0:r.L);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);if(Math.abs(tj-t)>=RD_GSTUB)continue;
     let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
     if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
   for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
-OB_fix();RD_net();
+OB_fix();RD_net();if(FILL_R)try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}// dev1: again on the final street net (the rfGrid pass runs before OB_fix/RD_net)
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});

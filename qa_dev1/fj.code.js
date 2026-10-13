@@ -1,0 +1,2 @@
+(()=>{const N=OB_net(),o=[];for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);const tj=js.length?(e?Math.max(...js):Math.min(...js)):null;let prot=false;if(tj!=null)for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}
+ const[x,z]=OB_fpt(r,t);o.push([Math.round(x),Math.round(z),e,Math.round(r.L),tj==null?null:Math.round(tj),prot,I.J.map(Math.round).join(' ')])}}return{o,n:FILL_R.length,v:typeof RD_fillJoin}})()
