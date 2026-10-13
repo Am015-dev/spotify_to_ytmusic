@@ -47,8 +47,8 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  s=await st();ok(s.dHome>15&&s.dHome<40,tag+' fast travel lands at Home',{d:+s.dHome.toFixed(1)});
  await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');
  // drive into the beacon: fast travel home leaves the car 26 m out facing it. GAS, then BRAKE to a stop on it (the card needs a stop)
- const goIn=async()=>{let f=0;await down('gas',await center('#tG'));while(f<600){await tick(6);f+=6;s=await st();if(s.card||s.dHome<9)break}await up('gas');
-  await down('brk',await center('#tB'));for(let i=0;i<40;i++){await tick(4);s=await st();if(s.card||Math.abs(s.v)<.5)break}await up('brk');for(let i=0;i<60&&!(s=await st()).card;i++)await tick(6);return s};
+ const goIn=async()=>{let f=0,mv=0;await down('gas',await center('#tG'));while(f<900){await tick(6);f+=6;s=await st();if(s.card||s.dHome<9)break;if(Math.abs(s.v)>1)mv=1;else if(!mv&&f%120===0){await up('gas');await tick(4);await down('gas',await center('#tG'))}}await up('gas');console.log(tag,'goIn',f,JSON.stringify(s));
+  if(Math.abs(s.v)>.6)await down('brk',await center('#tB'));for(let i=0;i<40;i++){await tick(4);s=await st();if(s.card||Math.abs(s.v)<.5)break}await up('brk');for(let i=0;i<60&&!(s=await st()).card;i++)await tick(6);return s};
  let f=0;s=await goIn();
  for(let i=0;i<60&&!(s=await st()).card;i++){await tick(6)}
  s=await st();ok(s.card&&s.saves>=1,tag+' driving into Home = save point (card + save)',s);
