@@ -176,7 +176,11 @@ def main():
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
         if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
-            if passing:
+            if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
+                try:
+                    subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + passing, env=env, capture_output=True, text=True, timeout=300)
+                    subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+                except Exception as e: print("lab-index (pre-test) skipped:", e)
                 code, tail = timed("all" if len(passing) > 1 else passing[0], "lab-test", lambda: run_check(["node", str(SCRIPTS / "lab-test.js")] + passing, str(SCRIPTS), env3, out / ".check" / "lab-test.log", 1800))
                 txt = (out / ".check" / "lab-test.log").read_text()
                 for s in passing:
