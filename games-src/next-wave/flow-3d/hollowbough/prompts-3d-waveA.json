@@ -1,0 +1,113 @@
+{
+ "cards": {
+  "worker-hedgehog": "a woodland worker peg figure: a small hedgehog in a flat cap and checked shirt, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "worker-rabbit": "a woodland worker peg figure: a small lop-eared rabbit in a leaf hat and a green cape, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "worker-squirrel": "a woodland worker peg figure: a small red squirrel in dungarees with an acorn-cap hat, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "worker-badger": "a woodland worker peg figure: a small old badger with a long white beard and a frosty cloak, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "worker-hare": "a woodland worker peg figure: a small tall hare in a green cloak, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "worker-porcupine": "a woodland worker peg figure: a small porcupine with round spectacles and a waistcoat, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted woodland gouache illustration for a cosy forest-critter game, warm autumn earth colours, soft rim light, matte paper texture, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave A",
+ "meta": {
+  "worker-hedgehog": {
+   "element": "3D model: worker-hedgehog",
+   "why": "distinct worker",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "worker-hedgehog.png",
+   "target": "games/hollowbough/models/worker-hedgehog.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "worker-rabbit": {
+   "element": "3D model: worker-rabbit",
+   "why": "distinct worker",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "worker-rabbit.png",
+   "target": "games/hollowbough/models/worker-rabbit.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "worker-squirrel": {
+   "element": "3D model: worker-squirrel",
+   "why": "every worker is the same acorn peg today",
+   "pri": 1,
+   "ref": "games/hollowbough/models/worker.webp",
+   "thumb": "hollowbough/models/worker.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "worker-squirrel.png",
+   "target": "games/hollowbough/models/worker-squirrel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "worker-badger": {
+   "element": "3D model: worker-badger",
+   "why": "distinct worker",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "worker-badger.png",
+   "target": "games/hollowbough/models/worker-badger.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "worker-hare": {
+   "element": "3D model: worker-hare",
+   "why": "distinct worker",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "worker-hare.png",
+   "target": "games/hollowbough/models/worker-hare.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "worker-porcupine": {
+   "element": "3D model: worker-porcupine",
+   "why": "distinct worker",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "worker-porcupine.png",
+   "target": "games/hollowbough/models/worker-porcupine.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  }
+ },
+ "targets": {
+  "worker-hedgehog": "games/hollowbough/models/worker-hedgehog.glb",
+  "worker-rabbit": "games/hollowbough/models/worker-rabbit.glb",
+  "worker-squirrel": "games/hollowbough/models/worker-squirrel.glb",
+  "worker-badger": "games/hollowbough/models/worker-badger.glb",
+  "worker-hare": "games/hollowbough/models/worker-hare.glb",
+  "worker-porcupine": "games/hollowbough/models/worker-porcupine.glb"
+ }
+}

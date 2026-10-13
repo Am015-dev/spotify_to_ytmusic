@@ -1,0 +1,12 @@
+{
+ "cards": {
+  "board-plate": "a single board plate, game art for a board game, no text",
+  "gx-bar-plate": "a single gx bar plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gx-drawer-head-plate": "a single gx drawer head plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gxh-ok-button-plate": "a single gxh ok button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "tbtn-button-plate": "a single tbtn button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "tbtn-story-button-plate": "a single tbtn story button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "tkey-picture": "a single tkey picture, game art for a board game, no text"
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame."
+}

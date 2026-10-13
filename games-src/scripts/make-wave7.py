@@ -2,15 +2,17 @@
 """Wave 7 prompt generator: pose sets, 3D variety and art variety for the shelf games (not Overdrive).
 
 Reads  games-src/scripts/wave7_data.py (what to add per game; edit that file, not the output).
+Splits the items into production waves (one wave per day, at most LIMIT=380 images each, a pose set never split):
+  2D (poses and paintings): Wave 7, Wave 8, Wave 9 ...   3D source paintings: 3D wave A, B, C ... (about 40 each, own track)
 Writes (laptop prompt files, same schema as prompts-wave6*.json: {"cards": {name: prompt}, "style": ...} plus "notes" and "meta")
-  games-src/next-wave/flow-2d/<slug>/prompts-wave7-poses.json
-  games-src/next-wave/flow-2d/<slug>/prompts-wave7-variety[-wide|-43|-34|-tall].json   (one file per ratio)
-  games-src/next-wave/flow-3d/<slug>/prompts-wave7-3d.json
-  games-src/next-wave/prompts-wave7-3d.json   all 3D sources in one list, with target games/<slug>/models/<item>.glb
-  games-src/VARIETY-PLAN.md                    per game: why each group helps, priority, count
+  games-src/next-wave/flow-2d/<slug>/prompts-wave<N>[-wide|-43|-34|-tall].json   (one file per game, wave and ratio)
+  games-src/next-wave/flow-3d/<slug>/prompts-3d-wave<A|B|..>.json
+  games-src/next-wave/prompts-3d-all.json    all 3D sources in one list, with wave and target games/<slug>/models/<item>.glb
+  games-src/next-wave/README.md                how to copy the folders to the laptop, one wave per day
+  games-src/VARIETY-PLAN.md                    per game: why each group helps, priority, count, the wave table
 next-wave.py reads the "meta" of these files and shows them on games/next-wave.html (tags Poses, 3D variety, Art variety).
 
-Run: python3 games-src/scripts/make-wave7.py   then   python3 games-src/scripts/next-wave.py
+Run: python3 games-src/scripts/make-wave7.py   then   python3 games-src/scripts/next-wave.py   then   python3 games-src/scripts/viewer-plan.py
 No background in any picture prompt: poses and cut-outs ask for a flat chroma green (#00FF00) or magenta (#FF00FF) background so
 games-src/scripts/cutout.py can key them. 3D source paintings use a plain light-grey background (the image-to-3D step removes it)."""
 import json, os, re, sys, collections, importlib.util
@@ -163,39 +165,107 @@ def build():
                                        save_as=f'{stem}.png', target=f'games/{slug}/media/{stem}.webp', size=px, ratio=ratio))
     return G
 
+LIMIT = 380          # images per day (games/asset-viewer/flow.json "limit")
+PER_3D_WAVE = 40
+# the owner's top picks, in order: (game, predicate on (kind, item)); 3D top picks are listed separately
+TOP2D = [
+ ('cauldron-fair', lambda k, i: (k == 'poses' and i['group'] in ('bag', 'cauldron')) or (k == 'art' and i['stem'].startswith('event-boom'))),
+ ('short-fuse', lambda k, i: (k == 'poses' and i['group'] == 'bomb') or (k == 'art' and i['stem'] in ('event-boom', 'event-defused'))),
+ ('crown-city-smash', lambda k, i: k == 'poses' and i['group'] in ('magmaw', 'glacyx', 'cortexa')),
+ ('doorkick-dungeon', lambda k, i: k == 'poses' and i['group'] in ('inferno', 'skygrif', 'pharaoh', 'wyrm', 'tentacles', 'dread')),
+ ('shipwreck-isle', lambda k, i: k == 'art' and i['stem'].startswith('hex-')),
+ ('hollowbough', lambda k, i: k == 'poses'),
+ ('sands-of-qamar', lambda k, i: k == 'art' and i['stem'].startswith('tile-')),
+ ('mainhattan-nightrun', lambda k, i: k == 'poses' and not i['group'].startswith('ship-')),
+]
+TOP3D = [('rampart-and-vine', lambda i: i['stem'].startswith('piece-')), ('hollowbough', lambda i: i['stem'].startswith('worker-')),
+         ('sands-of-qamar', lambda i: i['stem'].startswith('meeple-')), ('sunglaze', lambda i: i['stem'].startswith('tile-')),
+         ('doorkick-dungeon', lambda i: i['stem'].startswith('hero-')), ('short-fuse', lambda i: i['stem'].startswith('bomb-')),
+         ('cauldron-fair', lambda i: i['stem'].startswith('bag-'))]
+
+def assign_waves(G):
+    """Sets it['wave'] ('Wave 7', '3D wave A'), it['wave_n'] (7.. / 0..) and it['ord'] on every item.
+    2D units are pose sets (never split) or single paintings, ordered: top picks, main board/hand items, boss/character poses, extras."""
+    slugs = list(G)
+    objs = {oid for objs in W.OBJ.values() for oid, *_ in objs}
+    units = collections.OrderedDict()
+    for slug in slugs:
+        for kind in ('poses', 'art'):
+            for it in G[slug][kind]:
+                key = (slug, it['group']) if kind == 'poses' else (slug, it['stem'])
+                u = units.setdefault(key, dict(slug=slug, kind=kind, items=[], obj=kind == 'poses' and (it['group'] in objs or it['group'].startswith('ship-'))))
+                u['items'].append(it)
+    for u in units.values():
+        u['pri'] = min(i['pri'] for i in u['items'])
+        top = next((n for n, (g, f) in enumerate(TOP2D) if g == u['slug'] and all(f(u['kind'], i) for i in u['items'])), None)
+        if top is not None: u['tier'], u['rule'] = 0, top
+        elif u['kind'] == 'art' and u['pri'] <= 2 or u['obj']: u['tier'], u['rule'] = 1, 0
+        elif u['pri'] <= 2: u['tier'], u['rule'] = 2, 0
+        else: u['tier'], u['rule'] = 3, 0
+    order = sorted(units.values(), key=lambda u: (u['tier'], u['rule'], u['pri'], slugs.index(u['slug']), u['items'][0].get('group', u['items'][0]['stem']), u['items'][0]['stem']))
+    left, n, o = list(order), 7, 0
+    while left:
+        room, take, skipped = LIMIT, [], 0
+        for u in left:
+            if len(u['items']) <= room: take.append(u); room -= len(u['items'])
+            else:
+                skipped += 1
+            if room == 0 or skipped > 25: break   # fill gaps only from the next 25 units, so priority order holds
+        taken = set(map(id, take)); left = [u for u in left if id(u) not in taken]
+        for u in take:
+            for it in u['items']: it['wave'], it['wave_n'], it['ord'] = f'Wave {n}', n, o; o += 1
+        n += 1
+    d3 = [(s, it) for s in slugs for it in G[s]['d3']]
+    def key3(si):
+        s, it = si
+        t = next((k for k, (g, f) in enumerate(TOP3D) if g == s and f(it)), 99)
+        return (0 if t < 99 else 1, t, it['pri'], slugs.index(s), it['stem'])
+    d3.sort(key=key3)
+    k = -(-len(d3) // PER_3D_WAVE)
+    for j, (s, it) in enumerate(d3):
+        w = j * k // len(d3)
+        it['wave'], it['wave_n'], it['ord'] = f'3D wave {chr(65 + w)}', w, j
+
+def wave_file(it, tag):
+    if tag == '3d': return 'prompts-3d-wave' + it['wave'][-1] + '.json'
+    return f"prompts-wave{it['wave_n']}{RATIO_SUFFIX[it['ratio']]}.json"
+
 def write(G, titles):
     st = styles()
     for d in ('flow-2d', 'flow-3d'):
         for dp, dn, fn in os.walk(f'{OUT}/{d}'):
             for f in fn:
-                if f.startswith('prompts-wave7'): os.remove(os.path.join(dp, f))
-    allx = {'cards': {}, 'targets': {}, 'style': 'see each game folder (flow-3d/<slug>/prompts-wave7-3d.json)',
+                if re.match(r'prompts-(wave(7|8|9|1\d)\b|3d-wave)', f): os.remove(os.path.join(dp, f))
+    allx = {'cards': {}, 'targets': {}, 'style': 'see each game folder (flow-3d/<slug>/prompts-3d-wave<A|B|..>.json)',
             'notes': W3NOTE, 'meta': {}}
     counts = {}
     for slug, g in G.items():
         style = st.get(slug, '')
         c = counts[slug] = collections.Counter()
+        by = collections.defaultdict(list)
         for kind, root, tag in (('poses', 'flow-2d', 'poses'), ('d3', 'flow-3d', '3d'), ('art', 'flow-2d', 'art')):
-            by = collections.defaultdict(dict)
             for it in g[kind]:
-                meta = {k: it[k] for k in ('element', 'why', 'pri', 'ref', 'thumb', 'bg', 'align', 'save_as', 'target', 'size', 'ratio')}
-                if it.get('group'): meta['group'] = it['group']
-                meta['tag'] = tag
-                if kind == 'poses': name = f'wave7-poses'
-                elif kind == 'd3': name = 'wave7-3d'
-                else: name = 'wave7-variety' + RATIO_SUFFIX[it['ratio']]
-                by[name][it['stem']] = (it['prompt'], meta)
+                by[(root, wave_file(it, tag))].append((tag, it))
                 c[tag] += 1
-            for name, cards in by.items():
-                d = f'{OUT}/{root}/{slug}'
-                os.makedirs(d, exist_ok=True)
-                doc = {'cards': {k: v[0] for k, v in cards.items()}, 'style': style, 'notes': NOTES[tag], 'meta': {k: v[1] for k, v in cards.items()}}
-                if tag == '3d': doc['targets'] = {k: v[1]['target'] for k, v in cards.items()}
-                with open(f'{d}/prompts-{name}.json', 'w', encoding='utf-8') as f: json.dump(doc, f, ensure_ascii=False, indent=1); f.write('\n')
+        for (root, name), lst in by.items():
+            lst.sort(key=lambda x: x[1]['ord'])
+            tags = sorted({t for t, _ in lst}, key=['poses', '3d', 'art'].index)
+            cards, meta = {}, {}
+            for tag, it in lst:
+                m = {k: it[k] for k in ('element', 'why', 'pri', 'ref', 'thumb', 'bg', 'align', 'save_as', 'target', 'size', 'ratio')}
+                if it.get('group'): m['group'] = it['group']
+                m['tag'] = tag; m['wave'] = it['wave']
+                cards[it['stem']] = it['prompt']; meta[it['stem']] = m
                 if tag == '3d':
-                    for k, v in cards.items():
-                        allx['cards'][f'{slug}--{k}'] = v[0]; allx['targets'][f'{slug}--{k}'] = v[1]['target']; allx['meta'][f'{slug}--{k}'] = dict(v[1], slug=slug)
-    with open(f'{OUT}/prompts-wave7-3d.json', 'w', encoding='utf-8') as f: json.dump(allx, f, ensure_ascii=False, indent=1); f.write('\n')
+                    allx['cards'][f"{slug}--{it['stem']}"] = it['prompt']; allx['targets'][f"{slug}--{it['stem']}"] = m['target']; allx['meta'][f"{slug}--{it['stem']}"] = dict(m, slug=slug)
+            d = f'{OUT}/{root}/{slug}'
+            os.makedirs(d, exist_ok=True)
+            doc = {'cards': cards, 'style': style, 'notes': ' '.join(NOTES[t] for t in tags), 'wave': lst[0][1]['wave'], 'meta': meta}
+            if tags == ['3d']: doc['targets'] = {k: v['target'] for k, v in meta.items()}
+            with open(f'{d}/{name}', 'w', encoding='utf-8') as f: json.dump(doc, f, ensure_ascii=False, indent=1); f.write('\n')
+    with open(f'{OUT}/prompts-3d-all.json', 'w', encoding='utf-8') as f: json.dump(allx, f, ensure_ascii=False, indent=1); f.write('\n')
+    old = f'{OUT}/prompts-wave7-3d.json'
+    if os.path.exists(old): os.remove(old)
     return counts
 
 W3NOTE = ('Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path '
@@ -214,8 +284,8 @@ NOTES = {
 def plan(G, titles, counts):
     P = collections.defaultdict(lambda: collections.Counter())
     L = ['# Variety plan: poses, 3D variety, art variety (wave 7)', '',
-         'Generated by `python3 games-src/scripts/make-wave7.py` from `games-src/scripts/wave7_data.py`. Prompts: `games-src/next-wave/flow-2d/<game>/prompts-wave7-poses.json`, '
-         '`prompts-wave7-variety[-wide|-43|-34|-tall].json`, `flow-3d/<game>/prompts-wave7-3d.json` and the combined `games-src/next-wave/prompts-wave7-3d.json` (target `games/<slug>/models/<item>.glb`). '
+         'Generated by `python3 games-src/scripts/make-wave7.py` from `games-src/scripts/wave7_data.py`. Prompts: `games-src/next-wave/flow-2d/<game>/prompts-wave<N>[-wide|-43|-34|-tall].json`, '
+         '`flow-3d/<game>/prompts-3d-wave<A|B|..>.json` and the combined `games-src/next-wave/prompts-3d-all.json` (target `games/<slug>/models/<item>.glb`). '
          'They also show on https://am015-dev.github.io/spotify_to_ytmusic/next-wave.html with the tags Poses, 3D variety, Art variety.', '',
          '## What "poses like Overdrive" means technically', '',
          '1. Overdrive people are built from separate parts (hip, torso, left and right leg, arm and hand, head) that code poses every frame (walk swing, run, jump, sit in the car, wave, climb out), all on one origin at the feet and one scale, with real transparency because they are live 3D.',
@@ -269,9 +339,57 @@ def plan(G, titles, counts):
           'Where a reference painting exists (meta.ref) feed it to the picture tool so the character stays identical; if the written description and the painting disagree, the painting wins.']
     open('games-src/VARIETY-PLAN.md', 'w', encoding='utf-8').write('\n'.join(L) + '\n')
 
+def wave_rows(G, titles):
+    """[(wave, images, 'poses 200, art 100', 'game n, game n')] in run order."""
+    W_ = collections.OrderedDict()
+    for s, g in G.items():
+        for kind, tag in (('poses', 'poses'), ('d3', '3D'), ('art', 'art')):
+            for it in g[kind]: W_.setdefault(it['wave'], []).append((s, tag, it['ord']))
+    rows = []
+    for w in sorted(W_, key=lambda x: (x.startswith('3D'), x)):
+        L = W_[w]
+        mix = ', '.join(f'{t} {n}' for t, n in collections.Counter(t for _, t, _ in L).most_common())
+        first = collections.OrderedDict()
+        for s, t, o in sorted(L, key=lambda x: x[2]): first[s] = first.get(s, 0) + 1
+        rows.append((w, len(L), mix, ', '.join(f'{titles.get(s, s)} {n}' for s, n in first.items())))
+    return rows
+
+def wave_docs(G, titles):
+    rows = wave_rows(G, titles)
+    tab = ['| Wave | Images | Mix | Games (images) |', '|---|---:|---|---|'] + [f'| {w} | {n} | {m} | {g} |' for w, n, m, g in rows]
+    two = sum(n for w, n, _, _ in rows if not w.startswith('3D')); three = sum(n for w, n, _, _ in rows if w.startswith('3D'))
+    R = ['# Next wave: prompt files for the laptop', '',
+         f'Generated by `python3 games-src/scripts/make-wave7.py` (data: `games-src/scripts/wave7_data.py`, plan: `games-src/VARIETY-PLAN.md`). '
+         f'{two} paintings and pose images in 2D waves (Wave 7, 8, 9 ...) and {three} source paintings for 3D in their own track (3D wave A, B ...).', '',
+         '## How to run them', '',
+         '1. Copy the folders `flow-2d` and `flow-3d` from this folder into the laptop\'s game-art root (the folder that already holds `flow-2d` and `flow-3d`). '
+         'They only add `prompts-*.json` files; nothing existing is overwritten.',
+         f'2. Run **one wave per day**: every wave is at most {LIMIT} images, the laptop limit per day (`limit` in `games/asset-viewer/flow.json`). '
+         'Start with the lowest wave number; the files are ordered by priority, top picks first. A character\'s whole pose set is in one wave, so its poses stay consistent.',
+         '3. In each game folder the files for a wave are `prompts-wave<N>.json` (1:1) and `prompts-wave<N>-wide|-43|-34|-tall.json` (16:9, 4:3, 3:4, 9:16). '
+         'Run each file with its own ratio; every card already carries the game\'s style block.',
+         '4. 3D source paintings are `flow-3d/<game>/prompts-3d-wave<A|B|..>.json` (about 40 per wave, own track, 1:1, light-grey background). `prompts-3d-all.json` lists all of them with the target glb path.',
+         '5. Poses and cut-outs ask for a flat chroma colour background: cut them out with `python3 games-src/scripts/cutout.py` (see the note inside each file).',
+         '6. The laptop viewer (`flow_status.py`) labels the files by wave and shows the unmade ones as planned. The static copy is refreshed with `python3 games-src/scripts/viewer-plan.py`.', '',
+         '## Waves', ''] + tab + ['']
+    small = [(w, n) for w, n, _, _ in rows if not w.startswith('3D')]
+    if small and three and min(n for _, n in small) + three <= LIMIT:
+        w, n = min(small, key=lambda x: x[1])
+        R.insert(R.index('## Waves'), f'{w} has only {n} images: on that day the whole 3D track ({three}) fits in the same {LIMIT}, so run the 3D waves with it.\n')
+    open(f'{OUT}/README.md', 'w', encoding='utf-8').write('\n'.join(R))
+    fs = 'games-src/asset-viewer/flow_status.py'
+    t = open(fs, encoding='utf-8').read()
+    lst = ', '.join(f'("{w}", {n})' for w, n, _, _ in rows)
+    t = re.sub(r'(# PLANNED-BEGIN\n).*?(\n# PLANNED-END)', lambda m: m.group(1) + f'PLANNED_WAVES = [{lst}]' + m.group(2), t, flags=re.S)
+    open(fs, 'w', encoding='utf-8').write(t)
+    t = open('games-src/VARIETY-PLAN.md', encoding='utf-8').read()
+    t = t.replace('## Top 10 to make first', '## Production waves (one per day, at most %d images; 3D is its own track)\n\n' % LIMIT + '\n'.join(tab) + '\n\nOrder inside the 2D waves: the top 10 below, then main board and hand items, then the remaining boss and character poses, then extras. A pose set is never split across waves.\n\n## Top 10 to make first', 1)
+    open('games-src/VARIETY-PLAN.md', 'w', encoding='utf-8').write(t)
+
 def main():
     titles = {g['slug']: g['title'] for g in GS.shelf_games()}
     G = build()
+    assign_waves(G)
     # drop references that do not exist so the page and the prompt never point at nothing
     miss = []
     for s, g in G.items():
@@ -281,7 +399,9 @@ def main():
                     miss.append(it['ref']); it['ref'] = ''
     counts = write(G, titles)
     plan(G, titles, counts)
-    print('wrote wave 7 prompts:', sum(sum(c.values()) for c in counts.values()), 'items')
+    wave_docs(G, titles)
+    print('wrote wave prompts:', sum(sum(c.values()) for c in counts.values()), 'items')
+    for w, n, mix, games in wave_rows(G, titles): print(f'  {w:10} {n:4}  {mix}')
     for s, c in counts.items(): print(f'  {s:22} poses {c["poses"]:3}  3D {c["3d"]:3}  art {c["art"]:3}')
     if miss: print('references not found (cleared):', sorted(set(miss)))
 

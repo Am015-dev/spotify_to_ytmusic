@@ -21,6 +21,26 @@ KIND = {"prompts-kit.json": "Wave 4 kit", "prompts.json": "main set", "prompts-r
         "prompts-wave3-34.json": "Wave 3 (3:4)", "prompts-wave3-tall.json": "Wave 3 (9:16)",
         "prompts-wave5.json": "Wave 5", "prompts-wave5-wide.json": "Wave 5 (16:9)",
         "prompts-wave6.json": "Wave 6", "prompts-wave6-wide.json": "Wave 6 (16:9)", "prompts-wave6-43.json": "Wave 6 (4:3)", "prompts-wave6-34.json": "Wave 6 (3:4)", "prompts-wave6-tall.json": "Wave 6 (9:16)"}
+RATIO_LABEL = {"-wide": " (16:9)", "-43": " (4:3)", "-34": " (3:4)", "-tall": " (9:16)"}
+
+
+def kind_of(fname):
+    """Label of a prompt file. Next-wave files: prompts-wave<N>[-wide|-43|-34|-tall].json = 'Wave N (ratio)' (poses and paintings of one
+    production day, <= LIMIT images), prompts-3d-wave<A|B|..>.json = '3D wave A' (3D source paintings, about 40 per wave)."""
+    if fname in KIND: return KIND[fname]
+    m = re.fullmatch(r"prompts-wave(\d+)(-wide|-43|-34|-tall)?\.json", fname)
+    if m: return f"Wave {m.group(1)}" + RATIO_LABEL.get(m.group(2), "")
+    m = re.fullmatch(r"prompts-3d-wave([A-Z])\.json", fname)
+    if m: return f"3D wave {m.group(1)}"
+    return fname
+
+
+# Production waves from games-src/next-wave (README.md there). Kept in step by games-src/scripts/make-wave7.py, which rewrites the list
+# between the markers: (wave label, images). Shown in the plan table until the prompt files are copied here; then they are normal batches.
+# PLANNED-BEGIN
+PLANNED_WAVES = [("Wave 7", 376), ("Wave 8", 380), ("Wave 9", 183), ("3D wave A", 39), ("3D wave B", 38), ("3D wave C", 38), ("3D wave D", 38), ("3D wave E", 38)]
+# PLANNED-END
+
 # 2D items that an approved model in games-src/facelift-3d replaces (logs/FLOW-FACELIFT-PLAN.md "Crossed out by approved 3D")
 TWIN = {**{("rampart-and-vine", f"piece-{k}-{c}"): f"piece-{k}" for k in ("meeple", "champ", "mason", "hog") for c in ("red", "blue", "green", "yellow")},
         ("sands-of-qamar", "token-palm"): "palm", ("sands-of-qamar", "token-palace"): "palace",
@@ -34,9 +54,13 @@ CROSSED = [{"game": g, "name": n, "wave": w, "twin": t} for g, n, w, t in [
 
 
 def wave_of(root, fname):
-    if root == "flow-3d": return "3D sources"
+    m = re.match(r"prompts-wave(\d+)(?:-|\.json)", fname)
+    if root == "flow-3d":
+        m3 = re.fullmatch(r"prompts-3d-wave([A-Z])\.json", fname)
+        return f"3D wave {m3.group(1)}" if m3 else "3D sources"
     if root == "flow-covers": return "Covers"
     if root == "flow-video": return "Boss poses"
+    if root == "flow-2d" and m: return f"Wave {m.group(1)}"
     for key, w in (("kit", "Wave 4"), ("wave1", "Wave 1"), ("djinn", "Wave 1"), ("cards", "Wave 2"), ("wave2", "Wave 2"), ("wave3", "Wave 3"), ("wave5", "Wave 5"), ("wave6", "Wave 6")):
         if key in fname: return w
     return "Wave 0"
@@ -185,7 +209,7 @@ def build():
                               "stage": stage(folder.name, name, f.exists(), vt.get("v")) if root == "flow-2d" else None,
                               "flags": ["blank"] if root == "flow-2d" and f.exists() and facts(f)[1] else []})
             game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else folder.name
-            batches.append({"root": root, "game": game, "kind": KIND.get(p.name, p.name), "file": p.relative_to(GA).as_posix(),
+            batches.append({"root": root, "game": game, "kind": kind_of(p.name), "file": p.relative_to(GA).as_posix(),
                             "wave": wave_of(root, p.name), "ratio": ratio_of(p.name),
                             "done": sum(i["done"] for i in items), "total": len(items), "items": items})
     pending = sum(b["total"] - b["done"] for b in batches)
@@ -197,7 +221,8 @@ def build():
         extra_days = (left - forecast[-1]["room"]) / LIMIT
         eta = (now + dt.timedelta(hours=24) + dt.timedelta(days=extra_days)).isoformat()
     # facelift waves not turned into prompt files yet (logs/FLOW-FACELIFT-PLAN.md): planned at LIMIT images/day after the queue
-    PLANNED = []
+    have = {b["wave"] for b in batches}
+    PLANNED = [(w, n) for w, n in PLANNED_WAVES if w not in have]
     start = dt.datetime.fromisoformat(eta) if eta else now
     planned, acc = [], 0
     for name, n in PLANNED:

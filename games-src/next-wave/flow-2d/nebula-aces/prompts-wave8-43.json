@@ -1,0 +1,73 @@
+{
+ "cards": {
+  "end-lose-b": "a lone damaged starfighter drifting among debris in the dark, one engine flickering, no text, letters or numbers",
+  "end-lose-c": "an empty hangar with a single helmet on a bench, cold blue light, no text, letters or numbers",
+  "end-win-b": "a squadron of starfighters flying in formation over a bright planet at dawn, triumphant, no text, letters or numbers",
+  "end-win-c": "a pilot raising a helmet in a hangar full of cheering crew, warm light, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache sci-fi illustration for a starfighter duel game, deep indigo space, glowing engine light, clean readable shapes, retro-futurist, rich but not neon colours, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 8",
+ "meta": {
+  "end-lose-b": {
+   "element": "Painting: end-lose-b",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-b.png",
+   "target": "games/nebula-aces/media/end-lose-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 8"
+  },
+  "end-lose-c": {
+   "element": "Painting: end-lose-c",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-c.png",
+   "target": "games/nebula-aces/media/end-lose-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 8"
+  },
+  "end-win-b": {
+   "element": "Painting: end-win-b",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-b.png",
+   "target": "games/nebula-aces/media/end-win-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 8"
+  },
+  "end-win-c": {
+   "element": "Painting: end-win-c",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-c.png",
+   "target": "games/nebula-aces/media/end-win-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 8"
+  }
+ }
+}

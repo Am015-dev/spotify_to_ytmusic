@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "table-dune-night-phone": "a tall painted tabletop seen from above: moonlit dunes with camel tracks and a star-patterned cloth, calm empty space in the middle, no text, letters or numbers",
+  "table-souk-dusk-phone": "a tall painted tabletop seen from above: a bazaar floor of patterned rugs at dusk with lanterns, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-dune-night-phone": {
+   "element": "Painting: table-dune-night-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-dune-night-phone.png",
+   "target": "games/sands-of-qamar/media/table-dune-night-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-souk-dusk-phone": {
+   "element": "Painting: table-souk-dusk-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-souk-dusk-phone.png",
+   "target": "games/sands-of-qamar/media/table-souk-dusk-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

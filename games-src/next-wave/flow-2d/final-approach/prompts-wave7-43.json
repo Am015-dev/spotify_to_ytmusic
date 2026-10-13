@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "event-go-around": "a cartoon airliner pulling up steeply just above a runway with gear still down, dramatic sky, no text, letters or numbers",
+  "event-touchdown": "a cartoon airliner touching down with puffs of tyre smoke on a wet runway, bright and cheerful, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a cosy cockpit game, chunky soft shapes with a slightly wobbly dark navy outline, matte paper grain, rich but warm colours (teal panel, warm cream highlights, blue and orange crew colours), gentle rim light, soft drop shadow, crisp and readable at very small sizes, simple silhouettes, no text, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "event-go-around": {
+   "element": "Painting: event-go-around",
+   "why": "go-around splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-go-around.png",
+   "target": "games/final-approach/media/event-go-around.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "event-touchdown": {
+   "element": "Painting: event-touchdown",
+   "why": "touchdown splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-touchdown.png",
+   "target": "games/final-approach/media/event-touchdown.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}
