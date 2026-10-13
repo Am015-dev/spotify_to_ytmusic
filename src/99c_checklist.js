@@ -370,4 +370,4 @@ body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:non
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};
  {const st3=document.createElement('style');st3.textContent='body.odYield #odPin{display:none!important}';document.head.appendChild(st3)}setInterval(yieldStep,120);
- window.__chk={go:id=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it)goJump(it);return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
+ window.__chk={city:id=>{const L=GO[id];return !L?null:L[0].bx?'bx':goCity(L[0])},go:id=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it)goJump(it);return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
