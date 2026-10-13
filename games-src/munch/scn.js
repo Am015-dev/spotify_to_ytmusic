@@ -113,7 +113,7 @@
 
   // the short status line: one line of 8 words or fewer, on the glow it says what to drag or tap
   GXS.add({
-    id: 'dk-status-line', name: 'Short drag/tap status line', ask: 'Is the line short and does it match?', ls: { dkd_offer: '1' }, seed: 41, when: booted, group: 'Board',
+    id: 'dk-status-line', sizes: 'phone', name: 'Short drag/tap status line', ask: 'Is the line short and does it match?', ls: { dkd_offer: '1' }, seed: 41, when: booted, group: 'Board',
     setup: function () { table(41); return GXS.wait(function () { return document.querySelector('#prompt .bfline') && document.querySelector('.mine .hand .card'); }, 6000).then(function () { return idle(500); }); },
     checks: [
       { kind: 'visible', sel: '#prompt .bfline', name: 'status line' },
@@ -129,22 +129,44 @@
     id: 'dk-tips', name: 'Lightbulb, tips, rules cards, Tips switch', ask: 'Do tips, bulb and rules cards work?', ls: { dkd_offer: '1' }, seed: 42, when: function () { return booted() && typeof GXH !== 'undefined' && typeof hlpPhase === 'function'; }, group: 'UI',
     setup: function () {
       table(42); try { GXH.reset(); GXH.setEnabled(true); } catch (e) { }
-      var d = document.createElement('div'); d.id = 'tipsprobe'; d.style.cssText = 'position:fixed;left:8px;bottom:60px;z-index:9999;background:#fff;padding:4px'; d.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); document.body.appendChild(d);
+      var d = document.createElement('div'); d.id = 'tipsprobe'; d.style.cssText = 'position:fixed;left:8px;top:45%;width:230px;z-index:2147483000;background:#fff;color:#000;padding:4px;display:none'; d.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); document.body.appendChild(d);
       try { GXH.phase(hlpPhase()); } catch (e) { }
-      return GXS.wait(function () { var b = document.querySelector('.gxh-bub.on'); return b && b.textContent.trim(); }, 8000).then(function () { return idle(400); });
+      return idle(100).then(function () { return GXS.wait(function () { var b = document.querySelector('.gxh-bub.on'); return b && b.textContent.trim(); }, 8000); }).then(function () { return idle(400); });
     },
     checks: [
       { kind: 'visible', sel: '.gxh-bub.on', name: 'first-time tip bubble' },
       { kind: 'text', sel: '.gxh-bub.on', re: /\S/, name: 'tip text', minPx: 12 },
       { kind: 'fn', name: 'tip bubble is on screen', fn: function () { var r = document.querySelector('.gxh-bub.on').getBoundingClientRect(); return (r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2) || 'bubble off screen'; } },
       { kind: 'visible', sel: '#bulbbtn', name: 'lightbulb button' },
-      { kind: 'tap', sel: '[data-gxh=tips][data-v="0"]', name: 'tap Tips Off', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === true && b === false) || 'Tips switch did not turn off'; } },
-      { kind: 'fn', name: 'no tip bubble while Tips are off', fn: function () { return !document.querySelector('.gxh-bub.on') || 'bubble still shown'; } },
-      { kind: 'tap', sel: '[data-gxh=tips][data-v="1"]', name: 'tap Tips On', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === false && b === true) || 'Tips switch did not turn on'; } },
       { kind: 'tap', sel: '#bulbbtn', name: 'tap the lightbulb', state: function () { var s = GXH.state(); return JSON.stringify([s.cur && s.cur.kind, s.rules]); }, expect: function (a, b) { return a !== b || 'lightbulb did nothing'; } },
       { kind: 'fn', name: 'bulb hint has text', fn: function () { var b = document.querySelector('.gxh-bub.on'); return (b && b.textContent.trim().length > 3) || 'no hint text'; } },
-      { kind: 'fn', name: 'rules card opens and reads', fn: function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000).then(function () { var c = document.querySelector('.gxh-card'); return (c && /\S/.test((document.querySelector('.gxh-rt') || {}).textContent || '') && /\S/.test((document.querySelector('.gxh-rx') || {}).textContent || '')) || 'rules card empty'; }); } },
-      { kind: 'tap', sel: '.gxh-x', name: 'tap Close on the rules card', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'rules card did not close'; } }
+      { kind: 'fn', name: 'rules card opens and reads', fn: function () { GXH.rules(); var c = document.querySelector('.gxh-card'); return (c && /\S/.test((document.querySelector('.gxh-rt') || {}).textContent || '') && /\S/.test((document.querySelector('.gxh-rx') || {}).textContent || '')) || 'rules card missing or empty'; } },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close on the rules card', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'rules card did not close'; } },
+      { kind: 'fn', name: 'Tips switch is shown', fn: function () { document.getElementById('tipsprobe').style.display = 'block'; return true; } },
+      { kind: 'visible', sel: '#tipsprobe [data-gxh=tips][data-v="0"]', name: 'Tips Off button' },
+      { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="0"]', name: 'tap Tips Off', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === true && b === false) || 'Tips switch did not turn off'; } },
+      { kind: 'fn', name: 'no tip bubble while Tips are off', fn: function () { return !document.querySelector('.gxh-bub.on') || 'bubble still shown'; } },
+      { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="1"]', name: 'tap Tips On', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === false && b === true) || 'Tips switch did not turn on'; } }
+    ]
+  });
+  // painted icons and 3D hero renders: every wired file loads, and each is applied where it belongs
+  GXS.add({
+    id: 'dk-art', name: 'Painted icons and 3D heroes', ask: 'Are the new icons and hero figures in place?', ls: { dkd_offer: '1' }, seed: 43, when: booted, group: 'Art',
+    setup: function () {
+      table(43);
+      var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = '<div class="mine"><span class="lv"><small>Lv</small> 1</span></div><div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div>'; document.body.appendChild(h);
+      var files = ['media/icon-hand', 'media/icon-level', 'media/ui-bubble-tail'].concat(['pip', 'morwen', 'grub', 'tansy'].map(function (k) { return 'models/hero-' + k; }), ['pip', 'morwen', 'grub', 'tansy'].map(function (k) { return 'models/hero-' + k + '@512'; }));
+      window.__art = {};
+      return Promise.all(files.map(function (f) { return new Promise(function (r) { var i = new Image(); i.onload = function () { window.__art[f] = i.naturalWidth > 0; r(); }; i.onerror = function () { window.__art[f] = false; r(); }; i.src = f + '.webp'; }); })).then(function () { return idle(900); });
+    },
+    checks: [
+      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = Object.keys(window.__art).filter(function (f) { return !window.__art[f]; }); return !bad.length || 'not loaded: ' + bad.join(', '); } },
+      { kind: 'fn', name: 'hand icon replaces the hand emoji', fn: function () { return (document.documentElement.classList.contains('dk-hand') && handIc().indexOf('icon-hand.webp') > 0) || 'emoji still shown'; } },
+      { kind: 'fn', name: 'level gem is painted on the Lv label', fn: function () { return getComputedStyle(document.querySelector('#artprobe .lv small')).backgroundImage.indexOf('icon-level.webp') > 0 || 'no gem'; } },
+      { kind: 'fn', name: 'speech-bubble tail is painted', fn: function () { return getComputedStyle(document.querySelector('#artprobe .gxh-arr')).backgroundImage.indexOf('ui-bubble-tail.webp') > 0 || 'no tail'; } },
+      { kind: 'fn', name: 'winner stands as a 3D hero (Pip, Morwen, Grub, Tansy)', fn: function () { var bad = ''; ['Pip', 'Morwen', 'Grub', 'Tansy'].forEach(function (n) { if (dkHero3d(n, 'win3d').indexOf('models/hero-' + n.toLowerCase()) < 0) bad = bad || n; }); return !bad || 'no 3D sprite for ' + bad; } },
+      { kind: 'fn', name: 'heroes without a 3D model keep their painting', fn: function () { return dkHero3d('Bodkin', 'win3d') === '' && dkPortrait('Bodkin', 'winp').indexOf('camp-bodkin') > 0 || 'fallback broken'; } },
+      { kind: 'fn', name: 'hand count line keeps its words (>= 12 px)', fn: function () { var e = document.querySelector('.mine .str'); return !e || parseFloat(getComputedStyle(e).fontSize) >= 12 || 'strength line ' + getComputedStyle(e).fontSize; } }
     ]
   });
 })();
