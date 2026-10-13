@@ -1,6 +1,20 @@
 [
  {
   "date": "2026-10-13",
+  "game": "nebula",
+  "title": "Painted look for Nebula Aces",
+  "items": [
+   "Lancer and Talon hulls and the asteroids are detailed 3D models",
+   "Phones and Low graphics load lighter versions",
+   "Metal-and-glass buttons, panels and bar",
+   "Painted flight-plan cards for manoeuvres",
+   "Brass badges for hull, shields, focus, evade and lock",
+   "Painted ship art on pilot cards; painted star-chart arena floor"
+  ],
+  "check": "Start a battle: look at the buttons, the dial cards and the floor under the grid."
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Lantern Dive: painted deep-sea table",
   "items": [
@@ -123,16 +137,6 @@
    "They still lift with steam when the round reveals"
   ],
   "check": "Pick a plate and watch the cloches lift"
- },
- {
-  "date": "2026-10-13",
-  "game": "nebula",
-  "title": "Real 3D ships and asteroids",
-  "items": [
-   "Lancer and Talon hulls and the asteroids are detailed 3D models",
-   "Phones and Low graphics load lighter versions"
-  ],
-  "check": "Start a battle and look at the ships and asteroids on the mat."
  },
  {
   "date": "2026-10-13",
