@@ -76,4 +76,24 @@
     ]
   });
 
+  // painted art wired: each plate is painted on the element, its skin switch is on, the element visible
+  function art(name, sel, file, pseudo, cls) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
+  GXS.add({
+    id: 'sg-art', name: 'Painted art: rack trays, tail, rows', ask: 'Do the racks look like wooden trays?', seed: 5, sizes: 'phone', when: booted,
+    setup: function () {
+      return table(5).then(function () {
+        var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap a colour</div>'; document.body.appendChild(b);
+        var d = document.createElement('section'); d.className = 'gx-drawer'; d.id = 'artdrawer'; d.style.cssText = 'position:fixed;left:-300px;top:0;width:280px;visibility:hidden';
+        d.innerHTML = '<div class="gx-row"><div class="gx-row-l">Sound</div><div class="gx-row-k"><button>On</button></div></div>'; document.body.appendChild(d);
+        return idle(500);
+      });
+    },
+    checks: [
+      art('rack tray painted', '.bf-me .bf-rack:not(:has(>.bf-c.no))', 'ui-rack-frame-c', '::before', 'sk-rackf'),
+      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
+      { kind: 'text', sel: '#arttail .gxh-tx', re: /colour/i, name: 'bubble text readable' },
+      { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
+    ]
+  });
 })();
