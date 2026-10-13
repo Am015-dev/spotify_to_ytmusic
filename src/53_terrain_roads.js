@@ -192,7 +192,12 @@ const AB_AUTO=[];function AB_auto(M){if(/[?&]abf=0/.test(location.search))return
  // a motorway still without a ramp (A66 w/e: the A5/A661 are nearer to every town edge) gets one from the closest main/arterial street point that passes ok()
  for(const B of M){const K=B.r.k||B.r.id;if(!B.r.ab||AB_Z.some(Z=>Z.k===K))continue;const C=[];
   CITY_S.forEach((S,si)=>{if(!/^(main|arterial)$/.test(S.r.cls))return;for(let i=0;i<S.pts.length;i+=3){const p=S.pts[i];if(used.some(u=>Math.hypot(u[0]-p.x,u[1]-p.z)<200))continue;const[bi,d]=abNearI(B,p.x,p.z);if(d<6000)C.push({d,p,bi,S,si})}});
-  C.sort((a,b)=>a.d-b.d);for(const c of C.slice(0,400)){const q=B.pts[c.bi],pts=mk(c.p,(q.x-c.p.x)/c.d,(q.z-c.p.z)/c.d,B,c.bi);if(ok(pts,B,c.si)){add(pts,B,c.S,c.si,2);break}}}}
+  C.sort((a,b)=>a.d-b.d);for(const c of C.slice(0,400)){const q=B.pts[c.bi],pts=mk(c.p,(q.x-c.p.x)/c.d,(q.z-c.p.z)/c.d,B,c.bi);if(ok(pts,B,c.si)){add(pts,B,c.S,c.si,2);break}}}
+ // a drivable street end that is still dead (no ramp) runs on to the nearest sample of another drivable street within 150 m (not across the Main),
+ // before the hub builds, so its buildings line the new piece; the end lands ON that sample = a junction
+ let ext=0;CITY_S.forEach((S,si)=>{if(!OB_DRV(S))return;for(const e of[0,1]){const P=S.pts,E=e?P[P.length-1]:P[0];if(near(E.x,E.z,si,22)||used.some(u=>Math.hypot(u[0]-E.x,u[1]-E.z)<60))continue;
+  let b=null,bd=150*150;CITY_S.forEach((T,ti)=>{if(ti===si||!OB_DRV(T))return;for(const p of T.pts){const d=(p.x-E.x)**2+(p.z-E.z)**2;if(d<bd){bd=d;b=p}}});if(!b)continue;
+  let wet=false;for(let t=0;t<=1;t+=.05)if(inRiver(E.x+(b.x-E.x)*t,E.z+(b.z-E.z)*t,-4)){wet=true;break}if(wet)continue;OB_extend(S,e,b.x,b.z);ext++}});AB_AUTO.ext=ext}
 // check (GO v90k/fra-net): one road network; every motorway has its own ramp to a city street; dead ends (a street end with a ramp is not one)
 function AB_netChk(){const FR=hubRoads(),nB=BRIDGES.length,ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs,R=new Map();
  segs.forEach((S,a)=>{const r=N.find(a);R.set(r,(R.get(r)||0)+S.L)});FR.forEach((r,k)=>{const q=N.find(segs.length+nB+k);R.set(q,(R.get(q)||0)+r.L)});

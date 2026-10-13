@@ -199,7 +199,7 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   {const nB=BRIDGES.length,ext=OB_ext(FILL_R,nB),M=OB_net(null,ext),cl=new Map(M.comps);FILL_R.forEach((r,k)=>{const R=M.find(M.segs.length+nB+k);cl.set(R,(cl.get(R)||0)+r.L)});let main=-1,mL=-1;for(const[r,l]of cl)if(l>mL){mL=l;main=r}
     const keep=FILL_R.filter((r,k)=>M.find(M.segs.length+nB+k)===main);for(const r of FILL_R)if(!keep.includes(r))OB_log('fdel',(r.x0+r.x1)/2,(r.z0+r.z1)/2,r.L);O.fDel+=FILL_R.length-keep.length;FILL_R.length=0;FILL_R.push(...keep);OB_fillIdx()}
   O.fillMs=Math.round(performance.now()-t0)}
-{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}}}
+{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();RD_fillLoop()}}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
 // runtime audit of the CURRENT drawn network: CITY_S drivable streets + filler grid + bridges + Autobahn links, junction plates, GPS coverage
 function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?hubRoads():[],nF=FR.length,nB=BRIDGES.length;
   const ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs;
@@ -252,21 +252,23 @@ function RD_net(){if(!RD_ON)return;RD.before=OB_sum(OB_net());RD_prune();
   RD.after=OB_sum(OB_net())}
 // dev1 (v90k/fra-net, Frankfurt): a filler-grid road whose end is still not a junction runs on along its own line to the next road within 150 m
 // (street, other grid road), stopping at that road's centre line; if none (or the Main is in the way) it is trimmed back to its last crossing
-function RD_fillJoin(){if(!RD_ON||CID!=='fra'||!FILL_R||!FILL_R.length)return;const O=RD.ops;O.gjoin=O.gjoin||0;O.gcut=O.gcut||0;OB_fillIdx();const N=OB_net();
+// a trim can leave a neighbour's end dead (it touched the trimmed piece): repeat until nothing changes
+function RD_fillLoop(trimOnly){try{for(let i=0;i<6;i++){const o=(RD.ops.gjoin|0)+(RD.ops.gcut|0);RD_fillJoin(trimOnly);if((RD.ops.gjoin|0)+(RD.ops.gcut|0)===o)break}}catch(e){console.warn('RD_fillJoin',e)}}
+function RD_fillJoin(trimOnly){if(!RD_ON||CID!=='fra'||!FILL_R||!FILL_R.length)return;const O=RD.ops;O.gjoin=O.gjoin||0;O.gcut=O.gcut||0;FILL_G=new Map();OB_fillIdx();/* new Map: the bake cache (98bk BK_fi) keys on FILL_G identity, clear() alone left it answering with the old roads */const N=OB_net();
  const other=(r,x,z)=>{let b=null;for(const q of FILL_R){if(q===r)continue;const t=Math.max(0,Math.min(q.L,(x-q.x0)*q.ux+(z-q.z0)*q.uz)),d=Math.hypot(q.x0+q.ux*t-x,q.z0+q.uz*t-z);if(d<q.w/2&&(!b||d<b))b=d}
   const c=N.proj(x,z,40);if(c&&c.d<N.segs[c.a].r.w/2){const d=c.d;if(b==null||d<b)b=d}return b};
  for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,sg=e?1:-1;let hit=null;
-  for(let u=4;u<=150;u+=4){const[x,z]=OB_fpt(r,t+sg*u);if(inRiver(x,z,-4))break;const d=other(r,x,z);if(d!=null){let best=u,bd=d;for(let v=u+2;v<=u+40;v+=2){const[x2,z2]=OB_fpt(r,t+sg*v),d2=other(r,x2,z2);if(d2==null||d2>bd)break;bd=d2;best=v}hit=best;break}}
+  if(!trimOnly)for(let u=4;u<=150;u+=4){const[x,z]=OB_fpt(r,t+sg*u);if(inRiver(x,z,-4))break;const d=other(r,x,z);if(d!=null){let best=u,bd=d;for(let v=u+2;v<=u+40;v+=2){const[x2,z2]=OB_fpt(r,t+sg*v),d2=other(r,x2,z2);if(d2==null||d2>bd)break;bd=d2;best=v}hit=best;break}}
   if(hit!=null){if(e){r.x1=r.x0+r.ux*(r.L+hit);r.z1=r.z0+r.uz*(r.L+hit)}else{r.x0-=r.ux*hit;r.z0-=r.uz*hit;I.J=I.J.map(c=>c+hit)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gjoin++;continue}
   const js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot){O.gprot=(O.gprot||0)+1;continue}
   if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gcut++}}
- for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
+ for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}FILL_G=new Map();OB_fillIdx()}
 function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;OB_fillIdx();const N=OB_net();
   for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length&&I.endJ[1-e])js.push(e?0:r.L);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);if(Math.abs(tj-t)>=RD_GSTUB)continue;
     let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
     if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
   for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
-OB_fix();RD_net();try{if(FILL_R)RD_fillJoin()}catch(e){if(!(e instanceof ReferenceError))console.warn('RD_fillJoin',e)}/* int-2: FILL_R is declared in 53 (later): at load this is a ReferenceError and the rfGrid wrapper runs the join when the grid is built */// dev1: again on the final street net (the rfGrid pass runs before OB_fix/RD_net)
+OB_fix();RD_net();
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
