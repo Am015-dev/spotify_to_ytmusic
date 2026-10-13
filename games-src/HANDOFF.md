@@ -10,6 +10,7 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Wiring result: `table-tunnel-glow-phone` is already live (`ui99.js:18` builds the name by concatenation, so the scan still lists it). Nothing new wired.
 - `ui-bubble-tail`: no tail element exists in the shared help kit (`shell/gx-help.css`/`gx-help.js`). Adding one changes every game, so not used here. Needs an owner decision.
 - `ui-row`: its description names no place. Not used until a target is named.
+- 23:4x re-run on merged branch (50583c8): gate still FAILS only on ld-help@375x553 clipping. A report of a clipped player name ("Nerea", span.nm, seat plate, ld-art scenario) was NOT reproduced by this gate run. Verify it before any CSS change.
 - Deploy gate FAILED on merged branch: `ld-help@375x553` text clipped ("First two tricks", span.t). Not caused by this change (no Lantern source edited). Fix in help layout (`lantern-dive/game/src/ui11.js` / shared `gx-help.css`), then rerun `build-all.py --deploy lantern-dive`.
 
 ## Story bubble + painted plate fix (13 Oct 2026): source done, only 1 of 15 deployed
