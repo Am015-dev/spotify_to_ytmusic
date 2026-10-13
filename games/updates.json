@@ -90,15 +90,18 @@
  {
   "date": "2026-10-13",
   "game": "mainhattan",
-  "title": "Painted menus, HUD and touch buttons",
+  "title": "Animated bosses and a one-tap Lab",
   "items": [
    "Title, pause, garage, shop and story buttons are now painted plates",
    "Settings card has a painted frame, header and rows",
    "Run HUD sits in painted housings; hints in a speech bubble",
    "Phone pause, DASH and EMP are painted round buttons",
-   "Story map stages sit on medallions: open, done, boss, locked"
+   "Story map stages sit on medallions: open, done, boss, locked",
+   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
+   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
+   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones"
   ],
-  "check": "Open the title, a story run on a phone, pause and settings: everything readable and tappable"
+  "check": "LAB > BOSS PICKER, then watch each boss before it fires"
  },
  {
   "date": "2026-10-13",

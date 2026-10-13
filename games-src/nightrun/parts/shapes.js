@@ -47,7 +47,7 @@ function chestShow(done){G.chestT=true;const pool=CHR.slice().sort(()=>Math.rand
 {const ed=enterDistrict;enterDistrict=function(i){G.chestT=false;return ed.apply(this,arguments);};}
 NR.on('runStart',()=>{G.chestT=false;});
 {const st=document.createElement('style');st.textContent=`
-.db{display:inline-flex;vertical-align:-.2em;width:1.2em;height:1.2em;margin-right:.35em}.db svg,img.db{width:100%;height:100%;object-fit:contain}
+.db{display:inline-flex;vertical-align:-.2em;width:1.2em;height:1.2em;margin-right:.35em}.db svg{width:100%;height:100%}img.db{width:1.2em;height:1.2em;object-fit:contain}
 .md{display:block;height:72px;width:72px;margin-top:8px}.md svg{height:100%;width:100%}
 .pg .card .pi{height:clamp(34px,calc(var(--u)*10),52px);width:clamp(34px,calc(var(--u)*10),52px);flex:0 0 auto}.pg .card .pi.sh svg,.pg .card .shp.sh svg{width:100%;height:100%;color:var(--c)}
 .pg .card .shp.sh{display:inline-block;height:clamp(40px,calc(var(--u)*13),84px);width:clamp(40px,calc(var(--u)*13),84px);flex:0 0 auto}
