@@ -1,10 +1,10 @@
 {
  "_note": "Copy of SCENES_FOR / DEFAULT_SCENES / START / JUST from games/asset-viewer/screens.html (that page is a generated snapshot, so it keeps its own copy). Text steps are regex source strings, flags i.",
  "START": {
-  "text": "play vs computer|me vs computer|vs computer|play a real game|quick play|start the game|^play$"
+  "text": "^(play(?!.*(online|friend))|me vs computer|vs computer|quick play|start the game)|play vs computer|play a real game"
  },
  "JUST": {
-  "text": "just play|skip|no thanks",
+  "text": "just play|skip|no thanks|^start$",
   "optional": true
  },
  "SCENES_FOR": {
@@ -102,7 +102,7 @@
  "BOARD": [
   "START",
   {
-   "text": "^(start|start game|begin|deal|go|let.?s go)$",
+   "text": "^(start|start game|begin|deal|go|let.?s go|new game)\\b",
    "optional": true
   },
   "JUST"
