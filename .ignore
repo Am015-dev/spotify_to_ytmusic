@@ -1,0 +1,46 @@
+# Read by ripgrep (so the Grep tool), fd and ag. Keeps searches on real sources.
+# Built games and their media
+games/*/index.html
+games/**/media/
+# Generated / vendored / huge
+*.min.js
+vendor/
+node_modules/
+audio-data.js
+games-src/.staging/
+games-src/.stg-*/
+# Test output, screenshots, research dumps
+playtest/
+shots/
+shots-*/
+*-shots/
+sweep-shots/
+audit-shots/
+phone-check-shots/
+licence-snapshots/
+# Generated builds inside games-src (also in games-src/.gitignore); the numbered ui1..uiN.js parts are the sources
+games-src/**/x.js
+games-src/cauldron-fair/cauldron-fair.html
+games-src/**/kot2.html
+games-src/**/nebula.html
+games-src/**/doorkick.html
+games-src/**/shipwreck.html
+games-src/**/sands.html
+games-src/**/sunglaze.html
+games-src/**/rampart.html
+games-src/**/final-approach.html
+games-src/**/hollowbough.html
+games-src/**/kaiten.html
+games-src/**/lantern-dive.html
+games-src/**/shortfuse.html
+games-src/**/thornbound.html
+games-src/**/tidewake.html
+games-src/**/debug.html
+games-src/**/kit/demo.html
+games-src/cauldron-fair/ui.js
+games-src/final-approach/game/ui.js
+games-src/hollowbough/game/ui.js
+games-src/kaiten/game/ui.js
+games-src/lantern-dive/game/ui.js
+games-src/tidewake/game/ui.js
+games-src/thornbound/game/src/ui.js
