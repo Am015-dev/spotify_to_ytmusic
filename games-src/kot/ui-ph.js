@@ -33,7 +33,7 @@ function phLabels(){for(const b of document.querySelectorAll('header.gx-bar [dat
   const k=document.querySelector('.gx-dock-head [data-gx="dock"]');if(k)k.setAttribute('aria-label','Hide panel')}
 function phBuild(){const dk=document.querySelector('.gx-dock');if(!dk||$ph('pchips'))return;
   const mk=(id,tag,cls)=>{const e=document.createElement(tag||'div');e.id=id;if(cls)e.className=cls;dk.appendChild(e);return e};
-  mk('pchips');mk('pshop');mk('pfeed').setAttribute('aria-live','polite');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
+  mk('pchips');if(!$ph('pshop'))mk('pshop');mk('pfeed').setAttribute('aria-live','polite');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
   pc.innerHTML='<div class="pcx-h"><b id="pcxt"></b><span id="pcxa"></span><button class="gx-x" data-ph="close" aria-label="Close">×</button></div><div class="pcx-b" id="pcxb"></div>';
   phLabels()}
 // ---- monster chips ----

@@ -145,7 +145,7 @@ async function playGame(browser, size, gi, rep, opts) {
   await ctx.addInitScript(() => { try { const ch = {}; for (const id of ['c1','c2','c3','c4','c5','c6','c7','c8','c9']) ch[id] = { beaten: true, stars: 1, best: 1, tries: 1, losses: 0 }; if (location.search.indexOf('x') < 0) localStorage.setItem('gns-campaign-short-fuse', JSON.stringify({ v: 1, ch, unlocked: [], last: 'c1' })); } catch (e) { } });
   let tipsOff = false; const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, dead: 0, won: 0, lost: 0 };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
+  page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource|Fetch API cannot load file:/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
   try {
     await page.goto('file://' + FILE); await sleep(700);
     await page.evaluate(PAGE);

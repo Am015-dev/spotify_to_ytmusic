@@ -880,6 +880,123 @@ html.gxt-on.ph-l .gx-dock[data-bf="buy"] #pacts{grid-template-columns:minmax(0,3
 html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:36px;padding:3px 8px;border-radius:10px;font-size:12px;line-height:1.1;text-align:center;flex:none}
 html.ph .bfintro .you .gxt-menu.tutmini b{font:800 12px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}
 
+/* ===== Play on the board (see onboard.js): dice, Roll, SMASH!, End turn, painted cards for sale, your cards, questions ===== */
+#ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:min(60px,calc((var(--obw,360px) - 44px)/6.3))}
+#ob button,#ob .die,#ob #choice{pointer-events:auto}
+#ob #obown,#ob #obmid,#ob #obtoast,#ob #obcard{position:absolute}
+#ob #obact,#ob #pacts{position:static!important}
+#ob #obact{width:100%;display:flex;justify-content:center}
+#ob #pacts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:0;padding:0;border:0;background:none;box-shadow:none;width:100%}
+#ob #pacts>.btn{min-height:54px;margin:0;max-width:300px}
+#ob #pacts [data-act="reroll"]{min-width:150px;font-size:22px}
+#ob #pacts [data-act="hint"]{min-width:54px;width:54px;padding:0}
+#ob #pacts [data-act="end"]{min-width:210px;font-size:22px}
+#ob #pacts [data-act="sweep"]{min-width:64px}
+#ob #pacts .emotes{display:none}
+/* SMASH!: the real resolve button, hanging over Downtown */
+#ob #pacts [data-act="resolve"]{position:fixed;left:var(--cx,50%);top:var(--cy,40%);transform:translate(-50%,-50%);z-index:4;width:112px;height:112px;min-width:0;min-height:0;padding:0;border-radius:50%;border:4px solid #1a1320;
+  background:radial-gradient(circle at 36% 28%,#ffb35a 0%,#ff5a2c 55%,#c81d25 100%);color:#fff;display:grid;place-items:center;text-align:center;cursor:pointer;
+  box-shadow:0 0 0 4px #ffd23f,0 0 26px 8px rgba(255,120,40,.8),4px 6px 0 rgba(0,0,0,.5);animation:obGlow 1.5s ease-in-out infinite}
+#ob #pacts [data-act="resolve"] .bl{font:400 25px/.95 Bangers,Impact,sans-serif;letter-spacing:.05em;text-shadow:2px 2px 0 #1a1320;display:block;max-width:90px}
+#ob #pacts [data-act="resolve"] small{display:none}
+#ob #pacts [data-act="resolve"].pulse{animation:obGlow .8s ease-in-out infinite;width:124px;height:124px}
+#ob #pacts [data-act="resolve"]:active{transform:translate(-50%,-50%) scale(.93)}
+@keyframes obGlow{0%,100%{box-shadow:0 0 0 4px #ffd23f,0 0 20px 5px rgba(255,120,40,.7),4px 6px 0 rgba(0,0,0,.5)}50%{box-shadow:0 0 0 6px #fff1a0,0 0 38px 14px rgba(255,150,40,.95),4px 6px 0 rgba(0,0,0,.5)}}
+/* dice */
+#ob #dicewrap{margin:0;width:100%;padding:0;border:0;background:none;box-shadow:none;border-radius:0}
+#ob #dicewrap.off{display:none}
+#ob #dice{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 7px;padding:12px 0 0;min-height:0;background:none;border:0}
+#ob #dice>span{display:none}
+#ob .die{width:var(--dw);height:var(--dw);min-width:0;min-height:0;border-radius:12px;transition:transform .14s ease-out}
+#ob .die svg{width:calc(var(--dw)*.66);height:calc(var(--dw)*.66)}
+#ob .die.kept{transform:translateY(-12px);box-shadow:0 0 0 3px #ffd23f,0 0 16px rgba(255,210,63,.9),3px 9px 0 var(--shadow,rgba(0,0,0,.4))}
+#ob #dice:has(.die.kept) .die:not(.kept):not([disabled]){opacity:.85;transform:scale(.95)}
+#ob .die:active:not([disabled]){transform:scale(.92)}
+#ob .die[disabled]{opacity:1;filter:saturate(.92)}
+#ob .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
+#ob .die.bfroll svg{animation:bfFace var(--land,.6s) steps(1,end) both;animation-delay:inherit}
+html.ph #ob .die.sugg{outline:none}
+#ob #rolls{display:none}
+#ob #preview{display:block;text-align:center;font-size:13px;line-height:1.25;max-width:560px;margin:6px auto 0;padding:4px 10px;border-radius:10px;background:rgba(26,19,32,.78);color:#fff;border:0}
+#ob #preview:empty{display:none}
+html.ph #ob #preview{display:none}
+#ob[data-bf="resolving"] #pshop,#ob[data-bf="resolving"] #pacts>*,#ob[data-bf="resolving"] #dicewrap{visibility:hidden}
+/* cards for sale: painted cards on the board */
+#ob #obmkt{width:100%;display:flex;justify-content:center}
+#ob #pshop{display:flex;gap:10px;justify-content:center;width:100%;margin:0;padding:0}
+#ob #pshop:empty{display:none}
+#ob .obc{--cw:min(158px,calc((var(--obw,360px) - 44px)/3));appearance:none;position:relative;width:var(--cw);min-height:0;flex:0 0 var(--cw);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding:5px 5px 8px;border:3px solid #1a1320;border-radius:12px;background:#fff6dc;color:#1a1320;cursor:pointer;
+  box-shadow:3px 4px 0 rgba(0,0,0,.45);transition:transform .15s,box-shadow .15s;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation;text-align:center;font:inherit}
+#ob .obc.K{background:#efe2ff}#ob .obc.D{background:#ffe6d6}#ob .obc.C{background:#dcefff}
+#ob .obc .oart{display:block;width:100%;aspect-ratio:360/220;border-radius:7px;overflow:hidden;background:#2a1f33}
+#ob .obc .oart img,#ob .obc .oart svg{display:block;width:100%;height:100%;object-fit:cover}
+#ob .obc .oart svg{padding:12%;box-sizing:border-box;object-fit:contain}
+#ob .obc b{font:400 15px/1.05 Bangers,Impact,sans-serif;letter-spacing:.03em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.1em;overflow-wrap:anywhere}
+#ob .obc .cost{position:absolute;left:-8px;top:-10px;z-index:2;width:34px;height:34px;display:block;flex:none;border-radius:50%;background:#1f9d5c;border:3px solid #1a1320;color:#fff;font:400 20px/28px Bangers,Impact,sans-serif;text-align:center}
+#ob .obc .star{position:absolute;right:4px;top:0;z-index:2;font-style:normal;font-size:16px;color:#ffd23f;text-shadow:1px 1px 0 #1a1320}
+#ob .obc.ok{box-shadow:0 0 0 3px #2fd47a,0 0 18px 5px rgba(47,212,122,.75),3px 4px 0 rgba(0,0,0,.45)}
+#ob .obc.no{opacity:.62;filter:saturate(.6)}
+#ob .obc.sel{transform:translateY(-12px) scale(1.04);box-shadow:0 0 0 4px #ffd23f,0 8px 16px rgba(0,0,0,.55)}
+#ob .obc.sugg:not(.sel){outline:3px solid #ffd23f;outline-offset:1px}
+#ob .obc .go{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);z-index:3;background:#1a1320;color:#ffd23f;font:400 17px/1 Bangers,Impact,sans-serif;letter-spacing:.06em;font-style:normal;padding:4px 10px;border-radius:7px;white-space:nowrap;animation:bmPulse2 .9s ease-in-out infinite}
+#ob .obc.shake{animation:bShake .4s}
+@media (hover:hover){#ob .obc.ok:hover{transform:translateY(-8px)}}
+/* your cards, along the top */
+#ob #obown{left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none;z-index:2}
+#ob #obown:empty{display:none}
+html.ph #ob #obown{top:48px}
+#ob .obo{appearance:none;position:relative;width:62px;aspect-ratio:360/220;padding:0;border:3px solid #1a1320;border-radius:8px;overflow:hidden;background:#2a1f33;cursor:pointer;box-shadow:2px 3px 0 rgba(0,0,0,.45);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#ob .obo.K{border-color:#8e5be0}#ob .obo.D{border-color:#e8702a}#ob .obo.C{border-color:#2f8fe0}
+#ob .obo img,#ob .obo svg{display:block;width:100%;height:100%;object-fit:cover}
+#ob .obo svg{padding:14%;box-sizing:border-box;object-fit:contain}
+#ob .obo i{display:none}
+/* hold to read */
+#ob #obcard{inset:0;display:none;place-items:center;background:rgba(15,8,25,.6);z-index:9;pointer-events:none}
+#ob #obcard.on{display:grid}
+#ob .obbig{position:relative;width:min(330px,88%);box-sizing:border-box;padding:10px 12px 14px;border:4px solid #1a1320;border-radius:16px;background:#fff6dc;color:#1a1320;box-shadow:0 10px 30px rgba(0,0,0,.6);text-align:center}
+#ob .obbig.K{background:#efe2ff}#ob .obbig.D{background:#ffe6d6}#ob .obbig.C{background:#dcefff}
+#ob .obbig .bart{border-radius:10px;overflow:hidden;aspect-ratio:360/220;background:#2a1f33}
+#ob .obbig .bart img,#ob .obbig .bart svg{display:block;width:100%;height:100%;object-fit:cover}
+#ob .obbig .bart svg{padding:12%;box-sizing:border-box;object-fit:contain}
+#ob .obbig h3{margin:8px 0 2px;font:400 26px/1 Bangers,Impact,sans-serif;letter-spacing:.04em}
+#ob .obbig p{margin:4px 0 0;font-size:15px;line-height:1.3}
+#ob .obbig .ty{margin:2px 0 0}
+#ob .obbig .ex{font-weight:800;color:#a3281d}
+#ob .obbig .cost{position:absolute;left:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#1f9d5c;border:3px solid #1a1320;color:#fff;font:400 27px/38px Bangers,Impact,sans-serif;text-align:center;display:block}
+/* a question (Stay or yield, ...) opens in the middle of the board */
+#ob #obmid{left:8px;right:8px;top:50%;transform:translateY(-50%);display:flex;justify-content:center;pointer-events:none;z-index:8}
+#ob #obmid #choice{position:relative;display:block;width:min(430px,100%);max-height:min(78%,560px);overflow:auto;margin:0;box-sizing:border-box;border:4px solid #1a1320;border-top-color:var(--red,#e0453a);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6);background:var(--card,#fff6dc);color:#1a1320;overscroll-behavior:contain;padding:10px 12px 12px}
+#ob #obmid #choice.hidden{display:none}
+#ob #obmid #choice .acts{display:grid;gap:8px}
+#ob #obmid #choice .btn{min-height:50px}
+/* feedback line (desktop; the phone has its own line) */
+#ob #obtoast{left:50%;top:10px;transform:translateX(-50%);max-width:calc(100% - 20px);padding:6px 14px;border-radius:999px;background:#ffd23f;color:#1a1320;border:2px solid #1a1320;font:900 15px/1.2 Nunito,sans-serif;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;z-index:7}
+#ob #obtoast.on{opacity:1}
+html.ph #bline{bottom:auto;top:8px}
+html.ph #ob #btip{position:static;left:auto;right:auto;bottom:auto;width:calc(100% - 8px);max-width:420px;box-sizing:border-box;padding:4px 10px}
+html.ph #ob #btip p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* landscape phone: the buttons stand in a column at the right edge */
+html.ph-l #ob{padding-right:166px;--dw:56px}
+html.ph-l #ob #dice{max-width:calc(3*var(--dw) + 16px);margin:0 auto;gap:8px}
+html.ph-l #ob #obact{position:absolute!important;right:8px;bottom:calc(10px + var(--sab,0px));width:auto}
+html.ph-l #ob #pacts{flex-direction:column;flex-wrap:nowrap;width:auto;align-items:stretch}
+html.ph-l #ob #pacts [data-act="end"],html.ph-l #ob #pacts [data-act="reroll"]{min-width:140px}
+html.ph-l #ob .obc{--cw:min(112px,calc((var(--obw,500px) - 186px)/3))}
+html.ph-l #ob #obown{right:166px}
+html.ph-l #ob #obmid{right:166px}
+/* the panel keeps only the essentials: the result line, the advice and the status */
+html.ob #prompt #pmsg:empty{display:none}
+html.ph-p .gx-dock[data-card="coach"] #coach,html.ph-p .gx-dock[data-card="advice"] #advice,html.ph-p .gx-dock[data-card="pop"] #pcx{top:calc(var(--pz-t,50vh) - 230px)}
+html.ob #buymini{display:none!important}
+html.ob:not(.ph) #hud{left:auto;right:10px;bottom:auto;top:10px;max-width:46%}
+html.ob #pmsg .how{display:none}
+#ob #pacts [data-act="sweep"]{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:76px;min-height:54px;padding:0 6px}
+#ob #pacts [data-act="sweep"] .bl{font-size:20px}#ob #pacts [data-act="sweep"] small{font-size:12px}
+html.ph-p #ob #pacts [data-act="end"]{min-width:0;flex:1 1 150px}
+html.ob .gx-board{overflow:clip}
+html.ph-l #ob #pacts>.btn{flex:none}
+html.ph-l #ob #pacts [data-act="end"]{min-height:60px}
+
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -1309,15 +1426,15 @@ html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:cont
   function safeq(){var m=/[?&]safe=([^&]+)/.exec(q);if(!m)return null;var a=m[1].split(',').map(Number);return a.length===4&&a.every(function(x){return x>=0})?a:null}
   function env(){var s=safeq();if(s)return s;try{var p=document.createElement('div');p.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
       R.appendChild(p);var c=getComputedStyle(p);var r=[parseFloat(c.paddingTop)||0,parseFloat(c.paddingRight)||0,parseFloat(c.paddingBottom)||0,parseFloat(c.paddingLeft)||0];R.removeChild(p);return r}catch(e){return [0,0,0,0]}}
-  var PHONE=window.PHONE={on:false,land:false,bar:48,zone:200,
+  var PHONE=window.PHONE={on:false,land:false,bar:48,zone:64,
     want:function(){if(/[?&]phone=1/.test(q))return true;if(/[?&]phone=0/.test(q))return false;var s=Math.min(innerWidth,innerHeight);var co=false;try{co=matchMedia('(pointer:coarse)').matches}catch(e){}return s<=500||(co&&s<=600)},
     apply:function(){var W=innerWidth,H=innerHeight,on=PHONE.want(),land=W>H,st=R.style;PHONE.on=on;PHONE.land=land;
       R.classList.toggle('ph',on);R.classList.toggle('ph-l',on&&land);R.classList.toggle('ph-p',on&&!land);
       if(!on){['--ph-bw','--ph-bh','--sat','--sar','--sab','--sal','--ph-bar','--pz-l','--pz-t'].forEach(function(p){st.removeProperty(p)});return}
       PHONE.bar=land?48:52;var s=env();st.setProperty('--sat',s[0]+'px');st.setProperty('--sar',s[1]+'px');st.setProperty('--sab',s[2]+'px');st.setProperty('--sal',s[3]+'px');st.setProperty('--ph-bar',PHONE.bar+'px');
       var aw=W-s[1]-s[3],ah=H-s[0]-s[2],bw,bh;
-      if(land){bh=ah;bw=Math.min(Math.round(ah*1.28),aw-300);bw=Math.max(bw,Math.round(ah*.9))}
-      else{bw=aw;var zn=ah<600?PHONE.zone-12:PHONE.zone;/* short phones: a slightly lower tray keeps the board above 55% of the screen */bh=Math.max(Math.round(aw*.75),Math.min(Math.round(aw*1.3),ah-PHONE.bar-zn));PHONE.zn=zn}
+      if(land){bh=ah;bw=Math.min(Math.round(ah*1.28),aw-344);bw=Math.max(bw,Math.round(ah*.9))}
+      else{bw=aw;var zn=ah<600?PHONE.zone-8:PHONE.zone;/* short phones: a slightly lower tray keeps the board above 55% of the screen */bh=Math.max(Math.round(aw*.75),Math.min(Math.round(aw*1.7),ah-PHONE.bar-zn));PHONE.zn=zn}
       st.setProperty('--ph-bw',bw+'px');st.setProperty('--ph-bh',bh+'px');
       st.setProperty('--pz-l',(land?s[3]+bw:s[3])+'px');st.setProperty('--pz-t',(land?s[0]+PHONE.bar:s[0]+PHONE.bar+bh)+'px');PHONE.bw=bw;PHONE.bh=bh;PHONE.aw=aw;PHONE.ah=ah}};
   PHONE.apply();var t;function again(){clearTimeout(t);PHONE.apply();t=setTimeout(function(){PHONE.apply();if(window.phLayout)phLayout()},150)}
@@ -6190,7 +6307,7 @@ function phLabels(){for(const b of document.querySelectorAll('header.gx-bar [dat
   const k=document.querySelector('.gx-dock-head [data-gx="dock"]');if(k)k.setAttribute('aria-label','Hide panel')}
 function phBuild(){const dk=document.querySelector('.gx-dock');if(!dk||$ph('pchips'))return;
   const mk=(id,tag,cls)=>{const e=document.createElement(tag||'div');e.id=id;if(cls)e.className=cls;dk.appendChild(e);return e};
-  mk('pchips');mk('pshop');mk('pfeed').setAttribute('aria-live','polite');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
+  mk('pchips');if(!$ph('pshop'))mk('pshop');mk('pfeed').setAttribute('aria-live','polite');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
   pc.innerHTML='<div class="pcx-h"><b id="pcxt"></b><span id="pcxa"></span><button class="gx-x" data-ph="close" aria-label="Close">×</button></div><div class="pcx-b" id="pcxb"></div>';
   phLabels()}
 // ---- monster chips ----
@@ -6322,16 +6439,16 @@ function bfBuild(){if($bf('bfx'))return;const fx=document.createElement('div');f
     menu.insertAdjacentHTML('afterbegin',rows.map(([g,t,s])=>`<button class="btn mrow" data-gx="${g}" data-bfm="1">${t}<small>${s}</small></button>`).join(''))}}
 // ---- the one line on the board ----
 function bfOut(){if(!G||G.winner||G.mode!=='solo')return false;const me=meSeat();return me>=0&&!G.pl[me].alive}
-function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose below ↓';if(bfOut())return 'You’re knocked out · watching the end';
+function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose here';if(bfOut())return 'You’re knocked out · watching the end';
   if(UI.intro||UI.choice)return '';
   if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
-    if(G.rolls<=0||!nk)return 'No rolls left: tap Done';
+    if(G.rolls<=0||!nk)return 'No rolls left: tap SMASH';
     if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
-    return `Roll the other ${nk}, or tap Done`}
-  if(G.phase==='buy'&&!G.bug&&p.vp>=20)return '20★ reached: tap Done to win';
+    return `Roll the other ${nk}, or tap SMASH`}
+  if(G.phase==='buy'&&!G.bug&&p.vp>=20)return '20★ reached: End turn to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
-    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or Done to save ⚡':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: tap Done'}
+    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: End turn'}
   return ''}
 function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){BF.flash={t,until:bfNow()+(ms||2200)};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,(ms||2200)+20)}
@@ -6431,7 +6548,7 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
 // ---- render hook ----
 // the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
 function bfPlaceChips(){const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips'),dk=document.querySelector('.gx-dock');if(!bar||!ch||!dk)return;
-  if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pshop'))}
+  if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pfeed'))}
 function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
   const dk=document.querySelector('.gx-dock');const hold=!!(BF.cap&&bfNow()<BF.until);
   if(hold){clearTimeout(BF.holdT);BF.holdT=setTimeout(phRender,BF.until-bfNow()+40)}
@@ -6466,10 +6583,9 @@ function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfS
  // the old text tips stay off on phones: the finger and the line teach instead
  const _ct=checkTips;checkTips=function(){if(phOn())return;return _ct.apply(this,arguments)}}
 window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
-  const sh=t.closest&&t.closest('#pshop [data-shop]');if(sh){e.stopPropagation();e.preventDefault();bfTapCard(+sh.dataset.shop,sh);return}
-  if(t.closest&&t.closest('.gx-board')&&(UI.choice||UI.intro)&&!$bf('choice').classList.contains('hidden')){const c=$bf('choice');c.classList.remove('bfpoke');void c.offsetWidth;c.classList.add('bfpoke');bfFlash('Choose below ↓',1500);return}
+  if(t.closest&&t.closest('.gx-board')&&!t.closest('#ob')&&(UI.choice||UI.intro)&&!$bf('choice').classList.contains('hidden')){const c=$bf('choice');c.classList.remove('bfpoke');void c.offsetWidth;c.classList.add('bfpoke');bfFlash('Choose here',1500);return}
   if(t.closest&&t.closest('.gx-board')&&!humanTurn()&&!G.winner&&!UI.choice&&!UI.intro){bfSpeed()}
-  else if(t.closest&&t.closest('.gx-board')&&humanTurn()&&!UI.choice&&!UI.intro&&!t.closest('#bline')){bfFlash(G.phase==='roll'?'Tap the dice below ↓':'Tap a card below ↓',1300)}
+  else if(t.closest&&t.closest('.gx-board')&&humanTurn()&&!UI.choice&&!UI.intro&&!t.closest('#bline')&&!t.closest('#ob')){bfFlash(G.phase==='roll'?'Tap the dice':'Tap a card',1300)}
   if(t.closest&&t.closest('[data-die]')&&humanTurn()&&G.phase==='roll'){bfTut('keep',1);setTimeout(()=>{const d=t.closest('[data-die]');if(d&&typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},0)}
   if(t.closest&&t.closest('[data-act="reroll"]')&&humanTurn()&&G.phase==='roll'&&G.dice.some(d=>d.k))bfTut('roll',1);
   if(t.closest&&t.closest('[data-act="resolve"]')&&humanTurn()&&G.phase==='roll')bfTut('done',1);
@@ -6479,6 +6595,104 @@ window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
 try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=320}catch(e){}
 setInterval(()=>{if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
 phLayout();
+
+</script>
+<script>
+// ===== Play on the board (every screen) =====
+// Loaded after board.js, before tutor.js. Rules, AI and the phone strip are untouched. This only MOVES the real controls
+// out of the side panel onto the city, so every selector (#dice, #pacts, #pshop, #choice) and every handler keeps working:
+//   - the dice, Roll, and End turn sit along the bottom of the board
+//   - SMASH! (the real resolve button) hangs over Downtown: tap the city to use your dice
+//   - the cards for sale are painted cards on the board: hold (400 ms, or hover) to read, tap to buy (touch: tap twice)
+//   - your power cards sit in a row at the top of the board: hold or tap to read
+//   - Stay / Yield and the other questions open in the middle of the board
+// The panel keeps only the status, the result line and the advice. It stays one tap away (☰ Panel).
+const OB={t:0,shown:'',suppress:0,toastT:0};
+const $ob=id=>document.getElementById(id);
+const obCoarse=()=>{try{return matchMedia('(pointer:coarse)').matches||!matchMedia('(hover:hover)').matches}catch(e){return true}};
+const obTwo=()=>phOn()||obCoarse();   // touch: tap a card to pick it, tap again to buy. Mouse: one click.
+function obBuild(){if($ob('ob'))return true;const bd=document.querySelector('.gx-board');if(!bd||!$ob('dicewrap')||!$ob('pacts'))return false;
+  if(!$ob('pshop')){const e=document.createElement('div');e.id='pshop';document.body.appendChild(e)}
+  const ob=document.createElement('div');ob.id='ob';
+  ob.innerHTML='<div id="obown" aria-label="Your power cards"></div><div id="obmid"></div><div id="obtoast" aria-live="polite"></div><div id="obact"></div><div id="obmkt"></div><div id="obcard" aria-hidden="true"></div>';
+  bd.appendChild(ob);
+  $ob('obmid').appendChild($ob('choice'));$ob('obact').appendChild($ob('pacts'));$ob('obmkt').appendChild($ob('pshop'));
+  ob.insertBefore($ob('dicewrap'),$ob('obmkt'));ob.appendChild($ob('obact'));
+  document.documentElement.classList.add('ob');
+  return true}
+// ---- one line of feedback on the board (the phone has its own line; desktop uses this toast) ----
+function obFlash(t,ms){if(phOn()&&typeof bfFlash==='function'){bfFlash(t,ms);return}const el=$ob('obtoast');if(!el)return;el.textContent=t;el.classList.add('on');clearTimeout(OB.toastT);OB.toastT=setTimeout(()=>el.classList.remove('on'),ms||1500)}
+// ---- Downtown: where SMASH! hangs (a point above the monster in the city, in board pixels) ----
+function obPlace(){const ob=$ob('ob');if(!ob||!G)return;const bd=ob.getBoundingClientRect();if(!bd.width)return;
+  let x=bd.width/2,y=bd.height*.42;
+  try{if(typeof V3!=='undefined'&&V3.on&&V3.cam){const st=$ob('stage');const r=st.getBoundingClientRect();const v=new THREE.Vector3(0,6.2,0).project(V3.cam);x=r.left-bd.left+(v.x+1)/2*r.width;y=r.top-bd.top+(1-v.y)/2*r.height}}catch(e){}
+  ob.style.setProperty('--obw',Math.round(bd.width)+'px');const tip=$ob('btip');if(tip&&tip.parentNode!==ob)ob.insertBefore(tip,$ob('dicewrap'));
+  const pad=64;x=Math.max(pad,Math.min(bd.width-pad,x));y=Math.max(pad+36,Math.min(bd.height-pad-120,y));
+  // the button is position:fixed, so these are screen pixels
+  ob.style.setProperty('--cx',Math.round(bd.left+x)+'px');ob.style.setProperty('--cy',Math.round(bd.top+y)+'px')}
+// ---- the painted card on the board ----
+function obCardHTML(id,k,o){const C=CARDS[base(id)],p=o.p,c=costOf(p,id);
+  return `<button class="ptile bcard obc ${C.t} ${o.sg?'sugg':''} ${o.ok?'ok':'no'} ${o.arm?'sel':''}" data-shop="${k}" aria-label="${esc(C.n)}, costs ${c} energy${o.ok?'':', not affordable'}. ${esc(C.x)} ${o.ok?(obTwo()?(o.arm?'Tap to buy.':'Tap to pick it.'):'Click to buy.'):''}">
+    <span class="cost">${c}</span>${o.sg?'<i class="star">★</i>':''}<span class="oart" aria-hidden="true">${cardIcon(id)}</span><b>${esc(C.n)}</b>${o.ok&&(!obTwo()||o.arm)?`<em class="go">BUY ${c}⚡</em>`:''}</button>`}
+function obShop(){const el=$ob('pshop');if(!el||!G)return;
+  if(!phShopOK()||!G.market.length){BF.sel=-1;if(el.innerHTML)el.innerHTML='';return}
+  const p=cur(),sg=suggestCard(p);if(BF.sel>=G.market.length)BF.sel=-1;
+  const arm=BF.sel>=0?BF.sel:sg;
+  el.innerHTML=G.market.map((id,k)=>obCardHTML(id,k,{p,sg:k===sg,ok:canBuy(p,k),arm:k===arm})).join('')}
+bfShop=obShop;
+function obTapCard(k,el){const p=cur();if(!phShopOK())return;
+  if(!canBuy(p,k)){BF.sel=k;obShop();const t=document.querySelector(`#pshop [data-shop="${k}"]`);if(t){t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}if(typeof sfx==='function')sfx('click');obFlash(whyNot(p,G.market[k])||'You can’t buy this one',1600);return}
+  if(obTwo()){const fk=BF.sel>=0?BF.sel:suggestCard(p);if(fk!==k){BF.sel=k;obShop();if(phOn())phRender();if(typeof sfx==='function')sfx('click');obFlash('Tap it again to buy',1400);return}}
+  const nm=CARDS[base(G.market[k])].n;let from=null,to=null;try{if(phOn()){from=bfCenter(el);to=bfChipXY(meSeat()>=0?meSeat():G.active)}}catch(e){}
+  BF.sel=-1;if(typeof bfTut==='function')bfTut('buy',1);
+  if(from&&to&&typeof bfFly==='function')bfFly(`<div class="bcard-fly">${cardIcon(G.market[k])}</div>`,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});
+  uiAct({card:String(k)});obFlash(`Bought ${nm}!`,1400)}
+bfTapCard=obTapCard;
+// ---- hold to read: the big card ----
+function obShowCard(id,extra){const C=CARDS[base(id)];if(!C)return;const v=$ob('obcard');if(!v)return;const p=cur(),c=costOf(p,id);
+  v.innerHTML=`<div class="obbig ${C.t}"><span class="cost">${c}</span><div class="bart">${cardIcon(id)}</div><h3>${esc(C.n)}</h3><p class="ty">${chipOf(C)}${C.kw?' · '+esc(C.kw.toUpperCase()):''}</p><p>${esc(C.x)}</p>${extra?`<p class="ex">${esc(extra)}</p>`:''}</div>`;
+  v.classList.add('on');v.setAttribute('aria-hidden','false');OB.shown=String(id)}
+function obHideCard(){const v=$ob('obcard');if(v){v.classList.remove('on');v.setAttribute('aria-hidden','true')}OB.shown=''}
+function obCardOf(t){const s=t.closest&&t.closest('#ob [data-shop]');if(s&&G&&G.market[+s.dataset.shop]!==undefined){const id=G.market[+s.dataset.shop];const p=cur();return {id,extra:canBuy(p,+s.dataset.shop)?'':(whyNot(p,id)||'')}}
+  const o=t.closest&&t.closest('#ob [data-own]');if(o)return {id:o.dataset.own,extra:''};return null}
+document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const c=obCardOf(e.target);if(!c)return;OB.sx=e.clientX;OB.sy=e.clientY;clearTimeout(OB.t);OB.t=setTimeout(()=>{OB.suppress=1;obShowCard(c.id,c.extra)},400)},true);
+document.addEventListener('pointermove',e=>{if(OB.t&&Math.hypot(e.clientX-OB.sx,e.clientY-OB.sy)>12){clearTimeout(OB.t);OB.t=0}},true);
+const obUp=()=>{clearTimeout(OB.t);OB.t=0;if(OB.shown)obHideCard()};
+document.addEventListener('pointerup',obUp,true);document.addEventListener('pointercancel',obUp,true);
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('#ob [data-shop],#ob [data-own]'))e.preventDefault()},true);
+// mouse: hover for a moment
+document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const c=obCardOf(e.target);if(!c)return;clearTimeout(OB.ht);OB.ht=setTimeout(()=>obShowCard(c.id,c.extra),350)},true);
+document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse')return;if(!obCardOf(e.target))return;clearTimeout(OB.ht);obHideCard()},true);
+// the tap after a hold must not buy; a tap on a card of ours is handled here for every screen
+window.addEventListener('click',e=>{if(!G)return;
+  if(OB.suppress){OB.suppress=0;if(e.target.closest&&e.target.closest('#ob [data-shop],#ob [data-own]')){e.stopPropagation();e.preventDefault();return}}
+  const t=e.target,sh=t.closest&&t.closest('#pshop [data-shop]');if(sh){e.stopPropagation();e.preventDefault();obHideCard();bfTapCard(+sh.dataset.shop,sh);return}
+  const ow=t.closest&&t.closest('#ob [data-own]');if(ow){e.stopPropagation();e.preventDefault();OB.shown===ow.dataset.own?obHideCard():obShowCard(ow.dataset.own,'');clearTimeout(OB.ownT);OB.ownT=setTimeout(obHideCard,4000);return}
+  if(OB.shown)obHideCard();
+  if(BF.sel>=0&&!(t.closest&&t.closest('#pshop'))){BF.sel=-1;setTimeout(()=>{obShop();if(phOn())phRender()},0)}},true);
+// ---- your power cards, along the top of the board ----
+function obOwn(){const el=$ob('obown');if(!el)return;if(!G){el.innerHTML='';return}
+  const me=G.mode==='solo'?G.pl.find(q=>q.human):null,w=me||cur();
+  const cards=w.cards,key=w.i+':'+cards.join(',');if(el.dataset.k===key)return;el.dataset.k=key;
+  el.innerHTML=cards.map(id=>{const C=CARDS[base(id)];return `<button class="obo ${C.t}" data-own="${esc(String(id))}" aria-label="${esc(C.n)}: ${esc(C.x)}">${cardIcon(id)}<i>${esc(C.n)}</i></button>`}).join('')}
+// ---- labels: the words on the board say what the button does ----
+function obSync(){const ob=$ob('ob'),dk=document.querySelector('.gx-dock');if(!ob)return;const v=dk&&dk.dataset.bf;if(v)ob.dataset.bf=v;else delete ob.dataset.bf}
+function obLabels(){const pa=$ob('pacts');if(!pa||!G||!humanTurn())return;
+  const d=pa.querySelector('[data-act="resolve"]');if(d){d.innerHTML='<span class="bl">💥 SMASH!</span>';d.setAttribute('aria-label','Smash: use these dice');d.classList.toggle('pulse',G.rolls<=0||!G.dice.some(x=>!x.k))}
+  const e=pa.querySelector('[data-act="end"]');if(e&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;e.innerHTML=`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span><small>${win?'end your turn to win':'save your ⚡'}</small>`}
+}
+function obRender(){if(!obBuild())return;const ob=$ob('ob');
+  ob.dataset.ph=G&&!G.winner?(humanTurn()?G.phase:'watch'):'';
+  if(!phOn()){obShop();try{if(typeof bfRollWatch==='function'){bfRollWatch();bfDice()}}catch(e){}}
+  obSync();obLabels();obOwn();obPlace()}
+{const _rp=renderPanel;renderPanel=function(){_rp.apply(this,arguments);try{obRender()}catch(e){console.error(e)}}}
+{const _pr=phRender;phRender=function(){_pr.apply(this,arguments);try{if(obBuild()){obSync();obLabels();obOwn();obPlace()}}catch(e){console.error(e)}}}
+setInterval(()=>{try{if(G&&$ob('ob'))obPlace()}catch(e){}},500);
+addEventListener('resize',()=>setTimeout(()=>{try{obPlace()}catch(e){}},200));
+if(window.ResizeObserver){try{new ResizeObserver(()=>{try{obPlace()}catch(e){}}).observe(document.querySelector('.gx-board'))}catch(e){}}
+// desktop: the 3D dice tray is replaced by the dice on the board (the real buttons), so the table stays clear for the monsters
+{const _fc=fitCamera;fitCamera=function(asp){const r=_fc.apply(this,arguments);try{if(V3.tray)V3.tray.visible=false}catch(e){}return r}}
+if(obBuild())obRender();
 
 </script>
 <script>
@@ -6771,8 +6985,8 @@ const HLP_STEPS={
   choice:{target:()=>HLP_Q('#choice .acts'),title:'Make a choice',text:'Each button says what it does. Not sure? Tap the bulb.',pic:()=>hlpIcons([HLP_BULB],'',60)},
   roll:{target:()=>HLP_Q('#dice'),title:'Tap dice to keep',text:'Tap the dice you like. They turn yellow and stay. Then press Roll.',pic:()=>hlpFaces(['3'],'',[0])},
   reroll:{target:()=>HLP_Q('#pacts [data-act="reroll"]'),title:'Roll the rest',text:'Press Roll to throw the dice you did not keep.',pic:()=>hlpFaces(['2','C'],'')},
-  done:{target:()=>HLP_Q('#pacts [data-act="resolve"]'),title:'Use your dice',text:'Press Done to score them: stars, energy, hearts and claws.',pic:()=>hlpFaces(['E','C','H'],'')},
-  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Tap a card to read it, then tap Buy. Or press Done to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
+  done:{target:()=>HLP_Q('#pacts [data-act="resolve"]'),title:'Use your dice',text:'Tap SMASH! over the city to score them: stars, energy, hearts and claws.',pic:()=>hlpFaces(['E','C','H'],'')},
+  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Hold a card to read it, tap to buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
   watch:{target:()=>{const e=HLP_Q('#bline');return e&&e.getClientRects().length&&e.textContent?e:HLP_Q('#ptop')},title:'Others are playing',text:'Watch their dice. Tap the board to speed them up.',pic:()=>hlpIcons([HLP_CROWN],'',60)}};
 const HLP_RULES=[
   {title:'Win the city',text:'First monster to 20 ★ wins. The last monster standing wins too.',pic:()=>hlpIcons([HLP_STAR,HLP_CROWN],'20 ★ wins')},
@@ -6803,16 +7017,16 @@ const HLP_ALL=[].concat(HLP_RULES,
   HLP_PH('reroll',[
     {title:'Roll again',text:'Press Roll to throw every die you did not keep. You get up to two rerolls.',pic:()=>hlpFaces(['3','3','2'],'keep two, roll one',[0,1])},
     {title:'Chase a triple',text:'Two matching numbers score nothing. Keep the pair and roll for a third one.',pic:()=>hlpFaces(['2','2','2'],'three = 2 ★',[0,1,2])},
-    {title:'Happy already?',text:'You can press Done at any time. You do not have to use every roll.',pic:()=>hlpIcons([HLP_BTN('Done','#ffd23f')],'',84)}]),
+    {title:'Happy already?',text:'You can tap SMASH! at any time. You do not have to use every roll.',pic:()=>hlpIcons([HLP_BTN('SMASH!','#ff7a3a')],'',84)}]),
   HLP_PH('done',[
-    {title:'Using your dice',text:'Done scores them: numbers give ★, ⚡ adds energy, hearts heal, claws hit.',pic:()=>hlpFaces(['3','E','H','C'],'')},
+    {title:'Using your dice',text:'SMASH! scores them: numbers give ★, ⚡ adds energy, hearts heal, claws hit.',pic:()=>hlpFaces(['3','E','H','C'],'')},
     {title:'Claws',text:'Outside Downtown, claws hit the monster inside. Inside Downtown, they hit everyone outside.',pic:()=>hlpIcons([HLP_CROWN,HLP_ARROW],'claws hit the city')},
     {title:'What follows',text:'If Downtown is empty you move in for 1 ★. Then you may buy cards with ⚡.',pic:()=>hlpIcons([HLP_CROWN,HLP_STAR],'+1 ★')}]),
   HLP_PH('buy',[
     {title:'Power cards',text:'Spend ⚡ on the face-up cards. Tap a card to read it, tap Buy to take it.',pic:hlpShop},
     {title:'Card types',text:'PERMANENT cards stay with you. ONE-SHOT cards act at once. SAVE FOR LATER cards wait for their moment.',pic:()=>hlpIcons([HLP_CARD],'')},
     {title:'New cards',text:'Pay 2 ⚡ to throw away the cards for sale and deal fresh ones.',pic:hlpShop},
-    {title:'Save your ⚡',text:'Buying nothing is fine: saved ⚡ carries over. Press Done to end your turn.',pic:()=>hlpIcons([HLP_BTN('Done','#ffd23f')],'',84)}]),
+    {title:'Save your ⚡',text:'Buying nothing is fine: saved ⚡ carries over. Tap End turn to finish.',pic:()=>hlpIcons([HLP_BTN('End turn','#ffd23f')],'',84)}]),
   HLP_PH('watch',[
     {title:'Others play',text:'Each monster takes a turn. Watch which dice they keep. Tap the board to speed it up.',pic:()=>hlpFaces(['1','C','E'],'')},
     {title:'Your moment',text:'You get a pop-up when you may yield Downtown or play a special card.',pic:()=>hlpIcons([HLP_BTN('Yield','#ffd23f')],'',84)},
@@ -6945,7 +7159,7 @@ const isAct=a=>x=>x.what==='act'&&x.act===a;
 const isDie=(f,n)=>x=>x.what==='die'&&x.f===f&&!x.kept&&(n==null||x.k===n);
 const nm=i=>mname(P(i));
 function tutSteps(){
-  const phone=phOn();
+  const phone=obTwo();   // touch: tap a card to read it, tap again to buy (a mouse buys with one click)
   const S=[
  {id:'goal',title:'Your goal',say:'Smash your way to 20 ★. The last monster standing wins too.',target:tChips,wait:null,ready:()=>myRoll()&&G.rolls===2&&!G.dice.some(d=>d.k)},
  {id:'keep',title:'Keep your 3s',say:'Dice you tap stay put when you roll again. Tap both 3s.',target:tDie(0),also:tDie(1),wait:{type:'tap',times:2,match:isDie('3')},
@@ -6958,7 +7172,7 @@ function tutSteps(){
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].k&&G.dice.filter(d=>d.k&&d.f==='E').length<2},
  {id:'roll2',title:'Last roll',say:'One roll left. Throw the last die.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
    ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===5},
- {id:'done1',title:'Use your dice',say:'No rolls left. Tap Done to use your dice.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done1',title:'Smash!',say:'No rolls left. Tap SMASH! over the city to use your dice.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&G.rolls===0},
  {id:'score1',title:'Stars and energy',say:()=>'Three 3s score 3 ★, three ⚡ give 3 energy. Downtown was empty, so you moved in: +1 ★. You have '+P(0).vp+' ★.',target:tMe,wait:null,
    ready:()=>myBuy()&&inCity(0)},
@@ -6968,7 +7182,7 @@ function tutSteps(){
   S.push(
  {id:'buy',title:'Buy it',say:()=>(phone?'Tap it again to buy it for ':'Buy it for ')+costOf(P(0),G.market[0])+' ⚡. A PERMANENT card stays with you all game.',target:tShop(0),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
    ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||BF.sel===0)},
- {id:'end1',title:'End your turn',say:'Saved energy carries over. Tap Done to end your turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+ {id:'end1',title:'End your turn',say:'Saved energy carries over. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
  {id:'rivals',title:'Rivals play too',say:()=>nm(1)+' rolls like you. Its claws hit the monster in Downtown: you. Computers keep, roll and buy too.',
    target:tfirst('#dice','#pchips .pchip[data-pm="1"]','#pchips'),wait:null,onNext:()=>tutRelease(),
@@ -6977,17 +7191,17 @@ function tutSteps(){
    ready:()=>tChoice(/^Stay or yield/)},
  {id:'bonus',title:'Downtown pays',say:()=>'You started in Downtown: +2 ★. You have '+P(0).vp+' ★. But hearts cannot heal you there.',target:tMe,wait:null,
    ready:()=>myRoll()&&inCity(0)&&G.rolls===2},
- {id:'done2',title:'Claws hit everyone',say:'From Downtown your claws hit every rival. You may stop rolling any time. Tap Done.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done2',title:'Claws hit everyone',say:'From Downtown your claws hit every rival. You may stop rolling any time. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&inCity(0)&&G.rolls===2},
  {id:'score2',title:'Smash!',say:()=>'Two claws hit both rivals. Two ⚡ gained. The heart did nothing: no healing in Downtown.',target:tChips,wait:null,
    ready:()=>myBuy()&&inCity(0)},
  {id:'sweep',title:'New cards',say:'Not happy with the cards? Pay 2 ⚡ to swap all three for new ones.',target:tSweep,wait:{type:'tap',match:isAct('sweep')},
    ready:()=>myBuy()&&P(0).en>=2},
- {id:'end2',title:'End your turn',say:'Tap Done to end your turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+ {id:'end2',title:'End your turn',say:'Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&!G.market.includes(TUT_BUY[1])},
  {id:'yield',title:'Yield the city',say:()=>nm(1)+' hit you again. Yield to leave Downtown: it moves in, but you stop taking hits. Tap Yield.',target:tOpt('yield'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='yield'},
    ready:()=>tChoice(/^Stay or yield/)},
- {id:'done3',title:'Outside the city',say:'Outside, hearts heal you and claws hit whoever holds Downtown. Tap Done.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done3',title:'Outside the city',say:'Outside, hearts heal you and claws hit whoever holds Downtown. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&!inCity(0)&&G.rolls===2},
  {id:'score3',title:'Heal and hit',say:()=>'A heart healed you: '+Math.max(0,P(0).hp)+' ♥. Your claws hit '+nm(1)+' in Downtown.',target:tChips,wait:null,
    ready:()=>myBuy()&&!inCity(0)},
@@ -7033,7 +7247,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;
   return _ga.apply(this,arguments)}})();
 (function(){const _bt=bfTapCard;bfTapCard=function(k,el){
   if(tutOn()&&!UI._tutIn){const p=cur();if(!phShopOK())return;
-    const what=!canBuy(p,k)?'shopno':(BF.sel>=0?BF.sel:suggestCard(p))!==k?'shopsel':'shopbuy';
+    const what=!canBuy(p,k)?'shopno':obTwo()&&(BF.sel>=0?BF.sel:suggestCard(p))!==k?'shopsel':'shopbuy';
     if(!GXT.act({type:'tap',what,k}))return;
     UI._tutIn=1;try{return _bt.apply(this,arguments)}finally{UI._tutIn=0}}
   return _bt.apply(this,arguments)}})();

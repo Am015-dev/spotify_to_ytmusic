@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Nightrun desktop perf test: frame times, long tasks, JS heap, canvas size, draw calls, GC, plus audio continuity checks.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/perf-desktop.js
+//   QUERY="?scale=1" turns the adaptive render scale on in an automated browser (it is off there by default so the canvas size is fixed).
 //   env: W=2560 H=1440 DPR=2 SECS=180 (play time) HEAPSECS=0 (extra idle-play seconds for the leak check; 300 = 5 min) JSON=1
 //        P95=17 MAX=33 (limits, ms; the p95/max limits only apply with REAL_GPU=1 - software rasteriser machines report the numbers but cannot meet them)  GAME_DIR=...
 // Plays the real flow with keyboard steering (district -> boss -> pit stop -> next district, so the song changes every stage) in god mode.
@@ -29,7 +30,7 @@ const q = (a, f) => { if (!a.length) return 0; const s = a.slice().sort((x, y) =
     window.requestAnimationFrame = cb => raf(t => { const a = performance.now(); L.opsFrame = 0; const m = window.__mnr, pit = m && (m.SH.active || m.paused || !m.running) ? 1 : 0; cb(t); const b = performance.now();
       if (L.on && last && !document.hidden) { L.fr.push([+(t - last).toFixed(1), pit]); L.js.push(+(b - a).toFixed(2)); L.draws.push(L.opsFrame); } last = t; });
   });
-  await p.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded' });
+  await p.goto(`http://127.0.0.1:${port}/index.html` + (process.env.QUERY || ""), { waitUntil: "domcontentloaded" });
   await p.waitForFunction(() => window.__mnr);
   const cdp = await ctx.newCDPSession(p);
   await br.startTracing(p, { categories: ['v8', 'v8.gc', 'disabled-by-default-v8.gc'] }).catch(() => { });

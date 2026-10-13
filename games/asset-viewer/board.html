@@ -84,7 +84,7 @@
 <body><div style="position:sticky;top:0;z-index:99;background:#3a2f12;color:#ffe9a8;font:13px system-ui;padding:6px 12px">Read-only snapshot of 13 Oct 2026 13:39. Voting and Flow runs work only in the local viewer.</div>
 <header>
   <h1>Production <span>Board</span></h1>
-  <nav class="tabs"><a class="on" href="board.html">Production</a><a href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
+  <nav class="tabs"><a class="on" href="board.html">Production</a><a href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a href="games.html">Games</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
   <button class="btn primary" id="reviewAll">Review new images</button>
   <span id="upd"></span>
 </header>
@@ -110,10 +110,13 @@ const ST = [['planned', 'Planned'], ['redo', 'Redo'], ['generated', 'To review']
             ['pushed', 'Pushed to GitHub'], ['wired', 'Wired in game'], ['crossed', 'Crossed out (3D)']];
 const LABEL = Object.fromEntries(ST);
 let ITEMS = [], COVERS = {}, GAME = '', Q = '', WAVE = '', QUEUE = [], QI = 0;
+let VER = {};  // slug -> 'v47' from ../status.json (silent if missing)
+const vtag = g => { const v = VER[g === 'thornbound-throne' ? 'thornbound' : g]; return v ? ` <span style="font:700 11px ui-monospace,monospace;color:var(--accent);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:4px">${esc(v)}</span>` : ''; };
 
 async function load() {
   const d = await fetch('flow.json', { cache: 'no-cache' }).then(r => r.json());
   COVERS = d.covers || {};
+  try { const s = await fetch('../status.json', { cache: 'no-store' }).then(r => r.json()); VER = Object.fromEntries(s.games.map(x => [x.slug, x.version])); } catch (e) {}
   ITEMS = [];
   for (const b of d.batches) if (b.root === 'flow-2d')
     for (const i of b.items) ITEMS.push({ game: b.game, wave: b.wave, ratio: b.ratio, batch: b.kind, ...i });
@@ -122,6 +125,7 @@ async function load() {
   for (const m of d.models || []) ITEMS.push({ game: m.game, name: m.name, kind: '3d', wave: '3D models', stage: m.stage, thumb: m.src, glb: m.glb, kb: m.kb,
     prompt: m.replaces.length ? `3D model; replaces the painted ${m.replaces.join(', ')}.` : '3D model for the board; the game code has to load it.' });
   $('upd').textContent = 'updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (!window._h) { window._h = 1; const h = location.hash.slice(1); if (h && ITEMS.some(i => i.game === h)) GAME = h; }
   draw();
 }
 const count = (list, s) => list.filter(i => i.stage === s).length;
@@ -135,7 +139,7 @@ function draw() {
   const games = [...new Set(ITEMS.map(i => i.game))].sort();
   $('games').innerHTML = games.map(g => {
     const l = ITEMS.filter(i => i.game === g), cov = COVERS[g] || COVERS[g === 'thornbound' ? 'thornbound-throne' : g] || '';
-    return `<tr class="g ${g === GAME ? 'on' : ''}" data-g="${g}"><td><div class="gname">${cov ? `<img src="${esc(cov)}" alt="">` : ''}${esc(nice(g))}</div></td>
+    return `<tr class="g ${g === GAME ? 'on' : ''}" data-g="${g}"><td><div class="gname">${cov ? `<img src="${esc(cov)}" alt="">` : ''}${esc(nice(g))}${vtag(g)}</div></td>
       <td>${stack(l)}</td><td class="num"><span class="ready">${ready(l)}%</span></td><td class="num"><b>${count(l, 'generated')}</b></td><td class="num">${count(l, 'redo')}</td>
       <td class="num">${count(l, 'planned')}</td><td class="num">${count(l, 'approved')}</td><td class="num">${count(l, 'prepped') + count(l, 'pushed')}</td><td class="num">${count(l, 'wired')}</td></tr>`;
   }).join('');

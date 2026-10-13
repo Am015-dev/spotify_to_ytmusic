@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Game Status</title>
+<style>
+:root{--bg:#17120e;--card:#241c16;--fg:#f3e9da;--mut:#b9a88f;--acc:#f0b04a;--line:#3a2f25;--ok:#6cc78a;--warn:#e0574a;--blue:#8d97ff}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+header{position:sticky;top:0;z-index:5;background:rgba(23,18,14,.96);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:grid;gap:8px}
+h1{font-size:1.2rem;margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}h1 small{color:var(--mut);font-weight:400;font-size:.85rem}
+h1 a{color:var(--acc);font-size:.85rem;font-weight:600;margin-left:auto;text-decoration:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:99px;padding:6px 14px;font:600 13px system-ui;cursor:pointer;min-height:36px}
+.chip[aria-pressed=true]{background:var(--acc);color:#2a1808;border-color:var(--acc)}
+main{padding:12px 16px 40px;display:grid;gap:10px;max-width:1100px;margin:0 auto}
+.g{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;min-width:0}
+.top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.top h2{margin:0;font-size:1.05rem}
+.ver{font:700 12px ui-monospace,Menlo,monospace;background:#3a2a1a;color:var(--acc);border:1px solid #5a4126;border-radius:99px;padding:2px 9px;white-space:nowrap}
+.news{color:var(--mut);font-size:13px;overflow-wrap:anywhere}.news b{color:var(--fg);font-weight:600}
+.bars{display:grid;grid-template-columns:1fr;gap:6px}
+@media(min-width:700px){.bars{grid-template-columns:1fr 1fr}}
+.bar{display:grid;gap:3px;font-size:13px;color:var(--mut)}.bar span b{color:var(--fg)}
+.track{height:8px;border-radius:5px;background:#120d09;border:1px solid var(--line);overflow:hidden}.track i{display:block;height:100%;background:var(--ok)}
+details{border-top:1px solid var(--line);padding-top:6px}
+summary{cursor:pointer;font-weight:600;font-size:14px;min-height:30px;display:flex;align-items:center}
+summary.m{color:var(--warn)}summary.u{color:var(--blue)}summary.z{color:var(--mut);cursor:default}
+ul{margin:6px 0 2px;padding-left:18px;font-size:13px;color:var(--mut)}li{margin:3px 0;overflow-wrap:anywhere}li b{color:var(--fg)}
+.k{font:600 10px system-ui;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:4px}
+.empty{color:var(--mut);padding:30px 0;text-align:center}
+</style></head><body>
+<header><h1>Game status <small id="gen"></small><a href="index.html">&larr; Shelf</a></h1>
+<div class="chips" role="group" aria-label="Filter"><button class="chip" data-f="all" aria-pressed="true">All</button><button class="chip" data-f="miss" aria-pressed="false">Has missing</button><button class="chip" data-f="unw" aria-pressed="false">Not wired</button></div></header>
+<main id="m"><div class="empty">Loading&hellip;</div></main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let D=null,F='all';
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dshort=s=>{const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(s||'');return m?(+m[3])+' '+MON[m[2]-1]:''};
+const bar=(l,w,p)=>{const t=w+p;return `<div class="bar"><span>${l} <b>${w}/${t}</b></span><div class="track"><i style="width:${t?Math.round(w/t*100):0}%"></i></div></div>`};
+function draw(){
+  let L=D.games.slice().sort((a,b)=>b.missing.length-a.missing.length||b.unwired.length-a.unwired.length||a.title.localeCompare(b.title));
+  if(F==='miss')L=L.filter(g=>g.missing.length);if(F==='unw')L=L.filter(g=>g.unwired.length);
+  $('#m').innerHTML=L.length?L.map(g=>{
+    const n=g.news?`<div class="news">${esc(dshort(g.news.date))} &middot; <b>${esc(g.news.title)}</b></div>`:'';
+    const mk=g.missing.length?`<details><summary class="m">Still to make: ${g.missing.length}</summary><ul>${g.missing.map(x=>`<li><b>${esc(x.name)}</b><span class="k">${esc(x.kind)}</span><br>${esc(x.desc)}</li>`).join('')}</ul></details>`:`<details><summary class="z">Still to make: 0</summary></details>`;
+    const uw=g.unwired.length?`<details><summary class="u">Made, not in game: ${g.unwired.length}</summary><ul>${g.unwired.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`:`<details><summary class="z">Made, not in game: 0</summary></details>`;
+    return `<section class="g" data-slug="${g.slug}"><div class="top"><h2>${esc(g.title)}</h2><span class="ver">${esc(g.version)} &middot; ${esc(dshort(g.updated))}</span></div>${n}
+      <div class="bars">${bar('Paintings wired',g.paintings.wired,g.paintings.pushed)}${bar('3D models wired',g.models.wired,g.models.pushed)}</div>${mk}${uw}</section>`}).join(''):'<div class="empty">Nothing matches.</div>';
+}
+document.querySelector('.chips').onclick=e=>{const b=e.target.closest('.chip');if(!b||!D)return;F=b.dataset.f;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()};
+fetch('status.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{D=j;$('#gen').textContent='as of '+String(j.generated).slice(0,10);draw()}).catch(()=>{$('#m').innerHTML='<div class="empty">Could not load status.json.</div>'});
+</script></body></html>
