@@ -2,7 +2,7 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 661 paintings, 59 3D models. Still to wire: 54 paintings, 0 models.
+Wired: 663 paintings, 59 3D models. Still to wire: 52 paintings, 0 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
@@ -10,10 +10,9 @@ Wired: 661 paintings, 59 3D models. Still to wire: 54 paintings, 0 models.
 | crown-city-smash | 7 | 0 |
 | cauldron-fair | 4 | 0 |
 | lantern-dive | 3 | 0 |
-| shipwreck-isle | 2 | 0 |
-| final-approach | 2 | 0 |
-| kaiten-kitchen | 2 | 0 |
 | short-fuse | 2 | 0 |
+| final-approach | 2 | 0 |
+| shipwreck-isle | 2 | 0 |
 | nebula-aces | 1 | 0 |
 
 ## sands-of-qamar
@@ -89,14 +88,14 @@ Wired: 661 paintings, 59 3D models. Still to wire: 54 paintings, 0 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
 
-## shipwreck-isle
+## short-fuse
 
 3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
 
 ## final-approach
 
@@ -107,23 +106,14 @@ Wired: 661 paintings, 59 3D models. Still to wire: 54 paintings, 0 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
 
-## kaiten-kitchen
+## shipwreck-isle
 
 3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of washi paper with a lacquered red wood outline, single object, centr |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
-
-## short-fuse
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
 ## nebula-aces
 
