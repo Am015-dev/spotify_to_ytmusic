@@ -65,7 +65,7 @@ const RD_LEFT=-1;// turn sign: cross(h,e)=hx*ez-hz*ex > 0 = right turn (the righ
 // un-stacker: recycled/respawned cars were dropped on occupied spots (hubRecycle picks any node + t) and then sat inside each other in queues.
 // Every 0.25 s: two live cars < 2.6 m apart heading the same way → the one the camera cannot see (else the rear one) respawns elsewhere.
 const RD_US={t:0,n:0};
-function RD_unstack(dt){const G=new Map(),N=HUB.nodes;
+function RD_unstack(dt){const G=new Map(),N=HUB.nodes;for(const c of HUB.cars){if(!(c.dead>0)&&c.x!=null&&!c.route&&(c.a===c.b||!N[c.a]||!N[c.b]||!N[c.b].nb.length)){c.dead=.05;RD_US.strand=(RD_US.strand||0)+1}}/* stranded on a node without exits (respawn) */
   for(const c of HUB.cars){if(c.dead>0||c.x==null||c.tr||c.pk)continue;if(Math.abs(c.x-RO.x)>340||Math.abs(c.z-RO.z)>340)continue;const k=Math.floor(c.x/4)*100000+Math.floor(c.z/4);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(c)}
   const hd=c=>{const A=N[c.a],B=N[c.b];if(!A||!B)return[0,0];const l=Math.hypot(B.x-A.x,B.z-A.z)||1;return[(B.x-A.x)/l,(B.z-A.z)/l]};
   for(const L of G.values()){for(const c of L){if(c.dead>0)continue;const kx=Math.floor(c.x/4),kz=Math.floor(c.z/4);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const M=G.get((kx+a)*100000+kz+b);if(!M)continue;for(const o of M){if(o===c||o.dead>0||c.dead>0)continue;const dx=o.x-c.x,dz=o.z-c.z;if(dx*dx+dz*dz>6.76)continue;const h1=hd(c),h2=hd(o);if(h1[0]*h2[0]+h1[1]*h2[1]<.5)continue;
