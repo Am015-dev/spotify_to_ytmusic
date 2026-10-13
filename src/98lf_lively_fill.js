@@ -14,7 +14,7 @@ function LF_find(n){const N=HUB.nodes,C=[],inB=(x,z)=>!(typeof biomeAt==='functi
 // put the car at a spot, looking along h, camera snapped behind
 function LF_go(s){roamWarp(s.x,s.z,s.h);RO.v=0;camSnap=true;return true}
 function LF_metrics(s){const x=RO.x,z=RO.z,h=RO.h,fx=x+Math.sin(h)*45,fz=z+Math.cos(h)*45;return{x:+x.toFixed(1),z:+z.toFixed(1),h:+h.toFixed(2),props50:LF_count(fx,fz,50),hRange:LF_hrange(x,z,h),fill:LF.st.n||0}}
-window.__lvf={find:LF_find,go:LF_go,metrics:LF_metrics,count:LF_count,LF,dbg:()=>({st:LF.st,props:HUB.props.length,hx:[HX0,HX1,HZS,HZN]})};
+window.__lvf={HM:()=>HUB.M,THREE,scene:()=>scene,cam:()=>camera,find:LF_find,go:LF_go,metrics:LF_metrics,count:LF_count,LF,dbg:()=>({st:LF.st,props:HUB.props.length,hx:[HX0,HX1,HZS,HZN]})};
 // ---------- the fill. Open grass = 40 m cells of the city box that are ≥ 12 m from roads, buildings, water, decks, trails, ramps and existing props.
 // Each open cell gets ONE theme from a 160 m noise patch (so areas read as parks / meadows / ponds / wild ground, not confetti):
 //   grove (LEGO tree cluster + bushes) · garden (flower beds in a bush hedge + bench + lamp) · pond (water + sand rim + reeds + rocks) · wild (mound + rocks + dirt)
@@ -124,3 +124,16 @@ function LF_goMound(){let best=null,bd=1e18;for(const m of LF.M){const d=(m.x-RO
    try{say('',(r.pass?'✅ PASS':'❌ FAIL')+` · hill ${r.h} m · climbed ${r.climb} m · stalled: ${r.stall?'yes':'no'}`,4)}catch(e){}}},100);
  return`📍 GRASS HILL ${m.h.toFixed(1)} m high, 40 m ahead · drive over it`}
 Object.assign(window.__lvf,{goMound:LF_goMound});
+// grass mottle: the stud-plate grass (97_art ART_hub, one 10 m tile repeated) averages to ONE flat lime at driving distance, the "boring flat green".
+// The grass materials get world-space value noise (blotches 12-60 m) in the fragment shader: darker cool green ↔ lighter warm/yellow green, like the
+// mown and dry patches of 2K's lawns. One mix per pixel, no textures, no extra draws. ?lf=0 turns it off with the rest of LF.
+LF.MOT={dk:[.74,.86,.74],lt:[1.12,1.06,.86]};
+function LF_mottle(m){if(!m||m.userData.lfMot)return;m.userData.lfMot=1;const o=m.onBeforeCompile;m.onBeforeCompile=function(sh,r){if(o)o.call(this,sh,r);
+  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 vLfW;').replace('#include <project_vertex>','#include <project_vertex>\nvLfW=(modelMatrix*vec4(transformed,1.)).xz;');
+  sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
+varying vec2 vLfW;float lfH(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+float lfN(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(lfH(i),lfH(i+vec2(1,0)),f.x),mix(lfH(i+vec2(0,1)),lfH(i+vec2(1,1)),f.x),f.y);}`)
+   .replace('#include <map_fragment>',`#include <map_fragment>
+{float n=lfN(vLfW/58.)*.55+lfN(vLfW/21.+7.3)*.3+lfN(vLfW/7.5+3.1)*.15;n=smoothstep(.22,.78,n);diffuseColor.rgb*=mix(vec3(${LF.MOT.dk.join(',')}),vec3(${LF.MOT.lt.join(',')}),n);}`)};
+ m.customProgramCacheKey=()=>'lfMot';m.needsUpdate=true}
+ART_hub=(f=>function(){const r=f.apply(this,arguments);if(LF.on&&HUB&&HUB.M)try{for(const k of['walk','yard','grass'])LF_mottle(HUB.M[k])}catch(e){console.warn('LF mottle',e)}return r})(ART_hub);
