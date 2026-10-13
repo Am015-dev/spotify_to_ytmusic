@@ -41,7 +41,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  console.log(tag,'event after abandon',await ev('JSON.stringify({ch:!!RO.ch,sp:!!RO.sp,card:!!RO.card})'));
  // pause → HOME
  await tap('#tP');await tick(10);ok(await vis('#roamPause [data-p="home"]'),tag+' pause menu has 🏠 HOME');await add('Pause menu: 🏠 HOME','2_pause_home');
- await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(20);if(!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(40);await through();
+ await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(10);await p.waitForTimeout(120);const q=await st();if(q.dHome>0&&q.dHome<40&&!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(60);await through();
  s=await st();ok(s.dHome>15&&s.dHome<40,tag+' fast travel lands at Home',{d:+s.dHome.toFixed(1)});
  await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');
  // drive into the beacon: fast travel home leaves the car 26 m out facing it. GAS, then BRAKE to a stop on it (the card needs a stop)
@@ -82,7 +82,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  // back into the beacon → garage → install the kit (studs granted for the test)
  await G.evaluate(()=>__oc.ev('(()=>{const S=season();S.cr=Math.max(S.cr,5000);saveSeason(S)})()'));
  // pause → HOME again (the garage left the car on the beacon's exit), then drive in
- await tick(200);await tap('#tP');await tick(10);await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(20);if(!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(40);await through();s=await goIn();
+ await tick(200);await tap('#tP');await tick(10);await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(10);await p.waitForTimeout(120);const q=await st();if(q.dHome>0&&q.dHome<40&&!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(60);await through();s=await goIn();
  ok((s=await st()).card,tag+' back at the Home beacon',s);
  ok(await openGar(),tag+' garage again');await rides();await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmKit');e&&e.scrollIntoView({block:'center'})});await tick(6);
  ok(await tap('#gbBody .hmKit'),tag+' tap INSTALL NITRO KIT');await tick(20);
@@ -93,6 +93,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  await down('gas',await center('#tG'));await tick(120);await down('bst',await center('#tN'));await tick(40);const yb=await ev('JSON.stringify({b:!!RO.boosting})');await up('bst');await up('gas');ok(JSON.parse(yb).b,tag+' van with kit boosts (BOOST tap)',yb);
  await add('Van with Nitro Kit: BOOST','11_van_kit_boost');
  // reload → continue → restored
+ console.log(tag,'saved pos before reload',await G.evaluate(()=>JSON.stringify((JSON.parse(localStorage.getItem('mho_roam@1')||'{}')).pos)));
  const before=await G.evaluate(()=>({gar:JSON.parse(localStorage.getItem('mho_gar@1')||'{}'),home:JSON.parse(localStorage.getItem('mho_home@1')||'null')}));
  await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});await tap('#hcStory');await tick(10);await tap('#slotList .go');await toRoam();
  s=await st();const pk3=await ev('JSON.stringify(HM.P.map(g=>g.userData.hmId))');
