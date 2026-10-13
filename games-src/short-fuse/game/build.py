@@ -24,11 +24,11 @@ for f in ['data.js','engine.js','ai.js','debug-ui.js']:
 open(os.path.join(D,'debug.html'),'w',encoding='utf-8').write(b)
 
 # ---------- the game ----------
-SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'gx-skin.js':os.path.join(SP,'shell','gx-skin.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
+SRC={'gx-scenario.js': os.path.join(SP, 'shell', 'gx-scenario.js'), 'scn.js': os.path.join(D,'scn.js'), 'shell.js':os.path.join(SP,'shell','shell.js'),'gx-skin.js':os.path.join(SP,'shell','gx-skin.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'short-fuse','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
      'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
-ORDER=['shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-skin.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','art-data.js','data.js','engine.js','ai.js','netstrip.js','texts.js','hlp.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','tbl.js','extras.js','tutor.js','start.js']
+ORDER = ['gx-scenario.js', 'scn.js', 'shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-skin.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','art-data.js','data.js','engine.js','ai.js','netstrip.js','texts.js','hlp.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','tbl.js','extras.js','tutor.js','start.js']
 h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))).replace('/*TABLE_CSS*/',rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(D,'table.css'))+'\n'+rd(os.path.join(SP,'shell','gx-skin.css'))+'\n'+rd(os.path.join(D,'skin.css')))
 body=rd(os.path.join(D,'body.html'))
 body=body.replace('<!--CREDITS-->',rd(os.path.join(SP,'short-fuse','audio','credits.html')))
