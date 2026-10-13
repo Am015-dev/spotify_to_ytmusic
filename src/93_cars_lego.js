@@ -317,7 +317,7 @@ function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.
 // ---------- CAR5 HUD: one objective line
 (()=>{const st=document.createElement('style');st.textContent=`
 #m1Next b,#m1Next small{display:none!important}#m1Next{border-radius:18px!important;padding:3px 12px 3px 8px!important;gap:6px!important}#m1Next span{font-size:13px!important;max-width:min(300px,46vw)!important}
-#m1Next .crD{display:block;flex:none;font:800 12px system-ui;color:#4ceaff;white-space:nowrap}body.crMerge #roamArrow{visibility:hidden!important}
+#m1Next .crD{display:block;flex:0 100 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font:800 12px system-ui;color:#4ceaff;white-space:nowrap}#m1Next>div{min-width:0;flex:0 0 auto;max-width:calc(100% - 36px)}#m1Next>div small{width:0;min-width:100%}#m1Next{box-sizing:border-box;overflow:hidden}/* dev4: long text is cut with … inside the box (it ran under the ⚙ button in portrait) */body.crMerge #roamArrow{visibility:hidden!important}
 body.crMerge #m1Next{top:calc(54px + env(safe-area-inset-top,0px))!important}@media (max-height:520px){body.crMerge #m1Next{top:calc(26px + env(safe-area-inset-top,0px))!important}}
 #roamPlate{transition:opacity .45s}#roamPlate.crHide{opacity:0!important}
 body.touch #roamPlate{left:calc(114px + env(safe-area-inset-left,0px))!important}`;document.head.appendChild(st)})();
