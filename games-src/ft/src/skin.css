@@ -100,3 +100,9 @@ html.sk-spot .spot.taken{background:url(media/ui-spot.webp) center/100% 100% no-
 /* winner sparkle */
 html.sk-fx .ft.up{text-shadow:0 0 6px #ffd35a,0 1px 2px rgba(0,0,0,.6)}
 .card img.ca.cv{height:116px;object-position:center 10%;border-radius:8px}
+
+/* look check: readable ordinals / spot costs (11 px on a pale plate), 44 px summary tap, 11 px cpu tag */
+.spot .ord,.spot.taken .ord{font-size:11px;font-weight:800;color:#3a2010;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:1.15}
+.spot .sp-c,.spot.taken .sp-c{color:#3a2010;font-weight:800;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:20px}
+.exd summary{min-height:44px;display:flex;align-items:center;margin:0}
+.sch .sn small{font-size:11px;opacity:.85}
