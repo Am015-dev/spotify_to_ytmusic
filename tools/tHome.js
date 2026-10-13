@@ -16,7 +16,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200));if(/HM/.test(m.text()))console.log('  page:',m.text().slice(0,200))});
  await ctx.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
- await p.evaluate(([c])=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city]);
+ await p.evaluate(([c])=>{localStorage.clear();localStorage.setItem('mho_slot','1');/* a returning player: the Frankfurt intro (HOT DROP, replays on load while unfinished) is not the subject here */localStorage.setItem('mho_m1@1','{"v":1,"step":0,"fresh":0,"done":{},"wpn":0}');if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city]);
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
  const G=p,tick=n=>G.evaluate(n=>__tick(n),n),ev=s=>G.evaluate(s=>__oc.ev(s),s);
  const shot=async name=>{await G.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(2)});const f=path.join(OUT,`${tag}_${name}.jpg`);await p.screenshot({path:f,type:'jpeg',quality:72});
@@ -28,7 +28,7 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  const tap=async sel=>{const xy=await center(sel);if(!xy)return false;await down('tap',xy);await tick(4);await up('tap');await tick(4);return true};
  const CONT=['#storyGo','#m1Cs','#rcGo','#ogRetryB','.m1go','#resBtn','#tutSkip'];const through=async()=>{for(const s of CONT)if(await tap(s))return s;return null};
  const vis=sel=>G.evaluate(s=>{const e=document.querySelector(s);if(!e)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||c.visibility==='hidden')return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4},sel);
- const st=()=>G.evaluate(()=>{const R=__mho.RO,m=__hm.mark();return{x:R.x,z:R.z,v:R.v,h:R.h,card:!!R.card,dHome:m?Math.hypot(m.x-R.x,m.z-R.z):-1,at:__hm.HM.at,saves:__hm.HM.saves||0,ok:__hm.ok(),cur:__hm.cur().id,nb:document.body.classList.contains('hmNoB')}});
+ const st=()=>G.evaluate(()=>{const R=__mho.RO,m=__hm.mark();return{x:R.x,z:R.z,v:R.v,h:R.h,card:!!R.card,dHome:m?Math.hypot(m.x-R.x,m.z-R.z):-1,at:__hm.HM.at,saves:__hm.HM.saves||0,ok:__hm.ok(),cur:__hm.cur().id,nb:document.body.classList.contains('hmNoB'),foot:__oc.ev('RO.foot')}});
  const toRoam=async()=>{for(let i=0;i<150;i++){if(await G.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}await G.evaluate(()=>{window.__auto=false});for(let i=0;i<30;i++){await tick(30);if(!(await through()))break}await tick(60)};
  await tap('#hcStory');await tick(10);await tap('#slotList .go');await toRoam();
  const S=[];const add=async(lab,name)=>S.push(lab+'='+await shot(name));
@@ -38,10 +38,12 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  // a new save starts in the intro event (Home is hidden during events): abandon it from the pause menu, like a player
  await tap('#tP');await tick(10);if(await vis('#roamPause [data-p="eva"]')){await tap('#roamPause [data-p="eva"]');await tick(20);for(const sel of['#qAbn','.qvYes','#roamCard .go']){if(await vis(sel)){await tap(sel);await tick(20)}}await through();await tick(60)}
  if(await vis('#roamPause'))await tap('#roamPause [data-p="resume"]');await tick(20);
+ console.log(tag,'foot after start',JSON.stringify(await st()));
  console.log(tag,'event after abandon',await ev('JSON.stringify({ch:!!RO.ch,sp:!!RO.sp,card:!!RO.card})'));
  // pause → HOME
  await tap('#tP');await tick(10);ok(await vis('#roamPause [data-p="home"]'),tag+' pause menu has 🏠 HOME');await add('Pause menu: 🏠 HOME','2_pause_home');
  await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(10);await p.waitForTimeout(120);const q=await st();if(q.dHome>0&&q.dHome<40&&!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(60);await through();
+ console.log(tag,'after FT',JSON.stringify(await st()));
  s=await st();ok(s.dHome>15&&s.dHome<40,tag+' fast travel lands at Home',{d:+s.dHome.toFixed(1)});
  await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');
  // drive into the beacon: fast travel home leaves the car 26 m out facing it. GAS, then BRAKE to a stop on it (the card needs a stop)
