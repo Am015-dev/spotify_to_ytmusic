@@ -58,6 +58,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "grimbeard-attack": {
@@ -72,6 +73,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "grimbeard-hit": {
@@ -86,6 +88,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "grimbeard-win": {
@@ -100,6 +103,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "grimbeard-lose": {
@@ -114,6 +118,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "grimbeard-walk-a": {
@@ -128,6 +133,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "grimbeard-walk-b": {
@@ -142,6 +148,7 @@
    "target": "games/hollowbough/media/poses/grimbeard-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grimbeard",
    "tag": "poses"
   },
   "thistle-idle": {
@@ -156,6 +163,7 @@
    "target": "games/hollowbough/media/poses/thistle-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "thistle-attack": {
@@ -170,6 +178,7 @@
    "target": "games/hollowbough/media/poses/thistle-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "thistle-hit": {
@@ -184,6 +193,7 @@
    "target": "games/hollowbough/media/poses/thistle-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "thistle-win": {
@@ -198,6 +208,7 @@
    "target": "games/hollowbough/media/poses/thistle-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "thistle-lose": {
@@ -212,6 +223,7 @@
    "target": "games/hollowbough/media/poses/thistle-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "thistle-walk-a": {
@@ -226,6 +238,7 @@
    "target": "games/hollowbough/media/poses/thistle-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "thistle-walk-b": {
@@ -240,6 +253,7 @@
    "target": "games/hollowbough/media/poses/thistle-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "thistle",
    "tag": "poses"
   },
   "hazel-idle": {
@@ -254,6 +268,7 @@
    "target": "games/hollowbough/media/poses/hazel-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "hazel-attack": {
@@ -268,6 +283,7 @@
    "target": "games/hollowbough/media/poses/hazel-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "hazel-hit": {
@@ -282,6 +298,7 @@
    "target": "games/hollowbough/media/poses/hazel-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "hazel-win": {
@@ -296,6 +313,7 @@
    "target": "games/hollowbough/media/poses/hazel-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "hazel-lose": {
@@ -310,6 +328,7 @@
    "target": "games/hollowbough/media/poses/hazel-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "hazel-walk-a": {
@@ -324,6 +343,7 @@
    "target": "games/hollowbough/media/poses/hazel-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "hazel-walk-b": {
@@ -338,6 +358,7 @@
    "target": "games/hollowbough/media/poses/hazel-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hazel",
    "tag": "poses"
   },
   "bramble-idle": {
@@ -352,6 +373,7 @@
    "target": "games/hollowbough/media/poses/bramble-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "bramble-attack": {
@@ -366,6 +388,7 @@
    "target": "games/hollowbough/media/poses/bramble-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "bramble-hit": {
@@ -380,6 +403,7 @@
    "target": "games/hollowbough/media/poses/bramble-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "bramble-win": {
@@ -394,6 +418,7 @@
    "target": "games/hollowbough/media/poses/bramble-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "bramble-lose": {
@@ -408,6 +433,7 @@
    "target": "games/hollowbough/media/poses/bramble-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "bramble-walk-a": {
@@ -422,6 +448,7 @@
    "target": "games/hollowbough/media/poses/bramble-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "bramble-walk-b": {
@@ -436,6 +463,7 @@
    "target": "games/hollowbough/media/poses/bramble-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramble",
    "tag": "poses"
   },
   "fern-idle": {
@@ -450,6 +478,7 @@
    "target": "games/hollowbough/media/poses/fern-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "fern-attack": {
@@ -464,6 +493,7 @@
    "target": "games/hollowbough/media/poses/fern-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "fern-hit": {
@@ -478,6 +508,7 @@
    "target": "games/hollowbough/media/poses/fern-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "fern-win": {
@@ -492,6 +523,7 @@
    "target": "games/hollowbough/media/poses/fern-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "fern-lose": {
@@ -506,6 +538,7 @@
    "target": "games/hollowbough/media/poses/fern-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "fern-walk-a": {
@@ -520,6 +553,7 @@
    "target": "games/hollowbough/media/poses/fern-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "fern-walk-b": {
@@ -534,6 +568,7 @@
    "target": "games/hollowbough/media/poses/fern-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fern",
    "tag": "poses"
   },
   "quill-idle": {
@@ -548,6 +583,7 @@
    "target": "games/hollowbough/media/poses/quill-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-attack": {
@@ -562,6 +598,7 @@
    "target": "games/hollowbough/media/poses/quill-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-hit": {
@@ -576,6 +613,7 @@
    "target": "games/hollowbough/media/poses/quill-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-win": {
@@ -590,6 +628,7 @@
    "target": "games/hollowbough/media/poses/quill-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-lose": {
@@ -604,6 +643,7 @@
    "target": "games/hollowbough/media/poses/quill-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-walk-a": {
@@ -618,6 +658,7 @@
    "target": "games/hollowbough/media/poses/quill-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-walk-b": {
@@ -632,6 +673,7 @@
    "target": "games/hollowbough/media/poses/quill-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   }
  }

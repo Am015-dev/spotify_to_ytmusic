@@ -66,6 +66,7 @@
    "target": "games/mainhattan-nightrun/media/poses/sek-adler-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sek-adler",
    "tag": "poses"
   },
   "sek-adler-defeat-1": {
@@ -80,6 +81,7 @@
    "target": "games/mainhattan-nightrun/media/poses/sek-adler-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sek-adler",
    "tag": "poses"
   },
   "sek-adler-defeat-2": {
@@ -94,6 +96,7 @@
    "target": "games/mainhattan-nightrun/media/poses/sek-adler-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sek-adler",
    "tag": "poses"
   },
   "flusskrake-hit": {
@@ -108,6 +111,7 @@
    "target": "games/mainhattan-nightrun/media/poses/flusskrake-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "flusskrake",
    "tag": "poses"
   },
   "flusskrake-defeat-1": {
@@ -122,6 +126,7 @@
    "target": "games/mainhattan-nightrun/media/poses/flusskrake-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "flusskrake",
    "tag": "poses"
   },
   "flusskrake-defeat-2": {
@@ -136,6 +141,7 @@
    "target": "games/mainhattan-nightrun/media/poses/flusskrake-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "flusskrake",
    "tag": "poses"
   },
   "zentral-ice-hit": {
@@ -150,6 +156,7 @@
    "target": "games/mainhattan-nightrun/media/poses/zentral-ice-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "zentral-ice",
    "tag": "poses"
   },
   "zentral-ice-defeat-1": {
@@ -164,6 +171,7 @@
    "target": "games/mainhattan-nightrun/media/poses/zentral-ice-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "zentral-ice",
    "tag": "poses"
   },
   "zentral-ice-defeat-2": {
@@ -178,6 +186,7 @@
    "target": "games/mainhattan-nightrun/media/poses/zentral-ice-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "zentral-ice",
    "tag": "poses"
   },
   "kronos-hit": {
@@ -192,6 +201,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "kronos-defeat-1": {
@@ -206,6 +216,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "kronos-defeat-2": {
@@ -220,6 +231,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "kronos-atk1": {
@@ -234,6 +246,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-atk1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "kronos-atk2": {
@@ -248,6 +261,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-atk2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "kronos-atk3": {
@@ -262,6 +276,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-atk3.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "kronos-atk4": {
@@ -276,6 +291,7 @@
    "target": "games/mainhattan-nightrun/media/poses/kronos-atk4.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kronos",
    "tag": "poses"
   },
   "tresor-wart-hit": {
@@ -290,6 +306,7 @@
    "target": "games/mainhattan-nightrun/media/poses/tresor-wart-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tresor-wart",
    "tag": "poses"
   },
   "tresor-wart-defeat-1": {
@@ -304,6 +321,7 @@
    "target": "games/mainhattan-nightrun/media/poses/tresor-wart-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tresor-wart",
    "tag": "poses"
   },
   "tresor-wart-defeat-2": {
@@ -318,6 +336,7 @@
    "target": "games/mainhattan-nightrun/media/poses/tresor-wart-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tresor-wart",
    "tag": "poses"
   },
   "bruecken-waechter-hit": {
@@ -332,6 +351,7 @@
    "target": "games/mainhattan-nightrun/media/poses/bruecken-waechter-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bruecken-waechter",
    "tag": "poses"
   },
   "bruecken-waechter-defeat-1": {
@@ -346,6 +366,7 @@
    "target": "games/mainhattan-nightrun/media/poses/bruecken-waechter-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bruecken-waechter",
    "tag": "poses"
   },
   "bruecken-waechter-defeat-2": {
@@ -360,6 +381,7 @@
    "target": "games/mainhattan-nightrun/media/poses/bruecken-waechter-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bruecken-waechter",
    "tag": "poses"
   },
   "schranken-wart-hit": {
@@ -374,6 +396,7 @@
    "target": "games/mainhattan-nightrun/media/poses/schranken-wart-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "schranken-wart",
    "tag": "poses"
   },
   "schranken-wart-defeat-1": {
@@ -388,6 +411,7 @@
    "target": "games/mainhattan-nightrun/media/poses/schranken-wart-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "schranken-wart",
    "tag": "poses"
   },
   "schranken-wart-defeat-2": {
@@ -402,6 +426,7 @@
    "target": "games/mainhattan-nightrun/media/poses/schranken-wart-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "schranken-wart",
    "tag": "poses"
   },
   "messe-waechter-hit": {
@@ -416,6 +441,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "messe-waechter-defeat-1": {
@@ -430,6 +456,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "messe-waechter-defeat-2": {
@@ -444,6 +471,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "messe-waechter-atk1": {
@@ -458,6 +486,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-atk1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "messe-waechter-atk2": {
@@ -472,6 +501,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-atk2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "messe-waechter-atk3": {
@@ -486,6 +516,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-atk3.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "messe-waechter-atk4": {
@@ -500,6 +531,7 @@
    "target": "games/mainhattan-nightrun/media/poses/messe-waechter-atk4.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "messe-waechter",
    "tag": "poses"
   },
   "hoplite-hit": {
@@ -514,6 +546,7 @@
    "target": "games/mainhattan-nightrun/media/poses/hoplite-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hoplite",
    "tag": "poses"
   },
   "hoplite-defeat-1": {
@@ -528,6 +561,7 @@
    "target": "games/mainhattan-nightrun/media/poses/hoplite-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hoplite",
    "tag": "poses"
   },
   "hoplite-defeat-2": {
@@ -542,6 +576,7 @@
    "target": "games/mainhattan-nightrun/media/poses/hoplite-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hoplite",
    "tag": "poses"
   },
   "talos-hit": {
@@ -556,6 +591,7 @@
    "target": "games/mainhattan-nightrun/media/poses/talos-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talos",
    "tag": "poses"
   },
   "talos-defeat-1": {
@@ -570,6 +606,7 @@
    "target": "games/mainhattan-nightrun/media/poses/talos-defeat-1.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talos",
    "tag": "poses"
   },
   "talos-defeat-2": {
@@ -584,6 +621,7 @@
    "target": "games/mainhattan-nightrun/media/poses/talos-defeat-2.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talos",
    "tag": "poses"
   },
   "ship-std-bank-left": {
@@ -598,6 +636,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-std-bank-left.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-std",
    "tag": "poses"
   },
   "ship-std-bank-right": {
@@ -612,6 +651,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-std-bank-right.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-std",
    "tag": "poses"
   },
   "ship-std-boost": {
@@ -626,6 +666,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-std-boost.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-std",
    "tag": "poses"
   },
   "ship-std-damaged": {
@@ -640,6 +681,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-std-damaged.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-std",
    "tag": "poses"
   },
   "ship-lancer-bank-left": {
@@ -654,6 +696,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-lancer-bank-left.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-lancer",
    "tag": "poses"
   },
   "ship-lancer-bank-right": {
@@ -668,6 +711,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-lancer-bank-right.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-lancer",
    "tag": "poses"
   },
   "ship-lancer-boost": {
@@ -682,6 +726,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-lancer-boost.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-lancer",
    "tag": "poses"
   },
   "ship-lancer-damaged": {
@@ -696,6 +741,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-lancer-damaged.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-lancer",
    "tag": "poses"
   },
   "ship-nova-bank-left": {
@@ -710,6 +756,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-nova-bank-left.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-nova",
    "tag": "poses"
   },
   "ship-nova-bank-right": {
@@ -724,6 +771,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-nova-bank-right.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-nova",
    "tag": "poses"
   },
   "ship-nova-boost": {
@@ -738,6 +786,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-nova-boost.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-nova",
    "tag": "poses"
   },
   "ship-nova-damaged": {
@@ -752,6 +801,7 @@
    "target": "games/mainhattan-nightrun/media/poses/ship-nova-damaged.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ship-nova",
    "tag": "poses"
   }
  }

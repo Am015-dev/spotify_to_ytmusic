@@ -50,6 +50,7 @@
    "target": "games/final-approach/media/poses/voss-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voss",
    "tag": "poses"
   },
   "voss-taunt": {
@@ -64,6 +65,7 @@
    "target": "games/final-approach/media/poses/voss-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voss",
    "tag": "poses"
   },
   "voss-praise": {
@@ -78,6 +80,7 @@
    "target": "games/final-approach/media/poses/voss-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voss",
    "tag": "poses"
   },
   "voss-shock": {
@@ -92,6 +95,7 @@
    "target": "games/final-approach/media/poses/voss-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voss",
    "tag": "poses"
   },
   "voss-win": {
@@ -106,6 +110,7 @@
    "target": "games/final-approach/media/poses/voss-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voss",
    "tag": "poses"
   },
   "voss-lose": {
@@ -120,6 +125,7 @@
    "target": "games/final-approach/media/poses/voss-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voss",
    "tag": "poses"
   },
   "seabright-idle": {
@@ -134,6 +140,7 @@
    "target": "games/final-approach/media/poses/seabright-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "seabright",
    "tag": "poses"
   },
   "seabright-taunt": {
@@ -148,6 +155,7 @@
    "target": "games/final-approach/media/poses/seabright-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "seabright",
    "tag": "poses"
   },
   "seabright-praise": {
@@ -162,6 +170,7 @@
    "target": "games/final-approach/media/poses/seabright-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "seabright",
    "tag": "poses"
   },
   "seabright-shock": {
@@ -176,6 +185,7 @@
    "target": "games/final-approach/media/poses/seabright-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "seabright",
    "tag": "poses"
   },
   "seabright-win": {
@@ -190,6 +200,7 @@
    "target": "games/final-approach/media/poses/seabright-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "seabright",
    "tag": "poses"
   },
   "seabright-lose": {
@@ -204,6 +215,7 @@
    "target": "games/final-approach/media/poses/seabright-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "seabright",
    "tag": "poses"
   },
   "bowlrock-idle": {
@@ -218,6 +230,7 @@
    "target": "games/final-approach/media/poses/bowlrock-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bowlrock",
    "tag": "poses"
   },
   "bowlrock-taunt": {
@@ -232,6 +245,7 @@
    "target": "games/final-approach/media/poses/bowlrock-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bowlrock",
    "tag": "poses"
   },
   "bowlrock-praise": {
@@ -246,6 +260,7 @@
    "target": "games/final-approach/media/poses/bowlrock-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bowlrock",
    "tag": "poses"
   },
   "bowlrock-shock": {
@@ -260,6 +275,7 @@
    "target": "games/final-approach/media/poses/bowlrock-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bowlrock",
    "tag": "poses"
   },
   "bowlrock-win": {
@@ -274,6 +290,7 @@
    "target": "games/final-approach/media/poses/bowlrock-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bowlrock",
    "tag": "poses"
   },
   "bowlrock-lose": {
@@ -288,6 +305,7 @@
    "target": "games/final-approach/media/poses/bowlrock-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bowlrock",
    "tag": "poses"
   },
   "cloudspire-idle": {
@@ -302,6 +320,7 @@
    "target": "games/final-approach/media/poses/cloudspire-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloudspire",
    "tag": "poses"
   },
   "cloudspire-taunt": {
@@ -316,6 +335,7 @@
    "target": "games/final-approach/media/poses/cloudspire-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloudspire",
    "tag": "poses"
   },
   "cloudspire-praise": {
@@ -330,6 +350,7 @@
    "target": "games/final-approach/media/poses/cloudspire-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloudspire",
    "tag": "poses"
   },
   "cloudspire-shock": {
@@ -344,6 +365,7 @@
    "target": "games/final-approach/media/poses/cloudspire-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloudspire",
    "tag": "poses"
   },
   "cloudspire-win": {
@@ -358,6 +380,7 @@
    "target": "games/final-approach/media/poses/cloudspire-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloudspire",
    "tag": "poses"
   },
   "cloudspire-lose": {
@@ -372,6 +395,7 @@
    "target": "games/final-approach/media/poses/cloudspire-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloudspire",
    "tag": "poses"
   },
   "ravi-idle": {
@@ -386,6 +410,7 @@
    "target": "games/final-approach/media/poses/ravi-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ravi",
    "tag": "poses"
   },
   "ravi-talk": {
@@ -400,6 +425,7 @@
    "target": "games/final-approach/media/poses/ravi-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ravi",
    "tag": "poses"
   },
   "ravi-win": {
@@ -414,6 +440,7 @@
    "target": "games/final-approach/media/poses/ravi-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ravi",
    "tag": "poses"
   },
   "ravi-lose": {
@@ -428,6 +455,7 @@
    "target": "games/final-approach/media/poses/ravi-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ravi",
    "tag": "poses"
   },
   "alder-idle": {
@@ -442,6 +470,7 @@
    "target": "games/final-approach/media/poses/alder-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "alder",
    "tag": "poses"
   },
   "alder-win": {
@@ -456,6 +485,7 @@
    "target": "games/final-approach/media/poses/alder-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "alder",
    "tag": "poses"
   },
   "alder-lose": {
@@ -470,6 +500,7 @@
    "target": "games/final-approach/media/poses/alder-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "alder",
    "tag": "poses"
   },
   "foxmere-idle": {
@@ -484,6 +515,7 @@
    "target": "games/final-approach/media/poses/foxmere-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "foxmere",
    "tag": "poses"
   },
   "foxmere-win": {
@@ -498,6 +530,7 @@
    "target": "games/final-approach/media/poses/foxmere-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "foxmere",
    "tag": "poses"
   },
   "foxmere-lose": {
@@ -512,6 +545,7 @@
    "target": "games/final-approach/media/poses/foxmere-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "foxmere",
    "tag": "poses"
   }
  }

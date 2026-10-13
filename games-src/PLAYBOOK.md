@@ -23,6 +23,20 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
   (it is the repro that stays), put its `ask` line in the What's new entry with `add-update.py ... --scn <id>` so the owner gets "▶ Try this".
   Every game needs at least `<prefix>-board` and `<prefix>-zoom`.
 
+## Fast delivery (owner, 13 Oct 2026: "better checklists and tests, less playing the game and waiting for hours")
+Every change, however small, ships as: **code + scenario + checklist item**, in that order, in one deploy.
+1. **Scenario first.** For each requirement in the brief, register a `?scn=<id>` scenario (`games-src/shell/gx-scenario.js`)
+   that builds that exact moment directly (no menus, no playing there) with an `ask` line (8 words or fewer) and machine
+   `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
+2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
+   sweep while iterating.
+3. **One full `--deploy` at the end** (the full sweep gate is unchanged). Small batches: 1-3 games per worker, deploy each
+   game as soon as it passes; never hold finished games back for the rest of a batch.
+4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
+   gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
+5. **Report** = before/after numbers + the scenario ids. No "play a few games to check" steps for the owner, ever.
+6. Hand off at ~250k context tokens; long sessions get slow and expensive.
+
 ## The tools (all scripts, no AI)
 - `python3 games-src/scripts/build-all.py [slugs] [--out DIR] [--no-check] [--deploy [--suffix -next]]`
   Builds each game with its own build.py, stages `<out>/<slug>/index.html` (default `games-src/.staging/`), stamps the

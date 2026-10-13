@@ -59,6 +59,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "carpenter-attack": {
@@ -73,6 +74,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "carpenter-hit": {
@@ -87,6 +89,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "carpenter-win": {
@@ -101,6 +104,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "carpenter-lose": {
@@ -115,6 +119,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "carpenter-walk-a": {
@@ -129,6 +134,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "carpenter-walk-b": {
@@ -143,6 +149,7 @@
    "target": "games/shipwreck-isle/media/poses/carpenter-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "carpenter",
    "tag": "poses"
   },
   "cook-idle": {
@@ -157,6 +164,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "cook-attack": {
@@ -171,6 +179,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "cook-hit": {
@@ -185,6 +194,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "cook-win": {
@@ -199,6 +209,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "cook-lose": {
@@ -213,6 +224,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "cook-walk-a": {
@@ -227,6 +239,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "cook-walk-b": {
@@ -241,6 +254,7 @@
    "target": "games/shipwreck-isle/media/poses/cook-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cook",
    "tag": "poses"
   },
   "explorer-idle": {
@@ -255,6 +269,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "explorer-attack": {
@@ -269,6 +284,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "explorer-hit": {
@@ -283,6 +299,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "explorer-win": {
@@ -297,6 +314,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "explorer-lose": {
@@ -311,6 +329,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "explorer-walk-a": {
@@ -325,6 +344,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "explorer-walk-b": {
@@ -339,6 +359,7 @@
    "target": "games/shipwreck-isle/media/poses/explorer-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "explorer",
    "tag": "poses"
   },
   "soldier-idle": {
@@ -353,6 +374,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "soldier-attack": {
@@ -367,6 +389,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "soldier-hit": {
@@ -381,6 +404,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "soldier-win": {
@@ -395,6 +419,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "soldier-lose": {
@@ -409,6 +434,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "soldier-walk-a": {
@@ -423,6 +449,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "soldier-walk-b": {
@@ -437,6 +464,7 @@
    "target": "games/shipwreck-isle/media/poses/soldier-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "soldier",
    "tag": "poses"
   },
   "friday-idle": {
@@ -451,6 +479,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "friday-attack": {
@@ -465,6 +494,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "friday-hit": {
@@ -479,6 +509,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "friday-win": {
@@ -493,6 +524,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "friday-lose": {
@@ -507,6 +539,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "friday-walk-a": {
@@ -521,6 +554,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "friday-walk-b": {
@@ -535,6 +569,7 @@
    "target": "games/shipwreck-isle/media/poses/friday-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "friday",
    "tag": "poses"
   },
   "ada-idle": {
@@ -549,6 +584,7 @@
    "target": "games/shipwreck-isle/media/poses/ada-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ada",
    "tag": "poses"
   },
   "ada-win": {
@@ -563,6 +599,7 @@
    "target": "games/shipwreck-isle/media/poses/ada-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ada",
    "tag": "poses"
   },
   "ada-lose": {
@@ -577,6 +614,7 @@
    "target": "games/shipwreck-isle/media/poses/ada-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ada",
    "tag": "poses"
   },
   "prowler-idle": {
@@ -591,6 +629,7 @@
    "target": "games/shipwreck-isle/media/poses/prowler-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "prowler",
    "tag": "poses"
   },
   "prowler-attack": {
@@ -605,6 +644,7 @@
    "target": "games/shipwreck-isle/media/poses/prowler-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "prowler",
    "tag": "poses"
   },
   "prowler-hit": {
@@ -619,6 +659,7 @@
    "target": "games/shipwreck-isle/media/poses/prowler-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "prowler",
    "tag": "poses"
   },
   "prowler-win": {
@@ -633,6 +674,7 @@
    "target": "games/shipwreck-isle/media/poses/prowler-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "prowler",
    "tag": "poses"
   },
   "prowler-lose": {
@@ -647,6 +689,7 @@
    "target": "games/shipwreck-isle/media/poses/prowler-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "prowler",
    "tag": "poses"
   }
  }

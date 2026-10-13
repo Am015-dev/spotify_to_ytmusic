@@ -92,6 +92,7 @@
    "target": "games/doorkick-dungeon/media/poses/inferno-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "inferno",
    "tag": "poses"
   },
   "inferno-attack": {
@@ -106,6 +107,7 @@
    "target": "games/doorkick-dungeon/media/poses/inferno-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "inferno",
    "tag": "poses"
   },
   "inferno-hit": {
@@ -120,6 +122,7 @@
    "target": "games/doorkick-dungeon/media/poses/inferno-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "inferno",
    "tag": "poses"
   },
   "inferno-win": {
@@ -134,6 +137,7 @@
    "target": "games/doorkick-dungeon/media/poses/inferno-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "inferno",
    "tag": "poses"
   },
   "inferno-lose": {
@@ -148,6 +152,7 @@
    "target": "games/doorkick-dungeon/media/poses/inferno-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "inferno",
    "tag": "poses"
   },
   "skygrif-idle": {
@@ -162,6 +167,7 @@
    "target": "games/doorkick-dungeon/media/poses/skygrif-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "skygrif",
    "tag": "poses"
   },
   "skygrif-attack": {
@@ -176,6 +182,7 @@
    "target": "games/doorkick-dungeon/media/poses/skygrif-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "skygrif",
    "tag": "poses"
   },
   "skygrif-hit": {
@@ -190,6 +197,7 @@
    "target": "games/doorkick-dungeon/media/poses/skygrif-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "skygrif",
    "tag": "poses"
   },
   "skygrif-win": {
@@ -204,6 +212,7 @@
    "target": "games/doorkick-dungeon/media/poses/skygrif-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "skygrif",
    "tag": "poses"
   },
   "skygrif-lose": {
@@ -218,6 +227,7 @@
    "target": "games/doorkick-dungeon/media/poses/skygrif-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "skygrif",
    "tag": "poses"
   },
   "pharaoh-idle": {
@@ -232,6 +242,7 @@
    "target": "games/doorkick-dungeon/media/poses/pharaoh-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pharaoh",
    "tag": "poses"
   },
   "pharaoh-attack": {
@@ -246,6 +257,7 @@
    "target": "games/doorkick-dungeon/media/poses/pharaoh-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pharaoh",
    "tag": "poses"
   },
   "pharaoh-hit": {
@@ -260,6 +272,7 @@
    "target": "games/doorkick-dungeon/media/poses/pharaoh-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pharaoh",
    "tag": "poses"
   },
   "pharaoh-win": {
@@ -274,6 +287,7 @@
    "target": "games/doorkick-dungeon/media/poses/pharaoh-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pharaoh",
    "tag": "poses"
   },
   "pharaoh-lose": {
@@ -288,6 +302,7 @@
    "target": "games/doorkick-dungeon/media/poses/pharaoh-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pharaoh",
    "tag": "poses"
   },
   "wyrm-idle": {
@@ -302,6 +317,7 @@
    "target": "games/doorkick-dungeon/media/poses/wyrm-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wyrm",
    "tag": "poses"
   },
   "wyrm-attack": {
@@ -316,6 +332,7 @@
    "target": "games/doorkick-dungeon/media/poses/wyrm-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wyrm",
    "tag": "poses"
   },
   "wyrm-hit": {
@@ -330,6 +347,7 @@
    "target": "games/doorkick-dungeon/media/poses/wyrm-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wyrm",
    "tag": "poses"
   },
   "wyrm-win": {
@@ -344,6 +362,7 @@
    "target": "games/doorkick-dungeon/media/poses/wyrm-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wyrm",
    "tag": "poses"
   },
   "wyrm-lose": {
@@ -358,6 +377,7 @@
    "target": "games/doorkick-dungeon/media/poses/wyrm-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wyrm",
    "tag": "poses"
   },
   "tentacles-idle": {
@@ -372,6 +392,7 @@
    "target": "games/doorkick-dungeon/media/poses/tentacles-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tentacles",
    "tag": "poses"
   },
   "tentacles-attack": {
@@ -386,6 +407,7 @@
    "target": "games/doorkick-dungeon/media/poses/tentacles-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tentacles",
    "tag": "poses"
   },
   "tentacles-hit": {
@@ -400,6 +422,7 @@
    "target": "games/doorkick-dungeon/media/poses/tentacles-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tentacles",
    "tag": "poses"
   },
   "tentacles-win": {
@@ -414,6 +437,7 @@
    "target": "games/doorkick-dungeon/media/poses/tentacles-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tentacles",
    "tag": "poses"
   },
   "tentacles-lose": {
@@ -428,6 +452,7 @@
    "target": "games/doorkick-dungeon/media/poses/tentacles-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tentacles",
    "tag": "poses"
   },
   "dread-idle": {
@@ -442,6 +467,7 @@
    "target": "games/doorkick-dungeon/media/poses/dread-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dread",
    "tag": "poses"
   },
   "dread-attack": {
@@ -456,6 +482,7 @@
    "target": "games/doorkick-dungeon/media/poses/dread-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dread",
    "tag": "poses"
   },
   "dread-hit": {
@@ -470,6 +497,7 @@
    "target": "games/doorkick-dungeon/media/poses/dread-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dread",
    "tag": "poses"
   },
   "dread-win": {
@@ -484,6 +512,7 @@
    "target": "games/doorkick-dungeon/media/poses/dread-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dread",
    "tag": "poses"
   },
   "dread-lose": {
@@ -498,6 +527,7 @@
    "target": "games/doorkick-dungeon/media/poses/dread-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dread",
    "tag": "poses"
   },
   "pip-idle": {
@@ -512,6 +542,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-attack": {
@@ -526,6 +557,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-hit": {
@@ -540,6 +572,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-win": {
@@ -554,6 +587,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-lose": {
@@ -568,6 +602,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-walk-a": {
@@ -582,6 +617,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-walk-b": {
@@ -596,6 +632,7 @@
    "target": "games/doorkick-dungeon/media/poses/pip-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "tansy-idle": {
@@ -610,6 +647,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "tansy-attack": {
@@ -624,6 +662,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "tansy-hit": {
@@ -638,6 +677,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "tansy-win": {
@@ -652,6 +692,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "tansy-lose": {
@@ -666,6 +707,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "tansy-walk-a": {
@@ -680,6 +722,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "tansy-walk-b": {
@@ -694,6 +737,7 @@
    "target": "games/doorkick-dungeon/media/poses/tansy-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tansy",
    "tag": "poses"
   },
   "grub-idle": {
@@ -708,6 +752,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "grub-attack": {
@@ -722,6 +767,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "grub-hit": {
@@ -736,6 +782,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "grub-win": {
@@ -750,6 +797,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "grub-lose": {
@@ -764,6 +812,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "grub-walk-a": {
@@ -778,6 +827,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "grub-walk-b": {
@@ -792,6 +842,7 @@
    "target": "games/doorkick-dungeon/media/poses/grub-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "grub",
    "tag": "poses"
   },
   "morwen-idle": {
@@ -806,6 +857,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "morwen-attack": {
@@ -820,6 +872,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "morwen-hit": {
@@ -834,6 +887,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "morwen-win": {
@@ -848,6 +902,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "morwen-lose": {
@@ -862,6 +917,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "morwen-walk-a": {
@@ -876,6 +932,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "morwen-walk-b": {
@@ -890,6 +947,7 @@
    "target": "games/doorkick-dungeon/media/poses/morwen-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "morwen",
    "tag": "poses"
   },
   "wrenna-idle": {
@@ -904,6 +962,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "wrenna-attack": {
@@ -918,6 +977,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "wrenna-hit": {
@@ -932,6 +992,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "wrenna-win": {
@@ -946,6 +1007,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "wrenna-lose": {
@@ -960,6 +1022,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "wrenna-walk-a": {
@@ -974,6 +1037,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "wrenna-walk-b": {
@@ -988,6 +1052,7 @@
    "target": "games/doorkick-dungeon/media/poses/wrenna-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wrenna",
    "tag": "poses"
   },
   "bodkin-idle": {
@@ -1002,6 +1067,7 @@
    "target": "games/doorkick-dungeon/media/poses/bodkin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bodkin",
    "tag": "poses"
   },
   "bodkin-attack": {
@@ -1016,6 +1082,7 @@
    "target": "games/doorkick-dungeon/media/poses/bodkin-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bodkin",
    "tag": "poses"
   },
   "bodkin-hit": {
@@ -1030,6 +1097,7 @@
    "target": "games/doorkick-dungeon/media/poses/bodkin-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bodkin",
    "tag": "poses"
   },
   "bodkin-win": {
@@ -1044,6 +1112,7 @@
    "target": "games/doorkick-dungeon/media/poses/bodkin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bodkin",
    "tag": "poses"
   },
   "bodkin-lose": {
@@ -1058,6 +1127,7 @@
    "target": "games/doorkick-dungeon/media/poses/bodkin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bodkin",
    "tag": "poses"
   },
   "hobb-idle": {
@@ -1072,6 +1142,7 @@
    "target": "games/doorkick-dungeon/media/poses/hobb-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hobb",
    "tag": "poses"
   },
   "hobb-win": {
@@ -1086,6 +1157,7 @@
    "target": "games/doorkick-dungeon/media/poses/hobb-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hobb",
    "tag": "poses"
   },
   "hobb-lose": {
@@ -1100,6 +1172,7 @@
    "target": "games/doorkick-dungeon/media/poses/hobb-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hobb",
    "tag": "poses"
   },
   "chest-closed": {
@@ -1114,6 +1187,7 @@
    "target": "games/doorkick-dungeon/media/poses/chest-closed.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "chest",
    "tag": "poses"
   },
   "chest-opening": {
@@ -1128,6 +1202,7 @@
    "target": "games/doorkick-dungeon/media/poses/chest-opening.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "chest",
    "tag": "poses"
   },
   "chest-open": {
@@ -1142,6 +1217,7 @@
    "target": "games/doorkick-dungeon/media/poses/chest-open.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "chest",
    "tag": "poses"
   }
  }
