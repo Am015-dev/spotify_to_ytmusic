@@ -64,11 +64,11 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  const cardBtns=await G.evaluate(()=>[...document.querySelectorAll('#roamCard button')].filter(b=>b.offsetWidth).map(b=>(b.id||'')+':'+b.textContent.trim().slice(0,30)));console.log(tag,'card buttons',cardBtns);
  const openGar=async()=>{for(const sel of['#roamCard .go','#roamCard button']){if(await tap(sel)){await tick(30);if(await vis('#gbx'))return true}}return vis('#gbx')};
  ok(await openGar(),tag+' garage opens from the Home card');await tick(30);
- const rides=async()=>{for(const sel of['[data-r2="rides"]','#gbx [data-t="veh"]']){if(await vis(sel)){await tap(sel);await tick(20);break}}};await rides();
+ const rides=async()=>{for(const sel of['[data-r2m="rides"]','[data-r2="rides"]','#gbx [data-t="veh"]']){if(await vis(sel)){await tap(sel);await tick(20);break}}};await rides();
  await add('Home garage: RIDES (Hot Rod: Nitro built in)','6_garage_rides');
  // pick the Post Van: scroll its card into view, then tap it
  await G.evaluate(()=>{const e=document.querySelector('[data-gc="t_v6651_1"]');e&&e.scrollIntoView({block:'center'})});await tick(10);
- ok(await tap('[data-gc="t_v6651_1"]'),tag+' tap the Post Van card');await tick(20);
+ ok(await tap('[data-gc="t_v6651_1"]'),tag+' tap the Post Van card');await tick(40);await rides();
  s=await st();ok(s.cur==='t_v6651_1'&&!s.ok,tag+' Post Van selected, no nitro',s);
  await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmKit');e&&e.scrollIntoView({block:'center'})});await tick(6);
  const kitTxt=await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmKit');return e&&e.textContent});ok(!!kitTxt,tag+' NITRO KIT offered for the van',kitTxt);

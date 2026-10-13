@@ -8,6 +8,7 @@
 //  the 🏁 RACERS group, the sports templates, the speed/power boats). Any other ride gets nitro with a NITRO KIT (1,500 studs, installed at Home).
 //  Without nitro the BOOST button and boost bar are hidden. Races keep boost for everyone (state 'race', roam sprints RO.sp, rival/mission
 //  races = RO.ch with a race path): AI pace and rewards are tuned on boost.
+CK.push('mho_home');// per save slot, like mho_gar
 const HM={at:false,park:[],P:[],toastT:0,sig:''};
 const HM_KIT=1500,HM_NP=4;
 const HM_REF=new Set(['75870','75878','75892','75893','76897','75895','1517','30572','6501','6503','6509','6526','6530','6605','6609','6669','4641','4643']);
