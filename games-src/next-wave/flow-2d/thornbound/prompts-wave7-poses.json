@@ -57,6 +57,7 @@
    "target": "games/thornbound/media/poses/halvard-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "halvard",
    "tag": "poses"
   },
   "halvard-taunt": {
@@ -71,6 +72,7 @@
    "target": "games/thornbound/media/poses/halvard-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "halvard",
    "tag": "poses"
   },
   "halvard-praise": {
@@ -85,6 +87,7 @@
    "target": "games/thornbound/media/poses/halvard-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "halvard",
    "tag": "poses"
   },
   "halvard-shock": {
@@ -99,6 +102,7 @@
    "target": "games/thornbound/media/poses/halvard-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "halvard",
    "tag": "poses"
   },
   "halvard-win": {
@@ -113,6 +117,7 @@
    "target": "games/thornbound/media/poses/halvard-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "halvard",
    "tag": "poses"
   },
   "halvard-lose": {
@@ -127,6 +132,7 @@
    "target": "games/thornbound/media/poses/halvard-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "halvard",
    "tag": "poses"
   },
   "sable-idle": {
@@ -141,6 +147,7 @@
    "target": "games/thornbound/media/poses/sable-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sable",
    "tag": "poses"
   },
   "sable-taunt": {
@@ -155,6 +162,7 @@
    "target": "games/thornbound/media/poses/sable-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sable",
    "tag": "poses"
   },
   "sable-praise": {
@@ -169,6 +177,7 @@
    "target": "games/thornbound/media/poses/sable-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sable",
    "tag": "poses"
   },
   "sable-shock": {
@@ -183,6 +192,7 @@
    "target": "games/thornbound/media/poses/sable-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sable",
    "tag": "poses"
   },
   "sable-win": {
@@ -197,6 +207,7 @@
    "target": "games/thornbound/media/poses/sable-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sable",
    "tag": "poses"
   },
   "sable-lose": {
@@ -211,6 +222,7 @@
    "target": "games/thornbound/media/poses/sable-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sable",
    "tag": "poses"
   },
   "stag-idle": {
@@ -225,6 +237,7 @@
    "target": "games/thornbound/media/poses/stag-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "stag",
    "tag": "poses"
   },
   "stag-taunt": {
@@ -239,6 +252,7 @@
    "target": "games/thornbound/media/poses/stag-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "stag",
    "tag": "poses"
   },
   "stag-praise": {
@@ -253,6 +267,7 @@
    "target": "games/thornbound/media/poses/stag-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "stag",
    "tag": "poses"
   },
   "stag-shock": {
@@ -267,6 +282,7 @@
    "target": "games/thornbound/media/poses/stag-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "stag",
    "tag": "poses"
   },
   "stag-win": {
@@ -281,6 +297,7 @@
    "target": "games/thornbound/media/poses/stag-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "stag",
    "tag": "poses"
   },
   "stag-lose": {
@@ -295,6 +312,7 @@
    "target": "games/thornbound/media/poses/stag-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "stag",
    "tag": "poses"
   },
   "ysolde-idle": {
@@ -309,6 +327,7 @@
    "target": "games/thornbound/media/poses/ysolde-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-talk": {
@@ -323,6 +342,7 @@
    "target": "games/thornbound/media/poses/ysolde-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-win": {
@@ -337,6 +357,7 @@
    "target": "games/thornbound/media/poses/ysolde-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-lose": {
@@ -351,6 +372,7 @@
    "target": "games/thornbound/media/poses/ysolde-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "tamsin-idle": {
@@ -365,6 +387,7 @@
    "target": "games/thornbound/media/poses/tamsin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-talk": {
@@ -379,6 +402,7 @@
    "target": "games/thornbound/media/poses/tamsin-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-win": {
@@ -393,6 +417,7 @@
    "target": "games/thornbound/media/poses/tamsin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-lose": {
@@ -407,6 +432,7 @@
    "target": "games/thornbound/media/poses/tamsin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "fennick-idle": {
@@ -421,6 +447,7 @@
    "target": "games/thornbound/media/poses/fennick-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fennick",
    "tag": "poses"
   },
   "fennick-win": {
@@ -435,6 +462,7 @@
    "target": "games/thornbound/media/poses/fennick-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fennick",
    "tag": "poses"
   },
   "fennick-lose": {
@@ -449,6 +477,7 @@
    "target": "games/thornbound/media/poses/fennick-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "fennick",
    "tag": "poses"
   },
   "quill-idle": {
@@ -463,6 +492,7 @@
    "target": "games/thornbound/media/poses/quill-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-win": {
@@ -477,6 +507,7 @@
    "target": "games/thornbound/media/poses/quill-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-lose": {
@@ -491,6 +522,7 @@
    "target": "games/thornbound/media/poses/quill-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "rook-idle": {
@@ -505,6 +537,7 @@
    "target": "games/thornbound/media/poses/rook-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "rook",
    "tag": "poses"
   },
   "rook-win": {
@@ -519,6 +552,7 @@
    "target": "games/thornbound/media/poses/rook-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "rook",
    "tag": "poses"
   },
   "rook-lose": {
@@ -533,6 +567,7 @@
    "target": "games/thornbound/media/poses/rook-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "rook",
    "tag": "poses"
   },
   "ida-idle": {
@@ -547,6 +582,7 @@
    "target": "games/thornbound/media/poses/ida-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ida",
    "tag": "poses"
   },
   "ida-win": {
@@ -561,6 +597,7 @@
    "target": "games/thornbound/media/poses/ida-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ida",
    "tag": "poses"
   },
   "ida-lose": {
@@ -575,6 +612,7 @@
    "target": "games/thornbound/media/poses/ida-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ida",
    "tag": "poses"
   },
   "orlen-idle": {
@@ -589,6 +627,7 @@
    "target": "games/thornbound/media/poses/orlen-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "orlen",
    "tag": "poses"
   },
   "orlen-win": {
@@ -603,6 +642,7 @@
    "target": "games/thornbound/media/poses/orlen-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "orlen",
    "tag": "poses"
   },
   "orlen-lose": {
@@ -617,6 +657,7 @@
    "target": "games/thornbound/media/poses/orlen-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "orlen",
    "tag": "poses"
   }
  }

@@ -60,6 +60,7 @@
    "target": "games/lantern-dive/media/poses/brack-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brack",
    "tag": "poses"
   },
   "brack-talk": {
@@ -74,6 +75,7 @@
    "target": "games/lantern-dive/media/poses/brack-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brack",
    "tag": "poses"
   },
   "brack-win": {
@@ -88,6 +90,7 @@
    "target": "games/lantern-dive/media/poses/brack-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brack",
    "tag": "poses"
   },
   "brack-lose": {
@@ -102,6 +105,7 @@
    "target": "games/lantern-dive/media/poses/brack-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brack",
    "tag": "poses"
   },
   "nerea-idle": {
@@ -116,6 +120,7 @@
    "target": "games/lantern-dive/media/poses/nerea-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nerea",
    "tag": "poses"
   },
   "nerea-talk": {
@@ -130,6 +135,7 @@
    "target": "games/lantern-dive/media/poses/nerea-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nerea",
    "tag": "poses"
   },
   "nerea-win": {
@@ -144,6 +150,7 @@
    "target": "games/lantern-dive/media/poses/nerea-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nerea",
    "tag": "poses"
   },
   "nerea-lose": {
@@ -158,6 +165,7 @@
    "target": "games/lantern-dive/media/poses/nerea-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nerea",
    "tag": "poses"
   },
   "bram-idle": {
@@ -172,6 +180,7 @@
    "target": "games/lantern-dive/media/poses/bram-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "bram-talk": {
@@ -186,6 +195,7 @@
    "target": "games/lantern-dive/media/poses/bram-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "bram-win": {
@@ -200,6 +210,7 @@
    "target": "games/lantern-dive/media/poses/bram-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "bram-lose": {
@@ -214,6 +225,7 @@
    "target": "games/lantern-dive/media/poses/bram-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "sumi-idle": {
@@ -228,6 +240,7 @@
    "target": "games/lantern-dive/media/poses/sumi-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sumi",
    "tag": "poses"
   },
   "sumi-talk": {
@@ -242,6 +255,7 @@
    "target": "games/lantern-dive/media/poses/sumi-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sumi",
    "tag": "poses"
   },
   "sumi-win": {
@@ -256,6 +270,7 @@
    "target": "games/lantern-dive/media/poses/sumi-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sumi",
    "tag": "poses"
   },
   "sumi-lose": {
@@ -270,6 +285,7 @@
    "target": "games/lantern-dive/media/poses/sumi-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sumi",
    "tag": "poses"
   },
   "dag-idle": {
@@ -284,6 +300,7 @@
    "target": "games/lantern-dive/media/poses/dag-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dag",
    "tag": "poses"
   },
   "dag-talk": {
@@ -298,6 +315,7 @@
    "target": "games/lantern-dive/media/poses/dag-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dag",
    "tag": "poses"
   },
   "dag-win": {
@@ -312,6 +330,7 @@
    "target": "games/lantern-dive/media/poses/dag-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dag",
    "tag": "poses"
   },
   "dag-lose": {
@@ -326,6 +345,7 @@
    "target": "games/lantern-dive/media/poses/dag-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dag",
    "tag": "poses"
   },
   "echo-idle": {
@@ -340,6 +360,7 @@
    "target": "games/lantern-dive/media/poses/echo-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "echo",
    "tag": "poses"
   },
   "echo-attack": {
@@ -354,6 +375,7 @@
    "target": "games/lantern-dive/media/poses/echo-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "echo",
    "tag": "poses"
   },
   "echo-hit": {
@@ -368,6 +390,7 @@
    "target": "games/lantern-dive/media/poses/echo-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "echo",
    "tag": "poses"
   },
   "echo-win": {
@@ -382,6 +405,7 @@
    "target": "games/lantern-dive/media/poses/echo-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "echo",
    "tag": "poses"
   },
   "echo-lose": {
@@ -396,6 +420,7 @@
    "target": "games/lantern-dive/media/poses/echo-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "echo",
    "tag": "poses"
   },
   "undertow-idle": {
@@ -410,6 +435,7 @@
    "target": "games/lantern-dive/media/poses/undertow-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "undertow",
    "tag": "poses"
   },
   "undertow-attack": {
@@ -424,6 +450,7 @@
    "target": "games/lantern-dive/media/poses/undertow-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "undertow",
    "tag": "poses"
   },
   "undertow-hit": {
@@ -438,6 +465,7 @@
    "target": "games/lantern-dive/media/poses/undertow-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "undertow",
    "tag": "poses"
   },
   "undertow-win": {
@@ -452,6 +480,7 @@
    "target": "games/lantern-dive/media/poses/undertow-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "undertow",
    "tag": "poses"
   },
   "undertow-lose": {
@@ -466,6 +495,7 @@
    "target": "games/lantern-dive/media/poses/undertow-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "undertow",
    "tag": "poses"
   },
   "maze-idle": {
@@ -480,6 +510,7 @@
    "target": "games/lantern-dive/media/poses/maze-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "maze",
    "tag": "poses"
   },
   "maze-attack": {
@@ -494,6 +525,7 @@
    "target": "games/lantern-dive/media/poses/maze-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "maze",
    "tag": "poses"
   },
   "maze-hit": {
@@ -508,6 +540,7 @@
    "target": "games/lantern-dive/media/poses/maze-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "maze",
    "tag": "poses"
   },
   "maze-win": {
@@ -522,6 +555,7 @@
    "target": "games/lantern-dive/media/poses/maze-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "maze",
    "tag": "poses"
   },
   "maze-lose": {
@@ -536,6 +570,7 @@
    "target": "games/lantern-dive/media/poses/maze-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "maze",
    "tag": "poses"
   },
   "lampless-idle": {
@@ -550,6 +585,7 @@
    "target": "games/lantern-dive/media/poses/lampless-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lampless",
    "tag": "poses"
   },
   "lampless-attack": {
@@ -564,6 +600,7 @@
    "target": "games/lantern-dive/media/poses/lampless-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lampless",
    "tag": "poses"
   },
   "lampless-hit": {
@@ -578,6 +615,7 @@
    "target": "games/lantern-dive/media/poses/lampless-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lampless",
    "tag": "poses"
   },
   "lampless-win": {
@@ -592,6 +630,7 @@
    "target": "games/lantern-dive/media/poses/lampless-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lampless",
    "tag": "poses"
   },
   "lampless-lose": {
@@ -606,6 +645,7 @@
    "target": "games/lantern-dive/media/poses/lampless-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lampless",
    "tag": "poses"
   },
   "lantern-lit": {
@@ -620,6 +660,7 @@
    "target": "games/lantern-dive/media/poses/lantern-lit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lantern",
    "tag": "poses"
   },
   "lantern-dim": {
@@ -634,6 +675,7 @@
    "target": "games/lantern-dive/media/poses/lantern-dim.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lantern",
    "tag": "poses"
   },
   "lantern-flicker": {
@@ -648,6 +690,7 @@
    "target": "games/lantern-dive/media/poses/lantern-flicker.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lantern",
    "tag": "poses"
   },
   "lantern-out": {
@@ -662,6 +705,7 @@
    "target": "games/lantern-dive/media/poses/lantern-out.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lantern",
    "tag": "poses"
   }
  }

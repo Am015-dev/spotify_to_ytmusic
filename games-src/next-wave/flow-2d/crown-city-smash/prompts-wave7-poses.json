@@ -82,6 +82,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "magmaw-attack": {
@@ -96,6 +97,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "magmaw-hit": {
@@ -110,6 +112,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "magmaw-win": {
@@ -124,6 +127,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "magmaw-lose": {
@@ -138,6 +142,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "magmaw-walk-a": {
@@ -152,6 +157,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "magmaw-walk-b": {
@@ -166,6 +172,7 @@
    "target": "games/crown-city-smash/media/poses/magmaw-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "magmaw",
    "tag": "poses"
   },
   "glacyx-idle": {
@@ -180,6 +187,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "glacyx-attack": {
@@ -194,6 +202,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "glacyx-hit": {
@@ -208,6 +217,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "glacyx-win": {
@@ -222,6 +232,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "glacyx-lose": {
@@ -236,6 +247,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "glacyx-walk-a": {
@@ -250,6 +262,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "glacyx-walk-b": {
@@ -264,6 +277,7 @@
    "target": "games/crown-city-smash/media/poses/glacyx-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "glacyx",
    "tag": "poses"
   },
   "cortexa-idle": {
@@ -278,6 +292,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "cortexa-attack": {
@@ -292,6 +307,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "cortexa-hit": {
@@ -306,6 +322,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "cortexa-win": {
@@ -320,6 +337,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "cortexa-lose": {
@@ -334,6 +352,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "cortexa-walk-a": {
@@ -348,6 +367,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "cortexa-walk-b": {
@@ -362,6 +382,7 @@
    "target": "games/crown-city-smash/media/poses/cortexa-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cortexa",
    "tag": "poses"
   },
   "voltusk-idle": {
@@ -376,6 +397,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "voltusk-attack": {
@@ -390,6 +412,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "voltusk-hit": {
@@ -404,6 +427,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "voltusk-win": {
@@ -418,6 +442,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "voltusk-lose": {
@@ -432,6 +457,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "voltusk-walk-a": {
@@ -446,6 +472,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "voltusk-walk-b": {
@@ -460,6 +487,7 @@
    "target": "games/crown-city-smash/media/poses/voltusk-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "voltusk",
    "tag": "poses"
   },
   "squidrik-idle": {
@@ -474,6 +502,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "squidrik-attack": {
@@ -488,6 +517,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "squidrik-hit": {
@@ -502,6 +532,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "squidrik-win": {
@@ -516,6 +547,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "squidrik-lose": {
@@ -530,6 +562,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "squidrik-walk-a": {
@@ -544,6 +577,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "squidrik-walk-b": {
@@ -558,6 +592,7 @@
    "target": "games/crown-city-smash/media/poses/squidrik-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "squidrik",
    "tag": "poses"
   },
   "shroomhulk-idle": {
@@ -572,6 +607,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "shroomhulk-attack": {
@@ -586,6 +622,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "shroomhulk-hit": {
@@ -600,6 +637,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "shroomhulk-win": {
@@ -614,6 +652,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "shroomhulk-lose": {
@@ -628,6 +667,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "shroomhulk-walk-a": {
@@ -642,6 +682,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "shroomhulk-walk-b": {
@@ -656,6 +697,7 @@
    "target": "games/crown-city-smash/media/poses/shroomhulk-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "shroomhulk",
    "tag": "poses"
   },
   "boltbox-idle": {
@@ -670,6 +712,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "boltbox-attack": {
@@ -684,6 +727,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "boltbox-hit": {
@@ -698,6 +742,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "boltbox-win": {
@@ -712,6 +757,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "boltbox-lose": {
@@ -726,6 +772,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "boltbox-walk-a": {
@@ -740,6 +787,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "boltbox-walk-b": {
@@ -754,6 +802,7 @@
    "target": "games/crown-city-smash/media/poses/boltbox-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "boltbox",
    "tag": "poses"
   },
   "bramblebat-idle": {
@@ -768,6 +817,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "bramblebat-attack": {
@@ -782,6 +832,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "bramblebat-hit": {
@@ -796,6 +847,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "bramblebat-win": {
@@ -810,6 +862,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "bramblebat-lose": {
@@ -824,6 +877,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "bramblebat-walk-a": {
@@ -838,6 +892,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "bramblebat-walk-b": {
@@ -852,6 +907,7 @@
    "target": "games/crown-city-smash/media/poses/bramblebat-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bramblebat",
    "tag": "poses"
   },
   "clampede-idle": {
@@ -866,6 +922,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "clampede-attack": {
@@ -880,6 +937,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "clampede-hit": {
@@ -894,6 +952,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "clampede-win": {
@@ -908,6 +967,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "clampede-lose": {
@@ -922,6 +982,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "clampede-walk-a": {
@@ -936,6 +997,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-walk-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "clampede-walk-b": {
@@ -950,6 +1012,7 @@
    "target": "games/crown-city-smash/media/poses/clampede-walk-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "clampede",
    "tag": "poses"
   },
   "dot-idle": {
@@ -964,6 +1027,7 @@
    "target": "games/crown-city-smash/media/poses/dot-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dot",
    "tag": "poses"
   },
   "dot-win": {
@@ -978,6 +1042,7 @@
    "target": "games/crown-city-smash/media/poses/dot-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dot",
    "tag": "poses"
   },
   "dot-lose": {
@@ -992,6 +1057,7 @@
    "target": "games/crown-city-smash/media/poses/dot-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dot",
    "tag": "poses"
   }
  }

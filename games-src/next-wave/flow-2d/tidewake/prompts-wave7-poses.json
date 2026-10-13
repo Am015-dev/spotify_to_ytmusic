@@ -58,6 +58,7 @@
    "target": "games/tidewake/media/poses/harrow-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "harrow",
    "tag": "poses"
   },
   "harrow-taunt": {
@@ -72,6 +73,7 @@
    "target": "games/tidewake/media/poses/harrow-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "harrow",
    "tag": "poses"
   },
   "harrow-praise": {
@@ -86,6 +88,7 @@
    "target": "games/tidewake/media/poses/harrow-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "harrow",
    "tag": "poses"
   },
   "harrow-shock": {
@@ -100,6 +103,7 @@
    "target": "games/tidewake/media/poses/harrow-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "harrow",
    "tag": "poses"
   },
   "harrow-win": {
@@ -114,6 +118,7 @@
    "target": "games/tidewake/media/poses/harrow-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "harrow",
    "tag": "poses"
   },
   "harrow-lose": {
@@ -128,6 +133,7 @@
    "target": "games/tidewake/media/poses/harrow-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "harrow",
    "tag": "poses"
   },
   "sabel-idle": {
@@ -142,6 +148,7 @@
    "target": "games/tidewake/media/poses/sabel-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sabel",
    "tag": "poses"
   },
   "sabel-taunt": {
@@ -156,6 +163,7 @@
    "target": "games/tidewake/media/poses/sabel-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sabel",
    "tag": "poses"
   },
   "sabel-praise": {
@@ -170,6 +178,7 @@
    "target": "games/tidewake/media/poses/sabel-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sabel",
    "tag": "poses"
   },
   "sabel-shock": {
@@ -184,6 +193,7 @@
    "target": "games/tidewake/media/poses/sabel-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sabel",
    "tag": "poses"
   },
   "sabel-win": {
@@ -198,6 +208,7 @@
    "target": "games/tidewake/media/poses/sabel-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sabel",
    "tag": "poses"
   },
   "sabel-lose": {
@@ -212,6 +223,7 @@
    "target": "games/tidewake/media/poses/sabel-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sabel",
    "tag": "poses"
   },
   "ysolde-idle": {
@@ -226,6 +238,7 @@
    "target": "games/tidewake/media/poses/ysolde-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-taunt": {
@@ -240,6 +253,7 @@
    "target": "games/tidewake/media/poses/ysolde-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-praise": {
@@ -254,6 +268,7 @@
    "target": "games/tidewake/media/poses/ysolde-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-shock": {
@@ -268,6 +283,7 @@
    "target": "games/tidewake/media/poses/ysolde-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-win": {
@@ -282,6 +298,7 @@
    "target": "games/tidewake/media/poses/ysolde-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "ysolde-lose": {
@@ -296,6 +313,7 @@
    "target": "games/tidewake/media/poses/ysolde-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ysolde",
    "tag": "poses"
   },
   "osk-idle": {
@@ -310,6 +328,7 @@
    "target": "games/tidewake/media/poses/osk-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "osk",
    "tag": "poses"
   },
   "osk-talk": {
@@ -324,6 +343,7 @@
    "target": "games/tidewake/media/poses/osk-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "osk",
    "tag": "poses"
   },
   "osk-win": {
@@ -338,6 +358,7 @@
    "target": "games/tidewake/media/poses/osk-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "osk",
    "tag": "poses"
   },
   "osk-lose": {
@@ -352,6 +373,7 @@
    "target": "games/tidewake/media/poses/osk-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "osk",
    "tag": "poses"
   },
   "wick-idle": {
@@ -366,6 +388,7 @@
    "target": "games/tidewake/media/poses/wick-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wick",
    "tag": "poses"
   },
   "wick-talk": {
@@ -380,6 +403,7 @@
    "target": "games/tidewake/media/poses/wick-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wick",
    "tag": "poses"
   },
   "wick-win": {
@@ -394,6 +418,7 @@
    "target": "games/tidewake/media/poses/wick-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wick",
    "tag": "poses"
   },
   "wick-lose": {
@@ -408,6 +433,7 @@
    "target": "games/tidewake/media/poses/wick-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wick",
    "tag": "poses"
   },
   "brann-idle": {
@@ -422,6 +448,7 @@
    "target": "games/tidewake/media/poses/brann-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brann",
    "tag": "poses"
   },
   "brann-win": {
@@ -436,6 +463,7 @@
    "target": "games/tidewake/media/poses/brann-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brann",
    "tag": "poses"
   },
   "brann-lose": {
@@ -450,6 +478,7 @@
    "target": "games/tidewake/media/poses/brann-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brann",
    "tag": "poses"
   },
   "vey-idle": {
@@ -464,6 +493,7 @@
    "target": "games/tidewake/media/poses/vey-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vey",
    "tag": "poses"
   },
   "vey-win": {
@@ -478,6 +508,7 @@
    "target": "games/tidewake/media/poses/vey-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vey",
    "tag": "poses"
   },
   "vey-lose": {
@@ -492,6 +523,7 @@
    "target": "games/tidewake/media/poses/vey-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vey",
    "tag": "poses"
   },
   "crown-idle": {
@@ -506,6 +538,7 @@
    "target": "games/tidewake/media/poses/crown-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "crown",
    "tag": "poses"
   },
   "crown-attack": {
@@ -520,6 +553,7 @@
    "target": "games/tidewake/media/poses/crown-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "crown",
    "tag": "poses"
   },
   "crown-hit": {
@@ -534,6 +568,7 @@
    "target": "games/tidewake/media/poses/crown-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "crown",
    "tag": "poses"
   },
   "crown-win": {
@@ -548,6 +583,7 @@
    "target": "games/tidewake/media/poses/crown-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "crown",
    "tag": "poses"
   },
   "crown-lose": {
@@ -562,6 +598,7 @@
    "target": "games/tidewake/media/poses/crown-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "crown",
    "tag": "poses"
   },
   "saltshade-idle": {
@@ -576,6 +613,7 @@
    "target": "games/tidewake/media/poses/saltshade-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saltshade",
    "tag": "poses"
   },
   "saltshade-attack": {
@@ -590,6 +628,7 @@
    "target": "games/tidewake/media/poses/saltshade-attack.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saltshade",
    "tag": "poses"
   },
   "saltshade-hit": {
@@ -604,6 +643,7 @@
    "target": "games/tidewake/media/poses/saltshade-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saltshade",
    "tag": "poses"
   },
   "saltshade-win": {
@@ -618,6 +658,7 @@
    "target": "games/tidewake/media/poses/saltshade-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saltshade",
    "tag": "poses"
   },
   "saltshade-lose": {
@@ -632,6 +673,7 @@
    "target": "games/tidewake/media/poses/saltshade-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saltshade",
    "tag": "poses"
   }
  }

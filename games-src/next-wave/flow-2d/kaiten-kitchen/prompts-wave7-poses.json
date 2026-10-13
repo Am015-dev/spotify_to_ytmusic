@@ -49,6 +49,7 @@
    "target": "games/kaiten-kitchen/media/poses/kofi-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kofi",
    "tag": "poses"
   },
   "kofi-taunt": {
@@ -63,6 +64,7 @@
    "target": "games/kaiten-kitchen/media/poses/kofi-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kofi",
    "tag": "poses"
   },
   "kofi-praise": {
@@ -77,6 +79,7 @@
    "target": "games/kaiten-kitchen/media/poses/kofi-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kofi",
    "tag": "poses"
   },
   "kofi-shock": {
@@ -91,6 +94,7 @@
    "target": "games/kaiten-kitchen/media/poses/kofi-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kofi",
    "tag": "poses"
   },
   "kofi-win": {
@@ -105,6 +109,7 @@
    "target": "games/kaiten-kitchen/media/poses/kofi-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kofi",
    "tag": "poses"
   },
   "kofi-lose": {
@@ -119,6 +124,7 @@
    "target": "games/kaiten-kitchen/media/poses/kofi-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kofi",
    "tag": "poses"
   },
   "odile-idle": {
@@ -133,6 +139,7 @@
    "target": "games/kaiten-kitchen/media/poses/odile-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odile",
    "tag": "poses"
   },
   "odile-taunt": {
@@ -147,6 +154,7 @@
    "target": "games/kaiten-kitchen/media/poses/odile-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odile",
    "tag": "poses"
   },
   "odile-praise": {
@@ -161,6 +169,7 @@
    "target": "games/kaiten-kitchen/media/poses/odile-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odile",
    "tag": "poses"
   },
   "odile-shock": {
@@ -175,6 +184,7 @@
    "target": "games/kaiten-kitchen/media/poses/odile-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odile",
    "tag": "poses"
   },
   "odile-win": {
@@ -189,6 +199,7 @@
    "target": "games/kaiten-kitchen/media/poses/odile-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odile",
    "tag": "poses"
   },
   "odile-lose": {
@@ -203,6 +214,7 @@
    "target": "games/kaiten-kitchen/media/poses/odile-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odile",
    "tag": "poses"
   },
   "taro-idle": {
@@ -217,6 +229,7 @@
    "target": "games/kaiten-kitchen/media/poses/taro-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "taro",
    "tag": "poses"
   },
   "taro-taunt": {
@@ -231,6 +244,7 @@
    "target": "games/kaiten-kitchen/media/poses/taro-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "taro",
    "tag": "poses"
   },
   "taro-praise": {
@@ -245,6 +259,7 @@
    "target": "games/kaiten-kitchen/media/poses/taro-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "taro",
    "tag": "poses"
   },
   "taro-shock": {
@@ -259,6 +274,7 @@
    "target": "games/kaiten-kitchen/media/poses/taro-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "taro",
    "tag": "poses"
   },
   "taro-win": {
@@ -273,6 +289,7 @@
    "target": "games/kaiten-kitchen/media/poses/taro-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "taro",
    "tag": "poses"
   },
   "taro-lose": {
@@ -287,6 +304,7 @@
    "target": "games/kaiten-kitchen/media/poses/taro-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "taro",
    "tag": "poses"
   },
   "suzu-idle": {
@@ -301,6 +319,7 @@
    "target": "games/kaiten-kitchen/media/poses/suzu-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "suzu",
    "tag": "poses"
   },
   "suzu-talk": {
@@ -315,6 +334,7 @@
    "target": "games/kaiten-kitchen/media/poses/suzu-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "suzu",
    "tag": "poses"
   },
   "suzu-win": {
@@ -329,6 +349,7 @@
    "target": "games/kaiten-kitchen/media/poses/suzu-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "suzu",
    "tag": "poses"
   },
   "suzu-lose": {
@@ -343,6 +364,7 @@
    "target": "games/kaiten-kitchen/media/poses/suzu-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "suzu",
    "tag": "poses"
   },
   "mina-idle": {
@@ -357,6 +379,7 @@
    "target": "games/kaiten-kitchen/media/poses/mina-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mina",
    "tag": "poses"
   },
   "mina-talk": {
@@ -371,6 +394,7 @@
    "target": "games/kaiten-kitchen/media/poses/mina-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mina",
    "tag": "poses"
   },
   "mina-win": {
@@ -385,6 +409,7 @@
    "target": "games/kaiten-kitchen/media/poses/mina-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mina",
    "tag": "poses"
   },
   "mina-lose": {
@@ -399,6 +424,7 @@
    "target": "games/kaiten-kitchen/media/poses/mina-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mina",
    "tag": "poses"
   },
   "pip-idle": {
@@ -413,6 +439,7 @@
    "target": "games/kaiten-kitchen/media/poses/pip-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-win": {
@@ -427,6 +454,7 @@
    "target": "games/kaiten-kitchen/media/poses/pip-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "pip-lose": {
@@ -441,6 +469,7 @@
    "target": "games/kaiten-kitchen/media/poses/pip-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "pip",
    "tag": "poses"
   },
   "cloche-closed": {
@@ -455,6 +484,7 @@
    "target": "games/kaiten-kitchen/media/poses/cloche-closed.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloche",
    "tag": "poses"
   },
   "cloche-lift-a": {
@@ -469,6 +499,7 @@
    "target": "games/kaiten-kitchen/media/poses/cloche-lift-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloche",
    "tag": "poses"
   },
   "cloche-lift-b": {
@@ -483,6 +514,7 @@
    "target": "games/kaiten-kitchen/media/poses/cloche-lift-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloche",
    "tag": "poses"
   },
   "cloche-open": {
@@ -497,6 +529,7 @@
    "target": "games/kaiten-kitchen/media/poses/cloche-open.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cloche",
    "tag": "poses"
   }
  }

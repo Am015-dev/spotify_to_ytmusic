@@ -70,6 +70,7 @@
    "target": "games/nebula-aces/media/poses/knife-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "knife",
    "tag": "poses"
   },
   "knife-taunt": {
@@ -84,6 +85,7 @@
    "target": "games/nebula-aces/media/poses/knife-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "knife",
    "tag": "poses"
   },
   "knife-praise": {
@@ -98,6 +100,7 @@
    "target": "games/nebula-aces/media/poses/knife-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "knife",
    "tag": "poses"
   },
   "knife-shock": {
@@ -112,6 +115,7 @@
    "target": "games/nebula-aces/media/poses/knife-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "knife",
    "tag": "poses"
   },
   "knife-win": {
@@ -126,6 +130,7 @@
    "target": "games/nebula-aces/media/poses/knife-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "knife",
    "tag": "poses"
   },
   "knife-lose": {
@@ -140,6 +145,7 @@
    "target": "games/nebula-aces/media/poses/knife-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "knife",
    "tag": "poses"
   },
   "sorin-idle": {
@@ -154,6 +160,7 @@
    "target": "games/nebula-aces/media/poses/sorin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sorin",
    "tag": "poses"
   },
   "sorin-taunt": {
@@ -168,6 +175,7 @@
    "target": "games/nebula-aces/media/poses/sorin-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sorin",
    "tag": "poses"
   },
   "sorin-praise": {
@@ -182,6 +190,7 @@
    "target": "games/nebula-aces/media/poses/sorin-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sorin",
    "tag": "poses"
   },
   "sorin-shock": {
@@ -196,6 +205,7 @@
    "target": "games/nebula-aces/media/poses/sorin-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sorin",
    "tag": "poses"
   },
   "sorin-win": {
@@ -210,6 +220,7 @@
    "target": "games/nebula-aces/media/poses/sorin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sorin",
    "tag": "poses"
   },
   "sorin-lose": {
@@ -224,6 +235,7 @@
    "target": "games/nebula-aces/media/poses/sorin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "sorin",
    "tag": "poses"
   },
   "castigan-idle": {
@@ -238,6 +250,7 @@
    "target": "games/nebula-aces/media/poses/castigan-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "castigan",
    "tag": "poses"
   },
   "castigan-taunt": {
@@ -252,6 +265,7 @@
    "target": "games/nebula-aces/media/poses/castigan-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "castigan",
    "tag": "poses"
   },
   "castigan-praise": {
@@ -266,6 +280,7 @@
    "target": "games/nebula-aces/media/poses/castigan-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "castigan",
    "tag": "poses"
   },
   "castigan-shock": {
@@ -280,6 +295,7 @@
    "target": "games/nebula-aces/media/poses/castigan-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "castigan",
    "tag": "poses"
   },
   "castigan-win": {
@@ -294,6 +310,7 @@
    "target": "games/nebula-aces/media/poses/castigan-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "castigan",
    "tag": "poses"
   },
   "castigan-lose": {
@@ -308,6 +325,7 @@
    "target": "games/nebula-aces/media/poses/castigan-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "castigan",
    "tag": "poses"
   },
   "brecken-idle": {
@@ -322,6 +340,7 @@
    "target": "games/nebula-aces/media/poses/brecken-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brecken",
    "tag": "poses"
   },
   "brecken-talk": {
@@ -336,6 +355,7 @@
    "target": "games/nebula-aces/media/poses/brecken-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brecken",
    "tag": "poses"
   },
   "brecken-win": {
@@ -350,6 +370,7 @@
    "target": "games/nebula-aces/media/poses/brecken-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brecken",
    "tag": "poses"
   },
   "brecken-lose": {
@@ -364,6 +385,7 @@
    "target": "games/nebula-aces/media/poses/brecken-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "brecken",
    "tag": "poses"
   },
   "kael-idle": {
@@ -378,6 +400,7 @@
    "target": "games/nebula-aces/media/poses/kael-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kael",
    "tag": "poses"
   },
   "kael-talk": {
@@ -392,6 +415,7 @@
    "target": "games/nebula-aces/media/poses/kael-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kael",
    "tag": "poses"
   },
   "kael-win": {
@@ -406,6 +430,7 @@
    "target": "games/nebula-aces/media/poses/kael-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kael",
    "tag": "poses"
   },
   "kael-lose": {
@@ -420,6 +445,7 @@
    "target": "games/nebula-aces/media/poses/kael-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kael",
    "tag": "poses"
   },
   "quill-idle": {
@@ -434,6 +460,7 @@
    "target": "games/nebula-aces/media/poses/quill-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-win": {
@@ -448,6 +475,7 @@
    "target": "games/nebula-aces/media/poses/quill-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-lose": {
@@ -462,6 +490,7 @@
    "target": "games/nebula-aces/media/poses/quill-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "drill-idle": {
@@ -476,6 +505,7 @@
    "target": "games/nebula-aces/media/poses/drill-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "drill",
    "tag": "poses"
   },
   "drill-win": {
@@ -490,6 +520,7 @@
    "target": "games/nebula-aces/media/poses/drill-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "drill",
    "tag": "poses"
   },
   "drill-lose": {
@@ -504,6 +535,7 @@
    "target": "games/nebula-aces/media/poses/drill-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "drill",
    "tag": "poses"
   },
   "hammer-idle": {
@@ -518,6 +550,7 @@
    "target": "games/nebula-aces/media/poses/hammer-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hammer",
    "tag": "poses"
   },
   "hammer-win": {
@@ -532,6 +565,7 @@
    "target": "games/nebula-aces/media/poses/hammer-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hammer",
    "tag": "poses"
   },
   "hammer-lose": {
@@ -546,6 +580,7 @@
    "target": "games/nebula-aces/media/poses/hammer-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hammer",
    "tag": "poses"
   },
   "hex-idle": {
@@ -560,6 +595,7 @@
    "target": "games/nebula-aces/media/poses/hex-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hex",
    "tag": "poses"
   },
   "hex-win": {
@@ -574,6 +610,7 @@
    "target": "games/nebula-aces/media/poses/hex-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hex",
    "tag": "poses"
   },
   "hex-lose": {
@@ -588,6 +625,7 @@
    "target": "games/nebula-aces/media/poses/hex-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hex",
    "tag": "poses"
   },
   "kira-idle": {
@@ -602,6 +640,7 @@
    "target": "games/nebula-aces/media/poses/kira-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kira",
    "tag": "poses"
   },
   "kira-win": {
@@ -616,6 +655,7 @@
    "target": "games/nebula-aces/media/poses/kira-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kira",
    "tag": "poses"
   },
   "kira-lose": {
@@ -630,6 +670,7 @@
    "target": "games/nebula-aces/media/poses/kira-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "kira",
    "tag": "poses"
   },
   "wailer-idle": {
@@ -644,6 +685,7 @@
    "target": "games/nebula-aces/media/poses/wailer-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wailer",
    "tag": "poses"
   },
   "wailer-win": {
@@ -658,6 +700,7 @@
    "target": "games/nebula-aces/media/poses/wailer-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wailer",
    "tag": "poses"
   },
   "wailer-lose": {
@@ -672,6 +715,7 @@
    "target": "games/nebula-aces/media/poses/wailer-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wailer",
    "tag": "poses"
   },
   "lancer-idle": {
@@ -686,6 +730,7 @@
    "target": "games/nebula-aces/media/poses/lancer-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lancer",
    "tag": "poses"
   },
   "lancer-bank-left": {
@@ -700,6 +745,7 @@
    "target": "games/nebula-aces/media/poses/lancer-bank-left.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lancer",
    "tag": "poses"
   },
   "lancer-bank-right": {
@@ -714,6 +760,7 @@
    "target": "games/nebula-aces/media/poses/lancer-bank-right.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lancer",
    "tag": "poses"
   },
   "lancer-hit": {
@@ -728,6 +775,7 @@
    "target": "games/nebula-aces/media/poses/lancer-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lancer",
    "tag": "poses"
   },
   "lancer-wreck": {
@@ -742,6 +790,7 @@
    "target": "games/nebula-aces/media/poses/lancer-wreck.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "lancer",
    "tag": "poses"
   },
   "talon-idle": {
@@ -756,6 +805,7 @@
    "target": "games/nebula-aces/media/poses/talon-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talon",
    "tag": "poses"
   },
   "talon-bank-left": {
@@ -770,6 +820,7 @@
    "target": "games/nebula-aces/media/poses/talon-bank-left.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talon",
    "tag": "poses"
   },
   "talon-bank-right": {
@@ -784,6 +835,7 @@
    "target": "games/nebula-aces/media/poses/talon-bank-right.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talon",
    "tag": "poses"
   },
   "talon-hit": {
@@ -798,6 +850,7 @@
    "target": "games/nebula-aces/media/poses/talon-hit.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talon",
    "tag": "poses"
   },
   "talon-wreck": {
@@ -812,6 +865,7 @@
    "target": "games/nebula-aces/media/poses/talon-wreck.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "talon",
    "tag": "poses"
   }
  }

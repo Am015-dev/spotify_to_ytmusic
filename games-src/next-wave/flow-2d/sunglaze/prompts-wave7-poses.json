@@ -60,6 +60,7 @@
    "target": "games/sunglaze/media/poses/saffra-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saffra",
    "tag": "poses"
   },
   "saffra-taunt": {
@@ -74,6 +75,7 @@
    "target": "games/sunglaze/media/poses/saffra-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saffra",
    "tag": "poses"
   },
   "saffra-praise": {
@@ -88,6 +90,7 @@
    "target": "games/sunglaze/media/poses/saffra-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saffra",
    "tag": "poses"
   },
   "saffra-shock": {
@@ -102,6 +105,7 @@
    "target": "games/sunglaze/media/poses/saffra-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saffra",
    "tag": "poses"
   },
   "saffra-win": {
@@ -116,6 +120,7 @@
    "target": "games/sunglaze/media/poses/saffra-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saffra",
    "tag": "poses"
   },
   "saffra-lose": {
@@ -130,6 +135,7 @@
    "target": "games/sunglaze/media/poses/saffra-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "saffra",
    "tag": "poses"
   },
   "garnet-idle": {
@@ -144,6 +150,7 @@
    "target": "games/sunglaze/media/poses/garnet-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-taunt": {
@@ -158,6 +165,7 @@
    "target": "games/sunglaze/media/poses/garnet-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-praise": {
@@ -172,6 +180,7 @@
    "target": "games/sunglaze/media/poses/garnet-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-shock": {
@@ -186,6 +195,7 @@
    "target": "games/sunglaze/media/poses/garnet-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-win": {
@@ -200,6 +210,7 @@
    "target": "games/sunglaze/media/poses/garnet-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-lose": {
@@ -214,6 +225,7 @@
    "target": "games/sunglaze/media/poses/garnet-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "umbra-idle": {
@@ -228,6 +240,7 @@
    "target": "games/sunglaze/media/poses/umbra-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "umbra",
    "tag": "poses"
   },
   "umbra-taunt": {
@@ -242,6 +255,7 @@
    "target": "games/sunglaze/media/poses/umbra-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "umbra",
    "tag": "poses"
   },
   "umbra-praise": {
@@ -256,6 +270,7 @@
    "target": "games/sunglaze/media/poses/umbra-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "umbra",
    "tag": "poses"
   },
   "umbra-shock": {
@@ -270,6 +285,7 @@
    "target": "games/sunglaze/media/poses/umbra-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "umbra",
    "tag": "poses"
   },
   "umbra-win": {
@@ -284,6 +300,7 @@
    "target": "games/sunglaze/media/poses/umbra-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "umbra",
    "tag": "poses"
   },
   "umbra-lose": {
@@ -298,6 +315,7 @@
    "target": "games/sunglaze/media/poses/umbra-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "umbra",
    "tag": "poses"
   },
   "ochre-idle": {
@@ -312,6 +330,7 @@
    "target": "games/sunglaze/media/poses/ochre-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ochre",
    "tag": "poses"
   },
   "ochre-talk": {
@@ -326,6 +345,7 @@
    "target": "games/sunglaze/media/poses/ochre-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ochre",
    "tag": "poses"
   },
   "ochre-win": {
@@ -340,6 +360,7 @@
    "target": "games/sunglaze/media/poses/ochre-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ochre",
    "tag": "poses"
   },
   "ochre-lose": {
@@ -354,6 +375,7 @@
    "target": "games/sunglaze/media/poses/ochre-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ochre",
    "tag": "poses"
   },
   "tamsin-idle": {
@@ -368,6 +390,7 @@
    "target": "games/sunglaze/media/poses/tamsin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-talk": {
@@ -382,6 +405,7 @@
    "target": "games/sunglaze/media/poses/tamsin-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-win": {
@@ -396,6 +420,7 @@
    "target": "games/sunglaze/media/poses/tamsin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-lose": {
@@ -410,6 +435,7 @@
    "target": "games/sunglaze/media/poses/tamsin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "bram-idle": {
@@ -424,6 +450,7 @@
    "target": "games/sunglaze/media/poses/bram-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "bram-win": {
@@ -438,6 +465,7 @@
    "target": "games/sunglaze/media/poses/bram-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "bram-lose": {
@@ -452,6 +480,7 @@
    "target": "games/sunglaze/media/poses/bram-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bram",
    "tag": "poses"
   },
   "cobb-idle": {
@@ -466,6 +495,7 @@
    "target": "games/sunglaze/media/poses/cobb-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cobb",
    "tag": "poses"
   },
   "cobb-win": {
@@ -480,6 +510,7 @@
    "target": "games/sunglaze/media/poses/cobb-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cobb",
    "tag": "poses"
   },
   "cobb-lose": {
@@ -494,6 +525,7 @@
    "target": "games/sunglaze/media/poses/cobb-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cobb",
    "tag": "poses"
   },
   "iris-idle": {
@@ -508,6 +540,7 @@
    "target": "games/sunglaze/media/poses/iris-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "iris",
    "tag": "poses"
   },
   "iris-win": {
@@ -522,6 +555,7 @@
    "target": "games/sunglaze/media/poses/iris-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "iris",
    "tag": "poses"
   },
   "iris-lose": {
@@ -536,6 +570,7 @@
    "target": "games/sunglaze/media/poses/iris-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "iris",
    "tag": "poses"
   },
   "nell-idle": {
@@ -550,6 +585,7 @@
    "target": "games/sunglaze/media/poses/nell-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nell",
    "tag": "poses"
   },
   "nell-win": {
@@ -564,6 +600,7 @@
    "target": "games/sunglaze/media/poses/nell-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nell",
    "tag": "poses"
   },
   "nell-lose": {
@@ -578,6 +615,7 @@
    "target": "games/sunglaze/media/poses/nell-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "nell",
    "tag": "poses"
   },
   "twins-idle": {
@@ -592,6 +630,7 @@
    "target": "games/sunglaze/media/poses/twins-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "twins",
    "tag": "poses"
   },
   "twins-win": {
@@ -606,6 +645,7 @@
    "target": "games/sunglaze/media/poses/twins-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "twins",
    "tag": "poses"
   },
   "twins-lose": {
@@ -620,6 +660,7 @@
    "target": "games/sunglaze/media/poses/twins-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "twins",
    "tag": "poses"
   },
   "vesper-idle": {
@@ -634,6 +675,7 @@
    "target": "games/sunglaze/media/poses/vesper-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-win": {
@@ -648,6 +690,7 @@
    "target": "games/sunglaze/media/poses/vesper-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-lose": {
@@ -662,6 +705,7 @@
    "target": "games/sunglaze/media/poses/vesper-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   }
  }

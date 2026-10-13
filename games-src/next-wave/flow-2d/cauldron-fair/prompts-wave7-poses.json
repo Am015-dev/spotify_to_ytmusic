@@ -54,6 +54,7 @@
    "target": "games/cauldron-fair/media/poses/odo-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odo",
    "tag": "poses"
   },
   "odo-taunt": {
@@ -68,6 +69,7 @@
    "target": "games/cauldron-fair/media/poses/odo-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odo",
    "tag": "poses"
   },
   "odo-praise": {
@@ -82,6 +84,7 @@
    "target": "games/cauldron-fair/media/poses/odo-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odo",
    "tag": "poses"
   },
   "odo-shock": {
@@ -96,6 +99,7 @@
    "target": "games/cauldron-fair/media/poses/odo-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odo",
    "tag": "poses"
   },
   "odo-win": {
@@ -110,6 +114,7 @@
    "target": "games/cauldron-fair/media/poses/odo-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odo",
    "tag": "poses"
   },
   "odo-lose": {
@@ -124,6 +129,7 @@
    "target": "games/cauldron-fair/media/poses/odo-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "odo",
    "tag": "poses"
   },
   "tamsin-idle": {
@@ -138,6 +144,7 @@
    "target": "games/cauldron-fair/media/poses/tamsin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-taunt": {
@@ -152,6 +159,7 @@
    "target": "games/cauldron-fair/media/poses/tamsin-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-praise": {
@@ -166,6 +174,7 @@
    "target": "games/cauldron-fair/media/poses/tamsin-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-shock": {
@@ -180,6 +189,7 @@
    "target": "games/cauldron-fair/media/poses/tamsin-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-win": {
@@ -194,6 +204,7 @@
    "target": "games/cauldron-fair/media/poses/tamsin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-lose": {
@@ -208,6 +219,7 @@
    "target": "games/cauldron-fair/media/poses/tamsin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "vesper-idle": {
@@ -222,6 +234,7 @@
    "target": "games/cauldron-fair/media/poses/vesper-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-taunt": {
@@ -236,6 +249,7 @@
    "target": "games/cauldron-fair/media/poses/vesper-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-praise": {
@@ -250,6 +264,7 @@
    "target": "games/cauldron-fair/media/poses/vesper-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-shock": {
@@ -264,6 +279,7 @@
    "target": "games/cauldron-fair/media/poses/vesper-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-win": {
@@ -278,6 +294,7 @@
    "target": "games/cauldron-fair/media/poses/vesper-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "vesper-lose": {
@@ -292,6 +309,7 @@
    "target": "games/cauldron-fair/media/poses/vesper-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "vesper",
    "tag": "poses"
   },
   "hask-idle": {
@@ -306,6 +324,7 @@
    "target": "games/cauldron-fair/media/poses/hask-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hask",
    "tag": "poses"
   },
   "hask-talk": {
@@ -320,6 +339,7 @@
    "target": "games/cauldron-fair/media/poses/hask-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hask",
    "tag": "poses"
   },
   "hask-win": {
@@ -334,6 +354,7 @@
    "target": "games/cauldron-fair/media/poses/hask-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hask",
    "tag": "poses"
   },
   "hask-lose": {
@@ -348,6 +369,7 @@
    "target": "games/cauldron-fair/media/poses/hask-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hask",
    "tag": "poses"
   },
   "wynne-idle": {
@@ -362,6 +384,7 @@
    "target": "games/cauldron-fair/media/poses/wynne-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wynne",
    "tag": "poses"
   },
   "wynne-talk": {
@@ -376,6 +399,7 @@
    "target": "games/cauldron-fair/media/poses/wynne-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wynne",
    "tag": "poses"
   },
   "wynne-win": {
@@ -390,6 +414,7 @@
    "target": "games/cauldron-fair/media/poses/wynne-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wynne",
    "tag": "poses"
   },
   "wynne-lose": {
@@ -404,6 +429,7 @@
    "target": "games/cauldron-fair/media/poses/wynne-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wynne",
    "tag": "poses"
   },
   "mirabel-idle": {
@@ -418,6 +444,7 @@
    "target": "games/cauldron-fair/media/poses/mirabel-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mirabel",
    "tag": "poses"
   },
   "mirabel-win": {
@@ -432,6 +459,7 @@
    "target": "games/cauldron-fair/media/poses/mirabel-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mirabel",
    "tag": "poses"
   },
   "mirabel-lose": {
@@ -446,6 +474,7 @@
    "target": "games/cauldron-fair/media/poses/mirabel-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mirabel",
    "tag": "poses"
   },
   "bag-closed": {
@@ -460,6 +489,7 @@
    "target": "games/cauldron-fair/media/poses/bag-closed.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bag",
    "tag": "poses"
   },
   "bag-shake-a": {
@@ -474,6 +504,7 @@
    "target": "games/cauldron-fair/media/poses/bag-shake-a.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bag",
    "tag": "poses"
   },
   "bag-shake-b": {
@@ -488,6 +519,7 @@
    "target": "games/cauldron-fair/media/poses/bag-shake-b.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bag",
    "tag": "poses"
   },
   "bag-open": {
@@ -502,6 +534,7 @@
    "target": "games/cauldron-fair/media/poses/bag-open.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bag",
    "tag": "poses"
   },
   "bag-empty": {
@@ -516,6 +549,7 @@
    "target": "games/cauldron-fair/media/poses/bag-empty.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "bag",
    "tag": "poses"
   },
   "cauldron-simmer": {
@@ -530,6 +564,7 @@
    "target": "games/cauldron-fair/media/poses/cauldron-simmer.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cauldron",
    "tag": "poses"
   },
   "cauldron-bubble": {
@@ -544,6 +579,7 @@
    "target": "games/cauldron-fair/media/poses/cauldron-bubble.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cauldron",
    "tag": "poses"
   },
   "cauldron-boil-over": {
@@ -558,6 +594,7 @@
    "target": "games/cauldron-fair/media/poses/cauldron-boil-over.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cauldron",
    "tag": "poses"
   },
   "cauldron-boom": {
@@ -572,6 +609,7 @@
    "target": "games/cauldron-fair/media/poses/cauldron-boom.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "cauldron",
    "tag": "poses"
   }
  }

@@ -110,7 +110,7 @@ def build():
                 for k, ph in enumerate(W.NIGHTRUN_ATK_MISSING.get(cid, []), 1): lst.append((f'atk{k}', 'attack frame ' + str(k) + ' of 4, ' + ph, 1))
                 for pid, ph, pri in lst:
                     p = pose_prompt(kind, desc, ph, bgs)
-                    G[slug]['poses'].append(dict(stem=f'{cid}-{pid}', prompt=p, element=f'{name}: {pid} frame', why='Boss frames: same camera, scale and centre as the existing idle and attack stills', pri=pri,
+                    G[slug]['poses'].append(dict(group=cid, stem=f'{cid}-{pid}', prompt=p, element=f'{name}: {pid} frame', why='Boss frames: same camera, scale and centre as the existing idle and attack stills', pri=pri,
                                                  ref=still if os.path.exists(still) else 'games/' + ref, thumb=ref_url(ref), bg='magenta' if magenta else 'green', align=align,
                                                  save_as=f'{cid}-{pid}.png', target=f'games/{slug}/media/poses/{cid}-{pid}.webp', size='1024x1024', ratio='1:1'))
                 continue
@@ -122,7 +122,7 @@ def build():
                 if pid == 'attack': phrase = f'{act} (the signature attack)' if kind != 'bu' else act
                 p = pose_prompt(kind, desc, phrase, bgs)
                 n = len([1 for q in lst])
-                G[slug]['poses'].append(dict(stem=f'{cid}-{pid}', prompt=p, element=f'{name}: {pid} {"expression" if kind == "bu" else "pose"}',
+                G[slug]['poses'].append(dict(group=cid, stem=f'{cid}-{pid}', prompt=p, element=f'{name}: {pid} {"expression" if kind == "bu" else "pose"}',
                                              why=f'Set of {n} for {cid}: same description, camera, scale and {"framing" if kind == "bu" else "feet line"} as its other poses', pri=pr_,
                                              ref='games/' + ref if ref else '', thumb=ref_url(ref), bg='magenta' if magenta else 'green', align=align,
                                              save_as=f'{cid}-{pid}.png', target=f'games/{slug}/media/poses/{cid}-{pid}.webp', size='1024x1024', ratio='1:1'))
@@ -135,7 +135,7 @@ def build():
             for pid, ph in poses:
                 p = (f'{desc}. State: {ph}. Whole object visible, centred, front three-quarter view, the same camera distance, the same scale and the same baseline in every state of this object, '
                      f'{"same object exactly as the reference painting; " if ref else ""}reuse this exact description and the same seed for every state. {bgs[0].upper() + bgs[1:]}. {NOTXT}')
-                G[slug]['poses'].append(dict(stem=f'{oid}-{pid}', prompt=p, element=f'{nm(desc) if ":" in desc else oid}: {pid} state', why=f'State set for {oid}: same camera, scale and baseline',
+                G[slug]['poses'].append(dict(group=oid, stem=f'{oid}-{pid}', prompt=p, element=f'{nm(desc) if ":" in desc else oid}: {pid} state', why=f'State set for {oid}: same camera, scale and baseline',
                                              pri=pri, ref='games/' + ref if ref else '', thumb=ref_url(ref), bg='magenta' if magenta else 'green', align='feet' if fb == 'fb' else 'centre',
                                              save_as=f'{oid}-{pid}.png', target=f'games/{slug}/media/poses/{oid}-{pid}.webp', size='1024x1024', ratio='1:1'))
     for slug, ships in [('mainhattan-nightrun', W.NIGHTRUN_SHIPS)]:
@@ -144,7 +144,7 @@ def build():
                 p = (f'{desc}, seen from above and slightly behind. State: {ph}. Whole ship visible, centred, the same camera distance and scale in every state of this ship, '
                      f'same ship as the reference painting; reuse this exact description and the same seed for every state. {GREEN[0].upper() + GREEN[1:]}. {NOTXT}')
                 ref = f'mainhattan-nightrun/media/ship-{sid}.webp'
-                G[slug]['poses'].append(dict(stem=f'ship-{sid}-{pid}', prompt=p, element=f'{sid} ship: {pid} state', why='Player ship states: same camera, scale and centre', pri=2, ref='games/' + ref,
+                G[slug]['poses'].append(dict(group=f'ship-{sid}', stem=f'ship-{sid}-{pid}', prompt=p, element=f'{sid} ship: {pid} state', why='Player ship states: same camera, scale and centre', pri=2, ref='games/' + ref,
                                              thumb=ref_url(ref), bg='green', align='centre', save_as=f'ship-{sid}-{pid}.png', target=f'games/{slug}/media/poses/ship-{sid}-{pid}.webp', size='1024x1024', ratio='1:1'))
     # ---------------- 3D variety
     for slug, items in W.D3.items():
@@ -179,6 +179,7 @@ def write(G, titles):
             by = collections.defaultdict(dict)
             for it in g[kind]:
                 meta = {k: it[k] for k in ('element', 'why', 'pri', 'ref', 'thumb', 'bg', 'align', 'save_as', 'target', 'size', 'ratio')}
+                if it.get('group'): meta['group'] = it['group']
                 meta['tag'] = tag
                 if kind == 'poses': name = f'wave7-poses'
                 elif kind == 'd3': name = 'wave7-3d'

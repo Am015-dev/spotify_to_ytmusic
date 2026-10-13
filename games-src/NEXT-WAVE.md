@@ -9,6 +9,8 @@ Generated 2026-10-13 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 
 **Total 26**: paintings 17, 3D source paintings 0, music/sound 8, video 1.
 
+Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
+
 Dropped as already done: 3 family already made, 283 made (finished card), 8 replaced by approved 3D model, 1 named in game code, 13 pattern already made, 9 kit/family made, 1 kit made, 8 stale.
 
 ## Doorkick Dungeon (`doorkick-dungeon`): 9

@@ -63,6 +63,7 @@
    "target": "games/rampart-and-vine/media/poses/quill-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-taunt": {
@@ -77,6 +78,7 @@
    "target": "games/rampart-and-vine/media/poses/quill-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-praise": {
@@ -91,6 +93,7 @@
    "target": "games/rampart-and-vine/media/poses/quill-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-shock": {
@@ -105,6 +108,7 @@
    "target": "games/rampart-and-vine/media/poses/quill-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-win": {
@@ -119,6 +123,7 @@
    "target": "games/rampart-and-vine/media/poses/quill-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "quill-lose": {
@@ -133,6 +138,7 @@
    "target": "games/rampart-and-vine/media/poses/quill-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "quill",
    "tag": "poses"
   },
   "ostrand-idle": {
@@ -147,6 +153,7 @@
    "target": "games/rampart-and-vine/media/poses/ostrand-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ostrand",
    "tag": "poses"
   },
   "ostrand-taunt": {
@@ -161,6 +168,7 @@
    "target": "games/rampart-and-vine/media/poses/ostrand-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ostrand",
    "tag": "poses"
   },
   "ostrand-praise": {
@@ -175,6 +183,7 @@
    "target": "games/rampart-and-vine/media/poses/ostrand-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ostrand",
    "tag": "poses"
   },
   "ostrand-shock": {
@@ -189,6 +198,7 @@
    "target": "games/rampart-and-vine/media/poses/ostrand-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ostrand",
    "tag": "poses"
   },
   "ostrand-win": {
@@ -203,6 +213,7 @@
    "target": "games/rampart-and-vine/media/poses/ostrand-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ostrand",
    "tag": "poses"
   },
   "ostrand-lose": {
@@ -217,6 +228,7 @@
    "target": "games/rampart-and-vine/media/poses/ostrand-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ostrand",
    "tag": "poses"
   },
   "baron-idle": {
@@ -231,6 +243,7 @@
    "target": "games/rampart-and-vine/media/poses/baron-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "baron",
    "tag": "poses"
   },
   "baron-taunt": {
@@ -245,6 +258,7 @@
    "target": "games/rampart-and-vine/media/poses/baron-taunt.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "baron",
    "tag": "poses"
   },
   "baron-praise": {
@@ -259,6 +273,7 @@
    "target": "games/rampart-and-vine/media/poses/baron-praise.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "baron",
    "tag": "poses"
   },
   "baron-shock": {
@@ -273,6 +288,7 @@
    "target": "games/rampart-and-vine/media/poses/baron-shock.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "baron",
    "tag": "poses"
   },
   "baron-win": {
@@ -287,6 +303,7 @@
    "target": "games/rampart-and-vine/media/poses/baron-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "baron",
    "tag": "poses"
   },
   "baron-lose": {
@@ -301,6 +318,7 @@
    "target": "games/rampart-and-vine/media/poses/baron-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "baron",
    "tag": "poses"
   },
   "tamsin-idle": {
@@ -315,6 +333,7 @@
    "target": "games/rampart-and-vine/media/poses/tamsin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-talk": {
@@ -329,6 +348,7 @@
    "target": "games/rampart-and-vine/media/poses/tamsin-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-win": {
@@ -343,6 +363,7 @@
    "target": "games/rampart-and-vine/media/poses/tamsin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "tamsin-lose": {
@@ -357,6 +378,7 @@
    "target": "games/rampart-and-vine/media/poses/tamsin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "tamsin",
    "tag": "poses"
   },
   "garnet-idle": {
@@ -371,6 +393,7 @@
    "target": "games/rampart-and-vine/media/poses/garnet-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-talk": {
@@ -385,6 +408,7 @@
    "target": "games/rampart-and-vine/media/poses/garnet-talk.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-win": {
@@ -399,6 +423,7 @@
    "target": "games/rampart-and-vine/media/poses/garnet-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "garnet-lose": {
@@ -413,6 +438,7 @@
    "target": "games/rampart-and-vine/media/poses/garnet-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "garnet",
    "tag": "poses"
   },
   "hob-idle": {
@@ -427,6 +453,7 @@
    "target": "games/rampart-and-vine/media/poses/hob-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hob",
    "tag": "poses"
   },
   "hob-win": {
@@ -441,6 +468,7 @@
    "target": "games/rampart-and-vine/media/poses/hob-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hob",
    "tag": "poses"
   },
   "hob-lose": {
@@ -455,6 +483,7 @@
    "target": "games/rampart-and-vine/media/poses/hob-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "hob",
    "tag": "poses"
   },
   "wren-idle": {
@@ -469,6 +498,7 @@
    "target": "games/rampart-and-vine/media/poses/wren-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wren",
    "tag": "poses"
   },
   "wren-win": {
@@ -483,6 +513,7 @@
    "target": "games/rampart-and-vine/media/poses/wren-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wren",
    "tag": "poses"
   },
   "wren-lose": {
@@ -497,6 +528,7 @@
    "target": "games/rampart-and-vine/media/poses/wren-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "wren",
    "tag": "poses"
   },
   "mabry-idle": {
@@ -511,6 +543,7 @@
    "target": "games/rampart-and-vine/media/poses/mabry-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mabry",
    "tag": "poses"
   },
   "mabry-win": {
@@ -525,6 +558,7 @@
    "target": "games/rampart-and-vine/media/poses/mabry-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mabry",
    "tag": "poses"
   },
   "mabry-lose": {
@@ -539,6 +573,7 @@
    "target": "games/rampart-and-vine/media/poses/mabry-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "mabry",
    "tag": "poses"
   },
   "ferro-idle": {
@@ -553,6 +588,7 @@
    "target": "games/rampart-and-vine/media/poses/ferro-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ferro",
    "tag": "poses"
   },
   "ferro-win": {
@@ -567,6 +603,7 @@
    "target": "games/rampart-and-vine/media/poses/ferro-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ferro",
    "tag": "poses"
   },
   "ferro-lose": {
@@ -581,6 +618,7 @@
    "target": "games/rampart-and-vine/media/poses/ferro-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "ferro",
    "tag": "poses"
   },
   "dulcie-idle": {
@@ -595,6 +633,7 @@
    "target": "games/rampart-and-vine/media/poses/dulcie-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dulcie",
    "tag": "poses"
   },
   "dulcie-win": {
@@ -609,6 +648,7 @@
    "target": "games/rampart-and-vine/media/poses/dulcie-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dulcie",
    "tag": "poses"
   },
   "dulcie-lose": {
@@ -623,6 +663,7 @@
    "target": "games/rampart-and-vine/media/poses/dulcie-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "dulcie",
    "tag": "poses"
   },
   "isolde-idle": {
@@ -637,6 +678,7 @@
    "target": "games/rampart-and-vine/media/poses/isolde-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "isolde",
    "tag": "poses"
   },
   "isolde-win": {
@@ -651,6 +693,7 @@
    "target": "games/rampart-and-vine/media/poses/isolde-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "isolde",
    "tag": "poses"
   },
   "isolde-lose": {
@@ -665,6 +708,7 @@
    "target": "games/rampart-and-vine/media/poses/isolde-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "isolde",
    "tag": "poses"
   },
   "corvin-idle": {
@@ -679,6 +723,7 @@
    "target": "games/rampart-and-vine/media/poses/corvin-idle.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "corvin",
    "tag": "poses"
   },
   "corvin-win": {
@@ -693,6 +738,7 @@
    "target": "games/rampart-and-vine/media/poses/corvin-win.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "corvin",
    "tag": "poses"
   },
   "corvin-lose": {
@@ -707,6 +753,7 @@
    "target": "games/rampart-and-vine/media/poses/corvin-lose.webp",
    "size": "1024x1024",
    "ratio": "1:1",
+   "group": "corvin",
    "tag": "poses"
   }
  }
