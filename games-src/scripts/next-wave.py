@@ -12,6 +12,10 @@ Sources, deduped by game + file stem:
   3. games/look/needs-art.json     from the look-check reviewer (game, element, target_px, ratio, transparent, screen, crop).
                                    Optional: a missing file just means no look-check items yet.
 
+  4. games-src/next-wave/flow-2d|flow-3d/<slug>/prompts-wave7-*.json   (made by make-wave7.py): pose sets, 3D variety and art variety, each card
+                                   with a "meta" block. They show on the page grouped by game with the tags Poses, 3D variety, Art variety
+                                   and are NOT rewritten into the wave6 files, NOT counted in games/status.json and NOT listed in NEXT-WAVE.md.
+
 Writes
   games-src/next-wave/flow-2d/<slug>/prompts-wave6[-wide|-43|-34|-tall].json   laptop prompt files ({"cards": {name: prompt}},
         same schema and folder layout as game-assets/flow-2d; copy the next-wave/flow-2d and flow-3d folders into game-assets)
@@ -311,6 +315,34 @@ def from_lookcheck(styles, titles):
                           screen=str(r.get('screen') or '')))
     return items, True
 
+# ---------------------------------------------------------------- source 4: wave 7 (poses, 3D variety, art variety)
+W7_NOTE = {'poses': 'Pose set: reuse the reference painting and the same seed; flat chroma background; then cutout.py keys and aligns the set.',
+           '3d': 'Full-detail glb only (the lite copy is made by us). Light-grey background on purpose.',
+           'art': ''}
+def from_wave7(titles):
+    import glob
+    items = []
+    for f in sorted(glob.glob('games-src/next-wave/flow-2d/*/prompts-wave7-*.json') + glob.glob('games-src/next-wave/flow-3d/*/prompts-wave7-*.json')):
+        slug = f.split('/')[-2]
+        if slug not in titles: continue
+        try: d = json.load(open(f, encoding='utf-8'))
+        except ValueError: continue
+        meta = d.get('meta', {})
+        for name, prompt in d.get('cards', {}).items():
+            m = meta.get(name)
+            if not m: continue
+            tag = m.get('tag', 'art')
+            note = W7_NOTE.get(tag, '')
+            if m.get('ref'): note = f"Reference painting: {m['ref']}. " + note
+            if tag == 'poses':
+                ch = m.get('group') or name.rsplit('-', 1)[0]
+                note += f" Then: python3 games-src/scripts/cutout.py {ch}-*.png --out games/{slug}/media/poses --size 512 --align {m.get('align') or 'feet'}"
+            items.append(dict(slug=slug, game=titles[slug], kind='model3d' if tag == '3d' else 'art', stem=name, element=m.get('element', name), files=[m.get('save_as', name + '.png')],
+                              save_as=m.get('save_as', name + '.png'), repo_target=m.get('target', ''), size=m.get('size', ''), ratio=m.get('ratio', '1:1'), transparent=False,
+                              prompt=prompt, style=d.get('style', ''), why=m.get('why', ''), source='wave7', priority=3 + int(m.get('pri', 3)), note=note.strip(),
+                              crop=m.get('thumb', ''), tag=tag, bg=m.get('bg', ''), align=m.get('align', '')))
+    return items
+
 # ---------------------------------------------------------------- build
 def main():
     shelf = [g for g in GS.shelf_games() if g['slug'] != 'mainhattan-overdrive']  # Overdrive: other sessions own it
@@ -327,10 +359,12 @@ def main():
             all_items += it; drops.update(dr)
     lc, have_lc = from_lookcheck(styles, titles)
     all_items += lc
+    w7 = from_wave7(titles)
+    all_items += w7
     # dedupe by game + stem: keep the highest priority, remember every source
     merged = {}
     for it in all_items:
-        k = (it['slug'], it['stem'], 'music' if it['kind'] == 'music' else 'pic')
+        k = (it['slug'], it['stem'], 'w7' if it.get('tag') else 'music' if it['kind'] == 'music' else 'pic')
         if k in merged:
             a = merged[k]
             a['sources'] = sorted(set(a['sources']) | {it['source']})
@@ -340,11 +374,13 @@ def main():
             if not merged[k].get('crop') and it.get('crop'): merged[k]['crop'] = it['crop']
         else:
             it['sources'] = [it['source']]; merged[k] = it
-    items = sorted(merged.values(), key=lambda x: (x['slug'], x['priority'], {'art': 0, 'model3d': 1, 'video': 2, 'music': 3}[x['kind']], x['element'], x['stem']))
+    items = sorted(merged.values(), key=lambda x: (x['slug'], x['priority'], {'': 0, 'poses': 1, '3d': 2, 'art': 3}[x.get('tag', '')], {'art': 0, 'model3d': 1, 'video': 2, 'music': 3}[x['kind']], x['element'], x['stem']))
     for it in items:
         it['id'] = f"{it['slug']}:{it['stem']}"
         it['ratio_flow'] = flow_ratio(it['ratio']) if it['kind'] in ('art', 'model3d') else ''
         pr = it['prompt']
+        if it.get('tag'):                      # wave 7: the prompt carries its own background wording (chroma colour or light grey)
+            it['full_prompt'] = join_style(it['style'], pr); continue
         if it['kind'] == 'music':
             it['full_prompt'] = pr + ('' if 'no vocals' in pr.lower() else ' No vocals.') + ' Make 2 versions (a and b).'
             continue
@@ -353,17 +389,20 @@ def main():
         if 'no text' not in pr: pr += ', no text, letters or numbers'
         it['prompt'] = pr
         it['full_prompt'] = join_style(it['style'], pr)
-    write_json_files(items)
-    write_md(items, titles, have_lc, drops)
+    write_json_files([it for it in items if not it.get('tag')])
+    write_md([it for it in items if not it.get('tag')], titles, have_lc, drops, len(w7))
     write_html(items, titles, have_lc)
     json.dump(dict(generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), lookcheck=have_lc,
-                   items=[{k: v for k, v in it.items() if k in ('id', 'slug', 'kind', 'priority', 'stem')} for it in items]),
+                   items=[{k: v for k, v in it.items() if k in ('id', 'slug', 'kind', 'priority', 'stem', 'tag')} for it in items]),
               open('games/next-wave.json', 'w', encoding='utf-8'), separators=(',', ':'))
     subprocess.run([sys.executable, 'games-src/scripts/game-status.py'], stdout=subprocess.DEVNULL)
-    cnt = collections.Counter(it['kind'] for it in items)
-    print(f"next wave: {len(items)} items  paintings {cnt['art']}  music {cnt['music']}  3D {cnt['model3d']}  video {cnt['video']}  look-check file: {'yes' if have_lc else 'no'}")
+    core = [it for it in items if not it.get('tag')]
+    cnt = collections.Counter(it['kind'] for it in core)
+    wc = collections.Counter(it.get('tag') for it in items if it.get('tag'))
+    print(f"wave 7 (poses/3D/art variety): {dict(wc)}")
+    print(f"next wave: {len(core)} items  paintings {cnt['art']}  music {cnt['music']}  3D {cnt['model3d']}  video {cnt['video']}  look-check file: {'yes' if have_lc else 'no'}")
     per = collections.defaultdict(collections.Counter)
-    for it in items: per[it['slug']][it['kind']] += 1
+    for it in core: per[it['slug']][it['kind']] += 1
     for s, c in per.items(): print(f"  {s:20} paintings {c['art']:3} music {c['music']:3} 3D {c['model3d']:3} video {c['video']}")
     print('  dropped as done:', dict(drops))
 
@@ -389,8 +428,8 @@ def write_json_files(items):
         with open(os.path.join(d, name), 'w', encoding='utf-8') as f: json.dump(doc, f, ensure_ascii=False, indent=1); f.write('\n')
 
 KIND_LABEL = {'art': 'painting', 'music': 'music', 'model3d': '3D source painting', 'video': 'video'}
-SRC_LABEL = {'lookcheck': 'look-check finding', 'facelift': 'facelift', 'missing': 'missing'}
-def write_md(items, titles, have_lc, drops):
+SRC_LABEL = {'lookcheck': 'look-check finding', 'facelift': 'facelift', 'missing': 'missing', 'wave7': 'wave 7 variety'}
+def write_md(items, titles, have_lc, drops, n7=0):
     L = ['# Next wave: everything still to make, with prompts', '',
          f'Generated {datetime.date.today().isoformat()} by `python3 games-src/scripts/next-wave.py` (rerun after look-check and wiring-status). Page: https://am015-dev.github.io/spotify_to_ytmusic/next-wave.html', '',
          '- Replaces `MISSING-ASSETS.md` as the to-make list. Same sources deduped by game + file name: missing items, facelift elements still plain, and the look-check reviewer\'s findings (`games/look/needs-art.json`'
@@ -400,6 +439,7 @@ def write_md(items, titles, have_lc, drops):
          '- Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.', '']
     cnt = collections.Counter(it['kind'] for it in items)
     L += [f"**Total {len(items)}**: paintings {cnt['art']}, 3D source paintings {cnt['model3d']}, music/sound {cnt['music']}, video {cnt['video']}.", '']
+    if n7: L += [f'Plus {n7} wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.', '']
     L += [f"Dropped as already done: {', '.join(f'{v} {k}' for k, v in drops.items()) or 'none'}.", '']
     cur = None
     for it in items:
@@ -425,7 +465,7 @@ def write_html(items, titles, have_lc):
         pub.append({k: hide(v) if isinstance(v, str) else v for k, v in dict(
             id=it['id'], slug=it['slug'], game=it['game'], kind=it['kind'], stem=it['stem'], element=it['element'], save_as=it['save_as'],
             size=it['size'], ratio=it['ratio'], transparent=it['transparent'], prompt=it['full_prompt'], why=it['why'], src=it['sources'][0],
-            pri=it['priority'], note=it['note'], crop=it.get('crop', '')).items()})
+            pri=it['priority'], note=it['note'], crop=it.get('crop', ''), tag=it.get('tag', ''), bg=it.get('bg', '')).items()})
     gen = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
     data = json.dumps(dict(generated=gen, lookcheck=have_lc, titles=titles, items=pub), ensure_ascii=False).replace('</', '<\\/')
     html = HTML.replace('__DATA__', data)
@@ -465,7 +505,7 @@ main{padding:12px 16px 40px;display:grid;gap:10px;max-width:1100px;margin:0 auto
 .it .hd b{font-size:14px;overflow-wrap:anywhere}
 .tag{font:600 10px system-ui;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);border-radius:4px;padding:1px 5px;white-space:nowrap}
 .tag.p1{color:var(--warn);border-color:var(--warn)}.tag.p2{color:var(--acc);border-color:var(--acc)}.tag.p3{color:var(--mut)}
-.tag.k{color:var(--blue);border-color:#3b4170}
+.tag.k{color:var(--blue);border-color:#3b4170}.tag.t{color:#7fd6c2;border-color:#2f6d62}.tag.p4{color:var(--acc);border-color:var(--acc)}.tag.p5{color:#d8c08a}.tag.p6{color:var(--mut)}
 .meta{font-size:12px;color:var(--mut);overflow-wrap:anywhere}.meta code{color:var(--fg);font:12px ui-monospace,Menlo,monospace}
 .why{font-size:13px;color:var(--mut);overflow-wrap:anywhere}
 .crop{max-width:100%;max-height:150px;border:1px solid var(--line);border-radius:6px;background:#0d0a07;justify-self:start}
@@ -477,16 +517,18 @@ main{padding:12px 16px 40px;display:grid;gap:10px;max-width:1100px;margin:0 auto
 </style></head><body>
 <header><h1>Next wave <small id="gen"></small><a class="r" href="status.html">Status</a><a href="index.html">&larr; Shelf</a></h1>
 <div class="counts" id="counts"></div>
-<div class="chips" role="group" aria-label="Filter"><button class="chip" data-f="todo" aria-pressed="true">To make</button><button class="chip" data-f="all" aria-pressed="false">All</button><button class="chip" data-f="done" aria-pressed="false">Made</button></div></header>
+<div class="chips" role="group" aria-label="Filter"><button class="chip" data-f="todo" aria-pressed="true">To make</button><button class="chip" data-f="all" aria-pressed="false">All</button><button class="chip" data-f="done" aria-pressed="false">Made</button></div>
+<div class="chips" role="group" aria-label="Type"><button class="chip" data-t="" aria-pressed="true">All types</button><button class="chip" data-t="core" aria-pressed="false">Missing &amp; facelift</button><button class="chip" data-t="poses" aria-pressed="false">Poses</button><button class="chip" data-t="3d" aria-pressed="false">3D variety</button><button class="chip" data-t="art" aria-pressed="false">Art variety</button></div></header>
 <main><p class="intro" id="intro"></p><div id="m"></div></main>
 <script id="data" type="application/json">__DATA__</script>
 <script>
 const D=JSON.parse(document.getElementById('data').textContent);
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const KEY='nextwave-made-v1';let made={},F='todo',closed={};
+const KEY='nextwave-made-v1';let made={},F='todo',T='',cur={},opened={};
+try{const h=location.hash.match(/^#g-([\w-]+)/);if(h)opened[h[1]]=true}catch(e){}
 try{made=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){made={}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(made))}catch(e){}}
-const KL={art:'painting',music:'music',model3d:'3D painting',video:'video'},PL={1:'look-check',2:'facelift',3:'missing'};
+const KL={art:'painting',music:'music',model3d:'3D painting',video:'video'},PL={1:'look-check',2:'facelift',3:'missing',4:'top pick',5:'next',6:'later'},TL={poses:'Poses','3d':'3D variety',art:'Art variety'};
 function copy(text,btn){
   const ok=()=>{const o=btn.dataset.l||btn.textContent;btn.dataset.l=o;btn.textContent='Copied';btn.classList.add('on');setTimeout(()=>{btn.textContent=o;btn.classList.remove('on')},1400)};
   const fb=()=>{const t=document.createElement('textarea');t.value=text;t.style.cssText='position:fixed;left:-999px;top:0';document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();ok()};
@@ -494,12 +536,23 @@ function copy(text,btn){
 }
 function lineOf(it){return '## '+it.stem+' ('+it.save_as+(it.size?', '+it.size:'')+(it.ratio?', '+it.ratio:'')+(it.transparent?', transparent':'')+')\n'+it.prompt}
 function counts(){
-  const L=D.items,todo=L.filter(i=>!made[i.id]),c=k=>todo.filter(i=>i.kind===k).length;
-  $('#counts').innerHTML=`<span>To make <b>${todo.length}</b></span><span>Paintings <b>${c('art')}</b></span><span>Music <b>${c('music')}</b></span><span>3D <b>${c('model3d')}</b></span>`+(c('video')?`<span>Video <b>${c('video')}</b></span>`:'')+`<span>Made <b>${L.length-todo.length}</b></span>`;
+  const L=D.items,todo=L.filter(i=>!made[i.id]),core=todo.filter(i=>!i.tag),c=k=>core.filter(i=>i.kind===k).length,t=k=>todo.filter(i=>i.tag===k).length;
+  $('#counts').innerHTML=`<span>To make <b>${core.length}</b></span><span>Paintings <b>${c('art')}</b></span><span>Music <b>${c('music')}</b></span><span>3D <b>${c('model3d')}</b></span>`+(c('video')?`<span>Video <b>${c('video')}</b></span>`:'')+(t('poses')+t('3d')+t('art')?`<span>Poses <b>${t('poses')}</b></span><span>3D variety <b>${t('3d')}</b></span><span>Art variety <b>${t('art')}</b></span>`:'')+`<span>Made <b>${L.length-todo.length}</b></span>`;
+}
+const vis=i=>T===''||(T==='core'?!i.tag:i.tag===T);
+const BG={green:'flat chroma green #00FF00 background',magenta:'flat chroma magenta #FF00FF background',grey:'light-grey background (3D source)'};
+function itemHTML(i){
+  return `<div class="it${made[i.id]?' done':''}" data-id="${esc(i.id)}"><div class="hd"><span class="tag p${i.pri}">${i.src==='lookcheck'?'look-check':PL[i.pri]}</span><span class="tag ${i.tag?'t':'k'}">${i.tag?TL[i.tag]:KL[i.kind]}</span><b>${esc(i.stem)}</b></div>
+        <div class="why">${esc(i.element)} &middot; ${esc(i.why)}</div>
+        ${i.crop?`<img class="crop" loading="lazy" src="${esc(i.crop)}" alt="Reference picture" onerror="this.remove()">`:''}
+        <div class="meta">Save as <code>${esc(i.save_as)}</code>${i.size?' &middot; '+esc(i.size)+(i.kind==='music'?'':' px'):''}${i.ratio?' &middot; ratio '+esc(i.ratio):''}${i.transparent?' &middot; flat white background':''}${i.bg?' &middot; '+esc(BG[i.bg]||i.bg):''}</div>
+        ${i.note?`<div class="meta">${esc(i.note)}</div>`:''}
+        <pre class="pr">${esc(i.prompt)}</pre>
+        <div class="row"><button class="btn" data-copy="${esc(i.id)}">Copy prompt</button><label><input type="checkbox" data-made="${esc(i.id)}"${made[i.id]?' checked':''}> &#10003; Made</label></div></div>`;
 }
 function draw(){
   counts();
-  const by={};D.items.forEach(i=>{(by[i.slug]=by[i.slug]||[]).push(i)});
+  const by={};D.items.filter(vis).forEach(i=>{(by[i.slug]=by[i.slug]||[]).push(i)});
   let slugs=Object.keys(by).sort((a,b)=>{const pa=Math.min(...by[a].filter(i=>!made[i.id]).map(i=>i.pri),9),pb=Math.min(...by[b].filter(i=>!made[i.id]).map(i=>i.pri),9);return pa-pb||by[b].length-by[a].length||D.titles[a].localeCompare(D.titles[b])});
   let html='';
   slugs.forEach(s=>{
@@ -507,29 +560,23 @@ function draw(){
     const todo=L.filter(i=>!made[i.id]);
     if(F==='todo')L=todo;else if(F==='done')L=L.filter(i=>made[i.id]);
     if(!L.length)return;
-    const mix=['art','model3d','music','video'].map(k=>[k,todo.filter(i=>i.kind===k).length]).filter(x=>x[1]).map(x=>x[1]+' '+KL[x[0]]).join(', ');
-    const style=(L.find(i=>i.kind==='art'&&i.prompt)||{}).prompt;
-    html+=`<details class="g" id="g-${s}" data-s="${s}"${closed[s]?'':' open'}><summary><h2>${esc(D.titles[s])}</h2><span class="n">${todo.length} to make</span><span class="mix">${esc(mix)}</span><button class="btn" data-all="${s}">Copy all for this game</button></summary><div class="list">`+
-      L.map(i=>`<div class="it${made[i.id]?' done':''}" data-id="${esc(i.id)}"><div class="hd"><span class="tag p${i.pri}">${i.src==='lookcheck'?'look-check':PL[i.pri]}</span><span class="tag k">${KL[i.kind]}</span><b>${esc(i.stem)}</b></div>
-        <div class="why">${esc(i.element)} &middot; ${esc(i.why)}</div>
-        ${i.crop?`<img class="crop" loading="lazy" src="${esc(i.crop)}" alt="Crop from the game screen" onerror="this.remove()">`:''}
-        <div class="meta">Save as <code>${esc(i.save_as)}</code>${i.size?' &middot; '+esc(i.size)+(i.kind==='music'?'':' px'):''}${i.ratio?' &middot; ratio '+esc(i.ratio):''}${i.transparent?' &middot; flat white background':''}</div>
-        ${i.note?`<div class="meta">${esc(i.note)}</div>`:''}
-        <pre class="pr">${esc(i.prompt)}</pre>
-        <div class="row"><button class="btn" data-copy="${esc(i.id)}">Copy prompt</button><label><input type="checkbox" data-made="${esc(i.id)}"${made[i.id]?' checked':''}> &#10003; Made</label></div></div>`).join('')+`</div></details>`;
+    const mix=['art','model3d','music','video'].map(k=>[k,todo.filter(i=>!i.tag&&i.kind===k).length]).filter(x=>x[1]).map(x=>x[1]+' '+KL[x[0]]).concat(['poses','3d','art'].map(k=>[k,todo.filter(i=>i.tag===k).length]).filter(x=>x[1]).map(x=>x[1]+' '+TL[x[0]].replace(/^[^3]/,c=>c.toLowerCase()))).join(', ');
+    cur[s]=L;const isOpen=opened[s]!==undefined?opened[s]:L.length<=24;
+    html+=`<details class="g" id="g-${s}" data-s="${s}" data-def="${isOpen?1:0}"${isOpen?' open':''}><summary><h2>${esc(D.titles[s])}</h2><span class="n">${todo.length} to make</span><span class="mix">${esc(mix)}</span><button class="btn" data-all="${s}">Copy all for this game</button></summary><div class="list" data-lz="${isOpen?0:1}">`+(isOpen?L.map(itemHTML).join(''):'')+`</div></details>`;
   });
   $('#m').innerHTML=html||'<div class="empty">Nothing here.</div>';
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.copy){const it=D.items.find(i=>i.id===b.dataset.copy);if(it)copy(it.prompt,b)}
-  if(b.dataset.all){const L=D.items.filter(i=>i.slug===b.dataset.all&&!made[i.id]);copy(L.map(lineOf).join('\n\n'),b)}
-  if(b.classList.contains('chip')){F=b.dataset.f;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()}
+  if(b.dataset.all){const L=D.items.filter(i=>i.slug===b.dataset.all&&!made[i.id]&&vis(i));copy(L.map(lineOf).join('\n\n'),b)}
+  if(b.dataset.f!==undefined&&b.classList.contains('chip')){F=b.dataset.f;document.querySelectorAll('.chip[data-f]').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()}
+  if(b.dataset.t!==undefined&&b.classList.contains('chip')){T=b.dataset.t;document.querySelectorAll('.chip[data-t]').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()}
 });
-document.addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.s){if(d.open)delete closed[d.dataset.s];else closed[d.dataset.s]=1}},true);
+document.addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.s){if(d.open!==(d.dataset.def==='1'))opened[d.dataset.s]=d.open;else delete opened[d.dataset.s];const l=d.querySelector('.list');if(d.open&&l&&l.dataset.lz==='1'){l.dataset.lz='0';l.innerHTML=(cur[d.dataset.s]||[]).map(itemHTML).join('')}}},true);
 document.addEventListener('change',e=>{const c=e.target.closest('input[data-made]');if(!c)return;if(c.checked)made[c.dataset.made]=1;else delete made[c.dataset.made];save();draw()});
 $('#gen').textContent='as of '+D.generated;
-$('#intro').innerHTML='One list of everything still to make, deduped. Paste a prompt into the picture or music tool, save the file under the name shown, tick Made. Replaces <a href="missing.html">Missing assets</a>.'+(D.lookcheck?'':' Look-check findings are not in yet.');
+$('#intro').innerHTML='One list of everything still to make, deduped. Paste a prompt into the picture or music tool, save the file under the name shown, tick Made. Replaces <a href="missing.html">Missing assets</a>.'+(D.items.some(i=>i.tag)?' <b>Poses</b>, <b>3D variety</b> and <b>Art variety</b> are optional extras that make the games richer: pose sets are painted on a flat chroma colour so they can be cut out cleanly and keep one feet line; 3D items are source paintings for the 3D step. Top picks first.':'')+(D.lookcheck?'':' Look-check findings are not in yet.');
 draw();
 </script></body></html>
 '''

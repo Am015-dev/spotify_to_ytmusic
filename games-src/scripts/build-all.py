@@ -6,7 +6,7 @@
   python3 games-src/scripts/build-all.py --out /tmp/stage sunglaze
   python3 games-src/scripts/build-all.py --deploy sunglaze  # also copy PASSING games into games/<slug>/index.html
   python3 games-src/scripts/build-all.py --deploy --suffix -next sunglaze   # preview: games/<slug>-next/
-Other flags: --no-check (skip phone-check), --list (print the table and exit).
+Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
 Nothing is written under games/ unless --deploy is given. No AI is used.
@@ -43,6 +43,7 @@ def main():
     ap.add_argument("--deploy", action="store_true", help="copy PASSING games into games/<slug><suffix>/index.html")
     ap.add_argument("--suffix", default="", help='deploy folder suffix, e.g. "-next" for a preview')
     ap.add_argument("--no-check", action="store_true", help="skip phone-check (build + stamp only)")
+    ap.add_argument("--no-look", action="store_true", help="skip the look check gate (new severe visual findings block --deploy)")
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args()
     if a.list:
@@ -96,6 +97,19 @@ def main():
                 else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
     else:
         for s in ok: status[s] = "PASS" if a.no_check else status[s]
+
+    if a.deploy and not a.no_look:  # 3b. look check: only NEW severe visual findings vs games-src/look-baseline.json block the deploy
+        env = dict(os.environ); env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
+        for s in [x for x in slugs if status[x] == "PASS"]:
+            try:
+                r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"],
+                                   env=env, capture_output=True, text=True, timeout=900)
+                tail = [l for l in r.stdout.splitlines() if "[look]" in l and s in l]
+                if r.returncode == 1: status[s], why[s] = "FAIL", "look-check: " + (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                elif r.returncode != 0: print(f"[look] {s}: look-check crashed, report-only ({r.stderr.strip()[-80:]})")
+                else: print(f"[look] {s}: {tail[-1].split('] ', 1)[-1] if tail else 'ok'}")
+            except Exception as e:
+                print(f"[look] {s}: skipped ({e})")
 
     deployed = []
     if a.deploy:  # 4. copy only passing games into games/

@@ -1,0 +1,113 @@
+{
+ "cards": {
+  "event-boom-a": "a cartoon cauldron exploding in a huge puff of purple and gold smoke with flying chips and a startled fair crowd, no text, letters or numbers",
+  "event-boom-b": "a cartoon cauldron overflowing with foaming green brew and sparks, bubbles bursting, comic, no text, letters or numbers",
+  "event-boom-c": "a cartoon cauldron lid flying off into the night sky with a rain of glittering chips and confetti, no text, letters or numbers",
+  "end-win-b": "a fair crowd cheering around a golden ladle on a stage with confetti, no text, letters or numbers",
+  "end-win-c": "a happy brewer holding up a glowing potion under hanging lanterns, no text, letters or numbers",
+  "end-lose-b": "an empty fair stall at closing with a cold cauldron and a single lantern, no text, letters or numbers",
+  "end-lose-c": "a cracked cauldron with a drooping ribbon and rain, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "event-boom-a": {
+   "element": "Painting: event-boom-a",
+   "why": "a bust shows the same boom every time",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-boom-a.png",
+   "target": "games/cauldron-fair/media/event-boom-a.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "event-boom-b": {
+   "element": "Painting: event-boom-b",
+   "why": "boom variety",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-boom-b.png",
+   "target": "games/cauldron-fair/media/event-boom-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "event-boom-c": {
+   "element": "Painting: event-boom-c",
+   "why": "boom variety",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-boom-c.png",
+   "target": "games/cauldron-fair/media/event-boom-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-win-b": {
+   "element": "Painting: end-win-b",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-b.png",
+   "target": "games/cauldron-fair/media/end-win-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-win-c": {
+   "element": "Painting: end-win-c",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-c.png",
+   "target": "games/cauldron-fair/media/end-win-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-lose-b": {
+   "element": "Painting: end-lose-b",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-b.png",
+   "target": "games/cauldron-fair/media/end-lose-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  },
+  "end-lose-c": {
+   "element": "Painting: end-lose-c",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-c.png",
+   "target": "games/cauldron-fair/media/end-lose-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art"
+  }
+ }
+}

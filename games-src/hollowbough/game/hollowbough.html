@@ -6713,7 +6713,7 @@ function sceneEls(R) {
 // ---------------------------------------------------------------- pictures for the rules cards (the game's own art)
 const HPX = 46;
 const HP = {
-  res: r => ic(r, HPX), worker: () => pawn(0, HPX - 6), back: () => backEl(34), point: () => ic('point', HPX), road: () => ic('road', HPX),
+  res: r => HBKit.resource(r, HPX), worker: () => pawn(0, HPX - 6), back: () => backEl(34), point: () => ic('point', HPX), road: () => ic('road', HPX),
   flag: () => ic('flag', HPX), star: () => ic('star', HPX), haven: () => ic('haven', HPX), deck: () => ic('deck', HPX), tree: () => ic('tree', HPX),
   season: i => HBKit.season(SEAS[i], HPX + 4),
   cost: () => costEl({ twig: 2, berry: 1 }, 24),

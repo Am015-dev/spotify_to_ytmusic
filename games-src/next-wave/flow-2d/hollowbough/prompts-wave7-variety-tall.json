@@ -1,0 +1,38 @@
+{
+ "cards": {
+  "table-autumn-hollow-phone": "a tall painted tabletop seen from above: an autumn woodland floor with fallen leaves, acorns and moss, calm empty space in the middle, no text, letters or numbers",
+  "table-summer-brook-phone": "a tall painted tabletop seen from above: a sunny woodland brook bank with ferns and pebbles, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Hand-painted woodland gouache illustration for a cosy forest-critter game, warm autumn earth colours, soft rim light, matte paper texture, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-autumn-hollow-phone": {
+   "element": "Painting: table-autumn-hollow-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-autumn-hollow-phone.png",
+   "target": "games/hollowbough/media/table-autumn-hollow-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  },
+  "table-summer-brook-phone": {
+   "element": "Painting: table-summer-brook-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-summer-brook-phone.png",
+   "target": "games/hollowbough/media/table-summer-brook-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  }
+ }
+}

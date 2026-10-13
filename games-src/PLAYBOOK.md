@@ -4,6 +4,20 @@ Roles: **Orchestrator** = main model (plans, decides, deploys). **Worker** = Son
 Read root `CLAUDE.md` first (hard rules, cost rules). The live `games/<slug>/index.html` changes only after the owner OKs it;
 use `--suffix -next` for previews. Never touch Mainhattan / Overdrive; Ticket to Ride is on hold.
 
+## Fast delivery (owner, 13 Oct 2026: "better checklists and tests, less playing the game and waiting for hours")
+Every change, however small, ships as: **code + scenario + checklist item**, in that order, in one deploy.
+1. **Scenario first.** For each requirement in the brief, register a `?scn=<id>` scenario (`games-src/shell/gx-scenario.js`)
+   that builds that exact moment directly (no menus, no playing there) with an `ask` line (8 words or fewer) and machine
+   `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
+2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
+   sweep while iterating.
+3. **One full `--deploy` at the end** (the full sweep gate is unchanged). Small batches: 1-3 games per worker, deploy each
+   game as soon as it passes; never hold finished games back for the rest of a batch.
+4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
+   gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
+5. **Report** = before/after numbers + the scenario ids. No "play a few games to check" steps for the owner, ever.
+6. Hand off at ~250k context tokens; long sessions get slow and expensive.
+
 ## The tools (all scripts, no AI)
 - `python3 games-src/scripts/build-all.py [slugs] [--out DIR] [--no-check] [--deploy [--suffix -next]]`
   Builds each game with its own build.py, stages `<out>/<slug>/index.html` (default `games-src/.staging/`), stamps the
@@ -94,3 +108,18 @@ kot, xw, ft, carc, kaiten, final-approach, short-fuse, tidewake, hollowbough, la
 Do the migration as one worker per game (Sonnet), each followed by `build-all.py <slug>`; the games' own css/js stay as they are.
 
 - After a round with new screenshots, run `python3 games-src/scripts/shots-gallery.py`: it rebuilds games/shots.html, the owner's grid of every worker screenshot.
+
+## Look check (does it LOOK right? no AI)
+`games-src/scripts/look-check.js` opens every shelf game at 390x763, 375x553 (phone, 3x, touch) and 1366x768 (PC), on the start
+screen, the board, mid-game (a few taps on glowing targets), the Help panel and a card hold. It never plays a game. It reports
+text under 11 px (phone) / 12 px (PC), contrast under 3:1 measured against the real pixels behind the text, cut-off or overlapping
+text, failed fonts, buttons with no visible label / under 40 px / covered, broken, stretched, blurry or hard-cropped pictures,
+blank canvases, small boards, overlapping or spilling cards, sideways scroll and console errors. Every finding has a red-boxed crop.
+- Run: `NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/look-check.js [--game <slug>] [--sizes phone,small,pc]`
+  (one game takes about 100 s; run games one at a time). Output: `games/look/index.html`, `report.json`, `needs-art.json`
+  (findings only new art can fix: flat CSS plates, blurry or stretched pictures).
+- Gate: `build-all.py --deploy` runs `look-check.js --gate` on each passing game. Only NEW severe findings against
+  `games-src/look-baseline.json` block the deploy; everything else is report-only. Skip with `--no-look`.
+- After a real fix, re-save the baseline: `look-check.js --baseline --game <slug>`. Scene drivers live in
+  `games-src/scripts/look-scenes.json` (a copy of the ones in asset-viewer/screens.html).
+- An owner bug report about looks ("can't read it", "button has no label") goes into the fixer's brief first, then run the look check on that game.

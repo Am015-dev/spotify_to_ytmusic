@@ -1,0 +1,38 @@
+{
+ "cards": {
+  "table-moon-courtyard": "a wide painted tabletop seen from above: a moonlit tiled courtyard with a fountain edge and drifting petals, calm empty space in the middle for a game board, no text, letters or numbers",
+  "table-kiln-hall": "a wide painted tabletop seen from above: a warm workshop floor with kiln glow, clay dust and tile offcuts at the edges, calm empty space in the middle for a game board, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a glazed-tile mosaic workshop game, jewel-bright glaze colours, warm kiln glow, matte paper texture, slightly wobbly dark ink outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-moon-courtyard": {
+   "element": "Painting: table-moon-courtyard",
+   "why": "one table for ten chapters",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-moon-courtyard.png",
+   "target": "games/sunglaze/media/table-moon-courtyard.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  },
+  "table-kiln-hall": {
+   "element": "Painting: table-kiln-hall",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-kiln-hall.png",
+   "target": "games/sunglaze/media/table-kiln-hall.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  }
+ }
+}
