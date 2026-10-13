@@ -1,6 +1,6 @@
 
 /* ===== Nebula Aces skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons; html.sk-dark = light ink on dark glass) ===== */
-html.sk .btn:not(.sm):not(.ghost){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#161a2a;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
+html.sk .btn:not(.sm):not(.ghost){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#161a2a;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5));}
 html.sk .btn.primary:not(.sm){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.armed:not(.sm){border-image-source:url(media/ui-button-power-c.webp);color:#eaf0ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn:not(.sm):active{transform:translateY(2px)}

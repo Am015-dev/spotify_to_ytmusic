@@ -26,9 +26,23 @@ UIK.bossDraw=(e,nm,wd,by,tl,fl)=>{const A=UIK.boss[nm],sh=A&&ART.bm['anim-boss-'
   if(A.atk&&e.ph!==undefined&&(e.arm||e.fireT>0)){row=1;col=e.fireT>0?(e.fireT>.22?2:3):(PHF<.5?0:1);}      // wind-up on the beat before it fires, then the shot, then the recovery
   else col=[0,1,2,3,2,1][Math.floor(T*(A.atk?5:3.2))%6];
   if(e.labPose&&A.atk>=0){row=e.labPose[0];col=e.labPose[1];if(!A.atk)row=0;}                // LAB: a pose picked by hand
-  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}
+  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;
   const ctx_=ctx;ctx_.save();ctx_.translate(0,by);if(tl)ctx_.rotate(tl);ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);
   if(fl){ctx_.globalCompositeOperation='lighter';ctx_.globalAlpha=.4;ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);}
   ctx_.restore();return true;};
 // the sheet of a district's boss is fetched a few seconds after the district starts (never at the moment the boss arrives, never all ten at once)
 NR.on('tick',()=>{if(!G.live||G.di===UIK._di)return;UIK._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>ART.load('anim-boss-'+nm),3000);});
+
+/* ---------- boss movement by body: media/anim-boss.json "move" = ground (legs, wheels, tracks: walks / rolls on the road line, shadow under it, hops when it fires),
+   water (rides the water surface, ripples), air (flies, the old bob). Portrait is a view from above: there the sideways patrol stays, only the hover bob goes. ---------- */
+UIK.moveOf=e=>{const A=UIK.boss[ART.bossN[ART.artK(e)]];return A&&A.move||'air';};
+UIK.groundY=()=>{let y=H-70;if(G&&G.lab&&!rotMode&&labEl&&!labEl.hidden&&!LAB.min){const f=frame.getBoundingClientRect(),p=labEl.getBoundingClientRect();if(f.height>0&&p.height>0)y=Math.min(y,(p.top-f.top)/f.height*H-6);}return y;};   // the LAB panel covers the road: stand above it
+UIK.bossMove=(e,dt,mv)=>{const dh=e._dh||130;
+  if(e.x>bossX()){e.x-=110*dt;e.y=UIK.groundY()-dh/2;return;}
+  e.x=bossX()-34-34*Math.sin(e.t*(mv==='water'?.35:.5));                                   // patrols a short stretch, always left of its stop line
+  let hop=0;if(mv==='ground'&&e.fireT>0&&!e.labPose)hop=26*Math.sin(Math.PI*Math.min(1,e.fireT/.45));   // stomp-jump on the shot, back on the road
+  e.y=UIK.groundY()-dh/2-hop+(mv==='water'?Math.sin(e.t*1.3)*3:0);e.my=-dh*.12;};
+UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,y=dh/2+(mv==='water'?-1:3);ctx.save();
+  if(mv==='water'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const k=((e.t*.6+i/3)%1);ctx.globalAlpha=.5*(1-k);ctx.beginPath();ctx.ellipse(0,y,dw*(.45+.35*k),4+7*k,0,0,7);ctx.stroke();}}
+  else{const lift=e.y<UIK.groundY()-dh/2-2?.6:1;ctx.globalAlpha=.5*lift;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(0,y,dw*.5*(2-lift),6,0,0,7);ctx.fill();}   // the shadow stays on the road when it hops
+  ctx.restore();};

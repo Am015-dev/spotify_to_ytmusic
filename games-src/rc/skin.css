@@ -1,7 +1,7 @@
 
 /* ===== Shipwreck Isle skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons); this file holds the game's own buttons and icons ===== */
 html.sk{--sk-ink:#3a2410}
-html.sk .btn:not(.xs):not(.add):not(.opt):not(.sk),html.sk #modal .btn{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));justify-content:center;text-shadow:none}
+html.sk .btn:not(.xs):not(.add):not(.opt):not(.sk),html.sk #modal .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .btn.go:not(.xs){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn:not(.xs):not(.add):active{transform:translateY(2px)}
 html.sk .btn:disabled{opacity:.5}

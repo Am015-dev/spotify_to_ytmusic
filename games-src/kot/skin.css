@@ -8,7 +8,7 @@ html.sk .gx-drawer-head h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.7)}
 html.sk header.gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241048;border-bottom-color:transparent;box-shadow:0 3px 8px rgba(0,0,0,.5)}
 html.sk header.gx-bar::before{display:none}
 /* icon buttons: phone = round metal knobs, desktop = labelled power pills */
-html.sk header.gx-bar .gx-ibtn.btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#f6ecff;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk header.gx-bar .gx-ibtn.btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#f6ecff;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk header.gx-bar .gx-ibtn.btn:hover:not([disabled]){box-shadow:none;filter:drop-shadow(0 0 6px rgba(255,140,220,.8))}
 html.sk header.gx-bar .gx-ibtn[aria-expanded="true"]{background:none;box-shadow:none;filter:drop-shadow(0 0 7px #ffd36a)}
 html.sk.ph header.gx-bar .gx-ibtn.btn{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;width:44px;height:44px;color:#2a1650;text-shadow:none}
@@ -29,7 +29,7 @@ html.sk .gx-dock #prompt.box,html.sk .gx-dock #choice.box,html.sk .gx-dock #youb
 html.sk .gx-dock #prompt .box,html.sk .gx-dock #choice .box{background:rgba(20,8,48,.45);border-color:rgba(243,233,255,.35);box-shadow:none;color:#f3e9ff}
 html.sk #news{color:#f3e9ff}
 /* buttons: cream pill = normal, go (orange) = primary, purple = selected/danger */
-html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.mini{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#2a1650;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;animation:none}
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.mini{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#2a1650;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;animation:none}
 html.sk .btn:hover:not([disabled]){box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4)) brightness(1.07)}
 html.sk .btn:active:not([disabled]){box-shadow:none;transform:translateY(2px)}
 html.sk .btn[disabled]{opacity:.5}
@@ -84,3 +84,9 @@ html.ph .ptile.bcard .art:has(.cpic){width:100%;height:50px;border-radius:6px;ov
 .bfly .btok.hp{background:url(media/icon-heart.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
 
 html.sk .gx-ibtn>span{padding:0}
+
+/* look check: chip numbers get a pale plate + darker ink so gold/green read on yellow (active) tiles; sized to fit the chip */
+html.ph .pchip .v{color:#6b4200}html.ph .pchip .e{color:#0f6b3a}
+html.ph .pchip span em{background:rgba(255,253,245,.9);border-radius:4px;padding:0 1px}
+html.ph-p header.gx-bar .pchip span{font-size:12px;gap:1px;letter-spacing:-.7px}
+html.ph-p header.gx-bar .pchip{padding-left:2px;padding-right:2px}

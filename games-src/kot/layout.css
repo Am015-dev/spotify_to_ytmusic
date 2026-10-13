@@ -38,7 +38,7 @@ body.three #banner{top:auto}
 #pmsg:empty{display:none}
 #pmsg .how{margin:.1rem 0 .2rem}
 /* a pending decision: the question sits on top and the rest waits */
-#choice{border-color:var(--red);border-width:4px}
+#choice{border-color:var(--red);border-width:4px;overflow-x:hidden}
 #choice h2{margin:0 0 .3rem;font-size:1.55rem;line-height:1;color:var(--red)}
 #choice p{margin:.2rem 0 .35rem}
 #choice .acts{flex-direction:column}

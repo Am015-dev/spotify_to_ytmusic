@@ -857,7 +857,7 @@ const fanN=n=>{const m=Math.max(2,n+(ST.on?2*Math.floor(ST.lvl/4):0)+DF.fan+(ST.
 const ringN=n=>Math.max(6,Math.round((n+(ST.on?Math.floor(ST.lvl/2):0)+DF.fan+(ST.on?0:Math.floor(2*TUNE2.loopFan*Math.min(3,G.loop))))*.62));
 const FANSTEP=.19;                                         // adjacent bullets of a fan are never closer than this angle: about 60 px apart at the ship, a gap you can see and fly through
 const fanAngle=(n,sp,i)=>{if(n<2)return 0;const st=Math.max(sp/(n-1),FANSTEP);return-st*(n-1)/2+st*i;};
-function fan(e,n,sp,s,c){n=fanN(n);const room=ebCap()-G.eb.length;if(room<n)n=room>=3?odd(room):room>=1?1:0;if(n<1)return;const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y,a+fanAngle(n,sp,i),s,c);}
+function fan(e,n,sp,s,c){n=fanN(n);const room=ebCap()-G.eb.length;if(room<n)n=room>=3?odd(room):room>=1?1:0;if(n<1)return;const a=aim(e);for(let i=0;i<n;i++)eb(e.x-20,e.y+(e.my||0),a+fanAngle(n,sp,i),s,c);}
 function ring(e,n,s,off,c){n=ringN(n);n=Math.min(n,Math.max(0,ebCap()-G.eb.length));if(n<4)return;for(let i=0;i<n;i++)eb(e.x,e.y,off+i*Math.PI*2/n,s,c,6);}
 function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,mini=!!o.mini;
   const tab=[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']];
@@ -1094,8 +1094,9 @@ function update(dt){
 }
 
 function bossUpdate(e,dt,d){
-  if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
-  e.y=H/2-20+Math.sin(e.t*.7)*150;
+  const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
+  else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
+  else e.y=H/2-20+Math.sin(e.t*.7)*150;
   for(const l of e.lasers){l.t+=dt;if(l.t>2*BT.spb&&l.t<3.1*BT.spb&&!G.dead){const vx=Math.cos(l.a),vy=Math.sin(l.a),px=P.x-l.x,py=P.y-l.y,pr=px*vx+py*vy;
       if(pr>0&&Math.abs(px*vy-py*vx)<9)hurt();}}
   e.lasers=e.lasers.filter(l=>l.t<3.1*BT.spb);}
@@ -1171,7 +1172,8 @@ function gatePost(y,up,fl){const o=ART.sp('spr-en-gate',26);if(!o)return false;c
   if(fl)ART.put(ART.sil('spr-en-gate',26,'#ffffff'),0,cy,0,.8,1,up?1:-1);return true;}
 function hpBar(x,y,w,f){ctx.fillStyle='#00000099';ctx.fillRect(x,y,w,4);ctx.fillStyle='#ff3dbb';ctx.fillRect(x,y,w*clamp(f,0,1),4);}
 function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm['spr-boss-'+nm];if(!b)return false;
-  const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],by=Math.sin(t*1.6)*3,tl=Math.sin(t*.9)*.035;
+  const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;   // walkers and swimmers do not hover: no bob, no tilt
+  if(mv!=='air'&&!rotMode)UIK.bossShadow(e,mv,wd);
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
   if(UIK.bossDraw(e,nm,wd,by,tl,fl))return true;
@@ -1391,7 +1393,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     const g=this.ship==='tri'?1/3:this.ship==='hv'?2:0;
     if(g){const cur=Math.floor(G.bp/g);this.tk=cur!==this.prevCur&&this.prevCur!==-1;this.prevCur=cur;}else this.tk=true;
     const dn=P.dashT>0;if(dn&&!this.wasDash)this.dashId++;this.wasDash=dn;
-    if(dn&&this.db){const dm=5*this.db;for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
+    if(dn&&this.db){const dm=5*this.db*(1+(typeof SYN==='object'?SYN.v.db||0:0));for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
   absorb(){if(this.sh>0){this.sh--;P.inv=1.3;shake(8);G.flash=Math.max(G.flash,.12*FX());burst(P.x,P.y,'#19e3ff',26,320,.5);floater(P.x,P.y-24,'SHIELD','#19e3ff');AU.sfx('hurt');
       return true;}return false;},
   steer(b,dt,k){k=k||this.hm;let best=null,bd=1e9;for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.x<b.x-10||e.x>W+10)continue;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd&&d<420){bd=d;best=e;}}
@@ -1579,80 +1581,121 @@ setInterval(()=>PW.drums(),25);
 /* ---------- Nightrun Story: 12 stages in 3 acts, stage select, stars, Hard toggle for Endless ---------- */
 const ALL=/[?&]all=1/.test(location.search);             // ?all=1 opens every stage (test link); a long press on the title does the same and is remembered
 let HARD=HARDS.includes(SET.diff);DF=DIFFS[SET.diff]||DIFFS.normal;   // difficulty lives in the settings (Easy / Normal / Hard); the title button cycles it
-const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all,v30:!!o.v30};})();
+const sSave=(()=>{const o=load('mnr_story',{})||{};return{stars:o.stars||{},snap:o.snap||{},all:!!o.all,v30:!!o.v30,v40:!!o.v40};})();
 const sPersist=()=>save('mnr_story',sSave);
-// difficulty knobs in one place (tuned with the bot in games-src/nightrun/story-sim.js)
-const TUNE={d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:Array.from({length:30},(_,i)=>i<20?6:5),lv:Array.from({length:30},(_,i)=>+(2.4+i*.3+(i>=20?.35:0)).toFixed(2)),bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12};
+/* ===== THE TUNING TABLE: the whole difficulty curve lives here (check it with games-src/nightrun/story-sim.js, RUNS=12) =====
+   LV[n-1] is the level of stage n. It drives bullet speed, enemy HP, extra waves, elite share, heal drops and boss HP (ST.setLevel).
+   Stages 1-40 climb +0.2 per stage at the start and +0.3 at the end; a mini-boss or boss sits +0.2 above its neighbours and
+   the next stage never drops below it (the biggest step is 0.5, into a boss). 41-45 are the optional challenge stages: the level of their district's mini-boss + 0.2.
+   HULL: starting hull (7 for the first eight stages, 6 to stage 26, 5 after; challenges 6).
+   lenK: level change per bar of stage length against 89 bars (66 bars +0.46, 125 bars -0.72), so a stage's length does not decide its difficulty.
+   DM: per-difficulty multipliers: lv = added to the stage level, hp = enemy and boss HP. (Bullet speed, density and fire rate per difficulty live in DIFFS, b.js.) */
+const LV=[1.6, 1.8, 2.0, 2.2, 2.61, 2.62, 2.83, 3.24, 3.26, 3.47, 3.7, 3.92, 4.34, 4.37, 4.6, 5.04, 5.07, 5.31, 5.55, 5.8, 6.24, 6.29, 6.54, 7.0, 7.05, 7.31, 7.57, 7.84, 8.3, 8.37, 8.64, 9.12, 9.19, 9.47, 9.75, 10.04, 10.53, 10.61, 10.91, 11.4, 2.81, 4.54, 6.44, 8.5, 10.73];
+const HULL=[7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6];
+const TUNE={lenK:.02,d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:HULL,lv:LV,bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12,
+  dm:{easy:{lv:-.5,hp:.9},normal:{lv:0,hp:1},hard:{lv:.3,hp:1.1},vhard:{lv:.5,hp:1.2},legend:{lv:.8,hp:1.3}}};
+const dmOf=()=>TUNE.dm[SET.diff]||TUNE.dm.normal;
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
-/* 30 stages, six per city: a run through, a hunt, a gimmick stage, the city's mini-boss, a hard convoy (squad leaders) and the boss. Levels (TUNE.lv) rise along the whole list. */
+/* 40 story stages, eight per city: a run through, a hunt, a gimmick stage, a new twist, the city's mini-boss, a hard convoy (squad leaders), a pre-boss test and the boss.
+   Then 5 optional CHALLENGE stages (one per city, opened by that city's mini-boss): no-hit, speed or perfect-beat. Levels (LV above) rise along the whole list.
+   Row: [name, intro (8 words max), goal {k,v}, PERFECT target (for a 46-bar stage), waves, mini-boss] */
 const CITYS=[
  {di:0,st:[
   ['FIRST RUN','Deliver the data. Stay alive.',{k:'survive',v:46},46,['droneLine','droneV','droneSine']],
   ['PATROL','Drones on patrol. Shoot on the beat.',{k:'kill',v:170},35,['droneLine','droneSine','chargers','droneV']],
   ['ZEIL','Shop windows and swarms.',{k:'score',v:150000},30,['droneSine','droneV','chargers','turret']],
+  ['HAUPTWACHE','Guard post. Pick your lane.',{k:'survive',v:46},40,['droneLine','droneSine','droneV','chargers']],
   ['TRESOR-WART','The vault has a keeper.',{k:'mini'},24,['droneLine','turret','chargers'],{k:5,nm:'TRESOR-WART',r:38,pats:['laser','fan5','ring','laser'],lbl:'T'}],
   ['KONVOI','A squad leader. Kill it first.',{k:'kill',v:210},30,['droneV','droneSine','chargers','turret','gunship']],
+  ['TAUNUS TOWER','Climb the glass. Chain PERFECTs.',{k:'score',v:220000},28,['droneV','droneSine','chargers','turret','gunship']],
   ['SEK-ADLER','Police interceptor on your tail.',{k:'boss'},19,['droneLine','droneV','turret','chargers']]]},
  {di:1,st:[
   ['RIVER ROAD','Follow the river. Chain PERFECTs.',{k:'score',v:180000},29,['droneSine','chargers','droneV','turret']],
   ['EISERNER STEG','Narrow bridge, tight lanes.',{k:'survive',v:46},30,['droneSine','chargers','gate','turret']],
-  ['BRIDGE GUARD','Something guards the old bridge.',{k:'mini'},24,['droneSine','chargers','turret'],{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}],
   ['ROEMER','Old town, new guns.',{k:'kill',v:240},32,['droneV','chargers','turret','gunship']],
+  ['FAEHRE','Ferry crossing. Hunt the patrol.',{k:'kill',v:200},30,['droneSine','droneV','chargers','turret']],
+  ['BRIDGE GUARD','Something guards the old bridge.',{k:'mini'},24,['droneSine','chargers','turret'],{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B'}],
   ['FLOTTE','Patrol boats with a leader.',{k:'survive',v:46},28,['droneSine','droneV','gunship','chargers','turret']],
+  ['HAFENKRAN','Cranes swing. Score big.',{k:'score',v:380000},26,['droneSine','chargers','turret','gunship','gate']],
   ['FLUSSKRAKE','The river fights back.',{k:'boss'},22,['droneSine','chargers','turret','gunship']]]},
  {di:2,st:[
   ['GATE RUN','Laser gates ahead. Dash through.',{k:'survive',v:46},30,['gate','droneLine','turret','gate','chargers']],
   ['FREIGHT YARD','Rails, gates and chargers.',{k:'kill',v:230},30,['gate','chargers','turret','droneSine']],
-  ['GATE KEEPER','The gates have a keeper.',{k:'mini'},22,['gate','turret','chargers'],{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}],
   ['FIREWALL','Gates and gunships together.',{k:'score',v:500000},26,['gate','gunship','turret','droneSine']],
+  ['SIGNAL BOX','Signals fail. Read the gates.',{k:'survive',v:46},28,['gate','droneLine','chargers','turret']],
+  ['GATE KEEPER','The gates have a keeper.',{k:'mini'},22,['gate','turret','chargers'],{k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S'}],
   ['CORDON','The last cordon. Leaders hold the line.',{k:'survive',v:46},26,['gate','droneV','gunship','turret','chargers']],
+  ['LOADING DOCK','Crates, cranes and gunships.',{k:'kill',v:240},26,['gate','chargers','gunship','turret','droneV']],
   ['ZENTRAL-ICE','Break the bank firewall.',{k:'boss'},22,['gate','turret','droneSine','gunship']]]},
  {di:3,st:[
   ['TRADE FAIR','Elite guards everywhere. Stay sharp.',{k:'kill',v:230},34,['droneV','chargers','turret','gunship','droneSine']],
   ['RUSH HOUR','Rack up score. Do not get hit.',{k:'score',v:800000},22,['droneV','droneSine','turret','chargers','gate','gunship']],
   ['HAMMERING MAN','The hammer keeps the beat.',{k:'survive',v:46},26,['droneV','turret','gunship','gate','chargers']],
+  ['EXPO HALL','Stalls, lights and snipers.',{k:'survive',v:46},26,['droneV','turret','gate','chargers','droneSine']],
   ['MESSE-WÄCHTER','The fair has a guardian.',{k:'mini'},22,['droneV','turret','chargers','gunship'],{k:4,nm:'MESSE-WÄCHTER',r:42,pats:['fan7','ring','spiral','fan9'],lbl:'M'}],
-  ['BOARDROOM','Everything shoots. Leaders everywhere.',{k:'kill',v:260},30,['gate','gunship','turret','chargers','droneSine','droneV']],
+  ['BOARDROOM','Everything shoots. Leaders everywhere.',{k:'kill',v:205},30,['gate','gunship','turret','chargers','droneSine','droneV']],
+  ['SKYLINE','Top floor. Do not get hit.',{k:'score',v:650000},22,['droneV','gunship','turret','gate','chargers']],
   ['KRONOS','End the corporation. Last delivery.',{k:'boss'},20,['gate','gunship','turret','chargers','droneSine']]]},
  {di:4,st:[
   ['PLAKA NIGHTS','Rooftops and kiosks. Hold the block.',{k:'survive',v:46},30,['phalanx','droneSine','chargers','turret']],
   ['HARBOUR WATCH','Piraeus is closed. Dash the pillars.',{k:'score',v:900000},26,['pillars','wedge','turret','phalanx','gunship']],
-  ['LYCABETTUS','Climb the hill under fire.',{k:'kill',v:250},28,['phalanx','wedge','turret','droneSine','gunship']],
+  ['LYCABETTUS','Climb the hill under fire.',{k:'kill',v:215},28,['phalanx','wedge','turret','droneSine','gunship']],
+  ['ACROPOLIS','March up the sacred rock.',{k:'survive',v:46},26,['phalanx','wedge','turret','droneSine']],
   ['HOPLITE','The shield wall walks.',{k:'mini'},24,['phalanx','wedge','turret'],{k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H'}],
   ['AGORA','Phalanx and leaders. No gaps.',{k:'survive',v:46},26,['phalanx','wedge','pillars','gunship','turret']],
+  ['OLIVE ROAD','The last road to the sea.',{k:'kill',v:190},26,['phalanx','wedge','pillars','gunship','turret']],
   ['TALOS','Bronze guardian of the harbour.',{k:'boss'},20,['phalanx','wedge','pillars','gunship','turret']]]}];
+/* optional challenge stages: ch = nohit (the first hull hit ends it) | speed (reach the kills before the clock: tb = share of the stage) | perfect (finish with the PERFECT target);
+   req = the stage that opens it (the city's mini-boss); s3 = the score for its third star */
+const CHALL=[
+ {di:0,req:5, name:'GLASS LANE',  intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:30,s3:300000, waves:['droneLine','droneSine','droneV','chargers','turret']},
+ {di:1,req:13,name:'FERRY SPRINT',intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:130},    perf:24,s3:250000, waves:['droneSine','droneV','chargers','turret','gunship'],tb:.9},
+ {di:2,req:21,name:'RAIL RHYTHM', intro:'Land PERFECTs. Hold the beat.',  ch:'perfect',goal:{k:'survive',v:46}, perf:28,s3:450000, waves:['gate','droneLine','chargers','turret','droneSine']},
+ {di:3,req:29,name:'FAIR DASH',   intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:120},    perf:22,s3:600000, waves:['droneV','chargers','turret','gunship','gate'],tb:.9},
+ {di:4,req:37,name:'MARBLE LANE', intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:26,s3:800000, waves:['phalanx','wedge','turret','droneSine','gunship']}];
 const STAGES=[];
-CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci};
-  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
-/* the story grew from 16 to 30 stages: progress saved under the old numbers moves to the same stage by name (once) */
-if(!sSave.v30){const old=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],mv=k=>{const i=STAGES.findIndex(x=>x.name===old[k-1]);return i<0?null:i+1;},st={},sn={};
+CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci,pos:k};
+  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
+const MAIN=STAGES.length;                                  // 40 story stages; the challenge stages come after them
+CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3],kit:Math.min(24,c.req-1)});});
+/* the story grew from 16 to 30 and then to 40 stages: progress saved under the old numbers moves to the same stage by name (once) */
+if(!sSave.v40){const OLD16=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],
+  OLD30=['FIRST RUN','PATROL','ZEIL','TRESOR-WART','KONVOI','SEK-ADLER','RIVER ROAD','EISERNER STEG','BRIDGE GUARD','ROEMER','FLOTTE','FLUSSKRAKE','GATE RUN','FREIGHT YARD','GATE KEEPER','FIREWALL','CORDON','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','HAMMERING MAN','MESSE-WÄCHTER','BOARDROOM','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','LYCABETTUS','HOPLITE','AGORA','TALOS'],
+  old=sSave.v30?OLD30:OLD16,mv=k=>{const i=STAGES.findIndex(x=>x.name===old[k-1]);return i<0?null:i+1;},st={},sn={};
   for(const k in sSave.stars){const m=mv(+k);if(m)st[m]=sSave.stars[k];}for(const k in sSave.snap){const m=mv(+k);if(m)sn[m]=sSave.snap[k];}
-  sSave.stars=st;sSave.snap=sn;sSave.v30=1;sPersist();}
+  sSave.stars=st;sSave.snap=sn;sSave.v30=1;sSave.v40=1;sPersist();}
 const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
-const stLen=s=>songBars(s.song);                          // stage length in bars = its song
+const stLen=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};   // stage length in bars = its song (a challenge is 60% of it)
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
 const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
-const goalTxt=s=>{const g=s.goal;return g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
-const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
+const stS3=s=>Math.round(s.s3*stK(s)/5000)*5000;
+const goalTxt=s=>{const g=s.goal;return s.ch==='nohit'?'NO HIT · '+stLen(s)+' BARS':s.ch==='perfect'?'PERFECT '+stPerf(s)+' · '+stLen(s)+' BARS':s.ch==='speed'?'KILL '+stKill(s)+' IN '+Math.round(stLen(s)*s.tb)+' BARS':g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
+/* the three stars of a stage: [clear, PERFECT target, no hull lost (challenges: a score)] as plain lines */
+const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'?Math.round(stPerf(s)*1.4):stPerf(s))+' PERFECT hits',s.ch?'Score '+(stS3(s)/1000)+'K':'No hull lost'];
+const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1];
-    this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=1+TUNE.eh*L;
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLen(this.def));   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+    this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
     this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
-    this.dk=TUNE2.stDk;},
+    this.dk=TUNE2.stDk;
+    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';},
   kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
-  snapFor(n){const sn=sSave.snap[n];return sn?Object.assign({},sn):this.kit(n);},
+  snapFor(n){const f=STAGES[n-1].from||n,sn=sSave.snap[f];return sn?Object.assign({},sn):this.kit(f);},   // a challenge starts with what you had when you reached the stage that opens it
   // the new run has just been created: put this stage's district, hull and upgrades in place
   begin(){const D=DISTRICTS[this.def.di];G.di=this.def.di;G.pos=posOf(G.di);G.dt=0;G.d0=G.bc;DIR.plan(this.def.song);G.boss=null;G.bossDone=false;G.waveT=2.4;G.waveWait=false;G.preload=true;bgFor(G.di);AU.root=D.root;AU.boss=false;
     P.max=Math.max(5,this.hp0);P.hp=this.hp0;banner(this.n+' · '+this.def.name,this.def.intro,false,3.4);},
   carry(){const got=this.snapFor(this.n);for(const id in got)for(let i=0;i<got[id];i++)SH.add(id);},
   frac(){const g=this.def.goal,tf=G.dbar/this.len;let f=0;
-    if(g.k==='survive')f=tf;else if(g.k==='kill')f=Math.min(G.kills/this.kv,tf);else if(g.k==='score')f=Math.min(G.score/this.sv,tf);else f=G.boss||this.spawned?1:G.dbar/this.lead;
+    if(this.ch==='speed')f=Math.min(1,G.kills/this.kv);else if(g.k==='survive')f=tf;else if(g.k==='kill')f=Math.min(G.kills/this.kv,tf);else if(g.k==='score')f=Math.min(G.score/this.sv,tf);else f=G.boss||this.spawned?1:G.dbar/this.lead;
     return clamp(f,0,1);},
   label(){const g=this.def.goal;
+    if(this.ch==='speed')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS · '+Math.max(0,this.tb-Math.floor(G.dbar))+' BARS';
+    if(this.ch==='perfect')return 'PERFECT '+Math.min(this.pn,G.perf)+' / '+this.pn;
+    if(this.ch==='nohit')return 'NO HIT · '+Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='survive')return Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='kill')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS';
     if(g.k==='score')return 'SCORE '+Math.min(this.sv,G.score).toLocaleString('de-DE')+' / '+this.sv.toLocaleString('de-DE');
@@ -1660,10 +1703,13 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
   tick(dt){
-    if(this.over){this.cT-=dt;if(this.cT<=0&&!this.fin){this.fin=true;if(this.n>=STAGES.length||!SH.live)this.finish();else SH.pit(()=>this.finish());}return;}
+    if(this.over){this.cT-=dt;if(this.cT<=0&&!this.fin){this.fin=true;if(this.n>=MAIN||this.ch||!SH.live)this.finish();else SH.pit(()=>this.finish());}return;}
     if(G.dead)return;
     const g=this.def.goal;G.dt+=dt;DIR.tick(dt);const prog=clamp(G.dbar/this.len,0,1),up=G.dbar>=this.len-.5;this.d=this.d0*(.8+.3*prog);   // the ramp runs over the whole stage
     if(!this.pre&&G.t>5&&(g.k==='boss'||g.k==='mini')){this.pre=true;const k=DISTRICTS[this.def.di].boss,sg=g.k==='boss'?bossSong(k,false):null;if(sg)loadTrack(sg);}
+    if(this.ch==='nohit'&&this.hits>0){this.why='Hit. No-hit run over';this.fail();return;}
+    if(this.ch==='speed'){if(G.kills>=this.kv)this.clear();else if(G.dbar>=this.tb){this.why='Out of time';this.fail();}return;}
+    if(this.ch==='perfect'&&up){if(G.perf>=this.pn)this.clear();else{this.why='Short of the PERFECT target';this.fail();}return;}
     if(g.k==='survive'){if(up)this.clear();}
     else if(g.k==='kill'){if(G.kills>=this.kv&&up)this.clear();}
     else if(g.k==='score'){if(G.score>=this.sv&&up)this.clear();}
@@ -1673,27 +1719,27 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
   bossDown(e,pts){banner('STAGE CLEAR',(e.nm||'')+' down · +'+pts,false,3);this.clear(true);},
   clear(boss){if(this.over||G.dead)return;this.over=true;this.cT=boss?3.4:2.6;G.waveWait=false;G.eb=[];
     for(const e of G.en)if(e.type!=='boss')e.hp=0;
-    this.stars=[1,G.perf>=this.pn?1:0,this.hits===0?1:0];
+    this.stars=[1,G.perf>=(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)?1:0,this.ch?(G.score>=this.s3?1:0):(this.hits===0?1:0)];
     if(!boss)banner('STAGE CLEAR',this.def.name,false,2.6);
     G.flash=Math.max(G.flash,.3*FX());AU.sfx('up');AU.intense(false);NR.emit('stageClear',{n:this.n});},
   fail(){running=false;NR.emit('runEnd',{story:this.n,score:G.score,di:G.di,kills:G.kills});
-    $('overEyebrow').textContent='Stage '+this.n+' failed';$('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
+    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
     const b=sSave.stars[this.n]||0;$('oBest').innerHTML=this.def.goal.k==='boss'||this.def.goal.k==='mini'?'Goal <strong>'+goalTxt(this.def)+'</strong>':'Goal <strong>'+goalTxt(this.def)+'</strong> · '+this.label();
     $('stBtn2').hidden=false;
     overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
     G.over=true;},
   finish(){running=false;const n=this.n,st=this.stars,sum=st[0]+st[1]+st[2];
     if(sum>(sSave.stars[n]||0))sSave.stars[n]=sum;
-    if(n<STAGES.length){const got={};for(const id in SH.got)got[id]=SH.got[id];sSave.snap[n+1]=got;}
+    if(n<MAIN){const got={};for(const id in SH.got)got[id]=SH.got[id];sSave.snap[n+1]=got;}
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
-    const s=this.def;$('srEye').textContent=n>=STAGES.length?'Story complete':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
+    const s=this.def;$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],this.pn+' PERFECT · you '+G.perf)+row(st[2],'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)));
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)));
     $('srScore').textContent=G.score.toLocaleString('de-DE');
-    $('srNext').hidden=n>=STAGES.length;$('srNext').textContent='NEXT STAGE';
+    $('srNext').hidden=n>=MAIN;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
   totalStars(){let t=0;for(const k in sSave.stars)t+=sSave.stars[k]|0;return t;}};
-const unlocked=n=>n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1||Object.keys(sSave.stars).some(k=>+k>=n&&(sSave.stars[k]|0)>=1);   // a later stage cleared (older saves) opens the ones before it
+const unlocked=n=>{const f=STAGES[n-1]&&STAGES[n-1].from;if(f)return ALL||sSave.all||(sSave.stars[f]|0)>=1;return n===1||ALL||sSave.all||(sSave.stars[n-1]|0)>=1||Object.keys(sSave.stars).some(k=>+k>=n&&+k<=MAIN&&(sSave.stars[k]|0)>=1);};   // a later stage cleared (older saves) opens the ones before it
 
 function startStory(n){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;
   ST.setLevel(n);ST.on=true;newGame(false);ST.begin();G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(ST.def.song);AU.intense(false);
@@ -1702,55 +1748,10 @@ function startStory(n){if(running)return;AU.unlock();pressed={};titleEl.hidden=t
 let selEl,resEl;
 const lockI='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10V8a6 6 0 1112 0v2h1v12H5V10zm2 0h8V8a4 4 0 10-8 0z" fill="currentColor" fill-rule="evenodd"/></svg>';
 const stMsg=t=>{$('stMsg').textContent=t;clearTimeout(stMsg.h);stMsg.h=setTimeout(()=>{$('stMsg').textContent='';},1800);};
-function stDraw(){$('stStars').textContent='★ '+ST.totalStars()+' / '+STAGES.length*3;const box=$('stRows');box.innerHTML='';box.classList.toggle('many',ACTN.length>3);
-  for(let a=0;a<ACTN.length;a++){const row=document.createElement('div');row.className='arow';row.innerHTML='<div class="alab">'+ACTN[a]+'</div>';
-    for(const s of STAGES.filter(x=>x.act===a)){const ok=unlocked(s.n),k=sSave.stars[s.n]|0,D=DISTRICTS[s.di],b=document.createElement('button');b.type='button';
-      b.className='card'+(ok?'':' lock');b.dataset.nd=!ok?'locked':k>0?'done':s.goal&&s.goal.k==='boss'?'boss':'open';b.dataset.id='s'+s.n;b.dataset.n=s.n;b.style.setProperty('--c',D.a);
-      b.innerHTML=`<div class="hd"><span class="no">${s.n}</span>${ok?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:lockI}</div><div class="nm">${s.name}</div><div class="gl"><span class="ac">${ACTN[s.act]} · </span>${goalTxt(s)}</div>`;
-      b.addEventListener('click',()=>{if(!unlocked(s.n)){stMsg('Clear stage '+(s.n-1)+' first');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}startStory(s.n);});
-      row.appendChild(b);}
-    box.appendChild(row);}
-  try{const cur=box.querySelector('.card[data-nd=open],.card[data-nd=boss]');if(cur&&box.scrollHeight>box.clientHeight+2)box.scrollTop+=cur.getBoundingClientRect().top-box.getBoundingClientRect().top-box.clientHeight/2+cur.offsetHeight/2;}catch(e){}}   // on a phone the map scrolls: start at the next stage to play
-function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;stDraw();}
-function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 
 function storyUI(){
 /* ----- styles ----- */
 {const st=document.createElement('style');st.textContent=`
-#stsel .rows{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*1.4)}
-#stsel .arow{flex:1 1 0;min-height:0;display:flex;gap:calc(var(--u)*1.4);align-items:stretch}
-#stsel .alab{flex:0 0 auto;writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;font-family:var(--mono);letter-spacing:.2em;color:var(--dim);font-size:clamp(11px,calc(var(--u)*3),13px);white-space:nowrap}
-#stsel .card{gap:calc(var(--u)*.6);padding:calc(var(--u)*.8);justify-content:space-between}
-#stsel .card .hd{display:flex;align-items:baseline;justify-content:space-between;width:100%;gap:4px}
-#stsel .card .no{font-weight:700;font-size:clamp(16px,calc(var(--u)*8),34px);line-height:1;color:var(--c)}
-#stsel .card .stars{font-size:clamp(11px,calc(var(--u)*3.4),15px);letter-spacing:0;color:#ffe14d;white-space:nowrap}
-#stsel .card .nm{line-height:1.45;padding-bottom:1px;font-weight:700;font-size:clamp(11px,calc(var(--u)*3.2),14px);line-height:1.45;color:var(--ink);text-align:left;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-#stsel .card .gl{line-height:1.45;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.8),12px);color:var(--dim);text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#stsel .card.lock{opacity:.5;border-style:dashed}
-#stsel .card.lock .no{color:var(--dim)}
-#stsel .card svg.lk{height:clamp(10px,calc(var(--u)*4),18px);width:auto;aspect-ratio:1;color:var(--dim)}
-@container (max-height:300px){#stsel .card .nm{display:none}}
-#stsel .card .gl .ac{display:none}
-@container (max-aspect-ratio:1/1){
- /* upright phone: a scrolling list of stages, medallion + name + goal + stars on every card, all type 11 px or more, nothing squeezed */
- #stsel .rows{display:grid;grid-template-columns:1fr;grid-auto-rows:min-content;align-content:start;gap:6px;overflow-y:auto;overflow-x:hidden;padding:2px 2px 8px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
- #stsel .arow{display:contents}
- #stsel .alab{display:none}
- #stsel .card{display:grid!important;grid-template-columns:34px minmax(0,1fr) auto;grid-template-areas:"no nm st" "no gl st";align-items:center;column-gap:10px;row-gap:1px;padding:6px 12px!important;min-height:54px;text-align:left;justify-content:stretch;flex:none}
- #stsel .card .hd{display:contents!important}
- #stsel .card .no{grid-area:no;font-size:16px!important;line-height:1;text-align:center;width:34px;padding:0!important}
- #stsel .card .no::before{width:32px!important;height:32px!important}
- #stsel .card .stars,#stsel .card svg.lk{grid-area:st;font-size:12px!important;align-self:center}
- #stsel .card svg.lk{height:20px;width:20px}
- #stsel .card .nm{grid-area:nm;display:block!important;font-size:14px!important;line-height:1.15!important;width:auto!important;overflow:visible;white-space:normal;text-overflow:clip}
- #stsel .card .gl{grid-area:gl;display:block!important;font-size:11px!important;line-height:1.2!important;width:auto!important;overflow:visible;white-space:normal;text-overflow:clip}
- #stsel .card .gl .ac{display:inline;color:var(--c)}
-}
-@container (max-aspect-ratio:1/1) and (min-width:560px){#stsel .rows{grid-template-columns:1fr 1fr}}
-#stsel .rows.many .card{padding:calc(var(--u)*.7) calc(var(--u)*1.2);gap:0;justify-content:center}
-#stsel .rows.many .card .no{font-size:clamp(13px,calc(var(--u)*4.4),22px)}
-#stsel .rows.many .card .nm{font-size:clamp(11px,calc(var(--u)*2.7),13px)}
-#stsel .rows.many .card .gl{font-size:clamp(11px,calc(var(--u)*2.3),11px)}
 #stres .sr{font-family:var(--mono);font-size:clamp(13px,min(2vw,3.4vh),19px);color:var(--dim)}
 #stres .sr.ok{color:var(--ink)}#stres .sr .sg{color:#ffe14d;font-size:1.25em}
 #hardBtn.on{background:#ff3040;color:#fff}
@@ -1761,6 +1762,7 @@ selEl=document.createElement('div');selEl.id='stsel';selEl.className='ov solid p
 selEl.innerHTML='<div class="top"><span class="ttl">STORY</span><span class="neon" id="stStars" style="color:#ffe14d"></span><span class="sp"></span><button class="go alt" id="stBack" type="button" style="padding:.3em 1.1em">BACK</button></div>'
   +'<div class="rows" id="stRows"></div><div class="msg" id="stMsg"></div>';
 stage.appendChild(selEl);
+{const dt=document.createElement('div');dt.id='stDet';dt.hidden=true;selEl.appendChild(dt);}
 $('stBack').addEventListener('click',closeStages);
 addEventListener('keydown',e=>{if(!selEl.hidden&&e.code==='Escape')closeStages();});
 
@@ -1770,7 +1772,7 @@ resEl.innerHTML='<div class="in"><div class="eyebrow" id="srEye">Stage clear</di
   +'<div class="stat">Score <strong id="srScore">0</strong></div>'
   +'<div class="row"><button class="go" id="srNext" type="button">NEXT STAGE</button><button class="go dim" id="srRetry" type="button">RETRY</button><button class="go dim" id="srMenu" type="button">STAGES</button></div></div>';
 stage.appendChild(resEl);
-$('srNext').addEventListener('click',()=>startStory(Math.min(STAGES.length,ST.n+1)));
+$('srNext').addEventListener('click',()=>startStory(Math.min(MAIN,ST.n+1)));
 $('srRetry').addEventListener('click',()=>startStory(ST.n));
 $('srMenu').addEventListener('click',openStages);
 
@@ -1790,6 +1792,154 @@ $('srMenu').addEventListener('click',openStages);
 // extra button on the stage-failed screen
 {const b=document.createElement('button');b.className='go dim';b.id='stBtn2';b.type='button';b.textContent='STAGES';b.hidden=true;$('againBtn').after(b);b.addEventListener('click',openStages);}
 }
+
+/* ---------- Nightrun story MAP: a painted, scrollable route through the five districts (replaces the old stage list) ----------
+   Every stage is a node on a winding road: locked / open / done (with its stars) / boss (bigger) / challenge (a side branch off the mini-boss).
+   The current stage glows and the map scrolls to it. Tap a node: a plate shows the goal, the three stars, your best and PLAY.
+   Portrait phones climb the map upwards, wide screens run it left to right. Stage data and rules live in story.js, the shop hints in strategy.js. */
+const MAPD={sel:-1,land:false,lastW:0,lastH:0};
+const slugOf=n=>String(n||'').toLowerCase().replace(/ü/g,'ue').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const bgOf=di=>'media/bg-'+slugOf(DISTRICTS[di].name)+(MAPD.land?'':'-phone')+'.webp';
+const bossOf=s=>s.goal.k==='boss'?DISTRICTS[s.di].bossName:s.goal.k==='mini'?s.mini.nm:null;
+const CHRULE={nohit:'One hit ends the run.',speed:'Reach the kills before time is up.',perfect:'Land PERFECTs all the way.'};
+/* the stage you should play next: the first open main stage without a star */
+function mapCurrent(){for(let n=1;n<=MAIN;n++)if(unlocked(n)&&!(sSave.stars[n]|0))return n;return MAIN;}
+/* place every node: main axis m (the way the route runs), cross axis c (0..1 across it) -> x,y */
+function mapLayout(w,h){const land=w>h*1.15,STEP=land?Math.max(92,Math.min(124,w/8.5)):Math.max(74,Math.min(92,h/9)),BAN=land?150:104,PAD=land?70:56,bands=[];let m=PAD;
+  const nodes=[];
+  for(let ci=0;ci<5;ci++){const m0=m;m+=BAN;
+    for(let j=0;j<8;j++){const n=ci*8+j+1,c=.5+.27*Math.sin(j*.9+ci*1.9+.4);nodes.push({n,m,c,ci});m+=STEP;}
+    bands.push({ci,m0,m1:m});}
+  // challenge nodes branch off the mini-boss (position 5 of its city), to the roomier side
+  for(const s of STAGES.filter(x=>x.from)){const f=nodes[s.from-1],side=f.c<.5?1:-1;nodes.push({n:s.n,m:f.m+STEP*.62,c:Math.max(.12,Math.min(.88,f.c+side*.34)),ci:s.act,br:s.from});}
+  const total=m+PAD*.6;
+  const W=land?total:w,H=land?h:total;
+  const at=(mm,c)=>land?{x:mm,y:Math.max(.12,Math.min(.88,c))*h}:{x:Math.max(.1,Math.min(.9,c))*w,y:total-mm};
+  for(const nd of nodes)Object.assign(nd,at(nd.m,nd.c));
+  const bs=bands.map(b=>land?{ci:b.ci,x:b.m0-PAD*.4,y:0,w:b.m1-b.m0+PAD*.4,h}:{ci:b.ci,x:0,y:total-b.m1,w,h:b.m1-b.m0});
+  return{land,W,H,nodes,bands:bs,STEP,BAN,PAD,total,at};}
+function mapPath(a,b,land){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;return land?`M${a.x},${a.y}C${mx},${a.y} ${mx},${b.y} ${b.x},${b.y}`:`M${a.x},${a.y}C${a.x},${my} ${b.x},${my} ${b.x},${b.y}`;}
+function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=box.clientHeight||selEl.clientHeight;if(!w||!h)return;
+  const keepFrac=box.scrollHeight>box.clientHeight||box.scrollWidth>box.clientWidth?(MAPD.land?box.scrollLeft/Math.max(1,box.scrollWidth):box.scrollTop/Math.max(1,box.scrollHeight)):null;
+  const L=mapLayout(w,h);MAPD.land=L.land;MAPD.lastW=w;MAPD.lastH=h;
+  $('stStars').textContent='★ '+ST.totalStars()+' / '+STAGES.length*3;box.className='rows mapbox'+(L.land?' land':'');box.innerHTML='';
+  const cur=mapCurrent(),root=document.createElement('div');root.className='mp';root.style.width=L.W+'px';root.style.height=L.H+'px';
+  // painted district bands (the district's own backdrop, dimmed)
+  for(const b of L.bands){const D=DISTRICTS[b.ci],e=document.createElement('div');e.className='band';e.style.cssText=`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;--c:${D.a};background-image:linear-gradient(${L.land?'90deg':'0deg'},#05030cdd,#05030c88 45%,#05030cdd),url(${bgOf(b.ci)})`;
+    const got=STAGES.filter(s=>s.act===b.ci&&!s.ch).reduce((a,s)=>a+(sSave.stars[s.n]|0),0),dn=STAGES.filter(s=>s.act===b.ci&&!s.ch&&(sSave.stars[s.n]|0)>0).length;
+    const t=document.createElement('div');t.className='ban';t.style.cssText=L.land?`left:${b.x+L.PAD*.5}px;top:12px`:`left:50%;top:${b.y+b.h-L.BAN+6}px`;
+    t.innerHTML=`<small>${ACTN[b.ci]} · ${dn}/8</small><b>${D.name}</b><span>${D.sub.split('·')[0].trim()} · ★ ${got}/24</span>`;
+    root.append(e,t);}
+  // the road: one lit segment per stage you can reach, dark ones beyond
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','rt');svg.setAttribute('width',L.W);svg.setAttribute('height',L.H);
+  const by={};for(const nd of L.nodes)by[nd.n]=nd;let sv='';
+  for(let n=1;n<MAIN;n++){const a=by[n],b=by[n+1],D=DISTRICTS[STAGES[n].di],lit=unlocked(n+1),d=mapPath(a,b,L.land);
+    sv+=`<path d="${d}" class="rb"/><path d="${d}" class="rl${lit?' on':''}" style="stroke:${lit?D.a:'#4a4568'}"/>`;}
+  for(const s of STAGES.filter(x=>x.from)){const a=by[s.from],b=by[s.n],lit=unlocked(s.n);sv+=`<path d="${mapPath(a,b,L.land)}" class="rl br${lit?' on':''}" style="stroke:${lit?'#ffe14d':'#4a4568'}"/>`;}
+  svg.innerHTML=sv;root.append(svg);
+  for(const nd of L.nodes){const s=STAGES[nd.n-1],ok=unlocked(s.n),k=sSave.stars[s.n]|0,D=DISTRICTS[s.di],boss=s.goal.k==='boss',mini=s.goal.k==='mini',b=document.createElement('button');
+    b.type='button';b.className='nd'+(boss?' boss':mini?' mini':s.ch?' chl':'')+(s.n===cur?' cur':'')+(s.n===MAPD.sel?' sel':'');
+    b.dataset.n=s.n;b.dataset.id='s'+s.n;b.dataset.nd=!ok?'locked':k>0?'done':boss||mini?'boss':'open';b.style.cssText=`left:${nd.x}px;top:${nd.y}px;--c:${D.a}`;
+    b.setAttribute('aria-label',`Stage ${s.n} ${s.name}${ok?'':' locked'}`);
+    const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'v':(nd.x<L.W/2?'r':'l');b.classList.add('s'+side);   // r / l: the label sits beside the medallion, v: under it
+    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.ch?'◆':s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
+    b.addEventListener('click',()=>mapPick(s.n));root.append(b);}
+  box.append(root);
+  if(!box._edge){box._edge=1;let q=0;box.addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;mapEdge();});},{passive:true});}
+  // scroll: keep the place on a relayout, else bring the current stage into view
+  const c=by[MAPD.sel>0?MAPD.sel:cur];
+  if(L.land){box.scrollLeft=keepFrac!=null&&MAPD.keep?keepFrac*L.W:Math.max(0,c.x-w*.4);}else{box.scrollTop=keepFrac!=null&&MAPD.keep?keepFrac*L.H:Math.max(0,c.y-h*.55);}
+  MAPD.keep=true;mapDetail(MAPD.sel);requestAnimationFrame(mapEdge);}
+/* a name that would be cut by the edge of the map (or the screen) is hidden until it scrolls fully into view */
+function mapEdge(){const box=$('stRows');if(!box||selEl.hidden)return;const br=box.getBoundingClientRect();for(const n of box.querySelectorAll('.nd')){const r=n.querySelector('.meta').getBoundingClientRect();n.classList.toggle('ed',r.left<br.left+1||r.right>br.right-1||r.top<br.top+1||r.bottom>br.bottom-1);}}
+function mapPick(n){const ok=unlocked(n);MAPD.sel=n;for(const e of document.querySelectorAll('#stRows .nd'))e.classList.toggle('sel',+e.dataset.n===n);
+  if(!ok){const e=document.querySelector(`#stRows .nd[data-n="${n}"]`);if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}}
+  mapDetail(n);mapReveal(n);}
+function mapReveal(n){const box=$('stRows'),e=box.querySelector(`.nd[data-n="${n}"]`),pl=$('stDet');if(!e||!pl||pl.hidden)return;const x=parseFloat(e.style.left),y=parseFloat(e.style.top);
+  if(MAPD.land)box.scrollTo({left:Math.max(0,x-box.clientWidth*.42),behavior:'smooth'});else box.scrollTo({top:Math.max(0,y-(box.clientHeight-pl.offsetHeight)*.5),behavior:'smooth'});}
+/* the plate under the map: stage, goal, the three stars, best, PLAY */
+function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=true;return;}
+  const s=STAGES[n-1],ok=unlocked(n),k=sSave.stars[n]|0,D=DISTRICTS[s.di],bn=bossOf(s),lines=starTxt(s),rec=typeof stageTip==='function'?stageTip(s):'';
+  const need=s.from?STAGES[s.from-1].name:STAGES[n-2]&&STAGES[n-2].name;
+  el.hidden=false;el.dataset.n=n;el.style.setProperty('--c',D.a);
+  el.innerHTML=`<div class="dh"><span class="ac">${s.ch?'CHALLENGE':ACTN[s.act]+' · '+D.name}</span><span class="bs">${ok?'BEST '+'★'.repeat(k)+'☆'.repeat(3-k):''}</span><button class="x" id="stDx" type="button" aria-label="Close">✕</button></div>`
+   +`<div class="dm">${bn?`<img class="bp" src="media/boss-${slugOf(bn)}.webp" alt="" onerror="this.remove()">`:''}<div class="dt"><div class="nm">${s.n<=MAIN?s.n+' · ':''}${s.name}</div><div class="gl">${goalTxt(s)}</div>${s.ch?`<div class="rl">${CHRULE[s.ch]}</div>`:''}</div></div>`
+   +`<div class="stl">${lines.map((t,i)=>`<div class="${k>i?'ok':''}"><span>${k>i?'★':'☆'}</span> ${t}</div>`).join('')}</div>`
+   +(rec?`<div class="tip">${rec}</div>`:'')
+   +(ok?'':`<div class="lkn">Clear ${need||'the stage before'} first</div>`)
+   +`<button class="go" id="stPlay" type="button"${ok?'':' disabled'}>${ok?(k?'PLAY AGAIN':'PLAY'):'LOCKED'}</button>`;
+  $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
+  $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
+function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
+function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
+/* one debounced relayout for resize, rotation, visualViewport and ResizeObserver; measured again after 400 ms (iOS reports the old size right after rotating) */
+{let t=0;const go=()=>{if(selEl.hidden)return;const b=$('stRows');if(Math.abs(b.clientWidth-MAPD.lastW)>2||Math.abs(b.clientHeight-MAPD.lastH)>2)stDraw();},
+  kick=()=>{clearTimeout(t);t=setTimeout(()=>{go();setTimeout(go,400);},120);};
+  addEventListener('resize',kick);addEventListener('orientationchange',kick);if(window.visualViewport)visualViewport.addEventListener('resize',kick);
+  if(window.ResizeObserver)new ResizeObserver(kick).observe(stage);}
+{const st=document.createElement('style');st.textContent=`
+#stsel .mapbox{display:block!important;flex:1 1 0;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:10px;background:#05030c;touch-action:pan-x pan-y;scrollbar-width:thin}
+#stsel .mp{position:relative;overflow:hidden}
+#stsel .band{position:absolute;background-size:cover;background-position:center;opacity:1;border-top:2px solid var(--c);border-image:none}
+#stsel .band::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px #05030c}
+#stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);
+  border:14px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/14px stretch;background:#05030c99}
+#stsel .mapbox.land .ban{transform:none;align-items:flex-start;text-align:left}
+#stsel .ban small{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#c9c3ee}
+#stsel .ban b{font-size:clamp(15px,4.4vw,22px);letter-spacing:.14em;color:var(--c);line-height:1.1}
+#stsel .ban span{font-family:var(--mono);font-size:11px;color:#cfc9f2}
+#stsel .rt{position:absolute;left:0;top:0;pointer-events:none;z-index:1;overflow:visible}
+#stsel .rt path{fill:none;stroke-linecap:round}
+#stsel .rt .rb{stroke:#05030c;stroke-width:15}
+#stsel .rt .rl{stroke-width:5;stroke-dasharray:2 11;opacity:.85}
+#stsel .rt .rl.on{stroke-width:6;stroke-dasharray:none;filter:none;opacity:.95}
+#stsel .rt .rl.br{stroke-width:4;stroke-dasharray:3 9}
+#stsel .nd{position:absolute;z-index:3;margin:0;padding:0;border:0;background:none;color:#fff;font-family:var(--display);font-weight:700;font-size:17px;text-shadow:0 0 3px #000,0 0 7px #000;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;--m:54px}
+#stsel .nd.boss{--m:84px;font-size:26px}#stsel .nd.mini{--m:68px;font-size:22px}#stsel .nd.chl{--m:48px;font-size:18px}
+#stsel .nd .md{position:relative;flex:0 0 auto;width:var(--m);height:var(--m);display:flex;align-items:center;justify-content:center;background:url(media/ui-node-open.webp) center/contain no-repeat}
+#stsel .nd[data-nd=done] .md{background-image:url(media/ui-node-done.webp)}
+#stsel .nd[data-nd=boss] .md,#stsel .nd.boss .md,#stsel .nd.mini .md{background-image:url(media/ui-node-boss.webp)}
+#stsel .nd[data-nd=locked] .md{background-image:url(media/ui-node-locked.webp);color:#e6e2ff}
+#stsel .nd.boss[data-nd=done] .md,#stsel .nd.mini[data-nd=done] .md{background-image:url(media/ui-node-done.webp)}
+#stsel .nd.chl .md{filter:hue-rotate(160deg) saturate(1.2)}#stsel .nd.chl[data-nd=locked] .md{filter:grayscale(.6)}
+/* the button is the whole plate: medallion + stars + name. The anchor is the medallion centre. */
+#stsel .nd.sr{transform:translate(calc(var(--m)/-2),-50%)}
+#stsel .nd.sl{flex-direction:row-reverse;transform:translate(calc(var(--m)/2 - 100%),-50%)}
+#stsel .nd.sv{flex-direction:column;gap:0;transform:translate(-50%,calc(var(--m)/-2))}
+#stsel .nd .meta{display:flex;flex-direction:column;gap:0;min-width:0;padding:2px 7px;border-radius:7px;background:#05030cd0;text-align:left;align-items:flex-start}
+#stsel .nd.sl .meta{align-items:flex-end;text-align:right}
+#stsel .nd.sv .meta{align-items:center;text-align:center;margin-top:1px}
+#stsel .nd .ring{position:absolute;inset:-5px;border-radius:50%;border:3px solid var(--c);opacity:0;pointer-events:none}
+#stsel .nd.cur .ring{opacity:.9;animation:ndp 1.5s ease-out infinite}
+#stsel .nd.ed .meta{visibility:hidden}
+#stsel .nd.sel .ring{opacity:1;border-color:#fff;inset:-6px;animation:none;box-shadow:0 0 10px #fff}
+@keyframes ndp{0%{transform:scale(.9);opacity:.95}100%{transform:scale(1.5);opacity:0}}
+#stsel .nd .stars{font-size:12px;line-height:1.15;letter-spacing:0;color:#ffe14d;white-space:nowrap;text-shadow:none}
+#stsel .nd svg.lk{height:13px;width:13px;color:var(--dim)}
+#stsel .nd .nm{font-size:12px;line-height:1.2;font-weight:700;letter-spacing:.02em;white-space:nowrap;color:var(--ink);text-shadow:none}
+#stsel .nd[data-nd=locked] .nm{color:var(--dim)}
+#stsel .nd.shake{animation:pgsh .3s}
+#stDet{position:absolute;z-index:6;left:50%;bottom:calc(var(--u)*2);transform:translateX(-50%);width:min(94%,520px);box-sizing:border-box;display:flex;flex-direction:column;gap:5px;padding:2px 4px;
+  border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;background:#05030ce8;color:var(--ink);font-family:var(--display)}
+#stDet[hidden]{display:none}
+#stDet .dh{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
+#stDet .ac{color:var(--c);font-weight:700;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stDet .bs{color:#ffe14d;white-space:nowrap}
+#stDet .x{min-width:44px;min-height:44px;margin:-14px -10px -14px 0;border:0;background:none;color:var(--dim);font-size:16px;cursor:pointer}
+#stDet .dm{display:flex;gap:10px;align-items:center}
+#stDet .bp{width:clamp(44px,12vh,72px);height:clamp(44px,12vh,72px);object-fit:cover;border-radius:50%;border:2px solid var(--c);flex:0 0 auto;background:#05030c}
+#stDet .nm{font-weight:700;font-size:clamp(17px,4.6vw,24px);letter-spacing:.06em;line-height:1.1}
+#stDet .gl{font-family:var(--mono);font-size:13px;color:var(--cyan)}
+#stDet .rl{font-family:var(--mono);font-size:12px;color:var(--amber)}
+#stDet .stl{display:flex;flex-direction:column;gap:1px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+#stDet .stl .ok{color:var(--ink)}#stDet .stl span{color:#ffe14d;font-size:1.15em}
+#stDet .tip{font-family:var(--mono);font-size:12px;color:#7dffd8}
+#stDet .lkn{font-family:var(--mono);font-size:12px;color:var(--amber)}
+#stDet .go{align-self:stretch;min-height:44px}
+#stsel .mapbox.land~#stDet,#stsel.wide #stDet{left:auto;right:calc(var(--u)*2);transform:none;width:min(36%,400px)}
+#stDet .go:disabled{filter:grayscale(.8) brightness(.7);cursor:default}
+@container (max-height:600px){#stDet .stl{flex-direction:row;flex-wrap:wrap;gap:2px 10px}#stDet .bp{display:none}}
+`;document.head.appendChild(st);}
 
 /* ---------- ATHINA: night Athens as a fifth district and a fourth story act (stages 13-16) ----------
    Acropolis with the lit temple on its hill, Plaka rooftops, Lycabettus with its chapel, neon kiosks, and the sea at Piraeus.
@@ -2043,6 +2193,46 @@ pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;
  const dp=drawPickups;drawPickups=function(t){dp(t);DIR.drawWarn(t);};}
 NR.on('runStart',()=>{upsCalc();});
 
+/* ---------- build paths, synergies, set bonuses, heat load and boss counters: the data tables and pure helpers (the runtime is in strategy.js) ---------- */
+const PATHS={gc:{n:'Glass Cannon',s:'Hit hard, break fast',c:'#ff5a3d',ic:'M13 2L4 14h6l-1 8 9-12h-6z'},
+  tk:{n:'Tank',s:'Outlast every shot',c:'#19e3ff',ic:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z'},
+  bc:{n:'Beat Combo',s:'Live on the beat',c:'#ffe14d',ic:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z'}};
+const PATHOF={fr:'gc',dm:'gc',cr:'gc',sb:'gc',pc:'gc',cl:'gc',sc:'gc',rg:'gc',rc:'gc',og:'gc',dr:'gc',hm:'gc',
+  sh:'tk',hl:'tk',mh:'tk',rv:'tk',as:'tk',wn:'tk',lk:'tk',cool:'tk',rgn:'tk',hsk:'tk',
+  wd:'bc',ck:'bc',bt:'bc',db:'bc',dc:'bc',bd:'bc',sm:'bc',bea:'bc',lp:'bc'};
+const ALIAS={dmg:'dm',rof:'fr',crt:'cr',prc:'pc',sdc:'sc',drn:'dr',shd:'sh',hul:'mh',rev:'rv',ckp:'ck',dsh:'dc',tdl:'bt',mag:'mg',pwd:'lp',nmn:'nx',nint:'ni'};
+const canon=id=>{const d=typeof TP_BY!=='undefined'&&TP_BY[id];return d&&d.uid?d.uid:ALIAS[id]||id;};
+const pathOf=id=>PATHOF[canon(id)]||null;
+const pathChip=p=>p?`<i class="pc" style="--c:${PATHS[p].c}" title="${PATHS[p].n}">${svgI(PATHS[p].ic)}</i>`:'';
+const SYNS=[{id:'oc',n:'Overclock',a:'dm',b:'fr',t:'+8% shot damage',fx:{dmg:.08}},
+  {id:'bw',n:'Bulwark',a:'sh',b:'mh',t:'Shield pop: 0.8 s extra safe',fx:{inv:.8}},
+  {id:'mt',n:'Metronome',a:'wd',b:'ck',t:'Tier lasts 2 beats more',fx:{ck:2}},
+  {id:'sl',n:'Slingshot',a:'dc',b:'db',t:'Dash Blast hits 50% harder',fx:{db:.5}},
+  {id:'gr',n:'Gold Rush',a:'sb',b:'wd',t:'Gold pulses +15% harder',fx:{sharp:.15}},
+  {id:'cc',n:'Cash Cow',a:'nx',b:'mg',t:'+15% Neon from kills',fx:{nx:.15}},
+  {id:'cs',n:'Crit Storm',a:'cr',b:'pc',t:'+5% crit chance',fx:{crit:.05}},
+  {id:'cb',n:'Cold Barrel',a:'cool',b:'fr',t:'Rapid Fire adds no heat',fx:{fr0:1}}];
+const SETS={gc:[{n:2,t:'+8% damage',fx:{dmg:.08}},{n:4,t:'+7% damage, +15% heat',fx:{dmg:.07,heat:.15}}],
+  tk:[{n:2,t:'Shield pop: 0.4 s extra safe',fx:{inv:.4}},{n:4,t:'+1 hull, -5% damage',fx:{hull:1,dmg:-.05}}],
+  bc:[{n:2,t:'On-beat window +8 ms',fx:{win:8}},{n:4,t:'Tier +3 beats, off-beat -15%',fx:{ck:3,off:.15}}]};
+const HEATL={fr:.05,dm:.04,sc:.08,rg:.05,pc:.03,cl:.03,rc:.04,og:.1,dr:.03,sb:.03};          // extra heat per shot, per level
+const NOSELL=new Set(['sh','dc','hl','mh','rv','wn','ec','as']);                              // instant or one-shot upgrades cannot be sold back
+const PIT_SLOTS=6;                                                                              // different pit-stop upgrades in one run (more in the later story stages)
+/* what an upgrade is good against (the same four words are used for the bosses below) */
+const UT={bt:'dodge',db:'dodge',dc:'dodge',sc:'spread',rg:'spread',cl:'spread',rc:'spread',bd:'spread',dr:'spread',sh:'guard',hl:'guard',mh:'guard',rv:'guard',as:'guard',wn:'guard',
+  fr:'dps',dm:'dps',cr:'dps',sb:'dps',pc:'dps',og:'dps',cool:'dps'};
+const CT={dodge:{n:'Dash',w:'lasers'},spread:{n:'Spread',w:'minions'},guard:{n:'Guard',w:'bullet walls'},dps:{n:'Damage',w:'a long fight'}};
+const BPATS=k=>[['fan5','summon','fan7','ring'],['spiral','ring','fan5','spiral','summon'],['laser','ring','laser','fan7','spiral'],['spiral','laser','ring','fan9','summon','laser','fan7']][k]||(typeof ATAB!=='undefined'&&ATAB[k])||[];
+/* a foe's counters, read from its pattern list: lasers -> dash, summons -> spread, rings / spirals / wide fans -> guard, always some damage */
+function foeOf(s){if(!s)return null;const g=s.goal.k;if(g!=='boss'&&g!=='mini')return null;const pats=g==='mini'?s.mini.pats:BPATS(DISTRICTS[s.di].boss),nm=g==='mini'?s.mini.nm:DISTRICTS[s.di].bossName,tags=[];
+  if(pats.includes('laser'))tags.push('dodge');if(pats.includes('summon'))tags.push('spread');if(pats.some(p=>/^(ring|spiral|fan9|fan7)$/.test(p)))tags.push('guard');tags.push('dps');
+  return{nm,tags,pats,mini:g==='mini'};}
+function nextFoeFrom(n){for(let i=Math.max(1,n);i<=MAIN;i++){const f=foeOf(STAGES[i-1]);if(f)return f;}return null;}
+const foeTip=f=>{if(!f)return '';const t=f.tags.filter(x=>x!=='dps').slice(0,2).map(x=>CT[x].n);const w=f.tags.filter(x=>x!=='dps').slice(0,2).map(x=>CT[x].w);
+  return w.length?'Fires '+w.join(' and ')+'. Bring '+t.join(' + ')+'.':'A long fight. Bring Damage.';};
+const stageTip=s=>{const f=foeOf(s);return f?foeTip(f):'';};
+
+
 /* ---------- much more to buy: permanent TUNE perks in the garage (levels, scaling prices, a recommended pick), more pit-stop upgrades, five new power-ups
    that can be bought into the drop pool, and "you can afford N upgrades" prompts. Everything hooks in from here (wrappers), the shop/garage files stay as they were. ---------- */
 const RGN=[50,44,38,33,28,24];                                   // seconds per shield for Shield Regen levels 1 to 6
@@ -2067,11 +2257,11 @@ const TP={revLeft:0,rgnT:0,boost:{},
   l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
 GA.tune={};{const o=load('mnr_tune',{});if(o&&typeof o==='object'&&!Array.isArray(o))for(const d of TP_DEF)if(isFinite(o[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(o[d.id])));}
 const tsave=()=>save('mnr_tune',GA.tune);
-/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 15 story stars (up to 8). Existing players start with their best perks equipped. */
+/* LOADOUT: only EQUIPPED perks work. Slots: 4, +1 per 20 story stars (up to 8). Existing players start with their best perks equipped. */
 GA.eq={};{const o=load('mnr_eq',null);if(o&&typeof o==='object'){for(const d of TP_DEF)GA.eq[d.id]=!!o[d.id];}
   else{const own=TP_DEF.filter(d=>(GA.tune[d.id]|0)>0).sort((a,b)=>b.pri-a.pri);for(const d of own.slice(0,4))GA.eq[d.id]=true;}}
 const eqsave=()=>save('mnr_eq',GA.eq);
-const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/15));
+const eqSlots=()=>4+Math.min(4,Math.floor((typeof ST!=='undefined'&&ST.totalStars?ST.totalStars():0)/20));
 const eqCount=()=>TP_DEF.filter(d=>GA.eq[d.id]&&(GA.tune[d.id]|0)>0).length;
 GA.tab='tune';
 
@@ -2086,9 +2276,9 @@ const NEWU=[
   {id:'rv',n:'Revive Token',t:'Come back once',          p:90,max:3,c:'#ff2d95',ic:TP_BY.rev.ic}];
 for(const u of NEWU){SH.UPG.push(u);UBY[u.id]=u;}
 /* ----- effects (all through wrappers) ----- */
-const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'));   // stacking cap: damage perks together never more than x2.1
+const tpDmg=()=>Math.min(2.1,1+.08*TP.l('dmg')+.12*SH.n('dm'))*SYN.dmg();   // stacking cap: the damage upgrades and perks together never more than x2.1; synergies, set bonuses and the trade-off perks (strategy.js) come on top
 const DRONE_CAP=3,DOUBLE_CAP=.3,CRIT_CAP=.3;
-const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr'));
+const tpCrit=()=>Math.min(CRIT_CAP,.025*TP.l('crt')+.05*SH.n('cr')+SYN.v.crit);
 const tpDouble=()=>Math.min(DOUBLE_CAP,.025*TP.l('rof'));
 const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
 {const rc=SH.recalc;SH.recalc=function(){rc.call(this);
@@ -2099,7 +2289,7 @@ const tpDrones=()=>Math.min(DRONE_CAP,TP.l('drn')+SH.n('dr'));
     if(id==='mh'&&P){P.max++;P.hp=Math.min(P.max,P.hp+1);}
     if(id==='rv')TP.revLeft++;};
   const vol=SH.volley;                                        // damage, crits and double shots on every volley the ship fires
-  const boost=n0=>{const dm=tpDmg(),pc=tpCrit();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=dm;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
+  const boost=n0=>{const dm=tpDmg(),pc=tpCrit();const off=SYN.off();for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];b.dm*=b.pf?dm:dm*off;if(pc&&Math.random()<pc){b.dm*=3;b.crit=1;if(!b.big&&!b.hv)b.big=1;}}};
   SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);boost(n0);
     const dd=tpDouble();if(dd&&Math.random()<dd)G.delayed.push({t:.07,f:()=>{if(G.dead||!running||P.over)return;const m=G.pb.length;vol.call(SH,P.x+22,P.y+2,0);boost(m);}});};
   const hurt0=hurt;hurt=function(){if(PW.on('bub')){if(P.inv<=0){P.inv=.0;}if(!TP.bt||performance.now()-TP.bt>400){TP.bt=performance.now();burst(P.x,P.y,'#3dffb0',10,220,.3);AU.sfx('graze');}return;}hurt0();};
@@ -2159,15 +2349,13 @@ function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr
   for(const s of SHIPS)if(s.p&&!GA.own['ship_'+s.id]&&s.p<=GA.bank)n++;
   for(const c of CREW)if(!GA.own[c.id]&&c.p<=GA.bank)n++;
   for(const h of THEMES)if(h.p&&!GA.own['th_'+h.id]&&h.p<=GA.bank)n++;return n;}
-function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P.max?45:0,sh:()=>SH.sh===0?90:55,rv:()=>TP.revLeft===0?85:30,mh:()=>60,dm:()=>70,dc:()=>55,dr:()=>65,fr:()=>50,cr:()=>45,hm:()=>40,ck:()=>35,mg:()=>30,wd:()=>25,lp:()=>30};
-  SH.cards.forEach((c,i)=>{if(c.sold||SH.neon<SH.price(c.u))return;const s=(pri[c.u.id]?pri[c.u.id]():30)-4*SH.n(c.u.id);if(s>bs){bs=s;best=i;}});return best;}
 
 /* ----- styles ----- */
 {const st=document.createElement('style');st.textContent=`
 .pg .card .rec{position:absolute;top:-9px;right:10px;background:var(--amber,#ffb020);color:#120a1f;font-family:var(--mono);font-weight:700;font-size:clamp(11px,calc(var(--u)*2.6),12px);letter-spacing:.08em;padding:1px 7px;border-radius:9px;white-space:nowrap}
 .pg .card .lv{font-family:var(--mono);font-weight:400;color:var(--dim);font-size:.82em;margin-left:4px;white-space:nowrap}
 .pg .card .pp{display:flex;gap:2px;margin-top:2px}.pg .card .pp i{display:block;width:clamp(5px,calc(var(--u)*2),9px);height:4px;border-radius:1px;background:#ffffff22}.pg .card .pp i.on{background:var(--c)}
-#gaCards.tune{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,235px),1fr));grid-auto-rows:min-content;align-content:start;gap:calc(var(--u)*2) calc(var(--u)*2);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 2px 6px;flex:1 1 0;min-height:0}
+#gaCards.tune{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));grid-auto-rows:min-content;align-content:start;gap:calc(var(--u)*2) calc(var(--u)*2);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 2px 6px;flex:1 1 0;min-height:0}
 #gaCards.tune .card{flex-direction:row;text-align:left;justify-content:flex-start;gap:10px;padding:8px 10px;min-height:58px}
 #gaCards.tune .card .tx{flex:1 1 0;min-width:0;overflow-wrap:anywhere}#gaCards.tune .card .pr{flex:0 0 auto;margin-left:6px}#gaCards.tune .card>svg{height:30px;width:30px}
 #gaCards.tune .card.max{opacity:.55;border-style:dashed}
@@ -2182,9 +2370,10 @@ function recPit(){let best=-1,bs=-1e9;const pri={hl:()=>P.hp<=P.max-2?100:P.hp<P
 const gaItems0=gaItems;
 function perkIcon(d){let real=false;try{real=ART.isReal('kit-'+(d.uid||d.id));}catch(e){}return real?`<img class="ki" src="media/kit-${d.uid||d.id}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
 function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
-  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button');b.type='button';
+  for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button'),p=pathOf(d.id);b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
-    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div><div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':''}"></i>`).join('')}</div></div>`
+    const bad=d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(Math.min(d.max,l+1))}</b></div>`:'';
+    b.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${pathChip(p)}${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${l<d.max?d.t(l+1):d.t(l)}</div>${l>0&&l<d.max?`<div class="pv">${d.t(l)}</div>`:''}${bad}<div class="pp">${Array.from({length:d.max},(_,i)=>`<i class="${i<l?'on':i===l?'nx':''}"></i>`).join('')}</div></div>`
       +`<div class="pr">${pr?neonI+' '+pr:'MAX'}</div>`+(d.id===rec?'<span class="rec">RECOMMENDED</span>':'');
     b.addEventListener('click',()=>tuneBuy(d,b));box.appendChild(b);}}
 function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is maxed');return false;}
@@ -2200,27 +2389,18 @@ gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
       b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
       const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:it.kind==='ship'?shipPortrait(it):svgI(it.ic);
       const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
-      b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
+      b.innerHTML=`${ic}<div class="tx"><div class="n">${it.kind==='crew'?pathChip(pathOf(it.id.replace(/^up_|^pu_/,''))):''}${it.n}</div><div class="t">${it.t}</div>${it.kind==='ship'?rhythmHTML(it.id):''}</div><div class="pr">${pr}</div>`;
       b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}
-    if(GA.tab==='crew')box.classList.add('tune');}
+    if(GA.tab==='crew'||GA.tab==='ships')box.classList.add('tune');}
   affUpd();};
 function affUpd(){const n=affordCount();afford.all=n;const g=$('gaBtn');
   if(g){g.innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank+(n?'<small>'+n+' UPGRADE'+(n>1?'S':'')+' READY</small>':'');g.classList.toggle('rdy',n>0);}
   const g2=$('gaBtn2');if(g2){g2.innerHTML='GARAGE'+(n?'<small>'+n+' READY</small>':'');g2.classList.toggle('rdy',n>0);}}
 gaDraw();
 
-/* ----- the pit stop: levels on the cards, a recommended pick, and "you can afford N" ----- */
+/* ----- the pit stop: the "you can afford N" row (the cards, picks, slots and selling are in strategy.js) ----- */
 {const row=document.createElement('div');row.className='aff';row.id='shAff';$('shMsg').before(row);}
-SH.draw=function(){const box=$('shCards');box.innerHTML='';const rec=recPit();let aff=0;
-  this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),n=this.n(u.id),b=document.createElement('button');b.type='button';if(!c.sold&&this.neon>=pr)aff++;
-    b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
-    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}</div><div class="t">${lvText(u,n+1)}</div>${u.max>1?`<div class="pp">${Array.from({length:u.max},(_,k)=>`<i class="${k<n?'on':''}"></i>`).join('')}</div>`:''}</div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`+(i===rec&&!c.sold?'<span class="rec">RECOMMENDED</span>':'');
-    b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
-  $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
-  $('shGo').textContent=this.picks?'GO':'SKIP';
-  $('shOwn').innerHTML=this.order.length?this.order.map(id=>{const u=UBY[id];return `<span style="--c:${u.c}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</span>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>';
-  const ga=affordCount();$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(ga?` · Garage: <b>${ga}</b> ready`:'');
-  SH.aff=aff;SH.rec=rec;};
+
 NR.on('banked',()=>affUpd());NR.on('runEnd',()=>setTimeout(affUpd,0));
 affUpd();
 
@@ -2322,20 +2502,184 @@ const this_ship=()=>SH.ship;
   if(AX.arcs.length){ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';for(const a of AX.arcs){ctx.globalAlpha=clamp(a.l*4,0,1);ctx.strokeStyle='#8fe9ff';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(a.x1,a.y1);
       const n=5;for(let i=1;i<n;i++){const u=i/n;ctx.lineTo(a.x1+(a.x2-a.x1)*u+(((i*37+(a.x1|0))%11)-5),a.y1+(a.y2-a.y1)*u+(((i*53+(a.y1|0))%11)-5));}ctx.lineTo(a.x2,a.y2);ctx.stroke();}ctx.restore();}
   if(G.bt>0&&G.live){ctx.save();ctx.globalAlpha=clamp(G.bt*.5,0,.14);ctx.fillStyle='#19e3ff';ctx.fillRect(0,0,W,H);ctx.restore();}};}
-/* ----- recommended picks in the pit stop for the new upgrades ----- */
-{const rp=recPit;recPit=function(){let best=-1,bs=-1e9;const pri={sc:62,rg:38,pc:60,cl:58,bt:48,rc:36,og:64,as:66,bd:63,sm:28,ni:34,wn:80,ec:32,lk:35};
-  const base=rp.call(this);SH.cards.forEach((c,i)=>{if(c.sold||SH.neon<SH.price(c.u))return;const b=pri[c.u.id];if(b==null)return;const s=b-4*SH.n(c.u.id);if(s>bs){bs=s;best=i;}});
-  if(best<0)return base;if(base<0)return best;return bs>=60?best:base;};}
+
 
 /* ---------- fifteen more garage perks: STARTING KITS. An equipped kit gives you that pit-stop upgrade at the start of every run (up to the level you own),
    so what you equip decides your build, and slots are limited (see LOADOUT in meta.js). ---------- */
-{const KITS=[['sc','Wing Cannons',3,260,'Start with side cannons'],['rg','Rear Guard',3,240,'Start with a rear gun'],['pc','Piercer',4,300,'Start with piercing shots'],['cl','Arc Chain',3,320,'Start with chain lightning'],['bt','Chrono Dash',3,300,'Start with bullet time on beat dashes'],
+{const KITS=[['sc','Wing Cannons',3,260,'Start with side cannons'],['rg','Rear Guard',3,240,'Start with a rear gun'],['pc','Piercer',4,300,'Start with piercing shots'],['cl','Arc Chain',3,320,'Start with chain lightning'],['bt','Chrono Dash',3,300,'Start with beat-dash bullet time'],
   ['rc','Ricochet',3,280,'Start with bouncing shots'],['as','Aegis',3,320,'Start with auto-shields'],['bd','Orbit Guns',3,340,'Start with orbiting guns'],['hm','Seeker Shots',4,260,'Start with homing shots'],['sm','Score Magnet',3,200,'Start with a score magnet'],
   ['ni','Neon Interest',3,260,'Start with Neon interest'],['lk','Fortune',3,240,'Start with lucky drops'],['wn','Second Wind',1,500,'Start with Second Wind'],['og','Overdrive Core',1,520,'Start with Overdrive'],['ec','EMP Cell',1,300,'Start with an extra EMP']];
   const raw=load('mnr_tune',{}),eq=load('mnr_eq',null);
   for(const [id,n,max,p,t] of KITS){const u=UBY[id];if(!u)continue;const d={id:'kit_'+id,n:n+' kit',p,max:Math.min(max,u.max||max),c:u.c,pri:55,ic:u.ic,uid:id,t:l=>t+(l>1?' (level '+l+')':'')};
     TP_DEF.push(d);TP_BY[d.id]=d;if(raw&&isFinite(raw[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(raw[d.id])));GA.eq[d.id]=!!(eq&&eq[d.id]);}
   NR.on('runStart',()=>setTimeout(()=>{if(!G||!G.live)return;for(const d of TP_DEF){if(!d.uid||!TP.l(d.id))continue;const u=UBY[d.uid];for(let i=SH.n(d.uid);i<TP.l(d.id)&&i<u.max;i++)SH.add(d.uid);}},40));}
+
+/* ---------- STRATEGY: build paths, synergies, a heat budget, slot limits, stock that rotates per run, selling at a loss and boss-weakness picks ----------
+   Everything here is a layer on top of the pit stop (shop.js), the garage perks (upgrades.js) and the market (meta.js). The data tables come first.
+   PATHS     three builds: Glass Cannon (damage), Tank (survive), Beat Combo (live on the beat). Every upgrade and perk belongs to one or none.
+   SYNS      pairs of items that do more together; SETS: bonuses for owning 2 and 4 pieces of one path (the 4-piece bonus has a price).
+   HEAT      damage upgrades make every shot hotter (overheat locks the gun); Coolant and Heat Sink pay it back. One budget to balance.
+   SLOTS     a run holds at most 6 different pit-stop upgrades (7 from story stage 14, 8 from stage 28).
+   BOSSW     what a boss or mini-boss fires decides which upgrades are recommended against it (read from its real pattern list). */
+function nextFoe(){if(typeof ST!=='undefined'&&ST.on)return nextFoeFrom(ST.n+(ST.over?1:0));
+  const D=DISTRICTS[G&&G.di||0];if(!D)return null;const pats=BPATS(D.boss),tags=[];if(pats.includes('laser'))tags.push('dodge');if(pats.includes('summon'))tags.push('spread');if(pats.some(p=>/^(ring|spiral|fan9|fan7)$/.test(p)))tags.push('guard');tags.push('dps');
+  return{nm:D.bossName,tags,pats};}
+/* ----- what you own, the active synergies and set bonuses, and the numbers they add ----- */
+const SYN={v:{},act:[],sets:{},cnt:{gc:0,tk:0,bc:0},owned:new Set(),hg:0,
+  lvl(id){let l=SH.n(id);for(const d of TP_DEF)if(canon(d.id)===id)l=Math.max(l,TP.l(d.id));return l;},
+  scan(){const o=new Set();for(const id in SH.got)if(SH.got[id]>0)o.add(canon(id));for(const d of TP_DEF)if(TP.l(d.id)>0)o.add(canon(d.id));this.owned=o;return o;},
+  muted:false,   // tests of a single upgrade switch the synergy layer off
+  calc(){const o=this.scan(),v={dmg:0,crit:0,inv:0,ck:0,win:0,sharp:0,nx:0,db:0,hull:0,off:0,heat:0,fr0:0},add=fx=>{for(const k in fx)v[k]=(v[k]||0)+fx[k];};
+    if(this.muted){this.act=[];for(const p in PATHS){this.cnt[p]=0;this.sets[p]=[];}this.v=v;return v;}
+    this.act=SYNS.filter(s=>o.has(s.a)&&o.has(s.b));for(const s of this.act)add(s.fx);
+    for(const p in PATHS){let n=0;for(const id of o)if(PATHOF[id]===p)n++;this.cnt[p]=n;this.sets[p]=SETS[p].filter(t=>n>=t.n);for(const t of this.sets[p])add(t.fx);}
+    this.v=v;return v;},
+  heat(){let h=1+this.v.heat;for(const id in HEATL){if(id==='fr'&&this.v.fr0)continue;h+=HEATL[id]*this.lvl(id);}h-=.1*this.lvl('cool')+.1*TP.l('hsk');return Math.max(.55,Math.min(2.4,h));},
+  /* the heat line of an upgrade card: what one more level of it costs */
+  heatOf(id){return HEATL[id]?Math.round(HEATL[id]*100):0;},
+  // would buying this complete a synergy? (the chip on the card)
+  completes(id){const c=canon(id),o=this.owned;return SYNS.find(s=>!(o.has(s.a)&&o.has(s.b))&&((s.a===c&&o.has(s.b))||(s.b===c&&o.has(s.a))));},
+  /* the 4-piece bonus is a trade: say so before the pieces are bought */
+  hullDelta(){return (this.v.hull||0)-TP.l('glc');},
+  applyHull(){if(!P||!G||!G.live)return;const t=this.hullDelta(),d=t-this.hg;if(!d)return;this.hg=t;P.max=Math.max(3,P.max+d);P.hp=Math.max(1,Math.min(P.max,P.hp+(d>0?d:0)));}};
+{const rc=SH.recalc;SH.recalc=function(){rc.call(this);const v=SYN.calc(),n=id=>TP.l(id);
+    this.ck+=v.ck;NR.mod.win+=v.win+10*n('bea');this.sharp+=v.sharp;this.nx*=(1+v.nx)*(1+.1*n('grd'));
+    NR.mod.mag*=1-.15*n('grd');TP.nx0=this.nx;TP.mag0=NR.mod.mag;SYN.applyHull();};
+  const ab=SH.absorb;SH.absorb=function(){const r=ab.call(this);if(r&&SYN.v.inv)P.inv=Math.max(P.inv,1.3+SYN.v.inv);return r;};
+  const sh0=SH.shot;SH.shot=function(){const r=sh0.call(this);r.heat*=SYN.heat();return r;};}
+NR.on('runStart',()=>{SYN.hg=0;SH.stock=[];SH.seen=new Set();SH.sold=0;setTimeout(()=>{if(!G||!G.live)return;
+  const l=TP.l('ldp');if(l)SH.sh+=l;const g=TP.l('glc');if(g){P.max=Math.max(3,P.max-g);P.hp=Math.min(P.hp,P.max);SYN.hg=-g;}SH.recalc();},90);});
+
+/* ----- new garage perks. Three have a downside: that is the deal ----- */
+{const IC2={glc:'M12 2l3 7 7 .8-5.3 4.7 1.6 7.2L12 18l-6.3 3.7 1.6-7.2L2 9.8 9 9z',grd:'M12 2l8.5 5v10L12 22l-8.5-5V7z',ldp:'M5 8h14v8H5zM3 10h2v4H3zM19 10h2v4h-2z',bea:'M2 12l5-5v3h10V7l5 5-5 5v-3H7v3z',hsk:'M12 2a6 6 0 016 6c0 4-6 8-6 14C12 16 6 12 6 8a6 6 0 016-6z'};
+  const NP=[{id:'hsk',n:'Heat Sink',p:80,max:5,c:'#7dffd8',pri:66,ic:IC2.hsk,t:l=>'Shots build '+10*l+'% less heat'},
+    {id:'glc',n:'Glass Core',p:90,max:3,c:'#ff5a3d',pri:64,ic:IC2.glc,t:l=>'+'+14*l+'% shot damage',bad:l=>'Max hull -'+l},
+    {id:'grd',n:'Greedy Pilot',p:60,max:4,c:'#19e3ff',pri:34,ic:IC2.grd,t:l=>'+'+10*l+'% Neon from kills',bad:l=>'Pickup range -'+15*l+'%'},
+    {id:'ldp',n:'Lead Plating',p:110,max:3,c:'#3dffb0',pri:62,ic:IC2.ldp,t:l=>'Start with +'+l+' shield'+(l>1?'s':''),bad:l=>'Shot damage -'+6*l+'%'},
+    {id:'bea',n:'Beat Addict',p:100,max:3,c:'#ffe14d',pri:61,ic:IC2.bea,t:l=>'On-beat window +'+10*l+' ms',bad:l=>'Off-beat shots -'+15*l+'%'}];
+  const raw=load('mnr_tune',{}),eq=load('mnr_eq',null);
+  for(const d of NP){TP_DEF.push(d);TP_BY[d.id]=d;if(raw&&isFinite(raw[d.id]))GA.tune[d.id]=Math.max(0,Math.min(d.max,Math.floor(raw[d.id])));GA.eq[d.id]=!!(eq&&eq[d.id]);}}
+/* the pit-stop upgrade that pays the heat back */
+{const u={id:'cool',n:'Coolant',t:'Shots build less heat',p:36,max:4,c:'#7dffd8',ic:'M12 2a6 6 0 016 6c0 4-6 8-6 14C12 16 6 12 6 8a6 6 0 016-6z'};SH.UPG.push(u);UBY.cool=u;LVT.cool=l=>'Heat per shot -'+10*l+'%';}
+// what the upgrades.js damage formula multiplies in: synergies, set bonuses, the downside perks
+SYN.dmg=()=>(1+SYN.v.dmg)*(1+.14*TP.l('glc'))*(1-.06*TP.l('ldp'));
+SYN.off=()=>Math.max(.4,1-(SYN.v.off||0)-.15*TP.l('bea'));
+
+/* ----- the pit stop: slots, rotating stock, sell, boss picks, previews ----- */
+Object.defineProperty(SH,'slots',{get(){return PIT_SLOTS+(ST.on?(ST.n>=14)+(ST.n>=28):0);}});   // 6 different upgrades, 7 from stage 14, 8 from stage 28
+SH.stock=[];SH.seen=new Set();SH.sold=0;SH.armed=null;
+SH.pool=function(){const full=this.order.length>=this.slots;return UPG.filter(u=>this.n(u.id)<u.max&&(!u.x||GA.own[u.x])&&(!u.ok||u.ok())&&(!full||this.n(u.id)>0));};
+SH.rerollPrice=function(){return 8+4*this.rerolls+3*this.pits;};
+SH.restock=function(pool){const by={gc:[],tk:[],bc:[],n:[]},sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  for(const u of pool)by[pathOf(u.id)||'n'].push(u.id);for(const k in by)sh(by[k]);
+  const out=[];for(let i=0;i<3;i++)for(const k of['gc','tk','bc'])if(by[k].length&&out.length<9)out.push(by[k].shift());
+  const rest=sh([].concat(by.gc,by.tk,by.bc,by.n));while(out.length<11&&rest.length)out.push(rest.shift());this.stock=out;this.seen=new Set();};
+SH.buildScore=function(u){const c=canon(u.id),p=pathOf(u.id);let s=0;if(p){const top=Object.keys(SYN.cnt).sort((a,b)=>SYN.cnt[b]-SYN.cnt[a])[0];if(SYN.cnt[p]>0&&p===top)s+=30;s+=8*SYN.cnt[p];if(SYN.cnt[p]===1||SYN.cnt[p]===3)s+=14;}  // one piece short of a set bonus
+  if(SYN.completes(u.id))s+=35;if(this.n(u.id)>0)s+=6;if(u.id==='hl'&&P&&P.hp<=P.max-2)s+=70;if(HEATL[c]&&SYN.heat()>1.5)s-=25;return s;};
+SH.bossScore=function(u,foe){if(!foe)return 0;const t=UT[canon(u.id)];if(!t)return 0;const i=foe.tags.indexOf(t);return i<0?0:(i===0?60:i===1?45:t==='dps'?15:30)-4*this.n(u.id);};
+SH.deal=function(){let pool=this.pool();if(!this.stock.length||!pool.some(u=>this.stock.includes(u.id)))this.restock(pool);
+  const cand=pool.filter(u=>this.stock.includes(u.id)),out=[],take=u=>{if(u&&!out.includes(u)){out.push(u);return true;}return false;},foe=nextFoe();
+  const best=(f,only)=>cand.filter(u=>!out.includes(u)&&(!only||only(u))).sort((a,b)=>f(b)-f(a)+(this.seen.has(a.id)?.5:0)-(this.seen.has(b.id)?.5:0))[0];
+  take(best(u=>this.bossScore(u,foe),u=>this.bossScore(u,foe)>0));            // one card answers the next boss
+  take(best(u=>this.buildScore(u)));                                           // one card follows your build
+  const rest=cand.filter(u=>!out.includes(u)),unseen=rest.filter(u=>!this.seen.has(u.id));const wild=(unseen.length?unseen:rest);take(wild[Math.floor(Math.random()*wild.length)]);
+  while(out.length<3){const more=pool.filter(u=>!out.includes(u));if(!more.length)break;take(more[Math.floor(Math.random()*more.length)]);}
+  for(const u of out)this.seen.add(u.id);
+  this.cards=out.map(u=>({u,sold:false,why:this.bossScore(u,foe)>0&&u===out[0]?'boss':null}));
+  // the badge on the card: boss pick (first card) or build pick
+  const bp=this.cards.find(c=>c.why==='boss');if(!bp){const b=this.cards.map((c,i)=>[this.buildScore(c.u),i]).sort((a,b)=>b[0]-a[0])[0];if(b&&b[0]>=20)this.cards[b[1]].why='build';}
+  else{const b=this.cards.filter(c=>c!==bp).map(c=>[this.buildScore(c.u),c]).sort((a,b)=>b[0]-a[0])[0];if(b&&b[0]>=20)b[1].why='build';}
+  this.foe=foe;this.armed=null;};
+SH.sellPrice=function(id){const u=UBY[id],n=this.n(id);if(!u||n<1||NOSELL.has(id))return 0;return Math.max(1,Math.floor(.5*Math.round(1.25*u.p*(1+.5*(n-1)))));};
+SH.sell=function(id){if(!this.active||this.lock>0)return false;const pr=this.sellPrice(id);if(!pr)return false;
+  if(this.armed!==id){this.armed=id;this.msg('Sell '+UBY[id].n+' for '+pr+'? Tap again');this.draw();return false;}
+  this.got[id]--;if(this.got[id]<=0){delete this.got[id];this.order=this.order.filter(x=>x!==id);}this.neon+=pr;this.sold++;this.armed=null;this.recalc();AU.sfx('hit');this.msg(UBY[id].n+' sold +'+pr);this.draw();return true;};
+SH.buy0=SH.buy;SH.buy=function(i){this.armed=null;return this.buy0(i);};
+/* ----- the pit-stop screen ----- */
+{const st=document.createElement('style');st.textContent=`
+.pg .card .pc{display:inline-flex;width:1.25em;height:1.25em;border-radius:50%;background:#05030c;border:1.5px solid var(--c);vertical-align:-.25em;margin-right:4px;flex:0 0 auto}
+.pg .card .pc svg{width:100%;height:100%;padding:2px;box-sizing:border-box;background:none!important;color:var(--c);height:100%}
+.pg .card .pv{font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.8),15px);color:var(--dim);line-height:1.2}
+.pg .card .chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.7),14px)}
+.pg .card .chips b{font-weight:700;padding:0 6px;border-radius:8px;background:#05030c;border:1px solid var(--c,#8c86b8);color:var(--c,#ccc);white-space:nowrap}
+.pg .card .chips b.heat{--c:#ff9a3d}.pg .card .chips b.syn{--c:#3dffb0}.pg .card .chips b.bad{--c:#ff5a6a}
+.pg .card .n .rec{position:static;display:inline-block;margin-left:6px;vertical-align:middle;font-size:11px;padding:0 6px;line-height:1.35;background:#05030c;border:1.5px solid var(--amber,#ffb020);color:var(--amber,#ffb020)}
+.pg .card .n .rec.boss{border-color:#ff5a6a;color:#ff9aa5;background:#05030c}
+.pg .card .pp i.nx{background:var(--c);animation:pnx 1s ease-in-out infinite}
+@keyframes pnx{0%,100%{opacity:.25}50%{opacity:1}}
+.pg .bld{display:flex;gap:calc(var(--u)*2);align-items:center;flex:0 0 auto;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.9),15px);color:var(--dim);flex-wrap:wrap}
+.pg .bld .bp{display:inline-flex;align-items:center;gap:3px;color:var(--c)}
+.pg .bld .bp svg{height:1.5em;width:1.5em}
+.pg .bld .bp i{display:inline-block;width:7px;height:7px;border-radius:2px;background:#ffffff22}.pg .bld .bp i.on{background:var(--c)}.pg .bld .bp i.set{box-shadow:0 0 5px var(--c)}
+.pg .bld .hs{margin-left:auto;white-space:nowrap}.pg .bld .hs.hot{color:#ff9a3d}
+.pg .foe{font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.9),15px);color:#7dffd8;flex:0 0 auto;text-align:center;min-height:1.2em}
+.pg .own button.oi{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-height:44px;min-width:44px;padding:0 6px;border:1px solid transparent;border-radius:8px;background:#ffffff0a;color:var(--c);font-family:var(--mono);cursor:pointer}
+.pg .own button.oi.arm{border-color:#ff5a6a;background:#ff5a6a33;animation:pnx .5s infinite}
+.pg .own button.oi.ns{cursor:default;opacity:.85}
+.pg .own .sl{margin-left:auto;color:var(--dim);white-space:nowrap}
+@container (max-height:640px){.pg .aff{display:none}}
+@container (max-height:640px){.pg .card .pv{display:none}}
+@container (max-height:600px){.pg .card .chips{display:none}}
+@container (max-height:430px){.pg .card .pv,.pg .card .chips,.pg .foe{display:none}.pg .bld{font-size:11px}}
+`;document.head.appendChild(st);}
+{const bl=document.createElement('div');bl.className='bld';bl.id='shBld';const fo=document.createElement('div');fo.className='foe';fo.id='shFoe';$('shOwn').before(bl,fo);
+  $('shOwn').addEventListener('click',e=>{const b=e.target.closest('button.oi');if(b&&!b.classList.contains('ns'))SH.sell(b.dataset.id);});}
+const heatTxt=()=>{const h=Math.round((SYN.heat()-1)*100);return 'HEAT '+(h>=0?'+':'')+h+'%';};
+function buildBar(){let h='';for(const p in PATHS){const P_=PATHS[p],n=SYN.cnt[p],tier=n>=4?2:n>=2?1:0;h+=`<span class="bp" style="--c:${P_.c}" title="${P_.n}">${svgI(P_.ic)}${[0,1,2,3].map(i=>`<i class="${i<n?'on':''}${(i===1&&n>=2)||(i===3&&n>=4)?' set':''}"></i>`).join('')}</span>`;}
+  const hot=SYN.heat()>1.45;return h+`<span class="hs${hot?' hot':''}">${heatTxt()}</span>`;}
+SH.draw=function(){const box=$('shCards');box.innerHTML='';SYN.calc();let aff=0;const full=this.order.length>=this.slots;
+  this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),n=this.n(u.id),b=document.createElement('button'),p=pathOf(u.id),sy=SYN.completes(u.id),hl=SYN.heatOf(canon(u.id)),nw=n?lvText(u,n):'';b.type='button';if(!c.sold&&this.neon>=pr)aff++;
+    b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
+    const chips=(sy?`<b class="syn" title="${sy.t}">+ ${sy.n}</b>`:'')+(hl?`<b class="heat">HEAT +${hl}%</b>`:'')+(u.id==='cool'?'<b class="heat">COOLS</b>':'');
+    b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${pathChip(p)}${u.n}${u.max>1?`<span class="lv">${n+1}/${u.max}</span>`:''}${c.why&&!c.sold?`<span class="rec${c.why==='boss'?' boss':''}">${c.why==='boss'?'BOSS PICK':'BUILD PICK'}</span>`:''}</div><div class="t">${lvText(u,n+1)}</div>${nw?`<div class="pv">${nw}</div>`:''}${chips?`<div class="chips">${chips}</div>`:''}${u.max>1?`<div class="pp">${Array.from({length:u.max},(_,k)=>`<i class="${k<n?'on':k===n?'nx':''}"></i>`).join('')}</div>`:''}</div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`;
+    b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
+  $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
+  $('shGo').textContent=this.picks?'GO':'SKIP';
+  $('shBld').innerHTML=buildBar();$('shFoe').textContent=this.foe?this.foe.nm+': '+foeTip(this.foe):'';
+  $('shOwn').innerHTML=(this.order.length?this.order.map(id=>{const u=UBY[id],sp=this.sellPrice(id);return `<button type="button" class="oi${NOSELL.has(id)?' ns':''}${this.armed===id?' arm':''}" data-id="${id}" style="--c:${u.c}" aria-label="${u.n}${sp?', sell for '+sp:''}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</button>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>')+`<span class="sl">SLOTS ${this.order.length}/${this.slots}${full?' · FULL':''}${this.order.some(id=>!NOSELL.has(id))?' · TAP TO SELL':''}`+'</span>';
+  const ga=typeof affordCount==='function'?affordCount():0;$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(ga?` · Garage: <b>${ga}</b> ready`:'');
+  SH.aff=aff;SH.rec=this.cards.findIndex(c=>c.why);};
+
+/* ----- ship preview: one bar of the ship's fire pattern with a moving playhead, and what it does to damage and heat ----- */
+const SHIPACC={drift:{every:1,off:0,n:'FAN'},lancer:{every:2,off:1,n:'LANCE'},nova:{every:3,off:2,n:'RING'}};   // what the extra ships add on top of the steady 16th grid (shapes.js)
+function shipRhythm(id){const x=typeof SHIPX==='object'?SHIPX[id]:null,ac=SHIPACC[id],gs=x?x.gs:id==='tri'?1/3:id==='hv'?2:id==='ec'?.5:.25,mk=x?x.mk:()=>true,out=[];
+  for(let c=0;c*gs<4-1e-6;c++)if(mk(c)){const a=ac&&c%ac.every===ac.off;out.push({t:c*gs/4,cls:id==='hv'||a?'big':'',echo:id==='ec'});}return out;}
+function rhythmHTML(id){const shots=shipRhythm(id),x=typeof SHIPX==='object'?SHIPX[id]:null,ac=SHIPACC[id],nb=ac?shots.filter(s=>s.cls).length:0;
+  return `<div class="rh" aria-hidden="true">${shots.map(s=>`<i${s.cls?' class="big"':''} style="left:${(s.t*100).toFixed(1)}%"></i>${s.echo&&s.t+.25<1?`<i class="ech" style="left:${((s.t+.25)*100).toFixed(1)}%"></i>`:''}`).join('')}<u></u></div>`
+   +`<div class="chips">${id==='ec'?`<b>${shots.length} SHOTS + ${shots.length} ECHOES</b>`:ac?`<b>${nb} ${ac.n}${nb>1?'S':''} A BAR</b>`:`<b>${shots.length} ${id==='hv'?'BLASTS':'SHOTS'} A BAR</b>`}${x?`<b class="heat">HEAT x${x.hk}</b>`:''}</div>`;}
+{const st=document.createElement('style');st.textContent=`
+.pg .card .rh{position:relative;height:12px;margin-top:3px;background:#ffffff10;border-radius:3px;overflow:hidden}
+.pg .card .rh i{position:absolute;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2px;border-radius:50%;background:var(--c,#ccc)}
+.pg .card .rh i.big{width:10px;height:10px;margin:-5px 0 0 -4px}
+.pg .card .rh i.ech{opacity:.35}
+.pg .card .rh u{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 6px #fff;animation:rhp 2s linear infinite}
+@keyframes rhp{from{left:0}to{left:100%}}
+.pg .presets{display:flex;gap:calc(var(--u)*1.6)}.pg .presets .pst{flex:1 1 0;min-width:0;min-height:44px;display:flex;align-items:center;justify-content:center;gap:4px;padding:.3em .2em;font-size:clamp(11px,calc(var(--u)*2.8),13px);white-space:nowrap}
+.pg .presets .pst svg{height:1.3em;width:1.3em;color:var(--c)}
+.pg .paths{display:flex;flex-direction:column;gap:3px;text-align:left;width:min(100%,600px);margin:0 auto}
+.pg .pth{display:flex;flex-wrap:wrap;gap:0 10px;align-items:center;color:var(--c);font-size:clamp(11px,calc(var(--u)*2.9),13px)}
+.pg .pth .pn{display:flex;align-items:center;gap:4px;white-space:nowrap}.pg .pth svg{height:1.4em;width:1.4em}
+.pg .pth .pb i{display:inline-block;width:8px;height:8px;margin-right:2px;border-radius:2px;background:#ffffff22}.pg .pth .pb i.on{background:var(--c)}
+.pg .pth .pt{text-align:left;color:var(--dim);flex:1 1 100%;padding-left:1.9em}
+.pg .syns{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.pg .syns b,.pg .cargo button.oi{font-weight:700;padding:2px 8px;border-radius:9px;background:#05030c;border:1px solid #3dffb0;color:#3dffb0;font-size:clamp(11px,calc(var(--u)*2.8),12px);display:inline-flex;align-items:center;gap:3px}
+.pg .syns b svg{height:1.2em;width:1.2em}.pg .syns b:not(.on){border-style:dashed;opacity:.6}.pg .syns b.heat{border-color:#ff9a3d;color:#ff9a3d}
+.pg .cargo button.oi{border-color:var(--c);color:var(--c);min-height:44px;margin:2px 3px;cursor:pointer}.pg .cargo button.oi svg{height:1.3em;width:1.3em}
+.pg .mkbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.pg .mkbar .go{flex:0 0 auto;min-height:40px}
+.pg .mkbar .foe2{color:#7dffd8;font-size:clamp(11px,calc(var(--u)*2.8),12px);flex:1 1 12em;text-align:left}
+.pg .card s{color:var(--dim);margin-right:3px}
+.pg .card .pv::before{content:"NOW ";letter-spacing:.08em;color:#ffffff55}
+`;document.head.appendChild(st);}
+
+/* test hooks (strategy-test.js) */
+window.__nrs={get SYN(){return SYN},SYNS,PATHS,foeOf,foeTip,pathOf,lvText,tpDmg:()=>tpDmg(),get MK(){return MK},TP_BY,nextFoe};
+
+{const st=document.createElement('style');st.textContent=`
+#gaCards.tune .card.d{flex-wrap:wrap}
+#gaCards.tune .card.d .tx{flex:1 1 150px}
+#gaCards.tune .card.d .bt{flex:1 1 100%;justify-content:space-between}
+#gaCards.tune .card.d .bt button{flex:1 1 0;min-height:44px}
+`;document.head.appendChild(st);}
 
 /* ---------- ATHINA must be Athens in every orientation ----------
    Landscape: moon and glint on the water, olive groves on the shore, on top of the lit Acropolis, Plaka and Lycabettus that were already there.
@@ -2644,30 +2988,58 @@ const qsave=()=>save('mnr_q',GA.queue);
 {const tabs=garageEl.querySelector('.tabs');for(const [t,l] of [['load','LOAD'],['mkt','SHOP'],['soon','SOON']]){const b=document.createElement('button');b.className='go dim';b.dataset.t=t;b.type='button';b.textContent=l;tabs.append(b);b.addEventListener('click',()=>{GA.tab=t;gaDraw();});}}
 const day=()=>new Date().toISOString().slice(0,10);
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
-const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc','sc','pc','cl','bt','as','bd','sm','lk','ni','rc'].filter(id=>UBY[id]);
-const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?o:{day:day(),b:[]};})(),
-  offers(){const r=mul(hash(day()));const pool=MKP.slice(),o=[];while(o.length<3&&pool.length)o.push(pool.splice(Math.floor(r()*pool.length),1)[0]);return o;},
-  price(id){return Math.round(UBY[id].p*3.2/5)*5;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
+const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc','sc','pc','cl','bt','as','bd','sm','lk','ni','rc','cool','db','sb','nx'].filter(id=>UBY[id]);
+/* the daily MARKET: four offers (one per build path where possible, one of them on sale), two purchases a day, a hold for 3 items, a reroll that costs more every time.
+   Cargo can be sold back at 60%. Offers show the effect, the build path, a synergy with what you own and whether they answer the next boss. */
+const CARGO_MAX=3;
+const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?Object.assign({rr:0},o):{day:day(),b:[],rr:0};})(),
+  offers(){const r=mul(hash(day()+'/'+this.s.rr));const by={gc:[],tk:[],bc:[],n:[]};for(const id of MKP)by[pathOf(id)||'n'].push(id);
+    const pick=a=>a.length?a.splice(Math.floor(r()*a.length),1)[0]:null,o=[];for(const k of['gc','tk','bc'])o.push(pick(by[k]));
+    const rest=[].concat(by.gc,by.tk,by.bc,by.n);while(o.length<4&&rest.length)o.push(pick(rest));return o.filter(Boolean);},
+  sale(){const o=this.offers();return o[Math.floor(mul(hash(day()+'/sale/'+this.s.rr))()*o.length)];},
+  price(id){const p=Math.round(UBY[id].p*3.2/5)*5;return id===this.sale()?Math.round(p*.7/5)*5:p;},
+  full(id){return Math.round(UBY[id].p*3.2/5)*5;},
+  rerollPrice(){return 40+40*this.s.rr;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
 const gd0=gaDraw;
 gaDraw=function(){if(garageEl.hidden&&labEl&&!labEl.hidden){garageDirty=true;return;}if(!['load','mkt','soon'].includes(GA.tab)){gd0();return;}
   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.innerHTML='';box.classList.add('tune');
   if(GA.tab==='load')loadDraw(box);else if(GA.tab==='mkt')mktDraw(box);else soonDraw(box);affUpd();};
-function loadDraw(box){const sl=eqSlots(),n=eqCount(),own=TP_DEF.filter(d=>TP.raw(d.id)>0);
-  const h=document.createElement('div');h.className='slots';h.style.gridColumn='1/-1';h.innerHTML=`SLOTS <b style="color:#ffb020">${n}/${sl}</b> · only equipped perks work · +1 slot per 15 story stars (${ST.totalStars()} now) · selling returns 60%`;box.append(h);
-  if(!own.length){const e=document.createElement('div');e.className='slots';e.style.gridColumn='1/-1';e.textContent='Buy perks in TUNE first.';box.append(e);}
+const fullRow=(box,html,cls)=>{const e=document.createElement('div');e.className='slots '+(cls||'');e.style.gridColumn='1/-1';e.innerHTML=html;box.append(e);return e;};
+/* build preset: equip the best owned perks of one path */
+function loadPreset(p){const sl=eqSlots(),mine=TP_DEF.filter(d=>TP.raw(d.id)>0).sort((a,b)=>((pathOf(b.id)===p)-(pathOf(a.id)===p))||(b.pri-a.pri));GA.eq={};for(const d of mine.slice(0,sl))if(pathOf(d.id)===p||d.pri>=90)GA.eq[d.id]=true;eqsave();SH.recalc();AU.sfx('up');gaMsg(PATHS[p].n+' loadout set');gaDraw();}
+function loadDraw(box){const sl=eqSlots(),n=eqCount(),own=TP_DEF.filter(d=>TP.raw(d.id)>0);SYN.calc();
+  fullRow(box,`SLOTS <b style="color:#ffb020">${n}/${sl}</b> · only equipped perks work · +1 slot per 20 story stars (${ST.totalStars()} now) · selling returns 60%`);
+  const pr=fullRow(box,'','presets');pr.innerHTML=Object.keys(PATHS).map(p=>`<button type="button" class="go dim pst" data-p="${p}" style="--c:${PATHS[p].c}">${svgI(PATHS[p].ic)}${PATHS[p].n.toUpperCase()}</button>`).join('');
+  pr.addEventListener('click',e=>{const b=e.target.closest('.pst');if(b)loadPreset(b.dataset.p);});
+  // build paths: pieces owned, the next set bonus (the 4-piece bonus has a price)
+  fullRow(box,Object.keys(PATHS).map(p=>{const c=SYN.cnt[p],nx=SETS[p].find(t=>c<t.n),have=SETS[p].filter(t=>c>=t.n).pop();
+    return `<div class="pth" style="--c:${PATHS[p].c}"><span class="pn">${svgI(PATHS[p].ic)}${PATHS[p].n}</span><span class="pb">${[0,1,2,3].map(i=>`<i class="${i<c?'on':''}"></i>`).join('')}</span><span class="pt">${nx?`${c}/${nx.n}: ${nx.t}`:`Full: ${have.t}`}</span></div>`;}).join(''),'paths');
+  const act=SYN.act,near=SYNS.filter(s=>!act.includes(s)&&(SYN.owned.has(s.a)!==SYN.owned.has(s.b)));
+  fullRow(box,(act.length?act.map(s=>`<b class="syn on" title="${s.t}">${UBY[s.a]?svgI(UBY[s.a].ic):''}+${UBY[s.b]?svgI(UBY[s.b].ic):''} ${s.n}: ${s.t}</b>`).join(''):'<span style="color:var(--dim)">No synergy yet: pair two perks</span>')
+    +near.slice(0,3).map(s=>`<b class="syn" title="${s.t}">${UBY[s.a]?svgI(UBY[s.a].ic):''}+${UBY[s.b]?svgI(UBY[s.b].ic):''} ${s.n}?</b>`).join('')+`<b class="heat">${heatTxt()}</b>`,'syns');
+  if(!own.length){fullRow(box,'Buy perks in TUNE first.');}
   for(const d of own){const l=TP.raw(d.id),on=!!GA.eq[d.id],c=document.createElement('div');c.className='card d'+(on?' sel':'');c.style.setProperty('--c',on?d.c:'#8c86b8');c.dataset.id='lo_'+d.id;c.dataset.kind='load';
     const refund=Math.round(tpPrice(d,l-1)*.6);
-    c.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${d.t(l)}</div></div><div class="bt"><button class="go ${on?'':'alt'}" data-a="eq" type="button">${on?'UNEQUIP':'EQUIP'}</button><button class="go dim" data-a="sell" type="button">SELL +${refund}</button></div>`;
+    c.innerHTML=perkIcon(d)+`<div class="tx"><div class="n">${pathChip(pathOf(d.id))}${d.n}<span class="lv">${l}/${d.max}</span></div><div class="t">${d.t(l)}</div>${d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(l)}</b></div>`:''}</div><div class="bt"><button class="go ${on?'':'alt'}" data-a="eq" type="button">${on?'UNEQUIP':'EQUIP'}</button><button class="go dim" data-a="sell" type="button">SELL +${refund}</button></div>`;
     c.querySelector('[data-a=eq]').addEventListener('click',()=>{if(!on&&eqCount()>=eqSlots()){gaMsg('All '+eqSlots()+' slots are full: unequip one first');return;}GA.eq[d.id]=!on;eqsave();SH.recalc();AU.sfx('up');gaDraw();});
     c.querySelector('[data-a=sell]').addEventListener('click',()=>{GA.bank+=refund;GA.tune[d.id]=l-1;if(l-1<=0)GA.eq[d.id]=false;tsave();eqsave();gsave();SH.recalc();gaMsg(d.n+' sold for '+refund);gaDraw();});
     box.append(c);}}
-function mktDraw(box){const h=document.createElement('div');h.className='slots';h.style.gridColumn='1/-1';h.innerHTML=`TODAY'S MARKET · <b style="color:#ffb020">${MK.left()}</b> of ${MK.max} purchases left · applies to your next run only · new offers every day`;box.append(h);
-  const q=document.createElement('div');q.className='slots';q.style.gridColumn='1/-1';q.innerHTML=GA.queue.length?'In your cargo: '+GA.queue.map(id=>UBY[id].n).join(', '):'Cargo empty';box.append(q);
-  for(const id of MK.offers()){const u=UBY[id],pr=MK.price(id),got=MK.s.b.includes(id),c=document.createElement('button');c.type='button';c.className='card'+(got?' sold':GA.bank<pr||!MK.left()?' no':'');c.style.setProperty('--c',u.c);c.dataset.id='mk_'+id;c.dataset.kind='market';
-    c.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${lvText(u,1)}</div></div><div class="pr">${got?'BOUGHT':neonI+' '+pr}</div>`;
-    c.addEventListener('click',()=>{if(got)return;if(!MK.left()){gaMsg('No purchases left today');return;}if(GA.bank<pr){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return;}
-      GA.bank-=pr;MK.s.b.push(id);MK.save();GA.queue.push(id);qsave();gsave();AU.sfx('up');gaMsg(u.n+' is in your cargo');gaDraw();});box.append(c);}}
+function mktBuy(id,c){const pr=MK.price(id),u=UBY[id];if(!MK.left()){gaMsg('No purchases left today');return;}if(GA.queue.length>=CARGO_MAX){gaMsg('Cargo hold is full: sell one');return;}
+  if(GA.bank<pr){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return;}
+  GA.bank-=pr;MK.s.b.push(id);MK.save();GA.queue.push(id);qsave();gsave();AU.sfx('up');gaMsg(u.n+' is in your cargo');gaDraw();}
+function mktDraw(box){const foe=nextFoeFrom(mapCurrent()),offers=MK.offers(),sale=MK.sale();SYN.calc();
+  fullRow(box,`TODAY'S MARKET · <b style="color:#ffb020">${MK.left()}</b> of ${MK.max} buys left · cargo ${GA.queue.length}/${CARGO_MAX} · next run only`);
+  const q=fullRow(box,'','cargo');q.innerHTML=GA.queue.length?'Cargo (tap to sell at 60%): '+GA.queue.map((id,i)=>`<button type="button" class="oi" data-i="${i}" style="--c:${UBY[id].c}" aria-label="Sell ${UBY[id].n}">${svgI(UBY[id].ic)} ${UBY[id].n} +${Math.round(MK.full(id)*.6)}</button>`).join(''):'Cargo empty';
+  q.addEventListener('click',e=>{const b=e.target.closest('button.oi');if(!b)return;const i=+b.dataset.i,id=GA.queue[i];if(id==null)return;GA.queue.splice(i,1);GA.bank+=Math.round(MK.full(id)*.6);qsave();gsave();AU.sfx('hit');gaMsg(UBY[id].n+' sold for '+Math.round(MK.full(id)*.6));gaDraw();});
+  const best=foe?offers.map(id=>[SH.bossScore(UBY[id],foe),id]).sort((a,b)=>b[0]-a[0])[0]:null;
+  for(const id of offers){const u=UBY[id],pr=MK.price(id),got=MK.s.b.includes(id),c=document.createElement('button'),sy=SYN.completes(id)||SYNS.find(s=>(s.a===id&&GA.queue.includes(s.b))||(s.b===id&&GA.queue.includes(s.a))),hl=SYN.heatOf(id);c.type='button';
+    c.className='card'+(got?' sold':GA.bank<pr||!MK.left()?' no':'');c.style.setProperty('--c',u.c);c.dataset.id='mk_'+id;c.dataset.kind='market';
+    const chips=(id===sale?'<b class="syn">SALE -30%</b>':'')+(sy?`<b class="syn">+ ${sy.n}</b>`:'')+(hl?`<b class="heat">HEAT +${hl}%</b>`:'');
+    c.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${pathChip(pathOf(id))}${u.n}${best&&best[0]>0&&best[1]===id?'<span class="rec boss">BOSS PICK</span>':''}</div><div class="t">${lvText(u,1)}</div>${chips?`<div class="chips">${chips}</div>`:''}</div><div class="pr">${got?'BOUGHT':(id===sale?'<s>'+MK.full(id)+'</s> ':'')+neonI+' '+pr}</div>`;
+    c.addEventListener('click',()=>{if(!got)mktBuy(id,c);});box.append(c);}
+  fullRow(box,`<button type="button" class="go dim" id="mkRe">NEW OFFERS ${neonI} ${MK.rerollPrice()}</button>`+(foe?`<span class="foe2">${foe.nm}: ${foeTip(foe)}</span>`:''),'mkbar');
+  $('mkRe').addEventListener('click',()=>{const p=MK.rerollPrice();if(GA.bank<p){gaMsg('Need '+(p-GA.bank)+' more Neon');return;}GA.bank-=p;MK.s.rr++;MK.save();gsave();AU.sfx('up');gaDraw();});}
 const SOON=[['Weapon Forge','Craft and swap weapon mods between runs.','weapon-forge'],['Contracts','Three daily missions that pay Neon and slots.','contracts'],['Pilot Ranks','Level up your pilot for passive bonuses.','pilot-ranks'],
   ['Boss Trophies','A gallery of the bosses you beat, with their stats.','boss-trophies'],['Ship Skins','Paint jobs for every ship.','ship-skins'],['Squad Roster','Hire and level wingmen with their own skills.','squad-roster'],['Leaderboards','Daily and weekly scores, friends first.','leaderboards']];
 function soonDraw(box){for(const [n,t,im] of SOON){const c=document.createElement('div');c.className='card d no';c.style.setProperty('--c','#8c86b8');c.dataset.kind='soon';c.innerHTML=`${ART.isReal('soon-'+im)?'':'<span class="ph">PLACEHOLDER</span>'}${soonIcon(im)}<div class="tx"><div class="n">${n}</div><div class="t">${t}</div></div><div class="pr">SOON</div>`;box.append(c);}}
@@ -2830,7 +3202,8 @@ setTimeout(()=>{
   const sb=document.createElement('button');sb.className='go dim';sb.id='labBtnS';sb.type='button';sb.textContent='OPEN LAB';sb.addEventListener('click',()=>{if(running)return;closeSettings();startLab();});
   const body=$('setBody');if(body)body.append(sb);
   const _os=openSettings;openSettings=function(from){_os(from);sb.hidden=from==='pause'||running;};
-  if(/[?&]lab=1/.test(location.search))setTimeout(()=>startLab(),300);},0);
+  {const bq=(location.search.match(/[?&]boss=([a-z-]+)/)||[])[1],bi=bq?LAB_B.findIndex(B=>B.art===bq):-1;   // ?boss=<id> (e.g. ?boss=talos): the LAB opens on that boss
+    if(bi>=0)setTimeout(()=>startLab(bi),300);else if(/[?&]lab=1/.test(location.search))setTimeout(()=>startLab(),300);}},0);
 
 /* ---------- vector SHAPES for every item that still waits for painted art (see ASSETS-NEEDED.md). Each draws a simple shape now and switches to the painted file as soon as it is
    listed in media/ready.json (make-placeholders.py writes that list when it finds real art). Nothing here ever shows the placeholder pictures. ---------- */
@@ -2980,19 +3353,33 @@ UIK.init();
 
 /* ---------- animated bosses: one frame sheet per boss (media/anim-boss-<name>.webp, made by games-src/nightrun/make-boss-anim.py from the pose stills):
    row 1 = four idle frames, row 2 (when the boss has them) = wind-up, charge, fire, recover. cw/ch = frame size, kw/kh = frame size / body size of the idle frame. */
-UIK.boss={"bruecken-waechter":{"cw":300,"ch":229,"idle":4,"atk":4,"kw":1.121,"kh":1.0},"flusskrake":{"cw":300,"ch":266,"idle":4,"atk":4,"kw":1.116,"kh":1.084},"hoplite":{"cw":300,"ch":246,"idle":4,"atk":4,"kw":1.006,"kh":1.009},"kronos":{"cw":300,"ch":212,"idle":4,"atk":0,"kw":1.0,"kh":1.0},"messe-waechter":{"cw":300,"ch":243,"idle":4,"atk":0,"kw":1.052,"kh":1.002},"schranken-wart":{"cw":300,"ch":165,"idle":4,"atk":4,"kw":1.015,"kh":1.026},"sek-adler":{"cw":300,"ch":284,"idle":4,"atk":4,"kw":1.013,"kh":1.513},"talos":{"cw":292,"ch":300,"idle":4,"atk":4,"kw":1.429,"kh":1.0},"tresor-wart":{"cw":300,"ch":157,"idle":4,"atk":4,"kw":1.189,"kh":1.0},"zentral-ice":{"cw":300,"ch":258,"idle":4,"atk":4,"kw":1.093,"kh":1.065}};
+UIK.boss={"bruecken-waechter":{"cw":300,"ch":229,"idle":4,"atk":4,"kw":1.12,"kh":1.0,"move":"ground","face":"left","gb":1},"flusskrake":{"cw":300,"ch":265,"idle":4,"atk":4,"kw":1.118,"kh":1.083,"move":"water","face":"left","gb":0},"hoplite":{"cw":300,"ch":246,"idle":4,"atk":4,"kw":1.003,"kh":1.009,"move":"ground","face":"left","gb":1},"kronos":{"cw":300,"ch":212,"idle":4,"atk":0,"kw":1.0,"kh":1.0,"move":"air","face":"left","gb":0},"messe-waechter":{"cw":300,"ch":243,"idle":4,"atk":0,"kw":1.052,"kh":1.0,"move":"air","face":"left","gb":0},"schranken-wart":{"cw":300,"ch":164,"idle":4,"atk":4,"kw":1.015,"kh":1.026,"move":"air","face":"left","gb":0},"sek-adler":{"cw":300,"ch":284,"idle":4,"atk":4,"kw":1.012,"kh":1.517,"move":"air","face":"left","gb":0},"talos":{"cw":292,"ch":300,"idle":4,"atk":4,"kw":1.428,"kh":1.0,"move":"ground","face":"left","gb":1},"tresor-wart":{"cw":300,"ch":157,"idle":4,"atk":4,"kw":1.189,"kh":1.002,"move":"ground","face":"left","gb":1},"zentral-ice":{"cw":300,"ch":258,"idle":4,"atk":4,"kw":1.094,"kh":1.067,"move":"air","face":"left","gb":0}};
 UIK.bossDraw=(e,nm,wd,by,tl,fl)=>{const A=UIK.boss[nm],sh=A&&ART.bm['anim-boss-'+nm];if(!sh){if(A)ART.load('anim-boss-'+nm);return false;}
   e._at=(e._at||0)+FD;if(e.fireT>0)e.fireT=Math.max(0,e.fireT-FD);
   let col,row=0;const T=e._at;
   if(A.atk&&e.ph!==undefined&&(e.arm||e.fireT>0)){row=1;col=e.fireT>0?(e.fireT>.22?2:3):(PHF<.5?0:1);}      // wind-up on the beat before it fires, then the shot, then the recovery
   else col=[0,1,2,3,2,1][Math.floor(T*(A.atk?5:3.2))%6];
   if(e.labPose&&A.atk>=0){row=e.labPose[0];col=e.labPose[1];if(!A.atk)row=0;}                // LAB: a pose picked by hand
-  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}
+  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;
   const ctx_=ctx;ctx_.save();ctx_.translate(0,by);if(tl)ctx_.rotate(tl);ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);
   if(fl){ctx_.globalCompositeOperation='lighter';ctx_.globalAlpha=.4;ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);}
   ctx_.restore();return true;};
 // the sheet of a district's boss is fetched a few seconds after the district starts (never at the moment the boss arrives, never all ten at once)
 NR.on('tick',()=>{if(!G.live||G.di===UIK._di)return;UIK._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>ART.load('anim-boss-'+nm),3000);});
+
+/* ---------- boss movement by body: media/anim-boss.json "move" = ground (legs, wheels, tracks: walks / rolls on the road line, shadow under it, hops when it fires),
+   water (rides the water surface, ripples), air (flies, the old bob). Portrait is a view from above: there the sideways patrol stays, only the hover bob goes. ---------- */
+UIK.moveOf=e=>{const A=UIK.boss[ART.bossN[ART.artK(e)]];return A&&A.move||'air';};
+UIK.groundY=()=>{let y=H-70;if(G&&G.lab&&!rotMode&&labEl&&!labEl.hidden&&!LAB.min){const f=frame.getBoundingClientRect(),p=labEl.getBoundingClientRect();if(f.height>0&&p.height>0)y=Math.min(y,(p.top-f.top)/f.height*H-6);}return y;};   // the LAB panel covers the road: stand above it
+UIK.bossMove=(e,dt,mv)=>{const dh=e._dh||130;
+  if(e.x>bossX()){e.x-=110*dt;e.y=UIK.groundY()-dh/2;return;}
+  e.x=bossX()-34-34*Math.sin(e.t*(mv==='water'?.35:.5));                                   // patrols a short stretch, always left of its stop line
+  let hop=0;if(mv==='ground'&&e.fireT>0&&!e.labPose)hop=26*Math.sin(Math.PI*Math.min(1,e.fireT/.45));   // stomp-jump on the shot, back on the road
+  e.y=UIK.groundY()-dh/2-hop+(mv==='water'?Math.sin(e.t*1.3)*3:0);e.my=-dh*.12;};
+UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,y=dh/2+(mv==='water'?-1:3);ctx.save();
+  if(mv==='water'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const k=((e.t*.6+i/3)%1);ctx.globalAlpha=.5*(1-k);ctx.beginPath();ctx.ellipse(0,y,dw*(.45+.35*k),4+7*k,0,0,7);ctx.stroke();}}
+  else{const lift=e.y<UIK.groundY()-dh/2-2?.6:1;ctx.globalAlpha=.5*lift;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(0,y,dw*.5*(2-lift),6,0,0,7);ctx.fill();}   // the shadow stays on the road when it hops
+  ctx.restore();};
 
 /* ---------- lag fix, part 2: songs are streamed (see parts/a.js "tracks"), nothing is decoded any more, so there is no stall to hide.
    What is left of the old pump: keep the songs a district will need (its own, its boss's, the next one) buffered in their audio slots, ahead of time and one after
@@ -3045,8 +3432,15 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='K1';
+const NR_VER='L1';
 const NR_CHECKLIST=[
+ {ver:'L1',id:'story-map',text:'STORY opens a painted route map: 40 stages in five districts (8 each), mini-bosses and bosses are bigger medallions, your next stage glows, locked stages show a padlock. Tap a stage: a plate shows goal, the three stars, your best and PLAY. Scroll along the road (up on a phone, sideways on a wide screen).'},
+ {ver:'L1',id:'challenges',text:'Each district has an optional challenge stage that opens after its mini-boss: a side branch on the map. NO-HIT ends on the first hull hit, SPEED needs the kills before the clock, PERFECT needs a PERFECT count. Each pays up to 3 stars.'},
+ {ver:'L1',id:'curve',text:'Difficulty rises a little every stage with no sudden spike: stage 1 to 4 feel gentle, a boss is slightly above the stages around it.'},
+ {ver:'L1',id:'pit-build',text:'Pit stop: cards show a build path icon (Glass Cannon, Tank, Beat Combo), the effect now and next, HEAT chips, a + chip when a card completes a synergy, and BOSS PICK / BUILD PICK badges. The line under it names the next boss and what it fires.'},
+ {ver:'L1',id:'pit-limits',text:'A run holds 6 different upgrades (7 from stage 14, 8 from stage 28). Tap an owned icon twice to sell one level for half its price. Heat: damage upgrades raise the HEAT percentage, Coolant lowers it. Stock changes each run and each pit stop; REROLL costs more every time.'},
+ {ver:'L1',id:'garage-builds',text:'Garage > LOAD: three build buttons equip the best perks of a path, the path bars show the 2-piece and 4-piece bonus (the 4-piece bonus has a price), green chips show active synergies. Glass Core, Greedy Pilot, Lead Plating and Beat Addict each show a TRADE-OFF line. SHIPS cards show a moving fire pattern.'},
+ {ver:'L1',id:'market',text:'Garage > SHOP: four daily offers (one is on sale), 2 buys a day, a cargo hold for 3 that you can sell back at 60%, NEW OFFERS for Neon, a BOSS PICK badge and the next boss line.'},
  {ver:'K1',id:'lag-smooth',text:'Smoother on a big monitor: pause, settings, garage, shop and the story map no longer redraw the game behind them at full speed, the sky has one blended pass less, and a machine that cannot keep 60 fps lowers the sharpness of the picture by itself after a few seconds (soft but smooth). Play a district, a boss fight and a pit stop on a big screen; Settings > FPS counter shows the speed.'},
  {ver:'K1',id:'lab-stage',text:'The LAB is its own stage now: title > LAB (or Settings > OPEN LAB, or the address ending in ?lab=1). You fly in a quiet arena with a panel at the bottom: BOSS, FOES, ITEMS, CHEATS. EXIT goes back to the title. Nothing of it is in a normal run any more (no LAB chip, no LAB in the pause menu).'},
  {ver:'K1',id:'lab-bosses',text:'BOSS tab: tap any of the ten bosses; pick its district; INTRO plays the entrance. PHASE 1/2/3 jumps into that phase and keeps it. ATTACK forces one pattern (fan, ring, spiral, laser, summon). POSE holds one frame of its sprite sheet (idle, wind-up, charge, fire, recover). HIT shows the damage flash, DEATH the explosion, then it comes back. Check every boss moves, winds up and fires.'},
@@ -3652,7 +4046,7 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];
 window.__mnr={ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
-  get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,
+  get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,
   // test hooks: ?sim=1 has no audio clock; simOn stops the animation loop and step() advances the game by hand with the beat clock tied to game time
   simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},
   abort(){if(running){NR.emit('runEnd',{quit:true});running=false;}ST.on=false;ST.over=false;paused=false;touch=null;touchFire=false;pressed={};},

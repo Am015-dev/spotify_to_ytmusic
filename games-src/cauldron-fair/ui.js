@@ -197,7 +197,7 @@ UI.potN = UI.potN || {};
 function liveChips(p) {
   const prev = UI.potN[p.seat + ':' + G.round] || 0; UI.potN[p.seat + ':' + G.round] = p.pot.length;
   const row = h('span.lchips', { 'aria-label': p.name + ' has drawn ' + plural(p.pot.length, 'chip') + ', white ' + CF.whiteSum(p) });
-  p.pot.slice(-6).forEach((c, i, a) => { if (!c || !c.c) return; const d = h('i.lc' + (p.pot.length > prev && i === a.length - 1 ? '.pop' : ''), { html: chipHTML(c.c + c.v, 15) }); row.appendChild(d); });
+  p.pot.slice(-6).forEach((c, i, a) => { if (!c || !c.c) return; const d = h('i.lc' + (p.pot.length > prev && i === a.length - 1 ? '.pop' : ''), { html: chipHTML(c.c + c.v, 22, { big: 1 }) }); row.appendChild(d); });
   return row;
 }
 UI.thN = UI.thN || {};

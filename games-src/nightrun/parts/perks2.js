@@ -1,6 +1,6 @@
 /* ---------- fifteen more garage perks: STARTING KITS. An equipped kit gives you that pit-stop upgrade at the start of every run (up to the level you own),
    so what you equip decides your build, and slots are limited (see LOADOUT in meta.js). ---------- */
-{const KITS=[['sc','Wing Cannons',3,260,'Start with side cannons'],['rg','Rear Guard',3,240,'Start with a rear gun'],['pc','Piercer',4,300,'Start with piercing shots'],['cl','Arc Chain',3,320,'Start with chain lightning'],['bt','Chrono Dash',3,300,'Start with bullet time on beat dashes'],
+{const KITS=[['sc','Wing Cannons',3,260,'Start with side cannons'],['rg','Rear Guard',3,240,'Start with a rear gun'],['pc','Piercer',4,300,'Start with piercing shots'],['cl','Arc Chain',3,320,'Start with chain lightning'],['bt','Chrono Dash',3,300,'Start with beat-dash bullet time'],
   ['rc','Ricochet',3,280,'Start with bouncing shots'],['as','Aegis',3,320,'Start with auto-shields'],['bd','Orbit Guns',3,340,'Start with orbiting guns'],['hm','Seeker Shots',4,260,'Start with homing shots'],['sm','Score Magnet',3,200,'Start with a score magnet'],
   ['ni','Neon Interest',3,260,'Start with Neon interest'],['lk','Fortune',3,240,'Start with lucky drops'],['wn','Second Wind',1,500,'Start with Second Wind'],['og','Overdrive Core',1,520,'Start with Overdrive'],['ec','EMP Cell',1,300,'Start with an extra EMP']];
   const raw=load('mnr_tune',{}),eq=load('mnr_eq',null);

@@ -96,7 +96,4 @@ const this_ship=()=>SH.ship;
   if(AX.arcs.length){ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';for(const a of AX.arcs){ctx.globalAlpha=clamp(a.l*4,0,1);ctx.strokeStyle='#8fe9ff';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(a.x1,a.y1);
       const n=5;for(let i=1;i<n;i++){const u=i/n;ctx.lineTo(a.x1+(a.x2-a.x1)*u+(((i*37+(a.x1|0))%11)-5),a.y1+(a.y2-a.y1)*u+(((i*53+(a.y1|0))%11)-5));}ctx.lineTo(a.x2,a.y2);ctx.stroke();}ctx.restore();}
   if(G.bt>0&&G.live){ctx.save();ctx.globalAlpha=clamp(G.bt*.5,0,.14);ctx.fillStyle='#19e3ff';ctx.fillRect(0,0,W,H);ctx.restore();}};}
-/* ----- recommended picks in the pit stop for the new upgrades ----- */
-{const rp=recPit;recPit=function(){let best=-1,bs=-1e9;const pri={sc:62,rg:38,pc:60,cl:58,bt:48,rc:36,og:64,as:66,bd:63,sm:28,ni:34,wn:80,ec:32,lk:35};
-  const base=rp.call(this);SH.cards.forEach((c,i)=>{if(c.sold||SH.neon<SH.price(c.u))return;const b=pri[c.u.id];if(b==null)return;const s=b-4*SH.n(c.u.id);if(s>bs){bs=s;best=i;}});
-  if(best<0)return base;if(base<0)return best;return bs>=60?best:base;};}
+

@@ -159,3 +159,12 @@ html.ti .mbox.start canvas{display:none}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #7a4524;background:#fff4d8;color:#3a2412;font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .mchip.on{background:#3a2412;color:#fff4d8}.mchip.prev{border-style:dashed}
 html.tp .tile .tn{font-size:11px;letter-spacing:-.03em;padding:0 3px;max-width:calc(100% - 15px)}
+
+/* the painted skin never changes a box: these used to live in skin.css */
+html .gx-bar{gap:2px;padding-left:6px;padding-right:6px}
+html .gx-bar h1{font-size:.9rem;margin:0 2px 0 0}
+html .gx-bar .pchip{font-size:11px;padding:2px 6px}
+html.short:not(.land) .ab{min-height:44px;padding:0 2px}html.short:not(.land) .ab.pw{min-height:44px}
+html .mbox .btn.xs{min-height:44px}
+.gx-ibtn i[data-ic],.gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
+.ri{display:inline-block;width:26px;height:26px;margin-right:8px;vertical-align:middle;text-align:center;line-height:26px;font-style:normal;overflow:hidden}
