@@ -257,13 +257,13 @@ const OD_CHECKLIST=[
   if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}
   if(T.car){const c=(HUB.cars||[]).find(c=>!c.dead&&String(HCAR[c.k]).includes(T.car));return c&&{x:c.x,z:c.z}}return null};
  const goJump=it=>{const L=GO[k(it)];if(!L)return;if(L[0].bx){goI._t=L[0].n;BX_test(L[0].bx);return}const i=goI[k(it)]=((goI[k(it)]??-1)+1)%L.length,T=L[i],c=goCity(T);let st='';try{st=state}catch(e){}
-  if(c!==CID){if(st==='roam'&&cityTravel(c)){goSay('✈ Flying to '+(c==='ath'?'Athens':'Frankfurt')+' · tap 📍 again after landing');goI[k(it)]=i-1}else goSay('📍 Drive in '+(c==='ath'?'Athens':'Frankfurt')+' first (story → fly there)');return}
-  if(T.fn){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}goSay(T.fn());return}
-  if(T.gar){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}gbOpen();goSay('📍 GARAGE');return}
-  if(T.here){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}goSay('📍 '+T.n.toUpperCase()+' · drive');return}
-  if(T.race){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;
+  if(c!==CID){if(st==='roam'&&cityTravel(c)){goSay('✈ Flying to '+(c==='ath'?'Athens':'Frankfurt')+' · tap 📍 again after landing');goI[k(it)]=i-1}else{goI[k(it)]=i-1;goSay('📍 Loading a test drive in '+(c==='ath'?'Athens':'Frankfurt')+'…');setTimeout(()=>{location.href=TQ_url(c,{go:k(it)})},300)}return}
+  if(T.fn){if(st!=='roam'||!RO.on){{goI[k(it)]=i-1;goSay('📍 Loading a test drive…');setTimeout(()=>{location.href=TQ_url(c,{go:k(it)})},300)}return}goSay(T.fn());return}
+  if(T.gar){if(st!=='roam'||!RO.on){{goI[k(it)]=i-1;goSay('📍 Loading a test drive…');setTimeout(()=>{location.href=TQ_url(c,{go:k(it)})},300)}return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}gbOpen();goSay('📍 GARAGE');return}
+  if(T.here){if(st!=='roam'||!RO.on){{goI[k(it)]=i-1;goSay('📍 Loading a test drive…');setTimeout(()=>{location.href=TQ_url(c,{go:k(it)})},300)}return}goSay('📍 '+T.n.toUpperCase()+' · drive');return}
+  if(T.race){if(st!=='roam'||!RO.on){{goI[k(it)]=i-1;goSay('📍 Loading a test drive…');setTimeout(()=>{location.href=TQ_url(c,{go:k(it)})},300)}return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;
    menuTab='quick';menuTrack=T.race;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;return}  // like a roam race marker: back to the city after the race
-  if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}
+  if(st!=='roam'||!RO.on){{goI[k(it)]=i-1;goSay('📍 Loading a test drive…');setTimeout(()=>{location.href=TQ_url(c,{go:k(it)})},300)}return}
   if(RO.ch||RO.sp){const nm=((RO.ch&&RO.ch.m&&RO.ch.m.ev&&RO.ch.m.ev.name)||(RO.sp&&RO.sp.e&&RO.sp.e.name)||'the event').toUpperCase();
    if(!(goI._ok>performance.now())){goI._ok=performance.now()+6000;goI[k(it)]=i-1;goSay('📍 This leaves '+nm+' (you can restart it) · tap 📍 again to go');return}
    goI._ok=0;try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}

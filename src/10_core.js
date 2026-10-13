@@ -171,6 +171,14 @@ const mod=(a,n)=>((a%n)+n)%n;
 function mul(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const R=mul(20990);const rr=(a,b)=>a+R()*(b-a);
 const CK=['mho_season','mho_flags','mho_roam','mho_riv','mho_career','mho_prof','mho_story','mho_perks','mho_garage','mho_stars','mho_build','mho_packs','mho_gbown','mho_adapt','mho_disc','mho_log','mho_pstat','mho_city','mho_qpos','mho_enc','mho_sq'];let SLOT=1;try{SLOT=+(localStorage.getItem('mho_slot')||1)||1}catch(e){}
+// TQ (int-2, 2026-10-13): FAST TEST START. ?test=fra|ath[&car=<ride id>][&at=x,z][&go=<checklist ver/id>] skips intro, menu, story and tutorial and boots
+// straight into free roam on a throwaway save slot (9, wiped each load; the player's slots are untouched), minimal graphics; 98tq_test_quick.js does the rest.
+const TQ=(()=>{try{const q=new URLSearchParams(location.search),c=q.get('test');if(c!=='fra'&&c!=='ath')return null;const at=(q.get('at')||'').split(',').map(Number);
+ const o={c,car:q.get('car')||'',at:at.length===2&&at.every(Number.isFinite)?at:null,go:q.get('go')||'',nodraw:q.get('draw')==='0'};SLOT=9;
+ for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&/@9$/.test(k))localStorage.removeItem(k)}
+ const J=(k,v)=>localStorage.setItem(k+'@9',JSON.stringify(v));localStorage.setItem('mho_city@9',c);
+ J('mho_roam',{tut:1,otg:{},studs:[]});J('mho_roam.ath',{tut:1,otg:{},studs:[]});J('mho_story',{seen:1,end:0,fly:1});J('mho_story.ath',{seen:1});if(c==='ath')localStorage.setItem('mho_athd@9','A');
+ sessionStorage.setItem('mho_boot',JSON.stringify({go:'roam',t:Date.now(),snap:1}));return o}catch(e){return null}})();
 const CID=(()=>{try{return localStorage.getItem('mho_city@'+SLOT)==='ath'?'ath':'fra'}catch(e){return 'fra'}})(),CITYK=['mho_roam','mho_disc','mho_packs','mho_pick','mho_story','mho_qpos','mho_enc','mho_sq'];
 const skey=k=>{const K=CID!=='fra'&&CITYK.includes(k)?k+'.'+CID:k;return CK.includes(k)?K+'@'+SLOT:K};
 const _SC=new Map();try{const SP=Storage.prototype,w=(f,g)=>function(...a){g(a);return f.apply(this,a)};SP.setItem=w(SP.setItem,a=>_SC.delete(String(a[0])));SP.removeItem=w(SP.removeItem,a=>_SC.delete(String(a[0])));SP.clear=w(SP.clear,()=>_SC.clear())}catch(e){}
