@@ -1,6 +1,51 @@
 [
  {
   "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Doorkick: scenario tests and steadier phone layout",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
+   "Tutorial Help step: the Help button label is readable",
+   "Fight with bonuses: big YOU vs MONSTERS scoreline, colours, flying +N",
+   "Boss clip, then the monster card, with sound",
+   "Five rivals no longer push the hand off screen"
+  ],
+  "check": "Open each test with Try this",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   "dk-tut-help",
+   "dk-fight-bonus",
+   "dk-boss-reveal",
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   "Can you read the Help button?",
+   "Is YOU vs MONSTERS big and clear?",
+   "Boss clip, roar, then the monster card?",
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "mainhattan",
   "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
   "items": [
@@ -68,21 +113,6 @@
    "The side panel is smaller: just status and advice"
   ],
   "check": "Roll, keep a die, tap SMASH!, then hold a card and tap it to buy"
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Fight numbers you can read",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut",
-   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals."
-  ],
-  "check": "Kick open a door and fight a monster"
  },
  {
   "date": "2026-10-13",
