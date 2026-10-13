@@ -1,0 +1,31 @@
+BOOT fra 36.8 s
+PASS fra v90k/no-hollow 1.2s · 📍 FRANKFURT FREE ROAM · drive
+FAIL fra v90k/shadow 1.2s · 📍 No traffic car nearby right now · try again
+PASS fra v90j/ride-fast 2.0s · 📍 GARAGE
+PASS fra v90k/lag 1.3s · 📍 LAG · props near 10 far 472 wrong 0 ✅
+PASS fra v90k/fra-net 1.6s · 📍 NET · 1 network, 9 dead ends, ramps A5:4 A661:3 A3:2 A66w:1 A66e:1 ✅ · Ramp A5 · Bockenheimer Landstraße
+PASS fra v90k/park-sit 1.7s · 📍 PARKED CAR · check its tyres touch the road
+PASS fra v90j/fra-props 1.3s · 📍 CONE · 1/5, tap 📍 for the next
+PASS fra v90g/fra-props 1.3s · 📍 PIZZA TO GO · 1/4, tap 📍 for the next
+FAIL fra v90g/bigrig 1.4s · 📍 No Big Rig nearby right now · try again
+PASS fra v90g/land2 1.2s · 📍 PLANTER · 1/2, tap 📍 for the next
+PASS bx bxT/bx-t-cliff 2.6s · cliff run
+PASS bx bxT/bx-t-city 2.6s · two-level city
+PASS bx bxT/bx-t-canyon 2.6s · canyon split
+PASS bx bxA/bx-snap 2.5s · snap test
+PASS bx bxA/bx-jump 2.5s · cliff jump
+PASS bx bxA/bx-offroad 2.5s · off-road
+PASS bx bxA/bx-cliff 2.5s · cliff fall
+PASS bx bxA/bx-water 2.5s · water
+PASS bx bxA/bx-bridge 2.5s · bridge
+PASS bx bxA/bx-split 2.5s · split
+PASS bx bxA/bx-world 2.5s · new track
+PASS bx bxA/bx-elev 2.6s · elevation
+BOOT ath 75.0 s
+PASS ath v90j/ck-go 1.2s · 📍 ATHENS FREE ROAM · drive
+PASS ath v90k/ath-kriezi 1.2s · 📍 KRIEZI · asphalt, no walls ✅
+PASS ath v90j/ath-trees 1.2s · 📍 PINE · 1/4, tap 📍 for the next
+FAIL ath v90i/palms 3.9s · (no message)
+BOOT ath 77.6 s
+PASS ath v90g/ath-display 1.3s · 📍 LIGHTHOUSE · 1/2, tap 📍 for the next
+{"pass":220,"total":223,"fail":["v90k/shadow","v90g/bigrig","v90i/palms"],"boots":{"fra":[36.819],"ath":[75.042,77.611]},"errors":0,"firstErrors":[],"secs":262}
