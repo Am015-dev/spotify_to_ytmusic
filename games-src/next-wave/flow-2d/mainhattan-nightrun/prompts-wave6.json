@@ -1,0 +1,19 @@
+{
+ "cards": {
+  "fx-bullet-shell": "a big round orange energy shell, hot white core, molten orange glow, a thin darker ring, light on black, no text, letters or numbers",
+  "kit-ckp": "Combo Keeper: a padlock holding a glowing orange multiplier flame, no text, letters or numbers",
+  "kit-crt": "Critical Core: a faceted red crystal with a white starburst at its heart, no text, letters or numbers",
+  "kit-dmg": "Power Core: a glowing red-orange reactor core with a lightning crack, no text, letters or numbers",
+  "kit-drn": "Wingman Drone: a small round gunmetal drone with two thrusters and a cyan eye, no text, letters or numbers",
+  "kit-dsh": "Dash Capacitor: a capacitor cylinder with a bright motion streak behind it, no text, letters or numbers",
+  "kit-hul": "Hull Plating: a riveted steel hull plate with a green plus cut into it, no text, letters or numbers",
+  "kit-mag": "Magnet Coil: a coil magnet pulling small neon crystals toward it, no text, letters or numbers",
+  "kit-nmn": "Neon Mining: a pickaxe striking a cluster of neon crystals, no text, letters or numbers",
+  "kit-pwd": "Power Amp: a speaker amplifier cone with magenta shock rings, no text, letters or numbers",
+  "kit-rev": "Revive Token: a golden coin with a heartbeat glow, a thin halo above it, no text, letters or numbers",
+  "kit-rgn": "Shield Regen: a cyan shield with a circular refill arrow around it, no text, letters or numbers",
+  "kit-rof": "Rapid Coil: a coil of copper wire charged with yellow sparks, two forward chevrons behind it, no text, letters or numbers",
+  "kit-shd": "Shield Plating: a cyan shield made of layered armour plates, no text, letters or numbers"
+ },
+ "style": "Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers"
+}
