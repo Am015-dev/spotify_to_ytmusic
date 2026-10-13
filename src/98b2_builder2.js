@@ -159,12 +159,52 @@ function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)
  BX.pil=P;if(BX.pilM){BX.sc.remove(BX.pilM);BX.pilM.dispose()}if(!P.length){BX.pilM=null;return}
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1.6,1,1.6),M.pil,P.length),mt=new THREE.Matrix4();
  P.forEach(([x,z,g,t],i)=>{mt.makeScale(1,t-g+.3,1);mt.setPosition(x,(t+g)/2,z);im.setMatrixAt(i,mt)});im.castShadow=im.receiveShadow=true;BX.sc.add(im);BX.pilM=im}
+// ---------------------------------------------------------------- set dressing (coordinator after the 2K reference grid: "the mock-up is bare")
+// every ~9 m along the course, alternating sides: crowds of minifigs, banners, flags (flags stand on the rail on raised decks); glowing chevrons on BOOST pads;
+// one landmark per track (a giant LEGO minifig statue near the start). All instanced; no collision (they stand outside the rails).
+const BX_DC=['#c91a09','#0055bf','#f2cd37','#237841','#fe8a18','#ffffff','#a0a5a9'].map(bxCol);
+function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isInstancedMesh)o.dispose()})}const g=BX.drM=new THREE.Group();BX.sc.add(g);
+ const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],pole=[],flag=[],ban=[],chev=[],near=(x,z,me)=>BX.samp.some(q=>q.pc!==me&&Math.abs(q.s.p.x-x)<10&&Math.abs(q.s.p.z-z)<10),
+  inB=(x,z)=>(BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+2&&Math.abs(b.z-z)<b.d/2+2);let n=0,side=1,run=0,len=0,props=0;
+ for(const pc of L){const S=pc.S[0];for(let k=1;k<S.length;k++){const s=S[k],d=s.d-S[k-1].d;len+=d;run+=d;if(pc.def.boost&&k%Math.max(1,S.length>>1)===0)chev.push(s);if(run<7)continue;run=0;side=-side;n++;
+  const raised=s.p.y-BX_h(s.p.x,s.p.z)>2.5||pc.def.p.length>1;if(pc.def.p.length>1||pc.def.stick)continue;
+  if(raised){const x=s.p.x+s.S.x*side*6.8,z=s.p.z+s.S.z*side*6.8,y=s.p.y+s.S.y*side*6.8+1.4;pole.push([x,y,z,4]);flag.push([x,y+3.3,z,n,s]);props++;continue}
+  const x=s.p.x+s.S.x*side*11,z=s.p.z+s.S.z*side*11,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
+  if(n%3===0){for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*1.3,fz=z+s.F.z*f*1.3;body.push([fx,y+.75,fz,n+f]);head.push([fx,y+1.75,fz])}}
+  else if(n%3===1){ban.push([x,y,z,n,s])}else{pole.push([x,y,z,5]);flag.push([x,y+3.8,z,n,s])}}}
+ const mt=new THREE.Matrix4(),q=new THREE.Quaternion(),sc=bxV(),pos=bxV(),UP=bxV(0,1,0),M=(geo,mat,arr,fn)=>{if(!arr.length)return;const im=new THREE.InstancedMesh(geo,mat,arr.length);im.castShadow=true;
+  arr.forEach((a,i)=>{fn(a,i);im.setMatrixAt(i,mt)});g.add(im);return im},std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45});
+ const bi=M(new THREE.BoxGeometry(.9,1.5,.7),std(0xffffff),body,a=>{mt.makeTranslation(a[0],a[1],a[2])});if(bi){body.forEach((a,i)=>bi.setColorAt(i,BX_DC[Math.abs(a[3])%5]))}
+ M(new THREE.CylinderGeometry(.42,.42,.6,10),std(0xf2cd37),head,a=>{mt.makeTranslation(a[0],a[1],a[2])});
+ M(new THREE.CylinderGeometry(.12,.12,1,6),std(0xd9d9d9),pole,a=>{mt.makeScale(1,a[3],1);mt.setPosition(a[0],a[1]+a[3]/2,a[2])});
+ const fl=M(new THREE.BoxGeometry(.08,1.1,1.8),std(0xffffff),flag,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1],a[2]).addScaledVector(a[4].F,-.9),q,sc.set(1,1,1))});
+ if(fl)flag.forEach((a,i)=>fl.setColorAt(i,BX_DC[a[3]%4]));
+ const bn=M(new THREE.BoxGeometry(.3,2.2,7),std(0xffffff),ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+1.9,a[2]),q,sc.set(1,1,1))});
+ if(bn)ban.forEach((a,i)=>bn.setColorAt(i,BX_DC[(a[3]>>1)%4]));
+ // glowing chevrons on BOOST pads (pulse in BX_tick)
+ const cm=BX.chevMat=BX.chevMat||new THREE.MeshStandardMaterial({color:0xffb000,emissive:0xff8a00,emissiveIntensity:1.4,roughness:.3}),cg=new THREE.BoxGeometry(.5,.08,4.6);
+ const C=[];for(const s of chev)for(const sd of[-1,1])C.push([s,sd]);
+ M(cg,cm,C,([s,sd])=>{const a=Math.atan2(s.F.x,s.F.z)+sd*.75;q.setFromAxisAngle(UP,a);mt.compose(pos.copy(s.p).addScaledVector(s.U,.08).addScaledVector(s.S,sd*1.6),q,sc.set(1,1,1))});
+ BX.dressN={props,len,landmark:BX_landmark(g,L)}}
+// landmark: a giant LEGO minifig (~16 m) on open ground 30-50 m from the course, as close to START as possible
+function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp.length)return 0;const o=st.S[0][0].p;let best=null,bd=1e9;
+ for(let a=0;a<64;a++)for(const r of[34,44,56]){const x=o.x+Math.cos(a/64*6.283)*r,z=o.z+Math.sin(a/64*6.283)*r;if(Math.abs(x)>150||Math.abs(z)>150)continue;const h=BX_h(x,z);if(h<.3||BX_tn(x,z).y<.9)continue;
+  let dmin=1e9;for(const{s}of BX.samp){const d=Math.hypot(s.p.x-x,s.p.z-z);if(d<dmin)dmin=d}if(dmin<26)continue;if((BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+8&&Math.abs(b.z-z)<b.d/2+8))continue;
+  const sc=Math.abs(r-40)+a*.01;if(sc<bd){bd=sc;best=[x,h,z]}}
+ if(!best)return 0;const f=new THREE.Group(),std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.35}),B=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),std(c));m.position.set(x,y,z);m.castShadow=true;f.add(m);return m};
+ B(1.7,4.2,2.2,0x0055bf,-.95,2.1,0);B(1.7,4.2,2.2,0x0055bf,.95,2.1,0);B(3.9,1.1,2.2,0x0055bf,0,4.7,0);B(4.2,4.6,2.2,0xc91a09,0,7.5,0);
+ const arm=(sx)=>{const m=B(1.2,4,1.4,0xc91a09,sx*2.7,7.4,0);m.rotation.z=sx*.18};arm(-1);arm(1);
+ for(const sx of[-1,1]){const h=new THREE.Mesh(new THREE.CylinderGeometry(.6,.6,1,10),std(0xf2cd37));h.position.set(sx*3,5,0);f.add(h)}
+ const hd=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,3,16),std(0xf2cd37));hd.position.y=11.6;hd.castShadow=true;f.add(hd);
+ const stud=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,.7,12),std(0xf2cd37));stud.position.y=13.45;f.add(stud);
+ for(const sx of[-.6,.6]){const e=B(.3,.5,.1,0x111111,sx,12,1.7)}const mo=B(1.4,.25,.1,0x111111,0,11.1,1.7);
+ f.position.set(best[0],best[1]-.2,best[2]);f.rotation.y=Math.atan2(o.x-best[0],o.z-best[2]);g.add(f);return 1}
 // open ends (exits with no piece starting there) + the cursor
 // every cell a piece can be entered from (a MERGE has two)
 const BX_ents=p=>[p.c,...(p.def.in||[]).map(e=>BX_exit(p.c,[e[0],e[1],0,0]))];
 function BX_ends(){const key=c=>c.i+','+c.j+','+c.l+','+c.r,ent=new Set(BX.pcs.filter(p=>!p.dead).flatMap(p=>BX_ents(p).map(key)));const E=[];
  for(const p of BX.pcs)if(!p.dead)for(const e of p.ex)if(!ent.has(key(e)))E.push(e);return E}
-function BX_after(){BX_pillars();BX_marks();BX_ghost();BX_stats()}
+function BX_after(){BX_pillars();BX_dress();BX_marks();BX_ghost();BX_stats()}
 function BX_marks(){if(BX.gE){BX.sc.remove(BX.gE)}const g=BX.gE=new THREE.Group();BX.sc.add(g);const M=BX_mats(),ar=new THREE.ConeGeometry(1.6,3.2,4);
  if(BX.mode!=='build')return;for(const e of BX_ends()){const fr=BX_fr(e),m=new THREE.Mesh(ar,M.end);m.position.copy(fr.o).addScaledVector(fr.F,2).add(bxV(0,1.4,0));m.quaternion.setFromUnitVectors(bxV(0,1,0),fr.F);m.userData.end=e;g.add(m)}
  const fr=BX_fr(BX.cur),ring=new THREE.Mesh(new THREE.TorusGeometry(4.6,.35,6,24),M.cur);ring.position.copy(fr.o).addScaledVector(fr.F,4).add(bxV(0,.3,0));ring.rotation.x=Math.PI/2;g.add(ring);
@@ -178,8 +218,8 @@ function BX_terrMesh(){const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeo
   g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*n*3),3));g.setIndex(idx);
   BX.tm=new THREE.Mesh(g,BX_mats().terr);BX.tm.receiveShadow=true;BX.sc.add(BX.tm)}
  const g=BX.tg,p=g.attributes.position.array,c=g.attributes.color.array;for(let k=0;k<n*n;k++)p[k*3+1]=BX.th[k];g.attributes.position.needsUpdate=true;g.computeVertexNormals();
- const nm=g.attributes.normal.array,G1=bxCol('#4fb33a'),G2=bxCol('#3f9a2e'),RK=bxCol('#8d7b68'),RK2=bxCol('#a89a86'),SA=bxCol('#e0cf93'),tc=new THREE.Color();
- for(let k=0;k<n*n;k++){const h=BX.th[k],ny=nm[k*3+1];if(h<.4)tc.copy(SA);else if(ny<.72)tc.copy(h>20?RK2:RK);else tc.copy(G1).lerp(G2,bxCl((h-2)/30,0,1)*.7+((k*7919)%13)/60);c[k*3]=tc.r;c[k*3+1]=tc.g;c[k*3+2]=tc.b}
+ const nm=g.attributes.normal.array,G1=bxCol('#4fb33a'),G2=bxCol('#3f9a2e'),RK=bxCol('#8d7b68'),RK2=bxCol('#a89a86'),SA=bxCol('#e0cf93'),MD=bxCol('#a6d13a'),DT=bxCol('#9c7a4e'),tc=new THREE.Color();
+ for(let k=0;k<n*n;k++){const h=BX.th[k],ny=nm[k*3+1];if(h<.4)tc.copy(SA);else if(ny<.72)tc.copy(h>20?RK2:RK);else{tc.copy(G1).lerp(G2,bxCl((h-2)/30,0,1)*.7+((k*7919)%13)/60);const x=BXO+(k%n)*BXR,z=BXO+Math.floor(k/n)*BXR,pn=Math.sin(x/23)*Math.cos(z/31)+.5*Math.sin((x+z)/17);if(pn>1.05)tc.lerp(MD,.75);else if(pn<-1.15)tc.lerp(DT,.7)}c[k*3]=tc.r;c[k*3+1]=tc.g;c[k*3+2]=tc.b}
  g.attributes.color.needsUpdate=true;g.computeBoundingSphere();BX_trees()}
 function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[],RK=[];let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
  for(let i=0;i<60;i++){const x=BXO+16+rnd()*(BXW-32),z=BXO+16+rnd()*(BXW-32),h=BX_h(x,z);if(h<.3)continue;if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<10&&Math.abs(s.p.z-z)<10))continue;RK.push([x,z,h,1+rnd()*2.2])}
@@ -318,7 +358,7 @@ function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/10
   const V=BX.v;BX.car.position.copy(V.p);const S=bxV().crossVectors(V.F,V.U).normalize();BX.car.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(S.negate(),V.U,V.F));
   const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,Math.max(gy,V.boat?0:gy)+.08,V.p.z);
   if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
- BX_fxStep(dt);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
+ BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=1.1+.7*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
  BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
@@ -485,7 +525,8 @@ function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+
  const C=[['rails on every piece',noRail===0,`${noRail} pieces without rails`],['width >=14 m',width>=14,`width ${width} m`],['0 gaps',gaps.length===0,`open ends ${gaps.length}${gaps.length?' ('+gaps.join(',')+')':''}`],
   ['>=3 jumps',Math.min(R[0].kick,R[1].kick)>=3,`jumps ${R[0].kick}/${R[1].kick}`],['>=2 boosts',Math.min(R[0].boost,R[1].boost)>=2,`boosts ${R[0].boost}/${R[1].boost}`],
   ['shortcut',fk&&short>=50,`shortcut ${fk?'saves '+short.toFixed(0)+' m':'none'}`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} %`],
-  ['lap 1.5-2.7 km',lo>=1500&&hi<=2700,`lap ${(lo/1000).toFixed(2)}-${(hi/1000).toFixed(2)} km`]];
+  ['lap 1.5-2.7 km',lo>=1500&&hi<=2700,`lap ${(lo/1000).toFixed(2)}-${(hi/1000).toFixed(2)} km`],
+  ['>=20 props/200 m',(BX.dressN||{}).props/((BX.dressN||{}).len/200)>=20,`props ${((BX.dressN||{}).props/((BX.dressN||{}).len/200)||0).toFixed(1)}/200 m`],['>=1 landmark',(BX.dressN||{}).landmark>=1,`landmarks ${(BX.dressN||{}).landmark||0}`]];
  return{ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')}}
 // the bxT check: track data + the 3 s input check (GO -> GAS 3 s -> >=15 m forward, never backward)
 for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon']){const T=BX_TESTS[k];T.chk=()=>{const m=BX.m,D=BX_data(),i=[['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 backward',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`]];
