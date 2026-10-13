@@ -26,13 +26,13 @@ function TRN_base(){let n=0,bad=0,mx=0,w=null;for(const b of HUB.bld||[]){if(b.h
   const o={n,bad,max:+mx.toFixed(2),worst:w};TRN.base=o;return o}
 // relief: summit (highest ground within 150 m of the hill) above the lowest ground 400-1000 m around it
 function TRN_relief(cx,cz){let top=-1e9,tx=cx,tz=cz;for(let x=-400;x<=400;x+=10)for(let z=-400;z<=400;z+=10){const y=groundY(cx+x,cz+z);if(y>top){top=y;tx=cx+x;tz=cz+z}}
-  let lo=1e9;for(let a=0;a<48;a++)for(let r=400;r<=1000;r+=50){const t=a/48*6.283,y=groundY(tx+Math.cos(t)*r,tz+Math.sin(t)*r);if(y<lo)lo=y}return{top:+top.toFixed(1),lo:+lo.toFixed(1),relief:+(top-lo).toFixed(1),x:Math.round(tx),z:Math.round(tz)}}
+  const Y=[];for(let a=0;a<48;a++)for(let r=400;r<=1000;r+=50){const t=a/48*6.283,x=tx+Math.cos(t)*r,z=tz+Math.sin(t)*r;if(CID==='fra'&&inRiver(x,z,-30))continue;Y.push(groundY(x,z))}Y.sort((a,b)=>a-b);const lo=Y[Math.floor(Y.length*.1)];return{top:+top.toFixed(1),lo:+lo.toFixed(1),relief:+(top-lo).toFixed(1),x:Math.round(tx),z:Math.round(tz)}}
 const TRN_MUEHL=[-1350,-1400];
 function TRN_hill(which){const H=which==='lyka'?(typeof HILL_BY!=='undefined'&&HILL_BY.lyka?[HILL_BY.lyka.cx,HILL_BY.lyka.cz]:[298,-1107]):TRN_MUEHL,R=TRN_relief(H[0],H[1]);TRN[which]=R;
   // look at it from a street 300-700 m away
   for(let k=0;k<24;k++){const t=k/24*6.283,d=420+(k%3)*120,q=rfSnap(R.x+Math.cos(t)*d,R.z+Math.sin(t)*d,60);if(q&&!TRN_skip(q[0],q[1])){roamWarp(q[0],q[1],Math.atan2(R.x-q[0],R.z-q[1]));RO.v=0;break}}
   const need=which==='lyka'?150:TRN_NEED_MUEHL,ok=R.relief>=need;return'📍 '+(which==='lyka'?'LYCABETTUS':'MÜHLBERG')+' · summit '+R.top+' m, valley '+R.lo+' m → relief '+R.relief+' m (need ≥'+need+')'+(ok?' ✅':' ❌')}
-const TRN_NEED_MUEHL=45;
+const TRN_NEED_MUEHL=100;
 // tyre gap at 5 road spawns (async: settles 1.5 s at each)
 function TRN_gapNow(){if(!pl||!pl.mesh)return null;const T=THREE,m4=new T.Matrix4(),v=new T.Vector3();let low=1e9;pl.mesh.updateMatrixWorld(true);const ud=pl.mesh.userData;if(!ud.m)return null;
   ud.m.traverseVisible(o=>{if(!o.isMesh||!o.geometry||(o.material&&(o.material.transparent||o.material.blending===T.AdditiveBlending)))return;if(o.isInstancedMesh){o.getMatrixAt(0,m4);m4.premultiply(o.matrixWorld)}else m4.copy(o.matrixWorld);
@@ -48,7 +48,7 @@ const TRN_LOAD0={fra:null,ath:null};
 function TRN_fps(say){if(TRN.fpRun)return'📍 FPS VIEWS running…';TRN.fpRun=1;const V=TRN_VIEWS[CID==='fra'?'fra':'ath'],out=[];
   const step=k=>{if(k>=V.length){TRN.fpRun=0;TRN.fps=out;const L0=TRN_LOAD0[CID==='fra'?'fra':'ath'];let ok=true;if(L0)for(let i=0;i<out.length;i++)if(out[i].tris>L0[i].tris*1.05||out[i].calls>L0[i].calls*1.05)ok=false;
       say('📍 FPS VIEWS · '+out.map(o=>o.fps+' fps / '+Math.round(o.tris/1000)+'k tris / '+o.calls+' calls').join(' · ')+(L0?ok?' · load ≤ +5% ✅':' · load > +5% ❌':' · (no baseline) ✅'));return}
-    const q=rfSnap(V[k][0],V[k][1],200)||V[k];roamWarp(q[0],q[1],V[k][2]);RO.v=0;setTimeout(()=>{let n=0,t0=performance.now(),tr=0,ca=0;const f=()=>{n++;try{tr=Math.max(tr,renderer.info.render.triangles);ca=Math.max(ca,renderer.info.render.calls)}catch(e){}
+    const q=rfSnap(V[k][0],V[k][1],200)||V[k];roamWarp(q[0],q[1],V[k][2]);RO.v=0;setTimeout(()=>{let n=0,t0=performance.now(),tr=0,ca=0;const I=renderer.info,ar=I.autoReset;I.autoReset=false;I.reset();const f=()=>{n++;tr=Math.max(tr,I.render.triangles);ca=Math.max(ca,I.render.calls);I.reset();if(performance.now()-t0>=2000)I.autoReset=ar;
       if(performance.now()-t0<2000)requestAnimationFrame(f);else{out.push({fps:Math.round(n*1000/(performance.now()-t0)),tris:tr,calls:ca});step(k+1)}};requestAnimationFrame(f)},2500)};step(0);return'📍 FPS VIEWS · measuring 3 views…'}
 function TRN_go(kind,say){try{
   if(kind==='lyka'||kind==='muehl')return TRN_hill(kind);
@@ -58,3 +58,9 @@ function TRN_go(kind,say){try{
   if(kind==='base'){const o=TRN_base();return'📍 BUILDING BASES · '+o.n+' buildings · '+o.bad+' float above the ground (max '+o.max+' m) (need 0)'+(o.bad?' ❌':' ✅')}
   if(kind==='tyre')return TRN_tyre(say);if(kind==='fps')return TRN_fps(say)}catch(e){return'📍 terrain test error '+e.message+' ❌'}}
 window.__trn={TRN,go:TRN_go,grade:TRN_grade,edge:TRN_edge,ramp:TRN_ramp,base:TRN_base,relief:TRN_relief,roads:TRN_roads,gap:TRN_gapNow};
+// slope colours on the open land (outer ground heightfields with a col callback): grass → dry grass (15-30 %) → dirt (30-55 %) → rock (>55 %);
+// Athens also dries out with height (macchia above ~120 m)
+const TRN_C={dry:new THREE.Color(CID==='fra'?'#b3a85e':'#c2ae72'),dirt:new THREE.Color('#9a7a52'),rock:new THREE.Color('#8e8a82')};
+function TRN_slopeCol(c,x,z){if(!c||!c.isColor)return c;let s=0,h=0;try{h=groundY(x,z);const a=groundY(x+5,z)-groundY(x-5,z),b=groundY(x,z+5)-groundY(x,z-5);s=Math.hypot(a,b)/10}catch(e){return c}
+  const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};let d=ss(.12,.3,s)*.55;if(CID!=='fra')d=Math.max(d,ss(110,220,h)*.45);if(d>0)c.lerp(TRN_C.dry,d);const r=ss(.3,.55,s);if(r>0)c.lerp(TRN_C.dirt,r*.7);const k=ss(.55,.9,s);if(k>0)c.lerp(TRN_C.rock,k*.8);return c}
+if(new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{if(o&&o.col&&!o.trc){const c0=o.col;o={...o,trc:1,col:(x,z)=>TRN_slopeCol(c0(x,z),x,z)}}return _g(grp,x0,x1,z0,z1,o)}}

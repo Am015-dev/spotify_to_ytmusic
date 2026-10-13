@@ -9,7 +9,7 @@ const OD_CHECKLIST=[
  {ver:'v90n',id:'foot-go-obj',area:'people',text:'foot: · USE THINGS (📍 GO, tap again for the next): 1 next to your parked car: 🚪 ENTER gets you in · 2 next to a bench: 🪑 SIT sits the minifig on it, the stick stands it up · 3 next to a mission giver: 📋 TALK opens the mission card. Auto: tools/tFootGo.js obj.'},
  {ver:'v90n',id:'foot-go-jump',area:'people',text:'foot: · JUMP (📍 GO: on foot on a pavement). Tap JUMP (PC: Space): a short hop (0.5-1.2 m high), you land back on the ground and never sink into it; jumping while walking keeps you moving. Auto: tools/tFootGo.js jump.'},
  {ver:'terr1',id:'terrain-lyka',area:'city',text:'terrain: Athens Lycabettus (📍 GO looks at it from a street): a real tall hill, ground rises ≥150 m from the streets around it to the summit.'},
- {ver:'terr1',id:'terrain-muehl',area:'city',text:'terrain: Frankfurt Mühlberg / Sachsenhausen hills (📍 GO looks at them): visible hills south of the Main, ≥45 m above the valley floor.'},
+ {ver:'terr1',id:'terrain-muehl',area:'city',text:'terrain: Frankfurt Mühlberg / Sachsenhausen hills (📍 GO looks at them): visible hills south of the Main, ≥100 m above the valley floor (10th percentile of the ground 0.4-1 km around).'},
  {ver:'terr1',id:'terrain-grade-fra',area:'city',text:'terrain: Frankfurt roads: no street steeper than 12 % (every 8 m of every street, filler road and Autobahn).'},
  {ver:'terr1',id:'terrain-grade-ath',area:'city',text:'terrain: Athens roads: no street steeper than 12 % (every 8 m of every street).'},
  {ver:'terr1',id:'terrain-edge-fra',area:'city',text:'terrain: Frankfurt roads are flat across their width: at 50 road points the edge is within 0.3 m of the centre.'},
