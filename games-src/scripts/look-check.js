@@ -119,6 +119,9 @@ async function pageCollect(o) {
   const BTN = 'button,[role=button],a[href],[onclick],summary,input[type=button],input[type=submit],[data-act],[tabindex]:not([tabindex="-1"])';
   const OBJRE = /(^|[\s_-])(board|card|tile|token|piece|chip|meeple|cell|pc|hc|pcard)([\s_-]|$)|board|meeple/i;
   const isBtn = e => e.matches && e.matches(BTN);
+  let ROOT = null;
+  if (o.modal) { const h = document.elementFromPoint(W / 2, H / 2); for (let p = h; p && p !== document.body && p !== document.documentElement; p = p.parentElement) { const ps = cs(p).position; if (ps === 'fixed' || ps === 'absolute') { const r = R(p); if (r[2] * r[3] > 0.15 * W * H) ROOT = p; } } }
+  const inRoot = e => !ROOT || ROOT.contains(e);
   const out = { texts: [], btns: [], imgs: [], objs: [], fontsErr: [], fams: [], pageScroll: false, board: null, W, H };
 
   // fonts
@@ -141,12 +144,14 @@ async function pageCollect(o) {
     const s = cs(el), op = chainOk(el); const fs = num(s.fontSize);
     const x0 = Math.min(...rects.map(q => q[0])), y0 = Math.min(...rects.map(q => q[1])), x1 = Math.max(...rects.map(q => q[0] + q[2])), y1 = Math.max(...rects.map(q => q[1] + q[3]));
     const box = [x0, y0, x1 - x0, y1 - y0]; const ci = clipInfo(el, box);
-    const col = parseCol(s.color), fill = s.webkitTextFillColor ? parseCol(s.webkitTextFillColor) : col;
+    const isSvg = el instanceof SVGElement; let svgScale = null, svgStroke = 0, svgStrokeCol = [0, 0, 0, 0];
+    if (isSvg) { try { const te = el.closest('text') || el; const m = te.getScreenCTM(); if (m) svgScale = Math.hypot(m.a, m.b) || 1; } catch {} const sw = num(s.strokeWidth); if (s.stroke && s.stroke !== 'none' && sw > 0) { svgStroke = sw * (svgScale || 1); svgStrokeCol = parseCol(s.stroke); } }
+    const col = isSvg ? (() => { const c = parseCol(s.fill); c[3] *= num(s.fillOpacity || 1); return c; })() : parseCol(s.color), fill = isSvg ? col : (s.webkitTextFillColor ? parseCol(s.webkitTextFillColor) : col);
     const shown = op > 0.05 && ci.vpf > 0.3 && ci.vf > 0.3 && s.visibility !== 'hidden';
     const rec = {
-      el, text: txt.slice(0, 60), box, vis: ci.vis, rects, fs, scale: scaleOf(el) * zoomOf(el), op, col: fill[3] < col[3] ? fill : col, shown,
+      el, text: txt.slice(0, 60), box, vis: ci.vis, rects, fs, scale: svgScale != null ? svgScale : scaleOf(el) * zoomOf(el), op, col: fill[3] < col[3] ? fill : col, shown,
       visTxt: ci.vf, hardFrac: ci.hf, vpf: ci.vpf, scrollAnc: ci.scrollAnc, fam: firstFam(s.fontFamily), famRaw: s.fontFamily,
-      shadow: s.textShadow, stroke: num(s.webkitTextStrokeWidth), strokeCol: parseCol(s.webkitTextStrokeColor), letters: /[\p{L}\p{N}]/u.test(txt),
+      shadow: s.textShadow, stroke: isSvg ? svgStroke : num(s.webkitTextStrokeWidth), strokeCol: isSvg ? svgStrokeCol : parseCol(s.webkitTextStrokeColor), letters: /[\p{L}\p{N}]/u.test(txt),
       weight: s.fontWeight, clipText: /text/.test(s.webkitBackgroundClip || s.backgroundClip || ''), rot: rotated(el), ell: s.textOverflow === 'ellipsis',
     };
     out.texts.push(rec);
@@ -155,6 +160,7 @@ async function pageCollect(o) {
   const textRecs = [];
   for (const t of out.texts) {
     if (!t.shown || t.fs <= 0) { t.skip = 'hidden'; continue; }
+    if (!inRoot(t.el)) { t.skip = 'behind'; continue; }
     const cv = cover(t.el, t.box, null);
     t.cover = cv.frac; t.coverModal = cv.by ? modalish(cv.by) : false; t.coverBy = cv.by;
     t.sel = sel(t.el); t.btnEl = t.el.closest(BTN); t.dis = !!t.el.closest(':disabled,[aria-disabled=true],.disabled,.dis,.locked,[disabled]');
@@ -235,12 +241,13 @@ async function pageCollect(o) {
   const all = document.body.querySelectorAll('*');
   if (all.length < 5000) for (const e of all) { if (cand.has(e) || /^(HTML|BODY|CANVAS|svg|path|g|circle|rect|use|SPAN)$/i.test(e.tagName) && e.tagName !== 'SPAN') continue; if (cs(e).cursor === 'pointer' && !(e.parentElement && cs(e.parentElement).cursor === 'pointer')) cand.add(e); }
   for (const e of cand) {
+    if (!inRoot(e)) continue;
     const r = R(e); if (r[2] < 4 || r[3] < 4) continue;
     const op = chainOk(e); if (op < 0.3 || cs(e).visibility === 'hidden') continue;
     const ci = clipInfo(e, r); if (ci.vpf < 0.5 || ci.vf < 0.5) continue;
     if (cs(e).pointerEvents === 'none') continue;
     const cv = cover(e, r, ci.vis);
-    if (cv.frac >= 0.6 && cv.by && (modalish(cv.by) || (() => { const q = R(cv.by); return q[2] * q[3] > 0.45 * W * H; })())) continue;
+    if (cv.frac >= 0.6 && cv.by && (cv.by.closest('[data-help]') || modalish(cv.by) || (() => { const q = R(cv.by); return q[2] * q[3] > 0.45 * W * H; })())) continue;
     const s = cs(e);
     let hasText = false, textInvisible = null, hasVisual = false;
     for (const t of out.texts) if (e.contains(t.el)) {
@@ -270,7 +277,7 @@ async function pageCollect(o) {
   const pend = [];
   const dpr = devicePixelRatio;
   for (const im of document.querySelectorAll('img')) {
-    const r = R(im); if (r[2] < 8 || r[3] < 8 || chainOk(im) < 0.3) continue; const ci = clipInfo(im, r); if (ci.vpf < 0.5) continue;
+    if (!inRoot(im)) continue; const r = R(im); if (r[2] < 8 || r[3] < 8 || chainOk(im) < 0.3) continue; const ci = clipInfo(im, r); if (ci.vpf < 0.5) continue;
     const s = cs(im), nw = im.naturalWidth, nh = im.naturalHeight, src = im.currentSrc || im.src;
     const rec = { kind: 'img', sel: sel(im), src: src.slice(0, 120), box: r, broken: im.complete && nw === 0 && !!src, nw, nh, fit: s.objectFit, svg: /\.svg(\?|$)|^data:image\/svg/.test(src) };
     out.imgs.push(rec);
@@ -278,7 +285,7 @@ async function pageCollect(o) {
   const seenBg = new Set();
   for (const e of (all.length < 5000 ? all : [])) {
     const s = cs(e); if (s.backgroundImage === 'none' || !/url\(/.test(s.backgroundImage)) continue;
-    const r = R(e); if (r[2] < 10 || r[3] < 10 || chainOk(e) < 0.3) continue; const ci = clipInfo(e, r); if (ci.vpf < 0.5) continue;
+    if (!inRoot(e)) continue; const r = R(e); if (r[2] < 10 || r[3] < 10 || chainOk(e) < 0.3) continue; const ci = clipInfo(e, r); if (ci.vpf < 0.5) continue;
     const urls = [...s.backgroundImage.matchAll(/url\((["']?)(.*?)\1\)/g)].map(m => m[2]);
     const sizes = s.backgroundSize.split(/,(?![^(]*\))/);
     urls.forEach((u, k) => {
@@ -297,7 +304,7 @@ async function pageCollect(o) {
     const tag = e.tagName.toLowerCase(); if (tag === 'svg' && e.closest('svg') !== e) continue;
     if (!(tag === 'canvas' || tag === 'svg' || OBJRE.test(cls(e)) || OBJRE.test(e.id || ''))) continue;
     if (/^(path|g|circle|rect|use|line|polygon|text|defs)$/.test(tag) || tag === 'body') continue;
-    const r = R(e); if (r[2] < 12 || r[3] < 12 || chainOk(e) < 0.3) continue; const ci = clipInfo(e, r); if (ci.vpf < 0.1) continue;
+    if (!inRoot(e)) continue; const r = R(e); if (r[2] < 12 || r[3] < 12 || chainOk(e) < 0.3) continue; const ci = clipInfo(e, r); if (ci.vpf < 0.1) continue;
     const s = cs(e);
     if (tag === 'svg' && (r[2] < 40 || r[3] < 40)) continue;
     objs.push({ e, r, ci, tag, s });
@@ -428,7 +435,7 @@ function judge(raw, ctx) {
     if (t.skip || !t.letters || t.dis) continue;
     const px = t.fs * t.scale; const th = t.rects[0][3]; const min = phone ? PHONE_MIN : PC_MIN;
     if (px < min - 0.01 && th < min * 1.9) {
-      add({ check: 'size', sev: px < 9 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `size|${t.sel}`, num: Math.round(px * 10) / 10,
+      add({ check: 'size', sev: px < 9 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `size|${t.sel}|${px < 9 ? 'xs' : 's'}`, num: Math.round(px * 10) / 10,
         desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" is ${Math.round(px * 10) / 10} px on ${phone ? 'phone' : 'PC'}` });
     }
   }
@@ -462,7 +469,7 @@ function judge(raw, ctx) {
     const w = b.box[2], h = b.box[3];
     const label = nice(b.sel);
     if (phone && !b.inline && !b.isObj && (w < 40 || h < 40) && !b.scrollAnc && (b.text || b.aria || b.hasVisual || b.painted)) add({ check: 'button', sev: Math.min(w, h) < 24 ? 'severe' : 'warn', sel: b.sel, text: b.text || b.aria, box: b.box, key: `tap|${b.sel}`, num: `${Math.round(w)}x${Math.round(h)}`, desc: `${cap(label)} button${b.text ? ' "' + b.text.slice(0, 20) + '"' : ''} is only ${Math.round(w)}x${Math.round(h)} px to tap` });
-    if (!b.hasText && !b.hasVisual && (b.aria || b.textInvisible) && w >= 20 && h >= 20 && !b.isObj) add({ check: 'button', sev: 'severe', sel: b.sel, text: b.aria || b.text, box: b.box, key: `nolabel|${b.sel}`, desc: `${cap(b.aria ? b.aria.slice(0, 24) : label)} button has no visible label${b.textInvisible ? ' (' + b.textInvisible + ')' : ''}` });
+    if (!b.hasText && !b.hasVisual && (b.aria || b.textInvisible) && (b.painted || b.bgImg) && w >= 20 && h >= 20 && !b.isObj) add({ check: 'button', sev: 'severe', sel: b.sel, text: b.aria || b.text, box: b.box, key: `nolabel|${b.sel}`, desc: `${cap(b.aria ? b.aria.slice(0, 24) : label)} button has no visible label${b.textInvisible ? ' (' + b.textInvisible + ')' : ''}` });
     else if (!b.hasText && b.textInvisible && b.hasVisual && /font-size 0|transparent|opacity|clipped/.test(b.textInvisible) === false) { /* fine */ }
     if (b.cover >= 0.6 && !b.coverModal && !b.coverBig) add({ check: 'button', sev: b.cover >= 0.99 ? 'severe' : 'warn', sel: b.sel, text: b.text || b.aria, box: b.box, key: `cover|${b.sel}|${b.coverBy}`, desc: `${cap(label)} button${b.text ? ' "' + b.text.slice(0, 20) + '"' : ''} is covered by ${nice(b.coverBy) || 'another element'}` });
   }
@@ -545,7 +552,7 @@ async function checkGame(browser, helper, port, slug, deadline) {
     const snap = async (name, opts = {}) => {
       const id = `${slug}|${size.id}|${name}`;
       await freeze(p);
-      const raw = await p.evaluate(pageCollect, { phone: size.mobile, dbg: process.env.LOOK_TEXT || '' });
+      const raw = await p.evaluate(pageCollect, { phone: size.mobile, dbg: process.env.LOOK_TEXT || '', modal: !!opts.modal });
       if (raw.dbg && raw.dbg.length) console.log('DBG', size.id, name, JSON.stringify(raw.dbg, null, 1));
       if (process.env.LOOK_DEBUG) fs.mkdirSync(process.env.LOOK_DEBUG, { recursive: true });
       // strip DOM refs (not serialisable) - evaluate already serialised plain data only
@@ -561,8 +568,8 @@ async function checkGame(browser, helper, port, slug, deadline) {
     const loadPx = async (id, n1, n2) => {
       await helper.evaluate(async ([id, a, b, dpr]) => { await __px.load(id, a, dpr); await __px.load(id + '|bg', b, dpr); }, [id, n1.toString('base64'), n2.toString('base64'), size.dpr]);
     };
-    const screen = async (name, isBoard) => {
-      const sn = await snap(name); const id = sn.id; const raw = sn.raw;
+    const screen = async (name, isBoard, modal) => {
+      const sn = await snap(name, { modal }); const id = sn.id; const raw = sn.raw;
       await loadPx(id, sn.n1, sn.n2);
       const items = [], idx = [];
       raw.texts.forEach((t, i) => { if (t.skip || !t.letters || t.dis) return; const a = Math.min(1, (t.col[3] || 1) * (t.op || 1)); const rects = [...t.rects].map(q => { const v = t.vis, x0 = Math.max(q[0], v[0]), y0 = Math.max(q[1], v[1]), x1 = Math.min(q[0] + q[2], v[0] + v[2]), y1 = Math.min(q[1] + q[3], v[1] + v[3]); return x1 - x0 > 1 && y1 - y0 > 1 ? [x0, y0, x1 - x0, y1 - y0] : null; }).filter(Boolean).sort((x, y) => y[2] * y[3] - x[2] * x[3]).slice(0, 3); if (!rects.length) return;
@@ -604,7 +611,7 @@ async function checkGame(browser, helper, port, slug, deadline) {
           const hp = await findClick(p, { text: 'help|how to play|how this works|rules' }, size); if (hp) { await tap(p, hp.x, hp.y, size); await sleep(900); } }
         dlg = await p.evaluate(() => [...document.querySelectorAll('.gxh-rules,[role=dialog],.gx-drawer.on')].some(e => e.getClientRects().length && e.getBoundingClientRect().width > 100));
       }
-      if (dlg) await screen('help', false); else screens.push({ id: null, size: size.id, screen: 'help (none found)' });
+      if (dlg) await screen('help', false, true); else screens.push({ id: null, size: size.id, screen: 'help (none found)' });
       await p.keyboard.press('Escape').catch(() => {}); await sleep(400);
       for (const s of [{ sel: '.gxh-x, .gx-x, [data-gx=close]' }]) { const pos = await findClick(p, s, size); if (pos) { await tap(p, pos.x, pos.y, size); await sleep(500); } }
       // card zoom / hold
@@ -613,7 +620,7 @@ async function checkGame(browser, helper, port, slug, deadline) {
         const len0 = await p.evaluate(() => document.body.innerHTML.length);
         await p.mouse.move(cpos.x, cpos.y); await p.mouse.down(); await sleep(750);
         const zoomed = await p.evaluate(() => [...document.querySelectorAll('[class*=zoom],[class*=preview],[class*=big],[class*=peek],[class*=detail]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && e.getBoundingClientRect().width > 80));
-        if (zoomed) await screen('card-zoom', false);
+        if (zoomed) await screen('card-zoom', false, true);
         await p.mouse.up();
       }
     } catch (e) { findings.push({ size: size.id, screen: 'all', check: 'page', sev: 'warn', sel: 'look-check', text: '', box: [0, 0, 1, 1], key: 'drv|' + String(e.message).slice(0, 40), desc: 'Look check could not drive this screen: ' + String(e.message).slice(0, 80) }); }
