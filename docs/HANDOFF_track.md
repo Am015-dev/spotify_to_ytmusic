@@ -33,3 +33,24 @@ Draft PR #92 (alex/od-track → alex/od-models), for tracking only; the integrat
 - `node tools/tbLint.mjs track.json` runs the lint in node (same code as the game).
 - `node tools/tbDemo.mjs in.json out.json spec.json` places pieces by lap fraction and prints a fraction/R/y table.
 - `node tools/tTB.js URL outdir ui|json|db|gate [track.json]` (phone, real taps).
+
+# HANDOFF track-2 (stunt pieces + STUNT CUP, 2026-10-13) — details in docs/HANDOFF_track2.md
+State: alex/od-builder 0146a18 (export/import) PASS → build-10 v90k. alex/od-track deb7b1c (STUNT CUP, build tr2j) FULL PASS → build-10 v90l.
+Lab "Overdrive Track Lab" https://claude.ai/artifact/Ntmqn43osDXjTVwm7CbcRP = v5 (tr2j): Race → FRA/ATH → ★ STUNT CUP; home → 🛠 BUILDER.
+
+## Open items
+- Island-nose scrapes: a car entering a split late can glance the island nose (0–0.5 hits/min on 2 of 6 tracks, 0 on 4). Ideas: a longer
+  mouth (OPN_MOUTH/OPN_NOSE in 98ro) for builder routes, or a soft R17-style cushion on the island nose.
+- Split timing: alt lanes are balanced by kf = base × length ratio ρ × TB_V.rk[kind] (rk: scd 1.07, scw .95). Single tRace samples per split
+  are noisy (±7–10 %); per-kind medians are within ~2 %. For a real ±5 % per split, run ROUTE=road and default tRace 3× per track and average OPN.seg.
+- Loops / corkscrews / wall rides: NOT possible in the race physics (spline + lateral offset, frame roll ≤ ~20°). Banks (19°, +45 % grip) are the safe version.
+  A loop would need a new physics mode (car frame following a 3D tube); not started.
+- No iPhone/WebKit test in the cloud.
+
+## Importing Alex's tracks (from the Lab db "tracks" or a pasted code)
+1. Lab db: ArtifactData list collection "tracks" on the Lab URL → each doc {name, city, json, author, time}; `json` is the track JSON
+   (or an ODT1 code from ⧉ EXPORT). Save it to a file.
+2. `node tools/tbImport.mjs <file> --id tb_<name>` → docs/tracks/<id>.json + lint (L1–L19, docs/TRACK_FUN.md). Fix red rules with Alex.
+3. Official race: `--add` puts it in TB_BUILTIN (98tb, MY TRACKS for everyone). For the STUNT CUP row instead: copy the json to
+   docs/tracks2/<id>.json, add the id to ORDER in tools/tsEmbed.py, run it (embeds into TS_TRACKS in 98ts).
+4. `tools/build.sh <ver> --local`, load smoke (page errors + __tb), tRace 2 laps (0 errors, walls ≤ 0.5/min, stuck ≤ 3 %), grid, reviewer, build-10.
