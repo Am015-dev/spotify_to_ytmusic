@@ -146,7 +146,7 @@ function BX_pcMesh(pc){const M=BX_mats();for(const S of pc.S){const[g1,g2]=BX_ge
 function BX_pcDrop(pc){if(!pc)return;for(const o of pc.meshes){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}pc.meshes=[];BX_hashAll()}
 function BX_gate(pc){const s=pc.S[0][Math.floor(pc.S[0].length/2)],g=new THREE.Group(),c=pc.def.start?0xf4f4f4:0x0055bf,m=new THREE.MeshStandardMaterial({color:c,roughness:.4}),bx=new THREE.BoxGeometry(1,7,1),top=new THREE.BoxGeometry(10,1.4,1);
  for(const x of[-4.6,4.6]){const p=new THREE.Mesh(bx,m);p.position.set(x,3.5,0);g.add(p)}const t=new THREE.Mesh(top,new THREE.MeshStandardMaterial({color:pc.def.start?0x202020:0xf2cd37,roughness:.4}));t.position.y=7.4;g.add(t);
- g.position.copy(s.p);g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(s.S,s.U,s.F));g.traverse(o=>{o.castShadow=true});BX.gP.add(g);pc.meshes.push(g);
+ g.position.copy(s.p);g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(s.S.clone().negate(),s.U,s.F)); // (S,U,F) is left-handed: it rotated the posts onto the road centreg.traverse(o=>{o.castShadow=true});BX.gP.add(g);pc.meshes.push(g);
  g.children.forEach(o=>o.userData.pc=pc);BX.posts=BX.posts||[]}
 function BX_buildAll(){if(!BX.sc)return;for(const o of[...BX.gP.children]){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}for(const pc of BX.pcs)if(!pc.dead){pc.meshes=[];BX_pcMesh(pc)}
  BX_hashAll();BX_terrMesh();BX_bld();BX_after()}
@@ -256,7 +256,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // water: boat when the ground under the car is deep enough and the car is at the surface
  const gy=BX_h(V.p.x,V.p.z),wantBoat=gy<-.7&&V.p.y<.9&&!(grounded&&pc);
  if(wantBoat!==V.boat&&(wantBoat||grounded)){V.boat=wantBoat;BX_vmode(V.boat?'boat':'car');m.swaps++;BX_burst(V.p.clone().add(bxV(0,.3,0)),18,V.boat?0xbfe4ff:0x8d7b68,7);BX_say(V.boat?'SPLASH! BOAT':'BACK ON WHEELS',1)}
- const top=(V.boat?24:pc?34:27)+(V.boost>0?14:0),grip=V.boat?3.6:pc?11:6.5,acc=(V.boat?13:22)+(V.boost>0?18:0);
+ const top=(V.boat?20:pc?34:27)+(V.boost>0?14:0),grip=V.boat?3.6:pc?11:6.5,acc=(V.boat?13:22)+(V.boost>0?18:0);
  V.steer+=(inp.s-V.steer)*Math.min(1,dt*7);
  if(V.boat){grounded=false;const wave=.12*Math.sin(BX.t*2.1+V.p.x*.2);V.p.y+=(.05+wave-V.p.y)*Math.min(1,dt*6);V.v.y*=.8;
   U.lerp(bxV(.06*Math.sin(BX.t*1.7),1,.06*Math.sin(BX.t*1.3)),Math.min(1,dt*4)).normalize();m.boat+=dt;
