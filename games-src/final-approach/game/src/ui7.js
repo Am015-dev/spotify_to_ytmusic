@@ -50,6 +50,8 @@ function pxResize(force) {
 }
 // ---- textures ----
 async function pxTextures() {
+  // the 3D airliner (sprite rendered from the full-detail model) for the landing / crash scene; loads in the background, not on Low graphics
+  if (gfxLevel() !== 'low') pxLoadImg('models/plane' + (innerWidth < 700 ? '@512' : '') + '.webp').then(im => { PX.tex.plane3 = PIXI.Texture.from(im); }).catch(() => { });
   await Promise.all(Object.keys(ART).map(async k => { try { const im = await pxLoadImg(ART[k]); PX.img[k] = im; PX.tex[k] = PIXI.Texture.from(im); } catch (e) { } }));
   const cut = (id, name) => { const at = FA_ATLAS[id], im = PX.img[id]; if (!at || !im) return; const i = at.names.indexOf(name); if (i < 0) return; const c = at.cols, x = (i % c) * at.cw, y = Math.floor(i / c) * at.ch; PX.tex[id + ':' + name] = new PIXI.Texture({ source: PX.tex[id].source, frame: new PIXI.Rectangle(x, y, at.cw, at.ch) }); };
   for (const id of ['dice', 'tokens', 'icons']) if (FA_ATLAS[id]) for (const n of FA_ATLAS[id].names) cut(id, n);
@@ -230,7 +232,7 @@ function pxEnd(win, cb) {
   try {
     const L = PX.L.end, W = PX.w, H = PX.h; L.removeChildren(); $('#bd').classList.add('ending');
     const bgT = tx(win ? 'end-land' : 'end-crash'), bg = new PIXI.Sprite(bgT); const sc = Math.max(W / bgT.width, H / bgT.height); bg.scale.set(sc); bg.x = (W - bgT.width * sc) / 2; bg.y = (H - bgT.height * sc) / 2; bg.alpha = 0;
-    const plane = new PIXI.Sprite(tx(win ? 'planegear' : 'planeside')); plane.anchor.set(.5); const pw = Math.min(W * .5, 420); plane.width = pw; plane.height = pw * .39;
+    const p3 = PX.tex.plane3, plane = new PIXI.Sprite(p3 || tx(win ? 'planegear' : 'planeside')); plane.anchor.set(.5); const pw = Math.min(W * .5, 420); if (p3) { plane.width = plane.height = Math.min(W * .62, H * .5, 520); } else { plane.width = pw; plane.height = pw * .39; }
     const flash = new PIXI.Graphics(); flash.rect(0, 0, W, H).fill(0xff3322); flash.alpha = 0;
     L.addChild(bg, plane, flash); PX.endA = { t: 0, win, cb, bg, plane, flash, W, H, done: false };
   } catch (e) { setTimeout(cb, 300); }

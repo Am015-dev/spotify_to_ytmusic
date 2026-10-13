@@ -13,6 +13,26 @@
  },
  {
   "date": "2026-10-13",
+  "game": "nebula",
+  "title": "Real 3D ships and asteroids",
+  "items": [
+   "Lancer and Talon hulls and the asteroids are detailed 3D models",
+   "Phones and Low graphics load lighter versions"
+  ],
+  "check": "Start a battle and look at the ships and asteroids on the mat."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Final Approach: a real 3D airliner",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane"
+  ],
+  "check": "Finish a flight and watch the plane land or crash"
+ },
+ {
+  "date": "2026-10-13",
   "game": "short-fuse",
   "title": "Short Fuse: a real 3D bomb",
   "items": [
