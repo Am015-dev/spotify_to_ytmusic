@@ -11,7 +11,7 @@ const LDS={P:{
  tree3:{n:[[6,0],[6,42],[44,42],[26,64],[36,66],[20,88],[28,90],[15,112],[20,114],[10,136],[12,138],[0,159]],f:[[6,0],[6,42],[44,42],[0,159]],src:'3471'}},
  k:8.2/144,trunk:48,near:120,on:[],st:null};
 // lathe of a profile; trunk part (y < trunk LDU, thin) brown, crown white (the per-instance tint colours it, ART_TINT)
-function LDS_lathe(P,seg){const pts=P.map(([r,y])=>new THREE.Vector2(r*LDS.k,y*LDS.k)),g=new THREE.LatheGeometry(pts,seg).toNonIndexed(),p=g.attributes.position,keep=[];
+function LDS_lathe(P,seg){seg=Math.min(seg,8);const pts=P.map(([r,y])=>new THREE.Vector2(r*LDS.k,y*LDS.k)),g=new THREE.LatheGeometry(pts,seg).toNonIndexed(),p=g.attributes.position,keep=[];
  for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);
   if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()<1e-10)continue;keep.push(a,b,d)}// drop the degenerate triangles at the r=0 tip
  const q=new THREE.BufferGeometry().setFromPoints(keep),c=[],tb=new THREE.Color('#7a4a28'),cw=new THREE.Color('#ffffff'),yt=LDS.trunk*LDS.k;
@@ -65,7 +65,7 @@ kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='fra')return r;
   d.mat=LDS.mat||(LDS.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0}));d.lds=t;if(LDS.st)LDS.st[t]={src:LDS.SW[t][1],old,near:LDS_tri(d.g),far:LDS_tri(d.g)}}catch(e){console.warn('LDS '+t,e)}}return r})(kmProps);
 // construction props, stop sign, rock (land-3, swaps 9-13): LEGO parts (LDraw, CCAL 2.0) in LDU, low-poly; lathes use the part profile (tools/ld/lProfile.py)
 // generic lathe in LDU, colour by height stops [[yMax,'#hex'],..]; drops the degenerate tip triangles
-function LDS_lth(P,seg,cols){const g=new THREE.LatheGeometry(P.map(([r,y])=>new THREE.Vector2(r,y)),seg).toNonIndexed(),p=g.attributes.position,V=[],c=[],C=new THREE.Color();
+function LDS_lth(P,seg,cols){seg=Math.min(seg,8);const g=new THREE.LatheGeometry(P.map(([r,y])=>new THREE.Vector2(r,y)),seg).toNonIndexed(),p=g.attributes.position,V=[],c=[],C=new THREE.Color();
  for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()<1e-8)continue;V.push(a,b,d);C.set(cols.find(e=>(a.y+b.y+d.y)/3<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
  const q=new THREE.BufferGeometry().setFromPoints(V);q.setAttribute('color',new THREE.Float32BufferAttribute(c,3));q.computeVertexNormals();return q}
 // fit by height (tall thin props): old height, old footprint centre, standing on the old base
@@ -91,8 +91,8 @@ Object.assign(LDS.SW,{cone:[LDS_cone,'4589 cone'],barrier:[LDS_barrier,'4083 bar
 // in tan (160), CE_cypress -> 3778 Plant Tree Columnar 4x4x11.5: short trunk + its stacked tiers as 2, 5 sides (45 tris vs the old 41: 14k cypresses, +57k)
 LDS.CE={CE_pine:[()=>LDS_lth(LDS.P.tree3.n,8,[[48,'#6b4a2a'],[999,'#3e6b34']]),'3471',7.2],CE_olive:[()=>LDS_lth(LDS.P.tree.n,7,[[48,'#6a5848'],[999,'#8a9a68']]),'3470',4.1],
  CE_cypress:[()=>LDS_lth([[5,0],[5,26],[40,36],[20,110],[46,124],[0,280]],5,[[27,'#5a4030'],[999,'#2d5a32']]),'3778',8.6]};
-CE_defs=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='ath')return r;LDS.st=LDS.st||{};for(const t in LDS.CE){const d=D[t];if(!d||d.lds)continue;try{const[fn,src,h]=LDS.CE[t],old=LDS_tri(d.g),g=fn();g.computeBoundingBox();const k=h/g.boundingBox.max.y;g.scale(k,k,k);g.computeBoundingBox();g.computeBoundingSphere();d.gOld=d.g;d.g=g;d.lds=t;LDS.st[t]={src,old,near:LDS_tri(g),far:LDS_tri(g)}}catch(e){console.warn('LDS '+t,e)}}
- const d=D.CE_rock;if(d&&!d.lds)try{const old=LDS_tri(d.g),g=LDS_rock(d.g,'#c8b48a','#a89c84');d.gOld=d.g;d.g=g;d.lds='CE_rock';LDS.st.CE_rock={src:'42284+42291 rock',old,near:LDS_tri(g),far:LDS_tri(g)}}catch(e){console.warn('LDS CE_rock',e)}return r})(CE_defs);
+CE_defs=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='ath')return r;LDS.st=LDS.st||{};for(const t in LDS.CE){const d=D[t];if(!d||d.lds)continue;try{const[fn,src,h]=LDS.CE[t],old=LDS_tri(d.g),g=fn();g.computeBoundingBox();const k=h/g.boundingBox.max.y;g.scale(k,k,k);g.computeBoundingBox();g.computeBoundingSphere();d.gOld=d.g;d.g=g;d.gFar=d.gOld;d.lds=t;LDS.st[t]={src,old,near:LDS_tri(g),far:LDS_tri(d.gFar)}}catch(e){console.warn('LDS '+t,e)}}
+ const d=D.CE_rock;if(d&&!d.lds)try{const old=LDS_tri(d.g),g=LDS_rock(d.g,'#c8b48a','#a89c84');d.gOld=d.g;d.g=g;d.gFar=d.gOld;d.lds='CE_rock';LDS.st.CE_rock={src:'42284+42291 rock',old,near:LDS_tri(g),far:LDS_tri(d.gFar)}}catch(e){console.warn('LDS CE_rock',e)}return r})(CE_defs);
 // Athens palm (swap 7, Syntagma race palms, TRK.tree 'palm'): LEGO palm as built in set 6376 Breezeway Cafe (ld/land/l_palm.ldr, OMR, CCAL 2.0):
 // 2563 base (r 20 LDU), stacked 2536 trunk segments (r 11 -> 14 each), 2566 top and 4 x 2518 Palm Leaf Large (176 LDU long, 90 wide, drooping 43);
 // trunk = 5-sided lathe of that profile, each leaf = 2-sided quad + tip triangle; scaled to the old 9.5 m trunk. Replaces athTreeBy0('palm') (108 tris).
@@ -114,9 +114,17 @@ TInst.prototype.add=(f=>function(x,y,z,...a){if(!(this.geo&&this.geo.userData&&t
  const C=[];for(const px of fix(x))for(const pz of fix(z))C.push([px,pz]);C.sort((A,B)=>Math.hypot(A[0]-x,A[1]-z)-Math.hypot(B[0]-x,B[1]-z));
  for(const[px,pz]of C)if(ok(px,pz)){LDS.pm.moved++;return f.call(this,px,athH(px,pz)-.2,pz,...a)}LDS.pm.drop++;return this})(TInst.prototype.add);
 // LOD: a tree prop mesh (one per type per 800 m tile) draws the near lathe only while the camera is within LDS.near m of its instances' box
-function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in LDS.P){const d=D[t];if(d&&d.lds&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
-hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
- for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
+function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.length:0;if(!D||!HUB.grp)return;HUB.grp.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in D){const d=D[t];if(d&&d.lds&&d.gFar&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
+hubCullStep=(f=>function(){f.apply(this,arguments);if((LDS.fr=(LDS.fr|0)+1)%10)return;if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
+ for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),nr=Math.hypot(dx,dz)<LDS.near,g=nr?d.g:d.gFar;if(o.geometry!==g)o.geometry=g;if(d.mFar){const m=nr?d.mat:d.mFar;if(o.material!==m)o.material=m}}})(hubCullStep);
+// dev1 (v90k): Frankfurt LDS props (fence, crate, planter, dumpster, cone, barrier, warning light, sign, rock) far = the old Kenney geometry + its atlas material
+kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID==='fra')for(const t in D){const d=D[t];if(d&&d.lds&&!d.gFar&&d.gOld&&d.mOld){d.gFar=d.gOld;d.mFar=d.mOld;if(LDS.st&&LDS.st[t])LDS.st[t].far=LDS_tri(d.gFar)}}return r})(kmProps);
+// v90j-perf: ?props=0 hides all LDS/CE props (A/B on a real PC)
+LDS.props0=/[?&]props=0\b/.test(location.search);if(LDS.props0){LDS.off=true;buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{const D=HUB.ptypes,G=[];for(const t in D){const d=D[t];if(d&&(d.lds||t.startsWith('CE_')))G.push(d.g,d.gOld,d.gFar)}HUB.grp&&HUB.grp.traverse(o=>{if(o.isMesh&&G.includes(o.geometry))o.layers.set(31)})}catch(e){console.warn('props0',e)}return r})(buildHubProps)}
+// dev1 (v90k/lag GO): force one LOD pass, then count prop meshes drawing the near vs far model and any on the wrong one for their distance
+LDS.chk=()=>{LDS.fr=9;try{hubCullStep()}catch(e){}const D=HUB.ptypes||{},cp=camera.position,r={on:LDS.on.length,near:0,far:0,wrong:0,fraFar:0,off:!!LDS.off};
+ for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox;if(!d||!b)continue;const nr=Math.hypot(Math.max(b.min.x-cp.x,0,cp.x-b.max.x),Math.max(b.min.z-cp.z,0,cp.z-b.max.z))<LDS.near;
+  if(nr)r.near++;else{r.far++;if(d.mFar)r.fraFar++}if(o.geometry!==(nr?d.g:d.gFar)||(d.mFar&&o.material!==(nr?d.mat:d.mFar)))r.wrong++}return r};
 // test hook (before/after shots of the same spot): ab(1) draws the old trees again
 function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster','cone','barrier','clight','sign','rock','CE_pine','CE_olive','CE_cypress','CE_rock'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;if(DL.mOld)o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
 window.__ld.lds=LDS;LDS.race=t=>setupRace({type:'attract',laps:99,traffic:0,items:false,aggr:0,track:t,mood:(TRACK_DEFS.find(d=>d.id===t)||{}).mood||'brick'});LDS.cam=()=>camera;LDS.palm0=()=>athTreeBy0('palm');LDS.inB=(x,z)=>CITY.some(b=>Math.abs(b.x-x)<b.hw+2&&Math.abs(b.z-z)<b.hd+2);LDS.probe=(x,z)=>({d:nearestTrackDist(x,z,999),HALF,W,ath:athH(x,z)});window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
