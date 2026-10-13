@@ -9,7 +9,8 @@ var SC_K={
   fold:3.6,      // wings / fins / kit wings fold in to |x| ≤ this (local units; the pods end at 3.85)
   hover:.68,     // hover gap × this
   carW:2.1,      // traffic km cars: width cap (m) — shrink only, cars the base already sized stay as they are
-  carL:{def:4.9,van:5.9,delivery:5.9,truck:6.6,'garbage-truck':7}, // length caps (m)
+  carL:{def:4.9,van:5.9,delivery:5.9,truck:6.6,'garbage-truck':7,bus:99}, // length caps (m); size-2: the city bus keeps its true length (it was squeezed to a 4.9 m car)
+  carWn:{bus:2.8},carS:{bus:[1,1.12,1.25]}, // size-2: per-model width cap and extra stretch x,y,z (the 36-stud bus template is short for a 11-13 m bus)
   ped:.48,       // pavement minifigs (was .66 = 2.6 m) → 1.9 m
   fig:.5,        // quest-giver / passenger minifigs (was 1.7 = 6.8 m) → 2.0 m
   cam:.72,       // chase camera distances/heights × this (base + juice offsets): keeps v82 framing (car length / distance)
@@ -36,7 +37,7 @@ function SC_hit(x,z,y){if(!SC_S.on){SC_S.dx=SC_S.dz=0;return roamHit(x,z,2.2,y)}
 function SC_push(b,x,z){if(!SC_S.on)return bldPush(b,x,z,2.2);const p=bldPush(b,x+SC_S.dx,z+SC_S.dz,SC_K.rad);return[p[0]-SC_S.dx,p[1]-SC_S.dz,p[2]]}
 roamBounce=(f=>function(...a){SC_S.nb++;return f(...a)})(roamBounce);
 // ---- traffic: km cars scaled to car size (custom Athens trolley / scooter are already real-size)
-buildHubTraffic=(f=>function(){f();if(!SC_S.on||!HUB.cim)return;HCAR.forEach((nm,k)=>{if(nm[0]==='#')return;const im=HUB.cim[k];if(!im||im.userData.sc)return;const g=im.geometry;g.computeBoundingBox();const z=g.boundingBox.getSize(new THREE.Vector3()),sx=Math.min(1,SC_K.carW/z.x),sz=Math.min(1,(SC_K.carL[nm]||SC_K.carL.def)/z.z),sy=Math.min(1,(sx+sz)/2);if(sx<1||sz<1){im.geometry=g.clone().scale(sx,sy,sz)}im.userData.sc=1})})(buildHubTraffic);
+buildHubTraffic=(f=>function(){f();if(!SC_S.on||!HUB.cim)return;HCAR.forEach((nm,k)=>{if(nm[0]==='#')return;const im=HUB.cim[k];if(!im||im.userData.sc)return;const g=im.geometry;g.computeBoundingBox();const z=g.boundingBox.getSize(new THREE.Vector3()),sx=Math.min(1,(SC_K.carWn[nm]||SC_K.carW)/z.x),sz=Math.min(1,(SC_K.carL[nm]||SC_K.carL.def)/z.z),sy=Math.min(1,(sx+sz)/2),X=SC_K.carS[nm]||[1,1,1];if(sx<1||sz<1||X[2]!==1){im.geometry=g.clone().scale(sx*X[0],sy*X[1],sz*X[2])}im.userData.sc=1})})(buildHubTraffic);
 // ---- chase camera: every preset scaled; juice drop / pull limits read SC_CAM (patched in ju.js lines)
 const SC_RC0=JSON.parse(JSON.stringify(RCAM));function SC_rcam(){const k=SC_cam();for(const n in RCAM){const C=RCAM[n];for(const f of['b','bk','h','hk','l','lk','ly'])C[f]=+(SC_RC0[n][f]*k).toFixed(2)}}SC_rcam();
 // ---- measurement API for tSC.js (dimensions in metres, as rendered)

@@ -1,0 +1,5 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
+(async()=>{const [,,url,code,outdir]=process.argv;fs.mkdirSync(outdir,{recursive:true});const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await(await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1})).newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,150)));
+ await p.goto(url+'?test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{timeout:240000,polling:1000});
+ const r=await p.evaluate(async s=>{try{return await __oc.ev(s)}catch(e){return 'ERR '+e+e.stack}},fs.readFileSync(code,'utf8'));if(typeof r==='string'){console.log(r.slice(0,500));await b.close();return}
+ for(const x of r){fs.writeFileSync(`${outdir}/${x.mode}_${x.id}.jpg`,Buffer.from(x.png.split(',')[1],'base64'));console.log(x.mode,x.id,x.L,x.H)}console.log('errs',errs.length,errs.slice(0,2).join('|'));await b.close()})();
