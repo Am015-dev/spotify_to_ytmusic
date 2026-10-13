@@ -1,4 +1,4 @@
-# Vehicle converter lane handoff (build-8, 2026-10-10; was build-4). Branch alex/od-mdl-veh. Integrator: build-7 (session_01Run9xnszVkvZ3XTirQ58HF).
+# Vehicle converter lane handoff (veh-3, 2026-10-13). Branch alex/od-mdl-veh. Integrator: build-10 (session_01NEKmBJhbYZuQ3ir54EPH89); build-7 and build-9 have stood down.
 
 ## Loop (≈ 3 min per model)
 Setup in a fresh container: parts lib (`curl -o ld/c.zip https://library.ldraw.org/library/updates/complete.zip; unzip -q -d ld/lib ld/c.zip`),
@@ -20,8 +20,34 @@ Minifig-scale only: City, Classic Town, Speed Champions, Creator. NO Racers/Tiny
 ## Next: Classic Town bercik/others from the OMR list (scrape: library.ldraw.org/omr/sets?page=1..59, rows "id name theme year n"):
 6531 6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6355 6354 6361 6352 625 6504 6608; City 4206-2 (truck; file names use 4206-2, scripts assume -1); Creator 7347 6911 (check minifig scale).
 
+## veh-2 session (2026-10-10): 36 more done (incl. 6911 x2), sent to build-7/build-9; grid docs/shots/veh/GRID_veh2.jpg. 4288 fix affects no other ride (7242/75870 on alex/od-rescue do not use 4288).
+6525 6524 6523 6509 6507 6512 6511 6650 6651 6652 6653 6658 6661 6667 6648-2 6607 6605 6609 6354 6361 625 6504 6608 4206-2 7347(small car) 7638(rescued) 6600 6602 6603 6501 6675 6430 6450 6480.
+Skipped: 6531 (helicopter), 6352 (dock crane, no wheels), 6355 (horse cart), 6522 (motorbike), 7347 big truck (16 wide, not minifig scale).
+
+- 6911 done (2 rides). Multi-model sets use files <set>_<Model-Name>.mpd; find the names on library.ldraw.org/omr/sets/<n> (6911 = 538; scan ids 1..1600 by <title>).
+## Faster flow (veh-2)
+- `tools/ld/vehcv.sh <set-n> "<submodel>" [yaw]`: runs tools/ld/mpdroot.py (submodel becomes the root, unrotated, scene colour kept; fixes cars placed at 10-15 deg in the scene and colour-16 parts turning cream) then ld2garage; auto yaw = 2, or 3 when w > d. Writes ld/omr/<set-n>c.mpd (commit it with the module).
+- Facing rule (verified on 10 sets): LDraw front -z -> yaw 2, +z -> yaw 0, +x -> yaw 1, -x -> yaw 3. Read the front from the part positions (grille, headlights, steering wheel ahead of seat, bucket; small wheels at the front of tractors):
+  `awk 'index($0,"0 FILE <sub>.ldr")==1{f=1;next} /^0 FILE/{f=0} f' ld/omr/<s>.mpd | grep '^1 '` and look up titles in ld/lib/ldraw/parts (lower-case names).
+  `python3 tools/ld/vehfront.py ld/out/v<s>.json` = steering-wheel-vs-seat hint (front = -z); wrong for loaders and convertibles, a hint only.
+- In g_34 the front points RIGHT (camera sees the right side, slightly from the front).
+- Module ids: vehsrc.py <set-n> -> src/98ld_v_<set-n>.js, preset t_v<set>_<n>.
+- Converter fixes: 4288-style one-piece rubber wheels are tyres (11063ac); scaled inline primitives (cables, hoses) skipped, not a crash (cfdf040).
+## Next (from ld/dl/omr_sets.tsv; downloaded already: 6535 6550 6470 1029)
+6535 Dumper (dumper), 6550 Outback Racer (car; FILE names have trailing spaces), 6470 Mini Dump Truck, 1029 Milk Delivery Truck (car),
+then 6553 6571 6581 6594 6431 6473 6481 6484 6545 3056 6406 4016 30283 30284 20011 10220 (Creator: check scale) 6742 6743 6753 31027.
+
 ## Tips (build-8)
 - Orientation: most Classic Town LDraw cars (authors RainbowDolphin, bercik) need --yaw 3, not 1, when w > d. LOOK: grille/headlights/windscreen must face the camera (bottom-right) in g_34.
 - Run at most 4 ld2garage.py in parallel; 13 in parallel corrupted a cache (JSONDecodeError), rerun fixes it.
 - Trucks with trailers: --only "<set> - Truck" --drop trailer. When the cab is a sibling submodel (60018), use --drop worker,wheelbarrow,driver instead of --only.
 - tools/ld/calib.json changes on every run; not committed.
+
+## veh-3 session (2026-10-13): 21 more done, GRID docs/shots/veh/GRID_3.jpg, sent to build-9 and build-10
+6535 6550(yaw 0) 6470 1029 6553 6571 6571-1b(FD car 2) 6581 6594(cab only) 6431 6473(ground vehicle) 6481 6484(hauler) 6484-1b(F1 car) 6545 3056 30283 30284 20011 31027 6753-1b(red car).
+- Second vehicle from one set: cp ld/omr/<s>-1.mpd ld/omr/<s>-1b.mpd, then vehcv.sh <s>-1b "<sub>".
+- Skipped: 6743 (10 wide), 6753 truck (16 wide), 10220 (Creator Expert van, not minifig scale), 6406 (same go-kart as 3056), 6742 (no file found).
+- Other OMR source: GitHub mirror https://raw.githubusercontent.com/anteloc/ldraw-lib/606be1421f6c353d9f23f6c467e0be1812280455/models/<file>.mpd (has 4016-1.mpd, no FILE header).
+- Setup gotcha: in a fresh container, add all src/98ld_v_*.js missing from src/MODELS locally (`git update-index --assume-unchanged src/MODELS`), build, run ld_dump.js before vehcv.sh (ld2garage needs ld/ours.json).
+- tRides "car rod" in the log = the ride didn't load (shot shows the default car); rerun until it is gone.
+## Next: 4016 (GitHub mirror), more Classic Town/City cars from the OMR list.
