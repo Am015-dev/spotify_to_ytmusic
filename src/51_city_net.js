@@ -199,7 +199,7 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   {const nB=BRIDGES.length,ext=OB_ext(FILL_R,nB),M=OB_net(null,ext),cl=new Map(M.comps);FILL_R.forEach((r,k)=>{const R=M.find(M.segs.length+nB+k);cl.set(R,(cl.get(R)||0)+r.L)});let main=-1,mL=-1;for(const[r,l]of cl)if(l>mL){mL=l;main=r}
     const keep=FILL_R.filter((r,k)=>M.find(M.segs.length+nB+k)===main);for(const r of FILL_R)if(!keep.includes(r))OB_log('fdel',(r.x0+r.x1)/2,(r.z0+r.z1)/2,r.L);O.fDel+=FILL_R.length-keep.length;FILL_R.length=0;FILL_R.push(...keep);OB_fillIdx()}
   O.fillMs=Math.round(performance.now()-t0)}
-{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}}}
+{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();try{for(let i=0;i<3;i++){const o=(RD.ops.gjoin|0)+(RD.ops.gcut|0);RD_fillJoin();if((RD.ops.gjoin|0)+(RD.ops.gcut|0)===o)break}}catch(e){console.warn('RD_fillJoin',e)}}}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
 // runtime audit of the CURRENT drawn network: CITY_S drivable streets + filler grid + bridges + Autobahn links, junction plates, GPS coverage
 function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?hubRoads():[],nF=FR.length,nB=BRIDGES.length;
   const ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs;
@@ -266,7 +266,7 @@ function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;
     let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
     if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
   for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
-OB_fix();RD_net();if(FILL_R)try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}// dev1: again on the final street net (the rfGrid pass runs before OB_fix/RD_net)
+OB_fix();RD_net();
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
