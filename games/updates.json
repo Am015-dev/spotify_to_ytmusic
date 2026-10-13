@@ -1,6 +1,54 @@
 [
  {
   "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Doorkick: scenario tests and steadier phone layout",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
+   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario",
+   "Tutorial Help step: the Help button label is readable",
+   "Fight with bonuses: big YOU vs MONSTERS scoreline, colours, flying +N",
+   "Boss clip, then the monster card, with sound",
+   "Five rivals no longer push the hand off screen"
+  ],
+  "check": "Open each test with Try this",
+  "scn": [
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-fight-bonus",
+   "dk-tut-help",
+   "dk-board",
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-zoom",
+   "dk-tut-help",
+   "dk-fight-bonus",
+   "dk-boss-reveal",
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   "Can you read the Help button?",
+   "Is YOU vs MONSTERS big and clear?",
+   "Boss clip, roar, then the monster card?",
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "thornbound",
   "title": "Readable map labels",
   "items": [
@@ -411,42 +459,6 @@
   "ask": [
    null,
    null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Fight numbers you can read, and a test LAB",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut",
-   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
-   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario"
-  ],
-  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario",
-  "scn": [
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-fight-bonus",
-   "dk-tut-help",
-   "dk-board",
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-zoom"
-  ],
-  "ask": [
    null,
    null,
    null,
