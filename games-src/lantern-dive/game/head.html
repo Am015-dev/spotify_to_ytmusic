@@ -319,6 +319,10 @@ html.ph #prompt{font-size:14px}
 @keyframes popin{from{transform:translateX(-50%) scale(.3);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
 #lead{position:absolute;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;gap:1px;font-size:12px;font-weight:800;color:var(--ink2);pointer-events:none;text-shadow:0 1px 2px #000}
 #lead.on{display:flex}
+.lan3{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.lanrev{position:fixed;transform:translate(-50%,-50%);object-fit:contain;pointer-events:none;z-index:60;opacity:0;animation:lanrev 1.6s ease-out forwards;filter:drop-shadow(0 0 22px rgba(255,200,80,.85))}
+@keyframes lanrev{0%{opacity:0;transform:translate(-50%,-90%) scale(.5) rotate(-14deg)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(8deg)}45%{transform:translate(-50%,-50%) scale(1) rotate(-5deg)}70%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(2deg)}100%{opacity:0;transform:translate(-50%,-60%) scale(.9)}}
+@media (prefers-reduced-motion:reduce){.lanrev{animation-duration:.01s}}
 #cenmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;opacity:.9;animation:glowp 1.8s ease-in-out infinite}#cenmark svg{display:block}
 .fl{z-index:30;pointer-events:none;font-weight:900;font-size:28px;color:#fff3b0;text-shadow:0 2px 0 #0b1f3a,0 0 14px #ffb400;animation:rise 1.3s ease-out forwards}
 #bd>.fl:not(#pxc){position:absolute}

@@ -110,3 +110,19 @@ function extrasBoot() {
   document.addEventListener('pointerdown', () => setTimeout(() => { try { musicSync(); } catch (e) { } }, 60), { capture: true });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', extrasBoot); else setTimeout(extrasBoot, 0);
+
+// ---- 3D Commander lantern (sprite rendered from the full-detail model; Low graphics keeps the drawn icon)
+// seat badge: the lantern sprite, falling back to the drawn icon if the file is missing
+function cmdHTML(sz) { if (lowGfx()) return KIT.cmdSVG({ size: sz }); return '<img class="lan3" src="models/lantern@512.webp" alt="" width="' + (sz + 5) + '" height="' + (sz + 5) + '" decoding="async" draggable="false" onerror="this.outerHTML=KIT.cmdSVG({size:' + sz + '})">'; }
+// at the start of each job hand-out the Commander's lantern swings in and glows over the felt for a moment
+let lanKey = '';
+function lanternReveal(geo) {
+  if (!G || G.phase !== 'assign' || G.cap < 0 || lowGfx()) return;
+  const key = (G.seed || '') + ':' + (G.att || 0) + ':' + G.cap + ':' + (G.mission && (G.mission.id || G.mission.name)); if (key === lanKey) return; lanKey = key;
+  const felt = $('#felt'); const av = document.querySelector('[data-seat="' + G.cap + '"] .av') || document.querySelector('.me .av'); if (!felt || !av) return;
+  const fr = { left: 0, top: 0 }, ar = av.getBoundingClientRect(), sz = Math.round(Math.min(120, felt.clientWidth * .3));
+  const i = h('img.lanrev', { src: 'models/lantern' + (sz < 150 ? '@512' : '') + '.webp', alt: '', draggable: 'false', decoding: 'async', 'aria-hidden': 'true' });
+  const cx = Math.max(sz / 2 + 6, Math.min(innerWidth - sz / 2 - 6, ar.left + ar.width / 2)), cy = Math.max(sz / 2 + 54, Math.min(innerHeight - sz / 2 - 6, ar.top + ar.height / 2 - 20));
+  i.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;width:' + sz + 'px;height:' + sz + 'px'; i.onerror = () => i.remove();
+  document.body.appendChild(i); setTimeout(() => i.remove(), 1700);
+}

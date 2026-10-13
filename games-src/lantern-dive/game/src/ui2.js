@@ -78,7 +78,7 @@ function seatEl(s, act, mk) {
   const p = G.players[s]; if (p.helper) return droneEl(s, act, mk);
   const won = tricksWon()[s], cm = s === G.cap, vote = mk.vote.has(s);
   const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
-  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 17 }), title: 'Commander' }));
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(17), title: 'Commander' }));
   const t = pingTok(s, 18); if (t) { t.classList.add('pk'); av.append(t); }
   b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>', title: won + ' tricks won' })));
   const sh = shownEl(s); if (sh) b.append(h('span.pg', sh));
@@ -183,6 +183,7 @@ function renderFelt(v) {
   const from = v >= 0 ? v : 0;
   const assign = G.phase === 'assign';
   pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = !(G.phase === 'play' || G.phase === 'over' || UI.fz);
+  try { lanternReveal(geo); } catch (e) { }
   { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
   if (!pool.hidden) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
@@ -224,7 +225,7 @@ function renderMine(v) {
   const box = $('#mine'); box.innerHTML = ''; if (!G) return;
   const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap, mk = seatMarks();
   const me = h('button.me' + (act === s ? '.act' : '') + (mk.vote.has(s) ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Your seat' });
-  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 18 }) }));
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(18) }));
   me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b>', title: tricksWon()[s] + ' tricks won' }))));
   box.append(me);
   const t = pingTok(s, 30); if (t) box.append(t);
