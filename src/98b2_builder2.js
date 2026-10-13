@@ -43,7 +43,7 @@ function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.fl
   T[k]=bxCl(T[k],-8,60)}}
 // pieces sit IN the ground: terrain under a piece is cut to just below the deck, and lifted to it where the gap is small (embankment)
 // a road below the ground cuts a flat 9 m shoulder, then ~39° walls (dev-2: the old near-vertical 16 m cut walls let the car drive INTO the rock)
-function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18;
+function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-4.2*Math.abs(s.S.y); // banked deck: below its LOW edge
  const a0=Math.floor((s.p.x-R-BXO)/BXR),a1=Math.ceil((s.p.x+R-BXO)/BXR),b0=Math.floor((s.p.z-R-BXO)/BXR),b1=Math.ceil((s.p.z+R-BXO)/BXR);
  for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;
   const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a;if(dd<R0){if(T[k]>y||(dd<7&&y-T[k]<2.2))T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap}}}}
@@ -420,9 +420,9 @@ const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for
 // 36 m WIDE BANKs (full speed), one KICKER each (0.6-1.5 s air, flat landing), closed loops (the SPLIT joins again at a MERGE), laps ~1.4-1.7 km
 Object.assign(BX_DEMOS,{
  // mountain: low start -> climb in two hairpins -> across the mesa top (kicker) -> elevated 30 m hairpin -> long descent -> home
- 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf','st','st','bo',...bxRep('st',3),'cp',...bxRep('st',12),'wbr','st','wbr',
-  'su','st','su','st','cp',...bxRep('st',3),'wbl','st','wbl','lu','su',...bxRep('st',6),'kj',...bxRep('st',6),'wbr','st','wbr',
-  'st','st','sd','sd','cp','sd','ld','wbr',...bxRep('st',21),'wbr'])},
+ 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf',...bxRep('st',6),'cp',...bxRep('st',14),'wbr','st','wbr',
+  'su','st','su','st','cp',...bxRep('st',5),'wbl','st','wbl','lu','su',...bxRep('st',6),'kj',...bxRep('st',6),'wbr',...bxRep('st',4),'wbr',
+  'st','st','sd','sd','cp','sd','ld','wbr',...bxRep('st',24),'wbr'])},
  // city figure-8: boat ramp across the lake -> up onto the 14 m bridge -> down -> between the blocks (kicker) -> under the bridge -> back to the lake
  'TWO-LEVEL CITY':{log:bxCh('city',[29,15,-1,0],['up','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
   ...bxRep('st',24),'wbr',...bxRep('st',9),'wbr',...bxRep('st',7),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
@@ -481,6 +481,6 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  st:()=>{const V=BX.v;return{mode:BX.mode,cur:BX.cur,n:BX.pcs.filter(p=>!p.dead).length,log:BX.log.length,v:V&&{p:V.p.toArray().map(x=>+x.toFixed(2)),F:V.F.toArray().map(x=>+x.toFixed(3)),sp:+V.v.length().toFixed(2),g:V.g,boat:V.boat,air:+V.air.toFixed(2),Uy:+V.U.y.toFixed(2),on:V.on&&V.on.type,dC:V.dCourse},m:BX.m&&{...BX.m,pcs:BX.m.pcs.size}}},
  // the course as waypoints (for the test driver): follow exits from START, choosing branch ch[k] at the k-th SPLIT
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
-  while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type]);
-   const e=pc.ex[b];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
+  while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type]);
+   const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
  h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:2,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};

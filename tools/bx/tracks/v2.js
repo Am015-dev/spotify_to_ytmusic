@@ -1,8 +1,8 @@
 const R=(t,n)=>Array(n).fill(t);
 module.exports={
-'CLIFF RUN':['mountain',[8,4,1,3],['sf','st','st','bo',...R('st',3),'cp',...R('st',12),'wbr','st','wbr',
-  'su','st','su','st','cp',...R('st',3),'wbl','st','wbl','lu','su',...R('st',6),'kj',...R('st',6),'wbr','st','wbr',
-  'st','st','sd','sd','cp','sd','ld','wbr',...R('st',21),'wbr']],
+'CLIFF RUN':['mountain',[8,4,1,3],['sf',...R('st',6),'cp',...R('st',14),'wbr','st','wbr',
+  'su','st','su','st','cp',...R('st',5),'wbl','st','wbl','lu','su',...R('st',6),'kj',...R('st',6),'wbr',...R('st',4),'wbr',
+  'st','st','sd','sd','cp','sd','ld','wbr',...R('st',24),'wbr']],
 };
 module.exports['TWO-LEVEL CITY']=['city',[29,15,-1,0],['up','su','up',...R('st',4),'cp',...R('st',2),'wbr','sf','st','st','sd','dn',...R('st',6),'wbr',
   ...R('st',24),'wbr',...R('st',9),'wbr',...R('st',7),'kj',...R('st',8),'wbl',...R('st',4),'cp',...R('st',4),'wbl',...R('st',20),'wbl','wbl','dn']];
