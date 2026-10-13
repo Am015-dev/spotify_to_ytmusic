@@ -45,9 +45,14 @@ const ICO = {
   paw: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="6" ry="5" fill="#8a6240"/><circle cx="5.5" cy="10" r="2.4" fill="#8a6240"/><circle cx="9.5" cy="5.5" r="2.4" fill="#8a6240"/><circle cx="14.5" cy="5.5" r="2.4" fill="#8a6240"/><circle cx="18.5" cy="10" r="2.4" fill="#8a6240"/></svg>',
   tree: '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="7.5" fill="#7fae62" stroke="#3b2f2a" stroke-width="1.4"/><path d="M10.5 22V14h3v8Z" fill="#8a6240" stroke="#3b2f2a" stroke-width="1.2"/></svg>'
 };
+// painted resource icons and season wheel (media/icon-*.webp, ui-season-wheel.webp): used once loaded, the drawn kit icons until then
+const RESIMG = {}; RESK.forEach(k => { const i = new Image(); i.onload = () => { RESIMG[k] = 1; }; i.src = 'media/icon-' + k + '.webp'; });
+const WHEEL = { ok: 0 }; { const i = new Image(); i.onload = () => { WHEEL.ok = 1; }; i.src = 'media/ui-season-wheel.webp'; }
+function paintImg(src, px, cls, rot) { const i = document.createElement('img'); i.src = src; i.alt = ''; i.draggable = false; i.className = cls; i.style.cssText = 'width:' + px + 'px;height:' + px + 'px;object-fit:contain;display:inline-block;vertical-align:middle' + (rot ? ';transform:rotate(' + rot + 'deg)' : ''); return i; }
+function seasonIcon(i, px) { return WHEEL.ok ? paintImg('media/ui-season-wheel.webp', px, 'sw', -90 * i) : HBKit.season(SEAS[i], px); }
 function ic(kind, px) {
   px = px || 20;
-  if (RESK.indexOf(kind) >= 0) return HBKit.resource(kind, px);
+  if (RESK.indexOf(kind) >= 0) return RESIMG[kind] ? paintImg('media/icon-' + kind + '.webp', px, 'ri') : HBKit.resource(kind, px);
   if (kind === 'point') return HBKit.point(null, px);
   if (kind === 'occ') return HBKit.occupied(px);
   const s = h('span.ic', { 'aria-hidden': 'true', html: ICO[kind] || ICO.any }); s.style.width = s.style.height = px + 'px'; return s;
