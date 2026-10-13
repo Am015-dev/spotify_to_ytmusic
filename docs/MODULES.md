@@ -4,7 +4,7 @@ file | KB | purpose | first defines
 00_page.html | 113 | <title>, all CSS (HUD, menus, touch controls, phone  | 
 02_data_json.html | 108 | DATA: importmap (three r164 CDN), #rf-data (Frankfur | 
 10_core.js | 3 | OD_CHANGELOG (top; every deploy prepends an entry),  | W14_ST W14_PIV TUNE
-10_core2.js | 41 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | OD_CHANGELOG
+10_core2.js | 42 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | OD_CHANGELOG
 10_core3.js | 38 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | OD_VER CR_trackW CR_LS
 10_core4.js | 38 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | PD teamOf SIG
 10_core5.js | 21 | part of 10_core.js: OD_CHANGELOG (top; every deploy  | ENVD lightningT litV
