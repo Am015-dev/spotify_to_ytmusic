@@ -62,3 +62,18 @@ The 2 FAILs are test order: the kit was already installed when the second tap ca
 7. DROPPED by the reviewer (correction 13:58): the 98ld_v_* models are reviewed with od-models. Was: the reviewer saw ~19 new 98ld_v_* models + src/MODELS on this branch. They come from the base alex/od-models (b40e79b v90j WIP), NOT from
    home-1: `git diff origin/alex/od-models...HEAD -- src` = only 98hm_home.js, 70_roam_world.js (1 line), ORDER, MAP.md. Ship them with od-models' own review.
 8. Check that the 99c pin coverage isn't hidden by the HOME card.
+
+## home-2 (2026-10-13): reviewer FAIL items worked
+Branch rebased on alex/od-models v90j (2ca7c8f); `git diff origin/alex/od-models...HEAD -- src` = 98hm_home.js, 70_roam_world.js (1 line), ORDER, MAP.md, 10_core.js (v90k changelog), 99c_checklist.js (4 items).
+1. "Post Van shows Guacamonster" = test artifact, not a game bug: tHome tapped GAS (`#tG` coords) while the garage was still open; the tap landed on the OFF-ROAD tab chip
+   (closeGar's selectors didn't match, so the garage never closed). Now closes with `#gbSave` (SAVE & DRIVE); asserts G9C.type/pv stay 'car'; shots show the real Post Van.
+2. "Flying bricks over the UI" = the BUILD enter/exit brick shower (98t G8_shower, full-screen 2D canvas, 0.9 s, by design), triggered because the test tapped the card centre,
+   which is its ✎ BUILD button. The test taps the card picture now (asserts no BUILD) and waits out the shower/build-up (`calm()`) before every shot.
+3. SAVED toast: when it would touch the card it moves into the free column left of the card, under the minimap (`HM_toastPlace`); tHome asserts no overlap.
+4. In-world proof: low side camera on the parked pair (tyre gap measured 0.000 m on all 3 rides, both cities), top view `*_5b_home_top.jpg`, van driving without BOOST,
+   van + kit with BOOST, Hot Rod parked after the swap, minimap crops (Frankfurt pin under the arrow at 26 m; Athens 🏠 pinned on the edge).
+5. Athens works: tHome ath 29/29. Athens Home cars stand on the lawn between the façade and the road; verge trees hide them from the road-side camera (world props, not touched).
+6. tPlay phone (qa_home/tplay*, baseline v90j in qa_home/tplay_base): fra walls 0/min (v90j 0.75), stuck 2 % (2.1); ath walls 3.24 then 1.74 on a re-run (v90j 1.99), stuck 1 % (1.1).
+   The same 3 FAILs on v90j without Home: fra GPU-buffer trend 3.87 (3.83), ath heap 165 MB (161), ath walls > 1/min. Pre-existing, not from Home.
+7. OD_CHANGELOG v90k entry + 4 OD_CHECKLIST items (home-save, home-cars, nitro-gate, nitro-kit).
+Integrator: build-11 (session_01FYerWDe4eDfpw7Jfrm9mtb).

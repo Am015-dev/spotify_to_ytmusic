@@ -88,7 +88,8 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  const pk2=await ev('JSON.stringify(HM.P.map(g=>g.userData.hmId))');ok(JSON.parse(pk2).includes('rod'),tag+' Hot Rod now parked at Home',pk2);
  // try the boost key on the van: no boost
  await down('gas',await center('#tG'));await p.keyboard.down('Shift');await tick(90);const nb=await ev('JSON.stringify({b:!!RO.boosting,n:!!pl.nitro})');await p.keyboard.up('Shift');await up('gas');ok(!JSON.parse(nb).b,tag+' van: Shift does not boost',nb);
- await down('gas',await center('#tG'));await tick(60);await add('Post Van driving: no BOOST button','8_van_no_boost');await up('gas');await down('brk',await center('#tB'));await tick(90);await up('brk');
+ /* leave the beacon like a player: back out with BRAKE, then GAS (in Athens the garage exit faces the building) */await closeCard();await down('brk',await center('#tB'));await tick(100);await up('brk');await tick(10);await closeCard();
+ await down('gas',await center('#tG'));for(let i=0;i<10;i++){await tick(10);if((await st()).v>4)break}await tick(40);await closeCard();await add('Post Van driving: no BOOST button','8_van_no_boost');await up('gas');await down('brk',await center('#tB'));await tick(90);await up('brk');
  await G.evaluate(()=>__oc.ev('HM_build()'));await tick(40);await camShot('Hot Rod parked at Home after the swap','9_home_cars_after');
  // back into the beacon → garage → install the kit (studs granted for the test)
  await G.evaluate(()=>__oc.ev('(()=>{const S=season();S.cr=Math.max(S.cr,5000);saveSeason(S)})()'));
