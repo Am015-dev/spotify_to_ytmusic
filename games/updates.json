@@ -14,6 +14,28 @@
  },
  {
   "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Painted gear slots, rivals and clash medallions",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip"
+  ],
+  "check": "Start a game and kick a door."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sands",
+  "title": "Painted djinns, goods and tokens",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots"
+  ],
+  "check": "Start a game: look at the djinn row and goods; summon a djinn at a Shrine."
+ },
+ {
+  "date": "2026-10-13",
   "game": "final-approach",
   "title": "Painted cockpit kit",
   "items": [

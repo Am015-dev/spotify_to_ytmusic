@@ -18,7 +18,7 @@ let totals={games:0,taps:0,hint:0,kinds:{},bubbles:{},bulbs:0,bulbNull:0,rulesOp
 async function playGame(browser,W,H,gi){
   const tag=W+'x'+H+' g'+gi;
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const mf=require('path').join(__dirname,'..','..','..','games','thornbound',u.pathname);if(/^\/media\//.test(u.pathname)&&fs.existsSync(mf))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(mf)});r.fulfill({status:200,contentType:'text/html',body:html})});
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{if(m.type()==='warning'&&/rejected/.test(m.text()))note(tag,'ENGINE '+m.text().slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
