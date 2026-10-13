@@ -74,3 +74,4 @@ html.sk .btn,html.sk .btn.mrow{flex-shrink:0}
 html.sk .menu .mrow{display:flex}
 /* tall two-line buttons stretch the painted rim: keep the text clear of it */
 html.sk .btn.big,html.sk .btn.gxt-menu{padding:18px 8px}
+html.sk .cc-endart,html.sk .cc-hero{pointer-events:none}
