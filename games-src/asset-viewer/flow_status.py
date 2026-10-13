@@ -19,7 +19,8 @@ KIND = {"prompts-kit.json": "Wave 4 kit", "prompts.json": "main set", "prompts-r
         "prompts-cards-a.json": "Wave 2 power cards A (16:9)", "prompts-cards-b.json": "Wave 2 power cards B (16:9)", "prompts-wave2.json": "Wave 2", "prompts-wave2-wide.json": "Wave 2 (16:9)",
         "prompts-wave3.json": "Wave 3", "prompts-wave3-wide.json": "Wave 3 (16:9)", "prompts-wave3-43.json": "Wave 3 (4:3)",
         "prompts-wave3-34.json": "Wave 3 (3:4)", "prompts-wave3-tall.json": "Wave 3 (9:16)",
-        "prompts-wave5.json": "Wave 5", "prompts-wave5-wide.json": "Wave 5 (16:9)"}
+        "prompts-wave5.json": "Wave 5", "prompts-wave5-wide.json": "Wave 5 (16:9)",
+        "prompts-wave6.json": "Wave 6", "prompts-wave6-wide.json": "Wave 6 (16:9)", "prompts-wave6-43.json": "Wave 6 (4:3)", "prompts-wave6-34.json": "Wave 6 (3:4)", "prompts-wave6-tall.json": "Wave 6 (9:16)"}
 # 2D items that an approved model in games-src/facelift-3d replaces (logs/FLOW-FACELIFT-PLAN.md "Crossed out by approved 3D")
 TWIN = {**{("rampart-and-vine", f"piece-{k}-{c}"): f"piece-{k}" for k in ("meeple", "champ", "mason", "hog") for c in ("red", "blue", "green", "yellow")},
         ("sands-of-qamar", "token-palm"): "palm", ("sands-of-qamar", "token-palace"): "palace",
@@ -36,7 +37,7 @@ def wave_of(root, fname):
     if root == "flow-3d": return "3D sources"
     if root == "flow-covers": return "Covers"
     if root == "flow-video": return "Boss poses"
-    for key, w in (("kit", "Wave 4"), ("wave1", "Wave 1"), ("djinn", "Wave 1"), ("cards", "Wave 2"), ("wave2", "Wave 2"), ("wave3", "Wave 3"), ("wave5", "Wave 5")):
+    for key, w in (("kit", "Wave 4"), ("wave1", "Wave 1"), ("djinn", "Wave 1"), ("cards", "Wave 2"), ("wave2", "Wave 2"), ("wave3", "Wave 3"), ("wave5", "Wave 5"), ("wave6", "Wave 6")):
         if key in fname: return w
     return "Wave 0"
 

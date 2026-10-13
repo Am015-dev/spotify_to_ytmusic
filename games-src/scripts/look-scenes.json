@@ -1,0 +1,110 @@
+{
+ "_note": "Copy of SCENES_FOR / DEFAULT_SCENES / START / JUST from games/asset-viewer/screens.html (that page is a generated snapshot, so it keeps its own copy). Text steps are regex source strings, flags i.",
+ "START": {
+  "text": "play vs computer|me vs computer|vs computer|play a real game|quick play|start the game|^play$"
+ },
+ "JUST": {
+  "text": "just play|skip|no thanks",
+  "optional": true
+ },
+ "SCENES_FOR": {
+  "mainhattan-nightrun": [
+   [
+    "Title",
+    []
+   ],
+   [
+    "Run",
+    [
+     {
+      "sel": "#startBtn"
+     }
+    ]
+   ],
+   [
+    "Garage",
+    [
+     {
+      "sel": "#gaBtn"
+     }
+    ]
+   ],
+   [
+    "Settings",
+    [
+     {
+      "sel": "#setBtn"
+     }
+    ]
+   ]
+  ]
+ },
+ "DEFAULT_SCENES": [
+  [
+   "Start screen",
+   []
+  ],
+  [
+   "Board",
+   [
+    "START",
+    "JUST"
+   ]
+  ],
+  [
+   "Cards",
+   [
+    "START",
+    "JUST",
+    {
+     "sel": "[data-gx=refd], [data-gx=djd], [aria-label*=\"ard list\" i]",
+     "optional": true
+    },
+    {
+     "sel": "[aria-label=\"Menu\"]",
+     "onlyIfNoDrawer": true
+    },
+    {
+     "text": "card list|cards|power cards|reference",
+     "optional": true
+    }
+   ]
+  ],
+  [
+   "Menu",
+   [
+    "START",
+    "JUST",
+    {
+     "sel": "[aria-label=\"Menu\"]"
+    }
+   ]
+  ],
+  [
+   "Story mode",
+   [
+    {
+     "text": "story mode|^story$"
+    }
+   ]
+  ]
+ ],
+ "HELP": [
+  {
+   "sel": "[data-gx=help], [aria-label^=\"Help\" i]:not(.gxh-bulb), .gx-help",
+   "optional": true
+  },
+  {
+   "text": "^(help|how to play|rules|\\?)$|how to play|how this works|rules",
+   "optional": true
+  }
+ ],
+ "BOARD": [
+  "START",
+  {
+   "text": "^(start|start game|begin|deal|go|let.?s go)$",
+   "optional": true
+  },
+  "JUST"
+ ]
+}
