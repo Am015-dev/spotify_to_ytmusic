@@ -266,7 +266,7 @@ function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;
     let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
     if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
   for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
-OB_fix();RD_net();if(FILL_R)try{RD_fillJoin()}catch(e){console.warn('RD_fillJoin',e)}// dev1: again on the final street net (the rfGrid pass runs before OB_fix/RD_net)
+OB_fix();RD_net();try{if(FILL_R)RD_fillJoin()}catch(e){if(!(e instanceof ReferenceError))console.warn('RD_fillJoin',e)}/* int-2: FILL_R is declared in 53 (later): at load this is a ReferenceError and the rfGrid wrapper runs the join when the grid is built */// dev1: again on the final street net (the rfGrid pass runs before OB_fix/RD_net)
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
