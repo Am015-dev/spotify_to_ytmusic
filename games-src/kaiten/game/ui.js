@@ -320,7 +320,7 @@ function pudStand(s) {
 function slotEl(s, sl, cmp) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots;
   const box = h('div.sbox'), wrap = h('div.slot', box);
-  const cover = () => { box.innerHTML = KIT.clocheSVG({ w: sl }); };
+  const cover = () => { box.innerHTML = KIT.clocheImg({ w: sl }); box.firstChild && box.firstChild.style && (box.firstChild.style.width = sl + 'px', box.firstChild.style.height = Math.round(sl * 1.2) + 'px'); };
   if (fz) {
     const m = fz[s];
     if (m && m.mode === 'cover') { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }

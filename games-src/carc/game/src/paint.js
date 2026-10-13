@@ -16,7 +16,10 @@ function texApply(){TEXSET={};let any=false;
   if(typeof G!=='undefined'&&G&&typeof UI!=='undefined'){try{for(const k in UI.tl){const T=G.tiles[k];if(T)UI.tl[k].innerHTML=tileSvg(T.t,T.r)}UI.handKey=null;if(G.cur&&!G.over){renderHand();renderGlows()}}catch(e){}}}
 // pieces: painted figure on a player-coloured disc (seat chips keep the drawn icons: they are tiny and need the colour)
 const PCF={meeple:'models/piece-meeple@512',champ:'models/piece-champ@512',mason:'models/piece-mason@512',hog:'models/piece-hog@512'};   // 3D renders of the follower models (transparent, 3/4 view); the player colour is the disc behind them
-function pcHtml(n){return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
+const COLN=['red','blue','yellow','green'];   // seats 0-3 have a painted piece in their own colour; seats 4-5 keep the model sprite on a disc
+function pcHtml(n,seat){const pf='piece-'+n+'-'+COLN[seat];if(PAINT_ON&&seat!==undefined&&PIMG[pf]===1)return`<span class="pc pp"><img src="${MEDIA}${pf}.webp" alt="" draggable="false"></span>`;
+  return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
+function fi(n,seat){const pf='piece-'+n+'-'+COLN[seat];return PAINT_ON&&PIMG[pf]===1?`<img class="fi" src="${MEDIA}${pf}.webp" alt="" draggable="false">`:ico(n)}
 const TABLES=['harvest','riverbank','sable-hall'],BACKS=['tavern','raven'];
 function paintApply(){
   HR.classList.toggle('ti',PAINT_ON&&PIMG['title']===1);
@@ -26,9 +29,10 @@ function paintApply(){
   const cb=unl('cardback'),cf=BACKS.includes(cb)?'back-'+cb:'back-default';
   if(PAINT_ON)pimg(cf,()=>HR.style.setProperty('--cb','url('+MEDIA+cf+'.webp)'));
   HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1)}
-function paintBoot(){const all=Object.keys(TEXD).map(k=>'tex-'+k);let left=all.length;
+function paintBoot(){try{GXSK.init({})}catch(e){}
+  const all=Object.keys(TEXD).map(k=>'tex-'+k);let left=all.length;
   all.forEach(f=>pimg(f,()=>{if(--left===0)texApply()}));
-  ['title','title-phone','table-default','table-default-phone','back-default','end-win','end-lose',...Object.values(PCF)].forEach(f=>pimg(f,paintApply));
+  [...Object.keys(PCF).flatMap(n=>COLN.map(c=>'piece-'+n+'-'+c)),'icon-follower','icon-tile','icon-score','ui-score-pill','ui-tray','ui-rotate-btn','ui-ribbon','ui-trophy','title','title-phone','table-default','table-default-phone','back-default','end-win','end-lose',...Object.values(PCF)].forEach(f=>pimg(f,paintApply));
   ['table-harvest','table-riverbank','table-sable-hall','back-tavern','back-raven'].forEach(f=>pimg(f));paintApply()}
 function paintToggle(){PAINT_ON=!PAINT_ON;try{localStorage.setItem('rv_paint',PAINT_ON?'1':'0')}catch(x){}texApply();paintApply()}
 // end banner on the result card and on the story result screen

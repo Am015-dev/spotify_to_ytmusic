@@ -514,6 +514,11 @@ html.bf-w .ppop:not([hidden]){left:var(--bs,50vw)}
 .tkey{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .ttl-art{overflow:hidden}.ttl-art picture{display:contents}
 .tlinks{display:flex;gap:6px;justify-content:center}
+.crownrow{display:flex;justify-content:center;height:100px;margin:-6px 0 -4px;position:relative;z-index:2;pointer-events:none}.crown3{width:170px;height:170px;margin:-35px 0;flex:none;object-fit:contain;filter:brightness(1.55) saturate(1.25) drop-shadow(0 0 14px rgba(255,206,90,.75)) drop-shadow(0 4px 6px rgba(0,0,0,.55));animation:crowndrop .9s cubic-bezier(.2,.9,.3,1.2) both,crownsway 3.2s ease-in-out .9s infinite}
+@keyframes crowndrop{0%{transform:translateY(-70px) scale(.4) rotate(-25deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes crownsway{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
+@media (max-width:700px),(max-height:700px){.crownrow{height:66px}.crown3{width:116px;height:116px;margin:-25px 0}}
+@media (prefers-reduced-motion:reduce){.crown3{animation:none}}
 .endart{display:block;width:100%;height:auto;max-height:34vh;flex:none;object-fit:cover;object-position:50% 30%;border-radius:8px;margin:0 0 10px;box-shadow:0 0 0 2px rgba(232,200,103,.5)}
 /* painted table shows through the map; a painted map (data-mapimg) replaces the drawn land */
 html[data-timg]:not([data-gfx="low"]) .tb-bg-void{opacity:0}
@@ -5742,7 +5747,8 @@ function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)ret
 function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const me=vs();const iWon=(NET.on||humans().length===1)&&win===me;
   const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';const nmS=s=>(s===me&&(NET.on||humans().length===1))?'You ('+sideName(s)+')':shortName(s);
   const endImg='<img class="endart" src="media/end-'+((iWon||(!NET.on&&humans().length!==1))?'win':'lose')+'.webp" alt="" draggable="false" onerror="this.remove()">';
-  const body=endImg+'<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(nmS(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
+  const crown=UI.lowGfx?'':'<div class="crownrow" aria-hidden="true"><img class="crown3" src="models/crown'+(innerWidth<700?'@512':'')+'.webp" alt="" draggable="false" decoding="async" onerror="this.parentNode.remove()"></div>';
+  const body=endImg+crown+'<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(nmS(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
   const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
   const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. Suggestions show in rounds 1 and 2; after that tap Suggest a move when you want one.')+'</p>':'';
   return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}
