@@ -1,6 +1,16 @@
 [
  {
   "date": "2026-10-13",
+  "game": "tidewake",
+  "title": "Painted sea for Tidewake",
+  "items": [
+   "The board sea is painted water tiles with a painted brass compass rose",
+   "Brass-and-teal buttons and bar"
+  ],
+  "check": "Start a game: look at the water under the tiles and the compass in the middle."
+ },
+ {
+  "date": "2026-10-13",
   "game": "short-fuse",
   "title": "Short Fuse: painted workshop kit",
   "items": [
