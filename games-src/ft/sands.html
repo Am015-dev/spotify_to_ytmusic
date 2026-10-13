@@ -485,6 +485,27 @@ html.sk .mbox h2{color:#8e3a1c}
 html.sk .gx-bar{gap:2px;padding-left:6px;padding-right:6px}
 html.sk .gx-bar h1{font-size:.9rem;margin:0 2px 0 0}
 html.sk .gx-bar .pchip{font-size:11px;padding:2px 6px}
+
+/* 3D-model sprites on tiles (palm and palace stacks x1-x3, camel on the owner chip) and the summoning lamp; html.sp3 is set once the files loaded */
+html.sp3 .tok{position:relative;display:inline-block;width:24px;height:24px;font-size:0;text-shadow:none;background:var(--sp) center bottom/38px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}
+html.sp3 .tok small{display:none}
+html.sp3 .tok.palm{--sp:url(models/palm@512.webp)}html.sp3 .tok.pal{--sp:url(models/palace@512.webp)}
+html.sp3 .tok::before,html.sp3 .tok::after{content:'';position:absolute;inset:0;background:inherit;translate:0 -7px}
+html.sp3 .tok::after{translate:0 -14px}
+html.sp3 .tok[data-n="1"]::before,html.sp3 .tok[data-n="1"]::after,html.sp3 .tok[data-n="2"]::after{display:none}
+html.sp3 .own.cam{font-size:0;width:22px;height:22px;background:var(--pc) url(models/camel@512.webp) center 55%/40px no-repeat}
+#summon{position:fixed;inset:0;z-index:120;pointer-events:none;display:grid;place-items:center;align-content:center;gap:2px;background:radial-gradient(circle at 50% 46%,rgba(60,24,8,.1),rgba(10,4,20,.72));animation:smIn .25s ease-out both}
+#summon.out{opacity:0;transition:opacity .3s}
+#summon{--sz:min(46vw,190px)}
+#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
+@keyframes smTurn{to{background-position:calc(-24*var(--sz)) 0}}
+#summon .sm-smoke{position:absolute;left:50%;top:30%;width:min(60vw,260px);aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(190,140,255,.8),rgba(130,80,220,.4) 45%,rgba(90,40,180,0) 70%);filter:blur(8px);animation:smSmoke 1.7s ease-out both}
+@keyframes smSmoke{from{transform:translateY(60px) scale(.3);opacity:0}30%{opacity:.95}to{transform:translateY(-70px) scale(1.5);opacity:0}}
+#summon b{position:relative;font:900 clamp(26px,9vw,44px)/1 var(--title,Georgia,serif);color:#ffe9a8;text-shadow:0 3px 0 #3a1004,0 0 18px #ff9a2a;animation:smPop .5s .25s cubic-bezier(.2,1.6,.4,1) both}
+#summon span{position:relative;margin-top:6px;font:800 16px var(--title,Georgia,serif);color:#fff3d0;text-shadow:0 2px 0 #000;animation:smPop .4s .45s both}
+@keyframes smPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes smIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#summon .sm-lamp{animation:none}#summon .sm-smoke{animation:none;opacity:.5}}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -3913,7 +3934,7 @@ function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tile
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
 function placePalace(p,i,viaDj){const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
 function placePalm(p,i){const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
-function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);trig('djinn',p.i,{k})}
+function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
 function sellMoves(p){const kinds=[...new Set(p.res)];const o=[];// offer selling the n kinds you hold most copies of (the dock also lets you choose kinds)
@@ -4514,7 +4535,10 @@ const TICON={village:'🏘️',sacred:'🕌',oasis:'💧',small:'🧺',large:'�
 Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:0,hurry:false,pick:[],pickSeat:[],pickMk:[],pickDj:[],pickSpot:[],snap:null,autoMove:null,autoMs:650,modal:null,moveSnap:null,moveSteps:null});
 function refresh(){if(G&&!G.tut&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
+// the summoning moment: the brass lamp turns (24-frame strip rendered from the 3D model) and the djinn's name rises out of the smoke
+function showSummon(k){const d=DJ[k];if(!d||!document.documentElement.classList.contains('sp3'))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('role','status');
+  o.innerHTML=`<i class="sm-smoke"></i><i class="sm-lamp"></i><b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},1700)}
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='summon')try{showSummon(f.x)}catch(e){}const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
 const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
 const mySeatP=()=>online()?(NET.mySeat>=0?P(NET.mySeat):null):null;
@@ -4567,7 +4591,7 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${t.m.map(c=>mpHtml(c)).join('')}${hand.map(c=>mpHtml(c,1)).join('')}</div>
-   <div class="tk">${own!=null?`<b class="own" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
+   <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
 function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];
@@ -5193,7 +5217,9 @@ function paintApply(){
   HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1);
 }
 function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players','djinn','log','cards','rules','settings','menu','newgame','speed','sound','music','hint'],sets:{'sk-meeple':['vizier','elder','merchant','builder','assassin','artisan'].map(k=>'meeple-'+k)}});['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
-  ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply()}
+  ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d()}
+// 3D-model sprites (palm, palace, camel, lamp turntable): html.sp3 once the files are there; without them the emoji stay
+function sprites3d(){let n=0;['palm@512','palace@512','camel@512','lamp-turn'].forEach(f=>{const i=new Image();i.onload=()=>{if(++n===4)document.documentElement.classList.add('sp3')};i.src='models/'+f+'.webp'})}
 // painted pictures on/off (Settings)
 document.addEventListener('click',e=>{const b=e.target.closest('[data-paint]');if(!b)return;PAINT_ON=b.dataset.paint==='1';try{localStorage.setItem('soq_paint',PAINT_ON?'1':'0')}catch(x){}paintApply();if(G)render();renderSettings()});
 // modal marker (title art behind the start card) and the end banner

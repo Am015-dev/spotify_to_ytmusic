@@ -155,7 +155,7 @@ function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tile
   if(m.work){if(m.work==='art'){p.art--;G.bag.push('artisan')}else{p.fk-=2;G.rdisc.push('fakir','fakir')}p.items.push(G.items.shift());lg(`${p.nm} commissions an item at the Workshop.`,'good');return}}
 function placePalace(p,i,viaDj){const t=G.board[i];t.pal++;lg(`🏰 ${p.nm} raises a palace on ${tileName(t)}.`,'good');fx('build',i);trig('palace',p.i)}
 function placePalm(p,i){const t=G.board[i];t.palm++;lg(`🌴 ${p.nm} plants a palm on ${tileName(t)}.`,'good');fx('build',i)}
-function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);trig('djinn',p.i,{k})}
+function gainDjinn(p,k){p.dj.push(k);G.stats.djinns++;lg(`✨ ${p.nm} summons ${DJ[k].n}.`,'big');fx('djinn',k);fx('summon',k);trig('djinn',p.i,{k})}
 // ---------- goods sale (end of turn, optional) ----------
 function sellValue(n){return SETVP[Math.min(n,9)]}
 function sellMoves(p){const kinds=[...new Set(p.res)];const o=[];// offer selling the n kinds you hold most copies of (the dock also lets you choose kinds)

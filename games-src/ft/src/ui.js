@@ -8,7 +8,10 @@ const TICON={village:'🏘️',sacred:'🕌',oasis:'💧',small:'🧺',large:'�
 Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:0,hurry:false,pick:[],pickSeat:[],pickMk:[],pickDj:[],pickSpot:[],snap:null,autoMove:null,autoMs:650,modal:null,moveSnap:null,moveSteps:null});
 function refresh(){if(G&&!G.tut&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
+// the summoning moment: the brass lamp turns (24-frame strip rendered from the 3D model) and the djinn's name rises out of the smoke
+function showSummon(k){const d=DJ[k];if(!d||!document.documentElement.classList.contains('sp3'))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('role','status');
+  o.innerHTML=`<i class="sm-smoke"></i><i class="sm-lamp"></i><b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},1700)}
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='summon')try{showSummon(f.x)}catch(e){}const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
 const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
 const mySeatP=()=>online()?(NET.mySeat>=0?P(NET.mySeat):null):null;
@@ -61,7 +64,7 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${t.m.map(c=>mpHtml(c)).join('')}${hand.map(c=>mpHtml(c,1)).join('')}</div>
-   <div class="tk">${own!=null?`<b class="own" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
+   <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
 function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];

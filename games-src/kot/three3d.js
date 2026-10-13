@@ -52,6 +52,42 @@ function perfHooks(){if(!PH)return;
     orbit:t=>{V3.orbA=t==null?0:Math.sin(t*Math.PI*2)*.45},
     isAnimating:()=>!!V3.busy,
     beforeTest:()=>{try{if(window.GX&&GX.open)GX.close()}catch(e){}}})}
+
+// ---- facelift GLB models (shared loader gx-glb.js: meshopt + WebP textures, loaded once, cached, disposed on pagehide) ----
+// High = full-detail files; Medium/Low and phones = the -lite files. Towers and tokens are small instanced pieces, so they always use -lite.
+const GLBX={h:{},v:{},mon:{}};
+const glbOff=()=>typeof GXGLB==='undefined'||/[?&]old3d=1/.test(location.search);
+const glbVariant=()=>V3.q==='high'?'':'-lite';
+function glbUseAll(){if(!V3.scene||glbOff())return;
+  glbTowers();
+  glbSingle('fountain',src=>{const o=GXGLB.prep(src,{h:4.4,ground:true,env:.9});o.position.set(-6.4,.25,-4.6);return o});
+  glbSingle('dot',src=>{const o=GXGLB.prep(src,{h:2,ground:true,env:.9});o.position.set(6,.25,-4.4);o.rotation.y=-.35;return o});
+  glbTokens();
+  V3.mons.forEach(o=>{if(o.fig&&o.fig.userData.clamede)glbClampede(o.fig,o.mats)})}
+function glbSingle(key,make){const v=glbVariant();if(GLBX.v[key]===v)return;GLBX.v[key]=v;
+  GXGLB.load('models/'+key+v+'.glb').then(src=>{if(GLBX.v[key]!==v)return;const old=GLBX.h[key];if(old)V3.scene.remove(old);const o=make(src);GLBX.h[key]=o;V3.scene.add(o);applyEnv(o)}).catch(e=>{GLBX.v[key]=null;console.warn('model',key,e)})}
+// the four tower silhouettes, instanced over the slots buildCity reserved (one InstancedMesh per tower mesh); the box buildings stay hidden behind them
+function glbTowers(){if(GLBX.tw||!V3.towerSlots||!V3.towerSlots.length)return;GLBX.tw=1;
+  Promise.all(['a','b','c','d'].map(n=>GXGLB.load('models/tower-'+n+'-lite.glb'))).then(srcs=>{
+    const g=new THREE.Group(),q=new THREE.Quaternion(),m4=new THREE.Matrix4(),ax=new THREE.Vector3(0,1,0),sv=new THREE.Vector3(),pv=new THREE.Vector3();
+    srcs.forEach((src,t)=>{src.updateMatrixWorld(true);src.traverse(me=>{const m=me.isMesh&&me.material;if(m&&m.map&&!m.emissiveMap){m.emissive=new THREE.Color(0xffffff);m.emissiveMap=m.map;m.emissiveIntensity=.4;m.needsUpdate=true}});const bb=new THREE.Box3().setFromObject(src),H0=Math.max(1e-3,bb.max.y-bb.min.y),F0=Math.max(1e-3,bb.max.x-bb.min.x,bb.max.z-bb.min.z);
+      const mine=V3.towerSlots.filter((s,i)=>i%4===t);if(!mine.length)return;
+      src.traverse(me=>{if(!me.isMesh)return;const im=new THREE.InstancedMesh(me.geometry,me.material,mine.length);
+        mine.forEach((s,i)=>{const k=Math.max(6/H0,Math.min(1.25*s.h/H0,2.2*Math.max(s.w,s.d)/F0));q.setFromAxisAngle(ax,s.ry);m4.compose(pv.set(s.x,-bb.min.y*k,s.z),q,sv.setScalar(k)).multiply(me.matrixWorld);im.setMatrixAt(i,m4)});
+        im.castShadow=im.receiveShadow=true;im.frustumCulled=false;g.add(im)})});
+    V3.scene.add(g);GLBX.towers=g;if(V3.cityAlt)V3.cityAlt.visible=false;applyEnv(g)}).catch(e=>{GLBX.tw=0;console.warn('towers',e)})}
+// pickups: small 3D tokens (energy, star, heart) replace the flat sprites in the bursts
+function glbTokens(){if(GLBX.tk)return;GLBX.tk={};['energy','star','heart'].forEach(n=>GXGLB.load('models/token-'+n+'-lite.glb').then(src=>{const o=GXGLB.prep(src,{h:.78,env:.9});applyEnv(o);GLBX.tk[n]=o}).catch(e=>console.warn('token',n,e)))}
+function glbToken(kind){const k=kind==='bolt'?'energy':kind;return GLBX.tk&&GLBX.tk[k]||null}
+// Clampede: the full 3D piece in place of the built model (the other monsters keep their own glb through media.js)
+function glbClampede(g,mats){if(glbOff())return;const v=glbVariant();if(g.userData.clv===v)return;g.userData.clv=v;
+  GXGLB.load('models/clampede'+v+'.glb').then(src=>{if(g.userData.clv!==v)return;const o=GXGLB.prep(src,{h:2.3,ground:true,yaw:CLAMP_YAW});
+    const sz=o.userData.size,fit=Math.min(1,3.0/Math.max(sz.x,sz.z));if(fit<1)o.scale.setScalar(fit);
+    o.traverse(x=>{if(x.isMesh&&x.material){x.material=x.material.clone();x.material.userData.c0=x.material.color.clone();x.material.userData.e0=x.material.emissive.clone();x.material.userData.hero=true;mats.push(x.material)}});
+    const old=g.userData.clo;if(old){g.remove(old);old.traverse(x=>{const i=x.material?mats.indexOf(x.material):-1;if(i>=0)mats.splice(i,1)})}else g.children.slice().forEach(x=>x.visible=false);
+    g.add(o);g.userData.clo=o;applyEnv(o)}).catch(e=>{g.userData.clv=null;console.warn('clampede',e)})}
+const CLAMP_YAW=0;
+window.addEventListener('pagehide',()=>{try{GXGLB.dispose()}catch(e){}});
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;const was=V3.q;V3.q=q;
   const dpr=window.devicePixelRatio||1;{const want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;r.setPixelRatio(PH?PH.pixelRatio(want):want)}
@@ -60,7 +96,7 @@ function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=
     V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
   applyEnv(V3.scene);if(V3.faceMats)Object.values(V3.faceMats).forEach(envMat);
   V3.post=q==='high'&&r.capabilities.isWebGL2;if(!V3.post&&V3.P){disposePost()}
-  if(V3.r.domElement.parentElement)resize3D();gfxLabel()}
+  if(V3.r.domElement.parentElement)resize3D();gfxLabel();if(V3.scene&&V3.towerSlots)setTimeout(glbUseAll,V3.glbLate?0:500);V3.glbLate=1}
 // image-based lighting: every PBR material on High, only the hero pieces (figures, dice, brass, water) on Medium, none on Low
 function envMat(m){if(!m||!(m.isMeshStandardMaterial)||!V3.env)return;const want=V3.q==='high'||(V3.q==='medium'&&m.userData.hero)?V3.env:null;if(m.envMap!==want){m.envMap=want;m.needsUpdate=true}}
 function applyEnv(root){root.traverse(o=>{if(o.material)[].concat(o.material).forEach(envMat)})}
@@ -376,7 +412,7 @@ function buildWorld(){const sc=V3.scene;const TX=V3.tex;
 function refreshSigns(){if(V3.dtSign){if(V3.dtSign.material.map)V3.dtSign.material.map.dispose();V3.dtSign.material.map=canvasTex(1024,256,(x,w,h)=>neonDraw(x,'DOWNTOWN','#ff3f7a',w,h,'170px Bangers, Impact, "Arial Black", sans-serif'));V3.dtSign.material.needsUpdate=true}
   if(V3.neonMat){const old=V3.neonMat.map;V3.neonMat.map=neonAtlas();V3.neonMat.needsUpdate=true;if(old)old.dispose()}
   if(V3.hsign)V3.hsign.material.map=G&&!G.bayOn?signTex('CLOSED','#8aa6b5','#ffffff'):signTex('HARBOR','#43c8ff','#e9fbff')}
-function buildCity(){const sc=V3.scene;const B=Bag();const F=facadeTextures();V3.facade=F;const CW=.5,CH=.62,AT=16;
+function buildCity(){const sc=V3.scene;let B=Bag();const B1=B,B2=Bag();V3.towerSlots=[];const F=facadeTextures();V3.facade=F;const CW=.5,CH=.62,AT=16;
   let seed=1;const rnd3=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
   const pal=[0x7a4a92,0x4d4a9a,0x3f6a92,0x924a70,0x6a54a2,0x3a7a84,0x9a6252,0x7a6a8c,0xa08a6a];
   const facadeBox=(Mb,cx,cy,cz,w,h,d,tint)=>{const uo=[Math.floor(rnd3()*AT)/AT,Math.floor(rnd3()*AT)/AT];
@@ -388,6 +424,7 @@ function buildCity(){const sc=V3.scene;const B=Bag();const F=facadeTextures();V3
     if(z>2&&Math.abs(x)<18)continue;if(Math.abs(x-12.5)<6.5&&Math.abs(z+6.5)<6.5)continue;
     const w=snap(2+rnd3()*3,CW),d=snap(2+rnd3()*3,CW);const low=z<-8&&Math.abs(x)<18;let h=snap(low?3+rnd3()*5:3+rnd3()*(rad>25?17:11),CH);
     const ry=Math.round(Math.atan2(-x,-z)/(Math.PI/2))*(Math.PI/2)+(rnd3()-.5)*.3;const Mb=M4(x,0,z,0,ry);const tint=new THREE.Color(pal[i%pal.length]).offsetHSL((rnd3()-.5)*.04,0,(rnd3()-.5)*.08);
+    const slot=i%3===1&&h>=5;B=slot?B2:B1;if(slot)V3.towerSlots.push({x,z,ry,h,w,d});
     B.add('curb',roundedBox(w+.9,.12,d+.9,1,.06),new THREE.Matrix4().multiplyMatrices(Mb,M4(0,.06,0)),new THREE.Color(0x8e838c));
     const kind=rnd3();let topY=h,tw=w,td=d;
     if(kind<.5||h<5){facadeBox(Mb,0,.1,0,w,h,d,tint)}
@@ -398,7 +435,7 @@ function buildCity(){const sc=V3.scene;const B=Bag();const F=facadeTextures();V3
       B.add('trim',new THREE.CylinderGeometry(r*1.06,r*1.06,.16,24),new THREE.Matrix4().multiplyMatrices(Mb,M4(0,h+.1,0)),new THREE.Color(tint).offsetHSL(0,-.15,.2));topY=h+r*.45;tw=td=r}
     // rooftop props
     const pr=rnd3();const Mt=new THREE.Matrix4().multiplyMatrices(Mb,M4(0,topY+.18,0));
-    if(pr<.3){const ap=new THREE.Vector3(0,1.6,0).applyMatrix4(Mt);B.add('metal',new THREE.CylinderGeometry(.04,.06,1.6,6),new THREE.Matrix4().multiplyMatrices(Mt,M4(0,.8,0)));blinkPos[i%2].push(ap)}
+    if(pr<.3){const ap=new THREE.Vector3(0,1.6,0).applyMatrix4(Mt);B.add('metal',new THREE.CylinderGeometry(.04,.06,1.6,6),new THREE.Matrix4().multiplyMatrices(Mt,M4(0,.8,0)));if(B===B1)blinkPos[i%2].push(ap)}
     else if(pr<.55&&tw>1.2){const m=new THREE.Matrix4().multiplyMatrices(Mt,M4((rnd3()-.5)*tw*.4,0,(rnd3()-.5)*td*.4));B.add('wood',new THREE.CylinderGeometry(.42,.42,.8,14),new THREE.Matrix4().multiplyMatrices(m,M4(0,.75,0)));
       B.add('wood',new THREE.ConeGeometry(.5,.38,14),new THREE.Matrix4().multiplyMatrices(m,M4(0,1.34,0)),new THREE.Color(.55,.45,.42));[[.3,.3],[-.3,.3],[.3,-.3],[-.3,-.3]].forEach(([a,b])=>B.add('metal',new THREE.CylinderGeometry(.03,.03,.4,5),new THREE.Matrix4().multiplyMatrices(m,M4(a,.18,b))))}
     else if(pr<.8){for(let k=0;k<2;k++)B.add('metal',roundedBox(.42,.3,.34,1,.04),new THREE.Matrix4().multiplyMatrices(Mt,M4((k-.5)*.6,.1,(rnd3()-.5)*td*.4)),new THREE.Color(.75,.75,.8))}
@@ -416,7 +453,8 @@ function buildCity(){const sc=V3.scene;const B=Bag();const F=facadeTextures();V3
   V3.neonMat=new THREE.MeshBasicMaterial({color:new THREE.Color(1.6,1.6,1.6),map:null});
   const mats={fac:facMat,roof:std(0xffffff,{map:roofTex,roughness:.9}),trim:std(0xffffff,{vertexColors:true,roughness:.55,map:V3.tex.paint}),curb:std(0xffffff,{vertexColors:true,roughness:.85}),
     metal:std(0x4a4452,{vertexColors:true,metalness:.6,roughness:.4}),wood:std(0x8a5a3a,{vertexColors:true,roughness:.8}),neon:V3.neonMat,awn:vinyl(0xffffff,{roughness:.6,clearcoat:.2})};
-  for(const k in mats){const g=B.geo(k);if(!g)continue;const m=mesh(g,mats[k],0,0,0,sc,k==='neon');if(k==='curb'||k==='roof')m.castShadow=false;m.receiveShadow=k!=='neon'}
+  V3.cityAlt=new THREE.Group();sc.add(V3.cityAlt); // the procedural versions of the buildings that the tower models replace; hidden once those load
+  for(const k in mats){for(const [Bx,par] of [[B1,sc],[B2,V3.cityAlt]]){const g=Bx.geo(k);if(!g)continue;const m=mesh(g,mats[k],0,0,0,par,k==='neon');if(k==='curb'||k==='roof')m.castShadow=false;m.receiveShadow=k!=='neon'}}
   // rooftop aviation lights: two groups that blink out of phase
   V3.blinkMats=[glowMat(0xff2a44,3),glowMat(0xff2a44,3)];blinkPos.forEach((L,k)=>{if(!L.length)return;const im=new THREE.InstancedMesh(new THREE.SphereGeometry(.13,8,6),V3.blinkMats[k],L.length);L.forEach((p,i)=>im.setMatrixAt(i,M4(p.x,p.y,p.z)));sc.add(im)})}
 function sprite(tex,x,y,z,w,h,parent){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));s.position.set(x,y,z);s.scale.set(w,h,1);(parent||V3.scene).add(s);return s}
@@ -524,6 +562,7 @@ function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[
   const shadow=mesh(new THREE.PlaneGeometry(3.4,3.4),new THREE.MeshBasicMaterial({map:V3.tex.blob,transparent:true,depthWrite:false,opacity:.75}),0,.012,0,R,true);shadow.rotation.x=-Math.PI/2;shadow.renderOrder=1;
   const mats=[];g.traverse(o=>{if(o.isMesh&&o.material&&(o.material.isMeshPhysicalMaterial||o.material.isMeshStandardMaterial)&&!mats.includes(o.material)){o.material=o.material.clone();mats.push(o.material);o.material.userData.c0=o.material.color.clone();o.material.userData.e0=o.material.emissive.clone()}});
   {const gf=window.CCMedia&&CCMedia.model(m);if(gf)CCMedia.loadGLB(gf,m).then(obj=>{const old=g.children.slice();obj.traverse(x=>{if(x.isMesh&&x.material){x.material.userData.c0=x.material.color.clone();x.material.userData.e0=x.material.emissive.clone();mats.push(x.material)}});if(V3.r)applyEnv(obj);g.add(obj);old.forEach(x=>x.visible=false)}).catch(e=>console.warn('model',gf,e))} // the Flow character as a real 3D model; the built one stays if it cannot load
+  if(m===7){g.userData.clamede=true;if(V3.glbLate)glbClampede(g,mats)}
   R.traverse(o=>{if(o.material&&o.material.isMeshStandardMaterial)o.material.userData.hero=true});if(V3.r)applyEnv(R);R.scale.setScalar(MS);R.userData.s=MS;return {g:R,fig:g,anim,mats,phase:Math.random()*6}}
 // airbrushed shading baked into vertex colours: darker toward the feet and in the undersides, like a painted vinyl toy
 function airbrush(g){g.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(g.matrixWorld).invert();const v=new THREE.Vector3(),n=new THREE.Vector3(),nm=new THREE.Matrix3();
@@ -574,7 +613,9 @@ function fx3D(k,e){const o=V3.mons[k];if(!o)return;const at=o.g.position.clone()
   else if(e.c==='heal')spawn('heart',at,6,.9);else if(e.c==='star'){spawn(/brainjack/i.test(e.t)?'brain':'star',at,8,1);spawn('spark',at,4,1.2)}else if(e.c==='energy')spawn('bolt',at,6,.9)}
 function popLabel(v,text,c){const st=document.getElementById('stage');const p=v.clone().project(V3.cam);const el=document.createElement('div');el.className='pop '+c;el.textContent=text;
   el.style.left=((p.x+1)/2*100)+'%';el.style.top=((1-p.y)/2*100)+'%';el.style.setProperty('--dx',(Math.random()*40-20)+'px');st.appendChild(el);setTimeout(()=>el.remove(),1600)}
-function spawn(kind,at,n,speed){for(let i=0;i<n;i++){const s=sprite(V3.icons[kind],at.x,at.y,at.z,.6,.6);if(kind==='spark'||kind==='fire')s.material.color.setScalar(2);else if(kind!=='puff')s.material.color.setScalar(1.25);const a=Math.random()*Math.PI*2;
+function spawn(kind,at,n,speed){for(let i=0;i<n;i++){const tk=glbToken(kind);if(tk){const o=tk.clone(true);o.position.copy(at);V3.scene.add(o);const a=Math.random()*Math.PI*2;
+    V3.parts.push({s:o,tok:1,v:new THREE.Vector3(Math.cos(a)*speed*(.5+Math.random()),2+Math.random()*3*speed,Math.sin(a)*speed*(.5+Math.random())),life:1.1+Math.random()*.5,max:1.4,spin:(Math.random()-.5)*8});continue}
+  const s=sprite(V3.icons[kind],at.x,at.y,at.z,.6,.6);if(kind==='spark'||kind==='fire')s.material.color.setScalar(2);else if(kind!=='puff')s.material.color.setScalar(1.25);const a=Math.random()*Math.PI*2;
   V3.parts.push({s,v:new THREE.Vector3(Math.cos(a)*speed*(.5+Math.random()),2+Math.random()*3*speed,Math.sin(a)*speed*(.5+Math.random())),life:1+Math.random()*.5,max:1.4,grow:kind==='puff'||kind==='fire',spin:(Math.random()-.5)*4})}}
 // ---- dice ----
 function clearDice(){V3.dice.forEach(d=>{V3.tray.remove(d.m);if(d.blob)V3.tray.remove(d.blob)});V3.dice=[]}
@@ -669,7 +710,7 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);V3.frames=(V3.frames
     if(d.pulse>0)d.pulse=Math.max(0,d.pulse-dt*3);const s=1+(d.pulse||0)*.12+(V3.hover===k?.04:0);d.m.scale.setScalar(s);
     if(d.blob){d.blob.position.set(d.m.position.x,.02,d.m.position.z);const hgt=Math.max(0,d.m.position.y-.52);d.blob.material.opacity=.6/(1+hgt*1.2);d.blob.scale.setScalar(1+hgt*.25)}});
   // particles
-  for(let i=V3.parts.length-1;i>=0;i--){const q=V3.parts[i];q.life-=dt;q.v.y-=6*dt;q.s.position.addScaledVector(q.v,dt);const f=Math.max(0,q.life/q.max);q.s.material.opacity=Math.min(1,f*1.5);q.s.material.rotation+=q.spin*dt;if(q.grow)q.s.scale.setScalar(.45+(1-f)*1.1);
+  for(let i=V3.parts.length-1;i>=0;i--){const q=V3.parts[i];q.life-=dt;q.v.y-=6*dt;q.s.position.addScaledVector(q.v,dt);if(q.tok){q.s.rotation.y+=q.spin*dt;q.s.scale.setScalar(Math.min(1,q.life/q.max*2.2));if(q.life<=0){V3.scene.remove(q.s);V3.parts.splice(i,1)}continue}const f=Math.max(0,q.life/q.max);q.s.material.opacity=Math.min(1,f*1.5);q.s.material.rotation+=q.spin*dt;if(q.grow)q.s.scale.setScalar(.45+(1-f)*1.1);
     if(q.life<=0){V3.scene.remove(q.s);q.s.material.dispose();V3.parts.splice(i,1)}}
   animWorld(dt,t);
   // camera: eased towards the framed position, gentle sway, shake on hits, a slow push-in on the winner
