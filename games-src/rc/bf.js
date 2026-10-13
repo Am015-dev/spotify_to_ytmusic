@@ -79,7 +79,7 @@ BF.paint=function(){const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.stat
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${ACT_ICON[a.type]||'•'}</u>`:''}</button>`}
+  return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
     if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
@@ -101,7 +101,7 @@ function chipsFor(st){const out=[];
 function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chipsFor(st);
   const sig=JSON.stringify(cs.map(c=>[c.pos,c.a.id,c.a.type,c.a.pw,c.risk,c.cur,c.done]))+st;if(host.dataset.s===sig)return;host.dataset.s=sig;
   const g={};cs.forEach((c,j)=>{(g[c.pos]=g[c.pos]||[]).push([c,j])});
-  host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${ACT_ICON[c.a.type]||'•'}</s><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
+  host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${AI(c.a.type)}</s><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
     const cls=`bfa ${c.risk} ${c.cur?'cur':''} ${c.done?'done':''}`;const lab=`${E(actLabel(c.a))}${c.rm?' (tap to take back)':''}`;
     return c.rm?`<button class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" data-rm="${c.rm}" aria-label="${lab}">${inner}</button>`:`<div class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" title="${lab}">${inner}</div>`}).join('')}</div>`).join('');
   BF.place()}

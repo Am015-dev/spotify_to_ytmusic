@@ -24,6 +24,7 @@ function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.sh
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
 const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
 const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
+const AI=t=>`<i class="ai" data-a="${t}">${ACT_ICON[t]||'•'}</i>`;   // painted icon once html.sk-acts is set
 function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines=beatLines(i).filter(MEANINGFUL);const S=SCENARIOS[G.scen];const fs=(F.scen||{})[G.scen]||{};
   let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'📖';
   switch(b.kind){

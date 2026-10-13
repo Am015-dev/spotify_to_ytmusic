@@ -16,11 +16,11 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 | kaiten-kitchen | 23 | 2 |
 | sunglaze | 23 | 2 |
 | short-fuse | 22 | 2 |
-| mainhattan-nightrun | 22 | 0 |
+| mainhattan-nightrun | 0 | 0 |
 | cauldron-fair | 22 | 2 |
 | tidewake | 22 | 2 |
 | hollowbough | 19 | 2 |
-| **Total** | **678** | **56** |
+| **Total** | **656** | **56** |
 
 ## crown-city-smash
 
@@ -150,48 +150,7 @@ Still not loaded by the page (13 files; each needs a design decision, not just a
 
 ## rampart-and-vine
 
-3D: piece-champ, piece-hog, piece-mason, piece-meeple
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `icon-follower` | a small hand-painted icon of a chunky wooden meeple, bold, readable at 24 px, single object, centred, plain fl |
-| Wave 1 Wave 1 | `icon-score` | a small hand-painted icon of a stone shield wrapped in a vine laurel, bold, readable at 24 px, single object,  |
-| Wave 1 Wave 1 | `icon-tile` | a small hand-painted icon of a square land tile with a green field and a road, seen from above, bold, readable |
-| Wave 1 Wave 1 | `piece-champ-blue` | a chunky painted wooden knight champion game piece in solid blue, front view, single object, centred, plain fl |
-| Wave 1 Wave 1 | `piece-champ-green` | a chunky painted wooden knight champion game piece in solid green, front view, single object, centred, plain f |
-| Wave 1 Wave 1 | `piece-champ-red` | a chunky painted wooden knight champion game piece in solid red, front view, single object, centred, plain fla |
-| Wave 1 Wave 1 | `piece-champ-yellow` | a chunky painted wooden knight champion game piece in solid yellow, front view, single object, centred, plain  |
-| Wave 1 Wave 1 | `piece-hog-blue` | a chunky painted wooden little pig game piece in solid blue, front view, single object, centred, plain flat wh |
-| Wave 1 Wave 1 | `piece-hog-green` | a chunky painted wooden little pig game piece in solid green, front view, single object, centred, plain flat w |
-| Wave 1 Wave 1 | `piece-hog-red` | a chunky painted wooden little pig game piece in solid red, front view, single object, centred, plain flat whi |
-| Wave 1 Wave 1 | `piece-hog-yellow` | a chunky painted wooden little pig game piece in solid yellow, front view, single object, centred, plain flat  |
-| Wave 1 Wave 1 | `piece-mason-blue` | a chunky painted wooden mason with a trowel game piece in solid blue, front view, single object, centred, plai |
-| Wave 1 Wave 1 | `piece-mason-green` | a chunky painted wooden mason with a trowel game piece in solid green, front view, single object, centred, pla |
-| Wave 1 Wave 1 | `piece-mason-red` | a chunky painted wooden mason with a trowel game piece in solid red, front view, single object, centred, plain |
-| Wave 1 Wave 1 | `piece-mason-yellow` | a chunky painted wooden mason with a trowel game piece in solid yellow, front view, single object, centred, pl |
-| Wave 1 Wave 1 | `piece-meeple-blue` | a chunky painted wooden meeple follower game piece in solid blue, front view, single object, centred, plain fl |
-| Wave 1 Wave 1 | `piece-meeple-green` | a chunky painted wooden meeple follower game piece in solid green, front view, single object, centred, plain f |
-| Wave 1 Wave 1 | `piece-meeple-red` | a chunky painted wooden meeple follower game piece in solid red, front view, single object, centred, plain fla |
-| Wave 1 Wave 1 | `piece-meeple-yellow` | a chunky painted wooden meeple follower game piece in solid yellow, front view, single object, centred, plain  |
-| Wave 1 Wave 1 | `ui-rotate-btn` | a round oak button with a carved curved arrow going round, iron rim, single object, centred, plain flat white  |
-| Wave 1 Wave 1 | `ui-trophy` | a small silver goblet with a vine wrapped around it, single object, centred, plain flat white background, no s |
-| Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank green-and-gold ribbon banner, centre empty, single object, centred, plain flat white background, no sh |
-| Wave 1 Wave 1 (16:9) | `ui-score-pill` | a blank wooden name-peg plaque with a small shield on the left, single object, centred, plain flat white backg |
-| Wave 1 Wave 1 (16:9) | `ui-tray` | a shallow oak tray with a leather lining and rope handles at the sides, seen from above, empty, single object, |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of parchment with a grey stone outline and a tiny curl at one corner, single  |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of parchment with a grey stone outline, single object, centred, plain  |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream with a grey stone ri |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, terracotta with a grey sto |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, meadow-green with a grey s |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of carved oak with a vine inlay with a grey stone edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round grey stone button with a vine green ring, centre empty, single object, centred, plain flat white |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round grey stone medallion with a vine green ring, centre blank, larger with a small crown on top, single ob |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round grey stone medallion with a vine green ring, centre blank, with a small laurel at the bottom, single o |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round grey stone medallion with a vine green ring, centre blank, dull and darkened with a small padlock at t |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round grey stone medallion with a vine green ring, centre blank, bright and polished, single object, centred |
-| Wave 4 Wave 4 kit | `ui-panel` | a parchment panel with ornate grey stone corners and a thin grey stone border, the whole centre plain and empt |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of parchment with a thin grey stone edge and a small vine green diamond at the left end, ce |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of carved oak with a vine inlay, seamless left to right, empty, no text |
+WIRED and live 13 Oct 2026 (all 2D files: per-colour pieces, icons, score pill, tray, rotate button, ribbon, trophy, Wave 4 kit). 3D models: other worker.
 
 ## shipwreck-isle
 
@@ -513,32 +472,7 @@ Still not loaded by the page (13 files; each needs a design decision, not just a
 
 ## mainhattan-nightrun
 
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of smoked glass with a dark chrome outline and a tiny curl at one corner, sin |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of smoked glass with a dark chrome outline, single object, centred, pl |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale cyan with a dark chro |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, magenta with a dark chrome |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep indigo with a dark ch |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of a dark chrome strip with a thin cyan light line with a dark chrome edge line, seamless left to righ |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round dark chrome button with a magenta ring, centre empty, single object, centred, plain flat white b |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round dark chrome medallion with a magenta ring, centre blank, larger with a small crown on top, single obje |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round dark chrome medallion with a magenta ring, centre blank, with a small laurel at the bottom, single obj |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round dark chrome medallion with a magenta ring, centre blank, dull and darkened with a small padlock at the |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round dark chrome medallion with a magenta ring, centre blank, bright and polished, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-panel` | a smoked glass panel with ornate dark chrome corners and a thin dark chrome border, the whole centre plain and |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of smoked glass with a thin dark chrome edge and a small magenta diamond at the left end, c |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of a dark chrome strip with a thin cyan light line, seamless left to right, empty, no text |
-| Wave 5 Wave 5 | `ui-touch-dash` | a round glowing neon push-button with a double-chevron dash symbol, single object, centred, plain flat white b |
-| Wave 5 Wave 5 | `ui-touch-emp` | a round glowing neon push-button with a pulse-ring symbol, single object, centred, plain flat white background |
-| Wave 5 Wave 5 | `ui-touch-pause` | a round glowing neon push-button with a pause symbol, single object, centred, plain flat white background, no  |
-| Wave 5 Wave 5 (16:9) | `ui-btn-cyan` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-btn-pink` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-btn-violet` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-hud-bars` | a slim dark sci-fi gauge housing with a neon cyan trim and four empty horizontal channels stacked, wide and sh |
-| Wave 5 Wave 5 (16:9) | `ui-hud-mult` | a small dark sci-fi plate with a glowing magenta trim, wider than tall, centre empty, single object, centred,  |
+All painted files in media/ are now loaded by the live page (J2 wired the 22 UI kit files).
 
 ## short-fuse
 

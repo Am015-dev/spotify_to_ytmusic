@@ -465,6 +465,11 @@ html.bf-w .ppop:not([hidden]){left:var(--bs,50vw)}
 .tkey{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .ttl-art{overflow:hidden}.ttl-art picture{display:contents}
 .tlinks{display:flex;gap:6px;justify-content:center}
+.crownrow{display:flex;justify-content:center;height:100px;margin:-6px 0 -4px;position:relative;z-index:2;pointer-events:none}.crown3{width:170px;height:170px;margin:-35px 0;flex:none;object-fit:contain;filter:brightness(1.55) saturate(1.25) drop-shadow(0 0 14px rgba(255,206,90,.75)) drop-shadow(0 4px 6px rgba(0,0,0,.55));animation:crowndrop .9s cubic-bezier(.2,.9,.3,1.2) both,crownsway 3.2s ease-in-out .9s infinite}
+@keyframes crowndrop{0%{transform:translateY(-70px) scale(.4) rotate(-25deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes crownsway{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
+@media (max-width:700px),(max-height:700px){.crownrow{height:66px}.crown3{width:116px;height:116px;margin:-25px 0}}
+@media (prefers-reduced-motion:reduce){.crown3{animation:none}}
 .endart{display:block;width:100%;height:auto;max-height:34vh;flex:none;object-fit:cover;object-position:50% 30%;border-radius:8px;margin:0 0 10px;box-shadow:0 0 0 2px rgba(232,200,103,.5)}
 /* painted table shows through the map; a painted map (data-mapimg) replaces the drawn land */
 html[data-timg]:not([data-gfx="low"]) .tb-bg-void{opacity:0}

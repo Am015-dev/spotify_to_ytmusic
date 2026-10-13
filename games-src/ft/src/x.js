@@ -3660,8 +3660,8 @@ Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:
 function refresh(){if(G&&!G.tut&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
 // the summoning moment: the brass lamp turns (24-frame strip rendered from the 3D model) and the djinn's name rises out of the smoke
-function showSummon(k){const d=DJ[k];if(!d||!document.documentElement.classList.contains('sp3'))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('role','status');
-  o.innerHTML=`<i class="sm-smoke"></i><i class="sm-lamp"></i><b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},1700)}
+function showSummon(k){const d=DJ[k];const hc=document.documentElement.classList;if(!d||!(hc.contains('sp3')||hc.contains('sk-dj')))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('role','status');
+  o.innerHTML=`<i class="sm-smoke"></i>${hc.contains('sk-dj')?`<img class="sm-art" src="media/djinn-${k}.webp" alt="">`:'<i class="sm-lamp"></i>'}<b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},1700)}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='summon')try{showSummon(f.x)}catch(e){}const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
 const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
@@ -3699,12 +3699,13 @@ function lineText(){if(!G)return '';if(G.over)return `${G.winner.split(' & ').sl
   case 'sell':return 'Sell goods or end turn'}
   return ''}
 // ---------- seats (the score race) ----------
+function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
 function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="mp sm" data-c="${c}"></i>${n}</span>`:''}
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss">★${shownTotal(p)}</b>
-   <span class="s2"><span class="st">🪙${p.coins}</span><span class="st">🐪${p.camels}</span>${p.tent?'<span class="st">⛺</span>':''}</span>
-   <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">🧺${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">🧞${p.dj.length}</span>`:''}</span></div>`}
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}</span><span class="st">${E2('🐪','camel')}${p.camels}</span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
 function mpHtml(c,h){return `<i class="mp${h?' h':''}" data-c="${c}"></i>`}
@@ -3715,13 +3716,13 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${t.m.map(c=>mpHtml(c)).join('')}${hand.map(c=>mpHtml(c,1)).join('')}</div>
-   <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
+   <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
 function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];
-    h+=r?`<button class="mcard ${UI.pickMk.includes(j)?'glow':''} ${UI.mkSel.includes(j)?'sel':''} ${j<tk?'mtake':''}" data-mk="${j}" aria-label="${esc(RNAME[r])}"><span class="mi">${RICON[r]}</span></button>`:'<span class="mcard empty"></span>'}
-  h+='</div><div class="drow" aria-label="Djinns">'+G.djRow.map(k=>`<button class="dcard ${UI.pickDj.includes(k)?'glow':''}" data-dj="${k}" aria-label="${esc(DJ[k].n)}"><b>${esc(DJ[k].n)}</b><span class="dv">${DJ[k].vp}</span></button>`).join('')
-   +(G.ex.thieves?G.thRow.map(k=>`<button class="dcard th ${UI.pickDj.includes('t:'+k)?'glow':''}" data-th="${k}" aria-label="${esc(THIEVES[k].n)}"><b>🦹 ${esc(THIEVES[k].n.replace(' Cutpurse',''))}</b></button>`).join(''):'')+'</div>';
+    h+=r?`<button class="mcard ${UI.pickMk.includes(j)?'glow':''} ${UI.mkSel.includes(j)?'sel':''} ${j<tk?'mtake':''}" data-mk="${j}" data-r="${r}" style="--gi:url(media/good-${r}.webp)" aria-label="${esc(RNAME[r])}"><span class="mi">${RICON[r]}</span></button>`:'<span class="mcard empty"></span>'}
+  h+='</div><div class="drow" aria-label="Djinns">'+G.djRow.map(k=>`<button class="dcard ${UI.pickDj.includes(k)?'glow':''}" data-dj="${k}" style="--dj:url(media/djinn-${k}.webp)" aria-label="${esc(DJ[k].n)}"><b>${esc(DJ[k].n)}</b><span class="dv">${DJ[k].vp}</span></button>`).join('')
+   +(G.ex.thieves?G.thRow.map(k=>`<button class="dcard th ${UI.pickDj.includes('t:'+k)?'glow':''}" data-th="${k}" aria-label="${esc(THIEVES[k].n)}"><i class="thi" style="--ti:url(media/thief-${k}.webp)">🦹</i><b>${esc(THIEVES[k].n.replace(' Cutpurse',''))}</b></button>`).join(''):'')+'</div>';
   if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}}
 // ---------- buttons under the table ----------
 const mvAttr=m=>esc(JSON.stringify(m));
@@ -3950,13 +3951,13 @@ function playerSheet(p){const s=scoreOf(p);const hid=online()&&!G.over&&p.i!==NE
   <div><b>Tiles held:</b> ${G.board.filter(t=>owner(t)===p.i).map(t=>`${esc(tileName(t))}${t.palm?' 🌴'+t.palm:''}${t.pal?' 🏰'+t.pal:''}`).join(', ')||'none'}</div>
   <div class="small muted">So far: ${Object.entries(s).filter(([k,v])=>v&&k!=='total'&&!(hid&&k==='items')).map(([k,v])=>k+' '+v).join(' · ')}</div></section>`}
 function renderDjPop(){const b=$('#djbody');b.dataset.v=String(G.logN);const inGame=DJINNS_FOR(G.ex);const where=k=>{if(G.djRow.includes(k))return 'on offer';for(const p of G.pl)if(p.dj.includes(k))return 'owned by '+p.nm;if(G.djDisc.includes(k))return 'discarded';return 'in the deck'};
-  b.innerHTML=`<p class="muted small">Summon djinns at a Shrine: 2 Sages, or 1 Sage and 1 Mystic. Powers with a cost can be used once per turn, paying each time.</p><div class="cgrid">${inGame.map(d=>`<div class="card dj"><h4>${esc(d.n)} <small>${d.vp} pts</small></h4>${cardArt('djinn',d.n)}<div class="tag">${d.cost?{EF:'power: 1 Sage or 1 Mystic',EEF:'power: 1 Sage + 1 Sage-or-Mystic',F:'power: 1 Mystic','F+':'power: Mystics when bidding'}[d.cost]:'always on'} · ${where(d.k)}</div><p>${esc(d.x)}</p></div>`).join('')}</div>`}
+  b.innerHTML=`<p class="muted small">Summon djinns at a Shrine: 2 Sages, or 1 Sage and 1 Mystic. Powers with a cost can be used once per turn, paying each time.</p><div class="cgrid">${inGame.map(d=>`<div class="card dj"><h4>${esc(d.n)} <small>${d.vp} pts</small></h4>${cardArt('djinn',d.n,{img:'djinn-'+d.k})}<div class="tag">${d.cost?{EF:'power: 1 Sage or 1 Mystic',EEF:'power: 1 Sage + 1 Sage-or-Mystic',F:'power: 1 Mystic','F+':'power: Mystics when bidding'}[d.cost]:'always on'} · ${where(d.k)}</div><p>${esc(d.x)}</p></div>`).join('')}</div>`}
 function refHtml(){const sec=(t,items)=>`<h3>${t}</h3><div class="cgrid">${items.map(i=>`<div class="card"><h4>${i.n}${i.c>1?` <small>×${i.c}</small>`:''}</h4>${i.art||(/^[^\x00-\x7f]/.test(i.n)?cardArt('good',i.n,{glyph:i.n.split(' ')[0],hue:30}):'')}${i.tag?`<div class="tag">${esc(i.tag)}</div>`:''}<p>${esc(i.x)}</p></div>`).join('')}</div>`;
-  const tiles=[];for(const [k,v,n,col] of TILESET.concat(TILESET_ART,TILESET_WHIM)){const d=TILEDEF[k];tiles.push({art:cardArt('tile',d.n+v,{blue:col?col==='blue':d.blue,v,hue:30}),n:d.n,c:n,tag:`${v?v+' points · ':''}${(col?col==='blue':d.blue)?'blue':'red'}${TILESET_ART.some(x=>x[0]===k)?' · Crafters':TILESET_WHIM.some(x=>x[0]===k)?' · Wonder Cities':''}`,x:d.x})}
-  return sec('The tribes (and the Crafters)',Object.keys(MNAME).map(c=>({art:cardArt('tribe',c,{col:MCSS[c]||'#888',hue:35}),n:`${MNAME[c]} (${c==='vizier'?'yellow':c==='elder'?'white':c==='merchant'?'green':c==='builder'?'blue':c==='assassin'?'red':'purple'})`,c:c==='artisan'?15:MEEPLE_COUNT[c],tag:c==='artisan'?'Crafters expansion':'meeples',x:MHELP[c]})))+
-   sec('Tiles',tiles)+sec('Goods cards',Object.keys(RESOURCE_COUNT).map(r=>({art:cardArt('good',r,{glyph:RICON[r]}),n:`${RICON[r]} ${RNAME[r]}`,c:RESOURCE_COUNT[r],tag:r==='fakir'?'special':'goods',x:r==='fakir'?'Adds 1 Mason or 1 Shadow range, pays for a Sage when summoning, pays djinn powers. Never part of a set.':'Collect sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1–9 different kinds.'})))+
-   sec('Djinns',DJINNS.map(d=>({n:d.n,tag:`${d.vp} points · ${d.cost?'power':'always on'}${d.set?' · '+{promos:'promo',artisans:'Crafters',thieves:'Cutpurses'}[d.set]:''}${d.assumed?' · '+d.assumed+' assumed':''}`,x:d.x})))+
-   sec('Items (Crafters)',Object.values(ITEMS).map(i=>({n:i.n,c:i.cp,tag:i.kind,x:i.x})))+sec('Cutpurses',Object.values(THIEVES).map(t=>({n:t.n,tag:'Cutpurses expansion',x:t.x})))+
+  const tiles=[];for(const [k,v,n,col] of TILESET.concat(TILESET_ART,TILESET_WHIM)){const d=TILEDEF[k];tiles.push({art:cardArt('tile',d.n+v,{blue:col?col==='blue':d.blue,v,hue:30,img:['village','sacred','oasis','small','large','workshop','exchange','city'].includes(k)?'glyph-'+k:null,fit:'ct'}),n:d.n,c:n,tag:`${v?v+' points · ':''}${(col?col==='blue':d.blue)?'blue':'red'}${TILESET_ART.some(x=>x[0]===k)?' · Crafters':TILESET_WHIM.some(x=>x[0]===k)?' · Wonder Cities':''}`,x:d.x})}
+  return sec('The tribes (and the Crafters)',Object.keys(MNAME).map(c=>({art:cardArt('tribe',c,{col:MCSS[c]||'#888',hue:35,img:'meeple-'+c,fit:'ct'}),n:`${MNAME[c]} (${c==='vizier'?'yellow':c==='elder'?'white':c==='merchant'?'green':c==='builder'?'blue':c==='assassin'?'red':'purple'})`,c:c==='artisan'?15:MEEPLE_COUNT[c],tag:c==='artisan'?'Crafters expansion':'meeples',x:MHELP[c]})))+
+   sec('Tiles',tiles)+sec('Goods cards',Object.keys(RESOURCE_COUNT).map(r=>({art:cardArt('good',r,{glyph:RICON[r],img:'good-'+r,fit:'ct'}),n:`${RICON[r]} ${RNAME[r]}`,c:RESOURCE_COUNT[r],tag:r==='fakir'?'special':'goods',x:r==='fakir'?'Adds 1 Mason or 1 Shadow range, pays for a Sage when summoning, pays djinn powers. Never part of a set.':'Collect sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1–9 different kinds.'})))+
+   sec('Djinns',DJINNS.map(d=>({art:cardArt('djinn',d.n,{img:'djinn-'+d.k}),n:d.n,tag:`${d.vp} points · ${d.cost?'power':'always on'}${d.set?' · '+{promos:'promo',artisans:'Crafters',thieves:'Cutpurses'}[d.set]:''}${d.assumed?' · '+d.assumed+' assumed':''}`,x:d.x})))+
+   sec('Items (Crafters)',Object.entries(ITEMS).map(([k,i])=>({art:cardArt('item',i.n,{img:'item-'+k,fit:'ct'}),n:i.n,c:i.cp,tag:i.kind,x:i.x})))+sec('Cutpurses',Object.entries(THIEVES).map(([k,t])=>({art:cardArt('thief',t.n,{img:'thief-'+k,fit:'ct'}),n:t.n,tag:'Cutpurses expansion',x:t.x})))+
    sec('Tokens and pieces',[{n:'🐪 Camels',tag:'11 each with 2 players, 8 with 3–5',x:'Mark the tiles you control. Placing your last camel ends the game at the end of the round.'},{n:'⛺ Tent',tag:'Crafters · 1 each',x:'Claim a tile with it instead of a camel: it scores the tile plus 1 for each red tile around it.'},{n:'🌴 Palm tree',x:'3 points to whoever holds the tile (5 with Nakhla; doubled next to the Great Lake).'},{n:'🏰 Palace',x:'5 points to whoever holds the tile (doubled next to the Great Lake).'},{n:'⛰ Mountains',tag:'Crafters',x:'Block moving between two tiles (not Shadow range).'},{n:'🪙 Coins',x:'1 point each at the end; pay for turn order and bazaar goods.'},{n:'Turn-order track',x:'Costs 0, 0, 0, 1, 3, 5, 8, 12, 18 (5 players: 0, 0, 0, 1, 1, 3, 3, 5, 5, 8, 12, 18).'}])}
 // ---------- inline SVG icons (consistent line icons instead of emoji in the chrome) ----------
 const ICONS={bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.6 1 2.5h6c0-.9.2-1.7 1-2.5A6 6 0 0 0 12 3z"/>',
@@ -3975,7 +3976,7 @@ function paintIcons(root){for(const e of (root||document).querySelectorAll('[dat
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');const on=typeof SND==='undefined'||SND.on,mu=typeof SND!=='undefined'&&SND.music;
   if(a){a.innerHTML=ICON(on?'snd':'sndoff');a.setAttribute('aria-pressed',on?'true':'false')}if(b){b.innerHTML=ICON(mu?'mus':'musoff');b.setAttribute('aria-pressed',mu?'true':'false')}if(GX.open==='setd')renderSettings()}
 function hueOf(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h}
-function cardArt(kind,name,o){o=o||{};const h=o.hue!=null?o.hue:hueOf(name);const id='ca'+Math.abs(hueOf(name+kind))+kind.length;let fg='';
+function cardArt(kind,name,o){o=o||{};if(o.img&&typeof PAINT_ON!=='undefined'&&PAINT_ON)return `<img class="ca ci ${o.fit||'cv'}" src="media/${o.img}.webp" alt="" loading="lazy" draggable="false">`;const h=o.hue!=null?o.hue:hueOf(name);const id='ca'+Math.abs(hueOf(name+kind))+kind.length;let fg='';
   if(kind==='djinn')fg=`<path d="M22 58c6 5 16 7 28 7 11 0 17-4 20-9l9-6h-9c-3-6-10-8-19-8-9 0-20 3-29 16z" fill="#e9b24a" stroke="#6b3d10" stroke-width="1.5"/><path d="M50 42c-6-5 3-9 0-15-3-6 6-10 3-16" fill="none" stroke="hsl(${h},70%,85%)" stroke-width="4" stroke-linecap="round" opacity=".9"/><circle cx="53" cy="12" r="6" fill="hsl(${h},70%,80%)"/>`;
   else if(kind==='tribe')fg=`<path d="M40 70h20l-2-4c-3-2-4-8-4-16l4-2-3-2c4-2 6-6 6-10a11 11 0 0 0-22 0c0 4 2 8 6 10l-3 2 4 2c0 8-1 14-4 16z" fill="${o.col}" stroke="rgba(0,0,0,.45)" stroke-width="1.5"/><ellipse cx="46" cy="30" rx="3" ry="4" fill="rgba(255,255,255,.4)"/>`;
   else if(kind==='tile')fg=`<rect x="26" y="22" width="48" height="48" rx="6" fill="${o.blue?'#2d5f9f':'#b34a2a'}"/><rect x="31" y="27" width="38" height="38" rx="4" fill="#ecc996"/><rect x="33" y="54" width="34" height="8" rx="4" fill="#f6e7c6"/>${o.v?`<circle cx="36" cy="58" r="6" fill="${o.blue?'#1b3a66':'#7a2d17'}"/>`:''}`;
@@ -4321,6 +4322,7 @@ function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[
 function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
 const TABLES=['workshop','court','night','palace'],BACKS=['copper','lamp'];
 function paintApply(){
+  if(PAINT_ON)artProbe();else HR.classList.remove('sk-dj','sk-gd','sk-tk','sk-ic2','sk-spot','sk-fx');
   HR.classList.toggle('tp',PAINT_ON&&PIMG['tile-village']===1);HR.classList.toggle('ti',PAINT_ON&&PIMG['title']===1);
   const tb=unl('table'),tf=TABLES.includes(tb)?'table-'+tb:'';
   if(PAINT_ON&&tf)pimg(tf,()=>{HR.style.setProperty('--tbl','url('+MEDIA+tf+'.webp)');HR.classList.add('tbl','tbl-u')});
@@ -4331,7 +4333,8 @@ function paintApply(){
   HR.classList.toggle('cb',PAINT_ON&&PIMG[cf]===1);
 }
 function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players','djinn','log','cards','rules','settings','menu','newgame','speed','sound','music','hint'],sets:{'sk-meeple':['vizier','elder','merchant','builder','assassin','artisan'].map(k=>'meeple-'+k)}});['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
-  ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d()}
+  ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d();artProbe()}
+function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
 // 3D-model sprites (palm, palace, camel, lamp turntable): html.sp3 once the files are there; without them the emoji stay
 function sprites3d(){let n=0;['palm@512','palace@512','camel@512','lamp-turn'].forEach(f=>{const i=new Image();i.onload=()=>{if(++n===4)document.documentElement.classList.add('sp3')};i.src='models/'+f+'.webp'})}
 // painted pictures on/off (Settings)
