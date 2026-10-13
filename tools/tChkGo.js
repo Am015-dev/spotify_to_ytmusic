@@ -18,7 +18,7 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
  const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>{const T=window.__chk.GO[id][0];return[id,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));const seen={},same={};
  const pick=c=>all.filter(([id,cc])=>cc===c&&id.includes(FIL)).map(([id])=>id).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
  const run=async(c,ids)=>{for(const id of ids){const e0=errs.length;let said='';
-   const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id)}catch(e){said='EVAL '+String(e).slice(0,80)}
+   const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:60000,polling:500}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
    await p.waitForTimeout(c==='bx'?2500:1200);
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
    if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:spawnOnly?false:ok,spawnOnly,said,state:st.state,errs:errs.slice(e0)});
