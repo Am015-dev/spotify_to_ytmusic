@@ -24,3 +24,9 @@ Status: INCOMPLETE (10-minute slice). Raw data and script: `docs/perf_v90j/`.
 ## Next step
 Expose `window.__perf=()=>({i:renderer.info, n:...})` (one line) and re-run `perf.js` on a GPU machine, or compare `LDS.st` near/far tri counts
 (`__ld.lds.st`) in both versions. Quick A/B in v90j: `__ld.lds.off=1` (skips the per-frame LDS swap) or the `LDS_ab(1)` hook (old props).
+
+## perf-2 (13 Oct): triangle counts, hook `window.__perf` = renderer.info per rAF (autoReset off), added after `new THREE.WebGLRenderer(` in a test copy
+- Athens 852x393, 12 s after page load + GAS: v90j 191 calls / 1.154 M tris; v90j with `__ld.lds.off=1` 191 / 1.154 M; v90i 191 / 1.154 M (geometries 202 in all three).
+- Caveat: `RO.on` was false and `LDS.on.length` was 0 in all runs, so the page was in the menu/attract scene, not hub free roam. Clicking `#careerBtn`/`#roamBtn` did not enter the hub.
+- Attract/race scene: no difference between v90i and v90j, so the lag is not in that scene. The LDS props live only in the hub and are still unmeasured.
+- No fix applied (the >20 % rule was not met). Next: enter the hub via `hubEnter()` (script scope; expose it in the hook), then rerun `docs/perf_v90j/tris.js <port> ath|fra 0|1`.
