@@ -764,7 +764,7 @@ TB.map = function (opts) {
     /* track lane spaces */
     for (i = 0; i < N; i++) {
       var p = trackPt(i), five = i % 5 === 0;
-      s += '<g transform="translate(' + n2(p.x) + ' ' + n2(p.y) + ')"><rect x="-28" y="-28" width="56" height="56" rx="9" fill="' + (five ? 'url(#tb-gold)' : '#3a2616') + '" stroke="' + (five ? '#4a3208' : '#8a6a24') + '" stroke-width="' + (five ? 1.6 : 1.3) + '"/>' + (five ? '<rect x="-23" y="-23" width="46" height="46" rx="6" fill="none" stroke="#fff" stroke-opacity=".35"/><text y="10" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="28" fill="#2b1808">' + i + '</text>' : '<rect x="-23" y="-23" width="46" height="46" rx="6" fill="none" stroke="#000" stroke-opacity=".35"/><circle r="3.4" fill="#c9a24a" opacity=".75"/>') + '</g>';
+      s += '<g transform="translate(' + n2(p.x) + ' ' + n2(p.y) + ')"><rect x="-28" y="-28" width="56" height="56" rx="9" fill="' + (five ? 'url(#tb-gold)' : '#3a2616') + '" stroke="' + (five ? '#4a3208' : '#8a6a24') + '" stroke-width="' + (five ? 1.6 : 1.3) + '"/>' + (five ? '<rect x="-23" y="-23" width="46" height="46" rx="6" fill="none" stroke="#fff" stroke-opacity=".35"/><text y="13" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="36" fill="#2b1808">' + i + '</text>' : '<rect x="-23" y="-23" width="46" height="46" rx="6" fill="none" stroke="#000" stroke-opacity=".35"/><circle r="3.4" fill="#c9a24a" opacity=".75"/>') + '</g>';
     }
     L.static.innerHTML = s;
   }
@@ -856,7 +856,7 @@ TB.map = function (opts) {
   }
   function buildRound() {
     var r = S.round, bx = 156, by = 156, s = '', i, tot = Math.min(r.total, 12);
-    s += '<g transform="translate(' + bx + ' ' + by + ')" filter="url(#tb-shadow)">' + (window.TBP_SHIELD ? '<image href="media/ui-round-shield-c.webp" x="-40" y="-48" width="80" height="122" preserveAspectRatio="none"/>' : '<path d="M-54 -42 H54 V46 L0 68 L-54 46Z" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="3"/><path d="M-46 -34 H46 V40 L0 58 L-46 40Z" fill="url(#tb-c-gilded)" opacity=".9"/>') + '<text y="-17" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="15" letter-spacing="2.4" fill="#f1d98a">ROUND</text><text y="25" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="46" fill="#fff4cf" stroke="rgba(0,0,0,.55)" stroke-width="2" paint-order="stroke">' + r.n + '</text>';
+    s += '<g transform="translate(' + bx + ' ' + by + ')" filter="url(#tb-shadow)">' + (window.TBP_SHIELD ? '<image href="media/ui-round-shield-c.webp" x="-40" y="-48" width="80" height="122" preserveAspectRatio="none"/>' : '<path d="M-54 -42 H54 V46 L0 68 L-54 46Z" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="3"/><path d="M-46 -34 H46 V40 L0 58 L-46 40Z" fill="url(#tb-c-gilded)" opacity=".9"/>') + '<text y="-17" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="29" textLength="82" lengthAdjust="spacingAndGlyphs" fill="#f1d98a" stroke="#000" stroke-opacity=".55" stroke-width="2" paint-order="stroke">ROUND</text><text y="25" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="46" fill="#fff4cf" stroke="rgba(0,0,0,.55)" stroke-width="2" paint-order="stroke">' + r.n + '</text>';
     for (i = 0; i < tot; i++) { var px = -((tot - 1) * 7.4) / 2 + i * 7.4 + 0; s += '<circle cx="' + n2(px) + '" cy="41" r="2.6" fill="' + (i < r.n ? '#f1d98a' : '#00000066') + '" stroke="#f1d98a" stroke-width=".8"/>'; }
     s += '</g>';
     L.round.innerHTML = s;

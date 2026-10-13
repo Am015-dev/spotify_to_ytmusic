@@ -84,3 +84,9 @@ html.ph .ptile.bcard .art:has(.cpic){width:100%;height:50px;border-radius:6px;ov
 .bfly .btok.hp{background:url(media/icon-heart.webp) center/contain no-repeat;border:0;color:transparent;font-size:0}
 
 html.sk .gx-ibtn>span{padding:0}
+
+/* look check: chip numbers get a pale plate + darker ink so gold/green read on yellow (active) tiles; sized to fit the chip */
+html.ph .pchip .v{color:#6b4200}html.ph .pchip .e{color:#0f6b3a}
+html.ph .pchip span em{background:rgba(255,253,245,.9);border-radius:4px;padding:0 1px}
+html.ph-p header.gx-bar .pchip span{font-size:12px;gap:1px;letter-spacing:-.7px}
+html.ph-p header.gx-bar .pchip{padding-left:2px;padding-right:2px}

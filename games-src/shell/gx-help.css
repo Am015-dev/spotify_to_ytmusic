@@ -12,6 +12,8 @@
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
 .gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+/* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
+.gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px}
 .gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
@@ -58,5 +60,5 @@
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
-.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin-top:-8px;margin-bottom:-8px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
