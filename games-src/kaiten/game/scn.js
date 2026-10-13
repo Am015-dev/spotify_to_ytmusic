@@ -49,4 +49,15 @@
       { kind: 'fn', name: 'note goes away on release', fn: function () { var p = $('#peek'); return !p || p.hidden || 'note stuck after release'; } }
     ]
   });
+
+  GXS.add({
+    id: 'kk-help', name: 'Rules cards', ask: 'Can you read the rules card?', seed: 10, when: booted, group: 'UI',
+    setup: function () { return table(10).then(function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
 })();

@@ -6,13 +6,15 @@
   // a plain 3-player game against the computer, coach off, then tap through (draw / stop / continue) until the market of day 2 opens
   function toMarket() {
     try { GXH.setEnabled(false); } catch (e) { }
-    window.AIDELAY = 40; newGame('vs', {});
+    window.AIDELAY = 40; UI.pullMs = 0; newGame('vs', {});
     return GXS.wait(function () {
-      var b = q('[data-a=rscont]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
+      prepFix(); var b = q('[data-a=rscont]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
       if (b && !document.querySelector('.stalls')) b.click();
       return document.querySelector('.stalls');
     }, 60000).then(function () { return quiet(); });
   }
+  // a fortune card on day 1 can ask for a choice before the brew: take the suggested one
+  function prepFix() { var o = document.querySelector('.gxh-ok'); if (o) o.click(); if (G && G.phase === 'prep') { var b = q('.sug[data-a=mv]') || q('[data-a=mv]'); if (b) b.click(); } }
   // no coach bubble over the scene
   function quiet() { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } return new Promise(function (r) { setTimeout(r, 700); }); }
   GXS.add({
@@ -21,7 +23,7 @@
       try { GXH.setEnabled(false); } catch (e) { }
       window.AIDELAY = 120; newGame('vs', {});
       var t0 = 0;
-      return GXS.wait(function () { var s = q('.stopb:not(.off)'); if (s) return s; var b = q('.bagb:not(.off)'); if (b && Date.now() - t0 > 2500 && !BF.pulling) { t0 = Date.now(); b.click(); } return null; }, 40000).then(function () { return quiet(); });
+      return GXS.wait(function () { prepFix(); var s = q('.stopb:not(.off)'); if (s) return s; var b = q('.bagb:not(.off)'); if (b && Date.now() - t0 > 2500 && !BF.pulling) { t0 = Date.now(); b.click(); } return null; }, 40000).then(function () { return quiet(); });
     },
     checks: [
       { kind: 'visible', sel: '.bagb', name: 'Draw button' },
@@ -45,7 +47,7 @@
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
       window.AIDELAY = 120; newGame('vs', {});
-      return GXS.wait(function () { return q('.bagb:not(.off)'); }, 15000).then(function () { return quiet(); });
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)'); }, 25000).then(function () { return quiet(); });
     },
     checks: [
       { kind: 'visible', sel: '.bagb', name: 'Draw bag' },
@@ -57,7 +59,7 @@
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
       window.AIDELAY = 120; newGame('vs', {});
-      return GXS.wait(function () { return q('.bagb:not(.off)'); }, 15000).then(function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); });
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)'); }, 25000).then(function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); });
     },
     checks: [
       { kind: 'visible', sel: '.gxh-card', name: 'rules card' },

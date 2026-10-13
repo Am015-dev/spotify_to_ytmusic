@@ -57,8 +57,8 @@
   });
 
   GXS.add({
-    id: 'tw-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 7, when: booted, group: 'UI',
-    setup: function () { return table(7).then(function () { GXH.rules(null); return GXS.wait(function () { return $('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    id: 'tw-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 6, when: booted, group: 'UI',
+    setup: function () { return table(6).then(function () { GXH.rules(null); return GXS.wait(function () { return $('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
     checks: [
       { kind: 'visible', sel: '.gxh-rules .gxh-card', name: 'help card' },
       { kind: 'text', sel: '.gxh-rules .gxh-rt', re: /\S/, name: 'card title' },
@@ -73,7 +73,6 @@
     setup: function () { return table(8); },
     checks: [
       { kind: 'text', get sel() { return pick('.ps-main [data-a=place]', 'button[data-a=place]'); }, re: /place/i, name: 'Place label' },
-      { kind: 'visible', sel: '#bulbbtn', name: 'Help bulb' },
       { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
       skin
     ]

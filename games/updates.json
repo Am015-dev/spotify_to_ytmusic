@@ -33,7 +33,63 @@
    "Star and bolt numbers on the player chips are darker on a pale plate and no longer clipped",
    "The Got it button on help bubbles is a bigger tap target"
   ],
-  "check": "Start a game and look at the chips at the top: star and bolt numbers"
+  "check": "Start a game and look at the chips at the top: star and bolt numbers",
+  "scn": [
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   "cc-dice-end",
+   "cc-market",
+   "cc-smash",
+   "cc-smash",
+   "cc-market",
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -70,7 +126,19 @@
    "The board sea is painted water tiles with a painted brass compass rose",
    "Brass-and-teal buttons and bar"
   ],
-  "check": "Start a game: look at the water under the tiles and the compass in the middle."
+  "check": "Start a game: look at the water under the tiles and the compass in the middle.",
+  "scn": [
+   "tw-board",
+   "tw-buttons",
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -133,7 +201,35 @@
    "Brass badges for hull, shields, focus, evade and lock",
    "Painted ship art on pilot cards; painted star-chart arena floor"
   ],
-  "check": "Start a battle: look at the buttons, the dial cards and the floor under the grid."
+  "check": "Start a battle: look at the buttons, the dial cards and the floor under the grid.",
+  "scn": [
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -158,7 +254,27 @@
    "Wax seal strength plates on the map and a painted round shield",
    "Buttons, bars and menus use the painted vellum kit"
   ],
-  "check": "Open a rival's chip, then play a clash"
+  "check": "Open a rival's chip, then play a clash",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -171,7 +287,31 @@
    "Driftwood buttons, bar and panels",
    "Painted action and resource icons (food, wood, fur, build, hunt...)"
   ],
-  "check": "Start a game: look at the island, then open Camp and the plan list."
+  "check": "Start a game: look at the island, then open Camp and the plan list.",
+  "scn": [
+   "si-board",
+   "si-board",
+   "si-board",
+   "si-board",
+   "si-board",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -308,7 +448,35 @@
    "Bigger rival strip with larger bid cards",
    "The hand no longer disappears during the Great Road step"
   ],
-  "check": "Open Thornbound on a PC and bid a card"
+  "check": "Open Thornbound on a PC and bid a card",
+  "scn": [
+   "tb-board",
+   "tb-board",
+   "tb-pc-hand",
+   "tb-pc-hand",
+   "tb-rivals",
+   "tb-pc-hand",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -376,7 +544,23 @@
    "New title and end art, portraits",
    "Music per screen with a Music picker"
   ],
-  "check": "Start a game and look at the table."
+  "check": "Start a game and look at the table.",
+  "scn": [
+   "tw-board",
+   "tw-board",
+   "tw-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -406,7 +590,23 @@
    "New bench and mat",
    "Shorter menu music loops"
   ],
-  "check": "Start a game and look at the places and events."
+  "check": "Start a game and look at the places and events.",
+  "scn": [
+   "hb-board",
+   "hb-board",
+   "hb-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -417,7 +617,23 @@
    "Shorter menu music loops",
    "New empty belt look"
   ],
-  "check": "Finish a round and watch the reveal."
+  "check": "Finish a round and watch the reveal.",
+  "scn": [
+   "kk-board",
+   "kk-help",
+   "kk-board",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -429,7 +645,27 @@
    "Portrait title screen, end art and portraits",
    "Music with a Music picker"
   ],
-  "check": "Start a dive and look at the cards."
+  "check": "Start a dive and look at the cards.",
+  "scn": [
+   "ld-board",
+   "ld-board",
+   "ld-board",
+   "ld-help",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -610,7 +846,23 @@
    "Title and end screens",
    "Skipping the tutorial now counts as seen"
   ],
-  "check": "Look at the new tables."
+  "check": "Look at the new tables.",
+  "scn": [
+   "tw-zoom",
+   "tw-board",
+   "tw-board",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -634,7 +886,27 @@
    "Hand shows picture, name, cost and points in a scrolling row",
    "Hand toggle to hide or show the row"
   ],
-  "check": "Play a card from the hand row."
+  "check": "Play a card from the hand row.",
+  "scn": [
+   "hb-zoom",
+   "hb-help",
+   "hb-handtoggle",
+   "hb-handtoggle",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -647,7 +919,31 @@
    "Painted map for desktop and phone",
    "Crowned-stag card back option"
   ],
-  "check": "Hold a card in your hand."
+  "check": "Hold a card in your hand.",
+  "scn": [
+   "tb-board",
+   "tb-pc-hand",
+   "tb-zoom",
+   "tb-board",
+   "tb-board",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -660,7 +956,31 @@
    "Skipping the story prologue opens the chapter map",
    "Portrait phone title and table art"
   ],
-  "check": "Play a round and watch the belt."
+  "check": "Play a round and watch the belt.",
+  "scn": [
+   "kk-board",
+   "kk-board",
+   "kk-help",
+   "story-scene",
+   "kk-board",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -669,7 +989,15 @@
   "items": [
    "Skipping the tutorial now counts as seen"
   ],
-  "check": "Skip the tutorial, then open Story."
+  "check": "Skip the tutorial, then open Story.",
+  "scn": [
+   "ld-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -850,7 +1178,15 @@
   "items": [
    "Guided tutorial as Chapter 0"
   ],
-  "check": "Start the tutorial."
+  "check": "Start the tutorial.",
+  "scn": [
+   "story-scene",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -862,7 +1198,27 @@
    "Woodland tables, title and end art",
    "New music with a Music picker"
   ],
-  "check": "Start the tutorial."
+  "check": "Start the tutorial.",
+  "scn": [
+   "hb-help",
+   "hb-zoom",
+   "hb-board",
+   "hb-help",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -874,7 +1230,27 @@
    "Music with a Music picker",
    "Card list page with pictures"
   ],
-  "check": "Open the Card list page."
+  "check": "Open the Card list page.",
+  "scn": [
+   "tb-board",
+   "tb-board",
+   "tb-board",
+   "tb-help",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -883,7 +1259,15 @@
   "items": [
    "Guided tutorial as Chapter 0"
   ],
-  "check": "Start the tutorial."
+  "check": "Start the tutorial.",
+  "scn": [
+   "kk-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -892,7 +1276,15 @@
   "items": [
    "Guided tutorial replaces the old Training dive"
   ],
-  "check": "Start the tutorial from Story."
+  "check": "Start the tutorial from Story.",
+  "scn": [
+   "ld-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -1058,7 +1450,15 @@
   "items": [
    "Lightbulb hint with reason, first-time tips, rules cards, Tips switch"
   ],
-  "check": "Tap the lightbulb in a game."
+  "check": "Tap the lightbulb in a game.",
+  "scn": [
+   "hb-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-07",
@@ -1077,7 +1477,15 @@
   "items": [
    "Lightbulb, coach bubbles and rules cards"
   ],
-  "check": "Tap the lightbulb in a game."
+  "check": "Tap the lightbulb in a game.",
+  "scn": [
+   "kk-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-07",
@@ -1086,7 +1494,15 @@
   "items": [
    "Lightbulb, first-time coach bubbles, rules cards, Tips switch"
   ],
-  "check": "Tap the lightbulb in a game."
+  "check": "Tap the lightbulb in a game.",
+  "scn": [
+   "ld-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-07",
