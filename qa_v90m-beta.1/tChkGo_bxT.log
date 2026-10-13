@@ -1,0 +1,5 @@
+BOOT fra 20.6 s
+PASS bx bxT/bx-t-cliff 2.6s · cliff run
+PASS bx bxT/bx-t-city 2.6s · two-level city
+PASS bx bxT/bx-t-canyon 2.5s · canyon split
+{"pass":3,"total":3,"fail":[],"boots":{"fra":[20.591]},"errors":0,"firstErrors":[],"secs":37}
