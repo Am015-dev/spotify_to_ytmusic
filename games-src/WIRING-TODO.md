@@ -153,47 +153,7 @@ WIRED and live 13 Oct 2026 (all 2D files: per-colour pieces, icons, score pill, 
 
 ## shipwreck-isle
 
-3D: sw-carpenter, sw-cook, sw-explorer, sw-fire, sw-friday, sw-palisade, sw-palm-a, sw-palm-b, sw-palm-c, sw-raft, sw-shelter
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `hex-beach` | a top-down hexagon-shaped tile of white-sand beach with shells and a surf edge, hand-painted, soft light, no t |
-| Wave 3 Wave 3 | `hex-fog-a` | a top-down hexagon-shaped tile of thick dark volcanic mist, soft rim, centre calm, seamless, no text |
-| Wave 3 Wave 3 | `hex-fog-b` | a top-down hexagon-shaped tile of swirling slate-grey cloud, soft rim, centre calm, seamless, no text |
-| Wave 3 Wave 3 | `hex-fog-c` | a top-down hexagon-shaped tile of drifting grey sea fog with thin wisps, soft rim, centre calm, seamless, no t |
-| Wave 3 Wave 3 | `hex-hills` | a top-down hexagon-shaped tile of rolling green hills with scrub, hand-painted, soft light, no text |
-| Wave 3 Wave 3 | `hex-mountains` | a top-down hexagon-shaped tile of grey rocky mountain peaks, hand-painted, soft light, no text |
-| Wave 3 Wave 3 | `hex-plains` | a top-down hexagon-shaped tile of open grassy plains with wildflowers, hand-painted, soft light, no text |
-| Wave 3 Wave 3 | `hex-river` | a top-down hexagon-shaped tile of a winding river between green banks, hand-painted, soft light, no text |
-| Wave 3 Wave 3 | `icon-act-build` | a small hand-painted icon of a hammer resting on a plank in a wood-and-rope style, bold, readable at 28 px, si |
-| Wave 3 Wave 3 | `icon-act-camp` | a small hand-painted icon of a tidy camp bedroll beside a lantern in a wood-and-rope style, bold, readable at  |
-| Wave 3 Wave 3 | `icon-act-explore` | a small hand-painted icon of a rolled map with a spyglass in a wood-and-rope style, bold, readable at 28 px, s |
-| Wave 3 Wave 3 | `icon-act-gather` | a small hand-painted icon of a woven basket with coconuts and twigs in a wood-and-rope style, bold, readable a |
-| Wave 3 Wave 3 | `icon-act-hunt` | a small hand-painted icon of a wooden spear crossed with a bow in a wood-and-rope style, bold, readable at 28  |
-| Wave 3 Wave 3 | `icon-act-rest` | a small hand-painted icon of a hammock slung between two palm stumps in a wood-and-rope style, bold, readable  |
-| Wave 3 Wave 3 | `icon-act-threat` | a small hand-painted icon of a cracked wooden shield with a beast claw mark in a wood-and-rope style, bold, re |
-| Wave 3 Wave 3 | `icon-res-food` | a small hand-painted icon of a coconut and a fish, bold, readable at 24 px, single object, centred, plain flat |
-| Wave 3 Wave 3 | `icon-res-fur` | a small hand-painted icon of a folded animal pelt, bold, readable at 24 px, single object, centred, plain flat |
-| Wave 3 Wave 3 | `icon-res-palisade` | a small hand-painted icon of a short palisade of sharpened stakes, bold, readable at 24 px, single object, cen |
-| Wave 3 Wave 3 | `icon-res-pfood` | a small hand-painted icon of strips of dried fish hanging on a string, bold, readable at 24 px, single object, |
-| Wave 3 Wave 3 | `icon-res-roof` | a small hand-painted icon of a thatched palm-leaf roof, bold, readable at 24 px, single object, centred, plain |
-| Wave 3 Wave 3 | `icon-res-shelter` | a small hand-painted icon of a small lean-to shelter, bold, readable at 24 px, single object, centred, plain f |
-| Wave 3 Wave 3 | `icon-res-weapon` | a small hand-painted icon of a stone-tipped spear, bold, readable at 24 px, single object, centred, plain flat |
-| Wave 3 Wave 3 | `icon-res-wood` | a small hand-painted icon of a bundle of logs tied with rope, bold, readable at 24 px, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of sun-bleached sailcloth with a rope-lashed driftwood outline and a tiny cur |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, sand-cream with a rope-las |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, coral-orange with a rope-l |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, jungle-green with a rope-l |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of weathered driftwood planks with a rope-lashed driftwood edge line, seamless left to right, empty, n |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round rope-lashed driftwood button with a turquoise ring, centre empty, single object, centred, plain  |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round rope-lashed driftwood medallion with a turquoise ring, centre blank, larger with a small crown on top, |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round rope-lashed driftwood medallion with a turquoise ring, centre blank, with a small laurel at the bottom |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round rope-lashed driftwood medallion with a turquoise ring, centre blank, dull and darkened with a small pa |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round rope-lashed driftwood medallion with a turquoise ring, centre blank, bright and polished, single objec |
-| Wave 4 Wave 4 kit | `ui-panel` | a sun-bleached sailcloth panel with ornate rope-lashed driftwood corners and a thin rope-lashed driftwood bord |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of weathered driftwood planks, seamless left to right, empty, no text |
+WIRED and live 13 Oct 2026: fog hexes a/b (fog-c unused: it reads as land), terrain hexes beach/plains/river/hills/mountains, action and resource icons (food, dry food, wood, fur), driftwood kit. Not wired: icon-res-palisade/roof/shelter/weapon, hex-jungle-style extras. 3D models: other worker.
 
 ## doorkick-dungeon
 
