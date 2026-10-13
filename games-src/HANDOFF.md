@@ -141,6 +141,13 @@ Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist
 - Note: export `NODE_PATH=/opt/node-tools/node_modules` before build-all (the look gate crashes otherwise).
 - Doorkick Dungeon: live (hand/level icons, bubble tail, 3D winner heroes; scenarios dk-art, dk-tips, dk-status-line).
 
+## Shipwreck Isle: last paintings wired (blocked deploy gate)
+
+- Wired `ui-bubble-tail` (island label tail, `html.sk .tl:not(.far)::after` in games-src/rc/skin.css) and `ui-row` (`html.sk .row`, `.row.has`, `.row:hover`).
+- Deploy NOT done: `build-all.py --deploy shipwreck-isle` fails scenario si-art: "text under 11px" on the phase strip label "Event" (9.6px, ui.js PHASES). The same failure reproduces on the commit before this change, so it is pre-existing.
+- Next: raise the phase strip label to 11px or more (shared phase-bar style), then re-run the deploy.
+
 ## Update 13 Oct (late): Final Approach is live; Short Fuse blocked only by look-check
 Final Approach deployed (GO `fa-art`, LAB 24/24, look ok). Shelf checklist entries must use the shelf ids (`approach`, `shortfuse`), not the slugs, or the LAB shelf check says "missing".
 Short Fuse: GO scenarios 6/6 and LAB 24/24 pass; `--deploy` stops at look-check with NEW severe findings that are not from the art wiring: `plates|div.tile.crew` (the crew tile frame `wire-tile-frame-c.webp` is drawn stretched, box 56x73 vs picture 100x240) and `contrast|div.gxc-sc-name` (story-scene speaker name). Fix the tile frame slice/size in `games-src/short-fuse/game/skin.css` and the speaker-name colour, then `build-all.py --deploy short-fuse` (its art is already wired and committed).
+Short Fuse, after merging the build-all fix: every scenario (all 6, not only `sf-art`) now fails the universal "text under 11px" check: `"1"` at 7px in `<i.cn12>` (the small wire-number labels on the board). Together with the look-check findings above, Short Fuse needs a readability pass (wire number labels >= 11px, crew tile frame slice, speaker-name contrast) before it can deploy; its art wiring and `sf-art` are already committed.

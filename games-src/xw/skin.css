@@ -26,3 +26,8 @@ html.sk #radio:not(:empty){background:url(media/ui-row.webp) center/100% 100% no
 /* dark theme + cream button plates: dark ink on the plate (look check: "Skip" and the small lines under battle buttons were light on cream) */
 html.sk .btn:not(.sm):not(.primary):not(.armed) small{color:#3a4258}
 html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{color:#161a2a;text-shadow:none}
+/* coach bubble pointer: the painted speech-bubble tail replaces the drawn diamond; same 12 px box and place, no 45-degree turn */
+html.sk-tail .gxh-arr{width:12px;height:12px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-top .gxh-arr{transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{transform:rotate(-90deg)}
