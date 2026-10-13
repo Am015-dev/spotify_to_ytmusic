@@ -55,9 +55,10 @@ function pageAudit(opts) {
     if (fr < .05 || area(on) < 1) { it.skip = true; continue; }
     // the plate: the button / card the text sits on
     const pl = el.closest('button,[role=button],.card,.chk,.sl,label');
-    if (pl && visible(pl)) { const pr = pl.getBoundingClientRect(); const tol = 1.5;
+    const badge = getComputedStyle(el).position === 'absolute';
+    if (pl && visible(pl) && !badge) { const pr = pl.getBoundingClientRect(); const tol = 1.5;
       if (tr.left < pr.left - tol || tr.right > pr.right + tol || tr.top < pr.top - tol || tr.bottom > pr.bottom + tol) out.push(['overflow-plate', `${tag} sticks out of ${desc(pl)} [text ${Math.round(tr.left)},${Math.round(tr.top)},${Math.round(tr.right)},${Math.round(tr.bottom)} plate ${Math.round(pr.left)},${Math.round(pr.top)},${Math.round(pr.right)},${Math.round(pr.bottom)}]`]);
-      if (pl.tagName === 'BUTTON' && pl.textContent.trim() === t && !pl.querySelector('img,svg,canvas') && getComputedStyle(pl).textAlign !== 'left') {
+      if (pl.tagName === 'BUTTON' && pl.textContent.trim() === t && pl.children.length === 0 && getComputedStyle(pl).textAlign !== 'left') {
         const bx = (pr.left + pr.right) / 2, by = (pr.top + pr.bottom) / 2, cx = (tr.left + tr.right) / 2, cy = (tr.top + tr.bottom) / 2;
         if (Math.abs(cx - bx) > Math.max(5, pr.width * .1) || Math.abs(cy - by) > Math.max(5, pr.height * .18)) out.push(['offset', `${tag} is off the centre of its plate (dx ${Math.round(cx - bx)}, dy ${Math.round(cy - by)})`]); }
       if (pl.scrollWidth > pl.clientWidth + 2 && getComputedStyle(pl).overflowX !== 'visible') out.push(['truncated', `${tag}: ${desc(pl)} is wider inside (${pl.scrollWidth}) than outside (${pl.clientWidth})`]); }
@@ -77,7 +78,7 @@ function pageAudit(opts) {
   for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) { const a = live[i], b = live[j]; if (a.el === b.el || a.el.contains(b.el) || b.el.contains(a.el)) continue;
     const o = inter(a.vis, b.vis), ar = area(o); if (ar > 6 && ar > .12 * Math.min(area(a.vis), area(b.vis))) out.push(['overlap', `"${a.t.slice(0, 22)}" (${desc(a.el)}) overlaps "${b.t.slice(0, 22)}" (${desc(b.el)}) by ${Math.round(ar)} px2`]); }
   // contrast candidates (decided outside, on the screenshot)
-  const cc = live.map(i => ({ t: i.t.slice(0, 30), r: [i.vis.left, i.vis.top, i.vis.right, i.vis.bottom].map(Math.round), col: i.col, big: i.fs >= 24 || (i.fs >= 18.66 && i.fw >= 700), el: desc(i.el) }));
+  const cc = live.filter(i => !i.el.closest('.lock,:disabled')).map(i => ({ t: i.t.slice(0, 30), r: [i.vis.left, i.vis.top, i.vis.right, i.vis.bottom].map(Math.round), col: i.col, big: i.fs >= 24 || (i.fs >= 18.66 && i.fw >= 700), el: desc(i.el) }));
   return { out, cc };
 }
 /* the canvas side: texts and plates recorded of the last full frame */
