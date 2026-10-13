@@ -1,6 +1,19 @@
 [
  {
   "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Readable map labels",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger"
+  ],
+  "check": "Open a game: read ROUND and the region names on the map"
+ },
+ {
+  "date": "2026-10-13",
   "game": "tidewake",
   "title": "Readable top-bar labels",
   "items": [
@@ -195,18 +208,6 @@
    "Buttons, top bar and menus use the brass kit"
   ],
   "check": "Start a dive and look at the table"
- },
- {
-  "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Painted court kit",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit"
-  ],
-  "check": "Open a rival's chip, then play a clash"
  },
  {
   "date": "2026-10-13",

@@ -108,16 +108,15 @@
   }
  },
  "thornbound": {
-  "severe": 3,
-  "warn": 8,
+  "severe": 2,
+  "warn": 7,
   "severeKeys": [
    "size|g.tb-m-round > g > text",
-   "size|g.tb-m-static > g > text",
    "size|g.tbx-pan > g > text"
   ],
   "counts": {
-   "size": 5,
-   "images": 5,
+   "size": 4,
+   "images": 4,
    "button": 1,
    "art": 0
   }
