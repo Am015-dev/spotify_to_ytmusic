@@ -80,7 +80,7 @@ const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};
   if(s.item&&useAt>0&&s.raceT>=useAt){useAt=-1;if(await tap(phone?'#tF':'#tF')||(!phone&&(await p.keyboard.press('Space'),1))){used++;if(shots.item<1){shots.item++;await tick(8);await shot('item_use')}}}
   // choose a line like a person: an item box ahead, a marked shortcut entry ahead (rts from the game's own signs), else hold
   if(s.raceT>=tgtT){tgtT=s.raceT+.35+rng()*.3;let t=null;
-   if(process.env.NOSC){}else if(s.rts&&s.rts.in&&Math.abs(s.x)>Math.abs(s.rts.want)-12)t=null;else if(s.rts&&s.rts.want!=null)t=s.rts.want;else if(!s.item&&s.pads.length&&s.pads[0][0]<90){t=s.pads[0][1]}else t=Math.max(-(s.M-3),Math.min(s.M-3,s.ka*3200))
+   if(process.env.NOSC){}else if(s.rts&&s.rts.in&&Math.abs(s.x-s.rts.want)<3)t=null;/* track-2: hold the lane centre (was: stop 12 m short, then drift onto the island) */else if(s.rts&&s.rts.want!=null)t=s.rts.want;else if(!s.item&&s.pads.length&&s.pads[0][0]<90){t=s.pads[0][1]}else t=Math.max(-(s.M-3),Math.min(s.M-3,s.ka*3200))
    wob=(rng()-.5)*2*Math.min(3,s.W*.08);react.push(t==null?null:t+wob)}
   const tgt=react.length>1?react.shift():react[0];
   if(process.env.DBG&&s.rts)console.log('DBG',s.raceT.toFixed(1),JSON.stringify(s.rts),'x',s.x.toFixed(1),'tgt',tgt==null?null:tgt.toFixed(1),'B',s.B&&s.B.map(v=>v.toFixed(1)),s.terr,Math.round(s.v*3.6),'yaw',s.yaw.toFixed(3),'beta',s.beta.toFixed(3),'hold',s.hold&&s.hold.toFixed(1),'k',s.k.toFixed(4));
