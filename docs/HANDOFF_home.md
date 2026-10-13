@@ -79,3 +79,5 @@ Branch rebased on alex/od-models v90j (2ca7c8f); `git diff origin/alex/od-models
 Integrator: build-11 (session_01FYerWDe4eDfpw7Jfrm9mtb).
 Version label: NOT v90k (that is build-11's builder + STUNT CUP). The changelog entry and the 4 checklist items carry the placeholder 'vHOME'; build-11 sets the real
 number at integration (after v90l). Status 2026-10-13 ~15:50: REVIEW sent for 861a5ce9 (label fix on top). Coordinator OK'd the grid. Next: on PASS, hand to build-11, then stop.
+Final: reviewer PASS on 861a5ce9 (80cd2ea6 = label only). Condition: ships only on top of build-11's fixed v90j (upside-down Athens start), with an Athens start
+shot + tHome fra/ath re-run after the merge. Handed to build-11 (session_01FYerWDe4eDfpw7Jfrm9mtb) with commands; coordinator sent READY. home-2 stopped.
