@@ -77,12 +77,12 @@
       window.AIDELAY = 120; newGame('vs', {});
       return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)') || q('.stopb:not(.off)'); }, 40000).then(function () {
         quiet(); var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
-        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap the bag</div>'; document.body.appendChild(b); return new Promise(function (r) { setTimeout(r, 400); });
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap the bag</div>'; document.body.appendChild(b); var m = document.createElement('div'); m.className = 'meter lo'; m.id = 'artmeter'; m.style.cssText = 'position:fixed;left:8px;top:120px;width:240px;z-index:99'; m.innerHTML = '<span class="mcells"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><b class="mboom"></b></span>'; document.body.appendChild(m); return new Promise(function (r) { setTimeout(r, 400); });
       });
     },
     checks: [
       art('Draw dish painted', '.bagwrap', 'btn-draw-c', null, 'sk-draw'),
-      art('chip track painted', '#acts .mcells', 'ui-chipbar', null, 'sk-chipbar'),
+      art('chip track painted', '#artmeter .mcells', 'ui-chipbar', null, 'sk-chipbar'),
       art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
       { kind: 'text', sel: '#arttail .gxh-tx', re: /bag/i, name: 'bubble text readable' },
       { kind: 'fn', name: 'settings row painted', fn: function () { GX.show('setd'); var e = document.querySelector('#setbody .mrow'); if (!e) return 'no row'; var r = e.getBoundingClientRect(), c = getComputedStyle(e, '::before'); var ok = r.width > 4 && c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0; try { GX.close(); } catch (x) { } return ok || 'ui-row-c not painted'; } }

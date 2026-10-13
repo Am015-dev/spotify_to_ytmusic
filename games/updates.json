@@ -1,6 +1,192 @@
 [
  {
   "date": "2026-10-13",
+  "game": "sunglaze",
+  "title": "Painted art wired",
+  "items": [
+   "Painted terracotta kiln plates and a wooden centre tray",
+   "Carved rack dishes, clay floor dishes and plaster wall recesses",
+   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels",
+   "Rack tray, bubble tail, rows"
+  ],
+  "check": "Five-dish rack is a wooden tray",
+  "scn": [
+   "sg-board",
+   "sg-board",
+   "sg-buttons",
+   "sg-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   "Does the rack look like a tray?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "cauldron-fair",
+  "title": "Painted art wired",
+  "items": [
+   "Draw dish, chip track, bubble tail, rows"
+  ],
+  "check": "Draw bag and chip track look painted",
+  "scn": [
+   "cf-art"
+  ],
+  "ask": [
+   "Do the bag and chip track look painted?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "tidewake",
+  "title": "Painted art wired",
+  "items": [
+   "The board sea is painted water tiles with a painted brass compass rose",
+   "Brass-and-teal buttons and bar",
+   "Board frame, brass rings, luggage tag, bubble tail, rows"
+  ],
+  "check": "Board is framed, labels readable",
+  "scn": [
+   "tw-board",
+   "tw-buttons",
+   "tw-art"
+  ],
+  "ask": [
+   null,
+   null,
+   "Is the board framed?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "crown-city-smash",
+  "title": "Painted art wired",
+  "items": [
+   "Crown icon, chips, dice tray, pink/yellow/ghost buttons, bubble tail"
+  ],
+  "check": "Top chips, dice tray and crown look painted",
+  "scn": [
+   "cc-art"
+  ],
+  "ask": [
+   "Do the chips and dice tray look painted?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Painted menu row and tail",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane",
+   "Top bar, menus and buttons are now painted cockpit panels",
+   "Briefing is a real clipboard with painted check boxes",
+   "Weather and time-of-day badges on the briefing",
+   "Radio phrase buttons and the Roll plate are painted",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   "fa-board",
+   "fa-board",
+   "fa-buttons",
+   "fa-zoom",
+   "fa-zoom",
+   "fa-buttons",
+   "fa-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Painted art wired",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit",
+   "Menu tutorial row and speech tail are painted"
+  ],
+  "check": "Open Settings: Tutorial is a painted strip",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-buttons",
+   "sf-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Painted art wired",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "kk-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shipwreck-isle",
+  "title": "Painted art wired",
+  "items": [
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm"
+  ],
+  "check": "Do the camp icons and 3D camp look painted?",
+  "scn": [
+   "si-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "nebula-aces",
   "title": "Painted art wired",
   "items": [
@@ -223,61 +409,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: painted workshop kit",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big",
-   "Wire racks, name plates and equipment cards are painted",
-   "A rope fuse with a spark and a painted bomb",
-   "Top bar, menus and buttons use the workshop kit"
-  ],
-  "check": "Look at the table and the fuse strip",
-  "scn": [
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: painted chef tags and icons",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals",
-   "Each chef has a painted chopstick-sleeve name tag",
-   "Stars, plates, custard cups and Fire Paste are painted icons",
-   "Top bar, menus and buttons use the lacquer kit"
-  ],
-  "check": "Look under each chef on the table"
- },
- {
-  "date": "2026-10-13",
   "game": "shelf",
   "title": "Game versions and status page",
   "items": [
@@ -286,75 +417,6 @@
    "Asset viewer has a new Games tab with the same numbers"
   ],
   "check": "Open the shelf, then Status (status.html) and the Games tab in the asset viewer."
- },
- {
-  "date": "2026-10-13",
-  "game": "sunglaze",
-  "title": "Painted kilns and rack for Sunglaze",
-  "items": [
-   "Painted terracotta kiln plates and a wooden centre tray",
-   "Carved rack dishes, clay floor dishes and plaster wall recesses",
-   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
-  ],
-  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack.",
-  "scn": [
-   "sg-board",
-   "sg-board",
-   "sg-buttons",
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "final-approach",
-  "title": "Painted cockpit kit",
-  "items": [
-   "The landing and the crash now show a detailed 3D airliner",
-   "Low graphics keeps the old painted plane",
-   "Top bar, menus and buttons are now painted cockpit panels",
-   "Briefing is a real clipboard with painted check boxes",
-   "Weather and time-of-day badges on the briefing",
-   "Radio phrase buttons and the Roll plate are painted"
-  ],
-  "check": "Open Flight and read the briefing; tap Roll",
-  "scn": [
-   "fa-board",
-   "fa-board",
-   "fa-buttons",
-   "fa-zoom",
-   "fa-zoom",
-   "fa-buttons",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-13",
@@ -454,28 +516,6 @@
    null,
    null,
    null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "tidewake",
-  "title": "Painted sea for Tidewake",
-  "items": [
-   "The board sea is painted water tiles with a painted brass compass rose",
-   "Brass-and-teal buttons and bar"
-  ],
-  "check": "Start a game: look at the water under the tiles and the compass in the middle.",
-  "scn": [
-   "tw-board",
-   "tw-buttons",
-   null,
-   null
-  ],
-  "ask": [
    null,
    null,
    null,

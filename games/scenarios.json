@@ -29,6 +29,78 @@
    "group": "UI"
   },
   {
+   "id": "cf-art",
+   "name": "Painted art: bag, chip track, tail, rows",
+   "ask": "Do the bag, chip track and rows look painted?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
+ "crown-city-smash": [
+  {
+   "id": "cc-smash",
+   "name": "SMASH! over the city",
+   "ask": "Tap SMASH! over the city",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "cc-market",
+   "name": "Cards for sale on the board",
+   "ask": "Hold a card, then tap it",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "cc-dice-end",
+   "name": "Dice and rolling on the board",
+   "ask": "Keep a die, roll, then smash",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "cc-end-turn",
+   "name": "End turn from the board",
+   "ask": "Tap End turn on the board",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "cc-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "cc-zoom",
+   "name": "Big card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "cc-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "cc-art",
+   "name": "Painted art: chips, tray, crown, buttons, tail",
+   "ask": "Do the chips, dice tray and crown look painted?",
+   "sizes": "phone",
+   "group": "UI"
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -333,6 +405,43 @@
    "id": "sq-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
+ "shipwreck-isle": [
+  {
+   "id": "si-board",
+   "name": "Start of game board",
+   "ask": "Is the island clear with glowing places?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "si-art",
+   "name": "Camp icons and 3D campfire, raft, palm",
+   "ask": "Do camp icons and models look painted?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "si-zoom",
+   "name": "Card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "phone",
+   "group": "Cards"
+  },
+  {
+   "id": "si-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
    "sizes": "all",
    "group": "UI"
   },

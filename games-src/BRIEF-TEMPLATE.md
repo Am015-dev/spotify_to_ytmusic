@@ -17,6 +17,9 @@ Rules
 - Before every push: git fetch origin alex/brave-carson-rbpmlk && git merge. `git add` explicit paths only, check
   `git diff --cached --stat` before committing (other sessions share this branch).
 - If a command is blocked, stop and tell the owner.
+- NEVER wait for an answer (owner, 13 Oct 2026: workers sat blocked for ~15-20 min). If a check fails or you're unsure: fix the real
+  cause (max 20 min), never raise limits or skip checks; if it still fails, commit, write what fails and where in HANDOFF.md,
+  move on to your next game, and mention it in your report.
 
 Read less (this is the main cost lever)
 - Start with `games-src/scripts/find.sh --maps` and open ONLY the game's MODULES.md. Then `games-src/scripts/find.sh <symbol|text> <game>`.
@@ -36,7 +39,8 @@ Report (under 150 words, once): per game before -> after numbers, scenario ids, 
 ```
 
 Orchestrator notes
-- One session per game batch, at most 10 cloud sessions at a time. Model: Haiku for chores (status refresh, copying, converting, repeating
+- ONE session per game, at most 15 at a time. Title starts with the group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) + game; tag it
+  group:<name> (set_session_tags); add it to the groups table in HANDOFF.md. Model: Haiku for chores (status refresh, copying, converting, repeating
   an already-written fix, checks that only report), Sonnet for code/fixes/tests. Never the main model for workers.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
 - If a worker reports it is out of context, start a new session with this template plus its HANDOFF note.
