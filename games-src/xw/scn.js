@@ -115,4 +115,15 @@
       { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
     ]
   });
+
+  /* Coach bubble: its pointer is the painted speech-bubble tail (ui-bubble-tail), same 12 px size as before */
+  GXS.add({
+    id: 'nb-tail', name: 'Coach bubble has the painted tail', ask: 'Does the speech bubble have its painted tail?', seed: 9, group: 'UI',
+    when: function () { return typeof GXH !== 'undefined' && GXS.defs.some(function (x) { return x.id === 'nb-board' && (!x.when || x.when()); }); },
+    setup: function () { var b = GXS.defs.filter(function (x) { return x.id === 'nb-board'; })[0]; return Promise.resolve(b.setup()).then(function () { return GXS.wait(function () { return document.querySelector('.gxh-bub.on .gxh-arr'); }, 8000); }); },
+    checks: [
+      { kind: 'fn', name: 'bubble pointer wears the painted tail', fn: function () { var a = document.querySelector('.gxh-bub.on .gxh-arr'); if (!a) return 'no coach bubble'; var cs = getComputedStyle(a); return (/ui-bubble-tail/.test(cs.backgroundImage) && a.offsetWidth === 12 && a.offsetHeight === 12) || 'tail missing or not 12 px: ' + cs.backgroundImage + ' ' + a.offsetWidth + 'x' + a.offsetHeight; } },
+      { kind: 'fn', name: 'tail file loaded', fn: function () { var a = document.querySelector('.gxh-bub.on .gxh-arr'); return (!!a && getComputedStyle(a).backgroundImage !== 'none') || 'no painted background'; } }
+    ]
+  });
 })();
