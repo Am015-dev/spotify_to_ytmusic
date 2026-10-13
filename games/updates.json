@@ -1,6 +1,20 @@
 [
  {
   "date": "2026-10-13",
+  "game": "sands",
+  "title": "Readable ranks and bigger taps",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
+   "Bid chips 13 px",
+   "The 1st/2nd labels on the track spots are larger on a pale plate",
+   "More ways to play and Got it are bigger tap targets"
+  ],
+  "check": "Start screen: tap More ways to play; on the board read the 1st/2nd labels"
+ },
+ {
+  "date": "2026-10-13",
   "game": "crown",
   "title": "Clearer score chips and bigger Got it",
   "items": [
@@ -138,18 +152,6 @@
    "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
   ],
   "check": "Start a game on a phone: look at the kilns, the centre tray and your rack."
- },
- {
-  "date": "2026-10-13",
-  "game": "sands",
-  "title": "Button text size",
-  "items": [
-   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
-   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
-   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
-   "Bid chips 13 px"
-  ],
-  "check": "sweep 4/4 clean, no empty or clipped button labels"
  },
  {
   "date": "2026-10-13",
