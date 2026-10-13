@@ -218,8 +218,11 @@ function OF_parkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData;pl.
   const pitch=+(cp-gp).toFixed(2),roll=+(cr-gr).toFixed(2),tmx=Math.max(...tyre.map(Math.abs));
   return{foot:RO.foot,tyre,body:+body.toFixed(3),pitch,roll,ok:tyre.length>=3&&tmx<=.05&&body>=0&&Math.abs(pitch)<=1&&Math.abs(roll)<=1}}
 // --- per-frame hooks (outermost wrappers: none of the car-only wrappers run on foot)
-roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){if(state==='roam'&&!RO.frozen){OF_step(dt);OF.stT=(OF.stT||0)+(dt||0);if(OF.stT>.25){OF.stT=0;OF_settle()}}return}
-  const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}try{OF_fleeStep(dt||0);OF_starStep(dt||0)}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF flee',e)}}OF_dom();OF_btns();return r})(roamStep);
+// on-the-go markers (OG: event rings, gold, district collectibles = OG.imC, a translucent 2 m vase in the district colour, Gallus = mint green) are only
+// ticked in the car (roamStep); on foot they froze in the lane as a floating translucent green blob you can't collect (Alex b4). Hide them on foot.
+function OF_ogVis(on){try{if(typeof OG!=='undefined'&&OG.grp&&OG.grp.visible!==on)OG.grp.visible=on}catch(e){}}
+roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){OF_ogVis(false);if(state==='roam'&&!RO.frozen){OF_step(dt);OF.stT=(OF.stT||0)+(dt||0);if(OF.stT>.25){OF.stT=0;OF_settle()}}return}
+  OF_ogVis(true);const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}try{OF_fleeStep(dt||0);OF_starStep(dt||0)}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF flee',e)}}OF_dom();OF_btns();return r})(roamStep);
 roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);return f(dt)})(roamCam);
 // leaving roam (menu, district change, wreck reset) puts you back in the car
 function OF_reset(){OF_jackEnd();OF_fleeEnd();if(RO.foot==='car'&&!OF.car)return;try{if(OF.car)OF_poseCar(OF.car.x,OF.car.z,OF.car.y,OF.car.h)}catch(e){}OF.car=null;if(OF.fig)OF.fig.g.visible=false;RO.foot='car';try{if(OF.cur.own)OF_drv(pl&&pl.mesh,true)}catch(e){}OF_btns()}
