@@ -16,8 +16,11 @@ function RD_pedNext(p,B){const N=HUB.nodes,sd=RD_sd(p),fw=sd>0,L0=(fw?B.nb:RD_pr
   if(L.length){p.b=L[Math.floor(R()*L.length)];p.t=0}else{p.b=a;p.t=0;p.sd=-sd;p.rdK=RD_key(p);RD_PS.turnN=(RD_PS.turnN||0)+1;return}p.sd=sd;p.rdK=RD_key(p)}
 function RD_turnBack(p){const sd=RD_sd(p);[p.a,p.b]=[p.b,p.a];p.t=1-p.t;p.sd=-sd;p.rdK=RD_key(p);p.rdH=0;p.rdW=0;p.rdX=null;RD_PS.turn++}
 // carriageway under (x,z): real street (drivable) or grid road; {ref,hw,lat,cx,cz,nx,nz}
+// all drivable streets within ~16-32 m: the nearest sample of each street piece (cityAt returns only ONE street, which misses the carriageway at junctions)
+let RD_CG=null;function RD_cityNear(x,z,ev){if(!RD_CG){RD_CG={G:null};RD_CG.G=new Map();CITY_S.forEach((S,si)=>{if(!OB_DRV(S))return;S.pts.forEach((p,i)=>{const k=Math.floor(p.x/16)*100000+Math.floor(p.z/16);let L=RD_CG.G.get(k);if(!L)RD_CG.G.set(k,L=[]);L.push(si,i)})});}const kx=Math.floor(x/16),kz=Math.floor(z/16),best=new Map();for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=RD_CG.G.get((kx+a)*100000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){const si=L[j],i=L[j+1],p=CITY_S[si].pts[i],d=(p.x-x)**2+(p.z-z)**2,o=best.get(si);if(!o||d<o[0])best.set(si,[d,i])}}
+  for(const[si,o]of best){const S=CITY_S[si];ev({S,road:S.r,p:S.pts[o[1]],i:o[1],si})}}
 function RD_road(x,z,skip){let b=null;const ev=q=>{if(!q||!OB_DRV(q.S)||q.road===skip)return;const p=q.p,a=(x-p.x)*p.tx+(z-p.z)*p.tz,P=q.S.pts;if((q.i===0&&a<-2)||(q.i===P.length-1&&a>2))return;const cx=p.x+p.tx*a,cz=p.z+p.tz*a,lat=(x-cx)*p.tz-(z-cz)*p.tx,hw=q.road.w/2;if(!b||Math.abs(lat)-hw<Math.abs(b.lat)-b.hw)b={ref:q.road,hw,lat,cx,cz,nx:p.tz,nz:-p.tx}};
-  const q1=cityAt(x,z);ev(q1);if(q1)ev(cityAt(x,z,q1.si));
+  RD_cityNear(x,z,ev);
   const f=fillAt(x,z,skip);if(f&&f.r!==skip){const r=f.r,t=clamp((x-r.x0)*r.ux+(z-r.z0)*r.uz,0,r.L),cx=r.x0+r.ux*t,cz=r.z0+r.uz*t,lat=(x-cx)*r.uz-(z-cz)*r.ux,hw=r.w/2;if(!b||Math.abs(lat)-hw<Math.abs(b.lat)-b.hw)b={ref:r,hw,lat,cx,cz,nx:r.uz,nz:-r.ux}}return b}
 function RD_mem(p,ref,s){const M=p.rdM||(p.rdM=[]);for(const m of M)if(m[0]===ref){m[1]=s;return}M.unshift([ref,s]);if(M.length>3)M.pop()}
 function RD_memGet(p,ref){if(p.rdM)for(const m of p.rdM)if(m[0]===ref)return m[1];return null}
