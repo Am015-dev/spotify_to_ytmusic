@@ -23,7 +23,7 @@ html.sk .gxc-ib{color:#fff}
 
 /* carved wooden tray around the full five-dish rack (the shorter racks are a staircase, so they keep plain dishes) (overlay behind the dishes, no size change) */
 html.sk-rackf .bf-rack:not(:has(>.bf-c.no)){isolation:isolate}
-html.sk-rackf .bf-rack:not(:has(>.bf-c.no))::before{content:'';position:absolute;inset:-4px -5px;z-index:-1;pointer-events:none;border:solid transparent;border-width:6px 5px 5px;border-image:url(media/ui-rack-frame-c.webp) 36 16 30 16 fill/6px 5px 5px stretch;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no))::before{content:'';position:absolute;inset:-9px -5px -8px;z-index:-1;pointer-events:none;border:solid transparent;border-width:11px 5px 9px;border-image:url(media/ui-rack-frame-c.webp) 36 16 30 16 fill/11px 5px 9px stretch;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 /* coach bubble pointer: the painted tail instead of the plain diamond */
 html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
