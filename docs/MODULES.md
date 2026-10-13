@@ -76,7 +76,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ld | `98ld_run.js` | 5 | LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module (window.__LDQ, r |
 | 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98sz | `98sz_ride_scale.js` | 8 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
-| 98sz2 | `98sz2_ride_audit.js` | 4 | RSZ audit (size-2, 2026-10-13): measures EVERY garage ride (length/width/height in game metres, driver head vs roof) against its class and derives the per-ride  |
+| 98sz2 | `98sz2_ride_audit.js` | 6 | RSZ audit (size-2, 2026-10-13): measures EVERY garage ride (length/width/height in game metres, driver head vs roof) against its class and derives the per-ride  |
 | 98of | `98of_onfoot.js` | 50 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 98sh | `98sh_shadow.js` | 4 | SHB (v90k): soft blob shadows on the ground under the player car, city traffic, people and trees. One InstancedMesh, depth-write off, ~1 draw call. Cause of "no |
 | 99c | `99c_checklist.js` | 66 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
@@ -368,9 +368,9 @@ uses: 20(35), 93(22), 30(16), 98ld(15), 60(14), 92(13), 53(13), 10(10), 70(9), 9
 defines: RSZ SZ_f SZ_fac SZ_k SZ_add SZ_face __sz
 uses: 92(14), 96(12), 98ld(8), 20(6), 10(4), 98(4), 41(3), 98y(2), 98bc(2), 30(1)
 
-## 98sz2_ride_audit.js — 4 KB
+## 98sz2_ride_audit.js — 6 KB
 defines: RSZ_go
-uses: 98sz(35), 10(7), 98(4), 30(3), 20(2), 98ld(2), 93(2), 98y(1), 96(1), 98bc(1)
+uses: 98sz(48), 10(6), 98(4), 93(4), 20(3), 30(3), 98ld(2), 98y(1), 96(1), 98bc(1)
 
 ## 98of_onfoot.js — 50 KB
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_q OF_ax OF_bx OF_corners OF_gap OF_settle OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
