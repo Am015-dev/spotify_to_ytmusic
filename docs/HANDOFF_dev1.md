@@ -12,7 +12,21 @@
    `AB_netChk()` + GO v90k/fra-net PASS: 1 network, 9 dead ends, every motorway has a ramp, 0 ramp building hits.
    Open: ramp drive end-to-end unverified (headless real time too slow); green plate patch at the street→ramp seam.
 
-## Coordinator additions (in this order, after #3)
+## NEW ORDER (coordinator 21:02): (1) BUILDER TRACKS FIRST, (2) 3a vehicle scale audit, (3) 3b, 3c, then 4-18
+- (1) Alex: "I see no tracks made with the builder yet!!!" Build with BX (src/98b2_builder2.js, its own piece format so Alex can edit) 3 built-in
+  tracks, visible in the builder track list AND playable from the Race menu: "Cliff Run" (mountain, cliff jump ≥1.5 s air, a drop, banked turn),
+  "Two-Level City" (bridge over a road, tunnel under, water shortcut = boat), "Canyon Split" (canyon, 2 routes, off-road cut). ≥15 m elevation range
+  each, no invisible walls, not flat. Per track: checklist GO (rv: style) + auto check (lap completes, elevation range, airtime, 0 errors).
+  ONE grid of low chase-cam shots, LOOK (flat = redo). Push, one line + grid path to the coordinator. int-2 builds it live after.
+- (2) 3a Alex: "some cars do not fit the human, way too small; some bus like a car size". Script measuring L/W/H of EVERY ride + traffic model and
+  the driver minifig vs seat/roof; targets car 4-5 m, van 5-6, bus 11-13, truck 8-12 (check SZ_* in 98sz_ride_scale.js); per-model factor table
+  (id → class → factor); rv checklist test "every vehicle ±20 % of class, driver fits" + GO opening the worst 3 in the garage + auto check;
+  ONE before/after grid of the 6 worst beside a standing minifig.
+- Also: fix the green plate seam under the car at the street→ramp start (coordinator saw it in go_v90k_fra_net.jpg).
+- int-2's FILL_R fix (od-int2 0c07e04) targets my older e750be2 line; on od-dev1 that line is already gone (pass moved into rfGrid/buildHubG,
+  ffba9d8f). When merging od-int2, keep od-dev1's 51_city_net.js version.
+
+## Coordinator additions (after the above)
 - 3b rv:2026-10-13 checklist tests (GO + auto check, fix fails): roads-1 kerb-parked cars counted off-road (fix in HANDOFF_roads: monitor skips c.pk);
   ped crossing gap rule too loose (RD_may in 98rd_roads.js: no car <8 m, none <30 m heading in); Athens start upside down (rare; SZ_add / LD_FACE);
   home-1 bricks over garage UI + toast overlap.

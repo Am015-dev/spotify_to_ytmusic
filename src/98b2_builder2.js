@@ -382,11 +382,24 @@ function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mod
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
+// Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
+function BX_raceMenu(){const tw=$('#tracks');if(!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){const b=document.createElement('button');b.className='trk bxTrk';
+ b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 1 lap</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
+ b.onclick=e=>{e.stopPropagation();BX_open();BX_load(BX_DEMOS[k],k);BX.camGo=1;BX.seenAll=new Set();BX_driveStart()};tw.appendChild(b)}}
+buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);
+
 // ---------------------------------------------------------------- acceptance tests (checklist items 'bx-*', 📍 GO = BX_test(id); the automated run uses the same spawn)
 function bxCh(w,c,L){const log=w?[['w',w]]:[];let cur={i:c[0],j:c[1],l:c[2],r:c[3]},sp=null;for(const t of L){if(Array.isArray(t)){cur={i:t[0],j:t[1],l:t[2],r:t[3]};continue}
  if(typeof t==='number'){cur={...sp[t]};continue}log.push(['p',t,cur.i,cur.j,cur.l,cur.r]);const ex=BX_P[t].ex.map(e=>BX_exit(cur,e));if(ex.length>1)sp=ex;cur=ex[0]}return log}
 const bxRep=(t,n)=>Array(n).fill(t);
 const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for(const B of L){if(A===B)continue;for(const a of A.S[0])for(const b of B.S[0])if(Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<4&&a.p.y-b.p.y>5)return true}return false};
+// built-in tracks (dev-2, Alex: "I see no tracks made with the builder yet!!!"): plain builder logs, so ★ load + edit + save works like any track
+Object.assign(BX_DEMOS,{'CLIFF RUN':{log:bxCh('mountain',[18,21,16,3],['sf','st','st','cp','st','st','st','kk',[29,21,8,3],'st','st','st','sd','st','st','br','dn','st','st','st','st','st','st','br',
+  ...bxRep('st',3),'bo',...bxRep('st',5),'cp',...bxRep('st',8),'br','su','su','su','up','br'])},
+ 'TWO-LEVEL CITY':{log:bxCh('city',[8,26,1,2],['sf',...bxRep('st',6),'cp',...bxRep('st',6),'br',...bxRep('st',4),'bo',...bxRep('st',8),
+  [31,10,-1,3],'up','su','su','br','st','st','br',...bxRep('st',8),'cp',...bxRep('st',10),'bo',...bxRep('st',10),'sd','sd','bl',...bxRep('st',7),'bl',...bxRep('st',3),'bl'])},
+ 'CANYON SPLIT':{log:[...bxCh('canyon',[19,27,1,3],['sf','st','fk','bl','br','br','up','bl',1,'up','up','up','dn','dn','bl',[35,21,3,2],'su','su',...bxRep('st',3),'cp','st','bl',
+ ...bxRep('st',6),'bo',...bxRep('st',7),'bl','st','sd','sd','dn',...bxRep('st',5),'bl']),['b','raise',124,32,0]]}});
 const BX_TESTS={
  'bx-snap':{n:'SNAP TEST',log:()=>[['w','meadow']],drive:0,chk:()=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,ex=new Set();let con=0;
   for(const p of L){if(ex.has(key(p.c)))con++;for(const e of p.ex)ex.add(key(e))}const step=new Set(L.map(p=>p.c.l)).size>1||L.some(p=>p.ex[0].l!==p.c.l);
@@ -407,7 +420,15 @@ const BX_TESTS={
  'bx-world':{n:'NEW TRACK',log:()=>[['w','valley']],drive:0,chk:()=>{let lo=1e9,hi=-1e9;for(const h of BX.th){lo=Math.min(lo,h);hi=Math.max(hi,h)}let vis=0;const v=bxV();BX.cam.updateMatrixWorld();
   for(let k=0;k<BX.th.length;k+=3){if(BX.th[k]<20)continue;v.set(BXO+(k%BXTN)*BXR,BX.th[k],BXO+Math.floor(k/BXTN)*BXR).project(BX.cam);if(Math.abs(v.x)<1&&Math.abs(v.y)<1&&v.z<1)vis++}
   return{ok:hi-lo>=30&&vis>20,msg:`terrain range ${(hi-lo).toFixed(1)} m, ${vis} hill points (>20 m) on screen`}}},
- 'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['MOUNTAIN JUMP']?BX_DEMOS['MOUNTAIN JUMP'].log:BX_TESTS['bx-jump'].log(),drive:1,
+ // dev-2 built-in tracks (Alex: "I see no tracks made with the builder yet!!!"): lap completes, >=15 m elevation, + each track's feature
+ 'bx-t-cliff':{n:'CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,
+  chk:()=>{const m=BX.m,r=m.yMax-m.yMin;return{ok:m.laps>=1&&r>=15&&m.airMax>=1.5&&BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id)),msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, air max ${m.airMax.toFixed(2)} s, banked turn ${BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id))?'yes':'no'}`}}},
+ 'bx-t-city':{n:'TWO-LEVEL CITY',log:()=>(BX_DEMOS['TWO-LEVEL CITY']||{log:[['w','city']]}).log,drive:1,
+  chk:()=>{const m=BX.m,r=m.yMax-m.yMin,cr=bxCross(m.seen||new Set());return{ok:m.laps>=1&&r>=15&&cr&&m.boat>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, over+under ${cr?'yes':'no'}, boat ${m.boat.toFixed(1)} s`}}},
+ 'bx-t-canyon':{n:'CANYON SPLIT',log:()=>(BX_DEMOS['CANYON SPLIT']||{log:[['w','canyon']]}).log,drive:1,
+  chk:()=>{const m=BX.m,r=m.yMax-m.yMin,S=m.seen||new Set(),key=c=>c.i+','+c.j+','+c.l+','+c.r,fk=BX.pcs.find(p=>p.type==='fk'),br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[],n=br.filter(p=>p&&S.has(p.id)).length;
+   return{ok:m.laps>=1&&r>=15&&n===2&&m.terrT>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, routes driven ${n}/2, off-road ${m.terrT.toFixed(1)} s`}}},
+ 'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
