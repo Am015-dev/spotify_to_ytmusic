@@ -147,23 +147,30 @@ def main():
         srv, base = start_server(out)   # ONE server for every check below
         env = dict(os.environ, GX_URL=base, GX_STAGE=str(out))
         env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
-    if ok and not a.no_check:  # 3. phone-check against the staging folder
-        chk = out / ".check"
-        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
-        r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
-        rows = {}
-        md = chk / "phone-check-results.md"
-        if md.exists():
-            for line in md.read_text().splitlines():
-                m = re.match(r"\| (\S+) \| (.*) \| ([^|]*) \|$", line)
-                if m and m.group(1) in ok: rows[m.group(1)] = (m.group(2).split(" | "), m.group(3))
-        for s in ok:
-            if s not in rows: status[s], why[s] = "FAIL", "phone-check did not report (see %s)" % (r.stderr.strip()[-100:] or "log")
-            else:
-                cells, errs = rows[s]
-                failing = [c for c in cells if c != "PASS"]
-                if failing: status[s], why[s] = "FAIL", "phone-check: " + "; ".join(failing)[:120]
-                else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
+    # Owner, 13 Oct 2026: "don't play the game, run tests". phone-check PLAYS each game (6 scenarios, up to 3 min each), so it
+    # runs only with --full. The gate is the ?scn= scenario tests + LAB test + look check (open a state, check it, no playing).
+    if ok and not a.no_check:  # 3. phone-check (plays the game): --full only; otherwise straight to the scenario tests
+        if a.full:
+            chk = out / ".check"
+            env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
+            r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
+            rows = {}
+            md = chk / "phone-check-results.md"
+            if md.exists():
+                for line in md.read_text().splitlines():
+                    m = re.match(r"\| (\S+) \| (.*) \| ([^|]*) \|$", line)
+                    if m and m.group(1) in ok: rows[m.group(1)] = (m.group(2).split(" | "), m.group(3))
+            for s in ok:
+                if s not in rows: status[s], why[s] = "FAIL", "phone-check did not report (see %s)" % (r.stderr.strip()[-100:] or "log")
+                else:
+                    cells, errs = rows[s]
+                    failing = [c for c in cells if c != "PASS"]
+                    if failing: status[s], why[s] = "FAIL", "phone-check: " + "; ".join(failing)[:120]
+                    else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
+        else:
+            (out / ".check").mkdir(parents=True, exist_ok=True)
+            for s in ok: status[s], why[s] = "PASS", ""
+            print("[phone-check] skipped: it plays the game (use --full for engine/rules changes)", flush=True)
         if a.quick or a.deploy:  # 3a. scenario tests (`?scn=<id>` states: skip menus, seed the RNG, build the state, assert), all games in one run
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:
