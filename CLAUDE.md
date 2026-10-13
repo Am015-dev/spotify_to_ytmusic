@@ -39,10 +39,14 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
   - Phone rotation: iOS reports the old size right after rotating. Use one debounced relayout fed by resize,
     orientationchange, visualViewport and ResizeObserver, re-measured after ~400 ms.
+- **NO SCREENSHOTS (owner, 13 Oct 2026: "stop making screenshots, wire and create tests with GO I can approve").** Workers take
+  no screenshots, contact sheets, before/after images or shot grids, and commit no png/webp shots. Deliverable = the change + a
+  `?scn=` scenario with machine checks + a ✔ Test checklist item with GO. The owner approves by tapping GO. Only exception: the
+  owner asks for an image.
 - **Fast loop (owner, 13 Oct 2026; same rules as Overdrive):**
   - Tests first: a task's FIRST commit is its acceptance tests. Each test is one ✔ Test checklist item with a plain pass line
     and a `?scn=` link that spawns ONLY that requirement, plus an automated check of the same spawn that acts with REAL taps
-    (no forced state during the tested action). Done = every test passes, shown in ONE screenshot grid.
+    (no forced state during the tested action). Done = every test passes and its GO item is in the ✔ Test checklist.
   - The whole test set for a change runs in under 3 min. Prove a test with a 1-min dry run before any longer run; a run that
     fails on a script error is fixed, never repeated.
   - Workers commit at least every 10 min. Features over ~1 h or ~$5: spec + 3 acceptance tests + one mock-up first; the
@@ -53,12 +57,18 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
 - **Always set the model on every helper and cloud session.** The default is the most expensive model; all 45 earlier
   cloud sessions ran on it by accident. Main model: plan, decide, review only (no hands-on screenshots). Sonnet: build, fix, sweeps.
   Haiku: downloads, copying, simple loops.
+  Pick the cheapest model that can do the job, and write it in every brief (owner, 13 Oct 2026: "lower models for easy tasks"):
+  - **Haiku:** status refreshes (wiring-status, game-status, next-wave, shots gallery), commit/push chores, copying or converting
+    assets, cut-outs, applying an already-written fix to more games, the watchdog, link checks, reading logs to report a number.
+  - **Sonnet:** wiring art into game code, bug fixes, tests/scenarios, layout work, new features.
+  - **Main model (orchestrator):** plan, decide, brief and review only; never runs chores itself (hand them to Haiku).
 - One fixer per game, one round, one deploy: the brief names exact functions/lines (grep first) and every known
   bug; the fixer fixes until the sweep is clean and reports in under 150 words. No AI-tester rework loops.
 - Cloud sessions allowed (owner, 6 Oct 2026): one per game, at most 10 at a time (owner, 13 Oct 2026, after the token fixes), model set to Sonnet on every one; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
 - Answer each helper report once; ignore duplicate notifications. Commit work in progress as you go.
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks. Exception (owner, 13 Oct 2026): the orchestrator runs an
-  hourly worker watchdog routine that stops (interrupt + archive) any Game Night worker running > 2 h with no deploy in the last
+  hourly worker watchdog routine that makes any Game Night worker WRAP UP (commit + push all work, HANDOFF note, deploy what
+  passed) and only then archives it, if it is running > 2 h with no deploy in the last
   60 min, over 200k context, or blocked > 30 min, notes it in HANDOFF.md and starts one replacement for what is left.
 - Prove the approach on one game before touching others. Clarity before features.
 - **Read less (owner, 13 Oct 2026: 98% of tokens were workers re-reading their own long contexts):**
