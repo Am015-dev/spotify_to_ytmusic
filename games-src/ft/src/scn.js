@@ -75,7 +75,7 @@
   // painted plates/glyphs/badges: every wired file loaded, applied to its element, and not stretched out of shape
   var ART = [ // [selector, pseudo, file, max stretch]
     ['.tile.blue', '::after', 'ui-tile-frame-blue', 0], ['.tile:not(.blue)', '::after', 'ui-tile-frame-red', 0],
-    ['.tile .tv', '', 'ui-badge-gold', 1.6], ['.dcard:not(.th) .dv', '', 'ui-badge-cream', 1.6],
+    ['.tile .tv', '::before', 'ui-badge-gold', 1.6], ['.dcard:not(.th) .dv', '::before', 'ui-badge-cream', 1.6],
     ['.sch .sti', '', 'icon-star', 0], ['.mcard:not(.empty)', '', 'ui-goods-card', 0]
   ];
   var PROBE = [ // transient pieces: built as a probe so their CSS is tested without waiting for the moment

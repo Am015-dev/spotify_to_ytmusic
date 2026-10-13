@@ -26,11 +26,12 @@ function slot(){
   if(G.winner&&G.winner!=='draw'){const me=soloSide();return[(me<0||G.winner==='P'+(me+1))?'victory':'defeat',1]}
   if(!UI.tut&&UI.camp&&UI.camp.boss)return['fight',0];
   return['main',0]}
+const HULLART=['anvil','needle','razor','warden','maul','herald','hauler','keel','kestrel'];   // every expansion hull has its own painting, ship-<type>.webp
 const SHIPF={'lancer:0':'anvil','talon:0':'needle','lancer:1':'warden','talon:1':'razor','lancer:2':'maul','talon:2':'herald'};   // painted side view per hull and faction colour (keel, kestrel and hauler have no hull in the game yet)
-window.paintedShip=s=>{try{const f=SHIPF[s.type+':'+FACTIONS[G.fac[s.side]].col];return f&&IMG_OK['ship-'+f]===1?MEDIA+'ship-'+f+'.webp':null}catch(e){return null}};
+window.paintedShip=s=>{try{const f=HULLART.includes(s.type)?s.type:SHIPF[s.type+':'+FACTIONS[G.fac[s.side]].col];return f&&IMG_OK['ship-'+f]===1?MEDIA+'ship-'+f+'.webp':null}catch(e){return null}};
 function boot(){
   try{GXSK.init({dark:true,sets:{'sk-ico':['focus','evade','lock','shield','hull'].map(k=>'icon-'+k),'sk-cards':['white','green','red'].map(k=>'ui-move-card-'+k)}})}catch(e){}
-  Object.values(SHIPF).forEach(f=>pre('ship-'+f));
+  Object.values(SHIPF).concat(HULLART).forEach(f=>pre('ship-'+f));
   try{GXMUS.init({key:'na',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin();endMark()}catch(e){}},800);

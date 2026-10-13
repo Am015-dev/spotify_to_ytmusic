@@ -123,4 +123,31 @@
       { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
     ]
   });
+  // painted art wired: each plate is painted on the element, its skin switch is on, the element visible
+  function art(name, sel, file, pseudo, cls, hid) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (!hid && (r.width < 4 || r.height < 4)) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
+  GXS.add({
+    id: 'cc-art', name: 'Painted art: chips, tray, crown, buttons, tail', ask: 'Do the chips, dice tray and crown look painted?', seed: 5, sizes: 'phone', when: booted,
+    setup: function () {
+      return table(5).then(function () {
+        var h = document.createElement('div'); h.id = 'artbox'; h.style.cssText = 'position:fixed;left:8px;top:120px;z-index:99;display:flex;gap:8px;flex-wrap:wrap;width:250px';
+        h.innerHTML = '<i class="crn" id="artcrn">👑</i><button class="btn on" id="artpink" type="button">Chosen</button><button class="btn rec" id="artyel" type="button">Best move</button><button class="gx-reopen btn" id="artghost" type="button" style="position:static;display:inline-block">Panel</button>';
+        document.body.appendChild(h);
+        var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:200px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap dice to keep</div>'; document.body.appendChild(b);
+        return new Promise(function (r) { setTimeout(r, 500); });
+      });
+    },
+    checks: [
+      art('monster chip plate painted', 'header.gx-bar .pchip:not(.on)', 'ui-hud-chip-c', '::before', 'sk-hudchip'),
+      art('dice tray painted', '#dicewrap', 'ui-dice-tray-c', '::before', 'sk-tray'),
+      art('painted crown', '#artcrn', 'icon-crown', null, 'sk-crown'),
+      art('pink chosen button', '#artpink', 'ui-button-pink-c', null, 'sk-pink'),
+      art('yellow recommended button', '#artyel', 'ui-button-yellow-c', null, 'sk-yellow'),
+      art('see-through Panel button', '#artghost', 'ui-button-ghost-c', null, 'sk-ghost', true),
+      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
+      { kind: 'text', sel: '#artpink', re: /chosen/i, name: 'pink label readable' },
+      { kind: 'text', sel: '#artyel', re: /best/i, name: 'yellow label readable' },
+      { kind: 'text', sel: '#arttail .gxh-tx', re: /dice/i, name: 'bubble text readable' }
+    ]
+  });
 })();
