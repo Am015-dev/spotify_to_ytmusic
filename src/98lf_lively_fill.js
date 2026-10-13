@@ -135,7 +135,7 @@ Object.assign(window.__lvf,{goSpot:LF_goSpot,green:LF_green,SP:LF.SP});
 // mound GO: the nearest grass hill with a clear 50 m run-up (no building, road edge or water on the line); the car is parked 40 m before its centre
 // facing it. You (or the test) drive at it: PASS = the car climbs ≥ 60% of the hill's height, passes within r/3 of the top and never stalls (< 2 m/s after 1.5 s of gas).
 function LF_goMound(){LF_ensure(RO.x,RO.z,900);let best=null,bd=1e18;for(const m of LF.M){const d=(m.x-RO.x)**2+(m.z-RO.z)**2;if(d>=bd)continue;for(let k=0;k<8;k++){const a=k*Math.PI/4,sx=m.x-Math.sin(a)*(m.r+40),sz=m.z-Math.cos(a)*(m.r+40);let ok=true;
-   for(let t=0;t<=1&&ok;t+=.1)ok=!roamHit(sx+(m.x-sx)*t,sz+(m.z-sz)*t,3)&&!inRiver(sx+(m.x-sx)*t,sz+(m.z-sz)*t,-2);if(ok){best={m,sx,sz,h:a};bd=d;break}}}
+   ok=Math.abs(groundY(sx,sz)-groundY(m.x,m.z))<1;for(let t=0;t<=1&&ok;t+=.1){const px=sx+(m.x-sx)*t,pz=sz+(m.z-sz)*t;ok=!roamHit(px,pz,3)&&!inRiver(px,pz,-2)&&!onAnyDeck(px,pz)}if(ok){best={m,sx,sz,h:a};bd=d;break}}}
  if(!best)return'no hill nearby';const{m,sx,sz,h}=best;roamWarp(sx,sz,h);RO.v=0;camSnap=true;const y0=RO.y;const L={m,y0,top:0,near:1e9,stall:false,t:0,go:0};LF.lastM=null;
  const iv=setInterval(()=>{L.t+=.1;L.top=Math.max(L.top,RO.y-y0);L.near=Math.min(L.near,Math.hypot(RO.x-m.x,RO.z-m.z));if(Math.abs(RO.v)>3)L.go=L.go||L.t;if(L.go&&L.t-L.go>1.5&&L.near>m.r*.34&&Math.abs(RO.v)<2)L.stall=true;
   if(L.t>12||L.go&&Math.hypot(RO.x-m.x,RO.z-m.z)>m.r+12&&L.near<m.r/3){clearInterval(iv);const r={h:+m.h.toFixed(2),climb:+L.top.toFixed(2),near:+L.near.toFixed(1),stall:L.stall,pass:L.top>=m.h*.6&&L.near<m.r/3&&!L.stall};LF.lastM=r;
