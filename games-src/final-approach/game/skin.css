@@ -4,7 +4,7 @@ html.sk{--sk-ink:#14202c;--sk-cream:#eef6f6}
 .wxb{display:inline-flex;align-items:center;gap:2px}
 .wxb .wxi{width:28px;height:28px;vertical-align:middle}
 /* buttons: cream (alt) and amber (default) plates, green Roll keeps its colour with the painted die plate */
-html.sk .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-go-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-go-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .btn.alt,html.sk .btn.on{border-image-source:url(media/ui-button-cream-c.webp);color:var(--sk-ink);text-shadow:none}
 html.sk .btn:disabled,html.sk .btn.dis{opacity:.5}
 html.sk-roll #acts [data-a=ready]{position:relative}

@@ -65,4 +65,27 @@
       { kind: 'tap', sel: '#zoom .zbox', name: 'tap closes the zoom', state: function () { return !document.getElementById('zoom').hidden; }, expect: function (a, b) { return (a && !b) || 'zoom did not close'; } }
     ]
   });
+
+  GXS.add({
+    id: 'hb-handtoggle', name: 'Hide and show the hand', ask: 'Tap the hand toggle. Does the row hide?', seed: 9, when: booted, group: 'Board',
+    setup: function () { return table(9); },
+    checks: [
+      { kind: 'visible', sel: '#bd .hc', name: 'hand row' },
+      { kind: 'visible', sel: '#bd .htog', name: 'hand toggle' },
+      { kind: 'tap', sel: '#bd .htog', name: 'tap the hand toggle', state: function () { return !!UI.handHide; }, expect: function (a, b) { return a !== b || 'the hand toggle did nothing'; } },
+      { kind: 'visible', sel: '#bd .handbar', name: 'show-hand bar' },
+      { kind: 'tap', sel: '#bd .handbar', name: 'tap to show the hand', state: function () { return !!UI.handHide; }, expect: function (a, b) { return (a === true && b === false) || 'the hand did not come back'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'hb-help', name: 'Rules cards', ask: 'Can you read the rules card?', seed: 10, when: booted, group: 'UI',
+    setup: function () { return table(10).then(function () { GXH.rules(); return GXS.wait(function () { return $('.gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
 })();

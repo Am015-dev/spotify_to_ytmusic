@@ -6,7 +6,7 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
 ## Iterate fast, check once (two speeds; numbers in `CHECK-SPEED.md`)
 - **Iterate with `--quick`:** `python3 games-src/scripts/build-all.py --quick <slug>` = build + stamp + phone-check + the game's scenario tests
   (`?scn=` states, seconds each) + a QUICK sweep (4 games, one rotation). Run it after every small fix. Never run the full sweep to iterate.
-- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks + the FULL sweep (the CLAUDE.md gate, unchanged) + rotate-test,
+- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks (QUICK sweep; owner, 13 Oct 2026). Add `--full` (full sweep + rotate-test) only for engine/rules changes,
   once, then copies the passing game into `games/`. Run it once, right before going live (not after each fix, not again after a merge unless
   the merge touched your game's logic). `--no-sweep` skips the sweep: only for a change that cannot touch play, and say why in the commit.
 - **One shared http server:** build-all.py starts `scripts/gx-serve.js` once and passes `GX_URL` to every check. Sweeps, rotate-tests,
@@ -30,12 +30,21 @@ Every change, however small, ships as: **code + scenario + checklist item**, in 
    `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
 2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
    sweep while iterating.
-3. **One full `--deploy` at the end** (the full sweep gate is unchanged). Small batches: 1-3 games per worker, deploy each
+3. **`--deploy` as soon as the scenarios pass** (quick sweep; `--full` only for engine/rules changes). Small batches: 1-3 games per worker, deploy each
    game as soon as it passes; never hold finished games back for the rest of a batch.
 4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
    gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
 5. **Report** = before/after numbers + the scenario ids. No "play a few games to check" steps for the owner, ever.
-6. Hand off at ~250k context tokens; long sessions get slow and expensive.
+6. Hand off at ~150k context tokens with a HANDOFF note; long sessions get slow and expensive (see "Read less" below).
+
+## Read less: code maps, find.sh, guards (owner, 13 Oct 2026)
+Workers were re-reading 270-650k tokens of their own context, mostly whole UI files and built output. Now:
+1. `games-src/scripts/find.sh --maps` lists each game's `MODULES.md` (generated, not committed; `find.sh --refresh` or any `build-all.py` run rebuilds them).
+   It gives every source file in build order with size and purpose, its functions with line numbers, and which later file overrides which function.
+2. `games-src/scripts/find.sh <symbol|text> [game]` prints `file:line` and which definition wins. Read only that range.
+3. Built html, `x.js` and the joined `ui.js` are git-ignored and skipped by search (`.ignore` files). The numbered `ui1..uiN.js` parts are the real sources.
+4. `scripts/guard.py` (every build + `.github/workflows/guard.yml`) stops big non-media files, growth of sources over 120 KB, new override layer files and tracked build outputs.
+5. Start every worker session from `games-src/BRIEF-TEMPLATE.md`. Numbers: `games-src/CHECK-SPEED.md` (Tokens).
 
 ## The tools (all scripts, no AI)
 - `python3 games-src/scripts/build-all.py [slugs] [--out DIR] [--no-check] [--deploy [--suffix -next]]`
@@ -90,7 +99,7 @@ Versions and what is missing: `python3 games-src/scripts/game-status.py` writes 
    No AI testers for bugs.
 
 ## Efficiency rules (from CLAUDE.md)
-- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` runs the one full sweep. After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
+- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` (quick sweep; `--full` only for engine/rules changes). After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
 - One worker per game, a tiny brief that names the files; reports under 150 words; at most 2 subagents at once.
 - Always set the model: orchestrator on main, workers on Sonnet, plain copying/downloads on Haiku. No new cloud sessions.
 - Scripts do the checking (build-all, phone-check, sweep); AI testers only for new-game blind tests, never for bugs.
@@ -143,3 +152,7 @@ blank canvases, small boards, overlapping or spilling cards, sideways scroll and
 - After a real fix, re-save the baseline: `look-check.js --baseline --game <slug>`. Scene drivers live in
   `games-src/scripts/look-scenes.json` (a copy of the ones in asset-viewer/screens.html).
 - An owner bug report about looks ("can't read it", "button has no label") goes into the fixer's brief first, then run the look check on that game.
+
+## LAB and test mode (owner, 13 Oct 2026)
+Every deployed game carries the 🧪 LAB (test mode only; `shell/LAB.md`): build-all inlines `gx-lab-core.js`, `gx-lab.js`, `gx-lab.css` into the staged page, so a game only needs `scn.js`. Per game: `<prefix>-board`, `<prefix>-zoom`, `<prefix>-help`, the shared `story-scene`, and a scenario for every item of its newest What's new entries (`scripts/set-scn.py <game-id> <date> 3=<scn-id>`).
+`build-all.py --quick/--deploy` also runs `scripts/lab-test.js` (off = no LAB element; on = LAB lists GXSLIST and every GO passes its checks; pinned checklist -> shelf -> `games/lab.html`), and after a deploy refreshes `games/scenarios.json` (`scripts/lab-index.js`) and `games/lab.html` (`scripts/lab-page.py`). Brief for a scenarios worker: `games-src/lab/BRIEF-scenarios.md`.

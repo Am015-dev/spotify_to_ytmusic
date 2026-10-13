@@ -28,7 +28,12 @@
 (function () {
   var q = new URLSearchParams(location.search), id = q.get('scn');
   var S = window.GXS = { defs: [], on: !!id, id: id };
+  try { S.realLS = window.localStorage; } catch (e) { }   // the player's real storage (a scenario swaps window.localStorage for a private one): the LAB (gx-lab.js) keeps its results here
   S.add = function (d) { S.defs.push(d); };
+  /* group of a scenario for the LAB menu: d.group, else guessed from id / name (Board, Cards, Story, Bosses, UI) */
+  S.group = function (d) { if (d.group) return d.group; var t = (d.id + ' ' + d.name).toLowerCase();
+    return /boss/.test(t) ? 'Bosses' : /story|chapter|campaign|scene|cutscene/.test(t) ? 'Story' : /zoom|card|hand|market|deck|piece|token/.test(t) ? 'Cards' : /board|start|map|table|tile|grid|island|city|dungeon/.test(t) ? 'Board' : 'UI'; };
+  S.pub = function (d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', group: S.group(d) }; };
   if (!id) return;   // normal play: the module is inert (one small object)
 
   /* ---- seeded RNG (mulberry32) ---- */
@@ -54,7 +59,7 @@
 
   /* ---- list mode (no setup) ---- */
   function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
-  function pub(d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all' }; }
+  var pub = S.pub;
   function onload(fn) { if (document.readyState === 'complete') setTimeout(fn, 0); else addEventListener('load', function () { setTimeout(fn, 0); }); }
   if (id === 'list') { onload(function () { window.GXSLIST = S.defs.map(pub); window.GXSCN = { id: 'list', ready: true }; }); return; }
 

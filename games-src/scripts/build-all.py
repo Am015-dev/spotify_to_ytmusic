@@ -6,6 +6,7 @@
   python3 games-src/scripts/build-all.py --out /tmp/stage sunglaze
   python3 games-src/scripts/build-all.py --deploy sunglaze  # also copy PASSING games into games/<slug>/index.html
   python3 games-src/scripts/build-all.py --deploy --suffix -next sunglaze   # preview: games/<slug>-next/
+Every run first executes guard.py (stops on a failure) and modmap.py (refreshes the MODULES.md code maps).
 Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
@@ -56,6 +57,16 @@ SWEEPS = {
 }
 TIMES = []   # (slug, check, seconds)
 
+def inject_lab(html_path):
+    """Inline the LAB (shell/gx-lab-core.js + gx-lab.js + gx-lab.css) at the end of the staged page. Inert unless test mode is on (?test=1 or localStorage gx_test=1)."""
+    sh = SRC / "shell"
+    t = pathlib.Path(html_path).read_text(encoding="utf-8")
+    if "gxlab-" in t and "GXLAB_CSS" in t: return
+    blk = "<script>window.GXLAB_CSS=" + json.dumps((sh / "gx-lab.css").read_text(encoding="utf-8")).replace("</", "<\\/") + ";</script>\n<script>\n" + (sh / "gx-lab-core.js").read_text(encoding="utf-8") + "\n</script>\n<script>\n" + (sh / "gx-lab.js").read_text(encoding="utf-8") + "\n</script>\n"
+    i = t.rfind("</body>")
+    t = t[:i] + blk + t[i:] if i >= 0 else t + blk
+    pathlib.Path(html_path).write_text(t, encoding="utf-8")
+
 def timed(slug, name, fn):
     t = time.time(); r = fn(); dt = time.time() - t
     TIMES.append((slug, name, round(dt, 1)))
@@ -87,7 +98,8 @@ def main():
     ap.add_argument("--suffix", default="", help='deploy folder suffix, e.g. "-next" for a preview')
     ap.add_argument("--no-check", action="store_true", help="skip every check (build + stamp only)")
     ap.add_argument("--quick", action="store_true", help="iterate: phone-check + scenario tests + QUICK sweep (4 games, 1 rotation)")
-    ap.add_argument("--no-sweep", action="store_true", help="with --deploy: skip the full sweep (say why in the commit)")
+    ap.add_argument("--no-sweep", action="store_true", help="with --deploy: skip the sweep (say why in the commit)")
+    ap.add_argument("--full", action="store_true", help="with --deploy: run the full sweep (only for engine/rules changes or the nightly run; owner, 13 Oct 2026)")
     ap.add_argument("--no-look", action="store_true", help="skip the look check gate (new severe visual findings block --deploy)")
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args()
@@ -97,6 +109,12 @@ def main():
     slugs = a.slugs or list(GAMES)
     bad = [s for s in slugs if s not in GAMES]
     if bad: sys.exit("unknown slug(s): %s\nknown: %s" % (" ".join(bad), " ".join(GAMES)))
+    # cost guard (fails the build) and fresh code maps (games-src/<dir>/MODULES.md: read these, not the built files)
+    g = subprocess.run([sys.executable, str(SCRIPTS / "guard.py")], capture_output=True, text=True)
+    print(g.stdout.rstrip())
+    if g.returncode: sys.exit("build stopped by guard.py (see the Fix: hints above)")
+    m = subprocess.run([sys.executable, str(SCRIPTS / "modmap.py")], capture_output=True, text=True)
+    print(m.stdout.strip() or ("modmap failed: " + m.stderr.strip()[-200:]), flush=True)
     out = pathlib.Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     status, why = {}, {}
@@ -113,6 +131,7 @@ def main():
         else:
             (out / s).mkdir(parents=True, exist_ok=True)
             shutil.copyfile(built, out / s / "index.html")
+            inject_lab(out / s / "index.html")
             status[s], why[s] = "BUILT", ""
         print(f"[build] {s:18} {status[s]} {why[s]}", flush=True)
 
@@ -154,14 +173,26 @@ def main():
                     if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
                     elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
-        # 3c. the game's own sweeps: QUICK=1 for --quick, the full default for --deploy (once)
+        if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+            passing = [s for s in ok if status[s] == "PASS"]
+            if passing:
+                code, tail = timed("all" if len(passing) > 1 else passing[0], "lab-test", lambda: run_check(["node", str(SCRIPTS / "lab-test.js")] + passing, str(SCRIPTS), env3, out / ".check" / "lab-test.log", 1800))
+                txt = (out / ".check" / "lab-test.log").read_text()
+                for s in passing:
+                    m = re.search(r"^LAB %s (\S+) (.*)$" % re.escape(s), txt, re.M)
+                    if not m: status[s], why[s] = "FAIL", "lab-test did not report"
+                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "lab-test: " + m.group(2)[:140]
+                    else: print(f"[lab] {s:18} ok {m.group(2)[:40]}")
+        # 3c. the game's own sweeps: QUICK=1 (4 games) for --quick and --deploy; the full default only with --deploy --full.
+        # Owner, 13 Oct 2026: fast tests + checklist scenarios, no hour-long sweeps per deploy (Overdrive-style).
         if (a.quick or a.deploy) and not (a.deploy and a.no_sweep):
             for s in [x for x in ok if status[x] == "PASS"]:
                 d, scripts = SWEEPS[s]
-                for sc in (scripts if a.deploy else scripts[:1]):
+                full = a.deploy and a.full
+                for sc in (scripts if full else scripts[:1]):
                     e = dict(env, GX_SLUG=s)
-                    if not a.deploy: e["QUICK"] = "1"
-                    code, tail = timed(s, ("quick " if not a.deploy else "full ") + sc.replace(".js", ""), lambda: run_check(["node", sc], str(SRC / d), e, out / ".check" / f"{s}-{sc}.log", 5400))
+                    if not full: e["QUICK"] = "1"
+                    code, tail = timed(s, ("quick " if not full else "full ") + sc.replace(".js", ""), lambda: run_check(["node", sc], str(SRC / d), e, out / ".check" / f"{s}-{sc}.log", 5400))
                     if code != 0: status[s], why[s] = "FAIL", f"{sc}: {tail}"[:200]; break
                     print(f"[sweep] {s:18} {sc} ok: {tail[-90:]}", flush=True)
     else:
@@ -189,6 +220,11 @@ def main():
                 shutil.copyfile(out / s / "index.html", dest / "index.html")
                 deployed.append(s)
 
+    if deployed and srv and not a.suffix:  # the LAB owner page: every deployed game's scenario list -> games/scenarios.json, then games/lab.html
+        try:
+            r = subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + deployed, env=env, capture_output=True, text=True, timeout=300); print(r.stdout.strip())
+            subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+        except Exception as e: print("lab-index skipped:", e)
     if srv: srv.kill()
     if TIMES:
         tj = out / ".check" / "timings.json"; tj.parent.mkdir(parents=True, exist_ok=True)

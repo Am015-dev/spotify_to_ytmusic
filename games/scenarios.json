@@ -1,0 +1,83 @@
+{
+ "cauldron-fair": [
+  {
+   "id": "cf-board",
+   "name": "Cauldron: draw or stop",
+   "ask": "Can you see Draw and Stop?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "cf-zoom",
+   "name": "Market: stalls and prices",
+   "ask": "Can you read every stall price?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "cf-draw",
+   "name": "Cauldron: pull a chip",
+   "ask": "Tap Draw. Does a chip tumble out?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "cf-help",
+   "name": "Cauldron: rules cards",
+   "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
+ "doorkick-dungeon": [
+  {
+   "id": "dk-tut-help",
+   "name": "Tutorial: ask for help",
+   "ask": "Can you read the Help button?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "dk-fight-bonus",
+   "name": "Fight with bonuses",
+   "ask": "Is YOU vs MONSTERS big and clear?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "dk-boss-reveal",
+   "name": "Boss clip, then the card",
+   "ask": "Boss clip, roar, then the monster card?",
+   "sizes": "all",
+   "group": "Bosses"
+  },
+  {
+   "id": "dk-board",
+   "name": "Start of game board",
+   "ask": "Is the table clear, with Help and Run?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "dk-zoom",
+   "name": "Big card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ]
+}

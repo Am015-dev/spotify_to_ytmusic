@@ -73,4 +73,37 @@
       { kind: 'tap', sel: '#ppop .pp-x', name: 'tap close', state: function () { return !!UI.pop; }, expect: function (a, b) { return (a && !b) || 'zoom did not close'; } }
     ]
   });
+
+  GXS.add({
+    id: 'tb-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 9, when: booted, group: 'UI',
+    setup: function () { return table(9).then(function () { GXH.rules(null); return GXS.wait(function () { return $('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-rules .gxh-card', name: 'help card' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'visible', sel: '.gxh-rules .gxh-x', name: 'Close button' },
+      { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'tb-rivals', name: 'Rival strip with faction emblems', ask: 'Are the rival chips readable?', seed: 10, when: booted, group: 'Board',
+    setup: function () { return table(10); },
+    checks: [
+      { kind: 'visible', sel: '#rivals', name: 'rivals bar' },
+      { kind: 'fn', name: 'rival texts >= 12 px', fn: function () { var bad = leafFonts('#rivals').filter(function (x) { return x.px < 12; }); return !bad.length || 'text ' + bad[0].px + 'px: ' + bad[0].t; } },
+      { kind: 'fn', name: 'rivals bar is on screen', fn: function () { return inView($('#rivals')) || 'rivals bar off screen'; } },
+      skin
+    ]
+  });
+
+  GXS.add({
+    id: 'tb-buttons', name: 'Painted buttons keep their labels', ask: 'Are the action buttons readable?', seed: 11, when: booted, group: 'Board',
+    setup: function () { return table(11); },
+    checks: [
+      { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
+      skin
+    ]
+  });
+
 })();
