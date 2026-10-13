@@ -4,6 +4,13 @@
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
  {ver:'art1',id:'road-gap',area:'city',text:'Frankfurt Messe (Hot Drop start): tap 📍 GO: you stand on the street where the road used to end in a 10 m grass strip. Drive ahead: asphalt all the way to the next street, no grass across the road. Auto: a downward look every 2 m along the road, 0 on grass.'},
+ {ver:'lf1',id:'fra-1',area:'world',text:'Frankfurt west meadow (📍 GO parks you looking at it): no big flat green: trees, flower beds, rocks or a pond within 50 m, hills you can see. Pass line: flat green ≤ 8% of the screen, ≥ 6 props within 50 m, ≥ 4 m height range.'},
+ {ver:'lf1',id:'fra-2',area:'world',text:'Frankfurt west field (📍 GO): same as the west meadow: ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
+ {ver:'lf1',id:'fra-3',area:'world',text:'Frankfurt east lawn (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
+ {ver:'lf1',id:'fra-4',area:'world',text:'Frankfurt south-west field (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
+ {ver:'lf1',id:'ath-1',area:'world',text:'Athens north slope (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
+ {ver:'lf1',id:'ath-2',area:'world',text:'Athens south lawn (📍 GO): ≤ 8% flat green, ≥ 6 props within 50 m, ≥ 4 m hills in view.'},
+ {ver:'lf1',id:'mound',area:'world',text:'Drive over a grass hill (📍 GO puts you 40 m before one): the car rolls up and over it without a bump or a stop, and lands back on the grass.'},
  {ver:'v90k',id:'no-hollow',area:'city',text:'Frankfurt: drive 1 minute along the main road: every traffic vehicle is a whole car or truck (roof, cab, all 4+ wheels on the road); no hollow red/blue open box. Auto: HCAR has no ld:truck:v3221_1.'},
  {ver:'v90k',id:'shadow',text:'Cars, trees and people have shadows on the ground: a soft dark patch under your car, every traffic car, each person and each tree (📍 GO drops you behind a Frankfurt traffic car).'},
  {ver:'bxT',id:'bx-t-cliff',area:'race',text:'Built-in track CLIFF RUN (📍 GO): one lap: the cliff jump gives at least 1.5 s air, there is a drop and a banked turn, the road climbs and falls at least 15 m. AND drivable: never rolls backward at the start, at most 1 respawn per lap, at most 2 wall hits per minute, average speed at least 60 % of top speed, one 0.6-1.5 s jump with a clean landing, lap 45-90 s, no slope steeper than 25 %.'},
@@ -254,6 +261,8 @@ const OD_CHECKLIST=[
   'v90k/park-sit':[{fn:()=>{if(RO.foot==='walk'||RO.foot==='exit')return'📍 ALREADY OUT · look at the parked car';RO.v=0;try{OF.idle=1}catch(e){}if(!OF_canExit())return'📍 Can\'t get out right now · stop and tap again';OF_exit();return RO.foot==='exit'?'📍 OUT OF THE CAR · look at the parked car':'📍 Can\'t get out here'},c:'fra',n:'parked car'}],'v90g/land2':[{p:'planter',c:'fra',n:'planter'},{p:'dumpster',c:'fra',n:'dumpster'}],'v90i/palms':[{race:'synt',c:'ath',n:'Syntagma race'}],
   'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
   'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
+ // art-2 (lf1): empty-green spots, each GO parks the car at its spot and measures it (src/98lf_lively_fill.js)
+ for(const id in LF.SP)GO['lf1/'+id]=[{c:LF.SP[id].c,fn:()=>LF_goSpot(id),n:LF.SP[id].n}];GO['lf1/mound']=[{c:'fra',fn:()=>LF_goMound(),n:'grass hill'}];
  // chk-1 (Alex v90j-beta: "checklist has no GO scenarios"): every item without its own target gets one from its area/text:
  // garage items open the garage (RIDES); Athens items fly to Athens; the rest drive in Frankfurt free roam.
  for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
