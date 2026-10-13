@@ -218,7 +218,7 @@ function BX_hud(){const V=BX.v,m=BX.m,H=$('#bxHud'),M=$('#bxMsg');if(!H)return;c
 function BX_say(t,s=1.4){const V=BX.v;if(V){V.msg=t;V.msgT=s}}
 function BX_respawn(why){const V=BX.v,m=BX.m,s=V.lastCp||V.safe,sp=6;if(why==='far'&&V.fallPk-V.p.y>16)why='cliff';V.fallPk=-1e9;
  V.hist=[];V.p.copy(s.p).add(bxV(0,.8,0));V.F.copy(s.F);V.U.set(0,1,0);V.v.copy(s.F).multiplyScalar(sp);V.g=false;V.air=0;V.pk=V.p.y;V.far=0;V.stuck=0;
- if(V.boat){V.boat=false;BX_vmode('car')}BX.m.resp++;BX.m.respWhy.push(why);BX.m.respAt=BX.m.t;BX.m.backT=null;BX_say(why==='cliff'?'OFF THE CLIFF!':why==='far'?'TOO FAR FROM THE COURSE':'RESPAWN')}
+ if(V.boat){V.boat=false;BX_vmode('car')}BX.m.resp++;BX.m.respWhy.push(why);(BX.m.respTs=BX.m.respTs||[]).push(BX.m.t);BX.m.respAt=BX.m.t;BX.m.backT=null;BX_say(why==='cliff'?'OFF THE CLIFF!':why==='far'?'TOO FAR FROM THE COURSE':'RESPAWN')}
 const _r1=bxV(),_r2=bxV(),_r3=bxV();
 // one wheel ray along -U: nearest hit on pieces (real meshes) or analytic terrain
 function BX_cast(o,d,len,objs){let best=null;if(objs.length){BX.ray.set(o,d);BX.ray.near=0;BX.ray.far=len;const H=BX.ray.intersectObjects(objs,false);for(const h of H){if(!h.face)continue;best={d:h.distance,p:h.point.clone(),n:h.face.normal.clone(),pc:h.object.userData.pc};break}}
@@ -247,7 +247,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  if(grounded){U.lerp(n,Math.min(1,dt*(V.air>.2?12:20))).normalize();
   let dsum=0,c=0;for(const h of H)if(h){dsum+=h.d;c++}const err=(dsum/c)-(1+.5);V.p.addScaledVector(U,-err*Math.min(1,dt*25));
   const vn=V.v.dot(U);if(vn<0||!V.g||vn<3)V.v.addScaledVector(U,-vn);
-  if(!wasG&&V.air>.25){if(V.air>.5){m.jumps++;m.air+=V.air;m.airMax=Math.max(m.airMax,V.air);m.lastLand={air:V.air,Uy:0,t:m.t};BX_say('AIR '+V.air.toFixed(1)+' s!',1.1)}
+  if(!wasG&&V.air>.25){if(V.air>.5){m.jumps++;m.air+=V.air;m.airMax=Math.max(m.airMax,V.air);m.lastLand={air:V.air,Uy:0,t:m.t};(m.lands=m.lands||[]).push({air:+V.air.toFixed(2),t:m.t,Uy:+n.y.toFixed(2)});BX_say('AIR '+V.air.toFixed(1)+' s!',1.1)}
    BX_burst(V.p.clone(),6,0xd8d8d8,4);if(!pc)V.fallPk=Math.max(V.fallPk,V.pk)}
   V.air=0;V.pk=V.p.y;
   const g=bxV(0,-BXG,0),gn=g.dot(U),stick=pc&&pc.def.stick&&V.v.length()>9;
@@ -275,7 +275,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // respawn rules (the ONLY ones): below the terrain minimum, upside down >2 s (not in a loop), >40 m from the course >3 s (BX_farCheck)
  if(V.p.y<V.tMin-3)return BX_respawn('fall');
  if(U.y<0&&!(V.on&&V.on.def.stick)){V.stuck+=dt;if(V.stuck>2)return BX_respawn('stuck')}else V.stuck=0;
- m.t+=dt;m.dist+=V.v.length()*dt;m.yMin=Math.min(m.yMin,V.p.y);m.yMax=Math.max(m.yMax,V.p.y);if(!grounded&&!V.boat||U.y<Math.cos(.07))m.off+=dt}
+ m.t+=dt;m.dist+=V.v.length()*dt;{const vf=V.v.dot(F);if(vf<-1){m.backT=(m.backT||0)+dt;if(m.t<4)m.back0=(m.back0||0)+dt}}m.yMin=Math.min(m.yMin,V.p.y);m.yMax=Math.max(m.yMax,V.p.y);if(!grounded&&!V.boat||U.y<Math.cos(.07))m.off+=dt}
 function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9;for(const{s}of BX.samp){const dx=s.p.x-V.p.x,dz=s.p.z-V.p.z,d=dx*dx+dz*dz;if(d<best)best=d}best=Math.sqrt(best);V.dCourse=+best.toFixed(1);
  if(best>40){V.far+=dt;if(V.far>3)BX_respawn('far')}else V.far=0}
 // checkpoints and laps: START then every CHECKPOINT (any order), back over START = lap
@@ -402,6 +402,15 @@ Object.assign(BX_DEMOS,{'CLIFF RUN':{log:bxCh('mountain',[18,21,16,3],['sf','st'
   [31,10,-1,3],'up','su','su','br','st','st','br',...bxRep('st',8),'cp',...bxRep('st',10),'bo',...bxRep('st',10),'sd','sd','bl',...bxRep('st',7),'bl',...bxRep('st',3),'bl'])},
  'CANYON SPLIT':{log:[...bxCh('canyon',[19,27,1,3],['sf','st','fk','bl','br','br','up','bl',1,'up','up','up','dn','dn','bl',[35,21,3,2],'su','su',...bxRep('st',3),'cp','st','bl',
  ...bxRep('st',6),'bo',...bxRep('st',7),'bl','st','sd','sd','dn',...bxRep('st',5),'bl']),['b','raise',124,32,0]]}});
+// "drivable and fun" pass lines (coordinator 2026-10-13, after Alex: "horrible! not fun, not easy to drive, the car moves backward"):
+// 0 backward start, <=1 respawn per lap, <=2 wall hits/min, average speed >=60 % of top, a 0.6-1.5 s jump with a clean landing, lap 45-90 s, no grade >25 %
+function BX_grade(){let g=0,at='';for(const p of BX.pcs){if(p.dead||p.def.jump)continue;for(const S of p.S)for(let k=1;k<S.length;k++){const a=S[k-1].p,b=S[k].p,h=Math.hypot(b.x-a.x,b.z-a.z);if(h>.05){const q=Math.abs(b.y-a.y)/h;if(q>g){g=q;at=p.type}}}}return{g,at}}
+function BX_fun(){const m=BX.m,laps=m.laps,hpm=(m.wall+m.bump)/Math.max(m.t/60,1e-3),avg=m.dist/Math.max(m.t,1e-3),TOP=34,G=BX_grade(),lap=m.lapT[0]||0,
+ rs=m.respTs||[],J=(m.lands||[]).filter(l=>l.air>=.6&&l.air<=1.5&&l.Uy>.8&&!rs.some(t=>t>=l.t-l.air&&t<l.t+2)),
+ L=[['0 backward start',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`],['<=1 respawn/lap',laps>=1&&m.resp<=laps,`respawns ${m.resp}/${laps} laps`],
+  ['<=2 hits/min',hpm<=2,`hits ${hpm.toFixed(1)}/min`],['avg >=60 % top',avg>=.6*TOP,`avg ${Math.round(avg*3.6)} km/h (${Math.round(avg/TOP*100)} %)`],
+  ['jump 0.6-1.5 s clean',J.length>0,`jumps ${(m.lands||[]).map(l=>l.air).join('/')||'none'}`],['lap 45-90 s',lap>=45&&lap<=90,`lap ${lap.toFixed(1)} s`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} % (${G.at})`]];
+ return{ok:L.every(x=>x[1]),fails:L.filter(x=>!x[1]).map(x=>x[0]),msg:L.map(x=>(x[1]?'✔ ':'✘ ')+x[2]).join(', ')}}
 const BX_TESTS={
  'bx-snap':{n:'SNAP TEST',log:()=>[['w','meadow']],drive:0,chk:()=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,ex=new Set();let con=0;
   for(const p of L){if(ex.has(key(p.c)))con++;for(const e of p.ex)ex.add(key(e))}const step=new Set(L.map(p=>p.c.l)).size>1||L.some(p=>p.ex[0].l!==p.c.l);
@@ -424,15 +433,16 @@ const BX_TESTS={
   return{ok:hi-lo>=30&&vis>20,msg:`terrain range ${(hi-lo).toFixed(1)} m, ${vis} hill points (>20 m) on screen`}}},
  // dev-2 built-in tracks (Alex: "I see no tracks made with the builder yet!!!"): lap completes, >=15 m elevation, + each track's feature
  'bx-t-cliff':{n:'CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,
-  chk:()=>{const m=BX.m,r=m.yMax-m.yMin;return{ok:m.laps>=1&&r>=15&&m.airMax>=1.5&&BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id)),msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, air max ${m.airMax.toFixed(2)} s, banked turn ${BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id))?'yes':'no'}`}}},
+  chk0:()=>{const m=BX.m,r=m.yMax-m.yMin;return{ok:m.laps>=1&&r>=15&&m.airMax>=1.5&&BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id)),msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, air max ${m.airMax.toFixed(2)} s, banked turn ${BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id))?'yes':'no'}`}}},
  'bx-t-city':{n:'TWO-LEVEL CITY',log:()=>(BX_DEMOS['TWO-LEVEL CITY']||{log:[['w','city']]}).log,drive:1,
-  chk:()=>{const m=BX.m,r=m.yMax-m.yMin,cr=bxCross(m.seen||new Set());return{ok:m.laps>=1&&r>=15&&cr&&m.boat>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, over+under ${cr?'yes':'no'}, boat ${m.boat.toFixed(1)} s`}}},
+  chk0:()=>{const m=BX.m,r=m.yMax-m.yMin,cr=bxCross(m.seen||new Set());return{ok:m.laps>=1&&r>=15&&cr&&m.boat>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, over+under ${cr?'yes':'no'}, boat ${m.boat.toFixed(1)} s`}}},
  'bx-t-canyon':{n:'CANYON SPLIT',log:()=>(BX_DEMOS['CANYON SPLIT']||{log:[['w','canyon']]}).log,drive:1,
-  chk:()=>{const m=BX.m,r=m.yMax-m.yMin,S=m.seen||new Set(),key=c=>c.i+','+c.j+','+c.l+','+c.r,fk=BX.pcs.find(p=>p.type==='fk'),br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[],n=br.filter(p=>p&&S.has(p.id)).length;
+  chk0:()=>{const m=BX.m,r=m.yMax-m.yMin,S=m.seen||new Set(),key=c=>c.i+','+c.j+','+c.l+','+c.r,fk=BX.pcs.find(p=>p.type==='fk'),br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[],n=br.filter(p=>p&&S.has(p.id)).length;
    return{ok:m.laps>=1&&r>=15&&n===2&&m.terrT>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, routes driven ${n}/2, off-road ${m.terrT.toFixed(1)} s`}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
+for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon']){const T=BX_TESTS[k];T.chk=()=>{const a=T.chk0(),b=BX_fun();return{ok:a.ok&&b.ok,msg:a.msg+' | '+b.msg,fails:b.fails}}}
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
  BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();return T.n}
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
