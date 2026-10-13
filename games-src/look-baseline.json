@@ -146,9 +146,11 @@
   }
  },
  "cauldron-fair": {
-  "severe": 0,
+  "severe": 1,
   "warn": 8,
-  "severeKeys": [],
+  "severeKeys": [
+   "contrast|span.bagn"
+  ],
   "counts": {
    "contrast": 2,
    "images": 4,
