@@ -70,3 +70,8 @@ Last tPlay ATH (381ec86, rd/tp_final3): wall 5.63/min FAIL, stuck 1.4 %, heap 20
    (~1815,-1680), both also on base. Run 2 seeds before judging.
 3. Re-REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with docs/shots/roads/GRID.jpg (one labelled grid, reviewer rule) + numbers + tyre gap 0.03 m.
 4. After PASS: hand the commit to build-11, READY to the coordinator. Then the queued slice: scooter riders + rideable scooters, LEGO bikes/motorbikes (6522 Highway Bike) in traffic.
+
+## roads-2 (10-min slice): Athens wall-hit diagnosis, NO fix yet
+- tp_final3's 17 ATH wall hits are all 6–35 m OFF the asphalt (athRoad e>0), not buildings on the road; 14 of them are in Psyrri (2020–2240, -1400..-1600). Base tp_before2 had the same pattern at other spots. So the cause is the bot driving into blocks, not colliders overlapping the road.
+- Fix target: RD_prune cut Kriezi (sec) at 2142,-1419 / 2152,-1410 (base e 3.8 / 1.8 m → new 19 / 32 m). Buildings fill the old street, so a route through it now hits walls. Next: never prune `sec` in the old town (or within ~150 m of Garaz Psyrri), then re-run tPlay CITIES=ath ×2 seeds.
+- Tool: `tools/roads/rdEvalW.js <http url> ath code.js` evaluates in window scope (rdEval needs __g9ev, which this build lacks). Serve out/<ver> over http (file:// breaks fetch).
