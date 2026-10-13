@@ -1,0 +1,12 @@
+Sports car HUD with BOOST=qa_home/fra_1_sports_boost.jpg
+Pause menu: 🏠 HOME=qa_home/fra_2_pause_home.jpg
+Home on the minimap (🏠 pin) after fast travel=qa_home/fra_3_home_minimap.jpg
+Drive into Home: SAVED toast=qa_home/fra_4_home_saved.jpg
+Stored cars parked at Home · gap 0.000 m=qa_home/fra_5_home_cars.jpg
+Home garage: RIDES (Hot Rod: Nitro built in)=qa_home/fra_6_garage_rides.jpg
+Van stats: Nitro none + NITRO KIT=qa_home/fra_7_van_kit_offer.jpg
+Post Van driving: no BOOST button=qa_home/fra_8_van_no_boost.jpg
+Hot Rod parked at Home after the swap=qa_home/fra_9_home_cars_after.jpg
+NITRO KIT installed (ride stats)=qa_home/fra_10_kit_installed.jpg
+Post Van with Nitro Kit: BOOST=qa_home/fra_11_van_kit_boost.jpg
+Reload: progress restored at Home=qa_home/fra_12_reload_restored.jpg
