@@ -9,7 +9,7 @@
 // Drawn with the main renderer while BX.on (frame() is wrapped; the game loop is idle meanwhile). Probe: window.__bx.
 const BX={on:false,ui:0,tab:'track',sel:'st',tool:'raise',world:'valley',log:[],pcs:[],cur:{i:20,j:22,l:2,r:0},hl:-1,mode:'build',
  cam:null,sc:null,v:null,m:null,keys:{},t:0,acc:0,camB:{x:0,z:0,d:72,yaw:3.5,pit:0.52},name:'MY TRACK',fast:/[?&](bx)?fast=1/.test(location.search),tfast:/[?&]bxfast=1/.test(location.search)};
-const BXC=8,BXH=2,BXN=40,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=5.5; // road 11 m + kerbs = 12 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
+const BXC=8,BXH=2,BXN=40,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=6.5; // road 13 m + kerbs = 14 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
 const BXF=[[0,1],[-1,0],[0,-1],[1,0]];
 const bxV=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z),bxSS=t=>t*t*(3-2*t),bxCl=(v,a,b)=>v<a?a:v>b?b:v;
 BX.th=new Float32Array(BXTN*BXTN);
@@ -112,9 +112,9 @@ function BX_mats(){if(BX.M)return BX.M;const M=BX.M={};
  return M}
 const bxCol=c=>new THREE.Color(c);
 // piece mesh: road top (textured) + body (kerbs, sides, bottom; vertex colours). Collision uses these same meshes.
-const BX_PROF=[[-5.5,0,-5.5,.14,1,0,'k'],[-5.5,.14,-6,.14,0,1,'k'],[-6,.14,-6,-.8,-1,0,'s'],[-6,-.8,6,-.8,0,-1,'b'],[6,-.8,6,.14,1,0,'s'],[6,.14,5.5,.14,0,1,'k'],[5.5,.14,5.5,0,-1,0,'k']];
+const BX_PROF=[[-6.5,0,-6.5,.14,1,0,'k'],[-6.5,.14,-7,.14,0,1,'k'],[-7,.14,-7,-.8,-1,0,'s'],[-7,-.8,7,-.8,0,-1,'b'],[7,-.8,7,.14,1,0,'s'],[7,.14,6.5,.14,0,1,'k'],[6.5,.14,6.5,0,-1,0,'k']];
 // side barriers (Alex: "frustrated because of the multiple spawning"): a 1 m kerb-coloured wall on both edges keeps the car on the deck; SPLIT/MERGE have none (their lanes cross)
-const BX_RAIL=[[-6,.14,-6,1.4,-1,0,'k'],[-6,1.4,-5.55,1.4,0,1,'k'],[-5.55,1.4,-5.55,.14,1,0,'k'],[5.55,.14,5.55,1.4,-1,0,'k'],[5.55,1.4,6,1.4,0,1,'k'],[6,1.4,6,.14,1,0,'k']];
+const BX_RAIL=[[-7,.14,-7,1.4,-1,0,'k'],[-7,1.4,-6.55,1.4,0,1,'k'],[-6.55,1.4,-6.55,.14,1,0,'k'],[6.55,.14,6.55,1.4,-1,0,'k'],[6.55,1.4,7,1.4,0,1,'k'],[7,1.4,7,.14,1,0,'k']];
 function BX_geo(S,def){const rp=[],rn=[],ru=[],ri=[],bp=[],bc=[],bi=[],tmp=bxV(),cS=bxCol(def.boost?'#ff8a00':def.cp?'#0055bf':def.start?'#202020':'#a0a5a9'),cB=bxCol('#6d7276');
  for(let k=0;k<S.length;k++){const s=S[k];for(const x of[-BXRW,BXRW]){tmp.copy(s.p).addScaledVector(s.S,x);rp.push(tmp.x,tmp.y,tmp.z);rn.push(s.U.x,s.U.y,s.U.z);ru.push(x<0?0:1,s.d/8)}
   if(k){const a=(k-1)*2;ri.push(a,a+2,a+1,a+1,a+2,a+3)}}
@@ -146,8 +146,8 @@ function BX_pcMesh(pc){const M=BX_mats();for(const S of pc.S){const[g1,g2]=BX_ge
  for(const o of[a,b]){o.castShadow=o.receiveShadow=true;o.userData.pc=pc;BX.gP.add(o);pc.meshes.push(o)}}
  if(pc.def.cp||pc.def.start)BX_gate(pc);BX_hashAll();}
 function BX_pcDrop(pc){if(!pc)return;for(const o of pc.meshes){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}pc.meshes=[];BX_hashAll()}
-function BX_gate(pc){const s=pc.S[0][Math.floor(pc.S[0].length/2)],g=new THREE.Group(),c=pc.def.start?0xf4f4f4:0x0055bf,m=new THREE.MeshStandardMaterial({color:c,roughness:.4}),bx=new THREE.BoxGeometry(1,7,1),top=new THREE.BoxGeometry(14,1.4,1);
- for(const x of[-6.6,6.6]){const p=new THREE.Mesh(bx,m);p.position.set(x,3.5,0);g.add(p)}const t=new THREE.Mesh(top,new THREE.MeshStandardMaterial({color:pc.def.start?0x202020:0xf2cd37,roughness:.4}));t.position.y=7.4;g.add(t);
+function BX_gate(pc){const s=pc.S[0][Math.floor(pc.S[0].length/2)],g=new THREE.Group(),c=pc.def.start?0xf4f4f4:0x0055bf,m=new THREE.MeshStandardMaterial({color:c,roughness:.4}),bx=new THREE.BoxGeometry(1,7,1),top=new THREE.BoxGeometry(16,1.4,1);
+ for(const x of[-7.6,7.6]){const p=new THREE.Mesh(bx,m);p.position.set(x,3.5,0);g.add(p)}const t=new THREE.Mesh(top,new THREE.MeshStandardMaterial({color:pc.def.start?0x202020:0xf2cd37,roughness:.4}));t.position.y=7.4;g.add(t);
  g.position.copy(s.p);g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(s.S.clone().negate(),s.U,s.F)); // (S,U,F) is left-handed: it rotated the posts onto the road centreg.traverse(o=>{o.castShadow=true});BX.gP.add(g);pc.meshes.push(g);
  g.children.forEach(o=>o.userData.pc=pc);BX.posts=BX.posts||[]}
 function BX_buildAll(){if(!BX.sc)return;for(const o of[...BX.gP.children]){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}for(const pc of BX.pcs)if(!pc.dead){pc.meshes=[];BX_pcMesh(pc)}
@@ -293,7 +293,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
   const hp=h&&h.object.userData.pc;if(h&&h.face&&h.face.normal.dot(U)<.5&&!(hp&&!hp.def.in&&hp.def.p.length===1&&hp===V.on)){const nw=h.face.normal,vn=V.v.dot(nw);if(vn<0){V.v.addScaledVector(nw,-vn*1.3);m.wall++;V.p.addScaledVector(nw,.2)}}}}
  // barriers: on a railed piece the car's centre stays within 2.5 m of the deck centre line; the outward speed is taken away (it slides along the wall)
  {const q=V.on&&!V.on.def.in&&V.on.S.length===1&&!H.some(h=>h&&h.pc&&h.pc!==V.on)?V.on:null;if(q&&!V.boat){let b=null,bd=1e9;for(const s of q.S[0]){const d=s.p.distanceToSquared(V.p);if(d<bd){bd=d;b=s}}
-  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=4.4;if(Math.abs(lat)>lim&&Math.abs(lat)<8){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg);if(vo>4&&!V.rub)m.wall++;V.rub=.3}}}}if(V.rub>0)V.rub-=dt
+  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=5.4;if(Math.abs(lat)>lim&&Math.abs(lat)<8){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg);if(vo>4&&!V.rub)m.wall++;V.rub=.3}}}}if(V.rub>0)V.rub-=dt
  V.p.addScaledVector(V.v,dt);
  // respawn rules (the ONLY ones): below the terrain minimum, upside down >2 s (not in a loop), >40 m from the course >3 s (BX_farCheck)
  if(V.p.y<V.tMin-3)return BX_respawn('fall');
