@@ -1,21 +1,21 @@
 {
- "bx-offroad": {
-  "ok": true,
-  "msg": "terrain 18.8 s, respawns 0, invisible-wall hits 0, tree/pillar bumps 1",
+ "bx-jump": {
+  "ok": false,
+  "msg": "air 1.13 s, landed up 1.00, respawns 0",
   "why": "",
-  "wall": "33s"
- },
- "bx-water": {
-  "ok": true,
-  "msg": "boat 11.6 s, boat speed 23.3 m/s",
-  "why": "far",
-  "wall": "16s"
+  "wall": "46s"
  },
  "bx-cliff": {
-  "ok": true,
-  "msg": "respawn cliff, back on course after 0.29 s",
-  "why": "cliff",
-  "wall": "10s"
+  "ok": false,
+  "msg": "respawn none, back on course after - s",
+  "why": "",
+  "wall": "27s"
+ },
+ "bx-bridge": {
+  "ok": false,
+  "msg": "not both levels yet",
+  "why": "",
+  "wall": "101s"
  },
  "bx-errors": {
   "ok": true,
