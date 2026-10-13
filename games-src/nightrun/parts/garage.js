@@ -63,7 +63,8 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 .pg .sw{height:clamp(22px,calc(var(--u)*9),56px);aspect-ratio:1;border-radius:50%;background:linear-gradient(135deg,#ff2d95,#19e3ff);flex:0 0 auto}
 .pg .sp{flex:1 1 0}
 @container (max-aspect-ratio:1/1){
- .pg .cards{flex-direction:column}
+ .pg .cards{flex-direction:column;overflow-y:auto}
+ .pg .card{flex:1 0 auto}
  .pg .card{flex-direction:row;text-align:left;gap:calc(var(--u)*3);padding:calc(var(--u)*2) calc(var(--u)*3)}
  .pg .card .tx{flex:1 1 0}
  .pg .card .pr{margin-left:auto}

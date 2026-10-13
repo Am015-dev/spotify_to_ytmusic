@@ -1,0 +1,38 @@
+{
+ "cards": {
+  "table-reef-glow": "a wide painted deep-sea tabletop seen from above: a glowing reef with soft turquoise light and drifting bubbles, calm empty space in the middle for cards, no text, letters or numbers",
+  "table-wreck-bridge": "a wide painted deep-sea tabletop seen from above: the dark bridge of a sunken ship with brass dials and barnacles, calm empty space in the middle for cards, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-reef-glow": {
+   "element": "Painting: table-reef-glow",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-reef-glow.png",
+   "target": "games/lantern-dive/media/table-reef-glow.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  },
+  "table-wreck-bridge": {
+   "element": "Painting: table-wreck-bridge",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-wreck-bridge.png",
+   "target": "games/lantern-dive/media/table-wreck-bridge.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  }
+ }
+}

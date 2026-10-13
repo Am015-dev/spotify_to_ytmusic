@@ -85,7 +85,9 @@ def nextwave_counts():
     try: d = json.load(open('games/next-wave.json', encoding='utf-8'))
     except (OSError, ValueError): return {}
     c = {}
-    for it in d.get('items', []): c[it['slug']] = c.get(it['slug'], 0) + 1
+    for it in d.get('items', []):
+        if it.get('tag'): continue          # wave 7 variety items (poses, 3D variety, art variety) are optional extras, not must-make
+        c[it['slug']] = c.get(it['slug'], 0) + 1
     return c
 
 def main():

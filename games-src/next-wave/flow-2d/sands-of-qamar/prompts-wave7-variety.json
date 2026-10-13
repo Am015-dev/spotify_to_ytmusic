@@ -1,0 +1,98 @@
+{
+ "cards": {
+  "tile-small-b": "a top-down painted square city tile of a small desert town with flat roofs, a courtyard and a palm, different from the standard small town tile, no text, letters or numbers",
+  "tile-small-c": "a top-down painted square city tile of a small desert hamlet with tents and a well, no text, letters or numbers",
+  "tile-large-b": "a top-down painted square city tile of a large walled city with domes and a market square, no text, letters or numbers",
+  "tile-village-b": "a top-down painted square city tile of a village of mud-brick houses around a date grove, no text, letters or numbers",
+  "tile-oasis-b": "a top-down painted square city tile of an oasis with a turquoise pool and tall palms, no text, letters or numbers",
+  "tile-lake-b": "a top-down painted square city tile of a still blue desert lake with reeds and a small boat, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "tile-small-b": {
+   "element": "Painting: tile-small-b",
+   "why": "each tile type is one picture repeated",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-small-b.png",
+   "target": "games/sands-of-qamar/media/tile-small-b.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-small-c": {
+   "element": "Painting: tile-small-c",
+   "why": "tile variety",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-small-c.png",
+   "target": "games/sands-of-qamar/media/tile-small-c.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-large-b": {
+   "element": "Painting: tile-large-b",
+   "why": "tile variety",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-large-b.png",
+   "target": "games/sands-of-qamar/media/tile-large-b.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-village-b": {
+   "element": "Painting: tile-village-b",
+   "why": "tile variety",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-village-b.png",
+   "target": "games/sands-of-qamar/media/tile-village-b.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-oasis-b": {
+   "element": "Painting: tile-oasis-b",
+   "why": "tile variety",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-oasis-b.png",
+   "target": "games/sands-of-qamar/media/tile-oasis-b.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-lake-b": {
+   "element": "Painting: tile-lake-b",
+   "why": "tile variety",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-lake-b.png",
+   "target": "games/sands-of-qamar/media/tile-lake-b.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  }
+ }
+}

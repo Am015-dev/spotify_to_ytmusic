@@ -1,0 +1,68 @@
+{
+ "cards": {
+  "tile-water-e": "a top-down painted square sea tile with gentle blue waves and a small school of fish, no text, letters or numbers",
+  "tile-water-f": "a top-down painted square sea tile with deep dark teal water and a few foam streaks, no text, letters or numbers",
+  "tile-water-g": "a top-down painted square sea tile with a shallow reef showing under pale green water, no text, letters or numbers",
+  "tile-water-h": "a top-down painted square sea tile with floating driftwood and kelp, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a sea-tile navigation game with giant sea leviathans, deep teal water, warm lantern light, foam and scales, matte paper texture, slightly wobbly dark navy outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "tile-water-e": {
+   "element": "Painting: tile-water-e",
+   "why": "water tiles come in four looks only",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-water-e.png",
+   "target": "games/tidewake/media/tile-water-e.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-water-f": {
+   "element": "Painting: tile-water-f",
+   "why": "water variety",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-water-f.png",
+   "target": "games/tidewake/media/tile-water-f.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-water-g": {
+   "element": "Painting: tile-water-g",
+   "why": "water variety",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-water-g.png",
+   "target": "games/tidewake/media/tile-water-g.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  },
+  "tile-water-h": {
+   "element": "Painting: tile-water-h",
+   "why": "water variety",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tile-water-h.png",
+   "target": "games/tidewake/media/tile-water-h.webp",
+   "size": "512x512",
+   "ratio": "1:1",
+   "tag": "art"
+  }
+ }
+}

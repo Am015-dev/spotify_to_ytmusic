@@ -1,0 +1,38 @@
+{
+ "cards": {
+  "table-clock-tower-phone": "a tall painted tabletop seen from above: a clock tower workshop floor with big brass gears and blueprints, calm empty space in the middle, no text, letters or numbers",
+  "table-blueprint-phone": "a tall painted tabletop seen from above: a blue blueprint sheet with chalk marks and pencil lines, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Workshop gouache illustration for a cheerful bomb-defusal crew card game, warm lamplight against cool blueprint blues, brass and copper wire, slightly wobbly dark ink outline, matte paper texture, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-clock-tower-phone": {
+   "element": "Painting: table-clock-tower-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-clock-tower-phone.png",
+   "target": "games/short-fuse/media/table-clock-tower-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  },
+  "table-blueprint-phone": {
+   "element": "Painting: table-blueprint-phone",
+   "why": "phone version",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-blueprint-phone.png",
+   "target": "games/short-fuse/media/table-blueprint-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art"
+  }
+ }
+}

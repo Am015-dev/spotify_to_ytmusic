@@ -1,0 +1,23 @@
+{
+ "cards": {
+  "table-jungle-clearing": "a wide painted tabletop seen from above: a jungle clearing with a campfire ring, big leaves and sand at the edges, calm empty space in the middle for a hex board, no text, letters or numbers"
+ },
+ "style": "Tropical castaway gouache illustration for a co-operative island survival card game, turquoise, sand, jungle green and driftwood colours, soft rim light, matte paper texture, slightly wobbly dark ink outline, simple readable silhouette that works small, centred, plenty of margin, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "table-jungle-clearing": {
+   "element": "Painting: table-jungle-clearing",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-jungle-clearing.png",
+   "target": "games/shipwreck-isle/media/table-jungle-clearing.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art"
+  }
+ }
+}

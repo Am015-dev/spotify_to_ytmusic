@@ -1,0 +1,38 @@
+{
+ "cards": {
+  "back-veil-station": "a card back design: a pale violet orbital ring emblem on a starry pattern, ornate border, symmetrical, no text, letters or numbers",
+  "back-red-streak": "a card back design: a red comet streak emblem on a dark indigo starry pattern, ornate border, symmetrical, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache sci-fi illustration for a starfighter duel game, deep indigo space, glowing engine light, clean readable shapes, retro-futurist, rich but not neon colours, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "meta": {
+  "back-veil-station": {
+   "element": "Painting: back-veil-station",
+   "why": "card backs per chapter",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "back-veil-station.png",
+   "target": "games/nebula-aces/media/back-veil-station.webp",
+   "size": "768x1024",
+   "ratio": "3:4",
+   "tag": "art"
+  },
+  "back-red-streak": {
+   "element": "Painting: back-red-streak",
+   "why": "card backs per chapter",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "back-red-streak.png",
+   "target": "games/nebula-aces/media/back-red-streak.webp",
+   "size": "768x1024",
+   "ratio": "3:4",
+   "tag": "art"
+  }
+ }
+}
