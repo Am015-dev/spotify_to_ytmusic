@@ -5,7 +5,8 @@
 // over 8 words, on-screen strengths / levels differing from the engine, anything stuck > 8 s, hand cards off screen, buttons covered,
 // horizontal scroll, the [data-board] table under 55 % of a portrait screen, a ghost finger pointing at a move the engine would not allow.
 const { chromium } = require('playwright');
-const path = require('path');
+const path = require('path'), fs = require('fs');
+const localRoute = require('./local-route.js');
 const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'doorkick.html'), MAXMIN = +process.argv[4] || 8;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
@@ -45,6 +46,10 @@ const PAGE = `(() => {
       const bd = document.querySelector('[data-board]'); if (!bd) bad.push('no data-board');
       else if (H > W) { const r = bd.getBoundingClientRect(); const pc = 100 * Math.max(0, Math.min(r.right, W) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0)) / (W * H); if (pc < 55) bad.push('board ' + pc.toFixed(1) + '% phase ' + G.phase + ' q ' + (G.q && G.q.kind) + ' sell ' + !!UI.sell + ' dock ' + Math.round(document.querySelector('.gx-dock').getBoundingClientRect().height) + ' ' + (document.querySelector('#prompt') || {}).className); }
       if (UI.lastErr) bad.push('UI.lastErr ' + UI.lastErr);
+      for (const b of document.querySelectorAll('.fbtns button, #prompt .acts button, #modal .dlg button')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.bottom < 0 || r.top > H) continue;
+        if (!b.innerText.trim() && !b.querySelector('svg,img')) bad.push('button without label or icon: ' + b.className);
+        else if (b.scrollWidth > b.clientWidth + 2 && getComputedStyle(b).overflow !== 'visible') bad.push('button label clipped: "' + b.innerText.trim().slice(0, 20) + '"');
+        else if (parseFloat(getComputedStyle(b).fontSize) < 13) bad.push('button font under 13px: "' + b.innerText.trim().slice(0, 20) + '"'); }
       const ln = document.querySelector('#prompt .bfline'); if (ln && vis(ln)) { const w = words(ln.textContent); if (w.length > 8) bad.push('status ' + w.length + ' words: ' + w.join(' ')); }
       // any other visible block over 8 words (outside the pop-ups the player opened)
       for (const e of document.body.querySelectorAll('*')) {
@@ -96,12 +101,12 @@ async function dragTo(page, from, to) { await page.mouse.move(from.x, from.y); a
 async function playGame(browser, size, gi, rep) {
   const [W, H] = size, tag = W + 'x' + H + ' g' + gi;
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
-  const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, drags: 0, turns: 0, fights: 0, kinds: {}, rot: 0 };
+  await localRoute(ctx, fs.readFileSync(FILE)); const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, drags: 0, turns: 0, fights: 0, kinds: {}, rot: 0 };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 160)));
   page.on('console', m => { if (m.type() === 'error' && !/ERR_|Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
   const anim = gi % 3 === 0 ? 1 : 0, learn = gi % 5 === 4, np = NPS[gi % NPS.length];
   try {
-    await page.goto('file://' + FILE); await page.evaluate(() => { try { localStorage.clear(); localStorage.setItem('dkd_offer', '1') } catch (e) { } }); await page.reload(); await sleep(500);   // dkd_offer: a player who already saw the "New here?" tutorial offer (tutor-test.js covers the offer)
+    await page.goto('https://gns.test/'); await page.evaluate(() => { try { localStorage.clear(); localStorage.setItem('dkd_offer', '1') } catch (e) { } }); await page.reload(); await sleep(500);   // dkd_offer: a player who already saw the "New here?" tutorial offer (tutor-test.js covers the offer)
     await page.evaluate(PAGE);
     await page.evaluate(([seed, anim, np, learn]) => { setSeed(seed); ANIM = anim; AIDELAY = anim ? 90 : 0; UI.n = np; UI.lvl = ['easy', 'normal', 'hard'][seed % 3]; UI.learn = learn; UI.speed = 1; }, [1000 + gi * 7 + W, anim, np, learn]);
     if (learn) await page.evaluate(() => { try { localStorage.removeItem('dkd_learned'); localStorage.removeItem('dkd_bf') } catch (e) { } });
@@ -124,7 +129,7 @@ async function playGame(browser, size, gi, rep) {
       if (!R.inside) issues.add('rules card outside the screen (' + ph + ')');
       await page.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await sleep(100);
       if (await page.evaluate(() => !!document.querySelector('.gxh-rules'))) issues.add('rules cards did not close'); };
-    const audit = async () => { const bad = await page.evaluate(() => __sw.audit()); bad.forEach(b => issues.add(b)); const hb = bad.find(b => /help bubble/.test(b)); if (hb && (TOT.badshots = (TOT.badshots || 0) + 1) <= 4) await page.screenshot({ path: '/tmp/claude-0/helpbad_' + W + '_' + gi + '_' + TOT.badshots + '.png' }).catch(() => { }); };
+    const audit = async () => { const bad = await page.evaluate(() => __sw.audit()); bad.forEach(b => issues.add(b)); const cl = bad.find(b => /label clipped/.test(b)); if (cl && process.env.CLSHOTS && (TOT.clshots = (TOT.clshots || 0) + 1) <= 6) await page.screenshot({ path: process.env.CLSHOTS + '/clip_' + W + '_' + TOT.clshots + '.png' }).catch(() => { }); const hb = bad.find(b => /help bubble/.test(b)); if (hb && (TOT.badshots = (TOT.badshots || 0) + 1) <= 4) await page.screenshot({ path: '/tmp/claude-0/helpbad_' + W + '_' + gi + '_' + TOT.badshots + '.png' }).catch(() => { }); };
     const helpFlow = async () => {
       const hs = await page.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], st: GXH.state() }));
       if (hs.st.rules) { issues.add('rules overlay stuck open'); await page.evaluate(() => GXH.hide()); return false; }

@@ -1,6 +1,32 @@
 [
  {
   "date": "2026-10-13",
+  "game": "sands",
+  "title": "Button text size",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
+   "Bid chips 13 px"
+  ],
+  "check": "sweep 4/4 clean, no empty or clipped button labels"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Buttons readable again",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut"
+  ],
+  "check": "tutor-test 390x763 + 1280x800 and button label/contrast check pass"
+ },
+ {
+  "date": "2026-10-13",
   "game": "thornbound",
   "title": "Painted court kit",
   "items": [
@@ -23,28 +49,6 @@
    "Painted action and resource icons (food, wood, fur, build, hunt...)"
   ],
   "check": "Start a game: look at the island, then open Camp and the plan list."
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Painted gear slots, rivals and clash medallions",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip"
-  ],
-  "check": "Start a game and kick a door."
- },
- {
-  "date": "2026-10-13",
-  "game": "sands",
-  "title": "Painted djinns, goods and tokens",
-  "items": [
-   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
-   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
-   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots"
-  ],
-  "check": "Start a game: look at the djinn row and goods; summon a djinn at a Shrine."
  },
  {
   "date": "2026-10-13",
