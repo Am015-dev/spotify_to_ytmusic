@@ -146,7 +146,7 @@ function storyUI(){
 #stsel .card .hd{display:flex;align-items:baseline;justify-content:space-between;width:100%;gap:4px}
 #stsel .card .no{font-weight:700;font-size:clamp(16px,calc(var(--u)*8),34px);line-height:1;color:var(--c)}
 #stsel .card .stars{font-size:clamp(11px,calc(var(--u)*3.4),15px);letter-spacing:0;color:#ffe14d;white-space:nowrap}
-#stsel .card .nm{font-weight:700;font-size:clamp(11px,calc(var(--u)*3.2),14px);line-height:1.05;color:var(--ink);text-align:left;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#stsel .card .nm{line-height:1.3;padding-bottom:1px;font-weight:700;font-size:clamp(11px,calc(var(--u)*3.2),14px);line-height:1.05;color:var(--ink);text-align:left;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 #stsel .card .gl{font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*2.8),12px);color:var(--dim);text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #stsel .card.lock{opacity:.5;border-style:dashed}
 #stsel .card.lock .no{color:var(--dim)}
