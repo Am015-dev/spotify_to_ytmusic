@@ -3,6 +3,10 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90j',id:'town20',text:'Garage → RIDES: Recycling Truck, Classic Tractor, Pursuit Squad Car, Mobile Crane, Night Patroller, Mobile Police Truck, Hook and Ladder Truck, Sport Convertible, Farm Tractor (6504), Police Patrol, Fire Chief Car (6602), Shovel Tractor, Road Racer, Little Tractor, Race Car (6609), Road and Trail 4x4, Mini Ladder Truck, Rescue SUV, Highway Pickup: each stands on the floor, wheels down, driver in the seat.'},
+ {ver:'v90j',id:'tow7638',text:'Garage → RIDES → Tow Truck (7638): now with doors, windscreen and mudguards; drives forwards.'},
+ {ver:'v90j',id:'fra-props',text:'Frankfurt: road works have LEGO cones, barriers, a warning light and a STOP sign; rocks are LEGO rocks; none sit on the road.'},
+ {ver:'v90j',id:'ath-trees',text:'Athens: pines, olive trees, cypresses and rocks are LEGO pieces; driving stays smooth.'},
  {ver:'v90i',id:'town16',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer, Mini Dumper, Rescue Runabout, Landscape Loader, Service Truck, Dump Truck, Fire and Rescue Van, Post Van, Construction Truck, Highway Emergency Van, Bulldozer, TV Studio Van, Pothole Patcher: each looks complete and stands on the platform; drive two.'},
  {ver:'v90i',id:'pin-obj',text:'Phone, story mission: the checklist bar sits below the yellow NEXT objective line, never on top of it.'},
  {ver:'v90i',id:'palms',text:'Athens Syntagma race: the palms stand beside the track on the verge, none on the asphalt.'},
