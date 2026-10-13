@@ -63,6 +63,11 @@ KIT_PATCHES=[
  ("function applyQ(q, first) {\n  K.q = q;","function applyQ(q, first) {\n  K.q = q; glbLoadK();"),
  # 8. the 2D board: the leviathan tile shows the painted thumbnail
  ("L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);","L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);\n    var lvg = L.node.querySelector('.lv'); if (lvg) lvg.innerHTML = '<image href=\"models/leviathan@512.webp\" x=\"' + (cx - .47) + '\" y=\"' + (cy - .56) + '\" width=\".94\" height=\".94\"/>';"),
+ # 9. painted sea (tile-water-a..d, one per square) and compass rose, when media/ has loaded them before the board is painted (TW_ART, loaded in the page head); the drawn sea is the fallback
+ ("x.fillStyle = g; x.fillRect(0, 0, S_, S_);\n  // ink-wash blotches","x.fillStyle = g; x.fillRect(0, 0, S_, S_);\n  if (global.TW_ART && TW_ART.water) for (var wr = 0; wr < 6; wr++) for (var wc = 0; wc < 6; wc++) x.drawImage(TW_ART.water[(wr * 2 + wc * 3) % 4], wc * pu, wr * pu, pu + 1, pu + 1);\n  // ink-wash blotches"),
+ ("function compass(x, cx, cy, R, a) {\n  x.save();","function compass(x, cx, cy, R, a) {\n  if (global.TW_ART && TW_ART.compass) { x.save(); x.globalAlpha = a; x.drawImage(TW_ART.compass, cx - R * 1.08, cy - R * 1.08, R * 2.16, R * 2.16); x.restore(); return; }\n  x.save();"),
+ ("'<filter id=\"tw2glow\"","(global.TW_ART && TW_ART.water ? '<pattern id=\"tw2water\" patternUnits=\"userSpaceOnUse\" width=\"2\" height=\"2\"><image href=\"media/tile-water-a.webp\" width=\"1\" height=\"1\"/><image href=\"media/tile-water-b.webp\" x=\"1\" width=\"1\" height=\"1\"/><image href=\"media/tile-water-c.webp\" y=\"1\" width=\"1\" height=\"1\"/><image href=\"media/tile-water-d.webp\" x=\"1\" y=\"1\" width=\"1\" height=\"1\"/></pattern>' : '') + '<filter id=\"tw2glow\""),
+ ("fill: 'url(#tw2sea)' }, g);","fill: 'url(#tw2sea)' }, g); if (global.TW_ART && TW_ART.water) el('rect', { x: -lo, y: -lo, width: lo * 2, height: lo * 2, fill: 'url(#tw2water)' }, g);"),
 ]
 kit=rd(os.path.join(SP,'tidewake','kit','kit.js'))
 miss=[a for a,_ in KIT_PATCHES if a not in kit]
@@ -71,12 +76,15 @@ for a,z in KIT_PATCHES:kit=kit.replace(a,z)
 # ui.js is the join of ui1..ui5.js (kept in parts for editing)
 open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,11)))
 T=os.path.join(SP,'node_modules','three','build','three.min.js')
-SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-glb.js':os.path.join(SP,'shell','gx-glb.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'campaign-data.js':'','perfhud.js':os.path.join(SP,'perf','perfhud.js'),
+SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-skin.js':os.path.join(SP,'shell','gx-skin.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-glb.js':os.path.join(SP,'shell','gx-glb.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'campaign-data.js':'','perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'tidewake','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'tutscript.js':os.path.join(D,'src','tutscript.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
      'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js'),'gx-music.js':os.path.join(SP,'shell','gx-music.js'),'media.js':os.path.join(D,'media.js')}
-ORDER=['shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-music.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','kit.js','data.js','engine.js','ai.js','tutscript.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','media.js']
-h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))).replace('</head>','<style>\n'+rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))+'\n</style>\n</head>',1)
+ORDER=['shell.js','gx-viewport.js','gx-skin.js','gx-help.js','gx-tutor.js','gx-music.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','kit.js','data.js','engine.js','ai.js','tutscript.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','media.js']
+TW_LOADER="""<script>/* painted sea + compass for the board paint (kit patch 9): TW_ART.water is set only when all four tiles loaded */
+window.TW_ART={};(function(){function ld(f,cb){var i=new Image();i.onload=function(){cb(i)};i.src='media/'+f+'.webp'}
+var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function(i){W[j]=i;if(++n===4)TW_ART.water=W})});ld('compass-rose',function(i){TW_ART.compass=i})})();</script>"""
+h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))).replace('</head>','<style>\n'+rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))+'\n'+rd(os.path.join(SP,'shell','gx-skin.css'))+rd(os.path.join(D,'skin.css'))+'\n</style>\n'+TW_LOADER+'</head>',1)
 body=rd(os.path.join(D,'body.html')).replace('<!--CREDITS-->',rd(os.path.join(SP,'tidewake','audio','credits.html')))
 for f in ORDER:
     tag=f'<script src="{f}"></script>';assert tag in body,f
