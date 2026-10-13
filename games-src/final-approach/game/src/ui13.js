@@ -103,8 +103,11 @@ function extrasBoot() {
   GX.drawer('musicd', 'Music', h('div#musicbody'));
   ['back-default', 'back-spires'].forEach(preImg);
   tableApply();
+  try { GXSK.init({ sets: { 'sk-phrase': ['ui-phrase-c'], 'sk-roll': ['ui-button-roll-c'], 'sk-sheet': ['ui-sheet-c'], 'sk-alt': ['ui-altbar-c'], 'sk-check': ['ui-check'] } }); } catch (e) { }
   setInterval(() => { try { musicSync(); tableApply(); tableRetry(); } catch (e) { } }, 800);
 }
+// weather / time-of-day badge (painted); vanishes if the file is missing
+const wxImg = (k, a) => { const i = h('img.wxi', { src: MEDIA + 'icon-' + k + '.webp', alt: a || '', draggable: 'false' }); i.onerror = () => i.remove(); return i; };
 // the debrief picks up the end art after each draw
 (function () {
   const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { endBanner(); } catch (e) { } return r; };

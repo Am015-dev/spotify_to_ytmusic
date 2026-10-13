@@ -1745,11 +1745,26 @@ function pxResize(force) {
 function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
 function pxDrawFelt(R) {
   const g = PX.mat; g.clear(); if (!R) return;
+  if (PADIMG) pxPad(R); else {
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
+  }
+  if (!PADIMG && PX.padS) PX.padS.visible = false;
   g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
   PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
   PX.feltR = R;
+}
+// the painted trick pad (media/ui-trick-pad-c.webp): nine-sliced on a canvas at the felt's size, shown as a sprite under the felt strokes
+function pxPad(R) {
+  const w = Math.round(R.w - 8), h = Math.round(R.h - 4), key = w + 'x' + h; if (w < 40 || h < 40) return;
+  if (!PX.padS) { PX.padS = new PIXI.Sprite(); PX.L.felt.addChildAt(PX.padS, PX.L.felt.getChildIndex(PX.mat)); }
+  PX.padS.visible = true; PX.padS.x = R.x + 4; PX.padS.y = R.y + 2;
+  if (PX.padKey === key) return; PX.padKey = key;
+  const r = Math.min(2, Math.max(1, PX.res || 1)), c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(h * r); const x = c.getContext('2d'); x.scale(r, r);
+  const iw = PADIMG.naturalWidth, ih = PADIMG.naturalHeight, k = Math.min(iw * .16, 56), d = Math.min(24, w / 4, h / 4);   // k source px per corner, drawn d px
+  const xs = [0, k, iw - k, iw], ys = [0, k, ih - k, ih], xd = [0, d, w - d, w], yd = [0, d, h - d, h];
+  for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) x.drawImage(PADIMG, xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], xd[i], yd[j], xd[i + 1] - xd[i], yd[j + 1] - yd[j]);
+  const old = PX.padS.texture; PX.padS.texture = PIXI.Texture.from(c); try { if (old && old !== PIXI.Texture.EMPTY) old.destroy(true); } catch (e) { } PX.dirty = true;
 }
 function pxSeatRect(s, B) { const e = document.querySelector('[data-key="seat' + s + '"]'); return e ? pxRect(e, B) : null; }
 function pxSync() {
@@ -2270,3 +2285,15 @@ function lanternReveal(geo) {
   i.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;width:' + sz + 'px;height:' + sz + 'px'; i.onerror = () => i.remove();
   document.body.appendChild(i); setTimeout(() => i.remove(), 1700);
 }
+
+// ---- painted UI kit (gx-skin) plus the trick pad and small icons; each switches on only after its file loaded, the drawn version stays otherwise
+var PADIMG = null;
+(function () {
+  const R = document.documentElement;
+  function boot() {
+    try { GXSK.init({ sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
+    // card frames (media/card-face-*.webp) are NOT wired: the delivered paintings have ragged paper edges and corner lanterns that collide with the numerals
+    const pd = new Image(); pd.onload = () => { PADIMG = pd; try { if (PX && PX.on) { PX.padKey = ""; if (PX.feltR) pxDrawFelt(PX.feltR); pxDirty(); } } catch (e) { } }; pd.src = MEDIA + 'ui-trick-pad-c.webp';
+  }
+  if (typeof GXSK !== 'undefined' && !/jsdom/i.test(navigator.userAgent || '')) setTimeout(boot, 0);
+})();

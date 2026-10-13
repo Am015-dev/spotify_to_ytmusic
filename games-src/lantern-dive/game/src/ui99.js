@@ -126,3 +126,15 @@ function lanternReveal(geo) {
   i.style.cssText = 'left:' + cx + 'px;top:' + cy + 'px;width:' + sz + 'px;height:' + sz + 'px'; i.onerror = () => i.remove();
   document.body.appendChild(i); setTimeout(() => i.remove(), 1700);
 }
+
+// ---- painted UI kit (gx-skin) plus the trick pad and small icons; each switches on only after its file loaded, the drawn version stays otherwise
+var PADIMG = null;
+(function () {
+  const R = document.documentElement;
+  function boot() {
+    try { GXSK.init({ sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
+    // card frames (media/card-face-*.webp) are NOT wired: the delivered paintings have ragged paper edges and corner lanterns that collide with the numerals
+    const pd = new Image(); pd.onload = () => { PADIMG = pd; try { if (PX && PX.on) { PX.padKey = ""; if (PX.feltR) pxDrawFelt(PX.feltR); pxDirty(); } } catch (e) { } }; pd.src = MEDIA + 'ui-trick-pad-c.webp';
+  }
+  if (typeof GXSK !== 'undefined' && !/jsdom/i.test(navigator.userAgent || '')) setTimeout(boot, 0);
+})();
