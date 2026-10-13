@@ -43,12 +43,15 @@ function HM_carMesh(S){const B=G9C_bricks(S,'car'),t=Object.assign({},gbTeam(TEA
 // box of the visible meshes only (the hidden shield / boat would put the car in the air)
 function HM_box(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
 function HM_clear(){for(const o of HM.P){o.parent&&o.parent.remove(o);o.traverse(m=>{if(m.isMesh&&m.geometry&&!m.userData.gbc&&!m.userData.keep)m.geometry.dispose()})}HM.P=[]}
-function HM_build(){if(!RO.on||!RO.grp)return;const L=HM_parkList(),sig=CID+'|'+L.join(',');if(sig===HM.sig&&HM.P.length)return;HM.sig=sig;HM_clear();const Q=HM_slots();
+function HM_build(){if(!RO.on||!RO.grp)return;const L=HM_parkList(),sig=CID+'|'+L.join(',');if(sig===HM.sig&&HM.P.length)return;const miss=LD_probe(()=>[].concat(...L.map(id=>G9C_bricks(GAR_set(id),'car'))));if(miss.length){if(!HM.ld){HM.ld=1;LD_need(miss).then(()=>{HM.ld=0;HM.sig='';HM_build()})}return}/* LDraw rides load on demand */
+ HM.sig=sig;HM_clear();const Q=HM_slots();
  L.forEach((id,i)=>{const q=Q[i];if(!q)return;try{const g=HM_carMesh(GAR_set(id));const y=groundY(q[0],q[1]);g.position.set(q[0],y,q[1]);g.rotation.y=Math.PI;g.updateMatrixWorld(true);
   const bb=HM_box(g);if(Number.isFinite(bb.min.y))g.position.y+=y-bb.min.y;g.userData.hmId=id;RO.grp.add(g);HM.P.push(g)}catch(e){console.warn('HM car',id,e)}})}
 // ---- pause menu: 🏠 HOME fast travel
 {const g=document.querySelector('#roamPause .pg'),q=g&&g.querySelector('[data-p="garage"]');if(g){const b=document.createElement('button');b.dataset.p='home';b.textContent='🏠 HOME';
-  b.addEventListener('click',()=>{try{AU.sfx('pick')}catch(e){}const m=HM_mark();roamPauseClose();if(m)fastTravel(m)});g.insertBefore(b,q||null)}}
+  b.addEventListener('click',()=>{try{AU.sfx('pick')}catch(e){}const m=HM_mark();roamPauseClose();if(m){HM.flip=1;if(!fastTravel(m))HM.flip=0}});g.insertBefore(b,q||null)}}
+// fast travel home lands 26 m out FACING the beacon (garages face away from it): drive straight in
+roamWarp=(f=>function(x,z,h){if(HM.flip){HM.flip=0;const m=HM_mark();if(m&&Math.hypot(m.x-x,m.z-z)<40)h=Math.atan2(m.x-x,m.z-z)}return f.call(this,x,z,h,...[].slice.call(arguments,3))})(roamWarp);
 roamPauseOpen=(f=>function(){f.apply(this,arguments);const b=document.querySelector('#roamPause [data-p="home"]');if(b)b.hidden=!!(RO.ch||RO.sp)||!HM_mark()})(roamPauseOpen);
 // ---- garage: nitro row in the ride stats + NITRO KIT install (only at Home)
 GAR_tab=(f=>function(){f.apply(this,arguments);try{const B=$('#gbBody'),st=B&&B.querySelector('.garSt');if(!st)return;const fm=GAR_.pv==='4x4'?'off':GAR_.pv==='boat'?'boat':'car',S=GAR_set(G9C_eq(fm)),sp=HM_sport(S),kit=HM_kits().includes(S.id);

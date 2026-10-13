@@ -44,8 +44,10 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(20);if(!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(40);await through();
  s=await st();ok(s.dHome>15&&s.dHome<40,tag+' fast travel lands at Home',{d:+s.dHome.toFixed(1)});
  await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');
- // reverse into the beacon (fast travel leaves the car 26 m out, facing away)
- let f=0;await down('brk',await center('#tB'));while(f<900){await tick(6);f+=6;s=await st();if(s.card||s.dHome<5)break}await up('brk');
+ // drive into the beacon: fast travel home leaves the car 26 m out facing it. GAS, then BRAKE to a stop on it (the card needs a stop)
+ const goIn=async()=>{let f=0;await down('gas',await center('#tG'));while(f<600){await tick(6);f+=6;s=await st();if(s.card||s.dHome<9)break}await up('gas');
+  await down('brk',await center('#tB'));for(let i=0;i<40;i++){await tick(4);s=await st();if(s.card||Math.abs(s.v)<.5)break}await up('brk');for(let i=0;i<60&&!(s=await st()).card;i++)await tick(6);return s};
+ let f=0;s=await goIn();
  for(let i=0;i<60&&!(s=await st()).card;i++){await tick(6)}
  s=await st();ok(s.card&&s.saves>=1,tag+' driving into Home = save point (card + save)',s);
  const tst=await G.evaluate(()=>{const e=document.getElementById('hmToast');return e&&e.classList.contains('on')?e.textContent:null});ok(!!tst&&/SAVED/.test(tst),tag+' "Saved" toast',tst);
@@ -79,9 +81,8 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  await camShot('Hot Rod parked at Home after the swap','9_home_cars_after');
  // back into the beacon → garage → install the kit (studs granted for the test)
  await G.evaluate(()=>__oc.ev('(()=>{const S=season();S.cr=Math.max(S.cr,5000);saveSeason(S)})()'));
- for(let i=0;i<4&&!(s=await st()).card;i++){await down('brk',await center('#tB'));f=0;while(f<300){await tick(6);f+=6;s=await st();if(s.card)break;if(s.dHome<6){await up('brk');await tick(60);s=await st();if(s.card)break;await down('brk',await center('#tB'))}}await up('brk');await tick(40)}
- if(!(s=await st()).card){// drive forward towards it if reversing missed
-  await down('gas',await center('#tG'));for(let i=0;i<200&&!(s=await st()).card;i++)await tick(6);await up('gas');await tick(60)}
+ // pause → HOME again (the garage left the car on the beacon's exit), then drive in
+ await tick(200);await tap('#tP');await tick(10);await tap('#roamPause [data-p="home"]');for(let i=0;i<60;i++){await tick(20);if(!(await G.evaluate(()=>__mho.LD&&__mho.LD.on)))break}await tick(40);await through();s=await goIn();
  ok((s=await st()).card,tag+' back at the Home beacon',s);
  ok(await openGar(),tag+' garage again');await rides();await G.evaluate(()=>{const e=document.querySelector('#gbBody .hmKit');e&&e.scrollIntoView({block:'center'})});await tick(6);
  ok(await tap('#gbBody .hmKit'),tag+' tap INSTALL NITRO KIT');await tick(20);
