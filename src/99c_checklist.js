@@ -3,6 +3,11 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90l',id:'scup',text:'Race → FRA and ATH → STUNT CUP: each of the 6 tracks starts; every car on the grid stands on the grey paved start area, none on dirt or grass.'},
+ {ver:'v90l',id:'sjump',text:'STUNT CUP: every big jump lands; in the air the camera pulls back so the road shows far below; the slow-motion at the top is short.'},
+ {ver:'v90l',id:'ssplit',text:'STUNT CUP: every split offers 2 roads (dirt, boat lane or STUNT LINE) and both reach the finish; the stunt line has its own jump.'},
+ {ver:'v90l',id:'sfin',text:'STUNT CUP, Lykavittos Loop: at the finish the results card comes up quickly; the car is not stuck sideways.'},
+ {ver:'v90l',id:'spieces',text:'Track builder: place a BIG RAMP and a LANDMARK on your track, TEST it: you fly off the ramp and see the landmark.'},
  {ver:'v90i',id:'town16',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer, Mini Dumper, Rescue Runabout, Landscape Loader, Service Truck, Dump Truck, Fire and Rescue Van, Post Van, Construction Truck, Highway Emergency Van, Bulldozer, TV Studio Van, Pothole Patcher: each looks complete and stands on the platform; drive two.'},
  {ver:'v90i',id:'pin-obj',text:'Phone, story mission: the checklist bar sits below the yellow NEXT objective line, never on top of it.'},
  {ver:'v90i',id:'palms',text:'Athens Syntagma race: the palms stand beside the track on the verge, none on the asphalt.'},

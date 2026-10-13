@@ -65,7 +65,7 @@ const TS_bk=s=>{if(!TS_on()||!TS.BK)return 0;return TS.BK[Math.floor(mod(s.dist,
 physPlayer=(f=>function(s,c){const b=TS_bk(s);if(!b)return f(s,c);const m=C26.muRace;C26.muRace=m*(1+TB_ST.bankGrip*b);try{return f(s,c)}finally{C26.muRace=m}})(physPlayer);
 physAI=(f=>function(s){const b=TS_bk(s);if(!b)return f(s);const m=C26.muRace;C26.muRace=m*(1+TB_ST.bankGrip*b);try{return f(s)}finally{C26.muRace=m}})(physAI);
 // ---- 6) routes: the stunt lane is road (no transform); AI route choice by skill (stunt line = the best drivers, boat / dirt ≈ half the field)
-{const t=R15_ter;R15_ter=function(s){const r=t(s);if(!TS_on())return r;const i=OPN_i(s.dist),ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const ro=OPN.routes[ri];if(ro.kind==='stunt'){s.r15k=ro.kf||1;s.r15w=false;return null}}return r}}
+{const t=R15_ter;R15_ter=function(s){const r=t(s);if(!TS_on())return r;if(TS_apron(s.dist)&&Math.abs(s.x)<=14.5){s.r15k=1;s.r15w=false;return null}const i=OPN_i(s.dist),ri=OPN.RT[i];if(ri>=0&&s.x*OPN.SD[i]>OPN_I1-.5){const ro=OPN.routes[ri];if(ro.kind==='stunt'){s.r15k=ro.kf||1;s.r15w=false;return null}}return r}}
 {const a=R15_aiXt;R15_aiXt=function(s,xt){if(TS_on()&&!s.isPlayer){s.rod=s.rod||{};const m=mod(s.dist,OPN.L);
     for(const r of OPN.routes){const key=r.id+'@'+s.lap;if(s.rod[key]!=null)continue;const dd=mod(r.s0-m,OPN.L);if(dd>170)continue;const sk=clamp((s.skill-.82)/.3,0,1);
       const p=r.kind==='stunt'?.25+.55*sk:r.kind==='water'?.5:.45+.2*sk;s.rod[key]=R()<p;const rs=TS.stats&&TS.stats.route;if(rs){const q=rs['r'+r.id]=rs['r'+r.id]||{kind:r.kind,alt:0,road:0};q[s.rod[key]?'alt':'road']++}}}
@@ -123,6 +123,7 @@ function TS_build(){const td=TF,N=td.N,ds=td.ds,fr=mkF(),ath=TRK.city==='ath';
       rows.push([at(j*ds,-48.6,-1.8),at(j*ds,48.6,-1.8)]);fa[0].push([at(j*ds,-48.6,.2),at(j*ds,-48.6,-1.8)]);fa[1].push([at(j*ds,48.6,.2),at(j*ds,48.6,-1.8)])}flush()}
   // city edges (coordinator: "generic green fields"): LEGO blocks on the hill slopes 64–118 m beside the course, never on flyover / water / sea / gap rows
   try{TS_city(td,ath)}catch(e){console.warn('TS city',e)}
+  try{TS_apronBuild(td)}catch(e){console.warn('TS apron',e)}
   // landmarks
   let y0=1e9;for(let i=0;i<N;i++)y0=Math.min(y0,td.P[i*3+1]);
   for(const m of TRK.lms||[]){const i=TS_near(td,m.x,m.z),g=TS_lm(m.n,td,i);if(!g)continue;const gy=Math.min(td.P[i*3+1]-2,y0+6);g.position.set(m.x,gy,m.z);
@@ -142,6 +143,17 @@ function TS_city(td,ath){const N=td.N,ds=td.ds,fr=mkF(),L=[],H=(s,sg)=>7+9*(.5+.
   // flat LEGO roofs (a lighter cap) so the blocks read from the chase cam
   const rm=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({color:ath?0xc8643c:0x5b6670,roughness:.6}),L.length);
   L.forEach(([p,t,w,h,d],k)=>{q.setFromUnitVectors(V3(0,0,1),V3(t.x,0,t.z).normalize());M.compose(p.clone().add(V3(0,h/2+.4,0)),q,V3(w+.6,.8,d+.6));rm.setMatrixAt(k,M)});WORLD.add(rm);TS.city=L.length}
+// start apron (reviewer: the outer grid slots sat on dirt): a paved 29 m apron from 75 m before to 20 m after the line, painted slots; it is road
+const TS_apron=d=>{const L=TD.L,m=mod(d,L);return m>L-75||m<20};
+function TS_apronBuild(td){const rows=[],uv=[],fr=mkF(),at=(s,x,y)=>{frameAt(td,s,fr);return fr.p.clone().addScaledVector(fr.r,x).addScaledVector(fr.u,y)};
+  for(let s=-75;s<=20;s+=2){rows.push([at(s,-14.5,.02),at(s,14.5,.02)]);uv.push(0,s/32,1,s/32)}
+  const p=[],ix=[];rows.forEach((r,k)=>{for(const v of r)p.push(v.x,v.y,v.z);if(k)ix.push(2*k-2,2*k-1,2*k,2*k-1,2*k+1,2*k)});
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(ix);g.computeVertexNormals();
+  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({map:OPN_roadTex(),roughness:.55,polygonOffset:true,polygonOffsetFactor:-1}));m.receiveShadow=true;WORLD.add(m);
+  const wm=new THREE.MeshBasicMaterial({color:0xffffff});for(let row=0;row<2;row++)for(let col=0;col<4;col++){const d=-14-row*13-(col%2?4:0)+3.2,x=[-10.5,-3.5,3.5,10.5][col];frameAt(td,d,fr);
+    const b=new THREE.Mesh(new THREE.BoxGeometry(3.2,.04,.35),wm);b.position.copy(fr.p).addScaledVector(fr.r,x).addScaledVector(fr.u,.05);b.lookAt(b.position.clone().add(fr.t));WORLD.add(b)}}
+// results come up 1.6 s after the finish (was 4.5 s: the post-race coast showed a sideways car)
+finishPlayer=(f=>function(){f();if(TRK&&TRK.tb)finishT=2.9})(finishPlayer);
 // ---- landmark models (LEGO-ish blocks; heights in game metres, the course is ~2× real scale)
 function TS_lm(n,td,i){const g=new THREE.Group(),B=(...a)=>TS_box(g,...a),C=(...a)=>TS_cyl(g,...a);
   if(n==='messe'){B(34,10,34,0,5,0,0x8e8a84);const w=TS_winTex('#9c4d3c','#c9dbe8',6,24);const sh=new THREE.Mesh(new THREE.BoxGeometry(24,150,24),new THREE.MeshStandardMaterial({map:w,roughness:.5}));sh.position.y=85;g.add(sh);

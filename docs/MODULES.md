@@ -10,7 +10,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 |---|---|---|---|
 | 00 | `00_page.html` | 113 | <title>, all CSS (HUD, menus, touch controls, phone media queries), all HTML markup (#hud #roam #menu #pause #settings #cmap #gbx…) |
 | 02 | `02_data_json.html` | 108 | DATA: importmap (three r164 CDN), #rf-data (Frankfurt streets/quays/lm/spots JSON), #ath-data (Athens 100 KB line), <script src="km.js">, opening <script type=" |
-| 10 | `10_core.js` | 136 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
+| 10 | `10_core.js` | 137 | OD_CHANGELOG (top; every deploy prepends an entry), CR_ prelude (CR_trackW CR_smashHit CR_tumble CR_rampLaunch CR_TYRE_Y), ALL_OPEN=true, imports, utils ($ V3 c |
 | 20 | `20_race_world.js` | 104 | race circuits: neon Frankfurt world (buildRoad buildCity buildLandmarks loadTrack disposeWorld applyQuality), Athens race world (athPrep athTex athStands hazard |
 | 30 | `30_race.js` | 116 | race traffic (setupTraffic stepTraffic drawTraffic), props/Baustelle, particles (emit burst puff SPARK pools debris), audio AU, race state + race physics (stepS |
 | 31 | `31_race_r15.js` | 14 | R15 (race worker 15, v87q+): strategic routes. Per circuit, a WATER and an OFF-ROAD corridor run along the inside of a big bend: the inner wall opens at a signe |
@@ -77,11 +77,11 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ct | `98ct_city_lego.js` | 16 | CT (city-1, 2026-10-10). Alex: "now we have a big variety, we can include it in our city and replace buildings and cars". TRAFFIC: the procedural traffic kinds  |
 | 98sz | `98sz_ride_scale.js` | 5 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 45 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
-| 99c | `99c_checklist.js` | 47 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 48 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 31 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98tb | `98tb_track_builder.js` | 49 | TB track builder (track-1): editor UI #tbx, lint TB_lint (L1–L19, docs/TRACK_FUN.md), TB_ST stunt numbers, TB_def → open-course race def, db/local save, window. |
-| 98ts | `98ts_track_stunts.js` | 38 | TS stunt pieces (track-2): kickers / gap jumps / banks / stunt splits / landmarks / flyovers on builder courses, air launch + juice, AI route pick, STUNT CUP tr |
+| 98ts | `98ts_track_stunts.js` | 39 | TS stunt pieces (track-2): kickers / gap jumps / banks / stunt splits / landmarks / flyovers on builder courses, air launch + juice, AI route pick, STUNT CUP tr |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
 | 98bk | `98bk_bake.js` | 9 | BK (PERF-2, EFF #3): baked candidate grids for the road / terrain distance queries. Owner: perf worker (alex/od-mem). ===== Entering roam spent ~28 % of its CPU |
 | 98fb | `98fb_form_build.js` | 9 | FB (garage-17, Alex 2026-10-10: "the build guide and build does not work for the boats and off road"). Root cause: BUILD and the BUILD GUIDE only ever edit GB.d |
@@ -100,9 +100,9 @@ uses: -
 defines: (data / markup, no top-level declarations)
 uses: -
 
-## 10_core.js — 136 KB
+## 10_core.js — 137 KB
 defines: W14_ST W14_PIV TUNE OD_CHANGELOG OD_VER CR_trackW CR_LS CR_SPDCAM CR_smashHit _crTQ _crTE _crTS _crTP _crTM CR_tumbleStart CR_tumble CR_dodge CR_TYRE_Y CR_RG CR_RJM CR_rampLaunch CR_glowFar CR_glowCar CR_boxWall CR_noGlow CR_minBack CR_SMASHV ALL_OPEN TEST_MODE $ V3 clamp lerp mod mul R CK CID CITYK skey _SC _scGet store BOOTF fmt fmt2 ord pad2 S W HALF MARGIN CR_RK BASE_TOP CLASSES TEAMS PERKS PK perkUnlocked perkReq perkSlots perkEq perkSet garOwned teamLocked vehOf pickItem GB_PARTS GB_COLS GB_NEON GB_PATS GB_HORNS gbOwn packs gbReq gbReqTxt gbBuild gbTeam playerTeam hornPlay GB gbOpen gbLoop R1_chip R1_WT R1_weight gbRender gbClose liveryPat kitParts PILOTS PDL BOSS_TEAM PD teamOf SIG RIVAL_EV BOSS_EV flagsR flags BOSS_LINES radioLine worldCfg sigTick STYLE_NAME TAUNT NEM_LINES LEAGUES RND_NAMES SPTS SCRED UPC UPS UPG TRACK_DEFS TDF ATH_TRACKS ATH_TH athW ATH_IDS isAthT athOpen ATH_PD ATH_TRK_EV ATH_BOSS_EV DRAKOS_LINES athNF TRK CP MOODS ATHM MOOD RIVER BRANDS VSIGNS ITEMS ITEM_KEYS ICON itemSpinUntil itemShown EVENTS canvas renderer scene FOGC camera lowGfx adaptR adaptMul diffMul adaptAfter SET_DEF SET fxK rt composer SCRUB bloom FX SPRSCALE pFov DPR2 DRES resize hemi moonL shipKey glowCol neonMat SKY_VS SKY_FS V SKYU skyMat sky ENVSC ENVD lightningT litV applyMood applyMoodMaterials cv TEXV TEXMODE s2l dataTex mkTex texProbe TEXVAR tex refreshTex radial GLOW FLARE SHADOW roadTex wallTex facadeTex WIN_CELLS streetTex billboardTex vSignTex textTex padTex hazardTex liveryTex wingTex buildTrackData reverseTrack TF TD TRACKS frameAt mkF kAt yAt jumpAt WATER_Y isWater isDirt inGapF HCELL hash indexTrack crossAt nearTrack nearestTrackDist
-uses: 30(97), 20(66), 41(12), 72(11), 40(9), 70(5), 71(2), 98d(1), 99(1), 93(1)
+uses: 30(98), 20(66), 41(12), 72(11), 40(9), 70(5), 71(2), 98d(1), 99(1), 93(1)
 
 ## 20_race_world.js — 104 KB
 defines: _m _q _s _v geo placeOnTrack basisM TInst TBatch Batch colorize MAT sweep roadShader buildRoad startLights lampList buildGround buildPit trains waterRefl waterPlain LANDMARKS FACADE WINS INTU INT_FS interiorPatch withInterior GLASS glassMat CITY buildCity lmAt beacon edges buildLandmarks rain searchlights billboards traffic3d speedLines buildDressing buildAmbient planes gates inClear WFUN buildWaterFun _m4 dirtTex buildDirt wPos waterStep waterTick buildTrackProps updPlanes KEEP_TEX warmTextures disposeWorld R15_trackW loadTrack applyQuality ATHG ATH_NEON ATH_BRANDS athPrep athH athTD athUV athBox athNoise athRoadTex athWallTex athGroundTex athFacadeTex athWinTex athFlagTex athMerge athTreeGeo athTreeBy athCypGeo athPineGeo athKioskGeo athTaxiGeo athUmbGeo athSeatPts athLathe athStands athLandmarks athMountains athGround athCity athDressing athThemeDress AHZ athHazPlace athHazReset athHazTick athHazStep athFire loft HULL POD SHIP_K RIBBON_VS RIBBON_FS ribbonGeo RIB_GEO LIVERY WHEEL RIM WHEELMAT PONTOON FIN _tipV _tipC WINGMAT WINGGEO WINGTIP GLOWTIP VMAT STUD studs box buildBoat easeBack poseInit poseApply vehMode shipMesh
@@ -368,9 +368,9 @@ uses: 96(12), 92(10), 98ld(5), 20(5), 98(4), 41(2), 98y(2), 10(2), 98bc(2), 30(1
 defines: OF OF_R OF_STEP OF_WALK OF_RUN OF_G OF_JV OF_FIGH OF_NEAR OF_JV_MAX OF_JREACH OF_DG OF_drvGeo OF_drv OF_figBuild OF_figMake OF_figPose OF_cH OF_box OF_cars OF_edge OF_nearCar OF_dom OF_lbl0 OF_doorPlace OF_btns OF_canExit OF_door OF_ext OF_exit OF_enter OF_noW OF_bodyKids OF_poseCar OF_finishEnter OF_input OF_collide OF_walk OF_step OF_cam OF_v3 OF_lift OF_reset OF_m1 OF_api OF_jack OF_jackEnd OF_jackStep OF_bubble OF_fleeStart OF_BUBP _ofBv OF_hudOver OF_bubPlace OF_fleeEnd OF_fleeStep OF_seat OF_crime OF_starStep OF_starHud OF_athPark1 OF_CAMK OF_CAMP OF_camYaw OF_camDrag OF_camDom OF_bcBody
 uses: 53(48), 10(38), 30(28), 71(22), 40(17), 51(11), 98l(10), 72(9), 98bc(8), 92(7)
 
-## 99c_checklist.js — 47 KB
+## 99c_checklist.js — 48 KB
 defines: OD_CHECKLIST
-uses: 30(33), 10(19), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
+uses: 30(33), 10(20), 20(12), 41(5), 99t(5), 92(4), 40(2), 72(1)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
@@ -384,9 +384,9 @@ uses: 10(92), 20(28), 30(25), 31(17), 98rf(10), 53(6), 51(6), 72(2), 40(1)
 defines: TB_TERS TB_TCOL TB_V TB_PCS TB_ST TB_JK TB_SK TB_kick TB_air TB_route TB TB_clone TB_new TB_geo TB_near TB_lint TB_segOf TB_def TB_reg TB_gates TB_LS TB_loadLocal TB_saveLocal TB_code TB_decode TB_dbInit TB_save TB_regAll TB_css TB_mk TB_toast TB_open TB_close TB_push TB_changed TB_btn TB_ui TB_lintUi TB_selUi TB_bg TB_fit TB_cx TB_cy TB_w2s TB_s2w TB_draw TB_hitPt TB_hitPc TB_snapW TB_tap TB_hAt TB_nameIn TB_lab TB_input TB_drawList TB_export TB_codeBox TB_fromDef TB_test TB_editBtns TB_menu TB_BUILTIN __tbS
 uses: 10(45), 30(26), 20(13), 98ro(12), 72(6), 31(2), 40(1)
 
-## 98ts_track_stunts.js — 38 KB
-defines: TS TS_on TS_near TS_shape TS_launch TS_bk TS_M TS_box TS_cyl TS_winTex TS_build TS_city TS_lm __ts TS_TRACKS
-uses: 10(56), 30(42), 98ro(39), 98tb(31), 31(7), 20(7), 72(3), 53(1)
+## 98ts_track_stunts.js — 39 KB
+defines: TS TS_on TS_near TS_shape TS_launch TS_bk TS_M TS_box TS_cyl TS_winTex TS_build TS_city TS_apron TS_apronBuild TS_lm __ts TS_TRACKS
+uses: 10(62), 30(45), 98ro(40), 98tb(31), 31(7), 20(7), 72(3), 53(1)
 
 ## 98zp_perf_ctx.js — 13 KB
 defines: P1 P1_rt P1_free P1_draw P1_off P1_img P1_readAsync P1_CRC P1_png P1_view P1_attach P1_detach P1_gbDraw P1_thSet P1_tq __P1 P2_after P2_compile P2_warm
