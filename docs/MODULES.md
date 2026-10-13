@@ -85,7 +85,7 @@ file | KB | purpose | first defines
 98sz2_ride_audit.js | 6 | RSZ audit (size-2, 2026-10-13): measures EVERY garag | RSZ_go
 98of_onfoot.js | 50 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
 98sh_shadow.js | 4 | SHB (v90k): soft blob shadows on the ground under th | SHB SHB_pool SHB_M
-98lf_lively_fill.js | 21 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
+98lf_lively_fill.js | 23 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
 99c_checklist.js | 70 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | OD_CHECKLIST
 98rf_race_fun.js | 10 | (no header comment) | RF_GRID RF_rub RF_lat
 98ro_open.js | 30 | OPN (race worker, 2026-10-09): OPEN race courses in  | OPN_TER OPN_K OPN_I0
