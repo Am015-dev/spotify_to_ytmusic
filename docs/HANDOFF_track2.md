@@ -26,3 +26,7 @@ Brief: Alex "make tracks fun like YouTube: high stunts, alternative roads". STEP
 - Tyre gap: tRace now measures plane distance (old world-Y box was wrong on banks); median +0.002 m.
 - Split radius lint (dirt/water R≥150, stunt R≥90) removed the island scrapes; tRace driver now holds the split lane centre.
 - Next after PASS: build-10 handoff (OD_CHANGELOG entry + checklist: STUNT CUP row, a big jump, a split, the builder new pieces).
+
+## DONE (2026-10-13)
+- STUNT CUP: reviewer FULL PASS on deb7b1c (code 52734f8, build tr2j) → handed to build-10 as v90l (after v90k builder). Lab v5 = tr2j.
+- Open (not blocking): occasional island-nose scrape on late split entry; per-split timing noisy; no loops/wall rides (spline physics); no WebKit test.
