@@ -90,3 +90,24 @@ html.ph .pchip .v{color:#6b4200}html.ph .pchip .e{color:#0f6b3a}
 html.ph .pchip span em{background:rgba(255,253,245,.9);border-radius:4px;padding:0 1px}
 html.ph-p header.gx-bar .pchip span{font-size:12px;gap:1px;letter-spacing:-.7px}
 html.ph-p header.gx-bar .pchip{padding-left:2px;padding-right:2px}
+
+/* the painted crown marks the monster in Downtown (the emoji stays if the picture is missing) */
+html.sk-crown .crn{display:inline-block;width:18px;height:18px;font-size:0;vertical-align:-4px;background:url(media/icon-crown.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+html.sk-crown .pchip .crn{width:15px;height:15px;font-size:0;vertical-align:-3px}
+/* button colours: pink = chosen, yellow = recommended, see-through = the Panel button over the map */
+html.sk-pink .btn.on{border-image-source:url(media/ui-button-pink-c.webp);color:#fff8ff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk-yellow .btn.rec:not(.primary){border-image-source:url(media/ui-button-yellow-c.webp);color:#2a1650}
+html.sk-ghost .gx-reopen.btn{border-image-source:url(media/ui-button-ghost-c.webp);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+/* top-bar monster chips: the comic chip plate behind each (overlay; the coloured top edge stays) */
+html.sk-hudchip header.gx-bar .pchip{isolation:isolate;border-color:transparent;border-top-color:var(--mc)}
+html.sk-hudchip header.gx-bar .pchip:not(.on){background:transparent}
+html.sk-hudchip header.gx-bar .pchip:not(.on)::before{content:'';position:absolute;inset:-3px;z-index:-1;pointer-events:none;border:solid transparent;border-width:10px;border-image:url(media/ui-hud-chip-c.webp) 26 fill/10px stretch}
+/* dice tray: green felt with a dark wood rim behind the dice */
+html.sk-tray #dicewrap{position:relative;isolation:isolate}
+html.sk-tray #dicewrap::before{content:'';position:absolute;inset:-4px -4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:30px;border-image:url(media/ui-dice-tray-c.webp) 70 fill/30px stretch;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
