@@ -306,7 +306,8 @@ async function pageCollect(o) {
     if (e.tagName === 'HTML' || e.tagName === 'BODY' || !inRoot(e)) continue;
     const s = cs(e); if (s.display === 'none' || s.visibility === 'hidden') continue;
     const ox = /auto|scroll/.test(s.overflowX), oy = /auto|scroll/.test(s.overflowY);
-    if (ox || oy) {
+    const hiddenBar = s.scrollbarWidth === 'none' || getComputedStyle(e, '::-webkit-scrollbar').display === 'none';   // swipe-only strips (top bar) show no scrollbar
+    if ((ox || oy) && !hiddenBar) {
       const r = R(e); if (r[2] >= 60 && r[3] >= 40 && chainOk(e) >= 0.3) {
         const dx = e.scrollWidth - e.clientWidth, dy = e.scrollHeight - e.clientHeight;
         if (ox && dx > 1 && dx <= Math.max(28, e.clientWidth * 0.08)) out.panels.push({ sel: sel(e), box: r, axis: 'x', over: dx, cls: cls(e) });
@@ -558,7 +559,6 @@ function judge(raw, ctx) {
       const mx = (pl.bw - wd[1] - wd[3]) / Math.max(1, pl.nw - sl[1] - sl[3]), my = (pl.bh - wd[0] - wd[2]) / Math.max(1, pl.nh - sl[0] - sl[2]);
       const sx = cx == null ? mx : cx, sy = cy == null ? my : cy; if (!(sx > 0 && sy > 0)) continue;
       d = Math.max(sx, sy) / Math.min(sx, sy) - 1; how = `corners scaled ${sx.toFixed(2)} across vs ${sy.toFixed(2)} down on a ${pl.nw}x${pl.nh} picture`;
-      if (cx != null && cy != null) { const bwtot = wd[1] + wd[3], bhtot = wd[0] + wd[2]; if (bwtot > pl.bw + 1 || bhtot > pl.bh + 1) { d = Math.max(d, 0.41); how += ' (frame wider than the box)'; } }
     }
     if (d <= 0.25) continue; const k = `${pl.kind}|${pl.sel}|${pl.src.split('/').pop()}`; if (seenPl.has(k)) continue; seenPl.add(k);
     add({ check: 'plates', sev: d > 0.4 ? 'severe' : 'warn', sel: pl.sel, text: pl.src.split('/').pop().slice(0, 40), box: pl.box, key: `plate|${pl.sel}|${pl.src.split('/').pop()}`, num: Math.round(d * 100), needs_art: true, element: nice(pl.sel) + ' plate', target_px: [Math.round(pl.bw * 3), Math.round(pl.bh * 3)], ratio: Math.round(pl.bw / pl.bh * 100) / 100, transparent: true, desc: `${cap(nice(pl.sel))} plate ${pl.src.split('/').pop().slice(0, 30)} is distorted by ${Math.round(d * 100)}% (${how})` });
