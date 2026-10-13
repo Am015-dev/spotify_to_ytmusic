@@ -166,6 +166,16 @@ def main():
                     if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
                     elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
+        if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+            passing = [s for s in ok if status[s] == "PASS"]
+            if passing:
+                code, tail = timed("all" if len(passing) > 1 else passing[0], "lab-test", lambda: run_check(["node", str(SCRIPTS / "lab-test.js")] + passing, str(SCRIPTS), env3, out / ".check" / "lab-test.log", 1800))
+                txt = (out / ".check" / "lab-test.log").read_text()
+                for s in passing:
+                    m = re.search(r"^LAB %s (\S+) (.*)$" % re.escape(s), txt, re.M)
+                    if not m: status[s], why[s] = "FAIL", "lab-test did not report"
+                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "lab-test: " + m.group(2)[:140]
+                    else: print(f"[lab] {s:18} ok {m.group(2)[:40]}")
         # 3c. the game's own sweeps: QUICK=1 (4 games) for --quick and --deploy; the full default only with --deploy --full.
         # Owner, 13 Oct 2026: fast tests + checklist scenarios, no hour-long sweeps per deploy (Overdrive-style).
         if (a.quick or a.deploy) and not (a.deploy and a.no_sweep):
@@ -203,6 +213,11 @@ def main():
                 shutil.copyfile(out / s / "index.html", dest / "index.html")
                 deployed.append(s)
 
+    if deployed and srv and not a.suffix:  # the LAB owner page: every deployed game's scenario list -> games/scenarios.json, then games/lab.html
+        try:
+            r = subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + deployed, env=env, capture_output=True, text=True, timeout=300); print(r.stdout.strip())
+            subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+        except Exception as e: print("lab-index skipped:", e)
     if srv: srv.kill()
     if TIMES:
         tj = out / ".check" / "timings.json"; tj.parent.mkdir(parents=True, exist_ok=True)

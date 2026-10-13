@@ -587,6 +587,8 @@ html.ph #feat .ft{max-width:none}
 #wnbody .wnf{width:100%;text-align:left;font:700 .9rem var(--body);min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;margin-top:12px}
 /* in-game test checklist */
 #table .bar #cktest{position:relative}
+#table .bar #tmtog[aria-pressed=true],#fabtm[aria-pressed=true]{background:#f0c05a;color:#2a1b10;border-color:#f0c05a}
+#tmtog[hidden],#fabtm[hidden],#fablab[hidden]{display:none}
 .ckbadge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;margin-left:8px;border-radius:10px;background:#e23b2e;color:#fff6c8;font:800 .75rem/20px var(--body)}
 .ckbadge[hidden]{display:none}
 #ck{position:absolute;z-index:74;display:flex;flex-direction:column;background:#241810;color:#f4ead8;border:1.5px solid var(--brass);box-shadow:0 10px 30px rgba(0,0,0,.55);overflow:hidden;box-sizing:border-box}
@@ -667,20 +669,21 @@ html.ph #feat .ft{max-width:none}
 </div>
 <div id="listview" hidden></div>
 </main>
-<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="lab.html">🧪 LAB</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a> · <a href="status.html">Status</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
 
 <div id="inspect" hidden></div>
 <div id="tip" role="status" hidden></div>
 <dialog id="invite" aria-labelledby="invh"><div class="in"><h2 id="invh">Play online with friends</h2><p>Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server.</p><p>Each game keeps its own save, sound and difficulty settings.</p><button type="button" class="btn" id="invok">Got it</button></div></dialog>
 <dialog id="mine" aria-labelledby="mineh"><div class="in"><h2 id="mineh">Your games</h2><div id="minebody"></div><button type="button" class="btn" id="mineok">Close</button></div></dialog>
 <button type="button" id="fab" aria-label="Game menu: back to the shelf" hidden>←</button>
-<div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><button type="button" id="fabtest" role="menuitem" hidden>✔ Test<i class="ckbadge" hidden></i></button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
+<div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><button type="button" id="fabtest" role="menuitem" hidden>✔ Test<i class="ckbadge" hidden></i></button><button type="button" id="fabtm" role="menuitem" hidden aria-pressed="false">🧪 Test mode</button><a id="fablab" role="menuitem" href="lab.html" target="_blank" rel="noopener" hidden>🧪 LAB: every scenario</a><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
 <div id="iostip" hidden><p>For a full-screen shelf on iPhone: tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>, and open it from there.</p><button type="button" id="iosok">Got it</button></div>
 <div id="table" hidden>
   <div class="bar">
     <button type="button" id="back" aria-label="Back to the shelf">← Shelf</button>
     <strong id="tname">Game</strong><span id="tver" class="vchip" hidden></span>
     <button type="button" id="cktest" hidden aria-expanded="false" aria-controls="ck">✔ Test<i class="ckbadge" hidden></i></button>
+    <button type="button" id="tmtog" hidden aria-pressed="false">🧪 Test mode</button>
     <a id="solo" href="#" target="_blank" rel="noopener">Open on its own</a>
   </div>
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
@@ -886,7 +889,7 @@ function ckBadges(){
 function ckLayout(){
   const t=document.getElementById('table'),c=ckEl(),pill=document.getElementById('ckpill');
   const has=!!ckGame&&ckEnts(ckGame).length>0;
-  document.getElementById('cktest').hidden=!has;document.getElementById('fabtest').hidden=!has;
+  document.getElementById('cktest').hidden=!has;document.getElementById('fabtest').hidden=!has;{const tm=!!ckGame;['tmtog','fabtm','fablab'].forEach(i=>{const e=document.getElementById(i);if(e)e.hidden=!tm});tmSync()}
   const m=ckMode(),bar=t.querySelector('.bar'),barH=bar&&bar.offsetParent?bar.offsetHeight:0;
   let fr=0.4;try{fr=parseFloat(store.get(CKH))||0.4}catch(_){}
   fr=Math.max(.25,Math.min(.7,fr));
@@ -899,6 +902,10 @@ function ckLayout(){
   t.style.setProperty('--ckh',Math.round(innerHeight*fr)+'px');
   document.getElementById('cktest').setAttribute('aria-expanded',open?'true':'false');
   ckBadges();if(open)ckRender(true)}
+/* 🧪 Test mode: the same switch the games read (localStorage gx_test); games/lab.html lists every scenario */
+const tmOn=()=>{try{return store.get('gx_test')==='1'}catch(_){return false}};
+function tmSync(){const on=tmOn();['tmtog','fabtm'].forEach(i=>{const e=document.getElementById(i);if(e){e.setAttribute('aria-pressed',on?'true':'false');e.textContent='🧪 Test mode'+(on?': ON':'')}})}
+function tmToggle(){store.set('gx_test',tmOn()?'0':'1');tmSync();if(window.curGame&&window.curGame.id!=='ref'){ckToast(tmOn()?'Test mode ON: look for 🧪 LAB in the game':'Test mode off');ckNormal()}}
 function ckSet(st){ckState=st;store.set(CKS,st);ckLayout();clearTimeout(ckTimer);ckTimer=setTimeout(ckLayout,400)}
 function ckTry(id){
   const g=window.curGame;if(!g)return;ckScnId=id;
@@ -949,6 +956,7 @@ function ckCloseGame(){ckGame=null;ckLayout()}
 function initCk(){
   const c=ckEl(),body=document.getElementById('ckbody');
   document.getElementById('cktest').onclick=()=>ckSet(ckState==='open'?'closed':'open');
+  document.getElementById('tmtog').onclick=tmToggle;document.getElementById('fabtm').onclick=()=>{fabmenu.hidden=true;tmToggle()};
   document.getElementById('fabtest').onclick=()=>{fabmenu.hidden=true;ckSet('open')};
   document.getElementById('ckpill').onclick=()=>ckSet('open');
   document.getElementById('ckmin').onclick=()=>ckSet('min');
