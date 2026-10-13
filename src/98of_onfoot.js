@@ -358,7 +358,7 @@ function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first
   const P=OF_pave();if(!P)return'📍 No clear pavement nearby · drive on and try again';
   if(kind==='car'){if(!OF_spawn(P))return'📍 Can\'t jump right now';const c=OF.car,fx=Math.sin(c.h),fz=Math.cos(c.h);OF.x=c.x+fz*1.9-fx*.3;OF.z=c.z-fx*1.9-fz*.3;OF.y=groundAt(OF.x,OF.z,c.y+1);OF.h=Math.atan2(c.x-OF.x,c.z-OF.z);OF.cy=OF.cyIn=OF.h;return'📍 YOUR CAR · 🚪 ENTER appears, tap it (PC: E)'}
   if(!OF_spawn(P))return'📍 Can\'t jump right now';
-  if(kind==='npc'){const p=OF_npcPick();if(!p)return'📍 No pedestrian free · try again';const x=P.x+Math.sin(P.h)*2-P.rx*.9,z=P.z+Math.cos(P.h)*2-P.rz*.9;  // ahead, a step towards the shops: in view beside the minifigp.ofS={x,z,h:P.h+Math.PI/2,go:1};p._x=x;p._z=z;p.y=groundAt(x,z,P.y+2);p.yc=1;OF.npc=p;return'📍 PEDESTRIAN AHEAD · walk up, tap 👋 HI (PC: E)'}
+  if(kind==='npc'){const p=OF_npcPick();if(!p)return'📍 No pedestrian free · try again';const x=P.x+Math.sin(P.h)*2-P.rx*.9,z=P.z+Math.cos(P.h)*2-P.rz*.9;/* ahead, a step towards the shops: in view beside the minifig */p.ofS={x,z,h:P.h+Math.PI/2,go:1};p._x=x;p._z=z;p.y=groundAt(x,z,P.y+2);p.yc=1;OF.npc=p;return'📍 PEDESTRIAN AHEAD · walk up, tap 👋 HI (PC: E)'}
   return kind==='phone'?'📍 ON FOOT · half stick = walk, full stick = run':kind==='jump'?'📍 ON FOOT · JUMP (PC: Space)':'📍 ON FOOT · walk ahead, then turn (PC: WASD, Shift runs)'}
 function OF_npcPick(){const P=HUB.peds;if(!P)return null;const n=typeof LV_pn==='function'?LV_pn(P.length):P.length;let b=null,bd=-1;for(let i=0;i<n;i++){const p=P[i];if(p.cw||p.jy>0||p.ofS)continue;const d=p._x==null?1e9:Math.hypot(p._x-RO.x,p._z-RO.z);if(d>bd){bd=d;b=p}}return b}
 function OF_actEnd(){for(const p of HUB.peds||[])if(p.ofS)delete p.ofS}
@@ -376,8 +376,8 @@ function OF_say(txt,col){const cv=document.createElement('canvas');cv.width=256;
 function OF_bubOff(){const B=OF.bub;if(!B)return;if(B.s.parent)B.s.parent.remove(B.s);B.s.material.map.dispose();B.s.material.dispose();OF.bub=null}
 const OF_pedS=()=>typeof SC_S!=='undefined'&&SC_S&&SC_S.on?SC_K.ped:.66;
 function OF_acts(){const L=[],fx=Math.sin(OF.h),fz=Math.cos(OF.h),add=(k,o,d,x,z,bon)=>{const dx=x-OF.x,dz=z-OF.z,l=Math.hypot(dx,dz)||1,c=(dx*fx+dz*fz)/l;L.push({k,o,d,s:d+(1-c)*(k==='traf'?1.5:.6)-bon})};  // a passing car only wins when you face it
-  if(OF.near)add(OF.near.k==='traf'?'traf':'car',OF.near,OF_edge(OF.near)-(OF.near.k==='traf'?OF_JREACH-OF_NEAR:0),OF.near.x,OF.near.z,OF.near.k==='traf'?0:.4);
-  const P=HUB.peds||[],n=typeof LV_pn==='function'?LV_pn(P.length):P.length;for(let i=0;i<n;i++){const p=P[i];if(p._x==null||p.jy>0||Math.abs((p.y||0)-OF.y)>1.5)continue;const d=Math.hypot(p._x-OF.x,p._z-OF.z);if(d<2.8)add('npc',p,d,p._x,p._z,1)}
+  if(OF.near)add(OF.near.k==='traf'?'traf':'car',OF.near,OF_edge(OF.near)-(OF.near.k==='traf'?OF_JREACH-OF_NEAR:0),OF.near.x,OF.near.z,OF.near.k==='traf'?-.6:.4);
+  const P=HUB.peds||[],n=typeof LV_pn==='function'?LV_pn(P.length):P.length;for(let i=0;i<n;i++){const p=P[i];if(p._x==null||p.jy>0||Math.abs((p.y||0)-OF.y)>1.5)continue;const d=Math.hypot(p._x-OF.x,p._z-OF.z);if(d<2.8)add('npc',p,d,p._x,p._z,1.2)}
   const PG=HUB.pgrid;if(PG){const kx=Math.floor(OF.x/16),kz=Math.floor(OF.z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){for(const q of PG.get((kx+a)*10000+kz+c)||[]){if(q.t!=='bench'||!q.alive||Math.abs((q.y||0)-OF.y)>1.2)continue;const d=Math.hypot(q.x-OF.x,q.z-OF.z);if(d<2.2)add('bench',q,d,q.x,q.z,.3)}}}
   for(const m of RO.marks||[]){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(_ofBv),d=Math.hypot(v.x-OF.x,v.z-OF.z);if(d<3.5&&Math.abs(v.y-OF.y)<2)add('mission',m,d,v.x,v.z,1.2)}
   let b=null;for(const q of L)if(!b||q.s<b.s)b=q;return b}

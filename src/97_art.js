@@ -203,7 +203,18 @@ function ART7_far(x,z,w,h){if(w>64||ART7_rd(x+w/2,z+h/2)<=Math.hypot(w,h)/2+4)re
 function ART7_near(x,z,w,h){const r=Math.hypot(w,h)/4+1;for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(ART7_rd(x+w*(2*i+1)/6,z+h*(2*j+1)/6)<r)return true;return false}
 // grass vertices under a road sink up to 10 cm (some street strips run a few cm below the ground; the road covers the dip)
 function ART8_dip(x,z){const r=ART7_rd(x,z);return r<-.6?.1:r<.4?.1*(.4-r):0}
-function ART7_quad(x,z,w,h,out){const far=ART7_far(x,z,w,h),nr=!far&&ART7_near(x,z,w,h);if(w/2<(far?12:nr?2:6)||(far?ART7_flat(x,z,w,h,.2):ART7_flat(x,z,w,h,nr?.025:.06,.08))){out.push([x,z,w,h]);return}const w2=w/2,h2=h/2;
+// boot speed: the split/leaf decisions of every top-level cell are cached as bits (QTC in 10b_qt_data.js, made by tools/qtdump.js with ?qtdump=1);
+// a cached cell replays them instead of the ~29 height samples per node. A cell without an entry (or when the world changed) is fitted live.
+let ART7_bits=null,ART7_pos=0,ART7_rec=null;const ART7_QD=[];window.__qtD=ART7_QD;
+function ART7_qh(x,z,w){return((Math.round(x*2)*73856093^Math.round(z*2)*19349663^Math.round(w*8)*83492791)>>>0)&65535}
+function ART7_quad(x,z,w,h,out){
+  if(ART7_bits===null&&ART7_rec===null){const hh=ART7_qh(x,z,w);
+    if(CID==='ath'&&QTC.ok&&QTC.pos<QTC.n){const B=QTC.b;let v=0;for(let k=0;k<16;k++)v=v*2+B[QTC.pos+k];
+      if(v===hh){const n0=out.length;ART7_bits=B;ART7_pos=QTC.pos+16;try{ART7_quad(x,z,w,h,out)}finally{ART7_bits=null;QTC.pos=ART7_pos}if(++QTC.cnt%450===0)QTC.smp.push([x,z,w,h,out.slice(n0).map(q=>q.join()).join(';')]);return}QTC.ok=false;console.warn('QTC desync at '+QTC.pos+', fitting live')}
+    if(window.__qtdump){ART7_rec=[];try{ART7_quad(x,z,w,h,out)}finally{ART7_QD.push(hh.toString(2).padStart(16,'0')+ART7_rec.join(''));ART7_rec=null}return}}
+  let leaf;if(ART7_bits!==null)leaf=ART7_bits[ART7_pos++]===0;
+  else{const far=ART7_far(x,z,w,h),nr=!far&&ART7_near(x,z,w,h);leaf=w/2<(far?12:nr?2:6)||(far?ART7_flat(x,z,w,h,.2):ART7_flat(x,z,w,h,nr?.025:.06,.08));if(ART7_rec)ART7_rec.push(leaf?0:1)}
+  if(leaf){out.push([x,z,w,h]);return}const w2=w/2,h2=h/2;
   ART7_quad(x,z,w2,h2,out);ART7_quad(x+w2,z,w2,h2,out);ART7_quad(x,z+h2,w2,h2,out);ART7_quad(x+w2,z+h2,w2,h2,out)}
 // river-bank cells keep one uniform n×n grid (gndVert snaps it to the banks): the step is verified on the cell's own land triangles (pART8: water and
 // bank sub-cells skipped; they used to force the 3 m maximum over every 200 m river cell) and grown to the road/far fit (≥ 3 m)
