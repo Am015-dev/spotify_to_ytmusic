@@ -408,5 +408,49 @@
    "sizes": "all",
    "group": "Story"
   }
+ ],
+ "tidewake": [
+  {
+   "id": "tw-board",
+   "name": "Start of game board",
+   "ask": "Is the sea chart clear with your tiles?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "tw-zoom",
+   "name": "Piece detail: your junk",
+   "ask": "Is the ship card readable?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "tw-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "tw-buttons",
+   "name": "Brass buttons keep their labels",
+   "ask": "Are Place and Help buttons readable?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "tw-art",
+   "name": "Painted art: frame, rings, tag, tail, rows",
+   "ask": "Is the board framed, with brass rings?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
  ]
 }

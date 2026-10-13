@@ -72,7 +72,7 @@ html.ph .ptile .star{position:absolute;right:3px;top:0;font-style:normal;font-si
 html.ph .ptile.no{opacity:.6}
 /* cards: one at a time, over the control zone (never over the city) */
 html.ph #choice,html.ph #coach,html.ph #advice,html.ph #pcx{display:none}
-html.ph .gx-dock[data-card="choice"] #choice,html.ph .gx-dock[data-card="coach"] #coach,html.ph .gx-dock[data-card="advice"] #advice,html.ph .gx-dock[data-card="pop"] #pcx{display:block;position:fixed;left:var(--pz-l,0px);right:var(--sar,0px);top:var(--pz-t,50vh);bottom:var(--sab,0px);z-index:8;margin:0;border:0;border-radius:0;box-shadow:none;overflow:auto;overscroll-behavior:contain;padding:8px 12px 12px;background-color:var(--card)}
+html.ph .gx-dock[data-card="choice"] #choice,html.ph .gx-dock[data-card="coach"] #coach,html.ph .gx-dock[data-card="advice"] #advice,html.ph .gx-dock[data-card="pop"] #pcx{display:block;position:fixed;left:var(--pz-l,0px);right:var(--sar,0px);top:var(--pz-t,50vh);bottom:var(--sab,0px);z-index:8;margin:0;border:0;border-radius:0;box-shadow:none;overflow:auto;overflow-x:hidden;overscroll-behavior:contain;padding:8px 12px 12px;background-color:var(--card)}
 html.ph .gx-dock[data-card="pop"] #pcx{display:flex;flex-direction:column;padding:0}
 html.ph .gx-dock[data-card="choice"] #choice{border-top:4px solid var(--red)}
 html.ph #choice h2{font-size:1.35rem}

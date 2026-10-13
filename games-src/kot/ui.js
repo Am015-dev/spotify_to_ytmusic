@@ -77,7 +77,7 @@ function monDetail(p){const k=p.i;const hidden=(G.mode==='solo'||G.mode==='net')
   const evo=p.evo.map(e=>`<div class="mc E">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>evolution in play</i><br>${esc(evoText(e))}</div>`);
   const hand=p.hand.length?(hidden?[`<div class="mc E hand"><b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i></div>`]:p.hand.map(e=>`<div class="mc E hand">${cardPic(e,'cthumb')}<b>🧬 ${esc(evoName(e))}</b> <i>in hand</i><br>${esc(evoText(e))}</div>`)):[];
   const all=[...cards,...evo,...hand];
-  return `<div class="mon ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}" id="mon-${k}"><b style="background:${MONS[p.m].c}">${inCity(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>
+  return `<div class="mon ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}" id="mon-${k}"><b style="background:${MONS[p.m].c}">${inCity(p.i)?'<i class="crn">👑</i> ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>
     <div class="st2">${p.alive?`♥${p.hp}/${maxhp(p)} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${exIcons(p)} · ${esc(where(p.i))}`:'Knocked out'}</div>
     <div class="small muted" style="padding:0 .5rem .3rem">${esc(MONS[p.m].d)}</div><div class="mine">${all.length?all.join(''):'<span class="muted small">No cards.</span>'}</div></div>`}
 function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='<p class="muted">No game yet.</p>';return}

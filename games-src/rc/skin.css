@@ -16,6 +16,8 @@ html.sk-acts .ai:not([data-a=build]):not([data-a=camp]):not([data-a=explore]):no
 html.sk-acts .cat .ai{width:34px;height:34px}
 html.sk-res .rx{display:inline-block;font-size:0;width:22px;height:22px;background:center/contain no-repeat;vertical-align:middle;font-style:normal}
 html.sk-res .rx[data-r=food]{background-image:url(media/icon-res-food.webp)}html.sk-res .rx[data-r=pfood]{background-image:url(media/icon-res-pfood.webp)}
+html.sk-res .rx[data-r=shelter]{background-image:url(media/icon-res-shelter.webp)}html.sk-res .rx[data-r=roof]{background-image:url(media/icon-res-roof.webp)}html.sk-res .rx[data-r=palisade]{background-image:url(media/icon-res-palisade.webp)}html.sk-res .rx[data-r=weapon]{background-image:url(media/icon-res-weapon.webp)}
+html.sk-res .trk .rx{width:18px;height:18px}
 html.sk-res .rx[data-r=wood]{background-image:url(media/icon-res-wood.webp)}html.sk-res .rx[data-r=fur]{background-image:url(media/icon-res-fur.webp)}
 /* the driftwood bar and the drawer strips are light: dark ink instead of the cream text of the dark kits */
 html.sk{--sk-cream:#2a1a0a}
