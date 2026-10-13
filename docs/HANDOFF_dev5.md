@@ -41,3 +41,11 @@
 - Probes in qa_dev5/ on alex/od-dev1: probe.js, blob.js, og.js, view.js.
 - Render a fixed camera in headless with renderer.render + canvas.toDataURL in the same task; a plain screenshot gets the game's own frame.
 - Always use &draw=0 for state tests. Rendering with software GL runs at about 1 fps.
+
+## NEW TOP ITEM from the coordinator (23:36): HOT RELOAD (first cut target 15 min)
+- `tools/hot.js` = a daemon that keeps ONE booted page per city (`?test=fra|ath&draw=0`, playwright, persistent) and listens on a local port / unix socket.
+- `node tools/hot.js reload src/<module>.js`: re-evaluate that module's text in the live page (page.evaluate of the file, global script scope via `__oc.ev` or `(0,eval)`).
+  - Caveat: modules that WRAP functions (`f=(g=>function(){…})(f)`) would wrap twice on a reload. Either reload only modules that define functions,
+    or keep a per-module originals map. First cut: plain re-eval + a warning for wrapper modules.
+- `node tools/hot.js go <ver/id>`: `__tq.reset()` then `__chk.go(id)`, waits for the `…` result (same as tChkGo), prints PASS/FAIL. Target < 5 s.
+- Write docs/HOT.md (5 lines, CLAUDE.md style) and send the usage to the coordinator for all lanes.
