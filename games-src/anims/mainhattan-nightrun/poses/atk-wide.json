@@ -1,0 +1,53 @@
+{
+ "style": "",
+ "cards": {
+  "05-boss-tresor-wart-atk1": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: wind-up: vault door opened a crack, treads braced. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "05-boss-tresor-wart-atk2": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: charge: a red emitter glowing inside the open door. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "05-boss-tresor-wart-atk3": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: attack: side cannons firing with small orange muzzle flashes, body jolted back. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "05-boss-tresor-wart-atk4": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: recoil: vault door closing, cannons cooling. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "08-boss-messe-waechter-atk1": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: wind-up: both arms raised high, foot thrusters bright. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  },
+  "08-boss-messe-waechter-atk2": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: charge: small magenta electric arcs between its fists. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  },
+  "08-boss-messe-waechter-atk3": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: attack: both fists thrust forward toward the viewer, arcs crackling on the fists. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  },
+  "08-boss-messe-waechter-atk4": {
+   "prompt": "The exact same the hovering robot boss as the reference. Pose: recoil: arms lowering, arcs fading. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "08-boss-messe-waechter.png"
+   ]
+  }
+ }
+}

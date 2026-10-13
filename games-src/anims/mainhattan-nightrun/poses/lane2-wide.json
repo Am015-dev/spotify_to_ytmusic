@@ -1,0 +1,29 @@
+{
+ "style": "",
+ "cards": {
+  "05-boss-tresor-wart-a": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: door wheel turned a quarter turn, cyan lights bright. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "05-boss-tresor-wart-b": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: door wheel turned half a turn, cyan lights dim. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "05-boss-tresor-wart-c": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: door wheel turned three quarters, treads shifted forward, cyan lights bright. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  },
+  "05-boss-tresor-wart-d": {
+   "prompt": "The exact same the vault tank boss as the reference. Pose: door wheel back at the reference, cyan lights dim. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "05-boss-tresor-wart.png"
+   ]
+  }
+ }
+}

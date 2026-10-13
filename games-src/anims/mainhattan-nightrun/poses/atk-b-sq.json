@@ -1,0 +1,101 @@
+{
+ "style": "",
+ "cards": {
+  "06-boss-bruecken-waechter-atk1": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: wind-up: twin cannons lowered and aimed forward, body braced. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-atk2": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: charge: cannon muzzles glowing orange. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-atk3": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: attack: left cannon firing with a small orange muzzle flash and recoiling. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "06-boss-bruecken-waechter-atk4": {
+   "prompt": "The exact same the bridge guardian tank boss as the reference. Pose: recoil: right cannon firing with a small orange muzzle flash, left cannon back. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "06-boss-bruecken-waechter.png"
+   ]
+  },
+  "07-boss-schranken-wart-atk1": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: wind-up: striped arms swung level, red laser off. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "07-boss-schranken-wart-atk2": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: charge: red emitters between the arms glowing brighter. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "07-boss-schranken-wart-atk3": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: attack: arms jolted, emitters blazing red. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "07-boss-schranken-wart-atk4": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: recoil: arms tilting back up, emitters dimming. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "09-boss-hoplite-atk1": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: wind-up: shield raised, spear drawn far back. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "09-boss-hoplite-atk2": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: charge: spear tip glowing magenta. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "09-boss-hoplite-atk3": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: attack: spear thrust forward at full reach, small magenta flash on the tip. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "09-boss-hoplite-atk4": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: recoil: spear pulled back, shield in guard. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "10-boss-talos-atk1": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: wind-up: fists clenched and drawn back, shoulders hunched. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  },
+  "10-boss-talos-atk2": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: charge: chest core blazing bright orange. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  },
+  "10-boss-talos-atk3": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: attack: both fists slammed forward toward the viewer. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  },
+  "10-boss-talos-atk4": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: recoil: straightening up, chest core dimming. Glows and muzzle flashes are small, saturated magenta, cyan or orange, never white, and stay on the body. No bullets, beams or projectiles. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  }
+ }
+}
