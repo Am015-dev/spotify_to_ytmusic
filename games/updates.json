@@ -16,6 +16,120 @@
  },
  {
   "date": "2026-10-13",
+  "game": "mainhattan",
+  "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
+  "items": [
+   "Title, pause, garage, shop and story buttons are now painted plates",
+   "Settings card has a painted frame, header and rows",
+   "Run HUD sits in painted housings; hints in a speech bubble",
+   "Phone pause, DASH and EMP are painted round buttons",
+   "Story map stages sit on medallions: open, done, boss, locked",
+   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
+   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
+   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones",
+   "40 story stages plus 5 optional challenges on a painted route map: tap a stage to see its goal, stars and PLAY",
+   "Difficulty climbs a little every stage; bosses sit slightly above their stage",
+   "Pit stop: build paths, synergies, a heat budget, 6 to 8 upgrade slots, selling, boss picks",
+   "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back",
+   "LAB is its own stage (title > LAB, Settings > OPEN LAB, ?lab=1): boss gallery with intro, phases, attacks, poses, hit and death; foes, items and power-ups one at a time",
+   "Less lag on big screens: ground haze baked into the backdrop, menus no longer redraw the game behind them, slow machines lower the picture sharpness by themselves",
+   "Labels fit their plates: scrolling story list, HUD type 11 px or more on phones, readable garage tabs, new ui-align-test.js",
+   "No more white gaps or halos around the ten bosses",
+   "Talos now faces you",
+   "Tank, vault, spearman and Talos walk or roll along the road with a shadow; the river beast rides the water",
+   "LAB opens straight on a boss with ?boss=talos"
+  ],
+  "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Short Fuse: painted workshop kit",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit"
+  ],
+  "check": "Look at the table and the fuse strip"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Kaiten Kitchen: painted chef tags and icons",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit"
+  ],
+  "check": "Look under each chef on the table"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shelf",
+  "title": "Game versions and status page",
+  "items": [
+   "Every game card and the player bar show a version chip, like v47 and the date",
+   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
+   "Asset viewer has a new Games tab with the same numbers"
+  ],
+  "check": "Open the shelf, then Status (status.html) and the Games tab in the asset viewer."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sunglaze",
+  "title": "Painted kilns and rack for Sunglaze",
+  "items": [
+   "Painted terracotta kiln plates and a wooden centre tray",
+   "Carved rack dishes, clay floor dishes and plaster wall recesses",
+   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
+  ],
+  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "lantern-dive",
+  "title": "Lantern Dive: painted deep-sea table",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit"
+  ],
+  "check": "Start a dive and look at the table"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Painted cockpit kit",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane",
+   "Top bar, menus and buttons are now painted cockpit panels",
+   "Briefing is a real clipboard with painted check boxes",
+   "Weather and time-of-day badges on the briefing",
+   "Radio phrase buttons and the Roll plate are painted"
+  ],
+  "check": "Open Flight and read the briefing; tap Roll"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "rampart",
+  "title": "Painted look for Rampart & Vine",
+  "items": [
+   "Followers are painted pieces in each player's colour",
+   "Wooden score pills, oak top bar and a leather tile tray with a painted rotate button",
+   "Stone-framed menus and buttons, ribbon and goblet on the result"
+  ],
+  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
+ },
+ {
+  "date": "2026-10-13",
   "game": "crown",
   "title": "Clearer score chips and bigger Got it",
   "items": [
@@ -93,33 +207,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "mainhattan",
-  "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
-  "items": [
-   "Title, pause, garage, shop and story buttons are now painted plates",
-   "Settings card has a painted frame, header and rows",
-   "Run HUD sits in painted housings; hints in a speech bubble",
-   "Phone pause, DASH and EMP are painted round buttons",
-   "Story map stages sit on medallions: open, done, boss, locked",
-   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
-   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
-   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones",
-   "40 story stages plus 5 optional challenges on a painted route map: tap a stage to see its goal, stars and PLAY",
-   "Difficulty climbs a little every stage; bosses sit slightly above their stage",
-   "Pit stop: build paths, synergies, a heat budget, 6 to 8 upgrade slots, selling, boss picks",
-   "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back",
-   "LAB is its own stage (title > LAB, Settings > OPEN LAB, ?lab=1): boss gallery with intro, phases, attacks, poses, hit and death; foes, items and power-ups one at a time",
-   "Less lag on big screens: ground haze baked into the backdrop, menus no longer redraw the game behind them, slow machines lower the picture sharpness by themselves",
-   "Labels fit their plates: scrolling story list, HUD type 11 px or more on phones, readable garage tabs, new ui-align-test.js",
-   "No more white gaps or halos around the ten bosses",
-   "Talos now faces you",
-   "Tank, vault, spearman and Talos walk or roll along the road with a shadow; the river beast rides the water",
-   "LAB opens straight on a boss with ?boss=talos"
-  ],
-  "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
- },
- {
-  "date": "2026-10-13",
   "game": "tidewake",
   "title": "Painted sea for Tidewake",
   "items": [
@@ -139,55 +226,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: painted workshop kit",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big",
-   "Wire racks, name plates and equipment cards are painted",
-   "A rope fuse with a spark and a painted bomb",
-   "Top bar, menus and buttons use the workshop kit"
-  ],
-  "check": "Look at the table and the fuse strip"
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: painted chef tags and icons",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals",
-   "Each chef has a painted chopstick-sleeve name tag",
-   "Stars, plates, custard cups and Fire Paste are painted icons",
-   "Top bar, menus and buttons use the lacquer kit"
-  ],
-  "check": "Look under each chef on the table"
- },
- {
-  "date": "2026-10-13",
-  "game": "shelf",
-  "title": "Game versions and status page",
-  "items": [
-   "Every game card and the player bar show a version chip, like v47 and the date",
-   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
-   "Asset viewer has a new Games tab with the same numbers"
-  ],
-  "check": "Open the shelf, then Status (status.html) and the Games tab in the asset viewer."
- },
- {
-  "date": "2026-10-13",
-  "game": "sunglaze",
-  "title": "Painted kilns and rack for Sunglaze",
-  "items": [
-   "Painted terracotta kiln plates and a wooden centre tray",
-   "Carved rack dishes, clay floor dishes and plaster wall recesses",
-   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
-  ],
-  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack."
  },
  {
   "date": "2026-10-13",
@@ -230,19 +268,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-13",
-  "game": "lantern-dive",
-  "title": "Lantern Dive: painted deep-sea table",
-  "items": [
-   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
-   "The Commander badge is now the lantern too",
-   "The trick table is a brass-rimmed painted pad",
-   "Oxygen tanks and boss hearts are painted",
-   "Buttons, top bar and menus use the brass kit"
-  ],
-  "check": "Start a dive and look at the table"
  },
  {
   "date": "2026-10-13",
@@ -312,31 +337,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-13",
-  "game": "final-approach",
-  "title": "Painted cockpit kit",
-  "items": [
-   "The landing and the crash now show a detailed 3D airliner",
-   "Low graphics keeps the old painted plane",
-   "Top bar, menus and buttons are now painted cockpit panels",
-   "Briefing is a real clipboard with painted check boxes",
-   "Weather and time-of-day badges on the briefing",
-   "Radio phrase buttons and the Roll plate are painted"
-  ],
-  "check": "Open Flight and read the briefing; tap Roll"
- },
- {
-  "date": "2026-10-13",
-  "game": "rampart",
-  "title": "Painted look for Rampart & Vine",
-  "items": [
-   "Followers are painted pieces in each player's colour",
-   "Wooden score pills, oak top bar and a leather tile tray with a painted rotate button",
-   "Stone-framed menus and buttons, ribbon and goblet on the result"
-  ],
-  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
  },
  {
   "date": "2026-10-13",
@@ -438,48 +438,6 @@
  },
  {
   "date": "2026-10-10",
-  "game": "thornbound",
-  "title": "Bigger PC layout",
-  "items": [
-   "Painted throne and score track",
-   "Shorter menu music loops",
-   "On a computer the right side is now a table: the Great Road cards on offer sit big in the middle",
-   "Your hand is big along the bottom and lifts when you hover",
-   "Bigger rival strip with larger bid cards",
-   "The hand no longer disappears during the Great Road step"
-  ],
-  "check": "Open Thornbound on a PC and bid a card",
-  "scn": [
-   "tb-board",
-   "tb-board",
-   "tb-pc-hand",
-   "tb-pc-hand",
-   "tb-rivals",
-   "tb-pc-hand",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-10",
   "game": "shelf",
   "title": "Shelf: What's new panel",
   "items": [
@@ -537,6 +495,101 @@
  },
  {
   "date": "2026-10-10",
+  "game": "doorkick",
+  "title": "Doorkick Dungeon: shorter menu music",
+  "items": [
+   "Menu songs are shorter loops now"
+  ],
+  "check": "Open the menu and listen."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "shortfuse",
+  "title": "Short Fuse: phone workbench",
+  "items": [
+   "Painted workbench table when the phone is upright",
+   "Shorter menu music loops"
+  ],
+  "check": "Hold your phone upright and start a game."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "approach",
+  "title": "Final Approach: painted table",
+  "items": [
+   "Painted default table, with a portrait file for phones",
+   "Shorter menu music loops"
+  ],
+  "check": "Start a flight on your phone."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "mainhattan",
+  "title": "Nightrun: all art painted",
+  "items": [
+   "Painted cards in the SOON list and the chest",
+   "Painted garage and pause screens",
+   "Painted kit perks, medals, badges, new ships and two mini-bosses"
+  ],
+  "check": "Open the garage and the pause screen."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "overdrive",
+  "title": "Overdrive: fixes and faster Athens",
+  "items": [
+   "Athens loads about 20 seconds faster and uses less memory",
+   "No more pink and white blocks next to cars at night",
+   "Long dusk and night drives no longer slow down",
+   "Garage menus only open when you stop in the ring",
+   "Drift is now hold BRAKE while steering"
+  ],
+  "check": "Drive Athens at night for a few minutes."
+ },
+ {
+  "date": "2026-10-10",
+  "game": "thornbound",
+  "title": "Bigger PC layout",
+  "items": [
+   "Painted throne and score track",
+   "Shorter menu music loops",
+   "On a computer the right side is now a table: the Great Road cards on offer sit big in the middle",
+   "Your hand is big along the bottom and lifts when you hover",
+   "Bigger rival strip with larger bid cards",
+   "The hand no longer disappears during the Great Road step"
+  ],
+  "check": "Open Thornbound on a PC and bid a card",
+  "scn": [
+   "tb-board",
+   "tb-board",
+   "tb-pc-hand",
+   "tb-pc-hand",
+   "tb-rivals",
+   "tb-pc-hand",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-10",
   "game": "tidewake",
   "title": "Tidewake painted table and music",
   "items": [
@@ -561,25 +614,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-10",
-  "game": "doorkick",
-  "title": "Doorkick Dungeon: shorter menu music",
-  "items": [
-   "Menu songs are shorter loops now"
-  ],
-  "check": "Open the menu and listen."
- },
- {
-  "date": "2026-10-10",
-  "game": "shortfuse",
-  "title": "Short Fuse: phone workbench",
-  "items": [
-   "Painted workbench table when the phone is upright",
-   "Shorter menu music loops"
-  ],
-  "check": "Hold your phone upright and start a game."
  },
  {
   "date": "2026-10-10",
@@ -666,40 +700,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-10",
-  "game": "approach",
-  "title": "Final Approach: painted table",
-  "items": [
-   "Painted default table, with a portrait file for phones",
-   "Shorter menu music loops"
-  ],
-  "check": "Start a flight on your phone."
- },
- {
-  "date": "2026-10-10",
-  "game": "mainhattan",
-  "title": "Nightrun: all art painted",
-  "items": [
-   "Painted cards in the SOON list and the chest",
-   "Painted garage and pause screens",
-   "Painted kit perks, medals, badges, new ships and two mini-bosses"
-  ],
-  "check": "Open the garage and the pause screen."
- },
- {
-  "date": "2026-10-10",
-  "game": "overdrive",
-  "title": "Overdrive: fixes and faster Athens",
-  "items": [
-   "Athens loads about 20 seconds faster and uses less memory",
-   "No more pink and white blocks next to cars at night",
-   "Long dusk and night drives no longer slow down",
-   "Garage menus only open when you stop in the ring",
-   "Drift is now hold BRAKE while steering"
-  ],
-  "check": "Drive Athens at night for a few minutes."
  },
  {
   "date": "2026-10-10",
@@ -839,6 +839,56 @@
  },
  {
   "date": "2026-10-09",
+  "game": "shortfuse",
+  "title": "Short Fuse painted",
+  "items": [
+   "Painted cards, crew and tools",
+   "Card backs, workbench and unlockable tables",
+   "Title and end art, music with a Music picker, card list page",
+   "Skipping the story prologue opens the chapter map"
+  ],
+  "check": "Open the Card list page."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "approach",
+  "title": "Final Approach painted",
+  "items": [
+   "Painted sky, terrain, planes and crew",
+   "Portraits, table skins, card backs and end art",
+   "New music with a Music picker",
+   "Portrait phone title and table art"
+  ],
+  "check": "Start a flight and open Music."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "mainhattan",
+  "title": "Nightrun: much tougher and calmer",
+  "items": [
+   "Painted ships, enemies, bosses, effects and backdrops",
+   "30 story stages in five cities, with squad leaders and dodging drones",
+   "Two new difficulties: Very hard and Legend",
+   "Garage loadout, daily shop and 15 starting perks",
+   "Calm minimal HUD by default, with a HUD setting"
+  ],
+  "check": "Pick Legend difficulty and open the garage."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "overdrive",
+  "title": "Overdrive: on foot, garage, open races",
+  "items": [
+   "You can now get out and walk, run and jump",
+   "Take a slowing or parked car",
+   "Garage with a bigger build grid and parts you can save",
+   "Two open races: Riverbank Rally and Coast Rally",
+   "Cities stream in and out so Athens and Frankfurt use far less memory"
+  ],
+  "check": "Press EXIT to get out of your car."
+ },
+ {
+  "date": "2026-10-09",
   "game": "tidewake",
   "title": "Tidewake painted media",
   "items": [
@@ -863,18 +913,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-09",
-  "game": "shortfuse",
-  "title": "Short Fuse painted",
-  "items": [
-   "Painted cards, crew and tools",
-   "Card backs, workbench and unlockable tables",
-   "Title and end art, music with a Music picker, card list page",
-   "Skipping the story prologue opens the chapter map"
-  ],
-  "check": "Open the Card list page."
  },
  {
   "date": "2026-10-09",
@@ -998,44 +1036,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-09",
-  "game": "approach",
-  "title": "Final Approach painted",
-  "items": [
-   "Painted sky, terrain, planes and crew",
-   "Portraits, table skins, card backs and end art",
-   "New music with a Music picker",
-   "Portrait phone title and table art"
-  ],
-  "check": "Start a flight and open Music."
- },
- {
-  "date": "2026-10-09",
-  "game": "mainhattan",
-  "title": "Nightrun: much tougher and calmer",
-  "items": [
-   "Painted ships, enemies, bosses, effects and backdrops",
-   "30 story stages in five cities, with squad leaders and dodging drones",
-   "Two new difficulties: Very hard and Legend",
-   "Garage loadout, daily shop and 15 starting perks",
-   "Calm minimal HUD by default, with a HUD setting"
-  ],
-  "check": "Pick Legend difficulty and open the garage."
- },
- {
-  "date": "2026-10-09",
-  "game": "overdrive",
-  "title": "Overdrive: on foot, garage, open races",
-  "items": [
-   "You can now get out and walk, run and jump",
-   "Take a slowing or parked car",
-   "Garage with a bigger build grid and parts you can save",
-   "Two open races: Riverbank Rally and Coast Rally",
-   "Cities stream in and out so Athens and Frankfurt use far less memory"
-  ],
-  "check": "Press EXIT to get out of your car."
  },
  {
   "date": "2026-10-09",
@@ -1173,6 +1173,53 @@
  },
  {
   "date": "2026-10-08",
+  "game": "approach",
+  "title": "Final Approach: tutorial flight",
+  "items": [
+   "23-step tutorial flight as Chapter 0",
+   "Plainer wording in chapter 1"
+  ],
+  "check": "Start the tutorial flight."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "mainhattan",
+  "title": "Nightrun: pressure for standing still",
+  "items": [
+   "Standing still now costs you: score and fire rate drop",
+   "Fewer enemy bullets",
+   "Dimmer player shots",
+   "Dying slows the song",
+   "Perk stacking is capped"
+  ],
+  "check": "Stand still for a few seconds on Hard."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "overdrive",
+  "title": "Overdrive: life on the road",
+  "items": [
+   "People and stalls along your route, with roadside challenges",
+   "Speed Series cars: Time Coupe, Red Hypercar, Gold Formula",
+   "Pinned checklist folds away in the garage and during the countdown",
+   "Bigger parts palette with groups"
+  ],
+  "check": "Drive a route and look at the roadside."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "shelf",
+  "title": "Shelf: tutorials, filters and Featured",
+  "items": [
+   "All 15 board games now have a tutorial and lightbulb help",
+   "New filters: Has tutorial, Lightbulb help and more",
+   "Featured spotlight rotates between three games",
+   "Nightrun blurb updated"
+  ],
+  "check": "Open Filter and try the new options."
+ },
+ {
+  "date": "2026-10-08",
   "game": "tidewake",
   "title": "Tidewake: tutorial",
   "items": [
@@ -1288,53 +1335,6 @@
  },
  {
   "date": "2026-10-08",
-  "game": "approach",
-  "title": "Final Approach: tutorial flight",
-  "items": [
-   "23-step tutorial flight as Chapter 0",
-   "Plainer wording in chapter 1"
-  ],
-  "check": "Start the tutorial flight."
- },
- {
-  "date": "2026-10-08",
-  "game": "mainhattan",
-  "title": "Nightrun: pressure for standing still",
-  "items": [
-   "Standing still now costs you: score and fire rate drop",
-   "Fewer enemy bullets",
-   "Dimmer player shots",
-   "Dying slows the song",
-   "Perk stacking is capped"
-  ],
-  "check": "Stand still for a few seconds on Hard."
- },
- {
-  "date": "2026-10-08",
-  "game": "overdrive",
-  "title": "Overdrive: life on the road",
-  "items": [
-   "People and stalls along your route, with roadside challenges",
-   "Speed Series cars: Time Coupe, Red Hypercar, Gold Formula",
-   "Pinned checklist folds away in the garage and during the countdown",
-   "Bigger parts palette with groups"
-  ],
-  "check": "Drive a route and look at the roadside."
- },
- {
-  "date": "2026-10-08",
-  "game": "shelf",
-  "title": "Shelf: tutorials, filters and Featured",
-  "items": [
-   "All 15 board games now have a tutorial and lightbulb help",
-   "New filters: Has tutorial, Lightbulb help and more",
-   "Featured spotlight rotates between three games",
-   "Nightrun blurb updated"
-  ],
-  "check": "Open Filter and try the new options."
- },
- {
-  "date": "2026-10-08",
   "game": "sands",
   "title": "Sands of Qamar: tutorial",
   "items": [
@@ -1445,6 +1445,39 @@
  },
  {
   "date": "2026-10-07",
+  "game": "thornbound",
+  "title": "Thornbound: tutorial",
+  "items": [
+   "Story prologue tutorial as Chapter 0",
+   "Replay the tutorial from the chapter list"
+  ],
+  "check": "Open the chapter list and replay the tutorial."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "approach",
+  "title": "Final Approach: flight school",
+  "items": [
+   "Chapters 1-6 each teach one system",
+   "Plane picture and landing checklist",
+   "Co-pilot explains its choices"
+  ],
+  "check": "Play Chapter 1."
+ },
+ {
+  "date": "2026-10-07",
+  "game": "shelf",
+  "title": "Shelf: tidier header",
+  "items": [
+   "Compact Filter popover",
+   "One-row phone header",
+   "Continue chip with a +N list of saved games",
+   "Smaller New! starburst"
+  ],
+  "check": "Open the shelf on your phone."
+ },
+ {
+  "date": "2026-10-07",
   "game": "hollowbough",
   "title": "Hollowbough: help",
   "items": [
@@ -1459,16 +1492,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-07",
-  "game": "thornbound",
-  "title": "Thornbound: tutorial",
-  "items": [
-   "Story prologue tutorial as Chapter 0",
-   "Replay the tutorial from the chapter list"
-  ],
-  "check": "Open the chapter list and replay the tutorial."
  },
  {
   "date": "2026-10-07",
@@ -1503,29 +1526,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-07",
-  "game": "approach",
-  "title": "Final Approach: flight school",
-  "items": [
-   "Chapters 1-6 each teach one system",
-   "Plane picture and landing checklist",
-   "Co-pilot explains its choices"
-  ],
-  "check": "Play Chapter 1."
- },
- {
-  "date": "2026-10-07",
-  "game": "shelf",
-  "title": "Shelf: tidier header",
-  "items": [
-   "Compact Filter popover",
-   "One-row phone header",
-   "Continue chip with a +N list of saved games",
-   "Smaller New! starburst"
-  ],
-  "check": "Open the shelf on your phone."
  },
  {
   "date": "2026-10-06",
