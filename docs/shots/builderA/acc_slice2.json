@@ -1,0 +1,13 @@
+{
+ "bx-offroad": {
+  "ok": true,
+  "msg": "terrain 20.6 s, respawns 0, invisible-wall hits 0, tree/pillar bumps 1",
+  "why": "",
+  "wall": "78s"
+ },
+ "bx-errors": {
+  "ok": true,
+  "msg": "0 console/page errors",
+  "err": []
+ }
+}
