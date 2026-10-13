@@ -35,6 +35,7 @@ CROSSED = [{"game": g, "name": n, "wave": w, "twin": t} for g, n, w, t in [
 def wave_of(root, fname):
     if root == "flow-3d": return "3D sources"
     if root == "flow-covers": return "Covers"
+    if root == "flow-video": return "Boss poses"
     for key, w in (("kit", "Wave 4"), ("wave1", "Wave 1"), ("djinn", "Wave 1"), ("cards", "Wave 2"), ("wave2", "Wave 2"), ("wave3", "Wave 3"), ("wave5", "Wave 5")):
         if key in fname: return w
     return "Wave 0"
@@ -162,14 +163,16 @@ def build():
     batches = []
     import votes2d
     votes = votes2d.load()
-    for root in ["flow-2d", "flow-3d", "flow-covers"]:
-        for p in sorted((GA / root).glob("**/prompts*.json")):
+    for root, pat in [("flow-2d", "**/prompts*.json"), ("flow-3d", "**/prompts*.json"), ("flow-covers", "**/prompts*.json"),
+                      ("flow-video", "*/poses/*.json")]:  # boss pose stills (references for the boss videos)
+        for p in sorted((GA / root).glob(pat)):
             if p.name.startswith("prompts-redo-auto"): continue  # mirrors redo votes; the items already appear in their own batch
             try: cards = json.load(open(p, encoding="utf-8"))["cards"]
             except Exception: continue
             folder = p.parent
             items = []
             for name, prompt in cards.items():
+                if isinstance(prompt, dict): prompt = prompt.get("prompt", "")  # pose cards: {"prompt": ..., reference fields}
                 f = folder / f"{name}.jpg"
                 old = folder / "_redo" / f"{name}.jpg"
                 vt = votes.get(f"{folder.name}/{name}", {}) if root == "flow-2d" else {}
@@ -180,7 +183,7 @@ def build():
                               "old": thumb(old) if old.exists() else None,
                               "stage": stage(folder.name, name, f.exists(), vt.get("v")) if root == "flow-2d" else None,
                               "flags": ["blank"] if root == "flow-2d" and f.exists() and facts(f)[1] else []})
-            game = folder.name if root != "flow-covers" else "covers"
+            game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else folder.name
             batches.append({"root": root, "game": game, "kind": KIND.get(p.name, p.name), "file": p.relative_to(GA).as_posix(),
                             "wave": wave_of(root, p.name), "ratio": ratio_of(p.name),
                             "done": sum(i["done"] for i in items), "total": len(items), "items": items})
