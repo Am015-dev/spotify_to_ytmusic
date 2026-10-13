@@ -1,10 +1,10 @@
 PASS walk · GO puts you on foot · "📍 ON FOOT · walk ahead, then turn (PC: WASD, Shift runs)"
-PASS walk · 3 s forward moves ≥ 4 m · {"d":5.97}
+PASS walk · 3 s forward moves ≥ 4 m · {"d":4.35}
 PASS walk · steady speed, no jitter (sd/mean < 0.12) · {"mean":2,"sd":0}
 PASS walk · heading steady while walking straight · {"maxStep":0}
 PASS walk · feet step in time with the ground (foot speed / ground speed 0.75-1.35) · {"ratio":1}
-PASS walk · faces the new direction within 0.2 s (+1 frame) · {"ms":140}
-PASS walk · camera back behind within 1.5 s of the turn · {"ms":916,"end":0.01}
+PASS walk · faces the new direction within 0.2 s (+1 frame) · {"ms":110}
+PASS walk · camera back behind within 1.5 s of the turn · {"ms":906,"end":0}
 PASS walk · camera never inside a wall · {"camIn":0}
 PASS walk · no snagging (stuck frames < 10) · {"stuck":1}
 PASS phone · GO puts you on foot · "📍 ON FOOT · half stick = walk, full stick = run"
@@ -12,21 +12,21 @@ PASS phone · half stick = steady walk 1.4-2.6 m/s · {"v50":1.88}
 PASS phone · full stick = run ≥ 4 m/s · {"v100":5}
 PASS phone · ¾ stick is in between (smooth, no crawl→sprint jump) · {"v75":3.05}
 PASS npc · GO: pedestrian ahead · {"said":"📍 PEDESTRIAN AHEAD · walk up, tap 👋 HI (PC: E)","npc":{"d":2.19,"w":0,"face":1.15,"jy":0,"bub":false}}
-FAIL npc · 👋 HI button shows next to a person · {"act":"traf","btn":"🚗 TAKE","d":2.19}
-FAIL npc · tap HI: person faces you, waves, bubble within 0.5 s · {"tap":true,"ms":null,"last":{"d":1.95,"w":0,"face":2.88,"jy":0,"bub":false}}
-FAIL npc · E key greets too · {"d":4.63,"w":0,"face":2.88,"jy":1.83,"bub":false}
-FAIL npc · walking into people never sends them flying · {"flying":1}
+PASS npc · 👋 HI button shows next to a person · {"act":"npc","btn":"👋 HI","d":2.19}
+PASS npc · tap HI: person faces you, waves, bubble within 0.5 s · {"tap":true,"ms":9,"last":{"d":2.19,"w":0.82,"face":0,"jy":0,"bub":true}}
+PASS npc · E key greets too · {"d":2.19,"w":1.38,"face":0,"jy":0,"bub":true}
+PASS npc · walking into people never sends them flying · {"flying":0}
 PASS obj · next to your car: 🚪 ENTER · {"btn":"enter","said":"📍 YOUR CAR · 🚪 ENTER appears, tap it (PC: E)"}
 PASS obj · ENTER gets you in · {"state":"car"}
-PASS obj · next to a bench: 🪑 SIT · {"act":"bench","btn":"🪑 SIT","said":"📍 BENCH · walk up, tap the button (PC: E)"}
-PASS obj · SIT sits the minifig on the bench · {"sit":true,"y":19.38}
+FAIL obj · next to a bench: 🪑 SIT · {"act":null,"btn":"🚪 EXIT","said":"📍 No free spot at the bench"}
+FAIL obj · SIT sits the minifig on the bench · {"sit":false,"y":20.13}
 PASS obj · the stick stands it up again · {"sit":false}
 PASS obj · next to a mission giver: 📋 TALK · {"act":"mission","btn":"📋 TALK","said":"📍 MISSION GIVER · walk up, tap the button (PC: E)"}
 PASS obj · TALK opens the mission card · {"opened":1,"vis":false,"state":"car"}
 PASS jump · GO puts you on foot · "📍 ON FOOT · JUMP (PC: Space)"
-PASS jump · short hop 0.5-1.2 m · {"top":0.852}
+PASS jump · short hop 0.5-1.2 m · {"top":0.853}
 PASS jump · lands on the ground · {"air":false,"gnd":0}
 PASS jump · never sinks · {"sink":0}
 PASS jump · jumping while walking keeps you moving · {"before":2,"air":2}
 PASS all · no console errors · []
-GO 27/31
+GO 29/31
