@@ -15,7 +15,9 @@ Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuK
   98ld_v_6605-1 6609-1 6354-1 6361-1 625-1 6504-1 6608-1 4206-2 7347-1 7638-1 6600-1 6602-1 6603-1 6501-1 6675-1 6430-1 6450-1 6480-1
   6911-1_Ladder-Truck 6911-1_Rescue-SUV (.js). Grids: docs/shots/veh/GRID_veh2.jpg, GRID_veh2b.jpg.
 - CONFLICT: 7638 Tow Truck already shipped in v90g (rescue-1, same file src/98ld_v_7638-1.js). Keep one version (compare both on the stage).
-- veh-3 (new) sends MODEL lines + grids to the integrator directly.
+- veh-3 (session_01CyEic6W3fiivff8jZngR9M) REPORTED 21 more rides: alex/od-mdl-veh head ab4de71 (after 3cac11f), grid docs/shots/veh/GRID_3.jpg, 0 errors.
+  Add to src/MODELS: 98ld_v_ 6535-1 6550-1 6470-1 1029-1 6553-1 6571-1 6571-1b 6581-1 6594-1 6431-1 6473-1 6481-1 6484-1 6484-1b 6545-1 3056-1 30283-1 30284-1 20011-1 31027-1 6753-1b (.js).
+  Largest module 6484-1 = 130 KB. Ship veh-2's 20 and veh-3's 21 as separate small releases (v90j, v90k) rather than one batch of 41.
 - land-3 (session_01F9UVq3exKAQQy4xHV7BH6G) REPORTED 2026-10-13: alex/od-mdl-land db39943, all in src/98ld_l_land.js. Grid docs/shots/land/GRID_l3.jpg.
   fra: cone 4589, barrier 4083 (side view still owed), construction light, STOP sign, rock; ath: CE_pine 3471, CE_olive 3470 (-2.8M tris), CE_cypress 3778 (+57k), CE_rock.
   Frankfurt 4.21M->4.03M tris, same draws, 0 errors. The branch also holds 35406f1 (palms), already in v90i: merge db39943 (git handles the duplicate).
