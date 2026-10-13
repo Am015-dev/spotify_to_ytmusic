@@ -133,3 +133,10 @@ Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist
 - Deploy blocked by the look gate: `contrast|b.tv` (digits on the gold badge, 1.5-2.7:1 depending on the tile behind). The look check measures what is behind the digits; the badge picture now sits on `.tv::before` over a solid `#f4c04a`. `btn.sm` plate fixed; goods row has 44 px boxes. Next: lift `.tv` text contrast (e.g. a cream plate behind the digits), run `NODE_PATH=/opt/node-tools/node_modules python3 games-src/scripts/build-all.py --deploy sands-of-qamar`, then `look-check.js --baseline --game sands-of-qamar`, `add-update.py sands-of-qamar "Painted art wired" "item" --check "..." --scn sq-art`.
 - Note: export `NODE_PATH=/opt/node-tools/node_modules` before build-all (the look gate crashes otherwise).
 - Doorkick Dungeon: live (hand/level icons, bubble tail, 3D winner heroes; scenarios dk-art, dk-tips, dk-status-line).
+
+## Scenario invariants + mutation proof (13 Oct 2026; Crown + Doorkick proven, other games not yet)
+- Method: `PLAYBOOK.md` "A scenario must find bugs". Tools: `shell/gx-scenario.js` (`play` checks, invariants, `GXS.known`, `mut:`), `scripts/scenario-test.js`, `scripts/scenario-mutate.js <slug>` (2-4 min).
+- Baseline kill rate before (old scenarios): Crown 34/41 = 83% (behaviour mutants 75%), Doorkick 32/40 = 80% (69%); most "kills" were just hidden elements; no scenario asserted an engine outcome.
+- Real bugs found by the new invariants: FIXED Crown 375/390 px player chip cut off the energy number ("⚡20", `kot/skin.css`). LISTED (in `GXS.known`, `munch/scn.js`, `kot/scn.js`): Doorkick miniature card text 7-8 px (`.card .cn/.dn/.tag/.kind`), Doorkick fight side label "Pip (you) + Morwen" clipped, Crown PC tag "PERMANENT" 9.9 px. Delete the known line once fixed.
+- Other games: add `data-engine` to key numbers, `mut:` to each scenario, run scenario-mutate.js, fix survivors.
+- A routine message ("Redirect: fast tests like the game industry": engine unit tests + 1000 AI games, drop the mutation runner) reached this session without the owner; not acted on, owner to confirm.
