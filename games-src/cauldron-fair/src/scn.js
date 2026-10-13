@@ -68,4 +68,24 @@
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+  // painted art wired: each plate is painted on the element, its image loaded (the skin switch is on), the element visible
+  function art(name, sel, file, pseudo, cls) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
+  GXS.add({
+    id: 'cf-art', name: 'Painted art: bag, chip track, tail, rows', ask: 'Do the bag, chip track and rows look painted?', seed: 5, when: booted,
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      window.AIDELAY = 120; newGame('vs', {});
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)') || q('.stopb:not(.off)'); }, 40000).then(function () {
+        quiet(); var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
+        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap the bag</div>'; document.body.appendChild(b); return new Promise(function (r) { setTimeout(r, 400); });
+      });
+    },
+    checks: [
+      art('Draw dish painted', '.bagwrap', 'btn-draw-c', null, 'sk-draw'),
+      art('chip track painted', '#acts .mcells', 'ui-chipbar', null, 'sk-chipbar'),
+      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
+      { kind: 'text', sel: '#arttail .gxh-tx', re: /bag/i, name: 'bubble text readable' },
+      { kind: 'fn', name: 'settings row painted', fn: function () { GX.show('setd'); var e = document.querySelector('#setbody .mrow'); if (!e) return 'no row'; var r = e.getBoundingClientRect(), c = getComputedStyle(e, '::before'); var ok = r.width > 4 && c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0; try { GX.close(); } catch (x) { } return ok || 'ui-row-c not painted'; } }
+    ]
+  });
 })();

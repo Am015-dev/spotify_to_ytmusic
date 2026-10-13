@@ -20,3 +20,16 @@ html.sk-cells .bf-floor .bf-c{background:url(media/ui-floor-cell.webp) center/11
 html.sk .gxc-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1a0a}
 html.sk .gxc-htitle{color:#3a1a0a;text-shadow:none;line-height:1.3;padding:2px 0}
 html.sk .gxc-ib{color:#fff}
+
+/* carved wooden tray around the full five-dish rack (the shorter racks are a staircase, so they keep plain dishes) (overlay behind the dishes, no size change) */
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no)){isolation:isolate}
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no))::before{content:'';position:absolute;inset:-9px -5px -8px;z-index:-1;pointer-events:none;border:solid transparent;border-width:11px 5px 9px;border-image:url(media/ui-rack-frame-c.webp) 36 16 30 16 fill/11px 5px 9px stretch;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* settings rows: the painted glazed strip behind each row (overlay, no size change) */
+html.sk-row .gx-row{position:relative;isolation:isolate}
+html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
