@@ -43,6 +43,10 @@ const PAGE = `(() => {
       if (!G) return bad;
       const gr = document.getElementById('grid').getBoundingClientRect(); if (gr.right > W + 1 || gr.left < -1 || gr.bottom > H + 1) bad.push('grid off screen');
       const ln = document.getElementById('line').textContent.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w)); if (ln.length > 8) bad.push('line ' + ln.length + ' words: ' + ln.join(' '));
+      for (const b of document.querySelectorAll('#acts button, #modal .mbox button')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.bottom < 0 || r.top > H) continue;
+        if (!b.innerText.trim() && !b.querySelector('svg,img') && !b.getAttribute('aria-label')) bad.push('button without label or icon: ' + b.className);
+        else if (b.scrollWidth > b.clientWidth + 2 && getComputedStyle(b).overflow !== 'visible') bad.push('button label clipped: "' + b.innerText.trim().slice(0, 20) + '"');
+        else if (b.innerText.trim() && parseFloat(getComputedStyle(b).fontSize) < 13) bad.push('button font under 13px: "' + b.innerText.trim().slice(0, 20) + '"'); }
       if (!UI.modal) { for (const b of document.querySelectorAll('#acts button')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('button off screen: ' + lab(b));
           const t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); if (t && t !== b && !b.contains(t) && !t.closest('#chz')) bad.push('button covered: ' + lab(b) + ' by ' + (t.id || t.className)); } }
       G.pl.forEach((p, i) => { const e = document.querySelector('#seats [data-seat="' + i + '"] .ss'); if (!e) { bad.push('no seat chip ' + i); return; } const v = +e.textContent.replace(/[^0-9-]/g, ''); if (v !== shownTotal(p)) bad.push('score seat ' + i + ': screen ' + v + ' engine ' + shownTotal(p)); });
@@ -141,6 +145,7 @@ async function helpRules(page, ph, issue) { HT.rules++;
 async function play(browser, job) {
   const { idx, size, mode, seed, story } = job; const rnd = rng(seed * 7919 + idx);
   const ctx = await browser.newContext({ viewport: { width: size[0], height: size[1] }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
+  await require('../munch/local-route.js')(ctx, require('fs').readFileSync(FILE), [__dirname, path.join(__dirname, '../../games/sands-of-qamar')]);
   const page = await ctx.newPage(); const res = { idx, size: size.join('x'), mode: JSON.stringify(mode), seed, taps: 0, issues: new Set(), errors: [], rounds: 0, over: false, won: null, story: story || null };
   page.on('pageerror', e => res.errors.push(String(e.message || e).split('\n')[0].slice(0, 140)));
   page.on('console', m => { if (m.type() === 'error' && !/Fetch API cannot load|net::|Failed to load resource/.test(m.text())) res.errors.push('console: ' + m.text().slice(0, 140)); });
@@ -151,7 +156,7 @@ async function play(browser, job) {
   if (!H.tipsOn) await ctx.addInitScript(() => { try { localStorage.setItem('gxh-sands-of-qamar', JSON.stringify({ on: false, seen: {} })); } catch (e) { } });
   try {
     if (story) { const n = +story.slice(1); const ch = {}; for (let k = 1; k < n; k++) ch['c' + k] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; await ctx.addInitScript(p => { try { localStorage.setItem('gns-campaign-sands', JSON.stringify({ v: 1, ch: p, unlocked: [], last: null })); } catch (e) { } }, ch); }
-    await page.goto('file://' + FILE, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (idx === 0) await helpStatic(page, issue);
+    await page.goto('https://gns.test/', { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (idx === 0) await helpStatic(page, issue);
     if (story) {
       await page.evaluate(id => { setSeed(1000 + (+id.slice(1))); GXC.play(id); }, story); await sleep(400);
       for (let k = 0; k < 14; k++) { // intro, boss card, goal: tap the kit's own buttons until the game starts

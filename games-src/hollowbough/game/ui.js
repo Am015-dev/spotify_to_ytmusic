@@ -45,9 +45,14 @@ const ICO = {
   paw: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="6" ry="5" fill="#8a6240"/><circle cx="5.5" cy="10" r="2.4" fill="#8a6240"/><circle cx="9.5" cy="5.5" r="2.4" fill="#8a6240"/><circle cx="14.5" cy="5.5" r="2.4" fill="#8a6240"/><circle cx="18.5" cy="10" r="2.4" fill="#8a6240"/></svg>',
   tree: '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="7.5" fill="#7fae62" stroke="#3b2f2a" stroke-width="1.4"/><path d="M10.5 22V14h3v8Z" fill="#8a6240" stroke="#3b2f2a" stroke-width="1.2"/></svg>'
 };
+// painted resource icons and season wheel (media/icon-*.webp, ui-season-wheel.webp): used once loaded, the drawn kit icons until then
+const RESIMG = {}; RESK.forEach(k => { const i = new Image(); i.onload = () => { RESIMG[k] = 1; }; i.src = 'media/icon-' + k + '.webp'; });
+const WHEEL = { ok: 0 }; { const i = new Image(); i.onload = () => { WHEEL.ok = 1; }; i.src = 'media/ui-season-wheel.webp'; }
+function paintImg(src, px, cls, rot) { const i = document.createElement('img'); i.src = src; i.alt = ''; i.draggable = false; i.className = cls; i.style.cssText = 'width:' + px + 'px;height:' + px + 'px;object-fit:contain;display:inline-block;vertical-align:middle' + (rot ? ';transform:rotate(' + rot + 'deg)' : ''); return i; }
+function seasonIcon(i, px) { return WHEEL.ok ? paintImg('media/ui-season-wheel.webp', px, 'sw', -90 * i) : HBKit.season(SEAS[i], px); }
 function ic(kind, px) {
   px = px || 20;
-  if (RESK.indexOf(kind) >= 0) return HBKit.resource(kind, px);
+  if (RESK.indexOf(kind) >= 0) return RESIMG[kind] ? paintImg('media/icon-' + kind + '.webp', px, 'ri') : HBKit.resource(kind, px);
   if (kind === 'point') return HBKit.point(null, px);
   if (kind === 'occ') return HBKit.occupied(px);
   const s = h('span.ic', { 'aria-hidden': 'true', html: ICO[kind] || ICO.any }); s.style.width = s.style.height = px + 'px'; return s;
@@ -90,7 +95,7 @@ function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : [
 function mkey(m) { const o = {}; Object.keys(m).sort().forEach(k => { if (k !== 'label') o[k] = m[k]; }); return JSON.stringify(o); }
 function sameM(a, b) { return !!a && !!b && mkey(a) === mkey(b); }
 function pcolor(i) { return HBKit.PLAYER[i === 'G' ? 4 : i % 4]; }
-function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', h('span.wpg', { style: '--wc:' + HBKit.PLAYER[k].c }, h('img', { src: 'models/worker.webp', alt: '', draggable: 'false' })), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
+function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', h('span.wpg', { style: '--wc:' + HBKit.PLAYER[k].c }, h('img', { src: 'models/worker@512.webp', alt: '', draggable: 'false' })), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
 function score(seat) { try { return HB.score(G, seat); } catch (e) { return { total: 0 }; } }
 function lastLogs(n) { return G.log.slice(-n).map(x => x.t); }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
@@ -537,8 +542,8 @@ function renderActs(mm, qm, qShown) {
   const prep = mm.find(m => m.type === 'prepare'), pass = mm.find(m => m.type === 'pass');
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
-    if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, HBKit.season(SEAS[p.season + 1], 22), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare (workers still out)' }, HBKit.season(SEAS[Math.min(3, p.season + 1)], 22), h('span', 'Prepare')));
+    if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
+    else a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare (workers still out)' }, seasonIcon(Math.min(3, p.season + 1), 26), h('span', 'Prepare')));
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -870,7 +875,7 @@ function queueOver() {
     t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', sc.total)));
     return t;
   };
-  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40), h('img.hero-tree', { src: 'models/ever-tree.webp', alt: '', draggable: 'false' })), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
+  G.players.forEach((p, s) => UI.cards.push({ kind: 'over-score', title: 'Final score: ' + p.name, sub: p.ai ? 'Computer player' : 'Player', body: () => h('div', h('div.seasonrow', pawn(s, 40), h('img.hero-tree', { src: 'models/ever-tree@512.webp', alt: '', draggable: 'false' })), rows(ov.scores[s], p.name, s), h('p.sm', p.workers + ' workers, ' + HB.cityCount(G, s) + ' cards in the city, ' + ov.scores[s].left + ' resources left.')) }));
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
@@ -1597,6 +1602,7 @@ function tutOffer(go) {
 (function () { const o = nextCard; nextCard = function () { if (tutOn() && !UI._tutIn && UI.cards.length && UI.cards[0].kind !== 'pass') return; return o.apply(this, arguments); }; })();
 // ===================== part 13: painted extras (card backs, tables, title and end art, portraits) and music (per screen + picker) =====================
 const MEDIA = 'media/';
+try { GXSK.init({}); } catch (e) {}
 const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
 const IMG_OK = {};
 const preImg = f => { const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };

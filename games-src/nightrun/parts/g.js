@@ -3,8 +3,11 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='J2';
+const NR_VER='J3';
 const NR_CHECKLIST=[
+ {ver:'J3',id:'boss-anim',text:'Every boss now animates: it moves through its idle frames, and when it is about to fire (the beat before) it winds up, then shows the shot and recovers. Check Adler, Krake, Ice, Kronos, Tresor, Bruecke, Schranke, Messe, Hoplite and Talos (LAB > BOSS PICKER). No white boxes or fringes round any of them, size looks like before.'},
+ {ver:'J3',id:'lab-oneTap',text:'LAB: pause > LAB > any IN A RUN button (BOSS NOW, a boss from the BOSS PICKER, KILL ALL ...) closes the LAB and you are back in the game at once. RESUME RUN sits at the top. After you open the LAB once, a small LAB chip stays in the run (it pauses and opens the LAB).'},
+ {ver:'J3',id:'no-overlap',text:'Nothing overlaps: difficulty badges in the LAB are small icons, the story map shows number medallion, stage name and stars on one line on a small phone (375x553), the boss sub-title matches the boss.'},
  {ver:'J2',id:'ui-menus',text:'Menu, pause, garage, shop and story buttons are painted plates (angular on title and pause, round pills in garage, shop, story and settings); the settings card has a painted frame, header and rows. Every label is readable and every button still reacts to a tap.'},
  {ver:'J2',id:'ui-hud',text:'In a run the score and the hull/heat/dash/EMP bars sit in painted housings and the hint line in a speech bubble; all numbers stay easy to read. On a phone the pause, DASH and EMP buttons are the painted round buttons and still work.'},
  {ver:'J2',id:'ui-story-map',text:'On the story map every stage number sits on a medallion: open, done (laurel), boss (crown) or locked (padlock); garage and shop item icons sit in round chrome buttons.'},

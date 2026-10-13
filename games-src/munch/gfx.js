@@ -101,7 +101,12 @@ const GFX=(function(){
     if(!prev||prev.k!==k||!motion())return;
     const pop=(sel,d)=>{if(!d)return;const s=v.querySelector(sel);if(!s)return;const n=s.querySelector('.num');if(n)n.animate([{transform:'scale(1)'},{transform:'scale(1.5)',offset:.4},{transform:'scale(1)'}],{duration:520,easing:'cubic-bezier(.2,1.8,.4,1)'});
       const f=document.createElement('span');f.className='fxdelta '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);setTimeout(()=>f.remove(),1150)};
-    pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b)}
+    pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b);
+    // the big scoreline: a +N flies into the total and the number counts up to it
+    [['.sy',a,prev.a],['.sm',b,prev.b]].forEach(([sel,to,from])=>{const d=to-from;if(!d)return;const s=v.parentNode.querySelector('.sline '+sel);if(!s)return;const n=s.querySelector('.n');if(!n)return;
+      n.textContent=from;const f=document.createElement('span');f.className='fxfly '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);
+      f.animate([{transform:'translate(-50%,70px) scale(1.7)',opacity:0},{transform:'translate(-50%,30px) scale(1.7)',opacity:1,offset:.25},{transform:'translate(-50%,-4px) scale(.9)',opacity:1,offset:.85},{transform:'translate(-50%,-4px) scale(.6)',opacity:0}],{duration:760,easing:'ease-in'}).onfinish=()=>f.remove();
+      const t0=performance.now(),T=420,D=520;const step=t=>{const q=Math.min(1,Math.max(0,(t-t0-D)/T));n.textContent=Math.round(from+(to-from)*q);if(q<1)requestAnimationFrame(step);else n.animate([{transform:'scale(1)'},{transform:'scale(1.35)',offset:.4},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.2,1.8,.4,1)'})};requestAnimationFrame(step)})}
   function init(){if(!HAS_DOM)return;textures();apply(load());
     perf();
     try{addEventListener('resize',()=>{sizeEmbers();if(auto){const v=autoPick();if(v!==level&&!(v==='high'&&level!=='high'))apply(v)}})}catch(e){}

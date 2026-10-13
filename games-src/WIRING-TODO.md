@@ -2,25 +2,25 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
+Wired: 439 paintings, 47 3D models. Still to wire: 276 paintings, 12 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | sands-of-qamar | 41 | 0 |
-| nebula-aces | 32 | 0 |
-| lantern-dive | 28 | 0 |
-| thornbound | 28 | 0 |
 | kaiten-kitchen | 23 | 0 |
-| sunglaze | 23 | 1 |
 | rampart-and-vine | 23 | 4 |
+| tidewake | 22 | 0 |
 | cauldron-fair | 22 | 0 |
 | short-fuse | 22 | 0 |
-| tidewake | 22 | 0 |
 | final-approach | 21 | 0 |
 | hollowbough | 19 | 1 |
+| lantern-dive | 17 | 0 |
+| nebula-aces | 16 | 0 |
 | crown-city-smash | 13 | 0 |
 | shipwreck-isle | 11 | 3 |
+| thornbound | 9 | 0 |
 | doorkick-dungeon | 9 | 4 |
+| sunglaze | 8 | 0 |
 
 ## sands-of-qamar
 
@@ -70,115 +70,6 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 1 Wave 1 (16:9) | `ui-djinn-bar` | a long narrow banner plaque in deep violet lacquer with a thin hammered-gold border and small gold stars at bo |
 | Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank curling ribbon banner in terracotta with gold edges, centre empty, single object, centred, plain flat  |
 
-## nebula-aces
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `icon-evade` | a small glowing swirling arrow badge in brass and indigo, bold, readable at 24 px, single object, centred, pla |
-| Wave 3 Wave 3 | `icon-focus` | a small glowing eye badge in brass and indigo, bold, readable at 24 px, single object, centred, plain flat whi |
-| Wave 3 Wave 3 | `icon-hull` | a small glowing armour plate badge in brass and indigo, bold, readable at 24 px, single object, centred, plain |
-| Wave 3 Wave 3 | `icon-lock` | a small glowing crosshair badge in brass and indigo, bold, readable at 24 px, single object, centred, plain fl |
-| Wave 3 Wave 3 | `icon-shield` | a small glowing shield badge in brass and indigo, bold, readable at 24 px, single object, centred, plain flat  |
-| Wave 3 Wave 3 | `ui-move-card-green` | a blank rounded flight-plan card, taller than wide, mint-green, with a thin gold border and a small rivet in e |
-| Wave 3 Wave 3 | `ui-move-card-red` | a blank rounded flight-plan card, taller than wide, signal-red, with a thin gold border and a small rivet in e |
-| Wave 3 Wave 3 | `ui-move-card-white` | a blank rounded flight-plan card, taller than wide, cream, with a thin gold border and a small rivet in each c |
-| Wave 3 Wave 3 (16:9) | `ship-anvil` | a assault bomber with a pointed lance nose, swept wing plates, a heavy belly ordnance pod and armoured cheeks, |
-| Wave 3 Wave 3 (16:9) | `ship-hauler` | a boxy long-haul freighter with cargo pods along a spine, a forward bridge and a dorsal turret, cream hull wit |
-| Wave 3 Wave 3 (16:9) | `ship-herald` | a stubby shuttle on an inverted-gull delta wing with canted ventral fins, dark gunmetal hull with red trim, cl |
-| Wave 3 Wave 3 (16:9) | `ship-keel` | a crescent flying-wing strike fighter with a central cockpit pod and wingtip engine pods, cream hull with oran |
-| Wave 3 Wave 3 (16:9) | `ship-kestrel` | a flattened lifting-body courier ship with swept tail wings and twin engines, cream hull with orange trim, cle |
-| Wave 3 Wave 3 (16:9) | `ship-maul` | a widened arrowhead bomber with armour plates and two finned ordnance pods, dark gunmetal hull with red trim,  |
-| Wave 3 Wave 3 (16:9) | `ship-needle` | a slim hexagonal dart interceptor with swept wings and twin engines at the wing roots, cream hull with orange  |
-| Wave 3 Wave 3 (16:9) | `ship-razor` | a arrowhead interceptor with long forward-raked razor wings and wingtip cannons, dark gunmetal hull with red t |
-| Wave 3 Wave 3 (16:9) | `ship-warden` | a angular armoured wedge gunship with a stepped bridge, weapon pylons and twin drives, dark gunmetal hull with |
-| Wave 3 Wave 3 (4:3) | `arena-floor` | a painted star-chart sector seen from above, deep indigo with faint nebula clouds and tiny stars, busier edges |
-| Wave 4 Wave 4 kit | `ui-bubble` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a blank speech-bubbl |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a small pointed spee |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale grey enamel with a br |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, signal-orange enamel with  |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, indigo enamel with a brush |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of dark gunmetal panelling with a brushed steel edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a blank round brushe |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a round brushed stee |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round brushed steel medallion with a cyan ring, centre blank, with a small laurel at the bottom, single obje |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round brushed steel medallion with a cyan ring, centre blank, dull and darkened with a small padlock at the  |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round brushed steel medallion with a cyan ring, centre blank, bright and polished, single object, centred, p |
-| Wave 4 Wave 4 kit | `ui-panel` | a smoked indigo glass panel with ornate brushed steel corners and a thin brushed steel border, the whole centr |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of smoked indigo glass with a thin brushed steel edge and a small cyan diamond at the left  |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of dark gunmetal panelling, seamless left to right, empty, no text |
-
-## lantern-dive
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `icon-air` | a small hand-painted icon of a cluster of rising air bubbles, bold, readable at 24 px, single object, centred, |
-| Wave 3 Wave 3 | `icon-cross` | a small hand-painted icon of a red sea-glass cross mark, bold, readable at 24 px, single object, centred, plai |
-| Wave 3 Wave 3 | `icon-heart` | a small hand-painted icon of a coral-red heart, bold, readable at 24 px, single object, centred, plain flat wh |
-| Wave 3 Wave 3 | `icon-tank-empty` | a small hand-painted icon of a blue air tank, empty, dull and dented, bold, readable at 24 px, single object,  |
-| Wave 3 Wave 3 | `icon-tank-full` | a small hand-painted icon of a blue air tank, full, with a bright gauge, bold, readable at 24 px, single objec |
-| Wave 3 Wave 3 | `icon-tick` | a small hand-painted icon of a green sea-glass tick mark, bold, readable at 24 px, single object, centred, pla |
-| Wave 3 Wave 3 | `ui-trick-pad` | a blank rounded panel of dark deep-sea glass with a thin brass rim, centre empty, single object, centred, plai |
-| Wave 3 Wave 3 (16:9) | `ui-seat` | a small blank brass diving-helmet badge plate, wider than tall, centre empty, single object, centred, plain fl |
-| Wave 3 Wave 3 (3:4) | `card-face-coral` | a blank playing card face in cream paper with a thin coral pink-red border and tiny bubbles in the corners, mi |
-| Wave 3 Wave 3 (3:4) | `card-face-kelp` | a blank playing card face in cream paper with a thin green border and tiny bubbles in the corners, middle empt |
-| Wave 3 Wave 3 (3:4) | `card-face-lantern` | a blank playing card face in cream paper with a thin brass border and tiny bubbles in the corners, middle empt |
-| Wave 3 Wave 3 (3:4) | `card-face-sunstar` | a blank playing card face in cream paper with a thin golden yellow border and tiny bubbles in the corners, mid |
-| Wave 3 Wave 3 (3:4) | `card-face-tide` | a blank playing card face in cream paper with a thin blue border and tiny bubbles in the corners, middle empty |
-| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of weathered sea-chart paper with a brass outline and a tiny curl at one corn |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale sand with a brass rim |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, lantern-gold with a brass  |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-teal with a brass rim |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of a riveted brass and teal hull strip with a brass edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round brass button with a sea teal ring, centre empty, single object, centred, plain flat white backgr |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round brass medallion with a sea teal ring, centre blank, larger with a small crown on top, single object, c |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round brass medallion with a sea teal ring, centre blank, with a small laurel at the bottom, single object,  |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round brass medallion with a sea teal ring, centre blank, dull and darkened with a small padlock at the bott |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round brass medallion with a sea teal ring, centre blank, bright and polished, single object, centred, plain |
-| Wave 4 Wave 4 kit | `ui-panel` | a weathered sea-chart paper panel with ornate brass corners and a thin brass border, the whole centre plain an |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of a riveted brass and teal hull strip, seamless left to right, empty, no text |
-
-## thornbound
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `emblem-clans` | a small antlered heraldic badge in tarnished gold on teal, single object, centred, plain flat white background |
-| Wave 3 Wave 3 | `emblem-gathering` | a small moth-wing heraldic badge in tarnished gold on violet, single object, centred, plain flat white backgro |
-| Wave 3 Wave 3 | `emblem-nobility` | a small golden-crowned heraldic badge in tarnished gold on royal blue, single object, centred, plain flat whit |
-| Wave 3 Wave 3 | `emblem-uprising` | a small lantern heraldic badge in tarnished gold on crimson, single object, centred, plain flat white backgrou |
-| Wave 3 Wave 3 | `icon-influence` | a small hand-painted icon of a tarnished-gold signet ring, bold, readable at 24 px, single object, centred, pl |
-| Wave 3 Wave 3 | `icon-lore` | a small hand-painted icon of an old closed book with a crimson ribbon, bold, readable at 24 px, single object, |
-| Wave 3 Wave 3 | `icon-pledge` | a small hand-painted icon of a round council seal with a raised hand on it, bold, readable at 24 px, single ob |
-| Wave 3 Wave 3 | `icon-supporter` | a small hand-painted icon of a small hooded figure holding a candle, bold, readable at 24 px, single object, c |
-| Wave 3 Wave 3 | `token-strength-green` | a round enamelled wax seal plate in deep green with a tarnished-gold rim, centre empty, single object, centred |
-| Wave 3 Wave 3 | `token-strength-orange` | a round enamelled wax seal plate in amber with a tarnished-gold rim, centre empty, single object, centred, pla |
-| Wave 3 Wave 3 | `token-strength-red` | a round enamelled wax seal plate in crimson with a tarnished-gold rim, centre empty, single object, centred, p |
-| Wave 3 Wave 3 | `ui-round-shield` | a crimson heraldic pennant shield with gold trim, centre empty, single object, centred, plain flat white backg |
-| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
-| Wave 3 Wave 3 (16:9) | `ui-sheet-head` | a strip of aged vellum with a dark burnt edge and a thin crimson line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of aged vellum with a tarnished gold outline and a tiny curl at one corner, s |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, ivory with a tarnished gol |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, crimson velvet with a tarn |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-green velvet with a t |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of black wood with thorny gold vines with a tarnished gold edge line, seamless left to right, empty, n |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round tarnished gold button with a crimson ring, centre empty, single object, centred, plain flat whit |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round tarnished gold medallion with a crimson ring, centre blank, larger with a small crown on top, single o |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round tarnished gold medallion with a crimson ring, centre blank, with a small laurel at the bottom, single  |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round tarnished gold medallion with a crimson ring, centre blank, dull and darkened with a small padlock at  |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round tarnished gold medallion with a crimson ring, centre blank, bright and polished, single object, centre |
-| Wave 4 Wave 4 kit | `ui-panel` | a aged vellum panel with ornate tarnished gold corners and a thin tarnished gold border, the whole centre plai |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of black wood with thorny gold vines, seamless left to right, empty, no text |
-
 ## kaiten-kitchen
 
 3D: none
@@ -209,36 +100,6 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
 | Wave 4 Wave 4 kit | `ui-topbar` | a long strip of a bamboo and red-lacquer strip, seamless left to right, empty, no text |
 
-## sunglaze
-
-3D: plate
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `kiln-disc` | a round glazed terracotta plate seen from above, wide rim with a wavy cream pattern, flat dished middle, soft  |
-| Wave 1 Wave 1 | `kiln-disc-empty` | a round glazed terracotta plate seen from above, wide rim with a wavy cream pattern, flat dished middle, sligh |
-| Wave 1 Wave 1 | `tile-gloss` | a soft glossy glaze highlight shape on a square tile with tiny chips on the corner, white on black, no colour, |
-| Wave 1 Wave 1 | `token-sun` | a round brass sun token with a smiling face and short rays, single object, centred, plain flat white backgroun |
-| Wave 1 Wave 1 | `ui-floor-cell` | a single shallow square dish in dusty pink clay with a hairline crack, seen from above, empty, single object,  |
-| Wave 1 Wave 1 | `ui-rack-cell` | a single shallow square dish carved in warm oak, seen from above, empty, single object, centred, plain flat wh |
-| Wave 1 Wave 1 | `ui-rack-frame` | a blank carved wooden tile rack with shallow square dishes, warm oak, seen from above, single object, centred, |
-| Wave 1 Wave 1 | `ui-wall-cell` | a shallow square plaster recess with a hairline gold edge, single object, centred, plain flat white background |
-| Wave 1 Wave 1 (16:9) | `pool-oval` | a large oval wooden serving tray seen from above with a pale sunburst inlay and a brass rim, middle empty, sin |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of cream glazed ceramic with a copper outline and a tiny curl at one corner,  |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream glaze with a copper  |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, kiln-orange glaze with a c |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cobalt glaze with a copper |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of glazed terracotta tiles with a copper edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round copper button with a cobalt glaze ring, centre empty, single object, centred, plain flat white b |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round copper medallion with a cobalt glaze ring, centre blank, larger with a small crown on top, single obje |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round copper medallion with a cobalt glaze ring, centre blank, with a small laurel at the bottom, single obj |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round copper medallion with a cobalt glaze ring, centre blank, dull and darkened with a small padlock at the |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round copper medallion with a cobalt glaze ring, centre blank, bright and polished, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-panel` | a cream glazed ceramic panel with ornate copper corners and a thin copper border, the whole centre plain and e |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of glazed terracotta tiles, seamless left to right, empty, no text |
-
 ## rampart-and-vine
 
 3D: piece-champ, piece-hog, piece-mason, piece-meeple
@@ -268,6 +129,35 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, meadow-green with a grey s |
 | Wave 4 Wave 4 kit | `ui-panel` | a parchment panel with ornate grey stone corners and a thin grey stone border, the whole centre plain and empt |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of parchment with a thin grey stone edge and a small vine green diamond at the left end, ce |
+
+## tidewake
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 1 Wave 1 | `board-frame` | a carved dark-wood sea-chart frame with brass corner fittings, centre empty, single object, centred, plain fla |
+| Wave 1 Wave 1 | `compass-rose` | a hand-painted brass-and-gold compass rose with eight points seen from above, no letters, single object, centr |
+| Wave 1 Wave 1 | `ring-slot` | a round brass buoy ring seen from above, centre empty, single object, centred, plain flat white background, no |
+| Wave 1 Wave 1 | `tile-water-a` | a top-down square of deep teal sea water, calm, soft wave crests, seamless tileable, no objects, no text |
+| Wave 1 Wave 1 | `tile-water-b` | a top-down square of deep teal sea water, gentle ripples and a few foam flecks, seamless tileable, no objects, |
+| Wave 1 Wave 1 | `tile-water-c` | a top-down square of deep teal sea water, rolling crests with foam lines, seamless tileable, no objects, no te |
+| Wave 1 Wave 1 | `tile-water-d` | a top-down square of deep teal sea water, a slow swirl and scattered foam, seamless tileable, no objects, no t |
+| Wave 1 Wave 1 (16:9) | `ui-nametag` | a small blank luggage tag with a rope loop and a thin brass rim, single object, centred, plain flat white back |
+| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of sea-chart parchment with a brass outline and a tiny curl at one corner, si |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sea-chart parchment with a brass outline, single object, centred, p |
+| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream lacquer with a brass |
+| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, lantern-orange lacquer wit |
+| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-teal lacquer with a b |
+| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of dark teal lacquered wood with a brass edge line, seamless left to right, empty, no text |
+| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round brass button with a teal lacquer ring, centre empty, single object, centred, plain flat white ba |
+| Wave 4 Wave 4 kit | `ui-node-boss` | a round brass medallion with a teal lacquer ring, centre blank, larger with a small crown on top, single objec |
+| Wave 4 Wave 4 kit | `ui-node-done` | a round brass medallion with a teal lacquer ring, centre blank, with a small laurel at the bottom, single obje |
+| Wave 4 Wave 4 kit | `ui-node-locked` | a round brass medallion with a teal lacquer ring, centre blank, dull and darkened with a small padlock at the  |
+| Wave 4 Wave 4 kit | `ui-node-open` | a round brass medallion with a teal lacquer ring, centre blank, bright and polished, single object, centred, p |
+| Wave 4 Wave 4 kit | `ui-panel` | a sea-chart parchment panel with ornate brass corners and a thin brass border, the whole centre plain and empt |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sea-chart parchment with a thin brass edge and a small teal lacquer diamond at the left  |
+| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of dark teal lacquered wood, seamless left to right, empty, no text |
 
 ## cauldron-fair
 
@@ -327,35 +217,6 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
 | Wave 4 Wave 4 kit | `ui-topbar` | a long strip of riveted workbench wood, seamless left to right, empty, no text |
 
-## tidewake
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `board-frame` | a carved dark-wood sea-chart frame with brass corner fittings, centre empty, single object, centred, plain fla |
-| Wave 1 Wave 1 | `compass-rose` | a hand-painted brass-and-gold compass rose with eight points seen from above, no letters, single object, centr |
-| Wave 1 Wave 1 | `ring-slot` | a round brass buoy ring seen from above, centre empty, single object, centred, plain flat white background, no |
-| Wave 1 Wave 1 | `tile-water-a` | a top-down square of deep teal sea water, calm, soft wave crests, seamless tileable, no objects, no text |
-| Wave 1 Wave 1 | `tile-water-b` | a top-down square of deep teal sea water, gentle ripples and a few foam flecks, seamless tileable, no objects, |
-| Wave 1 Wave 1 | `tile-water-c` | a top-down square of deep teal sea water, rolling crests with foam lines, seamless tileable, no objects, no te |
-| Wave 1 Wave 1 | `tile-water-d` | a top-down square of deep teal sea water, a slow swirl and scattered foam, seamless tileable, no objects, no t |
-| Wave 1 Wave 1 (16:9) | `ui-nametag` | a small blank luggage tag with a rope loop and a thin brass rim, single object, centred, plain flat white back |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of sea-chart parchment with a brass outline and a tiny curl at one corner, si |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sea-chart parchment with a brass outline, single object, centred, p |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream lacquer with a brass |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, lantern-orange lacquer wit |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-teal lacquer with a b |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of dark teal lacquered wood with a brass edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round brass button with a teal lacquer ring, centre empty, single object, centred, plain flat white ba |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round brass medallion with a teal lacquer ring, centre blank, larger with a small crown on top, single objec |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round brass medallion with a teal lacquer ring, centre blank, with a small laurel at the bottom, single obje |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round brass medallion with a teal lacquer ring, centre blank, dull and darkened with a small padlock at the  |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round brass medallion with a teal lacquer ring, centre blank, bright and polished, single object, centred, p |
-| Wave 4 Wave 4 kit | `ui-panel` | a sea-chart parchment panel with ornate brass corners and a thin brass border, the whole centre plain and empt |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sea-chart parchment with a thin brass edge and a small teal lacquer diamond at the left  |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of dark teal lacquered wood, seamless left to right, empty, no text |
-
 ## final-approach
 
 3D: none
@@ -410,6 +271,53 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 5 Wave 5 | `icon-twig` | a small bundle of twigs tied with grass, bold, readable at 24 px, single object, centred, plain flat white bac |
 | Wave 5 Wave 5 | `ui-season-wheel` | a round wooden dial divided into four seasons with a leaf, flower, sun and snowflake motif carved in each quar |
 
+## lantern-dive
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 | `icon-cross` | a small hand-painted icon of a red sea-glass cross mark, bold, readable at 24 px, single object, centred, plai |
+| Wave 3 Wave 3 | `icon-tick` | a small hand-painted icon of a green sea-glass tick mark, bold, readable at 24 px, single object, centred, pla |
+| Wave 3 Wave 3 | `ui-trick-pad` | a blank rounded panel of dark deep-sea glass with a thin brass rim, centre empty, single object, centred, plai |
+| Wave 3 Wave 3 (16:9) | `ui-seat` | a small blank brass diving-helmet badge plate, wider than tall, centre empty, single object, centred, plain fl |
+| Wave 3 Wave 3 (3:4) | `card-face-coral` | a blank playing card face in cream paper with a thin coral pink-red border and tiny bubbles in the corners, mi |
+| Wave 3 Wave 3 (3:4) | `card-face-kelp` | a blank playing card face in cream paper with a thin green border and tiny bubbles in the corners, middle empt |
+| Wave 3 Wave 3 (3:4) | `card-face-lantern` | a blank playing card face in cream paper with a thin brass border and tiny bubbles in the corners, middle empt |
+| Wave 3 Wave 3 (3:4) | `card-face-sunstar` | a blank playing card face in cream paper with a thin golden yellow border and tiny bubbles in the corners, mid |
+| Wave 3 Wave 3 (3:4) | `card-face-tide` | a blank playing card face in cream paper with a thin blue border and tiny bubbles in the corners, middle empty |
+| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
+| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of weathered sea-chart paper with a brass outline and a tiny curl at one corn |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
+| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale sand with a brass rim |
+| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, lantern-gold with a brass  |
+| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-teal with a brass rim |
+| Wave 4 Wave 4 kit | `ui-panel` | a weathered sea-chart paper panel with ornate brass corners and a thin brass border, the whole centre plain an |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
+
+## nebula-aces
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 (16:9) | `ship-anvil` | a assault bomber with a pointed lance nose, swept wing plates, a heavy belly ordnance pod and armoured cheeks, |
+| Wave 3 Wave 3 (16:9) | `ship-hauler` | a boxy long-haul freighter with cargo pods along a spine, a forward bridge and a dorsal turret, cream hull wit |
+| Wave 3 Wave 3 (16:9) | `ship-herald` | a stubby shuttle on an inverted-gull delta wing with canted ventral fins, dark gunmetal hull with red trim, cl |
+| Wave 3 Wave 3 (16:9) | `ship-keel` | a crescent flying-wing strike fighter with a central cockpit pod and wingtip engine pods, cream hull with oran |
+| Wave 3 Wave 3 (16:9) | `ship-kestrel` | a flattened lifting-body courier ship with swept tail wings and twin engines, cream hull with orange trim, cle |
+| Wave 3 Wave 3 (16:9) | `ship-maul` | a widened arrowhead bomber with armour plates and two finned ordnance pods, dark gunmetal hull with red trim,  |
+| Wave 3 Wave 3 (16:9) | `ship-needle` | a slim hexagonal dart interceptor with swept wings and twin engines at the wing roots, cream hull with orange  |
+| Wave 3 Wave 3 (16:9) | `ship-razor` | a arrowhead interceptor with long forward-raked razor wings and wingtip cannons, dark gunmetal hull with red t |
+| Wave 3 Wave 3 (16:9) | `ship-warden` | a angular armoured wedge gunship with a stepped bridge, weapon pylons and twin drives, dark gunmetal hull with |
+| Wave 4 Wave 4 kit | `ui-bubble` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a blank speech-bubbl |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a small pointed spee |
+| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale grey enamel with a br |
+| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, signal-orange enamel with  |
+| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, indigo enamel with a brush |
+| Wave 4 Wave 4 kit | `ui-panel` | a smoked indigo glass panel with ornate brushed steel corners and a thin brushed steel border, the whole centr |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of smoked indigo glass with a thin brushed steel edge and a small cyan diamond at the left  |
+
 ## crown-city-smash
 
 3D: none
@@ -448,6 +356,22 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 4 Wave 4 kit | `ui-panel` | a sun-bleached sailcloth panel with ornate rope-lashed driftwood corners and a thin rope-lashed driftwood bord |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
+## thornbound
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 | `ui-round-shield` | a crimson heraldic pennant shield with gold trim, centre empty, single object, centred, plain flat white backg |
+| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
+| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of aged vellum with a tarnished gold outline and a tiny curl at one corner, s |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
+| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, ivory with a tarnished gol |
+| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, crimson velvet with a tarn |
+| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-green velvet with a t |
+| Wave 4 Wave 4 kit | `ui-panel` | a aged vellum panel with ornate tarnished gold corners and a thin tarnished gold border, the whole centre plai |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
+
 ## doorkick-dungeon
 
 3D: hero-grub, hero-morwen, hero-pip, hero-tansy
@@ -463,3 +387,18 @@ Wired: 378 paintings, 46 3D models. Still to wire: 337 paintings, 13 models.
 | Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, dungeon-purple with a dark |
 | Wave 4 Wave 4 kit | `ui-panel` | a aged parchment panel with ornate dark iron corners and a thin dark iron border, the whole centre plain and e |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged parchment with a thin dark iron edge and a small torch-orange diamond at the left e |
+
+## sunglaze
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 1 Wave 1 | `ui-rack-frame` | a blank carved wooden tile rack with shallow square dishes, warm oak, seen from above, single object, centred, |
+| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of cream glazed ceramic with a copper outline and a tiny curl at one corner,  |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
+| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream glaze with a copper  |
+| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, kiln-orange glaze with a c |
+| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cobalt glaze with a copper |
+| Wave 4 Wave 4 kit | `ui-panel` | a cream glazed ceramic panel with ornate copper corners and a thin copper border, the whole centre plain and e |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |

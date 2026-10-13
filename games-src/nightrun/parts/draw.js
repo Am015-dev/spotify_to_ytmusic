@@ -61,6 +61,7 @@ function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm[
   const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],by=Math.sin(t*1.6)*3,tl=Math.sin(t*.9)*.035;
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
+  if(UIK.bossDraw(e,nm,wd,by,tl,fl))return true;
   return ART.dflash('spr-boss-'+nm,wd,0,by,tl,fl,'#ff4058',.32);}   // damage: a red tint
 function drawBoss(e,t,fl){const c=e.col;
   for(const l of e.lasers){ctx.save();ctx.translate(-e.x,-e.y);const tele=l.t<2*BT.spb;ctx.translate(l.x,l.y);ctx.rotate(l.a);

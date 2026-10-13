@@ -1009,6 +1009,38 @@ html.ph-l .mine .hand .card.bf-picked{translate:0 -30px!important}
 /* an open drawer (diary, cards, menu) sits over the board: the board under it takes no taps and shows no glowing targets */
 html:has(.gx-drawer.on) .gx-main{pointer-events:none}
 
+/* ---- fight numbers: one big scoreline across the top of the fight (YOU 9 vs 13 MONSTERS) ---- */
+.arena:has(>.sline){padding-top:78px}
+.arena .sline{position:absolute;top:2px;left:0;right:0;z-index:6;display:grid;justify-items:center;gap:0;pointer-events:none}
+.sline .sl1{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,22px);padding:2px 22px 3px;border-radius:18px;background:rgba(18,8,3,.86);box-shadow:0 0 0 2px #0d0603,0 3px 0 rgba(0,0,0,.5)}
+.sline .sy,.sline .sm{position:relative;display:flex;align-items:baseline;gap:8px}
+.sline .sl1 i{font:700 .9rem/1 var(--title);font-style:normal;letter-spacing:.08em;color:#f3e3c0}
+.sline .n{font:900 clamp(40px,4.6vw,56px)/1 var(--title);font-variant-numeric:tabular-nums;color:#fff;-webkit-text-stroke:2px #0d0603;paint-order:stroke fill;text-shadow:0 3px 0 #0d0603;min-width:1.1em;text-align:center}
+.sline .sy .n{color:#8fd7ff}.sline .sm .n{color:#ff9d88}
+.sline.win .sy .n{color:#9dff8a;text-shadow:0 0 14px rgba(120,255,110,.7),0 3px 0 #0d0603}
+.sline.lose .sm .n{color:#ff6a55;text-shadow:0 0 14px rgba(255,80,60,.7),0 3px 0 #0d0603}
+.sline.lose .sy .n{color:#ff8a7a}
+.sline .sv{font:800 1.1rem var(--title);color:#e6c677}
+.sline .sd{margin-top:2px;padding:0 12px;border-radius:99px;font:800 1rem/1.35 var(--title);background:rgba(18,8,3,.86);color:#f3e3c0;box-shadow:0 0 0 1.5px #0d0603}
+.sline.win .sd{color:#9dff8a}.sline.lose .sd{color:#ff9d88}
+.fxfly{position:absolute;left:50%;top:0;font:900 1.9rem/1 var(--title);-webkit-text-stroke:2px #0d0603;paint-order:stroke fill;pointer-events:none;white-space:nowrap;z-index:7}
+.fxfly.up{color:#9dff8a}.fxfly.dn{color:#ff8a7a}
+.arena .vs .score .num{display:none}
+.arena .vs .score{padding:3px 8px}
+.arena .mon>.small.mstr{font:800 1.15rem/1.1 var(--title);color:#fff;-webkit-text-stroke:1.5px #0d0603;paint-order:stroke fill;text-shadow:0 2px 0 #0d0603}
+.arena .mon .card .tag{transform:scale(1.4);transform-origin:top left}
+.arena .mon .gchip{min-height:40px;font-size:.95rem;font-weight:800}.arena .mon .gchip b{font-size:1.15rem}
+html.ph .arena:has(>.sline){padding-top:60px}
+html.ph .sline .n{font-size:clamp(32px,9vw,40px);-webkit-text-stroke:1.5px #0d0603}
+html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.7rem}
+html.ph .sline .sd{font-size:.82rem;line-height:1.25}
+html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:15px}
+html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
+@media (max-height:600px){html.ph .arena:has(>.sline){padding-top:56px}html.ph .sline .n{font-size:32px}}
+html .arena .vs .score .num{display:none!important}
+html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.58rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
+html.ph .sline .n{min-width:.9em}
+
 </style>
 <style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
@@ -1391,6 +1423,28 @@ html.dk-par .gx-dock-body{background:#e9d7a8;border:20px solid transparent;borde
 html.dk-par .recent .rl{background:url(media/ui-ledger-head.webp) center/auto 100% repeat-x;padding:2px 10px;border-radius:6px;min-height:46px;align-items:center}
 html.dk-par .gx-dock-body{position:relative;isolation:isolate}
 html.dk-par .gx-dock-body::before{content:'';position:absolute;inset:0;z-index:-1;background:rgba(248,240,216,.62);pointer-events:none}
+/* fight bar: the painted plate's side caps (2 x 22px) must not eat the label; Help keeps room for icon + word, Run never squeezes it */
+html.sk .fbtns .btn{border-width:0 14px;border-image-width:0 14px;padding:0 2px;overflow:visible;text-overflow:clip;min-width:96px;white-space:nowrap;font-weight:700}
+html.sk .fbtns .btn:not(.helpb){flex:1 1 0;max-width:340px}
+html.sk .fbtns .helpb{flex:0 0 auto;min-width:112px}
+html.sk.ph .fbtns .helpb{min-width:104px}
+/* the painted dock panel is light parchment: dark status line, not cream */
+html.sk.ph #prompt .bfline{color:#3a2410;text-shadow:none}
+/* top-bar labels >=13px; small buttons reach 44px tap height */
+html.sk .gx-ibtn,html.sk .gx-ibtn>span{font-size:13px}
+html.sk .gx-drawer .btn{min-height:44px}
+html.sk .gxh-bub .gxh-ok{min-height:44px;min-width:64px;font-size:14px}
+/* contrast: dark ink on the orange "go" plates (cream on orange measured 3.3-3.8:1) */
+html.sk .btn.primary,html.sk .btn.good,html.sk .btn.rec,html.sk .seg .btn.on,html.sk .grid2 .btn.on{color:#1c0e03;text-shadow:0 1px 0 rgba(255,235,190,.5)}
+/* phone dock has a fixed height: the 20px painted frame left no room for the buttons (cut off at the screen bottom) */
+html.ph.dk-par .gx-dock-body{border-width:4px 14px;border-image-width:4px 14px;padding-top:0;padding-bottom:0}
+/* dock + dialog buttons: slimmer plate caps and labels that wrap instead of being cut off */
+html.sk #prompt .acts .btn,html.sk .dlg .acts .btn{border-width:0 16px;border-image-width:0 16px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;text-align:center;padding:2px 0}
+html.sk.ph #prompt .acts .btn{font-size:15px}
+html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;font-size:15px}
+/* a hovered card on the table must not stretch its tap zone over the buttons below it (it covered Help) */
+.arena .card>.hit,.arena .card:hover>.hit{pointer-events:none!important;bottom:0}
+html.sk.ph .fbtns .btn{min-height:44px}
 
 </style>
 </head>
@@ -4873,7 +4927,12 @@ const GFX=(function(){
     if(!prev||prev.k!==k||!motion())return;
     const pop=(sel,d)=>{if(!d)return;const s=v.querySelector(sel);if(!s)return;const n=s.querySelector('.num');if(n)n.animate([{transform:'scale(1)'},{transform:'scale(1.5)',offset:.4},{transform:'scale(1)'}],{duration:520,easing:'cubic-bezier(.2,1.8,.4,1)'});
       const f=document.createElement('span');f.className='fxdelta '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);setTimeout(()=>f.remove(),1150)};
-    pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b)}
+    pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b);
+    // the big scoreline: a +N flies into the total and the number counts up to it
+    [['.sy',a,prev.a],['.sm',b,prev.b]].forEach(([sel,to,from])=>{const d=to-from;if(!d)return;const s=v.parentNode.querySelector('.sline '+sel);if(!s)return;const n=s.querySelector('.n');if(!n)return;
+      n.textContent=from;const f=document.createElement('span');f.className='fxfly '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);
+      f.animate([{transform:'translate(-50%,70px) scale(1.7)',opacity:0},{transform:'translate(-50%,30px) scale(1.7)',opacity:1,offset:.25},{transform:'translate(-50%,-4px) scale(.9)',opacity:1,offset:.85},{transform:'translate(-50%,-4px) scale(.6)',opacity:0}],{duration:760,easing:'ease-in'}).onfinish=()=>f.remove();
+      const t0=performance.now(),T=420,D=520;const step=t=>{const q=Math.min(1,Math.max(0,(t-t0-D)/T));n.textContent=Math.round(from+(to-from)*q);if(q<1)requestAnimationFrame(step);else n.animate([{transform:'scale(1)'},{transform:'scale(1.35)',offset:.4},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.2,1.8,.4,1)'})};requestAnimationFrame(step)})}
   function init(){if(!HAS_DOM)return;textures();apply(load());
     perf();
     try{addEventListener('resize',()=>{sizeEmbers();if(auto){const v=autoPick();if(v!==level&&!(v==='high'&&level!=='high'))apply(v)}})}catch(e){}
@@ -6500,7 +6559,7 @@ function syncMenu(){const b=$('#dkMenuBody');if(!b)return;const so=typeof SND!==
 function syncGfxBtn(){const g=$('#gfxbtn');if(g&&typeof GFX!=='undefined')g.innerHTML=`${ic('gem')} ${GFX.name()}`;syncMenu()}
 function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
 function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
-  return `<div class="recent"><div class="rl"><h3>Just happened</h3><button class="btn" data-gx="dkLog" style="min-height:40px;padding:2px 10px;font-size:.85rem">📜 Diary</button></div><ol>${o?`<li class="story">📖 ${narrate(o)}</li>`:''}${bk.map(b=>`<li class="quote" style="border-left-color:${PCOL[b.s]}"><b>${esc(P(b.s).nm)}:</b> “${esc(b.t)}”</li>`).join('')}${G.log.slice(0,2).map(l=>`<li${l.s>=0?` style="border-left-color:${PCOL[l.s]}"`:''}>${esc(l.t)}</li>`).join('')}</ol></div>`}
+  return `<div class="recent"><div class="rl"><h3>Just happened</h3><button class="btn" data-gx="dkLog" style="min-height:44px;padding:2px 10px;font-size:.85rem">📜 Diary</button></div><ol>${o?`<li class="story">📖 ${narrate(o)}</li>`:''}${bk.map(b=>`<li class="quote" style="border-left-color:${PCOL[b.s]}"><b>${esc(P(b.s).nm)}:</b> “${esc(b.t)}”</li>`).join('')}${G.log.slice(0,2).map(l=>`<li${l.s>=0?` style="border-left-color:${PCOL[l.s]}"`:''}>${esc(l.t)}</li>`).join('')}</ol></div>`}
 function oppsHTML(me){const n=G.pl.length-(me>=0?1:0);return `<div class="opps n${n}" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map((p,k,a)=>{const act=p.i===G.active;const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;const q=a.length>1?(k/(a.length-1))*2-1:0;
   return `<button class="opp seat paper ${act?'active':''}${p.dead?' dead':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]};--q:${q.toFixed(2)}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Hold for details."><span class="sav">${typeof bfAv==='function'?bfAv(p,'savi'):''}<b class="slv" aria-hidden="true">${p.lvl}</b>${p.dead?'<i class="sdead" aria-hidden="true">💀</i>':''}</span><span class="snm">${esc(p.nm.split(/[ ,]/)[0])}</span><span class="sbd" aria-hidden="true"><span class="sw">⚔${pStr(p)}</span><span class="sg"><i class="gi" data-s="gear">🪖</i>${p.eq.length}</span>${p.curse.length?`<span class="sc"><i class="gi" data-s="curse">☁</i>${p.curse.length}</span>`:''}</span></button>`}).join('')}</div>`}
 // phone only (CSS shows it instead of the mini cards): one readable row per card, tap = the big card
@@ -6529,7 +6588,10 @@ function arenaHTML(){const cb=G.cb;
   cb.os.forEach(o=>chips.push(`<span class="chip">${esc(cname(o.id))} (${o.side==='p'?'heroes':'monsters'})</span>`));
   const wt=winThreat(cb);if(wt)chips.unshift(`<span class="chip wchip">${isMe(wt.who)?'🏆 This fight wins you the game!':'⚠ This fight wins '+esc(f.nm)+' the game!'}</span>`);
   const hn=`${nmY(f.i)}${h?' + '+nmY(h.i):''}`;const en=animOnce(cb.who+'-'+(cb.mons[0]?cb.mons[0].id:'x'),'enter');
-  return `<div class="vs clash" data-k="${G.turn}:${cb.who}" data-a="${a}" data-b="${b}" role="group" aria-label="${hn}: ${a} versus the monsters: ${b}"><span class="score hero ${win?'win':'lose'} ${en}"><span class="hsav">${typeof bfAv==='function'?bfAv(f,'hsavi')+(h?bfAv(h,'hsavi h2'):''):''}</span><b class="num">${a}</b><span class="sl">${hn}</span></span><span class="vsx ${en}" aria-hidden="true">${ic('swords')}</span><span class="score mons ${win?'lose':'win'} ${en}"><span class="sl">Monsters</span><b class="num">${b}</b></span></div>
+  const dlt=a-b,ymine=isMe(f.i)&&f.human,yn=ymine?'YOU':esc(f.nm.split(/[ ,]/)[0].toUpperCase());
+  const dtxt=win?(dlt>0?'+'+dlt+': you win':'Tied: a Warrior wins ties'):'−'+Math.abs(dlt)+(ymine?': need help or run':': monsters win');UI.arRes+=document.documentElement.classList.contains('ph')?0:56;
+  const sline=`<div class="sline ${win?'win':'lose'}" aria-hidden="true"><div class="sl1"><span class="sy"><i>${yn}${h?' +1':''}</i><b class="n" data-v="${a}">${a}</b></span><span class="sv">vs</span><span class="sm"><b class="n" data-v="${b}">${b}</b><i>MONSTERS</i></span></div><div class="sd">${dtxt}</div></div>`;
+  return `${sline}<div class="vs clash" data-k="${G.turn}:${cb.who}" data-a="${a}" data-b="${b}" role="group" aria-label="${hn}: ${a} versus the monsters: ${b}"><span class="score hero ${win?'win':'lose'} ${en}"><span class="hsav">${typeof bfAv==='function'?bfAv(f,'hsavi')+(h?bfAv(h,'hsavi h2'):''):''}</span><b class="num">${a}</b><span class="sl">${hn}</span></span><span class="vsx ${en}" aria-hidden="true">${ic('swords')}</span><span class="score mons ${win?'lose':'win'} ${en}"><span class="sl">Monsters</span><b class="num">${b}</b></span></div>
    <div class="row mons" style="--n:${cb.mons.length}">${cb.mons.map((m,j)=>`<div class="mon">${cardHTML(m.like!=null?m.like:m.id,{cls:animOnce(m.like!=null?m.like:m.id,'fly')})}<span class="small mstr">${m.like!=null?'the date · ':''}strength ${mStr(m,cb)}</span>${m.enh.length?`<div class="row" style="gap:4px">${m.enh.map(e=>{const c=cd(e);return `<button class="gchip door" data-card="${e}" aria-label="${esc(c.n)}: ${esc(c.x||'')}">${esc(c.n)} <b>${c.b>0?'+':''}${c.b}</b></button>`}).join('')}</div>`:''}</div>`).join('')}</div>
    ${chips.length?(UI.arRes+=30,`<div class="row small" style="gap:4px">${chips.join('')}</div>`):''}${rollHTML()}${fightBtns(cb)}`}
 function runShort(cb,me){try{const o=runOdds(P(me),cb);return o.all===0?' (no chance)':o.all===1?' (sure)':' '+pct(o.all)}catch(e){return ''}}

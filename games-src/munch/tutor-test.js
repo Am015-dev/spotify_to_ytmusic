@@ -7,8 +7,8 @@
 // playtest/tutor-early.png, tutor-mid.png, tutor-score.png, tutor-end.png.
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs'),path=require('path');
-const html=fs.readFileSync(__dirname+'/doorkick.html');
-const SIZES=(process.argv[2]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));
+const html=fs.readFileSync(__dirname+'/doorkick.html');const localRoute=require('./local-route.js'),labelcheck=require('./labelcheck.js');
+const SIZES=(process.argv[2]||'390x763,1280x800').split(',').map(s=>s.split('x').map(Number));
 const SHOTS=path.join(__dirname,'playtest');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
@@ -16,12 +16,12 @@ const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').f
 const totals={steps:0,wrong:0,runs:0,ids:[]};
 
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();
-  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:W<700,hasTouch:true});
+  await localRoute(ctx,html);
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{const t=m.text();if(m.type()==='warning'&&/rejected|gxt/.test(t))note(tag,'console '+t.slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(t))note(tag,'console error '+t.slice(0,160))});
-  await p.goto('https://gns.test/?phone=1');await sleep(900);
+  await p.goto('https://gns.test/'+(W<700?'?phone=1':''));await sleep(900);
   await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});
   await p.reload();await sleep(900);
   if(mode==='offer'){
@@ -37,8 +37,8 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await p.evaluate(()=>{G=null;render()});await sleep(300);await tapSel('#modal [data-start="F"]');await sleep(500);
     const o3=await p.evaluate(()=>({offer:!!document.getElementById('tutoffer'),g:!!G&&!G.tut}));if(o3.offer||!o3.g)note(tag,'the offer came back a second time '+JSON.stringify(o3));
     // fresh profile again: "Learn in 5 minutes" starts the tutorial
-    await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(900);
-    await tapSel('#modal [data-start="F"]');await sleep(400);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
+    await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(2000);
+    await tapSel('#modal [data-start="F"]');await p.waitForSelector('#tutoffer [data-tutoffer=learn]');await sleep(700);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
     const o4=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut,i:GXT.state().i}));if(!o4.run||!o4.tut||o4.i!==0)note(tag,'"Learn in 5 minutes" did not start the tutorial '+JSON.stringify(o4));
     totals.runs++;console.log(tag,'done');await ctx.close();return}
   if(mode==='storyskip'){
@@ -48,7 +48,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     const a0=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut}));if(!a0.run||!a0.tut)note(tag,'the first Story tap did not start the tutorial '+JSON.stringify(a0));
     await p.evaluate(()=>{UI.speed=4});await sleep(600);
     if(!await tapSel('.gxt-skip'))note(tag,'no Skip tutorial button');await sleep(700);
-    const a1=await p.evaluate(()=>({run:GXT.running(),map:!!document.querySelector('.gxc-map-on'),done:GXT.isDone('doorkick-dungeon')}));
+    const a1=await p.evaluate(()=>({run:GXT.running(),map:!!document.querySelector('.gxc-map-on'),done:GXT.status('doorkick-dungeon').done}));
     if(a1.run)note(tag,'skip left the tutorial running');if(!a1.map)note(tag,'skipping the Story prologue did not open the chapter map');if(a1.done)note(tag,'a skipped tutorial counted as done');
     await p.evaluate(()=>{GXC.close();G=null;render()});await sleep(300);await tapSel('#modal [data-a="story"]');await sleep(700);
     const a2=await p.evaluate(()=>({run:GXT.running(),map:!!document.querySelector('.gxc-map-on')}));if(a2.run||!a2.map)note(tag,'Story asked for the tutorial again after Skip '+JSON.stringify(a2));
@@ -98,7 +98,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(process.env.ALLSHOTS&&W===390&&mode==='clean'){await sleep(700);await p.screenshot({path:process.env.ALLSHOTS+'/s'+String(s.i).padStart(2,'0')+'_'+id+'.png'})}
+    if(process.env.ALLSHOTS&&mode==='clean'){await sleep(1200);await p.screenshot({path:process.env.ALLSHOTS+'/'+W+'_s'+String(s.i).padStart(2,'0')+'_'+id+'.png'})}
     if(wc(s.say)>20)note(tag,id+': say over 20 words ('+wc(s.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
     if(!s.say)note(tag,id+': empty text');
@@ -120,6 +120,11 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       if(h.width<24||h.height<24)note(tag,id+': target smaller than a fingertip ('+Math.round(h.width)+'x'+Math.round(h.height)+')');
       if(s.wait&&info.cover)note(tag,id+': target covered by '+info.under);
     }
+    if(s.wait&&h){const mk=await p.evaluate(()=>{const s=GXT.state(),h=s.hole;document.querySelectorAll('[data-tt]:not(.card)').forEach(e=>e.removeAttribute('data-tt'));
+        const hit=[...document.querySelectorAll('button,.btn,[data-a],[data-mv]')].filter(e=>e.classList.contains('btn')&&!e.closest('.gxt-bub,[data-help]')).find(e=>{const r=e.getBoundingClientRect();return r.width>0&&h.cx>=r.left&&h.cx<=r.right&&h.cy>=r.top&&h.cy<=r.bottom});
+        if(hit)if(hit&&!hit.classList.contains('card'))hit.setAttribute('data-tt','1');return !!hit&&!hit.classList.contains('card')});
+      if(mk){await p.evaluate(()=>{document.querySelectorAll('.gxt-cell,.gxt-ring').forEach(e=>e.style.visibility='hidden')});let lc=await labelcheck(p,tag+' '+id,'[data-tt]:not(.card)');if(lc.bad.length){await sleep(600);lc=await labelcheck(p,tag+' '+id,'[data-tt]:not(.card)')}   /* retry once: a card flying past the button is not a missing label */
+      await p.evaluate(()=>{document.querySelectorAll('.gxt-cell,.gxt-ring').forEach(e=>e.style.visibility='')});lc.bad.forEach(x=>note(tag,id+': spotlit control: '+x))}}
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
     // screenshots at 390x763
     if(!/^Tap (the glowing|Next)/.test(info.say)){if(id==='elf')await shot('early');if(id==='help')await shot('mid');if(id==='win')await shot('score')}

@@ -36,7 +36,7 @@ const LIB = `(() => {
 async function game(b, gi, [W, H]) {
   const seed = SEED0 + gi, tag = `g${gi}@${W}x${H}`; rs = seed * 7919 + 13;
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA });
-  await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+  await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort(); const mf = path.join(__dirname, '..', '..', '..', 'games', 'kaiten-kitchen', u.pathname); if (/^\/media\//.test(u.pathname) && fs.existsSync(mf)) return r.fulfill({ status: 200, contentType: 'image/webp', body: fs.readFileSync(mf) }); r.fulfill({ status: 200, contentType: 'text/html', body: html }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000); const errs = [], fails = [];
   p.on('pageerror', e => errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) errs.push('console ' + m.text().slice(0, 160)); });
   const fail = m => { if (!fails.includes(m)) fails.push(m); };

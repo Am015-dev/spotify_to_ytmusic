@@ -20,3 +20,4 @@ html.sk-ico .tk[data-t=focus]::before{background-image:url(media/icon-focus.webp
 .pc-art img{width:100%;height:100%;object-fit:contain}
 html.sk .btn:disabled{opacity:.8;filter:saturate(.45) brightness(.8) drop-shadow(0 2px 2px rgba(0,0,0,.5))}
 html.sk .btn.primary small,html.sk .btn.primary em,html.sk .btn.primary i{color:#fff8ec}
+@media (max-width:420px){html.sk .gx-bar{gap:2px;padding-left:4px;padding-right:4px}html.sk .gx-bar .gx-ibtn{min-width:40px;border-width:8px;border-image-width:8px}}

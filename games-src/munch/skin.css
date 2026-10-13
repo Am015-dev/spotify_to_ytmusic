@@ -83,3 +83,25 @@ html.dk-par .gx-dock-body{background:#e9d7a8;border:20px solid transparent;borde
 html.dk-par .recent .rl{background:url(media/ui-ledger-head.webp) center/auto 100% repeat-x;padding:2px 10px;border-radius:6px;min-height:46px;align-items:center}
 html.dk-par .gx-dock-body{position:relative;isolation:isolate}
 html.dk-par .gx-dock-body::before{content:'';position:absolute;inset:0;z-index:-1;background:rgba(248,240,216,.62);pointer-events:none}
+/* fight bar: the painted plate's side caps (2 x 22px) must not eat the label; Help keeps room for icon + word, Run never squeezes it */
+html.sk .fbtns .btn{border-width:0 14px;border-image-width:0 14px;padding:0 2px;overflow:visible;text-overflow:clip;min-width:96px;white-space:nowrap;font-weight:700}
+html.sk .fbtns .btn:not(.helpb){flex:1 1 0;max-width:340px}
+html.sk .fbtns .helpb{flex:0 0 auto;min-width:112px}
+html.sk.ph .fbtns .helpb{min-width:104px}
+/* the painted dock panel is light parchment: dark status line, not cream */
+html.sk.ph #prompt .bfline{color:#3a2410;text-shadow:none}
+/* top-bar labels >=13px; small buttons reach 44px tap height */
+html.sk .gx-ibtn,html.sk .gx-ibtn>span{font-size:13px}
+html.sk .gx-drawer .btn{min-height:44px}
+html.sk .gxh-bub .gxh-ok{min-height:44px;min-width:64px;font-size:14px}
+/* contrast: dark ink on the orange "go" plates (cream on orange measured 3.3-3.8:1) */
+html.sk .btn.primary,html.sk .btn.good,html.sk .btn.rec,html.sk .seg .btn.on,html.sk .grid2 .btn.on{color:#1c0e03;text-shadow:0 1px 0 rgba(255,235,190,.5)}
+/* phone dock has a fixed height: the 20px painted frame left no room for the buttons (cut off at the screen bottom) */
+html.ph.dk-par .gx-dock-body{border-width:4px 14px;border-image-width:4px 14px;padding-top:0;padding-bottom:0}
+/* dock + dialog buttons: slimmer plate caps and labels that wrap instead of being cut off */
+html.sk #prompt .acts .btn,html.sk .dlg .acts .btn{border-width:0 16px;border-image-width:0 16px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;text-align:center;padding:2px 0}
+html.sk.ph #prompt .acts .btn{font-size:15px}
+html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;font-size:15px}
+/* a hovered card on the table must not stretch its tap zone over the buttons below it (it covered Help) */
+.arena .card>.hit,.arena .card:hover>.hit{pointer-events:none!important;bottom:0}
+html.sk.ph .fbtns .btn{min-height:44px}
