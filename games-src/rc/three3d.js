@@ -308,10 +308,14 @@ function terrainField(terr,seed){const R=seeded(seed*31+11);const ox=R()*40,oz=R
     else if(terr==='unknown'){h=.06+g*.6+.12*(n-.5)}
     return h*(terr==='mountains'||terr==='hills'?Math.pow(rim,.7):rim)};
   return F}
+// painted hex art (media/hex-*.webp, flat-top, opaque): turned a quarter so it fits the pointy hex, sampled in paintTile in place of the flat colours (the sculpted light is kept, softer)
+const HEXART={n:0,done:0,img:{},px:{},started:0,t0:0};
+function hexArtLoad(){if(HEXART.started)return;HEXART.started=1;HEXART.t0=performance.now();['beach','plains','river','hills','mountains','fog-a','fog-b'].forEach(k=>{const i=new Image();i.onload=()=>{HEXART.img[k]=i;HEXART.n++;HEXART.done++};i.onerror=()=>{HEXART.done++};i.src='media/hex-'+k+'.webp'})}
+function hexArtPx(k,S){const key=k+S;if(HEXART.px[key])return HEXART.px[key];const im=HEXART.img[k];if(!im)return null;const c=cvs(S),x=c.getContext('2d');x.translate(S/2,S/2);x.rotate(Math.PI/2);const f=S/512*1.04;x.scale(f,f);x.drawImage(im,-256,-222);try{return HEXART.px[key]=x.getImageData(0,0,S,S).data}catch(e){HEXART.img[k]=null;return null}}   // a page opened from a file: taints the canvas: keep the drawn tile
 // paint the top of a tile from its height field: colour, soft baked light, wet sand, snow, riverbanks
 function paintTile(F,S){const c=cvs(S),x=c.getContext('2d'),id=x.createImageData(S,S),D=id.data;const rc=cvs(S/2),rx=rc.getContext('2d'),rid=rx.createImageData(S/2,S/2),RD=rid.data;
   const G1=S+1,H=new Float32Array(G1*G1);for(let j=0;j<G1;j++)for(let i=0;i<G1;i++){H[j*G1+i]=F.h((i/S*2-1)*HR0,(j/S*2-1)*HR0)}F.H=H;F.S=S;
-  const T=F.terr,cell=2*HR0/S;const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];const hx=h=>[(h>>16&255),(h>>8&255),(h&255)];
+  const T=F.terr,cell=2*HR0/S;const A=F.artK?hexArtPx(F.artK,S):null;const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];const hx=h=>[(h>>16&255),(h>>8&255),(h&255)];
   const C={sand:hx(0xe2cc98),sand2:hx(0xd2b57c),wet:hx(0x9c845a),foam:hx(0xf2efe4),g1:hx(0x86ad4e),g2:hx(0xb1b45c),g3:hx(0x5f8f3a),dry:hx(0xc4ae6a),j1:hx(0x2c5e2a),j2:hx(0x3f7a33),j3:hx(0x1f4a24),mud:hx(0x6b5a3a),bed:hx(0x3d4e48),
     r1:hx(0x857d70),r2:hx(0x9d9587),r3:hx(0x5f5a52),snow:hx(0xeef2f5),u1:hx(0x2f4038),u2:hx(0x1f2b27),u3:hx(0x3a3048),dirt:hx(0x8a7450)};
   for(let j=0;j<S;j++)for(let i=0;i<S;i++){const k=j*G1+i;const h=H[k];const gx=(H[k+1]-h)/cell,gz=(H[k+G1]-h)/cell;const slope=Math.hypot(gx,gz);
@@ -324,7 +328,8 @@ function paintTile(F,S){const c=cvs(S),x=c.getContext('2d'),id=x.createImageData
     else if(T==='mountains'){col=mix(C.r1,C.r2,n);col=mix(col,C.r3,.35*sst(.3,.8,Math.sin(h*22+n*5)*.5+.5));col=mix(col,C.g3,sst(.22,.05,h)*.7);const sn=sst(.9,1.05,h+(n2-.5)*.25-slope*.12);col=mix(col,C.snow,sn);ro=.85-sn*.35}
     else if(T==='down'){col=mix([58,52,46],[44,40,36],n);if(Math.abs(Math.sin(X*3+Z*5+n*6))<.04)col=[24,22,20]}
     else{col=mix(C.u1,C.u2,n);col=mix(col,C.u3,sst(.6,.9,n2)*.5)}
-    const L=Math.max(0,Math.min(1.4,1+(gx*.55-gz*.45)*.9));const sh=.78+.22*L;const edge=e<.012?.72:1;
+    if(A){const q4=(j*S+i)*4;col=[A[q4],A[q4+1],A[q4+2]]}
+    const L=Math.max(0,Math.min(1.4,1+(gx*.55-gz*.45)*.9));const sh=A?.9+.1*L:.78+.22*L;const edge=e<.012?.72:1;
     const o=(j*S+i)*4;D[o]=Math.min(255,col[0]*sh*edge);D[o+1]=Math.min(255,col[1]*sh*edge);D[o+2]=Math.min(255,col[2]*sh*edge);D[o+3]=255;
     if(!(i&1)&&!(j&1)){const q=((j>>1)*(S/2)+(i>>1))*4;RD[q]=RD[q+1]=RD[q+2]=Math.round(ro*255);RD[q+3]=255}}
   x.putImageData(id,0,0);rx.putImageData(rid,0,0);return {map:tex(c,true),rough:tex(rc,false)}}
@@ -345,8 +350,8 @@ function strataTex(col){return gq('strata'+col,()=>{const S=256,c=cvs(S,64),x=c.
   x.fillStyle='rgba(255,245,220,.25)';x.fillRect(0,0,S,3);const t=tex(c,true,true);t.repeat.set(.25,1.6);return t})}
 function sideMat(terr){if(V3.lite)return gq('sideL'+terr,()=>new THREE.MeshLambertMaterial({map:strataTex(TPAL[terr].side)}));return gq('side'+terr,()=>{const m=new THREE.MeshStandardMaterial({map:strataTex(TPAL[terr].side),roughness:.88});m.userData.bump=m.map;m.bumpMap=m.map;m.bumpScale=.6;return m})}
 function waterMat(){if(V3.lite)return gq('waterL',()=>new THREE.MeshPhongMaterial({color:0x2f7f96,transparent:true,opacity:.78,shininess:90,specular:0x6a8a96}));return gq('waterM',()=>new THREE.MeshPhysicalMaterial({color:0x2f7f96,roughness:.08,metalness:0,transparent:true,opacity:.78,clearcoat:1,envMapIntensity:1.2}))}
-function tileMesh(t){const grp=new THREE.Group();const terr=t.down?'down':t.terr;const T=TERR_OK[terr]?terr:'unknown';const F=terrainField(T==='down'?'plains':T,t.id*977+3+(T==='unknown'?0:(t.no||0)*131));if(T==='down')F.h=()=>0;F.terr=T;
-  const tS=T==='unknown'||T==='down'?Math.min(256,V3.texS):V3.texS,tk=T+'|'+(t.id*977+3+(T==='unknown'?0:(t.no||0)*131))+'|'+tS;V3.txC=V3.txC||{};const tx=V3.txC[tk]||(V3.txC[tk]=paintTile(F,tS));
+function tileMesh(t){const grp=new THREE.Group();const terr=t.down?'down':t.terr;const T=TERR_OK[terr]?terr:'unknown';const F=terrainField(T==='down'?'plains':T,t.id*977+3+(T==='unknown'?0:(t.no||0)*131));if(T==='down')F.h=()=>0;F.terr=T;hexArtLoad();F.artK=T==='down'?null:T==='unknown'?'fog-'+'ab'[t.id%2]:T;if(F.artK&&!HEXART.img[F.artK])F.artK=null;
+  const tS=T==='unknown'||T==='down'?Math.min(256,V3.texS):V3.texS,tk=T+'|'+(t.id*977+3+(T==='unknown'?0:(t.no||0)*131))+'|'+tS+(F.artK?'|'+F.artK:'');V3.txC=V3.txC||{};const tx=V3.txC[tk]||(V3.txC[tk]=paintTile(F,tS));
   const top=V3.lite?new THREE.MeshLambertMaterial({map:tx.map}):new THREE.MeshStandardMaterial({map:tx.map,roughnessMap:tx.rough,roughness:1,bumpMap:V3.lowM?null:tx.map,bumpScale:T==='mountains'?2.2:1.4,envMapIntensity:.55});if(!V3.lite)top.userData.bump=tx.map;
   const slab=new THREE.Mesh(slabGeo(),[gq('hideM',()=>new THREE.MeshBasicMaterial({visible:false})),sideMat(T)]);slab.castShadow=slab.receiveShadow=true;grp.add(slab);
   const cap=new THREE.Mesh(capGeo(F,T==='mountains'||T==='hills'?LO(18,9):LO(12,6)),top);cap.castShadow=cap.receiveShadow=true;cap.userData.tile=t.id;grp.add(cap);grp.userData.top=top;grp.userData.F=F;
@@ -517,10 +522,10 @@ function overlayMesh(m){const g=new THREE.Group();const t=tileAt(m.id);const o=V
   if(P.p.length)g.add(P.mesh());add.forEach(a=>g.add(a));return g}
 function overlayKey(m){return JSON.stringify([m.exh,m.tok,m.waste,m.cov,G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id),G.sc&&G.sc.temple===m.id&&!G.sc.templeDone])}
 function pawnSpot(act){if(!act)return null;if(act.type==='gather')return act.tgt.pos;if(act.type==='explore')return act.tgt;if(act.type==='build'&&act.tgt.k==='cross')return act.tgt.cross;if(act.type==='special'){const s=SPEC(act.tgt);return s&&s.pos?s.pos():null}return null}
-function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();const sc=V3.scene;if(!V3.layout){V3.layout=1;fitIsland()}
+function sync3D(){if(!V3.on||!G)return;hexArtLoad();if(HEXART.done<7&&performance.now()-HEXART.t0<2500){clearTimeout(HEXART.to);HEXART.to=setTimeout(()=>{try{sync3D()}catch(e){}},100);return}if(PH)PH.wake();const sc=V3.scene;if(!V3.layout){V3.layout=1;fitIsland()}
   for(const m of G.map){const v=spaceView(m);let o=V3.tiles[m.id];const key=v.terr+(v.no||'')+(v.src||[]).join()+(v.totem?1:0)+(v.shelter?1:0)+(v.down?'d':'');
-    if(!o||o.key!==key){const was=o;if(o){sc.remove(o.g)}const g=tileMesh(v);const p=hexPos(MAP[m.id].q,MAP[m.id].r);g.position.copy(p);g.userData.id=m.id;
-      if(was&&v.terr!=='unknown'){g.position.y=-2.5;tween(g.position,'y',0,.9,()=>puff(p.clone().setY(TOPY+.1),14))}sc.add(g);o=V3.tiles[m.id]={g,key,ov:null,ok:''}}
+    if(!o||o.key!==key||o.art!==HEXART.n){const was=o&&o.key===key?null:o;if(o){sc.remove(o.g)}const g=tileMesh(v);const p=hexPos(MAP[m.id].q,MAP[m.id].r);g.position.copy(p);g.userData.id=m.id;
+      if(was&&v.terr!=='unknown'){g.position.y=-2.5;tween(g.position,'y',0,.9,()=>puff(p.clone().setY(TOPY+.1),14))}sc.add(g);o=V3.tiles[m.id]={g,key,art:HEXART.n,ov:null,ok:''}}
     o.g.userData.id=m.id;const ok=overlayKey(m);if(o.ok!==ok){if(o.ov)o.g.remove(o.ov);o.ov=overlayMesh(m);o.g.add(o.ov);o.ok=ok}
     const mv=V3.mist[m.id]||(V3.mist[m.id]={v:0,c:0,to:0});mv.to=v.terr==='unknown'&&!v.down?1:m.fog?.62:0;mv.fog=!!m.fog;if(mv.init==null){mv.init=1;mv.v=mv.to}}
   // camp on the camp tile
