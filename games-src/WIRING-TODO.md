@@ -16,11 +16,11 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 | kaiten-kitchen | 23 | 2 |
 | sunglaze | 23 | 2 |
 | short-fuse | 22 | 2 |
-| mainhattan-nightrun | 22 | 0 |
+| mainhattan-nightrun | 0 | 0 |
 | cauldron-fair | 22 | 2 |
 | tidewake | 22 | 2 |
 | hollowbough | 19 | 2 |
-| **Total** | **678** | **56** |
+| **Total** | **656** | **56** |
 
 ## crown-city-smash
 
@@ -701,32 +701,7 @@ Generated from games/asset-viewer/flow.json (stage "pushed" = in games/<game>/me
 
 ## mainhattan-nightrun
 
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of smoked glass with a dark chrome outline and a tiny curl at one corner, sin |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of smoked glass with a dark chrome outline, single object, centred, pl |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pale cyan with a dark chro |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, magenta with a dark chrome |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep indigo with a dark ch |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of a dark chrome strip with a thin cyan light line with a dark chrome edge line, seamless left to righ |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round dark chrome button with a magenta ring, centre empty, single object, centred, plain flat white b |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round dark chrome medallion with a magenta ring, centre blank, larger with a small crown on top, single obje |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round dark chrome medallion with a magenta ring, centre blank, with a small laurel at the bottom, single obj |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round dark chrome medallion with a magenta ring, centre blank, dull and darkened with a small padlock at the |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round dark chrome medallion with a magenta ring, centre blank, bright and polished, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-panel` | a smoked glass panel with ornate dark chrome corners and a thin dark chrome border, the whole centre plain and |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of smoked glass with a thin dark chrome edge and a small magenta diamond at the left end, c |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of a dark chrome strip with a thin cyan light line, seamless left to right, empty, no text |
-| Wave 5 Wave 5 | `ui-touch-dash` | a round glowing neon push-button with a double-chevron dash symbol, single object, centred, plain flat white b |
-| Wave 5 Wave 5 | `ui-touch-emp` | a round glowing neon push-button with a pulse-ring symbol, single object, centred, plain flat white background |
-| Wave 5 Wave 5 | `ui-touch-pause` | a round glowing neon push-button with a pause symbol, single object, centred, plain flat white background, no  |
-| Wave 5 Wave 5 (16:9) | `ui-btn-cyan` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-btn-pink` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-btn-violet` | a blank angular sci-fi button plate, slanted parallelogram shape about three times wider than tall, dark glass |
-| Wave 5 Wave 5 (16:9) | `ui-hud-bars` | a slim dark sci-fi gauge housing with a neon cyan trim and four empty horizontal channels stacked, wide and sh |
-| Wave 5 Wave 5 (16:9) | `ui-hud-mult` | a small dark sci-fi plate with a glowing magenta trim, wider than tall, centre empty, single object, centred,  |
+All painted files in media/ are now loaded by the live page (J2 wired the 22 UI kit files).
 
 ## short-fuse
 

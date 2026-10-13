@@ -1,6 +1,19 @@
 [
  {
   "date": "2026-10-13",
+  "game": "mainhattan",
+  "title": "Painted menus, HUD and touch buttons",
+  "items": [
+   "Title, pause, garage, shop and story buttons are now painted plates",
+   "Settings card has a painted frame, header and rows",
+   "Run HUD sits in painted housings; hints in a speech bubble",
+   "Phone pause, DASH and EMP are painted round buttons",
+   "Story map stages sit on medallions: open, done, boss, locked"
+  ],
+  "check": "Open the title, a story run on a phone, pause and settings: everything readable and tappable"
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Lantern Dive: the Commander's real lantern",
   "items": [
