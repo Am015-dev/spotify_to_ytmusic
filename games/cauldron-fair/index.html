@@ -797,26 +797,6 @@ html.sk-stop #acts .btn.stopb::before{content:'';position:absolute;left:-12px;to
 html.sk-boom .mcells .mboom svg{display:none}
 html.sk-boom .mcells .mboom::after{content:'';display:block;width:30px;height:30px;background:url(media/icon-boom-c.webp) center/contain no-repeat}
 
-/* Draw button: the painted clay bag dish replaces the flat bag picture (the 3D bag still shakes on a pull) */
-html.sk-draw .bagwrap{background:url(media/btn-draw-c.webp) center/contain no-repeat}
-html.sk-draw .bagwrap .bagimg{opacity:0}
-/* white-chip meter with 7 spaces: the carved seven-pocket track behind the cells (cells become round chips in the pockets) */
-html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2)){aspect-ratio:8/1;background:url(media/ui-chipbar.webp) center/100% 100% no-repeat;padding:0 3.4%;gap:0}
-html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2))>i{height:auto;align-self:center;aspect-ratio:1;margin:0 1.5%;border-radius:50%;background:transparent;box-shadow:none;max-height:100%}
-html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on{background:#7fd65a;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25)}
-html.sk-chipbar .meter.mid .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on{background:#f2b81e}
-html.sk-chipbar .meter.hi .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on,html.sk-chipbar .meter.over .mcells:has(>i:nth-child(7):nth-last-child(2))>i.on{background:#ff5a3c}
-html.sk-chipbar .mcells:has(>i:nth-child(7):nth-last-child(2))>.mboom{position:absolute;right:-6px;top:-12px}
-/* coach bubble pointer: the painted tail instead of the plain diamond */
-html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
-html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
-html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
-html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
-html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
-/* settings rows: the painted parchment strip behind each row (overlay, no size change) */
-html.sk-row .mrow{position:relative;isolation:isolate}
-html.sk-row .mrow::before{content:'';position:absolute;inset:-4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
-
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -3682,26 +3662,6 @@ fn mainFragment(
       { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
       { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
-    ]
-  });
-  // painted art wired: each plate is painted on the element, its image loaded (the skin switch is on), the element visible
-  function art(name, sel, file, pseudo, cls) { return { kind: 'fn', name: name, fn: function () { var e = document.querySelector(sel); if (!e) return 'missing ' + sel; var r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return 'not visible'; var c = getComputedStyle(e, pseudo || null); if ((c.backgroundImage + ' ' + c.borderImageSource).indexOf(file) < 0) return file + ' not painted'; if (cls && GXSK.classes().indexOf(cls) < 0) return cls + ' not loaded'; return true; } }; }
-  GXS.add({
-    id: 'cf-art', name: 'Painted art: bag, chip track, tail, rows', ask: 'Do the bag, chip track and rows look painted?', seed: 5, when: booted,
-    setup: function () {
-      try { GXH.setEnabled(false); } catch (e) { }
-      window.AIDELAY = 120; newGame('vs', {});
-      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)') || q('.stopb:not(.off)'); }, 40000).then(function () {
-        quiet(); var b = document.createElement('div'); b.className = 'gxh-bub on gxh-a-bottom'; b.id = 'arttail'; b.style.cssText = 'left:16px;top:70px';
-        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap the bag</div>'; document.body.appendChild(b); return new Promise(function (r) { setTimeout(r, 400); });
-      });
-    },
-    checks: [
-      art('Draw dish painted', '.bagwrap', 'btn-draw-c', null, 'sk-draw'),
-      art('chip track painted', '#acts .mcells', 'ui-chipbar', null, 'sk-chipbar'),
-      art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
-      { kind: 'text', sel: '#arttail .gxh-tx', re: /bag/i, name: 'bubble text readable' },
-      { kind: 'fn', name: 'settings row painted', fn: function () { GX.show('setd'); var e = document.querySelector('#setbody .mrow'); if (!e) return 'no row'; var r = e.getBoundingClientRect(), c = getComputedStyle(e, '::before'); var ok = r.width > 4 && c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0; try { GX.close(); } catch (x) { } return ok || 'ui-row-c not painted'; } }
     ]
   });
 })();
@@ -9083,7 +9043,7 @@ function extrasBoot() {
   ['bag-moss', 'bag-ember', 'end-win', 'end-lose'].forEach(preImg);
   ['bag', 'chip'].forEach(n => { const i = new Image(); i.src = MODELS + n + '.webp'; });   // 3D sprites, loaded once
   tableApply();
-  try { GXSK.init({ sets: { 'sk-awn': ['awning-c'], 'sk-stall': ['ui-stall-c', 'ui-stall-locked-c'], 'sk-slot': ['ui-slot'], 'sk-stop': ['btn-stop'], 'sk-boom': ['icon-boom'], 'sk-draw': ['btn-draw-c'], 'sk-chipbar': ['ui-chipbar'], 'sk-tail': ['ui-bubble-tail'], 'sk-row': ['ui-row-c'] } }); } catch (e) { }
+  try { GXSK.init({ sets: { 'sk-awn': ['awning-c'], 'sk-stall': ['ui-stall-c', 'ui-stall-locked-c'], 'sk-slot': ['ui-slot'], 'sk-stop': ['btn-stop'], 'sk-boom': ['icon-boom'] } }); } catch (e) { }
   setInterval(() => { try { sndMusic(); bagApply(); tableApply(); } catch (e) { } }, 800);
 }
 // the final scores pick up the end art after each draw
@@ -9184,7 +9144,7 @@ function extrasBoot() {
   /* ---- the little bar (top corner): LAB, checklist chip, run controls, quick rating ---- */
   function bar() {
     var b = el.bar; if (!b) { b = el.bar = mk('div', 'gxlab-bar'); document.body.appendChild(b); }
-    b.className = (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'r' : '';
+    b.className = L.get('gx_lab_pos') === 'r' ? 'r' : '';
     var r = run(), done = 0, tot = 0, h = '<button type="button" id="gxlab-btn" aria-label="LAB menu">🧪 LAB</button>';
     if (!inShelf && UP.length) { var c = ckCount(); h += '<button type="button" id="gxlab-ck" aria-label="Test checklist">📍 ' + c.done + '/' + c.tot + '</button>'; }
     if (r) h += '<button type="button" id="gxlab-next" class="on">Next ▶ ' + (r.i + 1) + '/' + r.ids.length + '</button>';
@@ -9202,7 +9162,7 @@ function extrasBoot() {
         if (t.dataset.go) { go(t.dataset.go); return; }
         if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
         if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
-        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'l' : 'r'); bar(); return; }
+        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', L.get('gx_lab_pos') === 'r' ? 'l' : 'r'); bar(); return; }
         if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
         if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
     fillMenu(); p.hidden = false;

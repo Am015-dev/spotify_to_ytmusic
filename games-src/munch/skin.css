@@ -93,3 +93,11 @@ html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-over
 /* a hovered card on the table must not stretch its tap zone over the buttons below it (it covered Help) */
 .arena .card>.hit,.arena .card:hover>.hit{pointer-events:none!important;bottom:0}
 
+
+/* painted icons: hand, level gem, bubble tail, 3D winner (html.dk-hand / dk-lv / dk-bt) */
+.pic{width:1.15em;height:1.15em;vertical-align:-.25em;object-fit:contain}
+html.dk-lv .mine .lv small{display:inline-block;width:14px;height:14px;font-size:0;vertical-align:-2px;margin-right:2px;background:url(media/icon-level.webp) center/contain no-repeat}
+html.dk-lv.ph .mine .lv small{display:block}
+html.dk-bt .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
+html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.dk-bt .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.dk-bt .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+.win3d{display:block;margin:0 auto 2px;width:min(44vw,160px);height:min(44vw,160px);object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}

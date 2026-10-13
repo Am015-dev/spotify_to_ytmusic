@@ -112,16 +112,12 @@
   }
  },
  "thornbound": {
-  "severe": 2,
-  "warn": 7,
-  "severeKeys": [
-   "size|g.tb-m-round > g > text",
-   "size|g.tbx-pan > g > text"
-  ],
+  "severe": 0,
+  "warn": 6,
+  "severeKeys": [],
   "counts": {
-   "size": 4,
    "images": 4,
-   "button": 1,
+   "contrast": 2,
    "art": 0
   }
  },
@@ -144,17 +140,15 @@
   }
  },
  "cauldron-fair": {
-  "severe": 2,
-  "warn": 8,
-  "severeKeys": [
-   "contrast|span.bagn",
-   "size|svg.chip > text"
-  ],
+  "severe": 0,
+  "warn": 10,
+  "severeKeys": [],
   "counts": {
-   "contrast": 2,
+   "contrast": 1,
    "images": 4,
-   "button": 1,
-   "size": 1,
+   "overflow": 1,
+   "button": 2,
+   "size": 2,
    "art": 0
   }
  },
