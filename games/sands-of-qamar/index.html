@@ -480,7 +480,7 @@ html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-p
 html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
 html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
-html.sk .mbox .btn.sm{border-image-width:0 18px}
+html.sk .mbox .btn.sm{border-image-width:14px 18px}
 /* menu rows */
 html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
@@ -548,6 +548,31 @@ html.sk-fx .ft.up{text-shadow:0 0 6px #ffd35a,0 1px 2px rgba(0,0,0,.6)}
 .spot .sp-c,.spot.taken .sp-c{color:#3a2010;font-weight:800;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:20px}
 .exd summary{min-height:44px;display:flex;align-items:center;margin:0}
 .sch .sn small{font-size:11px;opacity:.85}
+
+/* painted plates, glyphs and badges (html.sk-pl): backgrounds and overlays only, no box moves */
+html.sk-pl .tile::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;box-sizing:border-box;border:5px solid transparent;border-image:url(media/ui-tile-frame-red.webp) 28/5px stretch}
+html.sk-pl .tile>*{z-index:2}
+html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.webp)}
+html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
+html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
+html.sk-pl .tile .tv{background:#f4c04a;border-color:transparent;z-index:3;isolation:isolate}
+html.sk-pl .tile .tv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:url(media/ui-badge-gold.webp) center/142% no-repeat}
+html.sk-pl .dcard .dv{background:#8a4a2a;isolation:isolate;position:relative;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
+html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
+html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
+html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}
+html.sk-pl .card.dj h4,html.sk-pl .dcard.th{background:url(media/ui-djinn-bar.webp) center/100% 100% no-repeat,#2a1250;color:#ffe9a8;text-indent:10px}
+html.sk-pl #summon b{background:url(media/ui-ribbon.webp) center/100% 100% no-repeat;padding:.3em 1.1em;text-shadow:0 2px 0 #3a1004}
+html.sk-pl #finger svg{display:none}html.sk-pl #finger{background:url(media/ui-finger.webp) center/contain no-repeat}
+.pic{width:1.25em;height:1.25em;vertical-align:-.3em;object-fit:contain}.tag .pic{margin-right:3px}
+html.sk-pl .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
+html.sk-pl .gxh-a-bottom .gxh-arr{bottom:-19px}html.sk-pl .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.sk-pl .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.sk-pl .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+
+/* look fixes: readable tile names, 44 px tap boxes for the goods row (footprint unchanged: margin takes back the extra 10 px) */
+html.sk-pl .tile .tn{background:rgba(255,247,226,.93);box-shadow:0 0 0 2px rgba(255,247,226,.93);border-radius:3px;color:#2e1a0a}
+html.sk-pl .tile .tv{color:#2a1500;font-weight:800;line-height:11px;padding-top:2px}
+html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-sizing:border-box;border:0;border-radius:7px;outline:1px solid #8a5a18;outline-offset:-5px;box-shadow:none;background-clip:content-box!important;background-origin:content-box!important}
+html.sk-pl .dcard .dv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:url(media/ui-badge-cream.webp) center/142% no-repeat}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -860,7 +885,12 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 (function () {
   var q = new URLSearchParams(location.search), id = q.get('scn');
   var S = window.GXS = { defs: [], on: !!id, id: id };
+  try { S.realLS = window.localStorage; } catch (e) { }   // the player's real storage (a scenario swaps window.localStorage for a private one): the LAB (gx-lab.js) keeps its results here
   S.add = function (d) { S.defs.push(d); };
+  /* group of a scenario for the LAB menu: d.group, else guessed from id / name (Board, Cards, Story, Bosses, UI) */
+  S.group = function (d) { if (d.group) return d.group; var t = (d.id + ' ' + d.name).toLowerCase();
+    return /boss/.test(t) ? 'Bosses' : /story|chapter|campaign|scene|cutscene/.test(t) ? 'Story' : /zoom|card|hand|market|deck|piece|token/.test(t) ? 'Cards' : /board|start|map|table|tile|grid|island|city|dungeon/.test(t) ? 'Board' : 'UI'; };
+  S.pub = function (d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', group: S.group(d) }; };
   if (!id) return;   // normal play: the module is inert (one small object)
 
   /* ---- seeded RNG (mulberry32) ---- */
@@ -886,7 +916,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 
   /* ---- list mode (no setup) ---- */
   function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
-  function pub(d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all' }; }
+  var pub = S.pub;
   function onload(fn) { if (document.readyState === 'complete') setTimeout(fn, 0); else addEventListener('load', function () { setTimeout(fn, 0); }); }
   if (id === 'list') { onload(function () { window.GXSLIST = S.defs.map(pub); window.GXSCN = { id: 'list', ready: true }; }); return; }
 
@@ -903,7 +933,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
     if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
     var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
-    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag' && !(t.closest && t.closest('#gxlab-bar'))) return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
     return ''; }
   function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
   S.step = function (i) {
@@ -1004,6 +1034,72 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
       { kind: 'fn', name: 'drawer is on screen', fn: function () { return inView($('#djd')) || 'drawer off screen'; } },
       skin,
       { kind: 'tap', sel: '#djd .gx-x', name: 'tap closes the drawer', state: function () { return GX.open === 'djd'; }, expect: function (a, b) { return (a && !b) || 'drawer did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'sq-chips', name: 'Bid chips and score chips', ask: 'Are the bid numbers big enough?', seed: 7, when: booted, group: 'Board',
+    setup: function () { return table(7); },
+    checks: [
+      { kind: 'text', sel: '#acts .sp-b.glow', re: /\d/, name: 'bid chip number', minPx: 13 },
+      { kind: 'fn', name: 'every bid chip number >= 13 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#acts .sp-b'), function (e) { if (bad || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < 13) bad = 'bid chip font ' + px + ' px'; }); return !bad || bad; } },
+      { kind: 'visible', sel: '.sch[data-seat="0"] .ss', name: 'your score chip' },
+      { kind: 'eq', name: 'your score', a: function () { return GXS.num('.sch[data-seat="0"] .ss'); }, b: function () { return shownTotal(G.pl[0]); } },
+      skin
+    ]
+  });
+
+  GXS.add({
+    id: 'sq-help', name: 'Rules cards', ask: 'Can you read the rules card?', seed: 8, when: booted, group: 'UI',
+    setup: function () { return table(8).then(function () { GXH.rules(); return GXS.wait(function () { return $('.gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
+  // painted plates/glyphs/badges: every wired file loaded, applied to its element, and not stretched out of shape
+  var ART = [ // [selector, pseudo, file, max stretch]
+    ['.tile.blue', '::after', 'ui-tile-frame-blue', 0], ['.tile:not(.blue)', '::after', 'ui-tile-frame-red', 0],
+    ['.tile .tv', '::before', 'ui-badge-gold', 1.6], ['.dcard:not(.th) .dv', '::before', 'ui-badge-cream', 1.6],
+    ['.sch .sti', '', 'icon-star', 0], ['.mcard:not(.empty)', '', 'ui-goods-card', 0]
+  ];
+  var PROBE = [ // transient pieces: built as a probe so their CSS is tested without waiting for the moment
+    ['<div class="card dj"><h4>Djinn</h4></div>', '.card.dj h4', '', 'ui-djinn-bar', 0], ['<div id="summon"><b>Name</b></div>', '#summon b', '', 'ui-ribbon', 0],
+    ['<div class="stat"><b class="nm">Ann</b></div>', '.stat .nm', '', 'ui-nameplate', 0], ['<div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div>', '.gxh-arr', '', 'ui-bubble-tail', 0],
+    ['<div id="finger"><svg></svg></div>', '#finger', '', 'ui-finger', 0]
+  ];
+  var GLYPH = ['village', 'sacred', 'oasis', 'small', 'large', 'workshop', 'exchange', 'city', 'lake'];
+  function bg(sel, ps) { var e = $(sel); if (!e) return null; var cs = getComputedStyle(e, ps || null); return { e: e, s: cs.backgroundImage + ' ' + cs.borderImageSource + ' ' + cs.getPropertyValue('--gl'), cs: cs }; }
+  function loaded(f) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 && i); }; i.onerror = function () { r(false); }; i.src = 'media/' + f + '.webp'; }); }
+  var artOut = null;
+  GXS.add({
+    id: 'sq-art', name: 'Painted plates and glyphs', ask: 'Are the painted pieces sharp and in place?', seed: 9, when: booted, group: 'Art',
+    setup: function () {
+      return table(9).then(function () {
+        var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = PROBE.map(function (p) { return p[0]; }).join(''); document.body.appendChild(h);
+        var files = ART.map(function (a) { return a[2]; }).concat(PROBE.map(function (p) { return p[3]; }), GLYPH.map(function (k) { return 'glyph-' + k; }), Object.keys(ITEMS).map(function (k) { return 'item-' + k; }), ['ui-trophy']);
+        return Promise.all(files.map(loaded)).then(function (r) { artOut = {}; files.forEach(function (f, i) { artOut[f] = r[i]; }); return idle(300); });
+      });
+    },
+    checks: [
+      { kind: 'fn', name: 'painted layer is on', fn: function () { return document.documentElement.classList.contains('sk-pl') || 'html.sk-pl missing'; } },
+      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = Object.keys(artOut).filter(function (f) { return !artOut[f]; }); return !bad.length || 'not loaded: ' + bad.join(', '); } },
+      { kind: 'fn', name: 'plates, badges, frames use their painting', fn: function () {
+        var bad = ''; ART.forEach(function (a) { var b = bg(a[0], a[1]); if (!b) { bad = bad || 'no element ' + a[0]; return; } if (b.s.indexOf(a[2] + '.webp') < 0) bad = bad || a[0] + a[1] + ' lacks ' + a[2]; });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'every tile kind has its glyph medallion', fn: function () {
+        var bad = ''; [].forEach.call(document.querySelectorAll('.tile'), function (t) { var k = (t.className.match(/k-(\w+)/) || [])[1]; var s = getComputedStyle(t, '::before').backgroundImage; if (k && GLYPH.indexOf(k) >= 0 && s.indexOf('glyph-' + k + '.webp') < 0) bad = bad || 'tile ' + k + ' has no glyph'; });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'transient pieces (djinn bar, ribbon, name plate, bubble tail, finger) are painted', fn: function () {
+        var bad = ''; PROBE.forEach(function (p) { var b = bg(p[1], p[2]); if (!b || b.s.indexOf(p[3] + '.webp') < 0) bad = bad || p[1] + ' lacks ' + p[3]; }); return !bad || bad; } },
+      { kind: 'fn', name: 'item and trophy pictures replace the emoji', fn: function () { return (itemIc('lamp').indexOf('item-lamp.webp') > 0 && pIc('ui-trophy.webp', 'x').indexOf('ui-trophy.webp') > 0) || 'emoji still shown'; } },
+      { kind: 'fn', name: 'plates are not stretched out of shape', fn: function () {
+        var bad = ''; ART.forEach(function (a) { if (!a[3]) return; var e = $(a[0]); if (!e) return; var r = e.getBoundingClientRect(), i = artOut[a[2]]; if (!i || !r.width || !r.height) return; var q = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (q > a[3] || q < 1 / a[3]) bad = bad || a[0] + ' stretched x' + q.toFixed(2); });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'labels on the art stay readable (>= 11 px)', fn: function () { var bad = ''; ['.sch .sn', '.tile .tn', '.tile .tv', '.dcard b'].forEach(function (s) { var e = $(s); if (e && parseFloat(getComputedStyle(e).fontSize) < 11 && !bad) bad = s + ' ' + getComputedStyle(e).fontSize; }); return !bad || bad; } },
+      skin
     ]
   });
 })();
@@ -4842,7 +4938,7 @@ function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
 function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="mp sm" data-c="${c}"></i>${n}</span>`:''}
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
-   <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss">★${shownTotal(p)}</b>
+   <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
    <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}</span><span class="st">${E2('🐪','camel')}${p.camels}</span>${p.tent?'<span class="st">⛺</span>':''}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
@@ -4875,7 +4971,7 @@ function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filt
   for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay=(m.pay.el?m.pay.el+'●':'')+(m.pay.fk?m.pay.fk+'🔮':'');
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
-      if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">🪄 ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`🪄 ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
+      if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
   return `<div class="arow pws">${h}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
@@ -5082,14 +5178,14 @@ function statusHtml(p){const s=scoreOf(p);const L=(ic,n,lab,t)=>`<span class="st
    <div class="sts">${L('🪙',p.coins,'coins')}${L('🐪',p.camels,'camels')}${p.tent?L('⛺',1,'tent'):''}${L(mdot('vizier'),p.vz,'Advisors')}${L(mdot('elder'),p.el,'Sages')}${G.ex.artisans?L(mdot('artisan'),p.art,'Crafters'):''}${L('🔮',p.fk,'Mystics','Mystic cards: add power to Masons or Shadows, or stand in for a Sage')}${L('🧺',p.res.length,'goods · set '+goodsBest(p),'goods cards; the set is worth '+goodsBest(p)+' points now')}${p.dj.length?L('🧞',p.dj.length,'djinns'):''}</div></div>`}
 function scoreTable(){const rows=G.over.scores;const keys=['coins','advisors','sages','crafters','djinns','tiles','palms','palaces','goods','items','cities','total'];const nm={coins:'🪙 Coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'Djinns',tiles:'Tiles',palms:'Palms',palaces:'Palaces',goods:'Goods',items:'Items',cities:'Cities',total:'★ Total'};
   const epi=rows.map(r=>{const best=keys.filter(k=>k!=='total').sort((a,b)=>r.s[b]-r.s[a])[0];return `<li>${pChip(P(r.p))}: most of the points came from <b>${nm[best]}</b> (${r.s[best]}).</li>`}).join('');
-  return `<div class="prompt"><h3>🏆 ${esc(G.winText)}</h3><ul class="story">${epi}</ul><div class="tw"><table><tr><th></th>${rows.map(r=>`<th>${pChip(P(r.p))}</th>`).join('')}</tr>${keys.filter(k=>k==='total'||rows.some(r=>r.s[k])).map(k=>`<tr class="${k==='total'?'tot':''}"><td>${nm[k]}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
+  return `<div class="prompt"><h3>${pIc('ui-trophy.webp','🏆')} ${esc(G.winText)}</h3><ul class="story">${epi}</ul><div class="tw"><table><tr><th></th>${rows.map(r=>`<th>${pChip(P(r.p))}</th>`).join('')}</tr>${keys.filter(k=>k==='total'||rows.some(r=>r.s[k])).map(k=>`<tr class="${k==='total'?'tot':''}"><td>${nm[k]}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
 function renderPopups(){if(GX.open==='logd'){const lb=$('#logbody');lb.innerHTML=`<ol class="log">${G.log.slice(0,300).reverse().map(l=>`<li class="${l.c}"><small>R${l.r}</small> ${esc(l.t)}</li>`).join('')}</ol>`;lb.scrollTop=lb.scrollHeight}
   if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>playerSheet(p)).join('');
   if(GX.open==='djd'&&$('#djbody').dataset.v!==String(G.logN))renderDjPop()}
 function playerSheet(p){const s=scoreOf(p);const hid=online()&&!G.over&&p.i!==NET.mySeat;return `<section class="sheet" style="--pc:${PCOL[p.i]}"><h3>${pChip(p)} ${online()&&p.i===NET.mySeat?'<small>(you)</small>':''}${p.human?'':'<small>(computer)</small>'} <span class="tot">★ ${shownTotal(p)}</span></h3>${statusHtml(p)}
   <div><b>Goods:</b> ${p.res.length?p.res.slice().sort().map(r=>RICON[r]).join(' '):'none'} ${p.fk?`· ${p.fk} Mystic${p.fk>1?'s':''}`:''}</div>
   <div><b>Djinns:</b> ${p.dj.length?p.dj.map(k=>`<span class="tag" title="${esc(DJ[k].x)}">${esc(DJ[k].n)} ${DJ[k].vp}</span>`).join(' '):'none'}</div>
-  ${G.ex.artisans?`<div><b>Items:</b> ${hid&&p.items.length?`${p.items.length} face down`:p.items.length?p.items.map(k=>`<span class="tag" title="${esc(ITEMS[k].x)}">${esc(ITEMS[k].n)}</span>`).join(' '):'none'}</div>`:''}
+  ${G.ex.artisans?`<div><b>Items:</b> ${hid&&p.items.length?`${p.items.length} face down`:p.items.length?p.items.map(k=>`<span class="tag" title="${esc(ITEMS[k].x)}">${itemIc(k)}${esc(ITEMS[k].n)}</span>`).join(' '):'none'}</div>`:''}
   ${G.ex.thieves?`<div><b>Cutpurses:</b> ${p.thieves.length?p.thieves.map(t=>esc(THIEVES[t.k].n)).join(', '):'none'}</div>`:''}
   <div><b>Tiles held:</b> ${G.board.filter(t=>owner(t)===p.i).map(t=>`${esc(tileName(t))}${t.palm?' 🌴'+t.palm:''}${t.pal?' 🏰'+t.pal:''}`).join(', ')||'none'}</div>
   <div class="small muted">So far: ${Object.entries(s).filter(([k,v])=>v&&k!=='total'&&!(hid&&k==='items')).map(([k,v])=>k+' '+v).join(' · ')}</div></section>`}
@@ -5471,7 +5567,7 @@ function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[
 function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
 const TABLES=['workshop','court','night','palace'],BACKS=['copper','lamp'];
 function paintApply(){
-  if(PAINT_ON)artProbe();else HR.classList.remove('sk-dj','sk-gd','sk-tk','sk-ic2','sk-spot','sk-fx');
+  if(PAINT_ON)artProbe();else HR.classList.remove('sk-dj','sk-gd','sk-tk','sk-ic2','sk-spot','sk-fx','sk-pl');
   HR.classList.toggle('tp',PAINT_ON&&PIMG['tile-village']===1);HR.classList.toggle('ti',PAINT_ON&&PIMG['title']===1);
   const tb=unl('table'),tf=TABLES.includes(tb)?'table-'+tb:'';
   if(PAINT_ON&&tf)pimg(tf,()=>{HR.style.setProperty('--tbl','url('+MEDIA+tf+'.webp)');HR.classList.add('tbl','tbl-u')});
@@ -5483,7 +5579,11 @@ function paintApply(){
 }
 function paintBoot(){GXSK.init({map:true,stars:true,banner:true,icons:['players','djinn','log','cards','rules','settings','menu','newgame','speed','sound','music','hint'],sets:{'sk-meeple':['vizier','elder','merchant','builder','assassin','artisan'].map(k=>'meeple-'+k)}});['tile-village','title','table-default','table-default-phone','back-default','end-win','end-lose'].forEach(f=>pimg(f,paintApply));
   ['sacred','oasis','small','large','workshop','exchange','lake','city','ravine'].forEach(k=>pimg('tile-'+k));paintApply();sprites3d();artProbe()}
-function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
+// painted plates, glyphs, items: html.sk-pl once ui-nameplate has loaded; an <img> in place of an emoji only when painted
+const ITEM_IMG={gem5:'item-gem5.webp',gem7:'item-gem7.webp',gem9:'item-gem9.webp',carpet:'item-carpet.webp',lamp:'item-lamp.webp',flute:'item-flute.webp',scimitar:'item-scimitar.webp',talisman:'item-talisman.webp',horn:'item-horn.webp'};
+function pIc(f,emo){return HR.classList.contains('sk-pl')&&f?`<img class="pic" src="media/${f}" alt="">`:emo}
+function itemIc(k){return pIc(ITEM_IMG[k],'🪄')}
+function artProbe(){[['sk-dj','djinn-amir'],['sk-gd','good-ivory'],['sk-tk','token-tent-0'],['sk-ic2','icon-coin'],['sk-spot','ui-spot'],['sk-fx','fx-sparkle'],['sk-pl','ui-nameplate']].forEach(([c,f])=>pimg(f,()=>{if(PAINT_ON)HR.classList.add(c)}))}
 // 3D-model sprites (palm, palace, camel, lamp turntable): html.sp3 once the files are there; without them the emoji stay
 function sprites3d(){let n=0;['palm@512','palace@512','camel@512','lamp-turn'].forEach(f=>{const i=new Image();i.onload=()=>{if(++n===4)document.documentElement.classList.add('sp3')};i.src='models/'+f+'.webp'})}
 // painted pictures on/off (Settings)
@@ -5540,6 +5640,190 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b
 function paintInit(){paintBoot();if(typeof GX!=='undefined'){const os=GX.onShow;GX.onShow=id=>{if(os)os(id);if(id==='musicd'){const mb=$('#musicbody');if(mb)mb._sig=null;renderMusic()}}}
   setInterval(()=>{try{paintApply();musicSync()}catch(e){}},800);document.addEventListener('pointerdown',()=>setTimeout(()=>{try{musicSync()}catch(e){}},60),{capture:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paintInit);else paintInit();
+
+</script>
+<script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>
+<script>
+/* GX LAB core: storage + result rules shared by the in-game LAB (gx-lab.js) and the owner page (games/lab.html).
+   Results live in the player's REAL localStorage (the same origin as the shelf), in the shelf's own format:
+     shelf_ck_res      {"<date>|<game>|<item index>": {s:'ok'|'bad'|'skip', n:'note'}}   (the shelf's ✔ Test checklist)
+     shelf_wn_checked / shelf_ck_auto                                                       (What's new "Checked" ticks, same rule as the shelf)
+     gx_lab_res        {"<slug>/<scenario id>": {s, n}}                                      (scenario results: LAB menu + lab.html)
+   Rating a scenario also rates every checklist item that points at it, and rating an item rates its scenario, so a tick shows everywhere.
+   Test mode: ?test=1 in the URL or localStorage gx_test = '1'. Off = nothing in the page changes. */
+(function (W) {
+  if (W.GXLAB && W.GXLAB.core) return;
+  var IDS = { 'crown-city-smash': 'crown', 'nebula-aces': 'nebula', 'doorkick-dungeon': 'doorkick', 'shipwreck-isle': 'shipwreck', 'sands-of-qamar': 'sands', 'sunglaze': 'sunglaze', 'rampart-and-vine': 'rampart', 'short-fuse': 'shortfuse', 'tidewake': 'tidewake', 'hollowbough': 'hollowbough', 'thornbound': 'thornbound', 'kaiten-kitchen': 'kaiten', 'lantern-dive': 'lantern', 'cauldron-fair': 'cauldron', 'final-approach': 'approach', 'mainhattan-nightrun': 'mainhattan', 'mainhattan-overdrive': 'overdrive' };
+  var L = W.GXLAB = W.GXLAB || {}; L.core = true; L.IDS = IDS;
+  L.idOf = function (slug) { return IDS[slug] || slug; };
+  L.slugOfId = function (id) { for (var k in IDS) if (IDS[k] === id) return k; return id; };
+  L.slug = function () { var p = location.pathname.split('/').filter(Boolean); if (p.length && /\.html?$/.test(p[p.length - 1])) p.pop(); return p[p.length - 1] || ''; };
+  L.ls = function () { try { return (W.GXS && W.GXS.realLS) || W.localStorage; } catch (e) { return null; } };
+  L.get = function (k) { try { return L.ls().getItem(k); } catch (e) { return null; } };
+  L.set = function (k, v) { try { L.ls().setItem(k, v); } catch (e) { } };
+  L.j = function (k) { try { return JSON.parse(L.get(k) || '{}') || {}; } catch (e) { return {}; } };
+  L.testOn = function () { return /[?&]test=1\b/.test(location.search) || L.get('gx_test') === '1'; };
+  L.setTest = function (on) { L.set('gx_test', on ? '1' : '0'); };
+  var RES = 'gx_lab_res', CKR = 'shelf_ck_res', WNK = 'shelf_wn_checked', CKA = 'shelf_ck_auto';
+  L.key = function (e, i) { return e.date + '|' + e.game + '|' + i; };
+  L.wnKey = function (e) { return e.date + '|' + e.game; };
+  L.entries = function (upds, slug) { var id = L.idOf(slug); return (upds || []).filter(function (e) { return e.game === id || e.game === slug; }); };
+  L.scnRes = function (slug, id) { return L.j(RES)[slug + '/' + id] || {}; };
+  L.itemRes = function (e, i) { return L.j(CKR)[L.key(e, i)] || {}; };
+  /* mark a What's new entry Checked when every item works; undo only what we marked (same rule as the shelf) */
+  L.sync = function (upds) {
+    var r = L.j(CKR), a = L.j(CKA), d = L.j(WNK), ch = false;
+    (upds || []).forEach(function (e) { var its = e.items || []; if (!its.length) return; var wk = L.wnKey(e), all = its.every(function (_, i) { return (r[L.key(e, i)] || {}).s === 'ok'; });
+      if (all && !d[wk]) { d[wk] = 1; a[wk] = 1; ch = true; } else if (!all && d[wk] && a[wk]) { delete d[wk]; delete a[wk]; ch = true; } });
+    if (ch) { L.set(WNK, JSON.stringify(d)); L.set(CKA, JSON.stringify(a)); }
+  };
+  function put(store, k, s, n) { var o = L.j(store); if (s == null) delete o[k]; else o[k] = { s: s, n: n || '' }; L.set(store, JSON.stringify(o)); }
+  L.setItem = function (upds, e, i, s, n) {
+    put(CKR, L.key(e, i), s, n); var sid = e.scn && e.scn[i]; if (sid) put(RES, L.slugOfId(e.game) + '/' + sid, s, n);
+    L.sync(upds);
+  };
+  L.setScn = function (upds, slug, id, s, n) {
+    put(RES, slug + '/' + id, s, n);
+    L.entries(upds, slug).forEach(function (e) { (e.scn || []).forEach(function (x, i) { if (x === id) put(CKR, L.key(e, i), s, n); }); });
+    L.sync(upds);
+  };
+  /* text for "Copy results": the shelf's own format per entry, then the scenarios that no checklist item covers */
+  L.text = function (upds, slug, list, name) {
+    var out = [], used = {};
+    L.entries(upds, slug).forEach(function (e) { var l = ['Game Night test · ' + name + ' · ' + e.date];
+      (e.items || []).forEach(function (t, i) { var v = L.itemRes(e, i), sid = e.scn && e.scn[i], tg = sid ? ' [scn:' + sid + ']' : ''; if (sid) used[sid] = 1;
+        l.push(v.s === 'ok' ? '✅ ' + t + tg : v.s === 'bad' ? '❌ ' + t + tg + (v.n ? ' — ' + v.n : '') : v.s === 'skip' ? '⏭ ' + t + tg : '⬜ ' + t + tg + ' (not tested)'); });
+      out.push(l.join('\n')); });
+    var rest = (list || []).filter(function (d) { return !used[d.id]; });
+    if (rest.length) out.push(['Game Night LAB · ' + name].concat(rest.map(function (d) { var v = L.scnRes(slug, d.id); return (v.s === 'ok' ? '✅ ' : v.s === 'bad' ? '❌ ' : v.s === 'skip' ? '⏭ ' : '⬜ ') + d.name + ' [scn:' + d.id + ']' + (v.s === 'bad' && v.n ? ' — ' + v.n : ''); })).join('\n'));
+    return out.join('\n\n');
+  };
+  L.copy = function (text, done) {
+    var fb = function () { var ok = false, box = document.createElement('div'); box.className = 'gxl-fb'; box.innerHTML = '<textarea readonly aria-label="Results"></textarea><button type="button">Close</button>';
+      var ta = box.firstChild; ta.value = text; document.body.appendChild(box); ta.focus(); ta.select(); try { ok = document.execCommand('copy'); } catch (_) { }
+      box.lastChild.onclick = function () { box.remove(); }; if (ok) { box.remove(); done(true); } else done(false); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, fb); else fb();
+  };
+  L.esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  L.chip = function (s) { return s === 'ok' ? '✅' : s === 'bad' ? '❌' : s === 'skip' ? '⏭' : '⬜'; };
+})(window);
+
+</script>
+<script>
+/* GX LAB (test mode only): 🧪 LAB menu of this game's scenarios, a pinned ✔ Test checklist, quick ✅/❌ for the scenario on screen.
+   Needs gx-scenario.js (GXS.defs) and gx-lab-core.js. Off (no ?test=1, no localStorage gx_test) = returns at once: no element, no listener.
+   build-all.py inlines gx-lab-core.js + this + gx-lab.css into every staged game. Read the use in games-src/shell/LAB.md. */
+(function (W) {
+  var L = W.GXLAB; if (!L || !L.core || !L.testOn()) return;
+  var slug = L.slug(), gid = L.idOf(slug), q = new URLSearchParams(location.search), scn = q.get('scn') && q.get('scn') !== 'list' ? q.get('scn') : '';
+  var inShelf = false; try { inShelf = parent !== window; } catch (e) { inShelf = true; }
+  var UP = [], el = {}, esc = L.esc, name = slug;
+  var list = function () { var S = W.GXS; return S && S.defs ? S.defs.map(S.pub) : []; };
+  var run = function () { try { return JSON.parse(sessionStorage.getItem('gx_lab_run') || 'null'); } catch (e) { return null; } };
+  var saveRun = function (r) { try { if (r) sessionStorage.setItem('gx_lab_run', JSON.stringify(r)); else sessionStorage.removeItem('gx_lab_run'); } catch (e) { } };
+  var ckOpen = function () { try { return sessionStorage.getItem('gx_lab_ck') === '1'; } catch (e) { return false; } };
+  var setCk = function (v) { try { sessionStorage.setItem('gx_lab_ck', v ? '1' : '0'); } catch (e) { } };
+  var go = function (id) { L.go = id; location.href = location.pathname + '?scn=' + encodeURIComponent(id) + '&test=1'; };
+  function toast(m) { var t = document.createElement('div'); t.className = 'gxl-toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 1600); }
+  function mk(tag, id, cls) { var e = document.createElement(tag); if (id) e.id = id; if (cls) e.className = cls; return e; }
+
+  function css() {   // the stylesheet is inlined next to this script by build-all.py (window.GXLAB_CSS); else load nothing
+    if (W.GXLAB_CSS && !document.getElementById('gxlab-css')) { var s = mk('style', 'gxlab-css'); s.textContent = W.GXLAB_CSS; document.head.appendChild(s); }
+  }
+
+  /* ---- the little bar (top corner): LAB, checklist chip, run controls, quick rating ---- */
+  function bar() {
+    var b = el.bar; if (!b) { b = el.bar = mk('div', 'gxlab-bar'); document.body.appendChild(b); }
+    b.className = (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'r' : '';
+    var r = run(), done = 0, tot = 0, h = '<button type="button" id="gxlab-btn" aria-label="LAB menu">🧪 LAB</button>';
+    if (!inShelf && UP.length) { var c = ckCount(); h += '<button type="button" id="gxlab-ck" aria-label="Test checklist">📍 ' + c.done + '/' + c.tot + '</button>'; }
+    if (r) h += '<button type="button" id="gxlab-next" class="on">Next ▶ ' + (r.i + 1) + '/' + r.ids.length + '</button>';
+    if (scn) { var v = L.scnRes(slug, scn).s; h += '<span class="gxl-r">' + [['ok', '✅'], ['bad', '❌'], ['skip', '⏭']].map(function (a) { return '<button type="button" data-s="' + a[0] + '" aria-pressed="' + (v === a[0]) + '" aria-label="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</span>'; }
+    b.innerHTML = h;
+  }
+  function ckEntries() { return L.entries(UP, slug).slice(0, 4); }
+  function ckCount() { var done = 0, tot = 0; ckEntries().forEach(function (e) { (e.items || []).forEach(function (_, i) { tot++; if (L.itemRes(e, i).s) done++; }); }); return { done: done, tot: tot }; }
+
+  /* ---- LAB menu ---- */
+  function menu() {
+    var p = el.menu; if (!p) { p = el.menu = mk('div', 'gxlab-menu', 'gxl-panel'); p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'LAB'); p.hidden = true; document.body.appendChild(p);
+      p.act = function (t) {
+        if (t.id === 'gxl-close') { p.hidden = true; return; }
+        if (t.dataset.go) { go(t.dataset.go); return; }
+        if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
+        if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
+        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'l' : 'r'); bar(); return; }
+        if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
+        if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
+    fillMenu(); p.hidden = false;
+  }
+  function fillMenu() {
+    var p = el.menu, ds = list(), g = {}, order = ['Board', 'Cards', 'Story', 'Bosses', 'UI'], h;
+    ds.forEach(function (d) { (g[d.group] = g[d.group] || []).push(d); });
+    Object.keys(g).forEach(function (k) { if (order.indexOf(k) < 0) order.push(k); });
+    var n = 0; ds.forEach(function (d) { if (L.scnRes(slug, d.id).s === 'ok') n++; });
+    h = '<div class="gxl-h"><h2>🧪 LAB · ' + esc(name) + ' · ' + n + '/' + ds.length + ' ✅</h2><button type="button" id="gxl-close" aria-label="Close LAB">✕</button></div>' +
+      '<div class="gxl-tools"><button type="button" id="gxl-all">All scenarios ▶</button><button type="button" id="gxl-copy">Copy results</button><button type="button" id="gxl-pos">⇄ Move 🧪</button><button type="button" id="gxl-off">Test mode off</button></div><div class="gxl-body" id="gxl-mbody">';
+    order.forEach(function (k) { if (!g[k]) return; h += '<div class="gxl-g">' + esc(k) + '</div>';
+      g[k].forEach(function (d) { var v = L.scnRes(slug, d.id).s;
+        h += '<div class="gxl-row" data-id="' + esc(d.id) + '"><div class="gxl-t"><b>' + esc(d.name) + '</b>' + (d.ask ? '<small>' + esc(d.ask) + '</small>' : '') + '</div>' +
+          '<button type="button" class="gxl-go' + (d.id === scn ? ' here' : '') + '" data-go="' + esc(d.id) + '" aria-label="Go: ' + esc(d.name) + '">▶ GO</button>' +
+          '<button type="button" class="gxl-chip" data-chip="' + esc(d.id) + '" aria-label="Result">' + L.chip(v) + '</button></div>'; }); });
+    if (!ds.length) h += '<div class="gxl-g">No scenarios registered for this game yet.</div>';
+    var bd = p.querySelector('.gxl-body'), st = bd ? bd.scrollTop : 0; p.innerHTML = h + '</div>'; p.querySelector('.gxl-body').scrollTop = st;
+  }
+
+  /* ---- pinned ✔ Test checklist (this game's What's new items, shared with the shelf) ---- */
+  function card() {
+    var p = el.card; if (!p) { p = el.card = mk('div', 'gxlab-card', 'gxl-panel'); p.setAttribute('role', 'region'); p.setAttribute('aria-label', 'Test checklist'); p.hidden = true; document.body.appendChild(p);
+      p.act = function (t) {
+        if (t.id === 'gxl-cclose') { setCk(false); p.hidden = true; return; }
+        if (t.id === 'gxl-ccopy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
+        if (t.dataset.go) { setCk(false); go(t.dataset.go); return; }
+        if (t.dataset.s) { var e2 = ckEntries()[+t.dataset.e], i = +t.dataset.i, cur = L.itemRes(e2, i).s; L.setItem(UP, e2, i, cur === t.dataset.s ? null : t.dataset.s, ''); fillCard(); bar(); if (el.menu && !el.menu.hidden) fillMenu(); } };
+      p.addEventListener('input', function (e) { var t = e.target; if (t.dataset && t.dataset.note) { var e3 = ckEntries()[+t.dataset.e], i = +t.dataset.i; L.setItem(UP, e3, i, 'bad', t.value); } }); }
+    fillCard(); p.hidden = false;
+  }
+  function fillCard() {
+    var p = el.card, c = ckCount(), h = '<div class="gxl-h"><h2>📍 ' + esc(name) + ' · ' + c.done + '/' + c.tot + ' checked</h2><button type="button" id="gxl-ccopy">Copy</button><button type="button" id="gxl-cclose" aria-label="Fold checklist">▾</button></div><div class="gxl-body">';
+    ckEntries().forEach(function (e, ei) { h += '<div class="gxl-ed">' + esc(e.date) + ' · <b>' + esc(e.title) + '</b></div>';
+      (e.items || []).forEach(function (t, i) { var v = L.itemRes(e, i), sid = e.scn && e.scn[i], d = list().filter(function (x) { return x.id === sid; })[0], ask = (d && d.ask) || (e.ask && e.ask[i]) || '';
+        h += '<div class="gxl-item" data-e="' + ei + '" data-i="' + i + '"><span class="gxl-p">' + esc(t) + '</span>' +
+          (sid ? '<div class="gxl-top"><button type="button" class="gxl-go' + (sid === scn ? ' here' : '') + '" data-go="' + esc(sid) + '">📍 GO</button>' + (ask ? '<span class="gxl-ask">' + esc(ask) + '</span>' : '') + '</div>' : '') +
+          '<div class="gxl-rate">' + [['ok', '✅ Works'], ['bad', '❌ Problem'], ['skip', '⏭ Skip']].map(function (a) { return '<button type="button" data-s="' + a[0] + '" data-e="' + ei + '" data-i="' + i + '" aria-pressed="' + (v.s === a[0]) + '">' + a[1] + '</button>'; }).join('') + '</div>' +
+          (v.s === 'bad' ? '<input class="gxl-note" type="text" maxlength="200" placeholder="What went wrong? (optional)" aria-label="Note" data-note="1" data-e="' + ei + '" data-i="' + i + '" value="' + esc(v.n || '') + '">' : '') + '</div>'; }); });
+    if (!ckEntries().length) h += '<div class="gxl-g">Nothing to test for this game yet.</div>';
+    var bd = p.querySelector('.gxl-body'), st = bd ? bd.scrollTop : 0; p.innerHTML = h + '</div>'; p.querySelector('.gxl-body').scrollTop = st;
+  }
+
+  /* ---- wiring ---- */
+  function init() {
+    css(); bar();
+    /* one window-capture handler on pointerup (a game's blocking handlers, e.g. the tutorial's, never see it) and on click (mouse / keyboard / when no pointerup came) */
+    var last = 0;
+    function hit(e) {
+      var b = e.target && e.target.closest && e.target.closest('#gxlab-bar button, .gxl-panel button'); if (!b) return;
+      e.stopPropagation(); if (e.type === 'click') e.preventDefault();
+      if (e.type === 'click' && Date.now() - last < 600) return;   // pointerup already did it
+      if (e.type === 'pointerup') last = Date.now();
+      var p = b.closest('.gxl-panel'); if (p) { if (p.act) p.act(b); return; }
+      if (b.id === 'gxlab-btn') { if (el.menu && !el.menu.hidden) el.menu.hidden = true; else { if (el.card) el.card.hidden = true; menu(); } return; }
+      if (b.id === 'gxlab-ck') { if (el.card && !el.card.hidden) { setCk(false); el.card.hidden = true; } else { if (el.menu) el.menu.hidden = true; setCk(true); card(); } return; }
+      if (b.id === 'gxlab-next') { var r = run(); if (!r) return; if (r.i + 1 < r.ids.length) { r.i++; saveRun(r); go(r.ids[r.i]); } else { saveRun(null); location.href = location.pathname + '?test=1#lab'; } return; }
+      if (b.dataset.s && scn) { var cur = L.scnRes(slug, scn).s; L.setScn(UP, slug, scn, cur === b.dataset.s ? null : b.dataset.s); bar(); if (el.menu && !el.menu.hidden) fillMenu(); if (el.card && !el.card.hidden) fillCard(); }
+    }
+    W.addEventListener('pointerup', hit, true); W.addEventListener('click', hit, true);
+    if (location.hash === '#lab') menu();
+    else if (ckOpen() && !inShelf && UP.length) card();
+  }
+  var ready = function () { init(); };
+  fetch('../updates.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }).then(function (u) {
+    UP = Array.isArray(u) ? u : []; if (W.GXS && W.GXS.defs) { /* scenarios are registered before this runs */ }
+    var go2 = function () { try { name = (document.title || slug).replace(/\s*[|–-].*$/, '').trim() || slug; } catch (e) { } ready(); };
+    if (document.body) go2(); else addEventListener('DOMContentLoaded', go2);
+  });
+  L.ui = { list: list, bar: bar, menu: menu, card: card };
+})(window);
 
 </script>
 </body>
