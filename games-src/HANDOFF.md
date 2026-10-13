@@ -18,8 +18,7 @@ Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BR
 - **Owner pages:** `status.html` (versions, missing, not wired), `look/index.html` (look check), `next-wave.html` (to-make list, Waves 7-9, 3D A-E; laptop prompt files in `games-src/next-wave/`), asset viewer Games tab, `lab.html` (coming).
 - **Cloud workers still running (check with get_session, model sonnet):**
   - `session_01VxGyhTM7mpMZhPEraRLygh` LAB menu + pinned in-game checklist with GO, all games (Doorkick first), `games/lab.html`.
-  - `session_01TKczxYncDcsdcj22o9Zg3W` shared skin: story bubble 9-slice + no sideways scrollbars, deploying game by game.
-  - `session_01Xv41avdLg3J35CCnreRR8M` faster checks + scenarios (was fixing 4/24 Doorkick sweep failures).
+  - ARCHIVED 21:29 (over time/context, owner rule): shared-skin bubble worker (shell fix pushed, only Cauldron live — the other games get it when the wiring workers redeploy them), faster-checks worker, old wiring batch A (overlapped the new wiring workers).
   - `session_01XvM88e6mByticHEdTcS4tq` Nightrun phone HUD: playfield ≥80% visible, power-ups as chips not banners (owner: "impossible to see on phone").
   - Wiring finish (13 Oct 21:28, 588/715 paintings + 47/59 models wired at start): `session_01USGHUaR7VayPywWkrGfMYc` Hollowbough+Rampart, `session_011XN3XWkxaDaz6hzkMhEdyv` Sands+Doorkick (+dk-tips, dk-status-line), `session_01FScDuF5uCNZdJFfDeUqTNh` Nebula+Lantern+Shipwreck, `session_018PZdut3kYbVEVaUDTUwQxr` Crown+Tidewake+Cauldron+Sunglaze, `session_01VZTUufsMh4x1FxGCz95a9S` Thornbound+Kaiten+Final Approach+Short Fuse. When all report: run wiring-status.py, check the asset viewer, report before→after.
   - `session_0173P8APho8S4jxLQSJj26oe` Nightrun K2: stages + map, difficulty curve, strategic shop/garage/market.
