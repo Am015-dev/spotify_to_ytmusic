@@ -1,6 +1,19 @@
 [
  {
   "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Kaiten Kitchen: painted chef tags and icons",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit"
+  ],
+  "check": "Look under each chef on the table"
+ },
+ {
+  "date": "2026-10-13",
   "game": "sunglaze",
   "title": "Painted kilns and rack for Sunglaze",
   "items": [
@@ -142,16 +155,6 @@
    "Stone-framed menus and buttons, ribbon and goblet on the result"
   ],
   "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: real brass cloches",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals"
-  ],
-  "check": "Pick a plate and watch the cloches lift"
  },
  {
   "date": "2026-10-13",
