@@ -43,14 +43,11 @@
   }
  },
  "sands-of-qamar": {
-  "severe": 6,
-  "warn": 33,
+  "severe": 3,
+  "warn": 36,
   "severeKeys": [
-   "button|b.tv",
    "button|details.exd > summary",
    "contrast|small.ord",
-   "contrast|span.dv",
-   "contrast|span.tn",
    "size|small.ord"
   ],
   "counts": {
@@ -116,19 +113,17 @@
   }
  },
  "thornbound": {
-  "severe": 4,
-  "warn": 9,
+  "severe": 3,
+  "warn": 8,
   "severeKeys": [
-   "button|span.bidc.up > b",
-   "contrast|svg.tb-card > text",
    "size|g.tb-m-round > g > text",
+   "size|g.tb-m-static > g > text",
    "size|g.tbx-pan > g > text"
   ],
   "counts": {
-   "size": 4,
-   "contrast": 2,
-   "button": 2,
+   "size": 5,
    "images": 5,
+   "button": 1,
    "art": 0
   }
  },

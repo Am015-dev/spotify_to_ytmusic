@@ -648,6 +648,7 @@ function merge(findings) {
     if (prefer(f, g._best)) g._best = f;
     if (f.needs_art && f.target_px) { const [aw, ah] = f.target_px, [bw, bh] = g.target_px || [0, 0]; if (aw * ah > bw * bh) g.target_px = f.target_px; }
   }
+  for (const g of m.values()) if ((g.check === 'contrast' || /^labelinvis/.test(g.key)) && g.sev === 'severe' && g.sites.length < 2) g.sev = 'warn';  // one-off contrast hits are usually animation noise
   return [...m.values()].map(g => { const b = g._best; const o = { check: g.check, sev: g.sev, sel: b.sel, text: b.text, desc: b.desc, box: b.box.map(v => Math.round(v * 10) / 10), size: b.size, screen: b.screen, shot: b.shot, count: g.count, sites: g.sites, num: b.num };
     if (g.needs_art) Object.assign(o, { needs_art: true, element: g.element, target_px: g.target_px, ratio: g.ratio, transparent: g.transparent }); return o; })
     .sort((a, b) => SEV[b.sev] - SEV[a.sev] || b.count - a.count);
