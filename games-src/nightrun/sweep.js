@@ -139,7 +139,8 @@ class Touch {                                           // real touch events thr
 const ev = (p, f, a) => p.evaluate(f, a);
 async function gridOk(p) { let g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) { await sleep(800); const g2 = await ev(p, () => window.__bot.gridErr()); if (g2 !== null && (g === null || Math.abs(g2) < Math.abs(g))) g = g2; } return g; }   // one more look: clock readings jitter when the machine is busy
 async function waitFor(p, f, a, ms = 5000) { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(f, a)) return true; await sleep(50); } return false; }
-async function press(p, cfg, T, sel) { if (cfg.touch) await T.tap(p, sel); else await p.click(sel); }
+async function press(p, cfg, T, sel) { if (/#stsel \.card/.test(sel)) { await p.evaluate(q => { const c = document.querySelector(q); if (c) c.scrollIntoView({ block: 'center' }); }, sel).catch(() => { }); await sleep(100); }   // the upright story map scrolls
+  if (cfg.touch) await T.tap(p, sel); else await p.click(sel); }
 async function startGame(p, cfg, T, how) {
   if (how === 'daily') { await press(p, cfg, T, '#dailyBtn'); }
   else if (cfg.touch) await T.tap(p, '#startBtn'); else await p.keyboard.press('Enter');

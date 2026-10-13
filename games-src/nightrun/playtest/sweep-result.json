@@ -1,702 +1,100 @@
 {
  "fails": [
   {
-   "tag": "difficulty",
-   "kind": "balance",
-   "detail": "Hard: the dodging bot must die and lose hull: [{\"died\":0.16666666666666666,\"t\":106.35000000000001,\"hits\":2.5},{\"died\":0,\"t\":120,\"hits\":0}]",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 12☆☆☆FLUSSKR 14,722,376,776",
-   "shot": "fail1-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 13☆☆☆GATE RU 14,782,376,836",
-   "shot": "fail2-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 14☆☆☆FREIGHT 14,842,376,896",
-   "shot": "fail3-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 15☆☆☆GATE KE 14,902,376,956",
-   "shot": "fail4-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 16☆☆☆FIREWAL 14,962,376,1016",
-   "shot": "fail5-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 17☆☆☆CORDONA 14,1022,376,1076",
-   "shot": "fail6-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 18☆☆☆ZENTRAL 14,1082,376,1136",
-   "shot": "fail7-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 19☆☆☆TRADE F 14,1142,376,1196",
-   "shot": "fail8-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 20☆☆☆RUSH HO 14,1202,376,1256",
-   "shot": "fail9-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 21☆☆☆HAMMERI 14,1262,376,1316",
-   "shot": "fail10-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 22☆☆☆MESSE-W 14,1322,376,1376",
-   "shot": "fail11-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 23☆☆☆BOARDRO 14,1382,376,1436",
-   "shot": "fail12-layout.png"
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 24☆☆☆KRONOSA 14,1442,376,1496",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 25☆☆☆PLAKA N 14,1502,376,1556",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 26☆☆☆HARBOUR 14,1562,376,1616",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 27☆☆☆LYCABET 14,1622,376,1676",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 28☆☆☆HOPLITE 14,1682,376,1736",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 29☆☆☆AGORAAC 14,1742,376,1796",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 30☆☆☆TALOSAC 14,1802,376,1856",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 9☆☆☆BRIDGE G 13,541,362,595",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 10☆☆☆ROEMERA 13,601,362,655",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 11☆☆☆FLOTTEA 13,661,362,715",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 12☆☆☆FLUSSKR 13,721,362,775",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 13☆☆☆GATE RU 13,781,362,835",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 14☆☆☆FREIGHT 13,841,362,895",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 15☆☆☆GATE KE 13,901,362,955",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 16☆☆☆FIREWAL 13,961,362,1015",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 17☆☆☆CORDONA 13,1021,362,1075",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 18☆☆☆ZENTRAL 13,1081,362,1135",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 19☆☆☆TRADE F 13,1141,362,1195",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 20☆☆☆RUSH HO 13,1201,362,1255",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 21☆☆☆HAMMERI 13,1261,362,1315",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 22☆☆☆MESSE-W 13,1321,362,1375",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 23☆☆☆BOARDRO 13,1381,362,1435",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 24☆☆☆KRONOSA 13,1441,362,1495",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 25☆☆☆PLAKA N 13,1501,362,1555",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 26☆☆☆HARBOUR 13,1561,362,1615",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 27☆☆☆LYCABET 13,1621,362,1675",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 28☆☆☆HOPLITE 13,1681,362,1735",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 29☆☆☆AGORAAC 13,1741,362,1795",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story",
-   "kind": "layout",
-   "detail": "stage select control off screen 30☆☆☆TALOSAC 13,1801,362,1855",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story#12",
-   "kind": "story",
-   "detail": "stage 12 did not start from the stage select",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story#24",
-   "kind": "story",
-   "detail": "stage 24 did not start from the stage select",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story#25",
-   "kind": "story",
-   "detail": "stage 25 did not start from the stage select",
-   "shot": ""
-  },
-  {
-   "tag": "375x553/story#30",
-   "kind": "story",
-   "detail": "stage 30 did not start from the stage select",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story#30",
-   "kind": "story",
-   "detail": "intro line not shown: [\"Dash on the pulse to power up\",\"BANKENVIERTEL\",\"Taunusanlage · 23:47\",\"30 · TALOS\"]",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "story",
-   "detail": "no stage-failed screen after dying",
-   "shot": ""
-  },
-  {
-   "tag": "390x763/story",
-   "kind": "page-error",
-   "detail": "pageerror Failed to execute 'addColorStop' on 'CanvasGradient': The value provided ('#fffff') could not be parsed as a color.",
-   "shot": ""
-  },
-  {
-   "tag": "1280x800/garage",
-   "kind": "ship-rhythm",
-   "detail": "Triplet 2.48/beat grid 1.00 n=6,6,6,6,6",
-   "shot": ""
-  },
-  {
    "tag": "lag",
    "kind": "frame-spike",
-   "detail": "3 frames over 55 ms: 83.3ms after boss0, 66.6ms after boss1, 83.3ms after boss1",
+   "detail": "5 frames over 55 ms: 83.4ms after boss0, 100ms after boss0, 66.7ms, 66.7ms, 66.7ms after boss-dead2",
    "shot": ""
   }
  ],
  "stats": {
-  "runs": 34,
-  "ticks": 11537,
-  "perfect": 27,
-  "kills": 1182,
-  "bosses": 6,
-  "fps": [
-   56.10064808382265,
-   58.71252836498268,
-   59.58073165700999,
-   57.893778335841425,
-   59.28160684861091,
-   59.906641489902135,
-   46.1565873859846,
-   48.97437397876277,
-   57.571786012152984,
-   59.09408198586714,
-   59.23436937477499,
-   46.28494081523269,
-   57.37716656085465,
-   58.8475881150006,
-   59.43822653247253,
-   58.22932462381897,
-   59.572680579688004,
-   59.61696820267842,
-   47.618290872271736,
-   51.06279233561484,
-   57.802915485348464,
-   58.66927418996399,
-   58.61136158701534,
-   43.66261849674556,
-   58.138979390997775,
-   58.99986634334485,
-   59.76181883796464,
-   58.37687216997562,
-   59.71425551744347,
-   59.62131890738694,
-   47.149602515249946,
-   50.600023619400616,
-   57.04753961634695,
-   59.3783751350054,
-   56.923153742447695,
-   57.160023708418926
-  ],
-  "maxDistrict": 4,
+  "runs": 0,
+  "ticks": 0,
+  "perfect": 0,
+  "kills": 0,
+  "bosses": 0,
+  "fps": [],
+  "maxDistrict": 0,
   "pits": 0,
-  "econ": [
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 0,
-    "spent": 0,
-    "picks": 0,
-    "left": 0,
-    "bank": 0,
-    "di": 0,
-    "score": 6774,
-    "t": 20.865699999999812,
-    "kills": 39,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 0,
-    "spent": 0,
-    "picks": 0,
-    "left": 0,
-    "bank": 0,
-    "di": 0,
-    "score": 6314,
-    "t": 21.332499999999794,
-    "kills": 36,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 10763,
-    "t": 20.865699999999784,
-    "kills": 38,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 2,
-    "spent": 0,
-    "picks": 0,
-    "left": 2,
-    "bank": 0,
-    "di": 0,
-    "score": 26656,
-    "t": 21.96539999999991,
-    "kills": 47,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 0,
-    "spent": 0,
-    "picks": 0,
-    "left": 0,
-    "bank": 0,
-    "di": 0,
-    "score": 9970,
-    "t": 20.8489999999998,
-    "kills": 41,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 15554,
-    "t": 20.898999999999837,
-    "kills": 45,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 0,
-    "spent": 0,
-    "picks": 0,
-    "left": 0,
-    "bank": 0,
-    "di": 0,
-    "score": 10893,
-    "t": 21.26589999999975,
-    "kills": 45,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 0,
-    "spent": 0,
-    "picks": 0,
-    "left": 0,
-    "bank": 0,
-    "di": 0,
-    "score": 5514,
-    "t": 21.36589999999976,
-    "kills": 41,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 19365,
-    "t": 21.865999999999875,
-    "kills": 49,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 20850,
-    "t": 20.132099999999816,
-    "kills": 40,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 0,
-    "spent": 0,
-    "picks": 0,
-    "left": 0,
-    "bank": 0,
-    "di": 0,
-    "score": 11511,
-    "t": 20.865999999999854,
-    "kills": 39,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 19986,
-    "t": 20.7991999999998,
-    "kills": 41,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 17294,
-    "t": 21.48249999999982,
-    "kills": 37,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 8318,
-    "t": 21.415699999999866,
-    "kills": 43,
-    "dead": false
-   },
-   {
-    "kind": "",
-    "pit": [],
-    "earned": 1,
-    "spent": 0,
-    "picks": 0,
-    "left": 1,
-    "bank": 0,
-    "di": 0,
-    "score": 15934,
-    "t": 20.7824999999998,
-    "kills": 43,
-    "dead": false
-   }
-  ],
-  "shopChecks": 149,
-  "judged": 28,
-  "switches": 8,
-  "rChecks": 33,
-  "maxPtSet": {
-   "0": 0,
-   "1": 16,
-   "2": 72
-  },
-  "sChecks": 63,
-  "diff": {
-   "easy/idle": {
-    "died": 1,
-    "t": 19,
-    "hits": 5
-   },
-   "easy/careless": {
-    "died": 1,
-    "t": 74.49999999999999,
-    "hits": 5
-   },
-   "easy/natural": {
-    "died": 0.16666666666666666,
-    "t": 105.18333333333334,
-    "hits": 1.6666666666666667
-   },
-   "normal/idle": {
-    "died": 1,
-    "t": 17.099999999999998,
-    "hits": 5
-   },
-   "normal/careless": {
-    "died": 1,
-    "t": 67.96666666666667,
-    "hits": 5
-   },
-   "normal/natural": {
-    "died": 0,
-    "t": 120,
-    "hits": 0
-   },
-   "hard/idle": {
-    "died": 1,
-    "t": 9.2,
-    "hits": 5
-   },
-   "hard/careless": {
-    "died": 1,
-    "t": 24.516666666666666,
-    "hits": 5
-   },
-   "hard/natural": {
-    "died": 0.16666666666666666,
-    "t": 106.35000000000001,
-    "hits": 2.5
-   }
-  },
-  "storyStages": 70,
-  "maxPt": 48,
+  "econ": [],
+  "shopChecks": 0,
+  "storyStages": 74,
   "lag": {
-   "frames": 4437,
-   "avgFps": 58.9,
+   "frames": 4418,
+   "avgFps": 58.6,
    "p50": 16.7,
    "p99": 33.3,
-   "max": 83.3,
-   "over50": 3,
+   "max": 100,
+   "over50": 5,
    "spikesAt": [
-    "83.3ms after boss0",
-    "66.6ms after boss1",
-    "83.3ms after boss1"
+    "83.4ms after boss0",
+    "100ms after boss0",
+    "66.7ms",
+    "66.7ms",
+    "66.7ms after boss-dead2"
    ],
    "urgent": 0,
    "midPlayUrgent": 0,
    "loads": 9,
    "urgentLog": [],
    "hist": [
-    "menu start 1379",
-    "stage1 start 1463",
-    "stage2 start 1638",
-    "menu end 1800",
-    "stage1 end 1874",
-    "stage2 end 1893",
-    "boss start 8813",
-    "boss end 9013",
-    "stage3 start 19604 pit",
-    "stage3 end 19694 pit",
-    "athina start 41804 pit",
-    "athina end 41901 pit",
-    "boss3 start 64308 pit",
-    "boss3 end 64397 pit",
-    "boss2 start 86525 pit",
-    "endless start 86531 pit",
-    "boss2 end 86617 pit",
-    "endless end 86617 pit"
+    "menu start 1547",
+    "stage1 start 1626",
+    "stage2 start 1763",
+    "stage1 end 1979",
+    "menu end 1979",
+    "stage2 end 2022",
+    "boss start 8949",
+    "boss end 9225",
+    "stage3 start 19677 pit",
+    "stage3 end 19759 pit",
+    "athina start 42130 pit",
+    "athina end 42219 pit",
+    "boss3 start 64330 pit",
+    "boss3 end 64423 pit",
+    "boss2 start 86530 pit",
+    "endless start 86534 pit",
+    "boss2 end 86623 pit",
+    "endless end 86623 pit"
    ],
    "marks": [
-    "district0@1758",
-    "boss-call0@8811",
-    "boss0@8876",
-    "boss-dead0@14973",
-    "pit0@19643",
-    "district1@24112",
-    "boss-call1@31144",
-    "boss1@31175",
-    "boss-dead1@37247",
-    "pit1@41949",
-    "district2@46392",
-    "boss-call2@53459",
-    "boss2@53490",
-    "boss-dead2@59542",
-    "pit2@64236",
-    "district3@68725",
-    "boss-call3@75885",
-    "boss3@75925",
-    "boss-dead3@81976",
-    "pit3@86747"
+    "district0@1881",
+    "boss-call0@8997",
+    "boss0@9028",
+    "boss-dead0@15145",
+    "pit0@19787",
+    "district1@24245",
+    "boss-call1@31450",
+    "boss1@31497",
+    "boss-dead1@37527",
+    "pit1@42194",
+    "district2@46612",
+    "boss-call2@53697",
+    "boss2@53726",
+    "boss-dead2@59745",
+    "pit2@64335",
+    "district3@68793",
+    "boss-call3@75834",
+    "boss3@75864",
+    "boss-dead3@81922",
+    "pit3@86502"
    ],
-   "longtasks": 5,
-   "longtaskMax": 108,
+   "longtasks": 6,
+   "longtaskMax": 117,
    "longtaskList": [
-    "108ms@44",
-    "72ms@19412",
-    "61ms@33350",
-    "65ms@33412",
-    "65ms@33480"
+    "117ms@65",
+    "50ms@1498",
+    "67ms@19581",
+    "54ms@31278",
+    "76ms@31334",
+    "64ms@60729"
    ],
-   "inputSamples": 1104,
+   "inputSamples": 1092,
    "inputP50": 0.1,
    "inputP99": 0.4,
-   "inputMax": 3.5,
+   "inputMax": 3,
    "errs": []
   }
  },
- "avg": 56.17147531717781
+ "avg": 0
 }

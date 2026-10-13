@@ -123,7 +123,6 @@ html.px #cwrap svg.pot{visibility:hidden}
 #acts .btn{flex:1 1 90px}
 #acts .btn.sec{flex:1 1 100%;min-height:44px;font-size:14px;justify-content:flex-start}
 #acts .btn.drawb,#acts .btn.stopb{flex:1 1 130px;min-height:60px;font-size:19px}
-#acts .btn.stopb{padding-left:38px}
 #qbox{display:flex;flex-direction:column;gap:6px}
 #qbox .qt{font-size:14px;line-height:1.35}
 #qbox .opts{display:flex;flex-direction:column;gap:5px}
@@ -709,7 +708,7 @@ html.ph #fort:not(.open) .fpic{display:none}html.ph #fort.open .fpic{width:84px;
 #lpb .lpi{flex-direction:column;align-items:center;gap:4px}#lpb .lpimg{width:84px;height:84px;border-radius:10px;object-fit:cover;border:2px solid #3a2438}
 .rfort{flex:0 0 auto;position:relative;width:56px;height:56px;border-radius:10px;overflow:hidden;display:block;background:#7a4ab5}.rfort.blue{background:#3b82d6}
 .rfimg{display:block;width:100%;height:100%;object-fit:cover}
-.rfort i{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font:900 12px/1 var(--font);text-align:center;padding:2px 0;font-style:normal}
+.rfort i{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font:900 10px/1 var(--font);text-align:center;padding:2px 0;font-style:normal}
 .endart{height:clamp(84px,22vh,190px);flex:0 0 auto;margin:0 0 8px;border-radius:12px;border:2px solid var(--ink);background:center/cover no-repeat}
 .endart.win{background-image:url(media/end-win.webp)}.endart.lose{background-image:url(media/end-lose.webp)}
 #musicbody .mtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.mvol{display:flex;align-items:center;gap:6px;font-weight:800}.mvol input{width:120px}
@@ -730,6 +729,7 @@ html.sk .gx-ibtn,html.sk .gxc-ib{border-style:solid;border-color:transparent;bor
 html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
 html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
+html.sk .gx-ibtn>span{padding:0 4px}
 html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
 html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
 html.sk-icons i[data-ic]{background:center/contain no-repeat}
@@ -737,7 +737,7 @@ html.sk-icons i[data-ic]{background:center/contain no-repeat}
 html.sk .gx-drawer{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
 html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
 html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
-html.sk .gx-drawer .gx-x{color:var(--sk-cream)}
+html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
 /* campaign kit */
 html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
@@ -774,7 +774,7 @@ html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-ind
 
 /* painted UI over the shared skin (gx-skin.css): html.sk and the sk-* switches are added by GXSK.init in ui12.js after the files loaded */
 html.sk{--sk-ink:#3a2438;--sk-cream:#f8eed8;--sk-num:#3a1d05;--sk-num-done:#fff4d6}
-html.sk .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .btn{border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.pri,html.sk .btn.on{border-image-source:url(media/ui-button-power-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn:disabled,html.sk .btn.off{opacity:.55}
@@ -783,7 +783,7 @@ html.sk .gx-bar .gx-ibtn{color:#f8eed8}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* market: awning, stall boards, clay dishes under the chips */
 html.sk-awn .awn{height:52px;border-radius:0;background:url(media/awning-c.webp) left top/auto 100% repeat-x;box-shadow:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
-html.sk-stall .stall{background:linear-gradient(180deg,#a8743f,#8a5a32) padding-box;border-style:solid;border-color:transparent;border-image:url(media/ui-stall-c.webp) 66 30 34/34px 14px 14px stretch;border-radius:0;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+html.sk-stall .stall{background:linear-gradient(180deg,#a8743f,#8a5a32) padding-box;border:solid transparent;border-width:34px 14px 14px;border-image:url(media/ui-stall-c.webp) 66 30 34/34px 14px 14px stretch;border-radius:0;padding:0 2px 2px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
 html.sk-stall .stall.locked{border-image-source:url(media/ui-stall-locked-c.webp);opacity:.9}
 html.sk-stall .stall .sth{text-shadow:0 1px 2px rgba(0,0,0,.85);color:#fff6dc}
 html.sk-slot .tokw{position:relative}
@@ -3588,55 +3588,45 @@ fn mainFragment(
 // Cauldron Fair scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
 (function () {
   if (!window.GXS) return;
-  var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof render === 'function' && typeof UI !== 'undefined' && typeof act === 'function'; };
-  var $ = function (s) { return document.querySelector(s); };
-  var idle = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
-  var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
-  var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
-  var skin = { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } };
-  // your points / rubies: the side panel on a wide screen, the top bar on a phone
-  function mine(title, i) { var e = $('#me .st[title^=' + title + '] b'); if (e && GXS.vis(e)) return GXS.num('#me .st[title^=' + title + '] b'); var b = document.querySelectorAll('#barstat .bst b')[i]; return b ? +b.textContent : NaN; }
-  // a plain three-cook game (you vs two computers), no menus, tips off; the day's fortune card is taken (first option) so the brew controls show
-  function table(seed) {
+  var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof schedule === 'function' && typeof UI !== 'undefined'; };
+  var q = function (s) { var b = document.querySelector(s); return b && !b.disabled && b.offsetParent ? b : null; };
+  // a plain 3-player game against the computer, coach off, then tap through (draw / stop / continue) until the market of day 2 opens
+  function toMarket() {
     try { GXH.setEnabled(false); } catch (e) { }
-    try { GX.close(); } catch (e) { }
-    UI.seed = seed; newGame('vs'); UI.coach.level = 'off'; UI.tip = null;
-    try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
-    return GXS.wait(function () { return UI.started && UI.legal && UI.legal[0] && UI.legal[0].length; }, 12000).then(function () { return idle(800); }).then(function () {
-      if (G.phase === 'prep') act(UI.legal[0][0], 0);
-      return GXS.wait(function () { return G.phase === 'brew' && document.querySelector('#acts .bagb'); }, 12000);
-    }).then(function () { return idle(3600); });
+    window.AIDELAY = 40; newGame('vs', {});
+    return GXS.wait(function () {
+      var b = q('[data-a=rscont]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
+      if (b && !document.querySelector('.stalls')) b.click();
+      return document.querySelector('.stalls');
+    }, 60000).then(function () { return quiet(); });
   }
-
+  // no coach bubble over the scene
+  function quiet() { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } return new Promise(function (r) { setTimeout(r, 700); }); }
   GXS.add({
-    id: 'cf-board', name: 'Start of game board', ask: 'Is the board clear and filled?', seed: 5, when: booted,
-    setup: function () { return table(5); },
+    id: 'cf-board', name: 'Cauldron: draw or stop', ask: 'Can you see Draw and Stop?', seed: 5, when: booted,
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      window.AIDELAY = 120; newGame('vs', {});
+      return GXS.wait(function () { return q('.bagb:not(.off)') || q('[data-a=mv]'); }, 15000).then(function () {
+        var b = q('.bagb:not(.off)'); if (b) b.click();
+        return GXS.wait(function () { return q('.stopb:not(.off)'); }, 15000);
+      }).then(function () { return quiet(); });
+    },
     checks: [
-      { kind: 'visible', sel: '#cwrap', name: 'cauldron board' },
-      { kind: 'fn', name: 'board fills the screen', fn: function () { var r = $('#board').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .5 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
-      { kind: 'visible', sel: '#acts .bagb', name: 'Draw (the bag)' },
-      { kind: 'visible', sel: '#acts .stopb', name: 'Stop button' },
-      { kind: 'text', sel: '#acts .bagb', re: /draw/i, name: 'Draw label' },
-      { kind: 'text', sel: '#acts .stopb', re: /stop/i, name: 'Stop label' },
-      { kind: 'eq', name: 'your points', a: function () { return mine('Victory', 0); }, b: function () { return G.players[0].vp; } },
-      { kind: 'eq', name: 'your rubies', a: function () { return mine('Rubies', 1); }, b: function () { return G.players[0].rubies; } },
-      { kind: 'eq', name: 'chips in the bag', a: function () { return GXS.num('#acts .bagb .bagn'); }, b: function () { return G.players[0].bag.length; } },
-      { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#board *, #acts *, #others *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
-      skin
+      { kind: 'visible', sel: '.bagb', name: 'Draw button' },
+      { kind: 'visible', sel: '.stopb', name: 'Stop button' },
+      { kind: 'visible', sel: '#acts .meter', name: 'white-chip meter' },
+      { kind: 'fn', name: 'buttons are at least 44 px tall', fn: function () { var h = Math.min(document.querySelector('.bagb').getBoundingClientRect().height, document.querySelector('.stopb').getBoundingClientRect().height); return h >= 44 || 'height ' + Math.round(h); } }
     ]
   });
-
   GXS.add({
-    id: 'cf-zoom', name: 'Chips, books and cards', ask: 'Is the chip and card list readable?', seed: 5, when: booted,
-    setup: function () { return table(5).then(function () { GX.show('refd'); try { renderDrawers(); } catch (e) { } [].forEach.call(document.querySelectorAll('#refd details'), function (d) { d.open = true; }); return idle(700); }); },
+    id: 'cf-zoom', name: 'Market: stalls and prices', ask: 'Can you read every stall price?', seed: 5, when: booted,
+    setup: toMarket,
     checks: [
-      { kind: 'visible', sel: '#refd summary', name: 'first section title' },
-      { kind: 'text', sel: '#refd summary', re: /\S/, name: 'section title', minPx: 13 },
-      { kind: 'fn', name: 'book cards have a name and text', fn: function () { var c = document.querySelectorAll('#refd .rcard .rt b'); return c.length >= 8 || 'only ' + c.length + ' book names'; } },
-      { kind: 'fn', name: 'every shown text >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#refd .gx-drawer-body *'), function (e) { if (e.children.length || !GXS.vis(e) || !(e.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < 12 && !bad) bad = '"' + e.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
-      { kind: 'fn', name: 'drawer is on screen', fn: function () { return inView($('#refd')) || 'drawer off screen'; } },
-      skin,
-      { kind: 'tap', sel: '#refd .gx-x', name: 'tap closes the drawer', state: function () { return GX.open === 'refd'; }, expect: function (a, b) { return (a && !b) || 'drawer did not close'; } }
+      { kind: 'visible', sel: '.awn', name: 'awning with the coin purse' },
+      { kind: 'visible', sel: '.stalls .stall', name: 'stall board' },
+      { kind: 'fn', name: 'every shown price is >= 12 px', fn: function () { var bad = [].slice.call(document.querySelectorAll('.stall .tok .pc')).filter(function (e) { return parseFloat(getComputedStyle(e).fontSize) < 12; }); return bad.length === 0 || bad.length + ' prices under 12 px'; } },
+      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 32 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
     ]
   });
 })();

@@ -1,6 +1,6 @@
 /* painted UI over the shared skin (gx-skin.css): html.sk and the sk-* switches are added by GXSK.init in ui12.js after the files loaded */
 html.sk{--sk-ink:#3a2438;--sk-cream:#f8eed8;--sk-num:#3a1d05;--sk-num-done:#fff4d6}
-html.sk .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .btn{border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.pri,html.sk .btn.on{border-image-source:url(media/ui-button-power-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn:disabled,html.sk .btn.off{opacity:.55}
@@ -9,7 +9,7 @@ html.sk .gx-bar .gx-ibtn{color:#f8eed8}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* market: awning, stall boards, clay dishes under the chips */
 html.sk-awn .awn{height:52px;border-radius:0;background:url(media/awning-c.webp) left top/auto 100% repeat-x;box-shadow:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
-html.sk-stall .stall{background:linear-gradient(180deg,#a8743f,#8a5a32) padding-box;border-style:solid;border-color:transparent;border-image:url(media/ui-stall-c.webp) 66 30 34/34px 14px 14px stretch;border-radius:0;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+html.sk-stall .stall{background:linear-gradient(180deg,#a8743f,#8a5a32) padding-box;border:solid transparent;border-width:34px 14px 14px;border-image:url(media/ui-stall-c.webp) 66 30 34/34px 14px 14px stretch;border-radius:0;padding:0 2px 2px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
 html.sk-stall .stall.locked{border-image-source:url(media/ui-stall-locked-c.webp);opacity:.9}
 html.sk-stall .stall .sth{text-shadow:0 1px 2px rgba(0,0,0,.85);color:#fff6dc}
 html.sk-slot .tokw{position:relative}
