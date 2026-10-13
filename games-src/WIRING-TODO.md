@@ -2,24 +2,25 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
+Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | sands-of-qamar | 31 | 0 |
 | hollowbough | 19 | 1 |
 | rampart-and-vine | 18 | 4 |
-| lantern-dive | 11 | 0 |
 | nebula-aces | 11 | 0 |
+| lantern-dive | 11 | 0 |
 | crown-city-smash | 7 | 0 |
 | shipwreck-isle | 6 | 3 |
 | tidewake | 5 | 0 |
 | cauldron-fair | 4 | 0 |
 | doorkick-dungeon | 3 | 4 |
 | sunglaze | 3 | 0 |
+| thornbound | 3 | 0 |
 | final-approach | 2 | 0 |
-| kaiten-kitchen | 2 | 0 |
 | short-fuse | 2 | 0 |
+| kaiten-kitchen | 2 | 0 |
 
 ## sands-of-qamar
 
@@ -110,24 +111,6 @@ Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of parchment with a grey stone outline, single object, centred, plain  |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of parchment with a thin grey stone edge and a small vine green diamond at the left end, ce |
 
-## lantern-dive
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `icon-cross` | a small hand-painted icon of a red sea-glass cross mark, bold, readable at 24 px, single object, centred, plai |
-| Wave 3 Wave 3 | `icon-tick` | a small hand-painted icon of a green sea-glass tick mark, bold, readable at 24 px, single object, centred, pla |
-| Wave 3 Wave 3 (16:9) | `ui-seat` | a small blank brass diving-helmet badge plate, wider than tall, centre empty, single object, centred, plain fl |
-| Wave 3 Wave 3 (3:4) | `card-face-coral` | a blank playing card face in cream paper with a thin coral pink-red border and tiny bubbles in the corners, mi |
-| Wave 3 Wave 3 (3:4) | `card-face-kelp` | a blank playing card face in cream paper with a thin green border and tiny bubbles in the corners, middle empt |
-| Wave 3 Wave 3 (3:4) | `card-face-lantern` | a blank playing card face in cream paper with a thin brass border and tiny bubbles in the corners, middle empt |
-| Wave 3 Wave 3 (3:4) | `card-face-sunstar` | a blank playing card face in cream paper with a thin golden yellow border and tiny bubbles in the corners, mid |
-| Wave 3 Wave 3 (3:4) | `card-face-tide` | a blank playing card face in cream paper with a thin blue border and tiny bubbles in the corners, middle empty |
-| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
-
 ## nebula-aces
 
 3D: none
@@ -145,6 +128,24 @@ Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
 | Wave 3 Wave 3 (16:9) | `ship-warden` | a angular armoured wedge gunship with a stepped bridge, weapon pylons and twin drives, dark gunmetal hull with |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a single flat interface element, no spaceships, no vehicles, no scene, no background art: a small pointed spee |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of smoked indigo glass with a thin brushed steel edge and a small cyan diamond at the left  |
+
+## lantern-dive
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 | `icon-cross` | a small hand-painted icon of a red sea-glass cross mark, bold, readable at 24 px, single object, centred, plai |
+| Wave 3 Wave 3 | `icon-tick` | a small hand-painted icon of a green sea-glass tick mark, bold, readable at 24 px, single object, centred, pla |
+| Wave 3 Wave 3 (16:9) | `ui-seat` | a small blank brass diving-helmet badge plate, wider than tall, centre empty, single object, centred, plain fl |
+| Wave 3 Wave 3 (3:4) | `card-face-coral` | a blank playing card face in cream paper with a thin coral pink-red border and tiny bubbles in the corners, mi |
+| Wave 3 Wave 3 (3:4) | `card-face-kelp` | a blank playing card face in cream paper with a thin green border and tiny bubbles in the corners, middle empt |
+| Wave 3 Wave 3 (3:4) | `card-face-lantern` | a blank playing card face in cream paper with a thin brass border and tiny bubbles in the corners, middle empt |
+| Wave 3 Wave 3 (3:4) | `card-face-sunstar` | a blank playing card face in cream paper with a thin golden yellow border and tiny bubbles in the corners, mid |
+| Wave 3 Wave 3 (3:4) | `card-face-tide` | a blank playing card face in cream paper with a thin blue border and tiny bubbles in the corners, middle empty |
+| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of weathered sea-chart paper with a brass outline, single object, cent |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of weathered sea-chart paper with a thin brass edge and a small sea teal diamond at the lef |
 
 ## crown-city-smash
 
@@ -216,6 +217,16 @@ Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
 
+## thornbound
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
+
 ## final-approach
 
 3D: none
@@ -225,15 +236,6 @@ Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
 
-## kaiten-kitchen
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of washi paper with a lacquered red wood outline, single object, centr |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
-
 ## short-fuse
 
 3D: none
@@ -242,3 +244,12 @@ Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
 |---|---|---|
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
+
+## kaiten-kitchen
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of washi paper with a lacquered red wood outline, single object, centr |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
