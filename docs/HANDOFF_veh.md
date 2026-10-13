@@ -4,7 +4,7 @@
 Setup in a fresh container: parts lib (`curl -o ld/c.zip https://library.ldraw.org/library/updates/complete.zip; unzip -q -d ld/lib ld/c.zip`),
 `pip install scipy pyfqmr`, `python3 -m http.server 8766 &`, `tools/build.sh vveh --local`, `node tools/ld/ld_dump.js http://127.0.0.1:8766/local_dbg.html?fast=1 ld/ours.json`.
 OMR file: `curl -o ld/omr/<set>-1.mpd https://library.ldraw.org/library/omr/<set>-1.mpd`. The full OMR list is ld/dl/omr_sets.tsv (git-ignored; scrape library.ldraw.org/omr/sets?page=1..62).
-1. `python3 tools/ld/ld2garage.py ld/omr/<s>.mpd ld/out/v<s> --only "<set> - truck" --yaw 2`. If size [w,d] has w > d, use --yaw 1 (or 3 if the shot shows it backwards).
+1. `python3 tools/ld/ld2garage.py ld/omr/<s>.mpd ld/out/v<s> --only "<set> - truck" --yaw 2`. Pick the yaw with `python3 tools/ld/ldfront.py <mpd>` (front from the parts; facing-1: the old "w > d -> --yaw 1" rule turned 1991/3180/4208/621/6633 backwards). vehcv.sh does this in auto mode.
 2. `python3 tools/ld/vehsrc.py <s> ld/out/v<s>.json "<Name>" <Kind> <perk> top acc han` writes src/98ld_v_<s>.js (data + GB_PC registration + GAR_SETS preset t_v<s with _>).
    Valid perks: armor drift heal luck refill shield slip start.
 3. Add it to src/MODELS locally (do NOT commit MODELS, ORDER or MODULES.md: build-7 owns them), `tools/build.sh vveh --local`.
@@ -51,3 +51,8 @@ then 6553 6571 6581 6594 6431 6473 6481 6484 6545 3056 6406 4016 30283 30284 200
 - Setup gotcha: in a fresh container, add all src/98ld_v_*.js missing from src/MODELS locally (`git update-index --assume-unchanged src/MODELS`), build, run ld_dump.js before vehcv.sh (ld2garage needs ld/ours.json).
 - tRides "car rod" in the log = the ride didn't load (shot shows the default car); rerun until it is gone.
 ## Next: 4016 (GitHub mirror), more Classic Town/City cars from the OMR list.
+
+## facing-1 (2026-10-13): driver + ride facing fixed at the root (docs/FACING.md)
+- Driver: src/98sz_ride_scale.js SZ_add always seats the drvM figure facing -z (the front), one stud behind the 'stw' brick. Never derive it from stw r.
+- Ride: front must be -z. tools/ld/ldfront.py = the part-based front; vehcv.sh auto uses it and WARNs when a manual yaw disagrees. Wrongly converted modules are
+  turned at load via LD_FACE in src/98ld_import.js (add the model id there instead of reconverting). Audit: tools/ld/tFacing.js -> tools/ld/facing.py.

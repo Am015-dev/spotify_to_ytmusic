@@ -12,9 +12,14 @@ GB_PC.drvM={n:'Minifig driver',w:2,d:2,h:9,ic:'🧑',hide:1};
 // marker scales them ×RSZ.rk (2: 4 studs at 2× = the 8-wide Speed Champions width, a car next to traffic). Their cockpits are closed canopies: no driver.
 RSZ.rk=2;GB_PC.szR={n:'Racers scale',w:1,d:1,h:1,ic:'🏁',hide:1};
 function SZ_k(B){let k=1;for(const b of B||[]){const t=b&&(b.t||b[0]);if(t==='drvM')return RSZ.k;if(t==='szR')k=RSZ.rk}return k}
-// the driver sits behind the steering wheel ('stw', r 2 = facing -z like the LDraw sets, r 0 = +z), 3 plates under it
-function SZ_add(B){if(!Array.isArray(B)||!B.length||SZ_k(B)>1)return B;const w=B.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');const A=B.slice();
- if(w){const r=w.r&2?2:0;A.push({t:'drvM',x:w.x,z:r?w.z+1:w.z-2,y:w.y-3,r,m:0,c:'#0055bf'})}else A.push({t:'drvM',x:-1,z:-1,y:-99,r:2,m:0,c:'#0055bf',hide:1});return A}
+// the driver sits behind the steering wheel, 3 plates under it, facing the ride's front.
+// facing-1 (Alex 2026-10-13: "in some cars the driver sits wrong direction"): the figure took its yaw from the 'stw' brick (r 2 -> drvM r 2), but drvM r 2
+// faces +z, the ride's REAR (r 0 faces -z = the front of every ride: the converter's yaw puts the LDraw front at -z, as the hand-built cars), and the 'stw'
+// brick's yaw is arbitrary (a symmetric box: the calibration cannot tell its turns apart). Now the driver always faces -z with his hands at the wheel
+// (cell one stud behind it), and an old drvM (saved garage copies) is replaced, so saved rides get the fixed driver too.
+function SZ_add(B){if(!Array.isArray(B)||!B.length||B.some(b=>b&&b.t==='szR'))return B;const A=B.filter(b=>!(b&&b.t==='drvM')),w=A.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');
+ if(w)A.push({t:'drvM',x:w.x,z:w.z+1,y:w.y-3,r:0,m:0,c:'#0055bf'});else{const d=B.find(b=>b&&b.t==='drvM'&&b.y>-90);// no wheel (6522 bike): the module's own rider, turned to the front
+  A.push(d?Object.assign({},d,{r:0}):{t:'drvM',x:-1,z:-1,y:-99,r:0,m:0,c:'#0055bf',hide:1})}return A}
 // figure only (the set has its own seat): true minifig height 5 studs (3.0 units; the 'drv' part is 0.83 of that and has a seat box)
 GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);const tm=[],tl=[];GB_figGeo(GB_figGet(),tm,tl,true);
  const s=1.5*(typeof SC_S!=='undefined'&&SC_S&&SC_S.drv?SC_K.drv:1),k=RSZ.fig;
@@ -26,8 +31,10 @@ RSZ.rac=S=>!!(S&&S.grp==='racers');const SZ_rac=B=>Array.isArray(B)&&B.length&&S
 for(const S of GAR_SETS)if(RSZ.rac(S)){const c=S.car;S.car=function(){return SZ_rac(c.apply(this,arguments))};S.ms=2}
 for(const S of GAR_SETS)if(!RSZ.rac(S)&&RSZ.mini(S)){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
 // saved copies of these rides (bricks stored before this fix) get the driver too
-G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?(S.ms===2?SZ_rac(B):SZ_add(B)):B})(G9C_bricks);
-gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=S.ms===2?SZ_rac(t.gbB):SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
+// facing-1: a saved copy of a ride the loader now turns (LD_FACE, 98ld_import.js) was stored the wrong way round: turn it once (marker 'fcT')
+const SZ_face=(S,B)=>S&&LD_FACE.has(String(S.id).slice(2))&&Array.isArray(B)&&B.length&&!B.some(b=>b&&b.t==='fcT')?LD_turn(B):B;
+G9C_bricks=(f=>function(S,fm){let B=f.apply(this,arguments);if(fm==='car')B=SZ_face(S,B);return fm==='car'&&S&&S.ms?(S.ms===2?SZ_rac(B):SZ_add(B)):B})(G9C_bricks);
+gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);t.gbB=SZ_face(S,t.gbB);if(S&&S.ms)t.gbB=S.ms===2?SZ_rac(t.gbB):SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
 // the ride scale: uniform, no width squeeze for brick rides; driver height checks use the same k
 GB_attach=(f=>function(g,bricks){const r=f.apply(this,arguments);try{if(g&&g.userData){g.userData.szK=SZ_k(bricks);g.userData.szB=!!(bricks&&bricks.length)}}catch(e){}return r})(GB_attach);
 SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(ud.szB||ud.szK>1))return f.apply(this,arguments);SC_fold(ud);
