@@ -76,3 +76,7 @@ html.sk .gxh-a-top .gxh-arr{top:-14px;transform:rotate(-90deg)}
 html.sk .gxh-a-bottom .gxh-arr{bottom:-14px;transform:rotate(90deg)}
 html.sk .gxh-a-left .gxh-arr{left:-17px;transform:rotate(180deg)}
 html.sk .gxh-a-right .gxh-arr{right:-17px;transform:rotate(0deg)}
+/* look check: crew tiles are wider than wire tiles; keep the frame's shape instead of stretching it (81% distortion) */
+html.sk-wire .tile.crew{background-size:auto 100%,100% 100%;background-repeat:no-repeat;background-position:center}
+/* look check: story speaker name readable on the painted panel (was 1.98:1) */
+html.sk .gxc-sc-name{color:#1d140c;text-shadow:0 0 3px #fff8e6,0 0 1px #fff8e6}
