@@ -10,6 +10,8 @@ if(TQ){
  try{menuTrack=ROAMCFG.track||'grand'}catch(e){}  // the menu backdrop builds the same track free roam needs: built once, not twice
  ldPrewarm=async function(){};SM_upload=async function(){};P2_warm=function(){};warmTextures=function(){};
  {const r0=composer.render.bind(composer);composer.render=function(){let st='';try{st=state}catch(e){}if(st==='loading'||LD.busy||TQ.nodraw&&!TQ.draw)return;return r0.apply(this,arguments)}}
+ // &draw=0: no NPC portraits (the first one, Hilde's tutorial face, cost 2.6 s of canvas emoji/font set-up in headless Chromium; nobody sees it)
+ if(TQ.nodraw){try{avatar=function(){return'data:,'}}catch(e){}}
  if(TQ.nodraw){const rr=renderer.render.bind(renderer);renderer.render=function(){if(!TQ.draw)return;return rr.apply(this,arguments)}}
  // &draw=0 (headless tools): no pictures at all except __tq.shot() (software GL needs ~10 s for the first frame's shaders)
  const TQS={ready:false,t0:performance.now(),tReady:0,log:[],st:[]};ldSet=(f=>function(a,lab){try{const L=TQS.st,l=lab||'';if(!L.length||L[L.length-1][1]!==l)L.push([Math.round(performance.now()-TQS.t0),l])}catch(e){}return f.apply(this,arguments)})(ldSet);
