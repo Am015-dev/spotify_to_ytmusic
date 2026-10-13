@@ -32,7 +32,10 @@ async function drive(p,cdp,{ch=[],secs=90,out,tag,shots={},wpExtra=null,stopLaps
   idx=Math.max(idx,bi);if(idx>=W.length-2&&stopLaps<=1&&!W.loop)idx=W.length-2;
   const look=Math.min(W.length-1,idx+Math.max(3,Math.round(V.sp/3.2))),tw=W[look%W.length],dx=tw[0]-V.p[0],dz=tw[2]-V.p[2],fh=Math.hypot(V.F[0],V.F[2])||1;
   const cross=(V.F[2]*dx-V.F[0]*dz)/fh,dot=(V.F[0]*dx+V.F[2]*dz)/fh,ang=Math.atan2(cross,dot); // >0: target is to the LEFT (x-left convention: right = F x up)
-  const steer=Math.abs(ang)<.06?0:ang>0?-1:1;await h.set('bxL',steer<0);await h.set('bxR',steer>0);await h.set('bxB',Math.abs(ang)>.9&&V.sp>16);
+  const steer=Math.abs(ang)<.06?0:ang>0?-1:1;await h.set('bxL',steer<0);await h.set('bxR',steer>0);
+  // brake like a player before a corner: heading change over the next ~30 m of course vs speed
+  let turn=0;{const a=W[Math.min(W.length-1,idx+2)],c=W[Math.min(W.length-1,idx+10)],d=W[Math.min(W.length-1,idx+18)];if(a&&c&&d){const h1=Math.atan2(c[0]-a[0],c[2]-a[2]),h2=Math.atan2(d[0]-c[0],d[2]-c[2]);turn=Math.abs(Math.atan2(Math.sin(h2-h1),Math.cos(h2-h1)))}}
+  await h.set('bxB',(Math.abs(ang)>.9&&V.sp>16)||(turn>.45&&V.sp>24)||(turn>.9&&V.sp>16));
   for(const k in shots)if(!taken[k]&&shots[k](s)){taken[k]=1;await shot(p,`${out}/${tag}_${k}.png`)}
   info.push([+s.m.t.toFixed(2),...V.p,V.sp,V.g?1:0,V.boat?1:0,idx]);await sleep(70)}
  await h.clear();return{s,info,taken}}
