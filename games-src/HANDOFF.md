@@ -4,6 +4,13 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+
+## Story bubble + painted plate fix (13 Oct 2026): source done, only 1 of 15 deployed
+- Shell: `gx-skin.css` speech bubble is a 9-slice (`22 62 34 30 fill`), `gx-campaign.css` scene/boss/result/sheet never scroll sideways, `?scn=story-scene` registered in `gx-campaign.js`. All painted buttons use `30 42 fill/14px Npx` (vertical caps, were `0 42` = stretched on tall buttons). Short Fuse nameplate/rack, Thornbound sheet head, Doorkick dock frame, Crown `#choice` fixed in their skin/layout css.
+- `look-check.js` has two new checks (`panels`: scrollbar for decoration-only overflow, severe on x; `plates`: 9-slice/100% 100% distortion, >25% warn, >40% severe) and a `story-scene` screen. Calibrated: old final-approach build = 2 severe, fixed = 0.
+- LIVE: cauldron-fair only. The other 14 are built from fixed sources but NOT deployed: full sweeps here take 20-60 min and failed under CPU load (final-approach phone-check slow 926ms; thornbound 375x553 bulb finger 4px off mid-spring; short-fuse help bubble covers target; crown phone-check browser crash; doorkick 1/24 sweep game; kaiten sweep ran >1 h). Not yet checked whether they also fail on the old build. Next: `python3 games-src/scripts/build-all.py --deploy <slug>` one game at a time on an idle machine (Crown needs `GAME_MS=420000`), then `look-check.js --baseline --game <slug>`, add-update (`--scn story-scene`).
+- Known art issue (needs new art): Short Fuse `wire-tile-frame-c.webp` (100x240) is stretched onto 52x69 tiles. Sunglaze top bar content overflows 69 px at 1366 wide (hidden scrollbar, buttons cut).
+
 ## START HERE — orchestrator hand-off (13 Oct 2026, 21:00 UTC)
 Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BRIEF-TEMPLATE.md` into every new worker brief.
 - **Deploy gate (owner, 13 Oct):** `build-all.py --deploy <slug>` = phone-check + scenarios + look check + QUICK sweep. Full sweep only `--full` (engine/rules changes).
