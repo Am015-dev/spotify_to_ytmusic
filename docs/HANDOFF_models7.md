@@ -22,3 +22,13 @@ Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuK
 - Athens start flip (if it reproduced): own it or route it (driving/feel → Opus worker).
 
 ## Status
+- 2026-10-13 ~15:00: v90j ON HOLD, NOT sent to review (coordinator rule: hold if it is a v90j regression vs v90i).
+  Athens start is upside down (whole world rendered inverted, car moving 46-50 km/h, first wall hit at f=130) in BOTH final runs:
+  docs/shots/v90j/ath_start_flip_run1.jpg, ath_start_flip_run2.jpg. v90i at the same moment: normal street, 0 km/h (docs/shots/v90i/phone_ath_start.jpg).
+  Athens walls/min: final run 2.97, rerun 3.47 (v90i 1.49, v90g 1.98). Frankfurt 1.49 (v90i 0.5).
+  The first v90j tPlay (BEFORE the facing-1 merge + veh-3 rides + 📍GO/build-up commits) had Athens 1.98 walls/min, 0 % stuck; its start shot was overwritten.
+  Changes since that run: facing-1 (src/98sz_ride_scale.js SZ_add, src/98ld_import.js LD_FACE/LD_turn), veh-3's 21 rides in MODELS, 98ba build-up timing,
+  99c 📍 GO, 98gz LOADING. Prime suspect: facing-1 (rides turned 180°; size-1's earlier Athens flip came from 98sz/JU, docs/HANDOFF_models4.md 18:55).
+  NEXT: bisect with the same tPlay (CITIES=ath MODE=phone MIN=2, ~30 min): build at b40e79b6/bd48e47e (pre-facing) vs 445cad61 vs HEAD; or revert the facing
+  merge locally and rerun. Route to facing-1 (session_01A8fqEaDzr9wqqGDEcwCYe4) if it is theirs. Then REVIEW (GRID docs/shots/v90j/GRID.jpg) → changelog → READY.
+- build-10 stood down after this note.
