@@ -1,6 +1,27 @@
 [
  {
   "date": "2026-10-13",
+  "game": "crown",
+  "title": "Clearer score chips and bigger Got it",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons.",
+   "Tap SMASH! over the city to use your dice",
+   "Cards for sale are painted cards on the board: hold to read, tap to buy",
+   "Your power cards sit along the top of the board",
+   "Stay or yield opens in the middle of the board",
+   "The side panel is smaller: just status and advice",
+   "Star and bolt numbers on the player chips are darker on a pale plate and no longer clipped",
+   "The Got it button on help bubbles is a bigger tap target"
+  ],
+  "check": "Start a game and look at the chips at the top: star and bolt numbers"
+ },
+ {
+  "date": "2026-10-13",
   "game": "cauldron",
   "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
   "items": [
@@ -67,25 +88,6 @@
    "Top bar, menus and buttons use the workshop kit"
   ],
   "check": "Look at the table and the fuse strip"
- },
- {
-  "date": "2026-10-13",
-  "game": "crown",
-  "title": "Play it on the board",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out",
-   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
-   "Hearts, energy and stars fly to the chips as painted icons.",
-   "Tap SMASH! over the city to use your dice",
-   "Cards for sale are painted cards on the board: hold to read, tap to buy",
-   "Your power cards sit along the top of the board",
-   "Stay or yield opens in the middle of the board",
-   "The side panel is smaller: just status and advice"
-  ],
-  "check": "Roll, keep a die, tap SMASH!, then hold a card and tap it to buy"
  },
  {
   "date": "2026-10-13",
