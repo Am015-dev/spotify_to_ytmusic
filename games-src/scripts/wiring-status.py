@@ -16,6 +16,8 @@ def text(g):
         H[g] = t
     return H[g]
 PFX = {}
+# files wired through names built in code that the scan cannot see: games-src/wiring-manual.json {game: [names]}
+MANUAL = json.load(open('games-src/wiring-manual.json')) if os.path.exists('games-src/wiring-manual.json') else {}
 def prefixes(g):
     # file names built in code: 'media/pc-'+id, `media/pc-${id}.webp`, MEDIA+'camp-'+k ...
     if g not in PFX:
@@ -24,7 +26,8 @@ def prefixes(g):
     return PFX[g]
 def wired(g, n, ext):
     t = text(g)
-    if f'{n}.{ext}' in t: return True
+    if f'{n}.{ext}' in t or f'{n}-c.{ext}' in t or f'{n}-k.{ext}' in t: return True   # -c = cropped 9-slice copy, -k = keyed copy (crop-kit.py)
+    if n in MANUAL.get(g, ()): return True
     if any(n.startswith(x) and len(x) >= 3 for x in prefixes(g)): return True
     return ext == 'webp' and 'media/' in t and bool(re.search(r"['\"`/]" + re.escape(n) + r"['\"`]", t))
 todo = collections.defaultdict(list); m3 = collections.defaultdict(list); cnt = collections.Counter()
