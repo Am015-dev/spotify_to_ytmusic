@@ -9,8 +9,10 @@
 // dismisses it, and the rules cards (2-4, <= 20 words, a picture each) open from "How does this work?".
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs'),path=require('path');
-const html=fs.readFileSync(__dirname+'/tidewake.html');
-const GAMES=+(process.argv[2]||20);const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||3);
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 2 games per size = 4 games
+let URL;
+const GAMES=+(process.argv[2]||(QUICK?2:20));const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||3);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
 const totals={games:0,taps:0,hint:0,phases:{},bubbles:{},bulbs:0,bulbNull:0,bulbFollowed:0,rulesOpened:0,tipsOffGames:0,rot:0};
@@ -20,12 +22,11 @@ const GLOW='.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .b
 async function playGame(browser,W,H,gi){
   const tag=W+'x'+H+' g'+gi;
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const m=/^\/media\/[\w.-]+\.webp$/.test(u.pathname)&&path.join(__dirname,'../../../games/tidewake',u.pathname);if(m&&fs.existsSync(m))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(m)});r.fulfill({status:200,contentType:'text/html',body:html})});   // painted kit served too, so the sweep runs with the skin on
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
-  p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon|Fetch API cannot load/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
+  p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
   const twoD=process.argv[5]==='3d'?false:process.argv[5]==='2d'?true:gi%4!==0;                       // most games on the 2D chart (fast), every 4th on the real 3D board
-  await p.goto('https://gns.test/?phone=1'+(twoD?'&2d':''),{timeout:90000});await sleep(1100);
+  await p.goto(URL+'?phone=1'+(twoD?'&2d':''),{timeout:90000});await sleep(1100);
   const np=2+gi%3,anim=gi%2===0;const exp=gi%3===1||gi%7===3?['rift','cannon','wave','maelstrom']:gi%4===2?['cannon','rift']:[];
   const tipsOn=gi%5!==4;
   await p.evaluate(([np,gi,exp,anim,seed])=>{try{localStorage.clear()}catch(e){}
@@ -197,8 +198,7 @@ async function playGame(browser,W,H,gi){
 
 // every phase has a step (title <= 4 words, text <= 20) and 2-4 rules cards (<= 20 words, a picture), plus 2+ general cards
 async function staticCheck(b){const ctx=await b.newContext({viewport:{width:390,height:763},isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const m=/^\/media\/[\w.-]+\.webp$/.test(u.pathname)&&path.join(__dirname,'../../../games/tidewake',u.pathname);if(m&&fs.existsSync(m))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(m)});r.fulfill({status:200,contentType:'text/html',body:html})});   // painted kit served too, so the sweep runs with the skin on
-  const p=await ctx.newPage();await p.goto('https://gns.test/?phone=1&2d',{timeout:90000});await sleep(900);
+  const p=await ctx.newPage();await p.goto(URL+'?phone=1&2d',{timeout:90000});await sleep(900);
   const R=await p.evaluate(()=>({steps:Object.entries(HLP_STEPS).map(([k,v])=>({k,t:v.title,x:v.text,pic:!!(v.pic&&v.pic())})),rules:HLP_RULES.map(r=>({ph:r.phase||null,t:r.title,x:r.text,pic:!!(r.pic&&r.pic())}))}));
   const phases=R.steps.map(s=>s.k);const sc={phases:phases.length,steps:R.steps.length,rules:R.rules.length};
   for(const s of R.steps){if(wc(s.t)>4)note('static','step '+s.k+' title over 4 words: '+s.t);if(wc(s.x)>20)note('static','step '+s.k+' text over 20 words: '+s.x);if(!s.pic)note('static','step '+s.k+' has no picture')}
@@ -207,7 +207,7 @@ async function staticCheck(b){const ctx=await b.newContext({viewport:{width:390,
   for(const r of R.rules){if(wc(r.x)>20)note('static','rules card over 20 words: '+r.t+': '+r.x);if(wc(r.t)>5)note('static','rules card title over 5 words: '+r.t);if(!r.pic)note('static','rules card without a picture: '+r.t)}
   const bad=R.rules.map(r=>r.ph).filter(ph=>ph&&!phases.includes(ph));if(bad.length)note('static','rules for unknown phases: '+bad.join());
   await ctx.close();return sc}
-(async()=>{const b=await PW.chromium.launch({args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const T=Date.now();
+(async()=>{URL=await gx.url('tidewake',{file:__dirname+'/tidewake.html'});const b=await PW.chromium.launch({args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const T=Date.now();
   const SC=await staticCheck(b);console.log('help kit: '+SC.phases+' phases, '+SC.steps+' coach steps, '+SC.rules+' rules cards');
   const jobs=[];for(const [W,H] of SIZES)for(let g=0;g<GAMES;g++)jobs.push([W,H,g]);
   let ji=0;const res=[];

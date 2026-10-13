@@ -3,6 +3,8 @@
 // Fails on: page errors, horizontal scroll, a hand card or seat off screen, a seat covering a trick card, the table collapsed, a glowing card that cannot be tapped after turning.
 const { chromium } = require('playwright');
 const path = require('path');
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const FILE = path.resolve(__dirname, 'lantern-dive.html'), N = +process.argv[2] || 6;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -28,7 +30,7 @@ async function one(browser, gi) {
   const page = await ctx.newPage(); const errs = [], issues = new Set();
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
   try {
-    await page.goto('file://' + FILE); await sleep(900);
+    await page.goto(URL); await sleep(900);
     const np = [4, 3, 5, 2, 4, 5][gi % 6], mission = [1, 2, 3, 5, 9, 17][gi % 6];
     await page.evaluate(`AIDELAY=120;UI.seed=${gi * 31 + 5};newGame('vs',{np:${np},mission:${mission},kind:'log'})`);
     const step = async () => {   // a few real moves on whatever glows
@@ -57,6 +59,7 @@ async function one(browser, gi) {
   return { gi, errs, issues: [...issues] };
 }
 (async () => {
+  URL = await gx.url('lantern-dive', { file: FILE });
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const res = []; let next = 0;
   const worker = async () => { while (next < N) { const g = next++; const r = await one(browser, g); res.push(r); console.log((r.errs.length || r.issues.length ? 'FAIL ' : 'ok   ') + 'rotate game ' + g + (r.errs.length ? ' ERR ' + [...new Set(r.errs)].slice(0, 2).join(' | ') : '') + (r.issues.length ? ' ISSUES ' + r.issues.slice(0, 5).join(' | ') : '')); } };

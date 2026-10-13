@@ -5,8 +5,10 @@
 // round-end counts (tap to hurry), Play again. Rotations happen mid-game in some games.
 const PW = require(process.env.PW || 'playwright');
 const fs = require('fs'), path = require('path');
-const html = fs.readFileSync(path.join(__dirname, 'kaiten.html'));
-const N = +(process.argv[2] || 20), SIZES = (process.argv[3] || '390x763,375x553').split(',').map(s => s.split('x').map(Number)), SEED0 = +(process.argv[4] || 1), FAST = process.argv[5] === '1';
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 2 games per size = 4 games
+let URL;
+const N = +(process.argv[2] || (QUICK ? 2 : 20)), SIZES = (process.argv[3] || '390x763,375x553').split(',').map(s => s.split('x').map(Number)), SEED0 = +(process.argv[4] || 1), FAST = process.argv[5] === '1';
 let rs = 12345; const R = () => (rs = (rs * 1664525 + 1013904223) >>> 0) / 4294967296;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const LIB = `(() => {
@@ -36,7 +38,6 @@ const LIB = `(() => {
 async function game(b, gi, [W, H]) {
   const seed = SEED0 + gi, tag = `g${gi}@${W}x${H}`; rs = seed * 7919 + 13;
   const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA });
-  await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort(); const mf = path.join(__dirname, '..', '..', '..', 'games', 'kaiten-kitchen', u.pathname); if (/^\/media\//.test(u.pathname) && fs.existsSync(mf)) return r.fulfill({ status: 200, contentType: 'image/webp', body: fs.readFileSync(mf) }); r.fulfill({ status: 200, contentType: 'text/html', body: html }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000); const errs = [], fails = [];
   p.on('pageerror', e => errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) errs.push('console ' + m.text().slice(0, 160)); });
   const fail = m => { if (!fails.includes(m)) fails.push(m); };
@@ -44,7 +45,7 @@ async function game(b, gi, [W, H]) {
   const ev = s => p.evaluate(s);
   const stats = { turns: 0, rounds: 0, twin: 0, hints: 0, hurry: 0, rot: 0, board: 999 };
   try {
-    await p.goto('https://gns.test/'); await p.waitForTimeout(1200); await p.evaluate(LIB);
+    await p.goto(URL); await p.waitForTimeout(1200); await p.evaluate(LIB);
     await p.evaluate(s => { try { localStorage.clear(); } catch (e) { } UI.seed = s; }, seed);
     if (FAST) await p.evaluate(() => { AIDELAY = 120; });
     let c = await ev(`__sw.btn('[data-a=play]')`); if (!c) { fail('no Play button'); throw 0; } await tap(c.x, c.y); await p.waitForTimeout(400);
@@ -167,6 +168,7 @@ async function game(b, gi, [W, H]) {
   return { tag, fails, stats };
 }
 (async () => {
+  URL = await gx.url('kaiten-kitchen', { file: path.join(__dirname, 'kaiten.html') });
   const b = await PW.chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   let bad = 0; const t0 = Date.now();
   for (let gi = 0; gi < N; gi++) for (const sz of SIZES) {

@@ -1,7 +1,7 @@
 // Phone check: no AI. Plays every published game on a phone-sized mobile browser in 6 scenarios and prints a table.
 // Run all:  NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/phone-check.js
 // One game: NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/phone-check.js sunglaze-next [more slugs]
-// Env: PORT (8097), JOBS (parallel games, default 3), GAME_MS (per-game limit, default 180000).
+// Env: GX_URL (shared server, set by build-all.py; else a private one over GAMES_DIR), JOBS (parallel games, default 3), GAME_MS (per-game limit, default 180000).
 // Output: games-src/scripts/phone-check-results.md and phone-check-shots/<game>/<scenario>.png
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 const { chromium } = require('playwright');
@@ -12,7 +12,8 @@ const GAMES = process.env.GAMES_DIR ? path.resolve(process.env.GAMES_DIR) : path
 const OUT_DIR = process.env.PC_OUT_DIR ? path.resolve(process.env.PC_OUT_DIR) : __dirname;
 const SHOTS = path.join(OUT_DIR, 'phone-check-shots');
 const OUT = path.join(OUT_DIR, 'phone-check-results.md');
-let PORT = +process.env.PORT || 8097;
+const gx = require('./gx-serve.js');
+let BASE = '';
 const JOBS = +process.env.JOBS || 3;
 const GAME_MS = +process.env.GAME_MS || 180000;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
@@ -221,17 +222,19 @@ async function audit(page, st, tag) {
   if (tag !== 'start') for (const w of a.wordy || []) st.wordy.add(w);
   if (tag !== 'start' && a.board !== null && a.board < 55) st.smallBoard.add(tag + ' ' + a.board + '%');
   if (a.hscroll) st.hscroll.add(tag + ' ' + a.sw + '>' + a.iw);
+  // the painted skin must not change any button / bar / panel box by more than 2 px (shell/gx-skin.js GXSK.audit measures skin on vs off)
+  if (st.skinCheck) { const k = await page.evaluate('window.GXSK ? GXSK.audit() : null').catch(() => null); if (k) for (const m of k.moved) st.skinMoved.add(m.replace(/ \[.*$/, '') + (m.match(/\[(.*)\]/) ? ' [' + m.match(/\[(.*)\]/)[1].split(' ').slice(0, 2).join(' ') + ']' : '')); }
 }
 
 async function runScenario(browser, slug, sc, deadline) {
-  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), smallBoard: new Set(), errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
+  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), smallBoard: new Set(), skinMoved: new Set(), skinCheck: sc.id === 'portrait' || sc.id === 'small', errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
   const ctx = await browser.newContext({ viewport: { width: sc.start.w, height: sc.start.h }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   page.on('pageerror', e => st.errors.push(String(e.message || e).split('\n')[0].slice(0, 120)));
   const dir = path.join(SHOTS, slug); fs.mkdirSync(dir, { recursive: true });
   const shot = async () => { try { await page.screenshot({ path: path.join(dir, sc.id + '.png'), scale: 'css' }); } catch (e) {} };
   try {
-    const resp = await page.goto(`http://127.0.0.1:${PORT}/${slug}/`, { waitUntil: 'load', timeout: 30000 }).catch(e => { st.notes.push('load: ' + e.message.slice(0, 60)); return null; });
+    const resp = await page.goto(BASE + '/' + slug + '/', { waitUntil: 'load', timeout: 30000 }).catch(e => { st.notes.push('load: ' + e.message.slice(0, 60)); return null; });
     if (resp && resp.status() >= 400) st.notes.push('http ' + resp.status());
     await sleep(1500);
     await ensureLib(page);
@@ -287,6 +290,7 @@ function verdict(st) {
   if (st.off.size) r.push('off-screen: ' + [...st.off].slice(0, 2).join(', '));
   if (st.hscroll.size) r.push('hscroll ' + [...st.hscroll][0]);
   if (st.smallBoard.size) r.push('board <55% of screen: ' + [...st.smallBoard][0]);
+  if (st.skinMoved.size) r.push('skin changed box: ' + [...st.skinMoved].slice(0, 2).join(' | ') + (st.skinMoved.size > 2 ? ' +' + (st.skinMoved.size - 2) : ''));
   if (st.wordy.size) r.push('text >8 words: ' + [...st.wordy].slice(0, 2).join(', '));
   if (st.unresp > 1) r.push(st.unresp + ' dead taps');
   if (st.stuck) r.push('stuck 8s');
@@ -318,27 +322,20 @@ async function checkGame(slug) {
   return { slug, cells, errs: [...errs] };
 }
 
-async function serverUp() { try { await fetch(`http://127.0.0.1:${PORT}/`); return true; /* any answer (a 404 is fine for a staging folder) */ } catch (e) { return false; } }
-
 (async () => {
   let games = listGames();
   const want = process.argv.slice(2);
   if (want.length) games = want;
-  let srv = null;
-  if (!process.env.PORT) PORT = await new Promise(r => { const t = require('net').createServer().listen(0, '127.0.0.1', () => { const q = t.address().port; t.close(() => r(q)); }); }); // free port: never reuse another run's server
-  for (let tries = 0; tries < 10 && !srv; tries++, PORT++) { // port may be held by a server for another dir: move on
-    const p = cp.spawn('python3', ['-m', 'http.server', String(PORT), '--directory', GAMES], { stdio: 'ignore' });
-    let dead = false; p.on('exit', () => { dead = true; });
-    for (let i = 0; i < 15 && !dead && !(await serverUp()); i++) await sleep(200);
-    if (!dead && await serverUp()) { srv = p; PORT--; } else p.kill();
-  }
-  if (!srv) throw new Error('could not start http server');
+  // one shared static server (games-src/scripts/gx-serve.js): build-all.py passes GX_URL; standalone runs start their own over GAMES_DIR + games/ for media
+  let own = null;
+  if (process.env.GX_URL) BASE = process.env.GX_URL.replace(/\/+$/, '');
+  else { own = await gx.startServer({ stage: GAMES }); BASE = own.base; }
   console.log('checking: ' + games.join(' '));
   const results = [], queue = [...games];
   await Promise.all(Array.from({ length: Math.min(JOBS, games.length) }, async () => {
     while (queue.length) { const g = queue.shift(); results.push(await checkGame(g).catch(e => ({ slug: g, cells: {}, errs: ['runner: ' + e.message] }))); }
   }));
-  if (srv) srv.kill();
+  if (own) await own.close();
   results.sort((a, b) => a.slug.localeCompare(b.slug));
   const short = c => !c ? '-' : c.ok ? 'PASS' : c.text.startsWith("couldn't") ? "couldn't start" : c.text.replace(/^FAIL /, 'FAIL: ').replace(/ \(\d+mv.*$/, '');
   let md = `# Phone check results\n\nGenerated ${new Date().toISOString()} by games-src/scripts/phone-check.js (mobile Chromium, DSF 3, touch). Scenarios: ${SCENARIOS.map(s => s.label).join(', ')}. Screenshots: games-src/scripts/phone-check-shots/<game>/<scenario>.png\n\n`;

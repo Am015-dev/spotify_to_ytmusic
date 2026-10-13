@@ -1,0 +1,96 @@
+{
+ "cards": {
+  "brass-beetle": "the Brass Beetle: a shiny brass clockwork beetle collectible, big and round, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "container-stack": "three stacked colourful shipping containers, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "harbor-crane": "a bright orange harbour gantry crane with a hanging container, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "lighthouse": "a red-and-white striped harbour lighthouse with a glowing lamp, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "tower-h": "a round tower hotel with a glowing neon ring near the top, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "brass-beetle": {
+   "element": "3D model: brass-beetle",
+   "why": "the collectible deserves a real object",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "brass-beetle.png",
+   "target": "games/crown-city-smash/models/brass-beetle.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "container-stack": {
+   "element": "3D model: container-stack",
+   "why": "cheap, instanced harbour filler",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "container-stack.png",
+   "target": "games/crown-city-smash/models/container-stack.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "harbor-crane": {
+   "element": "3D model: harbor-crane",
+   "why": "the Harbor space needs a recognisable prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "harbor-crane.png",
+   "target": "games/crown-city-smash/models/harbor-crane.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "lighthouse": {
+   "element": "3D model: lighthouse",
+   "why": "harbour landmark and a corner prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "lighthouse.png",
+   "target": "games/crown-city-smash/models/lighthouse.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "tower-h": {
+   "element": "3D model: tower-h",
+   "why": "a round silhouette and a night-time glow",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "tower-h.png",
+   "target": "games/crown-city-smash/models/tower-h.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "brass-beetle": "games/crown-city-smash/models/brass-beetle.glb",
+  "container-stack": "games/crown-city-smash/models/container-stack.glb",
+  "harbor-crane": "games/crown-city-smash/models/harbor-crane.glb",
+  "lighthouse": "games/crown-city-smash/models/lighthouse.glb",
+  "tower-h": "games/crown-city-smash/models/tower-h.glb"
+ }
+}

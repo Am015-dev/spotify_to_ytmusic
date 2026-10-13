@@ -6,7 +6,7 @@
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
 header{position:sticky;top:0;z-index:5;background:rgba(23,18,14,.96);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:grid;gap:8px}
 h1{font-size:1.2rem;margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}h1 small{color:var(--mut);font-weight:400;font-size:.85rem}
-h1 a{color:var(--acc);font-size:.85rem;font-weight:600;margin-left:auto;text-decoration:none}
+h1 a{color:var(--acc);font-size:.85rem;font-weight:600;text-decoration:none}h1 small+a{margin-left:auto}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:99px;padding:6px 14px;font:600 13px system-ui;cursor:pointer;min-height:36px}
 .chip[aria-pressed=true]{background:var(--acc);color:#2a1808;border-color:var(--acc)}
@@ -27,7 +27,7 @@ ul{margin:6px 0 2px;padding-left:18px;font-size:13px;color:var(--mut)}li{margin:
 .k{font:600 10px system-ui;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:4px}
 .empty{color:var(--mut);padding:30px 0;text-align:center}
 </style></head><body>
-<header><h1>Game status <small id="gen"></small><a href="index.html">&larr; Shelf</a></h1>
+<header><h1>Game status <small id="gen"></small><a href="next-wave.html" style="margin-left:0">Next wave &rarr;</a><a href="look/index.html" style="margin-left:0">Look check</a><a href="index.html" style="margin-left:0">&larr; Shelf</a></h1>
 <div class="chips" role="group" aria-label="Filter"><button class="chip" data-f="all" aria-pressed="true">All</button><button class="chip" data-f="miss" aria-pressed="false">Has missing</button><button class="chip" data-f="unw" aria-pressed="false">Not wired</button></div></header>
 <main id="m"><div class="empty">Loading&hellip;</div></main>
 <script>
@@ -36,6 +36,7 @@ let D=null,F='all';
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const dshort=s=>{const m=/^(\d{4})-(\d\d)-(\d\d)/.exec(s||'');return m?(+m[3])+' '+MON[m[2]-1]:''};
 const bar=(l,w,p)=>{const t=w+p;return `<div class="bar"><span>${l} <b>${w}/${t}</b></span><div class="track"><i style="width:${t?Math.round(w/t*100):0}%"></i></div></div>`};
+const nwl=g=>`<details><summary class="${g.nextwave?'m':'z'}"><a href="next-wave.html#g-${g.slug}" style="color:inherit;text-decoration:none">To make (next wave): ${g.nextwave||0}</a></summary></details>`;
 function draw(){
   let L=D.games.slice().sort((a,b)=>b.missing.length-a.missing.length||b.unwired.length-a.unwired.length||a.title.localeCompare(b.title));
   if(F==='miss')L=L.filter(g=>g.missing.length);if(F==='unw')L=L.filter(g=>g.unwired.length);
@@ -44,7 +45,7 @@ function draw(){
     const mk=g.missing.length?`<details><summary class="m">Still to make: ${g.missing.length}</summary><ul>${g.missing.map(x=>`<li><b>${esc(x.name)}</b><span class="k">${esc(x.kind)}</span><br>${esc(x.desc)}</li>`).join('')}</ul></details>`:`<details><summary class="z">Still to make: 0</summary></details>`;
     const uw=g.unwired.length?`<details><summary class="u">Made, not in game: ${g.unwired.length}</summary><ul>${g.unwired.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`:`<details><summary class="z">Made, not in game: 0</summary></details>`;
     return `<section class="g" data-slug="${g.slug}"><div class="top"><h2>${esc(g.title)}</h2><span class="ver">${esc(g.version)} &middot; ${esc(dshort(g.updated))}</span></div>${n}
-      <div class="bars">${bar('Paintings wired',g.paintings.wired,g.paintings.pushed)}${bar('3D models wired',g.models.wired,g.models.pushed)}</div>${mk}${uw}</section>`}).join(''):'<div class="empty">Nothing matches.</div>';
+      <div class="bars">${bar('Paintings wired',g.paintings.wired,g.paintings.pushed)}${bar('3D models wired',g.models.wired,g.models.pushed)}</div>${mk}${nwl(g)}${uw}</section>`}).join(''):'<div class="empty">Nothing matches.</div>';
 }
 document.querySelector('.chips').onclick=e=>{const b=e.target.closest('.chip');if(!b||!D)return;F=b.dataset.f;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));draw()};
 fetch('status.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{D=j;$('#gen').textContent='as of '+String(j.generated).slice(0,10);draw()}).catch(()=>{$('#m').innerHTML='<div class="empty">Could not load status.json.</div>'});

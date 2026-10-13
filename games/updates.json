@@ -1,23 +1,13 @@
 [
  {
   "date": "2026-10-13",
-  "game": "mainhattan",
-  "title": "Story map, 40 stages and real build choices",
+  "game": "tidewake",
+  "title": "Painted sea for Tidewake",
   "items": [
-   "Title, pause, garage, shop and story buttons are now painted plates",
-   "Settings card has a painted frame, header and rows",
-   "Run HUD sits in painted housings; hints in a speech bubble",
-   "Phone pause, DASH and EMP are painted round buttons",
-   "Story map stages sit on medallions: open, done, boss, locked",
-   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
-   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
-   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones",
-   "40 story stages plus 5 optional challenges on a painted route map: tap a stage to see its goal, stars and PLAY",
-   "Difficulty climbs a little every stage; bosses sit slightly above their stage",
-   "Pit stop: build paths, synergies, a heat budget, 6 to 8 upgrade slots, selling, boss picks",
-   "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back"
+   "The board sea is painted water tiles with a painted brass compass rose",
+   "Brass-and-teal buttons and bar"
   ],
-  "check": "STORY: tap a stage, then the pit stop after it"
+  "check": "Start a game: look at the water under the tiles and the compass in the middle."
  },
  {
   "date": "2026-10-13",
@@ -179,6 +169,26 @@
    "Radio phrase buttons and the Roll plate are painted"
   ],
   "check": "Open Flight and read the briefing; tap Roll"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "mainhattan",
+  "title": "Story map, 40 stages and real build choices",
+  "items": [
+   "Title, pause, garage, shop and story buttons are now painted plates",
+   "Settings card has a painted frame, header and rows",
+   "Run HUD sits in painted housings; hints in a speech bubble",
+   "Phone pause, DASH and EMP are painted round buttons",
+   "Story map stages sit on medallions: open, done, boss, locked",
+   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
+   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
+   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones",
+   "40 story stages plus 5 optional challenges on a painted route map: tap a stage to see its goal, stars and PLAY",
+   "Difficulty climbs a little every stage; bosses sit slightly above their stage",
+   "Pit stop: build paths, synergies, a heat budget, 6 to 8 upgrade slots, selling, boss picks",
+   "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back"
+  ],
+  "check": "STORY: tap a stage, then the pit stop after it"
  },
  {
   "date": "2026-10-13",

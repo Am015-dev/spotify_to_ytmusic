@@ -379,12 +379,12 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
    html.sk-stars (ui-star-*), html.sk-banner (ui-act-banner), html.sk-dark (dark panels: light ink). Game colours: --sk-ink, --sk-num, --sk-num-done. ===== */
-html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
+html.sk{--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;--sk-cream:#fbefd6}
 html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
 /* top bar + icon buttons */
 html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
-html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
-html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
 html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
 html.sk .gx-ibtn>span{padding:0 4px}
@@ -392,20 +392,18 @@ html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;displ
 html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
 html.sk-icons i[data-ic]{background:center/contain no-repeat}
 /* popups: parchment panel (9-slice) with a wooden title strip */
-html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
-html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+html.sk .gx-drawer{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
+html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
 html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
 html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
-html.sk .gx-drawer-body{padding:4px 4px 12px}
 /* campaign kit */
-html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
 html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
-html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
-html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
 html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
 html.sk .gxc-boss{border-color:transparent}
-html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;min-height:52px}
+html.sk .gxc-head{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208}
 /* story map nodes: painted medallions, the number (text) sits in the centre */
 html.sk .gxc-node{width:68px;height:68px}
 html.sk .gxc-disc{width:68px;height:68px;border:0;border-radius:0;background:url(media/ui-node-open.webp) center/contain no-repeat;box-shadow:none;color:var(--sk-num);text-shadow:0 1px 0 rgba(255,255,255,.45);font-size:22px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35))}
@@ -421,7 +419,7 @@ html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -442,6 +440,9 @@ html.sk .gx-ibtn svg,html.sk .gx-ibtn svg *{stroke:#3a1f0a}
 html.sk .gx-drawer-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-drawer-head.webp) center/auto 100% repeat-x #f3e3c4}
 html.sk .gx-drawer-head h2{text-shadow:none}
 html.sk .gx-bar>*:not(.gx-ibtn):not(.gx-sp){color:#5a2d0a!important}
+html.sk .gx-drawer{border-width:0}
+html.sk .gx-bar #prompt,html.sk .gx-bar #prompt.mine{color:#6e3205}
+html.sk .gx-ibtn>span{padding:0}
 
 :root{--ink:#3b2f2a;--paper:#f6ecd6;--paper2:#ecdcba;--wood:#a67c52;--wood2:#7c5636;--leaf:#5f8f4a;--gold:#e3b02e;--red:#b04a38;--gx-bg:#2c3b27;--gx-bar:#22301f;--gx-panel:#f6ecd6;--gx-ink:#3b2f2a;--gx-accent:#e3b02e;--gx-dock-w:clamp(330px,31vw,430px);--gx-bar-h:48px;
   --font:'Palatino Linotype','Book Antiqua',Palatino,'Iowan Old Style','Hoefler Text',Georgia,'DejaVu Serif',serif}
@@ -660,9 +661,9 @@ svg{display:block}
 .sc.hc{display:flex;align-items:center;gap:5px;padding:2px 4px 2px 2px;box-sizing:border-box;background:#f6ecd6;border:2px solid #3b2a1a;border-radius:8px;color:#2a1f19;text-align:left}
 .sc.hc .hct{position:relative;flex:0 0 auto;border-radius:4px;overflow:hidden}.sc.hc .hct svg text{display:none}
 .sc.hc .hcx{display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;flex:1}
-.sc.hc .hcn{font:700 11.5px/1.05 inherit;font-family:inherit;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#2a1f19}
-.sc.hc .cost{gap:3px;flex-wrap:nowrap}.sc.hc .ci b{font-size:11.5px;color:#2a1f19}
-.sc.hc .hcr{display:flex;align-items:center;justify-content:space-between;gap:4px}.sc.hc .hcp{display:inline-flex;align-items:center;gap:1px;font-size:11.5px;color:#2a1f19;flex:0 0 auto}.sc.hc .hcp b{font-size:11.5px;line-height:1}
+.sc.hc .hcn{font-weight:700;font-size:13px;line-height:1.05;font-family:inherit;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#2a1f19}
+.sc.hc .cost{gap:3px;flex-wrap:nowrap}.sc.hc .ci b{font-size:13px;color:#2a1f19}
+.sc.hc .hcr{display:flex;align-items:center;justify-content:space-between;gap:4px}.sc.hc .hcp{display:inline-flex;align-items:center;gap:1px;font-size:13px;color:#2a1f19;flex:0 0 auto}.sc.hc .hcp b{font-size:13px;line-height:1}
 .sc.hc.glow{margin-top:0}
 .sc.fan{transform:rotate(var(--rot,0deg));transform-origin:50% 140%}
 .resrow{background:linear-gradient(180deg,#8f6338,#6b4626);border:2px solid #3b2a1a;box-shadow:0 2px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2)}
@@ -807,6 +808,202 @@ html.ph-l .pcard .endart{height:22dvh}
 <div id="start" hidden></div>
 <div id="netbox" hidden></div>
 <div id="toast" role="status"></div>
+<script>
+/* GX scenarios: "spawn the requirement only". Open any game with  ?scn=<id>  and it skips menus / tutorial offers, seeds the RNG,
+   builds the exact engine state of ONE scenario directly (no playing through), shows a tiny "Test: <name>" tag and exposes
+   window.GXSCN = {id, name, ask, ready, checks}. `ask` is the one line the owner should try ("Tap SMASH over Downtown");
+   `checks` are the machine asserts the runner (scripts/scenario-test.js) runs at 390x763, 375x553 and 1366x768.
+   ?scn=list  ->  window.GXSLIST = [{id, name, ask, sizes}]  (no setup, used by the runner and the shelf).
+
+   A game registers its scenarios in ONE small file (scn.js) inlined right after this one and BEFORE the game scripts:
+     GXS.add({
+       id: 'dk-help-label',                         // unique, kebab-case, prefix = game
+       name: 'Tutorial: Help button',               // shown in the "Test:" tag
+       ask: 'Is the Help button label readable?',   // ONE line for the owner (8 words or fewer is best)
+       ls: { dkd_offer: '1' },                      // optional: localStorage seeded for this scenario (a private in-memory store: the player's saves are never touched)
+       seed: 7,                                     // optional RNG seed (default: hash of id)
+       sizes: 'all' | 'phone' | 'pc',               // optional, default all
+       when: () => window.G && window.UI,           // optional: wait until the game has booted (default: page loaded + 300 ms)
+       setup() { ...build the state directly... },  // may return a promise
+       checks: [ ... ]                              // see below
+     });
+   Checks (plain data + small functions; they run IN the page):
+     {kind:'visible', sel:'.fbtns .helpb', name:'Help button'}     exists, shown, inside the viewport, not covered by another element
+     {kind:'text', sel:'.fbtns .helpb', re:/help/i, name:'label'}   visible text matches re, font >= 12 px, not clipped, not transparent
+     {kind:'eq', name:'YOU total', a:() => dom number, b:() => engine number}   on-screen number equals the engine's
+     {kind:'tap', sel:'.fbtns .smash', name:'SMASH', state:() => any, expect:(before, after) => true|false|'why'}
+                                                                  the runner touch-taps the element; the engine state must then change as expected
+     {kind:'hold', sel:'#pshop .obc', ms:700, name:'hold a card', state:..., expect:...}   like tap, but the runner presses and holds ms (touch: CDP touchStart..touchEnd; pc: mouse hover); state is read WHILE held
+     {kind:'fn', name:'sound played', fn:() => true|false|'why'}   anything else
+   Universal asserts the runner adds to every scenario: no page error, no horizontal scroll, the Test tag shows, the board/game fills the screen. */
+(function () {
+  var q = new URLSearchParams(location.search), id = q.get('scn');
+  var S = window.GXS = { defs: [], on: !!id, id: id };
+  S.add = function (d) { S.defs.push(d); };
+  if (!id) return;   // normal play: the module is inert (one small object)
+
+  /* ---- seeded RNG (mulberry32) ---- */
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function seedRng(n) { var a = n >>> 0; Math.random = function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  S.seed = function (n) { seedRng(n); };
+  seedRng(hash(id));   // until the scenario's own seed is known, the run is already deterministic
+
+  /* ---- private storage: a scenario never reads or writes the player's saves ---- */
+  var mem = {}, store = { getItem: function (k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; }, setItem: function (k, v) { mem[k] = String(v); }, removeItem: function (k) { delete mem[k]; }, clear: function () { mem = {}; }, key: function (i) { return Object.keys(mem)[i] || null; } };
+  Object.defineProperty(store, 'length', { get: function () { return Object.keys(mem).length; } });
+  try { Object.defineProperty(window, 'localStorage', { configurable: true, get: function () { return store; } }); } catch (e) { }
+  S.store = store;
+  /* registration happens before the game scripts run, so the scenario's storage + seed are in place for the game's own boot */
+  S.add = function (d) { S.defs.push(d); if (d.id === id) { var ls = d.ls || {}; for (var k in ls) mem[k] = String(ls[k]); if (d.seed != null) seedRng(d.seed >>> 0); } };
+
+  /* ---- helpers for scenario files ---- */
+  S.vis = function (e) { if (!e) return false; var r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 3 && r.height > 3 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > .05 && !e.closest('[hidden]'); };
+  S.num = function (sel) { var e = document.querySelector(sel); return e ? +String(e.textContent).replace(/[^0-9.\-]/g, '') : NaN; };
+  S.wait = function (fn, ms) { return new Promise(function (res, rej) { var t0 = Date.now(); (function p() { var v; try { v = fn(); } catch (e) { } if (v) return res(v); if (Date.now() - t0 > (ms || 15000)) return rej(new Error('GXS.wait timed out: ' + String(fn).slice(0, 80))); setTimeout(p, 50); })(); }); };
+  S.click = function (sel) { var e = typeof sel === 'string' ? document.querySelector(sel) : sel; if (e) e.click(); return !!e; };
+  S.spy = function (obj, name) { var c = { n: 0, args: [] }, f = obj[name]; obj[name] = function () { c.n++; c.args.push([].slice.call(arguments).slice(0, 3)); return f && f.apply(this, arguments); }; return c; };
+
+  /* ---- list mode (no setup) ---- */
+  function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
+  function pub(d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all' }; }
+  function onload(fn) { if (document.readyState === 'complete') setTimeout(fn, 0); else addEventListener('load', function () { setTimeout(fn, 0); }); }
+  if (id === 'list') { onload(function () { window.GXSLIST = S.defs.map(pub); window.GXSCN = { id: 'list', ready: true }; }); return; }
+
+  /* ---- the "Test:" tag ---- */
+  function tag(d) {
+    var e = document.createElement('div'); e.id = 'gxscn-tag'; e.textContent = 'Test: ' + d.name;
+    e.style.cssText = 'position:fixed;left:4px;bottom:2px;z-index:2147483000;font:600 10px/1.2 system-ui,sans-serif;color:#fff;background:rgba(20,20,30,.62);padding:1px 6px;border-radius:8px;pointer-events:none;max-width:70vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+    document.body.appendChild(e);
+  }
+
+  /* ---- check engine (runs in the page; the runner drives the taps) ---- */
+  var saved = {};
+  function box(e) { var r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r }; }
+  function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
+    if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
+    var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    return ''; }
+  function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
+  S.step = function (i) {
+    var d = def(), c = d.checks[i], nm = c.name || c.sel || c.kind, f;
+    try {
+      if (c.kind === 'visible') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var w = onScreen(f.e); return w ? { ok: false, msg: nm + ' ' + w } : { ok: true }; }
+      if (c.kind === 'text') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var e = f.e, t = (e.innerText || e.textContent || '').trim(), cs = getComputedStyle(e), why = '';
+        if (c.re && !c.re.test(t)) why = 'text "' + t.slice(0, 30) + '" does not match ' + c.re; else if (!t && !e.querySelector('svg,img')) why = 'blank (no text, no icon)';
+        else if (parseFloat(cs.fontSize) < (c.minPx || 12)) why = 'font ' + cs.fontSize + ' under ' + (c.minPx || 12) + 'px';
+        else if (/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(cs.color) || +cs.opacity < .3) why = 'text transparent';
+        else if (e.scrollWidth > e.clientWidth + 2 && cs.overflow !== 'visible') why = 'label clipped (' + e.scrollWidth + '>' + e.clientWidth + ')';
+        else { var w2 = onScreen(e); if (w2) why = w2; }
+        return why ? { ok: false, msg: nm + ': ' + why } : { ok: true }; }
+      if (c.kind === 'eq') { var A = c.a(), B = c.b(); return A === B ? { ok: true } : { ok: false, msg: nm + ': screen ' + A + ' != engine ' + B }; }
+      if (c.kind === 'fn') { var r = c.fn(); return r === true ? { ok: true } : { ok: false, msg: nm + (typeof r === 'string' ? ': ' + r : ' failed') }; }
+      if (c.kind === 'tap' || c.kind === 'hold') { f = find(c); if (f.err) return { ok: false, msg: nm + ' ' + f.err }; var w3 = onScreen(f.e); if (w3) return { ok: false, msg: nm + ' ' + w3 };
+        saved[i] = c.state ? c.state() : null; var b = box(f.e); return c.kind === 'hold' ? { ok: true, hold: { x: b.x, y: b.y, ms: c.ms || 700 } } : { ok: true, tap: { x: b.x, y: b.y } }; }
+      return { ok: false, msg: 'unknown check kind ' + c.kind };
+    } catch (x) { return { ok: false, msg: nm + ' threw ' + String(x.message).slice(0, 100) }; }
+  };
+  S.after = function (i) {
+    var c = def().checks[i], nm = c.name || c.sel;
+    try { var now = c.state ? c.state() : null, r = c.expect ? c.expect(saved[i], now) : (JSON.stringify(saved[i]) !== JSON.stringify(now));
+      return r === true ? { ok: true } : { ok: false, msg: nm + ': tap did not ' + (typeof r === 'string' ? r : 'change the game as expected') + ' (' + JSON.stringify(saved[i]).slice(0, 60) + ' -> ' + JSON.stringify(now).slice(0, 60) + ')' };
+    } catch (x) { return { ok: false, msg: nm + ' threw ' + String(x.message).slice(0, 100) }; }
+  };
+  S.universal = function () {
+    var out = [], de = document.documentElement;
+    if (Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1) out.push('horizontal scroll ' + de.scrollWidth + '>' + innerWidth);
+    var t = document.getElementById('gxscn-tag'); if (!t || !t.textContent) out.push('Test tag missing');
+    return out;
+  };
+
+  /* ---- boot: wait for the game, seed, run setup, publish ---- */
+  onload(function () {
+    var d = def();
+    if (!d) { window.GXSCN = { id: id, ready: true, error: 'unknown scenario ' + id + ' (have: ' + S.defs.map(function (x) { return x.id; }).join(', ') + ')' }; return; }
+    tag(d);
+    S.wait(d.when || function () { return true; }, 20000).then(function () {
+      if (d.seed != null) seedRng(d.seed >>> 0);
+      return new Promise(function (r) { setTimeout(r, 300); });
+    }).then(function () { return d.setup && d.setup(); }).then(function () {
+      var pubD = pub(d); pubD.checks = d.checks.map(function (c) { return { kind: c.kind, name: c.name || c.sel || c.kind, sel: c.sel }; });
+      window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', checks: pubD.checks, ready: true };
+      try { if (parent !== window) parent.postMessage({ type: 'gxscn', id: d.id, name: d.name, ask: d.ask || '' }, '*'); } catch (e) { }
+    }).catch(function (e) { window.GXSCN = { id: d.id, name: d.name, ask: d.ask || '', ready: true, error: 'setup failed: ' + String(e && e.message || e).slice(0, 160), checks: [] }; });
+  });
+})();
+
+</script>
+<script>
+// Hollowbough scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
+(function () {
+  if (!window.GXS) return;
+  var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && typeof render === 'function' && typeof HB !== 'undefined'; };
+  var $ = function (s) { return document.querySelector(s); };
+  // a two-player game (you vs one computer), no menus, tips off, waiting at YOUR first turn
+  function table(seed) {
+    try { GXH.setEnabled(false); } catch (e) { }
+    try { GX.close(); } catch (e) { }
+    UI.seed = seed; UI.opt = { np: 2, level: 'normal', solo: 1 }; newGame('vs'); UI.fingerSeen = true; try { GXH.setEnabled(false); } catch (e) { }
+    return GXS.wait(function () { return UI.started && HB.actor(G) === 0 && !UI.animBusy && !UI.cards.length && document.querySelectorAll('#bd .hc').length; }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
+  }
+  var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
+  var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
+  var skin = { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } };
+  // make exactly one hand card playable: it goes first in the hand and you hold exactly its cost
+  function oneAffordable() {
+    var me = G.players[0], pick = null;
+    for (var i = 0; i < me.hand.length && !pick; i++) { var id = me.hand[i], c = cdef(id); if (HB.howOptions && true) { } me.res = { twig: 0, resin: 0, pebble: 0, berry: 0 }; for (var k in c.cost) if (k in me.res) me.res[k] = c.cost[k]; UI.mmc = null; if (myMoves().some(function (m) { return m.type === 'play' && m.card === id; })) pick = id; }
+    if (pick == null) throw new Error('no playable hand card for this seed');
+    me.hand.splice(me.hand.indexOf(pick), 1); me.hand.unshift(pick); UI.mmc = null; UI.hsx = 0; render();
+    return pick;
+  }
+
+  GXS.add({
+    id: 'hb-hand-chips', name: 'Hand chips: readable, tappable', ask: 'Tap the glowing hand chip', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { window.__pick = oneAffordable(); return new Promise(function (r) { setTimeout(r, 600); }); }); },
+    checks: [
+      { kind: 'visible', sel: '#bd .hc.glow', name: 'playable hand chip' },
+      { kind: 'text', sel: '#bd .hc .hcn', re: /\S/, name: 'chip name', minPx: 12 },
+      { kind: 'fn', name: 'every hand chip: text >= 12 px, nothing clipped', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bd .hc'), function (c) { [].forEach.call(c.querySelectorAll('.hcn,.hcr b,.hcp b'), function (e) { var px = parseFloat(getComputedStyle(e).fontSize); if (px < 12) bad = bad || e.textContent + ' ' + px + 'px'; if (e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible') bad = bad || 'clipped ' + e.textContent; }); var r = c.getBoundingClientRect(), t = c.querySelector('.hcx'); if (t && t.getBoundingClientRect().right > r.right + 1) bad = bad || 'text spills out of ' + c.getAttribute('aria-label'); }); return !bad || bad; } },
+      { kind: 'fn', name: 'first chip is fully inside the viewport', fn: function () { var e = document.querySelector('#bd .hc'); return inView(e) || 'chip off screen'; } },
+      { kind: 'fn', name: 'chip row is not under the buttons', fn: function () { var c = document.querySelector('#bd .hc').getBoundingClientRect(), a = [].filter.call(document.querySelectorAll('#acts button, #acts .btn'), GXS.vis).map(function (b) { return b.getBoundingClientRect(); }); var hit = a.filter(function (b) { return b.top < c.bottom - 2 && b.bottom > c.top + 2 && b.left < c.right && b.right > c.left; }); return !hit.length || 'a button covers the chips'; } },
+      { kind: 'tap', sel: '#bd .hc:not(.glow)', name: 'tap an unaffordable chip', state: function () { var m = G.players[0]; return { n: m.hand.length, city: m.city.length, log: G.logN }; }, expect: function (a, b) { return (a.n === b.n && a.city === b.city && a.log === b.log) || 'an unaffordable card changed the game'; } },
+      { kind: 'tap', sel: '#bd .hc.glow', name: 'tap the glowing chip', state: function () { var m = G.players[0]; return { n: m.hand.length, city: m.city.length, log: G.logN, sel: !!UI.sel }; }, expect: function (a, b) { return (b.sel || (b.log > a.log && b.n === a.n - 1)) || 'a playable card must be played (or ask how)'; } }
+    ]
+  });
+  var rgb = function (c) { var m = String(c).match(/[\d.]+/g) || [0, 0, 0]; return m.slice(0, 3).map(Number); };
+  var lum = function (c) { return .2126 * Math.pow(c[0] / 255, 2.2) + .7152 * Math.pow(c[1] / 255, 2.2) + .0722 * Math.pow(c[2] / 255, 2.2); };
+  var contrast = function (a, b) { var x = lum(rgb(a)), y = lum(rgb(b)); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+
+  GXS.add({
+    id: 'hb-board', name: 'Start of game board', ask: 'Is the board clear and filled?', seed: 7, when: booted,
+    setup: function () { return table(7); },
+    checks: [
+      { kind: 'visible', sel: '#bd', name: 'board' },
+      { kind: 'fn', name: 'board fills the screen', fn: function () { var r = document.querySelector('#bd').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .55 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
+      { kind: 'visible', sel: '#bd .hc', name: 'hand' },
+      { kind: 'visible', sel: '#acts .btn', name: 'Pass / Prepare buttons' },
+      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
+      { kind: 'fn', name: 'top line has contrast >= 3 against the bar', fn: function () { var e = document.querySelector('#prompt'), bar = document.querySelector('.gx-bar'), c = contrast(getComputedStyle(e).color, getComputedStyle(bar).backgroundColor); return c >= 3 || 'contrast ' + c.toFixed(1) + ' (' + getComputedStyle(e).color + ' on ' + getComputedStyle(bar).backgroundColor + ')'; } },
+      { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bd *, #prompt'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
+      skin
+    ]
+  });
+
+  GXS.add({
+    id: 'hb-zoom', name: 'Card zoom', ask: 'Is the big card readable?', seed: 8, when: booted,
+    setup: function () { return table(8).then(function () { openZoom('card:' + document.querySelector('#bd .hc').dataset.id); return new Promise(function (r) { setTimeout(r, 600); }); }); },
+    checks: [
+      { kind: 'visible', sel: '#zoom .zbox svg, #zoom .zbox canvas, #zoom .zbox img, #zoom .zbox .card', name: 'zoomed card' },
+      { kind: 'text', sel: '#zoom .zinfo b', re: /\S/, name: 'card name', minPx: 14 },
+      { kind: 'text', sel: '#zoom .zinfo p', re: /\S/, name: 'card text', minPx: 13 },
+      { kind: 'fn', name: 'zoom is on screen', fn: function () { var e = document.querySelector('#zoom .zbox'), r = e.getBoundingClientRect(); return (r.left >= -1 && r.right <= innerWidth + 1 && r.top >= -1 && r.bottom <= innerHeight + 1) || 'zoom box off screen ' + Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.right) + ',' + Math.round(r.bottom); } },
+      { kind: 'tap', sel: '#zoom .zbox', name: 'tap closes the zoom', state: function () { return !document.getElementById('zoom').hidden; }, expect: function (a, b) { return (a && !b) || 'zoom did not close'; } }
+    ]
+  });
+})();
+
+</script>
 <script>
 // ===== Board-first shell: dock toggle, sheet sizing, closable popups (drawers) =====
 const GX={key:'gx',open:null,
@@ -1328,20 +1525,42 @@ const GX={key:'gx',open:null,
 </script>
 <script>
 /* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
-   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays.
+   RULE: the skin never changes an element's layout box. Painted plates go on as background / border-image (border-width 0, the plate drawn
+   by border-image-width inside the element's own width, height and padding). GXSK.audit() proves it: it measures the visible buttons, bars and
+   panels with the skin on, takes every skin class off, measures again, puts them back, and lists each element whose box moved by more than 2 px.
+   phone-check.js runs it and fails the game on any entry. */
 (function () {
-  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  var H = document.documentElement, on = [], base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
   function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  function add(c) { if (on.indexOf(c) < 0) on.push(c); H.classList.add(c); }
+  var SEL = 'button,.gx-ibtn,.gxc-btn,.gxc-ib,.gxc-act,[role=button],.gx-bar,.gx-drawer,.gxc-sheet,.gxc-scene,.gxc-boss,.gxc-res,.gxc-head,.dlg,.gxc-sheet';
   window.GXSK = {
+    classes: function () { return on.slice(); },
+    audit: function (sel, tol) {
+      tol = tol == null ? 2 : tol; var els = [].filter.call(document.querySelectorAll(sel || SEL), function (e) { return e.offsetWidth > 0 && e.offsetHeight > 0; });
+      if (!on.length) return { skinned: false, n: els.length, moved: [] };
+      var st = document.createElement('style'); st.textContent = '*,*::before,*::after{transition:none!important;animation:none!important}'; document.head.appendChild(st);
+      var P = ['width','height','minWidth','minHeight','paddingTop','paddingRight','paddingBottom','paddingLeft','marginTop','marginRight','marginBottom','marginLeft','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','display','flex','fontSize','whiteSpace','boxSizing','fontWeight','letterSpacing','textAlign','justifyContent','alignSelf','maxWidth','overflow','textShadow','fontFamily'];
+      var cs = function (e) { var c = getComputedStyle(e), p = e.parentElement; return P.map(function (k) { return c[k]; }).concat([p ? p.offsetWidth + '/' + getComputedStyle(p).paddingLeft + '/' + getComputedStyle(p).borderLeftWidth : '']); };
+      var a = els.map(function (e) { return [e.offsetWidth, e.offsetHeight]; }), ca = els.map(cs), cl = on.slice();
+      cl.forEach(function (c) { H.classList.remove(c); }); void H.offsetWidth;
+      var b = els.map(function (e) { return [e.offsetWidth, e.offsetHeight]; }), cb = els.map(cs);
+      cl.forEach(function (c) { H.classList.add(c); }); void H.offsetWidth; st.remove();
+      var moved = [];
+      els.forEach(function (e, i) { if (!b[i][0] && !b[i][1]) return; var dw = a[i][0] - b[i][0], dh = a[i][1] - b[i][1];
+        if (Math.abs(dw) > tol || Math.abs(dh) > tol) moved.push((e.id ? '#' + e.id : e.tagName.toLowerCase()) + '.' + String(e.className && e.className.baseVal === undefined ? e.className : '').trim().split(/\s+/).slice(0, 2).join('.') + ' ' + (e.textContent || '').trim().slice(0, 14) + ' ' + b[i].join('x') + '->' + a[i].join('x') + ' [' + P.concat(['parent']).filter(function (k, j) { return ca[i][j] !== cb[i][j]; }).map(function (k) { var j = P.concat(['parent']).indexOf(k); return k + ':' + cb[i][j] + '>' + ca[i][j]; }).join(' ') + ']'); });
+      return { skinned: true, n: els.length, moved: moved };
+    },
     init: function (o) {
       o = o || {}; var extra = [];
       if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
       load(core, function (ok) {
         if (!ok) return;
-        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
-        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
-        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
-        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        add('sk'); if (o.dark) add('sk-dark');
+        load(extra, function () { if (o.map) add('sk-map'); if (o.stars) add('sk-stars'); if (o.banner) add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) add(cls); }); });
         if (o.cb) o.cb();
       });
     }
@@ -1915,7 +2134,7 @@ const GX={key:'gx',open:null,
   }
   var GXT = window.GXT = {
     version: 1, start: start, act: act, active: function () { return !!S && S.phase !== 'end'; }, running: function () { return !!S; }, current: function () { return S ? S.step : null; },
-    index: function () { return S ? S.i : -1; }, state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
+    index: function () { return S ? S.i : -1; }, goto: function (id) { if (!S) return false; for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) { clearVisuals(); enter(i); return true; } return false; },   /* test scenarios jump straight to a step (gx-scenario.js) */ state: state, skip: skip, stop: stop, next: next, relayout: relayout, lint: lint,
     status: status, isDone: function (g) { var s = status(g); return s.done || s.skipped; }, markDone: function (g) { mark(g, { done: 1, open: 0, step: 0 }); }, reset: function (g) { save(g, {}); try { localStorage.removeItem(key(g)); } catch (e) {} delete mem[g]; },
     menuHTML: menuHTML, label: label
   };
@@ -6713,7 +6932,7 @@ function sceneEls(R) {
 // ---------------------------------------------------------------- pictures for the rules cards (the game's own art)
 const HPX = 46;
 const HP = {
-  res: r => ic(r, HPX), worker: () => pawn(0, HPX - 6), back: () => backEl(34), point: () => ic('point', HPX), road: () => ic('road', HPX),
+  res: r => HBKit.resource(r, HPX), worker: () => pawn(0, HPX - 6), back: () => backEl(34), point: () => ic('point', HPX), road: () => ic('road', HPX),
   flag: () => ic('flag', HPX), star: () => ic('star', HPX), haven: () => ic('haven', HPX), deck: () => ic('deck', HPX), tree: () => ic('tree', HPX),
   season: i => HBKit.season(SEAS[i], HPX + 4),
   cost: () => costEl({ twig: 2, berry: 1 }, 24),

@@ -5,7 +5,7 @@
 <style>
 /* One full-bleed arcade screen: 16:9 letterboxed, or on a touch phone held upright a true portrait screen (vertical play area, ship at the bottom). HTML overlays for menus. */
 :root{
-  --void:#05030c; --ink:#e9e6ff; --dim:#8c86b8;
+  --void:#05030c; --ink:#e9e6ff; --dim:#9d97cc;
   --pink:#ff2d95; --cyan:#19e3ff; --amber:#ffb020; --strip:0px;
   --display:"Chakra Petch","Arial Narrow",system-ui,sans-serif;
   --mono:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -22,7 +22,7 @@ canvas{display:block;width:100%;height:100%;}
   background:linear-gradient(90deg,#05030cf2 0%,#05030cc0 55%,#05030c40 100%);}
 .ov.solid{background:#05030ce6}
 .ov .in{margin:auto 0;display:flex;flex-direction:column;align-items:flex-start;gap:clamp(5px,1.4vh,13px);max-width:100%;width:100%;}
-.eyebrow{font-family:var(--mono);font-size:clamp(11px,min(1.5vw,2.6vh),14px);letter-spacing:.24em;color:var(--cyan);text-transform:uppercase;}
+.eyebrow{font-family:var(--mono);font-size:clamp(11px,min(1.5vw,2.6vh),14px);letter-spacing:.24em;color:var(--cyan);text-transform:uppercase;margin-bottom:.4em;}
 h1{font-family:var(--display);font-weight:700;margin:0;line-height:.9;font-size:clamp(30px,min(7.4vw,11.5vh),84px);letter-spacing:.01em;
   color:var(--ink);text-shadow:3px 0 0 #ff2d95aa,-3px 0 0 #19e3ffaa;text-wrap:balance;}
 h1 span{color:var(--pink);text-shadow:0 0 18px #ff2d9599;}
@@ -71,7 +71,7 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
 #setm .sbody>*{flex:none}
 #setm h3{margin:12px 0 4px;font:italic 900 14px var(--display);letter-spacing:.12em;color:var(--yel);border-bottom:1px solid rgba(47,156,188,.35);padding-bottom:5px;text-transform:uppercase}
 #setm .seg,#setm .sl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:36px}
-#setm .seg>span,#setm .sl>span{font:italic 800 11px var(--display);letter-spacing:.14em;color:#8fb3c7;width:112px;flex:none;text-transform:uppercase}
+#setm .seg>span,#setm .sl>span{font:italic 800 11px var(--display);letter-spacing:.14em;color:#b4d2e2;width:112px;flex:none;text-transform:uppercase}
 #setm .seg button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:0 12px;min-height:34px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#0a2437;border:1px solid #28627a;color:#cfe6f5}
 #setm .seg button[aria-pressed="true"]{background:linear-gradient(90deg,#00c8ee,#8c55ff);border-color:transparent;color:#021018}
 #setm .seg button:focus-visible,#setm .go:focus-visible{outline:2px solid var(--yel);outline-offset:2px}

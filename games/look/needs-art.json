@@ -1,0 +1,2305 @@
+{
+ "generated": "2026-10-13T17:42:30.884Z",
+ "items": [
+  {
+   "game": "crown-city-smash",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 7.5,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/crown-city-smash/f2.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "crown-city-smash",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-drawer-head.webp is blurry: 1024x96 picture drawn at 3072x288 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 5.96,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/crown-city-smash/f5.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "crown-city-smash",
+   "check": "art",
+   "element": "btn primary button plate",
+   "sel": "button.btn.primary",
+   "issue": "Btn primary button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 1.79,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/crown-city-smash/f7.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game",
+    "pc:start",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "crown-city-smash",
+   "check": "art",
+   "element": "gxh ok button plate",
+   "sel": "button.gxh-ok",
+   "issue": "Gxh ok button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 2.06,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/crown-city-smash/f8.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "crown-city-smash",
+   "check": "art",
+   "element": "newsbtn button plate",
+   "sel": "button.newsbtn",
+   "issue": "Open the chronicle button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 11.94,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/crown-city-smash/f9.webp",
+   "sites": [
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "nebula-aces",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/nebula-aces/f1.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f0.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "images",
+   "element": "gx app plate",
+   "sel": "div.gx-app",
+   "issue": "Gx app art 72644c76-5d3e-4a65-8e5c-14c81b75876d is blurry: 1000x700 picture drawn at 3270x2289 px (3.3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f1.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "images",
+   "element": "modal plate",
+   "sel": "div#modal",
+   "issue": "Modal art title-phone.webp is blurry: 744x1334 picture drawn at 1277x2289 px (1.7x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f2.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "images",
+   "element": "gx app plate",
+   "sel": "div.gx-app",
+   "issue": "Gx app art ae74e6b6-107d-453e-8b7b-c75ccad2b250 is blurry: 1000x700 picture drawn at 2370x1659 px (2.4x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.68,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f3.webp",
+   "sites": [
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "images",
+   "element": "gx dock plate",
+   "sel": "aside.gx-dock",
+   "issue": "Gx dock art 65c352fc-5642-446c-b4ba-da2b93fa3d91 is stretched (box 410x716, picture 700x1000)",
+   "target_px": [
+    512,
+    1024
+   ],
+   "ratio": 0.57,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f4.webp",
+   "sites": [
+    "pc:start",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "art",
+   "element": "gxt b pri button plate",
+   "sel": "button.gxt-b.pri",
+   "issue": "Gxt b pri button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.29,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f5.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "phone:help",
+    "small:board",
+    "small:mid-game",
+    "small:help",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "art",
+   "element": "gxt b pulse button plate",
+   "sel": "button.gxt-b.pulse",
+   "issue": "Gxt b pulse button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.29,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f6.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "phone:help",
+    "small:board",
+    "small:mid-game",
+    "small:help",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "doorkick-dungeon",
+   "check": "art",
+   "element": "btn primary button plate",
+   "sel": "button.btn.primary",
+   "issue": "Btn primary button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 2.25,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/doorkick-dungeon/f7.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "shipwreck-isle",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/shipwreck-isle/f0.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "shipwreck-isle",
+   "check": "art",
+   "element": "gxt b pri button plate",
+   "sel": "button.gxt-b.pri",
+   "issue": "Gxt b pri button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.29,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/shipwreck-isle/f4.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "phone:help",
+    "small:board",
+    "small:mid-game",
+    "small:help",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "shipwreck-isle",
+   "check": "art",
+   "element": "gxt b button plate",
+   "sel": "button.gxt-b",
+   "issue": "Gxt b button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.29,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/shipwreck-isle/f5.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "phone:help",
+    "small:board",
+    "small:mid-game",
+    "small:help",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "shipwreck-isle",
+   "check": "art",
+   "element": "scen button plate",
+   "sel": "button.scen",
+   "issue": "Scen button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 2.44,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/shipwreck-isle/f6.webp",
+   "sites": [
+    "phone:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "spot plate",
+   "sel": "div.spot",
+   "issue": "Spot art ui-spot.webp is stretched (box 40x56, picture 128x160)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.71,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f6.webp",
+   "sites": [
+    "phone:board",
+    "small:board"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "tile red plate",
+   "sel": "div.tile.red",
+   "issue": "Tile red art tile-small.webp is cropped hard (36% cut off)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.65,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f7.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "tile blue plate",
+   "sel": "div.tile.blue",
+   "issue": "Tile blue art tile-sacred.webp is cropped hard (36% cut off)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.65,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f10.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "tile red plate",
+   "sel": "div.tile.red",
+   "issue": "Tile red art tile-oasis.webp is cropped hard (36% cut off)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.65,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f12.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-fakir.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f13.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "tile blue plate",
+   "sel": "div.tile.blue",
+   "issue": "Tile blue art tile-village.webp is cropped hard (36% cut off)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.65,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f14.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "tile red plate",
+   "sel": "div.tile.red",
+   "issue": "Tile red art tile-large.webp is cropped hard (36% cut off)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.65,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f16.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 7.5,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f18.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-fish.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f19.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-ivory.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f22.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-silk.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f23.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-spice.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f24.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "modal plate",
+   "sel": "div#modal",
+   "issue": "Modal art title-phone.webp is blurry: 744x1334 picture drawn at 2232x4002 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f25.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-pottery.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.2,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f26.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-qasra.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.16,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f27.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-nakhla.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.16,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f28.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-zarifa.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.16,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f29.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-drawer-head.webp is blurry: 1024x96 picture drawn at 3072x288 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 5.96,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f30.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-papyrus.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.41,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f31.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "mi plate",
+   "sel": "span.mi",
+   "issue": "Mi art good-wheat.webp is blurry: 192x192 picture drawn at 576x576 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.41,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f32.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-khanjar.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.6,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f33.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-sirra.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.6,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f34.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sands-of-qamar",
+   "check": "images",
+   "element": "dcard plate",
+   "sel": "button.dcard",
+   "issue": "Dcard art djinn-wahha.webp is blurry: 480x360 picture drawn at 1440x1080 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.6,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sands-of-qamar/f35.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "sunglaze",
+   "check": "art",
+   "element": "btn sm button plate",
+   "sel": "button.btn.sm",
+   "issue": "Easy · normal · hard button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.31,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/sunglaze/f0.webp",
+   "sites": [
+    "phone:start",
+    "pc:start",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "rampart-and-vine",
+   "check": "images",
+   "element": "top plate",
+   "sel": "header#top",
+   "issue": "Top art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 7.22,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/rampart-and-vine/f0.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "rampart-and-vine",
+   "check": "images",
+   "element": "scrim plate",
+   "sel": "div.scrim",
+   "issue": "Scrim art title-phone.webp is blurry: 768x1376 picture drawn at 2304x4128 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/rampart-and-vine/f1.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "rampart-and-vine",
+   "check": "art",
+   "element": "card frame",
+   "sel": "div.card",
+   "issue": "Card is drawn in flat CSS, no painting",
+   "target_px": [
+    512,
+    1024
+   ],
+   "ratio": 0.68,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/rampart-and-vine/f2.webp",
+   "sites": [
+    "pc:start",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help",
+    "pc:card-zoom"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "tile crew plate",
+   "sel": "div.tile.crew",
+   "issue": "Tile crew art wire-tile-frame-c.webp is stretched (box 56x73, picture 100x240)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.77,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f0.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "tile mine plate",
+   "sel": "div.tile.mine",
+   "issue": "Tile mine art wire-tile-frame-c.webp is blurry: 100x240 picture drawn at 300x720 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 0.76,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f1.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "plate plate",
+   "sel": "div.plate",
+   "issue": "Plate art ui-nameplate-c.webp is stretched (box 154x26, picture 139x56)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 5.91,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f2.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "plate plate",
+   "sel": "div.plate",
+   "issue": "Plate art ui-nameplate-c.webp is blurry: 139x56 picture drawn at 461x78 px (3.3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 5.91,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f3.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.13,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f4.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "tb plate",
+   "sel": "div#tb",
+   "issue": "Tb art table-workbench-phone.webp is blurry: 768x1376 picture drawn at 2304x4128 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.55,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/short-fuse/f5.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "plate mine plate",
+   "sel": "div.plate.mine",
+   "issue": "Plate mine art ui-nameplate-c.webp is stretched (box 111x26, picture 139x56)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.25,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f6.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "rp plate",
+   "sel": "div.rp",
+   "issue": "Rp art ui-fuse-track.webp is blurry: 1024x64 picture drawn at 3072x192 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 11.26,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f7.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "plate mine plate",
+   "sel": "div.plate.mine",
+   "issue": "Plate mine art ui-nameplate-c.webp is blurry: 139x56 picture drawn at 332x78 px (2.4x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 4.25,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f8.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "start plate",
+   "sel": "div#start",
+   "issue": "Start art title.webp is blurry: 1272x710 picture drawn at 3816x2130 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/short-fuse/f11.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "short-fuse",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-drawer-head.webp is blurry: 1024x96 picture drawn at 3072x288 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.42,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/short-fuse/f12.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "tidewake",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/tidewake/f3.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "tidewake",
+   "check": "images",
+   "element": "start plate",
+   "sel": "div#start",
+   "issue": "Start art title-phone.webp is blurry: 744x1334 picture drawn at 2232x4002 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/tidewake/f7.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "tidewake",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-drawer-head.webp is blurry: 1024x96 picture drawn at 3072x288 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 5.96,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/tidewake/f8.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "tidewake",
+   "check": "art",
+   "element": "gxh ok button plate",
+   "sel": "button.gxh-ok",
+   "issue": "Gxh ok button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.99,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/tidewake/f9.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "tidewake",
+   "check": "art",
+   "element": "button button plate",
+   "sel": "span.seg > button",
+   "issue": "Button button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.63,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/tidewake/f10.webp",
+   "sites": [
+    "phone:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "hollowbough",
+   "check": "images",
+   "element": "board plate",
+   "sel": "main#board",
+   "issue": "Board art table-woodland-phone.webp is blurry: 768x1376 picture drawn at 2304x4128 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.54,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/hollowbough/f2.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "hollowbough",
+   "check": "images",
+   "element": "start plate",
+   "sel": "div#start",
+   "issue": "Start art title-phone.webp is blurry: 744x1334 picture drawn at 2232x4002 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/hollowbough/f3.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "hollowbough",
+   "check": "art",
+   "element": "chipb button plate",
+   "sel": "button.chipb",
+   "issue": "Chipb button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.36,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/hollowbough/f4.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game",
+    "pc:start",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/thornbound/f4.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "images",
+   "element": "board plate",
+   "sel": "main#board",
+   "issue": "Board art table-court-phone.webp is blurry: 768x1376 picture drawn at 2304x4128 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.71,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/thornbound/f5.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-sheet-head.webp is stretched (box 334x52, picture 1024x96)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.42,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/thornbound/f7.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-sheet-head.webp is blurry: 1024x96 picture drawn at 1002x156 px (1.6x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6.42,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/thornbound/f8.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "images",
+   "element": "tkey picture",
+   "sel": "img.tkey",
+   "issue": "Tkey art title-phone.webp is blurry: 744x1334 picture drawn at 1277x2289 px (1.7x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/thornbound/f10.webp",
+   "sites": [
+    "phone:start"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "art",
+   "element": "gxh ok button plate",
+   "sel": "button.gxh-ok",
+   "issue": "Gxh ok button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 2.04,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/thornbound/f11.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "art",
+   "element": "tbtn story button plate",
+   "sel": "button.tbtn.story",
+   "issue": "Tbtn story button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 5.4,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/thornbound/f12.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "thornbound",
+   "check": "art",
+   "element": "tbtn button plate",
+   "sel": "button.tbtn",
+   "issue": "Tbtn button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 5.4,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/thornbound/f13.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f0.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "images",
+   "element": "ttl bg dim picture",
+   "sel": "img.ttl-bg.dim",
+   "issue": "Ttl bg dim art e7090daf-bdb8-4a79-a5e8-bf67f4afdfe1 is blurry: 1440x810 picture drawn at 4232x2381 px (2.9x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f1.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "phone:help"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "images",
+   "element": "ttl bg dim picture",
+   "sel": "img.ttl-bg.dim",
+   "issue": "Ttl bg dim art 019a5f58-2257-476b-bd63-5aa66c23e74a is blurry: 1440x810 picture drawn at 3067x1725 px (2.1x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.68,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f2.webp",
+   "sites": [
+    "small:board",
+    "small:mid-game",
+    "small:help"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art e7090daf-bdb8-4a79-a5e8-bf67f4afdfe1 is blurry: 1440x810 picture drawn at 4069x2289 px (2.8x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f3.webp",
+   "sites": [
+    "phone:start"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art 019a5f58-2257-476b-bd63-5aa66c23e74a is blurry: 1440x810 picture drawn at 2949x1659 px (2x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.68,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f4.webp",
+   "sites": [
+    "small:start"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "art",
+   "element": "tlink button plate",
+   "sel": "button.tlink",
+   "issue": "Tlink button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.03,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f5.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "art",
+   "element": "chipb seatb button plate",
+   "sel": "button.chipb.seatb",
+   "issue": "Chipb seatb button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.67,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f6.webp",
+   "sites": [
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "kaiten-kitchen",
+   "check": "art",
+   "element": "chipb button plate",
+   "sel": "button.chipb",
+   "issue": "Odile plays easy button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1.52,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/kaiten-kitchen/f7.webp",
+   "sites": [
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "lantern-dive",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.67,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/lantern-dive/f0.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "lantern-dive",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art title-phone.webp is blurry: 744x1334 picture drawn at 1277x2289 px (1.7x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/lantern-dive/f1.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "phone:help"
+   ]
+  },
+  {
+   "game": "lantern-dive",
+   "check": "art",
+   "element": "tlink button plate",
+   "sel": "button.tlink",
+   "issue": "Tlink button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.03,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/lantern-dive/f2.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "phone:help",
+    "pc:start",
+    "pc:board",
+    "pc:mid-game",
+    "pc:help"
+   ]
+  },
+  {
+   "game": "cauldron-fair",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art 6d21185c-6c97-4666-87e4-9bd8bdff5685 is blurry: 1440x810 picture drawn at 4069x2289 px (2.8x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/cauldron-fair/f6.webp",
+   "sites": [
+    "phone:start"
+   ]
+  },
+  {
+   "game": "cauldron-fair",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art c9489982-8cc9-425b-b583-478928ea5d17 is blurry: 1440x810 picture drawn at 2949x1659 px (2x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.68,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/cauldron-fair/f7.webp",
+   "sites": [
+    "small:start"
+   ]
+  },
+  {
+   "game": "cauldron-fair",
+   "check": "art",
+   "element": "gxh ok button plate",
+   "sel": "button.gxh-ok",
+   "issue": "Gxh ok button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 2.05,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/cauldron-fair/f8.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game",
+    "pc:board",
+    "pc:mid-game"
+   ]
+  },
+  {
+   "game": "cauldron-fair",
+   "check": "art",
+   "element": "tlink button plate",
+   "sel": "button.tlink",
+   "issue": "Tlink button plate is flat CSS, no painting",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.14,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/cauldron-fair/f9.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "final-approach",
+   "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/final-approach/f0.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "final-approach",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art 4cfd0d1d-83c3-4ad8-b891-c8854cc445fa is blurry: 1440x810 picture drawn at 4069x2289 px (2.8x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/final-approach/f1.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game"
+   ]
+  },
+  {
+   "game": "final-approach",
+   "check": "images",
+   "element": "ttl bg picture",
+   "sel": "img.ttl-bg",
+   "issue": "Ttl bg art 9a133476-4a90-4fcf-827f-b957ef0fa8ac is blurry: 1440x810 picture drawn at 2949x1659 px (2x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.68,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/final-approach/f2.webp",
+   "sites": [
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "final-approach",
+   "check": "art",
+   "element": "tlink button plate",
+   "sel": "button.tlink",
+   "issue": "Tlink button plate is flat CSS, no painting",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.03,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/final-approach/f3.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "missing picture fx-bullet-shell.webp",
+   "sel": "network",
+   "issue": "image failed to load (404): media/fx-bullet-shell.webp",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 1,
+   "transparent": true,
+   "needs_art": true,
+   "img": null,
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "missing picture fx-bullet-needle.webp",
+   "sel": "network",
+   "issue": "image failed to load (404): media/fx-bullet-needle.webp",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 1,
+   "transparent": true,
+   "needs_art": true,
+   "img": null,
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "missing picture fx-bullet-rocket.webp",
+   "sel": "network",
+   "issue": "image failed to load (404): media/fx-bullet-rocket.webp",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 1,
+   "transparent": true,
+   "needs_art": true,
+   "img": null,
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "bPause plate",
+   "sel": "button#bPause",
+   "issue": "BPause art ui-touch-pause.webp is blurry: 128x128 picture drawn at 384x384 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f0.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "bEmp plate",
+   "sel": "button#bEmp",
+   "issue": "BEmp art ui-touch-emp.webp is blurry: 128x128 picture drawn at 384x384 px (3x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 1,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f1.webp",
+   "sites": [
+    "phone:board",
+    "phone:mid-game",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "startBtn plate",
+   "sel": "button#startBtn",
+   "issue": "StartBtn art ui-btn-cyan.webp is stretched (box 136x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.09,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f2.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "diffBtn plate",
+   "sel": "button#diffBtn",
+   "issue": "DiffBtn art ui-btn-violet.webp is stretched (box 153x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.48,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f3.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "dailyBtn plate",
+   "sel": "button#dailyBtn",
+   "issue": "DailyBtn art ui-btn-violet.webp is stretched (box 152x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.45,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f4.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "gaBtn plate",
+   "sel": "button#gaBtn",
+   "issue": "GaBtn art ui-btn-violet.webp is stretched (box 165x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.76,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f5.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "setBtn plate",
+   "sel": "button#setBtn",
+   "issue": "SetBtn art ui-btn-violet.webp is stretched (box 144x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.28,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f6.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "labBtn plate",
+   "sel": "button#labBtn",
+   "issue": "LabBtn art ui-btn-violet.webp is stretched (box 89x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 2.01,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f7.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "wpBtn plate",
+   "sel": "button#wpBtn",
+   "issue": "WpBtn art ui-btn-violet.webp is stretched (box 124x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 2.82,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f8.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "go dim plate",
+   "sel": "button.go.dim",
+   "issue": "Go dim art ui-btn-violet.webp is stretched (box 162x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.68,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f9.webp",
+   "sites": [
+    "phone:start",
+    "small:start",
+    "pc:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "title plate",
+   "sel": "div#title",
+   "issue": "Title art title-phone.webp is blurry: 768x1376 picture drawn at 2304x4128 px (3x upscale)",
+   "target_px": [
+    1024,
+    1024
+   ],
+   "ratio": 0.51,
+   "transparent": false,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f10.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "diffBtn plate",
+   "sel": "button#diffBtn",
+   "issue": "DiffBtn art ui-btn-violet.webp is blurry: 256x96 picture drawn at 459x132 px (1.8x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.48,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f11.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "dailyBtn plate",
+   "sel": "button#dailyBtn",
+   "issue": "DailyBtn art ui-btn-violet.webp is blurry: 256x96 picture drawn at 455x132 px (1.8x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.45,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f12.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "gaBtn plate",
+   "sel": "button#gaBtn",
+   "issue": "GaBtn art ui-btn-violet.webp is blurry: 256x96 picture drawn at 496x132 px (1.9x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.76,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f13.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "setBtn plate",
+   "sel": "button#setBtn",
+   "issue": "SetBtn art ui-btn-violet.webp is blurry: 256x96 picture drawn at 433x132 px (1.7x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.28,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f14.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "go dim plate",
+   "sel": "button.go.dim",
+   "issue": "Go dim art ui-btn-violet.webp is blurry: 256x96 picture drawn at 486x132 px (1.9x upscale)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.68,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f15.webp",
+   "sites": [
+    "phone:start",
+    "small:start"
+   ]
+  },
+  {
+   "game": "mainhattan-nightrun",
+   "check": "images",
+   "element": "storyBtn plate",
+   "sel": "button#storyBtn",
+   "issue": "StoryBtn art ui-btn-pink.webp is stretched (box 162x44, picture 256x96)",
+   "target_px": [
+    512,
+    512
+   ],
+   "ratio": 3.68,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/mainhattan-nightrun/f16.webp",
+   "sites": [
+    "pc:start"
+   ]
+  }
+ ]
+}

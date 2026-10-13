@@ -389,8 +389,8 @@ html.sk{--gx-bar-h:48px;--sk-ink:#3a2410;--sk-num:#3a2205;--sk-num-done:#fff4d6;
 html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
 /* top bar + icon buttons */
 html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
-html.sk .gx-ibtn,html.sk .gxc-ib{border:10px solid transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;min-width:44px;min-height:44px;padding:0 2px;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
-html.sk .gxc-ib{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;padding:0 2px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gx-ibtn,html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));font-size:12px}
+html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
 html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
 html.sk .gx-ibtn>span{padding:0 4px}
@@ -398,16 +398,16 @@ html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;displ
 html.sk-icons .gx-ibtn i[data-ic] svg{display:none}
 html.sk-icons i[data-ic]{background:center/contain no-repeat}
 /* popups: parchment panel (9-slice) with a wooden title strip */
-html.sk .gx-drawer{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
+html.sk .gx-drawer{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));box-sizing:border-box;color:var(--sk-ink)}
 html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream);border:0;border-radius:6px;margin:-6px -6px 6px;padding:6px 6px 6px 12px;box-shadow:0 2px 5px rgba(0,0,0,.4)}
 html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
 html.sk .gx-drawer .gx-x{color:var(--sk-cream);font-size:1.8rem}
 html.sk .gx-drawer-body{padding:4px 4px 12px}
 /* campaign kit */
-html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border:0 solid transparent;border-width:0 24px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;min-width:100px;padding:0 4px;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
 html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
-html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;color:var(--sk-ink);box-sizing:border-box}
+html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink);box-sizing:border-box}
 html.sk .gxc-sheet{padding-bottom:calc(0px + env(safe-area-inset-bottom,0px))}
 html.sk-dark .gxc-sheet,html.sk-dark .gxc-scene,html.sk-dark .gxc-boss,html.sk-dark .gxc-res{--gxc-ink:#f3e9ff;--gxc-dim:rgba(243,233,255,.75)}
 html.sk .gxc-boss{border-color:transparent}
@@ -427,7 +427,7 @@ html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border:0 solid transparent;border-width:0 26px;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;margin-top:0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -1458,20 +1458,42 @@ const GX={key:'gx',open:null,
 </script>
 <script>
 /* GX skin loader: GXSK.init({dark:false, sets:{'sk-x':['file']}, icons:false, map:false, stars:false, banner:false}).
-   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays. */
+   Preloads the kit files from media/ and, once the core ones loaded, adds html.sk (+ switches). Missing files = the old CSS stays.
+   RULE: the skin never changes an element's layout box. Painted plates go on as background / border-image (border-width 0, the plate drawn
+   by border-image-width inside the element's own width, height and padding). GXSK.audit() proves it: it measures the visible buttons, bars and
+   panels with the skin on, takes every skin class off, measures again, puts them back, and lists each element whose box moved by more than 2 px.
+   phone-check.js runs it and fails the game on any entry. */
 (function () {
-  var H = document.documentElement, base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
+  var H = document.documentElement, on = [], base = 'media/', core = ['ui-topbar', 'ui-iconbtn', 'ui-panel-c', 'ui-button-power-c', 'ui-drawer-head', 'ui-button-cream-c', 'ui-button-go-c', 'ui-node-open'];
   function load(names, cb) { var n = names.length, ok = 0; if (!n) return cb(true); names.forEach(function (f) { var i = new Image(); i.onload = function () { ok++; if (!--n) cb(ok === names.length); }; i.onerror = function () { if (!--n) cb(false); }; i.src = base + f + '.webp'; }); }
+  function add(c) { if (on.indexOf(c) < 0) on.push(c); H.classList.add(c); }
+  var SEL = 'button,.gx-ibtn,.gxc-btn,.gxc-ib,.gxc-act,[role=button],.gx-bar,.gx-drawer,.gxc-sheet,.gxc-scene,.gxc-boss,.gxc-res,.gxc-head';
   window.GXSK = {
+    classes: function () { return on.slice(); },
+    audit: function (sel, tol) {
+      tol = tol == null ? 2 : tol; var els = [].filter.call(document.querySelectorAll(sel || SEL), function (e) { return e.offsetWidth > 0 && e.offsetHeight > 0; });
+      if (!on.length) return { skinned: false, n: els.length, moved: [] };
+      var st = document.createElement('style'); st.textContent = '*,*::before,*::after{transition:none!important;animation:none!important}'; document.head.appendChild(st);
+      var P = ['width','height','minWidth','minHeight','paddingTop','paddingRight','paddingBottom','paddingLeft','marginTop','marginRight','marginBottom','marginLeft','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','display','flex','fontSize','whiteSpace','boxSizing','fontWeight','letterSpacing','textAlign','justifyContent','alignSelf','maxWidth','overflow','textShadow','fontFamily'];
+      var cs = function (e) { var c = getComputedStyle(e), p = e.parentElement; return P.map(function (k) { return c[k]; }).concat([p ? p.offsetWidth + '/' + getComputedStyle(p).paddingLeft + '/' + getComputedStyle(p).borderLeftWidth : '']); };
+      var a = els.map(function (e) { return [e.offsetWidth, e.offsetHeight]; }), ca = els.map(cs), cl = on.slice();
+      cl.forEach(function (c) { H.classList.remove(c); }); void H.offsetWidth;
+      var b = els.map(function (e) { return [e.offsetWidth, e.offsetHeight]; }), cb = els.map(cs);
+      cl.forEach(function (c) { H.classList.add(c); }); void H.offsetWidth; st.remove();
+      var moved = [];
+      els.forEach(function (e, i) { if (!b[i][0] && !b[i][1]) return; var dw = a[i][0] - b[i][0], dh = a[i][1] - b[i][1];
+        if (Math.abs(dw) > tol || Math.abs(dh) > tol) moved.push((e.id ? '#' + e.id : e.tagName.toLowerCase()) + '.' + String(e.className && e.className.baseVal === undefined ? e.className : '').trim().split(/\s+/).slice(0, 2).join('.') + ' ' + (e.textContent || '').trim().slice(0, 14) + ' ' + b[i].join('x') + '->' + a[i].join('x') + ' [' + P.concat(['parent']).filter(function (k, j) { return ca[i][j] !== cb[i][j]; }).map(function (k) { var j = P.concat(['parent']).indexOf(k); return k + ':' + cb[i][j] + '>' + ca[i][j]; }).join(' ') + ']'); });
+      return { skinned: true, n: els.length, moved: moved };
+    },
     init: function (o) {
       o = o || {}; var extra = [];
       if (o.map) extra.push('story-map'); if (o.stars) extra.push('ui-star-on', 'ui-star-off'); if (o.banner) extra.push('ui-act-banner-c');
       load(core, function (ok) {
         if (!ok) return;
-        H.classList.add('sk'); if (o.dark) H.classList.add('sk-dark');
-        load(extra, function () { if (o.map) H.classList.add('sk-map'); if (o.stars) H.classList.add('sk-stars'); if (o.banner) H.classList.add('sk-banner'); });
-        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { H.classList.add('sk-icons'); });
-        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) H.classList.add(cls); }); });
+        add('sk'); if (o.dark) add('sk-dark');
+        load(extra, function () { if (o.map) add('sk-map'); if (o.stars) add('sk-stars'); if (o.banner) add('sk-banner'); });
+        if (o.icons) load(o.icons.map(function (k) { return 'icon-' + k; }), function () { add('sk-icons'); });
+        if (o.sets) Object.keys(o.sets).forEach(function (cls) { load(o.sets[cls], function (k) { if (k) add(cls); }); });
         if (o.cb) o.cb();
       });
     }

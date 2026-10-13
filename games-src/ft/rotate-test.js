@@ -4,6 +4,8 @@
 // the wrong layout class for the size, a status line over 8 words.
 const { chromium } = require('playwright');
 const path = require('path');
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const FILE = path.resolve(__dirname, process.argv[3] || 'sands.html'), N = +process.argv[2] || 6;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -28,7 +30,7 @@ async function one(browser, gi) {
   const page = await ctx.newPage(); const errs = [], issues = new Set();
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
   try {
-    await page.goto('file://' + FILE); await sleep(700);
+    await page.goto(URL); await sleep(700);
     await page.evaluate(`setSeed(${gi * 31 + 5});UI.setup.np=${[2, 3, 2, 4, 2, 5][gi % 6]};UI.setup.ex=Object.assign(UI.setup.ex,{artisans:${gi % 3 === 2},sultan:${gi % 6 === 5}});beginGame();UI.speed=6`);
     const step = async () => { for (let k = 0; k < 9; k++) {
       const st = await page.evaluate('({over:!!G.over,me:!!me(),modal:UI.modal})'); if (st.over) return;
@@ -50,6 +52,7 @@ async function one(browser, gi) {
   await ctx.close(); return { gi, errs, issues: [...issues] };
 }
 (async () => {
+  URL = await gx.url('sands-of-qamar', { file: FILE });
   const browser = await chromium.launch({ args: ['--no-sandbox'] }); const out = []; const q = [...Array(N).keys()]; let fail = 0;
   await Promise.all(Array.from({ length: Math.min(3, N) }, async () => { while (q.length) { const r = await one(browser, q.shift()); out.push(r); const bad = r.errs.length || r.issues.length; if (bad) fail++;
     console.log(`${bad ? 'FAIL' : 'ok  '} rotate game ${r.gi}${r.errs.length ? ' errors: ' + [...new Set(r.errs)].join(' | ') : ''}`); for (const i of r.issues.slice(0, 8)) console.log('     - ' + i); } }));

@@ -41,26 +41,33 @@ def stems(slug):
         for f in fn: s.add(os.path.splitext(f)[0].lower())
     return s
 
-def missing(slug, have):
+def missing_entries(slug):
+    """Every not-ticked entry of this game in MISSING-ASSETS.md (before the exists-check), with its group heading and style block."""
     try: lines = open('games-src/MISSING-ASSETS.md', encoding='utf-8').read().split('\n')
-    except OSError: return []
-    out, cur, ent, stop = [], None, None, False
+    except OSError: return [], ''
+    out, cur, ent, stop, group, style, want_style = [], None, None, False, '', '', False
     for ln in lines:
         if ln.startswith('## Made but NOT wired'): stop = True
         if stop: break
         h = re.match(r'### .*\(`games/([\w-]+)/`\)', ln)
-        if h: cur, ent = h.group(1), None; continue
+        if h: cur, ent, group, want_style = h.group(1), None, '', False; continue
         if cur != slug: continue
+        if ln.startswith('Style block'): want_style = True; continue
+        if want_style and ln.strip(): style, want_style = re.sub(r'^>\s*', '', ln).strip(), False; continue
+        b = re.match(r'\*\*(.+?)\*\*(?:\s*\(.*\))?\s*$', ln)
+        if b and not re.match(r'\d+ to make', b.group(1)): group = re.sub(r'\s*\(.*$', '', b.group(1)).strip(); ent = None; continue
         m = re.match(r'- \[( |x)\] `([^`]+)`\s*(.*)$', ln)
         if m:
-            ent = dict(done=m.group(1) == 'x', path=m.group(2), spec=m.group(3), prompt='', note='')
+            ent = dict(done=m.group(1) == 'x', path=m.group(2), spec=m.group(3), prompt='', note='', group=group)
             out.append(ent); continue
         if ent:
             p = re.match(r'\s+- (Prompt|Note): (.*)$', ln)
             if p: ent[p.group(1).lower()] = p.group(2)
+    return [e for e in out if not e['done']], style
+
+def missing(slug, have):
     res = []
-    for e in out:
-        if e['done']: continue
+    for e in missing_entries(slug)[0]:
         files = [x.strip() for x in re.split(r' and |, ', e['path']) if x.strip()]
         base = os.path.dirname(e['path'].split(' and ')[0])
         names = [os.path.basename(f) for f in files]
@@ -70,8 +77,18 @@ def missing(slug, have):
         if all(exists(f) for f in files): continue
         music = any(n.lower().endswith(('.mp3', '.wav', '.ogg')) for n in names) or '/audio/' in e['path']
         desc = scrub(e['prompt'] or e['note'])
-        res.append(dict(name=' + '.join(names), kind='music' if music else 'art', desc=desc[:140] + ('…' if len(desc) > 140 else '')))
+        res.append(dict(name=' + '.join(names), kind='music' if music else 'art', desc=desc[:140] + ('\u2026' if len(desc) > 140 else '')))
     return res
+
+def nextwave_counts():
+    """Items still to make per slug from games/next-wave.json (written by next-wave.py); {} if absent."""
+    try: d = json.load(open('games/next-wave.json', encoding='utf-8'))
+    except (OSError, ValueError): return {}
+    c = {}
+    for it in d.get('items', []):
+        if it.get('tag'): continue          # wave 7 variety items (poses, 3D variety, art variety) are optional extras, not must-make
+        c[it['slug']] = c.get(it['slug'], 0) + 1
+    return c
 
 def main():
     games = shelf_games()
@@ -79,7 +96,12 @@ def main():
     flow = json.load(open('games/asset-viewer/flow.json', encoding='utf-8'))
     pa, mo, unw = {}, {}, {}
     def slot(d, s): return d.setdefault(s, dict(wired=0, pushed=0))
+    planned = {}   # next-wave batches written by viewer-plan.py: optional extras by wave, never counted as must-make or as wired/pushed
     for b in flow['batches']:
+        if b.get('source') == 'next-wave':
+            p = planned.setdefault(ALIAS.get(b['game'], b['game']), dict(total=0, waves={}))
+            p['total'] += b['total']; p['waves'][b['wave']] = p['waves'].get(b['wave'], 0) + b['total']
+            continue
         if b.get('root') != 'flow-2d': continue
         s = ALIAS.get(b['game'], b['game'])
         for i in b['items']:
@@ -93,11 +115,13 @@ def main():
             slot(mo, s)[m['stage']] += 1
             if m['stage'] == 'pushed': unw.setdefault(s, []).append(m['name'] + ' (3D)')
     out = []
+    nw = nextwave_counts()
     for g in games:
         s = g['slug']; have = stems(s)
         e = dict(id=g['id'], slug=s, title=g['title'], **version(s), news=news(g, upd),
                  paintings=pa.get(s, dict(wired=0, pushed=0)), models=mo.get(s, dict(wired=0, pushed=0)),
-                 unwired=sorted(unw.get(s, [])), missing=missing(s, have), facelift=None)
+                 unwired=sorted(unw.get(s, [])), missing=missing(s, have), facelift=None, nextwave=nw.get(s, 0),
+                 planned=dict(total=planned.get(s, {}).get('total', 0), waves=dict(sorted(planned.get(s, {}).get('waves', {}).items(), key=lambda x: (x[0].startswith('3D'), x[0])))))
         out.append(e)
     data = dict(generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), games=out)
     with open('games/status.json', 'w', encoding='utf-8') as f:
@@ -105,6 +129,6 @@ def main():
     print(f'status.json: {len(out)} games')
     for e in out:
         print(f"  {e['slug']:20} {e['version']:>5} {e['updated']}  paint {e['paintings']['wired']}/{e['paintings']['pushed']}  "
-              f"3D {e['models']['wired']}/{e['models']['pushed']}  make {len(e['missing'])}  unwired {len(e['unwired'])}")
+              f"3D {e['models']['wired']}/{e['models']['pushed']}  make {len(e['missing'])}  next-wave {e['nextwave']}  unwired {len(e['unwired'])}")
 
 if __name__ == '__main__': main()

@@ -1,0 +1,45 @@
+{
+ "cards": {
+  "bomb-clockwork": "a clockwork bomb: a brass box with a big clock face, key and coloured wire bundles, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "bomb-dynamite": "a bundle of red dynamite sticks tied with twine around a small timer with wires, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Workshop gouache illustration for a cheerful bomb-defusal crew card game, warm lamplight against cool blueprint blues, brass and copper wire, slightly wobbly dark ink outline, matte paper texture, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave A",
+ "meta": {
+  "bomb-clockwork": {
+   "element": "3D model: bomb-clockwork",
+   "why": "a second bomb casing",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "bomb-clockwork.png",
+   "target": "games/short-fuse/models/bomb-clockwork.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "bomb-dynamite": {
+   "element": "3D model: bomb-dynamite",
+   "why": "a third bomb casing",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "bomb-dynamite.png",
+   "target": "games/short-fuse/models/bomb-dynamite.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  }
+ },
+ "targets": {
+  "bomb-clockwork": "games/short-fuse/models/bomb-clockwork.glb",
+  "bomb-dynamite": "games/short-fuse/models/bomb-dynamite.glb"
+ }
+}

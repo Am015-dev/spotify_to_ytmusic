@@ -43,7 +43,7 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
   box-shadow:0 0 calc(4px + 14px*var(--pul,0)) var(--c,transparent);touch-action:manipulation;position:relative}
 .pg .card svg{height:clamp(22px,calc(var(--u)*9),56px);width:auto;aspect-ratio:1;color:var(--c,#fff);flex:0 0 auto}
 .pg .card .tx{display:flex;flex-direction:column;gap:2px;min-width:0}
-.pg .card .n{font-weight:700;font-size:clamp(13px,calc(var(--u)*4.4),22px);line-height:1.05}
+.pg .card .n{overflow-wrap:anywhere;font-weight:700;font-size:clamp(13px,calc(var(--u)*4.4),22px);line-height:1.05}
 .pg .card .t{font-size:clamp(11px,calc(var(--u)*3.3),17px);line-height:1.15;color:#cfc9f2}
 .pg .card .pr{font-family:var(--mono);font-weight:700;font-size:clamp(13px,calc(var(--u)*4.2),22px);color:var(--amber);white-space:nowrap}
 .pg .card .pr .nI{height:.9em;width:.9em;color:inherit;aspect-ratio:auto}
@@ -63,7 +63,8 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 .pg .sw{height:clamp(22px,calc(var(--u)*9),56px);aspect-ratio:1;border-radius:50%;background:linear-gradient(135deg,#ff2d95,#19e3ff);flex:0 0 auto}
 .pg .sp{flex:1 1 0}
 @container (max-aspect-ratio:1/1){
- .pg .cards{flex-direction:column}
+ .pg .cards{flex-direction:column;overflow-y:auto}
+ .pg .card{flex:1 0 auto}
  .pg .card{flex-direction:row;text-align:left;gap:calc(var(--u)*3);padding:calc(var(--u)*2) calc(var(--u)*3)}
  .pg .card .tx{flex:1 1 0}
  .pg .card .pr{margin-left:auto}

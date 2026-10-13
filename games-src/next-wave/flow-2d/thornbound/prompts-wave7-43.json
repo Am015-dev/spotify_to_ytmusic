@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "event-coronation": "a pale antlered crown lifted over a throne in a candle-lit hall, solemn and glowing, no text, letters or numbers",
+  "event-uprising": "a crowd of villagers with torches and pitchforks marching up to a dark castle gate at dusk, no text, letters or numbers"
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "event-coronation": {
+   "element": "Painting: event-coronation",
+   "why": "coronation splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-coronation.png",
+   "target": "games/thornbound/media/event-coronation.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "event-uprising": {
+   "element": "Painting: event-uprising",
+   "why": "uprising splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-uprising.png",
+   "target": "games/thornbound/media/event-uprising.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

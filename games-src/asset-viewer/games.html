@@ -39,7 +39,7 @@
 <body>
 <header>
   <h1>Asset <span>viewer</span></h1>
-  <nav class="tabs"><a href="board.html">Production</a><a href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a class="on" href="games.html">Games</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
+  <nav class="tabs"><a href="board.html">Production</a><a href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a class="on" href="games.html">Games</a><a href="flow.html">Flow planner</a><a href="../look/index.html">Look check</a><a href="../next-wave.html">Next wave</a><a href="index.html">3D votes</a></nav>
   <span id="upd"></span>
 </header>
 <main>
@@ -52,6 +52,8 @@ let D = null, F = 'all';
 const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const dshort = s => { const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(s || ''); return m ? (+m[3]) + ' ' + MON[m[2] - 1] : ''; };
 const bar = (l, w, p) => { const t = w + p; return `<div class="bar"><span>${l} <b>${w}/${t}</b></span><div class="track"><i style="width:${t ? Math.round(w / t * 100) : 0}%"></i></div></div>`; };
+const nw = g => `<details><summary class="${g.nextwave ? 'm' : 'z'}"><a href="../next-wave.html#g-${g.slug}" style="color:inherit">To make (next wave): ${g.nextwave || 0}</a></summary></details>`;
+const pl = g => { const p = g.planned; if (!p || !p.total) return ''; return `<details><summary class="z"><a href="board.html#${g.slug}" style="color:inherit">Planned in waves: ${p.total}</a></summary><ul>${Object.entries(p.waves).map(([w, n]) => `<li>${esc(w)}: ${n}</li>`).join('')}</ul></details>`; };
 function draw() {
   let L = D.games.slice().sort((a, b) => b.missing.length - a.missing.length || b.unwired.length - a.unwired.length || a.title.localeCompare(b.title));
   if (F === 'miss') L = L.filter(g => g.missing.length); if (F === 'unw') L = L.filter(g => g.unwired.length);
@@ -60,7 +62,7 @@ function draw() {
     const mk = g.missing.length ? `<details><summary class="m">Still to make: ${g.missing.length}</summary><ul>${g.missing.map(x => `<li><b>${esc(x.name)}</b><span class="k">${esc(x.kind)}</span><br>${esc(x.desc)}</li>`).join('')}</ul></details>` : `<details><summary class="z">Still to make: 0</summary></details>`;
     const uw = g.unwired.length ? `<details><summary class="u">Made, not in game: ${g.unwired.length}</summary><ul>${g.unwired.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : `<details><summary class="z">Made, not in game: 0</summary></details>`;
     return `<section class="g" data-slug="${g.slug}"><div class="top"><h2>${esc(g.title)}</h2><span class="ver">${esc(g.version)} &middot; ${esc(dshort(g.updated))}</span></div>${n}
-      ${bar('Paintings wired', g.paintings.wired, g.paintings.pushed)}${bar('3D models wired', g.models.wired, g.models.pushed)}${mk}${uw}
+      ${bar('Paintings wired', g.paintings.wired, g.paintings.pushed)}${bar('3D models wired', g.models.wired, g.models.pushed)}${mk}${nw(g)}${pl(g)}${uw}
       <div class="links"><a href="board.html#${g.slug}">Production</a><a href="flow.html#${g.slug}">Flow batches</a><a href="screens.html#${g.slug}">In the game</a></div></section>`; }).join('') : '<div class="empty">Nothing matches.</div>';
 }
 document.querySelector('.chips').onclick = e => { const b = e.target.closest('.chip'); if (!b || !D) return; F = b.dataset.f; document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b)); draw(); };

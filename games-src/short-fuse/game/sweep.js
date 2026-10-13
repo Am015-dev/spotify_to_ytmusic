@@ -6,7 +6,10 @@
 // off screen or under another element, horizontal scroll, the table under 55 % of a portrait screen, a turn with nothing glowing.
 const { chromium } = require('playwright');
 const path = require('path');
-const N = process.argv[2] != null ? +process.argv[2] : 24, FILE = path.resolve(__dirname, process.argv[3] || 'shortfuse.html'), STORY = process.argv[4] != null ? +process.argv[4] : 2;
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;   // QUICK=1: 4 games
+let URL;
+const N = process.argv[2] != null ? +process.argv[2] : (QUICK ? 4 : 24), FILE = path.resolve(__dirname, process.argv[3] || 'shortfuse.html'), STORY = process.argv[4] != null ? +process.argv[4] : (QUICK ? 0 : 2);
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
 const JOBS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 15, 17, 18, 20, 22, 24, 26, 28, 31, 34, 36, 40, 44, 46, 50, 52, 55, 57, 60, 11, 14, 21, 33, 38, 45, 56, 62];
@@ -145,9 +148,9 @@ async function playGame(browser, size, gi, rep, opts) {
   await ctx.addInitScript(() => { try { const ch = {}; for (const id of ['c1','c2','c3','c4','c5','c6','c7','c8','c9']) ch[id] = { beaten: true, stars: 1, best: 1, tries: 1, losses: 0 }; if (location.search.indexOf('x') < 0) localStorage.setItem('gns-campaign-short-fuse', JSON.stringify({ v: 1, ch, unlocked: [], last: 'c1' })); } catch (e) { } });
   let tipsOff = false; const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, dead: 0, won: 0, lost: 0 };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource|Fetch API cannot load file:/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
+  page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
   try {
-    await page.goto('file://' + FILE); await sleep(700);
+    await page.goto(URL); await sleep(700);
     await page.evaluate(PAGE);
     const job = opts.job != null ? opts.job : JOBS[gi % JOBS.length];
     let np = opts.np || NPS[gi % NPS.length]; const pl = await page.evaluate(`MISSIONS[${job}].pl`); if (!pl.includes(np)) np = pl.find(x => x >= np) || pl[pl.length - 1];
@@ -225,6 +228,7 @@ async function playGame(browser, size, gi, rep, opts) {
   console.log((bad.length ? 'FAIL ' : 'ok   ') + tag + (opts.story ? ' story ' + opts.story : ' job ' + JOBS[gi % JOBS.length]) + ' taps ' + stats.taps + (stats.won ? ' WON' : stats.lost ? ' lost: ' + (stats.why || '').slice(0, 60) : '') + (bad.length ? ' :: ' + bad.slice(0, 4).join(' | ') : ''));
 }
 (async () => {
+  URL = await gx.url('short-fuse', { file: FILE });
   const browser = await chromium.launch(); const rep = []; const jobs = [];
   const GI = process.env.GI ? process.env.GI.split(',').map(Number) : null;
   for (let g = 0; g < N; g++) if (!GI || GI.includes(g)) jobs.push([SIZES[g % 2], g, {}]);

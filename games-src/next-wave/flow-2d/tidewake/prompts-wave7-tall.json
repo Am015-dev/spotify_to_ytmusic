@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "table-rift-night-phone": "a tall painted tabletop seen from above: a dark sea at night with a faint violet rift glow and lantern floats, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a sea-tile navigation game with giant sea leviathans, deep teal water, warm lantern light, foam and scales, matte paper texture, slightly wobbly dark navy outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-rift-night-phone": {
+   "element": "Painting: table-rift-night-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-rift-night-phone.png",
+   "target": "games/tidewake/media/table-rift-night-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

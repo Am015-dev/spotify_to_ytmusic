@@ -5,7 +5,8 @@
 // finger must sit on the tile/row/space the advice function names, the why is <= 15 words, the rules cards are 2-4, <= 20 words, with a picture; no advice -> rules only.
 // Env: GAMES=40 ROT=5 CONC=4 URL=... QUICK=1 (4 games, 1 rotation, chapter 3 only)
 const {chromium}=require('playwright');const fs=require('fs');const path=require('path');
-const URL=process.env.URL||'http://localhost:8095/sunglaze.html';
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mozilla/5.0 Mobile/15E148 Safari/604.1)';
 const SLOW=!!process.env.SLOW;const QUICK=!!process.env.QUICK;const GAMES=+(process.env.GAMES||(QUICK?4:40)),ROT=+(process.env.ROT||(QUICK?1:5)),CONC=+(process.env.CONC||4);
 const SHOTS=path.join(__dirname,'sweep-shots');fs.rmSync(SHOTS,{recursive:true,force:true});fs.mkdirSync(SHOTS,{recursive:true});
@@ -20,7 +21,7 @@ const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').f
 const HT={bubbles:{},bulbs:0,bulbNull:0,rules:0,tipsOff:0};
 async function newPage(b,w,h,init){const c=await b.newContext({viewport:{width:w,height:h},isMobile:true,hasTouch:true,deviceScaleFactor:2,userAgent:UA});
   if(SLOW)await c.addInitScript(()=>{window.__slow=1});if(init)await c.addInitScript(init);await c.addInitScript(()=>{try{localStorage.setItem('sgz_offer','1')}catch(e){}});const p=await c.newPage();p.errs=[];
-  p.on('pageerror',e=>p.errs.push('pageerror: '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource|Fetch API cannot load/.test(m.text()))p.errs.push('console: '+m.text())});
+  p.on('pageerror',e=>p.errs.push('pageerror: '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))p.errs.push('console: '+m.text())});
   await p.goto(URL);await sleep(1200);return p}
 const tapEl=async(p,sel)=>{const r=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return r.width>0?{x:r.left+r.width/2,y:r.top+r.height/2}:null},sel);if(!r)return false;await p.touchscreen.tap(r.x,r.y);return true};
 const st=p=>p.evaluate(()=>({over:!!G.over,busy:BF.busy,q:BF.q.length,side:sideToAct(),phase:G.phase,logN:G.logN,round:G.round,cur:G.cur,sel:UI.sel?1:0}));
@@ -185,7 +186,7 @@ async function storyGame(b,id,vp){const [w,h]=vp;const p=await newPage(b,w,h,CH_
   if(fin.over){let res=false;for(let k=0;k<100&&!res;k++){await sleep(200);res=await p.evaluate(()=>!!document.querySelector('.gxc-res-on .gxc-res'))}await chk(res,'chapter result screen appears',ctx,'no result screen',p)}
   const e=p.errs.splice(0);await chk(!e.length,'no console/page errors',ctx+' end',e.join(' | ').slice(0,300),p);await p.context().close()}
 
-(async()=>{const b=await chromium.launch();const t0=Date.now();
+(async()=>{URL=process.env.URL||await gx.url('sunglaze',{file:path.join(__dirname,'sunglaze.html')});const b=await chromium.launch();const t0=Date.now();
   const jobs=[];const VPS=process.env.VP?[process.env.VP.split('x').map(Number)]:[[390,763],[375,553]];
   for(let i=0;i<(process.env.NOGAMES?0:GAMES);i++)jobs.push(()=>playGame(b,i,VPS[i%VPS.length],false));
   for(let i=0;i<(process.env.NOGAMES?0:ROT);i++)jobs.push(()=>playGame(b,1000+i,VPS[i%VPS.length],true));

@@ -20,11 +20,11 @@ const LAB_POSE=[['IDLE 1',0,0],['IDLE 2',0,1],['IDLE 3',0,2],['IDLE 4',0,3],['WI
 const LAB={tab:'boss',bi:0,di:0,phase:0,pat:null,pose:null,hp:true,auto:true,kill:false,god0:null,starting:false,min:false,note:'',noteT:0,items:[]};
 labEl=document.createElement('div');labEl.id='labP';labEl.hidden=true;stage.appendChild(labEl);
 {const st=document.createElement('style');st.textContent=`
-#labP{position:absolute;left:0;right:0;bottom:0;z-index:4;max-height:min(46%,264px);display:flex;flex-direction:column;background:#07040f;border-top:1px solid #3a2b5c;font-family:var(--mono);color:var(--ink);touch-action:pan-y}
+#labP{position:absolute;left:0;right:0;bottom:0;z-index:4;max-height:min(46%,264px);overflow:hidden;display:flex;flex-direction:column;background:#07040f;border-top:1px solid #3a2b5c;font-family:var(--mono);color:var(--ink);touch-action:pan-y}
 #labP .lbar{display:flex;align-items:center;gap:6px;padding:4px 8px;flex:0 0 auto;min-width:0}
 #labP .ltabs{display:flex;gap:4px;flex:0 0 auto}
 #labP .linfo{flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--amber);text-align:right}
-#labP .lbody{overflow-y:auto;overflow-x:hidden;padding:2px 8px 8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:6px 16px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+#labP .lbody{min-height:0;overflow-y:auto;overflow-x:hidden;padding:2px 8px 8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:6px 16px;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 #labP.min .lbody{display:none}
 #labP .ls{min-width:0}
 #labP .lt{display:block;font-size:11px;letter-spacing:.12em;color:var(--dim);margin:0 0 2px}

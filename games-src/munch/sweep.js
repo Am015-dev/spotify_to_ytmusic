@@ -6,11 +6,13 @@
 // horizontal scroll, the [data-board] table under 55 % of a portrait screen, a ghost finger pointing at a move the engine would not allow.
 const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs');
-const localRoute = require('./local-route.js');
-const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'doorkick.html'), MAXMIN = +process.argv[4] || 8;
+const gx = require('../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+const QUICK = !!process.env.QUICK;              // QUICK=1: 4 games, one rotation each, for iterating
+const N = +process.argv[2] || (QUICK ? 4 : 24), FILE = path.resolve(__dirname, process.argv[3] || 'doorkick.html'), MAXMIN = +process.argv[4] || 8;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
 const NPS = [4, 3, 5, 4, 6, 4];
+let URL;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const TOT = { bubbles: {}, bulbs: 0, bulbNull: 0, rules: 0, tipsOff: 0, shots: {}, saved: {} };
 
@@ -101,12 +103,12 @@ async function dragTo(page, from, to) { await page.mouse.move(from.x, from.y); a
 async function playGame(browser, size, gi, rep) {
   const [W, H] = size, tag = W + 'x' + H + ' g' + gi;
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
-  await localRoute(ctx, fs.readFileSync(FILE)); const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, drags: 0, turns: 0, fights: 0, kinds: {}, rot: 0 };
+  const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, drags: 0, turns: 0, fights: 0, kinds: {}, rot: 0 };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 160)));
   page.on('console', m => { if (m.type() === 'error' && !/ERR_|Failed to load|net::/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
   const anim = gi % 3 === 0 ? 1 : 0, learn = gi % 5 === 4, np = NPS[gi % NPS.length];
   try {
-    await page.goto('https://gns.test/'); await page.evaluate(() => { try { localStorage.clear(); localStorage.setItem('dkd_offer', '1') } catch (e) { } }); await page.reload(); await sleep(500);   // dkd_offer: a player who already saw the "New here?" tutorial offer (tutor-test.js covers the offer)
+    await page.goto(URL); await page.evaluate(() => { try { localStorage.clear(); localStorage.setItem('dkd_offer', '1') } catch (e) { } }); await page.reload(); await sleep(500);   // dkd_offer: a player who already saw the "New here?" tutorial offer (tutor-test.js covers the offer)
     await page.evaluate(PAGE);
     await page.evaluate(([seed, anim, np, learn]) => { setSeed(seed); ANIM = anim; AIDELAY = anim ? 90 : 0; UI.n = np; UI.lvl = ['easy', 'normal', 'hard'][seed % 3]; UI.learn = learn; UI.speed = 1; }, [1000 + gi * 7 + W, anim, np, learn]);
     if (learn) await page.evaluate(() => { try { localStorage.removeItem('dkd_learned'); localStorage.removeItem('dkd_bf') } catch (e) { } });
@@ -223,6 +225,7 @@ async function playGame(browser, size, gi, rep) {
 }
 
 (async () => {
+  URL = await gx.url('doorkick-dungeon', { file: FILE });
   const browser = await chromium.launch({ args: ['--force-color-profile=srgb'] });
   require('fs').mkdirSync(path.join(__dirname, 'playtest'), { recursive: true });
   const jobs = []; for (let i = 0; i < N; i++) jobs.push([SIZES[i % 2], Math.floor(i / 2)]);

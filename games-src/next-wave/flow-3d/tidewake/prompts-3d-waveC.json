@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "galleon": "a large merchant galleon with white sails and a gilded stern, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "junk-d": "a small wooden sea junk with green sails and a shrine at the stern, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sea-lighthouse": "a tall rocky islet lighthouse with a warm glowing lamp, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a sea-tile navigation game with giant sea leviathans, deep teal water, warm lantern light, foam and scales, matte paper texture, slightly wobbly dark navy outline, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "galleon": {
+   "element": "3D model: galleon",
+   "why": "rival ship look",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "galleon.png",
+   "target": "games/tidewake/models/galleon.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "junk-d": {
+   "element": "3D model: junk-d",
+   "why": "per-player ship look 4",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "junk-d.png",
+   "target": "games/tidewake/models/junk-d.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "sea-lighthouse": {
+   "element": "3D model: sea-lighthouse",
+   "why": "board-edge prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sea-lighthouse.png",
+   "target": "games/tidewake/models/sea-lighthouse.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "galleon": "games/tidewake/models/galleon.glb",
+  "junk-d": "games/tidewake/models/junk-d.glb",
+  "sea-lighthouse": "games/tidewake/models/sea-lighthouse.glb"
+ }
+}

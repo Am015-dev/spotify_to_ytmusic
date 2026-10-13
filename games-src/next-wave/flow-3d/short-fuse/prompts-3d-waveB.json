@@ -1,0 +1,45 @@
+{
+ "cards": {
+  "bomb-tower-clock": "an ornate miniature tower clock bomb with a pointed brass roof, gears and wires, the Clockmaker masterpiece, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "bomb-barrel": "a small wooden powder barrel with iron hoops, a timer strapped to it and wires, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Workshop gouache illustration for a cheerful bomb-defusal crew card game, warm lamplight against cool blueprint blues, brass and copper wire, slightly wobbly dark ink outline, matte paper texture, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave B",
+ "meta": {
+  "bomb-tower-clock": {
+   "element": "3D model: bomb-tower-clock",
+   "why": "the final job needs a special bomb",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "bomb-tower-clock.png",
+   "target": "games/short-fuse/models/bomb-tower-clock.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "bomb-barrel": {
+   "element": "3D model: bomb-barrel",
+   "why": "a fourth bomb casing",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "bomb-barrel.png",
+   "target": "games/short-fuse/models/bomb-barrel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  }
+ },
+ "targets": {
+  "bomb-tower-clock": "games/short-fuse/models/bomb-tower-clock.glb",
+  "bomb-barrel": "games/short-fuse/models/bomb-barrel.glb"
+ }
+}

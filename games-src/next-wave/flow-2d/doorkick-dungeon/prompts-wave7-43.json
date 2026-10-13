@@ -1,0 +1,57 @@
+{
+ "cards": {
+  "event-door-kick": "a heavy dungeon door bursting open off its hinges from a kick with flying splinters and dust, a glow behind, no text, letters or numbers",
+  "event-curse": "a cartoon purple curse cloud with a goblin grin swirling around a startled adventurer, sparks, dramatic, no text, letters or numbers",
+  "event-level-up": "a cartoon adventurer glowing gold with a rising level ring and star bursts, triumphant, no text, letters or numbers"
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "event-door-kick": {
+   "element": "Painting: event-door-kick",
+   "why": "door-kick splash",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-door-kick.png",
+   "target": "games/doorkick-dungeon/media/event-door-kick.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "event-curse": {
+   "element": "Painting: event-curse",
+   "why": "curse splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-curse.png",
+   "target": "games/doorkick-dungeon/media/event-curse.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "event-level-up": {
+   "element": "Painting: event-level-up",
+   "why": "level-up splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-level-up.png",
+   "target": "games/doorkick-dungeon/media/event-level-up.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

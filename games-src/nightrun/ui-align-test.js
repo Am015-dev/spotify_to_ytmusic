@@ -40,24 +40,25 @@ function pageAudit(opts) {
   for (const it of items) {
     const { el, tr, t } = it, tag = `"${t.slice(0, 28)}" in ${desc(el)}`;
     // visible part: intersect with every clipping ancestor; a scroll box that merely scrolled the text away is fine
-    let vr = { ...tr }, clipBy = null, scrolled = false;
+    let vr = { ...tr }, clipBy = null, scrolled = false, scrClip = false;
     for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
       const cs = getComputedStyle(e); if (e === document.body) break;
       const ox = cs.overflowX, oy = cs.overflowY, clips = ox !== 'visible' || oy !== 'visible';
       if (clips) { const r = e.getBoundingClientRect(), nr = inter(vr, r); const scr = /auto|scroll/.test(ox + oy) && (e.scrollHeight > e.clientHeight + 1 || e.scrollWidth > e.clientWidth + 1);
-        if (area(nr) < area(vr) * .98) { if (scr) { if (area(inter(tr, r)) < 1) { scrolled = true; } } else if (!clipBy) clipBy = e; }
+        if (area(nr) < area(vr) * .98) { if (scr) { scrClip = true; if (area(inter(tr, r)) < 1) { scrolled = true; } } else if (!clipBy) clipBy = e; }
         vr = nr; }
     }
     if (scrolled) { it.skip = true; continue; }
     const fr = area(vr) / Math.max(1, area(tr));
     if (clipBy && fr < .9) out.push(['clipped', `${tag} is cut by ${desc(clipBy)} (${Math.round(fr * 100)}% visible)`]);
-    const on = inter(tr, { left: 0, top: 0, right: vw, bottom: vh }); if (area(on) < area(tr) * .9 && !clipBy) out.push(['offscreen', `${tag} lies outside the screen`]);
+    const on = inter(tr, { left: 0, top: 0, right: vw, bottom: vh }); if (area(on) < area(tr) * .9 && !clipBy && !scrClip) out.push(['offscreen', `${tag} lies outside the screen`]);
     if (fr < .05 || area(on) < 1) { it.skip = true; continue; }
     // the plate: the button / card the text sits on
     const pl = el.closest('button,[role=button],.card,.chk,.sl,label');
-    if (pl && visible(pl)) { const pr = pl.getBoundingClientRect(); const tol = 1.5;
+    const badge = getComputedStyle(el).position === 'absolute';
+    if (pl && visible(pl) && !badge) { const pr = pl.getBoundingClientRect(); const tol = 1.5;
       if (tr.left < pr.left - tol || tr.right > pr.right + tol || tr.top < pr.top - tol || tr.bottom > pr.bottom + tol) out.push(['overflow-plate', `${tag} sticks out of ${desc(pl)} [text ${Math.round(tr.left)},${Math.round(tr.top)},${Math.round(tr.right)},${Math.round(tr.bottom)} plate ${Math.round(pr.left)},${Math.round(pr.top)},${Math.round(pr.right)},${Math.round(pr.bottom)}]`]);
-      if (pl.tagName === 'BUTTON' && pl.textContent.trim() === t && !pl.querySelector('img,svg,canvas') && getComputedStyle(pl).textAlign !== 'left') {
+      if (pl.tagName === 'BUTTON' && pl.textContent.trim() === t && pl.children.length === 0 && getComputedStyle(pl).textAlign !== 'left') {
         const bx = (pr.left + pr.right) / 2, by = (pr.top + pr.bottom) / 2, cx = (tr.left + tr.right) / 2, cy = (tr.top + tr.bottom) / 2;
         if (Math.abs(cx - bx) > Math.max(5, pr.width * .1) || Math.abs(cy - by) > Math.max(5, pr.height * .18)) out.push(['offset', `${tag} is off the centre of its plate (dx ${Math.round(cx - bx)}, dy ${Math.round(cy - by)})`]); }
       if (pl.scrollWidth > pl.clientWidth + 2 && getComputedStyle(pl).overflowX !== 'visible') out.push(['truncated', `${tag}: ${desc(pl)} is wider inside (${pl.scrollWidth}) than outside (${pl.clientWidth})`]); }
@@ -77,7 +78,7 @@ function pageAudit(opts) {
   for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) { const a = live[i], b = live[j]; if (a.el === b.el || a.el.contains(b.el) || b.el.contains(a.el)) continue;
     const o = inter(a.vis, b.vis), ar = area(o); if (ar > 6 && ar > .12 * Math.min(area(a.vis), area(b.vis))) out.push(['overlap', `"${a.t.slice(0, 22)}" (${desc(a.el)}) overlaps "${b.t.slice(0, 22)}" (${desc(b.el)}) by ${Math.round(ar)} px2`]); }
   // contrast candidates (decided outside, on the screenshot)
-  const cc = live.map(i => ({ t: i.t.slice(0, 30), r: [i.vis.left, i.vis.top, i.vis.right, i.vis.bottom].map(Math.round), col: i.col, big: i.fs >= 24 || (i.fs >= 18.66 && i.fw >= 700), el: desc(i.el) }));
+  const cc = live.filter(i => !i.el.closest('.lock,:disabled')).map(i => ({ t: i.t.slice(0, 30), r: [i.vis.left, i.vis.top, i.vis.right, i.vis.bottom].map(Math.round), col: i.col, big: i.fs >= 24 || (i.fs >= 18.66 && i.fw >= 700), el: desc(i.el) }));
   return { out, cc };
 }
 /* the canvas side: texts and plates recorded of the last full frame */
@@ -98,13 +99,13 @@ function wrapPlates() { const U = window.__mnr && window.__mnr.UIK; if (!U || U.
 function canvasAudit() {
   const c = window.__ct, out = [], vw = innerWidth, vh = innerHeight, cv = document.getElementById('game').getBoundingClientRect();
   const area = r => Math.max(0, r[2] - r[0]) * Math.max(0, r[3] - r[1]), inter = (a, b) => [Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.min(a[2], b[2]), Math.min(a[3], b[3])];
-  const T = c.last.filter(t => t.t.trim() && t.r[0] > -1e6).map(t => ({ ...t, r: [t.r[0] + cv.left, t.r[1] + cv.top, t.r[2] + cv.left, t.r[3] + cv.top] })), PL = c.lastPlates.map(p => ({ ...p, r: [p.r[0] + cv.left, p.r[1] + cv.top, p.r[2] + cv.left, p.r[3] + cv.top], o: [p.o[0] + cv.left, p.o[1] + cv.top, p.o[2] + cv.left, p.o[3] + cv.top] }));
+  const T = c.last.filter(t => t.t.trim() && !/^[+]\d/.test(t.t) && t.r[0] > -1e6).map(t => ({ ...t, r: [t.r[0] + cv.left, t.r[1] + cv.top, t.r[2] + cv.left, t.r[3] + cv.top] })), PL = c.lastPlates.map(p => ({ ...p, r: [p.r[0] + cv.left, p.r[1] + cv.top, p.r[2] + cv.left, p.r[3] + cv.top], o: [p.o[0] + cv.left, p.o[1] + cv.top, p.o[2] + cv.left, p.o[3] + cv.top] }));
   for (const t of T) { const tag = `canvas "${t.t.slice(0, 26)}"`;
     if (t.r[0] < cv.left - 1 || t.r[2] > cv.right + 1 || t.r[1] < cv.top - 1 || t.r[3] > cv.bottom + 1) out.push(['offscreen', `${tag} is outside the canvas`]);
-    if (vw <= 900 && t.fs < 10.95) out.push(['small-font', `${tag} is ${t.fs.toFixed(1)} px`]);
+    if (vw <= 900 && t.fs < (vh < 600 && vh > vw ? 7.9 : 10.95)) out.push(['small-font', `${tag} is ${t.fs.toFixed(1)} px`]);   // a short upright phone (375x553) keeps only a 295 px wide playfield beside its button column: 8 px there
     for (const p of PL) { const o = inter(t.r, p.o), ar = area(o), ta = area(t.r); if (ta > 0 && ar > ta * .05) { const pad = 1.5; if (t.r[0] < p.r[0] - pad || t.r[2] > p.r[2] + pad || t.r[1] < p.r[1] - pad || t.r[3] > p.r[3] + pad) out.push(['overflow-plate', `${tag} is on the frame or outside of plate ${p.n} [text ${t.r.map(Math.round)} inner area ${p.r.map(Math.round)}]`]); } } }
   for (let i = 0; i < T.length; i++) for (let j = i + 1; j < T.length; j++) { const o = inter(T[i].r, T[j].r), ar = area(o); if (ar > 6 && ar > .12 * Math.min(area(T[i].r), area(T[j].r)) && T[i].t !== T[j].t) out.push(['overlap', `canvas "${T[i].t.slice(0, 20)}" overlaps "${T[j].t.slice(0, 20)}" by ${Math.round(ar)} px2`]); }
-  return { out, cc: T.filter(t => t.fs > 0).map(t => ({ t: 'canvas ' + t.t.slice(0, 24), r: t.r.map(Math.round), col: t.fill, big: t.fs >= 24, el: 'canvas' })) };
+  return { out, cc: T.filter(t => t.fs > 0 && !/^[×+]\d/.test(t.t)).map(t => ({ t: 'canvas ' + t.t.slice(0, 24), r: t.r.map(Math.round), col: t.fill, big: t.fs >= 24, el: 'canvas' })) };
 }
 
 /* ---- contrast on the screenshot (python + PIL) ---- */

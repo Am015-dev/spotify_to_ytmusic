@@ -3,6 +3,8 @@
 // Fails on: page errors, horizontal scroll, tiles off screen or clipped, my stand covered, the table collapsed, a glowing tile that cannot be tapped after turning.
 const { chromium } = require('playwright');
 const path = require('path');
+const gx = require('../../scripts/gx-serve.js');   // one shared http server (build-all passes GX_URL); never file://
+let URL;
 const FILE = path.resolve(__dirname, 'shortfuse.html'), N = +process.argv[2] || 6;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -30,7 +32,7 @@ async function one(browser, gi) {
   const page = await ctx.newPage(); const errs = [], issues = new Set();
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
   try {
-    await page.goto('file://' + FILE); await sleep(800);
+    await page.goto(URL); await sleep(800);
     const np = [4, 3, 5, 2, 4, 5][gi % 6], job = [4, 1, 12, 5, 9, 17][gi % 6];
     const pl = await page.evaluate(`MISSIONS[${job}].pl`), np2 = pl.includes(np) ? np : pl[0];
     await page.evaluate(`AIDELAY=100;UI.speed=5;startJob({job:${job},np:${np2},seats:['human','ai','ai','ai','ai'],lv:'normal',names:DEFNAMES.slice(),chars:[],captain:${gi % 3},seed:${gi * 31 + 5}});UI.brief=null;refresh()`);
@@ -58,6 +60,7 @@ async function one(browser, gi) {
   return { gi, errs, issues: [...issues] };
 }
 (async () => {
+  URL = await gx.url('short-fuse', { file: FILE });
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const res = []; let next = 0;
   const worker = async () => { while (next < N) { const g = next++; const r = await one(browser, g); res.push(r); console.log((r.errs.length || r.issues.length ? 'FAIL ' : 'ok   ') + 'rotate game ' + g + (r.errs.length ? ' ERR ' + [...new Set(r.errs)].slice(0, 2).join(' | ') : '') + (r.issues.length ? ' :: ' + r.issues.slice(0, 4).join(' | ') : '')); } };

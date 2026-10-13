@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Look check</title>
+<style>
+:root{--bg:#f6f4ef;--fg:#1e1d1b;--mut:#6b675f;--card:#fff;--line:#ddd8cd;--sev:#c62828;--warn:#b26a00;--ok:#2e7d32;--info:#4a5fa8}
+@media(prefers-color-scheme:dark){:root{--bg:#141517;--fg:#ecebe7;--mut:#9a9aa0;--card:#1e2024;--line:#33363c;--sev:#ff6b60;--warn:#f2b33d;--ok:#59c27a;--info:#8d97ff}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif;overflow-x:hidden}
+header{padding:14px 16px 6px}h1{font-size:20px;margin:0}h1 a{font-size:13px;font-weight:400;margin-left:8px;color:var(--mut)}
+.sub{color:var(--mut);font-size:13px;margin:2px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:6px 16px}
+.chips b{width:100%;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600;margin-top:4px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;min-height:36px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip small{opacity:.7;margin-left:4px}
+main{padding:8px 16px 60px;display:grid;gap:14px;max-width:1100px;margin:auto}
+.game{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.gh{display:flex;align-items:center;gap:10px;padding:10px 12px;flex-wrap:wrap;cursor:pointer}
+.dot{width:14px;height:14px;border-radius:50%;flex:none}.g{background:var(--ok)}.r{background:var(--sev)}.y{background:var(--warn)}
+.gh h2{font-size:17px;margin:0;flex:1;min-width:140px}
+.cnt{font-size:12px;color:var(--mut)}.cnt b{color:var(--sev)}
+.bychk{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 8px}.bychk span{font-size:11px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--mut)}
+.scr{display:flex;gap:8px;overflow-x:auto;padding:0 12px 10px}.scr img{height:150px;border-radius:6px;border:1px solid var(--line);flex:none}
+.fl{display:grid;gap:10px;padding:0 12px 12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.f{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+.f img{display:block;width:100%;height:auto;background:#222}
+.f .t{padding:8px 10px;font-size:13px}.f .t p{margin:0 0 4px}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;border-radius:4px;padding:1px 6px;margin-right:4px;color:#fff}
+.tag.severe{background:var(--sev)}.tag.warn{background:var(--warn)}.tag.info{background:var(--info)}.tag.art{background:#7b4fa3}
+.m{color:var(--mut);font-size:12px}.m code{font-size:11px;word-break:break-all}
+.empty{color:var(--mut);padding:30px 0;text-align:center}
+</style></head><body>
+<header><h1>Look check <a href="status.html" id="back">Status</a></h1><p class="sub" id="gen">Loading</p></header>
+<div class="chips" id="cg" role="group" aria-label="Game"></div>
+<div class="chips" id="cc" role="group" aria-label="Check"></div>
+<div class="chips" id="cs" role="group" aria-label="Severity"></div>
+<main id="m"><div class="empty">Loading&hellip;</div></main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CH={size:'Text size',contrast:'Contrast',overflow:'Cut off',overlap:'Overlap',fonts:'Fonts',button:'Buttons',images:'Images',boards:'Boards',cards:'Cards',page:'Page',art:'Flat CSS'};
+let D,fg='all',fc='all',fs='all';
+const nice=s=>s.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+function chips(el,list,cur,set){el.innerHTML=(el.dataset.t?`<b>${el.dataset.t}</b>`:'')+list.map(([k,l,n])=>`<button class="chip" data-k="${esc(k)}" aria-pressed="${cur===k}">${esc(l)}${n!=null?`<small>${n}</small>`:''}</button>`).join('');
+  el.onclick=e=>{const b=e.target.closest('button');if(b){set(b.dataset.k);draw()}}}
+function draw(){
+  const G=Object.entries(D.games);
+  $('#cg').dataset.t='Game';$('#cc').dataset.t='Check';$('#cs').dataset.t='Severity';
+  chips($('#cg'),[['all','All games'],...G.map(([k,g])=>[k,nice(k),g.severe])],fg,v=>fg=v);
+  const all=G.flatMap(([k,g])=>g.findings.map(f=>({...f,game:k})));
+  chips($('#cc'),[['all','All checks'],...Object.entries(CH).map(([k,l])=>[k,l,all.filter(f=>f.check===k).length])],fc,v=>fc=v);
+  chips($('#cs'),[['all','All'],['severe','Severe'],['warn','Warnings'],['info','Flat CSS notes']],fs,v=>fs=v);
+  const keep=f=>(fc==='all'||f.check===fc)&&(fs==='all'||f.sev===fs);
+  const out=G.filter(([k])=>fg==='all'||fg===k).map(([k,g])=>{
+    const fl=g.findings.filter(keep);const cls=g.error?'y':g.severe?'r':'g';
+    return `<section class="game"><div class="gh"><span class="dot ${cls}"></span><h2>${esc(nice(k))}</h2><span class="cnt"><b>${g.severe} severe</b> &middot; ${g.warn} warnings &middot; ${g.info||0} notes${g.seconds?` &middot; ${g.seconds}s`:''}</span></div>
+    <div class="bychk">${Object.entries(g.counts||{}).map(([c,v])=>`<span>${esc(CH[c]||c)} ${v.severe?`<b style="color:var(--sev)">${v.severe}</b>/`:''}${v.warn+(v.info||0)}</span>`).join('')}</div>
+    ${fg===k&&!(g.screens||[]).length?'':fg===k?`<div class="scr">${(g.screens||[]).map(s=>`<img loading="lazy" src="${esc(s.img)}" alt="${esc(s.size+' '+s.screen)}" title="${esc(s.size+' '+s.screen)}">`).join('')}</div>`:''}
+    <div class="fl">${fl.length?fl.slice(0,fg===k?200:6).map(f=>`<div class="f">${f.img?`<img loading="lazy" src="${esc(f.img)}" alt="">`:''}<div class="t"><p><span class="tag ${f.sev}">${f.sev}</span>${f.needs_art?'<span class="tag art">needs art</span>':''}${esc(f.desc)}</p>
+      <div class="m">${esc(CH[f.check]||f.check)} &middot; ${f.count>1?f.count+' times &middot; ':''}${esc(f.sites.join(', '))}<br><code>${esc(f.sel)}</code></div></div></div>`).join(''):'<div class="m">Nothing here for these filters.</div>'}</div>
+    ${fl.length>6&&fg!==k?`<div class="gh m" onclick="fg='${k}';draw()">Show all ${fl.length} findings</div>`:''}</section>`}).join('');
+  $('#m').innerHTML=out||'<div class="empty">No games</div>';
+}
+fetch('report.json',{cache:'no-cache'}).then(r=>r.json()).then(d=>{D=d;$('#gen').textContent='Generated '+d.generated.slice(0,16).replace('T',' ')+' UTC. Sizes: '+d.sizes.join(', ')+'. Green = no severe findings.';draw()}).catch(()=>{$('#m').innerHTML='<div class="empty">No report yet.</div>'});
+</script></body></html>

@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "end-lose-b": "a dented helmet and a broken club on a dungeon floor beside a closed door, dim torch, no text, letters or numbers",
+  "end-lose-c": "adventurers dragging themselves out of a dungeon at dawn, exhausted, comic, no text, letters or numbers"
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 8",
+ "meta": {
+  "end-lose-b": {
+   "element": "Painting: end-lose-b",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-b.png",
+   "target": "games/doorkick-dungeon/media/end-lose-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 8"
+  },
+  "end-lose-c": {
+   "element": "Painting: end-lose-c",
+   "why": "every loss shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-lose-c.png",
+   "target": "games/doorkick-dungeon/media/end-lose-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 8"
+  }
+ }
+}

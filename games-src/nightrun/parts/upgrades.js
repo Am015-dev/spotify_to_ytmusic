@@ -122,7 +122,7 @@ function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr
 .pg .card .pp{display:flex;gap:2px;margin-top:2px}.pg .card .pp i{display:block;width:clamp(5px,calc(var(--u)*2),9px);height:4px;border-radius:1px;background:#ffffff22}.pg .card .pp i.on{background:var(--c)}
 #gaCards.tune{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));grid-auto-rows:min-content;align-content:start;gap:calc(var(--u)*2) calc(var(--u)*2);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 2px 6px;flex:1 1 0;min-height:0}
 #gaCards.tune .card{flex-direction:row;text-align:left;justify-content:flex-start;gap:10px;padding:8px 10px;min-height:58px}
-#gaCards.tune .card .tx{flex:1 1 0}#gaCards.tune .card>svg{height:30px;width:30px}
+#gaCards.tune .card .tx{flex:1 1 0;min-width:0;overflow-wrap:anywhere}#gaCards.tune .card .pr{flex:0 0 auto;margin-left:6px}#gaCards.tune .card>svg{height:30px;width:30px}
 #gaCards.tune .card.max{opacity:.55;border-style:dashed}
 .pg .aff{font-family:var(--mono);color:var(--cyan);text-align:center;font-size:clamp(11px,calc(var(--u)*3.3),16px);min-height:1.3em;flex:0 0 auto}
 .pg .aff b{color:var(--amber)}
