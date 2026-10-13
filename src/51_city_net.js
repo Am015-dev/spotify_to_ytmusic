@@ -231,8 +231,10 @@ function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?h
 // overhang the last cross street (up to RD_GSTUB m) are trimmed. Stubs near a mission spot / landmark stay. ?rd=0 = old network (A/B).
 const RD_ON=!/[?&]rd=0/.test(location.search),RD={ops:{cut:0,del:0,gtrim:0,gdel:0,wide:0,two:0},before:null,after:null},RD_STUB={res:420,sec:220,link:200}/* main/arterial never cut: peeling them round by round removed whole arterials (Athens 1718,-1325) */,RD_GSTUB=230;
 const RD_keep=(()=>{const P=[];for(const k in RF.spots){const v=RF.spots[k];P.push(WP(v[0],v[1]))}for(const L of RF.lm)P.push(WP(L[2],L[3]));for(const G of (RF.garages||[]))if(G&&G.length>2)P.push(WP(G[1],G[2]));return(x,z,r=45)=>P.some(([a,b])=>(a-x)**2+(b-z)**2<r*r)})();
+/* Athens old town (Psyrri / Monastiraki / Plaka box) and 150 m round Garaz Psyrri: secondary streets never pruned (cut Kriezi stub = car drove into the blocks that filled it) */
+const RD_OLD=CID!=='ath'?()=>false:(()=>{const g=RF.lm.find(L=>L[1]==='Garaz Psyrri'),G=g?WP(g[2],g[3]):null;return(x,z)=>(x>1450&&x<2300&&z>-1760&&z<-1300)||(G&&(G[0]-x)**2+(G[1]-z)**2<150*150)})();
 function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<2;round++){const N=OB_net(),S=N.segs;let did=0;const kill=new Set(),cut=[];
-  for(const d of N.dead){const A=S[d.a];if(!(d.st<(RD_STUB[A.r.cls]||0))||kill.has(A)||cut.some(c=>c.a===d.a))continue;const P=A.pts;let prot=false;
+  for(const d of N.dead){const A=S[d.a];if(!(d.st<(RD_STUB[A.r.cls]||0))||kill.has(A)||cut.some(c=>c.a===d.a))continue;const P=A.pts;let prot=A.r.cls==='sec'&&P.some(q=>RD_OLD(q.x,q.z));
     if(d.e){for(let i=P.length-1;i>=0&&P[d.i].s-P[i].s<=d.st+1;i-=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}}else for(let i=0;i<P.length&&P[i].s<=d.st+1;i+=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}
     if(!prot){/* a stub that another drivable street crosses or touches is not a leaf (crossings without a shared junction key) */const lo=d.e?P[d.i].s-d.st:0,hi=d.e?P[d.i].s:d.st;const sJ=d.e?lo:hi;for(let i=0;i<P.length&&!prot;i++){if(P[i].s<lo-1||P[i].s>hi+1||Math.abs(P[i].s-sJ)<15)continue;const q=N.proj(P[i].x,P[i].z,A.r.w/2+12,(b)=>b!==d.a);if(q&&q.d<A.r.w/2+N.segs[q.a].r.w/2+1)prot=true}}
     if(prot)continue;cut.push(d)}

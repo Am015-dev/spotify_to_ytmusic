@@ -128,8 +128,8 @@ defines: KM_IDX KM_TEX KM_BIN
 uses: 30(2), 20(1)
 
 ## 51_city_net.js — 44 KB
-defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_prune RD_net RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
-uses: 53(53), 30(30), 10(19), 40(7), 20(6), 41(6), 50(5)
+defines: KMBUF kmBuf kmGeo kmKit kmSize kmMat ATH_DIST SM_ON SM SM_inD SM_dz ATHD athIn athDistAt athDistCfg CITYCFG HWY RF_E0 RF_E1 RF_N0 RF_N1 RF_K RF_EO RF_NO rfC rfU WP RW rfWorld HX0 HX1 HZS HZN HZT MIRX LAYOUT_VER RF rfRect inR athNetDecode linSamples polySamples rfHW WATERS MAINR RIV_C RIV_G _rwi _ri rivNear riverAt inRiver inWater rivClear rivSide deckLocal deckY deckY0 deckAt deckPt BRIDGES SLIPS CITY_S OB_RA OB_DRV OB_KA OB_kf OB_kunion OB_kn OB_cut OB_okLine OB_net OB_sum OB_extend OB_insert OB_tie OB_fix OB_despike OB_crossPass OB_deadPass cand OB_orphPass OB_fpt OB_fJ OB_fillIdx OB_ext OB_fillFix OB_audit RD_ON RD RD_STUB RD_GSTUB RD_keep RD_OLD RD_prune RD_net RD_fillTrim __ob CITY_G cityAt AJ JUNC PLAZAS PARKS LMX LM_BY
+uses: 53(53), 30(31), 10(20), 20(7), 40(7), 41(6), 50(5)
 
 ## 52_terrain_data.js — 115 KB
 defines: TR_DATA

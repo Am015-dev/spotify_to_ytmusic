@@ -3,6 +3,7 @@
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90k',id:'ath-kriezi',go:['ath',2142,-1419],text:'Athens Psyrri: tap 📍 GO, then drive Kriezi street (the short street by Garaz Psyrri) end to end: it is asphalt all the way, no buildings across it, no wall hits.'},
  {ver:'v90j',id:'rd-red',text:'Frankfurt: drive through 3 signal crossings. Cars wait at red in their lane behind the stop line; the middle of the crossing stays clear.'},
  {ver:'v90j',id:'rd-ped',text:'People walk on the pavement and cross only at the zebras (on green, or when no car is coming); cars stop for them.'},
  {ver:'v90j',id:'rd-ath',text:'Athens: drive around the centre for 2 minutes. Streets connect (few dead ends), main roads are wide, and you never have to cut across grass to follow the GPS line.'},
@@ -215,13 +216,13 @@ const OD_CHECKLIST=[
  const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>{const r=s[k(it)]||{};return `${it.ver} ${it.id}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')};
  const badge=()=>{try{pinR()}catch(e){}const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
  const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
-  for(const it of OD_CHECKLIST){const r=s[k(it)]||{};h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
+  for(const it of OD_CHECKLIST){const r=s[k(it)]||{};h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p>${it.go&&it.go[0]===CID?`<button data-c="go" title="Set a GPS pin at this spot">📍 GO</button>`:''}<button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
   ov.innerHTML=h+'</div></div>';badge()};
  const copy=()=>{const t=text();const done=()=>render('Copied: paste it to the coordinator.');
   const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;left:0;top:0;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();ok?done():render('Copy blocked here; long-press to select:\n'+t)};
   try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}};
  ov.addEventListener('click',e=>{if(e.target===ov){ov.hidden=true;document.body.classList.remove('ckOn');return}const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;try{AU.sfx('pick')}catch(er){}
-  if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='PASS'||c==='FAIL'){const key=b.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{st:s[key]&&s[key].st===c?'':c});save(s);render()}});
+  if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='go'){const it=OD_CHECKLIST.find(x=>k(x)===b.closest('.ci').dataset.k);if(it&&it.go&&typeof PIN_set==='function'&&PIN_set(it.go[1],it.go[2])){ov.hidden=true;document.body.classList.remove('ckOn')}}else if(c==='PASS'||c==='FAIL'){const key=b.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{st:s[key]&&s[key].st===c?'':c});save(s);render()}});
  ov.addEventListener('change',e=>{const i=e.target;if(i.tagName!=='INPUT')return;const key=i.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{n:i.value.slice(0,200)});save(s)});
  window.odChkOpen=()=>{render();ov.hidden=false;document.body.classList.add('ckOn')};
  const mk=()=>{const b=document.createElement('button');b.className='ckB';b.addEventListener('click',e=>{e.stopPropagation();try{if(typeof TU_toggle==='function')TU_toggle(false)}catch(er){}document.getElementById('odUpd')&&(document.getElementById('odUpd').hidden=true);odChkOpen()});return b};
