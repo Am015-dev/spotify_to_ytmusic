@@ -110,11 +110,17 @@
         if (!c && document.querySelector('.arena .row.mons .card')) obs.card = true; }, 60);
       window.__obsIv = iv;
       G.phase = 'main'; G.active = 0; UI.pause = true; render();
-      bfKick();
-      return GXS.wait(function () { return obs.card && !document.getElementById('bfclip') && !document.getElementById('bfrev'); }, 16000).then(function () { clearInterval(iv); UI.pause = true; });
+      return new Promise(function (r) { setTimeout(r, 400); });
     },
+    mut: [
+      { name: 'the boss clip never plays', js: 'bfBossClip = function () { return false }' },
+      { name: 'the kicked monster never joins', js: 'enterMonster = function () { }' }
+    ],
     checks: [
-      { kind: 'fn', name: 'a boss clip or the card reveal showed', fn: function () { return window.__obs.clip || window.__obs.rev || 'neither #bfclip nor #bfrev appeared'; } },
+      { kind: 'play', name: 'tap the door: boss clip, then the monster card lands', settleMs: 12000, snap: function () { return { door: G.door.length }; },
+        steps: [{ sel: '.bfdoor' }], idle: function () { var o = window.__obs; return o.card && !document.getElementById('bfclip') && !document.getElementById('bfrev'); },
+        verify: function (b, a) { clearInterval(window.__obsIv); return (a.door === b.door - 1) || 'the door pile did not shrink (' + b.door + ' -> ' + a.door + ')'; } },
+      { kind: 'fn', name: 'the boss clip showed before the card', fn: function () { return window.__obs.clip || 'no #bfclip appeared for a boss'; } },
       { kind: 'fn', name: 'the boss clip file loads over http', fn: function () { return window.__obs.clip ? (window.__obs.clipUrl.indexOf('http') === 0 || 'clip src ' + window.__obs.clipUrl) : true; } },
       { kind: 'fn', name: 'sound played (sfx calls)', fn: function () { return window.__obs.sfx > 0 || 'no sfx() call during the reveal'; } },
       { kind: 'fn', name: 'the monster is in the fight', fn: function () { return !!G.cb && G.cb.mons.length > 0 && G.C[G.cb.mons[0].id] === 'wyrm' || 'no wyrm in G.cb'; } },
@@ -130,16 +136,24 @@
       { kind: 'visible', sel: '[data-board]', name: 'table' },
       { kind: 'fn', name: 'table fills the screen', fn: function () { var r = document.querySelector('[data-board]').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > (innerWidth < 600 ? .55 : .4) || 'table only ' + Math.round(f * 100) + '%'; } },
       { kind: 'visible', sel: '.arena .bfdoor', name: 'the door' },
-      { kind: 'visible', sel: '.mine .hand', name: 'your hand' }
+      { kind: 'visible', sel: '.mine .hand', name: 'your hand' },
+      { kind: 'fn', name: 'the hand on screen is the engine hand (same cards, same order)', fn: function () { var on = [].map.call(document.querySelectorAll('.mine .hand [data-card]'), function (e) { return +e.dataset.card; }); return JSON.stringify(on.slice().sort()) === JSON.stringify(P(0).hand.slice().sort()) || 'screen shows cards ' + on.join(',') + ', engine hand is ' + P(0).hand.join(','); } },
+      { kind: 'fn', name: 'a rival seat for every rival', fn: function () { var n = document.querySelectorAll('.opp.seat').length; return n === G.pl.length - 1 || n + ' rival seats for ' + (G.pl.length - 1) + ' rivals'; } }
+    ],
+    mut: [
+      { name: 'a card is missing from the hand', js: 'document.querySelector(".mine .hand [data-card]").remove()' },
+      { name: 'a rival seat is missing', js: 'document.querySelector(".opp.seat").remove()' }
     ]
   });
 
   GXS.add({
     id: 'dk-zoom', name: 'Big card zoom', ask: 'Is the big card readable?', ls: { dkd_offer: '1' }, seed: 32, when: booted, group: 'Cards',
+    mut: [{ name: 'the zoom shows another card', js: 'document.querySelector("#dkCard h2").textContent = "Wrong Card"' }],
     setup: function () { table(32); UI.zoom = P(0).hand[0]; render(); return GXS.wait(function () { return document.querySelector('#dkCard .zoom .card'); }, 5000).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
     checks: [
       { kind: 'visible', sel: '#dkCard .zoom .card', name: 'big card' },
       { kind: 'text', sel: '#dkCard h2', re: /\S/, name: 'card name' },
+      { kind: 'fn', name: 'the zoomed card is the one you picked', fn: function () { var t = document.querySelector('#dkCard h2').textContent; return t.indexOf(cd(P(0).hand[0]).n) >= 0 || 'zoom shows "' + t.trim() + '" but the card is ' + cd(P(0).hand[0]).n; } },
       { kind: 'visible', sel: '#dkCard .gx-x', name: 'Close button' },
       { kind: 'tap', sel: '#dkCard .gx-x', name: 'tap Close', state: function () { return UI.zoom != null; }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
@@ -157,8 +171,10 @@
       { kind: 'text', sel: '#prompt .bfline', re: /\S/, name: 'status text', minPx: 12 },
       { kind: 'fn', name: 'line is 8 words or fewer', fn: function () { return wordsIn(line()) <= 8 || '"' + line() + '" is ' + wordsIn(line()) + ' words'; } },
       { kind: 'fn', name: 'line is a single line (no wrap past 2 rows)', fn: function () { var e = document.querySelector('#prompt .bfline'), px = parseFloat(getComputedStyle(e).lineHeight) || 16; return e.getBoundingClientRect().height <= px * 2.2 || 'line wraps to ' + Math.round(e.getBoundingClientRect().height / px) + ' rows'; } },
-      { kind: 'tap', sel: '.mine .hand .card.play', name: 'tap a glowing card', state: function () { return line(); }, expect: function (a, b) { return (a !== b && wordsIn(b) <= 8 && /tap|drop|drag|glow/i.test(b)) || 'line after tap: "' + b + '"'; } }
-    ]
+      { kind: 'tap', sel: '.mine .hand .card.play', name: 'tap a glowing card', state: function () { return line(); }, expect: function (a, b) { return (a !== b && wordsIn(b) <= 8 && /tap|drop|drag|glow/i.test(b)) || 'line after tap: "' + b + '"'; } },
+      { kind: 'fn', name: 'the picked card glows exactly where the engine allows it', fn: function () { if (BF.pick == null) return 'no card picked'; var zones = {}; bfMoves(0, BF.pick).forEach(function (x) { zones[x.z] = 1; }); var shown = {}; [].forEach.call(document.querySelectorAll('.bf-tgt'), function (e) { shown[e.dataset.bfz] = 1; }); var a = Object.keys(zones).sort().join(','), b = Object.keys(shown).sort().join(','); return (a === b && a !== '') || 'engine zones [' + a + '] but glowing [' + b + ']'; } }
+    ],
+    mut: [{ name: 'no target glows', js: 'document.querySelectorAll(".bf-tgt").forEach(function (e) { e.classList.remove("bf-tgt"); e.removeAttribute("data-bfz") })' }]
   });
 
   // lightbulb help, first-time tips, rules cards and the Tips switch
@@ -188,6 +204,11 @@
   // painted icons and 3D hero renders: every wired file loads, and each is applied where it belongs
   GXS.add({
     id: 'dk-art', name: 'Painted icons and 3D heroes', ask: 'Are the new icons and hero figures in place?', ls: { dkd_offer: '1' }, seed: 43, when: booted, group: 'Art',
+    mut: [
+      { name: 'hand emoji is back', js: 'document.documentElement.classList.remove("dk-hand")' },
+      { name: 'level gem unpainted', js: 'var st = document.createElement("style"); st.textContent = "#artprobe .lv small{background-image:none!important}"; document.head.appendChild(st)' },
+      { name: 'no 3D hero sprites', js: 'dkHero3d = function () { return "" }' }
+    ],
     setup: function () {
       table(43);
       var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = '<div class="mine"><span class="lv"><small>Lv</small> 1</span></div><div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div>'; document.body.appendChild(h);
