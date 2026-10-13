@@ -6,6 +6,7 @@
   python3 games-src/scripts/build-all.py --out /tmp/stage sunglaze
   python3 games-src/scripts/build-all.py --deploy sunglaze  # also copy PASSING games into games/<slug>/index.html
   python3 games-src/scripts/build-all.py --deploy --suffix -next sunglaze   # preview: games/<slug>-next/
+Every run first executes guard.py (stops on a failure) and modmap.py (refreshes the MODULES.md code maps).
 Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
@@ -108,6 +109,12 @@ def main():
     slugs = a.slugs or list(GAMES)
     bad = [s for s in slugs if s not in GAMES]
     if bad: sys.exit("unknown slug(s): %s\nknown: %s" % (" ".join(bad), " ".join(GAMES)))
+    # cost guard (fails the build) and fresh code maps (games-src/<dir>/MODULES.md: read these, not the built files)
+    g = subprocess.run([sys.executable, str(SCRIPTS / "guard.py")], capture_output=True, text=True)
+    print(g.stdout.rstrip())
+    if g.returncode: sys.exit("build stopped by guard.py (see the Fix: hints above)")
+    m = subprocess.run([sys.executable, str(SCRIPTS / "modmap.py")], capture_output=True, text=True)
+    print(m.stdout.strip() or ("modmap failed: " + m.stderr.strip()[-200:]), flush=True)
     out = pathlib.Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     status, why = {}, {}

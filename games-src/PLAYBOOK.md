@@ -35,7 +35,16 @@ Every change, however small, ships as: **code + scenario + checklist item**, in 
 4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
    gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
 5. **Report** = before/after numbers + the scenario ids. No "play a few games to check" steps for the owner, ever.
-6. Hand off at ~250k context tokens; long sessions get slow and expensive.
+6. Hand off at ~150k context tokens with a HANDOFF note; long sessions get slow and expensive (see "Read less" below).
+
+## Read less: code maps, find.sh, guards (owner, 13 Oct 2026)
+Workers were re-reading 270-650k tokens of their own context, mostly whole UI files and built output. Now:
+1. `games-src/scripts/find.sh --maps` lists each game's `MODULES.md` (generated, not committed; `find.sh --refresh` or any `build-all.py` run rebuilds them).
+   It gives every source file in build order with size and purpose, its functions with line numbers, and which later file overrides which function.
+2. `games-src/scripts/find.sh <symbol|text> [game]` prints `file:line` and which definition wins. Read only that range.
+3. Built html, `x.js` and the joined `ui.js` are git-ignored and skipped by search (`.ignore` files). The numbered `ui1..uiN.js` parts are the real sources.
+4. `scripts/guard.py` (every build + `.github/workflows/guard.yml`) stops big non-media files, growth of sources over 120 KB, new override layer files and tracked build outputs.
+5. Start every worker session from `games-src/BRIEF-TEMPLATE.md`. Numbers: `games-src/CHECK-SPEED.md` (Tokens).
 
 ## The tools (all scripts, no AI)
 - `python3 games-src/scripts/build-all.py [slugs] [--out DIR] [--no-check] [--deploy [--suffix -next]]`

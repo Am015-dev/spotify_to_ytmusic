@@ -1,57 +1,39 @@
 [
  {
   "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Fight numbers you can read, and a test LAB",
+  "game": "mainhattan-nightrun",
+  "title": "Clear phone screen in runs",
   "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut",
-   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
-   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario"
+   "On a phone the run shows the city and enemies: HUD is one slim strip on top, power-ups are small chips, dash and EMP charge sit on their buttons"
   ],
-  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario",
+  "check": "Play a run on your phone: you see the city and enemies, HUD only at the top",
   "scn": [
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-fight-bonus",
-   "dk-tut-help",
-   "dk-board",
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-zoom"
+   "nr-hud-busy"
   ],
   "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
+   "Is the middle of the screen clear?"
   ]
  },
  {
   "date": "2026-10-13",
-  "game": "cauldron",
-  "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
+  "game": "crown",
+  "title": "Clearer score chips and bigger Got it",
   "items": [
-   "Story speech bubble keeps its frame and tail instead of being stretched",
-   "Painted buttons and panels keep their proportions"
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons.",
+   "Tap SMASH! over the city to use your dice",
+   "Cards for sale are painted cards on the board: hold to read, tap to buy",
+   "Your power cards sit along the top of the board",
+   "Stay or yield opens in the middle of the board",
+   "The side panel is smaller: just status and advice",
+   "Star and bolt numbers on the player chips are darker on a pale plate and no longer clipped",
+   "The Got it button on help bubbles is a bigger tap target"
   ],
-  "check": "Open Story: speech bubble undistorted, no sideways scrollbar",
-  "scn": [
-   "story-scene",
-   "cf-board"
-  ],
-  "ask": [
-   null,
-   null
-  ]
+  "check": "Start a game and look at the chips at the top: star and bolt numbers"
  },
  {
   "date": "2026-10-13",
@@ -106,25 +88,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "crown",
-  "title": "Play it on the board",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out",
-   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
-   "Hearts, energy and stars fly to the chips as painted icons.",
-   "Tap SMASH! over the city to use your dice",
-   "Cards for sale are painted cards on the board: hold to read, tap to buy",
-   "Your power cards sit along the top of the board",
-   "Stay or yield opens in the middle of the board",
-   "The side panel is smaller: just status and advice"
-  ],
-  "check": "Roll, keep a die, tap SMASH!, then hold a card and tap it to buy"
- },
- {
-  "date": "2026-10-13",
   "game": "kaiten-kitchen",
   "title": "Kaiten Kitchen: painted chef tags and icons",
   "items": [
@@ -157,38 +120,6 @@
    "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
   ],
   "check": "Start a game on a phone: look at the kilns, the centre tray and your rack."
- },
- {
-  "date": "2026-10-13",
-  "game": "sands",
-  "title": "Button text size",
-  "items": [
-   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
-   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
-   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
-   "Bid chips 13 px"
-  ],
-  "check": "sweep 4/4 clean, no empty or clipped button labels",
-  "scn": [
-   "sq-zoom",
-   "sq-board",
-   "sq-chips",
-   "sq-chips",
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-13",
@@ -268,32 +199,81 @@
   "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
  },
  {
-  "date": "2026-10-10",
-  "game": "cauldron",
-  "title": "3D bag and tumbling chips",
+  "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Fight numbers you can read, and a test LAB",
   "items": [
-   "New painted stage and pass screens",
-   "Phone table, new Tamsin art",
-   "Shorter menu music loops",
-   "The bag swings and shakes as you reach in",
-   "Each chip tumbles out of the bag in its own colour"
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
+   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario"
   ],
-  "check": "Tap the bag and watch it shake, then the chip flip out",
+  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario",
   "scn": [
-   "cf-board",
-   "cf-board",
-   "cf-help",
-   "cf-draw",
-   "cf-draw",
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-fight-bonus",
+   "dk-tut-help",
+   "dk-board",
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-zoom"
+  ],
+  "ask": [
    null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "cauldron",
+  "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
+  "items": [
+   "Story speech bubble keeps its frame and tail instead of being stretched",
+   "Painted buttons and panels keep their proportions"
+  ],
+  "check": "Open Story: speech bubble undistorted, no sideways scrollbar",
+  "scn": [
+   "story-scene",
+   "cf-board"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sands",
+  "title": "Button text size",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
+   "Bid chips 13 px"
+  ],
+  "check": "sweep 4/4 clean, no empty or clipped button labels",
+  "scn": [
+   "sq-zoom",
+   "sq-board",
+   "sq-chips",
+   "sq-chips",
    null,
    null,
    null,
    null
   ],
   "ask": [
-   null,
-   null,
    null,
    null,
    null,
@@ -375,33 +355,6 @@
    "New music per screen with a Music picker"
   ],
   "check": "Start a game and open Music to pick a song."
- },
- {
-  "date": "2026-10-10",
-  "game": "sands",
-  "title": "Sands of Qamar fully painted",
-  "items": [
-   "Painted tiles and table skins",
-   "New card backs, title and end art, portraits",
-   "Music for each screen with a Music picker"
-  ],
-  "check": "Start a game and look at the tiles and table.",
-  "scn": [
-   "sq-board",
-   "sq-zoom",
-   "sq-help",
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-10",
@@ -513,6 +466,70 @@
   "check": "Drive Athens at night for a few minutes."
  },
  {
+  "date": "2026-10-10",
+  "game": "cauldron",
+  "title": "3D bag and tumbling chips",
+  "items": [
+   "New painted stage and pass screens",
+   "Phone table, new Tamsin art",
+   "Shorter menu music loops",
+   "The bag swings and shakes as you reach in",
+   "Each chip tumbles out of the bag in its own colour"
+  ],
+  "check": "Tap the bag and watch it shake, then the chip flip out",
+  "scn": [
+   "cf-board",
+   "cf-board",
+   "cf-help",
+   "cf-draw",
+   "cf-draw",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-10",
+  "game": "sands",
+  "title": "Sands of Qamar fully painted",
+  "items": [
+   "Painted tiles and table skins",
+   "New card backs, title and end art, portraits",
+   "Music for each screen with a Music picker"
+  ],
+  "check": "Start a game and look at the tiles and table.",
+  "scn": [
+   "sq-board",
+   "sq-zoom",
+   "sq-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
   "date": "2026-10-09",
   "game": "crown",
   "title": "Crown City Smash: painted cast and tables",
@@ -560,33 +577,6 @@
    "Skipping the story prologue opens the chapter map"
   ],
   "check": "Open the Card list and the Music picker."
- },
- {
-  "date": "2026-10-09",
-  "game": "sands",
-  "title": "Sands of Qamar painted media",
-  "items": [
-   "Painted tiles, 12 portraits, 3 card backs, 5 tables",
-   "Title and end art",
-   "Skipping the tutorial now counts as seen"
-  ],
-  "check": "Look at the tiles in a new game.",
-  "scn": [
-   "sq-board",
-   "sq-board",
-   "sq-help",
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-09",
@@ -683,43 +673,6 @@
  },
  {
   "date": "2026-10-09",
-  "game": "cauldron",
-  "title": "Cauldron Fair fully painted",
-  "items": [
-   "27 paintings: chips, pieces, makers, table and title",
-   "Campaign portraits, bag skins, 22 fortune cards",
-   "Music with a Music picker, with shuffle-all",
-   "Portrait phone title and table art",
-   "Fortune card list page"
-  ],
-  "check": "Draw from the bag and check the music picker.",
-  "scn": [
-   "cf-zoom",
-   "cf-board",
-   "cf-help",
-   "cf-board",
-   "cf-help",
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-09",
   "game": "approach",
   "title": "Final Approach painted",
   "items": [
@@ -755,6 +708,70 @@
    "Cities stream in and out so Athens and Frankfurt use far less memory"
   ],
   "check": "Press EXIT to get out of your car."
+ },
+ {
+  "date": "2026-10-09",
+  "game": "sands",
+  "title": "Sands of Qamar painted media",
+  "items": [
+   "Painted tiles, 12 portraits, 3 card backs, 5 tables",
+   "Title and end art",
+   "Skipping the tutorial now counts as seen"
+  ],
+  "check": "Look at the tiles in a new game.",
+  "scn": [
+   "sq-board",
+   "sq-board",
+   "sq-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-09",
+  "game": "cauldron",
+  "title": "Cauldron Fair fully painted",
+  "items": [
+   "27 paintings: chips, pieces, makers, table and title",
+   "Campaign portraits, bag skins, 22 fortune cards",
+   "Music with a Music picker, with shuffle-all",
+   "Portrait phone title and table art",
+   "Fortune card list page"
+  ],
+  "check": "Draw from the bag and check the music picker.",
+  "scn": [
+   "cf-zoom",
+   "cf-board",
+   "cf-help",
+   "cf-board",
+   "cf-help",
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -796,23 +813,6 @@
    "25-step tutorial as Chapter 0"
   ],
   "check": "Start the tutorial from the menu."
- },
- {
-  "date": "2026-10-08",
-  "game": "sands",
-  "title": "Sands of Qamar: tutorial",
-  "items": [
-   "Guided tutorial you can replay from the menu"
-  ],
-  "check": "Open the tutorial from the menu.",
-  "scn": [
-   "sq-help",
-   null
-  ],
-  "ask": [
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-08",
@@ -896,28 +896,6 @@
  },
  {
   "date": "2026-10-08",
-  "game": "cauldron",
-  "title": "Cauldron Fair: help and tutorial",
-  "items": [
-   "Lightbulb help and rules cards",
-   "Two-day guided tutorial as Chapter 0"
-  ],
-  "check": "Start the tutorial.",
-  "scn": [
-   "cf-help",
-   "cf-board",
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-08",
   "game": "approach",
   "title": "Final Approach: tutorial flight",
   "items": [
@@ -962,6 +940,45 @@
    "Nightrun blurb updated"
   ],
   "check": "Open Filter and try the new options."
+ },
+ {
+  "date": "2026-10-08",
+  "game": "sands",
+  "title": "Sands of Qamar: tutorial",
+  "items": [
+   "Guided tutorial you can replay from the menu"
+  ],
+  "check": "Open the tutorial from the menu.",
+  "scn": [
+   "sq-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-08",
+  "game": "cauldron",
+  "title": "Cauldron Fair: help and tutorial",
+  "items": [
+   "Lightbulb help and rules cards",
+   "Two-day guided tutorial as Chapter 0"
+  ],
+  "check": "Start the tutorial.",
+  "scn": [
+   "cf-help",
+   "cf-board",
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-07",
