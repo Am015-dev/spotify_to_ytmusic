@@ -138,7 +138,7 @@ function TB_push(){TB.undo.push(JSON.stringify(TB.trk));if(TB.undo.length>80)TB.
 function TB_changed(){TB.lint=TB_lint(TB.trk);TB_ui()}
 const TB_btn=(lab,fn,o={})=>{const b=document.createElement('button');b.innerHTML=lab;b.onclick=e=>{e.stopPropagation();fn(b)};if(o.p!=null)b.setAttribute('aria-pressed',!!o.p);if(o.c)b.className=o.c;if(o.t)b.title=o.t;return b};
 function TB_ui(){const t=TB.trk,e=TB.el;if(!t||!e)return;if(!TB.lint)TB.lint=TB_lint(t);const bar=e.querySelector('#tbBar');bar.innerHTML='';
-  bar.append(TB_btn('◀',()=>TB_drawList(),{t:'My tracks'}),TB_btn('<span class="nm">✎ '+t.name.replace(/</g,'')+'</span>',()=>{const v=prompt('Track name',t.name);if(v){TB_push();t.name=v.slice(0,28);TB_changed()}},{t:'Rename'}));
+  bar.append(TB_btn('◀',()=>TB_drawList(),{t:'My tracks'}),TB_nameIn(t));
   for(const[c,l]of[['fra','FRA'],['ath','ATH']])bar.append(TB_btn(l,()=>{if(t.city!==c){TB_push();t.city=c;TB_changed();TB_draw()}},{p:t.city===c}));
   bar.append(TB_btn('LAPS '+t.laps,()=>{TB_push();t.laps=t.laps%3+1;TB_changed()},{t:'Laps 1–3'}));
   const rw=document.createElement('label');rw.style.cssText='display:flex;align-items:center;gap:4px;font-size:12px;flex:0 0 auto';rw.innerHTML=`ROAD <input type=range min=10 max=17 step=1 value=${t.road} style="width:84px;height:40px"> <b>${t.road} m</b>`;
@@ -206,9 +206,12 @@ function TB_tap(px,py){const t=TB.trk,[x,z]=TB_s2w(px,py),G=TB.lint&&TB.lint.g,t
   if(!G)return TB_toast('Draw a loop first (3+ points)');const n=TB_near(G,x,z);if(n.d*TB.view.s>40)return;
   if(tool==='ter'){TB_push();const q=G.SEG[n.i],p=t.pts[q];p[3]=TB_TERS[(TB_TERS.indexOf(p[3]||'grass')+1)%TB_TERS.length];TB_changed();return}
   const c=TB_hitPc(px,py);if(c>=0&&t.pc[c].k===tool){TB_push();t.pc.splice(c,1);TB_changed();return}
-  const pc={k:tool,x:G.X[n.i],z:G.Z[n.i]};if(tool==='gate'){const k=t.pc.filter(p=>p.k==='gate').length+1,v=prompt('Checkpoint name (a landmark)',TB_lab(G.X[n.i],G.Z[n.i])||'CHECKPOINT '+k);if(v==null)return;pc.n=v.toUpperCase().slice(0,22)}
+  const pc={k:tool,x:G.X[n.i],z:G.Z[n.i]};if(tool==='gate'){const k=t.pc.filter(p=>p.k==='gate').length+1;pc.n=(TB_lab(G.X[n.i],G.Z[n.i])||'CHECKPOINT '+k).toUpperCase().slice(0,22)}// named after the nearest landmark (no prompt(): the app's sandboxed iframe may block modals)
   TB_push();t.pc.push(pc);TB_changed()}
 const TB_hAt=(G,i)=>Math.round(G.Y[i]);
+// track name: an inline text field (no prompt())
+function TB_nameIn(t){const i=document.createElement('input');i.value=t.name;i.maxLength=28;i.setAttribute('aria-label','Track name');i.style.cssText='width:130px;min-height:40px;border-radius:10px;border:0;background:#24324f;color:#fff;font:800 13px system-ui;padding:0 8px;flex:0 0 auto';
+  i.onchange=()=>{const v=i.value.trim();if(v&&v!==t.name){TB_push();t.name=v.slice(0,28);TB.lint=TB_lint(t);TB_lintUi()}};i.onkeydown=e=>{if(e.key==='Enter')i.blur()};return i}
 function TB_lab(x,z){const bg=TB_bg(TB.trk.city);let b=null,bd=600*600;for(const[n,a,c]of bg.labels){const d=(a-x)**2+(c-z)**2;if(d<bd){bd=d;b=n}}return b}
 function TB_input(){const cv=TB.cv,P=TB.ptr;
   cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});

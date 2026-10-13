@@ -15,7 +15,9 @@ const URL=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',OUT=process.ar
   // new Frankfurt track by real taps on the map
   const nb=await p.$('text=＋ NEW FRANKFURT');await nb.tap();await p.waitForTimeout(300);await shot('02_empty');
   for(const[x,y]of[[300,150],[420,110],[560,160],[580,260],[450,330],[300,300],[250,220]])await tap(x,y);
-  await shot('03_drawn');console.log(JSON.stringify(await p.evaluate(()=>({st:__tb.state(),lint:__tb.lint().rules.map(r=>r.id+(r.ok?'+':'-')+' '+r.val)}))));
+  await shot('03_drawn');
+  const gb=await p.$('#tbPal button:has-text("GATE")');await gb.tap();const q=await p.evaluate(()=>{const t=__tb.get(),a=t.pts[1],b=t.pts[2];return __tbS((a[0]+b[0])/2,(a[1]+b[1])/2)});await tap(q[0],q[1]);
+  console.log('GATE',JSON.stringify(await p.evaluate(()=>__tb.get().pc)),'NAME_INPUT',await p.evaluate(()=>!!document.querySelector('#tbBar input[aria-label="Track name"]')));await shot('04_gate');console.log(JSON.stringify(await p.evaluate(()=>({st:__tb.state(),lint:__tb.lint().rules.map(r=>r.id+(r.ok?'+':'-')+' '+r.val)}))));
  }
  if(STEP==='json'){const t=JSON.parse(fs.readFileSync(process.argv[5],'utf8'));await p.evaluate(t=>{__tb.open(t);__tb.fit()},t);await p.waitForTimeout(300);await shot('10_track');
   console.log(JSON.stringify(await p.evaluate(()=>{const L=__tb.lint();return{lap:L.lap,race:L.race,rules:L.rules.map(r=>r.id+(r.ok?' OK ':' XX ')+r.name+': '+r.val)}}),null,1))}

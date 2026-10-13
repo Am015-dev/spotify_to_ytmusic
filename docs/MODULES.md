@@ -380,7 +380,7 @@ defines: OPN_TER OPN_K OPN_I0 OPN_I1 OPN_MOUTH OPN_NOSE OPN OPN_cp OPN_DEFS OPN_
 uses: 10(91), 20(28), 30(25), 31(17), 98rf(10), 53(6), 51(6), 72(2), 40(1)
 
 ## 98tb_track_builder.js — 40 KB
-defines: TB_TERS TB_TCOL TB_V TB_PCS TB TB_clone TB_new TB_geo TB_near TB_lint TB_segOf TB_def TB_reg TB_gates TB_LS TB_loadLocal TB_saveLocal TB_code TB_decode TB_dbInit TB_save TB_regAll TB_css TB_mk TB_toast TB_open TB_close TB_push TB_changed TB_btn TB_ui TB_lintUi TB_selUi TB_bg TB_fit TB_cx TB_cy TB_w2s TB_s2w TB_draw TB_hitPt TB_hitPc TB_snapW TB_tap TB_hAt TB_lab TB_input TB_drawList TB_codeBox TB_fromDef TB_test TB_editBtns TB_menu TB_BUILTIN __tbS
+defines: TB_TERS TB_TCOL TB_V TB_PCS TB TB_clone TB_new TB_geo TB_near TB_lint TB_segOf TB_def TB_reg TB_gates TB_LS TB_loadLocal TB_saveLocal TB_code TB_decode TB_dbInit TB_save TB_regAll TB_css TB_mk TB_toast TB_open TB_close TB_push TB_changed TB_btn TB_ui TB_lintUi TB_selUi TB_bg TB_fit TB_cx TB_cy TB_w2s TB_s2w TB_draw TB_hitPt TB_hitPc TB_snapW TB_tap TB_hAt TB_nameIn TB_lab TB_input TB_drawList TB_codeBox TB_fromDef TB_test TB_editBtns TB_menu TB_BUILTIN __tbS
 uses: 10(44), 30(23), 98ro(12), 20(6), 72(6), 31(2), 40(1)
 
 ## 98zp_perf_ctx.js — 13 KB
