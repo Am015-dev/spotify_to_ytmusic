@@ -27,7 +27,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(!mn){ctx.fillStyle='#8c86b8';ctx.font='12px "Share Tech Mono",monospace';ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),20,54);}});
   cn(W,0,()=>{ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(HARD?' · HARD':''),W-18,28);
     const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),4);
-    if(!mn||ST.on){ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);}});
+    if(!mn||ST.on){ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);}});
   // bottom-left: hull, heat, dash, EMP on row 1, the weapons on row 2, all inside the painted frame (inner area: 12 units in from every edge)
   cn(0,H,()=>{const y0=H-78;UIK.plate(ctx,'ui-hud-bars',8,y0,322,mn?50:74,24,12,157,197);const by=y0+36;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#dcd8f6';ctx.fillText('HULL',20,y0+26);
     const hw=Math.min(16,88/P.max);for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(20+i*hw,by-8,hw-4,8);}
@@ -38,7 +38,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     ctx.fillStyle='#dcd8f6';WP.hud(ctx,20,y0+62,1);
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
-  if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
+  if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font='700 15px "Chakra Petch",sans-serif';{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,W/2-tw/2-26,H-62-26,tw+52,40);}ctx.fillStyle='#ffffff';ctx.fillText(G.hint.txt,W/2,H-62);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
   // boss bar
@@ -81,7 +81,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     ctx.textAlign='center';ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+4*k);ny+=30*k;}
   PW.hud(t,14,ny+22*k,k);
   tierMeter(w/2,h-10*k,k*1.1);
-  if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#8c86b8';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
+  if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font=`700 ${17*k}px "Chakra Petch",sans-serif`;{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,w/2-tw/2-26*k,h-170*k-28*k,tw+52*k,44*k);}ctx.fillStyle='#fff';ctx.fillText(G.hint.txt,w/2,h-170*k);ctx.globalAlpha=1;}
   if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
