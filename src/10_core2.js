@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.7',date:'13 Oct 2026',items:[{t:'FIXED',s:'Every person is now the same height, 1.80 m (pedestrians, quest givers, drivers, you on foot).'}]},
   {v:'v90m-beta.6',date:'13 Oct 2026',items:[{t:'CHANGED',s:'Athens loads about 15 s faster (the ground mesh layout is pre-computed).'},{t:'FIXED',s:'Frankfurt roads no longer end in a strip of grass where two street grids meet (e.g. by the Messe).'},{t:'FIXED',s:'Builder ramps are capped at a gentler slope; new pieces: long ramp, wide bank, kicker, merge (built-in tracks stay hidden).'}]},
   {v:'v90m-beta.4',date:'13 Oct 2026',items:[{t:'FIXED',s:'Vehicle sizes: every ride now has one size table, so buses and trucks are real bus and truck size and the driver is scaled to fit (Frankfurt bus was 4.9 m, now 10.3 m).'}]},
   {v:'v90m-beta.3',date:'13 Oct 2026',items:[{t:'NEW',s:'Liveliness meter: 8 spots per city are measured for life (people, cars, props) to guide the world art pass.'},{t:'CHANGED',s:'Builder track tests now check drivable/fun pass lines (tracks stay hidden).'}]},
