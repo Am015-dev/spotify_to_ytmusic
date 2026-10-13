@@ -143,3 +143,7 @@ blank canvases, small boards, overlapping or spilling cards, sideways scroll and
 - After a real fix, re-save the baseline: `look-check.js --baseline --game <slug>`. Scene drivers live in
   `games-src/scripts/look-scenes.json` (a copy of the ones in asset-viewer/screens.html).
 - An owner bug report about looks ("can't read it", "button has no label") goes into the fixer's brief first, then run the look check on that game.
+
+## LAB and test mode (owner, 13 Oct 2026)
+Every deployed game carries the 🧪 LAB (test mode only; `shell/LAB.md`): build-all inlines `gx-lab-core.js`, `gx-lab.js`, `gx-lab.css` into the staged page, so a game only needs `scn.js`. Per game: `<prefix>-board`, `<prefix>-zoom`, `<prefix>-help`, the shared `story-scene`, and a scenario for every item of its newest What's new entries (`scripts/set-scn.py <game-id> <date> 3=<scn-id>`).
+`build-all.py --quick/--deploy` also runs `scripts/lab-test.js` (off = no LAB element; on = LAB lists GXSLIST and every GO passes its checks; pinned checklist -> shelf -> `games/lab.html`), and after a deploy refreshes `games/scenarios.json` (`scripts/lab-index.js`) and `games/lab.html` (`scripts/lab-page.py`). Brief for a scenarios worker: `games-src/lab/BRIEF-scenarios.md`.

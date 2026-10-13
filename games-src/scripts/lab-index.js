@@ -3,7 +3,7 @@
 const fs = require('fs'), path = require('path'), { chromium } = require('playwright'), gx = require('./gx-serve.js');
 (async () => {
   const slugs = process.argv.slice(2); if (!slugs.length) { console.error('usage: lab-index.js <slug...>'); process.exit(2); }
-  let own = null, base = process.env.GX_URL; if (!base) { own = await gx.startServer({}); base = own.base; } base = base.replace(/\/+$/, '');
+  let own = null, base = process.env.GX_URL; if (!base) { own = await gx.startServer({ stage: process.env.GX_STAGE }); base = own.base; } base = base.replace(/\/+$/, '');
   const F = path.join(__dirname, '..', '..', 'games', 'scenarios.json'); let all = {}; try { all = JSON.parse(fs.readFileSync(F, 'utf8')); } catch (e) { }
   const b = await chromium.launch({ args: ['--no-sandbox'] });
   for (const slug of slugs) {

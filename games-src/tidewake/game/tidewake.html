@@ -409,7 +409,7 @@ html.ph #ps>*{flex-shrink:0}
 html.ph .bd.risk{background:#e3a21a;color:#14232b}html.ph .pt .bd.risk{background:#e3a21a;color:#14232b}
 /* the bar now holds the Hint bulb as well: 6 buttons + the turn chip must fit a 375px phone */
 html.ph .gx-bar .gx-ibtn{min-width:40px;width:40px}html.ph .gx-bar{gap:1px}html.ph .chip{padding:2px 6px;gap:5px;min-width:0;max-width:100%;overflow:hidden}html.ph .chip .c2 small{font-size:.7rem}
-html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:0}html.ph .gx-bar .gx-ibtn>span{display:block!important;font:800 .69rem/1 var(--fb);margin-top:1px;letter-spacing:0;padding:0;color:#fff7d6;text-shadow:0 0 3px #06141a,0 1px 2px #06141a,0 0 6px #06141a}html.ph .gx-bar .gx-ibtn .ico{width:18px;height:18px}html.ph .gx-bar .gx-ibtn{width:auto;min-width:40px;padding-left:3px;padding-right:3px}
+html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:0}html.ph .gx-bar .gx-ibtn>span{display:block!important;font:800 .69rem/1 var(--fb);margin-top:1px;letter-spacing:0;color:#fff7d6;background:rgba(6,20,26,.78);border-radius:4px;padding:1px 3px;text-shadow:0 1px 1px #06141a}html.ph .gx-bar .gx-ibtn .ico{width:18px;height:18px}html.ph .gx-bar .gx-ibtn{width:auto;min-width:40px;padding-left:3px;padding-right:3px}
 html.ph .ps-feed{margin:8px 4px 0;padding:8px 10px;border-radius:12px;background:rgba(8,30,37,.72);border:1px solid rgba(227,178,75,.35);font:500 .86rem/1.3 var(--fb);color:#dcefeb}
 html.ph .ps-feed h5{margin:0 0 4px;font:700 .78rem/1.2 var(--fb);color:#e3b24b;text-transform:uppercase;letter-spacing:.04em}
 html.ph .ps-feed ol{margin:0;padding:0 0 0 1.1em}html.ph .ps-feed li{margin:2px 0}html.ph .ps-feed li.bad{color:#ffb4a6}html.ph .ps-feed li.big{color:#ffe7a3}
@@ -678,7 +678,7 @@ html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
 /* top bar + icon buttons */
 html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
 html.sk .gx-ibtn,html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
-html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 30 42 fill/14px 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
 html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
 html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
@@ -690,7 +690,7 @@ html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 10
 html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
 html.sk .gx-drawer .gx-x{color:var(--sk-cream)}
 /* campaign kit */
-html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
 html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
 html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
@@ -726,7 +726,7 @@ html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-6px 0;z-index:-
 @media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}
 
 /* Tidewake skin (facelift) */
-html.sk .btn:not(.small):not(.on){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#10262d;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .btn:not(.small):not(.on){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#10262d;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .btn.pri:not(.small){border-image-source:url(media/ui-button-power-c.webp);color:#fff6d8;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn.warn:not(.small){border-image-source:url(media/ui-button-go-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn:not(.small):active{transform:translateY(2px)}
@@ -808,7 +808,12 @@ var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function
 (function () {
   var q = new URLSearchParams(location.search), id = q.get('scn');
   var S = window.GXS = { defs: [], on: !!id, id: id };
+  try { S.realLS = window.localStorage; } catch (e) { }   // the player's real storage (a scenario swaps window.localStorage for a private one): the LAB (gx-lab.js) keeps its results here
   S.add = function (d) { S.defs.push(d); };
+  /* group of a scenario for the LAB menu: d.group, else guessed from id / name (Board, Cards, Story, Bosses, UI) */
+  S.group = function (d) { if (d.group) return d.group; var t = (d.id + ' ' + d.name).toLowerCase();
+    return /boss/.test(t) ? 'Bosses' : /story|chapter|campaign|scene|cutscene/.test(t) ? 'Story' : /zoom|card|hand|market|deck|piece|token/.test(t) ? 'Cards' : /board|start|map|table|tile|grid|island|city|dungeon/.test(t) ? 'Board' : 'UI'; };
+  S.pub = function (d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', group: S.group(d) }; };
   if (!id) return;   // normal play: the module is inert (one small object)
 
   /* ---- seeded RNG (mulberry32) ---- */
@@ -834,7 +839,7 @@ var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function
 
   /* ---- list mode (no setup) ---- */
   function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
-  function pub(d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all' }; }
+  var pub = S.pub;
   function onload(fn) { if (document.readyState === 'complete') setTimeout(fn, 0); else addEventListener('load', function () { setTimeout(fn, 0); }); }
   if (id === 'list') { onload(function () { window.GXSLIST = S.defs.map(pub); window.GXSCN = { id: 'list', ready: true }; }); return; }
 
@@ -958,6 +963,29 @@ var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function
       { kind: 'fn', name: 'detail card is on screen', fn: function () { return inView($(pick('#ppop', '#piecesd'))) || 'card off screen'; } },
       skin,
       { kind: 'tap', get sel() { return pick('#ppop .ph-x', '#piecesd .gx-x'); }, name: 'tap closes the card', state: function () { return ph() ? PH.pop : GX.open; }, expect: function (a, b) { return (a && !b) || 'card did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'tw-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 7, when: booted, group: 'UI',
+    setup: function () { return table(7).then(function () { GXH.rules(null); return GXS.wait(function () { return $('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-rules .gxh-card', name: 'help card' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'visible', sel: '.gxh-rules .gxh-x', name: 'Close button' },
+      { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'tw-buttons', name: 'Brass buttons keep their labels', ask: 'Are Place and Help buttons readable?', seed: 8, when: booted, group: 'Board',
+    setup: function () { return table(8); },
+    checks: [
+      { kind: 'text', get sel() { return pick('.ps-main [data-a=place]', 'button[data-a=place]'); }, re: /place/i, name: 'Place label' },
+      { kind: 'visible', sel: '#bulbbtn', name: 'Help bulb' },
+      { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
+      skin
     ]
   });
 })();

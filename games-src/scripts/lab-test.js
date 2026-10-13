@@ -118,7 +118,7 @@ async function testGame(browser, base, slug) {
 
 (async () => {
   const slugs = process.argv.slice(2); if (!slugs.length) { console.error('usage: lab-test.js <slug...>'); process.exit(2); }
-  let own = null, base = process.env.GX_URL; if (!base) { own = await gx.startServer({}); base = own.base; } base = base.replace(/\/+$/, '');
+  let own = null, base = process.env.GX_URL; if (!base) { own = await gx.startServer({ stage: process.env.GX_STAGE }); base = own.base; } base = base.replace(/\/+$/, '');
   const browser = await chromium.launch({ args: ['--no-sandbox', '--force-color-profile=srgb'] }); let bad = 0;
   for (const slug of slugs) {
     const t0 = Date.now(), r = await testGame(browser, base, slug); if (r.fails.length) bad++;

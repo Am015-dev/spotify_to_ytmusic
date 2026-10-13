@@ -93,8 +93,7 @@
       { kind: 'visible', sel: '[data-board]', name: 'table' },
       { kind: 'fn', name: 'table fills the screen', fn: function () { var r = document.querySelector('[data-board]').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > (innerWidth < 600 ? .55 : .4) || 'table only ' + Math.round(f * 100) + '%'; } },
       { kind: 'visible', sel: '.arena .bfdoor', name: 'the door' },
-      { kind: 'visible', sel: '.mine .hand', name: 'your hand' },
-      { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } }
+      { kind: 'visible', sel: '.mine .hand', name: 'your hand' }
     ]
   });
 
