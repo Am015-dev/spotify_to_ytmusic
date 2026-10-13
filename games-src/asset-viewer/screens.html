@@ -94,7 +94,7 @@
 <body>
 <header>
   <h1>Game <span>Screens</span></h1>
-  <nav class="tabs"><a href="board.html">Production</a><a href="assets.html">Assets</a><a class="on" href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
+  <nav class="tabs"><a href="board.html">Production</a><a href="assets.html">Assets</a><a class="on" href="screens.html">Screens</a><a href="anims.html">Animations</a><a href="music.html">Music</a><a href="games.html">Games</a><a href="flow.html">Flow planner</a><a href="index.html">3D votes</a></nav>
   <div class="ctl">
     <span class="seg" id="dev"><button data-d="both" class="on">Phone + PC</button><button data-d="phone">Phone</button><button data-d="pc">PC</button></span>
     <span class="seg" id="cmp"><button data-c="both">Now + new</button><button data-c="new" class="on">New only</button></span>
@@ -299,6 +299,24 @@ const DEFAULT_SCENES = [
   ['Story mode', [{ text: /story mode|^story$/i }]],
 ];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Preview frames are silent: every screen loads the real game, which would otherwise play its music at once.
+function hush(f) {
+  let w; try { w = f.contentWindow; if (!w || w.__hush || w.location.href === 'about:blank') return false; } catch { return true; }
+  w.__hush = 1;
+  const P = w.HTMLMediaElement && w.HTMLMediaElement.prototype, M = P && Object.getOwnPropertyDescriptor(P, 'muted');
+  if (M) {
+    Object.defineProperty(P, 'muted', { configurable: true, get() { return M.get.call(this); }, set() { M.set.call(this, true); } });
+    const play = P.play; P.play = function () { M.set.call(this, true); return play.apply(this, arguments); };
+  }
+  for (const k of ['AudioContext', 'webkitAudioContext']) {
+    const A = w[k]; if (!A) continue;
+    A.prototype.resume = () => Promise.resolve();
+    w[k] = function (...a) { const c = new A(...a); try { c.suspend(); } catch {} return c; }; w[k].prototype = A.prototype;
+  }
+  if (w.AudioNode && w.AudioDestinationNode) { const con = w.AudioNode.prototype.connect; w.AudioNode.prototype.connect = function (t) { return t instanceof w.AudioDestinationNode ? t : con.apply(this, arguments); }; }
+  try { w.document.querySelectorAll('audio,video').forEach(m => { m.muted = true; }); } catch {}
+  return true;
+}
 async function drive(frame, steps) {
   const doc = () => frame.contentDocument;
   const visible = e => e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
@@ -433,6 +451,7 @@ function render() {
       <div class="dev ${d}"><iframe data-scene="${si}" data-dev="${d}" data-skin="${s ? 1 : ''}" width="${sizes[d][0]}" height="${sizes[d][1]}"
         src="game/${G}/index.html?fresh=1&v=${Date.now()}" title="${esc(nice(G))} ${scene} ${t} ${d}"></iframe></div></figure>`)).join('')}
     </div></div>`).join('');
+  document.querySelectorAll('iframe[data-scene]').forEach(f => { const t = setInterval(() => { if (hush(f)) clearInterval(t); }, 30); f.addEventListener('load', () => { clearInterval(t); hush(f); try { f.contentDocument.querySelectorAll('audio,video').forEach(m => { m.muted = true; }); } catch {} }); });
   document.querySelectorAll('iframe[data-scene]').forEach(f => f.addEventListener('load', () => {
     if (f.dataset.skin) skin(f);
     drive(f, SCENES[+f.dataset.scene][1]).then(() => { READY++; setTimeout(check, 400); });
