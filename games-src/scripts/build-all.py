@@ -55,6 +55,7 @@ SWEEPS = {
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
 }
+PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)
 
 def inject_lab(html_path):
@@ -148,7 +149,7 @@ def main():
         env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
     if ok and not a.no_check:  # 3. phone-check against the staging folder
         chk = out / ".check"
-        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk))
+        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
         r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
         rows = {}
         md = chk / "phone-check-results.md"

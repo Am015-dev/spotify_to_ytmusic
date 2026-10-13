@@ -1,6 +1,54 @@
 [
  {
   "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Doorkick: scenario tests and steadier phone layout",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
+   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario",
+   "Tutorial Help step: the Help button label is readable",
+   "Fight with bonuses: big YOU vs MONSTERS scoreline, colours, flying +N",
+   "Boss clip, then the monster card, with sound",
+   "Five rivals no longer push the hand off screen"
+  ],
+  "check": "Open each test with Try this",
+  "scn": [
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-fight-bonus",
+   "dk-tut-help",
+   "dk-board",
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-zoom",
+   "dk-tut-help",
+   "dk-fight-bonus",
+   "dk-boss-reveal",
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   "Can you read the Help button?",
+   "Is YOU vs MONSTERS big and clear?",
+   "Boss clip, roar, then the monster card?",
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "thornbound",
   "title": "Readable map labels",
   "items": [
@@ -115,7 +163,23 @@
    "Carved rack dishes, clay floor dishes and plaster wall recesses",
    "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
   ],
-  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack."
+  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack.",
+  "scn": [
+   "sg-board",
+   "sg-board",
+   "sg-buttons",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -153,7 +217,23 @@
    "Wooden score pills, oak top bar and a leather tile tray with a painted rotate button",
    "Stone-framed menus and buttons, ribbon and goblet on the result"
   ],
-  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
+  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour.",
+  "scn": [
+   "rv-board",
+   "rv-buttons",
+   "rv-buttons",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -335,42 +415,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Fight numbers you can read, and a test LAB",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut",
-   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
-   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario"
-  ],
-  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario",
-  "scn": [
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-fight-bonus",
-   "dk-tut-help",
-   "dk-board",
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-zoom"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "cauldron",
   "title": "Open Story: speech bubble undistorted, no sideways scrollbar",
   "items": [
@@ -475,7 +519,23 @@
    "New title and end art, plus portraits",
    "New music per screen with a Music picker"
   ],
-  "check": "Start a game and open Music to pick a song."
+  "check": "Start a game and open Music to pick a song.",
+  "scn": [
+   "sg-board",
+   "sg-board",
+   "sg-board",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -486,7 +546,23 @@
    "Table skins, tile backs, title and end art, portraits",
    "New music with a Music picker"
   ],
-  "check": "Place a few tiles and look at the fields and roads."
+  "check": "Place a few tiles and look at the fields and roads.",
+  "scn": [
+   "rv-board",
+   "rv-board",
+   "rv-board",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -505,7 +581,19 @@
    "Painted workbench table when the phone is upright",
    "Shorter menu music loops"
   ],
-  "check": "Hold your phone upright and start a game."
+  "check": "Hold your phone upright and start a game.",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -515,7 +603,19 @@
    "Painted default table, with a portrait file for phones",
    "Shorter menu music loops"
   ],
-  "check": "Start a flight on your phone."
+  "check": "Start a flight on your phone.",
+  "scn": [
+   "fa-board",
+   "fa-board",
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-10",
@@ -818,7 +918,23 @@
    "Title and end screens",
    "Skipping the tutorial now counts as seen"
   ],
-  "check": "Check Story unlocks for new tables."
+  "check": "Check Story unlocks for new tables.",
+  "scn": [
+   "sg-zoom",
+   "sg-board",
+   "sg-board",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -830,7 +946,27 @@
    "Title and end art",
    "Skipping the tutorial now counts as seen"
   ],
-  "check": "Start a game and pick a table."
+  "check": "Start a game and pick a table.",
+  "scn": [
+   "rv-board",
+   "rv-zoom",
+   "rv-board",
+   "rv-board",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -842,7 +978,27 @@
    "Title and end art, music with a Music picker, card list page",
    "Skipping the story prologue opens the chapter map"
   ],
-  "check": "Open the Card list page."
+  "check": "Open the Card list page.",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-zoom",
+   "story-scene",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -854,7 +1010,27 @@
    "New music with a Music picker",
    "Portrait phone title and table art"
   ],
-  "check": "Start a flight and open Music."
+  "check": "Start a flight and open Music.",
+  "scn": [
+   "fa-board",
+   "fa-board",
+   "fa-board",
+   "fa-board",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-09",
@@ -1146,7 +1322,23 @@
    "Lightbulb help with a ghost finger and rules cards",
    "Tips on/off switch"
   ],
-  "check": "Tap the lightbulb in a game."
+  "check": "Tap the lightbulb in a game.",
+  "scn": [
+   "story-scene",
+   "sg-help",
+   "sg-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -1155,7 +1347,15 @@
   "items": [
    "Guided tutorial"
   ],
-  "check": "Start the tutorial."
+  "check": "Start the tutorial.",
+  "scn": [
+   "story-scene",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -1164,7 +1364,15 @@
   "items": [
    "Guided tutorial"
   ],
-  "check": "Start the tutorial."
+  "check": "Start the tutorial.",
+  "scn": [
+   "story-scene",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -1174,7 +1382,19 @@
    "23-step tutorial flight as Chapter 0",
    "Plainer wording in chapter 1"
   ],
-  "check": "Start the tutorial flight."
+  "check": "Start the tutorial flight.",
+  "scn": [
+   "story-scene",
+   "fa-zoom",
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-08",
@@ -1427,7 +1647,15 @@
   "items": [
    "Lightbulb, first-time bubbles, rules cards and Tips switch"
   ],
-  "check": "Tap the lightbulb in a game."
+  "check": "Tap the lightbulb in a game.",
+  "scn": [
+   "sf-help",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-07",
@@ -1457,7 +1685,23 @@
    "Plane picture and landing checklist",
    "Co-pilot explains its choices"
   ],
-  "check": "Play Chapter 1."
+  "check": "Play Chapter 1.",
+  "scn": [
+   "fa-board",
+   "fa-zoom",
+   "fa-help",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-07",
