@@ -2,7 +2,7 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
+Wired: 591 paintings, 47 3D models. Still to wire: 124 paintings, 12 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
@@ -15,12 +15,11 @@ Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
 | shipwreck-isle | 6 | 3 |
 | tidewake | 5 | 0 |
 | cauldron-fair | 4 | 0 |
-| thornbound | 3 | 0 |
 | doorkick-dungeon | 3 | 4 |
 | sunglaze | 3 | 0 |
-| short-fuse | 2 | 0 |
-| kaiten-kitchen | 2 | 0 |
 | final-approach | 2 | 0 |
+| kaiten-kitchen | 2 | 0 |
+| short-fuse | 2 | 0 |
 
 ## sands-of-qamar
 
@@ -197,16 +196,6 @@ Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of fairground parchment with a copper outline, single object, centred, |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of fairground parchment with a thin copper edge and a small potion green diamond at the lef |
 
-## thornbound
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
-
 ## doorkick-dungeon
 
 3D: hero-grub, hero-morwen, hero-pip, hero-tansy
@@ -227,14 +216,14 @@ Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
 
-## short-fuse
+## final-approach
 
 3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
 
 ## kaiten-kitchen
 
@@ -245,11 +234,11 @@ Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of washi paper with a lacquered red wood outline, single object, centr |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of washi paper with a thin lacquered red wood edge and a small gold diamond at the left end |
 
-## final-approach
+## short-fuse
 
 3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |

@@ -272,6 +272,13 @@
    "group": "Board"
   },
   {
+   "id": "tb-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",

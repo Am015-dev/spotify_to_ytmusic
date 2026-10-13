@@ -1,6 +1,36 @@
 [
  {
   "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Painted art wired",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger",
+   "Menu tutorial row, speech badge and detail sheet are painted"
+  ],
+  "check": "Open Menu: Tutorial sits on the painted strip",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
+   null,
+   "tb-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "cauldron",
   "title": "Readable chip numbers",
   "items": [
@@ -65,33 +95,6 @@
    "Can you read the Help button?",
    "Is YOU vs MONSTERS big and clear?",
    "Boss clip, roar, then the monster card?",
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Readable map labels",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit",
-   "ROUND, region names and influence numbers on the map are bigger"
-  ],
-  "check": "Open a game: read ROUND and the region names on the map",
-  "scn": [
-   "tb-board",
-   "tb-rivals",
-   "tb-board",
-   "tb-buttons",
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
    null
   ]
  },
