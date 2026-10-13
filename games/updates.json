@@ -1,6 +1,16 @@
 [
  {
   "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Final Approach: a real 3D airliner",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane"
+  ],
+  "check": "Finish a flight and watch the plane land or crash"
+ },
+ {
+  "date": "2026-10-13",
   "game": "short-fuse",
   "title": "Short Fuse: a real 3D bomb",
   "items": [
