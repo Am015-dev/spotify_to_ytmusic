@@ -754,8 +754,9 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
-  {v:'v90i',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: 16 more classic LEGO Town sets, among them a Bulldozer, Post Van, TV Studio Van, Dump Truck, Fire and Rescue Van, Blaze Commander and the Red Devil Racer.'},{t:'FIXED',s:'In Athens the car could suddenly grow huge and flip over after a jump; fixed.'},{t:'FIXED',s:'Phone: the checklist bar no longer covers the mission objective line at the top.'},{t:'FIXED',s:'Athens race: the LEGO palms stand on the verge, not on the track.'}]},
-  {v:'v90h',date:'10 Oct 2026',items:[{t:'FIXED',s:'Garage: every ride now stands ON the garage floor. Before, most rides sank into it after you switched rides, and off-road trucks looked like a flat base with tiny wheels.'},{t:'FIXED',s:'Garage: boats rest on the platform instead of sinking into it.'},{t:'FIXED',s:'Garage: no more dark striped patch on the platform behind big rides.'}]},
+  {v:'v90j-beta',date:'13 Oct 2026',items:[{t:'FIXED',s:'Drivers now sit facing forward in every car, and the 5 rides that drove backwards drive the right way.'},{t:'NEW',s:'21 new LEGO rides in the garage.'},{t:'NEW',s:'HOME: each city\'s garage is now your Home (🏠 on the map). Drive in to save; Pause → 🏠 HOME takes you there.'},{t:'NEW',s:'Your other cars are parked outside Home. Swap rides there and the old one stays parked.'},{t:'CHANGED',s:'BOOST is now for sports cars only. Give any other ride BOOST with a 🧰 Nitro Kit (1,500 studs) in the Home garage. Races keep boost for everyone.'}]},
+  {v:'v90i',date:'13 Oct 2026',items:[{t:'NEW',s:'RIDES: 16 more classic LEGO Town sets, among them a Bulldozer, Post Van, TV Studio Van, Dump Truck, Fire and Rescue Van, Blaze Commander and the Red Devil Racer.'},{t:'FIXED',s:'In Athens the car could suddenly grow huge and flip over after a jump; fixed.'},{t:'FIXED',s:'Phone: the checklist bar no longer covers the mission objective line at the top.'},{t:'FIXED',s:'Athens race: the LEGO palms stand on the verge, not on the track.'}]},
+  {v:'v90h',date:'13 Oct 2026',items:[{t:'FIXED',s:'Garage: every ride now stands ON the garage floor. Before, most rides sank into it after you switched rides, and off-road trucks looked like a flat base with tiny wheels.'},{t:'FIXED',s:'Garage: boats rest on the platform instead of sinking into it.'},{t:'FIXED',s:'Garage: no more dark striped patch on the platform behind big rides.'}]},
   {v:'v90g',date:'10 Oct 2026',items:[{t:'NEW',s:'RIDES: 16 more LEGO vehicles, among them a Street Sweeper, Fire Truck, Tow Rig, Recycle Truck, Classic Patrol, Highway Bike, a Z06 racer and the five tiny Racers (new RACERS filter in the garage).'},{t:'NEW',s:'Frankfurt: a Pizza To Go shop, a phone booth, a LEGO fountain on the lawn and a speedboat on the river. Athens: a little lighthouse and a house on display plinths.'},{t:'CHANGED',s:'The yellow Big Rig drives in Frankfurt traffic again, on wide roads only. Planters, dumpsters, Athens street lamps and the Syntagma race palms are now LEGO parts.'}]},
   {v:'v90f',date:'10 Oct 2026',items:[{t:'FIXED',s:'Rides keep their real LEGO width (no more squeezed-thin cars and trucks).'},{t:'FIXED',s:'All LEGO City and Town rides are true minifig size with a LEGO driver in the cab; the four 1979 Town cars now drive forwards.'},{t:'NEW',s:'RIDES: Police Truck, Fire Chief Car, Precinct Cruiser, Police 4x4, Fire Engine, Ambulance, Rescue Rig, Town Tow Truck and Hook Wrecker.'},{t:'CHANGED',s:'Frankfurt: trees, street lamps, park fences and crates are now real LEGO parts, and a LEGO House (4956) stands near the start.'}]},
   {v:'v90e',date:'10 Oct 2026',items:[{t:'NEW',s:'City traffic is now real LEGO sets: the family car, the patrol car, the mail van, the service van, the camper, the LEGO taxi and Speed Champions cars drive the streets.'},{t:'CHANGED',s:'Each traffic car keeps its real set colours, and crashing into one uses its own size.'},{t:'NEW',s:'RIDES: Town Cruiser, another 1979 LEGO Town car. Garage ride pictures now draw the cards on screen first.'}]},
@@ -5196,7 +5197,7 @@ function miniDraw(){if(!RO.on)return;HUB.mf=(HUB.mf||0)+1;if(HUB.mf%2)return;con
   if(!qvMini(g,to,c)&&tg&&Number.isFinite(tg.x)){const[a,b]=to(tg.x,tg.z);g.strokeStyle='rgba(255,255,255,.95)';g.lineWidth=5;g.setLineDash([2,9]);g.lineCap='round';g.beginPath();g.moveTo(c,c);g.lineTo(c+a,c+b);g.stroke();g.setLineDash([]);const cq=cpTargets();if(cq&&cq.b){const[a2,b2]=to(cq.b.x,cq.b.z);g.strokeStyle='rgba(76,234,255,.8)';g.lineWidth=3;g.setLineDash([2,7]);g.beginPath();g.moveTo(c+a,c+b);g.lineTo(c+a2,c+b2);g.stroke();g.setLineDash([])}}
   g.restore();g.textAlign='center';g.textBaseline='middle';g.font='15px system-ui';
   const pin=(x,z,col,ic,big)=>{let[a,b]=to(x,z);const d=Math.hypot(a,b),lim=R0-12;if(d>lim){if(!big)return;a*=lim/d;b*=lim/d}const r=big?12:10;g.fillStyle=col;g.beginPath();g.arc(c+a,c+b,r,0,7);g.fill();g.lineWidth=2.5;g.strokeStyle='#fff';g.stroke();g.fillStyle='#fff';g.fillText(ic,c+a,c+b+1)};
-  if(ch&&ch.kind==='ball'&&ch.ball){const[a1,b1]=to(ch.ball.x,ch.ball.z),[a2,b2]=to(ch.goal[0],ch.goal[1]);g.save();g.beginPath();g.arc(c,c,R0,0,7);g.clip();g.strokeStyle='#ffd400';g.lineWidth=4;g.setLineDash([3,6]);g.beginPath();g.moveTo(c+a1,c+b1);g.lineTo(c+a2,c+b2);g.stroke();g.setLineDash([]);g.restore();pin(ch.goal[0],ch.goal[1],'#36d17a','🥅',true);pin(ch.ball.x,ch.ball.z,'#2a7fff','⚽',true)}if(ch)for(const o of ch.objs||[])if(!o.done&&Number.isFinite(o.x)&&o!==tg)pin(o.x,o.z,'#ffb000','•',false);if(!ch&&!RO.sp)for(const m of RO.marks){if(!markKnown(m)||markLocked(m))continue;const dn=markDone(m);if(Math.hypot(m.x-RO.x,m.z-RO.z)>R0/s+20&&m!==RO.wp)continue;pin(m.x,m.z,dn?'#59636e':m.col||'#2a6fdb',dn?'✔':mapIcon(m),m===RO.wp)}qvMiniQ(pin,R0,s);
+  if(ch&&ch.kind==='ball'&&ch.ball){const[a1,b1]=to(ch.ball.x,ch.ball.z),[a2,b2]=to(ch.goal[0],ch.goal[1]);g.save();g.beginPath();g.arc(c,c,R0,0,7);g.clip();g.strokeStyle='#ffd400';g.lineWidth=4;g.setLineDash([3,6]);g.beginPath();g.moveTo(c+a1,c+b1);g.lineTo(c+a2,c+b2);g.stroke();g.setLineDash([]);g.restore();pin(ch.goal[0],ch.goal[1],'#36d17a','🥅',true);pin(ch.ball.x,ch.ball.z,'#2a7fff','⚽',true)}if(ch)for(const o of ch.objs||[])if(!o.done&&Number.isFinite(o.x)&&o!==tg)pin(o.x,o.z,'#ffb000','•',false);if(!ch&&!RO.sp)for(const m of RO.marks){if(!markKnown(m)||markLocked(m))continue;const dn=markDone(m);const hm=typeof HM_isHome==='function'&&HM_isHome(m);/* Home: 🏠 Home stays pinned on the minimap edge */if(!hm&&Math.hypot(m.x-RO.x,m.z-RO.z)>R0/s+20&&m!==RO.wp)continue;pin(m.x,m.z,dn&&!hm?'#59636e':m.col||'#2a6fdb',dn&&!hm?'✔':mapIcon(m),m===RO.wp||hm)}qvMiniQ(pin,R0,s);
   if(tg&&Number.isFinite(tg.x))pin(tg.x,tg.z,'#ff3b5c',ch||RO.sp?'◆':mapIcon(tg)||'◆',true);
   // north marker on the rim, player arrow in the middle
   {const[a,b]=to(RO.x,RO.z+1e4),d=Math.hypot(a,b),nx=c+a/d*(R0-2),ny=c+b/d*(R0-2);g.fillStyle='#ffd400';g.beginPath();g.arc(nx,ny,11,0,7);g.fill();g.strokeStyle='#141413';g.lineWidth=2;g.stroke();g.fillStyle='#141413';g.font='900 13px system-ui';g.fillText('N',nx,ny+1)}
@@ -13462,6 +13463,17 @@ GB_brickGeo=(f=>function(b,M,L){if(typeof b.c!=='string'||b.c.indexOf('/')<0)ret
  if(+q[1])o.ox=+q[1];if(+q[2])o.oy=+q[2];if(+q[3])o.oz=+q[3];if(q[4])o.R=q[4].split(',').map(Number);return f.call(this,o,M,L)})(GB_brickGeo);
 // ---------- converted models → brick lists
 function LD_br(id){const Mo=LD_MODELS[id];if(!Mo)return[];return Mo.B.map(([t,x,z,y,r,m,ci,ox,oy,oz,R])=>{CR_reg(t.split('@')[0]);const b={t,x,z,y,r,m,c:Mo.C[ci]};if(ox)b.ox=ox;if(oy)b.oy=oy;if(oz)b.oz=oz;if(R)b.R=R;return b})}
+// facing-1 (Alex 2026-10-13: "cars drive backwards"): a ride's front must be -z (the game drives along -z). The converter picked the yaw from the size
+// (w > d -> --yaw 1 or 3), so sets whose LDraw front is -x came out turned 180 deg (grille at the back). tools/ld/ldfront.py now reads the front from the parts
+// (steering wheel ahead of the seat, clear/yellow lights at one end and red at the other, grille, windscreen) and tools/ld/vehcv.sh picks the yaw from it.
+// Models already converted with the wrong yaw are turned here, at load (audit: tools/ld/facing.py, docs/FACING.md). LD_turn: 180 deg about the origin,
+// cell = -cell - footprint, r + 2, offsets negated, free rotations R = Ry(pi)*R. 'fcT' = hidden marker of a turned list (saved garage copies, 98sz_ride_scale.js).
+const LD_FACE=new Set(['v1991_1','v3180_1','v4208_1','v621_1','v6633_1']);GB_PC.fcT={n:'Facing fix',w:1,d:1,h:1,ic:'↻',hide:1};
+function LD_turn(B){const A=B.map(b=>{if(!b||typeof b.t!=='string'||b.y<=-90)return b;try{if(b.t.indexOf('@')>0)G13_def(b.t)}catch(e){}const P=GB_PC[b.t]||GB_PC[b.t.split('@')[0]];if(!P)return b;
+ const[fw,fd]=b.R||!(b.r%2)?[P.w,P.d]:[P.d,P.w],o=Object.assign({},b,{x:-b.x-fw,z:-b.z-fd,r:((b.r||0)+2)%4});if(b.ox)o.ox=-b.ox;if(b.oz)o.oz=-b.oz;
+ if(b.R){const R=b.R;o.R=[-R[0],-R[1],-R[2],R[3],R[4],R[5],-R[6],-R[7],-R[8]]}return o});A.push({t:'fcT',x:0,z:0,y:-99,r:0,m:0,c:'#000000',hide:1});return A}
+LD_br=(f=>function(id){const B=f(id);return LD_FACE.has(id)&&B.length?LD_turn(B):B})(LD_br);
+GB_brickGeo=(f=>function(b){if(b&&b.t==='fcT')return;return f.apply(this,arguments)})(GB_brickGeo);
 // test hook: surface points of one part as the garage builds it (upright, r 0), used by tools/ld_dump.js to calibrate LDraw parts
 function LD_pts(t,n){const M=[],L=[],g0=CR_G,w0=CR_W;CR_G=[];CR_W=[];let G=[];
  try{GB_piece(t,'#888888',M,L);G=M.concat(L,CR_G);for(const w of CR_W){const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);G.push(g)}}finally{CR_G=g0;CR_W=w0}
@@ -13666,6 +13678,36 @@ kmProps=(f=>function(D){const r=f.apply(this,arguments);const d=D.lamp;if(CID===
 LDS.SW={planter:[LDS_planter,'LEGO flower bed 3020+33291+6255'],dumpster:[LDS_dumpster,'LEGO brick dumpster']};
 kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='fra')return r;for(const t in LDS.SW){const d=D[t];if(!d||d.lds)continue;try{const old=LDS_tri(d.g);d.gOld=d.g;d.mOld=d.mat;d.g=LDS.SW[t][0](d.g);
   d.mat=LDS.mat||(LDS.mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.35,metalness:0}));d.lds=t;if(LDS.st)LDS.st[t]={src:LDS.SW[t][1],old,near:LDS_tri(d.g),far:LDS_tri(d.g)}}catch(e){console.warn('LDS '+t,e)}}return r})(kmProps);
+// construction props, stop sign, rock (land-3, swaps 9-13): LEGO parts (LDraw, CCAL 2.0) in LDU, low-poly; lathes use the part profile (tools/ld/lProfile.py)
+// generic lathe in LDU, colour by height stops [[yMax,'#hex'],..]; drops the degenerate tip triangles
+function LDS_lth(P,seg,cols){const g=new THREE.LatheGeometry(P.map(([r,y])=>new THREE.Vector2(r,y)),seg).toNonIndexed(),p=g.attributes.position,V=[],c=[],C=new THREE.Color();
+ for(let i=0;i<p.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(p,i),b=new THREE.Vector3().fromBufferAttribute(p,i+1),d=new THREE.Vector3().fromBufferAttribute(p,i+2);if(b.clone().sub(a).cross(d.clone().sub(a)).lengthSq()<1e-8)continue;V.push(a,b,d);C.set(cols.find(e=>(a.y+b.y+d.y)/3<e[0])[1]);for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
+ const q=new THREE.BufferGeometry().setFromPoints(V);q.setAttribute('color',new THREE.Float32BufferAttribute(c,3));q.computeVertexNormals();return q}
+// fit by height (tall thin props): old height, old footprint centre, standing on the old base
+function LDS_fitH(G,old,H){const g=mergeG(G);old.computeBoundingBox();const ob=old.boundingBox,s=(ob.max.y-ob.min.y)/H;g.scale(s,s,s);g.translate((ob.min.x+ob.max.x)/2,ob.min.y,(ob.min.z+ob.max.z)/2);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
+// cone (swap 9): LEGO 4589 Cone 1x1 in orange (the LEGO City traffic cone), lathe of its profile r10 base flange -> r6 top, 8 sides; was Kenney CC0 'construction-cone' (66)
+function LDS_cone(old){return LDS_fitH([LDS_lth([[10,0],[10,5],[6,24],[0,24]],8,[[99,'#ff7a1c']])],old,24)}
+// barrier (swap 10): LEGO 4083 Bar 1x4x2 (80 LDU long, 2 bricks high: top bar on two legs) with the red/white roadworks stripes: 3 bar stripes + 2 legs; was Kenney 'construction-barrier' (60)
+function LDS_barrier(old){const G=[],B=(w,h,d,x,y,z,c)=>G.push(cbox(w,h,d,x,y,z,c));B(26,14,8,-27,40,0,'#d8302a');B(28,14,8,0,40,0,'#ffffff');B(26,14,8,27,40,0,'#d8302a');B(8,33,8,-30,16.5,0,'#ffffff');B(8,33,8,30,16.5,0,'#ffffff');return LDS_fit(G,old,80)}
+// warning light (swap 11): 4032 Plate 2x2 Round (black) + 3062b Brick 1x1 Round stack as post + trans-yellow 3062b lamp on top, one 8-sided lathe; was Kenney 'construction-light' (144)
+function LDS_clight(old){return LDS_fitH([LDS_lth([[20,0],[20,8],[8,8],[8,48],[10,48],[10,72],[6,74],[0,74]],8,[[9,'#2f3640'],[48,'#ffd12c'],[99,'#fff3a0']])],old,74)}
+// stop sign (swap 12): 4032 Plate 2x2 Round base + 3957a Antenna 4H pole (r4, 92 LDU) + 30260p01 Roadsign Clip-on 2x2 Octagonal (red STOP: white bar both sides); was Kenney 'road-sign-stop' (104)
+function LDS_sign(old){const G=[LDS_lth([[20,0],[20,8],[4,8],[4,98],[0,98]],6,[[9,'#2f3640'],[99,'#a0a5a9']])],o=new THREE.CylinderGeometry(21,21,4,8);o.rotateX(Math.PI/2);o.rotateZ(Math.PI/8);o.translate(0,104,6);G.push(colorize(o,new THREE.Color('#d8302a')));
+ for(const z of[8.2,3.8]){const w=new THREE.PlaneGeometry(28,7);if(z<6)w.rotateY(Math.PI);w.translate(0,104,z);G.push(colorize(w,new THREE.Color('#ffffff')))}return LDS_fitH(G,old,125)}
+// rock (swap 13): LEGO Rock 4x4x3 boulder (42284 top on 42291 bottom, as in 53934p01c01): convex hull of the two LDraw parts, simplified to 56 faces (pyfqmr), flat shaded,
+// light bluish grey with the dark bluish grey top of the dual-mould rock; was Kenney 'rock_largeA' (80)
+LDS.ROCK={V:[-41,36,-20,-41,36,20,-36,23,-3,-35,58,21,-21,24,-37,-24,70,-4,-19,0,-17,-18,0,18,-19,25,38,-20,46,-40,-14,72,-20,-16,72,16,-27,63,-25,-20,49,39,-4,16,-37,18,0,18,18,23,38,19,0,-17,16,72,-17,20,72,15,19,30,-40,20,55,-39,20,47,40,19,10,-32,25,61,-30,30,57,24,32,15,15,42,38,-20,33,65,-2,41,42,20],
+ F:[4,6,0,21,27,20,29,26,27,17,27,26,16,22,8,16,29,22,16,26,29,24,27,21,9,21,20,9,4,0,9,0,12,9,10,21,9,12,10,2,0,6,2,1,0,11,22,19,25,19,22,25,22,29,23,17,6,23,20,27,23,27,17,15,17,26,15,26,16,28,27,24,28,29,27,28,19,25,28,25,29,18,21,10,18,24,21,18,19,28,18,28,24,5,11,10,5,10,12,13,1,8,13,8,22,13,22,11,14,20,23,14,9,20,14,4,9,14,6,4,14,23,6,7,16,8,7,15,16,7,8,1,7,2,6,7,1,2,3,11,5,3,1,13,3,13,11,3,0,1,3,12,0,3,5,12,18,11,19,18,10,11,7,17,15,7,6,17]};
+function LDS_rock(old,cl,ch){const{V,F}=LDS.ROCK,P=[],c=[],lo=new THREE.Color(cl||'#a0a5a9'),hi=new THREE.Color(ch||'#6c6e68');for(let i=0;i<F.length;i+=3){let ym=0;for(let j=0;j<3;j++){const k=F[i+j]*3;P.push(V[k],V[k+1],V[k+2]);ym+=V[k+1]/3}const C=ym>54?hi:lo;for(let j=0;j<3;j++)c.push(C.r,C.g,C.b)}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));g.computeVertexNormals();return LDS_fit([g],old,180)}// 82 LDU wide fitted to 45% of the old (flat, wide) rock's footprint: same height class as the old rock
+Object.assign(LDS.SW,{cone:[LDS_cone,'4589 cone'],barrier:[LDS_barrier,'4083 barrier'],clight:[LDS_clight,'4032+3062b warning light'],sign:[LDS_sign,'30260p01 stop sign + 3957a'],rock:[LDS_rock,'42284+42291 rock']});
+// Athens CE_* procedural props (land-3, swaps 14-17), same LEGO parts as Frankfurt in Athens colours; set right after CE_defs (buildHubProps)
+// CE_pine -> 3471 Plant Tree Pyramidal 4x4x6⅔ (264 tris of icospheres), CE_olive -> 3470 Plant Tree Oval in olive sage (184), CE_rock -> the 42284/42291 boulder
+// in tan (160), CE_cypress -> 3778 Plant Tree Columnar 4x4x11.5: short trunk + its stacked tiers as 2, 5 sides (45 tris vs the old 41: 14k cypresses, +57k)
+LDS.CE={CE_pine:[()=>LDS_lth(LDS.P.tree3.n,8,[[48,'#6b4a2a'],[999,'#3e6b34']]),'3471',7.2],CE_olive:[()=>LDS_lth(LDS.P.tree.n,7,[[48,'#6a5848'],[999,'#8a9a68']]),'3470',4.1],
+ CE_cypress:[()=>LDS_lth([[5,0],[5,26],[40,36],[20,110],[46,124],[0,280]],5,[[27,'#5a4030'],[999,'#2d5a32']]),'3778',8.6]};
+CE_defs=(f=>function(D){const r=f.apply(this,arguments);if(CID!=='ath')return r;LDS.st=LDS.st||{};for(const t in LDS.CE){const d=D[t];if(!d||d.lds)continue;try{const[fn,src,h]=LDS.CE[t],old=LDS_tri(d.g),g=fn();g.computeBoundingBox();const k=h/g.boundingBox.max.y;g.scale(k,k,k);g.computeBoundingBox();g.computeBoundingSphere();d.gOld=d.g;d.g=g;d.lds=t;LDS.st[t]={src,old,near:LDS_tri(g),far:LDS_tri(g)}}catch(e){console.warn('LDS '+t,e)}}
+ const d=D.CE_rock;if(d&&!d.lds)try{const old=LDS_tri(d.g),g=LDS_rock(d.g,'#c8b48a','#a89c84');d.gOld=d.g;d.g=g;d.lds='CE_rock';LDS.st.CE_rock={src:'42284+42291 rock',old,near:LDS_tri(g),far:LDS_tri(g)}}catch(e){console.warn('LDS CE_rock',e)}return r})(CE_defs);
 // Athens palm (swap 7, Syntagma race palms, TRK.tree 'palm'): LEGO palm as built in set 6376 Breezeway Cafe (ld/land/l_palm.ldr, OMR, CCAL 2.0):
 // 2563 base (r 20 LDU), stacked 2536 trunk segments (r 11 -> 14 each), 2566 top and 4 x 2518 Palm Leaf Large (176 LDU long, 90 wide, drooping 43);
 // trunk = 5-sided lathe of that profile, each leaf = 2-sided quad + tip triangle; scaled to the old 9.5 m trunk. Replaces athTreeBy0('palm') (108 tris).
@@ -13691,7 +13733,7 @@ function LDS_scan(){const D=HUB.ptypes;LDS.on=[];LDS.n=HUB.props?HUB.props.lengt
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(!LDS.on.length||LDS.n!==HUB.props.length)LDS_scan();const cp=camera.position,D=HUB.ptypes;
  for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),g=Math.hypot(dx,dz)<LDS.near?d.g:d.gFar;if(o.geometry!==g)o.geometry=g}})(hubCullStep);
 // test hook (before/after shots of the same spot): ab(1) draws the old trees again
-function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
+function LDS_ab(off){for(const DL of['lamp','fence','crate','planter','dumpster','cone','barrier','clight','sign','rock','CE_pine','CE_olive','CE_cypress','CE_rock'].map(k=>HUB.ptypes&&HUB.ptypes[k]))if(DL&&DL.lds)HUB.grp.traverse(o=>{if(o.isInstancedMesh&&(o.geometry===DL.g||o.geometry===DL.gOld)){o.geometry=off?DL.gOld:DL.g;if(DL.mOld)o.material=off?DL.mOld:DL.mat}});LDS.off=off;const D=HUB.ptypes;LDS_scan();for(const o of LDS.on){const d=D[o.userData.lds];o.geometry=off?d.gOld:d.g}}
 window.__ld.lds=LDS;LDS.race=t=>setupRace({type:'attract',laps:99,traffic:0,items:false,aggr:0,track:t,mood:(TRACK_DEFS.find(d=>d.id===t)||{}).mood||'brick'});LDS.cam=()=>camera;LDS.palm0=()=>athTreeBy0('palm');LDS.inB=(x,z)=>CITY.some(b=>Math.abs(b.x-x)<b.hw+2&&Math.abs(b.z-z)<b.hd+2);LDS.probe=(x,z)=>({d:nearestTrackDist(x,z,999),HALF,W,ath:athH(x,z)});window.__ld.ldsAB=LDS_ab;window.__ld.ldsLathe=LDS_lathe;
 // ---- LDM runner (v89z: lazy per-model loading). models.js is now a small INDEX (tools/ld/mkmodels.py): the presets + placements of every data module
 // (window.__LDQ, run here at boot) and window.__LDX (chunk urls, mesh key -> chunk, preset -> models). The meshes + brick lists of each model live in
@@ -13853,9 +13895,14 @@ GB_PC.drvM={n:'Minifig driver',w:2,d:2,h:9,ic:'🧑',hide:1};
 // marker scales them ×RSZ.rk (2: 4 studs at 2× = the 8-wide Speed Champions width, a car next to traffic). Their cockpits are closed canopies: no driver.
 RSZ.rk=2;GB_PC.szR={n:'Racers scale',w:1,d:1,h:1,ic:'🏁',hide:1};
 function SZ_k(B){let k=1;for(const b of B||[]){const t=b&&(b.t||b[0]);if(t==='drvM')return RSZ.k;if(t==='szR')k=RSZ.rk}return k}
-// the driver sits behind the steering wheel ('stw', r 2 = facing -z like the LDraw sets, r 0 = +z), 3 plates under it
-function SZ_add(B){if(!Array.isArray(B)||!B.length||SZ_k(B)>1)return B;const w=B.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');const A=B.slice();
- if(w){const r=w.r&2?2:0;A.push({t:'drvM',x:w.x,z:r?w.z+1:w.z-2,y:w.y-3,r,m:0,c:'#0055bf'})}else A.push({t:'drvM',x:-1,z:-1,y:-99,r:2,m:0,c:'#0055bf',hide:1});return A}
+// the driver sits behind the steering wheel, 3 plates under it, facing the ride's front.
+// facing-1 (Alex 2026-10-13: "in some cars the driver sits wrong direction"): the figure took its yaw from the 'stw' brick (r 2 -> drvM r 2), but drvM r 2
+// faces +z, the ride's REAR (r 0 faces -z = the front of every ride: the converter's yaw puts the LDraw front at -z, as the hand-built cars), and the 'stw'
+// brick's yaw is arbitrary (a symmetric box: the calibration cannot tell its turns apart). Now the driver always faces -z with his hands at the wheel
+// (cell one stud behind it), and an old drvM (saved garage copies) is replaced, so saved rides get the fixed driver too.
+function SZ_add(B){if(!Array.isArray(B)||!B.length||B.some(b=>b&&b.t==='szR'))return B;const A=B.filter(b=>!(b&&b.t==='drvM')),w=A.find(b=>b&&b.t&&b.t.split('@')[0]==='stw');
+ if(w)A.push({t:'drvM',x:w.x,z:w.z+1,y:w.y-3,r:0,m:0,c:'#0055bf'});else{const d=B.find(b=>b&&b.t==='drvM'&&b.y>-90);// no wheel (6522 bike): the module's own rider, turned to the front
+  A.push(d?Object.assign({},d,{r:0}):{t:'drvM',x:-1,z:-1,y:-99,r:0,m:0,c:'#0055bf',hide:1})}return A}
 // figure only (the set has its own seat): true minifig height 5 studs (3.0 units; the 'drv' part is 0.83 of that and has a seat box)
 GB_piece=(f=>function(t,c,M,L){if(t!=='drvM')return f.apply(this,arguments);const tm=[],tl=[];GB_figGeo(GB_figGet(),tm,tl,true);
  const s=1.5*(typeof SC_S!=='undefined'&&SC_S&&SC_S.drv?SC_K.drv:1),k=RSZ.fig;
@@ -13867,8 +13914,10 @@ RSZ.rac=S=>!!(S&&S.grp==='racers');const SZ_rac=B=>Array.isArray(B)&&B.length&&S
 for(const S of GAR_SETS)if(RSZ.rac(S)){const c=S.car;S.car=function(){return SZ_rac(c.apply(this,arguments))};S.ms=2}
 for(const S of GAR_SETS)if(!RSZ.rac(S)&&RSZ.mini(S)){const c=S.car;S.car=function(){return SZ_add(c.apply(this,arguments))};S.ms=1}
 // saved copies of these rides (bricks stored before this fix) get the driver too
-G9C_bricks=(f=>function(S,fm){const B=f.apply(this,arguments);return fm==='car'&&S&&S.ms?(S.ms===2?SZ_rac(B):SZ_add(B)):B})(G9C_bricks);
-gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);if(S&&S.ms)t.gbB=S.ms===2?SZ_rac(t.gbB):SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
+// facing-1: a saved copy of a ride the loader now turns (LD_FACE, 98ld_import.js) was stored the wrong way round: turn it once (marker 'fcT')
+const SZ_face=(S,B)=>S&&LD_FACE.has(String(S.id).slice(2))&&Array.isArray(B)&&B.length&&!B.some(b=>b&&b.t==='fcT')?LD_turn(B):B;
+G9C_bricks=(f=>function(S,fm){let B=f.apply(this,arguments);if(fm==='car')B=SZ_face(S,B);return fm==='car'&&S&&S.ms?(S.ms===2?SZ_rac(B):SZ_add(B)):B})(G9C_bricks);
+gbTeam=(f=>function(base,b){const t=f.apply(this,arguments);try{if(t&&t.gbB&&b&&b.on){const S=GAR_set(GAR_get().sel);t.gbB=SZ_face(S,t.gbB);if(S&&S.ms)t.gbB=S.ms===2?SZ_rac(t.gbB):SZ_add(t.gbB)}}catch(e){}return t})(gbTeam);
 // the ride scale: uniform, no width squeeze for brick rides; driver height checks use the same k
 GB_attach=(f=>function(g,bricks){const r=f.apply(this,arguments);try{if(g&&g.userData){g.userData.szK=SZ_k(bricks);g.userData.szB=!!(bricks&&bricks.length)}}catch(e){}return r})(GB_attach);
 SC_ship=(f=>function(g,isPl){const ud=g&&g.userData;if(!ud||!ud.m||!SC_S.on||!(ud.szB||ud.szK>1))return f.apply(this,arguments);SC_fold(ud);
@@ -14194,6 +14243,24 @@ if(typeof BC_upd==='function')BC_upd=(f=>function(){if(OF.cur&&!OF.cur.own)retur
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
 const OD_CHECKLIST=[
+ {ver:'v90j-beta',id:'home-save',area:'city',text:'Pause → 🏠 HOME takes you to your Home garage (orange 🏠 on the minimap). Drive in and stop: "💾 SAVED · HOME" shows beside the card (not on it). Works in Frankfurt and Athens.'},
+ {ver:'v90j-beta',id:'home-cars',area:'city',text:'Your stored cars stand parked by the Home door, wheels on the ground. Swap your ride in the garage while at Home: the old ride is now parked outside.'},
+ {ver:'v90j-beta',id:'nitro-gate',area:'hud',text:'Free roam: sports cars (Hot Rod, Speed Champions, racers) have BOOST. Other rides (e.g. Post Van) have no BOOST button. Races still give everyone boost.'},
+ {ver:'v90j-beta',id:'nitro-kit',area:'garage',text:'At Home → garage → RIDES: a ride without nitro shows 🧰 INSTALL NITRO KIT (1,500 studs). After installing, that ride has BOOST everywhere. Reload: ride, kit and Home stay.'},
+ {ver:'v90j',id:'ride-fast',area:'garage',text:'Garage → RIDES: tap any ride card: the whole ride stands there within about 1 second (never just wheels or a bare chassis); a LOADING sign shows if it needs longer.'},
+ {ver:'v90j',id:'ck-go',area:'hud',text:'Checklist: items you can\'t reach in a short drive (pizza shop, phone booth, fountain, speedboat, Big Rig, planters, cones, Athens display models, Syntagma palms) have 📍 GO: it drops your car next to the thing (tap again for the next one).'},
+ {ver:'v90j',id:'gz-zoom',area:'garage',text:'Garage: the − ⤢ + buttons zoom the car in and out on every tab (RIDES, BUILD, PAINT…); ⤢ goes back to the normal view. Two-finger pinch zooms too.'},
+ {ver:'v90j',id:'gz-keys',area:'garage',dev:'pc',text:'PC, garage: the mouse wheel and the + / − / 0 keys zoom; the I key picks a part (like 💧 PICK).'},
+ {ver:'v90j',id:'gz-pick',area:'garage',text:'Garage → BUILD → ⋯ MORE → 💧 PICK, then tap a part of the car: the next part you place is the same part, turn and colour.'},
+ {ver:'v90j',id:'ck-filter',area:'hud',text:'Checklist: 📱 PHONE / 💻 PC and the GARAGE · RACE · CITY · PEOPLE · HUD chips filter the list; phone and PC answers are kept apart.'},
+ {ver:'v90j',id:'ck-fold',area:'hud',text:'While driving, fold the checklist strip (tap the counter): ✅ / ❌ still answer the item shown, with nothing to open or close.'},
+ {ver:'v90j',id:'veh21',area:'garage',text:'Garage → RIDES: 21 more: Site Dumper, Outback Racer, Mini Dump Truck, Milk Truck, News Van, Fire Chief Car (6571), Fire Patrol Car, Dig Master Truck, Gas Tanker Cab, Road Rescue Truck, Res-Q Cruiser, Bulldozer (6481), F1 Hauler, Formula Racer, Rescue Patrol Car, Go-Kart, Off-Roader, Farm Tractor (30284), Mini Garbage Truck, Blue Racer, Red Coupe: each complete, on the floor, driver facing forward.'},
+ {ver:'v90j',id:'facing',area:'garage',text:'Garage → RIDES → Construction Truck and Tanker Cab: the driver faces the grille and sits at the wheel; drive one: it goes grille-first.'},
+ {ver:'v90j',id:'fwd5',area:'city',text:'Drive the Racing Pickup, Tanker Cab, Fire Truck (4208), Classic Patrol and Family Car: each drives forwards, not backwards.'},
+ {ver:'v90j',id:'town20',text:'Garage → RIDES: Recycling Truck, Classic Tractor, Pursuit Squad Car, Mobile Crane, Night Patroller, Mobile Police Truck, Hook and Ladder Truck, Sport Convertible, Farm Tractor (6504), Police Patrol, Fire Chief Car (6602), Shovel Tractor, Road Racer, Little Tractor, Race Car (6609), Road and Trail 4x4, Mini Ladder Truck, Rescue SUV, Highway Pickup: each stands on the floor, wheels down, driver in the seat.'},
+ {ver:'v90j',id:'tow7638',text:'Garage → RIDES → Tow Truck (7638): now with doors, windscreen and mudguards; drives forwards.'},
+ {ver:'v90j',id:'fra-props',text:'Frankfurt: road works have LEGO cones, barriers, a warning light and a STOP sign; rocks are LEGO rocks; none sit on the road.'},
+ {ver:'v90j',id:'ath-trees',text:'Athens: pines, olive trees, cypresses and rocks are LEGO pieces; driving stays smooth.'},
  {ver:'v90i',id:'town16',text:'Garage → RIDES: Blaze Commander, Blizzard Blazer, Red Cross Car, Red Devil Racer, Mini Dumper, Rescue Runabout, Landscape Loader, Service Truck, Dump Truck, Fire and Rescue Van, Post Van, Construction Truck, Highway Emergency Van, Bulldozer, TV Studio Van, Pothole Patcher: each looks complete and stands on the platform; drive two.'},
  {ver:'v90i',id:'pin-obj',text:'Phone, story mission: the checklist bar sits below the yellow NEXT objective line, never on top of it.'},
  {ver:'v90i',id:'palms',text:'Athens Syntagma race: the palms stand beside the track on the verge, none on the asphalt.'},
@@ -14382,8 +14449,49 @@ const OD_CHECKLIST=[
  {ver:'v88f',id:'music',text:'Music plays after your first tap (iPhone and the Claude app).'}];
 {const KEY='mho_chk',esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
  const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){return{}}},save=s=>{try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}};
- const k=it=>it.ver+'/'+it.id,cur=()=>OD_CHECKLIST.filter(it=>it.ver===OD_CHECKLIST[0].ver);
- const open=()=>{const s=load();return cur().filter(it=>!(s[k(it)]&&s[k(it)].st)).length};
+ const k=it=>it.ver+'/'+it.id;
+ // CK2 (Alex 2026-10-13: "separate the checklist pc/phone and also make it easy to approve while playing not open close", "allow some filtering eg
+ // garage, race, city, person"): answers are kept per device (📱 PHONE = touch screen, 💻 PC = mouse); an item with dev:'phone'|'pc' (or whose text
+ // starts "Phone"/"PC") only shows on that device. AREA chips (GARAGE · RACE · CITY · PEOPLE · HUD) use it.area or words in the text. The filter
+ // (mho_chk._f) also drives the pinned strip, whose folded chip keeps ✅ / ❌ so an item is answered with one tap while playing.
+ const DEV=(()=>{try{return matchMedia('(pointer:coarse)').matches?'ph':'pc'}catch(e){return'pc'}})(),DEVN={ph:'📱 PHONE',pc:'💻 PC'};
+ const devOf=it=>it.dev?(it.dev==='pc'?'pc':'ph'):/^(phone|iphone|touch)\b/i.test(it.text)?'ph':/^(pc|desktop|keyboard|mouse)\b/i.test(it.text)?'pc':'';
+ const AREAS=[['all','ALL'],['garage','GARAGE'],['race','RACE'],['city','CITY'],['people','PEOPLE'],['hud','HUD']];
+ const AREA_RX={garage:/garage|\brides?\b|\bbuild|paint|showroom|\bkits?\b/i,race:/\brac(e|es|ing)\b|\bcup\b|\blaps?\b|countdown|finish|rival/i,
+  city:/frankfurt|athens|\bcity\b|street|road|traffic|\bdriv(e|ing)\b|roam|tree|props?\b|river|boat|jump/i,people:/minifig|pedestrian|people|person|driver|\bnpc|human|giant|statue|\bhost/i,
+  hud:/\bhud\b|button|checklist|menu|popup|\bpin\b|objective|screen|minimap|updates|\btext\b/i};
+ const areaOf=it=>it.area?[].concat(it.area):Object.keys(AREA_RX).filter(a=>AREA_RX[a].test(it.text));
+ const flt=()=>{const f=load()._f||{};return{d:f.d==='pc'||f.d==='ph'?f.d:DEV,a:f.a||'all'}};
+ const show=(it,F=flt())=>{const d=devOf(it);return(!d||d===F.d)&&(F.a==='all'||areaOf(it).includes(F.a))};
+ const res=(s,it,d=flt().d)=>s[k(it)+'|'+d]||s[k(it)]||{};  // answers from before v90j (no device) count on both devices
+ const rset=(s,it,o)=>{const kk=k(it)+'|'+flt().d;s[kk]=Object.assign({},res(s,it),s[kk]||{},o)};
+ const cur=()=>OD_CHECKLIST.filter(it=>it.ver===OD_CHECKLIST[0].ver&&show(it));
+ // 📍 GO (coordinator v90j: items a 2-min drive never reaches): drops the car on the nearest street facing the thing to check; items with
+ // several things step through them on each tap. Another city → the flight there (tap 📍 again after landing). Palms → the Syntagma race.
+ // Targets: w = a LEGO world model (LDW.on), p = a street prop type (HUB.props), car = a traffic car kind, race = a track id.
+ const GO={'v90g/fra-props':[{w:'w6350',n:'Pizza To Go'},{w:'w6613',n:'phone booth'},{w:'w10184f',n:'fountain'},{w:'w1069',n:'speedboat'}],
+  'v90g/ath-display':[{w:'w30023',n:'lighthouse'},{w:'w7796',n:'house'}],'v90g/bigrig':[{car:'v3221_1',c:'fra',n:'Big Rig'}],
+  'v90g/land2':[{p:'planter',c:'fra',n:'planter'},{p:'dumpster',c:'fra',n:'dumpster'}],'v90i/palms':[{race:'synt',c:'ath',n:'Syntagma race'}],
+  'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
+  'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
+ const goI={},goSay=t=>{goI._t=t;try{say('',t,2.2)}catch(e){}};
+ const goCity=T=>T.c||(T.w&&((LDW_P.find(q=>q.model===T.w)||{}).city))||'fra';
+ const goAt=T=>{if(T.w){const E=LDW.on.find(e=>e.id===T.w);return E&&{x:E.x,z:E.z}}
+  if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}
+  if(T.car){const c=(HUB.cars||[]).find(c=>!c.dead&&String(HCAR[c.k]).includes(T.car));return c&&{x:c.x,z:c.z}}return null};
+ const goJump=it=>{const L=GO[k(it)];if(!L)return;const i=goI[k(it)]=((goI[k(it)]??-1)+1)%L.length,T=L[i],c=goCity(T);let st='';try{st=state}catch(e){}
+  if(c!==CID){if(st==='roam'&&cityTravel(c)){goSay('✈ Flying to '+(c==='ath'?'Athens':'Frankfurt')+' · tap 📍 again after landing');goI[k(it)]=i-1}else goSay('📍 Drive in '+(c==='ath'?'Athens':'Frankfurt')+' first (story → fly there)');return}
+  if(T.race){if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;
+   menuTab='quick';menuTrack=T.race;quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;return}  // like a roam race marker: back to the city after the race
+  if(st!=='roam'||!RO.on){goSay('📍 Works while driving around the city');return}
+  if(RO.ch||RO.sp){const nm=((RO.ch&&RO.ch.m&&RO.ch.m.ev&&RO.ch.m.ev.name)||(RO.sp&&RO.sp.e&&RO.sp.e.name)||'the event').toUpperCase();
+   if(!(goI._ok>performance.now())){goI._ok=performance.now()+6000;goI[k(it)]=i-1;goSay('📍 This leaves '+nm+' (you can restart it) · tap 📍 again to go');return}
+   goI._ok=0;try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}
+  if(RO.wk){goSay('📍 Get back in the car first');return}
+  const t=goAt(T);if(!t){goSay('📍 No '+T.n+' nearby right now · try again');return}
+  let q=rfSnap(t.x,t.z,220)||[t.x+12,t.z+12];if(T.car&&q[2]!=null)q=[q[0]-Math.sin(q[2])*20,q[1]-Math.cos(q[2])*20];const h=Math.atan2(t.x-q[0],t.z-q[1])+(T.car?0:.35);  // .35 rad: the thing sits beside the car, not hidden behind it · a traffic car: 20 m back along its road, not on top of it
+  if(roamWarp(q[0],q[1],h))goSay('📍 '+T.n.toUpperCase()+(L.length>1?` · ${i+1}/${L.length}, tap 📍 for the next`:''));else goSay('📍 Can\'t jump right now')};
+ const open=()=>{const s=load();return cur().filter(it=>!res(s,it).st).length};
  const st=document.createElement('style');st.textContent=`#odChk{position:fixed;inset:0;z-index:9100;display:flex;align-items:center;justify-content:center;background:rgba(10,14,30,.6);padding:8px;box-sizing:border-box;user-select:none;-webkit-user-select:none}#odChk[hidden]{display:none}
 #odChk .cc{width:min(720px,100%);max-height:100%;display:flex;flex-direction:column;background:#0b1626;border:3px solid #3ddc84;border-radius:16px;color:#e8f2fa;font:600 13px system-ui}
 #odChk .ch{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:2px solid #1d3550}#odChk .ch b{font:italic 900 20px var(--hud,system-ui)}#odChk .ch small{color:#9fb3c8;font-size:12px}
@@ -14391,21 +14499,26 @@ const OD_CHECKLIST=[
 #odChk .cb{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 10px 10px}#odChk .ci{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #ffffff14;flex-wrap:wrap}
 #odChk .ci p{flex:1 1 300px;margin:0;line-height:1.35;font-size:13px}#odChk .ci .pa.on{background:#3ddc84;border-color:#3ddc84;color:#0b1626}#odChk .ci .fa.on{background:#ff4d6d;border-color:#ff4d6d}
 #odChk .ci input{flex:1 1 100%;min-height:36px;font:13px system-ui;background:#0d1a2c;color:#fff;border:1px solid #4ceaff55;border-radius:8px;padding:4px 8px;user-select:text;-webkit-user-select:text}
-#odChk .msg{color:#ffd12c;font-size:12px}.ckB{font:800 13px system-ui;min-height:44px;border-radius:10px;border:2px solid #3ddc84;background:#10301f;color:#fff;padding:0 10px}`;document.head.appendChild(st);
+#odChk .msg{color:#ffd12c;font-size:12px}#odChk .cf{display:flex;gap:4px;padding:4px 10px;overflow-x:auto;border-bottom:2px solid #1d3550;flex:none}#odChk .cf i{flex:none;width:8px}
+#odChk .cf button{flex:none;min-height:36px;min-width:44px;border-radius:9px;border:2px solid #4ceaff;background:#12304a;color:#fff;font:900 12px system-ui;padding:0 8px}#odChk .cf button.on{background:#ffd12c;border-color:#ffd12c;color:#0b1626}.ckB{font:800 13px system-ui;min-height:44px;border-radius:10px;border:2px solid #3ddc84;background:#10301f;color:#fff;padding:0 10px}`;document.head.appendChild(st);
  const ov=document.createElement('div');ov.id='odChk';ov.hidden=true;document.body.appendChild(ov);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown','wheel'])ov.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
  for(const ev of['keydown','keyup'])ov.addEventListener(ev,e=>{if(e.target.tagName==='INPUT')e.stopPropagation()});
- const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>{const r=s[k(it)]||{};return `${it.ver} ${it.id}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')};
+ const text=()=>{const s=load();return 'Mainhattan Overdrive checklist '+OD_VER+'\n'+OD_CHECKLIST.map(it=>['ph','pc'].filter(d=>!devOf(it)||devOf(it)===d).map(d=>{const r=res(s,it,d);return `${it.ver} ${it.id} ${d==='ph'?'phone':'pc'}: ${r.st||'-'}${r.n?' · '+r.n:''}`}).join('\n')).join('\n')};
  const badge=()=>{try{pinR()}catch(e){}const n=open();document.querySelectorAll('.ckB').forEach(b=>b.textContent='✔ CHECKLIST'+(n?` (${n})`:''))};
- const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
-  for(const it of OD_CHECKLIST){const r=s[k(it)]||{};h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button><input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
+ const render=msg=>{const s=load(),v=OD_CHECKLIST[0].ver;let h=`<div class="cc"><div class="ch"><b>TEST CHECKLIST</b><small>${esc(v)} · ${open()} open</small><button data-c="copy">COPY RESULTS</button><button class="x" data-c="x">✕</button></div>`;const F=flt();
+  h+=`<div class="cf">${['ph','pc'].map(d=>`<button data-c="d:${d}" class="${F.d===d?'on':''}">${DEVN[d]}</button>`).join('')}<i></i>${AREAS.map(([a,n])=>`<button data-c="a:${a}" class="${F.a===a?'on':''}">${n}</button>`).join('')}</div><div class="cb">${msg?`<div class="msg">${esc(msg)}</div>`:''}`;
+  const L=OD_CHECKLIST.filter(it=>show(it,F));if(!L.length)h+=`<div class="msg">Nothing to check for ${DEVN[F.d]} in ${F.a.toUpperCase()}.</div>`;
+  for(const it of L){const r=res(s,it,F.d);h+=`<div class="ci" data-k="${esc(k(it))}"><p>${it.ver===v?'':`<small>${esc(it.ver)} · </small>`}${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-c="PASS">✅ PASS</button><button class="fa ${r.st==='FAIL'?'on':''}" data-c="FAIL">❌ FAIL</button>${GO[k(it)]?'<button class="go" data-c="GO" title="Jump there">📍 GO</button>':''}<input type="text" placeholder="note (optional)" value="${esc(r.n||'')}"></div>`}
   ov.innerHTML=h+'</div></div>';badge()};
  const copy=()=>{const t=text();const done=()=>render('Copied: paste it to the coordinator.');
   const fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;left:0;top:0;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();ok?done():render('Copy blocked here; long-press to select:\n'+t)};
   try{navigator.clipboard.writeText(t).then(done,fb)}catch(e){fb()}};
  ov.addEventListener('click',e=>{if(e.target===ov){ov.hidden=true;document.body.classList.remove('ckOn');return}const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;try{AU.sfx('pick')}catch(er){}
-  if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='PASS'||c==='FAIL'){const key=b.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{st:s[key]&&s[key].st===c?'':c});save(s);render()}});
- ov.addEventListener('change',e=>{const i=e.target;if(i.tagName!=='INPUT')return;const key=i.closest('.ci').dataset.k,s=load();s[key]=Object.assign(s[key]||{},{n:i.value.slice(0,200)});save(s)});
+  if(c==='x'){ov.hidden=true;document.body.classList.remove('ckOn')}else if(c==='copy')copy();else if(c==='PASS'||c==='FAIL'){const it=OD_CHECKLIST.find(q=>k(q)===b.closest('.ci').dataset.k),s=load();if(it){rset(s,it,{st:res(s,it).st===c?'':c});save(s)}render()}
+  else if(c==='GO'){const it=OD_CHECKLIST.find(q=>k(q)===b.closest('.ci').dataset.k);ov.hidden=true;document.body.classList.remove('ckOn');if(it)setTimeout(()=>goJump(it),50)}
+  else if(/^[da]:/.test(c)){const s=load();s._f=Object.assign(flt(),c[0]==='d'?{d:c.slice(2)}:{a:c.slice(2)});s._pin=Object.assign(pst(),{i:0});save(s);render();try{pinR()}catch(er){}}});
+ ov.addEventListener('change',e=>{const i=e.target;if(i.tagName!=='INPUT')return;const it=OD_CHECKLIST.find(q=>k(q)===i.closest('.ci').dataset.k),s=load();if(it){rset(s,it,{n:i.value.slice(0,200)});save(s)}});
  window.odChkOpen=()=>{render();ov.hidden=false;document.body.classList.add('ckOn')};
  const mk=()=>{const b=document.createElement('button');b.className='ckB';b.addEventListener('click',e=>{e.stopPropagation();try{if(typeof TU_toggle==='function')TU_toggle(false)}catch(er){}document.getElementById('odUpd')&&(document.getElementById('odUpd').hidden=true);odChkOpen()});return b};
  // ⚙ drawer header (re-rendered on every change) and the UPDATES screen header
@@ -14417,20 +14530,21 @@ const OD_CHECKLIST=[
  // Touches on it never reach the controls under it and it never pauses the game.
  const pst=()=>{const s=load(),v=OD_CHECKLIST[0].ver;let P=s._pin;if(!P||P.v!==v)P={v,i:0,col:0,done:0};return P},psave=P=>{const s=load();s._pin=P;save(s)};
  // the strip walks the items of the newest 3 versions (a small hotfix release must not hide the open items of the release before it)
- const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver))};
+ const pinItems=()=>{const V=[...new Set(OD_CHECKLIST.map(it=>it.ver))].slice(0,3);return OD_CHECKLIST.filter(it=>V.includes(it.ver)&&show(it))};
  let pinBkOpen=0;const pinBk=()=>{const X=document.getElementById('gbx');return !!X&&!X.hidden&&X.getClientRects().length>0};
  // v88o2 (reviewer): folded in every garage mode (it covered the car preview in RIDES) unless opened there, and during the race GO countdown + first 3 s
  // RF5 (reviewer): folded chip in races, parked under LAP; hidden only while the big FINISH place text shows; on results at the card's top-right corner
  const pinCd=()=>{try{return state==='countdown'||state==='race'||state==='results'}catch(e){return false}},pinRun=()=>{try{return state==='finished'}catch(e){return false}};
  const pin=document.createElement('div');pin.id='odPin';pin.hidden=true;document.body.appendChild(pin);
  for(const ev of['touchstart','touchmove','touchend','pointerdown','pointerup','pointermove','mousedown','mouseup','wheel','dblclick'])pin.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
- const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>s[k(it)]&&s[k(it)].st).length;
+ const pinR=()=>{const P=pst(),C=pinItems(),s=load(),n=C.length,ans=C.filter(it=>res(s,it).st).length;
   const busy=!ov.hidden||!n||pinRun()||P.done&&ans===n||!!document.querySelector('#gbx.sbDiy')||(()=>{const l=document.getElementById('loading');return l&&!l.hidden&&getComputedStyle(l).display!=='none'})();
-  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=s[k(it)]||{};let h;const pinBld=pinBk()&&typeof GB_!=='undefined'&&GB_.bk,fold=P.col||(pinBk()&&(!pinBkOpen||pinBld))||pinCd();
-  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:'');
+  pin.hidden=!!busy;if(busy)return;P.i=Math.max(0,Math.min(n-1,P.i|0));const it=C[P.i],r=res(s,it);let h;const pinBld=pinBk()&&typeof GB_!=='undefined'&&GB_.bk,fold=P.col||(pinBk()&&(!pinBkOpen||pinBld))||pinCd();
+  if(fold)h=`<button class="pc" data-p="exp" title="Show the checklist">✓ ${ans}/${n}</button>`+(ans===n?`<button class="px" data-p="done" title="Hide (all answered)">✕</button>`:
+   `<p class="pt" data-p="exp" title="${esc(it.text)}">${esc(it.text)}</p><button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button><button class="pk" data-p="next" title="Skip">›</button>`);
   else h=`<button class="pn" data-p="col" title="Fold"><b>${P.i+1}/${n}</b><small>▴ ${ans}✓</small></button><p data-p="full" title="Open the full checklist (notes, COPY RESULTS)">${esc(it.text)}</p>`+
    `<button class="pa ${r.st==='PASS'?'on':''}" data-p="PASS" title="Pass">✅</button><button class="fa ${r.st==='FAIL'?'on':''}" data-p="FAIL" title="Fail">❌</button>`+
-   `<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
+   `${GO[k(it)]?'<button class="pg" data-p="GO" title="Jump there">📍</button>':''}<span class="pv"><button data-p="prev" title="Previous">‹</button><button data-p="next" title="Next">›</button></span>`;
   pin.classList.toggle('col',!!fold);if(pin._h!==h){pin._h=h;pin.innerHTML=h}pinPlace()};
  // garage: sit in the free band between the left column (mode rail, selection / groups panels) and the right column (layer views, side panel)
  const pinPlace=()=>{const X=document.getElementById('gbx'),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().width>0;
@@ -14450,18 +14564,18 @@ const OD_CHECKLIST=[
   pin.style.transform='none';pin.style.width=P_col()?'':w+'px';pin.style.left=Math.round(P_col()?x:L+(R-L-w)/2)+'px'};
  const P_col=()=>pin.classList.contains('col');
  pin.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p,P=pst(),C=pinItems(),n=C.length;try{AU.sfx('pick')}catch(er){}
-  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'&&pinBk()&&typeof GB_!=='undefined'&&GB_.bk){psave(P);odChkOpen();pinR();return}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}
-  else if(a==='PASS'||a==='FAIL'){const s=load(),key=k(C[P.i]),was=s[key]&&s[key].st===a;s[key]=Object.assign(s[key]||{},{st:was?'':a});s._pin=P;save(s);
-   if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n],x=s[k(q)];if(!(x&&x.st)){P.i=(P.i+j)%n;break}}}}
+  if(a==='col'){P.col=1;pinBkOpen=0}else if(a==='exp'&&pinBk()&&typeof GB_!=='undefined'&&GB_.bk){psave(P);odChkOpen();pinR();return}else if(a==='exp'){P.col=0;if(pinBk())pinBkOpen=1}else if(a==='done'){P.done=1}else if(a==='prev'){P.i=(P.i-1+n)%n}else if(a==='next'){P.i=(P.i+1)%n}else if(a==='full'){psave(P);odChkOpen();pinR();return}else if(a==='GO'){goJump(C[P.i]);return}
+  else if(a==='PASS'||a==='FAIL'){const s=load(),it=C[P.i],was=res(s,it).st===a;rset(s,it,{st:was?'':a});s._pin=P;save(s);
+   if(!was){for(let j=1;j<=n;j++){const q=C[(P.i+j)%n];if(!res(s,q).st){P.i=(P.i+j)%n;break}}}}
   psave(P);pinR();badge()});
  {const st2=document.createElement('style');st2.textContent=`#odPin{position:fixed;z-index:8990;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 54px);width:min(340px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:center;gap:4px;padding:4px;
  background:rgba(11,22,38,.88);border:2px solid #3ddc84;border-radius:12px;color:#e8f2fa;font:600 12px system-ui;user-select:none;-webkit-user-select:none;touch-action:manipulation;box-shadow:0 2px 0 rgba(0,0,0,.35)}#odPin[hidden]{display:none}
 #odPin button{min-height:44px;border-radius:9px;border:2px solid #4ceaff;background:#12304a;color:#fff;font:900 12px system-ui;padding:0;cursor:pointer;flex:none}
 #odPin .pn{width:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-color:#3ddc84}#odPin .pn b{font-size:13px}#odPin .pn small{font-size:12px;color:#9fe8bf;font-weight:800}
 #odPin p{flex:1;min-width:0;margin:0;line-height:15px;max-height:30px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;cursor:pointer;font-size:12px}
-#odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
+#odPin .pa,#odPin .fa{width:44px;font-size:17px}#odPin .pg{width:36px;font-size:16px;border-color:#ffd12c}#odPin .pa.on{background:#3ddc84;border-color:#3ddc84}#odPin .fa.on{background:#ff4d6d;border-color:#ff4d6d}
 #odPin .pv{display:flex;flex-direction:column;gap:2px}#odPin .pv button{width:28px;min-height:21px;height:21px;font-size:15px;line-height:1}
-#odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}
+#odPin.col{width:auto;padding:2px;gap:3px}#odPin.col .pc{padding:0 12px;border-color:#3ddc84;background:#10301f;font-size:13px}#odPin.col .px{width:44px}#odPin.col .pt{flex:0 1 auto;max-width:min(170px,32vw);-webkit-line-clamp:2;font-size:12px}#odPin.col .pa,#odPin.col .fa{width:40px}#odPin.col .pk{width:26px;font-size:15px}
 body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:none!important}body:has(#odPin:not([hidden])) #gbx.r2 #gsTip{top:calc(var(--r2hh,52px) + 66px)}`;document.head.appendChild(st2)}
  setInterval(pinR,700);pinR();
  // v89h: the strip never draws over a card (Alex: tip hidden at the start; PAUSE card's RESUME + title covered in roam). While any modal/card
@@ -14475,7 +14589,7 @@ body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:non
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};
  {const st3=document.createElement('style');st3.textContent='body.odYield #odPin{display:none!important}';document.head.appendChild(st3)}setInterval(yieldStep,120);
- window.__chk={open:()=>odChkOpen(),text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
+ window.__chk={go:id=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it)goJump(it);return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
 
 // ===== RF (race fun, 2026-10-09): Alex "we have functionalities but the races are boring". Reference: LEGO 2K Drive rival race
 // (docs/race_ref, docs/RACE_PLAN.md). Measured before (tRace, phone): the player started on POLE and led ~75 % of the race alone,
@@ -14985,7 +15099,7 @@ window.__fb={st:()=>FB.s&&{id:FB.s.id,f:FB.s.f,n:GB_list().length},saved:()=>Obj
 // ===== BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built").
 // When a ride first shows in the garage (garage opened, or another ride / form picked in RIDES), its parts drop in in build order:
 // the guide's step order (SB_steps: booklet steps where a template has them, else bottom layer first, then z, then x), in batches so the whole build
-// takes 1.5–3 s whatever the part count. Each batch falls from ~3 studs up with a small overshoot snap; light brick ticks. Tap/drag the view to skip.
+// takes 0.5–0.9 s (v90j; was 1.5–3 s) whatever the part count. Each batch falls from ~3 studs up with a small overshoot snap; light brick ticks. Tap/drag the view to skip.
 // Drawn only on top of the normal garage mesh (hidden meanwhile); nothing is edited or saved. Not in BUILD, the guide, or the showroom.
 const BA={on:0,G:[],hid:[],t:0,T:2,t0:0,last:'',tick:0};
 const BA_DROP=1.8,BA_FALL=.26;
@@ -14996,20 +15110,23 @@ function BA_now(){const U=GB.mesh&&GB.mesh.userData;if(!U)return null;const S=GA
  const t=gbTeam(TEAMS[teamIdx],GB.d),B=(t&&t.gbB)||[];return{key:S.id+'|car|'+B.length,B,tpl:S.car?S.car():null,fig:GB_figGet(),hide:(U.gbM||[]).slice()}}
 function BA_start(){BA_stop();if(!GB.mesh||$('#gbx').hidden||GB_.bk||(typeof SB!=='undefined'&&SB.on))return 0;const N=BA_now();if(!N||N.B.length<2)return 0;BA.last=N.key;
  let order;try{order=SB_steps(N.B,N.tpl).flat()}catch(e){order=N.B.map((b,i)=>i).sort((i,j)=>N.B[i].y-N.B[j].y||N.B[i].z-N.B[j].z||N.B[i].x-N.B[j].x)}
- const n=order.length,nb=Math.min(n,32),T=clamp(n*.05,1.5,3),host=GB.mesh.userData.carG||GB.mesh.userData.m;
+ const n=order.length,nb=Math.min(n,32),T=clamp(n*.012,.5,.9),host=GB.mesh.userData.carG||GB.mesh.userData.m;
  for(let k=0;k<nb;k++){const ids=order.slice(Math.floor(k*n/nb),Math.floor((k+1)*n/nb)),g=new THREE.Group();g.userData.m=g;
   GB_attach(g,ids.map(i=>N.B[i]),k===nb-1?N.fig:null,false,false);g.visible=false;host.add(g);BA.G.push({g,s:k/(nb-1||1)*(T-BA_FALL),p:0})}
  for(const o of N.hide)if(o.visible){o.visible=false;BA.hid.push(o)}
- Object.assign(BA,{on:1,t:0,T,t0:performance.now(),tick:0});try{GB.r.shadowMap.needsUpdate=true}catch(e){}return 1}
-function BA_step(){if(!BA.on)return;if($('#gbx').hidden||GB_.bk){BA_stop();return}const now=performance.now(),dt=Math.min(.1,(now-BA.t0)/1000);BA.t0=now;BA.t+=dt;
+ Object.assign(BA,{on:1,t:0,T,t0:performance.now(),ts:performance.now(),tick:0});try{GB.r.shadowMap.needsUpdate=true}catch(e){}return 1}
+function BA_step(){if(!BA.on)return;if($('#gbx').hidden||GB_.bk){BA_stop();return}const now=performance.now();BA.t0=now;BA.t=(now-BA.ts)/1000;if(BA.t>=BA.T+.05){BA_stop();return}
  let land=0;for(const d of BA.G){const u=(BA.t-d.s)/BA_FALL;if(u<0)continue;d.g.visible=true;const k=Math.min(1,u);
   // ease-out with a small overshoot below the rest height, then snap (the "click" of a brick)
   d.g.position.y=k<1?BA_DROP*Math.pow(1-k,3)-.05*Math.sin(Math.PI*k)*k:0;if(k>=1&&d.p<1)land++;d.p=k}
  if(land){try{GB.r.shadowMap.needsUpdate=true}catch(e){}if(++BA.tick%3===1)try{AU.sfx('brick')}catch(e){}}
  if(BA.t>=BA.T+.05)BA_stop()}
+// v90j (reviewer: Fire and Rescue Van = 4 tyres, Bulldozer chassis-only 4.8 s after the tap): the build-up ran on frame time capped at 0.1 s a frame,
+// so slow frames (model chunk build, thumbnail pump, a slow phone) stretched 1.5–3 s into many seconds of bare chassis. Now it runs on the wall clock,
+// lasts 0.5–0.9 s, and the whole ride shows the moment that time is up, however few frames were drawn.
 // a new ride shows → build it up; the same ride re-rendered (paint, leaving BUILD, upgrades) → no replay
 // (a re-render in the middle of the build-up, e.g. the panel refreshing after a pick, carries on from where it was)
-gbRender=(f=>function(){const was=BA.on?BA.t:-1,pk=BA.last;BA_stop();const r=f.apply(this,arguments);try{const N=!GB_.bk&&BA_now();if(N&&(N.key!==BA.last||was>=0)){if(BA_start()&&N.key===pk&&was>=0)BA.t=was}}catch(e){console.warn('BA',e)}return r})(gbRender);
+gbRender=(f=>function(){const was=BA.on?BA.t:-1,pk=BA.last;BA_stop();const r=f.apply(this,arguments);try{const N=!GB_.bk&&BA_now();if(N&&(N.key!==BA.last||was>=0)){if(BA_start()&&N.key===pk&&was>=0){BA.t=was;BA.ts=performance.now()-was*1000}}}catch(e){console.warn('BA',e)}return r})(gbRender);
 gbOpen=(f=>function(){BA.last='';return f.apply(this,arguments)})(gbOpen);
 gbLoop=(f=>function(){try{BA_step()}catch(e){BA_stop()}return f.apply(this,arguments)})(gbLoop);
 GB_enter=(f=>function(){BA_stop();return f.apply(this,arguments)})(GB_enter);
@@ -15039,6 +15156,141 @@ GB_plate=(f=>function(){const g=f.apply(this,arguments);GF.pg=g;return g})(GB_pl
 GB_attach=(f=>function(g,bricks,fig,cache,bp){GF.pg=null;const r=f.apply(this,arguments);try{if(bp&&GF.pg&&(bricks||[]).some(b=>b&&typeof b.t==='string'&&LD_MESH[b.t.split('@')[0]])){const U=g.userData,host=U.carG||U.m;
  U.gbM=(U.gbM||[]).filter(o=>{if(o.geometry!==GF.pg)return true;host.remove(o);o.geometry.dispose();GF.np=(GF.np||0)+1;return false})}}catch(e){console.warn('GF',e)}GF.pg=null;return r})(GB_attach);
 window.__gf={st:()=>({n:GF.n,np:GF.np||0,gy:GS.gy,top:GS.g?GS.y0+GS.g.position.y:null})};
+// ---- GZ (garage zoom + pick, Alex 2026-10-13: "include a zoom in/out and more builder functionalities for garage").
+// 1) ZOOM in every garage mode (RIDES / BUILD / PAINT / PERKS / DRIVER): − ⤢ + buttons at the stage's left edge (BUILD: top, clear of the palette), pinch with two fingers,
+//    mouse wheel, keys + / − / 0. It is the camera's own zoom on top of the shell's auto-framing (R2_frame), so every view (TOP / SIDE / 3D,
+//    build guide, phone layout) and tap-picking stay correct. ⤢ = back to the framed view. BUILD and the stage keep their own zoom (×0.6 … ×3.5).
+// 2) 💧 PICK (⋯ MORE, key I): tap a placed part to copy it: the same part, turn and colour become the part you place next.
+//    From PAINT ONE it copies only the colour and goes back to painting.
+const GZ={k:{b:1,s:1},base:1,last:-1,ptr:new Map(),d0:0,el:null,f:0,prev:'add'};
+const GZ_md=()=>GB_.bk?'b':'s',GZ_MIN=.6,GZ_MAX=3.5;
+function GZ_set(z,md=GZ_md()){GZ.k[md]=clamp(z,GZ_MIN,GZ_MAX);GZ_lab()}
+function GZ_step(dir){GZ_set(GZ.k[GZ_md()]*(dir>0?1.25:.8));try{AU.sfx('pick')}catch(e){}}
+function GZ_fit(){GZ_set(1);if(GB_.bk)GB_.dist=clamp(GB_.dist,7,26);try{AU.sfx('pick')}catch(e){}}
+function GZ_lab(){const e=GZ.el&&GZ.el.querySelector('[data-gz="0"]');if(e)e.textContent=Math.abs(GZ.k[GZ_md()]-1)<.02?'⤢':'×'+GZ.k[GZ_md()].toFixed(1)}
+R2_frame=(f=>function(C,bk){f.apply(this,arguments);if(!C)return;if(C.zoom!==GZ.last)GZ.base=C.zoom;const z=GZ.base*GZ.k[bk?'b':'s'];
+ if(C.zoom!==z){C.zoom=z;C.updateProjectionMatrix()}GZ.last=C.zoom})(R2_frame);
+// buttons: one row (− ⤢ +) at the bottom-left of the free stage area, 44 px tap targets
+function GZ_mk(){if(GZ.el||!$('#gbx'))return;const d=document.createElement('div');d.id='gzBar';
+ d.innerHTML='<button class="r2T" data-gz="-1" aria-label="Zoom out">−</button><button class="r2T" data-gz="0" aria-label="Fit view">⤢</button><button class="r2T" data-gz="1" aria-label="Zoom in">+</button>';
+ d.style.cssText='position:fixed;z-index:30;display:flex;gap:6px;pointer-events:auto';
+ d.addEventListener('pointerdown',e=>e.stopPropagation(),true);
+ d.addEventListener('click',e=>{const b=e.target.closest('[data-gz]');if(!b)return;e.stopPropagation();const v=+b.dataset.gz;if(v)GZ_step(v);else GZ_fit()},true);
+ $('#gbx').appendChild(d);GZ.el=d;GZ_lab()}
+function GZ_place(){const d=GZ.el;if(!d)return;const c=$('#gbC'),A=(typeof R2!=='undefined'&&R2.area)||null;if(!c||!A||$('#gbx').hidden||(typeof SB!=='undefined'&&SB.on)){d.style.display='none';return}
+ const r=c.getBoundingClientRect();d.style.display='flex';d.style.left=Math.round(r.left+A.l+8)+'px';d.style.top=Math.round(r.top+(GB_.bk?A.t+8:A.b-44-30))+'px';GZ_lab()}
+// 3) LOADING: while a ride's LEGO model is still on its way (LDL.wait), a spinner sits in the middle of the stage (reviewer v90j: never a bare chassis
+//    with no sign that something is coming). Only the ride you tapped counts, not the thumbnails loading in the background.
+function GZ_spin(){let e=$('#gzSpin');let on=0;if(GZ.want){try{if(GAR_get().sel===GZ.want||performance.now()-GZ.wt>20000)GZ.want=null;else on=!$('#gbx').hidden&&typeof LDL!=='undefined'&&LDL.wait.size>0}catch(er){GZ.want=null}}if(!e){if(!on)return;e=document.createElement('div');e.id='gzSpin';
+ e.innerHTML='<i></i>LOADING';e.style.cssText='position:fixed;z-index:31;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:12px;background:rgba(11,22,38,.85);border:2px solid #ffd12c;color:#fff;font:italic 900 14px system-ui;pointer-events:none';
+ const st=document.createElement('style');st.textContent='#gzSpin i{width:18px;height:18px;border:3px solid #ffd12c;border-top-color:transparent;border-radius:50%;animation:gzR .8s linear infinite}@keyframes gzR{to{transform:rotate(360deg)}}';document.head.appendChild(st);$('#gbx').appendChild(e)}
+ e.style.display=on?'flex':'none';if(!on)return;const c=$('#gbC').getBoundingClientRect(),A=(typeof R2!=='undefined'&&R2.area)||{l:0,r:c.width,t:0,b:c.height};e.style.left=Math.round(c.left+(A.l+A.r)/2)+'px';e.style.top=Math.round(c.top+(A.t+A.b)/2)+'px'}
+gbLoop=(f=>function(){if(!$('#gbx').hidden){GZ_mk();if(++GZ.f%10===1)GZ_place();if(GZ.f%6===1)GZ_spin()}else if(GZ.el)GZ.el.style.display='none';return f.apply(this,arguments)})(gbLoop);
+// pinch + wheel on the stage outside BUILD (BUILD already pinches / wheels the camera distance)
+{const v=document;const cv=e=>e.target&&e.target.id==='gbC'&&!GB_.bk;
+ v.addEventListener('pointerdown',e=>{if(!cv(e))return;GZ.ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});GZ.d0=0},true);
+ v.addEventListener('pointermove',e=>{const q=GZ.ptr.get(e.pointerId);if(!q)return;q.x=e.clientX;q.y=e.clientY;if(GZ.ptr.size!==2)return;const[A,B]=[...GZ.ptr.values()],d=Math.hypot(A.x-B.x,A.y-B.y);
+  if(GZ.d0>10&&d>10)GZ_set(GZ.k.s*d/GZ.d0,'s');GZ.d0=d},true);
+ const up=e=>{GZ.ptr.delete(e.pointerId);GZ.d0=0};v.addEventListener('pointerup',up,true);v.addEventListener('pointercancel',up,true);
+ v.addEventListener('wheel',e=>{if(!cv(e))return;e.preventDefault();GZ_set(GZ.k.s*(1-e.deltaY*.001),'s')},{passive:false,capture:true});
+ addEventListener('keydown',e=>{if($('#gbx').hidden||(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName)))return;const k=e.key;
+  if(k==='+'||k==='=')GZ_step(1);else if(k==='-'||k==='_')GZ_step(-1);else if(k==='0')GZ_fit();else if((k==='i'||k==='I')&&GB_.bk)GZ_pickOn();else return;e.preventDefault();e.stopImmediatePropagation()},true)}
+// 💧 PICK
+function GZ_pickOn(){if(!GB_.bk)return;if(GB_.tool==='pick'){GB_.tool=GZ.prev;GB_ui();GZ_ui();return}GZ.prev=GB_.tool==='paint'?'paint':'add';GB_.tool='pick';GB_ghostSet(null);
+ try{if(GS.held){GS.held=null}}catch(e){}GS_tip(GZ.prev==='paint'?'💧 Tap a part to copy its colour':'💧 Tap a part to copy it (part, turn and colour)');GB_ui();GZ_ui()}
+function GZ_ui(){const b=$('#r2More [data-gzm="pick"]');if(b)b.classList.toggle('on',GB_.tool==='pick')}
+GB_act=(f=>function(cx,cy,del){if(!GB_.bk||del||GB_.tool!=='pick')return f.apply(this,arguments);const h=GB_pick(cx,cy),o=h&&h.brick;
+ if(!o){GS_tip('💧 Tap a part of the car');return 0}GB_.col=o.c;
+ if(GZ.prev==='paint'){GB_.tool='paint';GS_tip('💧 Colour copied · tap parts to paint')}
+ else{GB_.pc=o.t;GB_.rot=o.r||0;GB_.tool='add';const P=GB_PC[o.t];GS_tip('💧 Copied '+((P&&P.n)||'part')+' · tap where it goes')}
+ try{AU.sfx('pick')}catch(e){}GB_ui();GZ_ui();try{G13_ui()}catch(e){}return 1})(GB_act);
+GB_exit=(f=>function(){if(GB_.tool==='pick')GB_.tool='add';return f.apply(this,arguments)})(GB_exit);
+GB_ui=(f=>function(){const r=f.apply(this,arguments);const mo=$('#r2More');if(mo&&!mo.querySelector('[data-gzm]')){mo.insertAdjacentHTML('afterbegin','<button class="r2T" data-gzm="pick"><i>💧</i>PICK</button>');
+ mo.addEventListener('click',e=>{if(!e.target.closest('[data-gzm]'))return;e.stopPropagation();try{R2_pop(null)}catch(_){}GZ_pickOn()},true)}GZ_ui();return r})(GB_ui);
+G9C_equip=(f=>function(S,fm){try{if(S&&S.id&&GAR_get().sel!==S.id){GZ.want=S.id;GZ.wt=performance.now()}}catch(e){}return f.apply(this,arguments)})(G9C_equip);
+window.__gz={S:GZ,set:GZ_set,step:GZ_step,fit:GZ_fit,pick:GZ_pickOn,st:()=>({bk:GB_.bk,tool:GB_.tool,pc:GB_.pc,col:GB_.col,rot:GB_.rot,zoom:GB.cam&&GB.cam.zoom}),
+ // screen point of the build's centre (tests tap it)
+ mid:()=>{if(!GB.mesh)return null;GB_cam();const c=new THREE.Box3().setFromObject(GB.mesh).getCenter(new THREE.Vector3()).project(GB.cam),r=$('#gbC').getBoundingClientRect();return[r.left+(c.x+1)/2*r.width,r.top+(1-c.y)/2*r.height]}};
+// ===== HM (home-1, version set at integration). Alex 2026-10-13: "the nitro/boost should be on sports cars only and not all cars unless you modify the car in home.
+// I think we should have a save point Home with a garage to store cars".
+// HOME = the city garage of each city (Werkstatt Konstablerwache / Garaz Psyrri), its 🔧 beacon becomes 🏠 HOME (pinned on the minimap edge).
+//  - driving in (the beacon stop) = SAVE POINT: position + stats saved at once, "💾 SAVED" toast. The card then opens the usual garage (RIDES).
+//  - stored cars: up to 4 rides stand parked beside the door; swapping your ride in the garage while at Home parks the old one there.
+//  - pause menu: 🏠 HOME = fast travel to it.
+// BOOST rule (free roam): built-in nitro only on sports-class rides (HM_sport: the QS sport/super classes, Speed Champions and racing sets,
+//  the 🏁 RACERS group, the sports templates, the speed/power boats). Any other ride gets nitro with a NITRO KIT (1,500 studs, installed at Home).
+//  Without nitro the BOOST button and boost bar are hidden. Races keep boost for everyone (state 'race', roam sprints RO.sp, rival/mission
+//  races = RO.ch with a race path): AI pace and rewards are tuned on boost.
+CK.push('mho_home');// per save slot, like mho_gar
+const HM={at:false,park:[],P:[],toastT:0,sig:''};
+const HM_KIT=1500,HM_NP=4;
+const HM_REF=new Set(['75870','75878','75892','75893','76897','75895','1517','30572','6501','6503','6509','6526','6530','6605','6609','6669','4641','4643']);
+const HM_IDS=new Set(['t_rosso','t_bianco','t_papaya','t_silver','t_viola','t_flame','t_racer','t_su_v8','t_sc_f1']);
+function HM_sport(S){if(!S)return false;const q=typeof QS_CLS!=='undefined'&&QS_CLS[S.id];return q==='spSport'||q==='spSuper'||S.grp==='racers'||HM_IDS.has(S.id)||!!(S.ref&&HM_REF.has(String(S.ref)))}
+const HM_form=()=>CR_MODE==='boat'?'boat':CR_MODE==='4x4'?'off':'car';
+function HM_curSet(){try{return GAR_set(G9C_eq(HM_form()))}catch(e){return GAR_set()}}
+const HM_kits=()=>GAR_get().nk||[];
+const HM_has=S=>!!S&&(HM_sport(S)||HM_kits().includes(S.id));
+// races keep boost for everyone
+function HM_race(){if(state!=='roam')return true;if(RO.sp)return true;const c=RO.ch;return !!(c&&c.v2&&c.v2.L&&c.v2.L.rp)}
+function HM_ok(){return HM_race()||HM_has(HM_curSet())}
+ctlPlayer=(f=>function(){const c=f.apply(this,arguments);try{if(c&&c.boost&&state==='roam'&&!document.body.classList.contains('onfoot')&&!HM_ok())c.boost=0}catch(e){}return c})(ctlPlayer);
+// ---- the home beacon
+const HM_isHome=m=>!!m&&m.kind==='garage'&&(!m.id||m.id==='g_city');
+const HM_mark=()=>(RO.marks||[]).find(HM_isHome)||null;
+mapIcon=(f=>function(m){return HM_isHome(m)?'🏠':f.apply(this,arguments)})(mapIcon);
+markTitle=(f=>function(m){return HM_isHome(m)?'Home · '+f.apply(this,arguments):f.apply(this,arguments)})(markTitle);
+function HM_toast(t){let e=document.getElementById('hmToast');if(!e){e=document.createElement('div');e.id='hmToast';(document.getElementById('roam')||document.body).appendChild(e)}
+ e.textContent=t;e.classList.remove('on','side');e.style.left=e.style.top=e.style.maxWidth='';void e.offsetWidth;HM_toastPlace(e);e.classList.add('on');clearTimeout(HM.toastT);HM.toastT=setTimeout(()=>e.classList.remove('on'),2200)}
+// reviewer (39d31f2): the toast sat on the Home card's title. When it would touch the card, it moves into the free column left of the card, under the minimap.
+function HM_toastPlace(e){const c=document.getElementById('roamCard'),R=x=>x&&x.getBoundingClientRect(),cr=R(c);if(!cr||cr.width<4||getComputedStyle(c).display==='none')return;
+ const tr=R(e),hit=!(tr.right<cr.left||tr.left>cr.right||tr.bottom<cr.top||tr.top>cr.bottom);if(!hit)return;const mm=R(document.getElementById('roamMini')||document.getElementById('mini')),top=mm&&mm.height>4?mm.bottom+10:120;
+ e.classList.add('side');e.style.left='10px';e.style.top=top+'px';e.style.maxWidth=Math.max(90,cr.left-20)+'px'}
+function HM_save(){try{pstatFlush()}catch(e){}roamSavePos();const H=store.get('mho_home',{});H[CID]={t:Date.now(),car:GAR_get().sel};H.last=CID;store.set('mho_home',H);HM.saves=(HM.saves||0)+1;HM_toast('💾 SAVED · HOME');try{AU.sfx('pick')}catch(e){}}
+roamOpen=(f=>function(m){const r=f.apply(this,arguments);try{if(HM_isHome(m)&&state==='roam'){HM.at=true;HM_save()}}catch(e){console.warn('HM',e)}return r})(roamOpen);
+// ---- stored cars: the old ride is parked at Home when you swap there
+function HM_parkList(){const H=store.get('mho_home',{}),sel=GAR_get().sel;let L=(H.park||[]).filter(id=>id!==sel&&GAR_SETS.some(s=>s.id===id));
+ if(!H.park){const fav=(GAR_get().fav||[]).map(k=>k.split('|')).filter(a=>a[1]==='car').map(a=>a[0]);L=[...fav,'t_v6651_1','t_v4208_1','t_v75870_1','rod'].filter((id,i,a)=>a.indexOf(id)===i&&id!==sel&&GAR_SETS.some(s=>s.id===id))}
+ return L.slice(0,HM_NP)}
+GAR_select=(f=>function(id){const p=GAR_get().sel;f.apply(this,arguments);try{const n=GAR_get().sel;if(HM.at&&p!==n){const H=store.get('mho_home',{});H.park=[p,...HM_parkList().filter(x=>x!==p&&x!==n)].slice(0,HM_NP);store.set('mho_home',H);HM.sig=''}}catch(e){console.warn('HM',e)}})(GAR_select);
+// parking slots beside the door (the door is 24 m wide at the building's -z face, the beacon stands in front of it)
+function HM_slots(){const L=typeof LM_BY!=='undefined'&&LM_BY[CID==='ath'?'Garaz Psyrri':'Werkstatt Konstablerwache'];if(!L)return[];const ath=CID==='ath',GD=ath?22:34,z=L.z-GD/2-3.6,X=ath?[14,17.4]:[15.5,19.5];
+ return[[L.x-X[0],z],[L.x+X[0],z],[L.x-X[1],z],[L.x+X[1],z]]}
+function HM_carMesh(S){const B=G9C_bricks(S,'car'),t=Object.assign({},gbTeam(TEAMS[teamIdx]||TEAMS[0],GB.d||null),{gbB:B,gbF:null,gbP:1}),g=shipMesh(t),U=g.userData;
+ for(const k of['boat','shield','flares','under'])if(U[k])U[k].visible=false;for(const rb of U.ribbons||[])rb.visible=false;try{SC_ship(g,false)}catch(e){}return g}
+// box of the visible meshes only (the hidden shield / boat would put the car in the air)
+function HM_box(g){const B=new THREE.Box3(),b=new THREE.Box3();g.updateMatrixWorld(true);g.traverse(o=>{if(!o.isMesh||!o.geometry)return;for(let a=o;a;a=a.parent)if(!a.visible)return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);B.union(b)});return B}
+function HM_clear(){for(const o of HM.P){o.parent&&o.parent.remove(o);o.traverse(m=>{if(m.isMesh&&m.geometry&&!m.userData.gbc&&!m.userData.keep)m.geometry.dispose()})}HM.P=[]}
+function HM_build(){if(!RO.on||!RO.grp)return;const L=HM_parkList(),sig=CID+'|'+L.join(',');if(sig===HM.sig&&HM.P.length)return;const miss=LD_probe(()=>[].concat(...L.map(id=>G9C_bricks(GAR_set(id),'car'))));if(miss.length){if(!HM.ld){HM.ld=1;LD_need(miss).then(()=>{HM.ld=0;HM.sig='';HM_build()})}return}/* LDraw rides load on demand */
+ HM.sig=sig;HM_clear();const Q=HM_slots();
+ L.forEach((id,i)=>{const q=Q[i];if(!q)return;try{const g=HM_carMesh(GAR_set(id));const y=groundY(q[0],q[1]);g.position.set(q[0],y,q[1]);g.rotation.y=Math.PI;g.updateMatrixWorld(true);
+  const bb=HM_box(g);if(Number.isFinite(bb.min.y))g.position.y+=y-bb.min.y;g.userData.hmId=id;RO.grp.add(g);HM.P.push(g)}catch(e){console.warn('HM car',id,e)}})}
+// ---- pause menu: 🏠 HOME fast travel
+{const g=document.querySelector('#roamPause .pg'),q=g&&g.querySelector('[data-p="garage"]');if(g){const b=document.createElement('button');b.dataset.p='home';b.textContent='🏠 HOME';
+  b.addEventListener('click',()=>{try{AU.sfx('pick')}catch(e){}const m=HM_mark();roamPauseClose();if(m){HM.flip=1;if(!fastTravel(m))HM.flip=0}});g.insertBefore(b,q||null)}}
+// fast travel home lands 26 m out FACING the beacon (garages face away from it): drive straight in
+roamWarp=(f=>function(x,z,h){if(HM.flip){HM.flip=0;const m=HM_mark();if(m&&Math.hypot(m.x-x,m.z-z)<40)h=Math.atan2(m.x-x,m.z-z)}return f.call(this,x,z,h,...[].slice.call(arguments,3))})(roamWarp);
+roamPauseOpen=(f=>function(){f.apply(this,arguments);const b=document.querySelector('#roamPause [data-p="home"]');if(b)b.hidden=!!(RO.ch||RO.sp)||!HM_mark()})(roamPauseOpen);
+// ---- garage: nitro row in the ride stats + NITRO KIT install (only at Home)
+GAR_tab=(f=>function(){f.apply(this,arguments);try{const B=$('#gbBody'),st=B&&B.querySelector('.garSt');if(!st)return;const fm=GAR_.pv==='4x4'?'off':GAR_.pv==='boat'?'boat':'car',S=GAR_set(G9C_eq(fm)),sp=HM_sport(S),kit=HM_kits().includes(S.id);
+  const r=document.createElement('div');r.className='hmNit';r.innerHTML=`<span>Nitro</span><em>${sp?'⚡ Built in (sports)':kit?'🧰 Nitro Kit':'— none'}</em>`;st.appendChild(r);if(sp||kit)return;
+  const b=document.createElement('button');b.className='gbP hmKit';b.dataset.hmkit=S.id;const cr=season().cr;
+  b.innerHTML=HM.at?`<b>🧰 INSTALL NITRO KIT</b><small>${S.n} gets BOOST · ${HM_KIT.toLocaleString('de-DE')} studs${cr<HM_KIT?' · need '+(HM_KIT-cr).toLocaleString('de-DE')+' more':''}</small>`:`<b>🧰 NITRO KIT</b><small>install it at 🏠 Home · ${HM_KIT.toLocaleString('de-DE')} studs</small>`;
+  if(!HM.at)b.disabled=true;st.after(b);
+  b.onclick=()=>{const S2=season();if(S2.cr<HM_KIT){try{AU.sfx('bump')}catch(e){}return}S2.cr-=HM_KIT;saveSeason(S2);const G=GAR_get();G.nk=[...(G.nk||[]).filter(x=>x!==S.id),S.id];GAR_put(G);try{AU.sfx('brick')}catch(e){}const sc=$('#gbBody').scrollTop;gbRender();$('#gbBody').scrollTop=sc}}catch(e){console.warn('HM kit',e)}})(GAR_tab);
+// ---- per frame: HUD (no BOOST button / bar without nitro), leaving Home, parked cars
+roamStep=(f=>function(dt){f.apply(this,arguments);try{const nb=!HM_ok();if(nb!==HM.nb){HM.nb=nb;document.body.classList.toggle('hmNoB',nb)}
+  const m=HM_mark();if(HM.at&&(!m||Math.hypot(m.x-RO.x,m.z-RO.z)>60))HM.at=false;if(m){m.col='#ff8a1c';if((HM.fr=(HM.fr||0)+1)%30===1)HM_build()}}catch(e){if(!HM.err)console.warn('HM',e);HM.err=String(e)}})(roamStep);
+exitRoam=(f=>function(){document.body.classList.remove('hmNoB');HM.nb=false;HM.at=false;HM_clear();HM.sig='';return f.apply(this,arguments)})(exitRoam);
+{const s=document.createElement('style');s.textContent=`
+body.hmNoB:not(.onfoot) #tN,body.hmNoB #artBoost{display:none!important}
+#hmToast{position:absolute;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translate(-50%,-8px);background:#141413;color:#ffd400;border:3px solid #ffd400;border-radius:12px;padding:6px 14px;font:italic 900 15px var(--hud,system-ui);letter-spacing:.04em;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:7;white-space:nowrap}
+#hmToast.on{opacity:1;transform:translate(-50%,0)}
+#hmToast.side{transform:none;transition:opacity .2s;white-space:normal;text-align:center;font-size:14px;line-height:1.15}#hmToast.side.on{transform:none}
+.garSt .hmNit em{color:#ffd400}
+#gbBody .hmKit{display:block;width:100%;margin:6px 0;text-align:left;background:#ffd400;color:#141413}#gbBody .hmKit[disabled]{opacity:.6;background:#fff}
+#gbBody .hmKit b{font-size:14px}#gbBody .hmKit small{display:block;font-size:12px}`;document.head.appendChild(s)}
+window.__hm={HM,box:HM_box,ok:HM_ok,sport:HM_sport,cur:HM_curSet,mark:HM_mark,save:HM_save,park:HM_parkList,slots:HM_slots,build:HM_build,kits:HM_kits};
 window.__mho={pin:()=>{const p=PIN_S.cur,N=QV.nav,t=PIN_navPt(),G=QV.g;let snap=null;if(p&&G){const i=qvNear(p.x,p.z,50);snap=i<0?null:Math.hypot(G.X[i]-p.x,G.Z[i]-p.z)}return{ready:!!(G&&G.N===HUB.nodes),on:!!p,x:p&&p.x,z:p&&p.z,d:p&&p.d,athd:CID==='ath'?ATHD:null,snap,wp:!!p&&RO.wp===p,nav:N?{n:N.P.length,tx:N.tx,tz:N.tz,rem:N.rem,rec:N.rec}:null,tgt:t&&{x:t.x,z:t.z,gate:!!t.gate,to:t.to||null},dist:p?PIN_dist():null,log:{...PIN_S.log},menu:!!PIN_S.menu,beam:!!(PIN_S.mesh&&PIN_S.mesh.visible),clr:!!document.getElementById('pinClr')&&!document.getElementById('pinClr').hidden}},pinSet:(x,z)=>PIN_set(x,z,1),pinNode:(d,near)=>{const G=QV.g;if(!G)return null;let b=null,bd=1e18;for(const i of G.list){const x=G.X[i],z=G.Z[i];if(CID==='ath'){const[e,n]=RW(x,z);if(athDistAt(e,n)!==d)continue}const dd=Math.hypot(x-near.x,z-near.z);if(dd<bd){bd=dd;b=[x,z]}}return b},pinClear:()=>PIN_clear(1),pinMapXY:(x,z,c)=>{if(c!==false){RO.mapC={x,z};drawRoamMap()}const[px,py]=RO.mapP(x,z),r=document.getElementById('roamMapC').getBoundingClientRect(),k=DPR2();return[r.left+px/k,r.top+py/k]},pinMini:()=>{const p=PIN_S.cur;if(!p||!RO.miniTo)return null;const el=document.querySelector('#roamMini canvas'),W=el.width,c=W/2,R0=c-6;let[a,b]=RO.miniTo(p.x,p.z);const d=Math.hypot(a,b),lim=R0-12;if(d>lim){a*=lim/d;b*=lim/d}return[c+a,c+b,W]},CE:{junc:()=>JUNC.map(J=>[J.x,J.z,J.r]),info:()=>HUB.CE&&{...HUB.CE},prof:()=>{const P=HUB.props.slice(0,20000),o={};for(const[k,f]of[['city',(x,z)=>cityAt(x,z)],['fill',(x,z)=>fillAt(x,z)],['ab',(x,z)=>abAt(x,z)],['trail',(x,z)=>trailDist(x,z)],['mtn',(x,z)=>mtnDist(x,z)],['lz',(x,z)=>lzRoadD(x,z)],['ard',(x,z)=>athRoadD(x,z,40)],['onRoad',(x,z)=>CE_onRoad(x,z)],['riv',(x,z)=>inRiver(x,z,-2)],['deck',(x,z)=>onAnyDeck(x,z)],['gy',(x,z)=>groundY(x,z)]]){const t=performance.now();for(const p of P)f(p.x,p.z);o[k]=Math.round(performance.now()-t)}return o}},athPts:id=>CITY_S.filter(S=>S.r.id===id).flatMap(S=>S.pts.map(p=>[p.x,p.z,S.r.w])),shd:(x,z)=>{const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32))||[];const o={};for(let j=0;j<L.length;j+=2){const S=L[j];o[CITY_S.indexOf(S)]=(o[CITY_S.indexOf(S)]||0)+1}return [Math.floor(x/32),Math.floor(z/32),o]},ahh:(x,z)=>[athHillH(x,z),athShelfY(x,z,athHillH(x,z)),HILLS.map(h=>h.id+'='+athHill1(h,x,z).toFixed(1)).join(' ')],athPiece:(si,a,b)=>CITY_S[si].pts.slice(a,b).map((p,k)=>[a+k,+(p.y??0).toFixed(2),p.j?1:0,+p.s.toFixed(1),+athHillH(p.x,p.z).toFixed(1)]),athNear:(x,z,R=40)=>{const out=[];CITY_S.forEach((S,si)=>{let b=1e9,bi=-1;S.pts.forEach((p,i)=>{const d=Math.hypot(p.x-x,p.z-z);if(d<b){b=d;bi=i}});if(b<R){const p=S.pts[bi];out.push({si,name:S.r.name,cls:S.r.cls,w:S.r.w,d:+b.toFixed(1),y:+(p.y??0).toFixed(2),hs:!!S.hs,j:!!p.j,i:bi,n:S.pts.length})}});return out},hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120&&S.r.cls!=='ped'&&S.pts.every(p=>p.x>WX0+80&&p.x<WX1-80&&p.z>WZS+80&&p.z<WZN-80&&!(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<90))).sort((a,b)=>Math.max(...b.pts.map(p=>p.y||0))-Math.max(...a.pts.map(p=>p.y||0))).slice(0,4);return L.map(S=>{const a=S.pts.map(p=>[p.x,p.z]);a.name=(S.r.name||S.r.id)+' ('+Math.round(Math.max(...S.pts.map(p=>p.y||0)))+' m)';return a})},roadProf:()=>{let mg=0,mc=0,n=0;for(const S of CITY_S){if(!S.prof)continue;n++;const P=S.pts;for(let i=1;i<P.length-1;i++){const g=Math.abs(P[i].dy||0);mg=Math.max(mg,g);const a=P[i-1],b=P[i+1],d1=(P[i].y-a.y)/Math.max(.5,P[i].s-a.s),d2=(b.y-P[i].y)/Math.max(.5,b.s-P[i].s);mc=Math.max(mc,Math.abs(d2-d1)/Math.max(1,(b.s-a.s)/2))}}return{n,maxGrade:+mg.toFixed(3),maxCurv:+mc.toFixed(4)}},lmk:()=>(HUB.lmk||[]).map(L=>({id:L.id,name:L.name,x:L.x,z:L.z})),lmNear:(x,z)=>{const L=athLmNear(x,z);return L&&L.name},athd:()=>ATHD,athDist:()=>ATH_DIST,athGates:()=>SM_ON?SM_gates():HUB.gates||[],athGo:(d,x,z,h)=>athDistGo(d,x,z,h),athPick:d=>athDistPick(d),athGar:()=>GARAGES.filter(g=>g.x!=null).map(g=>({id:g.id,x:g.x,z:g.z,h:g.h})),eleni:()=>{const L=LM_BY['Garaz Psyrri'];return L&&{x:L.x,z:L.z,door:HUB.garage}},hillFit:()=>HILLS.map(h=>({id:h.id,fit:h.fit||1,max:+Math.max(0,...CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped').flatMap(S=>S.pts.filter(p=>p.x>h.x0&&p.x<h.x1&&p.z>h.z0&&p.z<h.z1).map(p=>athHill1(h,p.x,p.z)))).toFixed(1)})),shelfN:()=>CITY_S.filter(S=>S.hs).length,inA:(x,z)=>athInA(x,z),athRoad:(x,z,R)=>athRoadD(x,z,R),athConn:()=>athConn(),athOverlap:()=>athOverlap(),athB:()=>HUB.athB,bhProf:()=>{if(HUB.built)return null;const o={};let t=performance.now(),lab='start';for(const y of buildHubG()){const n=performance.now();o[lab]=(o[lab]||0)+n-t;if(y&&y[1])lab=y[1];t=n}o[lab]=(o[lab]||0)+performance.now()-t;for(const k in o)o[k]=Math.round(o[k]);return o},athRR:(x,z)=>HUB.athRR?HUB.athRR.get(x,z):null,qv:{G:()=>qvGraph(),graph:()=>{const G=qvGraph();return G&&{n:G.n,main:G.list.length,ms:G.ms,cut:G.cut}},path:(a,b,c,d)=>{const P=qvPath(a,b,c,d);return{P,ids:P.ids}},near:(x,z)=>qvNear(x,z),nodeW:i=>{const G=qvGraph();return G&&{x:G.X[i],z:G.Z[i],w:G.W[i]}},layout:(id,seed,x,z)=>{const m=RO.marks.find(q=>q.ev&&q.ev.id===id&&!q.dyn);return m&&qvLayout(m.ev,seed??qvSeed(m),{x:x??m.x,z:z??m.z})},use:id=>{const m=RO.marks.find(q=>q.ev&&q.ev.id===id);return m&&qvUse(m)},mark:id=>{const m=RO.marks.find(q=>(q.ev&&q.ev.id===id&&!q.dyn)||q.uid===id);return m&&{x:m.x,z:m.z,h:m.h,seed:qvSeed(m),use:qvUse(m)}},start:(id,o)=>{const m=RO.marks.find(q=>(q.ev&&q.ev.id===id&&!q.dyn)||q.uid===id);if(m)chStart(m,o);return !!RO.ch},restart:()=>qvRestart(),abandon:()=>qvAbandon(),retry:k=>qvRetry(k),next:()=>{if(RO.ch&&RO.ch.v2)qvNext(RO.ch)},spawn:()=>qvSpawn(),tick:dt=>qvTick(dt||0),enc:()=>RO.marks.filter(m=>m.dyn).map(m=>({id:m.ev.id,k:m.ev.kind,x:m.x,z:m.z,disc:m.disc,uid:m.uid})),encDrop:uid=>{const m=RO.marks.find(q=>q.uid===uid);if(m)qvEncDrop(m,1)},nav:()=>QV.nav&&{n:QV.nav.P.length,rec:QV.nav.rec,rem:QV.nav.rem,d:QV.nav.d,P:QV.nav.P,ids:QV.nav.P.ids},ch:()=>{const c=RO.ch;return c&&{kind:c.kind,v2:!!c.v2,si:c.v2?c.v2.si:-1,n:c.v2?c.v2.L.st.length:0,seed:c.seed,left:c.v2?c.v2.left:0,t:c.t,cd:c.cd,par:c.v2?c.v2.L.par:0,len:c.v2?c.v2.L.len:0,st:c.v2?c.v2.L.st.map(S=>({t:S.t,x:S.x,z:S.z,txt:S.txt,it:S.it?S.it.map(o=>[o.x,o.z]):null})):null,tgt:c.v2&&qvTgt(c)?{...qvTgt(c)}:null,S:c.v2?(({t,hit,s,vx,vz,amb,n})=>({t,hit,s,vx,vz,amb,n}))(c.v2.L.st[c.v2.si]||{}):null}},roadD:(x,z)=>{let d=1e9;const q=cityAt(x,z);if(q)d=Math.min(d,q.d-q.road.w/2);const sd=(ax,az,bx,bz,w)=>{const dx=bx-ax,dz=bz-az,L2=dx*dx+dz*dz||1,u=clamp(((x-ax)*dx+(z-az)*dz)/L2,0,1);return Math.hypot(ax+dx*u-x,az+dz*u-z)-w/2};for(const r of hubRoads())d=Math.min(d,sd(r.x0,r.z0,r.x1,r.z1,r.w));for(const b of BRIDGES){const[a1,c1]=deckPt(b,-b.half-4),[a2,c2]=deckPt(b,b.half+4);d=Math.min(d,sd(a1,c1,a2,c2,b.w))}return d},hit:(x,z)=>!!roamHit(x,z,1),spawnK:k=>{const t=QV_ENC.find(q=>q.k===k),G=qvGraph();if(!t||!G)return null;const i=qvNear(RO.x+Math.sin(RO.h)*220,RO.z+Math.cos(RO.h)*220,400);if(i<0)return null;return qvEncMark(t,G.X[i],G.Z[i],0,(Math.random()*4e9)>>>0,1).uid},sq:()=>RO.marks.filter(m=>m.sq).map(m=>({id:m.ev.id,x:m.x,z:m.z,k:m.ev.kind})),dbg:()=>QV.sqDbg,twist:()=>RO.ch&&RO.ch.v2&&RO.ch.v2.L.tw,stats:()=>({fr:QV.fr,ms:QV.ms,mn:QV.mn,mt:QV.mt,it:QV.it})},net:()=>({pieces:CITY_S.length,km:+(CITY_S.reduce((a,S)=>a+S.L,0)/1000).toFixed(1),aj:AJ.length,junc:JUNC.length,cls:CITY_S.reduce((o,S)=>(o[S.r.cls]=(o[S.r.cls]||0)+1,o),{})}),cover:(x,z,r=60)=>{const G=HUB.grid,k0=Math.floor(x/40),j0=Math.floor(z/40),n=Math.ceil(r/40);for(let a=-n;a<=n;a++)for(let b=-n;b<=n;b++){const L=G&&G.get((k0+a)*10000+j0+b);if(L)for(const q of L)if(Math.hypot(q.x-x,q.z-z)<r+Math.max(q.hw,q.hd))return 'bld'}const P=HUB.pgrid,m=Math.ceil(r/16),kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-m;a<=m;a++)for(let b=-m;b<=m;b++){const L=P&&P.get((kx+a)*10000+kz+b);if(L)for(const p of L)if(Math.hypot(p.x-x,p.z-z)<r)return 'prop'}const Z=zoneAt(x,z);if(Z&&(Z.t==='plaza'||Z.t==='grass'))return 'zone';return null},bh:()=>{if(HUB.built)return null;const t=performance.now();buildHub();const t1=performance.now();buildRoam();return[Math.round(t1-t),Math.round(performance.now()-t1)]},rsnap:(x,z,r)=>rfSnap(x,z,r||200),gbs:()=>(RO.gbs||[]).map(g=>({x:g.x,z:g.z,y:g.y})),packs:()=>(RO.packs||[]).map(g=>({x:g.x,z:g.z,y:g.y})),cars:()=>HUB.cars.map(c=>({k:HCAR[c.k],x:+c.x.toFixed(1),z:+c.z.toFixed(1),y:+c.y.toFixed(2),tr:!!c.tr,dead:c.dead>0})),athU:()=>HUB.athU||0,hills:()=>HILLS.map(h=>({id:h.id,cx:h.cx,cz:h.cz,H:h.H,shape:h.shape})),shelf:()=>SHELF.size,stS:id=>{const S=CITY_S.find(q=>q.r.id===id);return S&&S.pts.map(p=>[+p.x.toFixed(1),+p.z.toFixed(1),+(p.y??0).toFixed(2),+p.tx.toFixed(3),+p.tz.toFixed(3)])},cityT:(x,z)=>{const q=cityAt(x,z);return q&&{d:q.d,id:q.road.id,w:q.road.w,cls:q.road.cls,tx:q.p.tx,tz:q.p.tz}},athProbe:()=>{const p=pl;frameAt(TD,p.dist,F2);const rs=F2.p.clone().addScaledVector(F2.r,p.x),m=p.mesh.position;return{cy:+m.y.toFixed(2),ry:+rs.y.toFixed(2),gy:+athH(m.x,m.z).toFixed(2),x:+p.x.toFixed(2),M:MARGIN,dead:p.dead>0,air:!!p.air,tun:F2.p.y<-11,sec:TD.SEC[F2.i]}},
   athEdges:()=>{let bad=0,maxUp=-9,maxStep=0,n=0,worst='',wu='';const td=TF,f=mkF();for(let s=0;s<td.L;s+=8){if(inGapF(s)||inGapF(s+26)||inGapF(s-26))continue;frameAt(td,s,f);if(f.p.y<-1||/FLYOVER/.test(td.SEC[f.i]))continue;
     for(const sd of[-1,1]){const a=f.p.clone().addScaledVector(f.r,sd*(HALF-3)),e=f.p.clone().addScaledVector(f.r,sd*HALF),o=f.p.clone().addScaledVector(f.r,sd*(HALF+5));const up=athH(a.x,a.z)-a.y,st=Math.abs(athH(o.x,o.z)-e.y);n++;if(up>maxUp){maxUp=up;wu=td.SEC[f.i]+'@'+Math.round(s)}if(st>maxStep){maxStep=st;worst=td.SEC[f.i]+'@'+Math.round(s)}if(up>0||st>2)bad++}}
