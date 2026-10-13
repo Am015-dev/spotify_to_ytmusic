@@ -1,8 +1,16 @@
 00_page.html
 02_data_json.html
 10_core.js
+10_core2.js
+10_core3.js
+10_core4.js
+10_core5.js
+10b_qt_data.js
 20_race_world.js
 30_race.js
+30_race2.js
+30_race3.js
+30_race4.js
 31_race_r15.js
 40_hud_input_menu.js
 41_career_quests.js
@@ -11,6 +19,11 @@
 52_terrain_data.js
 53_terrain_roads.js
 60_city_build.js
+60_city_build2.js
+60_city_build3.js
+60_city_build4.js
+60_city_build5.js
+60_city_build6.js
 70_roam_world.js
 71_roam_drive.js
 72_roam_map_loop_boot.js
@@ -66,8 +79,10 @@
 98ld_run.js
 98ct_city_lego.js
 98sz_ride_scale.js
+98sz2_ride_audit.js
 98of_onfoot.js
 98sh_shadow.js
+98lf_lively_fill.js
 99c_checklist.js
 98rf_race_fun.js
 98ro_open.js
@@ -80,4 +95,6 @@
 98b2_builder2.js
 98rd_roads.js
 98tq_test_quick.js
+98rs_road_seams.js
+98lm_liveliness.js
 99_api.js

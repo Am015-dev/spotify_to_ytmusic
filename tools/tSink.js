@@ -35,7 +35,7 @@ async function run(b,mode,city){const phone=mode!=='desk';const vp=phone?{width:
  await ctx.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);
  const url=mode==='iframe'?URL.replace(/local_dbg\.html.*/,'iframe852.html'):URL;
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
- await p.evaluate(([c])=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city]);
+ await p.evaluate(([c,car])=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(car)for(let i=0;i<10;i++)localStorage.setItem('mho_gar@'+i,JSON.stringify({sel:car,own:['rod',car],up:{},br:{}}));if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city,process.env.CAR||'']);
  await p.goto(url);let G=p;if(mode==='iframe'){await p.waitForTimeout(1500);G=p.frames().find(f=>/local_dbg/.test(f.url()));}
  await G.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
  const off=mode==='iframe'?[0,0]:[0,0];

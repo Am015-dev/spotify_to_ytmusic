@@ -12,7 +12,7 @@ Read `CLAUDE.md`, then `src/MAP.md`, then ONLY the modules of your area. Never r
    `local_dbg.html`, `chk.mjs`, `km.js` for the old test tools (`./setup.sh` once for the :8766 server; serve the repo root).
 4. Test: tPlay/g25-style real-input tests on `local_dbg.html` (add `?fast=1` for the fast test mode, see below); look at the shots.
 5. Commit **src/ changes** (+ your test/shot files). Diffs are now readable per module: `git diff src/`.
-6. Reviewer gate as in CLAUDE.md, then add the `OD_CHANGELOG` entry (top of `src/10_core.js`), rebuild, commit `out/<ver>/`
+6. Reviewer gate as in CLAUDE.md, then add the `OD_CHANGELOG` entry (in `src/10_core2.js` (const OD_CHANGELOG)), rebuild, commit `out/<ver>/`
    (`git add -f out/<ver>`), and send the coordinator `DEPLOY <branch> <commit> out/<ver> <msg>`. deploy.sh is unchanged.
 
 ## Old anchor patches (pXXX.py) still work

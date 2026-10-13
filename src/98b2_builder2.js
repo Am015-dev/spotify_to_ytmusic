@@ -48,27 +48,43 @@ function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)fo
  for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;
   const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a;if(dd<R0){if(T[k]>y||(dd<7&&y-T[k]<2.2))T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap}}}}
 // ---------------------------------------------------------------- pieces (local: x = right, y = up, z = forward; origin = entry edge middle)
+const bxRamp=t=>{const b=.25,c=1/(1-b);return t<b?c*t*t/(2*b):t>1-b?1-c*(1-t)*(1-t)/(2*b):c*(t-b/2)};
 const bxCurve=(R,s)=>t=>{const a=t*Math.PI/2;return[s*(R-R*Math.cos(a)),0,R*Math.sin(a)]};
 const BX_P={
  st:{n:'STRAIGHT',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3},
  cl:{n:'CURVE L',v:'top',p:[bxCurve(12,-1)],ex:[[-2,1,0,-1]],k:12},
  cr:{n:'CURVE R',v:'top',p:[bxCurve(12,1)],ex:[[2,1,0,1]],k:12},
- up:{n:'RAMP UP',v:'side',p:[t=>[0,4*bxSS(t),16*t]],ex:[[0,2,2,0]],k:10},
- dn:{n:'RAMP DOWN',v:'side',p:[t=>[0,-4*bxSS(t),16*t]],ex:[[0,2,-2,0]],k:10},
- su:{n:'STEEP UP',v:'side',p:[t=>[0,8*bxSS(t),16*t]],ex:[[0,2,4,0]],k:12},
- sd:{n:'STEEP DOWN',v:'side',p:[t=>[0,-8*bxSS(t),16*t]],ex:[[0,2,-4,0]],k:12},
+ // ramps (trk-1, Alex: "the car moves backward"): slope eases in/out over 25 % of the length, so the PEAK grade is h/(L*.75); every ramp <= 25 %
+ up:{n:'RAMP UP',v:'side',p:[t=>[0,4*bxRamp(t),24*t]],ex:[[0,3,2,0]],k:12},
+ dn:{n:'RAMP DOWN',v:'side',p:[t=>[0,-4*bxRamp(t),24*t]],ex:[[0,3,-2,0]],k:12},
+ lu:{n:'LONG RAMP UP',v:'side',p:[t=>[0,6*bxRamp(t),40*t]],ex:[[0,5,3,0]],k:16},
+ ld:{n:'LONG RAMP DOWN',v:'side',p:[t=>[0,-6*bxRamp(t),40*t]],ex:[[0,5,-3,0]],k:16},
+ su:{n:'TALL RAMP UP',v:'side',p:[t=>[0,8*bxRamp(t),48*t]],ex:[[0,6,4,0]],k:18},
+ sd:{n:'TALL RAMP DOWN',v:'side',p:[t=>[0,-8*bxRamp(t),48*t]],ex:[[0,6,-4,0]],k:18},
+ // the old short ramps (38 % / 75 %) only load old saved tracks (log v<2); not in the palette
+ up1:{n:'RAMP UP',v:'side',p:[t=>[0,4*bxSS(t),16*t]],ex:[[0,2,2,0]],k:10},
+ dn1:{n:'RAMP DOWN',v:'side',p:[t=>[0,-4*bxSS(t),16*t]],ex:[[0,2,-2,0]],k:10},
+ su1:{n:'STEEP UP',v:'side',p:[t=>[0,8*bxSS(t),16*t]],ex:[[0,2,4,0]],k:12},
+ sd1:{n:'STEEP DOWN',v:'side',p:[t=>[0,-8*bxSS(t),16*t]],ex:[[0,2,-4,0]],k:12},
  kk:{n:'JUMP',v:'side',p:[t=>[0,2.2*t*t,8*t]],ex:[[0,4,0,0]],k:8,jump:1},
+ // kicker: 0.9 m lip at 12.7°, the road goes on flat behind it (land on it): ~0.6 s air at 55 km/h, ~1.1 s at 120 km/h
+ kj:{n:'KICKER',v:'side',p:[t=>[0,.9*t*t,8*t]],ex:[[0,1,0,0]],k:8,jump:1},
  bl:{n:'BANK L',v:'top',p:[bxCurve(20,-1)],bank:t=>-.62*Math.sin(Math.PI*t),ex:[[-3,2,0,-1]],k:18},
  br:{n:'BANK R',v:'top',p:[bxCurve(20,1)],bank:t=>.62*Math.sin(Math.PI*t),ex:[[3,2,0,1]],k:18},
+ // wide banked corners (radius 36 m: full speed, no braking)
+ wbl:{n:'WIDE BANK L',v:'top',p:[bxCurve(36,-1)],bank:t=>-.42*Math.sin(Math.PI*t),ex:[[-5,4,0,-1]],k:30},
+ wbr:{n:'WIDE BANK R',v:'top',p:[bxCurve(36,1)],bank:t=>.42*Math.sin(Math.PI*t),ex:[[5,4,0,1]],k:30},
  wl:{n:'WALL L',v:'top',p:[bxCurve(20,-1)],bank:t=>-1.2*Math.sin(Math.PI*t)**.8,ex:[[-3,2,0,-1]],k:22,stick:1},
  wr:{n:'WALL R',v:'top',p:[bxCurve(20,1)],bank:t=>1.2*Math.sin(Math.PI*t)**.8,ex:[[3,2,0,1]],k:22,stick:1},
  lp:{n:'LOOP',v:'side',p:[t=>{const a=2*Math.PI*t;return[8*bxSS(t),7*(1-Math.cos(a)),16*t+7*Math.sin(a)]}],ex:[[1,2,0,0]],k:64,stick:1},
  fk:{n:'SPLIT',v:'top',p:[t=>[-8*bxSS(t),0,16*t],t=>[8*bxSS(t),0,16*t]],ex:[[-1,2,0,0],[1,2,0,0]],k:8},
+ // merge: the two SPLIT routes join again (entry = the left route's end; the right route ends 2 cells to the right: in)
+ mg:{n:'MERGE',v:'top',p:[t=>[8*bxSS(t),0,16*t],t=>[16-8*bxSS(t),0,16*t]],ex:[[1,2,0,0]],in:[[2,0]],k:8},
  bo:{n:'BOOST',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3,boost:1},
  cp:{n:'CHECKPOINT',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3,cp:1},
  sf:{n:'START',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3,start:1}
 };
-const BX_PAL=['sf','st','cl','cr','up','dn','su','sd','kk','lp','bl','br','wl','wr','fk','bo','cp'];
+const BX_PAL=['sf','st','cl','cr','wbl','wbr','up','dn','lu','ld','su','sd','kj','kk','lp','bl','br','wl','wr','fk','mg','bo','cp'];
 function BX_fr(c){const f=BXF[c.r&3],rv=BXF[(c.r+1)&3],cx=BXO+(c.i+.5)*BXC,cz=BXO+(c.j+.5)*BXC;
  return{o:bxV(cx-f[0]*BXC/2,c.l*BXH,cz-f[1]*BXC/2),F:bxV(f[0],0,f[1]),R:bxV(rv[0],0,rv[1])}}
 function BX_exit(c,e){const f=BXF[c.r&3],rv=BXF[(c.r+1)&3];return{i:c.i+e[0]*rv[0]+e[1]*f[0],j:c.j+e[0]*rv[1]+e[1]*f[1],l:c.l+e[2],r:(c.r+e[3]+4)&3}}
@@ -142,7 +158,9 @@ function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1.6,1,1.6),M.pil,P.length),mt=new THREE.Matrix4();
  P.forEach(([x,z,g,t],i)=>{mt.makeScale(1,t-g+.3,1);mt.setPosition(x,(t+g)/2,z);im.setMatrixAt(i,mt)});im.castShadow=im.receiveShadow=true;BX.sc.add(im);BX.pilM=im}
 // open ends (exits with no piece starting there) + the cursor
-function BX_ends(){const key=c=>c.i+','+c.j+','+c.l+','+c.r,ent=new Set(BX.pcs.filter(p=>!p.dead).map(p=>key(p.c)));const E=[];
+// every cell a piece can be entered from (a MERGE has two)
+const BX_ents=p=>[p.c,...(p.def.in||[]).map(e=>BX_exit(p.c,[e[0],e[1],0,0]))];
+function BX_ends(){const key=c=>c.i+','+c.j+','+c.l+','+c.r,ent=new Set(BX.pcs.filter(p=>!p.dead).flatMap(p=>BX_ents(p).map(key)));const E=[];
  for(const p of BX.pcs)if(!p.dead)for(const e of p.ex)if(!ent.has(key(e)))E.push(e);return E}
 function BX_after(){BX_pillars();BX_marks();BX_ghost();BX_stats()}
 function BX_marks(){if(BX.gE){BX.sc.remove(BX.gE)}const g=BX.gE=new THREE.Group();BX.sc.add(g);const M=BX_mats(),ar=new THREE.ConeGeometry(1.6,3.2,4);
@@ -238,7 +256,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // water: boat when the ground under the car is deep enough and the car is at the surface
  const gy=BX_h(V.p.x,V.p.z),wantBoat=gy<-.7&&V.p.y<.9&&!(grounded&&pc);
  if(wantBoat!==V.boat&&(wantBoat||grounded)){V.boat=wantBoat;BX_vmode(V.boat?'boat':'car');m.swaps++;BX_burst(V.p.clone().add(bxV(0,.3,0)),18,V.boat?0xbfe4ff:0x8d7b68,7);BX_say(V.boat?'SPLASH! BOAT':'BACK ON WHEELS',1)}
- const top=(V.boat?24:pc?34:27)+(V.boost>0?14:0),grip=V.boat?2.4:pc?11:6.5,acc=(V.boat?13:22)+(V.boost>0?18:0);
+ const top=(V.boat?24:pc?34:27)+(V.boost>0?14:0),grip=V.boat?3.6:pc?11:6.5,acc=(V.boat?13:22)+(V.boost>0?18:0);
  V.steer+=(inp.s-V.steer)*Math.min(1,dt*7);
  if(V.boat){grounded=false;const wave=.12*Math.sin(BX.t*2.1+V.p.x*.2);V.p.y+=(.05+wave-V.p.y)*Math.min(1,dt*6);V.v.y*=.8;
   U.lerp(bxV(.06*Math.sin(BX.t*1.7),1,.06*Math.sin(BX.t*1.3)),Math.min(1,dt*4)).normalize();m.boat+=dt;
@@ -275,7 +293,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // respawn rules (the ONLY ones): below the terrain minimum, upside down >2 s (not in a loop), >40 m from the course >3 s (BX_farCheck)
  if(V.p.y<V.tMin-3)return BX_respawn('fall');
  if(U.y<0&&!(V.on&&V.on.def.stick)){V.stuck+=dt;if(V.stuck>2)return BX_respawn('stuck')}else V.stuck=0;
- m.t+=dt;m.dist+=V.v.length()*dt;{const vf=V.v.dot(F);if(vf<-1){m.backT=(m.backT||0)+dt;if(m.t<4)m.back0=(m.back0||0)+dt}}m.yMin=Math.min(m.yMin,V.p.y);m.yMax=Math.max(m.yMax,V.p.y);if(!grounded&&!V.boat||U.y<Math.cos(.07))m.off+=dt}
+ m.t+=dt;m.dist+=V.v.length()*dt;{const vf=V.v.dot(F);if(vf<-1){m.backT=(m.backT||0)+dt;if(m.t<4)m.back0=(m.back0||0)+dt}}if(m.fwd3==null&&m.t>=3){const s0=BX.v.safe;m.fwd3=+V.p.clone().sub(s0.p).dot(s0.F).toFixed(1)}m.yMin=Math.min(m.yMin,V.p.y);m.yMax=Math.max(m.yMax,V.p.y);if(!grounded&&!V.boat||U.y<Math.cos(.07))m.off+=dt}
 function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9;for(const{s}of BX.samp){const dx=s.p.x-V.p.x,dz=s.p.z-V.p.z,d=dx*dx+dz*dz;if(d<best)best=d}best=Math.sqrt(best);V.dCourse=+best.toFixed(1);
  if(best>40){V.far+=dt;if(V.far>3)BX_respawn('far')}else V.far=0}
 // checkpoints and laps: START then every CHECKPOINT (any order), back over START = lap
@@ -368,12 +386,14 @@ function BX_tap(x,y){const R=BX.ray,nd=new THREE.Vector2(x/innerWidth*2-1,-y/inn
  const i=Math.floor((pt.x-BXO)/BXC),j=Math.floor((pt.z-BXO)/BXC),cy=BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC);BX.cur={i,j,l:Math.max(0,Math.round(cy/BXH)),r:BX.cur.r};BX.hl=-1;BX_hlShow();BX_after()}
 function BX_hlShow(){if(BX.hlM){BX.sc.remove(BX.hlM);BX.hlM=null}const pc=BX.pcs[BX.hl];if(!pc||pc.dead)return;const g=BX.hlM=new THREE.Group();for(const o of pc.meshes)if(o.isMesh){const m=new THREE.Mesh(o.geometry,BX_mats().hl);g.add(m)}BX.sc.add(g)}
 // ---------------------------------------------------------------- save / load (the action log)
+// tracks saved before v2 used the short steep ramps: keep their shape (legacy pieces up1/dn1/su1/sd1)
+const BX_mig=o=>o.v>=2?o:{v:2,log:o.log.map(a=>a[0]==='p'&&{up:1,dn:1,su:1,sd:1}[a[1]]?[a[0],a[1]+'1',...a.slice(2)]:a)};
 function BX_saved(){try{return JSON.parse(localStorage.getItem('bx_tracks')||'{}')}catch(e){return{}}}
-function BX_save(){const S=BX_saved();if(BX.name==='MY TRACK'||BX_DEMOS[BX.name])BX.name='TRACK '+(Object.keys(S).length+1);S[BX.name]={v:1,log:BX.log};try{localStorage.setItem('bx_tracks',JSON.stringify(S))}catch(e){}BX_stats()}
+function BX_save(){const S=BX_saved();if(BX.name==='MY TRACK'||BX_DEMOS[BX.name])BX.name='TRACK '+(Object.keys(S).length+1);S[BX.name]={v:2,log:BX.log};try{localStorage.setItem('bx_tracks',JSON.stringify(S))}catch(e){}BX_stats()}
 function BX_load(o,name){BX.log=JSON.parse(JSON.stringify(o.log));BX.name=name||'TRACK';BX_replay();const L=BX.pcs.filter(p=>!p.dead);if(L.length){BX.cur={...L[L.length-1].ex[0]};const s=L[0].S[0][0].p;BX.camB.x=s.x;BX.camB.z=s.z}BX_after()}
 function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=document.createElement('div');D.id='bxLoad';const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{D.remove();f()};D.appendChild(b)};
  D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');if(BX_DEMOS_SHOW)for(const k in BX_DEMOS)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
- const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(S[k],k));
+ const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(BX_mig(S[k]),k));
  add('✚ NEW EMPTY TRACK',()=>BX_load({log:[['w','valley']]},'MY TRACK'));add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
 // ---------------------------------------------------------------- open / close
@@ -396,18 +416,26 @@ function bxCh(w,c,L){const log=w?[['w',w]]:[];let cur={i:c[0],j:c[1],l:c[2],r:c[
 const bxRep=(t,n)=>Array(n).fill(t);
 const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for(const B of L){if(A===B)continue;for(const a of A.S[0])for(const b of B.S[0])if(Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<4&&a.p.y-b.p.y>5)return true}return false};
 // built-in tracks (dev-2, Alex: "I see no tracks made with the builder yet!!!"): plain builder logs, so ★ load + edit + save works like any track
-Object.assign(BX_DEMOS,{'CLIFF RUN':{log:bxCh('mountain',[18,21,16,3],['sf','st','st','cp','st','st','st','kk',[29,21,8,3],'st','st','st','sd','st','st','br','dn','st','st','st','st','st','st','st','st','br',
-  ...bxRep('st',3),'bo',...bxRep('st',5),'cp',...bxRep('st',8),'br','su','su','su','up','st','st','br'])},
- 'TWO-LEVEL CITY':{log:bxCh('city',[8,26,1,2],['sf',...bxRep('st',6),'cp',...bxRep('st',6),'br',...bxRep('st',4),'bo',...bxRep('st',8),
-  [31,10,-1,3],'up','su','su','br','st','st','br',...bxRep('st',8),'cp',...bxRep('st',10),'bo',...bxRep('st',10),'sd','sd','bl',...bxRep('st',7),'bl',...bxRep('st',3),'bl'])},
- 'CANYON SPLIT':{log:[...bxCh('canyon',[19,27,1,3],['sf','st','fk','bl','br','br','up','bl',1,'up','up','up','dn','dn','bl',[35,21,3,2],'su','su',...bxRep('st',3),'cp','st','bl',
- ...bxRep('st',6),'bo',...bxRep('st',7),'bl','st','sd','sd','dn',...bxRep('st',5),'bl']),['b','raise',124,32,0]]}});
+// trk-1 rebuild (Alex on the first versions: "horrible! not fun, not easy to drive, the car moves backward"): every ramp <= 22 %, corners are the
+// 36 m WIDE BANKs (full speed), one KICKER each (0.6-1.5 s air, flat landing), closed loops (the SPLIT joins again at a MERGE), laps ~1.4-1.7 km
+Object.assign(BX_DEMOS,{
+ // mountain: low start -> climb in two hairpins -> across the mesa top (kicker) -> elevated 30 m hairpin -> long descent -> home
+ 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf',...bxRep('st',6),'cp',...bxRep('st',8),'bo',...bxRep('st',3),'wbr','st','wbr',
+  'su','st','su','st','cp',...bxRep('st',3),'wbl','st','wbl','lu','su',...bxRep('st',6),'kj',...bxRep('st',6),'wbr','st','wbr',
+  'st','st','sd','sd','cp','sd','ld','wbr',...bxRep('st',21),'wbr'])},
+ // city figure-8: boat ramp across the lake -> up onto the 14 m bridge -> down -> between the blocks (kicker) -> under the bridge -> back to the lake
+ 'TWO-LEVEL CITY':{log:bxCh('city',[29,15,-1,0],['up','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
+  ...bxRep('st',24),'wbr',...bxRep('st',9),'wbr','st','st','bo',...bxRep('st',4),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
+  ...bxRep('st',20),'wbl','wbl','dn'])},
+ // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
+ 'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf',...bxRep('st',12),'wbr','fk',1,'sd','dn','st','st','st','up','su',0,...bxRep('st',21),'mg',
+  'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr',...bxRep('st',16),'wbr',...bxRep('st',12),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',7),'wbr','su',...bxRep('st',13),'wbr'])}});
 // "drivable and fun" pass lines (coordinator 2026-10-13, after Alex: "horrible! not fun, not easy to drive, the car moves backward"):
 // 0 backward start, <=1 respawn per lap, <=2 wall hits/min, average speed >=60 % of top, a 0.6-1.5 s jump with a clean landing, lap 45-90 s, no grade >25 %
 function BX_grade(){let g=0,at='';for(const p of BX.pcs){if(p.dead||p.def.jump)continue;for(const S of p.S)for(let k=1;k<S.length;k++){const a=S[k-1].p,b=S[k].p,h=Math.hypot(b.x-a.x,b.z-a.z);if(h>.05){const q=Math.abs(b.y-a.y)/h;if(q>g){g=q;at=p.type}}}}return{g,at}}
 function BX_fun(){const m=BX.m,laps=m.laps,hpm=(m.wall+m.bump)/Math.max(m.t/60,1e-3),avg=m.dist/Math.max(m.t,1e-3),TOP=34,G=BX_grade(),lap=m.lapT[0]||0,
  rs=m.respTs||[],J=(m.lands||[]).filter(l=>l.air>=.6&&l.air<=1.5&&l.Uy>.8&&!rs.some(t=>t>=l.t-l.air&&t<l.t+2)),
- L=[['0 backward start',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`],['<=1 respawn/lap',laps>=1&&m.resp<=laps,`respawns ${m.resp}/${laps} laps`],
+ L=[['0 backward start',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`],['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 respawns',laps>=1&&m.resp===0,`respawns ${m.resp}/${laps} laps`],
   ['<=2 hits/min',hpm<=2,`hits ${hpm.toFixed(1)}/min`],['avg >=60 % top',avg>=.6*TOP,`avg ${Math.round(avg*3.6)} km/h (${Math.round(avg/TOP*100)} %)`],
   ['jump 0.6-1.5 s clean',J.length>0,`jumps ${(m.lands||[]).map(l=>l.air).join('/')||'none'}`],['lap 45-90 s',lap>=45&&lap<=90,`lap ${lap.toFixed(1)} s`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} % (${G.at})`]];
  return{ok:L.every(x=>x[1]),fails:L.filter(x=>!x[1]).map(x=>x[0]),msg:L.map(x=>(x[1]?'✔ ':'✘ ')+x[2]).join(', ')}}
@@ -433,12 +461,12 @@ const BX_TESTS={
   return{ok:hi-lo>=30&&vis>20,msg:`terrain range ${(hi-lo).toFixed(1)} m, ${vis} hill points (>20 m) on screen`}}},
  // dev-2 built-in tracks (Alex: "I see no tracks made with the builder yet!!!"): lap completes, >=15 m elevation, + each track's feature
  'bx-t-cliff':{n:'CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,
-  chk0:()=>{const m=BX.m,r=m.yMax-m.yMin;return{ok:m.laps>=1&&r>=15&&m.airMax>=1.5&&BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id)),msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, air max ${m.airMax.toFixed(2)} s, banked turn ${BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id))?'yes':'no'}`}}},
+  chk0:()=>{const m=BX.m,r=m.yMax-m.yMin;return{ok:m.laps>=1&&r>=15&&BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id)),msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, banked turn ${BX.pcs.some(p=>p.def.bank&&m.seen.has(p.id))?'yes':'no'}`}}},
  'bx-t-city':{n:'TWO-LEVEL CITY',log:()=>(BX_DEMOS['TWO-LEVEL CITY']||{log:[['w','city']]}).log,drive:1,
   chk0:()=>{const m=BX.m,r=m.yMax-m.yMin,cr=bxCross(m.seen||new Set());return{ok:m.laps>=1&&r>=15&&cr&&m.boat>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, over+under ${cr?'yes':'no'}, boat ${m.boat.toFixed(1)} s`}}},
  'bx-t-canyon':{n:'CANYON SPLIT',log:()=>(BX_DEMOS['CANYON SPLIT']||{log:[['w','canyon']]}).log,drive:1,
   chk0:()=>{const m=BX.m,r=m.yMax-m.yMin,S=m.seen||new Set(),key=c=>c.i+','+c.j+','+c.l+','+c.r,fk=BX.pcs.find(p=>p.type==='fk'),br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[],n=br.filter(p=>p&&S.has(p.id)).length;
-   return{ok:m.laps>=1&&r>=15&&n===2&&m.terrT>=2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, routes driven ${n}/2, off-road ${m.terrT.toFixed(1)} s`}}},
+   return{ok:m.laps>=1&&r>=15&&n===2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, routes driven ${n}/2`}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
@@ -452,7 +480,7 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  look:(x,z,d,yaw,pit)=>{Object.assign(BX.camB,{x,z,d:d||BX.camB.d,yaw:yaw==null?BX.camB.yaw:yaw,pit:pit||BX.camB.pit})},
  st:()=>{const V=BX.v;return{mode:BX.mode,cur:BX.cur,n:BX.pcs.filter(p=>!p.dead).length,log:BX.log.length,v:V&&{p:V.p.toArray().map(x=>+x.toFixed(2)),F:V.F.toArray().map(x=>+x.toFixed(3)),sp:+V.v.length().toFixed(2),g:V.g,boat:V.boat,air:+V.air.toFixed(2),Uy:+V.U.y.toFixed(2),on:V.on&&V.on.type,dC:V.dCourse},m:BX.m&&{...BX.m,pcs:BX.m.pcs.size}}},
  // the course as waypoints (for the test driver): follow exits from START, choosing branch ch[k] at the k-th SPLIT
- route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.map(p=>[key(p.c),p]));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
+ route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type]);
    const e=pc.ex[b];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
- h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:1,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+ h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:2,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
