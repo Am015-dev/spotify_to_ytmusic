@@ -199,7 +199,7 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   {const nB=BRIDGES.length,ext=OB_ext(FILL_R,nB),M=OB_net(null,ext),cl=new Map(M.comps);FILL_R.forEach((r,k)=>{const R=M.find(M.segs.length+nB+k);cl.set(R,(cl.get(R)||0)+r.L)});let main=-1,mL=-1;for(const[r,l]of cl)if(l>mL){mL=l;main=r}
     const keep=FILL_R.filter((r,k)=>M.find(M.segs.length+nB+k)===main);for(const r of FILL_R)if(!keep.includes(r))OB_log('fdel',(r.x0+r.x1)/2,(r.z0+r.z1)/2,r.L);O.fDel+=FILL_R.length-keep.length;FILL_R.length=0;FILL_R.push(...keep);OB_fillIdx()}
   O.fillMs=Math.round(performance.now()-t0)}
-{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix()}}
+{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim()}}
 // runtime audit of the CURRENT drawn network: CITY_S drivable streets + filler grid + bridges + Autobahn links, junction plates, GPS coverage
 function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?hubRoads():[],nF=FR.length,nB=BRIDGES.length;
   const ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs;
@@ -225,8 +225,31 @@ function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?h
   s.city=CID==='fra'?'fra':'ath'+ATHD;s.fixOn=OB_RA.on;
   // a few problem spots for screenshots / inspection
   const sp=N.dead.filter(d=>d.st<40).map(d=>[Math.round(d.x),Math.round(d.z),Math.round(d.st),'city']);FR.forEach((r,k)=>{const I=ext.info[k];for(const e of[0,1])if(!I.endJ[e]){const[x,z]=OB_fpt(r,e?r.L:0);sp.push([Math.round(x),Math.round(z),0,'fill'])}});s.spots=sp.slice(0,12);s.noPlateAt=npAt.slice(0,6);return s}
-OB_fix();
-window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,
+// ===== RD (roads-1, Alex 2026-10-13 "simplify the maps … many areas do not connect … wider roads"): load-time network simplification.
+// Athens: short dead-end side streets (res/sec/link stubs < RD_STUB m to their junction) are cut back to the junction; the main/arterial net is widened;
+// every street is two-way for traffic (one-way chains split the traffic graph into ~5000 trapped pieces, main SCC 23 %). Frankfurt: grid stubs that
+// overhang the last cross street (up to RD_GSTUB m) are trimmed. Stubs near a mission spot / landmark stay. ?rd=0 = old network (A/B).
+const RD_ON=!/[?&]rd=0/.test(location.search),RD={ops:{cut:0,del:0,gtrim:0,gdel:0,wide:0,two:0},before:null,after:null},RD_STUB={res:420,sec:320,link:200,main:70,arterial:70},RD_GSTUB=230;
+const RD_keep=(()=>{const P=[];for(const k in RF.spots){const v=RF.spots[k];P.push(WP(v[0],v[1]))}for(const L of RF.lm)P.push(WP(L[2],L[3]));for(const G of (RF.garages||[]))if(G&&G.length>2)P.push(WP(G[1],G[2]));return(x,z,r=45)=>P.some(([a,b])=>(a-x)**2+(b-z)**2<r*r)})();
+function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<6;round++){const N=OB_net(),S=N.segs;let did=0;const kill=new Set(),cut=[];
+  for(const d of N.dead){const A=S[d.a];if(!(d.st<(RD_STUB[A.r.cls]||0))||kill.has(A)||cut.some(c=>c.a===d.a))continue;const P=A.pts;let prot=false;
+    if(d.e){for(let i=P.length-1;i>=0&&P[d.i].s-P[i].s<=d.st+1;i-=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}}else for(let i=0;i<P.length&&P[i].s<=d.st+1;i+=2)if(RD_keep(P[i].x,P[i].z)){prot=true;break}
+    if(prot)continue;cut.push(d)}
+  for(const d of cut){const A=S[d.a],P=A.pts,jf=N.jf[d.a];if(kill.has(A))continue;let k=-1;if(!d.e){for(let i=0;i<P.length;i++)if(jf[i]){k=i;break}}else for(let i=P.length-1;i>=0;i--)if(jf[i]){k=i;break}
+    if(k<0||(!d.e&&k>=P.length-2)||(d.e&&k<=1)){kill.add(A);O.del++;did++;continue}if(d.e)P.length=k+1;else{P.splice(0,k);const s0=P[0].s;for(const q of P)q.s-=s0}A.L=P[P.length-1].s;O.cut++;did++}
+  if(kill.size)for(let i=CITY_S.length-1;i>=0;i--)if(kill.has(CITY_S[i]))CITY_S.splice(i,1);if(!did)break}
+  // pieces cut off from the main network (< 3 km): dropped
+  {const N=OB_net(),kill=new Set();N.segs.forEach((S,a)=>{const r=N.find(a);if(r!==N.main&&(N.comps.get(r)||0)<3000)kill.add(S)});if(kill.size){O.orph=kill.size;for(let i=CITY_S.length-1;i>=0;i--)if(kill.has(CITY_S[i]))CITY_S.splice(i,1)}}}
+function RD_net(){if(!RD_ON)return;RD.before=OB_sum(OB_net());RD_prune();
+  if(CID!=='fra'){const O=RD.ops,WM={arterial:[13,1.25,22],main:[11,1.2,18],sec:[8,1,12],res:[7,1,10],link:[7,1,10]};const seen=new Set();for(const S of CITY_S){const r=S.r;if(seen.has(r))continue;seen.add(r);if(r.one){r.one0=1;r.one=0;O.two++}const m=WM[r.cls];if(m){const w=Math.min(Math.max(r.w,m[2]),Math.max(m[0],r.w*m[1]));if(w>r.w+.05){r.w0=r.w;r.w=+w.toFixed(1);O.wide++}}}}
+  RD.after=OB_sum(OB_net())}
+function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;OB_fillIdx();const N=OB_net();
+  for(const r of FILL_R){const I=OB_fJ(r,N);for(const e of[1,0]){if(I.endJ[e])continue;const t=e?r.L:0,js=I.J.filter(c=>Math.abs(c-t)>r.w/2+1);if(!js.length&&I.endJ[1-e])js.push(e?0:r.L);if(!js.length)continue;const tj=e?Math.max(...js):Math.min(...js);if(Math.abs(tj-t)>=RD_GSTUB)continue;
+    let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
+    if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
+  for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
+OB_fix();RD_net();
+window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
 

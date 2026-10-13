@@ -268,7 +268,7 @@ function CV_sigBuild(){const N=HUB.nodes,NG=N.ng,K=CV.K;CV.sig=[];CV.yl=[];CV.se
   // incoming edges: start outside the stop circle, run into it, towards the centre
   for(let i=0;i<NG;i++){const A=N[i];if(A.ab)continue;for(const j of A.nb){if(j>=NG)continue;const B=N[j],mx=(A.x+B.x)/2,mz=(A.z+B.z)/2;let best=null,bd=1e9;
     const kx=Math.floor(mx/64),kz=Math.floor(mz/64),ex=B.x-A.x,ez=B.z-A.z,L2=ex*ex+ez*ez||1;
-    for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const L=CV.JG.get((kx+a)*100000+kz+b);if(L)for(const C of L){const dA=Math.hypot(A.x-C.x,A.z-C.z);if(dA<C.R0||dA>140)continue;if(ex*(C.x-A.x)+ez*(C.z-A.z)<=0)continue;const t=Math.max(0,Math.min(1,((C.x-A.x)*ex+(C.z-A.z)*ez)/L2)),dm=Math.hypot(A.x+ex*t-C.x,A.z+ez*t-C.z);if(dm<C.R0*.9&&dA-(C.sig?60:0)<bd){bd=dA-(C.sig?60:0);best=C}}}
+    for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const L=CV.JG.get((kx+a)*100000+kz+b);if(L)for(const C of L){const dA=Math.hypot(A.x-C.x,A.z-C.z);if(dA<C.R0||dA>(RD_ON?Math.max(140,Math.sqrt(L2)+4):140))continue;/* RD: 240 m grid edges approach their crossing too (they had no yield rule) */if(ex*(C.x-A.x)+ez*(C.z-A.z)<=0)continue;const t=Math.max(0,Math.min(1,((C.x-A.x)*ex+(C.z-A.z)*ez)/L2)),dm=Math.hypot(A.x+ex*t-C.x,A.z+ez*t-C.z);if(dm<C.R0*.9&&dA-(C.sig?60:0)<bd){bd=dA-(C.sig?60:0);best=C}}}
     if(best)best.ed.push([i,j])}}
   const need=new Map();
   for(const C of all){const G=[];for(const e of C.ed){const A=N[e[0]],l=Math.hypot(C.x-A.x,C.z-A.z)||1,dx=(C.x-A.x)/l,dz=(C.z-A.z)/l;let g=G.find(q=>q.dx*dx+q.dz*dz>.82);if(!g)G.push(g={dx:0,dz:0,e:[],w:0});g.dx+=dx;g.dz+=dz;g.e.push(e);g.w=Math.max(g.w,A.w||14)}
@@ -277,7 +277,7 @@ function CV_sigBuild(){const N=HUB.nodes,NG=N.ng,K=CV.K;CV.sig=[];CV.yl=[];CV.se
     G.sort((a,b)=>b.w-a.w);C.ap=G;const hw=q=>Math.min(14,q.w/2);
     G.forEach((g,k)=>{for(const[i,j]of g.e){CV.seg.set(i*K+j,{J:C,k});need.set(i,[C,k])}});
     if(!C.sig){CV.yl.push(C);continue}
-    C.s=[];C.g=[];let t=0;G.forEach((g,k)=>{C.s.push(t);C.g.push(g.w>=16?12:8);t+=C.g[k]+CV_AM+CV_AR});C.Cw=t;C.C=t+CV_WK;
+    C.s=[];C.g=[];let t=0;if(RD_ON){/* RD: two-phase signals — opposite approaches share one green (was one approach per phase: 75 s cycles, spill-back gridlock) */const ph=G.map(()=>-1);let np=0;G.forEach((g,k)=>{if(ph[k]>=0)return;ph[k]=np;G.forEach((h,m)=>{if(ph[m]<0&&g.dx*h.dx+g.dz*h.dz<-.8)ph[m]=np});np++});const PS=[],PG=[];for(let q=0;q<np;q++){const w=Math.max(...G.filter((g,k)=>ph[k]===q).map(g=>g.w));PS.push(t);PG.push(w>=16?14:10);t+=PG[q]+CV_AM+CV_AR}G.forEach((g,k)=>{C.s.push(PS[ph[k]]);C.g.push(PG[ph[k]])});C.ph=ph}else G.forEach((g,k)=>{C.s.push(t);C.g.push(g.w>=16?12:8);t+=C.g[k]+CV_AM+CV_AR});C.Cw=t;C.C=t+(RD_ON?7:CV_WK);
     const a0=G[0];C.off=((C.x*a0.dx+C.z*a0.dz)/13)%C.C;CV.sig.push(C)}
   // the edge before each incoming edge is part of the approach too (braking room)
   for(let i=0;i<NG;i++){for(const j of N[i].nb){const q=need.get(j);if(!q||CV.seg.has(i*K+j))continue;const[C,k]=q;if(Math.hypot(N[i].x-C.x,N[i].z-C.z)>C.R0)CV.seg.set(i*K+j,{J:C,k,pre:1})}}
@@ -314,21 +314,21 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
     c.CVin=null;CV_near(c.x,c.z,J=>{if(Math.hypot(J.x-c.x,J.z-c.z)>=J.R0)return false;if(!c.CVin||J.sig)c.CVin=J;if(J.of!==CV.fr){J.of=CV.fr;J.oc=[]}J.oc.push(c);if(J.sig&&c.CVgh!==J){const r=J.res||(J.res=new Map());if(!r.has(c))r.set(c,CV.t)}return false})}
   for(const J of CV.act||[])if(J.res)for(const[c,t]of J.res){const rx=J.x-c.x,rz=J.z-c.z,l=Math.hypot(rx,rz);if(CV.t-t>7&&c.CVin===J)c.CVgh=J;if(c.dead>0||!c.CVn||CV.t-t>7||l>J.R0+1&&rx*c.CVhx+rz*c.CVhz<0||l>J.R0+30)J.res.delete(c)}
   CV.act=new Set();
-  for(const c of HUB.cars){if(c.CVr&&c.route&&!c.route.length){c.route=null;c.CVr=0}if(!c.CVn||c.dead>0)continue;const A=N[c.a],B=N[c.b];if(!A||!B)continue;let vm=1e9;const g=CV.seg.get(c.a*CV.K+c.b),In=c.CVin;if(In)CV.act.add(In);
+  for(const c of HUB.cars){c.RDy=null;if(c.CVr&&c.route&&!c.route.length){c.route=null;c.CVr=0}if(!c.CVn||c.dead>0)continue;const A=N[c.a],B=N[c.b];if(!A||!B)continue;let vm=1e9;const g=CV.seg.get(c.a*CV.K+c.b),In=c.CVin;if(In)CV.act.add(In);
     let J=null,jd=1e9;if(!In||!In.sig)CV_near(c.x,c.z,Q=>{if(Q===In)return false;const rx=Q.x-c.x,rz=Q.z-c.z,l=Math.hypot(rx,rz),e=l-(Q.sig?1e3:0);if(l<Q.R0+(Q.sig?40:16)&&e<jd&&rx*c.CVhx+rz*c.CVhz>l*.45&&Math.abs(rx*c.CVhz-rz*c.CVhx)<Q.R0*.8){jd=e;J=Q}return false});
     if(J){CV.act.add(J);let d=Math.hypot(J.x-c.x,J.z-c.z)-J.R0,k=-1,bd=-2;J.ap.forEach((a,i)=>{const v=a.dx*c.CVhx+a.dz*c.CVhz;if(v>bd){bd=v;k=i}});if(k>=0)d=(J.x-c.x)*J.ap[k].dx+(J.z-c.z)*J.ap[k].dz-J.R0;c.CVf=J.id*8+k;const res=J.res||(J.res=new Map());
       if(J.sig&&J.ap.length>1){if(!res.has(c)){const s=k<0?'r':CV_st(J,k);let go=s==='g'||s==='y'&&d<(c.cv||0)**2/12+2;const l=c.CVl;
         if(go&&l&&!(l.dead>0)&&(l.cv||0)<3&&Math.hypot(l.x-J.x,l.z-J.z)<J.R0+8)go=false;
-        if(go)for(const o of res.keys()){if(o===c||same(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
-        if(go&&d<6)res.set(c,CV.t);else if(!go)vm=Math.sqrt(10*Math.max(0,d-3.2))}}
-      else{vm=Math.min(vm,6+Math.max(0,d)*.6);const o=J.of===CV.fr?J.oc.find(o=>o!==c&&Math.abs(o.CVhx*c.CVhx+o.CVhz*c.CVhz)<.7):null;if(o&&d>2&&(c.CVw=(c.CVw||0)+dt)<4)vm=Math.min(vm,Math.sqrt(10*Math.max(0,d-3.2)));else if(!o)c.CVw=0}}
+        if(go&&RD_ON)RD_entry(c,J,k);if(go)for(const o of res.keys()){if(o===c||same(o,c)||RD_ON&&RD_compat(o,c))continue;const ox=o.x-J.x,oz=o.z-J.z;if(ox*o.CVhx+oz*o.CVhz>0&&Math.hypot(ox,oz)>J.R0*.45)continue;go=false;break}
+        if(go&&d<6)res.set(c,CV.t);else if(!go){vm=Math.sqrt(10*Math.max(0,d-3.2));c.RDy='sig'}}}
+      else{vm=Math.min(vm,6+Math.max(0,d)*.6);c.RDy='slow';const o=J.of===CV.fr?J.oc.find(o=>o!==c&&Math.abs(o.CVhx*c.CVhx+o.CVhz*c.CVhz)<.7):null;if(o&&d>2&&(c.CVw=(c.CVw||0)+dt)<4){vm=Math.min(vm,Math.sqrt(10*Math.max(0,d-3.2)));c.RDy='yield'}else if(!o)c.CVw=0}}
     if(g&&!g.pre&&!c.route&&!c.CVp){let nx=B.nb.filter(n=>n!==c.a&&n<N.ng&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);if(nx.length){const n=nx[Math.floor(Math.random()*nx.length)],C=N[n],l=Math.hypot(C.x-B.x,C.z-B.z)||1,s=((C.x-B.x)*c.CVhz-(C.z-B.z)*c.CVhx)/l;c.route=[n];c.CVx=n;c.CVr=1;c.CVp=1;if(Math.abs(s)>.4){c.CVi=s>0?1:-1;c.CViT=6}}}
     if(!g){c.CVp=0;if(!J&&!In)c.CVx=null}
     const Jb=In&&In.sig?In:J;if(Jb&&Jb.sig&&(In===Jb||Jb.res&&Jb.res.has(c))){const R=Jb.res,pc=R&&R.has(c)?R.get(c):1e9;let hold=0;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);
       for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,dd=Math.hypot(rx,rz);if(dd>8)continue;const al=rx*c.CVhx+rz*c.CVhz;if(al<-.5)continue;
-        const po=R&&R.has(o)?R.get(o):1e9;if(po<pc||po===pc&&o.j+o.k*997<c.j+c.k*997||dd<6&&al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<3)hold=1}
-      if(hold){vm=0;c.CVst=(c.CVst||0)+dt;if(c.CVst>5&&In&&Math.hypot(c.x-RO.x,c.z-RO.z)>50){c.dead=.05;c.CVst=0;c.route=null;c.CVr=0;CV.rc=(CV.rc||0)+1;for(const Q of[In,J])if(Q&&Q.res)Q.res.delete(c)}}else c.CVst=0}
-    const o=c.CVl;if(o&&!(o.dead>0)){const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<2.6)vm=Math.min(vm,al<7.5?0:(o.cv||0)+Math.sqrt(8*(al-7.5)))}
+        const po=R&&R.has(o)?R.get(o):1e9;if(RD_ON&&!(dd<6&&al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<3)&&RD_compat(o,c))continue;if(po<pc||po===pc&&o.j+o.k*997<c.j+c.k*997||dd<6&&al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<3)hold=1}
+      if(RD_ON&&hold&&(c.CVst||0)>6)hold=0;/* RD: a car held 6 s inside a box goes on (no permanent deadlock next to the player) */if(hold){vm=0;c.RDy='box';c.CVst=(c.CVst||0)+dt;if(c.CVst>5&&In&&(Math.hypot(c.x-RO.x,c.z-RO.z)>50||RD_ON&&typeof LV_seen==='function'&&!LV_seen(c.x,c.y||0,c.z))){c.dead=.05;c.CVst=0;c.route=null;c.CVr=0;CV.rc=(CV.rc||0)+1;for(const Q of[In,J])if(Q&&Q.res)Q.res.delete(c)}}else c.CVst=0}
+    const o=c.CVl;if(o&&!(o.dead>0)){const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al>0&&Math.abs(rx*c.CVhz-rz*c.CVhx)<2.6){const lv=al<7.5?0:(o.cv||0)+Math.sqrt(8*(al-7.5));if(lv<vm){vm=lv;c.RDy='lead'}}}
     if(vm<1e9){c.CVv=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(c.cv??c.v,vm);if(vm<.5)c.CVfz=[c.a,c.b,c.t]}}}
 function CV_post(dt){for(const c of HUB.cars){if(c.CVv!=null){c.v=c.CVv;c.CVv=null}if(c.CVfz){if(!(c.dead>0)){[c.a,c.b,c.t]=c.CVfz;c.cv=0}c.CVfz=null}}
   const im=CV.im;if(im){let n=0;const on=(CV.t*3|0)%2===0;for(const c of HUB.cars){if(!(c.CViT>0))continue;c.CViT-=dt;if(!on||!c.CVn||n>=158||c.dead>0)continue;const rx=c.CVhz*c.CVi*1.55,rz=-c.CVhx*c.CVi*1.55;for(const f of[2.7,-2.7]){_m.makeTranslation(c.x+rx+c.CVhx*f,c.y+1.1,c.z+rz+c.CVhz*f);im.setMatrixAt(n++,_m)}}im.count=n;im.instanceMatrix.needsUpdate=true}
@@ -344,7 +344,7 @@ function CV_pedPost(){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of P
   const bx=A.x+(B.x-A.x)*p.t,bz=A.z+(B.z-A.z)*p.t;if(Math.hypot(bx-J.x,bz-J.z)<J.R0&&Math.hypot(bx-J.x,bz-J.z)>J.R0-6){if(CV_walk(J)>=0)CV.pedOK++;else CV.pedBad++}}}
 {const _bt=buildHubTraffic;buildHubTraffic=()=>{_bt();try{CV_sigBuild();if(CID==='fra')CV_fraVar()}catch(e){console.warn('CV',e)}}
  const _ht=hubTrafficStep;hubTrafficStep=dt=>{if(!CV.sig.length&&!CV.yl.length||!HUB.cars)return _ht(dt);CV.t+=dt;CV_pre(dt);_ht(dt);CV_post(dt)}
- const _ps=pedStep;pedStep=dt=>{if(!CV.sig.length)return _ps(dt);CV_pedPre(dt);_ps(dt);CV_pedPost()}
+ const _ps=pedStep;pedStep=dt=>{if(!CV.sig.length||RD_ON)return _ps(dt);/* RD: pedestrians follow RD_kerb rules instead */CV_pedPre(dt);_ps(dt);CV_pedPost()}
  const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{CV_streets(add,D)}catch(e){console.warn('CV',e)}}}
 // ---------- city variety: Athens units (hooked into athBuildG put), per-building seed for height, colour, roof, balconies, shopfront
 const CV_AP={poly:['#f4f1ea','#efe3c8','#f2d9b0','#e9e4dc','#f3dcd2','#dfe9ee','#e8d5c0','#f0e0a8','#d8e4d0','#f6e2d6','#cfd8e0','#e9c9a8'],neo:['#efe0bf','#f2d7a0','#e8cfa6','#e6b8a0','#f0c8b8','#dcc8a8','#f3e9d8','#e8d0b0','#c9d6c0'],

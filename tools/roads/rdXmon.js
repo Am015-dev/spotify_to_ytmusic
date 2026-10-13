@@ -1,0 +1,24 @@
+// in-page traffic/pedestrian rule monitor. Install: __g9ev(<this file>). Then window.__xmon() each frame (samples every 6th), window.__xmonOut() = counts.
+(()=>{const X={ovT:{},stuck60:0,why:{},f:0,smp:0,carS:0,offRoad:0,wrongSide:0,wrongOneWay:0,sigEnter:0,redRun:0,overlap:0,stuck20:0,stuckCarS:0,uturnMid:0,pedS:0,pedRoad:0,pedRoadBad:0,pedHitByCar:0,pedNearPlayer:0,pedKick:0,ex:{red:[],off:[],wrong:[],ped:[],ovl:[],stuck:[]}};
+ const S=new Map();const P=new Map();const DT=0.1;
+ const roadOf=(x,z)=>{let best=null;const q=cityAt(x,z);if(q&&OB_DRV(q.S)){best={k:'st',d:q.d,hw:q.road.w/2,tx:q.p.tx,tz:q.p.tz,cx:q.p.x,cz:q.p.z,one:q.road.one,r:q.road}}const f=fillAt(x,z);if(f){const hw=f.r.w/2;if(!best||f.d-hw<best.d-best.hw){const t=clamp((x-f.r.x0)*f.r.ux+(z-f.r.z0)*f.r.uz,0,f.r.L);best={k:'fill',d:f.d,hw,tx:f.r.ux,tz:f.r.uz,cx:f.r.x0+f.r.ux*t,cz:f.r.z0+f.r.uz*t,one:0,r:f.r}}}return best};
+ const inJ=(x,z,m=0)=>CV_near(x,z,J=>Math.hypot(J.x-x,J.z-z)<J.R0+m);
+ const ex=(k,v)=>{if(X.ex[k].length<8)X.ex[k].push(v)};
+ window.__xmon=()=>{if(typeof RO==='undefined'||!RO.on||!HUB.cars)return;X.f++;if(X.f%6)return;X.smp++;const N=HUB.nodes;const live=[];
+  for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab)continue;const dP=Math.hypot(c.x-RO.x,c.z-RO.z);if(dP>150)continue;
+   const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;X.carS++;live.push([c,hx,hz]);const id=c.k*1000+c.j;let s=S.get(id);if(!s)S.set(id,s={st:0,hx,hz,inJ:null,cnt:0});
+   const J=inJ(c.x,c.z);const jn=J&&J.sig?J:null;
+   if(jn&&s.inJ!==jn){X.sigEnter++;let k=-1,bd=-2;jn.ap.forEach((a,i)=>{const v=a.dx*hx+a.dz*hz;if(v>bd){bd=v;k=i}});if(k>=0&&CV_st(jn,k)==='r'&&Math.hypot(c.x-jn.x,c.z-jn.z)>jn.R0-3){X.redRun++;ex('red',[Math.round(c.x),Math.round(c.z)])}}
+   s.inJ=jn;
+   if(!J){const r=roadOf(c.x,c.z);if(!r||r.d>r.hw+.6){X.offRoad++;ex('off',[Math.round(c.x),Math.round(c.z),r?+(r.d-r.hw).toFixed(1):null])}
+    else{const dir=Math.sign(hx*r.tx+hz*r.tz)||1,latR=(c.x-r.cx)*(-hz)+(c.z-r.cz)*hx;if(r.one){if(dir<0){X.wrongOneWay++;ex('wrong',[Math.round(c.x),Math.round(c.z),'1way'])}}else if(r.hw>=3&&latR<-0.8){X.wrongSide++;ex('wrong',[Math.round(c.x),Math.round(c.z),+latR.toFixed(1)])}}}
+   const v=c.cv??c.v;if(v<.3){const w=c.RDfz?'ped':c.hitT>0?'hit':c.RDy||(c.dead>0?'dead':'none');X.why[w]=(X.why[w]||0)+1;s.st+=DT;X.stuckCarS+=DT;if(s.st>=20&&s.st<20+DT*1.5)X.stuck20++;if(s.st>=60&&s.st<60+DT*1.5){X.stuck60++;ex('stuck',[Math.round(c.x),Math.round(c.z),c.RDy])}}else s.st=0;
+   if(v>2&&s.hx*hx+s.hz*hz<-.7&&!J){X.uturnMid++}s.hx=hx;s.hz=hz}
+  for(let i=0;i<live.length;i++){const[a]=live[i];for(let j=i+1;j<live.length;j++){const[b]=live[j];if(Math.abs(a.x-b.x)<2.2&&Math.abs(a.z-b.z)<2.2&&Math.hypot(a.x-b.x,a.z-b.z)<2.2){X.overlap++;const t=a.pk||b.pk?'park':(a.a===b.a&&a.b===b.b)?'sameEdge':(a.a===b.b&&a.b===b.a)?'oppEdge':inJ(a.x,a.z,2)?'junc':(a.b===b.b||a.a===b.a)?'shareNode':'other';X.ovT[t]=(X.ovT[t]||0)+1;ex('ovl',[Math.round(a.x),Math.round(a.z),t])}}}
+  const Pd=HUB.peds||[];for(let i=0;i<Pd.length;i++){const p=Pd[i];if(p._x==null||p.cw)continue;const d=Math.hypot(p._x-RO.x,p._z-RO.z);if(d>120)continue;X.pedS++;const q=P.get(i)||{jy:0};if(p.jy>0&&!(q.jy>0)){if(d<16)X.pedKick++}q.jy=p.jy;P.set(i,q);if(p.jy>0)continue;
+   const r=roadOf(p._x,p._z);if(r&&r.d<r.hw-.3){X.pedRoad++;const J=inJ(p._x,p._z,6);let ok=false;if(J&&J.sig){ok=CV_walk(J)>=0}else if(J&&CID!=='fra'){ok=false}if(!ok){X.pedRoadBad++;ex('ped',[Math.round(p._x),Math.round(p._z)])}
+    for(const[c]of live){if(Math.abs(c.x-p._x)<1.6&&Math.abs(c.z-p._z)<1.6){const k='h'+i;if(!(q.hT>X.smp-30)){q.hT=X.smp;X.pedHitByCar++}}}}}};
+ window.__xmonOut=()=>{const s=X.smp*DT,o={sec:+s.toFixed(0),carSamples:X.carS,pedSamples:X.pedS};const pc=(a,b)=>+(100*a/Math.max(1,b)).toFixed(2);
+  Object.assign(o,{redRunPct:pc(X.redRun,X.sigEnter),redRuns:X.redRun,sigEnter:X.sigEnter,offRoadPct:pc(X.offRoad,X.carS),wrongSidePct:pc(X.wrongSide,X.carS),wrongOneWayPct:pc(X.wrongOneWay,X.carS),overlapPerMin:+(X.overlap/Math.max(1,s/60)).toFixed(2),stuck20:X.stuck20,stuck60:X.stuck60,stuckCarPct:pc(X.stuckCarS/DT,X.carS),uturnMid:X.uturnMid,
+   pedOnRoadPct:pc(X.pedRoad,X.pedS),pedOutsideCrossingPct:pc(X.pedRoadBad,X.pedS),pedHitByCar:X.pedHitByCar,pedJumpsNearPlayer:X.pedKick,cvPedOK:CV.pedOK,cvPedBad:CV.pedBad,cvRecycled:CV.rc||0,why:X.why,ovT:X.ovT,ex:X.ex});return o};
+ return 'XMON_OK'})()
