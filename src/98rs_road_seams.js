@@ -29,7 +29,7 @@ function RS_strip(x0,z0,x1,z1){const cx=(x0+x1)/2,cz=(z0+z1)/2,L=Math.hypot(x1-x
  const out=[];for(let s=0;s<=L;s+=2){const x=x0+(x1-x0)*s/L,z=z0+(z1-z0)*s/L,i=Math.round((x-cx)/S*P+P/2),j=Math.round(P/2-(z-cz)/S*P);// row 0 = bottom = +z (camera up is -z)
   const o=(clamp(j,0,P-1)*P+clamp(i,0,P-1))*4,r=px[o],g=px[o+1],b=px[o+2];out.push({s,grass:g>r*1.12&&g>b*1.12&&g-Math.min(r,b)>10})}return out}
 function RS_check(){if(CID!=='fra')return'📍 Frankfurt only';const S=RS_SPOT,q=rfSnap(S.x,S.z0,30);if(!roamWarp(q?q[0]:S.x,q?q[1]:S.z0,Math.atan2(0,S.z1-S.z0)))return'📍 Can\'t jump right now';RO.v=0;
- setTimeout(()=>{let L;try{L=RS_strip(S.x,S.z0,S.x,S.z1)}catch(e){return}const bad=L.filter(p=>p.grass),ok=!bad.length;(window.__chk||{}).roadgap={ok,n:L.length,grass:bad.length,at:bad.map(p=>p.s),seams:RS.n};
+ setTimeout(()=>{let L;try{L=RS_strip(S.x,S.z0,S.x,S.z1)}catch(e){window.__rsErr=String(e&&e.stack||e);return}const bad=L.filter(p=>p.grass),ok=!bad.length;(window.__chk||{}).roadgap={ok,n:L.length,grass:bad.length,at:bad.map(p=>p.s),seams:RS.n};
   try{say('',`ROAD GAP: ${L.length} rays every 2 m · ${bad.length} on grass `+(ok?'✅':'❌ at '+bad.slice(0,6).map(p=>p.s+' m').join(', ')),5)}catch(e){}},2500);
  return'📍 '+S.n.toUpperCase()+' · checking the road ahead…'}
 window.__rs={RS,seams:RS_seams,strip:RS_strip,check:RS_check,SPOT:RS_SPOT};
