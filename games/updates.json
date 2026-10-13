@@ -2,7 +2,7 @@
  {
   "date": "2026-10-13",
   "game": "mainhattan",
-  "title": "Story map, 40 stages and real build choices",
+  "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
   "items": [
    "Title, pause, garage, shop and story buttons are now painted plates",
    "Settings card has a painted frame, header and rows",
@@ -18,9 +18,13 @@
    "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back",
    "LAB is its own stage (title > LAB, Settings > OPEN LAB, ?lab=1): boss gallery with intro, phases, attacks, poses, hit and death; foes, items and power-ups one at a time",
    "Less lag on big screens: ground haze baked into the backdrop, menus no longer redraw the game behind them, slow machines lower the picture sharpness by themselves",
-   "Labels fit their plates: scrolling story list, HUD type 11 px or more on phones, readable garage tabs, new ui-align-test.js"
+   "Labels fit their plates: scrolling story list, HUD type 11 px or more on phones, readable garage tabs, new ui-align-test.js",
+   "No more white gaps or halos around the ten bosses",
+   "Talos now faces you",
+   "Tank, vault, spearman and Talos walk or roll along the road with a shadow; the river beast rides the water",
+   "LAB opens straight on a boss with ?boss=talos"
   ],
-  "check": "STORY: tap a stage, then the pit stop after it"
+  "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
  },
  {
   "date": "2026-10-13",
