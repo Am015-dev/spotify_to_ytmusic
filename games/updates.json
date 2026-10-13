@@ -1,6 +1,18 @@
 [
  {
   "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Painted court kit",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit"
+  ],
+  "check": "Open a rival's chip, then play a clash"
+ },
+ {
+  "date": "2026-10-13",
   "game": "shipwreck",
   "title": "Painted island and kit for Shipwreck Isle",
   "items": [
@@ -85,15 +97,6 @@
    "Stone-framed menus and buttons, ribbon and goblet on the result"
   ],
   "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
- },
- {
-  "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Thornbound Throne: the real crown",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways"
-  ],
-  "check": "Finish a game and look at the winner screen"
  },
  {
   "date": "2026-10-13",
