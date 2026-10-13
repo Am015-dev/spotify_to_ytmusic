@@ -27,7 +27,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 80 | `80_story_m1.js` | 90 | M1 Frankfurt chapter 1 (M1_: scenes, goons, items, duel, missions), BA touch CSS, BF bug fixes (BF_), LK looks + phone perf (LK_) |
 | 81 | `81_story_ath_m2_m3.js` | 98 | ATC Athens campaign (ATC_), M2 Hafenbande (M2_), M3 Kaisers Schatten + finale (M3_) |
 | 85 | `85_audio_feel_sp_otg.js` | 105 | AU adaptive music/SFX (AU_), FL feel: vehicle auto-switch, smash→boost, day/night (FL_), SP split-screen (SP_), OG on-the-go events (OG_) |
-| 90 | `90_fixes_cv_ju.js` | 84 | OB burst-cause log (OB_), OC night lights/Acropolis scale/heights (OC_), CV traffic signals + city variety (CV_), JU juice (JU_) |
+| 90 | `90_fixes_cv_ju.js` | 85 | OB burst-cause log (OB_), OC night lights/Acropolis scale/heights (OC_), CV traffic signals + city variety (CV_), JU juice (JU_) |
 | 92 | `92_garage_builder.js` | 17 | GB brick builder core: pieces GB_PC GB_piece GB_brickGeo, minifig GB_FIG GB_figGeo, GB_geo GB_attach GB_mods, snapping, mirror, undo |
 | 93 | `93_cars_lego.js` | 66 | LEGO cars (CR_): part geometry (CR_bb CR_side CR_wheel CR_more), Speed-Champions presets, loadouts, rival/boss cars, LEGO traffic (instanced, suspension), CAR5  |
 | 94 | `94_garage_ui.js` | 19 | garage builder scene + pointer picking + UI (#gbx), garage blocked during events, cutscene portrait |
@@ -78,7 +78,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98sz | `98sz_ride_scale.js` | 6 | RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride: 1. SC_ship (96_scale_qa.js) squeezed EV |
 | 98of | `98of_onfoot.js` | 50 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1). EXIT at a stop, the minifig steps out, the car stays parked; walk / run / jump with a floating left stick (t |
 | 98sh | `98sh_shadow.js` | 4 | SHB (v90k): soft blob shadows on the ground under the player car, city traffic, people and trees. One InstancedMesh, depth-write off, ~1 draw call. Cause of "no |
-| 99c | `99c_checklist.js` | 65 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
+| 99c | `99c_checklist.js` | 74 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will play, just include a check list inside the game update so I can validate"). OD_CHECKLIST = items per versio |
 | 98rf | `98rf_race_fun.js` | 10 | (no header comment) |
 | 98ro | `98ro_open.js` | 30 | OPN (race worker, 2026-10-09): OPEN race courses in the LEGO 2K Drive style. Alex scored the narrow city races 2/10: "lots of freedom to run with multiple roads |
 | 98zp | `98zp_perf_ctx.js` | 13 | PERF1 (v89i): one WebGL context The menu car cards (W13_carImg), the garage part thumbnails (GS.th, shared by PA/R2/G9C) and the garage builder (GB.r) each had  |
@@ -87,7 +87,7 @@ Format: sections list top-level declarations (column 0; exact lines via find.sh)
 | 98ba | `98ba_build_anim.js` | 5 | BA (garage-17 task B, Alex 2026-10-10: "when opening the vehicle in the garage, a x20 build, so it looks like it's being built"). When a ride first shows in the |
 | 98gf | `98gf_garage_floor.js` | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the garage: some are inside the floor ..."). Root cause (audit g18/audit.js, docs/GARAGE_AUDIT.md): GS_fitY (98s |
 | 98gz | `98gz_garage_zoom.js` | 7 | GZ (garage zoom + pick, Alex 2026-10-13: "include a zoom in/out and more builder functionalities for garage"). 1) ZOOM in every garage mode (RIDES / BUILD / PAI |
-| 98b2 | `98b2_builder2.js` | 57 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: the STUNT CUP ribbon builder was "boring, flat, no levels". This is a PIECE builder on FULL terrain, in its ow |
+| 98b2 | `98b2_builder2.js` | 63 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: the STUNT CUP ribbon builder was "boring, flat, no levels". This is a PIECE builder on FULL terrain, in its ow |
 | 98rd | `98rd_roads.js` | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow traffic rules and also humans"): pedestrian kerb + crossing rules, cars yield, zebras in Frankfurt. |
 | 98tq | `98tq_test_quick.js` | 4 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z][&go=<ver/id>][&draw=0]: slot 9 (wiped each load), skips intro/menu/story/tutorial, low quality, no warm-up  |
 | 99 | `99_api.js` | 49 | test API window.__mho={…} (state, roamSim, warp, gnd, …), late CR_ hooks (_crD _cr25F), closing </script> |
@@ -149,7 +149,7 @@ uses: 53(629), 51(241), 20(237), 10(139), 30(105), 72(14), 70(10), 90(9), 98l(8)
 
 ## 70_roam_world.js — 81 KB
 defines: waterFx hubCullAdd hubCullInit cullPush hubCullStep DIST_R DISTRICTS districtAt rfWaterPaint bldPaint MINI URB urbDraw miniPaint miniDraw athDistGo athDistPick SM_step athDistStep districtStep _hfw _hrt _hup hubTrafficStep CLOUDS hubLayerFix hubShadow hubLeave hubFrame rfSnap rfWp rfPath SPRINTS SCH MARKPOS MARKH rfMarks rfRamps rfCheckpoints markKey RAMPT athGbSpots athGbSpots0 buildRoam _sq _se rr2s abPads abRoam CH_SCAT CH_LBL cpTargets raceHud cpBeam hitPop chNext chStart mapIcon mapRedraw athMapBase drawRoamMap spSave spGates spPos sprintStart sprintStep spHud sprintEnd sprintFinish TUT tutStep tutDone roamCatalog markTitle markDone disc ftGar markKnown discover ftShow fastTravel markStars markLocked iconTex enterRoam ROAMCFG roamPre roamPost ATH_NEED fraFlags athPre flyOpen flightMark flyFT cityTravel flyRoute slotInfo showSlots exitRoam
-uses: 10(159), 53(135), 51(130), 30(67), 71(58), 41(35), 20(26), 60(23), 72(21), 40(12)
+uses: 10(159), 53(135), 51(130), 30(67), 71(58), 41(36), 20(26), 60(23), 72(21), 40(12)
 
 ## 71_roam_drive.js — 67 KB
 defines: VSEL VNAME cycleVehicle roamFaceOpen edgeStep roamWarp roamSavePos W13S W13_corner W13_lift BG23_cap roamStep qCrate roamDamage roamHeal RBRK roamWreckStep roamGlance roamBounce angDiff studCombo studComboT streetMul studGain PD_HILDE ATH_RIVAL_EV ATH_CHAPTERS ATH_EPILOGUE ATH_INVITE CHS athInvited athInvitePending CHAPTERS EPILOGUE nFlags chapter RCH MCH OCH ECH markCh drvClass storyCheck storyShow homeShow homeArt roamPauseOpen roamPauseClose pstatFlush profileOpen storyClose roamBossOpen roamPrompt roamPromptOpen BRIEF briefHTML CARD_PAY cardStars roamOpen garageUI roamGo chStep roamLanded chAbort chResult chEnd roamPose camSnap RCAM roamCamCycle roamCam CB comboAdd POPS popStep packInit packStep gbStep comboStep huQ huT roamGauge markBadges roamHud
@@ -171,9 +171,9 @@ uses: 80(241), 30(111), 41(65), 10(63), 20(47), 51(44), 53(27), 70(24), 71(22), 
 defines: AU_M AU_BPM AU_KEYS AU_build AU_want AU_isDlg AU_tick AU_kick AU_snr AU_hat AU_pad AU_F AU_PAT AU_stinger AU_fanfare AU_VCAP AU_CSS AU_pop AU_confetti AU_fountain __au FL FL_HOLD FL_MINHOLD FL_road FL_raw FL_terr FL_VEH FL_veh FL_burst FL_RECH FL_CHAIN FL_mult FL_add FL_smash FL_pop FL_DAY FL_mode FL_keys FL_c1 FL_c2 FL_mix FL_at FL_night FL_time FL_clock FL_apply FL_emis FL_hm FL_hq FL_hv FL_hs FL_hy FL_headlights FL_step __fl SP_S SP_P1K SP_P2K SP_BATTLE_T SP_RF SP_okW SP_padsPoll SP_ctl SP_live SP_addP2 SP_tag SP_cr0 SP_rect SP_layout SP_draw SP_cam2Update SP_enterView SP_off SP_battle SP_battleInit SP_pts SP_p2Step SP_duel SP_hud SP_results SP_rematch SP_menu SP_btn SP_open SP_fill SP_go __SP TR_res TR_PL TR_bldFix TR_bf TR_pre TR_post TR_snap TR_tilt TR_q TR_up TR_live TR_SUM TR_VPK TR_summitStep TR_summitBuild TR_shade __tr OG OG_N OG_R OG_FADE OG_T OG_KS OG_PAY OG_TH OG_sv OG_save OG_snd OG_gk OG_rng OG_SM OG_dOf OG_inD OG_areaAt OG_distName OG_walk OG_flat OG_at OG_excl OG_near OG_build OG_key OG_clear OG_roof OG_roofOn OG_fadeMat OG_meshes _om _oq _oe _ov _os _oc OG_navCells OG_onPath OG_done OG_blocked OG_pickVis OG_draw OG_stats OG_areas OG_sum OG_reward OG_pop OG_el OG_css OG_hud OG_prog OG_mat OG_obj OG_start OG_val OG_tier OG_step OG_landed OG_boom OG_end OG_res OG_retry OG_pick OG_prune OG_tick OG_map OG_mapPanel OG_col __og
 uses: 10(182), 30(156), 53(90), 71(45), 51(33), 20(30), 70(20), 72(15), 41(13), 80(11)
 
-## 90_fixes_cv_ju.js — 84 KB
+## 90_fixes_cv_ju.js — 85 KB
 defines: OB OB_who OB_prop OB_rec __ob OB_LEAVE OB_HOLD OB_DIST OB_MINHOLD OB_raw0 OB_terr0 OB_HW OB_HL OB_touch OB_obb OB_cdim OB_car OB_carP OB_EURO OB_EURO_HW OB_EURO_HD OB_euroBuild __ob OC OC_beamGeo OC_poolGeo OC_lampsBuild OC_poolStep OC_GAME OC_fp OC_roadE OC_segE OC_junc OC_minG OC_props OC_onRoad OC_carScale OC_scaleDefs OC_traffic OC_AK OC_acroBuild OC_unbury OC_altFix OC_REAL OC_RANGE OC_TREES OC_CARS OC_audit OC_lyka OC_zone OC_top OC_fix OC_gy OC_ifl __oc CV CV_MAJ CV_h CV_pal CV_AM CV_AR CV_WK CV_u CV_st CV_walk CV_near CV_sigBuild CV_sigMesh CV_LC CV_lamps CV_tick CV_pre CV_post CV_pedPre CV_pedPost CV_AP CV_put CV_fsty CV_FP CV_fraVar CV_streets __cvCars __cv JU JU_C JU_TC JU_ev JU_roam JU_busy JU_split JU_mis JU_tier JU_ss JU_hit JU_gate JU_popEl JU_step1 __ju W12P W12_paint W12_cars
-uses: 53(197), 30(100), 20(94), 10(45), 51(34), 85(23), 71(23), 60(21), 72(12), 70(8)
+uses: 53(199), 30(100), 20(94), 10(45), 51(34), 85(23), 71(23), 60(21), 72(12), 70(8)
 
 ## 92_garage_builder.js — 17 KB
 defines: GB_U GB_PH GB_MAX GB_CAP GB_BC GB_PC GB_ GB_col GB_box GB_cyl GB_mirX GB_shape GB_dims GB_piece GB_brickGeo GB_FIG GB_FCAT GB_figGet GB_figOk GB_figGeo GB_PT GB_MAT GB_LMAT GB_geo GB_plate GB_attach GB_mods GB_cells GB_top GB_fit GB_twin GB_same GB_list GB_snap GB_add GB_hitBrick GB_del GB_paint GB_undo
@@ -375,9 +375,9 @@ uses: 53(52), 10(49), 30(28), 71(23), 40(17), 51(11), 72(10), 98l(10), 98bc(8), 
 defines: SHB SHB_pool SHB_M SHB_V SHB_Q SHB_S SHB_E SHB_B SHB_scanTrees SHB_put SHB_gy SHB_step __sh
 uses: 53(8), 10(4), 97(3), 80(1), 30(1)
 
-## 99c_checklist.js — 65 KB
+## 99c_checklist.js — 74 KB
 defines: OD_CHECKLIST
-uses: 30(52), 10(24), 20(16), 71(8), 70(7), 41(6), 53(6), 98tq(6), 99t(5), 72(4)
+uses: 30(62), 10(33), 53(19), 20(17), 71(13), 70(12), 41(6), 98tq(6), 51(5), 99t(5)
 
 ## 98rf_race_fun.js — 10 KB
 defines: RF_GRID RF_rub RF_lat RFX RF_popEl RF_pop __rf RSP RF_rspEl RF_rspNow RF_rsp
@@ -411,9 +411,9 @@ uses: 92(5), 98s(3), 72(2), 10(1), 93(1), 98ld(1)
 defines: GZ GZ_md GZ_MIN GZ_MAX GZ_set GZ_step GZ_fit GZ_lab GZ_mk GZ_place GZ_spin GZ_pickOn GZ_ui __gz
 uses: 92(28), 94(12), 10(7), 98u(4), 98s(4), 98ld(3), 30(2), 98(2), 98y(2), 98gb(1)
 
-## 98b2_builder2.js — 57 KB
-defines: BX BXC BXH BXN BXW BXR BXTN BXO BXG BXRW BXF bxV bxSS bxCl BX_hv BX_h BX_tn bxBowl BX_WORLDS BX_CITY BX_world BX_brush BX_carve bxCurve BX_P BX_PAL BX_fr BX_exit BX_samp BX_tex BX_mats bxCol BX_PROF BX_geo BX_mk BX_apply BX_replay BX_do BX_undo BX_hashAll BX_near BX_pcMesh BX_pcDrop BX_gate BX_buildAll BX_pillars BX_ends BX_after BX_marks BX_ghost BX_terrMesh BX_trees BX_bld BX_scene BX_fxInit BX_burst BX_fxStep BX_car BX_vmode BX_spawn BX_driveStart BX_driveStop BX_hud BX_say BX_respawn _r1 _r2 _r3 BX_cast BX_objs BX_step BX_farCheck BX_course BX_camBuild BX_camDrive BX_sunAt BX_tick BX_input BX_css BX_icon BX_TOOLS BX_ui BX_place BX_del BX_stats BX_tapInit BX_tap BX_hlShow BX_saved BX_save BX_load BX_loadUI BX_DEMOS BX_open BX_close bxCh bxRep bxCross BX_TESTS BX_test __bx
-uses: 10(31), 30(12), 20(10), 72(5), 40(1), 93(1)
+## 98b2_builder2.js — 63 KB
+defines: BX BXC BXH BXN BXW BXR BXTN BXO BXG BXRW BXF bxV bxSS bxCl BX_hv BX_h BX_tn bxBowl BX_WORLDS BX_CITY BX_world BX_brush BX_carve bxCurve BX_P BX_PAL BX_fr BX_exit BX_samp BX_tex BX_mats bxCol BX_PROF BX_geo BX_mk BX_apply BX_replay BX_do BX_undo BX_hashAll BX_near BX_pcMesh BX_pcDrop BX_gate BX_buildAll BX_pillars BX_ends BX_after BX_marks BX_ghost BX_terrMesh BX_trees BX_bld BX_scene BX_fxInit BX_burst BX_fxStep BX_car BX_vmode BX_spawn BX_driveStart BX_driveStop BX_hud BX_say BX_respawn _r1 _r2 _r3 BX_cast BX_objs BX_step BX_farCheck BX_course BX_camBuild BX_camDrive BX_sunAt BX_tick BX_input BX_css BX_icon BX_TOOLS BX_ui BX_place BX_del BX_stats BX_tapInit BX_tap BX_hlShow BX_saved BX_save BX_load BX_loadUI BX_DEMOS BX_open BX_close BX_DEMOS_SHOW BX_raceMenu bxCh bxRep bxCross BX_grade BX_fun BX_TESTS BX_test __bx
+uses: 10(31), 20(13), 30(13), 72(7), 40(1), 93(1)
 
 ## 98rd_roads.js — 14 KB
 defines: RD_PS RD_key RD_sd RD_pv RD_pred RD_predOf RD_inBox RD_boxPath RD_pedNext RD_turnBack RD_CG RD_RB RD_road RD_mem RD_memGet RD_may RD_KR RD_kerb RD_maySig RD_carPre RD_carPost RD_zebra __rd RD_entry RD_compat RD_LEFT RD_US RD_unstack RD_POLE RD_poleOn RD_poleOut RD_exitFree
