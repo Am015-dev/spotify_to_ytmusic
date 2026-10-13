@@ -21,7 +21,7 @@ const BAD=/can't|no .* nearby|loading a test drive|first|get back|works while/i;
    const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id)}catch(e){said='EVAL '+String(e).slice(0,80)}
    await p.waitForTimeout(c==='bx'?2500:1200);
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
-   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;res.push({id,c,ok,said,state:st.state,errs:errs.slice(e0)});
+   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&!/❌/.test(said)&&errs.length===e0&&!nav;res.push({id,c,ok,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!ok)console.log(`${ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(res.length<=3||id.endsWith('/shadow'))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
