@@ -89,6 +89,7 @@ const INIT = () => {
       for (const e of document.querySelectorAll(sels.join(','))) {
         if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
         const sb = e.closest('.sbody'); if (sb) { const sr = sb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // settings rows scroll: only the ones in view are checked
+        const sr2 = e.closest('#stRows'); if (sr2 && sr2.scrollHeight > sr2.clientHeight + 2) { const sr = sr2.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // the upright story map scrolls (K1): only the cards in view are checked
         const gb = e.closest('#gaCards.tune'); if (gb) { const sr = gb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) { if (r.left < -1 || r.right > innerWidth + 1) out.bad.push('scroll list sticks out sideways ' + e.dataset.id); continue; } }   // the perk list scrolls: only the cards in view are checked
         if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) { out.bad.push('control off screen ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); continue; }
         const h = document.elementFromPoint(x, y); if (!(h && (e === h || e.contains(h) || (h.closest && h.closest('label') && h.closest('label') === e.closest('label'))))) out.bad.push('control covered ' + (e.id || e.textContent.trim().slice(0, 12)) + ' by ' + (h && (h.id || h.className || h.tagName)));
@@ -1021,6 +1022,7 @@ async function storyTests(browser, cfg, full) {
       const d = defs[n - 1], t = tag + '#' + n;
       if (n > 1 && await ev(p, () => document.getElementById('stsel').hidden)) await ev(p, () => { window.__mnr.abort(); });
       await ev(p, () => { if (document.getElementById('stsel').hidden && !__mnr.running) { document.getElementById('title').hidden = true; document.getElementById('stres').hidden = true; document.getElementById('stsel').hidden = false; } });
+      await ev(p, n => { const c = document.querySelector(`#stsel .card[data-n="${n}"]`); if (c) c.scrollIntoView({ block: 'center' }); }, n); await sleep(120);   // the upright story map scrolls
       await press(p, cfg, T, `#stsel .card[data-n="${n}"]`);
       if (!await waitFor(p, n => __mnr.running && __mnr.ST.on && __mnr.ST.n === n, n, 4000)) { await fail(p, t, 'story', 'stage ' + n + ' did not start from the stage select'); continue; }
       await ev(p, () => { window.__mnr.god = true; }); stats.storyStages = (stats.storyStages || 0) + 1;
