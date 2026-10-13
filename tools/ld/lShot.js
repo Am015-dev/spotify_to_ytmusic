@@ -20,7 +20,8 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
    c.sort((a,b)=>a.d-b.d);const R=new THREE.Raycaster(),objs=[];R.camera=__ld.lds.cam();__art.scene.traverseVisible(o=>{const g=o.geometry;if(!o.isMesh||!g||!g.attributes.position||!g.attributes.position.array||(g.index&&!g.index.array))return;for(const k in g.attributes)if(!g.attributes[k].array)return;objs.push(o)});// meshes with CPU data (some arrays are freed after upload)
    let tried=0;
    for(const q of c.slice(0,80)){const H=h*q.s,Dd=Math.max(7,H*1.3,sz*q.s*2),ty=q.P.y+Math.min(H*.45,1.2+H*.3),tgt=new THREE.Vector3(q.P.x,ty,q.P.z);
-    const bx=D.g.boundingBox,lx=bx.max.x-bx.min.x>bx.max.z-bx.min.z,yaw=new THREE.Euler().setFromQuaternion(Q.copy(q.Q)).y,a0=-yaw+(lx?Math.PI/2:0);// long props (barrier): look across the long side first
+    const bx=D.g.boundingBox,lx=bx.max.x-bx.min.x>bx.max.z-bx.min.z,ax=new THREE.Vector3(lx?0:1,0,lx?1:0).applyQuaternion(q.Q),a0=Math.atan2(ax.z,ax.x);// world direction of the prop's short axis
+    // long props (barrier): look across the long side first
     for(let k=0;k<12;k++){tried++;const a=a0+[0,6,1,5,7,11,2,4,8,10,3,9][k]*Math.PI/6,cam=new THREE.Vector3(q.P.x+Math.cos(a)*Dd,q.P.y+camy,q.P.z+Math.sin(a)*Dd),dir=tgt.clone().sub(cam),L=dir.length();dir.normalize();
      R.set(cam,dir);R.far=L+sz*q.s;const h1=R.intersectObjects(objs,false).find(x=>x.object.visible);if(!h1||h1.object!==q.o||h1.instanceId!==q.i)continue;
      R.set(tgt,dir.clone().negate());R.far=L;const h2=R.intersectObjects(objs,false).filter(x=>x.object!==q.o&&x.object.visible&&!x.object.isSprite);if(h2.length)continue;

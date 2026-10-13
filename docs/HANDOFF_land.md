@@ -1,3 +1,31 @@
+# land-3 handoff (2026-10-13, stood down at ~250k context; continues land-2 below)
+
+## land-3 done (all in src/98ld_l_land.js; grid docs/shots/land/GRID_l3.jpg, shots docs/shots/land/l3/<type>_{before,after}.png)
+| type | LEGO parts | tris each old -> new | count | note |
+|---|---|---|---|---|
+| cone (fra) | 4589 Cone 1x1 orange, 8-side lathe | 66 -> 40 | 465 | no white stripe (plain part) |
+| barrier (fra) | 4083 Bar 1x4x2, red/white stripes | 60 -> 60 | 101 | shot still edge-on (lShot picks the same view): needs a side-view reshoot |
+| clight (fra) | 4032 + 3062b stack + trans-yellow 3062b | 144 -> 104 | 49 | |
+| sign (fra) | 4032 base + 3957a pole + 30260p01 octagonal STOP clip-on (plate in front of pole) | 104 -> 78 | 311 | |
+| rock (fra) | 42284+42291 Rock 4x4x3 boulder: convex hull, 56 faces (pyfqmr) | 80 -> 56 | 262 | fitted to 45% of the old footprint (2.4 m) |
+| CE_pine (ath) | 3471 Pyramidal tree lathe | 264 -> 168 | 179 | |
+| CE_olive (ath) | 3470 Oval tree lathe, sage | 184 -> 119 | 43,023 | saves 2.8M tris total |
+| CE_cypress (ath) | 3778 Columnar tree: short trunk + 2 tiers, 5 sides | 41 -> 45 | 14,161 | +57k total |
+| CE_rock (ath) | same boulder, tan | 160 -> 56 | 61 | no in-world shot: lShot finds no clear view on the hills (try CAMY=3+ or a top view) |
+Frame (Frankfurt site spot): 4.21M -> 4.03M tris, draws unchanged. No console errors.
+Hooks: Frankfurt types in `LDS.SW` (after kmProps); Athens CE_* in a `CE_defs` wrapper (`LDS.CE`). A/B via `__ld.ldsAB` (list includes all of them).
+
+## Tools
+- `node tools/ld/lShot.js <url> <out> <type,..>` (CITY=ath, CAMY=<m>): driver-view before/after, camera 1.5 m up 7-10 m away, both rays checked
+  (prop not hidden, camera not inside a building). Then `python3 tools/grid.py OUT.jpg "title" label=path ...` (one grid, coordinator rule).
+- `lRace.js` PICK=[[px,py],..] raycasts screen pixels (found the "orange plank" = a shop awning seen from inside its building, 20_race_world.js:526).
+- Don't `pkill -f lWorld.js` inside a command line that itself contains that string (kills itself).
+
+## Next (land-4)
+1. Barrier side-view reshoot; CE_rock shot.
+2. Athens CE_cafe / CE_moto / CE_pigeon (procedural), parked Kenney cars (ask the integrator first: art lane owns LEGO cars), container, tlight, parasol/awning, boats (docs/FREE_ASSETS.md).
+3. Same LEGO cone/barrier/clight/sign for Athens (LDS.SW is Frankfurt-only).
+
 # land-2 handoff (2026-10-10, continues land-1 below)
 
 ## land-2 done (each sent to build-7 as MODEL)
