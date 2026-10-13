@@ -23,6 +23,15 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
   (it is the repro that stays), put its `ask` line in the What's new entry with `add-update.py ... --scn <id>` so the owner gets "▶ Try this".
   Every game needs at least `<prefix>-board` and `<prefix>-zoom`.
 
+## A scenario must find bugs (owner, 13 Oct 2026: "the lab tests are extremely stupid, not finding any bugs")
+"Element visible / text matches / font >= 12 px" passes on a broken game. A scenario counts only if it:
+1. **acts with REAL taps** (`{kind:'play', steps:[{sel, until, max}], idle, verify}`: the runner touch-taps, nothing is forced during the action),
+2. **asserts the OUTCOME in the engine** in `verify(before, after)` (energy dropped by the cost, the card is in the hand, the market refilled, YOU/MONSTERS moved by the card's value, the winner and the loot are right, on-screen numbers equal the engine),
+3. **ends in a valid next state**: `idle()` must become true (no stuck state > 8 s: nothing changing for 8 s fails; the computer's turn completes) and the next turn must start,
+4. **is killed by `scripts/scenario-mutate.js`**: it breaks the feature (dead/throwing handler, hidden/covered/shrunk element, off-by-one number, and your own `mut:[{name, js}]` engine mutants: change a cost, skip the refill, swap a score) and the scenario must FAIL on every mutant. A survivor means the scenario is useless: fix it or delete it. Target: >= 90% killed per game, and every scenario needs at least one `mut` unless it only checks looks.
+Every scenario also gets these invariants for free (`gx-scenario.js`): no console/page error, no failed same-origin request (404 image/music/model), no text under 11 px / clipped / overlapping, no covered button, no horizontal scroll, every element with `data-engine="G.pl[0].en"` shows that engine value (settles for 5 s), and every glowing legal target (`GXS.glowSel`) answers a real tap. Mark numbers worth proving with `data-engine`. A finding a game cannot fix now goes into `GXS.known` (regex + why) in its `scn.js` AND `HANDOFF.md`, never silently.
+Run: `node games-src/scripts/scenario-test.js <slug>` (fast, every build) and `node games-src/scripts/scenario-mutate.js <slug>` (about 2-4 min a game; run when you add or change a scenario, not on every build). No screenshots.
+
 ## Fast delivery (owner, 13 Oct 2026: "better checklists and tests, less playing the game and waiting for hours")
 Every change, however small, ships as: **code + scenario + checklist item**, in that order, in one deploy.
 1. **Scenario first.** For each requirement in the brief, register a `?scn=<id>` scenario (`games-src/shell/gx-scenario.js`)

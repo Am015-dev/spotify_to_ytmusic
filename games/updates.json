@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-13",
+  "game": "sands-of-qamar",
+  "title": "Painted art in Sands",
+  "items": [
+   "item"
+  ],
+  "check": "Open a game: tiles, badges and items are painted; numbers readable",
+  "scn": [
+   "sq-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "sunglaze",
   "title": "Painted art wired",
   "items": [
