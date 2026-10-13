@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-13",
+  "game": "nebula-aces",
+  "title": "Painted art wired",
+  "items": [
+   "Every hull shows its own painted ship; radio strip on a painted plate"
+  ],
+  "check": "Does each ship card show its picture?",
+  "scn": [
+   "nb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Painted art wired",
   "items": [

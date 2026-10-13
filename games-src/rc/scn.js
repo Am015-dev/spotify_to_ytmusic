@@ -36,6 +36,31 @@
     ]
   });
 
+  // painted camp icons (shelter, roof, palisade, weapon) and the 3D models (campfire, raft, third palm)
+  GXS.add({
+    id: 'si-art', name: 'Camp icons and 3D campfire, raft, palm', ask: 'Do camp icons and models look painted?', seed: 7, sizes: 'all', when: booted,
+    setup: function () {
+      window.__swi = [];
+      var loads = ['shelter', 'roof', 'palisade', 'weapon'].map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { window.__swi.push([n, i.naturalWidth > 0]); r(); }; i.onerror = function () { window.__swi.push([n, false]); r(); }; i.src = 'media/icon-res-' + n + '.webp'; }); });
+      var mfiles = ['sw-fire', 'sw-raft', 'sw-palm-b'].reduce(function (a, n) { return a.concat([n + '.glb', n + '-lite.glb']); }, []);
+      window.__swm = [];
+      mfiles.forEach(function (f) { loads.push(fetch('models/' + f).then(function (r) { return r.arrayBuffer().then(function (b) { window.__swm.push([f, r.ok && b.byteLength > 20000]); }); }).catch(function () { window.__swm.push([f, false]); })); });
+      return Promise.all(loads).then(function () { return table(7); }).then(function () {
+        G.camp.shelter = true; G.camp.roof = 2; G.camp.pal = 2; G.weapon = 2; G.inv.built.raft = true;
+        refresh();
+        return GXS.wait(function () { return !V3.r || (V3.glbOK && V3.camp && V3.camp.userData.raft.children.length > 0 && V3.camp.userData.fmo); }, 20000).catch(function () { }).then(function () { return idle(1200); });
+      });
+    },
+    checks: [
+      { kind: 'fn', name: 'the 4 camp icons load', fn: function () { var b = (window.__swi || []).filter(function (x) { return !x[1]; }); return ((window.__swi || []).length === 4 && !b.length) || 'not loaded: ' + (b.map(function (x) { return x[0]; }).join(',') || 'none tried'); } },
+      { kind: 'fn', name: 'camp counters wear the painted icons (16px or bigger)', fn: function () { var t = document.createElement('div'); t.className = 'trk'; t.innerHTML = ['shelter', 'roof', 'palisade', 'weapon'].map(function (k) { return '<span class="hk">' + RX(k) + '<b>1</b></span>'; }).join(''); document.body.appendChild(t); var bad = []; ['shelter', 'roof', 'palisade', 'weapon'].forEach(function (k) { var cs = getComputedStyle(t.querySelector('.rx[data-r=' + k + ']')); if (!new RegExp('icon-res-' + k + '\\.webp').test(cs.backgroundImage)) bad.push(k + ' bg ' + cs.backgroundImage.slice(0, 30)); else if (parseFloat(cs.width) < 16) bad.push(k + ' ' + cs.width); }); t.remove(); return !bad.length || bad.join('; '); } },
+      { kind: 'fn', name: 'camp counter numbers stay readable', fn: function () { var e = document.querySelector('.trk .hk b'); if (!e || !GXS.vis(e)) return true; return parseFloat(getComputedStyle(e).fontSize) >= 12 || 'counter font ' + getComputedStyle(e).fontSize; } },
+      { kind: 'fn', name: 'fire, raft and palm models download (full + phone/Low)', fn: function () { var b = (window.__swm || []).filter(function (x) { return !x[1]; }); return ((window.__swm || []).length === 6 && !b.length) || 'bad model files: ' + b.map(function (x) { return x[0]; }).join(','); } },
+      { kind: 'fn', name: '3D (where WebGL runs): campfire and raft are in the camp', fn: function () { if (!V3.r) return true; var u = V3.camp && V3.camp.userData; return (u && V3.glbOK && V3.glbR.fire && V3.glbR.raft && V3.glbR.palmB && u.fmo && u.raft.children.length === 1 && !u.base.visible) || 'models missing: ok=' + V3.glbOK + ' fire=' + !!(u && u.fmo) + ' raft=' + (u && u.raft.children.length); } },
+      skin
+    ]
+  });
+
   GXS.add({
     id: 'si-zoom', name: 'Card zoom', ask: 'Is the big card readable?', seed: 6, sizes: 'phone', when: booted,
     setup: function () {
