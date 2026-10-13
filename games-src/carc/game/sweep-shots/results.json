@@ -1,13 +1,13 @@
 {
  "stat": {
-  "games": 24,
-  "steps": 8896,
+  "games": 40,
+  "steps": 13420,
   "hints": 0,
-  "places": 1053,
-  "figs": 319,
-  "rotates": 492,
+  "places": 1724,
+  "figs": 524,
+  "rotates": 817,
   "scorePops": 0,
-  "results": 27,
+  "results": 43,
   "rots": 4
  },
  "fails": []

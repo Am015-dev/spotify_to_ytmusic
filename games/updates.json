@@ -14,6 +14,36 @@
  },
  {
   "date": "2026-10-13",
+  "game": "rampart",
+  "title": "Painted look for Rampart & Vine",
+  "items": [
+   "Followers are painted pieces in each player's colour",
+   "Wooden score pills, oak top bar and a leather tile tray with a painted rotate button",
+   "Stone-framed menus and buttons, ribbon and goblet on the result"
+  ],
+  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
+ },
+ {
+  "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Thornbound Throne: the real crown",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways"
+  ],
+  "check": "Finish a game and look at the winner screen"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Kaiten Kitchen: real brass cloches",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals"
+  ],
+  "check": "Pick a plate and watch the cloches lift"
+ },
+ {
+  "date": "2026-10-13",
   "game": "lantern-dive",
   "title": "Lantern Dive: the Commander's real lantern",
   "items": [
