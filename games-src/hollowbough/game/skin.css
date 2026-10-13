@@ -1,0 +1,10 @@
+
+/* Hollowbough skin (facelift) */
+html.sk{--sk-ink:#3a1f0a;--sk-cream:#3a1f0a}
+html.sk .gx-bar{background:linear-gradient(rgba(255,246,226,.86),rgba(255,246,226,.86)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1f0a}
+html.sk .gx-bar h1,html.sk .gx-bar .gx-ibtn,html.sk .gx-bar .gx-ibtn span,html.sk .gx-bar #bartxt,html.sk .gx-bar .gx-sp+*{color:#3a1f0a;text-shadow:none}
+html.sk .gx-bar *{text-shadow:none}
+html.sk .gx-ibtn svg,html.sk .gx-ibtn svg *{stroke:#3a1f0a}
+html.sk .gx-drawer-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-drawer-head.webp) center/auto 100% repeat-x #f3e3c4}
+html.sk .gx-drawer-head h2{text-shadow:none}
+html.sk .gx-bar>*:not(.gx-ibtn):not(.gx-sp){color:#5a2d0a!important}
