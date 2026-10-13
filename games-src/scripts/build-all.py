@@ -219,7 +219,22 @@ def main():
                 r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"],
                                    env=env, capture_output=True, text=True, timeout=900)
                 tail = [l for l in r.stdout.splitlines() if "[look]" in l and s in l]
-                if r.returncode == 1: status[s], why[s] = "FAIL", "look-check: " + (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                if r.returncode == 1:
+                    # Block only on findings the LIVE game doesn't already have (the baseline file goes stale as other workers deploy).
+                    def sev(path):
+                        try:
+                            g = json.load(open(path)).get("games", {}).get(s, {})
+                            return {(f.get("check"), f.get("sel"), f.get("text")) for f in g.get("findings", []) if f.get("sev") == "severe"}
+                        except Exception: return None
+                    new_f = sev(out / ".look" / "report.json")
+                    rl = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(out / ".look-live"), "--no-shots"],
+                                        env=env, capture_output=True, text=True, timeout=900)
+                    live_f = sev(out / ".look-live" / "report.json")
+                    msg = (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                    if new_f is not None and live_f is not None and new_f <= live_f:
+                        print(f"[look] {s}: WARN pre-existing on the live game too, not caused by this change: {msg}", flush=True)
+                    else:
+                        status[s], why[s] = "FAIL", "look-check (new vs live): " + msg
                 elif r.returncode != 0: print(f"[look] {s}: look-check crashed, report-only ({r.stderr.strip()[-80:]})")
                 else: print(f"[look] {s}: {tail[-1].split('] ', 1)[-1] if tail else 'ok'}")
             except Exception as e:
