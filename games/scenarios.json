@@ -73,6 +73,27 @@
    "group": "Cards"
   },
   {
+   "id": "dk-status-line",
+   "name": "Short drag/tap status line",
+   "ask": "Is the line short and does it match?",
+   "sizes": "phone",
+   "group": "Board"
+  },
+  {
+   "id": "dk-tips",
+   "name": "Lightbulb, tips, rules cards, Tips switch",
+   "ask": "Do tips, bulb and rules cards work?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "dk-art",
+   "name": "Painted icons and 3D heroes",
+   "ask": "Are the new icons and hero figures in place?",
+   "sizes": "all",
+   "group": "Art"
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
