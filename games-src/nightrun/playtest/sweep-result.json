@@ -1,5 +1,126 @@
 {
- "fails": [],
+ "fails": [
+  {
+   "tag": "375x553/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px  34x34",
+   "shot": "fail1-layout.png"
+  },
+  {
+   "tag": "375x553/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px ×2 50x34",
+   "shot": "fail2-layout.png"
+  },
+  {
+   "tag": "375x553/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px ×4 50x34",
+   "shot": "fail3-layout.png"
+  },
+  {
+   "tag": "375x553/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px ×5 50x34",
+   "shot": "fail4-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px  34x34",
+   "shot": "fail5-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows sc",
+   "shot": "fail6-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows fr",
+   "shot": "fail7-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows sm",
+   "shot": "fail8-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px ×2 51x34",
+   "shot": "fail9-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows mh",
+   "shot": "fail10-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows ck",
+   "shot": "fail11-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows cr",
+   "shot": "fail12-layout.png"
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows dc",
+   "shot": ""
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows wd",
+   "shot": ""
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows mg",
+   "shot": ""
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px ×4 51x34",
+   "shot": ""
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage button under 44 px ×5 51x34",
+   "shot": ""
+  },
+  {
+   "tag": "844x390/story",
+   "kind": "layout",
+   "detail": "pit after stage card text overflows lk",
+   "shot": ""
+  },
+  {
+   "tag": "390x763/story#38",
+   "kind": "story",
+   "detail": "intro line not shown: [\"PERFECT\",\"LEADER DOWN\",\"+612\",\"PERFECT\"]",
+   "shot": ""
+  },
+  {
+   "tag": "1280x800/story#34",
+   "kind": "story",
+   "detail": "intro line not shown: [\"Dash on the pulse to power up\",\"BANKENVIERTEL\",\"Taunusanlage · 23:47\",\"34 · HARBOUR WATCH\"]",
+   "shot": ""
+  }
+ ],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -10,7 +131,9 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 32
+  "shopChecks": 0,
+  "switches": 6,
+  "storyStages": 110
  },
  "avg": 0
 }

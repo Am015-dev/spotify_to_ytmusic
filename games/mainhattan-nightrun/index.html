@@ -1704,7 +1704,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
   tick(dt){
-    if(this.over){this.cT-=dt;if(this.cT<=0&&!this.fin){this.fin=true;if(this.n>=STAGES.length||!SH.live)this.finish();else SH.pit(()=>this.finish());}return;}
+    if(this.over){this.cT-=dt;if(this.cT<=0&&!this.fin){this.fin=true;if(this.n>=MAIN||this.ch||!SH.live)this.finish();else SH.pit(()=>this.finish());}return;}
     if(G.dead)return;
     const g=this.def.goal;G.dt+=dt;DIR.tick(dt);const prog=clamp(G.dbar/this.len,0,1),up=G.dbar>=this.len-.5;this.d=this.d0*(.8+.3*prog);   // the ramp runs over the whole stage
     if(!this.pre&&G.t>5&&(g.k==='boss'||g.k==='mini')){this.pre=true;const k=DISTRICTS[this.def.di].boss,sg=g.k==='boss'?bossSong(k,false):null;if(sg)loadTrack(sg);}
@@ -2502,7 +2502,7 @@ const this_ship=()=>SH.ship;
 
 /* ---------- fifteen more garage perks: STARTING KITS. An equipped kit gives you that pit-stop upgrade at the start of every run (up to the level you own),
    so what you equip decides your build, and slots are limited (see LOADOUT in meta.js). ---------- */
-{const KITS=[['sc','Wing Cannons',3,260,'Start with side cannons'],['rg','Rear Guard',3,240,'Start with a rear gun'],['pc','Piercer',4,300,'Start with piercing shots'],['cl','Arc Chain',3,320,'Start with chain lightning'],['bt','Chrono Dash',3,300,'Start with bullet time on beat dashes'],
+{const KITS=[['sc','Wing Cannons',3,260,'Start with side cannons'],['rg','Rear Guard',3,240,'Start with a rear gun'],['pc','Piercer',4,300,'Start with piercing shots'],['cl','Arc Chain',3,320,'Start with chain lightning'],['bt','Chrono Dash',3,300,'Start with beat-dash bullet time'],
   ['rc','Ricochet',3,280,'Start with bouncing shots'],['as','Aegis',3,320,'Start with auto-shields'],['bd','Orbit Guns',3,340,'Start with orbiting guns'],['hm','Seeker Shots',4,260,'Start with homing shots'],['sm','Score Magnet',3,200,'Start with a score magnet'],
   ['ni','Neon Interest',3,260,'Start with Neon interest'],['lk','Fortune',3,240,'Start with lucky drops'],['wn','Second Wind',1,500,'Start with Second Wind'],['og','Overdrive Core',1,520,'Start with Overdrive'],['ec','EMP Cell',1,300,'Start with an extra EMP']];
   const raw=load('mnr_tune',{}),eq=load('mnr_eq',null);
@@ -2593,23 +2593,25 @@ SH.buy0=SH.buy;SH.buy=function(i){this.armed=null;return this.buy0(i);};
 {const st=document.createElement('style');st.textContent=`
 .pg .card .pc{display:inline-flex;width:1.25em;height:1.25em;border-radius:50%;background:#05030c;border:1.5px solid var(--c);vertical-align:-.25em;margin-right:4px;flex:0 0 auto}
 .pg .card .pc svg{width:100%;height:100%;padding:2px;box-sizing:border-box;background:none!important;color:var(--c);height:100%}
-.pg .card .pv{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.8),13px);color:var(--dim);line-height:1.2}
-.pg .card .chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.7),12px)}
+.pg .card .pv{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.8),15px);color:var(--dim);line-height:1.2}
+.pg .card .chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.7),14px)}
 .pg .card .chips b{font-weight:700;padding:0 6px;border-radius:8px;background:#05030c;border:1px solid var(--c,#8c86b8);color:var(--c,#ccc);white-space:nowrap}
 .pg .card .chips b.heat{--c:#ff9a3d}.pg .card .chips b.syn{--c:#3dffb0}.pg .card .chips b.bad{--c:#ff5a6a}
 .pg .card .rec.boss{background:#ff5a6a;color:#fff}
 .pg .card .pp i.nx{background:var(--c);animation:pnx 1s ease-in-out infinite}
 @keyframes pnx{0%,100%{opacity:.25}50%{opacity:1}}
-.pg .bld{display:flex;gap:calc(var(--u)*2);align-items:center;flex:0 0 auto;font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:var(--dim);flex-wrap:wrap}
+.pg .bld{display:flex;gap:calc(var(--u)*2);align-items:center;flex:0 0 auto;font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),15px);color:var(--dim);flex-wrap:wrap}
 .pg .bld .bp{display:inline-flex;align-items:center;gap:3px;color:var(--c)}
 .pg .bld .bp svg{height:1.5em;width:1.5em}
 .pg .bld .bp i{display:inline-block;width:7px;height:7px;border-radius:2px;background:#ffffff22}.pg .bld .bp i.on{background:var(--c)}.pg .bld .bp i.set{box-shadow:0 0 5px var(--c)}
 .pg .bld .hs{margin-left:auto;white-space:nowrap}.pg .bld .hs.hot{color:#ff9a3d}
-.pg .foe{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:#7dffd8;flex:0 0 auto;text-align:center;min-height:1.2em}
-.pg .own button.oi{display:inline-flex;align-items:center;gap:2px;min-height:34px;min-width:34px;padding:0 6px;border:1px solid transparent;border-radius:8px;background:#ffffff0a;color:var(--c);font-family:var(--mono);cursor:pointer}
+.pg .foe{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),15px);color:#7dffd8;flex:0 0 auto;text-align:center;min-height:1.2em}
+.pg .own button.oi{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-height:44px;min-width:44px;padding:0 6px;border:1px solid transparent;border-radius:8px;background:#ffffff0a;color:var(--c);font-family:var(--mono);cursor:pointer}
 .pg .own button.oi.arm{border-color:#ff5a6a;background:#ff5a6a33;animation:pnx .5s infinite}
 .pg .own button.oi.ns{cursor:default;opacity:.85}
 .pg .own .sl{margin-left:auto;color:var(--dim);white-space:nowrap}
+@container (max-height:640px){.pg .aff{display:none}}
+@container (max-height:430px){.pg .card .pv,.pg .card .chips,.pg .foe{display:none}.pg .bld{font-size:10px}}
 `;document.head.appendChild(st);}
 {const bl=document.createElement('div');bl.className='bld';bl.id='shBld';const fo=document.createElement('div');fo.className='foe';fo.id='shFoe';$('shOwn').before(bl,fo);
   $('shOwn').addEventListener('click',e=>{const b=e.target.closest('button.oi');if(b&&!b.classList.contains('ns'))SH.sell(b.dataset.id);});}
@@ -2626,8 +2628,8 @@ SH.draw=function(){const box=$('shCards');box.innerHTML='';SYN.calc();let aff=0;
   $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
   $('shGo').textContent=this.picks?'GO':'SKIP';
   $('shBld').innerHTML=buildBar();$('shFoe').textContent=this.foe?this.foe.nm+': '+foeTip(this.foe):'';
-  $('shOwn').innerHTML=(this.order.length?this.order.map(id=>{const u=UBY[id],sp=this.sellPrice(id);return `<button type="button" class="oi${NOSELL.has(id)?' ns':''}${this.armed===id?' arm':''}" data-id="${id}" style="--c:${u.c}" aria-label="${u.n}${sp?', sell for '+sp:''}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</button>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>')+`<span class="sl">SLOTS ${this.order.length}/${this.slots}${full?' · FULL':''}</span>`;
-  const ga=typeof affordCount==='function'?affordCount():0;$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(this.order.some(id=>!NOSELL.has(id))?' · tap owned to sell':'')+(ga?` · Garage: <b>${ga}</b> ready`:'');
+  $('shOwn').innerHTML=(this.order.length?this.order.map(id=>{const u=UBY[id],sp=this.sellPrice(id);return `<button type="button" class="oi${NOSELL.has(id)?' ns':''}${this.armed===id?' arm':''}" data-id="${id}" style="--c:${u.c}" aria-label="${u.n}${sp?', sell for '+sp:''}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</button>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>')+`<span class="sl">SLOTS ${this.order.length}/${this.slots}${full?' · FULL':''}${this.order.some(id=>!NOSELL.has(id))?' · TAP TO SELL':''}`+'</span>';
+  const ga=typeof affordCount==='function'?affordCount():0;$('shAff').innerHTML=(aff?`You can afford <b>${aff}</b> upgrade${aff>1?'s':''}`:'Nothing affordable yet')+(ga?` · Garage: <b>${ga}</b> ready`:'');
   SH.aff=aff;SH.rec=this.cards.findIndex(c=>c.why);};
 
 /* ----- ship preview: one bar of the ship's fire pattern with a moving playhead, and what it does to damage and heat ----- */
@@ -2646,11 +2648,11 @@ function rhythmHTML(id){const shots=shipRhythm(id),x=typeof SHIPX==='object'?SHI
 @keyframes rhp{from{left:0}to{left:100%}}
 .pg .presets{display:flex;gap:calc(var(--u)*1.6)}.pg .presets .pst{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:.3em .2em;font-size:clamp(9px,calc(var(--u)*2.8),13px);white-space:nowrap}
 .pg .presets .pst svg{height:1.3em;width:1.3em;color:var(--c)}
-.pg .paths{display:flex;flex-direction:column;gap:3px;text-align:left}
-.pg .pth{display:grid;grid-template-columns:minmax(0,9.5em) auto 1fr;gap:8px;align-items:center;color:var(--c);font-size:clamp(10px,calc(var(--u)*2.9),13px)}
+.pg .paths{display:flex;flex-direction:column;gap:3px;text-align:left;width:min(100%,600px);margin:0 auto}
+.pg .pth{display:grid;grid-template-columns:9.5em 5.5em minmax(0,1fr);gap:8px;align-items:center;color:var(--c);font-size:clamp(10px,calc(var(--u)*2.9),13px)}
 .pg .pth .pn{display:flex;align-items:center;gap:4px;white-space:nowrap}.pg .pth svg{height:1.4em;width:1.4em}
 .pg .pth .pb i{display:inline-block;width:8px;height:8px;margin-right:2px;border-radius:2px;background:#ffffff22}.pg .pth .pb i.on{background:var(--c)}
-.pg .pth .pt{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pg .pth .pt{text-align:left;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pg .syns{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
 .pg .syns b,.pg .cargo button.oi{font-weight:700;padding:2px 8px;border-radius:9px;background:#05030c;border:1px solid #3dffb0;color:#3dffb0;font-size:clamp(10px,calc(var(--u)*2.8),12px);display:inline-flex;align-items:center;gap:3px}
 .pg .syns b svg{height:1.2em;width:1.2em}.pg .syns b:not(.on){border-style:dashed;opacity:.6}.pg .syns b.heat{border-color:#ff9a3d;color:#ff9a3d}
@@ -2660,6 +2662,9 @@ function rhythmHTML(id){const shots=shipRhythm(id),x=typeof SHIPX==='object'?SHI
 .pg .card s{color:var(--dim);margin-right:3px}
 .pg .card .pv::before{content:"NOW ";letter-spacing:.08em;color:#ffffff55}
 `;document.head.appendChild(st);}
+
+/* test hooks (strategy-test.js) */
+window.__nrs={get SYN(){return SYN},SYNS,PATHS,foeOf,foeTip,pathOf,lvText,tpDmg:()=>tpDmg(),get MK(){return MK},TP_BY,nextFoe};
 
 /* ---------- ATHINA must be Athens in every orientation ----------
    Landscape: moon and glint on the water, olive groves on the shore, on top of the lit Acropolis, Plaka and Lycabettus that were already there.
@@ -3260,8 +3265,15 @@ setInterval(()=>{const n=DISTRICTS.length;if(document.hidden)return;
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='J3';
+const NR_VER='L1';
 const NR_CHECKLIST=[
+ {ver:'L1',id:'story-map',text:'STORY opens a painted route map: 40 stages in five districts (8 each), mini-bosses and bosses are bigger medallions, your next stage glows, locked stages show a padlock. Tap a stage: a plate shows goal, the three stars, your best and PLAY. Scroll along the road (up on a phone, sideways on a wide screen).'},
+ {ver:'L1',id:'challenges',text:'Each district has an optional challenge stage that opens after its mini-boss: a side branch on the map. NO-HIT ends on the first hull hit, SPEED needs the kills before the clock, PERFECT needs a PERFECT count. Each pays up to 3 stars.'},
+ {ver:'L1',id:'curve',text:'Difficulty rises a little every stage with no sudden spike: stage 1 to 4 feel gentle, a boss is slightly above the stages around it.'},
+ {ver:'L1',id:'pit-build',text:'Pit stop: cards show a build path icon (Glass Cannon, Tank, Beat Combo), the effect now and next, HEAT chips, a + chip when a card completes a synergy, and BOSS PICK / BUILD PICK badges. The line under it names the next boss and what it fires.'},
+ {ver:'L1',id:'pit-limits',text:'A run holds 6 different upgrades (7 from stage 14, 8 from stage 28). Tap an owned icon twice to sell one level for half its price. Heat: damage upgrades raise the HEAT percentage, Coolant lowers it. Stock changes each run and each pit stop; REROLL costs more every time.'},
+ {ver:'L1',id:'garage-builds',text:'Garage > LOAD: three build buttons equip the best perks of a path, the path bars show the 2-piece and 4-piece bonus (the 4-piece bonus has a price), green chips show active synergies. Glass Core, Greedy Pilot, Lead Plating and Beat Addict each show a TRADE-OFF line. SHIPS cards show a moving fire pattern.'},
+ {ver:'L1',id:'market',text:'Garage > SHOP: four daily offers (one is on sale), 2 buys a day, a cargo hold for 3 that you can sell back at 60%, NEW OFFERS for Neon, a BOSS PICK badge and the next boss line.'},
  {ver:'J3',id:'boss-anim',text:'Every boss now animates: it moves through its idle frames, and when it is about to fire (the beat before) it winds up, then shows the shot and recovers. Check Adler, Krake, Ice, Kronos, Tresor, Bruecke, Schranke, Messe, Hoplite and Talos (LAB > BOSS PICKER). No white boxes or fringes round any of them, size looks like before.'},
  {ver:'J3',id:'lab-oneTap',text:'LAB: pause > LAB > any IN A RUN button (BOSS NOW, a boss from the BOSS PICKER, KILL ALL ...) closes the LAB and you are back in the game at once. RESUME RUN sits at the top. After you open the LAB once, a small LAB chip stays in the run (it pauses and opens the LAB).'},
  {ver:'J3',id:'no-overlap',text:'Nothing overlaps: difficulty badges in the LAB are small icons, the story map shows number medallion, stage name and stars on one line on a small phone (375x553), the boss sub-title matches the boss.'},
@@ -3859,7 +3871,7 @@ document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];
 window.__mnr={ART,FUN,DIR,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
-  get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},get K(){return K},startStory,unlockedN:unlocked,sSave,
+  get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,
   // test hooks: ?sim=1 has no audio clock; simOn stops the animation loop and step() advances the game by hand with the beat clock tied to game time
   simOn(v){simOn=v!==false;},step(dt){fbT+=dt;if(running&&!paused)update(dt);},press(n){pressed[n]=performance.now();},touchTo(x,y){touch={id:-1,sx:0,sy:0,px:x,py:y,x:0,y:0};touchFire=true;},
   abort(){if(running){NR.emit('runEnd',{quit:true});running=false;}ST.on=false;ST.over=false;paused=false;touch=null;touchFire=false;pressed={};},

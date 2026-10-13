@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Mainhattan Nightrun bug sweep: plays the REAL page with real input (CDP touch, real keys) and asserts every step.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/sweep.js
-//   env: RUNS=34 (bot runs, split over the 4 sizes) SECS=22 (seconds per run) PAR=2 (pages at once) SKIP=beat,pause,... ONLY=beat SEED=1 SHOTS=1 (save playtest screenshots)
+//   env: SIZES=375x553 (only these sizes) RUNS=34 (bot runs, split over the 4 sizes) SECS=22 (seconds per run) PAR=2 (pages at once) SKIP=beat,pause,... ONLY=beat SEED=1 SHOTS=1 (save playtest screenshots)
 // It fails on: page errors, audio errors, a run that stands still >8 s, ship not following input, buttons off screen or covered,
 // horizontal scroll, average FPS < 45, a boss that cannot be hurt or reached, HUD text not equal to the game state, NaN state,
 // broken pause / restart / resume / settings, tab-hide not pausing, rotation breaking layout or input, and beat judging that is off by more than 80 ms.
@@ -23,6 +23,7 @@ const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mobile/15E148 Safari/60
 const CFGS = [
   { name: '390x763', w: 390, h: 763, touch: true }, { name: '375x553', w: 375, h: 553, touch: true },
   { name: '844x390', w: 844, h: 390, touch: true }, { name: '1280x800', w: 1280, h: 800, touch: false }];
+if (process.env.SIZES) { const keep = process.env.SIZES.split(','); for (let i = CFGS.length - 1; i >= 0; i--) if (!keep.includes(CFGS[i].name)) CFGS.splice(i, 1); }   // SIZES=375x553,844x390 runs only those sizes
 const PT_CAP = 60;                                      // calm visuals (the default): most particles allowed on screen at once
 const fails = [], seen = new Set(), stats = { runs: 0, ticks: 0, perfect: 0, kills: 0, bosses: 0, fps: [], maxDistrict: 0, pits: 0, econ: [], shopChecks: 0 }; let shotN = 0;
 let URL_BASE = '';
@@ -89,6 +90,7 @@ const INIT = () => {
       for (const e of document.querySelectorAll(sels.join(','))) {
         if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
         const sb = e.closest('.sbody'); if (sb) { const sr = sb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // settings rows scroll: only the ones in view are checked
+        const mb = e.closest('.mapbox'); if (mb) { const sr = mb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1 || r.left < sr.left - 1 || r.right > sr.right + 1) continue; const h0 = document.elementFromPoint(x, y); if (h0 && h0.closest('#stDet')) continue; }   // the story map scrolls (and the plate may sit over a node)
         const gb = e.closest('#gaCards.tune'); if (gb) { const sr = gb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) { if (r.left < -1 || r.right > innerWidth + 1) out.bad.push('scroll list sticks out sideways ' + e.dataset.id); continue; } }   // the perk list scrolls: only the cards in view are checked
         if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) { out.bad.push('control off screen ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); continue; }
         const h = document.elementFromPoint(x, y); if (!(h && (e === h || e.contains(h) || (h.closest && h.closest('label') && h.closest('label') === e.closest('label'))))) out.bad.push('control covered ' + (e.id || e.textContent.trim().slice(0, 12)) + ' by ' + (h && (h.id || h.className || h.tagName)));
@@ -138,6 +140,9 @@ class Touch {                                           // real touch events thr
 const ev = (p, f, a) => p.evaluate(f, a);
 async function gridOk(p) { let g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) { await sleep(800); const g2 = await ev(p, () => window.__bot.gridErr()); if (g2 !== null && (g === null || Math.abs(g2) < Math.abs(g))) g = g2; } return g; }   // one more look: clock readings jitter when the machine is busy
 async function waitFor(p, f, a, ms = 5000) { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(f, a)) return true; await sleep(50); } return false; }
+async function pickStage(p, cfg, T, n, play = true) {   // the story map: scroll the node into view, tap it, then PLAY on the plate
+  await ev(p, n => { document.querySelector(`#stsel .nd[data-n="${n}"]`).scrollIntoView({ block: 'center', inline: 'center' }); }, n); await sleep(250);
+  await press(p, cfg, T, `#stsel .nd[data-n="${n}"]`); await sleep(350); if (play) await press(p, cfg, T, '#stPlay'); }
 async function press(p, cfg, T, sel) { if (cfg.touch) await T.tap(p, sel); else await p.click(sel); }
 async function startGame(p, cfg, T, how) {
   if (how === 'daily') { await press(p, cfg, T, '#dailyBtn'); }
@@ -877,7 +882,7 @@ async function tuneTests(browser, cfg, full) {
     if (!await waitFor(p, () => __mnr.G.boss, null, 15000)) await fail(p, tag, 'pit-missing', 'no boss for the pit stop check'); else {
       await ev(p, () => { __mnr.killBoss(); }); if (!await waitFor(p, () => __mnr.SH.active, null, 9000)) await fail(p, tag, 'pit-missing', 'no pit stop'); else {
         await unlock(p); await sleep(300); const pit = await ev(p, () => ({ rec: document.querySelectorAll('#shCards .rec').length, aff: document.getElementById('shAff').textContent, words: document.getElementById('shAff').textContent.trim().split(/\s+/).filter(w => /\w/.test(w)).length, lv: document.querySelectorAll('#shCards .lv').length }));
-        await chk(p, pit.rec === 1 && /afford \d+ upgrade/.test(pit.aff) && /Garage: \d+ ready/.test(pit.aff) && pit.words <= 8, 'afford-prompt', 'pit stop ' + JSON.stringify(pit));
+        await chk(p, pit.rec >= 1 && pit.rec <= 2 && /afford \d+ upgrade/.test(pit.aff) && /Garage: \d+ ready/.test(pit.aff) && pit.words <= 8, 'afford-prompt', 'pit stop ' + JSON.stringify(pit));
         await probe2(p, tag, 'pit stop'); await p.screenshot({ path: path.join(OUT, 'shop2-' + cfg.name + '.png') });
       } }
     if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
@@ -1012,26 +1017,27 @@ async function storyTests(browser, cfg, full) {
     await sleep(500); await press(p, cfg, T, '#storyBtn'); await sleep(400);
     if (!await ev(p, () => !document.getElementById('stsel').hidden)) return fail(p, tag, 'story', 'STORY did not open the stage select');
     await probe('stage select'); await shot('select');
-    const tiles = await ev(p, () => [...document.querySelectorAll('#stsel .card')].map(c => ({ n: +c.dataset.n, lock: c.classList.contains('lock') })));
+    const tiles = await ev(p, () => [...document.querySelectorAll('#stsel .nd')].map(c => ({ n: +c.dataset.n, lock: c.dataset.nd === 'locked' })));
     const nSt = await ev(p, () => __mnr.STAGES.length); if (tiles.length !== nSt) await fail(p, tag, 'story', 'stage select shows ' + tiles.length + ' stages, not ' + nSt);
     if (tiles.some(t => t.lock)) await fail(p, tag, 'story', '?all=1 left stages locked');
-    const list = full ? Array.from({ length: nSt }, (_, i) => i + 1) : [1, 4, 6, 12, 24, 25, 30];
-    const defs = await ev(p, () => __mnr.STAGES.map(s => ({ n: s.n, di: s.di, k: s.goal.k, v: s.goal.v || 0, lead: s.lead || 0, name: s.name, intro: s.intro, song: s.song })));
+    const list = full ? Array.from({ length: nSt }, (_, i) => i + 1) : [1, 5, 8, 16, 33, 40, 41, 42, 43, 45], MAIN = await ev(p, () => __mnr.MAIN);
+    const defs = await ev(p, () => __mnr.STAGES.map(s => ({ n: s.n, di: s.di, k: s.goal.k, v: s.goal.v || 0, lead: s.lead || 0, name: s.name, intro: s.intro, song: s.song, ch: s.ch || '' })));
     for (const n of list) {
       const d = defs[n - 1], t = tag + '#' + n;
       if (n > 1 && await ev(p, () => document.getElementById('stsel').hidden)) await ev(p, () => { window.__mnr.abort(); });
       await ev(p, () => { if (document.getElementById('stsel').hidden && !__mnr.running) { document.getElementById('title').hidden = true; document.getElementById('stres').hidden = true; document.getElementById('stsel').hidden = false; } });
-      await press(p, cfg, T, `#stsel .card[data-n="${n}"]`);
+      await pickStage(p, cfg, T, n);
       if (!await waitFor(p, n => __mnr.running && __mnr.ST.on && __mnr.ST.n === n, n, 4000)) { await fail(p, t, 'story', 'stage ' + n + ' did not start from the stage select'); continue; }
       await ev(p, () => { window.__mnr.god = true; }); stats.storyStages = (stats.storyStages || 0) + 1;
       const s0 = await ev(p, () => ({ di: __mnr.G.di, hp: __mnr.P.hp, msgs: __mnr.MSGS.slice(-4), st: __mnr.ST.def.song }));
       if (s0.di !== d.di) await fail(p, t, 'story', 'stage ' + n + ' plays district ' + s0.di + ', want ' + d.di);
       if (!s0.msgs.includes(d.intro)) await fail(p, t, 'story', 'intro line not shown: ' + JSON.stringify(s0.msgs));
-      if (n > 24 && d.di !== 4) await fail(p, t, 'story', 'Act V stage ' + n + ' is not in Athens'); if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
+      if (n > 32 && n <= MAIN && d.di !== 4) await fail(p, t, 'story', 'Act V stage ' + n + ' is not in Athens'); if (d.intro.trim().split(/\s+/).length > 8) await fail(p, t, 'story', 'intro longer than 8 words');
       await sleep(900); const s1 = await probe('stage ' + n); if (!(await ev(p, () => __mnr.HUD.goal))) await fail(p, t, 'story', 'no goal on the HUD');
-      if (n === 1 || n === 6 || n === 25 || n === 30) await shot('play' + n);
+      if (n === 1 || n === 8 || n === 33 || n === 40) await shot('play' + n);
       // reach the goal
       const swBefore = await ev(p, () => __mnr.NR.sw.length);
+      if (d.ch === 'perfect') await ev(p, () => { __mnr.G.perf = __mnr.ST.pn * 2; });
       if (d.k === 'survive') await ev(p, () => { __mnr.G.dbar = __mnr.ST.len; });                       // a stage lasts as long as its song: jump the bar clock
       else if (d.k === 'kill') await ev(p, () => { __mnr.G.kills = __mnr.ST.kv; __mnr.G.dbar = __mnr.ST.len; });
       else if (d.k === 'score') await ev(p, () => { __mnr.G.score = __mnr.ST.sv; __mnr.G.dbar = __mnr.ST.len; });
@@ -1039,7 +1045,7 @@ async function storyTests(browser, cfg, full) {
         await ev(p, () => { __mnr.G.dbar = __mnr.ST.lead; });
         if (!await waitFor(p, () => __mnr.G.boss && __mnr.G.boss.x < 800, null, 14000)) { await fail(p, t, 'story', 'boss/mini-boss of stage ' + n + ' never arrived'); continue; }
         const isMini = d.k === 'mini', bossSong = d.k === 'boss' ? [null, 'boss', 'boss', 'boss2', 'boss3'][d.di] : null;
-        if (n === 6) await shot('boss');
+        if (n === 8) await shot('boss');
         if (bossSong) {
           if (!await waitFor(p, c => __mnr.NR.sw.length > c && !__mnr.BT.pend, swBefore, 16000)) await fail(p, t, 'switch', 'no song change for the boss of stage ' + n + ' ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT }))));
           else { const st = await ev(p, () => __mnr.BT.stage); if (st !== bossSong) await fail(p, t, 'switch', 'boss plays ' + st + ', want ' + bossSong);
@@ -1052,24 +1058,24 @@ async function storyTests(browser, cfg, full) {
         await ev(p, () => { __mnr.killBoss(); });
       }
       if (!await waitFor(p, () => __mnr.ST.over, null, 9000)) { await fail(p, t, 'story', 'goal ' + d.k + ' did not complete the stage'); continue; }
-      if (n < nSt) {
+      if (n < MAIN && !d.ch) {
         if (!await waitFor(p, () => __mnr.SH.active, null, 9000)) { await fail(p, t, 'story', 'no pit stop after stage ' + n); continue; }
         await sleep(800); await probe('pit after stage'); await press(p, cfg, T, '#shGo');
       }
       if (!await waitFor(p, () => !document.getElementById('stres').hidden, null, 9000)) { await fail(p, t, 'story', 'no result screen after stage ' + n); continue; }
       await sleep(300); const r = await ev(p, () => ({ title: document.getElementById('srTitle').textContent, rows: document.querySelectorAll('#srStars .sr').length, next: !document.getElementById('srNext').hidden, st: __mnr.sSave.stars[__mnr.ST.n], score: document.getElementById('srScore').textContent, g: __mnr.G.score, ok: document.querySelectorAll('#srStars .sr.ok').length }));
       if (r.title !== d.name || r.rows !== 3 || r.st < 1 || r.ok < 1) await fail(p, t, 'story', 'result screen wrong ' + JSON.stringify(r));
-      if (r.next !== (n < nSt)) await fail(p, t, 'story', 'NEXT STAGE button ' + (r.next ? 'shown after the last stage' : 'missing'));
+      if (r.next !== (n < MAIN)) await fail(p, t, 'story', 'NEXT STAGE button ' + (r.next ? 'shown after the last stage' : 'missing'));
       if (r.score.replace(/\D/g, '') !== String(r.g)) await fail(p, t, 'HUD-mismatch', 'result score ' + r.score + ' vs ' + r.g);
-      await probe('result'); if (n === 1 || n === 30) await shot('result' + n);
+      await probe('result'); if (n === 1 || n === 40) await shot('result' + n);
       await press(p, cfg, T, '#srMenu'); await sleep(250);
-      const sel = await ev(p, n => ({ shown: !document.getElementById('stsel').hidden, stars: document.querySelector(`#stsel .card[data-n="${n}"] .stars`).textContent }), n);
+      const sel = await ev(p, n => ({ shown: !document.getElementById('stsel').hidden, stars: document.querySelector(`#stsel .nd[data-n="${n}"] .stars`).textContent }), n);
       if (!sel.shown || !sel.stars.includes('★')) await fail(p, t, 'story', 'stage select does not show the stars earned: ' + JSON.stringify(sel));
       if (p.errs.length) { await fail(p, t, 'page-error', p.errs[0]); break; }
     }
     // dying: the stage-failed screen, STAGES and FLY AGAIN both work
     await ev(p, () => { __mnr.abort(); document.getElementById('stsel').hidden = false; document.getElementById('stres').hidden = true; document.getElementById('over').hidden = true; });
-    await press(p, cfg, T, '#stsel .card[data-n="1"]'); await waitFor(p, () => __mnr.running && __mnr.ST.on, null, 4000);
+    await pickStage(p, cfg, T, 1); await waitFor(p, () => __mnr.running && __mnr.ST.on, null, 4000);
     await ev(p, () => { const m = __mnr; m.god = false; m.P.inv = 0; m.P.hp = 1; m.G.eb.push({ x: m.P.x, y: m.P.y, vx: 0, vy: 0, r: 5, c: '#fff', g: true }); });
     if (!await waitFor(p, () => !document.getElementById('over').hidden, null, 8000)) await fail(p, tag, 'story', 'no stage-failed screen after dying');
     else { const o = await ev(p, () => ({ eye: document.getElementById('overEyebrow').textContent, st: !document.getElementById('stBtn2').hidden })); if (!/Stage 1 failed/.test(o.eye) || !o.st) await fail(p, tag, 'story', 'stage-failed screen wrong ' + JSON.stringify(o)); await probe('stage failed');
@@ -1082,15 +1088,18 @@ async function storyTests(browser, cfg, full) {
   const t2 = cfg.name + '/story-lock', { p: q, T: T2 } = await newPage(browser, cfg);
   try {
     await sleep(400); await press(q, cfg, T2, '#storyBtn'); await sleep(300);
-    const lk = await ev(q, () => [...document.querySelectorAll('#stsel .card')].map(c => c.classList.contains('lock')));
+    const lk = await ev(q, () => [...document.querySelectorAll('#stsel .nd')].map(c => c.dataset.nd === 'locked'));
     if (lk.length !== (await ev(q, () => __mnr.STAGES.length)) || lk[0] || !lk.slice(1).every(Boolean)) await fail(q, t2, 'story', 'a fresh player should have only stage 1 open: ' + JSON.stringify(lk));
-    // Athens (Act V) opens by playing: clearing stage 24 unlocks stage 25, and only that one
-    await ev(q, () => { for (let i = 1; i <= 24; i++) __mnr.sSave.stars[i] = 1; }); await press(q, cfg, T2, '#stBack'); await sleep(150); await press(q, cfg, T2, '#storyBtn'); await sleep(250);
-    const ath = await ev(q, () => [25, 26].map(n => document.querySelector(`#stsel .card[data-n="${n}"]`).classList.contains('lock'))); if (ath[0] || !ath[1]) await fail(q, t2, 'story', 'Athens does not open after stage 24: locks ' + JSON.stringify(ath));
+    // Athens (Act V) opens by playing: clearing stage 32 unlocks stage 33, and only that one (the challenge branches stay shut until their mini-boss)
+    await ev(q, () => { for (let i = 1; i <= 32; i++) __mnr.sSave.stars[i] = 1; }); await press(q, cfg, T2, '#stBack'); await sleep(150); await press(q, cfg, T2, '#storyBtn'); await sleep(250);
+    const ath = await ev(q, () => [33, 34, 45].map(n => document.querySelector(`#stsel .nd[data-n="${n}"]`).dataset.nd === 'locked')); if (ath[0] || !ath[1] || !ath[2]) await fail(q, t2, 'story', 'Athens does not open after stage 32: locks ' + JSON.stringify(ath));
+    await ev(q, () => { __mnr.sSave.stars[37] = 1; }); await press(q, cfg, T2, '#stBack'); await sleep(150); await press(q, cfg, T2, '#storyBtn'); await sleep(250);
+    if (await ev(q, () => document.querySelector('#stsel .nd[data-n="45"]').dataset.nd === 'locked')) await fail(q, t2, 'story', 'the Athens challenge did not open after its mini-boss');
     await ev(q, () => { __mnr.sSave.stars = {}; }); await press(q, cfg, T2, '#stBack'); await sleep(150); await press(q, cfg, T2, '#storyBtn'); await sleep(250);
-    await press(q, cfg, T2, '#stsel .card[data-n="2"]'); await sleep(300);
+    await pickStage(q, cfg, T2, 2, false); await sleep(300);
     if (await ev(q, () => __mnr.running)) await fail(q, t2, 'story', 'a locked stage started');
-    if (!/first/i.test(await ev(q, () => document.getElementById('stMsg').textContent))) await fail(q, t2, 'story', 'no message on a locked stage');
+    if (!/first/i.test(await ev(q, () => (document.querySelector('#stDet .lkn') || {}).textContent || ''))) await fail(q, t2, 'story', 'no message on a locked stage');
+    if (!await ev(q, () => document.getElementById('stPlay').disabled)) await fail(q, t2, 'story', 'PLAY is enabled on a locked stage');
     await press(q, cfg, T2, '#stBack'); await sleep(200);
     if (!await ev(q, () => !document.getElementById('title').hidden)) await fail(q, t2, 'story', 'BACK did not return to the title');
     // long press on the title
@@ -1098,7 +1107,7 @@ async function storyTests(browser, cfg, full) {
     if (cfg.touch) { await T2.down(5, r[0], r[1]); await sleep(1500); await T2.up(5); } else { await q.mouse.move(r[0], r[1]); await q.mouse.down(); await sleep(1500); await q.mouse.up(); }
     await sleep(200); if (!await ev(q, () => __mnr.sSave.all)) await fail(q, t2, 'story', 'long press on the title did not unlock all stages');
     await press(q, cfg, T2, '#storyBtn'); await sleep(300);
-    if ((await ev(q, () => document.querySelectorAll('#stsel .card.lock').length)) !== 0) await fail(q, t2, 'story', 'stages still locked after the long press');
+    if ((await ev(q, () => document.querySelectorAll('#stsel .nd[data-nd="locked"]').length)) !== 0) await fail(q, t2, 'story', 'stages still locked after the long press');
     await press(q, cfg, T2, '#stBack'); await sleep(200);
     // the title button cycles the difficulty (Normal -> Hard) for Endless
     await press(q, cfg, T2, '#diffBtn'); await sleep(150);

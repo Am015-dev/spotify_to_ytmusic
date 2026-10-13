@@ -3,8 +3,15 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='J3';
+const NR_VER='L1';
 const NR_CHECKLIST=[
+ {ver:'L1',id:'story-map',text:'STORY opens a painted route map: 40 stages in five districts (8 each), mini-bosses and bosses are bigger medallions, your next stage glows, locked stages show a padlock. Tap a stage: a plate shows goal, the three stars, your best and PLAY. Scroll along the road (up on a phone, sideways on a wide screen).'},
+ {ver:'L1',id:'challenges',text:'Each district has an optional challenge stage that opens after its mini-boss: a side branch on the map. NO-HIT ends on the first hull hit, SPEED needs the kills before the clock, PERFECT needs a PERFECT count. Each pays up to 3 stars.'},
+ {ver:'L1',id:'curve',text:'Difficulty rises a little every stage with no sudden spike: stage 1 to 4 feel gentle, a boss is slightly above the stages around it.'},
+ {ver:'L1',id:'pit-build',text:'Pit stop: cards show a build path icon (Glass Cannon, Tank, Beat Combo), the effect now and next, HEAT chips, a + chip when a card completes a synergy, and BOSS PICK / BUILD PICK badges. The line under it names the next boss and what it fires.'},
+ {ver:'L1',id:'pit-limits',text:'A run holds 6 different upgrades (7 from stage 14, 8 from stage 28). Tap an owned icon twice to sell one level for half its price. Heat: damage upgrades raise the HEAT percentage, Coolant lowers it. Stock changes each run and each pit stop; REROLL costs more every time.'},
+ {ver:'L1',id:'garage-builds',text:'Garage > LOAD: three build buttons equip the best perks of a path, the path bars show the 2-piece and 4-piece bonus (the 4-piece bonus has a price), green chips show active synergies. Glass Core, Greedy Pilot, Lead Plating and Beat Addict each show a TRADE-OFF line. SHIPS cards show a moving fire pattern.'},
+ {ver:'L1',id:'market',text:'Garage > SHOP: four daily offers (one is on sale), 2 buys a day, a cargo hold for 3 that you can sell back at 60%, NEW OFFERS for Neon, a BOSS PICK badge and the next boss line.'},
  {ver:'J3',id:'boss-anim',text:'Every boss now animates: it moves through its idle frames, and when it is about to fire (the beat before) it winds up, then shows the shot and recovers. Check Adler, Krake, Ice, Kronos, Tresor, Bruecke, Schranke, Messe, Hoplite and Talos (LAB > BOSS PICKER). No white boxes or fringes round any of them, size looks like before.'},
  {ver:'J3',id:'lab-oneTap',text:'LAB: pause > LAB > any IN A RUN button (BOSS NOW, a boss from the BOSS PICKER, KILL ALL ...) closes the LAB and you are back in the game at once. RESUME RUN sits at the top. After you open the LAB once, a small LAB chip stays in the run (it pauses and opens the LAB).'},
  {ver:'J3',id:'no-overlap',text:'Nothing overlaps: difficulty badges in the LAB are small icons, the story map shows number medallion, stage name and stars on one line on a small phone (375x553), the boss sub-title matches the boss.'},
