@@ -31,11 +31,22 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   - each game has `sweep.js` (40+ full games through the real page with touch taps at 390×763 and 375×553, plus
     rotations) and `rotate-test.js`. They fail on page errors, a glowing target that doesn't respond, a wrong hint
     or hint text ≠ finger, on-screen scores ≠ engine, anything stuck >8 s, covered buttons, horizontal scroll.
-    Run them before every deploy; a failing sweep blocks the deploy.
+    Deploy gate (owner, 13 Oct 2026: "fast tests, not hours of sweeps", Overdrive-style): `build-all.py --deploy`
+    = phone-check + the change's `?scn=` scenario tests + look check + a QUICK sweep (4 games); any failure blocks.
+    The full 40-game sweep runs only with `--deploy --full` for engine/rules changes. The owner checks via the
+    ✔ Test checklist scenarios (one tap each), not by playing whole games.
   - The owner's bug reports go first into the fixer's brief, then into the sweep.
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
   - Phone rotation: iOS reports the old size right after rotating. Use one debounced relayout fed by resize,
     orientationchange, visualViewport and ResizeObserver, re-measured after ~400 ms.
+- **Fast loop (owner, 13 Oct 2026; same rules as Overdrive):**
+  - Tests first: a task's FIRST commit is its acceptance tests. Each test is one ✔ Test checklist item with a plain pass line
+    and a `?scn=` link that spawns ONLY that requirement, plus an automated check of the same spawn that acts with REAL taps
+    (no forced state during the tested action). Done = every test passes, shown in ONE screenshot grid.
+  - The whole test set for a change runs in under 3 min. Prove a test with a 1-min dry run before any longer run; a run that
+    fails on a script error is fixed, never repeated.
+  - Workers commit at least every 10 min. Features over ~1 h or ~$5: spec + 3 acceptance tests + one mock-up first; the
+    orchestrator asks the owner one yes/no.
 - **"No story mode":** chapters with bosses and a difficulty curve (`games-src/shell/CAMPAIGN.md`).
 
 ## Cost rules (about $4,000 was spent, mostly waste)

@@ -6,7 +6,7 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
 ## Iterate fast, check once (two speeds; numbers in `CHECK-SPEED.md`)
 - **Iterate with `--quick`:** `python3 games-src/scripts/build-all.py --quick <slug>` = build + stamp + phone-check + the game's scenario tests
   (`?scn=` states, seconds each) + a QUICK sweep (4 games, one rotation). Run it after every small fix. Never run the full sweep to iterate.
-- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks + the FULL sweep (the CLAUDE.md gate, unchanged) + rotate-test,
+- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks (QUICK sweep; owner, 13 Oct 2026). Add `--full` (full sweep + rotate-test) only for engine/rules changes,
   once, then copies the passing game into `games/`. Run it once, right before going live (not after each fix, not again after a merge unless
   the merge touched your game's logic). `--no-sweep` skips the sweep: only for a change that cannot touch play, and say why in the commit.
 - **One shared http server:** build-all.py starts `scripts/gx-serve.js` once and passes `GX_URL` to every check. Sweeps, rotate-tests,
@@ -30,7 +30,7 @@ Every change, however small, ships as: **code + scenario + checklist item**, in 
    `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
 2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
    sweep while iterating.
-3. **One full `--deploy` at the end** (the full sweep gate is unchanged). Small batches: 1-3 games per worker, deploy each
+3. **`--deploy` as soon as the scenarios pass** (quick sweep; `--full` only for engine/rules changes). Small batches: 1-3 games per worker, deploy each
    game as soon as it passes; never hold finished games back for the rest of a batch.
 4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
    gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
@@ -90,7 +90,7 @@ Versions and what is missing: `python3 games-src/scripts/game-status.py` writes 
    No AI testers for bugs.
 
 ## Efficiency rules (from CLAUDE.md)
-- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` runs the one full sweep. After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
+- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` (quick sweep; `--full` only for engine/rules changes). After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
 - One worker per game, a tiny brief that names the files; reports under 150 words; at most 2 subagents at once.
 - Always set the model: orchestrator on main, workers on Sonnet, plain copying/downloads on Haiku. No new cloud sessions.
 - Scripts do the checking (build-all, phone-check, sweep); AI testers only for new-game blind tests, never for bugs.
