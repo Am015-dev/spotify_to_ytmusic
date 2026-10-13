@@ -117,7 +117,7 @@
         var row = $('#setd .btn.gxt-menu'); if (row) row.scrollIntoView({ block: 'center' });
         var b = document.createElement('div'); b.id = 'art-bub'; b.className = 'gxh-bub on gxh-a-bottom'; b.style.cssText = 'left:40px;top:70px';
         b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap a glowing card</div>'; document.body.appendChild(b);
-      var pp = document.getElementById('ppop'); if (pp) { pp.hidden = false; pp.innerHTML = '<h5>Details</h5><p class="small">Painted vellum sheet</p>'; }
+        var id = +document.querySelector('#handw .hc').dataset.id; openPop('card', { id: id, read: 1 });
         return new Promise(function (r) { setTimeout(r, 700); });
       });
     },
