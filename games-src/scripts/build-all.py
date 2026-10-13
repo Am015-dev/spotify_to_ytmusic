@@ -56,6 +56,16 @@ SWEEPS = {
 }
 TIMES = []   # (slug, check, seconds)
 
+def inject_lab(html_path):
+    """Inline the LAB (shell/gx-lab-core.js + gx-lab.js + gx-lab.css) at the end of the staged page. Inert unless test mode is on (?test=1 or localStorage gx_test=1)."""
+    sh = SRC / "shell"
+    t = pathlib.Path(html_path).read_text(encoding="utf-8")
+    if "gxlab-" in t and "GXLAB_CSS" in t: return
+    blk = "<script>window.GXLAB_CSS=" + json.dumps((sh / "gx-lab.css").read_text(encoding="utf-8")).replace("</", "<\\/") + ";</script>\n<script>\n" + (sh / "gx-lab-core.js").read_text(encoding="utf-8") + "\n</script>\n<script>\n" + (sh / "gx-lab.js").read_text(encoding="utf-8") + "\n</script>\n"
+    i = t.rfind("</body>")
+    t = t[:i] + blk + t[i:] if i >= 0 else t + blk
+    pathlib.Path(html_path).write_text(t, encoding="utf-8")
+
 def timed(slug, name, fn):
     t = time.time(); r = fn(); dt = time.time() - t
     TIMES.append((slug, name, round(dt, 1)))
@@ -114,6 +124,7 @@ def main():
         else:
             (out / s).mkdir(parents=True, exist_ok=True)
             shutil.copyfile(built, out / s / "index.html")
+            inject_lab(out / s / "index.html")
             status[s], why[s] = "BUILT", ""
         print(f"[build] {s:18} {status[s]} {why[s]}", flush=True)
 
