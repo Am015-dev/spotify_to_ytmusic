@@ -24,7 +24,7 @@
       { kind: 'visible', sel: '#board', name: 'board' },
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = $('#board').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .5 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
       { kind: 'visible', sel: '#belt .hc[data-id]', name: 'first dish' },
-      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
+      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
       { kind: 'fn', name: 'every dish is on screen and tappable', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#belt .hc[data-id]'), function (e) { if (bad) return; var r = e.getBoundingClientRect(), t = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(1, r.left + r.width / 2)), Math.min(innerHeight - 1, Math.max(1, r.top + r.height / 2))); if (!inView(e)) bad = 'dish ' + e.dataset.id + ' off screen'; else if (t && t !== e && !e.contains(t)) bad = 'dish ' + e.dataset.id + ' covered by ' + (t.id || t.className); }); return !bad || bad; } },
       { kind: 'eq', name: 'round number', a: function () { return +/Round (\d+)/.exec($('#barstat').textContent)[1]; }, b: function () { return G.round; } },
       { kind: 'eq', name: 'turn number', a: function () { return +/Turn (\d+)/.exec($('#barstat').textContent)[1]; }, b: function () { return G.turn; } },

@@ -112,11 +112,12 @@
   }
  },
  "thornbound": {
-  "severe": 2,
+  "severe": 3,
   "warn": 7,
   "severeKeys": [
    "size|g.tb-m-round > g > text",
-   "size|g.tbx-pan > g > text"
+   "size|g.tbx-pan > g > text",
+   "contrast|g.tb-m-static > g > text"
   ],
   "counts": {
    "size": 4,

@@ -47,7 +47,7 @@
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = document.querySelector('#bd').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .55 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
       { kind: 'visible', sel: '#bd .hc', name: 'hand' },
       { kind: 'visible', sel: '#acts .btn', name: 'Pass / Prepare buttons' },
-      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
+      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
       { kind: 'fn', name: 'top line has contrast >= 3 against the bar', fn: function () { var e = document.querySelector('#prompt'), bar = document.querySelector('.gx-bar'), c = contrast(getComputedStyle(e).color, getComputedStyle(bar).backgroundColor); return c >= 3 || 'contrast ' + c.toFixed(1) + ' (' + getComputedStyle(e).color + ' on ' + getComputedStyle(bar).backgroundColor + ')'; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bd *, #prompt'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin
