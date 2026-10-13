@@ -7,7 +7,7 @@
 // (98ro_open.js: 96 m ribbon, asphalt in the middle, terrain beside it, routes behind an island, pit jumps).
 // Track JSON v1: {v,id,name,city,laps,road,pts:[[x,z,h,ter]…] (world m; ter = surface of the segment pt→next), pc:[{k,x,z,n?}…], st:[x,z]}
 const TB_TERS=['grass','dirt','sand','cobble'],TB_TCOL={grass:'#58b43a',dirt:'#9b6a3c',sand:'#e2c98a',cobble:'#9a948a'};
-const TB_V={top:62,lat:13,acc:7,brk:16,cal:1,rk:{scd:1.15}};// rk: per-route-kind balance factor (measured, tRace alt vs road)// lap estimate (docs/TRACK_FUN.md); cal = measured / estimated (test drive)
+const TB_V={top:62,lat:13,acc:7,brk:16,cal:1,rk:{scd:1.07,scw:.95}};// rk: per-route-kind balance factor (measured, tRace alt vs road)// lap estimate (docs/TRACK_FUN.md); cal = measured / estimated (test drive)
 const TB_PCS={jump:{ic:'⤴',c:'#ff7a1c',l:'JUMP'},boost:{ic:'⚡',c:'#ffd12c',l:'BOOST'},item:{ic:'?',c:'#4ceaff',l:'ITEMS'},gate:{ic:'⛩',c:'#ff2d95',l:'GATE'},
   scw:{ic:'≈',c:'#29b6ff',l:'WATER SC'},scd:{ic:'⛰',c:'#ff9a1f',l:'DIRT SC'},
   // track-2 stunt pieces (98ts_track_stunts.js builds them): big kicker ramp, gap jumps over water / a road, banked curve, stunt split, landmark

@@ -3,7 +3,8 @@
 import sys, os
 from PIL import Image, ImageDraw, ImageFont
 out, title, items = sys.argv[1], sys.argv[2], sys.argv[3:]
-TW, TH, LB, COLS, PAD = 640, 295, 34, 3, 8
+TW, TH, LB, PAD = 640, 295, 34, 8
+COLS = int(os.environ.get("COLS", "3"))
 def font(sz):
     for f in ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf"):
         if os.path.exists(f): return ImageFont.truetype(f, sz)

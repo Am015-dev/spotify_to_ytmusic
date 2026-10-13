@@ -30,7 +30,7 @@ function TS_shape(td){const N=td.N,ds=td.ds,P=td.P,kk=[];TS.BK=new Float32Array(
   td.tsKick=kk;return td}
 // ---- 2) near-crossing rows (no hills there) + flyover data, before OPN_build
 {const _p=OPN_prep;OPN_prep=function(){_p();if(!(TRK&&TRK.tb&&OPN))return;const td=TF,N=td.N,ds=td.ds,P=td.P,st=3,NEAR=new Uint8Array(N),far=Math.round(300/ds);
-  for(let i=0;i<N;i+=st)for(let j=0;j<N;j+=st){const da=Math.min(Math.abs(j-i),N-Math.abs(j-i));if(da<far)continue;if((P[i*3]-P[j*3])**2+(P[i*3+2]-P[j*3+2])**2<260*260){for(let q=-st;q<=st;q++)NEAR[(i+q+N)%N]=1;break}}
+  for(let i=0;i<N;i+=st)for(let j=0;j<N;j+=st){const da=Math.min(Math.abs(j-i),N-Math.abs(j-i));if(da<far)continue;if((P[i*3]-P[j*3])**2+(P[i*3+2]-P[j*3+2])**2<180*180){for(let q=-st;q<=st;q++)NEAR[(i+q+N)%N]=1;break}}
   OPN.NEAR=NEAR;
   // stunt routes: the lane counts as road (no transform); the AI picks by skill (see TS_aiXt)
   for(const r of OPN.routes)if(r.kind==='stunt'){const L=r.s1-r.s0;r.kick=r.s0+L*.55}}}
@@ -47,7 +47,7 @@ function TS_launch(s){const L=TD.L,p0=s.tsP==null?s.dist:s.tsP;s.tsP=s.dist;if(s
     const gap=k.k==='gapw'||k.k==='gapr',slope=2*k.h/k.L;if(gap&&!s.isPlayer)s.v=Math.max(s.v,47);
     frameAt(TD,s.dist,F2);const y=yAt(TD,s.dist)+1.4,A={y,vy:lane?s.v*slope:s.v*slope+(gap?2:1),j:k.j,t:0,fall:false,cleared:false,tb:k.k,climb:lane?k.s:null,slope,v0:s.v};A.off=F2.p.y+F2.r.y*s.x-y;s.air=A;s.tsAir=A;
     if(s.isPlayer){TS.stats.launch++;AU.sfx('launch');fovKick=Math.max(fovKick,11);say('',gap&&s.v<44?'TOO SLOW!':k.k==='lane'?'STUNT LINE!':'BIG AIR!',.8)}else TS.stats.ai.launch++;return}}
-airStep=(f=>function(s){if(TS_on()){try{TS_launch(s)}catch(e){}const A=s.air;if(A&&A.climb!=null){if(mod(s.dist-A.climb+TD.L/2,TD.L)-TD.L/2<0)A.vy=s.v*A.slope+A.j.g*H;else if(A.climb!=null){A.climb=null;A.vy+=1}}}
+airStep=(f=>function(s){if(TS_on()){try{TS_launch(s)}catch(e){}const A=s.air;if(A&&A.climb!=null){const dl=mod(s.dist-A.climb+TD.L/2,TD.L)-TD.L/2;if(dl<0)A.vy=s.v*A.slope*clamp(1+dl/TB_ST.lL,0,1)+A.j.g*H;/* follow the wedge y=h·u² (slope 2h·u/L) */else if(A.climb!=null){A.climb=null;A.vy+=1}}}
   f(s);if(TS_on()&&s.tsAir){const A=s.tsAir;if(s.air===A){if(s.isPlayer&&!A.apex&&A.vy<=0&&A.t>.35){A.apex=1;if(A.t>.55)slowmo=Math.max(slowmo,.22)}return}
     s.tsAir=null;const ok=!(s.dead>0),st=TS.stats;if(s.isPlayer){if(ok){st.landed++;st.air.push(+A.t.toFixed(2));const lp=Math.max(0,s.lap);st.airLap[lp]=(st.airLap[lp]||0)+A.t;
         const at=s.mesh.position.clone();burst(SMOKE||SPARK,at,26,14,.7,new THREE.Color(1.2,1.1,.9));burst(SPARK,at,18,20,.4,new THREE.Color(2,1.7,1));shake=Math.max(shake,.55);
@@ -113,7 +113,7 @@ function TS_build(){const td=TF,N=td.N,ds=td.ds,fr=mkF(),ath=TRK.city==='ath';
   // flyovers: abutment skirts down to the ground where a row is near another part, a deck underside where it passes over it
   if(OPN.NEAR){const P=td.P,far=Math.round(300/ds),GY=(()=>{let y0=1e9;for(let i=0;i<N;i++)y0=Math.min(y0,P[i*3+1]);return ath?y0-2.4:y0-10})();
     const lowerAt=(x,z,i,rad)=>{let best=null;for(let j=0;j<N;j+=2){const da=Math.min(Math.abs(j-i),N-Math.abs(j-i));if(da<far)continue;const d=(P[j*3]-x)**2+(P[j*3+2]-z)**2;if(d<rad*rad&&(!best||P[j*3+1]<best))best=P[j*3+1]}return best};
-    const sk=TS_mat(ath?0xc9b48c:0x8a8076,{roughness:.95,flatShading:true,side:THREE.DoubleSide}),dk=TS_mat(0x4b5260,{roughness:.7,side:THREE.DoubleSide}),gm=TS_mat(0x2f6fb0,{roughness:.5,metalness:.3,side:THREE.DoubleSide});
+    const sk=TS_mat(ath?0xc9b48c:0x8a8076,{roughness:.95,side:THREE.DoubleSide,emissive:ath?0x5a4c3c:0x4a4038,emissiveIntensity:.6}),dk=TS_mat(0x4b5260,{roughness:.7,side:THREE.DoubleSide}),gm=TS_mat(0x2f6fb0,{roughness:.5,metalness:.3,side:THREE.DoubleSide});
     for(const sg of[-1,1]){let rows=[];const flush=()=>{if(rows.length>1)strip(rows,sk);rows=[]};
       for(let i=0;i<=N;i+=2){const j=i%N;if(!OPN.NEAR[j]){flush();continue}const e=at(j*ds,sg*48.6,0),lo=lowerAt(e.x,e.z,j,52);if(lo!=null&&lo<e.y-6){flush();continue}rows.push([e,V3(e.x,GY,e.z)])}flush()}
     let rows=[],fa=[[],[]];const flush=()=>{if(rows.length>1){strip(rows,dk);for(const f of fa)strip(f,gm)}rows=[];fa=[[],[]]};
