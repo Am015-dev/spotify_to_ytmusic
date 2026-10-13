@@ -348,12 +348,14 @@ function OF_spawn(P,fx,fz,fh){if(!roamWarp(P.cx,P.cz,P.h,true))return false;OF_p
   OF.vx=OF.vz=OF.vy=0;OF.spd=0;OF.air=false;OF.cy=OF.cyIn=OF.h;OF.cp=0;OF.camT=9;OF.camB=4.5;OF.inA=null;OF.recen=false;OF.hPrev=null;RO.x=OF.x;RO.z=OF.z;RO.y=OF.y;RO.h=RO.vh=OF.h;OF_btns();return true}
 function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}if(RO.card){RO.card=null;$('#roamCard').hidden=true}
   OF_reset();OF_actEnd&&OF_actEnd();
-  if(kind==='bench'||kind==='mission'){let t=null,bd=1e18;
-    if(kind==='bench'){for(const q of HUB.props||[]){if(q.t!=='bench'||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d<bd){bd=d;t={x:q.x,z:q.z,y:q.y||groundAt(q.x,q.z,99)}}}}
-    else for(const m of RO.marks||[]){if(!m.fig||markLocked(m)||!m.g||!m.g.visible&&m.g.visible!==undefined)continue;const v=m.fig.getWorldPosition(new THREE.Vector3()),d=(v.x-RO.x)**2+(v.z-RO.z)**2;if(d<bd){bd=d;t={x:v.x,z:v.z,y:v.y,m}}}
-    if(!t)return'📍 No '+kind+' nearby · try again';const q=rfSnap(t.x,t.z,200);if(!q)return'📍 No street near the '+kind;
-    for(const r of[2,2.5,3])for(let a=0;a<16;a++){const an=a/16*6.283,x=t.x+Math.sin(an)*r,z=t.z+Math.cos(an)*r,y=groundAt(x,z,t.y+2);if(Math.abs(y-t.y)>.6||!OF_clear(x,z,y))continue;
-      const P={cx:q[0],cz:q[1],h:q[2]??0};if(!OF_spawn(P,x,z,Math.atan2(t.x-x,t.z-z)))return'📍 Can\'t jump right now';return'📍 '+(kind==='bench'?'BENCH':'MISSION GIVER')+' · walk up, tap the button (PC: E)'}
+  if(kind==='bench'||kind==='mission'){const T=[];
+    if(kind==='bench'){for(const q of HUB.props||[])if(q.t==='bench'&&q.alive!==false)T.push({x:q.x,z:q.z,y:q.y??groundAt(q.x,q.z,99),q})}
+    else for(const m of RO.marks||[]){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(new THREE.Vector3());T.push({x:v.x,z:v.z,y:v.y,m})}
+    if(!T.length)return'📍 No '+kind+' nearby · try again';T.sort((a,b)=>((a.x-RO.x)**2+(a.z-RO.z)**2)-((b.x-RO.x)**2+(b.z-RO.z)**2));
+    for(const t of T.slice(0,25)){const q=rfSnap(t.x,t.z,200);if(!q)continue;  // the nearest one with a free spot 2-3 m away (the bench itself does not block it)
+      for(const r of[2,2.5,3])for(let a=0;a<16;a++){const an=a/16*6.283,x=t.x+Math.sin(an)*r,z=t.z+Math.cos(an)*r,y=groundAt(x,z,t.y+2);if(Math.abs(y-t.y)>.6||roamHit(x,z,OF_R+.25,y+1)||CID==='fra'&&inRiver(x,z))continue;
+        const pr=OF_propAt(x,z,y,.4);if(pr&&pr!==t.q)continue;
+        if(!OF_spawn({cx:q[0],cz:q[1],h:q[2]??0},x,z,Math.atan2(t.x-x,t.z-z)))return'📍 Can\'t jump right now';return'📍 '+(kind==='bench'?'BENCH':'MISSION GIVER')+' · walk up, tap the button (PC: E)'}}
     return'📍 No free spot at the '+kind}
   const P=OF_pave();if(!P)return'📍 No clear pavement nearby · drive on and try again';
   if(kind==='car'){if(!OF_spawn(P))return'📍 Can\'t jump right now';const c=OF.car,fx=Math.sin(c.h),fz=Math.cos(c.h);OF.x=c.x+fz*1.9-fx*.3;OF.z=c.z-fx*1.9-fz*.3;OF.y=groundAt(OF.x,OF.z,c.y+1);OF.h=Math.atan2(c.x-OF.x,c.z-OF.z);OF.cy=OF.cyIn=OF.h;return'📍 YOUR CAR · 🚪 ENTER appears, tap it (PC: E)'}
