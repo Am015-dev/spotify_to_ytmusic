@@ -14,7 +14,9 @@ Coordinator session_017iH3DB4VyxwKSdMwsco4Ut, reviewer session_01Y6FYerWwxv43FuK
 - track-2 builder: alex/od-builder 0146a18 (reviewer QUICK-plus PASS). ORDER: 98tb_track_builder.js right after 98ro_open.js; 98ro_open.js OPN_ROAD let.
   Conditions: OD_CHANGELOG v90k lines (NEW Track builder: home → 🛠 BUILDER…; NEW ⧉ EXPORT/IMPORT track codes), checklist items
   (BUILDER opens · EXPORT→COPY · IMPORT shows in MY TRACKS + TEST races it · PC and phone), page ≤ 3.6 MB after split, models.js + models/ ship.
-- STUNT CUP: alex/od-track 7f79e65 (conditional PASS: ask the coordinator for the conditions).
+- STUNT CUP: alex/od-track deb7b1c (code 52734f8) has a reviewer FULL-gate PASS, labelled v90l (after v90k home/builder). It CONTAINS od-builder 0146a18,
+  so v90k's builder diff is a subset. Adds src/98ts_track_stunts.js (ORDER right after 98tb_track_builder.js), 98ro_open.js builder-only hills, its own
+  OD_CHANGELOG v90l + 5 checklist items. Keep labels unique; page ≤ 3.6 MB after merging all slices (tr2j alone 2.997 MB); models.js + models/ ship.
 - roads-1 (alex/od-roads: map connectivity, traffic rules, scooters/bikes) and home-1 (alex/od-home 39d31f2 WIP, Home save point + boost gating):
   only after a reviewer PASS.
 - Athens start flip (if it reproduced): own it or route it (driving/feel → Opus worker).
