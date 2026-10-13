@@ -122,6 +122,12 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
   ready).
 - **Art:** the owner will make art with Google Flow later; each game has a prompt list in `ART-PROMPTS.md`.
 
+## Final Approach + Short Fuse: art wired, deploy blocked by phone-check (13 Oct 2026)
+Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist items); Thornbound and Kaiten Kitchen are live.
+`build-all.py --deploy <slug>` stops at phone-check. **The currently live games fail the same checks** (run `GAMES_DIR=$PWD/games PC_OUT_DIR=/tmp/pc node games-src/scripts/phone-check.js <slug>`), so the new art is not the cause.
+- **final-approach:** "slow" = one tap in every run takes 400-950 ms (limit 800). It is always the same tap: placing a die on "Axis, any die" (the 4th move). Median tap is ~120 ms. A GPU upload warm-up of all PIXI textures after `pxTextures()` (ui7.js) did not change it, so it is not first-use texture upload; next step is a CDP profile of that tap (suspects: the computer's reply / `render()` after a placement, PIXI scene rebuild).
+- **short-fuse:** "2 dead taps" in the rotation scenarios (P>L, stale; sometimes L>P): after rotating, taps on the candidates "2" and "Wire C" change nothing within 1 s. Not investigated yet; start with the rotation relayout (`gx-viewport.js` + the game's resize handler) and whether the board is re-laid out before the candidates are tapped.
+- `phone-check.js` now prints each tap's latency (slow taps labelled) and which taps were dead, to make this faster to chase.
 ## Sands of Qamar painted art wiring (13 Oct, worker)
 - Wired (sources, committed, not live yet): tile glyph medallions, tile frames, badges, star icon, goods-card, nameplate, djinn bar, ribbon, finger, bubble tail, item and trophy pictures (`html.sk-pl`, scenario `sq-art`). Not used: `ui-seat-chip` (its frame is too thick for 4-5 seat chips).
 - Deploy blocked by the look gate: `contrast|b.tv` (digits on the gold badge, 1.5-2.7:1 depending on the tile behind). The look check measures what is behind the digits; the badge picture now sits on `.tv::before` over a solid `#f4c04a`. `btn.sm` plate fixed; goods row has 44 px boxes. Next: lift `.tv` text contrast (e.g. a cream plate behind the digits), run `NODE_PATH=/opt/node-tools/node_modules python3 games-src/scripts/build-all.py --deploy sands-of-qamar`, then `look-check.js --baseline --game sands-of-qamar`, `add-update.py sands-of-qamar "Painted art wired" "item" --check "..." --scn sq-art`.
