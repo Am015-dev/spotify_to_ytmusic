@@ -48,6 +48,14 @@ DEF_ASSIGN_OBJ = re.compile(r"^Object\.assign\(\s*([A-Za-z_$][\w$.]*)\s*,")
 FNISH = re.compile(r"^(?:async\s+)?(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>|\(function\b)")
 
 
+def _outputs():
+    """Basenames of every build output (never a source)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("build_all_for_modmap", SRC / "scripts" / "build-all.py")
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    return {os.path.basename(o) for (_, _, o) in m.GAMES.values()} | {"x.js", "debug.html", "demo.html", "index.html", "sync.html"}
+
+
 def rd(p):
     return pathlib.Path(p).read_text(encoding="utf-8", errors="replace")
 
@@ -193,6 +201,20 @@ def build_order(slug):
     return order, generated, build_dir, family, title
 
 
+def style_files(build_dir, family, build_text, body):
+    """CSS / html templates the build inlines (head.html, skin.css, shell css...), found from the build script itself."""
+    skip = _outputs() | {"credits.html"}
+    names = []
+    for m in re.finditer(r"""['"][^'"\n]*?([\w.\-]+\.(?:css|html))['"]""", build_text):
+        if m.group(1) not in names and m.group(1) not in skip: names.append(m.group(1))
+    out = []
+    for n in names:
+        for d in (build_dir, build_dir / "src", build_dir.parent, family, SRC / "shell"):
+            if (d / n).exists(): out.append((d / n, n)); break
+    if body and body.name not in [n for _, n in out]: out.append((body, body.name))
+    return out
+
+
 def is_shared(path):
     p = pathlib.Path(path).resolve()
     return any(d in p.parents for d in SHARED_DIRS)
@@ -241,6 +263,14 @@ def analyse(slug):
             idx, line, kind = places[k]
             first = places[0][0]
             per_file.setdefault(idx, {}).setdefault(places[0][0], []).append(sym)
+    styles = []
+    _o, _g, bdir_, fam_, _t = build_order(slug)
+    btxt = rd(bdir_ / "build.py")
+    if slug != "mainhattan-nightrun":
+        for p, n in style_files(bdir_, fam_, btxt, find_body(bdir_, btxt)):
+            t = rd(p)
+            styles.append({"path": rel(p), "name": n, "kb": round(len(t.encode("utf-8", "replace")) / 1024, 1), "shared": is_shared(p),
+                           "purpose": purpose_of(t, []) or {"head.html": "page head: meta, base CSS", "body.html": "page body: screens and the script slots the build fills"}.get(n, ""), "lines": t.count("\n") + 1})
     sizes_ok = None
     for g in generated:
         gp = SRC / g.split(" ")[0]
@@ -248,7 +278,7 @@ def analyse(slug):
             parts = [f for f in files if re.fullmatch(r"ui\d+\.js", f["name"])]
             sizes_ok = sum(f["bytes"] for f in parts) == gp.stat().st_size
     return {"slug": slug, "title": title, "build_dir": rel(build_dir), "files": files, "generated": generated, "overrides": overrides,
-            "per_file": per_file, "join_check": sizes_ok}
+            "per_file": per_file, "join_check": sizes_ok, "styles": styles}
 
 
 # ---------------------------------------------------------------- MODULES.md
@@ -286,6 +316,15 @@ def render(a):
         if f["shared"]: continue
         n += 1
         L.append("| %d | %s | %s | %s |" % (n, f["path"], f["kb"], (f["purpose"] or "").replace("|", "/")))
+    own_st = [x for x in a["styles"] if not x["shared"]]
+    if own_st:
+        L.append("")
+        L.append("## Styles and page templates (CSS / html; searched by find.sh too)")
+        L.append("| file (games-src/...) | KB | lines | what it is |")
+        L.append("|---|--:|--:|---|")
+        for x in own_st: L.append("| %s | %s | %d | %s |" % (x["path"], x["kb"], x["lines"], x["purpose"].replace("|", "/")))
+        sh = [x["name"] for x in a["styles"] if x["shared"]]
+        if sh: L.append("Shared css inlined too: " + ", ".join(sh) + " (in games-src/shell/).")
     if shared:
         L.append("")
         L.append("Shared, inlined in this order between the game files (see `shell/MODULES.md`; edit only for cross-game changes): " +
@@ -405,6 +444,14 @@ def find(query, game=None, limit=30):
                     nfile += 1
                     if nfile > 8: continue
                     hits.append("%s:%d  %s%s" % (f["path"], i, ("[near %s] " % enc) if enc else "", line.strip()[:150]))
+        for x in a.get("styles", []):
+            if x["shared"]: continue
+            nfile = 0
+            for i, line in enumerate(rd(SRC / x["path"]).splitlines(), 1):
+                if pat.search(line):
+                    nfile += 1
+                    if nfile > 8: continue
+                    hits.append("%s:%d  %s" % (x["path"], i, line.strip()[:150]))
         if defs_hit or hits:
             print("== %s (%s)" % (slug, a["build_dir"]))
             for l in out: print(l)

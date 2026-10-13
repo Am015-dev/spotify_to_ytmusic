@@ -1,0 +1,5 @@
+# keep searches out of the built games and their media (see /.ignore)
+*/index.html
+*/media/
+reference.html
+shots.html
