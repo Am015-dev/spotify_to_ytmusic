@@ -41,3 +41,7 @@ Expose `window.__perf=()=>({i:renderer.info, n:...})` (one line) and re-run `per
 |---|---|---|---|
 | Athens | n/a | n/a | n/a |
 | Frankfurt | timeout | n/a | n/a |
+
+- v90j-perf (out/v90j-perf, patched from af1d3db, blind fix): Athens CE props (pine, olive, cypress, rock) now swap to their old cheap geometry beyond LDS.near (they had no far geometry); LDS swap loop in hubCullStep runs every 10th frame; LDS lathe segments capped at 8 (already ≤8, so no change).
+- A/B: `?props=0` hides all LDS/CE props. Headless check: menu reached, 0 page errors, both with and without `?props=0`. Frame rate not measured (software GL).
+- Not covered: Frankfurt LDS swaps (cone, barrier, sign, rock in the kmProps wrapper) still have far = near; their material changed to vertex colours, so swapping back to the old geometry needs a material swap too.
