@@ -49,3 +49,16 @@ The 2 FAILs are test order: the kit was already installed when the second tap ca
 3. The SAVED toast (shot 4) sits over the garage card title: move it above the card or hide it when the card opens.
 4. Shot 12: after the reload, the Frankfurt intro "STORY · Hot Drop" objective shows again (seeded fresh:0, step 0): existing story state, not the Home save.
 5. Not run: Athens (`CITIES=ath`), tPlay in both cities, tyre-gap measure on the parked cars, OD_CHANGELOG entry.
+
+## Reviewer verdict on 39d31f2: FAIL (partial). To do before re-REVIEW (one new GRID)
+1. BUG: name/model mismatch. Garage tiles 8–11 are headed "Post Van (6651)" but show OFF-ROAD · GUACAMONSTER stats and a green 4x4. Likely the RIDES view is
+   on the OFF-ROAD tab (G9C.type 'off', since the van has forms ['car'] it falls back to the Hot Rod's off-road). Show the street Post Van with its real model.
+2. Tile 7: a cloud of flying bricks (build-up burst, 98ba_build_anim?) covers the garage header + stats while the kit panel is open. Nothing may draw over the UI.
+3. Move the SAVED · HOME toast off the card title "Home · Garage".
+4. In-world proof shots: (a) stored cars at Home, tyres on the ground, gap measured ≤ 0.05 m; (b) the van driving with NO BOOST button; (c) the van after the
+   NITRO KIT with BOOST; (d) the Hot Rod parked at Home after the swap; (e) the Home pin on the minimap (zoom/circle).
+5. Athens: a Home shot + the boost gate. Phone tPlay fra+ath no worse than v90i (fra walls 0.5/min, stuck 4.5 %; ath walls 1.49/min).
+6. OD_CHANGELOG v90k entry + OD_CHECKLIST (99c) items for Home and the nitro gate.
+7. Scope note: the reviewer saw ~19 new 98ld_v_* models + src/MODELS on this branch. They come from the base alex/od-models (b40e79b v90j WIP), NOT from
+   home-1: `git diff origin/alex/od-models...HEAD -- src` = only 98hm_home.js, 70_roam_world.js (1 line), ORDER, MAP.md. Ship them with od-models' own review.
+8. Check that the 99c pin coverage isn't hidden by the HOME card.
