@@ -113,13 +113,15 @@ function BX_mats(){if(BX.M)return BX.M;const M=BX.M={};
 const bxCol=c=>new THREE.Color(c);
 // piece mesh: road top (textured) + body (kerbs, sides, bottom; vertex colours). Collision uses these same meshes.
 const BX_PROF=[[-3.5,0,-3.5,.14,1,0,'k'],[-3.5,.14,-4,.14,0,1,'k'],[-4,.14,-4,-.8,-1,0,'s'],[-4,-.8,4,-.8,0,-1,'b'],[4,-.8,4,.14,1,0,'s'],[4,.14,3.5,.14,0,1,'k'],[3.5,.14,3.5,0,-1,0,'k']];
+// side barriers (Alex: "frustrated because of the multiple spawning"): a 1 m kerb-coloured wall on both edges keeps the car on the deck; SPLIT/MERGE have none (their lanes cross)
+const BX_RAIL=[[-4,.14,-4,1.4,-1,0,'k'],[-4,1.4,-3.55,1.4,0,1,'k'],[-3.55,1.4,-3.55,.14,1,0,'k'],[3.55,.14,3.55,1.4,-1,0,'k'],[3.55,1.4,4,1.4,0,1,'k'],[4,1.4,4,.14,1,0,'k']];
 function BX_geo(S,def){const rp=[],rn=[],ru=[],ri=[],bp=[],bc=[],bi=[],tmp=bxV(),cS=bxCol(def.boost?'#ff8a00':def.cp?'#0055bf':def.start?'#202020':'#a0a5a9'),cB=bxCol('#6d7276');
  for(let k=0;k<S.length;k++){const s=S[k];for(const x of[-BXRW,BXRW]){tmp.copy(s.p).addScaledVector(s.S,x);rp.push(tmp.x,tmp.y,tmp.z);rn.push(s.U.x,s.U.y,s.U.z);ru.push(x<0?0:1,s.d/8)}
   if(k){const a=(k-1)*2;ri.push(a,a+2,a+1,a+1,a+2,a+3)}}
  // fix winding of the road so its front face points along U
  {const A=bxV().fromArray(rp,0),B=bxV().fromArray(rp,6),C=bxV().fromArray(rp,3),n=bxV().crossVectors(B.clone().sub(A),C.clone().sub(A));if(n.dot(S[0].U)<0)for(let i=0;i<ri.length;i+=3){const t=ri[i+1];ri[i+1]=ri[i+2];ri[i+2]=t}}
  let vb=0;const kerbC=(k)=>((S[k].d/2|0)%2?bxCol('#c91a09'):bxCol('#f4f4f4'));
- for(const e of BX_PROF){for(let k=1;k<S.length;k++){const q=[];for(const kk of[k-1,k])for(const[x,y]of[[e[0],e[1]],[e[2],e[3]]]){const s=S[kk];tmp.copy(s.p).addScaledVector(s.S,x).addScaledVector(s.U,y);q.push(tmp.clone())}
+ for(const e of def.in||def.p.length>1?BX_PROF:[...BX_PROF,...BX_RAIL]){for(let k=1;k<S.length;k++){const q=[];for(const kk of[k-1,k])for(const[x,y]of[[e[0],e[1]],[e[2],e[3]]]){const s=S[kk];tmp.copy(s.p).addScaledVector(s.S,x).addScaledVector(s.U,y);q.push(tmp.clone())}
    const nE=S[k].S.clone().multiplyScalar(e[4]).addScaledVector(S[k].U,e[5]),n=bxV().crossVectors(q[2].clone().sub(q[0]),q[1].clone().sub(q[0]));
    const c=e[6]==='k'?kerbC(k):e[6]==='s'?cS:cB;for(const v of q){bp.push(v.x,v.y,v.z);bc.push(c.r,c.g,c.b)}
    if(n.dot(nE)>=0)bi.push(vb,vb+2,vb+1,vb+1,vb+2,vb+3);else bi.push(vb,vb+1,vb+2,vb+1,vb+3,vb+2);vb+=4}}
@@ -289,6 +291,9 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  // deck sides: a forward ray at bumper height against the piece meshes (walls = faces whose normal is far from our up)
  if(objs.length&&!V.boat){const sp=V.v.length();if(sp>1){const d=V.v.clone().normalize();BX.ray.set(V.p.clone().addScaledVector(U,.55),d);BX.ray.far=2.4+sp*dt;const h=BX.ray.intersectObjects(objs,false)[0];
   if(h&&h.face&&h.face.normal.dot(U)<.5){const nw=h.face.normal,vn=V.v.dot(nw);if(vn<0){V.v.addScaledVector(nw,-vn*1.3);m.wall++;V.p.addScaledVector(nw,.2)}}}}
+ // barriers: on a railed piece the car's centre stays within 2.5 m of the deck centre line; the outward speed is taken away (it slides along the wall)
+ {const q=V.on&&!V.on.def.in&&V.on.S.length===1?V.on:null;if(q&&!V.boat){let b=null,bd=1e9;for(const s of q.S[0]){const d=s.p.distanceToSquared(V.p);if(d<bd){bd=d;b=s}}
+  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=2.5;if(Math.abs(lat)>lim&&Math.abs(lat)<6){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg*1.15);if(vo>4)m.wall++}}}}
  V.p.addScaledVector(V.v,dt);
  // respawn rules (the ONLY ones): below the terrain minimum, upside down >2 s (not in a loop), >40 m from the course >3 s (BX_farCheck)
  if(V.p.y<V.tMin-3)return BX_respawn('fall');
