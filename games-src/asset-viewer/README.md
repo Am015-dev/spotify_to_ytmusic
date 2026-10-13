@@ -6,6 +6,9 @@ game screens with painted art in place, animation clips.
 Source of truth is the Windows laptop copy (`Desktop\game-assets\viewer`); this folder is a code-only copy.
 Sync direction: laptop -> repo. Large data (`glb/`, `src/`, `media/`, `flowthumbs/`, Flow images) is not in git.
 
+Online (read-only snapshot): https://am015-dev.github.io/spotify_to_ytmusic/asset-viewer/ (Production board, Flow Planner,
+Asset Board). Refresh it with `python viewer/export_static.py`, then push `games/asset-viewer` (Pages deploys `games/`).
+
 ## Run
 
 ```sh
