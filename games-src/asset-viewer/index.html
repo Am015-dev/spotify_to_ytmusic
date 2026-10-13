@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRELLIS Models</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  :root { --bg: #16181d; --card: #22252c; --ink: #e8e6e1; --mute: #9a9ca3; --ok: #3fa34d; --drop: #6b6e76; --redo: #d23a2e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.4 system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #2c2f36; }
+  h1 { font-size: 18px; margin: 0 8px 0 0; }
+  select, button { background: var(--card); color: var(--ink); border: 1px solid #3a3d45; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  main { padding: 16px; display: grid; gap: 16px; }
+  .item { background: var(--card); border-radius: 12px; padding: 12px; }
+  .item.redo { outline: 2px solid var(--redo); }
+  .item.missing { opacity: .7; border: 1px dashed #4a4d55; }
+  .miss { color: #e0b050; font-size: 13px; margin: 4px 0 8px; }
+  .ph { width: 360px; max-width: 100%; height: 360px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+        background: repeating-linear-gradient(45deg, #23262d 0 12px, #1d2026 12px 24px); color: var(--mute); text-align: center; }
+  .ph img { width: 100%; height: 100%; object-fit: contain; background: #d9d9d9; border-radius: 10px; }
+  .badges { display: flex; gap: 4px; flex-wrap: wrap; padding: 0 10px 8px; }
+  .b { font-size: 11px; padding: 2px 6px; border-radius: 10px; background: #2c3038; color: var(--mute); }
+  .b.good { background: #1f3a26; color: #8fd19e; } .b.warn { background: #43361a; color: #e0b050; } .b.bad { background: #4a1f1f; color: #f08a80; }
+  .b.ship { background: #1d2f4a; color: #8fb8f0; }
+  model-viewer { cursor: zoom-in; }
+  #big { position: fixed; inset: 0; z-index: 9; background: rgba(10,11,14,.96); display: flex; flex-direction: column; }
+  #big[hidden] { display: none; }
+  #bigmv { flex: 1; width: 100%; height: auto; background: #2c3038; cursor: grab; }
+  #close { position: absolute; top: 12px; right: 12px; z-index: 10; }
+  #bigcap { padding: 10px 16px; color: var(--ink); }
+  .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+  .head b { font-size: 16px; } .head span { color: var(--mute); }
+  .versions { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; }
+  .ver { background: #1b1d22; border-radius: 10px; overflow: hidden; position: relative; }
+  .ver.drop { opacity: .45; } .ver.ok { outline: 2px solid var(--ok); }
+  model-viewer { width: 100%; height: 360px; background: #2c3038; }
+  .src { position: absolute; top: 8px; right: 8px; width: 84px; height: 84px; object-fit: contain; background: #d9d9d9; border-radius: 6px; border: 1px solid #3a3d45; }
+  .bar { padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .bar span { color: var(--mute); font-size: 12px; }
+  button.on.ok { background: var(--ok); } button.on.drop { background: var(--drop); } button.on.redo { background: var(--redo); }
+</style>
+</head>
+<body>
+<header>
+  <h1>TRELLIS Models</h1>
+  <a href="board.html" style="color:#5b8fd6">Production</a>
+  <a href="assets.html" style="color:#5b8fd6">Asset Board</a>
+  <a href="screens.html" style="color:#5b8fd6">Screens</a>
+  <a href="flow.html" style="color:#5b8fd6">Flow planner</a>
+  <a href="media.html" style="color:#5b8fd6">Video &amp; SFX</a>
+  <select id="game"><option value="">All games</option></select>
+  <select id="show"><option value="">All items</option><option value="open">Needs vote</option><option value="redo">Redo</option><option value="kept">Kept</option><option value="pixal">Has Pixal3D</option><option value="missing">Missing</option></select>
+  <input id="q" type="search" placeholder="Search items" style="background:var(--card);color:var(--ink);border:1px solid #3a3d45;border-radius:6px;padding:6px 10px">
+  <select id="sort"><option value="t">Recently updated</option><option value="name">Name</option></select>
+  <span id="count"></span>
+  <button id="copy">Copy redo list</button>
+  <span id="saved" style="color:var(--mute)"></span>
+</header>
+<div id="sum" style="padding:8px 16px 0;color:var(--mute)"></div>
+<main id="grid"></main>
+<div id="big" hidden><button id="close">Close (Esc)</button><model-viewer id="bigmv" camera-controls auto-rotate shadow-intensity="1" exposure="1.1"></model-viewer><div id="bigcap"></div></div>
+<script>
+// manifest.json: [{game, name, glb, src, kb}] from viewer/build_manifest.py. Versions of one item ("tower-a", "tower-a-v2",
+// "tower-a-v3", "tower-a-pixal") are grouped. Votes: "game/name" -> ok|drop per version, "game/base" -> redo per item.
+// Saved to viewer/votes.json through serve.py (and this browser as a fallback).
+const votes = (() => { try { return JSON.parse(localStorage.getItem('votes') || '{}'); } catch { return {}; } })();
+const status = t => { document.getElementById('saved').textContent = t; };
+const save = () => {
+  try { localStorage.setItem('votes', JSON.stringify(votes)); } catch {}
+  fetch('votes', { method: 'POST', body: JSON.stringify(votes) }).then(r => status(r.ok ? 'saved to votes.json' : 'save failed'), () => status('save failed'));
+};
+const badges = i => [
+  i.shipped ? '<span class="b ship">on GitHub</span>' : '',
+  i.see == null ? '' : `<span class="b ${i.see < 0.005 ? 'good' : i.see < 0.03 ? 'warn' : 'bad'}" title="see-through gaps, worst of 8 views (vm/hole_check.py)">gaps ${(i.see * 100).toFixed(1)}%</span>`,
+  i.upright == null ? '' : `<span class="b ${i.upright ? 'good' : 'warn'}">${i.upright ? 'upright' : 'not upright'}</span>`,
+].join('');
+const base = n => n.replace(/-pixal(-game)?$/, '').replace(/-v\d+$/, '');
+const ver = n => (n.replace(/-pixal(-game)?$/, '').match(/-v(\d+)$/) || [0, 1])[1];
+const rank = n => /-pixal-game$/.test(n) ? 200 + +ver(n) : /-pixal$/.test(n) ? 100 + +ver(n) : +ver(n);
+const label = n => /-pixal-game$/.test(n) ? `Pixal3D game (v${ver(n)} image)` : /-pixal$/.test(n) ? `Pixal3D (v${ver(n)} image)` : `v${ver(n)}`;
+// no-store: the browser otherwise reuses a cached manifest and new models do not show after a refresh (2026-10-10)
+Promise.all([fetch('manifest.json', { cache: 'no-store' }).then(r => r.json()),
+             fetch('votes.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))]).then(([items, disk]) => {
+  // old votes used "bad": on an item that means redo
+  Object.assign(votes, disk);
+  for (const [k, v] of Object.entries(votes)) if (v === 'bad') { delete votes[k]; votes[k.split('/')[0] + '/' + base(k.split('/')[1])] = 'redo'; }
+  const groups = {};
+  for (const i of items) (groups[`${i.game}/${base(i.name)}`] ||= []).push(i);
+  for (const g of Object.values(groups)) g.sort((a, b) => rank(a.name) - rank(b.name));
+  const sel = document.getElementById('game'), show = document.getElementById('show');
+  [...new Set(items.map(i => i.game))].forEach(g => sel.add(new Option(g, g)));
+  const draw = () => {
+    const models = k => groups[k].filter(i => !i.missing), miss = k => groups[k].find(i => i.missing);
+    const kept = k => models(k).some(i => votes[`${i.game}/${i.name}`] === 'ok');
+    const FILTER = { '': () => true, redo: k => votes[k] === 'redo', kept, open: k => models(k).length && !kept(k) && votes[k] !== 'redo',
+                     pixal: k => groups[k].some(i => /-pixal/.test(i.name)), missing: k => !!miss(k) };
+    const nMiss = Object.keys(groups).filter(k => miss(k)).length;
+    document.getElementById('show').options[5].text = `Missing (${nMiss})`;
+    const upd = k => Math.max(0, ...groups[k].map(i => i.t || 0));  // newest version of the item
+    const sortBy = document.getElementById('sort').value;
+    const q = document.getElementById('q').value.trim().toLowerCase();
+    const keys = Object.keys(groups).sort().sort((a, b) => sortBy === 't' ? upd(b) - upd(a) : 0)
+      .filter(k => (!sel.value || k.startsWith(sel.value + '/')) && FILTER[show.value](k) && (!q || k.toLowerCase().includes(q)));
+    const all = Object.keys(groups);
+    document.getElementById('sum').textContent = `${all.length} items · ${all.filter(kept).length} kept · ` +
+      `${all.filter(k => votes[k] === 'redo').length} redo · ${all.filter(k => miss(k)).length} missing · ` +
+      `${all.filter(k => groups[k].some(i => i.shipped)).length} on GitHub · ${all.filter(k => FILTER.open(k)).length} need a vote`;
+    document.getElementById('count').textContent = `${keys.length} items`;
+    document.getElementById('grid').innerHTML = keys.map(k => `
+      <section class="item ${votes[k] === 'redo' ? 'redo' : ''} ${models(k).length ? '' : 'missing'}">
+        <div class="head"><div><b>${k.split('/')[1]}</b> <span>${k.split('/')[0]} · ${models(k).length ? `${models(k).length} version${models(k).length > 1 ? 's' : ''}` : 'no model yet'}</span></div>
+          ${models(k).length ? `<button class="redo ${votes[k] === 'redo' ? 'on' : ''}" data-k="${k}" data-v="redo">Redo</button>` : ''}</div>
+        ${miss(k) ? `<div class="miss">${models(k).length ? 'Pixal3D version missing' : 'Missing'}: ${miss(k).missing}</div>` : ''}
+        ${miss(k) && !models(k).length ? `<div class="ph">${miss(k).src ? `<img src="${miss(k).src}" alt="source image">` : `<span>no image yet<br>${k.split('/')[1]}</span>`}</div>` : ''}
+        <div class="versions">${models(k).map(i => { const vk = `${i.game}/${i.name}`; return `
+          <div class="ver ${votes[vk] || ''}">
+            <model-viewer src="${i.glb}" camera-controls auto-rotate shadow-intensity="1" exposure="1.1" loading="lazy"></model-viewer>
+            <img class="src" src="${i.src}" alt="source" loading="lazy">
+            <div class="badges">${badges(i)}</div>
+            <div class="bar"><div><b>${label(i.name)}</b> <span>${i.kb} KB${i.t ? ' · ' + new Date(i.t * 1000).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</span></div>
+              <div><button class="ok ${votes[vk] === 'ok' ? 'on' : ''}" data-k="${vk}" data-v="ok">Keep</button>
+                   <button class="drop ${votes[vk] === 'drop' ? 'on' : ''}" data-k="${vk}" data-v="drop">Drop</button></div></div>
+          </div>`; }).join('')}</div>
+      </section>`).join('');
+  };
+  sel.onchange = show.onchange = document.getElementById('sort').onchange = draw; draw();
+  document.getElementById('q').oninput = draw;
+  // click a model -> full screen; Esc or Close returns
+  const big = document.getElementById('big'), bigmv = document.getElementById('bigmv');
+  const closeBig = () => { big.hidden = true; bigmv.removeAttribute('src'); };
+  document.getElementById('close').onclick = closeBig;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBig(); });
+  document.getElementById('grid').addEventListener('dblclick', e => {
+    const mv = e.target.closest('model-viewer'); if (!mv) return;
+    bigmv.setAttribute('src', mv.getAttribute('src'));
+    document.getElementById('bigcap').textContent = mv.closest('.item').querySelector('.head b').textContent + ' · ' + mv.closest('.ver').querySelector('.bar b').textContent;
+    big.hidden = false;
+  });
+  document.getElementById('grid').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const { k, v } = b.dataset;
+    votes[k] = votes[k] === v ? undefined : v; if (!votes[k]) delete votes[k];
+    if (v === 'ok') {  // keeping one version drops the others and clears the item's redo
+      const g = k.split('/')[0] + '/' + base(k.split('/')[1]);
+      groups[g].forEach(i => { const vk = `${i.game}/${i.name}`; if (vk !== k && votes[k] === 'ok') votes[vk] = 'drop'; });
+      if (votes[k] === 'ok') delete votes[g];
+    }
+    save(); draw();
+  };
+  document.getElementById('copy').onclick = () => {
+    const t = Object.keys(votes).filter(k => votes[k] === 'redo').sort().join('\n');
+    navigator.clipboard.writeText(t).then(() => status(`copied ${t ? t.split('\n').length : 0} redo items`), () => prompt('Redo list', t));
+  };
+});
+</script>
+</body>
+</html>

@@ -4,6 +4,13 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Orchestrator state (13 Oct 2026)
+- Owner pages: shelf What's new panel (`games/updates.json`, add with `games-src/scripts/add-update.py`), missing assets `games/missing.html`, facelift list `games/facelift.html` (`games-src/FACELIFT.md`), screenshot grid `games/shots.html` (rebuild: `games-src/scripts/shots-gallery.py`).
+- 3D: owner's Pixal3D models at FULL detail in `games/<game>/models/<item>.glb` + `-lite.glb` (phones/Low) + sprites; `games-src/facelift-3d/MODELS.md`. Never decimate the owner's models below 40k tris / 1024 px textures without asking.
+- In progress (cloud workers, 13 Oct): Crown + Doorkick UI kits + 3D, Sands 3D; 3D wiring for the other 12 board games (earlier workers stopped at the weekly usage limit: check `git log` for "Facelift" before redoing anything).
+- Owner rules this week: credits = "Art and music by Am015-dev", never name the music/art tools; "Shuffle all songs" is the default music; music never changes playback rate; check a live link (curl 200) before sending it; look at PC layouts as well as phone.
+- Open owner decisions: replace the few CC BY tracks (credits must stay while used); open games as separate pages instead of the shelf iframe (frees memory fully).
+
 ## Mainhattan Nightrun J1 (10 Oct 2026)
 - Music is locked at playbackRate 1 with natural pitch (`NR.music.setRate` ignores everything but 1); TEMPO UP = double-time fire + score x2, SLOW GROOVE = world at 0.6x (`PW.wk`) + soft low-pass, master limiter. `audio-test.js` asserts rate 1 and no clipping through TEMPO, SLOW, DROP, low hull.
 - `parts/fun.js`: set pieces every 6 bars (WEAVE, LASER FENCE, district formation), DROP every 16 bars (dash on the downbeat), shard showers; mini-boss every ~26 bars. `fun-test.js` covers it; bots call `FUN.cost(y)`.
@@ -12,7 +19,7 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 ## Standing rules
 - Never write an original game's, publisher's or designer's name in the public repo or the site. No model names
   in files or commits.
-- A live game is replaced only after the owner OKs a preview (`games/<slug>-next/` or `thornbound-new/`).
+- Publish live once checks pass (owner, 5 Oct); preview folders are retired and deleted.
 - Don't edit the Mainhattan / Overdrive games; other sessions own them. Ticket to Ride is on hold.
 - Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
