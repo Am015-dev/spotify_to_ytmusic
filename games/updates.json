@@ -11,6 +11,27 @@
  },
  {
   "date": "2026-10-13",
+  "game": "final-approach",
+  "title": "Final Approach: a real 3D airliner",
+  "items": [
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane"
+  ],
+  "check": "Finish a flight and watch the plane land or crash"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Short Fuse: a real 3D bomb",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big"
+  ],
+  "check": "Make a wrong cut, then let the fuse run out"
+ },
+ {
+  "date": "2026-10-13",
   "game": "shipwreck",
   "title": "Real 3D castaways and palms",
   "items": [
