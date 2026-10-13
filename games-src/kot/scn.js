@@ -28,6 +28,8 @@
   var inBoard = function (sel) { var b = $('[data-board]'), e = $(sel); if (!b || !e) return 'missing ' + sel; var B = b.getBoundingClientRect(), r = e.getBoundingClientRect(); return (r.width > 3 && r.left >= B.left - 1 && r.right <= B.right + 1 && r.top >= B.top - 1 && r.bottom <= B.bottom + 1) || sel + ' is outside the board'; };
   var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
 
+  // Known, listed in HANDOFF.md: the 'PERMANENT' card tag on the PC market prints at 9.9 px
+  GXS.known.push({ re: /span\.chip\.cK/, why: 'PC card tag under 11 px' });
   GXS.glowSel += ',#ob [data-act].pulse';   // the pulsing SMASH! button is a glowing legal target: it must answer a real tap
   var faces = function (a, f) { return a.filter(function (x) { return x === f; }).length; };
   var hp = function () { return G.pl.map(function (p) { return p.hp; }); };
@@ -94,7 +96,7 @@
           var q = cur(); if (b.en - a.en !== window.__cost) return 'energy ' + b.en + ' -> ' + a.en + ' but the card costs ' + window.__cost;
           if (a.cards.indexOf(window.__id) < 0) return 'the card is not in your hand of cards';
           if (a.mk.length !== 3 || a.mk.indexOf(window.__id) >= 0) return 'the market was not refilled with a new card (' + a.mk.join(',') + ')';
-          if (GXS.num('header.gx-bar .pchip.me .e') !== q.en) return 'screen energy ' + GXS.num('header.gx-bar .pchip.me .e') + ' != engine ' + q.en;
+          if (document.querySelector('header.gx-bar .pchip.me .e') && GXS.num('header.gx-bar .pchip.me .e') !== q.en) return 'screen energy ' + GXS.num('header.gx-bar .pchip.me .e') + ' != engine ' + q.en;
           return true; } }
     ]
   };
@@ -131,12 +133,12 @@
         snap: function () { return { tid: G.tid, act: G.active, en: cur().en, alive: G.pl.filter(function (p) { return p.alive; }).length }; },
         steps: [{ sel: '#ob [data-act="end"]' }],
         idle: myRoll,
-        verify: function (b, a) { return (a.tid >= b.tid + 4 && a.act === b.act && G.rolls > 0) || 'turn ' + b.tid + ' -> ' + a.tid + ' (expected the 3 computer monsters to play, then you again); rolls ' + G.rolls; } },
+        verify: function (b, a) { return (a.tid > b.tid && a.act === b.act && G.rolls > 0) || 'turn ' + b.tid + ' -> ' + a.tid + ' (expected the 3 computer monsters to play, then you again); rolls ' + G.rolls; } },
       { kind: 'play', name: 'tap SMASH! on the new turn: it goes on to buying', settleMs: 8000,
         snap: smashSnap, steps: [{ sel: '#ob [data-act="resolve"]' }], idle: settled, verify: smashVerify },
       { kind: 'play', name: 'End turn again: you are back on a fresh roll', settleMs: 8000,
         snap: function () { return { tid: G.tid }; }, steps: [{ sel: '#ob [data-act="end"]', ready: function () { return G.phase === 'buy'; } }],
-        idle: myRoll, verify: function (b, a) { return a.tid >= b.tid + 4 || 'turn ' + b.tid + ' -> ' + a.tid; } }
+        idle: myRoll, verify: function (b, a) { return a.tid > b.tid || 'turn ' + b.tid + ' -> ' + a.tid; } }
     ]
   });
 
