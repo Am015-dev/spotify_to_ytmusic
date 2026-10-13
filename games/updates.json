@@ -1,6 +1,15 @@
 [
  {
   "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Thornbound Throne: the real crown",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways"
+  ],
+  "check": "Finish a game and look at the winner screen"
+ },
+ {
+  "date": "2026-10-13",
   "game": "kaiten-kitchen",
   "title": "Kaiten Kitchen: real brass cloches",
   "items": [
