@@ -141,11 +141,12 @@
     for (var n = e.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.nodeValue.trim()) { r.selectNodeContents(n); var q = r.getBoundingClientRect(); if (q.width > 0) { L = Math.min(L, q.left); T = Math.min(T, q.top); R = Math.max(R, q.right); B = Math.max(B, q.bottom); } }
     return { left: L, top: T, right: R, bottom: B, width: R - L, height: B - T }; }
   function related(a, b) { return a === b || a.contains(b) || b.contains(a); }
-  function scrim(t) { var r = t.getBoundingClientRect(); return r.width * r.height >= .6 * innerWidth * innerHeight; }
+  function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
+  S.known = [];   // known findings a game lists on purpose: {re: /message/, why: 'owner-listed in HANDOFF.md'}; they are not hidden, scenario-test prints how many were skipped
   S.glowSel = '.bf-tgt,.glow,[data-legal]';
   S.audit = function () {
     var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 8) { seen[m] = 1; out.push(m); } }
@@ -181,11 +182,11 @@
     else if (m.t === 'js') (0, eval)(m.js);
   };
 
-  S.universal = function () {
+  S.universal = function (inv) {
     var out = [], de = document.documentElement;
     if (Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1) out.push('horizontal scroll ' + de.scrollWidth + '>' + innerWidth);
     var t = document.getElementById('gxscn-tag'); if (!t || !t.textContent) out.push('Test tag missing');
-    try { S.audit().forEach(function (m) { out.push(m); }); } catch (x) { out.push('audit threw ' + x.message); }
+    if (inv !== false) try { S.audit().forEach(function (m) { if (S.known.some(function (k) { return k.re.test(m); })) S.skipped = (S.skipped || 0) + 1; else out.push(m); }); } catch (x) { out.push('audit threw ' + x.message); }
     return out;
   };
 

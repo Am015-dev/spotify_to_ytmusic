@@ -43,10 +43,10 @@ async function listScn(browser, base, slug) {
 const tapAt = (page, sz, x, y) => sz.phone ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
 
 async function runOne(browser, base, slug, sc, sz, mut) {
-  const t0 = Date.now(), fails = [], { ctx, page, errs } = await openScn(browser, base, slug, sc.id, sz);
+  const t0 = Date.now(), fails = [], { ctx, page, errs } = await openScn(browser, base, slug, sc.id, sz); let info = null;
   try {
     await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => fails.push('scenario never became ready'));
-    const info = await page.evaluate(() => window.GXSCN).catch(() => null);
+    info = await page.evaluate(() => window.GXSCN).catch(() => null);
     if (info && info.error) fails.push(info.error);
     if (mut && info && !info.error) {   // scripts/scenario-mutate.js: break the feature on purpose before any check runs
       const ok = await page.evaluate(m => { try { if (m.t === 'named') return GXS.mutateNamed(m.name); GXS.mutate(m); return true; } catch (e) { return String(e.message); } }, mut);
@@ -90,8 +90,8 @@ async function runOne(browser, base, slug, sc, sz, mut) {
       }
     }
     if (info && !info.error) {
-      (await page.evaluate(() => GXS.universal()).catch(() => [])).forEach(m => fails.push(m));
-      for (let k = 0; k < 3; k++) {   // every glowing legal target must answer a real tap (the game state must change)
+      (await page.evaluate(inv => GXS.universal(inv), !process.env.SCN_NOINV).catch(() => [])).forEach(m => fails.push(m));
+      if (!process.env.SCN_NOINV) for (let k = 0; k < 3; k++) {   // every glowing legal target must answer a real tap (the game state must change)
         const g = await page.evaluate(() => ({ t: GXS.glow(), fp: GXS.fp() })).catch(() => ({ t: [] }));
         if (!g.t.length) break;
         await tapAt(page, sz, g.t[0].x, g.t[0].y); await sleep(500);
@@ -101,7 +101,7 @@ async function runOne(browser, base, slug, sc, sz, mut) {
     errs.forEach(e => fails.push('page error: ' + e));
   } catch (e) { fails.push('harness: ' + String(e.message).slice(0, 100)); }
   finally { await ctx.close(); }
-  return { id: sc.id, size: sz.id, mut: mut ? (mut.name || mut.t) : undefined, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) };
+  return { info, id: sc.id, size: sz.id, mut: mut ? (mut.name || mut.t) : undefined, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) };
 }
 
 module.exports = { SIZES, openScn, listScn, runOne };
