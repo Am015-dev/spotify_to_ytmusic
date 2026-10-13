@@ -20,7 +20,7 @@ const RS={n:0};
 {const _f=RD_fillLoop;RD_fillLoop=function(trimOnly){const r=_f.apply(this,arguments);try{RS_seams()}catch(e){console.warn('RS',e)}return r}}
 // GO check (checklist "roads: no gap at the Messe"): a top-down picture of the road (the GPU's downward ray: asphalt meshes free their CPU copy,
 // so a raycast can't see them), sampled every 2 m along the road from the spawn to the next street: every sample must be asphalt, not grass.
-const RS_SPOT={x:2160,z0:520,z1:420,n:'Messe grid seam (Hot Drop)'};
+const RS_SPOT={x:2160,z0:485,z1:405,n:'Messe grid seam (Hot Drop)'};
 function RS_strip(x0,z0,x1,z1){const cx=(x0+x1)/2,cz=(z0+z1)/2,L=Math.hypot(x1-x0,z1-z0),S=Math.max(40,L+20),P=256;
  const cam=new THREE.OrthographicCamera(-S/2,S/2,S/2,-S/2,1,3000);cam.position.set(cx,800,cz);cam.up.set(0,0,-1);cam.lookAt(cx,0,cz);cam.updateMatrixWorld();
  const hid=[];scene.traverse(o=>{if(o.visible&&(o.isInstancedMesh||o.isSprite||o.isPoints||(o.isMesh&&o.material&&o.material.transparent)))hid.push(o)});for(const o of hid)o.visible=false;
