@@ -209,3 +209,35 @@ html.ph-l .mine .hand .card.play,html.ph-l .mine .hand .card.sug{translate:0 cal
 html.ph-l .mine .hand .card.bf-picked{translate:0 -30px!important}
 /* an open drawer (diary, cards, menu) sits over the board: the board under it takes no taps and shows no glowing targets */
 html:has(.gx-drawer.on) .gx-main{pointer-events:none}
+
+/* ---- fight numbers: one big scoreline across the top of the fight (YOU 9 vs 13 MONSTERS) ---- */
+.arena:has(>.sline){padding-top:78px}
+.arena .sline{position:absolute;top:2px;left:0;right:0;z-index:6;display:grid;justify-items:center;gap:0;pointer-events:none}
+.sline .sl1{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,22px);padding:2px 22px 3px;border-radius:18px;background:rgba(18,8,3,.86);box-shadow:0 0 0 2px #0d0603,0 3px 0 rgba(0,0,0,.5)}
+.sline .sy,.sline .sm{position:relative;display:flex;align-items:baseline;gap:8px}
+.sline .sl1 i{font:700 .9rem/1 var(--title);font-style:normal;letter-spacing:.08em;color:#f3e3c0}
+.sline .n{font:900 clamp(40px,4.6vw,56px)/1 var(--title);font-variant-numeric:tabular-nums;color:#fff;-webkit-text-stroke:2px #0d0603;paint-order:stroke fill;text-shadow:0 3px 0 #0d0603;min-width:1.1em;text-align:center}
+.sline .sy .n{color:#8fd7ff}.sline .sm .n{color:#ff9d88}
+.sline.win .sy .n{color:#9dff8a;text-shadow:0 0 14px rgba(120,255,110,.7),0 3px 0 #0d0603}
+.sline.lose .sm .n{color:#ff6a55;text-shadow:0 0 14px rgba(255,80,60,.7),0 3px 0 #0d0603}
+.sline.lose .sy .n{color:#ff8a7a}
+.sline .sv{font:800 1.1rem var(--title);color:#e6c677}
+.sline .sd{margin-top:2px;padding:0 12px;border-radius:99px;font:800 1rem/1.35 var(--title);background:rgba(18,8,3,.86);color:#f3e3c0;box-shadow:0 0 0 1.5px #0d0603}
+.sline.win .sd{color:#9dff8a}.sline.lose .sd{color:#ff9d88}
+.fxfly{position:absolute;left:50%;top:0;font:900 1.9rem/1 var(--title);-webkit-text-stroke:2px #0d0603;paint-order:stroke fill;pointer-events:none;white-space:nowrap;z-index:7}
+.fxfly.up{color:#9dff8a}.fxfly.dn{color:#ff8a7a}
+.arena .vs .score .num{display:none}
+.arena .vs .score{padding:3px 8px}
+.arena .mon>.small.mstr{font:800 1.15rem/1.1 var(--title);color:#fff;-webkit-text-stroke:1.5px #0d0603;paint-order:stroke fill;text-shadow:0 2px 0 #0d0603}
+.arena .mon .card .tag{transform:scale(1.4);transform-origin:top left}
+.arena .mon .gchip{min-height:40px;font-size:.95rem;font-weight:800}.arena .mon .gchip b{font-size:1.15rem}
+html.ph .arena:has(>.sline){padding-top:60px}
+html.ph .sline .n{font-size:clamp(32px,9vw,40px);-webkit-text-stroke:1.5px #0d0603}
+html.ph .sline .sl1{padding:1px 14px 2px;gap:8px}html.ph .sline .sl1 i{font-size:.7rem}
+html.ph .sline .sd{font-size:.82rem;line-height:1.25}
+html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:15px}
+html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
+@media (max-height:600px){html.ph .arena:has(>.sline){padding-top:56px}html.ph .sline .n{font-size:32px}}
+html .arena .vs .score .num{display:none!important}
+html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.58rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
+html.ph .sline .n{min-width:.9em}

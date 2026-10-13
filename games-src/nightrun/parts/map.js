@@ -46,14 +46,17 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
     b.type='button';b.className='nd'+(boss?' boss':mini?' mini':s.ch?' chl':'')+(s.n===cur?' cur':'')+(s.n===MAPD.sel?' sel':'');
     b.dataset.n=s.n;b.dataset.id='s'+s.n;b.dataset.nd=!ok?'locked':k>0?'done':boss||mini?'boss':'open';b.style.cssText=`left:${nd.x}px;top:${nd.y}px;--c:${D.a}`;
     b.setAttribute('aria-label',`Stage ${s.n} ${s.name}${ok?'':' locked'}`);
-    const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'':(nd.x<L.W/2?'r':'l');
-    b.innerHTML=`<i class="ring"></i><span class="no">${s.ch?'◆':s.n}</span>${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm ${side}">${s.name}</span>`;
+    const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'v':(nd.x<L.W/2?'r':'l');b.classList.add('s'+side);   // r / l: the label sits beside the medallion, v: under it
+    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.ch?'◆':s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
     b.addEventListener('click',()=>mapPick(s.n));root.append(b);}
   box.append(root);
+  if(!box._edge){box._edge=1;let q=0;box.addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;mapEdge();});},{passive:true});}
   // scroll: keep the place on a relayout, else bring the current stage into view
   const c=by[MAPD.sel>0?MAPD.sel:cur];
   if(L.land){box.scrollLeft=keepFrac!=null&&MAPD.keep?keepFrac*L.W:Math.max(0,c.x-w*.4);}else{box.scrollTop=keepFrac!=null&&MAPD.keep?keepFrac*L.H:Math.max(0,c.y-h*.55);}
-  MAPD.keep=true;mapDetail(MAPD.sel);}
+  MAPD.keep=true;mapDetail(MAPD.sel);requestAnimationFrame(mapEdge);}
+/* a name that would be cut by the edge of the map (or the screen) is hidden until it scrolls fully into view */
+function mapEdge(){const box=$('stRows');if(!box||selEl.hidden)return;const br=box.getBoundingClientRect();for(const n of box.querySelectorAll('.nd')){const r=n.querySelector('.meta').getBoundingClientRect();n.classList.toggle('ed',r.left<br.left+1||r.right>br.right-1||r.top<br.top+1||r.bottom>br.bottom-1);}}
 function mapPick(n){const ok=unlocked(n);MAPD.sel=n;for(const e of document.querySelectorAll('#stRows .nd'))e.classList.toggle('sel',+e.dataset.n===n);
   if(!ok){const e=document.querySelector(`#stRows .nd[data-n="${n}"]`);if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}}
   mapDetail(n);mapReveal(n);}
@@ -87,7 +90,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 #stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);
   border:14px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/14px stretch;background:#05030c99}
 #stsel .mapbox.land .ban{transform:none;align-items:flex-start;text-align:left}
-#stsel .ban small{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--dim)}
+#stsel .ban small{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#c9c3ee}
 #stsel .ban b{font-size:clamp(15px,4.4vw,22px);letter-spacing:.14em;color:var(--c);line-height:1.1}
 #stsel .ban span{font-family:var(--mono);font-size:11px;color:#cfc9f2}
 #stsel .rt{position:absolute;left:0;top:0;pointer-events:none;z-index:1;overflow:visible}
@@ -96,27 +99,29 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 #stsel .rt .rl{stroke-width:5;stroke-dasharray:2 11;opacity:.85}
 #stsel .rt .rl.on{stroke-width:6;stroke-dasharray:none;filter:none;opacity:.95}
 #stsel .rt .rl.br{stroke-width:4;stroke-dasharray:3 9}
-#stsel .nd{position:absolute;z-index:3;width:54px;height:54px;margin:-27px 0 0 -27px;padding:0;border:0;background:url(media/ui-node-open.webp) center/contain no-repeat;color:#fff;font-family:var(--display);font-weight:700;
-  font-size:17px;text-shadow:0 0 3px #000,0 0 7px #000;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
-#stsel .nd::before{content:"";position:absolute;inset:-8px}
-#stsel .nd[data-nd=done]{background-image:url(media/ui-node-done.webp)}
-#stsel .nd[data-nd=boss]{background-image:url(media/ui-node-boss.webp)}
-#stsel .nd[data-nd=locked]{background-image:url(media/ui-node-locked.webp);color:var(--dim)}
-#stsel .nd.boss{width:84px;height:84px;margin:-42px 0 0 -42px;font-size:26px;background-image:url(media/ui-node-boss.webp)}
-#stsel .nd.mini{width:68px;height:68px;margin:-34px 0 0 -34px;font-size:22px;background-image:url(media/ui-node-boss.webp)}
-#stsel .nd.boss[data-nd=locked],#stsel .nd.mini[data-nd=locked]{background-image:url(media/ui-node-locked.webp)}
-#stsel .nd.boss[data-nd=done],#stsel .nd.mini[data-nd=done]{background-image:url(media/ui-node-done.webp)}
-#stsel .nd.chl{width:48px;height:48px;margin:-24px 0 0 -24px;filter:hue-rotate(160deg) saturate(1.2);font-size:18px}
-#stsel .nd.chl[data-nd=locked]{filter:grayscale(.6)}
+#stsel .nd{position:absolute;z-index:3;margin:0;padding:0;border:0;background:none;color:#fff;font-family:var(--display);font-weight:700;font-size:17px;text-shadow:0 0 3px #000,0 0 7px #000;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;--m:54px}
+#stsel .nd.boss{--m:84px;font-size:26px}#stsel .nd.mini{--m:68px;font-size:22px}#stsel .nd.chl{--m:48px;font-size:18px}
+#stsel .nd .md{position:relative;flex:0 0 auto;width:var(--m);height:var(--m);display:flex;align-items:center;justify-content:center;background:url(media/ui-node-open.webp) center/contain no-repeat}
+#stsel .nd[data-nd=done] .md{background-image:url(media/ui-node-done.webp)}
+#stsel .nd[data-nd=boss] .md,#stsel .nd.boss .md,#stsel .nd.mini .md{background-image:url(media/ui-node-boss.webp)}
+#stsel .nd[data-nd=locked] .md{background-image:url(media/ui-node-locked.webp);color:#e6e2ff}
+#stsel .nd.boss[data-nd=done] .md,#stsel .nd.mini[data-nd=done] .md{background-image:url(media/ui-node-done.webp)}
+#stsel .nd.chl .md{filter:hue-rotate(160deg) saturate(1.2)}#stsel .nd.chl[data-nd=locked] .md{filter:grayscale(.6)}
+/* the button is the whole plate: medallion + stars + name. The anchor is the medallion centre. */
+#stsel .nd.sr{transform:translate(calc(var(--m)/-2),-50%)}
+#stsel .nd.sl{flex-direction:row-reverse;transform:translate(calc(var(--m)/2 - 100%),-50%)}
+#stsel .nd.sv{flex-direction:column;gap:0;transform:translate(-50%,calc(var(--m)/-2))}
+#stsel .nd .meta{display:flex;flex-direction:column;gap:0;min-width:0;padding:2px 7px;border-radius:7px;background:#05030cd0;text-align:left;align-items:flex-start}
+#stsel .nd.sl .meta{align-items:flex-end;text-align:right}
+#stsel .nd.sv .meta{align-items:center;text-align:center;margin-top:-6px}
 #stsel .nd .ring{position:absolute;inset:-5px;border-radius:50%;border:3px solid var(--c);opacity:0;pointer-events:none}
 #stsel .nd.cur .ring{opacity:.9;animation:ndp 1.5s ease-out infinite}
+#stsel .nd.ed .meta{visibility:hidden}
 #stsel .nd.sel .ring{opacity:1;border-color:#fff;inset:-6px;animation:none;box-shadow:0 0 10px #fff}
 @keyframes ndp{0%{transform:scale(.9);opacity:.95}100%{transform:scale(1.5);opacity:0}}
-#stsel .nd .stars{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:-3px;font-size:12px;letter-spacing:0;color:#ffe14d;white-space:nowrap;text-shadow:0 0 3px #000,0 0 5px #000}
-#stsel .nd svg.lk{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:-1px;height:12px;width:12px;color:var(--dim)}
-#stsel .nd .nm{position:absolute;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;letter-spacing:.02em;white-space:nowrap;max-width:112px;overflow:hidden;text-overflow:ellipsis;padding:2px 7px;border-radius:6px;background:#05030cd0;color:var(--ink);text-shadow:none;pointer-events:none}
-#stsel .nd .nm.r{left:100%;margin-left:6px}#stsel .nd .nm.l{right:100%;margin-right:6px}
-#stsel .mapbox.land .nd .nm,#stsel .nd .nm:not(.r):not(.l){top:100%;left:50%;right:auto;margin:14px 0 0;transform:translateX(-50%)}
+#stsel .nd .stars{font-size:12px;line-height:1.15;letter-spacing:0;color:#ffe14d;white-space:nowrap;text-shadow:none}
+#stsel .nd svg.lk{height:13px;width:13px;color:var(--dim)}
+#stsel .nd .nm{font-size:12px;line-height:1.2;font-weight:700;letter-spacing:.02em;white-space:nowrap;color:var(--ink);text-shadow:none}
 #stsel .nd[data-nd=locked] .nm{color:var(--dim)}
 #stsel .nd.shake{animation:pgsh .3s}
 #stDet{position:absolute;z-index:6;left:50%;bottom:calc(var(--u)*2);transform:translateX(-50%);width:min(94%,520px);box-sizing:border-box;display:flex;flex-direction:column;gap:5px;padding:2px 4px;

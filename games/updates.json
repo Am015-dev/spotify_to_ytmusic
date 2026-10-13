@@ -1,6 +1,67 @@
 [
  {
   "date": "2026-10-13",
+  "game": "short-fuse",
+  "title": "Short Fuse: painted workshop kit",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit"
+  ],
+  "check": "Look at the table and the fuse strip"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "crown",
+  "title": "Play it on the board",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons.",
+   "Tap SMASH! over the city to use your dice",
+   "Cards for sale are painted cards on the board: hold to read, tap to buy",
+   "Your power cards sit along the top of the board",
+   "Stay or yield opens in the middle of the board",
+   "The side panel is smaller: just status and advice"
+  ],
+  "check": "Roll, keep a die, tap SMASH!, then hold a card and tap it to buy"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Fight numbers you can read",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals."
+  ],
+  "check": "Kick open a door and fight a monster"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Kaiten Kitchen: painted chef tags and icons",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit"
+  ],
+  "check": "Look under each chef on the table"
+ },
+ {
+  "date": "2026-10-13",
   "game": "shelf",
   "title": "Game versions and status page",
   "items": [
@@ -32,20 +93,6 @@
    "Bid chips 13 px"
   ],
   "check": "sweep 4/4 clean, no empty or clipped button labels"
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Buttons readable again",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut"
-  ],
-  "check": "tutor-test 390x763 + 1280x800 and button label/contrast check pass"
  },
  {
   "date": "2026-10-13",
@@ -115,20 +162,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "crown",
-  "title": "Every power card now has its own painting",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out",
-   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
-   "Hearts, energy and stars fly to the chips as painted icons."
-  ],
-  "check": "Open the Cards shop: each card has a picture, a dark name plate and readable text."
- },
- {
-  "date": "2026-10-13",
   "game": "mainhattan",
   "title": "Animated bosses and a one-tap Lab",
   "items": [
@@ -153,27 +186,6 @@
    "Stone-framed menus and buttons, ribbon and goblet on the result"
   ],
   "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour."
- },
- {
-  "date": "2026-10-13",
-  "game": "kaiten-kitchen",
-  "title": "Kaiten Kitchen: real brass cloches",
-  "items": [
-   "The domes over each pick are now detailed 3D brass cloches",
-   "They still lift with steam when the round reveals"
-  ],
-  "check": "Pick a plate and watch the cloches lift"
- },
- {
-  "date": "2026-10-13",
-  "game": "short-fuse",
-  "title": "Short Fuse: a real 3D bomb",
-  "items": [
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big"
-  ],
-  "check": "Make a wrong cut, then let the fuse run out"
  },
  {
   "date": "2026-10-10",

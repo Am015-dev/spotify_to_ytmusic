@@ -46,8 +46,8 @@ const HLP_STEPS={
   choice:{target:()=>HLP_Q('#choice .acts'),title:'Make a choice',text:'Each button says what it does. Not sure? Tap the bulb.',pic:()=>hlpIcons([HLP_BULB],'',60)},
   roll:{target:()=>HLP_Q('#dice'),title:'Tap dice to keep',text:'Tap the dice you like. They turn yellow and stay. Then press Roll.',pic:()=>hlpFaces(['3'],'',[0])},
   reroll:{target:()=>HLP_Q('#pacts [data-act="reroll"]'),title:'Roll the rest',text:'Press Roll to throw the dice you did not keep.',pic:()=>hlpFaces(['2','C'],'')},
-  done:{target:()=>HLP_Q('#pacts [data-act="resolve"]'),title:'Use your dice',text:'Press Done to score them: stars, energy, hearts and claws.',pic:()=>hlpFaces(['E','C','H'],'')},
-  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Tap a card to read it, then tap Buy. Or press Done to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
+  done:{target:()=>HLP_Q('#pacts [data-act="resolve"]'),title:'Use your dice',text:'Tap SMASH! over the city to score them: stars, energy, hearts and claws.',pic:()=>hlpFaces(['E','C','H'],'')},
+  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Hold a card to read it, tap to buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
   watch:{target:()=>{const e=HLP_Q('#bline');return e&&e.getClientRects().length&&e.textContent?e:HLP_Q('#ptop')},title:'Others are playing',text:'Watch their dice. Tap the board to speed them up.',pic:()=>hlpIcons([HLP_CROWN],'',60)}};
 const HLP_RULES=[
   {title:'Win the city',text:'First monster to 20 ★ wins. The last monster standing wins too.',pic:()=>hlpIcons([HLP_STAR,HLP_CROWN],'20 ★ wins')},
@@ -78,16 +78,16 @@ const HLP_ALL=[].concat(HLP_RULES,
   HLP_PH('reroll',[
     {title:'Roll again',text:'Press Roll to throw every die you did not keep. You get up to two rerolls.',pic:()=>hlpFaces(['3','3','2'],'keep two, roll one',[0,1])},
     {title:'Chase a triple',text:'Two matching numbers score nothing. Keep the pair and roll for a third one.',pic:()=>hlpFaces(['2','2','2'],'three = 2 ★',[0,1,2])},
-    {title:'Happy already?',text:'You can press Done at any time. You do not have to use every roll.',pic:()=>hlpIcons([HLP_BTN('Done','#ffd23f')],'',84)}]),
+    {title:'Happy already?',text:'You can tap SMASH! at any time. You do not have to use every roll.',pic:()=>hlpIcons([HLP_BTN('SMASH!','#ff7a3a')],'',84)}]),
   HLP_PH('done',[
-    {title:'Using your dice',text:'Done scores them: numbers give ★, ⚡ adds energy, hearts heal, claws hit.',pic:()=>hlpFaces(['3','E','H','C'],'')},
+    {title:'Using your dice',text:'SMASH! scores them: numbers give ★, ⚡ adds energy, hearts heal, claws hit.',pic:()=>hlpFaces(['3','E','H','C'],'')},
     {title:'Claws',text:'Outside Downtown, claws hit the monster inside. Inside Downtown, they hit everyone outside.',pic:()=>hlpIcons([HLP_CROWN,HLP_ARROW],'claws hit the city')},
     {title:'What follows',text:'If Downtown is empty you move in for 1 ★. Then you may buy cards with ⚡.',pic:()=>hlpIcons([HLP_CROWN,HLP_STAR],'+1 ★')}]),
   HLP_PH('buy',[
     {title:'Power cards',text:'Spend ⚡ on the face-up cards. Tap a card to read it, tap Buy to take it.',pic:hlpShop},
     {title:'Card types',text:'PERMANENT cards stay with you. ONE-SHOT cards act at once. SAVE FOR LATER cards wait for their moment.',pic:()=>hlpIcons([HLP_CARD],'')},
     {title:'New cards',text:'Pay 2 ⚡ to throw away the cards for sale and deal fresh ones.',pic:hlpShop},
-    {title:'Save your ⚡',text:'Buying nothing is fine: saved ⚡ carries over. Press Done to end your turn.',pic:()=>hlpIcons([HLP_BTN('Done','#ffd23f')],'',84)}]),
+    {title:'Save your ⚡',text:'Buying nothing is fine: saved ⚡ carries over. Tap End turn to finish.',pic:()=>hlpIcons([HLP_BTN('End turn','#ffd23f')],'',84)}]),
   HLP_PH('watch',[
     {title:'Others play',text:'Each monster takes a turn. Watch which dice they keep. Tap the board to speed it up.',pic:()=>hlpFaces(['1','C','E'],'')},
     {title:'Your moment',text:'You get a pop-up when you may yield Downtown or play a special card.',pic:()=>hlpIcons([HLP_BTN('Yield','#ffd23f')],'',84)},
