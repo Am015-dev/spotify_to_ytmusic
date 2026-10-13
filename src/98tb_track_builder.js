@@ -78,7 +78,8 @@ function TB_def(t){const key=JSON.stringify(t);if(TB.defs[t.id]&&TB.defs[t.id].k
   const cp=[],ter={},tseg=[];for(let k=0;k<n;k++){const i=(st+k)%n,p=t.pts[i],nm=secOf(i);cp.push([p[0]/S,p[2]||0,p[1]/S,nm]);tseg.push(p[3]||'grass')}
   const jumps=t.pc.filter(p=>p.k==='jump').map((p,k)=>({id:'tbj'+k,name:'JUMP',kind:'pit',at:[p.x/S,p.z/S],half:22,floor:-8,style:ath?'rock':'creek',msg:'BIG AIR'}));
   const routes=t.pc.filter(p=>p.k==='scw'||p.k==='scd').map(p=>{const q=rot(TB_segOf(t,g,p));return{a:q,b:(q+1)%n,kind:p.k==='scw'?'water':'dirt',kf:p.k==='scw'?1.45:undefined}}).filter((r,i,a)=>a.findIndex(o=>o.a===r.a)===i);
-  const def={id:t.id,tb:t,name:t.name||'My Track',short:(t.name||'My Track').slice(0,18),open:1,w:96,w15:96,laps:t.laps,bank:.25,road:clamp(t.road/2,5,8.5),mood:ath?'athnoon':'brick',tunnel:'',clear:[],city:ath?'ath':undefined,
+  // laps: 99_api.js scales every race's laps by CR_RK (round(laps·CR_RK)); pre-divided so the author's 1–3 laps survive
+  const def={id:t.id,tb:t,name:t.name||'My Track',short:(t.name||'My Track').slice(0,18),open:1,w:96,w15:96,laps:t.laps/CR_RK,bank:.25,road:clamp(t.road/2,5,8.5),mood:ath?'athnoon':'brick',tunnel:'',clear:[],city:ath?'ath':undefined,
     desc:'Built in the track builder.',cp,jumps,ro:{ter,tseg,routes,cliffs:[],sky:ath?0:1,acro:ath?1:0,col:ath?[0xa7a94a,0xa8763e,0xecd9a0,0xd8cdb8]:[0x58b43a,0x9b6a3c,0xe2c98a,0x9a948a]}};
   if(!ath)delete def.city;TB.defs[t.id]={key,def};return def}
 function TB_reg(def){const i=TRACK_DEFS.findIndex(d=>d.id===def.id);if(i>=0)TRACK_DEFS[i]=def;else TRACK_DEFS.push(def);return def}
