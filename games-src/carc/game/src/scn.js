@@ -1,6 +1,7 @@
 // Rampart & Vine scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
 (function () {
   if (!window.GXS) return;
+  GXS.labPos = "r";   // the LAB button sits top-right here: the player name is top-left
   var booted = function () { return typeof G !== 'undefined' && typeof beginGame === 'function' && typeof render === 'function' && typeof UI !== 'undefined' && typeof onGlow === 'function'; };
   var $ = function (s) { return document.querySelector(s); };
   var idle = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };

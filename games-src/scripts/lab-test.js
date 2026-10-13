@@ -52,6 +52,7 @@ async function testGame(browser, base, slug) {
   const lctx = await phoneCtx(browser, 390, 763), lp = await openGame(lctx, base, slug, '?scn=list', errs);
   await lp.waitForFunction(() => window.GXSLIST, null, { timeout: 20000 }).catch(() => { });
   const list = await lp.evaluate(() => window.GXSLIST || []); await lctx.close();
+  if (process.env.GX_STAGE) { const fs = require('fs'), path = require('path'); let all = {}; try { all = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'games', 'scenarios.json'), 'utf8')); } catch (e) { } try { Object.assign(all, JSON.parse(fs.readFileSync(path.join(process.env.GX_STAGE, 'scenarios.json'), 'utf8'))); } catch (e) { } all[slug] = list; fs.writeFileSync(path.join(process.env.GX_STAGE, 'scenarios.json'), JSON.stringify(all)); }
   ok(list.length >= 2, '(b) fewer than 2 scenarios registered (' + list.length + ')');
   // ---- (b) on, 390x763: menu lists GXSLIST, every GO runs ----
   { const ctx = await phoneCtx(browser, 390, 763), page = await openGame(ctx, base, slug, '?test=1', errs);
@@ -62,7 +63,7 @@ async function testGame(browser, base, slug) {
       await tapSel(page, '#gxlab-btn');
       const rows = await page.evaluate(() => [...document.querySelectorAll('#gxlab-menu .gxl-row')].map(r => r.dataset.id));
       ok(rows.length === list.length && list.every(s => rows.includes(s.id)), `(b) LAB rows [${rows.join(',')}] != scenarios [${list.map(s => s.id).join(',')}]`);
-      for (const s of list) {
+      for (const s of list.filter(x => x.sizes !== 'pc')) {   // PC-only scenarios cannot run at 390x763
         const open = await page.evaluate(() => { const m = document.getElementById('gxlab-menu'); return !!m && !m.hidden; });
         if (process.env.LABDBG) console.log('menu open?', open, page.url().slice(-45)); if (!open) await tapSel(page, '#gxlab-btn');
         await page.evaluate(id => { const b = document.querySelector('#gxlab-menu [data-go="' + id + '"]'); if (b) b.scrollIntoView({ block: 'center' }); }, s.id);
@@ -84,7 +85,7 @@ async function testGame(browser, base, slug) {
   { const ctx = await phoneCtx(browser, 390, 763), page = await openGame(ctx, base, slug, '?test=1', errs);
     try {
       const upds = await page.evaluate(() => fetch('../updates.json').then(r => r.json()));
-      const ents = upds.filter(e => e.game === gid).slice(0, 4), tot = ents.reduce((a, e) => a + (e.items || []).length, 0);
+      const ents = upds.filter(e => e.game === gid || e.game === slug).slice(0, 4), tot = ents.reduce((a, e) => a + (e.items || []).length, 0);
       ok(ents.length > 0, '(c) no What\'s new entry for ' + gid + ' in updates.json');
       await page.waitForSelector('#gxlab-ck', { timeout: 15000 }); await tapSel(page, '#gxlab-ck');
       const shown = await page.evaluate(() => [...document.querySelectorAll('#gxlab-card .gxl-item')].map(e => e.querySelector('.gxl-p').textContent));

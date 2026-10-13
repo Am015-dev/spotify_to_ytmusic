@@ -80,7 +80,35 @@
    "A rope fuse with a spark and a painted bomb",
    "Top bar, menus and buttons use the workshop kit"
   ],
-  "check": "Look at the table and the fuse strip"
+  "check": "Look at the table and the fuse strip",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-buttons",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",
@@ -158,7 +186,35 @@
    "Weather and time-of-day badges on the briefing",
    "Radio phrase buttons and the Roll plate are painted"
   ],
-  "check": "Open Flight and read the briefing; tap Roll"
+  "check": "Open Flight and read the briefing; tap Roll",
+  "scn": [
+   "fa-board",
+   "fa-board",
+   "fa-buttons",
+   "fa-zoom",
+   "fa-zoom",
+   "fa-buttons",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-13",

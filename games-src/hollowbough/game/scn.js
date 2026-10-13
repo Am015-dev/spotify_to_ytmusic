@@ -67,7 +67,7 @@
   });
 
   GXS.add({
-    id: 'hb-handtoggle', name: 'Hide and show the hand', ask: 'Tap the hand toggle. Does the row hide?', seed: 9, when: booted, group: 'Board',
+    id: 'hb-handtoggle', name: 'Hide and show the hand', ask: 'Tap the hand toggle. Does the row hide?', seed: 9, sizes: 'phone', when: booted, group: 'Board',
     setup: function () { return table(9); },
     checks: [
       { kind: 'visible', sel: '#bd .hc', name: 'hand row' },

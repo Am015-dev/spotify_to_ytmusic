@@ -66,4 +66,13 @@
     ]
   });
 
+  GXS.add({
+    id: 'sf-buttons', name: 'Painted buttons keep their labels', ask: 'Are the buttons readable?', seed: 14, when: booted, group: 'Board',
+    setup: function () { return table(14); },
+    checks: [
+      { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
+      skin
+    ]
+  });
+
 })();
