@@ -39,7 +39,8 @@ Report (under 150 words, once): per game before -> after numbers, scenario ids, 
 ```
 
 Orchestrator notes
-- One session per game batch, at most 10 cloud sessions at a time. Model: Haiku for chores (status refresh, copying, converting, repeating
+- ONE session per game, at most 15 at a time. Title starts with the group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) + game; tag it
+  group:<name> (set_session_tags); add it to the groups table in HANDOFF.md. Model: Haiku for chores (status refresh, copying, converting, repeating
   an already-written fix, checks that only report), Sonnet for code/fixes/tests. Never the main model for workers.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
 - If a worker reports it is out of context, start a new session with this template plus its HANDOFF note.

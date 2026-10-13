@@ -65,7 +65,7 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   - **Main model (orchestrator):** plan, decide, brief and review only; never runs chores itself (hand them to Haiku).
 - One fixer per game, one round, one deploy: the brief names exact functions/lines (grep first) and every known
   bug; the fixer fixes until the sweep is clean and reports in under 150 words. No AI-tester rework loops.
-- Cloud sessions allowed (owner, 6 Oct 2026): one per game, at most 10 at a time (owner, 13 Oct 2026, after the token fixes), model set to Sonnet on every one; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
+- Cloud sessions allowed (owner, 6 Oct 2026): ONE WORKER PER GAME, at most 15 at a time, Haiku or Sonnet per the model tiers (owner, 13 Oct 2026); every title starts with its group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) and the session gets the matching `group:<name>` tag, and HANDOFF.md keeps the groups table current; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
 - Answer each helper report once; ignore duplicate notifications. Commit work in progress as you go.
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks. Exception (owner, 13 Oct 2026): the orchestrator runs an
   hourly worker watchdog routine that makes any Game Night worker WRAP UP (commit + push all work, HANDOFF note, deploy what
