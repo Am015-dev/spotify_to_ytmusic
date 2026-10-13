@@ -34,16 +34,16 @@ function bfBuild(){if($bf('bfx'))return;const fx=document.createElement('div');f
     menu.insertAdjacentHTML('afterbegin',rows.map(([g,t,s])=>`<button class="btn mrow" data-gx="${g}" data-bfm="1">${t}<small>${s}</small></button>`).join(''))}}
 // ---- the one line on the board ----
 function bfOut(){if(!G||G.winner||G.mode!=='solo')return false;const me=meSeat();return me>=0&&!G.pl[me].alive}
-function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose below ↓';if(bfOut())return 'You’re knocked out · watching the end';
+function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose here';if(bfOut())return 'You’re knocked out · watching the end';
   if(UI.intro||UI.choice)return '';
   if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
-    if(G.rolls<=0||!nk)return 'No rolls left: tap Done';
+    if(G.rolls<=0||!nk)return 'No rolls left: tap SMASH';
     if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
-    return `Roll the other ${nk}, or tap Done`}
-  if(G.phase==='buy'&&!G.bug&&p.vp>=20)return '20★ reached: tap Done to win';
+    return `Roll the other ${nk}, or tap SMASH`}
+  if(G.phase==='buy'&&!G.bug&&p.vp>=20)return '20★ reached: End turn to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
-    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or Done to save ⚡':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: tap Done'}
+    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: End turn'}
   return ''}
 function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){BF.flash={t,until:bfNow()+(ms||2200)};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,(ms||2200)+20)}
@@ -143,7 +143,7 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
 // ---- render hook ----
 // the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
 function bfPlaceChips(){const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips'),dk=document.querySelector('.gx-dock');if(!bar||!ch||!dk)return;
-  if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pshop'))}
+  if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pfeed'))}
 function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
   const dk=document.querySelector('.gx-dock');const hold=!!(BF.cap&&bfNow()<BF.until);
   if(hold){clearTimeout(BF.holdT);BF.holdT=setTimeout(phRender,BF.until-bfNow()+40)}
@@ -178,10 +178,9 @@ function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfS
  // the old text tips stay off on phones: the finger and the line teach instead
  const _ct=checkTips;checkTips=function(){if(phOn())return;return _ct.apply(this,arguments)}}
 window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
-  const sh=t.closest&&t.closest('#pshop [data-shop]');if(sh){e.stopPropagation();e.preventDefault();bfTapCard(+sh.dataset.shop,sh);return}
-  if(t.closest&&t.closest('.gx-board')&&(UI.choice||UI.intro)&&!$bf('choice').classList.contains('hidden')){const c=$bf('choice');c.classList.remove('bfpoke');void c.offsetWidth;c.classList.add('bfpoke');bfFlash('Choose below ↓',1500);return}
+  if(t.closest&&t.closest('.gx-board')&&!t.closest('#ob')&&(UI.choice||UI.intro)&&!$bf('choice').classList.contains('hidden')){const c=$bf('choice');c.classList.remove('bfpoke');void c.offsetWidth;c.classList.add('bfpoke');bfFlash('Choose here',1500);return}
   if(t.closest&&t.closest('.gx-board')&&!humanTurn()&&!G.winner&&!UI.choice&&!UI.intro){bfSpeed()}
-  else if(t.closest&&t.closest('.gx-board')&&humanTurn()&&!UI.choice&&!UI.intro&&!t.closest('#bline')){bfFlash(G.phase==='roll'?'Tap the dice below ↓':'Tap a card below ↓',1300)}
+  else if(t.closest&&t.closest('.gx-board')&&humanTurn()&&!UI.choice&&!UI.intro&&!t.closest('#bline')&&!t.closest('#ob')){bfFlash(G.phase==='roll'?'Tap the dice':'Tap a card',1300)}
   if(t.closest&&t.closest('[data-die]')&&humanTurn()&&G.phase==='roll'){bfTut('keep',1);setTimeout(()=>{const d=t.closest('[data-die]');if(d&&typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},0)}
   if(t.closest&&t.closest('[data-act="reroll"]')&&humanTurn()&&G.phase==='roll'&&G.dice.some(d=>d.k))bfTut('roll',1);
   if(t.closest&&t.closest('[data-act="resolve"]')&&humanTurn()&&G.phase==='roll')bfTut('done',1);

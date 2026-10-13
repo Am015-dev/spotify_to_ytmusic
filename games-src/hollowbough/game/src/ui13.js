@@ -1,5 +1,6 @@
 // ===================== part 13: painted extras (card backs, tables, title and end art, portraits) and music (per screen + picker) =====================
 const MEDIA = 'media/';
+try { GXSK.init({}); } catch (e) {}
 const unl = t => { try { const u = GXC.unlocked().filter(x => x.type === t); return u.length ? u[u.length - 1].id : null; } catch (e) { return null; } };
 const IMG_OK = {};
 const preImg = f => { const i = new Image(); i.onload = () => { IMG_OK[f] = 1; }; i.src = MEDIA + f + '.webp'; };

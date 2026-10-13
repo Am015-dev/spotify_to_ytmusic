@@ -5,7 +5,7 @@
 // Per step it fails on: page errors; a control covered / off screen / under 30 px; the same screen for >8 s with nothing
 // moving; a tap on a glowing control that changes nothing; a text block over 8 words (the long-press / drawers excepted);
 // the score chips (hearts, stars, energy) differing from the engine for 3 probes in a row; the one board line over 8 words;
-// the ghost finger pointing at nothing; horizontal scroll; the board (data-board) under 55% of a portrait screen.
+// the ghost finger pointing at nothing; a control (SMASH!, Roll, End turn, dice, cards for sale) off the board or left in the panel; horizontal scroll; the board (data-board) under 55% of a portrait screen.
 const PW = require('/opt/node22/lib/node_modules/playwright'), path = require('path'), fs = require('fs');
 const E = process.env, FILE = path.resolve(E.FILE || 'kot2.html');
 const GAMES = +(E.GAMES || 10), PAR = +(E.PAR || 2), ROT = +(E.ROT || 3), STORY = E.STORY == null ? 2 : +E.STORY, MAXMS = +(E.MAXMS || 300000);
@@ -48,6 +48,11 @@ const PROBE = () => {
     const w = words(e.innerText); if (w.length > 8) out.wordy.push(w.length + 'w "' + w.slice(0, 6).join(' ') + '" in ' + e.tagName + '.' + e.className + '#' + e.id + ' < ' + (e.parentElement && (e.parentElement.id || e.parentElement.className)));
   }
   out.helpBad = []; for (const b of document.querySelectorAll('.gxh-bub,.gxh-rules .gxh-card')) { const r = b.getBoundingClientRect(); if (r.width && (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1)) out.helpBad.push('help element outside the screen: ' + b.className); }
+  // everything you play with is ON the board (the panel is not needed): SMASH!, Roll, End turn, the dice and the painted cards for sale
+  out.offBoard = []; { const bb = document.querySelector('[data-board]'); if (bb && out.humanTurn && !out.choice && !out.intro) { const br = bb.getBoundingClientRect();
+    for (const e of document.querySelectorAll('#ob [data-act="resolve"],#ob [data-act="reroll"],#ob [data-act="end"],#ob #dice .die,#ob #pshop .obc')) { const r = e.getBoundingClientRect(); if (r.width < 2 || (e.getAnimations && e.getAnimations().length)) continue;   // a tumbling die is not at rest yet
+      if (r.left < br.left - 2 || r.right > br.right + 2 || r.top < br.top - 2 || r.bottom > br.bottom + 2) out.offBoard.push((e.dataset.act || e.className.split(' ')[0]) + ' ' + Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.right) + ',' + Math.round(r.bottom)) }
+    if (document.querySelector('.gx-dock #dice .die,.gx-dock #pacts button,.gx-dock #pshop .obc')) out.offBoard.push('controls left in the panel') } }
   const bd = document.querySelector('[data-board]'); if (bd && innerHeight > innerWidth) { const r = bd.getBoundingClientRect(); out.board = Math.round(100 * Math.max(0, Math.min(r.right, innerWidth) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) / (innerWidth * innerHeight)); }
   const f = document.getElementById('bfinger'); if (f && f.classList.contains('on')) out.finger = { x: parseFloat(f.style.left), y: parseFloat(f.style.top) };
   // score chips vs the engine
@@ -64,7 +69,7 @@ async function newPage(b, W, H) {
 const SIG = () => typeof G === 'undefined' || !G ? '-' : [G.turn, G.phase, G.step, G.active, G.rolls, G.dice.map(d => d.f + (d.k ? 'k' : '')).join(''), G.pl.map(q => q.hp + ',' + q.vp + ',' + q.en + ',' + q.cards.length).join(';'), G.market.join(','), G.log && G.log.length, !!UI.choice, (document.getElementById('bline') || {}).textContent, document.querySelectorAll('.gxc:not([hidden])').length, UI.intro, UI.coach].join('|');
 async function choose(p, st, r) {
   return p.evaluate(([c, r1]) => {
-    const q = s => [...document.querySelectorAll(s)].filter(e => { const R = e.getBoundingClientRect(); return e.offsetParent !== null && !e.disabled && R.width > 4 && R.top >= 0 && R.bottom <= innerHeight && R.left >= 0 && R.right <= innerWidth && !e.closest('.hidden') });
+    const q = s => [...document.querySelectorAll(s)].filter(e => { const R = e.getBoundingClientRect(); return (e.offsetParent !== null || getComputedStyle(e).position === 'fixed') && !e.disabled && R.width > 4 && R.top >= 0 && R.bottom <= innerHeight && R.left >= 0 && R.right <= innerWidth && !e.closest('.hidden') });
     const pickR = a => a.length ? a[Math.floor(r1 * a.length) % a.length] : null; let el = null, kind = '';
     const ch = q('#choice [data-opt]'); if (c) { el = r1 < .25 ? pickR(ch) : (ch.find(e => /primary|sugg|rec/.test(e.className)) || pickR(ch)); kind = 'choice' }
     if (!el && G.phase === 'roll' && humanTurn()) {
@@ -79,6 +84,7 @@ async function choose(p, st, r) {
 async function checkStep(p, tag, st) {
   if (p.errs.length) await fail(p, tag, 'page error', p.errs[0]);
   if (st.hscroll) await fail(p, tag, 'hscroll', 'page scrolls sideways');
+  if (st.offBoard && st.offBoard.length) await fail(p, tag, 'control off the board', st.offBoard.slice(0, 3).join(' | '));
   for (const h of st.helpBad || []) await fail(p, tag, 'help geometry', h);
   if (st.board != null) { boardMin = Math.min(boardMin, st.board); if (st.board < 55) await fail(p, tag, 'board small', st.board + '%'); }
   if (st.line && st.line.split(/\s+/).filter(Boolean).length > 8) await fail(p, tag, 'line >8 words', st.line);
