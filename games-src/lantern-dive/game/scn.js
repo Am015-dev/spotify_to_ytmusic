@@ -59,4 +59,23 @@
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+  // painted art: card frames, tick/cross, seat plates and the portrait Descent table
+  GXS.add({
+    id: 'ld-art', name: 'Painted cards, seats, tick and cross', ask: 'Do cards and seats look painted?', seed: 5, when: booted,
+    setup: function () {
+      return table(5).then(function () {
+        try { GXC.unlocked = function () { return [{ type: 'table', id: 'tunnel-glow' }]; }; tableApply(); } catch (e) { }
+        return GXS.wait(function () { return /tunnel-glow/.test(getComputedStyle(document.documentElement).getPropertyValue('--tableimg')) && document.documentElement.classList.contains('sk-seat'); }, 8000);
+      }).then(function () { return idle(1200); });
+    },
+    checks: [
+      { kind: 'fn', name: 'all 5 card frames load', fn: function () { var bad = []; return Promise.all(['coral', 'tide', 'kelp', 'sunstar', 'lantern'].map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { if (!(i.naturalWidth > 0)) bad.push(n); r(); }; i.onerror = function () { bad.push(n); r(); }; i.src = 'media/card-face-' + n + '.webp'; }); })).then(function () { return !bad.length || 'not loaded: ' + bad.join(','); }); } },
+      { kind: 'fn', name: 'table cards use the painted frames', fn: function () { if (!PX || !PX.on) return true; var m = [0, 1, 2, 3, 4].filter(function (s) { return !PX.img['face' + s]; }); return !m.length || 'suits without frame: ' + m.join(','); } },
+      { kind: 'fn', name: 'tick and cross are painted and clipped to a disc', fn: function () { var t = KIT.stateMark(1, 100), c = KIT.stateMark(-1, 100); return (/icon-tick\.webp/.test(t) && /icon-cross\.webp/.test(c) && /clip-path/.test(t + c)) || 'marks not painted: ' + KIT.stateMark(1, 100).slice(0, 40); } },
+      { kind: 'fn', name: 'seat names sit on the brass plate and stay readable', fn: function () { var e = document.querySelector('.seat:not(.drone) .top .nm'); if (!e) return 'no seat name'; var cs = getComputedStyle(e), c = cs.color.match(/\d+/g).map(Number); return (/ui-seat\.webp/.test(cs.backgroundImage) && (c[0] + c[1] + c[2]) / 3 < 110 && parseFloat(cs.fontSize) >= 11) || 'plate ' + cs.backgroundImage.slice(0, 30) + ' ink ' + cs.color + ' ' + cs.fontSize; } },
+      { kind: 'fn', name: 'Descent table matches the screen shape', fn: function () { var v = getComputedStyle(document.documentElement).getPropertyValue('--tableimg'), want = innerWidth < 700 && innerHeight > innerWidth ? 'tunnel-glow-phone' : 'tunnel-glow.webp'; return v.indexOf(want) >= 0 || 'table image is ' + v.slice(-40) + ', wanted ' + want; } },
+      skin
+    ]
+  });
+
 })();
