@@ -39,10 +39,14 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
   - Phone rotation: iOS reports the old size right after rotating. Use one debounced relayout fed by resize,
     orientationchange, visualViewport and ResizeObserver, re-measured after ~400 ms.
+- **NO SCREENSHOTS (owner, 13 Oct 2026: "stop making screenshots, wire and create tests with GO I can approve").** Workers take
+  no screenshots, contact sheets, before/after images or shot grids, and commit no png/webp shots. Deliverable = the change + a
+  `?scn=` scenario with machine checks + a ✔ Test checklist item with GO. The owner approves by tapping GO. Only exception: the
+  owner asks for an image.
 - **Fast loop (owner, 13 Oct 2026; same rules as Overdrive):**
   - Tests first: a task's FIRST commit is its acceptance tests. Each test is one ✔ Test checklist item with a plain pass line
     and a `?scn=` link that spawns ONLY that requirement, plus an automated check of the same spawn that acts with REAL taps
-    (no forced state during the tested action). Done = every test passes, shown in ONE screenshot grid.
+    (no forced state during the tested action). Done = every test passes and its GO item is in the ✔ Test checklist.
   - The whole test set for a change runs in under 3 min. Prove a test with a 1-min dry run before any longer run; a run that
     fails on a script error is fixed, never repeated.
   - Workers commit at least every 10 min. Features over ~1 h or ~$5: spec + 3 acceptance tests + one mock-up first; the

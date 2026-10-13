@@ -651,12 +651,6 @@ html.sk .gx-drawer .gl,html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{text-de
 html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{color:#7c1b2c}
 html.sk .btn:has(>small),html.sk .btn:has(>b){flex-direction:column;gap:0}
 html.sk .gx-drawer{border-width:0}
-/* wide tap-rows (Tutorial) sit on the painted strip; border widths unchanged, only the paint changes */
-html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 5px stretch;text-align:center;color:var(--sk-ink);text-shadow:none}
-html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
-/* speech badge on the coach bubble, vellum sheet behind the detail popup */
-html.sk .gxh-bub::before{content:'';position:absolute;left:-9px;top:-11px;width:26px;height:20px;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;pointer-events:none}
-html.sk .ppop:not([hidden]){background:#e9d7a8 url(media/ui-sheet-c.webp) center/100% 100% no-repeat;border-top:0}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -1004,7 +998,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
     if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
     var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
-    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag' && !(t.closest && t.closest('#gxlab-bar'))) return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
     return ''; }
   function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
   S.step = function (i) {
@@ -1161,30 +1155,6 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
     checks: [
       { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
       skin
-    ]
-  });
-
-  /* painted art wiring (ui-row-c, ui-bubble-tail, ui-sheet-c): the files load and are used where they belong */
-  var artLoad = {};
-  GXS.add({
-    id: 'tb-art', name: 'Painted art: menu row and speech tail', ask: 'Do the menu row and tip tail look painted?', seed: 21, when: booted, group: 'UI',
-    setup: function () {
-      return table(21).then(function () {
-        ['ui-row-c', 'ui-bubble-tail', 'ui-sheet-c'].forEach(function (n) { var i = new Image(); i.onload = function () { artLoad[n] = i.naturalWidth > 0 ? 'ok' : 'empty'; }; i.onerror = function () { artLoad[n] = 'failed'; }; i.src = 'media/' + n + '.webp'; });
-        GX.show('setd');
-        var row = $('#setd .btn.gxt-menu'); if (row) row.scrollIntoView({ block: 'center' });
-        var b = document.createElement('div'); b.id = 'art-bub'; b.className = 'gxh-bub on gxh-a-bottom'; b.style.cssText = 'left:40px;top:70px';
-        b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">Tap a glowing card</div>'; document.body.appendChild(b);
-        var id = +document.querySelector('#handw .hc').dataset.id; openPop('card', { id: id, read: 1 });
-        return new Promise(function (r) { setTimeout(r, 700); });
-      });
-    },
-    checks: [
-      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = ['ui-row-c', 'ui-bubble-tail', 'ui-sheet-c'].filter(function (n) { return artLoad[n] !== 'ok'; }); return !bad.length || bad[0] + ' ' + artLoad[bad[0]]; } },
-      { kind: 'text', sel: '#setd .btn.gxt-menu', re: /\S/, name: 'row label readable' },
-      { kind: 'fn', name: 'Tutorial row uses the painted strip, not stretched', fn: function () { var e = $('#setd .btn.gxt-menu'); if (!e) return 'no row'; var r = e.getBoundingClientRect(); return (/ui-row-c/.test(getComputedStyle(e).borderImageSource) && r.height >= 40 && r.height <= 110) || 'row not painted: ' + getComputedStyle(e).borderImageSource + ' h' + r.height; } },
-      { kind: 'fn', name: 'speech badge on the coach bubble', fn: function () { var b = document.getElementById('art-bub'); var bg = b ? getComputedStyle(b, '::before').backgroundImage : ''; var w = b ? parseFloat(getComputedStyle(b, '::before').width) : 0; return (/ui-bubble-tail/.test(bg) && w >= 16) || 'badge missing: ' + bg + ' ' + w; } },
-      { kind: 'fn', name: 'detail sheet is the painted vellum', fn: function () { var e = document.getElementById('ppop'), bg = e ? getComputedStyle(e).backgroundImage : ''; return (!e.hidden && /ui-sheet-c/.test(bg)) || 'sheet missing: ' + bg; } },
     ]
   });
 

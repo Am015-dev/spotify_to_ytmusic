@@ -7,21 +7,35 @@ Generated 2026-10-13 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 109**: paintings 100, 3D source paintings 0, music/sound 8, video 1.
+**Total 111**: paintings 102, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
 Dropped as already done: 3 family already made, 283 made (finished card), 8 replaced by approved 3D model, 1 named in game code, 13 pattern already made, 9 kit/family made, 1 kit made, 8 stale.
 
-## Cauldron Fair (`cauldron-fair`): 3
+## Cauldron Fair (`cauldron-fair`): 5
 
 Style block (in front of every picture prompt): Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers
+
+### gx-bar-plate: gx bar plate
+- Why: look-check finding. Look-check: gx bar plate looks plain on screen
+- Type: painting; priority 1 (look-check)
+- Save as: `gx-bar-plate.webp` (laptop) -> `games/cauldron-fair/media/gx-bar-plate.webp`
+- Size/ratio: 1024x512, ratio 8.86, transparent (flat white background, we key it)
+- Prompt: Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers. a single gx bar plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
+
+### gx-drawer-head-plate: gx drawer head plate
+- Why: look-check finding. Look-check: gx drawer head plate looks plain on screen
+- Type: painting; priority 1 (look-check)
+- Save as: `gx-drawer-head-plate.webp` (laptop) -> `games/cauldron-fair/media/gx-drawer-head-plate.webp`
+- Size/ratio: 1024x512, ratio 6, transparent (flat white background, we key it)
+- Prompt: Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers. a single gx drawer head plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
 
 ### gxh-ok-button-plate: gxh ok button plate
 - Why: look-check finding. Look-check: gxh ok button plate looks plain on screen
 - Type: painting; priority 1 (look-check)
 - Save as: `gxh-ok-button-plate.webp` (laptop) -> `games/cauldron-fair/media/gxh-ok-button-plate.webp`
-- Size/ratio: 512x512, ratio 2.05, transparent (flat white background, we key it)
+- Size/ratio: 512x512, ratio 1.68, transparent (flat white background, we key it)
 - Prompt: Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers. a single gxh ok button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
 
 ### tlink-button-plate: tlink button plate
