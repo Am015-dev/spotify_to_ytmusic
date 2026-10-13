@@ -1,11 +1,11 @@
 // tCamGo: the cam: checklist tests (src/99c_checklist.js v90n/cam-go-*), automated. Each test runs the item's 📍 GO spawn (CAM_go: the ride on a straight
 // Frankfurt street / on foot), waits for the camera to settle, then measures what the player sees (__cam.meas: real camera, 3D): the road point 10 m past
 // the nose is not hidden by the ride (raycast) and sits in the lower middle (x 1/3-2/3, y 40-85 % from the top); the ride fills 15-35 % of the screen
-// height. Same in portrait 393×852 (framing checks snap the camera to its fitted target; the easing itself is the 'switch' check). bus/sport also drive 5 s with REAL keys (gas, then steer) and check the camera moves smoothly; 'switch' swaps
+// height. Same in portrait 393×852 (framing checks snap the camera to its fitted target; the easing itself is the 'switch' check). no driving (coordinator rule); optional 'drive' = a 3 s real-key input check on the bus; 'switch' swaps
 // sport → bus and checks the camera eases (no step > 0.5 m per 50 ms). Prints PASS/FAIL lines and "GO n/m".
 //   node tools/tCamGo.js <url …/index.html> [outdir] [tests: sport,bus,flatbed,truck,foot,switch]   env SHOTS=1 (bus+sport shots), BEFORE=1 (old camera)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
-const BASE=process.argv[2],OUT=process.argv[3]||'qa_camgo',ONLY=(process.argv[4]||'sport,bus,flatbed,truck,foot,switch,drive').split(','),SHOTS=process.env.SHOTS==='1',BEFORE=process.env.BEFORE==='1';fs.mkdirSync(OUT,{recursive:true});
+const BASE=process.argv[2],OUT=process.argv[3]||'qa_camgo',ONLY=(process.argv[4]||'sport,bus,flatbed,truck,foot,switch').split(','),SHOTS=process.env.SHOTS==='1',BEFORE=process.env.BEFORE==='1';fs.mkdirSync(OUT,{recursive:true});
 const ALL=process.env.ALL==='1';let nOk=0,nAll=0;const ok=(t,c,m,i)=>{nAll++;if(c)nOk++;if(!c||ALL)console.log((c?'PASS ':'FAIL ')+t+' · '+m+(i!==undefined?' · '+JSON.stringify(i):''))};
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(180000);
@@ -22,9 +22,9 @@ const ALL=process.env.ALL==='1';let nOk=0,nAll=0;const ok=(t,c,m,i)=>{nAll++;if(
   ok(T,m.fill>=.15&&m.fill<=.35,tag+': ride fills 15-35 % of the screen height',{fill:m.fill,top:m.top,bot:m.bot});return m};
  const shot=async f=>{if(!SHOTS)return;await p.evaluate(()=>__tq.draw()).catch(()=>{});await W(300);await p.screenshot({path:OUT+'/'+f,type:'jpeg',quality:75})};
  const drive=async T=>{const S=[];const smp=async ms=>{const e=Date.now()+ms;while(Date.now()<e){S.push(await cp());await W(50)}};
-  await p.keyboard.down('ArrowUp');await smp(3000);await p.keyboard.down('ArrowLeft');await smp(2000);await p.keyboard.up('ArrowLeft');await p.keyboard.up('ArrowUp');
+  await p.keyboard.down('ArrowUp');await smp(1500);await p.keyboard.down('ArrowLeft');await smp(1500);await p.keyboard.up('ArrowLeft');await p.keyboard.up('ArrowUp');
   const d=Math.hypot(S[S.length-1].x-S[0].x,S[S.length-1].z-S[0].z);let jb=0,jh=0;for(let i=1;i<S.length;i++){const q=50/Math.max(50,S[i].t-S[i-1].t);jb=Math.max(jb,q*Math.abs(S[i].b-S[i-1].b));jh=Math.max(jh,q*Math.abs(S[i].h-S[i-1].h))}
-  ok(T,d>=10,'drive 5 s (gas, then steer): the ride moves ≥ 10 m',{d:+d.toFixed(1)});ok(T,jb<.8&&jh<.6,'camera follows smoothly (no step > 0.8 m back / 0.6 m up per 50 ms)',{jb:+jb.toFixed(2),jh:+jh.toFixed(2)})};
+  ok(T,d>=5,'3 s input (gas, then steer): the ride moves ≥ 5 m',{d:+d.toFixed(1)});ok(T,jb<.8&&jh<.6,'camera follows smoothly (no step > 0.8 m back / 0.6 m up per 50 ms)',{jb:+jb.toFixed(2),jh:+jh.toFixed(2)})};
  const swS=[];const ride=async(k,T)=>{const sw=k==='bus'&&ONLY.includes('switch');await go(k);if(sw){const e=Date.now()+3500;while(Date.now()<e){swS.push(await cp());await W(50)}}await settle(!sw);await view(T,'landscape 852×393');await shot('cam_'+k+'.jpg');
   await p.setViewportSize({width:393,height:852});await settle();await view(T,'portrait 393×852');await p.setViewportSize({width:852,height:393})};
  try{
