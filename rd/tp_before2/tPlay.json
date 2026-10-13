@@ -1,0 +1,1936 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "fra": {
+    "min": 3.02,
+    "hits": 35,
+    "kinds": {
+     "traffic": 13,
+     "wall": 2,
+     "other": 19,
+     "ped": 1
+    },
+    "wallHits": 2,
+    "wallPerMin": 0.66,
+    "hitsPerMin": 11.6,
+    "bigDrop": 31,
+    "stuckPct": 4.2,
+    "avgKmh": 41.7,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 3.3,
+    "traffic120m": 15.2,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     }
+    ],
+    "stuckEp": [
+     {
+      "f": 758,
+      "x": 2030.3,
+      "z": 5.8,
+      "y": 7.78,
+      "h": -1.27,
+      "g": 0,
+      "car": 4.2,
+      "wall": null,
+      "ch": true,
+      "in": "G",
+      "veh": "ship",
+      "b2": "00000000",
+      "v2": 0,
+      "at121": {
+       "cd": 0,
+       "spcd": null,
+       "fr": false,
+       "wk": false,
+       "hp": 100,
+       "park": false,
+       "in": "B-1",
+       "stkT": 0,
+       "msg": "GO!",
+       "pop": "",
+       "cars": [
+        {
+         "d": 6.2,
+         "v": 9.6,
+         "k": 8,
+         "m": false
+        }
+       ]
+      },
+      "len": 151
+     },
+     {
+      "f": 4401,
+      "x": 1673.7,
+      "z": -11.7,
+      "y": 9.12,
+      "h": -12.28,
+      "g": 0,
+      "car": 6.7,
+      "wall": null,
+      "ch": true,
+      "in": "G",
+      "veh": "ship",
+      "b2": "00000000",
+      "v2": 0,
+      "at121": {
+       "cd": 0,
+       "spcd": null,
+       "fr": false,
+       "wk": false,
+       "hp": 100,
+       "park": false,
+       "in": "B1",
+       "stkT": 0,
+       "msg": "GO!",
+       "pop": "",
+       "cars": []
+      },
+      "len": 160
+     },
+     {
+      "f": 6248,
+      "x": 1736.1,
+      "z": 43.2,
+      "y": 10.11,
+      "h": -13.21,
+      "g": 0,
+      "car": 9.6,
+      "wall": null,
+      "ch": true,
+      "in": "G1",
+      "veh": "ship",
+      "b2": "00000000",
+      "v2": 0,
+      "at121": {
+       "cd": 0,
+       "spcd": null,
+       "fr": false,
+       "wk": false,
+       "hp": 100,
+       "park": false,
+       "in": "B-1",
+       "stkT": 0,
+       "msg": "GO!",
+       "pop": "",
+       "cars": []
+      },
+      "len": 145
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 4401,
+      "v0": 41,
+      "v1": 3,
+      "drop": 0.92,
+      "kind": "traffic",
+      "x": 1674,
+      "z": -12,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6247,
+      "v0": 44,
+      "v1": 5,
+      "drop": 0.88,
+      "kind": "other",
+      "x": 1736,
+      "z": 43,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 2165,
+      "v0": 41,
+      "v1": 6,
+      "drop": 0.86,
+      "kind": "traffic",
+      "x": 1803,
+      "z": -11,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6708,
+      "v0": 127,
+      "v1": 31,
+      "drop": 0.75,
+      "kind": "ped",
+      "x": 1691,
+      "z": 3,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4654,
+      "v0": 27,
+      "v1": 7,
+      "drop": 0.73,
+      "kind": "other",
+      "x": 1675,
+      "z": -8,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "wallList": [
+     {
+      "ctx": "GO!",
+      "f": 3606,
+      "v0": 39,
+      "v1": 15,
+      "drop": 0.63,
+      "kind": "wall",
+      "x": 1606,
+      "z": -103,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 7260,
+      "v0": 95,
+      "v1": 26,
+      "drop": 0.72,
+      "kind": "wall",
+      "x": 1636,
+      "z": -75,
+      "dy": 0
+     }
+    ],
+    "xmon": {
+     "sec": 191,
+     "carSamples": 75536,
+     "pedSamples": 63888,
+     "redRunPct": 9.52,
+     "redRuns": 2,
+     "sigEnter": 21,
+     "offRoadPct": 0,
+     "wrongSidePct": 2.72,
+     "wrongOneWayPct": 0,
+     "overlapPerMin": 1014.73,
+     "stuck20": 40,
+     "stuck60": 0,
+     "stuckCarPct": 32.37,
+     "uturnMid": 67,
+     "pedOnRoadPct": 24.41,
+     "pedOutsideCrossingPct": 18.14,
+     "pedHitByCar": 78,
+     "pedJumpsNearPlayer": 90,
+     "cvPedOK": 7,
+     "cvPedBad": 0,
+     "cvRecycled": 12,
+     "why": {
+      "none": 23464,
+      "hit": 987
+     },
+     "ovT": {
+      "sameEdge": 2904,
+      "junc": 41,
+      "park": 79,
+      "other": 119,
+      "oppEdge": 30,
+      "shareNode": 64
+     },
+     "ex": {
+      "red": [
+       [
+        1553,
+        -116
+       ],
+       [
+        1546,
+        -135
+       ]
+      ],
+      "off": [],
+      "wrong": [
+       [
+        1701,
+        2,
+        -1.9
+       ],
+       [
+        1701,
+        2,
+        -1.7
+       ],
+       [
+        1701,
+        2,
+        -1.5
+       ],
+       [
+        1700,
+        2,
+        -1.3
+       ],
+       [
+        1700,
+        1,
+        -1.1
+       ],
+       [
+        1700,
+        1,
+        -0.8
+       ],
+       [
+        1678,
+        -16,
+        -1.4
+       ],
+       [
+        1701,
+        3,
+        -2
+       ]
+      ],
+      "ped": [
+       [
+        2146,
+        -9
+       ],
+       [
+        2146,
+        -9
+       ],
+       [
+        2146,
+        7
+       ],
+       [
+        2151,
+        14
+       ],
+       [
+        2146,
+        -9
+       ],
+       [
+        2146,
+        -9
+       ],
+       [
+        2146,
+        7
+       ],
+       [
+        2151,
+        14
+       ]
+      ],
+      "ovl": [
+       [
+        2082,
+        8,
+        "sameEdge"
+       ],
+       [
+        2106,
+        8,
+        "sameEdge"
+       ],
+       [
+        2107,
+        8,
+        "sameEdge"
+       ],
+       [
+        1969,
+        8,
+        "sameEdge"
+       ],
+       [
+        2149,
+        8,
+        "sameEdge"
+       ],
+       [
+        1994,
+        8,
+        "sameEdge"
+       ],
+       [
+        1995,
+        8,
+        "sameEdge"
+       ],
+       [
+        2129,
+        8,
+        "sameEdge"
+       ]
+      ],
+      "stuck": []
+     },
+     "err": null
+    },
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.85,
+     "carL": 4.16,
+     "carH": 2.09,
+     "player": {
+      "h": 2.14,
+      "l": 4.48,
+      "w": 2.63
+     },
+     "pedRel": 1.11,
+     "pedVsPlayer": 1.03,
+     "nPed": 8,
+     "nCar": 8,
+     "pedNear": [
+      {
+       "d": 26.6,
+       "h": 1.73
+      },
+      {
+       "d": 27.1,
+       "h": 1.85
+      },
+      {
+       "d": 27.4,
+       "h": 1.86
+      },
+      {
+       "d": 27.8,
+       "h": 1.85
+      },
+      {
+       "d": 28.1,
+       "h": 1.8
+      },
+      {
+       "d": 28.6,
+       "h": 1.86
+      },
+      {
+       "d": 29.5,
+       "h": 1.77
+      },
+      {
+       "d": 29.5,
+       "h": 1.72
+      }
+     ],
+     "pedMax": 1.86
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1598,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#hitPop×#odPin",
+     "#roamArrow×#odPin",
+     "#hitPop×#juPop",
+     "#roamArrow×#r3Up",
+     "#r3Up×#odPin",
+     "#r3Up×#juPop"
+    ],
+    "tiny": [
+     "SMALL:10px:TAP TO CONTINUE",
+     "SMALL:9px:YOU"
+    ],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [],
+    "perf": {
+     "calls": 217,
+     "tris": 1564713,
+     "jsMs": 0,
+     "geoms": 4239,
+     "tex": 131
+    },
+    "mem": [
+     {
+      "f": 0,
+      "totMB": 373.7,
+      "geoms": 4102,
+      "tex": 129,
+      "sceneGeo": 4560,
+      "geoMB": 198,
+      "cpuGeoMB": 108.1,
+      "glMB": 143.5,
+      "str": {
+       "sup": 284,
+       "built": 35,
+       "mb": 35.9,
+       "lodT": 697910,
+       "b": 35,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 11.3
+      },
+      "heap": 80.9,
+      "glFix": 132.2
+     },
+     {
+      "f": 600,
+      "totMB": 369.3,
+      "geoms": 4127,
+      "tex": 129,
+      "sceneGeo": 4571,
+      "geoMB": 219.2,
+      "cpuGeoMB": 91.6,
+      "glMB": 162.4,
+      "str": {
+       "sup": 284,
+       "built": 37,
+       "mb": 38.3,
+       "lodT": 743675,
+       "b": 37,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 30.1
+      },
+      "heap": 81.8,
+      "glFix": 132.3
+     },
+     {
+      "f": 1200,
+      "totMB": 363.3,
+      "geoms": 4132,
+      "tex": 129,
+      "sceneGeo": 4589,
+      "geoMB": 224.1,
+      "cpuGeoMB": 96.5,
+      "glMB": 163.1,
+      "str": {
+       "sup": 284,
+       "built": 41,
+       "mb": 43.2,
+       "lodT": 839598,
+       "b": 41,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 30.1
+      },
+      "heap": 82.9,
+      "glFix": 133
+     },
+     {
+      "f": 1800,
+      "totMB": 363,
+      "geoms": 4161,
+      "tex": 129,
+      "sceneGeo": 4603,
+      "geoMB": 233.9,
+      "cpuGeoMB": 95.2,
+      "glMB": 171,
+      "str": {
+       "sup": 284,
+       "built": 43,
+       "mb": 47.5,
+       "lodT": 921824,
+       "b": 43,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 83.8,
+      "glFix": 135.4
+     },
+     {
+      "f": 2400,
+      "totMB": 365,
+      "geoms": 4163,
+      "tex": 129,
+      "sceneGeo": 4604,
+      "geoMB": 233.9,
+      "cpuGeoMB": 95.3,
+      "glMB": 171,
+      "str": {
+       "sup": 284,
+       "built": 43,
+       "mb": 47.5,
+       "lodT": 921824,
+       "b": 43,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 85.3,
+      "glFix": 135.4
+     },
+     {
+      "f": 3000,
+      "totMB": 365.1,
+      "geoms": 4167,
+      "tex": 130,
+      "sceneGeo": 4607,
+      "geoMB": 233.9,
+      "cpuGeoMB": 95.3,
+      "glMB": 171.6,
+      "str": {
+       "sup": 284,
+       "built": 44,
+       "mb": 47.5,
+       "lodT": 922048,
+       "b": 44,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 85.3,
+      "glFix": 136
+     },
+     {
+      "f": 3600,
+      "totMB": 365.3,
+      "geoms": 4183,
+      "tex": 131,
+      "sceneGeo": 4617,
+      "geoMB": 233.9,
+      "cpuGeoMB": 95.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 44,
+       "mb": 47.5,
+       "lodT": 922048,
+       "b": 44,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 85.6,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 4200,
+      "totMB": 365.5,
+      "geoms": 4183,
+      "tex": 131,
+      "sceneGeo": 4617,
+      "geoMB": 233.9,
+      "cpuGeoMB": 95.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 44,
+       "mb": 47.5,
+       "lodT": 922048,
+       "b": 44,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 85.8,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 4800,
+      "totMB": 365.7,
+      "geoms": 4183,
+      "tex": 131,
+      "sceneGeo": 4617,
+      "geoMB": 233.9,
+      "cpuGeoMB": 95.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 44,
+       "mb": 47.5,
+       "lodT": 922048,
+       "b": 44,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 86,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 5400,
+      "totMB": 365.9,
+      "geoms": 4183,
+      "tex": 131,
+      "sceneGeo": 4620,
+      "geoMB": 234,
+      "cpuGeoMB": 95.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 45,
+       "mb": 47.6,
+       "lodT": 923441,
+       "b": 45,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 86,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 6000,
+      "totMB": 342.8,
+      "geoms": 4184,
+      "tex": 131,
+      "sceneGeo": 4625,
+      "geoMB": 234.9,
+      "cpuGeoMB": 96.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 46,
+       "mb": 48.5,
+       "lodT": 941934,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 82.2,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 6600,
+      "totMB": 342.8,
+      "geoms": 4184,
+      "tex": 131,
+      "sceneGeo": 4625,
+      "geoMB": 234.9,
+      "cpuGeoMB": 96.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 46,
+       "mb": 48.5,
+       "lodT": 941934,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 82.3,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 7200,
+      "totMB": 342.7,
+      "geoms": 4184,
+      "tex": 131,
+      "sceneGeo": 4625,
+      "geoMB": 234.9,
+      "cpuGeoMB": 96.3,
+      "glMB": 171.8,
+      "str": {
+       "sup": 284,
+       "built": 46,
+       "mb": 48.5,
+       "lodT": 941934,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 35.6
+      },
+      "heap": 82.2,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 7800,
+      "totMB": 345.3,
+      "geoms": 4207,
+      "tex": 131,
+      "sceneGeo": 4628,
+      "geoMB": 247.9,
+      "cpuGeoMB": 87.3,
+      "glMB": 182.8,
+      "str": {
+       "sup": 284,
+       "built": 44,
+       "mb": 50.5,
+       "lodT": 980868,
+       "b": 48,
+       "f": 4,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 46.6
+      },
+      "heap": 82.4,
+      "glFix": 136.20000000000002
+     },
+     {
+      "f": 8400,
+      "totMB": 340.2,
+      "geoms": 4210,
+      "tex": 131,
+      "sceneGeo": 4638,
+      "geoMB": 254.9,
+      "cpuGeoMB": 93.4,
+      "glMB": 183.2,
+      "str": {
+       "sup": 284,
+       "built": 44,
+       "mb": 50.5,
+       "lodT": 980868,
+       "b": 48,
+       "f": 4,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 47.1
+      },
+      "heap": 82.3,
+      "glFix": 136.1
+     },
+     {
+      "f": 9000,
+      "totMB": 344.1,
+      "geoms": 4214,
+      "tex": 131,
+      "sceneGeo": 4656,
+      "geoMB": 258.5,
+      "cpuGeoMB": 97,
+      "glMB": 184.5,
+      "str": {
+       "sup": 284,
+       "built": 47,
+       "mb": 54.1,
+       "lodT": 1050118,
+       "b": 51,
+       "f": 4,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 47.1
+      },
+      "heap": 82.6,
+      "glFix": 137.4
+     },
+     {
+      "f": 9600,
+      "totMB": 349.9,
+      "geoms": 4238,
+      "tex": 131,
+      "sceneGeo": 4675,
+      "geoMB": 263.9,
+      "cpuGeoMB": 102.5,
+      "glMB": 190.2,
+      "str": {
+       "sup": 284,
+       "built": 49,
+       "mb": 59.6,
+       "lodT": 1156531,
+       "b": 54,
+       "f": 5,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 47.1
+      },
+      "heap": 82.8,
+      "glFix": 143.1
+     },
+     {
+      "f": 10200,
+      "totMB": 350,
+      "geoms": 4239,
+      "tex": 131,
+      "sceneGeo": 4675,
+      "geoMB": 263.9,
+      "cpuGeoMB": 102.5,
+      "glMB": 190.2,
+      "str": {
+       "sup": 284,
+       "built": 49,
+       "mb": 59.6,
+       "lodT": 1156531,
+       "b": 54,
+       "f": 5,
+       "lzB": 0,
+       "lzF": 1,
+       "upMB": 47.1
+      },
+      "heap": 82.9,
+      "glFix": 143.1
+     }
+    ],
+    "wallSec": 872
+   },
+   "ath": {
+    "min": 3.02,
+    "hits": 30,
+    "kinds": {
+     "traffic": 15,
+     "wall": 13,
+     "ped": 1,
+     "other": 1
+    },
+    "wallHits": 13,
+    "wallPerMin": 4.31,
+    "hitsPerMin": 9.94,
+    "bigDrop": 20,
+    "stuckPct": 2.7,
+    "avgKmh": 35.6,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 26.5,
+    "traffic120m": 11,
+    "missions": [
+     {
+      "f": 1430,
+      "start": "Koulouri Rush"
+     }
+    ],
+    "stuckEp": [
+     {
+      "f": 1714,
+      "x": 1833.5,
+      "z": -1675.2,
+      "y": 46.68,
+      "h": 8.36,
+      "g": 0,
+      "car": 4,
+      "wall": null,
+      "ch": true,
+      "in": "G-1",
+      "veh": "ship",
+      "b2": "00000000",
+      "v2": 0,
+      "at121": {
+       "cd": 0,
+       "spcd": null,
+       "fr": false,
+       "wk": false,
+       "hp": 100,
+       "park": false,
+       "in": "B1",
+       "stkT": 0,
+       "msg": "GO!",
+       "pop": "",
+       "cars": []
+      },
+      "len": 147
+     },
+     {
+      "f": 2428,
+      "x": 1816.9,
+      "z": -1668.4,
+      "y": 47.01,
+      "h": 9.65,
+      "g": 0,
+      "car": null,
+      "wall": {
+       "x": 1810.6,
+       "z": -1666.2,
+       "hw": 4.4,
+       "hd": 4.8,
+       "rot": true,
+       "keys": "x/z/hw/hd/h/ry/ab/c/s/trMin"
+      },
+      "ch": true,
+      "in": "G-1",
+      "veh": "ship",
+      "b2": "00000111",
+      "v2": 0,
+      "at121": {
+       "cd": 0,
+       "spcd": null,
+       "fr": false,
+       "wk": false,
+       "hp": 100,
+       "park": false,
+       "in": "B1",
+       "stkT": 0,
+       "msg": "GO!",
+       "pop": "",
+       "cars": []
+      },
+      "len": 142
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 7282,
+      "v0": 52,
+      "v1": 9,
+      "drop": 0.82,
+      "kind": "other",
+      "x": 1477,
+      "z": -1249,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 7848,
+      "v0": 40,
+      "v1": 8,
+      "drop": 0.81,
+      "kind": "traffic",
+      "x": 1442,
+      "z": -1254,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 1895,
+      "v0": 23,
+      "v1": 5,
+      "drop": 0.79,
+      "kind": "traffic",
+      "x": 1837,
+      "z": -1676,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 1713,
+      "v0": 28,
+      "v1": 6,
+      "drop": 0.78,
+      "kind": "traffic",
+      "x": 1833,
+      "z": -1675,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 1326,
+      "v0": 34,
+      "v1": 9,
+      "drop": 0.73,
+      "kind": "traffic",
+      "x": 1834,
+      "z": -1677,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "wallList": [
+     {
+      "ctx": "GO!",
+      "f": 2012,
+      "v0": 44,
+      "v1": 15,
+      "drop": 0.65,
+      "kind": "wall",
+      "x": 1833,
+      "z": -1666,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 2229,
+      "v0": 49,
+      "v1": 16,
+      "drop": 0.67,
+      "kind": "wall",
+      "x": 1817,
+      "z": -1666,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 2760,
+      "v0": 36,
+      "v1": 22,
+      "drop": 0.4,
+      "kind": "wall",
+      "x": 1817,
+      "z": -1666,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 3028,
+      "v0": 52,
+      "v1": 28,
+      "drop": 0.46,
+      "kind": "wall",
+      "x": 1803,
+      "z": -1621,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 8293,
+      "v0": 32,
+      "v1": 14,
+      "drop": 0.58,
+      "kind": "wall",
+      "x": 1343,
+      "z": -1206,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 9307,
+      "v0": 43,
+      "v1": 16,
+      "drop": 0.63,
+      "kind": "wall",
+      "x": 1461,
+      "z": -1234,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 9616,
+      "v0": 48,
+      "v1": 17,
+      "drop": 0.65,
+      "kind": "wall",
+      "x": 1436,
+      "z": -1232,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 9857,
+      "v0": 45,
+      "v1": 16,
+      "drop": 0.66,
+      "kind": "wall",
+      "x": 1443,
+      "z": -1222,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 10094,
+      "v0": 50,
+      "v1": 32,
+      "drop": 0.36,
+      "kind": "wall",
+      "x": 1472,
+      "z": -1220,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 10156,
+      "v0": 49,
+      "v1": 17,
+      "drop": 0.66,
+      "kind": "wall",
+      "x": 1484,
+      "z": -1219,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 10391,
+      "v0": 50,
+      "v1": 30,
+      "drop": 0.4,
+      "kind": "wall",
+      "x": 1473,
+      "z": -1203,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 10565,
+      "v0": 75,
+      "v1": 22,
+      "drop": 0.7,
+      "kind": "wall",
+      "x": 1449,
+      "z": -1178,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 11051,
+      "v0": 33,
+      "v1": 13,
+      "drop": 0.59,
+      "kind": "wall",
+      "x": 1429,
+      "z": -1129,
+      "dy": 0
+     }
+    ],
+    "xmon": {
+     "sec": 184,
+     "carSamples": 34565,
+     "pedSamples": 80438,
+     "redRunPct": 0,
+     "redRuns": 0,
+     "sigEnter": 0,
+     "offRoadPct": 0.07,
+     "wrongSidePct": 0,
+     "wrongOneWayPct": 0.84,
+     "overlapPerMin": 239.41,
+     "stuck20": 12,
+     "stuck60": 0,
+     "stuckCarPct": 29.06,
+     "uturnMid": 40,
+     "pedOnRoadPct": 4.47,
+     "pedOutsideCrossingPct": 3.28,
+     "pedHitByCar": 41,
+     "pedJumpsNearPlayer": 202,
+     "cvPedOK": 0,
+     "cvPedBad": 0,
+     "cvRecycled": 0,
+     "why": {
+      "none": 9854,
+      "hit": 192
+     },
+     "ovT": {
+      "sameEdge": 293,
+      "other": 46,
+      "shareNode": 229,
+      "oppEdge": 75,
+      "junc": 92
+     },
+     "ex": {
+      "red": [],
+      "off": [
+       [
+        1877,
+        -1674,
+        0.6
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ],
+       [
+        1336,
+        -1090,
+        2
+       ]
+      ],
+      "wrong": [
+       [
+        1889,
+        -1503,
+        "1way"
+       ],
+       [
+        1889,
+        -1502,
+        "1way"
+       ],
+       [
+        1890,
+        -1501,
+        "1way"
+       ],
+       [
+        1890,
+        -1500,
+        "1way"
+       ],
+       [
+        1891,
+        -1499,
+        "1way"
+       ],
+       [
+        1891,
+        -1498,
+        "1way"
+       ],
+       [
+        1892,
+        -1497,
+        "1way"
+       ],
+       [
+        1892,
+        -1497,
+        "1way"
+       ]
+      ],
+      "ped": [
+       [
+        2135,
+        -1624
+       ],
+       [
+        2135,
+        -1624
+       ],
+       [
+        2135,
+        -1624
+       ],
+       [
+        2135,
+        -1625
+       ],
+       [
+        2135,
+        -1625
+       ],
+       [
+        2135,
+        -1625
+       ],
+       [
+        2135,
+        -1625
+       ],
+       [
+        2135,
+        -1625
+       ]
+      ],
+      "ovl": [
+       [
+        2151,
+        -1625,
+        "sameEdge"
+       ],
+       [
+        2150,
+        -1625,
+        "sameEdge"
+       ],
+       [
+        2149,
+        -1625,
+        "sameEdge"
+       ],
+       [
+        1792,
+        -1681,
+        "other"
+       ],
+       [
+        1792,
+        -1682,
+        "sameEdge"
+       ],
+       [
+        1794,
+        -1681,
+        "other"
+       ],
+       [
+        1794,
+        -1681,
+        "other"
+       ],
+       [
+        1794,
+        -1681,
+        "other"
+       ]
+      ],
+      "stuck": []
+     },
+     "err": null
+    },
+    "rot": null,
+    "scale": {
+     "pedH": 1.76,
+     "carL": 4.43,
+     "carH": 1.78,
+     "player": {
+      "h": 1.89,
+      "l": 4.78,
+      "w": 3.02
+     },
+     "pedRel": 0.99,
+     "pedVsPlayer": 0.92,
+     "nPed": 8,
+     "nCar": 8,
+     "pedNear": [
+      {
+       "d": 24.3,
+       "h": 1.83
+      },
+      {
+       "d": 25.4,
+       "h": 1.73
+      },
+      {
+       "d": 25.8,
+       "h": 1.82
+      },
+      {
+       "d": 26.9,
+       "h": 1.84
+      },
+      {
+       "d": 29.8,
+       "h": 1.71
+      },
+      {
+       "d": 33.1,
+       "h": 1.75
+      },
+      {
+       "d": 33.3,
+       "h": 1.75
+      },
+      {
+       "d": 33.4,
+       "h": 1.76
+      }
+     ],
+     "pedMax": 1.84
+    },
+    "road": {
+     "roadPts": 450,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 554,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamArrow×#r3Up",
+     "#r3Up×#odPin",
+     "#wrongWay×#odPin"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@0"
+    ],
+    "perf": {
+     "calls": 157,
+     "tris": 1182650,
+     "jsMs": 0,
+     "geoms": 4176,
+     "tex": 129
+    },
+    "mem": [
+     {
+      "f": 0,
+      "totMB": 378.9,
+      "geoms": 3995,
+      "tex": 120,
+      "sceneGeo": 4345,
+      "geoMB": 204,
+      "cpuGeoMB": 49.8,
+      "glMB": 187.3,
+      "str": {
+       "sup": 0,
+       "built": 0,
+       "mb": 0,
+       "b": 0,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 0
+      },
+      "heap": 154,
+      "glFix": 187.3
+     },
+     {
+      "f": 600,
+      "totMB": 442.3,
+      "geoms": 4084,
+      "tex": 128,
+      "sceneGeo": 4601,
+      "geoMB": 279.7,
+      "cpuGeoMB": 58.3,
+      "glMB": 224.9,
+      "str": {
+       "sup": 306,
+       "built": 38,
+       "mb": 41.7,
+       "lodT": 809278,
+       "b": 38,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 33.6
+      },
+      "heap": 161.5,
+      "glFix": 191.3
+     },
+     {
+      "f": 1200,
+      "totMB": 446.2,
+      "geoms": 4094,
+      "tex": 128,
+      "sceneGeo": 4611,
+      "geoMB": 282.9,
+      "cpuGeoMB": 61.5,
+      "glMB": 225,
+      "str": {
+       "sup": 306,
+       "built": 40,
+       "mb": 44.9,
+       "lodT": 871605,
+       "b": 40,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 33.6
+      },
+      "heap": 163.9,
+      "glFix": 191.4
+     },
+     {
+      "f": 1800,
+      "totMB": 449.5,
+      "geoms": 4114,
+      "tex": 128,
+      "sceneGeo": 4621,
+      "geoMB": 288.9,
+      "cpuGeoMB": 60.6,
+      "glMB": 229.8,
+      "str": {
+       "sup": 306,
+       "built": 41,
+       "mb": 46,
+       "lodT": 893747,
+       "b": 41,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 37.1
+      },
+      "heap": 164.6,
+      "glFix": 192.70000000000002
+     },
+     {
+      "f": 2400,
+      "totMB": 446.6,
+      "geoms": 4117,
+      "tex": 129,
+      "sceneGeo": 4621,
+      "geoMB": 288.9,
+      "cpuGeoMB": 60.6,
+      "glMB": 230,
+      "str": {
+       "sup": 306,
+       "built": 41,
+       "mb": 46,
+       "lodT": 893747,
+       "b": 41,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 37.1
+      },
+      "heap": 165.1,
+      "glFix": 192.9
+     },
+     {
+      "f": 3000,
+      "totMB": 446.9,
+      "geoms": 4119,
+      "tex": 129,
+      "sceneGeo": 4621,
+      "geoMB": 290.3,
+      "cpuGeoMB": 59.2,
+      "glMB": 231.4,
+      "str": {
+       "sup": 306,
+       "built": 41,
+       "mb": 46,
+       "lodT": 893747,
+       "b": 41,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 38.5
+      },
+      "heap": 165.3,
+      "glFix": 192.9
+     },
+     {
+      "f": 3600,
+      "totMB": 446.3,
+      "geoms": 4120,
+      "tex": 129,
+      "sceneGeo": 4627,
+      "geoMB": 290.8,
+      "cpuGeoMB": 59.7,
+      "glMB": 231.4,
+      "str": {
+       "sup": 306,
+       "built": 42,
+       "mb": 46.5,
+       "lodT": 903809,
+       "b": 42,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 38.5
+      },
+      "heap": 165.4,
+      "glFix": 192.9
+     },
+     {
+      "f": 4200,
+      "totMB": 447,
+      "geoms": 4126,
+      "tex": 129,
+      "sceneGeo": 4633,
+      "geoMB": 290.8,
+      "cpuGeoMB": 59.7,
+      "glMB": 231.5,
+      "str": {
+       "sup": 306,
+       "built": 42,
+       "mb": 46.5,
+       "lodT": 903809,
+       "b": 42,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 38.5
+      },
+      "heap": 165.9,
+      "glFix": 193
+     },
+     {
+      "f": 4800,
+      "totMB": 448.7,
+      "geoms": 4131,
+      "tex": 129,
+      "sceneGeo": 4642,
+      "geoMB": 292.3,
+      "cpuGeoMB": 61.2,
+      "glMB": 231.5,
+      "str": {
+       "sup": 306,
+       "built": 43,
+       "mb": 48.1,
+       "lodT": 933089,
+       "b": 43,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 38.5
+      },
+      "heap": 165.9,
+      "glFix": 193
+     },
+     {
+      "f": 5400,
+      "totMB": 449,
+      "geoms": 4138,
+      "tex": 129,
+      "sceneGeo": 4646,
+      "geoMB": 292.9,
+      "cpuGeoMB": 60.6,
+      "glMB": 232.1,
+      "str": {
+       "sup": 306,
+       "built": 43,
+       "mb": 48.1,
+       "lodT": 933089,
+       "b": 43,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 39
+      },
+      "heap": 166.1,
+      "glFix": 193.1
+     },
+     {
+      "f": 6000,
+      "totMB": 446.8,
+      "geoms": 4149,
+      "tex": 129,
+      "sceneGeo": 4661,
+      "geoMB": 295.1,
+      "cpuGeoMB": 61,
+      "glMB": 233.1,
+      "str": {
+       "sup": 306,
+       "built": 46,
+       "mb": 49.3,
+       "lodT": 957725,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 40
+      },
+      "heap": 163.1,
+      "glFix": 193.1
+     },
+     {
+      "f": 6600,
+      "totMB": 435.6,
+      "geoms": 4163,
+      "tex": 129,
+      "sceneGeo": 4668,
+      "geoMB": 297.8,
+      "cpuGeoMB": 58.2,
+      "glMB": 235.9,
+      "str": {
+       "sup": 306,
+       "built": 46,
+       "mb": 49.3,
+       "lodT": 957725,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 42.7
+      },
+      "heap": 163.3,
+      "glFix": 193.2
+     },
+     {
+      "f": 7200,
+      "totMB": 432.8,
+      "geoms": 4164,
+      "tex": 129,
+      "sceneGeo": 4668,
+      "geoMB": 298.4,
+      "cpuGeoMB": 57.6,
+      "glMB": 236.5,
+      "str": {
+       "sup": 306,
+       "built": 46,
+       "mb": 49.3,
+       "lodT": 957725,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 43.3
+      },
+      "heap": 163.3,
+      "glFix": 193.2
+     },
+     {
+      "f": 7800,
+      "totMB": 432.4,
+      "geoms": 4165,
+      "tex": 129,
+      "sceneGeo": 4668,
+      "geoMB": 300,
+      "cpuGeoMB": 56.1,
+      "glMB": 238.1,
+      "str": {
+       "sup": 306,
+       "built": 46,
+       "mb": 49.3,
+       "lodT": 957725,
+       "b": 46,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 44.9
+      },
+      "heap": 163.3,
+      "glFix": 193.2
+     },
+     {
+      "f": 8400,
+      "totMB": 431.6,
+      "geoms": 4171,
+      "tex": 129,
+      "sceneGeo": 4673,
+      "geoMB": 302,
+      "cpuGeoMB": 55.1,
+      "glMB": 239.6,
+      "str": {
+       "sup": 306,
+       "built": 47,
+       "mb": 49.9,
+       "lodT": 968434,
+       "b": 47,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 46.4
+      },
+      "heap": 163.3,
+      "glFix": 193.2
+     },
+     {
+      "f": 9000,
+      "totMB": 432,
+      "geoms": 4175,
+      "tex": 129,
+      "sceneGeo": 4678,
+      "geoMB": 303.6,
+      "cpuGeoMB": 56.6,
+      "glMB": 239.6,
+      "str": {
+       "sup": 306,
+       "built": 48,
+       "mb": 51.4,
+       "lodT": 998468,
+       "b": 48,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 46.4
+      },
+      "heap": 162.6,
+      "glFix": 193.2
+     },
+     {
+      "f": 9600,
+      "totMB": 432.2,
+      "geoms": 4175,
+      "tex": 129,
+      "sceneGeo": 4678,
+      "geoMB": 303.6,
+      "cpuGeoMB": 56.6,
+      "glMB": 239.6,
+      "str": {
+       "sup": 306,
+       "built": 48,
+       "mb": 51.4,
+       "lodT": 998468,
+       "b": 48,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 46.4
+      },
+      "heap": 163.5,
+      "glFix": 193.2
+     },
+     {
+      "f": 10200,
+      "totMB": 432.1,
+      "geoms": 4175,
+      "tex": 129,
+      "sceneGeo": 4678,
+      "geoMB": 303.6,
+      "cpuGeoMB": 56.6,
+      "glMB": 239.6,
+      "str": {
+       "sup": 306,
+       "built": 48,
+       "mb": 51.4,
+       "lodT": 998468,
+       "b": 48,
+       "f": 0,
+       "lzB": 0,
+       "lzF": 0,
+       "upMB": 46.4
+      },
+      "heap": 163.3,
+      "glFix": 193.2
+     }
+    ],
+    "wallSec": 748
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]

@@ -37,3 +37,9 @@ Brief (coordinator, Alex 2026-10-13): simplify + connect the maps, wider roads, 
 1. Overlap diagnosis: observer says overlaps are mostly `sameEdge` (two cars on one edge < 2.2 m) — leader-follow failing somewhere (rdEval ov.js in scratchpad).
 2. Observer stuck% did not improve (queues at reds are normal; use stuck60 = gridlock). Lead=most stops.
 3. Then: tPlay XMON both cities on the new build; compare with STEP 0; Athens wall hits; shots grid; REVIEW.
+
+## Gate run (new build rd16 = commit below) vs base re-run with the same monitor (rd/tp_after*, rd/tp_before2*)
+- FRA: wall 0.66→0.99/min (PASS ≤1), player stuck 4.2→1.3 %; overlap 1015→324/min, stuckCar 32→26 %, pedOnRoad 24→12 %, ped outside crossing 18→10.5 %, pedHitByCar 78→57, redRun 2/21→3/36.
+- ATH: wall 4.31→2.98/min (both FAIL), stuck 2.7→4.0 % (FAIL; same challenge-start spot ~1815,-1680 in both runs, +1 episode blocked by a queued car), offRoad 0.07→3.2 %, wrongOneWay 0.84→0, overlap 239→117, pedHitByCar 41→64, heap avg 163→160 MB (both FAIL), peak 166→224.
+- Draw calls same views: ATH 249/249/288→232/228/292, FRA 380/421/477→378/431/455 (FRA over 250 already on base). Tyre gap 0.03 m both cities. 0 console errors.
+- Grid: rd/step1_grid.jpg. Next slice queued by the coordinator: scooter riders + rideable scooters, LEGO bikes/motorbikes (6522 Highway Bike) in traffic.
