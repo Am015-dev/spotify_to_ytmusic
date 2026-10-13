@@ -1,0 +1,29 @@
+/* painted UI over the shared skin (gx-skin.css): switches are added by GXSK.init in ui13.js once the files loaded */
+html.sk{--sk-ink:#14202c;--sk-cream:#eef6f6}
+.wxi{width:20px;height:20px;vertical-align:-5px;margin:0 2px 0 0;object-fit:contain}
+.wxb{display:inline-flex;align-items:center;gap:2px}
+.wxb .wxi{width:28px;height:28px;vertical-align:middle}
+/* buttons: cream (alt) and amber (default) plates, green Roll keeps its colour with the painted die plate */
+html.sk .btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-go-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:48px;padding:0 4px;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .btn.alt,html.sk .btn.on{border-image-source:url(media/ui-button-cream-c.webp);color:var(--sk-ink);text-shadow:none}
+html.sk .btn:disabled,html.sk .btn.dis{opacity:.5}
+html.sk-roll #acts [data-a=ready]{position:relative;padding-left:40px;min-height:48px}
+html.sk-roll #acts [data-a=ready]::before{content:'';position:absolute;left:-10px;top:50%;width:52px;height:52px;transform:translateY(-50%);background:url(media/ui-button-roll-c.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+/* radio phrase buttons */
+html.sk-phrase .say{border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-phrase-c.webp) 0 36 fill/0 22px stretch;border-radius:0;background:none;color:var(--sk-ink);padding:0 2px;min-height:48px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-phrase .say.on,html.sk-phrase .say.rec{font-weight:800;filter:drop-shadow(0 0 5px var(--gold))}
+/* flight briefing drawer = clipboard sheet */
+html.sk-sheet #crewd.gx-drawer{border:46px solid transparent;border-width:84px 34px 40px;border-image:url(media/ui-sheet-c.webp) 150 60 70 fill/84px 34px 40px stretch;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
+html.sk-sheet #crewd .gx-drawer-head{margin:0 0 6px;background:none;box-shadow:none;padding:2px 4px}
+html.sk-sheet #crewd .gx-drawer-body{background:#fbf3df;border-radius:4px;padding:6px 8px 12px}
+html.sk-sheet #crewd .gx-drawer-head h2{color:var(--sk-ink);text-shadow:none}
+html.sk-sheet #crewd .gx-x{color:var(--sk-ink)}
+/* landing checklist boxes */
+html.sk-check .cr .ck{width:24px;height:24px;border-radius:0;background:url(media/ui-check.webp) center/contain no-repeat;color:#176b2e;border:0;font-size:15px}
+html.sk-check .cr .ck.no{color:#b3261e}
+/* goal / altitude strip */
+html.sk-alt .gstrip{background:url(media/ui-altbar-c.webp) 0 0/100% 100% no-repeat;border:0;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);padding-left:8px;padding-right:8px}
+/* the aluminium icon buttons are light: dark ink; bar title gets a shadow over the busy teal strip */
+html.sk .gx-bar .gx-ibtn{color:#14202c;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.85)}
+html.sk .gx-bar .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
