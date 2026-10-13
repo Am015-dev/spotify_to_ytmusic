@@ -53,3 +53,20 @@ Brief (coordinator, Alex 2026-10-13): simplify + connect the maps, wider roads, 
 6 pole on asphalt → RD_poleOut pushes poles off carriageway/junction plates (__rd.POLE() = moved/left). Verify count + shot. OPEN.
 7 OD_CHANGELOG v90k (provisional) + 4 OD_CHECKLIST items (ver v90j, the current top) added. DONE.
 Final GRID must be ONE labelled grid at docs/shots/roads/GRID.jpg (reviewer rule).
+
+## STATE at stop (2026-10-13, Alex 10-min rule) — code head 381ec86, branch head = last commit
+GRID: docs/shots/roads/GRID.jpg. NOT re-reviewed since the FAIL on 5c43425. Integrator is now build-11 (session_01FYerWDe4eDfpw7Jfrm9mtb).
+Since the FAIL: un-stacker every frame + recycles never land on occupied spots + no respawn on exit-less nodes (FRA tPlay overlaps 36/min, base 1015);
+don't-block-the-box, amber = stop unless at the line, all-red 4 s, box breaker only inside the box (FRA tPlay red runs 4/53 = 7.5 %, base 9.5 %);
+poles off the asphalt (FRA 74/75, ATH 251/251); prune fix (main/arterial never cut, 2 rounds, crossed stubs kept → ATH 139 dead ends); ped gap rule;
+changelog v90k (provisional) + 4 checklist items (ver v90j).
+Last tPlay FRA (381ec86, MIN=3): wall 0.33/min, stuck 2.7 %, overlaps 36/min, red 7.5 %.
+Last tPlay ATH (381ec86, rd/tp_final3): wall 5.63/min FAIL, stuck 1.4 %, heap 202.6 MB FAIL, off-road 0.06 %, overlaps 74/min, ped contacts 32.
+
+## NEXT (fresh worker, 10-min slices)
+1. ATH heap: 202.6 MB on 381ec86 vs 166–168 MB on 8c60144/6ef8d78 (base 162–166). Suspects in 381ec86: the stranded-car respawn loop in RD_unstack
+   (respawn → stranded again → churn?) and the 70_roam_world respawn retry. Bisect 6ef8d78 vs 381ec86 with tPlay CITIES=ath (rdHeap.js does not show tPlay's offset).
+2. ATH wall hits swing 0.66–5.63/min between runs (base 4.31): mostly the tPlay bot entering the Plaka pedestrian area (~1585,-1450) and the challenge ring
+   (~1815,-1680), both also on base. Run 2 seeds before judging.
+3. Re-REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with docs/shots/roads/GRID.jpg (one labelled grid, reviewer rule) + numbers + tyre gap 0.03 m.
+4. After PASS: hand the commit to build-11, READY to the coordinator. Then the queued slice: scooter riders + rideable scooters, LEGO bikes/motorbikes (6522 Highway Bike) in traffic.
