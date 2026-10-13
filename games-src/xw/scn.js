@@ -78,6 +78,7 @@
       GXS.seed(9);
       Object.assign(UI, { mode: 'solo', camp: null, info: false, stats: false, rules: false, build: null, draft: {}, pass: null, sel: null, sugCache: null, autoSetup: false, advOpen: false, hints: false, hold: null, holdK: [], paused: false });
       newGame({ fac: [0, 1], players: [{ human: true }, { human: false, lvl: 'normal' }], squads: ART_SQ.map(function (a) { return a.map(function (x) { return { p: x.p, u: [] }; }); }), ex: { noRocks: true }, seed: 9 });
+      UI.radio = { r: G.round, side: 0, who: 'Kael', t: 'Form up on me.' };
       render(); GX.show('d-squads');
       return GXS.wait(function () { return document.querySelectorAll('#roster .pcard').length >= 9; }, 15000).then(function () {
         [].forEach.call(document.querySelectorAll('#roster .pc-art img'), function (i) { i.loading = 'eager'; });
@@ -96,6 +97,7 @@
       } },
       { kind: 'fn', name: 'paintings are not stretched', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#roster .pc-art img'), function (im) { var r = im.getBoundingClientRect(); if (!r.width || !im.naturalWidth) return; var a = (r.width / r.height) / (im.naturalWidth / im.naturalHeight); var fit = getComputedStyle(im).objectFit; if (fit === 'fill' && Math.abs(a - 1) > .05) bad.push(im.src.split('/').pop() + ' x' + a.toFixed(2)); }); return !bad.length || bad.join(', '); } },
       { kind: 'fn', name: 'cards are visible and text readable (>= 12 px)', fn: function () { var b = fonts('#roster .pcard', 12); return (GXS.vis(document.querySelector('#roster .pcard')) && !b.length) || 'card hidden or ' + b.length + ' texts under 12px'; } },
+      { kind: 'fn', name: 'radio strip wears the painted row plate and its text stays readable', fn: function () { var r = document.getElementById('radio'); if (!r || !r.textContent.trim()) return 'no radio text'; if (!GXS.vis(r)) return true; var cs = getComputedStyle(r); return (/ui-row\.webp/.test(cs.backgroundImage) && parseFloat(cs.fontSize) >= 12) || 'radio bg ' + cs.backgroundImage.slice(0, 40) + ' font ' + cs.fontSize; } },
       skin
     ]
   });

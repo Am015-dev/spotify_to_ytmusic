@@ -10,5 +10,17 @@
   "icon-time-day",
   "icon-time-dusk",
   "icon-time-night"
+ ],
+ "nebula-aces": [
+  "ship-anvil",
+  "ship-hauler",
+  "ship-herald",
+  "ship-keel",
+  "ship-kestrel",
+  "ship-maul",
+  "ship-needle",
+  "ship-razor",
+  "ship-warden",
+  "ui-row"
  ]
 }
