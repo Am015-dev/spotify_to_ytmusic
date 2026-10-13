@@ -19,3 +19,5 @@
   else grid-search b/h (pitch puts the road 10 m past the nose at 62 % screen height) with clearance ≥ 0.3 m over the profile and fill 16-34 %.
   roamCam wrapper eases RCAM fields (≤ 4 m/s on the real clock); SC_rcam wrapper restores the eased values. Refit 30 frames after a ride change / on rotation.
 - On-foot camera height OF_CAMH = 2.9 (98of). Tests: v90n/cam-go-* in 99c, `node tools/tCamGo.js <url>/index.html <out>` (FAIL lines only, ALL=1 all, SHOTS=1, BEFORE=1 old camera).
+- All rides: `node tools/tCamAll.js <url>/index.html` = __cam.audit(): every ride (157) built off-screen, chase cam solved for 852×393 + 393×852, virtual
+  camera raycast/projection; asserts road 10 m past the nose not hidden + lower middle, fill 15-35 %, ride's rear edge on screen (≤ 98 %). ~38 s. STOCK=1 = old camera (15/157).

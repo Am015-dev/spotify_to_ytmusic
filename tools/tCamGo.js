@@ -19,7 +19,7 @@ const ALL=process.env.ALL==='1';let nOk=0,nAll=0;const ok=(t,c,m,i)=>{nAll++;if(
  const view=async(T,tag)=>{const m=await M();if(!m){ok(T,false,tag+' measure',null);return null}
   ok(T,!m.road.blocked,tag+': road 10 m past the nose not hidden by the ride',{by:m.road.by,cam:m.cam,P:m.P});
   ok(T,m.road.x>=1/3&&m.road.x<=2/3&&m.road.y>=.4&&m.road.y<=.85,tag+': that road point is in the lower middle (x 33-67 %, y 40-85 %)',m.road);
-  ok(T,m.fill>=.15&&m.fill<=.35,tag+': ride fills 15-35 % of the screen height',{fill:m.fill,top:m.top,bot:m.bot});return m};
+  ok(T,m.fill>=.15&&m.fill<=.35,tag+': ride fills 15-35 % of the screen height',{fill:m.fill,top:m.top,bot:m.bot});ok(T,m.bot<=.98,tag+': the whole ride is on screen (rear edge ≤ 98 % down)',{bot:m.bot});return m};
  const shot=async f=>{if(!SHOTS)return;await p.evaluate(()=>__tq.draw()).catch(()=>{});await W(300);await p.screenshot({path:OUT+'/'+f,type:'jpeg',quality:75})};
  const drive=async T=>{const S=[];const smp=async ms=>{const e=Date.now()+ms;while(Date.now()<e){S.push(await cp());await W(50)}};
   await p.keyboard.down('ArrowUp');await smp(1500);await p.keyboard.down('ArrowLeft');await smp(1500);await p.keyboard.up('ArrowLeft');await p.keyboard.up('ArrowUp');

@@ -100,7 +100,7 @@ file | KB | purpose | first defines
 98tq_test_quick.js | 4 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z] | TQ_url
 98rs_road_seams.js | 5 | RS: ROAD SEAMS (art-1, 2026-10-13). Alex (v90m-beta. | RS_OFF RS_seams RS
 98lm_liveliness.js | 5 | LVM: LIVELINESS METER (art-1, 2026-10-13). Alex: "Al | LVM_SPOTS LVM_T LVM_HR
-98cam_size_cam.js | 13 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
+98cam_size_cam.js | 16 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
 99_api.js | 49 | test API window.__mho={…} (state, roamSim, warp, gnd | __mho CR_RBX CR_raceHide
 test/fast.js | 5 | FAST · test-only fast mode, active only with ?fast=1 | FAST
 test/g9iter.js | 0 | test-only (local builds): eval in module scope for t | __g9ev
