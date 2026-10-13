@@ -818,6 +818,8 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 .opps.n5 .snm,.opps.n4 .snm{display:none}
 .opps.n5 .opp.seat{padding-right:6px}.opps.n5 .sbd{gap:4px}
 .opps.n5 .opp.seat,.opps.n4 .opp.seat{grid-template-rows:auto auto}
+/* five rivals: the strength and the gear count stack, so a seat never pokes out of the table sideways (it made the clipped board scrollable) */
+.opps.n5 .sbd{grid-row:1/3;flex-direction:column;justify-content:center;gap:1px}
 /* hero strip: your avatar with the big strength number, level medal, gear laid out beside it */
 .mine .slots{display:flex;gap:10px;align-items:center;opacity:.4}
 .mine .slots i{font-style:normal;width:36px;height:36px;border-radius:9px;border:2px dashed rgba(245,231,200,.55);display:grid;place-items:center;color:var(--cream)}
@@ -1382,7 +1384,7 @@ html.sk .mrow .btn{border-image-width:0 16px}
 /* ===== painted HUD pieces (classes set in tbl.js once the file loaded) ===== */
 /* gear slots, curse and gear icons */
 html.dk-slot .mine .slots{opacity:.75}
-html.dk-slot .mine .slots i{width:40px;height:40px;border:0;border-radius:0;font-size:0;background:center/contain no-repeat}
+html.dk-slot .mine .slots i{border-color:transparent;border-radius:0;font-size:0;background:center/contain no-repeat}
 html.dk-slot .mine .slots i[data-s=head]{background-image:url(media/ui-slot-head.webp)}html.dk-slot .mine .slots i[data-s=body]{background-image:url(media/ui-slot-body.webp)}
 html.dk-slot .mine .slots i[data-s=hands]{background-image:url(media/ui-slot-hands.webp)}html.dk-slot .mine .slots i[data-s=feet]{background-image:url(media/ui-slot-feet.webp)}
 html.dk-slot .gchip .gi{font-size:0;display:inline-block;width:22px;height:22px;vertical-align:middle;margin-right:4px;background:center/contain no-repeat}
@@ -1392,7 +1394,7 @@ html.dk-slot .gchip .gi[data-s=class]{background-image:url(media/ui-slot-class.w
 html.dk-curse .gi[data-s=curse]{font-size:0;display:inline-block;width:18px;height:18px;vertical-align:middle;background:url(media/token-curse.webp) center/contain no-repeat}
 html.dk-gi .opp.seat .gi[data-s=gear]{font-size:0;display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:2px;background:url(media/icon-gear.webp) center/contain no-repeat}
 /* rival chips: carved-wood plaque */
-html.dk-chip .opp.seat{background:url(media/ui-rival-chip.webp) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;padding:4px 14px 4px 7px;min-height:44px;flex-basis:170px;max-width:200px;min-width:112px}
+html.dk-chip .opp.seat{background:url(media/ui-rival-chip.webp) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;}
 html.dk-chip .opp.seat.active,html.ph.dk-chip .opp.seat.active{box-shadow:none;filter:drop-shadow(0 0 4px #ffd76a) drop-shadow(0 0 2px #ffd76a)}
 /* clash: medallions behind the strength numbers, painted swords between them */
 html.dk-clash.dk-clash .arena .vs .score.hero .num,html.dk-clash.dk-clash .arena .vs .score.mons .num{background-color:transparent;background-position:center;background-size:contain;background-repeat:no-repeat;border:0;border-radius:0;box-shadow:none;min-width:2.5em;height:2.5em;display:grid;place-items:center;font-weight:800}
@@ -1423,7 +1425,6 @@ html.sk .fbtns .btn:not(.helpb){flex:1 1 0;max-width:340px}
 html.sk.ph #prompt .bfline{color:#3a2410;text-shadow:none}
 /* top-bar labels >=13px; small buttons reach 44px tap height */
 html.sk .gx-ibtn,html.sk .gx-ibtn>span{font-size:13px}
-html.sk .gxh-bub .gxh-ok{font-size:14px}
 /* contrast: dark ink on the orange "go" plates (cream on orange measured 3.3-3.8:1) */
 html.sk .btn.primary,html.sk .btn.good,html.sk .btn.rec,html.sk .seg .btn.on,html.sk .grid2 .btn.on{color:#1c0e03;text-shadow:0 1px 0 rgba(255,235,190,.5)}
 /* phone dock has a fixed height: the 20px painted frame left no room for the buttons (cut off at the screen bottom) */
@@ -1435,6 +1436,14 @@ html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-over
 /* a hovered card on the table must not stretch its tap zone over the buttons below it (it covered Help) */
 .arena .card>.hit,.arena .card:hover>.hit{pointer-events:none!important;bottom:0}
 
+
+/* painted icons: hand, level gem, bubble tail, 3D winner (html.dk-hand / dk-lv / dk-bt) */
+.pic{width:1.15em;height:1.15em;vertical-align:-.25em;object-fit:contain}
+html.dk-lv .mine .lv small{display:inline-block;width:14px;height:14px;font-size:0;vertical-align:-2px;margin-right:2px;background:url(media/icon-level.webp) center/contain no-repeat}
+html.dk-lv.ph .mine .lv small{display:block}
+html.dk-bt .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
+html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.dk-bt .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.dk-bt .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+.win3d{display:block;margin:0 auto 2px;width:min(44vw,160px);height:min(44vw,160px);object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
 
 </style>
 </head>
@@ -1551,7 +1560,7 @@ html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-over
   function onScreen(e) { var b = box(e), W = innerWidth, H = innerHeight; if (b.r.right <= 0 || b.r.bottom <= 0 || b.r.left >= W || b.r.top >= H) return 'outside the screen'; if (b.r.left < -2 || b.r.top < -2 || b.r.right > W + 2 || b.r.bottom > H + 2) { if (!(function () { for (var p = e.parentElement; p; p = p.parentElement) { var o = getComputedStyle(p); if (/(auto|scroll)/.test(o.overflowX + o.overflowY) && p.scrollWidth + p.scrollHeight > p.clientWidth + p.clientHeight) return true; } return false; })()) return 'partly off screen (' + Math.round(b.r.left) + ',' + Math.round(b.r.top) + ',' + Math.round(b.r.right) + ',' + Math.round(b.r.bottom) + ' in ' + W + 'x' + H + ')'; }
     if (getComputedStyle(e).pointerEvents === 'none' || (e.closest && e.closest('[style*="pointer-events:none"],[style*="pointer-events: none"]'))) return '';   // display-only overlays (score lines) cannot be hit-tested
     var cx = Math.max(1, Math.min(W - 1, b.x)), cy = Math.max(1, Math.min(H - 1, b.y)), t = document.elementFromPoint(cx, cy);
-    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag') return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
+    if (t && t !== e && !e.contains(t) && !t.contains(e) && t.id !== 'gxscn-tag' && !(t.closest && t.closest('#gxlab-bar'))) return 'covered by ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]);
     return ''; }
   function find(c) { var e = document.querySelector(c.sel); if (!e) return { err: 'not found: ' + c.sel }; if (!S.vis(e)) return { err: 'not visible: ' + c.sel }; return { e: e }; }
   S.step = function (i) {
@@ -1710,6 +1719,67 @@ html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-over
       { kind: 'text', sel: '#dkCard h2', re: /\S/, name: 'card name' },
       { kind: 'visible', sel: '#dkCard .gx-x', name: 'Close button' },
       { kind: 'tap', sel: '#dkCard .gx-x', name: 'tap Close', state: function () { return UI.zoom != null; }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
+  var idle = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var wordsIn = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
+  var line = function () { var e = document.querySelector('#prompt .bfline'); return e ? e.textContent : ''; };
+
+  // the short status line: one line of 8 words or fewer, on the glow it says what to drag or tap
+  GXS.add({
+    id: 'dk-status-line', sizes: 'phone', name: 'Short drag/tap status line', ask: 'Is the line short and does it match?', ls: { dkd_offer: '1' }, seed: 41, when: booted, group: 'Board',
+    setup: function () { table(41); return GXS.wait(function () { return document.querySelector('#prompt .bfline') && document.querySelector('.mine .hand .card'); }, 6000).then(function () { return idle(500); }); },
+    checks: [
+      { kind: 'visible', sel: '#prompt .bfline', name: 'status line' },
+      { kind: 'text', sel: '#prompt .bfline', re: /\S/, name: 'status text', minPx: 12 },
+      { kind: 'fn', name: 'line is 8 words or fewer', fn: function () { return wordsIn(line()) <= 8 || '"' + line() + '" is ' + wordsIn(line()) + ' words'; } },
+      { kind: 'fn', name: 'line is a single line (no wrap past 2 rows)', fn: function () { var e = document.querySelector('#prompt .bfline'), px = parseFloat(getComputedStyle(e).lineHeight) || 16; return e.getBoundingClientRect().height <= px * 2.2 || 'line wraps to ' + Math.round(e.getBoundingClientRect().height / px) + ' rows'; } },
+      { kind: 'tap', sel: '.mine .hand .card.play', name: 'tap a glowing card', state: function () { return line(); }, expect: function (a, b) { return (a !== b && wordsIn(b) <= 8 && /tap|drop|drag|glow/i.test(b)) || 'line after tap: "' + b + '"'; } }
+    ]
+  });
+
+  // lightbulb help, first-time tips, rules cards and the Tips switch
+  GXS.add({
+    id: 'dk-tips', name: 'Lightbulb, tips, rules cards, Tips switch', ask: 'Do tips, bulb and rules cards work?', ls: { dkd_offer: '1' }, seed: 42, when: function () { return booted() && typeof GXH !== 'undefined' && typeof hlpPhase === 'function'; }, group: 'UI',
+    setup: function () {
+      table(42); try { GXH.reset(); GXH.setEnabled(true); } catch (e) { }
+      var d = document.createElement('div'); d.id = 'tipsprobe'; d.style.cssText = 'position:fixed;left:8px;top:45%;width:230px;z-index:2147483000;background:#fff;color:#000;padding:4px;display:none'; d.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); document.body.appendChild(d);
+      try { GXH.phase(hlpPhase()); } catch (e) { }
+      return idle(100).then(function () { return GXS.wait(function () { var b = document.querySelector('.gxh-bub.on'); return b && b.textContent.trim(); }, 8000); }).then(function () { return idle(400); });
+    },
+    checks: [
+      { kind: 'visible', sel: '.gxh-bub.on', name: 'first-time tip bubble' },
+      { kind: 'text', sel: '.gxh-bub.on', re: /\S/, name: 'tip text', minPx: 12 },
+      { kind: 'fn', name: 'tip bubble is on screen', fn: function () { var r = document.querySelector('.gxh-bub.on').getBoundingClientRect(); return (r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2) || 'bubble off screen'; } },
+      { kind: 'visible', sel: '#bulbbtn', name: 'lightbulb button' },
+      { kind: 'tap', sel: '#bulbbtn', name: 'tap the lightbulb', state: function () { var s = GXH.state(); return JSON.stringify([s.cur && s.cur.kind, s.rules]); }, expect: function (a, b) { return a !== b || 'lightbulb did nothing'; } },
+      { kind: 'fn', name: 'rules card opens and reads', fn: function () { GXH.rules(); var c = document.querySelector('.gxh-card'); return (c && /\S/.test((document.querySelector('.gxh-rt') || {}).textContent || '') && /\S/.test((document.querySelector('.gxh-rx') || {}).textContent || '')) || 'rules card missing or empty'; } },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close on the rules card', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'rules card did not close'; } },
+      { kind: 'fn', name: 'Tips switch is shown', fn: function () { document.getElementById('tipsprobe').style.display = 'block'; return true; } },
+      { kind: 'visible', sel: '#tipsprobe [data-gxh=tips][data-v="0"]', name: 'Tips Off button' },
+      { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="0"]', name: 'tap Tips Off', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === true && b === false) || 'Tips switch did not turn off'; } },
+      { kind: 'fn', name: 'no tip bubble while Tips are off', fn: function () { return !document.querySelector('.gxh-bub.on') || 'bubble still shown'; } },
+      { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="1"]', name: 'tap Tips On', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === false && b === true) || 'Tips switch did not turn on'; } }
+    ]
+  });
+  // painted icons and 3D hero renders: every wired file loads, and each is applied where it belongs
+  GXS.add({
+    id: 'dk-art', name: 'Painted icons and 3D heroes', ask: 'Are the new icons and hero figures in place?', ls: { dkd_offer: '1' }, seed: 43, when: booted, group: 'Art',
+    setup: function () {
+      table(43);
+      var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = '<div class="mine"><span class="lv"><small>Lv</small> 1</span></div><div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div>'; document.body.appendChild(h);
+      var files = ['media/icon-hand', 'media/icon-level', 'media/ui-bubble-tail'].concat(['pip', 'morwen', 'grub', 'tansy'].map(function (k) { return 'models/hero-' + k; }), ['pip', 'morwen', 'grub', 'tansy'].map(function (k) { return 'models/hero-' + k + '@512'; }));
+      window.__art = {};
+      return Promise.all(files.map(function (f) { return new Promise(function (r) { var i = new Image(); i.onload = function () { window.__art[f] = i.naturalWidth > 0; r(); }; i.onerror = function () { window.__art[f] = false; r(); }; i.src = f + '.webp'; }); })).then(function () { return idle(900); });
+    },
+    checks: [
+      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = Object.keys(window.__art).filter(function (f) { return !window.__art[f]; }); return !bad.length || 'not loaded: ' + bad.join(', '); } },
+      { kind: 'fn', name: 'hand icon replaces the hand emoji', fn: function () { return (document.documentElement.classList.contains('dk-hand') && handIc().indexOf('icon-hand.webp') > 0) || 'emoji still shown'; } },
+      { kind: 'fn', name: 'level gem is painted on the Lv label', fn: function () { return getComputedStyle(document.querySelector('#artprobe .lv small')).backgroundImage.indexOf('icon-level.webp') > 0 || 'no gem'; } },
+      { kind: 'fn', name: 'speech-bubble tail is painted', fn: function () { return getComputedStyle(document.querySelector('#artprobe .gxh-arr')).backgroundImage.indexOf('ui-bubble-tail.webp') > 0 || 'no tail'; } },
+      { kind: 'fn', name: 'winner stands as a 3D hero (Pip, Morwen, Grub, Tansy)', fn: function () { var bad = ''; ['Pip', 'Morwen', 'Grub', 'Tansy'].forEach(function (n) { if (dkHero3d(n, 'win3d').indexOf('models/hero-' + n.toLowerCase()) < 0) bad = bad || n; }); return !bad || 'no 3D sprite for ' + bad; } },
+      { kind: 'fn', name: 'heroes without a 3D model keep their painting', fn: function () { return dkHero3d('Bodkin', 'win3d') === '' && dkPortrait('Bodkin', 'winp').indexOf('camp-bodkin') > 0 || 'fallback broken'; } },
+      { kind: 'fn', name: 'hand count line keeps its words (>= 12 px)', fn: function () { var e = document.querySelector('.mine .str'); return !e || parseFloat(getComputedStyle(e).fontSize) >= 12 || 'strength line ' + getComputedStyle(e).fontSize; } }
     ]
   });
 })();
@@ -6337,6 +6407,9 @@ if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DA
 <script>
 // painted hero portraits (media/camp-<name>.webp)
 const DK_PORT=new Set(['hobb','pip','tansy','bodkin','grub','morwen','wrenna']);
+// 3D hero renders (models/hero-<name>[@512].webp, transparent): the winner stands on the end screen; falls back to the painting
+const DK_3D=new Set(['pip','morwen','grub','tansy']);
+function dkHero3d(nm,cls){const k=String(nm||'').split(/[ ,]/)[0].toLowerCase();if(!DK_3D.has(k))return '';return `<img class="${cls||''}" src="models/hero-${k}${innerWidth<700?'@512':''}.webp" alt="" draggable="false" decoding="async" onerror="this.outerHTML=dkPortrait('${k}','winp')">`}
 function dkPortrait(nm,cls){const k=String(nm||'').split(/[ ,]/)[0].toLowerCase();if(!DK_PORT.has(k))return '';return `<img class="${cls||''}" src="media/camp-${k}.webp" alt="" draggable="false" decoding="async">`}
 // ---------- coach: hints, warnings and the story layer. It only READS the game: every "what if" runs on a throw-away copy of G. ----------
 const PERSONA={Pip:['the Plucky','first through every door, rarely first out'],Morwen:['the Grudge-Keeper','never forgets a curse, and always pays it back'],Grub:['the Mercenary','helps anyone… for a price'],
@@ -6840,7 +6913,7 @@ function phList(p){const ids=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[
 function oppsFullHTML(me){const ps=G.pl.filter(p=>p.i!==me);const f=UI.oppView;ps.sort((a,b)=>(b.i===f)-(a.i===f));if(!ps.length)return '<p class="muted">No rivals.</p>';
   return ps.map(p=>{const act=p.i===G.active;return `<div class="oppfull paper ${act?'active':''}"><span class="lv" aria-label="level">${p.lvl}</span>
    <div class="nm">${ptok(p.i)} ${esc(heroTitle(p))} ${p.human?'':'<span class="small muted">(computer'+(p.lv!=='normal'?' · '+p.lv:'')+')</span>'}${act?' <span class="chip" style="background:#ffd43b;color:#2b2233">their turn</span>':''}</div>
-   <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}) · ${p.sex==='m'?'♂':'♀'} · ✋ ${p.hand.length} card${p.hand.length===1?'':'s'} in hand (secret)${p.dead?' · 💀 dead':''}</div>${PERSONA[p.nm]?`<div class="small muted">${esc(PERSONA[p.nm][1])}.</div>`:''}${(()=>{const me=viewSeat();const rv=me>=0&&me!==p.i&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]):null;return rv&&(rv.curse+rv.boost+rv.stab)?`<div class="small warn">Against you so far: ${rv.curse} curse${plural(rv.curse)}, ${rv.boost} monster boost${plural(rv.boost)}, ${rv.stab} backstab${plural(rv.stab)}.${rv.curse>=2?' Payback?':''}</div>`:''})()}
+   <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}) · ${p.sex==='m'?'♂':'♀'} · ${handIc()} ${p.hand.length} card${p.hand.length===1?'':'s'} in hand (secret)${p.dead?' · 💀 dead':''}</div>${PERSONA[p.nm]?`<div class="small muted">${esc(PERSONA[p.nm][1])}.</div>`:''}${(()=>{const me=viewSeat();const rv=me>=0&&me!==p.i&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]):null;return rv&&(rv.curse+rv.boost+rv.stab)?`<div class="small warn">Against you so far: ${rv.curse} curse${plural(rv.curse)}, ${rv.boost} monster boost${plural(rv.boost)}, ${rv.stab} backstab${plural(rv.stab)}.${rv.curse>=2?' Payback?':''}</div>`:''})()}
    <div class="chips">${races(p).concat(classes(p)).map(r=>`<span class="chip">${esc(TRAITNAME[r]||r)}</span>`).join('')}${p.curse.map(id=>`<span class="chip" style="background:#e9ecef;color:#2b2233">☁ ${esc(cname(id))}</span>`).join('')}</div>
    <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div>${phList(p)}</div>`}).join('')}
 function deckHTML(kind,n){const d=Math.min(10,Math.ceil(n/7));const sh=[];for(let i=1;i<=d;i++)sh.push(`${(i*.55).toFixed(1)}px ${(i*1.25).toFixed(1)}px 0 ${i===d?'#1a0d06':i%2?'#e9dab4':'#bfa878'}`);
@@ -6887,7 +6960,7 @@ function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><di
   const gear=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).map(id=>gchipHTML(id,'')).join('')+(p.hire!=null?gchipHTML(p.hire,''):'')+p.eq.map(e=>gchipHTML(e.id,(e.on?'':'eqoff ')+(sellSet?selc(e.id):playable.has(e.id)?'play':'')+(sug===e.id?' sug':''))).join('')+p.curse.map(id=>gchipHTML(id,'')).join('');
   const lim=handLimit(p),over=p.hand.length-lim;
   return `<section class="mine paper" aria-label="You"><div class="top"><span class="who">${ptok(p.i)} ${esc(p.nm)}${G.mode!=='ai'?' <span class="you">(you)</span>':''} <span class="small muted">${p.sex==='m'?'♂':'♀'}${races(p).concat(classes(p)).map(r=>' · '+(TRAITNAME[r]||r)).join('')}</span></span>
-    <span class="str">⚔ <b>${pStr(p)}</b> strength <span class="muted">(level ${p.lvl} + items ${itemBonus(p)}${p.sexPen?' − 5 next fight':''})</span> · ✋ ${p.hand.length} card${plural(p.hand.length)} <span class="${over>0?'warn':'muted'}">(limit ${lim}${over>0?`: give away ${over} at end of turn`:''})</span>${p.hire!=null?' · Porter':''}${p.dead?' · 💀 dead until next turn':''}</span><span class="swipe" aria-hidden="true">${p.hand.length>3?'⇆ swipe':''}</span><span class="lv"><small>Lv</small> ${p.lvl}</span></div>
+    <span class="str">⚔ <b>${pStr(p)}</b> strength <span class="muted">(level ${p.lvl} + items ${itemBonus(p)}${p.sexPen?' − 5 next fight':''})</span> · ${handIc()} ${p.hand.length} card${plural(p.hand.length)} <span class="${over>0?'warn':'muted'}">(limit ${lim}${over>0?`: give away ${over} at end of turn`:''})</span>${p.hire!=null?' · Porter':''}${p.dead?' · 💀 dead until next turn':''}</span><span class="swipe" aria-hidden="true">${p.hand.length>3?'⇆ swipe':''}</span><span class="lv"><small>Lv</small> ${p.lvl}</span></div>
     <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="slots" aria-hidden="true"><i data-s="head">🪖</i><i data-s="body">🛡</i><i data-s="hands">🗡</i><i data-s="feet">👢</i></span><span class="small muted nogear">nothing yet: items you play from your hand appear here.</span>'}</div>
     <div class="hand${p.hand.length>3?' many':''}" aria-label="Your hand, ${p.hand.length} cards${p.hand.length>3?', scroll sideways for more':''}">${p.hand.map((id,i)=>{const n=p.hand.length,q=i-(n-1)/2;const fan=`style="--rot:${Math.max(-6,Math.min(6,q*1.7)).toFixed(1)}deg;--arc:${Math.min(10,q*q*.9).toFixed(1)}px"`;if(sellSet)return cardHTML(id,{cls:selc(id),attr:fan});const pl=playable.has(id);const rk=pl&&UI.hints?riskyCard(me,id):'';
       return cardHTML(id,{cls:(pl?(rk?'play risky ':'play '):''),badge:sug===id?badge:'',risk:rk,attr:fan})}).join('')||'<span class="small muted">No cards.</span>'}</div></section>`}
@@ -6975,7 +7048,7 @@ function menuHTML(me){const u=UI.menu;
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
-  return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?dkPortrait(w.nm,'winp'):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
+  return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?(dkHero3d(w.nm,'win3d')||dkPortrait(w.nm,'winp')):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
   return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick doors. Fight monsters. Stab friends.</p>${typeof tutBtn==='function'?tutBtn('btn bigb'):''}${online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`}${online?'':introHTML(n,UI.mode||'F')}
    <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
@@ -7127,7 +7200,8 @@ function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
   if(z[0]==='p')return q(`#phopps [data-opp="${z.slice(1)}"],#app .opps [data-opp="${z.slice(1)}"]`);
   if(z==='door')return q('.pile.pl,.bfdoor,.arena:not(:has(.vs))');if(z==='disc')return q('.pile.pr');return []}
-const bfCap=(t,n)=>{const w=String(t).split(/\s+/);return w.length>n?w.slice(0,n-1).join(' ')+'…':String(t)};
+// a hyphenated name counts as two words (the 8-word rule counts "Off-Key" as two)
+const bfCap=(t,n)=>{const w=String(t).split(/\s+/),k=x=>x.split(/[-–—]+/).filter(Boolean).length||1;let tot=0;w.forEach(x=>tot+=k(x));if(tot<=n)return String(t);let c=0,i=0;while(i<w.length&&c+k(w[i])<=n-1){c+=k(w[i]);i++}return w.slice(0,i).join(' ')+'…'};
 const bfShort=t=>{t=String(t).replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'');return t.length>26?t.slice(0,25)+'…':t};
 function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAttribute('data-bfz');e.removeAttribute('data-bfl');e.classList.remove('bf-tgt','bf-over')});
   document.querySelectorAll('.bf-picked').forEach(e=>e.classList.remove('bf-picked'));document.documentElement.classList.remove('bf-holding');
@@ -7351,6 +7425,9 @@ function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;co
   if(w!==w0){hd.style.setProperty('--hw',w.toFixed(1)+'px')}
   hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');
   hd.classList.toggle('scrolls',sc)}
+// bring an element into view inside its OWN sideways scroller (the hand, the gear row) and nothing else: scrollIntoView also scrolls the clipped
+// (overflow:hidden) table board sideways, which pushed the hand, the rival chips and the glow targets off the screen
+function dkReveal(e){for(let p=e&&e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX;if((o==='auto'||o==='scroll')&&p.scrollWidth>p.clientWidth+1){const r=e.getBoundingClientRect(),q=p.getBoundingClientRect();p.scrollLeft+=(r.left+r.width/2)-(q.left+q.width/2);return}}}
 // press and hold a rival seat: their gear and cards (tap is for dropping a card on them)
 function tbSeatDown(e){const s=e.target.closest&&e.target.closest('.opps .opp[data-opp]');if(!s||e.button>0)return;clearTimeout(TB.lp);const i=+s.dataset.opp,x=e.clientX,y=e.clientY;
   TB.lp={i,x,y,t:setTimeout(()=>{TB.lp=null;TB.lpAt=Date.now();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}UI.oppView=i;render();GX.show('dkOpp');const d=document.querySelector('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0},480)}}
@@ -7433,9 +7510,10 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   const _r=render;render=function(){const r=_r.apply(this,arguments);tableApply();return r};
   addEventListener('resize',tableApply);addEventListener('orientationchange',tableApply);
   ['door','treasure','cellar-oak','corridor-brass','crypt-bone'].forEach(n=>{new Image().src='media/back-'+n+'.webp'});
+  window.handIc=()=>document.documentElement.classList.contains('dk-hand')?'<img class="pic" src="media/icon-hand.webp" alt="">':'✋';
   tableApply();
   // painted HUD pieces: each class goes on <html> once its file has loaded (the CSS fallback stays until then)
-  [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
+  [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse'],['dk-hand','icon-hand'],['dk-lv','icon-level'],['dk-bt','ui-bubble-tail']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
 })();
 
 </script>
@@ -7564,7 +7642,7 @@ function hlpPlan0(m,me){if(!m||me<0)return null;
   const b=hlpBtn(m);if(b)return {toE:b};
   if(m.card!=null){const f=hlpCardEl(m.card);if(!hvis(f))return null;const mv=bfMoves(me,m.card).find(x=>mvKey(x.m)===mvKey(m));if(!mv)return null;
     const to=bfEls(mv.z).find(hvis);if(!to)return null;
-    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{f.scrollIntoView({inline:'center',block:'nearest',behavior:'instant'})}catch(e){}}
+    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{dkReveal(f)}catch(e){}}
     return {toE:to,fromE:f}}
   return null}
 // a short reason (<= 15 words) from the advisor's own text; '' when there is no honest short reason
@@ -7696,7 +7774,7 @@ const tchip=i=>tq(`#phopps [data-opp="${i}"]`,`#app .opps [data-opp="${i}"]`);
 const mv=a=>`#prompt [data-mv*='"act":"${a}"']`;
 function tcardEl(key){const id=myId(key);return id==null?null:document.querySelector(`.mine .hand [data-card="${id}"]`)}
 // the visible strip of a hand card (its neighbour overlaps it); the hand scrolls the card into view first
-function tcard(key){const e=tcardEl(key);if(!tvis(e))return null;let r=e.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4){try{e.scrollIntoView({inline:'center',block:'nearest'})}catch(x){}r=e.getBoundingClientRect()}return hslice(e)}
+function tcard(key){const e=tcardEl(key);if(!tvis(e))return null;let r=e.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4){try{dkReveal(e)}catch(x){}r=e.getBoundingClientRect()}return hslice(e)}
 const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&!GX.open&&document.getElementById('modal').hidden&&!BF.drag;
 const tmine=()=>!!G&&!G.winner&&sideToAct()===0&&!G.q&&tclear();
 const nowStr=()=>{const cb=G.cb;return cb?[sideStr(cb),monStr(cb)]:[0,0]};
@@ -7960,7 +8038,7 @@ if(!G)render();
   /* ---- the little bar (top corner): LAB, checklist chip, run controls, quick rating ---- */
   function bar() {
     var b = el.bar; if (!b) { b = el.bar = mk('div', 'gxlab-bar'); document.body.appendChild(b); }
-    b.className = L.get('gx_lab_pos') === 'r' ? 'r' : '';
+    b.className = (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'r' : '';
     var r = run(), done = 0, tot = 0, h = '<button type="button" id="gxlab-btn" aria-label="LAB menu">🧪 LAB</button>';
     if (!inShelf && UP.length) { var c = ckCount(); h += '<button type="button" id="gxlab-ck" aria-label="Test checklist">📍 ' + c.done + '/' + c.tot + '</button>'; }
     if (r) h += '<button type="button" id="gxlab-next" class="on">Next ▶ ' + (r.i + 1) + '/' + r.ids.length + '</button>';
@@ -7978,7 +8056,7 @@ if(!G)render();
         if (t.dataset.go) { go(t.dataset.go); return; }
         if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
         if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
-        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', L.get('gx_lab_pos') === 'r' ? 'l' : 'r'); bar(); return; }
+        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', (L.get('gx_lab_pos') || (W.GXS && W.GXS.labPos) || 'l') === 'r' ? 'l' : 'r'); bar(); return; }
         if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
         if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
     fillMenu(); p.hidden = false;

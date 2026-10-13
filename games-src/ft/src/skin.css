@@ -33,7 +33,7 @@ html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-p
 html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
 html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
-html.sk .mbox .btn.sm{border-image-width:0 18px}
+html.sk .mbox .btn.sm{border-image-width:14px 18px}
 /* menu rows */
 html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
@@ -108,8 +108,8 @@ html.sk-pl .tile>*{z-index:2}
 html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.webp)}
 html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
 html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
-html.sk-pl .tile .tv{background:url(media/ui-badge-gold.webp) center/100% 100% no-repeat;border-color:transparent;z-index:3}
-html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/100% 100% no-repeat;box-shadow:none}
+html.sk-pl .tile .tv{background:url(media/ui-badge-gold.webp) center/142% no-repeat;border-color:transparent;z-index:3}
+html.sk-pl .dcard .dv{background:url(media/ui-badge-cream.webp) center/142% no-repeat;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
 html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
 html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
 html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}
@@ -119,3 +119,8 @@ html.sk-pl #finger svg{display:none}html.sk-pl #finger{background:url(media/ui-f
 .pic{width:1.25em;height:1.25em;vertical-align:-.3em;object-fit:contain}.tag .pic{margin-right:3px}
 html.sk-pl .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
 html.sk-pl .gxh-a-bottom .gxh-arr{bottom:-19px}html.sk-pl .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.sk-pl .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.sk-pl .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+
+/* look fixes: readable tile names, 44 px tap boxes for the goods row (footprint unchanged: margin takes back the extra 10 px) */
+html.sk-pl .tile .tn{background:rgba(255,247,226,.93);box-shadow:0 0 0 2px rgba(255,247,226,.93);border-radius:3px;color:#2e1a0a}
+html.sk-pl .tile .tv{color:#2a1500;font-weight:800;line-height:11px;padding-top:2px}
+html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-sizing:border-box;border:0;border-radius:7px;outline:1px solid #8a5a18;outline-offset:-5px;box-shadow:none;background-clip:content-box!important;background-origin:content-box!important}

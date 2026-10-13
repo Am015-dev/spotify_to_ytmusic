@@ -73,6 +73,27 @@
    "group": "Cards"
   },
   {
+   "id": "dk-status-line",
+   "name": "Short drag/tap status line",
+   "ask": "Is the line short and does it match?",
+   "sizes": "phone",
+   "group": "Board"
+  },
+  {
+   "id": "dk-tips",
+   "name": "Lightbulb, tips, rules cards, Tips switch",
+   "ask": "Do tips, bulb and rules cards work?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "dk-art",
+   "name": "Painted icons and 3D heroes",
+   "ask": "Are the new icons and hero figures in place?",
+   "sizes": "all",
+   "group": "Art"
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -113,6 +134,13 @@
    "id": "hb-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "hb-art",
+   "name": "Painted art wired",
+   "ask": "Are the resource icons painted?",
    "sizes": "all",
    "group": "UI"
   },
@@ -173,6 +201,101 @@
    "id": "ld-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "ld-art",
+   "name": "Painted cards, seats, tick and cross",
+   "ask": "Do cards and seats look painted?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
+ "nebula-aces": [
+  {
+   "id": "nb-tutorial-play",
+   "name": "Tutorial: tap your ship",
+   "ask": "Tap the glowing ship",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "nb-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "nb-zoom",
+   "name": "Ship card zoom",
+   "ask": "Is the ship card readable?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "nb-art",
+   "name": "Painted ship art on every hull",
+   "ask": "Does each ship have its picture?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "nb-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story"
+  }
+ ],
+ "rampart-and-vine": [
+  {
+   "id": "rv-board",
+   "name": "Start of game board",
+   "ask": "Is the table clear with glowing spots?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "rv-zoom",
+   "name": "Tile zoom: place a follower",
+   "ask": "Is the zoomed tile and its spots clear?",
+   "sizes": "all",
+   "group": "Cards"
+  },
+  {
+   "id": "rv-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
+   "id": "rv-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the buttons readable?",
+   "sizes": "all",
+   "group": "Board"
+  },
+  {
+   "id": "rv-art",
+   "name": "Painted pieces, rows and bubble tail",
+   "ask": "Are the pieces painted and coloured?",
    "sizes": "all",
    "group": "UI"
   },
@@ -270,6 +393,13 @@
    "ask": "Are the action buttons readable?",
    "sizes": "all",
    "group": "Board"
+  },
+  {
+   "id": "tb-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI"
   },
   {
    "id": "story-scene",

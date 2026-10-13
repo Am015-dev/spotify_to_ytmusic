@@ -1,6 +1,117 @@
 [
  {
   "date": "2026-10-13",
+  "game": "nebula-aces",
+  "title": "Painted art wired",
+  "items": [
+   "Every hull shows its own painted ship; radio strip on a painted plate"
+  ],
+  "check": "Does each ship card show its picture?",
+  "scn": [
+   "nb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick-dungeon",
+  "title": "Short status line",
+  "items": [
+   "Hand and level icons, speech-bubble tail, 3D winner hero",
+   "Lightbulb, first-time tips, rules cards, Tips switch",
+   "Drag/tap status line is 8 words or fewer"
+  ],
+  "check": "Is the line short and does it match?",
+  "scn": [
+   "dk-art",
+   "dk-tips",
+   "dk-status-line"
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "lantern-dive",
+  "title": "Painted art wired",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit",
+   "Painted card frames, tick/cross, seat plates, portrait Descent table"
+  ],
+  "check": "Do cards, seats and job marks look painted?",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "ld-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Painted art wired",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger",
+   "Menu tutorial row, speech badge and detail sheet are painted"
+  ],
+  "check": "Open Menu: Tutorial sits on the painted strip",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
+   null,
+   "tb-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "hollowbough",
+  "title": "Painted art wired",
+  "items": [
+   "Painted resource icons, season wheel and kit"
+  ],
+  "check": "Are the resource icons painted?",
+  "scn": [
+   "hb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "cauldron",
   "title": "Readable chip numbers",
   "items": [
@@ -65,33 +176,6 @@
    "Can you read the Help button?",
    "Is YOU vs MONSTERS big and clear?",
    "Boss clip, roar, then the monster card?",
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Readable map labels",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit",
-   "ROUND, region names and influence numbers on the map are bigger"
-  ],
-  "check": "Open a game: read ROUND and the region names on the map",
-  "scn": [
-   "tb-board",
-   "tb-rivals",
-   "tb-board",
-   "tb-buttons",
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
    null
   ]
  },
@@ -229,19 +313,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-13",
-  "game": "lantern-dive",
-  "title": "Lantern Dive: painted deep-sea table",
-  "items": [
-   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
-   "The Commander badge is now the lantern too",
-   "The trick table is a brass-rimmed painted pad",
-   "Oxygen tanks and boss hearts are painted",
-   "Buttons, top bar and menus use the brass kit"
-  ],
-  "check": "Start a dive and look at the table"
  },
  {
   "date": "2026-10-13",
@@ -515,6 +586,48 @@
    null,
    null,
    null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "rampart-and-vine",
+  "title": "Painted art wired",
+  "items": [
+   "Painted pieces, menu rows, bubble tail"
+  ],
+  "check": "Are the pieces painted and coloured?",
+  "scn": [
+   "rv-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Readable map labels",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger"
+  ],
+  "check": "Open a game: read ROUND and the region names on the map",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
+   null
+  ],
+  "ask": [
    null,
    null,
    null,

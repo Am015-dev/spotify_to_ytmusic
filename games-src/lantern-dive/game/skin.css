@@ -12,3 +12,5 @@ html.sk-heart #bossbar .hp i{flex:0 0 18px;max-width:none;width:18px;height:18px
 html.sk-heart #bossbar .hp i.on{opacity:1;filter:none}
 html.sk-air .o2 b::before{content:'';display:inline-block;width:22px;height:22px;margin-right:4px;vertical-align:-6px;background:url(media/icon-air.webp) center/contain no-repeat}
 html.sk .gx-bar{box-shadow:inset 0 0 0 100px rgba(5,18,40,.45),0 3px 8px rgba(0,0,0,.45)}
+/* seats: the brass diving-helmet plate behind the diver's name (background only; the name keeps its box) */
+html.sk-seat .seat:not(.drone) .top .nm{background:url(media/ui-seat.webp) center/100% 100% no-repeat;color:#2b1d0c;text-indent:7px;text-shadow:0 1px 0 rgba(255,245,210,.6)}

@@ -21,3 +21,8 @@ html.sk .btn:disabled{opacity:.8;filter:saturate(.45) brightness(.8) drop-shadow
 html.sk .btn.primary small,html.sk .btn.primary em,html.sk .btn.primary i{color:#fff8ec}
 @media (max-width:420px){html.sk .gx-bar{gap:2px;padding-left:4px;padding-right:4px}html.sk .gx-bar .gx-ibtn{border-image-width:8px}}
 html.sk .gx-ibtn>span{padding:0}
+/* radio chatter strip: smoked-glass row plate behind the text (background only, box unchanged) */
+html.sk #radio:not(:empty){background:url(media/ui-row.webp) center/100% 100% no-repeat}
+/* dark theme + cream button plates: dark ink on the plate (look check: "Skip" and the small lines under battle buttons were light on cream) */
+html.sk .btn:not(.sm):not(.primary):not(.armed) small{color:#3a4258}
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{color:#161a2a;text-shadow:none}
