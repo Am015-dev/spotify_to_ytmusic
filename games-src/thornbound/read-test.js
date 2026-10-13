@@ -89,7 +89,7 @@ function judge(scene,size,rows){
 async function run(browser,W,H){
   const size=W+'x'+H;
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:W<700,hasTouch:W<700});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const mf=require('path').join(__dirname,'..','..','games','thornbound',u.pathname);if(/^\/media\//.test(u.pathname)&&fs.existsSync(mf))return r.fulfill({status:200,contentType:'image/webp',body:fs.readFileSync(mf)});r.fulfill({status:200,contentType:'text/html',body:html})});
   const p=await ctx.newPage();p.setDefaultTimeout(15000);innerH=H;
   p.on('pageerror',e=>fails.push(size+' PAGE ERROR '+e.message));
   await p.goto('https://gns.test/'+(W<700?'?phone=1':''));await sleep(1200);
