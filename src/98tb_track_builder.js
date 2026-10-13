@@ -112,7 +112,8 @@ async function TB_save(){const t=TB.trk;if(!t)return;TB_saveLocal(t);TB.list[t.i
 function TB_regAll(){for(const id in TB.list){try{const d=TB_def(TB.list[id].t);if(d)TB_reg(d)}catch(e){}}}
 
 /* ---------------- the builder screen */
-const TB_css=`#tbx{position:fixed;inset:0;z-index:9000;background:#0d1626;color:#eef3ff;font:600 13px/1.2 system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+const TB_css=`body.tbOn #tuG,body.tbOn #odNew,body.tbOn #odPin{display:none!important}
+#tbx{position:fixed;inset:0;z-index:9000;background:#0d1626;color:#eef3ff;font:600 13px/1.2 system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
 #tbx canvas{position:absolute;left:0;top:0}#tbx .tbar{position:absolute;left:0;right:0;top:0;height:48px;display:flex;gap:4px;align-items:center;padding:2px 6px calc(2px) max(6px,env(safe-area-inset-left));background:rgba(8,14,28,.92);overflow-x:auto}
 #tbx button{min-width:44px;min-height:44px;border:0;border-radius:10px;background:#24324f;color:#fff;font:800 13px system-ui,sans-serif;padding:0 8px;flex:0 0 auto}#tbx button[aria-pressed=true]{background:#ffd12c;color:#111}
 #tbx button.go{background:#2bd46b;color:#06210f}#tbx .nm{max-width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -131,8 +132,8 @@ function TB_mk(){if(TB.el)return TB.el;const st=document.createElement('style');
   const e=document.createElement('div');e.id='tbx';e.hidden=true;e.innerHTML=`<canvas id="tbC"></canvas><div class="tbar" id="tbBar"></div><div class="pal" id="tbPal"></div><div class="hint" id="tbHint"></div><div class="lint" id="tbLint"></div><div class="sel" id="tbSel" hidden></div><div class="toast" id="tbToast" hidden></div><div class="ov" id="tbOv" hidden></div>`;
   document.body.appendChild(e);TB.el=e;TB.cv=e.querySelector('#tbC');TB_input();addEventListener('resize',()=>{if(TB.on)TB_draw()});return e}
 function TB_toast(m){const e=TB.el&&TB.el.querySelector('#tbToast');if(!e)return;e.textContent=m;e.hidden=false;clearTimeout(TB.toast);TB.toast=setTimeout(()=>e.hidden=true,2200)}
-function TB_open(t){TB_mk();TB.on=true;TB.el.hidden=false;if(t){TB.trk=TB_clone(t);TB.lint=null;TB.undo=[];TB.sel=-1;TB_fit()}if(!TB.trk){TB_drawList();return}TB_ui()}
-function TB_close(){TB.on=false;if(TB.el)TB.el.hidden=true;try{buildMenu()}catch(e){}}
+function TB_open(t){TB_mk();TB.on=true;TB.el.hidden=false;document.body.classList.add('tbOn');TB.el.querySelector('#tbOv').hidden=true;if(t){TB.trk=TB_clone(t);TB.lint=null;TB.undo=[];TB.sel=-1;TB_fit()}if(!TB.trk){TB_drawList();return}TB_ui()}
+function TB_close(){TB.on=false;document.body.classList.remove('tbOn');if(TB.el)TB.el.hidden=true;try{buildMenu()}catch(e){}}
 function TB_push(){TB.undo.push(JSON.stringify(TB.trk));if(TB.undo.length>80)TB.undo.shift()}
 function TB_changed(){TB.lint=TB_lint(TB.trk);TB_ui()}
 const TB_btn=(lab,fn,o={})=>{const b=document.createElement('button');b.innerHTML=lab;b.onclick=e=>{e.stopPropagation();fn(b)};if(o.p!=null)b.setAttribute('aria-pressed',!!o.p);if(o.c)b.className=o.c;if(o.t)b.title=o.t;return b};
@@ -223,7 +224,7 @@ function TB_input(){const cv=TB.cv,P=TB.ptr;
   cv.addEventListener('wheel',e=>{e.preventDefault();const[x,z]=TB_s2w(e.clientX,e.clientY);TB.view.s=clamp(TB.view.s*Math.exp(-e.deltaY*.0015),.02,3);const[x2,z2]=TB_s2w(e.clientX,e.clientY);TB.view.x+=x-x2;TB.view.z+=z-z2;TB_draw()},{passive:false});
   addEventListener('keydown',e=>{if(!TB.on||e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();const s=TB.undo.pop();if(s){TB.trk=JSON.parse(s);TB_changed()}}else if(e.key==='Delete'&&TB.sel>=0){TB_push();TB.trk.pts.splice(TB.sel,1);TB.sel=-1;TB_changed()}e.stopPropagation()},true)}
 // ---- MY TRACKS / new / copy a circuit / track code
-function TB_drawList(){TB_mk();TB.on=true;TB.el.hidden=false;const o=TB.el.querySelector('#tbOv');o.hidden=false;o.innerHTML='';
+function TB_drawList(){TB_mk();TB.on=true;TB.el.hidden=false;document.body.classList.add('tbOn');const o=TB.el.querySelector('#tbOv');o.hidden=false;o.innerHTML='';
   const head=document.createElement('div');head.className='rowb';head.append(TB_btn('◀ MENU',()=>{o.hidden=true;TB_close()}),TB_btn('＋ NEW FRANKFURT',()=>{o.hidden=true;TB_open(TB_new('fra'))}),TB_btn('＋ NEW ATHENS',()=>{o.hidden=true;TB_open(TB_new('ath'))}));
   if(TB.trk)head.append(TB_btn('✎ BACK TO EDITOR',()=>{o.hidden=true;TB_ui()},{c:'go'}));o.append(head);
   const h=document.createElement('h3');h.textContent='MY TRACKS'+(TB.db?' · shared':' · on this device');o.append(h);
@@ -241,7 +242,7 @@ function TB_codeBox(t){const o=TB.el.querySelector('#tbOv'),ta=document.createEl
 function TB_fromDef(d){const t=TB_new(d.city==='ath'?'ath':'fra');t.name=d.short+' (copy)';t.laps=Math.min(3,d.laps||3);t.pts=d.cp.map(c=>[Math.round(c[0]*S),Math.round(c[2]*S),Math.max(0,Math.round(c[1])),'grass']);return t}
 // ---- TEST DRIVE: register the def and start a quick race on it (RETRY reuses the built world: no rebuild)
 function TB_test(){const t=TB.trk;if(!t)return;const def=TB_def(t);if(!def){TB_toast('Draw a loop first (3+ points)');return}TB_reg(def);TB.list[t.id]=Object.assign({src:'draft'},TB.list[t.id],{t:TB_clone(t)});
-  TB.on=false;TB.el.hidden=true;menuTab='quick';menuTrack=t.id;menuMood=def.mood;if(typeof trkCity!=='undefined')trkCity=t.city;startRace()}
+  TB.on=false;TB.el.hidden=true;document.body.classList.remove('tbOn');menuTab='quick';menuTrack=t.id;menuMood=def.mood;if(typeof trkCity!=='undefined')trkCity=t.city;startRace()}
 // pause + results: ✎ EDIT TRACK (only on builder tracks), MY TRACKS block in the race menu, BUILDER on the home footer
 function TB_editBtns(){for(const[sel,id]of[['#pause .row','tbEdP'],['#results .row','tbEdR']]){const row=$(sel);if(!row)continue;let b=document.getElementById(id);
   if(!b){b=document.createElement('button');b.id=id;b.className='go alt';b.textContent='✎ EDIT TRACK';b.onclick=()=>{paused=false;$('#pause').hidden=true;$('#results').hidden=true;const t=TRK&&TRK.tb;try{toMenu()}catch(e){}if(t)TB_open(t)};row.appendChild(b)}b.hidden=!(TRK&&TRK.tb)}}
@@ -260,4 +261,4 @@ const TB_BUILTIN=[{"v":1,"id":"tb_demo_twister","name":"Twister GP","city":"fra"
 TB_loadLocal();TB_regAll();
 if(String(menuTrack).startsWith('tb_')&&!TRACK_DEFS.some(d=>d.id===menuTrack)){menuTrack='grand'}
 TB_dbInit();
-window.__tb={open:TB_open,list:TB_drawList,lint:t=>TB_lint(t||TB.trk),def:t=>TB_def(t||TB.trk),get:()=>TB.trk,set:t=>{TB.trk=t;TB.undo=[];TB.lint=null;TB_changed()},fit:()=>{TB_fit();TB_draw()},test:TB_test,state:()=>({on:TB.on,tool:TB.tool,n:TB.trk&&TB.trk.pts.length,db:!!TB.db,dbErr:TB.dbErr,list:Object.keys(TB.list)}),V:TB_V,code:TB_code,decode:TB_decode};
+window.__tbS=(x,z)=>TB_w2s(x,z);window.__tb={open:TB_open,list:TB_drawList,lint:t=>TB_lint(t||TB.trk),def:t=>TB_def(t||TB.trk),get:()=>TB.trk,set:t=>{TB.trk=t;TB.undo=[];TB.lint=null;TB_changed()},fit:()=>{TB_fit();TB_draw()},test:TB_test,state:()=>({on:TB.on,tool:TB.tool,n:TB.trk&&TB.trk.pts.length,db:!!TB.db,dbErr:TB.dbErr,list:Object.keys(TB.list)}),V:TB_V,code:TB_code,decode:TB_decode};
