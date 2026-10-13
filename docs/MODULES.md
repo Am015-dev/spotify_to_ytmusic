@@ -35,7 +35,7 @@ file | KB | purpose | first defines
 85_audio_feel_sp_otg.js | 105 | AU adaptive music/SFX (AU_), FL feel: vehicle auto-s | AU_M AU_BPM AU_KEYS
 90_fixes_cv_ju.js | 85 | OB burst-cause log (OB_), OC night lights/Acropolis  | OB OB_who OB_prop
 92_garage_builder.js | 17 | GB brick builder core: pieces GB_PC GB_piece GB_bric | GB_U GB_PH GB_MAX
-93_cars_lego.js | 66 | LEGO cars (CR_): part geometry (CR_bb CR_side CR_whe | CR_G CR_W CR_LO
+93_cars_lego.js | 67 | LEGO cars (CR_): part geometry (CR_bb CR_side CR_whe | CR_G CR_W CR_LO
 94_garage_ui.js | 19 | garage builder scene + pointer picking + UI (#gbx),  | GB_hullMeshes GB_scanBase GB_gridMesh
 95_drive_flow.js | 19 | DR probe window.__dr + driving flow: fewer breakable | DR_edge __dr DR
 96_scale_qa.js | 33 | SC/SC2 real scale (SC_: 1.8 m humans, road setback), | SC_K SC_S SC_cam
@@ -86,7 +86,7 @@ file | KB | purpose | first defines
 98of_onfoot.js | 65 | OF (v89a): ON FOOT P1 (docs/ON_FOOT_PLAN.md §4 P1).  | OF OF_R OF_STEP
 98sh_shadow.js | 4 | SHB (v90k): soft blob shadows on the ground under th | SHB SHB_pool SHB_M
 98lf_lively_fill.js | 19 | LF (art-2, 2026-10-13): fill the EMPTY GREEN. Alex:  | LF LF_count LF_hrange
-99c_checklist.js | 82 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | OD_CHECKLIST
+99c_checklist.js | 87 | CK: in-game TEST CHECKLIST (Alex 2026-10-08: "I will | CK_pit OD_CHECKLIST
 98rf_race_fun.js | 10 | (no header comment) | RF_GRID RF_rub RF_lat
 98ro_open.js | 30 | OPN (race worker, 2026-10-09): OPEN race courses in  | OPN_TER OPN_K OPN_I0
 98zp_perf_ctx.js | 13 | PERF1 (v89i): one WebGL context The menu car cards ( | P1 P1_rt P1_free
