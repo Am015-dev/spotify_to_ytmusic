@@ -42,3 +42,12 @@ then 6553 6571 6581 6594 6431 6473 6481 6484 6545 3056 6406 4016 30283 30284 200
 - Run at most 4 ld2garage.py in parallel; 13 in parallel corrupted a cache (JSONDecodeError), rerun fixes it.
 - Trucks with trailers: --only "<set> - Truck" --drop trailer. When the cab is a sibling submodel (60018), use --drop worker,wheelbarrow,driver instead of --only.
 - tools/ld/calib.json changes on every run; not committed.
+
+## veh-3 session (2026-10-13): 21 more done, GRID docs/shots/veh/GRID_3.jpg, sent to build-9 (session_01GMDcFfTGnwQmyHKU8PFQfp; build-7 is dead)
+6535 6550(yaw 0) 6470 1029 6553 6571 6571-1b(FD car 2) 6581 6594(cab only) 6431 6473(ground vehicle) 6481 6484(hauler) 6484-1b(F1 car) 6545 3056 30283 30284 20011 31027 6753-1b(red car).
+- Second vehicle from one set: cp ld/omr/<s>-1.mpd ld/omr/<s>-1b.mpd, then vehcv.sh <s>-1b "<sub>".
+- Skipped: 6743 (10 wide), 6753 truck (16 wide), 10220 (Creator Expert van, not minifig scale), 6406 (same go-kart as 3056), 6742 (no file found).
+- Other OMR source: GitHub mirror https://raw.githubusercontent.com/anteloc/ldraw-lib/606be1421f6c353d9f23f6c467e0be1812280455/models/<file>.mpd (has 4016-1.mpd, no FILE header).
+- Setup gotcha: in a fresh container, add all src/98ld_v_*.js missing from src/MODELS locally (`git update-index --assume-unchanged src/MODELS`), build, run ld_dump.js before vehcv.sh (ld2garage needs ld/ours.json).
+- tRides "car rod" in the log = the ride didn't load (shot shows the default car); rerun until it is gone.
+## Next: 4016 (GitHub mirror), more Classic Town/City cars from the OMR list.
