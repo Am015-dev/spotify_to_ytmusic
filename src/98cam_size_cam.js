@@ -4,7 +4,7 @@
 // the road (the ray camera → road 10 m ahead passes 1-2 m below the cab roof). Also SC_rcam swaps the heights in one frame (a snap on a ride switch).
 // Fix: the chase camera (b back, h up, l look-ahead) is SOLVED from the ride's measured side profile (vertices binned along its length): the road point
 // 10 m past the nose must be in view over the cab (+0.3 m) at ~62 % screen height, the ride fills 15-35 % of the screen height (target 24 %), as close to
-// the stock camera as possible (normal cars keep the stock camera when it already passes). Re-solved on every ride/aspect change, blended over ~2 s.
+// the stock camera as possible (normal cars keep the stock camera when it already passes). Re-solved on every ride/aspect change, eased (≤ 4 m/s, ~2-3 s).
 const CAM={on:1,k:'',due:0,f:0,P:null,T:{},cur:null,asp:0,sP:.62,fill:.24,m:.3,ahead:10,n:{fit:0,keep:0},go:null,log:[]};
 const _cmV=new THREE.Vector3(),_cmB=new THREE.Box3();
 // side profile in the car frame: z forward from RO, y up from RO.y; bins of 0.5 m → top height; g = lowest point (tyre bottoms)
@@ -29,16 +29,17 @@ function CAM_solve(P,n){const C0=CAM_base(n),T=Math.tan(CAM_vfov()/2);
  for(let b=bMin;b<=60;b+=.25)for(let h=Math.max(1.2,C0.h*.8);h<=30;h+=.1){const aP=Math.atan2(h-P.g,P.z1+CAM.ahead+b),th=aP-aim,e=CAM_eval(P,b,h,th,T);if(!CAM_ok(e))continue;
   const c=((b-C0.b)/C0.b)**2+((h-C0.h)/C0.h)**2+6*(e.fill-CAM.fill)**2;if(c<bc){bc=c;best={b,h,th,e}}}
  if(!best)return Object.assign({keep:1,fail:1,e:e0},C0);const{b,h,th}=best,ly=C0.ly,l=Math.max(4,(h-ly)/Math.max(.02,Math.tan(th))-b),r=b/C0.b;
- return{b:+b.toFixed(2),h:+h.toFixed(2),l:+l.toFixed(2),ly,bk:C0.bk*r,hk:C0.hk*h/C0.h,lk:C0.lk*l/C0.l,e:best.e}}
+ return{b:+b.toFixed(2),h:+h.toFixed(2),l:+l.toFixed(2),ly,bk:C0.bk*r,hk:0,lk:C0.lk*l/C0.l,e:best.e}}
 function CAM_fit(){const P=CAM_prof();if(!P)return;CAM.P=P;CAM.asp=camera.aspect;CAM.T={};let kp=0;for(const n in RCAM){if(n==='high')continue;const s=CAM_solve(P,n);CAM.T[n]=s;if(n===(SET.rcam||'chase'))kp=s.keep}
  CAM.n.fit++;if(kp)CAM.n.keep++;CAM.log.push([RO.vsel||'',+P.L.toFixed(2),+P.H.toFixed(2),(CAM.T[SET.rcam||'chase']||{}).b,(CAM.T[SET.rcam||'chase']||{}).h]);if(CAM.log.length>20)CAM.log.shift()}
 // when: 30 sim frames after the ride (mesh / form) changes (the first frames still show stock parts), on a big aspect change (rotation), then every 4 s
 function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=ud.m.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
- if(key!==CAM.k){CAM.k=key;CAM.due=now+30;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05)CAM.due=Math.min(CAM.due,now);if(now<CAM.due)return;CAM.due=now+240;CAM_fit()}
+ if(key!==CAM.k){CAM.k=key;CAM.due=now+30;CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(now<CAM.due)return;CAM.due=now+240;CAM_fit();CAM.pend=0}
 const CAM_F=['b','h','l','ly','bk','hk','lk'];
 roamCam=(f=>function(dt){if(CAM.on&&state==='roam'&&(!RO.foot||RO.foot==='car')){try{CAM_upd();const n=SET.rcam||'chase',T=CAM.T[n],C=RCAM[n];
-  if(T&&C){const k=camSnap||!CAM.cur||CAM.cur.n!==n?1:Math.min(1,dt*1.4);if(k===1)CAM.cur={n};for(const q of CAM_F){const v=CAM.cur[q]==null?T[q]:CAM.cur[q]+(T[q]-CAM.cur[q])*k;CAM.cur[q]=v;C[q]=v}}}catch(e){}}
- const r=f(dt);try{const c=camera.position,ft=RO.foot&&RO.foot!=='car',ox=ft?OF.x:RO.x,oz=ft?OF.z:RO.z;CAM.cp={b:Math.hypot(c.x-ox,c.z-oz),h:c.y-(ft?OF.y:RO.y),v:RO.v||0,x:RO.x,z:RO.z,t:performance.now()}}catch(e){}return r})(roamCam);
+  const tn=performance.now(),rd=Math.min(dt,Math.max(0,Math.min(.1,(tn-(CAM.lt||tn))/1000)));CAM.lt=tn;
+  if(T&&C){const k=camSnap||!CAM.cur||CAM.cur.n!==n?1:Math.min(1,dt*1.4);if(k===1)CAM.cur={n};for(const q of CAM_F){const o=CAM.cur[q];let v;if(o==null||k===1)v=T[q];else{const d=(T[q]-o)*k,mx=(q==='l'||q==='lk'?Math.max(4,.5*Math.abs(T[q]-o)):q.length===1||q==='ly'?4:2)*rd;v=o+clamp(d,-mx,mx)}CAM.cur[q]=v;C[q]=v}}}catch(e){}}
+ const r=f(dt);try{const c=camera.position,ft=RO.foot&&RO.foot!=='car',ox=ft?OF.x:RO.x,oz=ft?OF.z:RO.z;const C=RCAM[SET.rcam||'chase'];CAM.cp={b:Math.hypot(c.x-ox,c.z-oz),h:c.y-(ft?OF.y:RO.y),cb:RO.camB,cy:RO.camY-RO.y,Ch:C&&C.h,Cb:C&&C.b,v:RO.v||0,x:RO.x,z:RO.z,t:performance.now()}}catch(e){}return r})(roamCam);
 // SC_rcam (BC_apply on a ride change) rewrites RCAM from the stock table in one frame: put the blended values straight back (no snap)
 SC_rcam=(f=>function(){const r=f.apply(this,arguments);try{const n=SET.rcam||'chase',C=RCAM[n];if(CAM.on&&CAM.cur&&CAM.cur.n===n&&C)for(const q of CAM_F)if(CAM.cur[q]!=null)C[q]=CAM.cur[q]}catch(e){}return r})(SC_rcam);
 // ---- test: what the player sees (real camera, 3D): ride share of the screen height, road point 10 m past the nose (ray not blocked by the ride, its
@@ -77,4 +78,4 @@ function CAM_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
  try{gbOpen();GAR_select(R[0])}catch(e){G.done=-1;return'📍 Can\'t switch the ride here'}
  let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>150){try{gbClose(true)}catch(e){}setTimeout(place,400)}else setTimeout(w,200)};setTimeout(w,300);
  return'📍 '+R[1]+' · loading the ride, then a straight street: the road 10 m past the nose shows in the lower middle, the ride fills 15-35 % of the screen height'}
-window.__cam={S:CAM,meas:CAM_meas,pass:m=>CAM_pass(m||CAM_meas()),go:CAM_go,fit:()=>{CAM.k='';CAM.due=0;CAM_fit();return CAM.T},prof:()=>CAM.P&&{L:CAM.P.L,H:CAM.P.H,z0:CAM.P.z0,z1:CAM.P.z1,g:CAM.P.g},rc:()=>RCAM[SET.rcam||'chase'],cp:()=>CAM.cp||null,sel:()=>{try{return GAR_get().sel}catch(e){return null}}};
+window.__cam={S:CAM,meas:CAM_meas,pass:m=>CAM_pass(m||CAM_meas()),go:CAM_go,fit:()=>{CAM.k='';CAM.due=0;CAM_fit();return CAM.T},prof:()=>CAM.P&&{L:CAM.P.L,H:CAM.P.H,z0:CAM.P.z0,z1:CAM.P.z1,g:CAM.P.g},rc:()=>RCAM[SET.rcam||'chase'],cp:()=>CAM.cp||null,settled:()=>{const n=SET.rcam||'chase',T=CAM.T[n],c=CAM.cur;if(RO.foot&&RO.foot!=='car')return true;if(!T||!c||CAM.pend||Math.abs((camera.aspect||1)-CAM.asp)>.05)return false;return['b','h','l','ly'].every(q=>Math.abs((c[q]??0)-(T[q]??0))<.05)},sel:()=>{try{return GAR_get().sel}catch(e){return null}}};
