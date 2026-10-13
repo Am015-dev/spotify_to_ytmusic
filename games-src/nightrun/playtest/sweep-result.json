@@ -1,5 +1,24 @@
 {
- "fails": [],
+ "fails": [
+  {
+   "tag": "390x763/story",
+   "kind": "story",
+   "detail": "no stage-failed screen after dying",
+   "shot": "fail1-story.png"
+  },
+  {
+   "tag": "1280x800/story#30",
+   "kind": "story",
+   "detail": "intro line not shown: [\"Phalanx and leaders. No gaps.\",\"STAGE CLEAR\",\"AGORA\",\"+1200\"]",
+   "shot": "fail2-story.png"
+  },
+  {
+   "tag": "lag",
+   "kind": "frame-spike",
+   "detail": "5 frames over 55 ms: 83.3ms after district0, 83.5ms after boss0, 100ms after boss0, 100ms after boss0, 66.7ms after boss1",
+   "shot": ""
+  }
+ ],
  "stats": {
   "runs": 0,
   "ticks": 0,
@@ -10,7 +29,82 @@
   "maxDistrict": 0,
   "pits": 0,
   "econ": [],
-  "shopChecks": 32
+  "shopChecks": 32,
+  "storyStages": 74,
+  "lag": {
+   "frames": 4396,
+   "avgFps": 58.3,
+   "p50": 16.7,
+   "p99": 33.4,
+   "max": 100,
+   "over50": 5,
+   "spikesAt": [
+    "83.3ms after district0",
+    "83.5ms after boss0",
+    "100ms after boss0",
+    "100ms after boss0",
+    "66.7ms after boss1"
+   ],
+   "urgent": 0,
+   "midPlayUrgent": 0,
+   "loads": 9,
+   "urgentLog": [],
+   "hist": [
+    "menu start 1343",
+    "stage1 start 1430",
+    "stage2 start 1559",
+    "stage2 end 1904",
+    "menu end 1917",
+    "stage1 end 1918",
+    "boss start 8787",
+    "boss end 9031",
+    "stage3 start 19607 pit",
+    "stage3 end 19698 pit",
+    "athina start 41815 pit",
+    "athina end 41904 pit",
+    "boss3 start 64007 pit",
+    "boss3 end 64100 pit",
+    "boss2 start 86507 pit",
+    "endless start 86511 pit",
+    "boss2 end 86613 pit",
+    "endless end 86675 pit"
+   ],
+   "marks": [
+    "district0@1728",
+    "boss-call0@8823",
+    "boss0@8876",
+    "boss-dead0@14941",
+    "pit0@19610",
+    "district1@24050",
+    "boss-call1@31084",
+    "boss1@31197",
+    "boss-dead1@37283",
+    "pit1@41848",
+    "district2@46314",
+    "boss-call2@53354",
+    "boss2@53384",
+    "boss-dead2@59463",
+    "pit2@64207",
+    "district3@68663",
+    "boss-call3@75733",
+    "boss3@75780",
+    "boss-dead3@81799",
+    "pit3@86392"
+   ],
+   "longtasks": 4,
+   "longtaskMax": 107,
+   "longtaskList": [
+    "107ms@40",
+    "93ms@19418",
+    "50ms@31247",
+    "63ms@31298"
+   ],
+   "inputSamples": 1088,
+   "inputP50": 0.1,
+   "inputP99": 0.4,
+   "inputMax": 3.6,
+   "errs": []
+  }
  },
  "avg": 0
 }

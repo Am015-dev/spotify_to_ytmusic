@@ -8,3 +8,6 @@ html.sk .gx-ibtn svg,html.sk .gx-ibtn svg *{stroke:#3a1f0a}
 html.sk .gx-drawer-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-drawer-head.webp) center/auto 100% repeat-x #f3e3c4}
 html.sk .gx-drawer-head h2{text-shadow:none}
 html.sk .gx-bar>*:not(.gx-ibtn):not(.gx-sp){color:#5a2d0a!important}
+html.sk .gx-drawer{border-width:0}
+html.sk .gx-bar #prompt,html.sk .gx-bar #prompt.mine{color:#6e3205}
+html.sk .gx-ibtn>span{padding:0}

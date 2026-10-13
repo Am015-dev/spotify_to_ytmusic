@@ -7,7 +7,7 @@ Generated 2026-10-13 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 110**: paintings 101, 3D source paintings 0, music/sound 8, video 1.
+**Total 109**: paintings 100, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
@@ -575,12 +575,12 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Size/ratio: 1024x512, ratio 7.22, transparent (flat white background, we key it)
 - Prompt: Hand-painted gouache illustration for a medieval valley tile-laying game, green fields, stone towers and vines, warm afternoon light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text. a single top plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
 
-## Sands of Qamar (`sands-of-qamar`): 9
+## Sands of Qamar (`sands-of-qamar`): 8
 
 Style block (in front of every picture prompt): Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text
 
 ### dcard-plate: dcard plate
-- Why: look-check finding. Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen
+- Why: look-check finding. Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen | Look-check: dcard plate looks plain on screen
 - Type: painting; priority 1 (look-check)
 - Save as: `dcard-plate.webp` (laptop) -> `games/sands-of-qamar/media/dcard-plate.webp`
 - Size/ratio: 512x512, ratio 4.16, transparent (flat white background, we key it)
@@ -601,7 +601,7 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Prompt: Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text. a single gx drawer head plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
 
 ### mi-plate: mi plate
-- Why: look-check finding. Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen
+- Why: look-check finding. Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen | Look-check: mi plate looks plain on screen
 - Type: painting; priority 1 (look-check)
 - Save as: `mi-plate.webp` (laptop) -> `games/sands-of-qamar/media/mi-plate.webp`
 - Size/ratio: 512x512, ratio 1.2, transparent (flat white background, we key it)
@@ -620,13 +620,6 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Save as: `spot-plate.webp` (laptop) -> `games/sands-of-qamar/media/spot-plate.webp`
 - Size/ratio: 512x512, ratio 0.71, transparent (flat white background, we key it)
 - Prompt: Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text. a single spot plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
-
-### spot-taken-plate: spot taken plate
-- Why: look-check finding. Look-check: spot taken plate looks plain on screen
-- Type: painting; priority 1 (look-check)
-- Save as: `spot-taken-plate.webp` (laptop) -> `games/sands-of-qamar/media/spot-taken-plate.webp`
-- Size/ratio: 512x512, ratio 0.68, transparent (flat white background, we key it)
-- Prompt: Hand-painted gouache illustration for a bazaar-and-palace bidding game, warm sand, copper and lapis blue, lantern light, soft rim light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text. a single spot taken plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
 
 ### tile-blue-plate: tile blue plate
 - Why: look-check finding. Look-check: tile blue plate looks plain on screen | Look-check: tile blue plate looks plain on screen

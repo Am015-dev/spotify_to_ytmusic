@@ -23,9 +23,9 @@ function wtxt(s,x,y){if(wcv===cv){ctx.fillText(s,x,y);return;}ctx.save();ctx.tra
 
 /* ---------- glow sprites ---------- */
 const gc={};
-function glow(col){if(gc[col])return gc[col];const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
+function glow(col0){if(gc[col0])return gc[col0];const col=/^#[0-9a-f]{3}$/i.test(col0)?'#'+col0[1]+col0[1]+col0[2]+col0[2]+col0[3]+col0[3]:col0;const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
   const r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,col+'ff');r.addColorStop(.18,col+'bb');r.addColorStop(.5,col+'30');r.addColorStop(1,col+'00');
-  g.fillStyle=r;g.fillRect(0,0,64,64);return gc[col]=c;}
+  g.fillStyle=r;g.fillRect(0,0,64,64);return gc[col0]=c;}
 function G_(x,y,r,col,a=1){ctx.globalAlpha=a;ctx.drawImage(glow(col),x-r,y-r,r*2,r*2);ctx.globalAlpha=1;}
 
 /* ---------- storage + settings ---------- */
