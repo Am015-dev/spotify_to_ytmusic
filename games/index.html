@@ -609,6 +609,12 @@ html.ph #feat .ft{max-width:none}
 #ckbody .cke.done{border-color:#2f7d4f}
 #ckbody .ckd{font:500 .8rem var(--mono);color:#bca78c;text-transform:uppercase;letter-spacing:.03em}
 #ckbody .ckd b{display:block;font:800 .95rem/1.25 var(--body);color:#f4ead8;text-transform:none;letter-spacing:0;margin-top:2px}
+#ckonly,#cknormal{width:100%;font:700 .9rem var(--body);min-height:44px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;touch-action:manipulation;margin-bottom:8px}
+#ckonly[aria-pressed=true]{border-color:#f0c05a;color:#f0c05a}
+#ckbody .cksc{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+#ckbody .cktry{min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid #f0c05a;background:rgba(240,192,90,.12);color:#f0c05a;font:800 .85rem var(--body);cursor:pointer;touch-action:manipulation}
+#ckbody .cktry.on{background:#f0c05a;color:#2a1b10}
+#ckbody .cka{font:700 .85rem/1.3 var(--body);color:#9fd6ff;flex:1;min-width:120px}
 #ckbody .ckc{font:800 .9rem/1.3 var(--body);color:#f0c05a;margin:8px 0 4px}
 #ckbody .cki{padding:8px 0;border-top:1px solid #3a2a1c}
 #ckbody .ckt{font:500 .9rem/1.35 var(--body);margin-bottom:6px}
@@ -867,6 +873,10 @@ let ckGame=null,ckState='closed',ckTimer=0;
 const ckEl=()=>document.getElementById('ck');
 const ckEnts=id=>UPDS.filter(e=>e.game===id);
 const ckK=(e,i)=>wnKey(e)+'|'+i;
+/* scenarios: an item may carry a scenario id (entry.scn[i], optional entry.ask[i]); "▶ Try this" opens the game with ?scn=<id> in the player frame */
+const ckScn=(e,i)=>(e.scn&&e.scn[i])||'';
+let ckScnId='',ckAsk={};const CKF='shelf_ck_scnonly';
+const ckOnly=()=>{try{return store.get(CKF)==='1'}catch(_){return false}};
 const ckLeftIn=(id)=>{const d=wnDone(),r=jget(CKR);let n=0;ckEnts(id).forEach(e=>{if(d[wnKey(e)])return;(e.items||[]).forEach((t,i)=>{if(!(r[ckK(e,i)]&&r[ckK(e,i)].s))n++})});return n};
 const ckMode=()=>(innerWidth<=700&&innerHeight>innerWidth)?'b':'r';
 function ckBadges(){
@@ -890,22 +900,29 @@ function ckLayout(){
   document.getElementById('cktest').setAttribute('aria-expanded',open?'true':'false');
   ckBadges();if(open)ckRender(true)}
 function ckSet(st){ckState=st;store.set(CKS,st);ckLayout();clearTimeout(ckTimer);ckTimer=setTimeout(ckLayout,400)}
+function ckTry(id){
+  const g=window.curGame;if(!g)return;ckScnId=id;
+  freshFrame();showLoader(g.name.replace(/ \(preview\)$/,''));
+  frame.src=g.src+(g.src.indexOf('?')<0?'?':'&')+'scn='+encodeURIComponent(id);frame.focus();ckRender(true)}
+function ckNormal(){const g=window.curGame;if(!g)return;ckScnId='';freshFrame();showLoader(g.name.replace(/ \(preview\)$/,''));frame.src=g.src;ckRender(true)}
+addEventListener('message',ev=>{const d=ev.data;if(!d||d.type!=='gxscn'||!frame||ev.source!==frame.contentWindow)return;ckAsk[d.id]={name:d.name||'',ask:d.ask||''};if(!ckEl().hidden)ckRender(true)});
 function ckRender(keep){
   const c=ckEl();if(c.hidden||!ckGame)return;const g=byId(ckGame),body=document.getElementById('ckbody'),st=body.scrollTop,r=jget(CKR),d=wnDone();
   document.getElementById('ckttl').textContent='Test: '+(g?g.name:ckGame);
-  const ents=ckEnts(ckGame);let h='<button type="button" id="ckcopy">&#128203; Copy results</button>';
+  const only=ckOnly();let ents=ckEnts(ckGame);if(only)ents=ents.filter(e=>(e.items||[]).some((_,i)=>ckScn(e,i)));
+  let h='<button type="button" id="ckcopy">&#128203; Copy results</button><button type="button" id="ckonly" aria-pressed="'+only+'">'+(only?'&#9745;':'&#9744;')+' Scenarios only</button>'+(ckScnId?'<button type="button" id="cknormal">&#9654; Back to normal game</button>':'');
   ents.forEach(e=>{
-    h+=`<section class="cke${d[wnKey(e)]?' done':''}"><div class="ckd">${wnDate(e.date)}<b>${esc(e.title)}</b></div>${e.check?`<p class="ckc">Try this: ${esc(e.check)}</p>`:''}`;
-    (e.items||[]).forEach((t,i)=>{const k=ckK(e,i),v=r[k]||{},s=v.s;
-      h+=`<div class="cki"><div class="ckt">${esc(t)}</div><div class="ckb">${[['ok','&#9989; Works'],['bad','&#10060; Problem'],['skip','&#9197; Skip']].map(([a,l])=>`<button type="button" data-ck="${a}" data-k="${esc(k)}" aria-pressed="${s===a}">${l}</button>`).join('')}</div>${s==='bad'?`<input class="ckn" type="text" maxlength="200" placeholder="What went wrong? (optional)" aria-label="Note" data-note="${esc(k)}" value="${esc(v.n||'')}">`:''}</div>`});
+    h+=`<section class="cke${d[wnKey(e)]?' done':''}"><div class="ckd">${wnDate(e.date)}<b>${esc(e.title)}</b></div>${e.check&&!only?`<p class="ckc">Try this: ${esc(e.check)}</p>`:''}`;
+    (e.items||[]).forEach((t,i)=>{const sid=ckScn(e,i);if(only&&!sid)return;const k=ckK(e,i),v=r[k]||{},s=v.s,ask=(ckAsk[sid]&&ckAsk[sid].ask)||(e.ask&&e.ask[i])||'';
+      h+=`<div class="cki"><div class="ckt">${esc(t)}</div>${sid?`<div class="cksc"><button type="button" class="cktry${ckScnId===sid?' on':''}" data-try="${esc(sid)}">&#9654; Try this</button>${ask?`<span class="cka">${esc(ask)}</span>`:''}</div>`:''}<div class="ckb">${[['ok','&#9989; Works'],['bad','&#10060; Problem'],['skip','&#9197; Skip']].map(([a,l])=>`<button type="button" data-ck="${a}" data-k="${esc(k)}" aria-pressed="${s===a}">${l}</button>`).join('')}</div>${s==='bad'?`<input class="ckn" type="text" maxlength="200" placeholder="What went wrong? (optional)" aria-label="Note" data-note="${esc(k)}" value="${esc(v.n||'')}">`:''}</div>`});
     h+='</section>'});
   if(!ents.length)h+='<div class="ckempty">Nothing to test for this game yet.</div>';
   body.innerHTML=h;body.scrollTop=keep?st:0}
 function ckText(id){
   const r=jget(CKR),g=byId(id),nm=g?g.name:id,out=[];
   ckEnts(id).forEach(e=>{const l=['Game Night test · '+nm+' · '+e.date];
-    (e.items||[]).forEach((t,i)=>{const v=r[ckK(e,i)]||{};
-      l.push(v.s==='ok'?'✅ '+t:v.s==='bad'?'❌ '+t+(v.n?' — '+v.n:''):v.s==='skip'?'⏭ '+t:'⬜ '+t+' (not tested)')});
+    (e.items||[]).forEach((t,i)=>{const v=r[ckK(e,i)]||{},sid=ckScn(e,i),tg=sid?' [scn:'+sid+']':'';
+      l.push(v.s==='ok'?'✅ '+t+tg:v.s==='bad'?'❌ '+t+tg+(v.n?' — '+v.n:''):v.s==='skip'?'⏭ '+t+tg:'⬜ '+t+tg+' (not tested)')});
     out.push(l.join('\n'))});
   return out.join('\n\n')}
 function ckToast(m){const t=document.getElementById('cktoast');t.textContent=m;t.hidden=false;clearTimeout(ckToast.t);ckToast.t=setTimeout(()=>{t.hidden=true},1800)}
@@ -925,7 +942,7 @@ function ckSync(){
     if(all&&!d[wk]){d[wk]=1;a[wk]=1;ch=true}else if(!all&&d[wk]&&a[wk]){delete d[wk];delete a[wk];ch=true}});
   if(ch){store.set(WNK,JSON.stringify(d));store.set(CKA,JSON.stringify(a));refreshUpd();const wp=document.getElementById('wnpanel');if(wp&&!wp.hidden)renderWn(true)}
   ckBadges()}
-function ckOpenGame(g){
+function ckOpenGame(g){ckScnId='';
   ckGame=g&&g.id!=='ref'?g.id:null;let st='closed';try{st=store.get(CKS)||'closed'}catch(_){}
   ckState=['open','min','closed'].includes(st)?st:'closed';ckLayout()}
 function ckCloseGame(){ckGame=null;ckLayout()}
@@ -938,6 +955,9 @@ function initCk(){
   document.getElementById('ckx').onclick=()=>ckSet('closed');
   body.addEventListener('click',e=>{
     if(e.target.closest('#ckcopy')){ckCopy(ckText(ckGame),ok=>ckToast(ok?'Copied':'Select and copy the text'));return}
+    if(e.target.closest('#ckonly')){store.set(CKF,ckOnly()?'0':'1');ckRender(false);return}
+    if(e.target.closest('#cknormal')){ckNormal();return}
+    const tr=e.target.closest('[data-try]');if(tr){ckTry(tr.dataset.try);return}
     const b=e.target.closest('[data-ck]');if(!b)return;
     const k=b.dataset.k,cur=(jget(CKR)[k]||{}).s,nx=b.dataset.ck;
     ckSetRes(k,cur===nx?null:nx,(jget(CKR)[k]||{}).n);ckRender(true);
