@@ -50,7 +50,8 @@ async function run(b,city){const vp={width:852,height:393};const tag=city;
  s=await st();ok(s.dHome>15&&s.dHome<40,tag+' fast travel lands at Home',{d:+s.dHome.toFixed(1)});
  await add('Home on the minimap (🏠 pin) after fast travel','3_home_minimap');fs.writeFileSync(path.join(OUT,tag+'_mini.json'),JSON.stringify(await G.evaluate(()=>{const r=document.getElementById('roamMini').getBoundingClientRect();return[r.left,r.top,r.width,r.height]})));
  // drive into the beacon: fast travel home leaves the car 26 m out facing it. GAS, then BRAKE to a stop on it (the card needs a stop)
- const goIn=async()=>{let f=0,mv=0;await down('gas',await center('#tG'));while(f<900){await tick(6);f+=6;s=await st();if(s.card||s.dHome<9)break;if(Math.abs(s.v)>1)mv=1;else if(!mv&&f%120===0){await up('gas');await tick(4);await down('gas',await center('#tG'))}}await up('gas');console.log(tag,'goIn',f,JSON.stringify(s));
+ const goIn=async()=>{let f=0,mv=0;await down('gas',await center('#tG'));let sd=0;const steer=async q=>{const m=await G.evaluate(()=>{const m=__hm.mark();return[m.x,m.z]});let ae=Math.atan2(m[0]-q.x,m[1]-q.z)-q.h;ae=Math.atan2(Math.sin(ae),Math.cos(ae));const w=ae>.13?-1:ae<-.13?1:0;if(w!==sd){if(sd)await up('st');if(w)await down('st',await center(w<0?'#tL':'#tR'));sd=w}};
+  while(f<900){await tick(6);f+=6;s=await st();if(s.card||s.dHome<9)break;await steer(s);if(Math.abs(s.v)>1)mv=1;else if(!mv&&f%120===0){await up('gas');await tick(4);await down('gas',await center('#tG'))}}await up('gas');if(sd)await up('st');console.log(tag,'goIn',f,JSON.stringify(s));
   if(Math.abs(s.v)>.6)await down('brk',await center('#tB'));for(let i=0;i<40;i++){await tick(4);s=await st();if(s.card||Math.abs(s.v)<.5)break}await up('brk');for(let i=0;i<60&&!(s=await st()).card;i++)await tick(6);return s};
  let f=0;s=await goIn();
  for(let i=0;i<60&&!(s=await st()).card;i++){await tick(6)}
