@@ -122,7 +122,7 @@ function hlpPlan0(m,me){if(!m||me<0)return null;
   const b=hlpBtn(m);if(b)return {toE:b};
   if(m.card!=null){const f=hlpCardEl(m.card);if(!hvis(f))return null;const mv=bfMoves(me,m.card).find(x=>mvKey(x.m)===mvKey(m));if(!mv)return null;
     const to=bfEls(mv.z).find(hvis);if(!to)return null;
-    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{f.scrollIntoView({inline:'center',block:'nearest',behavior:'instant'})}catch(e){}}
+    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{dkReveal(f)}catch(e){}}
     return {toE:to,fromE:f}}
   return null}
 // a short reason (<= 15 words) from the advisor's own text; '' when there is no honest short reason

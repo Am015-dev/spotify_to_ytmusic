@@ -2,12 +2,11 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
+Wired: 588 paintings, 47 3D models. Still to wire: 127 paintings, 12 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | sands-of-qamar | 31 | 0 |
-| cauldron-fair | 22 | 0 |
 | hollowbough | 19 | 1 |
 | rampart-and-vine | 18 | 4 |
 | lantern-dive | 11 | 0 |
@@ -15,12 +14,13 @@ Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 | crown-city-smash | 7 | 0 |
 | shipwreck-isle | 6 | 3 |
 | tidewake | 5 | 0 |
+| cauldron-fair | 4 | 0 |
 | thornbound | 3 | 0 |
-| sunglaze | 3 | 0 |
 | doorkick-dungeon | 3 | 4 |
+| sunglaze | 3 | 0 |
+| short-fuse | 2 | 0 |
 | kaiten-kitchen | 2 | 0 |
 | final-approach | 2 | 0 |
-| short-fuse | 2 | 0 |
 
 ## sands-of-qamar
 
@@ -59,35 +59,6 @@ Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 | Wave 1 Wave 1 | `ui-trophy` | a small copper trophy cup with a lapis band and two handles, single object, centred, plain flat white backgrou |
 | Wave 1 Wave 1 (16:9) | `ui-djinn-bar` | a long narrow banner plaque in deep violet lacquer with a thin hammered-gold border and small gold stars at bo |
 | Wave 1 Wave 1 (16:9) | `ui-ribbon` | a blank curling ribbon banner in terracotta with gold edges, centre empty, single object, centred, plain flat  |
-
-## cauldron-fair
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `btn-draw` | a big friendly clay button with a drawstring bag on it, single object, centred, plain flat white background, n |
-| Wave 3 Wave 3 | `btn-stop` | a big friendly clay button with a raised stop hand on it, single object, centred, plain flat white background, |
-| Wave 3 Wave 3 | `icon-boom` | a small cauldron pot with a puff of smoke bursting out, single object, centred, plain flat white background, n |
-| Wave 3 Wave 3 | `ui-slot` | a shallow round clay dish seen from above, single object, centred, plain flat white background, no shadow, no  |
-| Wave 3 Wave 3 | `ui-stall` | a market stall counter board of rough planks with a small cloth header and three round empty dishes, seen from |
-| Wave 3 Wave 3 | `ui-stall-locked` | a market stall counter board of rough planks with a small cloth header and three round empty dishes, dimmed, a |
-| Wave 3 Wave 3 (16:9) | `awning` | a scalloped red-and-cream striped awning edge seen from the front, seamless left to right, single object, cent |
-| Wave 3 Wave 3 (16:9) | `ui-chipbar` | a long narrow carved wooden track with seven shallow round pockets in a row, empty, single object, centred, pl |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of fairground parchment with a copper outline and a tiny curl at one corner,  |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of fairground parchment with a copper outline, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream with a copper rim, s |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, pumpkin-orange with a copp |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, potion-purple with a coppe |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of striped painted fair-booth wood with a copper edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round copper button with a potion green ring, centre empty, single object, centred, plain flat white b |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round copper medallion with a potion green ring, centre blank, larger with a small crown on top, single obje |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round copper medallion with a potion green ring, centre blank, with a small laurel at the bottom, single obj |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round copper medallion with a potion green ring, centre blank, dull and darkened with a small padlock at the |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round copper medallion with a potion green ring, centre blank, bright and polished, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-panel` | a fairground parchment panel with ornate copper corners and a thin copper border, the whole centre plain and e |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of fairground parchment with a thin copper edge and a small potion green diamond at the lef |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of striped painted fair-booth wood, seamless left to right, empty, no text |
 
 ## hollowbough
 
@@ -215,6 +186,17 @@ Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sea-chart parchment with a brass outline, single object, centred, p |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sea-chart parchment with a thin brass edge and a small teal lacquer diamond at the left  |
 
+## cauldron-fair
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 | `btn-draw` | a big friendly clay button with a drawstring bag on it, single object, centred, plain flat white background, n |
+| Wave 3 Wave 3 (16:9) | `ui-chipbar` | a long narrow carved wooden track with seven shallow round pockets in a row, empty, single object, centred, pl |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of fairground parchment with a copper outline, single object, centred, |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of fairground parchment with a thin copper edge and a small potion green diamond at the lef |
+
 ## thornbound
 
 3D: none
@@ -224,6 +206,16 @@ Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 | Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
+
+## doorkick-dungeon
+
+3D: hero-grub, hero-morwen, hero-pip, hero-tansy
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 | `icon-hand` | a small hand-painted icon of a fan of three blank playing cards, bold, readable at 24 px, single object, centr |
+| Wave 3 Wave 3 | `icon-level` | a small hand-painted icon of a gold level gem, bold, readable at 24 px, single object, centred, plain flat whi |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged parchment with a dark iron outline, single object, centred, pl |
 
 ## sunglaze
 
@@ -235,15 +227,14 @@ Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
 
-## doorkick-dungeon
+## short-fuse
 
-3D: hero-grub, hero-morwen, hero-pip, hero-tansy
+3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 3 Wave 3 | `icon-hand` | a small hand-painted icon of a fan of three blank playing cards, bold, readable at 24 px, single object, centr |
-| Wave 3 Wave 3 | `icon-level` | a small hand-painted icon of a gold level gem, bold, readable at 24 px, single object, centred, plain flat whi |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged parchment with a dark iron outline, single object, centred, pl |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
 
 ## kaiten-kitchen
 
@@ -262,12 +253,3 @@ Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 |---|---|---|
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
-
-## short-fuse
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |

@@ -12,6 +12,8 @@ function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0
 /* MINIMAL HUD (the default; settings > Visuals > HUD): no best score, no upgrade icon rows, no stat chips round the ship; only a small shield count and a revive count where the hull is.
    The numbers are still logged for the tests. */
 const HUDMIN=()=>SET.hud!=='full';
+const FPSOK=()=>!!SET.fpsc&&(/[?&]test=1/.test(location.search)||!touchUI);   // the FPS counter: PC any time; on a phone only in test mode (?test=1)
+function setRing(b,f,c,n){const key=f.toFixed(2)+'|'+n;if(!b||b._k===key)return;b._k=key;b.style.setProperty('--f',f);b.style.setProperty('--rc',c);b.dataset.n=n;}   // charge ring + count on a touch button
 function hudMin(c,k,x,y,t){try{Object.assign(HUDLOG,{x:HUDX.vals()});}catch(e){}
   const parts=[];if(SH.sh>0)parts.push(['#19e3ff','◆'+SH.sh]);if(TP.revLeft>0)parts.push(['#ff2d95','+'+TP.revLeft]);if(!parts.length)return;
   c.save();c.font=`700 ${13*k}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;for(const [col,txt] of parts){c.fillStyle=col;c.fillText(txt,xx,y);xx+=c.measureText(txt).width+10*k;}c.restore();}
@@ -57,30 +59,32 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
 function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.save();
   const sc=String(G.score).padStart(8,'0'),mu='×'+G.mult.toFixed(1),bs=String(Math.max(best.score,G.score)).padStart(8,'0');
   Object.assign(HUDLOG,{score:sc,mult:mu,best:bs,hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,tier:T,district:D.name+(G.loop?' +'+G.loop:''),story:ST.on?ST.n:0,goal:ST.on?ST.label():'',boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:((Math.floor(G.bp)%4)+4)%4,frame:HUDLOG.frame+1});
-  UIK.plate(ctx,'ui-hud-mult',6,4*k,206*k,(HUDMIN()?46:62)*k,20,12*k,33,125);     // the text sits inside the painted frame (12k thick), never on it
-  ctx.textAlign='left';ctx.font=`700 ${22*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,20*k,34*k);
-  const sw=ctx.measureText(sc).width;ctx.font=`${16*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,20*k+sw+10*k,33*k);
-  if(!HUDMIN()){ctx.fillStyle='#8c86b8';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),20*k,50*k);}
-  const dn=ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(DF===DIFFS.hard?' · HARD':DF===DIFFS.vhard?' · VERY HARD':DF===DIFFS.legend?' · LEGEND':'');
-  ctx.textAlign='right';ctx.font=`700 ${15*k}px "Chakra Petch",sans-serif`;const dtw=ctx.measureText(dn).width,tight=6+206*k+12+dtw>w-14,ro=tight?50*k:0;   // no room beside the score frame: the district block moves under it
-  ctx.fillStyle=D.a;ctx.fillText(dn,w-14,26*k+ro);
-  const pw=Math.min(170*k,Math.max(dtw,110*k)),px=w-14-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,33*k+ro,pw,4*k);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,33*k+ro,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),4*k);
-  if(!HUDMIN()||ST.on){ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,w-14,50*k+ro);}
-  // status row: hull, heat, dash, EMP on row 1, the weapons on row 2, all inside the painted frame (inner area: 12k in from every edge)
-  const y=88*k+ro,pw2=Math.min(w-12,270*k+34);UIK.plate(ctx,'ui-hud-bars',6,y-34*k,pw2,(HUDMIN()?66:82)*k,24,12*k,157,197);ctx.textAlign='left';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#dcd8f6';
-  const hw=Math.min(17,96/P.max);ctx.fillText('HULL',20*k,y-12*k);for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(20*k+i*hw*k,y-6*k,(hw-4)*k,9*k);}
-  const hx=20*k+P.max*hw*k+14*k;ctx.fillStyle='#dcd8f6';ctx.fillText('HEAT',hx,y-12*k);ctx.fillStyle='#ffffff1a';ctx.fillRect(hx,y-6*k,60*k,9*k);
-  ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(hx,y-6*k,60*k*P.heat/100,9*k);
-  const dx=hx+74*k;ctx.fillStyle='#dcd8f6';ctx.fillText('DASH',dx,y-12*k);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff1a';ctx.fillRect(dx,y-6*k,36*k*(1-P.dashCd),9*k);
-  const ex=dx+42*k;ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',ex,y-12*k);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(ex+5*k+i*14*k,y-1.5*k,4.5*k,0,7);ctx.fill();}
-  ctx.fillStyle='#dcd8f6';WP.hud(ctx,20*k,y+16*k,k);
-  if(HUDMIN())hudMin(ctx,k,14,y+50*k,t);else{SH.hud(ctx,t,{nx:24*k,ny:y+62*k,dx:dx,dy:y+30*k,sx:14,sy:y+70*k,k:k});
-  HUDX.ship(ctx,P.y,PH_-P.x,k,t);}
-  let ny=(HUDMIN()?y+60*k:y+90*k)+16*k;
-  if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(440,w-28);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+8*k,bw,9*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+8*k,bw*clamp(b.hp/b.max,0,1),9*k);
-    ctx.textAlign='center';ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+4*k);ny+=30*k;}
-  PW.hud(t,14,ny+22*k,k);
-  tierMeter(w/2,h-10*k,k*1.1);
+  // PHONE HUD (owner, 13 Oct 2026: "impossible to see"): ONE slim strip on the top edge, nothing else in the middle of the screen.
+  // left: score, multiplier, combo tier + a thin combo bar | right: hull pips + heat | hairline on the very top = district progress.
+  // The district / boss name is only the 2 s banner when it changes. Shield / revive / power-ups are small chips under the strip. Dash + EMP charge live on their touch buttons.
+  const sH=40*k,pad=10*k;ctx.fillStyle='#05030cc8';ctx.fillRect(0,0,w,sH);ctx.fillStyle=D.a+'66';ctx.fillRect(0,sH,w,1.5);
+  ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(0,0,w*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),2.5*k);
+  ctx.textAlign='left';ctx.font=`700 ${19*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,pad,19*k);
+  const sw=ctx.measureText(sc).width;ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,pad+sw+8*k,18*k);
+  {const col=TIERC[T-1],bx=pad+30*k,bw=Math.min(180*k,w*.36),sg=(bw-3*3*k)/TIERS,by=25*k,bh=6*k;
+    ctx.font=`700 ${13*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=col;ctx.fillText('×'+T,pad,32*k);
+    for(let i=0;i<TIERS;i++){const f=i<T-1?1:i===T-1?(T===TIERS?1:(C.n-(T-1)*TS)/TS):0,x=bx+i*(sg+3*k);ctx.fillStyle='#ffffff1c';ctx.fillRect(x,by,sg,bh);ctx.fillStyle=TIERC[i];ctx.fillRect(x,by,sg*f,bh);
+      if(i===T-1&&T===TIERS){ctx.globalAlpha=.3+.4*PUL;ctx.fillStyle='#fff';ctx.fillRect(x,by,sg,bh);ctx.globalAlpha=1;}}
+    if(C.n>0){const left=clamp(1-(G.bc-C.lb+PHF)/(8+SH.ck),0,1);ctx.fillStyle='#ffffff22';ctx.fillRect(bx,by+bh+2*k,bw,2*k);ctx.fillStyle=col;ctx.fillRect(bx,by+bh+2*k,bw*left,2*k);}}
+  {const hw=Math.min(11*k,70*k/P.max),hwid=P.max*(hw+3*k)-3*k,rx=w-pad;ctx.save();ctx.translate(rx-hwid-18*k,3*k);ctx.scale(.62*k,.62*k);ctx.fillStyle=P.hp<=1?'#ff3040':'#3dffb0';ctx.fill(HUDX.iHeart,'evenodd');ctx.restore();
+    for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(rx-hwid+i*(hw+3*k),6*k,hw,8*k);}
+    const lb=P.over?'OVERHEAT':'HEAT',bwd=64*k;ctx.textAlign='right';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle=P.over?'#ff3040':'#dcd8f6';ctx.fillText(lb,rx-bwd-5*k,32*k);
+    ctx.fillStyle='#ffffff1a';ctx.fillRect(rx-bwd,25*k,bwd,7*k);ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(rx-bwd,25*k,bwd*P.heat/100,7*k);}
+  Object.assign(HUDLOG,{x:HUDX.vals()});
+  let ny=sH+6*k;
+  if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+12*k,bw,6*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);
+    ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=21*k;}
+  {let cx=pad;const cy=ny+12*k;ctx.save();
+    if(SH.sh>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iShield,'#19e3ff','×'+SH.sh);
+    if(TP.revLeft>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iRev,'#ff2d95','×'+TP.revLeft);
+    ctx.restore();PW.chips(t,cx,cy,k);}
+  HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
+  {const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font=`700 ${17*k}px "Chakra Petch",sans-serif`;{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,w/2-tw/2-26*k,h-170*k-28*k,tw+52*k,44*k);}ctx.fillStyle='#fff';ctx.fillText(G.hint.txt,w/2,h-170*k);ctx.globalAlpha=1;}
   if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
@@ -91,7 +95,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     ctx.font=`${Math.min(15*k,w/Math.max(20,G.banner.b.length*.62))}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,w/2,h/2+26*k);ctx.globalAlpha=1;}
   ctx.restore();}
 
-let PUL=0,PHF=0,FD=0;
+let PUL=0,PHF=0,FD=0,HUDOFF=false;
 function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.012*(T-1)+.02*(T-1)*PUL*FX();c.fillStyle=TIERC[T-1];c.fillRect(0,0,W,H);c.restore();}   // each tier lifts the whole picture a little
 function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.55,sy;      // the ship's own shots stay thinner and dimmer than the lime enemy bullets
   if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
@@ -136,9 +140,9 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(PT){if(running)FXV.edges(t);
     ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);                // world, turned so that its right is the screen's up
     ctx.setTransform(VS,0,0,VS,0,0);ctx.drawImage(scanFor(true),0,0,PW_,PH_);
-    if(running)drawHUDP(t);}
+    if(running&&!HUDOFF)drawHUDP(t);}
   else{ctx.drawImage(scanFor(false),0,0,W,H);
-    if(running){FXV.edges(t);drawHUD(t);PW.hud(t);}}}
+    if(running){FXV.edges(t);if(!HUDOFF){drawHUD(t);PW.hud(t);}}}}
 
 /* ---------- menus, settings, flow ---------- */
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
@@ -165,7 +169,7 @@ function applyPal(){if(palOn===SET.pal)return;palOn=SET.pal;const th=PALS[SET.pa
   for(const k in BGC)delete BGC[k];for(const k in BGPC)delete BGPC[k];}
 function applySet(){deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
   stage.classList.toggle('ds-S',SET.dsize==='S');stage.classList.toggle('ds-L',SET.dsize==='L');document.documentElement.classList.toggle('hc',!!SET.hc);
-  $('fpsEl').hidden=!SET.fpsc;fit();
+  $('fpsEl').hidden=!FPSOK();fit();
   if(typeof diffDraw==='function')diffDraw();}
 function setVal(k,v){SET[k]=v;saveSet();applySet();syncSet();}
 const setRows={};
@@ -202,6 +206,7 @@ $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
 buildSettings();
 function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
+  if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
   syncUI();if(on)$('resumeBtn').focus();}
 function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
@@ -234,7 +239,7 @@ let simOn=false;
 let fpsN=0,fpsT=0;
 function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){requestAnimationFrame(loop);return;}   // FPS cap: 30 skips every other frame; 60 holds a 120/144/240 Hz screen to 60-80 draws a second (the game was drawing every refresh)
   let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
-  if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
+  if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').hidden=!FPSOK();$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
   if(CAL.on)calFrame();
   if(!paused)fbT+=dt;
   if(running&&!paused){update(dt);if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;RSC.feed(raw);}}
@@ -245,7 +250,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,

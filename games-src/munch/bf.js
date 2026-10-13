@@ -28,7 +28,8 @@ function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
   if(z[0]==='p')return q(`#phopps [data-opp="${z.slice(1)}"],#app .opps [data-opp="${z.slice(1)}"]`);
   if(z==='door')return q('.pile.pl,.bfdoor,.arena:not(:has(.vs))');if(z==='disc')return q('.pile.pr');return []}
-const bfCap=(t,n)=>{const w=String(t).split(/\s+/);return w.length>n?w.slice(0,n-1).join(' ')+'…':String(t)};
+// a hyphenated name counts as two words (the 8-word rule counts "Off-Key" as two)
+const bfCap=(t,n)=>{const w=String(t).split(/\s+/),k=x=>x.split(/[-–—]+/).filter(Boolean).length||1;let tot=0;w.forEach(x=>tot+=k(x));if(tot<=n)return String(t);let c=0,i=0;while(i<w.length&&c+k(w[i])<=n-1){c+=k(w[i]);i++}return w.slice(0,i).join(' ')+'…'};
 const bfShort=t=>{t=String(t).replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'');return t.length>26?t.slice(0,25)+'…':t};
 function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAttribute('data-bfz');e.removeAttribute('data-bfl');e.classList.remove('bf-tgt','bf-over')});
   document.querySelectorAll('.bf-picked').forEach(e=>e.classList.remove('bf-picked'));document.documentElement.classList.remove('bf-holding');

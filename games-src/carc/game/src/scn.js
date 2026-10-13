@@ -1,6 +1,7 @@
 // Rampart & Vine scenarios (see shell/gx-scenario.js): ?scn=<id> builds ONE state directly. Registered before the game scripts run; setup() runs after boot.
 (function () {
   if (!window.GXS) return;
+  GXS.labPos = "r";   // the LAB button sits top-right here: the player name is top-left
   var booted = function () { return typeof G !== 'undefined' && typeof beginGame === 'function' && typeof render === 'function' && typeof UI !== 'undefined' && typeof onGlow === 'function'; };
   var $ = function (s) { return document.querySelector(s); };
   var idle = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
@@ -54,4 +55,26 @@
       { kind: 'tap', sel: '#hand button', name: 'tap Skip ends the zoom step', state: function () { return G.step + ':' + G.turn; }, expect: function (a, b) { return a !== b || 'Skip did nothing'; } }
     ]
   });
+
+  GXS.add({
+    id: 'rv-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 9, when: booted, group: 'UI',
+    setup: function () { return table(9).then(function () { GXH.rules(null); return GXS.wait(function () { return document.querySelector('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-rules .gxh-card', name: 'help card' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'visible', sel: '.gxh-rules .gxh-x', name: 'Close button' },
+      { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'rv-buttons', name: 'Painted buttons keep their labels', ask: 'Are the buttons readable?', seed: 10, when: booted, group: 'Board',
+    setup: function () { return table(10); },
+    checks: [
+      { kind: 'fn', name: 'every visible button label >= 12 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('button'), function (b) { if (bad || !GXS.vis(b) || !(b.textContent || '').trim()) return; var px = parseFloat(getComputedStyle(b).fontSize); if (px < 12) bad = '"' + b.textContent.trim().slice(0, 20) + '" ' + px + 'px'; }); return !bad || bad; } },
+      skin
+    ]
+  });
+
 })();

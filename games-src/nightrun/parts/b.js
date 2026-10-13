@@ -295,7 +295,7 @@ function update(dt){
     if(P.over){P.heat-=48*pdt;if(P.heat<=25)P.over=false;}
     else if(firing&&fresh&&SH.cellOn(cell)){const fr=SH.shot(),x=P.x+22,y=P.y+2,pf=Math.abs(cell*gs-Math.round(cell*gs))<.01?1:0;P.heat+=fr.heat;
       SH.volley(x,y,pf);NR.emit('fire',{x,y,pf});SH.extra(cell,gs);
-      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
+      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');if(!rotMode)floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
     if(firing&&!P.over)P.heat=Math.max(0,P.heat-4*pdt);else if(!firing)P.heat=Math.max(0,P.heat-34*pdt);
     if(!SET.calm&&Math.random()<.7)G.pt.push({x:P.x-18,y:P.y+rnd(-2,2)+2,vx:rnd(-220,-120),vy:rnd(-15,15),l:.3,m:.3,c:D.a,sz:rnd(2,4)});
   }

@@ -55,10 +55,20 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   Haiku: downloads, copying, simple loops.
 - One fixer per game, one round, one deploy: the brief names exact functions/lines (grep first) and every known
   bug; the fixer fixes until the sweep is clean and reports in under 150 words. No AI-tester rework loops.
-- Cloud sessions allowed (owner, 6 Oct 2026): one per game, at most 4 at a time, model set to Sonnet on every one; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
+- Cloud sessions allowed (owner, 6 Oct 2026): one per game, at most 10 at a time (owner, 13 Oct 2026, after the token fixes), model set to Sonnet on every one; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
 - Answer each helper report once; ignore duplicate notifications. Commit work in progress as you go.
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks.
 - Prove the approach on one game before touching others. Clarity before features.
+- **Read less (owner, 13 Oct 2026: 98% of tokens were workers re-reading their own long contexts):**
+  - Start from the code map, not the files: `games-src/scripts/find.sh --maps`, then the game's `MODULES.md` and
+    `find.sh <symbol|text> <game>`. Read only the line ranges you change (Read with offset/limit). Never read the built
+    html, `x.js` or a joined `ui.js` (generated, git-ignored, skipped by search). Edit the file that owns the function;
+    never add an override layer file (`ui14.js`).
+  - Hand off at ~150k context tokens with a HANDOFF note, not at 450k. A worker takes at most 2-3 games and deploys each
+    one as soon as it passes. Briefs name exact files/functions (grep first): paste `games-src/BRIEF-TEMPLATE.md`.
+  - `games-src/scripts/guard.py` (run by every build and by CI) fails on big non-media files, growth of sources over
+    120 KB, new override layer files and tracked build outputs. Fix what it says; don't raise the limits.
+  - `git add` explicit paths, never `git add -A` (it re-adds build outputs).
 - Keep context small: hand off to a new session with an updated `games-src/HANDOFF.md`.
 - Merge your own work. Never ask the owner to review PRs. Live deploys of games that pass their checks are pre-approved by the owner.
 - Update `games/previews.html`, and end with ONE link plus 5 lines (before → after numbers, what's weak).

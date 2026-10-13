@@ -67,4 +67,18 @@
       { kind: 'fn', name: 'it can be closed', fn: function () { if (PHN.on) { var x = document.querySelector('#ppop [data-ph=x]'); if (!x || !GXS.vis(x)) return 'no close button'; x.click(); return !PHN.pop || 'popup did not close'; } GX.close(); var e = document.querySelector('#roster .pcard'); return !(e && GXS.vis(e)) || 'drawer did not close'; } }
     ]
   });
+
+  /* Help: the board scenario's table, then the rules cards (GXH.rules) */
+  GXS.add({
+    id: 'nb-help', name: 'Help: rules cards', ask: 'Can you read the help cards?', seed: 41, group: 'UI',
+    when: function () { return typeof GXH !== 'undefined' && GXS.defs.some(function (x) { return x.id === 'nb-board' && (!x.when || x.when()); }); },
+    setup: function () { var b = GXS.defs.filter(function (x) { return x.id === 'nb-board'; })[0]; return Promise.resolve(b.setup()).then(function () { GXH.rules(null); return GXS.wait(function () { return document.querySelector('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-rules .gxh-card', name: 'help card' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rules .gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'visible', sel: '.gxh-rules .gxh-x', name: 'Close button' },
+      { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
+    ]
+  });
 })();
