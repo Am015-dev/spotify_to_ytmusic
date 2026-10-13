@@ -952,7 +952,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
 /* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
-.gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px}
+.gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px;margin-right:-6px}
 .gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
@@ -999,7 +999,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
-.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin-top:-8px;margin-bottom:-8px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
@@ -3494,7 +3494,12 @@ fn mainFragment(
 (function () {
   var q = new URLSearchParams(location.search), id = q.get('scn');
   var S = window.GXS = { defs: [], on: !!id, id: id };
+  try { S.realLS = window.localStorage; } catch (e) { }   // the player's real storage (a scenario swaps window.localStorage for a private one): the LAB (gx-lab.js) keeps its results here
   S.add = function (d) { S.defs.push(d); };
+  /* group of a scenario for the LAB menu: d.group, else guessed from id / name (Board, Cards, Story, Bosses, UI) */
+  S.group = function (d) { if (d.group) return d.group; var t = (d.id + ' ' + d.name).toLowerCase();
+    return /boss/.test(t) ? 'Bosses' : /story|chapter|campaign|scene|cutscene/.test(t) ? 'Story' : /zoom|card|hand|market|deck|piece|token/.test(t) ? 'Cards' : /board|start|map|table|tile|grid|island|city|dungeon/.test(t) ? 'Board' : 'UI'; };
+  S.pub = function (d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all', group: S.group(d) }; };
   if (!id) return;   // normal play: the module is inert (one small object)
 
   /* ---- seeded RNG (mulberry32) ---- */
@@ -3520,7 +3525,7 @@ fn mainFragment(
 
   /* ---- list mode (no setup) ---- */
   function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
-  function pub(d) { return { id: d.id, name: d.name, ask: d.ask || '', sizes: d.sizes || 'all' }; }
+  var pub = S.pub;
   function onload(fn) { if (document.readyState === 'complete') setTimeout(fn, 0); else addEventListener('load', function () { setTimeout(fn, 0); }); }
   if (id === 'list') { onload(function () { window.GXSLIST = S.defs.map(pub); window.GXSCN = { id: 'list', ready: true }; }); return; }
 
@@ -3593,17 +3598,19 @@ fn mainFragment(
 (function () {
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof schedule === 'function' && typeof UI !== 'undefined'; };
-  var q = function (s) { var b = document.querySelector(s); return b && !b.disabled && b.offsetParent ? b : null; };
+  var q = function (s) { var b = document.querySelector(s); return b && !b.disabled && (b.offsetParent || getComputedStyle(b).position === 'fixed') && b.getBoundingClientRect().width > 3 ? b : null; };
   // a plain 3-player game against the computer, coach off, then tap through (draw / stop / continue) until the market of day 2 opens
   function toMarket() {
     try { GXH.setEnabled(false); } catch (e) { }
-    window.AIDELAY = 40; newGame('vs', {});
+    window.AIDELAY = 40; UI.pullMs = 0; newGame('vs', {});
     return GXS.wait(function () {
-      var b = q('[data-a=rscont]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
+      prepFix(); var b = q('[data-a=rscont]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
       if (b && !document.querySelector('.stalls')) b.click();
       return document.querySelector('.stalls');
     }, 60000).then(function () { return quiet(); });
   }
+  // a fortune card on day 1 can ask for a choice before the brew: take the suggested one
+  function prepFix() { var o = document.querySelector('.gxh-ok'); if (o) o.click(); if (G && G.phase === 'prep') { var b = q('.sug[data-a=mv]') || q('[data-a=mv]'); if (b) b.click(); } }
   // no coach bubble over the scene
   function quiet() { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } return new Promise(function (r) { setTimeout(r, 700); }); }
   GXS.add({
@@ -3611,10 +3618,8 @@ fn mainFragment(
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
       window.AIDELAY = 120; newGame('vs', {});
-      return GXS.wait(function () { return q('.bagb:not(.off)') || q('[data-a=mv]'); }, 15000).then(function () {
-        var b = q('.bagb:not(.off)'); if (b) b.click();
-        return GXS.wait(function () { return q('.stopb:not(.off)'); }, 15000);
-      }).then(function () { return quiet(); });
+      var t0 = 0;
+      return GXS.wait(function () { prepFix(); var s = q('.stopb:not(.off)'); if (s) return s; var b = q('.bagb:not(.off)'); if (b && Date.now() - t0 > 2500 && !BF.pulling) { t0 = Date.now(); b.click(); } return null; }, 40000).then(function () { return quiet(); });
     },
     checks: [
       { kind: 'visible', sel: '.bagb', name: 'Draw button' },
@@ -3631,6 +3636,32 @@ fn mainFragment(
       { kind: 'visible', sel: '.stalls .stall', name: 'stall board' },
       { kind: 'fn', name: 'every shown price is >= 12 px', fn: function () { var bad = [].slice.call(document.querySelectorAll('.stall .tok .pc')).filter(function (e) { return parseFloat(getComputedStyle(e).fontSize) < 12; }); return bad.length === 0 || bad.length + ' prices under 12 px'; } },
       { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 32 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
+    ]
+  });
+  GXS.add({
+    id: 'cf-draw', name: 'Cauldron: pull a chip', ask: 'Tap Draw. Does a chip tumble out?', seed: 5, when: booted, group: 'Board',
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      window.AIDELAY = 120; newGame('vs', {});
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)'); }, 25000).then(function () { return quiet(); });
+    },
+    checks: [
+      { kind: 'visible', sel: '.bagb', name: 'Draw bag' },
+      { kind: 'tap', sel: '.bagb', name: 'tap Draw', state: function () { return G.players[focusSeat()].pot.length + (BF.pulling ? 100 : 0); }, expect: function (a, b) { return b !== a || 'the bag did not start the pull (' + a + ' -> ' + b + ')'; } }
+    ]
+  });
+  GXS.add({
+    id: 'cf-help', name: 'Cauldron: rules cards', ask: 'Can you read the rules card?', seed: 5, when: booted, group: 'UI',
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      window.AIDELAY = 120; newGame('vs', {});
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)'); }, 25000).then(function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); });
+    },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
 })();
@@ -9019,6 +9050,190 @@ function extrasBoot() {
 (function () {
   const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { endBanner(); } catch (e) { } return r; };
 })();
+
+</script>
+<script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>
+<script>
+/* GX LAB core: storage + result rules shared by the in-game LAB (gx-lab.js) and the owner page (games/lab.html).
+   Results live in the player's REAL localStorage (the same origin as the shelf), in the shelf's own format:
+     shelf_ck_res      {"<date>|<game>|<item index>": {s:'ok'|'bad'|'skip', n:'note'}}   (the shelf's ✔ Test checklist)
+     shelf_wn_checked / shelf_ck_auto                                                       (What's new "Checked" ticks, same rule as the shelf)
+     gx_lab_res        {"<slug>/<scenario id>": {s, n}}                                      (scenario results: LAB menu + lab.html)
+   Rating a scenario also rates every checklist item that points at it, and rating an item rates its scenario, so a tick shows everywhere.
+   Test mode: ?test=1 in the URL or localStorage gx_test = '1'. Off = nothing in the page changes. */
+(function (W) {
+  if (W.GXLAB && W.GXLAB.core) return;
+  var IDS = { 'crown-city-smash': 'crown', 'nebula-aces': 'nebula', 'doorkick-dungeon': 'doorkick', 'shipwreck-isle': 'shipwreck', 'sands-of-qamar': 'sands', 'sunglaze': 'sunglaze', 'rampart-and-vine': 'rampart', 'short-fuse': 'shortfuse', 'tidewake': 'tidewake', 'hollowbough': 'hollowbough', 'thornbound': 'thornbound', 'kaiten-kitchen': 'kaiten', 'lantern-dive': 'lantern', 'cauldron-fair': 'cauldron', 'final-approach': 'approach', 'mainhattan-nightrun': 'mainhattan', 'mainhattan-overdrive': 'overdrive' };
+  var L = W.GXLAB = W.GXLAB || {}; L.core = true; L.IDS = IDS;
+  L.idOf = function (slug) { return IDS[slug] || slug; };
+  L.slugOfId = function (id) { for (var k in IDS) if (IDS[k] === id) return k; return id; };
+  L.slug = function () { var p = location.pathname.split('/').filter(Boolean); if (p.length && /\.html?$/.test(p[p.length - 1])) p.pop(); return p[p.length - 1] || ''; };
+  L.ls = function () { try { return (W.GXS && W.GXS.realLS) || W.localStorage; } catch (e) { return null; } };
+  L.get = function (k) { try { return L.ls().getItem(k); } catch (e) { return null; } };
+  L.set = function (k, v) { try { L.ls().setItem(k, v); } catch (e) { } };
+  L.j = function (k) { try { return JSON.parse(L.get(k) || '{}') || {}; } catch (e) { return {}; } };
+  L.testOn = function () { return /[?&]test=1\b/.test(location.search) || L.get('gx_test') === '1'; };
+  L.setTest = function (on) { L.set('gx_test', on ? '1' : '0'); };
+  var RES = 'gx_lab_res', CKR = 'shelf_ck_res', WNK = 'shelf_wn_checked', CKA = 'shelf_ck_auto';
+  L.key = function (e, i) { return e.date + '|' + e.game + '|' + i; };
+  L.wnKey = function (e) { return e.date + '|' + e.game; };
+  L.entries = function (upds, slug) { var id = L.idOf(slug); return (upds || []).filter(function (e) { return e.game === id || e.game === slug; }); };
+  L.scnRes = function (slug, id) { return L.j(RES)[slug + '/' + id] || {}; };
+  L.itemRes = function (e, i) { return L.j(CKR)[L.key(e, i)] || {}; };
+  /* mark a What's new entry Checked when every item works; undo only what we marked (same rule as the shelf) */
+  L.sync = function (upds) {
+    var r = L.j(CKR), a = L.j(CKA), d = L.j(WNK), ch = false;
+    (upds || []).forEach(function (e) { var its = e.items || []; if (!its.length) return; var wk = L.wnKey(e), all = its.every(function (_, i) { return (r[L.key(e, i)] || {}).s === 'ok'; });
+      if (all && !d[wk]) { d[wk] = 1; a[wk] = 1; ch = true; } else if (!all && d[wk] && a[wk]) { delete d[wk]; delete a[wk]; ch = true; } });
+    if (ch) { L.set(WNK, JSON.stringify(d)); L.set(CKA, JSON.stringify(a)); }
+  };
+  function put(store, k, s, n) { var o = L.j(store); if (s == null) delete o[k]; else o[k] = { s: s, n: n || '' }; L.set(store, JSON.stringify(o)); }
+  L.setItem = function (upds, e, i, s, n) {
+    put(CKR, L.key(e, i), s, n); var sid = e.scn && e.scn[i]; if (sid) put(RES, L.slugOfId(e.game) + '/' + sid, s, n);
+    L.sync(upds);
+  };
+  L.setScn = function (upds, slug, id, s, n) {
+    put(RES, slug + '/' + id, s, n);
+    L.entries(upds, slug).forEach(function (e) { (e.scn || []).forEach(function (x, i) { if (x === id) put(CKR, L.key(e, i), s, n); }); });
+    L.sync(upds);
+  };
+  /* text for "Copy results": the shelf's own format per entry, then the scenarios that no checklist item covers */
+  L.text = function (upds, slug, list, name) {
+    var out = [], used = {};
+    L.entries(upds, slug).forEach(function (e) { var l = ['Game Night test · ' + name + ' · ' + e.date];
+      (e.items || []).forEach(function (t, i) { var v = L.itemRes(e, i), sid = e.scn && e.scn[i], tg = sid ? ' [scn:' + sid + ']' : ''; if (sid) used[sid] = 1;
+        l.push(v.s === 'ok' ? '✅ ' + t + tg : v.s === 'bad' ? '❌ ' + t + tg + (v.n ? ' — ' + v.n : '') : v.s === 'skip' ? '⏭ ' + t + tg : '⬜ ' + t + tg + ' (not tested)'); });
+      out.push(l.join('\n')); });
+    var rest = (list || []).filter(function (d) { return !used[d.id]; });
+    if (rest.length) out.push(['Game Night LAB · ' + name].concat(rest.map(function (d) { var v = L.scnRes(slug, d.id); return (v.s === 'ok' ? '✅ ' : v.s === 'bad' ? '❌ ' : v.s === 'skip' ? '⏭ ' : '⬜ ') + d.name + ' [scn:' + d.id + ']' + (v.s === 'bad' && v.n ? ' — ' + v.n : ''); })).join('\n'));
+    return out.join('\n\n');
+  };
+  L.copy = function (text, done) {
+    var fb = function () { var ok = false, box = document.createElement('div'); box.className = 'gxl-fb'; box.innerHTML = '<textarea readonly aria-label="Results"></textarea><button type="button">Close</button>';
+      var ta = box.firstChild; ta.value = text; document.body.appendChild(box); ta.focus(); ta.select(); try { ok = document.execCommand('copy'); } catch (_) { }
+      box.lastChild.onclick = function () { box.remove(); }; if (ok) { box.remove(); done(true); } else done(false); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, fb); else fb();
+  };
+  L.esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  L.chip = function (s) { return s === 'ok' ? '✅' : s === 'bad' ? '❌' : s === 'skip' ? '⏭' : '⬜'; };
+})(window);
+
+</script>
+<script>
+/* GX LAB (test mode only): 🧪 LAB menu of this game's scenarios, a pinned ✔ Test checklist, quick ✅/❌ for the scenario on screen.
+   Needs gx-scenario.js (GXS.defs) and gx-lab-core.js. Off (no ?test=1, no localStorage gx_test) = returns at once: no element, no listener.
+   build-all.py inlines gx-lab-core.js + this + gx-lab.css into every staged game. Read the use in games-src/shell/LAB.md. */
+(function (W) {
+  var L = W.GXLAB; if (!L || !L.core || !L.testOn()) return;
+  var slug = L.slug(), gid = L.idOf(slug), q = new URLSearchParams(location.search), scn = q.get('scn') && q.get('scn') !== 'list' ? q.get('scn') : '';
+  var inShelf = false; try { inShelf = parent !== window; } catch (e) { inShelf = true; }
+  var UP = [], el = {}, esc = L.esc, name = slug;
+  var list = function () { var S = W.GXS; return S && S.defs ? S.defs.map(S.pub) : []; };
+  var run = function () { try { return JSON.parse(sessionStorage.getItem('gx_lab_run') || 'null'); } catch (e) { return null; } };
+  var saveRun = function (r) { try { if (r) sessionStorage.setItem('gx_lab_run', JSON.stringify(r)); else sessionStorage.removeItem('gx_lab_run'); } catch (e) { } };
+  var ckOpen = function () { try { return sessionStorage.getItem('gx_lab_ck') === '1'; } catch (e) { return false; } };
+  var setCk = function (v) { try { sessionStorage.setItem('gx_lab_ck', v ? '1' : '0'); } catch (e) { } };
+  var go = function (id) { L.go = id; location.href = location.pathname + '?scn=' + encodeURIComponent(id) + '&test=1'; };
+  function toast(m) { var t = document.createElement('div'); t.className = 'gxl-toast'; t.textContent = m; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 1600); }
+  function mk(tag, id, cls) { var e = document.createElement(tag); if (id) e.id = id; if (cls) e.className = cls; return e; }
+
+  function css() {   // the stylesheet is inlined next to this script by build-all.py (window.GXLAB_CSS); else load nothing
+    if (W.GXLAB_CSS && !document.getElementById('gxlab-css')) { var s = mk('style', 'gxlab-css'); s.textContent = W.GXLAB_CSS; document.head.appendChild(s); }
+  }
+
+  /* ---- the little bar (top corner): LAB, checklist chip, run controls, quick rating ---- */
+  function bar() {
+    var b = el.bar; if (!b) { b = el.bar = mk('div', 'gxlab-bar'); document.body.appendChild(b); }
+    b.className = L.get('gx_lab_pos') === 'r' ? 'r' : '';
+    var r = run(), done = 0, tot = 0, h = '<button type="button" id="gxlab-btn" aria-label="LAB menu">🧪 LAB</button>';
+    if (!inShelf && UP.length) { var c = ckCount(); h += '<button type="button" id="gxlab-ck" aria-label="Test checklist">📍 ' + c.done + '/' + c.tot + '</button>'; }
+    if (r) h += '<button type="button" id="gxlab-next" class="on">Next ▶ ' + (r.i + 1) + '/' + r.ids.length + '</button>';
+    if (scn) { var v = L.scnRes(slug, scn).s; h += '<span class="gxl-r">' + [['ok', '✅'], ['bad', '❌'], ['skip', '⏭']].map(function (a) { return '<button type="button" data-s="' + a[0] + '" aria-pressed="' + (v === a[0]) + '" aria-label="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</span>'; }
+    b.innerHTML = h;
+  }
+  function ckEntries() { return L.entries(UP, slug).slice(0, 4); }
+  function ckCount() { var done = 0, tot = 0; ckEntries().forEach(function (e) { (e.items || []).forEach(function (_, i) { tot++; if (L.itemRes(e, i).s) done++; }); }); return { done: done, tot: tot }; }
+
+  /* ---- LAB menu ---- */
+  function menu() {
+    var p = el.menu; if (!p) { p = el.menu = mk('div', 'gxlab-menu', 'gxl-panel'); p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', 'LAB'); p.hidden = true; document.body.appendChild(p);
+      p.act = function (t) {
+        if (t.id === 'gxl-close') { p.hidden = true; return; }
+        if (t.dataset.go) { go(t.dataset.go); return; }
+        if (t.id === 'gxl-all') { var ids = list().map(function (d) { return d.id; }); if (!ids.length) return; saveRun({ ids: ids, i: 0 }); go(ids[0]); return; }
+        if (t.id === 'gxl-copy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
+        if (t.id === 'gxl-pos') { L.set('gx_lab_pos', L.get('gx_lab_pos') === 'r' ? 'l' : 'r'); bar(); return; }
+        if (t.id === 'gxl-off') { L.setTest(false); location.href = location.pathname; return; }
+        if (t.dataset.chip) { var d = L.scnRes(slug, t.dataset.chip).s, nx = !d ? 'ok' : d === 'ok' ? 'bad' : d === 'bad' ? 'skip' : null; L.setScn(UP, slug, t.dataset.chip, nx); fillMenu(); bar(); if (el.card && !el.card.hidden) fillCard(); } }; }
+    fillMenu(); p.hidden = false;
+  }
+  function fillMenu() {
+    var p = el.menu, ds = list(), g = {}, order = ['Board', 'Cards', 'Story', 'Bosses', 'UI'], h;
+    ds.forEach(function (d) { (g[d.group] = g[d.group] || []).push(d); });
+    Object.keys(g).forEach(function (k) { if (order.indexOf(k) < 0) order.push(k); });
+    var n = 0; ds.forEach(function (d) { if (L.scnRes(slug, d.id).s === 'ok') n++; });
+    h = '<div class="gxl-h"><h2>🧪 LAB · ' + esc(name) + ' · ' + n + '/' + ds.length + ' ✅</h2><button type="button" id="gxl-close" aria-label="Close LAB">✕</button></div>' +
+      '<div class="gxl-tools"><button type="button" id="gxl-all">All scenarios ▶</button><button type="button" id="gxl-copy">Copy results</button><button type="button" id="gxl-pos">⇄ Move 🧪</button><button type="button" id="gxl-off">Test mode off</button></div><div class="gxl-body" id="gxl-mbody">';
+    order.forEach(function (k) { if (!g[k]) return; h += '<div class="gxl-g">' + esc(k) + '</div>';
+      g[k].forEach(function (d) { var v = L.scnRes(slug, d.id).s;
+        h += '<div class="gxl-row" data-id="' + esc(d.id) + '"><div class="gxl-t"><b>' + esc(d.name) + '</b>' + (d.ask ? '<small>' + esc(d.ask) + '</small>' : '') + '</div>' +
+          '<button type="button" class="gxl-go' + (d.id === scn ? ' here' : '') + '" data-go="' + esc(d.id) + '" aria-label="Go: ' + esc(d.name) + '">▶ GO</button>' +
+          '<button type="button" class="gxl-chip" data-chip="' + esc(d.id) + '" aria-label="Result">' + L.chip(v) + '</button></div>'; }); });
+    if (!ds.length) h += '<div class="gxl-g">No scenarios registered for this game yet.</div>';
+    var bd = p.querySelector('.gxl-body'), st = bd ? bd.scrollTop : 0; p.innerHTML = h + '</div>'; p.querySelector('.gxl-body').scrollTop = st;
+  }
+
+  /* ---- pinned ✔ Test checklist (this game's What's new items, shared with the shelf) ---- */
+  function card() {
+    var p = el.card; if (!p) { p = el.card = mk('div', 'gxlab-card', 'gxl-panel'); p.setAttribute('role', 'region'); p.setAttribute('aria-label', 'Test checklist'); p.hidden = true; document.body.appendChild(p);
+      p.act = function (t) {
+        if (t.id === 'gxl-cclose') { setCk(false); p.hidden = true; return; }
+        if (t.id === 'gxl-ccopy') { L.copy(L.text(UP, slug, list(), name), function (ok) { toast(ok ? 'Copied' : 'Select and copy the text'); }); return; }
+        if (t.dataset.go) { setCk(false); go(t.dataset.go); return; }
+        if (t.dataset.s) { var e2 = ckEntries()[+t.dataset.e], i = +t.dataset.i, cur = L.itemRes(e2, i).s; L.setItem(UP, e2, i, cur === t.dataset.s ? null : t.dataset.s, ''); fillCard(); bar(); if (el.menu && !el.menu.hidden) fillMenu(); } };
+      p.addEventListener('input', function (e) { var t = e.target; if (t.dataset && t.dataset.note) { var e3 = ckEntries()[+t.dataset.e], i = +t.dataset.i; L.setItem(UP, e3, i, 'bad', t.value); } }); }
+    fillCard(); p.hidden = false;
+  }
+  function fillCard() {
+    var p = el.card, c = ckCount(), h = '<div class="gxl-h"><h2>📍 ' + esc(name) + ' · ' + c.done + '/' + c.tot + ' checked</h2><button type="button" id="gxl-ccopy">Copy</button><button type="button" id="gxl-cclose" aria-label="Fold checklist">▾</button></div><div class="gxl-body">';
+    ckEntries().forEach(function (e, ei) { h += '<div class="gxl-ed">' + esc(e.date) + ' · <b>' + esc(e.title) + '</b></div>';
+      (e.items || []).forEach(function (t, i) { var v = L.itemRes(e, i), sid = e.scn && e.scn[i], d = list().filter(function (x) { return x.id === sid; })[0], ask = (d && d.ask) || (e.ask && e.ask[i]) || '';
+        h += '<div class="gxl-item" data-e="' + ei + '" data-i="' + i + '"><span class="gxl-p">' + esc(t) + '</span>' +
+          (sid ? '<div class="gxl-top"><button type="button" class="gxl-go' + (sid === scn ? ' here' : '') + '" data-go="' + esc(sid) + '">📍 GO</button>' + (ask ? '<span class="gxl-ask">' + esc(ask) + '</span>' : '') + '</div>' : '') +
+          '<div class="gxl-rate">' + [['ok', '✅ Works'], ['bad', '❌ Problem'], ['skip', '⏭ Skip']].map(function (a) { return '<button type="button" data-s="' + a[0] + '" data-e="' + ei + '" data-i="' + i + '" aria-pressed="' + (v.s === a[0]) + '">' + a[1] + '</button>'; }).join('') + '</div>' +
+          (v.s === 'bad' ? '<input class="gxl-note" type="text" maxlength="200" placeholder="What went wrong? (optional)" aria-label="Note" data-note="1" data-e="' + ei + '" data-i="' + i + '" value="' + esc(v.n || '') + '">' : '') + '</div>'; }); });
+    if (!ckEntries().length) h += '<div class="gxl-g">Nothing to test for this game yet.</div>';
+    var bd = p.querySelector('.gxl-body'), st = bd ? bd.scrollTop : 0; p.innerHTML = h + '</div>'; p.querySelector('.gxl-body').scrollTop = st;
+  }
+
+  /* ---- wiring ---- */
+  function init() {
+    css(); bar();
+    /* one window-capture handler on pointerup (a game's blocking handlers, e.g. the tutorial's, never see it) and on click (mouse / keyboard / when no pointerup came) */
+    var last = 0;
+    function hit(e) {
+      var b = e.target && e.target.closest && e.target.closest('#gxlab-bar button, .gxl-panel button'); if (!b) return;
+      e.stopPropagation(); if (e.type === 'click') e.preventDefault();
+      if (e.type === 'click' && Date.now() - last < 600) return;   // pointerup already did it
+      if (e.type === 'pointerup') last = Date.now();
+      var p = b.closest('.gxl-panel'); if (p) { if (p.act) p.act(b); return; }
+      if (b.id === 'gxlab-btn') { if (el.menu && !el.menu.hidden) el.menu.hidden = true; else { if (el.card) el.card.hidden = true; menu(); } return; }
+      if (b.id === 'gxlab-ck') { if (el.card && !el.card.hidden) { setCk(false); el.card.hidden = true; } else { if (el.menu) el.menu.hidden = true; setCk(true); card(); } return; }
+      if (b.id === 'gxlab-next') { var r = run(); if (!r) return; if (r.i + 1 < r.ids.length) { r.i++; saveRun(r); go(r.ids[r.i]); } else { saveRun(null); location.href = location.pathname + '?test=1#lab'; } return; }
+      if (b.dataset.s && scn) { var cur = L.scnRes(slug, scn).s; L.setScn(UP, slug, scn, cur === b.dataset.s ? null : b.dataset.s); bar(); if (el.menu && !el.menu.hidden) fillMenu(); if (el.card && !el.card.hidden) fillCard(); }
+    }
+    W.addEventListener('pointerup', hit, true); W.addEventListener('click', hit, true);
+    if (location.hash === '#lab') menu();
+    else if (ckOpen() && !inShelf && UP.length) card();
+  }
+  var ready = function () { init(); };
+  fetch('../updates.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }).then(function (u) {
+    UP = Array.isArray(u) ? u : []; if (W.GXS && W.GXS.defs) { /* scenarios are registered before this runs */ }
+    var go2 = function () { try { name = (document.title || slug).replace(/\s*[|–-].*$/, '').trim() || slug; } catch (e) { } ready(); };
+    if (document.body) go2(); else addEventListener('DOMContentLoaded', go2);
+  });
+  L.ui = { list: list, bar: bar, menu: menu, card: card };
+})(window);
 
 </script>
 </body>
