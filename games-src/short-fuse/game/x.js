@@ -639,7 +639,7 @@ const GX={key:'gx',open:null,
 
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
-//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, endArt:{win,lose} (painted result-screen backgrounds), onExit, scores, seats}
 //   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
@@ -1031,6 +1031,7 @@ const GX={key:'gx',open:null,
     return new Promise(function (done) {
       if (!doc) return done('map');
       var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      if (O && O.endArt) { var ea = r.won ? O.endArt.win : O.endArt.lose; if (ea) { s.parentNode.classList.add('has-art'); s.parentNode.style.setProperty('--gxc-art', 'url(' + ea + ')'); } }
       box.appendChild(el('div', 'gxc-res-k', def.title));
       box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
       var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
@@ -3807,7 +3808,7 @@ function sndLoop(name,on){const L=SND_LOOP[name];if(!L)return;if(on===!!SND.loop
 // the player's pick (a, b, shuffle, off) is saved. GA cross-fades between them; if the files fail, a quiet synth bass plays in game.
 const MSLOTS=[['tavern','Menu'],['main','Game'],['fight','Last seconds'],['victory','Win'],['defeat','Lose']];
 const MTITLE={'tavern-a':'Menu loop A','tavern-b':'Menu loop B','main-a':'Ninety Beats to Focus','main-b':'Clockwork Study','fight-a':'Final Wires','fight-b':'Brass on the Clock','victory-a':'Brass and Bells','victory-b':'Victory Fanfare','defeat-a':'Six Second Deflate','defeat-b':'Sad Tuba Plop'};
-const MUS={pick:{tavern:'a',main:'a',fight:'a',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0,last:null,since:0};
+const MUS={pick:{tavern:'all',main:'all',fight:'all',victory:'a',defeat:'a'},res:{},sh:{},cur:null,prev:null,prevT:0,last:null,since:0};
 // 'all' = shuffle through every looping song (menu, game and last-seconds tracks), a new one every ~2.5 min
 const MLOOPS=['tavern','main','fight'],MALL=Object.keys(MTITLE).filter(k=>MLOOPS.includes(k.split('-')[0])),MALL_MS=150000;
 try{Object.assign(MUS.pick,JSON.parse(localStorage.getItem('sf_mpick')||'{}'))}catch(e){}
@@ -4536,14 +4537,18 @@ function sparks(el,n,col){const f=document.getElementById('fx'),tb=document.getE
   for(let i=0;i<n;i++){const s=document.createElement('i');s.className='sp';const a=Math.random()*Math.PI*2,d=22+Math.random()*34;s.style.cssText=`left:${r.left-b.left+r.width/2}px;top:${r.top-b.top+r.height/2}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-10}px;background:${col||'#ffc928'}`;f.appendChild(s);setTimeout(()=>s.remove(),800)}}
 function pop(el,txt,cls){const f=document.getElementById('fx'),tb=document.getElementById('tb');if(!el||!f||!tb)return;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();const p=document.createElement('div');p.className='pop '+(cls||'');p.textContent=txt;
   p.style.left=Math.max(30,Math.min(b.width-30,r.left-b.left+r.width/2))+'px';p.style.top=Math.max(20,r.top-b.top-4)+'px';f.appendChild(p);setTimeout(()=>p.remove(),1100)}
+// 3D sprites (rendered from the full-detail models): pliers snip at a cut wire, the bomb wobbles on a miss and swells on the boom
+function sprite3(name,cls,cx,cy,size,ms){if(LOWGFX)return;const f=document.getElementById('fx');if(!f)return;const i=document.createElement('img');i.className='s3 '+cls;i.alt='';i.decoding='async';i.src='models/'+name+(size<=300?'@512':'')+'.webp';
+  i.style.cssText=`left:${cx-size/2}px;top:${cy-size/2}px;width:${size}px;height:${size}px`;i.onerror=()=>i.remove();f.appendChild(i);setTimeout(()=>i.remove(),ms)}
+function centerOf(el){const tb=document.getElementById('tb');if(!el||!tb)return null;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();return{x:r.left-b.left+r.width/2,y:r.top-b.top+r.height/2,w:b.width,h:b.height}}
 function flushFx(){const q=TBL.fxq;TBL.fxq=[];if(!ANIM||!q.length)return;const tb=document.getElementById('tb');
   for(const [name,arg] of q){try{
-    if(name==='cut'){const el=tileEl(arg);if(el){el.classList.add('snap');setTimeout(()=>el&&el.classList.remove('snap'),1000);sparks(el,9,'#ffe066');if(!TBL.popAt||Date.now()-TBL.popAt>500){TBL.popAt=Date.now();pop(el,'SNIP!','good')}}}
+    if(name==='cut'){const el=tileEl(arg);if(el){el.classList.add('snap');setTimeout(()=>el&&el.classList.remove('snap'),1000);sparks(el,9,'#ffe066');{const c=centerOf(el);if(c&&(!TBL.plAt||Date.now()-TBL.plAt>400)){TBL.plAt=Date.now();sprite3('pliers','pl',c.x,c.y-8,110,700)}}if(!TBL.popAt||Date.now()-TBL.popAt>500){TBL.popAt=Date.now();pop(el,'SNIP!','good')}}}
     else if(name==='miss'){const el=arg!=null?tileEl(arg):null;if(el){el.classList.add('buzz');setTimeout(()=>el.classList.remove('buzz'),800);sparks(el,6,'#ff7a3a')}
-      const fz=document.querySelector('#fuse .fz');if(fz){fz.classList.add('burn');setTimeout(()=>fz.classList.remove('burn'),1200);const sp=fz.querySelector('.spark');if(sp)sparks(sp,14,'#ff9a3a')}pop(el||document.querySelector('#fuse .fz'),'BUZZ!','bad');tb.classList.add('shake');setTimeout(()=>tb.classList.remove('shake'),500)}
+      const fz=document.querySelector('#fuse .fz');if(fz){fz.classList.add('burn');setTimeout(()=>fz.classList.remove('burn'),1200);const sp=fz.querySelector('.spark');if(sp)sparks(sp,14,'#ff9a3a')}pop(el||document.querySelector('#fuse .fz'),'BUZZ!','bad');{const c=centerOf(document.getElementById('tb'));if(c)sprite3('bomb','bw',c.w/2,Math.min(c.h*.32,230),Math.min(150,c.w*.4),1000)}tb.classList.add('shake');setTimeout(()=>tb.classList.remove('shake'),500)}
     else if(name==='phew'){const fz=document.querySelector('#fuse .fz');if(fz){fz.classList.add('phew');setTimeout(()=>fz.classList.remove('phew'),1200);pop(fz,'PHEW!','good')}}
     else if(name==='win'){tb.classList.add('winfx');setTimeout(()=>tb.classList.remove('winfx'),2500);document.querySelectorAll('#tb .tile.known').forEach((e,i)=>{if(i%3===0)sparks(e,2,'#8cf06a')})}
-    else if(name==='boom'){tb.classList.add('boomfx');setTimeout(()=>tb.classList.remove('boomfx'),2500);const el=arg!=null?tileEl(arg):document.querySelector('#fuse .spark');if(el)sparks(el,26,'#ff5a1f')}
+    else if(name==='boom'){tb.classList.add('boomfx');setTimeout(()=>tb.classList.remove('boomfx'),2500);const el=arg!=null?tileEl(arg):document.querySelector('#fuse .spark');if(el)sparks(el,26,'#ff5a1f');{const c=centerOf(document.getElementById('tb'));if(c)sprite3('bomb','bb',c.w/2,c.h*.42,Math.min(c.w*.8,c.h*.5,420),2300)}}
     else if(name==='coin'){const el=document.querySelector('#track .cn12.done:last-child');if(el){el.classList.add('flipc');setTimeout(()=>el.classList.remove('flipc'),900)}}
   }catch(e){console.error(e)}}}
 // a teammate's move is announced for a moment before it happens: the pointer, the number

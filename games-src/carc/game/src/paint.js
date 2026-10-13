@@ -15,7 +15,7 @@ function texApply(){TEXSET={};let any=false;
   el.innerHTML=any?`<svg width="0" height="0" style="position:absolute"><defs>${texDefs()}</defs></svg>`:'';
   if(typeof G!=='undefined'&&G&&typeof UI!=='undefined'){try{for(const k in UI.tl){const T=G.tiles[k];if(T)UI.tl[k].innerHTML=tileSvg(T.t,T.r)}UI.handKey=null;if(G.cur&&!G.over){renderHand();renderGlows()}}catch(e){}}}
 // pieces: painted figure on a player-coloured disc (seat chips keep the drawn icons: they are tiny and need the colour)
-const PCF={meeple:'models/piece-meeple',champ:'models/piece-champ',mason:'models/piece-mason',hog:'models/piece-hog'};   // 3D renders of the follower models (transparent, 3/4 view); the player colour is the disc behind them
+const PCF={meeple:'models/piece-meeple@512',champ:'models/piece-champ@512',mason:'models/piece-mason@512',hog:'models/piece-hog@512'};   // 3D renders of the follower models (transparent, 3/4 view); the player colour is the disc behind them
 function pcHtml(n){return PAINT_ON&&PIMG[PCF[n]]===1?`<span class="pc"><img src="${PCF[n]}.webp" alt="" draggable="false"></span>`:ico(n)}
 const TABLES=['harvest','riverbank','sable-hall'],BACKS=['tavern','raven'];
 function paintApply(){

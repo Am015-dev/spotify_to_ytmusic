@@ -273,3 +273,12 @@ html.short #over .card2.end .endart{height:16dvh}
 .mchips{display:flex;flex-wrap:wrap;gap:8px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2.5px solid var(--ink);background:#fff7e8;color:var(--ink);font:800 .85rem var(--fb);cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
 .mchip.on{background:#ffc928}.mchip.prev{border-style:dashed}
+
+.s3{position:absolute;pointer-events:none;object-fit:contain;z-index:5;will-change:transform,opacity}
+.s3.pl{animation:s3pl .7s ease-out forwards}
+@keyframes s3pl{0%{transform:scale(.4) rotate(-40deg);opacity:0}25%{transform:scale(1.05) rotate(0);opacity:1}45%{transform:scale(.92) rotate(-8deg)}70%{opacity:1}100%{transform:scale(1) translateY(-14px);opacity:0}}
+.s3.bw{animation:s3bw 1s ease-in-out forwards}
+@keyframes s3bw{0%{transform:scale(.5);opacity:0}15%{transform:scale(1) rotate(-10deg);opacity:1}30%{transform:rotate(10deg)}45%{transform:rotate(-8deg)}60%{transform:rotate(6deg)}80%{opacity:1}100%{transform:scale(.9);opacity:0}}
+.s3.bb{animation:s3bb 2.3s ease-out forwards}
+@keyframes s3bb{0%{transform:scale(.3);opacity:0}12%{transform:scale(.9);opacity:1}28%{transform:scale(1.25) rotate(-4deg)}40%{transform:scale(1.05) rotate(4deg)}55%{transform:scale(1.5);opacity:1}100%{transform:scale(2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.s3{animation-duration:.01s!important}}

@@ -50,7 +50,7 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   /* shader warm-up only where there is no GPU (it stalls start-up for seconds on iPhone); real GPUs compile on first use */if(V3.soft)try{warm3D()}catch(e){console.warn('warm off',e)}
   perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
-function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;const lo0=V3.q==='low';V3.q=q;if(q!=='low')glbLoad();if(V3.glbOK&&lo0!==(q==='low'))V3.gid=null;const dpr=window.devicePixelRatio||1;
+function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;const lo0=V3.q==='low';V3.q=q;glbLoad();if(V3.glbOK&&lo0!==(q==='low'))V3.gid=null;const dpr=window.devicePixelRatio||1;
   {let want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;/* software rendering (no GPU): fewer pixels keeps taps responsive */if(V3.soft)want=Math.min(want,.5);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=q!=='low',ms=q==='high'?2048:1024,st=q==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;
   if(r.shadowMap.enabled!==sh||V3.key.shadow.mapSize.x!==ms||r.shadowMap.type!==st){r.shadowMap.enabled=sh;r.shadowMap.type=st;V3.key.castShadow=sh;V3.key.shadow.mapSize.set(ms,ms);if(V3.key.shadow.map){V3.key.shadow.map.dispose();V3.key.shadow.map=null}
@@ -233,13 +233,14 @@ function plumeMat(col){V3.plm=V3.plm||{};if(V3.plm[col])return V3.plm[col];const
 function engineFx(grp,f){const c=grp.userData.engCol||0xffa24f;const g=new THREE.Group();g.position.set(...f.p);
   const pl=new THREE.Mesh(new THREE.ConeGeometry(f.r*.8,f.r*4.2,16,1,true).rotateZ(PI/2).translate(-f.r*2.1,0,0),plumeMat(c));g.add(pl);
   const s=glow(c,f.r*3.4,.6);s.position.x=-f.r*.3;g.add(s);const s2=glow(0xffffff,f.r*1.3,.6);s2.position.x=-f.r*.1;g.add(s2);grp.add(g);grp.userData.eng.push({g,pl,s,s2,r:f.r,ph:Math.random()*6})}
-// ---- GLB models (High/Medium only; Low keeps the procedural ships and rocks): Lancer + Talon hulls and three asteroids, loaded once, cloned per use ----
+// ---- GLB models (full-detail files on desktop, -lite files on phones and Low): Lancer + Talon hulls and three asteroids, loaded once, cloned per use ----
 const GLBS={lance:['na-lancer',4.6,Math.PI/2],shard:['na-talon',4.4,-Math.PI/2]},GLBR3=['na-rock-a','na-rock-b','na-rock-c'];
-function glbLoad(){if(V3.glbP||typeof GXGLB==='undefined')return;const R=V3.glbR={};const jobs=[];
-  for(const k in GLBS){const [f,len,yaw]=GLBS[k];jobs.push(GXGLB.load('models/'+f+'.glb').then(src=>{R[k]=GXGLB.prep(src,{len,yaw,env:.8})}))}
-  GLBR3.forEach((f,i)=>jobs.push(GXGLB.load('models/'+f+'.glb').then(src=>{R['rock'+i]=GXGLB.prep(src,{len:2,env:.5})})));
-  V3.glbP=Promise.all(jobs).then(()=>{V3.glbOK=true;V3.gid=null}).catch(()=>{V3.glbR=null})}
-const glbOn=()=>V3.q!=='low'&&V3.glbOK&&V3.glbR;
+function glbVar(){let ph=false;try{ph=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return V3.q==='low'||ph?'-lite':''}
+function glbLoad(){if(typeof GXGLB==='undefined')return;const v=glbVar();if(V3.glbV===v&&V3.glbP)return;const first=!V3.glbP;V3.glbV=v;V3.glbOK=false;if(!first)try{GXGLB.dispose()}catch(e){}const R=V3.glbR={};const jobs=[];
+  for(const k in GLBS){const [f,len,yaw]=GLBS[k];jobs.push(GXGLB.load('models/'+f+v+'.glb').then(src=>{R[k]=GXGLB.prep(src,{len,yaw,env:.8})}))}
+  GLBR3.forEach((f,i)=>jobs.push(GXGLB.load('models/'+f+v+'.glb').then(src=>{R['rock'+i]=GXGLB.prep(src,{len:2,env:.5})})));
+  const me=V3.glbP=Promise.all(jobs).then(()=>{if(V3.glbP!==me)return;V3.glbOK=true;V3.gid=null}).catch(()=>{if(V3.glbP===me)V3.glbR=null})}
+const glbOn=()=>V3.glbOK&&!!V3.glbR;
 // ---- original ship models (+x forward, y up). Every model: hull panels, greebles, glass canopy, bell nozzles with glow, faction trim ----
 const DESIGN={
   // Compact "Lancer" heavy fighter: a pointed central lance, two gun booms on swept wing plates, forward canards, three engines

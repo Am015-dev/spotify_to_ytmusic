@@ -5,13 +5,19 @@ D=os.path.dirname(os.path.abspath(__file__))
 SP=os.path.abspath(os.path.join(D,'..','..'))
 def rd(p):return open(p,encoding='utf-8').read()
 GLB_BLOCK=r'''
-/* ---- GLB junk + leviathan (High / Medium 3D only; Low and the 2D board keep their drawings, the 2D leviathan gets the thumbnail). Preloaded once from models/*.glb, cloned per use. ---- */
+/* ---- GLB junk + leviathan (full-detail files on desktop, -lite files on phones and Low; the 2D board keeps its drawings, the 2D leviathan gets the thumbnail). Preloaded from models/*.glb, cloned per use. ---- */
 var GLBK = { ok: false, p: null, junk: null, lev: null };
+function glbVarK() {
+  var ph = false; try { ph = Math.min(innerWidth, innerHeight) < 600 || (matchMedia('(pointer:coarse)').matches && Math.max(innerWidth, innerHeight) < 1200); } catch (e) {}
+  return K.q === 'low' || ph ? '-lite' : '';
+}
 function glbLoadK() {
-  if (GLBK.p || !global.GXGLB) return;
-  GLBK.p = Promise.all([GXGLB.load('models/junk.glb'), GXGLB.load('models/leviathan.glb')]).then(function (r) {
+  if (!global.GXGLB) return; var v = glbVarK(); if (GLBK.v === v && GLBK.p) return;
+  var first = !GLBK.p; GLBK.v = v; GLBK.ok = false; if (!first) try { GXGLB.dispose(); } catch (e) {}
+  var me = GLBK.p = Promise.all([GXGLB.load('models/junk' + v + '.glb'), GXGLB.load('models/leviathan' + v + '.glb')]).then(function (r) {
+    if (GLBK.p !== me) return;
     GLBK.junk = GXGLB.prep(r[0], { len: .76, ground: true, env: .8 }); GLBK.lev = GXGLB.prep(r[1], { h: .58, ground: true, env: .8 }); GLBK.ok = true; glbRefresh();
-  }).catch(function () { GLBK.p = null; });
+  }).catch(function () { if (GLBK.p === me) GLBK.p = null; });
 }
 function glbRefresh() {
   if (!K.on || !GLBK.ok) return;
@@ -51,12 +57,12 @@ KIT_PATCHES=[
 
  # 7. GLB junk and leviathan (see the GLB block): loader + helpers
  ("var hullG = null;",GLB_BLOCK+"var hullG = null;"),
- ("g.traverse(function (o) { if (o.isMesh) { o.castShadow = q.shadows; } });\n  s.g = g;","if (GLBK.ok && K.q !== 'low') glbDressShip(s, g, col);\n  g.traverse(function (o) { if (o.isMesh) { o.castShadow = q.shadows; } });\n  s.g = g;"),
- ("g.traverse(function (o) { if (o.isMesh) o.castShadow = true; });\n  return g;\n}\nfunction levPoint","if (GLBK.ok && K.q !== 'low') glbDressLev(L, g); else L.glb = null;\n  g.traverse(function (o) { if (o.isMesh) o.castShadow = true; });\n  return g;\n}\nfunction levPoint"),
+ ("g.traverse(function (o) { if (o.isMesh) { o.castShadow = q.shadows; } });\n  s.g = g;","if (GLBK.ok) glbDressShip(s, g, col);\n  g.traverse(function (o) { if (o.isMesh) { o.castShadow = q.shadows; } });\n  s.g = g;"),
+ ("g.traverse(function (o) { if (o.isMesh) o.castShadow = true; });\n  return g;\n}\nfunction levPoint","if (GLBK.ok) glbDressLev(L, g); else L.glb = null;\n  g.traverse(function (o) { if (o.isMesh) o.castShadow = true; });\n  return g;\n}\nfunction levPoint"),
  ("if (!L.group || !L.group.visible) return; var tube = L.tube;","if (!L.group || !L.group.visible) return; if (L.glb) return updLevGLB(L, t); var tube = L.tube;"),
- ("function applyQ(q, first) {\n  K.q = q;","function applyQ(q, first) {\n  var lo0 = K.q === 'low'; K.q = q; if (q !== 'low') glbLoadK(); if (!first && GLBK.ok && lo0 !== (q === 'low')) glbRefresh();"),
+ ("function applyQ(q, first) {\n  K.q = q;","function applyQ(q, first) {\n  K.q = q; glbLoadK();"),
  # 8. the 2D board: the leviathan tile shows the painted thumbnail
- ("L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);","L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);\n    var lvg = L.node.querySelector('.lv'); if (lvg) lvg.innerHTML = '<image href=\"models/leviathan.webp\" x=\"' + (cx - .47) + '\" y=\"' + (cy - .56) + '\" width=\".94\" height=\".94\"/>';"),
+ ("L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);","L.node = el('g', { 'pointer-events': 'none', filter: 'url(#tw2sh)' }, R2.gTiles, s);\n    var lvg = L.node.querySelector('.lv'); if (lvg) lvg.innerHTML = '<image href=\"models/leviathan@512.webp\" x=\"' + (cx - .47) + '\" y=\"' + (cy - .56) + '\" width=\".94\" height=\".94\"/>';"),
 ]
 kit=rd(os.path.join(SP,'tidewake','kit','kit.js'))
 miss=[a for a,_ in KIT_PATCHES if a not in kit]
