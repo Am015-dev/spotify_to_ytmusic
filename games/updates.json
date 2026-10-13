@@ -1,6 +1,18 @@
 [
  {
   "date": "2026-10-13",
+  "game": "crown",
+  "title": "Painted kit and 3D city",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out"
+  ],
+  "check": "Start a game as Clampede (Brainjack set) and look at the city"
+ },
+ {
+  "date": "2026-10-13",
   "game": "short-fuse",
   "title": "Short Fuse: a real 3D bomb",
   "items": [
