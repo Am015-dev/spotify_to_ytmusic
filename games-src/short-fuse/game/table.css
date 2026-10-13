@@ -282,3 +282,9 @@ html.short #over .card2.end .endart{height:16dvh}
 .s3.bb{animation:s3bb 2.3s ease-out forwards}
 @keyframes s3bb{0%{transform:scale(.3);opacity:0}12%{transform:scale(.9);opacity:1}28%{transform:scale(1.25) rotate(-4deg)}40%{transform:scale(1.05) rotate(4deg)}55%{transform:scale(1.5);opacity:1}100%{transform:scale(2);opacity:0}}
 @media (prefers-reduced-motion:reduce){.s3{animation-duration:.01s!important}}
+
+/* the painted skin never changes a box: these sizes used to live in skin.css */
+html .btn{min-height:48px;min-width:60px}
+html .btn.small{min-height:44px}
+html .jobrow .btn{min-width:64px;min-height:48px}
+html .st-main .seg .btn{min-width:60px;min-height:46px}

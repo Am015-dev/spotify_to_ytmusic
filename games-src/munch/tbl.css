@@ -88,7 +88,7 @@ html.ph #prompt .bfline{color:var(--cream);text-shadow:0 1px 0 #000}
 html.ph-p{--ph-dock:calc(98px + env(safe-area-inset-bottom,0px))}
 html.ph-p #prompt{min-height:78px;justify-content:center}
 html.ph-p .gx-dock{padding-bottom:env(safe-area-inset-bottom,0px)}
-html.ph .gx-dock-body{padding:6px 10px 6px}
+html.ph .gx-dock-body{padding:4px 10px 4px}
 /* the fight on the table: your hero on the left, the monster on the right, strengths as big numbers, buttons under them */
 html.ph .arena:has(>.vs){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr);grid-template-rows:minmax(0,1fr) auto;column-gap:4px;row-gap:4px;align-content:center;justify-content:stretch;justify-items:center;align-items:center;overflow:visible;--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.42),150px)}
 html.ph .arena:has(>.vs) .vs{display:contents}
