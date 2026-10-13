@@ -1,6 +1,17 @@
 [
  {
   "date": "2026-10-13",
+  "game": "tidewake",
+  "title": "Readable top-bar labels",
+  "items": [
+   "The board sea is painted water tiles with a painted brass compass rose",
+   "Brass-and-teal buttons and bar",
+   "Crews, Hint and the other top-bar labels are bigger and sit on a dark plate"
+  ],
+  "check": "Open a game and read the labels under the top-bar icons"
+ },
+ {
+  "date": "2026-10-13",
   "game": "sands",
   "title": "Readable ranks and bigger taps",
   "items": [
@@ -93,16 +104,6 @@
    "LAB opens straight on a boss with ?boss=talos"
   ],
   "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
- },
- {
-  "date": "2026-10-13",
-  "game": "tidewake",
-  "title": "Painted sea for Tidewake",
-  "items": [
-   "The board sea is painted water tiles with a painted brass compass rose",
-   "Brass-and-teal buttons and bar"
-  ],
-  "check": "Start a game: look at the water under the tiles and the compass in the middle."
  },
  {
   "date": "2026-10-13",

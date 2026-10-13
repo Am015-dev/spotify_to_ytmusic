@@ -87,17 +87,12 @@
   }
  },
  "tidewake": {
-  "severe": 2,
-  "warn": 7,
-  "severeKeys": [
-   "size|button#bulbbtn > span",
-   "size|button.gx-ibtn > span"
-  ],
+  "severe": 0,
+  "warn": 5,
+  "severeKeys": [],
   "counts": {
-   "size": 2,
-   "contrast": 2,
+   "contrast": 1,
    "images": 3,
-   "button": 1,
    "boards": 1,
    "art": 0
   }
