@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.33',date:'14 Oct 2026',items:[{t:'FIXED',s:'On foot you collide with real truck and bus shapes; café table and parasol rebuilt from LEGO parts.'}]},
   {v:'v90m-beta.32',date:'14 Oct 2026',items:[{t:'FIXED',s:'Walking on foot: ground surfaces and props fixed.'}]},
   {v:'v90m-beta.31',date:'14 Oct 2026',items:[{t:'NEW',s:'Street props (benches, bins, hydrants, stalls, cafe tables, fences) are built from LEGO parts near you.'}]},
   {v:'v90m-beta.30',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens birds, flags and street life were invisible; road and junction fixes.'}]},
