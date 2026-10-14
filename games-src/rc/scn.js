@@ -19,6 +19,9 @@
     return GXS.wait(function () { return G && G.phase === 'plan' && (!PHO.on || /^plan/.test(PHO.st || '')) && $('#panel') && !UI.modal; }, 15000).then(function () { return idle(1500); });
   }
 
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; try { GX.close(); } catch (e) { } try { setGfx('low'); } catch (e) { } AIDELAY = 60; UI.speed = 1; UI.modal = null; beginGame(); try { GXH.setEnabled(true); } catch (e) { } refresh(); return GXS.wait(function () { return G && G.phase === 'plan' && $('#panel') && !UI.modal; }, 15000).then(function () { return idle(800); }); };
+
   GXS.add({
     id: 'si-board', name: 'Start of game board', ask: 'Is the island clear with glowing places?', seed: 5, when: booted,
     setup: function () { return table(5); },
