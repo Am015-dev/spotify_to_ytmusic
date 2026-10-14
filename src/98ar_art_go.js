@@ -24,4 +24,17 @@ function ART_footSurf(say){if(state!=='roam'||!RO.on)return'📍 Start free roam
   if(performance.now()-t0<3500)return requestAnimationFrame(tick);key('keyup','KeyW');const mv=Math.hypot(OF.x-x0,OF.z-z0),ok=n>=4&&dp>=1&&w<=.05&&mv>=2;
   say(`📍 FEET ON THE PATCH: walked ${dp.toFixed(1)} m over a draped grass patch (≥ 1, ${n} samples), feet ${w.toFixed(3)} m from its surface (≤ 0.05), walked ${mv.toFixed(1)} m (≥ 2) `+(ok?'✅':'❌'))};
  requestAnimationFrame(tick);return'📍 FEET ON THE PATCH · walking across…'}
-window.__art={propsRoad:s=>ART_propsRoad(s),footSurf:s=>ART_footSurf(s)};// by name: hot reload picks up changes
+// art-6 (rv-ath-fest, rev-2): the quest crates are anchored once (qvCargoAt) to the roof of the car model visible at the start; a form change
+// (auto TRANSFORM: ship / 4x4 / boat) swaps the visible model, so the crates rode the old roof (-0.31 m) or a hidden model. Re-anchor every 0.5 s.
+roamStep=(f=>function(dt){f.apply(this,arguments);ARG_cargo(dt)})(roamStep);
+function ARG_cargo(dt){if(/[?&]cargo=0\b/.test(location.search))return;/* ?cargo=0 = old behaviour (test baseline) */ARG_.ct=(ARG_.ct||0)+(dt||0);if(ARG_.ct<.5)return;ARG_.ct=0;const P=typeof pl!=='undefined'&&pl&&pl.mesh;if(!P)return;let g=null;P.traverse(o=>{if(!g&&o.isGroup&&o.userData.cargo&&o.children.length)g=o});if(g)try{qvCargoAt(g)}catch(e){}}
+// crates on the roof: visible, bottom within 0.3 m of the top of the car model they ride (same math as RV14 fest)
+function ARG_crates(){const g=RO.ch&&RO.ch.crates;if(!g||!g.children.length)return null;for(let a=g;a&&a!==pl.mesh;a=a.parent)if(!a.visible)return{vis:0};const C=new THREE.Box3(),B=new THREE.Box3();g.updateMatrixWorld(true);C.setFromObject(g);
+ g.parent.children.forEach(o=>{if(o!==g&&o.visible&&!o.userData.cargo)B.expandByObject(o)});return{vis:1,dy:+(C.min.y-B.max.y).toFixed(2)}}
+// GO art/fest-form: Athens Festival Delivery start, then the transform button's form change (4x4): crates still on the new roof
+function ART_festForm(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const v0=RO.vsel;RV14_go('fest',()=>{});
+ setTimeout(()=>{const a=ARG_crates();if(!a)return say('📍 CRATES AFTER TRANSFORM · no crates loaded ❌');RO.vsel='offroad';
+  setTimeout(()=>{const b=ARG_crates(),m=pl.mesh.userData.m;RO.vsel=v0;const ok=b&&b.vis&&Math.abs(b.dy)<=.1&&Math.abs(a.dy)<=.1;
+   say(`📍 CRATES AFTER TRANSFORM: before ${a.dy} m vs roof, after the 4×4 form ${b?b.vis?b.dy+' m':'hidden':'gone'} (both within ±0.1), visible `+(ok?'✅':'❌'))},2500)},3200);
+ return'📍 CRATES AFTER TRANSFORM · starting the delivery…'}
+window.__art={festForm:s=>ART_festForm(s),propsRoad:s=>ART_propsRoad(s),footSurf:s=>ART_footSurf(s)};// by name: hot reload picks up changes
