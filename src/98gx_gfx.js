@@ -49,7 +49,7 @@ function GFX_flat(o){const g=o.geometry;if(!g||!g.attributes||!g.attributes.norm
 function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.castShadow||GFX_flat(o)){for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m)||!m.isMeshStandardMaterial||m.isMeshPhysicalMaterial||m.transparent||m.roughness>=.85)continue;
     GFX.mats.add(m);m.userData.gfx0=[m.roughness,m.envMapIntensity];m.roughness=.88;GFX_gspec(m);GFX.gm.push(m)}return}
   for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m))continue;if(GFX.gm.includes(m))continue;GFX.mats.add(m);
-  if(!m.isMeshStandardMaterial||m.transparent||m.metalness>.3)continue;m.userData.gfx0=[m.roughness,m.envMapIntensity];
+  if(!m.isMeshStandardMaterial||m.transparent||m.metalness>=.2)continue;m.userData.gfx0=[m.roughness,m.envMapIntensity];
   m.roughness=Math.min(m.roughness,m.isMeshPhysicalMaterial?.25:.4)*.85+.06;m.envMapIntensity=.9;GFX.pm.push(m);k++}});GFX.n+=k;
  // three uses scene.environmentIntensity for every material without its own envMap: give plastic the scene env explicitly so its own intensity counts
  const env=GFX_room();if(env)for(const m of GFX.pm){if(m.envMap!==env){if(!m.envMap)m.needsUpdate=true;m.envMap=env}GFX_ao2(m)}return k}
@@ -77,7 +77,7 @@ resize=(f=>function(){f.apply(this,arguments);GFX_aoSize()})(resize);addEventLis
 // the player car is rebuilt (LEGO model, garage, ride swap) after LK_shadow flagged it, so it lost castShadow: re-flag every pass.
 // It does not receive: self-shadowing small bricks gave red/black acne speckle on the body.
 // ART6_noCast (97_art.js, v86v) locks castShadow to a getter returning false on the player car: unlock it (delete the accessor), re-lock on GFX off.
-function GFX_car(){if(!pl||!pl.mesh||!RO.shadowOn)return;pl.mesh.traverse(o=>{if(!o.isMesh)return;for(const m of[].concat(o.material))if(m&&m.isMeshStandardMaterial&&!m.transparent&&m.metalness<=.3&&!m.userData.gfxCar){m.userData.gfxCar=1;m.userData.gfx0=m.userData.gfx0||[m.roughness,m.envMapIntensity];m.roughness=Math.min(m.roughness,.24);m.envMapIntensity=1.3;if(!GFX.pm.includes(m))GFX.pm.push(m);GFX.mats.add(m)}if(o.userData.art6c&&!o.userData.gfxUnl){delete o.castShadow;o.userData.gfxUnl=1}o.castShadow=true;o.receiveShadow=false})}
+function GFX_car(){if(!pl||!pl.mesh||!RO.shadowOn)return;pl.mesh.traverse(o=>{if(!o.isMesh)return;for(const m of[].concat(o.material))if(m&&m.isMeshStandardMaterial&&!m.transparent&&m.metalness<.2&&!m.userData.gfxCar){m.userData.gfxCar=1;m.userData.gfx0=m.userData.gfx0||[m.roughness,m.envMapIntensity];m.roughness=Math.min(m.roughness,.24);m.envMapIntensity=1.3;if(!GFX.pm.includes(m))GFX.pm.push(m);GFX.mats.add(m)}if(o.userData.art6c&&!o.userData.gfxUnl){delete o.castShadow;o.userData.gfxUnl=1}o.castShadow=true;o.receiveShadow=false})}
 function GFX_carLock(){if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.userData.gfxUnl){o.userData.gfxUnl=0;Object.defineProperty(o,'castShadow',{configurable:true,get(){return false},set(v){}})}})}
 // merged city blocks (95_drive_flow DR_, 98wb world batch) were built with castShadow=false: buildings threw no shadow on the street.
 // Tall ones (> 2.5 m) cast again; ground/road merges stay off (they would only add acne and shadow-pass cost).
