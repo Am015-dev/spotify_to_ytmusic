@@ -16,13 +16,81 @@ const TR_DATUM=TR_F?TR_F.base:0;
 let TR_W=null;
 function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX1-WX0)/r)+1,nz=Math.ceil((WZN-WZS)/r)+1,h=new Float32Array(nx*nz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const[e,n]=RW(WX0+i*r,WZS+j*r);h[j*nx+i]=Math.max(0,(TR_real(e,n)-TR_DATUM)*TR_EX)}
+  TR_relief(h,nx,nz,r);
   if(WATERS.length){const D=new Float32Array(nx*nz).fill(1e9);for(let j=0;j<nz;j++)for(let i=0;i<nx;i++)if(inRiver(WX0+i*r,WZS+j*r))D[j*nx+i]=0;
     const s2=r*Math.SQRT2;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;let d=D[k];if(i)d=Math.min(d,D[k-1]+r);if(j){d=Math.min(d,D[k-nx]+r);if(i)d=Math.min(d,D[k-nx-1]+s2);if(i<nx-1)d=Math.min(d,D[k-nx+1]+s2)}D[k]=d}
     for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;let d=D[k];if(i<nx-1)d=Math.min(d,D[k+1]+r);if(j<nz-1){d=Math.min(d,D[k+nx]+r);if(i<nx-1)d=Math.min(d,D[k+nx+1]+s2);if(i)d=Math.min(d,D[k+nx-1]+s2)}D[k]=d}
     for(let k=0;k<h.length;k++){const t=clamp((D[k]-30)/150,0,1);h[k]*=t*t*(3-2*t)}}
   if(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro){const A=HILL_BY.akro;let top=0;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r;if(athHill1(A,x,z)>=A.H-.01)top=Math.max(top,h[j*nx+i])}
     top=OC_top(top);const H0=A.H;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,m=athHill1(A,x,z)/H0;if(m>0){const k=j*nx+i;h[k]+=(top-h[k])*m}}A.H=top;A.trH0=H0}
-  OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};return TR_W}
+  OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};TR_roadsInit(TR_W);return TR_W}
+// ---- terr-1 (Alex: "both cities are flat, not realistic"): real relief, exaggerated above a smooth valley floor (floor = 1.2 km box blur of
+// the DEM): Frankfurt 3.6x on the soft-capped part (~2.2x on the Sachsenhausen hills; cap +320 m on the Taunus), Athens 1.4x outside the Acropolis (plateau keeps its real height).
+// feature flag (OFF until the lane passes): ?terr=1 = hills + graded road corridors + slope colours, kept for the tab (sessionStorage, so GO
+// reloads keep it) or for good with localStorage mho_terr=1; ?terr=0 clears it. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
+const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))==='1'}catch(e){return false}})()};
+const TR_RK=CID==="fra"?{k:3.6,c:200}:{k:1.4,c:200};
+function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
+  const R=Math.round(1200/96),T=new Float32Array(C.length),blur=()=>{for(let j=0;j<cz;j++){let a=0,c=0;for(let i=-R;i<cx+R;i++){if(i+R<cx){a+=C[j*cx+i+R];c++}if(i-R-1>=0){a-=C[j*cx+i-R-1];c--}if(i>=0&&i<cx)T[j*cx+i]=a/c}}
+    for(let i=0;i<cx;i++){let a=0,c=0;for(let j=-R;j<cz+R;j++){if(j+R<cz){a+=T[(j+R)*cx+i];c++}if(j-R-1>=0){a-=T[(j-R-1)*cx+i];c--}if(j>=0&&j<cz)C[j*cx+i]=a/c}}};blur();blur();
+  const A=CID!=='fra'&&typeof HILL_BY!=='undefined'?HILL_BY.akro:null,{k,c}=TR_RK;
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){let fx=Math.min(cx-1.001,Math.max(0,i/s-.5)),fz=Math.min(cz-1.001,Math.max(0,j/s-.5));const a=fx|0,b=fz|0,tx=fx-a,tz=fz-b,q=b*cx+a,
+      F=(C[q]*(1-tx)+C[q+1]*tx)*(1-tz)+(C[q+cx]*(1-tx)+C[q+cx+1]*tx)*tz,K=j*nx+i,e=h[K]-F;let m=1;if(A){const v=athHill1(A,WX0+i*r,WZS+j*r);if(v>0)m=Math.max(0,1-v/A.H*3)}
+    h[K]=Math.max(0,h[K]+(k-1)*m*c*Math.tanh(e/c))}}
+// road corridors baked into the raster: each street gets a smooth profile (<= 9.5 % grade, ends pinned at bridges), flat across its width
+// (+ a shoulder of one raster cell, so bilinear lookups on the road see only flat cells), feathered back to the terrain over 3x the cut/fill
+// height (12..40 m). Junctions average the profiles that meet there; 3 passes re-sample the merged surface. Frankfurt filler roads are
+// graded when the grid is built (rfGrid runs after the raster exists).
+function TR_grade(W,roads,o){const{r,nx,nz,h}=W,H0=h.slice(),G=o.g||.085,FL=o.flat??r+2,FM=o.fmax||40,n=nx*nz,SY=new Float32Array(n),SW=new Float32Array(n),IM=new Float32Array(n);
+  const smp=(A,x,z)=>{let fx=(x-WX0)/r,fz=(z-WZS)/r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>nz-1.001?nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*nx+i;return(A[k]*(1-tx)+A[k+1]*tx)*(1-tz)+(A[k+nx]*(1-tx)+A[k+nx+1]*tx)*tz};
+  // chain roads that meet end to end in line (filler roads split at every street, CITY_S runs): one profile through the joint
+  roads=roads.filter(R=>R.P.length>1).map(R=>({P:R.P.slice(),hw:R.hw,fix:R.fix,g:R.g}));{const key=p=>Math.round(p[0]/2)+','+Math.round(p[1]/2),dir=(P,end)=>{const a=end?P[P.length-2]:P[1],b=end?P[P.length-1]:P[0],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1;return[(b[0]-a[0])/l,(b[1]-a[1])/l]};
+    for(let pass=0;pass<4;pass++){const E=new Map();roads.forEach((R,i)=>{if(!R.P)return;for(const e of[0,1]){const k=key(e?R.P[R.P.length-1]:R.P[0]);let L=E.get(k);if(!L)E.set(k,L=[]);L.push([i,e])}});let mv=0;
+      for(const L of E.values()){if(L.length!==2)continue;const[[i,ei],[j,ej]]=L;if(i===j)continue;const A=roads[i],B=roads[j];if(!A.P||!B.P||Math.abs(A.hw-B.hw)>3||!A.fix!==!B.fix||(A.g||0)!==(B.g||0))continue;const da=dir(A.P,ei),db=dir(B.P,ej);if(da[0]*db[0]+da[1]*db[1]>-.9)continue;
+        const a=ei?A.P:A.P.slice().reverse(),b=ej?B.P.slice().reverse():B.P;A.P=a.concat(b.slice(1));B.P=null;mv++}if(!mv)break}roads=roads.filter(R=>R.P)}
+  const runs=[];for(const R of roads){let cur=null,cut=0;const P=R.P,st=4;for(let i=0;i<P.length;i++){const a=P[i],b=P[Math.min(P.length-1,i+1)],L=Math.hypot(b[0]-a[0],b[1]-a[1]),m=i<P.length-1?Math.max(1,Math.ceil(L/st)):1;
+      for(let q=0;q<m;q++){const x=a[0]+(b[0]-a[0])*q/m,z=a[1]+(b[1]-a[1])*q/m;if(x<WX0+r||x>WX1-r||z<WZS+r||z>WZN-r||(o.skip&&o.skip(x,z))){if(cur){cur.pb=1;if(cur.x.length>2)runs.push(cur)}cur=null;cut=1;continue}
+        if(!cur){cur={x:[],z:[],s:[],hw:R.hw,fix:R.fix,g:R.g||G,pa:cut,pb:0};cut=0}const n0=cur.x.length;cur.s.push(n0?cur.s[n0-1]+Math.hypot(x-cur.x[n0-1],z-cur.z[n0-1]):0);cur.x.push(x);cur.z.push(z)}}if(cur&&cur.x.length>2)runs.push(cur)}
+  // network solve: every sample is a node (start = the smoothed ground), consecutive samples are linked with |dy| <= G*ds, a sample inside
+  // another road or its flat shoulder is linked to that road's nearest sample with dy = 0 (junctions, T-ends, overlaps), o.pinAt nodes are fixed at the graded
+  // corridor they meet
+  const out=new Float32Array(n);let NN=0;for(const U of runs){U.o=NN;NN+=U.x.length}const Y=new Float64Array(NN),NS=new Float64Array(NN),FX=new Uint8Array(NN),NX=new Float64Array(NN),NZ=new Float64Array(NN),HW=new Float32Array(NN);
+  for(const U of runs){const N=U.x.length,y=new Float64Array(N);for(let i=0;i<N;i++)y[i]=smp(H0,U.x[i],U.z[i]);
+    for(let pass=0;pass<2;pass++){const t=Float64Array.from(y);for(let i=0;i<N;i++){let a=0,c=0;for(let j=Math.max(0,i-8);j<=Math.min(N-1,i+8);j++){a+=t[j];c++}y[i]=a/c}}
+    for(let i=0;i<N;i++){const k=U.o+i;Y[k]=y[i];NS[k]=U.s[i];NX[k]=U.x[i];NZ[k]=U.z[i];HW[k]=U.hw;if(U.fix){Y[k]=smp(H0,U.x[i],U.z[i]);FX[k]=1}}}
+  const EA=[],EB=[],EL=[];for(const U of runs)for(let i=1;i<U.x.length;i++){EA.push(U.o+i-1);EB.push(U.o+i);EL.push(U.g*(U.s[i]-U.s[i-1]))}
+  {const GI=new Map(),GS=Math.max(24,Math.ceil(Math.max(...runs.map(U=>U.hw))+FL)),gk=(x,z)=>Math.floor(x/GS)*100000+Math.floor(z/GS),RI=new Int32Array(NN);runs.forEach((U,ri)=>{for(let i=0;i<U.x.length;i++)RI[U.o+i]=ri});
+    for(let k=0;k<NN;k++){const q=gk(NX[k],NZ[k]);let Q=GI.get(q);if(!Q)GI.set(q,Q=[]);Q.push(k)}
+    for(let k=0;k<NN;k++){const kx=Math.floor(NX[k]/GS),kz=Math.floor(NZ[k]/GS),best=new Map();for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const Q=GI.get((kx+a)*100000+kz+c);if(!Q)continue;
+        for(const m of Q){if(m===k||(RI[m]===RI[k]&&Math.abs(NS[m]-NS[k])<3*(HW[k]+FL)))continue;const d=Math.hypot(NX[m]-NX[k],NZ[m]-NZ[k]);if(d>=HW[m]+FL)continue;const key=RI[m]===RI[k]?-1-m:RI[m],bb=best.get(key);if(!bb||d<bb[1])best.set(key,[m,d])}}
+      for(const[ri,[m]]of best)if(m>k){EA.push(k);EB.push(m);EL.push(0)}}}
+  // exact: lower envelope L(v)=min_u Y(u)+d(u,v), upper U(v)=max_u Y(u)-d(u,v) on the link graph (Dijkstra), Y = (L+U)/2 (both are
+  // G-Lipschitz, so is their mean); fixed nodes keep their value
+  const ne=EA.length,DEG=new Int32Array(NN+1);for(let i=0;i<ne;i++){DEG[EA[i]+1]++;DEG[EB[i]+1]++}for(let k=0;k<NN;k++)DEG[k+1]+=DEG[k];const AJ=new Int32Array(2*ne),AW=new Float64Array(2*ne),fill=DEG.slice(0,NN);
+  for(let i=0;i<ne;i++){AJ[fill[EA[i]]]=EB[i];AW[fill[EA[i]]++]=EL[i];AJ[fill[EB[i]]]=EA[i];AW[fill[EB[i]]++]=EL[i]}
+  const env=sg=>{const D=new Float64Array(NN),H=new Int32Array(NN),P=new Int32Array(NN).fill(-1);let hn=0;for(let k=0;k<NN;k++)D[k]=sg*Y[k];
+    const up=i=>{const v=H[i];while(i>0){const p=(i-1)>>1;if(D[H[p]]<=D[v])break;H[i]=H[p];P[H[i]]=i;i=p}H[i]=v;P[v]=i},dn=i=>{const v=H[i];for(;;){let c=2*i+1;if(c>=hn)break;if(c+1<hn&&D[H[c+1]]<D[H[c]])c++;if(D[H[c]]>=D[v])break;H[i]=H[c];P[H[i]]=i;i=c}H[i]=v;P[v]=i};
+    for(let k=0;k<NN;k++){H[hn]=k;P[k]=hn;up(hn++)}const done=new Uint8Array(NN);
+    while(hn){const u=H[0];done[u]=1;hn--;if(hn){H[0]=H[hn];P[H[0]]=0;dn(0)}for(let e=DEG[u];e<DEG[u+1];e++){const v=AJ[e];if(done[v])continue;const nd=D[u]+AW[e];if(nd<D[v]){D[v]=nd;up(P[v])}}}
+    for(let k=0;k<NN;k++)D[k]*=sg;return D};
+  const LO=env(1),UP=env(-1);let worst=0;for(let k=0;k<NN;k++){if(!FX[k])Y[k]=(LO[k]+UP[k])/2}for(let i=0;i<ne;i++){const v=Math.abs(Y[EA[i]]-Y[EB[i]])-EL[i];if(v>worst)worst=v}
+  W.trSolve=(W.trSolve||[]).concat([{nodes:NN,links:ne,worst:+worst.toFixed(3)}]);if(/trdbg/.test(location.search))W.trRuns=(W.trRuns||[]).concat(runs.map(U=>({x:U.x,z:U.z,hw:U.hw,y:Array.from(Y.subarray(U.o,U.o+U.x.length))})));
+  for(const U of runs){const N=U.x.length,y=Y.subarray(U.o,U.o+N);
+      const hw=U.hw,R0=hw+FL,RM=R0+FM;for(let i=0;i<N-1;i++){const ax=U.x[i],az=U.z[i],dx=U.x[i+1]-ax,dz=U.z[i+1]-az,l2=dx*dx+dz*dz||1e-9,ya=y[i],yb=y[i+1];
+        const i0=Math.max(0,Math.floor((Math.min(ax,ax+dx)-RM-WX0)/r)),i1=Math.min(nx-1,Math.ceil((Math.max(ax,ax+dx)+RM-WX0)/r)),j0=Math.max(0,Math.floor((Math.min(az,az+dz)-RM-WZS)/r)),j1=Math.min(nz-1,Math.ceil((Math.max(az,az+dz)+RM-WZS)/r));
+        for(let j=j0;j<=j1;j++){const z=WZS+j*r;for(let ii=i0;ii<=i1;ii++){const x=WX0+ii*r;let t=((x-ax)*dx+(z-az)*dz)/l2;t=t<0?0:t>1?1:t;const ex=ax+dx*t-x,ez=az+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=RM)continue;
+          const K=j*nx+ii,yy=ya+(yb-ya)*t,F=Math.min(FM,Math.max(12,3*Math.abs(yy-H0[K]))),u=(lat-R0)/F;if(u>=1)continue;const tt=u<0?0:u,I=1-tt*tt*(3-2*tt),oo=lat>hw?lat-hw+1:1,w=I/(oo*oo);SY[K]+=yy*w;SW[K]+=w;if(I>IM[K])IM[K]=I}}}}
+  for(let K=0;K<n;K++)out[K]=SW[K]>0?H0[K]+(SY[K]/SW[K]-H0[K])*IM[K]:H0[K];
+  h.set(out);return runs.length}
+const TR_RG=TERR.on&&new URLSearchParams(location.search).get('trg')!=='0';
+function TR_roadsInit(W,force){if(!TR_RG)return;if(CID!=='fra'&&!force)return;  // Athens: graded after AB_auto has extended the dead-end streets (TR_afterExt)
+  const T0=performance.now(),R=[];try{for(const S of CITY_S)if(S.r.cls!=='hill'||CID!=='fra')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,g:S.r.cls==='hill'?.3:0})
+    if(CID==='fra')for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
+    const skip=CID==='fra'?(x,z)=>inRiver(x,z,-25)||BRIDGES.some(b=>deckAt(b,x,z)!=null):null,pinY=(x,z)=>{for(const b of BRIDGES){if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,flat:W.r+4,g:CID==='fra'?.085:.07}),ms:0}}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
+// every deck (city bridges had none: decks from y 0) starts and ends at the graded ground, re-read after each grading pass: no step at the joints
+function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES,...(AB_BRIDGES||[])]){const g=s=>{const[x,z]=deckPt(b,s*(b.half+1));return TR_G(x,z)};b.yA=g(-1);b.yB=g(1);b.trE=1}}
+
 function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=fx<0?0:fx>W.nx-1.001?W.nx-1.001:fx;fz=fz<0?0:fz>W.nz-1.001?W.nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*W.nx+i,h=W.h;
   return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+W.nx]*(1-tx)+h[k+W.nx+1]*tx)*tz}
 const TR_tauH0=tauH;
@@ -35,17 +103,21 @@ function TR_grad(x,z,e=1.5){return[(groundY(x+e,z)-groundY(x-e,z))/(2*e),(ground
 athBlurH=(x,z)=>{let a=TR_G(x,z)*2,c=2;for(let k=0;k<8;k++){const t=k/8*Math.PI*2;a+=TR_G(x+Math.cos(t)*24,z+Math.sin(t)*24);c++}return a/c};
 athShelfMark=()=>{for(const S of CITY_S)if(S.r.cls!=='hill')S.hs=1};
 {const _p=athRoadProfiles;athRoadProfiles=()=>{for(const S of CITY_S){if(S.r.cls!=='hill')continue;const P=S.pts,n=P.length,raw=P.map(p=>TR_G(p.x,p.z));
-    for(let i=0;i<n;i++){let a=0,c=0;for(let k=-4;k<=4;k++){const j=i+k;if(j<0||j>=n)continue;a+=raw[j];c++}P[i].y=a/c}for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}}_p();
+    for(let i=0;i<n;i++){let a=0,c=0;const KR=TR_RG?1:4;for(let k=-KR;k<=KR;k++){const j=i+k;if(j<0||j>=n)continue;a+=raw[j];c++}P[i].y=a/c}for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}}_p();
+  // terr-1: streets and hill trails are graded into the raster already (TR_roadsInit): profiles read it and no shelf is laid on top
+  if(TR_RG)for(const S of CITY_S){const P=S.pts,n=P.length;for(const p of P)p.y=TR_G(p.x,p.z);for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}}
   // wider shelf lookup (feathers up to 60 m), see athShelfY below
-  SHELF.clear();for(const S of CITY_S){if(!(S.r.cls==='hill'||S.hs))continue;const Rr=S.r.w/2+70;
+  SHELF.clear();if(!TR_RG)for(const S of CITY_S){if(!(S.r.cls==='hill'||S.hs))continue;const Rr=S.r.w/2+70;
     S.pts.forEach((p,i)=>{for(let kx=Math.floor((p.x-Rr)/32);kx<=Math.floor((p.x+Rr)/32);kx++)for(let kz=Math.floor((p.z-Rr)/32);kz<=Math.floor((p.z+Rr)/32);kz++){const k=kx*100000+kz;let L=SHELF.get(k);if(!L)SHELF.set(k,L=[]);L.push(S,i)}})}}}
 // road shelves blend back to the real ground over 3x the cut/fill height (18..60 m), so cuts and embankments stay <= ~27 deg
 athShelfY=(x,z,h)=>{const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));if(!L)return h;const st=++TR_sst;let sw=0,sy=0,im=0;
   for(let j=0;j<L.length;j+=2){const S=L[j],Q=S.pts,i=L[j+1],hw=S.r.w/2;for(let a=i-1;a<=i;a++){if(a<0||a+1>=Q.length)continue;const A=Q[a];if(A._st===st)continue;A._st=st;
     const Bq=Q[a+1],dx=Bq.x-A.x,dz=Bq.z-A.z,l2=dx*dx+dz*dz||1e-9;let t=((x-A.x)*dx+(z-A.z)*dz)/l2;t=t<0?0:t>1?1:t;const ex=A.x+dx*t-x,ez=A.z+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+66)continue;
-    const ay=A.y??0,y=ay+((Bq.y??0)-ay)*t,F=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/F;if(u>=1)continue;const tt=u<0?0:u,I=1-tt*tt*(3-2*tt),o=lat>hw?lat-hw+1:1,w=I/(o*o);sw+=w;sy+=y*w;if(I>im)im=I}}
+    const ay=TR_py(A),y=ay+(TR_py(Bq)-ay)*t,F=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/F;if(u>=1)continue;const tt=u<0?0:u,I=1-tt*tt*(3-2*tt),o=lat>hw?lat-hw+1:1,w=I/(o*o);sw+=w;sy+=y*w;if(I>im)im=I}}
   if(!sw)return h;const y=sy/sw;return y+(h-y)*(1-im)};
 let TR_sst=0;
+// street points added after the profiles were made (no .y) read as y 0 and dragged the ground into 60 m pits (Panepistimiou, Patision): use the ground there
+const TR_py=p=>p.y??(p.y=TR_G(p.x,p.z));
 // hot-1: every shelf segment is stored ONCE (SM_SG: x,z,dx,dz,l2,hw + its two points); a 32 m cell keeps only the indices of the segments that can
 // reach it (Int32Array). All ~35k Athens cells stay cached (~6 MB; the old per-cell copies were capped at 6000 cells and rebuilt ~2.6 s per boot). Same order, same maths.
 const SM_SC=new Map(),SM_SG={id:new Map(),f:[],o:[]};
@@ -58,14 +130,14 @@ function SM_shC(L,cx,cz,full){const seen=new Set(),ix=[],G=SM_SG;let h0=-1e9,h1=
   for(let j=0;j<L.length;j+=2){const S=L[j],Q=S.pts,i=L[j+1],hw=S.r.w/2;for(let a=i-1;a<=i;a++){if(a<0||a+1>=Q.length)continue;const A=Q[a];if(seen.has(A))continue;seen.add(A);const B=Q[a+1],dx=B.x-A.x,dz=B.z-A.z;
     // conservative reject: no point of the 32 m cell (half diagonal 22.7 m) can come within hw+66 of this segment
     if(Math.hypot(A.x+dx/2-cx,A.z+dz/2-cz)-Math.hypot(dx,dz)/2-23>=hw+66)continue;
-    if(!full){const l2=dx*dx+dz*dz||1e-9;let t=((cx-A.x)*dx+(cz-A.z)*dz)/l2;t=t<0?0:t>1?1:t;const dc=Math.hypot(A.x+dx*t-cx,A.z+dz*t-cz),ya=A.y??0,yb=B.y??0,D=Math.max(Math.max(ya,yb)-h0,h1-Math.min(ya,yb),0);
+    if(!full){const l2=dx*dx+dz*dz||1e-9;let t=((cx-A.x)*dx+(cz-A.z)*dz)/l2;t=t<0?0:t>1?1:t;const dc=Math.hypot(A.x+dx*t-cx,A.z+dz*t-cz),ya=TR_py(A),yb=TR_py(B),D=Math.max(Math.max(ya,yb)-h0,h1-Math.min(ya,yb),0);
       if(dc-22.7>=hw+6+Math.min(60,Math.max(18,3*D))+.01)continue}
     let id=G.id.get(A);if(id===undefined){id=G.o.length/2;G.id.set(A,id);G.f.push(A.x,A.z,dx,dz,dx*dx+dz*dz||1e-9,hw);G.o.push(A,B)}ix.push(id)}}
   return{L,n:L.length,ix:Int32Array.from(ix),h0,h1,cx,cz,ixA:null}}
 if(CID!=='fra'){const _s0=athShelfY;athShelfY=(x,z,h)=>{const kx=Math.floor(x/32),kz=Math.floor(z/32),k=kx*100000+kz,L=SHELF.get(k);if(!L)return h;let C=SM_SC.get(k);
   if(!C||C.L!==L||C.n!==L.length){if(C||SM_SC.size>=60000){SM_SC.clear();SM_SG.id.clear();SM_SG.f=[];SM_SG.o=[]}SM_SC.set(k,C=SM_shC(L,kx*32+16,kz*32+16))}const F=SM_SG.f,O=SM_SG.o,I=h>=C.h0&&h<=C.h1?C.ix:C.ixA||(C.ixA=SM_shC(L,C.cx,C.cz,1).ix),n=I.length;let sw=0,sy=0,im=0;
   for(let m=0;m<n;m++){const s=I[m]*2,q=s*3,ax=F[q],az=F[q+1],dx=F[q+2],dz=F[q+3],hw=F[q+5];let t=((x-ax)*dx+(z-az)*dz)/F[q+4];t=t<0?0:t>1?1:t;const ex=ax+dx*t-x,ez=az+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+66)continue;
-    const A=O[s],B=O[s+1],ay=A.y??0,y=ay+((B.y??0)-ay)*t,Fq=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/Fq;if(u>=1)continue;const tt=u<0?0:u,I2=1-tt*tt*(3-2*tt),oo=lat>hw?lat-hw+1:1,w=I2/(oo*oo);sw+=w;sy+=y*w;if(I2>im)im=I2}
+    const A=O[s],B=O[s+1],ay=TR_py(A),y=ay+(TR_py(B)-ay)*t,Fq=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/Fq;if(u>=1)continue;const tt=u<0?0:u,I2=1-tt*tt*(3-2*tt),oo=lat>hw?lat-hw+1:1,w=I2/(oo*oo);sw+=w;sy+=y*w;if(I2>im)im=I2}
   if(!sw)return h;const y=sy/sw;return y+(h-y)*(1-im)};
  window.__smShelf={old:_s0,cur:(x,z,h)=>athShelfY(x,z,h),cells:()=>SM_SC.size}}
 // the Acropolis keeps its real plateau height in akro.H (walls, temples), but every placement mask still sees the original hill values
@@ -113,7 +185,7 @@ if(CID!=='fra')athRoadProfiles();
 function shelfY(x,z,h){if(CID!=='fra')return athShelfY(x,z,h);const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));if(!L)return h;let bd=1e18,bS=null,bi=0;for(let j=0;j<L.length;j+=2){const p=L[j].pts[L[j+1]],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;bS=L[j];bi=L[j+1]}}
   const p=bS.pts[bi],a0=(x-p.x)*p.tx+(z-p.z)*p.tz,al=clamp(a0,-6,6),lat=Math.hypot((x-p.x)*p.tz-(z-p.z)*p.tx,Math.max(0,Math.abs(a0)-6)),y=p.y+al*p.dy,t=clamp((lat-bS.r.w/2-6)/18,0,1),k=t*t*(3-2*t);return y+(h-y)*k}
 // ground mesh resolution for a ground cell: 10 m next to a hill street, 20 m on a hill, else coarse
-let _sst=0;function athShelfY(x,z,h){const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));if(!L)return h;const st=++_sst;let sw=0,sy=0,im=0;for(let j=0;j<L.length;j+=2){const S=L[j],Q=S.pts,i=L[j+1],hw=S.r.w/2;for(let a=i-1;a<=i;a++){if(a<0||a+1>=Q.length)continue;const A=Q[a];if(A._st===st)continue;A._st=st;const Bq=Q[a+1],dx=Bq.x-A.x,dz=Bq.z-A.z,l2=dx*dx+dz*dz||1e-9;let t=((x-A.x)*dx+(z-A.z)*dz)/l2;t=t<0?0:t>1?1:t;const ex=A.x+dx*t-x,ez=A.z+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+24)continue;const u=(lat-hw-6)/18,tt=u<0?0:u>1?1:u,I=1-tt*tt*(3-2*tt);if(I<=0)continue;const ay=A.y??0,y=ay+((Bq.y??0)-ay)*t,o=lat>hw?lat-hw+1:1,w=I/(o*o);sw+=w;sy+=y*w;if(I>im)im=I}}
+let _sst=0;function athShelfY(x,z,h){const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));if(!L)return h;const st=++_sst;let sw=0,sy=0,im=0;for(let j=0;j<L.length;j+=2){const S=L[j],Q=S.pts,i=L[j+1],hw=S.r.w/2;for(let a=i-1;a<=i;a++){if(a<0||a+1>=Q.length)continue;const A=Q[a];if(A._st===st)continue;A._st=st;const Bq=Q[a+1],dx=Bq.x-A.x,dz=Bq.z-A.z,l2=dx*dx+dz*dz||1e-9;let t=((x-A.x)*dx+(z-A.z)*dz)/l2;t=t<0?0:t>1?1:t;const ex=A.x+dx*t-x,ez=A.z+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+24)continue;const u=(lat-hw-6)/18,tt=u<0?0:u>1?1:u,I=1-tt*tt*(3-2*tt);if(I<=0)continue;const ay=TR_py(A),y=ay+(TR_py(Bq)-ay)*t,o=lat>hw?lat-hw+1:1,w=I/(o*o);sw+=w;sy+=y*w;if(I>im)im=I}}
   if(!sw)return h;const y=sy/sw;return y+(h-y)*(1-im)}
 function athHilly(a,b,c,d){for(const h of HILLS)if(h.H&&h.shape==='mesa'&&b>h.x0&&a<h.x1&&d>h.z0&&c<h.z1)return 5;for(const h of HILLS)if(h.H&&b>h.x0&&a<h.x1&&d>h.z0&&c<h.z1)return 12;for(let kx=Math.floor(a/32);kx<=Math.floor(b/32);kx++)for(let kz=Math.floor(c/32);kz<=Math.floor(d/32);kz++)if(SHELF.has(kx*100000+kz))return 12;return false;}
 function athHilly0(a,b,c,d){let r=false;for(const h of HILLS){if(b>h.x0&&a<h.x1&&d>h.z0&&c<h.z1){for(let i=0;i<=6;i++)for(let j=0;j<=6;j++){const v=athHill1(h,a+(b-a)*i/6,c+(d-c)*j/6);if(h.shape==='mesa'&&v>.5&&v<h.H-.5)return 5;if(v>0)r=20}}}
@@ -208,6 +280,9 @@ const AB_AUTO=[];function AB_auto(M){if(/[?&]abf=0/.test(location.search))return
  let ext=0;CITY_S.forEach((S,si)=>{if(!OB_DRV(S))return;for(const e of[0,1]){const P=S.pts,E=e?P[P.length-1]:P[0];if(near(E.x,E.z,si,22)||used.some(u=>Math.hypot(u[0]-E.x,u[1]-E.z)<60))continue;
   let b=null,bd=150*150;CITY_S.forEach((T,ti)=>{if(ti===si||!OB_DRV(T))return;for(const p of T.pts){const d=(p.x-E.x)**2+(p.z-E.z)**2;if(d<bd){bd=d;b=p}}});if(!b)continue;
   let wet=false;for(let t=0;t<=1;t+=.05)if(inRiver(E.x+(b.x-E.x)*t,E.z+(b.z-E.z)*t,-4)){wet=true;break}if(wet)continue;OB_extend(S,e,b.x,b.z);ext++}});AB_AUTO.ext=ext}
+// terr-1: AB_auto (just above) extends dead-end streets in both cities; Athens' raster exists before that (athRoadProfiles at load), so its
+// streets are graded here, once the network is final
+{const _a=AB_auto;AB_auto=function(M){_a(M);if(CID!=='fra'&&TR_RG&&TR_W&&!TR_W.trg){TR_roadsInit(TR_W,1);for(const S of CITY_S){const P=S.pts,n=P.length;for(const p of P)p.y=TR_G(p.x,p.z);for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}}}}}
 // check (GO v90k/fra-net): one road network; every motorway has its own ramp to a city street; dead ends (a street end with a ramp is not one)
 function AB_netChk(){const FR=hubRoads(),nB=BRIDGES.length,ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs,R=new Map();
  segs.forEach((S,a)=>{const r=N.find(a);R.set(r,(R.get(r)||0)+S.L)});FR.forEach((r,k)=>{const q=N.find(segs.length+nB+k);R.set(q,(R.get(q)||0)+r.L)});
@@ -269,6 +344,9 @@ function rfGrid(){if(FILL_R)return;FILL_R=[];FILL_G=new Map();BLOCK_C=[];
   {const byG={};for(const r of FILL_R)(byG[r.g]=byG[r.g]||[]).push(r);for(const k in byG){const L=byG[k],V=L.filter(r=>r.v),H=L.filter(r=>!r.v);for(const v of V)for(const h of H)if(v.x0>=h.x0-1&&v.x0<=h.x1+1&&h.z0>=v.z0-1&&h.z0<=v.z1+1){(v.cross=v.cross||[]).push([h.z0-v.z0,h.w]);(h.cross=h.cross||[]).push([v.x0-h.x0,v.w]);FILL_X.push({x:v.x0,z:h.z0,wa:v.w,wb:h.w,v,h})}}}
   for(const r of FILL_R){const a=Math.min(r.x0,r.x1)-r.w,b=Math.max(r.x0,r.x1)+r.w,c=Math.min(r.z0,r.z1)-r.w,d=Math.max(r.z0,r.z1)+r.w;for(let k=Math.floor(a/64);k<=Math.floor(b/64);k++)for(let j=Math.floor(c/64);j<=Math.floor(d/64);j++){const key=k*100000+j;let L=FILL_G.get(key);if(!L)FILL_G.set(key,L=[]);L.push(r)}}}
 function hubRoads(){rfGrid();return FILL_R}
+// terr-1: Frankfurt filler roads are graded into the raster as soon as the grid exists
+{const _rg=rfGrid;rfGrid=function(){const was=FILL_R;_rg();if(!was&&FILL_R&&CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(const S of CITY_S)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
+    W.trf={n:TR_grade(W,R,{skip:(x,z)=>inRiver(x,z,-25)||BRIDGES.some(b=>deckAt(b,x,z)!=null),flat:W.r+4})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}}}
 // footprint test for buildings (9 points of the rotated rectangle): off streets, filler roads, water, plazas/parks/landmarks
 function fpOK(x,z,w,d,ry,lm=true){const c=Math.cos(ry),s=Math.sin(ry);for(const[a,b]of[[0,0],[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5],[0,-.5],[0,.5],[-.5,0],[.5,0]]){const lx=a*w,lz=b*d,px=x+lx*c+lz*s,pz=z-lx*s+lz*c;
     if(!(px>HX0+10&&px<HX1-10&&pz>HZS+10&&pz<HZN-10))return false;const q=cityAt(px,pz);if(q&&q.d<q.road.w/2+(SC_S&&SC_S.on?SC_K.sbF:2.5))return false;const f=fillAt(px,pz);if(f&&f.d<f.r.w/2+(SC_S&&SC_S.on?SC_K.sbF:2.5))return false;if(inRiver(px,pz,-10)||hillH(px,pz)>.3)return false;

@@ -33,8 +33,8 @@ const ATH=()=>memo('ath',()=>jsonBlock('ath-data'));
 const CHANGELOG=()=>memo('cl',()=>{const a=ev(constSrc('OD_CHANGELOG'));if(SEED==='changelog')a[0].items=[{t:'WRONG',s:''}];return a});
 const CHECKLIST=()=>memo('ck',()=>{const a=ev(constSrc('OD_CHECKLIST'));if(SEED==='checklist'){a.push({ver:a[0].ver,id:a[0].id,text:'x'})}return a});
 // LDraw chunks: models/<id>.js = __LDC(id, meshes, models); needs a build (out/<ver>/models) -> newest dir that has models/ ; else null
-function modelsDir(){return memo('md',()=>{const o=path.join(ROOT,'out');if(!fs.existsSync(o))return null;
-  const L=fs.readdirSync(o).map(n=>({n,t:fs.existsSync(path.join(o,n,'models'))?fs.statSync(path.join(o,n,'models')).mtimeMs:0})).filter(x=>x.t).sort((a,b)=>b.t-a.t);return L[0]?path.join(o,L[0].n):null})}
+function modelsDir(){return memo('md',()=>{const d=path.join(require('os').tmpdir(),'od_unit_models');fs.mkdirSync(d,{recursive:true});
+  const r=require('child_process').spawnSync('python3',[path.join(ROOT,'tools/ld/mkmodels.py'),d],{encoding:'utf8'});return r.status===0&&fs.existsSync(path.join(d,'models'))?d:null})}
 function loadModels(){return memo('models',()=>{const d=modelsDir();if(!d)return null;const out={};
   const sb={__LDC:(id,M,D)=>{out[id]={M,D}}};vm.createContext(sb);
   for(const f of fs.readdirSync(path.join(d,'models')))if(f.endsWith('.js'))vm.runInContext(fs.readFileSync(path.join(d,'models',f),'utf8'),sb);
