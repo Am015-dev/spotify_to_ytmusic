@@ -68,6 +68,19 @@ def inject_lab(html_path):
     t = t[:i] + blk + t[i:] if i >= 0 else t + blk
     pathlib.Path(html_path).write_text(t, encoding="utf-8")
 
+def inject_menu(html_path):
+    """Self-hosted menu faces (shell/fonts: Cinzel 700, Alegreya Sans 400/700, base64 so the single html stays one file) + shell/gx-menu.css, last in <head>."""
+    import base64
+    sh = SRC / "shell"
+    t = pathlib.Path(html_path).read_text(encoding="utf-8")
+    if 'id="gx-menu"' in t: return
+    face = lambda fam, w, f: "@font-face{font-family:'%s';font-weight:%d;font-style:normal;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2')}" % (fam, w, base64.b64encode((sh / "fonts" / f).read_bytes()).decode())
+    css = face("Cinzel", 700, "cinzel-700.woff2") + face("Alegreya Sans", 400, "alegreya-sans-400.woff2") + face("Alegreya Sans", 700, "alegreya-sans-700.woff2") + (sh / "gx-menu.css").read_text(encoding="utf-8")
+    blk = '<style id="gx-menu">' + css + '</style>\n'
+    i = t.find("</head>")
+    t = t[:i] + blk + t[i:] if i >= 0 else blk + t
+    pathlib.Path(html_path).write_text(t, encoding="utf-8")
+
 def timed(slug, name, fn):
     t = time.time(); r = fn(); dt = time.time() - t
     TIMES.append((slug, name, round(dt, 1)))
@@ -133,6 +146,7 @@ def main():
             (out / s).mkdir(parents=True, exist_ok=True)
             shutil.copyfile(built, out / s / "index.html")
             inject_lab(out / s / "index.html")
+            inject_menu(out / s / "index.html")
             status[s], why[s] = "BUILT", ""
         print(f"[build] {s:18} {status[s]} {why[s]}", flush=True)
 

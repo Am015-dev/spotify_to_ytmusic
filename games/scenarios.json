@@ -109,6 +109,14 @@
  ],
  "doorkick-dungeon": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "dk-tut-help",
    "name": "Tutorial: ask for help",
    "ask": "Can you read the Help button?",

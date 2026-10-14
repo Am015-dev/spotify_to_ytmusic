@@ -1,0 +1,7 @@
+/* Shared menu look for every game (injected last by build-all.py, with the self-hosted faces from shell/fonts).
+   One title face (Cinzel), one body face (Alegreya Sans), text >= 13 px, text never absolutely positioned on top of other text. */
+:root{--gx-title:"Cinzel",Georgia,serif;--gx-body:"Alegreya Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+html body,html body *{font-family:var(--gx-body)!important}
+html body :is(h1,h2,h3,h4,.gx-title,.title,.logo,.ttl,.gxc-htitle,.gxc-htitle *,.gxc-title,.gxt-et){font-family:var(--gx-title)!important;font-weight:700;letter-spacing:.02em}
+/* menu text floor: the small print under a button and labels never go under 13 px */
+html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(13px,1em)}

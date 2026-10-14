@@ -68,6 +68,63 @@
   S.click = function (sel) { var e = typeof sel === 'string' ? document.querySelector(sel) : sel; if (e) e.click(); return !!e; };
   S.spy = function (obj, name) { var c = { n: 0, args: [] }, f = obj[name]; obj[name] = function () { c.n++; c.args.push([].slice.call(arguments).slice(0, 3)); return f && f.apply(this, arguments); }; return c; };
 
+  /* ---- shared "menu" scenario (?scn=menu): opens every menu surface of ANY game and checks it with machines ----
+     Surfaces: the title/start screen as booted, every top-bar button whose id/label says menu/settings/rules/help/options/about/how, the campaign screen (GXC.open), plus any a game adds
+     with  GXS.menuSurfaces.push({name, open(), close()}).  Per surface: no text boxes overlapping, no text clipped, text >= 13 px, no covered button, every font actually loaded and one of the two shelf faces,
+     tap targets (axe, run by scenarios.spec.js through GXS.menuOpen(i)). Report: GXS.menuReport = {surface: [problem, ...]}. */
+  S.menuSurfaces = S.menuSurfaces || [];
+  S.MENU_FONTS = ['Cinzel', 'Alegreya Sans'];   // the shelf's self-hosted title face and body face (shell/fonts, injected by build-all.py)
+  var MENU_MIN = 13, MENU_OPEN = /menu|setting|rules|help|option|about|how|info|pause|guide/i, MENU_SKIP = /bulb|hint|undo|dock|log|opp|mute|sound|music|zoom|full/i;
+  function menuTop() { return [].slice.call(document.querySelectorAll('button,[role=button]')).filter(function (b) { var t = (b.id + ' ' + b.className + ' ' + (b.getAttribute('aria-label') || '') + ' ' + (b.dataset && b.dataset.gx || '')); return MENU_OPEN.test(t) && !MENU_SKIP.test(t) && !/gxt-menu|story|learn|primary|bigb/.test(b.className) && S.vis(b) && !b.closest('[hidden]') && b.getBoundingClientRect().top < 80; }); }
+  function menuClose() { try { if (typeof GX !== 'undefined' && GX.close) GX.close(); } catch (e) { } [].slice.call(document.querySelectorAll('.gx-x,[data-gx-close],.gxc-x')).forEach(function (b) { if (S.vis(b)) b.click(); }); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); }
+  function famOk(cs, e) {
+    var first = cs.fontFamily.split(',')[0].trim().replace(/^["']|["']$/g, ''), px = cs.fontSize;
+    if (MENU_FONTS_OK(first)) { try { if (!document.fonts.check(cs.fontWeight + ' ' + px + ' "' + first + '"', ownText(e) || 'a')) return 'font "' + first + '" is not loaded'; } catch (x) { } return ''; }
+    return 'font "' + first + '" is not a shelf face (' + S.MENU_FONTS.join(' / ') + ')';
+  }
+  function MENU_FONTS_OK(f) { return S.MENU_FONTS.indexOf(f) >= 0; }
+  S.menuAudit = function () {   // problems on the CURRENT screen
+    var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 60) { seen[m] = 1; out.push(m); } }
+    S.audit().forEach(function (m) { if (!/^text under 11px/.test(m)) add(m); });   // overlap / clipped / covered button / engine
+    [].slice.call(document.querySelectorAll('body *')).forEach(function (e) {
+      if (/^(SCRIPT|STYLE|NOSCRIPT|OPTION|SVG|PATH)$/i.test(e.tagName) || e.closest(SKIPSEL) || !ownText(e) || !S.vis(e)) return;
+      var r = e.getBoundingClientRect(); if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return;
+      var cs = getComputedStyle(e), fsz = parseFloat(cs.fontSize), t = ownText(e).slice(0, 22); if (fsz < 1) return;
+      if (fsz < MENU_MIN) add('text under ' + MENU_MIN + 'px: "' + t + '" (' + Math.round(fsz * 10) / 10 + 'px) <' + who(e) + '>');
+      if (e.scrollWidth > e.clientWidth + 2 && /(hidden|clip)/.test(cs.overflowX) && e.clientWidth > 0) add('text clipped (scrollWidth ' + e.scrollWidth + ' > ' + e.clientWidth + '): "' + t + '" <' + who(e) + '>');
+      var f = famOk(cs, e); if (f) add(f + ': "' + t + '" <' + who(e) + '>');
+    });
+    return out;
+  };
+  S.menuList = function () {
+    var l = [{ name: 'title', open: function () { menuClose(); }, close: function () { } }];
+    menuTop().forEach(function (b, i) { var nm = 'panel ' + (b.id || b.getAttribute('aria-label') || (b.dataset && b.dataset.gx) || b.className.toString().split(' ').pop() || i); l.push({ name: nm, open: function () { b.click(); }, close: menuClose }); });
+    if (window.GXC && GXC.open) l.push({ name: 'campaign', open: function () { GXC.open(); }, close: function () { try { GXC.close(); } catch (e) { } menuClose(); } });
+    return l.concat(S.menuSurfaces);
+  };
+  S.menuOpen = function (i) { var l = S.menuList(), cur = S._menuCur; if (cur) try { cur.close(); } catch (e) { } menuClose(); S._menuCur = l[i]; if (!l[i]) return null; try { l[i].open(); } catch (e) { return 'open threw ' + e.message; } return l[i].name; };
+  S.menuReport = {};
+  function menuPass() {   // async: walk every surface once, record problems, end on the title
+    var l = S.menuList(), chain = Promise.resolve(), seenMsg = {};
+    try { document.fonts.forEach(function (f) { f.load(); }); } catch (e) { }   // every declared face must be fetchable: wait for them all before judging
+    chain = chain.then(function () { return document.fonts && document.fonts.ready; }).catch(function () { });
+    l.forEach(function (sf, i) { chain = chain.then(function () { var nm = S.menuOpen(i); return new Promise(function (r) { setTimeout(r, 700); }).then(function () { S.menuReport[sf.name] = S.menuAudit().filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); }); }); });
+    return chain.then(function () { S.menuOpen(0); S.menuN = l.length; return new Promise(function (r) { setTimeout(r, 400); }); });
+  }
+  function menuCheck(rx, name) { return { kind: 'fn', name: name, fn: function () { var bad = []; Object.keys(S.menuReport).forEach(function (k) { S.menuReport[k].filter(function (m) { return rx.test(m); }).forEach(function (m) { bad.push('[' + k + '] ' + m); }); }); return bad.length ? 'N=' + bad.length + ' ' + bad.slice(0, 14).join(' | ') : true; } }; }
+  S.defs.push({
+    id: 'menu', name: 'Menus: clean and readable', ask: 'Is every menu clean and readable?', group: 'UI',
+    setup: function () { return menuPass(); },
+    checks: [
+      { kind: 'fn', name: 'menu surfaces opened', fn: function () { return S.menuN >= 1 || 'no surface'; } },
+      menuCheck(/^text overlaps/, 'no two text boxes overlap'),
+      menuCheck(/^text clipped/, 'no text clipped'),
+      menuCheck(/^font "/, 'every font loaded and a shelf face'),
+      menuCheck(/^text under/, 'text at least ' + MENU_MIN + ' px'),
+      menuCheck(/^button covered/, 'no covered button')
+    ]
+  });
+
   /* ---- list mode (no setup) ---- */
   function def() { return S.defs.filter(function (d) { return d.id === id; })[0]; }
   var pub = S.pub;
