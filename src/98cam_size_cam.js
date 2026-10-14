@@ -23,7 +23,7 @@ function CAM_eval(P,b,h,th,T){const pz=P.z1+CAM.ahead,py=P.g;let clr=1e9,smin=1e
 const CAM_ok=e=>e.clr>=CAM.m&&e.sP>=.42&&e.sP<=.82&&e.fill>=.17&&e.fill<=.33&&e.smax<=.95;
 function CAM_vfov(asp){const a=asp||camera.aspect||1.5,f=TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0);return(a<.9?Math.min(100,f*(1+.5*Math.min(1,(.9-a)/.45))):f)*Math.PI/180}
 function CAM_base(n){const k=SC_S&&SC_S.on?BC.D0.cam:1,C=SC_RC0[n];return{b:C.b*k,h:C.h*k,l:C.l*k,ly:C.ly*k,bk:C.bk*k,hk:C.hk*k,lk:C.lk*k}}
-function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
+function CAM_solve(P,n,asp,C0x){const C0=C0x||CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
  const th0=Math.atan2(C0.h-C0.ly,C0.l+C0.b),e0=CAM_eval(P,C0.b,C0.h,th0,T);if(CAM_ok(e0))return Object.assign({keep:1,e:e0},C0);
  // perf (beta.12 "extremely slow": the full 0.25 m × 0.1 m grid = 58k evaluations, every 4 s, 4 modes): coarse 1 m × 0.5 m grid, then a fine pass around the best
  let best=null,bc=1e9;const bMin=Math.max(C0.b*.8,-P.z0+1.5),hMin=Math.max(1.2,C0.h*.8),aim=Math.atan(2*(CAM.sP-.5)*T);CAM.n.ev=0;
@@ -35,8 +35,19 @@ function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
 function CAM_fit(){const t0=performance.now(),P=CAM_prof();if(!P)return;CAM.P=P;CAM.asp=camera.aspect;CAM.T={};const n0=SET.rcam||'chase';let kp=0;if(n0!=='high'){const s=CAM_solve(P,n0);CAM.T[n0]=s;kp=s.keep}CAM.ms=performance.now()-t0
  CAM.n.fit++;if(kp)CAM.n.keep++;CAM.log.push([RO.vsel||'',+P.L.toFixed(2),+P.H.toFixed(2),(CAM.T[SET.rcam||'chase']||{}).b,(CAM.T[SET.rcam||'chase']||{}).h]);if(CAM.log.length>20)CAM.log.shift()}
 // when: 30 sim frames after the ride (mesh / form) changes (the first frames still show stock parts), on a big aspect change (rotation) or a camera-mode change; never periodically (perf)
-function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=ud.m.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
+function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=CAM_rkey(ud)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
  if(key!==CAM.k){CAM.k=key;CAM.due=now+30;CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0}
+// ride fingerprint: the player mesh is KEPT across rides (garage pick rebuilds gbM bricks on it; TAKE / ENTER swap the body children of ud.m), so the old key (mesh uuid + gbM.length)
+// missed same-count swaps and the camera stayed on the previous ride. Any change of the brick meshes or of the body children now re-fits (all paths, no per-caller hook).
+function CAM_rkey(ud){const m=ud.m,g=ud.gbM,c=m.children,l=c[c.length-1],f=c[0];return m.uuid+'|'+(g?g.length+'.'+(g[0]?g[0].uuid:''):0)+'|'+c.length+'.'+(f?f.uuid:'')+'.'+(l?l.uuid:'')}
+// race camera (state 'race' = updateCam in 30_race3, not roamCam): same solver, ride profile measured in its own frame; returns multipliers for the stock back / up
+// race ride heading = the track tangent at the ship (the model's own +z is not reliably the nose in a race)
+function CAM_fwd(s){try{frameAt(TD,s.dist,F2);const l=Math.hypot(F2.t.x,F2.t.z)||1;return[F2.t.x/l,F2.t.z/l]}catch(e){return[0,1]}}
+function CAM_rk(s){const one={b:1,h:1,l:1};try{const ud=s&&s.mesh&&s.mesh.userData,host=ud&&ud.m;if(!CAM.on||!host)return one;const R=CAM.R||(CAM.R={}),key=CAM_rkey(ud)+'|'+(camera.aspect||0).toFixed(1)+'|'+SET.camd;
+ if(R.s===s&&R.k===key&&R.v)return R.v;host.updateMatrixWorld(true);const e=host.matrixWorld.elements,fw=CAM_fwd(s),F={x:e[12],y:e[13],z:e[14],h:Math.atan2(fw[0],fw[1])},P=CAM_prof(host,F);if(!P)return one;
+ const sv=CAM_solve(P,'chase',null,CAM_rbase());R.s=s;R.k=key;R.P=P;R.v={b:clamp(sv.b/R.C0.b,.8,6),h:clamp(sv.h/R.C0.h,.8,6),l:clamp(sv.l/R.C0.l,.6,3)};R.n=(R.n||0)+1;return R.v}catch(e){return one}}
+// the race camera's stock numbers as a roam-style base: back 10.5, up 3.4 (× aspect / setting), look point = 58 % of 50 m ahead, 1.66 m up (the lerp to the ship in updateCam)
+function CAM_rbase(){const R=CAM.R||(CAM.R={}),tall=camera.aspect<1?1.3:1,cd={close:.85,normal:1,far:1.2}[SET.camd]||1;return R.C0={b:10.5*tall*cd,h:3.4*tall*cd,l:29,ly:1.66,bk:0,hk:0,lk:0}}
 const CAM_F=['b','h','l','ly','bk','hk','lk'];
 roamCam=(f=>function(dt){if(CAM.on&&state==='roam'&&(!RO.foot||RO.foot==='car')){try{CAM_upd();const n=SET.rcam||'chase',T=CAM.T[n],C=RCAM[n];
   const tn=performance.now(),rd=Math.min(dt,Math.max(0,Math.min(.1,(tn-(CAM.lt||tn))/1000)));CAM.lt=tn;
@@ -97,3 +108,50 @@ async function CAM_audit(ids,stock){const t0=performance.now(),b0=gbBuild()||GB.
   catch(e){out.push({id:S.id,n:S.n,err:String(e).slice(0,80)})}finally{RSZ.S=null;if(g){scene.remove(g)}}}
  const bad=out.filter(o=>!o.ok);return{n:out.length,ok:out.length-bad.length,ms:Math.round(performance.now()-t0),bad,all:out}}
 window.__cam={S:CAM,audit:CAM_audit,meas:CAM_meas,pass:m=>CAM_pass(m||CAM_meas()),go:CAM_go,fit:()=>{CAM.k='';CAM.due=0;CAM_fit();return CAM.T},prof:()=>CAM.P&&{L:CAM.P.L,H:CAM.P.H,z0:CAM.P.z0,z1:CAM.P.z1,g:CAM.P.g},rc:()=>RCAM[SET.rcam||'chase'],cp:()=>CAM.cp||null,settled:()=>{const n=SET.rcam||'chase',T=CAM.T[n],c=CAM.cur;if(RO.foot&&RO.foot!=='car')return true;if(!T||!c||CAM.pend||Math.abs((camera.aspect||1)-CAM.asp)>.05)return false;return['b','h','l','ly'].every(q=>Math.abs((c[q]??0)-(T[q]??0))<.05)},sel:()=>{try{return GAR_get().sel}catch(e){return null}}};
+// ---- cam-2 (2026-10-14): ride-switch tests. "The camera does not adjust when I switch vehicles / in races": every way the ride changes must re-fit the camera.
+// CAM_sw(path) = the 📍 GO of v90n/cam-sw-*: runs the switch with the game's own functions (garage pick, vehicle button, TAKE, ENTER, race start), waits for the
+// eased camera and checks it against a FRESH solve of the ride now on screen (within 10 %), and that the road 10 m past the nose is in view. Resolves to a one-line verdict.
+const CAM_W=ms=>new Promise(r=>setTimeout(r,ms));
+async function CAM_until(f,ms){const e=performance.now()+ms;while(performance.now()<e){try{if(f())return true}catch(x){}await CAM_W(60)}return false}
+function CAM_now(tag){const n=SET.rcam||'chase',P=CAM_prof();if(!P)return{tag,ok:false,why:'no ride profile'};const fr=CAM_solve(P,n),C=RCAM[n];
+ const dB=Math.abs(C.b-fr.b)/fr.b,dH=Math.abs(C.h-fr.h)/fr.h;return{tag,L:+P.L.toFixed(1),H:+P.H.toFixed(1),fb:+fr.b.toFixed(1),fh:+fr.h.toFixed(1),b:+C.b.toFixed(1),h:+C.h.toFixed(1),ok:dB<=.1&&dH<=.1}}
+// wait (≤ 7 s: 30-frame delay + the ≤ 4 m/s ease) until the camera equals the ride's fit, then require the road ahead in view (real camera, lower middle)
+async function CAM_conv(tag,wantRoad=true){const t0=performance.now();let r;await CAM_until(()=>{r=CAM_now(tag);return r.ok&&!CAM.pend},7000);r=CAM_now(tag);r.s=+((performance.now()-t0)/1000).toFixed(1);
+ if(r.ok&&wantRoad){const m=CAM_meas();r.road=m&&m.road?{x:+m.road.x.toFixed(2),y:+m.road.y.toFixed(2),bl:!!m.road.blocked}:null;r.ok=CAM_pass(m)}return r}
+async function CAM_garage(id,force){const cur=(()=>{try{return GAR_get().sel}catch(e){return''}})();if(cur===id&&!force)return true;try{gbOpen();GAR_select(id)}catch(e){return false}
+ await CAM_W(300);await CAM_until(()=>typeof LDL==='undefined'||!LDL.wait.size,30000);try{gbClose(true)}catch(e){return false}await CAM_W(400);return true}
+function CAM_fmt(R,extra){return R.map(r=>r.tag+' '+(r.ok?'ok':'NO')+' L'+r.L+' cam '+r.b+'/'+r.h+' fit '+r.fb+'/'+r.fh+' '+r.s+'s'+(r.road?' road '+r.road.x+','+r.road.y+(r.clr!==undefined?' clr '+r.clr:''):'')).join(' · ')+(extra||'')}
+async function CAM_ground(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}if(RO.card){RO.card=null;$('#roamCard').hidden=true}try{OF_reset()}catch(e){}
+ const q=CAM_road(70);if(q)roamWarp(q.x,q.z,q.h,true);await CAM_W(200);return''}
+const CAM_SP='t_v75870_1',CAM_BUS='t_bus';
+// the three-step rule for every path: sports car → bus → sports car; the camera distance must change with the ride (bus fit ≥ 1.3 × the sports fit)
+function CAM_verdict(R,name,nobus){const bad=R.filter(r=>!r.ok);let sw='';const a=R[0],b=R[1];if(!nobus&&a&&b&&b.fb<a.fb*1.3){sw=' · bus fit '+b.fb+' not larger than sports '+a.fb;bad.push(b)}
+ return(bad.length?'❌ FAIL '+name+': ':'✅ PASS '+name+': ')+CAM_fmt(R,sw)}
+async function CAM_sw(path){const R=[];const g=await CAM_ground();if(g)return g;
+ try{
+ if(path==='garage'){for(const id of[CAM_SP,CAM_BUS,CAM_SP]){if(!await CAM_garage(id,1))return'❌ FAIL garage: cannot pick '+id;R.push(await CAM_conv(id==='t_bus'?'bus':'sports'))}return CAM_verdict(R,'garage pick')}
+ if(path==='cycle'){await CAM_garage(CAM_SP,1);R.push(await CAM_conv('auto'));const seen=[];for(let i=0;i<4;i++){cycleVehicle();const v=RO.vsel;seen.push(v);if(v==='boat'){await CAM_W(600);continue}R.push(await CAM_conv(v))}
+  return CAM_verdict(R,'vehicle button '+seen.join('>'),1)}
+ if(path==='take'||path==='enter'){await CAM_garage(CAM_SP,1);R.push(await CAM_conv('sports'));OF_go('car');await CAM_until(()=>RO.foot==='walk',4000);
+  const goTo=o=>{OF.x=o.x+Math.cos(o.h)*3.2;OF.z=o.z-Math.sin(o.h)*3.2;OF.y=groundAt(OF.x,OF.z,OF.y+2)};
+  const pick=()=>OF_cars(true).filter(o=>(o.k==='traf'||o.k==='park')&&o.ref&&!o.ref.dead&&HCAR[o.ref.k]&&HCAR[o.ref.k][0]!=='#'&&!o.ref.tr&&!o.ref.route&&!o.ref.crW&&Math.hypot(o.x-RO.x,o.z-RO.z)<200).sort((a,b)=>Math.hypot(a.x-RO.x,a.z-RO.z)-Math.hypot(b.x-RO.x,b.z-RO.z))[0];
+  await CAM_until(()=>pick(),8000);const o=pick();if(!o)return'❌ FAIL '+path+': no traffic car near';goTo(o);const o2=OF_cars(true).find(q=>q.ref===o.ref)||o;OF_enter(o2);
+  if(!await CAM_until(()=>RO.foot==='car',8000))return'❌ FAIL '+path+': never got into the traffic car';R.push(await CAM_conv('taken '+(HCAR[o.ref.k]||[])[0]));
+  if(path==='enter'){OF_exit();await CAM_until(()=>RO.foot==='walk',3000);const v=OF_cars(false).find(q=>q.k==='grp');if(!v)return'❌ FAIL enter: no parked car of yours';goTo(v);OF_enter(v);
+   if(!await CAM_until(()=>RO.foot==='car',8000))return'❌ FAIL enter: never got back into your parked car';R.push(await CAM_conv('back in parked'))}
+  const bad=R.filter(r=>!r.ok);return(bad.length?'❌ FAIL ':'✅ PASS ')+(path==='take'?'TAKE traffic car':'ENTER parked car')+': '+CAM_fmt(R)+(R[1]&&R[0]&&Math.abs(R[1].fb-R[0].fb)<.05&&R[1].L>R[0].L*1.2?' · fit did not change':'')}
+ if(path==='race'||path==='racebus'){const rides=path==='racebus'?[CAM_BUS]:[CAM_SP,CAM_BUS];
+  for(const id of rides){await CAM_garage(id,1);R.push(await CAM_race(id===CAM_BUS?'bus race':'sports race'))}return CAM_verdict(R,'race start')}
+ }catch(e){return'❌ FAIL '+path+': '+String(e).slice(0,120)}
+ return'📍 ?'}
+// race start (state 'race', updateCam): launch like a roam race marker, wait for the countdown, compare the camera with the ride's fit; back to the city afterwards
+async function CAM_race(tag){roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;menuTab='quick';menuTrack='synt';quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;
+ if(!await CAM_until(()=>state==='race'&&pl&&pl.mesh,25000))return{tag,ok:false,L:0,b:0,h:0,fb:0,fh:0,s:0,why:'race did not start'};await CAM_until(()=>typeof LDL==='undefined'||!LDL.wait.size,20000);await CAM_W(2500);
+ const r=CAM_rchk(tag);try{paused=false;$('#pause').hidden=true;enterRoam(RO.lastMark)}catch(e){}await CAM_until(()=>state==='roam'&&RO.on,25000);await CAM_W(400);return r}
+// race camera vs the ride: horizontal distance behind the ride = stock × fit multiplier (±10 %), and the road 10 m past the nose is above the ride's roofline from the camera
+function CAM_rchk(tag){const s=pl,ud=s.mesh.userData,host=ud.m;host.updateMatrixWorld(true);const e=host.matrixWorld.elements,fw=CAM_fwd(s),fx=fw[0],fz=fw[1],P=CAM_prof(host,{x:e[12],y:e[13],z:e[14],h:Math.atan2(fx,fz)});
+ if(!P)return{tag,ok:false,L:0,b:0,h:0,fb:0,fh:0,s:0,why:'no profile'};const c=camera.position,rl=c.clone().sub(new THREE.Vector3(e[12],e[13],e[14])),back=-rl.dot(F2.t),up=rl.dot(F2.u),d=new THREE.Vector3();camera.getWorldDirection(d);const th=-Math.atan2(d.dot(F2.u),d.dot(F2.t));
+ const T=Math.tan(CAM_vfov(camera.aspect)/2),ev=CAM_eval(P,back,up,th,T),ck=CAM_rk(s),tall=camera.aspect<1?1.3:1,cd={close:.85,normal:1,far:1.2}[SET.camd]||1,want=10.5*tall*cd*ck.b;
+ const okB=Math.abs(back-want)/want<=.1,okRoad=ev.clr>=0&&ev.sP<=.95&&ev.sP>=.3;
+ return{tag,L:+P.L.toFixed(1),H:+P.H.toFixed(1),fb:+want.toFixed(1),fh:+(3.4*tall*cd*ck.h).toFixed(1),b:+back.toFixed(1),h:+up.toFixed(1),s:2.5,ok:okB&&okRoad,road:{x:.5,y:+ev.sP.toFixed(2)},clr:+ev.clr.toFixed(2)}}
+window.__cam.sw=CAM_sw;window.__cam.now=CAM_now;
