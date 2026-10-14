@@ -38,10 +38,14 @@ function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh||!o.castShadow
 // the player car is rebuilt (LEGO model, garage, ride swap) after LK_shadow flagged it, so it lost castShadow: re-flag every pass.
 // It does not receive: self-shadowing small bricks gave red/black acne speckle on the body.
 function GFX_car(){if(!pl||!pl.mesh||!RO.shadowOn)return;pl.mesh.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=false}})}
-function GFX_frame(dt){if(!GFX.on||state!=='roam')return;if((GFX.t-=dt)>0)return;GFX.t=2.5;GFX_shadow();GFX_car();try{GFX_plastic(scene)}catch(e){}}
+// merged city blocks (95_drive_flow DR_, 98wb world batch) were built with castShadow=false: buildings threw no shadow on the street.
+// Tall ones (> 2.5 m) cast again; ground/road merges stay off (they would only add acne and shadow-pass cost).
+function GFX_cast(){if(!HUB.grp)return;let k=0;HUB.grp.traverse(o=>{if(!o.isMesh||o.castShadow||o.userData.gfxNo||!o.geometry||!o.visible)return;const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();
+  if(g.boundingBox.max.y-g.boundingBox.min.y<2.5){o.userData.gfxNo=1;return}o.castShadow=true;o.receiveShadow=true;o.userData.gfxCast=1;k++});GFX.cast=(GFX.cast||0)+k}
+function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast();try{GFX_plastic(scene)}catch(e){}}
 ART_light=(f=>function(){const r=f.apply(this,arguments);try{GFX_light()}catch(e){}return r})(ART_light);
-LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame(0)}catch(e){}return r})(LK_roamLook);
-roamStep=(f=>function(dt){f(dt);GFX_frame(dt)})(roamStep);
+LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame()}catch(e){}return r})(LK_roamLook);
+roamStep=(f=>function(dt){f(dt);GFX_frame()})(roamStep);
 function GFX_set(on){GFX.on=!!on;try{store.set('mho_gfx',on?1:0)}catch(e){}if(on){GFX.t=0;ART_light()}else{GFX_off();applyMood(MOOD.id)}}
 // shadow-map depth check: depth (0 near the sun .. 1 far) at the car's roof vs at open road 12 m to its side; car < road = the car is in the map
 function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=sh.mapSize.x,px=new Uint8Array(4),v=new THREE.Vector3(),rd=p=>{v.copy(p).applyMatrix4(sh.matrix);
@@ -49,4 +53,4 @@ function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=s
  const c=new THREE.Vector3(RO.x,RO.y+1,RO.z),s=new THREE.Vector3(RO.x+Math.cos(RO.h)*12,RO.y,RO.z-Math.sin(RO.h)*12);return{car:rd(c),road:rd(s)}}
 window.__gfx={get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
- hemi:hemi.intensity,env:scene.environmentIntensity,plastic:GFX.n,carCast:!!(pl&&(()=>{let c=0;pl.mesh.traverse(o=>{if(o.isMesh&&o.castShadow)c++});return c})())}}};
+ hemi:hemi.intensity,env:scene.environmentIntensity,plastic:GFX.n,cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};

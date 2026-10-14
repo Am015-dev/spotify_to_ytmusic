@@ -17,6 +17,7 @@ const BASE=process.argv[2],OUT=process.argv[3]||'qa_gfx',Q=process.argv[4]||'hig
   // frame time: 60 rAF frames
   R[c].ms=await p.evaluate(()=>new Promise(res=>{let n=0,t0=0;const f=t=>{if(n===2)t0=t;if(++n<12)requestAnimationFrame(f);else res(+((t-t0)/10).toFixed(1))};requestAnimationFrame(f)}));
   if(process.env.NOMS)R[c].ms=null;
+  if(process.env.EVAL)R[c].ev=await p.evaluate(process.env.EVAL);
   R[c].shChk=await p.evaluate(()=>window.__gfx&&__gfx.shChk());
   await p.screenshot({path:OUT+'/'+c+'.png'});R[c].boot=((Date.now()-t)/1000).toFixed(1);}
  R.errs=errs.slice(0,5);fs.writeFileSync(OUT+'/state.json',JSON.stringify(R,null,1));console.log(JSON.stringify(R));await b.close()})().catch(e=>{console.log('FAIL',e.message.slice(0,300));process.exit(1)});
