@@ -14,7 +14,7 @@ const mode=()=>{const m={};try{if(RO.foot&&RO.foot!=='car')m.foot=RO.foot;if(RO.
 function bug(name,x,z,y,d,key){
   const k=name+'|'+(key||Math.floor(x/5)+','+Math.floor(z/5));let b=Q.hits[k];
   if(b){b.n++;b.t2=r1(Q.t);return b}
-  b=Q.hits[k]={name,x:r1(x),z:r1(z),y:r1(y||0),city:city(),ride:ride(),mode:mode(),h:r2(RO.h||0),foot:RO.foot||'car',t:r1(Q.t),wall:Date.now(),build:build(),n:1,d:d||''};Q.bugs.push(b);
+  b=Q.hits[k]={name,x:r1(x),z:r1(z),y:r1(y||0),city:city(),ride:ride(),mode:mode(),h:r2(RO.h||0),foot:RO.foot||'car',t:r1(Q.t),wall:Date.now(),build:build(),vp:innerWidth+'x'+innerHeight,n:1,d:d||''};Q.bugs.push(b);
   const w=Q.warn[name]||0;if(Date.now()-w>60000){Q.warn[name]=Date.now();try{console.warn('[QA] '+name+' @'+b.x+','+b.z+' ride '+b.ride+' '+b.d)}catch(e){}}
   return b}
 Q.bug=bug;
@@ -84,7 +84,7 @@ function hudCheck(px,pz,py,onFoot){
   camera.updateMatrixWorld();const v=new THREE.Vector3(onFoot?OF.x:px,(onFoot?OF.y:py)+.8,onFoot?OF.z:pz).project(camera),W=innerWidth,Hh=innerHeight,sx=(v.x+1)/2*W,sy=(1-v.y)/2*Hh;
   const fig=v.z<1?{left:sx-45,right:sx+45,top:sy-28,bottom:sy+28}:null;
   for(const[s,r]of H){if(fig&&s!=='#roamMini'&&inter(r,fig)>.25*Math.min(r.width*r.height,90*56))bug('hud_over_figure:'+s,px,pz,py,s+' covers the '+(onFoot?'walker':'car')+' on screen','h:'+s);
-    if(TOUCH&&TOUCH.on)for(const cs of CTL_SEL){const c=vis(document.querySelector(cs));if(c&&cs!==s&&inter(r,c)>.3*Math.min(r.width*r.height,c.width*c.height))bug('hud_over_controls:'+s+'/'+cs,px,pz,py,s+' overlaps '+cs,'hc:'+s+cs)}}
+    if(TOUCH&&TOUCH.on&&document.body.classList.contains('touch')/* rev-3: TOUCH.on with the desktop layout (matrix profile switch) is no phone state */)for(const cs of CTL_SEL){const c=vis(document.querySelector(cs));if(c&&cs!==s&&inter(r,c)>.3*Math.min(r.width*r.height,c.width*c.height))bug('hud_over_controls:'+s+'/'+cs,px,pz,py,s+' overlaps '+cs+' ['+(r=>[r.left,r.top,r.right,r.bottom].map(Math.round).join(','))(r)+'|'+(r=>[r.left,r.top,r.right,r.bottom].map(Math.round).join(','))(c)+'] touch='+TOUCH.on+' body.touch='+document.body.classList.contains('touch'),'hc:'+s+cs)}}
 }
 // ---- the tick: sim-time accumulator (fast-mode and bot steps count too), 0.5 s
 Q.tick=function(dt){Q.t+=dt;Q.acc+=dt;if(Q.acc<.5)return;Q.acc=0;

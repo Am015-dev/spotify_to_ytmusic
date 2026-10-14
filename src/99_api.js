@@ -23,6 +23,8 @@ html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;t
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
 /* rev-2 (monkey hud_over_figure, Athens start): bottom-centre sat on the car's rear in phone landscape → left column above TAP TAP = SMASH, under the left thumb */
 @media (orientation:landscape){html body.touch #roamPrompt#roamPrompt{left:calc(14px + env(safe-area-inset-left,0px))!important;transform:none!important;bottom:calc(166px + env(safe-area-inset-bottom,0px))!important;max-width:min(240px,34vw)!important}}
+/* rev-3 (matrix hud_over_figure, desktop 1280×720): the default bottom-centre prompt sat on the car's rear → above the car, in the road/sky band */
+html body:not(.touch) #roamPrompt#roamPrompt{bottom:auto!important;top:30%!important}
 /* rev-3 (matrix hud_over_controls @-444,455): in portrait the bottom-centre prompt sat on #tR and the car's rear (controls row 14-83 px, car to ~750 px) → empty road/sky band under the speed gauge */
 @media (orientation:portrait){html body.touch #roamPrompt#roamPrompt{bottom:auto!important;top:calc(268px + env(safe-area-inset-top,0px))!important}}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
