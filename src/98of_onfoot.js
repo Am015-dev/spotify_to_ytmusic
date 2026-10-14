@@ -516,3 +516,5 @@ async function OF_hudRun(){const W=ms=>new Promise(r=>setTimeout(r,ms)),bad=[],i
   for(const id of['t_v7612_1','rod']){if(!await OF_pickRide(id)){bad.push(id+':pick');continue}await W(200)}
   window.dispatchEvent(new TouchEvent('touchstart',{touches:[],changedTouches:[]}));await W(400);miss('hybrid after touch');
   return(bad.length?'❌ FAIL ':'✅ PASS ')+'TOUCH BUTTONS AFTER RIDE SWITCHES · 3 phone switches + hybrid touch · '+(bad.length?'missing '+bad.join(', '):'all 5 visible every time')}
+// cam-3: every RO.mark within 15 m of a road (rfSnap) and clear of colliders, both cities
+function OF_markChk(){const bad=[];for(const m of RO.marks||[]){const g=groundAt(m.x,m.z,99),q=rfSnap(m.x,m.z,400),d=q?Math.hypot(q[0]-m.x,q[1]-m.z):1e9;if(d>15||SC_hit(m.x,m.z,g))bad.push((m.kind+':'+(m.id||'?'))+'@'+(m.x|0)+','+(m.z|0)+(d>15?' '+Math.round(d)+'m':' wall'))}return{n:(RO.marks||[]).length,bad}}

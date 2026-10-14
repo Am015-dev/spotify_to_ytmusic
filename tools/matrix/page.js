@@ -159,7 +159,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
  // ---------------- mission/quest markers, garage exit, respawn ----------------
  markStarts(){const o=[];for(const m of RO.marks||[])if(isFinite(m.x)&&isFinite(m.z))o.push([m.x,m.z,isFinite(m.h)?m.h:0,m.kind,m.id]);return o},
  markCase(prof,rid,m,idx){const f0=R.length;const q=[m[0],m[1],m[2]];MX.roamCase(prof,rid,q,idx,false,'mission:'+m[3]);const r=R[R.length-1];
-  try{const g=groundAt(m[0],m[1],99);if(!isFinite(g)||g<-50)r.fails.push('mission-marker-no-ground');if(SC_hit(m[0],m[1],g))r.fails.push('mission-marker-inside-wall');const c=cityAt(m[0],m[1]);if(!c||c.d>(c.S.r.w||8)/2+200)r.fails.push('mission-marker-far-from-any-road')}catch(e){r.fails.push('mission-crash:'+String(e).slice(0,50))}
+  try{const g=groundAt(m[0],m[1],99);if(!isFinite(g)||g<-50)r.fails.push('mission-marker-no-ground');if(SC_hit(m[0],m[1],g))r.fails.push('mission-marker-inside-wall');const c=rfSnap(m[0],m[1],400);if(!c||Math.hypot(c[0]-m[0],c[1]-m[1])>15)r.fails.push('mission-marker-far-from-any-road')}catch(e){r.fails.push('mission-crash:'+String(e).slice(0,50))}
   r.tag=m[3]+':'+m[4]+'|'+prof+'|'+rid;return r.fails.length},
  garageExit(prof,rid){const f0=R.length;MX.roamCase(prof,rid,null,0,false,'garage-exit');const r=R[R.length-1];r.tag='exit|'+prof+'|'+rid;
   return r.fails.length},
