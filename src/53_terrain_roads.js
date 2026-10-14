@@ -29,6 +29,8 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
 // feature flag (OFF until the lane passes): ?terr=1 = hills + graded road corridors + slope colours, kept for the tab (sessionStorage, so GO
 // reloads keep it) or for good with localStorage mho_terr=1; ?terr=0 clears it. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
 const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))==='1'}catch(e){return false}})()};
+// the Athens ground-quadtree cache (10b) was fitted on the flat raster: with TERR on every cell is fitted live (regenerate with tools/qtdump.js when TERR goes default-on)
+if(TERR.on&&typeof QTC!=='undefined')QTC.ok=false;
 const TR_RK=CID==="fra"?{k:3.6,c:200}:{k:1.4,c:200};
 function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
