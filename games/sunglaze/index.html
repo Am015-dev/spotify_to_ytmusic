@@ -194,7 +194,7 @@ html.ph.ph-l .gx-board{grid-column:1;grid-row:1/3}html.ph.ph-l .gx-bar{grid-colu
 html.ph .gx-reopen,html.ph #chip,html.ph .gx-dock-head,html.ph #dockbody{display:none!important}
 html.ph .gx-board{background:#d9a56e}
 html.ph .gx-bar{box-sizing:border-box;height:var(--bar);min-height:var(--bar);padding:0 6px;gap:4px;overflow:hidden;border-bottom-width:2px}
-html.ph .gx-bar h1,html.ph .gx-bar .gx-sp,html.ph #coachbtn,html.ph .gx-bar [data-gx="refd"],html.ph #musbtn,html.ph #speedbtn,html.ph #gfxbtn,html.ph .gx-bar .perfb,html.ph #pausebtn,html.ph .gx-bar [data-a="new"]{display:none!important}
+html.ph .gx-bar h1,html.ph .gx-bar .gx-sp,html.ph #coachbtn,html.ph .gx-bar [data-gx="refd"],html.ph .gx-bar [data-gx="menud"],html.ph #musbtn,html.ph #speedbtn,html.ph #gfxbtn,html.ph .gx-bar .perfb,html.ph #pausebtn,html.ph .gx-bar [data-a="new"]{display:none!important}
 html.ph .gx-bar .gx-ibtn{min-width:44px;width:44px;min-height:44px;height:44px;padding:0;border-radius:10px}
 html.ph .gx-bar .ic{width:24px;height:24px}
 html.ph #ph-chip{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:6px;font-weight:800;font-size:13px;color:#fff3d6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:4px}
@@ -362,7 +362,7 @@ html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -411,6 +411,27 @@ html.sk-row .gx-row{position:relative;isolation:isolate}
 html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 
 html.sk .sg-hero,html.sk.ph .sg-hero{margin:0;border-radius:0}
+
+/* ===== UI bar (14 Oct 2026): inset, text size, menu drawer, start screen ===== */
+.gx-drawer{border-width:18px}
+html.sk .gx-drawer{border-image:url(media/ui-panel-c.webp) 100 fill/18px stretch}
+.gx-drawer-head{padding:10px 16px}.gx-drawer-body{padding:16px}
+.menugrid{display:flex;flex-direction:column;gap:8px}
+.menugrid .gx-ibtn{width:100%;justify-content:flex-start;min-height:48px;gap:10px;padding:8px 16px;font-size:1rem}
+.menugrid .gx-ibtn span{display:inline!important;font-size:1rem}
+.src b{font-size:1rem}.info{font-size:1rem}
+.mbox.start .lede{margin:0;font-size:1.05rem}
+.mbox.start .acts{justify-content:stretch}.mbox.start .acts .btn{flex:1 1 auto;justify-content:center}
+.mbox.start .qrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.mbox.start .qrow>span{font-weight:800;font-size:1rem;min-width:84px}
+.mbox.start .seg button{min-width:56px;min-height:44px;font-size:1rem;text-transform:capitalize}
+.mbox.start details.more{margin-top:2px}.mbox.start summary{cursor:pointer;font-weight:800;font-size:1rem;min-height:44px;display:flex;align-items:center}
+.mbox.start details.more[open]{display:flex;flex-direction:column;gap:10px}
+.mbox .nrow .btn.sm{min-height:44px}
+.gxc-head .gxc-htitle{overflow:visible;padding:2px 0;line-height:1.3}
+#chip{z-index:5}
+@media (min-width:1024px){.mbox,.gx-drawer,.gx-dock{font-size:1rem}.mbox small,.gx-drawer small,.gx-dock small,.small{font-size:1rem}}
+#chip,.gx-dock .info{display:none!important}
+@media (min-width:1024px){.gx-dock i,.gx-dock em,.gx-dock b,.gx-dock button,.mbox .btn.sm,.mbox .seg button,.mbox b{font-size:1rem}}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -614,6 +635,12 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* compact form: used by gx-help.js when no free spot exists on a crowded board */
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
    Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
 :root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
@@ -708,20 +735,10 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
 <header class="gx-bar">
   <h1><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#gz1"/></svg><span>Sunglaze</span></h1>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn" data-a="coach" id="coachbtn" title="Guided play: the panel explains every step"><svg class="ic" aria-hidden="true"><use href="#i-guide"/></svg><span>Guide</span></button>
-  <button class="gx-ibtn" data-gx="plrd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg><span>Players</span></button>
-  <button class="gx-ibtn" data-gx="logd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span>Log</span></button>
-  <button class="gx-ibtn" data-gx="refd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg><span>Tile list</span></button>
-  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg><span>Rules</span></button>
-  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound"><svg class="ic" aria-hidden="true"><use href="#i-snd"/></svg></button>
-  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg></button>
-  <button class="gx-ibtn" data-a="musicpick" id="songbtn" aria-label="Choose songs"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg><span>Songs</span></button>
-  <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" aria-hidden="true"><use href="#i-speed"/></svg><span>normal</span></button>
-  <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality (Auto picks by device; drops a level if frames stutter)"><svg class="ic" aria-hidden="true"><use href="#i-gfx"/></svg><span>Graphics</span></button>
-  <button class="gx-ibtn perfb" data-perfhud="show" aria-pressed="false" title="Show frame rate and frame time">Show speed</button>
-  <button class="gx-ibtn perfb" data-perfhud="test" title="Measure each graphics level and recommend one">Test speed</button>
-  <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden><svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg></button>
-  <button class="gx-ibtn" data-a="new"><svg class="ic" aria-hidden="true"><use href="#i-new"/></svg><span>New game</span></button>
+  <button class="gx-ibtn" aria-label="Players and scores" data-gx="plrd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg><span>Players</span></button>
+  <button class="gx-ibtn" aria-label="Log" data-gx="logd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span>Log</span></button>
+  <button class="gx-ibtn" aria-label="Rules" data-gx="rulesd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="menud" aria-expanded="false" aria-label="Menu"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
   <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The courtyard table in 3D. Tap a glowing tile to pick its glaze, then a glowing rack. Drag to tilt, scroll to zoom, double-click to reset."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
@@ -732,6 +749,19 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   <button class="gx-ibtn gx-reopen" data-gx="dock"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg> Panel</button>
 </div>
 </div>
+<section class="gx-drawer" id="menud" role="dialog" aria-label="Menu"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg> Menu</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"><div class="menugrid">
+  <button class="gx-ibtn" data-a="new"><svg class="ic" aria-hidden="true"><use href="#i-new"/></svg><span>New game</span></button>
+  <button class="gx-ibtn" data-a="coach" id="coachbtn" title="Guided play: the panel explains every step"><svg class="ic" aria-hidden="true"><use href="#i-guide"/></svg><span>Guide</span></button>
+  <button class="gx-ibtn" data-gx="refd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg><span>Tile list</span></button>
+  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound"><svg class="ic" aria-hidden="true"><use href="#i-snd"/></svg></button>
+  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg></button>
+  <button class="gx-ibtn" data-a="musicpick" id="songbtn" aria-label="Choose songs"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg><span>Songs</span></button>
+  <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" aria-hidden="true"><use href="#i-speed"/></svg><span>normal</span></button>
+  <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden><svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg></button>
+  <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality (Auto picks by device; drops a level if frames stutter)"><svg class="ic" aria-hidden="true"><use href="#i-gfx"/></svg><span>Graphics</span></button>
+  <button class="gx-ibtn perfb" data-perfhud="show" aria-pressed="false" title="Show frame rate and frame time">Show speed</button>
+  <button class="gx-ibtn perfb" data-perfhud="test" title="Measure each graphics level and recommend one">Test speed</button>
+</div></div></section>
 <section class="gx-drawer wide" id="plrd" role="dialog" aria-label="Players"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg> Players and scores</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="plrbody"></div></section>
 <section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg> Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div></section>
 <section class="gx-drawer wide" id="refd" role="dialog" aria-label="Tile list"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg> Tiles, tokens and scoring</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
@@ -1267,6 +1297,32 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
     ]
   });
+
+  // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var vis = function (e) { if (e.closest && e.closest('details:not([open])') && !e.matches('summary')) return false; var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var minFont = function (root, lim) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim - .01) bad = (e.className || e.tagName) + ' ' + f + 'px'; }); return bad || true; };
+  var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, dock, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { return idle(300); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: one instruction line of 8 words or fewer', fn: function () { if (ph()) return true; var t = (document.getElementById('dockt') || {}).textContent || ''; return words(t) <= 8 || 'dock line has ' + words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 1: dock text at least 13/16 px', fn: function () { return ph() ? true : minFont('.gx-dock', lim()); } },
+      { kind: 'fn', name: 'rule 6: dock has no empty parchment', fn: function () { if (ph()) return true; var d = $('.gx-dock'), b = $('#dockbody'); return d.scrollHeight - d.clientHeight <= 2 || 'dock overflows'; } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, b = m.clientWidth / m.clientHeight, cs = getComputedStyle(m).objectFit; if (cs === 'fill' && Math.abs(a / b - 1) > .04) bad = (m.src || '').slice(-30); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Begin button, simple options?', seed: 5, when: booted,
+    setup: function () { try { GX.close(); } catch (e) { } UI.modal = 'start'; render(); return idle(600); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#modal .bigb'), vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster', fn: function () { return ![].some.call(document.querySelectorAll('#modal .seat'), vis) || 'roster visible'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal', lim()); } },
+      { kind: 'fn', name: 'rule 7: start fits without scrolling', fn: function () { var m = $('#modal .mbox'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
 })();
 
 </script>
@@ -1423,8 +1479,23 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
+    return out;
+  }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
     return out;
   }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
@@ -1432,9 +1503,9 @@ const GX={key:'gx',open:null,
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -1442,6 +1513,17 @@ const GX={key:'gx',open:null,
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -1454,6 +1536,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
@@ -3937,7 +4020,7 @@ function drawFrame3D(){const r=V3.r;r.info.autoReset=false;r.info.reset();if(!V3
 V3.draw=()=>drawFrame3D();
 // ---------- scene ----------
 function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return false;const cv=document.getElementById('c3');if(!cv)return false;
-  let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false}catch(e){return false}
+  let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext()){cv.removeAttribute('data-engine');return false}cv.removeAttribute('data-engine')}catch(e){try{cv.removeAttribute('data-engine')}catch(e2){}return false}
   V3.r=r;V3.aniso=Math.min(8,r.capabilities.getMaxAnisotropy());r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.0;
   const sc=V3.scene=new THREE.Scene();
   sc.background=canvasTex(4,256,(x)=>{const g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,'#f5dcae');g.addColorStop(.6,'#eec38e');g.addColorStop(1,'#c98a5a');x.fillStyle=g;x.fillRect(0,0,4,256)});sc.fog=new THREE.Fog(0xe2b288,75,170);
@@ -4359,7 +4442,7 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusi
     SND.nextT+=st;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('sgz_snd',SND.on?'1':'0')}catch(e){}audioInit();if(HAS_GA)GA.setSfx(SND.on);if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('sgz_mus',SND.music?'1':'0')}catch(e){}if(HAS_GA)GA.setMusic(SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=IC(SND.on?'snd':'mute');if(b){b.innerHTML=IC(SND.music?'music':'nomusic')}}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=IC(SND.on?'snd':'mute')+'<span>Sound '+(SND.on?'on':'off')+'</span>';if(b){b.innerHTML=IC(SND.music?'music':'nomusic')+'<span>Music '+(SND.music?'on':'off')+'</span>'}}
 
 </script>
 <script>
@@ -4569,7 +4652,7 @@ function slotSel(sl){const p=me();if(!p||G.phase!=='offer')return null;let src,k
   const arr=src<0?G.ctr:G.fac[src];const t=arr&&arr[k];if(t==null)return null;if(t===PRISM)return {src,c:PRISM,j:1};return {src,c:t,j:0}}
 // ---------- render ----------
 function render(){renderModal();if(!G){try{phRender()}catch(e){console.error(e)}return}renderDock();renderPopups();renderMap2D();try{phRender()}catch(e){console.error(e)}
-  const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause');if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
+  const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause')+'<span>'+(UI.pause?'Resume':'Pause')+'</span>';if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
   const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',!!UI.coach);
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the mosaics':s>=0?P(s).nm+' to play':''}`}}
 function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${phBonus(p)?` <small title="End bonus earned so far">+${phBonus(p)} bonus</small>`:''}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
@@ -4653,14 +4736,20 @@ function renderPopups(){if(GX.open==='logd')$('#logbody').innerHTML=`<ol class="
 UI.setup={np:2,seats:['human','ai','ai','ai'],lv:['normal','normal','normal','normal'],ex:{gray:false,prism:false}};
 function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():UI.modal==='lobby'&&NET.on?lobbyHTML():'';m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h}}
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
-  return `<div class="mbox"><h2>Sunglaze</h2><p class="lede">Draft glazed tiles from the kilns, dry them on your racks and set them into the palace mosaic. Tiles score by what they touch; finished rows, columns and glazes pay at the end.</p>
-   ${saved&&!NET.on?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
-   <h3>Glaziers</h3><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div>
-   <div class="seats">${NET.on?'<p class="small muted">Online: players take the seats in the order they joined; the computer plays the rest at the levels set here.</p>':''}${Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
-   <h3>Variants</h3><div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
+  const lvAll=o.lv[1]||'normal';
+  const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Draft glazed tiles and set them into the palace mosaic.</p>
+   <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>
+   ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
+   <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
+   <div class="qrow"><span>Computer</span><div class="seg">${['easy','normal','hard'].map(l=>`<button class="${lvAll===l?'on':''}" data-alv="${l}">${l}</button>`).join('')}</div></div>
+   ${NET.on||typeof campOpen!=='function'||!window.CAMPAIGN?'':'<div class="acts"><button class="btn" data-ui="story-map">★ Story</button></div>'}
+   <details class="more"><summary>More options</summary>
+   <div class="seats">${NET.on?'<p class="small muted">Online: players take the seats in the order they joined; the computer plays the rest at the levels set here.</p>':''}${seats}</div>
+   <div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
-   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':(typeof tutBtn==='function'?tutBtn('btn bigb'):'')+'<button class="btn go bigb" data-ui="start">Begin ▶</button>'+(typeof campOpen==='function'&&window.CAMPAIGN?'<button class="btn go bigb story-btn" data-ui="story-map">★ Story</button>':'')}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}${NET.on||typeof tutBtn!=='function'?'':'<div class="acts">'+tutBtn('btn')+'</div>'}</details></div>`}
 function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,40+i*38,152,32));const arch=(x)=>`<path d="M${x} 300V210a55 55 0 0 1 110 0V300Z" fill="#5a3a2a" opacity=".85"/><path d="M${x+8} 300V212a47 47 0 0 1 94 0V300Z" fill="url(#shade)"/>`;
   return `<svg viewBox="0 0 600 330" role="img" aria-label="A palace courtyard at sunrise with tiled arches"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c77c"/><stop offset="1" stop-color="#fde9c4"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f6e"/><stop offset="1" stop-color="#6e4b3a"/></linearGradient></defs>
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
@@ -4718,6 +4807,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   if(d.slot){return on3DPick({k:'tile',sl:d.slot})}
   if(d.kiln!=null)return on3DPick({k:'kiln',i:+d.kiln});if(d.ctr!=null)return on3DPick({k:'ctr'});
   if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
+  if(d.alv){for(let i=0;i<4;i++)UI.setup.lv[i]=d.alv;render();return}
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}if(d.coach&&b.type==='checkbox'){setCoach(b.checked);return}
   if(d.ui)return uiAct(d.ui);
@@ -5046,7 +5136,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-floor{display:flex;align-items:center;gap:6px;margin-top:4px;border-radius:8px;cursor:pointer}
 .bf-floor .bf-fl{padding:1px;border-radius:8px}
 .bf-floor .bf-c{background:#ecd3c7;box-shadow:inset 0 0 0 2px #a8493a}
-.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);color:#a8302a}
+.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 max(13px,calc(var(--cs)*.42)) var(--ff);color:#a8302a}
 .bf-floor.ok .bf-fl{box-shadow:0 0 0 3px #ff7a4a,0 0 12px 2px rgba(255,110,70,.7)}
 .bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}.bf-bd.fbr{left:auto;right:34px}
 .bf-fll{font:italic 700 13px var(--ff);color:#8a4a2a}

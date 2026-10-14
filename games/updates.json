@@ -17,7 +17,7 @@
  {
   "date": "2026-10-14",
   "game": "crown-city-smash",
-  "title": "Menus: clean and readable",
+  "title": "readable on every screen size",
   "items": [
    "Buying a card, SMASH, rolling and ending the turn are now tested with real taps; energy chip fixed on small phones",
    "Painted button and dialog frames keep text inside them",
@@ -31,6 +31,102 @@
   ],
   "ask": [
    null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "hollowbough",
+  "title": "readable on every screen size",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "rampart-and-vine",
+  "title": "readable on every screen size",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sunglaze",
+  "title": "readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art",
+   "Start screen simplified, one Menu drawer in the top bar, bigger text and clear insets on every panel",
+   "UI-BAR checks for top bar, start screen and dock"
+  ],
+  "check": "Open Campaign: the three top buttons read cleanly",
+  "scn": [
+   "menu",
+   "menu",
+   "menu",
+   "ui-bar"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "short-fuse",
+  "title": "short-fuse: readable on every screen size",
+  "items": [
+   "Menus, panels and start screen readable at all 5 sizes"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "final-approach",
+  "title": "final-approach: readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "lantern-dive",
+  "title": "lantern-dive: readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Menu, help and tip text clear of frame art"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
    null,
    null
   ]
@@ -109,66 +205,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "short-fuse",
-  "title": "Menus: painted buttons keep their art shape",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
- },
- {
-  "date": "2026-10-14",
-  "game": "hollowbough",
-  "title": "Menu and board cleanup",
-  "items": [
-   "Board tip bubble no longer covers cards and counts; the caption line says it"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "sunglaze",
-  "title": "Menus tidied",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art"
-  ],
-  "check": "Open Campaign: the three top buttons read cleanly",
-  "scn": [
-   "menu",
-   "menu"
-  ],
-  "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "lantern-dive",
-  "title": "Menus tidied",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Menu, help and tip text clear of frame art"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu",
-   "menu"
-  ],
-  "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
   "game": "doorkick-dungeon",
   "title": "Menu clean-up",
   "items": [
@@ -195,21 +231,6 @@
    null,
    null,
    "Do the menus and board look clean?"
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "final-approach",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
   ]
  },
  {
