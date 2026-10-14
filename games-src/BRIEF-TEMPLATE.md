@@ -23,6 +23,9 @@ Rules
   Playwright Test for scenario/phone tests, axe-core for readable text/contrast/tap size, rembg for cut-outs. Copy or adapt it.
   Write new code only for what neither covers, and say in your report what you reused.
 - Shared/shell change: deploy all affected games in ONE `build-all.py --deploy a b c ...` call, never one by one.
+- REPORT BACK THE MOMENT YOU FINISH (owner, 14 Oct 2026: "you left workers hanging"): your last action, after the push, is
+  mcp__claude-code-remote__create_trigger with persistent_session_id=<orchestrator session id>, run_once_at = now + 1 min,
+  prompt = "[DONE <title>] <your report>". That wakes the orchestrator; it archives you and tells the owner.
 - HARD STOP: at 45 minutes or ~150k context, stop yourself: deploy what passed, commit + push, write a HANDOFF note, stop.
 - A check failure that the LIVE game also has is not yours: deploy anyway (build-all.py already warns instead of failing).
 - NEVER wait for an answer (owner, 13 Oct 2026: workers sat blocked for ~15-20 min). If a check fails or you're unsure: fix the real

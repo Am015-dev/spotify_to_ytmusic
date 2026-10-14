@@ -73,6 +73,8 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks. (The 13 Oct watchdog routines were removed: scheduled
   sessions can't see or stop other sessions.) Instead every worker STOPS ITSELF at 45 minutes or ~150k context: deploy what passed,
   commit + push, HANDOFF note, stop. The orchestrator checks all workers (get_session) at every owner message and archives finished ones.
+  Every worker reports back the moment it finishes by creating a one-shot trigger into the orchestrator's session
+  (BRIEF-TEMPLATE.md, owner 14 Oct 2026: "you left workers hanging": 9 workers finished at 02:29-02:40 and sat 10-20 min unreported).
 - Prove the approach on one game before touching others. Clarity before features.
 - **Reuse, don't build (owner, 14 Oct 2026: "why you continue to reinvent the wheel, most of the things you build are available,
   just search and copy paste").** Before any new script, checker, page or helper:
