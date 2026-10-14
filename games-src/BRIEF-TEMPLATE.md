@@ -27,8 +27,10 @@ Rules
   mcp__claude-code-remote__create_trigger with persistent_session_id=<orchestrator session id>, run_once_at = now + 1 min,
   prompt = "[DONE <title>] <your report>". That wakes the orchestrator; it archives you and tells the owner. Report EVEN IF
   blocked or not deployed, and never end on a question (14 Oct: 6 of 15 workers went idle asking "Which do you want?" and never reported).
-- HARD STOP: at 45 minutes or ~150k context, stop yourself: deploy what passed, commit + push, write a HANDOFF note, stop.
+- HARD STOP: at 30 minutes or ~150k context, stop yourself: deploy what passed, commit + push, write a HANDOFF note, stop.
 - A check failure that the LIVE game also has is not yours: deploy anyway (build-all.py already warns instead of failing).
+- DONE is decided by the independent audit (games-src/scripts/ui-audit.spec.js), not by you: run it on your game before you
+  report and paste its result. Report live time in UTC. All instructions are in this brief; expect no follow-ups.
 - NEVER wait for an answer (owner, 13 Oct 2026: workers sat blocked for ~15-20 min). If a check fails or you're unsure: fix the real
   cause (max 20 min), never raise limits or skip checks; if it still fails, commit, write what fails and where in HANDOFF.md,
   move on to your next game, and mention it in your report.
@@ -47,11 +49,11 @@ Fast loop
   passes (quick sweep; `--full` only for engine/rules changes). Then `add-update.py <game> "headline" "item" --check "..." --scn <id>`.
 - Commit at least every 10 minutes (explicit paths). Push after fetch+merge.
 
-Report (under 150 words, once): per game before -> after numbers, scenario ids, the live link, what is still weak.
+Report (5 lines max, once; print only pass/fail lines while working): per game before -> after numbers, scenario ids, the live link, what is still weak.
 ```
 
 Orchestrator notes
-- ONE session per game, at most 15 at a time. Title starts with the group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) + game; tag it
+- At most 3 workers at once (1 integrator + 2 fixers), one ~30-min deliverable each. Title starts with the group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) + game; tag it
   group:<name> (set_session_tags); add it to the groups table in HANDOFF.md. Model: Haiku for chores (status refresh, copying, converting, repeating
   an already-written fix, checks that only report), Sonnet for code/fixes/tests. Never the main model for workers.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
