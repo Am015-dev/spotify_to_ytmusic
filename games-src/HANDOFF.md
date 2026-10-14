@@ -313,7 +313,7 @@ Still weak: pile labels + Diary box hidden under 1000px wide (menu test fails at
 
 ## STOP 14 Oct 09:27 UTC (owner: "wrap up everything and deploy, make workers write down what they found and stop them")
 Last live times (UTC, games/<slug>/index.html): rampart 08:59, short-fuse 08:56, tidewake 08:56, nebula 09:01, final-approach 09:03, hollowbough 09:05, thornbound 09:05, kaiten 09:07, doorkick 09:10, crown 09:11, cauldron 09:15, shipwreck 09:15, lantern 09:20, sands 09:20, sunglaze 09:20.
-Open faults found by the owner, NOT fixed (workers stopped before doing them):
+Open faults found by the owner (rampart and lantern workers report these fixed and deployed after 09:20, NOT independently verified; check against the list):
 - rampart-and-vine (1920 wide, Menu drawer): row panel art starts ~30px in and cuts the labels; menu text 11-12px; Tips On/Off + Reset tips oval chips in another style; score chips "You 0 ★5" ~10px with icons over numbers; tiles ~90px in a 1900px table, "Place your tile" ~11px; full-width hand tray with one small tile.
 - lantern-dive (1920 wide): underwater background stretched/upscaled (blurry); seat names, "Same as Commander", "Exactly two Lanterns", "Lanterns", top-bar labels, status line all 9-11px; cards ~90px, hand card cut at bottom.
 - sunglaze: see "Sunglaze stop 14 Oct" (Guide button dead, black untextured tile on Olive's rack, 3D board labels 6-9px, scoring note cut at board edge, table ~60% of screen height, title pale on pale bar).
