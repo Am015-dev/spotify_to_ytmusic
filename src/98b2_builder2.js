@@ -474,10 +474,10 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
-const BX_DEMOS_SHOW=false,BX_RACE_LAPS=2; // trk-2: HIDDEN until fixed (Alex beta.22: car drives backwards, no race rules). trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
+const BX_DEMOS_SHOW=false,BX_RACE_LAPS=2; // trk-2: HIDDEN until fixed (Alex beta.22: car drives backwards, no race rules). trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)
 function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
  b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 2 laps</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
- b.onclick=e=>{e.stopPropagation();BX_open();BX_load(BX_DEMOS[k],k);BX.camGo=1;BX.seenAll=new Set();BX_driveStart()};tw.appendChild(b)}}
+ b.onclick=e=>{e.stopPropagation();BX_raceStart(k)};tw.appendChild(b)}} // trk-2: a Race-menu track starts a RACE (countdown, rivals, position, results)
 buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);
 
 // ---------------------------------------------------------------- acceptance tests (checklist items 'bx-*', 📍 GO = BX_test(id); the automated run uses the same spawn)
@@ -541,6 +541,10 @@ const BX_TESTS={
  'bx-t-canyon':{n:'CANYON SPLIT',log:()=>(BX_DEMOS['CANYON SPLIT']||{log:[['w','canyon']]}).log,drive:1,
   chk0:()=>{const m=BX.m,r=m.yMax-m.yMin,S=m.seen||new Set(),key=c=>c.i+','+c.j+','+c.l+','+c.r,fk=BX.pcs.find(p=>p.type==='fk'),br=fk?fk.ex.map(e=>BX.pcs.find(p=>key(p.c)===key(e))):[],n=br.filter(p=>p&&S.has(p.id)).length;
    return{ok:m.laps>=1&&r>=15&&n===2,msg:`laps ${m.laps}, elevation ${r.toFixed(1)} m, routes driven ${n}/2`}}},
+ // trk-2 race MVP: GO = CLIFF RUN as a race. Pass: countdown 3-2-1 with the car held, 5 rivals moving forward, position = the ranking, results after 2 laps
+ 'bx-race':{n:'RACE: CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,race:1,
+  chk:()=>{const r=BX.race;if(!r)return{ok:false,msg:'no race'};const mv=r.rv.filter(q=>q.s-r.s0>50).length,me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length,txt=($('#bxPos')||{}).textContent;
+   const ok=r.rv.length>=5&&(r.cd>0||mv>=5)&&txt===pos+'/'+(BX_RIV+1);return{ok,msg:`rivals ${r.rv.length}, ${r.cd>0?'countdown '+Math.ceil(r.cd):mv+' moved 50+ m'}, position ${txt} (ranking ${pos}/${BX_RIV+1})`}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
@@ -562,7 +566,7 @@ function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+
 for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon','bx-t-lagoon']){const T=BX_TESTS[k];T.chk=()=>{const m=BX.m,D=BX_data(),i=[['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 backward',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`]];
  const ok=D.ok&&i.every(x=>x[1]);return{ok,fails:[...D.fails,...i.filter(x=>!x[1]).map(x=>x[0])],msg:D.msg+' | '+i.map(x=>(x[1]?'✔ ':'✘ ')+x[2]).join(', ')}}}
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
- BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();return T.n}
+ BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();return T.n}
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
  proj:(x,y,z)=>{const v=bxV(x,y,z).project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z<1?1:0]},
  cell:(i,j,l)=>{const p=bxV(BXO+(i+.5)*BXC,l==null?BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC):l*BXH,BXO+(j+.5)*BXC).project(BX.cam);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]},
@@ -574,3 +578,47 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
    const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
  h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:2,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+
+// ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
+// 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,
+// results card in the city #results style. Rivals take the dry main lane (no boat/rubber-band logic yet).
+const BX_RIV=5,BX_RNAMES=['RED','BLUE','GREEN','ORANGE','WHITE'];
+function BX_rideMesh(team){let mesh=null;try{mesh=shipMesh(team);mesh.updateMatrixWorld(true)}catch(e){mesh=null}
+ if(!mesh){mesh=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(2,1,4.2),new THREE.MeshStandardMaterial({color:0x0055bf}));b.position.y=.8;mesh.add(b)}
+ const vb=o=>{const B=new THREE.Box3();o.updateMatrixWorld(true);o.traverseVisible(q=>{if(q.isMesh){q.geometry.computeBoundingBox();B.union(q.geometry.boundingBox.clone().applyMatrix4(q.matrixWorld))}});return B};
+ const sz=vb(mesh).getSize(bxV());mesh.scale.multiplyScalar(4.3/Math.max(sz.x,sz.z,.1));const b2=vb(mesh);mesh.position.y-=b2.min.y;mesh.position.x-=(b2.min.x+b2.max.x)/2;mesh.position.z-=(b2.min.z+b2.max.z)/2;
+ const inner=new THREE.Group();inner.add(mesh);inner.rotation.y=(sz.x>sz.z?Math.PI/2:0)+Math.PI;mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});const root=new THREE.Group();root.add(inner);return root}
+// course polyline for the rivals: the lane that stays out of the water (the longer one when both are dry)
+function BX_racePath(){const R=[0,1].map(b=>window.__bx.route([b])).filter(W=>W.length>4),dry=R.filter(W=>W.every(w=>w[1]>-.3)),W=(dry.length?dry:R).sort((a,b)=>b.length-a.length)[0];
+ const P=W.map(w=>bxV(w[0],w[1],w[2])),D=[0];for(let i=1;i<P.length;i++)D.push(D[i-1]+P[i].distanceTo(P[i-1]));const L=D[D.length-1]+P[0].distanceTo(P[P.length-1]);
+ // speed limit per point from the heading change over the next ~24 m (lateral 22 m/s^2: the 36 m corners are banked), max 33 m/s
+ const VL=P.map((p,i)=>{let j=i;while(j<i+40&&D[(j+1)%P.length]-D[i]<24&&j+1<P.length)j++;const a=P[Math.max(0,i-1)],b=P[i],c=P[Math.min(P.length-1,j)];
+  const h1=Math.atan2(b.x-a.x,b.z-a.z),h2=Math.atan2(c.x-b.x,c.z-b.z);let dh=Math.abs(h2-h1);if(dh>Math.PI)dh=2*Math.PI-dh;const d=Math.max(4,c.distanceTo(b));const k=dh/d;return Math.min(33,k>1e-4?Math.sqrt(22/k):33)});
+ return{P,D,L,VL}}
+function BX_pathAt(R,s){const L=R.L;s=((s%L)+L)%L;let lo=0,hi=R.D.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(R.D[m]<=s)lo=m;else hi=m-1}const a=R.P[lo],b=R.P[(lo+1)%R.P.length],seg=((lo+1<R.D.length?R.D[lo+1]:L)-R.D[lo])||1,t=(s-R.D[lo])/seg;
+ return{p:a.clone().lerp(b,t),F:b.clone().sub(a).setY(0).normalize(),i:lo}}
+function BX_raceStart(name){const D=BX_DEMOS[name];if(D){if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();BX_load(D,name)}BX.camGo=1;BX.seenAll=new Set();BX_driveStart();BX_raceSetup()}
+function BX_raceSetup(){BX_raceClear();const R=BX_racePath(),sp0=BX.v.p,F0=BX.v.F;let s0=0,bd=1e9;R.P.forEach((p,i)=>{const d=p.distanceTo(sp0);if(d<bd){bd=d;s0=R.D[i]}});
+ const rv=[];for(let k=0;k<BX_RIV;k++){const team=typeof TEAMS!=='undefined'?TEAMS[(k+1)%TEAMS.length]:null,o=BX_rideMesh(team);BX.sc.add(o);
+  // grid: two columns ahead of the player (the player starts last, like the city races)
+  rv.push({o,n:BX_RNAMES[k],s:s0+8+Math.floor(k/2)*9+(k%2)*4,lat:(k%2?-2.8:2.8),v:0,base:29+k*.9,fin:null})}
+ BX.race={R,s0,cd:3,t:0,rv,fin:null,start:BX.v.p.clone()};BX_raceUI()}
+function BX_raceClear(){const r=BX.race;if(r){for(const q of r.rv)BX.sc.remove(q.o);const e=$('#bxRace');if(e)e.remove();const f=$('#bxRes');if(f)f.remove()}BX.race=null}
+function BX_raceUI(){let e=$('#bxRace');if(!e){e=document.createElement('div');e.id='bxRace';e.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:61;font:italic 900 16px/1 var(--hud,system-ui);color:#fff;text-shadow:0 2px 0 #000';
+ e.innerHTML='<div id="bxPos" style="position:absolute;left:84px;top:44px;background:rgba(0,0,0,.45);border-radius:10px;padding:6px 12px;font-size:38px;color:#ffd21a">-/6</div><div id="bxTm" style="position:absolute;left:84px;top:96px;font-size:15px"></div><div id="bxCd" style="position:absolute;left:0;right:0;top:28%;text-align:center;font-size:110px;color:#ffd21a;-webkit-text-stroke:4px #1b1b1b"></div>';($('#bx')||document.body).appendChild(e)}} // inside #bx: builder mode hides the other body children
+function BX_raceProg(){const r=BX.race,V=BX.v,m=BX.m;let bi=0,bd=1e9;r.R.P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}});let a=r.R.D[bi]-r.s0;if(a<-r.R.L/2)a+=r.R.L;if(a>r.R.L/2&&m.laps===0)a-=r.R.L;return m.laps*r.R.L+a}
+function BX_raceTick(dt){const r=BX.race;if(!r||BX.mode!=='drive')return;const cd=$('#bxCd');
+ if(r.cd>0){r.cd-=dt;const V=BX.v;V.p.copy(r.start);V.v.set(0,0,0);if(cd)cd.textContent=r.cd>0?String(Math.ceil(r.cd)):'GO!';if(r.cd<=0){r.goT=0;BX.m.t=0;BX.m.lap0=0}return}
+ if(cd&&cd.textContent){r.goT+=dt;if(r.goT>.8)cd.textContent=''}r.t+=dt;const R=r.R,end=r.s0+BX_RACE_LAPS*R.L;
+ for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),lim=Math.min(q.base,R.VL[at.i]*(q.base/33));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
+  const a=BX_pathAt(R,q.s),b=BX_pathAt(R,q.s+3),Sx=b.F.z,Sz=-b.F.x;q.o.position.set(a.p.x+Sx*q.lat,a.p.y+.05,a.p.z+Sz*q.lat);q.o.lookAt(b.p.x+Sx*q.lat,a.p.y+.05,b.p.z+Sz*q.lat)}
+ const me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length;r.pos=pos;const P=$('#bxPos'),T=$('#bxTm'),lt=BX.m.t-BX.m.lap0;
+ if(P)P.textContent=pos+'/'+(BX_RIV+1);if(T)T.textContent=`LAP ${Math.min(BX.m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS} · ${Math.floor(lt/60)}:${(lt%60).toFixed(1).padStart(4,'0')}`;
+ if(BX.m.laps>=BX_RACE_LAPS&&!r.fin){r.fin=r.t;BX_raceResults()}}
+function BX_raceResults(){const r=BX.race,R=r.R,rows=[{n:'YOU',t:r.fin,me:1},...r.rv.map(q=>({n:q.n,t:q.fin!=null?q.fin:r.t+(r.s0+BX_RACE_LAPS*R.L-q.s)/Math.max(q.v,8)}))].sort((a,b)=>a.t-b.t);
+ const place=rows.findIndex(x=>x.me)+1,ord=['1ST','2ND','3RD','4TH','5TH','6TH'][place-1],ft=t=>Math.floor(t/60)+':'+(t%60).toFixed(2).padStart(5,'0');r.rows=rows;r.place=place;
+ const d=document.createElement('div');d.id='bxRes';d.className='screen center';d.style.zIndex=70;d.innerHTML=`<div class="card"><div class="eyebrow">Race complete</div><h2>${ord} PLACE</h2><table id="bxResT" style="width:100%;margin:10px 0">${rows.map((x,i)=>`<tr style="${x.me?'color:#ffd21a':''}"><td>${i+1}</td><td>${x.n}</td><td style="text-align:right">${ft(x.t)}</td></tr>`).join('')}</table><div class="row"><button id="bxResAgain" class="btn">RACE AGAIN</button> <button id="bxResBack" class="btn">BACK</button></div></div>`;
+ d.style.pointerEvents='auto';($('#bx')||document.body).appendChild(d);$('#bxResAgain').onclick=e=>{e.stopPropagation();d.remove();BX_raceStart(BX.name)};$('#bxResBack').onclick=e=>{e.stopPropagation();d.remove();BX_raceClear();BX_close()}}
+BX_farCheck=(f=>function(dt){const r=f.apply(this,arguments);try{BX_raceTick(dt)}catch(e){console.error(e)}return r})(BX_farCheck);
+BX_driveStop=(f=>function(){BX_raceClear();return f.apply(this,arguments)})(BX_driveStop);
+Object.assign(window.__bx,{raceStart:BX_raceStart,race:()=>BX.race});
