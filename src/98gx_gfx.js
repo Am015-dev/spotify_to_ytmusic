@@ -6,23 +6,26 @@
 // around the player on high AND med (2048 PCFSoft / 1024 PCF), a weak blue-sky/green-ground fill, glossy LEGO plastic (roughness .3-.42,
 // env 1.0) on everything that casts a shadow (buildings, cars, props; never the ground), deeper sky, subtle bloom on highlights.
 const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',0)===1}catch(e){return false}})(),
- day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],t:0,n:0,tier:null};
+ day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},t:0,n:0,tier:null};
 const GFX_SUN=[560,430,330];   // ~33° elevation, from the front-right of the usual driving direction: long side shadows, lit/shaded facades differ
 function GFX_tier(){try{const L=LK_lvl();return L==='high'?'high':L==='med'?'med':'off'}catch(e){return SET.q==='high'?'high':SET.q==='med'?'med':'off'}}
 function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MOOD.id!=='night'&&MOOD.id!=='flnight'}
 // lights, tone mapping, sky, fog: applied after ART_light (which runs after every mood / day-cycle update while roaming)
 function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
- if(!day){if(renderer.toneMapping!==THREE.NeutralToneMapping)renderer.toneMapping=THREE.NeutralToneMapping;return}
+ if(!day){GFX.U.value=1;if(renderer.toneMapping!==THREE.NeutralToneMapping)renderer.toneMapping=THREE.NeutralToneMapping;return}
  if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.set(...GFX_SUN);
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
  const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=4.3;
  hemi.color.set('#a9c8ff');hemi.groundColor.set(ath?'#7a6a48':'#4f6a38');hemi.intensity=.45;
  scene.environmentIntensity=.3;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
- const U=SKYU;U.uTop.value.set(.012,.09,.55);U.uMid.value.set(.05,.26,.86);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.6,1.25,.8);
+ const U=SKYU;U.uTop.value.set(.012,.09,.55);U.uMid.value.set(.05,.26,.86);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
  scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
- bloom.strength=.16;bloom.radius=.45}
-function GFX_off(){GFX_carLock();for(const m of GFX.pm){const o=m.userData.gfx0;if(o){m.roughness=o[0];m.envMapIntensity=o[1]}m.envMap=null;m.needsUpdate=true}GFX.pm=[];GFX.mats=new WeakSet();GFX.n=0;
- if(HUB.grp)HUB.grp.traverse(o=>{if(o.userData.gfxCast){o.castShadow=false;o.userData.gfxCast=0}});for(const[m,k]of GFX.keyOrig)m.key[2]=k;GFX.keyOrig.clear();renderer.toneMapping=THREE.NeutralToneMapping;bloom.threshold=1}
+ GFX.U.value=.15;bloom.strength=.16;bloom.radius=.45;
+for(const m of GFX.gm)m.roughness=.88}   // applyMoodMaterials resets the road's roughness on every mood change
+// 98_garage_driver forces bloom.threshold=1 before every roam render: by GFX day the threshold reads 2.2 whatever is written
+{let thr=bloom.threshold;Object.defineProperty(bloom,'threshold',{configurable:true,get(){return GFX.on&&GFX.day&&RO.on?2.2:thr},set(v){thr=v}})}
+function GFX_off(){GFX_carLock();GFX.U.value=1;for(const m of GFX.gm){const o=m.userData.gfx0;if(o)m.roughness=o[0]}GFX.gm=[];for(const m of GFX.pm){const o=m.userData.gfx0;if(o){m.roughness=o[0];m.envMapIntensity=o[1]}m.envMap=null;m.needsUpdate=true}GFX.pm=[];GFX.mats=new WeakSet();GFX.n=0;
+ if(HUB.grp)HUB.grp.traverse(o=>{if(o.userData.gfxCast){o.castShadow=false;o.userData.gfxCast=0}});for(const[m,k]of GFX.keyOrig)m.key[2]=k;GFX.keyOrig.clear();renderer.toneMapping=THREE.NeutralToneMapping}
 // shadow map: fitted ±55 m (high, 2048, soft) / ±40 m (med, 1024) around the player; LK_roamLook only allowed it on high
 function GFX_shadow(){if(!GFX.on||!HUB.grp||!HUB.grp.visible)return;const t=GFX_tier();GFX.tier=t;
  if(t==='off'||!GFX.day){return}
@@ -33,8 +36,16 @@ function GFX_shadow(){if(!GFX.on||!HUB.grp||!HUB.grp.visible)return;const t=GFX_
  if(sc.right!==ext){sc.left=sc.bottom=-ext;sc.right=sc.top=ext;sc.near=20;sc.far=1200;sc.updateProjectionMatrix()}
  sh.bias=-.0004;sh.normalBias=t==='high'?.35:.5}
 // glossy LEGO plastic: every non-transparent standard material on a shadow-casting mesh (the ground never casts)
-function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh||!o.castShadow)return;for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m))continue;GFX.mats.add(m);
-  if(!m.isMeshStandardMaterial||m.transparent||m.metalness>.5)continue;m.userData.gfx0=[m.roughness,m.envMapIntensity];
+// ground: driving towards a low sun, GGX Fresnel at grazing angles turned grass and road into a pale yellow sheen (not bloom: it stays with bloom off).
+// Grass and asphalt barely reflect: keep 15 % of the direct specular. Chains any existing onBeforeCompile; own program-cache key.
+function GFX_gspec(m){if(m.userData.gfxSpec)return;m.userData.gfxSpec=1;const ob=m.onBeforeCompile,ck=m.customProgramCacheKey;
+ m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.uniforms.uGfxSp=GFX.U;sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform float uGfxSp;\nvoid main() {').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directSpecular*=uGfxSp;')};
+ m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|gfxg'};m.needsUpdate=true}
+// ground (meshes that never cast): matte. Grass/pavement at roughness .55 caught the low sun as a white sheen across Frankfurt
+function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.castShadow){for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m)||!m.isMeshStandardMaterial||m.isMeshPhysicalMaterial||m.transparent||m.roughness>=.85)continue;
+    GFX.mats.add(m);m.userData.gfx0=[m.roughness,m.envMapIntensity];m.roughness=.88;GFX_gspec(m);GFX.gm.push(m)}return}
+  for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m))continue;if(GFX.gm.includes(m))continue;GFX.mats.add(m);
+  if(!m.isMeshStandardMaterial||m.transparent||m.metalness>.3)continue;m.userData.gfx0=[m.roughness,m.envMapIntensity];
   m.roughness=Math.min(m.roughness,m.isMeshPhysicalMaterial?.25:.4)*.85+.06;m.envMapIntensity=1.25;GFX.pm.push(m);k++}});GFX.n+=k;
  // three uses scene.environmentIntensity for every material without its own envMap: give plastic the scene env explicitly so its own intensity counts
  const env=scene.environment;if(env)for(const m of GFX.pm)if(m.envMap!==env){if(!m.envMap)m.needsUpdate=true;m.envMap=env}return k}
