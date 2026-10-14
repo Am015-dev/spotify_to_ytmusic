@@ -423,3 +423,18 @@ OF_actEnd=(f=>function(){f();OF_bubOff();OF.sit=null;OF.act=null;OF.wave=0})(OF_
 OF_reset=(f=>function(){OF_actEnd();return f.apply(this,arguments)})(OF_reset);
 // starting a mission from its card while on foot: back into your car first (the event then places the car as usual)
 document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#rcGo')&&RO.foot&&RO.foot!=='car')OF_reset()},true);
+// ---- sink audit (cam-2, 2026-10-14; Alex beta.25: the yellow semi cab sat half under the asphalt after he stepped out on the Hot Drop slope).
+// OF_sinkChk = the parked ride vs the road under every tyre (real wheel meshes: bottom of each tyre; else the box corners): float = max gap, sink = min gap (m).
+// OF_sinkAll(ids, steep) = for each ride (all 157 by default): pick it in the garage, exit on foot on the steepest clear street, settle, measure, step back in.
+function OF_sinkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let q=w;while(q&&q!==ud.m){if(!q.visible)return;q=q.parent}W.push(w)});pl.mesh.updateMatrixWorld(true);
+  const v=new THREE.Vector3(),g=[];for(const w of W){w.getWorldPosition(v);const r=w.userData.r*w.getWorldScale(new THREE.Vector3()).y;g.push(v.y-r-groundAt(v.x,v.z,v.y+1))}
+  const P=OF_corners(),c=P?P.map(p=>p.y-groundAt(p.x,p.z,p.y+1)):[];const mx=a=>a.length?+Math.max(...a).toFixed(3):null,mn=a=>a.length?+Math.min(...a).toFixed(3):null;
+  return{nW:W.length,wMax:mx(g),wMin:mn(g),cMax:mx(c),cMin:mn(c)}}
+async function OF_sinkAll(ids,steep){const W=ms=>new Promise(r=>setTimeout(r,ms)),until=async(f,ms)=>{const e=performance.now()+ms;while(performance.now()<e){try{if(f())return true}catch(x){}await W(60)}return false};
+  const L=(ids?ids.map(GAR_set):RSZ.sets()).filter(Boolean),out=[],bad=[];if(state!=='roam'||!RO.on)return{err:'start roam first'};try{OF_reset()}catch(e){}const q=CAM_road(60,steep!==false);if(q)roamWarp(q.x,q.z,q.h,true);await W(300);
+  for(const S of L){const r={id:S.id};try{gbOpen();GAR_select(S.id);await W(250);await until(()=>typeof LDL==='undefined'||!LDL.wait.size,30000);gbClose(true);await W(300);
+    if(q)roamWarp(q.x,q.z,q.h,true);RO.v=0;await W(200);OF_exit();await until(()=>RO.foot==='walk',3000);await W(700);Object.assign(r,OF_sinkChk()||{err:'no ride'});
+    const o=OF_cars(false).find(k=>k.k==='cur');if(o){goToCar:{OF.x=o.x+Math.cos(o.h)*3;OF.z=o.z-Math.sin(o.h)*3}OF_enter(o);await until(()=>RO.foot==='car',5000)}}catch(e){r.err=String(e).slice(0,80)}
+    r.ok=!r.err&&(r.wMax==null||(r.wMax<=.05&&r.wMin>=-.05))&&(r.cMin==null||r.cMin>=-.05)&&(r.nW>0||r.cMax!=null);out.push(r);if(!r.ok)bad.push(r)}
+  return{n:out.length,bad:bad.length,fails:bad,slope:q&&+(q.gr||0).toFixed(3)}}
+window.OF_sinkAll=OF_sinkAll;
