@@ -55,7 +55,7 @@ function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;B
   const near=(x,z)=>{const n={},kx=Math.floor(x/100),kz=Math.floor(z/100);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(const o of LG.get((kx+a)*100000+kz+b)||[])if((o.x-x)**2+(o.z-z)**2<1e4)n[o.t]=(n[o.t]||0)+1;return n};
   const box=(x,y,z,ry,sx,sy,sz,c)=>{const k=Math.floor(x/1600)*1000+Math.floor(z/1600);let A=I.get(k);if(!A)I.set(k,A=[]);A.push(x,y,z,ry,sx,sy,sz,typeof c==='string'?hx(c):c)};
   for(const o of BV_list()){if(o.ry==null||!o.w||(o.fr===0))continue;const{x,z,ry,w,d}=o,c=Math.cos(ry),s=Math.sin(ry),L0=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c],D0=d/2,[fx,fz]=L0(0,d/2+2);let L=L0;
-    const q=cityAt(fx,fz);if(!q||q.d>q.road.w/2+16||w<6)continue;const NS=fra&&w>=18?2:1;for(let sl=0;sl<NS;sl++){const ox=(sl-(NS-1)/2)*w/NS,w0=w;{const w=w0/NS,[fx,fz]=L(ox,D0+2);
+    const q=cityAt(fx,fz),f=fillAt(fx,fz);/* art-4: filler-grid streets count too (21 of 30 buildings at the bv1/fra spot faced one and got nothing) */if(!(q&&q.d<=q.road.w/2+16||f&&f.d<=f.r.w/2+16)||w<6)continue;const NS=fra&&w>=18?2:1;for(let sl=0;sl<NS;sl++){const ox=(sl-(NS-1)/2)*w/NS,w0=w;{const w=w0/NS,[fx,fz]=L(ox,D0+2);
     const n=near(fx,fz);let t='none',bs=1e9;T.forEach((k,i)=>{if(k==='mural'&&NS>1)return;const sc=(n[k]||0)/W[i]+BV_h(x+sl,z,40+i)*.8;if(sc<bs){bs=sc;t=k}});if(t==='bill'&&o.h<10)t='mural';if(t==='none')continue;
     const b=BI.get(Math.round(x)+'|'+Math.round(z)),y0=b&&b.trBase!=null?b.trBase:groundY(x,z),P=BV_PAL[BV_sty(x,z)],pc=i=>P[Math.floor(BV_h(x+sl*7,z,50+i)*P.length)%P.length],D=d/2;L=(lx,lz)=>L0(lx+ox,lz);
     const put=(lx,ly,lz,sx,sy,sz,col,dry)=>{const[px,pz]=L(lx,lz);box(px,y0+ly,pz,ry+(dry||0),sx,sy,sz,col)};
