@@ -88,6 +88,7 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
   planter:LIFE_g([[LB(.9,.55,.9),'#b85a3a',0,.28,0],[LS(.42,7),'#3aa046',0,.75,0],[LS(.14,5),'#ff4c8c',.2,1,.1],[LS(.14,5),'#ffd12c',-.2,.95,-.1]]),
   bin:LIFE_g([[LC(.32,.28,.95,10),'#3a8a4a',0,.48,0],[LC(.35,.35,.08,10),'#2a6a3a',0,.98,0]])};
  const pop=new THREE.IcosahedronGeometry(1.4,1),ring=new THREE.TorusGeometry(2.6,.22,6,24);colorize(pop,new THREE.Color('#ffffff'));colorize(ring,new THREE.Color('#ffffff'));
+ const TB=LIFE_ldTurb();LIFE.TB=TB&&TB.hub;if(TB)S.turbine=TB.geo;/* life-2: real 7747 turbine */
  return{S,Q,ball,dog,fig,torso,arms,M,pop,ring}}
 // ---------- pools: name → InstancedMesh (count set per frame; invisible while empty, so an empty pool costs no draw call)
 const LIFE_CAP={set:14,setM:14,prop:18,ball:14,dog:6,fig:180,sm:44,pop:8,bm:8};// bm: copies of each type in the batched pools (one draw call for all types)
@@ -191,7 +192,15 @@ const LIFE_DS=new Map();// Fabuland parts are converted with every face (LD_ALL=
 function LIFE_ldM(B,ds){const by=new Map();for(const[geo,m0]of LDW_geo(B)){let mat=m0;if(ds){if(!LIFE_DS.has(m0)){const c=m0.clone();c.side=THREE.DoubleSide;LIFE_DS.set(m0,c)}mat=LIFE_DS.get(m0)}if(!by.has(mat))by.set(mat,[]);const g=geo.index?geo.toNonIndexed():geo;for(const k of Object.keys(g.attributes))if(!['position','normal','color'].includes(k))g.deleteAttribute(k);by.get(mat).push(g)}
  return[...by].map(([mat,G])=>[G.length>1?mergeGeometries(G):G[0],mat])}
 function LIFE_ldBox(L){const b=new THREE.Box3();for(const[g]of L){g.computeBoundingBox();b.union(g.boundingBox)}return b}
-function LIFE_ldLm(fra){const p=fra?'lxfw':'lxmg';if(typeof LD_MODELS==='undefined'||!LD_MODELS[p+'_base']||typeof LDW_geo!=='function')return null;
+// flag: real sets on (default) unless ?ldlm=0; the turbine: 7747's pylon + head, blades turn about local z, height 16 m
+const LIFE_LD=()=>LIFE.ldOn!==false&&!/[?&]ldlm=0/.test(location.search)&&typeof LD_MODELS!=='undefined'&&typeof LDW_geo==='function';
+function LIFE_ldTurb(){if(!LIFE_LD()||!LD_MODELS.lxwt_base)return null;const one=L=>{const G=L.map(([g])=>g);const g=G.length>1?mergeGeometries(G):G[0];return g};
+ const base=one(LIFE_ldM(LD_br('lxwt_base'))),rot=one(LIFE_ldM(LD_br('lxwt_rotor')));rot.computeBoundingBox();let rs=rot.boundingBox.getSize(new THREE.Vector3());
+ if(rs.x<rs.z){base.rotateY(Math.PI/2);rot.rotateY(Math.PI/2)}base.computeBoundingBox();rot.computeBoundingBox();const bb=base.boundingBox.clone().union(rot.boundingBox),c=rot.boundingBox.getCenter(new THREE.Vector3()),bc=bb.getCenter(new THREE.Vector3()),S=16/(bb.max.y-bb.min.y);
+ base.translate(-bc.x,-bb.min.y,-bc.z);base.scale(S,S,S);rot.translate(-c.x,-c.y,-c.z);rot.scale(S,S,S);
+ for(const g of[base,rot])g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));
+ const bs=bb.getSize(new THREE.Vector3());return{geo:[base,rot],hub:{x:(c.x-bc.x)*S,y:(c.y-bb.min.y)*S,z:(c.z-bc.z)*S},w:bs.x*S,d:bs.z*S}}
+function LIFE_ldLm(fra){const p=fra?'lxfw':'lxmg';if(!LIFE_LD()||!LD_MODELS[p+'_base']||typeof LDW_geo!=='function')return null;
  const base=LIFE_ldM(LD_br(p+'_base'),1),rot=LIFE_ldM(LD_br(p+'_rotor'),1),rb=LIFE_ldBox(rot),bb=LIFE_ldBox(base).union(rb),c=rb.getCenter(new THREE.Vector3()),sz=rb.getSize(new THREE.Vector3());
  const ax=fra?(sz.x<sz.z?'x':'z'):'y';if(!fra)c.y=0;const inner=new THREE.Group(),piv=new THREE.Group();piv.position.copy(c);
  for(const[g,m]of base)inner.add(new THREE.Mesh(g,m));for(const[g,m]of rot){g.translate(-c.x,-c.y,-c.z);piv.add(new THREE.Mesh(g,m))}inner.add(piv);
@@ -241,7 +250,7 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
   else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;const bob=Math.sin(t*2+it.x)*.4,i=LIFE_put(M.pop,cnt,it.x,it.y+hy+bob,it.z,t*.8,t*1.3,0,1);if(i>=0){_lfC.set(it.K.col);M.pop.setColorAt(i,_lfC);LIFE_put(M.ring,cnt,it.x,it.y+hy,it.z,0,it.h,t*1.5,1);M.ring.setColorAt(i,_lfC)}}
   else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M['s_'+T],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M['m_'+T];
    if(T==='windmill')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.25,it.y+7.2,it.z+Math.cos(it.h)*1.25,0,it.h,tt*1.4,1);
-   else if(T==='turbine')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.2,it.y+13.2,it.z+Math.cos(it.h)*1.2,0,it.h,tt*2.2,1);
+   else if(T==='turbine'){const H=LIFE.TB;if(H){const c=Math.cos(it.h),sn=Math.sin(it.h);LIFE_put(m,cnt,it.x+H.x*c+H.z*sn,it.y+H.y,it.z-H.x*sn+H.z*c,0,it.h,tt*2.2,1)}else LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.2,it.y+13.2,it.z+Math.cos(it.h)*1.2,0,it.h,tt*2.2,1)}
    else if(T==='fountain'){const i=LIFE_put(m,cnt,it.x,it.y+2.2,it.z,0,tt,0,1);if(i>=0){_lfS.set(1,1+Math.sin(tt*5)*.18+Math.sin(tt*3.1)*.12,1);_lfM.compose(_lfP,_lfQ,_lfS);m.setMatrixAt(i,_lfM)}}
    else if(T==='banner')LIFE_put(m,cnt,it.x,it.y+6.3,it.z,0,it.h+Math.sin(tt*1.7)*.5,Math.sin(tt*4.3)*.06,1);
    else if(T==='billboard')LIFE_put(m,cnt,it.x,it.y+5.3,it.z,0,tt*.7,0,1);
@@ -365,7 +374,14 @@ function LIFE_goVar(say){if(!LIFE.on)return'📍 LIFE is OFF';const S=LIFE_sampl
  const nT=LIFE_SET.length+LIFE_GRP.length,pct=Math.round(ok6/S.length*100),js=sn?sim/sn:0,p=best||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.px=1e9;
  setTimeout(()=>{const c=LIFE_cost(),ok=pct>=90&&all.size>=nT&&js<=.6&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.var={pct,types:all.size,nT,js:+js.toFixed(2),dc:c.dc,here:bn,ok};
   say(`📍 VARIETY ${CID}: here ${bn} types within 100 m · ${pct}% of 60 windows have ≥ 6 · ${all.size}/${nT} types in the city (missing: ${[...LIFE_SET,...LIFE_GRP].filter(t=>!all.has(t)).join(',')||'none'}) · neighbours share ${Math.round(js*100)}% · ${c.dc} draws `+(ok?'✅':'❌'))},2000);return'📍 VARIETY '+CID+' · measuring…'}
+// GO (life-2): the landmark is the real LEGO set: Frankfurt Ferris wheel 20-30 m tall from ≥ 30 parts, seats level (< 2°) while it turns;
+// Athens carousel 14-20 m wide from ≥ 9 parts, top turns; the street wind turbines are the real 7747 turbine (blades turn)
+function LIFE_goLmLd(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const lm=LIFE.lm,fra=CID==='fra';if(!lm)return'📍 no landmark ❌';const r=LIFE_goLm(()=>{});
+ const D=lm.ld,p=fra?'lxfw':'lxmg',n=D?LD_MODELS[p+'_base'].B.length+LD_MODELS[p+'_rotor'].B.length+(fra?LD_MODELS.lxfw_seat.B.length:0):0,a0=lm.spin.rotation[lm.ax];
+ setTimeout(()=>{const turn=Math.abs(lm.spin.rotation[lm.ax]-a0);let tilt=0;if(D&&fra){lm.g.updateMatrixWorld(true);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),u=new THREE.Vector3();lm.g.traverse(o=>{if(!o.isInstancedMesh)return;for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);M.premultiply(o.matrixWorld);M.decompose(u,Q,new THREE.Vector3());u.set(0,1,0).applyQuaternion(Q);tilt=Math.max(tilt,Math.acos(Math.min(1,u.y))*180/Math.PI)}})}
+  const sz=D?(fra?D.h:Math.max(D.w,D.d)):0,okS=fra?sz>=20&&sz<=30&&n>=30:sz>=14&&sz<=20&&n>=9,ok=!!D&&okS&&turn>.1&&tilt<2&&!!LIFE.TB;window.__chk=window.__chk||{};window.__chk.lmld={sz,n,turn,tilt,tb:!!LIFE.TB,ok};
+  say(`📍 ${lm.k.toUpperCase()} (real LEGO set ${fra?'3681':'3668'}): ${D?sz.toFixed(1)+' m '+(fra?'tall':'wide')+', '+n+' parts':'stand-in ❌'}, turned ${turn.toFixed(2)} rad`+(fra?`, seats tilt ${tilt.toFixed(1)}°`:'')+`, turbines ${LIFE.TB?'7747':'stand-in'} `+(ok?'✅':'❌'))},2000);return r}
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
- 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
+ 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'fra-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
 window.__life={ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
