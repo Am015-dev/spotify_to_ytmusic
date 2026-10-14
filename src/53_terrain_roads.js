@@ -25,13 +25,13 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
     top=OC_top(top);const H0=A.H;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,m=athHill1(A,x,z)/H0;if(m>0){const k=j*nx+i;h[k]+=(top-h[k])*m}}A.H=top;A.trH0=H0}
   OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};TR_roadsInit(TR_W);return TR_W}
 // ---- terr-1 (Alex: "both cities are flat, not realistic"): real relief, exaggerated above a smooth valley floor (floor = 1.2 km box blur of
-// the DEM): Frankfurt 3.6x on the soft-capped part (~2.2x on the Sachsenhausen hills; cap +320 m on the Taunus), Athens 1.4x outside the Acropolis (plateau keeps its real height).
+// the DEM): Frankfurt 3.9x on the soft-capped part (~2.2x on the Sachsenhausen hills; cap +320 m on the Taunus), Athens 1.4x outside the Acropolis (plateau keeps its real height).
 // feature flag, ON by default (coordinator 2026-10-14): hills + graded road corridors + slope colours; ?terr=0 = the old flat raster, kept for
 // the tab (sessionStorage, so GO reloads keep it) or for good with localStorage mho_terr=0; ?terr=1 = on again. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
 const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))!=='0'}catch(e){return true}})()};
 // the Athens ground-quadtree cache (10b) is fitted on the TERR raster (tools/qtdump.js after any height change): with ?terr=0 every cell is fitted live
 if((!TERR.on||window.__qtdump)&&typeof QTC!=='undefined')QTC.ok=false;
-const TR_RK=CID==="fra"?{k:3.6,c:200}:{k:1.4,c:200};
+const TR_RK=CID==="fra"?{k:3.9,c:200}:{k:1.4,c:200};
 function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
   const R=Math.round(1200/96),T=new Float32Array(C.length),blur=()=>{for(let j=0;j<cz;j++){let a=0,c=0;for(let i=-R;i<cx+R;i++){if(i+R<cx){a+=C[j*cx+i+R];c++}if(i-R-1>=0){a-=C[j*cx+i-R-1];c--}if(i>=0&&i<cx)T[j*cx+i]=a/c}}
@@ -114,7 +114,7 @@ function TR_roadsInit(W,force){if(!TR_RG)return;if(CID!=='fra'&&!force)return;  
     if(CID==='fra')for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
     const skip=CID==='fra'?(x,z)=>inRiver(x,z,-25)||BRIDGES.some(b=>deckAt(b,x,z)!=null):null,pinY=(x,z)=>{for(const b of BRIDGES){if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0}}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
 // every deck (city bridges had none: decks from y 0) starts and ends at the graded ground, re-read after each grading pass: no step at the joints
-function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES,...(AB_BRIDGES||[])]){const g=s=>{const[x,z]=deckPt(b,s*(b.half+1));return TR_G(x,z)};b.yA=g(-1);b.yB=g(1);b.trE=1}}
+function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES,...(AB_BRIDGES||[])]){const g=s=>{const[x,z]=deckPt(b,s*(b.half+.6));return TR_G(x,z)};b.yA=g(-1);b.yB=g(1);b.trE=1}}
 
 function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=fx<0?0:fx>W.nx-1.001?W.nx-1.001:fx;fz=fz<0?0:fz>W.nz-1.001?W.nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*W.nx+i,h=W.h;
   return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+W.nx]*(1-tx)+h[k+W.nx+1]*tx)*tz}

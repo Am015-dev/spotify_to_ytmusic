@@ -21,10 +21,14 @@ TERR is ON by default (`?terr=0` = the old flat raster, sticky per tab; localSto
 ## Tests (TAG=terrain, 16 GOs, all < 10 s): last numbers on the final build (probe, not a full tChkGo run)
 fra: grade max 11.4 %, edge 0.06 m, junctions planar 0.021 m, Mühlberg ~100 m (margin thin), deck joints ok, tyre 0.02.
 ath: grade 9.7 %, edge 0.09 m, junctions 0.015 m, Lycabettus ~198 m. Unit OK 0 FAIL.
-OPEN: terrain-flush-fra FAILS: 2 sunk pieces at the Römerberg Ostzeile row (-73,-15)/(-73,10), ~1 m under (the ostzeile plaza disc
-didn't catch them, probably they lie outside its r 30 or the Römer junction disc wins). terrain-flush-ath FAILS: 1 floating piece
-(1025,-1816) +0.21 m (unknown object, near Thiseio). Find the builder (TRN_FL.float/buried give x,z,lo,hi,material) and drape it or pad it.
-Last full tChkGo run of the whole terrain tag was before the junction/flush work (16/16); rerun `TAG=terrain,road-gap,ath-boot,lf1/mound tools/tGo.sh <url>`.
+LAST RUN (od-int2 merge, TAG=terrain,road-gap,ath-boot,lf1/mound): 18/19, 0 errors. fra k is 3.9 now (Mühlberg ≥100 m, margin thin);
+bridge ends sample the ground 0.6 m past the deck end (= the joint the test reads).
+OPEN: terrain-flush-ath FAILS: 1 floating piece at (1025,-1816) +0.21 m (unknown object near Thiseio; TRN_FL.float gives x,z,lo,hi,colour).
+Find its builder and drape it or add a flat disc for it in TR_padList.
+unit: 4 FAIL checklist/go-explicit-xf1/* are on od-int2 itself (not terrain).
+Split-1 moved the Athens QTC blob to src/10c_qtc_blob.js (lazy): after tools/qtdump.js (still writes the whole thing to 10b) move the
+`{const A=...}` block from 10b into 10c (keep 10c's first comment line) — see the python split in this session's last commit.
+Locally: node_modules is untracked now: `npm i three@0.164.1 --no-save` before building.
 
 ## Tools
 art/rprobe.js `<url> <code> fra|ath` (needs attic/tools/lowgfx.js, restored from history, untracked in some checkouts), ?trdbg=1 keeps
