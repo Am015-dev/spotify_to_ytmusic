@@ -91,3 +91,14 @@ function RV16_freed(say){let freed=0,thrown=0;scene.traverse(o=>{const g=o.geome
  return('📍 FREED GPU ARRAYS · '+freed+' attributes with the CPU array freed after upload, '+thrown+' throw on getY (null reading 1)'+(thrown?' ❌':' ✅'))}
 function RV16_near(say){const r=OF_go('car');let n=0;const iv=setInterval(()=>{if((RO.foot==='car'||!RO.foot)&&++n<60)return;clearInterval(iv);for(let i=0;i<30;i++)roamStep(1/30);const nf=camera.near;
   say('📍 FOOT NEAR-CLIP · on foot camera.near '+nf.toFixed(2)+' m (0.4–1.1, grows with the camera distance)'+((RO.foot&&RO.foot!=='car'&&nf>=.4&&nf<=1.1)?' ✅':' ❌'))},200);return'📍 FOOT NEAR-CLIP · getting out…'}
+
+// rev-3 (Alex on PC: could not type in the 🐞 note): keys typed in the box never reach the game, held keys are released on open, Enter = SEND, Esc = close, the box has focus
+function RV16_type(say){const b=document.getElementById('qaBugTop'),sh=document.getElementById('qaSheet'),ta=document.getElementById('qaNote');if(!b||!ta)return'📍 BUG TYPING · missing ❌';
+ K.KeyW=true;K.KeyD=true;TOUCH.gas=true;const got=[];window.__qaDbMock={collection:()=>({add:async d=>{got.push(d);return{}}})};b.click();const rel=!K.KeyW&&!K.KeyD&&!TOUCH.gas;
+ setTimeout(()=>{const foc=document.activeElement===ta,bad=[];let pd=0,reached=0;const probe=e=>{reached++};addEventListener('keydown',probe);
+  for(const c of['KeyW','KeyA','KeyS','KeyD','Space','KeyE','KeyF']){const e=new KeyboardEvent('keydown',{code:c,key:c==='Space'?' ':c[3].toLowerCase(),bubbles:true,cancelable:true});ta.dispatchEvent(e);if(e.defaultPrevented)pd++;ta.dispatchEvent(new KeyboardEvent('keyup',{code:c,bubbles:true}))}
+  removeEventListener('keydown',probe);const held=Object.keys(K).filter(k=>K[k]);ta.value='wasd ';
+  ta.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',bubbles:true,cancelable:true}));
+  setTimeout(()=>{const sent=got.length===1&&got[0].note==='wasd ';ta.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',code:'Escape',bubbles:true,cancelable:true}));const closed=sh.style.display==='none';delete window.__qaDbMock;
+   const ok=rel&&foc&&!reached&&!pd&&!held.length&&sent&&closed;
+   say('📍 BUG TYPING · held keys released on open: '+rel+' · note box focused: '+foc+' · 7 game keys typed: reached the game '+reached+', blocked from typing '+pd+', held keys after '+held.length+' · Enter sent "wasd ": '+sent+' · Esc closed: '+closed+(ok?' ✅':' ❌'))},700)},300);return'📍 BUG TYPING · typing wasd into the note…'}
