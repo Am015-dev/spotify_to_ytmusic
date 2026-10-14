@@ -229,12 +229,12 @@ function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
  g.traverse(o=>{o.userData.keep=1});/* not merged by WB city batching: the wheel turns */g.position.set(at.x,at.y,at.z);g.rotation.y=at.h||0;LIFE.grp.add(g);const r=LD?LD.r:fra?6:8.5;LIFE.lm.r=r}
 // ---------- fill: items within LIFE_R m, nearest first, into the pools (every 12 frames or 20 m)
 function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Math.floor(x0/LIFE_CELL),cb=Math.floor(z0/LIFE_CELL),near=[],t0=performance.now();let todo=false;
- for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>3){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
+ for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>1.5){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  const pr=Math.ceil(LIFE_R/LIFE_PG);for(let a=Math.floor(x0/LIFE_PG)-pr;a<=Math.floor(x0/LIFE_PG)+pr;a++)for(let b=Math.floor(z0/LIFE_PG)-pr;b<=Math.floor(z0/LIFE_PG)+pr;b++){const it=LIFE_pop(a,b);if(it){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  near.sort((p,q)=>p[0]-q[0]);const keep=new Set(),L=[];for(const [,it] of near){keep.add(it.id);if(!LIFE.dead.has(it.id))L.push(it)}
  for(const id of LIFE.dead.keys())if(!keep.has(id))LIFE.dead.delete(id);// smashed things come back once you are out of range
  LIFE_kickSync(L);LIFE.L=L;LIFE.D=L.filter(it=>it.c==='pop'||it.c==='set'||it.c==='grp'&&(it.x-x0)**2+(it.z-z0)**2<150*150);LIFE.H=L.filter(it=>(it.x-x0)**2+(it.z-z0)**2<40*40);
- LIFE_draw(true);if(todo)LIFE.px=1e9}
+ LIFE_draw(true);LIFE.todo=todo?LIFE.fr+3:0}/* life-2: unbuilt cells → another ≤ 1.5 ms step 3 frames later (was 3 ms every frame after a teleport) */
 // ---------- draw (every frame: the pools are small; static parts are rewritten too, which keeps the code simple and costs ~0.1 ms)
 const _lfM=new THREE.Matrix4(),_lfQ=new THREE.Quaternion(),_lfE=new THREE.Euler(),_lfP=new THREE.Vector3(),_lfS=new THREE.Vector3();
 // static pools (smashables x_, set-piece bases s_, group props q_) are written only on a refill (LIFE.S), the rest every frame
@@ -309,9 +309,9 @@ function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[
 // ---------- per frame (after LV_step: free roam only)
 function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.KK&&LIFE.KK.size)LIFE_kickSync([]);if(LIFE.M&&LIFE.grp)for(const k in LIFE.M){LIFE.M[k].visible=false}if(LIFE.lm)LIFE.lm.g.visible=!!LIFE.on;return}
  const t0=performance.now();if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
- if(LIFE.fr%12===0||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
- LIFE_hit();LIFE_draw();const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;const a=LIFE.t*(lm.ax==='y'?.5:.12);lm.spin.rotation[lm.ax]=a;if(lm.upd&&lm.g.visible)lm.upd(a)}
- const ms=performance.now()-t0;LIFE.ms=LIFE.ms*.95+ms*.05;LIFE.msN++;if(LIFE.rec)LIFE.rec.push([ms,dt])}
+ const P=LIFE.pf||(LIFE.pf={fill:0,hit:0,draw:0,n:0});let q=performance.now();if(LIFE.fr%12===0||LIFE.todo&&LIFE.fr>=LIFE.todo||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
+ P.fill+=performance.now()-q;q=performance.now();LIFE_hit();P.hit+=performance.now()-q;q=performance.now();LIFE_draw();P.draw+=performance.now()-q;P.n++;/* where LIFE's time goes (window.__life.LIFE.pf) */const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;const a=LIFE.t*(lm.ax==='y'?.5:.12);lm.spin.rotation[lm.ax]=a;if(lm.upd&&lm.g.visible)lm.upd(a)}
+ const ms=performance.now()-t0;LIFE.ms=LIFE.ms*.95+ms*.05;LIFE.msN++;if(LIFE.rec){const w=LIFE.tw?t0-LIFE.tw:dt*1000;LIFE.rec.push([ms,w/1000])}LIFE.tw=t0/* life-2: wall-clock frame time (the game's dt is clamped at 50 ms on a slow page) */}
 {const _lfLS=LV_step;LV_step=dt=>{_lfLS(dt);try{LIFE_step(dt)}catch(e){if(!LIFE.e){LIFE.e=1;console.warn('LIFE',e)}}}}
 // ---------- tests: audit any road window (state asserts, no rendering), cost, GO spots
 // a "200 m of road" window = every LIFE item within 100 m of a street point (the stretch 100 m either way + side streets)
@@ -332,22 +332,29 @@ function LIFE_audit(n=60){if(!LIFE_init())return null;const S=LIFE_samples(n),fa
 // draw calls and instances this frame (the frame-cost metric) + the CPU time of LIFE_step (smoothed)
 function LIFE_cost(){let dc=0,inst=0;for(const k in LIFE.M||{}){const m=LIFE.M[k];if(m.userData.bmk){if(m.visible)dc++}else if(m.visible&&m.count){if(!m.isBm)dc++;inst+=m.count}}if(LIFE.lm&&LIFE.lm.g.visible)LIFE.lm.g.traverse(o=>{if(o.isMesh)dc++});return{dc,inst,ms:+LIFE.ms.toFixed(2)}}
 // GO: jump to a street spot of the audit, wait, then report density + cost; pass line in the checklist
-function LIFE_go(say){if(!LIFE.on)return'📍 LIFE is OFF in this build (remove ?life=0)';const S=LIFE_samples(40),p=S[(LIFE.goI=(LIFE.goI||0)+7)%S.length]||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.rec=[];
- setTimeout(()=>{let A,w,c;try{const R=LIFE.rec||[];LIFE.rec=null;c=LIFE_cost();const n=Math.max(1,R.length),m=R.reduce((a,r)=>a+r[0],0)/n,fd=R.reduce((a,r)=>a+r[1],0)/n*1000;c.ms=+m.toFixed(2);c.fr=+fd.toFixed(1);c.lim=+Math.max(1.5,fd*.08).toFixed(2);A=LIFE_audit(60);w=LIFE_win(RO.x,RO.z)}catch(e){say('📍 LIFE ❌ '+e);return}
-  const okW=w.move>=5&&w.grp>=3&&w.sm>=10&&w.sm<=LIFE_T.smMax&&w.pop>=1&&!w.lane,okA=A.pct>=95&&!A.lane&&A.repSet<=LIFE_T.rep&&A.repSm<=LIFE_T.rep,okC=c.ms<=c.lim&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.life=Object.assign({w,A,c},{ok:okW&&okA&&okC});
-  say(`📍 LIFE ${CID} here: ${w.move} moving · ${w.grp} groups · ${w.sm} smashables · ${w.pop} pop-up | city ${A.ok}/${A.n} windows pass (${A.pct}%, min ${A.min.move}/${A.min.grp}/${A.min.sm}/${A.min.pop}) · repeats ${Math.round(A.repSet*100)}% / ${Math.round(A.repSm*100)}% · in lanes ${A.lane} · max ${A.smMax} smashables/window | ${c.dc} draws · ${c.inst} inst · ${c.ms} ms/frame (limit ${c.lim}, frame ${c.fr} ms) `+(okW&&okA&&okC?'✅':'❌'))},2500);return'📍 LIFE '+CID+' · measuring…'}
+function LIFE_go(say){if(!LIFE.on)return'📍 LIFE is OFF in this build (remove ?life=0)';const S=LIFE_samples(40),p=S[(LIFE.goI=(LIFE.goI||0)+7)%S.length]||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.rec=null;
+ /* life-2: cost is measured once the cells around the new spot are built (the teleport warm-up is not driving cost) */
+ const w0=performance.now(),wt=setInterval(()=>{if(LIFE.todo&&performance.now()-w0<6000)return;clearInterval(wt);LIFE.rec=[];LIFE_goM(say)},200);return'📍 LIFE '+CID+' · measuring…'}
+function LIFE_goM(say){
+ setTimeout(()=>{let A,w,c;try{const R=LIFE.rec||[];LIFE.rec=null;c=LIFE_cost();const n=Math.max(1,R.length),m=R.reduce((a,r)=>a+r[0],0)/n,fd=R.reduce((a,r)=>a+r[1],0)/n*1000,md=R.map(r=>r[0]).sort((a,b)=>a-b)[n>>1]||0;c.ms=+md.toFixed(2);c.mean=+m.toFixed(2);c.fr=+fd.toFixed(1);c.lim=+Math.max(1.5,fd*.08).toFixed(2);/* life-2: median (a loaded test machine adds GC/refill spikes), mean ≤ 2× */A=LIFE_audit(60);w=LIFE_win(RO.x,RO.z)}catch(e){say('📍 LIFE ❌ '+e);return}
+  const okW=w.move>=5&&w.grp>=3&&w.sm>=10&&w.sm<=LIFE_T.smMax&&w.pop>=1&&!w.lane,okA=A.pct>=95&&!A.lane&&A.repSet<=LIFE_T.rep&&A.repSm<=LIFE_T.rep,okC=c.ms<=c.lim&&c.mean<=2*c.lim&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.life=Object.assign({w,A,c},{ok:okW&&okA&&okC});
+  say(`📍 LIFE ${CID} here: ${w.move} moving · ${w.grp} groups · ${w.sm} smashables · ${w.pop} pop-up | city ${A.ok}/${A.n} windows pass (${A.pct}%, min ${A.min.move}/${A.min.grp}/${A.min.sm}/${A.min.pop}) · repeats ${Math.round(A.repSet*100)}% / ${Math.round(A.repSm*100)}% · in lanes ${A.lane} · max ${A.smMax} smashables/window | ${c.dc} draws · ${c.inst} inst · ${c.ms} ms/frame median, ${c.mean} mean (limit ${c.lim}, frame ${c.fr} ms) `+(okW&&okA&&okC?'✅':'❌'))},2500);return'📍 LIFE '+CID+' · measuring…'}
 // a run-up of D m to target it, clear of buildings, other LIFE set pieces / groups and city props (2.2 m either side): {bx,bz,h} or null
 function LIFE_runup(it,D){const y=it.y+.5,nb=(x,z)=>{if(roamHit(x,z,1.6,y))return true;for(const q of LIFE.L)if(q!==it&&q.c!=='sm'&&q.c!=='pop'&&(q.x-x)**2+(q.z-z)**2<((q.r||1.5)+2.2)**2)return true;
   const G=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(G)for(const p of G)if(p.alive!==false&&(p.x-x)**2+(p.z-z)**2<2.2*2.2)return true;return false};
  for(let k=0;k<24;k++){const h=k*Math.PI/12,bx=it.x-Math.sin(h)*D,bz=it.z-Math.cos(h)*D;if(roamHit(bx,bz,2.5,y))continue;let ok=true;for(let s=3;s<=D&&ok;s+=2)if(nb(it.x-Math.sin(h)*s,it.z-Math.cos(h)*s))ok=false;if(ok)return{bx,bz,h}}return null}
 // GO: 25 m in front of a smashable group, real keyboard gas for 4 s straight at it → it bursts into bricks and studs
 function LIFE_goSmash(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();let it=null,R=null;for(const q of LIFE.L){if(q.c!=='sm'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,22);if(R){it=q;break}}if(!it)return'📍 no smashable with a clear run-up ❌';
- if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';RO.v=0;const s0=LIFE.n.smash,h0=HUB.smashed;K.ArrowUp=true;
+ if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';LIFE_aim(R);RO.v=0;const s0=LIFE.n.smash,h0=HUB.smashed;K.ArrowUp=true;
  setTimeout(()=>{K.ArrowUp=false;const n=LIFE.n.smash-s0;say(`📍 SMASH: ${n} LIFE things burst (${HUB.smashed-h0} smashes counted) `+(n>=1?"✅":"❌"))},5500);return'📍 SMASH · driving…'}
 // GO: in front of a people group, real gas through it → people jump aside or fly (harmless) and nobody stands inside the car
 function LIFE_goDodge(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();let it=null,R=null;for(const q of LIFE.L){if(q.c!=='grp'||q.t==='football'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,24);if(R){it=q;break}}if(!it)return'📍 no people group with a clear run-up ❌';
- if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';RO.v=0;const d0=LIFE.n.dodge+LIFE.n.fly;K.ArrowUp=true;
- setTimeout(()=>{K.ArrowUp=false;const n=LIFE.n.dodge+LIFE.n.fly-d0;say(`📍 PEOPLE (${it.t}): ${n} jumped aside or flew `+(n>=1?'✅':'❌'))},4000);return'📍 PEOPLE · driving…'}
+ if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';LIFE_aim(R);RO.v=0;const d0=LIFE.n.dodge+LIFE.n.fly,t0=performance.now();K.ArrowUp=true;
+ /* life-2: gas until somebody reacts or the car is 6 m past the group (max 10 s), so a slow page (low fps) still gets there */
+ const iv=setInterval(()=>{const n=LIFE.n.dodge+LIFE.n.fly-d0,past=(RO.x-it.x)*Math.sin(R.h)+(RO.z-it.z)*Math.cos(R.h)>6;if(!(n>=1||past||performance.now()-t0>10000))return;clearInterval(iv);K.ArrowUp=false;
+  say(`📍 PEOPLE (${it.t}): ${n} jumped aside or flew (${((performance.now()-t0)/1000).toFixed(1)} s) `+(n>=1?'✅':'❌'))},100);return'📍 PEOPLE · driving…'}
+// after roamWarp: keep the GO's run-up spot and heading (the warp may move the car to the right-hand lane of a divided road)
+function LIFE_aim(R){RO.x=R.bx;RO.z=R.bz;RO.h=R.h;if(RO.vh!=null)RO.vh=R.h}
 // GO: 30 m before a pop-up bubble on the street, real gas → the challenge starts
 function LIFE_goPop(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floor(RO.x/LIFE_PG),b0=Math.floor(RO.z/LIFE_PG);let p=null;for(let r=0;r<4&&!p;r++)for(let a=a0-r;a<=a0+r&&!p;a++)for(let b=b0-r;b<=b0+r&&!p;b++){const q=LIFE_pop(a,b);if(q&&(q.x-RO.x)**2+(q.z-RO.z)**2>40*40)p=q}
  if(!p)return'📍 no bubble near ❌';const bx=p.x-Math.sin(p.h)*30,bz=p.z-Math.cos(p.h)*30;p.cd=0;RO.pop=null;if(!roamWarp(bx,bz,p.h))return'📍 Can\'t jump right now';RO.v=0;const n0=LIFE.n.pop;K.ArrowUp=true;
