@@ -35,7 +35,8 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
     = phone-check + the change's `?scn=` GO scenario tests + look check; any failure blocks. NO game playing
     (owner: "don't play the game"): sweeps run only with `--full`, for engine/rules changes. The fast gate tests at
     phone size only (390×763); all sizes + LAB test run with `--full`. Max 2 deploys at once per machine (4 cores; 5 at once
-    pushed the load to 17 and 3D games render in software). The owner checks via the
+    pushed the load to 17 and 3D games render in software). A shared/shell change deploys ALL affected games in ONE `build-all.py --deploy a b c ...` call (one build,
+    scenarios run in parallel), never game by game (owner, 14 Oct 2026: "extremely slow"). The owner checks via the
     ✔ Test checklist scenarios (one tap each), not by playing whole games.
   - The owner's bug reports go first into the fixer's brief, then into the sweep.
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
