@@ -373,6 +373,20 @@ function hubFacadeTex(kind){const W=256,H=256,[c,g]=cv(W,H),r=mul(kind.length*97
       for(let b=0;b<3;b++){const x=b*85+6,sh=r();g.fillStyle=sh<.4?'#3d5a6e':'#2a3a48';g.fillRect(x,y+12,34,40);g.fillRect(x+40,y+12,34,40);if(sh>.62){g.fillStyle=['#ece4d0','#c8b48a','#a8bcae','#d8c8a8'][Math.floor(r()*4)];g.fillRect(x,y+12,34,40)}
         g.fillStyle='rgba(255,255,255,.28)';g.fillRect(x,y+12,74,3);g.fillStyle='#59636b';g.fillRect(x-5,y+34,84,2.5);for(let k=0;k<13;k++)g.fillRect(x-5+k*7,y+34,1.5,18);
         if(r()<.4){const c2=['#3f8a4a','#e8822a','#2f7fd0'][Math.floor(r()*3)];for(let k=0;k<8;k++){g.fillStyle=k%2?c2:'#f4f4f0';g.beginPath();g.moveTo(x-3+k*10,y+4);g.lineTo(x+7+k*10,y+4);g.lineTo(x+9+k*10,y+18);g.lineTo(x-1+k*10,y+18);g.fill()}}}}}
+  // art-3 (BV): more Athens facades so one street is not one tower repeated. poly2 ribbon windows + rail bands (1970s), poly3 tall shuttered
+  // French windows (roll shutters half down, colour per window), poly4 stone-tile cladding, square windows, flower boxes; neo2 arched windows
+  else if(kind==='poly2'){g.fillStyle='#ffffff';g.fillRect(0,0,W,H);for(let f=0;f<4;f++){const y=f*64;g.fillStyle='#2e4250';g.fillRect(0,y+14,W,30);g.fillStyle='rgba(255,255,255,.22)';g.fillRect(0,y+14,W,4);
+      g.fillStyle='#e9ecef';for(let x=0;x<W;x+=48)g.fillRect(x,y+14,4,30);g.fillStyle='#cfd3d6';g.fillRect(0,y+44,W,14);g.fillStyle='#6a747a';g.fillRect(0,y+44,W,2);for(let x=0;x<W;x+=6)g.fillRect(x,y+44,1.5,14);
+      if(r()<.5){const ac=['#2f7fd0','#3f8a4a','#e8822a','#c8302a'][Math.floor(r()*4)],x0=Math.floor(r()*3)*85;for(let k=0;k<6;k++){g.fillStyle=k%2?ac:'#f4f4f0';g.fillRect(x0+k*12,y+6,12,10)}}}}
+  else if(kind==='poly3'){g.fillStyle='#ffffff';g.fillRect(0,0,W,H);for(let f=0;f<4;f++){const y=f*64;g.fillStyle='rgba(0,0,0,.08)';g.fillRect(0,y+58,W,6);
+      for(let b=0;b<4;b++){const x=b*64+14,sc=['#3f7a4a','#7a5a3a','#3a6a9a','#a8783a','#5a8a7a'][Math.floor(r()*5)],dn=r();g.fillStyle='#2a3640';g.fillRect(x,y+8,36,48);g.fillStyle=sc;g.fillRect(x,y+8,36,48*dn*.9);
+        g.fillStyle='rgba(0,0,0,.18)';for(let k=0;k<48*dn*.9;k+=4)g.fillRect(x,y+8+k,36,1);g.fillStyle='#f4efe4';g.fillRect(x-3,y+5,42,4);g.fillStyle='#555d63';g.fillRect(x-4,y+44,44,2);for(let k=0;k<9;k++)g.fillRect(x-4+k*5.4,y+44,1.2,12)}}}
+  else if(kind==='poly4'){g.fillStyle='#ffffff';g.fillRect(0,0,W,H);for(let y=0;y<H;y+=16)for(let x=(y/16%2)*16;x<W;x+=32){const v=225+r()*30|0;g.fillStyle=`rgb(${v},${v-8},${v-20})`;g.fillRect(x,y,31,15)}
+    for(let f=0;f<4;f++){const y=f*64;for(let b=0;b<3;b++){const x=b*85+22;g.fillStyle='#f6f2ea';g.fillRect(x-4,y+10,48,40);g.fillStyle='#34444e';g.fillRect(x,y+14,40,32);g.fillStyle='#f6f2ea';g.fillRect(x+19,y+14,2,32);
+        g.fillStyle='#7a4a2a';g.fillRect(x-2,y+48,44,6);for(let k=0;k<6;k++){g.fillStyle=['#d8302a','#f28ac0','#ffd12c','#3f8a2e'][Math.floor(r()*4)];g.fillRect(x+k*7,y+44,5,5)}}}}
+  else if(kind==='neo2'){g.fillStyle='#ffffff';g.fillRect(0,0,W,H);for(let f=0;f<4;f++){const y=f*64;g.fillStyle='rgba(0,0,0,.09)';g.fillRect(0,y+60,W,4);g.fillStyle='rgba(255,255,255,.8)';g.fillRect(0,y+56,W,4);
+      for(let b=0;b<4;b++){const x=b*64+18;g.fillStyle='#faf6ec';g.beginPath();g.arc(x+14,y+22,19,Math.PI,0);g.fill();g.fillRect(x-5,y+22,38,32);g.fillStyle='#2f3f4a';g.beginPath();g.arc(x+14,y+22,14,Math.PI,0);g.fill();g.fillRect(x,y+22,28,30);
+        g.fillStyle='#faf6ec';g.fillRect(x+13,y+8,2,44);g.fillStyle=['#c8643c','#3f6a4a','#55707e'][Math.floor(r()*3)];if(r()<.5){g.fillRect(x-10,y+12,9,40);g.fillRect(x+29,y+12,9,40)}}}}
   else if(kind==='neo'){g.fillStyle='#ffffff';g.fillRect(0,0,W,H);for(let f=0;f<4;f++){const y=f*64;g.fillStyle='rgba(0,0,0,.1)';g.fillRect(0,y+60,W,4);g.fillStyle='rgba(255,255,255,.75)';g.fillRect(0,y+56,W,4);
       for(let b=0;b<4;b++){const x=b*64+18;g.fillStyle='rgba(0,0,0,.07)';g.fillRect(b*64,y,4,64);g.fillStyle='#34444e';g.fillRect(x,y+12,28,40);g.fillStyle='#faf6ec';g.fillRect(x-5,y+6,38,6);g.fillRect(x+13,y+12,2,40);
         g.fillStyle=r()<.5?'#3f6a4a':'#55707e';if(r()<.65){g.fillRect(x-10,y+12,10,40);g.fillRect(x+28,y+12,10,40)}}if(f<3){g.fillStyle='#3a3a3a';g.fillRect(12,y+46,104,2);g.fillRect(140,y+46,104,2);for(let k=0;k<26;k++){g.fillRect(12+k*4,y+46,1,10);g.fillRect(140+k*4,y+46,1,10)}}}}
@@ -387,6 +401,10 @@ function hubWinEm(kind){const W=256,H=256,[c,g]=cv(W,H),r=mul(kind.length*131);g
   else if(kind==='grund'){for(let y=0;y<H;y+=64)for(let x=12;x<W;x+=42)if(r()<.5){g.fillStyle=lit();g.fillRect(x,y+12,18,34)}}
   else if(kind==='poly'){for(let f=0;f<4;f++)for(let b=0;b<3;b++)for(let k=0;k<2;k++)if(r()<.3){g.fillStyle=lit();g.fillRect(b*85+6+k*40,f*64+12,34,40)}}
   else if(kind==='neo'){for(let f=0;f<4;f++)for(let b=0;b<4;b++)if(r()<.35){g.fillStyle=lit();g.fillRect(b*64+18,f*64+12,28,40)}}
+  else if(kind==='poly2'){for(let f=0;f<4;f++)for(let x=0;x<W;x+=48)if(r()<.3){g.fillStyle=lit();g.fillRect(x+4,f*64+14,44,30)}}
+  else if(kind==='poly3'){for(let f=0;f<4;f++)for(let b=0;b<4;b++)if(r()<.35){g.fillStyle=lit();g.fillRect(b*64+14,f*64+30,36,26)}}
+  else if(kind==='poly4'){for(let f=0;f<4;f++)for(let b=0;b<3;b++)if(r()<.35){g.fillStyle=lit();g.fillRect(b*85+22,f*64+14,40,32)}}
+  else if(kind==='neo2'){for(let f=0;f<4;f++)for(let b=0;b<4;b++)if(r()<.35){g.fillStyle=lit();g.fillRect(b*64+18,f*64+22,28,30)}}
   else if(kind==='plaka'){for(let f=0;f<4;f++)for(let b=0;b<3;b++)if(r()<.45){g.fillStyle=lit();g.fillRect(b*85+28,f*64+18,26,28)}}
   else if(kind==='shop'){for(let y=0;y<H*.6;y+=40)for(let x=8;x<W;x+=40)if(r()<.45){g.fillStyle=lit();g.fillRect(x,y+8,26,22)}for(let x=0;x<W;x+=64){g.fillStyle=['#ffe0a0','#a0e8ff','#ffb0e0'][(x/64)%3];g.fillRect(x+6,H*.74,52,H*.22)}}
   const t=tex(c);KEEP_TEX.add(t);return t}

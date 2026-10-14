@@ -29,3 +29,11 @@ function BV_go(){const N=HUB.nodes||[];let best=null,bn=-1;for(let i=0;i<N.lengt
   setTimeout(()=>{const m=BV_measure(RO.x,RO.z,600),a=BV_measure(0,0,1e6);m.city=a;m.pass=BV.pass(m)&&BV.pass(a);BV.last=m;try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · same look ≤100 m ${m.repeat}% (city ${a.repeat}%) · blocks with ≥3 facades ${m.blk3}% (city ${a.blk3}%) · ${a.variants} looks`,5)}catch(e){}},1500);
   return'📍 BUSIEST STREET · measuring building variety'}
 window.__bv={BV,measure:BV_measure,go:BV_go,list:BV_list,near:BV_near};
+// Athens roofs (called from athBuildG put for poly): garden = green roof plate + planters + pergola; tank = the Greek rooftop solar water
+// heaters (tilted dark-blue panel + white tank, 1-3 per roof); pent = penthouse (CE_dec builds it); flat = parapet + antenna only
+function BV_roof(E,U,x,z,ry,h,L){const{w,d}=U,r=BV_h(x,z,11);
+  if(U.rf==='terr'){const[gx,gz]=L(0,0);E('box',gx,h+.7,gz,ry,w*.6,.14,d*.5,0xf2eee6);for(const[a,b]of[[-1,-1],[1,-1],[-1,1],[1,1]]){const[qx,qz]=L(a*w*.28,b*d*.22);E('box',qx,h+.6,qz,ry,.18,2,.18,0xf2eee6)}const[px,pz]=L(w*.3,d*.3);E('box',px,h+.7,pz,ry,1.2,.9,1.2,0x3f8a30)}
+  else if(U.rf==='garden'){E('box',x,h+.5,z,ry,w-1.2,.18,d-1.2,0x5a9a3e);for(let i=0;i<3;i++){const[px,pz]=L((i-1)*w*.28,(BV_h(x,z,12+i)-.5)*d*.5);E('box',px,h+.68,pz,ry,1.6,.9,1.6,i%2?0x3f8a30:0x62b848)}
+    const[gx,gz]=L(w*.2,-d*.2);E('box',gx,h+2.6,gz,ry,w*.35,.14,d*.3,0xf2eee6);for(const[a,b]of[[-1,-1],[1,-1],[-1,1],[1,1]]){const[qx,qz]=L(w*.2+a*w*.16,-d*.2+b*d*.13);E('box',qx,h+.6,qz,ry,.18,2,.18,0xf2eee6)}}
+  else if(U.rf==='tank'){const n=1+Math.floor(r*3);for(let i=0;i<n;i++){const[tx,tz]=L((i-(n-1)/2)*3.2,-d*.15);E('box',tx,h+.6,tz,ry,2.2,.12,1.6,0x24406a);E('box',tx,h+.7,tz,ry,.08,1,.08,0x8a8a8a);
+    const[cx,cz]=L((i-(n-1)/2)*3.2,-d*.15-1.3);E('box',cx,h+1.4,cz,ry,1.9,.75,.75,0xf4f4f0)}}}
