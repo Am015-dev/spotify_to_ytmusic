@@ -28,11 +28,12 @@ const BX_WORLDS={
   return Math.min(Math.max(2+.8*Math.sin(x/23)*Math.cos(z/19),m),bxBowl(x,z,-95,-85,45,-4))}},
  canyon:{n:'CANYON',f:(x,z)=>{const cz=48*Math.sin(x/46),d=Math.abs(z-cz)*Math.cos(Math.atan(48/46*Math.cos(x/46))),pl=18+1.2*Math.sin(x/17)*Math.cos(z/21);
   if(d>32)return pl;if(d>22)return 2+(pl-2)*bxSS((d-22)/10);return d<7?2-5*bxSS(1-d/7):2}},
- city:{n:'CITY',f:(x,z)=>Math.min(2,bxBowl(x,z,70,-75,40,-4))},
+ city:{n:'CITY',f:(x,z)=>Math.min(2,bxBowl(x,z,-140,bxCl(z,-14,70),22,-4))},
  islands:{n:'ISLANDS',f:(x,z)=>{const b=(cx,cz,r,h)=>{const d=Math.hypot(x-cx,z-cz);return d<r?-5+(h+5)*bxSS(1-d/r):-5};return Math.max(b(-10,0,85,4),b(-95,85,45,12),b(100,90,50,7),b(90,-100,40,16))}}
 };
-const BX_CITY=[[-56,-40,18,18,22,'#c91a09'],[-24,-40,14,18,14,'#f2cd37'],[24,-40,18,14,30,'#0055bf'],[56,-40,14,14,18,'#a0a5a9'],[-56,40,16,16,26,'#237841'],
- [-20,40,18,16,12,'#fe8a18'],[20,40,16,18,34,'#e4cd9e'],[56,40,14,16,16,'#c91a09'],[-110,0,20,20,20,'#0055bf'],[110,10,16,24,24,'#f2cd37']];
+// trk-2: blocks stand in the TWO-LEVEL CITY infields (inner loop, north row, south row), clear of every lane (tools/bx/plan.js: bldg hits 0)
+const BX_CITY=[[34,-44,18,18,22,'#c91a09'],[72,-44,14,18,14,'#f2cd37'],[34,32,18,14,30,'#0055bf'],[74,26,14,14,18,'#a0a5a9'],[-80,-112,16,16,26,'#237841'],
+ [-30,-112,18,16,12,'#fe8a18'],[30,-112,16,18,34,'#e4cd9e'],[90,-112,14,16,16,'#c91a09'],[-50,96,20,20,20,'#0055bf'],[20,96,16,24,24,'#f2cd37']];
 function BX_world(w){BX.world=BX_WORLDS[w]?w:'valley';const f=BX_WORLDS[BX.world].f;for(let b=0;b<BXTN;b++)for(let a=0;a<BXTN;a++)BX.th[b*BXTN+a]=f(BXO+a*BXR,BXO+b*BXR);
  BX.bld=BX.world==='city'?BX_CITY.map(([x,z,w,d,h,c])=>({x,z,w,d,h,c,y:BX_h(x,z)})):[]}
 function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.floor((x-R-BXO)/BXR)),a1=Math.min(BXTN-1,Math.ceil((x+R-BXO)/BXR)),b0=Math.max(0,Math.floor((z-R-BXO)/BXR)),b1=Math.min(BXTN-1,Math.ceil((z+R-BXO)/BXR)),T=BX.th,o=T.slice();
@@ -449,7 +450,7 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
-const BX_DEMOS_SHOW=true,BX_RACE_LAPS=2; // trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (TWO-LEVEL CITY until its redo). Races are 2 laps (coordinator)
+const BX_DEMOS_SHOW=true,BX_RACE_LAPS=2; // trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)
 function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
  b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 2 laps</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
  b.onclick=e=>{e.stopPropagation();BX_open();BX_load(BX_DEMOS[k],k);BX.camGo=1;BX.seenAll=new Set();BX_driveStart()};tw.appendChild(b)}}
@@ -468,10 +469,10 @@ Object.assign(BX_DEMOS,{
  'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf','st','st','kj',...bxRep('st',3),'cp',...bxRep('st',6),'kj',...bxRep('st',10),'wbr','st','wbr',
   'su','st','su','st','cp',...bxRep('st',8),'wbl','st','wbl','lu','su','bo',...bxRep('st',5),'kj',...bxRep('st',6),'wbr',...bxRep('st',5),'wbr',
   'st','st','sd','sd','cp','sd','ld','wbr','bo','fk',1,'wbr','st','wbl','st','wbl','st','wbr',0,...bxRep('st',7),'kj',...bxRep('st',11),'mg','st','wbr'])},
- // city figure-8: boat ramp across the lake -> up onto the 14 m bridge -> down -> between the blocks (kicker) -> under the bridge -> back to the lake
- 'TWO-LEVEL CITY':{log:bxCh('city',[29,6,1,0],['fk',1,'dn',[28,13,-1,0],'up',0,...bxRep('st',8),'mg','su','up',...bxRep('st',4),'cp',...bxRep('st',2),'wbr','sf','st','st','sd','dn',...bxRep('st',6),'wbr',
-  'bo',...bxRep('st',5),'kj',...bxRep('st',8),'kj',...bxRep('st',8),'wbr',...bxRep('st',9),'wbr',...bxRep('st',7),'kj',...bxRep('st',8),'wbl',...bxRep('st',4),'cp',...bxRep('st',4),'wbl',
-  'bo',...bxRep('st',8),'kj',...bxRep('st',10),'wbl','wbl']),hide:1},
+ // city (trk-2 redo): the lagoon snail turned 180° on city ground. Start high on the 10 m viaduct, down over the inner loop (two levels),
+ // SPLIT by the lake: the straight lane splashes down into the lake (boat) and up the far ramp, the other lane is the causeway; blocks fill the infields
+ 'TWO-LEVEL CITY':{log:bxCh('city',[26,37,5,1],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','wbl','st','st','st','wbl','wbr',0,'dn',[2,18,-1,2],'up',...bxRep('st',6),'mg',
+  'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',5),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',6),'wbr','su',...bxRep('st',13),'wbr'])},
  // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
  'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','wbl','st','st','st','wbl','wbr',0,...bxRep('st',21),'mg',
   'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',5),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',6),'wbr','su',...bxRep('st',13),'wbr'])},

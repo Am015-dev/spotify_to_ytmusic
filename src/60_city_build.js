@@ -15,7 +15,9 @@ function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1
     let n=1,f=cs,Q=null;if(rivClear(cx,cz)<Math.hypot(dx,dz)/2+o.fine*1.5){n=Math.ceil(dx/o.fine);f=o.fine;if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}
     const k=o.cls(cx,cz),key=k+'|'+Math.floor((cx-x0)/o.tile)+'|'+Math.floor((cz-z0)/o.tile);let G=B.get(key);if(!G)B.set(key,G={k,p:[],u:[],c:[],n:[],i:[],m:new Map()});
     for(const[lx,lz,lw,lh,ln,sn]of Q||[[ax,az,dx,dz]]){if(Q){n=ln||1;f=lw/n}
-    const V=[],sx=lw/n,sz=lh/n;for(let a=0;a<=n;a++)for(let b=0;b<=n;b++)V.push(n>1||sn?gndVert(lx+a*sx,lz+b*sz,o.y0,f):[lx+a*sx,o.y0+tH(lx+a*sx,lz+b*sz)-ART8_dip(lx+a*sx,lz+b*sz),lz+b*sz,0]);
+    const V=[],sx=lw/n,sz=lh/n;for(let a=0;a<=n;a++)for(let b=0;b<=n;b++){const vx=lx+a*sx,vz=lz+b*sz;
+      // hot-1: a quadtree corner already in this group's vertex map is re-used below without reading its height: skip its ground samples (same mesh, ~30% fewer TR_Y calls)
+      V.push(n>1||sn?gndVert(vx,vz,o.y0,f):Q&&G.m.has(Math.round(vx*16)+','+Math.round(vz*16))?[vx,0,vz,0]:[vx,o.y0+tH(vx,vz)-ART8_dip(vx,vz),vz,0])}
     const ix=[];for(const v of V){const kk=Q?Math.round(v[0]*16)+','+Math.round(v[2]*16):null;if(kk!==null&&G.m.has(kk)){ix.push(G.m.get(kk));continue}ix.push(G.p.length/3);if(kk!==null)G.m.set(kk,G.p.length/3);G.p.push(v[0],v[1],v[2]);G.u.push(v[0]/o.uv,v[2]/o.uv);if(o.col){const c=o.col(v[0],v[2]);G.c.push(c.r,c.g,c.b)}
       if(v[3])G.n.push(0,1,0);else{const e=2,hx=tH(v[0]+e,v[2])-tH(v[0]-e,v[2]),hz=tH(v[0],v[2]+e)-tH(v[0],v[2]-e),l=Math.hypot(hx,2*e,hz);G.n.push(-hx/l,2*e/l,-hz/l)}}
     for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}}
