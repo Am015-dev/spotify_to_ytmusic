@@ -94,6 +94,8 @@ svg{display:block}
 .gx-dock .gx-ibtn{color:var(--ink);background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.2)}
 #dockbody>*{flex-shrink:0}
 #promptDock{min-height:2.7em}
+/* one instruction line: while a tip bubble is up, the top line steps aside (board-first rule) */
+html:has(.gxh-bub.on) #prompt{visibility:hidden}
 #prompt.mine{color:#b5361c}
 #rt{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px}
 #rt svg{flex:0 0 auto}
