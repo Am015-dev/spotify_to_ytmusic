@@ -17,6 +17,9 @@
     return GXS.wait(function () { return UI.started && G.phase === 'assign' && $('#pool .jcard') && $('#hand .card, #hand > *') && !UI.busy && !UI.cards.length; }, 12000).then(function () { return idle(1200); });
   }
 
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); }); };
+
   GXS.add({
     id: 'ld-board', name: 'Start of game board', ask: 'Are the jobs and your hand clear?', seed: 5, when: booted,
     setup: function () { return table(5); },

@@ -17,6 +17,14 @@
     return GXS.wait(function () { return G && G.step === 'place' && myTurn('place') && document.querySelectorAll('#world .glow').length && !UI.tw; }, 12000).then(function () { return idle(1000); });
   }
 
+  // 'board' surface of ?scn=menu: the real play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () {
+    if (!booted()) return;
+    AIDELAY = 60; beginGame({ np: 2, seats: ['human', 'ai'], lv: ['normal', 'normal'], ex: {}, seed: 51 });
+    try { GXH.reset(); GXH.setEnabled(true); } catch (e) { }
+    return GXS.wait(function () { return G && G.step === 'place' && document.querySelectorAll('#world .glow').length; }, 12000).then(function () { return idle(800); });
+  };
+
   GXS.add({
     id: 'rv-board', name: 'Start of game board', ask: 'Is the table clear with glowing spots?', seed: 7, when: booted,
     setup: function () { return table(7); },

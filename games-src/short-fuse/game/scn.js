@@ -18,6 +18,8 @@
       return GXS.wait(function () { return !UI.brief && $('#mine .tile.glow'); }, 10000);
     }).then(function () { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } return idle(1500); });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; return table(51).then(function () { try { GXH.setEnabled(true); } catch (e) { } try { render(); } catch (e) { } return idle(600); }); };
   var cuts = function () { return G.st.reduce(function (a, s) { return a + s.w.filter(function (x) { return x.cut; }).length; }, 0); };
   var total = function () { return G.st.reduce(function (a, s) { return a + s.w.length; }, 0); };
 

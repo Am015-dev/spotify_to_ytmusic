@@ -16,6 +16,8 @@
     return GXS.wait(function () { return G && G.phase === 'bid' && $('#acts .sp-b.glow') && !UI.modal; }, 12000).then(function () { return idle(1200); });
   }
 
+  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); }); };
+
   GXS.add({
     id: 'sq-board', name: 'Start of game board', ask: 'Is the bazaar clear and filled?', seed: 5, when: booted,
     setup: function () { return table(5); },

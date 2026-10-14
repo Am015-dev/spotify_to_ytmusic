@@ -3,6 +3,8 @@
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof schedule === 'function' && typeof UI !== 'undefined'; };
   var q = function (s) { var b = document.querySelector(s); return b && !b.disabled && (b.offsetParent || getComputedStyle(b).position === 'fixed') && b.getBoundingClientRect().width > 3 ? b : null; };
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; window.AIDELAY = 400; try { GXH.setEnabled(true); } catch (e) { } newGame('vs', {}); var n = 0, iv = setInterval(function () { prepFix(); if (q('.bagb:not(.off)') || ++n > 40) clearInterval(iv); }, 250); };
   // a plain 3-player game against the computer, coach off, then tap through (draw / stop / continue) until the market of day 2 opens
   function toMarket() {
     try { GXH.setEnabled(false); } catch (e) { }
