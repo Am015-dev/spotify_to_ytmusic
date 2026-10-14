@@ -136,4 +136,25 @@
       { kind: 'fn', name: 'no mesh is missing the texture its siblings have', fn: function () { if (!V3.on || !V3.scene) return true; var g = {}; V3.scene.traverse(function (m) { if (!m.isMesh || !m.visible) return; [].concat(m.material).forEach(function (mt) { if (!mt || mt.type === 'ShaderMaterial') return; var k = m.geometry.type + '|' + mt.type; var o = g[k] = g[k] || { y: 0, n: 0 }; if (mt.map) o.y++; else o.n++; if (mt.map && mt.map.image && !(mt.map.image.width > 0)) o.f = 1; }); }); var bad = Object.keys(g).filter(function (k) { return g[k].f || (g[k].y > 3 && g[k].n > 0 && g[k].n < 2 && /^ExtrudeGeometry\|MeshPhysical/.test(k)); }); return !bad.length || 'texture missing: ' + bad.join(', '); } }
     ]
   });
+
+  // the Guide controls, tapped for real through the Menu drawer (14 Oct 2026: "Guide does not work")
+  GXS.add({
+    id: 'sg-guide', name: 'Guide: switch it on and learn the rules', ask: 'Does Guide do something you can see?', seed: 5, sizes: 'pc', when: booted,
+    setup: function () {
+      return table(5).then(function () {
+        try { GXT.reset(TUT_GAME); } catch (e) { }
+        UI.coach = false; render();
+        GXS.click('[data-gx="menud"]'); return idle(500);
+      }).then(function () { GXS.click('#coachbtn'); return idle(500); }).then(function () {
+        window.__coachSeen = { coach: UI.coach, open: GX.open, label: $('#coachbtn').textContent, note: !!document.querySelector('.gx-dock .small, .coach') };
+        GXS.click('[data-gx="menud"]'); return idle(400);
+      }).then(function () { GXS.click('#tutbtn'); return GXS.wait(function () { var s = GXT.state(); return s.active && s.shown; }, 8000); }).then(function () { window.__tutFirst = GXT.state(); var ids = tutSteps().map(function (x) { return x.id; }); GXT.goto(ids[ids.length - 1]); return GXS.wait(function () { var s = GXT.state(); return s.active && s.i === ids.length - 1; }, 8000).then(function () { var s = GXT.state(); window.__tutLast = s; try { GXT.stop(); } catch (e) { } try { tutLeave(); } catch (e) { } UI.modal = null; refresh(); return idle(500); }); });
+    },
+    checks: [
+      { kind: 'fn', name: 'Guide button turns the guide on and closes the Menu', fn: function () { var c = window.__coachSeen || {}; return (c.coach === true && c.open === null) || 'coach ' + c.coach + ', drawer ' + c.open; } },
+      { kind: 'fn', name: 'Guide button says on/off', fn: function () { return /Guide: on/.test((window.__coachSeen || {}).label) || (window.__coachSeen || {}).label; } },
+      { kind: 'fn', name: 'first tutorial step shows', fn: function () { var s = window.__tutFirst || {}; return (s.active && s.i === 0 && s.shown) || 'first step not shown'; } },
+      { kind: 'fn', name: 'last tutorial step shows', fn: function () { var s = window.__tutLast || {}; return (s.active && s.i === s.n - 1) || 'last step not reached'; } }
+    ]
+  });
 })();
