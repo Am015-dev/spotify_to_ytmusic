@@ -63,7 +63,11 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
    if(!roamWarp(q[0],q[1],q[2])&&!(MX.rst()&&roamWarp(q[0],q[1],q[2])))fails.push('roam-warp-refused');
    else{
     const touch=prof!=='desktop';TOUCH.on=touch;TOUCH.used=touch;TOUCH.gas=false;TOUCH.brake=false;for(const k in K)K[k]=false;
-    if(prog)roamStep(1/120);/* the 10 ms world step is only needed for the gas test; pose/camera/tyre state needs none (same findings, 9x faster) */for(let i=0;i<3;i++)roamPose(pl,.25);camSnap=true;roamCam(1/60)
+    if(prog)roamStep(1/120);/* the 10 ms world step is only needed for the gas test; pose/camera/tyre state needs none (same findings, 9x faster) */
+    if(typeof RO_clearRamps==='function'&&RO_clearRamps())RO.y=groundAt(RO.x,RO.z,RO.y+3); // cam-3: a start overlapping a street ramp / jump-ramp gap steps out, like roamWarp's post-warp clear
+    // cam-3: a start on a >35 % slope (1.6 m rise over the wheelbase) is a cliff, not a street start: the rigid body + ±0.2 m wheel travel cannot sit on it. Counted, not failed.
+    {const fx=Math.sin(RO.h),fz=Math.cos(RO.h),sl=(groundAt(RO.x+fx*2.5,RO.z+fz*2.5,RO.y+4)-groundAt(RO.x-fx*2.5,RO.z-fz*2.5,RO.y+4))/5;if(Math.abs(sl)>.35){MX.steep=(MX.steep||0)+1;return{fails:[],ms:performance.now()-t0}}}
+    for(let i=0;i<3;i++)roamPose(pl,.25);camSnap=true;roamCam(1/60)
     const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
     {const r=rfSnap(RO.x,RO.z,60);if(!r)fails.push('roam-off-road-at-start');else{const a=ang(fx,fz,Math.sin(r[2]),Math.cos(r[2]));if(a>20&&a<160){const f=fillAt(RO.x,RO.z),a2=f&&f.d<f.r.w/2+6?ang(fx,fz,f.r.ux,f.r.uz):999;/* a filler street under the car counts too (rfSnap prefers a city road up to 60 m away) */if(!(a2<=20||a2>=160))fails.push('roam-heading-vs-road')}}}
     if(SC_hit(RO.x,RO.z,RO.y))fails.push('roam-start-inside-wall');
