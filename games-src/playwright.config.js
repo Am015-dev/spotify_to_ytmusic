@@ -1,6 +1,6 @@
 // Standard Playwright Test config for the ?scn= scenario tests (scripts/scenarios.spec.js) and the axe look check (scripts/look.spec.js).
 //   node_modules/.bin/playwright test [--project phone|phone-s|pc] [--grep <scn-id>]      env: SCN_SLUGS=a,b (games), GX_URL (build-all sets it), JOBS (workers)
-// "phone" (390x763) is the fast gate; "phone-s" (375x553) and "pc" (1366x768) only run with --full (build-all passes --project accordingly).
+// "phone" (390x763) is the fast gate; "phone-s" (375x553), "tablet" (768x1024), "pc" (1366x768), "wide" (1920x1080) run with --full or --project (build-all passes --project accordingly).
 const { defineConfig } = require('@playwright/test');
 const { execFileSync } = require('child_process');
 const path = require('path');
@@ -19,7 +19,9 @@ module.exports = defineConfig({
   projects: [
     { name: 'phone', use: phone(390, 763) },
     { name: 'phone-s', use: phone(375, 553) },
+    { name: 'tablet', use: { viewport: { width: 768, height: 1024 }, hasTouch: true } },
     { name: 'pc', use: { viewport: { width: 1366, height: 768 } } },
+    { name: 'wide', use: { viewport: { width: 1920, height: 1080 } } },
   ],
-  webServer: external ? undefined : { command: `node scripts/gx-serve.js ${process.env.GX_STAGE || '.staging'} ${PORT}`, port: PORT, reuseExistingServer: true },
+  webServer: external ? undefined : { command: `node scripts/gx-serve.js ${process.env.GX_STAGE || '.staging'} ${PORT}`, port: PORT, reuseExistingServer: false },
 });
