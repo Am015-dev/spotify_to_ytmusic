@@ -271,3 +271,6 @@ Measured 390x763, build only, all 15 games, 5-14 s per game (limit 60 s):
 | **total** | | 231 | 2 | 57 | 105 | 8 | 3 | **406** |
 
 Known weak: 'frame art' on small icon buttons (gx-ibtn svg 4 px) may be a sub-pixel icon box, not a visible fault; 'not topmost' on the campaign map ('2' disc under Back) is real overlap; board checks for 14 games wait for their boardOpen hook.
+## Doorkick menu/board fixes (14 Oct 2026, owner's phone screenshots)
+Fixed + scenarios `dk-menu-rows`, `dk-hand-names`, `dk-gear-up` (mutants 100%). Menu rows now have 24px side room, Tips rows framed like the others, menu bottom padding; hand names fit the visible strip (tbl.js tbFan); gear-up line is ONE line ("Tap or drag glowing cards onto your hero", tap-then-tap verified by a real-tap check; the setup tip bubble and board caption were removed); Lv and treasure badges moved inside; rival chips say "str"/"gear"; hero portrait fallback uses the painted camp-*.webp for every seat.
+Not ours: the dark "❮" edge tab and round back arrow are the iPhone browser's edge-swipe hints (no such element in the DOM; scenario checks it). Still to check by the owner on a real iPhone: bottom of the menu (Safari toolbar).

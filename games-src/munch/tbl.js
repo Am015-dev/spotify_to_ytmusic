@@ -9,8 +9,10 @@ function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;co
   let w=w0;if(n>1){const fit=avail-44*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
   const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<44,step=sc?44:Math.min(w*.8,need);
   if(w!==w0){hd.style.setProperty('--hw',w.toFixed(1)+'px')}
-  hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');
-  hd.classList.toggle('scrolls',sc)}
+  hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');hd.style.setProperty('--vis',(step-2).toFixed(1)+'px');
+  hd.classList.toggle('scrolls',sc);
+  // each name sits on the visible strip of its card (the next card covers the rest): shrink the type until no word is cut
+  cs.forEach((c,k)=>{const n=c.querySelector('.cn');if(!n)return;n.style.fontSize='';if(k===cs.length-1)return;let fs=parseFloat(getComputedStyle(n).fontSize)||8;for(let i=0;i<10&&n.scrollWidth>n.clientWidth+.5&&fs>5.5;i++){fs-=.5;n.style.fontSize=fs+'px'}})}
 // bring an element into view inside its OWN sideways scroller (the hand, the gear row) and nothing else: scrollIntoView also scrolls the clipped
 // (overflow:hidden) table board sideways, which pushed the hand, the rival chips and the glow targets off the screen
 function dkReveal(e){for(let p=e&&e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX;if((o==='auto'||o==='scroll')&&p.scrollWidth>p.clientWidth+1){const r=e.getBoundingClientRect(),q=p.getBoundingClientRect();p.scrollLeft+=(r.left+r.width/2)-(q.left+q.width/2);return}}}
@@ -81,7 +83,7 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   if(typeof IS_JSDOM!=='undefined'&&IS_JSDOM)return;
   const R=document.documentElement;
   // seat and fight avatars: the hero's painted portrait (class art stays for unnamed heroes)
-  const _av=bfAv;bfAv=function(p,cls){return dkPortrait(p.nm,cls)||_av(p,cls)};
+  const _av=bfAv;bfAv=function(p,cls){return dkPortrait(p.nm,cls)||dkPortrait([...DK_PORT][p.i%DK_PORT.size],cls)||_av(p,cls)};
   function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
   // card backs: painted door/treasure backs; a campaign card-back unlock replaces the door back
   const _cb=cardBack;

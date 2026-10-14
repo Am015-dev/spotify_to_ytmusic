@@ -156,7 +156,7 @@ function bfLine(me){const s=sideToAct();if(!G||G.winner)return '';if(s<0)return 
   if(!mine){if(p.human)return 'Waiting for '+p.nm+'…';const cb=G.cb;if(cb&&cb.who!==s&&cb.help!==s)return p.nm+' may meddle in the fight…';return p.nm+'’s turn…'}
   if(G.q)return '';const vm=validMoves(me);const cardy=vm.some(m=>m.card!=null&&m.act!=='sell'&&!bfHarm(m)&&bfZone(m,me));const cb=G.cb;
   switch(G.phase){
-    case 'setup':return cardy?'Drag glowing cards onto your hero':'All set? Tap Ready';
+    case 'setup':return cardy?'Tap or drag glowing cards onto your hero':'All set? Tap Ready';
     case 'window':return cardy?'Curse '+curPl().nm+'? Drag a card on them':curPl().nm+' is about to kick the door';
     case 'main':return cardy?'Gear up, then kick the door!':'Kick the door!';
     case 'after':return vm.some(m=>m.act==='trouble'&&!bfHarm(m))?'Empty room: loot, or drag a monster in':'Empty room: tap Loot';
@@ -171,7 +171,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _arena=arenaHTML;arenaHTML=function(){const me=viewSeat();
     if(G&&!G.cb&&G.phase==='main'&&me>=0&&sideToAct()===me&&G.active===me&&P(me).human&&validMoves(me).some(m=>m.act==='kick')){UI.arRes=40;
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
-    if(G&&!G.cb&&G.phase==='setup'&&(me>=0&&P(me).human||G.mode==='ai'||me<0||curPl().i!==me)){const mineS=me>=0&&P(me).human&&sideToAct()===me;const p=mineS?P(me):curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">${mineS?'Gear up your hero!':esc(p.nm.split(/[ ,]/)[0])+' gears up…'}</div></div>`}
+    if(G&&!G.cb&&G.phase==='setup'&&(me>=0&&P(me).human||G.mode==='ai'||me<0||curPl().i!==me)){const mineS=me>=0&&P(me).human&&sideToAct()===me;const p=mineS?P(me):curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div>${mineS?'':`<div class="bfcap">${esc(p.nm.split(/[ ,]/)[0])} gears up…</div>`}</div>`}
     if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=132;
       return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}

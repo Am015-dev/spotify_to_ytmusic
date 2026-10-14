@@ -166,6 +166,105 @@
   var line = function () { var e = document.querySelector('#prompt .bfline'); return e ? e.textContent : ''; };
 
   // the short status line: one line of 8 words or fewer, on the glow it says what to drag or tap
+  // ---- owner's phone screenshots, 14 Oct 2026: menu rows, gear-up board ----
+  var clipMsg = function (e, nm) {   // '' when whole; else why not (screen edge or a clipping ancestor)
+    var r = e.getBoundingClientRect(); if (!r.width) return nm + ' has no box';
+    if (r.left < -1 || r.right > innerWidth + 1 || r.top < -1 || r.bottom > innerHeight + 1) return nm + ' leaves the screen (' + Math.round(r.left) + '..' + Math.round(r.right) + ' of ' + innerWidth + ')';
+    for (var p = e.parentElement; p && p !== document.documentElement; p = p.parentElement) {
+      var cs = getComputedStyle(p); if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+      var q = p.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1 || r.top < q.top - 1 || r.bottom > q.bottom + 1) return nm + ' is cut by <' + p.tagName.toLowerCase() + '.' + String(p.className).split(' ')[0] + '> (' + Math.round(r.left - q.left) + ',' + Math.round(r.top - q.top) + ' / ' + Math.round(q.right - r.right) + ',' + Math.round(q.bottom - r.bottom) + ' px in)';
+    }
+    return '';
+  };
+  var frameW = function (e) {   // left/right painted frame width (border-image-width), px
+    var w = getComputedStyle(e).borderImageWidth.split(' ').map(parseFloat); if (w.length === 1) return [w[0], w[0]]; if (w.length === 2) return [w[1], w[1]]; return [w[3], w[1]];
+  };
+  GXS.add({
+    id: 'dk-menu-rows', sizes: 'phone', name: 'Menu rows: text clear of the painted frame', ask: 'Do menu rows read cleanly?', ls: { dkd_offer: '1' }, seed: 31, when: booted, group: 'UI',
+    setup: function () { table(31); document.querySelector('[data-gx="dkMenu"]').click(); return GXS.wait(function () { var d = document.querySelector('#dkMenuBody .menu'); return d && GXS.vis(d); }, 5000).then(function () { return idle(700); }); },
+    mut: [
+      { name: 'row text under the frame', js: 'var st = document.createElement("style"); st.textContent = "#dkMenuBody .btn{padding-left:2px!important;padding-right:2px!important}"; document.head.appendChild(st)' },
+      { name: 'tips row unframed', js: 'var st = document.createElement("style"); st.textContent = "#dkMenuBody .mrow{border-image:none!important;margin-left:-10px!important}"; document.head.appendChild(st)' },
+      { name: 'last row cut at the bottom', js: 'var st = document.createElement("style"); st.textContent = "#dkMenuBody{padding-bottom:0!important}.gx-drawer-body{padding-bottom:0!important}"; document.head.appendChild(st)' }
+    ],
+    checks: [
+      { kind: 'visible', sel: '#dkMenuBody .menu', name: 'menu is open' },
+      { kind: 'fn', name: 'the painted skin is on', fn: function () { return document.documentElement.classList.contains('sk') || 'html.sk missing'; } },
+      { kind: 'fn', name: 'every framed row: first letter/icon and last letter are clear of the frame cap (>= 6 px)', fn: function () {
+        var bad = []; [].forEach.call(document.querySelectorAll('#dkMenuBody .menu>.btn, #dkMenuBody .mrow .btn'), function (b) {
+          if (!GXS.vis(b)) return; var cs = getComputedStyle(b), f = frameW(b), l = parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft), r = parseFloat(cs.borderRightWidth) + parseFloat(cs.paddingRight);
+          if (l < f[0] + 6 || r < f[1] + 6) bad.push('"' + b.textContent.trim().slice(0, 16) + '" room ' + l + '/' + r + ' < frame ' + f[0] + '/' + f[1] + '+6'); });
+        return bad.length ? bad.slice(0, 4).join('; ') : true; } },
+      { kind: 'fn', name: 'Tips rows are framed and inset like every other row', fn: function () {
+        var rows = [].slice.call(document.querySelectorAll('#dkMenuBody .mrow')).filter(GXS.vis), b0 = document.querySelector('#dkMenuBody .menu>.btn').getBoundingClientRect(); if (!rows.length) return 'no Tips rows';
+        for (var i = 0; i < rows.length; i++) { var r = rows[i].getBoundingClientRect(), cs = getComputedStyle(rows[i]);
+          if (cs.borderImageSource === 'none') return 'row "' + rows[i].textContent.trim().slice(0, 14) + '" has no painted frame';
+          if (Math.abs(r.left - b0.left) > 1.5 || Math.abs(r.right - b0.right) > 1.5) return 'row "' + rows[i].textContent.trim().slice(0, 14) + '" is ' + Math.round(r.left) + '..' + Math.round(r.right) + ' but the other rows are ' + Math.round(b0.left) + '..' + Math.round(b0.right);
+          var f = frameW(rows[i]), lab = rows[i].querySelector('span'); if (lab) { var lr = document.createRange(); lr.selectNodeContents(lab); if (lr.getBoundingClientRect().left < r.left + f[0] + 6) return 'label "' + lab.textContent.trim().slice(0, 12) + '" sits on the frame'; }
+          var kids = rows[i].querySelectorAll('.btn'); for (var k = 0; k < kids.length; k++) { var q = kids[k].getBoundingClientRect(); if (q.right > r.right - f[1] - 2) return '"' + kids[k].textContent.trim() + '" runs into the right frame/edge (' + Math.round(q.right) + ' > ' + Math.round(r.right - f[1] - 2) + ')'; if (kids[k].scrollWidth > kids[k].clientWidth + 1) return '"' + kids[k].textContent.trim() + '" is cut'; } }
+        return true; } },
+      { kind: 'fn', name: 'scroll to the end: the last row is whole, with room under it', fn: function () {
+        var sc = document.querySelector('#dkMenuBody').closest('.gx-drawer-body'), last = document.querySelector('#dkMenuBody .menu').lastElementChild; sc.scrollTop = sc.scrollHeight;
+        var r = last.getBoundingClientRect(), q = sc.getBoundingClientRect(); return (r.bottom <= q.bottom - 20 && r.bottom <= innerHeight - 20 && r.top >= q.top) || 'last row "' + last.textContent.trim().slice(0, 12) + '" ends at ' + Math.round(r.bottom) + ', panel ends at ' + Math.round(q.bottom) + ', screen ' + innerHeight; } },
+      { kind: 'fn', name: 'no floating tab/arrow of ours over the menu (the edge tab and round back arrow belong to the browser)', fn: function () {
+        var bad = [].slice.call(document.querySelectorAll('body *')).filter(function (e) { return /^[❮‹❯›]\s*$/.test(e.textContent) && GXS.vis(e) && !e.closest('.gx-x'); }); return !bad.length || 'floating <' + bad[0].tagName + '.' + bad[0].className + '>'; } }
+    ]
+  });
+
+  // the gear-up moment: your hero big in the middle, the hand fanned below
+  var gearUp = function (seed, longNames) {
+    table(seed); G.phase = 'setup'; G.active = 0; G.setupOrd = G.pl.map(function (_, j) { return j; }); G.setupI = 0;
+    if (longNames) {   // the cards from the owner's screenshot: names with long words
+      var want = ['Shady Cloak', 'Soothing Sousaphone', 'Shieldmaiden Champion']; want.forEach(function (n) { var id = Object.keys(G.C).map(Number).filter(function (i) { return cd(i).n === n; })[0]; if (id != null) { pull(id); P(0).hand.unshift(id); } });
+      P(0).hand = P(0).hand.slice(0, 8); window.__want = want.filter(function (n) { return P(0).hand.some(function (i) { return cd(i).n === n; }); });
+    }
+    render();
+  };
+  GXS.add({
+    id: 'dk-hand-names', sizes: 'phone', name: 'Hand card names readable', ask: 'Can you read every card name?', ls: { dkd_offer: '1' }, seed: 33, when: booted, group: 'Board',
+    setup: function () { gearUp(33, true); return GXS.wait(function () { return document.querySelectorAll('.mine .hand .card').length >= 6; }, 6000).then(function () { return idle(700); }); },
+    mut: [{ name: 'names run under the next card', js: 'var st = document.createElement("style"); st.textContent = "html.ph .mine .hand .card .cn{width:100%!important;max-width:none!important}"; document.head.appendChild(st)' }],
+    checks: [
+      { kind: 'visible', sel: '.mine .hand .card', name: 'hand' },
+      { kind: 'fn', name: 'the long names are in the hand', fn: function () { return (window.__want && window.__want.length >= 2) || 'only ' + (window.__want || []).length + ' long-name cards found'; } },
+      { kind: 'fn', name: 'every card name is fully visible: not under the next card, not clipped, no word broken', fn: function () {
+        var cards = [].slice.call(document.querySelectorAll('.mine .hand .card')), bad = [];
+        cards.forEach(function (c) { var n = c.querySelector('.cn'); if (!n || !GXS.vis(n)) return; var r = document.createRange(); r.selectNodeContents(n); var rs = [].slice.call(r.getClientRects()).filter(function (q) { return q.width > 1 && q.height > 1; });
+          if (n.scrollWidth > n.clientWidth + 1) bad.push('"' + n.textContent.trim() + '" clipped');
+          rs.forEach(function (q) { [q.left + 1, q.right - 1].forEach(function (x) { var t = document.elementFromPoint(x, q.top + q.height / 2); var oc = t && t.closest('.card'); if (oc && oc !== c) { if (bad.length < 4) bad.push('"' + n.textContent.trim() + '" is covered at x=' + Math.round(x)); } }); });
+          var ws = n.textContent.trim().split(/\s+/); if (rs.length > ws.length + 1) bad.push('"' + n.textContent.trim() + '" has a word broken in the middle (' + rs.length + ' lines for ' + ws.length + ' words)'); });
+        return bad.length ? bad.slice(0, 4).join('; ') : true; } }
+    ]
+  });
+  GXS.add({
+    id: 'dk-gear-up', sizes: 'phone', name: 'Gear-up board: badges whole, one instruction', ask: 'One clear line, nothing cut off?', ls: { dkd_offer: '1' }, seed: 34, when: booted, group: 'Board',
+    setup: function () { gearUp(34, false); try { GXH.reset(); GXH.setEnabled(true); } catch (e) { } return GXS.wait(function () { return document.querySelector('.bfbig') && document.querySelector('#prompt .bfline'); }, 6000).then(function () { return idle(1800); }); },
+    mut: [
+      { name: 'Lv badge pushed out of the circle', js: 'var st = document.createElement("style"); st.textContent = ".bfbig .bfblv{top:-30px!important;right:-40px!important}"; document.head.appendChild(st)' },
+      { name: 'a second instruction line appears', js: 'var d = document.createElement("div"); d.className = "bfcap"; d.textContent = "Gear up your hero!"; document.querySelector(".bfstage").appendChild(d)' },
+      { name: 'treasure label cut at the edge', js: 'var st = document.createElement("style"); st.textContent = ".pile.pr{margin-right:-30px!important}"; document.head.appendChild(st)' }
+    ],
+    checks: [
+      { kind: 'visible', sel: '.bfbig', name: 'your hero, big' },
+      { kind: 'fn', name: 'Lv badge is whole (not cut by the hero circle or the screen)', fn: function () { return clipMsg(document.querySelector('.bfbig .bfblv'), 'Lv badge') || true; } },
+      { kind: 'fn', name: 'TREASURE label and its deck badge are whole', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('.pile.pr, .pile.pr *, .stack.treas, .stack.treas *'), function (e) { if (!GXS.vis(e) || (!e.children.length && !/\S/.test(e.textContent))) return; var m = clipMsg(e, '"' + (e.textContent.trim().slice(0, 12) || e.className) + '"'); if (m && bad.length < 3) bad.push(m); }); return bad.length ? bad.join('; ') : true; } },
+      { kind: 'fn', name: 'DOOR label and badge are whole', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('.pile.pl, .pile.pl *, .stack.door, .stack.door *'), function (e) { if (!GXS.vis(e) || (!e.children.length && !/\S/.test(e.textContent))) return; var m = clipMsg(e, '"' + (e.textContent.trim().slice(0, 12) || e.className) + '"'); if (m && bad.length < 3) bad.push(m); }); return bad.length ? bad.join('; ') : true; } },
+      { kind: 'fn', name: 'ONE instruction on screen (no board caption, no tip box), 8 words or fewer', fn: function () {
+        var vis = [].slice.call(document.querySelectorAll('#prompt .bfline, .bfstage .bfcap, .gxh-bub.on')).filter(function (e) { return GXS.vis(e) && /\S/.test(e.textContent); });
+        var lines = vis.map(function (e) { return e.textContent.trim(); }); if (lines.length !== 1) return lines.length + ' instruction texts at once: ' + lines.map(function (t) { return '"' + t + '"'; }).join(' / ');
+        return wordsIn(lines[0]) <= 8 || '"' + lines[0] + '" is ' + wordsIn(lines[0]) + ' words'; } },
+      { kind: 'fn', name: 'the line says what works: tap OR drag', fn: function () { var t = line(); return (/tap/i.test(t) && /drag/i.test(t)) || 'line is "' + t + '"'; } },
+      { kind: 'play', name: 'tap a glowing card, then your hero: it is played (the line is true)', snap: function () { return { hand: P(0).hand.length }; },
+        steps: [{ sel: '.mine .hand .card.play', until: function () { return BF.pick != null; }, max: 3 }, { sel: '.bf-tgt' }], idle: function () { return !UI.busy && BF.pick == null; },
+        verify: function (b, a) { return (a.hand === b.hand - 1) || 'hand ' + b.hand + ' -> ' + a.hand + ': the card was not played by tap, tap'; } },
+      { kind: 'fn', name: 'rival chips: the sword and helmet numbers carry a word (str / gear), whole inside the chip', fn: function () {
+        var bad = []; [].forEach.call(document.querySelectorAll('.opp.seat'), function (s) { var b = s.querySelector('.sbd'), t = b.textContent;
+          if (!/\d\s*str/.test(t) || !/\d\s*gear/.test(t)) bad.push('"' + t.trim() + '" has no words'); if (b.scrollWidth > b.clientWidth + 1 || b.getBoundingClientRect().right > s.getBoundingClientRect().right + 1) bad.push('chip text cut: "' + t.trim() + '"'); });
+        return bad.length ? bad.join('; ') : true; } },
+      { kind: 'fn', name: 'hero is a painted portrait (not the flat SVG face)', fn: function () { var i = document.querySelector('.bfbig img.bfbav'); return (i && /camp-|portrait|hero/.test(i.getAttribute('src') || '')) || 'big hero is ' + (document.querySelector('.bfbig .bfbav') ? document.querySelector('.bfbig .bfbav').tagName : 'missing'); } }
+    ]
+  });
+
   GXS.add({
     id: 'dk-status-line', sizes: 'phone', name: 'Short drag/tap status line', ask: 'Is the line short and does it match?', ls: { dkd_offer: '1' }, seed: 41, when: booted, group: 'Board',
     setup: function () { table(41); return GXS.wait(function () { return document.querySelector('#prompt .bfline') && document.querySelector('.mine .hand .card'); }, 6000).then(function () { return idle(500); }); },

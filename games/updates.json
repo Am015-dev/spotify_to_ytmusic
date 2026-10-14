@@ -1,6 +1,33 @@
 [
  {
   "date": "2026-10-14",
+  "game": "doorkick-dungeon",
+  "title": "Hand names",
+  "items": [
+   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC",
+   "Menus use one title font and one body font, no overlaps",
+   "Menu rows keep text clear of the frame, Tips rows framed, last row reachable; hand names sit on their visible strip; one gear-up line; badges whole; rival numbers labelled",
+   "One instruction line, whole Lv and deck badges, labelled str/gear numbers",
+   "Card names fit the visible strip"
+  ],
+  "check": "Can you read every card name?",
+  "scn": [
+   "dk-fight-bonus",
+   "menu",
+   "dk-menu-rows",
+   "dk-gear-up",
+   "dk-hand-names"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "sunglaze",
   "title": "Cleaner menus",
   "items": [
@@ -71,24 +98,6 @@
    "menu"
   ],
   "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "doorkick-dungeon",
-  "title": "Cleaner menus",
-  "items": [
-   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC",
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "dk-fight-bonus",
-   "menu"
-  ],
-  "ask": [
-   null,
    null
   ]
  },

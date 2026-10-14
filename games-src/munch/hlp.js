@@ -30,7 +30,6 @@ const hvis=e=>{if(!e||e.closest('[hidden]'))return false;const r=e.getBoundingCl
 const hfirst=(...sels)=>()=>{for(const s of sels){for(const e of document.querySelectorAll(s)){if(hvis(e))return e}}return null};
 const hmv=act=>`#prompt [data-mv*='"act":"${act}"'],.fbtns [data-mv*='"act":"${act}"']`;
 const HLP_STEPS={
- setup:{target:hfirst('.mine .hand .card.play','#prompt [data-mv*=\'"act":"ready"\']','.mine .hand'),title:'Gear up your hero',text:'Tap a glowing card, then the glowing spot. Tap Ready when you are done.',pic:()=>HP.hero()},
  main:{target:hfirst('.bfdoor','.pile.pl'),title:'Kick the door',text:'Play cards to gear up, then tap the door.',pic:()=>HP.door()},
  after:{target:hfirst(hmv('loot'),'#prompt .acts button'),title:'An empty room',text:'No monster this time. Tap Loot for a free card, or fight a monster from your hand.',pic:()=>HP.back()},
  post:{target:hfirst(hmv('end'),'#prompt .acts button'),title:'Tidy up',text:'Wear new items and sell spares for a level. Then tap End turn.',pic:()=>HP.coin('+1')},

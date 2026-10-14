@@ -338,7 +338,8 @@ h3{font-size:1.02rem}
 .swipe{display:none}
 .recent li.story{border-left-color:#c08418;font-style:italic}
 .recent li.quote{font-style:italic}
-.menu{display:grid;gap:8px}.menu .btn{text-align:left}
+.menu{display:grid;gap:8px}.menu .btn{text-align:left;padding-left:24px;padding-right:24px}
+#dkMenuBody{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
 .dk-narrow{display:none!important}
 /* the menu (sound, speed, hints, graphics, Show speed / Test speed, new game) is always there; below 1280px its items leave the bar, which used to overflow and scroll at 768-1279px */
 @media (max-width:1279px){.dk-wide{display:none!important}}
@@ -577,7 +578,7 @@ html.ph-p .phc .hc{display:none}
 html.ph #prompt>.sellbar{order:-5;margin:2px 0}
 html.ph #prompt:has(>.sellbar)>:is(.acts.main,.hint,.since,.lesson,.say){display:none}
 html.ph #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}html.ph #prompt>.sellbar .btn{flex:1 1 0;min-height:48px}
-.mrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}.mrow>span:first-child{flex:1 0 90px;font-weight:700}.mrow .btn{min-height:40px;padding:2px 12px}.mrow .btn[aria-pressed=true]{background:#d3f9d8;color:#1b4332}
+.mrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}.mrow>span:first-child{flex:1 0 90px;font-weight:700}.mrow .btn{min-height:40px;padding:2px 22px}.menu .mrow{margin:0;padding:2px 23px;border:1px solid transparent}.mrow .btn[aria-pressed=true]{background:#d3f9d8;color:#1b4332}
 /* help kit: compact coach bubbles (no picture, button beside the title): the table is crowded with glowing cards and spots */
 .gxh-bub[data-phase] .gxh-sp{display:none}.gxh-bub[data-phase] .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}
 .gxh-bub[data-phase] .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub[data-phase] .gxh-ok{min-height:28px;padding:0 12px}
