@@ -166,7 +166,7 @@ function drawFrame3D(){const r=V3.r;r.info.autoReset=false;r.info.reset();if(!V3
 V3.draw=()=>drawFrame3D();
 // ---------- scene ----------
 function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return false;const cv=document.getElementById('c3');if(!cv)return false;
-  let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false}catch(e){return false}
+  let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext()){cv.removeAttribute('data-engine');return false}cv.removeAttribute('data-engine')}catch(e){try{cv.removeAttribute('data-engine')}catch(e2){}return false}
   V3.r=r;V3.aniso=Math.min(8,r.capabilities.getMaxAnisotropy());r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.0;
   const sc=V3.scene=new THREE.Scene();
   sc.background=canvasTex(4,256,(x)=>{const g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,'#f5dcae');g.addColorStop(.6,'#eec38e');g.addColorStop(1,'#c98a5a');x.fillStyle=g;x.fillRect(0,0,4,256)});sc.fog=new THREE.Fog(0xe2b288,75,170);

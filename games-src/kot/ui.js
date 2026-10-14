@@ -107,7 +107,7 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
   const xpn={base:'classic rules',trial:'Brainjack Taster',exp:'Brainjack Full Set'}[xp];const lv={easy:'Easy',normal:'Normal',hard:'Hard'}[UI.lvl]||'Normal';
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
-   <p class="lede">Giant monsters brawl for Crown City. Roll dice, smash your rivals and hold Downtown. First to <b>20 ★</b>, or the <b>last monster standing</b>, is crowned.</p>
+   <p class="lede">Giant monsters brawl for Crown City. First to <b>20 ★</b> wins.</p>
    <div class="acts" style="margin:.5rem 0">
     ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn big'):''}
     <button class="btn primary big" data-start="solo">▶ Play now (recommended)<small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
@@ -115,10 +115,11 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
     ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
    </div>
+   <details class="custom" ${UI.custOpen?'open':''}><summary>Customise ▸ <span class="small muted">rules, expansions, players, other ways to play</span></summary>
    <p style="margin:.3rem 0 .2rem"><b>Your monster</b> <span class="small muted">(tap to choose)</span></p>
    <div class="monpick">${pool.map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}" title="${esc(MONS[k].d)}">${monPic(k)}<span>${esc(MONS[k].n)}${MONS[k].x?' 🧠':''}</span></button>`).join('')}</div>
    <p class="small muted" style="margin:.2rem 0">${esc(MONS[UI.mon].n)}: ${esc(MONS[UI.mon].d)}.</p>
-   <details class="custom" ${UI.custOpen?'open':''}><summary>Customise ▸ <span class="small muted">rules, expansions, players, other ways to play</span></summary>
+
    <div class="row"><b>Game:</b>${[['base','Classic'],['trial','Brainjack Taster'],['exp','Brainjack Full Set']].map(([k,l])=>`<button class="btn ${xp===k?'on':''}" data-xp="${k}">${l}</button>`).join('')}</div>
    <p class="small muted" style="margin:.1rem 0 .3rem">${xp==='base'?'The classic game: best for a first game.':xp==='trial'?'Adds Brainjack tokens (steal another monster\'s roll), 3 new monsters and 24 new cards shuffled into the classic deck.':'Brainjack tokens and 3 new monsters, playing with only the 24 new cards.'}</p>
    <p style="margin:.35rem 0 .15rem"><b>Expansions</b> <span class="small muted">(tap to switch on or off)</span> <button class="btn mini" data-preset="none">None</button><button class="btn mini" data-preset="all">All</button></p>

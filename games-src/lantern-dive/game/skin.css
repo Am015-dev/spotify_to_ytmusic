@@ -20,3 +20,8 @@ html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:
 
 /* one instruction line: the help tip replaces the top line while it is showing */
 body:has(.gxh-bub.on) #prompt{visibility:hidden}
+/* UI-BAR: help bubble button never covers its text; job chips wrap instead of cutting */
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+.jc{white-space:normal;min-height:26px;padding-top:2px;padding-bottom:2px}
+.jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;text-overflow:clip}
+.seat .jc{font-size:13px}

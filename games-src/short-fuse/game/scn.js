@@ -57,6 +57,17 @@
   });
 
   GXS.add({
+    id: 'sf-uibar', name: 'Title screen: one primary, readable, 5 top-bar buttons', ask: 'Is the title screen clean?', seed: 15, when: booted, group: 'UI',
+    setup: function () { try { GX.close(); } catch (e) { } try { showStart(); } catch (e) { } return idle(900); },
+    checks: [
+      { kind: 'fn', name: 'exactly one primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#start .big'), GXS.vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-ibtn,.bulbbtn'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'title text >= 13px phone / 16px wide', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = []; [].forEach.call(document.querySelectorAll('#start *'), function (e) { if (!GXS.vis(e)) return; var t = [].filter.call(e.childNodes, function (c) { return c.nodeType === 3 && c.textContent.trim(); }).length; if (t && parseFloat(getComputedStyle(e).fontSize) < min - .3) bad.push(e.textContent.trim().slice(0, 14) + ' ' + getComputedStyle(e).fontSize); }); return !bad.length || bad.slice(0, 4).join(' | '); } },
+      { kind: 'fn', name: 'no character roster on the title', fn: function () { return !document.querySelector('#start .chars,#start .roster,#start .crew') || 'roster shown'; } }
+    ]
+  });
+
+  GXS.add({
     id: 'sf-help', name: 'Help: how this works', ask: 'Can you read the help cards?', seed: 13, when: booted, group: 'UI',
     setup: function () { return table(13).then(function () { GXH.rules(null); return GXS.wait(function () { return document.querySelector('.gxh-rules .gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
     checks: [

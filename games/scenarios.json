@@ -727,6 +727,14 @@
    "mut": 0
   },
   {
+   "id": "sf-uibar",
+   "name": "Title screen: one primary, readable, 5 top-bar buttons",
+   "ask": "Is the title screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "sf-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
@@ -806,6 +814,22 @@
    "ask": "Do the racks look like wooden trays?",
    "sizes": "phone",
    "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, dock, images",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Begin button, simple options?",
+   "sizes": "all",
+   "group": "Board",
    "mut": 0
   },
   {
