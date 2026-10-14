@@ -1,5 +1,35 @@
 [
  {
+  "date": "2026-10-14",
+  "game": "doorkick-dungeon",
+  "title": "Tests that find bugs",
+  "items": [
+   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC"
+  ],
+  "check": "Kick, play the bonus, tap Fight!",
+  "scn": [
+   "dk-fight-bonus"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "crown-city-smash",
+  "title": "Tests that find bugs",
+  "items": [
+   "Buying a card, SMASH, rolling and ending the turn are now tested with real taps; energy chip fixed on small phones"
+  ],
+  "check": "Tap a card twice: energy drops by its cost",
+  "scn": [
+   "cc-market"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
   "date": "2026-10-13",
   "game": "shipwreck-isle",
   "title": "Last paintings wired",

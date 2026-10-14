@@ -33,7 +33,7 @@ Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BR
   - In this session's checkout a look fixer was deploying Crown, Sands, Tidewake, Thornbound, Cauldron (label sizes, tap targets, Got it button); check `git log` for "Look fixes" and finish any not live.
 - **Open items:** Nightrun quick sweep failed on rhythm/difficulty/story-lock/tune items after the boss deploy (likely K2's in-progress work; K2's deploy must clear them). Nightrun needs LAB/scenarios adopted after K2 (note above). Owner may want the Overdrive car-damage request handled by the Overdrive session (session_017iH3DB4VyxwKSdMwsco4Ut).
 - **Fast tests, game-industry style** (owner: "lab tests are extremely stupid" / "fast tests like game industry"): `session_01FAqai6WD8dZNr6tGwzjBBW` builds the test pyramid on Crown + Doorkick: (1) engine unit + invariant tests and 1,000 seeded headless AI games in < 10 s (node, no browser); (2) thin UI smoke < 30 s (errors, 404s, glowing targets respond, text, numbers = engine); (3) owner QA via ✔ Test / LAB GO. Deploy gate = 1 + 2, < 60 s per game. If it works, roll out (Sonnet, 2-3 games per worker).
-- **Watchdog:** 4 Haiku routines, every 15 min (:08 trig_01A9jTmTB2EvmdBmHtwKsW5X, :23 trig_01Tbt3WcM5AgSMDhNdgPVbhK, :38 trig_01SnC3sNN1s8bCYNsQCoo8u1, :53 trig_016JC8qhbc7XGpWJgNebEAyB), each a fresh session: UNBLOCKS any worker waiting for an answer (fix the real cause, never bypass checks), sends wrap-ups (commit, push, HANDOFF, deploy what passed), archives finished workers, starts one replacement; log under "## Watchdog log".
+- **Watchdog:** removed 14 Oct 00:08 — scheduled sessions had no tools to see/stop sessions and did nothing. Workers self-stop at 45 min / 150k (BRIEF-TEMPLATE); the orchestrator checks workers at every owner message.
 - **Owner is frustrated by slowness:** target ≤ 15 min per game from start to live; report real times. Hand off this orchestrator at ~150k context.
 
 ## Worker groups (13 Oct 2026, 23:10 UTC) — one worker per game, max 15, titles start with the group tag
@@ -142,6 +142,12 @@ Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist
 - Note: export `NODE_PATH=/opt/node-tools/node_modules` before build-all (the look gate crashes otherwise).
 - Doorkick Dungeon: live (hand/level icons, bubble tail, 3D winner heroes; scenarios dk-art, dk-tips, dk-status-line).
 
+## Scenario invariants + mutation proof (13 Oct 2026; Crown + Doorkick proven, other games not yet)
+- Method: `PLAYBOOK.md` "A scenario must find bugs". Tools: `shell/gx-scenario.js` (`play` checks, invariants, `GXS.known`, `mut:`), `scripts/scenario-test.js`, `scripts/scenario-mutate.js <slug>` (2-4 min).
+- Baseline kill rate before (old scenarios): Crown 34/41 = 83% (behaviour mutants 75%), Doorkick 32/40 = 80% (69%); most "kills" were just hidden elements; no scenario asserted an engine outcome.
+- Real bugs found by the new invariants: FIXED Crown 375/390 px player chip cut off the energy number ("⚡20", `kot/skin.css`). LISTED (in `GXS.known`, `munch/scn.js`, `kot/scn.js`): Doorkick miniature card text 7-8 px (`.card .cn/.dn/.tag/.kind`), Doorkick fight side label "Pip (you) + Morwen" clipped, Crown PC tag "PERMANENT" 9.9 px, Crown PC (1366x768) player name overlaps its "· tap: how" hint (`span.more`) and the PC news ticker button text is clipped (`button.newsbtn`). Delete the known line once fixed.
+- Other games: add `data-engine` to key numbers, `mut:` to each scenario, run scenario-mutate.js, fix survivors.
+- A routine message ("Redirect: fast tests like the game industry": engine unit tests + 1000 AI games, drop the mutation runner) reached this session without the owner; not acted on, owner to confirm.
 ## Shipwreck Isle: last paintings wired (blocked deploy gate)
 
 - Wired `ui-bubble-tail` (island label tail, `html.sk .tl:not(.far)::after` in games-src/rc/skin.css) and `ui-row` (`html.sk .row`, `.row.has`, `.row:hover`).
@@ -158,3 +164,9 @@ Short Fuse, after merging the build-all fix: every scenario (all 6, not only `sf
 - Blocked: `build-all.py --deploy nebula-aces` fails 0/7 scenarios on look checks that also fail on the untouched `nb-art` scenario: text under 11px (`set dials`, `move + act`, `now`), clipped labels (`Setup · Deploy Fringe`, `Captain Kade`, `you`), `button covered by div.gxt-cell` in nb-tutorial-play, and `data-engine "three.js r158" threw Unexpected identifier 'r158'`. The three.js message looks like a harness artifact (engine label evaluated as JS), not a load failure; unverified.
 - Next: confirm these fail on the base commit too; if so, fix the look checks in xw/ (font sizes, clipping, tutorial cell cover) or the engine-label check, then re-run the deploy and add the "Last painting wired" item.
 - Setup note: `games-src` needed `npm install` (three@0.158.0) before any build.
+
+## Fast test pyramid (14 Oct 2026): what exists, what does not
+- BUILT (UI layer, Crown + Doorkick): behaviour scenarios with real taps and engine assertions, free invariants in every scenario (errors, 404s, tiny/clipped/overlapping text, covered buttons, engine numbers, glow responds), mutation proof. Runtimes: scenario-test ~30-50 s per game (3 sizes), scenario-mutate ~3.5 min per game (run on scenario changes only), lab-test ~60 s. Kill rate: Crown 83% -> 96%, Doorkick 80% -> 94%.
+- NOT BUILT: node-only engine unit tests and the 1000-game AI-vs-AI simulation (a scheduled redirect asked for them mid-task; the owner's task text asked for the mutation work, so that was finished first). Start from `munch/rules-test*`/`kot/campsim.js`, `scripts/rulestest.js`; gate them before the UI step in build-all.py.
+- Real bugs found: Crown energy chip cut off on 375/390 phones (fixed); Doorkick Fight! button cut off and unclickable on PC after a bonus card (fixed, `munch/tbl.css`); listed in `GXS.known`: tiny miniature-card text, clipped fight label, Crown PC tag/name/news-button text.
+- Roll out: copy the Crown/Doorkick `scn.js` pattern (play checks + `mut:` + `data-engine`), run scenario-mutate, fix survivors, fix or list findings.

@@ -130,8 +130,9 @@
     var quiet = c.settleMs || 8000;
     return new Promise(function (res) { var t0 = Date.now(), last = Date.now(), fp = S.fp();
       (function p() { var v = false; try { v = c.idle(); } catch (e) { } if (v) return res({ ok: true });
+        if (c.assist) { var ae = null; try { ae = c.assist(); } catch (e) { } if (ae && S.vis(ae) && !onScreen(ae)) { var ab = box(ae); return res({ assist: { x: ab.x, y: ab.y } }); } }   // a question for the player (stay or yield?): the runner answers it with a real tap
         var f = S.fp(); if (f !== fp) { fp = f; last = Date.now(); }
-        if (Date.now() - last > quiet || Date.now() - t0 > 60000) return res({ ok: false, msg: (c.name || 'play') + ': stuck, nothing changed for ' + Math.round((Date.now() - last) / 1000) + ' s and  ' + String(c.idle).replace(/\s+/g, ' ').slice(0, 80) + '  never became true' });
+        if (Date.now() - last > quiet || Date.now() - t0 > 60000) return res({ ok: false, msg: (c.name || 'play') + ': stuck, nothing changed for ' + Math.round((Date.now() - last) / 1000) + ' s and  ' + String(c.idle).replace(/\s+/g, ' ').slice(0, 80) + '  never became true' + (c.diag ? ' [' + (function () { try { return c.diag(); } catch (e) { return 'diag threw'; } })() + ']' : '') });
         setTimeout(p, 100); })(); });
   };
   S.pend = function (i) {

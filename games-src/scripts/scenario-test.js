@@ -78,7 +78,9 @@ async function runOne(browser, base, slug, sc, sz, mut) {
           } while (p.until && tries < p.max && !(await page.evaluate(([i, j]) => GXS.puntil(i, j), [i, j])));
         }
         if (bad) { fails.push(bad); continue; }
-        const idle = await page.evaluate(i => GXS.pidle(i), i); if (!idle.ok) { fails.push(idle.msg); continue; }
+        let idle = await page.evaluate(i => GXS.pidle(i), i);
+        for (let k = 0; idle.assist && k < 12; k++) { await tapAt(page, sz, idle.assist.x, idle.assist.y); await sleep(500); idle = await page.evaluate(i => GXS.pidle(i), i); }
+        if (!idle.ok) { fails.push(idle.msg || 'question never answered'); continue; }
         await sleep(200);
         const a = await page.evaluate(i => GXS.pend(i), i); if (!a.ok) fails.push(a.msg);
         continue;
