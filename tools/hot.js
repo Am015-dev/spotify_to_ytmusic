@@ -95,7 +95,7 @@ async function daemon(){
    out.push(`${((Date.now()-t)/1000).toFixed(1)} s`);return out.join('\n')},
   async go({id}){const t=Date.now();const p0=await page(P.fra?'fra':Object.keys(P)[0]);let c=await p0.evaluate(id=>window.__chk&&__chk.city(id),id);if(!c)return'FAIL no GO '+id;if(c==='bx')c='fra';
    const p=await page(c),o=P[c],e0=o.errs.length,n0=o.nav;await p.evaluate(()=>__tq.reset()).catch(()=>{});
-   let said='';try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:90000,polling:100}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,120)}
+   let said='';try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:20000,polling:100}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,120)}
    const ne=errsSince(o,e0),nav=P[c].nav>n0;const ok=!!said&&!BAD.test(said)&&!ne.length&&!nav;
    return `${ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t)/1000).toFixed(1)}s · ${said||'(no message)'}${nav?' · NAVIGATED (page reloaded from current src)':''}${ne.length?' · ERR '+ne[0]:''}`},
   async eval({js,city}){const out=[];for(const c of city?[city]:Object.keys(P).slice(0,1)){const p=await page(c),o=P[c],e0=o.errs.length;
