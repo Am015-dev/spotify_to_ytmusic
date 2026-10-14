@@ -29,13 +29,6 @@
    "group": "UI"
   },
   {
-   "id": "cf-art",
-   "name": "Painted art: bag, chip track, tail, rows",
-   "ask": "Do the bag, chip track and rows look painted?",
-   "sizes": "all",
-   "group": "UI"
-  },
-  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -94,13 +87,6 @@
    "group": "UI"
   },
   {
-   "id": "cc-art",
-   "name": "Painted art: chips, tray, crown, buttons, tail",
-   "ask": "Do the chips, dice tray and crown look painted?",
-   "sizes": "phone",
-   "group": "UI"
-  },
-  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -143,71 +129,6 @@
    "ask": "Is the big card readable?",
    "sizes": "all",
    "group": "Cards"
-  },
-  {
-   "id": "dk-status-line",
-   "name": "Short drag/tap status line",
-   "ask": "Is the line short and does it match?",
-   "sizes": "phone",
-   "group": "Board"
-  },
-  {
-   "id": "dk-tips",
-   "name": "Lightbulb, tips, rules cards, Tips switch",
-   "ask": "Do tips, bulb and rules cards work?",
-   "sizes": "all",
-   "group": "UI"
-  },
-  {
-   "id": "dk-art",
-   "name": "Painted icons and 3D heroes",
-   "ask": "Are the new icons and hero figures in place?",
-   "sizes": "all",
-   "group": "Art"
-  },
-  {
-   "id": "story-scene",
-   "name": "Story scene: speech bubble",
-   "ask": "Is the speech bubble clean, with no sideways bar?",
-   "sizes": "all",
-   "group": "Story"
-  }
- ],
- "final-approach": [
-  {
-   "id": "fa-board",
-   "name": "Start of game board",
-   "ask": "Is the cockpit clear and filled?",
-   "sizes": "all",
-   "group": "Board"
-  },
-  {
-   "id": "fa-zoom",
-   "name": "Flight briefing sheet",
-   "ask": "Is the briefing sheet readable?",
-   "sizes": "all",
-   "group": "Cards"
-  },
-  {
-   "id": "fa-help",
-   "name": "Help: how this works",
-   "ask": "Can you read the help cards?",
-   "sizes": "all",
-   "group": "UI"
-  },
-  {
-   "id": "fa-buttons",
-   "name": "Painted buttons keep their labels",
-   "ask": "Are the buttons readable?",
-   "sizes": "all",
-   "group": "Board"
-  },
-  {
-   "id": "fa-art",
-   "name": "Painted art: menu row and speech tail",
-   "ask": "Do the menu row and tip tail look painted?",
-   "sizes": "all",
-   "group": "UI"
   },
   {
    "id": "story-scene",
@@ -291,6 +212,13 @@
    "group": "UI"
   },
   {
+   "id": "kk-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI"
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -304,77 +232,28 @@
    "name": "Start of game board",
    "ask": "Are the jobs and your hand clear?",
    "sizes": "all",
-   "group": "Board",
-   "mut": 0
+   "group": "Board"
   },
   {
    "id": "ld-zoom",
    "name": "Job card zoom",
    "ask": "Is the big job card readable?",
    "sizes": "all",
-   "group": "Cards",
-   "mut": 0
+   "group": "Cards"
   },
   {
    "id": "ld-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
    "sizes": "all",
-   "group": "UI",
-   "mut": 0
+   "group": "UI"
   },
   {
    "id": "ld-art",
    "name": "Painted cards, seats, tick and cross",
    "ask": "Do cards and seats look painted?",
    "sizes": "all",
-   "group": "Cards",
-   "mut": 0
-  },
-  {
-   "id": "story-scene",
-   "name": "Story scene: speech bubble",
-   "ask": "Is the speech bubble clean, with no sideways bar?",
-   "sizes": "all",
-   "group": "Story",
-   "mut": 0
-  }
- ],
- "nebula-aces": [
-  {
-   "id": "nb-tutorial-play",
-   "name": "Tutorial: tap your ship",
-   "ask": "Tap the glowing ship",
-   "sizes": "all",
-   "group": "UI"
-  },
-  {
-   "id": "nb-board",
-   "name": "Start of game board",
-   "ask": "Is the board clear and filled?",
-   "sizes": "all",
-   "group": "Board"
-  },
-  {
-   "id": "nb-zoom",
-   "name": "Ship card zoom",
-   "ask": "Is the ship card readable?",
-   "sizes": "all",
    "group": "Cards"
-  },
-  {
-   "id": "nb-art",
-   "name": "Painted ship art on every hull",
-   "ask": "Does each ship have its picture?",
-   "sizes": "all",
-   "group": "UI"
-  },
-  {
-   "id": "nb-help",
-   "name": "Help: rules cards",
-   "ask": "Can you read the help cards?",
-   "sizes": "all",
-   "group": "UI"
   },
   {
    "id": "story-scene",
@@ -412,13 +291,6 @@
    "ask": "Are the buttons readable?",
    "sizes": "all",
    "group": "Board"
-  },
-  {
-   "id": "rv-art",
-   "name": "Painted pieces, rows and bubble tail",
-   "ask": "Are the pieces painted and coloured?",
-   "sizes": "all",
-   "group": "UI"
   },
   {
    "id": "story-scene",
@@ -478,90 +350,65 @@
    "name": "Start of game board",
    "ask": "Is the island clear with glowing places?",
    "sizes": "all",
-   "group": "Board",
-   "mut": 0
-  },
-  {
-   "id": "si-art",
-   "name": "Camp icons and 3D campfire, raft, palm",
-   "ask": "Do camp icons and models look painted?",
-   "sizes": "all",
-   "group": "UI",
-   "mut": 0
+   "group": "Board"
   },
   {
    "id": "si-zoom",
    "name": "Card zoom",
    "ask": "Is the big card readable?",
    "sizes": "phone",
-   "group": "Cards",
-   "mut": 0
+   "group": "Cards"
   },
   {
    "id": "si-help",
    "name": "Help: rules cards",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI",
-   "mut": 0
+   "group": "UI"
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story",
-   "mut": 0
+   "group": "Story"
   }
  ],
- "short-fuse": [
+ "sunglaze": [
   {
-   "id": "sf-board",
+   "id": "sg-board",
    "name": "Start of game board",
-   "ask": "Are the wires and fuse clear?",
+   "ask": "Are the workshops and your rack clear?",
    "sizes": "all",
-   "group": "Board",
-   "mut": 0
+   "group": "Board"
   },
   {
-   "id": "sf-zoom",
-   "name": "Job card",
-   "ask": "Is the job card readable?",
+   "id": "sg-zoom",
+   "name": "Board / tile list zoom",
+   "ask": "Is the rival board readable?",
    "sizes": "all",
-   "group": "Cards",
-   "mut": 0
+   "group": "Cards"
   },
   {
-   "id": "sf-help",
+   "id": "sg-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI",
-   "mut": 0
+   "group": "UI"
   },
   {
-   "id": "sf-buttons",
+   "id": "sg-buttons",
    "name": "Painted buttons keep their labels",
    "ask": "Are the buttons readable?",
    "sizes": "all",
-   "group": "Board",
-   "mut": 0
-  },
-  {
-   "id": "sf-art",
-   "name": "Painted art: menu row and speech tail",
-   "ask": "Do the menu row and tip tail look painted?",
-   "sizes": "all",
-   "group": "UI",
-   "mut": 0
+   "group": "Board"
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story",
-   "mut": 0
+   "group": "Story"
   }
  ],
  "thornbound": [
@@ -615,13 +462,6 @@
    "group": "Board"
   },
   {
-   "id": "tb-art",
-   "name": "Painted art: menu row and speech tail",
-   "ask": "Do the menu row and tip tail look painted?",
-   "sizes": "all",
-   "group": "UI"
-  },
-  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -657,13 +497,6 @@
    "ask": "Are Place and Help buttons readable?",
    "sizes": "all",
    "group": "Board"
-  },
-  {
-   "id": "tw-art",
-   "name": "Painted art: frame, rings, tag, tail, rows",
-   "ask": "Is the board framed, with brass rings?",
-   "sizes": "all",
-   "group": "UI"
   },
   {
    "id": "story-scene",

@@ -617,7 +617,7 @@ html.sk .gx-bar{gap:4px}
 html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 7px stretch;text-align:center;color:var(--sk-ink);text-shadow:none}
 html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
 /* painted speech tail replaces the coach bubble's diamond arrow (art points right; rotated to face the target) */
-html.sk .gxh-arr{width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(0deg)}
+html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(0deg)}
 html.sk .gxh-a-top .gxh-arr{top:-14px;transform:rotate(-90deg)}
 html.sk .gxh-a-bottom .gxh-arr{bottom:-14px;transform:rotate(90deg)}
 html.sk .gxh-a-left .gxh-arr{left:-17px;transform:rotate(180deg)}
@@ -3438,7 +3438,7 @@ fn mainFragment(
       { kind: 'visible', sel: '#board', name: 'board' },
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = $('#board').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .5 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
       { kind: 'visible', sel: '#belt .hc[data-id]', name: 'first dish' },
-      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
+      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
       { kind: 'fn', name: 'every dish is on screen and tappable', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#belt .hc[data-id]'), function (e) { if (bad) return; var r = e.getBoundingClientRect(), t = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(1, r.left + r.width / 2)), Math.min(innerHeight - 1, Math.max(1, r.top + r.height / 2))); if (!inView(e)) bad = 'dish ' + e.dataset.id + ' off screen'; else if (t && t !== e && !e.contains(t)) bad = 'dish ' + e.dataset.id + ' covered by ' + (t.id || t.className); }); return !bad || bad; } },
       { kind: 'eq', name: 'round number', a: function () { return +/Round (\d+)/.exec($('#barstat').textContent)[1]; }, b: function () { return G.round; } },
       { kind: 'eq', name: 'turn number', a: function () { return +/Turn (\d+)/.exec($('#barstat').textContent)[1]; }, b: function () { return G.turn; } },

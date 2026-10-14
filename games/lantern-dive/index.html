@@ -3348,7 +3348,7 @@ fn mainFragment(
       { kind: 'visible', sel: '#pool .jcard.glow', name: 'job to take' },
       { kind: 'visible', sel: '#acts button', name: 'Pass button' },
       { kind: 'text', sel: '#pool .jcard b', re: /\S/, name: 'job name' },
-      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
+      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
       { kind: 'fn', name: 'your whole hand is on screen', fn: function () { var h = [].slice.call(document.querySelectorAll('#hand > *')).filter(GXS.vis); if (h.length !== G.players[0].hand.length) return h.length + ' cards shown, engine has ' + G.players[0].hand.length; for (var i = 0; i < h.length; i++) if (!inView(h[i])) return 'card ' + i + ' off screen'; return true; } },
       { kind: 'eq', name: 'cards left, first rival', a: function () { return GXS.num('#opp .seat[data-seat="1"] .bdg.n b'); }, b: function () { return G.players[1].hand.length; } },
       { kind: 'eq', name: 'your tricks won', a: function () { return GXS.num('#mine .bdg.t b'); }, b: function () { return tricksWon()[0]; } },
