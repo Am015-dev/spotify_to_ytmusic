@@ -14,7 +14,7 @@ const mode=()=>{const m={};try{if(RO.foot&&RO.foot!=='car')m.foot=RO.foot;if(RO.
 function bug(name,x,z,y,d,key){
   const k=name+'|'+(key||Math.floor(x/5)+','+Math.floor(z/5));let b=Q.hits[k];
   if(b){b.n++;b.t2=r1(Q.t);return b}
-  b=Q.hits[k]={name,x:r1(x),z:r1(z),y:r1(y||0),city:city(),ride:ride(),mode:mode(),t:r1(Q.t),wall:Date.now(),build:build(),n:1,d:d||''};Q.bugs.push(b);
+  b=Q.hits[k]={name,x:r1(x),z:r1(z),y:r1(y||0),city:city(),ride:ride(),mode:mode(),h:r2(RO.h||0),foot:RO.foot||'car',t:r1(Q.t),wall:Date.now(),build:build(),n:1,d:d||''};Q.bugs.push(b);
   const w=Q.warn[name]||0;if(Date.now()-w>60000){Q.warn[name]=Date.now();try{console.warn('[QA] '+name+' @'+b.x+','+b.z+' ride '+b.ride+' '+b.d)}catch(e){}}
   return b}
 Q.bug=bug;
@@ -98,6 +98,8 @@ Q.state=function(){const o={v:1,b:build(),c:city(),ride:ride(),x:r2(RO.x),z:r2(R
   if(foot()){o.ox=r2(OF.x);o.oz=r2(OF.z);o.oy=r2(OF.y);o.oh=r2(OF.h)}
   try{o.fl=Object.keys(flags()).filter(k=>flags()[k]===true).slice(0,40)}catch(e){}
   try{if(typeof SC_S!=='undefined')o.sc=1}catch(e){}return o};
+// repro link for a recorded bug (its own position / heading / ride / mode, not the current state)
+Q.reproFor=function(b){const o={v:1,b:b.build,c:b.city,ride:b.ride,x:b.x,z:b.z,y:b.y,h:b.h,sp:0,foot:b.foot||'car',m:b.mode||{}};if(o.foot==='walk'||o.foot==='sit'){o.ox=b.x;o.oz=b.z;o.oy=b.y;o.oh=b.h}return location.origin+location.pathname+'?repro='+b64(JSON.stringify(o))};
 Q.reproUrl=function(){return location.origin+location.pathname+'?repro='+b64(JSON.stringify(Q.state()))};
 Q.bundle=function(){const o=Q.state();o.bugs=Q.bugs.slice(-30);o.inputs=Q.inp.slice();o.ctl=Q.ctl.slice(-60);o.ua=navigator.userAgent;o.vp=[innerWidth,innerHeight,devicePixelRatio];return o};
 Q.shot=()=>new Promise(res=>{try{try{composer.render()}catch(e){}renderer.domElement.toBlob(b=>res(b),'image/png')}catch(e){res(null)}});

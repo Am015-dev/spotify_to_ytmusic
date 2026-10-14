@@ -4,8 +4,11 @@ const path=require('path'),fs=require('fs'),http=require('http');
 const PW='/opt/node22/lib/node_modules/playwright';
 const ROOT=path.resolve(__dirname,'../..');
 // base: a URL (http://127.0.0.1:8890/hot.html = the warm hot server) or an out/<ver> directory (served here on a free port)
+// older builds (no 98qa_loader stub): splice the kit into the served page right before the module script's end, so the kit can run on any out/<ver>
+function inject(html){if(html.includes('models/qa.js'))return html;const code=fs.readFileSync(path.join(ROOT,'src/assets/qa/code.js'),'utf8'),i=html.lastIndexOf('</script>');
+  return html.slice(0,i)+'\n;try{eval('+JSON.stringify(code)+')}catch(e){console.warn("QA inject",e)}\n'+html.slice(i)}
 async function serve(dir){const MT={'.js':'text/javascript','.json':'application/json','.html':'text/html','.mp3':'audio/mpeg','.png':'image/png','.jpg':'image/jpeg'};
-  const s=http.createServer((q,r)=>{const u=decodeURIComponent(q.url.split('?')[0]),f=path.join(dir,path.normalize(u==='/'?'/index.html':u));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':MT[path.extname(f)]||'application/octet-stream'});r.end(d)})});
+  const s=http.createServer((q,r)=>{const u=decodeURIComponent(q.url.split('?')[0]),f=path.join(dir,path.normalize(u==='/'?'/index.html':u));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':MT[path.extname(f)]||'application/octet-stream'});r.end(/index\.html$/.test(f)?inject(d.toString('utf8')):d)})});
   await new Promise(res=>s.listen(0,'127.0.0.1',res));return{s,url:`http://127.0.0.1:${s.address().port}/index.html`}}
 async function hotUp(){return new Promise(res=>{const q=http.get('http://127.0.0.1:8890/hot.html',r=>{r.destroy();res(r.statusCode===200)});q.on('error',()=>res(false));q.setTimeout(1500,()=>{q.destroy();res(false)})})}
 async function resolveBase(base){if(base&&/^https?:/.test(base))return{url:base};if(base&&fs.existsSync(base))return serve(path.resolve(base));if(await hotUp())return{url:'http://127.0.0.1:8890/hot.html'};throw new Error('no base: pass a URL or an out/<ver> dir')}
