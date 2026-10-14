@@ -35,7 +35,7 @@ function DMG_debStep(dt){const im=DMG.im;if(!im||!DMG.deb.length){if(im&&im.coun
 // THE hit: v = relative normal speed in km/h. Returns the health lost (%).
 function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return 0;const at=new THREE.Vector3(RO.x+Math.sin(RO.h)*1.8,RO.y+.8,RO.z+Math.cos(RO.h)*1.8);
  if(v<25){DMG.n.light++;if(v>8)try{burst(SPARK,at,8,6,.3,new THREE.Color(2,1.6,.9))}catch(e){}return 0}
- DMG.cls=DMG_cls();const d=15*Math.sqrt((v-25)/25)/DMG.cls;RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
+ DMG.lastV=v;DMG.cls=DMG_cls();const d=15*Math.sqrt((v-25)/25)/DMG.cls;RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
  const nb=clamp(Math.round(2+d/4),2,6),src=DMG_panels(1-RO.hp/100,nb);DMG_throw(nb,src,v);try{burst(SPARK,at,16,9,.4,new THREE.Color(2,1.6,.9))}catch(e){}
  DMG_hud(RO.hp);if(d>6)try{flashHud()}catch(e){}if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();try{fireball(V3(RO.x,RO.y+1.4,RO.z),26,3,1.1)}catch(e){}DMG_panels(0);roamWreck()}return d}
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
@@ -69,4 +69,17 @@ function DMG_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
  else if(kind==='traf'||kind==='trafFast'){const v=kind==='traf'?40:70,c={cv:0,x:RO.x,z:RO.z,y:RO.y,j:0,k:0},fx=Math.sin(RO.h),fz=Math.cos(RO.h);RO.vh=RO.h;const v0=RO.v;RO.v=v/3.6;r.burst=DMG_traf(c,RO.x+fx*3,RO.z+fz*3,fx,fz,false,false);r.pin=DMG_traf({cv:0,j:0,k:0,y:RO.y},RO.x,RO.z,fx,fz,false,true);RO.v=v0;r.txt=kind==='traf'?'40 km/h into a parked car: it loses bricks, NOT a burst; pushing a car never bursts it':'70 km/h into a parked car: it bursts'}
  else if(kind==='wreck'){let i=0;const hit=()=>{RO.inv=0;DMG_impact(60);if(++i<8&&!RO.wk)setTimeout(hit,150)};hit();r.txt='8 crashes at 60 km/h: smoke, fire, explosion, rebuilt within 2.5 s'}
  return'📍 '+r.txt}
+// GO (dmg-2, Alex: "GTA-style crash damage, bricks fly off on hard hits"): a straight run at a building wall, spawned already at 62 km/h, REAL gas into the wall;
+// pass = a hit at ≥ 60 km/h normal speed, ≥ 2 bricks thrown off, health > 0, then REAL reverse for 1.5 s moves the car ≥ 2 m (still drivable)
+function DMG_goWall(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!DMG.on)return'📍 Damage is off (?dmg=0)';try{OF_reset()}catch(e){}
+ const N=HUB.nodes||[],L=[],O=CID==='fra'?{x:2061,z:0}:{x:0,z:0};/* fixed search origin: the same wall every time */for(let i=0;i<N.length;i++){const A=N[i];if(A&&!A.ab&&A.nb&&A.nb.length)L.push([Math.hypot(A.x-O.x,A.z-O.z),A])}L.sort((a,b)=>a[0]-b[0]);let S=null;
+ for(const [,A] of L.slice(0,400)){if(S)break;for(let k=0;k<24&&!S;k++){const h=k*Math.PI/12,fx=Math.sin(h),fz=Math.cos(h),y=groundAt(A.x,A.z,999);if(roamHit(A.x,A.z,1.6,y+.5))break;
+  const wd=(o)=>{for(let d=2;d<=48;d+=.5)if(roamHit(A.x+fx*d+fz*o,A.z+fz*d-fx*o,.3,y+.5))return d;return 0};const w=wd(0);if(w<26)continue;const wl=wd(-1.5),wr=wd(1.5);if(!wl||!wr||Math.abs(wl-w)>.6||Math.abs(wr-w)>.6)continue;/* head-on: a flat wall square to the run */let ok=true;for(let d=0;d<w-4&&ok;d+=1){const g=groundAt(A.x+fx*d,A.z+fz*d,999);if(Math.abs(g-y)>.6)ok=false}
+  if(ok)S={x:A.x+fx*(w-24),z:A.z+fz*(w-24),h,w:24}}}
+ if(!S)return'📍 no straight 24 m run at a wall near here ❌';RO.hp=100;RO.inv=0;DMG_panels(0);DMG.deb.length=0;DMG.lastHit=-1e9;if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}
+ roamWarp(S.x,S.z,S.h,true);RO.x=S.x;RO.z=S.z;RO.h=RO.vh=S.h;RO.v=62/3.6;const h0=DMG.n.hits,d0=DMG.n.deb,t0=performance.now();DMG.lastV=0;K.ArrowUp=true;
+ const iv=setInterval(()=>{if(DMG.n.hits===h0&&performance.now()-t0<4000)return;clearInterval(iv);K.ArrowUp=false;const v=DMG.lastV||0,nb=DMG.n.deb-d0,hp=RO.hp??100;
+  setTimeout(()=>{const x0=RO.x,z0=RO.z;K.ArrowDown=true;setTimeout(()=>{K.ArrowDown=false;const mv=Math.hypot(RO.x-x0,RO.z-z0),ok=DMG.n.hits>h0&&v>=60&&nb>=2&&hp>0&&!RO.wk&&mv>=2;
+   window.__chk=window.__chk||{};window.__chk.dmgWall={v:+v.toFixed(0),nb,hp:+hp.toFixed(0),mv:+mv.toFixed(1),ok};
+   say(`📍 WALL CRASH: hit at ${v.toFixed(0)} km/h, ${nb} bricks flew off, health ${hp.toFixed(0)} %, reversed ${mv.toFixed(1)} m after `+(ok?'✅':'❌'))},1500)},400)},50);return'📍 WALL CRASH · driving at the wall…'}
 window.__dmg={traf:(rel,pin)=>{const c={cv:0,j:0,k:0,y:RO.y},fx=Math.sin(RO.h),fz=Math.cos(RO.h),v0=RO.v,vh=RO.vh;RO.vh=RO.h;RO.v=rel/3.6;try{return DMG_traf(c,RO.x+fx*3,RO.z+fz*3,fx,fz,false,!!pin)}finally{RO.v=v0;RO.vh=vh}},bench:()=>{DMG_throw(DMG.N,[],40);const t=performance.now();for(let i=0;i<100;i++){DMG_debStep(1/60)}const ms=(performance.now()-t)/100;return{ms:+ms.toFixed(3),live:DMG.deb.length}},S:DMG,go:DMG_go,impact:DMG_impact,wall:(k,a)=>DMG.wall(k,a),st:()=>({on:DMG.on,ro:[+RO.x.toFixed(1),+RO.z.toFixed(1)],mp:pl?[+pl.mesh.position.x.toFixed(1),+pl.mesh.position.z.toFixed(1)]:null,hp:+(RO.hp??100).toFixed(1),wk:!!RO.wk,deb:DMG.deb.length,n:Object.assign({},DMG.n),hid:DMG_meshes().reduce((s,o)=>{const I=DMG.G.get(o.userData.dmG0||o.geometry);return s+(I?I.hid:0)},0),tBoom:DMG.tBoom,tReb:DMG.tReb,cls:+DMG_cls().toFixed(2),hull:(document.getElementById('rgHull')||{}).style?.visibility||''})};
