@@ -46,16 +46,18 @@ athShelfY=(x,z,h)=>{const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));
     const ay=A.y??0,y=ay+((Bq.y??0)-ay)*t,F=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/F;if(u>=1)continue;const tt=u<0?0:u,I=1-tt*tt*(3-2*tt),o=lat>hw?lat-hw+1:1,w=I/(o*o);sw+=w;sy+=y*w;if(I>im)im=I}}
   if(!sw)return h;const y=sy/sw;return y+(h-y)*(1-im)};
 let TR_sst=0;
-const SM_SC=new Map();
-function SM_shC(L,cx,cz){const seen=new Set(),f=[],o=[];
+// hot-1: every shelf segment is stored ONCE (SM_SG: x,z,dx,dz,l2,hw + its two points); a 32 m cell keeps only the indices of the segments that can
+// reach it (Int32Array). All ~35k Athens cells stay cached (~6 MB; the old per-cell copies were capped at 6000 cells and rebuilt ~2.6 s per boot). Same order, same maths.
+const SM_SC=new Map(),SM_SG={id:new Map(),f:[],o:[]};
+function SM_shC(L,cx,cz){const seen=new Set(),ix=[],G=SM_SG;
   for(let j=0;j<L.length;j+=2){const S=L[j],Q=S.pts,i=L[j+1],hw=S.r.w/2;for(let a=i-1;a<=i;a++){if(a<0||a+1>=Q.length)continue;const A=Q[a];if(seen.has(A))continue;seen.add(A);const B=Q[a+1],dx=B.x-A.x,dz=B.z-A.z;
     // conservative reject: no point of the 32 m cell (half diagonal 22.7 m) can come within hw+66 of this segment
-    if(Math.hypot(A.x+dx/2-cx,A.z+dz/2-cz)-Math.hypot(dx,dz)/2-23>=hw+66)continue;f.push(A.x,A.z,dx,dz,dx*dx+dz*dz||1e-9,hw);o.push(A,B)}}
-  return{L,n:L.length,f:Float64Array.from(f),o}}
+    if(Math.hypot(A.x+dx/2-cx,A.z+dz/2-cz)-Math.hypot(dx,dz)/2-23>=hw+66)continue;let id=G.id.get(A);if(id===undefined){id=G.o.length/2;G.id.set(A,id);G.f.push(A.x,A.z,dx,dz,dx*dx+dz*dz||1e-9,hw);G.o.push(A,B)}ix.push(id)}}
+  return{L,n:L.length,ix:Int32Array.from(ix)}}
 if(CID!=='fra'){const _s0=athShelfY;athShelfY=(x,z,h)=>{const kx=Math.floor(x/32),kz=Math.floor(z/32),k=kx*100000+kz,L=SHELF.get(k);if(!L)return h;let C=SM_SC.get(k);
-  if(!C||C.L!==L||C.n!==L.length){if(SM_SC.size>=6000)SM_SC.clear();SM_SC.set(k,C=SM_shC(L,kx*32+16,kz*32+16))}const F=C.f,O=C.o,n=O.length;let sw=0,sy=0,im=0;
-  for(let s=0,q=0;s<n;s+=2,q+=6){const ax=F[q],az=F[q+1],dx=F[q+2],dz=F[q+3],hw=F[q+5];let t=((x-ax)*dx+(z-az)*dz)/F[q+4];t=t<0?0:t>1?1:t;const ex=ax+dx*t-x,ez=az+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+66)continue;
-    const A=O[s],B=O[s+1],ay=A.y??0,y=ay+((B.y??0)-ay)*t,Fq=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/Fq;if(u>=1)continue;const tt=u<0?0:u,I=1-tt*tt*(3-2*tt),oo=lat>hw?lat-hw+1:1,w=I/(oo*oo);sw+=w;sy+=y*w;if(I>im)im=I}
+  if(!C||C.L!==L||C.n!==L.length){if(C||SM_SC.size>=60000){SM_SC.clear();SM_SG.id.clear();SM_SG.f=[];SM_SG.o=[]}SM_SC.set(k,C=SM_shC(L,kx*32+16,kz*32+16))}const F=SM_SG.f,O=SM_SG.o,I=C.ix,n=I.length;let sw=0,sy=0,im=0;
+  for(let m=0;m<n;m++){const s=I[m]*2,q=s*3,ax=F[q],az=F[q+1],dx=F[q+2],dz=F[q+3],hw=F[q+5];let t=((x-ax)*dx+(z-az)*dz)/F[q+4];t=t<0?0:t>1?1:t;const ex=ax+dx*t-x,ez=az+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+66)continue;
+    const A=O[s],B=O[s+1],ay=A.y??0,y=ay+((B.y??0)-ay)*t,Fq=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/Fq;if(u>=1)continue;const tt=u<0?0:u,I2=1-tt*tt*(3-2*tt),oo=lat>hw?lat-hw+1:1,w=I2/(oo*oo);sw+=w;sy+=y*w;if(I2>im)im=I2}
   if(!sw)return h;const y=sy/sw;return y+(h-y)*(1-im)};
  window.__smShelf={old:_s0,cur:(x,z,h)=>athShelfY(x,z,h),cells:()=>SM_SC.size}}
 // the Acropolis keeps its real plateau height in akro.H (walls, temples), but every placement mask still sees the original hill values
