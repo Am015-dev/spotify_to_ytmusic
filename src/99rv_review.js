@@ -73,3 +73,32 @@ function RV15_go(id,say){const S=RV15_SPOTS[id];if(!S)return'📍 unknown spot '
   t+=Math.min(.05,(now-last)/1000);last=now;if(RO.card){const b=document.getElementById('rcNo');if(b)b.click()}if(t<3&&Math.hypot(RO.x-x0,RO.z-z0)<5)return requestAnimationFrame(f);/* state, not time: stop once the car has moved 5 m */K(false);const d=Math.hypot(RO.x-x0,RO.z-z0);
   say('📍 STUCK CLUSTER '+id+' ('+Math.round(x)+','+Math.round(z)+') · gas moved the car '+d.toFixed(1)+' m in '+t.toFixed(1)+' s (≥ 5 m within 3 s)'+(d>=5?' ✅':' ❌'))};
  requestAnimationFrame(f);return'📍 STUCK CLUSTER '+id+' · holding GAS 3 s…'}
+
+// rev-3 (Alex: "where is the bug to send inside the game"): the 🐞 button is on the HUD at all times; SEND writes a record to the shared db 'bugs' collection (mocked here)
+function RV16_bug(say){const b=document.getElementById('qaBugTop');if(!b||!window.__qa)return'📍 BUG BUTTON · missing (QA kit not loaded?) ❌';
+ const r=b.getBoundingClientRect(),bad=[];if(r.width<40||r.height<40||r.left<0||r.top<0||r.right>innerWidth||r.bottom>innerHeight||getComputedStyle(b).display==='none')bad.push('size/visibility '+Math.round(r.width)+'×'+Math.round(r.height));
+ for(const id of['tP','tL','tR','tG','tB','roamMini','roamGauge','spd','hPos']){const A=RV14_vis(id);if(A&&RV14_ovl({left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},A)>0)bad.push('over #'+id)}
+ const got=[];window.__qaDbMock={collection:n=>({add:async d=>{got.push([n,d]);return{}}})};b.click();const sh=document.getElementById('qaSheet'),open=sh&&sh.style.display==='block';document.getElementById('qaNote').value='GO test report';document.getElementById('qaSend').click();
+ let n=0;const iv=setInterval(()=>{const m=document.getElementById('qaMsg').textContent;if(m.indexOf('Sent')<0&&++n<40)return;clearInterval(iv);delete window.__qaDbMock;const rec=got[0]&&got[0][1],kb=rec&&rec.shot?Math.round(rec.shot.length*.75/1024):-1;
+  const ok=!bad.length&&open&&got.length===1&&got[0][0]==='bugs'&&rec.note==='GO test report'&&rec.build&&rec.city&&/^http/.test(rec.repro)&&Array.isArray(rec.errors)&&Array.isArray(rec.bugs)&&kb>0&&kb<=150&&m.indexOf('Sent')>=0;
+  document.getElementById('qaCancel').click();say('📍 BUG BUTTON · '+Math.round(r.width)+'×'+Math.round(r.height)+' px at '+Math.round(r.left)+','+Math.round(r.top)+(bad.length?' · '+bad.join(', '):' · clear of the controls')+' · sheet '+(open?'opens':'did NOT open')+' · SEND wrote '+got.length+' record to "bugs"'+(rec?' (shot '+kb+' KB, '+rec.errors.length+' errors, '+rec.bugs.length+' bugs)':'')+' · "'+m+'"'+(ok?' ✅':' ❌'))},150);return'📍 BUG BUTTON · tapping 🐞 → SEND…'}
+
+// rev-3 (Alex's first 🐞 report, Athens on foot @899.7,-1033): street turbine between apartment blocks, js_error null [1] (freed GPU array), pale slab in the foot camera
+function RV16_turb(say){const S=[[899.7,-1033],[2074,-1637],[1986,-1652],[525,-1629]],bad=[];let n=0;
+ for(const[x,z]of S){const q=rfSnap(x,z,80);if(!q)continue;roamWarp(q[0],q[1],q[2]);for(let i=0;i<150;i++)roamStep(1/30);const L=window.__life&&window.__life.LIFE;for(const it of((L&&L.H)||[])){if(it.c!=='set'||(it.t!=='turbine'&&it.t!=='windmill'))continue;n++;if(roamHit(it.x,it.z,15,it.y+.5))bad.push(it.t+'@'+Math.round(it.x)+','+Math.round(it.z))}}
+ return('📍 STREET TURBINES · '+n+' turbines/windmills near 4 Athens street spots, '+bad.length+' within 15 m of a building'+(bad.length?' ('+bad.slice(0,3).join(' ')+')':'')+(bad.length?' ❌':' ✅'))}
+function RV16_freed(say){let freed=0,thrown=0;scene.traverse(o=>{const g=o.geometry;if(!g||!g.attributes)return;for(const k in g.attributes){const a=g.attributes[k];if(a&&a.isBufferAttribute&&a.array===null){freed++;try{a.getX(0);a.getY(0);a.getZ(0)}catch(e){thrown++}}}});
+ return('📍 FREED GPU ARRAYS · '+freed+' attributes with the CPU array freed after upload, '+thrown+' throw on getY (null reading 1)'+(thrown?' ❌':' ✅'))}
+function RV16_near(say){const r=OF_go('car');let n=0;const iv=setInterval(()=>{if((RO.foot==='car'||!RO.foot)&&++n<60)return;clearInterval(iv);for(let i=0;i<30;i++)roamStep(1/30);const nf=camera.near;
+  say('📍 FOOT NEAR-CLIP · on foot camera.near '+nf.toFixed(2)+' m (0.4–1.1, grows with the camera distance)'+((RO.foot&&RO.foot!=='car'&&nf>=.4&&nf<=1.1)?' ✅':' ❌'))},200);return'📍 FOOT NEAR-CLIP · getting out…'}
+
+// rev-3 (Alex on PC: could not type in the 🐞 note): keys typed in the box never reach the game, held keys are released on open, Enter = SEND, Esc = close, the box has focus
+function RV16_type(say){const b=document.getElementById('qaBugTop'),sh=document.getElementById('qaSheet'),ta=document.getElementById('qaNote');if(!b||!ta)return'📍 BUG TYPING · missing ❌';
+ K.KeyW=true;K.KeyD=true;TOUCH.gas=true;const got=[];window.__qaDbMock={collection:()=>({add:async d=>{got.push(d);return{}}})};b.click();const rel=!K.KeyW&&!K.KeyD&&!TOUCH.gas;
+ setTimeout(()=>{const foc=document.activeElement===ta,bad=[];let pd=0,reached=0;const probe=e=>{reached++};addEventListener('keydown',probe);
+  for(const c of['KeyW','KeyA','KeyS','KeyD','Space','KeyE','KeyF']){const e=new KeyboardEvent('keydown',{code:c,key:c==='Space'?' ':c[3].toLowerCase(),bubbles:true,cancelable:true});ta.dispatchEvent(e);if(e.defaultPrevented)pd++;ta.dispatchEvent(new KeyboardEvent('keyup',{code:c,bubbles:true}))}
+  removeEventListener('keydown',probe);const held=Object.keys(K).filter(k=>K[k]);ta.value='wasd ';
+  ta.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',bubbles:true,cancelable:true}));
+  setTimeout(()=>{const sent=got.length===1&&got[0].note==='wasd ';ta.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',code:'Escape',bubbles:true,cancelable:true}));const closed=sh.style.display==='none';delete window.__qaDbMock;
+   const ok=rel&&foc&&!reached&&!pd&&!held.length&&sent&&closed;
+   say('📍 BUG TYPING · held keys released on open: '+rel+' · note box focused: '+foc+' · 7 game keys typed: reached the game '+reached+', blocked from typing '+pd+', held keys after '+held.length+' · Enter sent "wasd ": '+sent+' · Esc closed: '+closed+(ok?' ✅':' ❌'))},700)},300);return'📍 BUG TYPING · typing wasd into the note…'}

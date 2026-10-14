@@ -204,7 +204,7 @@ function OF_cam(dt){if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.py??OF.ca
   const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+OF_CAMH+Math.sin(OF.cp)*4.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5,carUp=0;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)){back=Math.max(.25,d-.5);break}if(!carUp&&PC.some(b=>bHit(b,x,z,.3)))carUp=1}
   OF.camB=back<OF.camB?back:OF.camB+(back-OF.camB)*Math.min(1,dt*3);const cx=OF.x-fx*OF.camB,cz=OF.z-fz*OF.camB;
   OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);{const la=2.5*clamp((OF.camB-.4)/3.6,0,1);camera.lookAt(OF.x+fx*la,OF.y+1.25-(1-la/2.5)*.4,OF.z+fz*la)};
-  if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
+  if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);/* rev-3 (Alex, beta.60): a bollard/statue block beside the walker cut into the lens at the bottom of the screen → near-clip grows with the camera distance (≤ 1.1 m), props closer than that are clipped, not shown as a pale slab */camera.near=clamp(OF.camB*.45,.4,1.1);camera.updateProjectionMatrix()}
 // parked cars stay parked while you walk (the lively-city parker would re-park them relative to the walker)
 if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(LV_parkStep);
 // borrowed body: lift ud.m so its lowest tyre point sits CR_TYRE_Y above the road (same rule as CR_carPose for real wheels)
@@ -254,7 +254,7 @@ function OF_parkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData;pl.
 function OF_ogVis(on){try{if(typeof OG!=='undefined'&&OG.grp&&OG.grp.visible!==on)OG.grp.visible=on}catch(e){}}
 roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){OF_ogVis(false);if(state==='roam'&&!RO.frozen){OF_step(dt);OF.stT=(OF.stT||0)+(dt||0);if(OF.stT>.25){OF.stT=0;OF_settle()}}return}
   OF_ogVis(true);const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}try{OF_fleeStep(dt||0);OF_starStep(dt||0)}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF flee',e)}}OF_dom();OF_btns();return r})(roamStep);
-roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);return f(dt)})(roamCam);
+roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);if(camera.near!==.4){camera.near=.4;camera.updateProjectionMatrix()}return f(dt)})(roamCam);
 // leaving roam (menu, district change, wreck reset) puts you back in the car
 function OF_reset(){OF_jackEnd();OF_fleeEnd();if(RO.foot==='car'&&!OF.car)return;try{if(OF.car)OF_poseCar(OF.car.x,OF.car.z,OF.car.y,OF.car.h)}catch(e){}OF.car=null;if(OF.fig)OF.fig.g.visible=false;RO.foot='car';try{if(OF.cur.own)OF_drv(pl&&pl.mesh,true)}catch(e){}OF_btns()}
 if(typeof exitRoam==='function')exitRoam=(f=>function(){OF_reset();return f.apply(this,arguments)})(exitRoam);

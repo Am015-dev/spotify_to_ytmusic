@@ -186,7 +186,7 @@ async function SM_upload(a,b){if(!SM3.on||!HUB.grp||SM3.done)return;SM3.done=1;c
   HUB.grp.traverse(o=>{if(o.isMesh&&o.geometry)use.set(o.geometry,(use.get(o.geometry)||0)+1)});
   HUB.grp.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh||o.userData.pw||!o.geometry||use.get(o.geometry)!==1)return;const g=o.geometry;
     if(g.morphAttributes&&Object.keys(g.morphAttributes).length)return;const P=g.attributes.position;if(!P||!P.array||P.isInterleavedBufferAttribute)return;L.push(g)});
-  const sc=new THREE.Scene(),mt=new THREE.MeshBasicMaterial(),rt=new THREE.WebGLRenderTarget(1,1),prev=renderer.getRenderTarget(),rel=function(){SM3.mb+=this.array.byteLength;this.array=null};
+  const sc=new THREE.Scene(),mt=new THREE.MeshBasicMaterial(),rt=new THREE.WebGLRenderTarget(1,1),prev=renderer.getRenderTarget(),rel=function(){SM3.mb+=this.array.byteLength;this.array=null;this.getX=this.getY=this.getZ=this.getW=BA_freed/* rev-3: a freed array made every CPU-side getY throw 'null (reading 1)' (Alex, beta.60) */};
   let t=performance.now(),i=0;
   try{while(i<L.length){const B=L.slice(i,i+120),dr=[];i+=B.length;
     for(const g of B){if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();for(const k in g.attributes)g.attributes[k].onUpload(rel);if(g.index)g.index.onUpload(rel);
