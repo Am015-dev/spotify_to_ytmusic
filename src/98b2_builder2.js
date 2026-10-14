@@ -165,22 +165,27 @@ function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)
 // one landmark per track (a giant LEGO minifig statue near the start). All instanced; no collision (they stand outside the rails).
 const BX_DC=['#c91a09','#0055bf','#f2cd37','#237841','#fe8a18','#ffffff','#a0a5a9'].map(bxCol);
 function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isInstancedMesh)o.dispose()})}const g=BX.drM=new THREE.Group();BX.sc.add(g);
- const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],pole=[],flag=[],ban=[],chev=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<8.5)/* another road within its rail */,
+ const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],legs=[],stand=[],pole=[],flag=[],ban=[],chev=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<8.5)/* another road within its rail */,
   inB=(x,z)=>(BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+2&&Math.abs(b.z-z)<b.d/2+2);let n=0,side=1,run=0,len=0,props=0;
  for(const pc of L){const S=pc.S[0];for(let k=1;k<S.length;k++){const s=S[k],d=s.d-S[k-1].d;len+=d;run+=d;if(pc.def.boost&&k%Math.max(1,S.length>>1)===0)chev.push(s);if(run<7)continue;run=0;side=-side;n++;
   const raised=s.p.y-BX_h(s.p.x,s.p.z)>2.5||pc.def.p.length>1;if(pc.def.p.length>1||pc.def.stick)continue;
   if(raised){const x=s.p.x+s.S.x*side*6.8,z=s.p.z+s.S.z*side*6.8,y=s.p.y+s.S.y*side*6.8+1.4;pole.push([x,y,z,7]);flag.push([x,y+6.4,z,n,s]);props++;continue}
   const x=s.p.x+s.S.x*side*9.6,z=s.p.z+s.S.z*side*9.6,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
-  if(n%3===0){for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*2.6,fz=z+s.F.z*f*2.6;body.push([fx,y+1.5,fz,n+f]);head.push([fx,y+3.5,fz])}}
-  else if(n%3===1){ban.push([x,y,z,n,s])}else{pole.push([x,y,z,10]);flag.push([x,y+8.6,z,n,s])}}}
+  if(n%3===0){stand.push([x,y,z,s]);for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*2.8,fz=z+s.F.z*f*2.8;legs.push([fx,y+1.7,fz]);body.push([fx,y+3.2,fz,n+f]);head.push([fx,y+4.55,fz])}}
+  else if(n%3===1){ban.push([x,y,z,n,s]);for(const e of[-4.6,4.6])pole.push([x+s.F.x*e,y,z+s.F.z*e,3.2])}else{pole.push([x,y,z,10]);flag.push([x,y+8.6,z,n,s])}}}
  const mt=new THREE.Matrix4(),q=new THREE.Quaternion(),sc=bxV(),pos=bxV(),UP=bxV(0,1,0),M=(geo,mat,arr,fn)=>{if(!arr.length)return;const im=new THREE.InstancedMesh(geo,mat,arr.length);im.castShadow=true;
   arr.forEach((a,i)=>{fn(a,i);im.setMatrixAt(i,mt)});g.add(im);return im},std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45});
- const bi=M(new THREE.BoxGeometry(1.8,3,1.4),std(0xffffff),body,a=>{mt.makeTranslation(a[0],a[1],a[2])});if(bi){body.forEach((a,i)=>bi.setColorAt(i,BX_DC[Math.abs(a[3])%5]))}
- M(new THREE.CylinderGeometry(.84,.84,1.2,10),std(0xf2cd37),head,a=>{mt.makeTranslation(a[0],a[1],a[2])});
+ // trk-2 (props readable at chase-cam distance): minifigs stand apart on a grey stand (dark legs, coloured torso, yellow head); banners are printed boards on two legs
+ M(new THREE.BoxGeometry(14,1,3.4),std(0x8a8f94),stand,a=>{q.setFromUnitVectors(bxV(1,0,0),a[3].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+.5,a[2]),q,sc.set(1,1,1))});
+ M(new THREE.BoxGeometry(1.5,1.4,1),std(0x1b2a4a),legs,a=>{mt.makeTranslation(a[0],a[1],a[2])});
+ const bi=M(new THREE.BoxGeometry(1.7,1.6,1.1),std(0xffffff),body,a=>{mt.makeTranslation(a[0],a[1],a[2])});if(bi){body.forEach((a,i)=>bi.setColorAt(i,BX_DC[Math.abs(a[3])%5]))}
+ M(new THREE.CylinderGeometry(.7,.7,1.1,12),std(0xf2cd37),head,a=>{mt.makeTranslation(a[0],a[1],a[2])});
  M(new THREE.CylinderGeometry(.24,.24,1,6),std(0xd9d9d9),pole,a=>{mt.makeScale(1,a[3],1);mt.setPosition(a[0],a[1]+a[3]/2,a[2])});
  const fl=M(new THREE.BoxGeometry(.12,2.2,3.6),std(0xffffff),flag,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1],a[2]).addScaledVector(a[4].F,-1.8),q,sc.set(1,1,1))});
  if(fl)flag.forEach((a,i)=>fl.setColorAt(i,BX_DC[a[3]%4]));
- const bn=M(new THREE.BoxGeometry(.5,4.4,12),std(0xffffff),ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+3,a[2]),q,sc.set(1,1,1))});
+ BX.banMat=BX.banMat||new THREE.MeshStandardMaterial({roughness:.5,map:BX_tex(256,64,(c,w,h)=>{c.fillStyle='#fff';c.fillRect(0,0,w,h);c.fillStyle='#111';for(let i=0;i<w/8;i++){c.fillRect(i*8,(i%2)*5,8,5);c.fillRect(i*8,h-10+(i%2)*5,8,5)}
+  c.fillRect(0,18,w,28);c.fillStyle='#fff';for(let i=0;i<8;i++){c.beginPath();c.arc(16+i*32,32,9,0,7);c.fill()}})});
+ const bn=M(new THREE.BoxGeometry(.5,3,10),BX.banMat,ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+4.7,a[2]),q,sc.set(1,1,1))});
  if(bn)ban.forEach((a,i)=>bn.setColorAt(i,BX_DC[(a[3]>>1)%4]));
  // glowing chevrons on BOOST pads (pulse in BX_tick)
  const cm=BX.chevMat=BX.chevMat||new THREE.MeshStandardMaterial({color:0xffb000,emissive:0xff8a00,emissiveIntensity:1.4,roughness:.3}),cg=new THREE.BoxGeometry(.5,.08,4.6);
@@ -193,12 +198,17 @@ function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp
   let dmin=1e9;for(const{s}of BX.samp){const d=Math.hypot(s.p.x-x,s.p.z-z);if(d<dmin)dmin=d}if(dmin<dm)continue;if((BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+8&&Math.abs(b.z-z)<b.d/2+8))continue;
   const sc=r-(ca*sF.x+sa*sF.z)*30;if(sc<bd){bd=sc;best=[x,h,z]}}
  if(!best)return 0;const f=new THREE.Group(),std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.35}),B=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),std(c));m.position.set(x,y,z);m.castShadow=true;f.add(m);return m};
- B(1.7,4.2,2.2,0x0055bf,-.95,2.1,0);B(1.7,4.2,2.2,0x0055bf,.95,2.1,0);B(3.9,1.1,2.2,0x0055bf,0,4.7,0);B(4.2,4.6,2.2,0xc91a09,0,7.5,0);
+ // trk-2: one landmark per world, readable from the chase cam: city TV tower, islands lighthouse, canyon giant brick stack, else the minifig
+ const Cy=(r,h,c,y,e)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,18),e?new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.8}):std(c));m.position.y=y;m.castShadow=true;f.add(m);return m},W=BX.world;
+ if(W==='city'){Cy(2.4,2,0xa0a5a9,1);Cy(1.3,26,0xf4f4f4,15);for(const y of[8,14,20])Cy(1.4,1.4,0xc91a09,y);Cy(4.2,2.4,0x0055bf,27.6);Cy(4.6,.6,0xf2cd37,29.1);Cy(3,2,0xf4f4f4,30.4);Cy(.3,7,0xc91a09,34.9)}
+ else if(W==='islands'){Cy(3.2,1.6,0x6b6b6b,.8);for(let k=0;k<6;k++)Cy(2.6-k*.12,3,k%2?0xf4f4f4:0xc91a09,3.1+k*3);Cy(2.3,2.2,0xffd84a,20.2,1);Cy(2.6,.6,0x1b1b1b,21.6);Cy(1.4,1.4,0x1b1b1b,22.6)}
+ else if(W==='canyon'){[[0x0055bf,0,0],[0xf2cd37,2,4],[0xc91a09,-1.5,8],[0x237841,1,12]].forEach(([c,x,k])=>{B(10,4,5,c,x,k+2,0);for(let i=0;i<4;i++)for(const z of[-1.25,1.25]){const st=new THREE.Mesh(new THREE.CylinderGeometry(.85,.85,.8,12),std(c));st.position.set(x-3.75+i*2.5,k+4.4,z);f.add(st)}})}
+ else{ B(1.7,4.2,2.2,0x0055bf,-.95,2.1,0);B(1.7,4.2,2.2,0x0055bf,.95,2.1,0);B(3.9,1.1,2.2,0x0055bf,0,4.7,0);B(4.2,4.6,2.2,0xc91a09,0,7.5,0);
  const arm=(sx)=>{const m=B(1.2,4,1.4,0xc91a09,sx*2.7,7.4,0);m.rotation.z=sx*.18};arm(-1);arm(1);
  for(const sx of[-1,1]){const h=new THREE.Mesh(new THREE.CylinderGeometry(.6,.6,1,10),std(0xf2cd37));h.position.set(sx*3,5,0);f.add(h)}
  const hd=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,3,16),std(0xf2cd37));hd.position.y=11.6;hd.castShadow=true;f.add(hd);
  const stud=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,.7,12),std(0xf2cd37));stud.position.y=13.45;f.add(stud);
- for(const sx of[-.6,.6]){const e=B(.3,.5,.1,0x111111,sx,12,1.7)}const mo=B(1.4,.25,.1,0x111111,0,11.1,1.7);
+ for(const sx of[-.6,.6]){const e=B(.3,.5,.1,0x111111,sx,12,1.7)}const mo=B(1.4,.25,.1,0x111111,0,11.1,1.7);}
  f.scale.setScalar(1.5);f.position.set(best[0],best[1]-.2,best[2]);if(BX_h(best[0],best[2])<.3){const pl=new THREE.Mesh(new THREE.BoxGeometry(12,6,12),std(0x4fb33a));pl.position.y=-3;pl.receiveShadow=true;f.add(pl)}f.rotation.y=Math.atan2(o.x-best[0],o.z-best[2]);g.add(f);return 1}
 // open ends (exits with no piece starting there) + the cursor
 // every cell a piece can be entered from (a MERGE has two)
