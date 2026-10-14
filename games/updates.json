@@ -34,6 +34,21 @@
  },
  {
   "date": "2026-10-14",
+  "game": "thornbound",
+  "title": "readable on every screen size",
+  "items": [
+   "Nothing covers text on the board or menus"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "readable on every screen size",
   "items": [
@@ -155,21 +170,6 @@
   "title": "Menus and Rules panel cleaned up",
   "items": [
    "Rules text clears the frame; More menu readable"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "thornbound",
-  "title": "Menus and board text",
-  "items": [
-   "Nothing covers text on the board or menus"
   ],
   "check": "",
   "scn": [
