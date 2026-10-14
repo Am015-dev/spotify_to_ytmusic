@@ -53,6 +53,8 @@ const OD_CHECKLIST=[
  {ver:'lf1',id:'fra-4',area:'world',text:'Frankfurt south-west field (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
  {ver:'lf1',id:'ath-1',area:'world',text:'Athens north slope (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
  {ver:'lf1',id:'ath-2',area:'world',text:'Athens south lawn (📍 GO): ≤ 8% flat green ground, ≥ 6 props within 50 m.'},
+ {ver:'bv1',id:'fra',area:'world',text:'Frankfurt busiest street (📍 GO parks you there): the buildings look different from each other: no two neighbours the same, mixed facades, roofs and colours. Pass line: same building look within 100 m ≤ 20%, ≥ 3 facade types in ≥ 95% of the blocks (near you and city-wide).'},
+ {ver:'bv1',id:'ath',area:'world',text:'Athens busiest street (📍 GO): mixed facades (balcony bands, shutters, ribbon windows, shops), roofs and colours, not one white tower repeated. Pass line: same look within 100 m ≤ 20%, ≥ 3 facade types in ≥ 95% of the blocks.'},
  {ver:'lf1',id:'mound',area:'world',text:'Drive over a grass hill (📍 GO puts you 40 m before one): the car rolls up and over it without a bump or a stop, and lands back on the grass.'},
  {ver:'v90k',id:'rv-human',area:'people',text:'rv:2026-10-13 · Every humanoid is the same height, 1.80 m (±3 %): you on foot, pavement pedestrians, quest givers and hosts, the moped goon, the minifig driver of City/Town rides; side by side none is a head taller. 📍 GO measures all five and says the verdict. (The small Speed-Champions garage driver is seated in an open cockpit and exempt.)'},
  {ver:'v90k',id:'rv-scale',area:'garage',text:'rv:2026-10-13 · Ride sizes: every garage ride is the size of its class (car 4-5 m, van 5-6, bus 11-13, truck 8-12, ±20 %) and the minifig driver sits with his head under the roof. 📍 GO measures the 6 worst rides (Service Truck, Race Car 6609, Little Tractor, Fire Chief Car, Sport Convertible, Sightseeing Bus), says the verdict and opens the garage. Auto: qa_dev3/tRvScale.js = RSZ.audit() over all 157 rides, 0 out of class.'},
@@ -358,6 +360,8 @@ const OD_CHECKLIST=[
   'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
  // art-2 (lf1): empty-green spots, each GO parks the car at its spot and measures it (src/98lf_lively_fill.js)
  for(const id in LF.SP)GO['lf1/'+id]=[{c:LF.SP[id].c,fn:()=>LF.on?LF_goSpot(id):'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:LF.SP[id].n}];GO['lf1/mound']=[{c:'fra',fn:()=>LF.on?LF_goMound():'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:'grass hill'}];
+ // art-3 (bv1): building variety, GO parks you on the busiest street and measures it (src/98bv_build_var.js)
+ for(const c of['fra','ath'])GO['bv1/'+c]=[{c,fn:()=>BV.on?BV_go():'📍 PENDING · building variety is OFF (?bv=0)',n:'busiest street'}];
  // chk-1 (Alex v90j-beta: "checklist has no GO scenarios"): every item without its own target gets one from its area/text:
  // garage items open the garage (RIDES); Athens items fly to Athens; the rest drive in Frankfurt free roam.
  for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
