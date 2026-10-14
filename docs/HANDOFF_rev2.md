@@ -8,6 +8,15 @@ Read docs/HANDOFF_rev1.md first (method, sweep tools, lanes). This adds what rev
   contact frame at any angle → LIFE_slide / AD_hit slide on glancing hits. #roamPrompt in phone landscape → left column above TAP TAP.
 - The portrait card/HUD/garage fixes are xform-1's (2dd177ee); rev-2's duplicates were dropped.
 
+## QUEUE for rev-3 (coordinator 05:16; all yours, no cam lane: cam-2/cam-3 archived, test-1 stopping)
+1. rv14/rv-cam-refit flaky in PORTRAIT: the bus sometimes keeps the hot rod's 6.4 m (no refit). Repro: node tools/rvGo.js <hot build> rv14/rv-cam-refit, several runs.
+2. hud_over_controls: #roamMini overlaps #tL/#tR on phone @-418,453 (matrix). Check which profile (portrait?) with probe.js + RV14_pairs.
+3. roam-no-forward-progress (matrix, 12 cases): every 6th spot of `--fam spot`, the gas test (rod, 90 steps, < 5 m). Not a state leak (int-5).
+   Look at MX.roamCase on those spots: is the rod blocked (run tools/rv/whystuck-style setter trap) or does the start pose face a wall?
+4. DONE by test-1 (6a2a35a0): monkey closes cards with #rcNo.
+5. Then sweep the newest live build (the beta.51 sweep was stopped, there are no results). Live lanes: int-5 01E4VvRX…, art-6 01WMhMm6h76o95ApqCdk5e28, terr-4 013iFpV7….
+   rv-ath-fest crate check → art-6 (coordinator forwarded).
+
 ## Open (owners told or coordinator asked to forward: cam-2, life-2, art-3 sessions were INACTIVE)
 - rv-cam-refit portrait intermittent: bus keeps 6.4 m (cam lane).
 - rv-ath-fest fails after a drive in the same page: crates −0.31 m vs roof (art-4's check, roof from sibling bbox).
