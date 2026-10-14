@@ -77,12 +77,15 @@
   var MENU_MIN = 13, MENU_OPEN = /menu|setting|rules|help|option|about|how|info|pause|guide/i, MENU_SKIP = /bulb|hint|undo|dock|log|opp|mute|sound|music|zoom|full/i;
   function menuTop() { return [].slice.call(document.querySelectorAll('button,[role=button]')).filter(function (b) { var t = (b.id + ' ' + b.className + ' ' + (b.getAttribute('aria-label') || '') + ' ' + (b.dataset && b.dataset.gx || '')); return MENU_OPEN.test(t) && !MENU_SKIP.test(t) && !/gxt-menu|story|learn|primary|bigb/.test(b.className) && S.vis(b) && !b.closest('[hidden]') && b.getBoundingClientRect().top < 80; }); }
   function menuClose() { try { if (typeof GX !== 'undefined' && GX.close) GX.close(); } catch (e) { } [].slice.call(document.querySelectorAll('.gx-x,[data-gx-close],.gxc-x')).forEach(function (b) { if (S.vis(b)) b.click(); }); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); }
-  function famOk(cs, e) {
-    var first = cs.fontFamily.split(',')[0].trim().replace(/^["']|["']$/g, ''), px = cs.fontSize;
-    if (MENU_FONTS_OK(first)) { try { if (!document.fonts.check(cs.fontWeight + ' ' + px + ' "' + first + '"', ownText(e) || 'a')) return 'font "' + first + '" is not loaded'; } catch (x) { } return ''; }
-    return 'font "' + first + '" is not a shelf face (' + S.MENU_FONTS.join(' / ') + ')';
+  function unq(f) { return String(f).trim().replace(/^["']|["']$/g, ''); }
+  function famOk(cs, e) {   // the face the browser really uses: the first listed family must be a shelf face, declared by an @font-face in document.fonts, and loaded (document.fonts.check() is true when nothing is declared, so it proves nothing)
+    var first = unq(cs.fontFamily.split(',')[0]);
+    if (S.MENU_FONTS.indexOf(first) < 0) return 'font "' + first + '" is not a shelf face (' + S.MENU_FONTS.join(' / ') + ')';
+    var mine = []; try { document.fonts.forEach(function (f) { if (unq(f.family) === first) mine.push(f); }); } catch (x) { }
+    if (!mine.length) return 'font "' + first + '" has no @font-face (falls back to a system font)';
+    if (!mine.some(function (f) { return f.status === 'loaded'; })) return 'font "' + first + '" declared but ' + mine[0].status;
+    return '';
   }
-  function MENU_FONTS_OK(f) { return S.MENU_FONTS.indexOf(f) >= 0; }
   S.menuAudit = function () {   // problems on the CURRENT screen
     var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 60) { seen[m] = 1; out.push(m); } }
     S.audit().forEach(function (m) { if (!/^text under 11px/.test(m)) add(m); });   // overlap / clipped / covered button / engine
@@ -93,8 +96,19 @@
       if (fsz < MENU_MIN) add('text under ' + MENU_MIN + 'px: "' + t + '" (' + Math.round(fsz * 10) / 10 + 'px) <' + who(e) + '>');
       if (e.scrollWidth > e.clientWidth + 2 && /(hidden|clip)/.test(cs.overflowX) && e.clientWidth > 0) add('text clipped (scrollWidth ' + e.scrollWidth + ' > ' + e.clientWidth + '): "' + t + '" <' + who(e) + '>');
       var f = famOk(cs, e); if (f) add(f + ': "' + t + '" <' + who(e) + '>');
+      var tr = S.menuTopmost && firstLine(e); if (tr && tr.width >= 2 && tr.left >= 0 && tr.right <= innerWidth && tr.top >= 0 && tr.bottom <= innerHeight) { var top = document.elementFromPoint(tr.left + tr.width / 2, tr.top + tr.height / 2); if (top && !related(top, e) && !/^(HTML|BODY)$/.test(top.tagName) && S.vis(top)) add('text not topmost: "' + t + '" <' + who(e) + '> is under <' + who(top) + '>'); }
     });
     return out;
+  };
+  function firstLine(e) {   // box of the first line of the element's own text (the centre of a multi-line union often lies on a neighbour)
+    for (var i = 0; i < e.childNodes.length; i++) { var n = e.childNodes[i]; if (n.nodeType === 3 && /\S/.test(n.textContent)) { var r = document.createRange(); r.selectNodeContents(n); var q = r.getClientRects()[0]; if (q) return q; } }
+    return null;
+  }
+  function menuScrollers() { return [].slice.call(document.querySelectorAll('body *')).filter(function (e) { var cs = getComputedStyle(e); return /(auto|scroll)/.test(cs.overflowY) && e.scrollHeight > e.clientHeight + 24 && e.clientHeight > 60 && S.vis(e); }); }
+  S.menuAuditAll = function () {   // async: the screen as shown, then every scrollable panel scrolled page by page (content below the fold), then back to the top
+    var out = S.menuAudit(), sc = menuScrollers(), chain = Promise.resolve();
+    sc.slice(0, 4).forEach(function (el) { var steps = Math.min(8, Math.ceil(el.scrollHeight / Math.max(60, el.clientHeight - 40))); for (var k = 1; k < steps; k++) (function (k) { chain = chain.then(function () { el.scrollTop = k * Math.max(60, el.clientHeight - 40); return new Promise(function (r) { setTimeout(r, 120); }); }).then(function () { S.menuAudit().forEach(function (m) { if (out.indexOf(m) < 0 && out.length < 90) out.push(m); }); }); })(k); chain = chain.then(function () { el.scrollTop = 0; }); });
+    return chain.then(function () { return out; });
   };
   S.menuList = function () {
     var l = [{ name: 'title', open: function () { menuClose(); }, close: function () { } }];
@@ -103,12 +117,13 @@
     return l.concat(S.menuSurfaces);
   };
   S.menuOpen = function (i) { var l = S.menuList(), cur = S._menuCur; if (cur) try { cur.close(); } catch (e) { } menuClose(); S._menuCur = l[i]; if (!l[i]) return null; try { l[i].open(); } catch (e) { return 'open threw ' + e.message; } return l[i].name; };
+  S.menuTopmost = false;   // text-not-topmost check: set GXS.menuTopmost = true to try it; unvalidated (flags ~every title screen, see HANDOFF Fast gate v2)
   S.menuReport = {};
   function menuPass() {   // async: walk every surface once, record problems, end on the title
     var l = S.menuList(), chain = Promise.resolve(), seenMsg = {};
     try { document.fonts.forEach(function (f) { f.load(); }); } catch (e) { }   // every declared face must be fetchable: wait for them all before judging
     chain = chain.then(function () { return document.fonts && document.fonts.ready; }).catch(function () { });
-    l.forEach(function (sf, i) { chain = chain.then(function () { var nm = S.menuOpen(i); return new Promise(function (r) { setTimeout(r, 700); }).then(function () { S.menuReport[sf.name] = S.menuAudit().filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); }); }); });
+    l.forEach(function (sf, i) { chain = chain.then(function () { var nm = S.menuOpen(i); return new Promise(function (r) { setTimeout(r, 700); }).then(function () { return S.menuAuditAll().then(function (ms) { S.menuReport[sf.name] = ms.filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); }); }); }); });
     return chain.then(function () { S.menuOpen(0); S.menuN = l.length; return new Promise(function (r) { setTimeout(r, 400); }); });
   }
   function menuCheck(rx, name) { return { kind: 'fn', name: name, fn: function () { var bad = []; Object.keys(S.menuReport).forEach(function (k) { S.menuReport[k].filter(function (m) { return rx.test(m); }).forEach(function (m) { bad.push('[' + k + '] ' + m); }); }); return bad.length ? 'N=' + bad.length + ' ' + bad.slice(0, 14).join(' | ') : true; } }; }
@@ -119,7 +134,8 @@
       { kind: 'fn', name: 'menu surfaces opened', fn: function () { return S.menuN >= 1 || 'no surface'; } },
       menuCheck(/^text overlaps/, 'no two text boxes overlap'),
       menuCheck(/^text clipped/, 'no text clipped'),
-      menuCheck(/^font "/, 'every font loaded and a shelf face'),
+      menuCheck(/^font "/, 'every font a loaded shelf face'),
+      menuCheck(/^text not topmost/, 'no text covered at its centre'),
       menuCheck(/^text under/, 'text at least ' + MENU_MIN + ' px'),
       menuCheck(/^button covered/, 'no covered button')
     ]

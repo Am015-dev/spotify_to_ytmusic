@@ -192,3 +192,36 @@ Live with LAB: all 15 shelf games (Doorkick, Crown, Nebula, Shipwreck, Sands, Su
 - Fixed + deployed (menu scenario green): doorkick-dungeon, cauldron-fair, kaiten-kitchen, final-approach, lantern-dive, sunglaze.
 - Still failing (after the shared fix): crown-city-smash (overlap "20 ★"/"last monster standing" on title); hollowbough (small "Build a woodland city." 11.2 px); nebula-aces (title overlap "New here?"/subtitle, axe .gx-gear target size, `data-engine "three.js r158"` is a bad attribute); rampart-and-vine (menubtn panel: 5 covered buttons, 11 axe contrast/target); sands-of-qamar (3 overlaps: "2 players"/"Begin" etc. in the title); shipwreck-isle (2 overlaps with p.small.muted, axe #bulbbtn); short-fuse (overlaps "Free and direct"/"All jobs", "Boot Camp I-III" 9.3 px, 8 axe contrast); thornbound (axe target-size/contrast in the campaign screen); tidewake (top-bar labels Hint/Crews/Log 11 px, axe target size). Common: top-bar buttons (#bulbbtn, rulesd, setd) report axe target-size while the campaign screen is open: check whether the campaign layer covers them.
 - Not done: Mainhattan games skipped as ordered; no per-game skin.css was deleted yet.
+
+## Fast gate v2 (14 Oct 2026, worker): `build-all.py --deploy` speed + menu test correctness
+Measured on this 4-core box, 3 games (sunglaze, short-fuse, tidewake; two fail the menu scenario as before), `--deploy --suffix=-tmp`:
+| step | before (owner's numbers) | after |
+|---|---|---|
+| 3 games total | ~6-7 min | **126 s** (142 s first run) |
+| 1 game (sunglaze) | n/a | **74 s** |
+| scenarios | 52 s + ~35 s rerun per failing game | 74 s once (21 tests); no rerun |
+| look-check | serial, ~30 s/game + live look ~30 s + live axe, per game | 2 in parallel, ~10 s/game, no live run |
+Target (90 s / 45 s) NOT reached: the remaining time is scenarios (~75 s: every test waits ~1.6 s + 5 s engine settle + 3 glow taps; axe on each page), builds ~12 s (now 3 in parallel). Next: cut `S.universal`'s 5 s wait, run scenarios with workers=4, fold look-check into the Playwright run.
+What changed (reused: Playwright Test, axe, existing look-check):
+1. `scn-run.js` returns `{fails, invFails}`; `scenarios.spec.js` writes invariants (text < 11 px, clipping, glow-tap) to `.staging/.inv/` and fails only on the scenario's own checks. The SCN_NOINV rerun is gone; `build-all.py` prints the invariants as WARN.
+2. Live look/axe re-measurement replaced by committed `games-src/look-known/<slug>.json` (per mode phone|all; rewritten for each game that passes the gate). A game with no file yet is measured once on the live game (as before), then committed. Only sunglaze is seeded; the rest seed on their first deploy.
+3. Look checks run in a 2-worker thread pool; game builds run 3 at once.
+4. Duplicate checks removed from the deploy look-check (`look-check.js --skip size,overflow,overlap,fonts`): the scenario invariants + menu scenario own text size, clipping, overlap and fonts. Images, cards, boards, covered buttons, page errors stay in look-check.
+Needs `cd games-src && npm ci` on a fresh machine (no node_modules in a new container).
+
+### Menus (shell/gx-scenario.js `menu` scenario)
+- Font check now real: first family must be a shelf face, have an @font-face in `document.fonts`, and some face `loaded` (old `document.fonts.check()` is true when nothing is declared).
+- Scrollable panels are scrolled page by page and re-audited (below the fold).
+- NOT done: pause / end / win-lose screen and chapter-boss intro need per-game spawn hooks (`GXS.menuSurfaces.push({name, open, close})`); the generic finder only opens top-bar buttons and the campaign screen. "Text not topmost at its centre" is coded behind `GXS.menuTopmost = true` but off: it flagged every game's title screen (28+ per game) and I did not find out whether that is real or a layout-timing artefact.
+- Results, phone 390x763, menu scenario, all 15 (new + old failures; every game FAILS the scenario now only where listed; no font failures anywhere):
+  - cauldron-fair, doorkick-dungeon, final-approach, kaiten-kitchen, lantern-dive, sunglaze: clean
+  - hollowbough: text < 13 px x2
+  - crown-city-smash: text overlaps x4
+  - nebula-aces: overlaps x3, axe tap target < 24 px x2
+  - rampart-and-vine: covered button x10, axe contrast x10
+  - sands-of-qamar: overlaps x10
+  - shipwreck-isle: overlaps x6, text < 13 px x28, tap target x1
+  - short-fuse: overlaps x11, text < 13 px x6, contrast x5, tap target x3
+  - thornbound: overlaps x2, tap target x4
+  - tidewake: overlaps x10, text < 13 px x12, tap target x3
+(Counts are matches in the first 14 messages per check, so "x28" = at least 14; run `playwright test --project=phone --grep menu` with SCN_SLUGS for full lists.) The "clean" games above passed with the topmost check off.
