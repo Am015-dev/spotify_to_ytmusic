@@ -1,7 +1,7 @@
 // offline track planner: chains pieces like bxCh (same BX_P, read from src), prints closure, length, max grade, near-overlaps.
 // node tools/bx/plan.js <file exporting {name:[world,[i,j,l,r],[pieces...]]}>
 const fs=require('fs'),src=fs.readFileSync(__dirname+'/../../src/98b2_builder2.js','utf8');
-const bxSS=t=>t*t*(3-2*t);const body=src.slice(src.indexOf('const bxRamp'),src.indexOf('const BX_PAL'));const BX_P=eval(body+';BX_P');
+const bxSS=t=>t*t*(3-2*t),BX_KJ=1.5,BX_BK=.5;/* trk-5: these live above the sliced body */const body=src.slice(src.indexOf('const bxRamp'),src.indexOf('const BX_PAL'));const BX_P=eval(body+';BX_P');
 const bxCl=(v,a,b)=>v<a?a:v>b?b:v,bxBowl=(x,z,cx,cz,r,deep)=>{const d=Math.hypot(x-cx,z-cz);return d<r?deep+(2-deep+1)*(d/r)**2:99};
 const W=eval(src.slice(src.indexOf('const BX_WORLDS'),src.indexOf('const BX_CITY'))+';BX_WORLDS');
 const BXN=+/BXN=(\d+)/.exec(src)[1],BX_OFF=+/BX_OFF=(\d+)/.exec(src)[1],BXC=8,BXH=2,BXO=-BXN*BXC/2,LIM=BXN*BXC/2-2,BXF=[[0,1],[-1,0],[0,-1],[1,0]];

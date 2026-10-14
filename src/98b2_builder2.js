@@ -34,6 +34,14 @@ const BX_WORLDS={
   return Math.min(Math.max(2+.8*Math.sin(x/23)*Math.cos(z/19),m),bxBowl(x,z,-95,-85,45,-4))}},
  canyon:{n:'CANYON',f:(x,z)=>{const cz=48*Math.sin(x/46),d=Math.abs(z-cz)*Math.cos(Math.atan(48/46*Math.cos(x/46))),pl=18+1.2*Math.sin(x/17)*Math.cos(z/21);
   if(d>32)return pl;if(d>22)return 2+(pl-2)*bxSS((d-22)/10);return d<7?2-5*bxSS(1-d/7):2}},
+ // trk-5 GRAND TOUR (flagship): 4 biomes on one map. South = stadium town (grass), east = red-rock CANYON plateau (11.4 m, cliffs, a dry gorge, mesas),
+ // north = FARM meadow with a river from the north edge into a lake, west = LAGOON (sand, turquoise water, a lighthouse islet). Zones: FS_zone (98fs_flagship.js)
+ gp:{n:'GRAND TOUR',f:(x,z)=>{let h=3.4+.7*Math.sin(x/31)*Math.cos(z/27)+.45*Math.sin((x+z)/53);
+  const dx=Math.max(46+26*bxSS(bxCl((z-16)/18,0,1))-x,x-240,0),dz=Math.max(-96-z,z-84,0),dd=Math.hypot(dx,dz);if(dd<10)h=Math.max(h,h+(11.4+.25*Math.sin(x/9)*Math.cos(z/11)-h)*(1-bxSS(dd/10)));
+  if(z>40&&x>100&&x<156){const g=Math.abs(x-128);if(g<11)h=Math.min(h,g<6?1.2:1.2+(h-1.2)*bxSS((g-6)/5))}
+  for(const[mx,mz,r,mh]of[[138,20,10,30],[205,-75,12,26],[196,150,15,24],[112,-204,9,18],[166,-160,13,30],[124,-118,7,16]]){const d=Math.hypot(x-mx,z-mz);if(d<r+5)h=Math.max(h,d<r?mh-(d/r)**4*2:mh*(1-bxSS((d-r)/5)))}
+  if(z>110&&x<20){const rx=-80+7*Math.sin(z/30),dr=Math.abs(x-rx);if(dr<12)h=Math.min(h,dr<6?-2.6:-2.6+(h+2.6)*bxSS((dr-6)/6))}
+  h=Math.min(h,bxBowl(x,z,-70,100,22,-3),bxBowl(x,z,-185,52,56,-7));const li=Math.hypot(x+205,z-52);if(li<9)h=Math.max(h,3.2-li*li/40);return h}},
  city:{n:'CITY',f:(x,z)=>Math.min(2,bxBowl(x,z,-180,bxCl(z,-60,40),24,-4))},
  islands:{n:'ISLANDS',f:(x,z)=>{const b=(cx,cz,r,h)=>{const d=Math.hypot(x-cx,z-cz);return d<r?-5+(h+5)*bxSS(1-d/r):-5};return Math.max(b(-10,0,85,4),b(-95,85,45,12),b(100,90,50,7),b(90,-100,40,16))}}
 };
@@ -645,9 +653,13 @@ function BX_demoNames(){return Object.keys(BX_DEMOS).filter(k=>!BX_DEMOS[k].hide
 function BX_eachDemo(f){const cur={log:BX.log},cn=BX.name,dr=BX.mode==='drive',R=[];if(dr)BX_driveStop();try{BX_raceClear()}catch(e){}
  for(const k of BX_demoNames()){BX_load(BX_DEMOS[k],k);R.push([k,f(k)])}BX_load(cur,cn);if(dr)BX_driveStart();return R}
 // the lap as piece samples (same walk as __bx.route): ch[k] = branch at the k-th SPLIT
+// trk-5: across a water gap (splash lane: RAMP DOWN into the water ... RAMP UP out of it) the course goes on at the nearest unseen piece AHEAD of the exit,
+// in line with it (the old nearest-piece rule jumped sideways onto the other lane of the split, so the AI never took the splash)
+function BX_gapNext(L,seen,e){const fr=BX_fr(e),E=fr.o,F=fr.F;let best=null,bs=1e9;for(const p of L){if(seen.has(p.id))continue;const d=p.S[0][0].p.clone().sub(E),fw=d.x*F.x+d.z*F.z,lat=Math.abs(d.x*F.z-d.z*F.x),dist=Math.hypot(d.x,d.z);
+ if(dist>60||fw<-2)continue;const sc=dist+3*lat;if(sc<bs){bs=sc;best=p}}return best}
 function BX_lap(ch=[]){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set(),splits=0;
  while(pc&&!seen.has(pc.id)){seen.add(pc.id);const last=out.length?out[out.length-1].s.p:null,b=pc.def.in?(last?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-last.x,S[0].p.z-last.z)]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;
-  if(pc.S.length>1&&!pc.def.in)splits++;for(const s of pc.S[b])out.push({s,pc});const e=pc.ex[Math.min(b,pc.ex.length-1)],E=BX_fr(e).o;pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).map(p=>[p,p.S[0][0].p.distanceTo(E)]).filter(x=>x[1]<60).sort((a,c)=>a[1]-c[1]).map(x=>x[0])[0]||null} // a water splash leaves a gap: the next piece is the nearest unseen start (like route())
+  if(pc.S.length>1&&!pc.def.in)splits++;for(const s of pc.S[b])out.push({s,pc});const e=pc.ex[Math.min(b,pc.ex.length-1)],E=BX_fr(e).o;pc=by.get(key(e))||BX_gapNext(L,seen,e)} // a water splash leaves a gap: the next piece is the nearest unseen start (like route())
  out.splits=splits;out.closed=!!(out.length&&out[0].s.p.distanceTo(out[out.length-1].s.p)<6);return out}
 // drivable metres beyond a deck edge (side sg = -1 left, +1 right), up to 30 m: no rail, ground (or water: boat) within 0.6 m per metre of the last point, no building/rock/tree/pillar
 const bxRail=pc=>pc.rail!=null?pc.rail:!(pc.def.in||pc.def.p.length>1)&&BX_RAIL.length>0;
@@ -698,7 +710,7 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  // the course as waypoints (for the test driver): follow exits from START, choosing branch ch[k] at the k-th SPLIT
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
-   const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
+   const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||BX_gapNext(L,seen,e)}return out},
  h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),sim:(ch,t)=>BX_sim(ch,t),lap:ch=>BX_lap(ch),openData:()=>BX_openData(),side:(s,pc,g)=>BX_side(s,pc,g),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
@@ -740,7 +752,7 @@ function BX_raceTick(dt){const r=BX.race;if(!r||BX.mode!=='drive')return;const c
  if(cd&&cd.textContent){r.goT+=dt;if(r.goT>.8)cd.textContent=''}r.t+=dt;const R=r.R,end=r.s0+BX_RACE_LAPS*R.L;
  const me0=BX_raceProg();
  // trk-3 (Alex beta.36 "5/6 -> 6/6 and never sees a rival"): light rubber-banding keeps the pack in sight: a rival > 10 m ahead eases off (to 50 % at ~70 m), one behind pushes up to +15 %
- for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),g=q.s-r.s0-me0,rb=g>10?Math.max(.5,1-(g-10)/120):g<-10?Math.min(1.15,1+(-g-10)/150):1,lim=Math.min(q.base*rb,R.VL[at.i]*(q.base/33)*Math.min(rb,1.08));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
+ for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),g=q.s-r.s0-me0,rb=r.fair?(g>10?Math.max(.85,1-(g-10)/400):1):g>10?Math.max(.5,1-(g-10)/120):g<-10?Math.min(1.15,1+(-g-10)/150):1 /* trk-5 fair (GRAND TOUR): a rival never speeds up because you lead; one far ahead eases off at most 15 % */,lim=Math.min(q.base*rb,R.VL[at.i]*(q.base/33)*Math.min(rb,1.08));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
   const a=BX_pathAt(R,q.s),b=BX_pathAt(R,q.s+3),Sx=b.F.z,Sz=-b.F.x;q.o.position.set(a.p.x+Sx*q.lat,a.p.y+.05,a.p.z+Sz*q.lat);q.o.lookAt(b.p.x+Sx*q.lat,a.p.y+.05,b.p.z+Sz*q.lat)}
  const me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length;r.pos=pos;r.gapNow=Math.min(...r.rv.map(q=>Math.abs(q.s-r.s0-me)));if(BX.m.laps<1)r.gapMax=Math.max(r.gapMax||0,r.gapNow);const P=$('#bxPos'),T=$('#bxTm'),lt=BX.m.t-BX.m.lap0;
  if(P)P.textContent=pos+'/'+(BX_RIV+1);if(T)T.textContent=`LAP ${Math.min(BX.m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS} · ${Math.floor(lt/60)}:${(lt%60).toFixed(1).padStart(4,'0')}`;

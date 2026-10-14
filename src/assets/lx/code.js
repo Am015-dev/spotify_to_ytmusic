@@ -140,7 +140,7 @@ function LIFE_cell(a,b){const key=a*100000+b;let C=LIFE.C.get(key);if(C)return C
  let nS=0,nM=0,nG=0;const used=[],cap=Math.ceil(S.length*(CID==='fra'?.7:.35)),h0=Math.floor(LIFE_h(a,b,3)*64);
  const room=(x,z,r,g=1.5)=>used.every(u=>(u[0]-x)**2+(u[1]-z)**2>(u[2]+r+Math.min(g,u[3]??g))**2);/* a smashable group only asks .3 m of air */
  const putM=(p,hh)=>{for(let tt=0;tt<LIFE_SET.length;tt++){const t=LIFE_SET[(h0+Math.floor(hh*8)+nM*3+tt)%LIFE_SET.length],r=LIFE_SETR[t],q=LIFE_at(p,r);
-   if(!q||!room(q.x,q.z,r))continue;C.push({c:'set',t,x:q.x,z:q.z,y:q.y,h:q.h,r,ph:hh*20,id:key*256+C.length});used.push([q.x,q.z,r]);nM++;return true}return false};
+   if(!q||!room(q.x,q.z,r))continue;if((t==='turbine'||t==='windmill')&&roamHit(q.x,q.z,15,q.y+.5))continue;/* rev-3 (Alex, Athens @899,-1033): a 16 m turbine stood between apartment blocks; only in open ground, ≥ 15 m from any building */C.push({c:'set',t,x:q.x,z:q.z,y:q.y,h:q.h,r,ph:hh*20,id:key*256+C.length});used.push([q.x,q.z,r]);nM++;return true}return false};
  const putG=(p,hh)=>{for(let tt=0;tt<LIFE_GRP.length;tt++){const t=LIFE_GRP[(h0+Math.floor(hh*8)+nG*3+tt)%LIFE_GRP.length],r=LIFE_GRPR[t],q=LIFE_at(p,r);
    if(!q||!room(q.x,q.z,r))continue;C.push({c:'grp',t,x:q.x,z:q.z,y:q.y,h:q.h,ux:q.ux,uz:q.uz,r,ph:hh*20,id:key*256+C.length});used.push([q.x,q.z,r]);nG++;return true}return false};
  const smPass=()=>{
