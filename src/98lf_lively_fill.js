@@ -28,6 +28,15 @@ const LF_h=(x,z,s)=>{let h=Math.sin(x*12.9898+z*78.233+(s||0)*37.719)*43758.5453
 const LF_n=(x,z)=>{const a=x/160,b=z/160,i=Math.floor(a),j=Math.floor(b),u=a-i,v=b-j,s=t=>t*t*(3-2*t),q=(p,r)=>LF_h(p,r,7);return q(i,j)*(1-s(u))*(1-s(v))+q(i+1,j)*s(u)*(1-s(v))+q(i,j+1)*(1-s(u))*s(v)+q(i+1,j+1)*s(u)*s(v)};
 function LF_mound(x,z){const L=LF.MG.get(Math.floor(x/64)*10000+Math.floor(z/64));if(!L)return 0;let h=0;for(const m of L){const q=((x-m.x)**2+(z-m.z)**2)/(m.r*m.r);if(q<1){const k=1-q;h=Math.max(h,m.h*k*k)}}return h}
 roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.MG.size){const m=LF_mound(x,z);if(m>0)r.g+=m}return r})(roamTerr);
+// foot-2: a dirt/sand/grass PATCH is a tilted plane draped on the ground under it (planar fit + lift so it never dips under the terrain / a mound),
+// and its top is part of the walk/drive height: LF_patchY(x,z) = the plane's top inside the 9-gon, else null. The figure's feet and the tyres use the SAME surface as the mesh.
+LF.PG=new Map();const LF_PPOLY=[];for(let i=0;i<9;i++){const a=i/9*Math.PI*2,r=.75+.25*LF_h(i,3,1);LF_PPOLY.push([Math.cos(a)*r,-Math.sin(a)*r])}
+function LF_patchY(x,z){const A=LF.PG.get(Math.floor(x/32)*10000+Math.floor(z/32));if(!A)return null;let best=null;
+ for(const p of A){const dx=x-p.x,dz=z-p.z;if(dx*dx+dz*dz>p.R2)continue;const lx=(p.c*dx-p.s*dz)/p.sx,lz=(p.s*dx+p.c*dz)/p.sz;let ins=false;
+  for(let i=0,j=8;i<9;j=i++){const a=LF_PPOLY[i],b=LF_PPOLY[j];if((a[1]>lz)!==(b[1]>lz)&&lx<(b[0]-a[0])*(lz-a[1])/(b[1]-a[1])+a[0])ins=!ins}
+  if(ins){const y=p.yt+p.gx*dx+p.gz*dz;if(best==null||y>best)best=y}}
+ return best}
+roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.PG.size){const t=LF_patchY(x,z);if(t!=null&&t>r.g&&t-r.g<.8)r.g=t}return r})(roamTerr);
 // cheapest checks first (grid lookups), trail distance (a loop over every trail point) last; returns the road-edge distance or -1
 function LF_open(x,z){if(roamHit(x,z,5))return -1;const q=cityAt(x,z),f=fillAt(x,z),d=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(d<7)return -1;
  if(inRiver(x,z,-12)||onAnyDeck(x,z))return -1;const a=abAt(x,z);if(a&&a.d<a.road.w/2+14)return -1;if(RO.ramps&&RO.ramps.some(r=>Math.abs(r.x-x)<30&&Math.abs(r.z-z)<30))return -1;
@@ -65,8 +74,18 @@ function LF_ctx(){if(LF.cx)return LF.cx;const fra=CID==='fra';const VS=new Map()
 function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Math.floor(HX0/1000)*1000;x<HX1;x+=1000)for(let z=Math.floor(HZS/1000)*1000;z<HZN;z+=1000)
   LF.regs.push(lzReg('lf_'+x+'_'+z,'',[x,x+1000,z,z+1000],{lf:1,build:LF_tileG}))}
 function LF_unreg(L){if(L.lfM&&L.lfM.length){const S=new Set(L.lfM);LF.M=LF.M.filter(m=>!S.has(m));for(const[k,A]of LF.MG){const B=A.filter(m=>!S.has(m));if(B.length)LF.MG.set(k,B);else LF.MG.delete(k)}}
- if(L.lfG)for(const[k,e]of L.lfG){const A=LF.G.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1)}}L.lfM=[];L.lfG=[];if(LF.ms)LF.ms=LF.ms.filter(m=>m.parent&&m.userData.lfR!==L.id)}
+ if(L.lfG)for(const[k,e]of L.lfG){const A=LF.G.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1)}}if(L.lfP)for(const[k,e]of L.lfP){const A=LF.PG.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1);if(!A.length)LF.PG.delete(k)}}L.lfM=[];L.lfG=[];L.lfP=[];if(LF.ms)LF.ms=LF.ms.filter(m=>m.parent&&m.userData.lfR!==L.id)}
 STR_lzFree=(f=>function(L){if(L&&L.lf)LF_unreg(L);return f.apply(this,arguments)})(STR_lzFree);
+// planar fit of a patch to the ground (terrain + mounds): slope from a 3 m cross, then lifted by the worst dip of the ground above the plane over the 9-gon, so the top is never under the surface
+function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p.y,cl=v=>Math.max(-1.2,Math.min(1.2,v));
+ const gx=cl((gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d)),gz=cl((gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d));let lift=0,ok=false;
+ for(let it=0;it<4&&!ok;it++){let hi=-9,lo=9;
+  for(const q of LF_PPOLY)for(const u of[.97,.5]){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(y0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}
+  hi=Math.max(hi,0);lo=Math.min(lo,0);if(hi-lo<=.3){ok=true;lift=hi}else{p.sx*=.7;p.sz*=.7}}
+ if(!ok){p.sx=p.sz=0;return}
+ p.y=y0+lift;p.gx=gx;p.gz=gz;
+ const R=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:R*R,yt:p.y+.04,gx,gz};if(!L.lfP)L.lfP=[];
+ for(let i=Math.floor((p.x-R)/32);i<=Math.floor((p.x+R)/32);i++)for(let j=Math.floor((p.z-R)/32);j<=Math.floor((p.z+R)/32);j++){const k=i*10000+j;let A=LF.PG.get(k);if(!A)LF.PG.set(k,A=[]);A.push(e);L.lfP.push([k,e])}}
 function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=CID==='fra',[X0,X1,Z0,Z1]=L.rect,I={tuft:[],bed:[],patch:[],pond:[],reed:[],mound:[]},st=LF.st;
  const has=t=>!!D[t],pk=a=>{const b=a.filter(has);return b.length?b[Math.floor(LF_h(a.length,b.length,L.props.length)*b.length)]:null},{TREES,ROCK,GRN,DIRT}=C;
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),G16=(x,z)=>{const k=Math.floor(x/16)*10000+Math.floor(z/16),e=[x,z];let A=LF.G.get(k);if(!A)LF.G.set(k,A=[]);A.push(e);L.lfG.push([k,e])};
@@ -129,7 +148,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
-  A.forEach((p,i)=>{Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'))});
+  A.forEach((p,i)=>{if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'))});
   m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield}
  st.regs=(st.regs||0)+1;yield* lzPropsG(L)}
 // GO / tests: build the fill tiles around (x,z) now (a GO lands you there before lazyStep would reach them)
