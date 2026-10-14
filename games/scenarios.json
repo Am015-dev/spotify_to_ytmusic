@@ -743,6 +743,14 @@
    "mut": 0
   },
   {
+   "id": "sf-uibar",
+   "name": "Title screen: one primary, readable, 5 top-bar buttons",
+   "ask": "Is the title screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "sf-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",

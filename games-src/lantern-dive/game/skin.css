@@ -25,3 +25,28 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}
 .jc{white-space:normal;min-height:26px;padding-top:2px;padding-bottom:2px}
 .jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;text-overflow:clip}
 .seat .jc{font-size:13px}
+/* UI-BAR 7: one primary button, one Quick game row of segmented buttons */
+.tbtn.res{min-height:56px}.tbtn.story{min-height:84px}
+.tbtns{gap:14px}
+.qg{display:flex;flex-direction:column;gap:6px}
+.qgl{font-size:14px;font-weight:800;color:#d6ecff;text-align:center;text-shadow:0 2px 6px rgba(0,0,0,.85)}
+.qrow{display:flex;gap:0;border:3px solid #0b1f3a;border-radius:14px;overflow:hidden;background:#173f70}
+.qrow .qseg,.qrow .tutw>button{flex:1 1 0;min-width:0;min-height:52px;padding:4px 6px;appearance:none;border:0;border-left:2px solid #0b1f3a;background:linear-gradient(180deg,#2f66a8,#173f70);color:var(--ink);font:800 15px var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center}
+.qrow>:first-child,.qrow>.tutw:first-child>button{border-left:0}
+.qrow .tutw span{display:none}
+@media (min-width:1024px){.tbtn span,.qgl,.ttl .tag{font-size:16px}.qrow .qseg,.qrow .tutw>button{font-size:16px}.tbtns{width:min(460px,100%)}}
+@media (min-width:1024px){.gx-bar .gx-ibtn span,.tlink{font-size:16px}}
+@media (min-width:1024px){.tbtn .gxt-menu span,.tbtn span,.tbtn small{font-size:16px!important}}
+/* UI-BAR 1: text sizes */
+.seat .nm,.me .nm,.bdg b,.bdg span{font-size:13px}
+@media (min-width:1024px){
+#barstat,#barstat span,#prompt,.jcard b,.seat .nm,.me .nm,.bdg b,.ll .lt,.rules p,.rules li,.credits-audio,.mrow .lbl,.mbt .btn,.setbody .sm,.setbody .btn,.mrow .btn,.mrow .gxt-menu b,.mrow .gxt-menu span,.mrow.gxh-set span,.btn.gxt-menu b,.btn.gxt-menu span{font-size:16px}
+}
+@media (min-width:1024px){.setbody p.sm,.setbody .sm{font-size:16px}}
+/* UI-BAR 8: wide screens get bigger job cards */
+@media (min-width:1024px){.jcard{min-height:92px;padding:10px 12px 10px 18px}.jcard b{font-size:18px}}
+/* UI-BAR 6: log and jobs panels fit their content */
+#logd.on,#jobd.on{bottom:auto;height:auto;max-height:calc(100% - 16px)}
+#logd .gx-drawer-body,#jobd .gx-drawer-body{height:auto;flex:0 1 auto;max-height:100%}
+/* UI-BAR 4: tablet top bar keeps room for the one line */
+@media (max-width:1023px){.gx-bar .gx-ibtn span{display:none}.gx-bar .gx-ibtn{min-width:44px}#barprompt{min-width:240px}.gx-bar .gx-sp{display:none}}
