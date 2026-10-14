@@ -1,6 +1,15 @@
 [
  {
   "date": "2026-10-14",
+  "game": "short-fuse",
+  "title": "short-fuse: readable on every screen size",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "Menus: clean and readable",
   "items": [
@@ -91,15 +100,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-14",
-  "game": "short-fuse",
-  "title": "Menus: painted buttons keep their art shape",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
  },
  {
   "date": "2026-10-14",
