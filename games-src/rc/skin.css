@@ -22,7 +22,7 @@ html.sk-res .rx[data-r=wood]{background-image:url(media/icon-res-wood.webp)}html
 /* the driftwood bar and the drawer strips are light: dark ink instead of the cream text of the dark kits */
 html.sk{--sk-cream:#2a1a0a}
 html.sk .gx-bar h1{color:#2a1a0a;text-shadow:0 1px 0 rgba(255,255,255,.55)}
-html.sk .gx-drawer-head h2{text-shadow:0 1px 0 rgba(255,255,255,.6)}
+html.sk .gx-drawer-head h2{color:#2a1a0a;text-shadow:0 1px 0 rgba(255,255,255,.6)}
 html.sk .gx-ibtn{text-shadow:0 1px 0 rgba(255,255,255,.5);color:#2a1a0a}
 html.sk #hud .hk{align-items:center}
 html.sk-res #hud .rx{width:20px;height:20px}
