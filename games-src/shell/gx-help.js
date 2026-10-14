@@ -44,14 +44,29 @@
     }
     return out;
   }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
+    return out;
+  }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
   function place(b, tr) {
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -59,6 +74,17 @@
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -71,6 +97,7 @@
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
