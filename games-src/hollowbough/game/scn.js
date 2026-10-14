@@ -10,6 +10,14 @@
     UI.seed = seed; UI.opt = { np: 2, level: 'normal', solo: 1 }; newGame('vs'); UI.fingerSeen = true; try { GXH.setEnabled(false); } catch (e) { }
     return GXS.wait(function () { return UI.started && HB.actor(G) === 0 && !UI.animBusy && !UI.cards.length && document.querySelectorAll('#bd .hc').length; }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the real play screen right after a game starts, tips on
+  GXS.boardOpen = function () {
+    if (!booted()) return;
+    try { GX.close(); } catch (e) { }
+    UI.seed = 51; UI.opt = { np: 2, level: 'normal', solo: 1 }; newGame('vs'); UI.fingerSeen = true;
+    try { if (typeof hlpInit === 'function') hlpInit(); GXH.reset(); GXH.setEnabled(true); } catch (e) { }
+    return GXS.wait(function () { return UI.started && HB.actor(G) === 0 && !UI.animBusy && !UI.cards.length && document.querySelectorAll('#bd .hc').length; }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
+  };
   var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
   var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
   var skin = { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } };
