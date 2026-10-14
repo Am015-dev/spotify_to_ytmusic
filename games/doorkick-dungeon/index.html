@@ -1487,7 +1487,7 @@ html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{to
 /* GX scenarios: "spawn the requirement only". Open any game with  ?scn=<id>  and it skips menus / tutorial offers, seeds the RNG,
    builds the exact engine state of ONE scenario directly (no playing through), shows a tiny "Test: <name>" tag and exposes
    window.GXSCN = {id, name, ask, ready, checks}. `ask` is the one line the owner should try ("Tap SMASH over Downtown");
-   `checks` are the machine asserts the runner (scripts/scenario-test.js) runs at 390x763, 375x553 and 1366x768.
+   `checks` are the machine asserts the runner (scripts/scn-run.js + scenarios.spec.js) runs at 390x763, 375x553 and 1366x768.
    ?scn=list  ->  window.GXSLIST = [{id, name, ask, sizes}]  (no setup, used by the runner and the shelf).
 
    A game registers its scenarios in ONE small file (scn.js) inlined right after this one and BEFORE the game scripts:
