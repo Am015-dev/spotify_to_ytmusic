@@ -14,7 +14,7 @@
   const total=Math.round(simSec/dt),per=Math.round(.5/dt);let done=0;const t0=__qa.t;
   while(done<total){
    // popups / cards / pause that a player would dismiss
-   try{if(window.__tq&&__tq.skip)__tq.skip();if(RO.pOpen){roamPauseClose&&roamPauseClose()}if(RO.card&&RO.card.close)RO.card.close()}catch(e){}
+   try{if(window.__tq&&__tq.skip)__tq.skip();if(RO.pOpen){roamPauseClose&&roamPauseClose()}if(RO.card){const b=document.getElementById('rcNo');if(b&&b.offsetWidth)b.click();else if(RO.card.close)RO.card.close()}}catch(e){}
    const foot=RO.foot;
    if(foot==='car'){
      // steering: a random walk of held keys, 0.6–3 s each; gas mostly on, some brake, boost bursts; now and then park and get out
