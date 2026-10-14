@@ -6,6 +6,9 @@ html.sk .btn.pri,html.sk .btn.on{border-image-source:url(media/ui-button-power-c
 html.sk .btn:disabled,html.sk .btn.off{opacity:.55}
 html.sk #acts .btn.bagb{border:3px solid #f2b81e;border-image:none;border-radius:18px;background:radial-gradient(ellipse at 50% 30%,#7a5236,#4a2e1c);filter:none}
 html.sk .gx-bar .gx-ibtn{color:#f8eed8}
+html.sk .gx-ibtn{border-image-width:7px;border-width:1px}
+html.sk.ph .gx-ibtn,html.sk.ph .gx-bar .gx-ibtn{padding:6px}
+html.sk.ph .gx-bar .gxh-bulb{min-width:44px;width:44px}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* market: awning, stall boards, clay dishes under the chips */
 html.sk-awn .awn{height:52px;border-radius:0;background:url(media/awning-c.webp) left top/auto 100% repeat-x;box-shadow:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
