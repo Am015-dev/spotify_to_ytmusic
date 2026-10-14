@@ -103,6 +103,6 @@ html.dk-bt .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(medi
 html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.dk-bt .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.dk-bt .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
 .win3d{display:block;margin:0 auto 2px;width:min(44vw,160px);height:min(44vw,160px);object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
 
-html.sk .btn.bigb,html.sk .btn.primary,html.sk .btn.gxt-menu{padding-top:11px;padding-bottom:11px}
+html.sk .btn.bigb,html.sk .btn.primary,html.sk .btn.gxt-menu{border-image-width:0 12px}
 body:has(.gxh-bub.on) #prompt .bfline{display:none}
 html.sk .gx-drawer{padding:33px}
