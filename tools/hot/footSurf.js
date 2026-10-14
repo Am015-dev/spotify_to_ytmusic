@@ -44,11 +44,17 @@ OF_go("walk");LF_ensure(RO.x,RO.z,2500);const keepIn=OF_input,keepK=Object.assig
    const s=clearStart(p.x,p.z,rad,y,(x,z)=>{for(const o of props)if(o!==p&&Math.abs(o.x-x)<5&&Math.abs(o.z-z)<5)return false;return true});if(!s){res.skip++;continue}
    const e=push(p.x,p.z,0,s,y+.05),d=v.circ?Math.hypot(e[0]-p.x,e[1]-p.z)-v.circ:sd(v.b,e[0],e[1]);rec(g,Math.max(0,OF_R-d),p.t+'@'+(p.x|0)+','+(p.z|0))}};
  doProps(cars,res.cars,50);doProps(others,res.props,50);
+ // every ride CLASS (cars, vans, trucks, buses, scooters...): push into 4 cars per class from rear / front / both sides; visible box = the class's real model bbox (HUB.cim[k])
+ {res.rides={n:0,w:0,bad:[]};const seen={};for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;(seen[c.k]=seen[c.k]||[]).push(c)}
+  for(const k in seen){const m=HUB.cim&&HUB.cim[k];if(!m||!m.geometry)continue;m.geometry.computeBoundingBox();const bb=m.geometry.boundingBox,hw=(bb.max.x-bb.min.x)/2,hd=(bb.max.z-bb.min.z)/2,box={hw,hd};
+   for(const c of seen[k].slice(0,4)){const h=OF_cH(c),ch=Math.cos(h),sh=Math.sin(h),y=c.y||groundY(c.x,c.z),b={x:c.x,z:c.z,hw,hd,c:ch,s:sh};
+    for(const[ax,az,rad]of[[0,-1,hd+3.5],[0,1,hd+3.5],[1,0,hw+3.5],[-1,0,hw+3.5]]){const x=c.x+(ax*ch+az*sh)*rad,z=c.z+(-ax*sh+az*ch)*rad;
+     if(roamHit(x,z,OF_R+.6,y+1)||Math.abs(groundAt(x,z,y+1)-y)>.5)continue;const e=push(c.x,c.z,0,[x,z],y+.05);rec(res.rides,Math.max(0,OF_R-sd(b,e[0],e[1])),'k'+k+'@'+(c.x|0)+','+(c.z|0))}}}}
  // building walls
  const blds=[];for(const L of HUB.grid.values())for(const b of L)if((b.h||0)-groundY(b.x,b.z)>3&&(b.y0==null||b.y0<=groundY(b.x,b.z)+1.5)&&Math.hypot(b.x-near2[0],b.z-near2[1])<1500)blds.push(b);
  {let tries=0;while(res.bld.n<20&&blds.length&&tries++<200){const b=pick(blds),rad=Math.hypot(b.hw,b.hd)+3.5,y=groundY(b.x,b.z),bb={x:b.x,z:b.z,hw:b.hw,hd:b.hd,c:b.c==null?1:b.c,s:b.c==null?0:b.s};
    const s=clearStart(b.x,b.z,rad,y,(x,z)=>sd(bb,x,z)>1.5&&sd(bb,x,z)<5);if(!s){res.skip++;continue}const e=push(b.x,b.z,0,s,y+.05);rec(res.bld,Math.max(0,OF_R-sd(bb,e[0],e[1])),'bld@'+(b.x|0)+','+(b.z|0))}}
- res.skip&&(out.B.skip=res.skip);for(const k of['cars','props','bld'])out.B[k]={n:res[k].n,worst:+res[k].w.toFixed(3),nBad:res[k].bad.length,bad:res[k].bad.slice(0,5)};
+ res.skip&&(out.B.skip=res.skip);for(const k of['cars','props','bld','rides'])out.B[k]={n:res[k].n,worst:+res[k].w.toFixed(3),nBad:res[k].bad.length,bad:res[k].bad.slice(0,5)};
  }finally{OF_input=keepIn;hold=null}
- out.pass=out.A.allBad===0&&out.A.nBad===0&&out.A.patchPts+out.A.coveredByHigherPatch+out.A.groundPts>=200&&out.B.cars.nBad===0&&out.B.props.nBad===0&&out.B.bld.nBad===0&&out.A.patchPts+out.A.groundPts>=150&&out.B.cars.n>=40&&out.B.props.n>=40&&out.B.bld.n>=15;out.ms=Math.round(performance.now()-t0);
+ out.pass=out.A.allBad===0&&out.A.nBad===0&&out.A.patchPts+out.A.coveredByHigherPatch+out.A.groundPts>=200&&out.B.cars.nBad===0&&out.B.props.nBad===0&&out.B.bld.nBad===0&&out.B.rides.nBad===0&&out.B.rides.n>=20&&out.A.patchPts+out.A.groundPts>=150&&out.B.cars.n>=40&&out.B.props.n>=40&&out.B.bld.n>=15;out.ms=Math.round(performance.now()-t0);
  return JSON.stringify(out)})()

@@ -37,7 +37,9 @@ const OF_cH=c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)return 0;return Ma
 const OF_box=(x,z,h,hw=1.02,hd=2.35)=>({x,z,hw,hd,c:Math.cos(h),s:Math.sin(h),h:999});
 function OF_cars(withTraffic){const L=[];if(OF.car)L.push({k:'cur',x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,ref:OF.car});for(const v of OF.vs)L.push({k:'grp',x:v.x,z:v.z,y:v.y,h:v.h,hw:v.hw,hd:v.hd,ref:v});
   if(withTraffic&&HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;// v89f: scooters / trolleybuses get their own size (was a 2 × 4.7 m car box: a stopped Athens scooter walled off the lane and the walker never reached the car behind it)
-    const dm=HCAR[c.k][0]==='#'&&typeof OB_cdim==='function'?OB_cdim(c.k):null;L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),hw:dm?dm[0]*.9:undefined,hd:dm?dm[1]*.95:undefined,ref:c})}return L}
+    const dm=OF_cdim(c.k);L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),hw:dm?dm[0]:undefined,hd:dm?dm[1]:undefined,ref:c})}return L}
+// foot-2: the walker's box of a traffic / parked ride = the bounding box of its REAL model (HUB.cim[k]): a delivery truck is 6.2 m long, a bus 12 m, not the 4.7 m car box
+function OF_cdim(k){const m=HUB.cim&&HUB.cim[k];if(m&&m.geometry){const g=m.geometry;if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox,w=(b.max.x-b.min.x)/2,l=(b.max.z-b.min.z)/2;if(w>.3&&l>.5)return[w,l]}return typeof OB_cdim==='function'?OB_cdim(k):null}
 function OF_edge(o){const b=OF_box(o.x,o.z,o.h,o.hw,o.hd),dx=OF.x-b.x,dz=OF.z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.max(0,Math.abs(lx)-b.hw),ez=Math.max(0,Math.abs(lz)-b.hd);return Math.hypot(ex,ez)}
 function OF_nearCar(){let best=null,bd=OF_NEAR;for(const o of OF_cars(true)){if(Math.abs((o.y||0)-OF.y)>2.5)continue;let d=OF_edge(o);
   if(o.k==='traf'){if(o.ref.tr||o.ref.route||o.ref.crW||HCAR[o.ref.k][0]==='#'||(o.ref.cv||0)>OF_JV_MAX)continue;d-=OF_JREACH-OF_NEAR}if(d<bd){bd=d;best=o}}return best}
