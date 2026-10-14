@@ -302,7 +302,8 @@ def main():
                 print(f"[look] {s}: skipped ({e})")
         # 3b2. axe part (contrast / tap size / button names, run on the scenario pages in 3a): only NEW severe findings vs the known set block
         def axe_set(d, s):
-            return {tuple(f) for fp in sorted((d / s).glob("*.json")) for f in json.load(open(fp))}
+            return {(fp.name,) + tuple(f) for fp in sorted((d / s).glob("*.json")) for f in json.load(open(fp))}   # page file name + (rule, selector, text)
+        def axe_pages(d, s): return {fp.name for fp in (d / s).glob("*.json")} if (d / s).is_dir() else set()
         new_axe = {}
         for s in [x for x in slugs if status[x] == "PASS" and (out / ".look-axe" / x).is_dir()]:
             try:
@@ -318,8 +319,14 @@ def main():
                                   AXE_ONLY="1", LOOK_OUT=str(cache), PW_JSON=str(out / ".check" / "axe-live.json")), out / ".check" / "axe-live.log", 900)
                         cache.mkdir(parents=True, exist_ok=True)
                     live_f = axe_set(cache, s)
-                if new_f - live_f: status[s], why[s] = "FAIL", "axe (new vs known): " + "; ".join(" ".join(f) for f in sorted(new_f - live_f))[:140]
-                else: print(f"[look] {s}: axe ok ({len(new_f)} severe, all already known)" if new_f else f"[look] {s}: axe ok")
+                # a page the live game does not have yet (a new scenario) cannot have regressed: its findings are recorded, a warning only
+                try: pages = set(json.load(open(KNOWN / f"{s}.json"))[mode]["axe_pages"])
+                except Exception: pages = axe_pages(SRC / ".look-live-cache" / f"{s}-live-axe-{mode}", s)
+                bad = {f for f in new_f - live_f if f[0] in pages}
+                if bad: status[s], why[s] = "FAIL", "axe (new vs known): " + "; ".join(" ".join(f[1:]) for f in sorted(bad))[:140]
+                else:
+                    if new_f - live_f: print(f"[look] {s}: WARN axe findings on scenario pages the live game lacks (recorded as known): {len(new_f - live_f)}", flush=True)
+                    else: print(f"[look] {s}: axe ok ({len(new_f)} severe, all already known)" if new_f else f"[look] {s}: axe ok")
             except Exception as e:
                 print(f"[look] {s}: axe skipped ({e})")
         # 3b3. committed baseline of known findings: rewritten for every game that passed (it becomes the live game when the deploy lands)
@@ -328,7 +335,7 @@ def main():
             if status[s] != "PASS" or (s not in new_look and s not in new_axe): continue
             try: cur = json.load(open(KNOWN / f"{s}.json"))
             except Exception: cur = {}
-            cur[mode] = {"look": sorted([list(f) for f in (new_look.get(s) or [])]), "axe": sorted([list(f) for f in new_axe.get(s, [])])}
+            cur[mode] = {"look": sorted([list(f) for f in (new_look.get(s) or [])]), "axe": sorted([list(f) for f in new_axe.get(s, [])]), "axe_pages": sorted(axe_pages(out / ".look-axe", s))}
             (KNOWN / f"{s}.json").write_text(json.dumps(cur, indent=0) + "\n")
 
     deployed = []

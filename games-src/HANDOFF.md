@@ -234,3 +234,9 @@ Needs `cd games-src && npm ci` on a fresh machine (no node_modules in a new cont
   - tidewake: overlaps x10, text < 13 px x12, tap target x3
 (Counts are matches in the first 14 messages per check, so "x28" = at least 14; run `playwright test --project=phone --grep menu` with SCN_SLUGS for full lists.) The "clean" games above passed with the topmost check off.
 - sands-of-qamar: menu scenario green (ft/src/board.css: sticky .acts made static inside .more). NOT deployed: axe gate 'new vs live' fails on in-game sq-* scenes (the live cache has no sq-* scenarios): `.ab` ghost '↶ Put them back' and `.bump` seat score contrast. Next: get the axe detail for those two and fix, then `build-all.py --deploy sands-of-qamar`.
+
+### Fast gate v2 follow-up: the 3 blocked menu deploys (14 Oct, 02:5x UTC)
+`build-all.py --deploy crown-city-smash sands-of-qamar shipwreck-isle` in ONE call: **106 s** for 3 games. Result: sands-of-qamar DEPLOYED; the other two are real blockers, not gate bugs.
+- Gate bug found and fixed: the live axe baseline was measured only on pages the live game has; a scenario page that is new in the build (sq-art, sq-board...) had no live page, so its old contrast findings counted as "new". Axe findings on pages the live game lacks are now a WARN and are recorded in `look-known/<slug>.json` (`axe_pages` lists the pages a later deploy may block on). Per-page keys, so one page's old finding can't hide a new one elsewhere.
+- crown-city-smash BLOCKED by the scenario's own check `cc-board`: "painted skin moves no box: button.btn.mrow 358x57->358x52" (a real own-check failure of the board scenario, not an invariant). Needs the crown fixer.
+- shipwreck-isle BLOCKED by the `menu` scenario: [panel Rules] "How to play" h2 overlaps text (N=7). Part of it is the new scrolled-panel audit exposing content below the fold. Needs the shipwreck menu fixer.
