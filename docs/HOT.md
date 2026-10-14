@@ -1,0 +1,5 @@
+# HOT RELOAD (tools/hot.js): edit → check in ~3 s, no rebuild, no reboot
+- `node tools/hot.js go <ver/id>`: first call starts the daemon (one warm `?test=fra|ath&draw=0` page per city, ~15 s fra / ~40 s ath, log out/hot/hot.log); then `__tq.reset()` + that GO → one PASS/FAIL line (+ new console errors).
+- `node tools/hot.js reload src/<mod>.js`: re-assigns only the functions (and wrappers) whose text changed since that page loaded the module, and replays every later wrapper of them in ORDER; state/data stay. `--full` = all functions of the module, `--all` = also re-run its other top-level statements (resets its `let` state). `const f=()=>` can't be hot-swapped: it says "reboot needed".
+- `eval '<js>' [--city ath]` (module scope: RO, OF, HUB…), `reset`, `errors`, `status`, `shot f.jpg [--city]`, `reboot [fra|ath]` (fresh page from current src, no build), `stop`.
+- The page is concatenated from src/ on every load (out/hot/hot.html, same as build.sh --local + a `window.__hot` eval hook that never ships). A GO that jumps city reloads from current src too. Still build + tChkGo before handing a commit to the integrator.
