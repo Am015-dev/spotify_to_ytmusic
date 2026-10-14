@@ -78,7 +78,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-floor{display:flex;align-items:center;gap:6px;margin-top:4px;border-radius:8px;cursor:pointer}
 .bf-floor .bf-fl{padding:1px;border-radius:8px}
 .bf-floor .bf-c{background:#ecd3c7;box-shadow:inset 0 0 0 2px #a8493a}
-.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);color:#a8302a}
+.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 max(13px,calc(var(--cs)*.42)) var(--ff);color:#a8302a}
 .bf-floor.ok .bf-fl{box-shadow:0 0 0 3px #ff7a4a,0 0 12px 2px rgba(255,110,70,.7)}
 .bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}.bf-bd.fbr{left:auto;right:34px}
 .bf-fll{font:italic 700 13px var(--ff);color:#8a4a2a}

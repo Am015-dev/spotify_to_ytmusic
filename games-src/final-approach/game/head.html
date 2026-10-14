@@ -496,4 +496,6 @@ html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-botto
 html.fapx .w.appr.scene{background:transparent}
 #acts [data-a=ready]{padding-left:40px;min-height:48px}
 #crewd.gx-drawer{border-style:solid;border-color:transparent;border-width:84px 34px 40px;background-clip:padding-box}
+/* a side drawer owns the screen while open: what it would cover steps aside (UI-BAR 9) */
+html:has(.gx-drawer.on) .gx-dock,html:has(.gx-drawer.on) .gx-reopen,html:has(.gx-drawer.on) #start{visibility:hidden}
 </style></head>
