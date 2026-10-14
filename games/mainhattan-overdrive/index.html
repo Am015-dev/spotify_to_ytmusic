@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.39',date:'14 Oct 2026',items:[{t:'FIXED',s:'Camera re-fits when you switch vehicle; respawn on divided roads uses the right-hand lane; on-foot spawns avoid walls.'}]},
   {v:'v90m-beta.38',date:'14 Oct 2026',items:[{t:'FIXED',s:'Fewer props on roads; parked tyres sit exactly on the ground; NPC lanes stay clear.'}]},
   {v:'v90m-beta.37',date:'14 Oct 2026',items:[{t:'FIXED',s:'Parked cars no longer sink into the ground; sitting on benches fits the seat.'}]},
   {v:'v90m-beta.36',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Two-level city race track has its own layout: downtown ring, viaduct over the lake, kicker shortcut.'}]},
@@ -2866,8 +2867,8 @@ function updateCam(dt,snap){let s=pl;
   if(state==='menu'||!pl){attractCam.t-=dt;if(attractCam.t<=0||snap){attractCam.t=rr(5,8);attractCam.ship=Math.floor(R()*ships.length);attractCam.kind=(attractCam.kind+1)%3;attractCam.side=R()<.5?-1:1}s=ships[attractCam.ship]||ships[0]}
   if(!s)return;frameAt(TD,s.dist,F2);const sp=s.mesh.position.clone().add(s.mesh.userData.m.position),top=s.stats.top0,spd=clamp(s.v/top,0,1.4);shipKey.position.copy(sp).addScaledVector(F2.u,11).addScaledVector(F2.t,4);
   const kind=state==='menu'?attractCam.kind:(camMode===1?3:0);const up=V3().copy(s.air?Yup:F2.u).lerp(Yup,.35).normalize();let want,look;
-  if(kind===0){const tall=camera.aspect<1?1.3:1;const cd={close:.85,normal:1,far:1.2}[SET.camd],back=10.5*tall*cd-(s.nitro?.5:0)-CR_SPDCAM.b*clamp(spd,0,1.2),ahead=50*(1+.35*spd);const lead=clamp((s.latV||0)*.06,-3,3),leadL=clamp((s.latV||0)*.14,-8,8);
-    want=sp.clone().addScaledVector(F2.t,-back).addScaledVector(up,3.4*tall*cd-(s.nitro?.25:0)-CR_SPDCAM.h*clamp(spd,0,1.2)).addScaledVector(F2.r,-lead*.8);look=sp.clone().addScaledVector(F2.t,ahead).addScaledVector(up,2).addScaledVector(F2.r,leadL);look.lerp(sp.clone().addScaledVector(up,1.2),.42)}
+  if(kind===0){const tall=camera.aspect<1?1.3:1;const ck=typeof CAM_rk==='function'?CAM_rk(s):{b:1,h:1,l:1};const cd={close:.85,normal:1,far:1.2}[SET.camd],back=10.5*tall*cd*ck.b-(s.nitro?.5:0)-CR_SPDCAM.b*clamp(spd,0,1.2),ahead=50*ck.l*(1+.35*spd);const lead=clamp((s.latV||0)*.06,-3,3),leadL=clamp((s.latV||0)*.14,-8,8);
+    want=sp.clone().addScaledVector(F2.t,-back).addScaledVector(up,3.4*tall*cd*ck.h-(s.nitro?.25:0)-CR_SPDCAM.h*clamp(spd,0,1.2)).addScaledVector(F2.r,-lead*.8);look=sp.clone().addScaledVector(F2.t,ahead).addScaledVector(up,2).addScaledVector(F2.r,leadL);look.lerp(sp.clone().addScaledVector(up,1.2),.42)}
   else if(kind===1){want=sp.clone().addScaledVector(F2.t,18).addScaledVector(F2.r,attractCam.side*11).addScaledVector(F2.u,2.6);look=sp.clone().addScaledVector(F2.u,1)}
   else if(kind===2){want=sp.clone().addScaledVector(F2.t,-30).addScaledVector(F2.u,16).addScaledVector(F2.r,attractCam.side*8);look=sp.clone().addScaledVector(F2.t,24)}
   else{want=sp.clone().addScaledVector(s._fw||F2.t,.5).addScaledVector(F2.u,1.25);look=sp.clone().addScaledVector(s._fw||F2.t,60).addScaledVector(F2.u,1)}
@@ -5769,7 +5770,12 @@ const VSEL=['auto','ship','boat','offroad'],VNAME={auto:'AUTO',ship:'SHIP',boat:
 function cycleVehicle(){RO.vsel=VSEL[(VSEL.indexOf(RO.vsel||'auto')+1)%4];if(RO.vsel==='boat'&&!WATERS.length)RO.vsel=VSEL[(VSEL.indexOf('boat')+1)%4];const o=roamSave();o.vsel=RO.vsel;roamStore(o);say('',`VEHICLE · ${VNAME[RO.vsel]}`,.8);AU.sfx('brick');$('#roamVeh').textContent='⟳ '+VNAME[RO.vsel]}
 function roamFaceOpen(){let best=RO.h,bs=-1;for(let k=0;k<16;k++){const h=RO.h+k*Math.PI/8*(k%2?1:-1)/2;let free=0;for(let d=4;d<=60;d+=4){if(roamHit(RO.x+Math.sin(h)*d,RO.z+Math.cos(h)*d,2.5,RO.y)||roamTerr(RO.x+Math.sin(h)*d,RO.z+Math.cos(h)*d,RO.y).low)break;free=d}if(free>bs){bs=free;best=h}if(free>=60)break}RO.h=RO.vh=best}
 function edgeStep(dt){const e=[[RO.x-WX0,1,0],[WX1-RO.x,-1,0],[RO.z-WZS,0,1],[WZN-RO.z,0,-1]].sort((a,b)=>a[0]-b[0])[0],d=e[0];RO.edgeT=Math.max(0,(RO.edgeT||0)-dt);if(d>=150)return;const out=Math.sin(RO.vh)*e[1]+Math.cos(RO.vh)*e[2]<0;if(out&&RO.v>0)RO.v-=RO.v*Math.min(1,dt*2.6*(1-d/150));if(RO.edgeT<=0){RO.edgeT=3;RO.edgeN=(RO.edgeN||0)+1;const el=$('#roamDist');if(el){el.textContent='↩ TURN BACK · '+CCF.edgeT+' · '+CCF.edge[e[1]>0?0:e[1]<0?1:e[2]>0?2:3];el.classList.remove('on');void el.offsetWidth;el.classList.add('on')}}}
-function roamWarp(x,z,h,now){if(!RO.on||RO.ch||RO.sp||RO.wk)return false;RO.x=clamp(x,WX0+20,WX1-20);RO.z=clamp(z,WZS+20,WZN-20);RO.y=groundAt(RO.x,RO.z,99);if(h!=null)RO.h=h;RO.vh=RO.h;RO.v=0;RO.vy=0;RO.yr=0;RO.dDir=0;RO.lastRamp=null;if(pl)pl.air=null;camSnap=true;camera.position.set(RO.x-Math.sin(RO.h)*14,RO.y+5,RO.z-Math.cos(RO.h)*14);HUB.cpos=null;hubCullStep();for(let i=0;i<30;i++)hubRecycle();for(const p of HUB.peds||[])pedPlace(p,30,380);RO.dist=null;roamSavePos();return true}
+// foot-2: a warp / spawn never leaves the car inside a collider (a grid point in a block interior, a quest spot a few metres into a wall): nearest free spot on a growing ring, r ≤ 160 m
+function roamFree(x,z){const fr=(a,b)=>{const g=groundAt(a,b,99);return!roamHit(a,b,2.8,g+.5)&&!(CID==='fra'&&inRiver(a,b,0))&&Math.abs(groundAt(a+3,b,99)-g)<.45&&Math.abs(groundAt(a,b+3,99)-g)<.45&&Math.abs(groundAt(a-3,b,99)-g)<.45&&Math.abs(groundAt(a,b-3,99)-g)<.45};if(!roamHit(x,z,2.8,groundAt(x,z,99)+.5)&&!(CID==='fra'&&inRiver(x,z,0)))return[x,z];
+  for(let r=4;r<=160;r+=4)for(let k=0;k<Math.max(8,Math.round(r/2));k++){const a=k/Math.max(8,Math.round(r/2))*6.2832,px=x+Math.sin(a)*r,pz=z+Math.cos(a)*r;if(fr(px,pz))return[px,pz]}return[x,z]}
+function roamWarp(x,z,h,now){if(!RO.on||RO.ch||RO.sp||RO.wk)return false;RO.x=clamp(x,WX0+20,WX1-20);RO.z=clamp(z,WZS+20,WZN-20);{// divided roads (≥ 24 m): a warp on the centre line puts the car on the green median plate → move into the right-hand lane (heading side), lane centre = w/4 (≤ 5 m)
+  const c=cityAt(RO.x,RO.z);if(c&&c.road&&c.road.w>=24&&c.d<c.road.w/2&&Math.abs(c.lat)<2.5&&c.p){const th=c.p,hh=h!=null?h:RO.h,d=Math.sign(th.tx*Math.sin(hh)+th.tz*Math.cos(hh))||1,a=Math.atan2(th.tx*d,th.tz*d),off=Math.min(c.road.w/4,5);RO.x+=-Math.cos(a)*off;RO.z+=Math.sin(a)*off}}
+  {const q=roamFree(RO.x,RO.z),mv=Math.hypot(q[0]-RO.x,q[1]-RO.z)>.5;RO.x=q[0];RO.z=q[1];if(mv&&h!=null){const r=rfSnap(RO.x,RO.z,60);if(r&&(r[0]!==RO.x||r[1]!==RO.z)){let d=r[2]-h;d=Math.atan2(Math.sin(d),Math.cos(d));h=Math.abs(d)>1.5708?r[2]+Math.PI:r[2]}}}RO.y=groundAt(RO.x,RO.z,99);if(h!=null)RO.h=h;RO.vh=RO.h;RO.v=0;RO.vy=0;RO.yr=0;RO.dDir=0;RO.lastRamp=null;if(pl)pl.air=null;camSnap=true;camera.position.set(RO.x-Math.sin(RO.h)*14,RO.y+5,RO.z-Math.cos(RO.h)*14);HUB.cpos=null;hubCullStep();for(let i=0;i<30;i++)hubRecycle();for(const p of HUB.peds||[])pedPlace(p,30,380);RO.dist=null;roamSavePos();return true}
 function roamSavePos(){const st=store.get('mho_story',{seen:0,end:0});st.last=Date.now();store.set('mho_story',st);const o=roamSave();o.pos={x:+RO.x.toFixed(1),z:+RO.z.toFixed(1),y:+RO.y.toFixed(1),h:+RO.h.toFixed(3)};o.lay=LAYOUT_VER;roamStore(o)}
 // W13: city top speed was 62% of the car's top (≈91 km/h, 0-100 never reached): "slow like a bike". City .82 (≈120 km/h), open road 1.0,
 // and the throttle pull falls off with (v/top)² instead of v/top, so 0-100 km/h takes ≈4.5 s in the city instead of never.
@@ -14685,9 +14691,9 @@ function OF_propAt(x,z,y,r){const PG=HUB.pgrid,D=HUB.ptypes;if(!PG||!D)return nu
   for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;if(Math.hypot(x-p.x,z-p.z)<Math.max(.15,Math.min(1.1,d.r*.45))+r)return p}}return null}
 function OF_clear(x,z,y){return!roamHit(x,z,OF_R+.25,y+1)&&!(CID==='fra'&&inRiver(x,z))&&Math.abs(groundAt(x,z,y+1)-y)<.5&&!OF_propAt(x,z,y,.6)}
 function OF_pave(far){const N=HUB.nodes;if(!N)return null;const L=[];for(let i=0;i<N.length;i++){const A=N[i];if(!A||A.ab||!A.nb||!A.nb.length)continue;const d=Math.hypot(A.x-RO.x,A.z-RO.z);if(d<=(far||300))L.push([d,i])}L.sort((a,b)=>a[0]-b[0]);
-  for(const[,i]of L.slice(0,150)){const A=N[i];for(const j of A.nb){const B=N[j];if(!B||B.ab||A.g&&B.g)continue;const len=Math.hypot(B.x-A.x,B.z-A.z);if(len<40)continue;const dx=(B.x-A.x)/len,dz=(B.z-A.z)/len,W=Math.min(A.w||20,B.w||20);
-    for(const sd of[1,-1]){const off=sd*(W/2+(CID==='fra'?3.2:2.1)),t0=8/len,mx=A.x+(B.x-A.x)*t0,mz=A.z+(B.z-A.z)*t0,x=mx-dz*off,z=mz+dx*off,y=groundAt(x,z,99),rx=dz*sd,rz=-dx*sd;let ok=true;
-      for(let s=0;s<=16&&ok;s++)ok=OF_clear(x+dx*s,z+dz*s,groundAt(x+dx*s,z+dz*s,y+1));for(let s=1;s<=3&&ok;s++)ok=OF_clear(x+rx*s,z+rz*s,groundAt(x+rx*s,z+rz*s,y+1));
+  for(const[,i]of L.slice(0,150)){const A=N[i];for(const j of A.nb){const B=N[j];if(!B||B.ab||CID==='fra'&&A.g&&B.g)continue;/* every Athens node is g:1 (generic) */const len=Math.hypot(B.x-A.x,B.z-A.z);if(len<(CID==='fra'?40:6))continue;/* Athens nodes are ~10 m apart */const dx=(B.x-A.x)/len,dz=(B.z-A.z)/len,W=Math.min(A.w||20,B.w||20);
+    for(const sd of[1,-1]){const off=sd*(W/2+(CID==='fra'?3.2:2.1)),t0=Math.min(8/len,1),mx=A.x+(B.x-A.x)*t0,mz=A.z+(B.z-A.z)*t0,x=mx-dz*off,z=mz+dx*off,y=groundAt(x,z,99),rx=dz*sd,rz=-dx*sd;let ok=true;
+      /* foot-2: a hilly pavement must pass: each metre is compared with the previous one (≤ 0.5 m step), not with the start (a 4 % grade over 16 m failed every Athens street) */let py=y;for(let s=0;s<=16&&ok;s++){const gy=groundAt(x+dx*s,z+dz*s,py+1);ok=OF_clear(x+dx*s,z+dz*s,py);py=gy}py=y;for(let s=1;s<=3&&ok;s++){const gy=groundAt(x+rx*s,z+rz*s,py+1);ok=OF_clear(x+rx*s,z+rz*s,py);py=gy}
       if(ok)return{x,z,y,h:Math.atan2(dx,dz),rx,rz,cx:mx-dz*sd*W/4,cz:mz+dx*sd*W/4}}}}return null}
 // car parked at (cx,cz) heading h, minifig on foot at (x,z) heading fh (default h), camera behind
 function OF_spawn(P,fx,fz,fh){if(!roamWarp(P.cx,P.cz,P.h,true))return false;OF_poseCar(RO.x,RO.z,RO.y,RO.h);OF.idle=1;OF_exit();const T=OF.tw;RO.foot='walk';OF.tw=null;OF.x=fx??P.x;OF.z=fz??P.z;OF.y=groundAt(OF.x,OF.z,RO.y+2);OF.h=fh??P.h;
@@ -16713,7 +16719,7 @@ function CAM_eval(P,b,h,th,T){const pz=P.z1+CAM.ahead,py=P.g;let clr=1e9,smin=1e
 const CAM_ok=e=>e.clr>=CAM.m&&e.sP>=.42&&e.sP<=.82&&e.fill>=.17&&e.fill<=.33&&e.smax<=.95;
 function CAM_vfov(asp){const a=asp||camera.aspect||1.5,f=TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0);return(a<.9?Math.min(100,f*(1+.5*Math.min(1,(.9-a)/.45))):f)*Math.PI/180}
 function CAM_base(n){const k=SC_S&&SC_S.on?BC.D0.cam:1,C=SC_RC0[n];return{b:C.b*k,h:C.h*k,l:C.l*k,ly:C.ly*k,bk:C.bk*k,hk:C.hk*k,lk:C.lk*k}}
-function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
+function CAM_solve(P,n,asp,C0x){const C0=C0x||CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
  const th0=Math.atan2(C0.h-C0.ly,C0.l+C0.b),e0=CAM_eval(P,C0.b,C0.h,th0,T);if(CAM_ok(e0))return Object.assign({keep:1,e:e0},C0);
  // perf (beta.12 "extremely slow": the full 0.25 m × 0.1 m grid = 58k evaluations, every 4 s, 4 modes): coarse 1 m × 0.5 m grid, then a fine pass around the best
  let best=null,bc=1e9;const bMin=Math.max(C0.b*.8,-P.z0+1.5),hMin=Math.max(1.2,C0.h*.8),aim=Math.atan(2*(CAM.sP-.5)*T);CAM.n.ev=0;
@@ -16725,8 +16731,20 @@ function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
 function CAM_fit(){const t0=performance.now(),P=CAM_prof();if(!P)return;CAM.P=P;CAM.asp=camera.aspect;CAM.T={};const n0=SET.rcam||'chase';let kp=0;if(n0!=='high'){const s=CAM_solve(P,n0);CAM.T[n0]=s;kp=s.keep}CAM.ms=performance.now()-t0
  CAM.n.fit++;if(kp)CAM.n.keep++;CAM.log.push([RO.vsel||'',+P.L.toFixed(2),+P.H.toFixed(2),(CAM.T[SET.rcam||'chase']||{}).b,(CAM.T[SET.rcam||'chase']||{}).h]);if(CAM.log.length>20)CAM.log.shift()}
 // when: 30 sim frames after the ride (mesh / form) changes (the first frames still show stock parts), on a big aspect change (rotation) or a camera-mode change; never periodically (perf)
-function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=ud.m.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
- if(key!==CAM.k){CAM.k=key;CAM.due=now+30;CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0}
+function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=CAM_rkey(ud)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
+ if(key!==CAM.k){CAM.k=key;CAM.due=now+(CAM.snap?4:30);CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0;if(CAM.snap){CAM.snap=0;CAM.cur=null}}
+// ride fingerprint: the player mesh is KEPT across rides (a garage pick rebuilds the gbM brick meshes on it; TAKE / ENTER swap the body children of ud.m), so the old key (mesh uuid + gbM.length)
+// missed same-count swaps: Athens never re-fitted, Frankfurt lagged one ride. Any change of the brick meshes or the body children now re-fits, whichever path changed the ride.
+function CAM_rkey(ud){const m=ud.m,g=ud.gbM,c=m.children,l=c[c.length-1],f=c[0];return m.uuid+'|'+(g?g.length+'.'+(g[0]?g[0].uuid:''):0)+'|'+c.length+'.'+(f?f.uuid:'')+'.'+(l?l.uuid:'')}
+// race camera (state 'race' = updateCam in 30_race3, not roamCam; it had no size fit: a truck put the camera inside it). Same solver with the race stock camera as the base;
+// the ride profile is measured in its own frame (heading = the track tangent). Returns multipliers for the stock back / up / look-ahead.
+function CAM_fwd(s){try{frameAt(TD,s.dist,F2);const l=Math.hypot(F2.t.x,F2.t.z)||1;return[F2.t.x/l,F2.t.z/l]}catch(e){return[0,1]}}
+function CAM_rbase(){const R=CAM.R||(CAM.R={}),tall=camera.aspect<1?1.3:1,cd={close:.85,normal:1,far:1.2}[SET.camd]||1;return R.C0={b:10.5*tall*cd,h:3.4*tall*cd,l:29,ly:1.66,bk:0,hk:0,lk:0}}
+function CAM_rk(s){const one={b:1,h:1,l:1};try{const ud=s&&s.mesh&&s.mesh.userData,host=ud&&ud.m;if(!CAM.on||!host)return one;const R=CAM.R||(CAM.R={}),key=CAM_rkey(ud)+'|'+(camera.aspect||0).toFixed(1)+'|'+SET.camd;
+ if(R.s===s&&R.k===key&&R.v)return R.v;host.updateMatrixWorld(true);const e=host.matrixWorld.elements,fw=CAM_fwd(s),P=CAM_prof(host,{x:e[12],y:e[13],z:e[14],h:Math.atan2(fw[0],fw[1])});if(!P)return one;
+ const sv=CAM_solve(P,'chase',null,CAM_rbase());R.s=s;R.k=key;R.P=P;R.v={b:clamp(sv.b/R.C0.b,.8,6),h:clamp(sv.h/R.C0.h,.8,6),l:clamp(sv.l/R.C0.l,.6,3)};R.n=(R.n||0)+1;return R.v}catch(e){return one}}
+// a garage close = the player just chose a ride: re-fit within a few frames and snap the camera to it (no 3 s crawl)
+gbClose=(f=>function(){const r=f.apply(this,arguments);try{CAM.snap=1;CAM.k=''}catch(e){}return r})(gbClose);
 const CAM_F=['b','h','l','ly','bk','hk','lk'];
 roamCam=(f=>function(dt){if(CAM.on&&state==='roam'&&(!RO.foot||RO.foot==='car')){try{CAM_upd();const n=SET.rcam||'chase',T=CAM.T[n],C=RCAM[n];
   const tn=performance.now(),rd=Math.min(dt,Math.max(0,Math.min(.1,(tn-(CAM.lt||tn))/1000)));CAM.lt=tn;
