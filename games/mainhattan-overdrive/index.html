@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.50',date:'14 Oct 2026',items:[{t:'FIXED',s:'LEGO-set buildings count as shops and landmarks in Athens and the visit checks.'}]},
   {v:'v90m-beta.49',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens loads faster; touch controls come back after the garage on hybrid devices.'}]},
   {v:'v90m-beta.48',date:'14 Oct 2026',items:[{t:'NEW',s:'Low-rise streets are lined with LEGO-set buildings on plinths.'}]},
   {v:'v90m-beta.47',date:'14 Oct 2026',items:[{t:'FIXED',s:'Sitting on a bench keeps you upright; the Hot Drop card closes when you park.'}]},
@@ -4837,7 +4838,7 @@ function* athBuildG(grp,BM,rnd){const T0=performance.now(),RS=2,NX=Math.ceil((WX
   const CE_dec=(k,U,x,z,ry,h,L,fr)=>{const{w,d,fl,fh}=U,sty=athStyleAt(x,z);let hr=h+.5;
     if(k==='poly'){if(U.rf?U.rf==='pent'&&fl>=3&&w>8&&d>7:fl>=4&&w>10&&d>9&&rd()<.45){const[rx,rz]=L(0,-1.3);E('poly',rx,h+.5,rz,ry,w-2.4,fh,d-4.2,hx(pc2(ATH_COL.poly)));E('box',rx,h+.5+fh,rz,ry,w-2.1,.4,d-3.9,0xe2ded6);hr=h+.9+fh;CEd.ret++;if(rd()<.6){const[px,pz]=L(0,d/2-2.2);E('box',px,h+.5+fh-.25,pz,ry,w-1,.16,3.2,0xf2eee6)}}
       if(rd()<.5){const[ax,az]=L((rd()-.5)*w*.6,(rd()-.5)*d*.5);E('box',ax,hr,az,ry,.1,3.2,.1,0x8a8a8a);E('box',ax,hr+2.6,az,ry+.6,1.6,.06,.06,0x8a8a8a);CEd.ant++}}
-    if(fr&&(k==='poly'||k==='neo')){const ps=sty==='town'?.35:sty==='villa'?0:sty==='plaka'?.5:.78;if(rd()<ps){const[gx,gz]=L(0,d/2+.06);E('box',gx,.1,gz,ry,w-.5,2.6,.14,hx(pc2(['#2c3e48','#34474f','#3a4a40','#4a3a34'])));const[sx,sz]=L(0,d/2+.2);E('box',sx,2.75,sz,ry,Math.min(w-.8,w*.4+rd()*w*.5),.75,.3,hx(pc2(SHOPC)));CEd.shop++}}};
+    if(fr&&(k==='poly'||k==='neo')){const ps=sty==='town'?.35:sty==='villa'?0:sty==='plaka'?.5:.78;if(rd()<ps){const[gx,gz]=L(0,d/2+.06);E('box',gx,.1,gz,ry,w-.5,2.6,.14,hx(pc2(['#2c3e48','#34474f','#3a4a40','#4a3a34'])));const[sx,sz]=L(0,d/2+.2);E('box',sx,2.75,sz,ry,Math.min(w-.8,w*.4+rd()*w*.5),.75,.3,hx(pc2(SHOPC)));CEd.shop++;(HUB.ceS=HUB.ceS||[]).push({x:sx,z:sz,t:'shop',h:ry})/* art-5: BV_life counts them */}}};
   const put=(U,x,z,ry,c,s,fr)=>{U=OC_fix(U,x,z);CV_put(E,U,x,z,ry,c,s,fr);if(typeof CTB_put==='function'&&CTB_put(U,x,z,ry)){cnt[U.k]++;return}/* CT (city-1): LEGO sets */const{w,d,fl,fh,k}=U,h=fl*fh+(k==='villa'?.4:.6),col=(c0=>U.cvc??c0)(hx(pc(ATH_COL[k]))),L=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c];E((k==='villa'?'plaka':k)+(U.fv||''),x,0,z,ry,w,h,d,col);hubAddB({x,z,hw:w/2-.3,hd:d/2-.3,h,ry,ab:1});cnt[k]++;
     if(k==='poly'){E('box',x,h,z,ry,w+.3,.5,d+.3,0xe2ded6);CE_dec(k,U,x,z,ry,h,L,fr);if(U.rf)BV_roof(E,U,x,z,ry,h,L);if(!fr)return;if(!U.nb)for(let f=1;f<fl;f++){const[bx,bz]=L(0,d/2);E('bal',bx,f*fh-.2,bz,ry,w-.8,1,1.1,0xeef0ee)}
       if(!U.rf&&rnd()<.5){const[tx,tz]=L((rnd()-.5)*w/2,rnd()*d/4);E('box',tx,h,tz,ry,1.4,1.5,1.4,0xdcdcd8);const[sx,sz]=L((rnd()-.5)*w/2,-d/4);E('box',sx,h+.8,sz,ry,2.4,.15,1.5,0x2a3a5a)}
@@ -14218,7 +14219,8 @@ const CTB={on:!/[?&]ctb=0/.test(location.search)/* art-5: default ON (ctb/fra-ro
 const CTB_V={fra:[
   {k:'bank',ids:['bank'],w:3},{k:'bank_t',ids:['bank'],w:2,rc:{'#b40000':'#e4cd9e','#f4f4f4':'#b40000'}},
   {k:'6372',ids:['w6372'],w:3},{k:'6372_r',ids:['w6372'],w:2,rc:{'#1e5aa8':'#b40000','#b40000':'#1b2a34'}},{k:'6372_g',ids:['w6372'],w:2,rc:{'#1e5aa8':'#00451a','#b40000':'#f4f4f4'}},
-  {k:'6683',ids:['w6683'],w:1},{k:'cg',ids:['cga','cgb'],w:1,gap:260}],
+  {k:'6683',ids:['w6683'],w:1},{k:'cg',ids:['cga','cgb'],w:1,gap:260},
+  /* art-5: more facade types for bv1 (≥ 3 per block): 6362 shop, 6374 Holiday Home, 4956 house (docs/HANDOFF_models4.md, RESCUE.md) */{k:'6362',ids:['w6362'],w:3},{k:'6374',ids:['w6374'],w:1},{k:'4956',ids:['w4956'],w:1}],
  ath:[{k:'6365_w',ids:['w6365'],w:3,rc:{'#fac80a':'#f4f4f4','#b40000':'#1e5aa8'}},{k:'6365_c',ids:['w6365'],w:1,rc:{'#fac80a':'#f2e3bd','#b40000':'#c8643c'}},
   {k:'6372_w',ids:['w6372'],w:2,rc:{'#1e5aa8':'#f4f4f4','#b40000':'#1e5aa8'}},{k:'6402',ids:['w6402'],w:1}]};
 function CTB_city(){return CID==='fra'?'fra':'ath'}
@@ -14243,17 +14245,19 @@ function CTB_kind(v){if(CTB.K[v.k])return CTB.K[v.k];if(!v.ids.every(id=>LD_MODE
  const tri=g=>(g.index?g.index.count:g.attributes.position.count)/3;
  return CTB.K[v.k]={v,near,far,W,D,H,col,L:[],ims:[],fim:null,tris:near.reduce((a,[g])=>a+tri(g),0),ftris:tri(far)}}
 const CTB_h=(x,z,s)=>{const v=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return v-Math.floor(v)};
-function CTB_pick(x,z,i,maxW,maxD){const V=CTB_V[CTB_city()],tot=V.reduce((a,v)=>a+v.w,0);let r=CTB_h(x,z,i)*tot;
+function CTB_pick(x,z,i,maxW,maxD,row){const V=CTB_V[CTB_city()],tot=V.reduce((a,v)=>a+v.w,0);let r=CTB_h(x,z,i)*tot;
+ if(CID==='fra'&&typeof BV_near==='function'&&BV.on){/* art-5: the LEGO family least used nearby (bv1: ≥ 3 facade types per block, no street of one look) */const n=BV_near(x,z,100,'fac'),N=BV_near(x,z,45,'fac'),rn=v=>(row||[]).filter(q=>q[0].v.ids[0]===v.ids[0]).length,sc=v=>{const f='lego:'+v.ids[0];return((n[f]||0)+3*(N[f]||0)+6*rn(v))/v.w+CTB_h(x,z,i+V.indexOf(v))*.9};/* + this slot's row so far */
+  for(const v of V.slice().sort((p,q)=>sc(p)-sc(q))){const K=CTB_kind(v);if(!K||K.W>maxW||K.D>maxD+1)continue;if(v.gap&&(rn(v)||CTB.cg.some(p=>Math.hypot(p[0]-x,p[1]-z)<v.gap)))continue;return K}return null}
  for(let t=0;t<V.length;t++){const v=V[(t+V.findIndex(q=>(r-=q.w)<0)+V.length)%V.length];const K=CTB_kind(v);if(!K||K.W>maxW||K.D>maxD+1)continue;
   if(v.gap&&CTB.cg.some(p=>Math.hypot(p[0]-x,p[1]-z)<v.gap))continue;return K}return null}
 // fill a slot (centre x,z; yaw ry; width w along the street, depth d; local +z = the street front). Returns false = keep the old building.
 function CTB_fill(x,z,ry,w,d,h0,extra){if(!CTB.on)return false;CTB.st.slots++;const c=Math.cos(ry),s=Math.sin(ry),row=[];let p=-w/2,i=0;
- while(p<w/2-3&&i<8&&!(row.length&&w/2-p<7)){const K=CTB_pick(x+p,z,i++,w/2-p,d);if(!K)break;row.push([K,p+K.W/2]);p+=K.W+.4}
+ while(p<w/2-3&&i<8&&!(row.length&&w/2-p<7)){const K=CTB_pick(x+p,z,i++,w/2-p,d,row);if(!K)break;row.push([K,p+K.W/2]);p+=K.W+.4}
  if(!row.length){CTB.st.skip++;return false}const sh=(w/2-p)/2;// centre the row in the slot
  const P=[];for(const[K,lx0]of row){const lx=lx0+sh,lz=d/2-K.D/2,px=x+lx*c+lz*s,pz=z-lx*s+lz*c;let g0=1e9,g1=-1e9;// art-5: on a slope the set sits at its HIGH corner on a grey plinth down to the low one (never sunk or floating); a slope over 3 m keeps the old building
   for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1],[0,0]]){const ux=u*K.W/2,uz=v*K.D/2,g=groundY(px+ux*c+uz*s,pz-ux*s+uz*c);g0=Math.min(g0,g);g1=Math.max(g1,g)}if(g1-g0>3){CTB.st.slope=(CTB.st.slope||0)+1;CTB.st.skip++;return false}P.push([K,px,pz,g1,g1-g0])}
  for(const[K,px,pz,y,ph]of P){const a=ry+Math.PI;// set front (−z) → street (+z local)
-  const o={x:px,z:pz,y,a,ph};if(ph>.12)CTB.pl.push([o,K,ph+.15]);K.L.push(o);if(K.v.gap)CTB.cg.push([px,pz]);const ca=Math.cos(a),sa=Math.sin(a);
+  const o={x:px,z:pz,y,a,ph};if(ph>.12)CTB.pl.push([o,K,ph+.15]);if(CID==='fra')try{BV_add(px,pz,'ctb:'+K.v.k,'lego:'+K.v.ids[0],{ry,w:K.W,d:K.D,h:K.H,ctb:1,yb:y})}catch(e){}/* art-5: bv1 variety + street life see the sets (Athens slots are already registered by CV_put) */K.L.push(o);if(K.v.gap)CTB.cg.push([px,pz]);const ca=Math.cos(a),sa=Math.sin(a);
   o.b=hubAddB({x:px+K.col.ox*ca+K.col.oz*sa,z:pz-K.col.ox*sa+K.col.oz*ca,hw:K.col.hw,hd:K.col.hd,h:y+K.H,ry:a,...(extra||{})});CTB.st.sets++}return true}
 // Frankfurt hook (putK in buildHubG): only the generic street buildings, never towers
 function CTB_putK(nm,sc,x,z,ry,tint,bx,w,h,d){if(!bx||CID!=='fra'||!/^building-([a-m]|type-[a-z])$/.test(nm))return false;return CTB_fill(x,z,ry,w,d,h)}
@@ -14291,11 +14295,11 @@ const CTB_off=()=>CTB.on?'':'📍 PENDING · LEGO-set buildings are OFF (?ctb=0)
 const CTB_box=(o,K,sh)=>{const c=Math.cos(o.a),s=Math.sin(o.a),C=K.col,cx=o.x+C.ox*c+C.oz*s,cz=o.z-C.ox*s+C.oz*c,P=[];for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1],[0,-1]]){const lx=u*(C.hw-sh),lz=v*(C.hd-sh);P.push([cx+lx*c+lz*s,cz-lx*s+lz*c])}return P};
 // ctb/fra-row: a street of sets, near LOD drawn, every footprint off the road, sitting on the ground
 function CTB_goRow(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(0);if(!S)return'📍 no row of LEGO sets with a free street spot ❌';
- CTB_park(S,S.o.a+1.1);const N=CTB_all().filter(([q])=>Math.hypot(q.x-RO.x,q.z-RO.z)<50);let road=0,gmax=0,near=0;
+ CTB_park(S,S.o.a+1.1);setTimeout(()=>{CTB_step(1);/* camera has followed the car */const N=CTB_all().filter(([q])=>Math.hypot(q.x-RO.x,q.z-RO.z)<50);let road=0,gmax=0,near=0;
  for(const[q,K]of N){for(const[x,z]of CTB_box(q,K,.3))if(CTB_onRoad(x,z))road++;const c=Math.cos(q.a),s=Math.sin(q.a);for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1]]){const lx=u*K.W/2,lz=v*K.D/2,g=groundY(q.x+lx*c+lz*s,q.z-lx*s+lz*c);gmax=Math.max(gmax,g-q.y,q.ph>.12?0:q.y-g)}}/* sunk anywhere, or floating without a plinth */
  for(const k in CTB.K)near+=CTB.K[k].ims[0]?CTB.K[k].ims[0].count:0;const kinds=new Set(N.map(([,K])=>K.v.k)).size,ok=N.length>=3&&near>=3&&road===0&&gmax<=.15&&kinds>=2;
  window.__chk=window.__chk||{};window.__chk.ctbRow={n:N.length,near,kinds,road,gmax:+gmax.toFixed(2),ok};
- return`📍 LEGO STREET: ${N.length} sets within 50 m (${kinds} looks), ${near} drawn full-detail, ${road} footprint corners on the road, sunk/floating ≤ ${gmax.toFixed(2)} m (≤ 0.15) `+(ok?'✅':'❌')}
+ say(`📍 LEGO STREET: ${N.length} sets within 50 m (${kinds} looks), ${near} drawn full-detail, ${road} footprint corners on the road, sunk/floating ≤ ${gmax.toFixed(2)} m (≤ 0.15) `+(ok?'✅':'❌'))},600);return'📍 LEGO STREET · measuring…'}
 // ctb/collide: drive (real gas) head-on into a set: the car stops at the facade (no pass-through, no invisible wall)
 function CTB_goHit(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(16);if(!S)return'📍 no set with a clear 16 m run ❌';
  const{o,F}=S,KK=S.K;CTB_park(S,Math.atan2(-F.nx,-F.nz));const pd=()=>(RO.x-o.x)*F.nx+(RO.z-o.z)*F.nz-KK.D/2;/* car centre ↔ visual facade plane */let mn=1e9,vmax=0,inb=0;K.ArrowUp=true;const t0=performance.now();
@@ -14305,8 +14309,8 @@ function CTB_goHit(say){const off=CTB_off();if(off)return off;if(state!=='roam'|
 // ctb/perf: at the row, frame time + draw calls with the sets drawn vs hidden, plus their GPU memory and per-frame CPU
 function CTB_goPerf(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(0);if(!S)return'📍 no row ❌';CTB_park(S,S.o.a+1.1);
  const M=[];for(const k in CTB.K){const K=CTB.K[k];M.push(...K.ims);K.fim&&M.push(K.fim)}const R=renderer,ar=R.info.autoReset;
- const fr=vis=>{for(const m of M)m.visible=vis;const T=[];let calls=0,tris=0;for(let i=0;i<4;i++){R.info.autoReset=false;R.info.reset();const t=performance.now(),q=typeof TQ!=='undefined'?TQ:null;/* test mode draws only on TQ.draw */if(q)q.draw=1;try{composer.render()}finally{if(q)q.draw=0}T.push(performance.now()-t);calls=R.info.render.calls;tris=R.info.render.triangles}R.info.autoReset=ar;T.shift();T.sort((a,b)=>a-b);return{ms:T[1],calls,tris}};
- let a,b;try{a=fr(false);b=fr(true);const a2=fr(false),b2=fr(true);a.ms=Math.min(a.ms,a2.ms);b.ms=Math.min(b.ms,b2.ms)}finally{for(const m of M)m.visible=true}
+ const fr=vis=>{for(const m of M)m.visible=vis;const T=[];let calls=0,tris=0;for(let i=0;i<3;i++){R.info.autoReset=false;R.info.reset();const t=performance.now(),q=typeof TQ!=='undefined'?TQ:null;/* test mode draws only on TQ.draw */if(q)q.draw=1;try{composer.render()}finally{if(q)q.draw=0}T.push(performance.now()-t);calls=R.info.render.calls;tris=R.info.render.triangles}R.info.autoReset=ar;T.shift();return{ms:Math.min(...T),calls,tris}};
+ let a,b;try{fr(true);/* warm-up: compiles the sets' programs */a=fr(false);b=fr(true);for(let r=0;r<2;r++){const a2=fr(false),b2=fr(true);a.ms=Math.min(a.ms,a2.ms);b.ms=Math.min(b.ms,b2.ms)}}finally{for(const m of M)m.visible=true}
  let mb=0;const seen=new Set();for(const k in CTB.K){const K=CTB.K[k];for(const g of[...K.near.map(q=>q[0]),K.far])if(g&&!seen.has(g)){seen.add(g);for(const n in g.attributes)mb+=g.attributes[n].array.byteLength;if(g.index)mb+=g.index.array.byteLength}for(const m of[...K.ims,K.fim])if(m)mb+=m.instanceMatrix.array.byteLength}mb/=1048576;
  const t=performance.now();for(let i=0;i<20;i++)CTB_step(1);const cpu=(performance.now()-t)/20/6;/* step runs every 6 frames */
  const df=(b.ms/a.ms-1)*100,dc=b.calls-a.calls,ok=df<=15&&dc<=40&&mb<=60&&cpu<=.5;window.__chk=window.__chk||{};window.__chk.ctbPerf={off:a,on:b,df:+df.toFixed(1),dc,mb:+mb.toFixed(1),cpu:+cpu.toFixed(3),ok};
@@ -15277,13 +15281,13 @@ function BV_roof(E,U,x,z,ry,h,L){const{w,d}=U,r=BV_h(x,z,11);
 const BV_PAL={bank:['#1f4a8a','#0d7a8a','#c0c8d0','#2a7ad8'],old:['#7a2a2a','#2a5a3a','#c8a040','#5a3a24'],grz:['#e8822a','#3f8a4a','#d6337f','#ffcc00'],ware:['#ff3a8a','#3ad0ff','#ffd12c','#7a3aff','#3aff8a'],
   off:['#2a7ad8','#ff7a1c','#3aa04a','#e8302a'],mix:['#e8302a','#2a7ad8','#ffcc00','#3aa04a','#ff7a1c','#d6337f','#1fb5b0'],plaka:['#2f6f9a','#8a2a2a','#3a7a4a','#c8643c'],poly:['#e8302a','#0d5eaf','#ffcc00','#1fb5b0','#ff7a1c','#7a3aa0']};
 function BV_sty(x,z){if(CID==='fra')return typeof CV_fsty==='function'?CV_fsty(x,z):'mix';const s=typeof athStyleAt==='function'?athStyleAt(x,z):'poly';return s==='plaka'||s==='old'?'plaka':s==='town'||s==='villa'?'grz':'poly'}
-function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;BV.L=(BV.RB||[]).slice();const fra=CID==='fra',T=fra?['shop','cafe','kiosk','bill','mural','none']:['cafe','kiosk','bill','mural','none'],W=fra?[3,2,1,1.2,1.2,.6]:[2,1,1.2,1.2,3];
+function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;BV.L=(BV.RB||[]).concat(HUB.ceS||[]);/* art-5: + Athens CE_dec shopfronts */const fra=CID==='fra',T=fra?['shop','cafe','kiosk','bill','mural','none']:['cafe','kiosk','bill','mural','none'],W=fra?[3,2,1,1.2,1.2,.6]:[2,1,1.2,1.2,3];
   const BI=new Map();for(const b of HUB.bld||[])BI.set(Math.round(b.x)+'|'+Math.round(b.z),b);const LG=new Map(),I=new Map(),hx=c=>parseInt(c.slice(1),16);
   const near=(x,z)=>{const n={},kx=Math.floor(x/100),kz=Math.floor(z/100);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(const o of LG.get((kx+a)*100000+kz+b)||[])if((o.x-x)**2+(o.z-z)**2<1e4)n[o.t]=(n[o.t]||0)+1;return n};
   const box=(x,y,z,ry,sx,sy,sz,c)=>{const k=Math.floor(x/1600)*1000+Math.floor(z/1600);let A=I.get(k);if(!A)I.set(k,A=[]);A.push(x,y,z,ry,sx,sy,sz,typeof c==='string'?hx(c):c)};
   for(const o of BV_list()){if(o.ry==null||!o.w||(o.fr===0))continue;const{x,z,ry,w,d}=o,c=Math.cos(ry),s=Math.sin(ry),L0=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c],D0=d/2,[fx,fz]=L0(0,d/2+2);let L=L0;
     const q=cityAt(fx,fz),f=fillAt(fx,fz);/* art-4: filler-grid streets count too (21 of 30 buildings at the bv1/fra spot faced one and got nothing) */if(!(q&&q.d<=q.road.w/2+16||f&&f.d<=f.r.w/2+16)||w<6)continue;const NS=fra&&w>=18?2:1;for(let sl=0;sl<NS;sl++){const ox=(sl-(NS-1)/2)*w/NS,w0=w;{const w=w0/NS,[fx,fz]=L(ox,D0+2);
-    const n=near(fx,fz);let t='none',bs=1e9;T.forEach((k,i)=>{if(k==='mural'&&NS>1)return;const sc=(n[k]||0)/W[i]+BV_h(x+sl,z,40+i)*.8;if(sc<bs){bs=sc;t=k}});if(t==='bill'&&o.h<10)t='mural';if(t==='none')continue;
+    const n=near(fx,fz);let t='none',bs=1e9;if(o.ctb&&!sl){/* art-5: a LEGO set is a shopfront itself */const e={x:fx,z:fz,t:'shop',h:Math.atan2(-s,-c)},k=Math.floor(fx/100)*100000+Math.floor(fz/100);let A=LG.get(k);if(!A)LG.set(k,A=[]);A.push(e);BV.L.push(e)}T.forEach((k,i)=>{if(k==='mural'&&NS>1)return;if(o.ctb&&k!=='cafe'&&k!=='kiosk'&&k!=='bill'&&k!=='none')return;/* sets: sidewalk extras only, nothing hung on the bricks */const sc=(n[k]||0)/W[i]+BV_h(x+sl,z,40+i)*.8;if(sc<bs){bs=sc;t=k}});if(t==='bill'&&o.h<10&&!o.ctb)t='mural';if(t==='none')continue;
     const b=BI.get(Math.round(x)+'|'+Math.round(z)),y0=b&&b.trBase!=null?b.trBase:groundY(x,z),P=BV_PAL[BV_sty(x,z)],pc=i=>P[Math.floor(BV_h(x+sl*7,z,50+i)*P.length)%P.length],D=d/2;L=(lx,lz)=>L0(lx+ox,lz);
     const put=(lx,ly,lz,sx,sy,sz,col,dry)=>{const[px,pz]=L(lx,lz);box(px,y0+ly,pz,ry+(dry||0),sx,sy,sz,col)};
     if(t==='shop'){const gw=Math.min(w*.7,12);put(0,1.4,D+.07,gw,2.6,.12,'#2c3e48');put(0,1.4,D+.1,gw*.08,2.6,.1,'#e8e4dc');put(0,3.3,D+.18,gw*.9,.85,.3,pc(0));put(0,2.9,D+.8,gw,.12,1.6,pc(1))}
@@ -15292,6 +15296,7 @@ function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;B
       put(-aw/2-.5,.35,D+.5,.6,.7,.6,'#8a5a3a');put(-aw/2-.5,.9,D+.5,.7,.6,.7,'#3f8a30');if(b||true)hubAddB({x:L(0,D+.9)[0],z:L(0,D+.9)[1],hw:aw/2,hd:.8,h:1.2,ry})}
     else if(t==='kiosk'){const kc=pc(3),lx=(BV_h(x,z,60)-.5)*Math.max(0,w-4);put(lx,1.1,D+1.4,2.6,2.2,2.6,kc);put(lx,1.3,D+2.72,1.8,1,.06,'#bfe3ff');put(lx,2.35,D+1.4,2.9,.3,2.9,'#f4f4f0');put(lx,2.75,D+2.6,2.2,.5,.12,pc(0));
       const[kx,kz]=L(lx,D+1.4);hubAddB({x:kx,z:kz,hw:1.3,hd:1.3,h:2.5,ry})}
+    else if(t==='bill'&&o.ctb){/* art-5: on a LEGO set's roof, 2 legs, set back 1.5 m from the facade */const bw=Math.min(w*.6,7),yb=o.h+(o.yb-y0);for(const sd of[-1,1])put(sd*bw*.35,yb+.9,D-1.5,.25,1.8,.25,'#2a2a2e');put(0,yb+2.9,D-1.5,bw+.4,2.4,.2,'#2a2a2e');put(0,yb+3.3,D-1.37,bw,1.1,.08,pc(0));put(0,yb+2.4,D-1.37,bw,.9,.08,pc(1))}
     else if(t==='bill'){const bw=Math.min(w*.6,9);put(0,6.5,D+.12,bw+.4,3.4,.2,'#2a2a2e');put(0,6.5,D+.25,bw,1.5,.08,pc(0));put(0,5.6,D+.25,bw,1.2,.08,pc(1));put(-bw*.25,7.4,D+.28,bw*.3,.6,.06,'#ffffff')}
     else{const sd=BV_h(x,z,61)<.5?-1:1,mh=Math.min(o.h*.6,9),mx=sd*(w/2+.06);put(mx,mh/2+.4,0,.1,mh,d*.7,pc(0));put(mx+sd*.03,mh*.35+.4,-d*.15,.1,mh*.5,d*.25,pc(1));put(mx+sd*.04,mh*.7,d*.15,.1,mh*.35,d*.3,pc(2));put(mx+sd*.05,mh*.55,0,.1,mh*.12,d*.6,'#ffffff')}
     const e={x:fx,z:fz,t,h:Math.atan2(-s,-c)};const k=Math.floor(fx/100)*100000+Math.floor(fz/100);let A=LG.get(k);if(!A)LG.set(k,A=[]);A.push(e);BV.L.push(e)}}}
@@ -15313,7 +15318,7 @@ function RV14_carBox(){try{const m=pl.mesh;m.updateMatrixWorld(true);const b=new
 function RV14_mark(kind,id,nth){const L=RO.marks.filter(m=>m.kind===kind&&(!id||(m.ev&&m.ev.id===id)));return L[nth||0]}
 function RV14_near(m,d){const h=m.h!=null?m.h:0,q=rfSnap(m.x-Math.sin(h)*d,m.z-Math.cos(h)*d,80);roamWarp(q?q[0]:m.x,q?q[1]:m.z,q&&q[2]!=null?q[2]:h);camSnap=true}
 function RV14_start(kind,id,nth){const m=RV14_mark(kind,id,nth);if(!m)return false;RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);return true}
-function RV14_ride(id,cb){try{gbOpen();GAR_select(id)}catch(e){return cb('ride '+id+': '+e)}let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>60){try{gbClose(true)}catch(e){}setTimeout(()=>cb(null),1200)}else setTimeout(w,100)};setTimeout(w,200)}
+function RV14_ride(id,cb){try{gbOpen();GAR_select(id)}catch(e){return cb('ride '+id+': '+e)}let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>60){try{gbClose(true)}catch(e){}setTimeout(()=>cb(null),450)}else setTimeout(w,100)};setTimeout(w,200)}
 function RV14_pairs(P){const bad=[];for(const[a,b]of P){const A=a==='CAR'?RV14_carBox():RV14_vis(a),B=b==='CAR'?RV14_carBox():RV14_vis(b),o=RV14_ovl(A,B),lim=(a==='CAR'||b==='CAR')?.5*Math.min(A?A.width*A.height:1e9,B?B.width*B.height:1e9):40;if(o>lim)bad.push(a+'×'+b+' '+o+'px²')}return bad}
 // RV14_reset (rev-2): clean drive before every rv14 GO and after the auto checks that start something (Hot Drop, rival race):
 //   no mission/race/sprint, back in the car (not sitting/on foot), garage/card/map closed, camera snapped. The GO warps after this.
