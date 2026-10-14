@@ -107,6 +107,14 @@
    "mut": 0
   },
   {
+   "id": "cc-uibar",
+   "name": "UI bar: top bar, dock and panels",
+   "ask": "Are bar, dock and panels clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "cc-zoom",
    "name": "Big card zoom",
    "ask": "Is the big card readable?",
