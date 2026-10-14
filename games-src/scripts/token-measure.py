@@ -12,7 +12,7 @@ def find(q, g):
     return len(subprocess.run([str(SRC / "scripts" / "find.sh"), q, g], capture_output=True, text=True).stdout)
 # game, task, [whole files a worker reads without maps], map file, [(query)], [(file, line) ranges read]
 CASES = [
- ("thornbound", "Undo button label bigger", ["thornbound/game/src/ui.js", "thornbound/game/src/head.html"], "thornbound/game/MODULES.md",
+ ("thornbound", "Undo button label bigger", ["thornbound/game/src/ui3.js", "thornbound/game/src/head.html"], "thornbound/game/MODULES.md",
   ["Undo", "#act .btn"], [("thornbound/game/src/ui3.js", 151), ("thornbound/game/src/head.html", 140)]),
  ("doorkick-dungeon", "Help button label bigger", ["munch/ui.js", "munch/head.html", "munch/tbl.css"], "munch/MODULES.md",
   ["helpb", ".btn{"], [("munch/ui.js", 123), ("munch/head.html", 477)]),
