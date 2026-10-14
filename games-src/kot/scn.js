@@ -17,6 +17,8 @@
       return new Promise(function (r) { setTimeout(r, 700); });
     });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; try { BF.tut = {}; localStorage.removeItem('ccs_bf1'); } catch (e) { } return table(51).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); return new Promise(function (r) { setTimeout(r, 500); }); }); };
   // the same, then SMASH through the real engine and wait for the buying phase with plenty of energy
   function marketTable(seed) {
     return table(seed).then(function () {
