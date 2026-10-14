@@ -13,10 +13,10 @@ Branch: trunk `alex/od-int2`. Continues docs/HANDOFF_ART5.md.
   footSurf PASS both cities (worst 0.042 / 0.037 m). GO `art/footsurf` (real W key across a draped patch).
 - GO module: src/98ar_art_go.js (`window.__art`, calls by name so hot reload works).
 
-- **District themes built, default ON** (`?dt=0` = off), src/98dt_district_themes.js + 4 hook lines in BV_life. fra: 67 taverns, 8 neon pylons +
+- **District themes built (ec37672c), then REVERTED upstream (e909e918, no reason given; not re-applied; `git revert e909e918` restores it)** (`?dt=0` = off), src/98dt_district_themes.js + 4 hook lines in BV_life. fra: 67 taverns, 8 neon pylons +
   9 roof neon, 11 mural walls; 11 extra draw calls. GO dt/sachs, dt/bahn, dt/ost PASS; ctb/fra-row, ctb/collide, bv1/fra (repeat 9.6 %, blocks 100 %),
   art/* PASS; 0 console errors. Shot grid `qa_art6/dt_grid.jpg` (looked: tavern table/benches/lights, neon blade, studs mural).
-- **Found + fixed: BV_life colliders never reached HUB.grid** (art-3/4 kiosks and cafés: 623 fra kiosks had no collision). `hubGridAdd` at the end
+- **Found + fixed in ec37672c, so ALSO REVERTED now: BV_life colliders never reached HUB.grid** (art-3/4 kiosks and cafés: 623 fra kiosks had no collision). `hubGridAdd` at the end
   of BV_life (1444 colliders fra).
 
 ## Next
