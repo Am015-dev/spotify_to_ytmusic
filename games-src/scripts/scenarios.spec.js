@@ -29,6 +29,14 @@ for (const [slug, scns] of Object.entries(list)) test.describe(slug, () => {
       await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => { });
       await page.waitForTimeout(800);
     } else fails = (await checkScenario(page, BASE, slug, sc.id, phone)).fails;
+    if (sc.id === 'menu' && !process.env.AXE_ONLY) {   // axe on every menu surface (tap targets >= 24 px, contrast >= 2:1, named buttons): the shared menu scenario opens them one by one
+      const n = await page.evaluate(() => window.GXS.menuList().length).catch(() => 0);
+      for (let i = 0; i < n; i++) {
+        const nm = await page.evaluate(i => window.GXS.menuOpen(i), i); await page.waitForTimeout(600);
+        for (const f of await axeSevere(page).catch(() => [])) fails.push(`[${nm}] axe ${f[0]}: ${f[1]} "${f[2]}"`);
+      }
+      await page.evaluate(() => window.GXS.menuOpen(0));
+    }
     if (process.env.LOOK_OUT) {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       const severe = await axeSevere(page).catch(() => []);
