@@ -143,15 +143,18 @@
  {
   "date": "2026-10-14",
   "game": "short-fuse",
-  "title": "short-fuse: readable on every screen size",
+  "title": "short-fuse: one primary button on the title",
   "items": [
-   "Menus, panels and start screen readable at all 5 sizes"
+   "Menus, panels and start screen readable at all 5 sizes",
+   "Title: Play is the only big button; top bar and text sizes checked"
   ],
   "check": "",
   "scn": [
-   "menu"
+   "menu",
+   "sf-uibar"
   ],
   "ask": [
+   null,
    null
   ]
  },
