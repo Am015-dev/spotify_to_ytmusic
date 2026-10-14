@@ -102,7 +102,7 @@ async function daemon(){
     const r=await p.evaluate(async s=>{try{const v=await window.__hot(s);return JSON.stringify(v,(k,x)=>typeof x==='number'?Math.round(x*1000)/1000:x)?.slice(0,2000)??String(v)}catch(e){return'ERR '+e}},js).catch(e=>'EVAL '+e);
     out.push(`${c}: ${r}${o.errs.length>e0?' · ERR '+o.errs[e0]:''}`)}return out.join('\n')},
   async reset({city}){const out=[];for(const c of city?[city]:Object.keys(P)){const p=await page(c);out.push(c+': '+JSON.stringify(await p.evaluate(()=>__tq.reset())))}return out.join('\n')},
-  async errors({city}){return Object.values(P).filter(o=>!city||o.c===city).map(o=>`${o.c}: ${o.errs.length} errors${o.errs.length?'\n  '+[...o.errs.slice(0,3),...o.errs.slice(-2)].join('\n  '):''}`).join('\n')},
+  async errors({city}){return Object.values(P).filter(o=>!city||o.c===city).map(o=>`${o.c}: ${o.errs.length} errors${o.errs.length?'\n  '+o.errs.slice(-5).join('\n  '):''}`).join('\n')},
   async reboot({city}){const cs=city?[city]:Object.keys(P);await Promise.all(cs.map(c=>{if(P[c])P[c].errs=[];return boot(c)}));return cs.map(c=>`${c} booted ${P[c].boot.toFixed(1)} s`).join('\n')},
   async shot({file,city}){const c=city||'fra',p=await page(c);await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.screenshot({path:path.resolve(file),type:/png$/.test(file)?'png':'jpeg',quality:/png$/.test(file)?undefined:75});return 'wrote '+file},
   async gym({kind}){const k=kind||'drive',t=Date.now();await boot('gym','gym='+k);const p=P.gym.p;await p.waitForFunction(()=>window.__gym&&__gym.ok,null,{timeout:8000,polling:50}).catch(()=>{});P.gym.boot=(Date.now()-t)/1000;const r=await p.evaluate(()=>window.__hot('JSON.stringify({x:RO.x,z:RO.z,foot:RO.foot,tReady:__tq.tReady})')).catch(e=>String(e));
