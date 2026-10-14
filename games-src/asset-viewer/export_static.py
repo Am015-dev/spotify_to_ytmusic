@@ -29,6 +29,7 @@ for t in used: shutil.copy2(V / t, OUT / t)
 (OUT / "flow.json").write_text(json.dumps(flow), encoding="utf-8")
 (OUT / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
 shutil.copy2(V / "votes.json", OUT / "votes.json")
+shutil.copy2(V / "review-tips.js", OUT / "review-tips.js")
 shutil.copy2(V / "crown-cards.json", OUT / "crown-cards.json")
 games = REPO / "games"
 tables = {g.name: sorted(p.name for p in (g / "media").glob("table-*.webp")) for g in games.iterdir() if (g / "media").is_dir()}
