@@ -58,7 +58,9 @@ function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.c
 function GFX_room(){if(GFX.room)return GFX.room;try{const pm=new THREE.PMREMGenerator(renderer);GFX.room=pm.fromScene(new RoomEnvironment(),.04).texture;pm.dispose()}catch(e){GFX.room=scene.environment}return GFX.room}
 // stock GTAOPass (three r164 addon) after the RenderPass, PC high tier by day only: contact shadows where bricks meet the street and in corners.
 // It re-renders scene normals/depth, so it costs one extra geometry pass: never on med/phone.
-function GFX_ao(){const want=GFX.on&&GFX.day&&GFX.tier==='high'&&state==='roam';if(!want&&!GFX.gtao)return;
+// measured (Athens, high): +~720 draw calls per frame (1229 vs 510) for its normal pass: opt-in only (?ao=1 or localStorage mho_gfxao=1)
+GFX.aoOk=(()=>{try{const q=new URLSearchParams(location.search).get('ao');return q!==null?q==='1':store.get('mho_gfxao',0)===1}catch(e){return false}})();
+function GFX_ao(){const want=GFX.aoOk&&GFX.on&&GFX.day&&GFX.tier==='high'&&state==='roam';if(!want&&!GFX.gtao)return;
  if(!GFX.gtao){const w=innerWidth,h=innerHeight;const p=new GTAOPass(scene,camera,w,h);p.output=GTAOPass.OUTPUT.Default;p.blendIntensity=.7;
   p.updateGtaoMaterial({radius:1.2,distanceExponent:1.5,thickness:1.5,scale:1,samples:12});p.updatePdMaterial({lumaPhi:10,depthPhi:2,normalPhi:3,radius:6,rings:2,samples:12});
   composer.insertPass(p,1);GFX.gtao=p;resize()}
@@ -82,7 +84,9 @@ function GFX_set(on){GFX.on=!!on;try{store.set('mho_gfx',on?1:0)}catch(e){}if(on
 // shadow-map depth check: depth (0 near the sun .. 1 far) at the car's roof vs at open road 12 m to its side; car < road = the car is in the map
 function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=sh.mapSize.x,px=new Uint8Array(4),v=new THREE.Vector3(),rd=p=>{v.copy(p).applyMatrix4(sh.matrix);
   const x=Math.round(v.x*W),y=Math.round(v.y*W);if(x<0||y<0||x>=W||y>=W)return null;renderer.readRenderTargetPixels(sh.map,x,y,1,1,px);return+(px[0]/255/16777216+px[1]/255/65536+px[2]/255/256+px[3]/255).toFixed(4)};
- const c=new THREE.Vector3(RO.x,RO.y+1,RO.z),s=new THREE.Vector3(RO.x+Math.cos(RO.h)*12,RO.y,RO.z-Math.sin(RO.h)*12);return{car:rd(c),road:rd(s)}}
+ // open road = the farthest of 4 samples 12 m away (one side can sit in a building's shadow)
+ const c=new THREE.Vector3(RO.x,RO.y+1,RO.z),R=[0,1,2,3].map(i=>rd(new THREE.Vector3(RO.x+Math.cos(RO.h+i*1.571)*12,RO.y,RO.z-Math.sin(RO.h+i*1.571)*12))).filter(v=>v!==null);
+ return{car:rd(c),road:R.length?Math.max(...R):null}}
 window.__gfx={render:()=>composer.render(),get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
  hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,ao:!!(GFX.gtao&&GFX.gtao.enabled),aoErr:GFX.aoErr||'',cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
