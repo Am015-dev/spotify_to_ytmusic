@@ -63,6 +63,10 @@ function TJ_fx(){if(HUB.tjFx)return HUB.tjFx;const F=[];if(CID==='fra'&&!TJ.off)
     let a=null,last=-9,qa=null;const end=()=>{const t0=a-1.5,t1=last+1.5/* past a filler end too: a T-junction's mouth */,B=(t1-t0)/2;if(B>40||B<.5)return;const tm=(t0+t1)/2;F.push({x:f.x0+f.ux*tm,z:f.z0+f.uz*tm,tx:nx,tz:nz,ux:f.ux,uz:f.uz,A:hw,B,ws:qa.road.w,wf:f.w})};
     for(let t=0;t<=f.L;){const q0=cityAt(f.x0+f.ux*t,f.z0+f.uz*t);if(!(q0&&q0.d<q0.road.w/2+hw+8)){if(a!=null&&t-last>3){end();a=null}t+=4;continue}const q=ins(t);if(q){if(a==null){a=t;qa=q}last=t}else if(a!=null&&t-last>3){end();a=null}t+=1}if(a!=null)end()}}
   return HUB.tjFx=F}
+// inside a street (true distance) or any junction area, + m: filler kerbs stop there (cityAt's sample distance let them run into junctions on curves)
+function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
+  for(const X of FILL_X||[])if(Math.abs(X.x-x)<X.wa/2+m&&Math.abs(X.z-z)<X.wb/2+m)return true;
+  for(const c of TJ_fx()){const dx=x-c.x,dz=z-c.z;if(Math.abs(dx*c.tx+dz*c.tz)<c.A+m&&Math.abs(dx*c.ux+dz*c.uz)<c.B+m)return true}return false}
 // near a filler crossing (for the CV boulevard medians, which only stopped at street discs)
 function TJ_nearFx(x,z,m){for(const c of TJ_fx())if(Math.hypot(c.x-x,c.z-z)<Math.max(c.A,c.B)+m)return true;return false}
 // ---- fix 2: pads conform to the road triangles under them. Every surface drapes the ground on its own coarse grid (up to 4 cm off,
@@ -82,15 +86,15 @@ function TJ_capture(g,mat,matrix){if(!TJ.cap||!TJ_isRoad(mat)||mat.map===HUB.M.j
     const ar=(T[3]-T[0])*(T[8]-T[2])-(T[6]-T[0])*(T[5]-T[2]);if(Math.abs(ar)<1e-6)continue;T.push(ar);
     const i0=Math.floor(Math.min(T[0],T[3],T[6])/8),i1=Math.floor(Math.max(T[0],T[3],T[6])/8),j0=Math.floor(Math.min(T[2],T[5],T[8])/8),j1=Math.floor(Math.max(T[2],T[5],T[8])/8);if((i1-i0)*(j1-j0)>400)continue;
     for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const A=TJ.cap.get(i*100000+j);if(A)A.push(T)}}}
-// highest captured surface at (x,z) within 0.3 m of the ground (decks/bridges above are not this junction's surface)
+// highest captured surface at (x,z) within 0.15 m of the ground (roads drape ≤ ~0.13 m; deck/bridge ramps above are not this junction's surface)
 function TJ_top(x,z,g){const A=TJ.cap&&TJ.cap.get(Math.floor(x/8)*100000+Math.floor(z/8));let m=-1e9;if(A)for(const T of A){const ar=T[9],w1=((T[3]-x)*(T[8]-z)-(T[6]-x)*(T[5]-z))/ar,w2=((T[6]-x)*(T[2]-z)-(T[0]-x)*(T[8]-z))/ar,w3=1-w1-w2;
-    if(w1<-1e-4||w2<-1e-4||w3<-1e-4)continue;const y=w1*T[1]+w2*T[4]+w3*T[7];if(y>m&&y<g+.3)m=y}return m}
+    if(w1<-1e-4||w2<-1e-4||w3<-1e-4)continue;const y=w1*T[1]+w2*T[4]+w3*T[7];if(y>m&&y<g+.15)m=y}return m}
 function TJ_y(x,z,off,r=.75){const g=groundY(x,z);if(!TJ.conf||!TJ.cap)return g+off;let e=0;
   if(!r){const t=TJ_top(x,z,g);return Math.max(g+off,t+TJ.mg)}  // r=0: one sample (small decals: zebra stripes)
   // how far the roads under it stand above "ground + off" anywhere within half a vertex spacing (relative to the local ground, so a slope adds nothing)
   for(const[dx,dz]of[[0,0],[r,0],[-r,0],[0,r],[0,-r],[r,r],[r,-r],[-r,r],[-r,-r]]){const x2=x+dx,z2=z+dz,g2=groundY(x2,z2),t=TJ_top(x2,z2,g2);if(t>-1e8)e=Math.max(e,t+TJ.mg-(g2+off))}
   // ground convexity towards the next vertex (2r away): the linear pad would dip by that much
-  let c=0;for(const[dx,dz]of[[r,0],[-r,0],[0,r],[0,-r]])c=Math.max(c,groundY(x+dx,z+dz)-(g+groundY(x+2*dx,z+2*dz))/2);return g+off+e+c}
+  let c=0;for(const[dx,dz]of[[r,0],[-r,0],[0,r],[0,-r]])c=Math.max(c,groundY(x+dx,z+dz)-(g+groundY(x+2*dx,z+2*dz))/2);return g+off+e+Math.min(c,.04)/* more is a quay wall / embankment edge, not road curvature */}
 // a pad = parallelogram c ± A·(ax,az) ± B·(bx,bz), vertices every ≤3 m, conformed; a planar pad (≤3 mm off its plane) is one quad
 function TJ_padGeo(cx,cz,ax,az,bx,bz,A,B,off){let na=Math.max(1,Math.ceil(2*A/3)),nb=Math.max(1,Math.ceil(2*B/3));const r=Math.max(A/na,B/nb),V=[];
   for(let i=0;i<=na;i++)for(let j=0;j<=nb;j++){const a=(i/na*2-1)*A,b=(j/nb*2-1)*B,x=cx+ax*a+bx*b,z=cz+az*a+bz*b;V.push([x,TJ_y(x,z,off,r),z,a,b])}
