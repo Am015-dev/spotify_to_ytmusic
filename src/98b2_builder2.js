@@ -642,7 +642,7 @@ function BX_raceUI(){let e=$('#bxRace');if(!e){e=document.createElement('div');e
 // trk-3: continuous progress: search the path near the last match (-40..+150 m); a global nearest point snapped to a crossing/overlapping part of the course (a whole lap off -> wrong position, "6/6")
 function BX_raceProg(){const r=BX.race,V=BX.v,m=BX.m,P=r.R.P,D=r.R.D,n=P.length;let bi=-1,bd=1e9;
  if(r.pi!=null)for(let k=-60;k<=200;k++){const i=((r.pi+k)%n+n)%n;let dd=D[i]-D[r.pi];if(dd<-r.R.L/2)dd+=r.R.L;if(dd>r.R.L/2)dd-=r.R.L;if(dd<-40||dd>150)continue;const d=P[i].distanceToSquared(V.p);if(d<bd){bd=d;bi=i}}
- if(bi<0||bd>30*30){bd=1e9;P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}})}r.pi=bi;let a=r.R.D[bi]-r.s0;if(a<-r.R.L/2)a+=r.R.L;if(a>r.R.L/2&&m.laps===0)a-=r.R.L;return m.laps*r.R.L+a}
+ if(bi<0||bd>30*30){bd=1e9;P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}})}const L=r.R.L,w=x=>x<-L/2?x+L:x>L/2?x-L:x;if(r.prog==null||r.pt!==r.t){/* once per tick: cumulative metres along the course (laps*L+a wrapped at half a lap: -L past 50 %) */r.prog=r.prog==null?w(D[bi]-r.s0):r.prog+w(D[bi]-D[r.pi]);r.pt=r.t}r.pi=bi;return r.prog}
 function BX_raceTick(dt){const r=BX.race;if(!r||BX.mode!=='drive')return;const cd=$('#bxCd');
  if(r.cd>0){r.cd-=dt;const V=BX.v;V.p.copy(r.start);V.v.set(0,0,0);if(cd)cd.textContent=r.cd>0?String(Math.ceil(r.cd)):'GO!';if(r.cd<=0){r.goT=0;BX.m.t=0;BX.m.lap0=0}return}
  if(cd&&cd.textContent){r.goT+=dt;if(r.goT>.8)cd.textContent=''}r.t+=dt;const R=r.R,end=r.s0+BX_RACE_LAPS*R.L;

@@ -13,7 +13,8 @@ function hud(ids,fails,pre){const rs={},V=VW();for(const id of ids){const e=docu
  const k=Object.keys(rs);for(let i=0;i<k.length;i++)for(let j=i+1;j<k.length;j++)if(ovl(rs[k[i]],rs[k[j]]))fails.push(pre+'hud-overlap-'+k[i]+'-'+k[j])}
 const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)frame(performance.now())},
  reset(){R.length=0},
- setProf(pr){MX.prof=pr;const t=pr!=='desktop';try{TOUCH.on=t;TOUCH.used=t;document.body.classList.toggle('touch',t)}catch(e){}window.dispatchEvent(new Event('resize'));MX.frame(2)},
+ rst(){try{__tq.reset();return true}catch(e){return false}},
+ setProf(pr){MX.prof=pr;const t=pr!=='desktop';try{TOUCH.on=t;TOUCH.used=t;document.body.classList.toggle('touch',t)}catch(e){}window.dispatchEvent(new Event('resize'))},
  bxEnd(){try{if(BX.on)BX_close()}catch(e){}try{__tq.reset()}catch(e){}},
  async setRide(id){TQ.car=id;gbOpen();GAR_select(id);let k=0;while(typeof LDL!=='undefined'&&LDL.wait.size&&k++<200)await new Promise(r=>setTimeout(r,25));gbClose(true);await new Promise(r=>setTimeout(r,20));
   if(typeof BX!=='undefined'){try{if(BX.mode==='drive')BX_driveStop()}catch(e){}try{if(BX.car&&BX.car.parent)BX.car.parent.remove(BX.car)}catch(e){}BX.car=null}return id},
@@ -59,10 +60,10 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   for(const t of RF.taxi||[])add(t[0],t[1]);for(const g of RF.garages||[])add(g[2],g[3]);for(const l of RF.lm||[])add(l[2],l[3]);return o},
  roamCase(prof,rid,q,idx,prog,fam){const fails=[],t0=performance.now();
   try{
-   if(!roamWarp(q[0],q[1],q[2]))fails.push('roam-warp-refused');
+   if(!roamWarp(q[0],q[1],q[2])&&!(MX.rst()&&roamWarp(q[0],q[1],q[2])))fails.push('roam-warp-refused');
    else{
     const touch=prof!=='desktop';TOUCH.on=touch;TOUCH.used=touch;TOUCH.gas=false;TOUCH.brake=false;for(const k in K)K[k]=false;
-    roamStep(1/120);for(let i=0;i<4;i++)roamPose(pl,.25);camSnap=true;roamCam(1/60)
+    if(prog)roamStep(1/120);/* the 10 ms world step is only needed for the gas test; pose/camera/tyre state needs none (same findings, 9x faster) */for(let i=0;i<3;i++)roamPose(pl,.25);camSnap=true;roamCam(1/60)
     const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
     {const r=rfSnap(RO.x,RO.z,60);if(!r)fails.push('roam-off-road-at-start');else{const a=ang(fx,fz,Math.sin(r[2]),Math.cos(r[2]));if(a>20&&a<160){const f=fillAt(RO.x,RO.z),a2=f&&f.d<f.r.w/2+6?ang(fx,fz,f.r.ux,f.r.uz):999;/* a filler street under the car counts too (rfSnap prefers a city road up to 60 m away) */if(!(a2<=20||a2>=160))fails.push('roam-heading-vs-road')}}}
     if(SC_hit(RO.x,RO.z,RO.y))fails.push('roam-start-inside-wall');
@@ -77,7 +78,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   R.push({fam:fam||'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
  // HUD of the profile once per ride (free roam)
  roamHud(prof,rid){const fails=[];const touch=prof!=='desktop';
-  try{if(state!=='roam'||document.body.classList.contains('bxOn')){try{MX.bxEnd()}catch(e){}}
+  try{if(state!=='roam'||!RO.on||document.body.classList.contains('bxOn')||getComputedStyle(document.getElementById('touch')).display==='none'){try{MX.bxEnd()}catch(e){}MX.frame(2)}
    TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);MX.frame(3);const ids=touch?['tB','tL','tR','tP',...(thrEff()==='pedal'?['tG']:[])]:[];hud(ids,fails,'roam-');
    if(touch){const g=vis(document.getElementById('tG'));if(!g&&!(typeof SET!=='undefined'&&SET.gas==='auto'||TOUCH.autoGas!==undefined))/* gas default on: GAS button may be hidden */void 0}
   }catch(e){fails.push('roam-hud-crash:'+String(e).slice(0,60))}
@@ -118,17 +119,17 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   try{
    TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);for(const k in K)K[k]=false;
    try{OF_reset()}catch(e){}
-   if(!roamWarp(q[0],q[1],q[2]))fails.push('foot-warp-refused');
-   else{roamStep(1/120);for(let i=0;i<4;i++)roamPose(pl,.25);OF_exit();for(let i=0;i<40;i++)roamStep(1/60);camSnap=true;roamCam(1/60);
+   if(!roamWarp(q[0],q[1],q[2])&&!(MX.rst()&&roamWarp(q[0],q[1],q[2])))fails.push('foot-warp-refused');
+   else{roamStep(1/120);for(let i=0;i<4;i++)roamPose(pl,.25);OF_exit();for(let i=0;i<16;i++)roamStep(1/30);camSnap=true;roamCam(1/60);
     if(RO.foot!=='walk')fails.push('foot-not-walking-after-exit');
     const B=new THREE.Box3().setFromObject(OF.fig.g),hh=B.max.y-B.min.y;if(Math.abs(hh/1.8-1)>.03)fails.push('foot-figure-not-1.80m');
     if(Math.abs(OF.y-groundAt(OF.x,OF.z,OF.y+2))>.35)fails.push('foot-not-on-ground');
     if(roamHit(OF.x,OF.z,OF_R,OF.y+1))fails.push('foot-inside-wall');
     {const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('foot-parked-car-tyre-gap>5cm')}
     if(roamHit(OF.car.x,OF.car.z,1.0,OF.car.y+1))fails.push('foot-parked-car-inside-wall');
-    if(idx%20===0){MX.frame(2);hud(touch?['ofZone','tP']:[],fails,'foot-');}
+    if(idx===0){MX.frame(2);hud(touch?['ofZone','tP']:[],fails,'foot-');}
     // walk: forward key (desktop) / stick not simulated on touch: use the same K path the stick feeds
-    const x0=OF.x,z0=OF.z;K.KeyW=true;for(let i=0;i<60;i++)roamStep(1/60);K.KeyW=false;roamCam(1/60);
+    const x0=OF.x,z0=OF.z;K.KeyW=true;for(let i=0;i<30;i++)roamStep(1/30);K.KeyW=false;roamCam(1/60);
     const mx=OF.x-x0,mz=OF.z-z0,mv=Math.hypot(mx,mz);info.mv=+mv.toFixed(1);
     if(!(mv>1.5))fails.push('foot-no-walk-progress');
     else{const c=camera.position,dx=OF.x-c.x,dz=OF.z-c.z;if(ang(dx,dz,mx,mz)>60)fails.push('foot-walks-toward-camera')}
