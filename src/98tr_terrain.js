@@ -59,6 +59,7 @@ function TRN_go(kind,say){if(!TERR.on)return'📍 PENDING · terr-1 hills are OF
   if(kind==='edge'){const o=TRN_edge();return'📍 ROAD FLAT ACROSS · 50 road points · max centre-to-edge drop '+o.max+' m at '+o.worst.id+' ('+o.worst.x+','+o.worst.z+') (need ≤0.3)'+(o.max<=.3?' ✅':' ❌')}
   if(kind==='ramp'){const o=TRN_ramp();return'📍 RAMP JOINTS · '+o.n+' deck ends · max step '+o.max+' m'+(o.worst?' at '+o.worst.id:'')+' (need <0.1)'+(o.max<.1?' ✅':' ❌')}
   if(kind==='base'){const o=TRN_base();return'📍 BUILDING BASES · '+o.n+' buildings · '+o.bad+' float above the ground (max '+o.max+' m) (need 0)'+(o.bad?' ❌':' ✅')}
+  if(kind==='flush'){const o=TRN_flush(),j=TRN_junc(),ok=!o.buried&&!o.float&&j.max<=.1;return'📍 ROAD PIECES FLUSH · '+o.n+' thin road pieces: '+o.buried+' sunk, '+o.float+' floating (need 0'+(o.ex[0]?', e.g. ('+o.ex[0][0]+','+o.ex[0][1]+')':'')+') · '+j.n+' junctions planar within '+j.max+' m'+(j.worst?' (worst '+j.worst.join(',')+')':'')+' (need ≤0.1)'+(ok?' ✅':' ❌')}
   if(kind==='tyre')return TRN_tyre(say);if(kind==='fps')return TRN_fps(say)}catch(e){return'📍 terrain test error '+e.message+' ❌'}}
 window.__trn={TRN,go:TRN_go,grade:TRN_grade,edge:TRN_edge,ramp:TRN_ramp,base:TRN_base,relief:TRN_relief,roads:TRN_roads,gap:TRN_gapNow};
 // slope colours on the open land (outer ground heightfields with a col callback): grass → dry grass (15-30 %) → dirt (30-55 %) → rock (>55 %);
@@ -70,3 +71,20 @@ if(TERR.on&&new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndB
   // in-city ground (pavement + grass classes, no colours): the grass material gets a slope tint (white = untinted texture; walk/rock ignore colours)
   else if(o&&o.mats&&o.mats.g&&!o.col&&!o.trc){const W=new THREE.Color(),g=o.mats.g.clone();g.vertexColors=true;o={...o,trc:1,mats:{...o.mats,g},col:(x,z)=>TRNinner(W.setRGB(1,1,1),x,z)}}return _g(grp,x0,x1,z0,z1,o)}}
 function TRNinner(c,x,z){TRN_slopeCol(c,x,z);return c}
+// flush test (Alex b27: kerb/edge bands across the asphalt at a junction): every thin piece added to the city batch (bbox height < 0.6 m:
+// asphalt, crossing squares, kerbs, lines) is compared with the ground under its vertices; floating = lowest vertex > 0.12 m above,
+// buried = highest vertex below the ground (structures > 1.5 m above/below, truss bars, underground pieces, are not decals; footbridge stairs/landings follow their deck). Recorded at build time (the batched meshes free their arrays later).
+const TRN_FL={n:0,float:[],buried:[],tilt:[]};
+if(typeof TBatch!=='undefined'){const _add=TBatch.prototype.add;TBatch.prototype.add=function(g,mat,matrix){try{if((TERR.on||/trflush/.test(location.search))&&g&&g.attributes&&g.attributes.position){if(matrix){g.applyMatrix4(matrix);matrix=null}g.computeBoundingBox();const b=g.boundingBox;
+    if(b.max.y-b.min.y<.6&&b.max.x-b.min.x<400&&b.max.z-b.min.z<400&&b.max.x-b.min.x+b.max.z-b.min.z>1.5){const cx=(b.min.x+b.max.x)/2,cz=(b.min.z+b.max.z)/2;if(BRIDGES.some(B=>B.kind==='foot'&&Math.hypot(cx-B.cx,cz-B.cz)<B.half+20)){}else{const p=g.attributes.position,st=Math.max(1,Math.floor(p.count/64));let lo=1e9,hi=-1e9,wx=0,wz=0;
+      for(let i=0;i<p.count;i+=st){const x=p.getX(i),z=p.getZ(i);if(CID==='fra'&&inRiver(x,z,-2))continue;let gd=groundY(x,z);for(const D of ALL_DECKS){const h=deckAt(D,x,z);if(h!=null)gd=Math.max(gd,h)}const d=p.getY(i)-gd;if(d<lo){lo=d;wx=x;wz=z}if(d>hi)hi=d}
+      if(lo<1e8){TRN_FL.n++;const e=[Math.round(wx),Math.round(wz),+lo.toFixed(2),+hi.toFixed(2),(mat&&mat.color?mat.color.getHexString():'')+(mat&&mat.map?'T':'')];if(lo>.12&&lo<1.5)TRN_FL.float.push(e);else if(hi<-.02&&hi>-1.5)TRN_FL.buried.push(e)}}}}}catch(e){}return _add.call(this,g,mat,matrix)}}
+function TRN_flush(){const F=TRN_FL;TRN.flush={n:F.n,float:F.float.length,buried:F.buried.length,ex:F.float.slice(0,3).concat(F.buried.slice(0,3))};return TRN.flush}
+// junction planarity: ground under every street junction (JUNC, radius r) and filler crossing (FILL_X) vs its best-fit plane, ≤ 0.1 m
+function TRN_junc(){const L=[];for(const J of (typeof JUNC!=='undefined'?JUNC:[]))L.push([J.x,J.z,Math.max(4,J.r||6)]);if(CID==='fra')for(const X of FILL_X||[])L.push([X.x,X.z,Math.max(X.wa,X.wb)/2]);let mx=0,w=null,n=0;
+  for(const[x0,z0,R]of L){if(TRN_skip(x0,z0))continue;const P=[];for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const x=x0+a*R/2,z=z0+b*R/2;if(Math.hypot(x-x0,z-z0)>R*1.01)continue;P.push([x-x0,z-z0,groundY(x,z)])}if(P.length<5)continue;n++;
+    // least squares plane y = c + gx·x + gz·z
+    let sx=0,sz=0,sy=0,sxx=0,szz=0,sxz=0,sxy=0,szy=0;const m=P.length;for(const[x,z,y]of P){sx+=x;sz+=z;sy+=y;sxx+=x*x;szz+=z*z;sxz+=x*z;sxy+=x*y;szy+=z*y}
+    const A=[[m,sx,sz],[sx,sxx,sxz],[sz,sxz,szz]],B=[sy,sxy,szy],det=M=>M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]),D=det(A);if(Math.abs(D)<1e-9)continue;
+    const sol=[0,1,2].map(k=>det(A.map((r,i)=>r.map((v,j)=>j===k?B[i]:v)))/D);let e=0;for(const[x,z,y]of P)e=Math.max(e,Math.abs(y-(sol[0]+sol[1]*x+sol[2]*z)));if(e>mx){mx=e;w=[Math.round(x0),Math.round(z0)]}}
+  const o={n,max:+mx.toFixed(3),worst:w};TRN.junc=o;return o}

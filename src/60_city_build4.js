@@ -22,7 +22,10 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){hubRoad
     for(const sd of[-1,1]){let a=null;const ox=uz*sd*w/2,oz=-ux*sd*w/2;for(let t=0;t<=L;t+=6){const x=x0+ux*t+ox,z=z0+uz*t+oz,q=cityAt(x,z),ok=t<L&&!(r.cross||[]).some(([tc,wc])=>Math.abs(t-tc)<wc/2+3)&&!(q&&q.d<q.road.w/2+1.5);
       if(ok&&a==null)a=t;else if(!ok&&a!=null){if(t-a>=6)kerb.push([x0+ux*(a+t)/2+ox,z0+uz*(a+t)/2+oz,t-a,yaw]);a=null}}}}
   for(const X of FILL_X){const g=new THREE.PlaneGeometry(X.wa,X.wb,...ART8_pq(X.x,X.z,X.wa,X.wb));g.rotateX(-Math.PI/2);g.translate(X.x,0,X.z);ART_drape(g,.04);bt.add(g,jm)}
-  for(const[x,z,L,yaw]of kerb){const g2=new THREE.BoxGeometry(.5,.25,L);g2.rotateY(yaw);g2.translate(x,.12,z);bt.add(colorize(g2,new THREE.Color('#e8e4dc')),BM.plain)}
+  // terr-1: kerbs follow the ground (were one flat box at y .12 over up to 100s of m: buried 3 m deep / cutting across the asphalt on slopes):
+  // pieces of ≤ 6 m, each at the ground under its centre and pitched along it
+  for(const[x,z,L,yaw]of kerb){const n=Math.max(1,Math.ceil(L/6)),l=L/n,ux=Math.sin(yaw),uz=Math.cos(yaw);for(let k=0;k<n;k++){const o=-L/2+l*(k+.5),cx=x+ux*o,cz=z+uz*o,ya=groundY(cx-ux*l/2,cz-uz*l/2),yb=groundY(cx+ux*l/2,cz+uz*l/2);
+    const g2=new THREE.BoxGeometry(.5,.25,l+.02);g2.rotateX(-Math.atan2(yb-ya,l));g2.rotateY(yaw);g2.translate(cx,(ya+yb)/2+.12,cz);bt.add(colorize(g2,new THREE.Color('#e8e4dc')),BM.plain)}}
   cityStreetsBuild(bt,M);CE_kerbs(bt);yield [.06,'Paving the streets'];
   yield [.1,CID==='fra'?'Growing the Taunus':'Planting the olive trees'];worldGroundBuild(grp,bt,BM);yield [.16,CID==='fra'?'Laying the Autobahn':'Opening the periptera'];abBuild(grp,bt,BM,M);yield [.24,CID==='fra'?'Filling the Main':'Polishing the marble'];
   // the Main: water ribbons along the bend, quay walls, slipways, the nine real bridges at their real angles
