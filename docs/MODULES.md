@@ -95,7 +95,7 @@ file | KB | purpose | first defines
 98ba_build_anim.js | 5 | BA (garage-17 task B, Alex 2026-10-10: "when opening | BA BA_DROP BA_FALL
 98gf_garage_floor.js | 3 | GF (garage-18, Alex 2026-10-10: "lot of bugs in the  | GF __gf
 98gz_garage_zoom.js | 7 | GZ (garage zoom + pick, Alex 2026-10-13: "include a  | GZ GZ_md GZ_MIN
-98b2_builder2.js | 76 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: th | BX BXC BXH
+98b2_builder2.js | 77 | BX builder-A (alex/od-builder2, 2026-10-13) Alex: th | BX BXC BXH
 98rd_roads.js | 14 | RD · roads-1 (Alex 2026-10-13: "cars should follow t | RD_PS RD_key RD_sd
 98tq_test_quick.js | 5 | fast test start ?test=fra\/ath[&car=<ride>][&at=x,z] | TQ_url
 98rs_road_seams.js | 5 | RS: ROAD SEAMS (art-1, 2026-10-13). Alex (v90m-beta. | RS_OFF RS_seams RS
