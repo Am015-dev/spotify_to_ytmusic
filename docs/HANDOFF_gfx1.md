@@ -26,6 +26,15 @@ Swiftshader only here: ~4 s/frame, Athens high boot up to ~5 min; never run more
 Perf (draw calls/frame, gfx=0 → 1): high fra 742→843, high ath 545→624, med ath 447→536 (+0.4 M shadow tris). GTAO (?ao=1) +~720 calls: opt-in only.
 Stock addons: RoomEnvironment+PMREM, GTAOPass (three 0.164.1). CSM/Sky not used: CSM needs setupMaterial on every material (collides with LK_inject), mood sky shader drives env.
 
+## Slice 3 (d3119c2, PAUSED by the coordinator 2026-10-14 for the session cap, flag still default OFF)
+Done (src/98gx_gfx.js): sun ~23° (GFX_SUN [600,300,380]) 4.8, sky fill .5 #8fb4ff, exposure 1.0, deeper sky (uTop .004,.045,.40), trees/props/people > 1.2 m cast
+(GFX_cast over the whole scene), car plastic roughness ≤ .24 + env 1.3, cheap contact AO (GFX_ao2: diffuse x .42→1 over the first 1.8 m above the
+player's ground y, via LK's vLkW, fades 45-75 m out; no extra pass, phone too), warm grade ShaderPass before OutputPass (gain 1.06/1/.9, sat 1.18, contrast).
+Checks on v90n-g21 = d3119c2: 9/9 PASS (fra high, ath high, fra med), 0 console errors; ath med not run yet (paused).
+Draw calls: fra high 896 (742 before GFX), ath high 660 (545), fra med 733. Shot: docs/shots/gfx/s3_before_after.jpg (before = s19 build).
+Resume: 1) run `tools/tGfx.js … ath` med; 2) LOOK at the grid; 3) flip default ON: in GFX.on use store.get('mho_gfx',1)===1 and catch→true
+(coordinator asked for ON by default, phone = med tier); 4) PUSHED to int-4 (session_01QewuGcL86b169339CDxRy9); 5) later: saturation per material, AO in corners.
+
 ## Open
 - Flip default on after reviewer look; perf on a real iPhone (med adds a 1024 shadow pass: +~16 % draw calls, +25 % tris at high).
 - Next: cheap contact AO at facade bottoms, height fog/aerial perspective, warm grade preset, per-building variation (art-2 owns fill/props).
