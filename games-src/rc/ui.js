@@ -151,19 +151,15 @@ function toggleMenu(){const m=$('#moremenu'),b=$('.menub');if(!m)return;const on
 function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){m.classList.remove('open');const b=$('.menub');if(b)b.setAttribute('aria-expanded','false')}}
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
-  return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
-   ${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb guided"><button class="btn go big" data-a="story">📖 Story: learn the island chapter by chapter ▶</button><small>New here? Start with chapter 1: survive three days. Each chapter adds one new idea. ${typeof campLine==='function'?campLine():''}</small></div>${typeof tutBlock==='function'?tutBlock('after'):''}
-   <h3 class="orfull">Or set up a full game</h3>
-   ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
-   ${typeof onlineBlock==='function'?onlineBlock():''}
-   <h3>Scenario</h3><div class="scens">${SCEN_ORDER.map((k,ix)=>{const S=SCENARIOS[k];return `<button class="scen ${o.scen===k?'on':''}" data-scen="${k}"><b>${ix+1}. ${esc(S.n)}</b><small>${S.rounds} rounds</small><span>${esc(S.x)}</span></button>`}).join('')}</div>
-   <h3>Castaways <small>(pick 1–4)</small></h3><div class="chars">${Object.keys(CHARS).filter(k=>!CHARS[k].npc).map(k=>{const on=o.chars.includes(k);const C=CHARS[k];return `<div class="cpick ${on?'on':''}"><button class="cp" data-char="${k}" aria-pressed="${on}"><b>${C.n}</b><small>❤ ${C.die} life · own invention: ${INVENTIONS[C.inv].n} (only they can make it)</small><span class="sks">${C.skills.map(s=>`<span title="${esc(s.x)}"><i>${esc(s.n)}</i> (${s.c}✊): ${esc(s.x)}</span>`).join('')}</span></button>${on?`<div class="ctl2" role="group" aria-label="Who plays the ${C.n}"><button data-ctl="${k}" data-v="h" class="${o.ai[k]?'':'on'}" aria-pressed="${!o.ai[k]}">🙂 You</button><button data-ctl="${k}" data-v="ai" class="${o.ai[k]?'on':''}" aria-pressed="${!!o.ai[k]}">🤖 Computer</button></div>`:''}</div>`}).join('')}</div>
-   <p class="muted small">✊ determination is earned by arranging the camp and failing rolls, and spent on skills.</p>
-   <div class="opts2"><label class="chk"><input type="checkbox" data-opt="friday" ${o.friday?'checked':''}> Friday helps (standard with 1–2 castaways)</label><label class="chk"><input type="checkbox" data-opt="dog" ${o.dog?'checked':''}> The dog helps (standard solo)</label>
-   <p class="muted small">Friday is a friendly islander who finds you on the beach: an extra pawn that works alone or helps, and never needs food or shelter (if he dies, the game goes on). The ship’s dog adds a pawn for hunting and exploring.</p>
-   <div class="diff" role="radiogroup" aria-label="Difficulty">${[['easy','Easier','the dog joins, 4 starting items, fewer book events'],['standard','Standard','2 starting items'],['hard','Harder','1 starting item, more book events']].map(([k,n,x])=>`<button class="dpick ${o.diff===k?'on':''}" role="radio" aria-checked="${o.diff===k}" data-diff="${k}"><b>${n}</b><small>${x}</small></button>`).join('')}</div></div>
-   <p class="muted small">${o.chars.length===1?'Solo: morale rises by 1 at the start of each morale phase.':o.chars.length===4?'Four castaways: arranging the camp gives 2 determination or morale +1, not both.':''} ${o.chars.length&&o.chars.every(k=>o.ai[k])?'Every castaway is a computer: you watch them play.':''}</p>
-   <div class="mb sticky"><button class="btn go" data-a="start" ${o.chars.length?'':'disabled'}>Play ▶</button><button class="btn" data-a="rulesstart">How to play</button></div></div>`}
+  const seg=(label,items)=>`<div class="qrow"><span class="ql">${label}</span><div class="seg" role="group" aria-label="${label}">${items.map(([a,v,t,on])=>`<button class="sg ${on?'on':''}" data-${a}="${v}" aria-pressed="${!!on}">${esc(t)}</button>`).join('')}</div></div>`;
+  const ALLC=Object.keys(CHARS).filter(k=>!CHARS[k].npc);
+  return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Survive together on a wild island.</p>
+   <div class="mb"><button class="btn go big" data-a="start" ${o.chars.length?'':'disabled'}>${saved?'New game ▶':'Play ▶'}</button>${saved?`<button class="btn" data-a="continue">Continue</button>`:''}</div>
+   <div class="quick"><h3>Quick game</h3>
+   ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
+   ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
+   ${seg('Difficulty',[['easy','Easy'],['standard','Standard'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
+   <details class="morep"><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];
   if(t==='events')list=EVENTS.concat(WRECKS).map(c=>({n:c.n,tag:c.k==='crates'||WRECKS.includes(c)?'wreckage':c.icon==='book'?'book event':c.icon+' event',cp:c.cp||1,x:cardText(c)}));
@@ -227,6 +223,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.disc!=null){const r=discUse(+d.disc);if(r)toast(r);return}
   if(d.tile!=null){on3DTile(+d.tile);return}
   if(d.scen){UI.setup.scen=d.scen;render();return}
+  if(d.np){const s=UI.setup,n=+d.np,all=Object.keys(CHARS).filter(k=>!CHARS[k].npc);s.chars=all.slice(0,n);s.friday=n<=2;s.dog=n===1||s.diff==='easy';render();return}
   if(d.char){const s=UI.setup;const i=s.chars.indexOf(d.char);if(i>=0)s.chars.splice(i,1);else if(s.chars.length<4)s.chars.push(d.char);s.friday=s.chars.length<=2;s.dog=s.chars.length===1||s.diff==='easy';render();return}
   if(d.ctl){UI.setup.ai[d.ctl]=d.v?d.v==='ai':!UI.setup.ai[d.ctl];render();return}
   if(d.ctab){UI.ctab=d.ctab;renderCards();return}

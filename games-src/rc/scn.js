@@ -94,4 +94,16 @@
       { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
     ]
   });
+  // UI-BAR rules 4-8 as DOM checks (top bar, dock text size and height, start screen, wide layout)
+  var visT = function (sel) { return [].slice.call(document.querySelectorAll(sel)).filter(function (e) { return GXS.vis(e); }); };
+  GXS.add({
+    id: 'rc-uibar', name: 'UI bar: top bar, dock, start screen', ask: 'Is the top bar short, the dock calm and the start screen one button?', seed: 5, when: booted,
+    setup: function () { return table(5); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var b = visT('.gx-bar button').filter(function (e) { return !e.closest('#moremenu') && e.id !== 'phchip'; }); return b.length <= 5 || b.length + ' buttons: ' + b.map(function (e) { return e.id || e.dataset.gx; }).join(','); } },
+      { kind: 'fn', name: 'dock text at least 13 px (16 px wide)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = ''; visT('.gx-dock *, #panel *').forEach(function (e) { if (bad || !e.childNodes.length) return; var own = [].slice.call(e.childNodes).some(function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); }); if (own && parseFloat(getComputedStyle(e).fontSize) > 0 && parseFloat(getComputedStyle(e).fontSize) < min - .2) bad = '"' + e.textContent.trim().slice(0, 20) + '" ' + getComputedStyle(e).fontSize; }); return !bad || bad; } },
+      { kind: 'fn', name: 'dock is not taller than the screen and shows at most one instruction line', fn: function () { var d = $('.gx-dock'); if (d && GXS.vis(d) && d.getBoundingClientRect().height > innerHeight) return 'dock taller than screen'; var l = visT('#dockmsg,#steptext,#phlabel').filter(function (e) { return /\S/.test(e.textContent); }); return l.length <= 1 || l.length + ' instruction lines'; } },
+      { kind: 'fn', name: 'start screen: one primary button, Quick game row, no roster', fn: function () { var m; try { UI.modal = 'start'; render(); } catch (e) { return 'cannot open start: ' + e.message; } m = $('#modal'); var go = visT('#modal .btn.go').length, roster = visT('#modal .cpick, #modal .chars').length, seg = visT('#modal .seg').length; UI.modal = null; try { render(); } catch (e) { } return (go === 1 && !roster && seg >= 3) || 'primary=' + go + ' roster=' + roster + ' segmented rows=' + seg; } }
+    ]
+  });
 })();

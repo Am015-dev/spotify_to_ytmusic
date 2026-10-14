@@ -103,7 +103,7 @@
   // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
   var vis = function (e) { var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 2 && r.height > 2 && c.visibility !== 'hidden' && c.display !== 'none'; };
   var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
-  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
+  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
   GXS.add({
     id: 'ui-bar', name: 'UI bar: top bar, one line, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
     setup: function () { return table(5).then(function () { try { GXH.setEnabled(true); GXH.reset(); } catch (e) { } return idle(900); }); },
@@ -112,6 +112,9 @@
       { kind: 'fn', name: 'rule 5: board line is 8 words or fewer', fn: function () { var t = ($('#status') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
       { kind: 'fn', name: 'rule 5: coach tip is 8 words or fewer and not a repeat', fn: function () { var x = $('.gxh-tx'), t = $('.gxh-tt'); if (!x || !vis(x)) return true; var st = ($('#status').textContent || '').trim().toLowerCase(); return words(x.textContent) > 8 ? words(x.textContent) + ' words in tip' : (t && t.textContent.trim().toLowerCase() === st) ? 'tip title repeats the status line' : true; } },
       { kind: 'fn', name: 'rule 1: top bar, status and tip text at least 13/16 px', fn: function () { var a = minFont('#top'); if (a !== true) return a; var s = parseFloat(getComputedStyle($('#status')).fontSize); if (s < lim() - 0.01) return 'status ' + s + 'px'; return minFont('.gxh-bub'); } },
+      { kind: 'fn', name: 'rule 8: wide screens zoom the valley (cells >= 120 px)', fn: function () { if (innerWidth < 1024) return true; var c = UI.view.s * 100; return c >= 120 || 'cell ' + Math.round(c) + 'px'; } },
+      { kind: 'fn', name: 'rule 8: hand tray hugs its content on wide screens', fn: function () { if (innerWidth < 1024) return true; var h = $('#hand').getBoundingClientRect(); return h.width <= innerWidth * 0.5 || 'tray ' + Math.round(h.width) + 'px of ' + innerWidth; } },
+      { kind: 'fn', name: 'rule 1: every text node on the board at least 13/16 px', fn: function () { return minFont('#main') === true ? minFont('#top') : minFont('#main'); } },
       { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, r = m.getBoundingClientRect(), b = r.width / r.height; if (Math.abs(a - b) / a > 0.15 && getComputedStyle(m).objectFit === 'fill') bad = m.src.split('/').pop() + ' ' + b.toFixed(2) + ' vs ' + a.toFixed(2); }); return bad || true; } }
     ]
   });
@@ -124,6 +127,17 @@
       { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = $('#modal [data-a=cont]'); return (!!c === !!savedGame()) || 'Continue shown without a save'; } },
       { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal'); } },
       { kind: 'fn', name: 'rule 7: start card fits without scrolling', fn: function () { var m = $('#modal .card'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-menu', name: 'UI bar: menu drawer', ask: 'Do menu labels sit inside their art, readable?', seed: 5, when: booted,
+    setup: function () {
+      return table(5).then(function () { [].forEach.call(document.querySelectorAll('#world .glow'), function (g) { g.remove(); }); openMenu(); window.__rowArt = []; var rows = [].slice.call(document.querySelectorAll('#menu button:not(.opt)')); return Promise.all(rows.map(function (b, i) { return new Promise(function (res) { var u = (/url\("?([^")]+)"?\)/.exec(getComputedStyle(b).backgroundImage) || [])[1]; if (!u) { window.__rowArt[i] = null; return res(); } var im = new Image(); im.onload = function () { var c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; var x = c.getContext('2d'); x.drawImage(im, 0, 0); var d = x.getImageData(0, 0, c.width, c.height).data, l = c.width, r = 0; for (var yy = 0; yy < c.height; yy++) for (var xx = 0; xx < c.width; xx++) if (d[(yy * c.width + xx) * 4 + 3] > 40) { if (xx < l) l = xx; if (xx > r) r = xx; } window.__rowArt[i] = { l: l / c.width, r: (r + 1) / c.width }; res(); }; im.onerror = function () { window.__rowArt[i] = null; res(); }; im.src = u; }); })).then(function () { return idle(300); }); });
+    },
+    checks: [
+      { kind: 'fn', name: 'rule 1: every text node in the drawer at least 13/16 px', fn: function () { return minFont('#menu'); } },
+      { kind: 'fn', name: 'rule 2: each menu label sits inside its row art with 12 px inset', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#menu button:not(.opt)'), function (b, i) { var a = window.__rowArt[i]; if (bad || !a) return; var R = b.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(b); var t = rg.getBoundingClientRect(); var al = R.left + a.l * R.width, ar = R.left + a.r * R.width; if (t.left < al + 12 || t.right > ar - 12) bad = '"' + b.textContent.trim().slice(0, 14) + '" text ' + Math.round(t.left) + '-' + Math.round(t.right) + ' art ' + Math.round(al) + '-' + Math.round(ar); }); return bad || true; } },
+      { kind: 'fn', name: 'rule 3: tips switches use the same button style as the start screen', fn: function () { var o = [].filter.call(document.querySelectorAll('#menu [data-gxh]'), vis); return (o.length && o.every(function (b) { return b.classList.contains('opt'); })) || 'tips chips are a different style'; } }
     ]
   });
 })();

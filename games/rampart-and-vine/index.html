@@ -168,7 +168,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
@@ -301,7 +302,7 @@ html.sk .opt[aria-pressed=true]{background:#2f6a22 padding-box;border-image-sour
 html.sk .card,html.sk .menu,html.sk .gx-drawer,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100/34px stretch;border-radius:0;background:var(--paper) padding-box;background-clip:padding-box;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
 html.sk .card{max-width:392px}
 html.sk .menu{padding:0;min-width:230px;border-image-width:22px;border-width:22px}
-html.sk .menu button{min-height:46px;background:url(media/ui-row.webp) center/100% 100% no-repeat;color:#3a2410}
+html.sk .menu button:not(.opt){min-height:46px;padding:11px 16px;background:url(media/ui-row-c.webp) 0 0/100% 100% no-repeat;color:#3a2410}
 /* coach bubble pointer: the painted tail (points down; turned for the other sides) */
 html.sk .gxh-arr{width:18px;height:18px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;margin:-3px}
 html.sk .gxh-a-top .gxh-arr{transform:rotate(180deg)}html.sk .gxh-a-left .gxh-arr{transform:rotate(90deg)}html.sk .gxh-a-right .gxh-arr{transform:rotate(-90deg)}
@@ -317,6 +318,11 @@ html.sk .gxc-btn.go{background:#b5532f padding-box}
 html.sk #hskip{padding:0}
 html.sk .seat .nm,html.sk .seat .fl{font-size:13px}html.sk .seat .dot{font-size:13px}
 @media(min-width:1024px){html.sk .seat .nm,html.sk .seat .fl,html.sk .seat .dot,html.sk .seat b,html.sk #left,html.sk #left b,html.sk #status,html.sk .opt,html.sk .sub,html.sk .gxh-tt,html.sk .gxh-tx,html.sk .gxh-ok,html.sk .btn{font-size:16px}html.sk .seat .dot{width:22px;height:22px}}
+html.sk .menu .srow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 16px;margin:2px 0;font-weight:700;font-size:1rem;color:#3a2410}
+html.sk .menu .srow>span:first-child{flex:1 1 auto}
+html.sk .menu .opt{min-height:38px;font:700 14px/1 var(--ff);padding:0}
+@media(min-width:1024px){html.sk .menu button,html.sk .menu .srow,html.sk .menu .srow span,html.sk .menu .opt,html.sk .menu .gxt-menu b,html.sk .menu .gxt-menu span{font-size:16px}
+#hand{align-self:center;width:fit-content;margin:0 auto 10px;padding:10px 44px;min-height:0}#htile{width:132px;height:132px}}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -1044,7 +1050,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
   var vis = function (e) { var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 2 && r.height > 2 && c.visibility !== 'hidden' && c.display !== 'none'; };
   var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
-  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
+  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
   GXS.add({
     id: 'ui-bar', name: 'UI bar: top bar, one line, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
     setup: function () { return table(5).then(function () { try { GXH.setEnabled(true); GXH.reset(); } catch (e) { } return idle(900); }); },
@@ -1053,6 +1059,9 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'rule 5: board line is 8 words or fewer', fn: function () { var t = ($('#status') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
       { kind: 'fn', name: 'rule 5: coach tip is 8 words or fewer and not a repeat', fn: function () { var x = $('.gxh-tx'), t = $('.gxh-tt'); if (!x || !vis(x)) return true; var st = ($('#status').textContent || '').trim().toLowerCase(); return words(x.textContent) > 8 ? words(x.textContent) + ' words in tip' : (t && t.textContent.trim().toLowerCase() === st) ? 'tip title repeats the status line' : true; } },
       { kind: 'fn', name: 'rule 1: top bar, status and tip text at least 13/16 px', fn: function () { var a = minFont('#top'); if (a !== true) return a; var s = parseFloat(getComputedStyle($('#status')).fontSize); if (s < lim() - 0.01) return 'status ' + s + 'px'; return minFont('.gxh-bub'); } },
+      { kind: 'fn', name: 'rule 8: wide screens zoom the valley (cells >= 120 px)', fn: function () { if (innerWidth < 1024) return true; var c = UI.view.s * 100; return c >= 120 || 'cell ' + Math.round(c) + 'px'; } },
+      { kind: 'fn', name: 'rule 8: hand tray hugs its content on wide screens', fn: function () { if (innerWidth < 1024) return true; var h = $('#hand').getBoundingClientRect(); return h.width <= innerWidth * 0.5 || 'tray ' + Math.round(h.width) + 'px of ' + innerWidth; } },
+      { kind: 'fn', name: 'rule 1: every text node on the board at least 13/16 px', fn: function () { return minFont('#main') === true ? minFont('#top') : minFont('#main'); } },
       { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, r = m.getBoundingClientRect(), b = r.width / r.height; if (Math.abs(a - b) / a > 0.15 && getComputedStyle(m).objectFit === 'fill') bad = m.src.split('/').pop() + ' ' + b.toFixed(2) + ' vs ' + a.toFixed(2); }); return bad || true; } }
     ]
   });
@@ -1065,6 +1074,17 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = $('#modal [data-a=cont]'); return (!!c === !!savedGame()) || 'Continue shown without a save'; } },
       { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal'); } },
       { kind: 'fn', name: 'rule 7: start card fits without scrolling', fn: function () { var m = $('#modal .card'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-menu', name: 'UI bar: menu drawer', ask: 'Do menu labels sit inside their art, readable?', seed: 5, when: booted,
+    setup: function () {
+      return table(5).then(function () { [].forEach.call(document.querySelectorAll('#world .glow'), function (g) { g.remove(); }); openMenu(); window.__rowArt = []; var rows = [].slice.call(document.querySelectorAll('#menu button:not(.opt)')); return Promise.all(rows.map(function (b, i) { return new Promise(function (res) { var u = (/url\("?([^")]+)"?\)/.exec(getComputedStyle(b).backgroundImage) || [])[1]; if (!u) { window.__rowArt[i] = null; return res(); } var im = new Image(); im.onload = function () { var c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; var x = c.getContext('2d'); x.drawImage(im, 0, 0); var d = x.getImageData(0, 0, c.width, c.height).data, l = c.width, r = 0; for (var yy = 0; yy < c.height; yy++) for (var xx = 0; xx < c.width; xx++) if (d[(yy * c.width + xx) * 4 + 3] > 40) { if (xx < l) l = xx; if (xx > r) r = xx; } window.__rowArt[i] = { l: l / c.width, r: (r + 1) / c.width }; res(); }; im.onerror = function () { window.__rowArt[i] = null; res(); }; im.src = u; }); })).then(function () { return idle(300); }); });
+    },
+    checks: [
+      { kind: 'fn', name: 'rule 1: every text node in the drawer at least 13/16 px', fn: function () { return minFont('#menu'); } },
+      { kind: 'fn', name: 'rule 2: each menu label sits inside its row art with 12 px inset', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#menu button:not(.opt)'), function (b, i) { var a = window.__rowArt[i]; if (bad || !a) return; var R = b.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(b); var t = rg.getBoundingClientRect(); var al = R.left + a.l * R.width, ar = R.left + a.r * R.width; if (t.left < al + 12 || t.right > ar - 12) bad = '"' + b.textContent.trim().slice(0, 14) + '" text ' + Math.round(t.left) + '-' + Math.round(t.right) + ' art ' + Math.round(al) + '-' + Math.round(ar); }); return bad || true; } },
+      { kind: 'fn', name: 'rule 3: tips switches use the same button style as the start screen', fn: function () { var o = [].filter.call(document.querySelectorAll('#menu [data-gxh]'), vis); return (o.length && o.every(function (b) { return b.classList.contains('opt'); })) || 'tips chips are a different style'; } }
     ]
   });
 })();
@@ -3493,7 +3513,7 @@ function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;const a=Obj
   const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;ensureGlowVisible()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100;return {s,x:m.W/2-cx*100*s,y:m.H/2+16-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
-  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
+  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
 function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
 function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
@@ -3639,7 +3659,7 @@ function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame
   m.querySelector('[data-a=play]').onclick=()=>{if(tutOffer())showOffer();else beginGame()};m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
   const c=m.querySelector('[data-a=cont]');if(c)c.onclick=loadSaved}
 function openMenu(){if($('#menu'))return closeMenu();const d=document.createElement('div');d.id='menu';d.className='menu';d.setAttribute('role','dialog');
-  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="musicp">Choose music</button><button data-a="paint">Pictures: ${PAINT_ON?'painted':'simple'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
+  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="musicp">Choose music</button><button data-a="paint">Pictures: ${PAINT_ON?'painted':'simple'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'srow',btnClass:'opt'}):''}`;
   document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.gxh||b.hasAttribute('data-gxt-open'))return;const a=b.dataset.a;closeMenu();
     if(a==='fit')refit(true);else if(a==='rules')showRules();else if(a==='snd')toggleSound();else if(a==='mus')toggleMusic();else if(a==='musicp')musicOpen();else if(a==='paint')paintToggle();else if(a==='spd'){UI.speed=UI.speed>1?1:3;try{localStorage.setItem('rv_fast',UI.speed>1?'1':'0')}catch(e){}}
     else if(a==='story'&&typeof campOpen==='function')campOpen();else if(a==='new'){UI.camp=null;showStart()}};

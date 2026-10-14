@@ -837,6 +837,7 @@ body :where(#board,.gx-drawer,.gx-dock) *:not(svg):not(svg *):not(canvas){font-s
 .tsb{flex:1 1 0;appearance:none;border:2px solid #2a1c36;border-radius:14px;background:linear-gradient(180deg,#fff8e6,#efdfbd);color:var(--ink);min-height:48px;padding:6px 12px;font-weight:800;font-size:16px;line-height:1.1;font-family:inherit;cursor:pointer}
 html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbtns .tbtn{flex:0 0 auto;width:min(460px,100%)}html:not(.ph) .tsec{width:min(460px,100%)}
 .tbtn span{font-size:max(16px,.97rem)}@media (min-width:1024px){#start,#start *{font-size:max(16px,1em)}}
+.tseg{display:flex;align-items:center;justify-content:center;gap:8px;color:#fff6dc;font-weight:800}.tseg .chipb{min-height:44px;min-width:56px}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -4073,7 +4074,8 @@ fn mainFragment(
     id: 'cf-start', name: 'UI bar 7: start screen', ask: 'One big Play button, small options below?', seed: 5, when: booted, group: 'UI',
     setup: function () { try { GXH.setEnabled(false); } catch (e) { } try { GX.close(); } catch (e) { } UI.sv = 'title'; renderStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
     checks: [
-      { kind: 'fn', name: 'exactly one big primary button', fn: function () { var n = document.querySelectorAll('#start .tbtn'); return n.length === 2 - (firstTime() ? 0 : 1) || n.length + ' big buttons'; } },
+      { kind: 'fn', name: 'exactly one big primary button', fn: function () { var n = document.querySelectorAll('#start .tbtn.go'); return n.length === 1 || n.length + ' green primary buttons'; } },
+      { kind: 'fn', name: 'quick game row: players 2/3/4 in one style', fn: function () { var b = document.querySelectorAll('#start .tseg .chipb'); return b.length === 3 || b.length + ' options'; } },
       { kind: 'fn', name: 'Continue only when a save exists', fn: function () { var c = !!document.querySelector('#start [data-a=loadsave]'); return c === !!hasSave() || 'Continue ' + c + ' but save ' + hasSave(); } },
       { kind: 'fn', name: 'no character roster on the start screen', fn: function () { return !document.querySelector('#start .dcard,#start #roster') || 'roster shown'; } },
       { kind: 'fn', name: 'start buttons at least 44 px tall', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#start button'), function (b) { if (b.getBoundingClientRect().height < 44) bad.push(b.textContent.slice(0, 12)); }); return uiBad(bad); } },
@@ -8125,8 +8127,10 @@ function titleEl() {
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
-      h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
+      h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
+      h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
       h('div.tsec',
+        h('button.tsb', { 'data-a': 'play', type: 'button' }, 'More options'),
         h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
         h('button.tsb', { 'data-a': 'online', type: 'button' }, 'Online'),
         sv ? h('button.tsb', { 'data-a': 'loadsave', type: 'button' }, 'Continue') : null))));

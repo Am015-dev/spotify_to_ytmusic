@@ -745,6 +745,14 @@
    "mut": 0
   },
   {
+   "id": "ui-menu",
+   "name": "UI bar: menu drawer",
+   "ask": "Do menu labels sit inside their art, readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -768,6 +776,14 @@
    "ask": "Is the bazaar clear and filled?",
    "sizes": "all",
    "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sq-uibar",
+   "name": "UI bar: bar, line, panels, text sizes",
+   "ask": "Is every screen clean and readable?",
+   "sizes": "all",
+   "group": "UI",
    "mut": 0
   },
   {
@@ -850,6 +866,14 @@
    "ask": "Can you read the help cards?",
    "sizes": "all",
    "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rc-uibar",
+   "name": "UI bar: top bar, dock, start screen",
+   "ask": "Is the top bar short, the dock calm and the start screen one button?",
+   "sizes": "all",
+   "group": "Board",
    "mut": 0
   },
   {
@@ -989,6 +1013,14 @@
    "name": "UI bar: start screen",
    "ask": "One big Begin button, simple options?",
    "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ui-3d",
+   "name": "UI bar: 3D board labels",
+   "ask": "Can you read the board labels?",
+   "sizes": "pc",
    "group": "Board",
    "mut": 0
   },
