@@ -65,6 +65,8 @@ function LF_liteOk(x,z){if(inRiver(x,z,-3.5))return false;const q=cityAt(x,z);if
 // ---- streamed: the fill is NOT built at boot (Athens boot was +5-7 s). Each 1 km tile of the city box is a LAZY region (60_city_build4 lzReg):
 // lazyStep builds it in ≤1.2 ms slices when you come near (scan, mounds, themes, verge, decor meshes, then lzPropsG = the city's smashable props),
 // 98cl_stream frees it when far (STR_lzFree, wrapped below to drop its mounds and grid entries). Only the tiles around the player exist.
+// art-4 (fra-4): the lite cover (3b) also runs in a LF.rb-wide band OUTSIDE the city box, where terr-1's horizon ridges rise (was bare green). ?lfr=0 = off.
+LF.rb=/[?&]lfr=0\b/.test(location.search)?-20:400;
 LF.keep=.6;LF.lite=!/[?&]lfl=0\b/.test(location.search);// share of open cells that get a theme (Athens has 2.5× the open ground)
 // my grass mounds: OFF once art-1's terrain relief (TR raster) is merged, so ground height has one owner; ?lfm=0 turns them off now
 LF.mounds=!/[?&]lfm=0\b/.test(location.search)&&!(typeof TERR!=='undefined'&&TERR.on);  // terr-1: off whenever the terrain raster (TERR.on) owns the relief
@@ -73,7 +75,7 @@ function LF_ctx(){if(LF.cx)return LF.cx;const fra=CID==='fra';const VS=new Map()
  for(const r of hubRoads())for(let d=8;d<r.L-8;d+=LF.vs)put(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w);
  return LF.cx={VS,TREES:fra?['tree','tree2','tree3','tree']:['CE_olive','CE_pine','CE_cypress','CE_olive','tree2'],ROCK:fra?'rock':'CE_rock',
   GRN:fra?['#4fa83a','#3f8f30','#62b848','#2f7a2a']:['#7a9a48','#8aa858','#6b8a3e','#9aae6a'],DIRT:fra?['#a8865a','#d8c08a','#8a6a44']:['#c8a46a','#d8bc84','#b08a5a']}}
-function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Math.floor(HX0/1000)*1000;x<HX1;x+=1000)for(let z=Math.floor(HZS/1000)*1000;z<HZN;z+=1000)
+function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Math.floor((HX0-LF.rb)/1000)*1000;x<HX1+LF.rb;x+=1000)for(let z=Math.floor((HZS-LF.rb)/1000)*1000;z<HZN+LF.rb;z+=1000)
   LF.regs.push(lzReg('lf_'+x+'_'+z,'',[x,x+1000,z,z+1000],{lf:1,build:LF_tileG}))}
 function LF_unreg(L){if(L.lfM&&L.lfM.length){const S=new Set(L.lfM);LF.M=LF.M.filter(m=>!S.has(m));for(const[k,A]of LF.MG){const B=A.filter(m=>!S.has(m));if(B.length)LF.MG.set(k,B);else LF.MG.delete(k)}}
  if(L.lfG)for(const[k,e]of L.lfG){const A=LF.G.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1)}}if(L.lfP)for(const[k,e]of L.lfP){const A=LF.PG.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1);if(!A.length)LF.PG.delete(k)}}L.lfM=[];L.lfG=[];L.lfP=[];if(LF.ms)LF.ms=LF.ms.filter(m=>m.parent&&m.userData.lfR!==L.id)}
@@ -137,9 +139,12 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  // 3b · lite ground cover (art-3): open cells with no theme (the 40% LF.keep skips, and far-from-street cells) get grass clumps, a flower tuft ring
  // and a dirt / dark-grass patch, no props (no colliders). Closes the last flat-green spots (fra-2 west field, ath-1 north slope). ?lfl=0 turns it off.
  // 20 m grid with road / river margins of 5 m (themed cells need 7-12 m), so the narrow strips (quay field, road medians) are covered too.
- if(LF.lite){const CG=new Set(cells.map(([x,z])=>Math.floor(x/40)*10000+Math.floor(z/40)));for(let x=X0+10;x<X1;x+=20){for(let z=Z0+10;z<Z1;z+=20){if(x<HX0+20||x>HX1-20||z<HZS+20||z>HZN-20)continue;
-   const jx=x+(LF_h(x,z,81)-.5)*6,jz=z+(LF_h(x,z,82)-.5)*6;if(CG.has(Math.floor(jx/40)*10000+Math.floor(jz/40))&&LF_h(jx,jz,83)<.6)continue;
-   if(roamHit(jx,jz,1.5)||!LF_free(jx,jz,3.5)&&!LF_liteOk(jx,jz)||onAnyDeck(jx,jz)||LF_count(jx,jz,8)>=2)continue;if(fra&&typeof biomeAt==='function'&&(biomeAt(jx,jz)||{}).g==='air')continue;lite.push([jx,jz])}if(slice()){yield;t0=performance.now()}}}
+ if(LF.lite){const CG=new Set(cells.map(([x,z])=>Math.floor(x/40)*10000+Math.floor(z/40)));for(let x=X0+10;x<X1;x+=20){for(let z=Z0+10;z<Z1;z+=20){if(x<HX0-LF.rb||x>HX1+LF.rb||z<HZS-LF.rb||z>HZN+LF.rb)continue;
+   const jx=x+(LF_h(x,z,81)-.5)*6,jz=z+(LF_h(x,z,82)-.5)*6;
+   const tryP=(jx,jz)=>{if(CG.has(Math.floor(jx/40)*10000+Math.floor(jz/40))&&LF_h(jx,jz,83)<.6)return;
+    if(roamHit(jx,jz,1.5)||!LF_free(jx,jz,3.5)&&!LF_liteOk(jx,jz)||onAnyDeck(jx,jz)||LF_count(jx,jz,8)>=2)return;if(fra&&typeof biomeAt==='function'&&(biomeAt(jx,jz)||{}).g==='air')return;lite.push([jx,jz])};tryP(jx,jz);
+   // art-4: the ground within 30 m of a road edge fills most of the driving view, so it gets a second, offset lite point (14 m spacing there)
+   if(LF.rb>0){const q=cityAt(x,z),f=fillAt(x,z),de=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(de<30)tryP(x+10+(LF_h(x,z,84)-.5)*4,z+10+(LF_h(x,z,85)-.5)*4)}}if(slice()){yield;t0=performance.now()}}}
  for(const[x,z]of lite){const u=LF_h(x,z,90),R=s=>(LF_h(x,z,s)-.5);st.lite=(st.lite||0)+1;
   for(let k=0;k<4;k++){const tx=x+R(91+k)*18,tz=z+R(97+k)*18,s=1.2+LF_h(tx,tz,1)*1.5;di('tuft',tx,tz,LF_h(tx,tz,2)*6.28,s,s,s,GRN[(k+Math.floor(u*4))%GRN.length])}
   const s=4+u*5;di('patch',x+R(103)*8,z+R(104)*8,u*6.28,s,1,s*(.6+LF_h(x,z,105)*.5),u<.65?DIRT[Math.floor(u*6)%DIRT.length]:GRN[(Math.floor(u*9)+1)%GRN.length]);
