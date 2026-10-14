@@ -21,8 +21,9 @@ const T={group(n){R.group=n},
   eq(a,b,id,msg){this.ok(a===b,id,(msg||'')+' got '+a+' want '+b)},
   near(a,b,tol,id,msg){this.ok(Math.abs(a-b)<=tol,id,(msg||'')+' got '+(+a).toFixed(3)+' want '+b+' ±'+tol)}};
 const suites=fs.readdirSync(__dirname).filter(f=>/^(lint|logic)_.*\.js$/.test(f)).sort();
+(async()=>{
 for(const f of suites){if(filt&&!f.includes(filt))continue;const t=Date.now();
-  try{require('./'+f)(T)}catch(e){R.fail++;R.lines.push('FAIL '+f+'/crash: '+(e.message||e).toString().slice(0,200))}
+  try{await require('./'+f)(T)}catch(e){R.fail++;R.lines.push('FAIL '+f+'/crash: '+(e.message||e).toString().slice(0,200))}
   R.times[f]=Date.now()-t}
 if(upd){const o={...known};for(const [k,m] of R.kn)o[k]=m;fs.writeFileSync(path.join(__dirname,'known.json'),JSON.stringify(o,null,1)+'\n');console.log('known.json updated: +'+R.kn.length);process.exit(0)}
 for(const l of R.lines)console.log(l);
@@ -30,3 +31,4 @@ for(const k of R.fixed)console.log('FIXED '+k+' (remove from known.json)');
 const ms=Date.now()-T0,n=R.pass+R.fail+R.known;
 console.log(`UNIT ${R.fail?'FAIL':'OK'}: ${n} assertions · ${R.pass} pass · ${R.fail} FAIL · ${R.known} known · ${ms} ms`+(quiet?'':'  ['+Object.entries(R.times).map(([k,v])=>k.replace(/^(lint|logic)_|\.js$/g,'')+' '+v).join(', ')+']'));
 process.exit(R.fail?1:0);
+})();

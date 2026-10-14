@@ -31,5 +31,15 @@ module.exports=T=>{
    T.ok(Ln<=32,'ride-length-'+tag,'length '+Ln+' studs > 32');
    T.ok(nwh>=4,'ride-wheels-'+tag,nwh+' wheel parts (<4)');
   }}
+ // ---- ride size in METRES: stud .245 m x set scale (minifig City/Town sets RSZ.MS x LD_FIG, 4-wide RACERS x RSZ.rk) x the per-ride factor table RSZ.F (98sz_ride_scale.js)
+ T.group('ride-scale');
+ {const src=L.JSCODE(),MS=L.ev(/const RSZ=\{MS:(\[[^\]]*\])/.exec(src)[1]),FIG=+/const LD_FIG=([\d.]+)/.exec(src)[1],RK=+/RSZ\.rk=(\d+)/.exec(src)[1],F=L.ev(/RSZ\.F=(\{[^}]*\})/.exec(src)[1]);
+  const RAC=['7611','7612','7613','8120','8121'];T.ok(MS.length>=10&&FIG>1&&RK>=1,'scale-consts-found');let n=0;
+  for(const id in M.chunks){if(!/^v\d/.test(id))continue;const num=id.slice(1).split('_')[0],k=MS.includes(num)?FIG:RAC.includes(num)?RK:1,f=F['t_'+id]||1;
+   for(const m of Object.values(M.chunks[id].D)){const xs=m.B.map(b=>b[1]),ys=m.B.map(b=>b[2]),Ln=(Math.max(...ys)-Math.min(...ys)+1)*.245*k*f,W=(Math.max(...xs)-Math.min(...xs)+1)*.245*k*f;n++;
+    T.ok(Ln>=1.4&&Ln<=15.6,'length-in-any-class-'+id,'length '+Ln.toFixed(1)+' m outside 1.4..15.6 (bike..bus +-20%)');
+    T.ok(W<=5,'width-under-5m-'+id,'width '+W.toFixed(1)+' m (BC_dims caps at 3.2 after this)');
+    T.ok(W/Ln<=1.15,'not-wider-than-long-'+id,'W/L '+(W/Ln).toFixed(2))}}
+  T.ok(n>=100,'rides-measured','only '+n)}
  T.ok(total>=120,'model-total','only '+total+' models checked');
 };
