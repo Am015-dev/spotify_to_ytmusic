@@ -435,7 +435,7 @@ BF.on=PHN.on&&bfWanted();document.documentElement.classList.toggle('bf',BF.on);
  const _pf=phFx;phFx=function(f){if(BF.on)return bfFx(f);return _pf.apply(this,arguments)};
  const _mp=renderMap2D;renderMap2D=function(){if(BF.on){const el=document.getElementById('map2d');if(el)el.hidden=true;return}return _mp.apply(this,arguments)};
  const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q">Tile the king’s palace wall.<br><b>Most ★ wins.</b></p><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
- const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more"><summary>Options</summary>'+h.slice(i+17,j+6)+'</details>'+h.slice(j+6)};
+ const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more" ontoggle="var x=this.querySelector(\'.exs\');if(x)x.hidden=!this.open"><summary>Options</summary>'+h.slice(i+17,j+6).replace('class="exs"','class="exs" hidden')+'</details>'+h.slice(j+6)};
  const _to=toast;toast=function(t){if(!BF.on)return _to.apply(this,arguments)}}
 function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();
   if(BF.q.length&&!BF.busy&&!UI.modal){bfRun();return}

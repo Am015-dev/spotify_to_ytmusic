@@ -168,3 +168,7 @@ html.short:not(.land) .ab{min-height:44px;padding:0 2px}html.short:not(.land) .a
 html .mbox .btn.xs{min-height:44px}
 .gx-ibtn i[data-ic],.gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
 .ri{display:inline-block;width:26px;height:26px;margin-right:8px;vertical-align:middle;text-align:center;line-height:26px;font-style:normal;overflow:hidden}
+/* menu test v2: one instruction line on the board (tutorial tip title hidden; the top line stays), tile coords readable */
+html:not(.tp) .tile .tc,html.tp .tile .tc{font-size:11px;line-height:13px}
+.gxh-bub .gxh-tt{display:none}
+body:has(.gxh-bub.on) #line{visibility:hidden}
