@@ -1,16 +1,52 @@
 [
  {
   "date": "2026-10-14",
-  "game": "hollowbough",
-  "title": "Menu and board cleanup",
+  "game": "sands-of-qamar",
+  "title": "Menus tidied",
   "items": [
-   "Board tip bubble no longer covers cards and counts; the caption line says it"
+   "Menu and campaign text now sits inside the painted frames"
   ],
   "check": "",
   "scn": [
    "menu"
   ],
   "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sunglaze",
+  "title": "Menus tidied",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art"
+  ],
+  "check": "Open Campaign: the three top buttons read cleanly",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "lantern-dive",
+  "title": "Menus tidied",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Menu, help and tip text clear of frame art"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
    null
   ]
  },
@@ -38,36 +74,6 @@
    null,
    null,
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "sunglaze",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "lantern-dive",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
    null
   ]
  },
