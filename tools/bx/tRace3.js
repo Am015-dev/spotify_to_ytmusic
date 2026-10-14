@@ -8,4 +8,5 @@ const L=require('./lib.js');process.env.VP=process.env.VP||'393x852';
  await run('bx-race-pack',async()=>{await p.waitForFunction(()=>__bx.race()&&__bx.race().cd<=0,null,{timeout:90000});const sh=process.argv[2];
   await L.drive(p,cdp,{secs:32,out:sh?require('path').dirname(sh):'.',tag:sh?require('path').basename(sh,'.png'):'x',shots:sh?{race:s=>s.m.t>9}:{}}).catch(e=>out.push('drive error '+e.message));});
  await run('bx-look',()=>L.sleep(1500));
+ await run('bx-clear',()=>L.sleep(500));
  for(const o of out)console.log(o);console.log('errors',E.length?E.slice(0,3).join(' / '):'none');await b.close()})();

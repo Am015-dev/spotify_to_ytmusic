@@ -17,6 +17,11 @@ BX.th=new Float32Array(BXTN*BXTN);
 function BX_hv(a,b){a=a<0?0:a>BXTN-1?BXTN-1:a;b=b<0?0:b>BXTN-1?BXTN-1:b;return BX.th[b*BXTN+a]}
 function BX_h(x,z){const fx=(x-BXO)/BXR,fz=(z-BXO)/BXR,a=Math.floor(fx),b=Math.floor(fz),u=fx-a,v=fz-b;
  return (BX_hv(a,b)*(1-u)+BX_hv(a+1,b)*u)*(1-v)+(BX_hv(a,b+1)*(1-u)+BX_hv(a+1,b+1)*u)*v}
+// trk-3: the terrain height as DRAWN (BX_terrMesh triangles: diagonal k+1..k+n), not bilinear
+function BX_hTri(x,z){const fx=(x-BXO)/BXR,fz=(z-BXO)/BXR,a=Math.floor(fx),b=Math.floor(fz),u=fx-a,v=fz-b,h00=BX_hv(a,b),h10=BX_hv(a+1,b),h01=BX_hv(a,b+1),h11=BX_hv(a+1,b+1);
+ return u+v<=1?h00+u*(h10-h00)+v*(h01-h00):h11+(1-u)*(h01-h11)+(1-v)*(h10-h11)}
+// trk-3: road points (both edges + across the deck) where the drawn terrain comes up through the road surface
+function BX_terrClear(){let bad=0,n=0,worst=0,at=null;for(const{s}of BX.samp||[])for(let l=-7;l<=7;l+=.5){const x=s.p.x+s.S.x*l,z=s.p.z+s.S.z*l,sf=s.p.y+s.S.y*l,d=BX_hTri(x,z)-sf;n++;if(d>-.03){bad++;if(d>worst){worst=d;at=[+x.toFixed(1),+z.toFixed(1),+l.toFixed(1)]}}}return{bad,n,worst:+worst.toFixed(2),at}}
 function BX_tn(x,z,o){return (o||bxV()).set(BX_h(x-1,z)-BX_h(x+1,z),2,BX_h(x,z-1)-BX_h(x,z+1)).normalize()}
 const bxBowl=(x,z,cx,cz,r,deep)=>{const d=Math.hypot(x-cx,z-cz);return d<r?deep+(2-deep+1)*(d/r)**2:99};
 const BX_WORLDS={
@@ -44,7 +49,7 @@ function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.fl
   T[k]=bxCl(T[k],-8,60)}}
 // pieces sit IN the ground: terrain under a piece is cut to just below the deck, and lifted to it where the gap is small (embankment)
 // a road below the ground cuts a flat 9 m shoulder, then ~39° walls (dev-2: the old near-vertical 16 m cut walls let the car drive INTO the rock)
-function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-4.2*Math.abs(s.S.y); // banked deck: below its LOW edge
+function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-7.4*Math.abs(s.S.y); // banked deck: below its LOW edge (trk-3: the edge is 7 m out; 4.2 left the inside of every banked corner up to 1.3 m under the terrain)
  const a0=Math.floor((s.p.x-R-BXO)/BXR),a1=Math.ceil((s.p.x+R-BXO)/BXR),b0=Math.floor((s.p.z-R-BXO)/BXR),b1=Math.ceil((s.p.z+R-BXO)/BXR);
  for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;
   const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a;if(dd<R0){if(T[k]>y||(dd<7&&y-T[k]<2.2))T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap}}}}
@@ -192,9 +197,9 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
  const rb=M(new THREE.BoxGeometry(.3,1.5,7.5),BX.banMat,rban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+.75,a[2]),q,sc.set(1,1,1))});
  if(rb)rban.forEach((a,i)=>rb.setColorAt(i,BX_DC[(a[3]>>1)%5]));
  // trackside trees: LEGO-style trunk + two stacked cones (canopy colours like BX_trees)
- M(new THREE.CylinderGeometry(.55,.65,3,8),std(0x7c4a1e),tree,a=>{mt.makeTranslation(a[0],a[1]+1.5,a[2])});
- const tc=M(new THREE.ConeGeometry(3,5,8),std(0xffffff),tree,a=>{mt.makeTranslation(a[0],a[1]+5,a[2])}),tc2=M(new THREE.ConeGeometry(2.2,4,8),std(0xffffff),tree,a=>{mt.makeTranslation(a[0],a[1]+7.6,a[2])});
- const TC=[0x237841,0x2f8f3c,0x4b9f4a,0xe07b16].map(c=>new THREE.Color(c));if(tc)tree.forEach((a,i)=>{tc.setColorAt(i,TC[a[3]%4]);tc2.setColorAt(i,TC[(a[3]+1)%3])});
+ const asT=BX_asTrees(g,tree,1);if(!asT)M(new THREE.CylinderGeometry(.55,.65,3,8),std(0x7c4a1e),tree,a=>{mt.makeTranslation(a[0],a[1]+1.5,a[2])});
+ const tc=asT?null:M(new THREE.ConeGeometry(3,5,8),std(0xffffff),tree,a=>{mt.makeTranslation(a[0],a[1]+5,a[2])}),tc2=asT?null:M(new THREE.ConeGeometry(2.2,4,8),std(0xffffff),tree,a=>{mt.makeTranslation(a[0],a[1]+7.6,a[2])});
+ BX.dressLego=asT;const TC=[0x237841,0x2f8f3c,0x4b9f4a,0xe07b16].map(c=>new THREE.Color(c));if(tc)tree.forEach((a,i)=>{tc.setColorAt(i,TC[a[3]%4]);tc2.setColorAt(i,TC[(a[3]+1)%3])});
  // BOOST pads: a glowing blue tile with three yellow chevrons (pulse in BX_tick). trk-2: the thin orange V-bars read as "tan cardboard wedges" (Alex beta.22)
  const cm=BX.chevMat=BX.chevMat||(()=>{const t=BX_tex(128,128,(c,w,h)=>{c.fillStyle='#1560e8';c.fillRect(0,0,w,h);c.strokeStyle='#9cc8ff';c.lineWidth=6;c.strokeRect(3,3,w-6,h-6);
    for(let k=0;k<3;k++){const y=24+k*36;c.beginPath();c.moveTo(18,y+26);c.lineTo(64,y);c.lineTo(110,y+26);c.lineTo(110,y+40);c.lineTo(64,y+14);c.lineTo(18,y+40);c.closePath();c.fillStyle='#ff8a00';c.fill();c.strokeStyle='#fff3c0';c.lineWidth=2;c.stroke()}});
@@ -239,7 +244,10 @@ function BX_ghost(){if(BX.gG){BX.sc.remove(BX.gG);BX.gG.traverse(o=>o.geometry&&
  const pc=BX_mk(BX.sel,BX.cur,-1);if(!pc)return;const g=BX.gG=new THREE.Group();for(const S of pc.S){const[g1,g2]=BX_geo(S,pc.def);g.add(new THREE.Mesh(g1,BX_mats().ghost),new THREE.Mesh(g2,BX_mats().ghost))}
  g.children.forEach(o=>o.userData.ghost=1);BX.sc.add(g)}
 // ---------------------------------------------------------------- terrain mesh + world dressing
-function BX_terrMesh(){const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeometry(),p=new Float32Array(n*n*3),uv=new Float32Array(n*n*2),idx=[];
+// trk-3: after all pieces carved: a later piece's 'fill under the road' clause could lift terrain over an EARLIER, lower road (1.2 m up through the deck); every vertex within 9 m stays under every road there
+function BX_clampRoads(){const T=BX.th;for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-7.4*Math.abs(s.S.y),a0=Math.floor((s.p.x-9-BXO)/BXR),a1=Math.ceil((s.p.x+9-BXO)/BXR),b0=Math.floor((s.p.z-9-BXO)/BXR),b1=Math.ceil((s.p.z+9-BXO)/BXR);
+ for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){if(Math.hypot(BXO+a*BXR-s.p.x,BXO+b*BXR-s.p.z)>9)continue;const k=b*BXTN+a;if(T[k]>y)T[k]=y}}}}
+function BX_terrMesh(){BX_clampRoads();const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeometry(),p=new Float32Array(n*n*3),uv=new Float32Array(n*n*2),idx=[];
   for(let b=0;b<n;b++)for(let a=0;a<n;a++){const k=b*n+a;p[k*3]=BXO+a*BXR;p[k*3+2]=BXO+b*BXR;uv[k*2]=(BXO+a*BXR)/.8;uv[k*2+1]=(BXO+b*BXR)/.8;if(a<n-1&&b<n-1)idx.push(k,k+n,k+1,k+1,k+n,k+n+1)}
   g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*n*3),3));g.setIndex(idx);
   BX.tm=new THREE.Mesh(g,BX_mats().terr);BX.tm.receiveShadow=true;BX.sc.add(BX.tm)}
@@ -247,6 +255,11 @@ function BX_terrMesh(){const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeo
  const nm=g.attributes.normal.array,G1=bxCol('#4fb33a'),G2=bxCol('#3f9a2e'),RK=bxCol('#8d7b68'),RK2=bxCol('#a89a86'),SA=bxCol('#e0cf93'),MD=bxCol('#a6d13a'),DT=bxCol('#9c7a4e'),tc=new THREE.Color();
  for(let k=0;k<n*n;k++){const h=BX.th[k],ny=nm[k*3+1];if(h<.4)tc.copy(SA);else if(ny<.72)tc.copy(h>20?RK2:RK);else{tc.copy(G1).lerp(G2,bxCl((h-2)/30,0,1)*.7+((k*7919)%13)/60);const x=BXO+(k%n)*BXR,z=BXO+Math.floor(k/n)*BXR,pn=Math.sin(x/23)*Math.cos(z/31)+.5*Math.sin((x+z)/17);if(pn>1.05)tc.lerp(MD,.75);else if(pn<-1.15)tc.lerp(DT,.7)}c[k*3]=tc.r;c[k*3+1]=tc.g;c[k*3+2]=tc.b}
  g.attributes.color.needsUpdate=true;g.computeBoundingSphere();BX_trees()}
+// trk-3 (coordinator: reuse asset-1's LEGO-part trees): instanced mid-LOD LEGO trees from window.__as (models/as.js); false = not loaded, caller keeps its cones
+function BX_asTrees(g,T,seed=0){const A=window.__as;if(!A||!A.build||!T.length)return false;const V=/mountain|canyon/.test(BX.world)?['fir','birch','oakAut','maple']:['oak','linden','chestnut','plane'];
+ BX.asG=BX.asG||{};BX.asMat=BX.asMat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.5});const by=V.map(()=>[]);T.forEach((t,i)=>by[(i+seed)%V.length].push(t));let ok=false;
+ V.forEach((v,k)=>{if(!by[k].length)return;let geo=BX.asG[v];if(geo===undefined){try{geo=A.build(v,'m')}catch(e){geo=null}BX.asG[v]=geo}if(!geo)return;const im=new THREE.InstancedMesh(geo,BX.asMat,by[k].length),m=new THREE.Matrix4(),q=new THREE.Quaternion(),sc=bxV();
+  by[k].forEach(([x,y,z],i)=>{const r=(x*12.9898+z*78.233)%6.283,f=.9+((Math.abs(x*7+z*3)|0)%5)*.06;m.compose(bxV(x,y-.1,z),q.setFromAxisAngle(bxV(0,1,0),r),sc.set(f,f,f));im.setMatrixAt(i,m)});im.castShadow=true;g.add(im);ok=true});return ok}
 function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[],RK=[];let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
  for(let i=0;i<60;i++){const x=BXO+16+rnd()*(BXW-32),z=BXO+16+rnd()*(BXW-32),h=BX_h(x,z);if(h<.3)continue;if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<10&&Math.abs(s.p.z-z)<10))continue;RK.push([x,z,h,1+rnd()*2.2])}
  BX.rk=RK;for(let i=0;i<150;i++){const x=BXO+20+rnd()*(BXW-40),z=BXO+20+rnd()*(BXW-40),h=BX_h(x,z),n=BX_tn(x,z);if(h<.6||n.y<.85)continue;
@@ -254,7 +267,7 @@ function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[],RK=[]
  BX.tr=T;const gg=new THREE.Group();BX.sc.add(gg);BX.trM=gg;if(RK.length){const rm=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x8f8a82,flatShading:true,roughness:.9}),RK.length),q=new THREE.Matrix4();
  RK.forEach(([x,z,h,r],i)=>{q.compose(bxV(x,h+r*.35,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(i,i*2,0)),bxV(r*1.3,r,r*1.1));rm.setMatrixAt(i,q)});rm.castShadow=rm.receiveShadow=true;gg.add(rm)}if(!T.length)return;const g=new THREE.Group(),tr=new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.6,3,6),new THREE.MeshStandardMaterial({color:0x7c4a1e}),T.length),
   lf=new THREE.InstancedMesh(new THREE.ConeGeometry(2.6,5,6),new THREE.MeshStandardMaterial({color:0x237841,flatShading:true}),T.length),mt=new THREE.Matrix4();
- const AC=[0x237841,0x2f8f3c,0xe07b16,0xf2b632,0xc4401b].map(c=>new THREE.Color(c));T.forEach(([x,z,h],i)=>{mt.makeTranslation(x,h+1.5,z);tr.setMatrixAt(i,mt);mt.makeTranslation(x,h+5,z);lf.setMatrixAt(i,mt);lf.setColorAt(i,AC[i%7<4?i%2:2+i%3])});
+ if(BX_asTrees(BX.trM,T.map(([x,z,h])=>[x,h,z])))return;const AC=[0x237841,0x2f8f3c,0xe07b16,0xf2b632,0xc4401b].map(c=>new THREE.Color(c));T.forEach(([x,z,h],i)=>{mt.makeTranslation(x,h+1.5,z);tr.setMatrixAt(i,mt);mt.makeTranslation(x,h+5,z);lf.setMatrixAt(i,mt);lf.setColorAt(i,AC[i%7<4?i%2:2+i%3])});
  tr.castShadow=lf.castShadow=true;lf.material.color.set(0xffffff);g.add(tr,lf);BX.trM.add(g)}
 function BX_bld(){if(BX.bM){BX.sc.remove(BX.bM);BX.bM=null}if(!BX.bld||!BX.bld.length)return;const g=BX.bM=new THREE.Group();
  for(const b of BX.bld){const geo=new THREE.BoxGeometry(b.w,b.h,b.d),c=bxCol(b.c),col=[];for(let i=0;i<geo.attributes.position.count;i++)col.push(c.r,c.g,c.b);geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
@@ -573,8 +586,12 @@ const BX_TESTS={
    const M=BX_mats(),tb=[];BX.sc.traverse(o=>{if(!o.isMesh||!o.visible||o===BX.wM)return;const m=o.material;if(!m||!m.transparent||m===M.ghost||m===M.hl)return;o.geometry.computeBoundingBox();const z=o.geometry.boundingBox.getSize(bxV());if(Math.min(z.x,z.y,z.z)>=.02)return;if(!(m.depthWrite===false&&m.polygonOffset))tb.push(o.name||o.geometry.type)});
    const D=BX.dressN||{},C2=[['boost pad blue',T[2]>180&&T[2]>T[0]+80,`tile rgb ${T.slice(0,3)}`],['chevrons orange',C[0]>220&&C[1]>100&&C[1]<180&&C[2]<80,`chevron rgb ${C.slice(0,3)}`],['kicker lip yellow',K[0]>200&&K[1]>170&&K[2]<90,`lip rgb ${K.slice(0,3)}`],
     ['0 pillars through a deck',pierce===0,`pillars through a deck ${pierce}/${(BX.pil||[]).length}`],['0 coplanar transparent',tb.length===0,`unsafe transparent meshes ${tb.length}${tb.length?' ('+tb.slice(0,3)+')':''}`],['shadow normalBias',BX.sun.shadow.normalBias>=.04,`normalBias ${BX.sun.shadow.normalBias}`],
-    ['dressing',(D.trees||0)>=6&&(D.rail||0)>=4&&D.landmark>=1,`trees ${D.trees||0}, rail boards ${D.rail||0}, landmark ${D.landmark||0}`]];
+    ['dressing',(D.trees||0)>=6&&(D.rail||0)>=4&&D.landmark>=1,`trees ${D.trees||0}, rail boards ${D.rail||0}, landmark ${D.landmark||0}`],['LEGO-part trees',!window.__as||BX.dressLego===true,`trees ${BX.dressLego?'asset LEGO parts':window.__as?'cones (asset loaded!)':'cones (asset code not loaded)'}`]];
    return{ok:C2.every(c=>c[1]),fails:C2.filter(c=>!c[1]).map(c=>c[0]),msg:C2.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')}}},
+ // trk-3 (coordinator: green terrain over the inside edge of a CLIFF RUN corner): every demo track's deck clear of the drawn terrain, both edges and across
+ 'bx-clear':{n:'DECK CLEAR: all tracks',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,
+  chk:()=>{const R=[],cur={log:BX.log},cn=BX.name;for(const k in BX_DEMOS){BX_load(BX_DEMOS[k],k);const c=BX_terrClear();R.push([k,c])}BX_load(cur,cn);
+   const ok=R.every(([k,c])=>c.bad===0);return{ok,fails:R.filter(([k,c])=>c.bad).map(([k])=>k),msg:R.map(([k,c])=>(c.bad?'✘ ':'✔ ')+`${k}: ${c.bad}/${c.n} road points under terrain${c.bad?' (worst '+c.worst+' m at '+c.at+')':''}`).join(', ')}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
@@ -607,7 +624,7 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
    const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
- h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+ h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
 // 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,
