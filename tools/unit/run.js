@@ -12,17 +12,19 @@ if(process.argv.includes('--selftest')){
   console.log(bad?'SELFTEST FAIL: '+bad+' seed(s) not caught':'SELFTEST OK: '+S.length+' seeded breaks all caught');process.exit(bad?1:0)}
 const quiet=process.argv.includes('--quiet'),filt=process.argv.slice(2).filter(a=>!a.startsWith('--'))[0]||'';
 let known={};try{known=JSON.parse(fs.readFileSync(path.join(__dirname,'known.json'),'utf8'))}catch(e){}
-const R={pass:0,fail:0,known:0,fixed:[],lines:[],group:'',seen:new Set(),times:{}};
+const R={pass:0,fail:0,known:0,fixed:[],lines:[],group:'',seen:new Set(),times:{},kn:[]};
+const upd=process.argv.includes('--update-known');
 const T={group(n){R.group=n},
   ok(cond,id,msg){const key=R.group+'/'+id;R.seen.add(key);
     if(cond){if(known[key])R.fixed.push(key);R.pass++;return}
-    if(known[key]){R.known++;return}R.fail++;R.lines.push('FAIL '+key+(msg?': '+msg:''))},
+    if(known[key]&&!upd){R.known++;return}R.fail++;R.kn.push([key,(msg||'').slice(0,160)]);R.lines.push('FAIL '+key+(msg?': '+msg:''))},
   eq(a,b,id,msg){this.ok(a===b,id,(msg||'')+' got '+a+' want '+b)},
   near(a,b,tol,id,msg){this.ok(Math.abs(a-b)<=tol,id,(msg||'')+' got '+(+a).toFixed(3)+' want '+b+' ±'+tol)}};
 const suites=fs.readdirSync(__dirname).filter(f=>/^(lint|logic)_.*\.js$/.test(f)).sort();
 for(const f of suites){if(filt&&!f.includes(filt))continue;const t=Date.now();
   try{require('./'+f)(T)}catch(e){R.fail++;R.lines.push('FAIL '+f+'/crash: '+(e.message||e).toString().slice(0,200))}
   R.times[f]=Date.now()-t}
+if(upd){const o={...known};for(const [k,m] of R.kn)o[k]=m;fs.writeFileSync(path.join(__dirname,'known.json'),JSON.stringify(o,null,1)+'\n');console.log('known.json updated: +'+R.kn.length);process.exit(0)}
 for(const l of R.lines)console.log(l);
 for(const k of R.fixed)console.log('FIXED '+k+' (remove from known.json)');
 const ms=Date.now()-T0,n=R.pass+R.fail+R.known;

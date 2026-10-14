@@ -31,7 +31,7 @@ const jsonBlock=id=>memo('j'+id,()=>{const m=new RegExp('<script type="applicati
 const FRA=()=>memo('fra',()=>{const d=JSON.parse(JSON.stringify(jsonBlock('rf-data')));if(SEED==='fra-dead')d.streets[0][4].push([99999,99999]);if(SEED==='fra-zero')d.streets[1][4].splice(1,0,d.streets[1][4][0].slice());return d});
 const ATH=()=>memo('ath',()=>jsonBlock('ath-data'));
 const CHANGELOG=()=>memo('cl',()=>{const a=ev(constSrc('OD_CHANGELOG'));if(SEED==='changelog')a[0].items=[{t:'WRONG',s:''}];return a});
-const CHECKLIST=()=>memo('ck',()=>{const a=ev(constSrc('OD_CHECKLIST'));if(SEED==='checklist'){a.push({ver:'v90x',id:a[0].id,text:'x'})}return a});
+const CHECKLIST=()=>memo('ck',()=>{const a=ev(constSrc('OD_CHECKLIST'));if(SEED==='checklist'){a.push({ver:a[0].ver,id:a[0].id,text:'x'})}return a});
 // LDraw chunks: models/<id>.js = __LDC(id, meshes, models); needs a build (out/<ver>/models) -> newest dir that has models/ ; else null
 function modelsDir(){return memo('md',()=>{const o=path.join(ROOT,'out');if(!fs.existsSync(o))return null;
   const L=fs.readdirSync(o).map(n=>({n,t:fs.existsSync(path.join(o,n,'models'))?fs.statSync(path.join(o,n,'models')).mtimeMs:0})).filter(x=>x.t).sort((a,b)=>b.t-a.t);return L[0]?path.join(o,L[0].n):null})}
