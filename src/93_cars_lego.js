@@ -305,8 +305,8 @@ const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_
 // FX19: seat traffic on all four tyres (as the player car): pitch/roll to the ground under the wheel contacts, height = their mean
 let FX19_R=260;const _fxA=new THREE.Vector3(),_fxR=new THREE.Matrix4(),_fxE=new THREE.Euler();
 function FX19_seat(c,dx,dz,im,M){const w=im.userData.w;if(!w||!w.geometry)return;let B=im.userData.fxWB;if(!B){w.geometry.computeBoundingBox();const b=w.geometry.boundingBox,r=(b.max.y-b.min.y)/2;B=im.userData.fxWB={l:Math.max(.3,(b.max.z-b.min.z)/2-r),w:(b.max.x-b.min.x)/2*.85,cz:(b.max.z+b.min.z)/2,by:b.min.y}}
- _fxA.setFromMatrixPosition(M);const x=_fxA.x,z=_fxA.z;if(Math.abs(x-camera.position.x)+Math.abs(z-camera.position.z)>FX19_R)return;const y0=c.y+2.5,G=(a,b)=>groundAt(x+dx*(a+B.cz)+dz*b,z+dz*(a+B.cz)-dx*b,y0),
-  fl=G(B.l,B.w),fr=G(B.l,-B.w),bl=G(-B.l,B.w),br=G(-B.l,-B.w);if(Math.max(fl,fr,bl,br)-Math.min(fl,fr,bl,br)>1.2)return;
+ _fxA.setFromMatrixPosition(M);const x=_fxA.x,z=_fxA.z;if(Math.abs(x-camera.position.x)+Math.abs(z-camera.position.z)>FX19_R){M.elements[13]+=CR_TYRE_Y-B.by;return}/* sink-1: far cars keep the same tyre line (wheel box bottom CR_TYRE_Y above the ground; they sat B.by low, 10 cm inside Athens asphalt) */const y0=c.y+2.5,G=(a,b)=>groundAt(x+dx*(a+B.cz)+dz*b,z+dz*(a+B.cz)-dx*b,y0),
+  fl=G(B.l,B.w),fr=G(B.l,-B.w),bl=G(-B.l,B.w),br=G(-B.l,-B.w);if(Math.max(fl,fr,bl,br)-Math.min(fl,fr,bl,br)>1.2){M.elements[13]+=CR_TYRE_Y-B.by;return}
  // local +x is (dz,0,-dx): b>0 is the right side
  const pt=-Math.atan2((fl+fr-bl-br)/2,2*B.l),rl=Math.atan2((fl+bl-fr-br)/2,2*B.w);M.multiply(_fxR.makeRotationFromEuler(_fxE.set(pt,0,rl)));M.elements[13]=(fl+fr+bl+br)/4-B.by+CR_TYRE_Y}
 function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}try{FX19_seat(c,dx,dz,im,M)}catch(e){}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;

@@ -20,15 +20,17 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
  await open(process.env.CITY||'fra');
  const all=await p.evaluate(()=>window.__chk.items.map(it=>it.ver+'/'+it.id).filter(id=>window.__chk.GO[id]).map(id=>[id,window.__chk.city(id)]));
  // items whose GO only opens the garage (or says "drive here") all do the same thing: run the first, report the rest as the same
- const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>{const T=window.__chk.GO[id][0];return[id,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));const seen={},same={};
+ const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>{const T=window.__chk.GO[id][0];return[id,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));
+ // a GO may declare its own time budget (secs, e.g. sink1/start-sink: the real parachute start + 15 s): wait for it and judge SLOW against it
+ const BUD=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>[id,+window.__chk.GO[id][0].secs||0])),all.map(a=>a[0]));const seen={},same={};
  const SM=['v90n/foot-go-walk','v90n/foot-go-npc','v90n/foot-go-jump','v90k/rv-human','v90k/no-hollow','v90k/shadow','v90k/lag','v90k/ramp-seam','v90k/fra-net','v90g/fra-props','v90m/ath-boot','v90k/ath-kriezi','v90g/ath-display','v90k/rv-scale','v90k/ww-card'],TG=(process.env.TAG||'').split(',').filter(Boolean);
  const want=id=>id.includes(FIL)&&(!process.env.SMOKE||SM.includes(id))&&(!TG.length||TG.some(t=>id.startsWith(t)||id.includes('/'+t)||id.split('/')[0]===t));
  const LAST=['v90k/rv-scale','v90k/ww-card','v90k/park-sit'],pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).sort((a,b)=>(process.env.SMOKE?LAST.includes(a)-LAST.includes(b):0)).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
  const run=async(c,ids)=>{for(const id of ids){const e0=errs.length;let said='';
-   const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:20000,polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
+   const t1=Date.now();try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:Math.max(20000,(BUD[id]+10)*1000),polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
    await p.waitForTimeout(c==='bx'?1500:process.env.SMOKE?150:500);
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
-   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const secs=(Date.now()-t1)/1000,slow=secs>10&&c!=='bx';if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:(spawnOnly||slow)?false:ok,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
+   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const secs=(Date.now()-t1)/1000,slow=secs>Math.max(10,BUD[id]||0)&&c!=='bx';if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok;res.push({id,c,ok:(spawnOnly||slow)?false:ok,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!ok||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(process.env.SHOTS&&(res.length<=3||id.endsWith('/shadow')))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;

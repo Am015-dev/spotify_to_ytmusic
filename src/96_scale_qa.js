@@ -196,8 +196,10 @@ function v85tick(dt){try{if(RO.ch)v85Road(RO.ch);
  lastCh=ch;lastRes=res;lastPlate=pl2;if(res)brief=Math.max(brief,2);
  if(RO.card||RO.mapOpen||RO.jOpen)brief=Math.max(brief,.1);
  brief=Math.max(0,brief-dt);const on=brief>0;if(on!==bc.contains('v85b'))bc.toggle('v85b',on)}catch(e){}}
-// road under the start: the hot-drop run begins on bare plaza paving. When a quest starts, lay a dark asphalt ribbon (white lane markings) along the first straight
-// stretch of its route, face the car down it and let it roll. Visual only: no collision.
+// road under the start (v85): when a quest starts, face the car down the first straight stretch of its route and let it roll.
+// sink-1 (2026-10-14, Alex beta.56 "the sinking is still not solved at the beginning"): the v85 asphalt ribbon laid here (16 m wide, groundY+0.34, visual only,
+// from when Hot Drop began on bare plaza paving) floated 0.30-0.34 m above the real road that is there now, so every quest start showed the tyres
+// a third deep in asphalt while groundAt (all earlier checks) said 0.03 m. The ribbon is gone; the real road carries the start.
 const V=window.__v85={};let ribbon=null;
 function v85Road(ch){try{const q=ch&&ch.v2;if(!q||q._v85)return;q._v85=1;const st=q.L.st[q.si||0],P=st&&st.R&&st.R.P;if(!P||P.length<4)return;
  const a0=Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]),pts=[{x:P[0][0],z:P[0][1]}];let L=0;
@@ -206,8 +208,7 @@ function v85Road(ch){try{const q=ch&&ch.v2;if(!q||q._v85)return;q._v85=1;const s
  // start 12 m behind the car so the car is already on it
  const b={x:pts[0].x-tx*12,z:pts[0].z-tz*12,tx,tz,s:-12};pts.unshift(b);
  if(ribbon){ribbon.parent&&ribbon.parent.remove(ribbon);ribbon.geometry.dispose()}
- const mat=new THREE.MeshStandardMaterial({map:HUB.M.road.map,roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-8});
- ribbon=new THREE.Mesh(abStrip(pts,0,pts.length-1,-8,8,.34,.34,32),mat);ribbon.receiveShadow=true;ribbon.frustumCulled=false;(HUB.grp||scene).add(ribbon);
+ ribbon=null;
  // facing along the route, already rolling
  if(Math.hypot(RO.x-P[0][0],RO.z-P[0][1])<40&&Math.abs(RO.v)<6){RO.h=RO.vh=a0;RO.yr=0;RO.v=13;camSnap=true;RO.v85w=4}
  V.road={n:pts.length,a0,L}}catch(e){V.err=String(e&&e.stack||e)}}
