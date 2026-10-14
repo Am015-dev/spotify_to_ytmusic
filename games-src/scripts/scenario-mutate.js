@@ -11,7 +11,7 @@
 const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const gx = require('./gx-serve.js');
-const T = require('./scenario-test.js');
+const T = require('./scn-run.js');
 const args = process.argv.slice(2), slugs = []; let only = null, min = 90;
 for (let i = 0; i < args.length; i++) { if (args[i] === '--only') only = args[++i]; else if (args[i] === '--min') min = +args[++i]; else if (!args[i].startsWith('--')) slugs.push(args[i]); }
 const JOBS = +process.env.JOBS || 3, SZ = T.SIZES[0], BEHAVIOUR = new Set(['dead', 'throw', 'named', 'num']);
