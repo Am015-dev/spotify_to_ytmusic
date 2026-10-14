@@ -227,7 +227,7 @@ table.stats tr.win{background:var(--yellow);color:#1a1320}
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
    everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
-:root{--gx-bar-h:48px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+:root{--gx-bar-h:52px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
 html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
 .gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
 .gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
@@ -242,7 +242,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-dock-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .gx-app.gx-dock-min .gx-dock{visibility:hidden}
 
-.gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:40px;min-height:40px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
+.gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:44px;min-height:44px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
 .gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
 .gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
 .gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
@@ -250,7 +250,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 /* popups */
 .gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
 .gx-scrim.on{opacity:1;pointer-events:auto}
-.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);padding:31px;transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
 .gx-drawer.on{transform:none;visibility:visible}
 .gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
 .gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
@@ -267,7 +267,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
   .gx-app.gx-dock-min .gx-dock-body{display:none}
   .gx-reopen{display:none!important}
   .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
-  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:calc(31px + env(safe-area-inset-bottom,0px))}
   .gx-drawer.wide{width:auto}
   .gx-hide-narrow{display:none!important}
 }
@@ -430,6 +430,9 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 @media (max-width:560px){header.gx-bar h1{display:none}header.gx-bar{gap:4px}}
 @media (max-width:560px){header.gx-bar{gap:3px;padding-left:6px}header.gx-bar .gx-ibtn.btn{font-size:.72rem;padding:.1rem .3rem;min-width:36px;border-width:2.5px}}
 .dlg.paper table.stats{width:100%;font-size:.85rem}@media (max-width:560px){.dlg.paper table.stats{font-size:.72rem}.dlg.paper table.stats th:nth-child(n+7),.dlg.paper table.stats td:nth-child(n+7){display:none}}
+/* menu test v2: bare text sits 8px+ inside the column of the framed rows (monster picker, buttons) */
+.dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:10px}
+details.custom:not([open])>*:not(summary){display:none}
 
 /* ===== v10 polish: dusk neon chrome, printed card frames, enamel buttons, resin dice (visual only) ===== */
 :root{--hl:rgba(255,255,255,.55);--hl0:rgba(255,255,255,0);--lo:rgba(26,19,32,.07);--drop:0 10px 24px rgba(26,19,32,.18);
@@ -879,6 +882,9 @@ html.gxt-on.ph-l .gx-dock[data-bf="buy"] #pacts{grid-template-columns:minmax(0,3
 .gxt-menu span{display:block;margin-top:2px;font-size:.74em;font-weight:600;opacity:.85;line-height:1.2}
 html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:36px;padding:3px 8px;border-radius:10px;font-size:12px;line-height:1.1;text-align:center;flex:none}
 html.ph .bfintro .you .gxt-menu.tutmini b{font:800 12px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}
+/* menu test v2: one instruction line at a time (the coach bubble replaces the board line); the chip's YOU tag sat on the name */
+html.ph:has(.gxh-bub.on) #bline{display:none}
+html.ph .pchip u{display:none}
 
 /* ===== Play on the board (see onboard.js): dice, Roll, SMASH!, End turn, painted cards for sale, your cards, questions ===== */
 #ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:min(60px,calc((var(--obw,360px) - 44px)/6.3))}
@@ -1040,7 +1046,7 @@ html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -1074,7 +1080,7 @@ html.sk header.gx-bar h1{-webkit-text-stroke:0;text-shadow:0 2px 3px rgba(0,0,0,
 html.sk #modal .dlg:not(.paper){background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
 html.sk #modal .dlg.paper{box-shadow:0 14px 26px rgba(0,0,0,.55)}
 html.sk #modal .dlg h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.6)}
-html.sk .cc-hero{margin:-6px -14px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+html.sk .cc-hero{margin:-6px -12px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
 html.sk .cc-endart{margin:-6px -14px 6px}
 html.sk .dlg.start details.custom{border:2px dashed rgba(243,233,255,.45);background:rgba(20,8,48,.35)}
 html.sk .gx-dock{background:none}
@@ -1167,6 +1173,11 @@ html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
 html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
 html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
 html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* menu test v2: text starts inside the painted frames (border-width + padding >= border-image-width on every side) */
+html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;padding:.6rem 12px}
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 4px}
+html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
+html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -1185,12 +1196,12 @@ html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
 .gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
 .gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
 .gxc-row.wrap{flex-wrap:wrap}
-.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 21px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
 .gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
 .gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
 .gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
 .gxc-btn.ghost{background:rgba(255,255,255,.22)}
-.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 21px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap;flex:0 0 auto}
 .gxc-tag{display:inline-block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
 /* portraits: image or emoji badge in a painted ring */
 .gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
@@ -1400,6 +1411,12 @@ html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:cont
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* compact form: used by gx-help.js when no free spot exists on a crowded board */
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
    Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
@@ -1616,7 +1633,7 @@ const MONS=[
   S.menuSurfaces = S.menuSurfaces || [];
   S.MENU_FONTS = ['Cinzel', 'Alegreya Sans'];   // the shelf's self-hosted title face and body face (shell/fonts, injected by build-all.py)
   var MENU_MIN = 13, MENU_OPEN = /menu|setting|rules|help|option|about|how|info|pause|guide/i, MENU_SKIP = /bulb|hint|undo|dock|log|opp|mute|sound|music|zoom|full/i;
-  function menuTop() { return [].slice.call(document.querySelectorAll('button,[role=button]')).filter(function (b) { var t = (b.id + ' ' + b.className + ' ' + (b.getAttribute('aria-label') || '') + ' ' + (b.dataset && b.dataset.gx || '')); return MENU_OPEN.test(t) && !MENU_SKIP.test(t) && !/gxt-menu|story|learn|primary|bigb/.test(b.className) && S.vis(b) && !b.closest('[hidden]') && b.getBoundingClientRect().top < 80; }); }
+  function menuTop() { return [].slice.call(document.querySelectorAll('button,[role=button]')).filter(function (b) { var t = (b.id + ' ' + b.className + ' ' + (b.getAttribute('aria-label') || '') + ' ' + (b.dataset && b.dataset.gx || '')), lab = (b.getAttribute('aria-label') || ''); return MENU_OPEN.test(t) && !MENU_SKIP.test(b.id + ' ' + b.className + ' ' + (b.dataset && b.dataset.gx || '') + ' ' + lab.split(/[\s:]/)[0]) && !/gxt-menu|story|learn|primary|bigb/.test(b.className) && S.vis(b) && !b.closest('[hidden]') && b.getBoundingClientRect().top < 80; }); }
   function menuClose() { try { if (typeof GX !== 'undefined' && GX.close) GX.close(); } catch (e) { } [].slice.call(document.querySelectorAll('.gx-x,[data-gx-close],.gxc-x')).forEach(function (b) { if (S.vis(b)) b.click(); }); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); }
   function unq(f) { return String(f).trim().replace(/^["']|["']$/g, ''); }
   function famOk(cs, e) {   // the face the browser really uses: the first listed family must be a shelf face, declared by an @font-face in document.fonts, and loaded (document.fonts.check() is true when nothing is declared, so it proves nothing)
@@ -1637,13 +1654,131 @@ const MONS=[
       if (fsz < MENU_MIN) add('text under ' + MENU_MIN + 'px: "' + t + '" (' + Math.round(fsz * 10) / 10 + 'px) <' + who(e) + '>');
       if (e.scrollWidth > e.clientWidth + 2 && /(hidden|clip)/.test(cs.overflowX) && e.clientWidth > 0) add('text clipped (scrollWidth ' + e.scrollWidth + ' > ' + e.clientWidth + '): "' + t + '" <' + who(e) + '>');
       var f = famOk(cs, e); if (f) add(f + ': "' + t + '" <' + who(e) + '>');
-      var tr = S.menuTopmost && firstLine(e); if (tr && tr.width >= 2 && tr.left >= 0 && tr.right <= innerWidth && tr.top >= 0 && tr.bottom <= innerHeight) { var top = document.elementFromPoint(tr.left + tr.width / 2, tr.top + tr.height / 2); if (top && !related(top, e) && !/^(HTML|BODY)$/.test(top.tagName) && S.vis(top)) add('text not topmost: "' + t + '" <' + who(e) + '> is under <' + who(top) + '>'); }
+      var tc = S.menuTopmost && coverOf(e); if (tc) add('text not topmost: "' + t + '" <' + who(e) + '> is under <' + who(tc) + '>');
     });
+    S.menuLook().forEach(add);
     return out;
   };
   function firstLine(e) {   // box of the first line of the element's own text (the centre of a multi-line union often lies on a neighbour)
     for (var i = 0; i < e.childNodes.length; i++) { var n = e.childNodes[i]; if (n.nodeType === 3 && /\S/.test(n.textContent)) { var r = document.createRange(); r.selectNodeContents(n); var q = r.getClientRects()[0]; if (q) return q; } }
     return null;
+  }
+  /* ---- Menu test v2 (owner, 14 Oct 2026: "the fix on menus did not work, still sloppy"): the faults a person sees on a phone ---- */
+  function px4(v) { var t = String(v).trim().split(/\s+/), a = t.map(function (x) { return x; }); return [a[0], a[1] || a[0], a[2] || a[0], a[3] || a[1] || a[0]]; }   // CSS 1-4 value expansion: top right bottom left
+  function sides(cs, prop) { return px4(cs[prop]); }
+  function textRects(e) {   // client rects of the element's own text nodes
+    var out = []; for (var n = e.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && /\S/.test(n.nodeValue)) { var r = document.createRange(); r.selectNodeContents(n); [].slice.call(r.getClientRects()).forEach(function (q) { if (q.width > 1 && q.height > 1) out.push(q); }); }
+    return out;
+  }
+  function scrolledOut(k, q) {   // text that sits outside the visible box of a scrolling ancestor is clipped (not on screen), so it is neither covered nor under the frame
+    for (var a = k; a && a !== document.body; a = a.parentElement) { if (a === k && !/(auto|scroll)/.test(getComputedStyle(a).overflowY)) continue; if (!/(auto|scroll|hidden|clip)/.test(getComputedStyle(a).overflowY)) continue; var r = a.getBoundingClientRect(); if (q.top < r.top - 1 || q.bottom > r.bottom + 1) return true; }
+    return false;
+  }
+  function framePx(e, cs) {   // painted frame art (border-image): how far in from each side [top,right,bottom,left] the art reaches; null when the element has none
+    if (!cs.borderImageSource || cs.borderImageSource === 'none') return null;
+    var bw = [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].map(parseFloat), w = sides(cs, 'borderImageWidth'), o = sides(cs, 'borderImageOutset'), r = [];
+    for (var i = 0; i < 4; i++) { var wi = /px$/.test(w[i]) ? parseFloat(w[i]) : w[i] === 'auto' ? bw[i] : parseFloat(w[i]) * bw[i], oi = /px$/.test(o[i]) ? parseFloat(o[i]) : parseFloat(o[i]) * bw[i]; r.push(Math.max(0, (wi || 0) - (oi || 0))); }
+    return r;
+  }
+  function hasBg(cs) { var m = /rgba?\(([^)]*)\)/.exec(cs.backgroundColor || ''); var a = m ? (m[1].split(',').length > 3 ? parseFloat(m[1].split(',')[3]) : 1) : 0; return a > .3 || (cs.backgroundImage && cs.backgroundImage !== 'none'); }
+  S.menuLook = function () {   // fault 1 (text under frame art / on a decorative image) and fault 4 (text hugging a dialog edge)
+    var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 60) { seen[m] = 1; out.push(m); } }
+    var els = [].slice.call(document.querySelectorAll('body *')).filter(function (e) { return !/^(SCRIPT|STYLE|NOSCRIPT|OPTION)$/i.test(e.tagName) && !e.closest(SKIPSEL) && S.vis(e); });
+    els.forEach(function (e) {
+      var cs = getComputedStyle(e), fr = framePx(e, cs), r = e.getBoundingClientRect();
+      if (fr && r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight) {   // every text / image inside must start inside the frame's inner area
+        var scroll = /(auto|scroll)/.test(cs.overflowY), bad = [];
+        var kids = [e].concat([].slice.call(e.querySelectorAll('*'))).filter(function (k) { return k === e || S.vis(k); });
+        kids.forEach(function (k) {
+          var rs = textRects(k); if (/^(IMG|SVG|CANVAS)$/i.test(k.tagName) && k !== e) rs.push(k.getBoundingClientRect());
+          rs.forEach(function (q) {
+            if (q.top < r.top - 2 || q.bottom > r.bottom + 2 || scrolledOut(k, q)) return;   // scrolled out of the box: not judged here
+            var t = (k.textContent || k.tagName).trim().slice(0, 20);
+            if (q.left < r.left + fr[3] - 1.5) bad.push('left ' + Math.round(r.left + fr[3] - q.left) + 'px: "' + t + '"');
+            else if (q.right > r.right - fr[1] + 1.5) bad.push('right ' + Math.round(q.right - (r.right - fr[1])) + 'px: "' + t + '"');
+            else if (!scroll && q.top < r.top + fr[0] - 1.5) bad.push('top ' + Math.round(r.top + fr[0] - q.top) + 'px: "' + t + '"');
+            else if (!scroll && q.bottom > r.bottom - fr[2] + 1.5) bad.push('bottom ' + Math.round(q.bottom - (r.bottom - fr[2])) + 'px: "' + t + '"');
+          });
+        });
+        if (bad.length) add('frame art under content: <' + who(e) + '> frame ' + fr.map(Math.round).join('/') + ' (t/r/b/l) but ' + bad[0] + (bad.length > 1 ? ' (+' + (bad.length - 1) + ')' : ''));
+      }
+      var t = ownText(e), tr = t && firstLine(e);   // text on top of a small decorative image box that is its own child / sibling
+      if (tr && tr.width > 2) {
+        var kin = [].slice.call(e.children).concat(e.parentElement ? [].slice.call(e.parentElement.children).filter(function (x) { return x !== e; }) : []);
+        kin.forEach(function (d) {
+          if (!S.vis(d) || ownText(d) || d.querySelector('*') && [].slice.call(d.querySelectorAll('*')).some(function (z) { return ownText(z); })) return;
+          var dc = getComputedStyle(d), img = /^(IMG)$/i.test(d.tagName) || /url\(/.test(dc.backgroundImage || ''); if (!img || /(absolute|fixed)/.test(dc.position)) return;   // an absolutely placed badge over art is a design choice; an in-flow image under the text is a collision
+          var q = d.getBoundingClientRect(); if (q.width > 90 || q.height > 90 || dc.position === 'static' && q.width > 60) return;
+          var ox = Math.min(tr.right, q.right) - Math.max(tr.left, q.left), oy = Math.min(tr.bottom, q.bottom) - Math.max(tr.top, q.top);
+          if (ox > 4 && oy > 4 && ox * oy > .3 * Math.min(tr.width * tr.height, q.width * q.height) && dc.pointerEvents !== 'none') add('text over a decorative image: "' + t.slice(0, 20) + '" <' + who(e) + '> overlaps <' + who(d) + '>');
+        });
+      }
+    });
+    var dl = [].slice.call(document.querySelectorAll('.dlg,.gx-drawer,[role=dialog],[aria-modal=true],dialog')).filter(function (d) { return S.vis(d) && !d.closest(SKIPSEL); });
+    dl.forEach(function (d) {   // fault 4: text closer than 8 px to the dialog's inner edge (frame art counts as border)
+      var cs = getComputedStyle(d), r = d.getBoundingClientRect(), L = r.left + parseFloat(cs.borderLeftWidth), R = r.right - parseFloat(cs.borderRightWidth);   // the frame art itself is judged by 'frame art under content'
+      var framed = [].slice.call(d.querySelectorAll('*')).filter(function (e) { var c = getComputedStyle(e); return S.vis(e) && ((c.borderImageSource && c.borderImageSource !== 'none') || (hasBg(c) && /BUTTON/.test(e.tagName))) && e.getBoundingClientRect().width > 60; });
+      if (framed.length) { var fl = Math.min.apply(null, framed.map(function (e) { return e.getBoundingClientRect().left; })), fr2 = Math.max.apply(null, framed.map(function (e) { return e.getBoundingClientRect().right; })); if (fl >= L && fl < L + 40) L = fl; if (fr2 <= R && fr2 > R - 40) R = fr2; }   // the column the framed rows are drawn in is the panel's inner edge: bare text must sit inside it too
+      [].slice.call(d.querySelectorAll('*')).forEach(function (e) {
+        if (!ownText(e) || !S.vis(e) || e.closest('.gx-x,[data-gx-close],.gxc-x') || framed.some(function (f) { return f.contains(e); })) return;
+        var q = textRects(e)[0]; if (!q || q.left < r.left - 1 || q.right > r.right + 1 || q.bottom < r.top || q.top > r.bottom || q.top < 0 || q.bottom > innerHeight || ownText(e).length < 3) return;
+        var dl_ = q.left - L, dr_ = R - q.right;
+        if (dl_ < 8 || dr_ < 8) add('text hugs dialog edge (' + Math.round(Math.min(dl_, dr_)) + ' px < 8): "' + ownText(e).slice(0, 20) + '" <' + who(e) + '> in <' + who(d) + '>');
+      });
+    });
+    return out;
+  };
+  function modalLayer(t, under) {   // a covering element inside a full-screen layer (scrim, drawer, dialog, other screen) is a screen on top, not a fault of the screen below
+    for (var x = t; x && x !== document.body && x !== document.documentElement; x = x.parentElement) { var cs = getComputedStyle(x); if (!x.contains(under) && /(fixed|absolute)/.test(cs.position)) { var r = x.getBoundingClientRect(); if (r.width * r.height > .55 * innerWidth * innerHeight) return true; } }
+    return false;
+  }
+  function paints(t) {   // does this element draw anything a person can see?
+    if (/^(IMG|SVG|CANVAS|VIDEO|BUTTON|INPUT)$/i.test(t.tagName)) return true;
+    var cs = getComputedStyle(t); return !!(hasBg(cs) || (cs.borderImageSource && cs.borderImageSource !== 'none') || ownText(t));
+  }
+  function coverOf(e) {   // the visible element lying over the text at its left end, centre or right end ("Shady Cloa" cut by the next card), or null. elementFromPoint skips pointer-events:none overlays.
+    var tr = firstLine(e); if (!tr || tr.width < 2 || tr.left < 0 || tr.right > innerWidth || tr.top < 0 || tr.bottom > innerHeight || scrolledOut(e, tr)) return null;
+    var xs = [tr.left + Math.min(3, tr.width / 4), tr.left + tr.width / 2, tr.right - Math.min(3, tr.width / 4)], y = tr.top + tr.height / 2;
+    var sc = null; for (var a = e.parentElement; a && a !== document.body; a = a.parentElement) { var ac = getComputedStyle(a); if (/(auto|scroll)/.test(ac.overflowY) && a.scrollHeight > a.clientHeight + 4) { sc = a; break; } }   // text scrolled under the panel's sticky head is how scrolling works, not a fault
+    for (var i = 0; i < 3; i++) { var top = document.elementFromPoint(xs[i], y); if (top && sc && !sc.contains(top)) { var pin = false; for (var z = top; z && z !== document.body; z = z.parentElement) if (/(sticky|fixed|absolute)/.test(getComputedStyle(z).position) && !z.contains(e)) pin = true; if (pin && sc.parentElement && sc.parentElement.contains(top)) continue; } if (top && sc && sc.contains(top) && !top.contains(e)) { var pin2 = false; for (var z2 = top; z2 && z2 !== sc; z2 = z2.parentElement) if (/(sticky|fixed)/.test(getComputedStyle(z2).position)) pin2 = true; if (pin2) continue; } if (top && !related(top, e) && !/^(HTML|BODY)$/.test(top.tagName) && S.vis(top) && !modalLayer(top, e) && paints(top) && !top.closest(SKIPSEL)) return top; }
+    return null;
+  }
+  /* ---- board surface: the play screen as it is right after the game starts, tips on. A game opens it with  GXS.boardOpen = function () {...}  (scn.js); else the title's Start button is tapped. ---- */
+  var INSTR = /\b(tap|drag|drop|swipe|press|click|choose|pick|select|glowing)\b|^\s*(kick|play|gear|roll|draw|hold|flip|place|move|use|watch|wait|take|collect|buy|your turn|it.s your|now)\b/i;
+  function clipBoxes(e) {   // clip regions of e: the screen, then every ancestor (and e) that hides overflow
+    var out = [{ n: 'the screen edge', l: 0, t: 0, r: innerWidth, b: innerHeight }];
+    for (var x = e; x && x !== document.body && x !== document.documentElement; x = x.parentElement) { var cs = getComputedStyle(x); if (/(hidden|clip)/.test(cs.overflowX + cs.overflowY)) { if (x === e && /ellipsis/.test(cs.textOverflow)) continue; var r = x.getBoundingClientRect(); out.push({ n: 'overflow:hidden <' + who(x) + '>', l: r.left + parseFloat(cs.borderLeftWidth), t: r.top + parseFloat(cs.borderTopWidth), r: r.right - parseFloat(cs.borderRightWidth), b: r.bottom - parseFloat(cs.borderBottomWidth), self: x === e }); } }
+    return out;
+  }
+  S.boardAudit = function () {
+    var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 60) { seen[m] = 1; out.push(m); } }
+    var els = [].slice.call(document.querySelectorAll('body *')).filter(function (e) { return !/^(SCRIPT|STYLE|NOSCRIPT|OPTION|SVG|PATH)$/i.test(e.tagName) && !e.closest(SKIPSEL) && S.vis(e); }), lines = [];
+    els.forEach(function (e) {
+      var t = ownText(e), cs0 = t ? null : getComputedStyle(e);
+      if (!t && cs0 && hasBg(cs0) && (e.textContent || '').trim() && e.getBoundingClientRect().width <= 120 && e.getBoundingClientRect().height <= 120) {   // a badge: a painted box that holds text in child elements
+        var bq = e.getBoundingClientRect(); clipBoxes(e).forEach(function (c) { if (c.self) return; var inter = bq.right > c.l && bq.left < c.r && bq.bottom > c.t && bq.top < c.b, over = Math.max(c.l - bq.left, bq.right - c.r, c.t - bq.top, bq.bottom - c.b); if (inter && over > 2 && over < Math.max(bq.width, bq.height) - 1) add('cut by ' + c.n + ' (' + Math.round(over) + ' px): badge "' + e.textContent.trim().slice(0, 14) + '" <' + who(e) + '>'); });
+      }
+      if (!t) return;
+      var rs = textRects(e), cs = getComputedStyle(e), tt = t.slice(0, 22); if (!rs.length || parseFloat(cs.fontSize) < 1) return;
+      var tc = coverOf(e); if (tc) add('text not topmost: "' + tt + '" <' + who(e) + '> is under <' + who(tc) + '>');
+      var boxes = rs.map(function (q) { return { l: q.left, t: q.top, r: q.right, b: q.bottom, what: 'text' }; });
+      if (hasBg(cs) || (cs.borderImageSource && cs.borderImageSource !== 'none')) { var br = e.getBoundingClientRect(); boxes.push({ l: br.left, t: br.top, r: br.right, b: br.bottom, what: 'box' }); }
+      boxes.forEach(function (bx) {
+        clipBoxes(e).forEach(function (c) {
+          if (c.self && bx.what === 'box') return;
+          var inter = bx.r > c.l && bx.l < c.r && bx.b > c.t && bx.t < c.b, over = Math.max(c.l - bx.l, bx.r - c.r, c.t - bx.t, bx.b - c.b);
+          if (inter && over > 2 && over < Math.max(bx.r - bx.l, bx.b - bx.t) - 1) add('cut by ' + c.n + ' (' + Math.round(over) + ' px): ' + bx.what + ' "' + tt + '" <' + who(e) + '>');
+        });
+      });
+      if (!e.closest('button,[role=button],.btn,.card,[class*=card]') && t.split(/\s+/).length >= 3 && INSTR.test(t)) lines.push({ t: t, e: e });
+    });
+    var uniq = lines.filter(function (l, i) { return !lines.some(function (m, j) { return j !== i && (m.e.contains(l.e) && m.e !== l.e || j < i && m.e.parentElement === l.e.parentElement); }); });   // nested or sibling pieces of one box (title + text of one tip) count once
+    if (uniq.length > 1) add('instruction lines: ' + uniq.length + ' at once (board-first rule: 1): ' + uniq.slice(0, 4).map(function (l) { return '"' + l.t.slice(0, 40) + '" <' + who(l.e) + '>'; }).join(' / '));
+    return out;
+  };
+  function boardStart() {   // fallback opener: tap the title's Start / Play button
+    var b = [].slice.call(document.querySelectorAll('button,[role=button]')).filter(function (x) { return S.vis(x) && /^\s*(start|play|new game|begin|let.?s play|deal)\b/i.test(x.textContent) && x.getBoundingClientRect().top < innerHeight; }).sort(function (a, c) { return /primary/.test(c.className) - /primary/.test(a.className); })[0];
+    if (b) b.click(); return !!b;
   }
   function menuScrollers() { return [].slice.call(document.querySelectorAll('body *')).filter(function (e) { var cs = getComputedStyle(e); return /(auto|scroll)/.test(cs.overflowY) && e.scrollHeight > e.clientHeight + 24 && e.clientHeight > 60 && S.vis(e); }); }
   S.menuAuditAll = function () {   // async: the screen as shown, then every scrollable panel scrolled page by page (content below the fold), then back to the top
@@ -1655,16 +1790,24 @@ const MONS=[
     var l = [{ name: 'title', open: function () { menuClose(); }, close: function () { } }];
     menuTop().forEach(function (b, i) { var nm = 'panel ' + (b.id || b.getAttribute('aria-label') || (b.dataset && b.dataset.gx) || b.className.toString().split(' ').pop() || i); l.push({ name: nm, open: function () { b.click(); }, close: menuClose }); });
     if (window.GXC && GXC.open) l.push({ name: 'campaign', open: function () { GXC.open(); }, close: function () { try { GXC.close(); } catch (e) { } menuClose(); } });
-    return l.concat(S.menuSurfaces);
+    l = l.concat(S.menuSurfaces);
+    l.push({ name: 'board', board: true, open: function () { try { if (window.GXC && GXC.close) GXC.close(); } catch (e) { } if (S.boardOpen) S.boardOpen(); else boardStart(); }, close: function () { } });   // last: it starts the game
+    return l;
   };
-  S.menuOpen = function (i) { var l = S.menuList(), cur = S._menuCur; if (cur) try { cur.close(); } catch (e) { } menuClose(); S._menuCur = l[i]; if (!l[i]) return null; try { l[i].open(); } catch (e) { return 'open threw ' + e.message; } return l[i].name; };
-  S.menuTopmost = false;   // text-not-topmost check: set GXS.menuTopmost = true to try it; unvalidated (flags ~every title screen, see HANDOFF Fast gate v2)
+  S.menuOpenSf = function (sf) { var cur = S._menuCur; if (cur) try { cur.close(); } catch (e) { } menuClose(); S._menuCur = sf; if (!sf) return null; try { sf.open(); } catch (e) { return 'open threw ' + e.message; } return sf.name; };   // by object: the list is rebuilt from the live page on every call and shifts as panels open
+  S.menuOpen = function (i) { return S.menuOpenSf(S.menuList()[i]); };
+  S.menuTopmost = true;   // text-not-topmost check ON (14 Oct 2026): 3 sample points, ignores pointer-events:none, transparent wrappers and screens layered on top (scrim / drawer)
   S.menuReport = {};
   function menuPass() {   // async: walk every surface once, record problems, end on the title
     var l = S.menuList(), chain = Promise.resolve(), seenMsg = {};
     try { document.fonts.forEach(function (f) { f.load(); }); } catch (e) { }   // every declared face must be fetchable: wait for them all before judging
     chain = chain.then(function () { return document.fonts && document.fonts.ready; }).catch(function () { });
-    l.forEach(function (sf, i) { chain = chain.then(function () { var nm = S.menuOpen(i); return new Promise(function (r) { setTimeout(r, 700); }).then(function () { return S.menuAuditAll().then(function (ms) { S.menuReport[sf.name] = ms.filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); }); }); }); });
+    function boardExtras() {   // panels that only exist on the board (the in-game menu with its Tips rows): open each top-bar button the title did not have
+      var have = {}; l.forEach(function (x) { have[x.name] = 1; }); var extra = menuTop().map(function (b) { return { name: 'board ' + (b.id || b.getAttribute('aria-label') || b.className.toString().split(' ').pop()), b: b }; }).filter(function (x) { return !have['panel ' + x.name.slice(6)] && !have[x.name]; }), c2 = Promise.resolve();
+      extra.slice(0, 5).forEach(function (x) { c2 = c2.then(function () { menuClose(); x.b.click(); return new Promise(function (r) { setTimeout(r, 800); }); }).then(function () { return S.menuAuditAll(); }).then(function (ms) { S.menuReport[x.name] = ms.filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); menuClose(); }); });
+      return c2;
+    }
+    l.forEach(function (sf, i) { if (sf.board) chain = chain.then(function () { S.menuOpenSf(sf); return new Promise(function (r) { setTimeout(r, 2500); }); }).then(function () { S.menuReport.board = S.menuLook().concat(S.boardAudit()).filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); return boardExtras(); }); else chain = chain.then(function () { var nm = S.menuOpenSf(sf); return new Promise(function (r) { setTimeout(r, 700); }).then(function () { return S.menuAuditAll().then(function (ms) { S.menuReport[sf.name] = ms.filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); }); }); }); });
     return chain.then(function () { S.menuOpen(0); S.menuN = l.length; return new Promise(function (r) { setTimeout(r, 400); }); });
   }
   function menuCheck(rx, name) { return { kind: 'fn', name: name, fn: function () { var bad = []; Object.keys(S.menuReport).forEach(function (k) { S.menuReport[k].filter(function (m) { return rx.test(m); }).forEach(function (m) { bad.push('[' + k + '] ' + m); }); }); return bad.length ? 'N=' + bad.length + ' ' + bad.slice(0, 14).join(' | ') : true; } }; }
@@ -1678,7 +1821,12 @@ const MONS=[
       menuCheck(/^font "/, 'every font a loaded shelf face'),
       menuCheck(/^text not topmost/, 'no text covered at its centre'),
       menuCheck(/^text under/, 'text at least ' + MENU_MIN + ' px'),
-      menuCheck(/^button covered/, 'no covered button')
+      menuCheck(/^button covered/, 'no covered button'),
+      menuCheck(/^frame art under content/, 'no text or icon under painted frame art'),
+      menuCheck(/^text over a decorative image/, 'no text over a decorative image'),
+      menuCheck(/^text hugs dialog edge/, 'text at least 8 px inside every dialog'),
+      menuCheck(/^cut by/, 'no box or text cut by the screen edge or an overflow:hidden parent'),
+      menuCheck(/^instruction lines/, 'at most one instruction line on the board')
     ]
   });
 
@@ -1781,7 +1929,7 @@ const MONS=[
       var fsz = parseFloat(cs.fontSize);   // 0 px = the text is replaced by a painted icon on purpose
       if (fsz >= 1 && fsz < 11) add('text under 11px: "' + t + '" (' + Math.round(fsz * 10) / 10 + 'px) <' + who(e) + '>');
       var tr = textRect(e); if (tr.width < 2) return;
-      for (var p = e; p && p !== document.body; p = p.parentElement) { var o = getComputedStyle(p); if (o.overflowX === 'visible' && o.overflowY === 'visible') continue; if (/(auto|scroll)/.test(o.overflowX + o.overflowY)) break; var pr = p.getBoundingClientRect(); if (pr.width > 0 && (tr.left < pr.left - 2 || tr.right > pr.right + 2 || tr.top < pr.top - 2 || tr.bottom > pr.bottom + 2)) { add('text clipped: "' + t + '" <' + who(e) + ' in ' + who(p) + ' ' + Math.round(tr.left - pr.left) + ',' + Math.round(tr.top - pr.top) + ',' + Math.round(pr.right - tr.right) + ',' + Math.round(pr.bottom - tr.bottom) + '>'); break; } }
+      for (var p = e; p && p !== document.body; p = p.parentElement) { var o = getComputedStyle(p); if (o.overflowX === 'visible' && o.overflowY === 'visible') continue; if (/(auto|scroll)/.test(o.overflowX + o.overflowY)) { var sr = p.getBoundingClientRect(), ct = Math.max(tr.top, sr.top), cb = Math.min(tr.bottom, sr.bottom); if (cb - ct < 2) return; tr = { left: tr.left, right: tr.right, width: tr.width, top: ct, bottom: cb, height: cb - ct }; break; } var pr = p.getBoundingClientRect(); if (pr.width > 0 && (tr.left < pr.left - 2 || tr.right > pr.right + 2 || tr.top < pr.top - 2 || tr.bottom > pr.bottom + 2)) { add('text clipped: "' + t + '" <' + who(e) + ' in ' + who(p) + ' ' + Math.round(tr.left - pr.left) + ',' + Math.round(tr.top - pr.top) + ',' + Math.round(pr.right - tr.right) + ',' + Math.round(pr.bottom - tr.bottom) + '>'); break; } }
       var top = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, tr.left + tr.width / 2)), Math.max(1, Math.min(innerHeight - 1, tr.top + tr.height / 2)));
       if (top && related(top, e)) rects.push({ t: t, r: tr, e: e });
     });
@@ -1855,6 +2003,8 @@ const MONS=[
       return new Promise(function (r) { setTimeout(r, 700); });
     });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; try { BF.tut = {}; localStorage.removeItem('ccs_bf1'); } catch (e) { } return table(51).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); return new Promise(function (r) { setTimeout(r, 500); }); }); };
   // the same, then SMASH through the real engine and wait for the buying phase with plenty of energy
   function marketTable(seed) {
     return table(seed).then(function () {
@@ -2158,8 +2308,23 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
+    return out;
+  }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
     return out;
   }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
@@ -2167,9 +2332,9 @@ const GX={key:'gx',open:null,
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -2177,6 +2342,17 @@ const GX={key:'gx',open:null,
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -2189,6 +2365,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
@@ -4872,7 +5049,7 @@ function faceSVG(f){const s=`stroke="${INK}" stroke-width="5" stroke-linejoin="r
   if(f==='FW')return `<svg viewBox="0 0 60 60"><path d="M6 24 Q16 14 26 24 T46 24 T56 24 M6 38 Q16 28 26 38 T46 38 T56 38" fill="none" stroke="#3a86ff" stroke-width="6" stroke-linecap="round"/></svg>`;
   if(f==='FS')return `<svg viewBox="0 0 60 60"><path d="M12 48 C4 38 22 34 30 38 C40 42 54 36 46 26 C40 18 24 26 22 16 C20 8 34 6 40 10" fill="none" stroke="#1a1320" stroke-width="9" stroke-linecap="round"/><path d="M12 48 C4 38 22 34 30 38 C40 42 54 36 46 26 C40 18 24 26 22 16 C20 8 34 6 40 10" fill="none" stroke="#7ee04c" stroke-width="5" stroke-linecap="round"/><circle cx="40" cy="10" r="3" fill="#e63946"/></svg>`;
   if(f==='FA')return `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="16" rx="9" ry="11" fill="none" stroke="#f4a300" stroke-width="7"/><path d="M30 26 V56 M14 30 H46" stroke="#f4a300" stroke-width="8" stroke-linecap="round"/><ellipse cx="30" cy="16" rx="9" ry="11" fill="none" stroke="${INK}" stroke-width="2"/></svg>`;
-  if('123'.includes(f))return `<svg viewBox="0 0 60 60"><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="${INK}">${f}</text><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="#ffd23f" transform="translate(-2,-2)">${f}</text><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="none" stroke="${INK}" stroke-width="2" transform="translate(-2,-2)">${f}</text></svg>`;
+  if('123'.includes(f))return `<svg viewBox="0 0 60 60"><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="#ffd23f" stroke="${INK}" stroke-width="2" transform="translate(-2,-2)" style="filter:drop-shadow(2px 2px 0 ${INK})">${f}</text></svg>`;
   if(f==='E')return `<svg viewBox="0 0 60 60"><path d="M36 4 L14 34 H28 L22 56 L48 22 H33 Z" fill="${INK}" transform="translate(2,2)"/><path d="M34 4 L12 34 H27 L22 56 L48 22 H32 Z" fill="#2ec27e" ${s}/><path d="M30 10 L20 26" stroke="#b9ffd8" stroke-width="3" stroke-linecap="round"/></svg>`;
   if(f==='H')return `<svg viewBox="0 0 60 60"><path d="M30 52 C8 36 4 24 10 15 C16 6 27 8 30 17 C33 8 44 6 50 15 C56 24 52 36 30 52 Z" fill="#e63946" ${s}/><path d="M15 18 C17 13 22 12 25 15" fill="none" stroke="#ffc2c7" stroke-width="3.5" stroke-linecap="round"/></svg>`;
   return `<svg viewBox="0 0 60 60"><g fill="none" ${s} stroke-width="7"><path d="M14 10 C22 22 22 38 12 52"/><path d="M29 6 C37 20 37 38 28 54"/><path d="M44 10 C52 22 52 38 42 52"/></g><g fill="none" stroke="#e63946" stroke-width="2.5" stroke-linecap="round"><path d="M14 10 C22 22 22 38 12 52"/><path d="M29 6 C37 20 37 38 28 54"/><path d="M44 10 C52 22 52 38 42 52"/></g></svg>`}
@@ -7637,7 +7814,7 @@ function hlpSuggest(){
     return {target:()=>HLP_Q('#pacts [data-act="end"]'),why:p.en<3?'Nothing to buy yet. Save your ⚡.':'Nothing here is worth it. Save your ⚡.'}}
   return null}
 {
-  GXH.init({game:'crown-city-smash',defaultOn:true,steps:HLP_STEPS,rules:HLP_ALL,avoid:'.sugg,.rec,#pacts .btn,#choice .btn.primary,#pshop .ptile,#dice .die,.pchip,.gx-bar button'});
+  GXH.init({game:'crown-city-smash',avoidPad:18,defaultOn:true,steps:HLP_STEPS,rules:HLP_ALL,avoid:'.gx-board svg text,.sugg,.rec,#pacts .btn,#choice .btn.primary,#pshop .ptile,#dice .die,.pchip,.gx-bar button'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   /* the dock scrolls (short desktop frames): a coach bubble is fixed to the screen, so lay it out again after any scroll, or it ends up on top of Reroll / Resolve */
   {let _t=0;document.addEventListener('scroll',()=>{clearTimeout(_t);_t=setTimeout(()=>{try{GXH.relayout()}catch(e){}},50)},true)}

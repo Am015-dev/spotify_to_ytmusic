@@ -25,3 +25,5 @@ html.sk-row .gx-row{position:relative;isolation:isolate}
 html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 html.sk-nametag .otag.ship.me{font-size:12px}
 html.sk-frame #ov{z-index:6}
+html.sk .gx-bar .gx-ibtn,html.sk .gx-dock .gx-ibtn{border-image-width:4px}
+.gx-drawer details:not([open])>*:not(summary){display:none}

@@ -19,7 +19,7 @@ html.sk header.gx-bar h1{-webkit-text-stroke:0;text-shadow:0 2px 3px rgba(0,0,0,
 html.sk #modal .dlg:not(.paper){background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
 html.sk #modal .dlg.paper{box-shadow:0 14px 26px rgba(0,0,0,.55)}
 html.sk #modal .dlg h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.6)}
-html.sk .cc-hero{margin:-6px -14px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+html.sk .cc-hero{margin:-6px -12px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
 html.sk .cc-endart{margin:-6px -14px 6px}
 html.sk .dlg.start details.custom{border:2px dashed rgba(243,233,255,.45);background:rgba(20,8,48,.35)}
 html.sk .gx-dock{background:none}
@@ -112,3 +112,8 @@ html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
 html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
 html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
 html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* menu test v2: text starts inside the painted frames (border-width + padding >= border-image-width on every side) */
+html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;padding:.6rem 12px}
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 4px}
+html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
+html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
