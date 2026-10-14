@@ -501,9 +501,10 @@ Object.assign(BX_DEMOS,{
  // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
  'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','wbl','st','st','st','wbl','wbr',0,...bxRep('st',21),'mg',
   'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',5),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',6),'wbr','su',...bxRep('st',13),'wbr'])},
- // islands: the canyon snail at sea level; the SPLIT's straight lane splashes down into the lagoon (boat) and up the far ramp, the other lane is the long way round
- 'LAGOON SPLASH':{log:bxCh('islands',[13,2,6,3],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','wbl','st','st','st','wbl','wbr',0,'dn',[37,21,0,0],'up',...bxRep('st',6),'mg',
-  'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',5),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',6),'wbr','su',...bxRep('st',13),'wbr'])}});
+ // islands (trk-2: its own layout on the 56-cell grid): a figure-8 over the sea. Loop A turns right, loop B left; the north run climbs over
+ // the start straight on a 12 m bridge. On loop A's south side a SPLIT: the straight lane splashes into the sea (boat) and up a ramp, the
+ // other lane is a banked detour round the inside; they MERGE again. Laid out with tools/bx/plan.js (closed, 0 overlaps, in bounds)
+ 'LAGOON SPLASH':{log:bxCh('islands',[25,24,2,3],['sf','st','bo',...bxRep('st',5),'kj',...bxRep('st',7),'cp',...bxRep('st',7),'wbr',...bxRep('st',5),'kj',...bxRep('st',13),'wbr','st','fk',1,'br',...bxRep('st',3),'bl',...bxRep('st',2),'bl',...bxRep('st',3),'br',0,'dn',[38,53,0,1],'up',...bxRep('st',2),'mg',...bxRep('st',2),'wbr',...bxRep('st',16),'su',...bxRep('st',5),'sd',...bxRep('st',8),'wbl',...bxRep('st',4),'kj',...bxRep('st',9),'wbl',...bxRep('st',3),'bo',...bxRep('st',9),'wbl',...bxRep('st',10),'kj',...bxRep('st',7)],0)}});
 // "drivable and fun" pass lines (coordinator 2026-10-13, after Alex: "horrible! not fun, not easy to drive, the car moves backward"):
 // 0 backward start, <=1 respawn per lap, <=2 wall hits/min, average speed >=60 % of top, a 0.6-1.5 s jump with a clean landing, lap 45-90 s, no grade >25 %
 function BX_grade(){let g=0,at='';for(const p of BX.pcs){if(p.dead||p.def.jump)continue;for(const S of p.S)for(let k=1;k<S.length;k++){const a=S[k-1].p,b=S[k].p,h=Math.hypot(b.x-a.x,b.z-a.z);if(h>.05){const q=Math.abs(b.y-a.y)/h;if(q>g){g=q;at=p.type}}}}return{g,at}}
