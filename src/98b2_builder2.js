@@ -474,7 +474,7 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
-const BX_DEMOS_SHOW=false,BX_RACE_LAPS=2; // trk-2: HIDDEN until fixed (Alex beta.22: car drives backwards, no race rules). trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)
+const BX_DEMOS_SHOW=true,BX_RACE_LAPS=2; // trk-2: shown again after the beta.22 fixes (ride facing, rail slide, race mode; matrix 96/96). trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)
 function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
  b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 2 laps</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
  b.onclick=e=>{e.stopPropagation();BX_raceStart(k)};tw.appendChild(b)}} // trk-2: a Race-menu track starts a RACE (countdown, rivals, position, results)
