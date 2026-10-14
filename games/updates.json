@@ -1,6 +1,15 @@
 [
  {
   "date": "2026-10-14",
+  "game": "tidewake",
+  "title": "tidewake: readable on every screen size",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "readable on every screen size",
   "items": [
@@ -145,15 +154,6 @@
   "ask": [
    null
   ]
- },
- {
-  "date": "2026-10-14",
-  "game": "tidewake",
-  "title": "Menus tidied: button frames, title text, rules, icon buttons, one start line",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
  },
  {
   "date": "2026-10-14",

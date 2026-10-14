@@ -383,5 +383,19 @@ html.ph .omark b{width:26px;height:26px;font-size:.85rem;border-width:2px}
 html.ph .gx-drawer{top:auto}
 body:has(.gx-drawer.on) .gxh-bub,body:has(.gx-drawer.open) .gxh-bub{display:none}
 @media (prefers-reduced-motion:reduce){html.ph .ppop.in,html.ph .pcard.in{animation:none}}
+/* ui-bar: readable sizes, panels stay inside the dock column */
+.otag,.opip,.opip b,.opip u,.omark span,.ostop span,.otag.ship,.otag.ship.me{font-size:max(13px,.72rem)}
+.otag.mon.hi{font-size:max(13px,.82rem)}
+.prompt .tiny,.prompt summary{opacity:1;color:#2a1c05;font-size:max(13px,.85rem)}
+@media (min-width:1000px){
+  .otag,.opip,.opip b,.opip u,.omark span,.ostop span,.otag.ship,.otag.ship.me,.otag.mon.hi{font-size:16px}
+  .opip{width:36px;height:36px;margin:-18px 0 0 -18px}.opip.best{width:44px;height:44px;margin:-22px 0 0 -22px}
+  .gx-drawer,.gx-drawer.wide{width:calc(var(--gx-dock-w) - 8px)}
+  body:has(.gx-drawer.on) .gx-dock{visibility:hidden}
+}
+.rs{font-size:max(13px,.78rem)}.startpick{font-size:max(13px,.8rem)}.startpick .btn{font-size:max(13px,.85rem)}
+body:has(.gxh-tx) #chip{display:none}
+@media (min-width:1000px){.gx-drawer{transition:none}body:has(.gx-drawer.on) :is(.gxh-bub,.gxh-finger,.gxh-ring,.gxh-arr,.gxh-bulb,.gxh-ar,.gxh-compact){visibility:hidden}}
+html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 </style>
 </head>
