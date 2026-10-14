@@ -48,3 +48,10 @@ html.sk .gxh-a-right .gxh-arr{right:-17px;transform:rotate(0deg)}
 html.sk .gx-drawer{background-color:#f4ecd8}
 html.sk .gxh-set button.btn[aria-pressed=true],html.sk .btn.on{background-color:#3b2a7a}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:100px;position:relative;z-index:0}.gxh-bub .gxh-ok{position:relative;z-index:1}}
+/* UI-BAR 6: side panels fit their content; 16px text on wide screens */
+#logd,#rivald{bottom:auto;max-height:calc(100dvh - var(--gx-bar-h) - 24px)}
+#logd .gx-drawer-body,#rivald .gx-drawer-body{flex:0 1 auto}
+@media (min-width:1024px){.logl .ll,.lt,#rivald .btn,#rivald .chipb,#rivald button,#rulesd p,#rulesd li,#start .tbtn span,#start .tbtn b,#rivald *{font-size:16px}}
+@media (min-width:1024px){#setd .lbl,#setd small,.gx-dt,.gx-dock *{font-size:16px}}
+@media (min-width:1024px){.gx-drawer *:not(svg):not(svg *),.gx-dock *:not(svg):not(svg *){font-size:max(1em,16px)!important}}
+@media (min-width:1024px){.gx-dock{align-self:start;max-height:100%}.gx-dock-body{flex:0 1 auto}}

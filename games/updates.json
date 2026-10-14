@@ -2,11 +2,20 @@
  {
   "date": "2026-10-14",
   "game": "kaiten-kitchen",
-  "title": "kaiten-kitchen: readable on every screen size",
+  "title": "kaiten-kitchen: clean top bar, panels, dock and start screen",
   "items": [
    "Menus use one title font and one body font, no overlaps"
   ],
   "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "sands-of-qamar",
   "title": "Readable on every screen size",
   "items": [
@@ -239,27 +248,6 @@
   ],
   "ask": [
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "sands-of-qamar",
-  "title": "Menus tidied",
-  "items": [
-   "Menu and campaign text now sits inside the painted frames"
-  ],
-  "check": "",
-  "game": "kaiten-kitchen",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
    null
   ]
  },
