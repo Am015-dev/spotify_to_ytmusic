@@ -197,3 +197,4 @@ Live with LAB: all 15 shelf games (Doorkick, Crown, Nebula, Shipwreck, Sands, Su
 - thornbound: fixed + deployed (title/campaign layer covered the top bar; `body.in-start .gx-bar{visibility:hidden}` in head.html).
 - hollowbough: FIXED + deployed 14 Oct (tagline 13 px in head.html; offline SW registration skipped on localhost, it 404ed on the test server).
 - Not done: Mainhattan games skipped as ordered; no per-game skin.css was deleted yet.
+- sands-of-qamar: menu scenario green (ft/src/board.css: sticky .acts made static inside .more). NOT deployed: axe gate 'new vs live' fails on in-game sq-* scenes (the live cache has no sq-* scenarios): `.ab` ghost '↶ Put them back' and `.bump` seat score contrast. Next: get the axe detail for those two and fix, then `build-all.py --deploy sands-of-qamar`.
