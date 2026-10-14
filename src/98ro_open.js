@@ -179,16 +179,21 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
           if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(49.6+OPN_noise(i,sg*29)*2.4));bush.push([v.x,v.y+hy(49.6,H)*.5,v.z,.7+OPN_noise(i,sg*31)*.6])}}
         const lim=OPN.CL[i]===sg?OPN.LIP[i]-3:wat?OPN_I1-1:44;for(let k=0;k<3;k++){const n=OPN_noise(i*3+k,sg*37);if(n<.3)continue;const x=16+OPN_noise(i*3+k,sg*41)*(lim-16);if(x>lim)continue;
           if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:ath&&n<.45?stn:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
+    // asset-2: trees, bushes and cypresses as the city's LEGO tree impostors (src/assets/as: each LEGO build pictured into an atlas, 4 tris each) when the
+    // LEGO assets are loaded; the old cones / icospheres otherwise. Variant per instance from its position, scale from the old size (old tree ≈ 8.5 m × s)
+    const AS=window.__as&&__as.A&&__as.A.V&&__as.impMesh,asV=(L,pool,k)=>L.map(a=>{const h=Math.abs(Math.sin(a[0]*12.9898+a[2]*78.233)*43758.5453)%1,v=pool[Math.floor(h*pool.length)];return{x:a[0],y:a[1],z:a[2],ry:a[3]*6.28,s:k(a,v),v}}),
+      asP=n=>n.filter(v=>__as.A.V[v]&&__as.A.V[v].cell!=null),asAdd=(L,pool,k)=>{const P=asP(pool);if(!AS||!P.length||!L.length)return false;const im=__as.impMesh(asV(L,P,k));im.castShadow=false;im.receiveShadow=false;WORLD.add(im);return true};
+    if(!asAdd(bush,ath?['oleander','bush']:['bush','bushFl'],(a,v)=>1.6*a[3]/__as.A.V[v].H))
     inst(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:ath?0x8a9a48:0x3f9a3c,roughness:.8,flatShading:true}),bush,a=>({x:1.4*a[3],y:1.1*a[3],z:1.4*a[3],dy:.5*a[3]}));
-    inst(new THREE.IcosahedronGeometry(.6,0),new THREE.MeshStandardMaterial({color:ath?0x96a04a:0x3c9a36,roughness:.85,flatShading:true}),tuft,a=>({x:1+a[3]*.8,y:.6+a[3]*.3,z:1+a[3]*.8,dy:.2}));
+    {const T=AS&&__as.A.tuft;inst(T||new THREE.IcosahedronGeometry(.6,0),new THREE.MeshStandardMaterial({color:ath?0x96a04a:0x3c9a36,roughness:.85,flatShading:!T,side:T?THREE.DoubleSide:THREE.FrontSide}),tuft,T?a=>({x:.75+a[3]*.5,y:.75+a[3]*.5,z:.75+a[3]*.5,dy:0}):a=>({x:1+a[3]*.8,y:.6+a[3]*.3,z:1+a[3]*.8,dy:.2}))}// asset-2: LEGO 6255 leaf tuft
     inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xffd21c,roughness:.5,emissive:0x302000}),flo.filter((a,k)=>k%2),()=>({x:1,y:1,z:1,dy:.3}));
     inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xe8231c,roughness:.5,emissive:0x300000}),flo.filter((a,k)=>!(k%2)),()=>({x:1,y:1,z:1,dy:.3}));
     inst(new THREE.IcosahedronGeometry(.8,0),new THREE.MeshStandardMaterial({color:0xcfc6b0,roughness:.9,flatShading:true}),stn,a=>({x:1+a[3],y:.22,z:.8+a[3]*.6,dy:.05}));// flat stones (drive-over, .2 m)
-    if(cyp.length){inst(new THREE.ConeGeometry(1.1,8,7),new THREE.MeshStandardMaterial({color:0x2f5a2a,roughness:.8,flatShading:true}),cyp,a=>({x:a[3],y:a[3],z:a[3],dy:5*a[3]}))}
+    if(cyp.length&&!asAdd(cyp,['cypress'],(a,v)=>8.5*a[3]/__as.A.V[v].H)){inst(new THREE.ConeGeometry(1.1,8,7),new THREE.MeshStandardMaterial({color:0x2f5a2a,roughness:.8,flatShading:true}),cyp,a=>({x:a[3],y:a[3],z:a[3],dy:5*a[3]}))}
     inst(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({color:ath?0xd8ccb0:0x9da3a8,roughness:.8,flatShading:true}),rocks,a=>({x:1.8+a[3],y:1.2+a[3]*.6,z:2.2,dy:.3}));
     inst(new THREE.SphereGeometry(.7,10,8),new THREE.MeshStandardMaterial({color:0xff6a1a,roughness:.4,emissive:0x401000}),buoys,()=>({x:1,y:1,z:1,dy:.3}));
-    const crown=ath?new THREE.IcosahedronGeometry(2.6,1):new THREE.ConeGeometry(3,7,8),tm=new THREE.MeshStandardMaterial({color:ath?0x7a8f3a:0x2f8f3a,roughness:.8,flatShading:true});
-    inst(crown,tm,trees,a=>({x:a[3],y:a[3],z:a[3],dy:(ath?3.6:5)*a[3]}));inst(new THREE.CylinderGeometry(.45,.6,3,6),new THREE.MeshStandardMaterial({color:0x6b4423,roughness:.9}),trees,a=>({x:a[3],y:a[3],z:a[3],dy:1.5*a[3]}))}
+    if(!asAdd(trees,ath?['stonepine','aleppo','olive','almond','plane']:['oak','linden','fir','birch','maple','oakAut'],(a,v)=>8.5*a[3]/__as.A.V[v].H)){const crown=ath?new THREE.IcosahedronGeometry(2.6,1):new THREE.ConeGeometry(3,7,8),tm=new THREE.MeshStandardMaterial({color:ath?0x7a8f3a:0x2f8f3a,roughness:.8,flatShading:true});
+    inst(crown,tm,trees,a=>({x:a[3],y:a[3],z:a[3],dy:(ath?3.6:5)*a[3]}));inst(new THREE.CylinderGeometry(.45,.6,3,6),new THREE.MeshStandardMaterial({color:0x6b4423,roughness:.9}),trees,a=>({x:a[3],y:a[3],z:a[3],dy:1.5*a[3]}))}}
   // far scenery: ground plane, Frankfurt skyline or the Acropolis + the sea
   {let cx=0,cz=0,y0=1e9;for(let i=0;i<N;i++){cx+=td.P[i*3]/N;cz+=td.P[i*3+2]/N;y0=Math.min(y0,td.P[i*3+1])}
     const gp=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),new THREE.MeshStandardMaterial({color:ath?0x2a7fc0:0x4f9a3a,roughness:ath?.2:.95,metalness:ath?.1:0}));gp.rotation.x=-Math.PI/2;gp.position.set(cx,ath?y0-2.4:y0-30,cz);WORLD.add(gp);
