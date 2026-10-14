@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.43',date:'14 Oct 2026',items:[{t:'FIXED',s:'Flat junctions: kerbs stop at every junction, no strips across the asphalt.'},{t:'CHANGED',s:'Sun sits behind the camera so all roads are lit; far trees are LEGO impostors.'},{t:'NEW',s:'More street life; crash damage test; portrait race shows the right position.'}]},
   {v:'v90m-beta.42',date:'14 Oct 2026',items:[{t:'NEW',s:'Real LEGO sets in the world: Frankfurt Ferris wheel, Athens carousel, wind turbines; more street activities and LEGO street furniture.'},{t:'CHANGED',s:'Sun follows the camera so cars are always lit; cars sit on slopes and grass.'},{t:'FIXED',s:'Portrait race HUD, banked pillars, rival grid; crates on car roofs; black facades.'}]},
   {v:'v90m-beta.41',date:'14 Oct 2026',items:[{t:'FIXED',s:'Road kerbs and junctions follow the ground (no sunk or floating pieces).'},{t:'NEW',s:'AIR TIME bubbles float over a real kicker ramp.'},{t:'FIXED',s:'Cars step out cleanly after a hot drop.'}]},
   {v:'v90m-beta.40',date:'14 Oct 2026',items:[{t:'NEW',s:'Athens building facades and storefronts have more variety; fewer props on roads.'}]},
@@ -1527,7 +1528,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"b67c0254","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"8793f64e","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -4509,7 +4510,7 @@ function cityStreetsBuild(bt,M){const sm=new THREE.MeshStandardMaterial({map:M.r
   const rm=CID!=='fra'?new THREE.MeshStandardMaterial({map:athResTex(),roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4}):sm;M.resSt=rm;
   for(const S of CITY_S){const P=S.pts,w=S.r.w,c=S.r.cls,mt=c==='ped'?pm:c==='res'||c==='link'?rm:sm,yy=c==='hill'||S.hs?.07:.045;let a=0;for(let i=1;i<P.length;i++)if(i-a>=100||i===P.length-1){bt.add(abStrip(P,a,i,-w/2,w/2,yy,yy,32),mt);a=i}}
   const jm=new THREE.MeshStandardMaterial({map:M.jn,roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-8});
-  for(const J of JUNC){const g=new THREE.RingGeometry(.01,J.r,24,Math.max(2,Math.ceil(J.r/2)));g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*J.r/8,uv.getY(i)*J.r/8);g.translate(J.x,0,J.z);const ps=g.attributes.position;for(let i=0;i<ps.count;i++)ps.setY(i,groundY(ps.getX(i),ps.getZ(i))+.056);g.computeVertexNormals();bt.add(g,jm)}
+  for(const J of JUNC){const g=new THREE.RingGeometry(.01,J.r,24,Math.max(2,Math.ceil(J.r/2)));g.rotateX(-Math.PI/2);g.translate(J.x,0,J.z);const uv=g.attributes.uv,p0=g.attributes.position;for(let i=0;i<uv.count;i++)uv.setXY(i,p0.getX(i)/8,p0.getZ(i)/8);/* terr-2: world uv like every pad */const ps=g.attributes.position;for(let i=0;i<ps.count;i++)ps.setY(i,TJ_y(ps.getX(i),ps.getZ(i),.056,Math.max(.75,J.r*.13)));g.computeVertexNormals();bt.add(g,jm)}/* terr-2: TJ_y = conformed to the streets under the disc */
   for(const T of TRAILS){const P=T.pts;let a=0;for(let i=1;i<P.length;i++)if(i-a>=100||i===P.length-1){bt.add(abStrip(P,a,i,-T.w/2,T.w/2,.06,.06,12),M.dirt);a=i}}}
 function* taunusBuildG(L){const grp=L.root,bt=L.bt,BM=HUB.BM,M=HUB.M,lzB=b=>hubAddB(b,L.bld),R=TAU_R,NX=4,NZ=3,W2=(R.x1-R.x0)/NX,D=(R.z1-R.z0)/NZ,nx=Math.ceil(W2/20),nz=Math.ceil(D/25),c=new THREE.Color(),lo=new THREE.Color('#d6f0a8'),mid=new THREE.Color('#a8d888'),hi=new THREE.Color('#e8e2cc'),out=new THREE.Color(WGC);const tm=HUB.tauMat;HUB.terr=[];
   for(let sI=0;sI<NX;sI++)for(let sJ=0;sJ<NZ;sJ++){const g=new THREE.PlaneGeometry(W2,D,nx,nz);g.rotateX(-Math.PI/2);g.translate(R.x0+W2*(sI+.5),0,R.z0+D*(sJ+.5));const p=g.attributes.position,uv=g.attributes.uv,col=new Float32Array(p.count*3);
@@ -4564,7 +4565,7 @@ function CE_kerbs(bt){const T0=performance.now(),KM=new THREE.MeshStandardMateri
   const T2=performance.now();let nZ=0;if(CID!=='fra'){const ZM=new THREE.MeshStandardMaterial({color:0xf4f4ee,roughness:.6,metalness:0,polygonOffset:true,polygonOffsetFactor:-6,polygonOffsetUnits:-10,side:THREE.DoubleSide}),pos=[];
     for(const J of AJ){if(!J.r||J.ix.length<3)continue;for(const[si,i]of J.ix){const S=CITY_S[si];if(NO[S.r.cls]||S.r.w<7)continue;const P=S.pts,dirs=[];if(i<P.length-1)dirs.push(P[Math.min(P.length-1,i+1)]);if(i>0)dirs.push(P[i-1]);
       for(const q of dirs){let dx=q.x-J.x,dz=q.z-J.z;const l=Math.hypot(dx,dz);if(l<.5)continue;dx/=l;dz/=l;const nx=dz,nz=-dx,c0=J.r+1.4,hw=S.r.w/2-.7;if(l<c0+3.4&&P.length<3)continue;
-        for(let o=-hw;o<=hw-.5;o+=1.25){const pts=[[o,c0],[o+.62,c0],[o+.62,c0+3.2],[o,c0+3.2]].map(([a,b])=>{const x=J.x+nx*a+dx*b,z=J.z+nz*a+dz*b;return[x,groundY(x,z)+(S.hs?.24:.068),z]});
+        for(let o=-hw;o<=hw-.5;o+=1.25){const pts=[[o,c0],[o+.62,c0],[o+.62,c0+3.2],[o,c0+3.2]].map(([a,b])=>{const x=J.x+nx*a+dx*b,z=J.z+nz*a+dz*b;return[x,TJ.conf&&TJ.cap?TJ_y(x,z,.035,0):groundY(x,z)+(S.hs?.24:.068),z]});/* terr-2: on the road under it (+.24 floated 17 cm with TERR shelves off) */
           const[A,B,C,D]=pts;pos.push(...A,...B,...C,...A,...C,...D)}nZ++}}}
     if(pos.length){for(let s=0;s<pos.length;s+=18*400){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos.slice(s,s+18*400),3));const n=new Float32Array(g.attributes.position.count*3);for(let i=1;i<n.length;i+=3)n[i]=1;g.setAttribute('normal',new THREE.BufferAttribute(n,3));bt.add(g,ZM)}}}
   HUB.CE=Object.assign(HUB.CE||{},{kerbRuns:nRun,kerbSeg:nSeg,zebra:nZ,kerbMs:Math.round(performance.now()-T0),kt:[Math.round(T1-T0),Math.round(T2-T1)]})}
@@ -4946,9 +4947,8 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){hubRoad
   // filler streets (axis-aligned per district): asphalt, crossing squares, kerbs that stop at crossings and at the real streets
   const jm=new THREE.MeshStandardMaterial({map:M.jn,roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2}),kerb=[];
   for(const r of hubRoads()){const{x0,z0,w,L,ux,uz}=r,cx=x0+ux*L/2,cz=z0+uz*L/2,yaw=Math.atan2(ux,uz);const g=new THREE.PlaneGeometry(w,L,...ART8_ps(x0,z0,ux,uz,w,L));g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i),uv.getY(i)*L/32);g.rotateY(yaw);g.translate(cx,0,cz);ART_drape(g,.035);bt.add(g,M.road);
-    for(const sd of[-1,1]){let a=null;const ox=uz*sd*w/2,oz=-ux*sd*w/2;for(let t=0;t<=L;t+=6){const x=x0+ux*t+ox,z=z0+uz*t+oz,q=cityAt(x,z),ok=t<L&&!(r.cross||[]).some(([tc,wc])=>Math.abs(t-tc)<wc/2+3)&&!(q&&q.d<q.road.w/2+1.5);
-      if(ok&&a==null)a=t;else if(!ok&&a!=null){if(t-a>=6)kerb.push([x0+ux*(a+t)/2+ox,z0+uz*(a+t)/2+oz,t-a,yaw]);a=null}}}}
-  for(const X of FILL_X){const g=new THREE.PlaneGeometry(X.wa,X.wb,...ART8_pq(X.x,X.z,X.wa,X.wb));g.rotateX(-Math.PI/2);g.translate(X.x,0,X.z);ART_drape(g,.04);bt.add(g,jm)}
+    for(const sd of[-1,1]){let a=null,pv=false;const ox=uz*sd*w/2,oz=-ux*sd*w/2,OK=t=>t<L&&!(r.cross||[]).some(([tc,wc])=>Math.abs(t-tc)<wc/2+3)&&!TJ_inJunc(x0+ux*t+ox,z0+uz*t+oz,1.5)/* terr-2: true street distance + every junction area */;for(let t=0;t<=L;t+=6){const ok=OK(t);if(ok&&a==null){a=t;if(t>0&&!pv)for(let u=t-5.5;u<t;u+=.5)if(OK(u)){a=u;break}}else if(!ok&&a!=null){let e=t;for(let u=t-.5;u>a;u-=.5){if(OK(u)){e=u;break}e=u}if(e-a>=3)kerb.push([x0+ux*(a+e)/2+ox,z0+uz*(a+e)/2+oz,e-a,yaw]);a=null}pv=ok}}}
+  for(const X of FILL_X){if(TJ.conf){bt.add(TJ_padGeo(X.x,X.z,1,0,0,1,X.wa/2,X.wb/2,.04),jm);continue}/* terr-2: conformed pad */const g=new THREE.PlaneGeometry(X.wa,X.wb,...ART8_pq(X.x,X.z,X.wa,X.wb));g.rotateX(-Math.PI/2);g.translate(X.x,0,X.z);ART_drape(g,.04);bt.add(g,jm)}
   // terr-1: kerbs follow the ground (were one flat box at y .12 over up to 100s of m: buried 3 m deep / cutting across the asphalt on slopes):
   // pieces of ≤ 6 m, each at the ground under its centre and pitched along it
   for(const[x,z,L,yaw]of kerb){const n=Math.max(1,Math.ceil(L/6)),l=L/n,ux=Math.sin(yaw),uz=Math.cos(yaw);for(let k=0;k<n;k++){const o=-L/2+l*(k+.5),cx=x+ux*o,cz=z+uz*o,ya=groundY(cx-ux*l/2,cz-uz*l/2),yb=groundY(cx+ux*l/2,cz+uz*l/2);
@@ -8421,14 +8421,14 @@ function CV_fraVar(){const grp=HUB.grp,BI=new Map();for(const b of HUB.bld)BI.se
     for(const x of[-.335,.335]){const g=new THREE.BoxGeometry(.03,.6,.02);g.rotateZ(x>0?.6:-.6);g.translate(x,.25,s*.5);B.push(colorize(g,new THREE.Color(bm)));const g2=new THREE.BoxGeometry(.02,.6,.03);g2.rotateX(x>0?.6:-.6);g2.translate(s*.5,.25,x);B.push(colorize(g2,new THREE.Color(bm)))}}
   mk(mergeG(B),tb,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}),(e,i,m)=>{_m.compose(Q.set(e[0],.3,e[1]),e[5],V3(e[3]+.12,e[2],e[4]+.12));m.setMatrixAt(i,_m)});CV.cr=cr.length;CV.tb=tb.length}
 // ---------- street types: tree-lined boulevard medians, tiled pedestrian streets, plaza fountains, small parks
-function CV_streets(add,D){const rd=mul(9090),grp=HUB.grp,MP=[],MC=[],TP=[],TU=[],TI=[];let nm=0,nt=0,nf=0,np=0;const has=t=>D[t]?t:'tree',nearJ=(x,z,m)=>JUNC.some(J=>Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m);
+function CV_streets(add,D){const rd=mul(9090),grp=HUB.grp,MP=[],MC=[],TP=[],TU=[],TI=[];let nm=0,nt=0,nf=0,np=0;const has=t=>D[t]?t:'tree',nearJ=(x,z,m)=>JUNC.some(J=>Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)||TJ_nearFx(x,z,m-4)/* terr-2: medians also stop at filler crossings */;
   // dev4: no median slab within 70 m of a motorway-ramp start (the green strip ended in a flat 'plate' right where the ramp's double yellow begins); CV.medP lists the median segment starts for the GO check
   const RS=(typeof AB_AUTO!=='undefined'?AB_AUTO:[]).map(Z=>Z.pts[0]),nearRamp=(x,z)=>RS.some(u=>Math.hypot(u[0]-x,u[1]-z)<70);CV.medP=[];
   const quad=(A,a,b,c,d)=>A.push(...a,...b,...c,...a,...c,...d);
   for(const S of CITY_S){const cl=S.r.cls,P=S.pts,w=S.r.w;if((cl==='arterial'||cl==='ring')&&w>=17&&!S.prof&&S.L>80){for(let i=2;i<P.length-3;i+=2){const p=P[i],o=P[i+2];if(nearJ(p.x,p.z,14)||nearJ(o.x,o.z,14)||nearRamp(p.x,p.z)||nearRamp(o.x,o.z)||onAnyDeck(p.x,p.z)||onAnyDeck(o.x,o.z)||inRiver(p.x,p.z,-2)||(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<40))continue;
       const y1=Math.min(Math.max(groundY(p.x,p.z),p.y||0),groundY(p.x,p.z)+1.2)+.16,y2=Math.min(Math.max(groundY(o.x,o.z),o.y||0),groundY(o.x,o.z)+1.2)+.16,hw=.85,a=[p.x-p.tz*hw,y1,p.z+p.tx*hw],b=[p.x+p.tz*hw,y1,p.z-p.tx*hw],c=[o.x+o.tz*hw,y2,o.z-o.tx*hw],d=[o.x-o.tz*hw,y2,o.z+o.tx*hw];quad(MP,a,b,c,d);for(let k=0;k<6;k++)MC.push(.38,.56,.27);CV.medP.push([p.x,p.z]);
       for(const[e,f]of[[a,d],[c,b]]){quad(MP,[e[0],e[1]-.2,e[2]],e,f,[f[0],f[1]-.2,f[2]]);for(let k=0;k<6;k++)MC.push(.85,.83,.8)}nm++;if(i%4===2){add(has(CID==='fra'?'tree':'CE_cypress'),p.x,p.z,rd()*6.28);nt++}else if(rd()<.5)add(has(CID==='fra'?'planter':'bush'),(p.x+o.x)/2,(p.z+o.z)/2,rd()*6.28)}}
-    if(cl==='ped'&&S.L>20){const hw=w/2-.6;let u=0;for(let i=0;i<P.length-1;i++){const p=P[i],o=P[i+1],y1=Math.min(Math.max(groundY(p.x,p.z),p.y||0),groundY(p.x,p.z)+1.2)+.075,y2=Math.min(Math.max(groundY(o.x,o.z),o.y||0),groundY(o.x,o.z)+1.2)+.075,l=Math.hypot(o.x-p.x,o.z-p.z);
+    if(cl==='ped'&&S.L>20){const hw=w/2-.6;let u=0;for(let i=0;i<P.length-1;i++){const p=P[i],o=P[i+1];if(nearJ(p.x,p.z,0)||nearJ(o.x,o.z,0))continue;/* terr-2: paving stops at the junction asphalt */const y1=Math.min(Math.max(groundY(p.x,p.z),p.y||0),groundY(p.x,p.z)+1.2)+.075,y2=Math.min(Math.max(groundY(o.x,o.z),o.y||0),groundY(o.x,o.z)+1.2)+.075,l=Math.hypot(o.x-p.x,o.z-p.z);
       quad(TP,[p.x-p.tz*hw,y1,p.z+p.tx*hw],[p.x+p.tz*hw,y1,p.z-p.tx*hw],[o.x+o.tz*hw,y2,o.z-o.tx*hw],[o.x-o.tz*hw,y2,o.z+o.tx*hw]);const u2=u+l/4,v=hw/2;TU.push(0,u,v,u,v,u2,0,u,v,u2,0,u2);u=u2}np++}}
   const mesh=(P,mat,C,U)=>{if(!P.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));if(C)g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));if(U)g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));g.computeVertexNormals();const m=new THREE.Mesh(g,mat);m.userData.cv=1;grp.add(m)};
   mesh(MP,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,side:THREE.DoubleSide}),MC);
@@ -14956,6 +14956,8 @@ function LF_liteOk(x,z){if(inRiver(x,z,-3.5))return false;const q=cityAt(x,z);if
 // ---- streamed: the fill is NOT built at boot (Athens boot was +5-7 s). Each 1 km tile of the city box is a LAZY region (60_city_build4 lzReg):
 // lazyStep builds it in ≤1.2 ms slices when you come near (scan, mounds, themes, verge, decor meshes, then lzPropsG = the city's smashable props),
 // 98cl_stream frees it when far (STR_lzFree, wrapped below to drop its mounds and grid entries). Only the tiles around the player exist.
+// art-4 (fra-4): the lite cover (3b) also runs in a LF.rb-wide band OUTSIDE the city box, where terr-1's horizon ridges rise (was bare green). ?lfr=0 = off.
+LF.rb=/[?&]lfr=0\b/.test(location.search)?-20:400;
 LF.keep=.6;LF.lite=!/[?&]lfl=0\b/.test(location.search);// share of open cells that get a theme (Athens has 2.5× the open ground)
 // my grass mounds: OFF once art-1's terrain relief (TR raster) is merged, so ground height has one owner; ?lfm=0 turns them off now
 LF.mounds=!/[?&]lfm=0\b/.test(location.search)&&!(typeof TERR!=='undefined'&&TERR.on);  // terr-1: off whenever the terrain raster (TERR.on) owns the relief
@@ -14964,7 +14966,7 @@ function LF_ctx(){if(LF.cx)return LF.cx;const fra=CID==='fra';const VS=new Map()
  for(const r of hubRoads())for(let d=8;d<r.L-8;d+=LF.vs)put(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w);
  return LF.cx={VS,TREES:fra?['tree','tree2','tree3','tree']:['CE_olive','CE_pine','CE_cypress','CE_olive','tree2'],ROCK:fra?'rock':'CE_rock',
   GRN:fra?['#4fa83a','#3f8f30','#62b848','#2f7a2a']:['#7a9a48','#8aa858','#6b8a3e','#9aae6a'],DIRT:fra?['#a8865a','#d8c08a','#8a6a44']:['#c8a46a','#d8bc84','#b08a5a']}}
-function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Math.floor(HX0/1000)*1000;x<HX1;x+=1000)for(let z=Math.floor(HZS/1000)*1000;z<HZN;z+=1000)
+function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Math.floor((HX0-LF.rb)/1000)*1000;x<HX1+LF.rb;x+=1000)for(let z=Math.floor((HZS-LF.rb)/1000)*1000;z<HZN+LF.rb;z+=1000)
   LF.regs.push(lzReg('lf_'+x+'_'+z,'',[x,x+1000,z,z+1000],{lf:1,build:LF_tileG}))}
 function LF_unreg(L){if(L.lfM&&L.lfM.length){const S=new Set(L.lfM);LF.M=LF.M.filter(m=>!S.has(m));for(const[k,A]of LF.MG){const B=A.filter(m=>!S.has(m));if(B.length)LF.MG.set(k,B);else LF.MG.delete(k)}}
  if(L.lfG)for(const[k,e]of L.lfG){const A=LF.G.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1)}}if(L.lfP)for(const[k,e]of L.lfP){const A=LF.PG.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1);if(!A.length)LF.PG.delete(k)}}L.lfM=[];L.lfG=[];L.lfP=[];if(LF.ms)LF.ms=LF.ms.filter(m=>m.parent&&m.userData.lfR!==L.id)}
@@ -15028,9 +15030,12 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  // 3b · lite ground cover (art-3): open cells with no theme (the 40% LF.keep skips, and far-from-street cells) get grass clumps, a flower tuft ring
  // and a dirt / dark-grass patch, no props (no colliders). Closes the last flat-green spots (fra-2 west field, ath-1 north slope). ?lfl=0 turns it off.
  // 20 m grid with road / river margins of 5 m (themed cells need 7-12 m), so the narrow strips (quay field, road medians) are covered too.
- if(LF.lite){const CG=new Set(cells.map(([x,z])=>Math.floor(x/40)*10000+Math.floor(z/40)));for(let x=X0+10;x<X1;x+=20){for(let z=Z0+10;z<Z1;z+=20){if(x<HX0+20||x>HX1-20||z<HZS+20||z>HZN-20)continue;
-   const jx=x+(LF_h(x,z,81)-.5)*6,jz=z+(LF_h(x,z,82)-.5)*6;if(CG.has(Math.floor(jx/40)*10000+Math.floor(jz/40))&&LF_h(jx,jz,83)<.6)continue;
-   if(roamHit(jx,jz,1.5)||!LF_free(jx,jz,3.5)&&!LF_liteOk(jx,jz)||onAnyDeck(jx,jz)||LF_count(jx,jz,8)>=2)continue;if(fra&&typeof biomeAt==='function'&&(biomeAt(jx,jz)||{}).g==='air')continue;lite.push([jx,jz])}if(slice()){yield;t0=performance.now()}}}
+ if(LF.lite){const CG=new Set(cells.map(([x,z])=>Math.floor(x/40)*10000+Math.floor(z/40)));for(let x=X0+10;x<X1;x+=20){for(let z=Z0+10;z<Z1;z+=20){if(x<HX0-LF.rb||x>HX1+LF.rb||z<HZS-LF.rb||z>HZN+LF.rb)continue;
+   const jx=x+(LF_h(x,z,81)-.5)*6,jz=z+(LF_h(x,z,82)-.5)*6;
+   const tryP=(jx,jz)=>{if(CG.has(Math.floor(jx/40)*10000+Math.floor(jz/40))&&LF_h(jx,jz,83)<.6)return;
+    if(roamHit(jx,jz,1.5)||!LF_free(jx,jz,3.5)&&!LF_liteOk(jx,jz)||onAnyDeck(jx,jz)||LF_count(jx,jz,8)>=2)return;if(fra&&typeof biomeAt==='function'&&(biomeAt(jx,jz)||{}).g==='air')return;lite.push([jx,jz])};tryP(jx,jz);
+   // art-4: the ground within 30 m of a road edge fills most of the driving view, so it gets a second, offset lite point (14 m spacing there)
+   if(LF.rb>0){const q=cityAt(x,z),f=fillAt(x,z),de=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(de<30)tryP(x+10+(LF_h(x,z,84)-.5)*4,z+10+(LF_h(x,z,85)-.5)*4)}}if(slice()){yield;t0=performance.now()}}}
  for(const[x,z]of lite){const u=LF_h(x,z,90),R=s=>(LF_h(x,z,s)-.5);st.lite=(st.lite||0)+1;
   for(let k=0;k<4;k++){const tx=x+R(91+k)*18,tz=z+R(97+k)*18,s=1.2+LF_h(tx,tz,1)*1.5;di('tuft',tx,tz,LF_h(tx,tz,2)*6.28,s,s,s,GRN[(k+Math.floor(u*4))%GRN.length])}
   const s=4+u*5;di('patch',x+R(103)*8,z+R(104)*8,u*6.28,s,1,s*(.6+LF_h(x,z,105)*.5),u<.65?DIRT[Math.floor(u*6)%DIRT.length]:GRN[(Math.floor(u*9)+1)%GRN.length]);
@@ -15184,7 +15189,7 @@ function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;B
   const near=(x,z)=>{const n={},kx=Math.floor(x/100),kz=Math.floor(z/100);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(const o of LG.get((kx+a)*100000+kz+b)||[])if((o.x-x)**2+(o.z-z)**2<1e4)n[o.t]=(n[o.t]||0)+1;return n};
   const box=(x,y,z,ry,sx,sy,sz,c)=>{const k=Math.floor(x/1600)*1000+Math.floor(z/1600);let A=I.get(k);if(!A)I.set(k,A=[]);A.push(x,y,z,ry,sx,sy,sz,typeof c==='string'?hx(c):c)};
   for(const o of BV_list()){if(o.ry==null||!o.w||(o.fr===0))continue;const{x,z,ry,w,d}=o,c=Math.cos(ry),s=Math.sin(ry),L0=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c],D0=d/2,[fx,fz]=L0(0,d/2+2);let L=L0;
-    const q=cityAt(fx,fz);if(!q||q.d>q.road.w/2+16||w<6)continue;const NS=fra&&w>=18?2:1;for(let sl=0;sl<NS;sl++){const ox=(sl-(NS-1)/2)*w/NS,w0=w;{const w=w0/NS,[fx,fz]=L(ox,D0+2);
+    const q=cityAt(fx,fz),f=fillAt(fx,fz);/* art-4: filler-grid streets count too (21 of 30 buildings at the bv1/fra spot faced one and got nothing) */if(!(q&&q.d<=q.road.w/2+16||f&&f.d<=f.r.w/2+16)||w<6)continue;const NS=fra&&w>=18?2:1;for(let sl=0;sl<NS;sl++){const ox=(sl-(NS-1)/2)*w/NS,w0=w;{const w=w0/NS,[fx,fz]=L(ox,D0+2);
     const n=near(fx,fz);let t='none',bs=1e9;T.forEach((k,i)=>{if(k==='mural'&&NS>1)return;const sc=(n[k]||0)/W[i]+BV_h(x+sl,z,40+i)*.8;if(sc<bs){bs=sc;t=k}});if(t==='bill'&&o.h<10)t='mural';if(t==='none')continue;
     const b=BI.get(Math.round(x)+'|'+Math.round(z)),y0=b&&b.trBase!=null?b.trBase:groundY(x,z),P=BV_PAL[BV_sty(x,z)],pc=i=>P[Math.floor(BV_h(x+sl*7,z,50+i)*P.length)%P.length],D=d/2;L=(lx,lz)=>L0(lx+ox,lz);
     const put=(lx,ly,lz,sx,sy,sz,col,dry)=>{const[px,pz]=L(lx,lz);box(px,y0+ly,pz,ry+(dry||0),sx,sy,sz,col)};
@@ -15245,10 +15250,10 @@ function RV14_go(kind,say){
  if(kind==='filo'){const q=rfSnap(2200,-2600,150);roamWarp(q?q[0]:2200,q?q[1]:-2600,q&&q[2]!=null?q[2]:0);camSnap=true;
   setTimeout(()=>{const inCar=!!SC_hit(RO.x,RO.z,RO.y),c=camera.position,inCam=!!roamHit(c.x,c.z,.3,c.y);say('📍 FILOPAPPOU ROAD · car inside a building: '+(inCar?'yes':'no')+' · camera inside a building: '+(inCam?'yes':'no')+ok(!inCar&&!inCam))},1200);return'📍 FILOPAPPOU ROAD · checking…'}
  if(kind==='athfoot'){try{__tq&&__tq.reset&&__tq.reset()}catch(e){}const r=OF_go('car');return r+(/No clear|first/i.test(r)?' ❌ (GO cannot get out at the Athens start, Eleni\'s garage)':' ✅')}
- if(kind==='fest'){let n=0;const go=()=>{const m=RO.marks.find(q=>q.ev&&(q.ev.id==='e_fest'||/Festival/.test(q.ev.name||'')));if(!m){if(++n<8)return setTimeout(go,250);const t=QV_ENC.find(q=>q.id==='e_fest'),q=rfSnap(RO.x+40,RO.z+40,150);if(!t||!q)return say('📍 Festival Delivery marker not on the map ❌');qvEncMark(t,q[0],q[1],q[2]||0,7,1);return go()}RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);
+ if(kind==='fest'){let n=0;const go=()=>{const m=RO.marks.find(q=>q.ev&&(q.ev.id==='e_fest'||/Festival/.test(q.ev.name||'')));if(!m){if(++n<3)return setTimeout(go,250);const t=QV_ENC.find(q=>q.id==='e_fest'),q=rfSnap(RO.x+40,RO.z+40,150);if(!t||!q)return say('📍 Festival Delivery marker not on the map ❌');qvEncMark(t,q[0],q[1],q[2]||0,7,1);return go()}RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);
   setTimeout(()=>{const g=RO.ch&&RO.ch.crates;if(!g||!g.children.length)return say('📍 FESTIVAL DELIVERY START · no crates loaded ❌');const C=new THREE.Box3(),B=new THREE.Box3();g.updateMatrixWorld(true);C.setFromObject(g);
    g.parent.children.forEach(o=>{if(o!==g&&o.visible&&!o.userData.cargo)B.expandByObject(o)});const c=C.getCenter(new THREE.Vector3()),b=B.getCenter(new THREE.Vector3()),dh=Math.hypot(c.x-b.x,c.z-b.z),hl=Math.max(B.max.x-B.min.x,B.max.z-B.min.z)/2,on=dh<hl&&C.min.y>B.max.y-.3;
-   say('📍 FESTIVAL DELIVERY START · '+g.children.length+' crates ride on the car roof (centre '+dh.toFixed(1)+' m from car centre, half-length '+hl.toFixed(1)+'; bottom '+(C.min.y-B.max.y).toFixed(2)+' m vs roof), no brown slab on the road'+ok(on))},3000)};go();
+   say('📍 FESTIVAL DELIVERY START · '+g.children.length+' crates ride on the car roof (centre '+dh.toFixed(1)+' m from car centre, half-length '+hl.toFixed(1)+'; bottom '+(C.min.y-B.max.y).toFixed(2)+' m vs roof), no brown slab on the road'+ok(on))},2200)};go();
   return'📍 FESTIVAL DELIVERY START · checking the crates…'}
  if(kind==='black'){roamWarp(706,564,Math.PI,true);camSnap=true;let dark=0,n=0,em=0;try{for(const k of['com','sub']){const m=KMM[k];if(!m||!m.map||!m.map.image)continue;n++;if(m.emissiveMap&&m.emissiveMap!==m.map)em++;
    const im=m.map.image,c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);const d=x.getImageData(0,0,c.width,c.height).data;
@@ -15511,16 +15516,21 @@ function OPN_build(){const td=TF,N=td.N,o=TRK.ro,ath=TRK.city==='ath',COL=o.col.
           if(OPN_noise(i,sg*23)>.45){v.copy(fr.p).addScaledVector(fr.r,sg*(49.6+OPN_noise(i,sg*29)*2.4));bush.push([v.x,v.y+hy(49.6,H)*.5,v.z,.7+OPN_noise(i,sg*31)*.6])}}
         const lim=OPN.CL[i]===sg?OPN.LIP[i]-3:wat?OPN_I1-1:44;for(let k=0;k<3;k++){const n=OPN_noise(i*3+k,sg*37);if(n<.3)continue;const x=16+OPN_noise(i*3+k,sg*41)*(lim-16);if(x>lim)continue;
           if(Math.abs(x)<OPN_I1+1&&OPN.RT[i]>=0)continue;v.copy(fr.p).addScaledVector(fr.r,sg*x);(n>.88?flo:ath&&n<.45?stn:tuft).push([v.x,v.y,v.z,OPN_noise(i*3+k,sg*43)])}}}
+    // asset-2: trees, bushes and cypresses as the city's LEGO tree impostors (src/assets/as: each LEGO build pictured into an atlas, 4 tris each) when the
+    // LEGO assets are loaded; the old cones / icospheres otherwise. Variant per instance from its position, scale from the old size (old tree ≈ 8.5 m × s)
+    const AS=window.__as&&__as.A&&__as.A.V&&__as.impMesh,asV=(L,pool,k)=>L.map(a=>{const h=Math.abs(Math.sin(a[0]*12.9898+a[2]*78.233)*43758.5453)%1,v=pool[Math.floor(h*pool.length)];return{x:a[0],y:a[1],z:a[2],ry:a[3]*6.28,s:k(a,v),v}}),
+      asP=n=>n.filter(v=>__as.A.V[v]&&__as.A.V[v].cell!=null),asAdd=(L,pool,k)=>{const P=asP(pool);if(!AS||!P.length||!L.length)return false;const im=__as.impMesh(asV(L,P,k));im.castShadow=false;im.receiveShadow=false;WORLD.add(im);return true};
+    if(!asAdd(bush,ath?['oleander','bush']:['bush','bushFl'],(a,v)=>1.6*a[3]/__as.A.V[v].H))
     inst(new THREE.IcosahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:ath?0x8a9a48:0x3f9a3c,roughness:.8,flatShading:true}),bush,a=>({x:1.4*a[3],y:1.1*a[3],z:1.4*a[3],dy:.5*a[3]}));
-    inst(new THREE.IcosahedronGeometry(.6,0),new THREE.MeshStandardMaterial({color:ath?0x96a04a:0x3c9a36,roughness:.85,flatShading:true}),tuft,a=>({x:1+a[3]*.8,y:.6+a[3]*.3,z:1+a[3]*.8,dy:.2}));
+    {const T=AS&&__as.A.tuft;inst(T||new THREE.IcosahedronGeometry(.6,0),new THREE.MeshStandardMaterial({color:ath?0x96a04a:0x3c9a36,roughness:.85,flatShading:!T,side:T?THREE.DoubleSide:THREE.FrontSide}),tuft,T?a=>({x:.75+a[3]*.5,y:.75+a[3]*.5,z:.75+a[3]*.5,dy:0}):a=>({x:1+a[3]*.8,y:.6+a[3]*.3,z:1+a[3]*.8,dy:.2}))}// asset-2: LEGO 6255 leaf tuft
     inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xffd21c,roughness:.5,emissive:0x302000}),flo.filter((a,k)=>k%2),()=>({x:1,y:1,z:1,dy:.3}));
     inst(new THREE.CylinderGeometry(.32,.32,.3,8),new THREE.MeshStandardMaterial({color:0xe8231c,roughness:.5,emissive:0x300000}),flo.filter((a,k)=>!(k%2)),()=>({x:1,y:1,z:1,dy:.3}));
     inst(new THREE.IcosahedronGeometry(.8,0),new THREE.MeshStandardMaterial({color:0xcfc6b0,roughness:.9,flatShading:true}),stn,a=>({x:1+a[3],y:.22,z:.8+a[3]*.6,dy:.05}));// flat stones (drive-over, .2 m)
-    if(cyp.length){inst(new THREE.ConeGeometry(1.1,8,7),new THREE.MeshStandardMaterial({color:0x2f5a2a,roughness:.8,flatShading:true}),cyp,a=>({x:a[3],y:a[3],z:a[3],dy:5*a[3]}))}
+    if(cyp.length&&!asAdd(cyp,['cypress'],(a,v)=>8.5*a[3]/__as.A.V[v].H)){inst(new THREE.ConeGeometry(1.1,8,7),new THREE.MeshStandardMaterial({color:0x2f5a2a,roughness:.8,flatShading:true}),cyp,a=>({x:a[3],y:a[3],z:a[3],dy:5*a[3]}))}
     inst(new THREE.IcosahedronGeometry(1,1),new THREE.MeshStandardMaterial({color:ath?0xd8ccb0:0x9da3a8,roughness:.8,flatShading:true}),rocks,a=>({x:1.8+a[3],y:1.2+a[3]*.6,z:2.2,dy:.3}));
     inst(new THREE.SphereGeometry(.7,10,8),new THREE.MeshStandardMaterial({color:0xff6a1a,roughness:.4,emissive:0x401000}),buoys,()=>({x:1,y:1,z:1,dy:.3}));
-    const crown=ath?new THREE.IcosahedronGeometry(2.6,1):new THREE.ConeGeometry(3,7,8),tm=new THREE.MeshStandardMaterial({color:ath?0x7a8f3a:0x2f8f3a,roughness:.8,flatShading:true});
-    inst(crown,tm,trees,a=>({x:a[3],y:a[3],z:a[3],dy:(ath?3.6:5)*a[3]}));inst(new THREE.CylinderGeometry(.45,.6,3,6),new THREE.MeshStandardMaterial({color:0x6b4423,roughness:.9}),trees,a=>({x:a[3],y:a[3],z:a[3],dy:1.5*a[3]}))}
+    if(!asAdd(trees,ath?['stonepine','aleppo','olive','almond','plane']:['oak','linden','fir','birch','maple','oakAut'],(a,v)=>8.5*a[3]/__as.A.V[v].H)){const crown=ath?new THREE.IcosahedronGeometry(2.6,1):new THREE.ConeGeometry(3,7,8),tm=new THREE.MeshStandardMaterial({color:ath?0x7a8f3a:0x2f8f3a,roughness:.8,flatShading:true});
+    inst(crown,tm,trees,a=>({x:a[3],y:a[3],z:a[3],dy:(ath?3.6:5)*a[3]}));inst(new THREE.CylinderGeometry(.45,.6,3,6),new THREE.MeshStandardMaterial({color:0x6b4423,roughness:.9}),trees,a=>({x:a[3],y:a[3],z:a[3],dy:1.5*a[3]}))}}
   // far scenery: ground plane, Frankfurt skyline or the Acropolis + the sea
   {let cx=0,cz=0,y0=1e9;for(let i=0;i<N;i++){cx+=td.P[i*3]/N;cz+=td.P[i*3+2]/N;y0=Math.min(y0,td.P[i*3+1])}
     const gp=new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),new THREE.MeshStandardMaterial({color:ath?0x2a7fc0:0x4f9a3a,roughness:ath?.2:.95,metalness:ath?.1:0}));gp.rotation.x=-Math.PI/2;gp.position.set(cx,ath?y0-2.4:y0-30,cz);WORLD.add(gp);
@@ -16520,7 +16530,7 @@ function BX_raceUI(){let e=$('#bxRace');if(!e){e=document.createElement('div');e
 // trk-3: continuous progress: search the path near the last match (-40..+150 m); a global nearest point snapped to a crossing/overlapping part of the course (a whole lap off -> wrong position, "6/6")
 function BX_raceProg(){const r=BX.race,V=BX.v,m=BX.m,P=r.R.P,D=r.R.D,n=P.length;let bi=-1,bd=1e9;
  if(r.pi!=null)for(let k=-60;k<=200;k++){const i=((r.pi+k)%n+n)%n;let dd=D[i]-D[r.pi];if(dd<-r.R.L/2)dd+=r.R.L;if(dd>r.R.L/2)dd-=r.R.L;if(dd<-40||dd>150)continue;const d=P[i].distanceToSquared(V.p);if(d<bd){bd=d;bi=i}}
- if(bi<0||bd>30*30){bd=1e9;P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}})}r.pi=bi;let a=r.R.D[bi]-r.s0;if(a<-r.R.L/2)a+=r.R.L;if(a>r.R.L/2&&m.laps===0)a-=r.R.L;return m.laps*r.R.L+a}
+ if(bi<0||bd>30*30){bd=1e9;P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}})}const L=r.R.L,w=x=>x<-L/2?x+L:x>L/2?x-L:x;if(r.prog==null||r.pt!==r.t){/* once per tick: cumulative metres along the course (laps*L+a wrapped at half a lap: -L past 50 %) */r.prog=r.prog==null?w(D[bi]-r.s0):r.prog+w(D[bi]-D[r.pi]);r.pt=r.t}r.pi=bi;return r.prog}
 function BX_raceTick(dt){const r=BX.race;if(!r||BX.mode!=='drive')return;const cd=$('#bxCd');
  if(r.cd>0){r.cd-=dt;const V=BX.v;V.p.copy(r.start);V.v.set(0,0,0);if(cd)cd.textContent=r.cd>0?String(Math.ceil(r.cd)):'GO!';if(r.cd<=0){r.goT=0;BX.m.t=0;BX.m.lap0=0}return}
  if(cd&&cd.textContent){r.goT+=dt;if(r.goT>.8)cd.textContent=''}r.t+=dt;const R=r.R,end=r.s0+BX_RACE_LAPS*R.L;
@@ -16801,6 +16811,120 @@ function TRN_junc(){const L=[];for(const J of (typeof JUNC!=='undefined'?JUNC:[]
     const A=[[m,sx,sz],[sx,sxx,sxz],[sz,sxz,szz]],B=[sy,sxy,szy],det=M=>M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]),D=det(A);if(Math.abs(D)<1e-9)continue;
     const sol=[0,1,2].map(k=>det(A.map((r,i)=>r.map((v,j)=>j===k?B[i]:v)))/D);let e=0;for(const[x,z,y]of P)e=Math.max(e,Math.abs(y-(sol[0]+sol[1]*x+sol[2]*z)));if(e>mx){mx=e;w=[Math.round(x0),Math.round(z0)]}}
   const o={n,max:+mx.toFixed(3),worst:w};TRN.junc=o;return o}
+// ===== terr-2 (Alex b27 shot: kerb/edge strips cutting across the asphalt, junction surfaces at different heights): junction STATE test.
+// Every junction (street discs JUNC, filler crossing squares FILL_X, filler road x real street overlaps): 1 m sample grid, a vertical ray
+// against the real road meshes. Pass: no painted edge band / kerb on top inside a junction, top surface flush with the physics (≤0.05 m),
+// no step between neighbouring samples (≤0.1 m) and no fold (2nd difference of the visible surface over 1 m samples ≤0.1 m).
+// The ground's off-plane residual is reported only: graded hills give smooth 0.1-0.6 m bows over 25-70 m junctions (checked by eye, not a warp).
+const TJ={EB:22/256,mg:.028,off:/[?&]tj=0/.test(location.search)};
+// true distance from (x,z) to the street polyline near cityAt's nearest sample (cityAt.d is to the sample point: coarse on curves)
+function TJ_st(x,z){const q=cityAt(x,z);if(!q)return null;const P=q.S.pts;let d=1e9;for(let i=Math.max(0,q.i-2);i<Math.min(P.length-1,q.i+2);i++){const a=P[i],b=P[i+1],dx=b.x-a.x,dz=b.z-a.z,l2=dx*dx+dz*dz||1,t=clamp(((x-a.x)*dx+(z-a.z)*dz)/l2,0,1);d=Math.min(d,Math.hypot(a.x+dx*t-x,a.z+dz*t-z))}
+  if(P.length===1)d=q.d;return{q,d,road:q.road}}
+function TJ_list(){const L=[];for(const J of JUNC||[])L.push({k:'disc',x:J.x,z:J.z,r:J.r,inA:(x,z)=>Math.hypot(x-J.x,z-J.z)<J.r-.5});
+  if(CID==='fra'){try{hubRoads()}catch(e){}for(const X of FILL_X||[])L.push({k:'sq',x:X.x,z:X.z,r:Math.hypot(X.wa,X.wb)/2,inA:(x,z)=>Math.abs(x-X.x)<X.wa/2-.3&&Math.abs(z-X.z)<X.wb/2-.3});
+    for(const f of FILL_R||[]){let a=null;const end=t=>{const tm=(a+t)/2,cx=f.x0+f.ux*tm,cz=f.z0+f.uz*tm,q=cityAt(cx,cz);if(!q)return;const S=q.S||q.road;
+        L.push({k:'fxs',x:cx,z:cz,r:Math.max(f.w,q.road.w)*1.2,f,inA:(x,z)=>{const dx=x-f.x0,dz=z-f.z0,t2=dx*f.ux+dz*f.uz,lat=Math.abs(dx*f.uz-dz*f.ux);if(t2<0||t2>f.L||lat>f.w/2-.3)return false;const p=TJ_st(x,z);return p&&p.road===q.road&&p.d<p.road.w/2-.3}})};
+      for(let t=0;t<=f.L;t+=2){const x=f.x0+f.ux*t,z=f.z0+f.uz*t,q=TJ_st(x,z),ins=q&&q.d<q.road.w/2;if(ins&&a==null)a=t;else if(!ins&&a!=null){end(t);a=null}}if(a!=null)end(f.L)}}
+  return L}
+// low, non-instanced meshes = road surfaces, pads, kerbs (props are instanced; buildings rise far above)
+// distance culling (hubCullStep) hides far tiles: those count as shown, so every junction is judged at full detail wherever the car is
+// static world only (HUB.grp): not the player car, roam objects, ramps or traffic
+function TJ_meshes(){const M=HUB.M,R=[],CS=new Set((HUB.cull||[]).map(e=>e.o));scene.updateMatrixWorld();HUB.grp.traverse(m=>{if(RO.grp&&(m===RO.grp||m.parent===RO.grp))return;if(!m.isMesh||m.isInstancedMesh||!m.geometry)return;let o=m,vis=true;for(let a=m;a;a=a.parent)if(a===RO.grp)return;while(o){if(!o.visible&&!CS.has(o))vis=false;o=o.parent}if(!vis)return;
+  const a=m.geometry.attributes.position;if(!a||!a.array||a.array.length<9)return;const mt=Array.isArray(m.material)?m.material[0]:m.material;if(!mt||mt.transparent&&mt.opacity<.5)return;
+  if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();const b=m.geometry.boundingBox.clone().applyMatrix4(m.matrixWorld);
+  if(m.userData.ramp||m.userData.wbLod||m.parent&&m.parent.userData.ramp)return;const kind=mt===M.road||mt===M.street||mt===M.resSt?'asph':mt.map&&mt.map===M.jn?'pad':TJ_ped(mt)?'ped':'other';R.push({m,b,kind,pf:mt.polygonOffset?mt.polygonOffsetFactor:0})});return R}
+// one pass over every triangle of the low meshes: keep up-facing ones in 8 m cells that junctions cover
+function TJ_tris(MS,L){const C=new Map(),key=(i,j)=>i*100000+j;for(const J of L)for(let i=Math.floor((J.x-J.r)/8);i<=Math.floor((J.x+J.r)/8);i++)for(let j=Math.floor((J.z-J.r)/8);j<=Math.floor((J.z+J.r)/8);j++)C.set(key(i,j),null);
+  const v=new THREE.Vector3();for(const o of MS){const g=o.m.geometry,P=g.attributes.position,U=g.attributes.uv,I=g.index,n=I?I.count:P.count,mw=o.m.matrixWorld,id=mw.equals(new THREE.Matrix4());
+    const W=new Float32Array(P.count*3);for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i);if(!id)v.applyMatrix4(mw);W[i*3]=v.x;W[i*3+1]=v.y;W[i*3+2]=v.z}
+    for(let t=0;t<n;t+=3){const a=I?I.getX(t):t,b=I?I.getX(t+1):t+1,c=I?I.getX(t+2):t+2,ax=W[a*3],az=W[a*3+2],bx=W[b*3],bz=W[b*3+2],cx=W[c*3],cz=W[c*3+2];
+      const ar=(bx-ax)*(cz-az)-(cx-ax)*(bz-az);if(Math.abs(ar)<1e-6)continue;const i0=Math.floor(Math.min(ax,bx,cx)/8),i1=Math.floor(Math.max(ax,bx,cx)/8),j0=Math.floor(Math.min(az,bz,cz)/8),j1=Math.floor(Math.max(az,bz,cz)/8);if(i1-i0>40||j1-j0>40)continue;
+      let T=null;for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const k=key(i,j);if(!C.has(k))continue;if(!T)T={ax,az,bx,bz,cx,cz,ar,ay:W[a*3+1],by:W[b*3+1],cy:W[c*3+1],ua:U?U.getX(a):.5,ub:U?U.getX(b):.5,uc:U?U.getX(c):.5,kind:o.kind,pf:o.pf};let A=C.get(k);if(!A)C.set(k,A=[]);A.push(T)}}}
+  return C}
+function TJ_hits(C,x,z){const A=C.get(Math.floor(x/8)*100000+Math.floor(z/8)),H=[];if(A)for(const T of A){const w1=((T.bx-x)*(T.cz-z)-(T.cx-x)*(T.bz-z))/T.ar,w2=((T.cx-x)*(T.az-z)-(T.ax-x)*(T.cz-z))/T.ar,w3=1-w1-w2;if(w1<-1e-6||w2<-1e-6||w3<-1e-6)continue;
+    H.push({y:w1*T.ay+w2*T.by+w3*T.cy,u:w1*T.ua+w2*T.ub+w3*T.uc,kind:T.kind,pf:T.pf})}return H.sort((a,b)=>b.y-a.y)}
+// bridge decks carry their own surface (their approach may start inside a quay junction): skipped, like the terrain tests
+function TJ_deck(x,z){for(const b of ALL_DECKS||[])if(deckAt(b,x,z)!=null)return true;return false}
+function TJ_one(J,C){const P=[];let strip=0,n=0,flush=0,wf=null;
+  for(let x=Math.ceil(J.x-J.r);x<=J.x+J.r;x++)for(let z=Math.ceil(J.z-J.r);z<=J.z+J.r;z++){if(!J.inA(x,z)||TJ_deck(x,z))continue;const g=groundY(x,z),H=TJ_hits(C,x+.01,z+.01).filter(h=>h.y>g-.4&&h.y<g+.6);if(!H.length)continue;n++;
+    // flush = how far the visible top stands above the road surface (asphalt / pad) under it; band = a painted kerb/edge line on top
+    // what the GPU shows: the highest surface; a sub-6 mm tie goes to the stronger polygon offset
+    let top=H[0];for(const h of H)if(h.y>=H[0].y-.006&&h.pf<top.pf)top=h;const rs=H.find(h=>h.kind!=='other'),band=top.kind==='asph'&&(top.u<TJ.EB||top.u>1-TJ.EB),fl=rs&&top.kind==='other'?top.y-rs.y:0,kerb=fl>.05;if(band||kerb){strip++;if(!wf)wf={x,z,why:band?'edge band':'raised strip '+fl.toFixed(2)+' m'}}
+    if(fl>flush)flush=fl;P.push({x,z,g,off:top.y-g})}
+  // neighbour step of the visible surface, ground plane residual
+  const idx=new Map(P.map(p=>[p.x+','+p.z,p]));let step=0,kink=0,ws=null;for(const p of P)for(const[dx,dz]of[[1,0],[0,1]]){const q=idx.get((p.x+dx)+','+(p.z+dz));if(q){const d=Math.abs(p.off-q.off);if(d>step){step=d;ws={x:p.x,z:p.z}}}
+    // kink: second difference of the visible surface (a fold / warp), y = g + off
+    const r=idx.get((p.x-dx)+','+(p.z-dz));if(q&&r)kink=Math.max(kink,Math.abs((q.g+q.off)-2*(p.g+p.off)+(r.g+r.off)))}
+  let res=0;if(P.length>=6){let sx=0,sz=0,sy=0,sxx=0,szz=0,sxz=0,sxy=0,szy=0;const N=P.length;for(const p of P){const X=p.x-J.x,Z=p.z-J.z;sx+=X;sz+=Z;sy+=p.g;sxx+=X*X;szz+=Z*Z;sxz+=X*Z;sxy+=X*p.g;szy+=Z*p.g}
+    const A=[[sxx,sxz,sx],[sxz,szz,sz],[sx,sz,N]],B=[sxy,szy,sy],det=m=>m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])-m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])+m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]),D=det(A);
+    if(Math.abs(D)>1e-9){const s=[0,1,2].map(c=>det(A.map((r,i)=>r.map((v,j)=>j===c?B[i]:v)))/D);for(const p of P)res=Math.max(res,Math.abs(s[0]*(p.x-J.x)+s[1]*(p.z-J.z)+s[2]-p.g))}}
+  return{k:J.k,x:Math.round(J.x),z:Math.round(J.z),n,strip,flush:+flush.toFixed(3),step:+step.toFixed(3),kink:+kink.toFixed(3),res:+res.toFixed(3),wf,ws}}
+function TJ_run(){const T0=performance.now(),MS=TJ_meshes(),L=TJ_list(),C=TJ_tris(MS,L),out=[];for(const J of L){const o=TJ_one(J,C);if(o.n)out.push(o)}
+  const bad=o=>o.strip>0||o.flush>.05||o.step>.1||o.kink>.1,B=out.filter(bad),w=k=>out.reduce((a,o)=>o[k]>a[k]?o:a,out[0]||{});
+  const by={};for(const o of out){const b=by[o.k]||(by[o.k]={n:0,bad:0,strip:0});b.n++;if(bad(o))b.bad++;if(o.strip)b.strip++}
+  const r={n:out.length,skipped:L.length-out.length,bad:B.length,by,strip:out.filter(o=>o.strip).length,maxFlush:w('flush').flush,maxStep:w('step').step,maxKink:w('kink').kink,maxRes:w('res').res,worst:B.sort((a,b)=>b.strip-a.strip||b.step-a.step).slice(0,6),ms:Math.round(performance.now()-T0)};TJ.last=r;return r}
+// GO: run the check, then put the car at the worst junction (or Alex's Hot Drop crossing when all pass)
+function TJ_go(){const r=TJ_run(),w=r.worst[0];try{const q=w||(CID==='fra'?{x:2160,z:-240}:JUNC.reduce((a,J)=>Math.hypot(J.x,J.z)<Math.hypot(a.x,a.z)?J:a));roamWarp(q.x-14,q.z-14,Math.atan2(14,14));RO.v=0}catch(e){}
+  return'📍 JUNCTIONS · '+r.n+' junctions ('+Object.entries(r.by).map(([k,b])=>k+' '+b.n).join(', ')+') · edge strips on junction asphalt: '+r.strip+' · max strip height above the asphalt '+r.maxFlush+' m (≤0.05) · max step '+r.maxStep+' m (≤0.1) · max fold '+r.maxKink+' m (≤0.1) · (info: ground off-plane '+r.maxRes+' m)'+(w?' · worst '+w.k+' ('+w.x+','+w.z+')'+(w.wf?' '+w.wf.why:''):'')+(r.bad?' ❌':' ✅')}
+// ---- fix 1 (Frankfurt): filler road x real street crossings had no junction pad, so the street's painted kerb band, white edge line and
+// yellow centre line ran straight across the side road's mouth (Alex b27). A plain-asphalt pad (same texture as the crossing squares /
+// street discs) now covers the overlap, draped on the ground 1 cm above the street strip. TJ.pad=0 (?tjpad=0) = off.
+TJ.pad=!TJ.off&&!/[?&]tjpad=0/.test(location.search);
+function TJ_fx(){if(HUB.tjFx)return HUB.tjFx;const F=[];if(CID==='fra'&&!TJ.off){try{hubRoads()}catch(e){}
+  // pad = the filler's own rectangle (full width) over the stretch where any part of its width is inside the street (+1.5 m: the street's kerb band)
+  for(const f of FILL_R||[]){const nx=f.uz,nz=-f.ux,hw=f.w/2,ins=t=>{for(const o of[-hw,-hw/2,0,hw/2,hw]){const x=f.x0+f.ux*t+nx*o,z=f.z0+f.uz*t+nz*o,q=TJ_st(x,z);if(q&&q.road.cls!=='hill'&&q.d<q.road.w/2)return q.q}return null};
+    let a=null,last=-9,qa=null;const end=()=>{const t0=a-1.5,t1=last+1.5/* past a filler end too: a T-junction's mouth */,B=(t1-t0)/2;if(B>40||B<.5)return;const tm=(t0+t1)/2;F.push({x:f.x0+f.ux*tm,z:f.z0+f.uz*tm,tx:nx,tz:nz,ux:f.ux,uz:f.uz,A:hw,B,ws:qa.road.w,wf:f.w})};
+    for(let t=0;t<=f.L;){const q0=cityAt(f.x0+f.ux*t,f.z0+f.uz*t);if(!(q0&&q0.d<q0.road.w/2+hw+8)){if(a!=null&&t-last>3){end();a=null}t+=4;continue}const q=ins(t);if(q){if(a==null){a=t;qa=q}last=t}else if(a!=null&&t-last>3){end();a=null}t+=1}if(a!=null)end()}}
+  return HUB.tjFx=F}
+// inside a street (true distance) or any junction area, + m: filler kerbs stop there (cityAt's sample distance let them run into junctions on curves)
+function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
+  for(const X of FILL_X||[])if(Math.abs(X.x-x)<X.wa/2+m&&Math.abs(X.z-z)<X.wb/2+m)return true;
+  for(const c of TJ_fx()){const dx=x-c.x,dz=z-c.z;if(Math.abs(dx*c.tx+dz*c.tz)<c.A+m&&Math.abs(dx*c.ux+dz*c.uz)<c.B+m)return true}return false}
+// near a filler crossing (for the CV boulevard medians, which only stopped at street discs)
+function TJ_nearFx(x,z,m){for(const c of TJ_fx())if(Math.hypot(c.x-x,c.z-z)<Math.max(c.A,c.B)+m)return true;return false}
+// ---- fix 2: pads conform to the road triangles under them. Every surface drapes the ground on its own coarse grid (up to 4 cm off,
+// ART8_tol), so a pad only 0.5-2 cm above "the ground" was often BELOW the road it covers: the road's kerb band / edge line showed
+// through, or the two z-fought. While the hub batch is built, road/pad triangles inside junction cells are kept (TJ.cap); a pad vertex
+// sits 2.8 cm above the highest of them (TJ_y; 1.2 cm left 1-2 cm dips between 3 m pad vertices on convex ground). TJ.conf=0 (?tjconf=0) = off.
+TJ.conf=!TJ.off&&!/[?&]tjconf=0/.test(location.search);
+function TJ_cells(){const C=new Map(),put=(x,z,r)=>{for(let i=Math.floor((x-r)/8);i<=Math.floor((x+r)/8);i++)for(let j=Math.floor((z-r)/8);j<=Math.floor((z+r)/8);j++)C.set(i*100000+j,[])};
+  for(const J of JUNC||[])put(J.x,J.z,J.r+1);for(const X of FILL_X||[])put(X.x,X.z,Math.hypot(X.wa,X.wb)/2+1);for(const c of TJ_fx())put(c.x,c.z,Math.hypot(c.A,c.B)+1);return C}
+// pedestrian streets: the walk texture with a polygon offset (M.walk itself, and the terrain ground trG, are ground, not road)
+function TJ_ped(mat){const M=HUB.M;return!!(M&&M.walk&&mat!==M.walk&&mat.map&&mat.map===M.walk.map&&mat.polygonOffset)}
+function TJ_isRoad(mat){const M=HUB.M;return!!M&&(mat===M.road||mat===M.street||mat===M.resSt||TJ_ped(mat)||(M.jn&&mat.map===M.jn))}
+// asphalt only: pads don't stack on pads (they share texture and world uv, so where two overlap they draw the same pixels)
+function TJ_capture(g,mat,matrix){if(!TJ.cap||!TJ_isRoad(mat)||mat.map===HUB.M.jn)return;const P=g.attributes.position,I=g.index,n=I?I.count:P.count,v=new THREE.Vector3(),W=[];
+  for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i);if(matrix)v.applyMatrix4(matrix);W.push(v.x,v.y,v.z)}
+  for(let t=0;t<n;t+=3){const a=(I?I.getX(t):t)*3,b=(I?I.getX(t+1):t+1)*3,c=(I?I.getX(t+2):t+2)*3,T=[W[a],W[a+1],W[a+2],W[b],W[b+1],W[b+2],W[c],W[c+1],W[c+2]];
+    const ar=(T[3]-T[0])*(T[8]-T[2])-(T[6]-T[0])*(T[5]-T[2]);if(Math.abs(ar)<1e-6)continue;T.push(ar);
+    const i0=Math.floor(Math.min(T[0],T[3],T[6])/8),i1=Math.floor(Math.max(T[0],T[3],T[6])/8),j0=Math.floor(Math.min(T[2],T[5],T[8])/8),j1=Math.floor(Math.max(T[2],T[5],T[8])/8);if((i1-i0)*(j1-j0)>400)continue;
+    for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const A=TJ.cap.get(i*100000+j);if(A)A.push(T)}}}
+// highest captured surface at (x,z) within 0.15 m of the ground (roads drape ≤ ~0.13 m; deck/bridge ramps above are not this junction's surface)
+function TJ_top(x,z,g){const A=TJ.cap&&TJ.cap.get(Math.floor(x/8)*100000+Math.floor(z/8));let m=-1e9;if(A)for(const T of A){const ar=T[9],w1=((T[3]-x)*(T[8]-z)-(T[6]-x)*(T[5]-z))/ar,w2=((T[6]-x)*(T[2]-z)-(T[0]-x)*(T[8]-z))/ar,w3=1-w1-w2;
+    if(w1<-1e-4||w2<-1e-4||w3<-1e-4)continue;const y=w1*T[1]+w2*T[4]+w3*T[7];if(y>m&&y<g+.15)m=y}return m}
+function TJ_y(x,z,off,r=.75){const g=groundY(x,z);if(!TJ.conf||!TJ.cap)return g+off;let e=0;
+  if(!r){const t=TJ_top(x,z,g);return Math.max(g+off,t+TJ.mg)}  // r=0: one sample (small decals: zebra stripes)
+  // how far the roads under it stand above "ground + off" anywhere within half a vertex spacing (relative to the local ground, so a slope adds nothing)
+  for(const[dx,dz]of[[0,0],[r,0],[-r,0],[0,r],[0,-r],[r,r],[r,-r],[-r,r],[-r,-r]]){const x2=x+dx,z2=z+dz,g2=groundY(x2,z2),t=TJ_top(x2,z2,g2);if(t>-1e8)e=Math.max(e,t+TJ.mg-(g2+off))}
+  // ground convexity towards the next vertex (2r away): the linear pad would dip by that much
+  let c=0;for(const[dx,dz]of[[r,0],[-r,0],[0,r],[0,-r]])c=Math.max(c,groundY(x+dx,z+dz)-(g+groundY(x+2*dx,z+2*dz))/2);return g+off+e+Math.min(c,.04)/* more is a quay wall / embankment edge, not road curvature */}
+// a pad = parallelogram c ± A·(ax,az) ± B·(bx,bz), vertices every ≤3 m, conformed; a planar pad (≤3 mm off its plane) is one quad
+function TJ_padGeo(cx,cz,ax,az,bx,bz,A,B,off){let na=Math.max(1,Math.ceil(2*A/3)),nb=Math.max(1,Math.ceil(2*B/3));const r=Math.max(A/na,B/nb),V=[];
+  for(let i=0;i<=na;i++)for(let j=0;j<=nb;j++){const a=(i/na*2-1)*A,b=(j/nb*2-1)*B,x=cx+ax*a+bx*b,z=cz+az*a+bz*b;V.push([x,TJ_y(x,z,off,r),z,a,b])}
+  {let n=V.length,sa=0,sb=0,sy=0,saa=0,sbb=0,sab=0,say=0,sby=0;for(const v of V){sa+=v[3];sb+=v[4];sy+=v[1];saa+=v[3]*v[3];sbb+=v[4]*v[4];sab+=v[3]*v[4];say+=v[3]*v[1];sby+=v[4]*v[1]}
+    // grid is symmetric (sa=sb=sab=0): y = k0 + ka·a + kb·b
+    const k0=sy/n,ka=saa?say/saa:0,kb=sbb?sby/sbb:0;let e=0;for(const v of V)e=Math.max(e,v[1]-(k0+ka*v[3]+kb*v[4]));const up=Math.max(0,e);
+    if(V.every(v=>Math.abs(v[1]-(k0+ka*v[3]+kb*v[4]))<.003)){V.length=0;na=nb=1;for(const i of[0,1])for(const j of[0,1]){const a=(i*2-1)*A,b=(j*2-1)*B;V.push([cx+ax*a+bx*b,k0+ka*a+kb*b+up,cz+az*a+bz*b])}}}
+  const pos=[],uv=[],idx=[];for(let i=0;i<=na;i++)for(let j=0;j<=nb;j++){const v=V[i*(nb+1)+j];pos.push(v[0],v[1],v[2]);uv.push(v[0]/8,v[2]/8);if(i<na&&j<nb){const k=i*(nb+1)+j;idx.push(k,k+1,k+nb+1,k+1,k+nb+2,k+nb+1)}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
+  if(g.attributes.normal.getY(0)<0){idx.reverse();g.setIndex(idx);g.computeVertexNormals()}return g}
+function TJ_pads(bt,M){if(!TJ.pad||CID!=='fra'||!M.jn)return;const jm=new THREE.MeshStandardMaterial({map:M.jn,roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-8});let n=0;
+  for(const c of TJ_fx()){bt.add(TJ_padGeo(c.x,c.z,c.tx,c.tz,c.ux,c.uz,c.A,c.B,.056),jm);n++}HUB.tjPads=n}
+{const _a=TBatch.prototype.add;TBatch.prototype.add=function(g,mat,matrix){try{TJ_capture(g,mat,matrix)}catch(e){}return _a.call(this,g,mat,matrix)}}
+// capture runs only while the hub is built (cells from the final street net: after hubRoads + RD_fillLoop, i.e. at the first road)
+{const _b=buildHubG;buildHubG=function*(){TJ.cap=null;TJ.capOn=TJ.conf;try{yield*_b()}finally{TJ.cap=null;TJ.capOn=0}}}
+{const _r=TJ_capture;TJ_capture=function(g,mat,matrix){if(TJ.capOn&&!TJ.cap&&TJ_isRoad(mat))TJ.cap=TJ_cells();return _r(g,mat,matrix)}}
+{const _f=cityStreetsBuild;cityStreetsBuild=function(bt,M){_f(bt,M);try{TJ_pads(bt,M)}catch(e){console.warn('TJ_pads',e)}}}
 // ===== LVM: LIVELINESS METER (art-1, 2026-10-13). Alex: "All the game looks extremely poor compared to lively 2K Drive ... way too many empty
 // spaces, boring green flat spaces." 8 fixed camera spots per city; LVM_measure() scores what the player sees from the chase camera:
 //  green = % of the frame that is flat uniform grass (green pixels in 4×4 blocks with no texture), props = street props within 50 m,
@@ -16993,7 +17117,7 @@ function DMG_debStep(dt){const im=DMG.im;if(!im||!DMG.deb.length){if(im&&im.coun
 // THE hit: v = relative normal speed in km/h. Returns the health lost (%).
 function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return 0;const at=new THREE.Vector3(RO.x+Math.sin(RO.h)*1.8,RO.y+.8,RO.z+Math.cos(RO.h)*1.8);
  if(v<25){DMG.n.light++;if(v>8)try{burst(SPARK,at,8,6,.3,new THREE.Color(2,1.6,.9))}catch(e){}return 0}
- DMG.cls=DMG_cls();const d=15*Math.sqrt((v-25)/25)/DMG.cls;RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
+ DMG.lastV=v;DMG.cls=DMG_cls();const d=15*Math.sqrt((v-25)/25)/DMG.cls;RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
  const nb=clamp(Math.round(2+d/4),2,6),src=DMG_panels(1-RO.hp/100,nb);DMG_throw(nb,src,v);try{burst(SPARK,at,16,9,.4,new THREE.Color(2,1.6,.9))}catch(e){}
  DMG_hud(RO.hp);if(d>6)try{flashHud()}catch(e){}if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();try{fireball(V3(RO.x,RO.y+1.4,RO.z),26,3,1.1)}catch(e){}DMG_panels(0);roamWreck()}return d}
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
@@ -17027,6 +17151,19 @@ function DMG_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
  else if(kind==='traf'||kind==='trafFast'){const v=kind==='traf'?40:70,c={cv:0,x:RO.x,z:RO.z,y:RO.y,j:0,k:0},fx=Math.sin(RO.h),fz=Math.cos(RO.h);RO.vh=RO.h;const v0=RO.v;RO.v=v/3.6;r.burst=DMG_traf(c,RO.x+fx*3,RO.z+fz*3,fx,fz,false,false);r.pin=DMG_traf({cv:0,j:0,k:0,y:RO.y},RO.x,RO.z,fx,fz,false,true);RO.v=v0;r.txt=kind==='traf'?'40 km/h into a parked car: it loses bricks, NOT a burst; pushing a car never bursts it':'70 km/h into a parked car: it bursts'}
  else if(kind==='wreck'){let i=0;const hit=()=>{RO.inv=0;DMG_impact(60);if(++i<8&&!RO.wk)setTimeout(hit,150)};hit();r.txt='8 crashes at 60 km/h: smoke, fire, explosion, rebuilt within 2.5 s'}
  return'📍 '+r.txt}
+// GO (dmg-2, Alex: "GTA-style crash damage, bricks fly off on hard hits"): a straight run at a building wall, spawned already at 62 km/h, REAL gas into the wall;
+// pass = a hit at ≥ 60 km/h normal speed, ≥ 2 bricks thrown off, health > 0, then REAL reverse for 1.5 s moves the car ≥ 2 m (still drivable)
+function DMG_goWall(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!DMG.on)return'📍 Damage is off (?dmg=0)';try{OF_reset()}catch(e){}
+ const N=HUB.nodes||[],L=[],O=CID==='fra'?{x:2061,z:0}:{x:0,z:0};/* fixed search origin: the same wall every time */for(let i=0;i<N.length;i++){const A=N[i];if(A&&!A.ab&&A.nb&&A.nb.length)L.push([Math.hypot(A.x-O.x,A.z-O.z),A])}L.sort((a,b)=>a[0]-b[0]);let S=null;
+ for(const [,A] of L.slice(0,400)){if(S)break;for(let k=0;k<24&&!S;k++){const h=k*Math.PI/12,fx=Math.sin(h),fz=Math.cos(h),y=groundAt(A.x,A.z,999);if(roamHit(A.x,A.z,1.6,y+.5))break;
+  const wd=(o)=>{for(let d=2;d<=48;d+=.5)if(roamHit(A.x+fx*d+fz*o,A.z+fz*d-fx*o,.3,y+.5))return d;return 0};const w=wd(0);if(w<26)continue;const wl=wd(-1.5),wr=wd(1.5);if(!wl||!wr||Math.abs(wl-w)>.6||Math.abs(wr-w)>.6)continue;/* head-on: a flat wall square to the run */let ok=true;for(let d=0;d<w-4&&ok;d+=1){const g=groundAt(A.x+fx*d,A.z+fz*d,999);if(Math.abs(g-y)>.6)ok=false}
+  if(ok)S={x:A.x+fx*(w-24),z:A.z+fz*(w-24),h,w:24}}}
+ if(!S)return'📍 no straight 24 m run at a wall near here ❌';RO.hp=100;RO.inv=0;DMG_panels(0);DMG.deb.length=0;DMG.lastHit=-1e9;if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}
+ roamWarp(S.x,S.z,S.h,true);RO.x=S.x;RO.z=S.z;RO.h=RO.vh=S.h;RO.v=62/3.6;const h0=DMG.n.hits,d0=DMG.n.deb,t0=performance.now();DMG.lastV=0;K.ArrowUp=true;
+ const iv=setInterval(()=>{if(DMG.n.hits===h0&&performance.now()-t0<4000)return;clearInterval(iv);K.ArrowUp=false;const v=DMG.lastV||0,nb=DMG.n.deb-d0,hp=RO.hp??100;
+  setTimeout(()=>{const x0=RO.x,z0=RO.z;K.ArrowDown=true;setTimeout(()=>{K.ArrowDown=false;const mv=Math.hypot(RO.x-x0,RO.z-z0),ok=DMG.n.hits>h0&&v>=60&&nb>=2&&hp>0&&!RO.wk&&mv>=2;
+   window.__chk=window.__chk||{};window.__chk.dmgWall={v:+v.toFixed(0),nb,hp:+hp.toFixed(0),mv:+mv.toFixed(1),ok};
+   say(`📍 WALL CRASH: hit at ${v.toFixed(0)} km/h, ${nb} bricks flew off, health ${hp.toFixed(0)} %, reversed ${mv.toFixed(1)} m after `+(ok?'✅':'❌'))},1500)},400)},50);return'📍 WALL CRASH · driving at the wall…'}
 window.__dmg={traf:(rel,pin)=>{const c={cv:0,j:0,k:0,y:RO.y},fx=Math.sin(RO.h),fz=Math.cos(RO.h),v0=RO.v,vh=RO.vh;RO.vh=RO.h;RO.v=rel/3.6;try{return DMG_traf(c,RO.x+fx*3,RO.z+fz*3,fx,fz,false,!!pin)}finally{RO.v=v0;RO.vh=vh}},bench:()=>{DMG_throw(DMG.N,[],40);const t=performance.now();for(let i=0;i<100;i++){DMG_debStep(1/60)}const ms=(performance.now()-t)/100;return{ms:+ms.toFixed(3),live:DMG.deb.length}},S:DMG,go:DMG_go,impact:DMG_impact,wall:(k,a)=>DMG.wall(k,a),st:()=>({on:DMG.on,ro:[+RO.x.toFixed(1),+RO.z.toFixed(1)],mp:pl?[+pl.mesh.position.x.toFixed(1),+pl.mesh.position.z.toFixed(1)]:null,hp:+(RO.hp??100).toFixed(1),wk:!!RO.wk,deb:DMG.deb.length,n:Object.assign({},DMG.n),hid:DMG_meshes().reduce((s,o)=>{const I=DMG.G.get(o.userData.dmG0||o.geometry);return s+(I?I.hid:0)},0),tBoom:DMG.tBoom,tReb:DMG.tReb,cls:+DMG_cls().toFixed(2),hull:(document.getElementById('rgHull')||{}).style?.visibility||''})};
 // ===== GFX (gfx-1, 2026-10-13): daytime lighting/rendering pass against the "flat, ugly" look.
 // Root cause (measured in v90n, Frankfurt, high): Neutral tone mapping (no filmic contrast), a white hemisphere fill at .85 that lights the
@@ -17037,7 +17174,7 @@ window.__dmg={traf:(rel,pin)=>{const c={cv:0,j:0,k:0,y:RO.y},fx=Math.sin(RO.h),f
 // env 1.0) on everything that casts a shadow (buildings, cars, props; never the ground), deeper sky, subtle bloom on highlights.
 const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
  day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},G:{value:new THREE.Vector4(0,0,0,0)},t:0,n:0,tier:null};
-const GFX_SUN=[600,300,380];   // ~23° elevation (coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
+const GFX_SUN=[600,300,380];   // ~30° elevation (GFX_sunFollow; coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
 function GFX_tier(){try{const L=LK_lvl();return L==='high'?'high':L==='med'?'med':'off'}catch(e){return SET.q==='high'?'high':SET.q==='med'?'med':'off'}}
 function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MOOD.id!=='night'&&MOOD.id!=='flnight'}
 // lights, tone mapping, sky, fog: applied after ART_light (which runs after every mood / day-cycle update while roaming)
@@ -17046,7 +17183,7 @@ function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.copy(moonL.target.position).add(new THREE.Vector3(...GFX_SUN).setLength(400));   // relative to the shadow target (71_roam_drive), not world 0
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
  const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=4.8;
- hemi.color.set('#86acff');hemi.groundColor.set(ath?'#5e4c32':'#3f5a2c');hemi.intensity=.34;   // gfx-2: .5 left shadows at ~65 % of sunlit; .34 = dark, cool-blue shadows
+ hemi.color.set('#86acff');hemi.groundColor.set(ath?'#5e4c32':'#4a5a4c');hemi.intensity=.4;   // gfx-2: .5 left shadows at ~65 % of sunlit; .4 = dark, cool-blue shadows (.34 + green-brown bounce read as mud)
  scene.environmentIntensity=.22;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
  const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
  scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
@@ -17121,7 +17258,7 @@ LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame
 // sun follows the camera slowly from behind-left (gfx-2): a fixed world sun was backlit on half the headings (v90m Frankfurt start: we saw only
 // shaded faces, the car's shadow hid under it, sun glare greyed the sky). Now lit faces + shadows falling forward-right on screen, every heading.
 // Azimuth slews at most GFX_SLEW rad/s (smoothed), so shadows creep while turning instead of swinging.
-function GFX_sunFollow(dt){const GFX_EL=.42,GFX_AZ=2.45,GFX_SLEW=.35;   // elevation ~24°, sun 140° from the view direction (behind, to the left)
+function GFX_sunFollow(dt){const GFX_EL=.52,GFX_AZ=2.8,GFX_SLEW=.35;   // elevation ~30°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
  if(!GFX.on||!GFX.day||!camera)return;const d=GFX.cd||(GFX.cd=new THREE.Vector3());camera.getWorldDirection(d);
  const want=Math.atan2(d.z,d.x)-GFX_AZ;if(GFX.az===undefined||dt>1)GFX.az=want;let e=want-GFX.az;e=Math.atan2(Math.sin(e),Math.cos(e));
  GFX.az+=Math.sign(e)*Math.min(Math.abs(e),Math.max(GFX_SLEW,Math.abs(e)*.6)*Math.min(dt,.1));
