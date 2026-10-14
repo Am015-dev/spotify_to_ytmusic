@@ -15,11 +15,11 @@ const LIFE_CELL=40,LIFE_STEP=16,LIFE_R=230,LIFE_PG=100;// pop-up bubble square
 const LIFE_gy=(x,z)=>{try{return groundY(x,z)}catch(e){return groundAt(x,z,999)}};
 const LIFE_h=(a,b,c)=>{let h=(a|0)*374761393+(b|0)*668265263+(c|0)*2147483647;h=(h^(h>>>13))*1274126177;h^=h>>>16;return(h>>>0)/4294967296};
 // ---------- types
-const LIFE_SET=['windmill','turbine','fountain','banner','billboard','crane','balloons','carousel'];
-const LIFE_SETR={windmill:2.2,turbine:1.2,fountain:2.8,banner:.5,billboard:1.4,crane:3.2,balloons:1.4,carousel:3.6};// collider radius; room needed = r+1.5
-const LIFE_GRP=['cafe','band','market','football','joggers','dog','fans','works'];
-const LIFE_GRPR={cafe:1.3,band:1.3,market:1.7,football:4,joggers:.8,dog:.8,fans:1.2,works:1.4};// room each group needs
-const LIFE_MOVE=new Set(['joggers','dog','football']);// people groups that also count as moving things
+const LIFE_SET=['windmill','turbine','fountain','banner','billboard','crane','balloons','carousel','swings','seesaw','sprinkler','teacups'];// life-2: +4 playground/fair pieces
+const LIFE_SETR={windmill:2.2,turbine:1.2,fountain:2.8,banner:.5,billboard:1.4,crane:3.2,balloons:1.4,carousel:3.6,swings:2.2,seesaw:2.3,sprinkler:1,teacups:3.8};// collider radius; room needed = r+1.5
+const LIFE_GRP=['cafe','band','market','football','joggers','dog','fans','works','picnic','painter','icecream','juggler','chess','dance','photo'];// life-2: +7 activities
+const LIFE_GRPR={cafe:1.3,band:1.3,market:1.7,football:4,joggers:.8,dog:.8,fans:1.2,works:1.4,picnic:1.7,painter:1.3,icecream:1.7,juggler:1.4,chess:1.4,dance:2,photo:1.6};// room each group needs
+const LIFE_MOVE=new Set(['joggers','dog','football','dance','juggler','icecream']);// people groups that also count as moving things
 const LIFE_SM=['cone','crate','barrel','fruit','planter','bin'];
 const LIFE_POP=[{k:'smash',name:'SMASH 20',goal:20,lim:25,u:'smashed',col:'#ff8a1c'},{k:'drift',name:'DRIFT HERE',goal:4,lim:20,u:'s of drift',col:'#4ceaff'},{k:'air',name:'AIR TIME',goal:2,lim:25,u:'s in the air',col:'#7cff4c'}];
 const LIFE_SHIRT=['#e8302a','#2a6be8','#ffd12c','#2fa84a','#ff8ac8','#f2f2f2','#8a4ae8','#ff8a1c','#22b8c8','#333a44'];
@@ -46,7 +46,16 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
   balloons:[LIFE_g([[LB(1.4,.9,.9),'#e8302a',0,.75,0],[LC(.3,.3,.15,8),'#222',.5,.3,.45,P/2],[LC(.3,.3,.15,8),'#222',-.5,.3,.45,P/2],[LC(.3,.3,.15,8),'#222',.5,.3,-.45,P/2],[LC(.3,.3,.15,8),'#222',-.5,.3,-.45,P/2],[LB(.06,2.6,.06),'#ffffff',0,2.4,0]]),
             LIFE_g([[LS(.55,8),'#ff4040',0,0,0],[LS(.55,8),'#ffd12c',.7,.4,.1],[LS(.55,8),'#4c8cff',-.65,.35,.2],[LS(.55,8),'#4cd860',.15,.9,-.3],[LS(.55,8),'#ff8ac8',-.2,1.1,.5]])],
   carousel:[LIFE_g([[LC(3.8,3.8,.4,16),'#c84060',0,.2,0],[LC(.3,.3,4,8),'#ffd12c',0,2.2,0],[LC(0,4.2,1.6,12),'#ffffff',0,4.9,0],[LC(4.2,4.2,.3,12),'#e8302a',0,4.1,0]]),
-            LIFE_g([0,1,2,3,4,5].map(i=>hor(i*P/3)).concat([0,1,2,3,4,5].map(i=>[LC(.05,.05,3.3,4),'#ffd12c',Math.sin(i*P/3)*2.6,2.1,Math.cos(i*P/3)*2.6])))]};
+            LIFE_g([0,1,2,3,4,5].map(i=>hor(i*P/3)).concat([0,1,2,3,4,5].map(i=>[LC(.05,.05,3.3,4),'#ffd12c',Math.sin(i*P/3)*2.6,2.1,Math.cos(i*P/3)*2.6])))],
+  // life-2: playground swings (2 seats swing in turn, kids on them), seesaw (2 kids), lawn sprinkler (2 water arms turn), teacup ride (4 cups + riders)
+  swings:[LIFE_g([[LB(.16,2.9,.16),'#e8302a',-1.6,1.35,.55,-.2,0,0],[LB(.16,2.9,.16),'#e8302a',-1.6,1.35,-.55,.2,0,0],[LB(.16,2.9,.16),'#e8302a',1.6,1.35,.55,-.2,0,0],[LB(.16,2.9,.16),'#e8302a',1.6,1.35,-.55,.2,0,0],[LB(3.5,.18,.18),'#ffd12c',0,2.7,0],[LB(3.6,.1,1.6),'#c8b890',0,.05,0]]),
+          LIFE_g([[LB(.04,2,.04),'#666',-.25,-1,0],[LB(.04,2,.04),'#666',.25,-1,0],[LB(.62,.08,.32),'#2a6be8',0,-2.04,0]])],
+  seesaw:[LIFE_g([[LB(.5,.6,.5),'#2fa84a',0,.3,0],[LB(.7,.12,.7),'#2fa84a',0,.06,0]]),
+          LIFE_g([[LB(4,.12,.36),'#ffd12c',0,0,0],[LB(.06,.36,.36),'#e8302a',-1.55,.22,0],[LB(.06,.36,.36),'#e8302a',1.55,.22,0]])],
+  sprinkler:[LIFE_g([[LC(.12,.18,.5,8),'#5a5e66',0,.25,0],[LC(1.4,1.4,.04,16),'#4cbf5a',0,.02,0]]),
+             LIFE_g([0,1,2,3,4,5,6].flatMap(k=>[[LS(.13+k*.012,5),'#8fdcff',.35*k,Math.sin(k/6*P)*1.1+.5,0],[LS(.13+k*.012,5),'#8fdcff',-.35*k,Math.sin(k/6*P)*1.1+.5,0]]))],
+  teacups:[LIFE_g([[LC(3.6,3.6,.35,20),'#ff8ac8',0,.18,0],[LC(3.7,3.7,.12,20),'#ffffff',0,.37,0],[LC(.4,.4,.8,10),'#ffd12c',0,.6,0]]),
+           LIFE_g([0,1,2,3].flatMap(i=>{const a=i*P/2,x=Math.sin(a)*2.2,z=Math.cos(a)*2.2,c=['#2a6be8','#e8302a','#2fa84a','#ffd12c'][i];return[[LC(.95,.7,.75,12),c,x,.8,z],[LC(1,1,.08,12),'#ffffff',x,1.2,z],[LB(.15,.4,.15),'#ffffff',x+.95,.85,z]]}))]};
  // people-group props (static) + two moving props (ball, dog)
  const Q={
   cafe:LIFE_g([[LC(.45,.45,.06,12),'#ffffff',0,1.05,0],[LC(.06,.06,1.05,6),'#666',0,.52,0],[LC(.06,.06,2.4,6),'#ddd',0,1.2,0],[LC(0,1.7,.6,8),'#e8302a',0,2.5,0]]),
@@ -54,7 +63,18 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
   band:LIFE_g([[LB(.7,.8,.5),'#222',0,.4,0],[LC(.03,.03,1.5,4),'#999',.8,.75,.3],[LC(.35,.35,.1,10),'#333',-.8,.05,.4]]),
   football:LIFE_g([[LB(.08,1.2,.08),'#ffffff',-3,.6,6],[LB(.08,1.2,.08),'#ffffff',-3,.6,4.2],[LB(.08,.08,1.9),'#ffffff',-3,1.2,5.1],[LB(.08,1.2,.08),'#ffffff',3,.6,6],[LB(.08,1.2,.08),'#ffffff',3,.6,4.2],[LB(.08,.08,1.9),'#ffffff',3,1.2,5.1]].map(p=>(p[4]-=5.1,p[2]*=1,p))),
   works:LIFE_g([[LB(2.4,.25,.12),'#e8302a',0,.9,0],[LB(.6,.12,.12),'#ffffff',-.6,.9,.07],[LB(.6,.12,.12),'#ffffff',.6,.9,.07],[LB(.1,.9,.3),'#333',-1.1,.45,0],[LB(.1,.9,.3),'#333',1.1,.45,0],[LB(1.4,.5,1),'#8a6a40',0,.25,1.2]]),
-  fans:LIFE_g([[LB(1.8,.12,.5),'#a8743c',0,.5,0],[LB(.12,.5,.4),'#333',-.8,.25,0],[LB(.12,.5,.4),'#333',.8,.25,0]])};
+  fans:LIFE_g([[LB(1.8,.12,.5),'#a8743c',0,.5,0],[LB(.12,.5,.4),'#333',-.8,.25,0],[LB(.12,.5,.4),'#333',.8,.25,0]]),
+  // life-2 activities: picnic blanket + basket, easel, ice-cream cart, juggler's hat + sign, chess table, dance speaker, photo tripod
+  picnic:LIFE_g([[LB(2.4,.04,2.4),'#e8302a',0,.02,0],...[0,1,2,3].flatMap(i=>[0,1,2,3].filter(j=>(i+j)%2).map(j=>[LB(.6,.05,.6),'#ffffff',-.9+i*.6,.03,-.9+j*.6])),[LB(.5,.32,.34),'#a8743c',.2,.2,.2],[LB(.06,.3,.06),'#6a4a30',.2,.45,.2]]),
+  painter:LIFE_g([[LB(.06,1.7,.06),'#8a5a30',-.35,.85,.1,.15,0,0],[LB(.06,1.7,.06),'#8a5a30',.35,.85,.1,.15,0,0],[LB(.06,1.6,.06),'#8a5a30',0,.8,-.25,-.25,0,0],[LB(.9,.7,.04),'#ffffff',0,1.35,.2,.15,0,0],
+    [LB(.3,.2,.05),'#2a6be8',-.15,1.45,.24,.15,0,0],[LB(.25,.25,.05),'#ffd12c',.2,1.3,.22,.15,0,0],[LB(.4,.12,.05),'#2fa84a',0,1.12,.19,.15,0,0]]),
+  icecream:LIFE_g([[LB(1.6,.9,.9),'#ffffff',0,.75,0],[LB(1.62,.15,.92),'#ff8ac8',0,1.05,0],[LC(.22,.22,.08,10),'#333',-.55,.22,.47,0,0,P/2],[LC(.22,.22,.08,10),'#333',.55,.22,.47,0,0,P/2],[LC(.04,.04,2.3,6),'#ddd',.6,1.6,0],
+    [LC(0,1.3,.5,8),'#ff8ac8',.6,2.7,0],[LC(.1,.12,.12,8),'#ffffff',.6,2.4,0],[LC(.12,0,.3,8),'#e8b060',-.4,1.35,0,P,0,0],[LS(.16,6),'#ff8ac8',-.4,1.55,0],[LS(.16,6),'#ffffff',-.1,1.3,0]]),
+  juggler:LIFE_g([[LC(.22,.26,.2,10),'#222',0,.1,.9],[LC(.36,.36,.03,12),'#222',0,.02,.9],[LB(.05,1,.05),'#8a5a30',-.9,.5,.6],[LB(.7,.4,.04),'#ffd12c',-.9,1.1,.6]]),
+  chess:LIFE_g([[LB(.9,.06,.9),'#a8743c',0,.78,0],[LB(.12,.75,.12),'#6a4a30',0,.38,0],...[0,1,2,3].flatMap(i=>[0,1,2,3].map(j=>[LB(.16,.03,.16),(i+j)%2?'#222':'#ffffff',-.24+i*.16,.82,-.24+j*.16])),
+    [LB(.4,.45,.4),'#8a5a30',0,.22,.85],[LB(.4,.45,.4),'#8a5a30',0,.22,-.85]]),
+  dance:LIFE_g([[LB(.5,.8,.5),'#222',0,.4,0],[LC(.15,.15,.04,10),'#666',0,.55,.26,P/2,0,0],[LC(.1,.1,.04,8),'#666',0,.25,.26,P/2,0,0]]),
+  photo:LIFE_g([[LB(.04,1.4,.04),'#333',-.1,.7,-.05,.2,0,.2],[LB(.04,1.4,.04),'#333',.1,.7,-.05,.2,0,-.2],[LB(.04,1.4,.04),'#333',0,.7,.12,-.2,0,0],[LB(.3,.2,.18),'#222',0,1.45,0],[LC(.06,.06,.12,8),'#555',0,1.45,.14,P/2,0,0]])};
  const ball=LIFE_g([[LS(.22,8),'#ffffff',0,.22,0]]),dog=LIFE_g([[LB(.3,.32,.75),'#a8743c',0,.4,0],[LB(.26,.26,.3),'#a8743c',0,.62,.42],[LB(.08,.3,.08),'#6a4a30',.1,.12,.25],[LB(.08,.3,.08),'#6a4a30',-.1,.12,.25],[LB(.08,.3,.08),'#6a4a30',.1,.12,-.25],[LB(.08,.3,.08),'#6a4a30',-.1,.12,-.25]]);
  // minifig 1.80 m: legs + hips + head (fixed colours) / torso (shirt colour) / arms (shirt colour, pivot at the shoulder, y = 0)
  const fig=LIFE_g([[LB(.24,.78,.3),'#2a3a6a',-.14,.39,0],[LB(.24,.78,.3),'#2a3a6a',.14,.39,0],[LB(.56,.12,.32),'#2a3a6a',0,.84,0],[LC(.2,.2,.34,10),'#ffd12c',0,1.58,0],[LC(.12,.12,.06,8),'#ffd12c',0,1.78,0],[LC(.08,.08,.12,8),'#ffd12c',0,1.43,0]]);
@@ -70,13 +90,20 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
  const pop=new THREE.IcosahedronGeometry(1.4,1),ring=new THREE.TorusGeometry(2.6,.22,6,24);colorize(pop,new THREE.Color('#ffffff'));colorize(ring,new THREE.Color('#ffffff'));
  return{S,Q,ball,dog,fig,torso,arms,M,pop,ring}}
 // ---------- pools: name → InstancedMesh (count set per frame; invisible while empty, so an empty pool costs no draw call)
-const LIFE_CAP={set:14,setM:14,prop:18,ball:6,dog:6,fig:150,sm:44,pop:8};
+const LIFE_CAP={set:14,setM:14,prop:18,ball:14,dog:6,fig:180,sm:44,pop:8,bm:8};// bm: copies of each type in the batched pools (one draw call for all types)
 // dynamic usage + userData.keep: WB city batching (98wb WB_cand) otherwise freezes static instanced meshes into its merged tiles (they vanished in Athens)
+// a batched pool: every geometry added LIFE_CAP.bm times (×mul), proxies with the InstancedMesh calls LIFE_put/LIFE_draw use (setMatrixAt, count, visible)
+function LIFE_bm(G,st,name,mul={}){let nv=0,n=0;for(const k in G){const c=LIFE_CAP.bm*(mul[k]||1);nv+=G[k].attributes.position.count*c;n+=c}
+ const B=new THREE.BatchedMesh(n,nv,nv,LV_mat());B.name=name;B.userData.keep=1;B.userData.bmk=1;B.userData.st=null;B.frustumCulled=false;B.perObjectFrustumCulled=false;B.sortObjects=false;B.castShadow=B.receiveShadow=false;LIFE.grp.add(B);
+ const O={},P=[];for(const k in G){const c=LIFE_CAP.bm*(mul[k]||1),ids=[];for(let i=0;i<c;i++){const id=B.addGeometry(G[k]);B.setVisibleAt(id,false);ids.push(id)}
+  const x={name:k,isBm:1,B,ids,vis:0,count:0,visible:false,userData:{st},instanceMatrix:{count:c,needsUpdate:false},setMatrixAt:(i,m)=>B.setMatrixAt(ids[i],m)};O[k]=x;P.push(x)}
+ B.userData.P=P;O[name]=B;return O}
 function LIFE_im(geo,n,mat){const m=new THREE.InstancedMesh(geo,mat||LV_mat(),n);m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;m.count=0;m.visible=false;LIFE.grp.add(m);return m}
 function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
  const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SL=new Map();LIFE.CA=new Map();LIFE.SC.clear();LIFE.dead.clear();LIFE.KK=new Set();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
- for(const k of LIFE_SET){M['s_'+k]=LIFE_im(G.S[k][0],LIFE_CAP.set);M['m_'+k]=LIFE_im(G.S[k][1],LIFE_CAP.setM)}
- for(const k in G.Q)M['q_'+k]=LIFE_im(G.Q[k],LIFE_CAP.prop);M.ball=LIFE_im(G.ball,LIFE_CAP.ball);M.dog=LIFE_im(G.dog,LIFE_CAP.dog);
+ // life-2: set-piece bases + group props share ONE BatchedMesh, the moving set-piece parts another (2 draw calls for every type instead of 1-2 each)
+ const bs={},bm={};for(const k of LIFE_SET){bs['s_'+k]=G.S[k][0];bm['m_'+k]=G.S[k][1]}for(const k in G.Q)bs['q_'+k]=G.Q[k];
+ Object.assign(M,LIFE_bm(bs,true,'bm_s'),LIFE_bm(bm,false,'bm_m',{m_swings:2}));M.ball=LIFE_im(G.ball,LIFE_CAP.ball);M.dog=LIFE_im(G.dog,LIFE_CAP.dog);
  M.fig=LIFE_im(G.fig,LIFE_CAP.fig);M.torso=LIFE_im(G.torso,LIFE_CAP.fig);M.arms=LIFE_im(G.arms,LIFE_CAP.fig);
  const c=new THREE.Color();for(let i=0;i<LIFE_CAP.fig;i++){c.set(LIFE_SHIRT[i%LIFE_SHIRT.length]);M.torso.setColorAt(i,c);M.arms.setColorAt(i,c)}
  for(const k of LIFE_SM)M['x_'+k]=LIFE_im(G.M[k],LIFE_CAP.sm);
@@ -158,20 +185,39 @@ function LIFE_kickGeo(){const K=LIFE_KK,P=[],wedge=(a0,a1,up)=>{const S=new THRE
  for(const s of[-1,1])for(let i=0;i<6;i++)P.push([LB(K.w/6,.3,.5),i%2?'#1b1c22':'#ffffff',-K.w/2+K.w/12+i*K.w/6,K.hgt-.15+.01,s*(K.gap/2+.25)]);
  const sl=Math.atan2(K.hgt,K.len),hy=Math.hypot(K.len,K.hgt);for(const s of[-1,1])for(const b of[-1,1])P.push([LB(.3,.3,hy),'#e8302a',b*(K.w/2-.15),K.hgt/2+.2,s*(K.gap/2+K.len/2),s*sl,0,0]);
  return LIFE_g(P)}
+// ---------- life-2: real LEGO sets (src/assets/lx/ld.js, LDraw OMR CCAL 2.0): Ferris wheel 3681 + Merry-Go-Round 3668 (Fabuland, Philo), turbine 7747 (Mad_Marc).
+// Each set is split into part groups sharing one frame (base / rotor / seat); one merged geometry per material per group keeps the draw calls low.
+const LIFE_DS=new Map();// Fabuland parts are converted with every face (LD_ALL=1): drawn double-sided
+function LIFE_ldM(B,ds){const by=new Map();for(const[geo,m0]of LDW_geo(B)){let mat=m0;if(ds){if(!LIFE_DS.has(m0)){const c=m0.clone();c.side=THREE.DoubleSide;LIFE_DS.set(m0,c)}mat=LIFE_DS.get(m0)}if(!by.has(mat))by.set(mat,[]);const g=geo.index?geo.toNonIndexed():geo;for(const k of Object.keys(g.attributes))if(!['position','normal','color'].includes(k))g.deleteAttribute(k);by.get(mat).push(g)}
+ return[...by].map(([mat,G])=>[G.length>1?mergeGeometries(G):G[0],mat])}
+function LIFE_ldBox(L){const b=new THREE.Box3();for(const[g]of L){g.computeBoundingBox();b.union(g.boundingBox)}return b}
+function LIFE_ldLm(fra){const p=fra?'lxfw':'lxmg';if(typeof LD_MODELS==='undefined'||!LD_MODELS[p+'_base']||typeof LDW_geo!=='function')return null;
+ const base=LIFE_ldM(LD_br(p+'_base'),1),rot=LIFE_ldM(LD_br(p+'_rotor'),1),rb=LIFE_ldBox(rot),bb=LIFE_ldBox(base).union(rb),c=rb.getCenter(new THREE.Vector3()),sz=rb.getSize(new THREE.Vector3());
+ const ax=fra?(sz.x<sz.z?'x':'z'):'y';if(!fra)c.y=0;const inner=new THREE.Group(),piv=new THREE.Group();piv.position.copy(c);
+ for(const[g,m]of base)inner.add(new THREE.Mesh(g,m));for(const[g,m]of rot){g.translate(-c.x,-c.y,-c.z);piv.add(new THREE.Mesh(g,m))}inner.add(piv);
+ const hang=[],seat=[];if(fra){const SB=LD_br(p+'_seat'),T=SB.find(b=>!b.R)||SB[0],tl=LIFE_ldM([T],1),tb=LIFE_ldBox(tl),tc=tb.getCenter(new THREE.Vector3()),th=tb.max.y-tc.y;
+  for(const b of SB){const q=LIFE_ldBox(LIFE_ldM([b])).getCenter(new THREE.Vector3());q.y+=th;hang.push(q.sub(c))}bb.union(LIFE_ldBox(tl));
+  for(const[g,m]of tl){g.translate(-tc.x,-tc.y-th,-tc.z);const im=new THREE.InstancedMesh(g,m,SB.length);im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);im.frustumCulled=false;seat.push(im);inner.add(im)}}
+ const bs=bb.getSize(new THREE.Vector3()),S=fra?22/bs.y:17/Math.max(bs.x,bs.z),bc=bb.getCenter(new THREE.Vector3());inner.scale.setScalar(S);inner.position.set(-bc.x*S,-bb.min.y*S,-bc.z*S);
+ const M=new THREE.Matrix4(),v=new THREE.Vector3();
+ const upd=a=>{const ca=Math.cos(a),sa=Math.sin(a);for(let i=0;i<hang.length;i++){const h=hang[i];if(ax==='x')v.set(h.x,h.y*ca-h.z*sa,h.y*sa+h.z*ca);else v.set(h.x*ca-h.y*sa,h.x*sa+h.y*ca,h.z);
+  M.makeTranslation(c.x+v.x,c.y+v.y,c.z+v.z);for(const im of seat){im.setMatrixAt(i,M);im.instanceMatrix.needsUpdate=true}}};upd(0);
+ return{inner,piv,ax,upd,r:Math.min(bs.x,bs.z)*S/2*.9,w:bs.x*S,d:bs.z*S,h:bs.y*S,S}}
 // ---------- landmarks: Frankfurt Ferris wheel on the Main bank; Athens big carousel in Pedion tou Areos (one mesh pair each, always drawn within 900 m)
 function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
  const tryAt=(x,z,r)=>{for(let k=0;k<60&&!at;k++){const a=k*2.39,d=k*4,px=x+Math.sin(a)*d,pz=z+Math.cos(a)*d,y=LIFE_gy(px,pz);if(isFinite(y)&&LIFE_free(px,pz,r,y))at={x:px,z:pz,y}}};
  if(fra&&typeof MAINR!=='undefined'&&MAINR&&MAINR.pts){const P=MAINR.pts;let bp=P[0],bd=1e18;for(const p of P){const d=(p.x-150)**2+(p.z+120)**2;if(d<bd){bd=d;bp=p}}
   tryAt(bp.x-bp.tz*(bp.hw+22),bp.z+bp.tx*(bp.hw+22),9);if(at)at.h=Math.atan2(bp.tx,bp.tz)}
  else if(!fra)tryAt(1250,-60,7);if(!at)return;
- const g=new THREE.Group(),P=Math.PI;if(fra){const base=LIFE_g([[LB(1.2,24,1.2),'#e8e8f0',-3,11,0,0,0,.25],[LB(1.2,24,1.2),'#e8e8f0',3,11,0,0,0,-.25],[LB(1.2,24,1.2),'#e8e8f0',-3,11,4,0,0,.25],[LB(1.2,24,1.2),'#e8e8f0',3,11,4,0,0,-.25],[LB(10,1,7),'#7a7e86',0,.5,2]]);
+ const g=new THREE.Group(),P=Math.PI,LD=LIFE_ldLm(fra);if(LD){g.add(LD.inner);LIFE.lm={g,spin:LD.piv,ax:LD.ax,upd:LD.upd,ld:LD,k:fra?'Ferris wheel':'big carousel',...at}}
+ else if(fra){const base=LIFE_g([[LB(1.2,24,1.2),'#e8e8f0',-3,11,0,0,0,.25],[LB(1.2,24,1.2),'#e8e8f0',3,11,0,0,0,-.25],[LB(1.2,24,1.2),'#e8e8f0',-3,11,4,0,0,.25],[LB(1.2,24,1.2),'#e8e8f0',3,11,4,0,0,-.25],[LB(10,1,7),'#7a7e86',0,.5,2]]);
    const sp=[];for(let i=0;i<16;i++){const a=i*P/8;sp.push([LB(.35,21,.35),'#f2f2f2',0,0,0,0,0,a]);sp.push([LB(1.6,1.6,1.6),LIFE_SHIRT[i%8],Math.sin(a)*10.5,Math.cos(a)*10.5-1.2,0])}
    sp.push([new THREE.TorusGeometry(10.5,.3,6,40),'#e8302a',0,0,0]);sp.push([LC(.8,.8,5,10),'#666',0,0,2,P/2]);const wheel=LIFE_g(sp);
    const mb=new THREE.Mesh(base,LV_mat()),mw=new THREE.Mesh(wheel,LV_mat());mw.position.set(0,23,2);g.add(mb,mw);LIFE.lm={g,spin:mw,ax:'z',k:'Ferris wheel',...at}}
  else{const base=LIFE_g([[LC(8,8,.6,24),'#c84060',0,.3,0],[LC(.6,.6,7,10),'#ffd12c',0,3.5,0],[LC(0,8.6,3,16),'#ffffff',0,8.6,0],[LC(8.6,8.6,.6,16),'#1f5fbf',0,7,0]]);
    const H=[];for(let i=0;i<12;i++){const a=i*P/6;H.push([LB(.7,1.8,2.2),LIFE_SHIRT[i%8],Math.sin(a)*6,2.2,Math.cos(a)*6,0,a,0]);H.push([LC(.08,.08,6,4),'#ffd12c',Math.sin(a)*6,3.6,Math.cos(a)*6])}
    const mb=new THREE.Mesh(base,LV_mat()),mh=new THREE.Mesh(LIFE_g(H),LV_mat());g.add(mb,mh);LIFE.lm={g,spin:mh,ax:'y',k:'big carousel',...at}}
- g.traverse(o=>{o.userData.keep=1});/* not merged by WB city batching: the wheel turns */g.position.set(at.x,at.y,at.z);g.rotation.y=at.h||0;LIFE.grp.add(g);const r=fra?6:8.5;LIFE.lm.r=r}
+ g.traverse(o=>{o.userData.keep=1});/* not merged by WB city batching: the wheel turns */g.position.set(at.x,at.y,at.z);g.rotation.y=at.h||0;LIFE.grp.add(g);const r=LD?LD.r:fra?6:8.5;LIFE.lm.r=r}
 // ---------- fill: items within LIFE_R m, nearest first, into the pools (every 12 frames or 20 m)
 function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Math.floor(x0/LIFE_CELL),cb=Math.floor(z0/LIFE_CELL),near=[],t0=performance.now();let todo=false;
  for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>3){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
@@ -201,7 +247,14 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
    else if(T==='billboard')LIFE_put(m,cnt,it.x,it.y+5.3,it.z,0,tt*.7,0,1);
    else if(T==='crane')LIFE_put(m,cnt,it.x,it.y+18.6,it.z,0,it.h+Math.sin(tt*.18)*1.3,0,1);
    else if(T==='balloons')LIFE_put(m,cnt,it.x+Math.sin(tt*.9)*.25,it.y+4.2+Math.sin(tt*1.3)*.25,it.z,Math.sin(tt*1.1)*.12,tt*.2,Math.sin(tt*.8)*.12,1);
-   else if(T==='carousel')LIFE_put(m,cnt,it.x,it.y+Math.sin(tt*2)*.12,it.z,0,tt*.9,0,1)}
+   else if(T==='carousel')LIFE_put(m,cnt,it.x,it.y+Math.sin(tt*2)*.12,it.z,0,tt*.9,0,1);
+   // life-2 pieces (local x = along the frame/plank: (cos h, -sin h); local z = (sin h, cos h))
+   else if(T==='swings'||T==='seesaw'||T==='teacups'||T==='sprinkler'){const ch=Math.cos(it.h),sh=Math.sin(it.h),kid=!LIFE.S&&d2<120*120;
+    if(T==='swings')for(let k=0;k<2;k++){const a=Math.sin(tt*2.2+k*Math.PI)*.75,lx=(k?.75:-.75),x=it.x+ch*lx,z=it.z-sh*lx;LIFE_put(m,cnt,x,it.y+2.7,z,a,it.h,0,1);
+     if(kid)LIFE_fig(cnt,x+sh*-2.04*Math.sin(a),it.y,z+ch*-2.04*Math.sin(a),it.h+(a>0?0:0),-1.9,2.7-2.04*Math.cos(a)-.9,a*.6,(it.id+k*5)&1023)}
+    else if(T==='seesaw'){const a=Math.sin(tt*1.6)*.3;LIFE_put(m,cnt,it.x,it.y+.68,it.z,0,it.h,a,1);if(kid)for(const e of[-1.75,1.75]){const lx=e*Math.cos(a);LIFE_fig(cnt,it.x+ch*lx,it.y,it.z-sh*lx,it.h+(e<0?Math.PI/2:-Math.PI/2),-1.6,.7+e*Math.sin(a)-.8,0,(it.id+(e<0?1:7))&1023)}}
+    else if(T==='teacups'){const a=tt*.7;LIFE_put(m,cnt,it.x,it.y+.3,it.z,0,a,0,1);if(kid)for(let k=0;k<4;k++){const b=a+k*Math.PI/2;LIFE_fig(cnt,it.x+Math.sin(b)*2.2,it.y,it.z+Math.cos(b)*2.2,b+tt*2,-2.5+Math.sin(tt*6+k)*.3,.2,0,(it.id+k*3)&1023)}}
+    else LIFE_put(m,cnt,it.x,it.y+.4,it.z,0,tt*1.8,0,1)}}
   else if(it.c==='grp'){if(d2>130*130)continue;const T=it.t,tt=t+it.ph,near=d2<45*45,ch=near&&stunt;if(ch)cheer++;
    const fx=Math.sin(it.h),fz=Math.cos(it.h),rx=-fz,rz=fx;// fx,fz: toward the road; rx,rz: along the kerb
    const P=[];// [x,z,h,arm,hop,lean]
@@ -215,6 +268,16 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
     if(!run){const x=it.x+rx*(s+(u<1?1.6:-1.6)),z=it.z+rz*(s+(u<1?1.6:-1.6));LIFE_put(M.dog,cnt,x,it.y+Math.abs(Math.sin(tt*10))*.06,z,0,Math.atan2(rx*(u<1?1:-1),rz*(u<1?1:-1)),0,1)}}
    else if(T==='fans'){LIFE_put(M.q_fans,cnt,it.x-fx*.8,it.y,it.z-fz*.8,0,it.h,0,1);for(let k=0;k<3;k++){const wv=d2<35*35&&sp>3;P.push([it.x+rx*(k-1)*.9,it.z+rz*(k-1)*.9,it.h,wv?-2.7+Math.sin(tt*9+k)*.35:-.15,wv?Math.abs(Math.sin(tt*5+k))*.15:0,0])}}
    else if(T==='works'){LIFE_put(M.q_works,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<2;k++)P.push([it.x-fx*.9+rx*(k?1:-1)*1.2,it.z-fz*.9+rz*(k?1:-1)*1.2,it.h+(k?-2.2:2.2),-1.3+Math.abs(Math.sin(tt*5+k*1.7))*1.1,0,.25*Math.abs(Math.sin(tt*5+k*1.7))])}
+   // life-2 activities
+   else if(T==='picnic'){LIFE_put(M.q_picnic,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<3;k++){const a=k*2.1+.3,x=it.x+Math.sin(a)*.95,z=it.z+Math.cos(a)*.95;P.push([x,z,a+Math.PI,-1+Math.max(0,Math.sin(tt*1.7+k*2.3))*-.9,-.5,0])}}
+   else if(T==='painter'){LIFE_put(M.q_painter,cnt,it.x,it.y,it.z,0,it.h,0,1);P.push([it.x-fx*.75,it.z-fz*.75,it.h,-1.5+Math.sin(tt*4)*.35,0,Math.sin(tt*.7)*.05]);const w=Math.sin(tt*.4)*.6;P.push([it.x-fx*1.7+rx*(1+w),it.z-fz*1.7+rz*(1+w),it.h+.4,-.1,0,.12])}
+   else if(T==='icecream'){LIFE_put(M.q_icecream,cnt,it.x,it.y,it.z,0,it.h,0,1);P.push([it.x-fx*.9,it.z-fz*.9,it.h,-1.3+Math.max(0,Math.sin(tt*2))*-.8,0,0]);const q=((tt*.15)%1+1)%1;
+    for(let k=0;k<3;k++){const d=1.1+k*.8-q*.8;P.push([it.x+fx*1.1+rx*d,it.z+fz*1.1+rz*d,it.h+Math.PI,-.2+(k===0?Math.sin(tt*3)*.3:0),0,0])}const w=q*6;P.push([it.x+fx*1.6-rx*(1+w),it.z+fz*1.6-rz*(1+w),it.h-Math.PI/2,-1.5,Math.abs(Math.sin(tt*6))*.05,0])}
+   else if(T==='juggler'){LIFE_put(M.q_juggler,cnt,it.x,it.y,it.z,0,it.h,0,1);P.push([it.x,it.z,it.h,-1.5+Math.sin(tt*9)*.25,0,0]);if(!LIFE.S)for(let k=0;k<3;k++){const f=tt*3.4+k*2.09,u=Math.sin(f)*.45;LIFE_put(M.ball,cnt,it.x+rx*u+fx*.35,it.y+1.25+Math.abs(Math.cos(f))*1.1,it.z+rz*u+fz*.35,0,0,0,.7)}
+    for(let k=0;k<2;k++){const cl=Math.sin(tt*12+k)>.3;P.push([it.x+fx*2.1+rx*(k?1:-1)*.9,it.z+fz*2.1+rz*(k?1:-1)*.9,it.h+Math.PI,cl?-1.4:-1.1,0,0])}}
+   else if(T==='chess'){LIFE_put(M.q_chess,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<2;k++){const sd=k?1:-1,mv=Math.sin(tt*.8+k*3)>.85;P.push([it.x+fx*.85*sd,it.z+fz*.85*sd,it.h+(k?Math.PI:0),mv?-1.4:-.6,-.38,mv?.15:.05])}P.push([it.x+rx*1.2,it.z+rz*1.2,it.h-Math.PI/2,-.15,0,.18])}
+   else if(T==='dance'){LIFE_put(M.q_dance,cnt,it.x-fx*1.6,it.y,it.z-fz*1.6,0,it.h,0,1);for(let k=0;k<5;k++){const a=tt*.8+k*1.2566,x=it.x+Math.sin(a)*1.4,z=it.z+Math.cos(a)*1.4;P.push([x,z,a+Math.PI/2,-1.6,Math.abs(Math.sin(tt*5+k*.4))*.18,Math.sin(tt*2.5)*.1])}}
+   else if(T==='photo'){LIFE_put(M.q_photo,cnt,it.x-fx*1.2,it.y,it.z-fz*1.2,0,it.h,0,1);P.push([it.x-fx*1.6,it.z-fz*1.6,it.h,-2.2,0,.05]);for(let k=0;k<3;k++){const pose=Math.sin(tt*.9+k)>0;P.push([it.x+fx*1+rx*(k-1)*.8,it.z+fz*1+rz*(k-1)*.8,it.h+Math.PI,pose?-2.8:-.3,pose&&k===1?Math.abs(Math.sin(tt*6))*.2:0,0])}}
    // reactions: jump aside from the car (or fly, harmless, on a direct hit) and cheer at stunts
    for(let k=0;k<P.length;k++){let [x,z,h,arm,hop,lean]=P[k];const fid=it.id*8+k,F=LIFE.fly.get(fid);
     if(F){const e=t-F.t0;if(e>F.T){LIFE.fly.delete(fid)}else{const f=e/F.T;x+=F.dx*Math.min(1,f*1.6);z+=F.dz*Math.min(1,f*1.6);hop+=F.up*4*f*(1-f);arm=-2.8;lean=F.fly?e*9:0}}
@@ -223,7 +286,7 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
      if(ch&&!F){arm=-2.8+Math.sin(tt*10+k)*.3;hop=Math.abs(Math.sin(tt*7+k))*.35}}
     LIFE_fig(cnt,x,it.y,z,h,arm,hop,lean,(it.id+k*3)&1023)}}}
  if(cheer&&!S)LIFE.n.cheer++;
- for(const k in M){const m=M[k];if(m.userData.st!==LIFE.S)continue;const n=cnt[k]||0;m.count=n;m.visible=n>0;if(n){m.instanceMatrix.needsUpdate=true;if(m.instanceColor&&(k==='pop'||k==='ring'||LIFE.cd&&(k==='torso'||k==='arms')))m.instanceColor.needsUpdate=true}}if(!S)LIFE.cd=0;LIFE.S=false;LIFE.cnt=Object.assign(LIFE.cnt||{},cnt)}
+ for(const k in M){const m=M[k];if(m.userData.st!==LIFE.S)continue;const n=cnt[k]||0;if(m.isBm){if(n!==m.vis){for(let i=0;i<m.ids.length;i++)m.B.setVisibleAt(m.ids[i],i<n);m.vis=n}m.count=n;m.visible=n>0;continue}m.count=n;m.visible=n>0;if(n){m.instanceMatrix.needsUpdate=true;if(m.instanceColor&&(k==='pop'||k==='ring'||LIFE.cd&&(k==='torso'||k==='arms')))m.instanceColor.needsUpdate=true}}for(const k in M){const B=M[k];if(B.userData.bmk)B.visible=B.userData.P.some(x=>x.visible)}if(!S)LIFE.cd=0;LIFE.S=false;LIFE.cnt=Object.assign(LIFE.cnt||{},cnt)}
 // ---------- collisions: smash small things, bump set pieces, drive through pop-up bubbles
 function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[]){const ex=RO.x-it.x,ez=RO.z-it.z;if(Math.abs(ex)>9||Math.abs(ez)>9)continue;const e2=ex*ex+ez*ez;
   if(it.c==='sm'){if(e2>1.9*1.9||Math.abs(y0-it.y)>3||LIFE.dead.has(it.id))continue;LIFE.dead.set(it.id,1);const at=V3(it.x,it.y+.6,it.z),fw=V3(Math.sin(RO.vh??RO.h),0,Math.cos(RO.vh??RO.h)),
@@ -238,7 +301,7 @@ function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[
 function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.KK&&LIFE.KK.size)LIFE_kickSync([]);if(LIFE.M&&LIFE.grp)for(const k in LIFE.M){LIFE.M[k].visible=false}if(LIFE.lm)LIFE.lm.g.visible=!!LIFE.on;return}
  const t0=performance.now();if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
  if(LIFE.fr%12===0||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
- LIFE_hit();LIFE_draw();const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;if(lm.ax==='z')lm.spin.rotation.z=LIFE.t*.12;else lm.spin.rotation.y=LIFE.t*.5}
+ LIFE_hit();LIFE_draw();const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;const a=LIFE.t*(lm.ax==='y'?.5:.12);lm.spin.rotation[lm.ax]=a;if(lm.upd&&lm.g.visible)lm.upd(a)}
  const ms=performance.now()-t0;LIFE.ms=LIFE.ms*.95+ms*.05;LIFE.msN++;if(LIFE.rec)LIFE.rec.push([ms,dt])}
 {const _lfLS=LV_step;LV_step=dt=>{_lfLS(dt);try{LIFE_step(dt)}catch(e){if(!LIFE.e){LIFE.e=1;console.warn('LIFE',e)}}}}
 // ---------- tests: audit any road window (state asserts, no rendering), cost, GO spots
@@ -258,7 +321,7 @@ function LIFE_audit(n=60){if(!LIFE_init())return null;const S=LIFE_samples(n),fa
   if(f.length)fail.push([Math.round(p.x),Math.round(p.z),f.join(' ')]);else ok++;rs+=LIFE_rep(w.set);rm+=LIFE_rep(w.smT);rn++}
  return{n:S.length,ok,pct:+(ok/Math.max(1,S.length)*100).toFixed(1),min,repSet:+(rs/rn).toFixed(2),repSm:+(rm/rn).toFixed(2),lane,smMax,fail:fail.slice(0,6),ms:Math.round(performance.now()-t0)}}
 // draw calls and instances this frame (the frame-cost metric) + the CPU time of LIFE_step (smoothed)
-function LIFE_cost(){let dc=0,inst=0;for(const k in LIFE.M||{}){const m=LIFE.M[k];if(m.visible&&m.count){dc++;inst+=m.count}}if(LIFE.lm&&LIFE.lm.g.visible)dc+=LIFE.lm.g.children.length;return{dc,inst,ms:+LIFE.ms.toFixed(2)}}
+function LIFE_cost(){let dc=0,inst=0;for(const k in LIFE.M||{}){const m=LIFE.M[k];if(m.userData.bmk){if(m.visible)dc++}else if(m.visible&&m.count){if(!m.isBm)dc++;inst+=m.count}}if(LIFE.lm&&LIFE.lm.g.visible)LIFE.lm.g.traverse(o=>{if(o.isMesh)dc++});return{dc,inst,ms:+LIFE.ms.toFixed(2)}}
 // GO: jump to a street spot of the audit, wait, then report density + cost; pass line in the checklist
 function LIFE_go(say){if(!LIFE.on)return'📍 LIFE is OFF in this build (remove ?life=0)';const S=LIFE_samples(40),p=S[(LIFE.goI=(LIFE.goI||0)+7)%S.length]||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.rec=[];
  setTimeout(()=>{let A,w,c;try{const R=LIFE.rec||[];LIFE.rec=null;c=LIFE_cost();const n=Math.max(1,R.length),m=R.reduce((a,r)=>a+r[0],0)/n,fd=R.reduce((a,r)=>a+r[1],0)/n*1000;c.ms=+m.toFixed(2);c.fr=+fd.toFixed(1);c.lim=+Math.max(1.5,fd*.08).toFixed(2);A=LIFE_audit(60);w=LIFE_win(RO.x,RO.z)}catch(e){say('📍 LIFE ❌ '+e);return}
@@ -282,8 +345,8 @@ function LIFE_goPop(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floo
  setTimeout(()=>{K.ArrowUp=false;const ok=LIFE.n.pop>n0&&RO.pop;say(`📍 POP-UP ${p.K.name}: `+(ok?'started ('+RO.pop.name+') ✅':'not started ❌'))},4000);return'📍 POP-UP · driving…'}
 // GO: the landmark (Ferris wheel / big carousel) 60 m away, camera on it: it turns
 function LIFE_goLm(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const lm=LIFE.lm;if(!lm)return'📍 no landmark ❌';let ok=false,bx=0,bz=0,h=0;for(let k=0;k<24&&!ok;k++){h=k*Math.PI/12;bx=lm.x-Math.sin(h)*55;bz=lm.z-Math.cos(h)*55;ok=!roamHit(bx,bz,2.5,groundAt(bx,bz,999)+.5)}
- if(!roamWarp(bx,bz,h))return'📍 Can\'t jump right now';RO.v=0;const r0=lm.ax==='z'?lm.spin.rotation.z:lm.spin.rotation.y;
- setTimeout(()=>{const r1=lm.ax==='z'?lm.spin.rotation.z:lm.spin.rotation.y;say(`📍 ${lm.k.toUpperCase()}: turned ${(r1-r0).toFixed(2)} rad in 2 s `+(lm.g.visible&&Math.abs(r1-r0)>.1?'✅':'❌'))},2000);return'📍 '+lm.k.toUpperCase()+' · watching…'}
+ if(!roamWarp(bx,bz,h))return'📍 Can\'t jump right now';RO.v=0;const r0=lm.spin.rotation[lm.ax];
+ setTimeout(()=>{const r1=lm.spin.rotation[lm.ax];say(`📍 ${lm.k.toUpperCase()}: turned ${(r1-r0).toFixed(2)} rad in 2 s `+(lm.g.visible&&Math.abs(r1-r0)>.1?'✅':'❌'))},2000);return'📍 '+lm.k.toUpperCase()+' · watching…'}
 // GO (life-2): 45 m before an AIR TIME kicker, real keyboard gas for 6 s: the car takes off from the lip, flies the gap through the bubble (≥ 0.6 s air), lands and keeps going
 function LIFE_goKick(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floor(RO.x/LIFE_PG),b0=Math.floor(RO.z/LIFE_PG);let p=null;
  for(let r=0;r<8&&!p;r++)for(let a=a0-r;a<=a0+r&&!p;a++)for(let b=b0-r;b<=b0+r&&!p;b++){if(Math.max(Math.abs(a-a0),Math.abs(b-b0))!==r)continue;const q=LIFE_pop(a,b);if(q&&q.K.k==='air'&&LIFE_kick(q)){const bx=q.x-Math.sin(q.h)*45,bz=q.z-Math.cos(q.h)*45;if(!roamHit(bx,bz,2.5,q.y+.5))p=q}}
@@ -292,7 +355,17 @@ function LIFE_goKick(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.flo
  setTimeout(()=>{v1=Math.abs(RO.v)},5200);
  setTimeout(()=>{clearInterval(iv);K.ArrowUp=false;const ok=LIFE.n.pop>n0&&air>=.6&&v1>5,P=RO.pop;window.__chk=window.__chk||{};window.__chk.kick={air:+air.toFixed(2),top:+top.toFixed(1),v1:+v1.toFixed(1),pop:!!P,ok};
   say(`📍 AIR TIME kicker: ${air.toFixed(2)} s in the air, ${top.toFixed(1)} m high, bubble ${LIFE.n.pop>n0?'started ('+(P?P.name+' '+(P.v||0).toFixed(1)+' s':'done')+')':'not hit'}, ${(v1*3.6).toFixed(0)} km/h after landing `+(ok?'✅':'❌'))},6000);return'📍 AIR TIME kicker · driving…'}
+// GO (life-2): variety. Parks you on a street; pass = here ≥ 6 different activities / set pieces within 100 m, the same in ≥ 90 % of 60 city windows,
+// every one of the 12 set-piece and 15 activity types somewhere in the city, neighbouring windows share ≤ 60 % of their types, LIFE ≤ 40 draw calls
+function LIFE_goVar(say){if(!LIFE.on)return'📍 LIFE is OFF';const S=LIFE_samples(60);let best=null,bn=0;const W=S.map(p=>{const w=LIFE_win(p.x,p.z),T=new Set();for(const it of w.set)T.add(it.t);
+  for(const a of[-1,0,1])for(const b of[-1,0,1])for(const it of LIFE_cell(Math.floor(p.x/LIFE_CELL)+a,Math.floor(p.z/LIFE_CELL)+b))if(it.c==='grp'&&(it.x-p.x)**2+(it.z-p.z)**2<1e4)T.add(it.t);
+  for(const it of w.set)T.add(it.t);if(T.size>bn){bn=T.size;best=p}return T});
+ const all=new Set();W.forEach(T=>T.forEach(t=>all.add(t)));let ok6=0,sim=0,sn=0;W.forEach(T=>{if(T.size>=6)ok6++});
+ for(let i=0;i<S.length;i++){let j=-1,jd=1e18;for(let k=0;k<S.length;k++){if(k===i)continue;const d=(S[k].x-S[i].x)**2+(S[k].z-S[i].z)**2;if(d<jd){jd=d;j=k}}const A=W[i],B=W[j],u=new Set([...A,...B]).size;if(u){sim+=[...A].filter(t=>B.has(t)).length/u;sn++}}
+ const nT=LIFE_SET.length+LIFE_GRP.length,pct=Math.round(ok6/S.length*100),js=sn?sim/sn:0,p=best||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.px=1e9;
+ setTimeout(()=>{const c=LIFE_cost(),ok=pct>=90&&all.size>=nT&&js<=.6&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.var={pct,types:all.size,nT,js:+js.toFixed(2),dc:c.dc,here:bn,ok};
+  say(`📍 VARIETY ${CID}: here ${bn} types within 100 m · ${pct}% of 60 windows have ≥ 6 · ${all.size}/${nT} types in the city (missing: ${[...LIFE_SET,...LIFE_GRP].filter(t=>!all.has(t)).join(',')||'none'}) · neighbours share ${Math.round(js*100)}% · ${c.dc} draws `+(ok?'✅':'❌'))},2000);return'📍 VARIETY '+CID+' · measuring…'}
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
- 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
-window.__life={setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
+ 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
+window.__life={ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};

@@ -249,6 +249,8 @@ def main():
     fx, fy, fz = mode_frac(c0[:, 0], 4), mode_frac(c0[:, 1], 8), mode_frac(c0[:, 2], 4)
     lo = np.array([b['c0'] for b in bricks]).min(0); hi = np.array([b['c0'] + [b['fw'], b['fh'], b['fd']] for b in bricks]).max(0)
     sh = np.array([fx + math.floor((lo[0] + hi[0]) / 2 - fx), fy + math.floor(lo[1] - fy), fz + math.floor((lo[2] + hi[2]) / 2 - fz)])
+    if os.environ.get('LDSHIFT'): sh = np.array([float(v) for v in os.environ['LDSHIFT'].split(',')])  # life-2: several part groups of one model share one frame
+    print('SHIFT', ','.join('%g' % v for v in sh))
     out = []
     for b in bricks:
         c = b['c0'] - sh; i = np.round(c).astype(int); o = np.round(c - i, 3)

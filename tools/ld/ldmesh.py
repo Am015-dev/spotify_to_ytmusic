@@ -60,6 +60,7 @@ def crease_normals(T, ang=35):
         N[i] = acc / (np.linalg.norm(acc) or 1)
     return T, N
 def mesh(name, S=0.03, keep=0.45, min_tris=160):
+    keep = float(os.environ.get("LD_KEEP", keep))  # life-2: LD_KEEP=1 = no simplification (big Fabuland parts)
     T, ST = _tris(name)
     if not len(T): return None
     Tall = T; k, D = outer(T); T = T[k]
