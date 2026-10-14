@@ -105,7 +105,7 @@ function BX_mats(){if(BX.M)return BX.M;const M=BX.M={};
   g.fillStyle=r;g.beginPath();g.arc(w/2,h/2,w*.3,0,7);g.fill();g.strokeStyle='rgba(0,0,0,.18)';g.lineWidth=2;g.stroke()});
  M.terr=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,map:M.stud});
  M.water=new THREE.MeshStandardMaterial({color:0x1e86e0,roughness:.18,metalness:.05,transparent:true,opacity:.84,map:BX_tex(64,64,(g,w,h)=>{g.fillStyle='#dfeeff';g.fillRect(0,0,w,h);g.strokeStyle='#ffffff';g.lineWidth=3;g.beginPath();g.arc(w/2,h/2,w*.28,0,7);g.stroke()},[220,220])});
- M.pil=new THREE.MeshStandardMaterial({roughness:.5,map:BX_tex(64,64,(g,w,h)=>{g.fillStyle='#d8d8d8';g.fillRect(0,0,w,h);g.fillStyle='#9a9a9a';g.fillRect(0,h-4,w,4);g.fillRect(w/2-1,0,2,h/2)}),color:0xe4cd9e});
+ M.pil=new THREE.MeshStandardMaterial({roughness:.5,map:BX_tex(64,64,(g,w,h)=>{g.fillStyle='#d8d8d8';g.fillRect(0,0,w,h);g.fillStyle='#9a9a9a';g.fillRect(0,h-4,w,4);g.fillRect(w/2-1,0,2,h/2)}),color:0xb4b9bd}); // trk-3: LEGO light grey, never tan
  M.ghost=new THREE.MeshBasicMaterial({color:0x54ff7a,transparent:true,opacity:.42,depthWrite:false});
  M.hl=new THREE.MeshBasicMaterial({color:0xffe14d,transparent:true,opacity:.5,depthWrite:false});
  M.end=new THREE.MeshBasicMaterial({color:0xffd400});M.cur=new THREE.MeshBasicMaterial({color:0x22e0ff});
@@ -155,7 +155,7 @@ function BX_buildAll(){if(!BX.sc)return;for(const o of[...BX.gP.children]){BX.gP
  BX_hashAll();BX_terrMesh();BX_bld();BX_after()}
 // pillars (LEGO brick columns) under every deck that floats > 0.8 m over the ground; colliders = the same circles; none within 9 m of a lower road (trk-2: 5.5 m put tan blocks on its edge)
 function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S){let last=-99;for(const s of S){if(s.U.y<.8||s.d-last<9)continue;
-  for(const sx of[-2.6,2.6]){const x=s.p.x+s.S.x*sx,z=s.p.z+s.S.z*sx,top=s.p.y-.8,g=BX_h(x,z);
+  for(const sx of[-2.6,2.6]){const x=s.p.x+s.S.x*sx,z=s.p.z+s.S.z*sx,top=s.p.y+s.S.y*sx-.8,g=BX_h(x,z); // trk-3: under the deck surface right above it (a banked deck's low side; top=centre-0.8 poked 0.9 m through: Alex's "tan wedges")
    if(top-g>.8&&!BX.samp.some(q=>q.pc!==pc&&q.s.p.y<top-1&&Math.hypot(q.s.p.x-x,q.s.p.z-z)<9))P.push([x,z,g,top])}last=s.d}}}
  BX.pil=P;if(BX.pilM){BX.sc.remove(BX.pilM);BX.pilM.dispose()}if(!P.length){BX.pilM=null;return}
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1.6,1,1.6),M.pil,P.length),mt=new THREE.Matrix4();
@@ -165,12 +165,14 @@ function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)
 // one landmark per track (a giant LEGO minifig statue near the start). All instanced; no collision (they stand outside the rails).
 const BX_DC=['#c91a09','#0055bf','#f2cd37','#237841','#fe8a18','#ffffff','#a0a5a9'].map(bxCol);
 function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isInstancedMesh)o.dispose()})}const g=BX.drM=new THREE.Group();BX.sc.add(g);
- const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],legs=[],stand=[],pole=[],flag=[],ban=[],chev=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<8.5)/* another road within its rail */,
+ const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],legs=[],stand=[],pole=[],flag=[],ban=[],chev=[],rban=[],tree=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<8.5)/* another road within its rail */,
   inB=(x,z)=>(BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+2&&Math.abs(b.z-z)<b.d/2+2);let n=0,side=1,run=0,len=0,props=0;
  for(const pc of L){const S=pc.S[0];for(let k=1;k<S.length;k++){const s=S[k],d=s.d-S[k-1].d;len+=d;run+=d;if(pc.def.boost&&k%Math.max(1,S.length>>1)===0)chev.push(s);if(run<7)continue;run=0;side=-side;n++;
   const raised=s.p.y-BX_h(s.p.x,s.p.z)>2.5||pc.def.p.length>1;if(pc.def.p.length>1||pc.def.stick)continue;
-  if(raised){const x=s.p.x+s.S.x*side*7.4,z=s.p.z+s.S.z*side*7.4,y=s.p.y+s.S.y*side*7.4+1.4;pole.push([x,y,z,3]);flag.push([x,y+2.2,z,n,s]);props++;continue} // trk-2 (Alex beta.22 "giant poles block the view"): 3 m rail pennants instead of 7 m poles
+  if(raised){if(n%2){const o=side*6.8;rban.push([s.p.x+s.S.x*o,s.p.y+s.S.y*o+1.4,s.p.z+s.S.z*o,n,s]);props++;continue} // trk-3 (Alex beta.36 "bare grey + sky"): sponsor boards on the deck rail, alternating with the pennants
+   const x=s.p.x+s.S.x*side*7.4,z=s.p.z+s.S.z*side*7.4,y=s.p.y+s.S.y*side*7.4+1.4;pole.push([x,y,z,3]);flag.push([x,y+2.2,z,n,s]);props++;continue} // trk-2 (Alex beta.22 "giant poles block the view"): 3 m rail pennants instead of 7 m poles
   const x=s.p.x+s.S.x*side*9.6,z=s.p.z+s.S.z*side*9.6,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
+  if(n%4===1){const tx=s.p.x-s.S.x*side*15,tz=s.p.z-s.S.z*side*15,ty=BX_h(tx,tz);if(ty>=.3&&!near(tx,tz)&&!inB(tx,tz)&&!BX.samp.some(q=>Math.hypot(q.s.p.x-tx,q.s.p.z-tz)<11))tree.push([tx,ty,tz,n])} // trk-3: a tree line at chase-cam distance on the other side
   if(n%3===0){stand.push([x,y,z,s]);for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*2.8,fz=z+s.F.z*f*2.8;legs.push([fx,y+1.7,fz]);body.push([fx,y+3.2,fz,n+f]);head.push([fx,y+4.55,fz])}}
   else if(n%3===1){ban.push([x,y,z,n,s]);for(const e of[-4.6,4.6])pole.push([x+s.F.x*e,y,z+s.F.z*e,3.2])}else{pole.push([x,y,z,10]);flag.push([x,y+8.6,z,n,s])}}}
  const mt=new THREE.Matrix4(),q=new THREE.Quaternion(),sc=bxV(),pos=bxV(),UP=bxV(0,1,0),M=(geo,mat,arr,fn)=>{if(!arr.length)return;const im=new THREE.InstancedMesh(geo,mat,arr.length);im.castShadow=true;
@@ -187,9 +189,15 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
   c.fillRect(0,18,w,28);c.fillStyle='#fff';for(let i=0;i<8;i++){c.beginPath();c.arc(16+i*32,32,9,0,7);c.fill()}})});
  const bn=M(new THREE.BoxGeometry(.5,3,10),BX.banMat,ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+4.7,a[2]),q,sc.set(1,1,1))});
  if(bn)ban.forEach((a,i)=>bn.setColorAt(i,BX_DC[(a[3]>>1)%4]));
+ const rb=M(new THREE.BoxGeometry(.3,1.5,7.5),BX.banMat,rban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+.75,a[2]),q,sc.set(1,1,1))});
+ if(rb)rban.forEach((a,i)=>rb.setColorAt(i,BX_DC[(a[3]>>1)%5]));
+ // trackside trees: LEGO-style trunk + two stacked cones (canopy colours like BX_trees)
+ M(new THREE.CylinderGeometry(.55,.65,3,8),std(0x7c4a1e),tree,a=>{mt.makeTranslation(a[0],a[1]+1.5,a[2])});
+ const tc=M(new THREE.ConeGeometry(3,5,8),std(0xffffff),tree,a=>{mt.makeTranslation(a[0],a[1]+5,a[2])}),tc2=M(new THREE.ConeGeometry(2.2,4,8),std(0xffffff),tree,a=>{mt.makeTranslation(a[0],a[1]+7.6,a[2])});
+ const TC=[0x237841,0x2f8f3c,0x4b9f4a,0xe07b16].map(c=>new THREE.Color(c));if(tc)tree.forEach((a,i)=>{tc.setColorAt(i,TC[a[3]%4]);tc2.setColorAt(i,TC[(a[3]+1)%3])});
  // BOOST pads: a glowing blue tile with three yellow chevrons (pulse in BX_tick). trk-2: the thin orange V-bars read as "tan cardboard wedges" (Alex beta.22)
- const cm=BX.chevMat=BX.chevMat||(()=>{const t=BX_tex(128,128,(c,w,h)=>{c.fillStyle='#0b2f86';c.fillRect(0,0,w,h);
-   for(let k=0;k<3;k++){const y=24+k*36;c.beginPath();c.moveTo(18,y+26);c.lineTo(64,y);c.lineTo(110,y+26);c.lineTo(110,y+40);c.lineTo(64,y+14);c.lineTo(18,y+40);c.closePath();c.fillStyle='#ffb000';c.fill();c.strokeStyle='#7a4d00';c.lineWidth=2;c.stroke()}});
+ const cm=BX.chevMat=BX.chevMat||(()=>{const t=BX_tex(128,128,(c,w,h)=>{c.fillStyle='#1560e8';c.fillRect(0,0,w,h);c.strokeStyle='#9cc8ff';c.lineWidth=6;c.strokeRect(3,3,w-6,h-6);
+   for(let k=0;k<3;k++){const y=24+k*36;c.beginPath();c.moveTo(18,y+26);c.lineTo(64,y);c.lineTo(110,y+26);c.lineTo(110,y+40);c.lineTo(64,y+14);c.lineTo(18,y+40);c.closePath();c.fillStyle='#ff8a00';c.fill();c.strokeStyle='#fff3c0';c.lineWidth=2;c.stroke()}});
    return new THREE.MeshStandardMaterial({map:t,emissiveMap:t,emissive:0xffffff,emissiveIntensity:.32,roughness:1,metalness:0,polygonOffset:true,polygonOffsetFactor:-2})})();
  M(new THREE.PlaneGeometry(11,7.4),cm,chev,s=>{mt.makeBasis(s.S,s.F,s.U);mt.setPosition(pos.copy(s.p).addScaledVector(s.U,.05))});
  // KICKERS read as jump ramps: a yellow/black striped band on the lip and on the 0.9 m drop face behind it (trk-2)
@@ -198,7 +206,7 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
  M(new THREE.PlaneGeometry(13,1.6),km,kk,e=>{mt.makeBasis(e.S,e.F,e.U);mt.setPosition(pos.copy(e.p).addScaledVector(e.F,-.8).addScaledVector(e.U,.05))});
  M(new THREE.PlaneGeometry(13,.9),km,kk,e=>{mt.makeBasis(e.S,e.U,e.F.clone().negate());mt.setPosition(pos.copy(e.p).addScaledVector(e.U,-.45).addScaledVector(e.F,.02))});
  const block=pole.filter(([x,y,z,h])=>h>4&&BX.samp.some(({s})=>Math.hypot(s.p.x-x,s.p.z-z)<8&&Math.abs(s.p.y-y)<6)).length+(BX.pil||[]).filter(([x,z,g,t])=>BX.samp.some(({s})=>s.p.y<t-1&&Math.hypot(s.p.x-x,s.p.z-z)<8)).length;
- BX.dressN={props,len,landmark:BX_landmark(g,L),block}}
+ BX.dressN={props:props+tree.length,len,landmark:BX_landmark(g,L),block,trees:tree.length,rail:rban.length}}
 // landmark: a giant LEGO minifig (~16 m) on open ground 30-50 m from the course, as close to START as possible
 function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp.length)return 0;const o=st.S[0][0].p,sF=st.S[0][0].F;let best=null,bd=1e9;
  for(const[cmin,dm]of[[.94,26],[.8,18]])if(!best)for(let a=0;a<64;a++)for(const r of[70,85,100,120,140]){const ca=Math.cos(a/64*6.283),sa=Math.sin(a/64*6.283),x=o.x+ca*r,z=o.z+sa*r;if(ca*sF.x+sa*sF.z<cmin)continue;/* ahead of the start grid */if(Math.abs(x)>BXW/2-10||Math.abs(z)>BXW/2-10)continue;const h0=BX_h(x,z),h=Math.max(h0,.6);if(h0>=.3&&BX_tn(x,z).y<.9)continue;
@@ -256,7 +264,7 @@ function BX_scene(){if(BX.sc)return;const sc=BX.sc=new THREE.Scene();BX_mats();
   fragmentShader:'varying vec3 vp;void main(){float h=clamp(normalize(vp).y,0.,1.);gl_FragColor=vec4(mix(vec3(.62,.82,1.),vec3(.08,.36,.86),pow(h,.55)),1.);}'}));sc.add(sky);
  sc.fog=new THREE.Fog(0xa9d3ff,260,700);sc.add(new THREE.HemisphereLight(0xcfe8ff,0x4f8f3a,1.1));
  const sun=BX.sun=new THREE.DirectionalLight(0xfff1d6,2.4);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);const sc2=sun.shadow.camera;sc2.left=sc2.bottom=-70;sc2.right=sc2.top=70;sc2.near=1;sc2.far=400;
- sun.shadow.bias=-.0006;sc.add(sun,sun.target);
+ sun.shadow.bias=-.0006;sun.shadow.normalBias=.08;sc.add(sun,sun.target); // trk-3: normalBias kills the dot-grid shadow acne Alex saw on the iPhone ("white speckle on track and kerbs")
  const w=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),BX_mats().water);w.rotation.x=-Math.PI/2;w.position.y=0;sc.add(w);BX.wM=w;
  const base=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),new THREE.MeshStandardMaterial({color:0x4fb33a,roughness:.9}));base.rotation.x=-Math.PI/2;base.position.y=-9;sc.add(base);
  // a few brick clouds (sparse: lesson 10, no white ceiling)
@@ -274,12 +282,13 @@ function BX_fxStep(dt){const F=BX.fx,c=new THREE.Color();F.P.forEach((o,i)=>{if(
 function BX_car(){if(BX.car)return BX.car;const root=new THREE.Group();let mesh=null;
  try{mesh=shipMesh(TEAMS[typeof teamIdx!=='undefined'?teamIdx:0]);mesh.updateMatrixWorld(true)}catch(e){mesh=null}
  if(!mesh){mesh=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(2,1,4.2),new THREE.MeshStandardMaterial({color:0xc91a09}));b.position.y=.8;mesh.add(b)}
+ BX_noFlat(mesh);
  const vbox=o=>{const B=new THREE.Box3();o.updateMatrixWorld(true);o.traverseVisible(q=>{if(q.isMesh){q.geometry.computeBoundingBox();B.union(q.geometry.boundingBox.clone().applyMatrix4(q.matrixWorld))}});return B};
  const box=vbox(mesh),sz=box.getSize(bxV()),k=4.3/Math.max(sz.x,sz.z,.1);mesh.scale.multiplyScalar(k);
  const b2=vbox(mesh);mesh.position.y-=b2.min.y;mesh.position.x-=(b2.min.x+b2.max.x)/2;mesh.position.z-=(b2.min.z+b2.max.z)/2;
  BX.cyaw=sz.x>sz.z?Math.PI/2:0;const inner=new THREE.Group();inner.add(mesh);inner.rotation.y=BX.cyaw+Math.PI;root.add(inner); // rides are built with their FRONT on local -z (roamPose basis(right,up,-fwd)); the car root faces +z (Alex beta.22: drawn backwards)
  mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});BX.carM=mesh;
- const sh=new THREE.Mesh(new THREE.CircleGeometry(1.7,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.22,depthWrite:false}));sh.rotation.x=-Math.PI/2;BX.shM=sh;
+ const sh=new THREE.Mesh(new THREE.CircleGeometry(1.7,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.22,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4}));sh.rotation.x=-Math.PI/2;BX.shM=sh;
  BX.car=root;return root}
 function BX_vmode(v){const ud=BX.carM&&BX.carM.userData;try{if(ud&&ud.gbV)CR_vis({vmode:v},ud)}catch(e){}
  if(!(ud&&ud.gbV&&ud.gbV.boat)&&BX.carM)BX.carM.position.y=v==='boat'?-.4:BX.carM.position.y}
@@ -381,9 +390,9 @@ function BX_sunAt(t){const s=BX.sun;s.position.set(t.x+60,t.y+120,t.z+40);s.targ
 function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/1000);BX.last=now;BX.t+=dt;const cam=BX.cam;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
  if(BX.mode==='drive'&&BX.hold){BX_camDrive(0)}else if(BX.mode==='drive'){const inp=BX.inp=BX_input(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
   const V=BX.v;BX.car.position.copy(V.p);const S=bxV().crossVectors(V.F,V.U).normalize();BX.car.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(S.negate(),V.U,V.F));
-  const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,Math.max(gy,V.boat?0:gy)+.08,V.p.z);
+  const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,V.on&&V.g?V.p.y+.06:Math.max(gy,V.boat?0:gy)+.08,V.p.z); // trk-3: on a road the blob sits on the deck, not 0.1 m under it (near-coplanar flicker)
   if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
- BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=.32+.18*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
+ BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=.5+.2*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
  BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
@@ -393,21 +402,23 @@ function BX_input(){const K=BX.keys,T=BX.tc||{};const l=K.ArrowLeft||K.KeyA||T.l
 // ---------------------------------------------------------------- UI
 function BX_css(){if($('#bxCss'))return;const s=document.createElement('style');s.id='bxCss';s.textContent=`
 body.bxOn>*:not(#c):not(#bx){visibility:hidden!important}
-#bx{position:fixed;inset:0;z-index:60;pointer-events:none;font:700 13px system-ui,-apple-system,sans-serif;color:#fff;user-select:none;-webkit-user-select:none}
+#bx{--bxT:env(safe-area-inset-top,0px);position:fixed;inset:0;z-index:60;pointer-events:none;font:700 13px system-ui,-apple-system,sans-serif;color:#fff;user-select:none;-webkit-user-select:none}
 #bx button{pointer-events:auto;font:800 12px system-ui,-apple-system,sans-serif;color:#fff;background:rgba(14,42,104,.86);border:2px solid rgba(255,255,255,.55);border-radius:10px;touch-action:manipulation;min-height:38px;padding:2px 6px;letter-spacing:.02em}
 #bx button.on{background:#f2cd37;color:#14243f;border-color:#fff}
 #bxTap{position:absolute;inset:0;pointer-events:auto;touch-action:none}
-#bxTop{position:absolute;left:0;right:0;top:0;display:flex;gap:5px;align-items:center;padding:4px max(8px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left))}
+#bxTop{position:absolute;left:0;right:0;top:var(--bxT);display:flex;gap:5px;align-items:center;padding:4px max(8px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left))}
 #bxTop button{min-height:32px}#bxInfo{flex:1;text-align:center;font-size:12px;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden}
-#bxPal{position:absolute;left:0;top:42px;bottom:0;width:164px;padding:2px 6px 8px max(6px,env(safe-area-inset-left));overflow-y:auto;pointer-events:auto;display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:start;background:linear-gradient(90deg,rgba(8,24,60,.6),rgba(8,24,60,.25))}
+#bxPal{position:absolute;left:0;top:calc(var(--bxT) + 42px);bottom:0;width:164px;padding:2px 6px 8px max(6px,env(safe-area-inset-left));overflow-y:auto;pointer-events:auto;display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:start;background:linear-gradient(90deg,rgba(8,24,60,.6),rgba(8,24,60,.25))}
 #bxPal button{display:flex;flex-direction:column;align-items:center;justify-content:center;height:66px;padding:2px}#bxPal canvas{width:52px;height:36px}
 #bxPal h4{grid-column:1/3;margin:6px 0 0;font-size:12px;color:#f2cd37}
-#bxAct{position:absolute;right:0;top:42px;bottom:0;width:92px;display:flex;flex-direction:column;gap:5px;padding:0 max(6px,env(safe-area-inset-right)) 6px 4px}
+#bxAct{position:absolute;right:0;top:calc(var(--bxT) + 42px);bottom:0;width:92px;display:flex;flex-direction:column;gap:5px;padding:0 max(6px,env(safe-area-inset-right)) 6px 4px}
 #bxAct button{flex:1;min-height:36px;font-size:13px}#bxAct .go{background:#1f9e3a}
 #bxD .st{position:absolute;bottom:max(10px,env(safe-area-inset-bottom));width:88px;height:88px;border-radius:50%;font-size:26px;background:rgba(14,42,104,.55)}
-#bxHud{position:absolute;top:6px;left:50%;transform:translateX(-50%);text-align:center;font-size:14px;text-shadow:0 1px 3px #000;white-space:nowrap}
+#bxHud{position:absolute;top:calc(var(--bxT) + 6px);left:50%;transform:translateX(-50%);text-align:center;font-size:14px;text-shadow:0 1px 3px #000;white-space:nowrap}
 #bxMsg{position:absolute;top:30%;left:50%;transform:translateX(-50%);font:900 24px system-ui,sans-serif;color:#f2cd37;text-shadow:0 2px 0 #14243f,0 0 8px #000;white-space:nowrap}
-#bxLoad{position:absolute;inset:44px 110px 10px 172px;background:rgba(8,24,60,.94);border-radius:12px;padding:8px;overflow-y:auto;pointer-events:auto;display:flex;flex-direction:column;gap:6px}
+#bxLoad{position:absolute;inset:calc(var(--bxT) + 44px) 110px 10px 172px;background:rgba(8,24,60,.94);border-radius:12px;padding:8px;overflow-y:auto;pointer-events:auto;display:flex;flex-direction:column;gap:6px}
+/* trk-3 (Alex beta.36 portrait: the 6/6 box sat under the Claude app's top bar): in portrait every top HUD row starts 100 px down (safe area + the in-app iframe bar) */
+@media (orientation:portrait){#bx{--bxT:calc(env(safe-area-inset-top,0px) + 100px)}}
 `;document.head.appendChild(s)}
 function BX_icon(type){const c=document.createElement('canvas');c.width=104;c.height=72;const g=c.getContext('2d'),def=BX_P[type];g.lineCap='round';
  const P=def.p.map(fn=>{const a=[];for(let k=0;k<=24;k++)a.push(fn(k/24));return a}),xs=[],ys=[];for(const A of P)for(const l of A){xs.push(def.v==='side'?l[2]:l[0]);ys.push(def.v==='side'?l[1]:l[2])}
@@ -418,7 +429,7 @@ function BX_icon(type){const c=document.createElement('canvas');c.width=104;c.he
  if(def.v==='side'){g.strokeStyle='#4fb33a';g.lineWidth=3;g.beginPath();g.moveTo(0,Y(0)+5);g.lineTo(104,Y(0)+5);g.stroke()}return c}
 const BX_TOOLS=[['raise','⬆ RAISE'],['lower','⬇ LOWER'],['flat','▬ FLATTEN'],['smooth','〰 SMOOTH'],['water','🌊 WATER']];
 function BX_ui(){BX_css();let R=$('#bx');if(!R){R=document.createElement('div');R.id='bx';document.body.appendChild(R)}const d=BX.mode==='drive';
- R.innerHTML=d?`<div id="bxD"><button id="bxBack" style="position:absolute;top:6px;left:max(8px,env(safe-area-inset-left))">◀ BUILD</button><button id="bxRsp" style="position:absolute;top:6px;right:max(8px,env(safe-area-inset-right))">↺ RESPAWN</button>
+ R.innerHTML=d?`<div id="bxD"><button id="bxBack" style="position:absolute;top:calc(var(--bxT) + 6px);left:max(8px,env(safe-area-inset-left))">◀ BUILD</button><button id="bxRsp" style="position:absolute;top:calc(var(--bxT) + 6px);right:max(8px,env(safe-area-inset-right))">↺ RESPAWN</button>
   <div id="bxHud"></div><div id="bxMsg"></div><button class="st" id="bxL" style="left:max(14px,env(safe-area-inset-left))">◀</button><button class="st" id="bxR" style="left:calc(max(14px,env(safe-area-inset-left)) + 100px)">▶</button>
   <button class="st" id="bxB" style="right:max(14px,env(safe-area-inset-right));font-size:14px">BRAKE</button></div>`
  :`<div id="bxTap"></div><div id="bxTop"><button id="bxExit">◀ EXIT</button><button id="bxT1" class="${BX.tab==='track'?'on':''}">TRACK</button><button id="bxT2" class="${BX.tab==='land'?'on':''}">LAND</button>
@@ -546,6 +557,24 @@ const BX_TESTS={
  'bx-race':{n:'RACE: CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,race:1,
   chk:()=>{const r=BX.race;if(!r)return{ok:false,msg:'no race'};const mv=r.rv.filter(q=>q.s-r.s0>50).length,me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length,txt=($('#bxPos')||{}).textContent;
    const ok=r.rv.length>=5&&(r.cd>0||mv>=5)&&txt===pos+'/'+(BX_RIV+1);return{ok,msg:`rivals ${r.rv.length}, ${r.cd>0?'countdown '+Math.ceil(r.cd):mv+' moved 50+ m'}, position ${txt} (ranking ${pos}/${BX_RIV+1})`}}},
+ // trk-3 (Alex beta.36 portrait): the race position box + lap timer fully on screen and clear of the in-app top bar (portrait: >= 100 px down) and of the other top buttons
+ 'bx-race-hud':{n:'RACE HUD: CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,race:1,
+  chk:()=>{const W=innerWidth,H=innerHeight,por=H>W,rc=id=>{const e=$('#'+id);if(!e)return null;const b=e.getBoundingClientRect();return b.width>0?b:null},P=rc('bxPos'),T=rc('bxTm');if(!P||!T)return{ok:false,msg:'no race HUD'};
+   const vis=b=>b.left>=0&&b.right<=W&&b.top>=0&&b.bottom<=H&&b.width>0,ov=(a,b)=>a&&b&&a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom,others=['bxBack','bxRsp','bxHud','bxL','bxR','bxB'].map(rc).filter(Boolean),
+   C=[['visible',vis(P)&&vis(T),`pos ${[P.left,P.top,P.right,P.bottom].map(Math.round)} timer ${[T.left,T.top,T.right,T.bottom].map(Math.round)} in ${W}x${H}`],['below the app bar',!por||P.top>=100,`top ${Math.round(P.top)} px (portrait needs >= 100)`],['no overlap',!others.some(o=>ov(o,P)||ov(o,T)),'clear of buttons']];
+   return{ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')}}},
+ // trk-3 (Alex beta.36 "5/6 -> 6/6, never sees a rival"): the pack stays in sight; the max of the nearest-rival gap so far this race (sampled in BX_raceTick) <= 60 m
+ 'bx-race-pack':{n:'RACE PACK: CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,race:1,
+  chk:()=>{const r=BX.race;if(!r)return{ok:false,msg:'no race'};const g=r.gapMax||0,t=r.t||0;return{ok:t>=20&&g<=60&&r.rv.length>=5,msg:`nearest rival never more than ${g.toFixed(0)} m away over ${t.toFixed(0)} s of racing (needs <= 60 m over >= 20 s), now ${(r.gapNow||0).toFixed(0)} m`}}},
+ // trk-3 (Alex beta.36 "tan cardboard wedges", "white speckle"): boost pads blue + orange, kicker lip yellow/black, no pillar through a deck, no near-coplanar transparent mesh, shadow normalBias set, trackside dressing
+ 'bx-look':{n:'TRACK LOOK: CLIFF RUN',log:()=>(BX_DEMOS['CLIFF RUN']||{log:[['w','mountain']]}).log,drive:1,
+  chk:()=>{const px=(m,x,y)=>{const c=m&&m.map&&m.map.image;if(!c||!c.getContext)return[0,0,0];return[...c.getContext('2d').getImageData(x,y,1,1).data]},T=px(BX.chevMat,20,14),C=px(BX.chevMat,64,31),K=px(BX.kickMat,14,12);
+   let pierce=0;for(const[x,z,g,t]of BX.pil||[]){const top=t+.15;for(const{s:q}of BX.samp){const dx=x-q.p.x,dz=z-q.p.z,f=dx*q.F.x+dz*q.F.z,l=dx*q.S.x+dz*q.S.z;if(Math.abs(f)<1.2&&Math.abs(l)<7){const sf=q.p.y+q.S.y*l;if(sf>g+.5&&top>sf-.05){pierce++;break}}}}
+   const M=BX_mats(),tb=[];BX.sc.traverse(o=>{if(!o.isMesh||!o.visible||o===BX.wM)return;const m=o.material;if(!m||!m.transparent||m===M.ghost||m===M.hl)return;o.geometry.computeBoundingBox();const z=o.geometry.boundingBox.getSize(bxV());if(Math.min(z.x,z.y,z.z)>=.02)return;if(!(m.depthWrite===false&&m.polygonOffset))tb.push(o.name||o.geometry.type)});
+   const D=BX.dressN||{},C2=[['boost pad blue',T[2]>180&&T[2]>T[0]+80,`tile rgb ${T.slice(0,3)}`],['chevrons orange',C[0]>220&&C[1]>100&&C[1]<180&&C[2]<80,`chevron rgb ${C.slice(0,3)}`],['kicker lip yellow',K[0]>200&&K[1]>170&&K[2]<90,`lip rgb ${K.slice(0,3)}`],
+    ['0 pillars through a deck',pierce===0,`pillars through a deck ${pierce}/${(BX.pil||[]).length}`],['0 coplanar transparent',tb.length===0,`unsafe transparent meshes ${tb.length}${tb.length?' ('+tb.slice(0,3)+')':''}`],['shadow normalBias',BX.sun.shadow.normalBias>=.04,`normalBias ${BX.sun.shadow.normalBias}`],
+    ['dressing',(D.trees||0)>=6&&(D.rail||0)>=4&&D.landmark>=1,`trees ${D.trees||0}, rail boards ${D.rail||0}, landmark ${D.landmark||0}`]];
+   return{ok:C2.every(c=>c[1]),fails:C2.filter(c=>!c[1]).map(c=>c[0]),msg:C2.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')}}},
  'bx-elev':{n:'ELEVATION',log:()=>BX_DEMOS['CLIFF RUN']?BX_DEMOS['CLIFF RUN'].log:BX_TESTS['bx-jump'].log(),drive:1,
   chk:()=>{const m=BX.m;return{ok:m.yMax-m.yMin>=15,msg:`elevation range ${(m.yMax-m.yMin).toFixed(1)} m`}}}
 };
@@ -582,10 +611,13 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
 // 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,
-// results card in the city #results style. Rivals take the dry main lane (no boat/rubber-band logic yet).
+// results card in the city #results style. Rivals take the dry main lane (no boat logic yet); light rubber-banding (trk-3).
 const BX_RIV=5,BX_RNAMES=['RED','BLUE','GREEN','ORANGE','WHITE'];
+// trk-3: a ride's own see-through contact-shadow plane lies on the road surface (coplanar flicker = Alex's "white speckle"); the builder has its own blob, so hide flat transparent meshes
+function BX_noFlat(o){o.traverse(q=>{if(!q.isMesh||!q.material||!q.material.transparent)return;q.geometry.computeBoundingBox();const z=q.geometry.boundingBox.getSize(bxV());if(Math.min(z.x,z.y,z.z)<.02)q.visible=false})}
 function BX_rideMesh(team){let mesh=null;try{mesh=shipMesh(team);mesh.updateMatrixWorld(true)}catch(e){mesh=null}
  if(!mesh){mesh=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(2,1,4.2),new THREE.MeshStandardMaterial({color:0x0055bf}));b.position.y=.8;mesh.add(b)}
+ BX_noFlat(mesh);
  const vb=o=>{const B=new THREE.Box3();o.updateMatrixWorld(true);o.traverseVisible(q=>{if(q.isMesh){q.geometry.computeBoundingBox();B.union(q.geometry.boundingBox.clone().applyMatrix4(q.matrixWorld))}});return B};
  const sz=vb(mesh).getSize(bxV());mesh.scale.multiplyScalar(4.3/Math.max(sz.x,sz.z,.1));const b2=vb(mesh);mesh.position.y-=b2.min.y;mesh.position.x-=(b2.min.x+b2.max.x)/2;mesh.position.z-=(b2.min.z+b2.max.z)/2;
  const inner=new THREE.Group();inner.add(mesh);inner.rotation.y=(sz.x>sz.z?Math.PI/2:0)+Math.PI;mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});const root=new THREE.Group();root.add(inner);return root}
@@ -601,19 +633,24 @@ function BX_pathAt(R,s){const L=R.L;s=((s%L)+L)%L;let lo=0,hi=R.D.length-1;while
 function BX_raceStart(name){const D=BX_DEMOS[name];if(D){if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();BX_load(D,name)}BX.camGo=1;BX.seenAll=new Set();BX_driveStart();BX_raceSetup()}
 function BX_raceSetup(){BX_raceClear();const R=BX_racePath(),sp0=BX.v.p,F0=BX.v.F;let s0=0,bd=1e9;R.P.forEach((p,i)=>{const d=p.distanceTo(sp0);if(d<bd){bd=d;s0=R.D[i]}});
  const rv=[];for(let k=0;k<BX_RIV;k++){const team=typeof TEAMS!=='undefined'?TEAMS[(k+1)%TEAMS.length]:null,o=BX_rideMesh(team);BX.sc.add(o);
-  // grid: two columns ahead of the player (the player starts last, like the city races)
-  rv.push({o,n:BX_RNAMES[k],s:s0+8+Math.floor(k/2)*9+(k%2)*4,lat:(k%2?-2.8:2.8),v:0,base:29+k*.9,fin:null})}
+  // grid (trk-3): one rival beside the player, two rows of two just ahead, so the race starts in a pack you can see
+  const G=[[0,4.4],[7,-2.8],[7,2.8],[14,-2.8],[14,2.8]][k];rv.push({o,n:BX_RNAMES[k],s:s0+G[0],lat:G[1],v:0,base:29+k*.9,fin:null})}
  BX.race={R,s0,cd:3,t:0,rv,fin:null,start:BX.v.p.clone()};BX_raceUI()}
 function BX_raceClear(){const r=BX.race;if(r){for(const q of r.rv)BX.sc.remove(q.o);const e=$('#bxRace');if(e)e.remove();const f=$('#bxRes');if(f)f.remove()}BX.race=null}
 function BX_raceUI(){let e=$('#bxRace');if(!e){e=document.createElement('div');e.id='bxRace';e.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:61;font:italic 900 16px/1 var(--hud,system-ui);color:#fff;text-shadow:0 2px 0 #000';
- e.innerHTML='<div id="bxPos" style="position:absolute;left:84px;top:44px;background:rgba(0,0,0,.45);border-radius:10px;padding:6px 12px;font-size:38px;color:#ffd21a">-/6</div><div id="bxTm" style="position:absolute;left:84px;top:96px;font-size:15px"></div><div id="bxCd" style="position:absolute;left:0;right:0;top:28%;text-align:center;font-size:110px;color:#ffd21a;-webkit-text-stroke:4px #1b1b1b"></div>';($('#bx')||document.body).appendChild(e)}} // inside #bx: builder mode hides the other body children
-function BX_raceProg(){const r=BX.race,V=BX.v,m=BX.m;let bi=0,bd=1e9;r.R.P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}});let a=r.R.D[bi]-r.s0;if(a<-r.R.L/2)a+=r.R.L;if(a>r.R.L/2&&m.laps===0)a-=r.R.L;return m.laps*r.R.L+a}
+ e.innerHTML='<div id="bxPos" style="position:absolute;left:84px;top:calc(var(--bxT) + 44px);background:rgba(0,0,0,.45);border-radius:10px;padding:6px 12px;font-size:38px;color:#ffd21a">-/6</div><div id="bxTm" style="position:absolute;left:84px;top:calc(var(--bxT) + 96px);font-size:15px"></div><div id="bxCd" style="position:absolute;left:0;right:0;top:28%;text-align:center;font-size:110px;color:#ffd21a;-webkit-text-stroke:4px #1b1b1b"></div>';($('#bx')||document.body).appendChild(e)}} // inside #bx: builder mode hides the other body children
+// trk-3: continuous progress: search the path near the last match (-40..+150 m); a global nearest point snapped to a crossing/overlapping part of the course (a whole lap off -> wrong position, "6/6")
+function BX_raceProg(){const r=BX.race,V=BX.v,m=BX.m,P=r.R.P,D=r.R.D,n=P.length;let bi=-1,bd=1e9;
+ if(r.pi!=null)for(let k=-60;k<=200;k++){const i=((r.pi+k)%n+n)%n;let dd=D[i]-D[r.pi];if(dd<-r.R.L/2)dd+=r.R.L;if(dd>r.R.L/2)dd-=r.R.L;if(dd<-40||dd>150)continue;const d=P[i].distanceToSquared(V.p);if(d<bd){bd=d;bi=i}}
+ if(bi<0||bd>30*30){bd=1e9;P.forEach((p,i)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=i}})}r.pi=bi;let a=r.R.D[bi]-r.s0;if(a<-r.R.L/2)a+=r.R.L;if(a>r.R.L/2&&m.laps===0)a-=r.R.L;return m.laps*r.R.L+a}
 function BX_raceTick(dt){const r=BX.race;if(!r||BX.mode!=='drive')return;const cd=$('#bxCd');
  if(r.cd>0){r.cd-=dt;const V=BX.v;V.p.copy(r.start);V.v.set(0,0,0);if(cd)cd.textContent=r.cd>0?String(Math.ceil(r.cd)):'GO!';if(r.cd<=0){r.goT=0;BX.m.t=0;BX.m.lap0=0}return}
  if(cd&&cd.textContent){r.goT+=dt;if(r.goT>.8)cd.textContent=''}r.t+=dt;const R=r.R,end=r.s0+BX_RACE_LAPS*R.L;
- for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),lim=Math.min(q.base,R.VL[at.i]*(q.base/33));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
+ const me0=BX_raceProg();
+ // trk-3 (Alex beta.36 "5/6 -> 6/6 and never sees a rival"): light rubber-banding keeps the pack in sight: a rival > 10 m ahead eases off (to 50 % at ~70 m), one behind pushes up to +15 %
+ for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),g=q.s-r.s0-me0,rb=g>10?Math.max(.5,1-(g-10)/120):g<-10?Math.min(1.15,1+(-g-10)/150):1,lim=Math.min(q.base*rb,R.VL[at.i]*(q.base/33)*Math.min(rb,1.08));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
   const a=BX_pathAt(R,q.s),b=BX_pathAt(R,q.s+3),Sx=b.F.z,Sz=-b.F.x;q.o.position.set(a.p.x+Sx*q.lat,a.p.y+.05,a.p.z+Sz*q.lat);q.o.lookAt(b.p.x+Sx*q.lat,a.p.y+.05,b.p.z+Sz*q.lat)}
- const me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length;r.pos=pos;const P=$('#bxPos'),T=$('#bxTm'),lt=BX.m.t-BX.m.lap0;
+ const me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length;r.pos=pos;r.gapNow=Math.min(...r.rv.map(q=>Math.abs(q.s-r.s0-me)));if(BX.m.laps<1)r.gapMax=Math.max(r.gapMax||0,r.gapNow);const P=$('#bxPos'),T=$('#bxTm'),lt=BX.m.t-BX.m.lap0;
  if(P)P.textContent=pos+'/'+(BX_RIV+1);if(T)T.textContent=`LAP ${Math.min(BX.m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS} · ${Math.floor(lt/60)}:${(lt%60).toFixed(1).padStart(4,'0')}`;
  if(BX.m.laps>=BX_RACE_LAPS&&!r.fin){r.fin=r.t;BX_raceResults()}}
 function BX_raceResults(){const r=BX.race,R=r.R,rows=[{n:'YOU',t:r.fin,me:1},...r.rv.map(q=>({n:q.n,t:q.fin!=null?q.fin:r.t+(r.s0+BX_RACE_LAPS*R.L-q.s)/Math.max(q.v,8)}))].sort((a,b)=>a.t-b.t);
