@@ -167,3 +167,4 @@ html body .gx-drawer{height:auto;bottom:auto;max-height:calc(100dvh - var(--gx-b
 @media (max-width:999px){html body .gx-drawer{height:auto;bottom:0;max-height:88dvh}}
 html body :is(#log li,#log small,.gx-dock .btn,.gx-dock .banner,#banner,#banner *,#youbox,.gx-drawer i,.gx-drawer em){font-size:max(var(--minfs),1em)!important}
 html body .gx-drawer-head{height:56px;box-sizing:border-box}html body .gx-drawer-head .gx-x{font-size:1.5rem;line-height:1}
+.die{min-width:44px;min-height:44px}
