@@ -16,4 +16,6 @@ module.exports=[
  {seed:'tyre',expect:'FAIL settle/CR_TYRE_Y-gap-under-5cm'},
  {seed:'cam-clear',expect:'FAIL camera/(sees-road-over-roof|ride-fills)'},
  {seed:'stick',expect:'FAIL stick/angle-decreases-with-speed'},
+ {seed:'track-grade',expect:'FAIL tracks-pieces/grade-<=22pct-up'},
+ {seed:'track-rail',expect:'FAIL tracks-rails/(rail-height|rail-continuous)'},
 ];

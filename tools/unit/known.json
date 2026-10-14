@@ -16,5 +16,8 @@
  "models/ride-wheels-v6522_1": "3 wheel parts (<4)",
  "models/ride-fill-v6581_1": "footprint fill 0.19 < 0.20 = hollow shell",
  "models/ride-bricks-v6609_1": "only 13 bricks (hollow?)",
- "models/ride-height-v7613_1": "height 5 < 6 plates: no roof/body"
+ "models/ride-height-v7613_1": "height 5 < 6 plates: no roof/body",
+ "tracks-demos/no-gaps-TWO-LEVEL CITY": "1 pieces start where no piece ends: 2:up@28,13,-1,0",
+ "tracks-demos/above-sea-level-TWO-LEVEL CITY": "a piece at a negative height level",
+ "tracks-demos/no-gaps-LAGOON SPLASH": "1 pieces start where no piece ends: 24:up@37,21,0,0"
 }
