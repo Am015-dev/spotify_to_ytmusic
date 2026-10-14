@@ -38,8 +38,9 @@ function quayBuild(bt,BM){for(const S of WATERS){const P=S.pts,n=P.length;for(co
     if(Q.P.length)bt.add(Q.geo('#b9ad98'),BM.plain);i0=i1}}
   if(S.basin)for(const p of[S.pts[0],S.pts[S.pts.length-1]])bt.add(cbox(2*p.hw+4,-HWY+.3+1,2,p.x,(HWY-1+.25)/2,p.z,'#b9ad98',Math.atan2(p.tx,p.tz)),BM.plain)}}
 // slipways down into the water
-function slipBuild(bt,BM){for(const s of SLIPS){const L=30,len=Math.hypot(L,-HWY),g=new THREE.BoxGeometry(20,.4,len);g.rotateX(-Math.atan2(HWY,L));const yaw=Math.atan2(s.ix,s.iz);g.rotateY(yaw);g.translate(s.x+s.ix*L/2,HWY/2,s.z+s.iz*L/2);bt.add(colorize(g,new THREE.Color('#9a9488')),BM.plain);
-  for(const sd of[-1,1])bt.add(cbox(.5,.6,L,s.x+s.ix*L/2+s.tx*sd*10,HWY/2+.4,s.z+s.iz*L/2+s.tz*sd*10,'#ffcc00',yaw),BM.plain)}}
+// terr-3: the top end meets the bank's ground (slipTop; was fixed at y 0 while the bank stood +4.7..+15 m), the top face is the drive surface (slipY)
+function slipBuild(bt,BM){for(const s of SLIPS){const L=30,yT=s.yT=slipTop(s),dy=HWY-yT,len=Math.hypot(L,dy),an=Math.atan2(dy,L),g=new THREE.BoxGeometry(20,.4,len);g.rotateX(-an);const yaw=Math.atan2(s.ix,s.iz);g.rotateY(yaw);g.translate(s.x+s.ix*L/2,(yT+HWY)/2-.2/Math.cos(an),s.z+s.iz*L/2);bt.add(colorize(g,new THREE.Color('#9a9488')),BM.plain);
+  for(const sd of[-1,1])bt.add(cbox(.5,.6,L,s.x+s.ix*L/2+s.tx*sd*10,(yT+HWY)/2+.3,s.z+s.iz*L/2+s.tz*sd*10,'#ffcc00',yaw),BM.plain)}}
 // an oriented deck: road surface (texture), sides and underside, rails; piers and arches by look
 function deckBuild(b,bt,BM,top,uvL,col,railCol){const N=Math.max(12,Math.ceil(b.half*2/6)),A=[];for(let k=0;k<=N;k++){const a=-b.half+2*b.half*k/N;A.push([a,Math.max(deckY(b,a)??0,0)])}
   const pos=[],uv=[],ix=[];for(let k=0;k<=N;k++){const[a,y]=A[k];for(const[c,u]of[[-b.w/2,0],[b.w/2,1]]){const[x,z]=deckPt(b,a,c);pos.push(x,y+.03,z);uv.push(u,(a+b.half)/uvL)}if(k<N){const q=k*2;ix.push(q,q+2,q+1,q+1,q+2,q+3)}}
