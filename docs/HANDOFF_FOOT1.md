@@ -30,5 +30,5 @@
   DMG_panels(frac) collapsing outer bricks' triangles in a cloned geometry (geometry.userData.bid/bt from GB_geo), smoke <50 %, fire <20 %, 0 → roamWreck
   (existing 2 s rebuild), 5 s no hit → repair. Hull bar #rgHull hidden at 100 %. Tests: v90n/dmg-go-{light,medium,wreck,graze}, `node tools/tDmgGo.js <url>` (14/14).
 - Gotcha: with ?draw=0 the ride mesh is not moved between a warp and the next frame; DMG_panels offsets by RO − mesh position.
-- NEXT (phase 2, not started): traffic victims (70_roam_world.js smash path: CR_tumbleStart + burst on first contact) lose bricks and get knocked aside,
-  burst only above 60 km/h relative; + checklist test. Then: repair pickup / prop smash +5 (LEGO 2K style).
+- Phase 2 DONE: DMG_traf (hook in 70_roam_world.js smash condition): pin no longer bursts, burst only side-dash / > 60 km/h closing / > 150 km/h; bumps > 25 km/h throw 2-4 bricks + DMG_impact.
+- NEXT: repair pickup / prop smash +5 (LEGO 2K style).

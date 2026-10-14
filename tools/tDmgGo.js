@@ -2,13 +2,15 @@
 // 📍 GO (DMG_go: your car on a street + the scripted hits through DMG_impact, the function the collisions call) and checks the pass line.
 //   node tools/tDmgGo.js <url …/index.html> [light,medium,wreck,graze,perf]   env SHOTS=1 (one shot after the medium crash), ALL=1 (PASS lines too)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
-const U=process.argv[2],ONLY=(process.argv[3]||'light,medium,wreck,graze,perf').split(','),OUT='qa_dmg';fs.mkdirSync(OUT,{recursive:true});let nOk=0,nAll=0;
+const U=process.argv[2],ONLY=(process.argv[3]||'traf,light,medium,wreck,graze,perf').split(','),OUT='qa_dmg';fs.mkdirSync(OUT,{recursive:true});let nOk=0,nAll=0;
 const ok=(t,c,m,i)=>{nAll++;if(c)nOk++;if(!c||process.env.ALL==='1')console.log((c?'PASS ':'FAIL ')+t+' · '+m+(i!==undefined?' · '+JSON.stringify(i):''))};
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await (await b.newContext({viewport:{width:852,height:393}})).newPage();p.setDefaultTimeout(120000);
  const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});const t0=Date.now();
  await p.goto(U+(U.includes('?')?'&':'?')+'test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__dmg,null,{polling:250,timeout:120000});
  const W=ms=>p.waitForTimeout(ms),st=()=>p.evaluate(()=>__dmg.st()),go=k=>p.evaluate(k=>__chk.go('v90n/dmg-go-'+k),k);
  try{
+ if(ONLY.includes('traf')){await go('light');await W(200);const a=await p.evaluate(()=>{const r={p:__dmg.traf(10,true),s40:__dmg.traf(40,false)};r.st=__dmg.st();return r});const b2=await p.evaluate(()=>__dmg.traf(70,false));
+  ok('traf',a.p===false,'pushing a car (pin) never bursts it',{pin:a.p});ok('traf',a.s40===false&&a.st.deb>=2,'40 km/h into a car: no burst, it loses ≥ 2 bricks',{burst:a.s40,deb:a.st.deb});ok('traf',b2===true,'70 km/h closing speed: it bursts',{burst:b2})}
  if(ONLY.includes('light')){await go('light');await W(300);const s=await st();ok('light',s.hp===100&&s.deb===0,'20 km/h bump: health 100 %, 0 bricks',s);ok('light',s.hull==='hidden','health bar hidden at 100 %',{hull:s.hull})}
  if(ONLY.includes('medium')){await go('medium');await W(400);const s=await st();ok('medium',s.hp>=70&&s.hp<=90,'50 km/h crash: health 70-90 %',{hp:s.hp});ok('medium',s.deb>=2&&s.deb<=6,'2-6 bricks fly off',{deb:s.deb});
   ok('medium',s.hid>0,'outer bricks missing from the car',{hid:s.hid});ok('medium',!s.wk&&s.n.boom===0,'no explosion',{wk:s.wk});ok('medium',s.hull==='visible','health bar shows',{hull:s.hull});
