@@ -5,7 +5,7 @@
 // Fix (all behind GFX.on, default ON; ?gfx=1 / ?gfx=0 overrides, else store 'mho_gfx'): ACES filmic, a warm lower sun (~33°) with a fitted shadow map
 // around the player on high AND med (2048 PCFSoft / 1024 PCF), a weak blue-sky/green-ground fill, glossy LEGO plastic (roughness .3-.42,
 // env 1.0) on everything that casts a shadow (buildings, cars, props; never the ground), deeper sky, subtle bloom on highlights.
-const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',0)===1}catch(e){return false}})(),   // flips to ON once slice-3 checks pass
+const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
  day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},G:{value:new THREE.Vector4(0,0,0,0)},t:0,n:0,tier:null};
 const GFX_SUN=[600,300,380];   // ~23° elevation (coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
 function GFX_tier(){try{const L=LK_lvl();return L==='high'?'high':L==='med'?'med':'off'}catch(e){return SET.q==='high'?'high':SET.q==='med'?'med':'off'}}
@@ -13,11 +13,11 @@ function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MO
 // lights, tone mapping, sky, fog: applied after ART_light (which runs after every mood / day-cycle update while roaming)
 function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  if(!day){GFX.U.value=1;GFX_GRADE.uniforms.uOn.value=0;if(renderer.toneMapping!==THREE.NeutralToneMapping)renderer.toneMapping=THREE.NeutralToneMapping;return}
- if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.set(...GFX_SUN);
+ if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.copy(moonL.target.position).add(new THREE.Vector3(...GFX_SUN).setLength(400));   // relative to the shadow target (71_roam_drive), not world 0
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
  const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=4.8;
- hemi.color.set('#8fb4ff');hemi.groundColor.set(ath?'#6a5638':'#3f5a2c');hemi.intensity=.5;
- scene.environmentIntensity=.3;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
+ hemi.color.set('#86acff');hemi.groundColor.set(ath?'#5e4c32':'#3f5a2c');hemi.intensity=.34;   // gfx-2: .5 left shadows at ~65 % of sunlit; .34 = dark, cool-blue shadows
+ scene.environmentIntensity=.22;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
  const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
  scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
  GFX.U.value=.15;GFX_GRADE.uniforms.uOn.value=1;bloom.strength=.16;bloom.radius=.45;
@@ -30,7 +30,8 @@ function GFX_off(){GFX_GRADE.uniforms.uOn.value=0;if(GFX.gtao)GFX.gtao.enabled=f
 function GFX_shadow(){if(!GFX.on||!HUB.grp||!HUB.grp.visible)return;const t=GFX_tier();GFX.tier=t;
  if(t==='off'||!GFX.day){return}
  if(!RO.shadowOn)LK_shadow(true);if(!RO.shadowOn)return;
- const sz=t==='high'?2048:1024,ext=t==='high'?55:40,sh=moonL.shadow,sc=sh.camera;
+ const sz=t==='high'?2048:1024,ext=t==='high'?42:32,   // gfx-2: tighter = crisper (high 4 cm, med 6 cm per texel)
+ sh=moonL.shadow,sc=sh.camera;
  renderer.shadowMap.type=t==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;
  if(sh.mapSize.x!==sz){sh.mapSize.set(sz,sz);if(sh.map){sh.map.dispose();sh.map=null}}
  if(sc.right!==ext){sc.left=sc.bottom=-ext;sc.right=sc.top=ext;sc.near=20;sc.far=1200;sc.updateProjectionMatrix()}
@@ -44,7 +45,7 @@ function GFX_gspec(m){if(m.userData.gfxSpec)return;m.userData.gfxSpec=1;const ob
 // ground (meshes that never cast): matte. Grass/pavement at roughness .55 caught the low sun as a white sheen across Frankfurt
 // ground = never casts, or mostly up-facing triangles (>= 70 % of sampled normals; pavement strips with kerbs sit near 75 %): Frankfurt's merged grass/pavement/road plates DO cast and
 // carry kerbs (bbox > .5 m), so neither "casts" nor a flat bbox found them; at roughness .4 they lit up as a white sun sheen
-function GFX_flat(o){const g=o.geometry;if(!g||!g.attributes||!g.attributes.normal)return false;if(g.userData.gfxUp!==undefined)return g.userData.gfxUp;
+function GFX_flat(o){const g=o.geometry;if(!g||!g.attributes||!g.attributes.normal||!g.attributes.normal.array)return false;   // array freed after GPU upload (onUploadCallback): getY threw every passif(g.userData.gfxUp!==undefined)return g.userData.gfxUp;
  const N=g.attributes.normal,n=N.count,st=Math.max(1,Math.floor(n/400));let up=0,k=0;for(let i=0;i<n;i+=st){k++;if(N.getY(i)>.9)up++}return g.userData.gfxUp=k>0&&up/k>=.7}
 function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.castShadow||GFX_flat(o)){for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m)||!m.isMeshStandardMaterial||m.isMeshPhysicalMaterial||m.transparent||m.roughness>=.85)continue;
     GFX.mats.add(m);m.userData.gfx0=[m.roughness,m.envMapIntensity];m.roughness=.88;GFX_gspec(m);GFX.gm.push(m)}return}
@@ -77,17 +78,27 @@ resize=(f=>function(){f.apply(this,arguments);GFX_aoSize()})(resize);addEventLis
 // the player car is rebuilt (LEGO model, garage, ride swap) after LK_shadow flagged it, so it lost castShadow: re-flag every pass.
 // It does not receive: self-shadowing small bricks gave red/black acne speckle on the body.
 // ART6_noCast (97_art.js, v86v) locks castShadow to a getter returning false on the player car: unlock it (delete the accessor), re-lock on GFX off.
-function GFX_car(){if(!pl||!pl.mesh||!RO.shadowOn)return;pl.mesh.traverse(o=>{if(!o.isMesh)return;for(const m of[].concat(o.material))if(m&&m.isMeshStandardMaterial&&!m.transparent&&m.metalness<.2&&!m.userData.gfxCar){m.userData.gfxCar=1;m.userData.gfx0=m.userData.gfx0||[m.roughness,m.envMapIntensity];m.roughness=Math.min(m.roughness,.24);m.envMapIntensity=1.3;if(!GFX.pm.includes(m))GFX.pm.push(m);GFX.mats.add(m)}if(o.userData.art6c&&!o.userData.gfxUnl){delete o.castShadow;o.userData.gfxUnl=1}o.castShadow=true;o.receiveShadow=false})}
+function GFX_car(){if(!pl||!pl.mesh||!RO.shadowOn)return;pl.mesh.traverse(o=>{if(!o.isMesh)return;for(const m of[].concat(o.material))if(m&&m.isMeshStandardMaterial&&!m.transparent&&m.metalness<.2&&!m.userData.gfxCar){m.userData.gfxCar=1;m.userData.gfx0=m.userData.gfx0||[m.roughness,m.envMapIntensity];m.roughness=Math.min(m.roughness,.18);m.envMapIntensity=1.7;if(!GFX.pm.includes(m))GFX.pm.push(m);GFX.mats.add(m)}if(o.userData.art6c&&!o.userData.gfxUnl){delete o.castShadow;o.userData.gfxUnl=1}o.castShadow=true;o.receiveShadow=false})}
 function GFX_carLock(){if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.userData.gfxUnl){o.userData.gfxUnl=0;Object.defineProperty(o,'castShadow',{configurable:true,get(){return false},set(v){}})}})}
 // merged city blocks (95_drive_flow DR_, 98wb world batch) were built with castShadow=false: buildings threw no shadow on the street.
 // Tall ones (> 2.5 m) cast again; ground/road merges stay off (they would only add acne and shadow-pass cost).
 // also trees, lamps, props, people (> 1.2 m, anywhere in the scene): 2K-style shadows under everything; skips transparent/unlit and ground
 function GFX_cast(){let k=0;scene.traverse(o=>{if(!o.isMesh||o.castShadow||o.userData.gfxNo||!o.geometry||!o.visible||o===sky)return;const g=o.geometry,m0=[].concat(o.material)[0];if(!m0||m0.transparent||m0.isMeshBasicMaterial||m0.isShaderMaterial||o.userData.art6||GFX_flat(o)){o.userData.gfxNo=1;return}if(!g.boundingBox)g.computeBoundingBox();
   if((g.boundingBox.max.y-g.boundingBox.min.y)*Math.abs(o.scale.y)<1.2){o.userData.gfxNo=1;return}o.castShadow=true;o.receiveShadow=true;o.userData.gfxCast=1;k++});GFX.cast=(GFX.cast||0)+k}
-function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast();try{GFX_ao()}catch(e){GFX.aoErr=String(e)}try{GFX_plastic(scene)}catch(e){}}
+function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;try{GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast()}catch(e){GFX.err=String(e)}try{GFX_ao()}catch(e){GFX.aoErr=String(e)}try{GFX_plastic(scene)}catch(e){}}
 ART_light=(f=>function(){const r=f.apply(this,arguments);try{GFX_light()}catch(e){}return r})(ART_light);
 LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame()}catch(e){}return r})(LK_roamLook);
-roamStep=(f=>function(dt){f(dt);GFX.G.value.set(RO.y,RO.x,RO.z,GFX.on&&GFX.day?1:0);GFX_frame()})(roamStep);
+// sun follows the camera slowly from behind-left (gfx-2): a fixed world sun was backlit on half the headings (v90m Frankfurt start: we saw only
+// shaded faces, the car's shadow hid under it, sun glare greyed the sky). Now lit faces + shadows falling forward-right on screen, every heading.
+// Azimuth slews at most GFX_SLEW rad/s (smoothed), so shadows creep while turning instead of swinging.
+function GFX_sunFollow(dt){const GFX_EL=.42,GFX_AZ=2.45,GFX_SLEW=.35;   // elevation ~24°, sun 140° from the view direction (behind, to the left)
+ if(!GFX.on||!GFX.day||!camera)return;const d=GFX.cd||(GFX.cd=new THREE.Vector3());camera.getWorldDirection(d);
+ const want=Math.atan2(d.z,d.x)-GFX_AZ;if(GFX.az===undefined||dt>1)GFX.az=want;let e=want-GFX.az;e=Math.atan2(Math.sin(e),Math.cos(e));
+ GFX.az+=Math.sign(e)*Math.min(Math.abs(e),Math.max(GFX_SLEW,Math.abs(e)*.6)*Math.min(dt,.1));
+ const c=Math.cos(GFX_EL)*700;GFX_SUN[0]=Math.cos(GFX.az)*c;GFX_SUN[1]=Math.sin(GFX_EL)*700;GFX_SUN[2]=Math.sin(GFX.az)*c;
+ if(MOOD&&MOOD.key[2]!==GFX_SUN){if(!GFX.keyOrig.has(MOOD))GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}
+ if(typeof SKYU!=='undefined'&&SKYU.uSunD)SKYU.uSunD.value.set(GFX_SUN[0],Math.max(GFX_SUN[1]*.35,40),GFX_SUN[2]).normalize()}
+roamStep=(f=>function(dt){f(dt);GFX.G.value.set(RO.y,RO.x,RO.z,GFX.on&&GFX.day?1:0);try{GFX_sunFollow(dt)}catch(e){}GFX_frame()})(roamStep);
 // warm grade (HDR, before OutputPass tone mapping): golden gain, +18 % saturation, a little contrast around mid-grey. By GFX day only.
 const GFX_GRADE=new ShaderPass({uniforms:{tDiffuse:{value:null},uOn:{value:0}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
  fragmentShader:'uniform sampler2D tDiffuse;uniform float uOn;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec3 c=t.rgb;if(uOn>.5){c*=vec3(1.06,1.0,.9);float l=dot(c,vec3(.2126,.7152,.0722));c=max(mix(vec3(l),c,1.18),0.);c=.18*pow(c/.18,vec3(1.07));}gl_FragColor=vec4(c,t.a);}'});
@@ -99,6 +110,6 @@ function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=s
  // open road = the farthest of 4 samples 12 m away (one side can sit in a building's shadow)
  const c=new THREE.Vector3(RO.x,RO.y+1,RO.z),R=[0,1,2,3].map(i=>rd(new THREE.Vector3(RO.x+Math.cos(RO.h+i*1.571)*12,RO.y,RO.z-Math.sin(RO.h+i*1.571)*12))).filter(v=>v!==null);
  return{car:rd(c),road:R.length?Math.max(...R):null}}
-window.__gfx={render:()=>composer.render(),get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
+window.__gfx={render:()=>composer.render(),side:()=>{const v=moonL.position.clone().sub(moonL.target.position),d=camera.getWorldDirection(new THREE.Vector3());return+(Math.acos((d.x*v.x+d.z*v.z)/Math.hypot(d.x,d.z)/Math.hypot(v.x,v.z))*57.3).toFixed(0)},get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
  hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,ao:!!(GFX.gtao&&GFX.gtao.enabled),aoErr:GFX.aoErr||'',cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};

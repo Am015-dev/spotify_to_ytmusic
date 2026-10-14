@@ -2,7 +2,7 @@
 // No rebuild, no reboot: edit → check in a few seconds. docs/HOT.md.
 //   node tools/hot.js reload src/71_roam_drive.js [more.js] [--all] [--city fra|ath]   re-evaluate module(s) in every warm page
 //   node tools/hot.js go v90k/park-sit                                                    __tq.reset() + that checklist GO → PASS/FAIL line
-//   node tools/hot.js eval 'RO.v' [--city ath]     node tools/hot.js reset|status|errors|stop     node tools/hot.js reboot [fra|ath]
+//   node tools/hot.js eval 'RO.v' [--city ath]     node tools/hot.js reset|status|errors|stop     node tools/hot.js reboot [fra|ath] [extra query, e.g. q=high&gfx=1; sticks for later reboots]
 //   node tools/hot.js shot out.jpg [--city ath]    (one rendered frame, slow in software GL)
 //   node tools/hot.js gym drive|foot|cam|park      small-world page (src/test/gym.js, ~3 s); then --city gym for eval/reload/shot
 // The first command starts the daemon (detached, log out/hot/hot.log); cities = HOT_CITIES (default fra,ath), port HOT_PORT (8890).
@@ -103,7 +103,7 @@ async function daemon(){
     out.push(`${c}: ${r}${o.errs.length>e0?' · ERR '+o.errs[e0]:''}`)}return out.join('\n')},
   async reset({city}){const out=[];for(const c of city?[city]:Object.keys(P)){const p=await page(c);out.push(c+': '+JSON.stringify(await p.evaluate(()=>__tq.reset())))}return out.join('\n')},
   async errors({city}){return Object.values(P).filter(o=>!city||o.c===city).map(o=>`${o.c}: ${o.errs.length} errors${o.errs.length?'\n  '+o.errs.slice(-5).join('\n  '):''}`).join('\n')},
-  async reboot({city}){const cs=city?[city]:Object.keys(P);await Promise.all(cs.map(c=>{if(P[c])P[c].errs=[];return boot(c)}));return cs.map(c=>`${c} booted ${P[c].boot.toFixed(1)} s`).join('\n')},
+  async reboot({city,q}){const cs=city?[city]:Object.keys(P);await Promise.all(cs.map(c=>{if(P[c])P[c].errs=[];return boot(c,q)}));return cs.map(c=>`${c} booted ${P[c].boot.toFixed(1)} s`).join('\n')},
   async shot({file,city}){const c=city||'fra',p=await page(c);await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.screenshot({path:path.resolve(file),type:/png$/.test(file)?'png':'jpeg',quality:/png$/.test(file)?undefined:75});return 'wrote '+file},
   async gym({kind}){const k=kind||'drive',t=Date.now();await boot('gym','gym='+k);const p=P.gym.p;await p.waitForFunction(()=>window.__gym&&__gym.ok,null,{timeout:8000,polling:50}).catch(()=>{});P.gym.boot=(Date.now()-t)/1000;const r=await p.evaluate(()=>window.__hot('JSON.stringify({x:RO.x,z:RO.z,foot:RO.foot,tReady:__tq.tReady})')).catch(e=>String(e));
    return `gym ${k} ready in ${P.gym.boot.toFixed(1)} s (page) · ${r} · errors ${P.gym.errs.length}${P.gym.errs.length?' · '+P.gym.errs[0]:''}\nuse --city gym with eval/reload/shot/reset`},
@@ -121,7 +121,7 @@ const send=j=>new Promise((res,rej)=>{const q=http.request({host:'127.0.0.1',por
 async function client(){
  const city=flag('--city');const j={cmd,city:typeof city==='string'?city:undefined};
  if(cmd==='reload'){j.files=pos;j.all=!!flag('--all');j.full=!!flag('--full');if(!pos.length)return console.log('usage: hot.js reload src/<mod>.js')}
- else if(cmd==='go')j.id=pos[0];else if(cmd==='eval')j.js=pos.join(' ');else if(cmd==='shot')j.file=pos[0]||'hot.jpg';else if(cmd==='reboot'&&pos[0])j.city=pos[0];else if(cmd==='gym')j.kind=pos[0];
+ else if(cmd==='go')j.id=pos[0];else if(cmd==='eval')j.js=pos.join(' ');else if(cmd==='shot')j.file=pos[0]||'hot.jpg';else if(cmd==='reboot'&&pos[0]){j.city=pos[0];if(pos[1])j.q=pos[1]}else if(cmd==='gym')j.kind=pos[0];
  try{console.log(await send(j))}catch(e){
   if(cmd==='stop')return console.log('not running');
   fs.mkdirSync(OUT,{recursive:true});const log=fs.openSync(OUT+'/hot.log','a');spawn(process.execPath,[__filename,'daemon'],{detached:true,stdio:['ignore',log,log],cwd:ROOT}).unref();
