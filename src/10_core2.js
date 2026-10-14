@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.19',date:'14 Oct 2026',items:[{t:'NEW',s:'Crashes knock bricks off, with smoke and fire; a car explodes only after about 6 hard hits and rebuilds in 2 s.'}]},
   {v:'v90m-beta.18',date:'13 Oct 2026',items:[{t:'NEW',s:'Race menu: CLIFF RUN and CANYON SPLIT builder tracks (2 laps each) are back.'}]},
   {v:'v90m-beta.17',date:'13 Oct 2026',items:[{t:'NEW',s:'Empty green fields now have grass clumps, flowers, rocks and trees (streamed in near you).'}]},
   {v:'v90m-beta.16',date:'13 Oct 2026',items:[{t:'FIXED',s:'The Sightseeing Bus has a roof now (it was an empty open frame), in the garage and in traffic.'},{t:'FIXED',s:'Portrait mode: the STORY button text no longer sticks out of its box.'},{t:'FIXED',s:'The camera no longer costs frame time (re-solving every 4 s removed).'}]},
