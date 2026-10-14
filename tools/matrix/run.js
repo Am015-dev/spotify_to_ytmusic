@@ -23,6 +23,9 @@ const up=()=>new Promise(r=>http.get('http://127.0.0.1:'+PORT+'/hot.html?probe=1
   if(FAMS.includes('builder')){const demos=await H('Object.keys(BX_DEMOS).filter(k=>!BX_DEMOS[k].hide)');
    for(const rid of rides){await H('MX.setRide('+JSON.stringify(rid)+')');
     for(const d of demos)await H('MX.bxCase('+JSON.stringify(d)+','+JSON.stringify(pr)+','+JSON.stringify(rid)+')')}}
+  if(FAMS.includes('roam')){const NS=+arg('--starts',150);const st=await H('MX.starts('+NS+')');
+   for(const rid of rides){await H('MX.setRide('+JSON.stringify(rid)+')');await H('MX.roamHud('+JSON.stringify(pr)+','+JSON.stringify(rid)+')');
+    const B=50;for(let i=0;i<st.length;i+=B){const js=st.slice(i,i+B).map((q,j)=>'MX.roamCase('+JSON.stringify(pr)+','+JSON.stringify(rid)+','+JSON.stringify(q)+','+(i+j)+','+((i+j)%25===0)+')').join(';');await H(js)}}}
   const res=await H('MX.R.slice()');for(const r of res){r.city=c;r.prof=pr}all.push(...res);errs.push(...E.map(e=>c+'/'+pr+' '+e));await ctx.close()}));
  await b.close();
  // ---- report: group FAILs by root cause (check id x family), one line per group with the case count

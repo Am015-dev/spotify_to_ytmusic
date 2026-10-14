@@ -47,5 +47,34 @@ const R=[];const MX={R,prof:'phone',ang,hud,
    hud(touch?['bxL','bxR','bxB','bxRsp','bxBack']:['bxRsp','bxBack'],fails,'bx-')
   }catch(e){fails.push('bx-crash:'+String(e).slice(0,60))}
   R.push({fam:'builder',tag:demo+'|'+prof+'|'+rid,fails,ms:performance.now()-t0});return fails.length},
+ // ---------------- free roam ----------------
+ starts(n){if(MX._st&&MX._st.length)return MX._st.slice(0,n);const S=new Map();for(let x=WX0+100;x<=WX1-100;x+=150)for(let z=WZS+100;z<=WZN-100;z+=150){const q=rfSnap(x,z,60);if(q)S.set(Math.round(q[0]/30)+','+Math.round(q[1]/30),q)}
+  const all=[...S.values()].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const step=Math.max(1,all.length/n),o=[];for(let i=0;i<n&&Math.floor(i*step)<all.length;i++)o.push(all[Math.floor(i*step)]);MX._st=o;return o},
+ roamCase(prof,rid,q,idx,prog){const fails=[],t0=performance.now();
+  try{
+   if(!roamWarp(q[0],q[1],q[2]))fails.push('roam-warp-refused');
+   else{
+    const touch=prof!=='desktop';TOUCH.on=touch;TOUCH.used=touch;TOUCH.gas=false;TOUCH.brake=false;for(const k in K)K[k]=false;
+    roamStep(1/120);for(let i=0;i<4;i++)roamPose(pl,.25);camSnap=true;roamCam(1/60)
+    const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
+    {const r=rfSnap(RO.x,RO.z,60);if(!r)fails.push('roam-off-road-at-start');else{const a=ang(fx,fz,Math.sin(r[2]),Math.cos(r[2]));if(a>20&&a<160)fails.push('roam-heading-vs-road')}}
+    if(SC_hit(RO.x,RO.z,RO.y))fails.push('roam-start-inside-wall');
+    if(RO.y<groundAt(RO.x,RO.z,RO.y+3)-.3)fails.push('roam-underground');
+    {const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('roam-tyre-gap>5cm');MX.last=pk&&pk.tyre}
+    {const m=pl.mesh.userData.m;m.updateMatrixWorld(true);const wd=new THREE.Vector3(0,0,-1).transformDirection(m.matrixWorld);if(ang(wd.x,wd.z,fx,fz)>20)fails.push('roam-visual-facing')}
+    {const c=camera.position,dx=c.x-RO.x,dz=c.z-RO.z,h=Math.hypot(dx,dz);if(!(h>2&&h<40&&(dx*fx+dz*fz)/h<-.5))fails.push('roam-camera-behind');if(c.y<RO.y)fails.push('roam-camera-below-car')}
+    if(prog){const x0=RO.x,z0=RO.z;if(touch)TOUCH.gas=true;else K.ArrowUp=true;let minV=1e9,wall0=SC_S.nb;for(let i=0;i<90;i++){roamStep(1/60);if(i>20)minV=Math.min(minV,RO.v)}K.ArrowUp=false;TOUCH.gas=false;
+     const mv=(RO.x-x0)*fx+(RO.z-z0)*fz;if(!(mv>5))fails.push('roam-no-forward-progress');if(minV<-1)fails.push('roam-reverses')}
+   }
+  }catch(e){fails.push('roam-crash:'+String(e).slice(0,70))}
+  R.push({fam:'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
+ // HUD of the profile once per ride (free roam)
+ roamHud(prof,rid){const fails=[];const touch=prof!=='desktop';
+  try{TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);const ids=touch?['tB','tL','tR','tP',...(thrEff()==='pedal'?['tG']:[])]:[];hud(ids,fails,'roam-');
+   if(touch){const g=vis(document.getElementById('tG'));if(!g&&!(typeof SET!=='undefined'&&SET.gas==='auto'||TOUCH.autoGas!==undefined))/* gas default on: GAS button may be hidden */void 0}
+   else for(const id of ['tB','tL','tR']){if(vis(document.getElementById(id)))fails.push('roam-hud-touch-controls-on-desktop-'+id)}
+  }catch(e){fails.push('roam-hud-crash:'+String(e).slice(0,60))}
+  R.push({fam:'roam-hud',tag:prof+'|'+rid,fails,ms:0});return fails.length},
+
 };
 window.MX=MX;return 'MX ready'})()
