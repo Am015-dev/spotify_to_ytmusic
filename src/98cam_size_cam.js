@@ -78,11 +78,10 @@ function CAM_meas(){camera.updateMatrixWorld(true);const foot=RO.foot&&RO.foot!=
 const CAM_pass=m=>!!m&&!m.road.blocked&&m.road.x>=1/3&&m.road.x<=2/3&&m.road.y>=.4&&m.road.y<=.85&&m.fill>=.15&&m.fill<=.35;
 // ---- 📍 GO: put the asked ride on a long straight Frankfurt street (centre of the lane, facing along it), stopped; 'foot' = on foot on a pavement
 const CAM_RIDES={bus:['t_bus','SIGHTSEEING BUS'],flatbed:['t_v60017_1','FLATBED (60017)'],truck:['t_v60059_1','LOGGER (60059), the longest/tallest truck'],sport:['t_v75870_1','Z06 RACER (75870), small sports car']};
-function CAM_road(minLen,steep){const N=HUB.nodes;if(!N)return null;const L=[];for(let i=0;i<N.length;i++){const A=N[i];if(!A||A.ab||!A.nb||!A.nb.length)continue;L.push([Math.hypot(A.x-RO.x,A.z-RO.z),i])}L.sort((a,b)=>a[0]-b[0]);let best=null;
- for(const[,i]of L.slice(0,steep?1200:400)){const A=N[i];for(const j of A.nb){const B=N[j];if(!B||B.ab)continue;const len=Math.hypot(B.x-A.x,B.z-A.z);if(len<minLen)continue;const dx=(B.x-A.x)/len,dz=(B.z-A.z)/len;let ok=true;
+function CAM_road(minLen){const N=HUB.nodes;if(!N)return null;const L=[];for(let i=0;i<N.length;i++){const A=N[i];if(!A||A.ab||!A.nb||!A.nb.length)continue;L.push([Math.hypot(A.x-RO.x,A.z-RO.z),i])}L.sort((a,b)=>a[0]-b[0]);
+ for(const[,i]of L.slice(0,400)){const A=N[i];for(const j of A.nb){const B=N[j];if(!B||B.ab)continue;const len=Math.hypot(B.x-A.x,B.z-A.z);if(len<minLen)continue;const dx=(B.x-A.x)/len,dz=(B.z-A.z)/len;let ok=true;
    for(let s=6;s<=len-6&&ok;s+=2){const x=A.x+dx*s,z=A.z+dz*s;if(roamHit(x,z,2.2,groundAt(x,z,99)+1)||CID==='fra'&&inRiver(x,z))ok=false}
-   if(ok){const w=Math.min(A.w||12,B.w||12),lo=w>=10?w/4:0,q={x:A.x+dx*12-dz*lo,z:A.z+dz*12+dx*lo,h:Math.atan2(dx,dz),len};if(!steep)return q;
-    const gr=Math.abs(groundAt(A.x+dx*12,A.z+dz*12,99)-groundAt(A.x+dx*(len-12),A.z+dz*(len-12),99))/Math.max(1,len-24);if(!best||gr>best.gr){q.gr=gr;best=q}}}}return best}
+   if(ok){const w=Math.min(A.w||12,B.w||12),lo=w>=10?w/4:0;return{x:A.x+dx*12-dz*lo,z:A.z+dz*12+dx*lo,h:Math.atan2(dx,dz),len}}}}return null}
 function CAM_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}if(RO.card){RO.card=null;$('#roamCard').hidden=true}
  if(kind==='foot'){const r=OF_go('walk');CAM.go={kind,done:1,t:performance.now()};return r.replace('walk ahead, then turn','check: road 10 m ahead in view')}
  try{OF_reset()}catch(e){}const R=CAM_RIDES[kind];if(!R)return'📍 ?';const G=CAM.go={kind,done:0,t:performance.now()};
