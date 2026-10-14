@@ -117,3 +117,9 @@ html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;paddin
 html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 4px}
 html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
 html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
+/* UI-BAR 2/9: text sits inside the painted frame, never on it */
+html.sk header.gx-bar .gx-ibtn.btn{border-image-width:10px 14px;padding-inline:14px}
+html.sk.ph header.gx-bar .gx-ibtn.btn{padding-inline:0}
+html.sk .gx-dock #prompt.box,html.sk .gx-dock #youbox.box{border-image-width:12px;padding:14px}
+header.gx-bar .pzb span{display:none}
+#news .newsbtn{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
