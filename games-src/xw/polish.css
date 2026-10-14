@@ -92,3 +92,4 @@
 .dlg.debrief[data-end=lose]{background-image:linear-gradient(180deg,rgba(14,12,42,.05) 0,rgba(14,12,42,.4) 110px,#0e0c2a 220px),var(--na-end-lose,none)}
 /* flat (simple) board shows the painted table under the map */
 body.flat .gx-board{background:#05040f var(--tbl-flat,none) center/cover no-repeat}
+.btn:not(.sm):not(.ghost){padding:13px 21px}   /* = painted frame 14/22 minus the 1px border, so the skin on/off boxes match */

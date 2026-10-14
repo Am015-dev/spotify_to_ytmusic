@@ -18,6 +18,8 @@
     camView('tilt'); render();
     return GXS.wait(function () { return G.phase === 'plan' && (BF.on || !PHN.on) && !UI.info; }, 15000).then(function () { return idle(900); });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tips on
+  GXS.boardOpen = function () { if (!booted()) return; return table(51).then(function () { UI.hints = true; try { GXH.setEnabled(true); } catch (e) { } render(); }); };
   var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
   var fonts = function (root, min) { var bad = []; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (e.children.length || !(e.textContent || '').trim() || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < min) bad.push(e.textContent.trim().slice(0, 16) + ' ' + px + 'px'); }); return bad; };
 
@@ -79,6 +81,7 @@
       Object.assign(UI, { mode: 'solo', camp: null, info: false, stats: false, rules: false, build: null, draft: {}, pass: null, sel: null, sugCache: null, autoSetup: false, advOpen: false, hints: false, hold: null, holdK: [], paused: false });
       newGame({ fac: [0, 1], players: [{ human: true }, { human: false, lvl: 'normal' }], squads: ART_SQ.map(function (a) { return a.map(function (x) { return { p: x.p, u: [] }; }); }), ex: { noRocks: true }, seed: 9 });
       UI.radio = { r: G.round, side: 0, who: 'Kael', t: 'Form up on me.' };
+      try { BF.seenBrief = G.seed; PHN.briefSeen = G.seed; } catch (e) { } try { BF.hideBan(); } catch (e) { }
       render(); GX.show('d-squads');
       return GXS.wait(function () { return document.querySelectorAll('#roster .pcard').length >= 9; }, 15000).then(function () {
         [].forEach.call(document.querySelectorAll('#roster .pc-art img'), function (i) { i.loading = 'eager'; });
