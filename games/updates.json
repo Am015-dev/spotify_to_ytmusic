@@ -139,72 +139,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "approach",
-  "title": "Painted menu row and tail",
-  "items": [
-   "Menu learn row and speech tail are painted",
-   "The landing and the crash now show a detailed 3D airliner",
-   "Low graphics keeps the old painted plane",
-   "Top bar, menus and buttons are now painted cockpit panels",
-   "Briefing is a real clipboard with painted check boxes",
-   "Weather and time-of-day badges on the briefing",
-   "Radio phrase buttons and the Roll plate are painted"
-  ],
-  "check": "Open Menu: the learn row is a painted strip",
-  "scn": [
-   "fa-art",
-   "fa-board",
-   "fa-board",
-   "fa-buttons",
-   "fa-zoom",
-   "fa-zoom",
-   "fa-buttons"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "shortfuse",
-  "title": "Painted art wired",
-  "items": [
-   "Menu tutorial row and speech tail are painted",
-   "Cutting a wire snaps a pair of pliers at it",
-   "A wrong cut wobbles a detailed bomb",
-   "When the fuse runs out the bomb blows up big",
-   "Wire racks, name plates and equipment cards are painted",
-   "A rope fuse with a spark and a painted bomb",
-   "Top bar, menus and buttons use the workshop kit"
-  ],
-  "check": "Open Settings: Tutorial is a painted strip",
-  "scn": [
-   "sf-art",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-board",
-   "sf-buttons"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "kaiten-kitchen",
   "title": "Painted art wired",
   "items": [
@@ -301,36 +235,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Painted art wired",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit",
-   "ROUND, region names and influence numbers on the map are bigger",
-   "Menu tutorial row, speech badge and detail sheet are painted"
-  ],
-  "check": "Open Menu: Tutorial sits on the painted strip",
-  "scn": [
-   "tb-board",
-   "tb-rivals",
-   "tb-board",
-   "tb-buttons",
-   null,
-   "tb-art"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "hollowbough",
   "title": "Painted art wired",
   "items": [
@@ -362,54 +266,6 @@
   "ask": [
    null,
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "doorkick",
-  "title": "Doorkick: scenario tests and steadier phone layout",
-  "items": [
-   "Gear slot plaques, curse token and rival chips are painted",
-   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
-   "Side panel is parchment with a painted Just happened strip",
-   "Help, Run and Fight keep their labels on the painted plates",
-   "Dock buttons no longer cut off at the phone bottom",
-   "Longer button labels wrap instead of being cut",
-   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
-   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario",
-   "Tutorial Help step: the Help button label is readable",
-   "Fight with bonuses: big YOU vs MONSTERS scoreline, colours, flying +N",
-   "Boss clip, then the monster card, with sound",
-   "Five rivals no longer push the hand off screen"
-  ],
-  "check": "Open each test with Try this",
-  "scn": [
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-fight-bonus",
-   "dk-tut-help",
-   "dk-board",
-   "dk-board",
-   "dk-fight-bonus",
-   "dk-zoom",
-   "dk-tut-help",
-   "dk-fight-bonus",
-   "dk-boss-reveal",
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   "Can you read the Help button?",
-   "Is YOU vs MONSTERS big and clear?",
-   "Boss clip, roar, then the monster card?",
    null
   ]
  },
@@ -454,44 +310,6 @@
    "LAB opens straight on a boss with ?boss=talos"
   ],
   "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
- },
- {
-  "date": "2026-10-13",
-  "game": "shelf",
-  "title": "Game versions and status page",
-  "items": [
-   "Every game card and the player bar show a version chip, like v47 and the date",
-   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
-   "Asset viewer has a new Games tab with the same numbers"
-  ],
-  "check": "Open the shelf, then Status (status.html) and the Games tab in the asset viewer."
- },
- {
-  "date": "2026-10-13",
-  "game": "rampart",
-  "title": "Painted look for Rampart & Vine",
-  "items": [
-   "Followers are painted pieces in each player's colour",
-   "Wooden score pills, oak top bar and a leather tile tray with a painted rotate button",
-   "Stone-framed menus and buttons, ribbon and goblet on the result"
-  ],
-  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour.",
-  "scn": [
-   "rv-board",
-   "rv-buttons",
-   "rv-buttons",
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
  },
  {
   "date": "2026-10-13",
@@ -572,85 +390,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "nebula",
-  "title": "Painted look for Nebula Aces",
-  "items": [
-   "Lancer and Talon hulls and the asteroids are detailed 3D models",
-   "Phones and Low graphics load lighter versions",
-   "Metal-and-glass buttons, panels and bar",
-   "Painted flight-plan cards for manoeuvres",
-   "Brass badges for hull, shields, focus, evade and lock",
-   "Painted ship art on pilot cards; painted star-chart arena floor"
-  ],
-  "check": "Start a battle: look at the buttons, the dial cards and the floor under the grid.",
-  "scn": [
-   "nb-board",
-   "nb-board",
-   "nb-board",
-   "nb-board",
-   "nb-board",
-   "nb-board",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "shipwreck",
-  "title": "Painted island and kit for Shipwreck Isle",
-  "items": [
-   "Pawns, palms, shelter and palisade are now detailed 3D models",
-   "Phones and Low graphics load lighter versions of the same models",
-   "Unexplored tiles are painted storm-fog; the island is drawn on painted tiles",
-   "Driftwood buttons, bar and panels",
-   "Painted action and resource icons (food, wood, fur, build, hunt...)"
-  ],
-  "check": "Start a game: look at the island, then open Camp and the plan list.",
-  "scn": [
-   "si-board",
-   "si-board",
-   "si-board",
-   "si-board",
-   "si-board",
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "sands",
   "title": "Button text size",
   "items": [
@@ -698,30 +437,318 @@
  },
  {
   "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Readable map labels",
+  "game": "approach",
+  "title": "Painted art wired",
   "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit",
-   "ROUND, region names and influence numbers on the map are bigger"
+   "The landing and the crash now show a detailed 3D airliner",
+   "Low graphics keeps the old painted plane",
+   "Top bar, menus and buttons are now painted cockpit panels",
+   "Briefing is a real clipboard with painted check boxes",
+   "Weather and time-of-day badges on the briefing",
+   "Radio phrase buttons and the Roll plate are painted",
+   "Menu learn row and speech tail are painted"
   ],
-  "check": "Open a game: read ROUND and the region names on the map",
+  "check": "Open Menu: the learn row is a painted strip",
   "scn": [
-   "tb-board",
-   "tb-rivals",
-   "tb-board",
-   "tb-buttons",
-   null
+   "fa-board",
+   "fa-board",
+   "fa-buttons",
+   "fa-zoom",
+   "fa-zoom",
+   "fa-buttons",
+   "fa-art"
   ],
   "ask": [
    null,
    null,
    null,
    null,
+   null,
+   null,
    null
   ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shortfuse",
+  "title": "Painted art wired",
+  "items": [
+   "Cutting a wire snaps a pair of pliers at it",
+   "A wrong cut wobbles a detailed bomb",
+   "When the fuse runs out the bomb blows up big",
+   "Wire racks, name plates and equipment cards are painted",
+   "A rope fuse with a spark and a painted bomb",
+   "Top bar, menus and buttons use the workshop kit",
+   "Menu tutorial row and speech tail are painted"
+  ],
+  "check": "Open Settings: Tutorial is a painted strip",
+  "scn": [
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-board",
+   "sf-buttons",
+   "sf-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten",
+  "title": "Painted art wired",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "kk-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "lantern",
+  "title": "Painted art wired",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit",
+   "Painted card frames, tick/cross, seat plates, portrait Descent table"
+  ],
+  "check": "Do cards, seats and job marks look painted?",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "ld-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "thornbound",
+  "title": "Painted art wired",
+  "items": [
+   "The winner's screen now shows a detailed 3D crown that drops in and sways",
+   "Faction emblems on the seat chips and faction sheet",
+   "Wax seal strength plates on the map and a painted round shield",
+   "Buttons, bars and menus use the painted vellum kit",
+   "ROUND, region names and influence numbers on the map are bigger",
+   "Menu tutorial row, speech badge and detail sheet are painted"
+  ],
+  "check": "Open Menu: Tutorial sits on the painted strip",
+  "scn": [
+   "tb-board",
+   "tb-rivals",
+   "tb-board",
+   "tb-buttons",
+   null,
+   "tb-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick",
+  "title": "Doorkick: scenario tests and steadier phone layout",
+  "items": [
+   "Gear slot plaques, curse token and rival chips are painted",
+   "Fight numbers sit on blue and red medallions with crossed swords; hero ring and draw-pile stacks added",
+   "Side panel is parchment with a painted Just happened strip",
+   "Help, Run and Fight keep their labels on the painted plates",
+   "Dock buttons no longer cut off at the phone bottom",
+   "Longer button labels wrap instead of being cut",
+   "The fight now shows a big YOU vs MONSTERS scoreline at the top: green when you win, red when you lose, with the gap. Bonuses fly into the totals.",
+   "Test mode: open 🧪 LAB, tap ▶ GO on any scenario",
+   "Tutorial Help step: the Help button label is readable",
+   "Fight with bonuses: big YOU vs MONSTERS scoreline, colours, flying +N",
+   "Boss clip, then the monster card, with sound",
+   "Five rivals no longer push the hand off screen",
+   "Hand and level icons, speech-bubble tail, 3D winner hero",
+   "Lightbulb, first-time tips, rules cards, Tips switch",
+   "Drag/tap status line is 8 words or fewer"
+  ],
+  "check": "Open each test with Try this",
+  "scn": [
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-fight-bonus",
+   "dk-tut-help",
+   "dk-board",
+   "dk-board",
+   "dk-fight-bonus",
+   "dk-zoom",
+   "dk-tut-help",
+   "dk-fight-bonus",
+   "dk-boss-reveal",
+   null,
+   "dk-art",
+   "dk-tips",
+   "dk-status-line"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   "Can you read the Help button?",
+   "Is YOU vs MONSTERS big and clear?",
+   "Boss clip, roar, then the monster card?",
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "rampart",
+  "title": "Painted look for Rampart & Vine",
+  "items": [
+   "Followers are painted pieces in each player's colour",
+   "Wooden score pills, oak top bar and a leather tile tray with a painted rotate button",
+   "Stone-framed menus and buttons, ribbon and goblet on the result",
+   "Painted pieces, menu rows, bubble tail"
+  ],
+  "check": "Place a tile, then a follower: your piece should be a painted wooden figure in your colour.",
+  "scn": [
+   "rv-board",
+   "rv-buttons",
+   "rv-buttons",
+   "rv-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "nebula",
+  "title": "Painted look for Nebula Aces",
+  "items": [
+   "Lancer and Talon hulls and the asteroids are detailed 3D models",
+   "Phones and Low graphics load lighter versions",
+   "Metal-and-glass buttons, panels and bar",
+   "Painted flight-plan cards for manoeuvres",
+   "Brass badges for hull, shields, focus, evade and lock",
+   "Painted ship art on pilot cards; painted star-chart arena floor",
+   "Every hull shows its own painted ship; radio strip on a painted plate"
+  ],
+  "check": "Start a battle: look at the buttons, the dial cards and the floor under the grid.",
+  "scn": [
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-board",
+   "nb-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shipwreck",
+  "title": "Painted island and kit for Shipwreck Isle",
+  "items": [
+   "Pawns, palms, shelter and palisade are now detailed 3D models",
+   "Phones and Low graphics load lighter versions of the same models",
+   "Unexplored tiles are painted storm-fog; the island is drawn on painted tiles",
+   "Driftwood buttons, bar and panels",
+   "Painted action and resource icons (food, wood, fur, build, hunt...)",
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm"
+  ],
+  "check": "Start a game: look at the island, then open Camp and the plan list.",
+  "scn": [
+   "si-board",
+   "si-board",
+   "si-board",
+   "si-board",
+   "si-board",
+   "si-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "shelf",
+  "title": "Test mode and LAB in every game",
+  "items": [
+   "Every game card and the player bar show a version chip, like v47 and the date",
+   "New Status page lists, per game, what is painted, what is missing and what is made but not in the game",
+   "Asset viewer has a new Games tab with the same numbers",
+   "Shelf: turn on 🧪 Test mode next to ✔ Test",
+   "In a game: 🧪 LAB lists its scenarios, ▶ GO opens one",
+   "📍 pinned checklist: GO, ✅ Works / ❌ Problem",
+   "lab.html: every game, every scenario, one page"
+  ],
+  "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario"
  },
  {
   "date": "2026-10-10",
@@ -1100,18 +1127,24 @@
   "items": [
    "Painted tiles and table skins",
    "New card backs, title and end art, portraits",
-   "Music for each screen with a Music picker"
+   "Music for each screen with a Music picker",
+   "New carved top bar and painted icon buttons",
+   "Parchment menus and dialogs with gilt corners",
+   "Painted story map with medallion chapters and act banners",
+   "The six tribes are now painted meeples on the board"
   ],
   "check": "Start a game and look at the tiles and table.",
   "scn": [
    "sq-board",
    "sq-zoom",
    "sq-help",
-   null,
-   null,
-   null
+   "sq-board",
+   "sq-help",
+   "story-scene",
+   "sq-board"
   ],
   "ask": [
+   null,
    null,
    null,
    null,

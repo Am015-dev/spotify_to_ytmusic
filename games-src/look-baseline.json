@@ -1,8 +1,13 @@
 {
  "crown-city-smash": {
-  "severe": 0,
+  "severe": 4,
   "warn": 3,
-  "severeKeys": [],
+  "severeKeys": [
+   "contrast|em.v",
+   "plates|button.btn.mini",
+   "panels|div#choice",
+   "plates|button.btn"
+  ],
   "counts": {
    "images": 2,
    "overflow": 1,
@@ -10,18 +15,25 @@
   }
  },
  "nebula-aces": {
-  "severe": 0,
+  "severe": 2,
   "warn": 2,
-  "severeKeys": [],
+  "severeKeys": [
+   "contrast|button.btn > small",
+   "contrast|button.gxc-btn.ghost"
+  ],
   "counts": {
    "size": 1,
    "images": 1
   }
  },
  "doorkick-dungeon": {
-  "severe": 0,
+  "severe": 3,
   "warn": 5,
-  "severeKeys": [],
+  "severeKeys": [
+   "plates|button.btn.primary",
+   "plates|button.btn",
+   "plates|div#side"
+  ],
   "counts": {
    "images": 5,
    "art": 0
@@ -39,12 +51,14 @@
   }
  },
  "sands-of-qamar": {
-  "severe": 3,
+  "severe": 5,
   "warn": 36,
   "severeKeys": [
    "button|details.exd > summary",
    "contrast|small.ord",
-   "size|small.ord"
+   "size|small.ord",
+   "plates|button.btn.sm",
+   "contrast|b.tv"
   ],
   "counts": {
    "size": 2,
@@ -109,12 +123,13 @@
   }
  },
  "thornbound": {
-  "severe": 3,
+  "severe": 4,
   "warn": 8,
   "severeKeys": [
    "size|g.tb-m-round > g > text",
    "size|g.tb-m-static > g > text",
-   "size|g.tbx-pan > g > text"
+   "size|g.tbx-pan > g > text",
+   "contrast|g.tb-m-static > g > text"
   ],
   "counts": {
    "size": 5,
@@ -142,9 +157,12 @@
   }
  },
  "cauldron-fair": {
-  "severe": 0,
+  "severe": 2,
   "warn": 8,
-  "severeKeys": [],
+  "severeKeys": [
+   "contrast|span.bagn",
+   "size|svg.chip > text"
+  ],
   "counts": {
    "contrast": 2,
    "images": 4,

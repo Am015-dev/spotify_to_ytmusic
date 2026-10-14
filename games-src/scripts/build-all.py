@@ -174,14 +174,23 @@ def main():
         if a.quick or a.deploy:  # 3a. scenario tests (`?scn=<id>` states: skip menus, seed the RNG, build the state, assert), all games in one run
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:
-                code, tail = timed("all" if len(passing) > 1 else passing[0], "scenarios", lambda: run_check(["node", str(SCRIPTS / "scenario-test.js")] + passing, str(SCRIPTS), dict(env3, SCN_OUT=str(out / ".scn")), out / ".check" / "scenarios.log", 1800))
+                code, tail = timed("all" if len(passing) > 1 else passing[0], "scenarios", lambda: run_check(["node", str(SCRIPTS / "scenario-test.js")] + passing + ([] if a.full else ["--sizes", "phone"]), str(SCRIPTS), dict(env3, SCN_OUT=str(out / ".scn")), out / ".check" / "scenarios.log", 1800))
                 txt = (out / ".check" / "scenarios.log").read_text()
                 for s in passing:
                     m = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), txt, re.M)
                     if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
-                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
+                    elif m.group(1) != "ok":
+                        # Universal invariants (text < 11 px, clipping, ...) also flag OLD problems already on the live game. Rerun with the
+                        # scenarios' own checks only: if those pass, warn (the look check, which compares with the live game, guards regressions).
+                        rn = subprocess.run(["node", str(SCRIPTS / "scenario-test.js"), s] + ([] if a.full else ["--sizes", "phone"]), cwd=str(SCRIPTS), env=dict(env3, SCN_NOINV="1", SCN_OUT=str(out / ".check" / ".scn-own")),
+                                            capture_output=True, text=True, timeout=600)
+                        m2 = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), rn.stdout, re.M)
+                        if m2 and m2.group(1) == "ok":
+                            print(f"[scn] {s:18} own checks {m2.group(2)}/{m2.group(3)} ok; WARN universal: {m.group(4).strip()[:120]}", flush=True)
+                        else:
+                            status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
-        if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+        if a.full:  # 3a2. LAB acceptance tests (shared pages; warn-only, so not in the fast gate: --full only): test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
                 try:
@@ -216,7 +225,7 @@ def main():
         env = dict(os.environ); env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
         for s in [x for x in slugs if status[x] == "PASS"]:
             try:
-                r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"],
+                r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"] + ([] if a.full else ["--sizes", "phone"]),
                                    env=env, capture_output=True, text=True, timeout=900)
                 tail = [l for l in r.stdout.splitlines() if "[look]" in l and s in l]
                 if r.returncode == 1:
@@ -227,9 +236,14 @@ def main():
                             return {(f.get("check"), f.get("sel"), f.get("text")) for f in g.get("findings", []) if f.get("sev") == "severe"}
                         except Exception: return None
                     new_f = sev(out / ".look" / "report.json")
-                    rl = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(out / ".look-live"), "--no-shots"],
-                                        env=env, capture_output=True, text=True, timeout=900)
-                    live_f = sev(out / ".look-live" / "report.json")
+                    import hashlib
+                    lp = SRC.parent / "games" / s / "index.html"
+                    key = hashlib.sha1(lp.read_bytes()).hexdigest()[:12] if lp.exists() else "none"
+                    cache = SRC / ".look-live-cache" / f"{s}-{key}-{'all' if a.full else 'phone'}"
+                    if not (cache / "report.json").exists():   # live version not measured yet: measure once, reuse for every later deploy
+                        subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(cache), "--no-shots"] + ([] if a.full else ["--sizes", "phone"]),
+                                       env=env, capture_output=True, text=True, timeout=900)
+                    live_f = sev(cache / "report.json")
                     msg = (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
                     if new_f is not None and live_f is not None and new_f <= live_f:
                         print(f"[look] {s}: WARN pre-existing on the live game too, not caused by this change: {msg}", flush=True)

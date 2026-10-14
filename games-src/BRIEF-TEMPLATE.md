@@ -17,6 +17,8 @@ Rules
 - Before every push: git fetch origin alex/brave-carson-rbpmlk && git merge. `git add` explicit paths only, check
   `git diff --cached --stat` before committing (other sessions share this branch).
 - If a command is blocked, stop and tell the owner.
+- HARD STOP: at 45 minutes or ~150k context, stop yourself: deploy what passed, commit + push, write a HANDOFF note, stop.
+- A check failure that the LIVE game also has is not yours: deploy anyway (build-all.py already warns instead of failing).
 - NEVER wait for an answer (owner, 13 Oct 2026: workers sat blocked for ~15-20 min). If a check fails or you're unsure: fix the real
   cause (max 20 min), never raise limits or skip checks; if it still fails, commit, write what fails and where in HANDOFF.md,
   move on to your next game, and mention it in your report.

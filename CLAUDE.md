@@ -33,7 +33,9 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
     or hint text ≠ finger, on-screen scores ≠ engine, anything stuck >8 s, covered buttons, horizontal scroll.
     Deploy gate (owner, 13 Oct 2026: "fast tests, not hours of sweeps", Overdrive-style): `build-all.py --deploy`
     = phone-check + the change's `?scn=` GO scenario tests + look check; any failure blocks. NO game playing
-    (owner: "don't play the game"): sweeps run only with `--full`, for engine/rules changes. The owner checks via the
+    (owner: "don't play the game"): sweeps run only with `--full`, for engine/rules changes. The fast gate tests at
+    phone size only (390×763); all sizes + LAB test run with `--full`. Max 2 deploys at once per machine (4 cores; 5 at once
+    pushed the load to 17 and 3D games render in software). The owner checks via the
     ✔ Test checklist scenarios (one tap each), not by playing whole games.
   - The owner's bug reports go first into the fixer's brief, then into the sweep.
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
@@ -67,10 +69,9 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   bug; the fixer fixes until the sweep is clean and reports in under 150 words. No AI-tester rework loops.
 - Cloud sessions allowed (owner, 6 Oct 2026): ONE WORKER PER GAME, at most 15 at a time, Haiku or Sonnet per the model tiers (owner, 13 Oct 2026); every title starts with its group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) and the session gets the matching `group:<name>` tag, and HANDOFF.md keeps the groups table current; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
 - Answer each helper report once; ignore duplicate notifications. Commit work in progress as you go.
-- No PR subscriptions, polling or scheduled wake-ups unless the owner asks. Exception (owner, 13 Oct 2026): the orchestrator runs an
-  hourly worker watchdog routine that makes any Game Night worker WRAP UP (commit + push all work, HANDOFF note, deploy what
-  passed) and only then archives it, if it is running > 2 h with no deploy in the last
-  60 min, over 200k context, or blocked > 30 min, notes it in HANDOFF.md and starts one replacement for what is left.
+- No PR subscriptions, polling or scheduled wake-ups unless the owner asks. (The 13 Oct watchdog routines were removed: scheduled
+  sessions can't see or stop other sessions.) Instead every worker STOPS ITSELF at 45 minutes or ~150k context: deploy what passed,
+  commit + push, HANDOFF note, stop. The orchestrator checks all workers (get_session) at every owner message and archives finished ones.
 - Prove the approach on one game before touching others. Clarity before features.
 - **Read less (owner, 13 Oct 2026: 98% of tokens were workers re-reading their own long contexts):**
   - Start from the code map, not the files: `games-src/scripts/find.sh --maps`, then the game's `MODULES.md` and
