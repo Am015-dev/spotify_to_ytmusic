@@ -50,3 +50,23 @@ Code: `src/98b2_builder2.js` (builder), `src/99c_checklist.js` (bxT items + GO).
 - tData now runs 4 tracks (`bx-t-city` added, with a checklist item + GO). All 4 PASS.
 - Polish: each world has its own landmark (`BX_landmark`: city TV tower, islands lighthouse, canyon brick stack, otherwise the minifig). Banners are printed boards on legs (`BX.banMat`). Crowds are separate minifigs on a grey stand.
 - Known: canyon, lagoon and city share one layout (different worlds and scenery). A distinct city layout needs a bigger grid (BXN=40 is global).
+
+## trk-2, part 2 (Alex beta.22: "car drives backwards, no race methods")
+- Root causes:
+  - BX_car drew the ride 180° backwards: inner yaw is now +PI; matrix bx-visual-facing 8/8.
+  - With the nose pinned into the rail the car had no yaw authority. The rail now slides the nose along the course, and BX_wrongWay turns the car to face the course after 2.5 s facing backwards or stuck.
+- Race mode, at the end of 98b2: 3-2-1-GO countdown holding the car, 5 rivals (BX_racePath = the dry lane, curve speed profile), position + lap timer in #bxRace, results card #bxRes.
+  - Overlays must live inside #bx: builder mode hides every other body child.
+  - Checklist item bx-race; test tools/bx/tRace.js.
+- Grid 40 -> 56 cells (BX_OFF=8):
+  - bxCh(w,c,L,o=BX_OFF): old 40-grid cells keep their metres. New layouts pass o=0.
+  - Saved tracks migrate on load (log v3).
+  - plan.js takes 56-grid layouts; set OLD=1 for 40-grid files.
+- Distinct layouts:
+  - CANYON: the original snail.
+  - LAGOON: a figure-8 over the sea with a 12 m bridge, splash vs detour.
+  - CITY: a downtown square ring, viaduct over the lake, kicker lane vs detour; the blocks and lake were moved.
+  - Generators live in the session scratchpad (gen.js figure-8, gen2.js ring). Layouts are checked with plan.js before install.
+- Boost pads are blue tiles; kickers have a striped lip; there are 3 m rail pennants; pillars stay 9 m clear of lower roads. The track check asserts 0 view blockers.
+- Env: if tools/unit crashes on three.module.js, run `npm i --no-save --no-package-lock three@0.164.1`. Restart `python3 -m http.server 8766` after a container restart. Page boot sometimes times out once; retry.
+- Next: rivals on boats/split lanes, rubber-banding.
