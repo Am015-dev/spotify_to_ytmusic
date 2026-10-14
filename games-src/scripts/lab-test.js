@@ -28,8 +28,19 @@ async function runChecks(page, fails, id) {   // same step/tap protocol as scena
   if (info.id !== id) { fails.push(`${id}: GO opened ${info.id} (page ${page.url().slice(-40)})`); return; }
   await sleep(600);
   for (let i = 0; i < (info.checks || []).length; i++) {
-    const r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw' }));
+    let r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw' }));
+    for (let k = 0; !r.ok && info.checks[i].kind === 'eq' && k < 8; k++) { await sleep(400); r = await page.evaluate(i => GXS.step(i), i).catch(() => r); }   // an animated tally gets ~3 s to land
     if (!r.ok) { fails.push(`${id}: ${r.msg}`); continue; }
+    if (r.play) {   // behaviour check: real taps step by step, the turn must settle, then the outcome is asserted (same protocol as scenario-test.js)
+      let bad = '';
+      for (let j = 0; j < r.play.n && !bad; j++) { let tries = 0, p;
+        do { p = await page.evaluate(([i, j]) => GXS.pstep(i, j), [i, j]); if (p.err) { bad = p.err; break; } if (p.skip) break; await page.touchscreen.tap(p.x, p.y); await sleep(p.after); tries++; }
+        while (p.until && tries < p.max && !(await page.evaluate(([i, j]) => GXS.puntil(i, j), [i, j]))); }
+      if (bad) { fails.push(`${id}: ${bad}`); continue; }
+      let idle = await page.evaluate(i => GXS.pidle(i), i);
+      for (let k = 0; idle.assist && k < 12; k++) { await page.touchscreen.tap(idle.assist.x, idle.assist.y); await sleep(500); idle = await page.evaluate(i => GXS.pidle(i), i); }
+      if (!idle.ok) { fails.push(`${id}: ${idle.msg || 'question never answered'}`); continue; }
+      await sleep(200); const a = await page.evaluate(i => GXS.pend(i), i); if (!a.ok) fails.push(`${id}: ${a.msg}`); continue; }
     const pt = r.tap || r.hold; if (!pt) continue;
     if (r.hold) { const cd = await page.context().newCDPSession(page); await cd.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: pt.x, y: pt.y }] }); await sleep(pt.ms);
       const a = await page.evaluate(i => GXS.after(i), i).catch(() => ({ ok: false, msg: 'after threw' })); if (!a.ok) fails.push(`${id}: ${a.msg}`);
