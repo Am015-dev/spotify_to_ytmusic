@@ -4,7 +4,7 @@
 // Test (checklist bv1/*, GO parks you on the densest street): same variant within 100 m ≤ 20 %, ≥ 3 facade types per 80 m block. ?bv=0 = off.
 const BV={on:!/[?&]bv=0\b/.test(location.search),G:new Map(),C:80,last:null};
 const BV_k=(x,z)=>Math.floor(x/BV.C)*100000+Math.floor(z/BV.C);
-function BV_reset(){BV.G=new Map()}
+function BV_reset(){BV.G=new Map();BV.RB=[]}
 function BV_add(x,z,key,fac,o){const k=BV_k(x,z);let A=BV.G.get(k);if(!A)BV.G.set(k,A=[]);A.push(Object.assign({x,z,key,fac},o))}
 // how many buildings within r m carry each key (or facade, by='fac')
 function BV_near(x,z,r,by){const n={},c=Math.ceil(r/BV.C),kx=Math.floor(x/BV.C),kz=Math.floor(z/BV.C);for(let a=-c;a<=c;a++)for(let b=-c;b<=c;b++){const A=BV.G.get((kx+a)*100000+kz+b);if(!A)continue;
@@ -42,7 +42,12 @@ function BV_roof(E,U,x,z,ry,h,L){const{w,d}=U,r=BV_h(x,z,11);
   else if(U.rf==='garden'){E('box',x,h+.5,z,ry,w-1.2,.18,d-1.2,0x5a9a3e);for(let i=0;i<3;i++){const[px,pz]=L((i-1)*w*.28,(BV_h(x,z,12+i)-.5)*d*.5);E('box',px,h+.68,pz,ry,1.6,.9,1.6,i%2?0x3f8a30:0x62b848)}
     const[gx,gz]=L(w*.2,-d*.2);E('box',gx,h+2.6,gz,ry,w*.35,.14,d*.3,0xf2eee6);for(const[a,b]of[[-1,-1],[1,-1],[-1,1],[1,1]]){const[qx,qz]=L(w*.2+a*w*.16,-d*.2+b*d*.13);E('box',qx,h+.6,qz,ry,.18,2,.18,0xf2eee6)}}
   else if(U.rf==='tank'){const n=1+Math.floor(r*3);for(let i=0;i<n;i++){const[tx,tz]=L((i-(n-1)/2)*3.2,-d*.15);E('box',tx,h+.6,tz,ry,2.2,.12,1.6,0x24406a);E('box',tx,h+.7,tz,ry,.08,1,.08,0x8a8a8a);
-    const[cx,cz]=L((i-(n-1)/2)*3.2,-d*.15-1.3);E('box',cx,h+1.4,cz,ry,1.9,.75,.75,0xf4f4f0)}}}
+    const[cx,cz]=L((i-(n-1)/2)*3.2,-d*.15-1.3);E('box',cx,h+1.4,cz,ry,1.9,.75,.75,0xf4f4f0)}}
+  // art-4: rooftop billboard on flat poly roofs ≥ 12 m (the classic Athens skyline): 2 steel legs + framed 2-band poster facing the front, district colours, 1 in 10 flat roofs (5 instanced boxes each; ?bvr=0 = off)
+  else if(U.rf==='flat'&&h>=12&&w>=7&&r<.1&&!/[?&]bvr=0\b/.test(location.search)){const bw=Math.min(w*.75,11),P=BV_PAL[BV_sty(x,z)]||BV_PAL.poly||['#d8302a','#ffd12c'],pc=i=>parseInt(P[Math.floor(BV_h(x,z,60+i)*P.length)%P.length].slice(1),16),lz=d*.1;
+   for(const a of[-.35,.35]){const[qx,qz]=L(a*bw,lz-.3);E('box',qx,h+.2,qz,ry,.3,2.6,.3,0x5a5e66)}const[fx,fz]=L(0,lz);E('box',fx,h+2.6,fz,ry,bw+.4,3.6,.25,0x2a2a2e);
+   const[ax,az]=L(0,lz+.16);E('box',ax,h+4.25,az,ry,bw,1.75,.08,pc(0));E('box',ax,h+2.8,az,ry,bw,1.45,.08,pc(1));
+   const[ex,ez]=L(0,d/2+2);(BV.RB||(BV.RB=[])).push({x:ex,z:ez,t:'roofbill',h:ry})}}
 // ---------- street life (art-3): every building whose front faces a street (front point ≤ 14 m from the road edge) gets ONE storefront piece,
 // the least used within 100 m: shop (dark glass + sign + awning), café (striped awning + 2 tables, 4 chairs against the wall), kiosk (Trinkhalle /
 // periptero box), billboard (wall poster 5-8 m up, buildings ≥ 10 m) or mural (side wall, 3 bold shapes) or nothing. Colours = the district's palette.
@@ -50,7 +55,7 @@ function BV_roof(E,U,x,z,ry,h,L){const{w,d}=U,r=BV_h(x,z,11);
 const BV_PAL={bank:['#1f4a8a','#0d7a8a','#c0c8d0','#2a7ad8'],old:['#7a2a2a','#2a5a3a','#c8a040','#5a3a24'],grz:['#e8822a','#3f8a4a','#d6337f','#ffcc00'],ware:['#ff3a8a','#3ad0ff','#ffd12c','#7a3aff','#3aff8a'],
   off:['#2a7ad8','#ff7a1c','#3aa04a','#e8302a'],mix:['#e8302a','#2a7ad8','#ffcc00','#3aa04a','#ff7a1c','#d6337f','#1fb5b0'],plaka:['#2f6f9a','#8a2a2a','#3a7a4a','#c8643c'],poly:['#e8302a','#0d5eaf','#ffcc00','#1fb5b0','#ff7a1c','#7a3aa0']};
 function BV_sty(x,z){if(CID==='fra')return typeof CV_fsty==='function'?CV_fsty(x,z):'mix';const s=typeof athStyleAt==='function'?athStyleAt(x,z):'poly';return s==='plaka'||s==='old'?'plaka':s==='town'||s==='villa'?'grz':'poly'}
-function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;BV.L=[];const fra=CID==='fra',T=fra?['shop','cafe','kiosk','bill','mural','none']:['cafe','kiosk','bill','mural','none'],W=fra?[3,2,1,1.2,1.2,.6]:[2,1,1.2,1.2,3];
+function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;BV.L=(BV.RB||[]).slice();const fra=CID==='fra',T=fra?['shop','cafe','kiosk','bill','mural','none']:['cafe','kiosk','bill','mural','none'],W=fra?[3,2,1,1.2,1.2,.6]:[2,1,1.2,1.2,3];
   const BI=new Map();for(const b of HUB.bld||[])BI.set(Math.round(b.x)+'|'+Math.round(b.z),b);const LG=new Map(),I=new Map(),hx=c=>parseInt(c.slice(1),16);
   const near=(x,z)=>{const n={},kx=Math.floor(x/100),kz=Math.floor(z/100);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(const o of LG.get((kx+a)*100000+kz+b)||[])if((o.x-x)**2+(o.z-z)**2<1e4)n[o.t]=(n[o.t]||0)+1;return n};
   const box=(x,y,z,ry,sx,sy,sz,c)=>{const k=Math.floor(x/1600)*1000+Math.floor(z/1600);let A=I.get(k);if(!A)I.set(k,A=[]);A.push(x,y,z,ry,sx,sy,sz,typeof c==='string'?hx(c):c)};
