@@ -445,39 +445,60 @@
  ],
  "rampart-and-vine": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "rv-board",
    "name": "Start of game board",
    "ask": "Is the table clear with glowing spots?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "rv-zoom",
    "name": "Tile zoom: place a follower",
    "ask": "Is the zoomed tile and its spots clear?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "rv-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "rv-buttons",
    "name": "Painted buttons keep their labels",
    "ask": "Are the buttons readable?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "rv-art",
+   "name": "Painted pieces, rows and bubble tail",
+   "ask": "Are the pieces painted and coloured?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ],
  "sands-of-qamar": [
