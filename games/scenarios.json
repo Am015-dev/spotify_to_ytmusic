@@ -403,6 +403,22 @@
    "mut": 0
   },
   {
+   "id": "kk-uibar",
+   "name": "UI bar: top bar, panels, dock, art",
+   "ask": "Are the bar, panels and dock clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar-start",
+   "name": "UI bar: start screen",
+   "ask": "Is the start screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "kk-art",
    "name": "Painted art: menu row and speech tail",
    "ask": "Do the menu row and tip tail look painted?",
