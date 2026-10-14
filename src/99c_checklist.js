@@ -22,7 +22,7 @@ function RV2K_drive(sec,tick,done){const K=(c,on)=>dispatchEvent(new KeyboardEve
   try{tick&&tick(dt,t)}catch(er){}if(t<sec&&state==='roam')return requestAnimationFrame(f);for(const c in H)set(c,false);done(t)};requestAnimationFrame(f)}
 function RV2K_txt(e){return((e&&e.innerText)||'').replace(/\s+/g,' ').trim()}
 function RV2K_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?'portrait':'landscape',home=()=>{const q=rfSnap(-375,475,120);roamWarp(q?q[0]:-375,q?q[1]:475,q&&q[2]!=null?q[2]:0,true);RO.v=0;camSnap=true};
- if(kind==='race'){if(!RV14_start('rival',null,0))return'📍 no rival marker ❌';let n=0;const iv=setInterval(()=>{n++;const st=state;if(st==='results'){iv.r=(iv.r||0)+1;if(iv.r<4)return}else if(n<480)return;clearInterval(iv);if(st!=='results')return say('📍 HANDS-OFF RIVAL RACE · still racing after 240 s with no input (stuck, no respawn, no DNF) ❌');
+ if(kind==='race'){if(!RV14_start('rival',null,0))return'📍 no rival marker ❌';let n=0,rr0=0;const iv=setInterval(()=>{n++;const st=state;if(st==='results'){rr0++;if(rr0<4)return}else if(n<480)return;clearInterval(iv);if(st!=='results')return say('📍 HANDS-OFF RIVAL RACE · still racing after 240 s with no input (stuck, no respawn, no DNF) ❌');
    const m=RV2K_txt(document.body).match(/YOU\s*(\d)(ST|ND|RD|TH)/);const pl1=m&&m[1]==='1';say('📍 HANDS-OFF RIVAL RACE · no input at all · you finished '+(m?m[1]+m[2]:'?')+' (must NOT be 1st and must END within 240 s: a race you do not steer is lost)'+ok(m&&!pl1))},500);
   return'📍 HANDS-OFF RACE · do NOT touch anything until the result…'}
  if(kind==='walls'){home();let hits=0,prev=RO.lastHit,hp=100;RV2K_drive(60,()=>{if(RO.lastHit<prev-.1)hits++;prev=RO.lastHit;hp=Math.min(hp,RO.hp)},t=>{const pm=hits/(t/60);
