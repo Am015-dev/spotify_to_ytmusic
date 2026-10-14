@@ -66,15 +66,18 @@
   "items": [
    "Menus use one title font and one body font, no overlaps",
    "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art",
-   "Start screen simplified, one Menu drawer in the top bar, bigger text and clear insets on every panel"
+   "Start screen simplified, one Menu drawer in the top bar, bigger text and clear insets on every panel",
+   "UI-BAR checks for top bar, start screen and dock"
   ],
   "check": "Open Campaign: the three top buttons read cleanly",
   "scn": [
    "menu",
    "menu",
-   "menu"
+   "menu",
+   "ui-bar"
   ],
   "ask": [
+   null,
    null,
    null,
    null
