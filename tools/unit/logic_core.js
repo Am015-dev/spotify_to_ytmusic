@@ -3,6 +3,7 @@
 const L=require('./lib.js');
 module.exports=async T=>{
  const THREE=await L.THREE();
+ if(!THREE){console.log('SKIP '+'logic_core.js'+': three.js missing: run  npm i three@0.164.1 --no-save  (node_modules is not tracked)');return}
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),calls={};
  const rec=n=>(...a)=>{calls[n]=(calls[n]||0)+1};
  // ===================== DMG_impact =====================
